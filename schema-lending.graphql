@@ -174,9 +174,27 @@ type InterestRate @entity {
 # There is a wide range of formats of lending protocols
 # And there are many unique mappings when it comes to input / output tokens
 # This generic type will help define the unique relationships between tokens in a market
-type TokenBalances @entity {
-  " { Input Token Address }-{ Optional: Snapshot ID } "
+# You can think of this as a 1:M relationship between 1 input token and output tokens
+type TokenData @entity {
+  " { Market Address }-{ Input Token Address }-{ Optional: Snapshot ID } "
   id: Bytes!
+
+  " Can you use the output token as collateral "
+  canUseAsCollateral: Boolean!
+
+  " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
+  maximumLTV: BigDecimal!
+
+  " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
+  liquidationThreshold: BigDecimal!
+
+  " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
+  liquidationPenalty: BigDecimal!
+
+  " Can the user choose to isloate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
+  canIsolate: Boolean!
+
+  ##### Token Data #####
 
   " Tokens that need to be deposited in this market to take a position in protocol (should be alphabetized) "
   inputToken: Token!
@@ -201,6 +219,15 @@ type TokenBalances @entity {
 
   " All interest rates for this input token. Should be in APR format "
   rates: [InterestRate!]
+
+  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
+  borrowedToken: Token
+
+  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
+  variableBorrowedTokenBalance: BigInt
+
+  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
+  stableBorrowedTokenBalance: BigInt
 
   " Allowed limit to how much of the underlying asset can be supplied to this market. "
   supplyCap: BigInt
@@ -247,8 +274,10 @@ enum OracleSource {
 # As oracles are a source of truth it is important to understand the details.
 # This entity will help track oracle-related data in a market
 type Oracle @entity {
-  " { Oracle Address } "
+  " { Market ID }-{ Oracle Address } "
   id: Bytes!
+
+  oracleAddress: Bytes!
 
   " The market that this oracle is used for pricing "
   market: Market!
@@ -256,14 +285,8 @@ type Oracle @entity {
   " The block this oracle was adopted for a market "
   blockCreated: BigInt!
 
-  " The most recent block that the oracle was updated (Update when an oracle proxy updates the contract, this happens in compound for example) "
-  blockLU: BigInt!
-
   " The timestamp this oracle was adopted for a market "
   timestampCreated: BigInt!
-
-  " The most recent timestamp that the oracle was updated (Updated when the oracle address is updated) "
-  timestampLU: BigInt!
 
   " Is the Oracle currently used as the source of truth for a market"
   isActive: Boolean!
@@ -284,7 +307,7 @@ type Oracle @entity {
 
 interface Protocol {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: ID!
+  id: Bytes!
 
   " Base name of the protocol, excluding transformations. e.g. Aave "
   protocol: String!
@@ -314,7 +337,7 @@ interface Protocol {
   lendingType: LendingType
 
   " The specific permissions required to use the protocol "
-  PermissionType: PermissionType
+  permissionType: PermissionType
 
   " Risk type of the lending protocol "
   riskType: RiskType
@@ -358,7 +381,7 @@ interface Protocol {
 
 type LendingProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: ID!
+  id: Bytes!
 
   " Base name of the protocol, excluding transformations. e.g. Aave "
   protocol: String!
@@ -388,7 +411,7 @@ type LendingProtocol implements Protocol @entity {
   lendingType: LendingType
 
   " The specific permissions required to use the protocol "
-  PermissionType: PermissionType
+  permissionType: PermissionType
 
   " Risk type of the lending protocol "
   riskType: RiskType
@@ -732,23 +755,8 @@ type Market @entity {
   " Is this market active or is it frozen "
   isActive: Boolean!
 
-  " Can you use the output token as collateral "
-  canUseAsCollateral: Boolean!
-
   " Can you borrow from this market "
   canBorrowFrom: Boolean!
-
-  " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
-  maximumLTV: BigDecimal!
-
-  " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
-  liquidationThreshold: BigDecimal!
-
-  " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
-  liquidationPenalty: BigDecimal!
-
-  " Can the user choose to isloate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
-  canIsolate: Boolean!
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
@@ -759,7 +767,7 @@ type Market @entity {
   ##### Quantitative Data #####
 
   " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
-  fees: [InterestRate!]!
+  fees: [InterestRate!]
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -847,13 +855,7 @@ type Market @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market "
-  tokens: [TokenBalances!]
-
-  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
-  variableBorrowedTokenBalance: BigInt
-
-  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
-  stableBorrowedTokenBalance: BigInt
+  tokens: [TokenData!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -1104,7 +1106,7 @@ type MarketDailySnapshot @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market (a list of input token structs) "
-  tokens: [TokenBalances!]
+  tokens: [TokenData!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -1191,7 +1193,7 @@ type MarketHourlySnapshot @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market "
-  tokens: [TokenBalances!]
+  tokens: [TokenData!]
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -1429,10 +1431,13 @@ type Deposit @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1476,10 +1481,13 @@ type Withdraw @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1528,10 +1536,13 @@ type Borrow @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1576,10 +1587,13 @@ type Repay @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1623,10 +1637,13 @@ type Liquidate @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1659,6 +1676,9 @@ type Liquidate @entity(immutable: true) {
   profitUSD: BigDecimal!
 }
 
+# This entity is solely for transfers outside of normal protocol interaction
+# e.g. transferring aTokens (collateral) directly, not a deposit.
+# Transfers associated with other transactions in this schema should live there and not here.
 # Note that only one transfer event should be created per transfer.
 type Transfer @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
@@ -1674,10 +1694,13 @@ type Transfer @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
