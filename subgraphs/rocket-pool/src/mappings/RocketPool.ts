@@ -22,7 +22,7 @@ import {
   MinipoolRemoved,
   MinipoolDequeued,
 } from "../../generated/rocketMinipoolQueue/rocketMinipoolQueue";
-
+import { RPLTokensClaimed } from "../../generated/RocketRewardsPool/rocketRewardsPool";
 import { BalancesUpdated } from "../../generated/rocketNetworkBalances/rocketNetworkBalances";
 
 import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
@@ -78,6 +78,13 @@ export function handleEtherWithdrawn(event: EtherWithdrawn): void {
 
 /** handleMinipoolEnqeued represents the 16 Eth enqued by a Node Manager to be deployed by the protocol. This is represented in the TVL of the network.*/
 export function handleMinipoolEnqueued(event: MinipoolEnqueued): void {
+  updateMinipoolTvlandRevenue(
+    event.block,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    event.params.minipool.toHexString()
+  );
   updateUsageMetrics(event.block, event.transaction.from);
   updateProtocolAndPoolTvl(event.block, event.transaction.value, BIGINT_ZERO);
   updateSnapshotsTvl(event.block);
@@ -85,6 +92,13 @@ export function handleMinipoolEnqueued(event: MinipoolEnqueued): void {
 
 /** handleMinipoolDeqeued represents the Eth being dequeued by a Node Manager.*/
 export function handleMinipoolDequeued(event: MinipoolDequeued): void {
+  updateMinipoolTvlandRevenue(
+    event.block,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    event.params.minipool.toHexString()
+  );
   updateUsageMetrics(event.block, event.params.minipool);
 }
 
@@ -92,7 +106,7 @@ export function handleMinipoolDequeued(event: MinipoolDequeued): void {
 export function handleMinipoolRemoved(event: MinipoolRemoved): void {
   updateMinipoolTvlandRevenue(
     event.block,
-    event.transaction.value.times(BIGINT_NEGATIVE_ONE),
+    BIGINT_ZERO,
     BIGINT_ZERO,
     BIGINT_ZERO,
     event.params.minipool.toHexString()
@@ -113,6 +127,7 @@ export function handleRPLWithdrawn(event: RPLWithdrawn): void {
     BIGINT_ZERO,
     event.params.amount.times(BIGINT_NEGATIVE_ONE)
   );
+
   updateSnapshotsTvl(event.block);
 }
 
@@ -126,6 +141,28 @@ export function handleRPLSlashed(event: RPLSlashed): void {
   );
 
   updateUsageMetrics(event.block, event.params.node);
+}
+
+export function handleTokensClaimed(event: RPLTokensClaimed): void {
+  let reth = RETH.bind(Address.fromString(RETH_ADDRESS));
+
+  let totalSupply = reth.try_totalSupply();
+
+  let totalsupply = BIGINT_ZERO;
+
+  if (totalSupply.reverted) {
+    log.error("[handleBalanceUpdate] Total supply call reverted", []);
+  } else {
+    totalsupply = totalSupply.value;
+  }
+
+  updateUsageMetrics(event.block, event.params.claimingAddress);
+  updateTotalRevenueMetrics(
+    event.block,
+    BIGDECIMAL_ZERO,
+    event.params.amount,
+    totalsupply
+  );
 }
 
 /** handleBalanceUpdate updates the revenue for RocketPool based on the amount of Eth generated on the beacon chain.  */
@@ -156,37 +193,37 @@ export function handleBalanceUpdate(event: BalancesUpdated): void {
 
     let Comissions = pool._miniPoolCommission;
 
-    log.error("[handleBalanceUpdate] sum: {}", [Comissions!.toString()]);
+    // log.error("[handleBalanceUpdate] sum: {}", [Comissions!.toString()]);
 
-    if (Comissions && Comissions.length > 0) {
-      avg_ComissionRate = getMean(Comissions);
-    }
-    log.error("[handleBalanceUpdate] comission rate: {}", [
-      avg_ComissionRate.toString(),
-    ]);
+    // if (Comissions && Comissions.length > 0) {
+    //   avg_ComissionRate = getMean(Comissions);
+    // }
+    // log.error("[handleBalanceUpdate] comission rate: {}", [
+    //   avg_ComissionRate.toString(),
+    // ]);
     cumrevCounter = bigIntToBigDecimal(BeaconChainRewardEth);
-    log.error("[handleBalanceUpdate] cumRev: {}", [cumrevCounter.toString()]);
-    let ratio = BIGDECIMAL_ZERO;
-    if (pool.inputTokenBalances[1].gt(BIGINT_ZERO)) {
-      ratio = bigIntToBigDecimal(pool._miniPoolTotalValueLocked).div(
-        bigIntToBigDecimal(pool.inputTokenBalances[1])
-      );
-      let minipoolMultiplier = BIGDECIMAL_HALF.plus(
-        BIGDECIMAL_HALF.times(avg_ComissionRate)
-      );
-      log.error("[handleBalanceUpdate] minipool multiplier: {}", [
-        minipoolMultiplier.toString(),
-      ]);
-      let minipoolRevenue = ratio
-        .times(bigIntToBigDecimal(BeaconChainRewardEth))
-        .times(minipoolMultiplier);
-      log.error("[handleBalanceUpdate] minipool rev in eth: {}", [
-        minipoolRevenue.toString(),
-      ]);
+    // log.error("[handleBalanceUpdate] cumRev: {}", [cumrevCounter.toString()]);
 
-      updateTotalRevenueMetrics(event.block, cumrevCounter, totalsupply);
-      updateProtocolSideRevenueMetrics(event.block, minipoolRevenue);
-      updateSupplySideRevenueMetrics(event.block);
-    }
+    let minipoolMultiplier = BIGDECIMAL_HALF.plus(
+      BIGDECIMAL_HALF.times(avg_ComissionRate)
+    );
+    // log.error("[handleBalanceUpdate] minipool multiplier: {}", [
+    //   minipoolMultiplier.toString(),
+    // ]);
+
+    let minipoolRevenue =
+      bigIntToBigDecimal(BeaconChainRewardEth).times(minipoolMultiplier);
+    // log.error("[handleBalanceUpdate] minipool rev in eth: {}", [
+    //   minipoolRevenue.toString(),
+    // ]);
+
+    updateTotalRevenueMetrics(
+      event.block,
+      cumrevCounter,
+      BIGINT_ZERO,
+      totalsupply
+    );
+    updateProtocolSideRevenueMetrics(event.block, minipoolRevenue);
+    updateSupplySideRevenueMetrics(event.block);
   }
 }

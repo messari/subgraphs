@@ -58,10 +58,6 @@ export function updateMinipoolTvlandRevenue(
       .lastPriceUSD!
   );
 
-  pool._miniPoolTotalValueLocked = pool._miniPoolTotalValueLocked.plus(
-    Minipool.inputTokenBalances[0]
-  );
-
   let Comissions = pool._miniPoolCommission;
 
   if (Comissions) {
@@ -168,6 +164,7 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
 export function updateTotalRevenueMetrics(
   block: ethereum.Block,
   stakingRewards: BigDecimal,
+  rplStaked: BigInt,
   totalShares: BigInt // of rETH
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
@@ -186,6 +183,10 @@ export function updateTotalRevenueMetrics(
 
   const lastPriceUsd = getOrCreateToken(
     Address.fromString(ETH_ADDRESS),
+    block.number
+  ).lastPriceUSD!;
+  const lastRewardPriceUsd = getOrCreateToken(
+    Address.fromString(RPL_ADDRESS),
     block.number
   ).lastPriceUSD!;
 
@@ -216,6 +217,13 @@ export function updateTotalRevenueMetrics(
     );
   poolMetricsDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
   poolMetricsDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsDailySnapshot.stakedOutputTokenAmount = pool.outputTokenSupply;
+
+  poolMetricsDailySnapshot.rewardTokenEmissionsAmount![0] =
+    poolMetricsDailySnapshot.rewardTokenEmissionsAmount![0].plus(rplStaked);
+  poolMetricsDailySnapshot.rewardTokenEmissionsUSD![0] = bigIntToBigDecimal(
+    poolMetricsDailySnapshot.rewardTokenEmissionsAmount![0]
+  ).times(lastRewardPriceUsd);
   poolMetricsDailySnapshot.save();
 
   // Pool Hourly
@@ -227,6 +235,12 @@ export function updateTotalRevenueMetrics(
     );
   poolMetricsHourlySnapshot.outputTokenSupply = pool.outputTokenSupply;
   poolMetricsHourlySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsHourlySnapshot.stakedOutputTokenAmount = pool.outputTokenSupply;
+  poolMetricsHourlySnapshot.rewardTokenEmissionsAmount![0] =
+    poolMetricsHourlySnapshot.rewardTokenEmissionsAmount![0].plus(rplStaked);
+  poolMetricsHourlySnapshot.rewardTokenEmissionsUSD![0] = bigIntToBigDecimal(
+    poolMetricsHourlySnapshot.rewardTokenEmissionsAmount![0]
+  ).times(lastRewardPriceUsd);
   poolMetricsHourlySnapshot.save();
 
   // Protocol
@@ -262,10 +276,15 @@ export function updateProtocolSideRevenueMetrics(
     block.number
   ).lastPriceUSD!;
 
-  const currentEthAmount = bigIntToBigDecimal(pool._miniPoolTotalValueLocked);
+  const currentEthAmount = pool._miniPoolTotalValueLocked;
+
+  log.error("[updateProtocolSideRevenueMetrics] currentEthAmount: {}", [
+    currentEthAmount.toString(),
+  ]);
 
   if (amount > currentEthAmount) {
     additionalRewards = amount.minus(currentEthAmount);
+    pool._miniPoolTotalValueLocked = amount;
   }
 
   // Pool
@@ -427,6 +446,8 @@ export function getOrCreatePoolsDailySnapshot(
     poolMetrics.inputTokenBalances = pool.inputTokenBalances;
     poolMetrics.outputTokenSupply = pool.outputTokenSupply;
     poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+    poolMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+    poolMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   }
 
   // Set block number and timestamp to the latest for snapshots
@@ -464,6 +485,8 @@ export function getOrCreatePoolsHourlySnapshot(
     poolMetrics.inputTokenBalances = pool.inputTokenBalances;
     poolMetrics.outputTokenSupply = pool.outputTokenSupply;
     poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+    poolMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+    poolMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   }
 
   // Set block number and timestamp to the latest for snapshots

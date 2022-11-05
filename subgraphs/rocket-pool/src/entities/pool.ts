@@ -61,7 +61,7 @@ export function getOrCreatePool(
     pool._miniPools = [];
     pool._miniPoolCommission = [];
     pool.cumulativeMinipoolSlashedAmount = BIGINT_ZERO;
-    pool._miniPoolTotalValueLocked = BIGINT_ZERO;
+    pool._miniPoolTotalValueLocked = BIGDECIMAL_ZERO;
     pool._beaconChainRewardEth = BIGDECIMAL_ZERO;
 
     pool.save();

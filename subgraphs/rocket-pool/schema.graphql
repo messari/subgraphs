@@ -312,7 +312,7 @@ type Pool @entity {
   " Minipool amount slashed. "
   cumulativeMinipoolSlashedAmount: BigInt!
 
-  _miniPoolTotalValueLocked: BigInt!
+  _miniPoolTotalValueLocked: BigDecimal!
 
   _beaconChainRewardEth: BigDecimal!
 
