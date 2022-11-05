@@ -219,7 +219,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
         subgraph: financialsData.financialsDailySnapshots.map((x: any) => ({
           value: parseFloat(x.totalValueLockedUSD),
           date: parseInt(x.timestamp),
-        })),
+        })).reverse(),
       };
       if (isMonthly) {
         // key number of months from epoch value first val of month
@@ -265,7 +265,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
         <div key={elementId} id={elementId}>
           <Box mt={3} mb={1}>
             <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-              <Typography variant="h6">{elementId}</Typography>
+              <Typography variant="h6">TVL Comparison</Typography>
             </CopyLinkToClipboard>
           </Box>
           <Grid container justifyContent="space-between">
@@ -299,12 +299,12 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
 
   let valueToggles = null;
   if (chartRenderCondition) {
-    let stakedTVL = null;
+    let stakedTVL = <Button disabled={true} variant="contained" color="primary" sx={{ my: 4, marginRight: "16px" }}>{"Include Staked TVL"}</Button>;
     if (stakedDataset) {
       stakedTVL = <Button variant="contained" color="primary" sx={{ my: 4, marginRight: "16px" }} onClick={() => setIncludeStakedTVL(!includeStakedTVL)}>{includeStakedTVL ? "Disclude Staked TVL" : "Include Staked TVL"}</Button>
     }
 
-    let borrowedTVL = null;
+    let borrowedTVL = <Button disabled={true} variant="contained" color="primary" sx={{ my: 4 }} >{"Include Borrowed TVL"}</Button>;
     if (borrowedDataset) {
       borrowedTVL = <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => setIncludeBorrowedTVL(!includeBorrowedTVL)}>{includeBorrowedTVL ? "Disclude Borrowed TVL" : "Include Borrowed TVL"}</Button>
     }
@@ -318,7 +318,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
   }
   return (
     <>
-      <div style={{ margin: "0px 16px" }}>
+      <div>
         <DeploymentsDropDown
           setDeploymentURL={(x) => setDeploymentURL(x)}
           setDefiLlamaSlug={(x) => setDefiLlamaSlug(x)}
@@ -327,9 +327,9 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
           deploymentURL={deploymentURL}
           deploymentJSON={deploymentNameToUrlMapping}
         />
+        {valueToggles}
         <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
         {chart}
-        {valueToggles}
       </div>
     </>
   );

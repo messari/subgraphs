@@ -94,11 +94,14 @@ function ProtocolTabEntity({
       const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
       // For the current entity, loop through all instances of that entity
       const overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
-
       const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
       for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[x - overlayDifference];
+        let overlayIndex = x;
+        if (overlayDifference > 0) {
+          overlayIndex = x - overlayDifference;
+        }
+        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[overlayIndex];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
@@ -106,9 +109,6 @@ function ProtocolTabEntity({
           if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename") {
             return;
           }
-          // if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
-          //   return;
-          // }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
           const currentInstanceField = timeseriesInstance[fieldName];
           let currentOverlayInstanceField: any = {};
@@ -366,7 +366,9 @@ function ProtocolTabEntity({
             // The following checks if the field is required or can be null
             const fieldName = field.split(" [")[0];
             if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
-              return <><Button onClick={() => setDefiLlamaCompareTVL(false)}>Show Regular TVL Component</Button><DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} getData={() => console.log('GET DATA')} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
+              return <>
+                <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(false)} >Show Regular TVL Component</div>
+                <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} getData={() => console.log('GET DATA')} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
             }
 
             const label = entityName + "-" + field;
@@ -473,7 +475,7 @@ function ProtocolTabEntity({
             }
             let tvlButton = null;
             if (fieldName === "totalValueLockedUSD" && entityName === "financialsDailySnapshots") {
-              tvlButton = <Button onClick={() => setDefiLlamaCompareTVL(true)}>Show DefiLlama Component</Button>;
+              tvlButton = <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(true)} >Show DefiLlama Component</div>;
             }
             return (
               <>

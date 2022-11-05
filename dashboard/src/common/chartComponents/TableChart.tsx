@@ -123,7 +123,30 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
           <Button className="Hover-Underline" onClick={() => toggleDateString(!showDateString)}>
             {showDateString ? `${hourly ? "hours" : "days"} since epoch` : "Date MM/DD/YYYY"}
           </Button>
-          <Button className="Hover-Underline" onClick={() => downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel)}>
+          <Button className="Hover-Underline" onClick={() => {
+            if (!Array.isArray(dataTable)) {
+              let length = dataTable[Object.keys(dataTable)[0]].length;
+              const arrayToSend: any = [];
+              for (let i = 0; i < length; i++) {
+                let objectIteration: any = {};
+                let hasUndefined = false;
+                objectIteration.date = dataTable[Object.keys(dataTable)[0]][i].date;
+                Object.keys(dataTable).forEach((x: any) => {
+                  if (dataTable[x][i]?.value) {
+                    objectIteration[x] = dataTable[x][i]?.value;
+                  } else {
+                    hasUndefined = true;
+                  }
+                });
+                if (!hasUndefined) {
+                  arrayToSend.push(objectIteration);
+                }
+              }
+              return downloadCSV(arrayToSend.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), ...x })), datasetLabel + '-csv', datasetLabel);
+            } else {
+              downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel);
+            }
+          }}>
             Save CSV
           </Button>
           {jpegDownloadHandler ? <Button className="Hover-Underline" onClick={() => jpegDownloadHandler()}>Save Chart</Button> : null}
