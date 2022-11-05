@@ -15,8 +15,8 @@ import {
   _Urn,
   _Proxy,
 } from "../../generated/schema";
+import { Versions } from "../versions";
 import {
-  BIGINT_ONE,
   BIGDECIMAL_ZERO,
   ProtocolType,
   SECONDS_PER_DAY,
@@ -27,15 +27,9 @@ import {
   DAI_ADDRESS,
   SECONDS_PER_HOUR,
   Network,
-  InterestRateSide,
-  InterestRateType,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   BIGINT_ZERO,
-  BIGINT_MAX,
   BIGINT_ONE_RAY,
 } from "./constants";
 
@@ -259,9 +253,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol = new LendingProtocol(VAT_ADDRESS);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
     protocol.cumulativeUniqueUsers = 0;
@@ -282,8 +273,14 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.mintedTokens = [DAI_ADDRESS];
     protocol.marketIDList = [];
     protocol._par = BIGINT_ONE_RAY;
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 

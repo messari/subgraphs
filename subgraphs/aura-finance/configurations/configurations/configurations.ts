@@ -1,4 +1,4 @@
-import { AuraFinanceMainnetConfigurations } from "../../protocols/aura-finance/config/deployments/aura-finance-mainnet/configurations";
+import { AuraFinanceMainnetConfigurations } from "../../protocols/aura-finance/config/deployments/aura-finance-ethereum/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";

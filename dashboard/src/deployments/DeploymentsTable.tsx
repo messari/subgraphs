@@ -120,6 +120,7 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, 
                             key={"ProtocolSection-" + subgraphName.toUpperCase() + '-' + schemaType}
                             subgraphName={subgraphName}
                             protocol={protocol}
+                            schemaType={schemaType}
                             clientIndexing={clientIndexing}
                             decenDeposToSubgraphIds={decenDeposToSubgraphIds}
                             tableExpanded={tableExpanded[schemaType]}

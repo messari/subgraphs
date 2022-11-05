@@ -6,7 +6,7 @@ import { errorsObj, protocolErrors } from "./errorSchemas.js";
 import { pullMessagesByThread, resolveQueriesToAttempt, resolveThreadCreation } from "./resolutions.js";
 import { generateEndpoints, indexStatusFlow } from "./indexingStatus.js";
 
-const hourMs = 3600000;
+const hourMs = 360000;
 
 try {
   executionFlow();
@@ -18,6 +18,7 @@ try {
 let protocolNameToBaseMapping = {};
 
 async function executionFlow() {
+  console.log('START');
   const { data } = await axios.get(
     "https://subgraphs.messari.io/deployment.json"
   );

@@ -33,6 +33,7 @@ export function handlePairCreated(event: PairCreated): void {
 //     protocolFeeUpdate = PROTOCOL_FEE_TO_OFF
 //   }
 //     for (let i = 0; i < poolIds.length; i++) {
+//       // will need blockNumber param
 //       let pool = getLiquidityPool(poolIds[i].toHexString())
 //       let lpFeeId = pool.fees[0]
 //       let protocolFeeId = pool.fees[1]

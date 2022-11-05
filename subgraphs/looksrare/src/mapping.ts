@@ -30,12 +30,13 @@ import {
   NftStandard,
   SaleStrategy,
   SECONDS_PER_DAY,
-  STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESS,
-  STRATEGY_PRIVATE_SALE_ADDRESS,
-  STRATEGY_STANDARD_SALE_ADDRESS,
+  STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESSES,
+  STRATEGY_PRIVATE_SALE_ADDRESSES,
+  STRATEGY_STANDARD_SALE_ADDRESSES,
   WETH_ADDRESS,
 } from "./helper";
 import { NetworkConfigs } from "../configurations/configure";
+import { Versions } from "./versions";
 
 export function handleTakerBid(event: TakerBid): void {
   if (event.params.currency != WETH_ADDRESS) {
@@ -73,8 +74,10 @@ export function handleRoyaltyPayment(event: RoyaltyPayment): void {
   if (event.params.currency != WETH_ADDRESS) {
     return;
   }
-  let collection = getOrCreateCollection(event.params.collection.toHexString());
-  let deltaCreatorRevenueETH = event.params.amount
+  const collection = getOrCreateCollection(
+    event.params.collection.toHexString()
+  );
+  const deltaCreatorRevenueETH = event.params.amount
     .toBigDecimal()
     .div(MANTISSA_FACTOR);
   collection.creatorRevenueETH = collection.creatorRevenueETH.plus(
@@ -85,7 +88,7 @@ export function handleRoyaltyPayment(event: RoyaltyPayment): void {
   );
   collection.save();
 
-  let marketplace = getOrCreateMarketplace(
+  const marketplace = getOrCreateMarketplace(
     NetworkConfigs.getMarketplaceAddress()
   );
   marketplace.creatorRevenueETH = marketplace.creatorRevenueETH.plus(
@@ -98,7 +101,9 @@ export function handleRoyaltyPayment(event: RoyaltyPayment): void {
 }
 
 export function handleRoyaltyFeeUpdate(event: RoyaltyFeeUpdate): void {
-  let collection = getOrCreateCollection(event.params.collection.toHexString());
+  const collection = getOrCreateCollection(
+    event.params.collection.toHexString()
+  );
   collection.royaltyFee = event.params.fee
     .toBigDecimal()
     .div(BIGDECIMAL_HUNDRED);
@@ -115,14 +120,16 @@ function handleMatch(
   price: BigInt,
   amount: BigInt
 ): void {
-  let priceETH = price.toBigDecimal().div(MANTISSA_FACTOR);
-  let volumeETH = amount.toBigDecimal().times(priceETH);
-  let strategy = getOrCreateExecutionStrategy(Address.fromString(strategyAddr));
+  const priceETH = price.toBigDecimal().div(MANTISSA_FACTOR);
+  const volumeETH = amount.toBigDecimal().times(priceETH);
+  const strategy = getOrCreateExecutionStrategy(
+    Address.fromString(strategyAddr)
+  );
 
   //
   // new trade
   //
-  let trade = new Trade(
+  const trade = new Trade(
     event.transaction.hash
       .toHexString()
       .concat("-")
@@ -145,9 +152,9 @@ function handleMatch(
   //
   // update collection
   //
-  let collection = getOrCreateCollection(collectionAddr);
+  const collection = getOrCreateCollection(collectionAddr);
   collection.tradeCount += 1;
-  let buyerCollectionAccountID = "COLLECTION_ACCOUNT-BUYER-"
+  const buyerCollectionAccountID = "COLLECTION_ACCOUNT-BUYER-"
     .concat(collection.id)
     .concat("-")
     .concat(buyer);
@@ -157,7 +164,7 @@ function handleMatch(
     buyerCollectionAccount.save();
     collection.buyerCount += 1;
   }
-  let sellerCollectionAccountID = "COLLECTION_ACCOUNT-SELLER-"
+  const sellerCollectionAccountID = "COLLECTION_ACCOUNT-SELLER-"
     .concat(collection.id)
     .concat("-")
     .concat(seller);
@@ -169,7 +176,7 @@ function handleMatch(
   }
   collection.cumulativeTradeVolumeETH =
     collection.cumulativeTradeVolumeETH.plus(volumeETH);
-  let deltaMarketplaceRevenueETH = volumeETH.times(
+  const deltaMarketplaceRevenueETH = volumeETH.times(
     strategy.protocolFee.div(BIGDECIMAL_HUNDRED)
   );
   collection.marketplaceRevenueETH = collection.marketplaceRevenueETH.plus(
@@ -183,7 +190,7 @@ function handleMatch(
   //
   // update marketplace
   //
-  let marketplace = getOrCreateMarketplace(
+  const marketplace = getOrCreateMarketplace(
     NetworkConfigs.getMarketplaceAddress()
   );
   marketplace.tradeCount += 1;
@@ -195,14 +202,14 @@ function handleMatch(
   marketplace.totalRevenueETH = marketplace.totalRevenueETH.plus(
     deltaMarketplaceRevenueETH
   );
-  let buyerAccountID = "MARKETPLACE_ACCOUNT-".concat(buyer);
+  const buyerAccountID = "MARKETPLACE_ACCOUNT-".concat(buyer);
   let buyerAccount = _Item.load(buyerAccountID);
   if (!buyerAccount) {
     buyerAccount = new _Item(buyerAccountID);
     buyerAccount.save();
     marketplace.cumulativeUniqueTraders += 1;
   }
-  let sellerAccountID = "MARKETPLACE_ACCOUNT-".concat(seller);
+  const sellerAccountID = "MARKETPLACE_ACCOUNT-".concat(seller);
   let sellerAccount = _Item.load(sellerAccountID);
   if (!sellerAccount) {
     sellerAccount = new _Item(sellerAccountID);
@@ -213,7 +220,7 @@ function handleMatch(
 
   // prepare for updating dailyTradedItemCount
   let newDailyTradedItem = false;
-  let dailyTradedItemID = "DAILY_TRADED_ITEM-"
+  const dailyTradedItemID = "DAILY_TRADED_ITEM-"
     .concat(collectionAddr)
     .concat("-")
     .concat(tokenId.toString())
@@ -228,7 +235,7 @@ function handleMatch(
   //
   // take collection snapshot
   //
-  let collectionSnapshot = getOrCreateCollectionDailySnapshot(
+  const collectionSnapshot = getOrCreateCollectionDailySnapshot(
     collectionAddr,
     event.block.timestamp
   );
@@ -259,7 +266,7 @@ function handleMatch(
   //
   // take marketplace snapshot
   //
-  let marketplaceSnapshot = getOrCreateMarketplaceDailySnapshot(
+  const marketplaceSnapshot = getOrCreateMarketplaceDailySnapshot(
     event.block.timestamp
   );
   marketplaceSnapshot.blockNumber = event.block.number;
@@ -273,21 +280,21 @@ function handleMatch(
   marketplaceSnapshot.tradeCount = marketplace.tradeCount;
   marketplaceSnapshot.cumulativeUniqueTraders =
     marketplace.cumulativeUniqueTraders;
-  let dailyBuyerID = "DAILY_MARKERPLACE_ACCOUNT-".concat(buyer);
+  const dailyBuyerID = "DAILY_MARKERPLACE_ACCOUNT-".concat(buyer);
   let dailyBuyer = _Item.load(dailyBuyerID);
   if (!dailyBuyer) {
     dailyBuyer = new _Item(dailyBuyerID);
     dailyBuyer.save();
     marketplaceSnapshot.dailyActiveTraders += 1;
   }
-  let dailySellerID = "DAILY_MARKETPLACE_ACCOUNT-".concat(seller);
+  const dailySellerID = "DAILY_MARKETPLACE_ACCOUNT-".concat(seller);
   let dailySeller = _Item.load(dailySellerID);
   if (!dailySeller) {
     dailySeller = new _Item(dailySellerID);
     dailySeller.save();
     marketplaceSnapshot.dailyActiveTraders += 1;
   }
-  let dailyTradedCollectionID = "DAILY_TRADED_COLLECTION-"
+  const dailyTradedCollectionID = "DAILY_TRADED_COLLECTION-"
     .concat(collectionAddr)
     .concat("-")
     .concat((event.block.timestamp.toI32() / SECONDS_PER_DAY).toString());
@@ -308,16 +315,16 @@ function getOrCreateCollection(collectionID: string): Collection {
   if (!collection) {
     collection = new Collection(collectionID);
     collection.nftStandard = getNftStandard(collectionID);
-    let contract = NftMetadata.bind(Address.fromString(collectionID));
-    let nameResult = contract.try_name();
+    const contract = NftMetadata.bind(Address.fromString(collectionID));
+    const nameResult = contract.try_name();
     if (!nameResult.reverted) {
       collection.name = nameResult.value;
     }
-    let symbolResult = contract.try_symbol();
+    const symbolResult = contract.try_symbol();
     if (!symbolResult.reverted) {
       collection.symbol = symbolResult.value;
     }
-    let totalSupplyResult = contract.try_totalSupply();
+    const totalSupplyResult = contract.try_totalSupply();
     if (!totalSupplyResult.reverted) {
       collection.totalSupply = totalSupplyResult.value;
     }
@@ -331,7 +338,7 @@ function getOrCreateCollection(collectionID: string): Collection {
     collection.sellerCount = 0;
     collection.save();
 
-    let marketplace = getOrCreateMarketplace(
+    const marketplace = getOrCreateMarketplace(
       NetworkConfigs.getMarketplaceAddress()
     );
     marketplace.collectionCount += 1;
@@ -347,9 +354,6 @@ function getOrCreateMarketplace(marketplaceID: string): Marketplace {
     marketplace.name = NetworkConfigs.getProtocolName();
     marketplace.slug = NetworkConfigs.getProtocolSlug();
     marketplace.network = NetworkConfigs.getNetwork();
-    marketplace.schemaVersion = NetworkConfigs.getSchemaVersion();
-    marketplace.subgraphVersion = NetworkConfigs.getSubgraphVersion();
-    marketplace.methodologyVersion = NetworkConfigs.getMethodologyVersion();
     marketplace.collectionCount = 0;
     marketplace.tradeCount = 0;
     marketplace.cumulativeTradeVolumeETH = BIGDECIMAL_ZERO;
@@ -357,8 +361,14 @@ function getOrCreateMarketplace(marketplaceID: string): Marketplace {
     marketplace.creatorRevenueETH = BIGDECIMAL_ZERO;
     marketplace.totalRevenueETH = BIGDECIMAL_ZERO;
     marketplace.cumulativeUniqueTraders = 0;
-    marketplace.save();
   }
+
+  marketplace.schemaVersion = Versions.getSchemaVersion();
+  marketplace.subgraphVersion = Versions.getSubgraphVersion();
+  marketplace.methodologyVersion = Versions.getMethodologyVersion();
+
+  marketplace.save();
+
   return marketplace;
 }
 
@@ -366,14 +376,14 @@ function getOrCreateExecutionStrategy(address: Address): _ExecutionStrategy {
   let strategy = _ExecutionStrategy.load(address.toHexString());
   if (!strategy) {
     strategy = new _ExecutionStrategy(address.toHexString());
-    if (address == STRATEGY_STANDARD_SALE_ADDRESS) {
+    if (STRATEGY_STANDARD_SALE_ADDRESSES.includes(address)) {
       strategy.saleStrategy = SaleStrategy.STANDARD_SALE;
-    } else if (address == STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESS) {
+    } else if (STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESSES.includes(address)) {
       strategy.saleStrategy = SaleStrategy.ANY_ITEM_FROM_COLLECTION;
-    } else if (address == STRATEGY_PRIVATE_SALE_ADDRESS) {
+    } else if (STRATEGY_PRIVATE_SALE_ADDRESSES.includes(address)) {
       strategy.saleStrategy = SaleStrategy.PRIVATE_SALE;
     }
-    let contract = ExecutionStrategy.bind(address);
+    const contract = ExecutionStrategy.bind(address);
     strategy.protocolFee = contract
       .viewProtocolFee()
       .toBigDecimal()
@@ -387,7 +397,7 @@ function getOrCreateCollectionDailySnapshot(
   collection: string,
   timestamp: BigInt
 ): CollectionDailySnapshot {
-  let snapshotID = collection
+  const snapshotID = collection
     .concat("-")
     .concat((timestamp.toI32() / SECONDS_PER_DAY).toString());
   let snapshot = CollectionDailySnapshot.load(snapshotID);
@@ -414,7 +424,7 @@ function getOrCreateCollectionDailySnapshot(
 function getOrCreateMarketplaceDailySnapshot(
   timestamp: BigInt
 ): MarketplaceDailySnapshot {
-  let snapshotID = (timestamp.toI32() / SECONDS_PER_DAY).toString();
+  const snapshotID = (timestamp.toI32() / SECONDS_PER_DAY).toString();
   let snapshot = MarketplaceDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketplaceDailySnapshot(snapshotID);
@@ -437,9 +447,9 @@ function getOrCreateMarketplaceDailySnapshot(
 }
 
 function getNftStandard(collectionID: string): string {
-  let erc165 = ERC165.bind(Address.fromString(collectionID));
+  const erc165 = ERC165.bind(Address.fromString(collectionID));
 
-  let isERC721Result = erc165.try_supportsInterface(
+  const isERC721Result = erc165.try_supportsInterface(
     Bytes.fromHexString(ERC721_INTERFACE_IDENTIFIER)
   );
   if (isERC721Result.reverted) {
@@ -450,7 +460,7 @@ function getNftStandard(collectionID: string): string {
     }
   }
 
-  let isERC1155Result = erc165.try_supportsInterface(
+  const isERC1155Result = erc165.try_supportsInterface(
     Bytes.fromHexString(ERC1155_INTERFACE_IDENTIFIER)
   );
   if (isERC1155Result.reverted) {

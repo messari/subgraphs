@@ -17,6 +17,8 @@ RUN yarn
 # add app
 COPY . ./
 
+RUN node public/buildPruningSlugs.js
+
 ADD https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json ./public
 
 # start app

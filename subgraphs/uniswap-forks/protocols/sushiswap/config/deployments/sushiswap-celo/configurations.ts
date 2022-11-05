@@ -50,13 +50,16 @@ export class SushiswapCeloConfigurations implements Configurations {
       )
     );
   }
-  getTradeFee(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  getLPFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
@@ -111,6 +114,9 @@ export class SushiswapCeloConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
+    return [];
+  }
+  getBrokenERC20Tokens(): string[] {
     return [];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {

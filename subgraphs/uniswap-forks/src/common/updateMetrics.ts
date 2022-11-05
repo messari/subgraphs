@@ -133,7 +133,10 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
   const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
 
-  const pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -205,9 +208,10 @@ export function updateTokenWhitelists(
 export function updateInputTokenBalances(
   poolAddress: string,
   reserve0: BigInt,
-  reserve1: BigInt
+  reserve1: BigInt,
+  blockNumber: BigInt
 ): void {
-  const pool = getLiquidityPool(poolAddress);
+  const pool = getLiquidityPool(poolAddress, blockNumber);
   const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
   const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
@@ -224,8 +228,11 @@ export function updateInputTokenBalances(
 }
 
 // Update tvl an token prices in the Sync event.
-export function updateTvlAndTokenPrices(poolAddress: string): void {
-  const pool = getLiquidityPool(poolAddress);
+export function updateTvlAndTokenPrices(
+  poolAddress: string,
+  blockNumber: BigInt
+): void {
+  const pool = getLiquidityPool(poolAddress, blockNumber);
 
   const protocol = getOrCreateProtocol();
 
@@ -234,8 +241,8 @@ export function updateTvlAndTokenPrices(poolAddress: string): void {
 
   const nativeToken = updateNativeTokenPriceInUSD();
 
-  token0.lastPriceUSD = findUSDPricePerToken(token0, nativeToken);
-  token1.lastPriceUSD = findUSDPricePerToken(token1, nativeToken);
+  token0.lastPriceUSD = findUSDPricePerToken(token0, nativeToken, blockNumber);
+  token1.lastPriceUSD = findUSDPricePerToken(token1, nativeToken, blockNumber);
 
   // Subtract the old pool tvl
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(

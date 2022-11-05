@@ -98,43 +98,51 @@ export const schemaMapping: { [x: string]: any } = {
   "dex-amm": "exchanges",
   "yield-aggregator": "vaults",
   "lending": "lending",
-  "generic": "generic"
+  "generic": "generic",
+  "EXCHANGE": "exchanges",
+  "LENDING": "lending",
+  "YIELD": "vaults",
+  "GENERIC": "generic"
 }
 
 export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
-  const arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
-  let CSV = '';
-  if (ShowLabel) {
-    let row = "";
-    for (let index in arrData[0]) {
-      row += index + ',';
+  try {
+    const arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+    let CSV = '';
+    if (ShowLabel) {
+      let row = "";
+      for (let index in arrData[0]) {
+        row += index + ',';
+      }
+      row = row.slice(0, -1);
+      CSV += row + '\r\n';
     }
-    row = row.slice(0, -1);
-    CSV += row + '\r\n';
-  }
 
-  for (let i = 0; i < arrData.length; i++) {
-    let row = "";
-    for (let index in arrData[i]) {
-      console.log('indy', arrData[i][index], index)
-      row += '"' + arrData[i][index] + '",';
+    for (let i = 0; i < arrData.length; i++) {
+      let row = "";
+      for (let index in arrData[i]) {
+        row += '"' + arrData[i][index] + '",';
+      }
+      row.slice(0, row.length - 1);
+      CSV += row + '\r\n';
     }
-    row.slice(0, row.length - 1);
-    CSV += row + '\r\n';
-  }
 
-  if (CSV === '') {
-    return;
-  }
+    if (CSV === '') {
+      return;
+    }
 
-  const csv = CSV;
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const csvUrl = window.webkitURL.createObjectURL(blob);
-  const filename = (ReportTitle || 'UserExport') + '.csv';
-  return { csvUrl, filename };
+    const csv = CSV;
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const csvUrl = window.webkitURL.createObjectURL(blob);
+    const filename = (ReportTitle || 'UserExport') + '.csv';
+    return { csvUrl, filename };
+  } catch (err: any) {
+    console.error(err.message);
+    return { csvURL: "", filename: "" };
+  }
 }
 
-export function downloadCSV(data: any[], label: string, identifier: string) {
+export function downloadCSV(data: any, label: string, identifier: string) {
   try {
     const link = document.createElement('a');
     const field = label.split("-")[1] || label;
@@ -153,8 +161,47 @@ export function downloadCSV(data: any[], label: string, identifier: string) {
       link.href = csvEle?.csvUrl;
       link.click();
     }
-  } catch (err) {
-    console.log(err)
+  } catch (err: any) {
+    console.error(err.message);
     return;
   }
+}
+
+export function base64toBlobJPEG(dataURI: string) {
+  try {
+    const byteString = atob(dataURI.split(',')[1]);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const integerArray = new Uint8Array(arrayBuffer);
+
+    for (let i = 0; i < byteString.length; i++) {
+      integerArray[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([arrayBuffer], { type: 'image/jpeg' });
+  } catch (err: any) {
+    console.error(err.message);
+    return;
+  }
+}
+
+export function lineupChartDatapoints(compChart: any, stitchLeftIndex: number, timeKey: string = 'date') {
+  const key1 = Object.keys(compChart)[0];
+  const key2 = Object.keys(compChart)[1];
+  while (toDate(compChart[key1][stitchLeftIndex][timeKey]) !== toDate(compChart[key2][stitchLeftIndex][timeKey])) {
+    if (compChart[key1][stitchLeftIndex][timeKey] < compChart[key2][stitchLeftIndex][timeKey]) {
+      const startIndex = compChart[key1].findIndex((x: any) => x[timeKey] >= compChart[key2][stitchLeftIndex][timeKey]);
+      let newArray = [...compChart[key1].slice(startIndex)];
+      if (stitchLeftIndex > 0) {
+        newArray = [...compChart[key1].slice(0, stitchLeftIndex), ...compChart[key1].slice(startIndex, compChart[key1].length)];
+      }
+      compChart[key1] = newArray;
+    } else {
+      const startIndex = compChart[key2].findIndex((x: any) => x[timeKey] >= compChart[key1][stitchLeftIndex][timeKey]);
+      let newArray = [...compChart[key2].slice(startIndex)];
+      if (stitchLeftIndex > 0) {
+        newArray = [...compChart[key2].slice(0, stitchLeftIndex), ...compChart[key2].slice(startIndex, compChart[key2].length)];
+      }
+      compChart[key2] = newArray;
+    }
+  }
+  return compChart;
 }

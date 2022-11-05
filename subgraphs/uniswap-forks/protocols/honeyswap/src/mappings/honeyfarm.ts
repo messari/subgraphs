@@ -14,13 +14,19 @@ import { handleReward } from "../common/handlers";
 // WIP: HoneyFarm subgraph handlers currently not used in Honeyswap subgraph deployment
 export function handlePoolAdded(event: PoolAddedEvent): void {
   log.debug("poolToken added: {}", [event.params.poolToken.toHexString()]);
-  createPoolRewardToken(event.params.poolToken.toHexString());
+  createPoolRewardToken(
+    event.params.poolToken.toHexString(),
+    event.block.number
+  );
 }
 
 // WIP: HoneyFarm subgraph handlers currently not used in Honeyswap subgraph deployment
 export function handlePoolRemoved(event: PoolRemovedEvent): void {
   log.debug("poolToken removed: {}", [event.params.poolToken.toHexString()]);
-  removePoolRewardToken(event.params.poolToken.toHexString());
+  removePoolRewardToken(
+    event.params.poolToken.toHexString(),
+    event.block.number
+  );
 }
 
 // WIP: HoneyFarm subgraph handlers currently not used in Honeyswap subgraph deployment

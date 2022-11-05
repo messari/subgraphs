@@ -50,6 +50,7 @@ import { ProtocolData } from "./mapping";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
 import { IPriceOracleGetter } from "../generated/LendingPool/IPriceOracleGetter";
 import { AToken } from "../generated/LendingPool/AToken";
+import { Versions } from "./versions";
 
 ////////////////////////
 ///// Initializers /////
@@ -65,9 +66,6 @@ export function getOrCreateLendingProtocol(
 
     lendingProtocol.name = protocolData.name;
     lendingProtocol.slug = protocolData.slug;
-    lendingProtocol.schemaVersion = protocolData.schemaVersion;
-    lendingProtocol.subgraphVersion = protocolData.subgraphVersion;
-    lendingProtocol.methodologyVersion = protocolData.methodologyVersion;
     lendingProtocol.network = protocolData.network;
     lendingProtocol.type = ProtocolType.LENDING;
     lendingProtocol.lendingType = LendingType.POOLED;
@@ -91,9 +89,13 @@ export function getOrCreateLendingProtocol(
     lendingProtocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     lendingProtocol.priceOracle = ZERO_ADDRESS;
     lendingProtocol.marketIDs = [];
-
-    lendingProtocol.save();
   }
+
+  lendingProtocol.schemaVersion = Versions.getSchemaVersion();
+  lendingProtocol.subgraphVersion = Versions.getSubgraphVersion();
+  lendingProtocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  lendingProtocol.save();
 
   return lendingProtocol;
 }
@@ -779,9 +781,10 @@ export function createAccount(accountID: string): Account {
   return account;
 }
 
-// returns the market based on the output token
-export function getMarketByOutputToken(
-  outputTokenID: string,
+// returns the market based on any auxillary token
+// ie, outputToken, vToken, or sToken
+export function getMarketByAuxillaryToken(
+  auxillaryToken: string,
   protocolData: ProtocolData
 ): Market | null {
   const protocol = getOrCreateLendingProtocol(protocolData);
@@ -793,8 +796,20 @@ export function getMarketByOutputToken(
       continue;
     }
 
-    if (market.outputToken!.toLowerCase() == outputTokenID.toLowerCase()) {
+    if (market.outputToken!.toLowerCase() == auxillaryToken.toLowerCase()) {
       // we found a matching market!
+      return market;
+    }
+    if (
+      market.vToken &&
+      market.vToken!.toLowerCase() == auxillaryToken.toLowerCase()
+    ) {
+      return market;
+    }
+    if (
+      market.sToken &&
+      market.sToken!.toLowerCase() == auxillaryToken.toLowerCase()
+    ) {
       return market;
     }
   }
@@ -982,7 +997,7 @@ export function getOrCreateMarket(
     // Create a new Market
     market = new Market(marketId.toHexString());
 
-    market.protocol = protocol.name;
+    market.protocol = protocol.id;
     market.isActive = true; // initialized to true on creation
     market.canUseAsCollateral = true; // only stopped when protocol is paused
     market.canBorrowFrom = true; // this field changes occasinally, but all markets are set to true after creation

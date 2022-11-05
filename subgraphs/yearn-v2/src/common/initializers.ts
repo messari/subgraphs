@@ -15,6 +15,7 @@ import { Vault as VaultTemplate } from "../../generated/templates";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/Registry_v1/ERC20";
+import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -38,9 +39,6 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol = new YieldAggregator(constants.PROTOCOL_ID);
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
-    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Protocol.NETWORK;
     protocol.type = constants.ProtocolType.YIELD;
 
@@ -54,6 +52,12 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
 
     protocol._vaultIds = [];
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }
