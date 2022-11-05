@@ -1,4 +1,4 @@
-import { Bytes, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, ethereum, log, BigInt } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../generated/Vat/ERC20";
 import { GemJoin } from "../generated/Vat/GemJoin";
 import { Vat, LogNote as VatNoteEvent } from "../generated/Vat/Vat";
@@ -225,6 +225,24 @@ export function handleVatFrob(event: VatNoteEvent): void {
     dart.toString(),
   ]);
 
+  let urn = u;
+  const migrationCaller = getMigrationCaller(u, v, w, event);
+  if (migrationCaller != null) {
+    if (dart.equals(BIGINT_ZERO) || dink.equals(BIGINT_ZERO)) {
+      // ignore the two migration frob calls that move SAI/DAI around to balance account
+      // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L118-L125
+      // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L148-L155
+      return;
+    } else {
+      // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L140-L144
+      // u, v, w is urns[cdp]; keep urn, but replace u,v,w with the actual owner
+      // because cdpManager.give() hasn't yet been called
+      // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L158
+      urn = u;
+      u = v = w = migrationCaller!;
+    }
+  }
+
   const market = getMarketFromIlk(ilk);
   if (market == null) {
     log.warning("[handleVatFrob]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
@@ -234,8 +252,6 @@ export function handleVatFrob(event: VatNoteEvent): void {
   const token = getOrCreateToken(market.inputToken);
   const deltaCollateral = bigIntChangeDecimals(dink, WAD, token.decimals);
   const deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
-
-  const urn = u;
 
   // translate possible UrnHandler/DSProxy address to its owner address
   u = getOwnerAddress(u);
@@ -1322,4 +1338,27 @@ function _handleSwapFee(event: ethereum.Event, feeUSD: BigDecimal): void {
   const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
   log.info("[handleSwapFee]Swap fee revenue {} collected from market {}", [feeUSD.toString(), marketID]);
   updateRevenue(event, marketID, feeUSD, BIGDECIMAL_ZERO, ProtocolSideRevenueType.PSM);
+}
+
+// detect if a frob is a migration transaction,
+// if it is, return the address of the caller (owner)
+// if it is not, return null
+// Ref: https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L107
+export function getMigrationCaller(u: string, v: string, w: string, event: ethereum.Event): string | null {
+  if (!(u == v && u == w && w == v)) return null;
+  // owner = msg.sender
+  const owner = event.transaction.from.toHexString();
+  if (u.toLowerCase() == MIGRATION_ADDRESS) {
+    return owner;
+  } else {
+    // check if u is an urn owned by MIGRATION_ADDRESS
+    // this should have been populated by
+    // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L133
+    const _urns = _Urn.load(u);
+    if (_urns && _urns.ownerAddress.toLowerCase() == MIGRATION_ADDRESS) {
+      return owner;
+    }
+  }
+
+  return null;
 }
