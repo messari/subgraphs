@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Grid, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { negativeFieldList } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
 import { useEffect, useState } from "react";
@@ -7,11 +7,13 @@ import { BigNumber } from "bignumber.js";
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
 import JSZip from "jszip";
+import DefiLlamaComparsionTab from "../DefiLlamaComparisonTab";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   entityName: string;
   protocolType: string;
+  subgraphEndpoints: any;
   protocolTableData: { [x: string]: any };
   overlaySchemaData: any;
   protocolSchemaData: any;
@@ -28,6 +30,7 @@ function ProtocolTabEntity({
   entitiesData,
   entityName,
   protocolType,
+  subgraphEndpoints,
   protocolTableData,
   overlaySchemaData,
   protocolSchemaData,
@@ -43,6 +46,7 @@ function ProtocolTabEntity({
 
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
   const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
+  const [defiLlamaCompareTVL, setDefiLlamaCompareTVL] = useState<boolean>(false);
 
   useEffect(() => {
     if (downloadAllCharts) {
@@ -90,11 +94,14 @@ function ProtocolTabEntity({
       const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
       // For the current entity, loop through all instances of that entity
       const overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
-
       const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
       for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[x - overlayDifference];
+        let overlayIndex = x;
+        if (overlayDifference > 0) {
+          overlayIndex = x - overlayDifference;
+        }
+        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[overlayIndex];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
@@ -358,12 +365,12 @@ function ProtocolTabEntity({
           {Object.keys(dataFields).map((field: string) => {
             // The following checks if the field is required or can be null
             const fieldName = field.split(" [")[0];
-            if (entitiesData[entityName][fieldName]) {
-              const schemaFieldTypeString = entitiesData[entityName][fieldName]?.split("");
-              if (schemaFieldTypeString[schemaFieldTypeString?.length - 1] !== "!") {
-                // return null;
-              }
+            if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
+              return <>
+                <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(false)} >Show Regular TVL Component</div>
+                <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} getData={() => console.log('GET DATA')} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
             }
+
             const label = entityName + "-" + field;
             const elementId = label.split(" ").join("%20");
 
@@ -466,8 +473,15 @@ function ProtocolTabEntity({
               }
               dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
             }
+            let tvlButton = null;
+            if (fieldName === "totalValueLockedUSD" && entityName === "financialsDailySnapshots") {
+              tvlButton = <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(true)} >Show DefiLlama Component</div>;
+            }
             return (
-              <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+              <>
+                {tvlButton}
+                <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+              </>
             );
           })}
         </Grid>
