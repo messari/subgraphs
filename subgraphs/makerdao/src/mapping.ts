@@ -51,6 +51,7 @@ import {
   PositionSide,
   INT_ZERO,
   INT_ONE,
+  MIGRATION_ADDRESS,
 } from "./common/constants";
 import {
   updateUsageMetrics,
@@ -190,11 +191,11 @@ export function handleVatSlip(event: VatNoteEvent): void {
   // those are handled in handleVatFrob
   //createTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
   //updatePosition(event, usr, ilk, deltaCollateral, BIGINT_ZERO);
-  updateMarket(event, market, deltaCollateral, deltaCollateralUSD);
-  updateUsageMetrics(event, [owner, owner, owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
-  updateProtocol(deltaCollateralUSD, BIGDECIMAL_ZERO);
+  //updateMarket(event, market, deltaCollateral, deltaCollateralUSD);
+  //updateUsageMetrics(event, [owner, owner, owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
+  //updateProtocol(deltaCollateralUSD, BIGDECIMAL_ZERO);
   //this needs to after updateProtocol as it uses protocol to do the update
-  updateFinancialsSnapshot(event, deltaCollateralUSD, BIGDECIMAL_ZERO);
+  //updateFinancialsSnapshot(event, deltaCollateralUSD, BIGDECIMAL_ZERO);
 }
 
 // Borrow/Repay
@@ -256,12 +257,12 @@ export function handleVatFrob(event: VatNoteEvent): void {
   ]);
 
   createTransactions(event, market, v, w, deltaCollateral, deltaCollateralUSD, dart, deltaDebtUSD);
+  updateUsageMetrics(event, [u, v, w], deltaCollateralUSD, deltaDebtUSD);
   updatePosition(event, urn, ilk, deltaCollateral, dart);
-  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
-  updateUsageMetrics(event, [u, v, w], BIGDECIMAL_ZERO, deltaDebtUSD);
-  updateProtocol(BIGDECIMAL_ZERO, deltaDebtUSD);
+  updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD);
+  updateProtocol(deltaCollateralUSD, deltaDebtUSD);
   //this needs to after updateProtocol as it uses protocol to do the update
-  updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, deltaDebtUSD);
+  updateFinancialsSnapshot(event, deltaCollateralUSD, deltaDebtUSD);
 }
 
 // function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
@@ -631,13 +632,18 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
   // bid is in DAI, assumed to priced at $1
   const profitUSD = amountUSD.minus(bigIntToBDUseDecimals(flipBidsStore.bid, RAD));
 
+  let liquidatee = flipBidsStore.liquidatee;
+  // translate possible proxy/urn handler address to owner address
+  liquidatee = getOwnerAddress(liquidatee);
+  const liquidator = flipBidsStore.bidder;
+
   const liquidateID = createEventID(event);
   const liquidate = getOrCreateLiquidate(
     liquidateID,
     event,
     market,
-    flipBidsStore.liquidatee,
-    flipBidsStore.bidder,
+    liquidatee,
+    liquidator,
     amount,
     amountUSD,
     profitUSD,
@@ -703,11 +709,11 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
     }
   }
 
-  liquidatePosition(event, flipBidsStore.urn, ilk, liquidate.liquidator, liquidate.amount, flipBidsStore.art);
+  liquidatePosition(event, flipBidsStore.urn, ilk, liquidate.amount, flipBidsStore.art);
 
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
 
@@ -824,18 +830,10 @@ export function handleClipTakeBid(event: TakeEvent): void {
     clipTakeStore.art.times(deltaTab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
   ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
-  liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.liquidator, liquidate.amount, debtRepaid);
+  liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.amount, debtRepaid);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateUsageMetrics(
-    event,
-    [],
-    BIGDECIMAL_ZERO,
-    BIGDECIMAL_ZERO,
-    liquidate.amountUSD,
-    liquidate.liquidator,
-    liquidate.liquidatee,
-  );
+  updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
 
@@ -900,7 +898,7 @@ export function handleClipYankBid(event: ClipYankEvent): void {
     clipTakeStore.art.times(tab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
   ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
-  liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.liquidator, liquidate.amount, debtRepaid);
+  liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.amount, debtRepaid);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);

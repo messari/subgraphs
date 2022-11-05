@@ -434,7 +434,7 @@ export function updatePosition(
 
       account.positionCount += INT_ONE;
       account.openPositionCount += INT_ONE;
-      account.depositCount += INT_ONE;
+      //account.depositCount += INT_ONE;
     }
 
     lenderPosition.balance = lenderPosition.balance.plus(deltaCollateral);
@@ -467,7 +467,7 @@ export function updatePosition(
 
         account.openPositionCount -= INT_ONE;
         account.closedPositionCount += INT_ONE;
-        account.withdrawCount += INT_ONE;
+        //account.withdrawCount += INT_ONE;
       }
 
       // link event to position (createTransactions needs to be called first)
@@ -531,7 +531,7 @@ export function updatePosition(
 
     if (deltaDebt.gt(BIGINT_ZERO)) {
       borrowerPosition.borrowCount += INT_ONE;
-      account.borrowCount += INT_ONE;
+      //account.borrowCount += INT_ONE;
 
       // link event to position (createTransactions needs to be called first)
       const borrow = Borrow.load(eventID)!;
@@ -553,7 +553,7 @@ export function updatePosition(
 
         account.openPositionCount -= INT_ONE;
         account.closedPositionCount += INT_ONE;
-        account.repayCount += INT_ONE;
+        //account.repayCount += INT_ONE;
       }
 
       const repay = Repay.load(eventID)!;
@@ -680,7 +680,6 @@ export function liquidatePosition(
   event: ethereum.Event,
   urn: string,
   ilk: Bytes,
-  liquidatorAddress: string,
   collateral: BigInt, // net collateral liquidated
   debt: BigInt, // debt repaid
 ): void {
@@ -688,11 +687,11 @@ export function liquidatePosition(
   const market: Market = getMarketFromIlk(ilk)!;
   const accountAddress = getOwnerAddress(urn);
   const account = getOrCreateAccount(accountAddress);
-  account.liquidateCount += INT_ONE;
+  //account.liquidateCount += INT_ONE;
 
-  const liquidator = getOrCreateAccount(liquidatorAddress);
-  liquidator.liquidationCount += INT_ONE;
-  liquidator.save();
+  //const liquidator = getOrCreateAccount(liquidatorAddress);
+  //liquidator.liquidationCount += INT_ONE;
+  //liquidator.save();
 
   const liquidate = Liquidate.load(createEventID(event))!;
 
@@ -906,11 +905,8 @@ export function updateUsageMetrics(
     if (liquidator) {
       let liquidatorAccount = Account.load(liquidator);
       // a new liquidator
-      if (liquidatorAccount == null) {
+      if (liquidatorAccount == null || liquidatorAccount.liquidateCount == 0) {
         liquidatorAccount = getOrCreateAccount(liquidator);
-        protocol.cumulativeUniqueLiquidators += 1;
-        usageDailySnapshot.cumulativeUniqueLiquidators += 1;
-      } else if (liquidatorAccount.liquidateCount == 0) {
         protocol.cumulativeUniqueLiquidators += 1;
         usageDailySnapshot.cumulativeUniqueLiquidators += 1;
       }
@@ -930,11 +926,8 @@ export function updateUsageMetrics(
     if (liquidatee) {
       let liquidateeAccount = Account.load(liquidatee);
       // a new liquidatee
-      if (liquidateeAccount == null) {
+      if (liquidateeAccount == null || liquidateeAccount.liquidationCount == 0) {
         liquidateeAccount = getOrCreateAccount(liquidatee);
-        protocol.cumulativeUniqueLiquidatees += 1;
-        usageDailySnapshot.cumulativeUniqueLiquidatees += 1;
-      } else if (liquidateeAccount.liquidationCount == 0) {
         protocol.cumulativeUniqueLiquidatees += 1;
         usageDailySnapshot.cumulativeUniqueLiquidatees += 1;
       }
