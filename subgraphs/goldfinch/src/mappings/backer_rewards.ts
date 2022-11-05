@@ -1,5 +1,5 @@
-import { BigInt } from "@graphprotocol/graph-ts";
-import { TranchedPoolToken } from "../../generated/schema";
+import { BigInt, log } from "@graphprotocol/graph-ts";
+import { TranchedPoolToken, _PoolToken } from "../../generated/schema";
 import {
   BackerRewardsSetTotalRewards,
   BackerRewardsSetMaxInterestDollarsEligible,
@@ -30,6 +30,35 @@ export function handleSetMaxInterestDollarsEligible(
 }
 
 export function handleBackerRewardsClaimed(event: BackerRewardsClaimed): void {
+  const tokenId = event.params.tokenId.toString();
+  const amount = event.params.amount;
+  const ERC721Token = _PoolToken.load(tokenId);
+  log.info("[handleBackerRewardsClaimed]tokenId={}", [tokenId]);
+  if (!ERC721Token) {
+    log.error("[handleBackerRewardsClaimed]tokenId={} not in _PoolToken", [
+      tokenId,
+    ]);
+    return;
+  }
+  //const ERC721Token = getOrCreatePoolToken(tokenId);
+  const marketId = ERC721Token.market;
+  const market = getOrCreateMarket(marketId, event);
+  market._cumulativeRewardAmount = market._cumulativeRewardAmount!.plus(amount);
+  const secondsSince = event.block.timestamp
+    .minus(market._rewardTimestamp!)
+    .toBigDecimal();
+  const dailyScaler = BigInt.fromI32(SECONDS_PER_DAY).divDecimal(secondsSince);
+  market.rewardTokenEmissionsAmount = [
+    bigDecimalToBigInt(
+      market._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler)
+    ),
+  ];
+  // Note rewards are recorded when they are claimed
+  // since there is no oracle, cannot update
+  // market.rewardTokenEmissionsAmountUSD
+  market.save();
+
+  //
   const poolToken = assert(
     TranchedPoolToken.load(event.params.tokenId.toString())
   );
@@ -45,7 +74,15 @@ export function handleBackerRewardsClaimed1(
   const amount = event.params.amountOfTranchedPoolRewards.plus(
     event.params.amountOfSeniorPoolRewards
   );
-  const ERC721Token = getOrCreatePoolToken(tokenId);
+  const ERC721Token = _PoolToken.load(tokenId);
+  log.info("[handleBackerRewardsClaimed1]tokenId={}", [tokenId]);
+  if (!ERC721Token) {
+    log.error("[handleBackerRewardsClaimed1]tokenId={} not in _PoolToken", [
+      tokenId,
+    ]);
+    return;
+  }
+  //const ERC721Token = getOrCreatePoolToken(tokenId);
   const marketId = ERC721Token.market;
   const market = getOrCreateMarket(marketId, event);
   market._cumulativeRewardAmount = market._cumulativeRewardAmount!.plus(amount);

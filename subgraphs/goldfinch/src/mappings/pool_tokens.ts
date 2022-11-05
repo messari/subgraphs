@@ -1,4 +1,4 @@
-import { BigInt, store } from "@graphprotocol/graph-ts";
+import { BigInt, log, store } from "@graphprotocol/graph-ts";
 import {
   TokenBurned,
   TokenMinted,
@@ -10,6 +10,7 @@ import { TranchedPool, TranchedPoolToken, User } from "../../generated/schema";
 import { getOrInitUser } from "../entities/user";
 import { deleteZapAfterClaimMaybe } from "../entities/zapper";
 import { removeFromList } from "../common/utils";
+import { getOrCreatePoolToken } from "../common/getters";
 
 export function handleTokenBurned(event: TokenBurned): void {
   const token = TranchedPoolToken.load(event.params.tokenId.toString());
@@ -20,6 +21,15 @@ export function handleTokenBurned(event: TokenBurned): void {
 }
 
 export function handleTokenMinted(event: TokenMinted): void {
+  const marketID = event.params.pool.toHexString();
+  const tokenId = event.params.tokenId.toString();
+  const _poolToken = getOrCreatePoolToken(tokenId, marketID);
+  log.info("[handleTokenMinted]poolToken({}, {})", [
+    _poolToken.id,
+    _poolToken.market,
+  ]);
+
+  //
   const tranchedPool = TranchedPool.load(event.params.pool.toHexString());
   const user = getOrInitUser(event.params.owner);
   if (tranchedPool) {

@@ -92,7 +92,6 @@ export function handleDepositMade(event: DepositMade): void {
   const owner = event.params.owner.toHexString();
 
   const market = getOrCreateMarket(marketID, event);
-  const account = getOrCreateAccount(owner);
 
   const tranchedPoolContract = TranchedPoolContract.bind(event.address);
   const configContract = GoldfinchConfigContract.bind(
@@ -134,6 +133,14 @@ export function handleDepositMade(event: DepositMade): void {
     market._cumulativeRewardAmount = BIGINT_ZERO;
   }
   market.save();
+  log.info(
+    "[handleDepositMade]depositAmountUSD={},totalDepositBalanceUSD={},tx={}",
+    [
+      amountUSD.toString(),
+      market.totalDepositBalanceUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
 
   const protocol = getOrCreateProtocol();
   protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(amountUSD);
@@ -146,6 +153,7 @@ export function handleDepositMade(event: DepositMade): void {
   snapshotFinancials(protocol, amountUSD, event, TransactionType.DEPOSIT);
   updateUsageMetrics(protocol, owner, event, TransactionType.DEPOSIT);
 
+  const account = getOrCreateAccount(owner);
   const poolTokensContract = PoolTokensContract.bind(
     Address.fromString(market._poolToken!)
   );
@@ -173,8 +181,9 @@ export function handleDepositMade(event: DepositMade): void {
   );
 
   // save a mapping of tokenID to market (tranched pool) id for backer emission reward
-  const tokenId = event.params.tokenId.toHexString();
-  getOrCreatePoolToken(tokenId, market.id);
+  //const tokenId = event.params.tokenId.toHexString();
+  //getOrCreatePoolToken(tokenId, market.id);
+  //log.info("[handleDepositMade]poolToken({}, {})", [tokenId, market.id]);
 
   //
   handleDeposit(event);
@@ -218,7 +227,6 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
 
   const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(marketID, event);
-  const account = getOrCreateAccount(owner);
 
   const creditLineContract = CreditLineContract.bind(
     Address.fromString(market._creditLine!)
@@ -228,6 +236,14 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
     market.totalDepositBalanceUSD.minus(principalAmountUSD);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
   market.save();
+  log.info(
+    "[handleWithdrawalMade]withdrawAmountUSD={},totalDepositBalanceUSD={},tx={}",
+    [
+      principalAmountUSD.toString(),
+      market.totalDepositBalanceUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
 
   protocol.totalDepositBalanceUSD =
     protocol.totalDepositBalanceUSD.minus(principalAmountUSD);
@@ -243,6 +259,7 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
   );
   updateUsageMetrics(protocol, owner, event, TransactionType.WITHDRAW);
 
+  const account = getOrCreateAccount(owner);
   const poolTokensContract = PoolTokensContract.bind(
     Address.fromString(market._poolToken!)
   );
@@ -341,7 +358,6 @@ export function handleDrawdownMade(event: DrawdownMade): void {
 
   const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(marketID, event);
-  const account = getOrCreateAccount(borrower);
 
   if (!market._interestTimestamp) {
     market._interestTimestamp = event.block.timestamp;
@@ -363,6 +379,7 @@ export function handleDrawdownMade(event: DrawdownMade): void {
   snapshotFinancials(protocol, amountUSD, event, TransactionType.BORROW);
   updateUsageMetrics(protocol, borrower, event, TransactionType.BORROW);
 
+  const account = getOrCreateAccount(borrower);
   const creditLineContract = CreditLineContract.bind(
     Address.fromString(market._creditLine!)
   );
@@ -421,7 +438,6 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     log.error("[]payer {} != borrower {}", [payer, market._borrower!]);
   }
   */
-  const account = getOrCreateAccount(payer);
 
   market.totalBorrowBalanceUSD =
     market.totalBorrowBalanceUSD.minus(principleAmountUSD);
@@ -437,6 +453,30 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     market.save();
     return;
   }
+
+  if (market.totalBorrowBalanceUSD.equals(BIGDECIMAL_ZERO)) {
+    log.error(
+      "[handlePaymentApplied]market.totalBorrowBalanceUSD={} for market {} at tx {}",
+      [
+        market.totalBorrowBalanceUSD.toString(),
+        marketID,
+        event.transaction.hash.toHexString(),
+      ]
+    );
+    return;
+  }
+  if (market.totalDepositBalanceUSD.equals(BIGDECIMAL_ZERO)) {
+    log.error(
+      "[handlePaymentApplied]market.totalDepositBalanceUSD={} for market {} at tx {}",
+      [
+        market.totalDepositBalanceUSD.toString(),
+        marketID,
+        event.transaction.hash.toHexString(),
+      ]
+    );
+    return;
+  }
+
   // scale interest rate to APR
   // since interest is not compounding, apply a linear scaler based on time
   const InterestRateScaler = BigInt.fromI32(SECONDS_PER_YEAR).divDecimal(
@@ -456,8 +496,8 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   // senior and junior rates are different, this is an average of them
   const lenderInterestRateID = `${marketID}-${InterestRateSide.LENDER}-${InterestRateType.STABLE}`;
   const lenderInterestRate = new InterestRate(lenderInterestRateID);
-  borrowerInterestRate.side = InterestRateSide.LENDER;
-  borrowerInterestRate.type = InterestRateType.STABLE;
+  lenderInterestRate.side = InterestRateSide.LENDER;
+  lenderInterestRate.type = InterestRateType.STABLE;
   lenderInterestRate.rate = interestAmountUSD
     .div(market.totalDepositBalanceUSD)
     .times(InterestRateScaler)
@@ -493,6 +533,7 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   );
   updateUsageMetrics(protocol, payer, event, TransactionType.REPAY);
 
+  const account = getOrCreateAccount(payer);
   const creditLineContract = CreditLineContract.bind(
     Address.fromString(market._creditLine!)
   );
@@ -556,4 +597,5 @@ export function handleReserveFundsCollected(
   const market = getOrCreateMarket(marketID, event);
 
   updateRevenues(protocol, market, BIGDECIMAL_ZERO, amountUSD, event, true);
+  //snapshots updated by updateRevenues()
 }

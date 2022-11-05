@@ -26,7 +26,6 @@ import {
   ProtocolType,
   LendingType,
   RiskType,
-  RewardTokenType,
   InterestRateType,
   InterestRateSide,
   SECONDS_PER_HOUR,
@@ -41,6 +40,7 @@ import {
   INT_ONE,
   LendingType,
   FIDU_ADDRESS,
+  BIGDECIMAL_ONE,
 } from "./constants";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
 import { prefixID } from "./utils";
@@ -106,9 +106,6 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol = new LendingProtocol(FACTORY_ADDRESS);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.POOLED;
@@ -133,8 +130,9 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol.totalPoolCount = INT_ZERO;
     protocol.openPositionCount = INT_ZERO;
     protocol.cumulativePositionCount = INT_ZERO;
-    protocol.save();
+    protocol._marketIDs = [];
   }
+
   // ensure versions are updated even when grafting
   protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
   protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
@@ -145,7 +143,8 @@ export function getOrCreateProtocol(): LendingProtocol {
 
 export function getOrCreateMarket(
   marketId: string,
-  event: ethereum.Event
+  event: ethereum.Event,
+  name: string | null = null
 ): Market {
   // marketID = poolAddr
   // all pool/market have the same underlying USDC
@@ -153,13 +152,17 @@ export function getOrCreateMarket(
   let market = Market.load(marketId);
 
   if (market == null) {
-    const poolContract = TranchedPoolContract.bind(
-      Address.fromString(marketId)
-    );
+    if (name == null) {
+      const poolContract = TranchedPoolContract.bind(
+        Address.fromString(marketId)
+      );
+      name = poolContract._name;
+    }
 
+    const protocol = getOrCreateProtocol();
     market = new Market(marketId);
-    market.protocol = FACTORY_ADDRESS;
-    market.name = poolContract._name;
+    market.protocol = protocol.id;
+    market.name = name;
     // TODO isActive, canBorrowFrom defaults to false?
     market.isActive = false;
     market.canUseAsCollateral = false;
@@ -182,7 +185,7 @@ export function getOrCreateMarket(
     market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     market.inputTokenBalance = BIGINT_ZERO;
-    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ONE; //USDC
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.exchangeRate = BIGDECIMAL_ZERO;
@@ -206,6 +209,11 @@ export function getOrCreateMarket(
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
     market.save();
+
+    const marketIDs = protocol._marketIDs!;
+    marketIDs.push(market.id);
+    protocol._marketIDs = marketIDs;
+    protocol.save();
   }
   return market;
 }
@@ -531,10 +539,11 @@ export function getOpenPosition(
   side: string
 ): Position | null {
   const positionCounter = getOrCreatePositionCounter(accountID, marketID, side);
-  log.info(
+  /*
+  log.debug(
     "[getOpenPosition]Finding open position for acount {}/market {}/side {}",
     [accountID, marketID, side]
-  );
+  );*/
   const nextCount = positionCounter.nextCount;
   for (let counter = nextCount; counter >= 0; counter--) {
     const positionID = `${positionCounter.id}-${counter}`;
@@ -546,7 +555,7 @@ export function getOpenPosition(
       const account = position.account;
       // position is open
       if (position.hashClosed == null) {
-        log.info(
+        log.debug(
           "[getOpenPosition]found open position counter={}, position.id={}, account={}, balance={}, hashClosed={}",
           [counter.toString(), positionID, account, balance, hashClosed]
         );

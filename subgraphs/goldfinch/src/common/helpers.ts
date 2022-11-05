@@ -253,7 +253,9 @@ export function updateRevenues(
   newSupplySideRevenueUSD: BigDecimal,
   newProtocolSideRevenueUSD: BigDecimal,
   event: ethereum.Event,
-  updateProtocol: bool = true // whether to update protocol level revenues; false for senior pool to avoid double counting revenues
+  updateProtocol: bool = true
+  // whether to update protocol level revenues;
+  // false for interest paid to senior pool to avoid double counting revenues
 ): void {
   const newTotalRevenueUSD = newSupplySideRevenueUSD.plus(
     newProtocolSideRevenueUSD
@@ -274,6 +276,12 @@ export function updateRevenues(
   );
 
   // update daily snapshot
+  marketDailySnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketDailySnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  marketDailySnapshot.cumulativeTotalRevenueUSD =
+    market.cumulativeTotalRevenueUSD;
   marketDailySnapshot.dailySupplySideRevenueUSD =
     marketDailySnapshot.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   marketDailySnapshot.dailyProtocolSideRevenueUSD =
@@ -285,6 +293,12 @@ export function updateRevenues(
   marketDailySnapshot.save();
 
   // update hourly snapshot
+  marketHourlySnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketHourlySnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  marketHourlySnapshot.cumulativeTotalRevenueUSD =
+    market.cumulativeTotalRevenueUSD;
   marketHourlySnapshot.hourlySupplySideRevenueUSD =
     marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
       newSupplySideRevenueUSD
@@ -412,14 +426,16 @@ export function updateUsageMetrics(
     protocol.cumulativeUniqueUsers += INT_ONE;
   }
   if (transactionType == TransactionType.DEPOSIT) {
-    if (account.depositCount == INT_ZERO)
+    if (account.depositCount == INT_ZERO) {
       protocol.cumulativeUniqueDepositors += INT_ONE;
+    }
     account.depositCount += INT_ONE;
   } else if (transactionType == TransactionType.WITHDRAW) {
     account.withdrawCount += INT_ONE;
   } else if (transactionType == TransactionType.BORROW) {
-    if (account.borrowCount == INT_ZERO)
+    if (account.borrowCount == INT_ZERO) {
       protocol.cumulativeUniqueBorrowers += INT_ONE;
+    }
     account.borrowCount += INT_ONE;
   } else if (transactionType == TransactionType.REPAY) {
     account.repayCount += INT_ONE;
@@ -433,7 +449,13 @@ export function updateUsageMetrics(
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
+
     dailyMetrics.dailyActiveUsers += INT_ONE;
+    if (transactionType == TransactionType.DEPOSIT) {
+      dailyMetrics.dailyActiveDepositors += INT_ONE;
+    } else if (transactionType == TransactionType.BORROW) {
+      dailyMetrics.dailyActiveBorrowers += INT_ONE;
+    }
   }
 
   // create active account for hourlyMetrics

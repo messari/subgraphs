@@ -22,6 +22,10 @@ dataSources:
       abis:
         - name: GoldfinchFactory
           file: ./abis/GoldfinchFactory.json
+        - name: GoldfinchConfig
+          file: ./abis/GoldfinchConfig.json
+        - name: SeniorPool
+          file: ./abis/SeniorPool.json
         - name: TranchedPool
           file: ./abis/TranchedPool.json
         - name: CreditLine
@@ -30,9 +34,9 @@ dataSources:
           file: ./abis/PoolTokens.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: FixedLeverageRatioStrategy
+          file: ./abis/FixedLeverageRatioStrategy.json
       eventHandlers:
-        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
-          handler: handleRoleGranted
         - event: PoolCreated(indexed address,indexed address)
           handler: handlePoolCreated
 
@@ -62,6 +66,8 @@ dataSources:
           file: ./abis/USDC.json
         - name: GoldfinchConfig
           file: ./abis/GoldfinchConfig.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: DepositMade(indexed address,uint256,uint256)
           handler: handleDepositMade
@@ -333,6 +339,8 @@ templates:
           file: ./abis/BackerRewards.json
         - name: Zapper
           file: ./abis/Zapper.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: CreditLineMigrated(indexed address,indexed address)
           handler: handleCreditLineMigrated

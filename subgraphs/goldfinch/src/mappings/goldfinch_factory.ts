@@ -16,6 +16,7 @@ import {
   FIDU_ADDRESS,
   GFI_ADDRESS,
   INT_ONE,
+  INVALID_POOLS,
   RewardTokenType,
   SENIOR_POOL_ADDRESS,
 } from "../common/constants";
@@ -73,6 +74,14 @@ export function handleRoleGranted(event: RoleGranted): void {
 export function handlePoolCreated(event: PoolCreated): void {
   // init TranchedPool tempate
   const poolAddress = event.params.pool;
+  if (INVALID_POOLS.has(poolAddress.toHexString())) {
+    log.warning(
+      "[handlePoolCreated]pool {} is included in INVALID_POOLS; skipping",
+      [poolAddress.toHexString()]
+    );
+    return;
+  }
+
   const protocol = getOrCreateProtocol();
   const borrowerAddr = event.params.borrower.toHexString();
   const tranchedPoolContract = TranchedPoolContract.bind(poolAddress);

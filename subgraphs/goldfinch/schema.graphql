@@ -318,6 +318,9 @@ type LendingProtocol implements Protocol @entity {
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
 
+  " List of market IDs  "
+  _marketIDs: [String!]
+
   " Address of GoldfinchConfig Contract "
   _GoldfinchConfig: String
 }

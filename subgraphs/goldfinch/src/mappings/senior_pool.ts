@@ -53,8 +53,11 @@ export function handleDepositMade(event: DepositMade): void {
   const amount = event.params.amount;
   const amountUSD = amount.divDecimal(USDC_DECIMALS);
   const protocol = getOrCreateProtocol();
-  const market = getOrCreateMarket(event.address.toHexString(), event);
-  const account = getOrCreateAccount(capitalProvider);
+  const market = getOrCreateMarket(
+    event.address.toHexString(),
+    event,
+    "Senior Pool"
+  );
   const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
   const outputToken = getOrCreateToken(Address.fromString(FIDU_ADDRESS));
   const rewardToken = getOrCreateRewardToken(
@@ -65,13 +68,17 @@ export function handleDepositMade(event: DepositMade): void {
   market.outputToken = outputToken.id;
   market.rewardTokens = [rewardToken.id];
   // USDC
-  market.inputTokenBalance = market.inputTokenBalance.plus(event.params.amount);
-  market.inputTokenPriceUSD = bigIntToBDUseDecimals(
-    market.inputTokenBalance,
-    inputToken.decimals
-  );
   market.inputTokenPriceUSD = BIGDECIMAL_ONE;
   const seniorPoolContract = SeniorPoolContract.bind(event.address);
+  market.inputTokenBalance = seniorPoolContract.assets();
+  market.totalDepositBalanceUSD =
+    market.inputTokenBalance.divDecimal(USDC_DECIMALS);
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+  // alternatively, calculate totalDepositBalanceUSD using deposit amount
+  // this somehow creates negative totalDepositBalanceUSD
+  //market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(amountUSD);
+  market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
+
   const fiduContract = FiduContract.bind(
     Address.fromString(market.outputToken!)
   );
@@ -86,27 +93,39 @@ export function handleDepositMade(event: DepositMade): void {
     inputToken.decimals
   ).div(bigIntToBDUseDecimals(event.params.shares, outputToken.decimals));
 
-  market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(amountUSD);
-  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
-  market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
   // calculate average daily emission since first deposit
   if (!market._rewardTimestamp) {
     market._rewardTimestamp = event.block.timestamp;
     market._cumulativeRewardAmount = BIGINT_ZERO;
   }
 
-  market.save();
+  assert(
+    market.totalValueLockedUSD.ge(BIGDECIMAL_ZERO),
+    `market ${market.id} TVL ${
+      market.totalValueLockedUSD
+    } < 0 after tx ${event.transaction.hash.toHexString()}`
+  );
 
-  protocol.totalDepositBalanceUSD =
-    protocol.totalDepositBalanceUSD.plus(amountUSD);
+  let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol._marketIDs!.length; i++) {
+    const mkt = getOrCreateMarket(protocol._marketIDs![i], event);
+    totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
+      mkt.totalDepositBalanceUSD
+    );
+  }
+  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
   protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
+
   protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(amountUSD);
+
+  market.save();
   protocol.save();
 
   snapshotMarket(market, amountUSD, event, TransactionType.DEPOSIT);
   snapshotFinancials(protocol, amountUSD, event, TransactionType.DEPOSIT);
   updateUsageMetrics(protocol, capitalProvider, event, TransactionType.DEPOSIT);
 
+  const account = getOrCreateAccount(capitalProvider);
   const positionID = updatePosition(
     protocol,
     market,
@@ -154,18 +173,22 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
 
   const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(event.address.toHexString(), event);
-  const account = getOrCreateAccount(capitalProvider);
   const outputToken = getOrCreateToken(Address.fromString(FIDU_ADDRESS));
   //const outputToken = Token.load(market.outputToken!)!;
 
-  // USDC
-  market.totalDepositBalanceUSD =
-    market.totalDepositBalanceUSD.minus(amountUSD);
-  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
-  market.inputTokenBalance = market.inputTokenBalance.minus(amount);
-  market.inputTokenPriceUSD = BIGDECIMAL_ONE;
-
   const seniorPoolContract = SeniorPoolContract.bind(event.address);
+  market.inputTokenBalance = seniorPoolContract.assets();
+  market.totalDepositBalanceUSD =
+    market.inputTokenBalance.divDecimal(USDC_DECIMALS);
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+
+  assert(
+    market.totalValueLockedUSD.ge(BIGDECIMAL_ZERO),
+    `market ${market.id} TVL ${
+      market.totalValueLockedUSD
+    } < 0 after tx ${event.transaction.hash.toHexString()}`
+  );
+
   const fiduContract = FiduContract.bind(Address.fromString(FIDU_ADDRESS));
   const accountBalance = fiduContract.balanceOf(event.params.capitalProvider);
   market.outputTokenSupply = fiduContract.totalSupply();
@@ -174,9 +197,14 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
     outputToken.decimals
   );
 
-  protocol.totalDepositBalanceUSD =
-    protocol.totalDepositBalanceUSD.minus(amountUSD);
-  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
+  let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol._marketIDs!.length; i++) {
+    const mkt = getOrCreateMarket(protocol._marketIDs![i], event);
+    totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
+      mkt.totalDepositBalanceUSD
+    );
+  }
+  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
 
   snapshotMarket(market, amountUSD, event, TransactionType.WITHDRAW);
   snapshotFinancials(protocol, amountUSD, event, TransactionType.WITHDRAW);
@@ -187,6 +215,7 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
     TransactionType.WITHDRAW
   );
 
+  const account = getOrCreateAccount(capitalProvider);
   const positionID = updatePosition(
     protocol,
     market,
@@ -360,7 +389,8 @@ export function handlePrincipalWrittenDown(event: PrincipalWrittenDown): void {
     outputToken.decimals
   );
   market.outputTokenPriceUSD = outputToken.lastPriceUSD!;
-  // writing down eats into supply side revenue
+  // writing down eats into supply side revenue this can cause
+  // cumulative total/supply side revenue to decrease
   market.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD.plus(amountUSD);
   market.cumulativeTotalRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(
@@ -368,7 +398,12 @@ export function handlePrincipalWrittenDown(event: PrincipalWrittenDown): void {
   );
   market.save();
   outputToken.save();
-  market.save();
+  assert(
+    market.totalValueLockedUSD.ge(BIGDECIMAL_ZERO),
+    `market ${market.id} TVL ${
+      market.totalValueLockedUSD
+    } < 0 after tx ${event.transaction.hash.toHexString()}`
+  );
 
   const protocol = getOrCreateProtocol();
   protocol.totalDepositBalanceUSD =
@@ -376,7 +411,8 @@ export function handlePrincipalWrittenDown(event: PrincipalWrittenDown): void {
   protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
   protocol.totalBorrowBalanceUSD =
     protocol.totalBorrowBalanceUSD.plus(amountUSD);
-  // writing down eats into supply side revenue
+  // writing down eats into supply side revenue, this can cause
+  // cumulative supply side revenue to decrease
   protocol.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD.plus(amountUSD);
   protocol.cumulativeTotalRevenueUSD =
