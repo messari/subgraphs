@@ -50,6 +50,7 @@ export const YEARN_LENS_BLACKLIST: Address[] = [
   Address.fromString("0x8daebade922df735c38c80c7ebd708af50815faa"), // tBTC
   Address.fromString("0x0316eb71485b0ab14103307bf65a021042c6d380"), // Huobi BTC
   Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
+  Address.fromString("0xae7ab96520de3a18e5e111b5eaab095312d7fe84"), // stETH
 ];
 export const AAVE_ORACLE_BLACKLIST: Address[] = [];
 export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [

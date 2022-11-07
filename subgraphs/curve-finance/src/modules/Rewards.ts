@@ -59,10 +59,17 @@ export function getRewardsData_v2(gaugeAddress: Address): RewardsInfoType {
     constants.NULL.TYPE_ADDRESS
   );
 
-  if (rewardToken.equals(constants.NULL.TYPE_ADDRESS))
-    return new RewardsInfoType([], []);
+  if (rewardToken.equals(constants.NULL.TYPE_ADDRESS)) {
+    rewardToken = utils.readValue<Address>(
+      gaugeContract.try_reward_tokens(constants.BIGINT_ZERO),
+      constants.NULL.TYPE_ADDRESS
+    );
 
-  let rewardContractAddress = utils.readValue<Address>(
+    if (rewardToken.equals(constants.NULL.TYPE_ADDRESS))
+      return new RewardsInfoType([], []);
+  }
+
+  const rewardContractAddress = utils.readValue<Address>(
     gaugeContract.try_reward_contract(),
     constants.NULL.TYPE_ADDRESS
   );
@@ -71,8 +78,7 @@ export function getRewardsData_v2(gaugeAddress: Address): RewardsInfoType {
     return new RewardsInfoType([], []);
 
   const rewardsContract = PoolRewardsContract.bind(rewardContractAddress);
-
-  let rewardRate = utils.readValue<BigInt>(
+  const rewardRate = utils.readValue<BigInt>(
     rewardsContract.try_rewardRate(),
     constants.BIGINT_ZERO
   );
@@ -84,7 +90,7 @@ export function getRewardsData_v3(gaugeAddress: Address): RewardsInfoType {
   let rewardRates: BigInt[] = [];
   let rewardTokens: Address[] = [];
 
-  let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
+  const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
   for (let idx = 0; idx < 5; idx++) {
     let rewardToken = utils.readValue<Address>(
@@ -264,7 +270,7 @@ export function updateRewardTokenEmissions(
   let rewardTokens = pool.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
-    rewardTokens = rewardTokens.sort()
+    rewardTokens = rewardTokens.sort();
 
     pool.rewardTokens = rewardTokens;
   }

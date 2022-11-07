@@ -145,3 +145,8 @@ export const CRV_TOKEN_ADDRESS = Address.fromString(
   "{{crvTokenAddress}}"
 );
 
+export const POOL_REGISTRIES: Address[] = [
+{{#poolRegistry}}
+  Address.fromString("{{address}}"), // {{name}}
+{{/poolRegistry}}
+]

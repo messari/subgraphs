@@ -7,13 +7,12 @@ import {
   Deposit,
   Withdraw,
 } from "../../generated/templates/LiquidityGauge/Gauge";
-import { Address, dataSource } from "@graphprotocol/graph-ts";
+import { getPoolFromGauge } from "../common/utils";
 
 export function handleDeposit(event: Deposit): void {
   let gaugeAddress = event.address;
 
-  const context = dataSource.context();
-  let poolAddress = Address.fromString(context.getString("poolAddress"));
+  const poolAddress = getPoolFromGauge(gaugeAddress);
 
   updateStakedOutputTokenAmount(poolAddress, gaugeAddress, event.block);
   updateControllerRewards(poolAddress, gaugeAddress, event.block);
@@ -23,8 +22,7 @@ export function handleDeposit(event: Deposit): void {
 export function handleWithdraw(event: Withdraw): void {
   let gaugeAddress = event.address;
 
-  const context = dataSource.context();
-  let poolAddress = Address.fromString(context.getString("poolAddress"));
+  const poolAddress = getPoolFromGauge(gaugeAddress);
 
   updateStakedOutputTokenAmount(poolAddress, gaugeAddress, event.block);
   updateControllerRewards(poolAddress, gaugeAddress, event.block);

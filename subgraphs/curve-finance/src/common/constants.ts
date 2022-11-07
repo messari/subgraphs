@@ -145,3 +145,10 @@ export const CRV_TOKEN_ADDRESS = Address.fromString(
   "0xd533a949740bb3306d119cc777fa900ba034cd52"
 );
 
+export const POOL_REGISTRIES: Address[] = [
+  Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), // PoolRegistry
+  Address.fromString("0x7d86446ddb609ed0f5f8684acf30380a356b2b4c"), // PoolRegistryV2
+  Address.fromString("0xB9fC157394Af804a3578134A6585C0dc9cc990d4"), // MetapoolFactory
+  Address.fromString("0x8F942C20D02bEfc377D41445793068908E2250D0"), // CryptoSwapRegistry
+  Address.fromString("0xF18056Bbd320E96A48e3Fbf8bC061322531aac99"), // CryptoPoolFactory
+]

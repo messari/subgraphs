@@ -4,6 +4,7 @@ import {
   Address,
   ethereum,
   BigDecimal,
+  dataSource,
 } from "@graphprotocol/graph-ts";
 import {
   getOrCreateToken,
@@ -186,10 +187,32 @@ export function getPoolCoins(
   return inputTokens;
 }
 
+export function getPoolUnderlyingCoins(poolAddress: Address): Address[] {
+  let underlyingCoins: Address[] = [];
+
+  for (let i = 0; i < constants.POOL_REGISTRIES.length; i++) {
+    const registryAddress = constants.POOL_REGISTRIES[i];
+    const registryContract = RegistryContract.bind(registryAddress);
+
+    underlyingCoins = readValue<Address[]>(
+      registryContract.try_get_underlying_coins(poolAddress),
+      []
+    );
+
+    if (underlyingCoins.length != 0) return underlyingCoins;
+  }
+
+  return underlyingCoins;
+}
+
 export function getPoolUnderlyingCoinsFromRegistry(
   poolAddress: Address,
   registryAddress: Address
 ): Address[] {
+  if (registryAddress.equals(constants.NULL.TYPE_ADDRESS)) {
+    return getPoolUnderlyingCoins(poolAddress);
+  }
+
   const registryContract = RegistryContract.bind(registryAddress);
 
   let underlyingCoins = readValue<Address[]>(
@@ -327,6 +350,29 @@ export function getLpTokenFromGauge(gaugeAddress: Address): Address {
   );
 
   return lpToken;
+}
+
+export function getPoolFromGauge(gaugeAddress: Address): Address {
+  const lpToken = getLpTokenFromGauge(gaugeAddress);
+
+  let poolAddress: Address = constants.NULL.TYPE_ADDRESS;
+
+  for (let i = 0; i < constants.POOL_REGISTRIES.length; i++) {
+    const registryAddress = constants.POOL_REGISTRIES[i];
+    const registryContract = RegistryContract.bind(registryAddress);
+
+    poolAddress = readValue<Address>(
+      registryContract.try_get_pool_from_lp_token(lpToken),
+      constants.NULL.TYPE_ADDRESS
+    );
+
+    if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return poolAddress;
+  }
+
+  const context = dataSource.context();
+  poolAddress = Address.fromString(context.getString("poolAddress"));
+
+  return poolAddress;
 }
 
 export function getPoolTVL(
