@@ -4,7 +4,7 @@ import { getOrCreatePoolFactory, getOrCreateProtocol } from "../common/mappingHe
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { getOrCreateMarket, getOrCreateStakeLocker } from "../common/mappingHelpers/getOrCreate/markets";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
-import { ONE_BI, ONE_I32 } from "../common/constants";
+import { ONE_I32 } from "../common/constants";
 
 export function handlePoolCreated(event: PoolCreatedEvent): void {
     const poolAddress = event.params.pool;
