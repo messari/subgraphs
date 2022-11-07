@@ -1,4 +1,11 @@
-import { Address, Bytes, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  ByteArray,
+  Bytes,
+  crypto,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { CometDeployed } from "../../../generated/Configurator/Configurator";
 import {
   Comet,
@@ -25,9 +32,11 @@ import {
 } from "../../../src/utils/getters";
 import {
   CONFIGURATOR_ADDRESS,
+  ENCODED_TRANSFER_SIGNATURE,
   getProtocolData,
   OracleSource,
   TokenType,
+  ZERO_ADDRESS,
 } from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
 import { createDeposit, createWithdraw } from "../../../src/utils/creator";
@@ -137,8 +146,9 @@ export function handleCometDeployed(event: CometDeployed): void {
 
 //
 //
-// Supplying the base token
+// Supplying the base token (could be a Deposit or Repay)
 export function handleSupply(event: Supply): void {
+  // TODO calculate repay like in withdraw
   const cometContract = Comet.bind(event.address);
   const tryBaseToken = cometContract.try_baseToken();
   const accountID = event.params.dst;
@@ -184,20 +194,20 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
 //
 // withdraws baseToken (could be a Withdrawal or Borrow)
 export function handleWithdraw(event: Withdraw): void {
+  const accountID = event.params.src;
+  const accountActorID = event.params.to;
+  const asset = Address.fromString(ZERO_ADDRESS);
   const amount = event.params.amount;
-  const transferIndex = event.transaction.index.plus(BIGINT_ONE);
-  if (event.receipt) {
-    const logs = event.receipt!.logs;
-    for (let i = 0; i < logs.length; i++) {
-      if (logs[i].logIndex == transferIndex) {
-        log.warning("Real withdraw:index: {} hash: {} data: {} topics: {}", [
-          event.logIndex.toString(),
-          event.transaction.hash.toHexString(),
-          logs[i].data.toHexString(),
-          logs[i].topics[0].toHexString(),
-        ]);
-      }
-    }
+
+  const burnAmount = isBurn(event);
+  if (!burnAmount) {
+    // Borrow only
+  } else if (burnAmount.toBigInt().gte(amount)) {
+    // withdraw only
+  } else {
+    // burnAmount < amount
+    // partial withdraw and partial borrow
+    burn;
   }
 }
 
@@ -211,6 +221,8 @@ export function handleWithdraw(event: Withdraw): void {
 //   return (uint104(oldPrincipal), uint104(-newPrincipal));
 // }
 
+//
+// Withdraw collateral tokens (cannot be a Borrow)
 export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   const accountID = event.params.src;
   const accountActorID = event.params.to;
@@ -231,3 +243,76 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
 }
 
 export function handleTransfer(event: Transfer): void {}
+
+///////////////////
+///// Helpers /////
+///////////////////
+
+function isMint(event: ethereum.Event): BigInt | null {
+  const transfer = findTransfer(event);
+  if (!transfer) {
+    // ie, this event is a Deposit (not a Repay)
+    return null;
+  }
+  const fromAddress = ethereum
+    .decode("address", transfer.topics.at(1))!
+    .toAddress();
+  if (
+    fromAddress != Address.fromString(ZERO_ADDRESS) ||
+    event.address != transfer.address
+  ) {
+    // coincidence that there is a transfer, must be a mint from the same comet
+    return null;
+  }
+
+  // return transfer amount
+  return ethereum.decode("uint256", transfer.data)!.toBigInt();
+}
+
+function isBurn(event: ethereum.Event): BigInt | null {
+  const transfer = findTransfer(event);
+  if (!transfer) {
+    // ie, this event is a Withdrawal (not a Borrow)
+    return null;
+  }
+  const toAddress = ethereum
+    .decode("address", transfer.topics.at(2))!
+    .toAddress();
+  if (
+    toAddress != Address.fromString(ZERO_ADDRESS) ||
+    event.address != transfer.address
+  ) {
+    // coincidence that there is a transfer, must be a burn from the same comet
+    return null;
+  }
+
+  // return transfer amount
+  return ethereum.decode("uint256", transfer.data)!.toBigInt();
+}
+
+//
+//
+// Find and return transfer (as long as it is one index after the handled event)
+function findTransfer(event: ethereum.Event): ethereum.Log | null {
+  if (!event.receipt) {
+    log.warning("[findTransfer] No receipt found for event: {}", [
+      event.transaction.hash.toHexString(),
+    ]);
+    return null;
+  }
+
+  const logs = event.receipt!.logs;
+  const transferLogIndex = event.logIndex.plus(BIGINT_ONE); // expected index
+  for (let i = 0; i < logs.length; i++) {
+    let thisLog = logs[i];
+    let logSignature = thisLog.topics[0];
+    if (
+      transferLogIndex.equals(thisLog.logIndex) &&
+      logSignature == ENCODED_TRANSFER_SIGNATURE
+    ) {
+      return thisLog;
+    }
+  }
+
+  return null;
+}

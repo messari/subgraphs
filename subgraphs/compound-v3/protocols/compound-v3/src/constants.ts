@@ -1,9 +1,9 @@
+import { ByteArray, Bytes, crypto } from "@graphprotocol/graph-ts";
+import { ProtocolData } from "../../../src/utils/getters";
+
 ////////////////////////
 ///// Schema Enums /////
 ////////////////////////
-
-import { Bytes } from "@graphprotocol/graph-ts";
-import { ProtocolData } from "../../../src/utils/getters";
 
 // The network names corresponding to the Network enum in the schema.
 // They also correspond to the ones in `dataSource.network()` after converting to lower case.
@@ -150,3 +150,11 @@ export function getProtocolData(): ProtocolData {
     RISK_TYPE
   );
 }
+
+//////////////////
+///// Extras /////
+//////////////////
+
+export const ENCODED_TRANSFER_SIGNATURE = crypto.keccak256(
+  ByteArray.fromUTF8("Transfer(address,address,uint256)")
+);

@@ -67,7 +67,7 @@ TODO
 - `Comet` is also the collateral token. (ie, it is cUSDCv3)
 - Need to manually add TotalsBasic() to Comet abi to get total Supply of base tokens with interest, interest (revenue), borrows with interest.
 - Base token withdraws act as withdraws and borrows depending on WHAT?? logic
--
+- The base asset cannot be used as collateral
 
 ## Reference and Useful Links
 
