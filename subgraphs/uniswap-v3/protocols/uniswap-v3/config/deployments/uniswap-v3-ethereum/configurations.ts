@@ -113,6 +113,7 @@ export class UniswapV3MainnetConfigurations implements Configurations {
       "0x398aea1c9ceb7de800284bb399a15e0efe5a9ec2", // Escrowed Illuvium
       "0x8c6bf16c273636523c29db7db04396143770f6a0", // MoonRabbit
       "0x4da27a545c0c5b758a6ba100e3a049001de870f5", // Staked AAVE
+      "0x785d7ff551c9b62562c6767551ffa3e3e562b6ed", // SifuM
     ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
