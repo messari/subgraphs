@@ -6,6 +6,7 @@ import {
   ethereum,
   BigInt,
   log,
+  BigDecimal,
 } from "@graphprotocol/graph-ts";
 import { CometDeployed } from "../../../generated/Configurator/Configurator";
 import {
@@ -18,6 +19,7 @@ import {
 } from "../../../generated/templates/Comet/Comet";
 import {
   BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   bigIntToBigDecimal,
   BIGINT_HUNDRED,
@@ -32,6 +34,7 @@ import {
   getOrCreateTokenData,
 } from "../../../src/utils/getters";
 import {
+  COMPOUND_DECIMALS,
   CONFIGURATOR_ADDRESS,
   ENCODED_TRANSFER_SIGNATURE,
   getProtocolData,
@@ -46,7 +49,13 @@ import {
   createRepay,
   createWithdraw,
 } from "../../../src/utils/creator";
-import { Repay } from "../../../generated/schema";
+import {
+  Market,
+  Oracle,
+  Repay,
+  Token,
+  TokenData,
+} from "../../../generated/schema";
 
 ///////////////////////////////
 ///// Configurator Events /////
@@ -84,7 +93,7 @@ export function handleCometDeployed(event: CometDeployed): void {
     baseTokenData.outputTokens = [outputToken.id];
     baseTokenData.outputTokenBalances = [BIGINT_ZERO];
     baseTokenData.outputTokenPricesUSD = [BIGDECIMAL_ZERO];
-    baseTokenData.exchangeRates = [BIGDECIMAL_ZERO];
+    baseTokenData.exchangeRates = [BIGDECIMAL_ONE];
 
     // create base token Oracle
     if (!tryBaseOracle.reverted) {
@@ -160,7 +169,13 @@ export function handleSupply(event: Supply): void {
   const accountID = event.params.dst;
   const accountActorID = event.params.from;
   const amount = event.params.amount;
-  // TODO update all token price in this market
+  const token = updateMarketPrices(event, tryBaseToken.value);
+  if (!token) {
+    log.warning("[handleSupply] Could not find token {}", [
+      tryBaseToken.value.toHexString(),
+    ]);
+    return;
+  }
 
   const mintAmount = isMint(event);
   if (!mintAmount) {
@@ -171,7 +186,7 @@ export function handleSupply(event: Supply): void {
       tryBaseToken.value,
       accountID,
       amount,
-      BIGDECIMAL_ZERO
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
     );
     repay.accountActor = accountActorID;
     repay.save();
@@ -184,7 +199,7 @@ export function handleSupply(event: Supply): void {
       tryBaseToken.value,
       accountID,
       amount,
-      BIGDECIMAL_ZERO
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
     );
     deposit.accountActor = accountActorID;
     deposit.save();
@@ -199,7 +214,7 @@ export function handleSupply(event: Supply): void {
       tryBaseToken.value,
       accountID,
       repayAmount,
-      BIGDECIMAL_ZERO
+      bigIntToBigDecimal(repayAmount, token.decimals).times(token.lastPriceUSD!)
     );
     repay.accountActor = accountActorID;
     repay.save();
@@ -210,7 +225,9 @@ export function handleSupply(event: Supply): void {
       tryBaseToken.value,
       accountID,
       depositAmount,
-      BIGDECIMAL_ZERO
+      bigIntToBigDecimal(depositAmount, token.decimals).times(
+        token.lastPriceUSD!
+      )
     );
     deposit.accountActor = accountActorID;
     deposit.save();
@@ -225,7 +242,13 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
   const accountActorID = event.params.from;
   const asset = event.params.asset;
   const amount = event.params.amount;
-  // TODO update all token price in this market
+  const token = updateMarketPrices(event, asset);
+  if (!token) {
+    log.warning("[handleSupplyCollateral] Could not find token {}", [
+      asset.toHexString(),
+    ]);
+    return;
+  }
 
   const deposit = createDeposit(
     event,
@@ -233,7 +256,7 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
     asset,
     accountID,
     amount,
-    BIGDECIMAL_ZERO
+    bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
   );
   deposit.accountActor = accountActorID;
   deposit.save();
@@ -248,6 +271,13 @@ export function handleWithdraw(event: Withdraw): void {
   const accountID = event.params.src;
   const accountActorID = event.params.to;
   const amount = event.params.amount;
+  const token = updateMarketPrices(event, tryBaseToken.value);
+  if (!token) {
+    log.warning("[handleWithdraw] Could not find token {}", [
+      tryBaseToken.value.toHexString(),
+    ]);
+    return;
+  }
 
   const burnAmount = isBurn(event);
   if (!burnAmount) {
@@ -258,7 +288,7 @@ export function handleWithdraw(event: Withdraw): void {
       tryBaseToken.value,
       accountID,
       amount,
-      BIGDECIMAL_ZERO
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
     );
     borrow.accountActor = accountActorID;
     borrow.save();
@@ -270,7 +300,7 @@ export function handleWithdraw(event: Withdraw): void {
       tryBaseToken.value,
       accountID,
       amount,
-      BIGDECIMAL_ZERO
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
     );
     withdraw.accountActor = accountActorID;
     withdraw.save();
@@ -285,7 +315,9 @@ export function handleWithdraw(event: Withdraw): void {
       tryBaseToken.value,
       accountID,
       borrowAmount,
-      BIGDECIMAL_ZERO
+      bigIntToBigDecimal(borrowAmount, token.decimals).times(
+        token.lastPriceUSD!
+      )
     );
     borrow.accountActor = accountActorID;
     borrow.save();
@@ -296,7 +328,9 @@ export function handleWithdraw(event: Withdraw): void {
       tryBaseToken.value,
       accountID,
       withdrawAmount,
-      BIGDECIMAL_ZERO
+      bigIntToBigDecimal(withdrawAmount, token.decimals).times(
+        token.lastPriceUSD!
+      )
     );
     withdraw.accountActor = accountActorID;
     withdraw.save();
@@ -311,7 +345,13 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   const accountActorID = event.params.to;
   const asset = event.params.asset;
   const amount = event.params.amount;
-  // TODO update all token price in this market
+  const token = updateMarketPrices(event, asset);
+  if (!token) {
+    log.warning("[handleWithdrawCollateral] Could not find token {}", [
+      asset.toHexString(),
+    ]);
+    return;
+  }
 
   const deposit = createWithdraw(
     event,
@@ -319,7 +359,7 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
     asset,
     accountID,
     amount,
-    BIGDECIMAL_ZERO // TODO price asset
+    bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
   );
   deposit.accountActor = accountActorID;
   deposit.save();
@@ -330,6 +370,63 @@ export function handleTransfer(event: Transfer): void {}
 ///////////////////
 ///// Helpers /////
 ///////////////////
+
+function updateMarketPrices(
+  event: ethereum.Event,
+  tokenAddress: Address // token we want the price of
+): Token | null {
+  const market = getOrCreateMarket(
+    event,
+    event.address,
+    getProtocolData().protocolID
+  );
+  const tokens = market.tokens!;
+  const marketAddress = event.address;
+  let thisToken: Token | null = null;
+
+  for (let i = 0; i < tokens.length; i++) {
+    const tokenData = TokenData.load(tokens[i]);
+    if (!tokenData) {
+      continue;
+    }
+    const inputToken = getOrCreateToken(tokenData.inputToken);
+    const oracleData = Oracle.load(inputToken.oracle!);
+    if (!oracleData) {
+      continue;
+    }
+    const tokenPrice = getPrice(
+      Address.fromBytes(oracleData.oracleAddress),
+      marketAddress
+    );
+
+    tokenData.inputTokenPricesUSD = tokenPrice;
+    if (tokenData.outputTokens) {
+      tokenData.outputTokenPricesUSD = [tokenPrice];
+    }
+    tokenData.save();
+
+    inputToken.lastPriceUSD = tokenPrice;
+    inputToken.lastPriceBlockNumber = event.block.number;
+    inputToken.save();
+
+    if (inputToken.id == tokenAddress) {
+      thisToken = inputToken;
+    }
+  }
+
+  return thisToken;
+}
+
+function getPrice(priceFeed: Address, cometAddress: Address): BigDecimal {
+  const cometContract = Comet.bind(cometAddress);
+  const tryPrice = cometContract.try_getPrice(priceFeed);
+
+  if (tryPrice.reverted) {
+    return BIGDECIMAL_ZERO;
+  }
+
+  return bigIntToBigDecimal(tryPrice.value, COMPOUND_DECIMALS);
+}
 
 function isMint(event: ethereum.Event): BigInt | null {
   const transfer = findTransfer(event);

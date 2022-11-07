@@ -192,13 +192,13 @@ export function getOrCreateOracle(
   return oracle;
 }
 
-export function getOrCreateToken(tokenAddress: Address): Token {
+export function getOrCreateToken(tokenAddress: Bytes): Token {
   let token = Token.load(tokenAddress);
   if (!token) {
     token = new Token(tokenAddress);
-    token.name = fetchTokenName(tokenAddress);
-    token.symbol = fetchTokenSymbol(tokenAddress);
-    token.decimals = fetchTokenDecimals(tokenAddress);
+    token.name = fetchTokenName(Address.fromBytes(tokenAddress));
+    token.symbol = fetchTokenSymbol(Address.fromBytes(tokenAddress));
+    token.decimals = fetchTokenDecimals(Address.fromBytes(tokenAddress));
     token.save();
   }
 

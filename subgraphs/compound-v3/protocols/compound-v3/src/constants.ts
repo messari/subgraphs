@@ -137,6 +137,7 @@ export const PROTOCOL_NETWORK = Network.MAINNET;
 export const LENDING_TYPE = LendingType.POOLED;
 export const PERMISSION_TYPE = PermissionType.PERMISSIONLESS;
 export const RISK_TYPE = RiskType.GLOBAL;
+export const COMPOUND_DECIMALS = 8;
 
 export function getProtocolData(): ProtocolData {
   return new ProtocolData(
