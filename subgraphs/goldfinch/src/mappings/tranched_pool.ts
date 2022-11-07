@@ -95,7 +95,6 @@ export function handleDepositMade(event: DepositMade): void {
     rewardTokenAddress,
     RewardTokenType.DEPOSIT
   );
-
   market.rewardTokens = [rewardToken.id];
 
   if (!market._poolToken) {
@@ -116,9 +115,10 @@ export function handleDepositMade(event: DepositMade): void {
     market.canBorrowFrom = true;
   }
 
-  market.inputTokenBalance = creditLineContract.balance();
+  market.inputTokenBalance = market.inputTokenBalance.plus(amount);
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
-  market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(amountUSD);
+  market.totalDepositBalanceUSD =
+    market.inputTokenBalance.divDecimal(USDC_DECIMALS);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
   // calculate average daily emission since first deposit
   if (!market._rewardTimestamp) {
@@ -126,21 +126,36 @@ export function handleDepositMade(event: DepositMade): void {
     market._cumulativeRewardAmount = BIGINT_ZERO;
   }
   market.save();
+
+  const protocol = getOrCreateProtocol();
+  let marketIDs = protocol._marketIDs!;
+  if (marketIDs.indexOf(market.id) < 0) {
+    marketIDs = marketIDs.concat([market.id]);
+  }
+  let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol._marketIDs!.length; i++) {
+    const mktID = protocol._marketIDs![i];
+    const mkt = getOrCreateMarket(mktID, event);
+    totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
+      mkt.totalDepositBalanceUSD
+    );
+  }
+  protocol._marketIDs = marketIDs;
+  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
+  protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(amountUSD);
+  protocol.save();
+
   log.info(
-    "[handleDepositMade]depositAmountUSD={},totalDepositBalanceUSD={},tx={}",
+    "[handleDepositMade]market {}: amountUSD={},market.tvl={},protocl.tvl={},tx={}",
     [
+      market.id,
       amountUSD.toString(),
-      market.totalDepositBalanceUSD.toString(),
+      market.totalValueLockedUSD.toString(),
+      protocol.totalValueLockedUSD.toString(),
       event.transaction.hash.toHexString(),
     ]
   );
-
-  const protocol = getOrCreateProtocol();
-  protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(amountUSD);
-  protocol.totalDepositBalanceUSD =
-    protocol.totalDepositBalanceUSD.plus(amountUSD);
-  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
-  protocol.save();
 
   snapshotMarket(market, amountUSD, event, TransactionType.DEPOSIT);
   snapshotFinancials(protocol, amountUSD, event, TransactionType.DEPOSIT);
@@ -212,7 +227,7 @@ export function handleDrawdownsUnpaused(event: DrawdownsUnpaused): void {
 export function handleWithdrawalMade(event: WithdrawalMade): void {
   const marketID = event.address.toHexString();
   const amount = event.params.principalWithdrawn.plus(
-    event.params.principalWithdrawn
+    event.params.interestWithdrawn
   );
   const principalAmountUSD =
     event.params.principalWithdrawn.divDecimal(USDC_DECIMALS);
@@ -221,27 +236,41 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
   const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(marketID, event);
 
-  const creditLineContract = CreditLineContract.bind(
-    Address.fromString(market._creditLine!)
+  market.inputTokenBalance = market.inputTokenBalance.minus(
+    event.params.principalWithdrawn
   );
-  market.inputTokenBalance = creditLineContract.balance();
   market.totalDepositBalanceUSD =
-    market.totalDepositBalanceUSD.minus(principalAmountUSD);
+    market.inputTokenBalance.divDecimal(USDC_DECIMALS);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
   market.save();
+
+  let marketIDs = protocol._marketIDs!;
+  if (marketIDs.indexOf(market.id) < 0) {
+    marketIDs = marketIDs.concat([market.id]);
+  }
+  let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol._marketIDs!.length; i++) {
+    const mktID = protocol._marketIDs![i];
+    const mkt = getOrCreateMarket(mktID, event);
+    totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
+      mkt.totalDepositBalanceUSD
+    );
+  }
+  protocol._marketIDs = marketIDs;
+  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
+  protocol.save();
+
   log.info(
-    "[handleWithdrawalMade]withdrawAmountUSD={},totalDepositBalanceUSD={},tx={}",
+    "[handleWithdrawalMade]market {}: withdrawAmountUSD={},market.tvl={},protocl.tvl={},tx={}",
     [
+      market.id,
       principalAmountUSD.toString(),
-      market.totalDepositBalanceUSD.toString(),
+      market.totalValueLockedUSD.toString(),
+      protocol.totalValueLockedUSD.toString(),
       event.transaction.hash.toHexString(),
     ]
   );
-
-  protocol.totalDepositBalanceUSD =
-    protocol.totalDepositBalanceUSD.minus(principalAmountUSD);
-  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
-  protocol.save();
 
   snapshotMarket(market, principalAmountUSD, event, TransactionType.WITHDRAW);
   snapshotFinancials(
@@ -253,12 +282,10 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
   updateUsageMetrics(protocol, owner, event, TransactionType.WITHDRAW);
 
   const account = getOrCreateAccount(owner);
-  const poolTokensContract = PoolTokensContract.bind(
-    Address.fromString(market._poolToken!)
+  const creditLineContract = CreditLineContract.bind(
+    Address.fromString(market._creditLine!)
   );
-  const accountBalance = poolTokensContract
-    .tokens(event.params.tokenId)
-    .getPrincipalAmount();
+  const accountBalance = creditLineContract.balance();
   const positionID = updatePosition(
     protocol,
     market,
@@ -359,12 +386,26 @@ export function handleDrawdownMade(event: DrawdownMade): void {
       [marketID, event.block.timestamp.toString()]
     );
   }
-  market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(amountUSD);
+  const creditLineContract = CreditLineContract.bind(
+    Address.fromString(market._creditLine!)
+  );
+
+  market.totalBorrowBalanceUSD = creditLineContract
+    .balance()
+    .divDecimal(USDC_DECIMALS);
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
   market.save();
 
-  protocol.totalBorrowBalanceUSD =
-    protocol.totalBorrowBalanceUSD.plus(amountUSD);
+  let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol._marketIDs!.length; i++) {
+    const mktID = protocol._marketIDs![i];
+    const mkt = getOrCreateMarket(mktID, event);
+    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
+      mkt.totalBorrowBalanceUSD
+    );
+  }
+
+  protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
   protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(amountUSD);
   protocol.save();
 
@@ -373,9 +414,6 @@ export function handleDrawdownMade(event: DrawdownMade): void {
   updateUsageMetrics(protocol, borrower, event, TransactionType.BORROW);
 
   const account = getOrCreateAccount(borrower);
-  const creditLineContract = CreditLineContract.bind(
-    Address.fromString(market._creditLine!)
-  );
   const accountBalance = creditLineContract.balance();
   const positionID = updatePosition(
     protocol,
@@ -422,6 +460,12 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   const principleAmountUSD =
     event.params.principalAmount.divDecimal(USDC_DECIMALS);
   const payer = event.params.payer.toHexString();
+  const tx = event.transaction.hash.toHexString();
+
+  log.info(
+    "[handlePaymentApplied]market {} payment interestAmountUSD {} + principleAmountUSD {} received at tx {}",
+    [marketID, interestAmountUSD.toString(), principleAmountUSD.toString(), tx]
+  );
 
   const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(marketID, event);
@@ -431,74 +475,88 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     log.error("[]payer {} != borrower {}", [payer, market._borrower!]);
   }
   */
+  const creditLineContract = CreditLineContract.bind(
+    Address.fromString(market._creditLine!)
+  );
+  market.totalBorrowBalanceUSD = creditLineContract
+    .balance()
+    .divDecimal(USDC_DECIMALS);
 
-  market.totalBorrowBalanceUSD =
-    market.totalBorrowBalanceUSD.minus(principleAmountUSD);
-  protocol.totalBorrowBalanceUSD =
-    protocol.totalBorrowBalanceUSD.minus(principleAmountUSD);
+  let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol._marketIDs!.length; i++) {
+    const mktID = protocol._marketIDs![i];
+    const mkt = getOrCreateMarket(mktID, event);
+    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
+      mkt.totalBorrowBalanceUSD
+    );
+  }
+  protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
 
+  let updateInterestRates = true;
   if (!market._interestTimestamp) {
-    log.error(
-      "[handlePaymentApplied]market._interestTimestamp for market {} not set",
-      [marketID]
+    log.warning(
+      "[handlePaymentApplied]market._interestTimestamp for market {} not set for tx {}",
+      [marketID, tx]
     );
     market._interestTimestamp = event.block.timestamp;
     market.save();
-    return;
+    updateInterestRates = false;
   }
 
-  if (market.totalBorrowBalanceUSD.equals(BIGDECIMAL_ZERO)) {
-    log.error(
-      "[handlePaymentApplied]market.totalBorrowBalanceUSD={} for market {} at tx {}",
-      [
-        market.totalBorrowBalanceUSD.toString(),
-        marketID,
-        event.transaction.hash.toHexString(),
-      ]
+  if (updateInterestRates) {
+    // scale interest rate to APR
+    // since interest is not compounding, apply a linear scaler based on time
+    const InterestRateScaler = BigInt.fromI32(SECONDS_PER_YEAR).divDecimal(
+      event.block.timestamp.minus(market._interestTimestamp!).toBigDecimal()
     );
-    return;
-  }
-  if (market.totalDepositBalanceUSD.equals(BIGDECIMAL_ZERO)) {
-    log.error(
-      "[handlePaymentApplied]market.totalDepositBalanceUSD={} for market {} at tx {}",
-      [
-        market.totalDepositBalanceUSD.toString(),
-        marketID,
-        event.transaction.hash.toHexString(),
-      ]
-    );
-    return;
-  }
+    // even though rates are supposed to be "STABLE", but there may be late payment, writedown
+    // the actual rate may not be stable
+    const borrowerInterestRateID = `${marketID}-${InterestRateSide.BORROWER}-${InterestRateType.STABLE}`;
+    const borrowerInterestRate = new InterestRate(borrowerInterestRateID);
+    if (market.totalBorrowBalanceUSD.gt(BIGDECIMAL_ZERO)) {
+      borrowerInterestRate.side = InterestRateSide.BORROWER;
+      borrowerInterestRate.type = InterestRateType.STABLE;
+      borrowerInterestRate.rate = interestAmountUSD
+        .div(market.totalBorrowBalanceUSD)
+        .times(InterestRateScaler)
+        .times(BIGDECIMAL_HUNDRED);
+      borrowerInterestRate.save();
+    } else {
+      log.warning(
+        "[handlePaymentApplied]market.totalBorrowBalanceUSD={} for market {} at tx {}, skip updating borrower rates",
+        [
+          market.totalBorrowBalanceUSD.toString(),
+          marketID,
+          event.transaction.hash.toHexString(),
+        ]
+      );
+    }
 
-  // scale interest rate to APR
-  // since interest is not compounding, apply a linear scaler based on time
-  const InterestRateScaler = BigInt.fromI32(SECONDS_PER_YEAR).divDecimal(
-    event.block.timestamp.minus(market._interestTimestamp!).toBigDecimal()
-  );
-  // even though rates are supposed to be "STABLE", but there may be late payment, writedown
-  // the actual rate may not be stable
-  const borrowerInterestRateID = `${marketID}-${InterestRateSide.BORROWER}-${InterestRateType.STABLE}`;
-  const borrowerInterestRate = new InterestRate(borrowerInterestRateID);
-  borrowerInterestRate.side = InterestRateSide.BORROWER;
-  borrowerInterestRate.type = InterestRateType.STABLE;
-  borrowerInterestRate.rate = interestAmountUSD
-    .div(market.totalBorrowBalanceUSD)
-    .times(InterestRateScaler)
-    .times(BIGDECIMAL_HUNDRED);
-  borrowerInterestRate.save();
-  // senior and junior rates are different, this is an average of them
-  const lenderInterestRateID = `${marketID}-${InterestRateSide.LENDER}-${InterestRateType.STABLE}`;
-  const lenderInterestRate = new InterestRate(lenderInterestRateID);
-  lenderInterestRate.side = InterestRateSide.LENDER;
-  lenderInterestRate.type = InterestRateType.STABLE;
-  lenderInterestRate.rate = interestAmountUSD
-    .div(market.totalDepositBalanceUSD)
-    .times(InterestRateScaler)
-    .times(BIGDECIMAL_HUNDRED);
-  lenderInterestRate.save();
+    // senior and junior rates are different, this is an average of them
+    const lenderInterestRateID = `${marketID}-${InterestRateSide.LENDER}-${InterestRateType.STABLE}`;
+    const lenderInterestRate = new InterestRate(lenderInterestRateID);
+    if (market.totalDepositBalanceUSD.gt(BIGDECIMAL_ZERO)) {
+      lenderInterestRate.side = InterestRateSide.LENDER;
+      lenderInterestRate.type = InterestRateType.STABLE;
+      lenderInterestRate.rate = interestAmountUSD
+        .div(market.totalDepositBalanceUSD)
+        .times(InterestRateScaler)
+        .times(BIGDECIMAL_HUNDRED);
+      lenderInterestRate.save();
+    } else {
+      log.warning(
+        "[handlePaymentApplied]market.totalDepositBalanceUSD={} for market {} at tx {}, skip updating lender rates",
+        [
+          market.totalDepositBalanceUSD.toString(),
+          marketID,
+          event.transaction.hash.toHexString(),
+        ]
+      );
+    }
 
-  market.rates = [borrowerInterestRate.id, lenderInterestRate.id];
-  market._interestTimestamp = event.block.timestamp;
+    market.rates = [borrowerInterestRate.id, lenderInterestRate.id];
+    market._interestTimestamp = event.block.timestamp;
+  }
 
   market.save();
   protocol.save();
@@ -527,9 +585,6 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   updateUsageMetrics(protocol, payer, event, TransactionType.REPAY);
 
   const account = getOrCreateAccount(payer);
-  const creditLineContract = CreditLineContract.bind(
-    Address.fromString(market._creditLine!)
-  );
   const accountBalance = creditLineContract.balance();
   const positionID = updatePosition(
     protocol,

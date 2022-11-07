@@ -103,7 +103,7 @@ export function handlePoolCreated(event: PoolCreated): void {
   protocol.totalPoolCount += INT_ONE;
   protocol.save();
 
-  TranchedPoolTemplate.create(poolAddress);
+  //TranchedPoolTemplate.create(poolAddress);
 
   //
   TranchedPoolTemplate.create(event.params.pool);

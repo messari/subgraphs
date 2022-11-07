@@ -39,6 +39,7 @@ import {
   INT_ONE,
   LendingType,
   BIGDECIMAL_ONE,
+  SENIOR_POOL_ADDRESS,
 } from "./constants";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
 import { prefixID } from "./utils";
@@ -141,8 +142,7 @@ export function getOrCreateProtocol(): LendingProtocol {
 
 export function getOrCreateMarket(
   marketId: string,
-  event: ethereum.Event,
-  name: string | null = null
+  event: ethereum.Event
 ): Market {
   // marketID = poolAddr
   // all pool/market have the same underlying USDC
@@ -150,11 +150,14 @@ export function getOrCreateMarket(
   let market = Market.load(marketId);
 
   if (market == null) {
-    if (name == null) {
+    let name: string;
+    if (marketId != SENIOR_POOL_ADDRESS) {
       const poolContract = TranchedPoolContract.bind(
         Address.fromString(marketId)
       );
       name = poolContract._name;
+    } else {
+      name = "Senior Pool";
     }
 
     const protocol = getOrCreateProtocol();
@@ -208,8 +211,8 @@ export function getOrCreateMarket(
     market.createdBlockNumber = event.block.number;
     market.save();
 
-    const marketIDs = protocol._marketIDs!;
-    marketIDs.push(market.id);
+    let marketIDs = protocol._marketIDs!;
+    marketIDs = marketIDs.concat([market.id]);
     protocol._marketIDs = marketIDs;
     protocol.save();
   }

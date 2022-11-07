@@ -18,7 +18,7 @@ export function handleSetTotalRewards(
 ): void {
   updateBackerRewardsData(event.address);
   // It's a little odd to see this calculation initiated here, but it's in order to ensure that rewards are calculated if the backer contract is deployed after some pools
-  calculateApyFromGfiForAllPools(event.block.timestamp);
+  calculateApyFromGfiForAllPools();
 }
 
 export function handleSetMaxInterestDollarsEligible(
@@ -26,7 +26,7 @@ export function handleSetMaxInterestDollarsEligible(
 ): void {
   updateBackerRewardsData(event.address);
   // It's a little odd to see this calculation initiated here, but it's in order to ensure that rewards are calculated if the backer contract is deployed after some pools
-  calculateApyFromGfiForAllPools(event.block.timestamp);
+  calculateApyFromGfiForAllPools();
 }
 
 export function handleBackerRewardsClaimed(event: BackerRewardsClaimed): void {

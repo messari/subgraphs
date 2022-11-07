@@ -326,7 +326,7 @@ export function initOrUpdateTranchedPool(
     seniorPoolStatus.tranchedPools = tpl;
     seniorPoolStatus.save();
   }
-  calculateApyFromGfiForAllPools(timestamp);
+  calculateApyFromGfiForAllPools();
 
   return tranchedPool;
 }

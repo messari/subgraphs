@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import {
   SeniorPool as SeniorPoolContract,
   DepositMade,
@@ -11,11 +11,13 @@ import {
   WithdrawalMade,
 } from "../../generated/templates/SeniorPool/SeniorPool";
 import { Fidu as FiduContract } from "../../generated/templates/SeniorPool/Fidu";
-
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  CONFIG_KEYS_ADDRESSES,
+  FIDU_ADDRESS,
+  GFI_ADDRESS,
   PositionSide,
   RewardTokenType,
   TransactionType,
@@ -50,11 +52,7 @@ export function handleDepositMade(event: DepositMade): void {
   const amount = event.params.amount;
   const amountUSD = amount.divDecimal(USDC_DECIMALS);
   const protocol = getOrCreateProtocol();
-  const market = getOrCreateMarket(
-    event.address.toHexString(),
-    event,
-    "Senior Pool"
-  );
+  const market = getOrCreateMarket(event.address.toHexString(), event);
   const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
   const outputToken = getOrCreateToken(Address.fromString(FIDU_ADDRESS));
   const rewardToken = getOrCreateRewardToken(
@@ -96,27 +94,48 @@ export function handleDepositMade(event: DepositMade): void {
     market._cumulativeRewardAmount = BIGINT_ZERO;
   }
 
-  assert(
-    market.totalValueLockedUSD.ge(BIGDECIMAL_ZERO),
-    `market ${market.id} TVL ${
-      market.totalValueLockedUSD
-    } < 0 after tx ${event.transaction.hash.toHexString()}`
-  );
-
+  log.info("[handleDepositMade]_marketIDs.length={}", [
+    protocol._marketIDs!.length.toString(),
+  ]);
+  let marketIDs = protocol._marketIDs!;
+  if (marketIDs.indexOf(market.id) < 0) {
+    marketIDs = marketIDs.concat([market.id]);
+  }
   let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
   for (let i = 0; i < protocol._marketIDs!.length; i++) {
     const mkt = getOrCreateMarket(protocol._marketIDs![i], event);
     totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
       mkt.totalDepositBalanceUSD
     );
+    log.info("[handleDepositMade]mkt {} totalDepositBalanceUSD={}", [
+      mkt.id,
+      mkt.totalDepositBalanceUSD.toString(),
+    ]);
   }
-  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
-  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
 
   protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(amountUSD);
-
+  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
   market.save();
   protocol.save();
+
+  log.info(
+    "[handleDepositMade]market {}: amountUSD={},market.tvl={},protocl.tvl={},tx={}",
+    [
+      market.id,
+      amountUSD.toString(),
+      market.totalValueLockedUSD.toString(),
+      protocol.totalValueLockedUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+
+  assert(
+    protocol.totalValueLockedUSD.ge(BIGDECIMAL_ZERO),
+    `TVL ${
+      protocol.totalValueLockedUSD
+    } <= 0 after tx ${event.transaction.hash.toHexString()}`
+  );
 
   snapshotMarket(market, amountUSD, event, TransactionType.DEPOSIT);
   snapshotFinancials(protocol, amountUSD, event, TransactionType.DEPOSIT);
@@ -194,13 +213,18 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
     outputToken.decimals
   );
 
+  let marketIDs = protocol._marketIDs!;
+  if (marketIDs.indexOf(market.id) < 0) {
+    marketIDs = marketIDs.concat([market.id]);
+  }
   let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-  for (let i = 0; i < protocol._marketIDs!.length; i++) {
-    const mkt = getOrCreateMarket(protocol._marketIDs![i], event);
+  for (let i = 0; i < marketIDs.length; i++) {
+    const mkt = getOrCreateMarket(marketIDs[i], event);
     totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
       mkt.totalDepositBalanceUSD
     );
   }
+  protocol._marketIDs = marketIDs;
   protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
 
   snapshotMarket(market, amountUSD, event, TransactionType.WITHDRAW);
@@ -235,6 +259,16 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
 
   market.save();
   protocol.save();
+  log.info(
+    "[handleWithdrawalMade]market {}: amountUSD={},market.tvl={},protocl.tvl={},tx={}",
+    [
+      market.id,
+      amountUSD.toString(),
+      market.totalValueLockedUSD.toString(),
+      protocol.totalValueLockedUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
 
   // ORIGINAL CODE BELOW
 
@@ -265,17 +299,27 @@ export function handleInvestmentMadeInJunior(
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(newBorrowUSD);
   market.save();
 
-  snapshotMarket(market, newBorrowUSD, event, null);
+  snapshotMarket(market, newBorrowUSD, event, TransactionType.BORROW);
 
   // deduct investment amount from TVL/totalDepositBalance to avoid double counting
   // because they will be counted as deposits to invested tranched pools
-  // Similarly, not updating protocol.totalBorrowBalanceUSD to avoid double counting
+  // Also not update protocol.totalBorrowBalanceUSD to avoid double counting
   const protocol = getOrCreateProtocol();
   protocol.totalDepositBalanceUSD =
     protocol.totalDepositBalanceUSD.minus(newBorrowUSD);
-  protocol.cumulativeBorrowUSD =
-    protocol.cumulativeDepositUSD.minus(newBorrowUSD);
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
   protocol.save();
+
+  log.info(
+    "[handleInvestmentMadeInJunior]market {}: amountUSD={},market.tvl={},protocl.tvl={},tx={}",
+    [
+      market.id,
+      newBorrowUSD.toString(),
+      market.totalValueLockedUSD.toString(),
+      protocol.totalValueLockedUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
 
   //
   updatePoolStatus(event.address);
@@ -292,7 +336,7 @@ export function handleInvestmentMadeInSenior(
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(newBorrowUSD);
   market.save();
 
-  snapshotMarket(market, newBorrowUSD, event, null);
+  snapshotMarket(market, newBorrowUSD, event, TransactionType.BORROW);
 
   // deduct investment amount from TVL/totalDepositBalance to avoid double counting
   // because they will be counted as deposits to invested tranched pools
@@ -300,9 +344,19 @@ export function handleInvestmentMadeInSenior(
   const protocol = getOrCreateProtocol();
   protocol.totalDepositBalanceUSD =
     protocol.totalDepositBalanceUSD.minus(newBorrowUSD);
-  protocol.cumulativeBorrowUSD =
-    protocol.cumulativeDepositUSD.minus(newBorrowUSD);
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
   protocol.save();
+
+  log.info(
+    "[handleInvestmentMadeInSenior]market {}: amountUSD={},market.tvl={},protocl.tvl={},tx={}",
+    [
+      market.id,
+      newBorrowUSD.toString(),
+      market.totalValueLockedUSD.toString(),
+      protocol.totalValueLockedUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
 
   // no need to snapshotFinancials here because it will be snapshoted
   // when DepositMade is handled in tranched pool

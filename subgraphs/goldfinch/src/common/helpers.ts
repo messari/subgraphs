@@ -1,13 +1,5 @@
+import { BigDecimal, ethereum, BigInt, log } from "@graphprotocol/graph-ts";
 import {
-  Address,
-  BigDecimal,
-  ethereum,
-  BigInt,
-  log,
-} from "@graphprotocol/graph-ts";
-import {
-  getOrCreateToken,
-  getOrCreateInterestRate,
   getOrCreateFinancialsDailySnapshot,
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
@@ -19,18 +11,7 @@ import {
   getOrCreateProtocol,
   getSnapshotRates,
 } from "./getters";
-import {
-  BIGDECIMAL_ONE,
-  BIGDECIMAL_ZERO,
-  InterestRateSide,
-  InterestRateType,
-  SECONDS_PER_YEAR,
-  BIGDECIMAL_HUNDRED,
-  SECONDS_PER_DAY,
-  INT_ZERO,
-  INT_ONE,
-  BIGINT_ZERO,
-} from "./constants";
+import { SECONDS_PER_DAY, INT_ZERO, INT_ONE, BIGINT_ZERO } from "./constants";
 import {
   LendingProtocol,
   Market,
@@ -126,127 +107,6 @@ export function createTransaction(
   }
 }
 
-export function updatePrices(
-  execProxyAddress: Address,
-  market: Market,
-  event: ethereum.Event
-): BigDecimal | null {
-  const underlying = Address.fromString(market.inputToken);
-  // update price
-  const execProxyContract = Exec.bind(execProxyAddress);
-  const blockNumber = event.block.number;
-  const underlyingPriceWETHResult =
-    execProxyContract.try_getPriceFull(underlying);
-  // this is the inversion of WETH price in USD
-  const USDCPriceWETHResult = execProxyContract.try_getPriceFull(
-    Address.fromString(USDC_ERC20_ADDRESS)
-  );
-  if (underlyingPriceWETHResult.reverted) {
-    log.warning("[updatePrices]try_getPriceFull({}) reverted at block {}", [
-      underlying.toHexString(),
-      blockNumber.toString(),
-    ]);
-    return null;
-  }
-
-  if (USDCPriceWETHResult.reverted) {
-    log.warning("[updatePrices]try_getPriceFull({}) reverted at block {}", [
-      "USDC",
-      blockNumber.toString(),
-    ]);
-    return null;
-  }
-
-  const underlyingPriceUSD = underlyingPriceWETHResult.value
-    .getCurrPrice()
-    .divDecimal(USDCPriceWETHResult.value.getCurrPrice().toBigDecimal());
-
-  const token = getOrCreateToken(underlying);
-  token.lastPriceUSD = underlyingPriceUSD;
-  token.lastPriceBlockNumber = blockNumber;
-  token.save();
-
-  market.inputTokenPriceUSD = underlyingPriceUSD;
-  if (market.exchangeRate && market.exchangeRate!.gt(BIGDECIMAL_ZERO)) {
-    market.outputTokenPriceUSD = underlyingPriceUSD.div(market.exchangeRate!);
-  }
-  market.save();
-
-  const eToken = getOrCreateToken(Address.fromString(market.outputToken!));
-  eToken.lastPriceUSD = market.outputTokenPriceUSD;
-  eToken.lastPriceBlockNumber = blockNumber;
-  eToken.save();
-
-  if (market._dToken && market._dTokenExchangeRate!.gt(BIGDECIMAL_ZERO)) {
-    const dToken = getOrCreateToken(Address.fromString(market._dToken!));
-    dToken.lastPriceUSD = underlyingPriceUSD.div(market._dTokenExchangeRate!);
-    dToken.lastPriceBlockNumber = blockNumber;
-    dToken.save();
-  }
-
-  return underlyingPriceUSD;
-}
-
-export function updateInterestRates(
-  market: Market,
-  interestRate: BigInt,
-  reserveFee: BigInt,
-  totalentitys: BigInt,
-  totalBalances: BigInt,
-  event: ethereum.Event
-): void {
-  // interestRate is entity Rate in Second Percentage Yield
-  // See computeAPYs() in EulerGeneralView.sol
-  const entitySPY = interestRate;
-  const entityAPY = bigDecimalExponential(
-    entitySPY.divDecimal(INTEREST_RATE_DECIMALS),
-    SECONDS_PER_YEAR
-  ).minus(BIGDECIMAL_ONE);
-  const supplySideShare = BIGDECIMAL_ONE.minus(
-    reserveFee.divDecimal(RESERVE_FEE_SCALE)
-  );
-  const supplySPY = interestRate
-    .times(totalentitys)
-    .toBigDecimal()
-    .times(supplySideShare)
-    .div(totalBalances.toBigDecimal());
-  const supplyAPY = bigDecimalExponential(
-    supplySPY.div(INTEREST_RATE_DECIMALS),
-    SECONDS_PER_YEAR
-  ).minus(BIGDECIMAL_ONE);
-
-  const entityerRate = getOrCreateInterestRate(
-    InterestRateSide.entityER,
-    InterestRateType.VARIABLE,
-    market.id
-  );
-  entityerRate.rate = entityAPY.times(BIGDECIMAL_HUNDRED);
-  entityerRate.save();
-  const lenderRate = getOrCreateInterestRate(
-    InterestRateSide.LENDER,
-    InterestRateType.VARIABLE,
-    market.id
-  );
-  lenderRate.rate = supplyAPY.times(BIGDECIMAL_HUNDRED);
-  lenderRate.save();
-  market.rates = [entityerRate.id, lenderRate.id];
-  market.save();
-
-  const marketDailySnapshot = getOrCreateMarketDailySnapshot(market.id, event);
-  const days = (event.block.timestamp.toI32() / SECONDS_PER_DAY).toString();
-  marketDailySnapshot.rates = getSnapshotRates(market.rates, days);
-  marketDailySnapshot.blockNumber = event.block.number;
-  marketDailySnapshot.timestamp = event.block.timestamp;
-  marketDailySnapshot.save();
-
-  const marketHourlySnapshot = getOrCreateMarketDailySnapshot(market.id, event);
-  const hours = (event.block.timestamp.toI32() / SECONDS_PER_DAY).toString();
-  marketHourlySnapshot.rates = getSnapshotRates(market.rates, hours);
-  marketHourlySnapshot.blockNumber = event.block.number;
-  marketHourlySnapshot.timestamp = event.block.timestamp;
-  marketHourlySnapshot.save();
-}
-
 export function updateRevenues(
   protocol: LendingProtocol,
   market: Market,
@@ -326,7 +186,7 @@ export function updateRevenues(
     financialSnapshot.cumulativeSupplySideRevenueUSD =
       protocol.cumulativeSupplySideRevenueUSD;
     financialSnapshot.cumulativeProtocolSideRevenueUSD =
-      protocol.cumulativeSupplySideRevenueUSD;
+      protocol.cumulativeProtocolSideRevenueUSD;
     financialSnapshot.cumulativeTotalRevenueUSD =
       protocol.cumulativeTotalRevenueUSD;
     financialSnapshot.dailySupplySideRevenueUSD =
