@@ -1,7 +1,6 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
-
 dataSources:
   # Vault
   - name: Vat
@@ -56,6 +55,7 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0xb65337df00000000000000000000000000000000000000000000000000000000"
           handler: handleVatFold
+        ## bad debt settlement/issue
 
   # Borrow rate
   - name: Jug
@@ -286,13 +286,7 @@ dataSources:
           topic0: "0x1b0dbf7200000000000000000000000000000000000000000000000000000000"
           handler: handleCdpQuit
         # Transfer cdp collateral from the cdp address to a dst address
-        #- event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-        #  topic0: "0x9bb8f83800000000000000000000000000000000000000000000000000000000"
-        #  handler: handleCdpFlux
-        # Transfer DAI from the cdp address to a dst address
-        #- event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-        #  topic0: "0xf9f30db600000000000000000000000000000000000000000000000000000000"
-        #  handler: handleCdpMove
+
 
   # User may interact w/ maker contracts via a DSProxy contract
   - name: DSProxyFactory
@@ -301,7 +295,7 @@ dataSources:
     source:
       abi: DSProxyFactory
       address: "0xA26e15C895EFc0616177B7c1e7270A4C7D51C997"
-      startBlock: 8928152
+      startBlock: 5834580
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

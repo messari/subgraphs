@@ -1,4 +1,4 @@
-import { Bytes, BigDecimal, ethereum, log, BigInt } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../generated/Vat/ERC20";
 import { GemJoin } from "../generated/Vat/GemJoin";
 import { Vat, LogNote as VatNoteEvent } from "../generated/Vat/Vat";
@@ -163,42 +163,7 @@ export function handleVatCage(event: VatNoteEvent): void {
   }
 }
 
-// Deposit/Withdraw
-export function handleVatSlip(event: VatNoteEvent): void {
-  const ilk = event.params.arg1;
-  if (ilk.toString() == "TELEPORT-FW-A") {
-    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
-    return;
-  }
-  const usr = bytes32ToAddressHexString(event.params.arg2);
-  const owner = getOwnerAddress(usr);
-  const wad = bytesToSignedBigInt(event.params.arg3);
-
-  const market: Market = getMarketFromIlk(ilk)!;
-  const token = getOrCreateToken(market.inputToken);
-  const deltaCollateral = bigIntChangeDecimals(wad, WAD, token.decimals);
-  const deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
-  log.info("[handleVatSlip]ilk/market: {}/{}, token={}, usr={}, owner={}, deltaCollateral={}, deltaCollateralUSD={}", [
-    ilk.toString(),
-    market.id,
-    token.name,
-    usr,
-    owner,
-    deltaCollateral.toString(),
-    deltaCollateralUSD.toString(),
-  ]);
-
-  // those are handled in handleVatFrob
-  //createTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
-  //updatePosition(event, usr, ilk, deltaCollateral, BIGINT_ZERO);
-  //updateMarket(event, market, deltaCollateral, deltaCollateralUSD);
-  //updateUsageMetrics(event, [owner, owner, owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
-  //updateProtocol(deltaCollateralUSD, BIGDECIMAL_ZERO);
-  //this needs to after updateProtocol as it uses protocol to do the update
-  //updateFinancialsSnapshot(event, deltaCollateralUSD, BIGDECIMAL_ZERO);
-}
-
-// Borrow/Repay
+// Borrow/Repay// Deposit/Withdraw
 export function handleVatFrob(event: VatNoteEvent): void {
   const ilk = event.params.arg1;
   if (ilk.toString() == "TELEPORT-FW-A") {
@@ -225,23 +190,42 @@ export function handleVatFrob(event: VatNoteEvent): void {
     dart.toString(),
   ]);
 
-  let urn = u;
+  const urn = u;
+  const tx = event.transaction.hash.toHexString();
   const migrationCaller = getMigrationCaller(u, v, w, event);
-  if (migrationCaller != null) {
-    if (dart.equals(BIGINT_ZERO) || dink.equals(BIGINT_ZERO)) {
-      // ignore the two migration frob calls that move SAI/DAI around to balance account
-      // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L118-L125
-      // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L148-L155
-      return;
-    } else {
+  if (migrationCaller != null && ilk.toString() == "SAI") {
+    // Ignore vat.frob calls not of interest
+    // - ignore swapSaiToDai() and swapDaiToSai() calls:
+    //   https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L76-L103
+    // - ignore the two migration frob calls that move SAI/DAI around to balance accounting:
+    //   https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L118-L125
+    //   https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L148-L155
+
+    log.info("[handleVatFrob]account migration tx {} for urn={},migrationCaller={} skipped", [
+      tx,
+      urn,
+      migrationCaller!,
+    ]);
+
+    return;
+    /*} 
+    else {
       // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L140-L144
       // u, v, w is urns[cdp]; keep urn, but replace u,v,w with the actual owner
       // because cdpManager.give() hasn't yet been called
       // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L158
-      urn = u;
+      //urn = u;
       u = v = w = migrationCaller!;
     }
+    */
   }
+
+  // translate possible UrnHandler/DSProxy address to its owner address
+  u = getOwnerAddress(u);
+  v = getOwnerAddress(v);
+  w = getOwnerAddress(w);
+
+  log.info("[DEBUGx]urn={},u={},tx={}", [urn, u, tx]);
 
   const market = getMarketFromIlk(ilk);
   if (market == null) {
@@ -252,11 +236,6 @@ export function handleVatFrob(event: VatNoteEvent): void {
   const token = getOrCreateToken(market.inputToken);
   const deltaCollateral = bigIntChangeDecimals(dink, WAD, token.decimals);
   const deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
-
-  // translate possible UrnHandler/DSProxy address to its owner address
-  u = getOwnerAddress(u);
-  v = getOwnerAddress(v);
-  w = getOwnerAddress(w);
 
   market.inputTokenPriceUSD = token.lastPriceUSD!;
   // change in borrowing amount
@@ -1152,25 +1131,28 @@ export function handlePotDrip(event: PotNoteEvent): void {
 export function handleNewCdp(event: NewCdp): void {
   const cdpi = event.params.cdp;
   const owner = event.params.own.toHexString().toLowerCase();
+  // if owner is a DSProxy, get the EOA owner of the DSProxy
+  const ownerEOA = getOwnerAddress(owner);
   const contract = CdpManager.bind(event.address);
   const urnhandlerAddress = contract.urns(cdpi).toHexString();
   const ilk = contract.ilks(cdpi);
   const _cdpi = new _Cdpi(cdpi.toString());
   _cdpi.urn = urnhandlerAddress.toString();
   _cdpi.ilk = ilk.toHexString();
-  _cdpi.ownerAddress = owner;
+  _cdpi.ownerAddress = ownerEOA;
   _cdpi.save();
 
   const _urn = new _Urn(urnhandlerAddress);
-  _urn.ownerAddress = owner;
+  _urn.ownerAddress = ownerEOA;
   _urn.cdpi = cdpi;
   _urn.save();
 
-  log.info("[handleNewCdp]cdpi={}, ilk={}, urn={}, owner={}", [
+  log.info("[handleNewCdp]cdpi={}, ilk={}, urn={}, owner={}, EOA={}", [
     cdpi.toString(),
     ilk.toString(),
     urnhandlerAddress,
     owner,
+    ownerEOA,
   ]);
 }
 
@@ -1179,16 +1161,18 @@ export function handleCdpGive(event: CdpNoteEvent): void {
   // update mapping between urnhandler and owner
   const cdpi = bytesToUnsignedBigInt(event.params.arg1);
   const dstAccountAddress = bytes32ToAddressHexString(event.params.arg2);
+  // if dstAccountAddress is a DSProxy, get the EOA owner of the DSProxy
+  const dstAccountOwner = getOwnerAddress(dstAccountAddress);
   const _cdpi = _Cdpi.load(cdpi.toString())!;
   const srcUrn = _cdpi.urn;
   const ilk = _cdpi.ilk;
-  _cdpi.ownerAddress = dstAccountAddress;
+  _cdpi.ownerAddress = dstAccountOwner;
   _cdpi.save();
 
   const _urn = _Urn.load(srcUrn)!;
   const srcAccountAddress = _urn.ownerAddress;
   // since it is a transfer of cdp position, the urn record should already exist
-  _urn.ownerAddress = dstAccountAddress;
+  _urn.ownerAddress = dstAccountOwner;
   _urn.save();
 
   log.info("[handleCdpGive] cdpi {} (ilk={}, urn={}) is given to {} from {}", [
@@ -1200,8 +1184,8 @@ export function handleCdpGive(event: CdpNoteEvent): void {
   ]);
 
   const ilkBytes = Bytes.fromHexString(ilk);
-  transferPosition(event, ilkBytes, srcUrn, srcUrn, PositionSide.LENDER, srcAccountAddress, dstAccountAddress);
-  transferPosition(event, ilkBytes, srcUrn, srcUrn, PositionSide.BORROWER, srcAccountAddress, dstAccountAddress);
+  transferPosition(event, ilkBytes, srcUrn, srcUrn, PositionSide.LENDER, srcAccountAddress, dstAccountOwner);
+  transferPosition(event, ilkBytes, srcUrn, srcUrn, PositionSide.BORROWER, srcAccountAddress, dstAccountOwner);
 }
 
 // Move a position from cdpSrc urn to the cdpDst urn
@@ -1346,19 +1330,9 @@ function _handleSwapFee(event: ethereum.Event, feeUSD: BigDecimal): void {
 // Ref: https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L107
 export function getMigrationCaller(u: string, v: string, w: string, event: ethereum.Event): string | null {
   if (!(u == v && u == w && w == v)) return null;
-  // owner = msg.sender
   const owner = event.transaction.from.toHexString();
   if (u.toLowerCase() == MIGRATION_ADDRESS) {
     return owner;
-  } else {
-    // check if u is an urn owned by MIGRATION_ADDRESS
-    // this should have been populated by
-    // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L133
-    const _urns = _Urn.load(u);
-    if (_urns && _urns.ownerAddress.toLowerCase() == MIGRATION_ADDRESS) {
-      return owner;
-    }
   }
-
   return null;
 }

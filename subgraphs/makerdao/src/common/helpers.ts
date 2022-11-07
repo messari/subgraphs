@@ -573,6 +573,11 @@ export function updatePosition(
   protocol.save();
   market.save();
   account.save();
+
+  assert(
+    account.openPositionCount >= 0,
+    `urn ${urn} for account ${account.id} openPositionCount=${account.openPositionCount} at tx ${tx}`,
+  );
 }
 
 // handle transfer of position from one user account (src) to another (dst),
@@ -587,6 +592,16 @@ export function transferPosition(
   dstAccountAddress: string | null = null,
   transferAmount: BigInt | null = null, // suport partial transfer of a position
 ): void {
+  if (srcUrn == dstUrn && !srcAccountAddress && !dstAccountAddress && srcAccountAddress == dstAccountAddress) {
+    log.info("[transferPosition]srcUrn {}=dstUrn {}, srcAccountAddress {}=dstAccountAddress {}, no transfer", [
+      srcUrn,
+      dstUrn,
+      srcAccountAddress!,
+      dstAccountAddress!,
+    ]);
+    return;
+  }
+
   const protocol = getOrCreateLendingProtocol();
   const market: Market = getMarketFromIlk(ilk)!;
   if (srcAccountAddress == null) {
@@ -604,9 +619,10 @@ export function transferPosition(
     return;
   }
 
+  const srcPositionBalance0 = srcPosition.balance;
   if (!transferAmount || transferAmount > srcPosition.balance) {
     const transferAmountStr = transferAmount ? transferAmount.toString() : "null";
-    log.warning("[transferPosition]transferAmount {} > src position balance {} for {}", [
+    log.warning("[transferPosition]transferAmount={} is null or > src position balance {} for {}", [
       transferAmountStr,
       srcPosition.balance.toString(),
       srcPosition.id,
@@ -651,6 +667,7 @@ export function transferPosition(
   snapshotPosition(event, dstPosition);
 
   protocol.openPositionCount += INT_ONE;
+  protocol.cumulativePositionCount += INT_ONE;
   market.openPositionCount += INT_ONE;
   market.positionCount += INT_ONE;
   if (side == PositionSide.BORROWER) {
@@ -659,11 +676,13 @@ export function transferPosition(
     market.lendingPositionCount += INT_ONE;
   }
   dstAccount.openPositionCount += INT_ONE;
+  dstAccount.positionCount += INT_ONE;
 
-  log.info("[transferPosition]transfer position {}/is_urn {}/balance {} to {}/is_urn {}/balance {}", [
+  log.info("[transferPosition]transfer {} from {} (is_urn={},balance={}) to {} (is_urn={},balance={})", [
+    transferAmount.toString(),
     srcPosition.id,
     srcPosition._is_urn.toString(),
-    srcPosition.balance.toString(),
+    srcPositionBalance0.toString(),
     dstPosition.id,
     dstPosition._is_urn.toString(),
     dstPosition.balance.toString(),
@@ -673,6 +692,15 @@ export function transferPosition(
   market.save();
   srcAccount.save();
   dstAccount.save();
+
+  assert(
+    srcAccount.openPositionCount >= 0,
+    `Account ${srcAccount.id} openPositionCount=${srcAccount.openPositionCount}`,
+  );
+  assert(
+    dstAccount.openPositionCount >= 0,
+    `Account ${dstAccount.id} openPositionCount=${dstAccount.openPositionCount}`,
+  );
 }
 
 // handle liquidations for Position entity
@@ -765,6 +793,8 @@ export function liquidatePosition(
   protocol.save();
   market.save();
   account.save();
+
+  assert(account.openPositionCount >= 0, `Account ${account.id} openPositionCount=${account.openPositionCount}`);
 }
 
 export function snapshotPosition(event: ethereum.Event, position: Position): void {
