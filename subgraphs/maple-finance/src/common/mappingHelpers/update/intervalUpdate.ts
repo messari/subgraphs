@@ -1,7 +1,6 @@
-import { Address, BigDecimal, BigInt, Entity, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Market, _MplReward, _StakeLocker } from "../../../../generated/schema";
 import { PoolLib } from "../../../../generated/templates/Pool/PoolLib";
-
 import { MAPLE_POOL_LIB_ADDRESS, SEC_PER_DAY, TEN_BD, ZERO_BD, ZERO_BI } from "../../constants";
 import { getBptTokenAmountInUSD, getTokenAmountInUSD, getTokenPriceInUSD } from "../../prices/prices";
 import { bigDecimalToBigInt, powBigDecimal, readCallResult } from "../../utils";
@@ -99,8 +98,8 @@ function intervalUpdateMarket(event: ethereum.Event, market: Market): Market {
         market.cumulativeSupplySideRevenueUSD
     );
 
-    let rewardTokenEmissionAmount = new Array<BigInt>();
-    let rewardTokenEmissionUSD = new Array<BigDecimal>();
+    const rewardTokenEmissionAmount = new Array<BigInt>();
+    const rewardTokenEmissionUSD = new Array<BigDecimal>();
     for (let i = 0; i < market.rewardTokens.length; i++) {
         let tokenEmission = ZERO_BI;
         let tokenEmissionUSD = ZERO_BD;

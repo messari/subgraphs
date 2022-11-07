@@ -102,8 +102,14 @@ function AllDataTabs({
   const [pendingQuery, setPendingQuery] = useState<any>(null);
 
   useEffect(() => {
-    if (subgraphEndpoints) {
-      setPendingQuery(getPendingSubgraphsOnProtocolQuery(subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0].slug]));
+    try {
+      if (subgraphEndpoints) {
+        if (subgraphEndpoints[schemaMapping[data.protocols[0]?.type]]) {
+          setPendingQuery(getPendingSubgraphsOnProtocolQuery(subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0]?.slug]));
+        }
+      }
+    } catch (err: any) {
+      console.error(err.message);
     }
   }, [subgraphEndpoints]);
 
@@ -222,6 +228,7 @@ function AllDataTabs({
           {/* PROTOCOL TAB */}
           <ProtocolTab
             entitiesData={entitiesData}
+            subgraphEndpoints={subgraphEndpoints}
             protocolFields={protocolFields}
             protocolType={data.protocols[0].type}
             protocolTableData={protocolTableData}
