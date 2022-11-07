@@ -59,11 +59,13 @@ templates:
           receipt: true
         - event: SupplyCollateral(indexed address,indexed address,indexed address,uint256)
           handler: handleSupplyCollateral
+          receipt: true
         - event: Withdraw(indexed address,indexed address,uint256)
           handler: handleWithdraw
           receipt: true
         - event: WithdrawCollateral(indexed address,indexed address,indexed address,uint256)
           handler: handleWithdrawCollateral
+          receipt: true
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
         # - event: AbsorbCollateral(indexed address,indexed address,indexed address,uint256,uint256)

@@ -1,5 +1,11 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Deposit, Withdraw } from "../../generated/schema";
+import {
+  Borrow,
+  Deposit,
+  Liquidate,
+  Repay,
+  Withdraw,
+} from "../../generated/schema";
 
 export function createDeposit(
   event: ethereum.Event,
@@ -16,6 +22,7 @@ export function createDeposit(
   deposit.nonce = event.transaction.nonce;
   deposit.logIndex = event.logIndex.toI32();
   deposit.gasPrice = event.transaction.gasPrice;
+  deposit.gasUsed = event.receipt ? event.receipt!.gasUsed : null;
   deposit.gasLimit = event.transaction.gasLimit;
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
@@ -47,6 +54,7 @@ export function createWithdraw(
   withdraw.nonce = event.transaction.nonce;
   withdraw.logIndex = event.logIndex.toI32();
   withdraw.gasPrice = event.transaction.gasPrice;
+  withdraw.gasUsed = event.receipt ? event.receipt!.gasUsed : null;
   withdraw.gasLimit = event.transaction.gasLimit;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
@@ -60,6 +68,81 @@ export function createWithdraw(
 
   return withdraw;
 
+  // TODO update market values, daily values, protocol values, snapshots
+}
+
+export function createBorrow(
+  event: ethereum.Event,
+  marketID: Address,
+  asset: Address,
+  account: Address,
+  amount: BigInt,
+  amountUSD: BigDecimal
+): Borrow {
+  const borrow = new Borrow(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  );
+  borrow.hash = event.transaction.hash;
+  borrow.nonce = event.transaction.nonce;
+  borrow.logIndex = event.logIndex.toI32();
+  borrow.gasPrice = event.transaction.gasPrice;
+  borrow.gasUsed = event.receipt ? event.receipt!.gasUsed : null;
+  borrow.gasLimit = event.transaction.gasLimit;
+  borrow.blockNumber = event.block.number;
+  borrow.timestamp = event.block.timestamp;
+  borrow.account = account;
+  borrow.market = marketID;
+  borrow.position = account; // TODO add position
+  borrow.asset = asset;
+  borrow.amount = amount;
+  borrow.amountUSD = amountUSD;
+  borrow.save();
+
+  return borrow;
+
+  // TODO update market values, daily values, protocol values, snapshots
+}
+
+export function createRepay(
+  event: ethereum.Event,
+  marketID: Address,
+  asset: Address,
+  account: Address,
+  amount: BigInt,
+  amountUSD: BigDecimal
+): Repay {
+  const repay = new Repay(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  );
+  repay.hash = event.transaction.hash;
+  repay.nonce = event.transaction.nonce;
+  repay.logIndex = event.logIndex.toI32();
+  repay.gasPrice = event.transaction.gasPrice;
+  repay.gasUsed = event.receipt ? event.receipt!.gasUsed : null;
+  repay.gasLimit = event.transaction.gasLimit;
+  repay.blockNumber = event.block.number;
+  repay.timestamp = event.block.timestamp;
+  repay.account = account;
+  repay.market = marketID;
+  repay.position = account; // TODO add position
+  repay.asset = asset;
+  repay.amount = amount;
+  repay.amountUSD = amountUSD;
+  repay.save();
+
+  return repay;
+
+  // TODO update market values, daily values, protocol values, snapshots
+}
+
+export function createLiquidate(
+  event: ethereum.Event,
+  marketID: Address,
+  asset: Address,
+  account: Address,
+  amount: BigInt,
+  amountUSD: BigDecimal
+): void {
   // TODO update market values, daily values, protocol values, snapshots
 }
 

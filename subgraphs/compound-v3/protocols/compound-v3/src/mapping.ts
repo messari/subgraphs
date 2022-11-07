@@ -4,6 +4,7 @@ import {
   Bytes,
   crypto,
   ethereum,
+  BigInt,
   log,
 } from "@graphprotocol/graph-ts";
 import { CometDeployed } from "../../../generated/Configurator/Configurator";
@@ -39,7 +40,13 @@ import {
   ZERO_ADDRESS,
 } from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
-import { createDeposit, createWithdraw } from "../../../src/utils/creator";
+import {
+  createBorrow,
+  createDeposit,
+  createRepay,
+  createWithdraw,
+} from "../../../src/utils/creator";
+import { Repay } from "../../../generated/schema";
 
 ///////////////////////////////
 ///// Configurator Events /////
@@ -148,7 +155,6 @@ export function handleCometDeployed(event: CometDeployed): void {
 //
 // Supplying the base token (could be a Deposit or Repay)
 export function handleSupply(event: Supply): void {
-  // TODO calculate repay like in withdraw
   const cometContract = Comet.bind(event.address);
   const tryBaseToken = cometContract.try_baseToken();
   const accountID = event.params.dst;
@@ -156,16 +162,59 @@ export function handleSupply(event: Supply): void {
   const amount = event.params.amount;
   // TODO update all token price in this market
 
-  const deposit = createDeposit(
-    event,
-    event.address, // marketID
-    tryBaseToken.value,
-    accountID,
-    amount,
-    BIGDECIMAL_ZERO
-  );
-  deposit.accountActor = accountActorID;
-  deposit.save();
+  const mintAmount = isMint(event);
+  if (!mintAmount) {
+    // Repay only
+    const repay = createRepay(
+      event,
+      event.address,
+      tryBaseToken.value,
+      accountID,
+      amount,
+      BIGDECIMAL_ZERO
+    );
+    repay.accountActor = accountActorID;
+    repay.save();
+  } else if (mintAmount.le(amount)) {
+    // TODO ensure this is correct
+    // deposit only
+    const deposit = createDeposit(
+      event,
+      event.address,
+      tryBaseToken.value,
+      accountID,
+      amount,
+      BIGDECIMAL_ZERO
+    );
+    deposit.accountActor = accountActorID;
+    deposit.save();
+  } else {
+    // mintAmount > amount
+    // partial deposit and partial repay
+    const repayAmount = amount.minus(mintAmount);
+    const depositAmount = amount.minus(repayAmount);
+    const repay = createRepay(
+      event,
+      event.address,
+      tryBaseToken.value,
+      accountID,
+      repayAmount,
+      BIGDECIMAL_ZERO
+    );
+    repay.accountActor = accountActorID;
+    repay.save();
+
+    const deposit = createDeposit(
+      event,
+      event.address,
+      tryBaseToken.value,
+      accountID,
+      depositAmount,
+      BIGDECIMAL_ZERO
+    );
+    deposit.accountActor = accountActorID;
+    deposit.save();
+  }
 }
 
 //
@@ -194,33 +243,67 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
 //
 // withdraws baseToken (could be a Withdrawal or Borrow)
 export function handleWithdraw(event: Withdraw): void {
+  const cometContract = Comet.bind(event.address);
+  const tryBaseToken = cometContract.try_baseToken();
   const accountID = event.params.src;
   const accountActorID = event.params.to;
-  const asset = Address.fromString(ZERO_ADDRESS);
   const amount = event.params.amount;
 
   const burnAmount = isBurn(event);
   if (!burnAmount) {
     // Borrow only
-  } else if (burnAmount.toBigInt().gte(amount)) {
+    const borrow = createBorrow(
+      event,
+      event.address,
+      tryBaseToken.value,
+      accountID,
+      amount,
+      BIGDECIMAL_ZERO
+    );
+    borrow.accountActor = accountActorID;
+    borrow.save();
+  } else if (burnAmount.ge(amount)) {
     // withdraw only
+    const withdraw = createWithdraw(
+      event,
+      event.address,
+      tryBaseToken.value,
+      accountID,
+      amount,
+      BIGDECIMAL_ZERO
+    );
+    withdraw.accountActor = accountActorID;
+    withdraw.save();
   } else {
     // burnAmount < amount
     // partial withdraw and partial borrow
-    burn;
+    const borrowAmount = amount.minus(burnAmount);
+    const withdrawAmount = amount.minus(borrowAmount);
+    const borrow = createBorrow(
+      event,
+      event.address,
+      tryBaseToken.value,
+      accountID,
+      borrowAmount,
+      BIGDECIMAL_ZERO
+    );
+    borrow.accountActor = accountActorID;
+    borrow.save();
+
+    const withdraw = createWithdraw(
+      event,
+      event.address,
+      tryBaseToken.value,
+      accountID,
+      withdrawAmount,
+      BIGDECIMAL_ZERO
+    );
+    withdraw.accountActor = accountActorID;
+    withdraw.save();
   }
 }
 
-// if (newPrincipal >= 0) {
-// withdraw no borrow
-// withdraw =
-//   return (uint104(oldPrincipal - newPrincipal), 0);
-// } else if (oldPrincipal <= 0) {
-//   return (0, uint104(oldPrincipal - newPrincipal));
-// } else {
-//   return (uint104(oldPrincipal), uint104(-newPrincipal));
-// }
-
+//
 //
 // Withdraw collateral tokens (cannot be a Borrow)
 export function handleWithdrawCollateral(event: WithdrawCollateral): void {
@@ -304,8 +387,8 @@ function findTransfer(event: ethereum.Event): ethereum.Log | null {
   const logs = event.receipt!.logs;
   const transferLogIndex = event.logIndex.plus(BIGINT_ONE); // expected index
   for (let i = 0; i < logs.length; i++) {
-    let thisLog = logs[i];
-    let logSignature = thisLog.topics[0];
+    const thisLog = logs[i];
+    const logSignature = thisLog.topics[0];
     if (
       transferLogIndex.equals(thisLog.logIndex) &&
       logSignature == ENCODED_TRANSFER_SIGNATURE
