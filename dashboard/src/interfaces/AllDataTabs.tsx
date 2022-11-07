@@ -1,6 +1,6 @@
 import { TabContext, TabPanel } from "@mui/lab";
 import { CircularProgress, Tab, Tabs } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import EventsTab from "./tabs/EventsTab";
 import PoolTab from "./tabs/PoolTab";
 import ProtocolTab from "./tabs/ProtocolTab";
@@ -13,6 +13,7 @@ import { NewClient, schemaMapping } from "../utils";
 import { NormalizedCacheObject, ApolloClient } from "@apollo/client";
 import { DeploymentOverlayDropDown } from "../common/utilComponents/DeploymentOverlayDropDown";
 import { getPendingSubgraphsOnProtocolQuery } from "../queries/subgraphStatusQuery";
+import PendingCalls from "./PendingCalls";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -97,6 +98,21 @@ function AllDataTabs({
   setOverlayDeploymentClient,
   setOverlayDeploymentURL
 }: AllDataTabsProps) {
+  const [pendingSubgraphData, setPendingSubgraphData] = useState<any>({});
+  const [pendingQuery, setPendingQuery] = useState<any>(null);
+
+  useEffect(() => {
+    try {
+      if (subgraphEndpoints) {
+        if (subgraphEndpoints[schemaMapping[data.protocols[0]?.type]]) {
+          setPendingQuery(getPendingSubgraphsOnProtocolQuery(subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0]?.slug]));
+        }
+      }
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  }, [subgraphEndpoints]);
+
   let protocolDropDown = null;
   if (data.protocols.length > 1) {
     protocolDropDown = (
@@ -177,7 +193,12 @@ function AllDataTabs({
   if (tabValue + "" !== "1" && tabValue + "" !== "3") {
     failedToLoad = true;
   }
-  console.log(getPendingSubgraphsOnProtocolQuery(subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0].slug]));
+
+  let pendingCalls = null;
+  if (pendingQuery) {
+    pendingCalls = <PendingCalls query={pendingQuery} pendingSubgraphData={pendingSubgraphData} setPendingSubgraphData={setPendingSubgraphData} />
+  }
+
   return (
     <>
       <TabContext value={tabValue}>
@@ -196,6 +217,7 @@ function AllDataTabs({
               setOverlayDeploymentURL(x);
             }}
             subgraphEndpoints={subgraphEndpoints}
+            pendingSubgraphData={pendingSubgraphData}
             decentralizedDeployments={decentralizedDeployments}
             currentDeploymentURL={overlayDeploymentURL}
             showDropDown={showDropDown}
@@ -206,6 +228,7 @@ function AllDataTabs({
           {/* PROTOCOL TAB */}
           <ProtocolTab
             entitiesData={entitiesData}
+            subgraphEndpoints={subgraphEndpoints}
             protocolFields={protocolFields}
             protocolType={data.protocols[0].type}
             protocolTableData={protocolTableData}
@@ -268,6 +291,7 @@ function AllDataTabs({
           </TabPanel>
         )}
       </TabContext>
+      {pendingCalls}
     </>
   );
 }

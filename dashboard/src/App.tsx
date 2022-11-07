@@ -227,10 +227,6 @@ function App() {
       <Routes>
         <Route path="/">
           <Route index element={<DeploymentsPage getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} indexingStatusQueries={indexingStatusQueries} endpointSlugs={endpointSlugs} aliasToProtocol={aliasToProtocol} decentralizedDeployments={decentralizedDeployments} />} />
-          <Route
-            path="comparison"
-            element={<DefiLlamaComparsionTab deploymentJSON={subgraphEndpoints} getData={() => getDeployments()} />}
-          />
           <Route path="subgraph" element={<ProtocolDashboard protocolJSON={protocolsToQuery} getData={() => getDeployments()} subgraphEndpoints={subgraphEndpoints} decentralizedDeployments={decentralizedDeployments} />} />
           <Route path="protocols-list" element={<ProtocolsListByTVL protocolsToQuery={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route

@@ -142,7 +142,7 @@ export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel
   }
 }
 
-export function downloadCSV(data: any[], label: string, identifier: string) {
+export function downloadCSV(data: any, label: string, identifier: string) {
   try {
     const link = document.createElement('a');
     const field = label.split("-")[1] || label;
@@ -181,4 +181,27 @@ export function base64toBlobJPEG(dataURI: string) {
     console.error(err.message);
     return;
   }
+}
+
+export function lineupChartDatapoints(compChart: any, stitchLeftIndex: number, timeKey: string = 'date') {
+  const key1 = Object.keys(compChart)[0];
+  const key2 = Object.keys(compChart)[1];
+  while (toDate(compChart[key1][stitchLeftIndex][timeKey]) !== toDate(compChart[key2][stitchLeftIndex][timeKey])) {
+    if (compChart[key1][stitchLeftIndex][timeKey] < compChart[key2][stitchLeftIndex][timeKey]) {
+      const startIndex = compChart[key1].findIndex((x: any) => x[timeKey] >= compChart[key2][stitchLeftIndex][timeKey]);
+      let newArray = [...compChart[key1].slice(startIndex)];
+      if (stitchLeftIndex > 0) {
+        newArray = [...compChart[key1].slice(0, stitchLeftIndex), ...compChart[key1].slice(startIndex, compChart[key1].length)];
+      }
+      compChart[key1] = newArray;
+    } else {
+      const startIndex = compChart[key2].findIndex((x: any) => x[timeKey] >= compChart[key1][stitchLeftIndex][timeKey]);
+      let newArray = [...compChart[key2].slice(startIndex)];
+      if (stitchLeftIndex > 0) {
+        newArray = [...compChart[key2].slice(0, stitchLeftIndex), ...compChart[key2].slice(startIndex, compChart[key2].length)];
+      }
+      compChart[key2] = newArray;
+    }
+  }
+  return compChart;
 }
