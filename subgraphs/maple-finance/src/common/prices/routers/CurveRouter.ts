@@ -7,17 +7,17 @@ import { CurveRegistry as CurveRegistryContract } from "../../../../generated/Ma
 import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../../generated/MapleGlobals/CurvePoolRegistry";
 
 export function getCurvePriceUsdc(curveLpTokenAddress: Address, network: string): CustomPriceType {
-    let tokensMapping = constants.WHITELIST_TOKENS_MAP.get(network);
+    const tokensMapping = constants.WHITELIST_TOKENS_MAP.get(network);
 
     const curveRegistry = CurveRegistryContract.bind(constants.CURVE_REGISTRY_ADDRESS_MAP.get(network)!);
 
-    let basePrice = getBasePrice(curveLpTokenAddress, curveRegistry, network);
-    let virtualPrice = getVirtualPrice(curveLpTokenAddress);
+    const basePrice = getBasePrice(curveLpTokenAddress, curveRegistry, network);
+    const virtualPrice = getVirtualPrice(curveLpTokenAddress);
 
-    let usdcDecimals = utils.getTokenDecimals(tokensMapping!.get("USDC")!);
-    let decimalsAdjustment = constants.DEFAULT_DECIMALS.minus(usdcDecimals);
+    const usdcDecimals = utils.getTokenDecimals(tokensMapping!.get("USDC")!);
+    const decimalsAdjustment = constants.DEFAULT_DECIMALS.minus(usdcDecimals);
 
-    let price = virtualPrice
+    const price = virtualPrice
         .times(basePrice.usdPrice)
         .times(constants.BIGINT_TEN.pow(decimalsAdjustment.toI32() as u8).toBigDecimal())
         .div(
@@ -58,9 +58,9 @@ export function getBasePrice(
         return new CustomPriceType();
     }
 
-    let underlyingCoinAddress = getUnderlyingCoinFromPool(poolAddress, curveRegistry, network);
+    const underlyingCoinAddress = getUnderlyingCoinFromPool(poolAddress, curveRegistry, network);
 
-    let basePrice = getPriceUsdcRecommended(underlyingCoinAddress, network);
+    const basePrice = getPriceUsdcRecommended(underlyingCoinAddress, network);
 
     return basePrice;
 }
@@ -70,7 +70,7 @@ export function getUnderlyingCoinFromPool(
     curveRegistry: CurveRegistryContract,
     network: string
 ): Address {
-    let coinsArray = curveRegistry.try_get_underlying_coins(poolAddress);
+    const coinsArray = curveRegistry.try_get_underlying_coins(poolAddress);
 
     let coins: Address[];
 
@@ -105,10 +105,10 @@ export function getUnderlyingCoinFromPool(
 }
 
 export function getVirtualPrice(curveLpTokenAddress: Address): BigDecimal {
-    let network = dataSource.network();
+    const network = dataSource.network();
     const curveRegistry = CurveRegistryContract.bind(constants.CURVE_REGISTRY_ADDRESS_MAP.get(network)!);
 
-    let virtualPrice = utils
+    const virtualPrice = utils
         .readValue<BigInt>(
             curveRegistry.try_get_virtual_price_from_lp_token(curveLpTokenAddress),
             constants.BIGINT_ZERO
@@ -124,8 +124,8 @@ export function getPriceUsdcRecommended(tokenAddress: Address, network: string):
 
 export function isBasicToken(tokenAddress: Address, network: string): bool {
     for (let basicTokenIdx = 0; basicTokenIdx < constants.WHITELIST_TOKENS_LIST.length; basicTokenIdx++) {
-        let basicTokenName = constants.WHITELIST_TOKENS_LIST[basicTokenIdx];
-        let basicTokenAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(basicTokenName);
+        const basicTokenName = constants.WHITELIST_TOKENS_LIST[basicTokenIdx];
+        const basicTokenAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(basicTokenName);
 
         if (basicTokenAddress && tokenAddress.toHex() == basicTokenAddress.toHex()) {
             return true;

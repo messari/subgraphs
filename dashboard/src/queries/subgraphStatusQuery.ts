@@ -143,6 +143,9 @@ export const idQuery = gql`
 `;
 
 export function getPendingSubgraphsOnProtocolQuery(protocol: any) {
+  if (!protocol) {
+    return null;
+  }
   try {
     const depoKeys = Object.keys(protocol).filter(x => !x.toUpperCase().includes('DECENTRALIZED'));
     if (depoKeys.length > 0) {

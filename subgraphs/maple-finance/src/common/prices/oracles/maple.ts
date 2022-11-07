@@ -1,8 +1,7 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { Token } from "../../../../generated/schema";
 import { MapleGlobals } from "../../../../generated/templates/Pool/MapleGlobals";
-
-import { MAPLE_GLOBALS_ADDRESS, MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS, ZERO_BD } from "../../constants";
+import { MAPLE_GLOBALS_ADDRESS, MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS } from "../../constants";
 import { parseUnits } from "../../utils";
 
 /**

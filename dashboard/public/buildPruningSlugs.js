@@ -13,7 +13,7 @@ https.get(url, res => {
         data = JSON.parse(data);
         const protocolKeys = Object.keys(data);
         protocolKeys.forEach(x => {
-            if (data[x].schema === 'lending' || data[x].schema === 'governance') {
+            if (data[x].schema === 'governance') {
                 return;
             }
             const deploymentsOnProtocolKeys = Object.keys(data[x].deployments);

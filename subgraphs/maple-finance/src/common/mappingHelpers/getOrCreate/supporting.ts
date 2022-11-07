@@ -1,7 +1,5 @@
 import { Address } from "@graphprotocol/graph-ts";
-
-import { RewardToken, Token, _Loan } from "../../../../generated/schema";
-
+import { RewardToken, Token } from "../../../../generated/schema";
 import {
     ETH_ADDRESS,
     ETH_DECIMALS,
@@ -10,7 +8,7 @@ import {
     OracleType,
     RewardTokenType,
     ZERO_BD,
-    ZERO_BI
+    ZERO_BI,
 } from "../../constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "../../utils";
 

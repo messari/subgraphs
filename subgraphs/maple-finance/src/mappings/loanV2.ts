@@ -4,7 +4,7 @@ import {
     FundsDrawnDown as FundsDrawnDownEvent,
     PaymentMade as PaymentMadeEvent,
     Repossessed as RepossessedEvent,
-    NewTermsAccepted as NewTermsAcceptedEvent
+    NewTermsAccepted as NewTermsAcceptedEvent,
 } from "../../generated/templates/LoanV2/LoanV2";
 import { LoanV2 as LoanV2Contract } from "../../generated/templates/LoanV2/LoanV2";
 
@@ -12,13 +12,13 @@ import { ONE_BI, SEC_PER_DAY, ZERO_BI } from "../common/constants";
 import {
     getOrCreateInterestRate,
     getOrCreateLoan,
-    getOrCreateMarket
+    getOrCreateMarket,
 } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
 import {
     getOrCreateFinancialsDailySnapshot,
     getOrCreateMarketDailySnapshot,
-    getOrCreateMarketHourlySnapshot
+    getOrCreateMarketHourlySnapshot,
 } from "../common/mappingHelpers/getOrCreate/snapshots";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { createBorrow, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
@@ -54,10 +54,7 @@ export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
     );
 
     interestRate.duration = bigDecimalToBigInt(
-        paymentIntervalSec
-            .times(paymentsRemaining)
-            .toBigDecimal()
-            .div(SEC_PER_DAY.toBigDecimal())
+        paymentIntervalSec.times(paymentsRemaining).toBigDecimal().div(SEC_PER_DAY.toBigDecimal())
     ).toI32();
 
     // Interst rate for V2/V3 stored as apr in units of 1e18, (i.e. 1% is 0.01e18).
@@ -127,15 +124,13 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     // Update market snapshot
     ////
     const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
-    marketDailySnapshot.dailyProtocolSideRevenueUSD = marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-        protocolRevenueUSD
-    );
+    marketDailySnapshot.dailyProtocolSideRevenueUSD =
+        marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenueUSD);
     marketDailySnapshot.save();
 
     const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-    MarketHourlySnapshot.hourlyProtocolSideRevenueUSD = MarketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-        protocolRevenueUSD
-    );
+    MarketHourlySnapshot.hourlyProtocolSideRevenueUSD =
+        MarketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(protocolRevenueUSD);
     MarketHourlySnapshot.save();
 
     ////

@@ -1,7 +1,8 @@
 import { Box, Button, TextField } from "@mui/material";
 import { DataGrid, GridAlignment } from "@mui/x-data-grid";
+import moment from "moment";
 import { useState } from "react";
-import { formatIntToFixed2, toDate } from "../../../src/utils/index";
+import { downloadCSV, formatIntToFixed2, toDate } from "../../../src/utils/index";
 
 interface ComparisonTableProps {
   datasetLabel: string;
@@ -36,13 +37,6 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
         align: "right" as GridAlignment,
       },
       {
-        field: "differenceVal",
-        headerName: "Diff. (value)",
-        minWidth: 160,
-        headerAlign: "right" as GridAlignment,
-        align: "right" as GridAlignment,
-      },
-      {
         field: "differencePercentage",
         headerName: "Diff. (%)",
         minWidth: 120,
@@ -71,7 +65,6 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
           date: date,
           subgraphData: "$" + formatIntToFixed2(val.value),
           defiLlamaData: "$" + formatIntToFixed2(llamaVal),
-          differenceVal: "$" + formatIntToFixed2(diff),
           differencePercentage: ((diff / llamaVal) * 100).toFixed(2) + "%",
         };
       })
@@ -79,9 +72,35 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
 
     return (
       <Box sx={{ height: "100%" }}>
-        <Box>
+        <Box position="relative" sx={{ marginTop: "-38px" }}>
           <Button onClick={() => setIsMonthly((prev: boolean) => !prev)}>View {isMonthly ? "daily" : "monthly"}</Button>
           <Button onClick={() => jpegDownloadHandler()}>Save Chart</Button>
+          <Button className="Hover-Underline" onClick={() => {
+            if (!Array.isArray(dataTable)) {
+              let length = dataTable[Object.keys(dataTable)[0]].length;
+              const arrayToSend: any = [];
+              for (let i = 0; i < length; i++) {
+                let objectIteration: any = {};
+                let hasUndefined = false;
+                objectIteration.date = dataTable[Object.keys(dataTable)[0]][i].date;
+                Object.keys(dataTable).forEach((x: any) => {
+                  if (dataTable[x][i]?.value) {
+                    objectIteration[x] = dataTable[x][i]?.value;
+                  } else {
+                    hasUndefined = true;
+                  }
+                });
+                if (!hasUndefined) {
+                  arrayToSend.push(objectIteration);
+                }
+              }
+              return downloadCSV(arrayToSend.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), ...x })), datasetLabel + '-csv', datasetLabel);
+            } else {
+              return downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [datasetLabel]: x.value })), datasetLabel + '-csv', datasetLabel);
+            }
+          }}>
+            Save CSV
+          </Button>
         </Box>
         <DataGrid
           sx={{ textOverflow: "clip" }}
