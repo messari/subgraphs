@@ -263,7 +263,7 @@ export function getVaultFees(
 }
 
 export function deactivateFinishedRewards(
-  vaultAddress: Address,
+  vault: VaultStore,
   block: ethereum.Block
 ): void {
   const rewardsLoggerContract = RewardsLoggerContract.bind(
@@ -271,7 +271,7 @@ export function deactivateFinishedRewards(
   );
 
   const unlockSchedulesArray =
-    rewardsLoggerContract.try_getAllUnlockSchedulesFor(vaultAddress);
+    rewardsLoggerContract.try_getAllUnlockSchedulesFor(Address.fromString(vault.id));
   if (unlockSchedulesArray.reverted) return;
 
   for (let i = 0; i < unlockSchedulesArray.value.length; i++) {
@@ -279,7 +279,7 @@ export function deactivateFinishedRewards(
 
     if (unlockSchedule.end.lt(block.timestamp)) {
       updateRewardTokenInfo(
-        vaultAddress,
+        vault,
         getOrCreateToken(unlockSchedule.token, block),
         constants.BIGINT_ZERO,
         block

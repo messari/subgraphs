@@ -1,15 +1,14 @@
 import {
   getOrCreateToken,
-  getOrCreateVault,
   getOrCreateRewardToken,
 } from "../common/initializers";
-import { Token } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { getRewardsPerDay } from "../common/rewards";
+import { Token, Vault as VaultStore } from "../../generated/schema";
 import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 
 export function updateRewardTokenInfo(
-  vaultAddress: Address,
+  vault: VaultStore,
   rewardToken: Token,
   rewardRate: BigInt,
   block: ethereum.Block
@@ -24,26 +23,25 @@ export function updateRewardTokenInfo(
   let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
 
   updateRewardTokenEmissions(
+    vault,
     Address.fromString(rewardToken.id),
-    vaultAddress,
     rewardPerDay,
     block
   );
 
   log.warning("[Rewards] Vault: {}, rewardTokenAddress: {}, RewardRate: {}", [
-    vaultAddress.toHexString(),
+    vault.id,
     rewardToken.id,
     rewardRatePerDay.toString(),
   ]);
 }
 
 export function updateRewardTokenEmissions(
+  vault: VaultStore,
   rewardTokenAddress: Address,
-  vaultAddress: Address,
   rewardTokenPerDay: BigInt,
   block: ethereum.Block
 ): void {
-  const vault = getOrCreateVault(vaultAddress, block);
   const rewardToken = getOrCreateRewardToken(rewardTokenAddress, block);
 
   if (!vault.rewardTokens) {

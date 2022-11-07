@@ -47,7 +47,7 @@ export function handleUnlockScheduleSet(event: UnlockScheduleSet): void {
   const rewardRate = totalAmount.div(duration);
 
   updateRewardTokenInfo(
-    vaultAddress,
+    vault,
     getOrCreateToken(rewardTokenAddress, event.block),
     rewardRate,
     event.block
