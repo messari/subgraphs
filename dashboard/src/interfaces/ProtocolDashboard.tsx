@@ -137,6 +137,9 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   }] = useLazyQuery(query, { client: overlayDeploymentClient });
 
   useEffect(() => {
+    if (overlayError) {
+      setOverlayError(null);
+    }
     const href = new URL(window.location.href);
     const p = new URLSearchParams(href.search);
     if (overlayDeploymentURL === "") {
@@ -1123,6 +1126,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
           protocolFields={protocolFields}
           protocolTableData={protocolTableData}
           overlaySchemaData={overlaySchemaDataProp}
+          overlayError={overlayError}
           protocolSchemaData={protocolSchemaDataProp}
           subgraphToQueryURL={subgraphToQuery.url}
           skipAmt={skipAmt}
