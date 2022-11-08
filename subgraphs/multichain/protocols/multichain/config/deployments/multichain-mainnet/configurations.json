@@ -1,0 +1,5 @@
+{
+  "deployment": "MULTICHAIN_MAINNET",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts"
+}
