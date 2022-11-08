@@ -38,10 +38,10 @@ dataSources:
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
@@ -93,7 +93,7 @@ templates:
           file: ./abis/UniswapV2Pair.json
         - name: Factory
           file: ./abis/UniswapV2Factory.json
-        
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -101,10 +101,10 @@ templates:
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts

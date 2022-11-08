@@ -45,102 +45,43 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
   return decimals;
 }
 
-type NetworkConfig = typeof TEMPLATE
+export function getTokenSupply(tokenAddr: Address): BigInt {
+  const tokenContract = _ERC20.bind(tokenAddr);
 
-export class Config implements Configurations {
-  config: NetworkConfig;
+  const totalSupply = readValue<BigInt>(
+    tokenContract.try_totalSupply(),
+    constants.BIGINT_ONE
+  );
 
-  constructor(config: NetworkConfig) {
-    this.config = config;
-  }
-
-  network(): string {
-    return this.config.NETWORK_STRING;
-  }
-
-  yearnLens(): Address {
-    return this.config.YEARN_LENS_CONTRACT_ADDRESS;
-  }
-  chainLink(): Address {
-    return this.config.CHAIN_LINK_CONTRACT_ADDRESS;
-  }
-  yearnLensBlacklist(): Address[] {
-    return this.config.YEARN_LENS_BLACKLIST;
-  }
-
-  aaveOracle(): Address {
-    return this.config.AAVE_ORACLE_CONTRACT_ADDRESS;
-  }
-  aaveOracleBlacklist(): Address[] {
-    return this.config.AAVE_ORACLE_BLACKLIST;
-  }
-
-  curveCalculations(): Address {
-    return this.config.CURVE_CALCULATIONS_ADDRESS;
-  }
-  curveCalculationsBlacklist(): Address[] {
-    return this.config.CURVE_CALCULATIONS_BLACKSLIST;
-  }
-
-  sushiCalculations(): Address {
-    return this.config.SUSHISWAP_CALCULATIONS_ADDRESS;
-  }
-  sushiCalculationsBlacklist(): Address[] {
-    return this.config.SUSHI_CALCULATIONS_BLACKSLIST;
-  }
-
-  uniswapForks(): Address[] {
-    return this.config.UNISWAP_FORKS_ROUTER_ADDRESSES;
-  }
-  curveRegistry(): Address[] {
-    return this.config.CURVE_REGISTRY_ADDRESSES;
-  }
-
-  hardcodedStables(): Address[] {
-    return this.config.HARDCODED_STABLES;
-  }
-
-  ethAddress(): Address {
-    return this.config.ETH_ADDRESS;
-  }
-  wethAddress(): Address {
-    return this.config.WETH_ADDRESS;
-  }
-  usdcAddress(): Address {
-    return this.config.USDC_ADDRESS;
-  }
-
-  usdcTokenDecimals(): BigInt {
-    return this.config.USDC_TOKEN_DECIMALS;
-  }
+  return totalSupply;
 }
 
 export function getConfig(): Configurations {
   const network = dataSource.network();
 
   if (network == XDAI.NETWORK_STRING) {
-    return new Config(XDAI);
+    return new XDAI.config();
   } else if (network == AURORA.NETWORK_STRING) {
-    return new Config(AURORA);
+    return new AURORA.config();
   } else if (network == BSC.NETWORK_STRING) {
-    return new Config(BSC);
+    return new BSC.config();
   } else if (network == FANTOM.NETWORK_STRING) {
-    return new Config(FANTOM);
+    return new FANTOM.config();
   } else if (network == POLYGON.NETWORK_STRING) {
-    return new Config(POLYGON);
+    return new POLYGON.config();
   } else if (network == MAINNET.NETWORK_STRING) {
-    return new Config(MAINNET);
+    return new MAINNET.config();
   } else if (network == HARMONY.NETWORK_STRING) {
-    return new Config(HARMONY);
+    return new HARMONY.config();
   } else if (network == MOONBEAM.NETWORK_STRING) {
-    return new Config(MOONBEAM);
+    return new MOONBEAM.config();
   } else if (network == OPTIMISM.NETWORK_STRING) {
-    return new Config(OPTIMISM);
+    return new OPTIMISM.config();
   } else if (network == AVALANCHE.NETWORK_STRING) {
-    return new Config(AVALANCHE);
+    return new AVALANCHE.config();
   } else if (network == ARBITRUM_ONE.NETWORK_STRING) {
-    return new Config(ARBITRUM_ONE);
+    return new ARBITRUM_ONE.config();
   }
 
-  return new Config(TEMPLATE);
+  return new TEMPLATE.config();
 }

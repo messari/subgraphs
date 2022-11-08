@@ -13,14 +13,15 @@ export const CHAIN_LINK_USD_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000348"
 );
 
-export const PRICE_LIB_VERSION = '1.1.0'
+export const PRICE_LIB_VERSION = "1.1.0";
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
+export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
-export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000")
+export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000");
 
 export const AAVE_ORACLE_DECIMALS = 8;
 export const DEFAULT_USDC_DECIMALS = 6;
