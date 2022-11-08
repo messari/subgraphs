@@ -9,8 +9,8 @@ import {
   PrincipalWrittenDown,
   ReserveFundsCollected,
   WithdrawalMade,
-} from "../../generated/templates/SeniorPool/SeniorPool";
-import { Fidu as FiduContract } from "../../generated/templates/SeniorPool/Fidu";
+} from "../../generated/SeniorPool/SeniorPool";
+import { Fidu as FiduContract } from "../../generated/SeniorPool/Fidu";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -94,9 +94,6 @@ export function handleDepositMade(event: DepositMade): void {
     market._cumulativeRewardAmount = BIGINT_ZERO;
   }
 
-  log.info("[handleDepositMade]_marketIDs.length={}", [
-    protocol._marketIDs!.length.toString(),
-  ]);
   let marketIDs = protocol._marketIDs!;
   if (marketIDs.indexOf(market.id) < 0) {
     marketIDs = marketIDs.concat([market.id]);

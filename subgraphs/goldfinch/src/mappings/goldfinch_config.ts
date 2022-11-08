@@ -2,7 +2,7 @@ import {
   GoListed,
   NoListed,
 } from "../../generated/GoldfinchConfig/GoldfinchConfig";
-import { AddressUpdated } from "../../generated/templates/GoldfinchConfig/GoldfinchConfig";
+import { AddressUpdated } from "../../generated/GoldfinchConfig/GoldfinchConfig";
 import { BIGINT_ONE } from "../common/constants";
 import { getOrInitUser } from "../entities/user";
 
@@ -19,7 +19,7 @@ export function handleNoListed(event: NoListed): void {
 }
 
 export function handleAddressUpdated(event: AddressUpdated): void {
-  // TODO update CreditLine related fields when CreditLineImplementation address is updated
+  // TODO update CreditLine related fields when  address is updated
   // Need a reverse mapping of config to market/pool
   // see ConfigOptions.sol for index
   if (event.params.index.equals(BIGINT_ONE)) {
