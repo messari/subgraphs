@@ -102,9 +102,9 @@ export function handleSharePriceChangeLog(event: SharePriceChangeLog): void {
 
   if (!inputToken) return
 
-  inputToken.lastPriceUSD = prices.getPricePerToken(
-    Address.fromString(vault.inputToken)
-  )
+  const priceUsd = prices.getPricePerToken(Address.fromString(vault.inputToken))
+
+  inputToken.lastPriceUSD = priceUsd
   inputToken.lastPriceBlockNumber = event.block.number
 
   inputToken.save()
@@ -122,7 +122,7 @@ export function handleSharePriceChangeLog(event: SharePriceChangeLog): void {
 
   vault.totalValueLockedUSD = decimals
     .fromBigInt(newInputTokenBalance, inputToken.decimals as u8)
-    .times(inputToken.lastPriceUSD)
+    .times(priceUsd)
 
   vault.inputTokenBalance = newInputTokenBalance
 
