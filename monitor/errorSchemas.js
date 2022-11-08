@@ -17,7 +17,7 @@ export const protocolErrorMessages = {
     totalBorrowBalanceUSD: "'Protocol' entity has a lower totalDepositBalanceUSD than totalBorrowBalanceUSD.",
     cumulativeLiquidateUSD: "'Protocol' entity has a lower cumulativeBorrowUSD than cumulativeLiquidateUSD.",
     protocolEntity: "'Protocol' entity has zero instances.",
-    relatedField: "This field on 'Protocol' entity is populated with non-existent instances of another entity.",
+    relatedField: "'Value' on 'Protocol' entity is null/[] but should be holding valid instances of another entity.",
     queryError: "Querying the 'Protocol' entity returned error messages."
 };
 
