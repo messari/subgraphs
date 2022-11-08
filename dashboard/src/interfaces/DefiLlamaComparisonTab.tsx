@@ -284,8 +284,11 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
           </Grid>
         </div>
       );
+    } else if (deploymentURL || defiLlamaSlug) {
+      chart = <CircularProgress sx={{ my: 5 }} size={40} />;
     }
   } catch (err: any) {
+    chart = null;
     console.error(err.message)
   }
 

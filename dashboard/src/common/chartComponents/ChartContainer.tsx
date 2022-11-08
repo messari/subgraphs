@@ -145,7 +145,6 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
                                     hoverBorderColor: "white"
                                 },
                             },
-
                             plugins: {
                                 legend: {
                                     display: true,

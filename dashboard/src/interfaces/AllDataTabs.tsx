@@ -35,6 +35,7 @@ interface AllDataTabsProps {
   subgraphToQueryURL: string;
   skipAmt: number;
   overlaySchemaData: any;
+  overlayError: any;
   protocolSchemaData: any;
   poolOverviewRequest: { [x: string]: any };
   poolTimeseriesRequest: { [x: string]: any };
@@ -75,6 +76,7 @@ function AllDataTabs({
   subgraphToQueryURL,
   skipAmt,
   overlaySchemaData,
+  overlayError,
   protocolSchemaData,
   poolOverviewRequest,
   poolTimeseriesRequest,
@@ -185,6 +187,10 @@ function AllDataTabs({
       } else if (poolTimeseriesRequest.poolTimeseriesError) {
         failedToLoad = true;
       }
+    }
+
+    if ((tabValue + "" === "1" || tabValue + "" === "3") && overlayError) {
+      showDropDown = true;
     }
   } catch (err: any) {
     console.error(err.message);
