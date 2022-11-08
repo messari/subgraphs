@@ -31,9 +31,6 @@ import {
   SECONDS_PER_DAY,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
   USDC_ADDRESS,
   GFI_ADDRESS,
   INT_ONE,
@@ -43,6 +40,7 @@ import {
 } from "./constants";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
 import { prefixID } from "./utils";
+import { Versions } from "../versions";
 
 export function getOrCreatePoolToken(
   tokenId: string,
@@ -133,9 +131,9 @@ export function getOrCreateProtocol(): LendingProtocol {
   }
 
   // ensure versions are updated even when grafting
-  protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-  protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-  protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
 
   return protocol;
 }

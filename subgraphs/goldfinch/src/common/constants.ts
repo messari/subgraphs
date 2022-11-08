@@ -6,10 +6,6 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export const PROTOCOL_NAME = "Goldfinch";
 export const PROTOCOL_SLUG = "goldfinch";
-export const PROTOCOL_SCHEMA_VERSION = "2.0.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
-
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";

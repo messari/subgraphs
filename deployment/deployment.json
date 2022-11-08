@@ -2083,12 +2083,12 @@
       }
     }
   },
-  "goldfinch-finance": {
+  "goldfinch": {
     "schema": "lending",
-    "base": "goldfinch-finance",
-    "protocol": "goldfinch-finance",
+    "base": "goldfinch",
+    "protocol": "goldfinch",
     "deployments": {
-      "goldfinch-finance-ethereum": {
+      "goldfinch-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -2105,11 +2105,11 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "goldfinch-finance-ethereum",
-            "query-id": "goldfinch-finance-ethereum"
+            "slug": "goldfinch-ethereum",
+            "query-id": "goldfinch-ethereum"
           },
           "decentralized-network": {
-            "slug": "goldfinch-finance-ethereum",
+            "slug": "goldfinch-ethereum",
             "query-id": ""
           }
         }
