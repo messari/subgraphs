@@ -8,8 +8,8 @@ import {
 import { ERC20 } from "../../generated/Notional/ERC20";
 import {
   BIGDECIMAL_ZERO,
-  NOTIONAL_USER_REVENUE_SHARE,
-  NOTIONAL_PROTOCOL_REVENUE_SHARE,
+  NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE,
+  NOTIONAL_PROTOCOL_SIDE_REVENUE_SHARE,
   TransactionType,
   NOTIONAL_TRADE_FEES,
   PROTOCOL_ID,
@@ -43,8 +43,12 @@ export function updateFinancials(
   // fees and revenue amounts
   const feesUSD = amountUSD.times(NOTIONAL_TRADE_FEES);
   const totalRevenueUSD = feesUSD;
-  const supplySideRevenueUSD = feesUSD.times(NOTIONAL_USER_REVENUE_SHARE);
-  const protocolSideRevenueUSD = feesUSD.times(NOTIONAL_PROTOCOL_REVENUE_SHARE);
+  const supplySideRevenueUSD = feesUSD.times(
+    NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE
+  );
+  const protocolSideRevenueUSD = feesUSD.times(
+    NOTIONAL_PROTOCOL_SIDE_REVENUE_SHARE
+  );
 
   // market cumulatives
   market.cumulativeTotalRevenueUSD =

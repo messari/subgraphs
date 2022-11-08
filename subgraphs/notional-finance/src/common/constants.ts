@@ -186,8 +186,8 @@ export namespace PoolId {
 
 // revenue
 export const NOTIONAL_TRADE_FEES = BigDecimal.fromString("0.003");
-export const NOTIONAL_USER_REVENUE_SHARE = BigDecimal.fromString("0.80");
-export const NOTIONAL_PROTOCOL_REVENUE_SHARE = BigDecimal.fromString("0.20");
+export const NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE = BigDecimal.fromString("0.80");
+export const NOTIONAL_PROTOCOL_SIDE_REVENUE_SHARE = BIGDECIMAL_ZERO;
 
 export const RATE_PRECISION = 1000000000;
 export const BASIS_POINTS = 100000;
