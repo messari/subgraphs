@@ -13,6 +13,30 @@ interface ComparisonTableProps {
 }
 
 export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonthly, jpegDownloadHandler }: ComparisonTableProps) => {
+  const [sortColumn, setSortColumn] = useState<string>("date");
+  const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
+
+  function sortFunction(a: any, b: any) {
+    let aVal = a[sortColumn];
+    if (!isNaN(Number(a[sortColumn]))) {
+      aVal = Number(a[sortColumn]);
+    } else if (a[sortColumn].includes("%")) {
+      aVal = Number(a[sortColumn].split("%").join(""));
+    }
+    let bVal = b[sortColumn];
+    if (!isNaN(Number(b[sortColumn]))) {
+      bVal = Number(b[sortColumn]);
+    } else if (b[sortColumn].includes("%")) {
+      bVal = Number(b[sortColumn].split("%").join(""));
+    }
+
+    if (sortOrderAsc) {
+      return (aVal - bVal);
+    } else {
+      return (bVal - aVal);
+    }
+  }
+
   if (dataTable) {
     const columns = [
       {
@@ -23,14 +47,14 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
         align: "right" as GridAlignment,
       },
       {
-        field: "subgraphData",
+        field: "subgraph",
         headerName: "Subgraph",
         minWidth: 160,
         headerAlign: "right" as GridAlignment,
         align: "right" as GridAlignment,
       },
       {
-        field: "defiLlamaData",
+        field: "defiLlama",
         headerName: "DefiLlama",
         minWidth: 160,
         headerAlign: "right" as GridAlignment,
@@ -44,6 +68,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
         align: "right" as GridAlignment,
       },
     ];
+    const differencePercentageArr: any = [];
     const tableData = dataTable.subgraph
       .map((val: any, i: any) => {
         let date = toDate(val.date);
@@ -60,11 +85,12 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
           llamaVal = 0;
         }
         const diff = Math.abs(val.value - llamaVal);
+        differencePercentageArr.push({ value: ((diff / llamaVal) * 100).toFixed(2) + "%", date: val.date });
         return {
           id: i,
           date: date,
-          subgraphData: "$" + formatIntToFixed2(val.value),
-          defiLlamaData: "$" + formatIntToFixed2(llamaVal),
+          subgraph: "$" + formatIntToFixed2(val.value),
+          defiLlama: "$" + formatIntToFixed2(llamaVal),
           differencePercentage: ((diff / llamaVal) * 100).toFixed(2) + "%",
         };
       })
@@ -83,6 +109,9 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
                 let objectIteration: any = {};
                 let hasUndefined = false;
                 objectIteration.date = dataTable[Object.keys(dataTable)[0]][i].date;
+                if (differencePercentageArr[i]) {
+                  objectIteration.differencePercentage = differencePercentageArr[i].value;
+                }
                 Object.keys(dataTable).forEach((x: any) => {
                   if (dataTable[x][i]?.value) {
                     objectIteration[x] = dataTable[x][i]?.value;
@@ -94,9 +123,9 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
                   arrayToSend.push(objectIteration);
                 }
               }
-              return downloadCSV(arrayToSend.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), ...x })), datasetLabel + '-csv', datasetLabel);
+              return downloadCSV(arrayToSend.sort(sortFunction).map((x: any) => ({ ...x, date: moment.utc(x.date * 1000).format("YYYY-MM-DD") })), datasetLabel + '-csv', datasetLabel);
             } else {
-              return downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [datasetLabel]: x.value })), datasetLabel + '-csv', datasetLabel);
+              return downloadCSV(dataTable.sort(sortFunction).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [datasetLabel]: x.value })), datasetLabel + '-csv', datasetLabel);
             }
           }}>
             Save CSV
@@ -108,6 +137,10 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
             sorting: {
               sortModel: [{ field: "date", sort: "desc" }],
             },
+          }}
+          onSortModelChange={(x) => {
+            setSortColumn(x[0].field);
+            setSortOrderAsc(x[0].sort === "asc");
           }}
           rows={tableData}
           columns={columns}

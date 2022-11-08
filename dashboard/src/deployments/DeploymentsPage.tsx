@@ -150,10 +150,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
           Deployed Subgraphs
         </Typography>
         <div style={{ width: "100%", textAlign: "center" }}>
-          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("/comparison")}>
-            DefiLlama Comparison
-          </span>
-          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderLeft: "#6656F8 2px solid", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
+          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
             {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
           </span>
           <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("protocols-list")}>
