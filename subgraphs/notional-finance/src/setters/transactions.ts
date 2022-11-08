@@ -17,21 +17,15 @@ import {
   Repay,
 } from "../../generated/schema";
 import {
-  cDAI_ADDRESS,
-  cETH_ADDRESS,
-  cUSDC_ADDRESS,
-  cWBTC_ADDRESS,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ZERO,
-  SECONDS_PER_DAY,
   TransactionType,
   InterestRateSide,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
 import { addAccountToProtocol, updateUsageMetrics } from "./usageMetrics";
 import { getOrCreateLendingProtocol } from "../getters/protocol";
-import { getOrCreateToken } from "../getters/token";
 import { getOrCreateAccount } from "../getters/account";
 import { getOrCreateMarket } from "../getters/market";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
