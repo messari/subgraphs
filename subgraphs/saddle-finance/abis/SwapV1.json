@@ -412,6 +412,17 @@
   },
   {
     "inputs": [
+      { "internalType": "uint8", "name": "tokenIndexFrom", "type": "uint8" },
+      { "internalType": "uint8", "name": "tokenIndexTo", "type": "uint8" },
+      { "internalType": "uint256", "name": "dx", "type": "uint256" }
+    ],
+    "name": "calculateSwapUnderlying",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "address", "name": "account", "type": "address" },
       { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" },
       { "internalType": "bool", "name": "deposit", "type": "bool" }
