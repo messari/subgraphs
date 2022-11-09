@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { toDate } from "../../utils";
 import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
+import { UploadFileCSV } from "../utilComponents/UploadFileCSV";
 import { TableChart } from "./TableChart";
 
 interface ChartContainerProps {
@@ -21,6 +22,7 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
     const chartRef = useRef<any>(null);
     const [chartIsImage, setChartIsImage] = useState<boolean>(false);
     const [initialLoaded, setInitialLoaded] = useState<boolean>(false);
+    const [csvJSON, setCsvJSON] = useState<any>(null);
 
     function jpegDownloadHandler(downloadInZip: boolean) {
         try {
@@ -66,17 +68,27 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
             let labels: string[] = [];
             let datasets: { data: any; backgroundColor: string; borderColor: string; label: string }[] = [];
             if (Array.isArray(dataChart)) {
-                labels = dataChart.map((e: any) => toDate(e.date));
-                datasets = [
-                    {
-                        data: dataChart.map((e: any) => e.value),
-                        backgroundColor: "rgba(53, 162, 235, 0.5)",
-                        borderColor: "rgb(53, 162, 235)",
-                        label: datasetLabel,
-                    },
-                ];
-            } else if (typeof dataChart === "object") {
+                if (!csvJSON) {
+                    labels = dataChart.map((e: any) => toDate(e.date));
+                    datasets = [
+                        {
+                            data: dataChart.map((e: any) => e.value),
+                            backgroundColor: "rgba(53, 162, 235, 0.5)",
+                            borderColor: "rgb(53, 162, 235)",
+                            label: datasetLabel,
+                        },
+                    ];
+                } else {
+                    dataChart = { base: dataChart, customCSV: csvJSON };
+                }
+            }
+            if (typeof dataChart === "object" && !Array.isArray(dataChart)) {
                 const colorList = ["rgb(53, 162, 235)", "red", "yellow", "lime", "pink", "black", "orange", "green"];
+                if (csvJSON) {
+                    dataChart.customCSV = csvJSON;
+                } else if (Object.keys(dataChart).includes('customCSV')) {
+                    delete dataChart.customCSV;
+                }
                 datasets = Object.keys(dataChart).map((item: string, idx: number) => {
                     if (labels.length === 0) {
                         labels = dataChart[item].map((e: any) => toDate(e.date));
@@ -88,8 +100,6 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
                         label: item,
                     };
                 });
-            } else {
-                return null;
             }
             const chartData = {
                 labels,
@@ -177,6 +187,7 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
                         <Typography variant="h6">{datasetLabel}</Typography>
                     </CopyLinkToClipboard>
                     <div style={{ margin: "5px 0" }}>
+                        <UploadFileCSV csvJSON={csvJSON} setCsvJSON={setCsvJSON} />
                         <Tooltip placement="top" title={"Chart can be dragged and dropped to another tab"}><Button onClick={() => setChartIsImage(true)} style={{ padding: "1px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", ...staticButtonStyle }}>Static</Button></Tooltip>
                         <Tooltip placement="top" title={"Show plot points on hover"}><Button onClick={() => setChartIsImage(false)} style={{ padding: "1px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", ...dynamicButtonStyle }}>Dynamic</Button></Tooltip>
                     </div>

@@ -1,8 +1,8 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { DataGrid, GridAlignment } from "@mui/x-data-grid";
 import moment from "moment";
 import { useState } from "react";
-import { downloadCSV, formatIntToFixed2, toDate } from "../../../src/utils/index";
+import { downloadCSV, formatIntToFixed2, tableCellTruncate, toDate, upperCaseFirstOfString } from "../../../src/utils/index";
 
 interface ComparisonTableProps {
   datasetLabel: string;
@@ -10,9 +10,11 @@ interface ComparisonTableProps {
   isMonthly: boolean;
   setIsMonthly: any;
   jpegDownloadHandler: any;
+  baseKey: string;
+  overlayKey: string;
 }
 
-export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonthly, jpegDownloadHandler }: ComparisonTableProps) => {
+export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonthly, jpegDownloadHandler, baseKey, overlayKey }: ComparisonTableProps) => {
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
 
@@ -47,15 +49,15 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
         align: "right" as GridAlignment,
       },
       {
-        field: "subgraph",
-        headerName: "Subgraph",
+        field: baseKey,
+        headerName: upperCaseFirstOfString(baseKey),
         minWidth: 160,
         headerAlign: "right" as GridAlignment,
         align: "right" as GridAlignment,
       },
       {
-        field: "defiLlama",
-        headerName: "DefiLlama",
+        field: overlayKey,
+        headerName: upperCaseFirstOfString(overlayKey),
         minWidth: 160,
         headerAlign: "right" as GridAlignment,
         align: "right" as GridAlignment,
@@ -64,34 +66,44 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
         field: "differencePercentage",
         headerName: "Diff. (%)",
         minWidth: 120,
+        type: "number",
         headerAlign: "right" as GridAlignment,
         align: "right" as GridAlignment,
+        renderCell: (params: any) => {
+          const value = Number(params?.value);
+          const cellStyle = { ...tableCellTruncate };
+          cellStyle.width = "100%";
+          cellStyle.textAlign = "right";
+          return (
+            <span style={cellStyle}>{value + (isNaN(Number(value)) ? "" : "%")}</span>
+          );
+        },
       },
     ];
     const differencePercentageArr: any = [];
-    const tableData = dataTable.subgraph
+    const tableData = dataTable[baseKey]
       .map((val: any, i: any) => {
         let date = toDate(val.date);
         if (isMonthly) {
           date = date.split("-").slice(0, 2).join("-");
         }
-        let llamaVal = dataTable.defiLlama.find((point: any) => {
+        let overlayVal = dataTable[overlayKey].find((point: any) => {
           if (isMonthly) {
             return toDate(point?.date)?.split("-")?.slice(0, 2)?.join("-");
           }
           return toDate(point?.date) === date;
         })?.value;
-        if (!llamaVal) {
-          llamaVal = 0;
+        if (!overlayVal) {
+          overlayVal = 0;
         }
-        const diff = Math.abs(val.value - llamaVal);
-        differencePercentageArr.push({ value: ((diff / llamaVal) * 100).toFixed(2) + "%", date: val.date });
+        const diff = Math.abs(val.value - overlayVal);
+        differencePercentageArr.push({ value: ((diff / overlayVal) * 100).toFixed(2) + "%", date: val.date });
         return {
           id: i,
           date: date,
-          subgraph: "$" + formatIntToFixed2(val.value),
-          defiLlama: "$" + formatIntToFixed2(llamaVal),
-          differencePercentage: ((diff / llamaVal) * 100).toFixed(2) + "%",
+          [baseKey]: "$" + formatIntToFixed2(val.value),
+          [overlayKey]: "$" + formatIntToFixed2(overlayVal),
+          differencePercentage: ((diff / overlayVal) * 100).toFixed(2),
         };
       })
       .reverse();
@@ -109,9 +121,6 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
                 let objectIteration: any = {};
                 let hasUndefined = false;
                 objectIteration.date = dataTable[Object.keys(dataTable)[0]][i].date;
-                if (differencePercentageArr[i]) {
-                  objectIteration.differencePercentage = differencePercentageArr[i].value;
-                }
                 Object.keys(dataTable).forEach((x: any) => {
                   if (dataTable[x][i]?.value) {
                     objectIteration[x] = dataTable[x][i]?.value;
@@ -119,6 +128,9 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
                     hasUndefined = true;
                   }
                 });
+                if (differencePercentageArr[i]) {
+                  objectIteration.differencePercentage = differencePercentageArr[i].value;
+                }
                 if (!hasUndefined) {
                   arrayToSend.push(objectIteration);
                 }
