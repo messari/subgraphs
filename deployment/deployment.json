@@ -3782,7 +3782,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.9",
+          "subgraph": "1.1.10",
           "methodology": "1.0.0"
         },
         "files": {
