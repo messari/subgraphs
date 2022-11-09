@@ -37,7 +37,7 @@ import {
   getOrCreateLPToken,
   getLiquidityPoolAmounts,
 } from "./getters";
-import { convertTokenToDecimal } from "./utils/utils";
+import { convertTokenToDecimal, isSameSign } from "./utils/utils";
 import {
   updateDepositHelper,
   updateTokenWhitelists,
@@ -356,6 +356,19 @@ export function getSwapTokens(
   let tokenOut: Token;
   let amountIn: BigInt;
   let amountOut: BigInt;
+
+  if (isSameSign(amount0, amount1)) {
+    // if amounts are same sign, we can't determine the direction of the swap
+    log.critical(
+      "Swap amounts have same sign - cannot determine inbound and outbound tokens: token0: {} amount0: {}, token1: {} amount1: {}",
+      [
+        token0.id.toString(),
+        amount0.toString(),
+        token1.id.toString(),
+        amount1.toString(),
+      ]
+    );
+  }
 
   if (amount0.gt(BIGINT_ZERO)) {
     tokenIn = token0;
