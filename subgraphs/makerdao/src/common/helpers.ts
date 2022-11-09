@@ -574,6 +574,7 @@ export function updatePosition(
   market.save();
   account.save();
 
+  const tx = event.transaction.hash.toHexString();
   assert(
     account.openPositionCount >= 0,
     `urn ${urn} for account ${account.id} openPositionCount=${account.openPositionCount} at tx ${tx}`,
