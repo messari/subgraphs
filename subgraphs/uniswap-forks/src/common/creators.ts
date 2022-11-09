@@ -292,9 +292,6 @@ export function createSwapHandleVolumeAndFees(
   // Gets the tokenIn and tokenOut payload based on the amounts
   const swapTokens = getSwapTokens(token0, token1, amount0, amount1);
 
-  // /// get total amounts of derived USD for tracking
-  // let derivedAmountUSD = token1USD.plus(token0USD).div(BIGDECIMAL_TWO)
-
   const logIndexI32 = event.logIndex.toI32();
   const transactionHash = event.transaction.hash.toHexString();
   const swap = new SwapEvent(
@@ -332,8 +329,8 @@ export function createSwapHandleVolumeAndFees(
     protocol,
     pool,
     trackedAmountUSD,
-    amount0,
-    amount1
+    amount0.abs(),
+    amount1.abs()
   );
 }
 
@@ -348,6 +345,7 @@ class SwapTokens {
   tokenOutUSD: BigDecimal;
 }
 
+// The purpose of this function is to identity input and output tokens for a swap event
 export function getSwapTokens(
   token0: Token,
   token1: Token,
