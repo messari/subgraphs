@@ -159,11 +159,11 @@ export function createLiquidate(
   liquidate.liquidator = liquidator;
   liquidate.liquidatee = borrower;
   liquidate.market = marketID;
-  liquidate.positions = [account]; // TODO add position
+  liquidate.positions = [borrower]; // TODO add position
   liquidate.asset = asset;
   liquidate.amount = amount;
   liquidate.amountUSD = amountUSD;
-  liquidate.profitUSD = liquidate.save();
+  liquidate.profitUSD = profitUSD;
 
   return liquidate;
 
