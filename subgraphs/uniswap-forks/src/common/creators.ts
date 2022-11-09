@@ -1,5 +1,12 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { BigInt, Address, store, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Address,
+  store,
+  ethereum,
+  log,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
 import {
   Account,
   _HelperStore,
@@ -9,6 +16,7 @@ import {
   Deposit,
   Withdraw,
   Swap as SwapEvent,
+  Token,
 } from "../../generated/schema";
 import { Pair as PairTemplate } from "../../generated/templates";
 import {
@@ -19,6 +27,7 @@ import {
   LiquidityPoolFeeType,
   FeeSwitch,
   BIGDECIMAL_FIFTY_PERCENT,
+  BIGINT_NEG_ONE,
 } from "./constants";
 import {
   getLiquidityPool,
@@ -276,36 +285,12 @@ export function createSwapHandleVolumeAndFees(
   const token0 = getOrCreateToken(pool.inputTokens[0]);
   const token1 = getOrCreateToken(pool.inputTokens[1]);
 
-  if (amount0In != BIGINT_ZERO && amount1In != BIGINT_ZERO) {
-    log.warning(
-      "Two input tokens given in swap - Transaction: " +
-        event.transaction.hash.toHexString() +
-        " Log Index: " +
-        event.logIndex.toString() +
-        " Token0: " +
-        token0.id +
-        " Token1: " +
-        token1.id,
-      []
-    );
-    return;
-  }
-
   // totals for volume updates
-  const amount0Total = amount0Out.plus(amount0In);
-  const amount1Total = amount1Out.plus(amount1In);
+  const amount0 = amount0In.minus(amount0Out);
+  const amount1 = amount1In.minus(amount1Out);
 
-  const amount0TotalConverted = convertTokenToDecimal(
-    amount0Total,
-    token0.decimals
-  );
-  const amount1TotalConverted = convertTokenToDecimal(
-    amount1Total,
-    token1.decimals
-  );
-
-  const token0USD = token0.lastPriceUSD!.times(amount0TotalConverted);
-  const token1USD = token1.lastPriceUSD!.times(amount1TotalConverted);
+  // Gets the tokenIn and tokenOut payload based on the amounts
+  const swapTokens = getSwapTokens(token0, token1, amount0, amount1);
 
   // /// get total amounts of derived USD for tracking
   // let derivedAmountUSD = token1USD.plus(token0USD).div(BIGDECIMAL_TWO)
@@ -324,12 +309,12 @@ export function createSwapHandleVolumeAndFees(
   swap.from = sender;
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;
-  swap.tokenIn = amount0In != BIGINT_ZERO ? token0.id : token1.id;
-  swap.amountIn = amount0In != BIGINT_ZERO ? amount0Total : amount1Total;
-  swap.amountInUSD = amount0In != BIGINT_ZERO ? token0USD : token1USD;
-  swap.tokenOut = amount0Out != BIGINT_ZERO ? token0.id : token1.id;
-  swap.amountOut = amount0Out != BIGINT_ZERO ? amount0Total : amount1Total;
-  swap.amountOutUSD = amount0Out != BIGINT_ZERO ? token0USD : token1USD;
+  swap.tokenIn = swapTokens.tokenIn.id;
+  swap.amountIn = swapTokens.amountIn;
+  swap.amountInUSD = swapTokens.tokenInUSD;
+  swap.tokenOut = swapTokens.tokenOut.id;
+  swap.amountOut = swapTokens.amountOut;
+  swap.amountOutUSD = swapTokens.tokenOutUSD;
   swap.pool = pool.id;
 
   swap.save();
@@ -337,17 +322,72 @@ export function createSwapHandleVolumeAndFees(
   // only accounts for volume through white listed tokens
   const trackedAmountUSD = getTrackedVolumeUSD(
     poolAmounts,
-    amount0TotalConverted,
-    token0,
-    amount1TotalConverted,
-    token1
+    swapTokens.amountInConverted,
+    swapTokens.tokenIn,
+    swapTokens.amountOutConverted,
+    swapTokens.tokenOut
   );
   updateVolumeAndFees(
     event,
     protocol,
     pool,
     trackedAmountUSD,
-    amount0Total,
-    amount1Total
+    amount0,
+    amount1
   );
+}
+
+class SwapTokens {
+  tokenIn: Token;
+  tokenOut: Token;
+  amountIn: BigInt;
+  amountOut: BigInt;
+  amountInConverted: BigDecimal;
+  amountOutConverted: BigDecimal;
+  tokenInUSD: BigDecimal;
+  tokenOutUSD: BigDecimal;
+}
+
+export function getSwapTokens(
+  token0: Token,
+  token1: Token,
+  amount0: BigInt,
+  amount1: BigInt
+): SwapTokens {
+  let tokenIn: Token;
+  let tokenOut: Token;
+  let amountIn: BigInt;
+  let amountOut: BigInt;
+
+  if (amount0.gt(BIGINT_ZERO)) {
+    tokenIn = token0;
+    tokenOut = token1;
+    amountIn = amount0;
+    amountOut = amount1.times(BIGINT_NEG_ONE);
+  } else {
+    tokenIn = token1;
+    tokenOut = token0;
+    amountIn = amount1;
+    amountOut = amount0.times(BIGINT_NEG_ONE);
+  }
+
+  const amountInConverted = convertTokenToDecimal(amountIn, tokenIn.decimals);
+  const amountOutConverted = convertTokenToDecimal(
+    amountOut,
+    tokenOut.decimals
+  );
+
+  const tokenInUSD = tokenIn.lastPriceUSD!.times(amountInConverted);
+  const tokenOutUSD = tokenOut.lastPriceUSD!.times(amountOutConverted);
+
+  return {
+    tokenIn,
+    tokenOut,
+    amountIn,
+    amountOut,
+    amountInConverted,
+    amountOutConverted,
+    tokenInUSD,
+    tokenOutUSD,
+  };
 }
