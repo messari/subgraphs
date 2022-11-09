@@ -203,7 +203,7 @@ type TokenData @entity {
   inputTokenBalance: BigInt!
 
   " Prices in USD of the input tokens (same order as inputTokens) "
-  inputTokenPricesUSD: BigDecimal!
+  inputTokenPriceUSD: BigDecimal!
 
   " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
   outputTokens: [Token!]
@@ -919,6 +919,11 @@ type Market @entity {
 
   " All flashloans made in this market"
   flashloans: [Flashloan!]! @derivedFrom(field: "market")
+
+  ##### Add Ons #####
+
+  " Base token interest multiplier for interest. Used to get revenue "
+  _baseBorrowIndex: BigInt
 }
 
 #################################

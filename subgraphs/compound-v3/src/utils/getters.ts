@@ -1,5 +1,6 @@
 import { Address, Bytes, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
+  InterestRate,
   LendingProtocol,
   Market,
   Oracle,
@@ -159,7 +160,7 @@ export function getOrCreateTokenData(
     tokenData.canIsolate = false;
     tokenData.inputToken = token.id;
     tokenData.inputTokenBalance = BIGINT_ZERO;
-    tokenData.inputTokenPricesUSD = BIGDECIMAL_ZERO;
+    tokenData.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     tokenData.save();
   }
 
@@ -203,4 +204,26 @@ export function getOrCreateToken(tokenAddress: Bytes): Token {
   }
 
   return token;
+}
+
+export function getOrCreateInterestRate(
+  rateSide: string,
+  rateType: string,
+  marketID: Address
+): InterestRate {
+  const interestRateID = rateSide
+    .concat("-")
+    .concat(rateType)
+    .concat("-")
+    .concat(marketID.toHexString());
+  let rate = InterestRate.load(interestRateID);
+  if (!rate) {
+    rate = new InterestRate(interestRateID);
+    rate.rate = BIGDECIMAL_ZERO;
+    rate.side = rateSide;
+    rate.type = rateType;
+    rate.save();
+  }
+
+  return rate;
 }

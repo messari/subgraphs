@@ -1,4 +1,10 @@
-import { ByteArray, Bytes, crypto } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  ByteArray,
+  BigInt,
+  Bytes,
+  crypto,
+} from "@graphprotocol/graph-ts";
 import { ProtocolData } from "../../../src/utils/getters";
 
 ////////////////////////
@@ -115,12 +121,15 @@ export namespace AccountActiity {
 ///// Ethereum Addresses /////
 //////////////////////////////
 
-export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const ZERO_ADDRESS = Address.fromString(
+  "0x0000000000000000000000000000000000000000"
+);
 
 export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 export const ETH_DECIMALS = 18;
+export const DEFAULT_DECIMALS = 18;
 
 // factory contract
 export const CONFIGURATOR_ADDRESS =
@@ -138,6 +147,7 @@ export const LENDING_TYPE = LendingType.POOLED;
 export const PERMISSION_TYPE = PermissionType.PERMISSIONLESS;
 export const RISK_TYPE = RiskType.GLOBAL;
 export const COMPOUND_DECIMALS = 8;
+export const BASE_INDEX_SCALE = BigInt.fromI64(1000000000000000);
 
 export function getProtocolData(): ProtocolData {
   return new ProtocolData(

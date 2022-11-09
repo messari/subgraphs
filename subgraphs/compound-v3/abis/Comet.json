@@ -635,6 +635,56 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "totalsBasic",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "baseSupplyIndex",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "baseBorrowIndex",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint256",
+            "name": "trackingSupplyIndex",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "trackingBorrowIndex",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint104",
+            "name": "totalSupplyBase",
+            "type": "uint104"
+          },
+          {
+            "internalType": "uint104",
+            "name": "totalBorrowBase",
+            "type": "uint104"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lastAccrualTime",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct CometExt.TotalsBasic",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [{ "internalType": "uint8", "name": "i", "type": "uint8" }],
     "name": "getAssetInfo",
     "outputs": [

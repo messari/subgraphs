@@ -139,10 +139,34 @@ export function createLiquidate(
   event: ethereum.Event,
   marketID: Address,
   asset: Address,
-  account: Address,
+  liquidator: Address,
+  borrower: Address,
   amount: BigInt,
-  amountUSD: BigDecimal
-): void {
+  amountUSD: BigDecimal,
+  profitUSD: BigDecimal
+): Liquidate {
+  const liquidate = new Liquidate(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  );
+  liquidate.hash = event.transaction.hash;
+  liquidate.nonce = event.transaction.nonce;
+  liquidate.logIndex = event.logIndex.toI32();
+  liquidate.gasPrice = event.transaction.gasPrice;
+  liquidate.gasUsed = event.receipt ? event.receipt!.gasUsed : null;
+  liquidate.gasLimit = event.transaction.gasLimit;
+  liquidate.blockNumber = event.block.number;
+  liquidate.timestamp = event.block.timestamp;
+  liquidate.liquidator = liquidator;
+  liquidate.liquidatee = borrower;
+  liquidate.market = marketID;
+  liquidate.positions = [account]; // TODO add position
+  liquidate.asset = asset;
+  liquidate.amount = amount;
+  liquidate.amountUSD = amountUSD;
+  liquidate.profitUSD = liquidate.save();
+
+  return liquidate;
+
   // TODO update market values, daily values, protocol values, snapshots
 }
 

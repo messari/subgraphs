@@ -68,6 +68,10 @@ TODO
 - Need to manually add TotalsBasic() to Comet abi to get total Supply of base tokens with interest, interest (revenue), borrows with interest.
 - Base token withdraws act as withdraws and borrows depending on WHAT?? logic
 - The base asset cannot be used as collateral
+- reserves factor is dynamic. Essentially just the spread of supply/borrow ir rates at the time
+- `BuyCollateral()` is a way for external accounts to purchase seized collateral at a discount. The discount being the liquidation penalty for that collateral asset.
+  - Compound V3 separates the liquidation callouts from the seized collateral sales.
+- Liquidations technically increase protocol revenue by any leftover collateral that is absorbed by the protocol. Is this what we should be calculating??
 
 ## Reference and Useful Links
 

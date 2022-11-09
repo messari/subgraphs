@@ -68,6 +68,11 @@ templates:
           receipt: true
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+        - event: AbsorbCollateral(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleAbsorbCollateral
+          receipt: true
+        - event: BuyCollateral(indexed address,indexed address,uint256,uint256)
+          handler: handleBuyCollateral
         # - event: AbsorbCollateral(indexed address,indexed address,indexed address,uint256,uint256)
         #   handler: handleAbsorbCollateral
         # - event: AbsorbDebt()
