@@ -4,8 +4,19 @@ import {
   Deposit,
   Liquidate,
   Repay,
+  Transfer,
   Withdraw,
 } from "../../generated/schema";
+
+/**
+ * This file contains schema type creator
+ * functions for schema-lending.graphql.
+ *
+ * Schema Version: 3.0.0
+ * Last Updated: Nov 10, 2022
+ * Author(s):
+ *  - @dmelotik
+ */
 
 export function createDeposit(
   event: ethereum.Event,
@@ -164,8 +175,43 @@ export function createLiquidate(
   liquidate.amount = amount;
   liquidate.amountUSD = amountUSD;
   liquidate.profitUSD = profitUSD;
+  liquidate.save();
 
   return liquidate;
+
+  // TODO update market values, daily values, protocol values, snapshots
+}
+
+export function createTransfer(
+  event: ethereum.Event,
+  marketID: Address,
+  asset: Address,
+  sender: Address,
+  receiver: Address,
+  amount: BigInt,
+  amountUSD: BigDecimal
+): Transfer {
+  const transfer = new Transfer(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  );
+  transfer.hash = event.transaction.hash;
+  transfer.nonce = event.transaction.nonce;
+  transfer.logIndex = event.logIndex.toI32();
+  transfer.gasPrice = event.transaction.gasPrice;
+  transfer.gasUsed = event.receipt ? event.receipt!.gasUsed : null;
+  transfer.gasLimit = event.transaction.gasLimit;
+  transfer.blockNumber = event.block.number;
+  transfer.timestamp = event.block.timestamp;
+  transfer.sender = sender;
+  transfer.receiver = receiver;
+  transfer.market = marketID;
+  transfer.positions = [sender, receiver]; // TODO add positions
+  transfer.asset = asset;
+  transfer.amount = amount;
+  transfer.amountUSD = amountUSD;
+  transfer.save();
+
+  return transfer;
 
   // TODO update market values, daily values, protocol values, snapshots
 }

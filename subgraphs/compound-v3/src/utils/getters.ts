@@ -1,5 +1,6 @@
 import { Address, Bytes, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
+  FinancialsDailySnapshot,
   InterestRate,
   LendingProtocol,
   Market,
@@ -13,15 +14,16 @@ import {
   BIGINT_ZERO,
   INT_ZERO,
   ProtocolType,
+  SECONDS_PER_DAY,
 } from "./constants";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
 
 /**
- * This file contains schema type getter (or creator)
+ * This file contains schema type getter (or updator)
  * functions for schema-lending.graphql.
  *
  * Schema Version: 3.0.0
- * Last Updated: Nov 1, 2022
+ * Last Updated: Nov 10, 2022
  * Author(s):
  *  - @dmelotik
  */
@@ -170,25 +172,26 @@ export function getOrCreateTokenData(
 export function getOrCreateOracle(
   event: ethereum.Event,
   oracleAddress: Address,
+  tokenAddress: Address,
   marketID: Address,
   isUSD: boolean,
   source?: string
 ): Oracle {
-  const oracleID = marketID.concat(oracleAddress);
+  const oracleID = marketID.concat(tokenAddress);
   let oracle = Oracle.load(oracleID);
   if (!oracle) {
     oracle = new Oracle(oracleID);
-    oracle.oracleAddress = oracleAddress;
     oracle.market = marketID;
     oracle.blockCreated = event.block.number;
     oracle.timestampCreated = event.block.timestamp;
     oracle.isActive = true;
-    oracle.isUSD = isUSD;
-    if (source) {
-      oracle.oracleSource = source;
-    }
-    oracle.save();
   }
+  oracle.oracleAddress = oracleAddress;
+  oracle.isUSD = isUSD;
+  if (source) {
+    oracle.oracleSource = source;
+  }
+  oracle.save();
 
   return oracle;
 }
@@ -226,4 +229,47 @@ export function getOrCreateInterestRate(
   }
 
   return rate;
+}
+
+export function getOrUpdateFinancials(
+  event: ethereum.Event,
+  protocol: LendingProtocol
+): FinancialsDailySnapshot {
+  const days = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let snapshot = FinancialsDailySnapshot.load(days.toString());
+  if (!snapshot) {
+    snapshot = new FinancialsDailySnapshot(days.toString());
+    snapshot.days = days;
+    snapshot.protocol = protocol.id;
+
+    snapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyTransferUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyFlashloanUSD = BIGDECIMAL_ZERO;
+  }
+
+  snapshot.blockNumber = event.block.number;
+  snapshot.timestamp = event.block.timestamp;
+  snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  snapshot.protocolControlledValueUSD = protocol.protocolControlledValueUSD;
+  snapshot.mintedTokenSupplies = protocol.mintedTokenSupplies;
+  snapshot.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  snapshot.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  // TODO create new entity for revenueDetails??
+  snapshot.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
+  snapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+  snapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
+  snapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+  snapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+  snapshot.save();
+
+  return snapshot;
 }

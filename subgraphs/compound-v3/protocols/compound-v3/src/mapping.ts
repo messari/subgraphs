@@ -8,17 +8,29 @@ import {
   log,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
-import { CometDeployed } from "../../../generated/Configurator/Configurator";
+import {
+  AddAsset,
+  CometDeployed,
+  SetBaseTokenPriceFeed,
+  UpdateAsset,
+  UpdateAssetBorrowCollateralFactor,
+  UpdateAssetLiquidateCollateralFactor,
+  UpdateAssetLiquidationFactor,
+  UpdateAssetPriceFeed,
+  UpdateAssetSupplyCap,
+} from "../../../generated/Configurator/Configurator";
 import {
   Comet,
   Supply,
   Withdraw,
-  Transfer,
+  // TransferBaseCall,
   SupplyCollateral,
   WithdrawCollateral,
   BuyCollateral,
   AbsorbCollateral,
+  TransferCollateral,
 } from "../../../generated/templates/Comet/Comet";
+import { ERC20 } from "../../../generated/templates/Comet/ERC20";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
@@ -57,6 +69,7 @@ import {
   createDeposit,
   createLiquidate,
   createRepay,
+  createTransfer,
   createWithdraw,
 } from "../../../src/utils/creator";
 import {
@@ -112,6 +125,7 @@ export function handleCometDeployed(event: CometDeployed): void {
       baseToken.oracle = getOrCreateOracle(
         event,
         tryBaseOracle.value,
+        tryBaseToken.value,
         marketID,
         true,
         OracleSource.CHAINLINK
@@ -152,6 +166,7 @@ export function handleCometDeployed(event: CometDeployed): void {
     inputToken.oracle = getOrCreateOracle(
       event,
       tryAssetInfo.value.priceFeed,
+      inputTokenID,
       marketID,
       true,
       OracleSource.CHAINLINK
@@ -165,6 +180,167 @@ export function handleCometDeployed(event: CometDeployed): void {
 
   market.tokens = tokenDataIDs;
   market.save();
+}
+
+//
+//
+// Add a new asset onto an existing market
+export function handleAddAsset(event: AddAsset): void {
+  const protocolData = getProtocolData();
+  const market = getOrCreateMarket(
+    event,
+    event.params.cometProxy,
+    protocolData.protocolID
+  );
+  const tokenDataIDs = market.tokens ? market.tokens : [];
+  const tokenData = getOrCreateTokenData(
+    event.params.cometProxy,
+    event.params.assetConfig.asset
+  );
+
+  // add unique TokenData fields
+  tokenData.canUseAsCollateral = true;
+  tokenData.maximumLTV = bigIntToBigDecimal(
+    event.params.assetConfig.borrowCollateralFactor,
+    16
+  );
+  tokenData.liquidationThreshold = bigIntToBigDecimal(
+    event.params.assetConfig.liquidateCollateralFactor,
+    16
+  );
+  tokenData.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
+    bigIntToBigDecimal(event.params.assetConfig.liquidationFactor, 16)
+  );
+  tokenData.supplyCap = event.params.assetConfig.supplyCap;
+  tokenData.save();
+  tokenDataIDs!.push(tokenData.id);
+
+  market.tokens = tokenDataIDs;
+  market.save();
+}
+
+//
+//
+// Update the price feed for the base token
+export function handleSetBaseTokenPriceFeed(
+  event: SetBaseTokenPriceFeed
+): void {
+  const cometContract = Comet.bind(event.params.cometProxy);
+  const tryBaseToken = cometContract.try_baseToken();
+  if (tryBaseToken.reverted) {
+    log.warning(
+      "[handleSetBaseTokenPriceFeed] Base token not found for comet: {}",
+      [event.params.cometProxy.toHexString()]
+    );
+    return;
+  }
+  getOrCreateOracle(
+    event,
+    event.params.oldBaseTokenPriceFeed,
+    tryBaseToken.value,
+    event.params.cometProxy,
+    true,
+    OracleSource.CHAINLINK
+  );
+}
+
+//
+//
+// Update the AssetConfig for an existing asset
+export function handleUpdateAsset(event: UpdateAsset): void {
+  const tokenData = getOrCreateTokenData(
+    event.params.cometProxy,
+    event.params.newAssetConfig.asset
+  );
+
+  // add unique TokenData fields
+  tokenData.canUseAsCollateral = true;
+  tokenData.maximumLTV = bigIntToBigDecimal(
+    event.params.newAssetConfig.borrowCollateralFactor,
+    16
+  );
+  tokenData.liquidationThreshold = bigIntToBigDecimal(
+    event.params.newAssetConfig.liquidateCollateralFactor,
+    16
+  );
+  tokenData.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
+    bigIntToBigDecimal(event.params.newAssetConfig.liquidationFactor, 16)
+  );
+  tokenData.supplyCap = event.params.newAssetConfig.supplyCap;
+  tokenData.save();
+}
+
+//
+//
+// Update the borrow collateral factor on a given collateral asset
+export function handleUpdateAssetBorrowCollateralFactor(
+  event: UpdateAssetBorrowCollateralFactor
+): void {
+  const tokenData = getOrCreateTokenData(
+    event.params.cometProxy,
+    event.params.asset
+  );
+  tokenData.maximumLTV = bigIntToBigDecimal(event.params.newBorrowCF, 16);
+  tokenData.save();
+}
+
+//
+//
+// Update the liquidate collateral factor on a given collateral asset
+export function handleUpdateAssetLiquidateCollateralFactor(
+  event: UpdateAssetLiquidateCollateralFactor
+): void {
+  const tokenData = getOrCreateTokenData(
+    event.params.cometProxy,
+    event.params.asset
+  );
+  tokenData.liquidationThreshold = bigIntToBigDecimal(
+    event.params.newLiquidateCF,
+    16
+  );
+  tokenData.save();
+}
+
+//
+//
+// Update the liquidation factor on a given collateral asset
+export function handleUpdateAssetLiquidationFactor(
+  event: UpdateAssetLiquidationFactor
+): void {
+  const tokenData = getOrCreateTokenData(
+    event.params.cometProxy,
+    event.params.asset
+  );
+  tokenData.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
+    bigIntToBigDecimal(event.params.newLiquidationFactor, 16)
+  );
+  tokenData.save();
+}
+
+//
+//
+// Update the price feed for a collateral asset
+export function handleUpdateAssetPriceFeed(event: UpdateAssetPriceFeed): void {
+  getOrCreateOracle(
+    event,
+    event.params.oldPriceFeed,
+    event.params.asset,
+    event.params.cometProxy,
+    true,
+    OracleSource.CHAINLINK
+  );
+}
+
+//
+//
+// Update the supply cap for a given collateral asset
+export function handleUpdateAssetSupplyCap(event: UpdateAssetSupplyCap): void {
+  const tokenData = getOrCreateTokenData(
+    event.params.cometProxy,
+    event.params.asset
+  );
+  tokenData.supplyCap = event.params.newSupplyCap;
+  tokenData.save();
 }
 
 ////////////////////////
@@ -390,19 +566,20 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
 
 //
 //
-// TODO- figure out if a transfer is independent of a supply or withdraw
-export function handleTransfer(event: Transfer): void {}
+// Transfer user base tokens to another account
+// Need to use callHandler
+// export function handleTransfer(call: TransferBaseCall): void {
+// TODO
+// }
 
-export function handleAbsorbCollateral(event: AbsorbCollateral): void {
-  const liquidator = event.params.absorber;
-  const borrower = event.params.borrower;
+//
+//
+// Transfer user collateral to another account
+export function handleTransferCollateral(event: TransferCollateral): void {
+  const sender = event.params.from;
+  const receiver = event.params.to;
   const asset = event.params.asset;
-  const amount = event.params.collateralAbsorbed;
-  const amountUSD = bigIntToBigDecimal(amount, COMPOUND_DECIMALS);
-  const tokenData = getOrCreateTokenData(event.address, asset);
-  const liquidationPenalty =
-    tokenData.liquidationPenalty.div(BIGDECIMAL_HUNDRED);
-  const profitUSD = amountUSD.times(liquidationPenalty);
+  const amount = event.params.amount;
   const token = updateMarketPrices(event, asset);
   if (!token) {
     log.warning("[handleWithdrawCollateral] Could not find token {}", [
@@ -410,12 +587,45 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
     ]);
     return;
   }
-  updateRevenue(event, Comet.bind(event.address));
+  // no revenue accrued during this event
+
+  const transfer = createTransfer(
+    event,
+    event.address, // marketID
+    asset,
+    sender,
+    receiver,
+    amount,
+    bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
+  );
+
+  updateMarketData(event, BIGINT_ZERO, ZERO_ADDRESS);
+}
+
+export function handleAbsorbCollateral(event: AbsorbCollateral): void {
+  const cometContract = Comet.bind(event.address);
+  const liquidator = event.params.absorber;
+  const borrower = event.params.borrower;
+  const baseAsset = cometContract.baseToken();
+  const amount = event.params.collateralAbsorbed;
+  const amountUSD = bigIntToBigDecimal(amount, COMPOUND_DECIMALS);
+  const tokenData = getOrCreateTokenData(event.address, baseAsset);
+  const liquidationPenalty =
+    tokenData.liquidationPenalty.div(BIGDECIMAL_HUNDRED);
+  const profitUSD = amountUSD.times(liquidationPenalty);
+  const token = updateMarketPrices(event, baseAsset);
+  if (!token) {
+    log.warning("[handleWithdrawCollateral] Could not find token {}", [
+      baseAsset.toHexString(),
+    ]);
+    return;
+  }
+  updateRevenue(event, cometContract);
 
   createLiquidate(
     event,
     event.address, // marketID
-    asset,
+    baseAsset,
     liquidator,
     borrower,
     amount,
@@ -425,8 +635,6 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
 
   updateMarketData(event, BIGINT_ZERO, ZERO_ADDRESS);
 }
-
-export function handleBuyCollateral(event: BuyCollateral): void {}
 
 ///////////////////
 ///// Helpers /////
@@ -512,11 +720,6 @@ function updateMarketData(
       continue;
     }
 
-    if (collateralAsset == tokenData.inputToken) {
-      tokenData.inputTokenBalance =
-        tokenData.inputTokenBalance.plus(collateralChange);
-    }
-
     if (tokenData.inputToken == baseToken) {
       const tryTotalSupply = cometContract.try_totalSupply();
       const tryTotalBorrow = cometContract.try_totalBorrow();
@@ -530,7 +733,16 @@ function updateMarketData(
         tokenData.variableBorrowedTokenBalance!,
         token.decimals
       ).times(tokenData.inputTokenPriceUSD);
+    } else {
+      const collateralERC20 = ERC20.bind(
+        Address.fromBytes(tokenData.inputToken)
+      );
+      const tryBalance = collateralERC20.try_balanceOf(event.address);
+      if (!tryBalance.reverted) {
+        tokenData.inputTokenBalance = tryBalance.value;
+      }
     }
+
     totalValueLockedUSD = totalValueLockedUSD.plus(
       bigIntToBigDecimal(tokenData.inputTokenBalance, token.decimals).times(
         tokenData.inputTokenPriceUSD
