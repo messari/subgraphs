@@ -15,6 +15,7 @@ import {
 } from "./initializers";
 import { PoolFeesType } from "./types";
 import * as constants from "./constants";
+import { updateRewardTokenInfo } from "../modules/Rewards";
 import { ERC20 } from "../../generated/templates/Strategy/ERC20";
 import { Token, Vault as VaultStore, VaultFee } from "../../generated/schema";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
@@ -22,7 +23,6 @@ import { BribesProcessor as BribesProcessorTemplate } from "../../generated/temp
 import { Strategy as StrategyContract } from "../../generated/templates/Strategy/Strategy";
 import { Controller as ControllerContract } from "../../generated/templates/Strategy/Controller";
 import { RewardsLogger as RewardsLoggerContract } from "../../generated/templates/Strategy/RewardsLogger";
-import { updateRewardTokenInfo } from "../modules/Rewards";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -122,6 +122,12 @@ export function getVaultAddressFromController(
   );
 
   if (vaultAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return vaultAddress;
+
+  if (
+    controllerAddress.equals(constants.CONTROLLER_ADDRESS) &&
+    wantToken.equals(constants.CVX_TOKEN_ADDRESS)
+  )
+    return constants.BVECVX_VAULT_ADDRESS;
 
   const wantTokenStore = getOrCreateWantToken(wantToken, null);
   vaultAddress = Address.fromString(wantTokenStore.vaultAddress);
@@ -271,7 +277,9 @@ export function deactivateFinishedRewards(
   );
 
   const unlockSchedulesArray =
-    rewardsLoggerContract.try_getAllUnlockSchedulesFor(Address.fromString(vault.id));
+    rewardsLoggerContract.try_getAllUnlockSchedulesFor(
+      Address.fromString(vault.id)
+    );
   if (unlockSchedulesArray.reverted) return;
 
   for (let i = 0; i < unlockSchedulesArray.value.length; i++) {

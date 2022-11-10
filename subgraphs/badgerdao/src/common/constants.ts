@@ -90,6 +90,18 @@ export const BDIGG_VAULT_ADDRESS = Address.fromString(
   "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a"
 );
 
+export const CONTROLLER_ADDRESS = Address.fromString(
+  "0x63cF44B2548e4493Fd099222A1eC79F3344D9682"
+);
+
+export const CVX_TOKEN_ADDRESS = Address.fromString(
+  "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B"
+);
+
+export const BVECVX_VAULT_ADDRESS = Address.fromString(
+  "0xfd05D3C7fe2924020620A8bE4961bBaA747e6305"
+)
+
 export const CRV_DAO_TOKEN = Address.fromString(
   "0xd533a949740bb3306d119cc777fa900ba034cd52"
 );
