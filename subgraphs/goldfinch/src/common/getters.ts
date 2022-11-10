@@ -162,19 +162,18 @@ export function getOrCreateMarket(
     market = new Market(marketId);
     market.protocol = protocol.id;
     market.name = name;
-    // TODO isActive, canBorrowFrom defaults to false?
     market.isActive = false;
     market.canUseAsCollateral = false;
     market.canBorrowFrom = true;
-    market.maximumLTV = BIGDECIMAL_ZERO; // TODO: what should this be?
-    market.liquidationThreshold = BIGDECIMAL_ZERO; // TODO: what should this be?
-    market.liquidationPenalty = BIGDECIMAL_ZERO; // TODO: what should this be?
+    // maximumLTV = 0 as Goldfinch borrowing is undercollateralized
+    // to KYC'ed borrowers
+    market.maximumLTV = BIGDECIMAL_ZERO;
+    // no liquidations, so liquidationThreshold and liquidationPenalty set to 0
+    market.liquidationThreshold = BIGDECIMAL_ZERO;
+    market.liquidationPenalty = BIGDECIMAL_ZERO;
 
     market.inputToken = USDC_ADDRESS;
-    //market.outputToken; //TODO: pool share token
-    //market.rewardTokens = [prefixID(GFI_ADDRESS, RewardTokenType.DEPOSIT)];
     market.rates = [];
-    //market.stableBorrowRate
 
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
     market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
@@ -198,12 +197,6 @@ export function getOrCreateMarket(
     market.closedPositionCount = 0;
     market.lendingPositionCount = 0;
     market.borrowingPositionCount = 0;
-    //market.snapshots - derived and don't need to be initialized
-    //market.deposits
-    //market.withdraws
-    //market.borrows
-    //market.repays
-    //market.liquidates
 
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
@@ -225,11 +218,11 @@ export function getOrCreateMarketDailySnapshot(
   const daysStr: string = days.toString();
   const id = prefixID(marketId, daysStr);
 
-  const market = getOrCreateMarket(marketId, event);
   let marketMetrics = MarketDailySnapshot.load(id);
   if (marketMetrics == null) {
     marketMetrics = new MarketDailySnapshot(id);
 
+    const market = getOrCreateMarket(marketId, event);
     marketMetrics.protocol = FACTORY_ADDRESS;
     marketMetrics.market = marketId;
     marketMetrics.blockNumber = event.block.number;
@@ -279,11 +272,11 @@ export function getOrCreateMarketHourlySnapshot(
 
   const id = prefixID(marketId, hoursStr);
 
-  const market = getOrCreateMarket(marketId, event);
   let marketMetrics = MarketHourlySnapshot.load(id);
   if (marketMetrics == null) {
     marketMetrics = new MarketHourlySnapshot(id);
 
+    const market = getOrCreateMarket(marketId, event);
     marketMetrics.protocol = FACTORY_ADDRESS;
     marketMetrics.market = marketId;
     marketMetrics.blockNumber = event.block.number;
@@ -538,11 +531,7 @@ export function getOpenPosition(
   side: string
 ): Position | null {
   const positionCounter = getOrCreatePositionCounter(accountID, marketID, side);
-  /*
-  log.debug(
-    "[getOpenPosition]Finding open position for acount {}/market {}/side {}",
-    [accountID, marketID, side]
-  );*/
+
   const nextCount = positionCounter.nextCount;
   for (let counter = nextCount; counter >= 0; counter--) {
     const positionID = `${positionCounter.id}-${counter}`;
@@ -552,7 +541,6 @@ export function getOpenPosition(
         position.hashClosed != null ? position.hashClosed! : "null";
       const balance = position.balance.toString();
       const account = position.account;
-      // position is open
       if (position.hashClosed == null) {
         log.debug(
           "[getOpenPosition]found open position counter={}, position.id={}, account={}, balance={}, hashClosed={}",
@@ -562,7 +550,7 @@ export function getOpenPosition(
       }
     }
   }
-  log.info(
+  log.warning(
     "[getOpenPosition]No open position found for account {}/market {}/side {}",
     [accountID, marketID, side]
   );

@@ -69,9 +69,6 @@ export function handleDepositMade(event: DepositMade): void {
   market.totalDepositBalanceUSD =
     market.inputTokenBalance.divDecimal(USDC_DECIMALS);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
-  // alternatively, calculate totalDepositBalanceUSD using deposit amount
-  // this somehow creates negative totalDepositBalanceUSD
-  //market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(amountUSD);
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
 
   const fiduContract = FiduContract.bind(
