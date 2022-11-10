@@ -122,17 +122,23 @@ export function csvToJSONConvertor(csv: string) {
     const obj: any = {};
     const currentline = lines[i].split(",");
     for (let j = 0; j < headers.length; j++) {
+      let entry: any = currentline[j];
       let header = headers[j].toLowerCase();
       if (header !== 'date') {
         header = 'value';
       }
-      let entry = currentline[j];
       if (entry) {
         if (entry.includes("'")) {
           entry = entry.split("'").join("");
         }
         if (entry.includes('"')) {
           entry = entry.split('"').join("");
+        }
+        if (header === 'date') {
+          entry = moment(entry).unix();
+        }
+        if (!isNaN(Number(entry))) {
+          entry = Number(entry);
         }
         obj[header] = entry;
       }

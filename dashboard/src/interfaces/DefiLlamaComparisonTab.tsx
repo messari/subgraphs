@@ -31,7 +31,6 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
       return;
     }
   }
-  const navigate = useNavigate();
 
   ChartJS.register(...registerables);
   ChartJS.register(PointElement);
