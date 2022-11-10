@@ -5520,34 +5520,5 @@
         }
       }
     }
-  },
-  "yeti-finance": {
-    "schema": "lending",
-    "base": "yeti-finance",
-    "protocol": "yeti-finance",
-    "deployments": {
-      "yeti-finance-avalanche": {
-        "network": "avalanche",
-        "status": "dev",
-        "versions": {
-          "schema": "1.2.1",
-          "subgraph": "1.2.0",
-          "methodology": "1.0.1"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "yeti-finance-avalanche",
-            "query-id": "yeti-finance-avalanche"
-          }
-        },
-        "files": {
-          "template": "yeti.finance.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": false
-        }
-      }
-    }
   }
 }
