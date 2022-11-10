@@ -15,9 +15,32 @@ interface TableChartProps {
 
 export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: TableChartProps) => {
   const field = datasetLabel.split("-")[1] || datasetLabel;
+  const [sortColumn, setSortColumn] = useState<string>("date");
+  const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDateString, toggleDateString] = useState(true);
   const [dates, setDates] = useState<any>([]);
+
+  function sortFunction(a: any, b: any) {
+    let aVal = a[sortColumn];
+    if (!isNaN(Number(a[sortColumn]))) {
+      aVal = Number(a[sortColumn]);
+    } else if (a[sortColumn].includes("%")) {
+      aVal = Number(a[sortColumn].split("%").join(""));
+    }
+    let bVal = b[sortColumn];
+    if (!isNaN(Number(b[sortColumn]))) {
+      bVal = Number(b[sortColumn]);
+    } else if (b[sortColumn].includes("%")) {
+      bVal = Number(b[sortColumn].split("%").join(""));
+    }
+
+    if (sortOrderAsc) {
+      return (aVal - bVal);
+    } else {
+      return (bVal - aVal);
+    }
+  }
 
   const isPercentageField = percentageFieldList.find((x) => {
     return datasetLabel.toUpperCase().includes(x.toUpperCase());
@@ -142,9 +165,9 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
                   arrayToSend.push(objectIteration);
                 }
               }
-              return downloadCSV(arrayToSend.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), ...x })), datasetLabel + '-csv', datasetLabel);
+              return downloadCSV(arrayToSend.sort(sortFunction).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), ...x })), datasetLabel + '-csv', datasetLabel);
             } else {
-              downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel);
+              downloadCSV(dataTable.sort(sortFunction).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel);
             }
           }}>
             Save CSV
@@ -157,6 +180,10 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
             sorting: {
               sortModel: [{ field: "date", sort: "desc" }],
             },
+          }}
+          onSortModelChange={(x) => {
+            setSortColumn(x[0].field);
+            setSortOrderAsc(x[0].sort === "asc");
           }}
           rows={tableData}
           columns={columns}

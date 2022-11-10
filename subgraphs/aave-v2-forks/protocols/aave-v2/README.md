@@ -56,8 +56,7 @@ Not applicable to Aave
 
 ## Issues
 
-- The WETH gateways seem to be giving the most trouble on positional entities.
-  - ie, a lot of the withdraw events not found is due to weth gateways acting as a third actor in transactions
+If you find an issue please create a github issue in [messari/subgraphs](https://github.com/messari/subgraphs)
 
 ## Notes
 
@@ -67,6 +66,9 @@ Not applicable to Aave
   - There are also similar features with swapAndRepay routers and swapAndLiquidate routers.
   - The logic in our subgraph accounts for all of the unique behaviour described above.
 - There is also a feature in Aave V2 to execute transactions on behalf of another account. We do account for this in the mappings. A position and transaction follow the controller of the collateral or debt.
+  - This does not affect any of the position data though.
+- There is also a feature in Aave V2 to execute transactions on behalf of another account. We do account for this in the mappings.
+- WMATIC price on the polygon deployment is funky at block `15783457` so we override it.
 
 ## Useful links and references
 

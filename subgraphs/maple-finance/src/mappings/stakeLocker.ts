@@ -1,12 +1,10 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
-
+import { Address } from "@graphprotocol/graph-ts";
 import {
     Stake as StakeEvent,
     Unstake as UnstakeEvent,
-    LossesRecognized as LossesRecognizedEvent
+    LossesRecognized as LossesRecognizedEvent,
 } from "../../generated/templates/StakeLocker/StakeLocker";
-
-import { StakeType, ZERO_BI } from "../common/constants";
+import { StakeType } from "../common/constants";
 import { getOrCreateMarket, getOrCreateStakeLocker } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { createStake, createUnstake } from "../common/mappingHelpers/getOrCreate/transactions";

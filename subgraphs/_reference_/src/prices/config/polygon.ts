@@ -1,134 +1,130 @@
-import { BigInt, Address, TypedMap } from "@graphprotocol/graph-ts";
+import { Configurations } from "../common/types";
+import * as constants from "../common/constants";
+import { BigInt, Address } from "@graphprotocol/graph-ts";
 
 export const NETWORK_STRING = "matic";
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+export const YEARN_LENS_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
+
+export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
+  "0xb023e699F5a33916Ea823A16485e259257cA8Bd1"
+);
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
-export const CURVE_REGISTRY_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
-export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
+export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
+
+export const CURVE_REGISTRY_ADDRESSES: Address[] = [
+  Address.fromString("0x094d12e5b541784701FD8d65F11fc0598FBC6332"),
+  Address.fromString("0x47bB542B9dE58b970bA50c9dae444DDB4c16751a"),
+];
 
 ///////////////////////////////////////////////////////////////////////////
-///////////////////////////// SUSHISWAP CONTRACT //////////////////////////
+/////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
-export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
-  "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"  // WMATIC
-);
-
-export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
-SUSHISWAP_ROUTER_ADDRESS.set(
-  "routerV1",
-  Address.fromString("0x0000000000000000000000000000000000000000")
-);
-SUSHISWAP_ROUTER_ADDRESS.set(
-  "routerV2",
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506")
-);
+export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
+  Address.fromString("0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff"), // QuickSwap
+  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"), // SushiSwap
+];
 
 ///////////////////////////////////////////////////////////////////////////
-////////////////////////// QUICKSWAP CONTRACT ///////////////////////////
-///////////////////////////////////////////////////////////////////////////
-// NOTE: QUICKSWAP is a Uniswap V2 Fork
-
-export const QUICKSWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
-QUICKSWAP_ROUTER_ADDRESS.set(
-  "routerV1",
-  Address.fromString("0x0000000000000000000000000000000000000000")
-);
-QUICKSWAP_ROUTER_ADDRESS.set(
-  "routerV2",
-  Address.fromString("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff")
-);
-
-export const QUICKSWAP_PATH_OVERRIDE = new TypedMap<Address, Address[]>();
-QUICKSWAP_PATH_OVERRIDE.set(
-  Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // WBTC - WBTC/WMATIC liquidity too low， use WBTC/USDC directly
-  [
-    Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // WBTC
-    Address.fromString("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"),  // USDC
-  ]
-)
-
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////// YEARNLENS CONTRACT //////////////////////////
+/////////////////////////// BLACKLISTED TOKENS ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS =
-  "0x0000000000000000000000000000000000000000";
+export const YEARN_LENS_BLACKLIST: Address[] = [];
+export const AAVE_ORACLE_BLACKLIST: Address[] = [];
+export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [];
+export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
-///////////////////////////// CHAINLINK CONTRACT //////////////////////////
+//////////////////////////// HARDCODED STABLES ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-// No Chainlink feed registry on polygon
-export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
-
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////// CHAINLINK CONTRACT //////////////////////////
-///////////////////////////////////////////////////////////////////////////
-
-export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
-
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////// CHAINLINK CONTRACT //////////////////////////
-///////////////////////////////////////////////////////////////////////////
-
-export const ONE_INCH_ORACLE_CONTRACT_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
+export const HARDCODED_STABLES: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_DECIMALS = BigInt.fromI32(6);
+export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
-export const WHITELIST_TOKENS = new TypedMap<string, Address>();
-WHITELIST_TOKENS.set(
-  "WETH",
-  Address.fromString("0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270")  // WMATIC
+export const ETH_ADDRESS = Address.fromString(
+  "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619"
 );
-WHITELIST_TOKENS.set(
-  "USDT",
-  Address.fromString("0xc2132D05D31c914a87C6611C10748AEb04B58e8F")
+export const WETH_ADDRESS = Address.fromString(
+  "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
 );
-WHITELIST_TOKENS.set(
-  "DAI",
-  Address.fromString("0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063")
+export const USDC_ADDRESS = Address.fromString(
+  "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
 );
-WHITELIST_TOKENS.set(
-  "USDC",
-  Address.fromString("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174")
-);
-WHITELIST_TOKENS.set(
-  "ETH",
-  Address.fromString("0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0") // MATIC
-);
-WHITELIST_TOKENS.set(
-  "WBTC",
-  Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6")
-);
-WHITELIST_TOKENS.set(
-  "EURS",
-  Address.fromString("0xE111178A87A3BFf0c8d18DECBa5798827539Ae99")
-);
-WHITELIST_TOKENS.set(
-  "LINK",
-  Address.fromString("0xb0897686c545045aFc77CF20eC7A532E3120E0F1")
-);
+
+export class config implements Configurations {
+  network(): string {
+    return NETWORK_STRING;
+  }
+
+  yearnLens(): Address {
+    return YEARN_LENS_CONTRACT_ADDRESS;
+  }
+  chainLink(): Address {
+    return CHAIN_LINK_CONTRACT_ADDRESS;
+  }
+  yearnLensBlacklist(): Address[] {
+    return YEARN_LENS_BLACKLIST;
+  }
+
+  aaveOracle(): Address {
+    return AAVE_ORACLE_CONTRACT_ADDRESS;
+  }
+  aaveOracleBlacklist(): Address[] {
+    return AAVE_ORACLE_BLACKLIST;
+  }
+
+  curveCalculations(): Address {
+    return CURVE_CALCULATIONS_ADDRESS;
+  }
+  curveCalculationsBlacklist(): Address[] {
+    return CURVE_CALCULATIONS_BLACKSLIST;
+  }
+
+  sushiCalculations(): Address {
+    return SUSHISWAP_CALCULATIONS_ADDRESS;
+  }
+  sushiCalculationsBlacklist(): Address[] {
+    return SUSHI_CALCULATIONS_BLACKSLIST;
+  }
+
+  uniswapForks(): Address[] {
+    return UNISWAP_FORKS_ROUTER_ADDRESSES;
+  }
+  curveRegistry(): Address[] {
+    return CURVE_REGISTRY_ADDRESSES;
+  }
+
+  hardcodedStables(): Address[] {
+    return HARDCODED_STABLES;
+  }
+
+  ethAddress(): Address {
+    return ETH_ADDRESS;
+  }
+  wethAddress(): Address {
+    return WETH_ADDRESS;
+  }
+  usdcAddress(): Address {
+    return USDC_ADDRESS;
+  }
+
+  usdcTokenDecimals(): BigInt {
+    return USDC_TOKEN_DECIMALS;
+  }
+}
