@@ -464,8 +464,8 @@ function ProtocolTabEntity({
               );
             }
             let dataChartToPass: any = dataFields[field];
+            const baseKey = `${protocolSchemaData?.protocols[0]?.name}-${protocolSchemaData?.protocols[0]?.network}-${protocolSchemaData?.protocols[0]?.subgraphVersion}`;
             if (overlayDataFields[field]) {
-              const baseKey = `${protocolSchemaData?.protocols[0]?.name}-${protocolSchemaData?.protocols[0]?.network}-${protocolSchemaData?.protocols[0]?.subgraphVersion}`;
               const overlayKey = `${overlaySchemaData?.protocols[0]?.name}-${overlaySchemaData?.protocols[0]?.network}-${overlaySchemaData?.protocols[0]?.subgraphVersion}`;
               let keyDiff = "";
               if (baseKey === overlayKey) {
@@ -480,7 +480,7 @@ function ProtocolTabEntity({
             return (
               <>
                 {tvlButton}
-                <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+                <ChartContainer baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
               </>
             );
           })}

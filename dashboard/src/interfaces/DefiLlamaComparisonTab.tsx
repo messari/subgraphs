@@ -31,7 +31,6 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
       return;
     }
   }
-  const navigate = useNavigate();
 
   ChartJS.register(...registerables);
   ChartJS.register(PointElement);
@@ -43,6 +42,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
 
   const [defiLlamaData, setDefiLlamaData] = useState<{ [x: string]: any }>({});
   const [defiLlamaProtocols, setDefiLlamaProtocols] = useState<any[]>([]);
+  const [defiLlamaProtocolFetchError, setDefiLlamaProtocolFetchError] = useState<boolean>(false);
   const [isMonthly, setIsMonthly] = useState(false);
   const [includeStakedTVL, setIncludeStakedTVL] = useState(true);
   const [includeBorrowedTVL, setIncludeBorrowedTVL] = useState(true);
@@ -154,11 +154,13 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
         setDefiLlamaData(json);
       })
       .catch((err) => {
+        setDefiLlamaProtocolFetchError(true);
         console.log(err);
       });
   };
 
   useEffect(() => {
+    setDefiLlamaProtocolFetchError(false);
     if (defiLlamaSlug.length > 0) {
       setDefiLlamaData({});
       defiLlama();
@@ -279,6 +281,8 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
                 isMonthly={isMonthly}
                 setIsMonthly={(x: boolean) => setIsMonthly(x)}
                 jpegDownloadHandler={() => jpegDownloadHandler()}
+                baseKey="subgraph"
+                overlayKey="defiLlama"
               />
             </Grid>
           </Grid>
@@ -319,6 +323,11 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
       </div>
     );
   }
+
+  if (defiLlamaProtocolFetchError) {
+    chart = null;
+  }
+
   return (
     <>
       <div>

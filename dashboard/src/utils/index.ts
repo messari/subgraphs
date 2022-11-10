@@ -7,7 +7,24 @@ import {
 } from "@apollo/client";
 import { useEffect, useRef } from "react";
 
-export const toDate = (timestamp: number, hour: boolean = false) => {
+export const tableCellTruncate: any = {
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+};
+
+export const schemaMapping: { [x: string]: any } = {
+  "dex-amm": "exchanges",
+  "yield-aggregator": "vaults",
+  "lending": "lending",
+  "generic": "generic",
+  "EXCHANGE": "exchanges",
+  "LENDING": "lending",
+  "YIELD": "vaults",
+  "GENERIC": "generic"
+}
+
+export function toDate(timestamp: number, hour: boolean = false) {
   let formatString = "YYYY-MM-DD";
   if (hour) {
     formatString += " HH:mm";
@@ -15,7 +32,7 @@ export const toDate = (timestamp: number, hour: boolean = false) => {
   return moment.utc(timestamp * 1000).format(formatString);
 };
 
-export const toUnitsSinceEpoch = (dateStr: string, hour: boolean) => {
+export function toUnitsSinceEpoch(dateStr: string, hour: boolean) {
   const timestamp = moment.utc(dateStr).unix();
   if (hour) {
     return (timestamp / 3600).toFixed(0);
@@ -77,14 +94,16 @@ export function convertTokenDecimals(value: string, decimals: number): number {
   return Number(value) / divisor;
 }
 
-export const parseSubgraphName = (url: string) => {
+export function parseSubgraphName(url: string) {
   const result = new RegExp(/\/name\/(.*)/g).exec(url);
   return result ? result[1] : "";
 };
 
-export const toPercent = (cur: number, total: number): number => parseFloat(((cur / total) * 100).toFixed(2));
+export function toPercent(cur: number, total: number): number {
+  return parseFloat(((cur / total) * 100).toFixed(2));
+}
 
-export const formatIntToFixed2 = (val: number): string => {
+export function formatIntToFixed2(val: number): string {
   let returnStr = parseFloat(val.toFixed(2)).toLocaleString();
   if (returnStr.split(".")[1]?.length === 1) {
     returnStr += "0";
@@ -94,15 +113,40 @@ export const formatIntToFixed2 = (val: number): string => {
   return returnStr;
 };
 
-export const schemaMapping: { [x: string]: any } = {
-  "dex-amm": "exchanges",
-  "yield-aggregator": "vaults",
-  "lending": "lending",
-  "generic": "generic",
-  "EXCHANGE": "exchanges",
-  "LENDING": "lending",
-  "YIELD": "vaults",
-  "GENERIC": "generic"
+export function csvToJSONConvertor(csv: string) {
+  const lines = csv.split("\n");
+  const result = [];
+  const headers = lines[0].split(",");
+
+  for (let i = 1; i < lines.length; i++) {
+    const obj: any = {};
+    const currentline = lines[i].split(",");
+    for (let j = 0; j < headers.length; j++) {
+      let entry: any = currentline[j];
+      let header = headers[j].toLowerCase();
+      if (header !== 'date') {
+        header = 'value';
+      }
+      if (entry) {
+        if (entry.includes("'")) {
+          entry = entry.split("'").join("");
+        }
+        if (entry.includes('"')) {
+          entry = entry.split('"').join("");
+        }
+        if (header === 'date' && isNaN(entry)) {
+          entry = moment(entry).unix();
+        }
+        if (!isNaN(Number(entry))) {
+          entry = Number(entry);
+        }
+        obj[header] = entry;
+      }
+    }
+    result.push(obj);
+  }
+
+  return (result);
 }
 
 export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
@@ -204,4 +248,10 @@ export function lineupChartDatapoints(compChart: any, stitchLeftIndex: number, t
     }
   }
   return compChart;
+}
+
+export function upperCaseFirstOfString(str: string) {
+  const arr = str.split("");
+  arr[0] = arr[0].toUpperCase();
+  return arr.join("");
 }
