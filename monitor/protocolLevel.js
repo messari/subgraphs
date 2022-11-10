@@ -496,6 +496,11 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                 if (returnedError) {
                     const alertArr = returnedError.filter(errObj => errObj.message !== "indexing_error").map(errObj => errObj.message);
                     if (alertArr.length > 0) {
+                        alertArr.map(alert => {
+                            if (!alert.includes("Store error: database unavailable")) {
+                                return alert;
+                            }
+                        });
                         alert = alertArr.join(" --- ");
                         deploymentsToReturn[depoKey].protocolErrors.queryError.push(alert);
                         // Map through errors and save the messages to protocolDerivedFieldErrors on depo object

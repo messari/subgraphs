@@ -2,7 +2,7 @@ import { Configurations } from "../common/types";
 import * as constants from "../common/constants";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-export const NETWORK_STRING = "bsc";
+export const NETWORK_STRING: string = "xdai";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
@@ -19,15 +19,17 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 
 export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 
-export const CURVE_REGISTRY_ADDRESSES: Address[] = [];
+export const CURVE_REGISTRY_ADDRESSES: Address[] = [
+  Address.fromString("0x55E91365697EB8032F98290601847296eC847210"),
+  Address.fromString("0x8A4694401bE8F8FCCbC542a3219aF1591f87CE17"),
+];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
-  Address.fromString("0x10ED43C718714eb63d5aA57B78B54704E256024E"), // PancakeSwap v2
-  Address.fromString("0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F"), // PancakeSwap v1
+  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"), // SushiSwap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -49,15 +51,16 @@ export const HARDCODED_STABLES: Address[] = [];
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_TOKEN_DECIMALS = BigInt.fromI32(18);
+export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
-export const ETH_ADDRESS = constants.NULL.TYPE_ADDRESS;
-
+export const ETH_ADDRESS = Address.fromString(
+  "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1"
+);
 export const WETH_ADDRESS = Address.fromString(
-  "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+  "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+  "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83"
 );
 
 export class config implements Configurations {

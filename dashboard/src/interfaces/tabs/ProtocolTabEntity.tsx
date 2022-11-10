@@ -367,7 +367,7 @@ function ProtocolTabEntity({
             const fieldName = field.split(" [")[0];
             if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
               return <>
-                <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(false)} >Show Regular TVL Component</div>
+                <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(false)} >Remove DefiLlama Comparison</div>
                 <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} getData={() => console.log('GET DATA')} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
             }
 
@@ -464,8 +464,8 @@ function ProtocolTabEntity({
               );
             }
             let dataChartToPass: any = dataFields[field];
+            const baseKey = `${protocolSchemaData?.protocols[0]?.name}-${protocolSchemaData?.protocols[0]?.network}-${protocolSchemaData?.protocols[0]?.subgraphVersion}`;
             if (overlayDataFields[field]) {
-              const baseKey = `${protocolSchemaData?.protocols[0]?.name}-${protocolSchemaData?.protocols[0]?.network}-${protocolSchemaData?.protocols[0]?.subgraphVersion}`;
               const overlayKey = `${overlaySchemaData?.protocols[0]?.name}-${overlaySchemaData?.protocols[0]?.network}-${overlaySchemaData?.protocols[0]?.subgraphVersion}`;
               let keyDiff = "";
               if (baseKey === overlayKey) {
@@ -475,12 +475,12 @@ function ProtocolTabEntity({
             }
             let tvlButton = null;
             if (fieldName === "totalValueLockedUSD" && entityName === "financialsDailySnapshots") {
-              tvlButton = <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(true)} >Show DefiLlama Component</div>;
+              tvlButton = <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(true)} >Compare TVL To DefiLlama</div>;
             }
             return (
               <>
                 {tvlButton}
-                <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+                <ChartContainer baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
               </>
             );
           })}
