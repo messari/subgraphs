@@ -7,10 +7,11 @@ interface UploadFileCSVProps {
     csvJSON: any;
     setCsvJSON: any;
     setChartIsImage: any;
+    setCsvMetaData: any;
     field: string;
 }
 
-export const UploadFileCSV = ({ csvJSON, setCsvJSON, setChartIsImage, field }: UploadFileCSVProps) => {
+export const UploadFileCSV = ({ csvJSON, setCsvJSON, setChartIsImage, setCsvMetaData, field }: UploadFileCSVProps) => {
     const classStr = "MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root";
     const [file, setFile] = useState<any>();
 
@@ -28,6 +29,7 @@ export const UploadFileCSV = ({ csvJSON, setCsvJSON, setChartIsImage, field }: U
                     if (typeof (text) === 'string') {
                         const json = csvToJSONConvertor(text);
                         setCsvJSON(json);
+                        setCsvMetaData({ fileName: file.name });
                     }
                 };
                 fileReader.readAsText(file);

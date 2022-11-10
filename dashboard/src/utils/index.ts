@@ -134,7 +134,7 @@ export function csvToJSONConvertor(csv: string) {
         if (entry.includes('"')) {
           entry = entry.split('"').join("");
         }
-        if (header === 'date') {
+        if (header === 'date' && isNaN(entry)) {
           entry = moment(entry).unix();
         }
         if (!isNaN(Number(entry))) {

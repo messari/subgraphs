@@ -16,15 +16,17 @@ interface ChartContainerProps {
     dataTable: any;
     downloadAllCharts: boolean;
     elementId: string;
+    baseKey: string;
     chartsImageFiles: any;
     setChartsImageFiles: any;
 }
 
-export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart, dataTable, downloadAllCharts, chartsImageFiles, setChartsImageFiles }: ChartContainerProps) => {
+export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, dataChart, dataTable, downloadAllCharts, chartsImageFiles, setChartsImageFiles }: ChartContainerProps) => {
     const chartRef = useRef<any>(null);
     const [chartIsImage, setChartIsImage] = useState<boolean>(false);
     const [initialLoaded, setInitialLoaded] = useState<boolean>(false);
     const [csvJSON, setCsvJSON] = useState<any>(null);
+    const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "" });
     const [isMonthly, setIsMonthly] = useState(false);
 
     function jpegDownloadHandler(downloadInZip: boolean) {
@@ -104,15 +106,15 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
                         },
                     ];
                 } else {
-                    dataChart = { base: dataChart, customCSV: csvArr };
+                    dataChart = { [baseKey?.length > 0 ? baseKey : "base"]: dataChart, [csvMetaData.fileName]: csvArr };
                 }
             }
             if (typeof dataChart === "object" && !Array.isArray(dataChart)) {
                 const colorList = ["rgb(53, 162, 235)", "red", "yellow", "lime", "pink", "black", "orange", "green"];
                 if (csvArr.length > 0) {
-                    dataChart.customCSV = csvArr;
-                } else if (Object.keys(dataChart).includes('customCSV')) {
-                    delete dataChart.customCSV;
+                    dataChart[csvMetaData.fileName] = csvArr;
+                } else if (Object.keys(dataChart).includes(csvMetaData.fileName)) {
+                    delete dataChart[csvMetaData.fileName];
                 }
                 datasets = Object.keys(dataChart).map((item: string, idx: number) => {
                     if (labels.length === 0) {
@@ -152,10 +154,10 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
 
     let tableRender = <TableChart datasetLabel={datasetLabel} dataTable={dataTable} jpegDownloadHandler={() => jpegDownloadHandler(false)} />
     if (csvJSON) {
-        let compChart = lineupChartDatapoints({ base: dataTable, customCSV: csvJSON }, 0);
-        compChart.base
+        let compChart = lineupChartDatapoints({ [baseKey?.length > 0 ? baseKey : "base"]: dataTable, [csvMetaData.fileName]: csvJSON }, 0);
+        compChart[baseKey?.length > 0 ? baseKey : "base"]
             .forEach((val: any, i: any) => {
-                const customCSVPoint = compChart.customCSV[i];
+                const customCSVPoint = compChart[csvMetaData.fileName][i];
                 if (!customCSVPoint) {
                     return;
                 }
@@ -164,8 +166,8 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
                 const baseDate = toDate(val.date);
 
                 if (Math.abs(customCSVTimestamp - val.date) > 86400) {
-                    const dateIndex = compChart.customCSV.findIndex((x: any) => toDate(x.date) === baseDate || x.date > val.date);
-                    compChart.customCSV = [...compChart.customCSV.slice(0, i), ...compChart.customCSV.slice(dateIndex, compChart.customCSV.length)];
+                    const dateIndex = compChart[csvMetaData.fileName].findIndex((x: any) => toDate(x.date) === baseDate || x.date > val.date);
+                    compChart[csvMetaData.fileName] = [...compChart[csvMetaData.fileName].slice(0, i), ...compChart[csvMetaData.fileName].slice(dateIndex, compChart[csvMetaData.fileName].length)];
                     compChart = lineupChartDatapoints({ ...compChart }, i);
                 }
             });
@@ -176,8 +178,8 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
             isMonthly={isMonthly}
             setIsMonthly={(x: boolean) => setIsMonthly(x)}
             jpegDownloadHandler={() => jpegDownloadHandler(false)}
-            baseKey="base"
-            overlayKey="customCSV"
+            baseKey={baseKey?.length > 0 ? baseKey : "base"}
+            overlayKey={csvMetaData.fileName}
         />
     }
     return (
@@ -188,7 +190,7 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
                         <Typography variant="h6">{datasetLabel}</Typography>
                     </CopyLinkToClipboard>
                     <div style={{ margin: "5px 0" }}>
-                        <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV field={datasetLabel} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setChartIsImage={setChartIsImage} /></Tooltip>
+                        <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV field={datasetLabel} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setChartIsImage={setChartIsImage} setCsvMetaData={setCsvMetaData} /></Tooltip>
                         <Tooltip placement="top" title={"Chart can be dragged and dropped to another tab"}><Button onClick={() => setChartIsImage(true)} style={{ padding: "1px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", ...staticButtonStyle }}>Static</Button></Tooltip>
                         <Tooltip placement="top" title={"Show plot points on hover"}><Button onClick={() => setChartIsImage(false)} style={{ padding: "1px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", ...dynamicButtonStyle }}>Dynamic</Button></Tooltip>
                     </div>
