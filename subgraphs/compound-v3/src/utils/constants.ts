@@ -45,14 +45,26 @@ export namespace LendingType {
   export const POOLED = "POOLED";
 }
 
+export namespace PermissionType {
+  export const WHITELIST_ONLY = "WHITELIST_ONLY";
+  export const PERMISSIONED = "PERMISSIONED";
+  export const PERMISSIONLESS = "PERMISSIONLESS";
+}
+
 export namespace RiskType {
   export const GLOBAL = "GLOBAL";
   export const ISOLATED = "ISOLATED";
 }
 
-export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT";
-  export const BORROW = "BORROW";
+export namespace CollateralizationType {
+  export const OVER_COLLATERALIZED = "OVER_COLLATERALIZED";
+  export const UNDER_COLLATERALIZED = "UNDER_COLLATERALIZED";
+  export const UNCOLLATERALIZED = "UNCOLLATERALIZED";
+}
+
+export namespace TokenType {
+  export const REBASING = "REBASING";
+  export const NON_REBASING = "NON_REBASING";
 }
 
 export namespace InterestRateType {
@@ -66,14 +78,43 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
-export namespace ActivityType {
+export namespace PositionSide {
+  export const COLLATERAL = "COLLATERAL";
+  export const BORROWER = "BORROWER";
+}
+
+export namespace RevenueSource {
+  export const BORROW_INTEREST = "BORROW_INTEREST";
+  export const LIQUIDATION_FEE = "LIQUIDATION_FEE";
+  export const FLASHLOAN_FEE = "FLASHLOAN_FEE";
+}
+
+export namespace OracleSource {
+  export const UNISWAP = "UNISWAP";
+  export const BALANCER = "BALANCER";
+  export const CHAINLINK = "CHAINLINK";
+  export const YEARN = "YEARN";
+  export const SUSHISWAP = "SUSHISWAP";
+  export const CURVE = "CURVE";
+}
+
+export namespace TransactionType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const BORROW = "BORROW";
+  export const REPAY = "REPAY";
+  export const LIQUIDATE = "LIQUIDATE";
+}
+
+export namespace AccountActiity {
   export const DAILY = "DAILY";
   export const HOURLY = "HOURLY";
 }
 
-export namespace PositionSide {
-  export const LENDER = "LENDER";
-  export const BORROWER = "BORROWER";
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT";
+  export const VARIABLE_BORROW = "VARIABLE_BORROW";
+  export const STABLE_BORROW = "STABLE_BORROW";
 }
 
 ////////////////////////
@@ -90,6 +131,7 @@ export const BIGINT_NEGATIVE_ONE = BigInt.fromI32(-1);
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
+export const BIGINT_THREE_HUNDRED = BigInt.fromI32(300);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);

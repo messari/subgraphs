@@ -12,6 +12,8 @@ import {
   AddAsset,
   CometDeployed,
   SetBaseTokenPriceFeed,
+  SetBaseTrackingBorrowSpeed,
+  SetBaseTrackingSupplySpeed,
   UpdateAsset,
   UpdateAssetBorrowCollateralFactor,
   UpdateAssetLiquidateCollateralFactor,
@@ -39,16 +41,23 @@ import {
   BIGINT_HUNDRED,
   BIGINT_NEGATIVE_ONE,
   BIGINT_ONE,
+  BIGINT_THREE_HUNDRED,
   BIGINT_ZERO,
+  exponentToBigDecimal,
   InterestRateSide,
   InterestRateType,
+  OracleSource,
+  RewardTokenType,
+  SECONDS_PER_DAY,
   SECONDS_PER_YEAR,
+  TokenType,
 } from "../../../src/utils/constants";
 import {
   getOrCreateInterestRate,
   getOrCreateLendingProtocol,
   getOrCreateMarket,
   getOrCreateOracle,
+  getOrCreateRewardToken,
   getOrCreateToken,
   getOrCreateTokenData,
 } from "../../../src/utils/getters";
@@ -58,10 +67,9 @@ import {
   CONFIGURATOR_ADDRESS,
   ENCODED_TRANSFER_SIGNATURE,
   getProtocolData,
-  OracleSource,
-  TokenType,
   ZERO_ADDRESS,
   DEFAULT_DECIMALS,
+  REWARDS_ADDRESS,
 } from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
 import {
@@ -79,7 +87,7 @@ import {
   Token,
   TokenData,
 } from "../../../generated/schema";
-import { MarketIdSet } from "../../../../aave-v2-forks/generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
+import { CometRewards } from "../../../generated/templates/Comet/CometRewards";
 
 ///////////////////////////////
 ///// Configurator Events /////
@@ -94,6 +102,8 @@ export function handleCometDeployed(event: CometDeployed): void {
   const protocol = getOrCreateLendingProtocol(getProtocolData());
   const marketID = event.params.cometProxy;
   const market = getOrCreateMarket(event, marketID, protocol.id);
+  market._baseTrackingBorrowSpeed = BIGINT_ZERO;
+  market._baseTrackingSupplySpeed = BIGINT_ZERO;
   market.canBorrowFrom = true;
   market._baseBorrowIndex = BASE_INDEX_SCALE;
 
@@ -115,7 +125,7 @@ export function handleCometDeployed(event: CometDeployed): void {
     market.name = outputToken.name;
 
     baseTokenData.outputTokens = [outputToken.id];
-    baseTokenData.outputTokenBalances = [BIGINT_ZERO];
+    baseTokenData.outputTokenSupplies = [BIGINT_ZERO];
     baseTokenData.outputTokenPricesUSD = [BIGDECIMAL_ZERO];
     baseTokenData.exchangeRates = [BIGDECIMAL_ONE];
 
@@ -246,6 +256,40 @@ export function handleSetBaseTokenPriceFeed(
 
 //
 //
+// Update the reward borrow speed
+export function handleSetBaseTrackingBorrowSpeed(
+  event: SetBaseTrackingBorrowSpeed
+): void {
+  const market = getOrCreateMarket(
+    event,
+    event.params.cometProxy,
+    getProtocolData().protocolID
+  );
+  market._baseTrackingBorrowSpeed = event.params.newBaseTrackingBorrowSpeed;
+  market.save();
+
+  updateRewards(event, event.params.cometProxy);
+}
+
+//
+//
+// Update the reward supply speed
+export function handleSetBaseTrackingSupplySpeed(
+  event: SetBaseTrackingSupplySpeed
+): void {
+  const market = getOrCreateMarket(
+    event,
+    event.params.cometProxy,
+    getProtocolData().protocolID
+  );
+  market._baseTrackingSupplySpeed = event.params.newBaseTrackingSupplySpeed;
+  market.save();
+
+  updateRewards(event, event.params.cometProxy);
+}
+
+//
+//
 // Update the AssetConfig for an existing asset
 export function handleUpdateAsset(event: UpdateAsset): void {
   const tokenData = getOrCreateTokenData(
@@ -364,6 +408,7 @@ export function handleSupply(event: Supply): void {
     return;
   }
   updateRevenue(event, cometContract);
+  updateRewards(event, event.address);
 
   const mintAmount = isMint(event);
   if (!mintAmount) {
@@ -440,6 +485,7 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
     return;
   }
   updateRevenue(event, Comet.bind(event.address));
+  updateRewards(event, event.address);
 
   const deposit = createDeposit(
     event,
@@ -472,6 +518,7 @@ export function handleWithdraw(event: Withdraw): void {
     return;
   }
   updateRevenue(event, cometContract);
+  updateRewards(event, event.address);
 
   const burnAmount = isBurn(event);
   if (!burnAmount) {
@@ -549,6 +596,7 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
     return;
   }
   updateRevenue(event, Comet.bind(event.address));
+  updateRewards(event, event.address);
 
   const withdraw = createWithdraw(
     event,
@@ -588,6 +636,7 @@ export function handleTransferCollateral(event: TransferCollateral): void {
     return;
   }
   // no revenue accrued during this event
+  updateRewards(event, event.address);
 
   const transfer = createTransfer(
     event,
@@ -621,6 +670,7 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
     return;
   }
   updateRevenue(event, cometContract);
+  updateRewards(event, event.address);
 
   createLiquidate(
     event,
@@ -639,6 +689,74 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
 ///////////////////
 ///// Helpers /////
 ///////////////////
+
+function updateRewards(event: ethereum.Event, marketID: Address): void {
+  const cometContract = Comet.bind(marketID);
+  const market = getOrCreateMarket(
+    event,
+    marketID,
+    getProtocolData().protocolID
+  );
+  const tryTrackingIndexScale = cometContract.try_trackingIndexScale();
+
+  const rewardContract = CometRewards.bind(Address.fromString(REWARDS_ADDRESS));
+  const tryRewardConfig = rewardContract.try_rewardConfig(
+    Address.fromBytes(market.id)
+  );
+
+  if (tryTrackingIndexScale.reverted || tryRewardConfig.reverted) {
+    log.warning("[updateRewards] Contract call(s) reverted on market: {}", [
+      market.id.toHexString(),
+    ]);
+    return;
+  }
+
+  const rewardToken = getOrCreateToken(tryRewardConfig.value.value0);
+  const borrowRewardToken = getOrCreateRewardToken(
+    rewardToken.id,
+    RewardTokenType.VARIABLE_BORROW
+  );
+  const supplyRewardToken = getOrCreateRewardToken(
+    rewardToken.id,
+    RewardTokenType.DEPOSIT
+  );
+
+  // Reward tokens emitted per day as follows:
+  // tokens/day = (speed * SECONDS_PER_DAY) / trackingIndexScale
+  const supplyRewardPerDay = BigInt.fromString(
+    market
+      ._baseTrackingBorrowSpeed!.times(BigInt.fromI64(SECONDS_PER_DAY))
+      .div(tryTrackingIndexScale.value)
+      .toBigDecimal()
+      .times(exponentToBigDecimal(rewardToken.decimals))
+      .truncate(0)
+      .toString()
+  );
+  const borrowRewardPerDay = BigInt.fromString(
+    market
+      ._baseTrackingSupplySpeed!.times(BigInt.fromI64(SECONDS_PER_DAY))
+      .div(tryTrackingIndexScale.value)
+      .toBigDecimal()
+      .times(exponentToBigDecimal(rewardToken.decimals))
+      .truncate(0)
+      .toString()
+  );
+  market.rewardTokenEmissionsAmount = [supplyRewardPerDay, borrowRewardPerDay]; // supply first to keep alphabetized
+  const supplyRewardPerDayUSD = bigIntToBigDecimal(
+    supplyRewardPerDay,
+    rewardToken.decimals
+  ).times(rewardToken.lastPriceUSD!);
+  const borrowRewardPerDayUSD = bigIntToBigDecimal(
+    borrowRewardPerDay,
+    rewardToken.decimals
+  ).times(rewardToken.lastPriceUSD!);
+  market.rewardTokenEmissionsUSD = [
+    supplyRewardPerDayUSD,
+    borrowRewardPerDayUSD,
+  ];
+  market.rewardTokens = [supplyRewardToken.id, borrowRewardToken.id];
+  market.save();
+}
 
 function updateRevenue(event: ethereum.Event, cometContract: Comet): void {
   const market = getOrCreateMarket(
@@ -727,7 +845,7 @@ function updateMarketData(
         continue;
       }
       tokenData.inputTokenBalance = tryTotalSupply.value;
-      tokenData.outputTokenBalances = [tryTotalSupply.value];
+      tokenData.outputTokenSupplies = [tryTotalSupply.value];
       tokenData.variableBorrowedTokenBalance = tryTotalBorrow.value;
       totalBorrowUSD = bigIntToBigDecimal(
         tokenData.variableBorrowedTokenBalance!,

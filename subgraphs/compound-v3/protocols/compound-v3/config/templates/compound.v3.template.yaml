@@ -42,6 +42,10 @@ dataSources:
           handler: handleAddAsset
         - event: SetBaseTokenPriceFeed(indexed address,indexed address,indexed address)
           handler: handleSetBaseTokenPriceFeed
+        - event: SetBaseTrackingBorrowSpeed(indexed address,uint64,uint64)
+          handler: handleSetBaseTrackingBorrowSpeed
+        - event: SetBaseTrackingSupplySpeed(indexed address,uint64,uint64)
+          handler: handleSetBaseTrackingSupplySpeed
         - event: UpdateAsset(indexed address,(address,address,uint8,uint64,uint64,uint64,uint128),(address,address,uint8,uint64,uint64,uint64,uint128))
           handler: handleUpdateAsset
         - event: UpdateAssetBorrowCollateralFactor(indexed address,indexed address,uint64,uint64)

@@ -5,6 +5,7 @@ import {
   LendingProtocol,
   Market,
   Oracle,
+  RewardToken,
   Token,
   TokenData,
 } from "../../generated/schema";
@@ -36,8 +37,10 @@ export class ProtocolData {
     public readonly slug: string,
     public readonly network: string,
     public readonly lendingType: string,
-    public readonly permissionType: string,
-    public readonly riskType: string
+    public readonly lenderPermissionType: string | null,
+    public readonly borrowerPermissionType: string | null,
+    public readonly collateralizationType: string | null,
+    public readonly riskType: string | null
   ) {}
 }
 
@@ -53,8 +56,10 @@ export function getOrCreateLendingProtocol(
     protocol.network = data.network;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = data.lendingType;
-    protocol.permissionType = data.permissionType;
+    protocol.lenderPermissionType = data.lenderPermissionType;
+    protocol.borrowerPermissionType = data.borrowerPermissionType;
     protocol.riskType = data.riskType;
+    protocol.collateralizationType = data.collateralizationType;
 
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.cumulativeUniqueDepositors = INT_ZERO;
@@ -207,6 +212,22 @@ export function getOrCreateToken(tokenAddress: Bytes): Token {
   }
 
   return token;
+}
+
+export function getOrCreateRewardToken(
+  tokenAddress: Bytes,
+  rewardTokenType: string
+): RewardToken {
+  const rewardTokenID = rewardTokenType.concat("-").concat(rewardTokenType);
+  let rewardToken = RewardToken.load(rewardTokenID);
+  if (!rewardToken) {
+    rewardToken = new RewardToken(rewardTokenID);
+    rewardToken.type = rewardTokenType;
+    rewardToken.token = tokenAddress;
+    rewardToken.save();
+  }
+
+  return rewardToken;
 }
 
 export function getOrCreateInterestRate(

@@ -231,7 +231,7 @@ type TokenData @entity {
   outputTokens: [Token!]
 
   " Total supply of output tokens (same order as outputTokens) "
-  outputTokenBalances: [BigInt!]
+  outputTokenSupplies: [BigInt!]
 
   " Prices in USD of the output tokens (same order as outputTokens) "
   outputTokenPricesUSD: [BigDecimal!]
@@ -964,6 +964,12 @@ type Market @entity {
 
   " Base token interest multiplier for interest. Used to get revenue "
   _baseBorrowIndex: BigInt
+
+  " Rewards borrow speed for this market"
+  _baseTrackingBorrowSpeed: BigInt
+
+  " Rewards supply speed for this market"
+  _baseTrackingSupplySpeed: BigInt
 }
 
 #################################
