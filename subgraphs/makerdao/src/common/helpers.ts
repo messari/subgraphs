@@ -593,18 +593,21 @@ export function transferPosition(
   dstAccountAddress: string | null = null,
   transferAmount: BigInt | null = null, // suport partial transfer of a position
 ): void {
-  if (srcUrn == dstUrn && !srcAccountAddress && !dstAccountAddress && srcAccountAddress == dstAccountAddress) {
-    log.info("[transferPosition]srcUrn {}=dstUrn {}, srcAccountAddress {}=dstAccountAddress {}, no transfer", [
+  if (srcUrn == dstUrn && srcAccountAddress == dstAccountAddress) {
+    log.info("[transferPosition]srcUrn {}==dstUrn {} && srcAccountAddress {}==dstAccountAddress {}, no transfer", [
       srcUrn,
       dstUrn,
-      srcAccountAddress!,
-      dstAccountAddress!,
+      srcAccountAddress ? srcAccountAddress : "null",
+      dstAccountAddress ? dstAccountAddress : "null",
     ]);
     return;
   }
 
   const protocol = getOrCreateLendingProtocol();
   const market: Market = getMarketFromIlk(ilk)!;
+  const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
+  const usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
+
   if (srcAccountAddress == null) {
     srcAccountAddress = getOwnerAddress(srcUrn).toLowerCase();
   }
@@ -654,7 +657,14 @@ export function transferPosition(
   if (dstAccountAddress == null) {
     dstAccountAddress = getOwnerAddress(dstUrn).toLowerCase();
   }
-  const dstAccount = getOrCreateAccount(dstAccountAddress!);
+
+  let dstAccount = Account.load(dstAccountAddress!);
+  if (dstAccount == null) {
+    dstAccount = getOrCreateAccount(dstAccountAddress!);
+    protocol.cumulativeUniqueUsers += 1;
+    usageDailySnapshot.cumulativeUniqueUsers += 1;
+    usageHourlySnapshot.cumulativeUniqueUsers += 1;
+  }
 
   // transfer srcUrn to dstUrn
   // or partial transfer of a position (amount < position.balance)
@@ -691,6 +701,8 @@ export function transferPosition(
 
   protocol.save();
   market.save();
+  usageDailySnapshot.save();
+  usageHourlySnapshot.save();
   srcAccount.save();
   dstAccount.save();
 
@@ -716,11 +728,6 @@ export function liquidatePosition(
   const market: Market = getMarketFromIlk(ilk)!;
   const accountAddress = getOwnerAddress(urn);
   const account = getOrCreateAccount(accountAddress);
-  //account.liquidateCount += INT_ONE;
-
-  //const liquidator = getOrCreateAccount(liquidatorAddress);
-  //liquidator.liquidationCount += INT_ONE;
-  //liquidator.save();
 
   const liquidate = Liquidate.load(createEventID(event))!;
 
@@ -937,6 +944,13 @@ export function updateUsageMetrics(
       let liquidatorAccount = Account.load(liquidator);
       // a new liquidator
       if (liquidatorAccount == null || liquidatorAccount.liquidateCount == 0) {
+        if (liquidatorAccount == null) {
+          // liquidators will repay debt & withdraw collateral,
+          // they are unique users if not yet in Account
+          protocol.cumulativeUniqueUsers += 1;
+          usageDailySnapshot.cumulativeUniqueUsers += 1;
+          usageHourlySnapshot.cumulativeUniqueUsers += 1;
+        }
         liquidatorAccount = getOrCreateAccount(liquidator);
         protocol.cumulativeUniqueLiquidators += 1;
         usageDailySnapshot.cumulativeUniqueLiquidators += 1;
@@ -958,6 +972,7 @@ export function updateUsageMetrics(
       let liquidateeAccount = Account.load(liquidatee);
       // a new liquidatee
       if (liquidateeAccount == null || liquidateeAccount.liquidationCount == 0) {
+        // liquidatee should already have positions & should not be new users
         liquidateeAccount = getOrCreateAccount(liquidatee);
         protocol.cumulativeUniqueLiquidatees += 1;
         usageDailySnapshot.cumulativeUniqueLiquidatees += 1;
