@@ -1,33 +1,43 @@
-import { Configurations } from "../common/types";
 import * as constants from "../common/constants";
+import { Configurations } from "../common/types";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-export const NETWORK_STRING = "bsc";
+export const NETWORK_STRING = "arbitrum-one";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const YEARN_LENS_CONTRACT_ADDRESS = Address.fromString(
+  "0x043518ab266485dc085a1db095b8d9c2fc78e9b9"
+);
 export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const AAVE_ORACLE_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
+  "0xb56c2F0B653B2e0b10C9b928C8580Ac5Df02C7C7"
+);
+export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
+  "0x5ea7e501c9a23f4a76dc7d33a11d995b13a1dd25"
+);
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
+  "0x3268c3bda100ef0ff3c2d044f23eab62c80d78d2"
+);
 
-export const CURVE_REGISTRY_ADDRESSES: Address[] = [];
+export const CURVE_REGISTRY_ADDRESSES: Address[] = [
+  Address.fromString("0x445FE580eF8d70FF569aB36e80c647af338db351"),
+  Address.fromString("0x0E9fBb167DF83EdE3240D6a5fa5d40c6C6851e15"),
+];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
-  Address.fromString("0x10ED43C718714eb63d5aA57B78B54704E256024E"), // PancakeSwap v2
-  Address.fromString("0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F"), // PancakeSwap v1
+  Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // SushiSwap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -49,15 +59,16 @@ export const HARDCODED_STABLES: Address[] = [];
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_TOKEN_DECIMALS = BigInt.fromI32(18);
+export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
-export const ETH_ADDRESS = constants.NULL.TYPE_ADDRESS;
-
+export const ETH_ADDRESS = Address.fromString(
+  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+);
 export const WETH_ADDRESS = Address.fromString(
-  "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+  "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+  "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
 );
 
 export class config implements Configurations {
