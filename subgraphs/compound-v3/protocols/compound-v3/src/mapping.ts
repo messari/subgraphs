@@ -781,6 +781,8 @@ function updateMarketData(
   const baseTokenData = getOrCreateTokenData(event.address, baseToken);
   baseTokenData.rates = [borrowerRate.id, supplierRate.id]; // borrower before supplier always
   baseTokenData.save();
+
+  // TODO- add rewards
 }
 
 function updateMarketPrices(

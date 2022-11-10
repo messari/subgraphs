@@ -71,6 +71,8 @@ templates:
           file: ./abis/Comet.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: CometRewards
+          file: ./abis/CometRewards.json
       eventHandlers:
         - event: Supply(indexed address,indexed address,uint256)
           handler: handleSupply
