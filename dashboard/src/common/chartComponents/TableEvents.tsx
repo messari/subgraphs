@@ -1,16 +1,10 @@
 import { Tooltip } from "@material-ui/core";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { convertTokenDecimals, toDate } from "../../../src/utils/index";
+import { convertTokenDecimals, tableCellTruncate, toDate } from "../../../src/utils/index";
 import { PoolName } from "../../constants";
 import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
 import { blockExplorers } from "../../constants";
-
-const tableCellTruncate: any = {
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
 
 interface TableEventsProps {
   datasetLabel: string;
