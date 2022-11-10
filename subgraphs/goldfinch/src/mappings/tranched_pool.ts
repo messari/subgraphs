@@ -14,6 +14,7 @@ import {
   DrawdownMade,
   PaymentApplied,
   ReserveFundsCollected,
+  SharePriceUpdated,
 } from "../../generated/templates/TranchedPool/TranchedPool";
 import { PoolTokens as PoolTokensContract } from "../../generated/templates/TranchedPool/PoolTokens";
 import {
@@ -646,4 +647,172 @@ export function handleReserveFundsCollected(
 
   updateRevenues(protocol, market, BIGDECIMAL_ZERO, amountUSD, event, true);
   //snapshots updated by updateRevenues()
+}
+
+export function handleSharePriceUpdated(event: SharePriceUpdated): void {
+  // handle migrated pools
+  const marketID = event.address.toHexString();
+  const market = getOrCreateMarket(marketID, event);
+  if (!market._isMigratedTranchedPool) {
+    // do nothing if it is not a migrated tranched pool
+    return;
+  }
+
+  const tranchedPoolContract = TranchedPoolContract.bind(event.address);
+  market.inputTokenBalance = tranchedPoolContract.getTranche(
+    event.params.tranche
+  ).principalDeposited;
+  market.totalDepositBalanceUSD =
+    market.inputTokenBalance.divDecimal(USDC_DECIMALS);
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+  // treat the migration as a one-off deposit
+  market.cumulativeDepositUSD = market.totalDepositBalanceUSD;
+
+  const rewardTokenAddress = Address.fromString(GFI_ADDRESS);
+  const rewardToken = getOrCreateRewardToken(
+    rewardTokenAddress,
+    RewardTokenType.DEPOSIT
+  );
+  market.rewardTokens = [rewardToken.id];
+
+  const configContract = GoldfinchConfigContract.bind(
+    tranchedPoolContract.config()
+  );
+  if (!market._poolToken) {
+    market._poolToken = configContract
+      .getAddress(BigInt.fromI32(CONFIG_KEYS_ADDRESSES.PoolTokens))
+      .toHexString();
+  }
+
+  const creditLineAddress = tranchedPoolContract.creditLine();
+  const creditLineContract = CreditLineContract.bind(creditLineAddress);
+  if (!market._creditLine) {
+    market._creditLine = creditLineAddress.toHexString();
+  }
+  const borrower = creditLineContract.borrower().toHexString();
+
+  const curretLimitResult = creditLineContract.try_currentLimit();
+  if (!curretLimitResult.reverted && curretLimitResult.value.gt(BIGINT_ZERO)) {
+    market.isActive = true;
+    market.canBorrowFrom = true;
+  }
+  const totalBorrowBalance = creditLineContract.balance();
+  market.totalBorrowBalanceUSD = totalBorrowBalance.divDecimal(USDC_DECIMALS);
+
+  // calculate average daily emission since first deposit
+  if (!market._rewardTimestamp) {
+    market._rewardTimestamp = event.block.timestamp;
+    market._cumulativeRewardAmount = BIGINT_ZERO;
+  }
+  // set _isMigratedTranchedPool to false, so we only process the migration once
+  market._isMigratedTranchedPool = false;
+  market.save();
+
+  const protocol = getOrCreateProtocol();
+  let marketIDs = protocol._marketIDs!;
+  if (marketIDs.indexOf(market.id) < 0) {
+    marketIDs = marketIDs.concat([market.id]);
+  }
+  let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol._marketIDs!.length; i++) {
+    const mktID = protocol._marketIDs![i];
+    const mkt = getOrCreateMarket(mktID, event);
+    totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
+      mkt.totalDepositBalanceUSD
+    );
+    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
+      mkt.totalBorrowBalanceUSD
+    );
+  }
+  protocol._marketIDs = marketIDs;
+  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
+  // treat the migration as a one-off deposit
+  protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
+    market.totalDepositBalanceUSD
+  );
+  protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(
+    market.totalBorrowBalanceUSD
+  );
+  protocol.save();
+
+  log.info(
+    "[handleSharePriceUpdated]migrated tranched pool {}: market.tvl={},market.totalBorrowUSD={},tx={}",
+    [
+      market.id,
+      market.totalDepositBalanceUSD.toString(),
+      market.totalBorrowBalanceUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+
+  snapshotMarket(
+    market,
+    market.totalDepositBalanceUSD,
+    event,
+    TransactionType.DEPOSIT
+  );
+  snapshotMarket(
+    market,
+    market.totalBorrowBalanceUSD,
+    event,
+    TransactionType.BORROW
+  );
+  snapshotFinancials(
+    protocol,
+    market.totalDepositBalanceUSD,
+    event,
+    TransactionType.DEPOSIT
+  );
+  snapshotFinancials(
+    protocol,
+    market.totalBorrowBalanceUSD,
+    event,
+    TransactionType.BORROW
+  );
+  updateUsageMetrics(protocol, borrower, event, TransactionType.BORROW);
+  // ignore the depositor usage metrics as we have no info
+
+  //handle borrow positin & transaction
+  const borrowerAccount = getOrCreateAccount(borrower);
+  const borrowPositionID = updatePosition(
+    protocol,
+    market,
+    borrowerAccount,
+    totalBorrowBalance,
+    PositionSide.BORROWER,
+    TransactionType.BORROW,
+    event
+  );
+  createTransaction(
+    TransactionType.BORROW,
+    market,
+    borrower,
+    borrowPositionID,
+    totalBorrowBalance,
+    totalBorrowBalanceUSD,
+    event
+  );
+
+  //handle lending positin & transaction
+  const lenderAccount = getOrCreateAccount(event.params.pool.toHexString());
+  const lenderPositionID = updatePosition(
+    protocol,
+    market,
+    lenderAccount,
+    market.inputTokenBalance,
+    PositionSide.LENDER,
+    TransactionType.DEPOSIT,
+    event
+  );
+  createTransaction(
+    TransactionType.DEPOSIT,
+    market,
+    borrower,
+    lenderPositionID,
+    market.inputTokenBalance,
+    market.totalDepositBalanceUSD,
+    event
+  );
 }

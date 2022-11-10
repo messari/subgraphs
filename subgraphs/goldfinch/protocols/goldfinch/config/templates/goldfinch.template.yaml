@@ -28,6 +28,8 @@ dataSources:
           file: ./abis/SeniorPool.json
         - name: TranchedPool
           file: ./abis/TranchedPool.json
+        - name: MigratedTranchedPool
+          file: ./abis/MigratedTranchedPool.json
         - name: CreditLine
           file: ./abis/CreditLine.json
         - name: PoolTokens
@@ -141,6 +143,8 @@ dataSources:
       abis:
         - name: StakingRewards
           file: ./abis/StakingRewards.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
       eventHandlers:
         - event: RewardAdded(uint256)
           handler: handleRewardAdded
@@ -182,6 +186,8 @@ dataSources:
       abis:
         - name: BackerRewards
           file: ./abis/BackerRewards.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
       eventHandlers:
         - event: BackerRewardsSetTotalRewards(indexed address,uint256,uint256)
           handler: handleSetTotalRewards
@@ -362,3 +368,5 @@ templates:
           handler: handleDrawdownMade
         - event: PaymentApplied(indexed address,indexed address,uint256,uint256,uint256,uint256)
           handler: handlePaymentApplied
+        - event: SharePriceUpdated(indexed address,indexed uint256,uint256,int256,uint256,int256)
+          handler: handleSharePriceUpdated

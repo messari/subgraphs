@@ -557,3 +557,12 @@ export function snapshotPosition(
     );
   }
 }
+
+export function isMigratedTranchedPool(event: PoolCreated): bool {
+  const contract = MigratedTranchedPoolContract.bind(event.address);
+  const migratedResult = contract.try_migrated();
+  if (!migratedResult.reverted && migratedResult.value) {
+    return true;
+  }
+  return false;
+}

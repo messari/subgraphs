@@ -671,6 +671,9 @@ type Market @entity {
 
   " timestamp when reward emission started "
   _rewardTimestamp: BigInt
+
+  " Is the market a migrated tranched pool "
+  _isMigratedTranchedPool: Boolean
 }
 
 #################################

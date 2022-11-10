@@ -4,6 +4,7 @@ import {
   PoolCreated,
   GoldfinchFactory,
 } from "../../generated/GoldfinchFactory/GoldfinchFactory";
+import { MigratedTranchedPool as MigratedTranchedPoolContract } from "../../generated/GoldfinchFactory/MigratedTranchedPool";
 import { GoldfinchConfig } from "../../generated/GoldfinchConfig/GoldfinchConfig";
 import { getOrInitTranchedPool } from "../entities/tranched_pool";
 import { TranchedPool as TranchedPoolTemplate } from "../../generated/templates";
@@ -92,6 +93,7 @@ export function handlePoolCreated(event: PoolCreated): void {
   market._borrower = borrowerAddr;
   market._creditLine = tranchedPoolContract.creditLine().toHexString();
   market._poolToken = poolTokenAddr;
+  market._isMigratedTranchedPool = isMigratedTranchedPool(event) as boolean;
   market.save();
 
   let account = Account.load(borrowerAddr);
@@ -108,4 +110,16 @@ export function handlePoolCreated(event: PoolCreated): void {
   //
   TranchedPoolTemplate.create(event.params.pool);
   getOrInitTranchedPool(event.params.pool, event.block.timestamp);
+}
+
+function isMigratedTranchedPool(event: PoolCreated): bool {
+  const contract = MigratedTranchedPoolContract.bind(event.params.pool);
+  const migratedResult = contract.try_migrated();
+  if (!migratedResult.reverted && migratedResult.value) {
+    log.info("[isMigratedTranchedPool]pool {} is a migrated tranched pool", [
+      event.params.pool.toHexString(),
+    ]);
+    return true;
+  }
+  return false;
 }
