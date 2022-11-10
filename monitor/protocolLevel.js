@@ -342,7 +342,8 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
             !(
                 parseFloat(data.totalBorrowBalanceUSD) <=
                 parseFloat(data.totalDepositBalanceUSD)
-            )
+            ) &&
+            !deploymentName.includes("rari-fuse")
         ) {
             issuesArrays.totalBorrowBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalBorrowBalanceUSD)));
         }
@@ -494,14 +495,10 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                 }
 
                 if (returnedError) {
-                    const alertArr = returnedError.filter(errObj => errObj.message !== "indexing_error").map(errObj => errObj.message);
+                    const alertArr = returnedError.filter(errObj => errObj.message !== "indexing_error").map(errObj => errObj.message).filter(alert => !alert.includes("Store error: database unavailable"));
                     if (alertArr.length > 0) {
-                        alertArr.map(alert => {
-                            if (!alert.includes("Store error: database unavailable")) {
-                                return alert;
-                            }
-                        });
                         alert = alertArr.join(" --- ");
+                        errorNotification("ERROR LOCATION 28 " + alert)
                         deploymentsToReturn[depoKey].protocolErrors.queryError.push(alert);
                         // Map through errors and save the messages to protocolDerivedFieldErrors on depo object
                         // Maybe save the query to this object to help reproduceability
