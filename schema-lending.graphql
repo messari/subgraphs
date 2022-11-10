@@ -92,11 +92,11 @@ enum LendingType {
 }
 
 enum PermissionType {
-  " Protocols that only allow KYC'd users "
-  PERMISSIONED
+  " Only users that have been whitelisted can interact. e.g. Only approved institutions can borrow "
+  WHITELIST_ONLY
 
-  " Protocols that allow a mix of KYC'd and non-KYC'd users "
-  PARTIALLY_PERMISSIONED
+  " To interact a user must be KYC'd "
+  PERMISSIONED
 
   " Protocols that do not KYC. Can be used by any account "
   PERMISSIONLESS
@@ -108,6 +108,17 @@ enum RiskType {
 
   " Isolated risk means each users position in a market or CDP is isolated for risk of liquidation "
   ISOLATED
+}
+
+enum CollateralizationType {
+  " Over collateralized protocols require users to put up more collateral than the amount borrowed. "
+  OVER_COLLATERALIZED
+
+  " Protocols that allow users to borrow more than their collateral locked.  "
+  UNDER_COLLATERALIZED
+
+  " Protocols that allow users to borrow without any collateral. Generally this protocol is KYC'd and only whitelist users can do this "
+  UNCOLLATERALIZED
 }
 
 # This is used for representative token descriptions
@@ -137,6 +148,14 @@ enum InterestRateSide {
 
   " Interest rate paid by borrowers "
   BORROWER
+}
+
+enum Tranche {
+  " Senior denotes debt with a higher priority. The first debt to be paid back to lenders. "
+  SENIOR
+
+  " Junior tranche denotes lower priority debt. This is secondary priority to be paid back to lenders. "
+  JUNIOR
 }
 
 enum PositionSide {
@@ -169,6 +188,9 @@ type InterestRate @entity {
 
   " The type of interest rate (e.g. stable, fixed, variable, etc) "
   type: InterestRateType!
+
+  " The level of debt priority at this interest rate "
+  tranche: Tranche
 }
 
 # There is a wide range of formats of lending protocols
@@ -203,7 +225,7 @@ type TokenData @entity {
   inputTokenBalance: BigInt!
 
   " Prices in USD of the input tokens (same order as inputTokens) "
-  inputTokenPricesUSD: BigDecimal!
+  inputTokenPriceUSD: BigDecimal!
 
   " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
   outputTokens: [Token!]
@@ -274,7 +296,7 @@ enum OracleSource {
 # As oracles are a source of truth it is important to understand the details.
 # This entity will help track oracle-related data in a market
 type Oracle @entity {
-  " { Market ID }-{ Oracle Address } "
+  " { Market ID }-{ Token Address } "
   id: Bytes!
 
   oracleAddress: Bytes!
@@ -336,11 +358,17 @@ interface Protocol {
   " The specific lending protocol type "
   lendingType: LendingType
 
-  " The specific permissions required to use the protocol "
-  permissionType: PermissionType
+  " The specific permissions required to lend in this protocol "
+  lenderPermissionType: PermissionType
+
+  " The specific permissions required to borrow from this protocol "
+  borrowerPermissionType: PermissionType
 
   " Risk type of the lending protocol "
   riskType: RiskType
+
+  " The way a positions can be collateralized "
+  collateralizationType: CollateralizationType
 
   ##### Quantitative Data #####
 
@@ -410,11 +438,17 @@ type LendingProtocol implements Protocol @entity {
   " The specific lending protocol type "
   lendingType: LendingType
 
-  " The specific permissions required to use the protocol "
-  permissionType: PermissionType
+  " The specific permissions required to lend in this protocol "
+  lenderPermissionType: PermissionType
+
+  " The specific permissions required to borrow from this protocol "
+  borrowerPermissionType: PermissionType
 
   " Risk type of the lending protocol "
   riskType: RiskType
+
+  " The way a positions can be collateralized "
+  collateralizationType: CollateralizationType
 
   " Tokens that can be minted. Only applies to CDP "
   mintedTokens: [Token!]
@@ -736,6 +770,12 @@ type FinancialsDailySnapshot @entity {
 
   " Total assets repaid on a given day, in USD. "
   dailyRepayUSD: BigDecimal!
+
+  " Total assets transferred on a given day, in USD. "
+  dailyTransferUSD: BigDecimal!
+
+  " Total flashloans executed on a given day, in USD. "
+  dailyFlashloanUSD: BigDecimal!
 }
 
 ###############################
