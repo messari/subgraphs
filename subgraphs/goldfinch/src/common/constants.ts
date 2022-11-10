@@ -171,6 +171,10 @@ export const SENIOR_POOL_ADDRESS = "0x8481a6ebaf5c7dabc3f7e09e44a89531fd31f822";
 export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const FIDU_ADDRESS = "0x6a445e9f40e0b97c92d0b8a3366cef1d67f700bf";
 export const GFI_ADDRESS = "0xdab396ccf3d84cf2d07c4454e10c8a6f5b008d2b";
+export const WETH_GFI_UniswapV2_Pair =
+  "0xa0ce0b8fdbed2b63a28e4f2d23e075c7f16a8259";
+export const USDC_WETH_UniswapV2_Pair =
+  "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc";
 
 export const INVALID_POOLS = new Set<string>();
 INVALID_POOLS.add("0x0e2e11dc77bbe75b2b65b57328a8e4909f7da1eb");

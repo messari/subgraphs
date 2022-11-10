@@ -35,22 +35,6 @@ export function handleRoleGranted(event: RoleGranted): void {
   // which sets config to the GoldfinchConfig argument
   if (event.params.role == OWNER_ROLE) {
     getOrCreateProtocol();
-
-    /*
-    const configAddress = contract.config();
-    log.info(
-      "[handleRoleGranted]Init GoldfinchConfig template at {} by tx {}",
-      [configAddress.toHexString(), event.transaction.hash.toHexString()]
-    );
-    //protocol._GoldfinchConfig = configAddress.toHexString();
-    protocol.save();
-    //GoldfinchConfigTemplate.create(configAddress);
-    
-    const configContract = GoldfinchConfig.bind(configAddress);
-    */
-    //Addresses enum defined in ConfigOptions.sol
-
-    getOrCreateProtocol();
     const rewardToken = getOrCreateRewardToken(
       Address.fromString(GFI_ADDRESS),
       RewardTokenType.DEPOSIT
@@ -62,11 +46,6 @@ export function handleRoleGranted(event: RoleGranted): void {
     market.outputToken = FiduToken.id;
     market.rewardTokens = [rewardToken.id];
     market.save();
-
-    //SeniorPoolTemplate.create(seniorPoolAddress);
-
-    //
-    //getOrInitSeniorPool(seniorPoolAddress);
   }
 }
 

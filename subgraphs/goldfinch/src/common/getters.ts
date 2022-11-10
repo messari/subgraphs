@@ -37,8 +37,13 @@ import {
   LendingType,
   BIGDECIMAL_ONE,
   SENIOR_POOL_ADDRESS,
+  WETH_GFI_UniswapV2_Pair,
+  USDC_WETH_UniswapV2_Pair,
+  GFI_DECIMALS,
+  USDC_DECIMALS,
 } from "./constants";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
+import { UniswapV2Pair } from "../../generated/BackerRewards/UniswapV2Pair";
 import { prefixID } from "./utils";
 import { Versions } from "../versions";
 
@@ -585,4 +590,56 @@ export function getNewPosition(
   position.repayCount = 0;
   position.liquidationCount = 0;
   return position;
+}
+
+// Goldfinch (GFI) price is generated from WETH-GFI reserve on Uniswap.
+export function getRewardPrice(event: ethereum.Event): BigDecimal {
+  const WETH_GFI_pair = UniswapV2Pair.bind(
+    Address.fromString(WETH_GFI_UniswapV2_Pair)
+  );
+
+  const reserves1 = WETH_GFI_pair.try_getReserves();
+  if (reserves1.reverted) {
+    log.error("[getRewardPrice] Unable to get price for asset {}", [
+      GFI_ADDRESS,
+    ]);
+    return BIGDECIMAL_ZERO;
+  }
+
+  const reserve1WETH = reserves1.value.value0;
+  const reserve1GFI = reserves1.value.value1;
+  const GFIpriceInWETH = reserve1WETH
+    .toBigDecimal()
+    .div(reserve1GFI.toBigDecimal());
+
+  // get WETH price in USDC from Uniswap pair contract.
+  const USDC_WETH_pair = UniswapV2Pair.bind(
+    Address.fromString(USDC_WETH_UniswapV2_Pair)
+  );
+
+  const reserves2 = USDC_WETH_pair.try_getReserves();
+  if (reserves2.reverted) {
+    log.error("[getRewardPrice] Unable to get price for asset {}", [
+      GFI_ADDRESS,
+    ]);
+    return BIGDECIMAL_ZERO;
+  }
+  const reserve2USDC = reserves2.value.value0;
+  const reserve2WETH = reserves2.value.value1;
+  const WETHpriceInUSDC = reserve2WETH
+    .toBigDecimal()
+    .div(reserve2USDC.toBigDecimal());
+
+  const GFIpriceUSD = GFIpriceInWETH.times(WETHpriceInUSDC).div(USDC_DECIMALS);
+
+  log.info(
+    "[getRewardPrice]GFI price={} at block #{} from inputs: GFIpriceInWETH={}, WETHpriceInUSDC={}",
+    [
+      GFIpriceUSD.toString(),
+      event.block.number.toString(),
+      GFIpriceInWETH.toString(),
+      WETHpriceInUSDC.toString(),
+    ]
+  );
+  return GFIpriceUSD;
 }
