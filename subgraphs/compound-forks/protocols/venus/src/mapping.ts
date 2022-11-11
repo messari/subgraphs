@@ -5,7 +5,7 @@ import {
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
-  ActionPaused1,
+  ActionPausedMarket,
   MarketEntered,
   MarketExited,
 } from "../../../generated/Comptroller/Comptroller";
@@ -70,7 +70,7 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 export function handleMarketEntered(event: MarketEntered): void {
   _handleMarketEntered(
     comptrollerAddr,
-    event.params.cToken.toHexString(),
+    event.params.vToken.toHexString(),
     event.params.account.toHexString(),
     true
   );
@@ -79,16 +79,16 @@ export function handleMarketEntered(event: MarketEntered): void {
 export function handleMarketExited(event: MarketExited): void {
   _handleMarketEntered(
     comptrollerAddr,
-    event.params.cToken.toHexString(),
+    event.params.vToken.toHexString(),
     event.params.account.toHexString(),
     false
   );
 }
 
 export function handleMarketListed(event: MarketListed): void {
-  CTokenTemplate.create(event.params.cToken);
+  CTokenTemplate.create(event.params.vToken);
 
-  const cTokenAddr = event.params.cToken;
+  const cTokenAddr = event.params.vToken;
   const cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
@@ -96,7 +96,7 @@ export function handleMarketListed(event: MarketListed): void {
   // this is a new cToken, a new underlying token, and a new market
 
   const protocol = getOrCreateProtocol();
-  const cTokenContract = CToken.bind(event.params.cToken);
+  const cTokenContract = CToken.bind(event.params.vToken);
   const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
@@ -144,7 +144,7 @@ export function handleMarketListed(event: MarketListed): void {
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  const marketID = event.params.cToken.toHexString();
+  const marketID = event.params.vToken.toHexString();
   const collateralFactorMantissa = event.params.newCollateralFactorMantissa;
   _handleNewCollateralFactor(marketID, collateralFactorMantissa);
 }
@@ -157,11 +157,37 @@ export function handleNewLiquidationIncentive(
   _handleNewLiquidationIncentive(protocol, newLiquidationIncentive);
 }
 
-export function handleActionPaused(event: ActionPaused1): void {
-  const marketID = event.params.cToken.toHexString();
-  const action = event.params.action;
+export function handleActionPaused(event: ActionPausedMarket): void {
+  const marketID = event.params.vToken.toHexString();
+  const action = actionEnumToString(event.params.action);
   const pauseState = event.params.pauseState;
   _handleActionPaused(marketID, action, pauseState);
+}
+
+function actionEnumToString(action: i32): string {
+  // https://github.com/VenusProtocol/venus-protocol/blob/develop/contracts/ComptrollerStorage.sol#L214
+  switch (action) {
+    case 0:
+      return "Mint";
+    case 1:
+      return "Redeem";
+    case 2:
+      return "Borrow";
+    case 3:
+      return "RepayBorrow";
+    case 4:
+      return "Seize";
+    case 5:
+      return "LiquidateBorrow";
+    case 6:
+      return "Transfer";
+    case 7:
+      return "EnterMarket";
+    case 8:
+      return "ExitMarket";
+    default:
+      return "Unknown";
+  }
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
