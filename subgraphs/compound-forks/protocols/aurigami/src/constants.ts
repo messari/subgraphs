@@ -9,19 +9,20 @@ import { TokenData } from "../../../src/mapping";
 export const comptrollerAddr = Address.fromString(
   "0x817af6cfAF35BdC1A634d6cC94eE9e4c68369Aeb"
 );
-
 export const nativeToken = new TokenData(
   Address.fromString("0x0000000000000000000000000000000000000000"),
   "Ether",
   "ETH",
   18
 );
-
 export const nativeCToken = new TokenData(
   Address.fromString("0xca9511B610bA5fc7E311FDeF9cE16050eE4449E9"),
   "Aurigami Ether",
   "auETH",
   cTokenDecimals
+);
+export const PLY_TOKEN_ADDRESS = Address.fromString(
+  "0x09c9d464b58d96837f8d8b6f4d9fe4ad408d3a4f"
 );
 
 // Markets with broken price oracles

@@ -25,13 +25,19 @@ import {
   NewReserveFactor,
   Transfer,
 } from "../../../generated/templates/CToken/CToken";
-import { LendingProtocol, Market, Token } from "../../../generated/schema";
+import {
+  LendingProtocol,
+  Market,
+  RewardToken,
+  Token,
+} from "../../../generated/schema";
 import {
   cTokenDecimals,
   Network,
   BIGINT_ZERO,
   SECONDS_PER_YEAR,
   exponentToBigDecimal,
+  RewardTokenType,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -70,6 +76,7 @@ import {
   nativeCToken,
   nativeToken,
   PLY_MARKET,
+  PLY_TOKEN_ADDRESS,
   TRI_MARKET,
   TRI_USDT_LP,
   USDT_MARKET,
@@ -79,6 +86,7 @@ import {
   WNEAR_USN_LP,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
+import { getRewardsPerDay, RewardIntervalType } from "./rewards";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
@@ -304,6 +312,19 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     false, // do not update market prices since not all markets have proper price oracle
     event
   );
+
+  // skip rewards if we cannot price PLY
+  // PLY market created at block 64795305
+  if (event.block.number.toI64() > 64795305) {
+    const market = Market.load(marketAddress.toHexString());
+    if (!market) {
+      log.warning("Market not found for address {}", [
+        marketAddress.toHexString(),
+      ]);
+      return;
+    }
+    updateRewards(event, market);
+  }
 }
 
 export function handleTransfer(event: Transfer): void {
@@ -332,6 +353,99 @@ function getOrCreateProtocol(): LendingProtocol {
 /////////////////
 //// Helpers ////
 /////////////////
+
+// calculate PLY reward speeds
+function updateRewards(event: ethereum.Event, market: Market): void {
+  const comptrollerContract = Comptroller.bind(
+    Address.fromString(market.protocol)
+  );
+  const tryBorrowSpeeds = comptrollerContract.try_compBorrowSpeeds(
+    Address.fromString(market.id)
+  );
+  const trySupplySpeeds = comptrollerContract.try_compSupplySpeeds(
+    Address.fromString(market.id)
+  );
+
+  if (tryBorrowSpeeds.reverted || trySupplySpeeds.reverted) {
+    log.warning("Could not get borrow/supply speeds for market {}", [
+      market.id,
+    ]);
+    return;
+  }
+
+  const plyToken = Token.load(PLY_TOKEN_ADDRESS.toHexString());
+  if (!plyToken) {
+    log.warning("PLY token not found", []);
+    return;
+  }
+
+  const borrowRewardToken = getOrCreateRewardToken(
+    PLY_TOKEN_ADDRESS,
+    RewardTokenType.BORROW
+  );
+  const supplyRewardToken = getOrCreateRewardToken(
+    PLY_TOKEN_ADDRESS,
+    RewardTokenType.DEPOSIT
+  );
+
+  const borrowRewardsBD = tryBorrowSpeeds.value
+    .toBigDecimal()
+    .div(exponentToBigDecimal(plyToken.decimals));
+  const supplyRewardsBD = trySupplySpeeds.value
+    .toBigDecimal()
+    .div(exponentToBigDecimal(plyToken.decimals));
+  const borrowRewardsPerDay = BigInt.fromString(
+    getRewardsPerDay(
+      event.block.timestamp,
+      event.block.number,
+      borrowRewardsBD,
+      RewardIntervalType.BLOCK
+    )
+      .times(exponentToBigDecimal(plyToken.decimals))
+      .truncate(0)
+      .toString()
+  );
+  const supplyRewardsPerDay = BigInt.fromString(
+    getRewardsPerDay(
+      event.block.timestamp,
+      event.block.number,
+      supplyRewardsBD,
+      RewardIntervalType.BLOCK
+    )
+      .times(exponentToBigDecimal(plyToken.decimals))
+      .truncate(0)
+      .toString()
+  );
+
+  const borrowRewardsPerDayUSD = borrowRewardsBD.times(plyToken.lastPriceUSD!);
+  const supplyRewardsPerDayUSD = supplyRewardsBD.times(plyToken.lastPriceUSD!);
+
+  market.rewardTokens = [borrowRewardToken.id, supplyRewardToken.id];
+  market.rewardTokenEmissionsAmount = [
+    borrowRewardsPerDay,
+    supplyRewardsPerDay,
+  ];
+  market.rewardTokenEmissionsUSD = [
+    borrowRewardsPerDayUSD,
+    supplyRewardsPerDayUSD,
+  ];
+  market.save();
+}
+
+function getOrCreateRewardToken(
+  tokenAddress: Address,
+  type: string
+): RewardToken {
+  const rewardTokenId = type.concat("-").concat(tokenAddress.toHexString());
+  let rewardToken = RewardToken.load(rewardTokenId);
+  if (!rewardToken) {
+    rewardToken = new RewardToken(rewardTokenId);
+    rewardToken.token = tokenAddress.toHexString();
+    rewardToken.type = type;
+    rewardToken.save();
+  }
+  return rewardToken;
+}
 
 function getPrice(
   marketAddress: Address,
