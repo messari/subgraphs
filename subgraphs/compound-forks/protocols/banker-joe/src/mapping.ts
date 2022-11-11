@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -23,6 +23,7 @@ import {
   LendingProtocol,
   Market,
   MarketDailySnapshot,
+  RewardToken,
   Token,
 } from "../../../generated/schema";
 import {
@@ -30,6 +31,9 @@ import {
   Network,
   BIGINT_ZERO,
   SECONDS_PER_YEAR,
+  RewardTokenType,
+  SECONDS_PER_DAY,
+  exponentToBigDecimal,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -59,8 +63,14 @@ import { CToken } from "../../../generated/Comptroller/CToken";
 import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
-import { comptrollerAddr } from "./constants";
+import {
+  comptrollerAddr,
+  JOE_ADDRESS,
+  REWARD_DISTRIBUTOR_ADDRESS,
+  WAVAX_ADDRESS,
+} from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
+import { RewardDistributor as RewardsContract } from "../../../generated/templates/CToken/RewardDistributor";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
@@ -255,6 +265,13 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
 export function handleAccrueInterest(event: AccrueInterest): void {
   const marketAddress = event.address;
+  const market = Market.load(marketAddress.toHexString());
+  if (!market) {
+    log.warning("[handleAccrueInterest] market not found for address: {}", [
+      marketAddress.toHexString(),
+    ]);
+    return;
+  }
   const cTokenContract = CToken.bind(marketAddress);
   const protocol = getOrCreateProtocol();
   const oracleContract = PriceOracle.bind(
@@ -283,16 +300,13 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     const comptroller = Comptroller.bind(comptrollerAddr);
     const tryBorrowPaused = comptroller.try_borrowGuardianPaused(marketAddress);
     const tryMintPaused = comptroller.try_mintGuardianPaused(marketAddress);
-    const market = Market.load(marketAddress.toHexString());
-    if (market) {
-      market.canBorrowFrom = !tryBorrowPaused.reverted
-        ? !tryBorrowPaused.value
-        : market.canBorrowFrom;
-      market.isActive = !tryMintPaused.reverted
-        ? !tryMintPaused.value
-        : market.isActive;
-      market.save();
-    }
+    market.canBorrowFrom = !tryBorrowPaused.reverted
+      ? !tryBorrowPaused.value
+      : market.canBorrowFrom;
+    market.isActive = !tryMintPaused.reverted
+      ? !tryMintPaused.value
+      : market.isActive;
+    market.save();
   }
 
   _handleAccrueInterest(
@@ -303,6 +317,8 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     false, // do not update all market prices
     event
   );
+
+  updateRewards(market);
 }
 
 export function handleTransfer(event: Transfer): void {
@@ -326,4 +342,152 @@ function getOrCreateProtocol(): LendingProtocol {
     comptroller.try_oracle()
   );
   return _getOrCreateProtocol(protocolData);
+}
+
+// Emits rewards in AVAX or JOE
+function updateRewards(market: Market): void {
+  const rewardsContract = RewardsContract.bind(REWARD_DISTRIBUTOR_ADDRESS);
+
+  // always in this order to stay alphabetical
+  const tryBorrowRewardSpeedsAVAX = rewardsContract.try_rewardBorrowSpeeds(
+    1,
+    Address.fromString(market.outputToken!)
+  );
+  const tryBorrowRewardSpeedsJOE = rewardsContract.try_rewardBorrowSpeeds(
+    0,
+    Address.fromString(market.outputToken!)
+  );
+  const trySupplyRewardSpeedsAVAX = rewardsContract.try_rewardSupplySpeeds(
+    1,
+    Address.fromString(market.outputToken!)
+  );
+  const trySupplyRewardSpeedsJOE = rewardsContract.try_rewardSupplySpeeds(
+    0,
+    Address.fromString(market.outputToken!)
+  );
+
+  const rewardTokens: string[] = [];
+  const rewardAmounts: BigInt[] = [];
+  const rewardEmissionsUSD: BigDecimal[] = [];
+
+  if (!tryBorrowRewardSpeedsAVAX.reverted) {
+    const rewardToken = getOrCreateRewardToken(
+      WAVAX_ADDRESS,
+      RewardTokenType.BORROW
+    );
+    const token = Token.load(rewardToken.token);
+    if (!token) {
+      log.warning("[updateRewards] token not found for address: {}", [
+        WAVAX_ADDRESS.toHexString(),
+      ]);
+      return;
+    }
+    rewardTokens.push(rewardToken.id);
+    const rewardsBI = tryBorrowRewardSpeedsAVAX.value.times(
+      BigInt.fromI64(SECONDS_PER_DAY)
+    );
+    rewardAmounts.push(rewardsBI);
+    rewardEmissionsUSD.push(
+      rewardsBI
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals))
+        .times(token.lastPriceUSD!)
+    );
+  }
+
+  if (!tryBorrowRewardSpeedsJOE.reverted) {
+    const rewardToken = getOrCreateRewardToken(
+      JOE_ADDRESS,
+      RewardTokenType.BORROW
+    );
+    const token = Token.load(rewardToken.token);
+    if (!token) {
+      log.warning("[updateRewards] token not found for address: {}", [
+        JOE_ADDRESS.toHexString(),
+      ]);
+      return;
+    }
+    rewardTokens.push(rewardToken.id);
+    const rewardsBI = tryBorrowRewardSpeedsJOE.value.times(
+      BigInt.fromI64(SECONDS_PER_DAY)
+    );
+    rewardAmounts.push(rewardsBI);
+    rewardEmissionsUSD.push(
+      rewardsBI
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals))
+        .times(token.lastPriceUSD!)
+    );
+  }
+
+  if (!trySupplyRewardSpeedsAVAX.reverted) {
+    const rewardToken = getOrCreateRewardToken(
+      WAVAX_ADDRESS,
+      RewardTokenType.DEPOSIT
+    );
+    const token = Token.load(rewardToken.token);
+    if (!token) {
+      log.warning("[updateRewards] token not found for address: {}", [
+        WAVAX_ADDRESS.toHexString(),
+      ]);
+      return;
+    }
+    rewardTokens.push(rewardToken.id);
+    const rewardsBI = trySupplyRewardSpeedsAVAX.value.times(
+      BigInt.fromI64(SECONDS_PER_DAY)
+    );
+    rewardAmounts.push(rewardsBI);
+    rewardEmissionsUSD.push(
+      rewardsBI
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals))
+        .times(token.lastPriceUSD!)
+    );
+  }
+
+  if (!trySupplyRewardSpeedsJOE.reverted) {
+    const rewardToken = getOrCreateRewardToken(
+      JOE_ADDRESS,
+      RewardTokenType.BORROW
+    );
+    const token = Token.load(rewardToken.token);
+    if (!token) {
+      log.warning("[updateRewards] token not found for address: {}", [
+        JOE_ADDRESS.toHexString(),
+      ]);
+      return;
+    }
+    rewardTokens.push(rewardToken.id);
+    const rewardsBI = trySupplyRewardSpeedsJOE.value.times(
+      BigInt.fromI64(SECONDS_PER_DAY)
+    );
+    rewardAmounts.push(rewardsBI);
+    rewardEmissionsUSD.push(
+      rewardsBI
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals))
+        .times(token.lastPriceUSD!)
+    );
+  }
+
+  market.rewardTokens = rewardTokens;
+  market.rewardTokenEmissionsAmount = rewardAmounts;
+  market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+  market.save();
+}
+
+function getOrCreateRewardToken(
+  tokenAddress: Address,
+  type: string
+): RewardToken {
+  const rewardTokenID = type.concat("-").concat(tokenAddress.toHexString());
+  let rewardToken = RewardToken.load(rewardTokenID);
+  if (!rewardToken) {
+    rewardToken = new RewardToken(rewardTokenID);
+    rewardToken.type = type;
+    rewardToken.token = tokenAddress.toHexString();
+    rewardToken.save();
+  }
+
+  return rewardToken;
 }
