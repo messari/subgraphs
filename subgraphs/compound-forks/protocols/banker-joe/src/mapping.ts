@@ -266,12 +266,6 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 export function handleAccrueInterest(event: AccrueInterest): void {
   const marketAddress = event.address;
   const market = Market.load(marketAddress.toHexString());
-  if (!market) {
-    log.warning("[handleAccrueInterest] market not found for address: {}", [
-      marketAddress.toHexString(),
-    ]);
-    return;
-  }
   const cTokenContract = CToken.bind(marketAddress);
   const protocol = getOrCreateProtocol();
   const oracleContract = PriceOracle.bind(
@@ -295,6 +289,12 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     event.block.timestamp.toI32()
   );
   const marketDailySnapshot = MarketDailySnapshot.load(marketDailySnapshotID);
+  if (!market) {
+    log.warning("[handleAccrueInterest] market not found for address: {}", [
+      marketAddress.toHexString(),
+    ]);
+    return;
+  }
   if (!marketDailySnapshot) {
     // make a check for canBorrowFrom / canUseAsCollateral
     const comptroller = Comptroller.bind(comptrollerAddr);
