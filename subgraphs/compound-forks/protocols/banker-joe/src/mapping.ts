@@ -318,7 +318,10 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     event
   );
 
-  updateRewards(market);
+  // reward distribution contract not deployed until block 15711425
+  if (event.block.number.toI32() < 15711425) {
+    updateRewards(market);
+  }
 }
 
 export function handleTransfer(event: Transfer): void {
