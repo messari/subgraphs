@@ -142,7 +142,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
       Address.fromString(contractAddress)
     );
 
-    governanceFramework.name = contract.name();
+    governanceFramework.name = "uniswap-governance";
     governanceFramework.type = GovernanceFrameworkType.GOVERNOR_BRAVO;
     governanceFramework.version = NA;
 

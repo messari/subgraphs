@@ -121,7 +121,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework = new GovernanceFramework(contractAddress);
     let contract = HOPGovernor.bind(Address.fromString(contractAddress));
 
-    governanceFramework.name = contract.name();
+    governanceFramework.name = "hop-governance";
     governanceFramework.type = GovernanceFrameworkType.OPENZEPPELIN_GOVERNOR;
     governanceFramework.version = contract.version();
 

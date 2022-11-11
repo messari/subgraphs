@@ -109,7 +109,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
     let contract = AaveGovernanceV2.bind(Address.fromString(contractAddress));
-    governanceFramework.name = contract.NAME();
+    governanceFramework.name = "aave-governance";
     governanceFramework.type = GOVERNANCE_TYPE;
     governanceFramework.version = NA;
 
