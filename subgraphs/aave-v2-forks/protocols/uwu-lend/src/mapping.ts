@@ -190,18 +190,16 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       !tryAllocPoints.reverted &&
       !tryRewardsPerSecond.reverted
     ) {
-      // create reward toke if it does not exist
-      if (market.rewardTokens == null || market.rewardTokens!.length != 2) {
-        const depositRewardToken = getOrCreateRewardToken(
-          Address.fromString(UWU_TOKEN_ADDRESS),
-          RewardTokenType.DEPOSIT
-        );
-        const borrowRewardToken = getOrCreateRewardToken(
-          Address.fromString(UWU_TOKEN_ADDRESS),
-          RewardTokenType.BORROW
-        );
-        rewardTokens = [borrowRewardToken.id, depositRewardToken.id]; // borrow first bc alphabetized
-      }
+      // set reward tokens
+      const depositRewardToken = getOrCreateRewardToken(
+        Address.fromString(UWU_TOKEN_ADDRESS),
+        RewardTokenType.DEPOSIT
+      );
+      const borrowRewardToken = getOrCreateRewardToken(
+        Address.fromString(UWU_TOKEN_ADDRESS),
+        RewardTokenType.BORROW
+      );
+      rewardTokens = [borrowRewardToken.id, depositRewardToken.id]; // borrow first bc alphabetized
 
       const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
       const poolAllocPoints = tryPoolInfo.value.value1;
