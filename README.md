@@ -1,8 +1,38 @@
-# Subgraphs
+# Messari Standard Subgraphs &bull; [![GitHub license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/messari/subgraphs/blob/master/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](docs/CONTRIBUTING.md) [![Issues Report](https://img.shields.io/badge/Issues-report-yellow.svg)](https://github.com/messari/subgraphs/issues/new)
 
-This repo contains subgraphs defined using a set of standardized schemas. These subgraphs are used to extract raw blockchain data and transform them into meaningful metrics, for products and analytics. Our goal is to build a subgraph for every DeFi protocol in the space.
+<p align="center">
+  <a href="https://messari.io/protocol-explorer/all-protocols">
+    <img src="./docs/images/messari-logo.png" alt="Messari Logo" width="550" />
+  </a>
+</p>
 
-## Contribution Guidelines
+Messari subgraphs set an industry standard for on chain data 🚀
+
+Utilizing [The Graph](https://thegraph.com/) these subgraphs extract raw blockchain data and transorm it into meaningful metrics, for products and analytics.
+
+## Working Environment
+
+Go to [`docs/SETUP.md`](./docs/SETUP.md) to learn how to setup your machine for Messari subgraph development.
+
+## Learn the Project
+
+It is important to familiarize yourself with the project structure and tooling to work effectively/efficiently. Go to [`docs/STRUCTURE.md`](./docs/STRUCTURE.md) and [`docs/TOOLING.md`](./docs/TOOLING.md) to learn more.
+
+## Becoming a Subgraph Developer
+
+Becoming a good subgrpah developer will take patience and practice. The following resources are for developers of all skill levels to up their subgraph development skills.
+
+- TODO
+
+## Contributing Guidelines
+
+We welcome contributions from the community! You can point out or fix bugs, suggest changes, add new features, or add new subgraphs.
+
+- For bugs, features, or change requests please submit an [issue](https://github.com/messari/subgraphs/issues) following our [guide](./docs/how-to-raise-github-issues.md).
+- For existing subgraph changes TODO
+- For **new** subgraphs please follow our walkthrough guide TODO
+
+## Contributing Guidelines
 
 - Decide which protocol you want to build a subgraph for.
 - Fork this repository.
