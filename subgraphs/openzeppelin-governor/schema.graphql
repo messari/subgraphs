@@ -105,6 +105,7 @@ enum GovernanceFrameworkType {
   GovernorAlpha
   GovernorBravo
   OZGovernor
+  AaveGovernanceV2
 }
 
 type Proposal @entity {
