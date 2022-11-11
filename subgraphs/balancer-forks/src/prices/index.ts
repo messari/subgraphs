@@ -14,7 +14,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   let config = utils.getConfig();
   let network = dataSource.network();
 
-  if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS) || !config) {
+  if (constants.BLACKLISTED_TOKENS.includes(tokenAddr) || !config) {
     return new CustomPriceType();
   }
 

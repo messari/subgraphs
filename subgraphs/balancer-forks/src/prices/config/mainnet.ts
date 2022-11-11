@@ -68,6 +68,9 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0x652d486b80c461c397b0d95612a404da936f3db3"), // bb-a-USDC
   Address.fromString("0xa3823e50f20982656557a4a6a9c06ba5467ae908"), // bb-a-DAI
   Address.fromString("0xe6bcc79f328eec93d4ec8f7ed35534d9ab549faa"), // bb-a-USDT
+  Address.fromString("0x2f4eb100552ef93840d5adc30560e5513dfffacb"), // bb-a-USDT
+  Address.fromString("0x82698aecc9e28e9bb27608bd52cf57f704bd1b83"), // bb-a-USDC
+  Address.fromString("0xae37d54ae477268b9997d4161b96b8200755935c"), // bb-a-DAI
 ];
 
 ///////////////////////////////////////////////////////////////////////////

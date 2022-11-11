@@ -145,7 +145,12 @@ export function Swap(
     poolAddress,
     pool.inputTokens
   );
+  pool.outputTokenSupply = utils.getOutputTokenSupply(
+    poolAddress,
+    pool.outputTokenSupply!
+  );
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(volumeUSD);
+  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
   pool.save();
 
   createSwapTransaction(
