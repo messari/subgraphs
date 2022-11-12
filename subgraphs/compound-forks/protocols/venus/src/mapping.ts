@@ -1,4 +1,10 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  BigDecimal,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -8,6 +14,7 @@ import {
   ActionPausedMarket,
   MarketEntered,
   MarketExited,
+  VenusSpeedUpdated,
 } from "../../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -19,12 +26,21 @@ import {
   NewReserveFactor,
   Transfer,
 } from "../../../generated/templates/CToken/CToken";
-import { LendingProtocol, Token } from "../../../generated/schema";
+import {
+  LendingProtocol,
+  Token,
+  RewardToken,
+  Market,
+} from "../../../generated/schema";
 import {
   cTokenDecimals,
   Network,
   BIGINT_ZERO,
   BSC_BLOCKS_PER_YEAR,
+  DAYS_PER_YEAR,
+  RewardTokenType,
+  BIGINT_TEN,
+  BIGDECIMAL_ZERO,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -47,6 +63,8 @@ import {
   _handleActionPaused,
   _handleMarketEntered,
   _handleTransfer,
+  getOrCreateMarketDailySnapshot,
+  getOrCreateMarketHourlySnapshot,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
@@ -57,9 +75,13 @@ import {
   comptrollerAddr,
   nativeCToken,
   nativeToken,
+  vXVS,
+  XVS,
   VDAI_MARKET_ADDRESS,
+  ORACLE_PRECISION,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
+import { getRewardsPerDay, RewardIntervalType } from "./rewards";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
@@ -289,6 +311,9 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
 export function handleAccrueInterest(event: AccrueInterest): void {
   const marketAddress = event.address;
+  const market = Market.load(marketAddress.toHexString())!;
+  updateRewardValueUSD(market);
+
   const cTokenContract = CToken.bind(marketAddress);
   const protocol = getOrCreateProtocol();
   const oracleContract = PriceOracle.bind(
@@ -336,6 +361,103 @@ export function handleTransfer(event: Transfer): void {
     event.params.from,
     comptrollerAddr
   );
+}
+
+// update market reward amounts based on event data.
+export function handleVenusSpeedUpdated(event: VenusSpeedUpdated): void {
+  const marketAddress = event.params.vToken;
+  const speed = event.params.newSpeed;
+  const rewards = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    speed.toBigDecimal(),
+    RewardIntervalType.BLOCK
+  ).times(BigDecimal.fromString(DAYS_PER_YEAR.toString()));
+
+  const rewardAmount = BigInt.fromString(rewards.truncate(0).toString());
+  const borrowRewardToken = getOrCreateRewardToken(RewardTokenType.BORROW);
+  const supplyRewardToken = getOrCreateRewardToken(RewardTokenType.DEPOSIT);
+
+  const market = Market.load(marketAddress.toHexString())!;
+  market.rewardTokens = [
+    borrowRewardToken.rewardToken.id,
+    supplyRewardToken.rewardToken.id,
+  ];
+  market.rewardTokenEmissionsAmount = [rewardAmount, rewardAmount]; // venus gives the same amount to borrowers and suppliers for each market
+  market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  updateRewardValueUSD(market);
+  market.save();
+
+  // update market snapshots.
+  getOrCreateMarketDailySnapshot(
+    market,
+    event.block.timestamp,
+    event.block.number
+  );
+  getOrCreateMarketHourlySnapshot(
+    market,
+    event.block.timestamp,
+    event.block.number
+  );
+}
+
+// updateRewardValueUSD will update the reward value in USD, assuming
+// the reward amount hasn't changed. If it changes it will be updated on VenusSpeedUpdated.
+// This function can be called anytime and it will update the reward value in USD.
+function updateRewardValueUSD(market: Market): void {
+  if (!market.rewardTokens || market.rewardTokens!.length == 0) {
+    return;
+  }
+
+  const protocol = getOrCreateProtocol();
+  const oracleContract = PriceOracle.bind(
+    Address.fromString(protocol._priceOracle)
+  );
+  const priceCall = oracleContract.try_getUnderlyingPrice(vXVS.address);
+  if (priceCall.reverted) {
+    log.error("unable to calculate rewards: priceCall reverted for vXVS {}", [
+      vXVS.address.toHexString(),
+    ]);
+    return;
+  }
+
+  const rewardAmount = market.rewardTokenEmissionsAmount![0];
+  const rewardAmountUSD = rewardAmount
+    .times(priceCall.value)
+    .divDecimal(BIGINT_TEN.pow(ORACLE_PRECISION as u8).toBigDecimal())
+    .div(BIGINT_TEN.pow(XVS.decimals as u8).toBigDecimal());
+  market.rewardTokenEmissionsUSD = [rewardAmountUSD, rewardAmountUSD];
+  market.save();
+}
+
+class rewardToken {
+  token: Token;
+  rewardToken: RewardToken;
+}
+
+function getOrCreateRewardToken(type: string): rewardToken {
+  let token = Token.load(XVS.address.toHexString());
+  if (!token) {
+    token = new Token(XVS.address.toHexString());
+    token.symbol = "XVS";
+    token.decimals = 18;
+    token.name = "Venus";
+    token.save();
+  }
+
+  const rewardTokenId = type + "-" + token.id;
+  let rToken = RewardToken.load(rewardTokenId);
+  if (!rToken) {
+    rToken = new RewardToken(rewardTokenId);
+    rToken.token = token.id;
+    rToken.type = type;
+    rToken.save();
+  }
+
+  return {
+    token: token,
+    rewardToken: rToken,
+  };
 }
 
 function getOrCreateProtocol(): LendingProtocol {

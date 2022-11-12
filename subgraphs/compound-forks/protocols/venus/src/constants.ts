@@ -23,3 +23,20 @@ export const nativeCToken = new TokenData(
 export const VDAI_MARKET_ADDRESS = Address.fromString(
   "0x334b3ecb4dca3593bccc3c7ebd1a1c1d1780fbf1"
 );
+
+export const vXVS = new TokenData(
+  Address.fromString("0x151b1e2635a717bcdc836ecd6fbb62b674fe3e1d"),
+  "Venus XVS",
+  "vXVS",
+  cTokenDecimals
+);
+
+export const XVS = new TokenData(
+  Address.fromString("0xcf6bb5389c92bdda8a3747ddb454cb7a64626c63"),
+  "Venus",
+  "XVS",
+  18
+);
+
+// number of decimals the oracle results are scaled by.
+export const ORACLE_PRECISION = 18;
