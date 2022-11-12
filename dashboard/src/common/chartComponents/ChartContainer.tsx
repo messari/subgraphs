@@ -26,7 +26,7 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
     const [chartIsImage, setChartIsImage] = useState<boolean>(false);
     const [initialLoaded, setInitialLoaded] = useState<boolean>(false);
     const [csvJSON, setCsvJSON] = useState<any>(null);
-    const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "" });
+    const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
     const [isMonthly, setIsMonthly] = useState(false);
 
     function jpegDownloadHandler(downloadInZip: boolean) {
@@ -190,7 +190,7 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                         <Typography variant="h6">{datasetLabel}</Typography>
                     </CopyLinkToClipboard>
                     <div style={{ margin: "5px 0" }}>
-                        <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV field={datasetLabel} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setChartIsImage={setChartIsImage} setCsvMetaData={setCsvMetaData} /></Tooltip>
+                        <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV csvMetaData={csvMetaData} field={datasetLabel} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setChartIsImage={setChartIsImage} setCsvMetaData={setCsvMetaData} /></Tooltip>
                         <Tooltip placement="top" title={"Chart can be dragged and dropped to another tab"}><Button onClick={() => setChartIsImage(true)} style={{ padding: "1px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", ...staticButtonStyle }}>Static</Button></Tooltip>
                         <Tooltip placement="top" title={"Show plot points on hover"}><Button onClick={() => setChartIsImage(false)} style={{ padding: "1px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", ...dynamicButtonStyle }}>Dynamic</Button></Tooltip>
                     </div>

@@ -114,39 +114,47 @@ export function formatIntToFixed2(val: number): string {
 };
 
 export function csvToJSONConvertor(csv: string) {
-  const lines = csv.split("\n");
-  const result = [];
-  const headers = lines[0].split(",");
-
-  for (let i = 1; i < lines.length; i++) {
-    const obj: any = {};
-    const currentline = lines[i].split(",");
-    for (let j = 0; j < headers.length; j++) {
-      let entry: any = currentline[j];
-      let header = headers[j].toLowerCase();
-      if (header !== 'date') {
-        header = 'value';
+  try {
+    const lines = csv.split("\n");
+    const result = [];
+    const headers = lines[0].split(",");
+    if (headers.length !== 2 || !headers.map(x => x?.toLowerCase()).includes('date')) {
+      return 'Wrong CSV data format. The CSV must have two columns, one must be a "date" column.';
+    }
+    for (let i = 1; i < lines.length; i++) {
+      const obj: any = {};
+      const currentline = lines[i].split(",");
+      for (let j = 0; j < headers.length; j++) {
+        let entry: any = currentline[j];
+        let header = headers[j].toLowerCase();
+        if (header !== 'date') {
+          header = 'value';
+        }
+        if (entry) {
+          if (entry.includes("'")) {
+            entry = entry.split("'").join("");
+          }
+          if (entry.includes('"')) {
+            entry = entry.split('"').join("");
+          }
+          if (header === 'date' && isNaN(entry)) {
+            entry = moment(entry).unix();
+          }
+          if (!isNaN(Number(entry))) {
+            entry = Number(entry);
+          }
+          obj[header] = entry;
+        }
       }
-      if (entry) {
-        if (entry.includes("'")) {
-          entry = entry.split("'").join("");
-        }
-        if (entry.includes('"')) {
-          entry = entry.split('"').join("");
-        }
-        if (header === 'date' && isNaN(entry)) {
-          entry = moment(entry).unix();
-        }
-        if (!isNaN(Number(entry))) {
-          entry = Number(entry);
-        }
-        obj[header] = entry;
+      if (Object.keys(obj)?.length === 2) {
+        result.push(obj);
       }
     }
-    result.push(obj);
+    return (result);
+  } catch (err: any) {
+    console.error(err.message);
+    return "csvToJSONConvertor encountered an JS error while processing: " + err?.message + ".";
   }
-
-  return (result);
 }
 
 export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
