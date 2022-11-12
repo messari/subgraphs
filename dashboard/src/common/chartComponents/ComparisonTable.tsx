@@ -3,6 +3,7 @@ import { DataGrid, GridAlignment } from "@mui/x-data-grid";
 import moment from "moment";
 import { useState } from "react";
 import { downloadCSV, formatIntToFixed2, tableCellTruncate, toDate, upperCaseFirstOfString } from "../../../src/utils/index";
+import { DatePicker } from "../utilComponents/DatePicker";
 
 interface ComparisonTableProps {
   datasetLabel: string;
@@ -17,6 +18,8 @@ interface ComparisonTableProps {
 export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonthly, jpegDownloadHandler, baseKey, overlayKey }: ComparisonTableProps) => {
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dates, setDates] = useState<any>([]);
 
   function sortFunction(a: any, b: any) {
     let aVal = a[sortColumn];
@@ -81,14 +84,28 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
           },
         },
       ];
+      const datesSelectedTimestamps = dates.map((x: any) => x.format("YYYY-MM-DD"));
       const differencePercentageArr: any = [];
-      const tableData = dataTable[baseKey]
+      const dataTableCopy = JSON.parse(JSON.stringify({ ...dataTable }));
+      dataTableCopy[baseKey] = dataTableCopy[baseKey].filter((x: any) => {
+        if (datesSelectedTimestamps.length > 0) {
+          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+        }
+        return true;
+      });
+      dataTableCopy[overlayKey] = dataTableCopy[overlayKey].filter((x: any) => {
+        if (datesSelectedTimestamps.length > 0) {
+          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+        }
+        return true;
+      });
+      const tableData = dataTableCopy[baseKey]
         .map((val: any, i: any) => {
           let date = toDate(val.date);
           if (isMonthly) {
             date = date.split("-").slice(0, 2).join("-");
           }
-          let overlayVal = dataTable[overlayKey].find((point: any) => {
+          let overlayVal = dataTableCopy[overlayKey].find((point: any) => {
             if (isMonthly) {
               return toDate(point?.date)?.split("-")?.slice(0, 2)?.join("-");
             }
@@ -112,19 +129,22 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
       return (
         <Box sx={{ height: "100%" }}>
           <Box position="relative" sx={{ marginTop: "-38px" }}>
-            <Button onClick={() => setIsMonthly((prev: boolean) => !prev)}>View {isMonthly ? "daily" : "monthly"}</Button>
+            {showDatePicker && <DatePicker dates={dates} setDates={setDates} />}
+            <Button className="Hover-Underline" onClick={() => setShowDatePicker((prev) => !prev)}>
+              Date Filter
+            </Button>
             <Button onClick={() => jpegDownloadHandler()}>Save Chart</Button>
             <Button className="Hover-Underline" onClick={() => {
-              if (!Array.isArray(dataTable)) {
-                let length = dataTable[Object.keys(dataTable)[0]].length;
+              if (!Array.isArray(dataTableCopy)) {
+                let length = dataTableCopy[Object.keys(dataTableCopy)[0]].length;
                 const arrayToSend: any = [];
                 for (let i = 0; i < length; i++) {
                   let objectIteration: any = {};
                   let hasUndefined = false;
-                  objectIteration.date = dataTable[Object.keys(dataTable)[0]][i].date;
-                  Object.keys(dataTable).forEach((x: any) => {
-                    if (dataTable[x][i]?.value) {
-                      objectIteration[x] = dataTable[x][i]?.value;
+                  objectIteration.date = dataTableCopy[Object.keys(dataTableCopy)[0]][i].date;
+                  Object.keys(dataTableCopy).forEach((x: any) => {
+                    if (dataTableCopy[x][i]?.value) {
+                      objectIteration[x] = dataTableCopy[x][i]?.value;
                     } else {
                       hasUndefined = true;
                     }
@@ -136,9 +156,19 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
                     arrayToSend.push(objectIteration);
                   }
                 }
-                return downloadCSV(arrayToSend.sort(sortFunction).map((x: any) => ({ ...x, date: moment.utc(x.date * 1000).format("YYYY-MM-DD") })), datasetLabel + '-csv', datasetLabel);
+                return downloadCSV(arrayToSend.sort(sortFunction).filter((x: any) => {
+                  if (datesSelectedTimestamps.length > 0) {
+                    return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+                  }
+                  return true;
+                }).map((x: any) => ({ ...x, date: moment.utc(x.date * 1000).format("YYYY-MM-DD") })), datasetLabel + '-csv', datasetLabel);
               } else {
-                return downloadCSV(dataTable.sort(sortFunction).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [datasetLabel]: x.value })), datasetLabel + '-csv', datasetLabel);
+                return downloadCSV(dataTableCopy.sort(sortFunction).filter((x: any) => {
+                  if (datesSelectedTimestamps.length > 0) {
+                    return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+                  }
+                  return true;
+                }).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [datasetLabel]: x.value })), datasetLabel + '-csv', datasetLabel);
               }
             }}>
               Save CSV
