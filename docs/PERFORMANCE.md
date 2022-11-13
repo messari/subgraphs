@@ -23,11 +23,13 @@ The following tests are done to compare performance difference with the addition
 - Start block - 10,207,858
 
 * Checkpoint 1 - 2:17:23 PM April 21 2022
+
   - End block - 10,219,356
   - Seconds between start and end - 4,447
   - Blocks per second - 2.58556
 
 * Checkpoint 2 - 9:58:44 PM April 22 2022
+
   - End block - 10,309,915
   - Block Difference - 102,057
   - Seconds between start and end - 75,328
@@ -45,6 +47,7 @@ The following tests are done to compare performance difference with the addition
 - Start block - 10,207,858
 
 * Checkpoint 1 - 2:14:41 PM April 21 2022
+
   - End block - 10,224,219
   - Block Difference - 16,361
   - Seconds between start and end - 5,149
@@ -165,23 +168,27 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 - An additional insight that I believe can be extracted from this test is that event and call handlers are by far the greatest bottleneck in the indexing speed using The Graph.
 
 ## Bytes and Immutables Test 1.0
-- The purpose of this test is to check how much changing the id values of entities to Bytes and adding immutable entities where relavent affects indexing performance 
-- The entities which I added the immutable quality to are the RewardToken, Deposit, Withdraw, Swap, Account, and ActiveAccount 
+
+- The purpose of this test is to check how much changing the id values of entities to Bytes and adding immutable entities where relavent affects indexing performance
+- The entities which I added the immutable quality to are the RewardToken, Deposit, Withdraw, Swap, Account, and ActiveAccount
 
 ### Checkpoints
+
 https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-IDs
+
 #### Baseline - String IDs and no immutables
 
 - Start time - 3:45:30 PM May 4 2022
 - Start block - 10,000,834
 
-* Checkpoint 1  -9:44:02 AM May 5 2022
+* Checkpoint 1 -9:44:02 AM May 5 2022
   - End block - 10,539,781
   - Block Difference - 538,947
   - Seconds between start and end - 64,712
   - Blocks per second - 8.3284
 
 #### Immutables - Added Immutables
+
 https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-IDs
 
 - Start time - 3:46:15 PM May 4 2022
@@ -194,6 +201,7 @@ https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-IDs
   - Blocks per second - 7.8008
 
 #### Bytes - Added Byte IDs
+
 https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
 
 - Start time - 3:49:39 PM May 4 2022
@@ -206,7 +214,9 @@ https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
   - Blocks per second - 6.7672
 
 #### Both - Added Immutables and Byte IDs
+
 https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
+
 - Start time - 3:48:35 PM May 4 2022
 - Start block - 10,000,834
 
@@ -218,6 +228,6 @@ https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
 
 ### Results
 
-- The results of this test indicate that having neither bytes as IDs or immutable entities is the fasted case. This is against our expectations. It was expected to see that adding both immutables and bytes as IDs would improve indexing speed. 
-- The results are quite strange upon analysis. Adding bytes as IDs only slows down the indexing process quite a lot (-23%) and adding immutables only slows the indexing process by a moderate amount (-6.8%). However when we combine both the addition of immutables and bytes, it only slightly slows down the indexing process (-1.2%). 
-- These results are far from the expectation of how the addition of immutables and bytes as IDs would impact the speed of indexing in isolation and combination. The results of this test warrant investation into how the graph handles immutables and bytes as IDs behind the scenes so that we can get results more in line with our expectation and acheive the desired performance improvements. 
+- The results of this test indicate that having neither bytes as IDs or immutable entities is the fasted case. This is against our expectations. It was expected to see that adding both immutables and bytes as IDs would improve indexing speed.
+- The results are quite strange upon analysis. Adding bytes as IDs only slows down the indexing process quite a lot (-23%) and adding immutables only slows the indexing process by a moderate amount (-6.8%). However when we combine both the addition of immutables and bytes, it only slightly slows down the indexing process (-1.2%).
+- These results are far from the expectation of how the addition of immutables and bytes as IDs would impact the speed of indexing in isolation and combination. The results of this test warrant investation into how the graph handles immutables and bytes as IDs behind the scenes so that we can get results more in line with our expectation and acheive the desired performance improvements.

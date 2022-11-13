@@ -6,7 +6,7 @@
   </a>
 </p>
 
-Messari subgraphs set an industry standard for on chain data 🚀
+Messari subgraphs set an industry leading standard for on chain data 🚀
 
 Utilizing [The Graph](https://thegraph.com/) these subgraphs extract raw blockchain data and transorm it into meaningful metrics, for products and analytics.
 
@@ -16,21 +16,32 @@ Go to [`docs/SETUP.md`](./docs/SETUP.md) to learn how to setup your machine for 
 
 ## Learn the Project
 
-It is important to familiarize yourself with the project structure and tooling to work effectively/efficiently. Go to [`docs/STRUCTURE.md`](./docs/STRUCTURE.md) and [`docs/TOOLING.md`](./docs/TOOLING.md) to learn more.
+It is important to familiarize yourself with the project structure and tooling to build efficiently. Go to [`docs/STRUCTURE.md`](./docs/STRUCTURE.md) and [`docs/TOOLING.md`](./docs/TOOLING.md) to learn more.
+
+- Familiarize youself with our schemas labeled `schema-{protocol type}.graphql`. Read more details in [`docs/SCHEMA.md`](./docs/SCHEMA.md)
+- We update our schemas as necessary. You can find out about each upgrade in [`docs/CHANGES.md`](./docs/CHANGES.md)
 
 ## Becoming a Subgraph Developer
 
-Becoming a good subgrpah developer will take patience and practice. The following resources are for developers of all skill levels to up their subgraph development skills.
+Becoming a good subgrpah developer will take patience and practice. The following resources are for developers of all skill levels to learn the ins and outs of subgraph development. 👾
 
-- TODO
+- For a full walkthrough of our subgraph development process visit [`docs/WALKTHROUGH.md`](./docs/WALKTHROUGH.md).
+- Resources for develoment of varying levels can be found in [`docs/RESOURCES.md`](./docs/RESOURCES.md).
+- To learn about common errors, best error handling practices, and debugging see [`docs/ERROR.md`](./docs/ERROR.md)
+- Subgraph performance is also a concern. Learn about indexing / querying performance by reading [`docs/PERFORMANCE`](./docs/PERFORMANCE.md)
 
 ## Contributing Guidelines
 
-We welcome contributions from the community! You can point out or fix bugs, suggest changes, add new features, or add new subgraphs.
+We welcome contributions from the community! You can point out or fix bugs, suggest changes, add new features, or add new subgraphs ✅.
 
-- For bugs, features, or change requests please submit an [issue](https://github.com/messari/subgraphs/issues) following our [guide](./docs/how-to-raise-github-issues.md).
-- For existing subgraph changes TODO
-- For **new** subgraphs please follow our walkthrough guide TODO
+- For bugs, features, or change requests please submit an [issue](https://github.com/messari/subgraphs/issues) following our [guide](./docs/ISSUES.md).
+- General contribution guidelines and practices will be found in [`docs/CONTRIBUTING.md`](./docs/CONTRIBUTING.md)
+
+## Development Status
+
+You can find a visualizer with the status of all Messari subgraphs at [subgraphs.xyz](https://subgraphs.messari.io/)! The code lives under `./dashboard`.
+
+> _Quick note_: the raw deployment status of all subgraphs lives in [`./deployment/deployment.json`](./deployment/deployment.json)
 
 ## Contributing Guidelines
 
@@ -112,7 +123,3 @@ We welcome contributions from the community! You can point out or fix bugs, sugg
 - Building ambitious subgraphs (Part II) https://www.youtube.com/watch?v=1-8AW-lVfrA
   - Performance tips and tricks (for both mappings and queries)
 - [Documentation for the graph-node](https://github.com/graphprotocol/graph-node/tree/master/docs)
-
-## Development Status
-
-We've moved development status [here](https://subgraphs.messari.io/).
