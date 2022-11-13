@@ -320,7 +320,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
 
   // reward distribution contract not deployed until block 15711425
   if (event.block.number.toI32() < 15711425) {
-    updateRewards(market);
+    updateRewards(event.address);
   }
 }
 
@@ -348,7 +348,14 @@ function getOrCreateProtocol(): LendingProtocol {
 }
 
 // Emits rewards in AVAX or JOE
-function updateRewards(market: Market): void {
+function updateRewards(marketID: Address): void {
+  const market = Market.load(marketID.toHexString());
+  if (!market) {
+    log.warning("[updateRewards] market not found for address: {}", [
+      marketID.toHexString(),
+    ]);
+    return;
+  }
   const rewardsContract = RewardsContract.bind(REWARD_DISTRIBUTOR_ADDRESS);
 
   // always in this order to stay alphabetical
