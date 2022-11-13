@@ -69,6 +69,7 @@ import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import { Pair } from "../../../generated/templates/CToken/Pair";
 import {
+  AURI_LENS_CONTRACT_ADDRESS,
   AURORA_ETH_LP,
   AURORA_MARKET,
   comptrollerAddr,
@@ -87,6 +88,7 @@ import {
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 import { getRewardsPerDay, RewardIntervalType } from "./rewards";
+import { AuriLens } from "../../../generated/templates/CToken/AuriLens";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
@@ -354,15 +356,13 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
     log.warning("Market not found for address {}", [marketID.toHexString()]);
     return;
   }
-  const auriLensContract = AuriLens.bind(auriLensAddr);
-  const tryBorrowSpeeds = comptrollerContract.try_compBorrowSpeeds(
-    Address.fromString(market.id)
-  );
-  const trySupplySpeeds = comptrollerContract.try_compSupplySpeeds(
-    Address.fromString(market.id)
+  const auriLensContract = AuriLens.bind(AURI_LENS_CONTRACT_ADDRESS);
+  const tryRewardSpeeds = auriLensContract.try_getRewardSpeeds(
+    comptrollerAddr,
+    event.address
   );
 
-  if (tryBorrowSpeeds.reverted || trySupplySpeeds.reverted) {
+  if (tryRewardSpeeds.reverted) {
     log.warning("Could not get borrow/supply speeds for market {}", [
       market.id,
     ]);
@@ -384,12 +384,10 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
     RewardTokenType.DEPOSIT
   );
 
-  const borrowRewardsBD = tryBorrowSpeeds.value
+  const borrowRewardsBD = tryRewardSpeeds.value
     .toBigDecimal()
     .div(exponentToBigDecimal(plyToken.decimals));
-  const supplyRewardsBD = trySupplySpeeds.value
-    .toBigDecimal()
-    .div(exponentToBigDecimal(plyToken.decimals));
+  const supplyRewardsBD = borrowRewardsBD;
   const borrowRewardsPerDay = BigInt.fromString(
     getRewardsPerDay(
       event.block.timestamp,

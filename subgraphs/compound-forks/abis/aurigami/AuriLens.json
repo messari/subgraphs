@@ -56,7 +56,10 @@
   { "stateMutability": "payable", "type": "receive" },
   {
     "constant": true,
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "comptroller", "type": "address" },
+      { "internalType": "address", "name": "auToken", "type": "address" }
+    ],
     "name": "getRewardSpeeds",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "payable": false,
