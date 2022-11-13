@@ -23,14 +23,20 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
 }
 
 export function calculateMedian(prices: BigDecimal[]): BigDecimal {
-  let sorted = prices.sort((a, b) => {
+  const sorted = prices.sort((a, b) => {
     return a.equals(b) ? 0 : a.gt(b) ? 1 : -1;
   });
 
-  let mid = Math.ceil(sorted.length / 2) as i32;
+  const mid = Math.ceil(sorted.length / 2) as i32;
   if (sorted.length % 2 == 0) {
     return sorted[mid].plus(sorted[mid - 1]).div(BigDecimal.fromString("2"));
   }
 
   return sorted[mid - 1];
+}
+
+// bigDecimalToBigInt will plainly convert a BigDecimal to BigInt
+// by truncating all the digits after the period.
+export function bigDecimalToBigInt(num: BigDecimal): BigInt {
+  return BigInt.fromString(num.truncate(0).toString());
 }

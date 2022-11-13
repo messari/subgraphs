@@ -3,6 +3,7 @@ import { DataGrid, GridColumnHeaderParams } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { blockExplorers } from "../../constants";
+import { tableCellTruncate } from "../../utils";
 
 interface TableChartProps {
   datasetLabel: string;
@@ -15,12 +16,6 @@ interface TableChartProps {
   setIssues: React.Dispatch<{ message: string; type: string; level: string; fieldName: string }[]>;
   issueProps: { message: string; type: string; level: string; fieldName: string }[];
 }
-
-const tableCellTruncate: any = {
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
 
 export const TablePoolOverview = ({
   datasetLabel,

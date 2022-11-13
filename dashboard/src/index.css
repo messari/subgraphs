@@ -42,3 +42,7 @@ code {
 .rotated {
   transform: rotate(180deg);
 }
+
+input[type="file"] {
+  display: none;
+}

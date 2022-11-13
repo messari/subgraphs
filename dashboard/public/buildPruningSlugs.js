@@ -3,7 +3,7 @@ const fs = require('fs')
 var path = require('path');
 
 const url = "https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json";
-const slugsArr = [];
+const slugsArr = ["jaimehgb/trader-joe-debug"];
 https.get(url, res => {
     let data = '';
     res.on('data', chunk => {
@@ -13,7 +13,7 @@ https.get(url, res => {
         data = JSON.parse(data);
         const protocolKeys = Object.keys(data);
         protocolKeys.forEach(x => {
-            if (data[x].schema === 'lending' || data[x].schema === 'governance') {
+            if (data[x].schema === 'governance') {
                 return;
             }
             const deploymentsOnProtocolKeys = Object.keys(data[x].deployments);

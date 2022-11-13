@@ -1,6 +1,20 @@
 {
   "chain": "optimism",
+  "miniChef": {
+    "address": "0x220d6beedea6a6317dae19d39cd62eb7bb0ae5e4",
+    "startBlock": 16591776
+  },
   "pools": [
+    {
+      "name": "DAI",
+      "address": "0xA500b0e1360462eF777804BCAe6CE2BfB524dD2e",
+      "startBlock": 2403701
+    },
+    {
+      "name": "FRAX Metapool",
+      "address": "0x9DC37020f261758871104f9D8b87e575Ee45Bc5a",
+      "startBlock": 2403850
+    },
     {
       "name": "optUSD",
       "address": "0x5847f8177221268d279Cf377D0E01aB3FD993628",
@@ -10,6 +24,14 @@
       "name": "FRAX",
       "address": "0xc55E8C79e5A6c3216D4023769559D06fa9A7732e",
       "startBlock": 2404225
+    }
+  ],
+  "deployers": [],
+  "poolRegistries": [
+    {
+      "name": "Pool Registry",
+      "address": "0x4E1484607760118ebE2Ab07C0c71f1B4D9671e01",
+      "startBlock": 12238914
     }
   ]
 }

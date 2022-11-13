@@ -19,7 +19,7 @@ import {
     TEN_BD,
     ZERO_ADDRESS,
     ZERO_BD,
-    ZERO_BI
+    ZERO_BI,
 } from "../../constants";
 import { bigDecimalToBigInt, parseUnits, powBigDecimal, readCallResult } from "../../utils";
 import { getOrCreateRewardToken, getOrCreateToken } from "./supporting";
@@ -214,7 +214,7 @@ export function getOrCreateInterestRate(
         if (ZERO_BD == rate || ZERO_BI == durationDays) {
             log.error("Created interest rate with invalid params: rate={}, durationDays={}", [
                 rate.toString(),
-                durationDays.toString()
+                durationDays.toString(),
             ]);
         }
     }
@@ -299,10 +299,7 @@ export function getOrCreateLoan(
             );
 
             const termDays = bigDecimalToBigInt(
-                paymentIntervalSec
-                    .times(paymentsRemaining)
-                    .toBigDecimal()
-                    .div(SEC_PER_DAY.toBigDecimal())
+                paymentIntervalSec.times(paymentsRemaining).toBigDecimal().div(SEC_PER_DAY.toBigDecimal())
             );
 
             // Interst rate for V2/V3 stored as apr in units of 1e18, (i.e. 1% is 0.01e18).

@@ -37,7 +37,7 @@ export const WHITELIST_TOKENS_LIST: string[] = [
     "WFTM",
     "fBTC",
     "FRAX",
-    "CRV"
+    "CRV",
 ];
 
 export namespace OracleType {
