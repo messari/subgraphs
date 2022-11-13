@@ -316,14 +316,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   // skip rewards if we cannot price PLY
   // PLY market created at block 64795305
   if (event.block.number.toI64() > 64795305) {
-    const market = Market.load(marketAddress.toHexString());
-    if (!market) {
-      log.warning("Market not found for address {}", [
-        marketAddress.toHexString(),
-      ]);
-      return;
-    }
-    updateRewards(event, market);
+    updateRewards(event, event.address);
   }
 }
 
@@ -355,10 +348,13 @@ function getOrCreateProtocol(): LendingProtocol {
 /////////////////
 
 // calculate PLY reward speeds
-function updateRewards(event: ethereum.Event, market: Market): void {
-  const comptrollerContract = Comptroller.bind(
-    Address.fromString(market.protocol)
-  );
+function updateRewards(event: ethereum.Event, marketID: Address): void {
+  const market = Market.load(marketID.toHexString());
+  if (!market) {
+    log.warning("Market not found for address {}", [marketID.toHexString()]);
+    return;
+  }
+  const auriLensContract = AuriLens.bind(auriLensAddr);
   const tryBorrowSpeeds = comptrollerContract.try_compBorrowSpeeds(
     Address.fromString(market.id)
   );
