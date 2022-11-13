@@ -149,7 +149,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
 
   // update fCash asset values
   const accountPortfolioCallResult = notional.try_getAccountPortfolio(
-    event.transaction.from
+    event.params.account
   );
 
   if (accountPortfolioCallResult.reverted) {

@@ -6,6 +6,7 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Notional/ERC20";
+import { Notional } from "../../generated/Notional/Notional";
 import {
   BIGDECIMAL_ZERO,
   NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE,
@@ -13,12 +14,9 @@ import {
   TransactionType,
   NOTIONAL_TRADE_FEES,
   PROTOCOL_ID,
-  cETH_ADDRESS,
-  cDAI_ADDRESS,
-  cUSDC_ADDRESS,
-  cWBTC_ADDRESS,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
+import { getTokenFromCurrency } from "../common/util";
 import { getOrCreateFinancialsDailySnapshot } from "../getters/financialMetrics";
 import {
   getMarketsWithStatus,
@@ -133,38 +131,46 @@ export function updateFinancials(
   protocol.save();
 }
 
-// TODO: instead of calculating TVL this,
-// - create a new function updateTVLDepositBorrow
-// - iterate over active markets
-// - sum TVL (markets) = protocol and financialsDailySnapshot TVL
-// - sum Deposit Balances (markets) = protocol and financialsDailySnapshot TVL
-// - sum Borrow Balances (markets) = protocol and financialsDailySnapshot TVL
-// This is dependent on having activeMarkets
-
 export function updateTVLAndBalances(event: ethereum.Event): void {
   const protocol = getOrCreateLendingProtocol();
   const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
 
-  // TVL
+  const currencyIds = [1, 2, 3, 4];
+  const notional = Notional.bind(Address.fromString(PROTOCOL_ID));
   let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
-  const tokenAddress = [
-    cETH_ADDRESS,
-    cDAI_ADDRESS,
-    cUSDC_ADDRESS,
-    cWBTC_ADDRESS,
-  ];
-  for (let i = 0; i < tokenAddress.length; i++) {
-    const assetToken = getOrCreateToken(
-      Address.fromString(tokenAddress[i]),
-      event.block.number
-    );
-    const erc20 = ERC20.bind(Address.fromString(assetToken.id));
-    // TODO: This doesn't work for cWBTC_ADDRESS (there are two tokens cWBTC, cWBTC: 2)
-    const assetTokenBalance = erc20.balanceOf(Address.fromString(PROTOCOL_ID));
 
-    protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(
-      bigIntToBigDecimal(assetTokenBalance, 8).times(assetToken.lastPriceUSD!)
+  for (let i = 0; i < currencyIds.length; i++) {
+    const assetToken = getTokenFromCurrency(event, currencyIds[i].toString());
+    const erc20 = ERC20.bind(Address.fromString(assetToken.id));
+
+    const currencyAndRatesCallResult = notional.try_getCurrencyAndRates(
+      currencyIds[i]
     );
+
+    if (currencyAndRatesCallResult.reverted) {
+      log.error("[updateTVLAndBalances] getCurrencyAndRates reverted", []);
+    } else {
+      const assetRateParams = currencyAndRatesCallResult.value.getAssetRate();
+      const underlyingAssetToken = getOrCreateToken(
+        currencyAndRatesCallResult.value.getUnderlyingToken().tokenAddress,
+        event.block.number
+      );
+
+      const assetTokenBalance = erc20.balanceOf(
+        Address.fromString(PROTOCOL_ID)
+      );
+      const underlyingAssetTokenBalance = bigIntToBigDecimal(
+        assetRateParams.rate
+          .times(assetTokenBalance)
+          .div(BigInt.fromI32(10).pow(10))
+          .div(assetRateParams.underlyingDecimals),
+        8
+      );
+
+      protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(
+        underlyingAssetTokenBalance.times(underlyingAssetToken.lastPriceUSD!)
+      );
+    }
   }
 
   let protocolTotalDepositBalanceUSD = BIGDECIMAL_ZERO;
