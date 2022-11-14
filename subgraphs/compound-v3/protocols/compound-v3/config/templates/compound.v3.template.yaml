@@ -29,6 +29,8 @@ dataSources:
           file: ./abis/Configurator.json
         - name: Comet
           file: ./abis/Comet.json
+        - name: CometRewards
+          file: ./abis/CometRewards.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20NameBytes
