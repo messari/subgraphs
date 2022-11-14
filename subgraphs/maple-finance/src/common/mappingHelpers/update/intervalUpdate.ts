@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Market, _MplReward, _StakeLocker } from "../../../../generated/schema";
 import { PoolLib } from "../../../../generated/templates/Pool/PoolLib";
 import { MAPLE_POOL_LIB_ADDRESS, SEC_PER_DAY, TEN_BD, ZERO_BD, ZERO_BI } from "../../constants";
@@ -141,6 +141,7 @@ function intervalUpdateProtocol(event: ethereum.Event, marketBefore: Market, mar
         const market = Market.load(marketIDs[i]);
         if (!market) {
             // fail safe in case market does not exist for some reason
+            log.warning("[intervalUpdateProtocol] Market does not exist: {}", [marketIDs[i]]);
             continue;
         }
 
