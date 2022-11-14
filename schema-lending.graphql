@@ -231,7 +231,7 @@ type TokenData @entity {
   outputTokens: [Token!]
 
   " Total supply of output tokens (same order as outputTokens) "
-  outputTokenBalances: [BigInt!]
+  outputTokenSupplies: [BigInt!]
 
   " Prices in USD of the output tokens (same order as outputTokens) "
   outputTokenPricesUSD: [BigDecimal!]
