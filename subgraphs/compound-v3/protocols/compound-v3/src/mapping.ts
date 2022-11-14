@@ -1,6 +1,5 @@
 import {
   Address,
-  ByteArray,
   Bytes,
   crypto,
   ethereum,
@@ -25,10 +24,8 @@ import {
   Comet,
   Supply,
   Withdraw,
-  // TransferBaseCall,
   SupplyCollateral,
   WithdrawCollateral,
-  BuyCollateral,
   AbsorbCollateral,
   TransferCollateral,
 } from "../../../generated/templates/Comet/Comet";
@@ -38,10 +35,7 @@ import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   bigIntToBigDecimal,
-  BIGINT_HUNDRED,
-  BIGINT_NEGATIVE_ONE,
   BIGINT_ONE,
-  BIGINT_THREE_HUNDRED,
   BIGINT_ZERO,
   exponentToBigDecimal,
   InterestRateSide,
@@ -64,7 +58,6 @@ import {
 import {
   BASE_INDEX_SCALE,
   COMPOUND_DECIMALS,
-  CONFIGURATOR_ADDRESS,
   ENCODED_TRANSFER_SIGNATURE,
   getProtocolData,
   ZERO_ADDRESS,
@@ -80,13 +73,7 @@ import {
   createTransfer,
   createWithdraw,
 } from "../../../src/utils/creator";
-import {
-  Market,
-  Oracle,
-  Repay,
-  Token,
-  TokenData,
-} from "../../../generated/schema";
+import { Oracle, Token, TokenData } from "../../../generated/schema";
 import { CometRewards } from "../../../generated/templates/Comet/CometRewards";
 
 ///////////////////////////////
@@ -466,7 +453,7 @@ export function handleSupply(event: Supply): void {
     deposit.save();
   }
 
-  updateMarketData(event, BIGINT_ZERO, ZERO_ADDRESS);
+  updateMarketData(event);
 }
 
 //
@@ -498,7 +485,7 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
   deposit.accountActor = accountActorID;
   deposit.save();
 
-  updateMarketData(event, amount, asset);
+  updateMarketData(event);
 }
 
 //
@@ -577,7 +564,7 @@ export function handleWithdraw(event: Withdraw): void {
     withdraw.save();
   }
 
-  updateMarketData(event, BIGINT_ZERO, ZERO_ADDRESS);
+  updateMarketData(event);
 }
 
 //
@@ -609,7 +596,7 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   withdraw.accountActor = accountActorID;
   withdraw.save();
 
-  updateMarketData(event, amount.times(BIGINT_NEGATIVE_ONE), asset);
+  updateMarketData(event);
 }
 
 //
@@ -648,7 +635,7 @@ export function handleTransferCollateral(event: TransferCollateral): void {
     bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
   );
 
-  updateMarketData(event, BIGINT_ZERO, ZERO_ADDRESS);
+  updateMarketData(event);
 }
 
 export function handleAbsorbCollateral(event: AbsorbCollateral): void {
@@ -683,7 +670,7 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
     profitUSD
   );
 
-  updateMarketData(event, BIGINT_ZERO, ZERO_ADDRESS);
+  updateMarketData(event);
 }
 
 ///////////////////
@@ -805,16 +792,19 @@ function updateRevenue(event: ethereum.Event, cometContract: Comet): void {
   market.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
   market.save();
+
+  const baseTokenData = getOrCreateTokenData(
+    event.address,
+    Address.fromBytes(baseToken.id)
+  );
+  baseTokenData.reserveFactor = reserveFactor;
+  baseTokenData.save();
 }
 
 //
 //
 // Updates market TVL and borrow values
-function updateMarketData(
-  event: ethereum.Event,
-  collateralChange: BigInt,
-  collateralAsset: Address
-): void {
+function updateMarketData(event: ethereum.Event): void {
   const market = getOrCreateMarket(
     event,
     event.address,
@@ -823,8 +813,10 @@ function updateMarketData(
   const cometContract = Comet.bind(event.address);
   const tokens = market.tokens!;
   const baseToken = cometContract.baseToken();
+  let baseTokenData: TokenData | null = null;
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
   let totalBorrowUSD = BIGDECIMAL_ZERO;
+  let totalReservesUSD = BIGDECIMAL_ZERO;
   for (let i = 0; i < tokens.length; i++) {
     const tokenData = TokenData.load(tokens[i]);
     if (!tokenData) {
@@ -851,6 +843,18 @@ function updateMarketData(
         tokenData.variableBorrowedTokenBalance!,
         token.decimals
       ).times(tokenData.inputTokenPriceUSD);
+
+      // update reserves
+      const tryReserves = cometContract.try_getReserves();
+      if (!tryReserves.reverted) {
+        tokenData.reserves = bigIntToBigDecimal(
+          tryReserves.value,
+          token.decimals
+        ).times(tokenData.inputTokenPriceUSD);
+        totalReservesUSD = totalReservesUSD.plus(tokenData.reserves!);
+      }
+
+      baseTokenData = tokenData;
     } else {
       const collateralERC20 = ERC20.bind(
         Address.fromBytes(tokenData.inputToken)
@@ -858,6 +862,18 @@ function updateMarketData(
       const tryBalance = collateralERC20.try_balanceOf(event.address);
       if (!tryBalance.reverted) {
         tokenData.inputTokenBalance = tryBalance.value;
+      }
+
+      // update reserves
+      const tryReserves = cometContract.try_getCollateralReserves(
+        Address.fromBytes(tokenData.inputToken)
+      );
+      if (!tryReserves.reverted) {
+        tokenData.reserves = bigIntToBigDecimal(
+          tryReserves.value,
+          token.decimals
+        ).times(tokenData.inputTokenPriceUSD);
+        totalReservesUSD = totalReservesUSD.plus(tokenData.reserves!);
       }
     }
 
@@ -870,9 +886,18 @@ function updateMarketData(
   }
 
   market.totalValueLockedUSD = totalValueLockedUSD;
+  market.totalReservesUSD = totalReservesUSD;
   market.totalDepositBalanceUSD = totalValueLockedUSD;
   market.totalBorrowBalanceUSD = totalBorrowUSD;
   market.save();
+
+  if (!baseTokenData) {
+    log.warning(
+      "[updateMarketData] Could not find base token data in market: {}",
+      [event.address.toHexString()]
+    );
+    return;
+  }
 
   // update interest rates
   const utilization = cometContract.getUtilization();
@@ -896,11 +921,8 @@ function updateMarketData(
     .times(BigDecimal.fromString(SECONDS_PER_YEAR.toString()))
     .times(BIGDECIMAL_HUNDRED);
   supplierRate.save();
-  const baseTokenData = getOrCreateTokenData(event.address, baseToken);
   baseTokenData.rates = [borrowerRate.id, supplierRate.id]; // borrower before supplier always
   baseTokenData.save();
-
-  // TODO- add rewards
 }
 
 function updateMarketPrices(
