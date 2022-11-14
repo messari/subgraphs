@@ -38,6 +38,7 @@ import {
   SECONDS_PER_YEAR,
   exponentToBigDecimal,
   RewardTokenType,
+  BIGDECIMAL_ZERO,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -374,6 +375,9 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
     log.warning("PLY token not found", []);
     return;
   }
+  const plyPriceUSD = plyToken.lastPriceUSD
+    ? plyToken.lastPriceUSD!
+    : BIGDECIMAL_ZERO;
 
   const borrowRewardToken = getOrCreateRewardToken(
     PLY_TOKEN_ADDRESS,
@@ -411,8 +415,8 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
       .toString()
   );
 
-  const borrowRewardsPerDayUSD = borrowRewardsBD.times(plyToken.lastPriceUSD!);
-  const supplyRewardsPerDayUSD = supplyRewardsBD.times(plyToken.lastPriceUSD!);
+  const borrowRewardsPerDayUSD = borrowRewardsBD.times(plyPriceUSD);
+  const supplyRewardsPerDayUSD = supplyRewardsBD.times(plyPriceUSD);
 
   market.rewardTokens = [borrowRewardToken.id, supplyRewardToken.id];
   market.rewardTokenEmissionsAmount = [
