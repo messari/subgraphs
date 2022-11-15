@@ -27,12 +27,12 @@ Becoming a good subgrpah developer will take patience and practice. The followin
 
 - For a full walkthrough of our subgraph development process visit [`docs/WALKTHROUGH.md`](./docs/WALKTHROUGH.md).
 - Resources for develoment of varying levels can be found in [`docs/RESOURCES.md`](./docs/RESOURCES.md).
-- To learn about common errors, best error handling practices, and debugging see [`docs/ERROR.md`](./docs/ERROR.md)
+- To learn about common errors, best error handling practices, and debugging see [`docs/ERRORS.md`](./docs/ERRORS.md)
 - Subgraph performance is also a concern. Learn about indexing / querying performance by reading [`docs/PERFORMANCE`](./docs/PERFORMANCE.md)
 
 ## Contributing Guidelines
 
-We welcome contributions from the community! You can point out or fix bugs, suggest changes, add new features, or add new subgraphs ✅.
+We welcome contributions from the community! You can point out or fix bugs, suggest changes, add new features, or add new subgraphs. ✅
 
 - For bugs, features, or change requests please submit an [issue](https://github.com/messari/subgraphs/issues) following our [guide](./docs/ISSUES.md).
 - General contribution guidelines and practices will be found in [`docs/CONTRIBUTING.md`](./docs/CONTRIBUTING.md)
@@ -74,52 +74,3 @@ You can find a visualizer with the status of all Messari subgraphs at [subgraphs
   - [TokenTerminal](https://www.tokenterminal.com/terminal)
 
 > For other contributing guidelines, please refer to [Contributing.md](./docs/Contributing.md)
-
-## Video Walkthrough Series of Subgraph Development Workflow for Messari
-
-**CLI Installation:**
-
-- `npm install -g messari-subgraph-cli`
-- `npm install -g mustache`
-
-**Deployment.json Walkthough:**
-
-[![Deployment.json Walkthrough](https://img.youtube.com/vi/cgCNkRmM4NM/0.jpg)](https://youtu.be/cgCNkRmM4NM)
-
-**Standard Directory Structure Walkthrough:**
-
-[![Standard Directory Structure Walkthrough](https://img.youtube.com/vi/i3VAQYFMwEI/0.jpg)](https://youtu.be/i3VAQYFMwEI)
-
-**How to use Messari Subgraph CLI and Explanation:**
-
-[![How to use Messari Subgraph CLI and Explanation](https://img.youtube.com/vi/WYWa-3Vh5Jc/0.jpg)](https://youtu.be/WYWa-3Vh5Jc)
-
-## Resources
-
-### Introductory
-
-- Learn the basics of GraphQL: [https://graphql.org/learn/](https://graphql.org/learn/)
-- Query subgraphs using GraphQL: https://thegraph.com/docs/en/developer/graphql-api/
-- Get familiar with The Graph: [https://thegraph.academy/developers/](https://thegraph.academy/developers/)
-- Defining a subgraph: [https://thegraph.academy/developers/defining-a-subgraph/](https://thegraph.academy/developers/defining-a-subgraph/)
-- Creating a subgraph: https://thegraph.com/docs/en/developer/create-subgraph-hosted/
-- Deploying a subgraph using The Graph Studio: [https://thegraph.com/docs/en/studio/deploy-subgraph-studio/](https://thegraph.com/docs/en/studio/deploy-subgraph-studio/)
-
-### Intermediate
-
-- [AssemblyScript API](https://thegraph.com/docs/en/developer/assemblyscript-api/)
-- [Unit Test Using Matchstick](https://thegraph.com/docs/en/developer/matchstick/)
-- [Building a Subgraph for Sushiswap](https://docs.simplefi.finance/subgraph-development-documentation/sushiswap-subgraph-development)
-- [Building a Subgraph for Loopring](https://www.youtube.com/watch?v=SNmzhwlQqgU)
-  - Using templates (dynamic data sources)
-  - Indexing proxies
-
-### Advanced
-
-- Building ambitious subgraphs (Part I): https://www.youtube.com/watch?v=4V2o5YJooOM
-  - Schema design
-  - Error handling
-  - Interface and union types
-- Building ambitious subgraphs (Part II) https://www.youtube.com/watch?v=1-8AW-lVfrA
-  - Performance tips and tricks (for both mappings and queries)
-- [Documentation for the graph-node](https://github.com/graphprotocol/graph-node/tree/master/docs)

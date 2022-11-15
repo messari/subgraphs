@@ -1,4 +1,4 @@
-# Schema Definition
+# Schemas
 
 All subgraphs follow a set of standardized schemas. This standardization brings some important benefits:
 

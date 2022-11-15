@@ -1,8 +1,20 @@
-# Introduction
+# Performance
+
+This document outlines how to increase the indexing performance of subgraphs with data to backup claims.
+
+## Indexing Speed
+
+There are couple things you can do to significantly improve your indexing speed:
+
+- Set a startblock (Use the deployment block of the contracts, [startblock app](https://startblock.vercel.app) may help).
+- Avoid call handlers and block handlers. Also depending on the Ethereum node ran by an indexer, call handlers and block handlers may or may not be supported (esp. on alt-EVM chains).
+- Limit the number of contract calls you perform. If you do need to perform contract calls, save the data, so you won't have to do repeated calls.
+
+## Performance Tests
 
 The following tests are done to compare performance difference with the addition or subtraction of different indexing objectives or the substitution of methods for performing indexing operations.
 
-## Price Oracle Test 1.0
+### Price Oracle Test 1.0
 
 - The purpose of this test is to compare the performance of 2 price oracles in the uniswap v2 subgraph implementation. This is done by deploying nearly identical subgraphs where the only difference is the price oracle.
 - The performance can be measured by estimating the blocks per second indexing speed for each subgraph deployment accross similar intervals of time. The prices are calculated around each deposit, withdraw, and swap event for both tokens involved.
@@ -167,7 +179,7 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 - The results after a a roughly 5 hour test across about 284,000 is a nearly identical indexing speed. This test tells me that adding hourly metrics will not severely impact the indexing speed of a subgraph.
 - An additional insight that I believe can be extracted from this test is that event and call handlers are by far the greatest bottleneck in the indexing speed using The Graph.
 
-## Bytes and Immutables Test 1.0
+### Bytes and Immutables Test 1.0
 
 - The purpose of this test is to check how much changing the id values of entities to Bytes and adding immutable entities where relavent affects indexing performance
 - The entities which I added the immutable quality to are the RewardToken, Deposit, Withdraw, Swap, Account, and ActiveAccount
