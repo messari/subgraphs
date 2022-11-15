@@ -34,7 +34,9 @@ The most used things here are the "Logs", "API", and the "Messari Visualizer". A
 
 This dashboard allows easier viewing of subgraph logs. Without it logs are cleared after ~1 hour. With this tool you can save logs, search through them, and filter.
 
-TODO - add walkthrough from JS
+Here is a [video](https://drive.google.com/file/d/1to7ZRsEcsnsS0DO23oC3W47RUVlsoC2o/view) describing how to use the dashboard.
+
+> If you need any credentials please ask us!
 
 ## Miniscan
 

@@ -17,7 +17,7 @@ As you begin adding code to the repository you will notice there is a lot of cod
 4. Once your PR is ready for review go ahead and click "Ready for review". As a courtesy it is nice to let the reviewer know that it is ready through a DM.
 
 At this point you will just need to follow the "Reviewing" process until your PR is merged.
-    
+
 ## Reviewing
 
 ### Reviewee
