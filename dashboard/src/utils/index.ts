@@ -113,11 +113,55 @@ export function formatIntToFixed2(val: number): string {
   return returnStr;
 };
 
-export function csvToJSONConvertor(csv: string) {
+export const invalidColumns = [".", "..", "...", ",", "-", "_", " ", '"', "'"];
+
+export function csvToJSONConvertorMultiCol(lines: string[], headers: string[], chartTitles: string[] = []) {
+  const result = [];
   try {
-    const lines = csv.split("\n");
-    const result = [];
-    const headers = lines[0].split(",");
+    if (!(headers.length > 2) || (!headers.map(x => x?.toLowerCase()).includes('date') && !headers.map(x => x?.toLowerCase()).includes('time'))) {
+      return 'Wrong CSV data format. The CSV must have multiple columns, one must be a "date" column.';
+    }
+    const obj: any = {};
+    for (let i = 1; i < lines.length; i++) {
+      const currentline = lines[i].split(",");
+      for (let j = 0; j < headers.length; j++) {
+        let entry: any = currentline[j];
+        let header = headers[j].toLowerCase();
+        if (!invalidColumns.includes(header)) {
+          if (header === "time") {
+            header = "date";
+          }
+          if (entry) {
+            if (!obj[header]) {
+              obj[header] = [];
+            }
+            if (entry.includes("'")) {
+              entry = entry.split("'").join("");
+            }
+            if (entry.includes('"')) {
+              entry = entry.split('"').join("");
+            }
+            if (header === 'date' && isNaN(entry)) {
+              entry = moment(entry).unix();
+            }
+            if (!isNaN(Number(entry))) {
+              entry = Number(entry);
+            }
+            obj[header].push(entry);
+          }
+        }
+      }
+    }
+    return (obj);
+  } catch (err: any) {
+    console.error(err.message);
+    return "csvToJSONConvertor encountered an JS error while processing: " + err?.message + ".";
+  }
+}
+
+export function csvToJSON2Col(lines: string[], headers: string[]) {
+  const result = [];
+  try {
     if (headers.length !== 2 || !headers.map(x => x?.toLowerCase()).includes('date')) {
       return 'Wrong CSV data format. The CSV must have two columns, one must be a "date" column.';
     }
@@ -151,6 +195,25 @@ export function csvToJSONConvertor(csv: string) {
       }
     }
     return (result);
+  } catch (err: any) {
+    console.error(err.message);
+    return "csvToJSONConvertor encountered an JS error while processing: " + err?.message + ".";
+  }
+}
+
+export function csvToJSONConvertor(csv: string, chartTitles: string[] = []) {
+  try {
+    const lines = csv.split("\n");
+    const headers = lines[0].split(",").map(x => x?.includes('\r') ? x.split('\r').join("") : x);
+    let result: any = null
+    if (headers.length === 2) {
+      result = csvToJSON2Col(lines, headers);
+    }
+    if (headers.length > 2) {
+      result = csvToJSONConvertorMultiCol(lines, headers, []);
+    }
+    return (result);
+
   } catch (err: any) {
     console.error(err.message);
     return "csvToJSONConvertor encountered an JS error while processing: " + err?.message + ".";
@@ -238,22 +301,26 @@ export function base64toBlobJPEG(dataURI: string) {
 export function lineupChartDatapoints(compChart: any, stitchLeftIndex: number, timeKey: string = 'date') {
   const key1 = Object.keys(compChart)[0];
   const key2 = Object.keys(compChart)[1];
-  while (toDate(compChart[key1][stitchLeftIndex][timeKey]) !== toDate(compChart[key2][stitchLeftIndex][timeKey])) {
-    if (compChart[key1][stitchLeftIndex][timeKey] < compChart[key2][stitchLeftIndex][timeKey]) {
-      const startIndex = compChart[key1].findIndex((x: any) => x[timeKey] >= compChart[key2][stitchLeftIndex][timeKey]);
-      let newArray = [...compChart[key1].slice(startIndex)];
-      if (stitchLeftIndex > 0) {
-        newArray = [...compChart[key1].slice(0, stitchLeftIndex), ...compChart[key1].slice(startIndex, compChart[key1].length)];
+  try {
+    while (toDate(compChart[key1][stitchLeftIndex][timeKey]) !== toDate(compChart[key2][stitchLeftIndex][timeKey])) {
+      if (compChart[key1][stitchLeftIndex][timeKey] < compChart[key2][stitchLeftIndex][timeKey]) {
+        const startIndex = compChart[key1].findIndex((x: any) => x[timeKey] >= compChart[key2][stitchLeftIndex][timeKey]);
+        let newArray = [...compChart[key1].slice(startIndex)];
+        if (stitchLeftIndex > 0) {
+          newArray = [...compChart[key1].slice(0, stitchLeftIndex), ...compChart[key1].slice(startIndex, compChart[key1].length)];
+        }
+        compChart[key1] = newArray;
+      } else {
+        const startIndex = compChart[key2].findIndex((x: any) => x[timeKey] >= compChart[key1][stitchLeftIndex][timeKey]);
+        let newArray = [...compChart[key2].slice(startIndex)];
+        if (stitchLeftIndex > 0) {
+          newArray = [...compChart[key2].slice(0, stitchLeftIndex), ...compChart[key2].slice(startIndex, compChart[key2].length)];
+        }
+        compChart[key2] = newArray;
       }
-      compChart[key1] = newArray;
-    } else {
-      const startIndex = compChart[key2].findIndex((x: any) => x[timeKey] >= compChart[key1][stitchLeftIndex][timeKey]);
-      let newArray = [...compChart[key2].slice(startIndex)];
-      if (stitchLeftIndex > 0) {
-        newArray = [...compChart[key2].slice(0, stitchLeftIndex), ...compChart[key2].slice(startIndex, compChart[key2].length)];
-      }
-      compChart[key2] = newArray;
     }
+  } catch (err: any) {
+    console.error(err.message);
   }
   return compChart;
 }

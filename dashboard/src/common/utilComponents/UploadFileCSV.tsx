@@ -30,18 +30,18 @@ export const UploadFileCSV = ({ csvJSON, csvMetaData, setCsvJSON, setChartIsImag
                     if (typeof (text) === 'string') {
                         const json = csvToJSONConvertor(text);
                         if (typeof json === "string") {
-                            setCsvMetaData({ ...csvMetaData, csvError: json })
+                            setCsvMetaData({ ...csvMetaData, columnName: "", csvError: json })
                             return;
                         }
                         setCsvJSON(json);
-                        setCsvMetaData({ fileName: file.name, csvError: null });
+                        setCsvMetaData({ fileName: file.name, columnName: "", csvError: null });
                     }
                 };
                 fileReader.readAsText(file);
             }
         } catch (err: any) {
             console.error(err.message);
-            setCsvMetaData({ ...csvMetaData, csvError: err?.message })
+            setCsvMetaData({ fileName: "", columnName: "", csvError: err?.message })
         }
     }, [file]);
 
@@ -51,7 +51,7 @@ export const UploadFileCSV = ({ csvJSON, csvMetaData, setCsvJSON, setChartIsImag
                 <div className={classStr} style={{ textAlign: "center" }}>
                     <Button style={{ padding: "1px 8px", borderRadius: "0", border: "1px red solid", backgroundColor: "red", color: "white" }} onClick={() => {
                         setCsvJSON(null);
-                        setCsvMetaData({ ...csvMetaData, csvError: null });
+                        setCsvMetaData({ fileName: "", columnName: "", csvError: null });
                         setChartIsImage(false);
                         return;
                     }} >Remove CSV</Button>
@@ -65,6 +65,7 @@ export const UploadFileCSV = ({ csvJSON, csvMetaData, setCsvJSON, setChartIsImag
             <div className={classStr} style={{ textAlign: "center" }}>
                 <Button style={{ padding: "1px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", backgroundColor: "rgb(102,86,248)", color: "white" }} onClick={() => {
                     setCsvJSON(null);
+                    setCsvMetaData({ fileName: "", columnName: "", csvError: null });
                     setChartIsImage(false);
                     return;
                 }} >Remove CSV</Button>
