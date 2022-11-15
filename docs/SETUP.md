@@ -6,7 +6,7 @@ This document describes how to setup your local working environment in order to 
 
 - [Node & npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 - Some development experience
-- Technicaly knowledge of blockchains (especially evm)
+- Technical knowledge of blockchains (especially evm)
 - Knowledge of [The Graph](https://thegraph.com/docs/) (our beginner [RESOURCES.md](./RESOURCES.md) file will be a good starting place)
 
 ## Installation

@@ -1,6 +1,6 @@
 # Structure
 
-This document will help you understand the structure of the Messari subgraphs repsistory. What should you know at a high level? What does each protocol directory look like? What should I worry about?
+This document will help you understand the structure of the Messari subgraphs repository. What should you know at a high level? What does each protocol directory look like? What should I worry about?
 
 ## High Level
 
@@ -24,7 +24,7 @@ The `subgraphs` directory stores all of the actual subgraph code. More on this i
 
 The `docs` contain all of the documentation around this code, progress, and development of this repo. The `monitor` houses the code that we use to find any issues in subgraphs as listed in `deployment.json`. It is a discord bot that alerts us on errors in production and `messari/` subgraphs.
 
-It is important to note that the schemas titled `schema-{protocol type}.graphql` in the head of the repository are our standard schemas. These act as a base for all of our subgraphs. We can add field and entities in individual subgraphs, but the base is a guaruntee in terms of schema design.
+It is important to note that the schemas titled `schema-{protocol type}.graphql` in the head of the repository are our standard schemas. These act as a base for all of our subgraphs. We can add field and entities in individual subgraphs, but the base is a guarantee in terms of schema design.
 
 ```
 .
@@ -43,7 +43,7 @@ It is important to note that the schemas titled `schema-{protocol type}.graphql`
 
 ## `./subgraphs` Directory
 
-In `./subgraphs` you will first notice there are many protocol names. Each folder is a subgraph for that protocol. Each folder includes the code for subgraphs on all networks that protocol is depployed to.
+In `./subgraphs` you will first notice there are many protocol names. Each folder is a subgraph for that protocol. Each folder includes the code for subgraphs on all networks that protocol is deployed to.
 
 ### Subgraph Structure
 
@@ -111,7 +111,7 @@ There is nice video that goes over this in more depth:
 
 ### README
 
-The `README.md` should contain the methology for the subgraph. Normally defined by our protocol specialists. An end user should be able to go there and understand how we calculate different metrics in the scope of this protocol. This file needs to live under `./protocols/protocol-name/README.md`.
+The `README.md` should contain the methodology for the subgraph. Normally defined by our protocol specialists. An end user should be able to go there and understand how we calculate different metrics in the scope of this protocol. This file needs to live under `./protocols/protocol-name/README.md`.
 
 ## Forked Subgraph Repository
 

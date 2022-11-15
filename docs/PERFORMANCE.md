@@ -17,7 +17,7 @@ The following tests are done to compare performance difference with the addition
 ### Price Oracle Test 1.0
 
 - The purpose of this test is to compare the performance of 2 price oracles in the uniswap v2 subgraph implementation. This is done by deploying nearly identical subgraphs where the only difference is the price oracle.
-- The performance can be measured by estimating the blocks per second indexing speed for each subgraph deployment accross similar intervals of time. The prices are calculated around each deposit, withdraw, and swap event for both tokens involved.
+- The performance can be measured by estimating the blocks per second indexing speed for each subgraph deployment across similar intervals of time. The prices are calculated around each deposit, withdraw, and swap event for both tokens involved.
 
 * Note - the performance should be accurate but not totally precise since the end blocks are not the same. Some blocks index slower than others due to high volume
 
@@ -143,12 +143,12 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 
 #### Results
 
-- The results after an approximately 22 hour test indicate that the use of Pheonix's oracle in the uniswap v2 subgraph results in a roughly 4% decrease in indexing speed. While this is substantial, it is a much diminished difference in pace when compart to Test 1.0.
+- The results after an approximately 22 hour test indicate that the use of Pheonix's oracle in the uniswap v2 subgraph results in a roughly 4% decrease in indexing speed. While this is substantial, it is a much diminished difference in pace when compared to Test 1.0.
 
 ## Hourly Metrics Test 1.0
 
 - The purpose of this test is to check how much adding entities that track hourly metrics affects the indexing speed of the uniswap v2 subgraph.
-- In this test, I adding hourly metrics for financials, usaage, and pools in addition to the daily metrics. The tests were were started at the same block number and near the same time.
+- In this test, I adding hourly metrics for financials, usage, and pools in addition to the daily metrics. The tests were were started at the same block number and near the same time.
 
 ### Checkpoints
 
@@ -181,7 +181,7 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 
 ### Bytes and Immutables Test 1.0
 
-- The purpose of this test is to check how much changing the id values of entities to Bytes and adding immutable entities where relavent affects indexing performance
+- The purpose of this test is to check how much changing the id values of entities to Bytes and adding immutable entities where relevant affects indexing performance
 - The entities which I added the immutable quality to are the RewardToken, Deposit, Withdraw, Swap, Account, and ActiveAccount
 
 ### Checkpoints
@@ -242,4 +242,4 @@ https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
 
 - The results of this test indicate that having neither bytes as IDs or immutable entities is the fasted case. This is against our expectations. It was expected to see that adding both immutables and bytes as IDs would improve indexing speed.
 - The results are quite strange upon analysis. Adding bytes as IDs only slows down the indexing process quite a lot (-23%) and adding immutables only slows the indexing process by a moderate amount (-6.8%). However when we combine both the addition of immutables and bytes, it only slightly slows down the indexing process (-1.2%).
-- These results are far from the expectation of how the addition of immutables and bytes as IDs would impact the speed of indexing in isolation and combination. The results of this test warrant investation into how the graph handles immutables and bytes as IDs behind the scenes so that we can get results more in line with our expectation and acheive the desired performance improvements.
+- These results are far from the expectation of how the addition of immutables and bytes as IDs would impact the speed of indexing in isolation and combination. The results of this test warrant investigation into how the graph handles immutables and bytes as IDs behind the scenes so that we can get results more in line with our expectation and achieve the desired performance improvements.

@@ -1,6 +1,6 @@
 # Errors
 
-This docuemnt will help you with common errors, how to handle errors, and known issues plus workarounds.
+This document will help you with common errors, how to handle errors, and known issues plus workarounds.
 
 ## Error Squashing Methods
 
@@ -133,7 +133,7 @@ Here are some known issues with subgraph tooling that you may run into:
 - Using a `derivedFrom` field in the graph code gives no compile time issues but fails when the graph syncs with error `unexpected null wasm` ([Github Issue](https://github.com/graphprotocol/graph-ts/issues/219))
 - Event data can be different from contract call data as event data are calculated amid execution of a block whereas contract call data are calculated at the end of a block.
 - Note that **call-handlers** are not available on some EVM sidechains (e.g. Avalanche, Harmony, Polygon, etc). So you won't be able to use **call-handlers** in your subgraphs when indexing on these chains.
-- As of [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) there is a new enviornment variable called `GRAPH_MAX_GAS_PER_HANDLER`. This sets a maximum gas limit on handlers. This does not refer to on-chain gas limits, but a measure of the computation exerted per handler. You will get a subgraph error if this limit is exceeded.
+- As of [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) there is a new environment variable called `GRAPH_MAX_GAS_PER_HANDLER`. This sets a maximum gas limit on handlers. This does not refer to on-chain gas limits, but a measure of the computation exerted per handler. You will get a subgraph error if this limit is exceeded.
   > A place you may find this is using the built-in `.pow()` with large numbers.
 - Different graph-cli versions handle missing required fields defined in schema differently. Deploying a subgraph with missing required field with [`graph-cli v0.30.1`](https://github.com/graphprotocol/graph-node/releases/tag/v0.30.1) will fail with error `missing value for non-nullable field`, while it will succeed with [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) as it automatically sets default values for those missing fields.
 
@@ -259,4 +259,4 @@ Couple more tutorial videos:
 https://www.youtube.com/watch?v=T-orbT4gRiA
 https://www.youtube.com/watch?v=EFTHDIxOjVY
 
-Keep in mind that the test.ts file no longer needs to wrap all test() method calls into a runTests() function like older documentation specifies. Ensure that you have installed Rust, PostgreSQL, and Docker. If you are experiencing issues building the Dockerfile that is provided by matchstick documentation, confirm that all of the directories in the Dockerfile script are valid. In particular, step 15 attempts to copy the parent directory which is outiside of the build context. For some users, this throws an error and prevents execution. In this case, changing the step 15 to "COPY ./. ." can resolve this and facilitate a successful build.
+Keep in mind that the test.ts file no longer needs to wrap all test() method calls into a runTests() function like older documentation specifies. Ensure that you have installed Rust, PostgreSQL, and Docker. If you are experiencing issues building the Dockerfile that is provided by matchstick documentation, confirm that all of the directories in the Dockerfile script are valid. In particular, step 15 attempts to copy the parent directory which is outside of the build context. For some users, this throws an error and prevents execution. In this case, changing the step 15 to "COPY ./. ." can resolve this and facilitate a successful build.

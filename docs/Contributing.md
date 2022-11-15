@@ -22,7 +22,7 @@ At this point you will just need to follow the "Reviewing" process until your PR
 
 ### Reviewee
 
-- Generally you will need to make changes, either respond to a change/comment with a question, rebuttle, or comment. Otherwise, make the change and resolve the issue.
+- Generally you will need to make changes, either respond to a change/comment with a question, rebuttal, or comment. Otherwise, make the change and resolve the issue.
 - When you feel changes are sufficient, let the reviewer know again that the PR is ready for another round of reviews.
 - Do not make a new PR for changes, this will make it harder for the reviewer to track their progress.
 
@@ -112,7 +112,7 @@ For now after a PR is reviewed Vincent (@this-username-is-taken) does the final 
 
 It is nice to outline the changes / fixes you made in your PR. This way the reviewer knows what to look for and what to expect.
 
-If the change affects a subgraph you should make a link to your testing subgraph in https://okgraph.xyz/. This website is a great hub for subgraph viewing (shoutout @0xbe1).
+If the change affects a subgraph you should make a link to your testing subgraph in https://okgraph.xyz/. This website is a great hub for subgraph viewing (h/t @0xbe1).
 
 An example of good PR heading comments:
 
@@ -176,7 +176,7 @@ Examples:
 - "style(); uniswap; format code"
 - "perf(#patch); spookyswap; find value without contract call"
 
-> Notice: some of the names don't have a #`semver` name. This is because they don't actually affect the versioning on any of the subgraphs / dashboard. A good way to know which semver identifer to use is to notice which part of the version you are updating. And it looks like this (MAJOR.MINOR.PATCH)!
+> Notice: some of the names don't have a #`semver` name. This is because they don't actually affect the versioning on any of the subgraphs / dashboard. A good way to know which semver identifier to use is to notice which part of the version you are updating. And it looks like this (MAJOR.MINOR.PATCH)!
 
 ## Syncing with upstream/master
 

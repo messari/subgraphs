@@ -39,7 +39,7 @@ Fixes: [#109](https://github.com/messari/subgraphs/pull/109), [#111](https://git
 
 ### Common
 
-- Added prefixes to diambiguate quantitative fields:
+- Added prefixes to disambiguate quantitative fields:
   - _cumulative_: sum of all historical data from day 1 up to this point. E.g. `cumulativeDepositUSD` means all deposits has ever been made to this protocol/pool.
   - _daily/hourly_: this only applies to snapshots and represents the sum of the snapshot interval (i.e. daily aggregate). E.g. `dailyActiveUsers` means all unique active users on a given day, up till now.
   - All other quantitative field indicates a spot balance. In other words, the value at this point in time. E.g. `totalValueLockedUSD` means the total TVL of the protocol/pool as of now.

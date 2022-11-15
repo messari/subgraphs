@@ -28,7 +28,7 @@ This community developed tool allows you to plugin the subgraph id and gives you
 
 [![okgraph](./images/tooling/okgraph.png)](https://okgraph.xyz/?q=messari%2Fcompound-v2-ethereum)
 
-The most used things here are the "Logs", "API", and the "Messari Visualizer". All of these links are imperatve for debugging and verifying your subgraphs. If your subgraph fails to index the error will be displayed obviously with the (hopefully) descriptive error message. More on errors in [ERRORS.md](./ERRORS.md).
+The most used things here are the "Logs", "API", and the "Messari Visualizer". All of these links are imperative for debugging and verifying your subgraphs. If your subgraph fails to index the error will be displayed obviously with the (hopefully) descriptive error message. More on errors in [ERRORS.md](./ERRORS.md).
 
 ## Logging Dashboard
 
@@ -38,4 +38,4 @@ TODO - add walkthrough from JS
 
 ## Miniscan
 
-[Miniscan](https://miniscan.xyz/) is essentially an etherscan wrapper, but it allows for more chains and the ability to maek historic contract calls. This tool is especially useful when you are trying to learn about a contract. You would plug in the address and you can view the source code (assuming it is verified) and make contract calls to understand behaviour.
+[Miniscan](https://miniscan.xyz/) is essentially an etherscan wrapper, but it allows for more chains and the ability to make historic contract calls. This tool is especially useful when you are trying to learn about a contract. You would plug in the address and you can view the source code (assuming it is verified) and make contract calls to understand behavior.
