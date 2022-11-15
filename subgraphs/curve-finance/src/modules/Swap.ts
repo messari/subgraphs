@@ -157,7 +157,6 @@ export function Swap(
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,
-    pool.totalValueLockedUSD,
     block
   );
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(volumeUSD);

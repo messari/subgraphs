@@ -121,7 +121,6 @@ export function Deposit(
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,
-    pool.totalValueLockedUSD,
     block
   );
   pool.outputTokenSupply = totalSupplyAfterDeposit;

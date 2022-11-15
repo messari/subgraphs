@@ -442,7 +442,6 @@ export function getOrCreateLiquidityPool(
     pool.inputTokenWeights = utils.getPoolTokenWeights(
       pool.inputTokens,
       pool.inputTokenBalances,
-      constants.BIGDECIMAL_ZERO,
       block
     );
 

@@ -246,14 +246,41 @@ export function getPoolBalances(pool: LiquidityPool): BigInt[] {
   return sortByInputTokenOrder(pool, inputTokenBalances);
 }
 
+export function getPoolTVLUsingInputTokens(
+  inputTokens: string[],
+  inputTokenBalances: BigInt[],
+  block: ethereum.Block
+): BigDecimal {
+  let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+
+  for (let idx = 0; idx < inputTokens.length; idx++) {
+    let balance = inputTokenBalances[idx];
+    let inputToken = getOrCreateTokenFromString(inputTokens[idx], block);
+
+    let balanceUSD = balance
+      .divDecimal(
+        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+      )
+      .times(inputToken.lastPriceUSD!);
+    
+    totalValueLockedUSD = totalValueLockedUSD.plus(balanceUSD)
+  }
+
+  return totalValueLockedUSD;
+}
+
 export function getPoolTokenWeights(
   inputTokens: string[],
   inputTokenBalances: BigInt[],
-  totalValueLockedUSD: BigDecimal,
   block: ethereum.Block
 ): BigDecimal[] {
-  let inputTokenWeights: BigDecimal[] = [];
+  const totalValueLockedUSD = getPoolTVLUsingInputTokens(
+    inputTokens,
+    inputTokenBalances,
+    block
+  )
 
+  let inputTokenWeights: BigDecimal[] = [];
   for (let idx = 0; idx < inputTokens.length; idx++) {
     if (totalValueLockedUSD == constants.BIGDECIMAL_ZERO) {
       inputTokenWeights.push(constants.BIGDECIMAL_ZERO);

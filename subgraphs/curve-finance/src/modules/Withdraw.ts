@@ -203,7 +203,6 @@ export function Withdraw(
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,
-    pool.totalValueLockedUSD,
     block
   );
   pool.outputTokenSupply = tokenSupplyAfterWithdrawal;

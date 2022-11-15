@@ -11,6 +11,7 @@ import {
   getOrCreateLiquidityPool,
 } from "../common/initializers";
 import * as utils from "../common/utils";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
@@ -86,7 +87,10 @@ export function getRewardsData_v2(gaugeAddress: Address): RewardsInfoType {
   return new RewardsInfoType([rewardToken], [rewardRate]);
 }
 
-export function getRewardsData_v3(gaugeAddress: Address): RewardsInfoType {
+export function getRewardsData_v3(
+  gaugeAddress: Address, 
+  block: ethereum.Block
+): RewardsInfoType {
   let rewardRates: BigInt[] = [];
   let rewardTokens: Address[] = [];
 
@@ -108,14 +112,22 @@ export function getRewardsData_v3(gaugeAddress: Address): RewardsInfoType {
     if (!rewardRateCall.reverted) {
       let rewardRate = rewardRateCall.value.getRate();
 
-      rewardRates.push(rewardRate);
+      if (rewardRateCall.value.getPeriod_finish().lt(block.timestamp)) {
+        rewardRates.push(constants.BIGINT_ZERO)
+      } else {
+        rewardRates.push(rewardRate);
+      }
     } else {
       let rewardRate1Call = gaugeContract.try_reward_data1(rewardToken);
 
       if (!rewardRate1Call.reverted) {
         let rewardRate = rewardRate1Call.value.rate;
 
-        rewardRates.push(rewardRate);
+        if (rewardRate1Call.value.period_finish.lt(block.timestamp)) {
+          rewardRates.push(constants.BIGINT_ZERO)
+        } else {
+          rewardRates.push(rewardRate);
+        }
       } else {
         rewardRates.push(constants.BIGINT_ZERO);
       }
@@ -225,7 +237,7 @@ export function updateFactoryRewards(
   }
 
   if (rewardsInfo.isEmpty()) {
-    rewardsInfo = getRewardsData_v3(gaugeAddress);
+    rewardsInfo = getRewardsData_v3(gaugeAddress, block);
   }
 
   let rewardTokens = rewardsInfo.getRewardTokens;
@@ -275,7 +287,7 @@ export function updateRewardTokenEmissions(
     pool.rewardTokens = rewardTokens;
   }
 
-  const rewardTokenIndex = rewardTokens!.indexOf(rewardToken.id);
+  const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
 
   if (!pool.rewardTokenEmissionsAmount) {
     pool.rewardTokenEmissionsAmount = [];
@@ -288,11 +300,12 @@ export function updateRewardTokenEmissions(
   let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
   const token = getOrCreateToken(rewardTokenAddress, block);
+  const tokenPrice = getUsdPricePerToken(rewardTokenAddress);
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
     .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
-    .times(token.lastPriceUSD!);
+    .times(tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen));
 
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
