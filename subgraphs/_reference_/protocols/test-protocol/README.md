@@ -6,6 +6,10 @@
 
 Explain how the main metrics are calculated for this subgraph.
 
+## Notes
+
+Any issues, discrepencies, unique logic to report.
+
 ## Links
 
 Links to the relevant sources to learn about this protocol.
