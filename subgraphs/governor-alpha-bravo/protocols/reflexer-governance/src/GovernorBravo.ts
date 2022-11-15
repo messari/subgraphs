@@ -39,8 +39,8 @@ export function handleProposalCreated(event: ProposalCreated): void {
 
   // HACK: Reflexer is setting undefined for values and signatures instead of correct values
   // this results in diff array lengths so we have to add dummy values
-  const values: BigInt[] = new Array();
-  const signatures: string[] = new Array();
+  const values: BigInt[] = [];
+  const signatures: string[] = [];
   for (let i = 0; i < event.params.targets.length; i++) {
     values[i] = BIGINT_ZERO;
     signatures[i] = "";
