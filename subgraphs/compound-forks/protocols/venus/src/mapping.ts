@@ -1,10 +1,4 @@
-import {
-  Address,
-  BigInt,
-  BigDecimal,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -34,12 +28,11 @@ import {
 } from "../../../generated/schema";
 import {
   cTokenDecimals,
+  exponentToBigDecimal,
   Network,
   BIGINT_ZERO,
   BSC_BLOCKS_PER_YEAR,
-  DAYS_PER_YEAR,
   RewardTokenType,
-  BIGINT_TEN,
   BIGDECIMAL_ZERO,
 } from "../../../src/constants";
 import {
@@ -372,7 +365,7 @@ export function handleVenusSpeedUpdated(event: VenusSpeedUpdated): void {
     event.block.number,
     speed.toBigDecimal(),
     RewardIntervalType.BLOCK
-  ).times(BigDecimal.fromString(DAYS_PER_YEAR.toString()));
+  );
 
   const rewardAmount = BigInt.fromString(rewards.truncate(0).toString());
   const borrowRewardToken = getOrCreateRewardToken(RewardTokenType.BORROW);
@@ -424,8 +417,8 @@ function updateRewardValueUSD(market: Market): void {
   const rewardAmount = market.rewardTokenEmissionsAmount![0];
   const rewardAmountUSD = rewardAmount
     .times(priceCall.value)
-    .divDecimal(BIGINT_TEN.pow(ORACLE_PRECISION as u8).toBigDecimal())
-    .div(BIGINT_TEN.pow(XVS.decimals as u8).toBigDecimal());
+    .divDecimal(exponentToBigDecimal(ORACLE_PRECISION))
+    .div(exponentToBigDecimal(XVS.decimals));
   market.rewardTokenEmissionsUSD = [rewardAmountUSD, rewardAmountUSD];
   market.save();
 }
