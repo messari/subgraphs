@@ -20,7 +20,6 @@ import { GovernanceFramework, Proposal } from "../../../generated/schema";
 import {
   BIGINT_ONE,
   GovernanceFrameworkType,
-  NA,
   ProposalState,
 } from "../../../src/constants";
 
