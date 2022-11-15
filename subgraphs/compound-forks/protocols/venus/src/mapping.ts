@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -53,7 +53,12 @@ import { CToken } from "../../../generated/Comptroller/CToken";
 import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
-import { comptrollerAddr, nativeCToken, nativeToken } from "./constants";
+import {
+  comptrollerAddr,
+  nativeCToken,
+  nativeToken,
+  VDAI_MARKET_ADDRESS,
+} from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
@@ -263,12 +268,26 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   const oracleContract = PriceOracle.bind(
     Address.fromString(protocol._priceOracle)
   );
+
+  // DAI price oracle broken from blocks 17803407 - 17836448
+  // We will override it to exactly 1 USD for those blocks
+  let tryUnderlyingPrice = oracleContract.try_getUnderlyingPrice(marketAddress);
+  if (
+    marketAddress == VDAI_MARKET_ADDRESS &&
+    event.block.number.toI32() >= 17803407 &&
+    event.block.number.toI32() <= 17836448
+  ) {
+    tryUnderlyingPrice = ethereum.CallResult.fromValue(
+      BigInt.fromI64(1000000000000000000)
+    );
+  }
+
   const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
-    oracleContract.try_getUnderlyingPrice(marketAddress),
+    tryUnderlyingPrice,
     BSC_BLOCKS_PER_YEAR
   );
   const interestAccumulated = event.params.interestAccumulated;

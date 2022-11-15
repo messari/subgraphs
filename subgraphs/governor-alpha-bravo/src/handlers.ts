@@ -370,6 +370,7 @@ export function _handleVoteCast(
   vote.logIndex = event.logIndex;
   // Retrieve enum string key by value (0 = Against, 1 = For, 2 = Abstain)
   vote.choice = getVoteChoiceByValue(support);
+  vote.blockTimeId = `${event.block.timestamp.toI64()}-${event.logIndex}`;
   vote.save();
 
   // Increment respective vote choice counts

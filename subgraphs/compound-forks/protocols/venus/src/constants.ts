@@ -19,3 +19,7 @@ export const nativeCToken = new TokenData(
   "vBNB",
   cTokenDecimals
 );
+
+export const VDAI_MARKET_ADDRESS = Address.fromString(
+  "0x334b3ecb4dca3593bccc3c7ebd1a1c1d1780fbf1"
+);

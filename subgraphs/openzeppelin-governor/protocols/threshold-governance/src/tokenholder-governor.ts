@@ -156,7 +156,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
       Address.fromString(contractAddress)
     );
 
-    governanceFramework.name = contract.name();
+    governanceFramework.name = "threshold-governance";
     governanceFramework.type = GovernanceFrameworkType.OPENZEPPELIN_GOVERNOR;
     governanceFramework.version = contract.version();
 

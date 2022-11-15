@@ -170,7 +170,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework = new GovernanceFramework(contractAddress);
     const contract = Governance.bind(Address.fromString(contractAddress));
 
-    governanceFramework.name = contract.name();
+    governanceFramework.name = "ousd-governance";
     governanceFramework.type = GovernanceFrameworkType.OPENZEPPELIN_GOVERNOR;
     governanceFramework.version = contract.version();
 
