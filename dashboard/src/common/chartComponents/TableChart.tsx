@@ -17,8 +17,8 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showDateString, toggleDateString] = useState(true);
   const [dates, setDates] = useState<any>([]);
+  const [showDateString, toggleDateString] = useState(true);
 
   function sortFunction(a: any, b: any) {
     let aVal = a[sortColumn];
