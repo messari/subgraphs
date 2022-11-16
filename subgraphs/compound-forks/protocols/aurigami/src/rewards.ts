@@ -5,10 +5,9 @@
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { BigDecimal, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { _CircularBuffer } from "../../../generated/schema";
 import {
-  Network,
   BIGDECIMAL_ZERO,
   INT_FOUR,
   INT_NEGATIVE_ONE,
@@ -171,6 +170,9 @@ export function getRewardsPerDay(
   const windowSecondsCount = BigDecimal.fromString(
     (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString()
   );
+  if (windowSecondsCount == BIGDECIMAL_ZERO) {
+    return BIGDECIMAL_ZERO;
+  }
 
   // Wideness of the window in blocks.
   const windowBlocksCount = BigDecimal.fromString(
@@ -184,6 +186,9 @@ export function getRewardsPerDay(
     WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
 
   // block speed converted to specified rate.
+  if (WINDOW_SIZE_SECONDS_BD == BIGDECIMAL_ZERO) {
+    return BIGDECIMAL_ZERO;
+  }
   const normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
     WINDOW_SIZE_SECONDS_BD
   ).times(unnormalizedBlockSpeed);
