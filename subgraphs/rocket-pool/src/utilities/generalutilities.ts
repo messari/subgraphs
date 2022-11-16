@@ -17,4 +17,4 @@ class GeneralUtilities {
     return event.transaction.hash.toHex() + "-" + event.logIndex.toString();
   }
 }
-export let generalUtilities = new GeneralUtilities();
+export const generalUtilities = new GeneralUtilities();

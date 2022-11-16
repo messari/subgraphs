@@ -58,41 +58,42 @@ export function handleBalancesUpdated(event: BalancesUpdated): void {
 
   // Load the RocketTokenRETH contract
   // We will need the rocketvault smart contract state to get specific addresses.
-  let rETHContract = rocketTokenRETH.bind(
+  const rETHContract = rocketTokenRETH.bind(
     Address.fromString(ROCKET_TOKEN_RETH_CONTRACT_ADDRESS)
   );
   if (rETHContract === null) return;
 
   // Load the rocketDepositPool contract
-  let rocketDepositPoolContract = rocketDepositPool.bind(
+  const rocketDepositPoolContract = rocketDepositPool.bind(
     Address.fromString(ROCKET_DEPOSIT_POOL_CONTRACT_ADDRESS)
   );
   if (rocketDepositPoolContract === null) return;
 
   // How much is the total staker ETH balance in the deposit pool?
-  let depositPoolBalance = rocketDepositPoolContract.getBalance();
-  let depositPoolExcessBalance = rocketDepositPoolContract.getExcessBalance();
+  const depositPoolBalance = rocketDepositPoolContract.getBalance();
+  const depositPoolExcessBalance = rocketDepositPoolContract.getExcessBalance();
 
   // The RocketEth contract balance is equal to the total collateral - the excess deposit pool balance.
-  let stakerETHInRocketETHContract = getRocketETHBalance(
+  const stakerETHInRocketETHContract = getRocketETHBalance(
     depositPoolExcessBalance,
     rETHContract.getTotalCollateral()
   );
 
   // Attempt to create a new network balance checkpoint.
-  let rETHExchangeRate = rETHContract.getExchangeRate();
-  let checkpoint = rocketPoolEntityFactory.createNetworkStakerBalanceCheckpoint(
-    generalUtilities.extractIdForEntity(event),
-    protocol.lastNetworkStakerBalanceCheckPoint,
-    event,
-    depositPoolBalance,
-    stakerETHInRocketETHContract,
-    rETHExchangeRate
-  );
+  const rETHExchangeRate = rETHContract.getExchangeRate();
+  const checkpoint =
+    rocketPoolEntityFactory.createNetworkStakerBalanceCheckpoint(
+      generalUtilities.extractIdForEntity(event),
+      protocol.lastNetworkStakerBalanceCheckPoint,
+      event,
+      depositPoolBalance,
+      stakerETHInRocketETHContract,
+      rETHExchangeRate
+    );
   if (checkpoint === null) return;
 
   // Retrieve previous checkpoint.
-  let previousCheckpointId = protocol.lastNetworkStakerBalanceCheckPoint;
+  const previousCheckpointId = protocol.lastNetworkStakerBalanceCheckPoint;
   let previousTotalStakerETHRewards = BigInt.fromI32(0);
   let previousTotalStakersWithETHRewards = BigInt.fromI32(0);
   let previousRETHExchangeRate = BigInt.fromI32(1);
@@ -219,31 +220,30 @@ function generateStakerBalanceCheckpoints(
   // Loop through all the staker id's in the protocol.
   for (let index = 0; index < activeStakerIds.length; index++) {
     // Determine current staker ID.
-    let stakerId = <string>activeStakerIds[index];
+    const stakerId = <string>activeStakerIds[index];
     if (stakerId == null || stakerId == ZERO_ADDRESS_STRING) continue;
 
     // Load the indexed staker.
-    let staker = Staker.load(stakerId);
+    const staker = Staker.load(stakerId);
 
     // Shouldn't occur since we're only passing in staker ID's that have an active rETH balance.
     if (staker === null || staker.rETHBalance == BigInt.fromI32(0)) continue;
 
     // Get the current & previous balances for this staker and update the staker balance for the current exchange rate.
-    let stakerBalance = stakerUtilities.getStakerBalance(
+    const stakerBalance = stakerUtilities.getStakerBalance(
       <Staker>staker,
       networkCheckpoint.rETHExchangeRate
     );
     staker.ethBalance = stakerBalance.currentETHBalance;
 
     // Calculate rewards (+/-) for this staker since the previous checkpoint.
-    let ethRewardsSincePreviousCheckpoint =
+    const ethRewardsSincePreviousCheckpoint =
       stakerUtilities.getETHRewardsSincePreviousStakerBalanceCheckpoint(
         stakerBalance.currentRETHBalance,
         stakerBalance.currentETHBalance,
         stakerBalance.previousRETHBalance,
         stakerBalance.previousETHBalance,
-        previousRETHExchangeRate,
-        networkCheckpoint.rETHExchangeRate
+        previousRETHExchangeRate
       );
     stakerUtilities.handleEthRewardsSincePreviousCheckpoint(
       ethRewardsSincePreviousCheckpoint,
@@ -270,7 +270,7 @@ function generateStakerBalanceCheckpoints(
     updateSnapshotsTvl(block);
 
     // Create a new staker balance checkpoint
-    let stakerBalanceCheckpoint =
+    const stakerBalanceCheckpoint =
       rocketPoolEntityFactory.createStakerBalanceCheckpoint(
         networkCheckpoint.id + " - " + stakerId,
         staker,

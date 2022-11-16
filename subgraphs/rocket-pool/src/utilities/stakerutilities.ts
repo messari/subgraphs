@@ -44,7 +44,7 @@ class StakerUtilities {
       Retrieve the latest network balance checkpoint.
       If there is none at the moment, return false because this hasnt been handled yet.
     */
-    let latestNetworkStakerBalanceCheckpointId =
+    const latestNetworkStakerBalanceCheckpointId =
       protocol.lastNetworkStakerBalanceCheckPoint;
     if (latestNetworkStakerBalanceCheckpointId === null) return false;
     const latestNetworkStakerBalanceCheckpoint =
@@ -58,10 +58,10 @@ class StakerUtilities {
       return false;
 
     // Get the date of the network staker balance event candidate and the latest network staker balance checkpoint.
-    let dateOfNewNetworkStakerBalanceCheckpoint = new Date(
+    const dateOfNewNetworkStakerBalanceCheckpoint = new Date(
       event.block.timestamp.toI32() * 1000
     );
-    let dateOfLatestNetworkStakerBalanceCheckpoint = new Date(
+    const dateOfLatestNetworkStakerBalanceCheckpoint = new Date(
       latestNetworkStakerBalanceCheckpoint.blockTime.toI32() * 1000
     );
 
@@ -88,7 +88,7 @@ class StakerUtilities {
     /*
      * Load or attempt to create the (new) staker from whom the rETH is being transferred.
      */
-    let fromId = this.extractStakerId(from);
+    const fromId = this.extractStakerId(from);
     let fromStaker: Staker | null = <Staker | null>Staker.load(fromId);
     if (fromStaker === null) {
       fromStaker = <Staker>(
@@ -103,7 +103,7 @@ class StakerUtilities {
     /**
      * Load or attempt to create the (new) staker to whom the rETH is being transferred.
      */
-    let toId = this.extractStakerId(to);
+    const toId = this.extractStakerId(to);
     let toStaker: Staker | null = <Staker | null>Staker.load(toId);
     if (toStaker === null) {
       toStaker = <Staker>(
@@ -149,7 +149,7 @@ class StakerUtilities {
     staker: Staker,
     currentRETHExchangeRate: BigInt
   ): StakerBalance {
-    let result = new StakerBalance();
+    const result = new StakerBalance();
 
     // Determine current rETH & ETH value balance.
     result.currentRETHBalance = staker.rETHBalance;
@@ -167,7 +167,7 @@ class StakerUtilities {
 
     // If we had a previous staker balance checkpoint, then use the balances from that link.
     if (staker.lastBalanceCheckpoint !== null) {
-      let previousStakerBalanceCheckpoint = StakerBalanceCheckpoint.load(
+      const previousStakerBalanceCheckpoint = StakerBalanceCheckpoint.load(
         <string>staker.lastBalanceCheckpoint
       );
 
@@ -198,8 +198,7 @@ class StakerUtilities {
     activeETHBalance: BigInt,
     previousRETHBalance: BigInt,
     previousETHBalance: BigInt,
-    previousCheckPointExchangeRate: BigInt,
-    currentCheckpointExchangeRate: BigInt
+    previousCheckPointExchangeRate: BigInt
   ): BigInt {
     // This will indicate how many ETH rewards we have since the previous checkpoint.
     let ethRewardsSincePreviousCheckpoint = BigInt.fromI32(0);
@@ -221,7 +220,7 @@ class StakerUtilities {
       // CASE #2: The staker has burned or transferred some of his/her rETH holdings since last checkpoint.
       else if (activeRETHBalance < previousRETHBalance) {
         // How much was the ETH value that was transferred away during this checkpoint.
-        let ethTransferredSinceThePreviousCheckpoint = previousRETHBalance
+        const ethTransferredSinceThePreviousCheckpoint = previousRETHBalance
           .minus(activeRETHBalance)
           .times(previousCheckPointExchangeRate)
           .div(ONE_ETHER_IN_WEI);
@@ -232,7 +231,7 @@ class StakerUtilities {
       // CASE #3: The staker increased his/her rETH holdings since last checkpoint.
       else if (activeRETHBalance > previousRETHBalance) {
         // How much was the ETH value that was received during this checkpoint.
-        let ethReceivedSinceThePreviousCheckpointAtPreviousExchangeRate =
+        const ethReceivedSinceThePreviousCheckpointAtPreviousExchangeRate =
           activeRETHBalance
             .minus(previousRETHBalance)
             .times(previousCheckPointExchangeRate)
@@ -283,7 +282,7 @@ class StakerUtilities {
       staker.hasAccruedETHRewardsDuringLifecycle = true;
 
       // Update the collection that keeps track of how many stakers there are/have been with ETH rewards.
-      let stakersWithETHRewards = protocol.stakersWithETHRewards;
+      const stakersWithETHRewards = protocol.stakersWithETHRewards;
       if (stakersWithETHRewards.indexOf(staker.id) == -1)
         stakersWithETHRewards.push(staker.id);
       protocol.stakersWithETHRewards = stakersWithETHRewards;
@@ -355,4 +354,4 @@ class StakerUtilities {
   }
 }
 
-export let stakerUtilities = new StakerUtilities();
+export const stakerUtilities = new StakerUtilities();

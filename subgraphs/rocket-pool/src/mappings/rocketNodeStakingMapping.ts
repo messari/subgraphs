@@ -90,20 +90,20 @@ function saveNodeRPLStakeTransaction(
     return;
 
   // We can only handle an Node RPL transaction if the node exists.
-  let node = Node.load(nodeId);
+  const node = Node.load(nodeId);
   if (node === null) return;
 
   // Load the storage contract because we need to get the rETH contract address. (and some of its state)
-  let rocketNetworkPricesContract = rocketNetworkPrices.bind(
+  const rocketNetworkPricesContract = rocketNetworkPrices.bind(
     Address.fromString(ROCKET_NETWORK_PRICES_CONTRACT_ADDRESS)
   );
 
   // Calculate the ETH amount at the time of the transaction.
-  let rplETHExchangeRate = rocketNetworkPricesContract.getRPLPrice();
-  let ethAmount = amount.times(rplETHExchangeRate).div(ONE_ETHER_IN_WEI);
+  const rplETHExchangeRate = rocketNetworkPricesContract.getRPLPrice();
+  const ethAmount = amount.times(rplETHExchangeRate).div(ONE_ETHER_IN_WEI);
 
   // Create a new transaction for the given values.
-  let nodeRPLStakeTransaction =
+  const nodeRPLStakeTransaction =
     rocketPoolEntityFactory.createNodeRPLStakeTransaction(
       generalUtilities.extractIdForEntity(event),
       nodeId,
@@ -132,11 +132,11 @@ function updateNodeRPLBalances(
   transactionType: string
 ): void {
   // We will need the rocket node staking contract to get some latest state for the associated node.
-  let rocketNodeStakingContract = rocketNodeStaking.bind(
+  const rocketNodeStakingContract = rocketNodeStaking.bind(
     Address.fromString(ROCKET_NODE_STAKING_CONTRACT_ADDRESS)
   );
 
-  let nodeAddress = Address.fromString(node.id);
+  const nodeAddress = Address.fromString(node.id);
   node.rplStaked = rocketNodeStakingContract.getNodeRPLStake(nodeAddress);
   node.effectiveRPLStaked =
     rocketNodeStakingContract.getNodeEffectiveRPLStake(nodeAddress);

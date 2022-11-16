@@ -100,7 +100,7 @@ function updateOracleNodeState(
   blockTime: BigInt
 ): void {
   // Load the associated node. It has to exist.
-  let node = Node.load(nodeAddress.toHexString());
+  const node = Node.load(nodeAddress.toHexString());
   if (node === null) return;
 
   // Update the node state and index it.

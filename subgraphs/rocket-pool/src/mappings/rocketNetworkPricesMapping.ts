@@ -43,19 +43,19 @@ export function handlePricesUpdated(event: PricesUpdated): void {
     return;
 
   // Determine the fee for a new minipool.
-  let networkFeesContract = rocketNetworkFees.bind(
+  const networkFeesContract = rocketNetworkFees.bind(
     Address.fromString(ROCKET_NETWORK_FEES_CONTRACT_ADDRESS)
   );
-  let nodeFeeForNewMinipool = networkFeesContract.getNodeFee();
+  const nodeFeeForNewMinipool = networkFeesContract.getNodeFee();
 
   // Determine the RPL minimum and maximum for a new minipool.
-  let effectiveRPLBoundsNewMinipool = getEffectiveMinipoolRPLBounds(
+  const effectiveRPLBoundsNewMinipool = getEffectiveMinipoolRPLBounds(
     event.block.number,
     event.params.rplPrice
   );
 
   // Create a new network node balance checkpoint.
-  let checkpoint = rocketPoolEntityFactory.createNetworkNodeBalanceCheckpoint(
+  const checkpoint = rocketPoolEntityFactory.createNetworkNodeBalanceCheckpoint(
     generalUtilities.extractIdForEntity(event),
     protocol.lastNetworkNodeBalanceCheckPoint,
     effectiveRPLBoundsNewMinipool.minimum,
@@ -69,7 +69,7 @@ export function handlePricesUpdated(event: PricesUpdated): void {
 
   // Retrieve the previous network node checkpoint & store some of the running totals it holds for later.
   let previousCheckpoint: NetworkNodeBalanceCheckpoint | null = null;
-  let previousCheckpointId = protocol.lastNetworkNodeBalanceCheckPoint;
+  const previousCheckpointId = protocol.lastNetworkNodeBalanceCheckPoint;
   if (previousCheckpointId != null) {
     previousCheckpoint = NetworkNodeBalanceCheckpoint.load(
       <string>previousCheckpointId
@@ -80,7 +80,7 @@ export function handlePricesUpdated(event: PricesUpdated): void {
   }
 
   // Handle the node impact.
-  let metadata = generateNodeBalanceCheckpoints(
+  const metadata = generateNodeBalanceCheckpoints(
     protocol.nodes,
     <NetworkNodeBalanceCheckpoint>checkpoint,
     event.block.number,
@@ -110,7 +110,7 @@ export function handlePricesUpdated(event: PricesUpdated): void {
   protocol.lastNetworkNodeBalanceCheckPoint = checkpoint.id;
 
   // Add the new network node balance checkpoint to the protocol collection.
-  let nodeBalanceCheckpoints = protocol.networkNodeBalanceCheckpoints;
+  const nodeBalanceCheckpoints = protocol.networkNodeBalanceCheckpoints;
   if (nodeBalanceCheckpoints.indexOf(checkpoint.id) == -1)
     nodeBalanceCheckpoints.push(checkpoint.id);
   protocol.networkNodeBalanceCheckpoints = nodeBalanceCheckpoints;
@@ -133,28 +133,28 @@ function generateNodeBalanceCheckpoints(
   blockNumber: BigInt,
   blockTime: BigInt
 ): NetworkNodeBalanceMetadata {
-  let networkMetadata = new NetworkNodeBalanceMetadata();
+  const networkMetadata = new NetworkNodeBalanceMetadata();
 
   // If we don't have any registered nodes at this time, stop.
   if (nodeIds.length === 0) return networkMetadata;
 
   // We will need the rocket node staking contract to get some latest state for the associated node.
-  let rocketNodeStakingContract = rocketNodeStaking.bind(
+  const rocketNodeStakingContract = rocketNodeStaking.bind(
     Address.fromString(ROCKET_NODE_STAKING_CONTRACT_ADDRESS)
   );
 
   // Loop through all the node id's in the protocol.
   for (let index = 0; index < nodeIds.length; index++) {
     // Determine current node ID.
-    let nodeId = <string>nodeIds[index];
+    const nodeId = <string>nodeIds[index];
     if (nodeId == null) continue;
 
     // Load the indexed node.
-    let node = Node.load(nodeId);
+    const node = Node.load(nodeId);
     if (node === null) continue;
 
     // We'll need this to pass to the rocketnodestaking contract.
-    let nodeAddress = Address.fromString(node.id);
+    const nodeAddress = Address.fromString(node.id);
 
     // Update the node state that is affected by the update in RPL/ETH price.
     node.effectiveRPLStaked =
@@ -183,7 +183,7 @@ function generateNodeBalanceCheckpoints(
     );
 
     // Create a new node balance checkpoint
-    let nodeBalanceCheckpoint =
+    const nodeBalanceCheckpoint =
       rocketPoolEntityFactory.createNodeBalanceCheckpoint(
         networkCheckpoint.id + " - " + node.id,
         networkCheckpoint.id,
@@ -228,13 +228,13 @@ function setAverageRplEthRatio(
     index++
   ) {
     // Determine current network node balance checkpoint ID.
-    let networkNodeBalanceCheckpointId = <string>(
+    const networkNodeBalanceCheckpointId = <string>(
       protocol.networkNodeBalanceCheckpoints[index]
     );
     if (networkNodeBalanceCheckpointId == null) continue;
 
     // Load the indexed network node balance checkpoint.
-    let activeIterationCheckpoint = NetworkNodeBalanceCheckpoint.load(
+    const activeIterationCheckpoint = NetworkNodeBalanceCheckpoint.load(
       networkNodeBalanceCheckpointId
     );
     if (
@@ -281,13 +281,13 @@ function getEffectiveMinipoolRPLBounds(
   blockNumber: BigInt,
   rplPrice: BigInt
 ): EffectiveMinipoolRPLBounds {
-  let effectiveRPLBounds = new EffectiveMinipoolRPLBounds();
+  const effectiveRPLBounds = new EffectiveMinipoolRPLBounds();
 
   let halfDepositAmount = BigInt.fromI32(0);
 
   // Get the half deposit amount from the DAO Protocol settings minipool contract instance.
   if (blockNumber < BigInt.fromI32(13555066)) {
-    let rocketDAOProtocolSettingsMinipoolContract =
+    const rocketDAOProtocolSettingsMinipoolContract =
       rocketDAOProtocolSettingsMinipoolV1.bind(
         Address.fromString(
           ROCKET_DAO_PROTOCOL_SETTINGS_MINIPOOL_CONTRACT_ADDRESS_V1
@@ -297,7 +297,7 @@ function getEffectiveMinipoolRPLBounds(
     halfDepositAmount =
       rocketDAOProtocolSettingsMinipoolContract.getHalfDepositNodeAmount();
   } else {
-    let rocketDAOProtocolSettingsMinipoolContract =
+    const rocketDAOProtocolSettingsMinipoolContract =
       rocketDAOProtocolSettingsMinipoolV2.bind(
         Address.fromString(
           ROCKET_DAO_PROTOCOL_SETTINGS_MINIPOOL_CONTRACT_ADDRESS_V2
@@ -309,7 +309,7 @@ function getEffectiveMinipoolRPLBounds(
   }
 
   // Get the DAO Protocol settings node contract instance.
-  let rocketDAOProtocolSettingsNodeContract =
+  const rocketDAOProtocolSettingsNodeContract =
     rocketDAOProtocolSettingsNode.bind(
       Address.fromString(ROCKET_DAO_PROTOCOL_SETTINGS_NODE_CONTRACT_ADDRESS)
     );

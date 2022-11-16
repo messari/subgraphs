@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 import {
   EtherDeposited,
   StatusUpdated,
@@ -21,11 +21,11 @@ export function handleStatusUpdated(event: StatusUpdated): void {
   if (event === null || event.address === null || event.block === null) return;
 
   // There must be an existing minipool with the same address.
-  let minipool = Minipool.load(event.address.toHexString());
+  const minipool = Minipool.load(event.address.toHexString());
   if (minipool === null || minipool.node == null) return;
 
   // Retrieve the parent node. It has to exist.
-  let node = Node.load(minipool.node);
+  const node = Node.load(minipool.node);
   if (node === null) return;
 
   // Handle the status.
@@ -55,7 +55,7 @@ export function handleEtherDeposited(event: EtherDeposited): void {
     return;
 
   // There must be an existing minipool with the same address.
-  let minipool = Minipool.load(event.address.toHexString());
+  const minipool = Minipool.load(event.address.toHexString());
   if (minipool === null) return;
 
   // Check if the deposit came from a node.

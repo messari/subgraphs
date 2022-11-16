@@ -21,7 +21,7 @@ export function handleNodeRegister(event: NodeRegistered): void {
   if (node !== null) return;
 
   // Retrieve the associated timezone, if the timezone doesn't exist yet, we need to create it.
-  let nodeTimezoneStringId = getNodeTimezoneId(
+  const nodeTimezoneStringId = getNodeTimezoneId(
     event.params.node.toHex(),
     event.address
   );
@@ -54,7 +54,7 @@ export function handleNodeRegister(event: NodeRegistered): void {
   }
 
   // Add this node to the collection of the protocol if necessary and index.
-  let protocolNodes = protocol.nodes;
+  const protocolNodes = protocol.nodes;
   if (protocol.nodes.indexOf(node.id) == -1) protocolNodes.push(node.id);
   protocol.nodes = protocolNodes;
 
@@ -76,7 +76,7 @@ export function handleNodeTimezoneChanged(
     return;
 
   // The node in question has to exist before we can change its timezone.
-  let node = Node.load(event.params.node.toHexString());
+  const node = Node.load(event.params.node.toHexString());
   if (node === null) return;
 
   let oldNodeTimezone: NetworkNodeTimezone | null = null;
@@ -94,7 +94,7 @@ export function handleNodeTimezoneChanged(
   }
 
   // If the newly set timezone doesn't exist yet, we need to create it.
-  let newNodeTimezoneId = getNodeTimezoneId(
+  const newNodeTimezoneId = getNodeTimezoneId(
     event.params.node.toHex(),
     event.address
   );
@@ -126,7 +126,7 @@ function getNodeTimezoneId(
   nodeAddress: string,
   nodeManagerContractAddress: Address
 ): string {
-  let rocketNodeManagerContract = rocketNodeManager.bind(
+  const rocketNodeManagerContract = rocketNodeManager.bind(
     nodeManagerContractAddress
   );
   let nodeTimezoneStringId = rocketNodeManagerContract.getNodeTimezoneLocation(

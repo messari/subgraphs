@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Transfer } from "../../generated/rocketTokenRETH/rocketTokenRETH";
 import { rocketTokenRETH } from "../../generated/rocketTokenRETH/rocketTokenRETH";
 import { Staker } from "../../generated/schema";
@@ -35,7 +35,7 @@ function handleRocketETHTransaction(
   if (stakerUtilities.hasTransactionHasBeenIndexed(event)) return;
 
   // Who are the stakers for this transaction?
-  let stakers = stakerUtilities.getTransactionStakers(
+  const stakers = stakerUtilities.getTransactionStakers(
     from,
     to,
     event.block.number,
@@ -72,7 +72,7 @@ function saveTransaction(
     return;
 
   // Create a new transaction for the given values.
-  let rEthTransaction = rocketPoolEntityFactory.createRocketETHTransaction(
+  const rEthTransaction = rocketPoolEntityFactory.createRocketETHTransaction(
     generalUtilities.extractIdForEntity(event),
     from,
     to,
@@ -88,22 +88,22 @@ function saveTransaction(
   }
 
   // Load the RocketTokenRETH contract.
-  let rETHContract = rocketTokenRETH.bind(event.address);
+  const rETHContract = rocketTokenRETH.bind(event.address);
   if (rETHContract === null) return;
 
   // Update active balances for stakesr.
-  let exchangeRate = rETHContract.getExchangeRate();
+  const exchangeRate = rETHContract.getExchangeRate();
   stakerUtilities.changeStakerBalances(from, rETHAmount, exchangeRate, false);
   stakerUtilities.changeStakerBalances(to, rETHAmount, exchangeRate, true);
 
   // Save all indirectly affected entities of the protocol - All stakers
-  let protocolStakers = protocol.stakers;
+  const protocolStakers = protocol.stakers;
   if (protocolStakers.indexOf(from.id) == -1) protocolStakers.push(from.id);
   if (protocolStakers.indexOf(to.id) == -1) protocolStakers.push(to.id);
   protocol.stakers = protocolStakers;
 
   // Save all indirectly affected entities of the protocol - Active stakers.
-  let protocolActiveStakers = protocol.activeStakers;
+  const protocolActiveStakers = protocol.activeStakers;
   if (
     from.rETHBalance > BigInt.fromI32(0) &&
     protocolActiveStakers.indexOf(from.id) == -1

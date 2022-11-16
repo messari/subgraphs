@@ -36,7 +36,7 @@ export function handleMinipoolCreated(event: MinipoolCreated): void {
   if (minipool !== null) return;
 
   // Retrieve the parent node. It has to exist.
-  let node = Node.load(event.params.node.toHexString());
+  const node = Node.load(event.params.node.toHexString());
   if (node === null) return;
 
   // Create a new minipool.
@@ -53,7 +53,7 @@ export function handleMinipoolCreated(event: MinipoolCreated): void {
   if (minipool === null) return;
 
   // Add this minipool to the collection of the node
-  let nodeMinipools = node.minipools;
+  const nodeMinipools = node.minipools;
   if (nodeMinipools.indexOf(minipool.id) == -1) nodeMinipools.push(minipool.id);
   node.minipools = nodeMinipools;
 
@@ -95,11 +95,11 @@ export function handleMinipoolDestroyed(event: MinipoolDestroyed): void {
     return;
 
   // There must be an indexed minipool.
-  let minipool = Minipool.load(event.params.minipool.toHexString());
+  const minipool = Minipool.load(event.params.minipool.toHexString());
   if (minipool === null) return;
 
   // Retrieve the parent node. It has to exist.
-  let node = Node.load(event.params.node.toHexString());
+  const node = Node.load(event.params.node.toHexString());
   if (node === null) return;
 
   // Update the minipool so it will contain its destroyed state.
@@ -133,11 +133,11 @@ export function handleIncrementNodeFinalisedMinipoolCount(
   if (call === null || call.block === null || call.from === null) return;
 
   // Calling address should be a minipool with a valid link to a node.
-  let minipool = Minipool.load(call.from.toHexString());
+  const minipool = Minipool.load(call.from.toHexString());
   if (minipool === null || minipool.node == null) return;
 
   // Retrieve the parent node. It has to exist.
-  let node = Node.load(minipool.node);
+  const node = Node.load(minipool.node);
   if (node === null) return;
 
   // Update the finalized block time for this minipool and the number of total finalized minipools for the node.
@@ -188,13 +188,13 @@ function getNewMinipoolFee(): BigInt {
  */
 function setEffectiveRPLStaked(node: Node): void {
   // We need this to get the new (minimum/maximum) effective RPL staked for the node.
-  let rocketNodeStakingContract = rocketNodeStaking.bind(
+  const rocketNodeStakingContract = rocketNodeStaking.bind(
     Address.fromString(ROCKET_NODE_STAKING_CONTRACT_ADDRESS)
   );
   if (rocketNodeStakingContract === null) return;
 
   // Load the effective RPL staked state from the smart contracts and update the node.
-  let nodeAddress = Address.fromString(node.id);
+  const nodeAddress = Address.fromString(node.id);
   node.effectiveRPLStaked =
     rocketNodeStakingContract.getNodeEffectiveRPLStake(nodeAddress);
   node.minimumEffectiveRPL =
@@ -217,11 +217,11 @@ function getAverageFeeForActiveMinipools(minipoolIds: string[]): BigInt {
   // Loop through all the minipool ids of the node.
   for (let index = 0; index < minipoolIds.length; index++) {
     // Get the current minipool ID for this iteration.
-    let minipoolId = <string>minipoolIds[index];
+    const minipoolId = <string>minipoolIds[index];
     if (minipoolId == null) continue;
 
     // Load the indexed minipool.
-    let minipool = Minipool.load(minipoolId);
+    const minipool = Minipool.load(minipoolId);
 
     /* 
      If the minipool:

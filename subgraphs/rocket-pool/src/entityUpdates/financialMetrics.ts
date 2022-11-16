@@ -200,7 +200,7 @@ export function updateTotalRevenueMetrics(
     block
   );
 
-  let additionalRewards = bigIntToBigDecimal(additionalRevenue);
+  const additionalRewards = bigIntToBigDecimal(additionalRevenue);
 
   const lastPriceUsd = getOrCreateToken(
     Address.fromString(ETH_ADDRESS),
@@ -269,7 +269,7 @@ export function updateProtocolSideRevenueMetrics(
     Address.fromString(PROTOCOL_ID),
     block
   );
-  let additionalRewards = additionalRevenue;
+  const additionalRewards = additionalRevenue;
 
   const lastPriceUsd = getOrCreateToken(
     Address.fromString(ETH_ADDRESS),

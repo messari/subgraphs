@@ -20,11 +20,11 @@ export function handleMinipoolEnqueued(event: MinipoolEnqueued): void {
     return;
 
   // There must be a minipool that was created, otherwise stop.
-  let minipool = Minipool.load(event.params.minipool.toHexString());
+  const minipool = Minipool.load(event.params.minipool.toHexString());
   if (minipool === null || minipool.node == null) return;
 
   // Retrieve the parent node. It has to exist.
-  let node = Node.load(minipool.node);
+  const node = Node.load(minipool.node);
   if (node === null) return;
 
   // Update the time this minipool was queued.
@@ -54,11 +54,11 @@ export function handleMinipoolDequeued(event: MinipoolDequeued): void {
     return;
 
   // There must be a minipool that was created, otherwise stop.
-  let minipool = Minipool.load(event.params.minipool.toHexString());
+  const minipool = Minipool.load(event.params.minipool.toHexString());
   if (minipool === null || minipool.node == null) return;
 
   // Retrieve the parent node. It has to exist.
-  let node = Node.load(minipool.node);
+  const node = Node.load(minipool.node);
   if (node === null) return;
 
   // Update the time this minipool was dequeued.

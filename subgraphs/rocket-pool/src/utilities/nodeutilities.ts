@@ -1,9 +1,4 @@
-import {
-  ethereum,
-  BigInt,
-  bigDecimal,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
+import { ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   NetworkNodeBalanceCheckpoint,
   Node,
@@ -38,7 +33,7 @@ class NodeUtilities {
     Retrieve the latest network balance checkpoint.
     If there is none at the moment, return false because this hasnt been handled yet.
   */
-    let latestNetworkNodeBalanceCheckpointId =
+    const latestNetworkNodeBalanceCheckpointId =
       protocol.lastNetworkNodeBalanceCheckPoint;
     if (latestNetworkNodeBalanceCheckpointId === null) return false;
     const latestNetworkNodeBalanceCheckpoint =
@@ -50,10 +45,10 @@ class NodeUtilities {
       return false;
 
     // Get the date of the network node balance event candidate and the latest network node balance checkpoint.
-    let dateOfNewNetworkNodeBalanceCheckpoint = new Date(
+    const dateOfNewNetworkNodeBalanceCheckpoint = new Date(
       event.block.timestamp.toI32() * 1000
     );
-    let dateOfLatestNetworkNodeBalanceCheckpoint = new Date(
+    const dateOfLatestNetworkNodeBalanceCheckpoint = new Date(
       latestNetworkNodeBalanceCheckpoint.blockTime.toI32() * 1000
     );
 
@@ -384,4 +379,4 @@ class NodeUtilities {
   }
 }
 
-export let nodeUtilities = new NodeUtilities();
+export const nodeUtilities = new NodeUtilities();

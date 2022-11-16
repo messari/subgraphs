@@ -22,7 +22,7 @@ class RocketPoolEntityFactory {
    * Should only every be created once.
    */
   public createRocketPoolProtocol(): RocketPoolProtocol {
-    let protocol = new RocketPoolProtocol(ROCKETPOOL_PROTOCOL_ROOT_ID);
+    const protocol = new RocketPoolProtocol(ROCKETPOOL_PROTOCOL_ROOT_ID);
     protocol.activeStakers = new Array<string>(0);
     protocol.stakersWithETHRewards = new Array<string>(0);
     protocol.stakers = new Array<string>(0);
@@ -57,7 +57,7 @@ class RocketPoolEntityFactory {
     )
       return null;
 
-    let rocketETHTransaction = new RocketETHTransaction(id);
+    const rocketETHTransaction = new RocketETHTransaction(id);
     rocketETHTransaction.from = from.id;
     rocketETHTransaction.amount = amount;
     rocketETHTransaction.to = to.id;
@@ -88,7 +88,7 @@ class RocketPoolEntityFactory {
       return null;
     }
 
-    let networkBalance = new NetworkStakerBalanceCheckpoint(id);
+    const networkBalance = new NetworkStakerBalanceCheckpoint(id);
     networkBalance.previousCheckpointId = previousCheckpointId;
     networkBalance.nextCheckpointId = null;
     networkBalance.stakerETHActivelyStaking = event.params.stakingEth;
@@ -118,7 +118,7 @@ class RocketPoolEntityFactory {
   ): Staker | null {
     if (id == null) return null;
 
-    let staker = new Staker(id);
+    const staker = new Staker(id);
     staker.rETHBalance = BigInt.fromI32(0);
     staker.ethBalance = BigInt.fromI32(0);
     staker.totalETHRewards = BigInt.fromI32(0);
@@ -152,7 +152,7 @@ class RocketPoolEntityFactory {
     )
       return null;
 
-    let stakerBalanceCheckpoint = new StakerBalanceCheckpoint(id);
+    const stakerBalanceCheckpoint = new StakerBalanceCheckpoint(id);
     stakerBalanceCheckpoint.stakerId = staker.id;
     stakerBalanceCheckpoint.networkStakerBalanceCheckpointId =
       networkStakerBalanceCheckpoint.id;
@@ -169,7 +169,7 @@ class RocketPoolEntityFactory {
    * Attempts to create a node timezone.
    */
   public createNodeTimezone(timezoneId: string): NetworkNodeTimezone {
-    let timezone = new NetworkNodeTimezone(timezoneId);
+    const timezone = new NetworkNodeTimezone(timezoneId);
     timezone.totalRegisteredNodes = BigInt.fromI32(0);
     return timezone;
   }
@@ -185,7 +185,7 @@ class RocketPoolEntityFactory {
   ): Node | null {
     if (id == null) return null;
 
-    let node = new Node(id);
+    const node = new Node(id);
     node.timezone = timezoneId;
     node.isOracleNode = false;
     node.oracleNodeBlockTime = BigInt.fromI32(0);
@@ -228,7 +228,7 @@ class RocketPoolEntityFactory {
   ): NodeRPLStakeTransaction | null {
     if (id == null) return null;
 
-    let transaction = new NodeRPLStakeTransaction(id);
+    const transaction = new NodeRPLStakeTransaction(id);
     transaction.node = nodeId;
     transaction.amount = amount;
     transaction.ethAmount = ethAmount;
@@ -257,7 +257,7 @@ class RocketPoolEntityFactory {
   ): RPLRewardInterval | null {
     if (id == null) return null;
 
-    let rewardInterval = new RPLRewardInterval(id);
+    const rewardInterval = new RPLRewardInterval(id);
     rewardInterval.previousIntervalId = previousIntervalId;
     rewardInterval.nextIntervalId = null;
     rewardInterval.claimableRewards = claimableRewards;
@@ -313,7 +313,7 @@ class RocketPoolEntityFactory {
     )
       return null;
 
-    let rewardInterval = new RPLRewardClaim(id);
+    const rewardInterval = new RPLRewardClaim(id);
     rewardInterval.rplRewardIntervalId = rplRewardIntervalId;
     rewardInterval.claimer = claimer;
     rewardInterval.claimerType = claimerType;
@@ -341,7 +341,7 @@ class RocketPoolEntityFactory {
   ): NetworkNodeBalanceCheckpoint | null {
     if (id == null || newRplPriceInETH == BigInt.fromI32(0)) return null;
 
-    let checkpoint = new NetworkNodeBalanceCheckpoint(id);
+    const checkpoint = new NetworkNodeBalanceCheckpoint(id);
     checkpoint.previousCheckpointId = previousCheckpointId;
     checkpoint.nextCheckpointId = null;
     checkpoint.nodesRegistered = BigInt.fromI32(0); // Will be calculated.
@@ -386,7 +386,7 @@ class RocketPoolEntityFactory {
   ): NodeBalanceCheckpoint | null {
     if (id == null) return null;
 
-    let checkpoint = new NodeBalanceCheckpoint(id);
+    const checkpoint = new NodeBalanceCheckpoint(id);
     checkpoint.NetworkNodeBalanceCheckpoint = networkCheckpointId;
     checkpoint.Node = node.id;
     checkpoint.isOracleNode = node.isOracleNode;
@@ -419,7 +419,7 @@ class RocketPoolEntityFactory {
    * Attempts to create a new minipool.
    */
   public createMinipool(id: string, node: Node, fee: BigInt): Minipool {
-    let minipool = new Minipool(id);
+    const minipool = new Minipool(id);
     minipool.node = node.id;
     minipool.fee = fee;
     minipool.nodeDepositETHAmount = BigInt.fromI32(0);
@@ -437,4 +437,4 @@ class RocketPoolEntityFactory {
   }
 }
 
-export let rocketPoolEntityFactory = new RocketPoolEntityFactory();
+export const rocketPoolEntityFactory = new RocketPoolEntityFactory();

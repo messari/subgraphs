@@ -3,7 +3,6 @@ import {
   rocketRewardsPool,
   RPLTokensClaimed,
 } from "../../generated/rocketRewardsPool/rocketRewardsPool";
-import { rocketDAONodeTrusted } from "../../generated/rocketRewardsPool/rocketDAONodeTrusted";
 import { rocketNetworkPrices } from "../../generated/rocketRewardsPool/rocketNetworkprices";
 import { RPLRewardInterval, Node } from "../../generated/schema";
 import { generalUtilities } from "../utilities/generalutilities";
@@ -54,11 +53,11 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
 
   // We will need the rocketvault smart contract state to get specific addresses.
   // We will need the rocket rewards pool contract to get its smart contract state.
-  let rocketRewardPoolContract = rocketRewardsPool.bind(event.address);
+  const rocketRewardPoolContract = rocketRewardsPool.bind(event.address);
 
   // We need to retrieve the last RPL rewards interval so we can compare it to the current state in the smart contracts.
   let activeIndexedRewardInterval: RPLRewardInterval | null = null;
-  let lastRPLRewardIntervalId = protocol.lastRPLRewardInterval;
+  const lastRPLRewardIntervalId = protocol.lastRPLRewardInterval;
   if (lastRPLRewardIntervalId != null) {
     activeIndexedRewardInterval = RPLRewardInterval.load(
       <string>lastRPLRewardIntervalId
@@ -66,7 +65,7 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
   }
 
   // Determine claimer type based on the claiming contract and/or claiming address.
-  let rplRewardClaimerType: string | null = getRplRewardClaimerType(
+  const rplRewardClaimerType: string | null = getRplRewardClaimerType(
     event.params.claimingContract,
     event.params.claimingAddress
   );
@@ -77,7 +76,7 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
 
   // If we don't have an indexed RPL Reward interval,
   // or if the last indexed RPL Reward interval isn't equal to the current one in the smart contracts:
-  let smartContractCurrentRewardIntervalStartTime =
+  const smartContractCurrentRewardIntervalStartTime =
     rocketRewardPoolContract.getClaimIntervalTimeStart();
   let previousActiveIndexedRewardInterval: RPLRewardInterval | null = null;
   let previousActiveIndexedRewardIntervalId: string | null = null;
@@ -140,10 +139,10 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
 
   // We need this to determine the current RPL/ETH price based on the smart contracts.
   // If for some reason this fails, something is horribly wrong and we need to stop indexing.
-  let networkPricesContract = rocketNetworkPrices.bind(
+  const networkPricesContract = rocketNetworkPrices.bind(
     Address.fromString(ROCKET_NETWORK_PRICES_CONTRACT_ADDRESS)
   );
-  let rplETHExchangeRate = networkPricesContract.getRPLPrice();
+  const rplETHExchangeRate = networkPricesContract.getRPLPrice();
   let rplRewardETHAmount = BigInt.fromI32(0);
   if (rplETHExchangeRate > BigInt.fromI32(0)) {
     rplRewardETHAmount = event.params.amount
@@ -152,7 +151,7 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
   }
 
   // Create a new reward claim.
-  let rplRewardClaim = rocketPoolEntityFactory.createRPLRewardClaim(
+  const rplRewardClaim = rocketPoolEntityFactory.createRPLRewardClaim(
     generalUtilities.extractIdForEntity(event),
     activeIndexedRewardInterval.id,
     event.params.claimingAddress.toHexString(),
@@ -166,7 +165,7 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
   if (rplRewardClaim === null) return;
 
   // If the claimer was a node..
-  let associatedNode = Node.load(event.params.claimingAddress.toHexString());
+  const associatedNode = Node.load(event.params.claimingAddress.toHexString());
   if (
     associatedNode !== null &&
     (rplRewardClaimerType == RPLREWARDCLAIMERTYPE_ODAO ||
@@ -248,7 +247,7 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
   }
 
   // Add this reward claim to the current interval
-  let currentRPLRewardClaims = activeIndexedRewardInterval.rplRewardClaims;
+  const currentRPLRewardClaims = activeIndexedRewardInterval.rplRewardClaims;
   currentRPLRewardClaims.push(rplRewardClaim.id);
   activeIndexedRewardInterval.rplRewardClaims = currentRPLRewardClaims;
 
@@ -265,22 +264,6 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
   updateUsageMetrics(event.block, event.params.claimingAddress);
   updateTotalRewardsMetrics(event.block, event.params.amount);
   updateSnapshotsTvl(event.block);
-}
-
-/**
- * Checks if the given address is actually a oracle node.
- */
-function getIsOracleNode(address: Address): boolean {
-  let isOracleNode: boolean = false;
-
-  let rocketDaoNodeTrustedContract = rocketDAONodeTrusted.bind(
-    Address.fromString(ROCKET_DAO_NODE_TRUSTED_CONTRACT_ADDRESS)
-  );
-  isOracleNode =
-    rocketDaoNodeTrustedContract !== null &&
-    rocketDaoNodeTrustedContract.getMemberIsValid(address);
-
-  return isOracleNode;
 }
 
 /**
@@ -317,7 +300,7 @@ function getRplRewardClaimerType(
   // #3: if the claimer type is still null, it **should** be a regular node.
   if (rplRewardClaimerType == null) {
     // Load the associated regular node.
-    let associatedNode = Node.load(claimingAddress.toHexString());
+    const associatedNode = Node.load(claimingAddress.toHexString());
     if (associatedNode !== null) {
       rplRewardClaimerType = RPLREWARDCLAIMERTYPE_NODE;
     }
@@ -333,7 +316,7 @@ function getClaimingContractAllowance(
   rplRewardClaimType: string,
   rewardsPoolAddress: Address
 ): BigInt {
-  let rocketRewardsContract = rocketRewardsPool.bind(rewardsPoolAddress);
+  const rocketRewardsContract = rocketRewardsPool.bind(rewardsPoolAddress);
 
   if (rplRewardClaimType == RPLREWARDCLAIMERTYPE_PDAO) {
     return rocketRewardsContract.getClaimingContractAllowance(
