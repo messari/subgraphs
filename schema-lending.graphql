@@ -193,6 +193,28 @@ type InterestRate @entity {
   tranche: Tranche
 }
 
+enum FeeType {
+  " Fees from liquidations "
+  LIQUIDATION_FEE
+
+  " Fees given to an admin "
+  ADMIN_FEE
+
+  " Fees that are taken by the protocol "
+  PROTOCOL_FEE
+}
+
+type Fee @entity {
+  " { Fee type }-{ Market ID }-{ Optional: # days/hours since epoch time } "
+  id: ID!
+
+  " Fee in percentage. E.g. 5.21% should be stored as 5.21 "
+  rate: BigDecimal!
+
+  " The type of fee (e.g. liquidation, admin, etc.) "
+  type: FeeType!
+}
+
 # There is a wide range of formats of lending protocols
 # And there are many unique mappings when it comes to input / output tokens
 # This generic type will help define the unique relationships between tokens in a market
@@ -819,7 +841,7 @@ type Market @entity {
   ##### Quantitative Data #####
 
   " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
-  fees: [InterestRate!]
+  fees: [Fee!]
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -995,8 +1017,8 @@ type MarketDailySnapshot @entity {
 
   ##### Quantitative Data #####
 
-  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
-  rates: [InterestRate!]!
+  " All the fees allowed in the market. Fee should be in APY percentage "
+  fees: [Fee!]
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -1188,8 +1210,8 @@ type MarketHourlySnapshot @entity {
 
   ##### Quantitative Data #####
 
-  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
-  rates: [InterestRate!]!
+  " All the fees allowed in the market. Fee should be in APY percentage "
+  fees: [Fee!]
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
