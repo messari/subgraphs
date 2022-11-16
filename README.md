@@ -20,6 +20,7 @@ It is important to familiarize yourself with the project structure and tooling t
 
 - Familiarize yourself with our schemas labeled `schema-{protocol type}.graphql`. Read more details in [`docs/SCHEMA.md`](./docs/SCHEMA.md)
 - We update our schemas as necessary. You can find out about each upgrade in [`docs/CHANGES.md`](./docs/CHANGES.md)
+- To learn about Messari standard methodologies see [`docs/METHODOLOGY.md`](./docs/METHODOLOGY.md)
 
 ## Becoming a Subgraph Developer
 
@@ -29,7 +30,6 @@ Becoming a good subgraph developer will take patience and practice. The followin
 - Resources for development of varying levels can be found in [`docs/RESOURCES.md`](./docs/RESOURCES.md).
 - To learn about common errors, best error handling practices, and debugging see [`docs/ERRORS.md`](./docs/ERRORS.md)
 - Subgraph performance is also a concern. Learn about indexing / querying performance by reading [`docs/PERFORMANCE`](./docs/PERFORMANCE.md)
-- To learn about Messari standard methodologies see [`docs/METHODOLOGY.md`](./docs/METHODOLOGY.md)
 - Learn about pricing and how to handle this in [`docs/ORACLES.md`](./docs/ORACLES.md)
 
 ## Contributing Guidelines

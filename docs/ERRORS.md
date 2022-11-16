@@ -25,6 +25,8 @@ Fatal errors will be apparent, if you see an error message in [Protocol Metrics]
 
 Data errors will be less obvious and more nuanced. It is possible that there is an error, but we decide not to fix it. For example, in Compound V2 we chose to not fix the ETH price when a proposal they passed broke it. This was what actually happened on chain.
 
+> If you find this it should be added to the methodology `README.md` document in a protocol directory. We aim to be as transparent as possible!
+
 To find these errors, you may notice it by browsing [Protocol Metrics](https://messari.io/protocol-explorer/all-protocols). But it is more likely you will be notified on the Discord [monitor bot](../monitor/README.md).
 
 ### How to Setup the Monitor

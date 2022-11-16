@@ -28,6 +28,12 @@ cd subgraphs
 npm install
 ```
 
+`npm install` will install `husky` in order to run some pre-commit hooks behind the scenes (mainly to format with `prettier`). If you want to disable this for some reason you can run:
+
+```bash
+npm uninstall husky && git config --unset core.hooksPath
+```
+
 ## What is next?
 
 From here you should be set to build, run, and deploy Messari subgraphs as outlined in [WALKTHROUGH.md](./WALKTHROUGH.md). Next you should familiarize yourself with the project [structure](./STRUCTURE.md) and [tooling](./TOOLING.md). 🚀
