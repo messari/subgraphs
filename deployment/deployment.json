@@ -5508,7 +5508,7 @@
           }
         },
         "files": {
-          "template": "rocketpool.template.yaml"
+          "template": "rocket-pool.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
