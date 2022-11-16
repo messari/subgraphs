@@ -1,0 +1,16 @@
+// Related to Node RPL Stake Transactions.
+export let NODERPLSTAKETRANSACTIONTYPE_STAKED = "Staked";
+export let NODERPLSTAKETRANSACTIONTYPE_WITHDRAWAL = "Withdrawal";
+export let NODERPLSTAKETRANSACTIONTYPE_SLASHED = "Slashed";
+
+// Related to RPL Rewards Claims.
+export let RPLREWARDCLAIMERTYPE_PDAO = "PDAO";
+export let RPLREWARDCLAIMERTYPE_ODAO = "ODAO";
+export let RPLREWARDCLAIMERTYPE_NODE = "Node";
+
+// Related to Minipool Status.
+export let MINIPOOLSTATUS_INITIALIZED = 0;
+export let MINIPOOLSTATUS_PRELAUNCH = 1;
+export let MINIPOOLSTATUS_STAKING = 2;
+export let MINIPOOLSTATUS_WITHDRAWABLE = 3;
+export let MINIPOOLSTATUS_DISSOLVED = 4;
