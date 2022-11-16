@@ -1,6 +1,6 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Account, Asset } from "../../generated/schema";
-import { BIGINT_ZERO, PROTOCOL_ID } from "../common/constants";
+import { BIGINT_ZERO } from "../common/constants";
 
 export function getOrCreateAsset(
   accountId: string,

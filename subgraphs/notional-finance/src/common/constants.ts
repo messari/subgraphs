@@ -131,8 +131,7 @@ export const BIGINT_MAX = BigInt.fromString(
 export const INT_NEGATIVE_ONE = -1 as i32;
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
-export const INT_TWO = 2 as i32;
-export const INT_FOUR = 4 as i32;
+export const INT_HUNDRED = 100 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
@@ -190,9 +189,5 @@ export const NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE = BigDecimal.fromString("0.80");
 export const NOTIONAL_PROTOCOL_SIDE_REVENUE_SHARE = BIGDECIMAL_ZERO;
 
 export const RATE_PRECISION = 1000000000;
+export const RATE_PRECISION_DECIMALS: i32 = 9;
 export const BASIS_POINTS = 100000;
-export const DAY = 86400;
-export const WEEK = DAY * 6;
-export const MONTH = DAY * 30;
-export const QUARTER = DAY * 90;
-export const YEAR = QUARTER * 4;

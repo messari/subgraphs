@@ -538,24 +538,15 @@ type Market @entity {
   " Can you borrow from this market "
   canBorrowFrom: Boolean!
 
-  # TODO: Should be an array, needs to be calculated for every collateralCurrency accepted
   " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
   maximumLTV: BigDecimal!
 
-  # TODO: maximumLTV == liquidationThreshold
   " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
   liquidationThreshold: BigDecimal!
 
-  # TODO: Dependent on exchangeRate, Should this be represented as liquidation discount x exchangeRate %?
-  # Will this be different depending on the collateral used for liquidation?
-  # Get liquidationDiscount from getCurrencyAndRates(currencyId).getEtheRate().liquidationDiscount => How should this be calculated per currency-collateral combination?
-  # https://docs.notional.finance/developer-documentation/how-to/liquidations a discount applied to the exchange rate between collateral an local currencies as an incentive to the liquidator.
-  # https://docs.notional.finance/governance/overview-of-governance-parameters/selected-parameters#deposit-shares
-  # https://docs.notional.finance/governance/overview-of-governance-parameters/selected-parameters#exchange-rate-liquidation-discounts exchange rate liquidation discount
   " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
   liquidationPenalty: BigDecimal!
 
-  # TODO: Should this be cToken only or all tokens supported as collateral? Simplify it to be cToken
   " Token that need to be deposited to take a position in protocol "
   inputToken: Token!
 
@@ -568,10 +559,6 @@ type Market @entity {
 
   ##### Quantitative Data #####
 
-  # TODO: annualized interest rates from exchange rates
-  # https://docs.notional.finance/developer-documentation/how-to/lend-and-borrow-fcash#interest-rate-from-exchange-rate
-  # https://github.com/notional-finance/sdk-v2/blob/master/src/system/Market.ts#L189-L197
-  # getMarket(currencyId, maturity, settlementDate).value.impliedRate
   " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
   rates: [InterestRate!]!
 
@@ -616,7 +603,6 @@ type Market @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
-  # TODO: exchangeRate
   " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
   exchangeRate: BigDecimal
 
@@ -768,7 +754,6 @@ type MarketDailySnapshot @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
-  # TODO: exchangeRate
   " Amount of input token per full share of output token. Only applies when the output token exists "
   exchangeRate: BigDecimal
 
@@ -865,7 +850,6 @@ type MarketHourlySnapshot @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
-  # TODO: exchangeRate
   " Amount of input token per full share of output token. Only applies when the output token exists "
   exchangeRate: BigDecimal
 
@@ -1245,7 +1229,6 @@ type Liquidate @entity {
   " The user position changed by this event "
   position: Position
 
-  # TODO: should this support all possible assets or just cTokens?
   " Asset repaid (borrowed) "
   asset: Token
 

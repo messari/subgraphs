@@ -6,7 +6,6 @@ import {
   cETH_ADDRESS,
   cUSDC_ADDRESS,
   cWBTC_ADDRESS,
-  QUARTER,
 } from "./constants";
 
 export function getTokenFromCurrency(
@@ -33,8 +32,4 @@ export function getTokenFromCurrency(
   );
 
   return token;
-}
-
-export function getTimeRef(timestamp: i32): i32 {
-  return timestamp - (timestamp % QUARTER);
 }

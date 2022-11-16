@@ -1,4 +1,4 @@
-import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { Notional } from "../../generated/Notional/Notional";
 import {
   Market,
@@ -13,21 +13,11 @@ import {
   PROTOCOL_ID,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
-  ZERO_ADDRESS,
 } from "../common/constants";
 import { getTokenFromCurrency } from "../common/util";
 import { bigIntToBigDecimal } from "../common/numbers";
-import { getOrCreateInterestRate } from "./InterestRate";
 import { getOrCreateLendingProtocol } from "./protocol";
-import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
-
-// TODO: create all tokens necessary
-// - cTokens (cETH, cDAI, cUSDC, cWBTC)
-// - fCash (fMaturityDateETH, fMaturityDateDAI, fMaturityDateUSDC, fMaturityDateWBTC)
-
-// TODO: get currencies
-// - either get them as constants
-// - or, get them https://github.com/notional-finance/subgraph-v2/blob/d851d9b18e55eb0698337314c6f176058b5b5350/src/notional.ts#L84
+import { getOrCreateInterestRate } from "./InterestRate";
 
 export function getOrCreateMarket(
   event: ethereum.Event,
@@ -79,7 +69,9 @@ export function getOrCreateMarket(
     market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.outputTokenSupply = BIGINT_ZERO; // Not fixed supply.
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO; // There is no price.
-    market.rates = [];
+
+    const interestRate = getOrCreateInterestRate(market.id);
+    market.rates = [interestRate.id];
     market.exchangeRate = BIGDECIMAL_ZERO;
 
     // revenue

@@ -523,6 +523,7 @@ export function createLiquidate(
 
   const token = getTokenFromCurrency(event, currencyId);
 
+  liquidate.asset = token.id;
   liquidate.amount = bigIntToBigDecimal(cTokenAmount, token.decimals);
   liquidate.amountUSD = liquidate.amount.times(token.lastPriceUSD!);
   liquidate.profitUSD = BIGDECIMAL_ZERO;

@@ -11,15 +11,14 @@ import {
   LiquidateCollateralCurrency,
   LiquidatefCashEvent,
   LiquidateLocalCurrency,
-  Notional__getActiveMarketsResultValue0Struct,
 } from "../../generated/Notional/Notional";
 import {
-  BIGDECIMAL_ONE,
+  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
-  BIGINT_ONE,
   BIGINT_ZERO,
-  INT_ZERO,
+  INT_HUNDRED,
   PROTOCOL_ID,
+  RATE_PRECISION_DECIMALS,
   SECONDS_PER_YEAR,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
@@ -39,39 +38,51 @@ import {
 } from "../getters/accountAssets";
 import { getTokenFromCurrency } from "../common/util";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
+import { getOrCreateInterestRate } from "../getters/InterestRate";
 
 export function handleLendBorrowTrade(event: LendBorrowTrade): void {
-  // TODO: why is nonce null? reading nonce value results in subgraph error
-  // log.error(" -- Before Nonce", []);
-  // let nonce = event.transaction.nonce;
-  // log.error(" -- After Nonce", [nonce.toString()]);
-
+  // params
   const currencyId = event.params.currencyId;
   const maturity = event.params.maturity;
   const marketId = currencyId.toString() + "-" + maturity.toString();
 
+  // entities
   const market = getOrCreateMarket(event, marketId);
   const account = getOrCreateAccount(event.params.account.toHexString(), event);
   const token = getTokenFromCurrency(event, currencyId.toString());
 
-  // update market
+  // protocol contract
+  const notional = Notional.bind(Address.fromString(PROTOCOL_ID));
+
+  // update input token price
   market.inputTokenPriceUSD = token.lastPriceUSD!;
-  //
-  // TODO: market.rates cannot be fetched without settlement date
-  // let interestRate = getOrCreateInterestRate(market.id);
-  // let settlement = event.params.settlementDate;    // not available
-  // Get 'impliedRate' from 'getMarket(currencyId, maturity, settlementDate);
-  // interestRate.rate = impliedRate;
-  // market.rates = [interestRate];
-  //
-  // TODO: market exchange rate, talking to notional on how to find this
-  // market.exchangeRate
-  //
+
+  // update liquidation params
+  const rateStorageCall = notional.try_getRateStorage(currencyId);
+  if (rateStorageCall.reverted) {
+    log.error(
+      "[handleLendBorrowTrade] getRateStorage for currencyId {} reverted",
+      [currencyId.toString()]
+    );
+  } else {
+    // TODO: fix truncating
+    market.maximumLTV = BigDecimal.fromString(
+      (rateStorageCall.value.getEthRate().haircut / INT_HUNDRED).toString()
+    );
+    // TODO: fix truncating
+    market.liquidationThreshold = BigDecimal.fromString(
+      (rateStorageCall.value.getEthRate().rateBuffer / INT_HUNDRED).toString()
+    );
+    market.liquidationPenalty = BigDecimal.fromString(
+      (
+        rateStorageCall.value.getEthRate().liquidationDiscount - INT_HUNDRED
+      ).toString()
+    );
+  }
+
   market.save();
 
   // marketstatus entity
-  // TODO: we could make this protocol entity
-  // TODO: do this getOrCreateMarket?
   const markets = getMarketsWithStatus(event);
   if (markets.activeMarkets.indexOf(market.id) < 0) {
     markets.activeMarkets = addToArrayAtIndex(
@@ -84,20 +95,58 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
 
   // getActiveMarkets
   const currencyIds = [1, 2, 3, 4];
-  const notional = Notional.bind(Address.fromString(PROTOCOL_ID));
+  // const notional = Notional.bind(Address.fromString(PROTOCOL_ID));
   let activeMarkets: string[] = [];
   for (let i = 0; i < currencyIds.length; i++) {
     const call = notional.try_getActiveMarkets(currencyIds[i]);
     if (call.reverted) {
       log.error(
         "[handleLendBorrowTrade] getActiveMarkets for currencyId {} reverted",
-        [currencyId.toString()]
+        [currencyIds[i].toString()]
       );
     } else {
       for (let j = 0; j < call.value.length; j++) {
+        const maturity = call.value[j].maturity;
+        const impliedRate = call.value[j].lastImpliedRate;
         const currencyMarket =
-          currencyIds[i].toString() + "-" + call.value[j].maturity.toString();
+          currencyIds[i].toString() + "-" + maturity.toString();
+
+        // set active markets for currency
         activeMarkets = activeMarkets.concat([currencyMarket]);
+
+        if (currencyMarket == market.id) {
+          const m = getOrCreateMarket(event, currencyMarket);
+
+          // set interest rate for market in event
+          const interestRate = getOrCreateInterestRate(currencyMarket);
+          const r = bigIntToBigDecimal(impliedRate, RATE_PRECISION_DECIMALS);
+          interestRate.rate = r.times(BIGDECIMAL_HUNDRED);
+          interestRate.save();
+          m.rates = [interestRate.id];
+
+          // set exchange rate for market in event
+          const timeToMaturity = bigIntToBigDecimal(
+            maturity.minus(event.block.timestamp),
+            0
+          );
+
+          // TODO: fix precision/decimals and remove two variables
+          // set exchange rate when timeMaturity > 0
+          if (timeToMaturity > BIGDECIMAL_ZERO) {
+            const er0 = Math.exp(
+              parseFloat(
+                r.times(timeToMaturity).div(SECONDS_PER_YEAR).toString()
+              )
+            );
+            const er = BigDecimal.fromString(er0.toString()).times(
+              BIGDECIMAL_HUNDRED
+            );
+            m.exchangeRate = er;
+          }
+
+          // save
+          m.save();
+        }
       }
     }
   }
@@ -197,46 +246,8 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
     absfCashAmount = fCashAmount.neg();
   }
 
-  // TODO: Need to deal with int and float formats for getting the rate
-  // let RATE_PRECISION: BigDecimal = BIGDECIMAL_ONE;
-  // let SECONDS_IN_YEAR: BigInt = BigInt.fromI32(60 * 60 * 24 * 365);
-  // let exchangeRate: BigDecimal = BIGDECIMAL_ZERO;
-  // exchangeRate = bigIntToBigDecimal(absfCashAmount.div(absAmount));
-
-  // let exchangeRateWithRatePrecision: BigDecimal = BIGDECIMAL_ZERO;
-  // exchangeRateWithRatePrecision = bigIntToBigDecimal(
-  //   bigIntToBigDecimal(absfCashAmount)
-  //     .times(RATE_PRECISION)
-  //     .div(absAmount)
-  // );
-
-  // let annualizedRate: BigDecimal = BIGDECIMAL_ZERO;
-  // let annualizedRateWithRatePrecision: BigInt = BIGINT_ZERO;
-  // let timeToMaturity: BigInt = maturity.minus(event.block.timestamp);
-  // annualizedRateWithRatePrecision = RATE_PRECISION;
-  // let whatever: BigInt = Math.log(
-  //   exchangeRateWithRatePrecision.div(RATE_PRECISION)
-  // )
-  //   .times(SECONDS_IN_YEAR)
-  //   .div(timeToMaturity)
-  //   .times(RATE_PRECISION);
-
-  // log.error(
-  //   " ---> currencyId: {}, absfCash: {}, absAssetCash: {}, exchangeRate: {}, exchangeRateWithRatePrecision: {}",
-  //   [
-  //     currencyId.toString(),
-  //     absfCashAmount.toString(),
-  //     absAmount.toString(),
-  //     exchangeRate.toString(),
-  //     exchangeRateWithRatePrecision.toString(),
-  //     // annualizedRate.toString(),
-  //     // annualizedRateWithRatePrecision.toString(),
-  //   ]
-  // );
-
   // identify transaction type
   // transactions of different user intention may call the same action type in notional smart contract design
-  // TODO: is there a way to identify if a transaction type is also liquidation event?
   if (
     fCashBeforeTransaction <= BIGINT_ZERO &&
     fCashAfterTransaction < fCashBeforeTransaction
@@ -288,6 +299,9 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   }
 }
 
+// TODO: factor liquidation discount in profit?
+// TODO:
+
 export function handleLiquidateLocalCurrency(
   event: LiquidateLocalCurrency
 ): void {
@@ -295,6 +309,15 @@ export function handleLiquidateLocalCurrency(
   const liquidatee = event.params.liquidated;
   const liquidator = event.params.liquidator;
   const amount = event.params.netLocalFromLiquidator;
+
+  log.error(
+    "*************** [handleLiquidateLocalCurrency] tx: {}, localCurrencyId: {}",
+    [
+      event.transaction.hash.toHexString(),
+      event.params.localCurrencyId.toString(),
+    ]
+  );
+
   // TODO: not possible to calculate
   // let profit
 
@@ -312,6 +335,20 @@ export function handleLiquidateCollateralCurrency(
   const liquidatee = event.params.liquidated;
   const liquidator = event.params.liquidator;
   const amount = event.params.netLocalFromLiquidator;
+  // const collateralAmount = event.params.netCollateralTransfer || event.params.netNTokenTransfer;
+
+  log.error(
+    "%%%%%%%%%%%%%%% [handleLiquidateCollateralCurrency] tx:{}, localCurrencyId: {}, collateralCurrencyId: {}, netLocalFromLiquidator: {}, netCollateralTransfer: {}, netNTokenTransfer: {}",
+    [
+      event.transaction.hash.toHexString(),
+      event.params.localCurrencyId.toString(),
+      event.params.collateralCurrencyId.toString(),
+      event.params.netLocalFromLiquidator.toString(),
+      event.params.netCollateralTransfer.toString(),
+      event.params.netNTokenTransfer.toString(),
+    ]
+  );
+
   // TODO: not possible to calculate
   // let profit
 
@@ -327,6 +364,21 @@ export function handleLiquidatefCash(event: LiquidatefCashEvent): void {
   const liquidatee = event.params.liquidated;
   const liquidator = event.params.liquidator;
   const amount = event.params.netLocalFromLiquidator;
+
+  // asset?
+  // event.params.fCashCurrency
+  // event.params.localCurrencyId
+  log.error(
+    "$$$$$$$$$$$$$$$$$$$$ [handleLiquidatefCash] tx: {}, localCurrencyId: {}, fCashCurrencyId: {}, netLocalFromLiquidator: {}, fCashNotionalTransfer: {}",
+    [
+      event.transaction.hash.toHexString(),
+      event.params.localCurrencyId.toString(),
+      event.params.fCashCurrency.toString(),
+      event.params.netLocalFromLiquidator.toString(),
+      event.params.fCashNotionalTransfer.toString(),
+    ]
+  );
+
   // TODO: not possible to calculate
   // let profit
 
