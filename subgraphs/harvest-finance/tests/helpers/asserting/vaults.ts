@@ -69,6 +69,10 @@ export function symbol(id: string, value: string): void {
   assertString(id, 'symbol', value)
 }
 
+export function outputTokenPriceUSD(id: string, value: BigDecimal): void {
+  assertBigDecimal(id, 'outputTokenPriceUSD', value)
+}
+
 class AssertVaultAttributes {
   name: string
   symbol: string

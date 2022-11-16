@@ -16,6 +16,7 @@ import { tokens } from '../src/utils/tokens'
 import { constants } from '../src/utils/constants'
 import { protocols } from '../src/utils/protocols'
 import { helpers } from './helpers'
+import { decimals } from '../src/utils'
 
 const vaultAddress = Address.fromString(
   '0x0000000000000000000000000000000000000001'
@@ -27,11 +28,11 @@ const inputTokenAddress = Address.fromString(
 
 const protocolAddressString = '0x222412af183bceadefd72e4cb1b71f1889953b1c'
 
-export function createVault(): Vault {
-  const outputTokenAddress = Address.fromString(
-    '0x0000000000000000000000000000000000000003'
-  )
+const outputTokenAddress = Address.fromString(
+  '0x0000000000000000000000000000000000000003'
+)
 
+export function createVault(): Vault {
   const vault = vaults.initialize(vaultAddress.toHexString())
   const protocol = protocols.initialize(protocolAddressString)
   protocol.totalPoolCount = protocol.totalPoolCount + 1
@@ -138,7 +139,7 @@ describe('Vault', () => {
       })
     })
 
-    test('updates Token.lastPriceUSD and Vault.totalValueLockedUSD ', () => {
+    test('updates Token.lastPriceUSD and Vault.totalValueLockedUSD', () => {
       const vault = createVault()
 
       const beneficiaryAddress = Address.fromString(
@@ -420,8 +421,14 @@ describe('Vault', () => {
 
   describe('handleTransfer', () => {
     describe('when transfer comes from zero address (minting)', () => {
-      test('increments outputTokenSupply', () => {
+      test('increments outputTokenSupply and updates outputTokenPriceUSD', () => {
+        const outputToken = tokens.initialize(outputTokenAddress.toHexString())
+        outputToken.decimals = 6
+        outputToken.save()
+
         const vault = createVault()
+        vault.totalValueLockedUSD = BigDecimal.fromString('1000')
+        vault.save()
 
         const zeroAddress = Address.zero()
         const toAddress = Address.fromString(
@@ -441,6 +448,60 @@ describe('Vault', () => {
         handleTransfer(event)
 
         helpers.asserting.vaults.outputTokenSupply(vault.id, amount)
+
+        const newOutputTokenPriceUSD = vault.totalValueLockedUSD.div(
+          decimals.fromBigInt(amount, outputToken.decimals as u8)
+        )
+
+        helpers.asserting.vaults.outputTokenPriceUSD(
+          vault.id,
+          newOutputTokenPriceUSD
+        )
+      })
+    })
+
+    describe('when transfer goes to zero address (burning)', () => {
+      test('decrements outputTokenSupply and updates outputTokenPriceUSD', () => {
+        const outputTokenSupply = BigInt.fromString('300000000') // 300
+        const totalValueLockedUSD = BigDecimal.fromString('1000')
+
+        const outputToken = tokens.initialize(outputTokenAddress.toHexString())
+        outputToken.decimals = 6
+        outputToken.save()
+
+        const vault = createVault()
+        vault.outputTokenSupply = outputTokenSupply
+        vault.totalValueLockedUSD = totalValueLockedUSD
+        vault.save()
+
+        const from = Address.fromString(
+          '0x0000000000000000000000000000000000000001'
+        )
+        const to = Address.zero()
+
+        const amount = BigInt.fromString('200000000') // 200
+
+        const event = helpers.createTransferEvent(from, to, amount)
+
+        event.address = vaultAddress
+
+        handleTransfer(event)
+
+        const newOutputTokenSupply = outputTokenSupply.minus(amount)
+
+        helpers.asserting.vaults.outputTokenSupply(
+          vault.id,
+          newOutputTokenSupply
+        )
+
+        const newOutputTokenPriceUSD = vault.totalValueLockedUSD.div(
+          decimals.fromBigInt(newOutputTokenSupply, outputToken.decimals as u8)
+        )
+
+        helpers.asserting.vaults.outputTokenPriceUSD(
+          vault.id,
+          newOutputTokenPriceUSD
+        )
       })
     })
   })

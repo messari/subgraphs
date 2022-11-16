@@ -132,8 +132,6 @@ export function handleDeposit(event: DepositEvent): void {
 }
 
 function handleMint(event: TransferEvent): void {
-  // const from = event.params.from;
-  // const to = event.params.to;
   const amount = event.params.value
   const vaultAddress = event.address
 
@@ -147,6 +145,39 @@ function handleMint(event: TransferEvent): void {
 
   vault.outputTokenSupply = vault.outputTokenSupply!.plus(amount)
 
+  const outputToken = Token.load(vault.outputToken!)
+
+  vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
+    decimals.fromBigInt(vault.outputTokenSupply!, outputToken!.decimals as u8)
+  )
+
+  vault.save()
+
+  metrics.updateFinancials(event.block)
+  metrics.updateUsageMetrics(event.block, event.transaction.from)
+  metrics.updateVaultSnapshots(vaultAddress, event.block)
+}
+
+function handleBurn(event: TransferEvent): void {
+  const amount = event.params.value
+  const vaultAddress = event.address
+
+  const vault = Vault.load(vaultAddress.toHexString())
+
+  if (!vault) return
+
+  if (!vault.outputTokenSupply) {
+    vault.outputTokenSupply = BigInt.fromI32(0)
+  }
+
+  vault.outputTokenSupply = vault.outputTokenSupply!.minus(amount)
+
+  const outputToken = Token.load(vault.outputToken!)
+
+  vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
+    decimals.fromBigInt(vault.outputTokenSupply!, outputToken!.decimals as u8)
+  )
+
   vault.save()
 
   metrics.updateFinancials(event.block)
@@ -156,9 +187,14 @@ function handleMint(event: TransferEvent): void {
 
 export function handleTransfer(event: TransferEvent): void {
   const from = event.params.from
+  const to = event.params.to
 
   if (from == Address.zero()) {
     handleMint(event)
     return
+  }
+
+  if (to == Address.zero()) {
+    handleBurn(event)
   }
 }
