@@ -227,35 +227,6 @@ export function getOrCreateCircularBuffer(): _CircularBuffer {
 
 function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
-
-  const network = dataSource.network();
-  if (network == Network.MAINNET.toLowerCase()) {
-    return BigDecimal.fromString("13.39");
-  } else if (network == Network.ARBITRUM_ONE.toLowerCase()) {
-    return BigDecimal.fromString("15");
-  } else if (network == Network.AURORA.toLowerCase()) {
-    return BigDecimal.fromString("1.03");
-  } else if (network == Network.BSC.toLowerCase()) {
-    return BigDecimal.fromString("5");
-  } else if (network == Network.CELO.toLowerCase()) {
-    return BigDecimal.fromString("5");
-  } else if (network == Network.FANTOM.toLowerCase()) {
-    return BigDecimal.fromString("1");
-  } else if (network == Network.OPTIMISM.toLowerCase()) {
-    return BigDecimal.fromString("12.5");
-  } else if (network == Network.MATIC.toLowerCase()) {
-    return BigDecimal.fromString("2");
-  } else if (network == Network.XDAI.toLowerCase()) {
-    return BigDecimal.fromString("5");
-  }
-  // Blocks are mined as needed
-  // else if (network == Network.AVALANCHE) return BigDecimal.fromString("2.5")
-  // else if (dataSource.network() == "cronos") return BigDecimal.fromString("13.39")
-  // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")
-  // else if (dataSource.network() == Network.MOONBEAM) return BigDecimal.fromString("13.39")
-  // else if (dataSource.network() == Network.MOONRIVER) return BigDecimal.fromString("13.39")
-  else {
-    log.warning("getStartingBlockRate(): Network not found", []);
-    return BIGDECIMAL_ZERO;
-  }
+  // hardcoding the aurora rate
+  return BigDecimal.fromString("1.03");
 }
