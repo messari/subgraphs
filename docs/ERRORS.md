@@ -45,13 +45,16 @@ In order to get notified of production errors (without the noise) follow these s
 
 You will need to use your subgraph debugging skills, but here are some tips to help!
 
-- Follow any advice in our [debugging docs](https://github.com/messari/subgraphs/blob/master/docs/Mapping.md#debugging).
+- Read the rest of this document for more error details.
 - Focus on only solving the issue causing the error.
   - If you find other things (nice job), those can be solved in a separate PR after the error is fixed.
 - Log in as many spots as possible to narrow down the issue (generally it will be isolated since the subgraph is QA'd)
 - If it is taking more than 2-3 hours of debugging time, it is safe to skip that block (if that fixes it).
   - Use your judgement when it comes to this. And if you do this, please make sure you go back after the fact to continue to try and diagnose the issue.
+- The graph's [docs](https://thegraph.com/docs/en/) also have a lot of information and are easily searchable
 - Ask questions in our Discord or [The Graph's Discord](https://discord.gg/jxMUPqbAzr)
+
+> Logs only seem to stay for ~1 hour before being cleared. If you need to keep persistent logs see our logging dashboard [tool](./TOOLING.md#logging-dashboard)
 
 ### Grafting
 
