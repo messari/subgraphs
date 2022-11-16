@@ -2,6 +2,11 @@ import { Address, BigInt, log } from '@graphprotocol/graph-ts'
 import { VaultContract } from '../../generated/Controller/VaultContract'
 import { Vault } from '../../generated/schema'
 import { constants } from '../utils/constants'
+import { tokens } from './tokens'
+import { prices } from './prices'
+import { protocols } from './protocols'
+import { fees } from './fees'
+import { Vault as VaultTemplate } from '../../generated/templates'
 
 export namespace vaults {
   class VaultData {
@@ -98,5 +103,86 @@ export namespace vaults {
     vault.cumulativeTotalRevenueUSD = constants.BIG_DECIMAL_ZERO
 
     return vault
+  }
+
+  export function createVault(
+    vaultAddress: Address,
+    timestamp: BigInt,
+    blockNumber: BigInt
+  ): void {
+    let vault = Vault.load(vaultAddress.toHexString())
+
+    if (vault) return
+
+    const vaultData = vaults.getData(vaultAddress)
+
+    if (vaultData == null) {
+      log.debug('VaultCall Reverted block: {}, address: {}', [
+        blockNumber.toString(),
+        vaultAddress.toHexString(),
+      ])
+      return
+    }
+
+    const underlying = vaultData.underlying
+
+    const erc20Values = tokens.getData(underlying)
+
+    if (erc20Values == null) {
+      log.debug('Erc20Call Reverted block: {}, address: {}', [
+        blockNumber.toString(),
+        underlying.toHexString(),
+      ])
+      return
+    }
+
+    let inputToken = tokens.findOrInitialize(underlying)
+
+    inputToken.name = erc20Values.name
+    inputToken.symbol = erc20Values.symbol
+    inputToken.decimals = erc20Values.decimals
+    inputToken.lastPriceUSD = prices.getPricePerToken(underlying)
+    inputToken.lastPriceBlockNumber = blockNumber
+
+    inputToken.save()
+
+    let outputToken = tokens.findOrInitialize(vaultAddress)
+
+    outputToken.name = vaultData.name
+    outputToken.symbol = vaultData.symbol
+    outputToken.decimals = vaultData.decimals
+
+    outputToken.save()
+
+    vault = vaults.initialize(vaultAddress.toHexString())
+
+    vault.name = vaultData.name
+    vault.symbol = vaultData.symbol
+    vault.inputToken = underlying.toHexString()
+    vault.outputToken = vaultAddress.toHexString()
+    vault.createdTimestamp = timestamp
+    vault.createdBlockNumber = blockNumber
+
+    //TODO: Parameterize this for multiple networks
+    //ETH Mainnet performance fee is 30%
+    const vaultFee = fees.getOrCreateVaultFee(
+      vaultAddress.toHexString(),
+      constants.FEE_TYPE_PERFORMANCE,
+      BigInt.fromI32(30)
+    )
+
+    vault.fees = [vaultFee.id]
+
+    const protocol = protocols.findOrInitialize(constants.CONTROLLER_ADDRESS)
+
+    protocol.totalPoolCount = protocol.totalPoolCount + 1
+
+    protocol.save()
+
+    vault.protocol = protocol.id
+
+    vault.save()
+
+    VaultTemplate.create(vaultAddress)
   }
 }

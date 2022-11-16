@@ -6,6 +6,8 @@ import * as noMintRewardPool from './noMintRewardPool'
 import * as notifyHelper from './notifyHelper'
 import * as chainLink from './chainLink'
 import * as yearnLens from './yearnLens'
+import * as potPool from './potPool'
+import * as megaFactory from './megaFactory'
 
 export {
   vault,
@@ -16,4 +18,6 @@ export {
   notifyHelper,
   chainLink,
   yearnLens,
+  potPool,
+  megaFactory,
 }

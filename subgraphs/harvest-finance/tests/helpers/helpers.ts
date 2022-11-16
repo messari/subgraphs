@@ -7,6 +7,7 @@ import {
   Deposit as DepositEvent,
   Transfer as TransferEvent,
 } from '../../generated/Controller/VaultContract'
+import { DeploymentCompleted as DeploymentCompletedEvent } from '../../generated/MegaFactory/MegaFactory'
 import * as mocking from './mocking'
 import * as asserting from './asserting'
 
@@ -137,6 +138,29 @@ export function createTransferEvent(
     new ethereum.EventParam('from', ethereum.Value.fromAddress(from)),
     new ethereum.EventParam('to', ethereum.Value.fromAddress(to)),
     new ethereum.EventParam('value', ethereum.Value.fromUnsignedBigInt(amount)),
+  ]
+
+  return event
+}
+
+export function createDeploymentCompletedEvent(
+  id: string
+): DeploymentCompletedEvent {
+  let mockEvent = newMockEvent()
+
+  let event = new DeploymentCompletedEvent(
+    mockEvent.address,
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    mockEvent.block,
+    mockEvent.transaction,
+    mockEvent.parameters,
+    null
+  )
+
+  event.parameters = [
+    new ethereum.EventParam('id', ethereum.Value.fromString(id)),
   ]
 
   return event

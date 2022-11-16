@@ -7,7 +7,7 @@ import { log } from '@graphprotocol/graph-ts'
 import { Vault } from '../../generated/schema'
 
 export namespace rewardTokens {
-  function getOrCreateRewardToken(address: Address): RewardToken {
+  export function getOrCreateRewardToken(address: Address): RewardToken {
     let rewardToken = RewardToken.load(address.toHexString())
 
     if (!rewardToken) {

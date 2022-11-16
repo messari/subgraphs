@@ -43,6 +43,10 @@ export namespace constants {
     '0xa0246c9032bc3a600820415ae600c6388619a14d'
   )
 
+  export const MEGAFACTORY_CONTRACT_ADDRESS = Address.fromString(
+    '0xe1ec9151eb8d9a3451b8f623ce8b62632a6d4f4d'
+  )
+
   export const REWARD_TOKEN_TYPE_DEPOSIT = 'DEPOSIT'
   export const REWARD_TOKEN_TYPE_BORROW = 'BORROW'
 
