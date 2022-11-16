@@ -228,24 +228,24 @@ export function getOrCreateCircularBuffer(): _CircularBuffer {
 function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
-  const network = dataSource.network().toUpperCase();
-  if (network == Network.MAINNET) {
+  const network = dataSource.network();
+  if (network == Network.MAINNET.toLowerCase()) {
     return BigDecimal.fromString("13.39");
-  } else if (network == Network.ARBITRUM_ONE) {
+  } else if (network == Network.ARBITRUM_ONE.toLowerCase()) {
     return BigDecimal.fromString("15");
-  } else if (network == Network.AURORA) {
+  } else if (network == Network.AURORA.toLowerCase()) {
     return BigDecimal.fromString("1.03");
-  } else if (network == Network.BSC) {
+  } else if (network == Network.BSC.toLowerCase()) {
     return BigDecimal.fromString("5");
-  } else if (network == Network.CELO) {
+  } else if (network == Network.CELO.toLowerCase()) {
     return BigDecimal.fromString("5");
-  } else if (network == Network.FANTOM) {
+  } else if (network == Network.FANTOM.toLowerCase()) {
     return BigDecimal.fromString("1");
-  } else if (network == Network.OPTIMISM) {
+  } else if (network == Network.OPTIMISM.toLowerCase()) {
     return BigDecimal.fromString("12.5");
-  } else if (network == Network.MATIC) {
+  } else if (network == Network.MATIC.toLowerCase()) {
     return BigDecimal.fromString("2");
-  } else if (network == Network.XDAI) {
+  } else if (network == Network.XDAI.toLowerCase()) {
     return BigDecimal.fromString("5");
   }
   // Blocks are mined as needed
