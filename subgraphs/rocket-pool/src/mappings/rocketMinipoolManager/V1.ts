@@ -175,7 +175,7 @@ export function handleIncrementNodeFinalisedMinipoolCount(
  */
 function getNewMinipoolFee(): BigInt {
   // Get the network fees contract instance.
-  let networkFeesContract = rocketNetworkFees.bind(
+  const networkFeesContract = rocketNetworkFees.bind(
     Address.fromString(ROCKET_NETWORK_FEES_CONTRACT_ADDRESS)
   );
   if (networkFeesContract === null) return BigInt.fromI32(0);
