@@ -1,5 +1,25 @@
 # Schema Updates
 
+## Schema Update 3.0.0
+
+Main PR: [#1265](https://github.com/messari/subgraphs/pull/1265)
+
+> Find a detailed description of the motivation and reasoning behind this. Also see the proposal document [here](https://messari.notion.site/Lending-Protocol-Schema-cbc6f46a75044bb5829e29d12f7004d2).
+
+### Lending
+
+- Used immutable entities where possible for performance (see [here](https://medium.com/edge-node-engineering/two-simple-subgraph-performance-improvements-a76c6b3e7eac)).
+- Used `Bytes!` for entity IDs when possible.
+- Designate difference and balances of variable vs stable borrows.
+- Created a more generic type `TokenData` to support the multiple input / output tokens per market.
+- Added more nuance to the market fields.
+- Added native balance daily metrics.
+- Added a new entity to track revenue coming from different sources `RevenueDetails`.
+- Added more nuance and transaction counts to the `LendingProtocol` entity.
+- New transaction entities for `Flashloans` and `Transfers`.
+- Distinguish between `Fees` and `InterestRates`.
+- Added more context to positional data like the `asset` and recording balances in USD at each position snapshot.
+
 ## Schema Update 1.3.0
 
 Main PR: [#310](https://github.com/messari/subgraphs/pull/310)
