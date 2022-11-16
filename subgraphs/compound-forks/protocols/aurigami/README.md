@@ -1,4 +1,4 @@
-# Autigami Subgraph
+# Aurigami Subgraph
 
 ## Calculation Methodology v1.0.0
 
@@ -22,7 +22,7 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
+`(Pool Outstanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
 
 Note: This currently excludes Liquidations
 

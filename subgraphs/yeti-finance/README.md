@@ -1,1 +1,0 @@
-Yeti Finance

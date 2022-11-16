@@ -1,4 +1,4 @@
-# Aave v2 Subgraph
+# Banker Joe Subgraph
 
 ## Calculation Methodology v1.0.0
 
@@ -12,9 +12,9 @@ Sum across all Pools:
 
 Sum across all Pools:
 
-`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate)`
+`(Pool Borrow Amount * Pool Borrow Rate)`
 
-Note: This currently excludes Flash Loans
+Note: This currently excludes Liquidations
 
 ### Protocol-Side Revenue USD
 
@@ -24,13 +24,17 @@ Sum across all Pools:
 
 `(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
 
+Note: This currently excludes Liquidations
+
 ### Supply-Side Revenue USD
 
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Pool Outstanding Borrow Amount * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
+`(Pool Outstanding Borrows * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
+
+Note: This currently excludes Liquidations
 
 ### Total Unique Users
 
@@ -48,12 +52,15 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-To be added
+Amount of reward tokens (BSTN / wNEAR) distributed each day in a given market.
+
+`rewardsPerSecond * 60 * 60 * 24`
 
 ### Protocol Controlled Value
 
-Not applicable to Aave
+Not applicable
 
-### Links
+## Reference and Useful Links
 
-Contracts: https://docs.aave.com/developers/v/2.0/deployed-contracts/amm-market
+Protocol: https://traderjoexyz.com/lending
+Contracts: https://github.com/traderjoe-xyz/joe-lending

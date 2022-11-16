@@ -58,7 +58,7 @@ Amount of reward tokens (BSTN / wNEAR) distributed each day in a given market.
 
 ### Protocol Controlled Value
 
-Not applicable to Compound v2
+Not applicable
 
 ### Outlier Events
 

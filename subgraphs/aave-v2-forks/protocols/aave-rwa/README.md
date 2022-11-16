@@ -57,3 +57,7 @@ Not applicable to Aave
 ## Notes
 
 Aave RWA is an aave v2 fork. This protocol focuses on real world assets (rwa).
+
+## Links
+
+Contracts: https://aave-arc.gitbook.io/docs/deployed-contracts/rwa

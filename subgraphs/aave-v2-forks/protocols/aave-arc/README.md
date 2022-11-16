@@ -57,3 +57,7 @@ Not applicable to Aave
 ## Notes
 
 This aave subgraph is an aave v2 fork, however it is a permissioned protocol.
+
+## Links
+
+Contracts: https://aave-arc.gitbook.io/docs/deployed-contracts/arc

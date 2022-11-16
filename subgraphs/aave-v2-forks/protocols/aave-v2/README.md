@@ -69,6 +69,8 @@ If you find an issue please create a github issue in [messari/subgraphs](https:/
   - This does not affect any of the position data though.
 - There is also a feature in Aave V2 to execute transactions on behalf of another account. We do account for this in the mappings.
 - WMATIC price on the polygon deployment is funky at block `15783457` so we override it.
+- Avalanche oracles return prices offset by 8 decimals for some reason.
+- Unable to change `protocol.id` for multiple deployments on mainnet [see code](./protocols/aave-v2/src/constants.ts)
 
 ## Useful links and references
 

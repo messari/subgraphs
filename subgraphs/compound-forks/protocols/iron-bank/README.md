@@ -1,4 +1,4 @@
-# Aave v2 Subgraph
+# Iron Bank Subgraph
 
 ## Calculation Methodology v1.0.0
 
@@ -12,9 +12,9 @@ Sum across all Pools:
 
 Sum across all Pools:
 
-`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate)`
+`(Pool Borrow Amount * Pool Borrow Rate)`
 
-Note: This currently excludes Flash Loans
+Note: This currently excludes Liquidations
 
 ### Protocol-Side Revenue USD
 
@@ -24,13 +24,17 @@ Sum across all Pools:
 
 `(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
 
+Note: This currently excludes Liquidations
+
 ### Supply-Side Revenue USD
 
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Pool Outstanding Borrow Amount * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
+`(Pool Outstanding Borrows * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
+
+Note: This currently excludes Liquidations
 
 ### Total Unique Users
 
@@ -48,12 +52,14 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-To be added
+NA
 
 ### Protocol Controlled Value
 
-Not applicable to Aave
+NA
 
-### Links
+## Reference and Useful Links
 
-Contracts: https://docs.aave.com/developers/v/2.0/deployed-contracts/amm-market
+Protocol: https://app.ib.xyz/
+Documentation: https://docs.ib.xyz/
+Official Subgraph: https://docs.ib.xyz/developer/the-graph

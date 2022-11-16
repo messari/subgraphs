@@ -1,4 +1,4 @@
-# Rari Capital Fuse v1 Subgraph
+# Rari Capital Fuse V1 Subgraph
 
 ## Calculation Methodology v1.0.0
 
