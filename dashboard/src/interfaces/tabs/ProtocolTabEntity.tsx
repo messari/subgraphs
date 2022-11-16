@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
 import { negativeFieldList } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
 import JSZip from "jszip";
 import DefiLlamaComparsionTab from "../DefiLlamaComparisonTab";
+import { UploadFileCSV } from "../../common/utilComponents/UploadFileCSV";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
@@ -47,6 +48,8 @@ function ProtocolTabEntity({
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
   const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
   const [defiLlamaCompareTVL, setDefiLlamaCompareTVL] = useState<boolean>(false);
+  const [csvJSON, setCsvJSON] = useState<any>(null);
+  const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
 
   useEffect(() => {
     if (downloadAllCharts) {
@@ -358,6 +361,7 @@ function ProtocolTabEntity({
               </Typography>
             </CopyLinkToClipboard>
           </Box>
+          <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} /></Tooltip>
           <div>
             <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
             <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Chart Images</div>
@@ -480,7 +484,7 @@ function ProtocolTabEntity({
             return (
               <>
                 {tvlButton}
-                <ChartContainer baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+                <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
               </>
             );
           })}

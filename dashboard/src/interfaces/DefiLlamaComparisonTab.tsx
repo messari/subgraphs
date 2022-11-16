@@ -244,23 +244,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
         };
       }
 
-      compChart = lineupChartDatapoints({ ...compChart }, 0);
-      compChart.defiLlama
-        .forEach((val: any, i: any) => {
-          const subgraphPoint = compChart.subgraph[i];
-          if (!subgraphPoint) {
-            return;
-          }
-
-          const subgraphTimestamp = subgraphPoint?.date || 0;
-          const llamaDate = toDate(val.date);
-
-          if (Math.abs(subgraphTimestamp - val.date) > 86400) {
-            const dateIndex = compChart.subgraph.findIndex((x: any) => toDate(x.date) === llamaDate || x.date > val.date);
-            compChart.subgraph = [...compChart.subgraph.slice(0, i), ...compChart.subgraph.slice(dateIndex, compChart.subgraph.length)];
-            compChart = lineupChartDatapoints({ ...compChart }, i);
-          }
-        });
+      compChart = lineupChartDatapoints({ ...compChart });
 
       const elementId = `${isMonthly ? "Monthly" : "Daily"} Chart - ${defiLlamaSlug}`;
       chart = (
