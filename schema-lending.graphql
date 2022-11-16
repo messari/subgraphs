@@ -202,6 +202,9 @@ enum FeeType {
 
   " Fees that are taken by the protocol "
   PROTOCOL_FEE
+
+  " Fee to mint an asset. Found mostly in CDPs "
+  MINT_FEE
 }
 
 type Fee @entity {
