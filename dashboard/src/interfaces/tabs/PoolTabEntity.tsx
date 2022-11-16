@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Tooltip, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
@@ -7,6 +7,7 @@ import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipb
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
 import JSZip from "jszip";
+import { UploadFileCSV } from "../../common/utilComponents/UploadFileCSV";
 
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
@@ -81,6 +82,8 @@ function PoolTabEntity({
   const list: { [x: string]: any } = {};
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
   const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
+  const [csvJSON, setCsvJSON] = useState<any>(null);
+  const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
 
   useEffect(() => {
     if (downloadAllCharts) {
@@ -866,7 +869,7 @@ function PoolTabEntity({
         rewardAPRElement = null;
       } else {
         rewardAPRElement = (
-          <ChartContainer baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+          <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
         );
       }
     }
@@ -898,7 +901,7 @@ function PoolTabEntity({
         }
       });
       ratesElement = (
-        <ChartContainer baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+        <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
       );
     }
 
@@ -1096,6 +1099,7 @@ function PoolTabEntity({
             <Typography variant="h4">{entityName}</Typography>
           </CopyLinkToClipboard>
         </Box>
+        <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} /></Tooltip>
         <div>
           <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
           <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Charts</div>
@@ -1267,7 +1271,7 @@ function PoolTabEntity({
             dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
           }
           return (
-            <ChartContainer baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+            <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
           );
         })}
         {ratesElement}
