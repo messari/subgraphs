@@ -33,7 +33,7 @@ export const UploadFileCSV = ({ csvJSON, csvMetaData, setCsvJSON, setCsvMetaData
                     const text = event?.target?.result || "";
                     if (typeof (text) === 'string') {
                         const json = csvToJSONConvertor(text, isEntityLevel);
-                        if (typeof json === "string") {
+                        if (json instanceof Error) {
                             setCsvMetaData({ ...csvMetaData, columnName: "", csvError: json })
                             return;
                         }

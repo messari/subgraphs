@@ -1,7 +1,6 @@
 import { Box, Button, Grid, Tooltip, Typography } from "@mui/material";
 import moment from "moment";
 import { useEffect, useRef, useState } from "react";
-import { Line } from "react-chartjs-2";
 import { lineupChartDatapoints, toDate } from "../../utils";
 import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
 import { CsvOverlayColumnDropDown } from "../utilComponents/CsvOverlayColumnDropDown";
@@ -23,6 +22,8 @@ interface ChartContainerProps {
     csvJSONProp: any;
     csvMetaDataProp: any;
 }
+
+const colorList = ["rgb(53, 162, 235)", "red", "yellow", "lime", "pink", "black", "orange", "green"];
 
 export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, dataChart, dataTable, downloadAllCharts, chartsImageFiles, setChartsImageFiles, csvJSONProp, csvMetaDataProp }: ChartContainerProps) => {
     const chartRef = useRef<any>(null);
@@ -70,11 +71,6 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
         }
     }, [csvJSONProp, csvJSON]);
 
-    useEffect(() => {
-        if (csvJSONProp) {
-            setCsvJSON(null);
-        }
-    }, [csvJSONProp]);
 
     let chart = null;
     let csvColumnOptions = null;
@@ -85,8 +81,15 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
             let labels: string[] = [];
             let csvArr = [];
             let jsonToUse: any = null;
-            if (csvJSONProp) {
-                jsonToUse = csvJSONProp;
+            if (csvJSONProp?.[csvMetaData?.columnName]) {
+                jsonToUse = csvJSONProp[csvMetaData?.columnName].map((x: any, idx: number) => {
+                    if (csvJSONProp?.date[idx]) {
+                        return {
+                            date: csvJSONProp?.date[idx],
+                            value: x
+                        };
+                    }
+                });
             }
             if (csvJSON) {
                 jsonToUse = csvJSON;
@@ -157,7 +160,6 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                 }
             }
             if (typeof dataChartCopy === "object" && !Array.isArray(dataChartCopy)) {
-                const colorList = ["rgb(53, 162, 235)", "red", "yellow", "lime", "pink", "black", "orange", "green"];
                 if (csvArr.length > 0) {
                     dataChartCopy[csvMetaData.fileName?.length > 0 ? csvMetaData.fileName : csvMetaDataProp.fileName] = csvArr;
                 } else if (Object.keys(dataChartCopy).includes(csvMetaData.fileName?.length > 0 ? csvMetaData.fileName : csvMetaDataProp.fileName) && !csvMetaData.columnName) {
@@ -238,9 +240,22 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                     }
                 })
             }
+            // let datasetMaxLength = 0;
+            // datasets.forEach((dataset: any) => {
+            //     if (dataset?.data?.length > datasetMaxLength) {
+            //         datasetMaxLength = dataset?.data?.length;
+            //     }
+            // })
+            const datasetsCopy = JSON.parse(JSON.stringify(datasets));
+            // datasets.forEach((dataset: any, idx: number) => {
+            //     while (datasetsCopy[idx]?.data?.length < datasetMaxLength) {
+            //         datasetsCopy[idx].data.unshift(0);
+            //     }
+            // });
+
             const chartData = {
                 labels,
-                datasets: datasets,
+                datasets: datasetsCopy,
             };
             chart = (<>
                 <Box padding={2} sx={{ border: 1, maxWidth: "100%" }}>
@@ -267,6 +282,9 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
     }
     if ((csvJSON || csvJSONProp) && !Array.isArray(dataChartCopy) && typeof dataChartCopy === 'object' && (Object.keys(dataChartCopy).includes(csvMetaData.fileName?.length > 0 ? csvMetaData.fileName : csvMetaDataProp.fileName))) {
         const compChart = lineupChartDatapoints({ [baseKey?.length > 0 ? baseKey : "base"]: dataTable, [overlayKey]: dataChartCopy[csvMetaData.fileName?.length > 0 ? csvMetaData.fileName : csvMetaDataProp.fileName] });
+        if (compChart instanceof Error) {
+            throw new Error(compChart?.message);
+        }
         tableRender = <ComparisonTable
             datasetLabel="Custom CSV Comparison"
             dataTable={compChart}
@@ -278,47 +296,51 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
         />
     } else if (dataTable?.length > 0) {
         let compChart: any = {};
+        let valueArray = [];
+        let dateArray: number[] = [];
         if (csvJSON) {
             if (csvJSON[csvMetaData?.columnName]) {
-                const overlayData = csvJSON[csvMetaData?.columnName].map((x: any, idx: number) => {
-                    if (csvJSON?.date[idx]) {
-                        return {
-                            date: csvJSON?.date[idx],
-                            value: x
-                        };
-                    }
-                });
-                compChart = lineupChartDatapoints({ [baseKey?.length > 0 ? baseKey : "base"]: dataTable, [overlayKey]: overlayData });
+                valueArray = csvJSON[csvMetaData?.columnName];
+                dateArray = csvJSON.date;
             }
         } else if (csvJSONProp) {
             if (csvJSONProp[csvMetaData?.columnName]) {
-                const overlayData = csvJSONProp[csvMetaData?.columnName].map((x: any, idx: number) => {
-                    if (csvJSONProp?.date[idx]) {
-                        return {
-                            date: csvJSONProp?.date[idx],
-                            value: x
-                        }
-                    }
-                })
-                compChart = lineupChartDatapoints({ [baseKey?.length > 0 ? baseKey : "base"]: dataTable, [overlayKey]: overlayData });
+                valueArray = csvJSONProp[csvMetaData?.columnName];
+                dateArray = csvJSONProp.date;
             }
         }
 
-        if (compChart) {
-            if (Object.keys(compChart)?.length > 0) {
-                tableRender = <ComparisonTable
-                    datasetLabel="Custom CSV Comparison"
-                    dataTable={compChart}
-                    isMonthly={isMonthly}
-                    setIsMonthly={(x: boolean) => setIsMonthly(x)}
-                    jpegDownloadHandler={() => jpegDownloadHandler(false)}
-                    baseKey={baseKey?.length > 0 ? baseKey : "base"}
-                    overlayKey={overlayKey}
-                />
+        if (valueArray.length > 0) {
+            const overlayData = valueArray.map((x: any, idx: number) => {
+                if (dateArray[idx]) {
+                    return {
+                        date: dateArray[idx],
+                        value: x
+                    };
+                }
+            });
+
+            compChart = lineupChartDatapoints({ [baseKey?.length > 0 ? baseKey : "base"]: dataTable, [overlayKey]: overlayData });
+            if (compChart instanceof Error) {
+                throw new Error(compChart?.message);
+            }
+
+            if (compChart) {
+                if (Object.keys(compChart)?.length > 0) {
+                    tableRender = <ComparisonTable
+                        datasetLabel="Custom CSV Comparison"
+                        dataTable={compChart}
+                        isMonthly={isMonthly}
+                        setIsMonthly={(x: boolean) => setIsMonthly(x)}
+                        jpegDownloadHandler={() => jpegDownloadHandler(false)}
+                        baseKey={baseKey?.length > 0 ? baseKey : "base"}
+                        overlayKey={overlayKey}
+                    />
+                }
             }
         }
     }
-    if (!csvColumnOptions && csvJSONProp) {
+    if (!csvColumnOptions && csvJSONProp && !csvJSON) {
         const columnsList = Object.keys(csvJSONProp).filter(x => x !== 'date');
         csvColumnOptions = <CsvOverlayColumnDropDown setSelectedColumn={(x: string) => setCsvMetaData({ ...csvMetaData, columnName: x })} selectedColumn={csvMetaData.columnName} columnsList={columnsList} />
     }
@@ -333,10 +355,10 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                     <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
                         <Typography variant="h6">{chartTitle}</Typography>
                     </CopyLinkToClipboard>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         {csvColumnOptions}
                         <div style={{ marginLeft: "35px" }}>
-                            {!csvJSONProp ? <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{}} csvMetaData={csvMetaData} field={datasetLabel} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} isEntityLevel={false} /></Tooltip> : null}
+                            <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{}} csvMetaData={csvMetaData} field={datasetLabel} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} isEntityLevel={false} /></Tooltip>
                             <Tooltip placement="top" title={"Chart can be dragged and dropped to another tab"}><Button onClick={() => setChartIsImage(true)} style={{ margin: "1.5px 0 0 0", padding: "6px 8px 5px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", ...staticButtonStyle }}>Static</Button></Tooltip>
                             <Tooltip placement="top" title={"Show plot points on hover"}><Button onClick={() => setChartIsImage(false)} style={{ margin: "1.5px 0 0 0", padding: "6px 8px 5px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", ...dynamicButtonStyle }}>Dynamic</Button></Tooltip>
                         </div>

@@ -117,7 +117,7 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
   const invalidColumns = [".", "..", "...", ",", "-", "_", " ", '"', "'"];
   try {
     if (!(headers.length >= 2) || (!headers.map(x => x?.toLowerCase()).includes('date') && !headers.map(x => x?.toLowerCase()).includes('time'))) {
-      return 'Wrong CSV data format. The CSV must have multiple columns, one must be a "date" column.';
+      throw new Error('Wrong CSV data format. The CSV must have multiple columns, one must be a "date" column.');
     }
     const obj: any = {};
     for (let i = 1; i < lines.length; i++) {
@@ -154,15 +154,15 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
     return (obj);
   } catch (err: any) {
     console.error(err.message);
-    return "csvToJSONConvertor encountered an JS error while processing: " + err?.message + ".";
+    return err;
   }
 }
 
-export function csvToJSON2Col(lines: string[], headers: string[]) {
+export function csvToJSONConvertorTwoCol(lines: string[], headers: string[]) {
   const result = [];
   try {
     if (headers.length !== 2 || !headers.map(x => x?.toLowerCase()).includes('date')) {
-      return 'Wrong CSV data format. The CSV must have two columns, one must be a "date" column.';
+      throw new Error('Wrong CSV data format. The CSV must have two columns, one must be a "date" column.');
     }
     for (let i = 1; i < lines.length; i++) {
       const obj: any = {};
@@ -196,7 +196,7 @@ export function csvToJSON2Col(lines: string[], headers: string[]) {
     return (result);
   } catch (err: any) {
     console.error(err.message);
-    return "csvToJSONConvertor encountered an JS error while processing: " + err?.message + ".";
+    return err;
   }
 }
 
@@ -206,16 +206,18 @@ export function csvToJSONConvertor(csv: string, isEntityLevel: boolean) {
     const headers = lines[0].split(",").map(x => x?.includes('\r') ? x.split('\r').join("") : x);
     let result: any = null
     if (headers.length === 2 && !isEntityLevel) {
-      result = csvToJSON2Col(lines, headers);
+      result = csvToJSONConvertorTwoCol(lines, headers);
     }
     if (headers.length > 2 || (headers.length === 2 && isEntityLevel)) {
       result = csvToJSONConvertorMultiCol(lines, headers);
     }
+    if (result instanceof Error) {
+      throw result;
+    }
     return (result);
-
   } catch (err: any) {
     console.error(err.message);
-    return "csvToJSONConvertor encountered an JS error while processing: " + err?.message + ".";
+    return new Error("csvToJSONConvertor encountered an JS error while processing: " + err?.message + ".");
   }
 }
 
@@ -298,32 +300,37 @@ export function base64toBlobJPEG(dataURI: string) {
 }
 
 export function lineupChartDatapoints(compChart: any) {
-  const key1 = Object.keys(compChart)[0];
-  const key2 = Object.keys(compChart)[1];
+  try {
+    const key1 = Object.keys(compChart)[0];
+    const key2 = Object.keys(compChart)[1];
 
-  const arrLocal1 = compChart[key1].sort((a: any, b: any) => a.date - b.date);
-  const arrLocal2 = compChart[key2].sort((a: any, b: any) => a.date - b.date);
+    let arr1 = compChart[key1].sort((a: any, b: any) => a.date - b.date);
+    let arr2 = compChart[key2].sort((a: any, b: any) => a.date - b.date);
 
-  function shiftStartDates(arr1: any[], arr2: any[]): any {
-    const prop1StartDate = arr1[0]?.date;
-    const prop2StartDate = arr2[0]?.date;
+    const arr1StartDate = arr1[0]?.date;
+    const arr2StartDate = arr2[0]?.date;
 
-    if (!prop1StartDate || !prop2StartDate) {
-
+    if (!arr1StartDate) {
+      throw new Error(`lineupChartDatapoints() error: compChart input key ${key1} was not an array holding objects with valid date properties holding timestamp values.`);
+    }
+    if (!arr2StartDate) {
+      throw new Error(`lineupChartDatapoints() error: compChart input key ${key2} was not an array holding objects with valid date properties holding timestamp values.`);
     }
 
-    if (prop1StartDate > prop2StartDate) {
-      const arr2Index = arr2.findIndex((x: any) => x.date >= prop1StartDate - 86400);
+    if (arr1StartDate > arr2StartDate) {
+      const arr2Index = arr2.findIndex((x: any) => x.date >= arr1StartDate - 86400);
       arr2 = arr2.slice(arr2Index);
-    } else if (prop1StartDate < prop2StartDate) {
-      const arr1Index = arr1.findIndex((x: any) => x.date >= prop2StartDate - 86400);
+    } else if (arr1StartDate < arr2StartDate) {
+      const arr1Index = arr1.findIndex((x: any) => x.date >= arr2StartDate - 86400);
       arr1 = arr1.slice(arr1Index);
     }
-    return { [key1]: arr1, [key2]: arr2 };
-  }
 
-  const matchedStartDatesCompChart = shiftStartDates(arrLocal1, arrLocal2);
-  return matchedStartDatesCompChart;
+    const matchedStartDatesCompChart = { [key1]: arr1, [key2]: arr2 };
+    return matchedStartDatesCompChart;
+  } catch (err: any) {
+    console.error(err.message);
+    return err;
+  }
 }
 
 export function upperCaseFirstOfString(str: string) {
