@@ -200,7 +200,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
         }
       });
 
-      let compChart = {
+      let compChart: any = {
         defiLlama: defiLlamaData.chainTvls[dataset].tvl.map((x: any, idx: number) => {
           let value = x.totalLiquidityUSD;
           const date = toDate(x.date);
@@ -245,6 +245,9 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
       }
 
       compChart = lineupChartDatapoints({ ...compChart });
+      if (compChart instanceof Error) {
+        throw new Error(compChart?.message);
+      }
 
       const elementId = `${isMonthly ? "Monthly" : "Daily"} Chart - ${defiLlamaSlug}`;
       chart = (
