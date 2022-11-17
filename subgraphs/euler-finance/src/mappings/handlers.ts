@@ -364,7 +364,7 @@ export function handleStake(event: Stake): void {
       for (let i = 0; i < protocol._marketIDs!.length; i++) {
         const mktID = protocol._marketIDs![i];
         const mrkt = getOrCreateMarket(mktID);
-        if (!mrkt.rewardTokens || mrkt.rewardTokens.length == 0) {
+        if (!mrkt.rewardTokens || mrkt.rewardTokens!.length == 0) {
           mrkt.rewardTokens = [rewardToken.id];
         }
         const rewardTokenEmissionsAmount = BigDecimalTruncateToBigInt(

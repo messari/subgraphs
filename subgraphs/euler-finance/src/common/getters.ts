@@ -1,4 +1,4 @@
-import { Address, BigInt, ByteArray, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ByteArray, ethereum, log, crypto } from "@graphprotocol/graph-ts";
 import {
   Token,
   LendingProtocol,
@@ -26,7 +26,6 @@ import {
   SECONDS_PER_DAY,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
-  RewardTokenType,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   LendingType,
