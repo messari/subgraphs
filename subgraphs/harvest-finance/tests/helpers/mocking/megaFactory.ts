@@ -1,5 +1,6 @@
 import { Address, ethereum } from '@graphprotocol/graph-ts'
-import { createMockedFunction } from 'matchstick-as'
+import { createMockedFunction, newMockEvent } from 'matchstick-as'
+import { DeploymentCompleted as DeploymentCompletedEvent } from '../../../generated/MegaFactory/MegaFactory'
 
 export function megaFactory(
   contractAddress: Address,
@@ -23,4 +24,27 @@ export function megaFactory(
       ),
       ethereum.Value.fromAddress(poolAddress),
     ])
+}
+
+export function createDeploymentCompletedEvent(
+  id: string
+): DeploymentCompletedEvent {
+  let mockEvent = newMockEvent()
+
+  let event = new DeploymentCompletedEvent(
+    mockEvent.address,
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    mockEvent.block,
+    mockEvent.transaction,
+    mockEvent.parameters,
+    null
+  )
+
+  event.parameters = [
+    new ethereum.EventParam('id', ethereum.Value.fromString(id)),
+  ]
+
+  return event
 }

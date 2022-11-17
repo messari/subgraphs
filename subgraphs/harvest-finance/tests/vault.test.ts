@@ -9,49 +9,26 @@ import {
 } from 'matchstick-as'
 import { handleDeposit, handleTransfer, handleWithdraw } from '../src/vault'
 import { Token, Vault } from '../generated/schema'
-import { vaults } from '../src/utils/vaults'
 import { deposits } from '../src/utils/deposits'
 import { withdraws } from '../src/utils/withdraws'
 import { tokens } from '../src/utils/tokens'
 import { constants } from '../src/utils/constants'
-import { protocols } from '../src/utils/protocols'
 import { helpers } from './helpers'
 import { decimals } from '../src/utils'
+import { createVaultAndProtocol } from './helpers/mocking/vault'
 
 const vaultAddress = Address.fromString(
   '0x0000000000000000000000000000000000000001'
 )
-
 const inputTokenAddress = Address.fromString(
   '0x0000000000000000000000000000000000000002'
 )
-
-const protocolAddressString = '0x222412af183bceadefd72e4cb1b71f1889953b1c'
-
 const outputTokenAddress = Address.fromString(
   '0x0000000000000000000000000000000000000003'
 )
-
-export function createVault(): Vault {
-  const vault = vaults.initialize(vaultAddress.toHexString())
-  const protocol = protocols.initialize(protocolAddressString)
-  protocol.totalPoolCount = protocol.totalPoolCount + 1
-
-  vault.name = 'FARM_USDC'
-  vault.symbol = 'fUSDC'
-  vault.inputToken = inputTokenAddress.toHexString()
-  vault.outputToken = outputTokenAddress.toHexString()
-  vault.protocol = protocolAddressString
-
-  const feeId = 'DEPOSIT-'.concat(vaultAddress.toHexString())
-
-  vault.fees = [feeId]
-
-  vault.save()
-  protocol.save()
-
-  return vault
-}
+const protocolAddress = Address.fromString(
+  '0x222412af183bceadefd72e4cb1b71f1889953b1c'
+)
 
 let token: Token
 
@@ -86,13 +63,21 @@ describe('Vault', () => {
 
   describe('handleDeposit', () => {
     test('updates inputTokenBalance', () => {
-      const vault = createVault()
+      const vault = createVaultAndProtocol(
+        vaultAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        protocolAddress
+      )
 
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('100000000') // 100
-      const event = helpers.createDepositEvent(amount, beneficiaryAddress)
+      const event = helpers.mocking.vault.createDepositEvent(
+        amount,
+        beneficiaryAddress
+      )
       event.address = Address.fromString(vault.id)
 
       handleDeposit(event)
@@ -104,7 +89,12 @@ describe('Vault', () => {
     })
 
     test('creates Deposit', () => {
-      const vault = createVault()
+      const vault = createVaultAndProtocol(
+        vaultAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        protocolAddress
+      )
 
       const fromAddress = Address.fromString(
         '0x0000000000000000000000000000000000000010'
@@ -114,7 +104,10 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('100000000') // 100
-      const event = helpers.createDepositEvent(amount, beneficiaryAddress)
+      const event = helpers.mocking.vault.createDepositEvent(
+        amount,
+        beneficiaryAddress
+      )
       event.address = Address.fromString(vault.id)
       event.transaction.from = fromAddress
       handleDeposit(event)
@@ -139,14 +132,22 @@ describe('Vault', () => {
       })
     })
 
-    test('updates Token.lastPriceUSD and Vault.totalValueLockedUSD', () => {
-      const vault = createVault()
+    test('updates Token.lastPriceUSD and Vault.totalValueLockedUSD ', () => {
+      const vault = createVaultAndProtocol(
+        vaultAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        protocolAddress
+      )
 
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('100000000') // 100
-      const event = helpers.createDepositEvent(amount, beneficiaryAddress)
+      const event = helpers.mocking.vault.createDepositEvent(
+        amount,
+        beneficiaryAddress
+      )
       event.address = Address.fromString(vault.id)
 
       handleDeposit(event)
@@ -160,7 +161,12 @@ describe('Vault', () => {
     })
 
     test('updates VaultSnapshots', () => {
-      const vault = createVault()
+      const vault = createVaultAndProtocol(
+        vaultAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        protocolAddress
+      )
 
       const fromAddress = Address.fromString(
         '0x0000000000000000000000000000000000000010'
@@ -172,7 +178,10 @@ describe('Vault', () => {
       const amount = BigInt.fromString('100000000') // 100
 
       // 1st deposit
-      const event0 = helpers.createDepositEvent(amount, beneficiaryAddress)
+      const event0 = helpers.mocking.vault.createDepositEvent(
+        amount,
+        beneficiaryAddress
+      )
       event0.address = Address.fromString(vault.id)
       event0.transaction.from = fromAddress
       handleDeposit(event0)
@@ -208,7 +217,10 @@ describe('Vault', () => {
       )
 
       // 2nd deposit on different day. Should create new snapshot
-      const event1 = helpers.createDepositEvent(amount, beneficiaryAddress)
+      const event1 = helpers.mocking.vault.createDepositEvent(
+        amount,
+        beneficiaryAddress
+      )
       event1.address = Address.fromString(vault.id)
       event1.transaction.from = fromAddress
       event1.block.timestamp = event1.block.timestamp.plus(
@@ -250,7 +262,12 @@ describe('Vault', () => {
 
   describe('handleWithdraw', () => {
     test('updates inputTokenBalance', () => {
-      const vault = createVault()
+      const vault = createVaultAndProtocol(
+        vaultAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        protocolAddress
+      )
       vault.inputTokenBalance = BigInt.fromString('1000000000') // 1000
       vault.save()
 
@@ -258,7 +275,10 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('100000000') // 100
-      const event = helpers.createWithdrawEvent(amount, beneficiaryAddress)
+      const event = helpers.mocking.vault.createWithdrawEvent(
+        amount,
+        beneficiaryAddress
+      )
       event.address = Address.fromString(vault.id)
 
       handleWithdraw(event)
@@ -270,7 +290,12 @@ describe('Vault', () => {
     })
 
     test('creates Withdraw', () => {
-      const vault = createVault()
+      const vault = createVaultAndProtocol(
+        vaultAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        protocolAddress
+      )
 
       const fromAddress = Address.fromString(
         '0x0000000000000000000000000000000000000010'
@@ -280,7 +305,10 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('100000000') // 100
-      const event = helpers.createWithdrawEvent(amount, beneficiaryAddress)
+      const event = helpers.mocking.vault.createWithdrawEvent(
+        amount,
+        beneficiaryAddress
+      )
       event.address = Address.fromString(vault.id)
       event.transaction.from = fromAddress
       handleWithdraw(event)
@@ -306,7 +334,12 @@ describe('Vault', () => {
     })
 
     test('updates Token.lastPriceUSD and Vault.totalValueLockedUSD', () => {
-      const vault = createVault()
+      const vault = createVaultAndProtocol(
+        vaultAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        protocolAddress
+      )
       vault.inputTokenBalance = BigInt.fromString('1000000000') // 1000
       vault.save()
 
@@ -314,7 +347,10 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('400000000') // 400
-      const event = helpers.createWithdrawEvent(amount, beneficiaryAddress)
+      const event = helpers.mocking.vault.createWithdrawEvent(
+        amount,
+        beneficiaryAddress
+      )
       event.address = Address.fromString(vault.id)
 
       handleWithdraw(event)
@@ -329,7 +365,12 @@ describe('Vault', () => {
 
     test('updates VaultSnapshots', () => {
       // Vault is created with 1000 inputTokenBalance
-      const vault = createVault()
+      const vault = createVaultAndProtocol(
+        vaultAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        protocolAddress
+      )
       vault.inputTokenBalance = BigInt.fromI32(1000)
       vault.save()
 
@@ -343,7 +384,10 @@ describe('Vault', () => {
       const amount = BigInt.fromString('100000000') // 100
 
       // 1st withdraw
-      const event0 = helpers.createWithdrawEvent(amount, beneficiaryAddress)
+      const event0 = helpers.mocking.vault.createWithdrawEvent(
+        amount,
+        beneficiaryAddress
+      )
       event0.address = Address.fromString(vault.id)
       event0.transaction.from = fromAddress
       handleWithdraw(event0)
@@ -379,7 +423,10 @@ describe('Vault', () => {
       )
 
       // 2nd withdraw on different day. Should create new snapshot
-      const event1 = helpers.createWithdrawEvent(amount, beneficiaryAddress)
+      const event1 = helpers.mocking.vault.createWithdrawEvent(
+        amount,
+        beneficiaryAddress
+      )
       event1.address = Address.fromString(vault.id)
       event1.transaction.from = fromAddress
       event1.block.timestamp = event1.block.timestamp.plus(
@@ -426,7 +473,12 @@ describe('Vault', () => {
         outputToken.decimals = 6
         outputToken.save()
 
-        const vault = createVault()
+        const vault = createVaultAndProtocol(
+          vaultAddress,
+          inputTokenAddress,
+          outputTokenAddress,
+          protocolAddress
+        )
         vault.totalValueLockedUSD = BigDecimal.fromString('1000')
         vault.save()
 
@@ -437,7 +489,7 @@ describe('Vault', () => {
 
         const amount = BigInt.fromString('200000000') // 200
 
-        const event = helpers.createTransferEvent(
+        const event = helpers.mocking.vault.createTransferEvent(
           zeroAddress,
           toAddress,
           amount
@@ -469,7 +521,12 @@ describe('Vault', () => {
         outputToken.decimals = 6
         outputToken.save()
 
-        const vault = createVault()
+        const vault = createVaultAndProtocol(
+          vaultAddress,
+          inputTokenAddress,
+          outputTokenAddress,
+          protocolAddress
+        )
         vault.outputTokenSupply = outputTokenSupply
         vault.totalValueLockedUSD = totalValueLockedUSD
         vault.save()
@@ -481,7 +538,11 @@ describe('Vault', () => {
 
         const amount = BigInt.fromString('200000000') // 200
 
-        const event = helpers.createTransferEvent(from, to, amount)
+        const event = helpers.mocking.vault.createTransferEvent(
+          from,
+          to,
+          amount
+        )
 
         event.address = vaultAddress
 
@@ -508,7 +569,12 @@ describe('Vault', () => {
 
   describe('usageMetrics', () => {
     test('update usage metrics', () => {
-      const vault = createVault()
+      const vault = createVaultAndProtocol(
+        vaultAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        protocolAddress
+      )
 
       const fromAddress = Address.fromString(
         '0x0000000000000000000000000000000000000010'
@@ -528,7 +594,10 @@ describe('Vault', () => {
       let withdrawCount = 0
 
       // 1st deposit
-      const event0 = helpers.createDepositEvent(amount, beneficiaryAddress)
+      const event0 = helpers.mocking.vault.createDepositEvent(
+        amount,
+        beneficiaryAddress
+      )
       dailyTxCount++
       depositCount++
       event0.address = Address.fromString(vault.id)
@@ -542,7 +611,7 @@ describe('Vault', () => {
       helpers.asserting.usageMetricsDailySnapshots.usageMetricsDailySnapshot(
         usageMetricDailySnapshotId0,
         {
-          protocol: protocolAddressString,
+          protocol: protocolAddress.toHexString(),
           activeUsers: 1,
           cumulativeUniqueUsers: 1,
           transactionCount: dailyTxCount,
@@ -555,7 +624,10 @@ describe('Vault', () => {
       )
 
       // 1st withdraw
-      const event1 = helpers.createWithdrawEvent(amount, beneficiaryAddress)
+      const event1 = helpers.mocking.vault.createWithdrawEvent(
+        amount,
+        beneficiaryAddress
+      )
       dailyTxCount++
       withdrawCount++
       event1.address = Address.fromString(vault.id)
@@ -565,7 +637,7 @@ describe('Vault', () => {
       helpers.asserting.usageMetricsDailySnapshots.usageMetricsDailySnapshot(
         usageMetricDailySnapshotId0,
         {
-          protocol: protocolAddressString,
+          protocol: protocolAddress.toHexString(),
           activeUsers: 1,
           cumulativeUniqueUsers: 1,
           transactionCount: dailyTxCount,
@@ -584,7 +656,10 @@ describe('Vault', () => {
 
       // New Day
       // 2nd deposit. Should create new snapshot
-      const event2 = helpers.createDepositEvent(amount, beneficiaryAddress)
+      const event2 = helpers.mocking.vault.createDepositEvent(
+        amount,
+        beneficiaryAddress
+      )
       dailyTxCount++
       depositCount++
       event2.address = Address.fromString(vault.id)
@@ -601,7 +676,7 @@ describe('Vault', () => {
       helpers.asserting.usageMetricsDailySnapshots.usageMetricsDailySnapshot(
         usageMetricDailySnapshotId1,
         {
-          protocol: protocolAddressString,
+          protocol: protocolAddress.toHexString(),
           activeUsers: 1,
           cumulativeUniqueUsers: 1,
           transactionCount: dailyTxCount,
@@ -614,7 +689,10 @@ describe('Vault', () => {
       )
 
       // 3rd deposit. Different user. Should increment active users
-      const event3 = helpers.createDepositEvent(amount, beneficiaryAddress)
+      const event3 = helpers.mocking.vault.createDepositEvent(
+        amount,
+        beneficiaryAddress
+      )
       dailyTxCount++
       depositCount++
       event3.address = Address.fromString(vault.id)
@@ -627,7 +705,7 @@ describe('Vault', () => {
       helpers.asserting.usageMetricsDailySnapshots.usageMetricsDailySnapshot(
         usageMetricDailySnapshotId1,
         {
-          protocol: protocolAddressString,
+          protocol: protocolAddress.toHexString(),
           activeUsers: 2,
           cumulativeUniqueUsers: 2,
           transactionCount: dailyTxCount,

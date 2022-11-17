@@ -4,9 +4,9 @@ import { PotPool } from '../generated/MegaFactory/PotPool'
 import { rewardTokens } from './utils/rewardTokens'
 import { constants } from './utils/constants'
 import { log } from '@graphprotocol/graph-ts'
-import { tokens } from './utils/tokens'
 import { vaults } from './utils/vaults'
 import { Vault } from '../generated/schema'
+import { PotPool as PotPoolTemplate } from '../generated/templates'
 
 export function handleDeploymentCompleted(event: DeploymentCompleted): void {
   // First we need to get the completedDeployment struct from the id obtained from the event
@@ -37,8 +37,17 @@ export function handleDeploymentCompleted(event: DeploymentCompleted): void {
 
   vaults.createVault(vaultAddress, timestamp, blockNumber)
 
-  // Bind PotPoolContract
+  // PotPoolContract
   let poolAddress = completedDeployment.value.getNewPool()
+
+  if (!poolAddress) {
+    log.debug('Pool address from vault {} is null', [
+      vaultAddress.toHexString(),
+    ])
+    return
+  }
+
+  PotPoolTemplate.create(poolAddress)
   const potPoolContract = PotPool.bind(poolAddress)
 
   // Obtain rewardTokenAddress

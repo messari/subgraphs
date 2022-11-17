@@ -1,9 +1,22 @@
 import { Address, BigInt } from '@graphprotocol/graph-ts'
 import { assert, describe, test, afterEach, clearStore } from 'matchstick-as'
 import { handleNotifyPools } from '../src/notifyHelper'
-import { createVault } from './vault.test'
 import { helpers } from './helpers'
 import { RewardToken } from '../generated/schema'
+import { createVaultAndProtocol } from './helpers/mocking/vault'
+
+const vaultAddress = Address.fromString(
+  '0x0000000000000000000000000000000000000001'
+)
+const inputTokenAddress = Address.fromString(
+  '0x0000000000000000000000000000000000000002'
+)
+const outputTokenAddress = Address.fromString(
+  '0x0000000000000000000000000000000000000003'
+)
+const protocolAddress = Address.fromString(
+  '0x222412af183bceadefd72e4cb1b71f1889953b1c'
+)
 
 describe('RewardTokens', () => {
   afterEach(() => {
@@ -12,7 +25,12 @@ describe('RewardTokens', () => {
 
   test('creates Reward Token from pools', () => {
     //Create vault
-    const vault = createVault()
+    const vault = createVaultAndProtocol(
+      vaultAddress,
+      inputTokenAddress,
+      outputTokenAddress,
+      protocolAddress
+    )
 
     //Create token
     const tokenAddress = Address.fromString(
@@ -31,7 +49,10 @@ describe('RewardTokens', () => {
     )
 
     //Contract call
-    const call = helpers.mockNotifyPoolsCall([BigInt.fromI32(0)], [poolAddress])
+    const call = helpers.mocking.notifyHelper.mockNotifyPoolsCall(
+      [BigInt.fromI32(0)],
+      [poolAddress]
+    )
 
     //Handler
     handleNotifyPools(call)

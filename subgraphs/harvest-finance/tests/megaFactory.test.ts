@@ -3,7 +3,20 @@ import { assert, describe, test, afterEach, clearStore } from 'matchstick-as'
 import { helpers } from './helpers'
 import { RewardToken } from '../generated/schema'
 import { handleDeploymentCompleted } from '../src/megaFactory'
-import { createVault } from './vault.test'
+import { createVaultAndProtocol } from './helpers/mocking/vault'
+
+const vaultAddress = Address.fromString(
+  '0x0000000000000000000000000000000000000001'
+)
+const inputTokenAddress = Address.fromString(
+  '0x0000000000000000000000000000000000000002'
+)
+const outputTokenAddress = Address.fromString(
+  '0x0000000000000000000000000000000000000003'
+)
+const protocolAddress = Address.fromString(
+  '0x222412af183bceadefd72e4cb1b71f1889953b1c'
+)
 
 describe('MegaFactory', () => {
   afterEach(() => {
@@ -13,7 +26,12 @@ describe('MegaFactory', () => {
   describe('handleDeploymentCompleted', () => {
     test('Create vault, tokens and rewardTokens', () => {
       //Create vault
-      const vault = createVault()
+      const vault = createVaultAndProtocol(
+        vaultAddress,
+        inputTokenAddress,
+        outputTokenAddress,
+        protocolAddress
+      )
 
       //Create token
       const tokenAddress = Address.fromString(
@@ -25,7 +43,7 @@ describe('MegaFactory', () => {
       const poolAddress = Address.fromString(
         '0x0000000000000000000000000000000000000005'
       )
-      helpers.mocking.potPool.potPool(poolAddress, tokenAddress)
+      helpers.mocking.potPool.potPool(poolAddress, tokenAddress, Address.zero())
 
       //Create megaFactory
       const megaFactoryAddress = Address.fromString(
@@ -40,7 +58,8 @@ describe('MegaFactory', () => {
       )
 
       //Create event
-      const event = helpers.createDeploymentCompletedEvent('0')
+      const event =
+        helpers.mocking.megaFactory.createDeploymentCompletedEvent('0')
 
       //Handler
       handleDeploymentCompleted(event)
