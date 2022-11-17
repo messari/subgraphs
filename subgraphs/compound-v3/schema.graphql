@@ -1007,7 +1007,7 @@ type MarketDailySnapshot @entity {
   ##### Quantitative Data #####
 
   " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
-  rates: [InterestRate!]!
+  fees: [InterestRate!]
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -1200,7 +1200,7 @@ type MarketHourlySnapshot @entity {
   ##### Quantitative Data #####
 
   " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
-  rates: [InterestRate!]!
+  fees: [InterestRate!]
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -1817,6 +1817,9 @@ type Flashloan @entity(immutable: true) {
 
   " Price of gas in this transaction "
   gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
   gasLimit: BigInt

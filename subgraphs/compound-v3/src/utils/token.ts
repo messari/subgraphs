@@ -2,10 +2,24 @@
 import { ERC20 } from "../../generated/Configurator/ERC20";
 import { ERC20SymbolBytes } from "../../generated/Configurator/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/Configurator/ERC20NameBytes";
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, Bytes } from "@graphprotocol/graph-ts";
+import { Token } from "../../generated/schema";
 
 export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
+
+export function getOrCreateToken(tokenAddress: Bytes): Token {
+  let token = Token.load(tokenAddress);
+  if (!token) {
+    token = new Token(tokenAddress);
+    token.name = fetchTokenName(Address.fromBytes(tokenAddress));
+    token.symbol = fetchTokenSymbol(Address.fromBytes(tokenAddress));
+    token.decimals = fetchTokenDecimals(Address.fromBytes(tokenAddress));
+    token.save();
+  }
+
+  return token;
+}
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
   let contract = ERC20.bind(tokenAddress);
