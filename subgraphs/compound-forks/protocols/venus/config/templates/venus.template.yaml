@@ -27,11 +27,13 @@ dataSources:
         - Token
       abis:
         - name: Comptroller
-          file: ./abis/Comptroller.json
+          file: ./abis/venus/Comptroller.json
         - name: CToken
           file: ./abis/CToken.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: PriceOracle
+          file: ./abis/PriceOracle.json
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
@@ -45,8 +47,11 @@ dataSources:
           handler: handleNewCollateralFactor
         - event: NewLiquidationIncentive(uint256,uint256)
           handler: handleNewLiquidationIncentive
-        - event: ActionPaused(address,string,bool)
+        - event: ActionPausedMarket(indexed address,indexed uint8,bool)
           handler: handleActionPaused
+          # venus rewards emissions changes are conveniently emitted :)
+        - event: VenusSpeedUpdated(indexed address,uint256)
+          handler: handleVenusSpeedUpdated
       file: ./protocols/venus/src/mapping.ts
 templates:
   - name: CToken
