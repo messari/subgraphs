@@ -1,0 +1,7 @@
+{
+  "network": "mainnet",
+  "governorContractAddress": "0xc4e172459f1e7939d522503b81afaac1014ce6f6",
+  "governorContractStartBlock": 12543659,
+  "tokenContractAddress": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+  "tokenContractStartBlock": 10861674
+}

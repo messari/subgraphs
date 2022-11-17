@@ -4686,6 +4686,35 @@
       }
     }
   },
+  "compound-governance-v1": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "compound-governance-v1",
+    "deployments": {
+      "compound-governance-v1-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "compound-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "compound-governance-v1",
+            "query-id": "compound-governance-v1"
+          }
+        }
+      }
+    }
+  },
   "cryptex-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
@@ -4768,6 +4797,35 @@
           "hosted-service": {
             "slug": "idle-governance",
             "query-id": "idle-governance"
+          }
+        }
+      }
+    }
+  },
+  "idle-governance-v1": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "idle-governance-v1",
+    "deployments": {
+      "idle-governance-v1-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "idle-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "idle-governance-v1",
+            "query-id": "idle-governance-v1"
           }
         }
       }
@@ -4913,6 +4971,64 @@
           "hosted-service": {
             "slug": "uniswap-governance",
             "query-id": "uniswap-governance"
+          }
+        }
+      }
+    }
+  },
+  "uniswap-governance-v1": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "uniswap-governance-v1",
+    "deployments": {
+      "uniswap-governance-v1-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswap-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-governance-v1",
+            "query-id": "uniswap-governance-v1"
+          }
+        }
+      }
+    }
+  },
+  "uniswap-governance-v2": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "uniswap-governance-v2",
+    "deployments": {
+      "uniswap-governance-v2-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswap-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-governance-v2",
+            "query-id": "uniswap-governance-v2"
           }
         }
       }
