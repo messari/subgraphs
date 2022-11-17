@@ -294,9 +294,4 @@ The following set of entities/fields cannot be calculated or calculated accurate
 
 - [ ] Liquidation metrics (`market.cumulativeLiquidateUSD`, `liquidate.market`, `liquidate.position`): Liquidation events do not report any market info because they are not associated with a market from the perspective of Notional. We cannot update position or market data associated with liquidation events as a result.
 
-- [ ] `Liquidate.profitUSD`: There is no straightforward way to calculate this.
-
-  - Notional Team's Response = Profit is tricky because different liquidators likely use different contracts and they are mostly unverified closed-source contracts. I am not sure if there's a general way to calculate it. Maybe you can look at the amount of collateral being transferred and simulate a dex trade to determine what would have been the profit if the liquidator did do a flash liquidation?
-  - What would a simpler approach be?
-
 - [ ] `event.params.nonce`: This is null for all events (I think) and causing subgraph syncing errors, need debugging.

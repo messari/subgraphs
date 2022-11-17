@@ -299,92 +299,76 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   }
 }
 
-// TODO: factor liquidation discount in profit?
-// TODO:
-
 export function handleLiquidateLocalCurrency(
   event: LiquidateLocalCurrency
 ): void {
-  const currencyId = event.params.localCurrencyId as i32;
+  const currencyId: i32 = event.params.localCurrencyId;
   const liquidatee = event.params.liquidated;
   const liquidator = event.params.liquidator;
   const amount = event.params.netLocalFromLiquidator;
 
-  log.error(
-    "*************** [handleLiquidateLocalCurrency] tx: {}, localCurrencyId: {}",
-    [
-      event.transaction.hash.toHexString(),
-      event.params.localCurrencyId.toString(),
-    ]
-  );
-
-  // TODO: not possible to calculate
-  // let profit
+  // log.error(
+  //   "*************** [handleLiquidateLocalCurrency] tx: {}, localCurrencyId: {}",
+  //   [
+  //     event.transaction.hash.toHexString(),
+  //     event.params.localCurrencyId.toString(),
+  //   ]
+  // );
 
   // TODO: Blocker. cannot associate liquidation event with a market without maturity info.
   // let market = getOrCreateMarket(event, marketId); // marketId = currencyId.toString() + "-" + maturity.toString();
 
   // createliquidate(event, market, liquidator, liquidatee, amount);
-  createLiquidate(event, currencyId.toString(), liquidator, liquidatee, amount);
+  createLiquidate(event, currencyId, liquidator, liquidatee, amount);
 }
 
 export function handleLiquidateCollateralCurrency(
   event: LiquidateCollateralCurrency
 ): void {
-  const currencyId = event.params.localCurrencyId as i32;
+  const currencyId: i32 = event.params.localCurrencyId;
   const liquidatee = event.params.liquidated;
   const liquidator = event.params.liquidator;
   const amount = event.params.netLocalFromLiquidator;
-  // const collateralAmount = event.params.netCollateralTransfer || event.params.netNTokenTransfer;
 
-  log.error(
-    "%%%%%%%%%%%%%%% [handleLiquidateCollateralCurrency] tx:{}, localCurrencyId: {}, collateralCurrencyId: {}, netLocalFromLiquidator: {}, netCollateralTransfer: {}, netNTokenTransfer: {}",
-    [
-      event.transaction.hash.toHexString(),
-      event.params.localCurrencyId.toString(),
-      event.params.collateralCurrencyId.toString(),
-      event.params.netLocalFromLiquidator.toString(),
-      event.params.netCollateralTransfer.toString(),
-      event.params.netNTokenTransfer.toString(),
-    ]
-  );
-
-  // TODO: not possible to calculate
-  // let profit
+  // log.error(
+  //   "%%%%%%%%%%%%%%% [handleLiquidateCollateralCurrency] tx:{}, localCurrencyId: {}, collateralCurrencyId: {}, netLocalFromLiquidator: {}, netCollateralTransfer: {}, netNTokenTransfer: {}",
+  //   [
+  //     event.transaction.hash.toHexString(),
+  //     event.params.localCurrencyId.toString(),
+  //     event.params.collateralCurrencyId.toString(),
+  //     event.params.netLocalFromLiquidator.toString(),
+  //     event.params.netCollateralTransfer.toString(),
+  //     event.params.netNTokenTransfer.toString(),
+  //   ]
+  // );
 
   // TODO: Blocker. cannot associate liquidation event with a market without maturity info.
   // let market = getOrCreateMarket(event, marketId); // marketId = currencyId.toString() + "-" + maturity.toString();
 
   // createliquidate(event, market, liquidator, liquidatee, amount);
-  createLiquidate(event, currencyId.toString(), liquidator, liquidatee, amount);
+  createLiquidate(event, currencyId, liquidator, liquidatee, amount);
 }
 
 export function handleLiquidatefCash(event: LiquidatefCashEvent): void {
-  const currencyId = event.params.localCurrencyId as i32;
+  const currencyId: i32 = event.params.localCurrencyId;
   const liquidatee = event.params.liquidated;
   const liquidator = event.params.liquidator;
   const amount = event.params.netLocalFromLiquidator;
 
-  // asset?
-  // event.params.fCashCurrency
-  // event.params.localCurrencyId
-  log.error(
-    "$$$$$$$$$$$$$$$$$$$$ [handleLiquidatefCash] tx: {}, localCurrencyId: {}, fCashCurrencyId: {}, netLocalFromLiquidator: {}, fCashNotionalTransfer: {}",
-    [
-      event.transaction.hash.toHexString(),
-      event.params.localCurrencyId.toString(),
-      event.params.fCashCurrency.toString(),
-      event.params.netLocalFromLiquidator.toString(),
-      event.params.fCashNotionalTransfer.toString(),
-    ]
-  );
-
-  // TODO: not possible to calculate
-  // let profit
+  // log.error(
+  //   "$$$$$$$$$$$$$$$$$$$$ [handleLiquidatefCash] tx: {}, localCurrencyId: {}, fCashCurrencyId: {}, netLocalFromLiquidator: {}, fCashNotionalTransfer: {}",
+  //   [
+  //     event.transaction.hash.toHexString(),
+  //     event.params.localCurrencyId.toString(),
+  //     event.params.fCashCurrency.toString(),
+  //     event.params.netLocalFromLiquidator.toString(),
+  //     event.params.fCashNotionalTransfer.toString(),
+  //   ]
+  // );
 
   // TODO: Blocker. cannot associate liquidation event with a market without maturity info.
   // let market = getOrCreateMarket(event, marketId); // marketId = currencyId.toString() + "-" + maturity.toString();
 
   // createliquidate(event, market, liquidator, liquidatee, amount);
-  createLiquidate(event, currencyId.toString(), liquidator, liquidatee, amount);
+  createLiquidate(event, currencyId, liquidator, liquidatee, amount);
 }

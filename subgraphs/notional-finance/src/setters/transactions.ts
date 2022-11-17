@@ -17,11 +17,13 @@ import {
   Repay,
 } from "../../generated/schema";
 import {
-  BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ZERO,
   TransactionType,
   InterestRateSide,
+  PROTOCOL_ID,
+  BIGDECIMAL_HUNDRED,
+  INT_HUNDRED,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
 import { addAccountToProtocol, updateUsageMetrics } from "./usageMetrics";
@@ -35,6 +37,7 @@ import {
   updateTVLAndBalances,
 } from "./financialMetrics";
 import { getTokenFromCurrency } from "../common/util";
+import { Notional } from "../../generated/Notional/Notional";
 
 export function getOrCreatePosition(
   event: ethereum.Event,
@@ -496,13 +499,14 @@ export function createRepay(
 export function createLiquidate(
   event: ethereum.Event,
   // market: Market,
-  currencyId: string,
+  currencyId: i32,
   liquidator: Address,
   liquidatee: Address,
   cTokenAmount: BigInt
 ): Liquidate {
   const id =
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+  const token = getTokenFromCurrency(event, currencyId.toString());
   const liquidate = new Liquidate(id);
   const liquidatorAccount = getOrCreateAccount(liquidator.toHexString(), event);
   const liquidateeAccount = getOrCreateAccount(liquidatee.toHexString(), event);
@@ -516,19 +520,27 @@ export function createLiquidate(
   liquidate.liquidator = liquidatorAccount.id;
   liquidate.liquidatee = liquidateeAccount.id;
 
-  // liquidate.market = market.id;
-  // let currencyId = market.id.split("-")[0];
-  // TODO: verify if a TX is observed in liquidation and deposit/repay
-  // updateLiquidation
-
-  const token = getTokenFromCurrency(event, currencyId);
-
   liquidate.asset = token.id;
   liquidate.amount = bigIntToBigDecimal(cTokenAmount, token.decimals);
   liquidate.amountUSD = liquidate.amount.times(token.lastPriceUSD!);
-  liquidate.profitUSD = BIGDECIMAL_ZERO;
 
-  liquidate.save();
+  // get liquidation discount and set profit
+  const notional = Notional.bind(Address.fromString(PROTOCOL_ID));
+  const rateStorageCall = notional.try_getRateStorage(currencyId);
+  if (rateStorageCall.reverted) {
+    log.error(
+      "[handleLendBorrowTrade] getRateStorage for currencyId {} reverted",
+      [currencyId.toString()]
+    );
+  } else {
+    // TODO: better way to do these conversions?
+    const liquidationDiscount = BigDecimal.fromString(
+      (
+        rateStorageCall.value.getEthRate().liquidationDiscount - INT_HUNDRED
+      ).toString()
+    ).div(BIGDECIMAL_HUNDRED);
+    liquidate.profitUSD = liquidate.amountUSD.times(liquidationDiscount);
+  }
 
   updateUsageMetrics(
     event,
