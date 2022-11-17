@@ -17,6 +17,7 @@ import {
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
   getOrCreateAssetStatus,
+  getCurrentEpoch,
 } from "../common/getters";
 import {
   BIGDECIMAL_ONE,
@@ -35,7 +36,7 @@ import {
   UNDERLYING_RESERVES_FEE,
 } from "../common/constants";
 import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
-import { LendingProtocol, Market, _AssetStatus } from "../../generated/schema";
+import { LendingProtocol, Market, _AssetStatus, _Epoch } from "../../generated/schema";
 import { Exec } from "../../generated/euler/Exec";
 import { bigDecimalExponential } from "../common/conversions";
 import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
@@ -665,4 +666,22 @@ function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
   }
 
   return null;
+}
+
+export function upateWeightedBorrow(mrkt: Market, event: ethereum.Event): void {
+  // update total borrow balance USD weighted by blocks lapsed
+  const _receivingRewards = mrkt._receivingRewards == null ? "null" : mrkt._receivingRewards.toString();
+  log.debug("[upateWeightedBorrow]mrkt {} _receivingRewards={}", [mrkt.id, _receivingRewards]);
+  if (mrkt._receivingRewards) {
+    const blocksLapsed = event.block.number.minus(mrkt._borrowLastUpdateBlock!);
+    const addWeightedTotalBorrowUSD = mrkt.totalBorrowBalanceUSD.times(blocksLapsed.toBigDecimal());
+    mrkt._weightedTotalBorrowUSD = mrkt._weightedTotalBorrowUSD!.plus(addWeightedTotalBorrowUSD);
+    mrkt._borrowLastUpdateBlock = event.block.number;
+    mrkt.save();
+
+    const epochID = getCurrentEpoch(event);
+    const epoch = _Epoch.load(epochID.toString())!;
+    epoch.sumWeightedBorrowUSD = epoch.sumWeightedBorrowUSD.plus(addWeightedTotalBorrowUSD);
+    epoch.save();
+  }
 }

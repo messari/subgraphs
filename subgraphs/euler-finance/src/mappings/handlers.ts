@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ByteArray, log, crypto, ethereum } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -11,10 +11,14 @@ import {
   Withdraw,
 } from "../../generated/euler/Euler";
 import {
+  getCurrentEpoch,
+  getDeltaStakedAmount,
   getOrCreateAssetStatus,
   getOrCreateLendingProtocol,
   getOrCreateMarket,
+  getOrCreateRewardToken,
   getOrCreateToken,
+  getStartBlockForEpoch,
 } from "../common/getters";
 import {
   EULER_ADDRESS,
@@ -25,8 +29,17 @@ import {
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
   BIGINT_SEVENTY_FIVE,
+  START_EPOCH,
+  BLOCKS_PER_EPOCH,
+  START_EPOCH_BLOCK,
+  MAX_EPOCHS,
+  EUL_DIST,
+  BIGINT_NEG_ONE,
+  EULSTAKES_ADDRESS,
+  EUL_DECIMALS,
+  RewardTokenType,
 } from "../common/constants";
-import { snapshotFinancials, snapshotMarket, updateUsageMetrics } from "./helpers";
+import { snapshotFinancials, snapshotMarket, upateWeightedBorrow, updateUsageMetrics } from "./helpers";
 import {
   createBorrow,
   createDeposit,
@@ -37,10 +50,12 @@ import {
   updatePrices,
   updateRevenue,
 } from "./helpers";
-import { LendingProtocol, Market, Token } from "../../generated/schema";
+import { LendingProtocol, Market, RewardToken, Token } from "../../generated/schema";
 import { ERC20 } from "../../generated/euler/ERC20";
 import { GovConvertReserves, GovSetReserveFee } from "../../generated/euler/Exec";
-import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
+import { BigDecimalTruncateToBigInt, bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
+import { _Epoch } from "../../generated/schema";
+import { Stake } from "../../generated/EulStakes/EulStakes";
 
 export function handleAssetStatus(event: AssetStatus): void {
   const underlying = event.params.underlying.toHexString();
@@ -65,6 +80,7 @@ export function handleAssetStatus(event: AssetStatus): void {
     );
   }
 
+  upateWeightedBorrow(market, event);
   // tvl, totalDepositBalanceUSD and totalBorrowBalanceUSD may be updated again with new price
   updateBalances(token, protocol, market, totalBalances, totalBorrows, totalDepositBalance, totalBorrowBalance);
 
@@ -100,6 +116,7 @@ function updateProtocolTVL(event: AssetStatus, protocol: LendingProtocol): void 
       const tkn = getOrCreateToken(Address.fromString(mrkt.inputToken));
       const currPriceUSD = updatePrices(execProxyAddress, mrkt, event);
       const underlyingPriceUSD = currPriceUSD ? currPriceUSD : mrkt.inputTokenPriceUSD;
+      upateWeightedBorrow(mrkt, event);
       // mark-to-market
       mrkt.totalDepositBalanceUSD = bigIntToBDUseDecimals(mrkt.inputTokenBalance, tkn.decimals).times(
         underlyingPriceUSD,
@@ -107,6 +124,7 @@ function updateProtocolTVL(event: AssetStatus, protocol: LendingProtocol): void 
       mrkt.totalBorrowBalanceUSD = bigIntToBDUseDecimals(mrkt._totalBorrowBalance!, tkn.decimals).times(
         underlyingPriceUSD,
       );
+
       mrkt.totalValueLockedUSD = mrkt.totalDepositBalanceUSD;
       mrkt.save();
 
@@ -145,6 +163,7 @@ function updateBalances(
   protocol.save();
 
   market.totalDepositBalanceUSD = newTotalDepositBalanceUSD;
+
   market.totalBorrowBalanceUSD = newTotalBorrowBalanceUSD;
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
@@ -292,4 +311,98 @@ export function handleGovSetReserveFee(event: GovSetReserveFee): void {
     assetStatus.totalBalances,
     event,
   );
+}
+
+export function handleStake(event: Stake): void {
+  const EulStakes_Address = event.address.toHexString();
+  const underlying = event.params.underlying.toHexString();
+  const market = getOrCreateMarket(underlying); //TODO
+  const currStakedAmount = market._stakedAmount!;
+  let deltaStakedAmount = getDeltaStakedAmount(event);
+  market._stakedAmount = market._stakedAmount!.plus(deltaStakedAmount ? deltaStakedAmount : BIGINT_ZERO);
+  market.save();
+
+  const epochID = getCurrentEpoch(event);
+  log.info("[handleStake]market {}/tbl {}, block={}, epoch={}; deltaAmount = {} at tx {}", [
+    (market.id,
+    market.totalBorrowBalanceUSD.toString(),
+    event.block.number.toString(),
+    epochID.toString(),
+    deltaStakedAmount ? deltaStakedAmount.toString() : "0",
+    event.transaction.hash.toHexString()),
+  ]);
+  if (epochID < 0) {
+    return;
+  }
+
+  const epochStartBlock = getStartBlockForEpoch(epochID)!;
+
+  let prevEpochID = epochID - 1;
+  let epoch = _Epoch.load(epochID.toString());
+  if (!epoch) {
+    //Start of a new epoch
+    epoch = new _Epoch(epochID.toString());
+    epoch.marketsRanked = false;
+    epoch.top10StakeAmounts = [];
+    epoch.sumWeightedBorrowUSD = BIGDECIMAL_ZERO;
+    epoch.save();
+
+    // rank markets use prev epoch
+    // find the top ten staked markets; according to the euler guage
+    // https://app.euler.finance/gaugeweight
+    // users "vote" for the next epoch
+    const prevEpoch = _Epoch.load(prevEpochID.toString());
+    log.info("[handleStake]new epochID={},prevEpoch={}", [epoch.id, prevEpoch ? prevEpoch.id : "null"]);
+    if (prevEpoch) {
+      const protocol = getOrCreateLendingProtocol();
+
+      const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
+      const top10cutoffAmount = prevEpoch.top10StakeAmounts![9];
+      const sumWeightedBorrowUSD = prevEpoch.sumWeightedBorrowUSD;
+      const EULToken = getOrCreateToken(Address.fromString(EULER_ADDRESS));
+      const rewardToken = getOrCreateRewardToken(Address.fromString(EULER_ADDRESS), RewardTokenType.BORROW);
+      for (let i = 0; i < protocol._marketIDs!.length; i++) {
+        const mktID = protocol._marketIDs![i];
+        const mrkt = getOrCreateMarket(mktID);
+        if (!mrkt.rewardTokens || mrkt.rewardTokens.length == 0) {
+          mrkt.rewardTokens = [rewardToken.id];
+        }
+        const rewardTokenEmissionsAmount = BigDecimalTruncateToBigInt(
+          mrkt._weightedTotalBorrowUSD!.div(sumWeightedBorrowUSD).times(totalRewardAmount),
+        );
+        const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
+          .divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
+          .times(EULToken.lastPriceUSD!);
+        mrkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
+        mrkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+
+        if (prevEpoch.marketsRanked == false) {
+          //reset info for new epoch
+          mrkt._receivingRewards = false;
+          mrkt._borrowLastUpdateBlock = epochStartBlock;
+          mrkt._stakeLastUpdateBlock = epochStartBlock;
+          mrkt._weightedStakedAmount = BIGINT_ZERO;
+          mrkt._weightedTotalBorrowUSD = BIGDECIMAL_ZERO;
+          if (mrkt._weightedStakedAmount!.ge(top10cutoffAmount)) {
+            mrkt._receivingRewards = true;
+            mrkt.save();
+          }
+        }
+      }
+      prevEpoch.marketsRanked = true;
+      prevEpoch.save();
+    }
+  }
+
+  const blocksLapsed = event.block.number.minus(market._stakeLastUpdateBlock!);
+  market._weightedStakedAmount = market._weightedStakedAmount!.plus(currStakedAmount.times(blocksLapsed));
+  market._stakeLastUpdateBlock = event.block.number;
+  market.save();
+
+  const topStakeAmounts = epoch.top10StakeAmounts!;
+  topStakeAmounts.push(market._weightedStakedAmount!);
+  const startIdx = topStakeAmounts.length < 10 ? 0 : topStakeAmounts.length - 10;
+  epoch.top10StakeAmounts = topStakeAmounts.sort().slice(startIdx);
+
+  epoch.save();
 }

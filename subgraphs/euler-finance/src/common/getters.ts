@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ByteArray, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   LendingProtocol,
@@ -34,8 +34,15 @@ import {
   INT_ZERO,
   DEFAULT_RESERVE_FEE,
   BIGDECIMAL_ONE,
+  BIGINT_NEG_ONE,
+  BLOCKS_PER_EPOCH,
+  EULSTAKES_ADDRESS,
+  MAX_EPOCHS,
+  START_EPOCH,
+  START_EPOCH_BLOCK,
 } from "../common/constants";
 import { Versions } from "../versions";
+import { Stake } from "../../generated/EulStakes/EulStakes";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -52,13 +59,14 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getOrCreateRewardToken(address: Address): RewardToken {
-  let rewardToken = RewardToken.load(address.toHexString());
+export function getOrCreateRewardToken(address: Address, type: string): RewardToken {
+  const id = `${address.toHexString()}-${type}`;
+  let rewardToken = RewardToken.load(id);
   if (rewardToken == null) {
     const token = getOrCreateToken(address);
-    rewardToken = new RewardToken(address.toHexString());
+    rewardToken = new RewardToken(id);
     rewardToken.token = token.id;
-    rewardToken.type = RewardTokenType.DEPOSIT;
+    rewardToken.type = type;
     rewardToken.save();
 
     return rewardToken as RewardToken;
@@ -313,6 +321,8 @@ export function getOrCreateMarket(id: string): Market {
     market.exchangeRate = BIGDECIMAL_ONE;
     market._totalBorrowBalance = BIGINT_ZERO;
     market._dTokenExchangeRate = BIGDECIMAL_ONE;
+    market._stakedAmount = BIGINT_ZERO;
+    market._receivingRewards = false;
     market.save();
 
     // update protocol.totalPoolCount
@@ -491,4 +501,67 @@ export function getSnapshotRates(rates: string[], timeSuffix: string): string[] 
     snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
+}
+
+export function getCurrentEpoch(event: ethereum.Event): i32 {
+  const blockNum = event.block.number;
+  const epoch = blockNum.minus(START_EPOCH_BLOCK).toI32() / BLOCKS_PER_EPOCH + START_EPOCH;
+  if (epoch < START_EPOCH || epoch > START_EPOCH + MAX_EPOCHS) {
+    return -1;
+  }
+  return epoch;
+}
+
+export function getStartBlockForEpoch(epoch: i32): BigInt | null {
+  if (epoch < START_EPOCH || epoch > START_EPOCH + MAX_EPOCHS) {
+    return null;
+  }
+  const startBlock = BigInt.fromI32((epoch - 1) * BLOCKS_PER_EPOCH).plus(START_EPOCH_BLOCK);
+  return startBlock;
+}
+
+export function getDeltaStakedAmount(event: Stake): BigInt | null {
+  if (!event.receipt) {
+    log.warning("[getStakedDeltaAmount][{}] has no event.receipt", [event.transaction.hash.toHexString()]);
+    return null;
+  }
+
+  // since the event only gives new total staked amount for an account
+  // we use the transfer event to figure out the net change in staked amount
+  const currentEventLogIndex = event.logIndex;
+  const logs = event.receipt!.logs;
+  const transferSig = crypto.keccak256(ByteArray.fromUTF8("Transfer(address,address,uint256)"));
+
+  let foundIndex: i32 = -1;
+  // find index for the current logIndex
+  for (let i = 0; i < logs.length; i++) {
+    const currLog = logs.at(i);
+    if (currLog.logIndex.equals(currentEventLogIndex)) {
+      foundIndex = i;
+      break;
+    }
+  }
+  // check next log
+  const nextLog = logs.at(foundIndex + 1);
+  const topic0Sig = nextLog.topics.at(0); //topic0
+  if (topic0Sig.notEqual(transferSig)) {
+    // this should be a transfer event, error if not
+    log.error("[handleStake]The event after the Stake event is not a Transfer event at tx {}", [
+      event.transaction.hash.toHexString(),
+    ]);
+    return null;
+  }
+
+  const from = ethereum.decode("address", nextLog.topics.at(1))!.toAddress().toHexString();
+  const to = ethereum.decode("address", nextLog.topics.at(2))!.toAddress().toHexString();
+  const amount = ethereum.decode("uint256", nextLog.data)!.toBigInt();
+  let deltaAmount = BIGINT_ZERO;
+  if (to == EULSTAKES_ADDRESS) {
+    //stake
+    deltaAmount = amount;
+  } else if (from == EULSTAKES_ADDRESS) {
+    // unstake
+    deltaAmount = amount.times(BIGINT_NEG_ONE);
+  }
+  return deltaAmount;
 }
