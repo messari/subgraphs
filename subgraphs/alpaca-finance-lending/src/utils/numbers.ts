@@ -14,7 +14,6 @@ export function bigIntToBigDecimal(
 // returns a^exp
 export function exponent(a: BigDecimal, exp: i32): BigDecimal {
   let bd = BigDecimal.fromString("1");
-  const ten = BigDecimal.fromString("10");
   for (let i = 0; i < exp; i++) {
     bd = bd.times(a);
   }
