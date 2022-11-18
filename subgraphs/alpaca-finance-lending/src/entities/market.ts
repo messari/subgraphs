@@ -310,7 +310,8 @@ export function changeMarketBorrowBalance(
     getTokenById(market.inputToken),
     event.block.number
   );
-  market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(changeUSD);
+  const previousTotalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+  market.totalBorrowBalanceUSD = previousTotalBorrowBalanceUSD.plus(changeUSD);
   if (market.totalBorrowBalanceUSD.lt(BIGDECIMAL_ZERO)) {
     log.warning(
       "[changeMarketBorrowBalance] totalBorrowBalanceUSD {} is negative, should not happen",
@@ -322,7 +323,10 @@ export function changeMarketBorrowBalance(
 
   getOrCreateMarketSnapshot(event, market);
   getOrCreateMarketHourlySnapshot(event, market);
-  updateProtocolBorrowBalance(event, changeUSD);
+  updateProtocolBorrowBalance(
+    event,
+    market.totalBorrowBalanceUSD.minus(previousTotalBorrowBalanceUSD)
+  );
 }
 
 export function updateMarketRates(

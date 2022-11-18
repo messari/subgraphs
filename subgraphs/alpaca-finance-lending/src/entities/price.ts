@@ -71,7 +71,7 @@ export function getTokenPrice(token: Token, blockNumber: BigInt): BigDecimal {
   } else {
     // Use external oracle to get price.
     const customPrice = getUsdPricePerToken(Address.fromString(token.id));
-    priceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
+    priceUSD = customPrice.usdPrice;
   }
 
   token.lastPriceUSD = priceUSD;
