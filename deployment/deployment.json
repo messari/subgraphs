@@ -1424,6 +1424,10 @@
           "hosted-service": {
             "slug": "dforce-ethereum",
             "query-id": "dforce-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "dforce-ethereum",
+            "query-id": "ECtdoov16DUmk5qbhFx4PVVN7vidiNDwzFNsui6FoHEo"
           }
         }
       },
