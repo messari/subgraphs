@@ -24,6 +24,9 @@ export const nativeCToken = new TokenData(
 export const PLY_TOKEN_ADDRESS = Address.fromString(
   "0x09c9d464b58d96837f8d8b6f4d9fe4ad408d3a4f"
 );
+export const AURORA_TOKEN_ADDRESS = Address.fromString(
+  "0x8bec47865ade3b172a928df8f990bc7f2a3b9f79"
+);
 export const AURI_LENS_CONTRACT_ADDRESS = Address.fromString(
   "0xFfdFfBDB966Cb84B50e62d70105f2Dbf2e0A1e70"
 );
