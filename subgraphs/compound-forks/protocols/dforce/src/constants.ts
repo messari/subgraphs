@@ -13,10 +13,9 @@ import {
   Network,
 } from "../../../src/constants";
 
-// optimism does not have constant # blocks/year
-// rewarddistributor is paused on optimism and
-// setting OPTIMISM_BLOCKS_PER_YEAR to 0 will be fine
-const OPTIMISM_BLOCKS_PER_YEAR = 0;
+// similar to Arbitrum block numbers issue below, set block numbers
+// to those of mainnet
+const OPTIMISM_BLOCKS_PER_YEAR = ETHEREUM_BLOCKS_PER_YEAR;
 
 const AVALANCHE_BLOCKS_PER_DAY = AVALANCHE_BLOCKS_PER_YEAR / 365;
 const BSC_BLOCKS_PER_DAY = BSC_BLOCKS_PER_YEAR / 365;
@@ -33,18 +32,18 @@ const ARBITRUM_BLOCKS_PER_DAY = ETHEREUM_BLOCKS_PER_DAY;
 export class NetworkSpecificConstant {
   comptrollerAddr: Address;
   network: string;
-  unitPerDay: i32;
-  unitPerYear: i32;
+  blocksPerDay: i32;
+  blocksPerYear: i32;
   constructor(
     comptrollerAddr: Address,
     network: string,
-    unitPerDay: i32,
-    unitPerYear: i32
+    blocksPerDay: i32,
+    blocksPerYear: i32
   ) {
     this.comptrollerAddr = comptrollerAddr;
     this.network = network;
-    this.unitPerDay = unitPerDay;
-    this.unitPerYear = unitPerYear;
+    this.blocksPerDay = blocksPerDay;
+    this.blocksPerYear = blocksPerYear;
   }
 }
 const ARBITRUM_ONE = "ARBITRUM-ONE";
