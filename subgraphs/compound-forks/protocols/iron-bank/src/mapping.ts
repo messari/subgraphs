@@ -19,8 +19,20 @@ import {
   NewReserveFactor,
   Transfer,
 } from "../../../generated/templates/CToken/CToken";
-import { LendingProtocol, Token } from "../../../generated/schema";
-import { cTokenDecimals, BIGINT_ZERO } from "../../../src/constants";
+import {
+  LendingProtocol,
+  Market,
+  RewardToken,
+  Token,
+} from "../../../generated/schema";
+import {
+  cTokenDecimals,
+  BIGINT_ZERO,
+  SECONDS_PER_DAY,
+  exponentToBigDecimal,
+  bigDecimalToBigInt,
+  RewardTokenType,
+} from "../../../src/constants";
 import {
   ProtocolData,
   _getOrCreateProtocol,
@@ -50,6 +62,13 @@ import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 import { getNetworkSpecificConstant } from "./constants";
+
+import { StakingRewardsCreated } from "../../../generated/StakingRewardsFactory/StakingRewardsFactory";
+import { StakingRewards as StakingRewardsTemplate } from "../../../generated/templates";
+import {
+  RewardPaid,
+  StakingRewards as StakingRewardsContract,
+} from "../../../generated/templates/StakingRewards/StakingRewards";
 
 // Constant values
 const constant = getNetworkSpecificConstant();
@@ -297,6 +316,102 @@ export function handleTransfer(event: Transfer): void {
     event.params.from,
     comptrollerAddr
   );
+}
+
+export function handleStakingRewardsCreated(
+  event: StakingRewardsCreated
+): void {
+  log.info(
+    "[handleStakingRewardsCreated]StakingReward contract {} created for token {} at tx {}",
+    [
+      event.params.stakingRewards.toHexString(),
+      event.params.stakingToken.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+
+  StakingRewardsTemplate.create(event.params.stakingRewards);
+}
+
+export function handleRewardPaid(event: RewardPaid): void {
+  const rewardContract = StakingRewardsContract.bind(event.address);
+  const marketID = rewardContract.getStakingToken().toHexString();
+
+  const market = Market.load(marketID);
+  if (!market) {
+    log.error(
+      "[handleRewardPaid]market does not exist for staking token {} at tx {}",
+      [marketID, event.transaction.hash.toHexString()]
+    );
+    return;
+  }
+  // to get token decimals & prices
+  const token = Token.load(event.params.rewardsToken.toHexString())!;
+
+  const marketRewardTokens = market.rewardTokens;
+  if (!marketRewardTokens || marketRewardTokens.length == 0) {
+    const rewardTokenID = `${RewardTokenType.DEPOSIT}-${token.id}`;
+    let rewardToken = RewardToken.load(rewardTokenID);
+    if (!rewardToken) {
+      rewardToken = new RewardToken(rewardTokenID);
+      rewardToken.type = RewardTokenType.DEPOSIT;
+      rewardToken.save();
+    }
+    market.rewardTokens = [rewardToken.id];
+  }
+
+  const _cumulativeRewardAmount = market._cumulativeRewardAmount;
+  if (_cumulativeRewardAmount) {
+    market._cumulativeRewardAmount = market._cumulativeRewardAmount!.plus(
+      event.params.reward
+    );
+  } else {
+    market._cumulativeRewardAmount = event.params.reward;
+  }
+  market.save();
+
+  const currTimestamp = event.block.timestamp;
+  if (!market._rewardLastUpdatedTimestamp) {
+    log.info(
+      "[handleRewardPaid]_rewardLastUpdatedTimestamp for market {} not set, skip updating reward emission, current timestamp={}",
+      [market.id, currTimestamp.toString()]
+    );
+    market._rewardLastUpdatedTimestamp = currTimestamp;
+    market.save();
+    return;
+  }
+
+  // update reward emission every day or longer
+  if (
+    currTimestamp.lt(
+      market._rewardLastUpdatedTimestamp!.plus(BigInt.fromI32(SECONDS_PER_DAY))
+    )
+  ) {
+    log.info(
+      "[handleRewardPaid]Reward emission updated less than 1 day ago (_rewardLastUpdatedTimestamp={}, current timestamp={}), skip updating reward emission",
+      [market._rewardLastUpdatedTimestamp!.toString(), currTimestamp.toString()]
+    );
+    return;
+  }
+
+  const secondsSince = currTimestamp
+    .minus(market._rewardLastUpdatedTimestamp!)
+    .toBigDecimal();
+  const dailyScaler = BigInt.fromI32(SECONDS_PER_DAY).divDecimal(secondsSince);
+  const rewardTokenEmissionsAmount = bigDecimalToBigInt(
+    market._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler)
+  );
+
+  const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
+    .divDecimal(exponentToBigDecimal(token.decimals))
+    .times(token.lastPriceUSD!);
+  market.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
+  market.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+
+  //reset _cumulativeRewardAmount and _rewardTimestamp for next update
+  market._rewardLastUpdatedTimestamp = currTimestamp;
+  market._cumulativeRewardAmount = BIGINT_ZERO;
+  market.save();
 }
 
 function getOrCreateProtocol(): LendingProtocol {

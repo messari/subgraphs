@@ -1,5 +1,7 @@
 {
   "network": "mainnet",
   "factoryAddress": "0xAB1c342C7bf5Ec5F02ADEA1c2270670bCa144CbB",
-  "startBlock": 11384868
+  "startBlock": 11384868,
+  "rewardsFactoryAddress": "0x0000000000000000000000000000000000000000",
+  "rewardStartBlock": 11384868
 }
