@@ -44,11 +44,8 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_YEAR,
   TokenType,
-} from "../../../src/utils/constants";
-import {
-  getOrCreateRewardToken,
-  MarketClass,
-} from "../../../src/utils/getters";
+} from "../../../src/sdk/constants";
+import { getOrCreateRewardToken, MarketClass } from "../../../src/sdk/market";
 import {
   BASE_INDEX_SCALE,
   COMPOUND_DECIMALS,
@@ -61,7 +58,7 @@ import {
 import { Comet as CometTemplate } from "../../../generated/templates";
 import { Oracle, Token, TokenData } from "../../../generated/schema";
 import { CometRewards } from "../../../generated/templates/Comet/CometRewards";
-import { getOrCreateToken } from "../../../src/utils/token";
+import { getOrCreateToken } from "../../../src/sdk/token";
 
 ///////////////////////////////
 ///// Configurator Events /////

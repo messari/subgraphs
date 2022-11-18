@@ -11,8 +11,8 @@ import {
   Network,
   PermissionType,
   RiskType,
-} from "../../../src/utils/constants";
-import { ProtocolData } from "../../../src/utils/getters";
+} from "../../../src/sdk/constants";
+import { ProtocolData } from "../../../src/sdk/market";
 
 //////////////////////////////
 ///// Ethereum Addresses /////

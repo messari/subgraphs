@@ -19,6 +19,7 @@ import {
   MarketHourlySnapshot,
   Oracle,
   Repay,
+  RevenueDetails,
   RewardToken,
   Token,
   TokenData,
@@ -54,34 +55,19 @@ import {
  *  - @dmelotik
  */
 
-export class ProtocolData {
-  constructor(
-    public readonly protocolID: Bytes,
-    public readonly protocol: string,
-    public readonly name: string,
-    public readonly slug: string,
-    public readonly network: string,
-    public readonly lendingType: string,
-    public readonly lenderPermissionType: string | null,
-    public readonly borrowerPermissionType: string | null,
-    public readonly collateralizationType: string | null,
-    public readonly riskType: string | null
-  ) {}
-}
-
 export class MarketClass {
-  event!: ethereum.Event;
+  private event!: ethereum.Event;
 
   // entities
-  protocol!: LendingProtocol;
-  market!: Market;
+  private protocol!: LendingProtocol;
+  private market!: Market;
 
   // snapshots
-  marketHourlySnapshot!: MarketHourlySnapshot;
-  marketDailySnapshot!: MarketDailySnapshot;
-  financialSnapshot!: FinancialsDailySnapshot;
-  usageHourlySnapshot!: UsageMetricsHourlySnapshot;
-  usageDailySnapshot!: UsageMetricsDailySnapshot;
+  private marketHourlySnapshot!: MarketHourlySnapshot;
+  private marketDailySnapshot!: MarketDailySnapshot;
+  private financialSnapshot!: FinancialsDailySnapshot;
+  private usageHourlySnapshot!: UsageMetricsHourlySnapshot;
+  private usageDailySnapshot!: UsageMetricsDailySnapshot;
 
   // instantiate MarketClass (create new Market if necessary)
   constructor(
@@ -237,7 +223,7 @@ export class MarketClass {
     snapshot.cumulativeBorrowUSD = this.market.cumulativeBorrowUSD;
     snapshot.cumulativeLiquidateUSD = this.market.cumulativeLiquidateUSD;
     snapshot.tokens = this.market.tokens
-      ? this.getSnapshotTokenData(this.market.tokens!, hours.toString())
+      ? this.getSnapshotTokenData(this.market.tokens!, hours)
       : null;
     snapshot.rewardTokenEmissionsAmount =
       this.market.rewardTokenEmissionsAmount;
@@ -303,7 +289,12 @@ export class MarketClass {
     snapshot.cumulativeProtocolSideRevenueUSD =
       this.market.cumulativeProtocolSideRevenueUSD;
     snapshot.cumulativeTotalRevenueUSD = this.market.cumulativeTotalRevenueUSD;
-    // TODO get rev details snapshot
+    snapshot.revenueDetails = this.market.revenueDetails
+      ? this.getRevenueDetailsSnapshot(
+          this.market.revenueDetails!,
+          days.toString()
+        )
+      : null;
     snapshot.totalDepositBalanceUSD = this.market.totalDepositBalanceUSD;
     snapshot.cumulativeDepositUSD = this.market.cumulativeDepositUSD;
     snapshot.totalBorrowBalanceUSD = this.market.totalBorrowBalanceUSD;
@@ -317,7 +308,7 @@ export class MarketClass {
     snapshot.lendingPositionCount = this.market.lendingPositionCount;
     snapshot.borrowingPositionCount = this.market.borrowingPositionCount;
     snapshot.tokens = this.market.tokens
-      ? this.getSnapshotTokenData(this.market.tokens!, days.toString())
+      ? this.getSnapshotTokenData(this.market.tokens!, days)
       : null;
     snapshot.rewardTokenEmissionsAmount =
       this.market.rewardTokenEmissionsAmount;
@@ -417,18 +408,24 @@ export class MarketClass {
       const snapshotRateId = rates[i].concat("-").concat(timeSuffix);
       const snapshotRate = new InterestRate(snapshotRateId);
       snapshotRate.rate = rate.rate;
-      snapshotRate.duration = rate.duration;
-      snapshotRate.maturityBlock = rate.maturityBlock;
+      // if (rate.duration == null) {
+      //   snapshotRate.duration = rate.duration;
+      // }
+      if (rate.maturityBlock) {
+        snapshotRate.maturityBlock = rate.maturityBlock;
+      }
       snapshotRate.side = rate.side;
       snapshotRate.type = rate.type;
-      snapshotRate.tranche = rate.tranche;
+      if (rate.tranche) {
+        snapshotRate.tranche = rate.tranche;
+      }
       snapshotRate.save();
       snapshotRates.push(snapshotRateId);
     }
     return snapshotRates;
   }
 
-  getSnapshotTokenData(tokenDatas: Bytes[], timeSuffix: string): Bytes[] {
+  getSnapshotTokenData(tokenDatas: Bytes[], timeSuffix: i32): Bytes[] {
     const snapshotTokenDatas: Bytes[] = [];
     for (let i = 0; i < tokenDatas.length; i++) {
       const tokenData = TokenData.load(tokenDatas[i]);
@@ -442,7 +439,7 @@ export class MarketClass {
 
       // create new snapshot tokenData
       const snapshotTokenDataId = tokenDatas[i].concat(
-        Bytes.fromHexString(timeSuffix)
+        Bytes.fromI32(timeSuffix)
       );
       const snapshotTokenData = new TokenData(snapshotTokenDataId);
       snapshotTokenData.canUseAsCollateral = tokenData.canUseAsCollateral;
@@ -458,7 +455,7 @@ export class MarketClass {
       snapshotTokenData.outputTokenPricesUSD = tokenData.outputTokenPricesUSD;
       snapshotTokenData.exchangeRates = tokenData.exchangeRates;
       snapshotTokenData.rates = tokenData.rates
-        ? this.getSnapshotRates(tokenData.rates!, timeSuffix)
+        ? this.getSnapshotRates(tokenData.rates!, timeSuffix.toString())
         : null;
       snapshotTokenData.reserves = tokenData.reserves;
       snapshotTokenData.reserveFactor = tokenData.reserveFactor;
@@ -473,6 +470,26 @@ export class MarketClass {
       snapshotTokenDatas.push(snapshotTokenDataId);
     }
     return snapshotTokenDatas;
+  }
+
+  getRevenueDetailsSnapshot(currID: string, timeSuffix: string): string | null {
+    const currDetails = RevenueDetails.load(currID);
+    if (!currDetails) {
+      log.error(
+        "[getRevenueDetailsSnapshot] Cannot find revenue details id: {}",
+        [currID]
+      );
+      return null;
+    }
+
+    const newDetails = new RevenueDetails(
+      currDetails.id.concat("-").concat(timeSuffix)
+    );
+    newDetails.sources = currDetails.sources;
+    newDetails.amountsUSD = currDetails.amountsUSD;
+    newDetails.save();
+
+    return newDetails.id;
   }
 
   //////////////////
@@ -742,45 +759,46 @@ export function getOrCreateRewardToken(
   return rewardToken;
 }
 
-export function getOrUpdateFinancials(
-  event: ethereum.Event,
-  protocol: LendingProtocol
-): FinancialsDailySnapshot {
-  const days = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let snapshot = FinancialsDailySnapshot.load(days.toString());
-  if (!snapshot) {
-    snapshot = new FinancialsDailySnapshot(days.toString());
-    snapshot.days = days;
-    snapshot.protocol = protocol.id;
+// export function getOrUpdateFinancials(
+//   event: ethereum.Event,
+//   protocol: LendingProtocol
+// ): FinancialsDailySnapshot {
+//   const days = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+//   let snapshot = FinancialsDailySnapshot.load(days.toString());
+//   if (!snapshot) {
+//     snapshot = new FinancialsDailySnapshot(days.toString());
+//     snapshot.days = days;
+//     snapshot.protocol = protocol.id;
 
-    snapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyTransferUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyFlashloanUSD = BIGDECIMAL_ZERO;
-  }
+//     snapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+//     snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+//     snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+//     snapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
+//     snapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
+//     snapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+//     snapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+//     snapshot.dailyTransferUSD = BIGDECIMAL_ZERO;
+//     snapshot.dailyFlashloanUSD = BIGDECIMAL_ZERO;
+//   }
 
-  snapshot.blockNumber = event.block.number;
-  snapshot.timestamp = event.block.timestamp;
-  snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  snapshot.protocolControlledValueUSD = protocol.protocolControlledValueUSD;
-  snapshot.mintedTokenSupplies = protocol.mintedTokenSupplies;
-  snapshot.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
-  snapshot.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-  snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  // TODO create new entity for revenueDetails??
-  snapshot.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
-  snapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
-  snapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
-  snapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
-  snapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
-  snapshot.save();
+//   snapshot.blockNumber = event.block.number;
+//   snapshot.timestamp = event.block.timestamp;
+//   snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+//   snapshot.protocolControlledValueUSD = protocol.protocolControlledValueUSD;
+//   snapshot.mintedTokenSupplies = protocol.mintedTokenSupplies;
+//   snapshot.cumulativeSupplySideRevenueUSD =
+//     protocol.cumulativeSupplySideRevenueUSD;
+//   snapshot.cumulativeProtocolSideRevenueUSD =
+//     protocol.cumulativeProtocolSideRevenueUSD;
+//   snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+//   // TODO create new entity for revenueDetails??
+//   snapshot.revenueDetails = protocol.revenueDetails ? getSnapshotRevenue()
+//   snapshot.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
+//   snapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+//   snapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
+//   snapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+//   snapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+//   snapshot.save();
 
-  return snapshot;
-}
+//   return snapshot;
+// }
