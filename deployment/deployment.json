@@ -1341,7 +1341,7 @@
     "deployments": {
       "dforce-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.2.4",
@@ -1363,7 +1363,7 @@
       },
       "dforce-avalanche": {
         "network": "avalanche",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.2.3",
@@ -1385,7 +1385,7 @@
       },
       "dforce-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.2.3",
@@ -1407,7 +1407,7 @@
       },
       "dforce-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.2.3",
@@ -1429,7 +1429,7 @@
       },
       "dforce-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.2.3",
@@ -1451,7 +1451,7 @@
       },
       "dforce-polygon": {
         "network": "polygon",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.2.3",
