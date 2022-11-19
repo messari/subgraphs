@@ -27,6 +27,7 @@ import { HoneyswapXdaiConfigurations } from "../../protocols/honeyswap/config/de
 import { HoneyswapMaticConfigurations } from "../../protocols/honeyswap/config/deployments/honeyswap-polygon/configurations";
 import { PangolinAvalancheConfigurations } from "../../protocols/pangolin/config/deployments/pangolin-avalanche/configurations";
 import { BiswapBscConfigurations } from "../../protocols/biswap/config/deployments/biswap-bsc/configurations";
+import { VaporDEXAvalancheConfigurations } from "../../protocols/vapordex/config/deployments/vapordex-avalanche/configurations";
 
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
@@ -123,6 +124,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.BISWAP_BSC: {
       return new BiswapBscConfigurations();
+    }
+    case Deploy.VAPORDEX_AVALANCHE: {
+      return new VaporDEXAvalancheConfigurations();
     }
     default: {
       log.critical(

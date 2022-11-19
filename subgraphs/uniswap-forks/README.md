@@ -13,6 +13,7 @@
 - VVS (Cronos)
 - Honeyswap (Gnosis, Polygon)
 - Pangolin (Avalanche)
+- VaporDEX (Avalanche)
 
 ## Calculation Methodology v1.0.0
 
