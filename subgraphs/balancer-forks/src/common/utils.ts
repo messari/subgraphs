@@ -81,9 +81,6 @@ export function getOutputTokenPriceUSD(
   );
   let outputTokenPriceUSD = pool.totalValueLockedUSD.div(outputTokenSupply);
 
-  outputToken.lastPriceUSD = outputTokenPriceUSD;
-  outputToken.save();
-
   return outputTokenPriceUSD;
 }
 
