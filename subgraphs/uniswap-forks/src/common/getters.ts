@@ -67,21 +67,11 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     position = new Position(positionId);
     position.account = account.id
     position.pool = pool.id;
-    
     position.hashOpened = event.transaction.hash.toHexString();
     position.blockNumberOpened = event.block.number;
     position.timestampOpened = event.block.timestamp;
     position.depositCount = INT_ZERO;
-
-    log.debug("Adding input token balances to new position GETTERS.ts line 71", []);
-    position.inputTokenBalances = new Array<BigInt>();//.map<BigInt>(() => BIGINT_ZERO);
-    // let inputTokenBalances = position.inputTokenBalances;
-    // inputTokenBalances.push(BIGINT_ZERO);
-    // inputTokenBalances.push(BIGINT_ZERO);
-    log.debug("Added input token balances to new position GETTERS.ts line 73", []);
-    // let cumulativeRewards = new Array<BigInt>(1);
-    log.debug("Adding cumulative rewards to new position", []);
-    // cumulativeRewards.push(BIGINT_ZERO);
+    position.inputTokenBalances = new Array<BigInt>();
     position.cumulativeRewardTokenAmounts = new Array<BigInt>();
     position.withdrawCount = INT_ZERO;
   }
