@@ -32,6 +32,7 @@ import {
   exponentToBigDecimal,
   bigDecimalToBigInt,
   RewardTokenType,
+  BIGDECIMAL_ZERO,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -422,7 +423,7 @@ export function handleRewardPaid(event: RewardPaid): void {
   //  .divDecimal(exponentToBigDecimal(token.decimals))
   //  .times(token.lastPriceUSD!);
   market.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
-  //market.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+  market.rewardTokenEmissionsUSD = [];
 
   //reset _cumulativeRewardAmount and _rewardTimestamp for next update
   market._rewardLastUpdatedTimestamp = currTimestamp;
