@@ -346,7 +346,21 @@ export function handleRewardPaid(event: RewardPaid): void {
     return;
   }
   // to get token decimals & prices
-  const token = Token.load(event.params.rewardsToken.toHexString())!;
+  const tokenAddr = event.params.rewardsToken.toHexString();
+  log.info("[handleRewardPaid]rewardsToken={} at tx={}", [
+    tokenAddr,
+    event.transaction.hash.toHexString(),
+  ]);
+
+  let token = Token.load(tokenAddr);
+  if (!token) {
+    const erc20Contract = ERC20.bind(event.params.rewardsToken);
+    token = new Token(tokenAddr);
+    token.decimals = erc20Contract.decimals();
+    token.symbol = erc20Contract.symbol();
+    token.name = erc20Contract.name();
+    token.save();
+  }
 
   const marketRewardTokens = market.rewardTokens;
   if (!marketRewardTokens || marketRewardTokens.length == 0) {
@@ -354,6 +368,7 @@ export function handleRewardPaid(event: RewardPaid): void {
     let rewardToken = RewardToken.load(rewardTokenID);
     if (!rewardToken) {
       rewardToken = new RewardToken(rewardTokenID);
+      rewardToken.token = token.id;
       rewardToken.type = RewardTokenType.DEPOSIT;
       rewardToken.save();
     }
@@ -401,12 +416,13 @@ export function handleRewardPaid(event: RewardPaid): void {
   const rewardTokenEmissionsAmount = bigDecimalToBigInt(
     market._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler)
   );
-
-  const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
-    .divDecimal(exponentToBigDecimal(token.decimals))
-    .times(token.lastPriceUSD!);
+  // TODO find price for IB token:
+  // https://optimistic.etherscan.io/address/0x00a35fd824c717879bf370e70ac6868b95870dfb
+  //const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
+  //  .divDecimal(exponentToBigDecimal(token.decimals))
+  //  .times(token.lastPriceUSD!);
   market.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
-  market.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+  //market.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
 
   //reset _cumulativeRewardAmount and _rewardTimestamp for next update
   market._rewardLastUpdatedTimestamp = currTimestamp;

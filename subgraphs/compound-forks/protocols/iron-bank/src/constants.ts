@@ -17,6 +17,8 @@ export class NetworkSpecificConstant {
   }
 }
 
+const OPTIMISM_BLOCKS_PER_YEAR = ETHEREUM_BLOCKS_PER_YEAR;
+
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
@@ -36,6 +38,12 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
       Address.fromString("0x2eE80614Ccbc5e28654324a66A396458Fa5cD7Cc"),
       Network.AVALANCHE,
       AVALANCHE_BLOCKS_PER_YEAR
+    );
+  } else if (equalsIgnoreCase(network, Network.OPTIMISM)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0xE0B57FEEd45e7D908f2d0DaCd26F113Cf26715BF"),
+      Network.OPTIMISM,
+      OPTIMISM_BLOCKS_PER_YEAR
     );
   } else {
     log.error("[getNetworkSpecificConstant] Unsupported network {}", [network]);
