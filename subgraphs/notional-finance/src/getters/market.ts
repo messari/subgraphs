@@ -60,9 +60,6 @@ export function getOrCreateMarket(
 
     // market tokens
     market.inputToken = getTokenFromCurrency(event, currencyId).id;
-    // TODO: How do we represent ERC-1155 fCash
-    // ERC1155Action - 0xBf12d7e41a25f449293AB8cd1364Fe74A175bFa5
-    // Notional ERC1155 Token - https://etherscan.io/token/0x1344a36a1b56144c3bc62e7757377d288fde0369#inventory
     market.outputToken = "";
     market.rewardTokens = [];
     market.inputTokenBalance = BIGINT_ZERO;

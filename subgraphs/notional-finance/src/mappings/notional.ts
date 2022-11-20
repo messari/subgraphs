@@ -39,6 +39,7 @@ import {
 import { getTokenFromCurrency } from "../common/util";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
 import { getOrCreateInterestRate } from "../getters/InterestRate";
+import { getOrCreateERC1155Token } from "../getters/token";
 
 export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   // params
@@ -65,13 +66,12 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
       [currencyId.toString()]
     );
   } else {
-    // TODO: fix truncating
+    // TODO: WebAssembly division truncation vs 0.01
     market.maximumLTV = BigDecimal.fromString(
-      (rateStorageCall.value.getEthRate().haircut / INT_HUNDRED).toString()
+      (rateStorageCall.value.getEthRate().haircut * 0.01).toString()
     );
-    // TODO: fix truncating
     market.liquidationThreshold = BigDecimal.fromString(
-      (rateStorageCall.value.getEthRate().rateBuffer / INT_HUNDRED).toString()
+      (rateStorageCall.value.getEthRate().rateBuffer * 0.01).toString()
     );
     market.liquidationPenalty = BigDecimal.fromString(
       (
@@ -80,9 +80,24 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
     );
   }
 
+  // update output token
+  const encodedIdCall = notional.try_encodeToId(currencyId, maturity, 1);
+  if (encodedIdCall.reverted) {
+    log.error(
+      "[handleLendBorrowTrade] encodeToId for currencyId {}, maturity {} reverted",
+      [currencyId.toString(), maturity.toString()]
+    );
+  } else {
+    // TODO: WebAssembly division truncation vs 0.01
+    market.outputToken = getOrCreateERC1155Token(
+      PROTOCOL_ID,
+      encodedIdCall.value
+    ).id;
+  }
+
   market.save();
 
-  // marketstatus entity
+  // track market status
   const markets = getMarketsWithStatus(event);
   if (markets.activeMarkets.indexOf(market.id) < 0) {
     markets.activeMarkets = addToArrayAtIndex(
@@ -93,9 +108,8 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
     markets.save();
   }
 
-  // getActiveMarkets
+  // get active markets
   const currencyIds = [1, 2, 3, 4];
-  // const notional = Notional.bind(Address.fromString(PROTOCOL_ID));
   let activeMarkets: string[] = [];
   for (let i = 0; i < currencyIds.length; i++) {
     const call = notional.try_getActiveMarkets(currencyIds[i]);

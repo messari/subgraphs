@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
 import { ERC20 } from "../../generated/Notional/ERC20";
 import { getUsdPricePerToken } from "../prices";
@@ -24,9 +24,9 @@ export function getOrCreateToken(
       token.symbol = ETH_SYMBOL;
       token.decimals = 18;
     } else {
-      token.name = fetchTokenName(tokenAddress);
-      token.symbol = fetchTokenSymbol(tokenAddress);
-      token.decimals = fetchTokenDecimals(tokenAddress) as i32;
+      token.name = _fetchTokenName(tokenAddress);
+      token.symbol = _fetchTokenSymbol(tokenAddress);
+      token.decimals = _fetchTokenDecimals(tokenAddress) as i32;
     }
   }
 
@@ -43,7 +43,23 @@ export function getOrCreateToken(
   return token;
 }
 
-function fetchTokenName(tokenAddress: Address): string {
+export function getOrCreateERC1155Token(
+  tokenAddress: string,
+  encodedId: BigInt
+): Token {
+  const tokenId = "ERC1155-" + tokenAddress + "-" + encodedId.toString();
+  let token = Token.load(tokenId);
+
+  if (!token) {
+    token = new Token(tokenId);
+  }
+
+  token.save();
+  log.error("ERC1155 token created: {}", [token.id]);
+  return token;
+}
+
+function _fetchTokenName(tokenAddress: Address): string {
   const tokenContract = ERC20.bind(tokenAddress);
   const call = tokenContract.try_name();
   if (call.reverted) {
@@ -53,7 +69,7 @@ function fetchTokenName(tokenAddress: Address): string {
   }
 }
 
-function fetchTokenSymbol(tokenAddress: Address): string {
+function _fetchTokenSymbol(tokenAddress: Address): string {
   const tokenContract = ERC20.bind(tokenAddress);
   const call = tokenContract.try_symbol();
   if (call.reverted) {
@@ -63,7 +79,7 @@ function fetchTokenSymbol(tokenAddress: Address): string {
   }
 }
 
-function fetchTokenDecimals(tokenAddress: Address): number {
+function _fetchTokenDecimals(tokenAddress: Address): number {
   const tokenContract = ERC20.bind(tokenAddress);
   const call = tokenContract.try_decimals();
   if (call.reverted) {

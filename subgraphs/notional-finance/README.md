@@ -280,18 +280,9 @@ However, this might be technically cumbersome to recitify this error. In any cas
 
 The following set of entities/fields cannot be calculated or calculated accurately or are pending:
 
-- [ ] `market.outputToken`, `market.outputTokenSupplies` and `market.outputTokenPriceUSD`: Notional uses fCash for accounting purposes, whiich is an ERC1155 token. There aren't ERC1155 contract calls to get name, symbol, decimals or price.
-
-  - Does it make sense to track fCash price given it's primarily used for internal account?
-  - What are best practices to approach this?
-    - option 1: set some of these as static values and explore calculating price indirectly through other mechanisms.
-    - fCash price = amountUSD / netfCash (amountUSD = cToken \* USDprice)
-
 - [ ] Market Positions
 
   - How to manage updating and closing positions and position counters in the event of rollovers?
   - How do we ensure liquidated positions are updated? (Note that liquidation event don't provide any market info and hence cannot be associated with a market/position).
 
 - [ ] Liquidation metrics (`market.cumulativeLiquidateUSD`, `liquidate.market`, `liquidate.position`): Liquidation events do not report any market info because they are not associated with a market from the perspective of Notional. We cannot update position or market data associated with liquidation events as a result.
-
-- [ ] `event.params.nonce`: This is null for all events (I think) and causing subgraph syncing errors, need debugging.

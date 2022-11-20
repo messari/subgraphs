@@ -167,8 +167,7 @@ export function createPositionSnapshot(
   snapshot.position = position.id;
   snapshot.hash = hash;
   snapshot.logIndex = txlogIndex;
-  // snapshot.nonce = event.transaction.nonce;
-  snapshot.nonce = BIGINT_ZERO;
+  snapshot.nonce = event.transaction.nonce;
   snapshot.balance = position.balance;
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
@@ -302,8 +301,7 @@ export function createDeposit(
   const transactionType = TransactionType.DEPOSIT;
 
   deposit.hash = event.transaction.hash.toHexString();
-  // deposit.nonce = event.transaction.
-  deposit.nonce = BIGINT_ZERO;
+  deposit.nonce = event.transaction.nonce;
   deposit.logIndex = event.logIndex.toI32();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
@@ -355,8 +353,7 @@ export function createWithdraw(
   const transactionType = TransactionType.WITHDRAW;
 
   withdraw.hash = event.transaction.hash.toHexString();
-  // withdraw.nonce = event.transaction.nonce;
-  withdraw.nonce = BIGINT_ZERO;
+  withdraw.nonce = event.transaction.nonce;
   withdraw.logIndex = event.logIndex.toI32();
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
@@ -409,8 +406,7 @@ export function createBorrow(
   const transactionType = TransactionType.BORROW;
 
   borrow.hash = event.transaction.hash.toHexString();
-  // borrow.nonce = event.transaction.nonce;
-  borrow.nonce = BIGINT_ZERO;
+  borrow.nonce = event.transaction.nonce;
   borrow.logIndex = event.logIndex.toI32();
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
@@ -462,8 +458,7 @@ export function createRepay(
   const transactionType = TransactionType.REPAY;
 
   repay.hash = event.transaction.hash.toHexString();
-  // repay.nonce = event.transaction.nonce;
-  repay.nonce = BIGINT_ZERO;
+  repay.nonce = event.transaction.nonce;
   repay.logIndex = event.logIndex.toI32();
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
@@ -512,8 +507,7 @@ export function createLiquidate(
   const liquidateeAccount = getOrCreateAccount(liquidatee.toHexString(), event);
 
   liquidate.hash = event.transaction.hash.toHexString();
-  // liquidate.nonce = event.transaction.nonce;
-  liquidate.nonce = BIGINT_ZERO;
+  liquidate.nonce = event.transaction.nonce;
   liquidate.logIndex = event.logIndex.toI32();
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;

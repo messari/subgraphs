@@ -40,13 +40,13 @@ type Token @entity {
   id: ID!
 
   " Name of the token, mirrored from the smart contract "
-  name: String!
+  name: String
 
   " Symbol of the token, mirrored from the smart contract "
-  symbol: String!
+  symbol: String
 
   " The number of decimal places this token uses, default to 18 "
-  decimals: Int!
+  decimals: Int
 
   " Optional field to track the price of a token, mostly for caching purposes "
   lastPriceUSD: BigDecimal
