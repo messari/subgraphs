@@ -17,6 +17,7 @@ import {
   Withdraw,
   Swap as SwapEvent,
   Token,
+  Position,
 } from "../../generated/schema";
 import { Pair as PairTemplate } from "../../generated/templates";
 import {
@@ -36,6 +37,7 @@ import {
   getOrCreateToken,
   getOrCreateLPToken,
   getLiquidityPoolAmounts,
+  getOrCreatePosition,
 } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import {
@@ -168,6 +170,45 @@ export function createAndIncrementAccount(accountId: string): i32 {
   return INT_ZERO;
 }
 
+/**
+ * Create a position 
+ * id format is  " { Account address }-{ Market address }-{ Count }"
+ * id { Count } is always 0 for the active position
+ */
+export function createPosition(
+  event: ethereum.Event,
+  amount0: BigInt,
+  amount1: BigInt
+): void {
+  const transfer = getOrCreateTransfer(event);
+
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
+
+  // Open position always ends with zero
+  const positionId = transfer.sender!
+                            .concat("-")
+                            .concat(pool.id)
+                            .concat("-0");
+  let position = Position.load(positionId);
+  if(position == null) {
+    position = new Position(positionId);
+    position.account = transfer.sender!
+    position.pool = pool.id;
+    position.hashOpened = event.transaction.hash.toHexString();
+    position.blockNumberOpened = event.block.number;
+    position.timestampOpened = event.block.timestamp;
+    position.depositCount = BIGINT_ZERO;
+    let inputTokenBalances = new Array<BigInt>(2);
+    inputTokenBalances = [ INT_ZERO, INT_ZERO ]
+    position.inputTokenBalances = inputTokenBalances;
+    position.withdrawCount= INT_ZERO;
+  }
+
+}
+
 // Create a Deposit entity and update deposit count on a Mint event for the specific pool..
 export function createDeposit(
   event: ethereum.Event,
@@ -181,6 +222,7 @@ export function createDeposit(
     event.block.number
   );
 
+  
   const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
 
@@ -210,9 +252,35 @@ export function createDeposit(
     .plus(token1.lastPriceUSD!.times(token1Amount));
   deposit.pool = pool.id;
 
+  // Create or update active position for this deposit
+  let position = getOrCreatePosition(event);
+
+  log.debug("Getting input token balances to new position creators.ts line 249", []);
+  let tokenInputBalances = position.inputTokenBalances;
+  log.debug("Got input token balances to new position creators.ts line 251", []);
+  if(!tokenInputBalances) {
+    log.debug("createDeposit - creating new token input balances array", []);
+    tokenInputBalances = new Array<BigInt>(2);
+  }
+  log.debug("added amount0 to token balances {}", [amount0.toString()])
+  tokenInputBalances.push(amount0);
+  log.debug("added amount1 to token balances {}", [amount1.toString()])
+  tokenInputBalances.push(amount1);
+  log.debug("Updating position with inputTokenBalances array", [])
+  position.inputTokenBalances = tokenInputBalances;
+  
+  // TODO: Create position snapshot
+  // TODO: Output token balances
+  position.save();
+  deposit.position = position.id;
+  deposit.save();
+
+
+  position.depositCount += 1;
+  position.save();
+
   updateDepositHelper(event.address);
 
-  deposit.save();
 }
 
 // Create a Withdraw entity on a Burn event for the specific pool..

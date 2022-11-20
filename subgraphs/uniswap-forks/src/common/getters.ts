@@ -1,8 +1,9 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { TokenABI } from "../../generated/Factory/TokenABI";
 import {
+  Account,
   DexAmmProtocol,
   LiquidityPool,
   UsageMetricsDailySnapshot,
@@ -16,6 +17,8 @@ import {
   RewardToken,
   LiquidityPoolHourlySnapshot,
   UsageMetricsHourlySnapshot,
+  Position,
+  Deposit,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
@@ -29,6 +32,63 @@ import {
   SECONDS_PER_HOUR,
 } from "./constants";
 import { createPoolFees } from "./creators";
+
+
+/**
+ * Called when a deposit is made into a LiquidityPool
+ * @param event 
+ * @param amount0 
+ * @param amount1 
+ */
+export function getOrCreatePosition(event: ethereum.Event):Position {
+  // Find the position if one exists
+  // Create the Id
+  // Load from the Id
+  // If not create a new position
+  let transfer = getOrCreateTransfer(event);
+
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
+
+  let account = Account.load(transfer.sender!)
+  if(!account) {
+    account = new Account(transfer.sender!)
+    account.save()
+  }
+  // Open position always ends with zero
+  const positionId = account.id
+                            .concat("-")
+                            .concat(pool.id)
+                            .concat("-0");
+  let position = Position.load(positionId);
+  if(!position) {
+    position = new Position(positionId);
+    position.account = account.id
+    position.pool = pool.id;
+    
+    position.hashOpened = event.transaction.hash.toHexString();
+    position.blockNumberOpened = event.block.number;
+    position.timestampOpened = event.block.timestamp;
+    position.depositCount = INT_ZERO;
+
+    log.debug("Adding input token balances to new position GETTERS.ts line 71", []);
+    position.inputTokenBalances = new Array<BigInt>();//.map<BigInt>(() => BIGINT_ZERO);
+    // let inputTokenBalances = position.inputTokenBalances;
+    // inputTokenBalances.push(BIGINT_ZERO);
+    // inputTokenBalances.push(BIGINT_ZERO);
+    log.debug("Added input token balances to new position GETTERS.ts line 73", []);
+    // let cumulativeRewards = new Array<BigInt>(1);
+    log.debug("Adding cumulative rewards to new position", []);
+    // cumulativeRewards.push(BIGINT_ZERO);
+    position.cumulativeRewardTokenAmounts = new Array<BigInt>();
+    position.withdrawCount = INT_ZERO;
+  }
+  position.save();
+  return position;
+  
+}
 
 export function getOrCreateProtocol(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.getFactoryAddress());
