@@ -255,18 +255,12 @@ export function createDeposit(
   // Create or update active position for this deposit
   let position = getOrCreatePosition(event);
 
-  log.debug("Getting input token balances to new position creators.ts line 249", []);
   let tokenInputBalances = position.inputTokenBalances;
-  log.debug("Got input token balances to new position creators.ts line 251", []);
   if(!tokenInputBalances) {
-    log.debug("createDeposit - creating new token input balances array", []);
-    tokenInputBalances = new Array<BigInt>(2);
+    tokenInputBalances = new Array<BigInt>(pool.inputTokens.length).map<BigInt>(()=>BIGINT_ZERO);
   }
-  log.debug("added amount0 to token balances {}", [amount0.toString()])
-  tokenInputBalances.push(amount0);
-  log.debug("added amount1 to token balances {}", [amount1.toString()])
-  tokenInputBalances.push(amount1);
-  log.debug("Updating position with inputTokenBalances array", [])
+  tokenInputBalances[0] = tokenInputBalances[0].plus(amount0);
+  tokenInputBalances[1] = tokenInputBalances[1].plus(amount1);
   position.inputTokenBalances = tokenInputBalances;
   
   // TODO: Create position snapshot
