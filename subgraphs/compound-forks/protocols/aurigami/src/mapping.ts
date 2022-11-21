@@ -464,7 +464,7 @@ function getRewardsPerDay(
   rewardSpeed: BigInt,
   rewardToken: RewardToken
 ): RewardSpeeds {
-  const token = getOrCreateToken(Address.fromString(rewardToken.id));
+  const token = getOrCreateToken(Address.fromString(rewardToken.token));
   const rewardsBI = rewardSpeed.times(BigInt.fromI64(SECONDS_PER_DAY));
   const rewardsBD = rewardSpeed
     .toBigDecimal()
