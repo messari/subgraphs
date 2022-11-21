@@ -252,3 +252,6 @@ export const DEFAULT_POOL_FEE = BigInt.fromString("4000000");
 export const DEFAULT_ADMIN_FEE = BigInt.fromString("5000000000");
 
 export const REGISTRY_ADDRESS_V2 = Address.fromString("0x266Bb386252347b03C7B6eB37F950f476D7c3E63");
+export const EPS_POOL_ADDRESS = Address.fromString(
+  "0x19ec9e3f7b21dd27598e7ad5aae7dc0db00a806d"
+);
