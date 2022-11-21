@@ -1341,10 +1341,10 @@
     "deployments": {
       "dforce-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.3",
+          "subgraph": "1.2.4",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1363,10 +1363,10 @@
       },
       "dforce-avalanche": {
         "network": "avalanche",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.2",
+          "subgraph": "1.2.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1385,10 +1385,10 @@
       },
       "dforce-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.2",
+          "subgraph": "1.2.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1407,10 +1407,10 @@
       },
       "dforce-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.2",
+          "subgraph": "1.2.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1424,15 +1424,19 @@
           "hosted-service": {
             "slug": "dforce-ethereum",
             "query-id": "dforce-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "dforce-ethereum",
+            "query-id": "ECtdoov16DUmk5qbhFx4PVVN7vidiNDwzFNsui6FoHEo"
           }
         }
       },
       "dforce-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.2",
+          "subgraph": "1.2.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1451,10 +1455,10 @@
       },
       "dforce-polygon": {
         "network": "polygon",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.2",
+          "subgraph": "1.2.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1695,7 +1699,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.9",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4686,6 +4690,35 @@
       }
     }
   },
+  "compound-governance-v1": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "compound-governance-v1",
+    "deployments": {
+      "compound-governance-v1-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "compound-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "compound-governance-v1",
+            "query-id": "compound-governance-v1"
+          }
+        }
+      }
+    }
+  },
   "cryptex-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
@@ -4768,6 +4801,35 @@
           "hosted-service": {
             "slug": "idle-governance",
             "query-id": "idle-governance"
+          }
+        }
+      }
+    }
+  },
+  "idle-governance-v1": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "idle-governance-v1",
+    "deployments": {
+      "idle-governance-v1-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "idle-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "idle-governance-v1",
+            "query-id": "idle-governance-v1"
           }
         }
       }
@@ -4913,6 +4975,64 @@
           "hosted-service": {
             "slug": "uniswap-governance",
             "query-id": "uniswap-governance"
+          }
+        }
+      }
+    }
+  },
+  "uniswap-governance-v1": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "uniswap-governance-v1",
+    "deployments": {
+      "uniswap-governance-v1-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswap-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-governance-v1",
+            "query-id": "uniswap-governance-v1"
+          }
+        }
+      }
+    }
+  },
+  "uniswap-governance-v2": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "uniswap-governance-v2",
+    "deployments": {
+      "uniswap-governance-v2-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswap-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-governance-v2",
+            "query-id": "uniswap-governance-v2"
           }
         }
       }
