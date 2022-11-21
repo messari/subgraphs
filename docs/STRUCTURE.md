@@ -2,6 +2,16 @@
 
 This document will help you understand the structure of the Messari subgraphs repository. What should you know at a high level? What does each protocol directory look like? What should I worry about?
 
+## Why is the standard structure important?
+
+All our subgraphs share the same build and deployment scripts. They are used during development, when deploying a subgraph, and during our CI/CD validation pipelines. These scripts expect all subgraphs to follow a given directory structure. So for them to work without adding extra hassle, and to keep code itself organized in a consistent and predictable manner, we require all subgraphs to follow this structure.
+
+Our CI pipelines on PRs automatically validate that this structure is followed, to enforce it and make sure things don't break in case of error.
+
+To do so we are using [folderslint](). It is a simple tool that allows you to define some rules and then validates that they are met. The rules are very simple, it is a set of paths that are whitelisted. These are contained at `/subgraphs/.folderslintrc`.
+
+See the following for the actual directory structure.
+
 ## High Level
 
 ### Dashboard

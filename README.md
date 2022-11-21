@@ -30,7 +30,7 @@ Becoming a good subgraph developer will take patience and practice. The followin
 - Resources for development of varying levels can be found in [`docs/RESOURCES.md`](./docs/RESOURCES.md).
 - To learn about common errors, best error handling practices, and debugging see [`docs/ERRORS.md`](./docs/ERRORS.md)
 - Subgraph performance is also a concern. Learn about indexing / querying performance by reading [`docs/PERFORMANCE`](./docs/PERFORMANCE.md)
-- Learn about pricing and how to handle this in [`docs/ORACLES.md`](./docs/ORACLES.md)
+- Learn about retrieving prices in subgraphs and how to handle this in [`docs/ORACLES.md`](./docs/ORACLES.md)
 
 ## Contributing Guidelines
 

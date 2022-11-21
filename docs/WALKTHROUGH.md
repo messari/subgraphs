@@ -47,7 +47,7 @@ Some of the notable things in this folder:
 
 ## Create a PR
 
-At this point you have a little work done. You should make a PR and convert it to a Draft so we can track the status and suggest changes as you build! To do this follow the notes in [CONTRIBUTING.md](../CONTRIBUTING.md).
+At this point you have a little work done. You should make a PR and convert it to a Draft so we can track the status and suggest changes as you build! To do this follow the notes in [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Define the Manifest
 

@@ -11,7 +11,7 @@ This document describes how to setup your local working environment in order to 
 
 ## Installation
 
-After installing Nodejs and npm you are close to done with installing all of the development dependencies. There are a few other npm packages to install globally:
+After installing Nodejs and npm you are close to done with installing all of the development dependencies. There are a few other npm packages to [install globally](https://docs.npmjs.com/downloading-and-installing-packages-globally):
 
 - [graph-cli](https://www.npmjs.com/package/@graphprotocol/graph-cli)
 - [graph-ts](https://www.npmjs.com/package/@graphprotocol/graph-ts)

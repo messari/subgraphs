@@ -147,6 +147,7 @@ Here are some known issues with subgraph tooling that you may run into:
 - When updating an entity array, you cannot use `array.push()` or `array[0] = ...` on the entity's field directly. Instead, you need to assign a new array to the entity array. See [details](https://thegraph.com/docs/en/developer/assemblyscript-api/#updating-existing-entities).
 - Initialize array using `let a = new Array<T>()` instead of `let a = []`. See [details](https://www.youtube.com/watch?v=1-8AW-lVfrA&t=3174s).
 - Scope is not inherited into closures (can't use variables declared outside of a closure). See [details](https://www.youtube.com/watch?v=1-8AW-lVfrA&t=3243s).
+- Private global variables in classes are not supported. You can still make them, but there is no way to prevent a class object from directly changing private class variables. See: [https://www.assemblyscript.org/status.html#language-features](https://www.assemblyscript.org/status.html#language-features)
 
 ## Debugging
 
@@ -197,6 +198,8 @@ Beyond these two possible causes, these are the steps you can take to narrow dow
 As an example, the euler finance subgraph had a "oneshot cancelled" error for tx [0x102d9eb3d096d5cfc74ba56ea7c3b0ebfc30454d7f3d000fd42c1307f746c2cf](https://etherscan.io/tx/0x102d9eb3d096d5cfc74ba56ea7c3b0ebfc30454d7f3d000fd42c1307f746c2cf#eventlog) at block 15700199. After going through the process, it is clear that error happened within the loop `for (let i = 0; i < eulerViewMarkets.length; i += 1)` in function [`syncWithEulerGeneralView`](https://github.com/messari/subgraphs/blob/4d6c3432f946a57ecdc295ef0f357dc1ca8309a6/subgraphs/euler-finance/src/mappings/helpers.ts#L321) of `src/mappings/helpers.ts`. The first hypothesis was that the `eulerViewMarkets` array used in the loop is too big. An attempted fix is to save data in the array into an entity and load needed info from the entity inside the loop. It didn't fix the error. Going back to the logs, it appears the error always happened in the last few lines of the loop at different iterations. Another fix moved the last two lines of the loop elsewhere and [it worked](https://github.com/messari/subgraphs/pull/1213).
 
 ### Historical Contract Calls
+
+> Note: since this is supported in [miniscan](./TOOLING.md#miniscan) it is generally easier to use that. There still may be edge cases where the following is useful.
 
 Making historical contract calls can aide your debugging. You would want to perform this in order to see the response to a contract call at a previous block. On the chain's blockscanner you can make contract calls to the current state of the network, but previous calls will require this method:
 
