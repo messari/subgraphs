@@ -95,7 +95,7 @@ export namespace NULL {
 export namespace Protocol {
   export const NAME = "Balancer v2";
   export const SLUG = "balancer-v2";
-  export const NETWORK = Network.MAINNET;
+  export const NETWORK = Network.MATIC;
 }
 
 export namespace MasterChef {
@@ -126,6 +126,10 @@ export const BIGDECIMAL_TEN = new BigDecimal(BIGINT_TEN);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 export const BIGDECIMAL_POINT_FOUR = BigDecimal.fromString("0.4");
+export const BIGINT_MAX = BigInt.fromString(
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+);
+export const BIGDECIMAL_BIGINT_MAX = new BigDecimal(BIGINT_MAX);
 
 export const DEFAULT_DECIMALS_DENOMINATOR = BigDecimal.fromString(
   "1000000000000000000"
@@ -148,16 +152,16 @@ export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
   "0xce88686553686DA562CE7Cea497CE749DA109f9F"
 );
 export const PROTOCOL_TOKEN_ADDRESS = Address.fromString(
-  "0xba100000625a3754423978a60c9317c58a424e3D"
+  "0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD"
+  "0x3b8cA519122CdD8efb272b0D3085453404B25bD0"
 );
 export const AAVE_BOOSTED_POOL_ADDRESS = Address.fromString(
   "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2"
 );
 
-export const INFLATION_INTERVAL = "TIMESTAMP";
+export const INFLATION_INTERVAL = "NONE";
 export const STARTING_INFLATION_RATE = BigDecimal.fromString(
-  (0.23974867724).toString()
+  (0).toString()
 ).times(DEFAULT_DECIMALS_DENOMINATOR);

@@ -24,6 +24,8 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
+import { getStat, updateStat } from "./Stat";
+import { getOrCreateAccount } from "./Position";
 
 export function createSwapTransaction(
   liquidityPool: LiquidityPoolStore,
@@ -36,7 +38,7 @@ export function createSwapTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): SwapTransaction {
-  let transactionId = "swap-"
+  const transactionId = "swap-"
     .concat(transaction.hash.toHexString())
     .concat("-")
     .concat(transaction.index.toString());
@@ -49,11 +51,14 @@ export function createSwapTransaction(
     swapTransaction.pool = liquidityPool.id;
     swapTransaction.protocol = getOrCreateDexAmmProtocol().id;
 
-    swapTransaction.to = liquidityPool.id;
-    swapTransaction.from = transaction.from.toHexString();
+    const account = getOrCreateAccount(transaction.from.toHexString(), true);
+    swapTransaction.account = account.id;
 
     swapTransaction.hash = transaction.hash.toHexString();
     swapTransaction.logIndex = transaction.index.toI32();
+    swapTransaction.nonce = transaction.nonce;
+    swapTransaction.gasLimit = transaction.gasLimit;
+    swapTransaction.gasPrice = transaction.gasPrice;
 
     swapTransaction.tokenIn = tokenIn.id;
     swapTransaction.amountIn = amountIn;
@@ -72,18 +77,23 @@ export function createSwapTransaction(
   return swapTransaction;
 }
 
-export function UpdateMetricsAfterSwap(block: ethereum.Block): void {
+export function UpdateMetricsAfterSwap(
+  block: ethereum.Block,
+  amountToken: BigInt,
+  amountUSD: BigDecimal
+): void {
   const protocol = getOrCreateDexAmmProtocol();
 
   // Update hourly and daily deposit transaction count
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
   const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
 
-  metricsDailySnapshot.dailySwapCount += 1;
   metricsHourlySnapshot.hourlySwapCount += 1;
 
   metricsDailySnapshot.save();
   metricsHourlySnapshot.save();
+
+  updateStat(getStat(metricsDailySnapshot.swapStats), amountToken, amountUSD);
 
   protocol.save();
 }
@@ -99,10 +109,10 @@ export function Swap(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  let inputTokenBalances: BigInt[] = pool.inputTokenBalances;
+  const inputTokenBalances: BigInt[] = pool.inputTokenBalances;
 
-  let tokenInStore = getOrCreateToken(tokenIn, block.number);
-  let tokenInIndex = pool.inputTokens.indexOf(tokenIn.toHexString());
+  const tokenInStore = getOrCreateToken(tokenIn, block.number);
+  const tokenInIndex = pool.inputTokens.indexOf(tokenIn.toHexString());
 
   let amountInUSD = amountIn
     .divDecimal(
@@ -110,8 +120,8 @@ export function Swap(
     )
     .times(tokenInStore.lastPriceUSD!);
 
-  let tokenOutStore = getOrCreateToken(tokenOut, block.number);
-  let tokenOutIndex = pool.inputTokens.indexOf(tokenOut.toHexString());
+  const tokenOutStore = getOrCreateToken(tokenOut, block.number);
+  const tokenOutIndex = pool.inputTokens.indexOf(tokenOut.toHexString());
 
   let amountOutUSD = amountOut
     .divDecimal(
@@ -134,6 +144,7 @@ export function Swap(
   }
 
   const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
+  const volumeToken = utils.calculateAverageBigInt([amountIn, amountOut]);
 
   pool.inputTokenBalances = inputTokenBalances;
   pool.totalValueLockedUSD = utils.getPoolTVL(
@@ -177,8 +188,8 @@ export function Swap(
   );
 
   updateProtocolRevenue(poolAddress, volumeUSD, block);
-  updateSnapshotsVolume(poolAddress, volumeUSD, block);
-  UpdateMetricsAfterSwap(block);
+  updateSnapshotsVolume(poolAddress, volumeToken, volumeUSD, block);
+  UpdateMetricsAfterSwap(block, volumeToken, volumeUSD);
 
   utils.updateProtocolTotalValueLockedUSD();
 

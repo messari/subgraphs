@@ -108,7 +108,7 @@ dataSources:
           handler: handleNewGauge
         - event: RewardsOnlyGaugeCreated(indexed address,indexed address,address)
           handler: handleRewardsOnlyGaugeCreated
-      file: ./src/mappings/GaugeControllerMappings.ts
+      file: ./src/mappings/gaugeControllerMappings.ts
 
 templates:
   - kind: ethereum/contract

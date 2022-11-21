@@ -15,9 +15,12 @@ import {
   getOrCreateDexAmmProtocol,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
+  getOrCreateLiquidityPoolDailySnapshots,
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
+import { getStat, updateStat } from "./Stat";
+import { getOrCreatePosition, updatePositions } from "./Position";
 
 export function createWithdrawTransaction(
   pool: LiquidityPoolStore,
@@ -28,7 +31,7 @@ export function createWithdrawTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): WithdrawTransaction {
-  let withdrawTransactionId = "withdraw-"
+  const withdrawTransactionId = "withdraw-"
     .concat(transaction.hash.toHexString())
     .concat("-")
     .concat(transaction.index.toString());
@@ -41,11 +44,13 @@ export function createWithdrawTransaction(
     withdrawTransaction.pool = pool.id;
     withdrawTransaction.protocol = constants.VAULT_ADDRESS.toHexString();
 
-    withdrawTransaction.to = transaction.to!.toHexString();
-    withdrawTransaction.from = provider.toHexString();
+    withdrawTransaction.account = provider.toHexString();
 
     withdrawTransaction.hash = transaction.hash.toHexString();
     withdrawTransaction.logIndex = transaction.index.toI32();
+    withdrawTransaction.nonce = transaction.nonce;
+    withdrawTransaction.gasLimit = transaction.gasLimit;
+    withdrawTransaction.gasPrice = transaction.gasPrice;
 
     withdrawTransaction.inputTokens = pool.inputTokens;
     withdrawTransaction.inputTokenAmounts = inputTokenAmounts;
@@ -58,24 +63,40 @@ export function createWithdrawTransaction(
     withdrawTransaction.timestamp = block.timestamp;
     withdrawTransaction.blockNumber = block.number;
 
+    withdrawTransaction.position = getOrCreatePosition(
+      pool.id,
+      provider.toHexString(),
+      transaction,
+      block
+    ).id;
+
     withdrawTransaction.save();
   }
 
   return withdrawTransaction;
 }
 
-export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
+export function UpdateMetricsAfterWithdraw(
+  block: ethereum.Block,
+  amountToken: BigInt,
+  amountUSD: BigDecimal
+): void {
   const protocol = getOrCreateDexAmmProtocol();
 
-  // Update hourly and daily deposit transaction count
+  // Update hourly and daily withdraw transaction count
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
   const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
 
-  metricsDailySnapshot.dailyWithdrawCount += 1;
   metricsHourlySnapshot.hourlyWithdrawCount += 1;
 
   metricsDailySnapshot.save();
   metricsHourlySnapshot.save();
+
+  updateStat(
+    getStat(metricsDailySnapshot.withdrawStats),
+    amountToken,
+    amountUSD
+  );
 
   protocol.save();
 }
@@ -87,7 +108,8 @@ export function Withdraw(
   fees: BigInt[],
   provider: Address,
   transaction: ethereum.Transaction,
-  block: ethereum.Block
+  block: ethereum.Block,
+  transactionLogIndex: BigInt
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
@@ -96,15 +118,15 @@ export function Withdraw(
     x.times(constants.BIGINT_NEGATIVE_ONE)
   );
 
-  let inputTokenAmounts: BigInt[] = [];
-  let inputTokenBalances = pool.inputTokenBalances;
+  const inputTokenAmounts: BigInt[] = [];
+  const inputTokenBalances = pool.inputTokenBalances;
   let withdrawAmountUSD = constants.BIGDECIMAL_ZERO;
 
   for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
     if (inputTokens.at(idx).equals(poolAddress)) continue;
 
-    let inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
-    let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
+    const inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
+    const inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
 
     inputTokenBalances[inputTokenIndex] = inputTokenBalances[
       inputTokenIndex
@@ -121,11 +143,11 @@ export function Withdraw(
     );
   }
 
-  let tokenSupplyAfterWithdrawal = utils.getOutputTokenSupply(
+  const tokenSupplyAfterWithdrawal = utils.getOutputTokenSupply(
     poolAddress,
     pool.outputTokenSupply!
   );
-  let outputTokenBurntAmount = pool.outputTokenSupply!.minus(
+  const outputTokenBurntAmount = pool.outputTokenSupply!.minus(
     tokenSupplyAfterWithdrawal
   );
 
@@ -153,8 +175,28 @@ export function Withdraw(
     block
   );
 
+  updatePositions(
+    pool,
+    constants.UsageType.WITHDRAW,
+    provider,
+    outputTokenBurntAmount,
+    transaction,
+    block,
+    transactionLogIndex
+  );
+
   utils.updateProtocolTotalValueLockedUSD();
-  UpdateMetricsAfterWithdraw(block);
+  UpdateMetricsAfterWithdraw(block, outputTokenBurntAmount, withdrawAmountUSD);
+
+  const poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
+    pool.id,
+    block
+  );
+  updateStat(
+    getStat(poolDailySnaphot.depositStats),
+    outputTokenBurntAmount,
+    withdrawAmountUSD
+  );
 
   log.info(
     "[RemoveLiquidity] LiquidityPool: {}, sharesBurnt: {}, inputTokenBalances: [{}], withdrawnAmounts: [{}], withdrawAmountUSD: {}, fees: [{}], TxnHash: {}",

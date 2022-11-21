@@ -1,5 +1,4 @@
 import {
-  log,
   BigInt,
   Address,
   ethereum,
@@ -8,7 +7,6 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   Token,
-  Account,
   RewardToken,
   DexAmmProtocol,
   LiquidityPoolFee,
@@ -26,21 +24,7 @@ import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
 import { Versions } from "../versions";
-
-export function getOrCreateAccount(id: string): Account {
-  let account = Account.load(id);
-
-  if (!account) {
-    account = new Account(id);
-    account.save();
-
-    const protocol = getOrCreateDexAmmProtocol();
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-
-  return account;
-}
+import { getStat } from "../modules/Stat";
 
 export function getOrCreateRewardToken(
   address: Address,
@@ -113,18 +97,20 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    protocol.cumulativeUniqueUsers = 0;
-    protocol.totalPoolCount = 0;
+    protocol.cumulativeUniqueUsers = constants.INT_ZERO;
+    protocol.cumulativeUniqueLPs = constants.INT_ZERO;
+    protocol.cumulativeUniqueTraders = constants.INT_ZERO;
+    protocol.openPositionCount = constants.INT_ZERO;
+    protocol.cumulativePositionCount = constants.INT_ZERO;
+    protocol.totalPoolCount = constants.INT_ZERO;
     protocol._poolIds = [];
+
+    protocol.schemaVersion = Versions.getSchemaVersion();
+    protocol.subgraphVersion = Versions.getSubgraphVersion();
+    protocol.methodologyVersion = Versions.getMethodologyVersion();
 
     protocol.save();
   }
-
-  protocol.schemaVersion = Versions.getSchemaVersion();
-  protocol.subgraphVersion = Versions.getSubgraphVersion();
-  protocol.methodologyVersion = Versions.getMethodologyVersion();
-
-  protocol.save();
 
   return protocol;
 }
@@ -143,7 +129,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       .readValue<BigInt>(contract.try_decimals(), constants.BIGINT_ZERO)
       .toI32();
 
-    let tokenPrice = getUsdPricePerToken(address);
+    const tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = blockNumber;
     token.save();
@@ -156,7 +142,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       .minus(token.lastPriceBlockNumber!)
       .gt(constants.PRICE_CACHING_BLOCKS)
   ) {
-    let tokenPrice = getUsdPricePerToken(address);
+    const tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = blockNumber;
 
@@ -169,7 +155,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
 export function getOrCreateFinancialDailySnapshots(
   block: ethereum.Block
 ): FinancialsDailySnapshot {
-  let id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
+  const id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
   if (!financialMetrics) {
@@ -200,7 +186,7 @@ export function getOrCreateFinancialDailySnapshots(
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let id: string = (
+  const id: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_DAY
   ).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
@@ -212,15 +198,16 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
-    usageMetrics.dailyDepositCount = 0;
-    usageMetrics.dailyWithdrawCount = 0;
-    usageMetrics.dailySwapCount = 0;
 
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;
 
     const protocol = getOrCreateDexAmmProtocol();
     usageMetrics.totalPoolCount = protocol.totalPoolCount;
+
+    usageMetrics.swapStats = getStat(`protocol-swap-${id}`).id;
+    usageMetrics.depositStats = getStat(`protocol-deposit-${id}`).id;
+    usageMetrics.withdrawStats = getStat(`protocol-withdraw-${id}`).id;
 
     usageMetrics.save();
   }
@@ -231,7 +218,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let metricsID: string = (
+  const metricsID: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_HOUR
   ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
@@ -260,9 +247,8 @@ export function getOrCreateLiquidityPoolDailySnapshots(
   poolId: string,
   block: ethereum.Block
 ): LiquidityPoolDailySnapshot {
-  let id: string = poolId
-    .concat("-")
-    .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString());
+  const day = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
+  const id: string = poolId.concat("-").concat(day);
   let poolSnapshots = LiquidityPoolDailySnapshot.load(id);
 
   if (!poolSnapshots) {
@@ -271,7 +257,7 @@ export function getOrCreateLiquidityPoolDailySnapshots(
     poolSnapshots.pool = poolId;
 
     const pool = getOrCreateLiquidityPool(Address.fromString(poolId), block);
-    let inputTokenLength = pool.inputTokens.length;
+    const inputTokenLength = pool.inputTokens.length;
 
     poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
@@ -307,6 +293,10 @@ export function getOrCreateLiquidityPoolDailySnapshots(
     poolSnapshots.blockNumber = block.number;
     poolSnapshots.timestamp = block.timestamp;
 
+    poolSnapshots.swapStats = getStat(`pool-${poolId}-swap-${day}`).id;
+    poolSnapshots.depositStats = getStat(`pool-${poolId}-deposit-${day}`).id;
+    poolSnapshots.withdrawStats = getStat(`pool-${poolId}-withdraw-${day}`).id;
+
     poolSnapshots.save();
   }
 
@@ -317,7 +307,7 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
   poolId: string,
   block: ethereum.Block
 ): LiquidityPoolHourlySnapshot {
-  let id: string = poolId
+  const id: string = poolId
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString());
   let poolSnapshots = LiquidityPoolHourlySnapshot.load(id);
@@ -330,7 +320,7 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
     poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
     const pool = getOrCreateLiquidityPool(Address.fromString(poolId), block);
-    let inputTokenLength = pool.inputTokens.length;
+    const inputTokenLength = pool.inputTokens.length;
 
     poolSnapshots.hourlyVolumeByTokenAmount = new Array<BigInt>(
       inputTokenLength
@@ -415,6 +405,10 @@ export function getOrCreateLiquidityPool(
 
     pool.fees = utils.getPoolFees(poolAddress).stringIds();
     pool.isSingleSided = false;
+
+    pool.positionCount = constants.INT_ZERO;
+    pool.openPositionCount = constants.INT_ZERO;
+    pool.closedPositionCount = constants.INT_ZERO;
 
     pool.createdBlockNumber = block.number;
     pool.createdTimestamp = block.timestamp;
