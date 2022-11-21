@@ -18,6 +18,7 @@ import {
   getOrCreateUsageHourlySnapshot,
   getOrCreateAssetStatus,
   getCurrentEpoch,
+  getStartBlockForEpoch,
 } from "../common/getters";
 import {
   BIGDECIMAL_ONE,
@@ -668,20 +669,41 @@ function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
   return null;
 }
 
-export function upateWeightedBorrow(mrkt: Market, event: ethereum.Event): void {
+export function updateWeightedBorrow(mrkt: Market, epoch: _Epoch, endBlock: BigInt, event: ethereum.Event): void {
   // update total borrow balance USD weighted by blocks lapsed
-  const _receivingRewards = mrkt._receivingRewards == null ? "null" : mrkt._receivingRewards.toString();
-  log.debug("[upateWeightedBorrow]mrkt {} _receivingRewards={}", [mrkt.id, _receivingRewards]);
+  const mktReceivingRewards = mrkt._receivingRewards;
+  log.debug("[updateWeightedBorrow]mrkt {} _receivingRewards={}", [mrkt.id, mktReceivingRewards.toString()]);
   if (mrkt._receivingRewards) {
-    const blocksLapsed = event.block.number.minus(mrkt._borrowLastUpdateBlock!);
+    //const epochID = getCurrentEpoch(event);
+
+    if (!mrkt._borrowLastUpdateBlock) {
+      const epochStartBlock = getStartBlockForEpoch(epoch.epoch)!;
+      mrkt._borrowLastUpdateBlock = epochStartBlock;
+      mrkt._weightedTotalBorrowUSD = BIGDECIMAL_ZERO;
+    }
+
+    const blocksLapsed = endBlock.minus(mrkt._borrowLastUpdateBlock!);
     const addWeightedTotalBorrowUSD = mrkt.totalBorrowBalanceUSD.times(blocksLapsed.toBigDecimal());
     mrkt._weightedTotalBorrowUSD = mrkt._weightedTotalBorrowUSD!.plus(addWeightedTotalBorrowUSD);
-    mrkt._borrowLastUpdateBlock = event.block.number;
+    mrkt._borrowLastUpdateBlock = endBlock;
     mrkt.save();
 
-    const epochID = getCurrentEpoch(event);
-    const epoch = _Epoch.load(epochID.toString())!;
+    //const epoch = _Epoch.load(epochID.toString())!;
     epoch.sumWeightedBorrowUSD = epoch.sumWeightedBorrowUSD.plus(addWeightedTotalBorrowUSD);
+
+    log.info(
+      "[updateWeightedBorrow]market {}, epoch={}, blocksLapsed={} (lastUpdateBlock={},endBlock={}),addWeightedTotalBorrowUSD={},market._weightedTotalBorrowUSD={},epoch.sumWeightedBorrowUSD={}",
+      [
+        mrkt.id,
+        epoch.id,
+        blocksLapsed.toString(),
+        mrkt._borrowLastUpdateBlock!.toString(),
+        endBlock.toString(),
+        addWeightedTotalBorrowUSD.toString(),
+        mrkt._weightedTotalBorrowUSD!.toString(),
+        epoch.sumWeightedBorrowUSD.toString(),
+      ],
+    );
     epoch.save();
   }
 }

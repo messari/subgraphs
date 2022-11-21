@@ -16,6 +16,7 @@ import {
   Liquidate,
   InterestRate,
   _AssetStatus,
+  _AccountStakeAmount,
 } from "../../generated/schema";
 import { getAssetSymbol, getAssetName, getAssetDecimals } from "./tokens";
 import {
@@ -515,52 +516,28 @@ export function getStartBlockForEpoch(epoch: i32): BigInt | null {
   if (epoch < START_EPOCH || epoch > START_EPOCH + MAX_EPOCHS) {
     return null;
   }
-  const startBlock = BigInt.fromI32((epoch - 1) * BLOCKS_PER_EPOCH).plus(START_EPOCH_BLOCK);
+  const startBlock = BigInt.fromI32((epoch - START_EPOCH) * BLOCKS_PER_EPOCH).plus(START_EPOCH_BLOCK);
   return startBlock;
 }
 
-export function getDeltaStakedAmount(event: Stake): BigInt | null {
-  if (!event.receipt) {
-    log.warning("[getStakedDeltaAmount][{}] has no event.receipt", [event.transaction.hash.toHexString()]);
-    return null;
-  }
-
-  // since the event only gives new total staked amount for an account
-  // we use the transfer event to figure out the net change in staked amount
-  const currentEventLogIndex = event.logIndex;
-  const logs = event.receipt!.logs;
-  const transferSig = crypto.keccak256(ByteArray.fromUTF8("Transfer(address,address,uint256)"));
-
-  let foundIndex: i32 = -1;
-  // find index for the current logIndex
-  for (let i = 0; i < logs.length; i++) {
-    const currLog = logs.at(i);
-    if (currLog.logIndex.equals(currentEventLogIndex)) {
-      foundIndex = i;
-      break;
-    }
-  }
-  // check next log
-  const nextLog = logs.at(foundIndex + 1);
-  const topic0Sig = nextLog.topics.at(0); //topic0
-  if (topic0Sig.notEqual(transferSig)) {
-    // this should be a transfer event, error if not
-    log.error("[handleStake]The event after the Stake event is not a Transfer event at tx {}", [
-      event.transaction.hash.toHexString(),
-    ]);
-    return null;
-  }
-
-  const from = ethereum.decode("address", nextLog.topics.at(1))!.toAddress().toHexString();
-  const to = ethereum.decode("address", nextLog.topics.at(2))!.toAddress().toHexString();
-  const amount = ethereum.decode("uint256", nextLog.data)!.toBigInt();
-  let deltaAmount = BIGINT_ZERO;
-  if (to == EULSTAKES_ADDRESS) {
-    //stake
-    deltaAmount = amount;
-  } else if (from == EULSTAKES_ADDRESS) {
-    // unstake
-    deltaAmount = amount.times(BIGINT_NEG_ONE);
-  }
+export function getDeltaStakeAmount(event: Stake): BigInt {
+  const underlying = event.params.underlying.toHexString();
+  const account = event.params.who.toHexString();
+  const accountStakeAmount = getOrCreateAccountStakeAmount(underlying, account);
+  const deltaAmount = event.params.newAmount.minus(accountStakeAmount.stakeAmount);
+  accountStakeAmount.stakeAmount = event.params.newAmount;
+  accountStakeAmount.save();
   return deltaAmount;
+}
+
+export function getOrCreateAccountStakeAmount(underlying: string, account: string): _AccountStakeAmount {
+  const id = `${underlying}-${account}`;
+  let accountStakeAmount = _AccountStakeAmount.load(id);
+  if (!accountStakeAmount) {
+    accountStakeAmount = new _AccountStakeAmount(id);
+    accountStakeAmount.undlerlying = underlying;
+    accountStakeAmount.stakeAmount = BIGINT_ZERO;
+    accountStakeAmount.save();
+  }
+  return accountStakeAmount;
 }

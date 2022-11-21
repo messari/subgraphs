@@ -84,6 +84,6 @@ dataSources:
           file: ./abis/EulStakes.json
       eventHandlers:
         - event: Stake(indexed address,indexed address,address,uint256)
-          handler: handleEULStake
+          handler: handleStake
           receipt: true
       file: ./src/mappings/handlers.ts
