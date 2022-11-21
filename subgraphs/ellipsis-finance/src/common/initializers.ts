@@ -345,7 +345,7 @@ export function getOrCreateToken(
     }
 
     const tokenPrice = getUsdPricePerToken(address);
-    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceUSD = tokenPrice.usdPrice;
     token.lastPriceBlockNumber = block.number;
     token.save();
   }
@@ -358,7 +358,7 @@ export function getOrCreateToken(
       .gt(constants.BSC_AVERAGE_BLOCK_PER_HOUR)
   ) {
     const tokenPrice = getUsdPricePerToken(address);
-    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceUSD = tokenPrice.usdPrice;
     token.lastPriceBlockNumber = block.number;
 
     token.save();

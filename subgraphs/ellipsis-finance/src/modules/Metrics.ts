@@ -159,6 +159,8 @@ export function updateTokenVolume(
   block: ethereum.Block,
   underlying: boolean
 ): void {
+  if(poolAddress==Address.fromString("0x19EC9e3F7B21dd27598E7ad5aAe7dC0Db00A806d"))
+  underlying = false
   if (underlying) return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, block);

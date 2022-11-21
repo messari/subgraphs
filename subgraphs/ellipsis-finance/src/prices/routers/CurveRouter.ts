@@ -1,130 +1,133 @@
-import {
-  BigInt,
-  Address,
-  BigDecimal,
-  dataSource,
-  
-} from "@graphprotocol/graph-ts";
+import { getUsdPricePerToken } from "..";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { getPriceUsdc as getPriceUsdcSushi } from "./SushiSwapRouter";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/Factory/CurveRegistry";
-import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/Factory/CurvePoolRegistry";
-import { Pool } from "../../../generated/templates/PoolTemplate/Pool";
+import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { CurvePool as CurvePoolContract } from "../../../generated/DAI/CurvePool";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/DAI/CurveRegistry";
 
-export function getCurvePriceUsdc(
-  curveLpTokenAddress: Address,
-  network: string
-): CustomPriceType {
-  const tokensMapping = constants.WHITELIST_TOKENS_MAP.get(network);
+export function isCurveLpToken(lpAddress: Address): bool {
+  const poolAddress = getPoolFromLpToken(lpAddress);
+  if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return true;
 
-  const curveRegistry = CurveRegistryContract.bind(
-    constants.CURVE_REGISTRY_ADDRESS_MAP.get(network)!
+  return false;
+}
+
+export function getPoolFromLpToken(lpAddress: Address): Address {
+  let config = utils.getConfig();
+  const curveRegistryAdresses = config.curveRegistry();
+
+  for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
+    let curveRegistryContract = CurveRegistryContract.bind(
+      curveRegistryAdresses[idx]
+    );
+
+    let poolAddress = utils.readValue<Address>(
+      curveRegistryContract.try_get_pool_from_lp_token(lpAddress),
+      constants.NULL.TYPE_ADDRESS
+    );
+
+    if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return poolAddress;
+  }
+
+  return constants.NULL.TYPE_ADDRESS;
+}
+
+export function isLpCryptoPool(lpAddress: Address): bool {
+  const poolAddress = getPoolFromLpToken(lpAddress);
+
+  if (poolAddress != constants.NULL.TYPE_ADDRESS) {
+    return isPoolCryptoPool(poolAddress);
+  }
+
+  return false;
+}
+
+export function isPoolCryptoPool(poolAddress: Address): bool {
+  const poolContract = CurvePoolContract.bind(poolAddress);
+
+  const priceOracleCall = poolContract.try_price_oracle();
+  if (!priceOracleCall.reverted) return true;
+
+  const priceOracle1Call = poolContract.try_price_oracle1(
+    constants.BIGINT_ZERO
   );
+  if (!priceOracle1Call.reverted) return true;
 
-  const basePrice = getBasePrice(curveLpTokenAddress, curveRegistry, network);
-  const virtualPrice = getVirtualPrice(curveLpTokenAddress);
+  return false;
+}
 
-  const usdcDecimals = utils.getTokenDecimals(tokensMapping!.get("USDC")!);
-  const decimalsAdjustment = constants.DEFAULT_DECIMALS.minus(usdcDecimals);
+export function getCurvePriceUsdc(lpAddress: Address): CustomPriceType {
+  if (isLpCryptoPool(lpAddress)) {
+    return cryptoPoolLpPriceUsdc(lpAddress);
+  }
 
-  const price = virtualPrice
+  const basePrice = getBasePrice(lpAddress);
+  const virtualPrice = getVirtualPrice(lpAddress).toBigDecimal();
+
+  const config = utils.getConfig();
+  const usdcTokenDecimals = config.usdcTokenDecimals();
+
+  const decimalsAdjustment =
+    constants.DEFAULT_DECIMALS.minus(usdcTokenDecimals);
+  const priceUsdc = virtualPrice
     .times(basePrice.usdPrice)
     .times(
       constants.BIGINT_TEN.pow(decimalsAdjustment.toI32() as u8).toBigDecimal()
-    )
-    .div(
-      constants.BIGINT_TEN.pow(
-        decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8
-      ).toBigDecimal()
     );
 
-  return CustomPriceType.initialize(price, constants.DEFAULT_USDC_DECIMALS);
+  return CustomPriceType.initialize(
+    priceUsdc,
+    decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8
+  );
 }
 
-export function getPoolFromLpToken(
-  lpAddress: Address,
-  curveRegistry: CurveRegistryContract,
-  network: string
-): Address {
-  let poolAddress = utils.readValue<Address>(
-    curveRegistry.try_get_pool_from_lp_token(lpAddress),
-    constants.ZERO_ADDRESS
-  );
+export function getBasePrice(lpAddress: Address): CustomPriceType {
+  const poolAddress = getPoolFromLpToken(lpAddress);
 
-  if (poolAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
-    const curvePoolRegistry = CurvePoolRegistryContract.bind(
-      constants.CURVE_POOL_REGISTRY_ADDRESS_MAP.get(network)!
-    );
-
-    poolAddress = utils.readValue<Address>(
-      curvePoolRegistry.try_get_pool_from_lp_token(lpAddress),
-      constants.ZERO_ADDRESS
-    );
-  }
-
-  return poolAddress;
-}
-
-export function getBasePrice(
-  curveLpTokenAddress: Address,
-  curveRegistry: CurveRegistryContract,
-  network: string
-): CustomPriceType {
-  const poolAddress = getPoolFromLpToken(
-    curveLpTokenAddress,
-    curveRegistry,
-    network
-  );
-
-  if (poolAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS))
     return new CustomPriceType();
-  }
 
-  const underlyingCoinAddress = getUnderlyingCoinFromPool(
-    poolAddress,
-    curveRegistry,
-    network
-  );
-
-  const basePrice = getPriceUsdcRecommended(underlyingCoinAddress, network);
+  let underlyingCoinAddress = getUnderlyingCoinFromPool(poolAddress);
+  let basePrice = getPriceUsdcRecommended(underlyingCoinAddress);
 
   return basePrice;
 }
 
-export function getUnderlyingCoinFromPool(
-  poolAddress: Address,
-  curveRegistry: CurveRegistryContract,
-  network: string
-): Address {
-  const coinsArray = curveRegistry.try_get_coins(poolAddress);
+export function getUnderlyingCoinFromPool(poolAddress: Address): Address {
+  let config = utils.getConfig();
+  const curveRegistryAdresses = config.curveRegistry();
 
-  let coins: Address[];
+  for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
+    let curveRegistryContract = CurveRegistryContract.bind(
+      curveRegistryAdresses[idx]
+    );
 
-  if (coinsArray.reverted) {
-    return constants.ZERO_ADDRESS;
-  } else {
-    coins = coinsArray.value;
+    let coins = utils.readValue<Address[]>(
+      curveRegistryContract.try_get_underlying_coins(poolAddress),
+      []
+    );
+
+    if (coins.length != 0) return getPreferredCoinFromCoins(coins);
   }
 
-  //? Use first coin from pool and if that is empty (due to error) fall back to second coin
-  let preferredCoinAddress = coins[0];
-  if (preferredCoinAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
-    preferredCoinAddress = coins[1];
-  }
+  return constants.NULL.TYPE_ADDRESS;
+}
 
-  //? Look for preferred coins (basic coins)
-  let coinAddress: Address;
-  for (let coinIdx = 0; coinIdx < coins.length; coinIdx++) {
-    coinAddress = coins[coinIdx];
+export function getPreferredCoinFromCoins(coins: Address[]): Address {
+  let preferredCoinAddress = constants.NULL.TYPE_ADDRESS;
+  for (let coinIdx = 0; coinIdx < 8; coinIdx++) {
+    const coinAddress = coins[coinIdx];
 
-    if (coinAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
-      break;
-    }
-
-    if (isBasicToken(coinAddress, network)) {
+    if (coinAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
       preferredCoinAddress = coinAddress;
+    }
+    // Found preferred coin and we're at the end of the token array
+    if (
+      (preferredCoinAddress.notEqual(constants.NULL.TYPE_ADDRESS) &&
+        coinAddress.equals(constants.NULL.TYPE_ADDRESS)) ||
+      coinIdx == 7
+    ) {
       break;
     }
   }
@@ -132,23 +135,124 @@ export function getUnderlyingCoinFromPool(
   return preferredCoinAddress;
 }
 
-export function getVirtualPrice(curveLpTokenAddress: Address): BigDecimal {
-  const network = dataSource.network();
-  const curveRegistry = CurveRegistryContract.bind(
-    constants.CURVE_REGISTRY_ADDRESS_MAP.get(network)!
-  );
+export function getVirtualPrice(curveLpTokenAddress: Address): BigInt {
+  let config = utils.getConfig();
+  const curveRegistryAdresses = config.curveRegistry();
 
-  const virtualPrice = utils
+  for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
+    let curveRegistryContract = CurveRegistryContract.bind(
+      curveRegistryAdresses[idx]
+    );
+
+    let virtualPriceCall =
+      curveRegistryContract.try_get_virtual_price_from_lp_token(
+        curveLpTokenAddress
+      );
+
+    if (!virtualPriceCall.reverted) return virtualPriceCall.value;
+  }
+
+  return constants.BIGINT_ZERO;
+}
+
+export function getPriceUsdcRecommended(
+  tokenAddress: Address
+): CustomPriceType {
+  return getUsdPricePerToken(tokenAddress);
+}
+
+export function cryptoPoolLpPriceUsdc(lpAddress: Address): CustomPriceType {
+  const totalSupply = utils.getTokenSupply(lpAddress);
+
+  const totalValueUsdc = cryptoPoolLpTotalValueUsdc(lpAddress);
+  const priceUsdc = totalValueUsdc
+    .times(
+      constants.BIGINT_TEN.pow(
+        constants.DEFAULT_DECIMALS.toI32() as u8
+      ).toBigDecimal()
+    )
+    .div(totalSupply.toBigDecimal());
+
+  return CustomPriceType.initialize(priceUsdc, 0);
+}
+
+export function cryptoPoolLpTotalValueUsdc(lpAddress: Address): BigDecimal {
+  const poolAddress = getPoolFromLpToken(lpAddress);
+
+  const underlyingTokensAddresses =
+    cryptoPoolUnderlyingTokensAddressesByPoolAddress(poolAddress);
+
+  let totalValue = constants.BIGDECIMAL_ZERO;
+
+  for (
+    let tokenIdx = 0;
+    tokenIdx < underlyingTokensAddresses.length;
+    tokenIdx++
+  ) {
+    const tokenValueUsdc = cryptoPoolTokenAmountUsdc(
+      poolAddress,
+      underlyingTokensAddresses[tokenIdx],
+      BigInt.fromI32(tokenIdx)
+    );
+    totalValue = totalValue.plus(tokenValueUsdc);
+  }
+
+  return totalValue;
+}
+
+export function cryptoPoolTokenAmountUsdc(
+  poolAddress: Address,
+  tokenAddress: Address,
+  tokenIdx: BigInt
+): BigDecimal {
+  const poolContract = CurvePoolContract.bind(poolAddress);
+
+  const tokenBalance = utils
     .readValue<BigInt>(
-      curveRegistry.try_get_virtual_price_from_lp_token(curveLpTokenAddress),
+      poolContract.try_balances(tokenIdx),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
 
-  return virtualPrice;
+  const tokenDecimals = utils.getTokenDecimals(tokenAddress);
+  const tokenPrice = getPriceUsdcRecommended(tokenAddress);
+  const tokenValueUsdc = tokenBalance
+    .times(tokenPrice.usdPrice)
+    .div(constants.BIGINT_TEN.pow(tokenDecimals.toI32() as u8).toBigDecimal());
+
+  return tokenValueUsdc;
 }
-export function getVirtualPriceFromPool(poolAddress: Address): BigDecimal {
-  const poolContract = Pool.bind(poolAddress);
+
+export function cryptoPoolUnderlyingTokensAddressesByPoolAddress(
+  poolAddress: Address
+): Address[] {
+  const poolContract = CurvePoolContract.bind(poolAddress);
+
+  let idx = 0;
+  let coins: Address[] = [];
+  while (idx >= 0) {
+    let coin = utils.readValue<Address>(
+      poolContract.try_coins(BigInt.fromI32(idx)),
+      constants.NULL.TYPE_ADDRESS
+    );
+
+    if (coin.equals(constants.NULL.TYPE_ADDRESS)) {
+      return coins;
+    }
+
+    coins.push(coin);
+    idx += 1;
+  }
+
+  return coins;
+}
+
+export function getPriceUsdc(tokenAddress: Address): CustomPriceType {
+  if (isCurveLpToken(tokenAddress)) {
+    return getCurvePriceUsdc(tokenAddress);
+  }
+
+  const poolContract = CurvePoolContract.bind(tokenAddress);
   const virtualPrice = utils
     .readValue<BigInt>(
       poolContract.try_get_virtual_price(),
@@ -156,32 +260,21 @@ export function getVirtualPriceFromPool(poolAddress: Address): BigDecimal {
     )
     .toBigDecimal();
 
-  return virtualPrice;
-}
+  let coins: Address[] = [];
+  for (let i = 0; i < 8; i++) {
+    const coin = utils.readValue<Address>(
+      poolContract.try_coins(BigInt.fromI32(i)),
+      constants.NULL.TYPE_ADDRESS
+    );
 
-export function getPriceUsdcRecommended(
-  tokenAddress: Address,
-  network: string
-): CustomPriceType {
-  return getPriceUsdcSushi(tokenAddress, network);
-}
-
-export function isBasicToken(tokenAddress: Address, network: string): bool {
-  for (
-    let basicTokenIdx = 0;
-    basicTokenIdx < constants.WHITELIST_TOKENS_LIST.length;
-    basicTokenIdx++
-  ) {
-    const basicTokenName = constants.WHITELIST_TOKENS_LIST[basicTokenIdx];
-    const basicTokenAddress =
-      constants.WHITELIST_TOKENS_MAP.get(network)!.get(basicTokenName);
-
-    if (
-      basicTokenAddress &&
-      tokenAddress.toHex() == basicTokenAddress.toHex()
-    ) {
-      return true;
-    }
+    coins.push(coin);
   }
-  return false;
+
+  const preferredCoin = getPreferredCoinFromCoins(coins);
+  const price = getPriceUsdcRecommended(preferredCoin);
+
+  return CustomPriceType.initialize(
+    price.usdPrice.times(virtualPrice),
+    constants.DEFAULT_DECIMALS.toI32() as u8
+  );
 }

@@ -2,25 +2,26 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/Factory/CalculationsCurve";
+import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/DAI/CalculationsCurve";
 
 export function getCalculationsCurveContract(
-  network: string
-): CalculationsCurveContract {
-  return CalculationsCurveContract.bind(
-    constants.CURVE_CALCULATIONS_ADDRESS_MAP.get(network)!
-  );
+  contractAddress: Address
+): CalculationsCurveContract | null {
+  if (utils.isNullAddress(contractAddress)) return null;
+
+  return CalculationsCurveContract.bind(contractAddress);
 }
 
-export function getTokenPriceFromCalculationCurve(
-  tokenAddr: Address,
-  network: string
-): CustomPriceType {
-  const calculationCurveContract = getCalculationsCurveContract(network);
+export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
+  const config = utils.getConfig();
 
-  if (!calculationCurveContract) {
+  if (!config || config.curveCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
-  }
+
+  const calculationCurveContract = getCalculationsCurveContract(
+    config.curveCalculations()
+  );
+  if (!calculationCurveContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(

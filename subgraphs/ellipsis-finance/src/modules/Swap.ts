@@ -108,15 +108,15 @@ export function Swap(
     tokenIn = pool.inputTokens[sold_id.toI32()];
     tokenOut = pool.inputTokens[bought_id.toI32()];
   } else {
-    log.warning("[Swap] before getunderlyingcoins {}", [""]);
-
-    const underlyingCoins = utils.getPoolUnderlyingCoins(
+    let underlyingCoins = utils.getPoolUnderlyingCoins(
       liquidityPoolAddress,
       pool._registry
         ? Address.fromString(pool._registry!)
         : constants.ADDRESS_ZERO
     );
-    log.warning("[Swap] after getunderlyingcoins coins {}", [""]);
+
+    if (liquidityPoolAddress.equals(constants.EPS_POOL_ADDRESS))
+      if (underlyingCoins.length == 0) underlyingCoins = pool.inputTokens;
 
     if (underlyingCoins.length == 0) return;
 
@@ -125,6 +125,7 @@ export function Swap(
   }
 
   const tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);
+
   const amountInUSD = amountIn
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()

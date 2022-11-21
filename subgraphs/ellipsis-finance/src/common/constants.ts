@@ -102,13 +102,6 @@ export const ETH_ADDRESS = Address.fromString(
   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
 );
 
-export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
-
-export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
-export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // created block 10042267
-export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // created block 10093341
-
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
@@ -130,18 +123,7 @@ export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 
-export const INT_NEGATIVE_ONE = -1 as i32;
-export const INT_ZERO = 0 as i32;
-export const INT_ONE = 1 as i32;
-export const INT_TWO = 2 as i32;
-export const INT_FOUR = 4 as i32;
-
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
-export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
-export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
-export const BIGDECIMAL_ONE_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
-export const BIG_DECIMAL_1E18 = new BigDecimal(BIGINT_TEN_TO_EIGHTEENTH);
-export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
 /////////////////////
 ///// Date/Time /////
@@ -198,10 +180,6 @@ export const REGISTRY_ADDRESS = Address.fromString(
 export const STAKING_V1 = "0xcce949De564fE60e7f96C85e55177F8B9E4CF61b";
 export const STAKING_V2 = "0x5B74C99AA2356B4eAa7B85dC486843eDff8Dfdbe";
 
-export const TRICRYPTO_LP_TOKEN = Address.fromString(
-  "0xaF4dE8E872131AE328Ce21D909C74705d3Aaf452"
-);
-
 export const POOL_LP_TOKEN_MAP = new Map<string, Address>();
 POOL_LP_TOKEN_MAP.set(
   "0x160CAed03795365F3A589f10C379FfA7d75d4E76".toLowerCase(),
@@ -257,7 +235,7 @@ export namespace NULL {
   export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
   export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
 }
-export const BSC_AVERAGE_BLOCK_PER_HOUR = BigInt.fromString("200000");
+export const BSC_AVERAGE_BLOCK_PER_HOUR = BigInt.fromString("10000");
 
 export const BIGINT_TEN = BigInt.fromI32(10);
 

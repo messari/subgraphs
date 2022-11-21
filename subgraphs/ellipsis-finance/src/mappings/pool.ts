@@ -1,4 +1,4 @@
-import {
+ import {
   updateFinancials,
   updatePoolSnapshots,
   updateUsageMetrics,
@@ -19,6 +19,7 @@ import { Swap } from "../modules/Swap";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
 import * as constants from "../common/constants";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
   const liquidityPoolAddress = event.address;
@@ -237,7 +238,9 @@ export function handleTokenExchangeUnderlying(
   const amountIn = event.params.tokens_sold;
   const boughtId = event.params.bought_id;
   const amountOut = event.params.tokens_bought;
-
+  if(liquidityPoolAddress.equals(Address.fromString("0x19ec9e3f7b21dd27598e7ad5aae7dc0db00a806d"))){
+    log.warning("[TokenExchangeUnderlying] Pool {} soldId {} boughtId {} amountIn {} amountOut {}",[liquidityPoolAddress.toHexString(),soldId.toString(),boughtId.toString(),amountIn.toString(),amountOut.toString()])
+  }
   Swap(
     liquidityPoolAddress,
     soldId,

@@ -335,6 +335,7 @@ export function getPoolUnderlyingCoins(
     registryContract.try_get_underlying_coins(poolAddress),
     []
   );
+  if(poolAddress.equals(Address.fromString("0x19ec9e3f7b21dd27598e7ad5aae7dc0db00a806d")))
   log.warning("[getUnderlyingcoins] coins from registry length {}", [
     underlyingCoins.length.toString(),
   ]);
@@ -353,6 +354,7 @@ export function getPoolUnderlyingCoins(
     factoryContract.try_get_underlying_coins(poolAddress),
     []
   );
+  if(poolAddress.equals(Address.fromString("0x19ec9e3f7b21dd27598e7ad5aae7dc0db00a806d")))
   log.warning("[getUnderlyingcoins] coins from factory length {}", [
     underlyingCoins.length.toString(),
   ]);
@@ -372,6 +374,7 @@ export function getPoolUnderlyingCoins(
       factoryContract.try_get_underlying_coins(poolAddress),
       []
     );
+    if(poolAddress.equals(Address.fromString("0x19ec9e3f7b21dd27598e7ad5aae7dc0db00a806d")))
     log.warning("[getUnderlyingcoins] coins from new registry length {}", [
       underlyingCoins.length.toString(),
     ]);
@@ -392,6 +395,7 @@ export function getPoolUnderlyingCoins(
       registryContract.try_get_underlying_coins(poolAddress),
       []
     );
+    if(poolAddress.equals(Address.fromString("0x19ec9e3f7b21dd27598e7ad5aae7dc0db00a806d")))
     log.warning("[getUnderlyingcoins] coins from new factory length {}", [
       underlyingCoins.length.toString(),
     ]);
@@ -405,6 +409,8 @@ export function getPoolUnderlyingCoins(
       return coins;
     }
   }
+ 
+
 
   return coins;
 }

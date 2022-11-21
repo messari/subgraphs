@@ -89,6 +89,11 @@ export function handleStakingV2(
   const rewardsPerSecond = BigDecimal.fromString(
     poolInfoCall.value.getRewardsPerSecond().toString()
   );
+  const adjustedSupply = poolInfoCall.value.getAdjustedSupply();
+  if(adjustedSupply){
+  pool.stakedOutputTokenAmount = adjustedSupply;
+  pool.save();
+  }
   const rewardTokensPerDay = getRewardsPerDay(
     block.timestamp,
     block.number,
@@ -108,6 +113,7 @@ export function updateRewardTokenEmissions(
   rewardTokenAddress: Address,
   poolAddress: Address,
   rewardTokenPerDay: BigInt,
+  
   block: ethereum.Block
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
