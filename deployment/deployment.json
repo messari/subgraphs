@@ -3173,7 +3173,7 @@
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.2",
-          "methodology": "1.0.0"
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "qidao.template.yaml"
@@ -3195,7 +3195,7 @@
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.2",
-          "methodology": "1.0.0"
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "qidao.template.yaml"
@@ -3217,7 +3217,7 @@
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.2",
-          "methodology": "1.0.0"
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "qidao.template.yaml"
@@ -3239,7 +3239,7 @@
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.2",
-          "methodology": "1.0.0"
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "qidao.template.yaml"
@@ -3261,7 +3261,7 @@
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.2",
-          "methodology": "1.0.0"
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "qidao.template.yaml"
@@ -3283,7 +3283,7 @@
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.2",
-          "methodology": "1.0.0"
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "qidao.template.yaml"
@@ -3305,7 +3305,7 @@
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.2",
-          "methodology": "1.0.0"
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "qidao.template.yaml"
@@ -3327,7 +3327,7 @@
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.2",
-          "methodology": "1.0.0"
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "qidao.template.yaml"
