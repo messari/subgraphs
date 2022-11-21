@@ -29,10 +29,8 @@ import {
   cTokenDecimals,
   BIGINT_ZERO,
   SECONDS_PER_DAY,
-  exponentToBigDecimal,
   bigDecimalToBigInt,
   RewardTokenType,
-  BIGDECIMAL_ZERO,
 } from "../../../src/constants";
 import {
   ProtocolData,
