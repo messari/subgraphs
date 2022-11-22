@@ -48,7 +48,9 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-To be added
+`rewards/second` \* `seconds/day`
+
+Note: This is on each market and there are different emissions for Lend / Borrow side
 
 ### Protocol Controlled Value
 
