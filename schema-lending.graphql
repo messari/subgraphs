@@ -1012,6 +1012,9 @@ type MarketDailySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
+  " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
+  relation: Bytes
+
   ##### Incentives #####
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
@@ -1246,6 +1249,9 @@ type MarketHourlySnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+
+  " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
+  relation: Bytes
 
   ##### Incentives #####
 
