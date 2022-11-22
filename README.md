@@ -14,6 +14,8 @@ We aim to make sense of DEFI protocols in an open, holistic approach capturing e
 
 > Protocol types supported: [Lending](./schema-lending.graphql), [CDP](./schema-lending.graphql), [DEX](./schema-dex-amm.graphql), [Yield Aggregator](./schema-yield.graphql), [NFT Marketplace](./schema-nft-marketplace.graphql), [Network](./schema-network.graphql), [Bridge](./schema-bridge.graphql), Governance
 
+<sub>If you are a protocol and want to collaborate please visit [messari.io/web3-data-collaboration](https://messari.io/web3-data-collaboration)</sub>
+
 ## Working Environment
 
 Go to [`docs/SETUP.md`](./docs/SETUP.md) to learn how to setup your machine for Messari subgraph development.
