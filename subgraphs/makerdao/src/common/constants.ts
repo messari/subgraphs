@@ -91,6 +91,24 @@ export namespace ProtocolSideRevenueType {
   export const LIQUIDATION: u32 = 2;
   export const PSM: u32 = 3;
 }
+export namespace PositionSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
+export namespace EventType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const BORROW = "BORROW";
+  export const REPAY = "REPAY";
+  export const LIQUIDATOR = "LIQUIDAOTR";
+  export const LIQUIDATEE = "LIQUIDATEE";
+}
+
+export namespace ActivityType {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
 
 //////////////////////////////
 ///// Ethereum Addresses /////
@@ -118,6 +136,8 @@ export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
 export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
+export const BIGINT_NEG_HUNDRED = BigInt.fromI32(-100);
+
 //10^18
 export const BIGINT_ONE_WAD = BigInt.fromString("1000000000000000000");
 // 10^27
@@ -166,6 +186,7 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 export const VAT_ADDRESS = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
 export const VOW_ADDRESS = "0xa950524441892a31ebddf91d3ceefa04bf454466".toLowerCase();
 export const DAI_ADDRESS = "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase();
+export const MIGRATION_ADDRESS = "0xc73e0383f3aff3215e6f04b0331d58cecf0ab849";
 
 // unconventional token requiring special handling
 export const ILK_SAI = "0x5341490000000000000000000000000000000000000000000000000000000000";
