@@ -6,7 +6,7 @@ import { errorsObj, protocolErrors } from "./errorSchemas.js";
 import { pullMessagesByThread, resolveQueriesToAttempt, resolveThreadCreation } from "./resolutions.js";
 import { generateEndpoints, indexStatusFlow } from "./indexingStatus.js";
 
-const hourMs = 360000;
+const hourMs = 3600000;
 
 try {
   executionFlow();

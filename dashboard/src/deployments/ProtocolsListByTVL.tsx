@@ -60,6 +60,7 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
         "cdp": "CDP",
         "lending": "Lending",
         "dexes": "Exchanges",
+        "bridge": "Bridges",
         "nft lending": "NFT Lending",
         "nft marketplace": "NFT Marketplace",
     }
@@ -91,7 +92,7 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
                 if (!!Object.keys(NetworkLogos).includes(chain.toLowerCase())) {
                     onSupportedChain = true;
                 }
-            })
+            });
             const supportedCategory = Object.keys(categoryTypesSupported).includes(x?.category?.toLowerCase());
             let slugNotUsed = false;
             if (!protocolSlugs.includes(x.slug) && !protocolSlugs.includes(x.slug.split('-')[0]) && !protocolSlugs.includes(x.slug + '-finance') && !protocolSlugs.includes(x.slug + '-protocol')) {

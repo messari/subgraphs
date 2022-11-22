@@ -19,10 +19,11 @@ import {
     TEN_BD,
     ZERO_ADDRESS,
     ZERO_BD,
-    ZERO_BI
+    ZERO_BI,
 } from "../../constants";
 import { bigDecimalToBigInt, parseUnits, powBigDecimal, readCallResult } from "../../utils";
 import { getOrCreateRewardToken, getOrCreateToken } from "./supporting";
+import { getOrCreateProtocol } from "./protocol";
 
 /**
  * Get the market at marketAddress, or create it if it doesn't exist
@@ -131,6 +132,13 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
         market._lastUpdatedBlockNumber = event.block.number;
 
         market.save();
+
+        // add market to lending protocol
+        const protocol = getOrCreateProtocol();
+        const marketIDs = protocol._marketIDs;
+        marketIDs.push(market.id);
+        protocol._marketIDs = marketIDs;
+        protocol.save();
     }
 
     return market;
@@ -214,7 +222,7 @@ export function getOrCreateInterestRate(
         if (ZERO_BD == rate || ZERO_BI == durationDays) {
             log.error("Created interest rate with invalid params: rate={}, durationDays={}", [
                 rate.toString(),
-                durationDays.toString()
+                durationDays.toString(),
             ]);
         }
     }
@@ -299,10 +307,7 @@ export function getOrCreateLoan(
             );
 
             const termDays = bigDecimalToBigInt(
-                paymentIntervalSec
-                    .times(paymentsRemaining)
-                    .toBigDecimal()
-                    .div(SEC_PER_DAY.toBigDecimal())
+                paymentIntervalSec.times(paymentsRemaining).toBigDecimal().div(SEC_PER_DAY.toBigDecimal())
             );
 
             // Interst rate for V2/V3 stored as apr in units of 1e18, (i.e. 1% is 0.01e18).

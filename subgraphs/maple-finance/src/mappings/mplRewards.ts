@@ -5,7 +5,7 @@ import {
     Withdrawn as WithdrawnEvent,
     RewardAdded as RewardAddedEvent,
     RewardsDurationUpdated as RewardsDurationUpdatedEvent,
-    UpdatePeriodFinishCall
+    UpdatePeriodFinishCall,
 } from "../../generated/templates/MplReward/MplReward";
 
 import { StakeType, ZERO_BI } from "../common/constants";

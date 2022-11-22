@@ -322,6 +322,9 @@ type LendingProtocol implements Protocol @entity {
 
     " Treasury fee stored in decimals (e.g. 0.01 for 1%). This is the establishment fee to the treasury."
     _treasuryFee: BigDecimal!
+
+    " List of market IDs "
+    _marketIDs: [String!]!
 }
 
 ###############################

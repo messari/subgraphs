@@ -59,6 +59,12 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
       } else {
         subgraphName = "";
       }
+    } else if (!subgraphParam.includes('/')) {
+      if (subgraphParam?.toUpperCase()?.split("QM")?.length === 1) {
+        queryURL = "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + subgraphParam;
+      } else {
+        queryURL = "https://api.thegraph.com/subgraphs/id/" + subgraphParam;
+      }
     }
   }
 
@@ -137,6 +143,9 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   }] = useLazyQuery(query, { client: overlayDeploymentClient });
 
   useEffect(() => {
+    if (overlayError) {
+      setOverlayError(null);
+    }
     const href = new URL(window.location.href);
     const p = new URLSearchParams(href.search);
     if (overlayDeploymentURL === "") {
@@ -1123,6 +1132,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
           protocolFields={protocolFields}
           protocolTableData={protocolTableData}
           overlaySchemaData={overlaySchemaDataProp}
+          overlayError={overlayError}
           protocolSchemaData={protocolSchemaDataProp}
           subgraphToQueryURL={subgraphToQuery.url}
           skipAmt={skipAmt}

@@ -6,5 +6,13 @@
       "address": "0xBea9F78090bDB9e662d8CB301A00ad09A5b756e9",
       "startBlock": 28679173
     }
+  ],
+  "deployers": [],
+  "poolRegistries": [
+    {
+      "name": "Pool Registry",
+      "address": "0x88Cc4aA0dd6Cf126b00C012dDa9f6F4fd9388b17",
+      "startBlock": 40799176
+    }
   ]
 }
