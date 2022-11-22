@@ -40,6 +40,4 @@ Here is a [video](https://drive.google.com/file/d/1to7ZRsEcsnsS0DO23oC3W47RUVlso
 
 ## Miniscan
 
-[Miniscan](https://miniscan.xyz/) is essentially an etherscan wrapper, but it allows for more chains and the ability to make historic contract calls (retrieving state at a specific blocknumber). This tool is especially useful when you are trying to learn about a contract. You would plug in the address and you can view the source code (assuming it is verified) and make contract calls to understand behavior.
-
-You can also make
+[Miniscan](https://miniscan.xyz/) is essentially an etherscan wrapper, but it allows for more chains and the ability to make historic contract calls (retrieving state at a specific block number). This tool is especially useful when you are trying to learn about a contract. You would plug in the address and you can view the source code (assuming it is verified) and make contract calls to understand behavior.
