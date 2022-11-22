@@ -40,6 +40,7 @@ import {
   RewardTokenType,
   BIGINT_ONE,
   SECONDS_PER_DAY,
+  RiskType,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -389,11 +390,14 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
       tryRewardSpeeds.value.plyRewardBorrowSpeed,
       rewardToken
     );
-    const plyPriceUSD = getPrice(PLY_MARKET, protocol._priceOracle)
+    const mantissaFactorBD = exponentToBigDecimal(
+      18 - rewards.token.decimals + 18
+    );
+    const priceUSD = getPrice(PLY_MARKET, protocol._priceOracle)
       .value.toBigDecimal()
-      .div(exponentToBigDecimal(rewards.token.decimals));
+      .div(mantissaFactorBD);
     rewardsAmount.push(rewards.rewardsPerDayBI);
-    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(plyPriceUSD));
+    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
   }
 
   if (tryRewardSpeeds.value.plyRewardSupplySpeed.gt(BIGINT_ONE)) {
@@ -406,11 +410,14 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
       tryRewardSpeeds.value.plyRewardSupplySpeed,
       rewardToken
     );
-    const plyPriceUSD = getPrice(PLY_MARKET, protocol._priceOracle)
+    const mantissaFactorBD = exponentToBigDecimal(
+      18 - rewards.token.decimals + 18
+    );
+    const priceUSD = getPrice(PLY_MARKET, protocol._priceOracle)
       .value.toBigDecimal()
-      .div(exponentToBigDecimal(rewards.token.decimals));
+      .div(mantissaFactorBD);
     rewardsAmount.push(rewards.rewardsPerDayBI);
-    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(plyPriceUSD));
+    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
   }
 
   if (tryRewardSpeeds.value.auroraRewardBorrowSpeed.gt(BIGINT_ONE)) {
@@ -423,11 +430,14 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
       tryRewardSpeeds.value.auroraRewardBorrowSpeed,
       rewardToken
     );
-    const plyPriceUSD = getPrice(AURORA_MARKET, protocol._priceOracle)
+    const mantissaFactorBD = exponentToBigDecimal(
+      18 - rewards.token.decimals + 18
+    );
+    const priceUSD = getPrice(AURORA_MARKET, protocol._priceOracle)
       .value.toBigDecimal()
-      .div(exponentToBigDecimal(rewards.token.decimals));
+      .div(mantissaFactorBD);
     rewardsAmount.push(rewards.rewardsPerDayBI);
-    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(plyPriceUSD));
+    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
   }
 
   if (tryRewardSpeeds.value.auroraRewardSupplySpeed.gt(BIGINT_ONE)) {
@@ -440,11 +450,14 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
       tryRewardSpeeds.value.auroraRewardSupplySpeed,
       rewardToken
     );
-    const plyPriceUSD = getPrice(AURORA_MARKET, protocol._priceOracle)
+    const mantissaFactorBD = exponentToBigDecimal(
+      18 - rewards.token.decimals + 18
+    );
+    const priceUSD = getPrice(AURORA_MARKET, protocol._priceOracle)
       .value.toBigDecimal()
-      .div(exponentToBigDecimal(rewards.token.decimals));
+      .div(mantissaFactorBD);
     rewardsAmount.push(rewards.rewardsPerDayBI);
-    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(plyPriceUSD));
+    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
   }
   market.rewardTokens = rewardTokens;
   market.rewardTokenEmissionsAmount = rewardsAmount;
