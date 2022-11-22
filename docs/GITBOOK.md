@@ -1,5 +1,5 @@
-# Add Methodologies To Gitbook
-Note: Only methodologies for protocols that are supported on protocol metrics should be added to the Gitbook
+# Add Methodologies To GitBook
+Note: Only methodologies for protocols that are supported on protocol metrics should be added to the GitBook
 
 ## Instructions 
 1. Navigate to [SUMMARY.MD](/subgraphs/SUMMARY.md)
@@ -7,3 +7,4 @@ Note: Only methodologies for protocols that are supported on protocol metrics sh
 3. Add the protocol in alphabetical order (if the protocol is a fork, make sure to add it under the corresponding fork header and in alphabetical order in relation to the other forks)
 4. To direct the existing methodology to gitbooks, enter the protocol name and repository path in the format: `[protocol name](protocol/blah/READ.ME)` (You do not need to add `/subgraphs/` to the path as it is autmaticaly included)
 5. Save changes and make PR
+6. Once PR is merged make sure that methodology is reflected on the Messari GitBook
