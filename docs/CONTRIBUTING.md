@@ -22,7 +22,7 @@ At this point you will just need to follow the "Reviewing" process until your PR
 
 ### Reviewee
 
-- Generally you will need to make changes, either respond to a change/comment with a question, rebuttle, or comment. Otherwise, make the change and resolve the issue.
+- Generally you will need to make changes, either respond to a change/comment with a question, rebuttal, or comment. Otherwise, make the change and resolve the issue.
 - When you feel changes are sufficient, let the reviewer know again that the PR is ready for another round of reviews.
 - Do not make a new PR for changes, this will make it harder for the reviewer to track their progress.
 
@@ -33,36 +33,6 @@ At this point you will just need to follow the "Reviewing" process until your PR
 - The reviewer is generally assigned by Vincent (@this-username-is-taken)
 
 > This is an iterative process that takes time, so don't think it will always be easy.
-
-## Subgraph Directory Structure Guidelines
-
-All our subgraphs share the same build and deployment scripts. They are used during development, when deploying a subgraph, and during our CI validation pipelines. These scripts expect all subgraphs to follow a given directory structure. So for them to work without adding extra hassle, and to keep code itself organized in a consistent and predictable manner, we require all subgraphs to follow this structure.
-
-Our CI pipelines on PRs automatically validate that this structure is followed, to enforce it and make sure things don't break in case of error. To do so we are using [folderslint](). It is a simple tool that allows you to define some rules and then validates that they are met. The rules are very simple, it is a set of paths that are whitelisted. These are contained at `/subgraphs/.folderslintrc`.
-
-The directory structure for a given subgraph should be as follows (this might eventually go out of date, so always refer to the code to see the actual rules):
-
-```
-subgraphs/
-    someBaseName/
-        abis/
-            (no limitations on child directories here)
-        protocols/
-            (might have more than 1 in the case of forks)
-            someProtocolName/
-                config/
-                    deployments/
-                        someProtocolName-ethereum/
-                            configurations.json
-                        someProtocolName-arbitrum/
-                            configurations.json
-                    templates/
-                        someProtocol.template.yaml
-                src/
-                    (protocol/deployment specific code)
-        src/
-            (code common to all protocols in this subgraph)
-```
 
 ## Rebasing
 
@@ -103,6 +73,7 @@ To keep PRs small follow these guidelines, and use them to make educated choices
 - If you are formatting code outside of the scope of your PR it should be in a separate PR
 - Isolate bug fixes into individual PRs, do not combine them. If they depend on each other use your judgement if they should be together or not. You can always branch off a `feature-branch`
 - Use a single PR for each feature (ie, a new subgraph has its own PR)
+- Update the subgraph version according to our versioning outlined [below](#naming-conventions).
 
 ### Merging
 
@@ -112,7 +83,7 @@ For now after a PR is reviewed Vincent (@this-username-is-taken) does the final 
 
 It is nice to outline the changes / fixes you made in your PR. This way the reviewer knows what to look for and what to expect.
 
-If the change affects a subgraph you should make a link to your testing subgraph in https://okgraph.xyz/. This website is a great hub for subgraph viewing (shoutout @0xbe1).
+If the change affects a subgraph you should make a link to your testing subgraph in https://okgraph.xyz/. This website is a great hub for subgraph viewing (h/t @0xbe1).
 
 An example of good PR heading comments:
 
@@ -120,7 +91,7 @@ An example of good PR heading comments:
 
 > Sometimes a PR is so small or the name is self explanatory and a descriptive comment is not necessary. See [#715](https://github.com/messari/subgraphs/pull/715). Use your judgement and ask questions if you want to learn and grow as a team!
 
-## Naming Conventions
+## Naming and Versioning Conventions
 
 ### How to name your PR
 
@@ -176,7 +147,7 @@ Examples:
 - "style(); uniswap; format code"
 - "perf(#patch); spookyswap; find value without contract call"
 
-> Notice: some of the names don't have a #`semver` name. This is because they don't actually affect the versioning on any of the subgraphs / dashboard. A good way to know which semver identifer to use is to notice which part of the version you are updating. And it looks like this (MAJOR.MINOR.PATCH)!
+> Notice: some of the names don't have a #`semver` name. This is because they don't actually affect the versioning on any of the subgraphs / dashboard. A good way to know which semver identifier to use is to notice which part of the version you are updating. And it looks like this (MAJOR.MINOR.PATCH)!
 
 ## Syncing with upstream/master
 
@@ -184,14 +155,16 @@ Examples:
 
 When you want to make a new branch on your forked subgraphs repo you should always start from the latest upstream/master branch. However, this process requires the github ui or a number of commands. The following walks through how to setup a custom git command.
 
-### Previous workflow
+### Naive Workflow
 
 - Go to github.com and open your forked `subgraphs` repo
 - Sync-up with upstream master
 - Go to your local `subgraphs` repo and switch to `master`
 - Pull the latest changes from remote
 
-### How to make the custom git command
+### Supercoder Workflow
+
+tl;dr build a custom git command!
 
 Start by setting the upstream branch on your local repo to `messari/subgraphs`
 

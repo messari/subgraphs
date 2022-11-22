@@ -1,6 +1,6 @@
 # Subgraph Schema: Generic
 # Version: 1.3.0
-# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
   ARBITRUM_ONE
@@ -129,10 +129,12 @@ type Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")

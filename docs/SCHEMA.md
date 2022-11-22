@@ -1,4 +1,4 @@
-# Schema Definition
+# Schemas
 
 All subgraphs follow a set of standardized schemas. This standardization brings some important benefits:
 
@@ -95,7 +95,7 @@ In some cases, a smart contract call can emit multiple Ethereum events. In this 
 
 The words _transaction_ and _event_ are used interchangeably in this repo, instead of using _transaction_ to refer to an Ethereum transaction. Note that we do not index any Ethereum transactions in our subgraphs, as Ethereum transactions can contain any number of heterogeneous events (or user actions) and are difficult to generalize in a useful way. That being said, all Event entities are keyed upon its parent transaction hash (and the event log index), so it's easy to trace back to a transaction if needed.
 
-When indexing smart contract calls that represent a user action but do not emit any events, we still create Event entities but use an arbitrary index as the event log index. The index should always start from 0 and increment onwards. This is necessary in situation where there are multiple calls in the same transaction, we need a way to differetiate the Event entity created from each call.
+When indexing smart contract calls that represent a user action but do not emit any events, we still create Event entities but use an arbitrary index as the event log index. The index should always start from 0 and increment onwards. This is necessary in situation where there are multiple calls in the same transaction, we need a way to differentiate the Event entity created from each call.
 
 ### From & To
 
@@ -157,9 +157,9 @@ There are different ways to calculate `rewardTokenEmissionsAmount` and `rewardTo
 
 When handling reward tokens that need to be staked (e.g. in the MasterChef contract), make sure you also keep track of `stakedOutputTokenAmount`, which will be needed to calculate reward APR.
 
-For veModel protocols (e.g. Balancer V2 and Curve) that utilize gauges and "boosts" to direct and increase reward token emissions, `stakedOutputTokenAmount` should be equivalent to `GAUGE_WORKING_SUPPLY`. By doing this, using `stakedOutputTokenAmount` for reward token APR will result in the maximum boosted reward APR; therefore, users who want to show a range of min and max reward APR should divide the default reward APR by the maximum boost multiplier. For example, a reward APR of 10% is initially calculated for a Balancer V2 pool. This the maximum reward APR and the minimum reward APR would be 10% divided by 2.5 (max boost for Balancer V2 pools) or 4%. This is done so that `stakedOutputTokenAmount` accurately portrays the amount of output tokens staked in the gauge contract. 
+For veModel protocols (e.g. Balancer V2 and Curve) that utilize gauges and "boosts" to direct and increase reward token emissions, `stakedOutputTokenAmount` should be equivalent to `GAUGE_WORKING_SUPPLY`. By doing this, using `stakedOutputTokenAmount` for reward token APR will result in the maximum boosted reward APR; therefore, users who want to show a range of min and max reward APR should divide the default reward APR by the maximum boost multiplier. For example, a reward APR of 10% is initially calculated for a Balancer V2 pool. This the maximum reward APR and the minimum reward APR would be 10% divided by 2.5 (max boost for Balancer V2 pools) or 4%. This is done so that `stakedOutputTokenAmount` accurately portrays the amount of output tokens staked in the gauge contract.
 
-The fields related to rewards tokens in the LP staking programs (e.g. `rewardTokenEmissionsAmount`, `rewardTokenEmissionsUSD`, `stakedOutputTokenAmount`, `rewardToken`) should all remain null unless the LP tokens minted from this pool have been elligeable for staking to earn rewards. If an LP token has at one time been elligeable for use in a staking program but is no longer earning rewards, these fields should still remain as non-null values.
+The fields related to rewards tokens in the LP staking programs (e.g. `rewardTokenEmissionsAmount`, `rewardTokenEmissionsUSD`, `stakedOutputTokenAmount`, `rewardToken`) should all remain null unless the LP tokens minted from this pool have been eligible for staking to earn rewards. If an LP token has at one time been eligible for use in a staking program but is no longer earning rewards, these fields should still remain as non-null values.
 
 ## Usage Metrics
 
@@ -190,11 +190,11 @@ That being said, here are some general definitions for certain fields:
 
 - **Total Revenue**: All new money entering the protocol from operations. This is fees from dexs. and total yield generated in yield aggregators.
 - **Supply Side Revenue**: portion of Total Rev paid to depositors. this is total yield generated less protocol fees in yield ags. This is fees directed to LPs in DEXes.
-- **Protocol Revenue**: portion of total revenue directed to protocol and its operations. Includes strategiest revenue and other operational funds. so this includes all protocol fees such as protocols' DEX fee portion, yield aggregator's performance fees etc.
+- **Protocol Revenue**: portion of total revenue directed to protocol and its operations. Includes strategist revenue and other operational funds. so this includes all protocol fees such as protocols' DEX fee portion, yield aggregator's performance fees etc.
 
 In the future, we may also consider more detailed financial metrics. But these are not needed for now:
 
-- **Operational Earnings**: Protocol Revenue after paying for operational expenses. Operational expenses would include strategiest fees in yield ag. Also includes consultant fees such as Gauntlet, GFX Labs contracts with the protocol (second part obv very manual but we should figure out how to leverage our intel prowess here for a metric no one else can put together at scale).
+- **Operational Earnings**: Protocol Revenue after paying for operational expenses. Operational expenses would include strategist fees in yield ag. Also includes consultant fees such as Gauntlet, GFX Labs contracts with the protocol (second part obv very manual but we should figure out how to leverage our intel prowess here for a metric no one else can put together at scale).
 - **Adj Operational Earnings**: Operational Earnings minus token emissions (in USD). This should represent net capital into the protocol before income redistribution, accounts for incentivized revenue.
 
 ## Internal Entities

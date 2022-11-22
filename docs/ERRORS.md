@@ -1,22 +1,81 @@
-# Mapping
+# Errors
 
-This document contains some information about issues you may run into, or tips and tricks that may help you when working on mappings.
+This document will help you with common errors, how to handle errors, and known issues plus workarounds.
 
-## Best Practices
+## Error Squashing Methods
 
-### Indexing Speed
+_Note_: If you are the first to discover the error, please raise it to the team in `#development` on Discord.
 
-There are couple things you can do to significantly improve your indexing speed:
+It is inevitable that there will be errors in production subgraphs! This document describes how to be the first to catch the errors, and correct them efficiently.
 
-- Set a startblock (Use the deployment block of the contracts, [startblock app](https://startblock.vercel.app) may help).
-- Avoid call handlers and block handlers. Also depending on the Ethereum node ran by an indexer, call handlers and block handlers may or may not be supported (esp. on alt-EVM chains).
-- Limit the number of contract calls you perform. If you do need to perform contract calls, save the data, so you won't have to do repeated calls.
+### Catching Errors
 
-### Versions and Grafting
+There are two types of errors we are concerned about.
 
-- When fetching a protocol entity, it important that that the versions get updated at regular intervals such as at the time of fetching the protocol entity (Recommended). The 3 versions that should be updated are subgraph version, schema version, and methodology version. If the version is not updated, the subgraph will not be able to fetch the latest version of the protocol entity in cases where indexing is rebooted using the grafting feature.
+1. Fatal errors (the subgraph stops indexing)
+2. Data errors (something in the data is now incorrect, e.g. oracle breaks)
 
-## Common Issues
+### Where to look
+
+Fatal errors will be apparent, if you see an error message in [Protocol Metrics](https://messari.io/protocol-explorer/all-protocols) that looks something like the following:
+
+![Home page error](./images/errors/home-page-error.png)
+
+![Protocol page error](./images/errors/protocol-page-error.png)
+
+Data errors will be less obvious and more nuanced. It is possible that there is an error, but we decide not to fix it. For example, in Compound V2 we chose to not fix the ETH price when a proposal they passed broke it. This was what actually happened on chain.
+
+> If you find this it should be added to the methodology `README.md` document in a protocol directory. We aim to be as transparent as possible!
+
+To find these errors, you may notice it by browsing [Protocol Metrics](https://messari.io/protocol-explorer/all-protocols). But it is more likely you will be notified on the Discord [monitor bot](../monitor/README.md).
+
+### How to Setup the Monitor
+
+In order to get notified of production errors (without the noise) follow these steps:
+
+1. Navigate to `#data-validation-bots` in the Subgraphs discord.
+2. Mute the channel.
+3. Jump into the `Production Ready Subgraph Indexing Failures` thread.
+4. Unmute this thread.
+5. Congrats! Now you will get notified of production errors here.
+
+### Fixing Errors
+
+> As these subgraphs are in production we want to be efficient and solve the problems swiftly to reduce downtime.
+
+You will need to use your subgraph debugging skills, but here are some tips to help!
+
+- Read the rest of this document for more error details.
+- Focus on only solving the issue causing the error.
+  - If you find other things (nice job), those can be solved in a separate PR after the error is fixed.
+- Log in as many spots as possible to narrow down the issue (generally it will be isolated since the subgraph is QA'd)
+- If it is taking more than 2-3 hours of debugging time, it is safe to skip that block (if that fixes it).
+  - Use your judgement when it comes to this. And if you do this, please make sure you go back after the fact to continue to try and diagnose the issue.
+- The graph's [docs](https://thegraph.com/docs/en/) also have a lot of information and are easily searchable
+- Ask questions in our Discord or [The Graph's Discord](https://discord.gg/jxMUPqbAzr)
+
+> Logs only seem to stay for ~1 hour before being cleared. If you need to keep persistent logs see our logging dashboard [tool](./TOOLING.md#logging-dashboard)
+
+### Grafting
+
+Grafting is a feature that allows you to copy the data of an existing subgraph (on the hosted service) to a new subgraph at any given block. This is useful when a bug is millions of blocks into the indexing. It is likely much faster to graft right before the affected block. To graft follow the docs [here](https://thegraph.com/docs/en/cookbook/grafting/)
+
+In the case of our subgraphs you want to setup grafting by adding it into the `.yaml` template and the configuration. [This commit](https://github.com/messari/subgraphs/pull/1381/commits/cc63949bc06f95399cd3b7b63c206ae8b3842f1b) does exactly that. The same setup can be copied.
+
+### Once Solved
+
+Once you have the issue solved, make sure we have it deployed to a Messari production subgraph endpoint.
+
+> Ideally you will want to graft as it is generally faster than indexing from the start.
+
+Once it is fully synced and the issue is fixed:
+
+- Notify a Messarian to backfill the data.
+- If you are a Messarian (or have access) please backfill the data, and check to ensure it is fixed ✅
+
+Happy debugging (Don't stress it too much)! 💻
+
+## Common Errors
 
 ### Proxy
 
@@ -24,7 +83,7 @@ Some protocols use proxy contracts for upgradeability. Note that when handling p
 
 You should navigate to the implementation contract first (Contract -> Read as Proxy -> Address underlined in red) and use the ABI there:
 
-![Proxy Contract](images/proxy.png "Proxy Contract")
+![Proxy Contract](./images/errors/proxy.png "Proxy Contract")
 
 ### Price Oracles
 
@@ -70,22 +129,25 @@ When building a subgraph to our lending schema you will notice `InterstRate`s in
 
 To combat this you need to create a new entity for each snapshot. To do this you can append `{# of days/hours since epoch time}` to the end of a rate entity to create daily/hourly copies. You can find an example of this in [compound-forks.getSnapshotRates()](../subgraphs/compound-forks/src/mapping.ts)
 
-## Testing
+## Known Issues
 
-### Matchstick
+Here are some known issues with subgraph development that you may run into:
 
-You can leverage the Matchstick unit testing framework to better debug/test your code:
+### Subgraph Issues
 
-https://github.com/LimeChain/matchstick/blob/main/README.md
+- Using a `derivedFrom` field in the graph code gives no compile time issues but fails when the graph syncs with error `unexpected null wasm` ([Github Issue](https://github.com/graphprotocol/graph-ts/issues/219))
+- Event data can be different from contract call data as event data are calculated amid execution of a block whereas contract call data are calculated at the end of a block.
+- Note that **call-handlers** are not available on some EVM sidechains (e.g. Avalanche, Harmony, Polygon, etc). So you won't be able to use **call-handlers** in your subgraphs when indexing on these chains.
+- As of [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) there is a new environment variable called `GRAPH_MAX_GAS_PER_HANDLER`. This sets a maximum gas limit on handlers. This does not refer to on-chain gas limits, but a measure of the computation exerted per handler. You will get a subgraph error if this limit is exceeded.
+  > A place you may find this is using the built-in `.pow()` with large numbers.
+- Different graph-cli versions handle missing required fields defined in schema differently. Deploying a subgraph with missing required field with [`graph-cli v0.30.1`](https://github.com/graphprotocol/graph-node/releases/tag/v0.30.1) will fail with error `missing value for non-nullable field`, while it will succeed with [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) as it automatically sets default values for those missing fields.
 
-They have a YouTube series where they walkthrough the framework: https://www.youtube.com/watch?v=cB7o2n-QrnU
+### AssemblyScript Issues
 
-Couple more tutorial videos:
-
-https://www.youtube.com/watch?v=T-orbT4gRiA
-https://www.youtube.com/watch?v=EFTHDIxOjVY
-
-Keep in mind that the test.ts file no longer needs to wrap all test() method calls into a runTests() function like older documentation specifies. Ensure that you have installed Rust, PostgreSQL, and Docker. If you are experiencing issues building the Dockerfile that is provided by matchstick documentation, confirm that all of the directories in the Dockerfile script are valid. In particular, step 15 attempts to copy the parent directory which is outiside of the build context. For some users, this throws an error and prevents execution. In this case, changing the step 15 to "COPY ./. ." can resolve this and facilitate a successful build.
+- When updating an entity array, you cannot use `array.push()` or `array[0] = ...` on the entity's field directly. Instead, you need to assign a new array to the entity array. See [details](https://thegraph.com/docs/en/developer/assemblyscript-api/#updating-existing-entities).
+- Initialize array using `let a = new Array<T>()` instead of `let a = []`. See [details](https://www.youtube.com/watch?v=1-8AW-lVfrA&t=3174s).
+- Scope is not inherited into closures (can't use variables declared outside of a closure). See [details](https://www.youtube.com/watch?v=1-8AW-lVfrA&t=3243s).
+- Private global variables in classes are not supported. You can still make them, but there is no way to prevent a class object from directly changing private class variables. See: [https://www.assemblyscript.org/status.html#language-features](https://www.assemblyscript.org/status.html#language-features)
 
 ## Debugging
 
@@ -99,7 +161,7 @@ log.debug('[Test Log] arbitrary argument {}', [123]);
 
 which will show up in the Logs tab of Subgraph Studio:
 
-![Debug Logs](images/logs.png "Debug Logs")
+![Debug Logs](images/errors/logs.png "Debug Logs")
 
 You also have an option of `Error`, `Warning`, `Info`, `Debug` as the log level. I like to use `Warning` so that I can quickly filter for it. The way to filter for logs of a specific level is to click (uncheck) the log levels circled in red above.
 
@@ -135,7 +197,21 @@ Beyond these two possible causes, these are the steps you can take to narrow dow
 
 As an example, the euler finance subgraph had a "oneshot cancelled" error for tx [0x102d9eb3d096d5cfc74ba56ea7c3b0ebfc30454d7f3d000fd42c1307f746c2cf](https://etherscan.io/tx/0x102d9eb3d096d5cfc74ba56ea7c3b0ebfc30454d7f3d000fd42c1307f746c2cf#eventlog) at block 15700199. After going through the process, it is clear that error happened within the loop `for (let i = 0; i < eulerViewMarkets.length; i += 1)` in function [`syncWithEulerGeneralView`](https://github.com/messari/subgraphs/blob/4d6c3432f946a57ecdc295ef0f357dc1ca8309a6/subgraphs/euler-finance/src/mappings/helpers.ts#L321) of `src/mappings/helpers.ts`. The first hypothesis was that the `eulerViewMarkets` array used in the loop is too big. An attempted fix is to save data in the array into an entity and load needed info from the entity inside the loop. It didn't fix the error. Going back to the logs, it appears the error always happened in the last few lines of the loop at different iterations. Another fix moved the last two lines of the loop elsewhere and [it worked](https://github.com/messari/subgraphs/pull/1213).
 
+### Historical Contract Calls
+
+> Note: since this is supported in [miniscan](./TOOLING.md#miniscan) it is generally easier to use that. There still may be edge cases where the following is useful.
+
+Making historical contract calls can aide your debugging. You would want to perform this in order to see the response to a contract call at a previous block. On the chain's blockscanner you can make contract calls to the current state of the network, but previous calls will require this method:
+
+- You will need an archival node access to the blockchain you want to query (contact @Vincent for this)
+- You can download and use this script: https://gist.github.com/0xbe1/bb1e4b4e0c3906b4fd119f62084b6749
+- install `web3.js` using `npm`
+- run `npm call_demo.js` in the folder you downloaded the script to
+- If you are struggling here is a video demo: https://youtu.be/-XLFWeOHJgk
+
 ### Running Locally
+
+> Note: this is generally not very useful now that grafting has been introduced.
 
 You can debug your subgraph by running `graph-node` locally. Here are some instructions to set it up:
 
@@ -172,33 +248,23 @@ Useful links for troubleshooting:
 
 ### Subgraph Forking
 
+> Note: This is generally an outdated method. The more useful way to do this now is grafting.
+
 You can avoid re-syncing your subgraph every time by "forking" it from an existing one, which should significantly speed up the iteration time. For more details: https://thegraph.com/docs/en/developer/subgraph-debug-forking/.
 
-### Historical Contract Calls
+## Testing
 
-Making historical contract calls can aide your debugging. You would want to perform this in order to see the response to a contract call at a previous block. On the chain's blockscanner you can make contract calls to the current state of the network, but previous calls will require this method:
+### Matchstick
 
-- You will need an archival node access to the blockchain you want to query (contact @Vincent for this)
-- You can download and use this script: https://gist.github.com/0xbe1/bb1e4b4e0c3906b4fd119f62084b6749
-- install `web3.js` using `npm`
-- run `npm call_demo.js` in the folder you downloaded the script to
-- If you are struggling here is a video demo: https://youtu.be/-XLFWeOHJgk
+You can leverage the Matchstick unit testing framework to better debug/test your code:
 
-## Known Issues
+https://github.com/LimeChain/matchstick/blob/main/README.md
 
-Here are some known issues with subgraph tooling that you may run into:
+They have a YouTube series where they walkthrough the framework: https://www.youtube.com/watch?v=cB7o2n-QrnU
 
-### Subgraph Issues
+Couple more tutorial videos:
 
-- Using a `derivedFrom` field in the graph code gives no compile time issues but fails when the graph syncs with error `unexpected null wasm` ([Github Issue](https://github.com/graphprotocol/graph-ts/issues/219))
-- Event data can be different from contract call data as event data are calculated amid execution of a block whereas contract call data are calculated at the end of a block.
-- Note that **call-handlers** are not available on some EVM sidechains (e.g. Avalanche, Harmony, Polygon, etc). So you won't be able to use **call-handlers** in your subgraphs when indexing on these chains.
-- As of [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) there is a new enviornment variable called `GRAPH_MAX_GAS_PER_HANDLER`. This sets a maximum gas limit on handlers. This does not refer to on-chain gas limits, but a measure of the computation exerted per handler. You will get a subgraph error if this limit is exceeded.
-  > A place you may find this is using the built-in `.pow()` with large numbers.
-- Different graph-cli versions handle missing required fields defined in schema differently. Deploying a subgraph with missing required field with [`graph-cli v0.30.1`](https://github.com/graphprotocol/graph-node/releases/tag/v0.30.1) will fail with error `missing value for non-nullable field`, while it will succeed with [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) as it automatically sets default values for those missing fields.
+https://www.youtube.com/watch?v=T-orbT4gRiA
+https://www.youtube.com/watch?v=EFTHDIxOjVY
 
-### AssemblyScript Issues
-
-- When updating an entity array, you cannot use `array.push()` or `array[0] = ...` on the entity's field directly. Instead, you need to assign a new array to the entity array. See [details](https://thegraph.com/docs/en/developer/assemblyscript-api/#updating-existing-entities).
-- Initialize array using `let a = new Array<T>()` instead of `let a = []`. See [details](https://www.youtube.com/watch?v=1-8AW-lVfrA&t=3174s).
-- Scope is not inherited into closures (can't use variables declared outside of a closure). See [details](https://www.youtube.com/watch?v=1-8AW-lVfrA&t=3243s).
+Keep in mind that the test.ts file no longer needs to wrap all test() method calls into a runTests() function like older documentation specifies. Ensure that you have installed Rust, PostgreSQL, and Docker. If you are experiencing issues building the Dockerfile that is provided by matchstick documentation, confirm that all of the directories in the Dockerfile script are valid. In particular, step 15 attempts to copy the parent directory which is outside of the build context. For some users, this throws an error and prevents execution. In this case, changing the step 15 to "COPY ./. ." can resolve this and facilitate a successful build.
