@@ -1,4 +1,4 @@
-# Messari Standard Subgraphs &bull; [![GitHub license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/messari/subgraphs/blob/master/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](docs/CONTRIBUTING.md) [![Issues Report](https://img.shields.io/badge/Issues-report-yellow.svg)](https://github.com/messari/subgraphs/issues/new)
+# Messari Standard Subgraphs &bull; [![GitHub license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/messari/subgraphs/blob/master/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](docs/CONTRIBUTING.md) [![Issues Report](https://img.shields.io/badge/issues-report-yellow.svg)](https://github.com/messari/subgraphs/issues/new)
 
 <p align="center">
   <a href="https://messari.io/protocol-explorer/all-protocols">
@@ -9,6 +9,10 @@
 Messari subgraphs set an industry leading standard for on chain data 🚀
 
 Utilizing [The Graph](https://thegraph.com/) these subgraphs extract raw blockchain data and transform it into meaningful metrics, for products and analytics.
+
+We aim to make sense of DEFI protocols in an open, holistic approach capturing every piece of data from a given protocol type.
+
+> Protocol types supported: [Lending](./schema-lending.graphql), [CDP](./schema-lending.graphql), [DEX](./schema-dex-amm.graphql), [Yield Aggregator](./schema-yield.graphql), [NFT Marketplace](./schema-nft-marketplace.graphql), [Network](./schema-network.graphql), [Bridge](./schema-bridge.graphql), Governance
 
 ## Working Environment
 
@@ -42,5 +46,7 @@ We welcome contributions from the community! You can point out or fix bugs, sugg
 ## Development Status
 
 You can find a visualizer with the status of all Messari subgraphs at [subgraphs.xyz](https://subgraphs.messari.io/)! The code lives under `./dashboard`.
+
+You can see our subgraphs supporting the data for our product ["Protocol Metrics"](https://messari.io/protocol-explorer/all-protocols)
 
 > _Quick note_: the raw deployment status of all subgraphs lives in [`./deployment/deployment.json`](./deployment/deployment.json)
