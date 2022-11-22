@@ -40,7 +40,6 @@ import {
   RewardTokenType,
   BIGINT_ONE,
   SECONDS_PER_DAY,
-  RiskType,
 } from "../../../src/constants";
 import {
   ProtocolData,
