@@ -1,5 +1,5 @@
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
-import { Token } from "../../generated/schema";
+import { ActiveEventAccount, Token } from "../../generated/schema";
 import { ERC20 } from "../../generated/Notional/ERC20";
 import { getUsdPricePerToken } from "../prices";
 import {
@@ -31,14 +31,16 @@ export function getOrCreateToken(
   }
 
   // Optional lastPriceUSD and lastPriceBlockNumber, but used in financialMetrics
-  const price = getUsdPricePerToken(tokenAddress);
-  if (price.reverted) {
-    token.lastPriceUSD = BIGDECIMAL_ZERO;
-  } else {
-    token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+  if (token.lastPriceBlockNumber != blockNumber) {
+    const price = getUsdPricePerToken(tokenAddress);
+    if (price.reverted) {
+      token.lastPriceUSD = BIGDECIMAL_ZERO;
+    } else {
+      token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+    }
+    token.lastPriceBlockNumber = blockNumber;
+    token.save();
   }
-  token.lastPriceBlockNumber = blockNumber;
-  token.save();
 
   return token;
 }

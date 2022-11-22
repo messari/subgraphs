@@ -285,4 +285,4 @@ The following set of entities/fields cannot be calculated or calculated accurate
   - How to manage updating and closing positions and position counters in the event of rollovers?
   - How do we ensure liquidated positions are updated? (Note that liquidation event don't provide any market info and hence cannot be associated with a market/position).
 
-- [ ] Liquidation metrics (`market.cumulativeLiquidateUSD`, `liquidate.market`, `liquidate.position`): Liquidation events do not report any market info because they are not associated with a market from the perspective of Notional. We cannot update position or market data associated with liquidation events as a result.
+- [ ] Liquidation metrics (e.g. `market.cumulativeLiquidateUSD`, `liquidate.market`, `liquidate.position`, `cumulativeLiquidateUSD`): Liquidation events do not report any market info because they are not associated with a market from the perspective of Notional. We cannot update position or market data associated with liquidation events as a result.

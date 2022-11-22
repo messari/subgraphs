@@ -24,8 +24,6 @@ dataSources:
           file: ./abis/Notional.json
         - name: ERC20
           file: ./abis/ERC20.json
-        - name: ERC1155
-          file: ./abis/ERC1155.json
         ###########################################
         ############## Price Oracle ###############
         ###########################################

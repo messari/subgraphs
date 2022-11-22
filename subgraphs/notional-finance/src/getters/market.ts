@@ -43,20 +43,7 @@ export function getOrCreateMarket(
     market.canBorrowFrom = true;
     market.maximumLTV = BIGDECIMAL_ZERO;
     market.liquidationThreshold = BIGDECIMAL_ZERO;
-
-    // TODO: liquidation penalty methodology needs to be reviewed
-    const notional = Notional.bind(Address.fromString(PROTOCOL_ID));
-    const currencyAndRatesCallResult = notional.try_getCurrencyAndRates(
-      parseInt(currencyId) as i32
-    );
-    if (currencyAndRatesCallResult.reverted) {
-      log.error("[handleLendBorrowTrade:market] getCurrencyRates reverted", []);
-      market.liquidationPenalty = BIGDECIMAL_ZERO;
-    } else {
-      market.liquidationPenalty = bigIntToBigDecimal(
-        currencyAndRatesCallResult.value.getEthRate().liquidationDiscount
-      );
-    }
+    market.liquidationPenalty = BIGDECIMAL_ZERO;
 
     // market tokens
     market.inputToken = getTokenFromCurrency(event, currencyId).id;
@@ -67,6 +54,7 @@ export function getOrCreateMarket(
     market.outputTokenSupply = BIGINT_ZERO; // Not fixed supply.
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO; // There is no price.
 
+    // market rates
     const interestRate = getOrCreateInterestRate(market.id);
     market.rates = [interestRate.id];
     market.exchangeRate = BIGDECIMAL_ZERO;
@@ -84,6 +72,7 @@ export function getOrCreateMarket(
     market.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
 
+    // metadata
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
 

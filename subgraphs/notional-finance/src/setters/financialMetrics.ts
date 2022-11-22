@@ -121,7 +121,7 @@ export function updateFinancials(
   marketHourlySnapshot.cumulativeProtocolSideRevenueUSD =
     market.cumulativeProtocolSideRevenueUSD;
 
-  // TODO: market liquidate metrics are still pending
+  // cannot associate liquidation event with a market without maturity info
   financialsDailySnapshots.cumulativeLiquidateUSD =
     protocol.cumulativeLiquidateUSD;
 

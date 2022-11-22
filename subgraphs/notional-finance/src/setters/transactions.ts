@@ -51,6 +51,7 @@ export function getOrCreatePosition(
 
   for (let curr = 0; curr < account.openPositionCount; curr += 1) {
     const op = account.openPositions.at(curr);
+    // TODO: revist this in final review and remove log
     if (op.startsWith(positionIdPrefix)) {
       log.info(" ----- Found position with prefix... {}", [
         Position.load(op)!.id,
@@ -102,7 +103,7 @@ export function getOrCreatePosition(
   position.timestampOpened = event.block.timestamp;
   position.isCollateral = market.canUseAsCollateral;
 
-  // Counts
+  // counts
   position.depositCount = INT_ZERO;
   position.borrowCount = INT_ZERO;
   position.repayCount = INT_ZERO;
@@ -181,13 +182,13 @@ export function updatePosition(
   amount: BigInt,
   accountId: string,
   event: ethereum.Event,
-  eventId: string,
-  liquidation: boolean = false
+  eventId: string
+  // liquidation: boolean = false
 ): void {
   let closePositionToggle = false;
 
   const market = getOrCreateMarket(event, marketId);
-  const account = getOrCreateAccount(accountId, event);
+  const account = getOrCreateAccount(accountId);
 
   // interest rate side
   let side: string;
@@ -222,7 +223,7 @@ export function updatePosition(
     position.withdrawCount = position.withdrawCount + 1;
     position.balance = position.balance.minus(amount);
 
-    // TODO: Does liquidation using REPAY action or is it a separate action? Can we identify if a withdraw action is a liquidation event?
+    // TODO: Does liquidation using WITHDRAW action or is it a separate action? Can we identify if a withdraw action is a liquidation event?
     // if (liquidation) {
     //   position.liquidationCount = position.liquidationCount + 1;
     //   let liqudationEventId = event.transaction.hash.toHexString() + "-" event.transactionlogIndex
@@ -293,10 +294,7 @@ export function createDeposit(
   const id =
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
   const deposit = new Deposit(id);
-  const account = getOrCreateAccount(
-    event.transaction.from.toHexString(),
-    event
-  );
+  const account = getOrCreateAccount(event.transaction.from.toHexString());
 
   const transactionType = TransactionType.DEPOSIT;
 
@@ -345,10 +343,7 @@ export function createWithdraw(
   const id =
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
   const withdraw = new Withdraw(id);
-  const account = getOrCreateAccount(
-    event.transaction.from.toHexString(),
-    event
-  );
+  const account = getOrCreateAccount(event.transaction.from.toHexString());
 
   const transactionType = TransactionType.WITHDRAW;
 
@@ -398,10 +393,7 @@ export function createBorrow(
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
   const borrow = new Borrow(id);
 
-  const account = getOrCreateAccount(
-    event.transaction.from.toHexString(),
-    event
-  );
+  const account = getOrCreateAccount(event.transaction.from.toHexString());
 
   const transactionType = TransactionType.BORROW;
 
@@ -450,10 +442,7 @@ export function createRepay(
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
   const repay = new Repay(id);
 
-  const account = getOrCreateAccount(
-    event.transaction.from.toHexString(),
-    event
-  );
+  const account = getOrCreateAccount(event.transaction.from.toHexString());
 
   const transactionType = TransactionType.REPAY;
 
@@ -493,7 +482,7 @@ export function createRepay(
 
 export function createLiquidate(
   event: ethereum.Event,
-  // market: Market,
+  // market: Market,            // market isn't available in liquidation events
   currencyId: i32,
   liquidator: Address,
   liquidatee: Address,
@@ -503,8 +492,8 @@ export function createLiquidate(
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
   const token = getTokenFromCurrency(event, currencyId.toString());
   const liquidate = new Liquidate(id);
-  const liquidatorAccount = getOrCreateAccount(liquidator.toHexString(), event);
-  const liquidateeAccount = getOrCreateAccount(liquidatee.toHexString(), event);
+  const liquidatorAccount = getOrCreateAccount(liquidator.toHexString());
+  const liquidateeAccount = getOrCreateAccount(liquidatee.toHexString());
 
   liquidate.hash = event.transaction.hash.toHexString();
   liquidate.nonce = event.transaction.nonce;
@@ -527,7 +516,6 @@ export function createLiquidate(
       [currencyId.toString()]
     );
   } else {
-    // TODO: better way to do these conversions?
     const liquidationDiscount = BigDecimal.fromString(
       (
         rateStorageCall.value.getEthRate().liquidationDiscount - INT_HUNDRED
@@ -543,11 +531,11 @@ export function createLiquidate(
     TransactionType.LIQUIDATEE
   );
 
-  // Could be combined into single call but this is easier to read
+  // separate calls for readability
   addAccountToProtocol(TransactionType.LIQUIDATEE, liquidateeAccount, event);
   addAccountToProtocol(TransactionType.LIQUIDATOR, liquidatorAccount, event);
 
-  // TODO: cannot update these metrics without market id
+  // BLOCKER: cannot update these metrics without market id
   // updateFinancials(event, amountUSD, market.id);
   // updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
 

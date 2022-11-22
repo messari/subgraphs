@@ -1,11 +1,7 @@
-import { ethereum, log } from "@graphprotocol/graph-ts";
 import { Account } from "../../generated/schema";
 import { getOrCreateLendingProtocol } from "./protocol";
 
-export function getOrCreateAccount(
-  accountId: string,
-  event: ethereum.Event
-): Account {
+export function getOrCreateAccount(accountId: string): Account {
   let account = Account.load(accountId);
 
   if (!account) {

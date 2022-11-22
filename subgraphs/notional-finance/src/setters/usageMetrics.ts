@@ -14,7 +14,6 @@ import {
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../getters/usageMetrics";
-import { getOrCreateAccount } from "../getters/account";
 import { addToArrayAtIndex } from "../common/arrays";
 
 export function updateUsageMetrics(
@@ -37,10 +36,6 @@ export function updateUsageMetrics(
   usageDailySnapshot.blockNumber = event.block.number;
   usageDailySnapshot.timestamp = event.block.timestamp;
   usageDailySnapshot.dailyTransactionCount += 1;
-
-  // unused
-  // let fromAccount = getOrCreateAccount(from.toHexString(), event);
-  // let toAccount = getOrCreateAccount(to.toHexString(), event);
 
   usageHourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageDailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
@@ -114,6 +109,7 @@ export function addAccountToProtocol(
   const dailyId: string = (
     event.block.timestamp.toI64() / SECONDS_PER_DAY
   ).toString();
+  // TODO: why did I add "hourly-"? and not "daily-"?
   const activeEventId = `hourly-${account.id}-${dailyId}-${transactionType}`;
   let activeEvent = ActiveEventAccount.load(activeEventId);
   const dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);

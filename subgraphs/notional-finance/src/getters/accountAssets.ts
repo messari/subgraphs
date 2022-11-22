@@ -14,7 +14,7 @@ export function getOrCreateAsset(
     asset = new Asset(id);
     asset.currency = currencyId;
     asset.maturity = maturity;
-    asset.notional = BigInt.fromI32(0);
+    asset.notional = BIGINT_ZERO;
     asset.settlementDate = maturity;
   }
 

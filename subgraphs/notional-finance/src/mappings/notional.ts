@@ -49,7 +49,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
 
   // entities
   const market = getOrCreateMarket(event, marketId);
-  const account = getOrCreateAccount(event.params.account.toHexString(), event);
+  const account = getOrCreateAccount(event.params.account.toHexString());
   const token = getTokenFromCurrency(event, currencyId.toString());
 
   // protocol contract
@@ -66,7 +66,6 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
       [currencyId.toString()]
     );
   } else {
-    // TODO: WebAssembly division truncation vs 0.01
     market.maximumLTV = BigDecimal.fromString(
       (rateStorageCall.value.getEthRate().haircut * 0.01).toString()
     );
@@ -88,7 +87,6 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
       [currencyId.toString(), maturity.toString()]
     );
   } else {
-    // TODO: WebAssembly division truncation vs 0.01
     market.outputToken = getOrCreateERC1155Token(
       PROTOCOL_ID,
       encodedIdCall.value
@@ -97,15 +95,15 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
 
   market.save();
 
-  // track market status
-  const markets = getMarketsWithStatus(event);
-  if (markets.activeMarkets.indexOf(market.id) < 0) {
-    markets.activeMarkets = addToArrayAtIndex(
-      markets.activeMarkets,
+  // track status of markets
+  const allMarkets = getMarketsWithStatus(event);
+  if (allMarkets.activeMarkets.indexOf(market.id) < 0) {
+    allMarkets.activeMarkets = addToArrayAtIndex(
+      allMarkets.activeMarkets,
       market.id,
       0
     );
-    markets.save();
+    allMarkets.save();
   }
 
   // get active markets
@@ -129,14 +127,14 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
         activeMarkets = activeMarkets.concat([currencyMarket]);
 
         if (currencyMarket == market.id) {
-          const m = getOrCreateMarket(event, currencyMarket);
+          const mkt = getOrCreateMarket(event, currencyMarket);
 
-          // set interest rate for market in event
+          // set interest rate for market
           const interestRate = getOrCreateInterestRate(currencyMarket);
           const r = bigIntToBigDecimal(impliedRate, RATE_PRECISION_DECIMALS);
           interestRate.rate = r.times(BIGDECIMAL_HUNDRED);
           interestRate.save();
-          m.rates = [interestRate.id];
+          mkt.rates = [interestRate.id];
 
           // set exchange rate for market in event
           const timeToMaturity = bigIntToBigDecimal(
@@ -144,33 +142,30 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
             0
           );
 
-          // TODO: fix precision/decimals and remove two variables
-          // set exchange rate when timeMaturity > 0
+          // set exchange rate only when timeMaturity > 0
           if (timeToMaturity > BIGDECIMAL_ZERO) {
-            const er0 = Math.exp(
-              parseFloat(
-                r.times(timeToMaturity).div(SECONDS_PER_YEAR).toString()
-              )
-            );
-            const er = BigDecimal.fromString(er0.toString()).times(
-              BIGDECIMAL_HUNDRED
-            );
-            m.exchangeRate = er;
+            const exchangeRate = BigDecimal.fromString(
+              Math.exp(
+                parseFloat(
+                  r.times(timeToMaturity).div(SECONDS_PER_YEAR).toString()
+                )
+              ).toString()
+            ).times(BIGDECIMAL_HUNDRED);
+            mkt.exchangeRate = exchangeRate;
           }
 
-          // save
-          m.save();
+          mkt.save();
         }
       }
     }
   }
 
-  for (let k = 0; k < markets.activeMarkets.length; k++) {
-    if (!activeMarkets.includes(markets.activeMarkets[k])) {
-      // event is irrelevant
-      const m = getOrCreateMarket(event, markets.activeMarkets[k]);
+  // update market entities when they become inactive
+  for (let k = 0; k < allMarkets.activeMarkets.length; k++) {
+    if (!activeMarkets.includes(allMarkets.activeMarkets[k])) {
+      // event is irrelevant, but needed
+      const m = getOrCreateMarket(event, allMarkets.activeMarkets[k]);
 
-      // status
       m.isActive = false;
       m.canBorrowFrom = false;
 
@@ -189,17 +184,17 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
 
       m.save();
 
-      const maturedMarketIndex = markets.activeMarkets.indexOf(m.id);
-      markets.activeMarkets = removeFromArrayAtIndex(
-        markets.activeMarkets,
+      const maturedMarketIndex = allMarkets.activeMarkets.indexOf(m.id);
+      allMarkets.activeMarkets = removeFromArrayAtIndex(
+        allMarkets.activeMarkets,
         maturedMarketIndex
       );
-      markets.maturedMarkets = addToArrayAtIndex(
-        markets.maturedMarkets,
+      allMarkets.maturedMarkets = addToArrayAtIndex(
+        allMarkets.maturedMarkets,
         m.id,
         0
       );
-      markets.save();
+      allMarkets.save();
     }
   }
 
@@ -223,7 +218,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
       portfolio.push(accountPortfolioCallResult.value[i]);
     }
     updateAccountAssets(account, portfolio, event);
-    // Update fCash for currency-maturity for an account when portfolio is empty
+    // Update fCash for currency-maturity pair for an account when portfolio is empty
     if (portfolio.length == 0) {
       updateAccountAssetOnEmptyPortfolio(
         account.id,
@@ -260,8 +255,8 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
     absfCashAmount = fCashAmount.neg();
   }
 
-  // identify transaction type
-  // transactions of different user intention may call the same action type in notional smart contract design
+  // identify transaction type: transactions of different user intention may call the
+  // same action type in notional smart contract design
   if (
     fCashBeforeTransaction <= BIGINT_ZERO &&
     fCashAfterTransaction < fCashBeforeTransaction
@@ -321,18 +316,6 @@ export function handleLiquidateLocalCurrency(
   const liquidator = event.params.liquidator;
   const amount = event.params.netLocalFromLiquidator;
 
-  // log.error(
-  //   "*************** [handleLiquidateLocalCurrency] tx: {}, localCurrencyId: {}",
-  //   [
-  //     event.transaction.hash.toHexString(),
-  //     event.params.localCurrencyId.toString(),
-  //   ]
-  // );
-
-  // TODO: Blocker. cannot associate liquidation event with a market without maturity info.
-  // let market = getOrCreateMarket(event, marketId); // marketId = currencyId.toString() + "-" + maturity.toString();
-
-  // createliquidate(event, market, liquidator, liquidatee, amount);
   createLiquidate(event, currencyId, liquidator, liquidatee, amount);
 }
 
@@ -344,22 +327,6 @@ export function handleLiquidateCollateralCurrency(
   const liquidator = event.params.liquidator;
   const amount = event.params.netLocalFromLiquidator;
 
-  // log.error(
-  //   "%%%%%%%%%%%%%%% [handleLiquidateCollateralCurrency] tx:{}, localCurrencyId: {}, collateralCurrencyId: {}, netLocalFromLiquidator: {}, netCollateralTransfer: {}, netNTokenTransfer: {}",
-  //   [
-  //     event.transaction.hash.toHexString(),
-  //     event.params.localCurrencyId.toString(),
-  //     event.params.collateralCurrencyId.toString(),
-  //     event.params.netLocalFromLiquidator.toString(),
-  //     event.params.netCollateralTransfer.toString(),
-  //     event.params.netNTokenTransfer.toString(),
-  //   ]
-  // );
-
-  // TODO: Blocker. cannot associate liquidation event with a market without maturity info.
-  // let market = getOrCreateMarket(event, marketId); // marketId = currencyId.toString() + "-" + maturity.toString();
-
-  // createliquidate(event, market, liquidator, liquidatee, amount);
   createLiquidate(event, currencyId, liquidator, liquidatee, amount);
 }
 
@@ -369,20 +336,5 @@ export function handleLiquidatefCash(event: LiquidatefCashEvent): void {
   const liquidator = event.params.liquidator;
   const amount = event.params.netLocalFromLiquidator;
 
-  // log.error(
-  //   "$$$$$$$$$$$$$$$$$$$$ [handleLiquidatefCash] tx: {}, localCurrencyId: {}, fCashCurrencyId: {}, netLocalFromLiquidator: {}, fCashNotionalTransfer: {}",
-  //   [
-  //     event.transaction.hash.toHexString(),
-  //     event.params.localCurrencyId.toString(),
-  //     event.params.fCashCurrency.toString(),
-  //     event.params.netLocalFromLiquidator.toString(),
-  //     event.params.fCashNotionalTransfer.toString(),
-  //   ]
-  // );
-
-  // TODO: Blocker. cannot associate liquidation event with a market without maturity info.
-  // let market = getOrCreateMarket(event, marketId); // marketId = currencyId.toString() + "-" + maturity.toString();
-
-  // createliquidate(event, market, liquidator, liquidatee, amount);
   createLiquidate(event, currencyId, liquidator, liquidatee, amount);
 }

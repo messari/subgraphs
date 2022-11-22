@@ -42,8 +42,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.liquidatees = [];
     protocol.liquidators = [];
 
-    // protocol._treasuryFee = constants.PROTOCOL_INITIAL_TREASURY_FEE;
-
     protocol.save();
   }
 

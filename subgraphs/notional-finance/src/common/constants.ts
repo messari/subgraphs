@@ -175,14 +175,6 @@ export const PROTOCOL_INTEREST_RATE_SIDE = InterestRateSide.BORROWER;
 // contracts/addresses
 export const PROTOCOL_ID = "0x1344A36A1B56144C3Bc62E7757377D288fDE0369";
 
-// markets
-export namespace PoolId {
-  export const ETH_POOL = 1;
-  export const DAI_POOL = 2;
-  export const USDC_POOL = 3;
-  export const WBTC_POOL = 4;
-}
-
 // revenue
 export const NOTIONAL_TRADE_FEES = BigDecimal.fromString("0.003");
 export const NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE = BigDecimal.fromString("0.80");
