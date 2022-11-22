@@ -44,6 +44,8 @@ Some of the notable things in this folder:
 - There is a pricing library you can learn more about [here](../subgraphs/_reference_/src/prices/README.md)
 - There are some common mapping functions that you can reuse to reduce the amount of rework needed
 - Ensure you are using the right schema for your subgraph type found in the head of the repo
+- Folder names use [kebab-case](https://www.theserverside.com/definition/Kebab-case) in all lower case
+- File names use [camelCase](https://en.wikipedia.org/wiki/Camel_case) with a preceding lowercase letter
 
 ## Create a PR
 
@@ -52,6 +54,8 @@ At this point you have a little work done. You should make a PR and convert it t
 ## Define the Manifest
 
 This means to start figuring out what contracts, events, and abis you will need and updating the `subgraph.yaml` template accordingly. In some protocols there will (hopefully) be a factory contract. This contract will create and deploy other contracts. These deployed contracts are going to usually be templates in the `subgraph.yaml` file.
+
+You want to only include the ABIs used in each `dataSource`. Excess will start to bloat the file and make it difficult to read.
 
 Then you want to find the important events in the contracts and start by marking those events to create handlers in the `subgraph.yaml`.
 
