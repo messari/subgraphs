@@ -1,0 +1,13 @@
+{
+  "deployment": "PANGOLIN_AVALANCHE",
+  "network": "avalanche",
+  "factory": {
+    "address": "0xefa94DE7a4656D787667C749f7E1223D71E9FD88",
+    "startBlock": 56877
+  },
+  "miniChefAddress": "0x1f806f7c8ded893fd3cae279191ad7aa3798e928",
+  "miniChefStartBlock": 6987996,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

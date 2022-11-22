@@ -1,5 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
     Borrow,
     Deposit,
@@ -11,13 +10,12 @@ import {
     _Claim,
     _Loan,
     _Stake,
-    _Unstake
+    _Unstake,
 } from "../../../../generated/schema";
 import { Pool as PoolContract } from "../../../../generated/templates/Pool/Pool";
-
-import { PROTOCOL_ID, StakeType, TransactionType, ZERO_BD, ZERO_BI } from "../../constants";
+import { PROTOCOL_ID, TransactionType, ZERO_BD, ZERO_BI } from "../../constants";
 import { getTokenAmountInUSD } from "../../prices/prices";
-import { bigDecimalToBigInt, minBigInt, readCallResult } from "../../utils";
+import { bigDecimalToBigInt, readCallResult } from "../../utils";
 import { updateUsageMetrics } from "../update/usage";
 import { getOrCreateMarket } from "./markets";
 import { getOrCreateToken } from "./supporting";

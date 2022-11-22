@@ -56,10 +56,7 @@ export namespace NULL {
 export namespace Protocol {
   export const NAME = "Yearn v2";
   export const SLUG = "yearn-v2";
-  export const SCHEMA_VERSION = "1.3.0";
   export const NETWORK = Network.MAINNET;
-  export const SUBGRAPH_VERSION = "1.2.1";
-  export const METHODOLOGY_VERSION = "1.0.0";
 }
 
 export namespace VaultVersions {
@@ -97,21 +94,40 @@ export const YEARN_TREASURY_VAULT = Address.fromString(
   "0x93a62da5a14c80f265dabc077fcee437b1a0efde"
 );
 
-export const MAX_UINT256 = BigInt.fromI32(
-  115792089237316195423570985008687907853269984665640564039457584007913129639935
-);
+export const MAX_UINT256 =
+  BigInt.fromI32(
+    115792089237316195423570985008687907853269984665640564039457584007913129639935
+  );
 
 export const MAX_UINT256_STR =
   "115792089237316195423570985008687907853269984665640564039457584007913129639935";
 
 export const BLACKLISTED_TRANSACTION: Bytes[] = [
-  Bytes.fromHexString('0xc0ce9effb23616906fb04c5400764fc5f036c2977939c976e959aad23326fb55'),
-  Bytes.fromHexString('0x0603adc7020c93dfa207b9cc00d4474fb6767ae2f0caf1aa7db64bf23cd67822'),
-  Bytes.fromHexString('0x8dfecd98048998b91223303890f3e0f28b0b863077f98189090a837932fa6041'),
-  Bytes.fromHexString('0x216abefbba23885d385278cb44573f407e250c9f4f65260c4bc71921e0ceeb19'),
-  Bytes.fromHexString('0x4f7e0254eee6a2e2847cd4562fc2178d978b2ebfe424c8b5a6b93a3662f41525'),
-  Bytes.fromHexString('0x4fc4e03751af80bf1bd548346ef6cdcb0ee99219379ffb7e9088585a4ef73c7e'),
-  Bytes.fromHexString('0x09d08d6a2caeb6f4f1c90ac68adea93f758dc57d173acfa6621d92f3dc3277d0'),
-  Bytes.fromHexString('0x151be1c35cbf00fd29e0e370cf5a0469d96656df16b74f19a597b3e87d8f724d'),
-  Bytes.fromHexString('0x66847f4dc80a6b4c32666972a9a68416d802d78b54619503fd0aec358fedb185')
-] 
+  Bytes.fromHexString(
+    "0xc0ce9effb23616906fb04c5400764fc5f036c2977939c976e959aad23326fb55"
+  ),
+  Bytes.fromHexString(
+    "0x0603adc7020c93dfa207b9cc00d4474fb6767ae2f0caf1aa7db64bf23cd67822"
+  ),
+  Bytes.fromHexString(
+    "0x8dfecd98048998b91223303890f3e0f28b0b863077f98189090a837932fa6041"
+  ),
+  Bytes.fromHexString(
+    "0x216abefbba23885d385278cb44573f407e250c9f4f65260c4bc71921e0ceeb19"
+  ),
+  Bytes.fromHexString(
+    "0x4f7e0254eee6a2e2847cd4562fc2178d978b2ebfe424c8b5a6b93a3662f41525"
+  ),
+  Bytes.fromHexString(
+    "0x4fc4e03751af80bf1bd548346ef6cdcb0ee99219379ffb7e9088585a4ef73c7e"
+  ),
+  Bytes.fromHexString(
+    "0x09d08d6a2caeb6f4f1c90ac68adea93f758dc57d173acfa6621d92f3dc3277d0"
+  ),
+  Bytes.fromHexString(
+    "0x151be1c35cbf00fd29e0e370cf5a0469d96656df16b74f19a597b3e87d8f724d"
+  ),
+  Bytes.fromHexString(
+    "0x66847f4dc80a6b4c32666972a9a68416d802d78b54619503fd0aec358fedb185"
+  ),
+];

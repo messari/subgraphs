@@ -22,12 +22,10 @@ interface DeploymentsPageProps {
   indexingStatusQueries: any;
   endpointSlugs: string[];
   aliasToProtocol: any;
+  decentralizedDeployments: any;
 }
 
-function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol }: DeploymentsPageProps) {
-  const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
-    [type: string]: { [network: string]: any };
-  }>({});
+function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol, decentralizedDeployments }: DeploymentsPageProps) {
 
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
@@ -41,44 +39,12 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
   const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
   const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
 
-  const clientDecentralizedEndpoint = useMemo(
-    () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"),
-    [],
-  );
-  const {
-    data: decentralized,
-  } = useQuery(decentralizedNetworkSubgraphsQuery, {
-    client: clientDecentralizedEndpoint,
-  });
+
+
 
   useEffect(() => {
     getData();
   }, []);
-
-  useEffect(() => {
-    if (decentralized && !Object.keys(decentralizedDeployments)?.length) {
-      const decenDepos: { [x: string]: any } = {};
-      const subs = [...decentralized.graphAccounts[0].subgraphs, ...decentralized.graphAccounts[1].subgraphs];
-      subs.forEach((sub: any, idx: number) => {
-        try {
-          let name = sub.currentVersion?.subgraphDeployment?.originalName?.toLowerCase()?.split(" ");
-          if (!name) {
-            name = sub?.displayName?.toLowerCase()?.split(" ");
-          }
-          name.pop();
-          name = name.join("-");
-          const network = sub.currentVersion.subgraphDeployment.network.id;
-          const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
-          const signalledTokens = sub.currentVersion.subgraphDeployment.signalledTokens;
-          const subgraphId = sub.id;
-          decenDepos[name] = { network, deploymentId, subgraphId, signalledTokens };
-        } catch (err) {
-          return;
-        }
-      });
-      setDecentralizedDeployments(decenDepos);
-    }
-  }, [decentralized]);
 
   const navigate = useNavigate();
   window.scrollTo(0, 0);
@@ -184,10 +150,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
           Deployed Subgraphs
         </Typography>
         <div style={{ width: "100%", textAlign: "center" }}>
-          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("/comparison")}>
-            DefiLlama Comparison
-          </span>
-          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderLeft: "#6656F8 2px solid", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
+          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
             {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
           </span>
           <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("protocols-list")}>

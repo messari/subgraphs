@@ -3,8 +3,6 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
-  MINIMUM_LIQUIDITY_TEN_THOUSAND,
   MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
@@ -51,13 +49,16 @@ export class SushiswapMaticConfigurations implements Configurations {
       )
     );
   }
-  getTradeFee(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  getLPFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
@@ -109,6 +110,9 @@ export class SushiswapMaticConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
+    return [];
+  }
+  getBrokenERC20Tokens(): string[] {
     return [];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {

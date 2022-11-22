@@ -1,8 +1,4 @@
 import {
-  _MasterChefAddressToPid,
-  _MasterChefStakingPool,
-} from "../../../../../generated/schema";
-import {
   RewardPaid,
   Staked,
   Withdrawn,

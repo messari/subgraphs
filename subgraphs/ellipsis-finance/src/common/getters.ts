@@ -24,14 +24,12 @@ import {
   FACTORY,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
   EARLY_BASEPOOLS,
   PoolType,
   ZERO_ADDRESS,
 } from "./constants";
 import { createNewPool, getBasePool, getLpToken, getPoolCoinsFromAddress } from "../services/pool";
+import { Versions } from "../versions";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -211,9 +209,6 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol = new DexAmmProtocol(FACTORY);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.BSC;
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -223,8 +218,14 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = 0;
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 
@@ -264,8 +265,8 @@ export function getOrCreatePool(poolAddress: Address, event: ethereum.Event): Li
     const lpToken = getLpToken(poolAddress);
     const lpTokenEntity = getOrCreateToken(lpToken);
     const basePool = getBasePool(poolAddress);
-    const poolCoins = getPoolCoinsFromAddress(poolAddress)
-    const pooltype = EARLY_BASEPOOLS.includes(poolAddress) ? PoolType.BASEPOOL : PoolType.PLAIN
+    const poolCoins = getPoolCoinsFromAddress(poolAddress);
+    const pooltype = EARLY_BASEPOOLS.includes(poolAddress) ? PoolType.BASEPOOL : PoolType.PLAIN;
     pool = createNewPool(
       poolAddress,
       lpToken,
@@ -275,7 +276,7 @@ export function getOrCreatePool(poolAddress: Address, event: ethereum.Event): Li
       event.block.timestamp,
       basePool,
       poolCoins,
-      pooltype
+      pooltype,
     );
   }
   return pool;

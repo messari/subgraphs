@@ -1,10 +1,6 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { SolarDistributorV2 } from "../../../../../generated/MasterChef/SolarDistributorV2";
-import {
-  LiquidityPool,
-  _HelperStore,
-  _MasterChefStakingPool,
-} from "../../../../../generated/schema";
+import { LiquidityPool } from "../../../../../generated/schema";
 import {
   MasterChef,
   RECENT_BLOCK_THRESHOLD,
@@ -31,17 +27,17 @@ export function handleReward(
   pid: BigInt,
   amount: BigInt
 ): void {
-  let poolContract = SolarDistributorV2.bind(event.address);
-  let masterChefPool = getOrCreateMasterChefStakingPool(
+  const poolContract = SolarDistributorV2.bind(event.address);
+  const masterChefPool = getOrCreateMasterChefStakingPool(
     event,
     MasterChef.MASTERCHEF,
     pid
   );
-  let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
+  const masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
   // Check if the liquidity pool address is available. Try to get it if not or return if the contract call was reverted
   if (!masterChefPool.poolAddress) {
-    let getPoolInfo = poolContract.try_poolInfo(pid);
+    const getPoolInfo = poolContract.try_poolInfo(pid);
     if (!getPoolInfo.reverted) {
       masterChefPool.poolAddress = getPoolInfo.value.value0.toHexString();
     }
@@ -57,7 +53,7 @@ export function handleReward(
   }
 
   // If the pool comes back null just return
-  let pool = LiquidityPool.load(masterChefPool.poolAddress!);
+  const pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
     return;
   }
@@ -79,10 +75,10 @@ export function handleReward(
   }
 
   // Get the reward tokens emitted per second for the pool. There can be multiple reward tokens per pool.
-  let getPoolRewardsPerSecond = poolContract.try_poolRewardsPerSec(pid);
-  let rewardTokenEmissionsAmountArray: BigInt[] = [];
-  let rewardTokenEmissionsUSDArray: BigDecimal[] = [];
-  let rewardTokenIds: string[] = [];
+  const getPoolRewardsPerSecond = poolContract.try_poolRewardsPerSec(pid);
+  const rewardTokenEmissionsAmountArray: BigInt[] = [];
+  const rewardTokenEmissionsUSDArray: BigDecimal[] = [];
+  const rewardTokenIds: string[] = [];
   if (!getPoolRewardsPerSecond.reverted) {
     // Value 0: Reward Token Address
     // Value 3: Reward Token Emissions Per Second
@@ -91,30 +87,31 @@ export function handleReward(
       index < getPoolRewardsPerSecond.value.value0.length;
       index++
     ) {
-      let rewardTokenAddresses = getPoolRewardsPerSecond.value.value0;
-      let rewardTokenEmissionsPerSecond = getPoolRewardsPerSecond.value.value3;
+      const rewardTokenAddresses = getPoolRewardsPerSecond.value.value0;
+      const rewardTokenEmissionsPerSecond =
+        getPoolRewardsPerSecond.value.value3;
 
       rewardTokenIds.push(
         getOrCreateRewardToken(rewardTokenAddresses[index].toHexString()).id
       );
-      let rewardToken = getOrCreateToken(
+      const rewardToken = getOrCreateToken(
         rewardTokenAddresses[index].toHexString()
       );
-      let rewardTokenRateBigDecimal =
+      const rewardTokenRateBigDecimal =
         rewardTokenEmissionsPerSecond[index].toBigDecimal();
 
       // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-      let rewardTokenPerDay = getRewardsPerDay(
+      const rewardTokenPerDay = getRewardsPerDay(
         event.block.timestamp,
         event.block.number,
         rewardTokenRateBigDecimal,
         masterChef.rewardTokenInterval
       );
 
-      let rewardTokenPerDayRounded = BigInt.fromString(
+      const rewardTokenPerDayRounded = BigInt.fromString(
         roundToWholeNumber(rewardTokenPerDay).toString()
       );
-      let rewardTokenEmissionsUSD = convertTokenToDecimal(
+      const rewardTokenEmissionsUSD = convertTokenToDecimal(
         rewardTokenPerDayRounded,
         rewardToken.decimals
       ).times(rewardToken.lastPriceUSD!);

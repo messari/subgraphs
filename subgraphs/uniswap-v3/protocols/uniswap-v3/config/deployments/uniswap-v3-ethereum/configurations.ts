@@ -1,32 +1,17 @@
-import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   FeeSwitch,
   Network,
-  PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
 } from "../../../../../src/common/constants";
 import { Configurations } from "../../../../../configurations/configurations/interface";
-import {
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
-  PROTOCOL_NAME,
-  PROTOCOL_SLUG,
-} from "../../../src/common/constants";
+import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/common/constants";
 import { toLowerCase } from "../../../../../src/common/utils/utils";
 
 export class UniswapV3MainnetConfigurations implements Configurations {
   getNetwork(): string {
     return Network.MAINNET;
-  }
-  getSchemaVersion(): string {
-    return PROTOCOL_SCHEMA_VERSION;
-  }
-  getSubgraphVersion(): string {
-    return PROTOCOL_SUBGRAPH_VERSION;
-  }
-  getMethodologyVersion(): string {
-    return PROTOCOL_METHODOLOGY_VERSION;
   }
   getProtocolName(): string {
     return PROTOCOL_NAME;
@@ -128,6 +113,7 @@ export class UniswapV3MainnetConfigurations implements Configurations {
       "0x398aea1c9ceb7de800284bb399a15e0efe5a9ec2", // Escrowed Illuvium
       "0x8c6bf16c273636523c29db7db04396143770f6a0", // MoonRabbit
       "0x4da27a545c0c5b758a6ba100e3a049001de870f5", // Staked AAVE
+      "0x5938999dd0cc4d480c3b1a451aecc78ae4ddaab5", // SifuM
     ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {

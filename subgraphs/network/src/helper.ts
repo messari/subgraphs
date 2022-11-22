@@ -16,17 +16,15 @@ import {
   IntervalType,
   INT_TWO,
   INT_ZERO,
-  METHODOLOGY_VERSION,
   NETWORK_NAME,
-  SCHEMA_VERSION,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
-  SUBGRAPH_VERSION,
   BIGDECIMAL_TWO,
   BIGINT_MAX,
 } from "./constants";
 import { BlockData, UpdateNetworkData } from "./mapping";
 import { exponentToBigDecimal } from "./utils";
+import { Versions } from "./versions";
 
 //////////////////
 //// Updaters ////
@@ -675,15 +673,17 @@ function getOrCreateNetwork(id: string): Network {
   let network = Network.load(id);
   if (!network) {
     network = new Network(id);
-    network.schemaVersion = SCHEMA_VERSION;
-    network.subgraphVersion = SUBGRAPH_VERSION;
-    network.methodologyVersion = METHODOLOGY_VERSION;
     network.cumulativeUniqueAuthors = INT_ZERO;
     network.blockHeight = INT_ZERO;
     network.dailyBlocks = getOrCreateStats(id, DataType.BLOCKS).id;
-
-    network.save();
   }
+
+  network.schemaVersion = Versions.getSchemaVersion();
+  network.subgraphVersion = Versions.getSubgraphVersion();
+  network.methodologyVersion = Versions.getMethodologyVersion();
+
+  network.save();
+
   return network;
 }
 

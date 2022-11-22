@@ -742,9 +742,6 @@ type Withdraw implements Event @entity {
 
   " The pool involving this transaction "
   pool: LiquidityPool!
-
-  " Specifies whether the withdrawal from a pool is trigger from a user collecting accrued swap fees "
-  isCollect: Boolean!
 }
 
 type Swap implements Event @entity {

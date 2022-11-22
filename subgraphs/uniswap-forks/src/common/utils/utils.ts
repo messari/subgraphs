@@ -4,6 +4,7 @@ import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_TEN,
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
 } from "../constants";
@@ -40,7 +41,7 @@ export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
 
 // convert string array to byte array
 export function toBytesArray(arr: string[]): Bytes[] {
-  let byteArr = new Array<Bytes>(arr.length);
+  const byteArr = new Array<Bytes>(arr.length);
   for (let i = 0; i < arr.length; i++) {
     byteArr[i] = Bytes.fromHexString(arr[i]);
   }
@@ -60,7 +61,7 @@ export function toPercentage(n: BigDecimal): BigDecimal {
 
 // Convert a list of strings to lower case
 export function toLowerCaseList(list: string[]): string[] {
-  let lowerCaseList = new Array<string>(list.length);
+  const lowerCaseList = new Array<string>(list.length);
   for (let i = 0; i < list.length; i++) {
     lowerCaseList[i] = list[i].toLowerCase();
   }
@@ -78,4 +79,15 @@ export function roundToWholeNumber(n: BigDecimal): BigDecimal {
 
 export function percToDec(percentage: BigDecimal): BigDecimal {
   return percentage.div(BIGDECIMAL_HUNDRED);
+}
+
+// Check if tokens are of the same sign
+export function isSameSign(a: BigInt, b: BigInt): boolean {
+  if (
+    (a.gt(BIGINT_ZERO) && b.gt(BIGINT_ZERO)) ||
+    (a.lt(BIGINT_ZERO) && b.lt(BIGINT_ZERO))
+  ) {
+    return true;
+  }
+  return false;
 }

@@ -10,6 +10,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 - Copy over the corresponding schema from the root folder. For example, if you are working on a yield aggregator, you should copy over `schema-yield.graphql` to your folder and rename it to `schema.graphql`. Note `schema-common.graphql` is used for schema design and reference, and should never be used for implementation.
 - Build the subgraph within that folder. Feel free to use the [reference subgraph](./subgraphs/_reference_/) as a reference.
 - Submit a PR (pull request) to this repo after you are done. Make sure you submit your PR as a draft if it's a work-in-progress. Include a link to your deployment in your PR description.
+- If there are errors on any production subgraph (seen on "[protocol metrics](https://messari.io/protocol-explorer/all-protocols)") please reference the firefighting [docs](./docs/ProductionErrors.md) to efficiently solve the problem!
 
 ## Recommended Development Workflow
 
@@ -24,6 +25,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 - Implement the mappings, deploy and test your data using either Hosted Service or The Graph Studio.
 - For metrics calculation (e.g. revenue, fees, TVL), please refer to the `README.md` in the protocol's subgraph folder for methodology. There is also a broader explanation of how different fields are defined in the schema in `docs/Schema.md`. Feel free to reach out to me if anything isn't clear.
 - We've built a handy debugging/validation dashboard for you to quickly visualize the data in your subgraph. It's deployed to [subgraphs.xyz](https://subgraphs.xyz/) and the source code is under `dashboard` if you want to spin it up locally.
+- There is also a cli-tool called `messari-cli`. It utilized The Graph CLI and exploits the standard directory structure to template and prepare subgraph deployments for you with simple commands. You can learn more about installing and using the CLI by looking at the README.md within the `messari-cli/docs` folder.
 - Verify your subgraph against other sources and include specific links to these sources in the README. Below are some common sources:
   - Project's official analytics dashboard
   - [DeFi Llama](https://defillama.com/) (for TVL)
@@ -31,6 +33,25 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
   - [TokenTerminal](https://www.tokenterminal.com/terminal)
 
 > For other contributing guidelines, please refer to [Contributing.md](./docs/Contributing.md)
+
+## Video Walkthrough Series of Subgraph Development Workflow for Messari
+
+**CLI Installation:**
+
+- `npm install -g messari-subgraph-cli`
+- `npm install -g mustache`
+
+**Deployment.json Walkthough:**
+
+[![Deployment.json Walkthrough](https://img.youtube.com/vi/cgCNkRmM4NM/0.jpg)](https://youtu.be/cgCNkRmM4NM)
+
+**Standard Directory Structure Walkthrough:**
+
+[![Standard Directory Structure Walkthrough](https://img.youtube.com/vi/i3VAQYFMwEI/0.jpg)](https://youtu.be/i3VAQYFMwEI)
+
+**How to use Messari Subgraph CLI and Explanation:**
+
+[![How to use Messari Subgraph CLI and Explanation](https://img.youtube.com/vi/WYWa-3Vh5Jc/0.jpg)](https://youtu.be/WYWa-3Vh5Jc)
 
 ## Resources
 
@@ -64,4 +85,4 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 
 ## Development Status
 
-We've moved development status [here](https://subgraphs.messari.io/development-status).
+We've moved development status [here](https://subgraphs.messari.io/).

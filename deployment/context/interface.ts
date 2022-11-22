@@ -1,8 +1,5 @@
-export interface DeploymentJsonContextInterface {
-  protocolSlug: string;
-  protocolName: string;
-  network: string;
-  schemaVersion: string;
-  subgraphVersion: string;
-  methodologyVersion: string;
+export interface Versions {
+  getSchemaVersion(): string;
+  getSubgraphVersion(): string;
+  getMethodologyVersion(): string;
 }

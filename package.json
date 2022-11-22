@@ -5,7 +5,7 @@
   },
   "devDependencies": {
     "@graphprotocol/graph-ts": "^0.28.0",
-    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/eslint-plugin": "^5.39.0",
     "@typescript-eslint/parser": "^5.38.0",
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
@@ -24,7 +24,7 @@
     "prettier-check": "prettier --loglevel silent --write --check \"**/*.{md,jsx,tsx,ts,json,html,css,js}\"",
     "lint:fix": "npx eslint --fix --max-warnings 0",
     "lint": "npx eslint",
-    "lint:subgraphs": "npx eslint -c subgraphs/.eslintrc.json",
+    "lint:subgraphs": "npx eslint -c subgraphs/.eslintrc.js",
     "prepare": "husky install",
     "folderslint": "cd subgraphs && folderslint"
   }

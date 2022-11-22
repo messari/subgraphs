@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/aave-aave-eol/CalculationsSushiSwap";
+import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/Standard/CalculationsSushiSwap";
 
 export function getSushiSwapContract(
   network: string
@@ -21,7 +21,7 @@ export function getTokenPriceFromSushiSwap(
     return new CustomPriceType();
   }
 
-  let tokenPrice: BigDecimal = utils
+  const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       curveContract.try_getPriceUsdc(tokenAddr),
       constants.BIGINT_ZERO

@@ -25,8 +25,8 @@ export const DeploymentsDropDown = ({
   //   array of objects containing label and subgraph url
   const href = new URL(window.location.href);
   const p = new URLSearchParams(href.search);
-  const protocolStr = p.get("protocol");
-  const networkStr = p.get("network");
+  const protocolStr = p.get("defillamaprotocol");
+  const networkStr = p.get("defillamanetwork");
 
   const selectionsSet: { [x: string]: any }[] = [];
 
@@ -67,7 +67,7 @@ export const DeploymentsDropDown = ({
     } else if (!(issuesProps.filter((x: any) => x.type === "QRY").length > 0) && selectionsSet.length > 0) {
       setIssues([
         {
-          message: `"protocol=${protocolStr}"//"network=${networkStr}"`,
+          message: `"defillamaprotocol=${protocolStr}"//"defillamanetwork=${networkStr}"`,
           type: "QRY",
           level: "critical",
           fieldName: deploymentURL,
@@ -88,9 +88,9 @@ export const DeploymentsDropDown = ({
           const targEle = event?.target as HTMLLIElement;
           const subgraphObj = selectionsSet.find((x) => x.label === targEle.innerText);
           if (targEle.innerText && subgraphObj) {
-            p.set("protocol", targEle.innerText?.split(" (")[0].split(" ").join("-"));
-            p.set("network", targEle.innerText?.split(" (")[1].split(")")[0]);
-            navigate("?" + p.toString());
+            p.set("defillamaprotocol", targEle.innerText?.split(" (")[0].split(" ").join("-"));
+            p.set("defillamanetwork", targEle.innerText?.split(" (")[1].split(")")[0]);
+            navigate("?" + p.toString().split('%2F').join('/'));
             setTextInput(targEle.innerText);
             setDefiLlamaSlug(targEle.innerText);
             setDeploymentURL(subgraphObj.url);

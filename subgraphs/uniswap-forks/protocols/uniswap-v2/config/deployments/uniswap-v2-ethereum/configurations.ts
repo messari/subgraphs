@@ -44,13 +44,16 @@ export class UniswapV2MainnetConfigurations implements Configurations {
       Address.fromString("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f")
     );
   }
-  getTradeFee(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  getLPFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
@@ -203,6 +206,9 @@ export class UniswapV2MainnetConfigurations implements Configurations {
       "0x82a77710495a35549d2add797412b4a4497d33ef", // DOGZ
       "0x5b558564b57e4ff88c6b8d8e7eeee599bf79b368", // MultiMillion
     ];
+  }
+  getBrokenERC20Tokens(): string[] {
+    return [];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND;

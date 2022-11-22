@@ -37,13 +37,10 @@ import {
   ETH_DECIMALS,
   ETH_NAME,
   ETH_SYMBOL,
-  METHODOLOGY_VERSION,
   Network,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   RewardTokenType,
-  SCHEMA_VERSION,
-  SUBGRAPH_VERSION,
 } from "./constants";
 import {
   convertRatePerUnitToAPY,
@@ -349,9 +346,6 @@ function getOrCreateProtocol(): LendingProtocol {
     comptrollerAddr,
     PROTOCOL_NAME,
     PROTOCOL_SLUG,
-    SCHEMA_VERSION,
-    SUBGRAPH_VERSION,
-    METHODOLOGY_VERSION,
     Network.MAINNET,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()
