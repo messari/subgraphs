@@ -1907,6 +1907,9 @@ type Flashloan @entity(immutable: true) {
   " Price of gas in this transaction "
   gasPrice: BigInt
 
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
+
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
   gasLimit: BigInt
 
