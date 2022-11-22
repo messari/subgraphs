@@ -398,6 +398,10 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
       .div(mantissaFactorBD);
     rewardsAmount.push(rewards.rewardsPerDayBI);
     rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
+    log.warning("price: {}, token: {}", [
+      priceUSD.toString(),
+      rewards.token.name,
+    ]);
   }
 
   if (tryRewardSpeeds.value.plyRewardSupplySpeed.gt(BIGINT_ONE)) {
@@ -418,6 +422,10 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
       .div(mantissaFactorBD);
     rewardsAmount.push(rewards.rewardsPerDayBI);
     rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
+    log.warning("price: {}, token: {}", [
+      priceUSD.toString(),
+      rewards.token.name,
+    ]);
   }
 
   if (tryRewardSpeeds.value.auroraRewardBorrowSpeed.gt(BIGINT_ONE)) {
@@ -438,6 +446,10 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
       .div(mantissaFactorBD);
     rewardsAmount.push(rewards.rewardsPerDayBI);
     rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
+    log.warning("price: {}, token: {}", [
+      priceUSD.toString(),
+      rewards.token.name,
+    ]);
   }
 
   if (tryRewardSpeeds.value.auroraRewardSupplySpeed.gt(BIGINT_ONE)) {
@@ -458,6 +470,10 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
       .div(mantissaFactorBD);
     rewardsAmount.push(rewards.rewardsPerDayBI);
     rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
+    log.warning("price: {}, token: {}", [
+      priceUSD.toString(),
+      rewards.token.name,
+    ]);
   }
   market.rewardTokens = rewardTokens;
   market.rewardTokenEmissionsAmount = rewardsAmount;
