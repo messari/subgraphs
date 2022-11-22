@@ -688,11 +688,8 @@ export function updateWeightedBorrow(mrkt: Market, epoch: _Epoch, endBlock: BigI
     mrkt._borrowLastUpdateBlock = endBlock;
     mrkt.save();
 
-    //const epoch = _Epoch.load(epochID.toString())!;
-    epoch.sumWeightedBorrowUSD = epoch.sumWeightedBorrowUSD.plus(addWeightedTotalBorrowUSD);
-
     log.info(
-      "[updateWeightedBorrow]market {}, epoch={}, blocksLapsed={} (lastUpdateBlock={},endBlock={}),addWeightedTotalBorrowUSD={},market._weightedTotalBorrowUSD={},epoch.sumWeightedBorrowUSD={}",
+      "[updateWeightedBorrow]market {}, epoch={}, blocksLapsed={} (lastUpdateBlock={},endBlock={}),addWeightedTotalBorrowUSD={},market._weightedTotalBorrowUSD={}",
       [
         mrkt.id,
         epoch.id,
@@ -701,9 +698,7 @@ export function updateWeightedBorrow(mrkt: Market, epoch: _Epoch, endBlock: BigI
         endBlock.toString(),
         addWeightedTotalBorrowUSD.toString(),
         mrkt._weightedTotalBorrowUSD!.toString(),
-        epoch.sumWeightedBorrowUSD.toString(),
       ],
     );
-    epoch.save();
   }
 }

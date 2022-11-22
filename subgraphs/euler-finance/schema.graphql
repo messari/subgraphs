@@ -1101,13 +1101,7 @@ type _AssetStatus @entity {
 
 type _Epoch @entity {
   id: ID!
-  " Have markets been ranked in the current epoch"
-  marketsRanked: Boolean!
   epoch: Int!
-  " The highest 10 weighted staked amounts across all markets "
-  top10StakeAmounts: [BigInt!]
-  " running sum of weighted totalBorrowBalanceUSD "
-  sumWeightedBorrowUSD: BigDecimal!
 }
 
 type _AccountStakeAmount @entity {

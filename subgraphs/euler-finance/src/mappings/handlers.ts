@@ -30,15 +30,10 @@ import {
   DEFAULT_DECIMALS,
   BIGINT_SEVENTY_FIVE,
   START_EPOCH,
-  BLOCKS_PER_EPOCH,
-  START_EPOCH_BLOCK,
-  MAX_EPOCHS,
   EUL_DIST,
-  BIGINT_NEG_ONE,
-  EULSTAKES_ADDRESS,
   EUL_DECIMALS,
   RewardTokenType,
-  BIGDECIMAL_ONE,
+  EUL_ADDRESS,
 } from "../common/constants";
 import { snapshotFinancials, snapshotMarket, updateWeightedBorrow, updateUsageMetrics } from "./helpers";
 import {
@@ -354,10 +349,10 @@ export function handleStake(event: Stake): void {
   if (!epoch) {
     //Start of a new epoch
     epoch = new _Epoch(epochID.toString());
-    epoch.marketsRanked = false;
+    //epoch.marketsRanked = false;
     epoch.epoch = epochID;
-    epoch.top10StakeAmounts = [];
-    epoch.sumWeightedBorrowUSD = BIGDECIMAL_ZERO;
+    //epoch.top10StakeAmounts = [];
+    //epoch.sumWeightedBorrowUSD = BIGDECIMAL_ZERO;
     epoch.save();
 
     // rank markets use votes in prev epoch
@@ -372,30 +367,36 @@ export function handleStake(event: Stake): void {
     if (prevEpoch) {
       // finalize mkt._weightedStakedAmount and mrkt._weightedTotalBorrowUSD
       // epoch.top10StakeAmounts for prev Epoch
+      let marketStakeAmounts: BigInt[] = [];
+      let sumWeightedBorrowUSD = BIGDECIMAL_ZERO;
       for (let i = 0; i < protocol._marketIDs!.length; i++) {
         const mktID = protocol._marketIDs![i];
         const mrkt = getOrCreateMarket(mktID);
         const stakedAmount = mrkt._stakedAmount;
         if (stakedAmount.gt(BIGINT_ZERO)) {
-          updateWeightedStakeAmount(mrkt, prevEpoch, epochStartBlock, event);
+          updateWeightedStakeAmount(mrkt, epochStartBlock, event);
         }
+        marketStakeAmounts.push(mrkt._weightedStakedAmount ? mrkt._weightedStakedAmount! : BIGINT_ZERO);
         if (mrkt.totalBorrowBalanceUSD.gt(BIGDECIMAL_ZERO)) {
           updateWeightedBorrow(mrkt, prevEpoch, epochStartBlock, event);
         }
+        sumWeightedBorrowUSD = sumWeightedBorrowUSD.plus(
+          mrkt._weightedTotalBorrowUSD ? mrkt._weightedTotalBorrowUSD! : BIGDECIMAL_ZERO,
+        );
       }
 
+      const cutoffAmount = getCutoffValue(marketStakeAmounts, 10);
       const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
-      const cutoffAmount = prevEpoch.top10StakeAmounts![0];
-      const sumWeightedBorrowUSD = prevEpoch.sumWeightedBorrowUSD;
-      log.info("[handleStake]epoch={},totalRewardAmount={},top10stakeAmounts=[{}],sumWeightedBorrowUSD={}", [
+      //const sumWeightedBorrowUSD = prevEpoch.sumWeightedBorrowUSD;
+      log.info("[handleStake]epoch={},totalRewardAmount={},cutoffStakeAmounts=[{}],sumWeightedBorrowUSD={}", [
         epoch.id,
         totalRewardAmount.toString(),
-        prevEpoch.top10StakeAmounts!.toString(),
+        cutoffAmount.toString(),
         sumWeightedBorrowUSD.toString(),
       ]);
 
-      const EULToken = getOrCreateToken(Address.fromString(EULER_ADDRESS));
-      const rewardToken = getOrCreateRewardToken(Address.fromString(EULER_ADDRESS), RewardTokenType.BORROW);
+      const EULToken = getOrCreateToken(Address.fromString(EUL_ADDRESS));
+      const rewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
       for (let i = 0; i < protocol._marketIDs!.length; i++) {
         const mktID = protocol._marketIDs![i];
         const mrkt = getOrCreateMarket(mktID);
@@ -415,17 +416,11 @@ export function handleStake(event: Stake): void {
           mrkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
           mrkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
         }
-        // TODO: marketsRanked is not necessary as (!epoch & prevEpoch) should only happen once
-        if (prevEpoch.marketsRanked == false) {
-          //reset info for new epoch
-          mrkt._receivingRewards = false;
-          //mrkt._borrowLastUpdateBlock = epochStartBlock;
-          //mrkt._stakeLastUpdateBlock = epochStartBlock;
-          //mrkt._weightedStakedAmount = BIGINT_ZERO;
-          //mrkt._weightedTotalBorrowUSD = BIGDECIMAL_ZERO;
-          if (mrkt._weightedStakedAmount && mrkt._weightedStakedAmount!.ge(cutoffAmount)) {
-            mrkt._receivingRewards = true;
-          }
+
+        // set mkrts receiving rewards in the new epoch
+        mrkt._receivingRewards = false;
+        if (mrkt._weightedStakedAmount && mrkt._weightedStakedAmount!.ge(cutoffAmount)) {
+          mrkt._receivingRewards = true;
         }
         mrkt.save();
       }
@@ -438,13 +433,13 @@ export function handleStake(event: Stake): void {
     market._weightedStakedAmount = BIGINT_ZERO;
   }
 
-  updateWeightedStakeAmount(market, epoch, event.block.number, event);
+  updateWeightedStakeAmount(market, event.block.number, event);
   market._stakedAmount = market._stakedAmount.plus(deltaStakedAmount);
   market._stakeLastUpdateBlock = event.block.number;
   market.save();
 }
 
-function updateWeightedStakeAmount(market: Market, epoch: _Epoch, endBlock: BigInt, event: ethereum.Event): void {
+function updateWeightedStakeAmount(market: Market, endBlock: BigInt, event: ethereum.Event): void {
   const blocksLapsed = endBlock.minus(market._stakeLastUpdateBlock!);
   const _weightedStakedAmount = market._weightedStakedAmount!.plus(market._stakedAmount.times(blocksLapsed));
   market._weightedStakedAmount = _weightedStakedAmount;
@@ -464,6 +459,7 @@ function updateWeightedStakeAmount(market: Market, epoch: _Epoch, endBlock: BigI
     ],
   );
 
+  /*
   const top10StakeAmounts0 = epoch.top10StakeAmounts!;
   const topStakeAmounts = epoch.top10StakeAmounts!;
   topStakeAmounts.push(market._weightedStakedAmount!);
@@ -477,4 +473,11 @@ function updateWeightedStakeAmount(market: Market, epoch: _Epoch, endBlock: BigI
   ]);
 
   epoch.save();
+  */
+}
+
+function getCutoffValue(stakedAmounts: BigInt[], top: i32 = 10): BigInt {
+  const startIdx = stakedAmounts.length < top ? 0 : stakedAmounts.length - top;
+  const topStakeAmounts = stakedAmounts.sort().slice(startIdx);
+  return topStakeAmounts[0];
 }
