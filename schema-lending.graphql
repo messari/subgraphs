@@ -144,9 +144,27 @@ type InterestRate @entity {
 # There is a wide range of formats of lending protocols
 # And there are many unique mappings when it comes to input / output tokens
 # This generic type will help define the unique relationships between tokens in a market
-type TokenBalances @entity {
-  " { Input Token Address }-{ Optional: Snapshot ID } "
+# You can think of this as a 1:M relationship between 1 input token and output tokens
+type TokenData @entity {
+  " { Market Address }-{ Input Token Address }-{ Optional: Snapshot ID } "
   id: Bytes!
+
+  " Can you use the output token as collateral "
+  canUseAsCollateral: Boolean!
+
+  " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
+  maximumLTV: BigDecimal!
+
+  " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
+  liquidationThreshold: BigDecimal!
+
+  " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
+  liquidationPenalty: BigDecimal!
+
+  " Can the user choose to isloate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
+  canIsolate: Boolean!
+
+  ##### Token Data #####
 
   " Tokens that need to be deposited in this market to take a position in protocol (should be alphabetized) "
   inputToken: Token!
@@ -155,7 +173,7 @@ type TokenBalances @entity {
   inputTokenBalance: BigInt!
 
   " Prices in USD of the input tokens (same order as inputTokens) "
-  inputTokenPricesUSD: BigDecimal!
+  inputTokenPriceUSD: BigDecimal!
 
   " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
   outputTokens: [Token!]
@@ -171,6 +189,12 @@ type TokenBalances @entity {
 
   " All interest rates for this input token. Should be in APR format "
   rates: [InterestRate!]
+
+  " Total amount of reserves (in USD) "
+  reserves: BigDecimal
+
+  " The amount of revenue that is converted to reserves at the current time. 20% reserve factor should be in format 0.20 "
+  reserveFactor: BigDecimal
 
   " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
   borrowedToken: Token
@@ -203,7 +227,7 @@ enum RevenueSource {
 # Use this to provide the sources of revenue and amounts of each
 type RevenueDetails @entity {
   " { Market/Protocol ID }-{ Optional: Snapshot ID } "
-  id: ID!
+  id: Bytes!
 
   " The source of revenue (in alphabetical order) "
   sources: [RevenueSource!]!
@@ -453,7 +477,7 @@ type LendingProtocol implements Protocol @entity {
 
 type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
-  id: ID!
+  id: Bytes!
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
@@ -518,7 +542,7 @@ type UsageMetricsDailySnapshot @entity {
 
 type UsageMetricsHourlySnapshot @entity {
   " { # of hours since Unix epoch time } "
-  id: ID!
+  id: Bytes!
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
@@ -556,7 +580,7 @@ type UsageMetricsHourlySnapshot @entity {
 
 type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
-  id: ID!
+  id: Bytes!
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
@@ -633,6 +657,11 @@ type FinancialsDailySnapshot @entity {
 ##### Pool-Level Metadata #####
 ###############################
 
+"""
+A market is defined by the input token.
+At a minimum that means being able to deposit/withdraw that token.
+e.g. there may be related markets as they only act as collateral for other markets.
+"""
 type Market @entity {
   " Smart contract address of the market "
   id: ID!
@@ -652,6 +681,9 @@ type Market @entity {
   " Can you borrow from this market "
   canBorrowFrom: Boolean!
 
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
   " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
   maximumLTV: BigDecimal!
 
@@ -661,19 +693,43 @@ type Market @entity {
   " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
   liquidationPenalty: BigDecimal!
 
-  " Can the user choose to isloate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
+  " Can the user choose to isolate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
   canIsolate: Boolean!
-
-  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
-  rewardTokens: [RewardToken!]
 
   " All oracles that have been used for this market "
   oracles: [Oracle!]! @derivedFrom(field: "market")
 
+  " Creation timestamp "
+  createdTimestamp: BigInt!
+
+  " Creation block number "
+  createdBlockNumber: BigInt!
+
   ##### Quantitative Data #####
 
-  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
-  rates: [InterestRate!]!
+  " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
+  fees: [InterestRate!]
+
+  " Total amount of reserves (in USD) "
+  reserves: BigDecimal
+
+  " The amount of revenue that is converted to reserves at the current time. 20% reserve factor should be in format 0.20 "
+  reserveFactor: BigDecimal
+
+  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
+  borrowedToken: Token
+
+  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
+  variableBorrowedTokenBalance: BigInt
+
+  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
+  stableBorrowedTokenBalance: BigInt
+
+  " Allowed limit to how much of the underlying asset can be supplied to this market. "
+  supplyCap: BigInt
+
+  " Allowed limit for how much of the underlying asset can be borrowed from this market. "
+  borrowCap: BigInt
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -761,13 +817,7 @@ type Market @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market "
-  tokens: [TokenBalances!]
-
-  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
-  variableBorrowedTokenBalance: BigInt
-
-  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
-  stableBorrowedTokenBalance: BigInt
+  tokens: [TokenData!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -841,10 +891,63 @@ type MarketDailySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
+  ##### Incentives #####
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
   ##### Quantitative Data #####
 
-  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
-  rates: [InterestRate!]!
+  " Token that need to be deposited in this market to take a position in protocol (should be alphabetized) "
+  inputToken: Token!
+
+  " Amount of input token in the market (same order as inputTokens) "
+  inputTokenBalance: BigInt!
+
+  " Prices in USD of the input token (same order as inputTokens) "
+  inputTokenPriceUSD: BigDecimal!
+
+  " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
+  outputToken: Token
+
+  " Total supply of output token (same order as outputTokens) "
+  outputTokenSupply: BigInt
+
+  " Prices in USD of the output token (same order as outputTokens) "
+  outputTokenPriceUSD: BigDecimal
+
+  " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
+  exchangeRate: BigDecimal
+
+  " All interest rates for this input token. Should be in APR format "
+  rates: [InterestRate!]
+
+  " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
+  fees: [Fee!]
+
+  " Total amount of reserves (in USD) "
+  reserves: BigDecimal
+
+  " The amount of revenue that is converted to reserves at the current time. 20% reserve factor should be in format 0.20 "
+  reserveFactor: BigDecimal
+
+  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
+  borrowedToken: Token
+
+  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
+  variableBorrowedTokenBalance: BigInt
+
+  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
+  stableBorrowedTokenBalance: BigInt
+
+  " Allowed limit to how much of the underlying asset can be supplied to this market. "
+  supplyCap: BigInt
+
+  " Allowed limit for how much of the underlying asset can be borrowed from this market. "
+  borrowCap: BigInt
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -990,7 +1093,7 @@ type MarketDailySnapshot @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market (a list of input token structs) "
-  tokens: [TokenBalances!]
+  tokens: [TokenData!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -1015,10 +1118,54 @@ type MarketHourlySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
+  ##### Incentives #####
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
   ##### Quantitative Data #####
 
-  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
-  rates: [InterestRate!]!
+  " Token that need to be deposited in this market to take a position in protocol (should be alphabetized) "
+  inputToken: Token!
+
+  " Amount of input token in the market (same order as inputTokens) "
+  inputTokenBalance: BigInt!
+
+  " Prices in USD of the input token (same order as inputTokens) "
+  inputTokenPriceUSD: BigDecimal!
+
+  " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
+  outputToken: Token
+
+  " Total supply of output token (same order as outputTokens) "
+  outputTokenSupply: BigInt
+
+  " Prices in USD of the output token (same order as outputTokens) "
+  outputTokenPriceUSD: BigDecimal
+
+  " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
+  exchangeRate: BigDecimal
+
+  " All interest rates for this input token. Should be in APR format "
+  rates: [InterestRate!]
+
+  " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
+  fees: [Fee!]
+
+  " Total amount of reserves (in USD) "
+  reserves: BigDecimal
+
+  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
+  borrowedToken: Token
+
+  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
+  variableBorrowedTokenBalance: BigInt
+
+  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
+  stableBorrowedTokenBalance: BigInt
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -1074,7 +1221,7 @@ type MarketHourlySnapshot @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market "
-  tokens: [TokenBalances!]
+  tokens: [TokenData!]
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
