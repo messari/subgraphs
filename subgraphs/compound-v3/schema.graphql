@@ -1,6 +1,6 @@
 # Subgraph Schema: Lending Protocol
 # Version: 3.0.0
-# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
   ARBITRUM_ONE
@@ -1023,6 +1023,9 @@ type MarketDailySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
+  " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
+  relation: Bytes
+
   ##### Incentives #####
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
@@ -1257,6 +1260,9 @@ type MarketHourlySnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+
+  " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
+  relation: Bytes
 
   ##### Incentives #####
 
