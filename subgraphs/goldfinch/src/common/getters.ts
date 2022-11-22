@@ -39,7 +39,6 @@ import {
   SENIOR_POOL_ADDRESS,
   WETH_GFI_UniswapV2_Pair,
   USDC_WETH_UniswapV2_Pair,
-  GFI_DECIMALS,
   USDC_DECIMALS,
 } from "./constants";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";

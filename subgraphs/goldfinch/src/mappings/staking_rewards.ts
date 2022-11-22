@@ -14,7 +14,6 @@ import {
   RewardPaid,
 } from "../../generated/StakingRewards/StakingRewards";
 import {
-  BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   GFI_DECIMALS,
   SECONDS_PER_DAY,
