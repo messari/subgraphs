@@ -742,6 +742,11 @@ type FinancialsDailySnapshot @entity {
 ##### Pool-Level Metadata #####
 ###############################
 
+"""
+A market is defined by the input token.
+At a minimum that means being able to deposit/withdraw that token.
+e.g. there may be related markets as they only act as collateral for other markets.
+"""
 type Market @entity {
   " Smart contract address of the market "
   id: Bytes!
