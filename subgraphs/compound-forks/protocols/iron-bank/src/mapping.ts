@@ -66,7 +66,9 @@ import { StakingRewardsCreated } from "../../../generated/StakingRewardsFactory/
 import { StakingRewards as StakingRewardsTemplate } from "../../../generated/templates";
 import {
   RewardPaid,
+  Staked,
   StakingRewards as StakingRewardsContract,
+  Withdrawn,
 } from "../../../generated/templates/StakingRewards/StakingRewards";
 
 // Constant values
@@ -330,6 +332,38 @@ export function handleStakingRewardsCreated(
   );
 
   StakingRewardsTemplate.create(event.params.stakingRewards);
+}
+
+export function handleStaked(event: Staked): void {
+  const rewardContract = StakingRewardsContract.bind(event.address);
+  const marketID = rewardContract.getStakingToken().toHexString();
+
+  const market = Market.load(marketID);
+  if (!market) {
+    log.error(
+      "[handleStaked]market does not exist for staking token {} at tx {}",
+      [marketID, event.transaction.hash.toHexString()]
+    );
+    return;
+  }
+  market._stakedOutputTokenAmount = rewardContract.totalSupply();
+  market.save();
+}
+
+export function handleWithdrawn(event: Withdrawn): void {
+  const rewardContract = StakingRewardsContract.bind(event.address);
+  const marketID = rewardContract.getStakingToken().toHexString();
+
+  const market = Market.load(marketID);
+  if (!market) {
+    log.error(
+      "[handleStaked]market does not exist for staking token {} at tx {}",
+      [marketID, event.transaction.hash.toHexString()]
+    );
+    return;
+  }
+  market._stakedOutputTokenAmount = rewardContract.totalSupply();
+  market.save();
 }
 
 export function handleRewardPaid(event: RewardPaid): void {

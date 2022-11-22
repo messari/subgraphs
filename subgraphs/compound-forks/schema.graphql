@@ -670,6 +670,9 @@ type Market @entity {
 
   " cumulative Reward Emission Amount (used to calc reward for iron-bank) "
   _cumulativeRewardAmount: BigInt
+
+  " Amount of output token staked (used to calc reward for iron-bank) "
+  _stakedOutputTokenAmount: BigInt
 }
 
 #################################

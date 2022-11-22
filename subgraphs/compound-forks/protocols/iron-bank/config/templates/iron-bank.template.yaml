@@ -126,5 +126,9 @@ templates:
       eventHandlers:
         - event: RewardPaid(indexed address,address,uint256)
           handler: handleRewardPaid
+        - event: Staked(indexed address,uint256)
+          hanlder: handleStaked
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleWithdrawn
       file: ./protocols/iron-bank/src/mapping.ts
 
