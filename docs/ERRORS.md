@@ -131,7 +131,7 @@ To combat this you need to create a new entity for each snapshot. To do this you
 
 ## Known Issues
 
-Here are some known issues with subgraph tooling that you may run into:
+Here are some known issues with subgraph development that you may run into:
 
 ### Subgraph Issues
 
