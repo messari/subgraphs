@@ -2060,7 +2060,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.3.3",
+          "subgraph": "1.3.0",
           "methodology": "1.2.0"
         },
         "files": {
