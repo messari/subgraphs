@@ -17,7 +17,6 @@ import {
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
   getOrCreateAssetStatus,
-  getCurrentEpoch,
   getStartBlockForEpoch,
 } from "../common/getters";
 import {
@@ -669,13 +668,11 @@ function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
   return null;
 }
 
-export function updateWeightedBorrow(mrkt: Market, epoch: _Epoch, endBlock: BigInt, event: ethereum.Event): void {
+export function updateWeightedBorrow(mrkt: Market, epoch: _Epoch, endBlock: BigInt): void {
   // update total borrow balance USD weighted by blocks lapsed
   const mktReceivingRewards = mrkt._receivingRewards;
   log.debug("[updateWeightedBorrow]mrkt {} _receivingRewards={}", [mrkt.id, mktReceivingRewards.toString()]);
   if (mrkt._receivingRewards) {
-    //const epochID = getCurrentEpoch(event);
-
     if (!mrkt._borrowLastUpdateBlock) {
       const epochStartBlock = getStartBlockForEpoch(epoch.epoch)!;
       mrkt._borrowLastUpdateBlock = epochStartBlock;
@@ -687,18 +684,12 @@ export function updateWeightedBorrow(mrkt: Market, epoch: _Epoch, endBlock: BigI
     mrkt._weightedTotalBorrowUSD = mrkt._weightedTotalBorrowUSD!.plus(addWeightedTotalBorrowUSD);
     mrkt._borrowLastUpdateBlock = endBlock;
     mrkt.save();
-
-    log.info(
-      "[updateWeightedBorrow]market {}, epoch={}, blocksLapsed={} (lastUpdateBlock={},endBlock={}),addWeightedTotalBorrowUSD={},market._weightedTotalBorrowUSD={}",
-      [
-        mrkt.id,
-        epoch.id,
-        blocksLapsed.toString(),
-        mrkt._borrowLastUpdateBlock!.toString(),
-        endBlock.toString(),
-        addWeightedTotalBorrowUSD.toString(),
-        mrkt._weightedTotalBorrowUSD!.toString(),
-      ],
-    );
   }
+}
+
+export function updateWeightedStakeAmount(market: Market, endBlock: BigInt): void {
+  const blocksLapsed = endBlock.minus(market._stakeLastUpdateBlock!);
+  const _weightedStakedAmount = market._weightedStakedAmount!.plus(market._stakedAmount.times(blocksLapsed));
+  market._weightedStakedAmount = _weightedStakedAmount;
+  market.save();
 }

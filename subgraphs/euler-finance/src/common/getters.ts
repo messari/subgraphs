@@ -1,4 +1,4 @@
-import { Address, BigInt, ByteArray, ethereum, log, crypto } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   LendingProtocol,
@@ -34,9 +34,7 @@ import {
   INT_ZERO,
   DEFAULT_RESERVE_FEE,
   BIGDECIMAL_ONE,
-  BIGINT_NEG_ONE,
   BLOCKS_PER_EPOCH,
-  EULSTAKES_ADDRESS,
   MAX_EPOCHS,
   START_EPOCH,
   START_EPOCH_BLOCK,
@@ -540,4 +538,10 @@ export function getOrCreateAccountStakeAmount(underlying: string, account: strin
     accountStakeAmount.save();
   }
   return accountStakeAmount;
+}
+
+export function getCutoffValue(stakedAmounts: BigInt[], top: i32 = 10): BigInt {
+  const startIdx = stakedAmounts.length < top ? 0 : stakedAmounts.length - top;
+  const topStakeAmounts = stakedAmounts.sort().slice(startIdx);
+  return topStakeAmounts[0];
 }

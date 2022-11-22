@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ByteArray, log, crypto, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -12,6 +12,7 @@ import {
 } from "../../generated/euler/Euler";
 import {
   getCurrentEpoch,
+  getCutoffValue,
   getDeltaStakeAmount,
   getOrCreateAssetStatus,
   getOrCreateLendingProtocol,
@@ -35,7 +36,13 @@ import {
   RewardTokenType,
   EUL_ADDRESS,
 } from "../common/constants";
-import { snapshotFinancials, snapshotMarket, updateWeightedBorrow, updateUsageMetrics } from "./helpers";
+import {
+  snapshotFinancials,
+  snapshotMarket,
+  updateWeightedBorrow,
+  updateUsageMetrics,
+  updateWeightedStakeAmount,
+} from "./helpers";
 import {
   createBorrow,
   createDeposit,
@@ -46,7 +53,7 @@ import {
   updatePrices,
   updateRevenue,
 } from "./helpers";
-import { LendingProtocol, Market, RewardToken, Token } from "../../generated/schema";
+import { LendingProtocol, Market, Token } from "../../generated/schema";
 import { ERC20 } from "../../generated/euler/ERC20";
 import { GovConvertReserves, GovSetReserveFee } from "../../generated/euler/Exec";
 import { BigDecimalTruncateToBigInt, bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
@@ -78,7 +85,7 @@ export function handleAssetStatus(event: AssetStatus): void {
   const epochID = getCurrentEpoch(event);
   const epoch = _Epoch.load(epochID.toString());
   if (epoch) {
-    updateWeightedBorrow(market, epoch, event.block.number, event);
+    updateWeightedBorrow(market, epoch, event.block.number);
   }
   // tvl, totalDepositBalanceUSD and totalBorrowBalanceUSD may be updated again with new price
   updateBalances(token, protocol, market, totalBalances, totalBorrows, totalDepositBalance, totalBorrowBalance);
@@ -118,7 +125,7 @@ function updateProtocolTVL(event: AssetStatus, protocol: LendingProtocol): void 
       const epochID = getCurrentEpoch(event);
       const epoch = _Epoch.load(epochID.toString());
       if (epoch) {
-        updateWeightedBorrow(mrkt, epoch, event.block.number, event);
+        updateWeightedBorrow(mrkt, epoch, event.block.number);
       }
       // mark-to-market
       mrkt.totalDepositBalanceUSD = bigIntToBDUseDecimals(mrkt.inputTokenBalance, tkn.decimals).times(
@@ -317,27 +324,14 @@ export function handleGovSetReserveFee(event: GovSetReserveFee): void {
 }
 
 export function handleStake(event: Stake): void {
-  const EulStakes_Address = event.address.toHexString();
   const underlying = event.params.underlying.toHexString();
   // find market id for underlying
   const assetStatus = getOrCreateAssetStatus(underlying);
   const marketId = assetStatus.eToken!;
   const market = getOrCreateMarket(marketId);
-  //const currStakedAmount = market._stakedAmount;
-  let deltaStakedAmount = getDeltaStakeAmount(event);
-  //market._stakedAmount = market._stakedAmount.plus(deltaStakedAmount);
-  //market.save();
+  const deltaStakedAmount = getDeltaStakeAmount(event);
 
   const epochID = getCurrentEpoch(event);
-  log.info("[handleStake]block={}, epoch={}; market {}: tvb {}, deltaStakedAmount={} at tx {}", [
-    event.block.number.toString(),
-    epochID.toString(),
-    market.id,
-    market.totalBorrowBalanceUSD.toString(),
-    deltaStakedAmount.toString(),
-    event.transaction.hash.toHexString(),
-  ]);
-
   if (epochID < 0) {
     market._stakedAmount = market._stakedAmount.plus(deltaStakedAmount);
     market.save();
@@ -349,36 +343,32 @@ export function handleStake(event: Stake): void {
   if (!epoch) {
     //Start of a new epoch
     epoch = new _Epoch(epochID.toString());
-    //epoch.marketsRanked = false;
     epoch.epoch = epochID;
-    //epoch.top10StakeAmounts = [];
-    //epoch.sumWeightedBorrowUSD = BIGDECIMAL_ZERO;
     epoch.save();
 
     // rank markets use votes in prev epoch
     // find the top ten staked markets; according to the euler guage
     // https://app.euler.finance/gaugeweight
     // users "vote" for the next epoch
-    let prevEpochID = epochID - 1;
+    const prevEpochID = epochID - 1;
     const prevEpoch = _Epoch.load(prevEpochID.toString());
-    log.info("[handleStake]epochID={}(new),prevEpoch={}", [epoch.id, prevEpoch ? prevEpoch.id : "null"]);
 
     const protocol = getOrCreateLendingProtocol();
     if (prevEpoch) {
       // finalize mkt._weightedStakedAmount and mrkt._weightedTotalBorrowUSD
       // epoch.top10StakeAmounts for prev Epoch
-      let marketStakeAmounts: BigInt[] = [];
+      const marketStakeAmounts: BigInt[] = [];
       let sumWeightedBorrowUSD = BIGDECIMAL_ZERO;
       for (let i = 0; i < protocol._marketIDs!.length; i++) {
         const mktID = protocol._marketIDs![i];
         const mrkt = getOrCreateMarket(mktID);
         const stakedAmount = mrkt._stakedAmount;
         if (stakedAmount.gt(BIGINT_ZERO)) {
-          updateWeightedStakeAmount(mrkt, epochStartBlock, event);
+          updateWeightedStakeAmount(mrkt, epochStartBlock);
         }
         marketStakeAmounts.push(mrkt._weightedStakedAmount ? mrkt._weightedStakedAmount! : BIGINT_ZERO);
         if (mrkt.totalBorrowBalanceUSD.gt(BIGDECIMAL_ZERO)) {
-          updateWeightedBorrow(mrkt, prevEpoch, epochStartBlock, event);
+          updateWeightedBorrow(mrkt, prevEpoch, epochStartBlock);
         }
         sumWeightedBorrowUSD = sumWeightedBorrowUSD.plus(
           mrkt._weightedTotalBorrowUSD ? mrkt._weightedTotalBorrowUSD! : BIGDECIMAL_ZERO,
@@ -387,13 +377,6 @@ export function handleStake(event: Stake): void {
 
       const cutoffAmount = getCutoffValue(marketStakeAmounts, 10);
       const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
-      //const sumWeightedBorrowUSD = prevEpoch.sumWeightedBorrowUSD;
-      log.info("[handleStake]epoch={},totalRewardAmount={},cutoffStakeAmounts=[{}],sumWeightedBorrowUSD={}", [
-        epoch.id,
-        totalRewardAmount.toString(),
-        cutoffAmount.toString(),
-        sumWeightedBorrowUSD.toString(),
-      ]);
 
       const EULToken = getOrCreateToken(Address.fromString(EUL_ADDRESS));
       const rewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
@@ -433,51 +416,8 @@ export function handleStake(event: Stake): void {
     market._weightedStakedAmount = BIGINT_ZERO;
   }
 
-  updateWeightedStakeAmount(market, event.block.number, event);
+  updateWeightedStakeAmount(market, event.block.number);
   market._stakedAmount = market._stakedAmount.plus(deltaStakedAmount);
   market._stakeLastUpdateBlock = event.block.number;
   market.save();
-}
-
-function updateWeightedStakeAmount(market: Market, endBlock: BigInt, event: ethereum.Event): void {
-  const blocksLapsed = endBlock.minus(market._stakeLastUpdateBlock!);
-  const _weightedStakedAmount = market._weightedStakedAmount!.plus(market._stakedAmount.times(blocksLapsed));
-  market._weightedStakedAmount = _weightedStakedAmount;
-  //market._stakeLastUpdateBlock = event.block.number;
-  market.save();
-
-  log.info(
-    "[handleStake]blocksLapsed={} (lastUpdateBlock={},endBlock={}),market {},stakedAmount={},_weightedStakedAmount={},tx={},",
-    [
-      blocksLapsed.toString(),
-      market._stakeLastUpdateBlock!.toString(),
-      endBlock.toString(),
-      market.id,
-      market._stakedAmount.toString(),
-      _weightedStakedAmount.toString(),
-      event.transaction.hash.toHexString(),
-    ],
-  );
-
-  /*
-  const top10StakeAmounts0 = epoch.top10StakeAmounts!;
-  const topStakeAmounts = epoch.top10StakeAmounts!;
-  topStakeAmounts.push(market._weightedStakedAmount!);
-  const startIdx = topStakeAmounts.length < 10 ? 0 : topStakeAmounts.length - 10;
-  epoch.top10StakeAmounts = topStakeAmounts.sort().slice(startIdx);
-  log.info("[handleStake]epoch.top10StakeAmounts0=[{}],topStakeAmounts=[{}],startIdx={},epoch.top10StakeAmounts=[{}]", [
-    top10StakeAmounts0.toString(),
-    topStakeAmounts.toString(),
-    startIdx.toString(),
-    epoch.top10StakeAmounts!.toString(),
-  ]);
-
-  epoch.save();
-  */
-}
-
-function getCutoffValue(stakedAmounts: BigInt[], top: i32 = 10): BigInt {
-  const startIdx = stakedAmounts.length < top ? 0 : stakedAmounts.length - top;
-  const topStakeAmounts = stakedAmounts.sort().slice(startIdx);
-  return topStakeAmounts[0];
 }
