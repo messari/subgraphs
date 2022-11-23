@@ -115,9 +115,9 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
     governanceFramework.contractAddress = contractAddress;
     governanceFramework.tokenAddress =
-      "0x92D6C1e31e14520e676a687F0a93788B716BEff5";
+      "0x92d6c1e31e14520e676a687f0a93788b716beff5";
     governanceFramework.timelockAddress =
-      "0x64c7d40c07EFAbec2AafdC243bF59eaF2195c6dc";
+      "0x64c7d40c07efabec2aafdc243bf59eaf2195c6dc";
 
     // Init as zero, as govStrat / executor contracts are not deployed yet
     // values will be updated when proposal voting starts
