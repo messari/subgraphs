@@ -1,6 +1,6 @@
 # Subgraph Schema: Network
 # Version: 1.1.1
-# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum SubgraphNetwork {
   ARBITRUM_ONE
