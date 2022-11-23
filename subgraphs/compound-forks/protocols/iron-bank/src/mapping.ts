@@ -355,7 +355,10 @@ export function handleStakingRewardsCreated(
 
 export function handleStaked(event: Staked): void {
   const rewardContract = StakingRewardsContract.bind(event.address);
-  const marketID = rewardContract.getStakingToken().toHexString();
+  const marketID = getOrElse<Address>(
+    rewardContract.try_getStakingToken(),
+    Address.zero()
+  ).toHexString();
 
   const market = Market.load(marketID);
   if (!market) {
@@ -371,7 +374,10 @@ export function handleStaked(event: Staked): void {
 
 export function handleWithdrawn(event: Withdrawn): void {
   const rewardContract = StakingRewardsContract.bind(event.address);
-  const marketID = rewardContract.getStakingToken().toHexString();
+  const marketID = getOrElse<Address>(
+    rewardContract.try_getStakingToken(),
+    Address.zero()
+  ).toHexString();
 
   const market = Market.load(marketID);
   if (!market) {
@@ -387,7 +393,10 @@ export function handleWithdrawn(event: Withdrawn): void {
 
 export function handleRewardPaid(event: RewardPaid): void {
   const rewardContract = StakingRewardsContract.bind(event.address);
-  const marketID = rewardContract.getStakingToken().toHexString();
+  const marketID = getOrElse<Address>(
+    rewardContract.try_getStakingToken(),
+    Address.zero()
+  ).toHexString();
 
   const market = Market.load(marketID);
   if (!market) {
@@ -408,9 +417,9 @@ export function handleRewardPaid(event: RewardPaid): void {
   if (!token) {
     const erc20Contract = ERC20.bind(event.params.rewardsToken);
     token = new Token(tokenAddr);
-    token.decimals = erc20Contract.decimals();
-    token.symbol = erc20Contract.symbol();
-    token.name = erc20Contract.name();
+    token.decimals = getOrElse<i32>(erc20Contract.try_decimals(), 18 as i32);
+    token.symbol = getOrElse<string>(erc20Contract.try_symbol(), "Unknown");
+    token.name = getOrElse<string>(erc20Contract.try_name(), "Unknown");
     token.save();
   }
 
