@@ -5,6 +5,7 @@ import { NewClient, schemaMapping } from "../utils";
 
 interface DeploymentsTable {
     protocolsToQuery: { [x: string]: any };
+    issuesTitles: any;
     getData: any;
     decenDeposToSubgraphIds: { [x: string]: any };
     indexingStatusLoaded: any;
@@ -13,7 +14,7 @@ interface DeploymentsTable {
     indexingStatusErrorPending: any;
 }
 
-function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, indexingStatusLoaded, indexingStatusLoadedPending, indexingStatusError, indexingStatusErrorPending }: DeploymentsTable) {
+function DeploymentsTable({ protocolsToQuery, issuesTitles, getData, decenDeposToSubgraphIds, indexingStatusLoaded, indexingStatusLoadedPending, indexingStatusError, indexingStatusErrorPending }: DeploymentsTable) {
     const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
     const [tableExpanded, setTableExpanded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
     if (Object.keys(protocolsToQuery).length === 0) {
@@ -118,6 +119,7 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, 
                     return (
                         <ProtocolSection
                             key={"ProtocolSection-" + subgraphName.toUpperCase() + '-' + schemaType}
+                            issuesTitles={issuesTitles}
                             subgraphName={subgraphName}
                             protocol={protocol}
                             schemaType={schemaType}
