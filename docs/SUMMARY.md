@@ -2,7 +2,7 @@
 
 ## Lending
 
-- [Aave V2 Forks](aave-v2-forks/README.md)
+- [Aave V2 Forks](../subgraphs/aave-v2-forks/README.md)
   - [Aave AMM](aave-v2-forks/protocols/aave-amm/README.md)
   - [Aave Arc](aave-v2-forks/protocols/aave-arc/README.md)
   - [Aave V2](aave-v2-forks/protocols/aave-rwa/README.md)
