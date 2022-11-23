@@ -4,4 +4,4 @@ root: ./subgraphs/
     readme: README.md  
     summary: SUMMARY.md​
 
-redirect:
+redirects:
