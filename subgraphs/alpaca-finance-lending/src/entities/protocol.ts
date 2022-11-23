@@ -46,13 +46,13 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.totalPoolCount = INT_ZERO;
     protocol.openPositionCount = INT_ZERO;
     protocol.cumulativePositionCount = INT_ZERO;
-    protocol.save();
   }
 
   protocol.schemaVersion = Versions.getSchemaVersion();
   protocol.subgraphVersion = Versions.getSubgraphVersion();
   protocol.methodologyVersion = Versions.getMethodologyVersion();
   protocol.save();
+
   return protocol;
 }
 
