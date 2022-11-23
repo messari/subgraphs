@@ -54,10 +54,9 @@ export function getOrCreateERC1155Token(
 
   if (!token) {
     token = new Token(tokenId);
+    token.save();
   }
 
-  token.save();
-  log.error("ERC1155 token created: {}", [token.id]);
   return token;
 }
 

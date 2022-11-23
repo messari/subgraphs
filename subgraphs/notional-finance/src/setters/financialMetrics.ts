@@ -289,13 +289,8 @@ export function updateMarket(
       financialsDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
   } else if (transactionType == TransactionType.BORROW) {
     // update total borrow amount
-    // TODO: we are using cToken as outputToken but ideal we should be use fCash
-    const outputTokenSupply = market.outputTokenSupply.plus(amount);
-    market.outputTokenSupply = outputTokenSupply;
-    market.totalBorrowBalanceUSD = bigIntToBigDecimal(
-      outputTokenSupply,
-      token.decimals
-    ).times(priceUSD);
+    // take add/sub approach since we don't have fCash supply info available
+    market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(amountUSD);
 
     // update borrow amounts
     market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
@@ -314,12 +309,9 @@ export function updateMarket(
       financialsDailySnapshot.dailyBorrowUSD.plus(amountUSD);
   } else if (transactionType == TransactionType.REPAY) {
     // update total borrow amount
-    const outputTokenSupply = market.outputTokenSupply.minus(amount);
-    market.outputTokenSupply = outputTokenSupply;
-    market.totalBorrowBalanceUSD = bigIntToBigDecimal(
-      outputTokenSupply,
-      token.decimals
-    ).times(priceUSD);
+    // take add/sub approach since we don't have fCash supply info available
+    market.totalBorrowBalanceUSD =
+      market.totalBorrowBalanceUSD.minus(amountUSD);
 
     // update repay amounts
     marketDailySnapshot.dailyRepayUSD =

@@ -276,13 +276,12 @@ In this method, there might be a situation when the same person borrows and repa
 
 However, this might be technically cumbersome to recitify this error. In any case, most lending protocols do not eliminate lendings and borrowing from the same address from their statistics.
 
-# Methodology and Implementations Challenges
+# Methodology Implementation Challenges
 
-The following set of entities/fields cannot be calculated or calculated accurately or are pending:
+- Market Balances and Positions: We update market balances and positions to 0 manually when a market is observed to have matured (become inactive). When a market is approaching maturity (see [settlement](https://docs.notional.finance/notional-v2/risk-and-collateralization/settlement#third-party-settlement) details), a user can roll over their position (through individual lend and borrow trades which will be captured through `LendBorrowTrade` event) or a 3p can settle the user balances. In either case, matured market positions should become 0 and positions with rolled-over market will be captured separately.
 
-- [ ] Market Positions
+- Liquidation metrics (e.g. `market.cumulativeLiquidateUSD`, `liquidate.market`, `liquidate.position`): Liquidation events do not report any market info because they are not associated with a market from the perspective of Notional. We cannot update position or market data associated with liquidation events as a result.
 
-  - How to manage updating and closing positions and position counters in the event of rollovers?
-  - How do we ensure liquidated positions are updated? (Note that liquidation event don't provide any market info and hence cannot be associated with a market/position).
+- ERC1155: Notional finance represents positions (asset deposits/borrowals) using ERC1155 tokens (currencyfCash-maturityDate pairs). The contracts expose `tokenId` but do not expose any metadata. Therefore, we create token entities with only id param available and set to `ERC1155-{tokenAddress}-{tokenId}`.
 
-- [ ] Liquidation metrics (e.g. `market.cumulativeLiquidateUSD`, `liquidate.market`, `liquidate.position`, `cumulativeLiquidateUSD`): Liquidation events do not report any market info because they are not associated with a market from the perspective of Notional. We cannot update position or market data associated with liquidation events as a result.
+- Repay and Deposit, Withdraw and Borrow: Notional team confirmed that these can happen in a single action. However, such actions seem to happen through [BatchActions](https://github.com/notional-finance/contracts-v2/blob/63eb0b46ec37e5fc5447bdde3d951dd90f245741/contracts/external/actions/BatchAction.sol#L78) which should still result in individual LendBorrow trades. Further, I didn't find any occurances of `repay and deposit` and `withdraw and borrow` in single LendBorrow trade based on logging observations. Hence, I include those conditionals for such events and log.warn any such occurances for future.

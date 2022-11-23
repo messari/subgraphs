@@ -167,7 +167,6 @@ export const PROTOCOL_NETWORK = Network.MAINNET;
 // lending
 export const PROTOCOL_TYPE = ProtocolType.LENDING;
 export const PROTOCOL_LENDING_TYPE = LendingType.POOLED;
-// TODO: verify
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_INTEREST_RATE_TYPE = InterestRateType.FIXED;
 export const PROTOCOL_INTEREST_RATE_SIDE = InterestRateSide.BORROWER;

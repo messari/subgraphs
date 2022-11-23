@@ -109,8 +109,7 @@ export function addAccountToProtocol(
   const dailyId: string = (
     event.block.timestamp.toI64() / SECONDS_PER_DAY
   ).toString();
-  // TODO: why did I add "hourly-"? and not "daily-"?
-  const activeEventId = `hourly-${account.id}-${dailyId}-${transactionType}`;
+  const activeEventId = `daily-${account.id}-${dailyId}-${transactionType}`;
   let activeEvent = ActiveEventAccount.load(activeEventId);
   const dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
   if (transactionType == TransactionType.DEPOSIT) {

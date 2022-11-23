@@ -10,12 +10,10 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ZERO,
-  PROTOCOL_ID,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "../common/constants";
 import { getTokenFromCurrency } from "../common/util";
-import { bigIntToBigDecimal } from "../common/numbers";
 import { getOrCreateLendingProtocol } from "./protocol";
 import { getOrCreateInterestRate } from "./InterestRate";
 

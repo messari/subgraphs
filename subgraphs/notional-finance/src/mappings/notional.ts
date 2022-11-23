@@ -131,8 +131,8 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
 
           // set interest rate for market
           const interestRate = getOrCreateInterestRate(currencyMarket);
-          const r = bigIntToBigDecimal(impliedRate, RATE_PRECISION_DECIMALS);
-          interestRate.rate = r.times(BIGDECIMAL_HUNDRED);
+          const rate = bigIntToBigDecimal(impliedRate, RATE_PRECISION_DECIMALS);
+          interestRate.rate = rate.times(BIGDECIMAL_HUNDRED);
           interestRate.save();
           mkt.rates = [interestRate.id];
 
@@ -147,10 +147,10 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
             const exchangeRate = BigDecimal.fromString(
               Math.exp(
                 parseFloat(
-                  r.times(timeToMaturity).div(SECONDS_PER_YEAR).toString()
+                  rate.times(timeToMaturity).div(SECONDS_PER_YEAR).toString()
                 )
               ).toString()
-            ).times(BIGDECIMAL_HUNDRED);
+            );
             mkt.exchangeRate = exchangeRate;
           }
 
@@ -163,24 +163,22 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   // update market entities when they become inactive
   for (let k = 0; k < allMarkets.activeMarkets.length; k++) {
     if (!activeMarkets.includes(allMarkets.activeMarkets[k])) {
-      // event is irrelevant, but needed
       const m = getOrCreateMarket(event, allMarkets.activeMarkets[k]);
 
       m.isActive = false;
       m.canBorrowFrom = false;
 
-      // balances
+      // manual update balances to 0
       m.totalValueLockedUSD = BIGDECIMAL_ZERO;
       m.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
       m.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
 
-      // positions
-      // TODO: should we update position counts manually to 0? do we need to manually close positions as markets mature?
-      // positionCount
-      // openPositionCount
-      // closedPositionCount
-      // lendingPositionCount
-      // borrowingPositionCount
+      // manually update positions to 0
+      m.positionCount = 0;
+      m.openPositionCount = 0;
+      m.closedPositionCount = 0;
+      m.lendingPositionCount = 0;
+      m.borrowingPositionCount = 0;
 
       m.save();
 
@@ -255,7 +253,8 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
     absfCashAmount = fCashAmount.neg();
   }
 
-  // identify transaction type: transactions of different user intention may call the
+  // Identify Transaction Type:
+  // transactions of different user intention may call the
   // same action type in notional smart contract design
   if (
     fCashBeforeTransaction <= BIGINT_ZERO &&
@@ -263,15 +262,12 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   ) {
     createBorrow(event, market, absfCashAmount, absAmount, absAmountUSD);
   } else if (
-    // This means they withdrew their deposit and borrowed at the same time.
-    // No such events found but worth logging them.
-    // TODO: Methodology Question: A) Is this possible? B) How should this be treated? Currently, I'm treating this as borrow.
+    // Logging for reference. More details in README.
     fCashBeforeTransaction > BIGINT_ZERO &&
     fCashAfterTransaction < BIGINT_ZERO &&
     fCashAfterTransaction < fCashBeforeTransaction
   ) {
-    createBorrow(event, market, absfCashAmount, absAmount, absAmountUSD);
-    log.info(
+    log.warning(
       " -- Withdraw and Borrow at the same time, account: {}, hash: {}, fCashAmount: {}",
       [account.id, event.transaction.hash.toHexString(), fCashAmount.toString()]
     );
@@ -282,15 +278,12 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   ) {
     createWithdraw(event, market, absfCashAmount, absAmount, absAmountUSD);
   } else if (
-    // This means they withdrew their deposit and borrowed at the same time.
-    // No such events found but worth logging them.
-    // TODO: Methodology Question: A) Is this possible? B) How should this be treated? Currently, I'm treating this as borrow.
+    // Logging for reference. More details in README.
     fCashBeforeTransaction < BIGINT_ZERO &&
     fCashAfterTransaction > BIGINT_ZERO &&
     fCashAfterTransaction > fCashBeforeTransaction
   ) {
-    createRepay(event, market, absfCashAmount, absAmount, absAmountUSD);
-    log.info(
+    log.warning(
       " -- Repay and Deposit at the same time, account: {}, hash: {}, fCashAmount: {}",
       [account.id, event.transaction.hash.toHexString(), fCashAmount.toString()]
     );

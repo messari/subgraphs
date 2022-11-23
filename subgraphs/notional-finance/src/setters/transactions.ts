@@ -49,17 +49,15 @@ export function getOrCreatePosition(
   const marketId = market.id;
   const positionIdPrefix = `${accountId}-${marketId}-${side}`;
 
+  // return open position if found
   for (let curr = 0; curr < account.openPositionCount; curr += 1) {
     const op = account.openPositions.at(curr);
-    // TODO: revist this in final review and remove log
     if (op.startsWith(positionIdPrefix)) {
-      log.info(" ----- Found position with prefix... {}", [
-        Position.load(op)!.id,
-      ]);
       return Position.load(op)!;
     }
   }
 
+  // close position and update position counts
   let count = 0;
   for (let curr = 0; curr < account.closedPositionCount; curr += 1) {
     const cp = account.closedPositions.at(curr);
@@ -68,6 +66,7 @@ export function getOrCreatePosition(
     }
   }
 
+  // create open position and update position counts
   const positionId = `${accountId}-${market.id}-${side}-${count}`;
   const position = new Position(positionId);
 
@@ -183,7 +182,6 @@ export function updatePosition(
   accountId: string,
   event: ethereum.Event,
   eventId: string
-  // liquidation: boolean = false
 ): void {
   let closePositionToggle = false;
 
@@ -223,15 +221,6 @@ export function updatePosition(
     position.withdrawCount = position.withdrawCount + 1;
     position.balance = position.balance.minus(amount);
 
-    // TODO: Does liquidation using WITHDRAW action or is it a separate action? Can we identify if a withdraw action is a liquidation event?
-    // if (liquidation) {
-    //   position.liquidationCount = position.liquidationCount + 1;
-    //   let liqudationEventId = event.transaction.hash.toHexString() + "-" event.transactionlogIndex
-    //   let liquidate = new Liquidate(eventId);
-    //   liquidate.position = position.id;
-    //   liquidate.save();
-    // }
-
     const withdraw = new Withdraw(eventId);
     withdraw.position = position.id;
     withdraw.save();
@@ -255,15 +244,6 @@ export function updatePosition(
     account.repayCount = account.repayCount + 1;
     position.repayCount = position.repayCount + 1;
     position.balance = position.balance.minus(amount);
-
-    // TODO: Does liquidation using REPAY action or is it a separate action? Can we identify if a repay action is a liquidation event?
-    // if (liquidation) {
-    //   position.liquidationCount = position.liquidationCount + 1;
-    //   let liqudationEventId = event.transaction.hash.toHexString() + "-" event.transactionlogIndex
-    //   let liquidate = new Liquidate(eventId);
-    //   liquidate.position = position.id;
-    //   liquidate.save();
-    // }
 
     const repay = new Repay(eventId);
     repay.position = position.id;
@@ -344,7 +324,6 @@ export function createWithdraw(
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
   const withdraw = new Withdraw(id);
   const account = getOrCreateAccount(event.transaction.from.toHexString());
-
   const transactionType = TransactionType.WITHDRAW;
 
   withdraw.hash = event.transaction.hash.toHexString();
@@ -392,9 +371,7 @@ export function createBorrow(
   const id =
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
   const borrow = new Borrow(id);
-
   const account = getOrCreateAccount(event.transaction.from.toHexString());
-
   const transactionType = TransactionType.BORROW;
 
   borrow.hash = event.transaction.hash.toHexString();
@@ -441,9 +418,7 @@ export function createRepay(
   const id =
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
   const repay = new Repay(id);
-
   const account = getOrCreateAccount(event.transaction.from.toHexString());
-
   const transactionType = TransactionType.REPAY;
 
   repay.hash = event.transaction.hash.toHexString();
@@ -523,6 +498,7 @@ export function createLiquidate(
     ).div(BIGDECIMAL_HUNDRED);
     liquidate.profitUSD = liquidate.amountUSD.times(liquidationDiscount);
   }
+  liquidate.save();
 
   updateUsageMetrics(
     event,

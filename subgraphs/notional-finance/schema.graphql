@@ -550,7 +550,6 @@ type Market @entity {
   " Token that need to be deposited to take a position in protocol "
   inputToken: Token!
 
-  # TODO: How can an ERC-1155 be used?
   " Token that is minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist "
   outputToken: Token
 
@@ -1221,11 +1220,11 @@ type Liquidate @entity {
   " Account that got liquidated "
   liquidatee: Account!
 
-  # TODO: BLOCKED: cannot associate without a market, no market info in event
+  # BLOCKER: cannot associate without a market, no market info in event
   " The market of the collateral being used "
   market: Market
 
-  # TODO: BLOCKED: cannot create/update position without a market, no market info in event
+  # BLOCKER: cannot create/update position without a market, no market info in event
   " The user position changed by this event "
   position: Position
 
@@ -1238,7 +1237,6 @@ type Liquidate @entity {
   " Amount of collateral liquidated in USD "
   amountUSD: BigDecimal!
 
-  # TODO: profitUSD
   " Amount of profit from liquidation in USD "
   profitUSD: BigDecimal!
 }
