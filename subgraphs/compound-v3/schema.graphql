@@ -413,7 +413,7 @@ type LendingProtocol implements Protocol @entity {
   " Tokens that can be minted. Only applies to CDP "
   mintedTokens: [Token!]
 
-  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. "
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -590,6 +590,12 @@ type UsageMetricsDailySnapshot @entity {
 
   " Total number of liquidations in a day "
   dailyLiquidateCount: Int!
+
+  " Total number of transfers in a day "
+  dailyTransferCount: Int!
+
+  " Total number of flashloans in a day "
+  dailyFlashloanCount: Int!
 
   " Total number of positions (open and closed) "
   cumulativePositionCount: Int!
@@ -1183,7 +1189,7 @@ type MarketDailySnapshot @entity {
   dailyActiveLiquidatees: Int!
 
   " Number of unique daily transferers (the sender in a Transfer) "
-  dailyActiveTransferers: Int!
+  dailyActiveTransferrers: Int!
 
   " Number of unique daily accounts that executed a flash loan"
   dailyActiveFlashloaners: Int!
@@ -1345,6 +1351,12 @@ type MarketHourlySnapshot @entity {
 
   " Total assets repaid on a given hour, in USD. "
   hourlyRepayUSD: BigDecimal!
+
+  " Total assets transferred on a given hour, in USD. "
+  hourlyTransferUSD: BigDecimal!
+
+  " Total assets flashloaned on a given hour, in USD. "
+  hourlyFlashloanUSD: BigDecimal!
 }
 
 ##############################
@@ -1555,8 +1567,8 @@ type PositionSnapshot @entity(immutable: true) {
 
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity(immutable: true) {
-  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
-  id: Bytes!
+  " { daily/hourly }-{ Optional: Transaction Type }-{ Address of the account }-{ Optional: Market Address }-{ Optional: Days/hours since Unix epoch } "
+  id: ID!
 }
 
 ############################
