@@ -1,4 +1,11 @@
-import { Address, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  dataSource,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -31,6 +38,8 @@ import {
   SECONDS_PER_DAY,
   bigDecimalToBigInt,
   RewardTokenType,
+  BIGDECIMAL_ZERO,
+  exponentToBigDecimal,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -60,7 +69,15 @@ import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
-import { getNetworkSpecificConstant } from "./constants";
+import {
+  BB_aUSD_ADDRESS,
+  BEETHOVEN_POOL_DEPLOYED_BLOCK,
+  getNetworkSpecificConstant,
+  IB_TOKEN_ADDRESS,
+  rETH_ADDRESS,
+  rETH_IB_POOL_ADDRESS,
+  rETH_OP_USD_POOL_ADDRESS,
+} from "./constants";
 
 import { StakingRewardsCreated } from "../../../generated/StakingRewardsFactory/StakingRewardsFactory";
 import { StakingRewards as StakingRewardsTemplate } from "../../../generated/templates";
@@ -70,6 +87,8 @@ import {
   StakingRewards as StakingRewardsContract,
   Withdrawn,
 } from "../../../generated/templates/StakingRewards/StakingRewards";
+import { BeethovenXPool as BeethovenXPoolContract } from "../../../generated/templates/StakingRewards/BeethovenXPool";
+import { BeethovenXVault as BeethovenVaultContract } from "../../../generated/templates/StakingRewards/BeethovenXVault";
 
 // Constant values
 const constant = getNetworkSpecificConstant();
@@ -449,13 +468,20 @@ export function handleRewardPaid(event: RewardPaid): void {
   const rewardTokenEmissionsAmount = bigDecimalToBigInt(
     market._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler)
   );
-  // TODO find price for IB token:
-  // https://optimistic.etherscan.io/address/0x00a35fd824c717879bf370e70ac6868b95870dfb
-  //const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
-  //  .divDecimal(exponentToBigDecimal(token.decimals))
-  //  .times(token.lastPriceUSD!);
+  const IBTokenPriceUSD = getIBTokenPrice(event);
+  let rewardTokenEmissionsUSD = BIGDECIMAL_ZERO;
+  if (IBTokenPriceUSD) {
+    token.lastPriceUSD = IBTokenPriceUSD;
+    token.lastPriceBlockNumber = event.block.number;
+    token.save();
+
+    rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
+      .divDecimal(exponentToBigDecimal(token.decimals))
+      .times(IBTokenPriceUSD);
+  }
+
   market.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
-  market.rewardTokenEmissionsUSD = [];
+  market.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
 
   //reset _cumulativeRewardAmount and _rewardTimestamp for next update
   market._rewardLastUpdatedTimestamp = currTimestamp;
@@ -474,4 +500,72 @@ function getOrCreateProtocol(): LendingProtocol {
     comptroller.try_oracle()
   );
   return _getOrCreateProtocol(protocolData);
+}
+
+function getIBTokenPrice(event: ethereum.Event): BigDecimal | null {
+  if (event.block.number.lt(BEETHOVEN_POOL_DEPLOYED_BLOCK)) {
+    return null;
+  }
+  const IBPriceInrETH = getToken0PriceInToken1(
+    rETH_IB_POOL_ADDRESS,
+    IB_TOKEN_ADDRESS,
+    rETH_ADDRESS
+  );
+
+  const rETHPriceInUSD = getToken0PriceInToken1(
+    rETH_OP_USD_POOL_ADDRESS,
+    rETH_ADDRESS,
+    BB_aUSD_ADDRESS
+  );
+
+  if (!IBPriceInrETH || !rETHPriceInUSD) {
+    return null;
+  }
+  const IBPriceInUSD = IBPriceInrETH.times(rETHPriceInUSD);
+  log.info("[getIBTokenPrice]IB Price USD={} at timestamp {}", [
+    IBPriceInUSD.toString(),
+    event.block.timestamp.toString(),
+  ]);
+
+  return IBPriceInUSD;
+}
+
+function getToken0PriceInToken1(
+  poolAddress: string,
+  token0: string,
+  token1: string
+): BigDecimal | null {
+  const poolContract = BeethovenXPoolContract.bind(
+    Address.fromString(poolAddress)
+  );
+  const vaultAddressResult = poolContract.try_getVault();
+  if (vaultAddressResult.reverted) {
+    return null;
+  }
+  const vaultContract = BeethovenVaultContract.bind(vaultAddressResult.value);
+
+  const weightsResult = poolContract.try_getNormalizedWeights();
+  if (weightsResult.reverted) {
+    return null;
+  }
+  const poolIDResult = poolContract.try_getPoolId();
+  if (poolIDResult.reverted) {
+    return null;
+  }
+  const poolTokensResult = vaultContract.try_getPoolTokens(poolIDResult.value);
+  if (poolTokensResult.reverted) {
+    return null;
+  }
+  const poolTokenAddrs = poolTokensResult.value.getTokens();
+  const poolTokenBalances = poolTokensResult.value.getBalances();
+  const token0Idx = poolTokenAddrs.indexOf(Address.fromString(token0));
+  const token1Idx = poolTokenAddrs.indexOf(Address.fromString(token1));
+  const token0PriceInToken1 = poolTokenBalances[token1Idx]
+    .times(weightsResult.value[token0Idx])
+    .divDecimal(
+      poolTokenBalances[token0Idx]
+        .times(weightsResult.value[token1Idx])
+        .toBigDecimal()
+    );
+  return token0PriceInToken1;
 }

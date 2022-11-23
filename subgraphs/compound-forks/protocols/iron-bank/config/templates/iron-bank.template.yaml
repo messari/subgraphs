@@ -123,11 +123,15 @@ templates:
           file: ./abis/iron-bank/StakingRewards.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: BeethovenXPool
+          file: ./abis/iron-bank/BeethovenXPool.json
+        - name: BeethovenXVault
+          file: ./abis/iron-bank/BeethovenXVault.json
       eventHandlers:
         - event: RewardPaid(indexed address,address,uint256)
           handler: handleRewardPaid
         - event: Staked(indexed address,uint256)
-          hanlder: handleStaked
+          handler: handleStaked
         - event: Withdrawn(indexed address,uint256)
           handler: handleWithdrawn
       file: ./protocols/iron-bank/src/mapping.ts
