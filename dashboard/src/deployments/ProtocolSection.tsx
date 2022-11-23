@@ -34,10 +34,12 @@ function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, cli
             hasDecentralizedDepo = true;
         }
     });
-    const hasOpenRepoIssue = !!(issuesTitles.find((x: any) => x.includes(subgraphName.toUpperCase().split('-')[0])));
     let prodStatusIcon = "https://images.emojiterra.com/twitter/v13.1/512px/2705.png";
-    if (hasOpenRepoIssue) {
-        prodStatusIcon = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoseJ8t1vi2kPFznJJSyeIHGYxgvCvbCMgs6a9TMI&s";
+    if (Array.isArray(issuesTitles)) {
+        const hasOpenRepoIssue = !!(issuesTitles.find((x: any) => x.includes(subgraphName.toUpperCase().split('-')[0])));
+        if (hasOpenRepoIssue) {
+            prodStatusIcon = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoseJ8t1vi2kPFznJJSyeIHGYxgvCvbCMgs6a9TMI&s";
+        }
     }
     if (showDeposDropDown) {
         const depoRowsOnProtocol = protocol.networks.map((depo: any) => {

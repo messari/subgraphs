@@ -31,7 +31,9 @@ function App() {
         return res.json();
       })
       .then(function (json) {
-        setIssuesTitles(json.map((x: any) => x.title.toUpperCase().split(' ').join(" ")));
+        if (Array.isArray(json)) {
+          setIssuesTitles(json.map((x: any) => x.title.toUpperCase().split(' ').join(" ")));
+        }
       })
       .catch((err) => {
         console.log(err);
