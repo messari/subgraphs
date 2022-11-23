@@ -596,6 +596,17 @@ function getPriceFromLp(
   }
   const wantMarketDecimals = Token.load(wantMarket.inputToken)!.decimals;
 
+  // no divide by zero
+  if (
+    tryReserves.value.value0.equals(BIGINT_ZERO) ||
+    tryReserves.value.value1.equals(BIGINT_ZERO)
+  ) {
+    log.warning("tryReserves value is zero for LP: ", [
+      lpAddress.toHexString(),
+    ]);
+    return BIGINT_ZERO;
+  }
+
   // decide which token we want to price
   const tryToken0 = lpPair.try_token0();
   if (tryToken0.reverted) {
