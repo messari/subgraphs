@@ -1036,17 +1036,11 @@ type MarketDailySnapshot @entity {
 
   ##### Quantitative Data #####
 
-  " Token that need to be deposited in this market to take a position in protocol (should be alphabetized) "
-  inputToken: Token!
-
   " Amount of input token in the market (same order as inputTokens) "
   inputTokenBalance: BigInt!
 
   " Prices in USD of the input token (same order as inputTokens) "
   inputTokenPriceUSD: BigDecimal!
-
-  " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
-  outputToken: Token
 
   " Total supply of output token (same order as outputTokens) "
   outputTokenSupply: BigInt
@@ -1068,9 +1062,6 @@ type MarketDailySnapshot @entity {
 
   " The amount of revenue that is converted to reserves at the current time. 20% reserve factor should be in format 0.20 "
   reserveFactor: BigDecimal
-
-  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
-  borrowedToken: Token
 
   " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
   variableBorrowedTokenBalance: BigInt
@@ -1274,17 +1265,11 @@ type MarketHourlySnapshot @entity {
 
   ##### Quantitative Data #####
 
-  " Token that need to be deposited in this market to take a position in protocol (should be alphabetized) "
-  inputToken: Token!
-
   " Amount of input token in the market (same order as inputTokens) "
   inputTokenBalance: BigInt!
 
   " Prices in USD of the input token (same order as inputTokens) "
   inputTokenPriceUSD: BigDecimal!
-
-  " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
-  outputToken: Token
 
   " Total supply of output token (same order as outputTokens) "
   outputTokenSupply: BigInt
@@ -1303,9 +1288,6 @@ type MarketHourlySnapshot @entity {
 
   " Total amount of reserves (in USD) "
   reserves: BigDecimal
-
-  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
-  borrowedToken: Token
 
   " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
   variableBorrowedTokenBalance: BigInt
