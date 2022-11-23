@@ -170,6 +170,8 @@ export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60)));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const SECONDS_PER_BLOCK = 13;
+export const BLOCKS_PER_DAY = SECONDS_PER_DAY / SECONDS_PER_BLOCK;
 
 ////////////////
 ///// Misc /////

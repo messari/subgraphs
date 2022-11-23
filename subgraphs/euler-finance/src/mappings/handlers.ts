@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -35,6 +35,8 @@ import {
   EUL_DECIMALS,
   RewardTokenType,
   EUL_ADDRESS,
+  BLOCKS_PER_DAY,
+  BLOCKS_PER_EPOCH,
 } from "../common/constants";
 import {
   snapshotFinancials,
@@ -373,13 +375,25 @@ export function handleStake(event: Stake): void {
         sumWeightedBorrowUSD = sumWeightedBorrowUSD.plus(
           mrkt._weightedTotalBorrowUSD ? mrkt._weightedTotalBorrowUSD! : BIGDECIMAL_ZERO,
         );
+        log.info("[handleStake]epoch {}: market {} _receivingRewards={} _weightedTotalBorrowUSD={}", [
+          prevEpoch.epoch.toString(),
+          mrkt.id,
+          mrkt._receivingRewards.toString(),
+          mrkt._weightedStakedAmount!.toString(),
+        ]);
       }
+
+      const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
+      const execProxyAddress = eulerContract.moduleIdToProxy(MODULEID__EXEC);
+      // update EUL token prices
+      updatePrices(execProxyAddress, market, event);
 
       const cutoffAmount = getCutoffValue(marketStakeAmounts, 10);
       const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
 
       const EULToken = getOrCreateToken(Address.fromString(EUL_ADDRESS));
       const rewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
+      const dailyScaler = BigDecimal.fromString((BLOCKS_PER_DAY / BLOCKS_PER_EPOCH).toString());
       for (let i = 0; i < protocol._marketIDs!.length; i++) {
         const mktID = protocol._marketIDs![i];
         const mrkt = getOrCreateMarket(mktID);
@@ -391,13 +405,19 @@ export function handleStake(event: Stake): void {
         // only for epochs after the START_EPOCH (6)
         if (sumWeightedBorrowUSD.gt(BIGDECIMAL_ZERO) && mrkt._weightedTotalBorrowUSD) {
           const rewardTokenEmissionsAmount = BigDecimalTruncateToBigInt(
-            mrkt._weightedTotalBorrowUSD!.div(sumWeightedBorrowUSD).times(totalRewardAmount),
+            mrkt._weightedTotalBorrowUSD!.div(sumWeightedBorrowUSD).times(totalRewardAmount).times(dailyScaler),
           );
           const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
             .divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
             .times(EULToken.lastPriceUSD!);
           mrkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
           mrkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+          log.info("[handleStake]epoch {}: market {} EUL distribution amount={} amountUSD={}", [
+            prevEpoch.epoch.toString(),
+            mrkt.id,
+            rewardTokenEmissionsAmount.toString(),
+            rewardTokenEmissionsUSD.toString(),
+          ]);
         }
 
         // set mkrts receiving rewards in the new epoch
