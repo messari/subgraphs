@@ -1,4 +1,4 @@
-root: ./subgraphs/
+root: /
 
 ​structure:  
     readme: README.md  
