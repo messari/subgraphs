@@ -1,4 +1,4 @@
-# Aurigami Subgraph
+# Tectonic Subgraph
 
 ## Calculation Methodology v1.0.0
 
@@ -52,28 +52,14 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-Amount of reward tokens (PLY/AURORA) distributed each day in a given market.
-
-`rewardsPerSecond * 60 * 60 * 24`
+Not applicable to Venus Protocol
 
 ### Protocol Controlled Value
 
-Not applicable to Aurigami
-
-### Notes
-
-- The PLY, USN, AURORA, and TRI markets do not allow for borrows. For some reason the price oracle doesn't work with them. Instead we can derive price from another method.
-  - To get price we are using LP pools from Trisolaris
-  - The USN market will be missing price for the first month.
-  - PLY market will be missing price for the first 2 days.
-  - stNEAR is missing accurate pricing for the first 2 weeks.
+Not applicable to Venus Protocol
 
 ## Reference and Useful Links
 
-Protocol: https://www.aurigami.finance/
+Protocol: [https://tectonic.finance/](https://tectonic.finance/)
 
-Docs: https://docs.aurigami.finance/public/introduction/aurigami
-
-Smart contracts: https://github.com/Aurigami-Finance/aurigami-smart-contracts
-
-Deployed addresses: https://docs.aurigami.finance/public/protocol/contract-addresses
+Docs: [https://tectonic.gitbook.io/docs/introduction/what-is-tectonic](https://tectonic.gitbook.io/docs/introduction/what-is-tectonic)

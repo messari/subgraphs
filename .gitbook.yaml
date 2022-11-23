@@ -2,8 +2,4 @@ root: ./subgraphs/
 
 ​structure:  
     readme: README.md  
-    summary: SUMMARY.md​
-
-redirects: 
-    
-    
+    summary: ./docs/SUMMARY.md​
