@@ -23,9 +23,10 @@ interface DeploymentsPageProps {
   endpointSlugs: string[];
   aliasToProtocol: any;
   decentralizedDeployments: any;
+  issuesTitles: any;
 }
 
-function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol, decentralizedDeployments }: DeploymentsPageProps) {
+function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol, decentralizedDeployments, issuesTitles }: DeploymentsPageProps) {
 
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
@@ -38,9 +39,6 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
   const [indexingStatus, setIndexingStatus] = useState<any>(false);
   const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
   const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
-
-
-
 
   useEffect(() => {
     getData();
@@ -160,6 +158,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         {devCountTable}
         <DeploymentsTable
           getData={() => getData()}
+          issuesTitles={issuesTitles}
           protocolsToQuery={protocolsToQuery}
           decenDeposToSubgraphIds={decenDeposToSubgraphIds}
           indexingStatusLoaded={indexingStatusLoaded}

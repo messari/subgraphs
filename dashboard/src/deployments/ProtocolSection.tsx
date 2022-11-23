@@ -8,6 +8,7 @@ import { convertTokenDecimals, formatIntToFixed2, toPercent } from "../utils";
 
 interface ProtocolSection {
     protocol: { [x: string]: any };
+    issuesTitles: any;
     schemaType: string;
     subgraphName: string;
     clientIndexing: any;
@@ -20,7 +21,7 @@ interface ProtocolSection {
     validationSupported: boolean;
 }
 
-function ProtocolSection({ protocol, schemaType, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
+function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
     const [showDeposDropDown, toggleShowDeposDropDown] = useState<boolean>(false);
     const navigate = useNavigate();
     useEffect(() => {
@@ -32,8 +33,14 @@ function ProtocolSection({ protocol, schemaType, subgraphName, clientIndexing, d
         if (!!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.decentralizedNetworkId) || !!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.hostedServiceId)) {
             hasDecentralizedDepo = true;
         }
-    })
-
+    });
+    let prodStatusIcon = "https://images.emojiterra.com/twitter/v13.1/512px/2705.png";
+    if (Array.isArray(issuesTitles)) {
+        const hasOpenRepoIssue = !!(issuesTitles.find((x: any) => x.includes(subgraphName.toUpperCase().split('-')[0])));
+        if (hasOpenRepoIssue) {
+            prodStatusIcon = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoseJ8t1vi2kPFznJJSyeIHGYxgvCvbCMgs6a9TMI&s";
+        }
+    }
     if (showDeposDropDown) {
         const depoRowsOnProtocol = protocol.networks.map((depo: any) => {
             let chainLabel = depo.chain;
@@ -112,7 +119,7 @@ function ProtocolSection({ protocol, schemaType, subgraphName, clientIndexing, d
                                     <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
                                 </TableCell>
                                 <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                    {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                    {depo?.status === "prod" ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
                                 </TableCell>
                                 <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                     <CircularProgress size={20} />
@@ -184,7 +191,7 @@ function ProtocolSection({ protocol, schemaType, subgraphName, clientIndexing, d
                                     <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
                                 </TableCell>
                                 <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                    {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                    {depo?.status === "prod" ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
                                 </TableCell>
                                 <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                     {indexedPending ? indexedPending + "%" : "N/A"}
@@ -325,7 +332,7 @@ function ProtocolSection({ protocol, schemaType, subgraphName, clientIndexing, d
                                 <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.chain + 'Logo-DECEN'} size={30} network={depo.chain} />
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                {depo?.status === "prod" ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {indexedDecen ? indexedDecen + "%" : "N/A"}
@@ -438,7 +445,7 @@ function ProtocolSection({ protocol, schemaType, subgraphName, clientIndexing, d
                                 <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                {depo?.status === "prod" ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 <CircularProgress size={20} />
@@ -512,7 +519,7 @@ function ProtocolSection({ protocol, schemaType, subgraphName, clientIndexing, d
                                 <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                {depo?.status === "prod" ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {indexed ? indexed + "%" : "N/A"}
@@ -589,7 +596,7 @@ function ProtocolSection({ protocol, schemaType, subgraphName, clientIndexing, d
                     }
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                    {protocol?.status ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                    {protocol?.status ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
                     -
@@ -698,7 +705,7 @@ function ProtocolSection({ protocol, schemaType, subgraphName, clientIndexing, d
                 </Tooltip>
             </TableCell>
             <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                {protocol?.status ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                {protocol?.status ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
             </TableCell>
             <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
 
