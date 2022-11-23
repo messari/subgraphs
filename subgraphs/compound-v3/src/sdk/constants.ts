@@ -104,9 +104,14 @@ export namespace TransactionType {
   export const BORROW = "BORROW";
   export const REPAY = "REPAY";
   export const LIQUIDATE = "LIQUIDATE";
+  export const TRANSFER = "TRANSFER";
+  export const FLASHLOAN = "FLASHLOAN";
+
+  export const LIQUIDATOR = "LIQUIDATOR";
+  export const LIQUIDATEE = "LIQUIDATEE";
 }
 
-export namespace AccountActiity {
+export namespace AccountActivity {
   export const DAILY = "DAILY";
   export const HOURLY = "HOURLY";
 }

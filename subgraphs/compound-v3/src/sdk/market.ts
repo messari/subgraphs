@@ -7,6 +7,8 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
+  Account,
+  ActiveAccount,
   Borrow,
   Deposit,
   Fee,
@@ -22,8 +24,6 @@ import {
   Repay,
   RevenueDetails,
   RewardToken,
-  Token,
-  TokenData,
   Transfer,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
@@ -31,21 +31,20 @@ import {
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
+  AccountActivity,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
+  LendingType,
   ProtocolType,
+  RevenueSource,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
+  TransactionType,
 } from "./constants";
-import { ProtocolClass, ProtocolData } from "./protocol";
-import {
-  fetchTokenDecimals,
-  fetchTokenName,
-  fetchTokenSymbol,
-  getOrCreateToken,
-} from "./token";
+import { ProtocolData } from "./protocol";
+import { getOrCreateToken } from "./token";
 
 /**
  * This file contains schema classes.
@@ -64,6 +63,7 @@ export class MarketClass {
   // entities
   private protocol!: LendingProtocol;
   private market!: Market;
+  private account!: Account;
 
   // snapshots
   private marketHourlySnapshot!: MarketHourlySnapshot;
@@ -222,6 +222,8 @@ export class MarketClass {
       snapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
       snapshot.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
       snapshot.hourlyRepayUSD = BIGDECIMAL_ZERO;
+      snapshot.hourlyTransferUSD = BIGDECIMAL_ZERO;
+      snapshot.hourlyFlashloanUSD = BIGDECIMAL_ZERO;
     }
     snapshot.blockNumber = this.event.block.number;
     snapshot.timestamp = this.event.block.timestamp;
@@ -420,6 +422,8 @@ export class MarketClass {
       snapshot.dailyBorrowCount = INT_ZERO;
       snapshot.dailyRepayCount = INT_ZERO;
       snapshot.dailyLiquidateCount = INT_ZERO;
+      snapshot.dailyTransferCount = INT_ZERO;
+      snapshot.dailyFlashloanCount = INT_ZERO;
       snapshot.dailyActivePositions = INT_ZERO;
     }
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
@@ -579,6 +583,40 @@ export class MarketClass {
     return newDetails.id;
   }
 
+  getOrCreateRevenueDetails(id: Bytes): RevenueDetails {
+    let details = RevenueDetails.load(id);
+    if (!details) {
+      details = new RevenueDetails(id);
+      details.sources = [
+        RevenueSource.BORROW_INTEREST,
+        RevenueSource.FLASHLOAN_FEE,
+        RevenueSource.LIQUIDATION_FEE,
+      ];
+      details.amountsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+      details.save();
+    }
+
+    return details;
+  }
+
+  getOrCreateAccount(address: Address): Account {
+    const account = new Account(address);
+    account.positionCount = INT_ZERO;
+    account.openPositionCount = INT_ZERO;
+    account.closedPositionCount = INT_ZERO;
+    account.depositCount = INT_ZERO;
+    account.withdrawCount = INT_ZERO;
+    account.borrowCount = INT_ZERO;
+    account.repayCount = INT_ZERO;
+    account.liquidateCount = INT_ZERO;
+    account.liquidationCount = INT_ZERO;
+    account.transferredCount = INT_ZERO;
+    account.receivedCount = INT_ZERO;
+    account.flashloanCount = INT_ZERO;
+    account.save();
+    return account;
+  }
+
   //////////////////
   //// Creators ////
   //////////////////
@@ -608,9 +646,10 @@ export class MarketClass {
     deposit.amountUSD = amountUSD;
     deposit.save();
 
-    return deposit;
+    this.updateMarketData(TransactionType.DEPOSIT, amount, amountUSD);
+    this.updateAccountData(TransactionType.DEPOSIT, account);
 
-    // TODO update market values, daily values, protocol values, snapshots
+    return deposit;
   }
 
   createWithdraw(
@@ -638,9 +677,10 @@ export class MarketClass {
     withdraw.amountUSD = amountUSD;
     withdraw.save();
 
-    return withdraw;
+    this.updateMarketData(TransactionType.WITHDRAW, amount, amountUSD);
+    this.updateAccountData(TransactionType.WITHDRAW, account);
 
-    // TODO update market values, daily values, protocol values, snapshots
+    return withdraw;
   }
 
   createBorrow(
@@ -668,9 +708,10 @@ export class MarketClass {
     borrow.amountUSD = amountUSD;
     borrow.save();
 
-    return borrow;
+    this.updateMarketData(TransactionType.BORROW, amount, amountUSD);
+    this.updateAccountData(TransactionType.BORROW, account);
 
-    // TODO update market values, daily values, protocol values, snapshots
+    return borrow;
   }
 
   createRepay(
@@ -698,15 +739,16 @@ export class MarketClass {
     repay.amountUSD = amountUSD;
     repay.save();
 
-    return repay;
+    this.updateMarketData(TransactionType.REPAY, amount, amountUSD);
+    this.updateAccountData(TransactionType.REPAY, account);
 
-    // TODO update market values, daily values, protocol values, snapshots
+    return repay;
   }
 
   createLiquidate(
     asset: Address,
     liquidator: Address,
-    borrower: Address,
+    liquidatee: Address,
     amount: BigInt,
     amountUSD: BigDecimal,
     profitUSD: BigDecimal
@@ -723,18 +765,20 @@ export class MarketClass {
     liquidate.blockNumber = this.event.block.number;
     liquidate.timestamp = this.event.block.timestamp;
     liquidate.liquidator = liquidator;
-    liquidate.liquidatee = borrower;
+    liquidate.liquidatee = liquidatee;
     liquidate.market = this.market.id;
-    liquidate.positions = [borrower]; // TODO add position
+    liquidate.positions = [liquidatee]; // TODO add position
     liquidate.asset = asset;
     liquidate.amount = amount;
     liquidate.amountUSD = amountUSD;
     liquidate.profitUSD = profitUSD;
     liquidate.save();
 
-    return liquidate;
+    this.updateMarketData(TransactionType.LIQUIDATE, amount, amountUSD);
+    this.updateAccountData(TransactionType.LIQUIDATEE, liquidatee);
+    this.updateAccountData(TransactionType.LIQUIDATOR, liquidator);
 
-    // TODO update market values, daily values, protocol values, snapshots
+    return liquidate;
   }
 
   createTransfer(
@@ -764,9 +808,10 @@ export class MarketClass {
     transfer.amountUSD = amountUSD;
     transfer.save();
 
-    return transfer;
+    this.updateMarketData(TransactionType.TRANSFER, amount, amountUSD);
+    this.updateAccountData(TransactionType.TRANSFER, sender);
 
-    // TODO update market values, daily values, protocol values, snapshots
+    return transfer;
   }
 
   createFlashloan(
@@ -793,6 +838,9 @@ export class MarketClass {
     flashloan.amountUSD = amountUSD;
     flashloan.save();
 
+    this.updateMarketData(TransactionType.FLASHLOAN, amount, amountUSD);
+    this.updateAccountData(TransactionType.FLASHLOAN, account);
+
     return flashloan;
   }
 
@@ -800,10 +848,279 @@ export class MarketClass {
   //// Updaters ////
   //////////////////
 
+  updateAccountData(transactionType: string, account: Address): void {
+    // create Account for total active accounts
+    let _account = Account.load(account);
+    this.account = this.getOrCreateAccount(account);
+    if (!_account) {
+      this.protocol.cumulativeUniqueUsers += INT_ONE;
+    }
+
+    const dailyActiveAccountID = AccountActivity.DAILY.concat("-")
+      .concat(account.toHexString())
+      .concat("-")
+      .concat(this.marketDailySnapshot.days.toString());
+    const dailyActiveAccountMarketID = dailyActiveAccountID
+      .concat("-")
+      .concat(this.market.id.toHexString());
+    const hourlyActiveAccountID = AccountActivity.HOURLY.concat("-")
+      .concat(account.toHexString())
+      .concat("-")
+      .concat(this.marketHourlySnapshot.hours.toString());
+    const activeAccountMarketID = account
+      .toHexString()
+      .concat("-")
+      .concat(this.market.id.toHexString());
+    const activeAccountTransactionID = transactionType
+      .concat("-")
+      .concat(account.toHexString());
+    const dailyActiveAccountTransactionID = dailyActiveAccountID
+      .concat("-")
+      .concat(this.marketDailySnapshot.days.toString());
+    const activeAccountTransactionMarketID = activeAccountTransactionID
+      .concat("-")
+      .concat(this.market.id.toHexString());
+    const dailyActiveAccountTransactionMarketID = AccountActivity.DAILY.concat(
+      "-"
+    ).concat(activeAccountTransactionMarketID);
+    let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountID); // usage daily
+    let dailyActiveAccountMarket = ActiveAccount.load(
+      dailyActiveAccountMarketID
+    ); // market daily
+    let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountID); // usage hourly
+    let activeAccountMarket = ActiveAccount.load(activeAccountMarketID); // market
+    let activeAccountTransaction = ActiveAccount.load(
+      activeAccountTransactionID
+    ); // lending protocol
+    let dailyActiveAccountTransaction = ActiveAccount.load(
+      dailyActiveAccountTransactionID
+    ); // usage daily
+    let activeAccountTransactionMarket = ActiveAccount.load(
+      activeAccountTransactionMarketID
+    ); // market
+    let dailyActiveAccountTransactionMarket = ActiveAccount.load(
+      dailyActiveAccountTransactionMarketID
+    ); // market daily
+
+    if (!dailyActiveAccount) {
+      dailyActiveAccount = new ActiveAccount(dailyActiveAccountID);
+      dailyActiveAccount.save();
+      this.usageDailySnapshot.dailyActiveUsers += INT_ONE;
+    }
+    if (!dailyActiveAccountMarket) {
+      dailyActiveAccountMarket = new ActiveAccount(dailyActiveAccountMarketID);
+      dailyActiveAccountMarket.save();
+      this.marketDailySnapshot.dailyActiveUsers += INT_ONE;
+    }
+    if (!hourlyActiveAccount) {
+      hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountID);
+      hourlyActiveAccount.save();
+      this.usageHourlySnapshot.hourlyActiveUsers += INT_ONE;
+    }
+    if (!activeAccountMarket) {
+      activeAccountMarket = new ActiveAccount(activeAccountMarketID);
+      activeAccountMarket.save();
+      this.market.cumulativeUniqueUsers += INT_ONE;
+    }
+    if (!activeAccountTransaction) {
+      activeAccountTransaction = new ActiveAccount(activeAccountTransactionID);
+      activeAccountTransaction.save();
+      if (transactionType == TransactionType.DEPOSIT)
+        this.protocol.cumulativeUniqueDepositors += INT_ONE;
+      if (transactionType == TransactionType.BORROW)
+        this.protocol.cumulativeUniqueBorrowers += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATOR)
+        this.protocol.cumulativeUniqueLiquidators += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATEE)
+        this.protocol.cumulativeUniqueLiquidatees += INT_ONE;
+    }
+    if (!dailyActiveAccountTransaction) {
+      dailyActiveAccountTransaction = new ActiveAccount(
+        dailyActiveAccountTransactionID
+      );
+      dailyActiveAccountTransaction.save();
+      if (transactionType == TransactionType.DEPOSIT)
+        this.usageDailySnapshot.dailyActiveDepositors += INT_ONE;
+      if (transactionType == TransactionType.BORROW)
+        this.usageDailySnapshot.dailyActiveBorrowers += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATOR)
+        this.usageDailySnapshot.dailyActiveLiquidators += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATEE)
+        this.usageDailySnapshot.dailyActiveLiquidatees += INT_ONE;
+    }
+    if (!activeAccountTransactionMarket) {
+      activeAccountTransactionMarket = new ActiveAccount(
+        activeAccountTransactionMarketID
+      );
+      activeAccountTransactionMarket.save();
+      if (transactionType == TransactionType.DEPOSIT)
+        this.market.cumulativeUniqueDepositors += INT_ONE;
+      if (transactionType == TransactionType.BORROW)
+        this.market.cumulativeUniqueBorrowers += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATOR)
+        this.market.cumulativeUniqueLiquidators += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATEE)
+        this.market.cumulativeUniqueLiquidatees += INT_ONE;
+      if (transactionType == TransactionType.TRANSFER)
+        this.market.cumulativeUniqueTransferrers += INT_ONE;
+      if (transactionType == TransactionType.FLASHLOAN)
+        this.market.cumulativeUniqueFlashloaners += INT_ONE;
+    }
+    if (!dailyActiveAccountTransactionMarket) {
+      dailyActiveAccountTransactionMarket = new ActiveAccount(
+        dailyActiveAccountTransactionMarketID
+      );
+      dailyActiveAccountTransactionMarket.save();
+      if (transactionType == TransactionType.DEPOSIT)
+        this.marketDailySnapshot.dailyActiveDepositors += INT_ONE;
+      if (transactionType == TransactionType.BORROW)
+        this.marketDailySnapshot.dailyActiveBorrowers += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATOR)
+        this.marketDailySnapshot.dailyActiveLiquidators += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATEE)
+        this.marketDailySnapshot.dailyActiveLiquidatees += INT_ONE;
+      if (transactionType == TransactionType.TRANSFER)
+        this.marketDailySnapshot.dailyActiveTransferrers += INT_ONE;
+      if (transactionType == TransactionType.FLASHLOAN)
+        this.marketDailySnapshot.dailyActiveFlashloaners += INT_ONE;
+    }
+
+    this.market.save();
+    this.protocol.save();
+    this.usageDailySnapshot.save();
+    this.usageHourlySnapshot.save();
+    this.marketDailySnapshot.save();
+  }
+
+  updateMarketData(
+    transactionType: string,
+    amount: BigInt,
+    amountUSD: BigDecimal
+  ): void {
+    if (transactionType == TransactionType.DEPOSIT) {
+      this.protocol.depositCount += INT_ONE;
+      this.market.cumulativeDepositUSD =
+        this.market.cumulativeDepositUSD.plus(amountUSD);
+      this.market.depositCount += INT_ONE;
+      this.marketDailySnapshot.dailyDepositUSD =
+        this.marketDailySnapshot.dailyDepositUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyNativeDeposit =
+        this.marketDailySnapshot.dailyNativeDeposit.plus(amount);
+      this.marketHourlySnapshot.hourlyDepositUSD =
+        this.marketHourlySnapshot.hourlyDepositUSD.plus(amountUSD);
+      this.financialSnapshot.dailyDepositUSD =
+        this.financialSnapshot.dailyDepositUSD.plus(amountUSD);
+      this.usageDailySnapshot.dailyDepositCount += INT_ONE;
+      this.usageHourlySnapshot.hourlyDepositCount += INT_ONE;
+    } else if (transactionType == TransactionType.WITHDRAW) {
+      this.protocol.withdrawalCount += INT_ONE;
+      this.market.withdrawalCount += INT_ONE;
+      this.marketDailySnapshot.dailyWithdrawUSD =
+        this.marketDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyNativeWithdraw =
+        this.marketDailySnapshot.dailyNativeWithdraw.plus(amount);
+      this.marketHourlySnapshot.hourlyWithdrawUSD =
+        this.marketHourlySnapshot.hourlyWithdrawUSD.plus(amountUSD);
+      this.financialSnapshot.dailyWithdrawUSD =
+        this.financialSnapshot.dailyWithdrawUSD.plus(amountUSD);
+      this.usageDailySnapshot.dailyWithdrawCount += INT_ONE;
+      this.usageHourlySnapshot.hourlyWithdrawCount += INT_ONE;
+    } else if (transactionType == TransactionType.BORROW) {
+      this.protocol.borrowCount += INT_ONE;
+      this.market.cumulativeBorrowUSD =
+        this.market.cumulativeBorrowUSD.plus(amountUSD);
+      this.market.borrowCount += INT_ONE;
+      this.marketDailySnapshot.dailyBorrowUSD =
+        this.marketDailySnapshot.dailyBorrowUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyNativeBorrow =
+        this.marketDailySnapshot.dailyNativeBorrow.plus(amount);
+      this.marketHourlySnapshot.hourlyBorrowUSD =
+        this.marketHourlySnapshot.hourlyBorrowUSD.plus(amountUSD);
+      this.financialSnapshot.dailyBorrowUSD =
+        this.financialSnapshot.dailyBorrowUSD.plus(amountUSD);
+      this.usageDailySnapshot.dailyBorrowCount += INT_ONE;
+      this.usageHourlySnapshot.hourlyBorrowCount += INT_ONE;
+    } else if (transactionType == TransactionType.REPAY) {
+      this.protocol.repayCount += INT_ONE;
+      this.market.repayCount += INT_ONE;
+      this.marketDailySnapshot.dailyRepayUSD =
+        this.marketDailySnapshot.dailyRepayUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyNativeRepay =
+        this.marketDailySnapshot.dailyNativeRepay.plus(amount);
+      this.marketHourlySnapshot.hourlyRepayUSD =
+        this.marketHourlySnapshot.hourlyRepayUSD.plus(amountUSD);
+      this.financialSnapshot.dailyRepayUSD =
+        this.financialSnapshot.dailyRepayUSD.plus(amountUSD);
+      this.usageDailySnapshot.dailyRepayCount += INT_ONE;
+      this.usageHourlySnapshot.hourlyRepayCount += INT_ONE;
+    } else if (transactionType == TransactionType.LIQUIDATE) {
+      this.protocol.liquidationCount += INT_ONE;
+      this.market.cumulativeLiquidateUSD =
+        this.market.cumulativeLiquidateUSD.plus(amountUSD);
+      this.market.liquidationCount += INT_ONE;
+      this.marketDailySnapshot.dailyLiquidateUSD =
+        this.marketDailySnapshot.dailyLiquidateUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyNativeLiquidate =
+        this.marketDailySnapshot.dailyNativeLiquidate.plus(amount);
+      this.marketHourlySnapshot.hourlyLiquidateUSD =
+        this.marketHourlySnapshot.hourlyLiquidateUSD.plus(amountUSD);
+      this.financialSnapshot.dailyLiquidateUSD =
+        this.financialSnapshot.dailyLiquidateUSD.plus(amountUSD);
+      this.usageDailySnapshot.dailyLiquidateCount += INT_ONE;
+      this.usageHourlySnapshot.hourlyLiquidateCount += INT_ONE;
+    } else if (transactionType == TransactionType.TRANSFER) {
+      this.protocol.transferCount += INT_ONE;
+      this.market.cumulativeTransferUSD =
+        this.market.cumulativeTransferUSD.plus(amountUSD);
+      this.market.transferCount += INT_ONE;
+      this.marketDailySnapshot.dailyTransferUSD =
+        this.marketDailySnapshot.dailyTransferUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyNativeTransfer =
+        this.marketDailySnapshot.dailyNativeTransfer.plus(amount);
+      this.marketHourlySnapshot.hourlyTransferUSD =
+        this.marketHourlySnapshot.hourlyTransferUSD.plus(amountUSD);
+      this.financialSnapshot.dailyTransferUSD =
+        this.financialSnapshot.dailyTransferUSD.plus(amountUSD);
+      this.usageDailySnapshot.dailyTransferCount += INT_ONE;
+    } else if (transactionType == TransactionType.FLASHLOAN) {
+      this.protocol.flashloanCount += INT_ONE;
+      this.market.cumulativeFlashloanUSD =
+        this.market.cumulativeFlashloanUSD.plus(amountUSD);
+      this.market.flashloanCount += INT_ONE;
+      this.marketDailySnapshot.dailyFlashloanUSD =
+        this.marketDailySnapshot.dailyFlashloanUSD.plus(amountUSD);
+      this.marketDailySnapshot.dailyNativeFlashloan =
+        this.marketDailySnapshot.dailyNativeFlashloan.plus(amount);
+      this.marketHourlySnapshot.hourlyFlashloanUSD =
+        this.marketHourlySnapshot.hourlyFlashloanUSD.plus(amountUSD);
+      this.financialSnapshot.dailyFlashloanUSD =
+        this.financialSnapshot.dailyFlashloanUSD.plus(amountUSD);
+      this.usageDailySnapshot.dailyFlashloanCount += INT_ONE;
+    } else {
+      log.error("[updateMarketData] Invalid transaction type: {}", [
+        transactionType,
+      ]);
+      return;
+    }
+    this.protocol.transactionCount += INT_ONE;
+    this.market.transactionCount += INT_ONE;
+    this.usageDailySnapshot.dailyTransactionCount += INT_ONE;
+    this.usageHourlySnapshot.hourlyTransactionCount += INT_ONE;
+
+    this.protocol.save();
+    this.market.save();
+    this.marketDailySnapshot.save();
+    this.marketHourlySnapshot.save();
+    this.financialSnapshot.save();
+    this.usageDailySnapshot.save();
+    this.usageHourlySnapshot.save();
+  }
+
   updateRevenue(
     newTotalRevenueUSD: BigDecimal,
     newProtocolRevenueUSD: BigDecimal,
-    newSupplySideRevenueUSD: BigDecimal
+    newSupplySideRevenueUSD: BigDecimal,
+    revenueSource: string | null = null
   ): void {
     // update market
     this.market.cumulativeTotalRevenueUSD =
@@ -814,7 +1131,7 @@ export class MarketClass {
       this.market.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
     this.market.save();
 
-    // update protcol
+    // update protocol
     this.protocol.cumulativeTotalRevenueUSD =
       this.protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
     this.protocol.cumulativeProtocolSideRevenueUSD =
@@ -825,8 +1142,69 @@ export class MarketClass {
       this.protocol.cumulativeSupplySideRevenueUSD.plus(
         newSupplySideRevenueUSD
       );
+    this.protocol.save();
 
-    // update snapshots
+    // update market hourly snapshot
+    this.marketHourlySnapshot.hourlyTotalRevenueUSD =
+      this.marketHourlySnapshot.hourlyTotalRevenueUSD.plus(newTotalRevenueUSD);
+    this.marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
+      this.marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+        newProtocolRevenueUSD
+      );
+    this.marketHourlySnapshot.hourlySupplySideRevenueUSD =
+      this.marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
+        newSupplySideRevenueUSD
+      );
+    this.marketHourlySnapshot.save();
+
+    // update market daily snapshot
+    this.marketDailySnapshot.dailyTotalRevenueUSD =
+      this.marketDailySnapshot.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+    this.marketDailySnapshot.dailyProtocolSideRevenueUSD =
+      this.marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+        newProtocolRevenueUSD
+      );
+    this.marketDailySnapshot.dailySupplySideRevenueUSD =
+      this.marketDailySnapshot.dailySupplySideRevenueUSD.plus(
+        newSupplySideRevenueUSD
+      );
+    this.marketDailySnapshot.save();
+
+    // update financials snapshot
+    this.financialSnapshot.dailyTotalRevenueUSD =
+      this.financialSnapshot.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+    this.financialSnapshot.dailyProtocolSideRevenueUSD =
+      this.financialSnapshot.dailyProtocolSideRevenueUSD.plus(
+        newProtocolRevenueUSD
+      );
+    this.financialSnapshot.dailySupplySideRevenueUSD =
+      this.financialSnapshot.dailySupplySideRevenueUSD.plus(
+        newSupplySideRevenueUSD
+      );
+    this.financialSnapshot.save();
+
+    // update RevenueDetails
+    if (revenueSource) {
+      const marketDetails = this.getOrCreateRevenueDetails(this.market.id);
+      let sourceIndex = marketDetails.sources.indexOf(revenueSource);
+      if (sourceIndex != -1) {
+        marketDetails.amountsUSD[sourceIndex] =
+          marketDetails.amountsUSD[sourceIndex].plus(newTotalRevenueUSD);
+        marketDetails.save();
+      }
+      this.market.revenueDetails = marketDetails.id;
+      this.market.save();
+
+      const protocolDetails = this.getOrCreateRevenueDetails(this.protocol.id);
+      sourceIndex = protocolDetails.sources.indexOf(revenueSource);
+      if (sourceIndex != -1) {
+        protocolDetails.amountsUSD[sourceIndex] =
+          protocolDetails.amountsUSD[sourceIndex].plus(newTotalRevenueUSD);
+        protocolDetails.save();
+      }
+      this.protocol.revenueDetails = protocolDetails.id;
+      this.protocol.save();
+    }
   }
 }
 
