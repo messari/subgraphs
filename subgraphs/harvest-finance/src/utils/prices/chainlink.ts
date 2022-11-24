@@ -1,4 +1,5 @@
 import { Address, BigDecimal, log, BigInt } from '@graphprotocol/graph-ts'
+import { decimals } from '..'
 import { ChainLinkContract } from '../../../generated/Controller/ChainLinkContract'
 import { constants } from '../constants'
 
@@ -32,12 +33,11 @@ export namespace chainlink {
       return null
     }
 
-    const decimals = decimalsCall.value
+    const pairDecimals = decimalsCall.value
 
-    const decimalsBase10 = BigInt.fromI32(10).pow(decimals as u8)
-
-    return latestRoundDataCall.value.value1
-      .toBigDecimal()
-      .div(decimalsBase10.toBigDecimal())
+    return decimals.fromBigInt(
+      latestRoundDataCall.value.value1,
+      pairDecimals as u8
+    )
   }
 }

@@ -8,6 +8,7 @@ import * as chainLink from './chainLink'
 import * as yearnLens from './yearnLens'
 import * as potPool from './potPool'
 import * as megaFactory from './megaFactory'
+import * as controller from './controller'
 
 export {
   vault,
@@ -20,4 +21,5 @@ export {
   yearnLens,
   potPool,
   megaFactory,
+  controller,
 }

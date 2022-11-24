@@ -1,7 +1,11 @@
-import { BigInt } from '@graphprotocol/graph-ts'
+import { BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { assert } from 'matchstick-as'
 
 const ENTITY = 'Token'
+
+function assertBigDecimal(id: string, field: string, value: BigDecimal): void {
+  assert.fieldEquals(ENTITY, id, field, value.toString())
+}
 
 function assertBigInt(id: string, field: string, value: BigInt): void {
   assert.fieldEquals(ENTITY, id, field, value.toString())
@@ -21,6 +25,14 @@ export function symbol(id: string, value: string): void {
 
 export function decimals(id: string, value: BigInt): void {
   assertBigInt(id, 'decimals', value)
+}
+
+export function lastPriceUSD(id: string, value: BigDecimal): void {
+  assertBigDecimal(id, 'lastPriceUSD', value)
+}
+
+export function lastPriceBlockNumber(id: string, value: BigInt): void {
+  assertBigInt(id, 'lastPriceBlockNumber', value)
 }
 
 class AssertTokenAttributes {

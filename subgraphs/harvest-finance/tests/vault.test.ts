@@ -729,7 +729,7 @@ describe('Vault', () => {
           methodologyVersion: '1.0.0',
           network: 'MAINNET',
           type: 'YIELD',
-          totalValueLockedUSD: BigDecimal.fromString('0'),
+          totalValueLockedUSD: BigDecimal.fromString('119.9704788'),
           protocolControlledValueUSD: BigDecimal.fromString('0'),
           cumulativeSupplySideRevenueUSD: BigDecimal.fromString('0'),
           cumulativeProtocolSideRevenueUSD: BigDecimal.fromString('0'),

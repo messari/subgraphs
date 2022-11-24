@@ -12,6 +12,7 @@ import { withdraws } from './utils/withdraws'
 import { metrics } from './utils/metrics'
 import { decimals } from './utils'
 import { vaults } from './utils/vaults'
+import { protocols } from './utils/protocols'
 
 export function handleWithdraw(event: WithdrawEvent): void {
   const beneficiary = event.params.beneficiary
@@ -66,6 +67,8 @@ export function handleWithdraw(event: WithdrawEvent): void {
   token.save()
   withdraw.save()
   vault.save()
+
+  protocols.updateTotalValueLockedUSD(vault.protocol)
 
   metrics.updateFinancials(event.block)
   metrics.updateUsageMetrics(event.block, event.transaction.from)
@@ -124,6 +127,8 @@ export function handleDeposit(event: DepositEvent): void {
   deposit.save()
   token.save()
   vault.save()
+
+  protocols.updateTotalValueLockedUSD(vault.protocol)
 
   metrics.updateFinancials(event.block)
   metrics.updateUsageMetrics(event.block, event.transaction.from)

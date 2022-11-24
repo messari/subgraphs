@@ -177,6 +177,11 @@ export namespace vaults {
 
     protocol.totalPoolCount = protocol.totalPoolCount + 1
 
+    // workaround: issue with derivedFrom
+    protocol._vaults = protocol._vaults
+      ? protocol._vaults!.concat([vault.id])
+      : [vault.id]
+
     protocol.save()
 
     vault.protocol = protocol.id

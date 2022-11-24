@@ -15,10 +15,12 @@ export function createVaultAndProtocol(
   outputTokenAddress: Address,
   protocolAddress: Address
 ): Vault {
-  const vault = vaults.initialize(vaultAddress.toHexString())
   const protocol = protocols.initialize(protocolAddress.toHexString())
   protocol.totalPoolCount = protocol.totalPoolCount + 1
+  protocol._vaults = [vaultAddress.toHexString()]
+  protocol.save()
 
+  const vault = vaults.initialize(vaultAddress.toHexString())
   vault.name = 'FARM_USDC'
   vault.symbol = 'fUSDC'
   vault.inputToken = inputTokenAddress.toHexString()
@@ -30,7 +32,6 @@ export function createVaultAndProtocol(
   vault.fees = [feeId]
 
   vault.save()
-  protocol.save()
 
   return vault
 }

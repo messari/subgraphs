@@ -2,11 +2,12 @@ import {
   AddVaultAndStrategyCall,
   SharePriceChangeLog,
 } from '../generated/Controller/ControllerContract'
-import { Address, BigInt, log } from '@graphprotocol/graph-ts'
+import { Address } from '@graphprotocol/graph-ts'
 import { vaults } from './utils/vaults'
 import { Token, Vault } from '../generated/schema'
 import { prices } from './utils/prices'
 import { decimals } from './utils'
+import { protocols } from './utils/protocols'
 
 export function handleAddVaultAndStrategy(call: AddVaultAndStrategyCall): void {
   let vaultAddress = call.inputs._vault
@@ -59,4 +60,6 @@ export function handleSharePriceChangeLog(event: SharePriceChangeLog): void {
   //TVL, revenue, metrics, etc should be updated
 
   vault.save()
+
+  protocols.updateTotalValueLockedUSD(vault.protocol)
 }
