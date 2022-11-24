@@ -1,5 +1,6 @@
 import { BigDecimal, BigInt, Bytes, Address } from "@graphprotocol/graph-ts";
 import { RocketStorage } from "../../generated/rocketTokenRETH/RocketStorage";
+import { Versions } from "../versions";
 
 ////////////////////
 ///// Versions /////
@@ -7,9 +8,9 @@ import { RocketStorage } from "../../generated/rocketTokenRETH/RocketStorage";
 
 export const PROTOCOL_NAME = "RocketPool";
 export const PROTOCOL_SLUG = "RocketPool";
-export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
+export const PROTOCOL_SCHEMA_VERSION = Versions.getSchemaVersion();
+export const PROTOCOL_SUBGRAPH_VERSION = Versions.getSubgraphVersion();
+export const PROTOCOL_METHODOLOGY_VERSION = Versions.getMethodologyVersion();
 
 ////////////////////////
 ///// Schema Enums /////
@@ -165,7 +166,7 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 
 export const ETH_SYMBOL = "ETH";
 export const ETH_NAME = "Ether";
-
+export const RETH_NAME = "RETH";
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
@@ -197,7 +198,6 @@ export const NETWORKBALANCES_ENCODE = Bytes.fromHexString(
 );
 
 export const DEFAULT_COMMISSION = BigDecimal.fromString("0.15");
-
 export function getStorageAddress(encode: Bytes): Address {
   const storage = RocketStorage.bind(Address.fromString(STORAGE));
   const address = storage.try_getAddress(encode);

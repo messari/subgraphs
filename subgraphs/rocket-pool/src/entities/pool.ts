@@ -7,7 +7,9 @@ import {
   BIGINT_ZERO,
   ETH_ADDRESS,
   RPL_ADDRESS,
-} from "../Constants/constants";
+  RewardTokenType,
+  RETH_NAME,
+} from "../utils/constants";
 
 export function getOrCreatePool(
   blockNumber: BigInt,
@@ -21,7 +23,7 @@ export function getOrCreatePool(
 
     // Metadata
     pool.name = protocol.id;
-    pool.symbol = "RETH";
+    pool.symbol = RETH_NAME;
     pool.protocol = protocol.id;
     pool.createdTimestamp = blockTimestamp;
     pool.createdBlockNumber = blockNumber;
@@ -38,7 +40,7 @@ export function getOrCreatePool(
     pool.rewardTokens = [
       getOrCreateRewardToken(
         Address.fromString(RPL_ADDRESS),
-        "DEPOSIT",
+        RewardTokenType.DEPOSIT,
         blockNumber
       ).id,
     ];

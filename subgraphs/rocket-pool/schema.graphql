@@ -428,6 +428,10 @@ type PoolHourlySnapshot @entity {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
+###################
+##### Add Ons #####
+###################
+
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
 type Account @entity {

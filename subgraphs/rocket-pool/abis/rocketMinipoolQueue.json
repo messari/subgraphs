@@ -124,11 +124,7 @@
         "name": "_depositType",
         "type": "uint8"
       },
-      {
-        "internalType": "address",
-        "name": "_minipool",
-        "type": "address"
-      }
+      { "internalType": "address", "name": "_minipool", "type": "address" }
     ],
     "name": "enqueueMinipool",
     "outputs": [],
@@ -138,13 +134,7 @@
   {
     "inputs": [],
     "name": "getEffectiveCapacity",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -157,26 +147,14 @@
       }
     ],
     "name": "getLength",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getNextCapacity",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -184,16 +162,8 @@
     "inputs": [],
     "name": "getNextDeposit",
     "outputs": [
-      {
-        "internalType": "enum MinipoolDeposit",
-        "name": "",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+      { "internalType": "enum MinipoolDeposit", "name": "", "type": "uint8" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -201,26 +171,14 @@
   {
     "inputs": [],
     "name": "getTotalCapacity",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getTotalLength",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -240,13 +198,7 @@
   {
     "inputs": [],
     "name": "version",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
     "stateMutability": "view",
     "type": "function"
   }

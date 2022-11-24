@@ -7,7 +7,7 @@ import {
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
-} from "../Constants/constants";
+} from "../utils/constants";
 
 export function getOrCreateToken(
   tokenAddress: Address,

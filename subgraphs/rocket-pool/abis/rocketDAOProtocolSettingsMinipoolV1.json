@@ -19,13 +19,7 @@
       }
     ],
     "name": "getDepositNodeAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "pure",
     "type": "function"
   },
@@ -38,215 +32,111 @@
       }
     ],
     "name": "getDepositUserAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "pure",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getEmptyDepositNodeAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "pure",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getEmptyDepositUserAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "pure",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getFullDepositNodeAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "pure",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getFullDepositUserAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "pure",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getHalfDepositNodeAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "pure",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getHalfDepositUserAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "pure",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getLaunchBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "pure",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getLaunchTimeout",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getMaximumCount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "string",
-        "name": "_settingPath",
-        "type": "string"
-      }
+      { "internalType": "string", "name": "_settingPath", "type": "string" }
     ],
     "name": "getSettingAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "string",
-        "name": "_settingPath",
-        "type": "string"
-      }
+      { "internalType": "string", "name": "_settingPath", "type": "string" }
     ],
     "name": "getSettingBool",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "string",
-        "name": "_settingPath",
-        "type": "string"
-      }
+      { "internalType": "string", "name": "_settingPath", "type": "string" }
     ],
     "name": "getSettingUint",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getSubmitWithdrawableEnabled",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "string",
-        "name": "_settingPath",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "_value",
-        "type": "address"
-      }
+      { "internalType": "string", "name": "_settingPath", "type": "string" },
+      { "internalType": "address", "name": "_value", "type": "address" }
     ],
     "name": "setSettingAddress",
     "outputs": [],
@@ -255,16 +145,8 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "string",
-        "name": "_settingPath",
-        "type": "string"
-      },
-      {
-        "internalType": "bool",
-        "name": "_value",
-        "type": "bool"
-      }
+      { "internalType": "string", "name": "_settingPath", "type": "string" },
+      { "internalType": "bool", "name": "_value", "type": "bool" }
     ],
     "name": "setSettingBool",
     "outputs": [],
@@ -273,16 +155,8 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "string",
-        "name": "_settingPath",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_value",
-        "type": "uint256"
-      }
+      { "internalType": "string", "name": "_settingPath", "type": "string" },
+      { "internalType": "uint256", "name": "_value", "type": "uint256" }
     ],
     "name": "setSettingUint",
     "outputs": [],
@@ -292,13 +166,7 @@
   {
     "inputs": [],
     "name": "version",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
     "stateMutability": "view",
     "type": "function"
   }

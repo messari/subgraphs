@@ -1,4 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
+import { BIGINT_ZERO } from "../utils/constants";
 
 /**
  * Everything that is needed to calculate the network summaries (e.g. average) regarding RPL for a network node balance checkpoint.
@@ -10,9 +11,9 @@ export class NetworkNodeBalanceRPLMetadata {
   totalODAORewardClaimCount: BigInt;
 
   constructor() {
-    this.totalNodesWithRewardClaim = BigInt.fromI32(0);
-    this.totalNodeRewardClaimCount = BigInt.fromI32(0);
-    this.totalNodesWithAnODAORewardClaim = BigInt.fromI32(0);
-    this.totalODAORewardClaimCount = BigInt.fromI32(0);
+    this.totalNodesWithRewardClaim = BIGINT_ZERO;
+    this.totalNodeRewardClaimCount = BIGINT_ZERO;
+    this.totalNodesWithAnODAORewardClaim = BIGINT_ZERO;
+    this.totalODAORewardClaimCount = BIGINT_ZERO;
   }
 }

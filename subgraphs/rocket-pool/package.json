@@ -1,16 +1,13 @@
 {
-  "name": "rocket-pool",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ rocket-pool",
-    "create-local": "graph create --node http://localhost:8020/ rocket-pool",
-    "remove-local": "graph remove --node http://localhost:8020/ rocket-pool",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 rocket-pool"
+    "format": "npx prettier --write ."
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.33.1",
-    "@graphprotocol/graph-ts": "^0.27.0"
+    "@graphprotocol/graph-cli": "0.36.0",
+    "@graphprotocol/graph-ts": "0.29.0"
+  },
+  "devDependencies": {
+    "prettier": "2.7.1"
   }
 }

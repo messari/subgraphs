@@ -9,7 +9,7 @@ import {
   Network,
   ProtocolType,
   BIGDECIMAL_ZERO,
-} from "../Constants/constants";
+} from "../utils/constants";
 
 export function getOrCreateProtocol(): Protocol {
   let protocol = Protocol.load(RETH_ADDRESS);

@@ -92,26 +92,10 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_block",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_totalEth",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_stakingEth",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_rethSupply",
-        "type": "uint256"
-      }
+      { "internalType": "uint256", "name": "_block", "type": "uint256" },
+      { "internalType": "uint256", "name": "_totalEth", "type": "uint256" },
+      { "internalType": "uint256", "name": "_stakingEth", "type": "uint256" },
+      { "internalType": "uint256", "name": "_rethSupply", "type": "uint256" }
     ],
     "name": "executeUpdateBalances",
     "outputs": [],
@@ -121,103 +105,51 @@
   {
     "inputs": [],
     "name": "getBalancesBlock",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getETHUtilizationRate",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getLatestReportableBlock",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getStakingETHBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getTotalETHBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getTotalRETHSupply",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_block",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_totalEth",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_stakingEth",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_rethSupply",
-        "type": "uint256"
-      }
+      { "internalType": "uint256", "name": "_block", "type": "uint256" },
+      { "internalType": "uint256", "name": "_totalEth", "type": "uint256" },
+      { "internalType": "uint256", "name": "_stakingEth", "type": "uint256" },
+      { "internalType": "uint256", "name": "_rethSupply", "type": "uint256" }
     ],
     "name": "submitBalances",
     "outputs": [],
@@ -227,13 +159,7 @@
   {
     "inputs": [],
     "name": "version",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
     "stateMutability": "view",
     "type": "function"
   }

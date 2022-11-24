@@ -1,4 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BIGINT_ZERO, BIGDECIMAL_ZERO } from "../utils/constants";
 
 /**
  * Everything that is needed to calculate the network summaries (e.g. average) for a network node balance checkpoint.
@@ -10,9 +11,9 @@ export class NetworkNodeBalanceMinipoolMetadata {
   totalMaximumEffectiveRPL: BigInt;
 
   constructor() {
-    this.totalNodesWithActiveMinipools = BigInt.fromI32(0);
-    this.totalAverageFeeForAllActiveMinipools = BigDecimal.fromString("0");
-    this.totalMinimumEffectiveRPL = BigInt.fromI32(0);
-    this.totalMaximumEffectiveRPL = BigInt.fromI32(0);
+    this.totalNodesWithActiveMinipools = BIGINT_ZERO;
+    this.totalAverageFeeForAllActiveMinipools = BIGDECIMAL_ZERO;
+    this.totalMinimumEffectiveRPL = BIGINT_ZERO;
+    this.totalMaximumEffectiveRPL = BIGINT_ZERO;
   }
 }

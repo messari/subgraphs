@@ -1,4 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
+import { BIGINT_ZERO } from "../utils/constants";
 
 export class StakerBalance {
   currentRETHBalance: BigInt;
@@ -7,9 +8,9 @@ export class StakerBalance {
   previousETHBalance: BigInt;
 
   constructor() {
-    this.currentRETHBalance = BigInt.fromI32(0);
-    this.currentETHBalance = BigInt.fromI32(0);
-    this.previousRETHBalance = BigInt.fromI32(0);
-    this.previousETHBalance = BigInt.fromI32(0);
+    this.currentRETHBalance = BIGINT_ZERO;
+    this.currentETHBalance = BIGINT_ZERO;
+    this.previousRETHBalance = BIGINT_ZERO;
+    this.previousETHBalance = BIGINT_ZERO;
   }
 }
