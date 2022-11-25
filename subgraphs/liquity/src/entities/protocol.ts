@@ -2,6 +2,7 @@ import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   FinancialsDailySnapshot,
   LendingProtocol,
+  Market,
 } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
@@ -21,6 +22,7 @@ import {
   getOrCreateMarket,
   getOrCreateMarketHourlySnapshot,
   getOrCreateMarketSnapshot,
+  getOrCreateStabilityPool,
 } from "./market";
 import { getLUSDToken } from "./token";
 
@@ -103,7 +105,8 @@ export function getOrCreateFinancialsSnapshot(
 
 export function addProtocolSideRevenue(
   event: ethereum.Event,
-  revenueAmountUSD: BigDecimal
+  revenueAmountUSD: BigDecimal,
+  market: Market
 ): void {
   const protocol = getOrCreateLiquityProtocol();
   protocol.cumulativeProtocolSideRevenueUSD =
@@ -119,7 +122,6 @@ export function addProtocolSideRevenue(
     financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
 
-  const market = getOrCreateMarket();
   market.cumulativeProtocolSideRevenueUSD =
     market.cumulativeProtocolSideRevenueUSD.plus(revenueAmountUSD);
   market.cumulativeTotalRevenueUSD =
@@ -143,7 +145,8 @@ export function addProtocolSideRevenue(
 
 export function addSupplySideRevenue(
   event: ethereum.Event,
-  revenueAmountUSD: BigDecimal
+  revenueAmountUSD: BigDecimal,
+  market: Market
 ): void {
   const protocol = getOrCreateLiquityProtocol();
   protocol.cumulativeSupplySideRevenueUSD =
@@ -159,7 +162,6 @@ export function addSupplySideRevenue(
     financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
 
-  const market = getOrCreateMarket();
   market.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD.plus(revenueAmountUSD);
   market.cumulativeTotalRevenueUSD =
@@ -237,8 +239,14 @@ export function updateProtocolUSDLocked(
 
 export function updateProtocolUSDLockedStabilityPool(
   event: ethereum.Event,
+  lusdAmount: BigInt,
   stabilityPoolTVL: BigDecimal
 ): void {
+  const stabilityPool = getOrCreateStabilityPool(event);
+  stabilityPool.inputTokenBalance = lusdAmount;
+  stabilityPool.totalValueLockedUSD = stabilityPoolTVL;
+  stabilityPool.save();
+
   const protocol = getOrCreateLiquityProtocol();
   const market = getOrCreateMarket();
   const totalValueLocked = market.totalValueLockedUSD.plus(stabilityPoolTVL);

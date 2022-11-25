@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Account,
   Market,
@@ -12,6 +12,7 @@ import { getOrCreateAccount } from "./account";
 import {
   closeMarketPosition,
   getOrCreateMarket,
+  getOrCreateStabilityPool,
   openMarketBorrowerPosition,
   openMarketLenderPosition,
 } from "./market";
@@ -117,6 +118,28 @@ export function incrementPositionRepayCount(position: Position): void {
 export function incrementPositionLiquidationCount(position: Position): void {
   position.liquidationCount += 1;
   position.save();
+}
+
+export function updateSPUserPositionBalances(
+  event: ethereum.Event,
+  depositor: Address,
+  newBalance: BigInt
+): void {
+  const sp = getOrCreateStabilityPool(event);
+  const account = getOrCreateAccount(depositor);
+
+  const position = getOrCreateUserPosition(
+    event,
+    account,
+    sp,
+    PositionSide.LENDER
+  );
+  position.balance = newBalance;
+  if (position.balance.equals(BIGINT_ZERO)) {
+    closePosition(event, account, sp, position);
+  }
+  position.save();
+  getOrCreatePositionSnapshot(event, position);
 }
 
 export function updateUserPositionBalances(

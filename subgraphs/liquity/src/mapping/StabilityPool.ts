@@ -2,9 +2,11 @@ import {
   StabilityPool,
   StabilityPoolETHBalanceUpdated,
   StabilityPoolLUSDBalanceUpdated,
+  UserDepositChanged,
 } from "../../generated/StabilityPool/StabilityPool";
-import { getCurrentETHPrice } from "../entities/token";
+import { getCurrentETHPrice, getCurrentLUSDPrice } from "../entities/token";
 import { updateProtocolUSDLockedStabilityPool } from "../entities/protocol";
+import { updateSPUserPositionBalances } from "../entities/position";
 import { bigIntToBigDecimal } from "../utils/numbers";
 
 /**
@@ -17,11 +19,21 @@ export function handleStabilityPoolETHBalanceUpdated(
 ): void {
   const stabilityPool = StabilityPool.bind(event.address);
   const totalETHLocked = event.params._newBalance;
+  const totalETHValue = bigIntToBigDecimal(totalETHLocked).times(
+    getCurrentETHPrice()
+  );
+
   const totalLUSDLocked = stabilityPool.getTotalLUSDDeposits();
-  const totalValueLocked = bigIntToBigDecimal(totalETHLocked)
-    .times(getCurrentETHPrice())
-    .plus(bigIntToBigDecimal(totalLUSDLocked));
-  updateProtocolUSDLockedStabilityPool(event, totalValueLocked);
+  const LUSDValue = bigIntToBigDecimal(totalLUSDLocked).times(
+    getCurrentLUSDPrice()
+  );
+
+  const totalValueLocked = totalETHValue.plus(LUSDValue);
+  updateProtocolUSDLockedStabilityPool(
+    event,
+    totalLUSDLocked,
+    totalValueLocked
+  );
 }
 
 /**
@@ -34,9 +46,33 @@ export function handleStabilityPoolLUSDBalanceUpdated(
 ): void {
   const stabilityPool = StabilityPool.bind(event.address);
   const totalLUSDLocked = event.params._newBalance;
+  const LUSDValue = bigIntToBigDecimal(totalLUSDLocked).times(
+    getCurrentLUSDPrice()
+  );
   const totalETHLocked = stabilityPool.getETH();
-  const totalValueLocked = bigIntToBigDecimal(totalETHLocked)
-    .times(getCurrentETHPrice())
-    .plus(bigIntToBigDecimal(totalLUSDLocked));
-  updateProtocolUSDLockedStabilityPool(event, totalValueLocked);
+  const totalETHValue = bigIntToBigDecimal(totalETHLocked).times(
+    getCurrentETHPrice()
+  );
+
+  const totalValueLocked = totalETHValue.plus(LUSDValue);
+  updateProtocolUSDLockedStabilityPool(
+    event,
+    totalLUSDLocked,
+    totalValueLocked
+  );
+}
+
+/**
+ * Triggered when some deposit balance changes. We use this to track position
+ * value and deposits. But cannot accurately tell when it was caused by a withdrawal
+ * or just by the transformation of LUSD into ETH due to liquidations (see stability pool docs).
+ *
+ * @param event UserDepositChanged
+ */
+export function handleUserDepositChanged(event: UserDepositChanged): void {
+  updateSPUserPositionBalances(
+    event,
+    event.params._depositor,
+    event.params._newDeposit
+  );
 }

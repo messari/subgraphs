@@ -1,12 +1,16 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { Token } from "../../generated/schema";
+import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
+import { RewardToken, Token } from "../../generated/schema";
 import {
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
   LUSD_ADDRESS,
+  LQTY_ADDRESS,
+  RewardTokenType,
+  BIGDECIMAL_ONE,
 } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
+import { getUsdPricePerToken } from "../prices";
 
 export function getETHToken(): Token {
   const token = new Token(ETH_ADDRESS);
@@ -26,6 +30,26 @@ export function getLUSDToken(): Token {
   return token;
 }
 
+export function getLQTYToken(): Token {
+  const token = new Token(LQTY_ADDRESS);
+  token.name = "Liquity LQTY";
+  token.symbol = "LQTY";
+  token.decimals = 18;
+  token.save();
+  return token;
+}
+
+export function getRewardToken(): RewardToken {
+  const token = getLQTYToken();
+  const id = `${RewardTokenType.DEPOSIT}-${token.id}`;
+
+  const rToken = new RewardToken(id);
+  rToken.type = RewardTokenType.DEPOSIT;
+  rToken.token = token.id;
+  rToken.save();
+  return rToken;
+}
+
 export function setCurrentETHPrice(blockNumber: BigInt, price: BigInt): void {
   const token = getETHToken();
   token.lastPriceUSD = bigIntToBigDecimal(price);
@@ -36,4 +60,16 @@ export function setCurrentETHPrice(blockNumber: BigInt, price: BigInt): void {
 export function getCurrentETHPrice(): BigDecimal {
   const ethToken = Token.load(ETH_ADDRESS);
   return ethToken!.lastPriceUSD!;
+}
+
+export function getCurrentLUSDPrice(): BigDecimal {
+  const price = getUsdPricePerToken(Address.fromString(LUSD_ADDRESS));
+  if (price.reverted) {
+    return BIGDECIMAL_ONE; // default to 1
+  }
+
+  const token = Token.load(LUSD_ADDRESS)!;
+  token.lastPriceUSD = price.usdPrice;
+  token.save();
+  return token.lastPriceUSD;
 }

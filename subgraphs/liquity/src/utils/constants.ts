@@ -163,17 +163,19 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const TROVE_MANAGER = "0xA39739EF8b0231DbFA0DcdA07d7e29faAbCf4bb2";
+export const TROVE_MANAGER = "0xa39739ef8b0231dbfa0dcda07d7e29faabcf4bb2";
 
 export const ACTIVE_POOL_CREATED_TIMESTAMP = BigInt.fromI32(1617600130);
 
 export const ACTIVE_POOL_CREATED_BLOCK = BigInt.fromI32(12178562);
 
-export const ACTIVE_POOL = "0xDf9Eb223bAFBE5c5271415C75aeCD68C21fE3D7F";
+export const ACTIVE_POOL = "0xdf9eb223bafbe5c5271415c75aecd68c21fe3d7f";
 
-export const STABILITY_POOL = "0x66017D22b0f8556afDd19FC67041899Eb65a21bb";
+export const STABILITY_POOL = "0x66017d22b0f8556afdd19fc67041899eb65a21bb";
 
-export const LUSD_ADDRESS = "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0";
+export const LUSD_ADDRESS = "0x5f98805a4e8be255a32880fdec7f6728c6568ba0";
+
+export const LQTY_ADDRESS = "0x6dea81c8171d0ba574754ef6f8b412f2ed88c54d";
 
 export const MINIMUM_COLLATERAL_RATIO = BigDecimal.fromString("1.1");
 
