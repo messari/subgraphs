@@ -17,6 +17,29 @@ function App() {
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
 
+  const [issuesTitles, setIssuesTitles] = useState<any>([]);
+
+  const getGithubRepoIssues = () => {
+    fetch("https://api.github.com/repos/messari/subgraphs/issues?per_page=100&state=open", {
+      method: "GET",
+      headers: {
+        Accept: "*/*",
+        Authorization: "Bearer " + process.env.REACT_APP_GITHUB_API_KEY
+      },
+    })
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (json) {
+        if (Array.isArray(json)) {
+          setIssuesTitles(json.map((x: any) => x.title.toUpperCase().split(' ').join(" ")));
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   const getDeployments = () => {
     fetch("https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json", {
       method: "GET",
@@ -197,6 +220,10 @@ function App() {
   });
 
   useEffect(() => {
+    getGithubRepoIssues();
+  }, []);
+
+  useEffect(() => {
     if (decentralized && !Object.keys(decentralizedDeployments)?.length) {
       const decenDepos: { [x: string]: any } = {};
       const subs = [...decentralized.graphAccounts[0].subgraphs, ...decentralized.graphAccounts[1].subgraphs];
@@ -226,7 +253,7 @@ function App() {
       <DashboardVersion />
       <Routes>
         <Route path="/">
-          <Route index element={<DeploymentsPage getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} indexingStatusQueries={indexingStatusQueries} endpointSlugs={endpointSlugs} aliasToProtocol={aliasToProtocol} decentralizedDeployments={decentralizedDeployments} />} />
+          <Route index element={<DeploymentsPage issuesTitles={issuesTitles} getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} indexingStatusQueries={indexingStatusQueries} endpointSlugs={endpointSlugs} aliasToProtocol={aliasToProtocol} decentralizedDeployments={decentralizedDeployments} />} />
           <Route path="subgraph" element={<ProtocolDashboard protocolJSON={protocolsToQuery} getData={() => getDeployments()} subgraphEndpoints={subgraphEndpoints} decentralizedDeployments={decentralizedDeployments} />} />
           <Route path="protocols-list" element={<ProtocolsListByTVL protocolsToQuery={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route
