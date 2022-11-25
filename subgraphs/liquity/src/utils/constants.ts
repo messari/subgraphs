@@ -1,4 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { bigIntToBigDecimal } from "./numbers";
 
 ////////////////////
 ///// Versions /////
@@ -169,9 +170,9 @@ export const ACTIVE_POOL_CREATED_TIMESTAMP = BigInt.fromI32(1617600130);
 
 export const ACTIVE_POOL_CREATED_BLOCK = BigInt.fromI32(12178562);
 
-export const ACTIVE_POOL = "0xdf9eb223bafbe5c5271415c75aecd68c21fe3d7f";
+export const ACTIVE_POOL = "0xDf9Eb223bAFBE5c5271415C75aeCD68C21fE3D7F";
 
-export const STABILITY_POOL = "0x66017d22b0f8556afdd19fc67041899eb65a21bb";
+export const STABILITY_POOL = "0x66017D22b0f8556afDd19FC67041899Eb65a21bb";
 
 export const LUSD_ADDRESS = "0x5f98805a4e8be255a32880fdec7f6728c6568ba0";
 
@@ -187,3 +188,19 @@ export const LIQUIDATION_FEE_PERCENT = BigDecimal.fromString("0.5");
 export const LIQUIDATION_FEE = LIQUIDATION_FEE_PERCENT.div(BIGDECIMAL_HUNDRED);
 
 export const LIQUIDATION_RESERVE_LUSD = BigDecimal.fromString("200");
+
+// Rewards Calculation Constants
+
+// Issuance factor.
+// https://github.com/liquity/dev/blob/main/packages/contracts/contracts/LQTY/CommunityIssuance.sol#L37
+export const STABILITY_POOL_LQTY_ISSUANCE_FACTOR = bigIntToBigDecimal(
+  BigInt.fromString("999998681227695000")
+);
+
+// 32 Million
+// https://github.com/liquity/dev/blob/main/packages/contracts/contracts/LQTY/CommunityIssuance.sol#L45
+export const STABILITY_POOL_LQTY_BUGDET = BigDecimal.fromString("32000000");
+
+// Timestamp when CommunityIssuance contract was deployed.
+// https://etherscan.io/tx/0xb77963d3d9280625c886b82f593cc742998cdfa69be7fe9946dea429dcebd8bf
+export const STABILITY_POOL_REWARD_START = BigInt.fromI32(1617611537);

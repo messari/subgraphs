@@ -71,5 +71,5 @@ export function getCurrentLUSDPrice(): BigDecimal {
   const token = Token.load(LUSD_ADDRESS)!;
   token.lastPriceUSD = price.usdPrice;
   token.save();
-  return token.lastPriceUSD;
+  return token.lastPriceUSD!;
 }

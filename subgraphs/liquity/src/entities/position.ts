@@ -6,9 +6,12 @@ import {
   PositionSnapshot,
   _Trove,
 } from "../../generated/schema";
+import { getUsdPrice } from "../prices";
 import { BIGINT_ZERO, INT_ZERO } from "../utils/constants";
 import { PositionSide } from "../utils/constants";
+import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateAccount } from "./account";
+import { createDeposit } from "./event";
 import {
   closeMarketPosition,
   getOrCreateMarket,
@@ -134,12 +137,21 @@ export function updateSPUserPositionBalances(
     sp,
     PositionSide.LENDER
   );
+
+  const delta = newBalance.minus(position.balance);
   position.balance = newBalance;
   if (position.balance.equals(BIGINT_ZERO)) {
     closePosition(event, account, sp, position);
   }
   position.save();
   getOrCreatePositionSnapshot(event, position);
+
+  const lusdAddr = Address.fromString(sp.inputToken);
+  const deltaUSD = getUsdPrice(lusdAddr, bigIntToBigDecimal(delta));
+
+  if (delta.gt(BIGINT_ZERO)) {
+    createDeposit(event, sp, lusdAddr, delta, deltaUSD, depositor);
+  } // negative doesn't imply withdrawal.
 }
 
 export function updateUserPositionBalances(

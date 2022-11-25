@@ -254,9 +254,9 @@ export function setMarketETHBalance(
 
 export function addMarketDepositVolume(
   event: ethereum.Event,
+  market: Market,
   depositedUSD: BigDecimal
 ): void {
-  const market = getOrCreateMarket();
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(depositedUSD);
   market.save();
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);

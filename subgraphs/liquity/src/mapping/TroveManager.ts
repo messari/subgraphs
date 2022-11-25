@@ -23,6 +23,7 @@ import {
   LUSD_ADDRESS,
   ZERO_ADDRESS,
   ACTIVE_POOL,
+  ETH_ADDRESS,
 } from "../utils/constants";
 import { _Trove } from "../../generated/schema";
 import {
@@ -117,7 +118,15 @@ export function handleTroveLiquidated(event: TroveLiquidated): void {
     const collateralRewardUSD = bigIntToBigDecimal(collateralRewardETH).times(
       getCurrentETHPrice()
     );
-    createDeposit(event, collateralRewardETH, collateralRewardUSD, borrower);
+    const ethAddress = Address.fromString(ETH_ADDRESS);
+    createDeposit(
+      event,
+      getOrCreateMarket(),
+      ethAddress,
+      collateralRewardETH,
+      collateralRewardUSD,
+      borrower
+    );
   }
   const borrowAmountLUSD = newDebt.minus(trove.debt);
   if (borrowAmountLUSD.gt(BIGINT_ZERO)) {
@@ -136,12 +145,20 @@ function applyPendingRewards(event: TroveUpdated, trove: _Trove): void {
   const borrower = event.params._borrower;
   const newCollateral = event.params._coll;
   const newDebt = event.params._debt;
+  const ethAddress = Address.fromString(ETH_ADDRESS);
 
   const collateralRewardETH = newCollateral.minus(trove.collateral);
   const collateralRewardUSD = bigIntToBigDecimal(collateralRewardETH).times(
     getCurrentETHPrice()
   );
-  createDeposit(event, collateralRewardETH, collateralRewardUSD, borrower);
+  createDeposit(
+    event,
+    getOrCreateMarket(),
+    ethAddress,
+    collateralRewardETH,
+    collateralRewardUSD,
+    borrower
+  );
   const borrowAmountLUSD = newDebt.minus(trove.debt);
   const borrowAmountUSD = bigIntToBigDecimal(borrowAmountLUSD);
   createBorrow(event, borrowAmountLUSD, borrowAmountUSD, borrower);
@@ -173,6 +190,7 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
   );
   createWithdraw(
     event,
+    getOrCreateMarket(),
     withdrawAmountETH,
     withdrawAmountUSD,
     Address.fromString(trove.id),
@@ -196,11 +214,6 @@ function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
     Address.fromString(trove.id),
     event.transaction.from
   );
-  const liquidatedDebtUSD = bigIntToBigDecimal(trove.debt);
-  const supplySideRevenueUSD = amountLiquidatedUSD
-    .times(BIGDECIMAL_ONE.minus(LIQUIDATION_FEE))
-    .minus(liquidatedDebtUSD);
-  addSupplySideRevenue(event, supplySideRevenueUSD, getOrCreateMarket());
   addProtocolSideRevenue(event, profitUSD, getOrCreateMarket());
 }
 
