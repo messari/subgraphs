@@ -8,13 +8,20 @@ import { Token, Vault } from '../generated/schema'
 import { prices } from './utils/prices'
 import { decimals } from './utils'
 import { protocols } from './utils/protocols'
+import { strategies } from './utils/strategies'
+import { metrics } from './utils/metrics'
 
 export function handleAddVaultAndStrategy(call: AddVaultAndStrategyCall): void {
   let vaultAddress = call.inputs._vault
+  let strategyAddress = call.inputs._strategy
   let timestamp = call.block.timestamp
   let blockNumber = call.block.number
 
   vaults.createVault(vaultAddress, timestamp, blockNumber)
+
+  let strategy = strategies.getOrCreateStrategy(strategyAddress)
+  strategy.vault = vaultAddress.toHexString()
+  strategy.save()
 }
 
 export function handleSharePriceChangeLog(event: SharePriceChangeLog): void {
@@ -39,8 +46,6 @@ export function handleSharePriceChangeLog(event: SharePriceChangeLog): void {
     inputToken.decimals as u8
   )
 
-  const oldInputTokenBalance = vault.inputTokenBalance
-
   const newInputTokenBalance = vaults.extractInputTokenBalance(vaultAddress)
 
   if (!newInputTokenBalance) return
@@ -51,13 +56,11 @@ export function handleSharePriceChangeLog(event: SharePriceChangeLog): void {
 
   vault.inputTokenBalance = newInputTokenBalance
 
-  //TODO: Review this logic
-  const profit = newInputTokenBalance.minus(oldInputTokenBalance)
+  metrics.updateVaultSnapshots(vaultAddress, event.block)
+  metrics.updateFinancials(event.block)
 
   //If theres more input token than before, and the same amount of output token
   //Output token price should be updated
-
-  //TVL, revenue, metrics, etc should be updated
 
   vault.save()
 

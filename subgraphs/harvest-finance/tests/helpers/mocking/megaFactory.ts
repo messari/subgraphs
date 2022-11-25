@@ -7,6 +7,7 @@ export function megaFactory(
   tokenAddress: Address,
   poolAddress: Address,
   vaultAddress: Address,
+  strategyAddress: Address,
   id: string
 ): void {
   createMockedFunction(
@@ -19,9 +20,7 @@ export function megaFactory(
       ethereum.Value.fromI32(0),
       ethereum.Value.fromAddress(tokenAddress),
       ethereum.Value.fromAddress(vaultAddress),
-      ethereum.Value.fromAddress(
-        Address.fromString('0x0000000000000000000000000000000000000000')
-      ),
+      ethereum.Value.fromAddress(strategyAddress),
       ethereum.Value.fromAddress(poolAddress),
     ])
 }

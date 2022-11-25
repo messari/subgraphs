@@ -1,7 +1,7 @@
 import { Address } from '@graphprotocol/graph-ts'
 import { assert, describe, test, afterEach, clearStore } from 'matchstick-as'
 import { helpers } from './helpers'
-import { RewardToken } from '../generated/schema'
+import { RewardToken, _Strategy } from '../generated/schema'
 import { handleDeploymentCompleted } from '../src/megaFactory'
 import { createVaultAndProtocol } from './helpers/mocking/vault'
 
@@ -43,6 +43,12 @@ describe('MegaFactory', () => {
       const poolAddress = Address.fromString(
         '0x0000000000000000000000000000000000000005'
       )
+
+      //Create strategy
+      const strategyAddress = Address.fromString(
+        '0x0000000000000000000000000000000000000006'
+      )
+
       helpers.mocking.potPool.potPool(poolAddress, tokenAddress, Address.zero())
 
       //Create megaFactory
@@ -54,6 +60,7 @@ describe('MegaFactory', () => {
         tokenAddress,
         poolAddress,
         Address.fromString(vault.id),
+        strategyAddress,
         '0'
       )
 
@@ -73,6 +80,17 @@ describe('MegaFactory', () => {
         vault.id,
         'rewardTokens',
         helpers.toStringArray([tokenAddress.toHexString()])
+      )
+
+      //Assert strategy entity created
+      assert.assertNotNull(_Strategy.load(strategyAddress.toHexString()))
+
+      //Assert strategy has vault
+      assert.fieldEquals(
+        '_Strategy',
+        strategyAddress.toHexString(),
+        'vault',
+        vault.id
       )
     })
   })

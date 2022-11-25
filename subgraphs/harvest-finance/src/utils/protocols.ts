@@ -1,4 +1,4 @@
-import { Address, BigDecimal } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, log } from '@graphprotocol/graph-ts'
 import { Vault, YieldAggregator } from '../../generated/schema'
 import { constants } from './constants'
 
@@ -61,5 +61,31 @@ export namespace protocols {
     protocol.totalPoolCount = 0
 
     return protocol
+  }
+
+  export function updateRevenue(
+    protocolId: string,
+    profitAmountUSD: BigDecimal,
+    feeAmountUSD: BigDecimal
+  ): void {
+    const protocol = YieldAggregator.load(protocolId)
+
+    if (!protocol) {
+      log.debug('Yield aggregator not found with ID: {}', [protocolId])
+      return
+    }
+
+    protocol.cumulativeTotalRevenueUSD =
+      protocol.cumulativeTotalRevenueUSD.plus(profitAmountUSD)
+
+    protocol.cumulativeProtocolSideRevenueUSD =
+      protocol.cumulativeProtocolSideRevenueUSD.plus(feeAmountUSD)
+
+    protocol.cumulativeSupplySideRevenueUSD =
+      protocol.cumulativeSupplySideRevenueUSD.plus(
+        profitAmountUSD.minus(feeAmountUSD)
+      )
+
+    protocol.save()
   }
 }

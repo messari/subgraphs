@@ -20,6 +20,8 @@ dataSources:
       abis:
         - name: ControllerContract
           file: ./abis/Controller.json
+        - name: Strategy
+          file: ./abis/Strategy.json
         - name: VaultContract
           file: ./abis/Vault.json
         - name: ERC20Contract
@@ -35,6 +37,43 @@ dataSources:
       callHandlers:
         - function: addVaultAndStrategy(address,address)
           handler: handleAddVaultAndStrategy
+      eventHandlers:
+        - event: SharePriceChangeLog(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleSharePriceChangeLog
+      file: ./src/controller.ts
+
+  - kind: ethereum
+    name: ControllerV2
+    network: {{ network }}
+    source:
+      address: '0x3cC47874dC50D98425ec79e647d83495637C55e3'
+      startBlock: 12652884
+      abi: ControllerContract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - YieldAggregator
+        - Token
+      abis:
+        - name: ControllerContract
+          file: ./abis/Controller.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: VaultContract
+          file: ./abis/Vault.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: ChainLinkContract
+          file: ./abis/ChainLink.json
+        - name: YearnLensContract
+          file: ./abis/YearnLens.json
+        - name: UniswapRouterContract
+          file: ./abis/UniswapRouter.json
+        - name: UniswapPairContract
+          file: ./abis/UniswapV2Pair.json
       eventHandlers:
         - event: SharePriceChangeLog(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleSharePriceChangeLog
@@ -107,6 +146,7 @@ dataSources:
         - event: DeploymentCompleted(string)
           handler: handleDeploymentCompleted
       file: ./src/megaFactory.ts
+
 templates:
   - kind: ethereum/contract
     name: Vault
@@ -140,7 +180,36 @@ templates:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/vault.ts
-          
+
+  - kind: ethereum/contract
+    name: Strategy
+    network: {{ network }}
+    source:
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - _Strategy
+      abis:
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: ChainLinkContract
+          file: ./abis/ChainLink.json
+        - name: YearnLensContract
+          file: ./abis/YearnLens.json
+        - name: UniswapRouterContract
+          file: ./abis/UniswapRouter.json
+        - name: UniswapPairContract
+          file: ./abis/UniswapV2Pair.json
+      eventHandlers:
+        - event: ProfitLogInReward(uint256,uint256,uint256)
+          handler: handleProfitLogInReward
+      file: ./src/strategy.ts
+
   - kind: ethereum/contract
     name: PotPool
     network: {{ network }}

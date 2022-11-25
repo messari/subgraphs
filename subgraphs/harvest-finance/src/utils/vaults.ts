@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt, BigDecimal, log } from '@graphprotocol/graph-ts'
 import { VaultContract } from '../../generated/Controller/VaultContract'
 import { Vault } from '../../generated/schema'
 import { constants } from '../utils/constants'
@@ -189,5 +189,27 @@ export namespace vaults {
     vault.save()
 
     VaultTemplate.create(vaultAddress)
+  }
+
+  export function updateRevenue(
+    vaultAddress: string,
+    profitAmountUSD: BigDecimal,
+    feeAmountUSD: BigDecimal
+  ): void {
+    const vault = Vault.load(vaultAddress)
+    if (!vault) return
+
+    vault.cumulativeTotalRevenueUSD =
+      vault.cumulativeTotalRevenueUSD.plus(profitAmountUSD)
+
+    vault.cumulativeProtocolSideRevenueUSD =
+      vault.cumulativeProtocolSideRevenueUSD.plus(feeAmountUSD)
+
+    vault.cumulativeSupplySideRevenueUSD =
+      vault.cumulativeSupplySideRevenueUSD.plus(
+        profitAmountUSD.minus(feeAmountUSD)
+      )
+
+    vault.save()
   }
 }
