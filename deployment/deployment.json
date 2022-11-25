@@ -2215,8 +2215,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "arweave-mainnet",
-            "query-id": "arweave-mainnet"
+            "slug": "network-arweave-mainnet",
+            "query-id": "network-arweave-mainnet"
           }
         }
       }
