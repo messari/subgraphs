@@ -19,7 +19,7 @@ import { Rewards as PoolRewardsContract } from "../../generated/templates/PoolTe
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/LiquidityGauge/Gauge";
 import { GaugeController as GaugeControllereContract } from "../../generated/GaugeController/GaugeController";
 
-export function getRewardsData_v1(gaugeAddress: Address): RewardsInfoType {
+export function getRewardsData_v1(gaugeAddress: Address, block: ethereum.Block): RewardsInfoType {
   let rewardRates: BigInt[] = [];
   let rewardTokens: Address[] = [];
 
@@ -42,8 +42,13 @@ export function getRewardsData_v1(gaugeAddress: Address): RewardsInfoType {
     let rewardRateCall = gaugeContract.try_reward_data(rewardToken);
     if (!rewardRateCall.reverted) {
       let rewardRate = rewardRateCall.value.getRate();
-
-      rewardRates.push(rewardRate);
+      let periodFinish = rewardRateCall.value.getPeriod_finish();
+      
+      if (periodFinish.lt(block.timestamp)) {
+        rewardRates.push(constants.BIGINT_ZERO)
+      } else {
+        rewardRates.push(rewardRate);
+      }
     } else {
       rewardRates.push(constants.BIGINT_ZERO);
     }
