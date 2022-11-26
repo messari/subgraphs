@@ -1,6 +1,6 @@
 # Subgraph Schema: Lending Protocol
 # Version: 1.3.0
-# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
     ARBITRUM_ONE
@@ -322,6 +322,9 @@ type LendingProtocol implements Protocol @entity {
 
     " Treasury fee stored in decimals (e.g. 0.01 for 1%). This is the establishment fee to the treasury."
     _treasuryFee: BigDecimal!
+
+    " List of market IDs "
+    _marketIDs: [String!]!
 }
 
 ###############################

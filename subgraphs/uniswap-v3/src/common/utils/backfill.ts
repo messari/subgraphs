@@ -11,7 +11,11 @@ import {
   INT_ONE,
   INT_ZERO,
 } from "../constants";
-import { getOrCreateDex, getOrCreateToken, getTradingFee } from "../getters";
+import {
+  getOrCreateProtocol,
+  getOrCreateToken,
+  getTradingFee,
+} from "../getters";
 import { updateTokenWhitelists } from "../updateMetrics";
 import { Pool as PoolTemplate } from "../../../generated/templates";
 import { Pool } from "../../../generated/Factory/Pool";
@@ -25,7 +29,7 @@ import { POOL_MAPPINGS } from "./poolMappings";
  * before regenesis.
  */
 export function populateEmptyPools(event: ethereum.Event): void {
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
   const length = POOL_MAPPINGS.length;
 
   for (let i = 0; i < length; ++i) {

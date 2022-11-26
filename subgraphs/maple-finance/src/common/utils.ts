@@ -6,14 +6,14 @@ import { ONE_BD, ONE_BI, TEN_BD, ZERO_BI } from "./constants";
 
 // Functions designed to try...catch erc20 name/symbol/decimals to prevent errors
 export function getAssetName(address: Address): string {
-    let contract = ERC20.bind(address);
-    let nameCall = contract.try_name();
+    const contract = ERC20.bind(address);
+    const nameCall = contract.try_name();
     if (!nameCall.reverted) {
         return nameCall.value;
     }
 
-    let bytesContract = ERC20NameBytes.bind(address);
-    let nameBytesCall = bytesContract.try_name();
+    const bytesContract = ERC20NameBytes.bind(address);
+    const nameBytesCall = bytesContract.try_name();
     if (!nameBytesCall.reverted) {
         return nameBytesCall.value.toString();
     }
@@ -23,14 +23,14 @@ export function getAssetName(address: Address): string {
 }
 
 export function getAssetSymbol(address: Address): string {
-    let contract = ERC20.bind(address);
-    let symbolCall = contract.try_symbol();
+    const contract = ERC20.bind(address);
+    const symbolCall = contract.try_symbol();
     if (!symbolCall.reverted) {
         return symbolCall.value;
     }
 
-    let bytesContract = ERC20SymbolBytes.bind(address);
-    let symbolBytesCall = bytesContract.try_symbol();
+    const bytesContract = ERC20SymbolBytes.bind(address);
+    const symbolBytesCall = bytesContract.try_symbol();
     if (!symbolBytesCall.reverted) {
         return symbolBytesCall.value.toString();
     }
@@ -40,8 +40,8 @@ export function getAssetSymbol(address: Address): string {
 }
 
 export function getAssetDecimals(address: Address): i32 {
-    let contract = ERC20.bind(address);
-    let decimalsCall = contract.try_decimals();
+    const contract = ERC20.bind(address);
+    const decimalsCall = contract.try_decimals();
     if (!decimalsCall.reverted) {
         return decimalsCall.value;
     }
@@ -107,10 +107,7 @@ export function formatUnits(value: BigDecimal, decimals: i32): BigInt {
  */
 export function computeNewAverage(oldAvg: BigDecimal, oldCount: BigInt, newVal: BigDecimal): BigDecimal {
     // new_avg = (old_avg * old_count + new_val) / (oldCount + 1)
-    return oldAvg
-        .times(oldCount.toBigDecimal())
-        .plus(newVal)
-        .div(oldCount.plus(ONE_BI).toBigDecimal());
+    return oldAvg.times(oldCount.toBigDecimal()).plus(newVal).div(oldCount.plus(ONE_BI).toBigDecimal());
 }
 
 /**

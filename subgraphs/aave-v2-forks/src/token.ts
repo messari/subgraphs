@@ -7,18 +7,18 @@ export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
-  let contract = ERC20.bind(tokenAddress);
-  let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);
+  const contract = ERC20.bind(tokenAddress);
+  const contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);
 
   // try types string and bytes32 for symbol
   let symbolValue = UNKNOWN_TOKEN_VALUE;
-  let symbolResult = contract.try_symbol();
+  const symbolResult = contract.try_symbol();
   if (!symbolResult.reverted) {
     return symbolResult.value;
   }
 
   // non-standard ERC20 implementation
-  let symbolResultBytes = contractSymbolBytes.try_symbol();
+  const symbolResultBytes = contractSymbolBytes.try_symbol();
   if (!symbolResultBytes.reverted) {
     // for broken pairs that have no symbol function exposed
     if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
@@ -30,18 +30,18 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
 }
 
 export function fetchTokenName(tokenAddress: Address): string {
-  let contract = ERC20.bind(tokenAddress);
-  let contractNameBytes = ERC20NameBytes.bind(tokenAddress);
+  const contract = ERC20.bind(tokenAddress);
+  const contractNameBytes = ERC20NameBytes.bind(tokenAddress);
 
   // try types string and bytes32 for name
   let nameValue = UNKNOWN_TOKEN_VALUE;
-  let nameResult = contract.try_name();
+  const nameResult = contract.try_name();
   if (!nameResult.reverted) {
     return nameResult.value;
   }
 
   // non-standard ERC20 implementation
-  let nameResultBytes = contractNameBytes.try_name();
+  const nameResultBytes = contractNameBytes.try_name();
   if (!nameResultBytes.reverted) {
     // for broken exchanges that have no name function exposed
     if (!isNullEthValue(nameResultBytes.value.toHexString())) {
@@ -53,12 +53,12 @@ export function fetchTokenName(tokenAddress: Address): string {
 }
 
 export function fetchTokenDecimals(tokenAddress: Address): i32 {
-  let contract = ERC20.bind(tokenAddress);
+  const contract = ERC20.bind(tokenAddress);
 
   // try types uint8 for decimals
-  let decimalResult = contract.try_decimals();
+  const decimalResult = contract.try_decimals();
   if (!decimalResult.reverted) {
-    let decimalValue = decimalResult.value;
+    const decimalValue = decimalResult.value;
     return decimalValue;
   }
 

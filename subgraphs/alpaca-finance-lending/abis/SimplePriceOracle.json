@@ -1,0 +1,124 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token0",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token1",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "price",
+        "type": "uint256"
+      }
+    ],
+    "name": "PriceUpdate",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token0", "type": "address" },
+      { "internalType": "address", "name": "token1", "type": "address" }
+    ],
+    "name": "getPrice",
+    "outputs": [
+      { "internalType": "uint256", "name": "price", "type": "uint256" },
+      { "internalType": "uint256", "name": "lastUpdate", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_feeder", "type": "address" }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_feeder", "type": "address" }
+    ],
+    "name": "setFeeder",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address[]", "name": "token0s", "type": "address[]" },
+      { "internalType": "address[]", "name": "token1s", "type": "address[]" },
+      { "internalType": "uint256[]", "name": "prices", "type": "uint256[]" }
+    ],
+    "name": "setPrices",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "store",
+    "outputs": [
+      { "internalType": "uint192", "name": "price", "type": "uint192" },
+      { "internalType": "uint64", "name": "lastUpdate", "type": "uint64" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

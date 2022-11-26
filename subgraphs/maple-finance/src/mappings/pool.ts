@@ -1,9 +1,9 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 import {
     LoanV1 as LoanV1Template,
     LoanV2 as LoanV2Template,
-    LoanV3 as LoanV3Template
+    LoanV3 as LoanV3Template,
 } from "../../generated/templates";
 import {
     PoolStateChanged as PoolStateChangedEvent,
@@ -11,26 +11,26 @@ import {
     Transfer as TransferEvent,
     Claim as ClaimEvent,
     DefaultSuffered as DefaultSufferedEvent,
-    FundsWithdrawn as FundsWithdrawnEvent
+    FundsWithdrawn as FundsWithdrawnEvent,
 } from "../../generated/templates/Pool/Pool";
 
-import { LoanVersion, PoolState, ZERO_BD, ZERO_BI } from "../common/constants";
+import { LoanVersion, PoolState } from "../common/constants";
 import {
     getOrCreateFinancialsDailySnapshot,
-    getOrCreateMarketHourlySnapshot
+    getOrCreateMarketHourlySnapshot,
 } from "../common/mappingHelpers/getOrCreate/snapshots";
 import { getOrCreateMarketDailySnapshot } from "../common/mappingHelpers/getOrCreate/snapshots";
 import {
     getOrCreateAccountMarket,
     getOrCreateLoan,
     getOrCreateMarket,
-    getOrCreateStakeLocker
+    getOrCreateStakeLocker,
 } from "../common/mappingHelpers/getOrCreate/markets";
 import {
     createClaim,
     createDeposit,
     createLiquidate,
-    createWithdraw
+    createWithdraw,
 } from "../common/mappingHelpers/getOrCreate/transactions";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 import { getTokenAmountInUSD } from "../common/prices/prices";
@@ -236,9 +236,8 @@ export function handleClaim(event: ClaimEvent): void {
     // Update stake locker
     ////
     const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
-    stakeLocker.cumulativeInterestInPoolInputTokens = stakeLocker.cumulativeInterestInPoolInputTokens.plus(
-        poolDelegateInterestAmount
-    );
+    stakeLocker.cumulativeInterestInPoolInputTokens =
+        stakeLocker.cumulativeInterestInPoolInputTokens.plus(poolDelegateInterestAmount);
     stakeLocker.save();
 
     ////
@@ -261,27 +260,24 @@ export function handleClaim(event: ClaimEvent): void {
     // Update financial snapshot
     ////
     const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
-    financialsDailySnapshot.dailySupplySideRevenueUSD = financialsDailySnapshot.dailySupplySideRevenueUSD.plus(
-        totalInterestAmountUSD
-    );
+    financialsDailySnapshot.dailySupplySideRevenueUSD =
+        financialsDailySnapshot.dailySupplySideRevenueUSD.plus(totalInterestAmountUSD);
     financialsDailySnapshot.save();
 
     ////
     // Update market snapshot
     ////
     const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
-    marketDailySnapshot.dailySupplySideRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
-        totalInterestAmountUSD
-    );
+    marketDailySnapshot.dailySupplySideRevenueUSD =
+        marketDailySnapshot.dailySupplySideRevenueUSD.plus(totalInterestAmountUSD);
     marketDailySnapshot.dailyRepayUSD = marketDailySnapshot.dailyRepayUSD.plus(
         principalRepayAmountUSD.plus(totalInterestAmountUSD)
     );
     marketDailySnapshot.save();
 
     const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-    marketHourlySnapshot.hourlySupplySideRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
-        totalInterestAmountUSD
-    );
+    marketHourlySnapshot.hourlySupplySideRevenueUSD =
+        marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(totalInterestAmountUSD);
     marketHourlySnapshot.hourlyRepayUSD = marketHourlySnapshot.hourlyRepayUSD.plus(
         principalRepayAmountUSD.plus(totalInterestAmountUSD)
     );

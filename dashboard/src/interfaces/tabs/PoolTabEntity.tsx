@@ -1,11 +1,13 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Tooltip, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
-import { convertTokenDecimals, downloadCSV, JSONToCSVConvertor, toDate } from "../../utils";
+import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
+import JSZip from "jszip";
+import { UploadFileCSV } from "../../common/utilComponents/UploadFileCSV";
 
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
@@ -47,9 +49,11 @@ function addDataPoint(
 
 interface PoolTabEntityProps {
   data: any;
+  overlayData: any;
   currentEntityData: any[];
   entityName: string;
   entitiesData: { [x: string]: { [x: string]: string } };
+  overlayPoolTimeseriesData: any;
   poolId: string;
   protocolData: { [x: string]: any };
   setIssues: React.Dispatch<{ [x: string]: { message: string; type: string; level: string; fieldName: string }[] }>;
@@ -58,14 +62,17 @@ interface PoolTabEntityProps {
 
 function PoolTabEntity({
   data,
+  overlayData,
   currentEntityData,
   entityName,
   entitiesData,
+  overlayPoolTimeseriesData,
   poolId,
   protocolData,
   setIssues,
   issuesProps,
 }: PoolTabEntityProps) {
+
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   // Get the key name of the pool specific to the protocol type (singular and plural)
   const poolKeySingular = PoolName[data.protocols[0].type];
@@ -74,6 +81,32 @@ function PoolTabEntity({
   const excludedEntities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "usageMetricsHourlySnapshots"];
   const list: { [x: string]: any } = {};
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
+  const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
+  const [csvJSON, setCsvJSON] = useState<any>(null);
+  const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
+
+  useEffect(() => {
+    if (downloadAllCharts) {
+      if (chartsImageFiles) {
+        if (Object.keys(chartsImageFiles).length > 0) {
+          let zip = new JSZip();
+          Object.keys(chartsImageFiles).forEach(fileName => {
+            const blob = base64toBlobJPEG(chartsImageFiles[fileName]);
+            if (blob) {
+              zip.file(fileName + '.jpeg', blob);
+            }
+          });
+          zip.generateAsync({ type: "base64" }).then(function (content) {
+            const link = document.createElement('a');
+            link.download = "charts.zip";
+            link.href = "data:application/zip;base64," + content;
+            link.click()
+            triggerDownloadAllCharts(false);
+          });
+        }
+      }
+    }
+  }, [chartsImageFiles])
 
   useEffect(() => {
     if (!!downloadAllCharts) {
@@ -88,7 +121,6 @@ function PoolTabEntity({
   });
 
   try {
-    // entityName is the type of entity being looped through
     if (!poolId) {
       return null;
     }
@@ -109,8 +141,13 @@ function PoolTabEntity({
     const dataFields: { [dataField: string]: { date: number; value: number }[] } = {};
     // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
     const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
+
+    const overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+
     for (let x = currentEntityData.length - 1; x >= 0; x--) {
       const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+      const overlayDifference = currentEntityData.length - overlayPoolTimeseriesData.length;
+      const overlayTimeseriesInstance: { [x: string]: any } = overlayPoolTimeseriesData[x - overlayDifference];
 
       // For exchange protocols, calculate the baseYield
       if (data.protocols[0].type === "EXCHANGE") {
@@ -132,7 +169,27 @@ function PoolTabEntity({
           dataFieldMetrics.baseYield.sum += value;
         }
       }
+
+      if (overlayData?.protocols[0]?.type === "EXCHANGE" && overlayTimeseriesInstance) {
+        let value = 0;
+        if (Object.keys(overlayData[poolKeySingular]?.fees)?.length > 0 && overlayTimeseriesInstance.totalValueLockedUSD) {
+          const revenueUSD =
+            Number(overlayTimeseriesInstance.dailySupplySideRevenueUSD) * 365 ||
+            Number(overlayTimeseriesInstance.hourlySupplySideRevenueUSD) * 24 * 365;
+          value = (revenueUSD / Number(overlayTimeseriesInstance.totalValueLockedUSD)) * 100;
+          if (!value) {
+            value = 0;
+          }
+        }
+        if (!overlayDataFields.baseYield) {
+          overlayDataFields.baseYield = [];
+        } else {
+          overlayDataFields.baseYield.push({ value, date: Number(overlayTimeseriesInstance.timestamp) });
+        }
+      }
+
       // Take the given timeseries instance and loop thru the fields of the instance (ie totalValueLockedUSD)
+      let skip = false;
       for (let z = 0; z < Object.keys(timeseriesInstance).length; z++) {
         const fieldName = Object.keys(timeseriesInstance)[z];
         if (fieldName === "timestamp" || fieldName === "__typename" || fieldName === "id") {
@@ -140,6 +197,12 @@ function PoolTabEntity({
         }
         const capsFieldName = fieldName.toUpperCase();
         const currentInstanceField = timeseriesInstance[fieldName];
+        let currentOverlayInstanceField: any = null;
+        if (overlayTimeseriesInstance) {
+          if (Object.keys(overlayTimeseriesInstance).includes(fieldName)) {
+            currentOverlayInstanceField = overlayTimeseriesInstance[fieldName];
+          }
+        }
         let value: any = currentInstanceField;
         try {
           if (!value && value !== 0 && !Array.isArray(currentInstanceField)) {
@@ -165,9 +228,13 @@ function PoolTabEntity({
             );
             dataFields[fieldName] = returnedData.currentEntityField;
             dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
-            continue;
+            if (overlayTimeseriesInstance) {
+              skip = true;
+            } else {
+              continue;
+            }
           }
-          if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField) {
+          if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField && !skip) {
             // Add the data to the array held on the dataField key of the fieldName
             if (!dataFields[fieldName]) {
               dataFields[fieldName] = [];
@@ -209,10 +276,9 @@ function PoolTabEntity({
             );
             dataFields[fieldName] = returnedData.currentEntityField;
             dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
-
           }
 
-          if (fieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField) {
+          if (fieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField && !skip) {
             // Catch the fields for reward token data that is optional but would be handled as an array
             let dataFieldKey = "";
             let iterateArray = data[poolKeySingular][fieldName];
@@ -249,8 +315,12 @@ function PoolTabEntity({
                 }
               }
             });
-            continue;
-          } else if (Array.isArray(currentInstanceField)) {
+            if (overlayTimeseriesInstance) {
+              skip = true;
+            } else {
+              continue;
+            }
+          } else if (Array.isArray(currentInstanceField) && !skip) {
             // If the instance field data is an array, extrapolate this array into multiple keys (one for each element of the array)
             currentInstanceField.forEach((val: any, arrayIndex: number) => {
               // Determine the name/label/id of each element to be separated out of the array
@@ -417,6 +487,253 @@ function PoolTabEntity({
             });
           }
         }
+        if (x < overlayDifference && overlayPoolTimeseriesData.length > 0) {
+          overlayDataFields[fieldName] = [
+            { value: 0, date: Number(timeseriesInstance.timestamp) },
+            ...overlayDataFields[fieldName],
+          ];
+          continue
+        }
+        if (!overlayTimeseriesInstance) {
+          continue;
+        }
+        value = currentOverlayInstanceField;
+        try {
+          if (!value && value !== 0 && !Array.isArray(currentOverlayInstanceField)) {
+            value = 0;
+            if (!overlayDataFields[fieldName]) {
+              overlayDataFields[fieldName] = [];
+            }
+            if (capsFieldName === "REWARDTOKENEMISSIONSUSD") {
+              if (!overlayDataFields.rewardAPR) {
+                overlayDataFields.rewardAPR = [];
+              }
+              overlayDataFields.rewardAPR.push(value);
+            }
+            const returnedData = addDataPoint(
+              overlayDataFields,
+              dataFieldMetrics,
+              fieldName,
+              Number(value),
+              overlayTimeseriesInstance.timestamp,
+              overlayTimeseriesInstance.id,
+            );
+            overlayDataFields[fieldName] = returnedData.currentEntityField;
+            continue;
+          }
+          if (!isNaN(currentOverlayInstanceField) && !Array.isArray(currentOverlayInstanceField) && currentOverlayInstanceField) {
+            // Add the data to the array held on the dataField key of the fieldName
+            if (!overlayDataFields[fieldName]) {
+              overlayDataFields[fieldName] = [];
+            }
+
+            value = currentOverlayInstanceField;
+            if (
+              (capsFieldName.includes("OUTPUTTOKEN") &&
+                capsFieldName !== "OUTPUTTOKEN" &&
+                !capsFieldName.includes("USD")) ||
+              capsFieldName === "PRICEPERSHARE"
+            ) {
+              value = convertTokenDecimals(currentOverlayInstanceField, data[poolKeySingular]?.outputToken?.decimals);
+            }
+            if (fieldName === "inputTokenBalance") {
+              const dec = overlayData[poolKeySingular].inputToken.decimals;
+              value = convertTokenDecimals(currentOverlayInstanceField, dec);
+            }
+
+            const returnedData = addDataPoint(
+              overlayDataFields,
+              dataFieldMetrics,
+              fieldName,
+              Number(value),
+              overlayTimeseriesInstance.timestamp,
+              overlayTimeseriesInstance.id,
+            );
+            overlayDataFields[fieldName] = returnedData.currentEntityField;
+          }
+
+          if (fieldName.toUpperCase().includes("REWARDTOKEN") && !currentOverlayInstanceField) {
+            // Catch the fields for reward token overlayData that is optional but would be handled as an array
+            let dataFieldKey = "";
+            let iterateArray = overlayData[poolKeySingular][fieldName];
+            if (!Array.isArray(iterateArray)) {
+              iterateArray = overlayData[poolKeySingular]?.rewardTokens;
+            }
+            iterateArray.forEach((item: any, idx: number) => {
+              const token = overlayData[poolKeySingular]?.rewardTokens[idx];
+              if (token?.token?.name) {
+                dataFieldKey = " [" + token?.token?.name + "]";
+              } else {
+                dataFieldKey = " [" + idx + "]";
+              }
+              if (!overlayDataFields[fieldName + dataFieldKey]) {
+                overlayDataFields[fieldName + dataFieldKey] = [{ value: 0, date: Number(overlayTimeseriesInstance.timestamp) }];
+              } else {
+                overlayDataFields[fieldName + dataFieldKey].push({
+                  value: 0,
+                  date: Number(overlayTimeseriesInstance.timestamp),
+                });
+              }
+              if (fieldName === "rewardTokenEmissionsUSD") {
+                if (!overlayDataFields["rewardAPR" + dataFieldKey]) {
+                  overlayDataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: Number(overlayTimeseriesInstance.timestamp) }];
+                } else {
+                  overlayDataFields["rewardAPR" + dataFieldKey].push({
+                    value: 0,
+                    date: Number(overlayTimeseriesInstance.timestamp),
+                  });
+                }
+              }
+            });
+            continue;
+          } else if (Array.isArray(currentOverlayInstanceField)) {
+            // If the instance field overlayData is an array, extrapolate this array into multiple keys (one for each element of the array)
+            currentOverlayInstanceField.forEach((val: any, arrayIndex: number) => {
+              // Determine the name/label/id of each element to be separated out of the array
+              let fieldSplitIdentifier = arrayIndex.toString();
+              let value: number = 0;
+              if (!isNaN(Number(val))) {
+                value = Number(val);
+              } else if (typeof val === "object") {
+                const holdingValueKey = Object.keys(val).find((x) => {
+                  return !isNaN(Number(val[x]));
+                });
+                if (holdingValueKey) {
+                  value = Number(val[holdingValueKey]);
+                }
+                if (val["type"]) {
+                  fieldSplitIdentifier = val["type"];
+                } else {
+                  const holdingValueStr = Object.keys(val).find((x) => {
+                    return typeof val[x] === "string" && isNaN(Number(val[x]));
+                  });
+                  if (holdingValueStr) {
+                    fieldSplitIdentifier = holdingValueStr;
+                  }
+                }
+              }
+
+              if (fieldName === "rates") {
+                fieldSplitIdentifier = val.id.split("-0x")[0];
+              }
+              const dataFieldKey = fieldName + " [" + fieldSplitIdentifier + "]";
+
+              // Save the overlayData to the overlayDataFields object array
+              if (!overlayDataFields[dataFieldKey]) {
+                overlayDataFields[dataFieldKey] = [];
+              }
+
+              if (value || value === 0) {
+                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT")) {
+                  // convert the value with decimals for certain fields
+                  value = convertTokenDecimals(val, overlayData[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
+                }
+
+                if (fieldName === "rewardTokenEmissionsAmount") {
+                  // If the current field is rewardTokenEmissionsAmount, convert the value with decimals
+                  // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
+                  const currentRewardToken = overlayData[poolKeySingular].rewardTokens[arrayIndex];
+                  if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
+                    value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
+                  } else {
+                    value = convertTokenDecimals(val, 18);
+                  }
+                }
+
+                if (fieldName === "rewardTokenEmissionsUSD") {
+                  //Convert emissions amount in USD to APR
+                  const currentRewardToken = overlayData[poolKeySingular].rewardTokens[arrayIndex];
+                  const factors = ["rewardTokenEmissionsUSD"];
+                  let apr = 0;
+                  if (
+                    currentRewardToken?.type === "BORROW" &&
+                    overlayData.protocols[0]?.type === "LENDING" &&
+                    overlayTimeseriesInstance?.totalBorrowBalanceUSD
+                  ) {
+                    apr = (Number(val) / overlayTimeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
+                    factors.push("snapshot.totalBorrowBalanceUSD");
+                  } else if (
+                    currentRewardToken?.type === "BORROW" &&
+                    issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length ===
+                    0
+                  ) {
+                    issues.push({
+                      type: "BORROW",
+                      message:
+                        "Attempted to calculate APR of BORROW reward token. Field 'totalBorrowBalanceUSD' is not present in the timeseries instance.",
+                      level: "critical",
+                      fieldName: entityName + "-" + fieldName,
+                    });
+                  } else if (overlayTimeseriesInstance?.totalDepositBalanceUSD && overlayData.protocols[0].type === "LENDING") {
+                    factors.push("snapshot.totalDepositBalanceUSD");
+                    apr = (Number(val) / overlayTimeseriesInstance.totalDepositBalanceUSD) * 100 * 365;
+                  } else {
+                    if (
+                      !Number(overlayTimeseriesInstance?.stakedOutputTokenAmount) ||
+                      !Number(overlayTimeseriesInstance?.outputTokenSupply)
+                    ) {
+                      factors.push("snapshot.totalValueLockedUSD");
+                      apr = (Number(val) / Number(overlayTimeseriesInstance.totalValueLockedUSD)) * 100 * 365;
+                    } else {
+                      factors.push(
+                        "snapshot.totalValueLockedUSD",
+                        "snapshot.stakedOutputTokenAmount",
+                        "snapshot.outputTokenSupply",
+                      );
+                      apr =
+                        (Number(val) /
+                          (Number(overlayTimeseriesInstance.totalValueLockedUSD) *
+                            (Number(overlayTimeseriesInstance?.stakedOutputTokenAmount) /
+                              Number(overlayTimeseriesInstance?.outputTokenSupply)))) *
+                        100 *
+                        365;
+                    }
+                  }
+
+                  if (!apr || !isFinite(apr)) {
+                    apr = 0;
+                  }
+                  // Create the reward APR [idx] field
+                  if (!overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
+                    overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
+                      { value: apr, date: Number(overlayTimeseriesInstance.timestamp) },
+                    ];
+                  } else {
+                    overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
+                      value: apr,
+                      date: Number(overlayTimeseriesInstance.timestamp),
+                    });
+                  }
+                }
+              } else {
+                value = 0;
+              }
+              const returnedData = addDataPoint(
+                overlayDataFields,
+                dataFieldMetrics,
+                dataFieldKey,
+                Number(value),
+                overlayTimeseriesInstance.timestamp,
+                overlayTimeseriesInstance.id,
+              );
+              overlayDataFields[dataFieldKey] = returnedData.currentEntityField;
+            });
+          }
+        } catch (err) {
+          if (issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0) {
+            let message = "JAVASCRIPT ERROR";
+            if (err instanceof Error) {
+              message = err.message;
+            }
+            console.log(err);
+            issues.push({
+              type: "JS",
+              message: message,
+              level: "critical",
+              fieldName: entityName + "-" + fieldName,
+            });
+          }
+        }
       }
     }
 
@@ -552,15 +869,7 @@ function PoolTabEntity({
         rewardAPRElement = null;
       } else {
         rewardAPRElement = (
-          <div id={elementId}>
-            <Box mt={3} mb={1}>
-              <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-                <Typography variant="h6">{elementId}</Typography>
-              </CopyLinkToClipboard>
-            </Box>
-            <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} />
-
-          </div>
+          <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
         );
       }
     }
@@ -592,14 +901,7 @@ function PoolTabEntity({
         }
       });
       ratesElement = (
-        <div key={elementId} id={elementId}>
-          <Box mt={3} mb={1}>
-            <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-              <Typography variant="h6">{elementId}</Typography>
-            </CopyLinkToClipboard>
-          </Box>
-          <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} />
-        </div>
+        <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
       );
     }
 
@@ -797,6 +1099,7 @@ function PoolTabEntity({
             <Typography variant="h4">{entityName}</Typography>
           </CopyLinkToClipboard>
         </Box>
+        <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} /></Tooltip>
         <div>
           <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
           <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Charts</div>
@@ -957,15 +1260,18 @@ function PoolTabEntity({
           if (fieldName.toUpperCase().includes("OUTPUT") && !data[poolKeySingular]?.outputToken) {
             return null;
           }
+          let dataChartToPass: any = dataFields[field];
+          let baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}`;
+          if (overlayDataFields[field]) {
+            const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network || ""}-${overlayData?.protocols[0]?.subgraphVersion}`;
+            let keyDiff = "";
+            if (baseKey === overlayKey) {
+              keyDiff = ' (Overlay)';
+            }
+            dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
+          }
           return (
-            <div key={elementId} id={linkToElementId}>
-              <Box mt={3} mb={1}>
-                <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
-                  <Typography variant="h6">{label}</Typography>
-                </CopyLinkToClipboard>
-              </Box>
-              <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataFields[field]} />
-            </div>
+            <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
           );
         })}
         {ratesElement}

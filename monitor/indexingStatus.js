@@ -130,7 +130,6 @@ export async function generateIndexStatusQuery(deployments) {
 
   try {
 
-
     Object.keys(deployments).forEach((name) => {
       fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += `        
               ${name

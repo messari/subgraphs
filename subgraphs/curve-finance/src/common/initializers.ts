@@ -24,6 +24,7 @@ import * as constants from "./constants";
 import { getUsdPricePerToken } from "../prices";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
+import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -89,9 +90,6 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     );
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
-    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Network.MAINNET;
     protocol.type = constants.ProtocolType.EXCHANGE;
 
@@ -104,9 +102,13 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
     protocol._poolIds = [];
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }
@@ -156,7 +158,8 @@ export function getOrCreateFinancialDailySnapshots(
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = constants.Mainnet.REGISTRY_ADDRESS.toHexString();
+    financialMetrics.protocol =
+      constants.Mainnet.REGISTRY_ADDRESS.toHexString();
 
     financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailyVolumeUSD = constants.BIGDECIMAL_ZERO;

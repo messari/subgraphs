@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
+import { AtomicMatch_Call } from "../generated/OpenSea/OpenSea";
 import { Trade, _Item } from "../generated/schema";
 import { NetworkConfigs } from "../configurations/configure";
 import {

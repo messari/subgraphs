@@ -50,13 +50,16 @@ export class SushiswapAvalancheConfigurations implements Configurations {
       )
     );
   }
-  getTradeFee(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  getLPFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
@@ -79,6 +82,9 @@ export class SushiswapAvalancheConfigurations implements Configurations {
   }
   getRewardToken(): string {
     return toLowerCase("0x37B608519F91f70F2EeB0e5Ed9AF4061722e4F76");
+  }
+  getBrokenERC20Tokens(): string[] {
+    return [];
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([

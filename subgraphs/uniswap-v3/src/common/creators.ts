@@ -13,7 +13,7 @@ import { Pool as PoolTemplate } from "../../generated/templates";
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
-  getOrCreateDex,
+  getOrCreateProtocol,
   getOrCreateToken,
 } from "./getters";
 import { NetworkConfigs } from "../../configurations/configure";
@@ -47,7 +47,7 @@ export function createLiquidityPool(
   token1Address: string,
   fees: i32
 ): void {
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
 
   // create the tokens and tokentracker
   const token0 = getOrCreateToken(token0Address);
@@ -159,7 +159,7 @@ export function createDeposit(
   const pool = getLiquidityPool(poolAddress);
   const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
 
   const token0 = getOrCreateToken(pool.inputTokens[0]);
   const token1 = getOrCreateToken(pool.inputTokens[1]);
@@ -230,18 +230,16 @@ export function createDeposit(
 // Also, updated token balances and total value locked.
 export function createWithdraw(
   event: ethereum.Event,
-  owner: Address,
   recipient: Address,
   amount0: BigInt,
-  amount1: BigInt,
-  isCollect: boolean
+  amount1: BigInt
 ): void {
   const poolAddress = event.address.toHexString();
 
   const pool = getLiquidityPool(poolAddress);
   const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
 
   const token0 = getOrCreateToken(pool.inputTokens[0]);
   const token1 = getOrCreateToken(pool.inputTokens[1]);
@@ -298,7 +296,6 @@ export function createWithdraw(
   withdrawal.inputTokenAmounts = [amount0, amount1];
   withdrawal.pool = pool.id;
   withdrawal.amountUSD = amountUSD;
-  withdrawal.isCollect = isCollect;
 
   withdrawal.save();
   pool.save();
@@ -317,7 +314,7 @@ export function createSwapHandleVolumeAndFees(
   sqrtPriceX96: BigInt
 ): void {
   const poolAddress = event.address.toHexString();
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
 
   const pool = getLiquidityPool(poolAddress);
   const poolAmounts = getLiquidityPoolAmounts(poolAddress);

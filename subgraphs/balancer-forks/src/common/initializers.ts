@@ -25,6 +25,7 @@ import { getUsdPricePerToken } from "../prices";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
+import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -103,9 +104,6 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     protocol = new DexAmmProtocol(constants.VAULT_ADDRESS.toHexString());
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
-    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Protocol.NETWORK;
     protocol.type = constants.ProtocolType.EXCHANGE;
 
@@ -121,6 +119,12 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
 
     protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }
