@@ -272,7 +272,14 @@ export function createPositionSnapshot(
   snapShot.blockNumber = event.block.number;
   snapShot.timestamp = event.block.timestamp;
 
-  snapShot.save();                               
+  snapShot.save();     
+  let snapShots = position.snapshots;
+  if(!snapShots) {
+    snapShots = new Array<string>();
+  }
+  snapShots.push(snapShot.id);
+  position.snapshots = snapShots;
+  position.save();
 
 }
 

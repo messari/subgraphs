@@ -702,8 +702,8 @@ type Position @entity {
   # " All withdraw events of this position "
   # withdraws: [Withdraw!]! @derivedFrom(field: "position")
 
-  # " Position daily snapshots for open positions "
-  # snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
+  " Position daily snapshots for open positions "
+  snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
 
 # Unlike other snapshots that are taken at a fixed time interval. Position
