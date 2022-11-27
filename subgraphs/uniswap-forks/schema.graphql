@@ -797,27 +797,36 @@ type Deposit @entity {
   amountUSD: BigDecimal!
 }
 
-type Withdraw implements Event @entity {
+type Withdraw @entity {
   " withdraw-{ Transaction hash }-{ Log index }"
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
   hash: String!
 
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
+  " Gas limit of the transaction that emitted this event "
+  gasLimit: BigInt!
+
+  " Gas price of the transaction that emitted this event "
+  gasPrice: BigInt!
 
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Address that received the tokens "
-  to: String!
+  " Account that emitted this event "
+  account: Account!
 
-  " Address that sent the tokens "
-  from: String!
+  " The user position changed by this event "
+  position: Position!
 
-  # " The user position changed by this event "
-  # position: Position! 
+  " The pool involving this event "
+  pool: LiquidityPool!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -839,9 +848,6 @@ type Withdraw implements Event @entity {
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
-
-  " The pool involving this transaction "
-  pool: LiquidityPool!
 }
 
 type Swap implements Event @entity {
@@ -1077,4 +1083,13 @@ type _CircularBuffer @entity {
 
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
+}
+
+
+type _PositionCounter @entity {
+  " { Account address }-{ Market address }"
+  id: ID!
+  " Next count "
+  # Increment this when a position is closed
+  nextCount: Int!
 }
