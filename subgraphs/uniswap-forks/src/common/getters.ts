@@ -19,6 +19,7 @@ import {
   UsageMetricsHourlySnapshot,
   Position,
   PositionSnapshot,
+  _PositionCounter,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
@@ -52,11 +53,21 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
 
   const account = getOrCreateAccount(event);
 
+  const counterId = account.id
+                        .concat("-")
+                        .concat(pool.id)
+  let counter = _PositionCounter.load(counterId);                      
   // Open position always ends with zero
+  if(!counter) {
+    counter = new _PositionCounter(counterId)
+    counter.nextCount = 0;
+    counter.save();
+  }
   const positionId = account.id
                             .concat("-")
                             .concat(pool.id)
-                            .concat("-0");
+                            .concat("-")
+                            .concat(counter.nextCount.toString());
   let position = Position.load(positionId);
   if(!position) {
     position = new Position(positionId);
@@ -68,7 +79,7 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     position.depositCount = INT_ZERO;
     position.inputTokenBalances = new Array<BigInt>(pool.inputTokens.length).map<BigInt>(()=>BIGINT_ZERO);
     position.withdrawCount = INT_ZERO;
-    position.save();    
+    position.save(); 
   }
 
   return position;
