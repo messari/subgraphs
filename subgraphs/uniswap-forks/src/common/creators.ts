@@ -11,6 +11,7 @@ import {
   Swap as SwapEvent,
   Position,
   PositionSnapshot,
+  _PositionCounter,
 } from "../../generated/schema";
 import { Pair as PairTemplate } from "../../generated/templates";
 import {
@@ -290,32 +291,53 @@ export function createWithdraw(
 
   const logIndexI32 = event.logIndex.toI32();
   const transactionHash = event.transaction.hash.toHexString();
-  const withdrawal = new Withdraw(
+  const withdrawl = new Withdraw(
     transactionHash.concat("-").concat(event.logIndex.toString())
   );
 
-  withdrawal.hash = transactionHash;
-  withdrawal.logIndex = logIndexI32;
-  withdrawal.protocol = NetworkConfigs.getFactoryAddress();
-  withdrawal.to = transfer.sender!;
-  withdrawal.from = pool.id;
-  withdrawal.blockNumber = event.block.number;
-  withdrawal.timestamp = event.block.timestamp;
-  withdrawal.inputTokens = [
+  withdrawl.hash = transactionHash;
+  withdrawl.logIndex = logIndexI32;
+  withdrawl.protocol = NetworkConfigs.getFactoryAddress();
+  let account = getOrCreateAccount(event)
+  withdrawl.account = account.id;
+  withdrawl.nonce = event.transaction.nonce;
+  withdrawl.gasLimit = event.transaction.gasLimit;
+  withdrawl.gasPrice = event.transaction.gasPrice;
+  withdrawl.blockNumber = event.block.number;
+  withdrawl.timestamp = event.block.timestamp;
+  withdrawl.inputTokens = [
     pool.inputTokens[INT_ZERO],
     pool.inputTokens[INT_ONE],
   ];
-  withdrawal.outputToken = pool.outputToken;
-  withdrawal.inputTokenAmounts = [amount0, amount1];
-  withdrawal.outputTokenAmount = transfer.liquidity;
-  withdrawal.amountUSD = token0
+  withdrawl.outputToken = pool.outputToken;
+  withdrawl.inputTokenAmounts = [amount0, amount1];
+  withdrawl.outputTokenAmount = transfer.liquidity;
+  withdrawl.amountUSD = token0
     .lastPriceUSD!.times(token0Amount)
     .plus(token1.lastPriceUSD!.times(token1Amount));
-  withdrawal.pool = pool.id;
+  withdrawl.pool = pool.id;
+
+  // update positions
+  const position = getOrCreatePosition(event);
+  let inputTokenBalances = position.inputTokenBalances;
+  inputTokenBalances[0] = inputTokenBalances[0].minus(amount0);
+  inputTokenBalances[1] = inputTokenBalances[1].minus(amount1);
+  position.inputTokenBalances = inputTokenBalances;
+    // if input token balances are zero, close the position
+  if(inputTokenBalances[0] == BIGINT_ZERO && inputTokenBalances[1] == BIGINT_ZERO) {
+    position.hashClosed = event.transaction.hash.toHexString();
+    position.timestampClosed = event.block.timestamp;
+    position.blockNumberClosed = event.block.number;
+    let counter = _PositionCounter.load(account.id.concat("-").concat(pool.id));
+    counter!.nextCount += 1;
+    counter!.save();
+  }
+  position.save();
 
   store.remove("_Transfer", transfer.id);
-
-  withdrawal.save();
+  
+  withdrawl.position = position.id; 
+  withdrawl.save();
 }
 
 // Handle swaps data and update entities volumes and fees
