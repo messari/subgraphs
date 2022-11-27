@@ -33,6 +33,10 @@ export function updateProtocolAndPoolTvl(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
   );
+  pool.outputTokenPriceUSD = getOrCreateToken(
+    Address.fromString(PROTOCOL_ID),
+    block.number
+  ).lastPriceUSD;
   pool.save();
 
   // Protocol
@@ -52,6 +56,7 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
   poolMetricsDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsDailySnapshot.inputTokenBalances = pool.inputTokenBalances;
   poolMetricsDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
+  poolMetricsDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsDailySnapshot.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
   poolMetricsDailySnapshot.cumulativeSupplySideRevenueUSD =
@@ -64,11 +69,12 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
   poolMetricsHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsHourlySnapshot.inputTokenBalances = pool.inputTokenBalances;
   poolMetricsHourlySnapshot.outputTokenSupply = pool.outputTokenSupply;
-  poolMetricsDailySnapshot.cumulativeProtocolSideRevenueUSD =
+  poolMetricsHourlySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsHourlySnapshot.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
-  poolMetricsDailySnapshot.cumulativeSupplySideRevenueUSD =
+  poolMetricsHourlySnapshot.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
-  poolMetricsDailySnapshot.cumulativeTotalRevenueUSD =
+  poolMetricsHourlySnapshot.cumulativeTotalRevenueUSD =
     pool.cumulativeTotalRevenueUSD;
   poolMetricsHourlySnapshot.save();
 
@@ -85,7 +91,7 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
 export function updateTotalRevenueMetrics(
   block: ethereum.Block,
   revenueETH: BigInt,
-  totalShares: BigInt
+  totalSupply: BigInt
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
@@ -103,7 +109,7 @@ export function updateTotalRevenueMetrics(
   // Pool
   pool.cumulativeTotalRevenueUSD =
     pool.cumulativeTotalRevenueUSD.plus(stakingRewardsUSD);
-  pool.outputTokenSupply = totalShares;
+  pool.outputTokenSupply = totalSupply;
   pool.outputTokenPriceUSD = getOrCreateToken(
     Address.fromString(PROTOCOL_ID),
     block.number
