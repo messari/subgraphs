@@ -236,8 +236,8 @@ export function createDeposit(
 
   position.depositCount += 1;
   position.save();
-  // update position snapshot
-
+  // create a position snapshot
+  createPositionSnapshot(event, position);
   updateDepositHelper(event.address);
 
 }
