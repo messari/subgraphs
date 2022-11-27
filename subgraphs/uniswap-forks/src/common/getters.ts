@@ -45,18 +45,13 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
   // Create the Id
   // Load from the Id
   // If not create a new position
-  let transfer = getOrCreateTransfer(event);
-
   const pool = getLiquidityPool(
     event.address.toHexString(),
     event.block.number
   );
 
-  let account = Account.load(transfer.sender!)
-  if(!account) {
-    account = new Account(transfer.sender!)
-    account.save()
-  }
+  const account = getOrCreateAccount(event);
+
   // Open position always ends with zero
   const positionId = account.id
                             .concat("-")
@@ -73,12 +68,22 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     position.depositCount = INT_ZERO;
     position.inputTokenBalances = new Array<BigInt>(pool.inputTokens.length).map<BigInt>(()=>BIGINT_ZERO);
     position.withdrawCount = INT_ZERO;
-    position.snapshots = new Array<string>();
     position.save();    
   }
 
   return position;
   
+}
+
+export function getOrCreateAccount(event:ethereum.Event): Account {
+  let transfer = getOrCreateTransfer(event);
+
+  let account = Account.load(transfer.sender!)
+  if(!account) {
+    account = new Account(transfer.sender!)
+    account.save()
+  }
+  return account;
 }
 
 export function getOrCreateProtocol(): DexAmmProtocol {

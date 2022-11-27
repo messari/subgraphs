@@ -39,6 +39,7 @@ import {
   getOrCreateLPToken,
   getLiquidityPoolAmounts,
   getOrCreatePosition,
+  getOrCreateAccount,
 } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import {
@@ -202,9 +203,12 @@ export function createDeposit(
 
   deposit.hash = transactionHash;
   deposit.logIndex = logIndexI32;
+  deposit.nonce = event.transaction.nonce;
   deposit.protocol = NetworkConfigs.getFactoryAddress();
-  deposit.to = pool.id;
-  deposit.from = transfer.sender!;
+  deposit.gasLimit = event.transaction.gasLimit;
+  deposit.gasPrice = event.transaction.gasPrice;
+  const account = getOrCreateAccount(event);
+  deposit.account = account.id
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = [pool.inputTokens[INT_ZERO], pool.inputTokens[INT_ONE]];
@@ -226,9 +230,6 @@ export function createDeposit(
   tokenInputBalances[0] = tokenInputBalances[0].plus(amount0);
   tokenInputBalances[1] = tokenInputBalances[1].plus(amount1);
   position.inputTokenBalances = tokenInputBalances;
-  
-  // TODO: Create position snapshot
-  // TODO: Output token balances
   position.save();
   deposit.position = position.id;
   deposit.save();
@@ -273,13 +274,6 @@ export function createPositionSnapshot(
   snapShot.timestamp = event.block.timestamp;
 
   snapShot.save();     
-  let snapShots = position.snapshots;
-  if(!snapShots) {
-    snapShots = new Array<string>();
-  }
-  snapShots.push(snapShot.id);
-  position.snapshots = snapShots;
-  position.save();
 
 }
 
