@@ -4,7 +4,7 @@ import { rocketTokenRETH } from "../../generated/rocketTokenRETH/rocketTokenRETH
 import { Staker } from "../../generated/schema";
 import { generalUtilities } from "../utilities/generalutilities";
 import { stakerUtilities } from "../utilities/stakerUtilities";
-import { rocketPoolEntityFactory } from "../entityfactory";
+import { rocketPoolEntityFactory } from "../entityFactory";
 import { ethereum } from "@graphprotocol/graph-ts";
 import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
 

@@ -1,6 +1,6 @@
 import { BigInt, Address } from "@graphprotocol/graph-ts";
 import { generalUtilities } from "../utilities/generalutilities";
-import { rocketPoolEntityFactory } from "../entityfactory";
+import { rocketPoolEntityFactory } from "../entityFactory";
 import { Node, NetworkNodeTimezone } from "../../generated/schema";
 import {
   rocketNodeManager,

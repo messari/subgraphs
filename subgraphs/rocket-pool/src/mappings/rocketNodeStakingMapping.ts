@@ -6,20 +6,20 @@ import {
 } from "../../generated/rocketNodeStaking/rocketNodeStaking";
 import { rocketNetworkPrices } from "../../generated/rocketNodeStaking/rocketNetworkPrices";
 import { rocketNodeStaking } from "../../generated/rocketNodeStaking/rocketNodeStaking";
-import { ONE_ETHER_IN_WEI } from "./../constants/generalconstants";
+import { ONE_ETHER_IN_WEI } from "../Constants/generalConstants";
 import {
   ROCKET_NODE_STAKING_CONTRACT_ADDRESS,
   ROCKET_NETWORK_PRICES_CONTRACT_ADDRESS,
-} from "./../constants/contractconstants";
+} from "../Constants/contractConstants";
 import {
   NODERPLSTAKETRANSACTIONTYPE_STAKED,
   NODERPLSTAKETRANSACTIONTYPE_WITHDRAWAL,
   NODERPLSTAKETRANSACTIONTYPE_SLASHED,
-} from "./../constants/enumconstants";
+} from "../Constants/enumConstants";
 import { Node } from "../../generated/schema";
 import { ethereum } from "@graphprotocol/graph-ts";
 import { generalUtilities } from "../utilities/generalutilities";
-import { rocketPoolEntityFactory } from "../entityfactory";
+import { rocketPoolEntityFactory } from "../entityFactory";
 import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
 
 /**

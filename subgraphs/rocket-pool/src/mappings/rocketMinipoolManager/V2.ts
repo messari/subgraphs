@@ -9,9 +9,9 @@ import { rocketNodeStaking } from "../../../generated/rocketMinipoolManagerV2/ro
 import {
   ROCKET_NETWORK_FEES_CONTRACT_ADDRESS,
   ROCKET_NODE_STAKING_CONTRACT_ADDRESS,
-} from "../../constants/contractconstants";
+} from "../../Constants/contractConstants";
 import { Minipool, Node } from "../../../generated/schema";
-import { rocketPoolEntityFactory } from "../../entityfactory";
+import { rocketPoolEntityFactory } from "../../entityFactory";
 import {
   rocketMinipoolDelegateV1,
   rocketMinipoolDelegateV2,
