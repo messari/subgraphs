@@ -71,7 +71,6 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     position.timestampOpened = event.block.timestamp;
     position.depositCount = INT_ZERO;
     position.inputTokenBalances = new Array<BigInt>(pool.inputTokens.length).map<BigInt>(()=>BIGINT_ZERO);
-    position.cumulativeRewardTokenAmounts = new Array<BigInt>();
     position.withdrawCount = INT_ZERO;
     position.save();    
   }
