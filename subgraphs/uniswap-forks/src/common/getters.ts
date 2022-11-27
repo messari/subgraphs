@@ -18,7 +18,6 @@ import {
   LiquidityPoolHourlySnapshot,
   UsageMetricsHourlySnapshot,
   Position,
-  Deposit,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
@@ -74,8 +73,9 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     position.inputTokenBalances = new Array<BigInt>(pool.inputTokens.length).map<BigInt>(()=>BIGINT_ZERO);
     position.cumulativeRewardTokenAmounts = new Array<BigInt>();
     position.withdrawCount = INT_ZERO;
+    position.save();    
   }
-  position.save();
+
   return position;
   
 }
