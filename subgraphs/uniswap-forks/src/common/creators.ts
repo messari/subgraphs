@@ -260,11 +260,15 @@ export function createPositionSnapshot(
   const snapShot = new PositionSnapshot(snapshotId);
   
   snapShot.hash = event.transaction.hash.toHexString();
-  snapShot.logIndex = event.logIndex;
+  snapShot.logIndex = event.logIndex.toI32();
   snapShot.nonce = event.transaction.nonce;
   snapShot.position = position.id;
   snapShot.inputTokenBalances = position.inputTokenBalances.map<BigInt>(value => value);
-  snapShot.cumulativeRewardTokenAmounts = position.cumulativeRewardTokenAmounts.map<BigInt>(value => value);
+  let cumulativeRewards = position.cumulativeRewardTokenAmounts;
+  if(cumulativeRewards) {
+    snapShot.cumulativeRewardTokenAmounts = cumulativeRewards.map<BigInt>(value => value);
+  }
+  
   snapShot.blockNumber = event.block.number;
   snapShot.timestamp = event.block.timestamp;
 
