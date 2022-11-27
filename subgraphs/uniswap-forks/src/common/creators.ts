@@ -18,6 +18,7 @@ import {
   Swap as SwapEvent,
   Token,
   Position,
+  PositionSnapshot,
 } from "../../generated/schema";
 import { Pair as PairTemplate } from "../../generated/templates";
 import {
@@ -170,44 +171,7 @@ export function createAndIncrementAccount(accountId: string): i32 {
   return INT_ZERO;
 }
 
-/**
- * Create a position 
- * id format is  " { Account address }-{ Market address }-{ Count }"
- * id { Count } is always 0 for the active position
- */
-export function createPosition(
-  event: ethereum.Event,
-  amount0: BigInt,
-  amount1: BigInt
-): void {
-  const transfer = getOrCreateTransfer(event);
 
-  const pool = getLiquidityPool(
-    event.address.toHexString(),
-    event.block.number
-  );
-
-  // Open position always ends with zero
-  const positionId = transfer.sender!
-                            .concat("-")
-                            .concat(pool.id)
-                            .concat("-0");
-  let position = Position.load(positionId);
-  if(position == null) {
-    position = new Position(positionId);
-    position.account = transfer.sender!
-    position.pool = pool.id;
-    position.hashOpened = event.transaction.hash.toHexString();
-    position.blockNumberOpened = event.block.number;
-    position.timestampOpened = event.block.timestamp;
-    position.depositCount = BIGINT_ZERO;
-    let inputTokenBalances = new Array<BigInt>(2);
-    inputTokenBalances = [ INT_ZERO, INT_ZERO ]
-    position.inputTokenBalances = inputTokenBalances;
-    position.withdrawCount= INT_ZERO;
-  }
-
-}
 
 // Create a Deposit entity and update deposit count on a Mint event for the specific pool..
 export function createDeposit(
@@ -272,8 +236,39 @@ export function createDeposit(
 
   position.depositCount += 1;
   position.save();
+  // update position snapshot
 
   updateDepositHelper(event.address);
+
+}
+
+/**
+ * Creates a snapshot of a position. Called evertime there is a position event
+ * e.g. Deposit or Withdrawl
+ * @param event 
+ * @param position 
+ */
+export function createPositionSnapshot(
+  event:ethereum.Event, 
+  position:Position
+): void {
+  const snapshotId = position.id.concat("-")
+                                .concat(event.transaction.hash.toHexString())
+                                .concat("-")
+                                .concat(event.logIndex.toString());
+
+  const snapShot = new PositionSnapshot(snapshotId);
+  
+  snapShot.hash = event.transaction.hash.toHexString();
+  snapShot.logIndex = event.logIndex;
+  snapShot.nonce = event.transaction.nonce;
+  snapShot.position = position.id;
+  snapShot.inputTokenBalances = position.inputTokenBalances.map<BigInt>(value => value);
+  snapShot.cumulativeRewardTokenAmounts = position.cumulativeRewardTokenAmounts.map<BigInt>(value => value);
+  snapShot.blockNumber = event.block.number;
+  snapShot.timestamp = event.block.timestamp;
+
+  snapShot.save();                               
 
 }
 

@@ -706,6 +706,44 @@ type Position @entity {
   # snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
 
+# Unlike other snapshots that are taken at a fixed time interval. Position
+# snapshots should be taken after every event, including the opening and
+# closing events. This will prevent an ever growing number of snapshots
+# for positions that are not moving. As we are only recording the balance
+# in token amounts instead of in USD, this will work well.
+# Note that we only take snapshot for open positions
+type PositionSnapshot @entity {
+  " { Position ID }-{ Transaction hash }-{ Log index } "
+  id: ID!
+
+  " Transaction hash of the transaction that triggered this snapshot "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Nonce of the transaction that triggered this snapshot "
+  nonce: BigInt!
+
+  " Position of this snapshot "
+  position: Position!
+
+  " Input token balances in this position, in native amounts "
+  inputTokenBalances: [BigInt!]!
+
+  " Output token balance in this position, in native amounts "
+  outputTokenBalance: BigInt
+
+  " Total reward token accumulated under this position, in native amounts "
+  cumulativeRewardTokenAmounts: [BigInt!]
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
 type Deposit implements Event @entity {
   " deposit-{ Transaction hash }-{ Log index } "
   id: ID!
