@@ -2,12 +2,10 @@ import { styled } from "../styled";
 import { useNavigate } from "react-router";
 import { SearchInput } from "../common/utilComponents/SearchInput";
 import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
-import { Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { NewClient } from "../utils";
 import { useEffect, useMemo, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
-import { useQuery } from "@apollo/client";
-import { decentralizedNetworkSubgraphsQuery } from "../queries/decentralizedNetworkSubgraphsQuery";
 import DevCountTable from "./DevCountTable";
 import IndexingCalls from "./IndexingCalls";
 
@@ -23,10 +21,10 @@ interface DeploymentsPageProps {
   endpointSlugs: string[];
   aliasToProtocol: any;
   decentralizedDeployments: any;
-  issuesTitles: any;
+  issuesMapping: any;
 }
 
-function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol, decentralizedDeployments, issuesTitles }: DeploymentsPageProps) {
+function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol, decentralizedDeployments, issuesMapping }: DeploymentsPageProps) {
 
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
@@ -158,7 +156,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         {devCountTable}
         <DeploymentsTable
           getData={() => getData()}
-          issuesTitles={issuesTitles}
+          issuesMapping={issuesMapping}
           protocolsToQuery={protocolsToQuery}
           decenDeposToSubgraphIds={decenDeposToSubgraphIds}
           indexingStatusLoaded={indexingStatusLoaded}
