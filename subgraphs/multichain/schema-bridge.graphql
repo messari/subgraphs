@@ -57,7 +57,6 @@ enum Network {
   TOMOCHAIN
   VELAS
   XDAI
-  UNKNOWN_NETWORK
 }
 
 enum ProtocolType {
@@ -69,7 +68,7 @@ enum ProtocolType {
   # Will add more
 }
 
-enum TokenType {
+enum CrosschainTokenType {
   WRAPPED # Minted by a bridge and backed by a canonical token in other network
   CANONICAL
 }
@@ -98,12 +97,6 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
-
-	" Canonical token if the token type is wrapped "
-  _canonicalToken: Token
-
-  " Total supply of asset "
-  _totalSupply: BigInt!
 }
 
 # CrosschainToken is the representation of a token from a different chain.
@@ -124,7 +117,7 @@ type CrosschainToken @entity {
   address: String!
 
   " The type of token on the other chain "
-  type: TokenType!
+  type: CrosschainTokenType!
 
   " The underlying token on the network where this subgraph running "
   token: Token!
@@ -153,7 +146,7 @@ type RewardToken @entity {
 ##### Protocol Metadata #####
 #############################
 
-interface Protocol {
+type Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
@@ -214,7 +207,7 @@ interface Protocol {
   ##### Pools #####
 
   " All pools that belong to this protocol "
-  pools: [Pool!]!
+  pools: [Pool!]! @derivedFrom(field: "protocol")
 }
 
 type BridgeProtocol implements Protocol @entity {
@@ -330,7 +323,7 @@ type BridgeProtocol implements Protocol @entity {
   ##### Pools #####
 
   " All pools that belong to this protocol "
-  pools: [Pool!]!
+  pools: [Pool!]! @derivedFrom(field: "protocol")
 }
 
 ###############################
@@ -515,7 +508,7 @@ type Pool @entity {
   type: BridgePoolType!
 
   " Tokens that can be bridged from and to this pool "
-  inputTokens: [Token!]!
+  inputToken: Token!
 
   " Equivalent to inputTokens but in the other networks "
   destinationTokens: [CrosschainToken!]!
@@ -525,6 +518,7 @@ type Pool @entity {
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols don't mint any tokens to track ownership, in that case outputToken is null.
+
 
   " Token that is minted to track ownership of a liquidity position, if the pool is liquidity based. "
   outputToken: Token
@@ -543,7 +537,7 @@ type Pool @entity {
   mintSupply: BigInt
 
   " Amount of input tokens in the pool "
-  inputTokenBalances: [BigInt!]!
+  inputTokenBalance: BigInt!
 
   " Current TVL (Total Value Locked) of this pool in USD (only applies to LOCK_RELEASE and LIQUIDITY pools)"
   totalValueLockedUSD: BigDecimal!
@@ -611,7 +605,7 @@ type PoolRoute @entity {
   counterType: BridgePoolType
 
   " The token sent or received on the current chain "
-  inputTokens: [Token!]!
+  inputToken: Token!
 
   " The token sent or received on the opposite chain "
   crossToken: CrosschainToken!
@@ -699,7 +693,7 @@ type PoolDailySnapshot @entity {
   mintSupply: BigInt
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
+  inputTokenBalance: BigInt!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
   outputTokenSupply: BigInt
@@ -778,7 +772,7 @@ type PoolHourlySnapshot @entity {
   mintSupply: BigInt
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
+  inputTokenBalance: BigInt!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
   outputTokenSupply: BigInt
@@ -846,13 +840,6 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-enum EventType {
-  DEPOSIT
-  WITHDRAW
-  TRANSFER
-  MESSAGE
-}
-
 interface Event {
   " { Event type }-{ Transaction hash }-{ Log index } "
   id: ID!
@@ -861,7 +848,7 @@ interface Event {
   hash: String!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: BigInt!
+  logIndex: Int!
 
   " The protocol this transaction belongs to "
   protocol: BridgeProtocol!
@@ -905,16 +892,13 @@ type LiquidityDeposit implements Event @entity {
   token: Token!
 
   " Id of the chain where this is ocurring (should always be the chain where the subgraph is running) "
-  chainID: BigInt!
+  chainID: Int!
 
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
-
-  " Amount of deposit "
-  amount: BigInt!
 }
 
 type LiquidityWithdraw implements Event @entity {
@@ -925,7 +909,7 @@ type LiquidityWithdraw implements Event @entity {
   hash: String!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: BigInt!
+  logIndex: Int!
 
   " The protocol this transaction belongs to "
   protocol: BridgeProtocol!
@@ -943,16 +927,13 @@ type LiquidityWithdraw implements Event @entity {
   token: Token!
 
   " Id of the chain where this is ocurring (should always be the chain where the subgraph is running) "
-  chainID: BigInt!
+  chainID: Int!
 
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
-
-  " Amount of withdraw "
-  amount: BigInt!
 }
 
 enum TransferType {
@@ -970,7 +951,7 @@ type BridgeTransfer implements Event @entity {
   hash: String!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: BigInt!
+  logIndex: Int!
 
   " The protocol this transaction belongs to "
   protocol: BridgeProtocol!
@@ -983,12 +964,6 @@ type BridgeTransfer implements Event @entity {
 
   " Are we briding in or out? "
   isOutgoing: Boolean!
-
-  " Chain ID from where the message is being sent "
-  fromChainID: BigInt!
-
-  " Chain ID where the message is being sent to"
-  toChainID: BigInt!
 
   " This is the address that's receiving the bridged funds (not a pool contract). When bridging out, it will be the address on the destination chain. "
   transferTo: String!
@@ -1022,9 +997,6 @@ type BridgeTransfer implements Event @entity {
 
   " Timestamp of this event "
   timestamp: BigInt!
-
-  " Amount of bridged funds "
-  amount: BigInt!
 }
 
 # Some bridges support sending 
@@ -1036,7 +1008,7 @@ type BridgeMessage implements Event @entity {
   hash: String!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: BigInt!
+  logIndex: Int!
 
   " The protocol this transaction belongs to "
   protocol: BridgeProtocol!
@@ -1082,24 +1054,11 @@ type Account @entity {
   id: ID!
 
   " ChainIDs where this account has sent or received funds through this bridge "
-  chains: [BigInt!]!
-}
-
-type AccountTransaction @entity {
-  " { Address of the account }-{ transaction type [TRANSFER / DEPOSIT / WITHDRAW / MESSAGE] } "
-  id: ID!
-
-  " ChainIDs where this account has sent or received funds through this bridge "
-  chains: [BigInt!]!
+  chains: [Int!]!
 }
 
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
-  id: ID!
-}
-
-type ActiveAccountTransaction @entity {
-  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch }-{ transaction type [TRANSFER / DEPOSIT / WITHDRAW / MESSAGE] } "
   id: ID!
 }

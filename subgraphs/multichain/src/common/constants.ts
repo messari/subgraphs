@@ -17,26 +17,60 @@ export const PROTOCOL_SLUG = "multichain";
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
-  export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
+  export const ARBITRUM_NOVA = "ARBITRUM_NOVA";
+  export const ASTAR = "ASTAR";
   export const AURORA = "AURORA";
   export const AVALANCHE = "AVALANCHE";
+  export const BITGERT = "BITGERT";
+  export const BITTORRENT = "BITTORRENT";
   export const BOBA = "BOBA";
+  export const BOBA_2 = "BOBA_2";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const COSMOS = "COSMOS";
+  export const CLOVER = "CLOVER";
+  export const CONFLUX = "CONFLUX";
   export const CRONOS = "CRONOS";
+  export const CUBE = "CUBE";
+  export const DFK = "DFK";
+  export const DOGECHAIN = "DOGECHAIN";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
+  export const ETH_POW = "ETH_POW";
+  export const ETHEREUM_CLASSIC = "ETHEREUM_CLASSIC";
+  export const EVMOS = "EVMOS";
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
+  export const FUSION = "FUSION";
+  export const GODWOKEN_V1 = "GODWOKEN_V1";
   export const HARMONY = "HARMONY";
-  export const JUNO = "JUNO";
+  export const HECO = "HECO";
+  export const HOO = "HOO";
+  export const IOTEX = "IOTEX";
+  export const KARDIA = "KARDIA";
+  export const KAVA = "KAVA";
+  export const KCC = "KCC";
+  export const KLAYTN = "KLAYTN";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const METIS = "METIS";
+  export const MILKOMEDA = "MILKOMEDA";
+  export const MILKOMEDA_A1 = "MILKOMEDA_A1";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OASIS = "OASIS";
+  export const OKEXCHAIN = "OKEXCHAIN";
+  export const ONTOLOGY_EVM = "ONTOLOGY_EVM";
   export const OPTIMISM = "OPTIMISM";
-  export const OSMOSIS = "OSMOSIS";
-  export const MATIC = "MATIC"; // aka Polygon
+  export const REI = "REI";
+  export const RONIN = "RONIN";
+  export const RSK = "RSK";
+  export const SHIDEN = "SHIDEN";
+  export const SMARTBCH = "SMARTBCH";
+  export const SYSCOIN = "SYSCOIN";
+  export const TELOS = "TELOS";
+  export const THUNDERCORE = "THUNDERCORE";
+  export const TOMOCHAIN = "TOMOCHAIN";
+  export const VELAS = "VELAS";
   export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const UNKNOWN_NETWORK = "UNKNOWN_NETWORK";
 }
 
 export namespace ProtocolType {
@@ -47,9 +81,34 @@ export namespace ProtocolType {
   export const GENERIC = "GENERIC";
 }
 
+export namespace BridgePoolType {
+  export const LOCK_RELEASE = "LOCK_RELEASE";
+  export const BURN_MINT = "BURN_MINT";
+  export const LIQUIDITY = "LIQUIDITY";
+}
+
+export namespace TokenType {
+  export const WRAPPED = "WRAPPED";
+  export const CANONICAL = "CANONICAL";
+}
+
 export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";
   export const BORROW = "BORROW";
+}
+
+export namespace EventType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const TRANSFER = "TRANSFER";
+  export const MESSAGE = "MESSAGE";
+}
+
+export namespace TransferType {
+  export const MINT = "MINT";
+  export const BURN = "BURN";
+  export const LOCK = "LOCK";
+  export const RELEASE = "RELEASE";
 }
 
 ////////////////////
@@ -85,6 +144,7 @@ export const INT_FOUR = 4 as i32;
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -104,58 +164,62 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const CHAINS = new Map<string, string>();
-CHAINS.set("1", "ethereum");
-CHAINS.set("10", "optimism");
-CHAINS.set("24", "kardia");
-CHAINS.set("25", "cronos");
-CHAINS.set("30", "rsk");
-CHAINS.set("40", "telos");
-CHAINS.set("56", "bsc");
-CHAINS.set("57", "syscoin");
-CHAINS.set("58", "ontology_evm");
-CHAINS.set("61", "ethereumclassic");
-CHAINS.set("66", "okexchain");
-CHAINS.set("70", "hoo");
-CHAINS.set("88", "tomochain");
-CHAINS.set("100", "xdai");
-CHAINS.set("106", "velas");
-CHAINS.set("108", "thundercore");
-CHAINS.set("122", "fuse");
-CHAINS.set("128", "heco");
-CHAINS.set("137", "polygon");
-CHAINS.set("199", "bittorrent");
-CHAINS.set("250", "fantom");
-CHAINS.set("288", "boba");
-CHAINS.set("321", "kcc");
-CHAINS.set("336", "shiden");
-CHAINS.set("592", "astar");
-CHAINS.set("1024", "clv");
-CHAINS.set("1030", "conflux");
-CHAINS.set("1088", "metis");
-CHAINS.set("1284", "moonbeam");
-CHAINS.set("1285", "moonriver");
-CHAINS.set("1818", "cube");
-CHAINS.set("1294", "boba");
-CHAINS.set("2000", "dogechain");
-CHAINS.set("2001", "milkomeda");
-CHAINS.set("2002", "milkomeda_a1");
-CHAINS.set("2020", "ronin");
-CHAINS.set("2222", "kava");
-CHAINS.set("4689", "iotex");
-CHAINS.set("8217", "klaytn");
-CHAINS.set("9001", "evmos");
-CHAINS.set("10000", "smartbch");
-CHAINS.set("10001", "ethpow");
-CHAINS.set("32659", "fusion");
-CHAINS.set("42161", "arbitrum");
-CHAINS.set("42170", "arbitrum_nova");
-CHAINS.set("42220", "celo");
-CHAINS.set("42262", "oasis");
-CHAINS.set("43114", "avax");
-CHAINS.set("47805", "rei");
-CHAINS.set("53935", "dfk");
-CHAINS.set("71402", "godwoken_v1");
-CHAINS.set("1313161554", "aurora");
-CHAINS.set("1666600000", "harmony");
-CHAINS.set("32520", "bitgert");
+export const NetworkByID = new TypedMap<string, string>();
+NetworkByID.set("1", Network.MAINNET);
+NetworkByID.set("10", Network.OPTIMISM);
+NetworkByID.set("24", Network.KARDIA);
+NetworkByID.set("25", Network.CRONOS);
+NetworkByID.set("30", Network.RSK);
+NetworkByID.set("40", Network.TELOS);
+NetworkByID.set("56", Network.BSC);
+NetworkByID.set("57", Network.SYSCOIN);
+NetworkByID.set("58", Network.ONTOLOGY_EVM);
+NetworkByID.set("61", Network.ETHEREUM_CLASSIC);
+NetworkByID.set("66", Network.OKEXCHAIN);
+NetworkByID.set("70", Network.HOO);
+NetworkByID.set("88", Network.TOMOCHAIN);
+NetworkByID.set("100", Network.XDAI);
+NetworkByID.set("106", Network.VELAS);
+NetworkByID.set("108", Network.THUNDERCORE);
+NetworkByID.set("122", Network.FUSE);
+NetworkByID.set("128", Network.HECO);
+NetworkByID.set("137", Network.MATIC);
+NetworkByID.set("199", Network.BITTORRENT);
+NetworkByID.set("250", Network.FANTOM);
+NetworkByID.set("288", Network.BOBA);
+NetworkByID.set("321", Network.KCC);
+NetworkByID.set("336", Network.SHIDEN);
+NetworkByID.set("592", Network.ASTAR);
+NetworkByID.set("1024", Network.CLOVER);
+NetworkByID.set("1030", Network.CONFLUX);
+NetworkByID.set("1088", Network.METIS);
+NetworkByID.set("1284", Network.MOONBEAM);
+NetworkByID.set("1285", Network.MOONRIVER);
+NetworkByID.set("1818", Network.CUBE);
+NetworkByID.set("1294", Network.BOBA);
+NetworkByID.set("2000", Network.DOGECHAIN);
+NetworkByID.set("2001", Network.MILKOMEDA);
+NetworkByID.set("2002", Network.MILKOMEDA_A1);
+NetworkByID.set("2020", Network.RONIN);
+NetworkByID.set("2222", Network.KAVA);
+NetworkByID.set("4689", Network.IOTEX);
+NetworkByID.set("8217", Network.KLAYTN);
+NetworkByID.set("9001", Network.EVMOS);
+NetworkByID.set("10000", Network.SMARTBCH);
+NetworkByID.set("10001", Network.ETH_POW);
+NetworkByID.set("32659", Network.FUSION);
+NetworkByID.set("42161", Network.ARBITRUM_ONE);
+NetworkByID.set("42170", Network.ARBITRUM_NOVA);
+NetworkByID.set("42220", Network.CELO);
+NetworkByID.set("42262", Network.OASIS);
+NetworkByID.set("43114", Network.AVALANCHE);
+NetworkByID.set("47805", Network.REI);
+NetworkByID.set("53935", Network.DFK);
+NetworkByID.set("71402", Network.GODWOKEN_V1);
+NetworkByID.set("1313161554", Network.AURORA);
+NetworkByID.set("1666600000", Network.HARMONY);
+NetworkByID.set("32520", Network.BITGERT);
+
+export const INACURATE_PRICEFEED_TOKENS = [
+  Address.fromString("0xD9A8bB44968F35282F1b91c353f77a61BaF31A4B"), // GTPS
+];
