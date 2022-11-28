@@ -90,6 +90,8 @@ dataSources:
           file: ./abis/RocketStorage.json
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
       eventHandlers:
         - event: BalancesUpdated(uint256,uint256,uint256,uint256,uint256)
           handler: handleBalancesUpdated
@@ -225,6 +227,8 @@ dataSources:
           file: ./abis/RocketStorage.json
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
       eventHandlers:
         - event: PricesUpdated(uint256,uint256,uint256,uint256)
           handler: handlePricesUpdated

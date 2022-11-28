@@ -6,7 +6,7 @@ import {
 } from "../../generated/schema";
 import { generalUtilities } from "./generalUtilities";
 import { NetworkNodeBalanceMinipoolMetadata } from "../models/networkNodeBalanceMinipoolMetadata";
-import { ONE_ETHER_IN_WEI } from "../constants/generalconstants";
+import { ONE_ETHER_IN_WEI } from "../Constants/generalConstants";
 import { NetworkNodeBalanceRPLMetadata } from "../models/networkNodeBalanceRPLMetadata";
 import { updateProtocolAndPoolRewardsTvl } from "../entityUpdates/financialMetrics";
 

@@ -21,11 +21,11 @@ export function getOrCreateProtocol(): Protocol {
     protocol.id = RETH_ADDRESS;
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
+    protocol.network = Network.MAINNET;
+    protocol.type = ProtocolType.GENERIC;
     protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
     protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
     protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
-    protocol.network = Network.MAINNET;
-    protocol.type = ProtocolType.GENERIC;
 
     // Quantitative Data
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -38,6 +38,12 @@ export function getOrCreateProtocol(): Protocol {
 
     protocol.save();
   }
+
+  protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
+  protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
+  protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
+
+  protocol.save();
 
   return protocol;
 }

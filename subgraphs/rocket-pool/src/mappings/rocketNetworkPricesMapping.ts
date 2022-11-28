@@ -10,7 +10,7 @@ import {
   RocketPoolProtocol,
 } from "../../generated/schema";
 import { generalUtilities } from "../utilities/generalUtilities";
-import { rocketPoolEntityFactory } from "../entityfactory";
+import { rocketPoolEntityFactory } from "../entityFactory";
 import { NetworkNodeBalanceMetadata } from "../models/networkNodeBalanceMetadata";
 import {
   ROCKET_DAO_PROTOCOL_SETTINGS_MINIPOOL_CONTRACT_ADDRESS_V1,
@@ -18,11 +18,11 @@ import {
   ROCKET_DAO_PROTOCOL_SETTINGS_NODE_CONTRACT_ADDRESS,
   ROCKET_NETWORK_FEES_CONTRACT_ADDRESS,
   ROCKET_NODE_STAKING_CONTRACT_ADDRESS,
-} from "./../constants/contractconstants";
+} from "../Constants/contractConstants";
 import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { nodeUtilities } from "../utilities/nodeutilities";
 import { EffectiveMinipoolRPLBounds } from "../models/effectiveMinipoolRPLBounds";
-import { ONE_ETHER_IN_WEI } from "../constants/generalconstants";
+import { ONE_ETHER_IN_WEI } from "../Constants/generalConstants";
 import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
 
 /**

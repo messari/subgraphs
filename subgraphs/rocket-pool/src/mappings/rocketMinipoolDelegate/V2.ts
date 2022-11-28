@@ -7,11 +7,11 @@ import { Minipool, Node } from "../../../generated/schema";
 import {
   MINIPOOLSTATUS_STAKING,
   MINIPOOLSTATUS_WITHDRAWABLE,
-} from "../../constants/enumconstants";
+} from "../../Constants/enumConstants";
 import {
   ROCKET_NODE_DEPOSIT_CONTRACT_ADDRESS_V1,
   ROCKET_NODE_DEPOSIT_CONTRACT_ADDRESS_V2,
-} from "../../constants/contractconstants";
+} from "../../Constants/contractConstants";
 import { updateUsageMetrics } from "../../entityUpdates/usageMetrics";
 /**
  * Occurs when a node operator makes an ETH deposit on his node to create a minipool.

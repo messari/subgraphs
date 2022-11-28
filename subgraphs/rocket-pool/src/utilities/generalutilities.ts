@@ -1,6 +1,6 @@
 import { ethereum } from "@graphprotocol/graph-ts";
 import { RocketPoolProtocol } from "../../generated/schema";
-import { ROCKETPOOL_PROTOCOL_ROOT_ID } from "../constants/generalconstants";
+import { ROCKETPOOL_PROTOCOL_ROOT_ID } from "../Constants/generalConstants";
 
 class GeneralUtilities {
   /**
