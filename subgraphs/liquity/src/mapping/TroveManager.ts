@@ -21,7 +21,6 @@ import {
   LIQUIDATION_RESERVE_LUSD,
   STABILITY_POOL,
   LUSD_ADDRESS,
-  ZERO_ADDRESS,
   ACTIVE_POOL,
   ETH_ADDRESS,
 } from "../utils/constants";
@@ -259,7 +258,7 @@ export function handleLiquidation(event: Liquidation): void {
   }
 
   if (!lusdBurned || !ethSent) {
-    log.info("no LUSD was burned on this liquidation", []);
+    log.error("no LUSD was burned on this liquidation", []);
     return;
   }
 
@@ -279,15 +278,15 @@ function stabilityPoolLUSDBurn(log: ethereum.Log): BigInt | null {
     return null;
   }
 
-  if (transfer.tokenAddr.toHexString() != LUSD_ADDRESS) {
+  if (transfer.tokenAddr.notEqual(Address.fromString(LUSD_ADDRESS))) {
     return null;
   }
 
-  if (transfer.from.toHexString() != STABILITY_POOL) {
+  if (transfer.from.notEqual(Address.fromString(STABILITY_POOL))) {
     return null;
   }
 
-  if (transfer.to.toHexString() != ZERO_ADDRESS) {
+  if (transfer.to.notEqual(Address.zero())) {
     return null;
   }
 
@@ -303,11 +302,11 @@ function etherSentToStabilityPool(log: ethereum.Log): BigInt | null {
     return null;
   }
 
-  if (decoded.contractAddr.toHexString() != ACTIVE_POOL) {
+  if (decoded.contractAddr.notEqual(Address.fromString(ACTIVE_POOL))) {
     return null;
   }
 
-  if (decoded.to.toHexString() != STABILITY_POOL) {
+  if (decoded.to.notEqual(Address.fromString(STABILITY_POOL))) {
     return null;
   }
 
