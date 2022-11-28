@@ -69,6 +69,7 @@ function ProtocolInfo({ protocolData, protocolId, subgraphToQueryURL, schemaVers
   }
 
   let subgraphAlert: JSX.Element | null = null;
+  // Possibility of alert not showing when both are not equal?
   if (!!versionsJSON?.subgraph && !!protocolData?.protocols?.[0]?.subgraphVersion && versionsJSON?.subgraph !== protocolData?.protocols?.[0]?.subgraphVersion) {
     subgraphAlert = (<span style={{ display: "inline-flex", alignItems: "center", padding: "0px 0px 0px 10px", fontSize: "10px" }}>
       <Tooltip title={`The subgraph version in the deployment JSON (${versionsJSON?.subgraph}) is different than the subgraph version in the protocol entity (${protocolData?.protocols?.[0]?.subgraphVersion})`} placement="top" ><span style={{ padding: "4px 8px 2px 7px", borderRadius: "50%", backgroundColor: "#EFCB68", cursor: "default", fontWeight: "800" }}>!</span></Tooltip>

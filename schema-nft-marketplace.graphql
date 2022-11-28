@@ -1,5 +1,6 @@
 # Subgraph Schema: NFT Marketplace
 # Version: 2.0.0
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
   ARBITRUM_ONE

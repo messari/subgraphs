@@ -23,6 +23,7 @@ import {
 } from "../../constants";
 import { bigDecimalToBigInt, parseUnits, powBigDecimal, readCallResult } from "../../utils";
 import { getOrCreateRewardToken, getOrCreateToken } from "./supporting";
+import { getOrCreateProtocol } from "./protocol";
 
 /**
  * Get the market at marketAddress, or create it if it doesn't exist
@@ -131,6 +132,13 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
         market._lastUpdatedBlockNumber = event.block.number;
 
         market.save();
+
+        // add market to lending protocol
+        const protocol = getOrCreateProtocol();
+        const marketIDs = protocol._marketIDs;
+        marketIDs.push(market.id);
+        protocol._marketIDs = marketIDs;
+        protocol.save();
     }
 
     return market;

@@ -1,6 +1,6 @@
 # Subgraph Schema: Yield Aggregator
 # Version: 1.3.0
-# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
   ARBITRUM_ONE
@@ -230,7 +230,7 @@ type YieldAggregator implements Protocol @entity {
 
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
-  
+
   _vaultIds: [String!]!
 }
 

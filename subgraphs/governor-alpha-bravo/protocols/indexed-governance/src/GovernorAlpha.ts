@@ -111,7 +111,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework = new GovernanceFramework(contractAddress);
     const contract = GovernorAlpha.bind(Address.fromString(contractAddress));
 
-    governanceFramework.name = contract.name();
+    governanceFramework.name = "indexed-governance";
     governanceFramework.type = GovernanceFrameworkType.GOVERNOR_ALPHA;
     governanceFramework.version = NA;
 
