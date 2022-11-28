@@ -15,7 +15,6 @@ import { createDeposit } from "./event";
 import {
   closeMarketPosition,
   getOrCreateMarket,
-  getOrCreateStabilityPool,
   openMarketBorrowerPosition,
   openMarketLenderPosition,
 } from "./market";
@@ -125,10 +124,10 @@ export function incrementPositionLiquidationCount(position: Position): void {
 
 export function updateSPUserPositionBalances(
   event: ethereum.Event,
+  sp: Market,
   depositor: Address,
   newBalance: BigInt
 ): void {
-  const sp = getOrCreateStabilityPool(event);
   const account = getOrCreateAccount(depositor);
 
   const position = getOrCreateUserPosition(

@@ -24,7 +24,8 @@ import {
   getOrCreateMarketSnapshot,
   getOrCreateStabilityPool,
 } from "./market";
-import { getLUSDToken } from "./token";
+import { getLUSDToken, getCurrentETHPrice, getCurrentLUSDPrice } from "./token";
+import { bigIntToBigDecimal } from "../utils/numbers";
 
 export function getOrCreateLiquityProtocol(): LendingProtocol {
   let protocol = LendingProtocol.load(TROVE_MANAGER);
@@ -240,11 +241,20 @@ export function updateProtocolUSDLocked(
 export function updateProtocolUSDLockedStabilityPool(
   event: ethereum.Event,
   lusdAmount: BigInt,
-  stabilityPoolTVL: BigDecimal
+  ethAmount: BigInt
 ): void {
+  const lusdPrice = getCurrentLUSDPrice();
+  const LUSDValue = bigIntToBigDecimal(lusdAmount).times(lusdPrice);
+  const totalETHValue = bigIntToBigDecimal(ethAmount).times(
+    getCurrentETHPrice()
+  );
+  const stabilityPoolTVL = LUSDValue.plus(totalETHValue);
+
   const stabilityPool = getOrCreateStabilityPool(event);
   stabilityPool.inputTokenBalance = lusdAmount;
   stabilityPool.totalValueLockedUSD = stabilityPoolTVL;
+  stabilityPool.totalDepositBalanceUSD = stabilityPoolTVL;
+  stabilityPool.inputTokenPriceUSD = lusdPrice;
   stabilityPool.save();
 
   const protocol = getOrCreateLiquityProtocol();

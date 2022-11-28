@@ -196,4 +196,6 @@ dataSources:
           handler: handleStabilityPoolLUSDBalanceUpdated
         - event: ETHGainWithdrawn(indexed address,uint256,uint256)
           handler: handleETHGainWithdrawn
+        - event: UserDepositChanged(indexed address,uint256)
+          handler: handleUserDepositChanged
       file: ./src/mapping/StabilityPool.ts
