@@ -19,13 +19,13 @@ export function getTokenPriceFromChainLink(
     return new CustomPriceType();
   }
 
-  let result = chainLinkContract.try_latestRoundData(
+  const result = chainLinkContract.try_latestRoundData(
     tokenAddr,
     constants.CHAIN_LINK_USD_ADDRESS
   );
 
   if (!result.reverted) {
-    let decimals = chainLinkContract.try_decimals(
+    const decimals = chainLinkContract.try_decimals(
       tokenAddr,
       constants.CHAIN_LINK_USD_ADDRESS
     );

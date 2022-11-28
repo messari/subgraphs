@@ -1,4 +1,4 @@
-import { Address, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
 
 import {
   createBridgeTransferEvent,
@@ -16,7 +16,7 @@ import {
   getOrCreatePoolRoute,
   getOrCreateToken,
 } from "../common/getters";
-import { EventType, ZERO_ADDRESS } from "../common/constants";
+import { EventType } from "../common/constants";
 import { NetworkConfigs } from "../../configurations/configure";
 
 import { LogAnySwapIn, LogAnySwapOut } from "../../generated/RouterV6/Router";

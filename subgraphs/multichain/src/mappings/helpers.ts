@@ -4,7 +4,6 @@ import {
   BigInt,
   Bytes,
   ethereum,
-  log,
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -352,21 +351,22 @@ export function updateUsageMetrics(
   block: ethereum.Block,
   transaction: ethereum.Transaction
 ): void {
-  let transactionCount = INT_ONE;
-  let transferCount = eventType == EventType.TRANSFER ? INT_ONE : INT_ZERO;
-  let depositCount = eventType == EventType.DEPOSIT ? INT_ONE : INT_ZERO;
-  let withdrawCount = eventType == EventType.WITHDRAW ? INT_ONE : INT_ZERO;
-  let messageSentCount = eventType == EventType.MESSAGE ? INT_ONE : INT_ZERO;
+  const transactionCount = INT_ONE;
+  const transferCount = eventType == EventType.TRANSFER ? INT_ONE : INT_ZERO;
+  const depositCount = eventType == EventType.DEPOSIT ? INT_ONE : INT_ZERO;
+  const withdrawCount = eventType == EventType.WITHDRAW ? INT_ONE : INT_ZERO;
+  const messageSentCount = eventType == EventType.MESSAGE ? INT_ONE : INT_ZERO;
 
-  let liquidityProviders = eventType == EventType.DEPOSIT ? INT_ONE : INT_ZERO;
-  let messageSenders = eventType == EventType.MESSAGE ? INT_ONE : INT_ZERO;
+  const liquidityProviders =
+    eventType == EventType.DEPOSIT ? INT_ONE : INT_ZERO;
+  const messageSenders = eventType == EventType.MESSAGE ? INT_ONE : INT_ZERO;
 
-  let from = transaction.from.toHexString();
+  const from = transaction.from.toHexString();
 
-  let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(block);
-  let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(block);
+  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(block);
+  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(block);
 
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
 
   protocol.cumulativeTransactionCount += transactionCount;
   protocol.cumulativeTransferCount += transferCount;
@@ -390,14 +390,14 @@ export function updateUsageMetrics(
   usageMetricsHourly.hourlyMessageSentCount += messageSentCount;
 
   // Number of days since Unix epoch
-  let day = block.timestamp.toI32() / SECONDS_PER_DAY;
-  let hour = block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const day = block.timestamp.toI32() / SECONDS_PER_DAY;
+  const hour = block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-  let dayId = day.toString();
-  let hourId = hour.toString();
+  const dayId = day.toString();
+  const hourId = hour.toString();
 
   // Combine the id, user address and transaction type to generate a unique user id for the day
-  let dailyActiveAccountId = "daily-"
+  const dailyActiveAccountId = "daily-"
     .concat(from)
     .concat("-")
     .concat(dayId)
@@ -410,7 +410,7 @@ export function updateUsageMetrics(
     dailyActiveAccount.save();
   }
 
-  let dailyActiveAccountTransactionId = "daily-"
+  const dailyActiveAccountTransactionId = "daily-"
     .concat(from)
     .concat("-")
     .concat(dayId)
@@ -429,7 +429,10 @@ export function updateUsageMetrics(
     dailyActiveAccountTransaction.save();
   }
 
-  let hourlyActiveAccountId = "hourly-".concat(from).concat("-").concat(hourId);
+  const hourlyActiveAccountId = "hourly-"
+    .concat(from)
+    .concat("-")
+    .concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -448,7 +451,7 @@ export function updateUsageMetrics(
   account.chains = arrayUnique(addToArrayAtIndex(account.chains, crosschainID));
   account.save();
 
-  let accountTransactionId = from.concat("-").concat(eventType);
+  const accountTransactionId = from.concat("-").concat(eventType);
   let accountTransaction = AccountTransaction.load(accountTransactionId);
   if (!accountTransaction) {
     accountTransaction = new AccountTransaction(accountTransactionId);
@@ -482,13 +485,13 @@ export function updateUsageMetrics(
 }
 
 export function updateProtocolTVL(event: ethereum.Event): void {
-  let protocol = getOrCreateProtocol();
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+  const protocol = getOrCreateProtocol();
+  const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
 
-  let pools = protocol.pools;
+  const pools = protocol.pools;
   let tvl = BIGDECIMAL_ZERO;
   for (let i = 0; i < pools.length; i++) {
-    let pool = getOrCreatePool(pools[i], event);
+    const pool = getOrCreatePool(pools[i], event);
 
     tvl = tvl.plus(pool.totalValueLockedUSD);
   }
@@ -546,10 +549,10 @@ export function createBridgeTransferEvent(
     transferEvent.type = TransferType.MINT;
   }
 
-  let token = getOrCreateToken(tokenAddress, event.block.number);
+  const token = getOrCreateToken(tokenAddress, event.block.number);
   transferEvent.token = token.id;
 
-  let crosschainToken = getOrCreateCrosschainToken(
+  const crosschainToken = getOrCreateCrosschainToken(
     crosschainTokenAddress,
     crosschainID,
     tokenAddress,

@@ -3,7 +3,6 @@ import {
   ethereum,
   BigInt,
   DataSourceContext,
-  log,
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -102,7 +101,7 @@ export function getOrCreateToken(
     token = new Token(tokenAddress.toHexString());
 
     if (isNativeToken(tokenAddress)) {
-      let conf = NetworkConfigs.getNativeToken();
+      const conf = NetworkConfigs.getNativeToken();
 
       token.name = conf.get("name")!;
       token.symbol = conf.get("symbol")!;
@@ -136,7 +135,7 @@ export function getOrCreateToken(
         Address.fromString(canonicalToken.id)
       )
     ) {
-      let price = getUsdPricePerToken(Address.fromString(canonicalToken.id));
+      const price = getUsdPricePerToken(Address.fromString(canonicalToken.id));
       if (!price.reverted) {
         token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
       }
@@ -160,7 +159,7 @@ export function getOrCreateCrosschainToken(
   tokenAddress: Address,
   blockNumber: BigInt
 ): CrosschainToken {
-  let crosschainTokenID = crosschainID
+  const crosschainTokenID = crosschainID
     .toString()
     .concat("-")
     .concat(crosschainTokenAddress.toHexString());
@@ -169,7 +168,7 @@ export function getOrCreateCrosschainToken(
   if (!crosschainToken) {
     crosschainToken = new CrosschainToken(crosschainTokenID);
 
-    let token = getOrCreateToken(tokenAddress, blockNumber);
+    const token = getOrCreateToken(tokenAddress, blockNumber);
 
     crosschainToken.network = NetworkByID.get(crosschainID.toString())
       ? NetworkByID.get(crosschainID.toString())!
@@ -194,7 +193,7 @@ export function getOrCreatePool(
   if (!pool) {
     pool = new Pool(poolAddress);
 
-    let token = getOrCreateToken(
+    const token = getOrCreateToken(
       Address.fromString(poolAddress),
       event.block.number
     );
@@ -230,7 +229,7 @@ export function getOrCreatePool(
 
     PoolTemplate.createWithContext(Address.fromString(pool.id), context);
 
-    let protocol = getOrCreateProtocol();
+    const protocol = getOrCreateProtocol();
 
     protocol.pools = addToArrayAtIndex<string>(protocol.pools, pool.id);
     protocol.totalPoolCount += INT_ONE;
@@ -250,9 +249,9 @@ export function getOrCreatePoolRoute(
   crosschainID: BigInt,
   event: ethereum.Event
 ): PoolRoute {
-  let lowerChainID = chainID < crosschainID ? chainID : crosschainID;
-  let greaterChainID = chainID > crosschainID ? chainID : crosschainID;
-  let routeID = poolAddress
+  const lowerChainID = chainID < crosschainID ? chainID : crosschainID;
+  const greaterChainID = chainID > crosschainID ? chainID : crosschainID;
+  const routeID = poolAddress
     .concat("-")
     .concat(lowerChainID.toString())
     .concat("-")
@@ -277,7 +276,7 @@ export function getOrCreatePoolRoute(
     poolRoute.crossToken = crosschainToken.address;
     poolRoute.counterType = BridgePoolType.LIQUIDITY;
 
-    let protocol = getOrCreateProtocol();
+    const protocol = getOrCreateProtocol();
 
     if (crosschainToken.type == CrosschainTokenType.CANONICAL) {
       protocol.canonicalRouteCount += INT_ONE;
@@ -311,7 +310,7 @@ export function getOrCreatePoolDailySnapshot(
   poolAddress: string,
   event: ethereum.Event
 ): PoolDailySnapshot {
-  let dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
 
   let poolMetrics = PoolDailySnapshot.load(
     poolAddress.concat("-").concat(dayId)
@@ -356,7 +355,7 @@ export function getOrCreatePoolHourlySnapshot(
   poolAddress: string,
   event: ethereum.Event
 ): PoolHourlySnapshot {
-  let hourId = getHoursSinceEpoch(event.block.timestamp.toI32());
+  const hourId = getHoursSinceEpoch(event.block.timestamp.toI32());
 
   let poolMetrics = PoolHourlySnapshot.load(
     poolAddress.concat("-").concat(hourId)
@@ -405,7 +404,7 @@ export function getOrCreatePoolRouteSnapshot(
   poolSnapshotID: string,
   event: ethereum.Event
 ): PoolRouteSnapshot {
-  let routeSnapshotID = poolRouteID.concat("-").concat(poolSnapshotID);
+  const routeSnapshotID = poolRouteID.concat("-").concat(poolSnapshotID);
 
   let poolRouteSnapshot = PoolRouteSnapshot.load(routeSnapshotID);
   if (!poolRouteSnapshot) {
@@ -433,7 +432,7 @@ export function getOrCreatePoolRouteSnapshot(
 export function getOrCreateUsageMetricDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let dayId = getDaysSinceEpoch(block.timestamp.toI32());
+  const dayId = getDaysSinceEpoch(block.timestamp.toI32());
 
   let usageMetrics = UsageMetricsDailySnapshot.load(dayId);
   if (!usageMetrics) {
@@ -469,7 +468,7 @@ export function getOrCreateUsageMetricDailySnapshot(
 export function getOrCreateUsageMetricHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let hourId = getHoursSinceEpoch(block.timestamp.toI32());
+  const hourId = getHoursSinceEpoch(block.timestamp.toI32());
 
   let usageMetrics = UsageMetricsHourlySnapshot.load(hourId);
   if (!usageMetrics) {
@@ -497,7 +496,7 @@ export function getOrCreateUsageMetricHourlySnapshot(
 export function getOrCreateFinancialsDailySnapshot(
   event: ethereum.Event
 ): FinancialsDailySnapshot {
-  let dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
 
   let financialMetrics = FinancialsDailySnapshot.load(dayId);
   if (!financialMetrics) {
