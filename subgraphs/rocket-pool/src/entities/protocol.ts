@@ -23,9 +23,6 @@ export function getOrCreateProtocol(): Protocol {
     protocol.slug = PROTOCOL_SLUG;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.GENERIC;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
 
     // Quantitative Data
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -35,8 +32,6 @@ export function getOrCreateProtocol(): Protocol {
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
-
-    protocol.save();
   }
 
   protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;

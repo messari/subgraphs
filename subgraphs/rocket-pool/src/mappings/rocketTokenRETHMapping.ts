@@ -2,7 +2,7 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Transfer } from "../../generated/rocketTokenRETH/rocketTokenRETH";
 import { rocketTokenRETH } from "../../generated/rocketTokenRETH/rocketTokenRETH";
 import { Staker } from "../../generated/schema";
-import { generalUtilities } from "../utilities/generalutilities";
+import { generalUtilities } from "../utilities/generalUtilities";
 import { stakerUtilities } from "../utilities/stakerUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { ethereum } from "@graphprotocol/graph-ts";

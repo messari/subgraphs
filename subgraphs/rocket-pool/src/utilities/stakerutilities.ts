@@ -10,9 +10,9 @@ import { TransactionStakers } from "../models/transactionStakers";
 import { StakerBalance } from "../models/stakerBalance";
 import { BigInt } from "@graphprotocol/graph-ts";
 import { rocketPoolEntityFactory } from "../entityFactory";
-import { ONE_ETHER_IN_WEI } from "../Constants/generalConstants";
-import { ZERO_ADDRESS_STRING } from "../Constants/contractConstants";
-import { generalUtilities } from "./generalutilities";
+import { ONE_ETHER_IN_WEI } from "../constants/generalConstants";
+import { ZERO_ADDRESS_STRING } from "../constants/contractConstants";
+import { generalUtilities } from "./generalUtilities";
 
 class StakerUtilities {
   /**
