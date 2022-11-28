@@ -1,6 +1,6 @@
 # Subgraph Schema: Lending Protocol
 # Version: 3.0.0
-# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
   ARBITRUM_ONE
@@ -413,7 +413,7 @@ type LendingProtocol implements Protocol @entity {
   " Tokens that can be minted. Only applies to CDP "
   mintedTokens: [Token!]
 
-  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. "
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -590,6 +590,12 @@ type UsageMetricsDailySnapshot @entity {
 
   " Total number of liquidations in a day "
   dailyLiquidateCount: Int!
+
+  " Total number of transfers in a day "
+  dailyTransferCount: Int!
+
+  " Total number of flashloans in a day "
+  dailyFlashloanCount: Int!
 
   " Total number of positions (open and closed) "
   cumulativePositionCount: Int!
@@ -1017,6 +1023,9 @@ type MarketDailySnapshot @entity {
 
   ##### Incentives #####
 
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
 
@@ -1025,17 +1034,11 @@ type MarketDailySnapshot @entity {
 
   ##### Quantitative Data #####
 
-  " Token that need to be deposited in this market to take a position in protocol (should be alphabetized) "
-  inputToken: Token!
-
   " Amount of input token in the market (same order as inputTokens) "
   inputTokenBalance: BigInt!
 
   " Prices in USD of the input token (same order as inputTokens) "
   inputTokenPriceUSD: BigDecimal!
-
-  " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
-  outputToken: Token
 
   " Total supply of output token (same order as outputTokens) "
   outputTokenSupply: BigInt
@@ -1057,9 +1060,6 @@ type MarketDailySnapshot @entity {
 
   " The amount of revenue that is converted to reserves at the current time. 20% reserve factor should be in format 0.20 "
   reserveFactor: BigDecimal
-
-  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
-  borrowedToken: Token
 
   " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
   variableBorrowedTokenBalance: BigInt
@@ -1181,7 +1181,7 @@ type MarketDailySnapshot @entity {
   dailyActiveLiquidatees: Int!
 
   " Number of unique daily transferers (the sender in a Transfer) "
-  dailyActiveTransferers: Int!
+  dailyActiveTransferrers: Int!
 
   " Number of unique daily accounts that executed a flash loan"
   dailyActiveFlashloaners: Int!
@@ -1255,6 +1255,9 @@ type MarketHourlySnapshot @entity {
 
   ##### Incentives #####
 
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
 
@@ -1263,17 +1266,11 @@ type MarketHourlySnapshot @entity {
 
   ##### Quantitative Data #####
 
-  " Token that need to be deposited in this market to take a position in protocol (should be alphabetized) "
-  inputToken: Token!
-
   " Amount of input token in the market (same order as inputTokens) "
   inputTokenBalance: BigInt!
 
   " Prices in USD of the input token (same order as inputTokens) "
   inputTokenPriceUSD: BigDecimal!
-
-  " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
-  outputToken: Token
 
   " Total supply of output token (same order as outputTokens) "
   outputTokenSupply: BigInt
@@ -1292,9 +1289,6 @@ type MarketHourlySnapshot @entity {
 
   " Total amount of reserves (in USD) "
   reserves: BigDecimal
-
-  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
-  borrowedToken: Token
 
   " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
   variableBorrowedTokenBalance: BigInt
@@ -1352,6 +1346,12 @@ type MarketHourlySnapshot @entity {
 
   " Total assets repaid on a given hour, in USD. "
   hourlyRepayUSD: BigDecimal!
+
+  " Total assets transferred on a given hour, in USD. "
+  hourlyTransferUSD: BigDecimal!
+
+  " Total assets flashloaned on a given hour, in USD. "
+  hourlyFlashloanUSD: BigDecimal!
 }
 
 ##############################
@@ -1562,8 +1562,8 @@ type PositionSnapshot @entity(immutable: true) {
 
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity(immutable: true) {
-  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
-  id: Bytes!
+  " { daily/hourly }-{ Address of the account }-{ Optional: Transaction Type }-{ Optional: Market Address }-{ Optional: Days/hours since Unix epoch } "
+  id: ID!
 }
 
 ############################
