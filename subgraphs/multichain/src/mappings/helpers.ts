@@ -15,10 +15,8 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   EventType,
-  ZERO_ADDRESS,
   TransferType,
   BridgePoolType,
-  TokenType,
 } from "../common/constants";
 import {
   getOrCreateProtocol,
@@ -541,9 +539,11 @@ export function createBridgeTransferEvent(
   if (isOutgoing) {
     transferEvent.fromChainID = chainID;
     transferEvent.toChainID = crosschainID;
+    transferEvent.type = TransferType.BURN;
   } else {
     transferEvent.fromChainID = crosschainID;
     transferEvent.toChainID = chainID;
+    transferEvent.type = TransferType.MINT;
   }
 
   let token = getOrCreateToken(tokenAddress, event.block.number);
@@ -560,16 +560,6 @@ export function createBridgeTransferEvent(
   transferEvent.isSwap = false;
   if (crosschainToken.token != token.id) {
     transferEvent.isSwap = true;
-  }
-
-  if (isOutgoing && crosschainToken.type == TokenType.CANONICAL) {
-    transferEvent.type = TransferType.BURN;
-  } else if (!isOutgoing && crosschainToken.type == TokenType.CANONICAL) {
-    transferEvent.type = TransferType.MINT;
-  } else if (isOutgoing && crosschainToken.type == TokenType.WRAPPED) {
-    transferEvent.type = TransferType.LOCK;
-  } else {
-    transferEvent.type = TransferType.RELEASE;
   }
 
   transferEvent.blockNumber = event.block.number;

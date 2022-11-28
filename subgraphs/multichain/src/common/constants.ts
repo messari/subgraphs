@@ -87,14 +87,9 @@ export namespace BridgePoolType {
   export const LIQUIDITY = "LIQUIDITY";
 }
 
-export namespace TokenType {
+export namespace CrosschainTokenType {
   export const WRAPPED = "WRAPPED";
   export const CANONICAL = "CANONICAL";
-}
-
-export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT";
-  export const BORROW = "BORROW";
 }
 
 export namespace EventType {

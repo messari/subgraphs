@@ -15,7 +15,7 @@ import {
   Network,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  TokenType,
+  CrosschainTokenType,
   ZERO_ADDRESS,
 } from "../../../../../src/common/constants";
 import { bigIntToBigDecimal } from "../../../../../src/common/utils/numbers";
@@ -64,7 +64,7 @@ export class MultichainMainnetConfigurations implements Configurations {
     return Address.fromString(crosschainToken);
   }
   getCrosschainTokenType(token: Token, crosschainID: string): string {
-    let crosschainTokenType = TokenType.WRAPPED;
+    let crosschainTokenType = CrosschainTokenType.WRAPPED;
 
     const key = token.id.toUpperCase().concat(":").concat(crosschainID);
     const obj = json.fromString(TokenlistAPIResponse).toObject().get(key);

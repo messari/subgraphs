@@ -21,8 +21,7 @@ import {
   PROTOCOL_SLUG,
   ProtocolType,
   BridgePoolType,
-  TokenType,
-  RewardTokenType,
+  CrosschainTokenType,
   INACURATE_PRICEFEED_TOKENS,
   INT_ONE,
   Network,
@@ -41,7 +40,6 @@ import {
   PoolHourlySnapshot,
   Token,
   CrosschainToken,
-  RewardToken,
   UsageMetricsHourlySnapshot,
   UsageMetricsDailySnapshot,
   FinancialsDailySnapshot,
@@ -124,7 +122,7 @@ export function getOrCreateToken(
     const anyTokenContract = anyTOKEN.bind(tokenAddress);
     const underlyingTokenCall = anyTokenContract.try_underlying();
     if (
-      !underlyingTokenCall.reverted ||
+      !underlyingTokenCall.reverted &&
       underlyingTokenCall.value != Address.fromString(ZERO_ADDRESS)
     ) {
       canonicalToken = getOrCreateToken(underlyingTokenCall.value, blockNumber);
@@ -181,34 +179,11 @@ export function getOrCreateCrosschainToken(
       token,
       crosschainID.toString()
     );
-    crosschainToken.token = token.id.toString();
+    crosschainToken.token = token.id;
     crosschainToken.save();
   }
 
   return crosschainToken;
-}
-
-export function getOrCreateRewardToken(
-  address: Address,
-  blockNumber: BigInt
-): RewardToken {
-  let rewardToken = RewardToken.load(
-    RewardTokenType.DEPOSIT.concat("-").concat(address.toHexString())
-  );
-  if (!rewardToken) {
-    let token = getOrCreateToken(address, blockNumber);
-
-    rewardToken = new RewardToken(
-      RewardTokenType.DEPOSIT.concat("-").concat(address.toHexString())
-    );
-
-    rewardToken.token = token.id;
-    rewardToken.type = RewardTokenType.DEPOSIT;
-
-    rewardToken.save();
-  }
-
-  return rewardToken;
 }
 
 export function getOrCreatePool(
@@ -304,7 +279,7 @@ export function getOrCreatePoolRoute(
 
     let protocol = getOrCreateProtocol();
 
-    if (crosschainToken.type == TokenType.CANONICAL) {
+    if (crosschainToken.type == CrosschainTokenType.CANONICAL) {
       protocol.canonicalRouteCount += INT_ONE;
     } else {
       protocol.wrappedRouteCount += INT_ONE;

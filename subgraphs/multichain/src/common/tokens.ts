@@ -75,13 +75,6 @@ export function isNullEthValue(value: string): boolean {
   );
 }
 
-export function isRewardToken(tokenAddress: Address): boolean {
-  return (
-    tokenAddress ==
-    Address.fromString(NetworkConfigs.getRewardToken().get("address")!)
-  );
-}
-
 export function isNativeToken(tokenAddress: Address): boolean {
   return (
     tokenAddress ==

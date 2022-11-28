@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_ONE, BIGINT_TWO, BIGINT_ZERO } from "../constants";
+import { BIGDECIMAL_ZERO } from "../constants";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
@@ -73,4 +73,13 @@ export function wadToRay(a: BigInt): BigInt {
 // Round BigDecimal to whole number
 export function roundToWholeNumber(n: BigDecimal): BigDecimal {
   return n.truncate(0);
+}
+
+// Return abs(Bigdecimal)
+export function absBigDecimal(n: BigDecimal): BigDecimal {
+  if (n.lt(BIGDECIMAL_ZERO)) {
+    n = n.neg();
+  }
+
+  return n;
 }

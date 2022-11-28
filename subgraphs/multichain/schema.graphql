@@ -69,7 +69,7 @@ enum ProtocolType {
   # Will add more
 }
 
-enum TokenType {
+enum CrosschainTokenType {
   WRAPPED # Minted by a bridge and backed by a canonical token in other network
   CANONICAL
 }
@@ -124,7 +124,7 @@ type CrosschainToken @entity {
   address: String!
 
   " The type of token on the other chain "
-  type: TokenType!
+  type: CrosschainTokenType!
 
   " The underlying token on the network where this subgraph running "
   token: Token!

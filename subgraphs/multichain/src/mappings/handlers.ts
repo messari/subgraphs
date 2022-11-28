@@ -161,7 +161,7 @@ export function handleSwapIn(event: LogAnySwapIn): void {
     event.params.fromChainID,
     poolRoute.id,
     false,
-    Address.fromString(ZERO_ADDRESS), // LogAnySwapIn does not have from address
+    event.transaction.from, // LogAnySwapIn does not have from address in params
     event.params.to,
     event.params.txhash,
     event.params.amount,
@@ -170,7 +170,6 @@ export function handleSwapIn(event: LogAnySwapIn): void {
 }
 
 export function handleDeposit(call: DepositCall): void {
-  log.warning("deposit! 0", []);
   const context = dataSource.context();
   const poolAddress = context.getString("poolAddress");
   const chainID = BigInt.fromString(context.getString("chainID"));
@@ -189,7 +188,6 @@ export function handleDeposit(call: DepositCall): void {
 }
 
 export function handleDeposit1(call: Deposit1Call): void {
-  log.warning("deposit! 1", []);
   const context = dataSource.context();
   const poolAddress = context.getString("poolAddress");
   const chainID = BigInt.fromString(context.getString("chainID"));
@@ -208,7 +206,6 @@ export function handleDeposit1(call: Deposit1Call): void {
 }
 
 export function handleDeposit2(call: Deposit2Call): void {
-  log.warning("deposit! 2", []);
   const context = dataSource.context();
   const poolAddress = context.getString("poolAddress");
   const chainID = BigInt.fromString(context.getString("chainID"));
@@ -227,7 +224,6 @@ export function handleDeposit2(call: Deposit2Call): void {
 }
 
 export function handleDepositVault(call: DepositVaultCall): void {
-  log.warning("deposit! vault", []);
   const context = dataSource.context();
   const poolAddress = context.getString("poolAddress");
   const chainID = BigInt.fromString(context.getString("chainID"));
@@ -246,7 +242,6 @@ export function handleDepositVault(call: DepositVaultCall): void {
 }
 
 export function handleWithdraw(call: WithdrawCall): void {
-  log.warning("withdraw! 0", []);
   const context = dataSource.context();
   const poolAddress = context.getString("poolAddress");
   const chainID = BigInt.fromString(context.getString("chainID"));
@@ -265,7 +260,6 @@ export function handleWithdraw(call: WithdrawCall): void {
 }
 
 export function handleWithdraw1(call: Withdraw1Call): void {
-  log.warning("withdraw! 1", []);
   const context = dataSource.context();
   const poolAddress = context.getString("poolAddress");
   const chainID = BigInt.fromString(context.getString("chainID"));
@@ -284,7 +278,6 @@ export function handleWithdraw1(call: Withdraw1Call): void {
 }
 
 export function handleWithdraw2(call: Withdraw2Call): void {
-  log.warning("withdraw! 2", []);
   const context = dataSource.context();
   const poolAddress = context.getString("poolAddress");
   const chainID = BigInt.fromString(context.getString("chainID"));
@@ -303,7 +296,6 @@ export function handleWithdraw2(call: Withdraw2Call): void {
 }
 
 export function handleWithdrawVault(call: WithdrawVaultCall): void {
-  log.warning("withdraw! vault", []);
   const context = dataSource.context();
   const poolAddress = context.getString("poolAddress");
   const chainID = BigInt.fromString(context.getString("chainID"));
