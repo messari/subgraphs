@@ -11,6 +11,7 @@ import {
 } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getUsdPrice } from "../prices";
+import { BIGDECIMAL_ZERO } from "../prices/common/constants";
 
 export function getETHToken(): Token {
   const token = new Token(ETH_ADDRESS);
@@ -63,7 +64,10 @@ export function getCurrentETHPrice(): BigDecimal {
 }
 
 export function getCurrentLUSDPrice(): BigDecimal {
-  const price = getUsdPrice(Address.fromString(LUSD_ADDRESS), BIGDECIMAL_ONE);
+  let price = getUsdPrice(Address.fromString(LUSD_ADDRESS), BIGDECIMAL_ONE);
+  if (price.equals(BIGDECIMAL_ZERO)) {
+    price = BIGDECIMAL_ONE; // default to 1USD if price lib doesn't get a price
+  }
 
   const token = Token.load(LUSD_ADDRESS)!;
   token.lastPriceUSD = price;

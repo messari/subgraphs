@@ -12,7 +12,7 @@ import {
   createWithdraw,
 } from "../entities/event";
 import { getOrCreateTrove } from "../entities/trove";
-import { getCurrentETHPrice } from "../entities/token";
+import { getCurrentETHPrice, getCurrentLUSDPrice } from "../entities/token";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import {
   BIGDECIMAL_ONE,
@@ -32,7 +32,6 @@ import {
 } from "../entities/protocol";
 import { Address, log, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { updateUserPositionBalances } from "../entities/position";
-import { getUsdPrice } from "../prices";
 import {
   getOrCreateMarket,
   getOrCreateStabilityPool,
@@ -264,10 +263,7 @@ export function handleLiquidation(event: Liquidation): void {
     return;
   }
 
-  const lusdValue = getUsdPrice(
-    Address.fromString(LUSD_ADDRESS),
-    bigIntToBigDecimal(lusdBurned)
-  );
+  const lusdValue = getCurrentLUSDPrice().times(bigIntToBigDecimal(lusdBurned));
   const ethValue = bigIntToBigDecimal(ethSent).times(getCurrentETHPrice());
 
   const revenue = ethValue.minus(lusdValue);

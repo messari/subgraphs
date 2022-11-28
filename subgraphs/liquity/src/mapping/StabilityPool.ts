@@ -5,20 +5,22 @@ import {
   StabilityPoolLUSDBalanceUpdated,
   UserDepositChanged,
 } from "../../generated/StabilityPool/StabilityPool";
-import { getCurrentLQTYPrice, getRewardToken } from "../entities/token";
+import {
+  getCurrentETHPrice,
+  getCurrentLQTYPrice,
+  getRewardToken,
+} from "../entities/token";
 import { updateProtocolUSDLockedStabilityPool } from "../entities/protocol";
 import { updateSPUserPositionBalances } from "../entities/position";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { createWithdraw } from "../entities/event";
-import { getUsdPrice } from "../prices";
 import {
   BIGDECIMAL_ONE,
   BIGINT_TEN,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
-  ETH_ADDRESS,
 } from "../utils/constants";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   getOrCreateMarketHourlySnapshot,
   getOrCreateMarketSnapshot,
@@ -91,8 +93,7 @@ export function handleETHGainWithdrawn(event: ETHGainWithdrawn): void {
     return;
   }
 
-  const amountUSD = getUsdPrice(
-    Address.fromString(ETH_ADDRESS),
+  const amountUSD = getCurrentETHPrice().times(
     bigIntToBigDecimal(event.params._ETH)
   );
   const market = getOrCreateStabilityPool(event);
