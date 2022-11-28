@@ -243,3 +243,30 @@ https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
 - The results of this test indicate that having neither bytes as IDs or immutable entities is the fasted case. This is against our expectations. It was expected to see that adding both immutables and bytes as IDs would improve indexing speed.
 - The results are quite strange upon analysis. Adding bytes as IDs only slows down the indexing process quite a lot (-23%) and adding immutables only slows the indexing process by a moderate amount (-6.8%). However when we combine both the addition of immutables and bytes, it only slightly slows down the indexing process (-1.2%).
 - These results are far from the expectation of how the addition of immutables and bytes as IDs would impact the speed of indexing in isolation and combination. The results of this test warrant investigation into how the graph handles immutables and bytes as IDs behind the scenes so that we can get results more in line with our expectation and achieve the desired performance improvements.
+
+### Use graph transaction receipts to get information for different events in the same transaction
+
+In many cases, an event is a part of a transaction emitting many events and it is helpful to get the information from an event upstream or downstream of current event in the same transaction. One example is in the balancer V2 subgraph, needed OutputTokenAmount info was included in the Transfer event preceding the PoolBalanceChanged event; another example is in the Euler subgraph, we need to know whether a Liquidation event is emitted after a AssetStatus event. Transaction receipt allow us the traverse the information of all events in the same transaction and can help improve performance of subgraphs.
+
+Steps to use transaction receipt:
+
+1. Set `apiVersion: 0.0.7` in subgraph.yaml (or in `templates/<protocol>.template.yaml`);
+2. In subgraph.yaml, append a line `receipt: true` after the handler function that uses transaction receipt, see the [euler subgraph.yaml](https://github.com/messari/subgraphs/blob/dc4d674f30fb62efb59664ec7dffb26c5da7b0f3/subgraphs/euler-finance/protocols/euler-finance/config/templates/euler.template.yaml#L49) for an example.
+3. In the handler function, you can get an array of logs with `event.receipt!.logs` and iterate it to access all events in the same transaction.
+
+A few tips of using transaction receipts:
+
+- `let currLog = logs.at(i)` gets the log at index `i`;
+- `currLog.topics.at(0)` is topic0 and matches the keccak256 signature of the event at the corresponding index;
+- topic0 can be checked against the keccak2556 signature of known events to select desired event:
+  ```
+  const liquidationSig = crypto.keccak256(
+      ByteArray.fromUTF8("Liquidation(address,address,address,address,uint256,uint256,uint256,uint256,uint256)"),
+    )
+  if (currLog.topics.at(0).equals(liquidationSig)) {
+    //do something for liquidation event log
+  }
+  ```
+- topic1, topic2, etc corresponds to the indexed argument of the event and can be accessed with `currLog.topics.at(1)`; un-indexed arguments can be accessed with `let variable = Bytes.fromUint8Array(nextLog.data.subarray(startIndex, endIndex))`. Information in topic1 and data can be decoded with `ethereum.decode("uint256", topic1)` or `ethereum.decode("address", variable)` and then converted to desired typescript data type (e.g. `.toBigInt()`, `.toAddress()`).
+
+See [euler subgraph](https://github.com/messari/subgraphs/blob/dc4d674f30fb62efb59664ec7dffb26c5da7b0f3/subgraphs/euler-finance/src/mappings/helpers.ts#L631-L668) and [balancer subgraph](https://github.com/nemani/subgraphs/blob/5a8df9d044b51f64e1999572ce3afa466fcce899/subgraphs/balancer-forks-ext/src/common/creators.ts#L334-L364) for examples of transaction receipt used in actual subgraphs.
