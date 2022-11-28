@@ -5,12 +5,7 @@ import {
   DataSourceContext,
 } from "@graphprotocol/graph-ts";
 
-import {
-  fetchTokenSymbol,
-  fetchTokenName,
-  fetchTokenDecimals,
-  isNativeToken,
-} from "./tokens";
+import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
   INT_ZERO,
   BIGINT_ZERO,
@@ -100,17 +95,10 @@ export function getOrCreateToken(
   if (!token) {
     token = new Token(tokenAddress.toHexString());
 
-    if (isNativeToken(tokenAddress)) {
-      const conf = NetworkConfigs.getNativeToken();
+    token.name = fetchTokenName(tokenAddress);
+    token.symbol = fetchTokenSymbol(tokenAddress);
+    token.decimals = fetchTokenDecimals(tokenAddress) as i32;
 
-      token.name = conf.get("name")!;
-      token.symbol = conf.get("symbol")!;
-      token.decimals = parseInt(conf.get("decimals")!) as i32;
-    } else {
-      token.name = fetchTokenName(tokenAddress);
-      token.symbol = fetchTokenSymbol(tokenAddress);
-      token.decimals = fetchTokenDecimals(tokenAddress) as i32;
-    }
     token.lastPriceBlockNumber = blockNumber;
     token._totalSupply = BIGINT_ZERO;
   }

@@ -7,7 +7,6 @@ export interface Configurations {
   getProtocolSlug(): string;
   getFactoryAddress(): string;
   getChainID(): BigInt;
-  getNativeToken(): TypedMap<string, string>;
   getCrosschainTokenAddress(token: Token, crosschainID: string): Address;
   getCrosschainTokenType(token: Token, crosschainID: string): string;
   getBridgeFeeUSD(

@@ -1,0 +1,8891 @@
+// { "token:crosschainID": ["crosschainTokenAddress", "crosschainTokenType", "swapFeeRate,minFee,maxFee"], }
+
+export const TokenlistAPIResponse = `{
+  "0x00aa85e010204068b7cc2235800b2d8036bdbf2e:137": [
+    "0x8ae1f939b6f12fc017dfc6510010dae9dad28d68",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x0116a8fc7500af82c528f5fb069a84080117482e:1": [
+    "0x4d67a556f6fb7d84a857f363518501c831e1348b",
+    "WRAPPED",
+    "0.1,80.256419,1003.205241"
+  ],
+  "0x0116a8fc7500af82c528f5fb069a84080117482e:137": [
+    "0x0db2e82660812b56bade5b03059f2b0133bcd136",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0x0116a8fc7500af82c528f5fb069a84080117482e:250": [
+    "0xbb8b2f05a88108f7e9227b954358110c20e97e26",
+    "WRAPPED",
+    "0.1,5.016026,1003.205241"
+  ],
+  "0x0116a8fc7500af82c528f5fb069a84080117482e:42161": [
+    "0xdf00960e0adfea78ee29da7fcca17cfdddc0a4ca",
+    "WRAPPED",
+    "0.1,10,1000"
+  ],
+  "0x01a4229adc327220209a6d9a4842da27098c6ed1:24": [
+    "0x2c78f1b70ccf63cdee49f9233e9faa99d43aa07e",
+    "WRAPPED",
+    "0.1,512,102300"
+  ],
+  "0x01c3d9cbcf40482ba0d5206f63e3f04ef9e134d9:1": [
+    "0xb753428af26e81097e7fd17f40c88aaa3e04902c",
+    "CANONICAL",
+    "0.1,0.12,6"
+  ],
+  "0x01d6370230ae0deb59bca3742ccc7de018a8b5b4:1": [
+    "0x8497842420cfdbc97896c2353d75d89fc8d5be5d",
+    "WRAPPED",
+    "0.1,21293.641985,266170.524808"
+  ],
+  "0x01d6370230ae0deb59bca3742ccc7de018a8b5b4:10": [
+    "0xf2b3e3fa33232c639d4ca5a26e4e95c490417c84",
+    "WRAPPED",
+    "0.1,18598.768762,1859876.876151"
+  ],
+  "0x01d6370230ae0deb59bca3742ccc7de018a8b5b4:137": [
+    "0x6562e5791da22950c959b8c2febcfbca15ae520c",
+    "WRAPPED",
+    "0.1,1330.852624,266170.524808"
+  ],
+  "0x01d6370230ae0deb59bca3742ccc7de018a8b5b4:2000": [
+    "0x0b32357430fe98c24b2b245b815af68bc9ecfdad",
+    "WRAPPED",
+    "0.1,9299.384381,1859876.876151"
+  ],
+  "0x01d6370230ae0deb59bca3742ccc7de018a8b5b4:25": [
+    "0xe6cdd3a275c976bca5d3de4f96c7514b899f0434",
+    "WRAPPED",
+    "0.1,16749.857626,3349971.525242"
+  ],
+  "0x01d6370230ae0deb59bca3742ccc7de018a8b5b4:250": [
+    "0x2127b96a05f9bf9095913d1e8b7bdb203a683a9f",
+    "WRAPPED",
+    "0.1,2334.158069,466831.613837"
+  ],
+  "0x01d6370230ae0deb59bca3742ccc7de018a8b5b4:43114": [
+    "0xfd14d755a3a3358aec08d0979ecf369b4a387039",
+    "WRAPPED",
+    "0.1,1330.852624,266170.524808"
+  ],
+  "0x021750e46a47b2a02f4f860c93dcc774b1aba1d5:1": [
+    "0x1d37986f252d0e349522ea6c3b98cb935495e63e",
+    "CANONICAL",
+    "0.1,2900,72500"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:1": [
+    "0x2ac03bf434db503f6f5f85c3954773731fc3f056",
+    "WRAPPED",
+    "0.1,0.023,0.6"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:10000": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:10001": [
+    "0xaf3ccfd9b59b36628cc2f659a09d6440795b2520",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:1024": [
+    "0xf480f38c366daac4305dc484b2ad7a496ff00cea",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:1030": [
+    "0x9610b01aaa57ec026001f7ec5cface51bfea0ba6",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:106": [
+    "0x6ab6d61428fde76768d7b45d8bfeec19c6ef91a8",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:1111": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:1234": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:2002": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:2025": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:2109": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:2222": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:24": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:24734": [
+    "0x818938a83036b18a44f2ddf43d47454f6ae49bd6",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:25": [
+    "0xa384bc7cdc0a93e686da9e7b8c0807cd040f4e0b",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:32520": [
+    "0x6ab6d61428fde76768d7b45d8bfeec19c6ef91a8",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:42170": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:42220": [
+    "0x9610b01aaa57ec026001f7ec5cface51bfea0ba6",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:71402": [
+    "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0230219b25395f14b84cf4dcd987e2daf5a71e4b:88": [
+    "0x325b5baba7ac1cde57fb7ae3e0a0ea8640486bd1",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0x0288d3e353fe2299f11ea2c2e1696b4a648ecc07:137": [
+    "0xcaf870dad882b00f4b20d714bbf7fceada5e4195",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x0288d3e353fe2299f11ea2c2e1696b4a648ecc07:250": [
+    "0x6ed51c44d0a9e1c23f729fcd00b5a06051c502a5",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x02a40c048ee2607b5f5606e445cfc3633fb20b58:137": [
+    "0x5198e7cc1640049de37d1bd10b03fa5a3afda120",
+    "CANONICAL",
+    "0.1,72,14300"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:1": [
+    "0xa01a715a1465150060ec881fdfbf02186072b5e8",
+    "WRAPPED",
+    "0.1,326.538609,4081.732614"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:10": [
+    "0xa649325aa7c5093d12d6f98eb4378deae68ce23f",
+    "WRAPPED",
+    "0.1,5.354,1070.82"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:100": [
+    "0xa649325aa7c5093d12d6f98eb4378deae68ce23f",
+    "WRAPPED",
+    "0.1,12,2400"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:1088": [
+    "0xc1be9a4d5d45beeacae296a7bd5fadbfc14602c4",
+    "WRAPPED",
+    "0.1,12,2400"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:1284": [
+    "0x5e31a71d3cdd90d517f1f38000ab08bfa6922421",
+    "WRAPPED",
+    "0.1,25.753,5150.79"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:137": [
+    "0xe705af5f63fcabdcdf5016aa838eaaac35d12890",
+    "WRAPPED",
+    "0.1,12,2400"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:2001": [
+    "0x4f3aff3a747fcade12598081e80c6605a8be192f",
+    "WRAPPED",
+    "0.1,4.504,900.9"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:2222": [
+    "0xdc42728b0ea910349ed3c6e1c9dc06b5fb591f98",
+    "WRAPPED",
+    "0.1,18.101644,3620.328871"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:250": [
+    "0x84b67e43474a403cde9aa181b02ba07399a54573",
+    "WRAPPED",
+    "0.1,12,2400"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:288": [
+    "0x65e66a61d0a8f1e686c2d6083ad611a10d84d97a",
+    "WRAPPED",
+    "0.1,24,2400"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:42161": [
+    "0x0ebd9537a25f56713e34c45b38f421a1e7191469",
+    "WRAPPED",
+    "0.1,24,2400"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:42220": [
+    "0x3028b4395f98777123c7da327010c40f3c7cc4ef",
+    "WRAPPED",
+    "0.1,12,2400"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:43114": [
+    "0xa87827efcac7ab82992665fc178cca16843fe353",
+    "WRAPPED",
+    "0.1,12,2400"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:4689": [
+    "0xf27ee99622c3c9b264583dacb2cce056e194494f",
+    "WRAPPED",
+    "0.1,12,2400"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:57": [
+    "0xd6070ae98b8069de6b494332d1a1a81b6179d960",
+    "WRAPPED",
+    "0.1,6.096,1219.32"
+  ],
+  "0x02a5ad4597f7a090148ed209e022555ec2afdbc7:8217": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,26.729963,5345.992644"
+  ],
+  "0x02a9cd311c4d7244f7a0ac7735b5f1987b76e3db:1": [
+    "0xfcb7388eef472293290b15027642702ebf57250a",
+    "WRAPPED",
+    "0.1,438,5473"
+  ],
+  "0x036bae7f92fc429725871d44b1a4dcda21691f50:1": [
+    "0xc5c71cd0b734dae8c6eba9d79c3db693d112dda1",
+    "WRAPPED",
+    "0.1,11957.61,149470.13"
+  ],
+  "0x039b724994260d7c956a06f85c565355a8383198:1": [
+    "0xc261b646f2e4b63068470666db5cc39e4be743a8",
+    "WRAPPED",
+    "0.1,2666.666667,33333.333333"
+  ],
+  "0x039b724994260d7c956a06f85c565355a8383198:1285": [
+    "0xaeddc4a469ace97e90c605e3f52eb89620e305c0",
+    "WRAPPED",
+    "0.1,166.666667,33333.333333"
+  ],
+  "0x039b724994260d7c956a06f85c565355a8383198:137": [
+    "0xeb4c3961f9c06307af0e6bc195204352bd3dbfc6",
+    "WRAPPED",
+    "0.1,166.666667,33333.333333"
+  ],
+  "0x039b724994260d7c956a06f85c565355a8383198:43114": [
+    "0x2c90fa253a19ebecd05456955958765162a98c4f",
+    "WRAPPED",
+    "0.1,166.666667,33333.333333"
+  ],
+  "0x03a99830a543f35bf9c2c8a56d48b1dbe9a45f4e:1": [
+    "0x6425c6be902d692ae2db752b3c268afadb099d3b",
+    "CANONICAL",
+    "0.1,10128,253166"
+  ],
+  "0x03ee4919bf3cfb9b0362e17f739f8c2973616a86:66": [
+    "0x3d632d9e1a60a0880dd45e61f279d919b5748377",
+    "WRAPPED",
+    "0.1,23470.872647,4694174.529409"
+  ],
+  "0x04068da6c83afcfa0e13ba15a6696662335d5b75:1": [
+    "0x0ae055097c6d159879521c384f1d2123d1f195e6",
+    "CANONICAL",
+    "0.1,6.4,160"
+  ],
+  "0x041640ea980e3fe61e9c4ca26d9007bc70094c15:1": [
+    "0x5f006745a9a192a7cd1236089f704f9b35d3b9cd",
+    "WRAPPED",
+    "0.1,270000000000,3300000000000"
+  ],
+  "0x0491648c910ad2c1afaab733faf71d30313df7fc:137": [
+    "0x340fe1d898eccaad394e2ba0fc1f93d27c7b717a",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x049d68029688eabf473097a2fc38ef61633a3c7a:1": [
+    "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "CANONICAL",
+    "0.1,80,2000"
+  ],
+  "0x04ae5cb48b8f968ed821972c5480b5b850f55554:1": [
+    "0xfd9cd8c0d18cd7e06958f3055e0ec3adbdba0b17",
+    "CANONICAL",
+    "0.1,620,15500"
+  ],
+  "0x051048fda2c88e1bed3af811fa3dcd10ddd350a0:137": [
+    "0x985aa5568afb9306d9c3fb04b207f0b116631948",
+    "WRAPPED",
+    "0.1,14.3,2851"
+  ],
+  "0x05409a4df9f5e2407642cc3f29e90d3589366bf2:1": [
+    "0x96610186f3ab8d73ebee1cf950c750f3b1fb79c2",
+    "CANONICAL",
+    "0.1,515,12862"
+  ],
+  "0x0551b4c819bc50101f6961f29cfb277aa998cebc:250": [
+    "0xe7f04e0fbde4b16feb4a67747133f251e4dbccd7",
+    "WRAPPED",
+    "0.1,0.157,31.56"
+  ],
+  "0x0551b4c819bc50101f6961f29cfb277aa998cebc:43114": [
+    "0x1d80583d5c03b70720a91bd4c17bb744183c1b9c",
+    "WRAPPED",
+    "0.1,0.157,31.56"
+  ],
+  "0x0615dbba33fe61a31c7ed131bda6655ed76748b1:1": [
+    "0x34f797e7190c131cf630524655a618b5bd8738e7",
+    "CANONICAL",
+    "0.1,1080,27000"
+  ],
+  "0x0653553e574657410d41ce758db36617f409b6c5:1": [
+    "0xe6b9d092223f39013656702a40dbe6b7decc5746",
+    "WRAPPED",
+    "0.1,0.0011,0.0536"
+  ],
+  "0x0653553e574657410d41ce758db36617f409b6c5:10": [
+    "0x338726dd694db9e2230ec2bb8624a2d7f566c96d",
+    "WRAPPED",
+    "0.1,0.000062,0.000062"
+  ],
+  "0x0653553e574657410d41ce758db36617f409b6c5:128": [
+    "0x85fd5f8dbd0c9ef1806e6c7d4b787d438621c1dc",
+    "WRAPPED",
+    "0.1,0.000029,0.000029"
+  ],
+  "0x0653553e574657410d41ce758db36617f409b6c5:137": [
+    "0x161de8f0b9a59c8197e152da422b9031d3eaf338",
+    "WRAPPED",
+    "0.01,0.000025,0.05"
+  ],
+  "0x0653553e574657410d41ce758db36617f409b6c5:25": [
+    "0xcceaed1f682ef03dd35708e1cbaddd725f8df8a9",
+    "WRAPPED",
+    "0.1,0.000029,0.000029"
+  ],
+  "0x0653553e574657410d41ce758db36617f409b6c5:250": [
+    "0x2406dce4da5ab125a18295f4fb9fd36a0f7879a2",
+    "WRAPPED",
+    "0.1,0.00002,0.00002"
+  ],
+  "0x0653553e574657410d41ce758db36617f409b6c5:321": [
+    "0xf480f38c366daac4305dc484b2ad7a496ff00cea",
+    "WRAPPED",
+    "0.1,0.000029,0.000029"
+  ],
+  "0x0653553e574657410d41ce758db36617f409b6c5:42161": [
+    "0x1e31e3ba5e246e2f2390d29c778e33a59f6aa6c6",
+    "WRAPPED",
+    "0.1,0.000062,0.000062"
+  ],
+  "0x0653553e574657410d41ce758db36617f409b6c5:43114": [
+    "0xbf926e44884f76cd211b800488905ce12158ae67",
+    "WRAPPED",
+    "0.01,0.000025,0.05"
+  ],
+  "0x0653553e574657410d41ce758db36617f409b6c5:66": [
+    "0x9fda7ceec4c18008096c2fe2b85f05dc300f94d0",
+    "WRAPPED",
+    "0.1,0.000029,0.000029"
+  ],
+  "0x06580eabb4a1c643b0f48a5590a2df70c16dadb7:877": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,4690,940000"
+  ],
+  "0x068002c95f033ed7ac19f32638a85a6f971ba11f:1": [
+    "0x0f65f65792d4b286b6f2ff373ee1c1631f71c635",
+    "WRAPPED",
+    "0.1,23952095808383.233532,299401197604790.419159"
+  ],
+  "0x069b7f195e8dae15a70bbc1d7d9f3a7a8a942039:256256": [
+    "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844",
+    "WRAPPED",
+    "0.1,666.666667,133333.333333"
+  ],
+  "0x069b7f195e8dae15a70bbc1d7d9f3a7a8a942039:43114": [
+    "0x525b43a49be2ed530e3516c22bd7ecbcf1586ad4",
+    "WRAPPED",
+    "0.1,666.666667,133333.333333"
+  ],
+  "0x06ebc9c542357e2129d16717cd02c02fbc835d33:1": [
+    "0x06ebc9c542357e2129d16717cd02c02fbc835d33",
+    "WRAPPED",
+    "0.1,10221.651,127770.64"
+  ],
+  "0x06ebc9c542357e2129d16717cd02c02fbc835d33:137": [
+    "0x06ebc9c542357e2129d16717cd02c02fbc835d33",
+    "WRAPPED",
+    "0.1,638.853,127770.64"
+  ],
+  "0x06ebc9c542357e2129d16717cd02c02fbc835d33:250": [
+    "0x06ebc9c542357e2129d16717cd02c02fbc835d33",
+    "WRAPPED",
+    "0.1,638.853,127770.64"
+  ],
+  "0x06ebc9c542357e2129d16717cd02c02fbc835d33:43114": [
+    "0x06ebc9c542357e2129d16717cd02c02fbc835d33",
+    "WRAPPED",
+    "0.1,638.853,127770.64"
+  ],
+  "0x070625d5a14706c30b8e2264753b2f5d035bc1b4:1": [
+    "0xceb286c9604c542d3cc08b41aa6c9675b078a832",
+    "CANONICAL",
+    "0.1,2000,50000"
+  ],
+  "0x07ee3dbf87c3c25994717bbee854ddc354f81e9d:1": [
+    "0x34290390c2fdedb968e7128af26a98e731b781d0",
+    "WRAPPED",
+    "0.1,36696.406046,458705.075572"
+  ],
+  "0x0802d66f029c46e042b74d543fc43b6705ccb4ba:BLOCK": [
+    "block",
+    "CANONICAL",
+    "0.1,5,50"
+  ],
+  "0x09a15e2ecc0306046826d95696c183d533c228df:1": [
+    "0x884247ec9921195c1e722d5e8e812415bd8715d2",
+    "WRAPPED",
+    "0.1,1069.676,13370.95"
+  ],
+  "0x09a15e2ecc0306046826d95696c183d533c228df:137": [
+    "0xd86eee98e7d6726a1701f004f747e5ce3e48e87c",
+    "WRAPPED",
+    "0.1,66.854,13370.95"
+  ],
+  "0x09d3829bb51ba759a879777a8d0040efba1fa165:1": [
+    "0x8e347e33d991a51f5b654245c054bc5a6bc60ce1",
+    "WRAPPED",
+    "0.1,30769.230769,384615.384615"
+  ],
+  "0x09d3829bb51ba759a879777a8d0040efba1fa165:137": [
+    "0xb4593c161f051f5ca601d4364234fff8168afbd5",
+    "WRAPPED",
+    "0.1,1923.076923,384615.384615"
+  ],
+  "0x09d3829bb51ba759a879777a8d0040efba1fa165:43114": [
+    "0x2ebff165cb363002c5f9cbcfd6803957ba0b7208",
+    "WRAPPED",
+    "0.1,1923.076923,384615.384615"
+  ],
+  "0x0a0cf7c39cfa43cecfc6d9e3ce16baa9a069f865:1": [
+    "0x436da116249044e8b4464f0cf21dd93311d88190",
+    "CANONICAL",
+    "0.1,1080,28000"
+  ],
+  "0x0a3a21356793b49154fd3bbe91cbc2a16c0457f5:1": [
+    "0xa1d6df714f91debf4e0802a542e13067f31b8262",
+    "CANONICAL",
+    "0.1,720,17986"
+  ],
+  "0x0aa473bdf86233b7f9224ffaead25b1ed182279c:1": [
+    "0x7761a5e95c96ff0d68daf5ef2f94741229b36b50",
+    "WRAPPED",
+    "0.1,2000,25000"
+  ],
+  "0x0aaef3db5d2847b231468658001c278ee892b7e8:1": [
+    "0xc36824905dff2eaaee7ecc09fcc63abc0af5abc5",
+    "CANONICAL",
+    "0.1,6180,154500"
+  ],
+  "0x0acaabc390d7d7134eef4166f61e3e30b362f675:1": [
+    "0x52dc835d5a36fdf9e6a84603cfef82298645635c",
+    "WRAPPED",
+    "0.1,98.5,1230"
+  ],
+  "0x0acaabc390d7d7134eef4166f61e3e30b362f675:137": [
+    "0xdfb5a6b5136186f4ffcf3fe055b48f27793cdbd2",
+    "WRAPPED",
+    "0.1,6.2,1230"
+  ],
+  "0x0acaabc390d7d7134eef4166f61e3e30b362f675:42161": [
+    "0xb0ae108669ceb86e9e98e8fe9e40d98b867855fd",
+    "WRAPPED",
+    "0.1,30.72,3072.2"
+  ],
+  "0x0acbb2c3d3826b82b17c09e2dfa605b5279e0c63:250": [
+    "0x89d45ccdae300e9a2a725eec8ec76dda571d6e2b",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x0acfc95a193009f1ea45b7faeef2d5e4a47c21b4:137": [
+    "0x8497842420cfdbc97896c2353d75d89fc8d5be5d",
+    "WRAPPED",
+    "0.1,54.306,10861.3"
+  ],
+  "0x0acfc95a193009f1ea45b7faeef2d5e4a47c21b4:25": [
+    "0x53098a3656de0c1ee8dcf004e6a0e886b2968a2f",
+    "WRAPPED",
+    "0.1,78.710409,15742.081733"
+  ],
+  "0x0b079b33b6e72311c6be245f9f660cc385029fc3:1": [
+    "0xc167f62e93775acadeb3d2b0940bce560171fdf3",
+    "WRAPPED",
+    "0.1,3.6,3.6"
+  ],
+  "0x0b079b33b6e72311c6be245f9f660cc385029fc3:108": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,0.805,161.03"
+  ],
+  "0x0b079b33b6e72311c6be245f9f660cc385029fc3:1284": [
+    "0x3d632d9e1a60a0880dd45e61f279d919b5748377",
+    "WRAPPED",
+    "0.1,0.36,0.36"
+  ],
+  "0x0b079b33b6e72311c6be245f9f660cc385029fc3:137": [
+    "0xd10da41d535078f23f68bd90e28b50b31fc40dbc",
+    "WRAPPED",
+    "0.1,0.36,0.36"
+  ],
+  "0x0b079b33b6e72311c6be245f9f660cc385029fc3:2001": [
+    "0x0dcb0cb0120d355cde1ce56040be57add0185baa",
+    "WRAPPED",
+    "0.1,0.36,72.05"
+  ],
+  "0x0b079b33b6e72311c6be245f9f660cc385029fc3:25": [
+    "0x7ae97042a4a0eb4d1eb370c34bfec71042a056b7",
+    "WRAPPED",
+    "0.1,1.461988,292.397661"
+  ],
+  "0x0b079b33b6e72311c6be245f9f660cc385029fc3:250": [
+    "0x2d72a97a31dc920db03330780d30074626e39c8a",
+    "WRAPPED",
+    "0.1,0.36,0.36"
+  ],
+  "0x0b079b33b6e72311c6be245f9f660cc385029fc3:321": [
+    "0xdae6c2a48bfaa66b43815c5548b10800919c993e",
+    "WRAPPED",
+    "0.1,1.461988,292.397661"
+  ],
+  "0x0b079b33b6e72311c6be245f9f660cc385029fc3:40": [
+    "0x86b3f23b6e90f5bbfac59b5b2661134ef8ffd255",
+    "WRAPPED",
+    "0.1,0.312,62.54"
+  ],
+  "0x0b079b33b6e72311c6be245f9f660cc385029fc3:43114": [
+    "0x0802d66f029c46e042b74d543fc43b6705ccb4ba",
+    "WRAPPED",
+    "0.1,0.36,0.36"
+  ],
+  "0x0b32357430fe98c24b2b245b815af68bc9ecfdad:1": [
+    "0xcf3c8be2e2c42331da80ef210e9b1b307c03d36a",
+    "CANONICAL",
+    "0.1,5660,141500"
+  ],
+  "0x0baf6f41514812880212b2e2bb59fe3ca147d6a2:250": [
+    "0x799f44d26e0c51205fe61e3fb0fa6a097bbf933f",
+    "WRAPPED",
+    "0.1,0.597,119.47"
+  ],
+  "0x0baf6f41514812880212b2e2bb59fe3ca147d6a2:43114": [
+    "0x9a1331a6f638cfbdfb263fb7fe4718eabba27e2b",
+    "WRAPPED",
+    "0.1,0.597,119.47"
+  ],
+  "0x0c5f149362ca17eac5d18e6912ab4f5aeabf88e6:1": [
+    "0x48c276e8d03813224bb1e55f953adb6d02fd3e02",
+    "CANONICAL",
+    "0.1,250000000,6230000000"
+  ],
+  "0x0cf21cac0b5689aa39b38032ae228cec9e2d0192:1": [
+    "0x2baac9330cf9ac479d819195794d79ad0c7616e3",
+    "CANONICAL",
+    "0.1,61600,1538460"
+  ],
+  "0x0d501b743f22b641b8c8dfe00f1aab881d57ddc7:1": [
+    "0x06e2ddd17f1043c0a4cbe72cc7c256e4d8a3e374",
+    "WRAPPED",
+    "0.1,353.749,4421.86"
+  ],
+  "0x0d501b743f22b641b8c8dfe00f1aab881d57ddc7:10": [
+    "0x6b7a87899490ece95443e979ca9485cbe7e71522",
+    "WRAPPED",
+    "0.1,22.109,4421.86"
+  ],
+  "0x0d501b743f22b641b8c8dfe00f1aab881d57ddc7:1284": [
+    "0x3b25bc1dc591d24d60560d0135d6750a561d4764",
+    "WRAPPED",
+    "0.1,22.109,4421.86"
+  ],
+  "0x0d501b743f22b641b8c8dfe00f1aab881d57ddc7:137": [
+    "0x1bc3a1e3842145f7a76e8522543c8a7dc8d1b6f9",
+    "WRAPPED",
+    "0.1,26.485576,5297.115191"
+  ],
+  "0x0d501b743f22b641b8c8dfe00f1aab881d57ddc7:43114": [
+    "0x12365293cb6477d4fc2686e46bb97e3fb64f1550",
+    "WRAPPED",
+    "0.1,87.374399,17474.87986"
+  ],
+  "0x0d66f9aa410ca289105355b4940e7551fdce2c14:1": [
+    "0x7d92a06808b4c4833623f809218ed403e4a85fe1",
+    "CANONICAL",
+    "0.1,3200,80000"
+  ],
+  "0x0dbc3e02d8ef0c4c1f7e429c5a3a9aaeedf18a75:137": [
+    "0x599eaef483958da53da541190a78c7427e1d086f",
+    "WRAPPED",
+    "0.1,13,2602"
+  ],
+  "0x0e37d70b51ffa2b98b4d34a5712c5291115464e3:1": [
+    "0x579cea1889991f68acc35ff5c3dd0621ff29b0c9",
+    "CANONICAL",
+    "0.1,4044,101100"
+  ],
+  "0x0e8c9611bc2fefb0a0adeb3f12ee7b11ab206c49:1": [
+    "0xfc5c0e5d0ba6386fbb7d921e5073fd04082a5b49",
+    "WRAPPED",
+    "0.1,1097.845,13723.07"
+  ],
+  "0x0ebd9537a25f56713e34c45b38f421a1e7191469:1": [
+    "0x24ec2ca132abf8f6f8a6e24a1b97943e31f256a7",
+    "CANONICAL",
+    "0.1,3480,87000"
+  ],
+  "0x0ebddb1ef6d508b89bfd62b26d162c13f05be477:1": [
+    "0x6574e2c013171cd50a6d34e588906047a0d12f2c",
+    "WRAPPED",
+    "0.1,2227.791,27847.4"
+  ],
+  "0x0ee249311cd882ca360567960ce9559f5d4184c6:1": [
+    "0xc49f8b8a273456171a7e059ee90437eb51159ec0",
+    "WRAPPED",
+    "0.1,38451.371032,480642.137896"
+  ],
+  "0x0f07ffd690dffd9a0ce8274116830cf62d086b5f:1": [
+    "0x44e2dec86b9f0e0266e9aa66e10323a2bd69cf9a",
+    "CANONICAL",
+    "0.1,2776,69400"
+  ],
+  "0x0f231ae1f3ab499fdb0ada397e344497cd0d73c1:137": [
+    "0x35f80a39eefe33d0dfd2ad2daa6ad6a9d472cebd",
+    "WRAPPED",
+    "0.1,7.866806,1573.361108"
+  ],
+  "0x0f231ae1f3ab499fdb0ada397e344497cd0d73c1:66": [
+    "0xec8d1e2e8b8b9302d448e24a94399134f124796d",
+    "WRAPPED",
+    "0.1,376.191021,75238.204154"
+  ],
+  "0x0f9c0a22fdef62f88c981188351ab531cfec00e6:1": [
+    "0x59e9261255644c411afdd00bd89162d09d862e38",
+    "CANONICAL",
+    "0.1,828,20660"
+  ],
+  "0x0fc22a684ee0f37efa8f7dd12f48f62c17ee0c92:1": [
+    "0xb3214d4af8af68e56a4716f7538e57c5f0ef622c",
+    "CANONICAL",
+    "0.1,42,1054"
+  ],
+  "0x0ffccbff59bffa90bc27e41a362839947bb11f80:1": [
+    "0x31429d1856ad1377a8a0079410b297e1a9e214c2",
+    "CANONICAL",
+    "0.1,134,3342"
+  ],
+  "0x1024fb39d9938d3b028e940b95c84a326cd57a58:137": [
+    "0x2127b96a05f9bf9095913d1e8b7bdb203a683a9f",
+    "WRAPPED",
+    "0.1,1000,200000"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:1": [
+    "0xcfd5868fbf612bd8907827f012d71f3c7ba6c943",
+    "WRAPPED",
+    "0.1,0.001,0.026"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:10001": [
+    "0x5df101f56ea643e06066392d266e9f4366b9186d",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:1024": [
+    "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:1030": [
+    "0x965f84d915a9efa2dd81b653e3ae736555d945f4",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:106": [
+    "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:1111": [
+    "0x2c78f1b70ccf63cdee49f9233e9faa99d43aa07e",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:1234": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:2002": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:2025": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:2109": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:2222": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:24": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:24734": [
+    "0x67f44cb704884e0eb53c48fec8f1b1e7f8a63729",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:25": [
+    "0xd96ddb35c6268cb3085003248853c39f3bfffb4b",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:42220": [
+    "0x338726dd694db9e2230ec2bb8624a2d7f566c96d",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b620a6e3182850c005f0bcbd9a56e9121d8c62:71402": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,0.00003,0.00003"
+  ],
+  "0x10b6edf7b2da48f6cd37e01be18d3c19120a46f2:1": [
+    "0xebeef419bb5a347e3d98f7d2168055214d12cbdb",
+    "CANONICAL",
+    "0.1,640,16000"
+  ],
+  "0x1104918312cc9ad88eadabe07b5110cae99583f6:1": [
+    "0x76fba02e148cab052f86dc1d8f4b10e64efc7046",
+    "WRAPPED",
+    "0.1,800,10000"
+  ],
+  "0x11eb3aa66fe1f2b75cb353d3e874e96968182bda:137": [
+    "0xf4b0903774532aee5ee567c02aab681a81539e92",
+    "CANONICAL",
+    "0.1,14.53,2910"
+  ],
+  "0x1282911d3600b202698997f61f46379db3b9f01e:1": [
+    "0x739ca6d71365a08f584c8fc4e1029045fa8abc4b",
+    "WRAPPED",
+    "0.1,20,1000"
+  ],
+  "0x1282911d3600b202698997f61f46379db3b9f01e:10": [
+    "0x4f3aff3a747fcade12598081e80c6605a8be192f",
+    "WRAPPED",
+    "0.1,1.9,1.9"
+  ],
+  "0x1282911d3600b202698997f61f46379db3b9f01e:137": [
+    "0x9b17baadf0f21f03e35249e0e59723f34994f806",
+    "WRAPPED",
+    "0.01,0.5,1000"
+  ],
+  "0x1282911d3600b202698997f61f46379db3b9f01e:25": [
+    "0xb96b904ba83ddeece47caada8b40ee6936d92091",
+    "WRAPPED",
+    "0.1,0.5,0.5"
+  ],
+  "0x1282911d3600b202698997f61f46379db3b9f01e:250": [
+    "0xd652776de7ad802be5ec7bebfafda37600222b48",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x1282911d3600b202698997f61f46379db3b9f01e:42161": [
+    "0xaef9e3e050d0ef060cdfd5246209b0b6bb66060f",
+    "WRAPPED",
+    "0.1,1.9,1.9"
+  ],
+  "0x1282911d3600b202698997f61f46379db3b9f01e:43114": [
+    "0xd4143e8db48a8f73afcdf13d7b3305f28da38116",
+    "WRAPPED",
+    "0.01,0.5,1000"
+  ],
+  "0x1284970541d8ada703dbb5f3287c2db608a1d70f:1285": [
+    "0x55af5865807b196bd0197e0902746f31fbccfa58",
+    "WRAPPED",
+    "0.1,176,35125"
+  ],
+  "0x1284970541d8ada703dbb5f3287c2db608a1d70f:137": [
+    "0xb53ec4ace420a62cfb75afdeba600d284777cd65",
+    "WRAPPED",
+    "0.1,176,35125"
+  ],
+  "0x1284970541d8ada703dbb5f3287c2db608a1d70f:250": [
+    "0x5f7f94a1dd7b15594d17543beb8b30b111dd464c",
+    "WRAPPED",
+    "0.1,176,35125"
+  ],
+  "0x1284970541d8ada703dbb5f3287c2db608a1d70f:43114": [
+    "0x09211dc67f9fe98fb7bbb91be0ef05f4a12fa2b2",
+    "WRAPPED",
+    "0.1,176,35125"
+  ],
+  "0x134b372f5543c5cca30be6a796da032c8274bddf:1": [
+    "0x8b0e42f366ba502d787bb134478adfae966c8798",
+    "CANONICAL",
+    "0.1,20000,500000"
+  ],
+  "0x1351ab0323b1127e1cfb8406adf87ca88a5a4ff6:1": [
+    "0x5d285f735998f36631f678ff41fb56a10a4d0429",
+    "CANONICAL",
+    "0.1,8696,440000"
+  ],
+  "0x13616f44ba82d63c8c0dc3ff843d36a8ec1c05a9:1": [
+    "0x442b153f6f61c0c99a33aa4170dcb31e1abda1d0",
+    "WRAPPED",
+    "0.1,6.7,334"
+  ],
+  "0x138218c8e064ed2a011c9ff203759a8a1e23e6c8:1": [
+    "0x772722b55cdc2a086abd064267a17855eb15e8b3",
+    "WRAPPED",
+    "0.1,1076.730508,13459.131348"
+  ],
+  "0x138218c8e064ed2a011c9ff203759a8a1e23e6c8:24734": [
+    "0x5ecd7381ecf460436ae22cf7b94221943642c7e2",
+    "WRAPPED",
+    "0.1,67.295657,13459.131348"
+  ],
+  "0x138218c8e064ed2a011c9ff203759a8a1e23e6c8:25": [
+    "0xd652776de7ad802be5ec7bebfafda37600222b48",
+    "WRAPPED",
+    "0.1,93.536619,18707.323917"
+  ],
+  "0x13e971de9181eef7a4aeaeaa67552a6a4cc54f43:250": [
+    "0x0914d4ccc4154ca864637b0b653bc5fd5e1d3ecf",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x1441e091e1247e6e6990ccb2c27169204fb04aa9:1": [
+    "0xe613a914bbb433855378183c3ab13003285da40a",
+    "WRAPPED",
+    "0.1,25683,321028"
+  ],
+  "0x14834532cd1aaaca7d271a4d419dcbda0b64f630:1": [
+    "0x6362496bef53458b20548a35a2101214ee2be3e0",
+    "WRAPPED",
+    "0.1,731,9130"
+  ],
+  "0x14834532cd1aaaca7d271a4d419dcbda0b64f630:137": [
+    "0x6d696ebbb49c304e004f112c85a4a710e96c09d8",
+    "WRAPPED",
+    "0.1,45.7,9130"
+  ],
+  "0x14834532cd1aaaca7d271a4d419dcbda0b64f630:250": [
+    "0x0615dbba33fe61a31c7ed131bda6655ed76748b1",
+    "WRAPPED",
+    "0.1,45.7,9130"
+  ],
+  "0x14834532cd1aaaca7d271a4d419dcbda0b64f630:43114": [
+    "0x20cf1b6e9d856321ed4686877cf4538f2c84b4de",
+    "WRAPPED",
+    "0.1,45.7,9130"
+  ],
+  "0x14943e8bdf07049470b6a001f9b09ddad0c0065b:137": [
+    "0xacb5f391f51e15418845bec74781bdd1cbe0fd89",
+    "WRAPPED",
+    "0.1,18532452177.007,3706490435401.43"
+  ],
+  "0x14a92e19df812134a82fd12527612b2143742d4b:1": [
+    "0xd95f99d6e5527eeb35eba9e024900ee7f8eaeafc",
+    "WRAPPED",
+    "0.1,600.015,7500.187505"
+  ],
+  "0x14a92e19df812134a82fd12527612b2143742d4b:321": [
+    "0x739ca6d71365a08f584c8fc4e1029045fa8abc4b",
+    "WRAPPED",
+    "0.1,37.500938,7500.187505"
+  ],
+  "0x14a9a94e555fdd54c21d7f7e328e61d7ebece54b:1": [
+    "0xd6cce248263ea1e2b8cb765178c944fc16ed0727",
+    "WRAPPED",
+    "0.1,100,1250"
+  ],
+  "0x14a9a94e555fdd54c21d7f7e328e61d7ebece54b:137": [
+    "0x4e2b07c0bcd975caf4f6b10ca30d59d568d0fb0d",
+    "WRAPPED",
+    "0.1,6.25,1250"
+  ],
+  "0x158335c10d3eee1c5db5a302ab972022f3e59040:1": [
+    "0x5d47baba0d66083c52009271faf3f50dcc01023c",
+    "WRAPPED",
+    "0.1,2080,102200"
+  ],
+  "0x15d1d8274277a2f4c1f45be70ab189a16ab15673:1": [
+    "0x10864cd0c4250f7de15dd3cd3788dc704cdb6706",
+    "WRAPPED",
+    "0.1,410260,5128210"
+  ],
+  "0x15d1d8274277a2f4c1f45be70ab189a16ab15673:106": [
+    "0x7c598c96d02398d89fbcb9d41eab3df0c16f227d",
+    "WRAPPED",
+    "0.1,25650,5128210"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:1": [
+    "0x92804831ac036ca77d57db8bba0e522cd35a8049",
+    "WRAPPED",
+    "0.1,40,1000"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:10000": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:10001": [
+    "0x312b15d6d531ea0fe91ddd212db8c0f37e4cc698",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:1024": [
+    "0x3028b4395f98777123c7da327010c40f3c7cc4ef",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:1030": [
+    "0x6c2c113c8ca73db67224ef4d8c8dfcec61e52a9c",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:106": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:108": [
+    "0x461d52769884ca6235b685ef2040f47d30c94eb5",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:1234": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:2002": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:2025": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:2109": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:2222": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:32520": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:42220": [
+    "0x4f3aff3a747fcade12598081e80c6605a8be192f",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16316ab20088b133626ffdaa37a53876099cbd44:71402": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x16a6612eda615c63b946dd75aebed7d4b7252b3c:NAS": [
+    "n1jrkxgpeucs7bu2vq3jbznbdtwwh1ofxku",
+    "CANONICAL",
+    "0.1,25,4930"
+  ],
+  "0x170dc35c5b58aededc81960691eb4b389eba9e95:137": [
+    "0x2df54842cd85c60f21b4871e09bcc6047b2dcc4d",
+    "WRAPPED",
+    "0.1,18091.688,3618337.73"
+  ],
+  "0x170dc35c5b58aededc81960691eb4b389eba9e95:1666600000": [
+    "0xf7428ffcb2581a2804998efbb036a43255c8a8d3",
+    "WRAPPED",
+    "0.1,18091.688,3618337.73"
+  ],
+  "0x1785113910847770290f5f840b4c74fc46451201:137": [
+    "0x23e8b6a3f6891254988b84da3738d2bfe5e703b9",
+    "CANONICAL",
+    "0.1,102,20374"
+  ],
+  "0x181de8c57c4f25eba9fd27757bbd11cc66a55d31:137": [
+    "0x47536f17f4ff30e64a96a7555826b8f9e66ec468",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x181de8c57c4f25eba9fd27757bbd11cc66a55d31:250": [
+    "0x4a13a2cf881f5378def61e430139ed26d843df9a",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x1861c9058577c3b48e73d91d6f25c18b17fbffe0:1": [
+    "0x3affcca64c2a6f4e3b6bd9c64cd2c969efd1ecbe",
+    "CANONICAL",
+    "0.1,7820,195500"
+  ],
+  "0x18ac7323615f1fabf332ff4afca735eaf6dd9668:1": [
+    "0xbae5f2d8a1299e5c4963eaff3312399253f27ccb",
+    "CANONICAL",
+    "0.1,590,14750"
+  ],
+  "0x1935c03bb7dbc3623bd992ce599bc26bd30a43eb:1": [
+    "0x05ec81610ab47a094502bac0d7ec256f06a1c6f8",
+    "WRAPPED",
+    "0.1,48146.65471,601833.183878"
+  ],
+  "0x1935c03bb7dbc3623bd992ce599bc26bd30a43eb:10": [
+    "0x22648c12acd87912ea1710357b1302c6a4154ebc",
+    "WRAPPED",
+    "0.1,5950.50371,595050.371014"
+  ],
+  "0x1935c03bb7dbc3623bd992ce599bc26bd30a43eb:137": [
+    "0x525b43a49be2ed530e3516c22bd7ecbcf1586ad4",
+    "WRAPPED",
+    "0.1,443.73,88745.79"
+  ],
+  "0x1935c03bb7dbc3623bd992ce599bc26bd30a43eb:250": [
+    "0x81382e9693de2afc33f69b70a6c12ca9b3a73f47",
+    "WRAPPED",
+    "0.1,443.73,88745.79"
+  ],
+  "0x1935c03bb7dbc3623bd992ce599bc26bd30a43eb:42161": [
+    "0xbb85d38faa5064fab8bf3e0a79583a2670f03dbc",
+    "WRAPPED",
+    "0.1,5950.50371,595050.371014"
+  ],
+  "0x19a6da6e382b85f827088092a3dbe864d9ccba73:250": [
+    "0xd2f38621c3c65300ecaba7020c05d1350f9c265c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x19c91764a976ac6c1e2c2e4c5856f2939342a814:1": [
+    "0x1beef31946fbbb40b877a72e4ae04a8d1a5cee06",
+    "CANONICAL",
+    "0.1,24000,600000"
+  ],
+  "0x1a056a5fcbbe5ad69793cea8569c6dba33e4080a:1": [
+    "0xcaaa93712bdac37f736c323c93d4d5fdefcc31cc",
+    "CANONICAL",
+    "0.1,17204,430100"
+  ],
+  "0x1a6990fcce4fe96be417d48f60b7ea5cc329de80:1": [
+    "0x7e291890b01e5181f7ecc98d79ffbe12ad23df9e",
+    "CANONICAL",
+    "0.1,3.4,86"
+  ],
+  "0x1a8d54beed300e99e41dfc806d522eba5aefa034:1": [
+    "0xbbb63f49fe75cd82513c4a3da2ec80dd36a8448f",
+    "WRAPPED",
+    "0.1,197.19,4929.65"
+  ],
+  "0x1a8d7ac01d21991bf5249a3657c97b2b6d919222:43114": [
+    "0x468003b688943977e6130f4f68f23aad939a1040",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x1a91c7852fb2436ac87671bddf8f720e83ef1fd3:1": [
+    "0x91827bc11cb9bbed7f4796393cd664aff9c60f58",
+    "WRAPPED",
+    "0.1,39.60396,495.049505"
+  ],
+  "0x1a91c7852fb2436ac87671bddf8f720e83ef1fd3:137": [
+    "0x0f730d43d85f722903b8aded334b32332466b207",
+    "WRAPPED",
+    "0.1,2.475248,495.049505"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:1": [
+    "0x5870700f1272a1adbb87c3140bd770880a95e55d",
+    "WRAPPED",
+    "0.1,0.207045,2.588059"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:10": [
+    "0x4e720dd3ac5cfe1e1fbde4935f386bb1c66f4642",
+    "WRAPPED",
+    "0.1,0.012534,2.506768"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:1088": [
+    "0xe6801928061cdbe32ac5ad0634427e140efd05f9",
+    "WRAPPED",
+    "0.1,0.0035,0.7"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:122": [
+    "0x2bf9b864cdc97b08b6d79ad4663e71b8ab65c45c",
+    "WRAPPED",
+    "0.1,0.0035,0.7"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:128": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.013582,2.716358"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:1284": [
+    "0x595c8481c48894771ce8fade54ac6bf59093f9e8",
+    "WRAPPED",
+    "0.1,0.0035,0.7"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:1285": [
+    "0x173fd7434b8b50df08e3298f173487ebdb35fd14",
+    "WRAPPED",
+    "0.1,0.0035,0.7"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:137": [
+    "0xfbdd194376de19a88118e84e279b977f165d01b8",
+    "WRAPPED",
+    "0.1,0.0035,0.7"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:1666600000": [
+    "0x6ab6d61428fde76768d7b45d8bfeec19c6ef91a8",
+    "WRAPPED",
+    "0.1,0.0035,0.7"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:2222": [
+    "0xc19281f22a075e0f10351cd5d6ea9f0ac63d4327",
+    "WRAPPED",
+    "0.1,0.015943,3.188572"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:25": [
+    "0xe6801928061cdbe32ac5ad0634427e140efd05f9",
+    "WRAPPED",
+    "0.1,0.013582,2.716358"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:250": [
+    "0xd6070ae98b8069de6b494332d1a1a81b6179d960",
+    "WRAPPED",
+    "0.1,0.0035,0.7"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:42161": [
+    "0x99c409e5f62e4bd2ac142f17cafb6810b8f0baae",
+    "WRAPPED",
+    "0.1,0.007,0.7"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:42220": [
+    "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c",
+    "WRAPPED",
+    "0.1,0.0035,0.7"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:42262": [
+    "0x65e66a61d0a8f1e686c2d6083ad611a10d84d97a",
+    "WRAPPED",
+    "0.1,0.01,2.01"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:43114": [
+    "0xd6070ae98b8069de6b494332d1a1a81b6179d960",
+    "WRAPPED",
+    "0.1,0.0035,0.7"
+  ],
+  "0x1ab7de6ac4ef91ea4f10fabe444b9a2e727ec89b:57": [
+    "0xd7c295e399ca928a3a14b01d760e794f1adf8990",
+    "WRAPPED",
+    "0.1,0.01,2.01"
+  ],
+  "0x1ac0d76f11875317f8a7d791db94cdd82bd02bd1:1": [
+    "0x27054b13b1b798b345b591a4d22e6562d47ea75a",
+    "CANONICAL",
+    "0.1,320,8000"
+  ],
+  "0x1ad411be31cba244d0ff981a8c50cdd92002afd9:1": [
+    "0xa71353bb71dda105d383b02fc2dd172c4d39ef8b",
+    "WRAPPED",
+    "0.1,34.5,862"
+  ],
+  "0x1ad411be31cba244d0ff981a8c50cdd92002afd9:137": [
+    "0x61b31f8d9d8bd303891ec4030b1206cab9488c95",
+    "WRAPPED",
+    "0.1,4.4,862"
+  ],
+  "0x1ad8b8b151b7d408c757ed0d583e9b7c2f78ce19:137": [
+    "0x5dd3411c533ab5a1d416e47756e261bd733dc103",
+    "WRAPPED",
+    "0.1,0.85,170"
+  ],
+  "0x1ad8b8b151b7d408c757ed0d583e9b7c2f78ce19:43114": [
+    "0xe705af5f63fcabdcdf5016aa838eaaac35d12890",
+    "WRAPPED",
+    "0.1,0.85,170"
+  ],
+  "0x1b41a1ba7722e6431b1a782327dbe466fe1ee9f9:1": [
+    "0xef53462838000184f35f7d991452e5f25110b207",
+    "CANONICAL",
+    "0.1,290,7250"
+  ],
+  "0x1b79708eea29900dbbbca8a5ae620ac741618ae4:137": [
+    "0x130966628846bfd36ff31a822705796e8cb8c18d",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x1b79708eea29900dbbbca8a5ae620ac741618ae4:250": [
+    "0x735abe48e8782948a37c7765ecb76b98cde97b0f",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x1c019af5b059f4473289c1ddeea02cc4993478ea:1": [
+    "0x049e119413ab1f1b0fd836e657e3e4ba3ad9cab8",
+    "CANONICAL",
+    "0.1,2160,54000"
+  ],
+  "0x1cdee2f21c066848a8a135e19f5f302ca29f1f69:1": [
+    "0x09970aec766b6f3223aca9111555e99dc50ff13a",
+    "CANONICAL",
+    "0.1,1228,30680"
+  ],
+  "0x1dc56f2705ff2983f31fb5964cc3e19749a7cba7:1": [
+    "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "CANONICAL",
+    "0.1,80,1000"
+  ],
+  "0x1dd20779c8facd5a60680c3f423137ca18155e47:1": [
+    "0x614d7f40701132e25fe6fc17801fbd34212d2eda",
+    "WRAPPED",
+    "0.1,13600000000,170000000000"
+  ],
+  "0x1dd20779c8facd5a60680c3f423137ca18155e47:10": [
+    "0xd1a891e6eccb7471ebd6bc352f57150d4365db21",
+    "WRAPPED",
+    "0.1,2373605506.764776,237360550676.477569"
+  ],
+  "0x1dd20779c8facd5a60680c3f423137ca18155e47:137": [
+    "0xd145261dd80bc5388ea8f437d503897060410f1c",
+    "WRAPPED",
+    "0.1,1447178002.894356,289435600578.871201"
+  ],
+  "0x1dd20779c8facd5a60680c3f423137ca18155e47:25": [
+    "0x9d3e3624b3de482331f4f091fd8b76d3f344bd8c",
+    "WRAPPED",
+    "0.1,1163331782.22429,232666356444.858074"
+  ],
+  "0x1dd20779c8facd5a60680c3f423137ca18155e47:250": [
+    "0x7d226bff737c5855254c307523afb3c464c5680b",
+    "WRAPPED",
+    "0.1,1218620521.569583,243724104313.916646"
+  ],
+  "0x1dd20779c8facd5a60680c3f423137ca18155e47:42161": [
+    "0xe0eb31082bbf8252f7425c6dd72a8c6b3bfbe99f",
+    "WRAPPED",
+    "0.1,2373605506.764776,237360550676.477569"
+  ],
+  "0x1dd20779c8facd5a60680c3f423137ca18155e47:43114": [
+    "0x3bd9856bf578910b55261d45d9148d61c177b092",
+    "WRAPPED",
+    "0.1,1218620521.569583,243724104313.916646"
+  ],
+  "0x1e06229b037ec6bfeb48fc4d3b473e6c91bb99b7:250": [
+    "0x4e8543032da7ba1ee010c4964f11cedd7374b7d0",
+    "WRAPPED",
+    "0.1,5.051,1010.33"
+  ],
+  "0x1e06229b037ec6bfeb48fc4d3b473e6c91bb99b7:43114": [
+    "0x2e1f94dfc828d4f9d69b73bfc87db9c8038a0beb",
+    "WRAPPED",
+    "0.1,5.051,1010.33"
+  ],
+  "0x1e584d356db17decfa474fb9669fa7d2f181ee4e:137": [
+    "0xecb6d48e04d1df057e398b98ac8b3833eb3839ec",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x1f3406687cc885f18c310e44496c11b2500087b9:1": [
+    "0x55091ee4c62cdcf7bfb6e0f7f78447f8f7b44269",
+    "CANONICAL",
+    "0.1,320,8000"
+  ],
+  "0x1f38620f555a4725c2e27d34a175e4f97a32b3ac:1666600000": [
+    "0x4518231a8fdf6ac553b9bbd51bbb86825b583263",
+    "WRAPPED",
+    "0.1,507.248,101449.61"
+  ],
+  "0x1f63670f1fac519ec57fca17b986871d6cf7b52f:1": [
+    "0xa7de087329bfcda5639247f96140f9dabe3deed1",
+    "CANONICAL",
+    "0.1,2020,50500"
+  ],
+  "0x1f681b1c4065057e07b95a1e5e504fb2c85f4625:1": [
+    "0x4f851750a3e6f80f1e1f89c67b56960bfc29a934",
+    "WRAPPED",
+    "0.1,1244.91,31122.79"
+  ],
+  "0x1f681b1c4065057e07b95a1e5e504fb2c85f4625:137": [
+    "0x652fae511be0a529b422945594a2a727b64af1af",
+    "WRAPPED",
+    "0.1,155.613,31122.79"
+  ],
+  "0x1f681b1c4065057e07b95a1e5e504fb2c85f4625:250": [
+    "0x65c9d9d080714cda7b5d58989dc27f897f165179",
+    "WRAPPED",
+    "0.1,155.613,31122.79"
+  ],
+  "0x1f7216fdb338247512ec99715587bb97bbf96eae:1": [
+    "0x19d97d8fa813ee2f51ad4b4e04ea08baf4dffc28",
+    "CANONICAL",
+    "0.1,2,50"
+  ],
+  "0x1f9ce5ac8befa74bfa614ae22ffc0fdd1e06827e:1": [
+    "0xb808d767ddf0f61ca62331c1bbbebe0530b41079",
+    "WRAPPED",
+    "0.1,244.01,3050.08"
+  ],
+  "0x1f9ce5ac8befa74bfa614ae22ffc0fdd1e06827e:137": [
+    "0x45f91600e8363dbadb4d7371530716d9407f8395",
+    "WRAPPED",
+    "0.1,15.25,3050.08"
+  ],
+  "0x1fd377178511e9c74e055aa3789cfb64fc7ca07b:250": [
+    "0xf75565b89ba076b8fc7b9708d14855fd3da89e97",
+    "WRAPPED",
+    "0.1,18.93,3786.77"
+  ],
+  "0x1fd377178511e9c74e055aa3789cfb64fc7ca07b:43114": [
+    "0x7fc5670b2041d34414b0b2178fc660b1e1faf801",
+    "WRAPPED",
+    "0.1,18.84,3768.35"
+  ],
+  "0x1fe4751d9bdabac8d90067056cb45ab6823d2c12:1": [
+    "0xd4342a57ecf2fe7ffa37c33cb8f63b1500e575e6",
+    "CANONICAL",
+    "0.1,1320,33000"
+  ],
+  "0x1fe5b870bca201db77bc0a8573fdebc35ee7a114:1": [
+    "0x30f271c9e86d2b7d00a6376cd96a1cfbd5f0b9b3",
+    "CANONICAL",
+    "0.1,344,8600"
+  ],
+  "0x204d3d2bbbf39a7bb85a00dd45fb0d2fe57a660b:1": [
+    "0xb53ec4ace420a62cfb75afdeba600d284777cd65",
+    "WRAPPED",
+    "0.1,1924,24050"
+  ],
+  "0x204d3d2bbbf39a7bb85a00dd45fb0d2fe57a660b:250": [
+    "0x19193f450086d0442157b852081976d41657ad56",
+    "WRAPPED",
+    "0.1,121,24050"
+  ],
+  "0x204d3d2bbbf39a7bb85a00dd45fb0d2fe57a660b:42161": [
+    "0x3053ad3b31600074e9a90440770f78d5e8fc5a54",
+    "WRAPPED",
+    "0.1,242,24050"
+  ],
+  "0x205f93cd558aac99c4609d0511829194b5405533:137": [
+    "0x2c2c1cd892cfe2368a0070b7ae28740e954b0920",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x21a0433662c36028e0bb9537ccd768d7c0017b48:1": [
+    "0xe7976c4efc60d9f4c200cc1bcef1a1e3b02c73e7",
+    "CANONICAL",
+    "0.1,190,4750"
+  ],
+  "0x21adb1c644663069e83059ac3f9d9ca1133d29e4:137": [
+    "0x2cf7d99c1bff7caa25b737c909637948e6e7781e",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x21adb1c644663069e83059ac3f9d9ca1133d29e4:250": [
+    "0x99f7d752745f270e100233cc05768b4a12bd09f0",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x21f1ce0fcf1e9e39f8e79b7762801e8096d9f6cd:137": [
+    "0xfa0ca21da6a94623d953034f140372613f102346",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x2210502051221a600d3653eccc899eceea11a0fd:1": [
+    "0x27c4af9a860c4cadc358005f8b48140b2e434a7b",
+    "CANONICAL",
+    "0.1,200000,5000000"
+  ],
+  "0x222cf80a8514f8ce551c06d1b8d01db3678688ad:1": [
+    "0xfe77d71baf7a6cdabbd63a2ad1e0adb68ca64c06",
+    "WRAPPED",
+    "0.1,6845000,85543200"
+  ],
+  "0x2244faab5a2a633cb7f6e3d35e7db8ec0136d3e2:1": [
+    "0x9ea48018587fdf4b5857940171d3d32465b0b761",
+    "WRAPPED",
+    "0.1,64,800"
+  ],
+  "0x2244faab5a2a633cb7f6e3d35e7db8ec0136d3e2:137": [
+    "0x3b79a28264fc52c7b4cea90558aa0b162f7faf57",
+    "WRAPPED",
+    "0.1,1.4,272"
+  ],
+  "0x22648c12acd87912ea1710357b1302c6a4154ebc:1": [
+    "0x6dc02164d75651758ac74435806093e421b64605",
+    "CANONICAL",
+    "0.1,106,1060"
+  ],
+  "0x2291fb9abafaad7d701f2cc26f4e89ae2ecb2b8f:137": [
+    "0x7db1b41e7a3a54b89272973189aee6548dd9c199",
+    "WRAPPED",
+    "0.1,956,191080"
+  ],
+  "0x22d224ce83103a8d218b1e6cc2a38bd94f60f066:1": [
+    "0xbbfe0b60de96a189bf09079de86a2db7bf0c7883",
+    "WRAPPED",
+    "0.1,6770.566654,84632.083176"
+  ],
+  "0x22e7f79c547d676baf561032bf64d51d6ceb5f3f:1": [
+    "0xfc2afd7ebf2e0ca69340cd9f466177e23812cf5a",
+    "WRAPPED",
+    "0.1,137,1705"
+  ],
+  "0x22e7f79c547d676baf561032bf64d51d6ceb5f3f:137": [
+    "0xc5c71cd0b734dae8c6eba9d79c3db693d112dda1",
+    "WRAPPED",
+    "0.1,8.6,1705"
+  ],
+  "0x22e7f79c547d676baf561032bf64d51d6ceb5f3f:250": [
+    "0x609d6ea495e00c982df8f76fdbaa14cd8f922d16",
+    "WRAPPED",
+    "0.1,8.6,1705"
+  ],
+  "0x231f197d0e3e912deccd93c076ad92bddde70d61:1": [
+    "0x1748e1a07e82762660b4e57838b570dcb73bf75d",
+    "WRAPPED",
+    "0.1,104000000,1300000000"
+  ],
+  "0x232d9a35f3e0bfa1b34901cba525fe916d2af6d5:128": [
+    "ht",
+    "CANONICAL",
+    "0.1,0.4,4"
+  ],
+  "0x2406dce4da5ab125a18295f4fb9fd36a0f7879a2:1": [
+    "0x9b31bb425d8263fa1b8b9d090b83cf0c31665355",
+    "CANONICAL",
+    "0.1,1040,26000"
+  ],
+  "0x2442afe6cf6958bf6a026bce5d9c6cc07e03a6c9:1": [
+    "0x28cb7e841ee97947a86b06fa4090c8451f64c0be",
+    "CANONICAL",
+    "0.1,0.14,3.5"
+  ],
+  "0x245d3238cbbe03f9b8e1bff4709d1ebdf22ced4b:1": [
+    "0x389999216860ab8e0175387a0c90e5c52522c945",
+    "CANONICAL",
+    "0.1,15200000000,380000000000"
+  ],
+  "0x248c45af3b2f73bc40fa159f2a90ce9cad7a77ba:137": [
+    "0x306377cfa2ac72e757151591e9ecf0135d7c9613",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x248d995f14deebb179a222cd36c4767388545a62:1": [
+    "0x97bbbc5d96875fb78d2f14b7ff8d7a3a74106f17",
+    "WRAPPED",
+    "0.1,23.121387,289.017341"
+  ],
+  "0x248d995f14deebb179a222cd36c4767388545a62:137": [
+    "0x91827bc11cb9bbed7f4796393cd664aff9c60f58",
+    "WRAPPED",
+    "0.1,1.445087,289.017341"
+  ],
+  "0x249463c47e10f81228f90c79d2e01608b0e91155:1": [
+    "0x84bb947fcedba6b9c7dcead42df07e113bb03007",
+    "CANONICAL",
+    "0.1,1542,38536"
+  ],
+  "0x250c30a63374a613ed14a0e4d7bd7d14abab8fbf:1": [
+    "0xdb12c7e30dc2a2c421724d07c7a09147bd9f61bb",
+    "WRAPPED",
+    "0.1,65.573,819.67"
+  ],
+  "0x250e8703097f33d4e098fbf633040c0fb83231a8:1": [
+    "0x41471fbf66dafb95b682afaf1426bee11f25e10a",
+    "WRAPPED",
+    "0.1,850.815,10635.19"
+  ],
+  "0x250e8703097f33d4e098fbf633040c0fb83231a8:137": [
+    "0x133873fb966cb927024179a09e7cfb2f89a2dd29",
+    "WRAPPED",
+    "0.1,51.569,10313.85"
+  ],
+  "0x250e8703097f33d4e098fbf633040c0fb83231a8:43114": [
+    "0xdfb5a6b5136186f4ffcf3fe055b48f27793cdbd2",
+    "WRAPPED",
+    "0.1,51.569,10313.85"
+  ],
+  "0x25a528af62e56512a19ce8c3cab427807c28cc19:1": [
+    "0x21381e026ad6d8266244f2a583b35f9e4413fa2a",
+    "CANONICAL",
+    "0.1,400,10000"
+  ],
+  "0x25cf8524de30ee979afc3a1f185eb6868629ece4:1": [
+    "0xd8485513dd9947aa3287d90fd3804d3df52d0da1",
+    "WRAPPED",
+    "0.1,2666.666667,33333.333333"
+  ],
+  "0x2630c7d2104b92721357b3735412ce647a28ed8a:250": [
+    "0x99bb54f7a11eb8af1d486fe644ebed304f52f85a",
+    "WRAPPED",
+    "0.1,20600000,4100000000"
+  ],
+  "0x26414054e097156c58b0294a9189a34c06bb0ecb:1": [
+    "0xcb56e96615bb22bf4d78390ac79f4b5e9f582ccf",
+    "WRAPPED",
+    "0.1,500,6250"
+  ],
+  "0x26414054e097156c58b0294a9189a34c06bb0ecb:137": [
+    "0xbe08caee66d2c1dff3ff79b89aa05d647b51d219",
+    "WRAPPED",
+    "0.1,31.25,6250"
+  ],
+  "0x26414054e097156c58b0294a9189a34c06bb0ecb:1666600000": [
+    "0x7d3b448c1242b563c65e8dafcc13557c3069b5b6",
+    "WRAPPED",
+    "0.1,31.25,6250"
+  ],
+  "0x264c1383ea520f73dd837f915ef3a732e204a493:1": [
+    "0xc52c326331e9ce41f04484d3b5e5648158028804",
+    "CANONICAL",
+    "0.1,15.6,390"
+  ],
+  "0x26519efc30494c20f435819910062a607e0630a6:1": [
+    "0x419fa2e21092d834e3b02bd0802dee329c84268a",
+    "WRAPPED",
+    "0.1,2285.714286,28571.428571"
+  ],
+  "0x26519efc30494c20f435819910062a607e0630a6:137": [
+    "0x7e78d327b15f2a36a22c5955d3a23d99dbccd8e0",
+    "WRAPPED",
+    "0.1,142.857143,28571.428571"
+  ],
+  "0x268074fa5255109f92b219f795adb75016f2f1ba:137": [
+    "0x172a7bee1fa5617431ca0d8324947d9a4c60196f",
+    "WRAPPED",
+    "0.1,5.943522,1188.704455"
+  ],
+  "0x268074fa5255109f92b219f795adb75016f2f1ba:321": [
+    "0x6c2c113c8ca73db67224ef4d8c8dfcec61e52a9c",
+    "WRAPPED",
+    "0.1,5.323833,1064.766555"
+  ],
+  "0x273a4ffceb31b8473d51051ad2a2edbb7ac8ce02:1": [
+    "0x5f1c76b7a90d88ee5bada971a28aaef514719dbf",
+    "WRAPPED",
+    "0.1,5413,67658"
+  ],
+  "0x273a4ffceb31b8473d51051ad2a2edbb7ac8ce02:128": [
+    "0x97513e975a7fa9072c72c92d8000b0db90b163c5",
+    "WRAPPED",
+    "0.1,339,67658"
+  ],
+  "0x273a4ffceb31b8473d51051ad2a2edbb7ac8ce02:137": [
+    "0xbb5fcfcc96e9e8e22a1a7c12abba67fdd0f84665",
+    "WRAPPED",
+    "0.1,741.597,148319.54"
+  ],
+  "0x277be44551a8c4d4004e2091ff7d3f69be21782f:1": [
+    "0x33d0568941c0c64ff7e0fb4fba0b11bd37deed9f",
+    "CANONICAL",
+    "0.1,280,7000"
+  ],
+  "0x27fdc52e83bfe163d620af68f54ddbec26bfacc8:1": [
+    "0x4123a133ae3c521fd134d7b13a2dec35b56c2463",
+    "CANONICAL",
+    "0.1,14.6,366"
+  ],
+  "0x284643d9df25551a85d68ef903e59f8ef90bec01:137": [
+    "0x804a8ecc6e3af0ab085b3e8a63ae34420403cb01",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x297817ce1a8de777e7ddbed86c3b7f9dc9349f2c:137": [
+    "0x2eaa12c0c76ea8192d82b63f8dbbb7ec2a270295",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x297817ce1a8de777e7ddbed86c3b7f9dc9349f2c:43114": [
+    "0xc1a49c0b9c10f35850bd8e15eaef0346be63e002",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x29ced01c447166958605519f10dcf8b0255fb379:1": [
+    "0x853d955acef822db058eb8505911ed77f175b99e",
+    "CANONICAL",
+    "0.1,80,2000"
+  ],
+  "0x29dfd3d644b18e0345eed3a3c94b4efe35f2771b:1": [
+    "0xefc1c73a3d8728dc4cf2a18ac5705fe93e5914ac",
+    "CANONICAL",
+    "0.1,17.4,440"
+  ],
+  "0x2a0da514b2281b12a9b93ff1b5ed738a91e0da22:43114": [
+    "0x1bc84db86ef36fadb86e5882d5445d5725394937",
+    "WRAPPED",
+    "0.1,7.253,1450.72"
+  ],
+  "0x2b15bc62d1fb46ade4763a3c5ea0917460bb25f1:250": [
+    "0xe069af87450fb51fc0d0e044617f1c134163e591",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x2b6864600d470d2b743b1a6693cb486121889942:137": [
+    "0x86a298581388bc199e61bfecdca8ea22cf6c0da3",
+    "WRAPPED",
+    "0.1,3698.717285,739743.456969"
+  ],
+  "0x2ba9288c577c04cd1a5770810a9d4dcbb5ecb464:66": [
+    "0xe5cf1558a1470cb5c166c2e8651ed0f3c5fb8f42",
+    "WRAPPED",
+    "0.1,297.570869,59514.173896"
+  ],
+  "0x2bf56908b0f2440ad11169d281967eb76665f8c6:137": [
+    "0x4f60a160d8c2dddaafe16fcc57566db84d674bd6",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x2bfdf2adc0e8f738c4a1bca25c5c1d36072eba31:1": [
+    "0x40d4c6ceca870a0439dc0232d40cf8be8b425baf",
+    "WRAPPED",
+    "0.1,536,6692"
+  ],
+  "0x2c591c8078ea432b7affb04957c89fedc5e854b5:1285": [
+    "0xbb5571c287edf052af4d3781df62ca0ba1a58a35",
+    "CANONICAL",
+    "0.1,250,50000"
+  ],
+  "0x2c78f1b70ccf63cdee49f9233e9faa99d43aa07e:1": [
+    "0x232fb065d9d24c34708eedbf03724f2e95abe768",
+    "CANONICAL",
+    "0.1,0.086,4.26"
+  ],
+  "0x2c961ff9b386b597abc58a56f3ec63e313cada76:1": [
+    "0x0763fdccf1ae541a5961815c0872a8c5bc6de4d7",
+    "CANONICAL",
+    "0.1,92,2300"
+  ],
+  "0x2cbff5a1b0c34791fb96d89467798b4e6f755e34:1": [
+    "0x02a2b736f9150d36c0919f3acee8ba2a92fbbb40",
+    "WRAPPED",
+    "0.1,8874,111000"
+  ],
+  "0x2cd598b0513abdb52bdd92a1ab4670fc4578570f:LTC": [
+    "ltc",
+    "CANONICAL",
+    "0.1,0.07,0.5"
+  ],
+  "0x2cf51e73c3516f3d86e9c0b4de0971dbf0766fd4:1": [
+    "0x0e8d6b471e332f140e7d9dbb99e5e3822f728da6",
+    "CANONICAL",
+    "0.1,2840,71000"
+  ],
+  "0x2e6db117182be2d2bb880a610d4abfe4ca4cc544:1": [
+    "0xad996a45fd2373ed0b10efa4a8ecb9de445a4302",
+    "WRAPPED",
+    "0.1,1023.02,12787.72"
+  ],
+  "0x2ec59b2105be94d2d94bdd55c447810edd495d3d:1": [
+    "0x986a4ea3679afe15b5963a6ec3437be859279bc1",
+    "WRAPPED",
+    "0.1,3650000000,46000000000"
+  ],
+  "0x2ede13880e11b19b7d6113a86ac7ac84ac651042:1": [
+    "0xc00e94cb662c3520282e6f5717214004a7f26888",
+    "CANONICAL",
+    "0.1,0.23,3"
+  ],
+  "0x2f2c7cc8a6d0a0f3e1edbd4ae571f9e40d09f4d6:1": [
+    "0x7a58c0be72be218b41c608b7fe7c5bb630736c71",
+    "CANONICAL",
+    "0.1,474,11808"
+  ],
+  "0x2f3391aebe27393aba0a790aa5e1577fea0361c2:137": [
+    "0x6d2a71f4edf10ab1e821b9b373363e1e24e5df6b",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x2f3bca2631fff538b8a55207f6c2081457e229f7:128": [
+    "0xbf84214ea409a369774321727595f218889ed943",
+    "CANONICAL",
+    "0.1,550,110050"
+  ],
+  "0x2f4a4fdcf8c77d63c2c967c07a61bdf8992c3c50:137": [
+    "0x1c83fae1f7029763086b39ed14d53047d912e734",
+    "WRAPPED",
+    "0.1,3.25,649.35"
+  ],
+  "0x2fb886aaf51764ae175f80e49cd10e90d446e8a9:250": [
+    "0x48844ddba89799dc40ec31728dac629802d407f3",
+    "WRAPPED",
+    "0.1,360,71400"
+  ],
+  "0x2ff0b946a6782190c4fe5d4971cfe79f0b6e4df2:1": [
+    "0x58c1bbb508e96cfec1787acf6afe1c7008a5b064",
+    "WRAPPED",
+    "0.1,81.5,1017"
+  ],
+  "0x2ff0b946a6782190c4fe5d4971cfe79f0b6e4df2:137": [
+    "0x8f0224e841b78bf380649b6b19503e2bfc76efc7",
+    "WRAPPED",
+    "0.1,5.1,1017"
+  ],
+  "0x2ffb752b867415b57f8bc07ce4f70cac26b7300d:321": [
+    "0x338726dd694db9e2230ec2bb8624a2d7f566c96d",
+    "WRAPPED",
+    "0.1,3845.680532,769136.106325"
+  ],
+  "0x301af3eff0c904dc5ddd06faa808f653474f7fcc:1": [
+    "0xc0330289b5509269bc312c83e5db42aeb259b687",
+    "WRAPPED",
+    "0.1,33424.973469,417812.168362"
+  ],
+  "0x301af3eff0c904dc5ddd06faa808f653474f7fcc:137": [
+    "0xd81f558b71a5323e433729009d55159955f8a7f9",
+    "WRAPPED",
+    "0.1,2089.060842,417812.168362"
+  ],
+  "0x301af3eff0c904dc5ddd06faa808f653474f7fcc:250": [
+    "0x79637d860380bd28df5a07329749654790fac1df",
+    "WRAPPED",
+    "0.1,2441.680462,488336.092432"
+  ],
+  "0x301af3eff0c904dc5ddd06faa808f653474f7fcc:43114": [
+    "0xf915fdda4c882731c0456a4214548cd13a822886",
+    "WRAPPED",
+    "0.1,2089.060842,417812.168362"
+  ],
+  "0x3028b4395f98777123c7da327010c40f3c7cc4ef:1": [
+    "0xc12d099be31567add4e4e4d0d45691c3f58f5663",
+    "CANONICAL",
+    "0.1,1100,27500"
+  ],
+  "0x3053ad3b31600074e9a90440770f78d5e8fc5a54:1": [
+    "0x4c25bdf026ea05f32713f00f73ca55857fbf6342",
+    "CANONICAL",
+    "0.1,33.2,826"
+  ],
+  "0x314593fa9a2fa16432913dbccc96104541d32d11:1": [
+    "0x7866e48c74cbfb8183cd1a929cd9b95a7a5cb4f4",
+    "CANONICAL",
+    "0.1,110,2750"
+  ],
+  "0x315ccd12b4af427c578a50b8abdc6cee936fa080:43114": [
+    "0x37d87e316cb4e35163881fdb6c6bc0cdba91dc0a",
+    "CANONICAL",
+    "0.1,9,1730"
+  ],
+  "0x31cdd9f5a6a1e39a38a6b073fc3fabe6cbfeac76:43114": [
+    "0x599eaef483958da53da541190a78c7427e1d086f",
+    "WRAPPED",
+    "0.1,0.13,26.11"
+  ],
+  "0x31d0a7ada4d4c131eb612db48861211f63e57610:1": [
+    "0x1d7ca62f6af49ec66f6680b8606e634e55ef22c1",
+    "WRAPPED",
+    "0.1,3.76,188"
+  ],
+  "0x31d0a7ada4d4c131eb612db48861211f63e57610:43114": [
+    "0xf44fb887334fa17d2c5c0f970b5d320ab53ed557",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x3222b546981ca597842cb271138e26ea1afab44a:250": [
+    "0xad996a45fd2373ed0b10efa4a8ecb9de445a4302",
+    "WRAPPED",
+    "0.1,15,2926"
+  ],
+  "0x323a07f929f7c4db7631866af151248ae3912d98:1": [
+    "0xd0345d30fd918d7682398acbcdf139c808998709",
+    "CANONICAL",
+    "0.1,5,125"
+  ],
+  "0x323ba4181ed3d7a7e267330c27c176a006f91313:137": [
+    "0x47536f17f4ff30e64a96a7555826b8f9e66ec468",
+    "WRAPPED",
+    "0.1,0.009,1.7"
+  ],
+  "0x323ba4181ed3d7a7e267330c27c176a006f91313:1666600000": [
+    "0xc46fedc533e9f14c99c4c5124e2085701fa9b255",
+    "WRAPPED",
+    "0.1,0.009,1.7"
+  ],
+  "0x323ba4181ed3d7a7e267330c27c176a006f91313:250": [
+    "0x4a13a2cf881f5378def61e430139ed26d843df9a",
+    "WRAPPED",
+    "0.1,0.009,1.7"
+  ],
+  "0x32df1bc949d51bec5ff63cfd1d1fd9a11751c8b0:43114": [
+    "0x511d35c52a3c244e7b8bd92c0c297755fbd89212",
+    "WRAPPED",
+    "0.1,8.5,1670"
+  ],
+  "0x332730a4f6e03d9c55829435f10360e13cfa41ff:1": [
+    "0x1c2e7118591ec1b6122e4fe3d645706a9747b10e",
+    "WRAPPED",
+    "0.1,47.337,591.72"
+  ],
+  "0x332730a4f6e03d9c55829435f10360e13cfa41ff:250": [
+    "0x461d52769884ca6235b685ef2040f47d30c94eb5",
+    "WRAPPED",
+    "0.1,2.958,591.72"
+  ],
+  "0x332730a4f6e03d9c55829435f10360e13cfa41ff:43114": [
+    "0xe70efb1ff1c0b63fdf84b5ea319693cf804914a8",
+    "WRAPPED",
+    "0.1,2.958,591.72"
+  ],
+  "0x33333ee26a7d02e41c33828b42fb1e0889143477:250": [
+    "0x33333ee26a7d02e41c33828b42fb1e0889143477",
+    "WRAPPED",
+    "0.1,61,61"
+  ],
+  "0x33333ee26a7d02e41c33828b42fb1e0889143477:43114": [
+    "0x33333ee26a7d02e41c33828b42fb1e0889143477",
+    "WRAPPED",
+    "0.1,61,61"
+  ],
+  "0x336f5a68fd46a25056a6c1d9c06072c691486acc:1": [
+    "0x20cf1b6e9d856321ed4686877cf4538f2c84b4de",
+    "WRAPPED",
+    "0.1,238,2963"
+  ],
+  "0x336f5a68fd46a25056a6c1d9c06072c691486acc:137": [
+    "0xd1790c5435b9fb7c9444c749cefe53d40d751eac",
+    "WRAPPED",
+    "0.1,15,2963"
+  ],
+  "0x337957324abb649c767073484136f6a9eb5c13a1:137": [
+    "0x005178eebca9f15268c203250c5e0574f05b53a0",
+    "WRAPPED",
+    "0.1,13513.513514,2702702.702703"
+  ],
+  "0x33e4cd013fcad9de00a1b12e8ae9dfea2342e4eb:25": [
+    "0x165dbb08de0476271714952c3c1f068693bd60d7",
+    "WRAPPED",
+    "0.1,27.001485,5400.297016"
+  ],
+  "0x33e4cd013fcad9de00a1b12e8ae9dfea2342e4eb:43114": [
+    "0x5e430f88d1be82eb3ef92b6ff06125168fd5dcf2",
+    "WRAPPED",
+    "0.1,4.17,833.33"
+  ],
+  "0x3447ac4ad1153ba762034ee7b8ac637c553a9134:1": [
+    "0x511d35c52a3c244e7b8bd92c0c297755fbd89212",
+    "WRAPPED",
+    "0.1,122,1521"
+  ],
+  "0x3447ac4ad1153ba762034ee7b8ac637c553a9134:250": [
+    "0xb83bb1a7c2d5d93525417acea9453df0c8bc6a76",
+    "WRAPPED",
+    "0.1,7.6,1521"
+  ],
+  "0x347e430b7cd1235e216be58ffa13394e5009e6e2:137": [
+    "0x723b17718289a91af252d616de2c77944962d122",
+    "CANONICAL",
+    "0.1,8.8,1750"
+  ],
+  "0x3516141b1ac8751c2042a8a1bc411ab8655464ac:1": [
+    "0x967da4048cd07ab37855c090aaf366e4ce1b9f48",
+    "CANONICAL",
+    "0.1,87.4,2200"
+  ],
+  "0x359895e830b7723625ce86d8fca69eba833a037a:1": [
+    "0x9c36ed4d73c674bfba9c8f0c0508c869d65e082a",
+    "WRAPPED",
+    "0.1,760,9500"
+  ],
+  "0x359895e830b7723625ce86d8fca69eba833a037a:APT": [
+    "0xd6d6372c8bde72a7ab825c00b9edd35e643fb94a61c55d9d94a9db3010098548::starship::makerdao",
+    "WRAPPED",
+    "0.1,48,9500"
+  ],
+  "0x35addb6e6a081da64e2014e77d2963804b0ce55f:1": [
+    "0xd2c244d5c3b530b9310c34962bf9b48c08dc0bcb",
+    "WRAPPED",
+    "0.1,1.6,20"
+  ],
+  "0x35addb6e6a081da64e2014e77d2963804b0ce55f:137": [
+    "0x1bcd24605e6b864fc5f932550458c1f2d85b2138",
+    "WRAPPED",
+    "0.1,0.1,20"
+  ],
+  "0x35addb6e6a081da64e2014e77d2963804b0ce55f:250": [
+    "0x413fbfdce9b5afb65b6147fbbc970148b79e706a",
+    "WRAPPED",
+    "0.1,0.1,20"
+  ],
+  "0x35addb6e6a081da64e2014e77d2963804b0ce55f:43114": [
+    "0x996016283f5dcf985c5ac20df8137cc077b94e66",
+    "WRAPPED",
+    "0.1,0.1,20"
+  ],
+  "0x35bc8f36ab08fc1b484d4c921a6f3b3c75e6d15d:1": [
+    "0xd91903d548f19c0fc0a6b9ed09d2f72b4dfe7144",
+    "WRAPPED",
+    "0.1,221.078,2763.48"
+  ],
+  "0x35bc8f36ab08fc1b484d4c921a6f3b3c75e6d15d:1284": [
+    "0x0aaafe33611f6b7b0068e48d82d2d05d27ff904c",
+    "WRAPPED",
+    "0.1,13.817,2763.48"
+  ],
+  "0x35bc8f36ab08fc1b484d4c921a6f3b3c75e6d15d:288": [
+    "0x79fee86c458470cf192c8d02bc6328f0376a8d2e",
+    "WRAPPED",
+    "0.1,13.817,2763.48"
+  ],
+  "0x35bc8f36ab08fc1b484d4c921a6f3b3c75e6d15d:43114": [
+    "0x0aaafe33611f6b7b0068e48d82d2d05d27ff904c",
+    "WRAPPED",
+    "0.1,13.817,2763.48"
+  ],
+  "0x366d71ab095735b7dae83ce2b82d5262ef655f10:128": [
+    "0x2c78f1b70ccf63cdee49f9233e9faa99d43aa07e",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x36953b5ec00a13edceceb3af258d034913d2a79d:1": [
+    "0x39fc9e94caeacb435842fadedecb783589f50f5f",
+    "WRAPPED",
+    "0.1,1334,16667"
+  ],
+  "0x3726ea463f2d2841be466f7dd2c663030be70d36:108": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,6619.623,1323924.64"
+  ],
+  "0x373e768f79c820aa441540d254dca6d045c6d25b:1": [
+    "0xc5e509bc8438d4f4ee355282eeb4af92ae14e43a",
+    "WRAPPED",
+    "0.1,27.2,260"
+  ],
+  "0x373e768f79c820aa441540d254dca6d045c6d25b:137": [
+    "0xb35fcbcf1fd489fce02ee146599e893fdcdc60e6",
+    "WRAPPED",
+    "0.1,1.3,260"
+  ],
+  "0x374c1135911602a13ee041e6e6e848a14fa62320:1": [
+    "0x06e0feb0d74106c7ada8497754074d222ec6bcdf",
+    "CANONICAL",
+    "0.1,14286,357144"
+  ],
+  "0x3758428802fbeab2858d58aec5ff5176df464edd:1": [
+    "0xf1f508c7c9f0d1b15a76fba564eef2d956220cf7",
+    "CANONICAL",
+    "0.1,26.6,666"
+  ],
+  "0x37807d4fbeb84124347b8899dd99616090d3e304:1": [
+    "0x496cd9b62b192e04811f38d97b88733f969afd5d",
+    "WRAPPED",
+    "0.1,1307.360439,16342.005491"
+  ],
+  "0x37807d4fbeb84124347b8899dd99616090d3e304:137": [
+    "0xbbfe0b60de96a189bf09079de86a2db7bf0c7883",
+    "WRAPPED",
+    "0.1,81.710027,16342.005491"
+  ],
+  "0x378dacb12e3dccca598c37325a2b32c2dc3a4ae4:1": [
+    "0x40df1ae6074c35047bff66675488aa2f9f6384f3",
+    "WRAPPED",
+    "0.1,190,2370"
+  ],
+  "0x37bdfd6ed491ee0e0fe2ce49de2cb573880e3734:1": [
+    "0xaa4e3edb11afa93c41db59842b29de64b72e355b",
+    "CANONICAL",
+    "0.1,148.2,3706"
+  ],
+  "0x37c24675e4a0dfce683c51e1746599f1e2517eb5:137": [
+    "0x5f1c76b7a90d88ee5bada971a28aaef514719dbf",
+    "WRAPPED",
+    "0.1,262,52320"
+  ],
+  "0x37c24675e4a0dfce683c51e1746599f1e2517eb5:43114": [
+    "0x95555e4e4cb2c094914af53598eff14b9340881f",
+    "WRAPPED",
+    "0.1,262,52320"
+  ],
+  "0x3831dfef762f4f64261f2d875c710f90038578e4:1": [
+    "0x34324e1598bf02ccd3dea93f4e332b5507097473",
+    "WRAPPED",
+    "0.1,3544.691,44308.64"
+  ],
+  "0x3831dfef762f4f64261f2d875c710f90038578e4:137": [
+    "0x92804831ac036ca77d57db8bba0e522cd35a8049",
+    "WRAPPED",
+    "0.1,221.543,44308.64"
+  ],
+  "0x3831dfef762f4f64261f2d875c710f90038578e4:43114": [
+    "0x609d6ea495e00c982df8f76fdbaa14cd8f922d16",
+    "WRAPPED",
+    "0.1,221.543,44308.64"
+  ],
+  "0x3878110877052425282a7d4a712b1d8a45ad04cb:1": [
+    "0x1c23f0f3e06fa0e07c5e661353612a2d63323bc6",
+    "CANONICAL",
+    "0.1,12308,307694"
+  ],
+  "0x38c84d5bbad726d465cf6a5349e41d6d7095faf7:1": [
+    "0xe705af5f63fcabdcdf5016aa838eaaac35d12890",
+    "WRAPPED",
+    "0.1,71.5,893"
+  ],
+  "0x38c84d5bbad726d465cf6a5349e41d6d7095faf7:122": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0.1,4.5,893"
+  ],
+  "0x38c84d5bbad726d465cf6a5349e41d6d7095faf7:1666600000": [
+    "0x634398cb81b76bfc75ebb434cf7c82036f9e7d78",
+    "WRAPPED",
+    "0.1,4.5,893"
+  ],
+  "0x38c84d5bbad726d465cf6a5349e41d6d7095faf7:250": [
+    "0x02a2b736f9150d36c0919f3acee8ba2a92fbbb40",
+    "WRAPPED",
+    "0.1,4.5,893"
+  ],
+  "0x38c84d5bbad726d465cf6a5349e41d6d7095faf7:43114": [
+    "0x6fefd97f328342a8a840546a55fdcfee7542f9a8",
+    "WRAPPED",
+    "0.1,4.5,893"
+  ],
+  "0x38c84d5bbad726d465cf6a5349e41d6d7095faf7:57": [
+    "0xdae6c2a48bfaa66b43815c5548b10800919c993e",
+    "WRAPPED",
+    "0.1,4.672,934.58"
+  ],
+  "0x3a218d024f452caac91fcfa39ba524e0bdfe9ec0:1284": [
+    "0x4e720dd3ac5cfe1e1fbde4935f386bb1c66f4642",
+    "WRAPPED",
+    "0.1,20,4000"
+  ],
+  "0x3a218d024f452caac91fcfa39ba524e0bdfe9ec0:1285": [
+    "0xcceaed1f682ef03dd35708e1cbaddd725f8df8a9",
+    "WRAPPED",
+    "0.1,20,4000"
+  ],
+  "0x3a2927e68749dd6ad0a568d7c05b587863c0bc10:1": [
+    "0x19193f450086d0442157b852081976d41657ad56",
+    "WRAPPED",
+    "0.1,800,10000"
+  ],
+  "0x3a2927e68749dd6ad0a568d7c05b587863c0bc10:43114": [
+    "0x771c01e1917b5ab5b791f7b96f0cd69e22f6dbcf",
+    "WRAPPED",
+    "0.1,50,10000"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:1": [
+    "0x8965349fb649a33a30cbfda057d8ec2c48abe2a2",
+    "WRAPPED",
+    "0.1,0.8,16"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:1030": [
+    "0xb2c22a9fb4fc02eb9d1d337655ce079a04a526c7",
+    "WRAPPED",
+    "0.1,0.08,16"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:106": [
+    "0x332730a4f6e03d9c55829435f10360e13cfa41ff",
+    "WRAPPED",
+    "0.1,0.29274,58.548009"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:108": [
+    "0x6ab6d61428fde76768d7b45d8bfeec19c6ef91a8",
+    "WRAPPED",
+    "0.1,0.08,16"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:1088": [
+    "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844",
+    "WRAPPED",
+    "0.1,0.08,16"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:1234": [
+    "0xd6070ae98b8069de6b494332d1a1a81b6179d960",
+    "WRAPPED",
+    "0.1,0.22,44"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:1666600000": [
+    "0xb12c13e66ade1f72f71834f2fc5082db8c091358",
+    "WRAPPED",
+    "0.1,0.08,16"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:2001": [
+    "0x65e66a61d0a8f1e686c2d6083ad611a10d84d97a",
+    "WRAPPED",
+    "0.1,0.08,16"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:25": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.338295,67.658999"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:250": [
+    "0x511d35c52a3c244e7b8bd92c0c297755fbd89212",
+    "WRAPPED",
+    "0.1,0.08,16"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:288": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.08,16"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:40": [
+    "0x7c598c96d02398d89fbcb9d41eab3df0c16f227d",
+    "WRAPPED",
+    "0.1,0.08,16"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:42220": [
+    "0xfbdd194376de19a88118e84e279b977f165d01b8",
+    "WRAPPED",
+    "0.1,0.08,16"
+  ],
+  "0x3ac92ff3c5bf439a87b26741ac6db1793ba1b025:43114": [
+    "0xe2d27f06f63d98b8e11b38b5b08a75d0c8dd62b9",
+    "WRAPPED",
+    "0.1,0.08,16"
+  ],
+  "0x3af577f9d8c86ae8dbcbf51fe9836c9df825759d:1": [
+    "0x514910771af9ca656af840dff83e8264ecf986ca",
+    "CANONICAL",
+    "0.1,2.6,32.5"
+  ],
+  "0x3b79a28264fc52c7b4cea90558aa0b162f7faf57:1": [
+    "0xc1f976b91217e240885536af8b63bc8b5269a9be",
+    "CANONICAL",
+    "0.1,3000,75000"
+  ],
+  "0x3bd92db7b1ce1a3a8704ee5898578c866fdf12c4:25": [
+    "0x7d09a42045359aa85488bc07d0ada83e22d50017",
+    "WRAPPED",
+    "0.1,1.582278,316.455696"
+  ],
+  "0x3bd92db7b1ce1a3a8704ee5898578c866fdf12c4:250": [
+    "0xfc5c0e5d0ba6386fbb7d921e5073fd04082a5b49",
+    "WRAPPED",
+    "0.1,0.45208,90.415913"
+  ],
+  "0x3bd92db7b1ce1a3a8704ee5898578c866fdf12c4:43114": [
+    "0x1e0e8e6a2c8a3ec61f65e97338871bd7ddcb76d0",
+    "WRAPPED",
+    "0.1,0.45208,90.415913"
+  ],
+  "0x3c1748d647e6a56b37b66fcd2b5626d0461d3aa0:1": [
+    "0x20a8cec5fffea65be7122bcab2ffe32ed4ebf03a",
+    "CANONICAL",
+    "0.1,184.4,4610"
+  ],
+  "0x3c2b521be49aae9208f4f9766a63216afaced4d7:1": [
+    "0x5cdd7cd69cedb9b56b8ca47f844a0de16d8b5761",
+    "WRAPPED",
+    "0.1,312.597687,3907.471085"
+  ],
+  "0x3c48d39479c4e34657aa141543c56bf340967de8:43114": [
+    "0x9bd3fac4d9b051ef7ca9786aa0ef5a7e0558d44c",
+    "WRAPPED",
+    "0.1,20.5,4070"
+  ],
+  "0x3c6dad0475d3a1696b359dc04c99fd401be134da:1": [
+    "0xfa14fa6958401314851a17d6c5360ca29f74b57b",
+    "CANONICAL",
+    "0.1,1546,38612"
+  ],
+  "0x3c9d97d4d7fe1755cbf2b27ff99654d02fd8ae42:1": [
+    "0x6ccf1c009416b57bc19218db3a4ebbf7afd52afd",
+    "WRAPPED",
+    "0.1,58181818181.818182,727272727272.727273"
+  ],
+  "0x3c9d97d4d7fe1755cbf2b27ff99654d02fd8ae42:61": [
+    "0x0cae51e1032e8461f4806e26332c030e34de3adb",
+    "WRAPPED",
+    "0.1,3636363636.363636,727272727272.727273"
+  ],
+  "0x3ca1f50e8178a8a21cc919e617f8fad98a048ce9:137": [
+    "0x700843380021776970a28a7a74da3e5908755fcc",
+    "WRAPPED",
+    "0.1,38.82,7763.55"
+  ],
+  "0x3ca1f50e8178a8a21cc919e617f8fad98a048ce9:43114": [
+    "0x19193f450086d0442157b852081976d41657ad56",
+    "WRAPPED",
+    "0.1,38.82,7763.55"
+  ],
+  "0x3cbc101e0ab2ef6fed8eb9bea24e7ec97bfca98f:1": [
+    "0x66fd97a78d8854fec445cd1c80a07896b0b4851f",
+    "CANONICAL",
+    "0.1,97000,2425000"
+  ],
+  "0x3cfcd47c94f1d20ae350a5d9b5264537a89396c9:1": [
+    "0xf7b38053a4885c99279c4955cb843797e04455f8",
+    "WRAPPED",
+    "0.1,322,4015"
+  ],
+  "0x3cfcd47c94f1d20ae350a5d9b5264537a89396c9:137": [
+    "0xde16ce60804a881e9f8c4ebb3824646edecd478d",
+    "WRAPPED",
+    "0.1,20,4015"
+  ],
+  "0x3cfcd47c94f1d20ae350a5d9b5264537a89396c9:250": [
+    "0x4f76664105ba7e35dd4904ec70f2042fc17563d9",
+    "WRAPPED",
+    "0.1,20,4015"
+  ],
+  "0x3cfcd47c94f1d20ae350a5d9b5264537a89396c9:43114": [
+    "0xcfd5868fbf612bd8907827f012d71f3c7ba6c943",
+    "WRAPPED",
+    "0.1,20,4015"
+  ],
+  "0x3cfcd47c94f1d20ae350a5d9b5264537a89396c9:XRP": [
+    "534f4c4f00000000000000000000000000000000/rsolo2s1kigeccn6hcuxvrcpgmwlrrrlzz",
+    "WRAPPED",
+    "0.1,20,4015"
+  ],
+  "0x3d0e22387ddfe75d1aea9d7108a4392922740b96:1": [
+    "0x3129662808bec728a27ab6a6b9afd3cbaca8a43c",
+    "WRAPPED",
+    "0.1,992,12390"
+  ],
+  "0x3d2e9d762413cec5bf862fdb0085315dd2c4c09e:1": [
+    "0xbdba76fa2659c33ffcc2b0bc134c3a2c8a3aa94d",
+    "WRAPPED",
+    "0.1,6465,80806"
+  ],
+  "0x3d2e9d762413cec5bf862fdb0085315dd2c4c09e:137": [
+    "0x7782046601e7b9b05ca55a3899780ce6ee6b8b2b",
+    "WRAPPED",
+    "0.1,404,80806"
+  ],
+  "0x3d2e9d762413cec5bf862fdb0085315dd2c4c09e:43114": [
+    "0x4de21b78c0478f215f00445e9f04d4076fb72e27",
+    "WRAPPED",
+    "0.1,404,80806"
+  ],
+  "0x3da9769665849bd67139cf67735445deea16340d:1": [
+    "0xa4fffc757e8c4f24e7b209c033c123d20983ad40",
+    "WRAPPED",
+    "0.1,50.4,630"
+  ],
+  "0x3da9769665849bd67139cf67735445deea16340d:137": [
+    "0xe5fe6295e7291e3b538c2e43ecbc9f908bdf7eb9",
+    "WRAPPED",
+    "0.1,3.2,630"
+  ],
+  "0x3e0a7c7db7bb21bda290a80c9811de6d47781671:1": [
+    "0x77609d4f3ae31382389374101aca6108d95b093a",
+    "WRAPPED",
+    "0.1,987654.320988,12345679.012346"
+  ],
+  "0x3e0a7c7db7bb21bda290a80c9811de6d47781671:106": [
+    "0x218c3c3d49d0e7b37aff0d8bb079de36ae61a4c0",
+    "WRAPPED",
+    "0.1,39575.747,7915149.6"
+  ],
+  "0x3e0a7c7db7bb21bda290a80c9811de6d47781671:137": [
+    "0x158335c10d3eee1c5db5a302ab972022f3e59040",
+    "WRAPPED",
+    "0.1,26260.504,5252100.84"
+  ],
+  "0x3e0a7c7db7bb21bda290a80c9811de6d47781671:1666600000": [
+    "0x130966628846bfd36ff31a822705796e8cb8c18d",
+    "WRAPPED",
+    "0.1,39575.747,7915149.6"
+  ],
+  "0x3e0a7c7db7bb21bda290a80c9811de6d47781671:250": [
+    "0x323d0dba53ee9a6f0faa464fb099ec562b591fc7",
+    "WRAPPED",
+    "0.1,39575.747,7915149.6"
+  ],
+  "0x3e0a7c7db7bb21bda290a80c9811de6d47781671:42262": [
+    "0xe6801928061cdbe32ac5ad0634427e140efd05f9",
+    "WRAPPED",
+    "0.1,112688.753,22537750.73"
+  ],
+  "0x3e0a7c7db7bb21bda290a80c9811de6d47781671:43114": [
+    "0xc763f8570a48c4c00c80b76107cbe744dda67b79",
+    "WRAPPED",
+    "0.1,26260.504,5252100.84"
+  ],
+  "0x3e0a7c7db7bb21bda290a80c9811de6d47781671:9001": [
+    "0xb12c13e66ade1f72f71834f2fc5082db8c091358",
+    "WRAPPED",
+    "0.1,112688.753,22537750.73"
+  ],
+  "0x3f6a377ae52fd89fa7c47e4902a2b4861a2077f6:1": [
+    "0xb9964c8b9c48800678e72b2fe7b9b365d3d0019d",
+    "CANONICAL",
+    "0.1,390,9720"
+  ],
+  "0x400e3a1ba43d272e576c237e51d0e1ef3253f153:1": [
+    "0x99bb54f7a11eb8af1d486fe644ebed304f52f85a",
+    "WRAPPED",
+    "0.1,91300000000,1200000000000"
+  ],
+  "0x405d64a2790ca1d37cda5e01983a68975c0c4ecf:1285": [
+    "0x1e0f2a75be02c025bd84177765f89200c04337da",
+    "CANONICAL",
+    "0.1,12.5,2500"
+  ],
+  "0x40642f7f80138913ca239306aa74f1acaef6b0e8:1": [
+    "0x1608278e54fb9e070cb109234d111ff3a359612b",
+    "WRAPPED",
+    "0.1,290520,3632000"
+  ],
+  "0x40b34cc972908060d6d527276e17c105d224559d:137": [
+    "0x6362496bef53458b20548a35a2101214ee2be3e0",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x40d4c6ceca870a0439dc0232d40cf8be8b425baf:1": [
+    "0x725c263e32c72ddc3a19bea12c5a0479a81ee688",
+    "CANONICAL",
+    "0.1,280,7000"
+  ],
+  "0x41065e3428188ba6eb27fbdde8526ae3af8e3830:1": [
+    "0x2ef4a574b72e1f555185afa8a09c6d1a8ac4025c",
+    "WRAPPED",
+    "0.1,3187.013,39837.67"
+  ],
+  "0x4131b87f74415190425ccd873048c708f8005823:43114": [
+    "0x64d5baf5ac030e2b7c435add967f787ae94d0205",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x4164a997b0b9a3de5e8ed35e59b015f9e892b7a9:250": [
+    "0x247b5bcc806f86969e0ee5446d411283b218f645",
+    "WRAPPED",
+    "0.1,4.63,925.92"
+  ],
+  "0x4164a997b0b9a3de5e8ed35e59b015f9e892b7a9:43114": [
+    "0x8f0224e841b78bf380649b6b19503e2bfc76efc7",
+    "WRAPPED",
+    "0.1,4.63,925.92"
+  ],
+  "0x417871f0682db63924b931fc16ba3ff40343cdcb:137": [
+    "0xe8d17b127ba8b9899a160d9a07b69bca8e08bfc6",
+    "CANONICAL",
+    "0.1,7.8,1545"
+  ],
+  "0x4197c6ef3879a08cd51e5560da5064b773aa1d29:43114": [
+    "0x68f7a9e795c7074f2d0e698101d5c3fea7aa0acb",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x41a072b1c8d716721e407640e5b1fdcc714239ab:1": [
+    "0xe008ff5483d5c0214911ba6cbdaccf822436d165",
+    "WRAPPED",
+    "0.1,791610,9895112"
+  ],
+  "0x41a072b1c8d716721e407640e5b1fdcc714239ab:137": [
+    "0xe21af796c227acd3c7fb31ad2e2c36ede22afb82",
+    "WRAPPED",
+    "0.1,49476,9895112"
+  ],
+  "0x41a072b1c8d716721e407640e5b1fdcc714239ab:2000": [
+    "0x3d632d9e1a60a0880dd45e61f279d919b5748377",
+    "WRAPPED",
+    "0.1,142571.998859,28514399.771885"
+  ],
+  "0x41a072b1c8d716721e407640e5b1fdcc714239ab:42161": [
+    "0xc8a45dd787a301c38ad33f692f0d41c18590ef94",
+    "WRAPPED",
+    "0.1,98952,9895112"
+  ],
+  "0x41a072b1c8d716721e407640e5b1fdcc714239ab:43114": [
+    "0x3176ff6e935544dd1bd249265c080c95adb00512",
+    "WRAPPED",
+    "0.1,49476,9895112"
+  ],
+  "0x41a4c52925cae8ec45292113b5934e902f920fcd:1": [
+    "0xede1b2f557942c9132c0ea1b7f20a63f711982d4",
+    "WRAPPED",
+    "0.1,38.834951,485.436893"
+  ],
+  "0x41a4c52925cae8ec45292113b5934e902f920fcd:137": [
+    "0x4b641f607570b9053035780615f5b56a91f38f90",
+    "WRAPPED",
+    "0.1,2.427184,485.436893"
+  ],
+  "0x4251c70de644de7f9262d335244f8c4b9c139a0f:1": [
+    "0x6cd6cb131764c704ba9167c29930fbdc38901ab7",
+    "WRAPPED",
+    "0.1,1815.594,22694.93"
+  ],
+  "0x43242138833e8d360e84920462a483eb9e35c8b4:1": [
+    "0xe6d9c0acf30194e2a5ae9c1c8342ac49e98a4b0a",
+    "WRAPPED",
+    "0.1,125,1554"
+  ],
+  "0x43242138833e8d360e84920462a483eb9e35c8b4:122": [
+    "0x218c3c3d49d0e7b37aff0d8bb079de36ae61a4c0",
+    "WRAPPED",
+    "0.1,8,1554"
+  ],
+  "0x43242138833e8d360e84920462a483eb9e35c8b4:137": [
+    "0xf915fdda4c882731c0456a4214548cd13a822886",
+    "WRAPPED",
+    "0.1,8,1554"
+  ],
+  "0x43ba383b9934d8d45ea6348d00dbc1bae97d6e74:1": [
+    "0x362bc847a3a9637d3af6624eec853618a43ed7d2",
+    "CANONICAL",
+    "0.1,84.4,2110"
+  ],
+  "0x43f5b29d63cedc5a7c1724dbb1d698fde05ada21:1": [
+    "0x8ce3dfcae03beb7d2cab25a1e1434c3791f45dd8",
+    "WRAPPED",
+    "0.1,507.952,6349.41"
+  ],
+  "0x43f5b29d63cedc5a7c1724dbb1d698fde05ada21:43114": [
+    "0x77c62e549ca46ef8dd5edc052b1edc783f60a400",
+    "WRAPPED",
+    "0.1,31.747,6349.41"
+  ],
+  "0x43fbbe7a5397117b3da58722635832ba60905285:1": [
+    "0x5218e472cfcfe0b64a064f055b43b4cdc9efd3a6",
+    "CANONICAL",
+    "0.1,560,14000"
+  ],
+  "0x4437743ac02957068995c48e08465e0ee1769fbe:137": [
+    "0x3129662808bec728a27ab6a6b9afd3cbaca8a43c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x4477b28e8b797ebaebd2539bb24290fdfcc27807:250": [
+    "0xb808d767ddf0f61ca62331c1bbbebe0530b41079",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x447c1c18979e71161eda8c4d0a0b9cb2d0d26ce0:137": [
+    "0x8506560320826e459f356cb56ccf721da8875414",
+    "WRAPPED",
+    "0.1,198807.157058,39761431.411531"
+  ],
+  "0x447c1c18979e71161eda8c4d0a0b9cb2d0d26ce0:24": [
+    "0x461d52769884ca6235b685ef2040f47d30c94eb5",
+    "WRAPPED",
+    "0.1,305997.55202,61199510.403917"
+  ],
+  "0x447c1c18979e71161eda8c4d0a0b9cb2d0d26ce0:43114": [
+    "0xfa0ca21da6a94623d953034f140372613f102346",
+    "WRAPPED",
+    "0.1,198807.157058,39761431.411531"
+  ],
+  "0x4518231a8fdf6ac553b9bbd51bbb86825b583263:1": [
+    "0x9506d37f70eb4c3d79c398d326c871abbf10521d",
+    "CANONICAL",
+    "0.1,292,7300"
+  ],
+  "0x4615e03cb458e08ed3a7996b2e0f61e6f59864bc:25": [
+    "0x9ea48018587fdf4b5857940171d3d32465b0b761",
+    "WRAPPED",
+    "0.1,6482116.488819,1296423297.763799"
+  ],
+  "0x461d52769884ca6235b685ef2040f47d30c94eb5:1": [
+    "0xe63d6b308bce0f6193aec6b7e6eba005f41e36ab",
+    "CANONICAL",
+    "0.1,174,4350"
+  ],
+  "0x463e737d8f740395abf44f7aac2d9531d8d539e9:1285": [
+    "0x165dbb08de0476271714952c3c1f068693bd60d7",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x4699fb07df635bae3fa370d9f5f69b9857d49990:137": [
+    "0xc6527b9db96b4790604a3f8873d23140c8391d07",
+    "WRAPPED",
+    "0.1,7.53,1505.57"
+  ],
+  "0x46a531fe4bf0728b00a5ce09291091e630e83431:61": [
+    "0x6b7a87899490ece95443e979ca9485cbe7e71522",
+    "WRAPPED",
+    "0.1,0.14,27.2"
+  ],
+  "0x46dcb8fb3022652b1980f1ffaeaf2bb2104be09c:42161": [
+    "0xa384bc7cdc0a93e686da9e7b8c0807cd040f4e0b",
+    "WRAPPED",
+    "0.1,3400,339810"
+  ],
+  "0x471ea49dd8e60e697f4cac262b5fafcc307506e4:137": [
+    "0xc004e2318722ea2b15499d6375905d75ee5390b8",
+    "CANONICAL",
+    "0.1,4020,804000"
+  ],
+  "0x4760ada00b93effb7833fd07be61c8dfef7f3b1e:1": [
+    "0x2210502051221a600d3653eccc899eceea11a0fd",
+    "WRAPPED",
+    "0.1,40,1000"
+  ],
+  "0x4760ada00b93effb7833fd07be61c8dfef7f3b1e:2020": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0x4760ada00b93effb7833fd07be61c8dfef7f3b1e:7363": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0x477bc8d23c634c154061869478bce96be6045d12:1": [
+    "0x461d52769884ca6235b685ef2040f47d30c94eb5",
+    "WRAPPED",
+    "0.1,7.7,382"
+  ],
+  "0x47eaf5f54d79d5c2b6537a90a0c58a534ab51c8c:1": [
+    "0x374cb8c27130e2c9e04f44303f3c8351b9de61c1",
+    "CANONICAL",
+    "0.1,260800,6520000"
+  ],
+  "0x489580eb70a50515296ef31e8179ff3e77e24965:1": [
+    "0x49a0400587a7f65072c87c4910449fdcc5c47242",
+    "WRAPPED",
+    "0.1,2570.56,64264.01"
+  ],
+  "0x49236832a3f75d3b13cba687da952aea5042e2aa:1": [
+    "0xed3516aa436b630b50960a3d19ba7a2e46d0e368",
+    "WRAPPED",
+    "0.1,19916.5,248956.25"
+  ],
+  "0x49369aeee769bd6043726b0cd5f0bd53d843bc32:1": [
+    "0x6b26780e74cfc64b88c9e1ebc33ffae29c1679ea",
+    "WRAPPED",
+    "0.1,1703,15000"
+  ],
+  "0x496e80cad8712025dafc5b2c96fc36c395af684a:1": [
+    "0x84051efb5e0c61ac1863b5de72cd5bc3221870e4",
+    "WRAPPED",
+    "0.1,2394.638,29932.98"
+  ],
+  "0x496e80cad8712025dafc5b2c96fc36c395af684a:137": [
+    "0x5eee4d55961705eb55d12cb6fa70eb93c4063216",
+    "WRAPPED",
+    "0.1,149.664,29932.98"
+  ],
+  "0x496e80cad8712025dafc5b2c96fc36c395af684a:250": [
+    "0x5a33869045db8a6a16c9f351293501cfd92cf7ed",
+    "WRAPPED",
+    "0.1,149.664,29932.98"
+  ],
+  "0x496e80cad8712025dafc5b2c96fc36c395af684a:42161": [
+    "0x750bfe8490175c2a9a9387b19aa2aae2d75db638",
+    "WRAPPED",
+    "0.1,299.33,29932.98"
+  ],
+  "0x496e80cad8712025dafc5b2c96fc36c395af684a:43114": [
+    "0x63682bdc5f875e9bf69e201550658492c9763f89",
+    "WRAPPED",
+    "0.1,149.664,29932.98"
+  ],
+  "0x49969019255d948dc2f1d9e4485aaea8cf701487:66": [
+    "0xb657e86395db6b1165cebd89c23ae84d4f3d29b7",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x49974c3c99f4e74d08845c31d3f4f16fdc264ebd:1030": [
+    "0x95bf7e307bc1ab0ba38ae10fc27084bc36fcd605",
+    "WRAPPED",
+    "0.1,0.01,2"
+  ],
+  "0x49974c3c99f4e74d08845c31d3f4f16fdc264ebd:106": [
+    "0x65e66a61d0a8f1e686c2d6083ad611a10d84d97a",
+    "WRAPPED",
+    "0.1,0.018781,3.756292"
+  ],
+  "0x49974c3c99f4e74d08845c31d3f4f16fdc264ebd:1088": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.01,2"
+  ],
+  "0x49974c3c99f4e74d08845c31d3f4f16fdc264ebd:2001": [
+    "0xfbdd194376de19a88118e84e279b977f165d01b8",
+    "WRAPPED",
+    "0.1,0.01,2"
+  ],
+  "0x49974c3c99f4e74d08845c31d3f4f16fdc264ebd:25": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.01716,3.431944"
+  ],
+  "0x49974c3c99f4e74d08845c31d3f4f16fdc264ebd:288": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,0.01,2"
+  ],
+  "0x49974c3c99f4e74d08845c31d3f4f16fdc264ebd:40": [
+    "0x2c78f1b70ccf63cdee49f9233e9faa99d43aa07e",
+    "WRAPPED",
+    "0.1,0.01,2"
+  ],
+  "0x49974c3c99f4e74d08845c31d3f4f16fdc264ebd:42220": [
+    "0xa649325aa7c5093d12d6f98eb4378deae68ce23f",
+    "WRAPPED",
+    "0.1,0.01,2"
+  ],
+  "0x49974c3c99f4e74d08845c31d3f4f16fdc264ebd:57": [
+    "0xf27ee99622c3c9b264583dacb2cce056e194494f",
+    "WRAPPED",
+    "0.1,0.01,2"
+  ],
+  "0x49a42bb2edbd857f5bcf7f685ea068880a6c1f4b:1": [
+    "0xb2004d3299eaad78951ba8502cc1840655061483",
+    "WRAPPED",
+    "0.1,11784.861461,147310.76827"
+  ],
+  "0x49a42bb2edbd857f5bcf7f685ea068880a6c1f4b:137": [
+    "0xa2b0217943f826ba3ce0753316e0d78fc50fd581",
+    "WRAPPED",
+    "0.1,736.553841,147310.76827"
+  ],
+  "0x4a080377f83d669d7bb83b3184a8a5e61b500608:1": [
+    "0xe4cfe9eaa8cdb0942a80b7bc68fd8ab0f6d44903",
+    "CANONICAL",
+    "0.1,280,7000"
+  ],
+  "0x4a0a3902e091cdb3aec4279a6bfac50297f0a79e:1": [
+    "0xd7f0cc50ad69408ae58be033f4f85d2367c2e468",
+    "CANONICAL",
+    "0.1,686,17150"
+  ],
+  "0x4b106b91c5fe4ae933cda197b9caf91a07bdae15:1": [
+    "0x5f69b7ab8f7cab199a310fd5a27b43fef44ddcc0",
+    "WRAPPED",
+    "0.1,43,532"
+  ],
+  "0x4b106b91c5fe4ae933cda197b9caf91a07bdae15:137": [
+    "0x4036f3d9c45a20f44f0b8b85dd6ca33005ff9654",
+    "WRAPPED",
+    "0.1,2.7,532"
+  ],
+  "0x4b106b91c5fe4ae933cda197b9caf91a07bdae15:25": [
+    "0xabd380327fe66724ffda91a87c772fb8d00be488",
+    "WRAPPED",
+    "0.1,10.757246,2151.449108"
+  ],
+  "0x4b27cd6e6a5e83d236ead376d256fe2f9e9f0d2e:1": [
+    "0x2610f0bfc21ef389fe4d03cfb7de9ac1e6c99d6e",
+    "CANONICAL",
+    "0.1,680,17000"
+  ],
+  "0x4b5c23cac08a567ecf0c1ffca8372a45a5d33743:1": [
+    "0xa0246c9032bc3a600820415ae600c6388619a14d",
+    "CANONICAL",
+    "0.1,0.52,26"
+  ],
+  "0x4b6e3a07335ab6558b7c5251601a18096944f665:1": [
+    "0x56501b0b12ee9518c2991451bbc8d7f9267949d2",
+    "WRAPPED",
+    "0.1,400000,5000000"
+  ],
+  "0x4b6e3a07335ab6558b7c5251601a18096944f665:137": [
+    "0x6f1bc0967945465539877b39ba48373b0219248f",
+    "WRAPPED",
+    "0.1,25000,5000000"
+  ],
+  "0x4b6e3a07335ab6558b7c5251601a18096944f665:250": [
+    "0x7db1b41e7a3a54b89272973189aee6548dd9c199",
+    "WRAPPED",
+    "0.1,25000,5000000"
+  ],
+  "0x4b6f0494b08d6f387b392cb9f56539b238de3367:1": [
+    "0xe5cf1558a1470cb5c166c2e8651ed0f3c5fb8f42",
+    "WRAPPED",
+    "0.1,108,2600"
+  ],
+  "0x4b6f0494b08d6f387b392cb9f56539b238de3367:137": [
+    "0xdf00960e0adfea78ee29da7fcca17cfdddc0a4ca",
+    "WRAPPED",
+    "0.1,13,2600"
+  ],
+  "0x4b6f0494b08d6f387b392cb9f56539b238de3367:43114": [
+    "0x6b289cceaa8639e3831095d75a3e43520fabf552",
+    "WRAPPED",
+    "0.1,13,2600"
+  ],
+  "0x4c21105de9927063490238fd8d15c622078f4a7e:1": [
+    "0x7d226bff737c5855254c307523afb3c464c5680b",
+    "WRAPPED",
+    "0.1,0.104368,1.304597"
+  ],
+  "0x4c21105de9927063490238fd8d15c622078f4a7e:250": [
+    "0x915120fd4c52f104a359318a0c525edaa44a7c10",
+    "WRAPPED",
+    "0.1,0.006523,1.304597"
+  ],
+  "0x4c21105de9927063490238fd8d15c622078f4a7e:43114": [
+    "0xc5c71cd0b734dae8c6eba9d79c3db693d112dda1",
+    "WRAPPED",
+    "0.1,0.006523,1.304597"
+  ],
+  "0x4c3a7c3bcc3d5bdf19b1e0d7d3a164b7cbd598ea:1": [
+    "0xe7c9c6bc87b86f9e5b57072f907ee6460b593924",
+    "WRAPPED",
+    "0.1,69267.667,865845.84"
+  ],
+  "0x4c888e116d57a32f84865f3789dcb131fdc9fab6:1": [
+    "0xa01199c61841fce3b3dafb83fefc1899715c8756",
+    "CANONICAL",
+    "0.1,190,4732"
+  ],
+  "0x4cff6d3ab6f0cee7186e610760b6f2549e17b2bc:1": [
+    "0x7683f14614a1f68ea71474680e80b9bd93db74d1",
+    "WRAPPED",
+    "0.1,8918617.61427,111482720.178372"
+  ],
+  "0x4cff6d3ab6f0cee7186e610760b6f2549e17b2bc:137": [
+    "0x77609d4f3ae31382389374101aca6108d95b093a",
+    "WRAPPED",
+    "0.1,226514.716,45302943.27"
+  ],
+  "0x4d338614fc25afe6edf3994f331b4bad32fb3c6a:1": [
+    "0xc888a0ab4831a29e6ca432babf52e353d23db3c2",
+    "CANONICAL",
+    "0.1,46,1150"
+  ],
+  "0x4da996c5fe84755c80e108cf96fe705174c5e36a:1": [
+    "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+    "WRAPPED",
+    "0.1,4,200"
+  ],
+  "0x4da996c5fe84755c80e108cf96fe705174c5e36a:128": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x4da996c5fe84755c80e108cf96fe705174c5e36a:137": [
+    "0x855d4248672a1fce482165e8dbe1207b94b1968a",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x4da996c5fe84755c80e108cf96fe705174c5e36a:43114": [
+    "0xa384bc7cdc0a93e686da9e7b8c0807cd040f4e0b",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x4da996c5fe84755c80e108cf96fe705174c5e36a:4689": [
+    "0xd67de0e0a0fd7b15dc8348bb9be742f3c5850454",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x4e720dd3ac5cfe1e1fbde4935f386bb1c66f4642:1": [
+    "0x41d5d79431a913c4ae7d69a668ecdfe5ff9dfb68",
+    "CANONICAL",
+    "0.1,0.12,3"
+  ],
+  "0x4e840aadd28da189b9906674b4afcb77c128d9ea:1": [
+    "0x6be61833fc4381990e82d7d4a9f4c9b3f67ea941",
+    "CANONICAL",
+    "0.1,1600,40000"
+  ],
+  "0x4ea6f39c719d3a77ce2e5b913312cf2999e6d19d:1": [
+    "0xa097c96acc9587d140ad8aeaac13d9db2c6cc07f",
+    "WRAPPED",
+    "0.1,649.39,8117.34"
+  ],
+  "0x4ea6f39c719d3a77ce2e5b913312cf2999e6d19d:137": [
+    "0x1c7f927f45a3ac113eacdfab3dca22db78b65601",
+    "WRAPPED",
+    "0.1,40.59,8117.34"
+  ],
+  "0x4ea6f39c719d3a77ce2e5b913312cf2999e6d19d:43114": [
+    "0xa6e822e865fbe37d6ebc6d721947afbbd9f95c19",
+    "WRAPPED",
+    "0.1,40.59,8117.34"
+  ],
+  "0x4ec16da4c9007462de151c0da9f5426c69978a7b:1": [
+    "0xb453f1f2ee776daf2586501361c457db70e1ca0f",
+    "CANONICAL",
+    "0.1,0.48,12"
+  ],
+  "0x4f60a160d8c2dddaafe16fcc57566db84d674bd6:1": [
+    "0x87761e886399ef8e1624cb0db3230b075a322c88",
+    "CANONICAL",
+    "0.1,1100,27500"
+  ],
+  "0x4f6318e97011fe21fdfce3ffcf868d44e5f6994a:32659": [
+    "fsn",
+    "CANONICAL",
+    "0.1,20,200"
+  ],
+  "0x4fee8628787d450154b4efef48d8e495201aa0f3:137": [
+    "0xa65779aa9a29af831da49c48899e7146934905c7",
+    "WRAPPED",
+    "0.1,495.137,99027.55"
+  ],
+  "0x4fee8628787d450154b4efef48d8e495201aa0f3:321": [
+    "0x64d5baf5ac030e2b7c435add967f787ae94d0205",
+    "WRAPPED",
+    "0.1,3616.793495,723358.699112"
+  ],
+  "0x4fee8628787d450154b4efef48d8e495201aa0f3:43114": [
+    "0x48844ddba89799dc40ec31728dac629802d407f3",
+    "WRAPPED",
+    "0.1,495.137,99027.55"
+  ],
+  "0x5003c91913944f9a0ae82c729508808b3f7c7c7e:1": [
+    "0x34f380a4e3389e99c0369264453523bbe5af7fab",
+    "WRAPPED",
+    "0.1,4567000,57080000"
+  ],
+  "0x5022a3772357a2bba192a4d93a918446492baa94:1": [
+    "0x95555e4e4cb2c094914af53598eff14b9340881f",
+    "WRAPPED",
+    "0.1,77,962"
+  ],
+  "0x5022a3772357a2bba192a4d93a918446492baa94:137": [
+    "0xbf0f03ff8d8f09bd2c02a711ced1390da8f52c54",
+    "WRAPPED",
+    "0.1,28.496036,5699.20724"
+  ],
+  "0x5022a3772357a2bba192a4d93a918446492baa94:250": [
+    "0x6626c47c00f1d87902fc13eecfac3ed06d5e8d8a",
+    "WRAPPED",
+    "0.1,4.8,962"
+  ],
+  "0x509949c4ee0c1c2c765cf9b23c75d823981e22ae:137": [
+    "0x685b63cfe0179b3efb70a01dcb1d648549aa192d",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x51138ef0dc9de2a03aaafa95f69924302b49a5fb:1": [
+    "0x95dd59343a893637be1c3228060ee6afbf6f0730",
+    "WRAPPED",
+    "0.1,1717,21500"
+  ],
+  "0x514f696af215a33bc9856cd39bb4b3f7c04db690:1": [
+    "0x1fbbc7dba1ef75ff43f955a5b9ceec3cc1692cd8",
+    "WRAPPED",
+    "0.1,23,286"
+  ],
+  "0x514f696af215a33bc9856cd39bb4b3f7c04db690:137": [
+    "0x2cd8650ca253bff0c3b99d636a7119d7cb7077d4",
+    "WRAPPED",
+    "0.1,1.43,286"
+  ],
+  "0x51634caff769b4a04d9b40e06198a4c451f896b5:1": [
+    "0x6fefd97f328342a8a840546a55fdcfee7542f9a8",
+    "WRAPPED",
+    "0.1,800,10000"
+  ],
+  "0x51688bf5b9c87c61af3fe18c94281cfbc872a119:1": [
+    "0xb1f66997a5760428d3a87d68b90bfe0ae64121cc",
+    "CANONICAL",
+    "0.1,1100,27500"
+  ],
+  "0x518445f0db93863e5e93a7f70617c05afa8048f1:1": [
+    "0x9f9913853f749b3fe6d6d4e16a1cc3c1656b6d51",
+    "CANONICAL",
+    "0.1,340,8500"
+  ],
+  "0x51ba0b044d96c3abfca52b64d733603ccc4f0d4d:1": [
+    "0xe53ec727dbdeb9e2d5456c3be40cff031ab40a55",
+    "CANONICAL",
+    "0.1,69,865"
+  ],
+  "0x5248f6c6196eb9df6fa4870c66f97638f33d13b0:137": [
+    "0x2d1c6a7362e75d88b4cf3b66b83052775846e2b8",
+    "WRAPPED",
+    "0.1,0.031837,6.367399"
+  ],
+  "0x5248f6c6196eb9df6fa4870c66f97638f33d13b0:250": [
+    "0x2f4d6f72ab9be667b09ff4da6efd4bef94ec556d",
+    "WRAPPED",
+    "0.1,0.031837,6.367399"
+  ],
+  "0x5248f6c6196eb9df6fa4870c66f97638f33d13b0:43114": [
+    "0xda5b232fb6e3e897d2f84797d19c53cf3f5ae938",
+    "WRAPPED",
+    "0.1,0.031837,6.367399"
+  ],
+  "0x5329b989b69f3c46b5e6868619ee390757b7c5bb:137": [
+    "0x1e0e8e6a2c8a3ec61f65e97338871bd7ddcb76d0",
+    "WRAPPED",
+    "0.1,6870,1374005"
+  ],
+  "0x5344c20fd242545f31723689662ac12b9556fc3d:1": [
+    "0x5444c30210d8a0a156178cfb8048b4137c0d40d1",
+    "WRAPPED",
+    "0.1,477187460,5965000000"
+  ],
+  "0x5344c20fd242545f31723689662ac12b9556fc3d:137": [
+    "0xf887906e130349a624ffa3cf1fa5b56f48b11c08",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x538d4622c34064dc532f232842b72a99cdefe4c8:1": [
+    "0x976cdc77e43667747e35c82a9477111259d0c6f0",
+    "WRAPPED",
+    "0.1,4615.587879,57694.848485"
+  ],
+  "0x54261774905f3e6e9718f2abb10ed6555cae308a:BTC": [
+    "btc",
+    "CANONICAL",
+    "0.1,0.0005,0.01"
+  ],
+  "0x54511c749f5af298fc7e5ffc9779280f104028e3:1": [
+    "0x9b17baadf0f21f03e35249e0e59723f34994f806",
+    "WRAPPED",
+    "0.1,654,8176"
+  ],
+  "0x54511c749f5af298fc7e5ffc9779280f104028e3:108": [
+    "0x218c3c3d49d0e7b37aff0d8bb079de36ae61a4c0",
+    "WRAPPED",
+    "0.1,164.021707,32804.341458"
+  ],
+  "0x54511c749f5af298fc7e5ffc9779280f104028e3:137": [
+    "0x4a7b9a4589a88a06ca29f99556db08234078d727",
+    "WRAPPED",
+    "0.1,41,8176"
+  ],
+  "0x54511c749f5af298fc7e5ffc9779280f104028e3:43114": [
+    "0xdebb1d6a2196f2335ad51fbde7ca587205889360",
+    "WRAPPED",
+    "0.1,41,8176"
+  ],
+  "0x5478a575ece4fb4768d1d43edf5826cfe1c6225a:1": [
+    "0x76c5449f4950f6338a393f53cda8b53b0cd3ca3a",
+    "CANONICAL",
+    "0.1,70,1750"
+  ],
+  "0x547cbe0f0c25085e7015aa6939b28402eb0ccdac:43114": [
+    "0x026e91e4c3d35eb31a90fcdbf50313d0290af3cb",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x552c8037a765e2dd62babdb8250380962244e75d:1": [
+    "0x9a046925f592513a9ca9ed214112e373f7971023",
+    "WRAPPED",
+    "0.1,1290.322581,16129.032258"
+  ],
+  "0x552c8037a765e2dd62babdb8250380962244e75d:1284": [
+    "0xcceaed1f682ef03dd35708e1cbaddd725f8df8a9",
+    "WRAPPED",
+    "0.1,80.645161,16129.032258"
+  ],
+  "0x552c8037a765e2dd62babdb8250380962244e75d:137": [
+    "0xeac967e8178a35bd743053298bd837bd20e8c6b2",
+    "WRAPPED",
+    "0.1,80.645161,16129.032258"
+  ],
+  "0x552c8037a765e2dd62babdb8250380962244e75d:42161": [
+    "0xe3d7a068a7d99ee79d9112d989c5aff4e7594a21",
+    "WRAPPED",
+    "0.1,161.290322,16129.032258"
+  ],
+  "0x552c8037a765e2dd62babdb8250380962244e75d:43114": [
+    "0x39c3dc3c1cb63ba8b5ace7ce05861352de930251",
+    "WRAPPED",
+    "0.1,80.645161,16129.032258"
+  ],
+  "0x552c8037a765e2dd62babdb8250380962244e75d:86": [
+    "0x2bf9b864cdc97b08b6d79ad4663e71b8ab65c45c",
+    "WRAPPED",
+    "0.1,80.645161,16129.032258"
+  ],
+  "0x554ce7e138581ee3408885e38213d169e7dd2017:1": [
+    "0x056354f3ff20743aa4c0da365603871c7000b081",
+    "CANONICAL",
+    "0.1,26668,666668"
+  ],
+  "0x559e9fc6a4d28d4b514f076724cb62f07ace862a:1": [
+    "0xf751575ed3390f6c02b4358f9e165e7b44877032",
+    "WRAPPED",
+    "0.1,80,1000"
+  ],
+  "0x559e9fc6a4d28d4b514f076724cb62f07ace862a:250": [
+    "0x9879abdea01a879644185341f7af7d8343556b7a",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0x55af5865807b196bd0197e0902746f31fbccfa58:1": [
+    "0xcc0014ccb39f6e86b1be0f17859a783b6722722f",
+    "CANONICAL",
+    "0.1,2800,70000"
+  ],
+  "0x55bfa96df825fa4ffbb8288ce751e09389b1a48a:1": [
+    "0x8d1e50bc4f5399f6012fd24a768a67f30630330a",
+    "WRAPPED",
+    "0.1,4884332.891,61054161.15"
+  ],
+  "0x55eca618a100b004c291949abef1bd15e60ae564:1": [
+    "0x59d1bf15e3340dae7a5d893cc2296e2d939daacd",
+    "WRAPPED",
+    "0.1,800,10000"
+  ],
+  "0x55eca618a100b004c291949abef1bd15e60ae564:APT": [
+    "0xd6d6372c8bde72a7ab825c00b9edd35e643fb94a61c55d9d94a9db3010098548::smart::makedao",
+    "WRAPPED",
+    "0.1,50,10000"
+  ],
+  "0x5608d5159ab98881bc116ae7761c74ad2ebb0448:137": [
+    "0xf244e91a46a9cdd48da295ca5d0b27894f8032b1",
+    "CANONICAL",
+    "0.1,20,4000"
+  ],
+  "0x5621b5a3f4a8008c4ccdd1b942b121c8b1944f1f:1": [
+    "0xee573a945b01b788b9287ce062a0cfc15be9fd86",
+    "CANONICAL",
+    "0.1,188,4700"
+  ],
+  "0x564bef31ec942ffe1bff250786f76a5c5141b9f3:1": [
+    "0xc28e931814725bbeb9e670676fabbcb694fe7df2",
+    "CANONICAL",
+    "0.1,12140,303500"
+  ],
+  "0x56501b0b12ee9518c2991451bbc8d7f9267949d2:1": [
+    "0x7f8bc696bebbbd29255f871cbef55b74e8f10e57",
+    "WRAPPED",
+    "0.1,800000,10000000"
+  ],
+  "0x56501b0b12ee9518c2991451bbc8d7f9267949d2:137": [
+    "0x34f380a4e3389e99c0369264453523bbe5af7fab",
+    "WRAPPED",
+    "0.1,350000,70000000"
+  ],
+  "0x5650c49d662cb83666ab0fad224453b603179d2a:1": [
+    "0x7beb05cf5681f402e762f8569c2fc138a2172978",
+    "WRAPPED",
+    "0.1,17.817,222.72"
+  ],
+  "0x5650c49d662cb83666ab0fad224453b603179d2a:10": [
+    "0x4518231a8fdf6ac553b9bbd51bbb86825b583263",
+    "WRAPPED",
+    "0.1,5.988024,598.802395"
+  ],
+  "0x5650c49d662cb83666ab0fad224453b603179d2a:137": [
+    "0x9ee45adbb2f2083ab5cd9bc888c77a662dbd55fe",
+    "WRAPPED",
+    "0.1,1.113,222.72"
+  ],
+  "0x5650c49d662cb83666ab0fad224453b603179d2a:250": [
+    "0x1e1085efaa63edfe74aad7c05a28eae4ef917c3f",
+    "WRAPPED",
+    "0.1,1.113,222.72"
+  ],
+  "0x5650c49d662cb83666ab0fad224453b603179d2a:42161": [
+    "0x316772cfec9a3e976fde42c3ba21f5a13aaaff12",
+    "WRAPPED",
+    "0.1,5.988024,598.802395"
+  ],
+  "0x5650c49d662cb83666ab0fad224453b603179d2a:43114": [
+    "0x39fc9e94caeacb435842fadedecb783589f50f5f",
+    "WRAPPED",
+    "0.1,1.113,222.72"
+  ],
+  "0x5655592badf214bbd520187de0a766cd7bd7c712:1": [
+    "0xed28b1890fbb4aa9ded528c1034fed278ff68f5d",
+    "WRAPPED",
+    "0.1,170176.558179,2127206.977239"
+  ],
+  "0x5655592badf214bbd520187de0a766cd7bd7c712:137": [
+    "0x0c5f149362ca17eac5d18e6912ab4f5aeabf88e6",
+    "WRAPPED",
+    "0.1,10636.034886,2127206.977239"
+  ],
+  "0x56aa0237244c67b9a854b4efe8479cca0b105289:137": [
+    "0x5d5530eb3147152fe78d5c4bfeede054c8d1442a",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x56aa0237244c67b9a854b4efe8479cca0b105289:250": [
+    "0xa9cad0165c155f3998b0001b3ef30bca0aa6b591",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x56f3878c54ad3cec18a380e788c5135bf617f5d6:1": [
+    "0x6339bd92eaa3cb8e629b06449e08b90581a33cea",
+    "CANONICAL",
+    "0.1,220400,5520000"
+  ],
+  "0x56fb3fd352e5875c6f2771ca86f3fd361cc0d93e:1": [
+    "0xff2b3353c3015e9f1fbf95b9bda23f58aa7ce007",
+    "CANONICAL",
+    "0.1,5420,135500"
+  ],
+  "0x5774b2fc3e91af89f89141eacf76545e74265982:1": [
+    "0xe1d7c7a4596b038ced2a84bf65b8647271c53208",
+    "CANONICAL",
+    "0.1,126,3150"
+  ],
+  "0x57aac97909756cd55bdfb6104dbc80071028d612:32520": [
+    "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+    "WRAPPED",
+    "0.1,1465.210052,293042.010503"
+  ],
+  "0x57f3fee2cfa3769fd25e3774eb514face7c70beb:2000": [
+    "0x2c78f1b70ccf63cdee49f9233e9faa99d43aa07e",
+    "WRAPPED",
+    "0.05,17,17"
+  ],
+  "0x582c12b30f85162fa393e5dbe2573f9f601f9d91:1": [
+    "0x9833c643f387ecfb76aa8114546ad524703c66fb",
+    "WRAPPED",
+    "0.1,173.232,4330.8"
+  ],
+  "0x582c12b30f85162fa393e5dbe2573f9f601f9d91:137": [
+    "0xadbe0eac80f955363f4ff47b0f70189093908c04",
+    "WRAPPED",
+    "0.1,21.654,4330.8"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:1": [
+    "0xee9762352f63f4387af40d58291612067727457d",
+    "WRAPPED",
+    "0.1,40,1000"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:10001": [
+    "0x8a496486f4c7cb840555bc2be327cba1447027c3",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:1024": [
+    "0x6b7a87899490ece95443e979ca9485cbe7e71522",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:1030": [
+    "0x4f3aff3a747fcade12598081e80c6605a8be192f",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:106": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:1234": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:137": [
+    "0x434aed11aad392089cd1aedd97cb024c85c43e11",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:2002": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:2025": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:2109": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:2222": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:24734": [
+    "0xaae3f40c4d02c9cfa7d5cb6f371226b3fa9c8fc8",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:25": [
+    "0xc1a49c0b9c10f35850bd8e15eaef0346be63e002",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:256256": [
+    "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:32520": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:40": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:42220": [
+    "0x86b3f23b6e90f5bbfac59b5b2661134ef8ffd255",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:43114": [
+    "0xeaf8190fd5042ec3144184241fd405bb1dec59e8",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:58": [
+    "0xd6070ae98b8069de6b494332d1a1a81b6179d960",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:71402": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:86": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:88": [
+    "0xc86c716478d7e1734d46913dfe5961c6a5254a72",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:NEAR": [
+    "usdt.tether-token.near",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58340a102534080b9d3175f868aea9f6af986dd9:XRP": [
+    "5553445400000000000000000000000000000000/rdsvn6ajg4ymqdhnujtp9nlrfp18jytjuf",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0x58759dd469ae5631c42cf8a473992335575b58d7:1": [
+    "0xbd83010eb60f12112908774998f65761cf9f6f9a",
+    "WRAPPED",
+    "0.1,70.4,880"
+  ],
+  "0x58759dd469ae5631c42cf8a473992335575b58d7:100": [
+    "0xfbdd194376de19a88118e84e279b977f165d01b8",
+    "WRAPPED",
+    "0.1,4.4,880"
+  ],
+  "0x58759dd469ae5631c42cf8a473992335575b58d7:137": [
+    "0x5fcb9de282af6122ce3518cde28b7089c9f97b26",
+    "WRAPPED",
+    "0.1,4.96,1000"
+  ],
+  "0x58a4e4f9f0bd1bfc2fe287493a130649f349255a:1": [
+    "0x539f3615c1dbafa0d008d87504667458acbd16fa",
+    "CANONICAL",
+    "0.1,11240,281000"
+  ],
+  "0x58a746553fff813f4301bc5605aaafc487b5328b:1": [
+    "0x50de6856358cc35f3a9a57eaaa34bd4cb707d2cd",
+    "CANONICAL",
+    "0.1,700,17500"
+  ],
+  "0x5921dee8556c4593eefcfad3ca5e2f618606483b:1": [
+    "0x2e1e15c44ffe4df6a0cb7371cd00d5028e571d14",
+    "CANONICAL",
+    "0.1,40.2,500"
+  ],
+  "0x595c8481c48894771ce8fade54ac6bf59093f9e8:1": [
+    "0xd478161c952357f05f0292b56012cd8457f1cfbf",
+    "CANONICAL",
+    "0.1,84.4,2110"
+  ],
+  "0x5986d5c77c65e5801a5caa4fae80089f870a71da:1": [
+    "0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a",
+    "CANONICAL",
+    "0.1,0.008,0.2"
+  ],
+  "0x5999e0ec1c678a8c08c0eb02436f3a2097884259:1": [
+    "0x3301ee63fb29f863f2333bd4466acb46cd8323e6",
+    "CANONICAL",
+    "0.1,306440000,7661000000"
+  ],
+  "0x59d1bf15e3340dae7a5d893cc2296e2d939daacd:1": [
+    "0x4157aa94c04799d8ea1ca09e8440e6eebbe04830",
+    "CANONICAL",
+    "0.1,1890,25610"
+  ],
+  "0x59d66751eff67d7150196b4086afcc0313163026:137": [
+    "0x12365293cb6477d4fc2686e46bb97e3fb64f1550",
+    "WRAPPED",
+    "0.1,15.09,3018.41"
+  ],
+  "0x5a41f637c3f7553dba6ddc2d3ca92641096577ea:250": [
+    "0xeff6fcfbc2383857dd66ddf57efffc00d58b7d9d",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x5a4fb10e7c4cbb9a2b9d9a942f9a875ebd3489ea:1": [
+    "0xcdeee767bed58c5325f68500115d4b722b3724ee",
+    "CANONICAL",
+    "0.1,480,12000"
+  ],
+  "0x5a68f06ef5e3f3b65ac466e74f4c61c3ab4d171b:1": [
+    "0xb3ed706b564bba9cab64042f4e1b391be7bebce5",
+    "CANONICAL",
+    "0.1,78.5,1962"
+  ],
+  "0x5ae9604fea71d4916ecedb3af1df8c4903a064b7:1": [
+    "0x2d72a97a31dc920db03330780d30074626e39c8a",
+    "WRAPPED",
+    "0.1,38773.027,484662.84"
+  ],
+  "0x5b641728c9f1e544fb3c9f16a19aa7916f75fd44:137": [
+    "0xe0ce60af0850bf54072635e66e79df17082a1109",
+    "WRAPPED",
+    "0.1,66515.897299,13303179.459891"
+  ],
+  "0x5b641728c9f1e544fb3c9f16a19aa7916f75fd44:250": [
+    "0x5444c30210d8a0a156178cfb8048b4137c0d40d1",
+    "WRAPPED",
+    "0.1,66515.897299,13303179.459891"
+  ],
+  "0x5b641728c9f1e544fb3c9f16a19aa7916f75fd44:43114": [
+    "0x65c9d9d080714cda7b5d58989dc27f897f165179",
+    "WRAPPED",
+    "0.1,66515.897299,13303179.459891"
+  ],
+  "0x5b641728c9f1e544fb3c9f16a19aa7916f75fd44:66": [
+    "0x94977c9888f3d2fafae290d33fab4a5a598ad764",
+    "WRAPPED",
+    "0.1,797448.165869,159489633.173844"
+  ],
+  "0x5c865352f9012308378b1c74fe01d899f28e8fd9:1": [
+    "0x8d34a11f49172c057d11833cf92aff97f28fc595",
+    "WRAPPED",
+    "0.1,3640000000000,45600000000000"
+  ],
+  "0x5c865352f9012308378b1c74fe01d899f28e8fd9:137": [
+    "0x1a056a5fcbbe5ad69793cea8569c6dba33e4080a",
+    "WRAPPED",
+    "0.1,230000000000,45600000000000"
+  ],
+  "0x5c865352f9012308378b1c74fe01d899f28e8fd9:250": [
+    "0xf887906e130349a624ffa3cf1fa5b56f48b11c08",
+    "WRAPPED",
+    "0.1,250000000000,50000000000000"
+  ],
+  "0x5c865352f9012308378b1c74fe01d899f28e8fd9:42161": [
+    "0xc1a49c0b9c10f35850bd8e15eaef0346be63e002",
+    "WRAPPED",
+    "0.1,230000000000,45600000000000"
+  ],
+  "0x5c9565950d2124d6e8387e2b3e9e0cd17fd8f6bd:1": [
+    "0xdfd8d604951ebf1b2297285f1b68de140c43992b",
+    "CANONICAL",
+    "0.1,28,700"
+  ],
+  "0x5d0158a5c3ddf47d4ea4517d8db0d76aa2e87563:1": [
+    "0x91dfbee3965baaee32784c2d546b7a0c62f268c9",
+    "CANONICAL",
+    "0.1,1360,34000"
+  ],
+  "0x5d47baba0d66083c52009271faf3f50dcc01023c:1": [
+    "0xc96df921009b790dffca412375251ed1a2b75c60",
+    "CANONICAL",
+    "0.1,9200,230000"
+  ],
+  "0x5e0691ba91e21f3fdc88a0550aa4f7304ed89b5c:1": [
+    "0x63b8b7d4a3efd0735c4bffbd95b332a55e4eb851",
+    "CANONICAL",
+    "0.1,1892,47300"
+  ],
+  "0x5e23bea955bc322f2894d94faceca744bb5c3cf9:1": [
+    "0x106538cc16f938776c7c180186975bca23875287",
+    "CANONICAL",
+    "0.1,24.8,620"
+  ],
+  "0x5e54301415546401626036a10f85f9f06de8dffd:1": [
+    "0x96b14e64b53b9950d2a4d2292f8dc7d51a4f467a",
+    "WRAPPED",
+    "0.1,727.272,9090.91"
+  ],
+  "0x5e54301415546401626036a10f85f9f06de8dffd:137": [
+    "0x5aa72b990060d25f13b4db88ea63143174c8090f",
+    "WRAPPED",
+    "0.1,45.454,9090.91"
+  ],
+  "0x5ec0d8751be5e7b1779430e62b8f61225a947b9c:128": [
+    "0xb12c13e66ade1f72f71834f2fc5082db8c091358",
+    "WRAPPED",
+    "0.1,1.893939,378.787879"
+  ],
+  "0x5eff9315e6b24e3dc268f65e93bac8af28d03063:128": [
+    "0x4e720dd3ac5cfe1e1fbde4935f386bb1c66f4642",
+    "WRAPPED",
+    "0.1,438.35309,87670.617981"
+  ],
+  "0x5f2110985f641a139c6b48bae7adac8f46b93d89:1": [
+    "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "CANONICAL",
+    "0.1,80,2000"
+  ],
+  "0x5f58aee77fba2760cec20ccdcd982bd42e56fc4e:1": [
+    "0x31df3cfc1113b0afa2120887db216948c36eb77c",
+    "WRAPPED",
+    "0.1,128828.625721,1610357.821508"
+  ],
+  "0x5f58aee77fba2760cec20ccdcd982bd42e56fc4e:137": [
+    "0x636db84815d6a5af9202cbb44dad7fd672f178e1",
+    "WRAPPED",
+    "0.1,8051.789108,1610357.821508"
+  ],
+  "0x5fac4f1ac9f8a4233e4ca6a332e6a5d0266edc0b:250": [
+    "0x2f50405ffe9b8aa109836d18f217929f33a177bb",
+    "WRAPPED",
+    "0.1,46.152,9230.54"
+  ],
+  "0x5fac4f1ac9f8a4233e4ca6a332e6a5d0266edc0b:43114": [
+    "0x323d0dba53ee9a6f0faa464fb099ec562b591fc7",
+    "WRAPPED",
+    "0.1,46.152,9230.54"
+  ],
+  "0x5fe5a66c84c6f8c213503a04f95a417ac6684361:1": [
+    "0xb72842d6f5fedf91d22d56202802bb9a79c6322e",
+    "WRAPPED",
+    "0.1,36.5,913"
+  ],
+  "0x5fe5a66c84c6f8c213503a04f95a417ac6684361:137": [
+    "0xe26ae3d881f3d5def58d795f611753804e7a6b26",
+    "WRAPPED",
+    "0.1,0.77,0.77"
+  ],
+  "0x5fe5a66c84c6f8c213503a04f95a417ac6684361:250": [
+    "0xf8acf86194443dcde55fc5b9e448e183c290d8cb",
+    "WRAPPED",
+    "0.1,0.77,0.77"
+  ],
+  "0x5fe5a66c84c6f8c213503a04f95a417ac6684361:42161": [
+    "0xd22a58f79e9481d1a88e00c343885a588b34b68b",
+    "WRAPPED",
+    "0.1,1.7,1.7"
+  ],
+  "0x5fe80d2cd054645b9419657d3d10d26391780a7b:1": [
+    "0xd1a891e6eccb7471ebd6bc352f57150d4365db21",
+    "WRAPPED",
+    "0.1,2.3,28"
+  ],
+  "0x5fe80d2cd054645b9419657d3d10d26391780a7b:42161": [
+    "0xd7c295e399ca928a3a14b01d760e794f1adf8990",
+    "WRAPPED",
+    "0.1,0.25,4"
+  ],
+  "0x5ff584f11b3dc5bc26cd099239ced7eaa2d4e581:137": [
+    "0xa56c978be266b1a9ab7b8982050d500505eeae61",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x5ff584f11b3dc5bc26cd099239ced7eaa2d4e581:250": [
+    "0x05e481b19129b560e921e487adb281e70bdba463",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x603c7f932ed1fc6575303d8fb018fdcbb0f39a95:137": [
+    "0x5d47baba0d66083c52009271faf3f50dcc01023c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x6043c1600cf0a9c66fc0626b36b4e1e4d59098ba:2222": [
+    "0x99c409e5f62e4bd2ac142f17cafb6810b8f0baae",
+    "WRAPPED",
+    "0.1,468,93540"
+  ],
+  "0x6043c1600cf0a9c66fc0626b36b4e1e4d59098ba:25": [
+    "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+    "WRAPPED",
+    "0.1,1427.193168,285438.633548"
+  ],
+  "0x60e29a5e0c1d84eb48fadd862ab7fcd550dafa09:1": [
+    "0x7837fd820ba38f95c54d6dac4ca3751b81511357",
+    "WRAPPED",
+    "0.1,1.664586,20.807324"
+  ],
+  "0x60e29a5e0c1d84eb48fadd862ab7fcd550dafa09:137": [
+    "0x92df60c51c710a1b1c20e42d85e221f3a1bfc7f2",
+    "WRAPPED",
+    "0.1,0.125691,25.13826"
+  ],
+  "0x60e29a5e0c1d84eb48fadd862ab7fcd550dafa09:250": [
+    "0x7beb05cf5681f402e762f8569c2fc138a2172978",
+    "WRAPPED",
+    "0.1,0.125691,25.13826"
+  ],
+  "0x60e29a5e0c1d84eb48fadd862ab7fcd550dafa09:43114": [
+    "0xa8752333f6a6fe47323a4edac3d09bb1048a0e23",
+    "WRAPPED",
+    "0.1,0.125691,25.13826"
+  ],
+  "0x619f98fcf9a3f5fecee753fa9f4e3ce39ef43caa:1": [
+    "0x5d5530eb3147152fe78d5c4bfeede054c8d1442a",
+    "WRAPPED",
+    "0.1,48780488,610000000"
+  ],
+  "0x61fa01129ac0bb124d1c60dc9f735c6c579a858b:43114": [
+    "0xc167f62e93775acadeb3d2b0940bce560171fdf3",
+    "WRAPPED",
+    "0.1,27.777,5555.56"
+  ],
+  "0x62113b7033fd0affff9c38783bbf5e4bc3f62c2b:61": [
+    "0x85fd5f8dbd0c9ef1806e6c7d4b787d438621c1dc",
+    "WRAPPED",
+    "0.1,789422119406.393381,157884423881278.676208"
+  ],
+  "0x62334d3c6f48891deed7324abd0a3dcb23305f77:1": [
+    "0xbcd4b7de6fde81025f74426d43165a5b0d790fdd",
+    "CANONICAL",
+    "0.1,6400,160000"
+  ],
+  "0x627524d78b4fc840c887ffec90563c7a42b671fd:1": [
+    "0x3fa400483487a489ec9b1db29c4129063eec4654",
+    "CANONICAL",
+    "0.1,940,23500"
+  ],
+  "0x62907ad5c2d79e2a4f048a90ae2b49d062a773f3:137": [
+    "0xe56979f6ada241c1bed92e68535dcead9de2a5ef",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x62c3c2c714f934b5e2a7a3d225cc23fb279060c1:1": [
+    "0x8564ba78f88b744fcc6f9407b9af503ad35adafc",
+    "WRAPPED",
+    "0.1,51282.051,641025.64"
+  ],
+  "0x62c3c2c714f934b5e2a7a3d225cc23fb279060c1:137": [
+    "0x7c083ab0612ca7fbcd893e1b3ed01fc5401c1df7",
+    "WRAPPED",
+    "0.1,3205.128,641025.64"
+  ],
+  "0x62c3c2c714f934b5e2a7a3d225cc23fb279060c1:42161": [
+    "0x340fe1d898eccaad394e2ba0fc1f93d27c7b717a",
+    "WRAPPED",
+    "0.1,6410.26,641025.64"
+  ],
+  "0x62c3c2c714f934b5e2a7a3d225cc23fb279060c1:43114": [
+    "0x884247ec9921195c1e722d5e8e812415bd8715d2",
+    "WRAPPED",
+    "0.1,3205.128,641025.64"
+  ],
+  "0x634398cb81b76bfc75ebb434cf7c82036f9e7d78:1": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,21,340"
+  ],
+  "0x6362c3ac9713008b79deb0ee361f1f6f57037694:1": [
+    "0x623332a33ae3a8fc9b121322c72550decc0ed81c",
+    "WRAPPED",
+    "0.1,3035.969,37949.61"
+  ],
+  "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c:1": [
+    "0xef6e45af9a422c5469928f927ca04ed332322e2e",
+    "CANONICAL",
+    "0.1,0.0006,0.006"
+  ],
+  "0x641ec142e67ab213539815f67e4276975c2f8d50:66": [
+    "0x4518231a8fdf6ac553b9bbd51bbb86825b583263",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x64b84d2eab43109220c84e0b163fb073fe125223:1": [
+    "0xb1d6bc439f5d3bfbd828da3d0848b0f3658c9dc6",
+    "WRAPPED",
+    "0.1,182.146,2276.83"
+  ],
+  "0x64b84d2eab43109220c84e0b163fb073fe125223:250": [
+    "0x11eb3aa66fe1f2b75cb353d3e874e96968182bda",
+    "WRAPPED",
+    "0.1,19.53,3906.25"
+  ],
+  "0x655ed56a36cedbbd24f45e564643b85e5c346a5d:1": [
+    "0xe7f58a92476056627f9fdb92286778abd83b285f",
+    "CANONICAL",
+    "0.1,80,980"
+  ],
+  "0x657c620fee04a225e57822606c357d21663d507c:137": [
+    "0x7c10b66c442fc403ab2b8bd73553d0df262ad8a5",
+    "WRAPPED",
+    "0.1,87,17400"
+  ],
+  "0x657c620fee04a225e57822606c357d21663d507c:250": [
+    "0x5d5530eb3147152fe78d5c4bfeede054c8d1442a",
+    "WRAPPED",
+    "0.1,87,17400"
+  ],
+  "0x657c620fee04a225e57822606c357d21663d507c:43114": [
+    "0x6496994241804d7fe2b032901931e03bcd82301f",
+    "WRAPPED",
+    "0.1,87,17400"
+  ],
+  "0x65d9033cff96782394dab5dbef17fa771bbe1732:1": [
+    "0x31ea0de8119307aa264bb4b38727aab4e36b074f",
+    "CANONICAL",
+    "0.1,800,20000"
+  ],
+  "0x65e66a61d0a8f1e686c2d6083ad611a10d84d97a:1": [
+    "0x5eaa69b29f99c84fe5de8200340b4e9b4ab38eac",
+    "CANONICAL",
+    "0.1,620,15500"
+  ],
+  "0x6633c083f54bb65f702f9f276319bb24b65fec18:1": [
+    "0x9cd39da8f25ec50cf2ee260e464ac23ea23f6bb0",
+    "CANONICAL",
+    "0.1,76.2,1906"
+  ],
+  "0x66eff5221ca926636224650fd3b9c497ff828f7d:1": [
+    "0x6b289cceaa8639e3831095d75a3e43520fabf552",
+    "WRAPPED",
+    "0.1,2600,32332"
+  ],
+  "0x66eff5221ca926636224650fd3b9c497ff828f7d:250": [
+    "0xbb29d2a58d880af8aa5859e30470134deaf84f2b",
+    "WRAPPED",
+    "0.1,162,32332"
+  ],
+  "0x66eff5221ca926636224650fd3b9c497ff828f7d:42161": [
+    "0xf7428ffcb2581a2804998efbb036a43255c8a8d3",
+    "WRAPPED",
+    "0.1,324,32332"
+  ],
+  "0x66eff5221ca926636224650fd3b9c497ff828f7d:43114": [
+    "0x3ee97d514bbef95a2f110e6b9b73824719030f7a",
+    "WRAPPED",
+    "0.1,162,32332"
+  ],
+  "0x6740e5fd93161af01ceaf18effcba489b5de0997:1": [
+    "0xf545cd9ec67770748c3c2bdb4b7511a86f00af0a",
+    "WRAPPED",
+    "0.1,17870.984892,223387.311154"
+  ],
+  "0x67d66e8ec1fd25d98b3ccd3b19b7dc4b4b7fc493:137": [
+    "0x7c10b66c442fc403ab2b8bd73553d0df262ad8a5",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x67d66e8ec1fd25d98b3ccd3b19b7dc4b4b7fc493:250": [
+    "0x5d5530eb3147152fe78d5c4bfeede054c8d1442a",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x685b63cfe0179b3efb70a01dcb1d648549aa192d:1": [
+    "0xf3dcbc6d72a4e1892f7917b7c43b74131df8480e",
+    "CANONICAL",
+    "0.1,522,13050"
+  ],
+  "0x68df36a52a0a35527794cb09d89d4b53721839d9:10": [
+    "0x0b322577569418b166cd98ea8ae7c681e4a820eb",
+    "WRAPPED",
+    "0.1,2.28833,228.832952"
+  ],
+  "0x693e3f585f7d6e57648c31967f34585fa3e419f1:1": [
+    "0xa7d838bfc461b777d14b05823063d2118f5d91ac",
+    "WRAPPED",
+    "0.1,549.111,6863.89"
+  ],
+  "0x693e3f585f7d6e57648c31967f34585fa3e419f1:128": [
+    "0x634398cb81b76bfc75ebb434cf7c82036f9e7d78",
+    "WRAPPED",
+    "0.1,56.026175,11205.235086"
+  ],
+  "0x693e3f585f7d6e57648c31967f34585fa3e419f1:66": [
+    "0x38389eb214c4ac1cdda7a7582ab01e8a9bb548ba",
+    "WRAPPED",
+    "0.1,56.026175,11205.235086"
+  ],
+  "0x696e96f08f9d046b0125be299bf900f645d79acd:1": [
+    "0xfedadce4361658ad34410f02de20af217b0a9048",
+    "WRAPPED",
+    "0.1,80,1000"
+  ],
+  "0x696e96f08f9d046b0125be299bf900f645d79acd:137": [
+    "0x0e7ae79d3c324726f3610233f3d6510815611031",
+    "WRAPPED",
+    "0.1,5.045,1009.06"
+  ],
+  "0x696e96f08f9d046b0125be299bf900f645d79acd:43114": [
+    "0x8ce3dfcae03beb7d2cab25a1e1434c3791f45dd8",
+    "WRAPPED",
+    "0.1,5.045,1009.06"
+  ],
+  "0x6a46d878401f46b4c7f665f065e0667580e031ec:1": [
+    "0xd22a58f79e9481d1a88e00c343885a588b34b68b",
+    "WRAPPED",
+    "0.1,100,5000"
+  ],
+  "0x6a545f9c64d8f7b957d8d2e6410b52095a9e6c29:1": [
+    "0x63b4f3e3fa4e438698ce330e365e831f7ccd1ef4",
+    "CANONICAL",
+    "0.1,10.16,254"
+  ],
+  "0x6a8fd46f88dbd7bdc2d536c604f811c63052ce0f:1": [
+    "0xd47bdf574b4f76210ed503e0efe81b58aa061f3d",
+    "CANONICAL",
+    "0.1,81,1011"
+  ],
+  "0x6aa217312960a21adbde1478dc8cbcf828110a67:137": [
+    "0x35f80a39eefe33d0dfd2ad2daa6ad6a9d472cebd",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x6ab6d61428fde76768d7b45d8bfeec19c6ef91a8:1": [
+    "0x92e187a03b6cd19cb6af293ba17f2745fd2357d5",
+    "CANONICAL",
+    "0.1,1404,35100"
+  ],
+  "0x6ab899f7c0a1bd4e9cab0501683ae90db34be1ce:1": [
+    "0x4d2ee5dae46c86da2ff521f7657dad98834f97b8",
+    "CANONICAL",
+    "0.1,0.6,15"
+  ],
+  "0x6aeec4b23aa51442e613e5023dafa5c9de2dfe95:1": [
+    "0xe84cea9df2d6a6010c0bd74b803f6372534e75e9",
+    "WRAPPED",
+    "0.1,1600,20000"
+  ],
+  "0x6b0c81a800054a661a6062261c13cf16dbd2cd8f:32520": [
+    "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844",
+    "WRAPPED",
+    "0.1,85,16900"
+  ],
+  "0x6ba7a8f9063c712c1c8cabc776b1da7126805f3b:137": [
+    "0x692ac1e363ae34b6b489148152b12e2785a3d8d6",
+    "CANONICAL",
+    "0.1,6.4,1263"
+  ],
+  "0x6bfd576220e8444ca4cc5f89efbd7f02a4c94c16:43114": [
+    "0x306377cfa2ac72e757151591e9ecf0135d7c9613",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x6c01361d8dbaf43b81b52da3efae7dab1b8fffe9:1": [
+    "0xf75565b89ba076b8fc7b9708d14855fd3da89e97",
+    "WRAPPED",
+    "0.1,25.48,636.94"
+  ],
+  "0x6c01361d8dbaf43b81b52da3efae7dab1b8fffe9:250": [
+    "0xbf77e7b4ccc92bbaff26dd08a6a00609d05ff459",
+    "WRAPPED",
+    "0.1,4.7,926"
+  ],
+  "0x6c5544e720dcf8173ff06fdc7aa3a634994375d2:1": [
+    "0xdb04345ba2d2f02ef0dbaaffae8cef0da28952cf",
+    "WRAPPED",
+    "0.1,4638.132873,57976.660915"
+  ],
+  "0x6c5544e720dcf8173ff06fdc7aa3a634994375d2:250": [
+    "0x8c77057c3343b7dcc97ca21da274730396162a98",
+    "WRAPPED",
+    "0.1,289.883304,57976.660915"
+  ],
+  "0x6c5544e720dcf8173ff06fdc7aa3a634994375d2:43114": [
+    "0xa6ad0ef910ca4c54a97cecf82bf5892c0fa4913b",
+    "WRAPPED",
+    "0.1,289.883304,57976.660915"
+  ],
+  "0x6c5544e720dcf8173ff06fdc7aa3a634994375d2:61": [
+    "0xf480f38c366daac4305dc484b2ad7a496ff00cea",
+    "WRAPPED",
+    "0.1,289.883304,57976.660915"
+  ],
+  "0x6c76545a0da5ae50a081dd1b8ae35daaa00b1352:1": [
+    "0x9ee45adbb2f2083ab5cd9bc888c77a662dbd55fe",
+    "WRAPPED",
+    "0.1,109,1357"
+  ],
+  "0x6c76545a0da5ae50a081dd1b8ae35daaa00b1352:43114": [
+    "0x1748e1a07e82762660b4e57838b570dcb73bf75d",
+    "WRAPPED",
+    "0.1,7,1357"
+  ],
+  "0x6c784028670359b5c590cdb1c096ef275db26788:1284": [
+    "0xb0731d50c681c45856bfc3f7539d5f61d4be81d8",
+    "WRAPPED",
+    "0.1,1392.040313,278408.062697"
+  ],
+  "0x6c7fc3fd4a9f1cfa2a69b83f92b9da7ec26240a2:10": [
+    "0xc46fedc533e9f14c99c4c5124e2085701fa9b255",
+    "WRAPPED",
+    "0.1,0.71736,143.472023"
+  ],
+  "0x6c7fc3fd4a9f1cfa2a69b83f92b9da7ec26240a2:1284": [
+    "0x130966628846bfd36ff31a822705796e8cb8c18d",
+    "WRAPPED",
+    "0.1,1.106195,221.238938"
+  ],
+  "0x6c7fc3fd4a9f1cfa2a69b83f92b9da7ec26240a2:137": [
+    "0x8063037ea50e4a066bf1430ea1e3e609cd5cef6b",
+    "WRAPPED",
+    "0.1,0.148,29.75"
+  ],
+  "0x6c7fc3fd4a9f1cfa2a69b83f92b9da7ec26240a2:25": [
+    "0x99415856b37be9e75c0153615c7954f9ddb97a6e",
+    "WRAPPED",
+    "0.1,13.611628,2722.325519"
+  ],
+  "0x6c7fc3fd4a9f1cfa2a69b83f92b9da7ec26240a2:250": [
+    "0xc167f62e93775acadeb3d2b0940bce560171fdf3",
+    "WRAPPED",
+    "0.1,0.008,1.6"
+  ],
+  "0x6c7fc3fd4a9f1cfa2a69b83f92b9da7ec26240a2:42161": [
+    "0xae8627db72d7fc6241f2e2b87eb2bbc7cafb1661",
+    "WRAPPED",
+    "0.1,2.212389,221.238938"
+  ],
+  "0x6c7fc3fd4a9f1cfa2a69b83f92b9da7ec26240a2:43114": [
+    "0x9466ab927611725b9af76b9f31b2f879ff14233d",
+    "WRAPPED",
+    "0.1,0.008,1.6"
+  ],
+  "0x6cee1e8763589d77746e7a0ec84f9815402facd7:1": [
+    "0x09b809fbb0a1fa04916fb47b24dbc33529fd0c73",
+    "WRAPPED",
+    "0.1,8994.827,112435.35"
+  ],
+  "0x6d34f621d2a1812434ce7af6e04a344bfce9b47e:137": [
+    "0x70a20ccb2a35f47ed90c4460ca9f8e660107344b",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x6d3a0fb0070ea61f901ebc0b675c30450acac737:137": [
+    "0xbb29d2a58d880af8aa5859e30470134deaf84f2b",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x6da1dce036e5ca4318fbc7e7fc4234020ef8841e:137": [
+    "0x247b5bcc806f86969e0ee5446d411283b218f645",
+    "WRAPPED",
+    "0.1,42.5,8500"
+  ],
+  "0x6e283470cb5f0c7315c6e165eec4cc39965e5ceb:1": [
+    "0xf7428ffcb2581a2804998efbb036a43255c8a8d3",
+    "WRAPPED",
+    "0.1,0.32,16"
+  ],
+  "0x6e2a5ea25b161befa6a8444c71ae3a89c39933c6:1": [
+    "0xd7c302fc3ac829c7e896a32c4bd126f3e8bd0a1f",
+    "CANONICAL",
+    "0.1,2000,100000"
+  ],
+  "0x6e3bf2fff13e18413d3780f93753d6cff5aee3e1:1": [
+    "0x99f7d752745f270e100233cc05768b4a12bd09f0",
+    "WRAPPED",
+    "0.1,4097,51203"
+  ],
+  "0x6e3bf2fff13e18413d3780f93753d6cff5aee3e1:137": [
+    "0x2d72a97a31dc920db03330780d30074626e39c8a",
+    "WRAPPED",
+    "0.1,256,51203"
+  ],
+  "0x6e5476e9c14f3a3c3611bfce694f2b3ced81fa4c:1": [
+    "0x063069f9beab2b01153c87622f6ed8f693ed5215",
+    "WRAPPED",
+    "0.1,16000,200000"
+  ],
+  "0x6e5476e9c14f3a3c3611bfce694f2b3ced81fa4c:2000": [
+    "0xbbc4a8d076f4b1888fec42581b6fc58d242cf2d5",
+    "WRAPPED",
+    "0.1,1000,200000"
+  ],
+  "0x6e5476e9c14f3a3c3611bfce694f2b3ced81fa4c:42161": [
+    "0xb576c9403f39829565bd6051695e2ac7ecf850e2",
+    "WRAPPED",
+    "0.1,2000,200000"
+  ],
+  "0x6e6bed1409e7c1eebec4b0df0419b32e0c6314ba:1": [
+    "0x5150956e082c748ca837a5dfa0a7c10ca4697f9c",
+    "CANONICAL",
+    "0.1,786,19628"
+  ],
+  "0x6e948add7eb958c81b79191c05bd4d4213bf61c0:1": [
+    "0x508df5aa4746be37b5b6a69684dfd8bdc322219d",
+    "CANONICAL",
+    "0.1,2650,66234"
+  ],
+  "0x6ea5f827130e81c6b82b6b852b7f0b505110e939:128": [
+    "0x338726dd694db9e2230ec2bb8624a2d7f566c96d",
+    "WRAPPED",
+    "0.1,50000,10000000"
+  ],
+  "0x6ea5f827130e81c6b82b6b852b7f0b505110e939:137": [
+    "0xf99fc9f2d4b9f6cc4d6e56b13c5ae7e0030fb406",
+    "WRAPPED",
+    "0.1,50000,10000000"
+  ],
+  "0x6ea5f827130e81c6b82b6b852b7f0b505110e939:66": [
+    "0xbfc044a234e45412ecfec2cd6aae2dd0c083a7cd",
+    "WRAPPED",
+    "0.1,50000,10000000"
+  ],
+  "0x6ecd502545a0c7691b5371ab0ab07840061c2c5d:43114": [
+    "0x0efa5328fefce96c8d10661bd97403764d477853",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0x6ef583d55ab552a4dc7fc4ad9683d75f15211551:1285": [
+    "0xbdc8fd437c489ca3c6da3b5a336d11532a532303",
+    "WRAPPED",
+    "0.1,16744809.109176,3348961821.835231"
+  ],
+  "0x6ef583d55ab552a4dc7fc4ad9683d75f15211551:137": [
+    "0x116fe9717a65f19041b7e30ad56cb735159089a0",
+    "WRAPPED",
+    "0.1,16744809.109176,3348961821.835231"
+  ],
+  "0x6f0210a6a52af56068e370bd7e071431f8e7be31:137": [
+    "0x45827b9457f8b7bef503172819f333d1a9eb85f6",
+    "WRAPPED",
+    "0.1,1512.63504,302527.008099"
+  ],
+  "0x6f1bc0967945465539877b39ba48373b0219248f:1": [
+    "0xd4143e8db48a8f73afcdf13d7b3305f28da38116",
+    "WRAPPED",
+    "0.1,460,5200"
+  ],
+  "0x6f26e8a40c8daae8c4358ce557c10226527cebce:137": [
+    "0x840195888db4d6a99ed9f73fcd3b225bb3cb1a79",
+    "CANONICAL",
+    "0.1,8.8,1760"
+  ],
+  "0x6f817a0ce8f7640add3bc0c1c2298635043c2423:1": [
+    "eth",
+    "CANONICAL",
+    "0.1,0.02,0.25"
+  ],
+  "0x6f9c26fa731c7ea4139fa669962cf8f1ce6c8b0b:250": [
+    "0x9ba3e4f84a34df4e08c112e1a0ff148b81655615",
+    "CANONICAL",
+    "0.1,15580000000,3200000000000"
+  ],
+  "0x6fefd97f328342a8a840546a55fdcfee7542f9a8:1": [
+    "0x32e6c34cd57087abbd59b5a4aecc4cb495924356",
+    "CANONICAL",
+    "0.1,154.4,3860"
+  ],
+  "0x6ff0609046a38d76bd40c5863b4d1a2dce687f73:1": [
+    "0x35747eb4c027ebbf0a7f4e642627afcd7fd8cd7a",
+    "CANONICAL",
+    "0.1,27200000,680000000"
+  ],
+  "0x6ffd446cef7e60b7758e0ed836035738a8d18aa1:1": [
+    "0xa3a7cba479df86c7f866280b90ebc3b25f2371f0",
+    "CANONICAL",
+    "0.1,29.2,730"
+  ],
+  "0x702d161ed480e4a367a5810a6086074b791cf6a0:1": [
+    "0xc03841b5135600312707d39eb2af0d2ad5d51a91",
+    "CANONICAL",
+    "0.1,550,13750"
+  ],
+  "0x70523d78a74f5533768075283bcb473ca01a8a4b:1": [
+    "0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0",
+    "CANONICAL",
+    "0.1,7.2,180"
+  ],
+  "0x708739980021a0b0b2e555383fe1283697e140e9:1285": [
+    "0x6c2c113c8ca73db67224ef4d8c8dfcec61e52a9c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x708739980021a0b0b2e555383fe1283697e140e9:137": [
+    "0xd7b78f43ab667ff671f7025ffd2216b72332acbb",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x708739980021a0b0b2e555383fe1283697e140e9:4689": [
+    "0x0dcb0cb0120d355cde1ce56040be57add0185baa",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x70d6b3cfaabd6c0eb6b99b80c6540fa754a72c40:250": [
+    "0x37c045be4641328dfeb625f1dde610d061613497",
+    "CANONICAL",
+    "0.1,130,26000"
+  ],
+  "0x70d9b7457c713019f5b9c99bf73fd42084555630:1": [
+    "0xc8f884783ea40116ac7ee1893858c21d9d438b6c",
+    "WRAPPED",
+    "0.1,2053.168334,25664.604173"
+  ],
+  "0x70d9b7457c713019f5b9c99bf73fd42084555630:137": [
+    "0x7faabda3de9be051f97beaba3d539666933b2fa8",
+    "WRAPPED",
+    "0.1,29.411,5882.35"
+  ],
+  "0x70d9b7457c713019f5b9c99bf73fd42084555630:66": [
+    "0x4e840aadd28da189b9906674b4afcb77c128d9ea",
+    "WRAPPED",
+    "0.1,250.46411,50092.821999"
+  ],
+  "0x71b0191635b30fb6412a2f8b721ca1e904eb40df:1": [
+    "0x0c8af3016eec474f79373be89f534073bb33fe4d",
+    "WRAPPED",
+    "0.1,0.048851,0.610635"
+  ],
+  "0x71b0191635b30fb6412a2f8b721ca1e904eb40df:43114": [
+    "0xf24fd75c5bf897f272ae79a878089b12de5f1d62",
+    "WRAPPED",
+    "0.1,0.003053,0.610635"
+  ],
+  "0x721692d13fb70f499e8678ede56bb45e4e320f48:1": [
+    "0x21fb4dd8c500be1a9ba27f827217e477217d6225",
+    "CANONICAL",
+    "0.1,800000000,20000000000"
+  ],
+  "0x72449ed79841981b19d4552861007a63da3963fe:1": [
+    "0xfd09911130e6930bf87f2b0554c44f400bd80d3e",
+    "CANONICAL",
+    "0.1,110,11470"
+  ],
+  "0x72cfd829bbda21f812f57c7012a5bf434cb6e7b3:137": [
+    "0x3176ff6e935544dd1bd249265c080c95adb00512",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x72ee88374d8087eeb069510a79c7220d90dc4779:1": [
+    "0x6e264d4f2f7810cb82b9b73d6310e73c88be0bff",
+    "WRAPPED",
+    "0.1,8.333,104.17"
+  ],
+  "0x731282fe28e71550dcbca783c40287a1945abb84:1": [
+    "0x827ed6fe802db52970f0e36b709279e606e4f252",
+    "WRAPPED",
+    "0.1,1798.665884,22483.323557"
+  ],
+  "0x73f059db0182dc2ed716d028e1b13033cfcbf63b:1": [
+    "0xe2d27f06f63d98b8e11b38b5b08a75d0c8dd62b9",
+    "WRAPPED",
+    "0.1,54,676"
+  ],
+  "0x73f059db0182dc2ed716d028e1b13033cfcbf63b:137": [
+    "0xda803c6ad8078c51c5334b51aa4cc3f440d56d5f",
+    "WRAPPED",
+    "0.1,3.4,676"
+  ],
+  "0x73f059db0182dc2ed716d028e1b13033cfcbf63b:250": [
+    "0x944a05c5acc46c9777aca7d8dd92b048b1b6d3e0",
+    "WRAPPED",
+    "0.1,3.4,676"
+  ],
+  "0x73ff5dd853cb87c144f463a555dce0e43954220d:1": [
+    "0x8c6fa66c21ae3fc435790e451946a9ea82e6e523",
+    "CANONICAL",
+    "0.1,8264,206588"
+  ],
+  "0x73ffdf2d2afb3def5b10bf967da743f2306a51db:1": [
+    "0x667fd83e24ca1d935d36717d305d54fa0cac991c",
+    "WRAPPED",
+    "0.1,170,8470"
+  ],
+  "0x740623d2c797b7d8d1ecb98e9b4afcf99ec31e14:1": [
+    "0x740623d2c797b7d8d1ecb98e9b4afcf99ec31e14",
+    "CANONICAL",
+    "0.1,152,3800"
+  ],
+  "0x7440c40d76da976c7cda8552630c1b24f23e6872:137": [
+    "0xc9dfb31aaaff1f0979265e782b69454d2db73ef1",
+    "WRAPPED",
+    "0.1,5530.973451,1106194.690265"
+  ],
+  "0x747b1223b23e53070c54df355fac2e198aa54708:1": [
+    "0xc976be9ddbb3e2b2effd9af4845c38b6195dab71",
+    "WRAPPED",
+    "0.1,153,1910"
+  ],
+  "0x747b1223b23e53070c54df355fac2e198aa54708:250": [
+    "0xa873e87c2c935fa11c72003231a2eee7d391ce5f",
+    "WRAPPED",
+    "0.1,9.6,1910"
+  ],
+  "0x747b1223b23e53070c54df355fac2e198aa54708:43114": [
+    "0xf8a363cf116b6b633faedf66848ed52895ce703b",
+    "WRAPPED",
+    "0.1,9.6,1910"
+  ],
+  "0x747b1223b23e53070c54df355fac2e198aa54708:57": [
+    "0x0dcb0cb0120d355cde1ce56040be57add0185baa",
+    "WRAPPED",
+    "0.1,9.6,1910"
+  ],
+  "0x749fec660a245f8b4c3b9bbc8a1ebf1c22863c8e:1": [
+    "0xea5f88e54d982cbb0c441cde4e79bc305e5b43bc",
+    "CANONICAL",
+    "0.1,464280,11607000"
+  ],
+  "0x753fbc5800a8c8e3fb6dc6415810d627a387dfc9:1": [
+    "0x3472a5a71965499acd81997a54bba8d852c6e53d",
+    "CANONICAL",
+    "0.1,2.6,65"
+  ],
+  "0x7588df009c3d82378be6ab81f2108fa963c10fc8:1": [
+    "0xc629d02732ee932db1fa83e1fcf93ae34abfc96b",
+    "WRAPPED",
+    "0.1,113.846,1423.08"
+  ],
+  "0x7588df009c3d82378be6ab81f2108fa963c10fc8:137": [
+    "0x83c13ecaea386b0d13ec1970c409c2a291617f31",
+    "WRAPPED",
+    "0.1,21.161,4232.21"
+  ],
+  "0x7588df009c3d82378be6ab81f2108fa963c10fc8:43114": [
+    "0xf75565b89ba076b8fc7b9708d14855fd3da89e97",
+    "WRAPPED",
+    "0.1,21.161,4232.21"
+  ],
+  "0x758d08864fb6cce3062667225ca10b8f00496cc2:1": [
+    "0x4a615bb7166210cce20e6642a6f8fb5d4d044496",
+    "CANONICAL",
+    "0.1,84,2100"
+  ],
+  "0x75e0eb8e6d92ab832bb11e46c041d06a89ac5f0d:1": [
+    "0x123ab66587361bebd0141f1dde69d8075f073450",
+    "CANONICAL",
+    "0.1,1482,74200"
+  ],
+  "0x765277eebeca2e31912c9946eae1021199b39c61:1": [
+    "0xff20817765cb7f73d4bde2e66e067e58d11095c2",
+    "CANONICAL",
+    "0.1,1700,42500"
+  ],
+  "0x766afcf83fd5eaf884b3d529b432ca27a6d84617:1": [
+    "0xf8a363cf116b6b633faedf66848ed52895ce703b",
+    "WRAPPED",
+    "0.1,5064,63292"
+  ],
+  "0x766afcf83fd5eaf884b3d529b432ca27a6d84617:137": [
+    "0x4b27cd6e6a5e83d236ead376d256fe2f9e9f0d2e",
+    "WRAPPED",
+    "0.1,317,63292"
+  ],
+  "0x768b63c11d66a1d9cb2a9a1779f25ef275f76647:137": [
+    "0xf24fd75c5bf897f272ae79a878089b12de5f1d62",
+    "WRAPPED",
+    "0.1,97.51,19501.54"
+  ],
+  "0x772722b55cdc2a086abd064267a17855eb15e8b3:1": [
+    "0xbc17729fdf562723f0267f79ff25ade441056d87",
+    "CANONICAL",
+    "0.1,38.4,960"
+  ],
+  "0x7837fd820ba38f95c54d6dac4ca3751b81511357:1": [
+    "0x2cf7d99c1bff7caa25b737c909637948e6e7781e",
+    "WRAPPED",
+    "0.1,344,4290"
+  ],
+  "0x7837fd820ba38f95c54d6dac4ca3751b81511357:137": [
+    "0x81382e9693de2afc33f69b70a6c12ca9b3a73f47",
+    "WRAPPED",
+    "0.1,21.5,4290"
+  ],
+  "0x790be81c3ca0e53974be2688cdb954732c9862e1:137": [
+    "0xa0b20decbc557e3f68e140ed5a0c69bc865f865a",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x790cfdc6ab2e0ee45a433aac5434f183be1f6a20:1": [
+    "0xe3818504c1b32bf1557b16c238b2e01fd3149c17",
+    "CANONICAL",
+    "0.1,2320,58000"
+  ],
+  "0x795a7df2f22bfc2633a04799915b5fe54e7d9e65:137": [
+    "0x2f4d6f72ab9be667b09ff4da6efd4bef94ec556d",
+    "WRAPPED",
+    "0.1,130.003,26000.62"
+  ],
+  "0x795a7df2f22bfc2633a04799915b5fe54e7d9e65:43114": [
+    "0x1c2e7118591ec1b6122e4fe3d645706a9747b10e",
+    "WRAPPED",
+    "0.1,130.003,26000.62"
+  ],
+  "0x7961ade0a767c0e5b67dd1a1f78ba44f727642ed:1": [
+    "0xda9fdab21bc4a5811134a6e0ba6ca06624e67c07",
+    "CANONICAL",
+    "0.1,43,1070"
+  ],
+  "0x7a0b11230050817c0d7631e206a0f547f9348de7:128": [
+    "0x595c8481c48894771ce8fade54ac6bf59093f9e8",
+    "WRAPPED",
+    "0.1,366.041054,73208.21074"
+  ],
+  "0x7a0b11230050817c0d7631e206a0f547f9348de7:137": [
+    "0x5d5530eb3147152fe78d5c4bfeede054c8d1442a",
+    "WRAPPED",
+    "0.1,221.238,44247.79"
+  ],
+  "0x7a0b11230050817c0d7631e206a0f547f9348de7:250": [
+    "0xa9cad0165c155f3998b0001b3ef30bca0aa6b591",
+    "WRAPPED",
+    "0.1,221.238,44247.79"
+  ],
+  "0x7a9f28eb62c791422aa23ceae1da9c847cbec9b0:137": [
+    "0x09211dc67f9fe98fb7bbb91be0ef05f4a12fa2b2",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x7a9f28eb62c791422aa23ceae1da9c847cbec9b0:250": [
+    "0xc976be9ddbb3e2b2effd9af4845c38b6195dab71",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x7abba96651d668fd8e44d7cd7872f5b794b5e93b:250": [
+    "0xc5c71cd0b734dae8c6eba9d79c3db693d112dda1",
+    "WRAPPED",
+    "0.1,0.491,98.23"
+  ],
+  "0x7af3f80c5788a9f83800d308be671bdd3c0db796:1": [
+    "0xe4ae84448db5cfe1daf1e6fb172b469c161cb85f",
+    "CANONICAL",
+    "0.1,940,23420"
+  ],
+  "0x7b2223aa112c08356b10e4675ce32724a10fac51:1": [
+    "0x1337def16f9b486faed0293eb623dc8395dfe46a",
+    "CANONICAL",
+    "0.1,410,10250"
+  ],
+  "0x7b9255953b7c39d46dadcee91ab17d9434f96a05:1": [
+    "0x5a4fb10e7c4cbb9a2b9d9a942f9a875ebd3489ea",
+    "WRAPPED",
+    "0.1,421,5258"
+  ],
+  "0x7b9255953b7c39d46dadcee91ab17d9434f96a05:137": [
+    "0x8ce95561ec220df4178899dd3c500daae2b5f5bd",
+    "WRAPPED",
+    "0.1,27,5258"
+  ],
+  "0x7b9255953b7c39d46dadcee91ab17d9434f96a05:30": [
+    "0xa649325aa7c5093d12d6f98eb4378deae68ce23f",
+    "WRAPPED",
+    "0.1,27,5258"
+  ],
+  "0x7b9255953b7c39d46dadcee91ab17d9434f96a05:43114": [
+    "0x7782046601e7b9b05ca55a3899780ce6ee6b8b2b",
+    "WRAPPED",
+    "0.1,27,5258"
+  ],
+  "0x7b9255953b7c39d46dadcee91ab17d9434f96a05:XRP": [
+    "brz/r4i4knpm26rjqvqtx7hkg9tc4u2udbl9gg",
+    "WRAPPED",
+    "0.1,27,5258"
+  ],
+  "0x7c598c96d02398d89fbcb9d41eab3df0c16f227d:1": [
+    "0xdacd69347de42babfaecd09dc88958378780fb62",
+    "CANONICAL",
+    "0.1,1700,42500"
+  ],
+  "0x7c96ed505d77f82b1229220d96ee9feeea7c1fe7:1": [
+    "0x4a527d8fc13c5203ab24ba0944f4cb14658d1db6",
+    "CANONICAL",
+    "0.1,984,24600"
+  ],
+  "0x7d3dc11f8aa754a9054c398f75d5e0dd81d2727e:1": [
+    "0xf4cd3d3fda8d7fd6c5a500203e38640a70bf9577",
+    "CANONICAL",
+    "0.1,0.352,8.8"
+  ],
+  "0x7d57760f68ed2238e16a002d12f3a741d03f364b:137": [
+    "0x0b5c958534ddf6f1b2694dcb59c84de207024972",
+    "WRAPPED",
+    "0.1,50286.633813,10057326.762547"
+  ],
+  "0x7dd300a2d3f881f44b33c96fb751746e9a0175a8:1": [
+    "0x515d7e9d75e2b76db60f8a051cd890eba23286bc",
+    "CANONICAL",
+    "0.1,48.6,1216"
+  ],
+  "0x7de7b0a6cf5f3565d5b754b67902dcce35eaf2ac:43114": [
+    "0xfc5c0e5d0ba6386fbb7d921e5073fd04082a5b49",
+    "WRAPPED",
+    "0.1,0.64,127"
+  ],
+  "0x7de7b0a6cf5f3565d5b754b67902dcce35eaf2ac:XRP": [
+    "46414b5455525900000000000000000000000000/rnwbnkhz3zanx77xfjgr8nrnzhw4gkgmpr",
+    "WRAPPED",
+    "0.1,0.64,127"
+  ],
+  "0x7e624fa0e1c4abfd309cc15719b7e2580887f570:1": [
+    "0x83e6f1e41cdd28eaceb20cb649155049fac3d5aa",
+    "CANONICAL",
+    "0.1,29,526"
+  ],
+  "0x7e7fd06a447b4b438170a80dd53b2f785d9db825:1": [
+    "0xa5e48a6e56e164907263e901b98d9b11ccb46c47",
+    "CANONICAL",
+    "0.1,162,4040"
+  ],
+  "0x7ea2be2df7ba6e54b1a9c70676f668455e329d29:1": [
+    "0x2aeccb42482cc64e087b6d2e5da39f5a7a7001f8",
+    "CANONICAL",
+    "0.1,206,5150"
+  ],
+  "0x7efabc2c92b20e0987af979ae9f87d508c5da1c9:1": [
+    "0x921f99719eb6c01b4b8f0ba7973a7c24891e740a",
+    "WRAPPED",
+    "0.1,1.15,14.3"
+  ],
+  "0x7efabc2c92b20e0987af979ae9f87d508c5da1c9:137": [
+    "0x28f5fb63482980f182a38d2d109a0bf3c9176bf2",
+    "WRAPPED",
+    "0.1,0.072,14.3"
+  ],
+  "0x7efabc2c92b20e0987af979ae9f87d508c5da1c9:250": [
+    "0xfb288d60d3b66f9c3e231a9a39ed3f158a4269aa",
+    "WRAPPED",
+    "0.1,0.072,14.3"
+  ],
+  "0x7f102dbb31b41e359a05b2291bb71d8efcdaeacd:1": [
+    "0xcaf5191fc480f43e4df80106c7695eca56e48b18",
+    "WRAPPED",
+    "0.1,141,1755"
+  ],
+  "0x7f102dbb31b41e359a05b2291bb71d8efcdaeacd:40": [
+    "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a",
+    "WRAPPED",
+    "0.1,9,1755"
+  ],
+  "0x7f12a37b6921ffac11fab16338b3ae67ee0c462b:1": [
+    "0x1e1085efaa63edfe74aad7c05a28eae4ef917c3f",
+    "WRAPPED",
+    "0.1,910,11364"
+  ],
+  "0x7f12a37b6921ffac11fab16338b3ae67ee0c462b:137": [
+    "0xed3d0319c0a04b02e856ffaf6ea140d5cfac2e73",
+    "WRAPPED",
+    "0.1,57,11364"
+  ],
+  "0x7f12a37b6921ffac11fab16338b3ae67ee0c462b:250": [
+    "0x7fc5670b2041d34414b0b2178fc660b1e1faf801",
+    "WRAPPED",
+    "0.1,57,11364"
+  ],
+  "0x7f295cbaae4ee39e723e1a4bdeb0ce7a381e56a9:1": [
+    "0x28fda76721a8077a5de802ab0212849b8c38429e",
+    "CANONICAL",
+    "0.1,90,2224"
+  ],
+  "0x7faaf8d4c411218415d9d3f82d56214658349dbb:1": [
+    "0xf331b2c406fef2539e9b1150345575feb9f0323c",
+    "WRAPPED",
+    "0.1,7460.511,93256.4"
+  ],
+  "0x7faaf8d4c411218415d9d3f82d56214658349dbb:25": [
+    "0x3d632d9e1a60a0880dd45e61f279d919b5748377",
+    "WRAPPED",
+    "0.1,1684.505581,336901.116153"
+  ],
+  "0x7faaf8d4c411218415d9d3f82d56214658349dbb:43114": [
+    "0xb25e20de2f2ebb4cffd4d16a55c7b395e8a94762",
+    "WRAPPED",
+    "0.1,466.281,93256.4"
+  ],
+  "0x7fe378c5e0b5c32af2ecc8829bedf02245a0e4ef:1": [
+    "0xe87d84dcbb848fe94c6daedc9c81c913f707f2d2",
+    "WRAPPED",
+    "0.1,160,2000"
+  ],
+  "0x7fe378c5e0b5c32af2ecc8829bedf02245a0e4ef:137": [
+    "0x2c92a8a41f4b806a6f6f1f7c9d9dec78dcd8c18e",
+    "WRAPPED",
+    "0.1,10,2000"
+  ],
+  "0x8076c74c5e3f5852037f31ff0093eeb8c8add8d3:128": [
+    "0x461d52769884ca6235b685ef2040f47d30c94eb5",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844:1": [
+    "0x377d552914e7a104bc22b4f3b6268ddc69615be7",
+    "CANONICAL",
+    "0.1,640,16000"
+  ],
+  "0x80cd73badb406ea36b9a7cdeb8df06aefa7e12d9:1": [
+    "0x80cd73badb406ea36b9a7cdeb8df06aefa7e12d9",
+    "CANONICAL",
+    "0.1,640,8000"
+  ],
+  "0x80d209227cf0a64e1fcbe62c7a80b8e691f0ef4d:1": [
+    "0xf9cfbdd3120f59f261f0db3610d683fe0337eb20",
+    "WRAPPED",
+    "0.1,80.137,1001.72"
+  ],
+  "0x80d209227cf0a64e1fcbe62c7a80b8e691f0ef4d:250": [
+    "0xff7b22053219edf569499a3794829fb71d6f8821",
+    "WRAPPED",
+    "0.1,5.02,1003.4"
+  ],
+  "0x80d209227cf0a64e1fcbe62c7a80b8e691f0ef4d:43114": [
+    "0x782617249085aa28a367feb49cf811434660cee5",
+    "WRAPPED",
+    "0.1,5.02,1003.4"
+  ],
+  "0x80d2fe89b6c6c24edfb553daf35599649ac55283:137": [
+    "0x56ac3cb5e74b8a5a25ec9dc05155af1dad2715bd",
+    "WRAPPED",
+    "0.1,107.274912,21454.982512"
+  ],
+  "0x80d2fe89b6c6c24edfb553daf35599649ac55283:250": [
+    "0x9ad4266000f068e20b2f4e574b2b47cabb448717",
+    "WRAPPED",
+    "0.1,107.274912,21454.982512"
+  ],
+  "0x80d2fe89b6c6c24edfb553daf35599649ac55283:43114": [
+    "0xc944151ba61cfedd9625bfc086398b55642c1492",
+    "WRAPPED",
+    "0.1,107.274912,21454.982512"
+  ],
+  "0x812764fa37a4fd731a5d39f0e519b6b8d61e82a0:1": [
+    "0x0f51bb10119727a7e5ea3538074fb341f56b09ad",
+    "CANONICAL",
+    "0.1,29,526"
+  ],
+  "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b:1": [
+    "0x26db5439f651caf491a87d48799da81f191bdb6b",
+    "CANONICAL",
+    "0.1,1686,42150"
+  ],
+  "0x82030cdbd9e4b7c5bb0b811a61da6360d69449cc:1": [
+    "0x9fb83c0635de2e815fd1c21b3a292277540c2e8d",
+    "WRAPPED",
+    "0.1,2033,102000"
+  ],
+  "0x82030cdbd9e4b7c5bb0b811a61da6360d69449cc:137": [
+    "0xe6b9d092223f39013656702a40dbe6b7decc5746",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x82443a77684a7da92fdcb639c8d2bd068a596245:1": [
+    "0xcc4304a31d09258b0029ea7fe63d032f52e44efe",
+    "CANONICAL",
+    "0.1,70,1750"
+  ],
+  "0x83085138ed8a96ec0cbd2013ddfe1ebb975940cc:1": [
+    "0x3449fc1cd036255ba1eb19d65ff4ba2b8903a69a",
+    "CANONICAL",
+    "0.1,2080,52000"
+  ],
+  "0x833f307ac507d47309fd8cdd1f835bef8d702a93:1": [
+    "0x557b933a7c2c45672b610f8954a3deb39a51a8ca",
+    "CANONICAL",
+    "0.1,500,12500"
+  ],
+  "0x83fc51a3a35d3e2a2c42003df964294062f505a2:1": [
+    "0x8dfdc61c7c7551d0deec950a2822eb59cddb8f59",
+    "WRAPPED",
+    "0.1,4.8,60"
+  ],
+  "0x83fc51a3a35d3e2a2c42003df964294062f505a2:2001": [
+    "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+    "WRAPPED",
+    "0.1,0.295,59.1"
+  ],
+  "0x83fc51a3a35d3e2a2c42003df964294062f505a2:40": [
+    "0x1ccca1ce62c62f7be95d4a67722a8fdbed6eecb4",
+    "WRAPPED",
+    "0.1,0.3,60"
+  ],
+  "0x83fc51a3a35d3e2a2c42003df964294062f505a2:42262": [
+    "0xc9baa8cfdde8e328787e29b4b078abf2dadc2055",
+    "WRAPPED",
+    "0.1,0.3,60"
+  ],
+  "0x84151755679590d3c79347315c5dbeff031f1b98:1": [
+    "0xaa2ce7ae64066175e0b90497ce7d9c190c315db4",
+    "CANONICAL",
+    "0.1,10200,255000"
+  ],
+  "0x845ab325e3e4ec379c68047313d66bbd631e59a9:1024": [
+    "0xc1be9a4d5d45beeacae296a7bd5fadbfc14602c4",
+    "WRAPPED",
+    "0.1,2,370"
+  ],
+  "0x8497842420cfdbc97896c2353d75d89fc8d5be5d:1": [
+    "0x9040e237c3bf18347bb00957dc22167d0f2b999d",
+    "CANONICAL",
+    "0.1,76,1900"
+  ],
+  "0x84a5d1d7b78810512357c1ebd252447acc91d77e:1": [
+    "0x3915c77dc839d97e875613a5b64179acc1da97df",
+    "WRAPPED",
+    "0.1,8,100"
+  ],
+  "0x84ae7b0ff2bc523969fb3162e04149a419196f4b:128": [
+    "0x3ac19481face71565155f370b3e34a1178745382",
+    "CANONICAL",
+    "0.1,33.4,6700"
+  ],
+  "0x84c882a4d8eb448ce086ea19418ca0f32f106117:1": [
+    "0x0c7d5ae016f806603cb1782bea29ac69471cab9c",
+    "CANONICAL",
+    "0.1,280,7000"
+  ],
+  "0x84e9a6f9d240fdd33801f7135908bfa16866939a:1": [
+    "0xf1b7980826cd89a99e45eb4236492fd42d463660",
+    "WRAPPED",
+    "0.1,204,2600"
+  ],
+  "0x84e9a6f9d240fdd33801f7135908bfa16866939a:137": [
+    "0x7a8941f4e77786a63e584c579f55c7c599bf0c67",
+    "WRAPPED",
+    "0.1,13,2600"
+  ],
+  "0x8506560320826e459f356cb56ccf721da8875414:1": [
+    "0x5fcb9de282af6122ce3518cde28b7089c9f97b26",
+    "WRAPPED",
+    "0.1,1.65,21"
+  ],
+  "0x8506560320826e459f356cb56ccf721da8875414:137": [
+    "0xb808d767ddf0f61ca62331c1bbbebe0530b41079",
+    "WRAPPED",
+    "0.1,0.27,52.5"
+  ],
+  "0x8506560320826e459f356cb56ccf721da8875414:250": [
+    "0x7f620d7d0b3479b1655cefb1b0bc67fb0ef4e443",
+    "WRAPPED",
+    "0.1,0.11,21"
+  ],
+  "0x8506560320826e459f356cb56ccf721da8875414:42161": [
+    "0x6c2c113c8ca73db67224ef4d8c8dfcec61e52a9c",
+    "WRAPPED",
+    "0.1,0.11,21"
+  ],
+  "0x8506560320826e459f356cb56ccf721da8875414:43114": [
+    "0x546d10c1378febef063b72ae4865496ad801c386",
+    "WRAPPED",
+    "0.1,0.11,21"
+  ],
+  "0x851f7a700c5d67db59612b871338a85526752c25:43114": [
+    "0x1fe4751d9bdabac8d90067056cb45ab6823d2c12",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x85ba4988443bc8b39307eec67b8c488666cd5819:1": [
+    "0xa1388e73c51b37383b1ab9dce8317ef5a0349cc5",
+    "WRAPPED",
+    "0.1,355555.555,4444444.44"
+  ],
+  "0x85d4c747da02ec4fc8d6b8da6f2a59ea91f7a460:1": [
+    "0x0b23341fa1da0171f52aa8ef85f3946b44d35ac0",
+    "WRAPPED",
+    "0.1,90.684,1133.55"
+  ],
+  "0x860ea5712db042de011c4ffb2789bdcb2bff9828:1": [
+    "0x9f47f313acfd4bdc52f4373b493eae7d5ac5b765",
+    "WRAPPED",
+    "0.1,160,1870"
+  ],
+  "0x860ea5712db042de011c4ffb2789bdcb2bff9828:137": [
+    "0x05f024c6f5a94990d32191d6f36211e3ee33504e",
+    "WRAPPED",
+    "0.1,9.4,1870"
+  ],
+  "0x865109a3eb981b2be9f66cbbc78653ba09e79128:10": [
+    "0x76a3d96726c0ed756ea420d239d3feb998ebf528",
+    "WRAPPED",
+    "0.1,75.90709,7590.708972"
+  ],
+  "0x865109a3eb981b2be9f66cbbc78653ba09e79128:137": [
+    "0x18cafd594e8c400a6d2c0182f94b81e25736266f",
+    "WRAPPED",
+    "0.1,7.58,1516.53"
+  ],
+  "0x865109a3eb981b2be9f66cbbc78653ba09e79128:250": [
+    "0xf7554d17d1c3f09899dcc8b404becae6dfa584fa",
+    "WRAPPED",
+    "0.1,7.58,1516.53"
+  ],
+  "0x8683e604cdf911cd72652a04bf9d571697a86a60:1": [
+    "0x09211dc67f9fe98fb7bbb91be0ef05f4a12fa2b2",
+    "WRAPPED",
+    "0.1,400,5000"
+  ],
+  "0x8683e604cdf911cd72652a04bf9d571697a86a60:43114": [
+    "0xafb2780cbb58b2af27023eb2a0e60c8ca0eee9bb",
+    "WRAPPED",
+    "0.1,25,5000"
+  ],
+  "0x86b3f23b6e90f5bbfac59b5b2661134ef8ffd255:1": [
+    "0x217ddead61a42369a266f1fb754eb5d3ebadc88a",
+    "CANONICAL",
+    "0.1,81,2026"
+  ],
+  "0x873801ae2ff12d816db9a7b082f5796bec64c82c:1": [
+    "0x1f19f83fc9a25f3c861260143e36c17706257986",
+    "CANONICAL",
+    "0.1,2540,63500"
+  ],
+  "0x886f85a6da6c7806125004b2e1fd53ec82398bea:1284": [
+    "0xf2b3e3fa33232c639d4ca5a26e4e95c490417c84",
+    "WRAPPED",
+    "0.1,60385744.133525,12077148826.704991"
+  ],
+  "0x88ac7c9fdc4667bdeefde291f2faadba0b0f3318:137": [
+    "0x9d939e22d4a50025cddac3d26f9485e49f95d074",
+    "WRAPPED",
+    "0.1,3.164557,632.911392"
+  ],
+  "0x88ac7c9fdc4667bdeefde291f2faadba0b0f3318:2000": [
+    "0xb153fb3d196a8eb25522705560ac152eeec57901",
+    "WRAPPED",
+    "0.1,3.164557,632.911392"
+  ],
+  "0x88ac7c9fdc4667bdeefde291f2faadba0b0f3318:43114": [
+    "0x727bf64db1ad9d7babadce9ea1e8bef5898b8420",
+    "WRAPPED",
+    "0.1,1.736111,347.222222"
+  ],
+  "0x88d7e9b65dc24cf54f5edef929225fc3e1580c25:1": [
+    "0x420a24c9c65bd44c48bfb1cc8d6cd1ea8b1ac840",
+    "WRAPPED",
+    "0.1,42.5,530"
+  ],
+  "0x8965349fb649a33a30cbfda057d8ec2c48abe2a2:1": [
+    "0x7ea2be2df7ba6e54b1a9c70676f668455e329d29",
+    "WRAPPED",
+    "0.01,4.9,1000"
+  ],
+  "0x8965349fb649a33a30cbfda057d8ec2c48abe2a2:10": [
+    "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0x8965349fb649a33a30cbfda057d8ec2c48abe2a2:137": [
+    "0xd69b31c3225728cc57ddaf9be532a4ee1620be51",
+    "WRAPPED",
+    "0.01,0.19,1000"
+  ],
+  "0x8965349fb649a33a30cbfda057d8ec2c48abe2a2:25": [
+    "0xcc9b1f919282c255eb9ad2c0757e8036165e0cad",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0x8965349fb649a33a30cbfda057d8ec2c48abe2a2:250": [
+    "0x95bf7e307bc1ab0ba38ae10fc27084bc36fcd605",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0x8965349fb649a33a30cbfda057d8ec2c48abe2a2:321": [
+    "0x375488f097176507e39b9653b88fdc52cde736bf",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0x8965349fb649a33a30cbfda057d8ec2c48abe2a2:42161": [
+    "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0x8965349fb649a33a30cbfda057d8ec2c48abe2a2:43114": [
+    "0xcc9b1f919282c255eb9ad2c0757e8036165e0cad",
+    "WRAPPED",
+    "0.01,0.19,1000"
+  ],
+  "0x8965349fb649a33a30cbfda057d8ec2c48abe2a2:66": [
+    "0x0cae51e1032e8461f4806e26332c030e34de3adb",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0x89c90e480a39fbe3886bb5bd53ba5b1acc69d4fb:1": [
+    "0x964291d2d0a7e3477a8a06ee745f3cd8e3d0b375",
+    "CANONICAL",
+    "0.1,42,1050"
+  ],
+  "0x89dabcb99301614f016f2edfec35e535d70bf5c1:1": [
+    "0xfe4db7ca9455bebb7583c764389842c85e06fe1a",
+    "WRAPPED",
+    "0.1,1533,13162"
+  ],
+  "0x89dabcb99301614f016f2edfec35e535d70bf5c1:137": [
+    "0xe2304ad8780d993f050bbda96025369a4bf0bfb2",
+    "WRAPPED",
+    "0.1,63.5,12690"
+  ],
+  "0x89dabcb99301614f016f2edfec35e535d70bf5c1:43114": [
+    "0xf049b37803de34ba970388149a9add2638025943",
+    "WRAPPED",
+    "0.1,63.5,12690"
+  ],
+  "0x89dabcb99301614f016f2edfec35e535d70bf5c1:XRP": [
+    "oxp/rrno7nj4rkfjlzc4nrazilf5ahwctvon3d",
+    "WRAPPED",
+    "0.1,63.5,12690"
+  ],
+  "0x8ad96050318043166114884b59e2fc82210273b3:1": [
+    "0xe2dc070524a6e305ddb64d8513dc444b6a1ec845",
+    "CANONICAL",
+    "0.1,45.6,1140"
+  ],
+  "0x8b3cc638431b34014fa3de174a25b18b364a7cc5:250": [
+    "0x3ff1af9e583d3790ec51e1407c9e94d8d1133dc3",
+    "WRAPPED",
+    "0.1,0.019,3.83"
+  ],
+  "0x8b3cc638431b34014fa3de174a25b18b364a7cc5:43114": [
+    "0x7db1b41e7a3a54b89272973189aee6548dd9c199",
+    "WRAPPED",
+    "0.1,0.019,3.83"
+  ],
+  "0x8c1d1ae5d02629e6b8bf4da1b8ced34346cb8a9f:1": [
+    "0xe5130d3dbfac6ae7d73a24d719762df74d8e4c27",
+    "WRAPPED",
+    "0.1,39186.68,489833.5"
+  ],
+  "0x8c1d1ae5d02629e6b8bf4da1b8ced34346cb8a9f:42220": [
+    "0x4792c1ecb969b036eb51330c63bd27899a13d84e",
+    "WRAPPED",
+    "0.1,2449.167,489833.5"
+  ],
+  "0x8c4daef64d4246d0274fe68243fd32bb8d5707e5:137": [
+    "0x981aecc6eb4d382b96a02b75e931900705e95a31",
+    "CANONICAL",
+    "0.1,300,58000"
+  ],
+  "0x8c4e06c8d4297448e768f91947e0643b31db08d3:1": [
+    "0xf887906e130349a624ffa3cf1fa5b56f48b11c08",
+    "WRAPPED",
+    "0.1,676.97,16924.2"
+  ],
+  "0x8c4e06c8d4297448e768f91947e0643b31db08d3:137": [
+    "0x470bfee42a801abb9a1492482d609fb84713d60f",
+    "WRAPPED",
+    "0.1,60,12000"
+  ],
+  "0x8cba70b78ef6760141bf887af9456b32e2c181d4:137": [
+    "0x8e734e30270292993dbe71c421ad2b128b6dae11",
+    "WRAPPED",
+    "0.1,0.271887,54.377379"
+  ],
+  "0x8cba70b78ef6760141bf887af9456b32e2c181d4:25": [
+    "0x5fc17416925789e0852fbfcd81c490ca4abc51f9",
+    "WRAPPED",
+    "0.1,5371.146202,1074229.24052"
+  ],
+  "0x8cba70b78ef6760141bf887af9456b32e2c181d4:250": [
+    "0x525b43a49be2ed530e3516c22bd7ecbcf1586ad4",
+    "WRAPPED",
+    "0.1,0.271887,54.377379"
+  ],
+  "0x8cba70b78ef6760141bf887af9456b32e2c181d4:43114": [
+    "0x3350289891543865f8bb41ee747f31ce5d5e3739",
+    "WRAPPED",
+    "0.1,0.271887,54.377379"
+  ],
+  "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e:1": [
+    "0x16980b3b4a3f9d89e33311b5aa8f80303e5ca4f8",
+    "CANONICAL",
+    "0.1,132,3300"
+  ],
+  "0x8e8538c75f273ab2df6adeecd3622a9c314fccf3:43114": [
+    "0xcb69f7ac645f5e09310b91445277a53f7fcb78cf",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x8e984e03ab35795c60242c902ece2450242c90e9:1": [
+    "0x3907e6ff436e2b2b05d6b929fb05f14c0ee18d90",
+    "WRAPPED",
+    "0.1,1501,75050"
+  ],
+  "0x8e984e03ab35795c60242c902ece2450242c90e9:137": [
+    "0x39fc9e94caeacb435842fadedecb783589f50f5f",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x8f01d597d2022656494e30fb76eccf1eea2e092e:1": [
+    "0xa0b20decbc557e3f68e140ed5a0c69bc865f865a",
+    "WRAPPED",
+    "0.1,26,325"
+  ],
+  "0x8f01d597d2022656494e30fb76eccf1eea2e092e:137": [
+    "0x0e98c977b943f06075b2d795794238fbfb9b9a34",
+    "WRAPPED",
+    "0.1,1.63,325"
+  ],
+  "0x8f01d597d2022656494e30fb76eccf1eea2e092e:250": [
+    "0xbe019533519fe5b5b5ca57be2ad563e15e623dcf",
+    "WRAPPED",
+    "0.1,1.63,325"
+  ],
+  "0x8f01d597d2022656494e30fb76eccf1eea2e092e:43114": [
+    "0xb84527d59b6ecb96f433029ecc890d4492c5dce1",
+    "WRAPPED",
+    "0.1,1.63,325"
+  ],
+  "0x8fe6545381e88de4df2f22f8b6b74e0060654f8a:1": [
+    "0x4187252a32a32e4d44c1bd15bda675dc92e42df5",
+    "WRAPPED",
+    "0.1,6.471654,80.895677"
+  ],
+  "0x8fe6545381e88de4df2f22f8b6b74e0060654f8a:43114": [
+    "0x3c08cdc102fd746d06f85d3ea348ba6102c43f32",
+    "WRAPPED",
+    "0.1,0.404478,80.895677"
+  ],
+  "0x9036398c00f8e021c2b1818855e2df20b0e17005:1": [
+    "0xfd8971d5e8e1740ce2d0a84095fca4de729d0c16",
+    "CANONICAL",
+    "0.1,11480,273440"
+  ],
+  "0x910651f81a605a6ef35d05527d24a72fecef8bf0:128": [
+    "0x910651f81a605a6ef35d05527d24a72fecef8bf0",
+    "CANONICAL",
+    "0.1,25,5000"
+  ],
+  "0x91648237a47585242f1f8ad10e84dd03fa95ec4e:1": [
+    "0x758d08864fb6cce3062667225ca10b8f00496cc2",
+    "WRAPPED",
+    "0.1,2200000000,27200000000"
+  ],
+  "0x9179089a11feddc9411236b63c8aeb25eb45e2ac:1": [
+    "0xab37e1358b639fd877f015027bb62d3ddaa7557e",
+    "CANONICAL",
+    "0.1,23.4,586"
+  ],
+  "0x9198bbbd8201584a630f93b83fbda70a5ee1970d:250": [
+    "0x133bf038277fda5eaa2b5fc4cc4e6e15bc5cace3",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x91d025e6454813f6d2d1cb22a0e9fd62a2a0c237:1": [
+    "0x0db8d8b76bc361bacbb72e2c491e06085a97ab31",
+    "CANONICAL",
+    "0.1,26,646"
+  ],
+  "0x91f006ee672f8f39c6e63ca75b1ca14067b3c366:137": [
+    "0xf331b2c406fef2539e9b1150345575feb9f0323c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x921f99719eb6c01b4b8f0ba7973a7c24891e740a:1": [
+    "0x73627974adea82397bcf7fac5848207cce88938d",
+    "CANONICAL",
+    "0.1,4000,200000"
+  ],
+  "0x92299822a8be65c9390c905941ea34b9c530f247:1": [
+    "0x1f4cb968b76931c494ff92ed80ccb169ad641cb1",
+    "CANONICAL",
+    "0.1,542,13544"
+  ],
+  "0x92df60c51c710a1b1c20e42d85e221f3a1bfc7f2:1": [
+    "0xf5cfbc74057c610c8ef151a439252680ac68c6dc",
+    "CANONICAL",
+    "0.1,26,650"
+  ],
+  "0x92fe6753ba36ba74200f3f2c9a3b5a58ec02d049:137": [
+    "0x771c01e1917b5ab5b791f7b96f0cd69e22f6dbcf",
+    "WRAPPED",
+    "0.1,3.4,680"
+  ],
+  "0x9366790d807f1fb7dd08c36ec0e8b8acbbc1354d:1": [
+    "0x2f1bd435e2b928c1744202dae9400d10a2d569dc",
+    "CANONICAL",
+    "0.1,3924,98100"
+  ],
+  "0x943978707717d4d73da6f74312aef59feafe368c:137": [
+    "0xae8627db72d7fc6241f2e2b87eb2bbc7cafb1661",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x946f3df8537511ee59385ae1a6fdebf5d0d20d3d:1": [
+    "0xc1f1699fe47bd5512e6dd8353db43b8186b67fd4",
+    "WRAPPED",
+    "0.1,350992651.091368,4387408138.642097"
+  ],
+  "0x948d2a81086a075b3130bac19e4c6dee1d2e3fe8:137": [
+    "0x1e1085efaa63edfe74aad7c05a28eae4ef917c3f",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x94977c9888f3d2fafae290d33fab4a5a598ad764:1": [
+    "0x922d641a426dcffaef11680e5358f34d97d112e1",
+    "WRAPPED",
+    "0.1,1950,24330"
+  ],
+  "0x951fcfb095a45b34c5fd9f7d9af4a232eff62b8d:1": [
+    "0xa6ebe316317de53724967c5bf462e007e9bdf761",
+    "WRAPPED",
+    "0.1,53.691275,671.140939"
+  ],
+  "0x951fcfb095a45b34c5fd9f7d9af4a232eff62b8d:137": [
+    "0xa31dfe74cda04de990cafc6a0ab2bb6d6c9077cd",
+    "WRAPPED",
+    "0.1,3.355705,671.140939"
+  ],
+  "0x951fcfb095a45b34c5fd9f7d9af4a232eff62b8d:250": [
+    "0xcc3bed3712cbc88994f85c8a06405a6ce807ba1f",
+    "WRAPPED",
+    "0.1,3.355705,671.140939"
+  ],
+  "0x951fcfb095a45b34c5fd9f7d9af4a232eff62b8d:43114": [
+    "0xd9f942e36b4cac550daa0cb31ef09efb1d1505f3",
+    "WRAPPED",
+    "0.1,3.355705,671.140939"
+  ],
+  "0x9529366ca0d697af36e25a094ada8d2515d51f64:1": [
+    "0xde0518903b3a0e7904b08547f73d4350be7eb798",
+    "WRAPPED",
+    "0.1,3586.708912,44833.861401"
+  ],
+  "0x958d48293b4df8f9722273bf1ca90cc2236e1b6d:1234": [
+    "0x4792c1ecb969b036eb51330c63bd27899a13d84e",
+    "WRAPPED",
+    "0.1,706.268557,141253.711441"
+  ],
+  "0x9611579c926294b0e29e5371a81a3e463650be17:1": [
+    "0xe4f726adc8e89c6a6017f01eada77865db22da14",
+    "CANONICAL",
+    "0.1,20,500"
+  ],
+  "0x9617857e191354dbea0b714d78bc59e57c411087:1": [
+    "0x937e077abaea52d3abf879c9b9d3f2ebd15baa21",
+    "WRAPPED",
+    "0.1,6400,80000"
+  ],
+  "0x9617857e191354dbea0b714d78bc59e57c411087:137": [
+    "0x873801ae2ff12d816db9a7b082f5796bec64c82c",
+    "WRAPPED",
+    "0.1,400,80000"
+  ],
+  "0x963fac6d71cddbd717d8d0c2fd06aae5dd6072fc:1": [
+    "0x0c75dd36af9a59ba1d248a98fe91b2384cfea9be",
+    "WRAPPED",
+    "0.1,324,4050"
+  ],
+  "0x963fac6d71cddbd717d8d0c2fd06aae5dd6072fc:137": [
+    "0x511d35c52a3c244e7b8bd92c0c297755fbd89212",
+    "WRAPPED",
+    "0.1,20.3,4050"
+  ],
+  "0x963fac6d71cddbd717d8d0c2fd06aae5dd6072fc:250": [
+    "0xdfed31e640b7280f76f046a97179e5e369d209b5",
+    "WRAPPED",
+    "0.1,20.3,4050"
+  ],
+  "0x963fac6d71cddbd717d8d0c2fd06aae5dd6072fc:43114": [
+    "0xd806a4a473e44578796898a4c546f575d7247b2b",
+    "WRAPPED",
+    "0.1,20.3,4050"
+  ],
+  "0x9663677b81c2d427e81c01ef7315ea96546f5bb1:137": [
+    "0xed0bb69f9f96e8c5fffdf16c468ecec385134ea5",
+    "CANONICAL",
+    "0.1,167,33335"
+  ],
+  "0x96a70751fd5bf2b18091b99ef7689b9a3a90920e:1": [
+    "0x25a528af62e56512a19ce8c3cab427807c28cc19",
+    "WRAPPED",
+    "0.1,0.00008,0.001"
+  ],
+  "0x96a70751fd5bf2b18091b99ef7689b9a3a90920e:137": [
+    "0x6390cb919eeda9174146c32e1a974119ac786f98",
+    "WRAPPED",
+    "0.1,0.000005,0.001"
+  ],
+  "0x96a70751fd5bf2b18091b99ef7689b9a3a90920e:250": [
+    "0xb280458b3cf0facc33671d52fb0e894447c2539a",
+    "WRAPPED",
+    "0.1,0.000005,0.001"
+  ],
+  "0x96a70751fd5bf2b18091b99ef7689b9a3a90920e:42161": [
+    "0x6633c083f54bb65f702f9f276319bb24b65fec18",
+    "WRAPPED",
+    "0.1,0.00001,0.001"
+  ],
+  "0x96a70751fd5bf2b18091b99ef7689b9a3a90920e:43114": [
+    "0xe87d84dcbb848fe94c6daedc9c81c913f707f2d2",
+    "WRAPPED",
+    "0.1,0.000005,0.001"
+  ],
+  "0x97200cc65c4082e9e0f8e966b1f296a7c4c46a61:1": [
+    "0xbaf8e9ca8693036bbd1e5b81b82f2359739ee5a6",
+    "WRAPPED",
+    "0.1,800,10000"
+  ],
+  "0x97200cc65c4082e9e0f8e966b1f296a7c4c46a61:43114": [
+    "0x6c7b8dc81ae49ea793998a0c784db9bc05981a3c",
+    "WRAPPED",
+    "0.1,50,10000"
+  ],
+  "0x976e33b07565b0c05b08b2e13affd3113e3d178d:1": [
+    "0x2d80f5f5328fdcb6eceb7cacf5dd8aedaec94e20",
+    "CANONICAL",
+    "0.1,112,2800"
+  ],
+  "0x977b4fec686ad3d37dfc7c54336a26113d4c1393:1": [
+    "0xbaa75208d0ec8dde89c036dd71e897c8df903f11",
+    "WRAPPED",
+    "0.1,16,200"
+  ],
+  "0x981e360161a37de663f232e6c800fc6a56fb536a:1": [
+    "0x1735db6ab5baa19ea55d0adceed7bcdc008b3136",
+    "CANONICAL",
+    "0.1,154,3828"
+  ],
+  "0x9824aec2bd455d921303017f9600a589e6765c15:1": [
+    "0x9a54a39a8d78cd6031636628a11c890124b1b5cf",
+    "CANONICAL",
+    "0.1,1880,46800"
+  ],
+  "0x9833c643f387ecfb76aa8114546ad524703c66fb:1": [
+    "0x38389eb214c4ac1cdda7a7582ab01e8a9bb548ba",
+    "WRAPPED",
+    "0.1,400000,5000000"
+  ],
+  "0x9833c643f387ecfb76aa8114546ad524703c66fb:137": [
+    "0xc789f877fbb6aa4457ee5531cceb76da6d3d1e3f",
+    "WRAPPED",
+    "0.1,8400,1700000"
+  ],
+  "0x98631c69602083d04f83934576a53e2a133d482f:1666600000": [
+    "0x99c409e5f62e4bd2ac142f17cafb6810b8f0baae",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x986cdf0fd180b40c4d6aeaa01ab740b996d8b782:1": [
+    "0xa5432cbf7097c4e3536731dec837e3fa676b38c3",
+    "WRAPPED",
+    "0.1,10.8,135"
+  ],
+  "0x986cdf0fd180b40c4d6aeaa01ab740b996d8b782:2001": [
+    "0xb12c13e66ade1f72f71834f2fc5082db8c091358",
+    "WRAPPED",
+    "0.1,1.026,205.34"
+  ],
+  "0x986cdf0fd180b40c4d6aeaa01ab740b996d8b782:2222": [
+    "0x7c598c96d02398d89fbcb9d41eab3df0c16f227d",
+    "WRAPPED",
+    "0.1,3.546099,709.219858"
+  ],
+  "0x986cdf0fd180b40c4d6aeaa01ab740b996d8b782:42161": [
+    "0x9873795f5dab11e1c0342c4a58904c59827ede0c",
+    "WRAPPED",
+    "0.1,1.36,135"
+  ],
+  "0x9883ae441105f815b472517389b979f031b5c87e:1": [
+    "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e",
+    "CANONICAL",
+    "0.1,0.0024,0.03"
+  ],
+  "0x9899a98b222fcb2f3dbee7df45d943093a4ff9ff:1": [
+    "0x20c36f062a31865bed8a5b1e512d9a1a20aa333a",
+    "CANONICAL",
+    "0.1,680,17000"
+  ],
+  "0x989a6de580b9e918017f02fe7180e6f94805d2ab:137": [
+    "0xcb9d0b8cfd8371143ba5a794c7218d4766c493e2",
+    "WRAPPED",
+    "0.1,115.006,23001.24"
+  ],
+  "0x98d939325313ae0129c377b3eabdf39188b38760:137": [
+    "0x1c174f6ab0753162befbb916c69def2cc1bfdec1",
+    "WRAPPED",
+    "0.1,657900,132000000"
+  ],
+  "0x98d939325313ae0129c377b3eabdf39188b38760:250": [
+    "0x373e768f79c820aa441540d254dca6d045c6d25b",
+    "WRAPPED",
+    "0.1,657900,132000000"
+  ],
+  "0x9922879913c0b6c1860d45a3b9d3a6c44e3d183f:1": [
+    "0xaf3ccfd9b59b36628cc2f659a09d6440795b2520",
+    "WRAPPED",
+    "0.1,241911.097672,3023888.720895"
+  ],
+  "0x9922879913c0b6c1860d45a3b9d3a6c44e3d183f:66": [
+    "0x55af5865807b196bd0197e0902746f31fbccfa58",
+    "WRAPPED",
+    "0.1,15119.443604,3023888.720895"
+  ],
+  "0x99415856b37be9e75c0153615c7954f9ddb97a6e:1": [
+    "0x7eaf9c89037e4814dc0d9952ac7f888c784548db",
+    "CANONICAL",
+    "0.1,1140,28500"
+  ],
+  "0x994cd2bfdeba7663fb561948ae85882ab9e4f20c:1030": [
+    "0xb12c13e66ade1f72f71834f2fc5082db8c091358",
+    "WRAPPED",
+    "0.1,10,7825"
+  ],
+  "0x994cd2bfdeba7663fb561948ae85882ab9e4f20c:321": [
+    "0x4792c1ecb969b036eb51330c63bd27899a13d84e",
+    "WRAPPED",
+    "0.1,10,7825"
+  ],
+  "0x99889048584c710b3a2383e322dd3841e2c77d34:1": [
+    "0x44f262622248027f8e2a8fb1090c4cf85072392c",
+    "CANONICAL",
+    "0.1,4844,121100"
+  ],
+  "0x99ba071bbf4593c239d5633106d15696810840e7:137": [
+    "0x5157629e486b36f5862d163c119c4e86506ca15e",
+    "WRAPPED",
+    "0.1,65.79,13157.89"
+  ],
+  "0x99ba071bbf4593c239d5633106d15696810840e7:43114": [
+    "0xcaf870dad882b00f4b20d714bbf7fceada5e4195",
+    "WRAPPED",
+    "0.1,65.79,13157.89"
+  ],
+  "0x99c5a2fcc97b59fe6d0b56e21e72b002f644123f:1": [
+    "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+    "CANONICAL",
+    "0.1,3.2,40"
+  ],
+  "0x9a293f938ffc319ccffdec21df1930dfc8f5c3f0:137": [
+    "0x8a874960986f4ed95cd8cf4b209311b5953791d5",
+    "WRAPPED",
+    "0.1,5716.768425,1143353.685029"
+  ],
+  "0x9a6d5c2e0376572f214a35f832740e412932d277:1": [
+    "0x05d3606d5c81eb9b7b18530995ec9b29da05faba",
+    "CANONICAL",
+    "0.1,31,776"
+  ],
+  "0x9a8e7727b9733b194339dfd8f923b45b60d0fc3a:1": [
+    "0x4b27cd6e6a5e83d236ead376d256fe2f9e9f0d2e",
+    "WRAPPED",
+    "0.1,95.648,1195.61"
+  ],
+  "0x9a8e7727b9733b194339dfd8f923b45b60d0fc3a:10": [
+    "0x130966628846bfd36ff31a822705796e8cb8c18d",
+    "WRAPPED",
+    "0.1,11.12399,1112.399022"
+  ],
+  "0x9a8e7727b9733b194339dfd8f923b45b60d0fc3a:250": [
+    "0x3028b4395f98777123c7da327010c40f3c7cc4ef",
+    "WRAPPED",
+    "0.1,6.389,1277.82"
+  ],
+  "0x9a8e7727b9733b194339dfd8f923b45b60d0fc3a:42161": [
+    "0x7c10b66c442fc403ab2b8bd73553d0df262ad8a5",
+    "WRAPPED",
+    "0.1,11.96,1195.61"
+  ],
+  "0x9adbbc5410a30f3d71473efe7ed5e27cb6c02e1c:1": [
+    "0x2eaa12c0c76ea8192d82b63f8dbbb7ec2a270295",
+    "WRAPPED",
+    "0.1,562,7018"
+  ],
+  "0x9b17baadf0f21f03e35249e0e59723f34994f806:1": [
+    "0xcb86c6a22cb56b6cf40cafedb06ba0df188a416e",
+    "CANONICAL",
+    "0.1,23200,580000"
+  ],
+  "0x9b26e16377ad29a6ccc01770bcfb56de3a36d8b2:137": [
+    "0x6afcff9189e8ed3fcc1cffa184feb1276f6a82a5",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9b26e16377ad29a6ccc01770bcfb56de3a36d8b2:66": [
+    "0x6b7a87899490ece95443e979ca9485cbe7e71522",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9b3a299a3db37c662ab9d39cbfedacb81c0e09e3:250": [
+    "0x34324e1598bf02ccd3dea93f4e332b5507097473",
+    "WRAPPED",
+    "0.1,1490309.86,298061971.26"
+  ],
+  "0x9b44df3318972be845d83f961735609137c4c23c:137": [
+    "0xe0ce60af0850bf54072635e66e79df17082a1109",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9b44df3318972be845d83f961735609137c4c23c:250": [
+    "0x5444c30210d8a0a156178cfb8048b4137c0d40d1",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9b44df3318972be845d83f961735609137c4c23c:43114": [
+    "0x65c9d9d080714cda7b5d58989dc27f897f165179",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9b4bdddaeb68d85b0848bab7774e6855439fd94e:1": [
+    "0x24e89bdf2f65326b94e36978a7edeac63623dafa",
+    "CANONICAL",
+    "0.1,5460752,136518772"
+  ],
+  "0x9ba4c78b048eeed69f4ed3cfddeda7b51baf7ca8:1": [
+    "0xe0b9a2c3e9f40cf74b2c7f591b2b0cca055c3112",
+    "CANONICAL",
+    "0.1,400,10000"
+  ],
+  "0x9c8a7a2b154e3999c7c3774b662dcdd6580b3722:250": [
+    "0x623332a33ae3a8fc9b121322c72550decc0ed81c",
+    "WRAPPED",
+    "0.1,50,10000"
+  ],
+  "0x9c8a7a2b154e3999c7c3774b662dcdd6580b3722:40": [
+    "0x4f3aff3a747fcade12598081e80c6605a8be192f",
+    "WRAPPED",
+    "0.1,50,10000"
+  ],
+  "0x9d709ca51507730dfb8379a38c15f7f3d5a3710e:250": [
+    "0x9833c643f387ecfb76aa8114546ad524703c66fb",
+    "WRAPPED",
+    "0.1,68.49,13697.15"
+  ],
+  "0x9d8be3c08c97e92f76a546ca217836b0dd56aa78:1": [
+    "0xc4bb7277a74678f053259cb1f96140347efbfd46",
+    "WRAPPED",
+    "0.1,324365965.901,4054574573.76"
+  ],
+  "0x9d8be3c08c97e92f76a546ca217836b0dd56aa78:137": [
+    "0x2489eb26b6c3ee7815e024d14aed4dad71ebef51",
+    "WRAPPED",
+    "0.1,20194758.248,4038951649.71"
+  ],
+  "0x9d986a3f147212327dd658f712d5264a73a1fdb0:128": [
+    "0x9610b01aaa57ec026001f7ec5cface51bfea0ba6",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9d9affac2175ef541642035ab66f5fe7df813851:137": [
+    "0xb53ec4ace420a62cfb75afdeba600d284777cd65",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9d9affac2175ef541642035ab66f5fe7df813851:250": [
+    "0x5f7f94a1dd7b15594d17543beb8b30b111dd464c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9d9affac2175ef541642035ab66f5fe7df813851:43114": [
+    "0x09211dc67f9fe98fb7bbb91be0ef05f4a12fa2b2",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9e0846677ea91ea5308d3f525c09e782ef17da21:1": [
+    "0x177ba0cac51bfc7ea24bad39d81dcefd59d74faa",
+    "CANONICAL",
+    "0.1,1.94,50"
+  ],
+  "0x9e40868e8024aa52433ad3af311dba88ff8c86bd:1": [
+    "0xf3d6af45c6dfec43216cc3347ea91fefba0849d1",
+    "CANONICAL",
+    "0.1,10,250"
+  ],
+  "0x9e6b3e35c8f563b45d864f9ff697a144ad28a371:128": [
+    "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9f080368661261ee5d03bbd2b2f09d5489225e2c:1": [
+    "0x76ce14947f74a2664700e68452fe9166174af9ab",
+    "WRAPPED",
+    "0.1,8791208.791,109890109.89"
+  ],
+  "0x9f080368661261ee5d03bbd2b2f09d5489225e2c:137": [
+    "0x702d161ed480e4a367a5810a6086074b791cf6a0",
+    "WRAPPED",
+    "0.1,549450.549,109890109.89"
+  ],
+  "0x9f402f44684574f3535ea6f1bb5cfbffef42ee28:1": [
+    "0x27bef51f483a3d41e7a816dae22b47e249db5650",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9f402f44684574f3535ea6f1bb5cfbffef42ee28:XRP": [
+    "prn/rdsvn6ajg4ymqdhnujtp9nlrfp18jytjuf",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9f4298f2893e756030515f7b0dc85065cfae674b:1": [
+    "0x61107a409fffe1965126aa456af679719695c69c",
+    "CANONICAL",
+    "0.1,851160,21278860"
+  ],
+  "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3:1": [
+    "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3",
+    "WRAPPED",
+    "0.1,5,5"
+  ],
+  "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3:1024": [
+    "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3:1030": [
+    "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3:1285": [
+    "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3:137": [
+    "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3:250": [
+    "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3:321": [
+    "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3:42161": [
+    "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3",
+    "WRAPPED",
+    "0.1,1,1"
+  ],
+  "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3:43114": [
+    "0x9fb9a33956351cf4fa040f65a13b835a3c8764e3",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0x9fe28d11ce29e340b7124c493f59607cbab9ce48:1": [
+    "0x4e840aadd28da189b9906674b4afcb77c128d9ea",
+    "WRAPPED",
+    "0.1,2620,32750"
+  ],
+  "0x9fe28d11ce29e340b7124c493f59607cbab9ce48:10": [
+    "0xe3ab61371ecc88534c522922a026f2296116c109",
+    "WRAPPED",
+    "0.1,9868.236026,986823.602645"
+  ],
+  "0x9fe28d11ce29e340b7124c493f59607cbab9ce48:250": [
+    "0x468003b688943977e6130f4f68f23aad939a1040",
+    "WRAPPED",
+    "0.1,164,32750"
+  ],
+  "0x9fe28d11ce29e340b7124c493f59607cbab9ce48:288": [
+    "0x332730a4f6e03d9c55829435f10360e13cfa41ff",
+    "WRAPPED",
+    "0.1,506,50600"
+  ],
+  "0x9fe28d11ce29e340b7124c493f59607cbab9ce48:43114": [
+    "0xce1bffbd5374dac86a2893119683f4911a2f7814",
+    "WRAPPED",
+    "0.1,164,32750"
+  ],
+  "0xa01000c52b234a92563ba61e5649b7c76e1ba0f3:1": [
+    "0xff44b937788215eca197baaf9af69dbdc214aa04",
+    "CANONICAL",
+    "0.1,152,3800"
+  ],
+  "0xa0eda2d19211d108772711a3698c69f79673aec8:1": [
+    "0x8cd309e14575203535ef120b5b0ab4dded0c2073",
+    "WRAPPED",
+    "0.1,1910,24000"
+  ],
+  "0xa1051433ec7b5cc249c75fdd5b96bf423f2f4a32:1": [
+    "0x4470deda57a7d6c18fbc8c6a178e986dd54c89c9",
+    "WRAPPED",
+    "0.1,8183,102280"
+  ],
+  "0xa1051433ec7b5cc249c75fdd5b96bf423f2f4a32:137": [
+    "0xa92a1576d11db45c53be71d59245ac97ce0d8147",
+    "WRAPPED",
+    "0.1,73,14504"
+  ],
+  "0xa1051433ec7b5cc249c75fdd5b96bf423f2f4a32:43114": [
+    "0x19f36bbb75cfb2969486d46a95e37c74a90c7cbb",
+    "WRAPPED",
+    "0.1,73,14504"
+  ],
+  "0xa1051433ec7b5cc249c75fdd5b96bf423f2f4a32:XRP": [
+    "pop/rdsvn6ajg4ymqdhnujtp9nlrfp18jytjuf",
+    "WRAPPED",
+    "0.1,73,14504"
+  ],
+  "0xa1303e6199b319a891b79685f0537d289af1fc83:137": [
+    "0xf3ce95ec61114a4b1bfc615c16e6726015913ccc",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xa184088a740c695e156f91f5cc086a06bb78b827:250": [
+    "0xa1150db5105987cec5fd092273d1e3cbb22b378b",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xa184088a740c695e156f91f5cc086a06bb78b827:42220": [
+    "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xa184088a740c695e156f91f5cc086a06bb78b827:43114": [
+    "0xe56979f6ada241c1bed92e68535dcead9de2a5ef",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xa184088a740c695e156f91f5cc086a06bb78b827:66": [
+    "0x739ca6d71365a08f584c8fc4e1029045fa8abc4b",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xa19863e302fd1b41276fce5a48d9c511dbeef34c:1": [
+    "0x46e98ffe40e408ba6412beb670507e083c8b95ff",
+    "CANONICAL",
+    "0.1,1600,40000"
+  ],
+  "0xa249d7844dad40908afd8c54a9a41194c363aea7:137": [
+    "0x890fca365e1438b5adb58a53413c4bf6cbb1bde8",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xa249d7844dad40908afd8c54a9a41194c363aea7:40": [
+    "0x965f84d915a9efa2dd81b653e3ae736555d945f4",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xa296ad1c47fe6bdc133f39555c1d1177bd51fbc5:43114": [
+    "0xcaf870dad882b00f4b20d714bbf7fceada5e4195",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xa2b0217943f826ba3ce0753316e0d78fc50fd581:137": [
+    "0xe2d27f06f63d98b8e11b38b5b08a75d0c8dd62b9",
+    "WRAPPED",
+    "0.1,632,126400"
+  ],
+  "0xa387d1ebd7c6fc182a370fbd1f0cce0da1a865d9:1": [
+    "0x152c0f9c32c393961e9803a9467b2194e1c00b21",
+    "WRAPPED",
+    "0.1,941.17647,11764.705882"
+  ],
+  "0xa387d1ebd7c6fc182a370fbd1f0cce0da1a865d9:30": [
+    "0xe6801928061cdbe32ac5ad0634427e140efd05f9",
+    "WRAPPED",
+    "0.1,58.823529,11764.705882"
+  ],
+  "0xa387d1ebd7c6fc182a370fbd1f0cce0da1a865d9:66": [
+    "0xd4143e8db48a8f73afcdf13d7b3305f28da38116",
+    "WRAPPED",
+    "0.1,79.365079,15873.015873"
+  ],
+  "0xa4050aa9b76ccdae1a6a8b2f3e8627cdc1546d86:1": [
+    "0xbba6c7c7d673c48d90069ad2e9d2fe587fcb6bc3",
+    "CANONICAL",
+    "0.1,534,13334"
+  ],
+  "0xa4050aa9b76ccdae1a6a8b2f3e8627cdc1546d86:137": [
+    "0x124f09492c62fd0d86d1e8d71c949720941ef914",
+    "WRAPPED",
+    "0.1,34,6667"
+  ],
+  "0xa4b6573c9ae09d81e4d1360e6402b81f52557098:1": [
+    "0x9c2dc0c3cc2badde84b0025cf4df1c5af288d835",
+    "CANONICAL",
+    "0.1,3800,95000"
+  ],
+  "0xa4fffc757e8c4f24e7b209c033c123d20983ad40:1": [
+    "0x9b2f9f348425b1ef54c232f87ee7d4d570c1b552",
+    "WRAPPED",
+    "0.1,1274291.175534,15928639.69417"
+  ],
+  "0xa4fffc757e8c4f24e7b209c033c123d20983ad40:137": [
+    "0x58c1bbb508e96cfec1787acf6afe1c7008a5b064",
+    "WRAPPED",
+    "0.1,83236.224405,16647244.880972"
+  ],
+  "0xa4fffc757e8c4f24e7b209c033c123d20983ad40:250": [
+    "0xf31778d591c558140398f46feca42a6a2dbffe90",
+    "WRAPPED",
+    "0.1,83236.224405,16647244.880972"
+  ],
+  "0xa4fffc757e8c4f24e7b209c033c123d20983ad40:66": [
+    "0x9873795f5dab11e1c0342c4a58904c59827ede0c",
+    "WRAPPED",
+    "0.1,201288.244766,40257648.953301"
+  ],
+  "0xa5342d72d04c133180f376753f90a4b2eee29bb3:128": [
+    "0x854bb58fdda85f20b5ab20b20d888f0554c02560",
+    "CANONICAL",
+    "0.1,93.2,18700"
+  ],
+  "0xa58663faef461761e44066ea26c1fcddf2927b80:1": [
+    "0x1be66c15731788bae659b4bdd40d4aa9b3bbca94",
+    "CANONICAL",
+    "0.1,76800000000,1920000000000"
+  ],
+  "0xa58950f05fea2277d2608748412bf9f802ea4901:137": [
+    "0x3c1bb39bb696b443a1d80bb2b3a3d950ba9dee87",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xa6168c7e5eb7c5c379f3a1d7cf1073e09b2f031e:137": [
+    "0xfd14d755a3a3358aec08d0979ecf369b4a387039",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xa688223dffd18097edd29e1ace08e6b6940b96d6:1": [
+    "0x22b6c31c2beb8f2d0d5373146eed41ab9ede3caf",
+    "CANONICAL",
+    "0.1,0.52,12.8"
+  ],
+  "0xa7748f52273e11c0cb2edfa5128385453740ce20:1": [
+    "0xe51b8ab09008285a0380dd2680cd9dd5e13924d3",
+    "CANONICAL",
+    "0.1,50000,1250000"
+  ],
+  "0xa778505c0c3a71da2820332eda82005b2c13b27b:66": [
+    "0x0ebd9537a25f56713e34c45b38f421a1e7191469",
+    "WRAPPED",
+    "0.1,1075.32663,215065.326093"
+  ],
+  "0xa802e06cf47a4bc6a8c99f525be1400d6cc29301:250": [
+    "0x05f2972cd67705e7f2dcbffd0daa3f939b61020b",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xa802e06cf47a4bc6a8c99f525be1400d6cc29301:43114": [
+    "0x0615dbba33fe61a31c7ed131bda6655ed76748b1",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xa83ebae74ac8f256dd3fdfea409b98eb44c7c52b:137": [
+    "0x6f34bdf41a982bf4eb80d955a6bac36a981b56c9",
+    "WRAPPED",
+    "0.1,0.44,87.26"
+  ],
+  "0xa83ebae74ac8f256dd3fdfea409b98eb44c7c52b:42161": [
+    "0x97cd1cfe2ed5712660bb6c14053c0ecb031bff7d",
+    "WRAPPED",
+    "0.1,8.47,847.46"
+  ],
+  "0xa83ebae74ac8f256dd3fdfea409b98eb44c7c52b:43114": [
+    "0x6e283470cb5f0c7315c6e165eec4cc39965e5ceb",
+    "WRAPPED",
+    "0.1,0.44,87.26"
+  ],
+  "0xa85bf4a53e288c658367d007f267ab2ef63d7050:1": [
+    "0xc7026a20a640bc71b9074f7aed52a00cd9147091",
+    "WRAPPED",
+    "0.1,492.238022,6152.975271"
+  ],
+  "0xa85bf4a53e288c658367d007f267ab2ef63d7050:137": [
+    "0x7961ade0a767c0e5b67dd1a1f78ba44f727642ed",
+    "WRAPPED",
+    "0.1,30.764876,6152.975271"
+  ],
+  "0xa85d8c972e1d54136e4bbed3d108db6e108e98f9:137": [
+    "0xc68e83a305b0fad69e264a1769a0a070f190d2d6",
+    "CANONICAL",
+    "0.1,150,30000"
+  ],
+  "0xa865197a84e780957422237b5d152772654341f3:1": [
+    "0xd6040966181c9d1b28158335780dc42514b119e7",
+    "WRAPPED",
+    "0.1,592.592593,7407.407407"
+  ],
+  "0xa865197a84e780957422237b5d152772654341f3:122": [
+    "0xe6801928061cdbe32ac5ad0634427e140efd05f9",
+    "WRAPPED",
+    "0.1,37.037037,7407.407407"
+  ],
+  "0xa865197a84e780957422237b5d152772654341f3:137": [
+    "0xc7ed9aa2b7d302fd5a68dfbefe5f530f9bd35a06",
+    "WRAPPED",
+    "0.1,84.559445,16911.889058"
+  ],
+  "0xa865197a84e780957422237b5d152772654341f3:25": [
+    "0x76a3d96726c0ed756ea420d239d3feb998ebf528",
+    "WRAPPED",
+    "0.1,259.254746,51850.949261"
+  ],
+  "0xa865197a84e780957422237b5d152772654341f3:250": [
+    "0xa6ad0ef910ca4c54a97cecf82bf5892c0fa4913b",
+    "WRAPPED",
+    "0.1,84.559445,16911.889058"
+  ],
+  "0xa865197a84e780957422237b5d152772654341f3:321": [
+    "0x1ccca1ce62c62f7be95d4a67722a8fdbed6eecb4",
+    "WRAPPED",
+    "0.1,259.254746,51850.949261"
+  ],
+  "0xa865197a84e780957422237b5d152772654341f3:43114": [
+    "0x2f50405ffe9b8aa109836d18f217929f33a177bb",
+    "WRAPPED",
+    "0.1,84.559445,16911.889058"
+  ],
+  "0xa86bfc69c99d04552808b425a68a06430fb9bddf:1": [
+    "0x2b89bf8ba858cd2fcee1fada378d5cd6936968be",
+    "CANONICAL",
+    "0.1,9,225"
+  ],
+  "0xa873e87c2c935fa11c72003231a2eee7d391ce5f:1": [
+    "0x0239d3a3485ec54511bee9d77d92695e443bf060",
+    "CANONICAL",
+    "0.1,156600,3915000"
+  ],
+  "0xa8752333f6a6fe47323a4edac3d09bb1048a0e23:1": [
+    "0x3d632d9e1a60a0880dd45e61f279d919b5748377",
+    "WRAPPED",
+    "0.1,22,840"
+  ],
+  "0xa8752333f6a6fe47323a4edac3d09bb1048a0e23:43114": [
+    "0x165dbb08de0476271714952c3c1f068693bd60d7",
+    "WRAPPED",
+    "0.1,4.2,840"
+  ],
+  "0xa8ea8d1d7a3e689ccc90dcecb437ab0674d5ec6f:1": [
+    "0x6496994241804d7fe2b032901931e03bcd82301f",
+    "WRAPPED",
+    "0.1,7240000000000000,90500000000000000"
+  ],
+  "0xa8f47fdb7ef480abe45747092f79cfeb7cf2c2f3:1": [
+    "0x77dce26c03a9b833fc2d7c31c22da4f42e9d9582",
+    "CANONICAL",
+    "0.1,610,15210"
+  ],
+  "0xa8fced5c6b791ca66faa05ceea6636d5382572fc:1": [
+    "0x15a3fe3e6b8a5c01b1bfe72c76660c897368eec0",
+    "WRAPPED",
+    "0.1,1941.523732,24269.046651"
+  ],
+  "0xa8fced5c6b791ca66faa05ceea6636d5382572fc:106": [
+    "0xabd380327fe66724ffda91a87c772fb8d00be488",
+    "WRAPPED",
+    "0.1,121.345233,24269.046651"
+  ],
+  "0xaa6c3d37760039264186d919d7a64a93cd3a6984:1": [
+    "0xa5342d72d04c133180f376753f90a4b2eee29bb3",
+    "WRAPPED",
+    "0.1,473.936457,5924.205712"
+  ],
+  "0xaa6c3d37760039264186d919d7a64a93cd3a6984:2000": [
+    "0x338726dd694db9e2230ec2bb8624a2d7f566c96d",
+    "WRAPPED",
+    "0.1,29.621029,5924.205712"
+  ],
+  "0xab24f8e6b7f759a1abe727a9c06de8f70da42504:61": [
+    "0x375488f097176507e39b9653b88fdc52cde736bf",
+    "WRAPPED",
+    "0.1,29.856807,5971.361351"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:1": [
+    "0xea928a8d09e11c66e074fbf2f6804e19821f438d",
+    "WRAPPED",
+    "0.1,40,1000"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:10000": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:10001": [
+    "0x11bbb41b3e8baf7f75773db7428d5acee25fec75",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:1024": [
+    "0x4792c1ecb969b036eb51330c63bd27899a13d84e",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:1030": [
+    "0x0b32357430fe98c24b2b245b815af68bc9ecfdad",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:106": [
+    "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:1111": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:1234": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:1294": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:137": [
+    "0x9877dc155d64970d3e32264a1d120da82947dca8",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:2002": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:2025": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:2109": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:2222": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:24": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:24734": [
+    "0xdcb579aa78e35e34581c72c291d493105949ac27",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:25": [
+    "0x3d51a9fb5dcc87f7b237b04975559b920a9a56ff",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:32520": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:40": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:42220": [
+    "0x965f84d915a9efa2dd81b653e3ae736555d945f4",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:43114": [
+    "0xa2f9a3323e3664b9684fbc9fb64861dc493085df",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:71402": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:APT": [
+    "0xd6d6372c8bde72a7ab825c00b9edd35e643fb94a61c55d9d94a9db3010098548::usdc::coin",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:NEAR": [
+    "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab6290bbd5c2d26881e8a7a10bc98552b9082e7f:XRP": [
+    "5553444300000000000000000000000000000000/rdsvn6ajg4ymqdhnujtp9nlrfp18jytjuf",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xab671ea900a8e3c959f5bd29ceb5e370ba75bb9e:1": [
+    "0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b",
+    "CANONICAL",
+    "0.1,0.24,6"
+  ],
+  "0xab7a6fe97866aa1e5865f26b0d034a03128b7d80:1": [
+    "0xec7d3e835da3f6118079fa9a236b267d044fd7ca",
+    "CANONICAL",
+    "0.1,38100,476200"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:1": [
+    "0xd13eb71515dc48a8a367d12f844e5737bab415df",
+    "WRAPPED",
+    "0.1,40,1000"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:106": [
+    "0xc9baa8cfdde8e328787e29b4b078abf2dadc2055",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:1088": [
+    "0x2bf9b864cdc97b08b6d79ad4663e71b8ab65c45c",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:137": [
+    "0x7b7cafa0d7e72fd10df4e6f855da9e2ca0c5f45d",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:2001": [
+    "0x218c3c3d49d0e7b37aff0d8bb079de36ae61a4c0",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:25": [
+    "0x6ab6d61428fde76768d7b45d8bfeec19c6ef91a8",
+    "WRAPPED",
+    "0.1,4.99002,998.003992"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:288": [
+    "0x461d52769884ca6235b685ef2040f47d30c94eb5",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:40": [
+    "0x99c409e5f62e4bd2ac142f17cafb6810b8f0baae",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:42220": [
+    "0x0dcb0cb0120d355cde1ce56040be57add0185baa",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:43114": [
+    "0x6e3bf2fff13e18413d3780f93753d6cff5aee3e1",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xab7efd5333f5a636488cda6f8c1b5a128977ab93:57": [
+    "0x375488f097176507e39b9653b88fdc52cde736bf",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xab883fca554233129e927fd398a8f2083713c234:2001": [
+    "0x634398cb81b76bfc75ebb434cf7c82036f9e7d78",
+    "WRAPPED",
+    "0.1,11,2145"
+  ],
+  "0xac118686565af7393b0843587d483cbded9c3baf:1": [
+    "0xfbbe9b1142c699512545f47937ee6fae0e4b0aa9",
+    "CANONICAL",
+    "0.1,0.124,3.1"
+  ],
+  "0xacb5f391f51e15418845bec74781bdd1cbe0fd89:1": [
+    "0xa12d7e5319f5b43476ef19d1569e10097cacdfe2",
+    "CANONICAL",
+    "0.1,1000,25000"
+  ],
+  "0xacbaf478216fbb2eb3607ec2c1a6b5d434bded2f:1": [
+    "0xcb4e8cafeda995da5cedfda5205bd5664a12b848",
+    "CANONICAL",
+    "0.1,32,800"
+  ],
+  "0xacd7b3d9c10e97d0efa418903c0c7669e702e4c0:137": [
+    "0xacd7b3d9c10e97d0efa418903c0c7669e702e4c0",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xacd7b3d9c10e97d0efa418903c0c7669e702e4c0:250": [
+    "0xacd7b3d9c10e97d0efa418903c0c7669e702e4c0",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xacd7b3d9c10e97d0efa418903c0c7669e702e4c0:43114": [
+    "0xacd7b3d9c10e97d0efa418903c0c7669e702e4c0",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xacd7b3d9c10e97d0efa418903c0c7669e702e4c0:66": [
+    "0xacd7b3d9c10e97d0efa418903c0c7669e702e4c0",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xad02770e15d100955ced9a0ea2d7a18c01c8f2cb:137": [
+    "0xaaa5b9e6c589642f98a1cda99b9d024b8407285a",
+    "CANONICAL",
+    "0.1,15087007,3017401354"
+  ],
+  "0xad260f380c9a30b1d60e4548a75010ede630b665:1": [
+    "0x2791bfd60d232150bff86b39b7146c0eaaa2ba81",
+    "CANONICAL",
+    "0.1,742,18550"
+  ],
+  "0xadc29741a2bd5c32b66d14cec42b91b221bdfce7:1": [
+    "0xd8b110beee01e74dba9be687fc247c550a41cffe",
+    "CANONICAL",
+    "0.1,800,20000"
+  ],
+  "0xadec335a2e3881303a9b0203eb99de12202280df:1": [
+    "0x2a039b1d9bbdccbb91be28691b730ca893e5e743",
+    "CANONICAL",
+    "0.1,28,684"
+  ],
+  "0xadfc9a631157b59a65eb337fed810dab8879a5fd:1284": [
+    "0xf480f38c366daac4305dc484b2ad7a496ff00cea",
+    "WRAPPED",
+    "0.1,0.46,91"
+  ],
+  "0xae555cd91c93b1ac8940b8e2e845000c8781c468:25": [
+    "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+    "WRAPPED",
+    "0.1,226.107963,45221.592587"
+  ],
+  "0xae8627db72d7fc6241f2e2b87eb2bbc7cafb1661:1": [
+    "0xf70a642bd387f94380ffb90451c2c81d4eb82cbc",
+    "CANONICAL",
+    "0.1,9600,240000"
+  ],
+  "0xaf00aac2431b04ef6afd904d19b08d5146e3a9a0:1": [
+    "0x6d0f5149c502faf215c89ab306ec3e50b15e2892",
+    "CANONICAL",
+    "0.1,7680,192000"
+  ],
+  "0xaf1167b1f90e4f27d9f520a4cd3a1e452e011cea:43114": [
+    "0x05e481b19129b560e921e487adb281e70bdba463",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xaf2d1c5374ee99b167dd8567f2819c7567f1f1a0:1": [
+    "0x84e9a6f9d240fdd33801f7135908bfa16866939a",
+    "WRAPPED",
+    "0.1,46,572"
+  ],
+  "0xaf2d1c5374ee99b167dd8567f2819c7567f1f1a0:2025": [
+    "0xfbdd194376de19a88118e84e279b977f165d01b8",
+    "WRAPPED",
+    "0.1,2.9,572"
+  ],
+  "0xaff9d0da646a4f11998980dd80a5728a1ecae726:137": [
+    "0x948d2a81086a075b3130bac19e4c6dee1d2e3fe8",
+    "CANONICAL",
+    "0.1,26,5140"
+  ],
+  "0xb027c02aff109a545e4ce4fdc08b9597030c4ef6:2222": [
+    "0x218c3c3d49d0e7b37aff0d8bb079de36ae61a4c0",
+    "WRAPPED",
+    "0.1,3.144654,628.930818"
+  ],
+  "0xb027c02aff109a545e4ce4fdc08b9597030c4ef6:43114": [
+    "0x2ad402655243203fcfa7dcb62f8a08cc2ba88ae0",
+    "WRAPPED",
+    "0.1,1.09,217.86"
+  ],
+  "0xb0611177bb3ce464c512d84bfab0b9b33b01f534:137": [
+    "0xb01371072fdcb9b4433b855e16a682b461f94ab3",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xb0731d50c681c45856bfc3f7539d5f61d4be81d8:1": [
+    "0x65fc94d99cb301c5630c485d312e6ff5edde13d0",
+    "CANONICAL",
+    "0.1,42,1050"
+  ],
+  "0xb08ba8c99a883d85d929f561b81bb8c365a5a93b:137": [
+    "0x013253863b0e1cc8b6e473fc64d756d2f17a3637",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xb097e83211d896650ed0104da3309d3654416bc0:1285": [
+    "0x130966628846bfd36ff31a822705796e8cb8c18d",
+    "WRAPPED",
+    "0.1,45,8923"
+  ],
+  "0xb0b2ef34d412d73b0ff90a709d1779a20655165a:1": [
+    "0x012e0e6342308b247f36ee500ecb14dc77a7a8c1",
+    "CANONICAL",
+    "0.1,1460,18250"
+  ],
+  "0xb0e1fc65c1a741b4662b813eb787d369b8614af1:1": [
+    "0xb0e1fc65c1a741b4662b813eb787d369b8614af1",
+    "WRAPPED",
+    "0.1,8,400"
+  ],
+  "0xb0e94feadc03f489c4503101ea06ea9c5eeaf7a4:137": [
+    "0x4f438603ebde2b0e4524173f2f123aa738f14652",
+    "WRAPPED",
+    "0.1,267.665,53533.19"
+  ],
+  "0xb0ff8188f374902bb180bd186d17967b5b1188f2:1": [
+    "0x36e43065e977bc72cb86dbd8405fae7057cdc7fd",
+    "CANONICAL",
+    "0.1,286000000000,7120000000000"
+  ],
+  "0xb139ed4143bceb793346020453ab1f9d886bd294:1": [
+    "0x05f2972cd67705e7f2dcbffd0daa3f939b61020b",
+    "WRAPPED",
+    "0.1,1333.33,33333.33"
+  ],
+  "0xb139ed4143bceb793346020453ab1f9d886bd294:10": [
+    "0xe6bf0e14e33a469f2b0640b53949a9f90e675135",
+    "WRAPPED",
+    "0.1,4554.750377,455475.03769"
+  ],
+  "0xb139ed4143bceb793346020453ab1f9d886bd294:137": [
+    "0x17e2e3d4a27e8e0790c85ff2ec13d001e749e49e",
+    "WRAPPED",
+    "0.1,166.67,33333.33"
+  ],
+  "0xb139ed4143bceb793346020453ab1f9d886bd294:2000": [
+    "0xc19281f22a075e0f10351cd5d6ea9f0ac63d4327",
+    "WRAPPED",
+    "0.1,2277.375188,455475.03769"
+  ],
+  "0xb139ed4143bceb793346020453ab1f9d886bd294:25": [
+    "0x6ccf12b480a99c54b23647c995f4525d544a7e72",
+    "WRAPPED",
+    "0.1,3989.849822,797969.96441"
+  ],
+  "0xb139ed4143bceb793346020453ab1f9d886bd294:250": [
+    "0xd2c244d5c3b530b9310c34962bf9b48c08dc0bcb",
+    "WRAPPED",
+    "0.1,681.210975,136242.195025"
+  ],
+  "0xb139ed4143bceb793346020453ab1f9d886bd294:43114": [
+    "0x56501b0b12ee9518c2991451bbc8d7f9267949d2",
+    "WRAPPED",
+    "0.1,166.67,33333.33"
+  ],
+  "0xb235163f7f567b97d33775bfde6811e43212c098:1": [
+    "0xea26c4ac16d4a5a106820bc8aee85fd0b7b2b664",
+    "CANONICAL",
+    "0.1,2600,65000"
+  ],
+  "0xb247a33e8201586a06f564b603759df7990e744d:137": [
+    "0x5fe80d2cd054645b9419657d3d10d26391780a7b",
+    "WRAPPED",
+    "0.1,1397.487,279497.46"
+  ],
+  "0xb247a33e8201586a06f564b603759df7990e744d:43114": [
+    "0x11eb3aa66fe1f2b75cb353d3e874e96968182bda",
+    "WRAPPED",
+    "0.1,1380.029,276005.97"
+  ],
+  "0xb2c7a198be3345d554043f6b875e254cb2034219:1": [
+    "0x782617249085aa28a367feb49cf811434660cee5",
+    "WRAPPED",
+    "0.1,1.1,13.5"
+  ],
+  "0xb2ea25cd1912fd85f815088ea5f89f19f708ec62:43114": [
+    "0x74a488bccb16d90fd628e75132e49ff067384aa9",
+    "WRAPPED",
+    "0.1,41368811225.840614,8273762245168.122849"
+  ],
+  "0xb2ebaa0ad65e9c888008bf10646016f7fcdd73c3:137": [
+    "0x5f006745a9a192a7cd1236089f704f9b35d3b9cd",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xb361989412516d3414f100089cb89905ee7c896b:1": [
+    "0x77e9618179820961ee99a988983bc9ab41ff3112",
+    "CANONICAL",
+    "0.1,138,3424"
+  ],
+  "0xb37cad62441ef8b866f3e36f12fd42062b6c0f33:137": [
+    "0x1dd9e9e142f3f84d90af1a9f2cb617c7e08420a4",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xb3e589d2983a7432064842b267c8f5b78c4820ba:1": [
+    "0x31c2415c946928e9fd1af83cdfa38d3edbd4326f",
+    "CANONICAL",
+    "0.1,524,13064"
+  ],
+  "0xb43a66162bd23b499e49429c8e6de0f71e7ca302:43114": [
+    "0xf2f7ce610a091b94d41d69f4ff1129434a82e2f0",
+    "CANONICAL",
+    "0.1,0.52,103"
+  ],
+  "0xb44a9b6905af7c801311e8f4e76932ee959c663c:137": [
+    "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xb46d67fb63770052a07d5b7c14ed858a8c90f825:1": [
+    "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "CANONICAL",
+    "0.1,80,1000"
+  ],
+  "0xb506c06ad11faf466f668a6cb4d1f538838e3b8e:1": [
+    "0x23da57c5f99ca7dea8d38b15419c7003ee85d76c",
+    "WRAPPED",
+    "0.1,1204.492758,15056.159475"
+  ],
+  "0xb506c06ad11faf466f668a6cb4d1f538838e3b8e:137": [
+    "0x37ee376553833d9247d38eee826b696bd3ae1b1f",
+    "WRAPPED",
+    "0.1,128.207265,25641.452998"
+  ],
+  "0xb52da8102e715d5e220aae2ef58e9f978fcdeb3f:1": [
+    "0x92df60c51c710a1b1c20e42d85e221f3a1bfc7f2",
+    "WRAPPED",
+    "0.1,216.68,2708.5"
+  ],
+  "0xb52da8102e715d5e220aae2ef58e9f978fcdeb3f:137": [
+    "0x5d47baba0d66083c52009271faf3f50dcc01023c",
+    "WRAPPED",
+    "0.1,13.542,2708.5"
+  ],
+  "0xb52da8102e715d5e220aae2ef58e9f978fcdeb3f:199": [
+    "0xfbdd194376de19a88118e84e279b977f165d01b8",
+    "WRAPPED",
+    "0.1,61.529374,12305.874825"
+  ],
+  "0xb52da8102e715d5e220aae2ef58e9f978fcdeb3f:40": [
+    "0x667fd83e24ca1d935d36717d305d54fa0cac991c",
+    "WRAPPED",
+    "0.1,56.329142,11265.828489"
+  ],
+  "0xb5389a679151c4b8621b1098c6e0961a3cfee8d4:43114": [
+    "0x86b3f23b6e90f5bbfac59b5b2661134ef8ffd255",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xb5be8d87fce6ce87a24b90abdb019458a8ec31f9:1": [
+    "0x7f352fa977713019c484c58e9bdfb04910016871",
+    "WRAPPED",
+    "0.1,6265.693,78321.17"
+  ],
+  "0xb5be8d87fce6ce87a24b90abdb019458a8ec31f9:137": [
+    "0x221743dc9e954be4f86844649bf19b43d6f8366d",
+    "WRAPPED",
+    "0.1,391.605,78321.17"
+  ],
+  "0xb5c9aa0d54091b32c6496b1f3f745e2492daa2ff:43114": [
+    "0xe82f4cb6026b2005900ce77896bac82c49420f78",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xb614ad939e9477d5103baa32164db901214e2625:1": [
+    "0xaef4f02e31cdbf007f8d98da4ae365188a0e9ecc",
+    "CANONICAL",
+    "0.1,77,1926"
+  ],
+  "0xb6246d51f3bd98608f26e866f1453109f8f76809:4689": [
+    "0xe2f300065c1ebfc2be8574da8063dd0721c85a33",
+    "CANONICAL",
+    "0.1,5650,1130000"
+  ],
+  "0xb64e638e60d154b43f660a6bf8fd8a3b249a6a21:137": [
+    "0x3053ad3b31600074e9a90440770f78d5e8fc5a54",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xb72842d6f5fedf91d22d56202802bb9a79c6322e:1": [
+    "0xbd1848e1491d4308ad18287a745dd4db2a4bd55b",
+    "CANONICAL",
+    "0.1,1280,32000"
+  ],
+  "0xb8295460962728d496a138a391f18b1b558025ed:250": [
+    "0x4b649a521de7cfebebca88e82abb3e39fb42cc90",
+    "WRAPPED",
+    "0.1,0.06,12.19"
+  ],
+  "0xb8295460962728d496a138a391f18b1b558025ed:43114": [
+    "0x32f1200bfb876fbb8f6e6a2dea8f07f279146422",
+    "WRAPPED",
+    "0.1,0.06,12.19"
+  ],
+  "0xb83003f7fe62870e2e9ed57323ed02630d971525:1": [
+    "0xce3b8897be065315c8eab816a31153025ae428be",
+    "WRAPPED",
+    "0.1,10113780.025284,126422250.316056"
+  ],
+  "0xb86deb16e27ece0bcd5b3a616e58926458ba72e1:137": [
+    "0x5774b2fc3e91af89f89141eacf76545e74265982",
+    "WRAPPED",
+    "0.1,789.666,157933.22"
+  ],
+  "0xb86deb16e27ece0bcd5b3a616e58926458ba72e1:43114": [
+    "0xdb12c7e30dc2a2c421724d07c7a09147bd9f61bb",
+    "WRAPPED",
+    "0.1,789.666,157933.22"
+  ],
+  "0xb8937846d416062ae02d87391d855c2befe1f942:1": [
+    "0x6aa40c573def21abd6fb30a5fb53749325bc5d65",
+    "WRAPPED",
+    "0.1,0.047387,0.592343"
+  ],
+  "0xb8937846d416062ae02d87391d855c2befe1f942:250": [
+    "0xa2f9a3323e3664b9684fbc9fb64861dc493085df",
+    "WRAPPED",
+    "0.1,0.002962,0.592343"
+  ],
+  "0xb8937846d416062ae02d87391d855c2befe1f942:43114": [
+    "0x7f352fa977713019c484c58e9bdfb04910016871",
+    "WRAPPED",
+    "0.1,0.002962,0.592343"
+  ],
+  "0xb969792e669b92e2e6d33441a0c6caf3aee1d01d:1": [
+    "0x8323fcf06d58f49533da60906d731c6a56626fb2",
+    "WRAPPED",
+    "0.1,113,1410"
+  ],
+  "0xb969792e669b92e2e6d33441a0c6caf3aee1d01d:128": [
+    "0x99c409e5f62e4bd2ac142f17cafb6810b8f0baae",
+    "WRAPPED",
+    "0.1,29.342551,5868.510161"
+  ],
+  "0xb969792e669b92e2e6d33441a0c6caf3aee1d01d:137": [
+    "0x901ab106a543e11ad63d5b57ebe2485200d46e28",
+    "WRAPPED",
+    "0.1,20.601141,4120.228261"
+  ],
+  "0xb9b41da7fa895b093b95340a3379383bba36735e:1": [
+    "0x08ba718f288c3b12b01146816bef9fa03cc635bc",
+    "CANONICAL",
+    "0.1,5096,127390"
+  ],
+  "0xb9d8592e16a9c1a3ae6021cddb324eac1cbc70d6:137": [
+    "0xe95fd76cf16008c12ff3b3a937cb16cd9cc20284",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xba0626fdd269140fda8919b33c5585137daffed5:43114": [
+    "0x1c174f6ab0753162befbb916c69def2cc1bfdec1",
+    "WRAPPED",
+    "0.1,8.425,1685.11"
+  ],
+  "0xbad3fe9b36780e187455c57ba68ca1c2e43bbc9b:1": [
+    "0x9a058058e14838ef83d25df227c149aff7df8bd3",
+    "WRAPPED",
+    "0.1,4142931.12377,51786639.047126"
+  ],
+  "0xbad3fe9b36780e187455c57ba68ca1c2e43bbc9b:137": [
+    "0x7fcdeae1418aad9cd85439f8ca091564985cbc72",
+    "WRAPPED",
+    "0.1,258933.195236,51786639.047126"
+  ],
+  "0xbb10c3ba37b4da01a70d6f3f456c5323a11a76fb:1": [
+    "0x1fbd3df007eb8a7477a1eab2c63483dcc24effd6",
+    "CANONICAL",
+    "0.1,590,14706"
+  ],
+  "0xbb244fc91e86c5a4b9d31b2935c5bc57c034bfa1:1": [
+    "0xcb69f7ac645f5e09310b91445277a53f7fcb78cf",
+    "WRAPPED",
+    "0.1,2.4,30"
+  ],
+  "0xbb244fc91e86c5a4b9d31b2935c5bc57c034bfa1:137": [
+    "0x5126f540a90b43eb3c20fc5d734ecc749f2aadc7",
+    "WRAPPED",
+    "0.1,0.15,30"
+  ],
+  "0xbb244fc91e86c5a4b9d31b2935c5bc57c034bfa1:43114": [
+    "0x7d86f1eaff29f076576b2ff09ce3bcc7533fd2c5",
+    "WRAPPED",
+    "0.1,0.18,36.21"
+  ],
+  "0xbbc4a8d076f4b1888fec42581b6fc58d242cf2d5:1": [
+    "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+    "WRAPPED",
+    "0.1,1356,25000"
+  ],
+  "0xbbeb90cfb6fafa1f69aa130b7341089abeef5811:1": [
+    "0x8564653879a18c560e7c0ea0e084c516c62f5653",
+    "CANONICAL",
+    "0.1,2040,51000"
+  ],
+  "0xbc2597d3f1f9565100582cde02e3712d03b8b0f6:1": [
+    "0x53bd789f2cdb846b227d8ffc7b46ed4263231fdf",
+    "CANONICAL",
+    "0.1,228,5700"
+  ],
+  "0xbc690879d762ca00bcfa5e9e6f4b7011485c29c9:1": [
+    "0x2127b96a05f9bf9095913d1e8b7bdb203a683a9f",
+    "WRAPPED",
+    "0.1,0.16,2"
+  ],
+  "0xbc690879d762ca00bcfa5e9e6f4b7011485c29c9:137": [
+    "0x358bcb7d1d96c40d775d14a1452b6608026a44c8",
+    "WRAPPED",
+    "0.1,0.01,2"
+  ],
+  "0xbc690879d762ca00bcfa5e9e6f4b7011485c29c9:250": [
+    "0xa1388e73c51b37383b1ab9dce8317ef5a0349cc5",
+    "WRAPPED",
+    "0.1,0.01,2"
+  ],
+  "0xbc690879d762ca00bcfa5e9e6f4b7011485c29c9:43114": [
+    "0x434d6ab73e2224d68566a92736594b9dc8f609d9",
+    "WRAPPED",
+    "0.1,0.01,2"
+  ],
+  "0xbc70a08ece842698dd89dd7fc8767fc962e4533b:1": [
+    "0xcf0bcf85082e3cfe591bd2451bc4b46faa34c7de",
+    "WRAPPED",
+    "0.1,970,12100"
+  ],
+  "0xbc7370641ddcf16a27eea11230af4a9f247b61f9:1": [
+    "0x967fb0d760ed3ce53afe2f0a071674cccae73550",
+    "WRAPPED",
+    "0.1,997.653141,12470.664264"
+  ],
+  "0xbc7370641ddcf16a27eea11230af4a9f247b61f9:1234": [
+    "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+    "WRAPPED",
+    "0.1,104.761977,20952.39532"
+  ],
+  "0xbc7370641ddcf16a27eea11230af4a9f247b61f9:43114": [
+    "0x470bfee42a801abb9a1492482d609fb84713d60f",
+    "WRAPPED",
+    "0.1,62.185961,12437.192179"
+  ],
+  "0xbc7370641ddcf16a27eea11230af4a9f247b61f9:8888": [
+    "0x890482c67cee4849ebc881a59dceecfb51334df7",
+    "WRAPPED",
+    "0.1,112.269281,22453.856203"
+  ],
+  "0xbc7d6b50616989655afd682fb42743507003056d:1": [
+    "0xed04915c23f00a313a544955524eb7dbd823143d",
+    "CANONICAL",
+    "0.1,1548,38686"
+  ],
+  "0xbd29490383edfd560426c3b63d01534408bc2da6:43114": [
+    "0xbee994ad257dcc84672c0c6e6168a4701041f39f",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xbd83010eb60f12112908774998f65761cf9f6f9a:1": [
+    "0xc55c2175e90a46602fd42e931f62b3acc1a013ca",
+    "CANONICAL",
+    "0.1,6528,163200"
+  ],
+  "0xbd87fa704d5ab65e9a189d6e0dbaade51643adf0:1": [
+    "0xfbdd194376de19a88118e84e279b977f165d01b8",
+    "WRAPPED",
+    "0.1,2575.848,32198.11"
+  ],
+  "0xbd87fa704d5ab65e9a189d6e0dbaade51643adf0:1088": [
+    "0x6b7a87899490ece95443e979ca9485cbe7e71522",
+    "WRAPPED",
+    "0.1,160.99,32198.11"
+  ],
+  "0xbd87fa704d5ab65e9a189d6e0dbaade51643adf0:137": [
+    "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+    "WRAPPED",
+    "0.1,160.99,32198.11"
+  ],
+  "0xbd87fa704d5ab65e9a189d6e0dbaade51643adf0:250": [
+    "0x4792c1ecb969b036eb51330c63bd27899a13d84e",
+    "WRAPPED",
+    "0.1,160.99,32198.11"
+  ],
+  "0xbdc3b3639f7aa19e623a4d603a3fb7ab20115a91:1": [
+    "0xc4bb7277a74678f053259cb1f96140347efbfd46",
+    "WRAPPED",
+    "0.1,52980135,662251660"
+  ],
+  "0xbdf5680cc6b9e7355d24575e59e764b21d6cf7bf:1": [
+    "0xe408849d21646a42fd5e36cc520b26e7cdd62370",
+    "WRAPPED",
+    "0.1,382.206,4777.58"
+  ],
+  "0xbdf5680cc6b9e7355d24575e59e764b21d6cf7bf:10": [
+    "0xe0cca86b254005889ac3a81e737f56a14f4a38f5",
+    "WRAPPED",
+    "0.1,31.878403,6375.680604"
+  ],
+  "0xbdf5680cc6b9e7355d24575e59e764b21d6cf7bf:250": [
+    "0xe0cca86b254005889ac3a81e737f56a14f4a38f5",
+    "WRAPPED",
+    "0.1,31.878403,6375.680604"
+  ],
+  "0xbdf5680cc6b9e7355d24575e59e764b21d6cf7bf:42161": [
+    "0xe0cca86b254005889ac3a81e737f56a14f4a38f5",
+    "WRAPPED",
+    "0.1,63.756806,6375.680604"
+  ],
+  "0xbdf5680cc6b9e7355d24575e59e764b21d6cf7bf:43114": [
+    "0xe0cca86b254005889ac3a81e737f56a14f4a38f5",
+    "WRAPPED",
+    "0.1,25.967,5193.43"
+  ],
+  "0xbf05279f9bf1ce69bbfed670813b7e431142afa4:1": [
+    "0x6b4c7a5e3f0b99fcd83e9c089bddd6c7fce5c611",
+    "CANONICAL",
+    "0.1,4.4,110"
+  ],
+  "0xbf731bfa03e0095a2039e7e4c3b466efb7f3ec4e:1": [
+    "0x1cb1284cf62c3e593a8f49eef3db37ad20467bed",
+    "WRAPPED",
+    "0.1,28.2,500"
+  ],
+  "0xbf731bfa03e0095a2039e7e4c3b466efb7f3ec4e:1030": [
+    "0x1ccca1ce62c62f7be95d4a67722a8fdbed6eecb4",
+    "WRAPPED",
+    "0.1,1.8,500"
+  ],
+  "0xbf731bfa03e0095a2039e7e4c3b466efb7f3ec4e:106": [
+    "0xa649325aa7c5093d12d6f98eb4378deae68ce23f",
+    "WRAPPED",
+    "0.1,6.767438,1353.487667"
+  ],
+  "0xbf731bfa03e0095a2039e7e4c3b466efb7f3ec4e:1088": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,1.8,500"
+  ],
+  "0xbf731bfa03e0095a2039e7e4c3b466efb7f3ec4e:137": [
+    "0x21804205c744dd98fbc87898704564d5094bb167",
+    "WRAPPED",
+    "0.1,2.5,500"
+  ],
+  "0xbf731bfa03e0095a2039e7e4c3b466efb7f3ec4e:2000": [
+    "0xdc42728b0ea910349ed3c6e1c9dc06b5fb591f98",
+    "WRAPPED",
+    "0.1,6.4,1263"
+  ],
+  "0xbf731bfa03e0095a2039e7e4c3b466efb7f3ec4e:25": [
+    "0xc9baa8cfdde8e328787e29b4b078abf2dadc2055",
+    "WRAPPED",
+    "0.1,4.812319,962.463908"
+  ],
+  "0xbf731bfa03e0095a2039e7e4c3b466efb7f3ec4e:288": [
+    "0x922d641a426dcffaef11680e5358f34d97d112e1",
+    "WRAPPED",
+    "0.1,2.5,500"
+  ],
+  "0xbf731bfa03e0095a2039e7e4c3b466efb7f3ec4e:40": [
+    "0x332730a4f6e03d9c55829435f10360e13cfa41ff",
+    "WRAPPED",
+    "0.1,2.5,500"
+  ],
+  "0xbf731bfa03e0095a2039e7e4c3b466efb7f3ec4e:42220": [
+    "0xc9baa8cfdde8e328787e29b4b078abf2dadc2055",
+    "WRAPPED",
+    "0.1,2.5,500"
+  ],
+  "0xbfc044a234e45412ecfec2cd6aae2dd0c083a7cd:1": [
+    "0x7777777777697cfeecf846a76326da79cc606517",
+    "CANONICAL",
+    "0.1,160,4000"
+  ],
+  "0xbfdcce6ab5533a8b285a86116c957808e118c3b6:1": [
+    "0xb9892f9a892f3e251fc58b9076c56add528eb8a6",
+    "CANONICAL",
+    "0.1,370000,3700000"
+  ],
+  "0xbfef6ccfc830d3baca4f6766a0d4aaa242ca9f3d:43114": [
+    "0x3d51a9fb5dcc87f7b237b04975559b920a9a56ff",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xc04e039ae8587e71f8024b36d630f841cc2106cc:1": [
+    "0x6c972b70c533e2e045f333ee28b9ffb8d717be69",
+    "CANONICAL",
+    "0.1,6940,173500"
+  ],
+  "0xc05b9aba543dc4f1c19cdd73753d77f8cc75097d:1": [
+    "0x0802d66f029c46e042b74d543fc43b6705ccb4ba",
+    "WRAPPED",
+    "0.1,152875979.36,1910949742.02"
+  ],
+  "0xc073c4ed65622a9423b5e5bde2bfc8b81ebc471c:1": [
+    "0x256f2d67e52fe834726d2ddcd8413654f5eb8b53",
+    "CANONICAL",
+    "0.1,178,4446"
+  ],
+  "0xc0a51ac9d548bdcde53fa59448029e41a39feb20:1": [
+    "0x7de91b204c1c737bcee6f000aaa6569cf7061cb7",
+    "CANONICAL",
+    "0.1,4.6,115"
+  ],
+  "0xc0dad366ebee605f9774823404f84e43a6092531:1": [
+    "0x5e492b3b79df8037a83771d905d057ef1557b72a",
+    "WRAPPED",
+    "0.1,10362694.300518,129533678.756477"
+  ],
+  "0xc0dad366ebee605f9774823404f84e43a6092531:32520": [
+    "0x735abe48e8782948a37c7765ecb76b98cde97b0f",
+    "WRAPPED",
+    "0.1,690607.734807,138121546.961326"
+  ],
+  "0xc0dad366ebee605f9774823404f84e43a6092531:43114": [
+    "0x39d486ff2a97b0724c5f012ccb84f2a58f05057c",
+    "WRAPPED",
+    "0.1,647668.393782,129533678.756477"
+  ],
+  "0xc0dd739c4a190a45c91ed3ec587b1f3fc4d31ba6:1": [
+    "0x5fd564518a71aab9b1d0ac6d5825bbbc46a5845e",
+    "WRAPPED",
+    "0.1,2.276608,28.457598"
+  ],
+  "0xc0dd739c4a190a45c91ed3ec587b1f3fc4d31ba6:137": [
+    "0x1e323b29debdd06e5fa498d380952ae41f46e6e8",
+    "WRAPPED",
+    "0.1,0.142288,28.457598"
+  ],
+  "0xc0dd739c4a190a45c91ed3ec587b1f3fc4d31ba6:250": [
+    "0xf7b38053a4885c99279c4955cb843797e04455f8",
+    "WRAPPED",
+    "0.1,0.142288,28.457598"
+  ],
+  "0xc0dd739c4a190a45c91ed3ec587b1f3fc4d31ba6:42161": [
+    "0x6ff0609046a38d76bd40c5863b4d1a2dce687f73",
+    "WRAPPED",
+    "0.1,0.12427,12.426991"
+  ],
+  "0xc19b327b51227550a28e09a94bce23ea1e5abe00:137": [
+    "0x592efb6a2cbf3bce4ec28567fb181ce6972ae2a1",
+    "WRAPPED",
+    "0.1,187,37270"
+  ],
+  "0xc1be9a4d5d45beeacae296a7bd5fadbfc14602c4:1": [
+    "0x2c9023bbc572ff8dc1228c7858a280046ea8c9e5",
+    "CANONICAL",
+    "0.1,170,4250"
+  ],
+  "0xc1fb2d1dbf7e4f605de0f0f6fbaa724e1b1ffba6:336": [
+    "sdn",
+    "CANONICAL",
+    "0.1,3.4,680"
+  ],
+  "0xc20ff003662d9b91b4139ffa6b7c9d69968bad2c:1": [
+    "0xd5ebd23d5eb968c2efba2b03f27ee61718609a71",
+    "WRAPPED",
+    "0.1,586,7320"
+  ],
+  "0xc232e3741660f097515fc46c3d65a9f56adda6fb:137": [
+    "0xfcb7388eef472293290b15027642702ebf57250a",
+    "WRAPPED",
+    "0.1,67.849,13569.99"
+  ],
+  "0xc28ea768221f67b6a1fd33e6aa903d4e42f6b177:1": [
+    "0x7ae1d57b58fa6411f32948314badd83583ee0e8c",
+    "CANONICAL",
+    "0.1,3860,96460"
+  ],
+  "0xc2c23a86def9e9f5972a633b3d25f7ecbfa5e575:1": [
+    "0x0ff6ffcfda92c53f615a4a75d982f399c989366b",
+    "CANONICAL",
+    "0.1,69,1726"
+  ],
+  "0xc2c82622a7cb7159d44cea7e39843a495f2674de:1": [
+    "0xaac2bb703093eca3ce9b97434fd16f2765951c0e",
+    "WRAPPED",
+    "0.1,60,1500"
+  ],
+  "0xc2c82622a7cb7159d44cea7e39843a495f2674de:1285": [
+    "0xcb58418aa51ba525aef0fe474109c0354d844b7c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xc2c82622a7cb7159d44cea7e39843a495f2674de:137": [
+    "0x5f7f94a1dd7b15594d17543beb8b30b111dd464c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xc2c82622a7cb7159d44cea7e39843a495f2674de:43114": [
+    "0x63d3f3b271dbbd43a788687b86d516fe185d2509",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xc2cb89bbb5bba6e21db1dfe13493dfd7dcbabd68:1": [
+    "0x2cf51e73c3516f3d86e9c0b4de0971dbf0766fd4",
+    "WRAPPED",
+    "0.1,72850,91630"
+  ],
+  "0xc325bd4c437a9a78eb8de486b5321253e650cf0d:1": [
+    "0x126c121f99e1e211df2e5f8de2d96fa36647c855",
+    "CANONICAL",
+    "0.1,11.6,290"
+  ],
+  "0xc32bb619966b9a56cf2472528a36fd099ce979e0:1": [
+    "0xc8d3dcb63c38607cb0c9d3f55e8ecce628a01c36",
+    "CANONICAL",
+    "0.1,186.4,4660"
+  ],
+  "0xc36d14c0be40dc9ab88760d2112cc5a69ff8b3c7:1": [
+    "0xb25e20de2f2ebb4cffd4d16a55c7b395e8a94762",
+    "WRAPPED",
+    "0.1,16000,200000"
+  ],
+  "0xc39fd0625684f5ae0cd8b3da491c377a1da45721:250": [
+    "0x58759dd469ae5631c42cf8a473992335575b58d7",
+    "WRAPPED",
+    "0.1,1773.942907,354788.581484"
+  ],
+  "0xc3a134d42d93f3168931c0e4ac3ed8ab7096267f:1666600000": [
+    "0x9fb83c0635de2e815fd1c21b3a292277540c2e8d",
+    "WRAPPED",
+    "0.1,162.039,32407.97"
+  ],
+  "0xc3ede3bb006db3e82e436acdf867e8c6be0e017e:100": [
+    "0xc931f61b1534eb21d8c11b24f3f5ab2471d4ab50",
+    "WRAPPED",
+    "0.1,644.915806,128983.161248"
+  ],
+  "0xc3ede3bb006db3e82e436acdf867e8c6be0e017e:43114": [
+    "0x21804205c744dd98fbc87898704564d5094bb167",
+    "WRAPPED",
+    "0.1,644.915806,128983.161248"
+  ],
+  "0xc40ef4f38a3235f21987f9f13431983cd3025e58:1": [
+    "0x790cfdc6ab2e0ee45a433aac5434f183be1f6a20",
+    "WRAPPED",
+    "0.1,0.11,1.3"
+  ],
+  "0xc40ef4f38a3235f21987f9f13431983cd3025e58:137": [
+    "0x1bc84db86ef36fadb86e5882d5445d5725394937",
+    "WRAPPED",
+    "0.1,0.0065,1.3"
+  ],
+  "0xc40ef4f38a3235f21987f9f13431983cd3025e58:43114": [
+    "0x4ecf513a7d0e1548e14b621e21d2584bc7570918",
+    "WRAPPED",
+    "0.1,0.0065,1.3"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:1": [
+    "0x4b641f607570b9053035780615f5b56a91f38f90",
+    "WRAPPED",
+    "0.1,20,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:10": [
+    "0x65e66a61d0a8f1e686c2d6083ad611a10d84d97a",
+    "WRAPPED",
+    "0.1,10,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:100": [
+    "0xc9baa8cfdde8e328787e29b4b078abf2dadc2055",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:1088": [
+    "0x2c78f1b70ccf63cdee49f9233e9faa99d43aa07e",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:1284": [
+    "0xf44fb887334fa17d2c5c0f970b5d320ab53ed557",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:1285": [
+    "0xaab1688899a833d0b6e0226afcd9a4c1128a5a77",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:137": [
+    "0x95dd59343a893637be1c3228060ee6afbf6f0730",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:2000": [
+    "0x6b7a87899490ece95443e979ca9485cbe7e71522",
+    "WRAPPED",
+    "0.1,5.029564,1005.912755"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:2001": [
+    "0x9610b01aaa57ec026001f7ec5cface51bfea0ba6",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:2222": [
+    "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:25": [
+    "0xc931f61b1534eb21d8c11b24f3f5ab2471d4ab50",
+    "WRAPPED",
+    "0.1,4.985045,997.008973"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:250": [
+    "0xfb98b335551a418cd0737375a2ea0ded62ea213b",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:288": [
+    "0xd67de0e0a0fd7b15dc8348bb9be742f3c5850454",
+    "WRAPPED",
+    "0.1,10,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:42161": [
+    "0x99415856b37be9e75c0153615c7954f9ddb97a6e",
+    "WRAPPED",
+    "0.1,10,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:42220": [
+    "0xc931f61b1534eb21d8c11b24f3f5ab2471d4ab50",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:43114": [
+    "0x3b79a28264fc52c7b4cea90558aa0b162f7faf57",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:4689": [
+    "0xabd380327fe66724ffda91a87c772fb8d00be488",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:57": [
+    "0x3028b4395f98777123c7da327010c40f3c7cc4ef",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc412ecccaa35621cfcbada4ce203e3ef78c4114a:8217": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xc417b45e6090bd4201d9400b48f84c9f34f4d0a5:1": [
+    "0x6399c842dd2be3de30bf99bc7d1bbf6fa3650e70",
+    "CANONICAL",
+    "0.1,16.2,406"
+  ],
+  "0xc4726d59761a35e3a7e8d4eac631d034aa68ee3c:1": [
+    "0x58a3520d738b268c2353ecee518a1ad8e28e4ae5",
+    "CANONICAL",
+    "0.1,860000,21500000"
+  ],
+  "0xc53611ae47602c7b92a0766fcb65de91ac4d904b:1": [
+    "0x4fabb145d64652a948d72533023f6e7a623c7c53",
+    "CANONICAL",
+    "0.1,80,2000"
+  ],
+  "0xc53df2c74929f6afab07e96aea4561464dd6486b:32520": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0.1,11000000,2200000000"
+  ],
+  "0xc55d3a143e16e509358ccb09c00aed072efd48e0:137": [
+    "0x6e3bf2fff13e18413d3780f93753d6cff5aee3e1",
+    "WRAPPED",
+    "0.1,23.81,4761.9"
+  ],
+  "0xc6fd4c36a822d43283b79cce07d015a1faf7b321:1": [
+    "0xd080f46d7781a6c82b3dd74a223b73242884e7e6",
+    "CANONICAL",
+    "0.1,160,4000"
+  ],
+  "0xc7091aa18598b87588e37501b6ce865263cd67ce:137": [
+    "0xbc2597d3f1f9565100582cde02e3712d03b8b0f6",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xc748673057861a797275cd8a068abb95a902e8de:128": [
+    "0xe6801928061cdbe32ac5ad0634427e140efd05f9",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xc748673057861a797275cd8a068abb95a902e8de:66": [
+    "0x97513e975a7fa9072c72c92d8000b0db90b163c5",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xc75cc1ca9f7e821809b9151044f12a2392bfe4ba:1": [
+    "0x114b3381b47650c6bea8a4dca8d8fa6afb329678",
+    "CANONICAL",
+    "0.1,10400000,260000000"
+  ],
+  "0xc780beb413dc5cbf23b016ca835af56e7711a060:137": [
+    "0x3c6dad0475d3a1696b359dc04c99fd401be134da",
+    "WRAPPED",
+    "0.1,1056.984128,211396.825665"
+  ],
+  "0xc7e444f9a853ce55e6d775469c8319c0a37aab3f:1": [
+    "0x346d2664fafa7f1723074bf3d0b903a059b42af1",
+    "WRAPPED",
+    "0.1,800,10000"
+  ],
+  "0xc7e444f9a853ce55e6d775469c8319c0a37aab3f:137": [
+    "0x0a240c550ef2bb7d5a9a451e08fed3d94ecca792",
+    "WRAPPED",
+    "0.1,50,10000"
+  ],
+  "0xc7ed9aa2b7d302fd5a68dfbefe5f530f9bd35a06:137": [
+    "0x3750144acd56cc1d3e8dafd8a187ad10d174d462",
+    "CANONICAL",
+    "0.1,10.8,2145"
+  ],
+  "0xc822bb8f72c212f0f9477ab064f3bdf116c193e6:1": [
+    "0x5fe67350e9d2aab2570ff86b48509a18cfd7b08c",
+    "WRAPPED",
+    "0.1,49040.642432,613008.030405"
+  ],
+  "0xc8f531700971fd1da43a52912ea53fc8da3b1b00:1": [
+    "0x73c9275c3a2dd84b5741fd59aebf102c91eb033f",
+    "CANONICAL",
+    "0.1,1.72,42.6"
+  ],
+  "0xc90c592677a58e3af3af0e36635be22b76d92d45:1": [
+    "0xdfed31e640b7280f76f046a97179e5e369d209b5",
+    "WRAPPED",
+    "0.1,9185,114809"
+  ],
+  "0xc94595b56e301f3ffedb8ccc2d672882d623e53a:1": [
+    "0xaf9db9e362e306688af48c4acb9618c06db38ac3",
+    "CANONICAL",
+    "0.1,400,10000"
+  ],
+  "0xc9574679a89f9893e9b1e288ce6aad1c7be60624:250": [
+    "0xc4bb7277a74678f053259cb1f96140347efbfd46",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xc9ad37e9baf41377540df5a77831db98c1915128:43114": [
+    "0x790cfdc6ab2e0ee45a433aac5434f183be1f6a20",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xca3f508b8e4dd382ee878a314789373d80a5190a:128": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xca3f508b8e4dd382ee878a314789373d80a5190a:1285": [
+    "0x173fd7434b8b50df08e3298f173487ebdb35fd14",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xca3f508b8e4dd382ee878a314789373d80a5190a:137": [
+    "0xfbdd194376de19a88118e84e279b977f165d01b8",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xca3f508b8e4dd382ee878a314789373d80a5190a:1666600000": [
+    "0x6ab6d61428fde76768d7b45d8bfeec19c6ef91a8",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xca3f508b8e4dd382ee878a314789373d80a5190a:250": [
+    "0xd6070ae98b8069de6b494332d1a1a81b6179d960",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xca3f508b8e4dd382ee878a314789373d80a5190a:42161": [
+    "0x99c409e5f62e4bd2ac142f17cafb6810b8f0baae",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xca3f508b8e4dd382ee878a314789373d80a5190a:42220": [
+    "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xca3f508b8e4dd382ee878a314789373d80a5190a:43114": [
+    "0xd6070ae98b8069de6b494332d1a1a81b6179d960",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xca6d25c10dad43ae8be0bc2af4d3cd1114583c08:137": [
+    "0x350fa8f62e50f8ac20a840c3dc570ebc5bdffc4c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xca6d25c10dad43ae8be0bc2af4d3cd1114583c08:43114": [
+    "0x4e840aadd28da189b9906674b4afcb77c128d9ea",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xcaf5191fc480f43e4df80106c7695eca56e48b18:1": [
+    "0xafaace7138ab3c2bcb2db4264f8312e1bbb80653",
+    "WRAPPED",
+    "0.1,1706,21322"
+  ],
+  "0xcaf5191fc480f43e4df80106c7695eca56e48b18:250": [
+    "0x8dfdc61c7c7551d0deec950a2822eb59cddb8f59",
+    "WRAPPED",
+    "0.1,107,21322"
+  ],
+  "0xcaf5191fc480f43e4df80106c7695eca56e48b18:43114": [
+    "0xd4d026322c88c2d49942a75dff920fcfbc5614c1",
+    "WRAPPED",
+    "0.1,107,21322"
+  ],
+  "0xcaf5191fc480f43e4df80106c7695eca56e48b18:592": [
+    "0x0999e8267a09d41a5a76605e3d01ae95fafb58f4",
+    "WRAPPED",
+    "0.1,454.337,90867.46"
+  ],
+  "0xcb93bf5c6c1d84a6f8fe163a64a56b9969a23329:321": [
+    "0x667fd83e24ca1d935d36717d305d54fa0cac991c",
+    "WRAPPED",
+    "0.1,1352.115114,270423.022734"
+  ],
+  "0xcc1f1cbf22293cd906f9e7c4419fbbcde9bd8148:137": [
+    "0xedad6876ab29b08e133e4f11d19162738e140734",
+    "WRAPPED",
+    "0.1,226.777,45355.42"
+  ],
+  "0xcc41555e193d56b2b5c07db69418d90dfaf20c08:1": [
+    "0x3b9e3b5c616a1a038fdc190758bbe9bab6c7a857",
+    "WRAPPED",
+    "0.1,267,3334"
+  ],
+  "0xcc41555e193d56b2b5c07db69418d90dfaf20c08:137": [
+    "0x471ea49dd8e60e697f4cac262b5fafcc307506e4",
+    "WRAPPED",
+    "0.1,17,3334"
+  ],
+  "0xcc41555e193d56b2b5c07db69418d90dfaf20c08:250": [
+    "0x27749e79ad796c4251e0a0564aef45235493a0b6",
+    "WRAPPED",
+    "0.1,17,3334"
+  ],
+  "0xcc41555e193d56b2b5c07db69418d90dfaf20c08:43114": [
+    "0x3d8f74620857dd8ed6d0da02ceb13fd0ed8ba678",
+    "WRAPPED",
+    "0.1,17,3334"
+  ],
+  "0xcc658cdfda5244b1be85d5fe9156cde4324ac023:137": [
+    "0x7683f14614a1f68ea71474680e80b9bd93db74d1",
+    "WRAPPED",
+    "0.1,1250,250000"
+  ],
+  "0xcc658cdfda5244b1be85d5fe9156cde4324ac023:2000": [
+    "0x7ea2be2df7ba6e54b1a9c70676f668455e329d29",
+    "WRAPPED",
+    "0.1,1250,250000"
+  ],
+  "0xcc9b1f919282c255eb9ad2c0757e8036165e0cad:128": [
+    "0x7eed8a3ccfe3d507ec4df443773eae792b9ef2d7",
+    "CANONICAL",
+    "0.1,24,240"
+  ],
+  "0xccaa7ad74eaf153b4ab0d327794d0b6734e4d51a:1": [
+    "0xb775feee081bd18cf0244fae8ac641f1bf7704b0",
+    "WRAPPED",
+    "0.1,10612.922825,132661.535318"
+  ],
+  "0xccb24022c573b6c3877bf9eb19716c037b11d9eb:1": [
+    "0xc789f877fbb6aa4457ee5531cceb76da6d3d1e3f",
+    "WRAPPED",
+    "0.1,82.5,1031"
+  ],
+  "0xccb24022c573b6c3877bf9eb19716c037b11d9eb:137": [
+    "0xad0ddb54d79d2de572e25cd9375782aabb440353",
+    "WRAPPED",
+    "0.1,5.2,1031"
+  ],
+  "0xccb24022c573b6c3877bf9eb19716c037b11d9eb:336": [
+    "0x85fd5f8dbd0c9ef1806e6c7d4b787d438621c1dc",
+    "WRAPPED",
+    "0.1,5.2,1031"
+  ],
+  "0xccb24022c573b6c3877bf9eb19716c037b11d9eb:43114": [
+    "0x99f7d752745f270e100233cc05768b4a12bd09f0",
+    "WRAPPED",
+    "0.1,10.5,2080"
+  ],
+  "0xcd0dcfa92b0be5041a58c2bae41a2b51fe9a8a02:1": [
+    "0xbdfa65533074b0b23ebc18c7190be79fa74b30c2",
+    "CANONICAL",
+    "0.1,446,11130"
+  ],
+  "0xcd5d75dbe75449a9021b6c570a41959eb571c751:250": [
+    "0xe84cea9df2d6a6010c0bd74b803f6372534e75e9",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xcd9f28cfb602b9cace776d6b9a86646b662dde7b:1": [
+    "0xb26c4b3ca601136daf98593feaeff9e0ca702a8d",
+    "CANONICAL",
+    "0.1,564,14100"
+  ],
+  "0xcdd28a3033a6dc1472a1403156b426905bf127ba:137": [
+    "0xb0b2ef34d412d73b0ff90a709d1779a20655165a",
+    "WRAPPED",
+    "0.1,4.901961,980.392157"
+  ],
+  "0xcdf2c63d05a62898a6b86850c9d06e0621f9977f:1": [
+    "0xfafa220145dfa5c3ec85b6fa8a75aee2451cde5e",
+    "WRAPPED",
+    "0.1,40,1000"
+  ],
+  "0xcdf2c63d05a62898a6b86850c9d06e0621f9977f:1024": [
+    "0xbbc4a8d076f4b1888fec42581b6fc58d242cf2d5",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xcdf2c63d05a62898a6b86850c9d06e0621f9977f:1030": [
+    "0xc46fedc533e9f14c99c4c5124e2085701fa9b255",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xcdf2c63d05a62898a6b86850c9d06e0621f9977f:1234": [
+    "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xcdf2c63d05a62898a6b86850c9d06e0621f9977f:2000": [
+    "0x332730a4f6e03d9c55829435f10360e13cfa41ff",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xcdf2c63d05a62898a6b86850c9d06e0621f9977f:2002": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xcdf2c63d05a62898a6b86850c9d06e0621f9977f:2109": [
+    "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xcdf2c63d05a62898a6b86850c9d06e0621f9977f:2222": [
+    "0x332730a4f6e03d9c55829435f10360e13cfa41ff",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xcdf2c63d05a62898a6b86850c9d06e0621f9977f:32520": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xcdf2c63d05a62898a6b86850c9d06e0621f9977f:61": [
+    "0xb12c13e66ade1f72f71834f2fc5082db8c091358",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xce1ab3678e56b4a03d14a66c7ee23c055fdaea16:250": [
+    "0x9a1331a6f638cfbdfb263fb7fe4718eabba27e2b",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xce1ab3678e56b4a03d14a66c7ee23c055fdaea16:43114": [
+    "0x46f74778b265df3a15ec9695ccd2fd3869ca848c",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xce3b0d4e4e4285e55c0bfb294112caf19682eb8a:137": [
+    "0x8d43b5c7e3d7577bbf75b70c3880b99164a23634",
+    "CANONICAL",
+    "0.1,1300,260000"
+  ],
+  "0xce57283ce0e7446364e0bc479b5de5d74b5e0ffc:1": [
+    "0x02f2d4a04e6e01ace88bd2cd632875543b2ef577",
+    "CANONICAL",
+    "0.1,2264000,56600000"
+  ],
+  "0xcf0e74d4256d3ea96dd294ff194a1915595e74d6:250": [
+    "0x4f851750a3e6f80f1e1f89c67b56960bfc29a934",
+    "WRAPPED",
+    "0.1,2.58,515.46"
+  ],
+  "0xcf0e74d4256d3ea96dd294ff194a1915595e74d6:43114": [
+    "0x62aceea3e666c5706ce1c61055fac1a669d31d93",
+    "WRAPPED",
+    "0.1,2.58,515.46"
+  ],
+  "0xcf21f436e86a978863aca38e845f00af61c5ad09:1": [
+    "0x8c77057c3343b7dcc97ca21da274730396162a98",
+    "WRAPPED",
+    "0.1,4913401302.051,61417516275.64"
+  ],
+  "0xcf21f436e86a978863aca38e845f00af61c5ad09:25": [
+    "0xe6bf0e14e33a469f2b0640b53949a9f90e675135",
+    "WRAPPED",
+    "0.1,1038853106.170787,207770621234.15749"
+  ],
+  "0xcf3ddd04360811187bdc158dcc622d817384fe9f:1": [
+    "0x411f3e09c66b30e7facfec45cd823b2e19dfad2d",
+    "WRAPPED",
+    "0.1,363,4531"
+  ],
+  "0xcf3ddd04360811187bdc158dcc622d817384fe9f:25": [
+    "0x7d3b448c1242b563c65e8dafcc13557c3069b5b6",
+    "WRAPPED",
+    "0.1,64.519459,12903.891814"
+  ],
+  "0xcf3ddd04360811187bdc158dcc622d817384fe9f:250": [
+    "0x667c856f1a624baefe89fc4909c8701296c86c98",
+    "WRAPPED",
+    "0.1,23,4531"
+  ],
+  "0xcf799767d366d789e8b446981c2d578e241fa25c:1": [
+    "0xcf799767d366d789e8b446981c2d578e241fa25c",
+    "WRAPPED",
+    "0.1,40,1000"
+  ],
+  "0xcf799767d366d789e8b446981c2d578e241fa25c:10": [
+    "0xc22885e06cd8507c5c74a948c59af853aed1ea5c",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xcf799767d366d789e8b446981c2d578e241fa25c:199": [
+    "0xcf799767d366d789e8b446981c2d578e241fa25c",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xcf799767d366d789e8b446981c2d578e241fa25c:250": [
+    "0xcf799767d366d789e8b446981c2d578e241fa25c",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xcf799767d366d789e8b446981c2d578e241fa25c:42161": [
+    "0xc22885e06cd8507c5c74a948c59af853aed1ea5c",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xcf799767d366d789e8b446981c2d578e241fa25c:43114": [
+    "0xcf799767d366d789e8b446981c2d578e241fa25c",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xcf87d3d50a98a7832f5cfdf99ae1b88c7cfba4a7:1": [
+    "0x90f615bb7b2def7bd14c507f90ff42b6acacf86e",
+    "WRAPPED",
+    "0.1,18.5,231"
+  ],
+  "0xcf87d3d50a98a7832f5cfdf99ae1b88c7cfba4a7:1088": [
+    "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+    "WRAPPED",
+    "0.1,2.6,520.83"
+  ],
+  "0xcf87d3d50a98a7832f5cfdf99ae1b88c7cfba4a7:128": [
+    "0x7d3b448c1242b563c65e8dafcc13557c3069b5b6",
+    "WRAPPED",
+    "0.1,107.147855,21429.570965"
+  ],
+  "0xcf87d3d50a98a7832f5cfdf99ae1b88c7cfba4a7:137": [
+    "0x3c08cdc102fd746d06f85d3ea348ba6102c43f32",
+    "WRAPPED",
+    "0.1,2.21,442.48"
+  ],
+  "0xcf87d3d50a98a7832f5cfdf99ae1b88c7cfba4a7:250": [
+    "0x75e0eb8e6d92ab832bb11e46c041d06a89ac5f0d",
+    "WRAPPED",
+    "0.1,1.3,231"
+  ],
+  "0xcf87d3d50a98a7832f5cfdf99ae1b88c7cfba4a7:321": [
+    "0x965f84d915a9efa2dd81b653e3ae736555d945f4",
+    "WRAPPED",
+    "0.1,107.147855,21429.570965"
+  ],
+  "0xcf87d3d50a98a7832f5cfdf99ae1b88c7cfba4a7:43114": [
+    "0xd7783a275e53fc6746dedfbad4a06059937502a4",
+    "WRAPPED",
+    "0.1,1.3,231"
+  ],
+  "0xcfb24d3c3767364391340a2e6d99c64f1cbd7a3d:1": [
+    "0x6149c26cd2f7b5ccdb32029af817123f6e37df5b",
+    "CANONICAL",
+    "0.1,35,880"
+  ],
+  "0xd0660cd418a64a1d44e9214ad8e459324d8157f1:1": [
+    "0xd0660cd418a64a1d44e9214ad8e459324d8157f1",
+    "CANONICAL",
+    "0.1,2224,55600"
+  ],
+  "0xd0975664b2c276520722560ef7bda3e6ad4a734b:137": [
+    "0x96b14e64b53b9950d2a4d2292f8dc7d51a4f467a",
+    "WRAPPED",
+    "0.1,507,101265"
+  ],
+  "0xd0c5bad763432f22ebf21da947395d8fc2d11145:137": [
+    "0x783fbedf704e45a4ed0d7e3ae85be8c376ecba1c",
+    "WRAPPED",
+    "0.1,38.62,7724.1"
+  ],
+  "0xd0c5bad763432f22ebf21da947395d8fc2d11145:57": [
+    "0x6b7a87899490ece95443e979ca9485cbe7e71522",
+    "WRAPPED",
+    "0.1,38.62,7724.1"
+  ],
+  "0xd10332818d6a9b4b84bf5d87dbf9d80012fdf913:137": [
+    "0xe7f04e0fbde4b16feb4a67747133f251e4dbccd7",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xd1102332a213e21faf78b69c03572031f3552c33:1": [
+    "0xfbdd194376de19a88118e84e279b977f165d01b8",
+    "WRAPPED",
+    "0.1,80,4000"
+  ],
+  "0xd1102332a213e21faf78b69c03572031f3552c33:137": [
+    "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xd1102332a213e21faf78b69c03572031f3552c33:250": [
+    "0x4792c1ecb969b036eb51330c63bd27899a13d84e",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xd12e907be12e7bc2b33ae1db65e31117c9ba8f99:XRP": [
+    "els/rhxuearynnjhbdeubh5w8yph5uwnvh5zag",
+    "WRAPPED",
+    "0.1,373,74470"
+  ],
+  "0xd185c16756873b907df064bd7b4815839de4e6b9:1": [
+    "0x9ed8e7c9604790f7ec589f99b94361d8aab64e5e",
+    "CANONICAL",
+    "0.1,3324,83100"
+  ],
+  "0xd20738760aededa73f6cd91a3d357746e0283a0e:1": [
+    "0xf604d1e51122592e0babe63ac334c0e647222f2d",
+    "CANONICAL",
+    "0.1,7922,198020"
+  ],
+  "0xd2435625c901dc9b4f76d4af3d8e1d353aa7c428:43114": [
+    "0x68f7a9e795c7074f2d0e698101d5c3fea7aa0acb",
+    "WRAPPED",
+    "0.1,5.421817,1084.363479"
+  ],
+  "0xd2435625c901dc9b4f76d4af3d8e1d353aa7c428:592": [
+    "0xf27ee99622c3c9b264583dacb2cce056e194494f",
+    "WRAPPED",
+    "0.1,5.303245,1060.648969"
+  ],
+  "0xd31228d81b2b295e18ea1ad4cd4e25da0afe1e4c:1": [
+    "0xa1ae26219565370fcfea073249309d117d805c39",
+    "WRAPPED",
+    "0.1,5180.994,64762.43"
+  ],
+  "0xd35b831d5759844ad275a443085fecd615fea43c:137": [
+    "0x5a6cd2dffc9fee60b832a832fd39867e7d03b0c9",
+    "WRAPPED",
+    "0.1,8747819.605963,1749563921.192643"
+  ],
+  "0xd35b831d5759844ad275a443085fecd615fea43c:43114": [
+    "0xd8438cd9d6f5297679030cc36f3df82e68ad1070",
+    "WRAPPED",
+    "0.1,3311258.278,662251655.63"
+  ],
+  "0xd35b831d5759844ad275a443085fecd615fea43c:4689": [
+    "0x99c409e5f62e4bd2ac142f17cafb6810b8f0baae",
+    "WRAPPED",
+    "0.1,3311258.278,662251655.63"
+  ],
+  "0xd35b831d5759844ad275a443085fecd615fea43c:9001": [
+    "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+    "WRAPPED",
+    "0.1,6265083.187775,1253016637.554913"
+  ],
+  "0xd3a33b8222ba7b25a0ea2a6ddcda237c154046af:1": [
+    "0xb01371072fdcb9b4433b855e16a682b461f94ab3",
+    "WRAPPED",
+    "0.1,53.5,666"
+  ],
+  "0xd3a33b8222ba7b25a0ea2a6ddcda237c154046af:1030": [
+    "0xd7c295e399ca928a3a14b01d760e794f1adf8990",
+    "WRAPPED",
+    "0.1,2.4,481"
+  ],
+  "0xd3a33b8222ba7b25a0ea2a6ddcda237c154046af:1284": [
+    "0xc19281f22a075e0f10351cd5d6ea9f0ac63d4327",
+    "WRAPPED",
+    "0.1,2.4,481"
+  ],
+  "0xd3a33b8222ba7b25a0ea2a6ddcda237c154046af:1666600000": [
+    "0x735abe48e8782948a37c7765ecb76b98cde97b0f",
+    "WRAPPED",
+    "0.1,1.7,340"
+  ],
+  "0xd3a33b8222ba7b25a0ea2a6ddcda237c154046af:2001": [
+    "0x332730a4f6e03d9c55829435f10360e13cfa41ff",
+    "WRAPPED",
+    "0.1,2.4,481"
+  ],
+  "0xd3a33b8222ba7b25a0ea2a6ddcda237c154046af:25": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,25.306333,5061.266633"
+  ],
+  "0xd3a33b8222ba7b25a0ea2a6ddcda237c154046af:250": [
+    "0x6362496bef53458b20548a35a2101214ee2be3e0",
+    "WRAPPED",
+    "0.1,1.7,340"
+  ],
+  "0xd3a33b8222ba7b25a0ea2a6ddcda237c154046af:288": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0.1,1.7,340"
+  ],
+  "0xd3a33b8222ba7b25a0ea2a6ddcda237c154046af:40": [
+    "0xc1be9a4d5d45beeacae296a7bd5fadbfc14602c4",
+    "WRAPPED",
+    "0.1,1.7,340"
+  ],
+  "0xd3a33b8222ba7b25a0ea2a6ddcda237c154046af:42220": [
+    "0x218c3c3d49d0e7b37aff0d8bb079de36ae61a4c0",
+    "WRAPPED",
+    "0.1,1.7,340"
+  ],
+  "0xd3b71117e6c1558c1553305b44988cd944e97300:1": [
+    "0x7815bda662050d84718b988735218cffd32f75ea",
+    "CANONICAL",
+    "0.1,800,200000"
+  ],
+  "0xd41ed5867f6b82ca64d8cb3eeba9315891c0b7c9:1": [
+    "0xde58658a05a8ce87bb8ab96a05a4c4544938e28f",
+    "WRAPPED",
+    "0.1,111.11,1388.89"
+  ],
+  "0xd41ed5867f6b82ca64d8cb3eeba9315891c0b7c9:137": [
+    "0x3cb1967b36c318510cc06ab901b428a166bb6dda",
+    "WRAPPED",
+    "0.1,6.94,1388.89"
+  ],
+  "0xd451051d7d9f0b154ed25211094ec74036f49923:1": [
+    "0x3b79a28264fc52c7b4cea90558aa0b162f7faf57",
+    "WRAPPED",
+    "0.1,0.00056,0.015"
+  ],
+  "0xd451051d7d9f0b154ed25211094ec74036f49923:250": [
+    "0xddc0385169797937066bbd8ef409b5b3c0dfeb52",
+    "WRAPPED",
+    "0.1,0.000075,0.015"
+  ],
+  "0xd451051d7d9f0b154ed25211094ec74036f49923:42161": [
+    "0xecf2adaff1de8a512f6e8bfe67a2c836edb25da3",
+    "WRAPPED",
+    "0.1,0.00015,0.015"
+  ],
+  "0xd451051d7d9f0b154ed25211094ec74036f49923:43114": [
+    "0x4551fa2b6625d06179d30c30eedddc05c46d3f20",
+    "WRAPPED",
+    "0.1,0.000075,0.015"
+  ],
+  "0xd4fbc57b6233f268e7fba3b66e62719d74deecbc:1": [
+    "0xea1ea0972fa092dd463f2968f9bb51cc4c981d71",
+    "CANONICAL",
+    "0.1,50,1250"
+  ],
+  "0xd6403c6318a87bc7dd5ba242e120f3ca878df98f:128": [
+    "0x0b32357430fe98c24b2b245b815af68bc9ecfdad",
+    "WRAPPED",
+    "0.1,1084.01554,216803.108089"
+  ],
+  "0xd675ff2b0ff139e14f86d87b7a6049ca7c66d76e:1666600000": [
+    "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xd67de0e0a0fd7b15dc8348bb9be742f3c5850454:1": [
+    "0x66d28cb58487a7609877550e1a34691810a6b9fc",
+    "CANONICAL",
+    "0.1,464,11600"
+  ],
+  "0xd68f75b3aa54bee23e6ac3ad4b3c28d3e6319725:250": [
+    "0xcea59dce6a6d73a24e6d6944cfabc330814c098a",
+    "WRAPPED",
+    "0.1,15.455,3091.11"
+  ],
+  "0xd68f75b3aa54bee23e6ac3ad4b3c28d3e6319725:43114": [
+    "0xf7554d17d1c3f09899dcc8b404becae6dfa584fa",
+    "WRAPPED",
+    "0.1,15.455,3091.11"
+  ],
+  "0xd6cce248263ea1e2b8cb765178c944fc16ed0727:1": [
+    "0x923b83c26b3809d960ff80332ed00aa46d7ed375",
+    "CANONICAL",
+    "0.1,580,14500"
+  ],
+  "0xd6e6513f1c449fbaf3b527456a3f7ecc729b63cd:1": [
+    "0x77c62e549ca46ef8dd5edc052b1edc783f60a400",
+    "WRAPPED",
+    "0.1,1471.21,36780.2"
+  ],
+  "0xd6e6513f1c449fbaf3b527456a3f7ecc729b63cd:137": [
+    "0x3bd9856bf578910b55261d45d9148d61c177b092",
+    "WRAPPED",
+    "0.1,183.9,36780.2"
+  ],
+  "0xd7008fe6577a8c4c4c995359e157480e36b8c710:1": [
+    "0xcea59dce6a6d73a24e6d6944cfabc330814c098a",
+    "WRAPPED",
+    "0.1,5223.797,65297.46"
+  ],
+  "0xd714d91a169127e11d8fab3665d72e8b7ef9dbe2:1": [
+    "0xd714d91a169127e11d8fab3665d72e8b7ef9dbe2",
+    "CANONICAL",
+    "0.1,2340,58500"
+  ],
+  "0xd73f32833b6d5d9c8070c23e599e283a3039823c:43114": [
+    "0x873801ae2ff12d816db9a7b082f5796bec64c82c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xd8485513dd9947aa3287d90fd3804d3df52d0da1:250": [
+    "0x986a4ea3679afe15b5963a6ec3437be859279bc1",
+    "WRAPPED",
+    "0.1,500,100000"
+  ],
+  "0xd875b938fae59b5d04f1acd85446ba2edf336493:2000": [
+    "0x22648c12acd87912ea1710357b1302c6a4154ebc",
+    "WRAPPED",
+    "0.1,500,100000"
+  ],
+  "0xd875b938fae59b5d04f1acd85446ba2edf336493:321": [
+    "0x3d632d9e1a60a0880dd45e61f279d919b5748377",
+    "WRAPPED",
+    "0.1,500,100000"
+  ],
+  "0xd88ca08d8eec1e9e09562213ae83a7853ebb5d28:137": [
+    "0x6cd6cb131764c704ba9167c29930fbdc38901ab7",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xd8a1734945b9ba38eb19a291b475e31f49e59877:1": [
+    "0xbebdab6da046bc49ffbb61fbd7b33157eb270d05",
+    "CANONICAL",
+    "0.1,860,21500"
+  ],
+  "0xd8dbc29c651e0571d8c1e1b5f9c1d68d5fa4d752:137": [
+    "0x3984fac1bd61fc62c5d5797205dd1679da6437f0",
+    "WRAPPED",
+    "0.1,2.63,526.32"
+  ],
+  "0xd8f895704f4e561bcda39a3ea9c98bc3f1ff5a15:7363": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,0.02,3.6"
+  ],
+  "0xd91b043ccf991d9ef4aa912554cf3fd8833e73fc:1": [
+    "0x8f8221afbb33998d8584a2b05749ba73c37a938a",
+    "CANONICAL",
+    "0.1,276,6866"
+  ],
+  "0xd95f99d6e5527eeb35eba9e024900ee7f8eaeafc:1": [
+    "0x3bd2dfd03bc7c3011ed7fb8c4d0949b382726cee",
+    "WRAPPED",
+    "0.1,60.2,1102"
+  ],
+  "0xd95f99d6e5527eeb35eba9e024900ee7f8eaeafc:137": [
+    "0xbccff1c6c1ca650f533d3dcc5f4722aae6718337",
+    "WRAPPED",
+    "0.1,5.6,1102"
+  ],
+  "0xd95f99d6e5527eeb35eba9e024900ee7f8eaeafc:250": [
+    "0x6474239b1a83ceb3789cd8ddb2218e6f5c6840dd",
+    "WRAPPED",
+    "0.1,11.62,2324.05"
+  ],
+  "0xd98274562eb6e18f9deecff23e8164ff83861a6d:250": [
+    "0x5cc61a78f164885776aa610fb0fe1257df78e59b",
+    "CANONICAL",
+    "0.1,47.2,9445"
+  ],
+  "0xd9e8d20bde081600fac0d94b88eafaddce55aa43:1": [
+    "0x9196e18bc349b1f64bc08784eae259525329a1ad",
+    "CANONICAL",
+    "0.1,1280000,32000000"
+  ],
+  "0xd9ea58350bf120e2169a35fa1afc31975b07de01:1": [
+    "0xd9b312d77bc7bed9b9cecb56636300bed4fe5ce9",
+    "CANONICAL",
+    "0.1,170,4250"
+  ],
+  "0xda00b89ea3d2d0b022c663793b3d47d5b02ec627:250": [
+    "0x7dd7eaf5872e260f35dc60a54e0f25193128c765",
+    "WRAPPED",
+    "0.1,4.67,934.58"
+  ],
+  "0xda00b89ea3d2d0b022c663793b3d47d5b02ec627:43114": [
+    "0xbaa75208d0ec8dde89c036dd71e897c8df903f11",
+    "WRAPPED",
+    "0.1,5.63,1125.31"
+  ],
+  "0xda830e0d109e29c8460aa4e4512a181030cec521:43114": [
+    "0x5126f540a90b43eb3c20fc5d734ecc749f2aadc7",
+    "WRAPPED",
+    "0.1,0.209908,41.981528"
+  ],
+  "0xda8929a6338f408cc78c1845fb4f71bffd2cfcfb:1": [
+    "0xba6b0dbb2ba8daa8f5d6817946393aef8d3a4487",
+    "CANONICAL",
+    "0.1,12,290"
+  ],
+  "0xdae0e692805350d738202e0a7d8136da3e9078d9:25": [
+    "0x0dcb0cb0120d355cde1ce56040be57add0185baa",
+    "WRAPPED",
+    "0.1,0.029861,5.972288"
+  ],
+  "0xdae6c2a48bfaa66b43815c5548b10800919c993e:1": [
+    "0x491e136ff7ff03e6ab097e54734697bb5802fc1c",
+    "CANONICAL",
+    "0.1,14.8,370"
+  ],
+  "0xdb0ee671b52a866df968ee0913e906bfb743a6d5:137": [
+    "0x64afdf9e28946419e325d801fb3053d8b8ffdc23",
+    "CANONICAL",
+    "0.1,4.1,814"
+  ],
+  "0xdc37fa1507c7697c0778d3a7d61b31dce7cbba70:1": [
+    "0x58a547ed09684ac2a688610d5caf8e8968b51908",
+    "WRAPPED",
+    "0.1,2560,33227"
+  ],
+  "0xdc37fa1507c7697c0778d3a7d61b31dce7cbba70:137": [
+    "0x4f851750a3e6f80f1e1f89c67b56960bfc29a934",
+    "WRAPPED",
+    "0.1,167,33227"
+  ],
+  "0xdc42728b0ea910349ed3c6e1c9dc06b5fb591f98:1": [
+    "0x5adc961d6ac3f7062d2ea45fefb8d8167d44b190",
+    "CANONICAL",
+    "0.1,8620,215500"
+  ],
+  "0xdd03dbed9abdb125f1bdd465caadbefdff4f7524:1": [
+    "0x4f60a160d8c2dddaafe16fcc57566db84d674bd6",
+    "WRAPPED",
+    "0.1,80,1000"
+  ],
+  "0xdd03dbed9abdb125f1bdd465caadbefdff4f7524:10": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xdd03dbed9abdb125f1bdd465caadbefdff4f7524:1284": [
+    "0x1ccca1ce62c62f7be95d4a67722a8fdbed6eecb4",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xdd03dbed9abdb125f1bdd465caadbefdff4f7524:137": [
+    "0xfe952465773be3802eac343c89ad351c77c00ab1",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xdd03dbed9abdb125f1bdd465caadbefdff4f7524:250": [
+    "0xbdba76fa2659c33ffcc2b0bc134c3a2c8a3aa94d",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xdd03dbed9abdb125f1bdd465caadbefdff4f7524:288": [
+    "0x0dcb0cb0120d355cde1ce56040be57add0185baa",
+    "WRAPPED",
+    "0.1,10,1000"
+  ],
+  "0xdd03dbed9abdb125f1bdd465caadbefdff4f7524:42161": [
+    "0x667fd83e24ca1d935d36717d305d54fa0cac991c",
+    "WRAPPED",
+    "0.1,10,1000"
+  ],
+  "0xde69c05e8121ef0db29c3d9ceceda6ef6b606d0c:1": [
+    "0x4eed0fa8de12d5a86517f214c2f11586ba2ed88d",
+    "CANONICAL",
+    "0.1,28572,714286"
+  ],
+  "0xdebb1d6a2196f2335ad51fbde7ca587205889360:1": [
+    "0x0615dbba33fe61a31c7ed131bda6655ed76748b1",
+    "WRAPPED",
+    "0.01,0.004,0.8224"
+  ],
+  "0xdebb1d6a2196f2335ad51fbde7ca587205889360:10": [
+    "0x965f84d915a9efa2dd81b653e3ae736555d945f4",
+    "WRAPPED",
+    "0.1,0.000156,0.000156"
+  ],
+  "0xdebb1d6a2196f2335ad51fbde7ca587205889360:128": [
+    "0x6b7a87899490ece95443e979ca9485cbe7e71522",
+    "WRAPPED",
+    "0.1,0.000156,0.000156"
+  ],
+  "0xdebb1d6a2196f2335ad51fbde7ca587205889360:137": [
+    "0xbd83010eb60f12112908774998f65761cf9f6f9a",
+    "WRAPPED",
+    "0.01,0.000156,0.822368"
+  ],
+  "0xdebb1d6a2196f2335ad51fbde7ca587205889360:25": [
+    "0xecf2adaff1de8a512f6e8bfe67a2c836edb25da3",
+    "WRAPPED",
+    "0.1,0.000156,0.000156"
+  ],
+  "0xdebb1d6a2196f2335ad51fbde7ca587205889360:250": [
+    "0xbdc8fd437c489ca3c6da3b5a336d11532a532303",
+    "WRAPPED",
+    "0.1,0.000156,0.000156"
+  ],
+  "0xdebb1d6a2196f2335ad51fbde7ca587205889360:321": [
+    "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a",
+    "WRAPPED",
+    "0.1,0.000156,0.000156"
+  ],
+  "0xdebb1d6a2196f2335ad51fbde7ca587205889360:42161": [
+    "0x1dd9e9e142f3f84d90af1a9f2cb617c7e08420a4",
+    "WRAPPED",
+    "0.1,0.000156,0.000156"
+  ],
+  "0xdebb1d6a2196f2335ad51fbde7ca587205889360:43114": [
+    "0x7d09a42045359aa85488bc07d0ada83e22d50017",
+    "WRAPPED",
+    "0.01,0.000156,0.822368"
+  ],
+  "0xdebb1d6a2196f2335ad51fbde7ca587205889360:66": [
+    "0x6f058086d91a181007c2325e5b285425ca84d615",
+    "WRAPPED",
+    "0.1,0.000156,0.000156"
+  ],
+  "0xded6a27debe293d373bc4bfed4ae8d70fbc80001:1": [
+    "0x3e780920601d61cedb860fe9c4a90c9ea6a35e78",
+    "CANONICAL",
+    "0.1,9.6,240"
+  ],
+  "0xdef06a9048a753efc1d614519632a2e031ce2ce7:1030": [
+    "0x173fd7434b8b50df08e3298f173487ebdb35fd14",
+    "WRAPPED",
+    "0.1,166.666,33333.33"
+  ],
+  "0xe0286c89c626d11c7a1ea9f5ac2620e31cc80618:42220": [
+    "0x94140c2ea9d208d8476ca4e3045254169791c59e",
+    "CANONICAL",
+    "0.1,1842,368360"
+  ],
+  "0xe069af87450fb51fc0d0e044617f1c134163e591:1": [
+    "0x5eeaa2dcb23056f4e8654a349e57ebe5e76b5e6e",
+    "CANONICAL",
+    "0.1,174.8,4370"
+  ],
+  "0xe06d45e4524b3191f69a01808f911555d8771341:43114": [
+    "0x61b31f8d9d8bd303891ec4030b1206cab9488c95",
+    "WRAPPED",
+    "0.1,8750000,1750000000"
+  ],
+  "0xe1168753035cfb5bf8841bef92355c583e5b704b:1": [
+    "0xafb2780cbb58b2af27023eb2a0e60c8ca0eee9bb",
+    "WRAPPED",
+    "0.1,102,1273"
+  ],
+  "0xe1168753035cfb5bf8841bef92355c583e5b704b:137": [
+    "0x1b41a1ba7722e6431b1a782327dbe466fe1ee9f9",
+    "WRAPPED",
+    "0.1,6.4,1273"
+  ],
+  "0xe17915332d853093af2a35b0f7acb3dea8734f0d:1": [
+    "0xcc081220542a60a8ea7963c4f53d522b503272c1",
+    "WRAPPED",
+    "0.1,2.978,37.23"
+  ],
+  "0xe17915332d853093af2a35b0f7acb3dea8734f0d:137": [
+    "0x100432c8c862b42a2b93d784e7ebe5a61e4acfaa",
+    "WRAPPED",
+    "0.1,0.186,37.23"
+  ],
+  "0xe1e66e037dc20247c2fabda5ec89c911e68724e7:1": [
+    "0xf1f5de69c9c8d9be8a7b01773cc1166d4ec6ede2",
+    "CANONICAL",
+    "0.1,142,3550"
+  ],
+  "0xe2476ec3a5954e717a1ed3b35296011af07da71a:137": [
+    "0xd6cce248263ea1e2b8cb765178c944fc16ed0727",
+    "WRAPPED",
+    "0.1,100.19,20038.35"
+  ],
+  "0xe251f9bc3e1ccb247847d3af28c4fa9b9c180a47:1": [
+    "0x270371c58d9d775ed73971dd414656107384f235",
+    "CANONICAL",
+    "0.1,39400,985000"
+  ],
+  "0xe25d77fedeeda321006bea62727cc3b67882b14e:1": [
+    "0xd7d8f3b8bc8bc48d3acc37879eaba7b85889fa52",
+    "CANONICAL",
+    "0.1,1334,33334"
+  ],
+  "0xe29f15d5efc30eb5e229538dc5aff2d751494c37:25": [
+    "0xbfc044a234e45412ecfec2cd6aae2dd0c083a7cd",
+    "WRAPPED",
+    "0.1,7142.857,1428571.43"
+  ],
+  "0xe29f15d5efc30eb5e229538dc5aff2d751494c37:250": [
+    "0xbe08caee66d2c1dff3ff79b89aa05d647b51d219",
+    "WRAPPED",
+    "0.1,7142.857,1428571.43"
+  ],
+  "0xe2be59436da627be05a4ea6ccf4a4ebdcbb24d84:1": [
+    "0xf7fbaa0328c5faee1a0b2155065804f4077284e1",
+    "WRAPPED",
+    "0.1,4299919376.51169,53748992206.39613"
+  ],
+  "0xe2be59436da627be05a4ea6ccf4a4ebdcbb24d84:1234": [
+    "0xbbc4a8d076f4b1888fec42581b6fc58d242cf2d5",
+    "WRAPPED",
+    "0.1,268744961.031981,53748992206.39613"
+  ],
+  "0xe2f28d24a2c6a69de859dfdefe347c9b25ad6aa2:250": [
+    "0x31a37aedc0c18aa139e120e1cdc673bbb2063e6f",
+    "CANONICAL",
+    "0.1,16,3180"
+  ],
+  "0xe336a772532650bc82828e9620dd0d5a3b78bfe8:1": [
+    "0x19f36bbb75cfb2969486d46a95e37c74a90c7cbb",
+    "WRAPPED",
+    "0.1,569.411,7117.64"
+  ],
+  "0xe3f1d843dde0748fa370879536cb6877a7ff9db3:1": [
+    "0x9fb83c0635de2e815fd1c21b3a292277540c2e8d",
+    "WRAPPED",
+    "0.1,49013.601,612670.01"
+  ],
+  "0xe3f1d843dde0748fa370879536cb6877a7ff9db3:137": [
+    "0xe6b9d092223f39013656702a40dbe6b7decc5746",
+    "WRAPPED",
+    "0.1,3063.35,612670.01"
+  ],
+  "0xe3f1d843dde0748fa370879536cb6877a7ff9db3:43114": [
+    "0x73178fceb736a9d6c1a9ef1fe413f09cba2d4a68",
+    "WRAPPED",
+    "0.1,3063.35,612670.01"
+  ],
+  "0xe408849d21646a42fd5e36cc520b26e7cdd62370:1": [
+    "0x7d09a42045359aa85488bc07d0ada83e22d50017",
+    "WRAPPED",
+    "0.1,173,2200"
+  ],
+  "0xe408849d21646a42fd5e36cc520b26e7cdd62370:137": [
+    "0xbf05279f9bf1ce69bbfed670813b7e431142afa4",
+    "WRAPPED",
+    "0.1,10,2000"
+  ],
+  "0xe409679a90aba847922682798757c8be8dc54c15:1": [
+    "0xde16ce60804a881e9f8c4ebb3824646edecd478d",
+    "WRAPPED",
+    "0.1,22966.792888,287084.911104"
+  ],
+  "0xe409679a90aba847922682798757c8be8dc54c15:250": [
+    "0xe705af5f63fcabdcdf5016aa838eaaac35d12890",
+    "WRAPPED",
+    "0.1,834,166667"
+  ],
+  "0xe44108ca708a5016131f5fe82581e789cb4eaf96:1": [
+    "0xef5ce7411b389e004a73b37acfc51a8218322a6c",
+    "WRAPPED",
+    "0.1,1023.1,25577.61"
+  ],
+  "0xe44108ca708a5016131f5fe82581e789cb4eaf96:1285": [
+    "0xd1a891e6eccb7471ebd6bc352f57150d4365db21",
+    "WRAPPED",
+    "0.1,127.888,25577.61"
+  ],
+  "0xe44108ca708a5016131f5fe82581e789cb4eaf96:137": [
+    "0x0664e6b2f836f5d8805dcca8dfd848cbd7eeac99",
+    "WRAPPED",
+    "0.1,127.888,25577.61"
+  ],
+  "0xe529797535426a042a79aa555334f444565d118e:1": [
+    "0xd9a807e9d2f61b0098b4c3f79b2dfb9bc2e181ae",
+    "WRAPPED",
+    "0.1,0.186,2.33"
+  ],
+  "0xe529797535426a042a79aa555334f444565d118e:137": [
+    "0x3350289891543865f8bb41ee747f31ce5d5e3739",
+    "WRAPPED",
+    "0.1,0.012,2.33"
+  ],
+  "0xe529797535426a042a79aa555334f444565d118e:43114": [
+    "0x3b9e3b5c616a1a038fdc190758bbe9bab6c7a857",
+    "WRAPPED",
+    "0.1,0.01,2.85"
+  ],
+  "0xe5b834d5086564de95ec6ce390605186a7732439:1": [
+    "0xa6e822e865fbe37d6ebc6d721947afbbd9f95c19",
+    "WRAPPED",
+    "0.1,8996,112440"
+  ],
+  "0xe5cf1558a1470cb5c166c2e8651ed0f3c5fb8f42:1": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0.1,300,30000"
+  ],
+  "0xe600b5960b002d5f7c8d7e7ee182065ced999ecb:1": [
+    "0x3bd9856bf578910b55261d45d9148d61c177b092",
+    "WRAPPED",
+    "0.1,4000,50000"
+  ],
+  "0xe600b5960b002d5f7c8d7e7ee182065ced999ecb:66": [
+    "0x3907e6ff436e2b2b05d6b929fb05f14c0ee18d90",
+    "WRAPPED",
+    "0.1,2832.732794,566546.558796"
+  ],
+  "0xe60988bfb3c4669fca76fc466d6cffafe11d2b6e:1": [
+    "0x57e8283743b169855248c1de250b921336096677",
+    "WRAPPED",
+    "0.1,120553,1506910"
+  ],
+  "0xe6358c1d7a91915abba46d9855bd6418898fc091:1": [
+    "0xd26114cd6ee289accf82350c8d8487fedb8a0c07",
+    "CANONICAL",
+    "0.1,5.3,67"
+  ],
+  "0xe6b9d092223f39013656702a40dbe6b7decc5746:137": [
+    "0x87f654c4b347230c60cad8d7ea9cf0d7238bcc79",
+    "CANONICAL",
+    "0.1,130,26000"
+  ],
+  "0xe6bf0e14e33a469f2b0640b53949a9f90e675135:1": [
+    "0x2c2f7e7c5604d162d75641256b80f1bf6f4dc796",
+    "CANONICAL",
+    "0.1,1060,26500"
+  ],
+  "0xe6de9f70d5a4ec9da52ce35f449794eba826de72:1": [
+    "0x16aba2d28329620f31d44748ec82fa08daa50b86",
+    "WRAPPED",
+    "0.1,20043,250530"
+  ],
+  "0xe6de9f70d5a4ec9da52ce35f449794eba826de72:66": [
+    "0x7ae97042a4a0eb4d1eb370c34bfec71042a056b7",
+    "WRAPPED",
+    "0.1,21819.76871,4363953.74209"
+  ],
+  "0xe77b2e0347cc910d7ad9dc1a8f97108c825cf81f:1": [
+    "0x015cea338ce68bd912b3c704620c6000ee9f4ab9",
+    "WRAPPED",
+    "0.1,5500000,68000000"
+  ],
+  "0xe77b2e0347cc910d7ad9dc1a8f97108c825cf81f:137": [
+    "0x67009471a7eb7095ef3ce6a7b70ff4434205768c",
+    "WRAPPED",
+    "0.1,11152648.530973,2230529706.194627"
+  ],
+  "0xe7b91602ce96a537cb729f484b8ddb3c1fecbb45:1": [
+    "0xac51066d7bec65dc4589368da368b212745d63e8",
+    "CANONICAL",
+    "0.1,6.8,170"
+  ],
+  "0xe7c9c6bc87b86f9e5b57072f907ee6460b593924:1": [
+    "0x1c9922314ed1415c95b9fd453c3818fd41867d0b",
+    "CANONICAL",
+    "0.1,1640,41000"
+  ],
+  "0xe7f04e0fbde4b16feb4a67747133f251e4dbccd7:128": [
+    "0xe5944b50df84001a36c7de0d5cb4da7ab21407d2",
+    "CANONICAL",
+    "0.1,20.4,4070"
+  ],
+  "0xe821ff93acd958d8ef637ff9627217d28a5b6845:250": [
+    "0x546d10c1378febef063b72ae4865496ad801c386",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xe8647ea19496e87c061bbad79f457928b2f52b5a:1": [
+    "0xd0cd466b34a24fcb2f87676278af2005ca8a78c4",
+    "CANONICAL",
+    "0.1,31,776"
+  ],
+  "0xe91a8d2c584ca93c7405f15c22cdfe53c29896e3:1": [
+    "0x47736ccbab8117d09540e4e56db4089a328ff7a1",
+    "WRAPPED",
+    "0.1,351.97,4399.68"
+  ],
+  "0xe91a8d2c584ca93c7405f15c22cdfe53c29896e3:321": [
+    "0x7ea2be2df7ba6e54b1a9c70676f668455e329d29",
+    "WRAPPED",
+    "0.1,22,4399.68"
+  ],
+  "0xe95fd76cf16008c12ff3b3a937cb16cd9cc20284:1": [
+    "0x04e0af0af1b7f0023c6b12af5a94df59b0e8cf59",
+    "CANONICAL",
+    "0.1,1244,31100"
+  ],
+  "0xe98803e5ce78cf8aad43267d9852a4057423cb1d:1": [
+    "0xd76b758a552f763cd496f1fb06a8f56364122675",
+    "WRAPPED",
+    "0.1,9.840098,123.00123"
+  ],
+  "0xe98803e5ce78cf8aad43267d9852a4057423cb1d:250": [
+    "0x8564ba78f88b744fcc6f9407b9af503ad35adafc",
+    "WRAPPED",
+    "0.1,0.615006,123.00123"
+  ],
+  "0xe98803e5ce78cf8aad43267d9852a4057423cb1d:43114": [
+    "0x5ed507330650cc714fecb39984d6c702198ed73e",
+    "WRAPPED",
+    "0.1,0.615006,123.00123"
+  ],
+  "0xe9930602f0f27bb72be520513e111b33cbacd084:2001": [
+    "0x338726dd694db9e2230ec2bb8624a2d7f566c96d",
+    "WRAPPED",
+    "0.1,7.811279,1562.255897"
+  ],
+  "0xe9b9c1c38dab5eab3b7e2ad295425e89bd8db066:1": [
+    "0x657b83a0336561c8f64389a6f5ade675c04b0c3b",
+    "CANONICAL",
+    "0.1,1100,27500"
+  ],
+  "0xe9c64384deb0c2bf06d991a8d708c77eb545e3d5:1": [
+    "0x4740735aa98dc8aa232bd049f8f0210458e7fca3",
+    "CANONICAL",
+    "0.1,96.4,2410"
+  ],
+  "0xe9e7cea3dedca5984780bafc599bd69add087d56:1284": [
+    "0xa649325aa7c5093d12d6f98eb4378deae68ce23f",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xe9e7cea3dedca5984780bafc599bd69add087d56:1285": [
+    "0x5d9ab5522c64e1f6ef5e3627eccc093f56167818",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xe9e7cea3dedca5984780bafc599bd69add087d56:137": [
+    "0x9fb83c0635de2e815fd1c21b3a292277540c2e8d",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xe9e7cea3dedca5984780bafc599bd69add087d56:250": [
+    "0xc931f61b1534eb21d8c11b24f3f5ab2471d4ab50",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xe9e7cea3dedca5984780bafc599bd69add087d56:30": [
+    "0x2bf9b864cdc97b08b6d79ad4663e71b8ab65c45c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xe9e7cea3dedca5984780bafc599bd69add087d56:321": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xe9e7cea3dedca5984780bafc599bd69add087d56:336": [
+    "0x65e66a61d0a8f1e686c2d6083ad611a10d84d97a",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xe9e7cea3dedca5984780bafc599bd69add087d56:42262": [
+    "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xe9e7cea3dedca5984780bafc599bd69add087d56:66": [
+    "0x332730a4f6e03d9c55829435f10360e13cfa41ff",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xea136fc555e695ba96d22e10b7e2151c4c6b2a20:42220": [
+    "0x74c0c58b99b68cf16a717279ac2d056a34ba2bfe",
+    "CANONICAL",
+    "0.1,11.2,2223"
+  ],
+  "0xea565ecfddb298f88186692429173781ac176d53:1": [
+    "0xd9f942e36b4cac550daa0cb31ef09efb1d1505f3",
+    "WRAPPED",
+    "0.1,17052.406,213155.08"
+  ],
+  "0xea565ecfddb298f88186692429173781ac176d53:137": [
+    "0x3d8e0bb811c45845687baa32b6e092238c919ed9",
+    "WRAPPED",
+    "0.1,1065.775,213155.08"
+  ],
+  "0xea565ecfddb298f88186692429173781ac176d53:25": [
+    "0x9fb83c0635de2e815fd1c21b3a292277540c2e8d",
+    "WRAPPED",
+    "0.1,24696.236294,4939247.258718"
+  ],
+  "0xea565ecfddb298f88186692429173781ac176d53:250": [
+    "0x7f352fa977713019c484c58e9bdfb04910016871",
+    "WRAPPED",
+    "0.1,1065.775,213155.08"
+  ],
+  "0xea565ecfddb298f88186692429173781ac176d53:43114": [
+    "0xe5130d3dbfac6ae7d73a24d719762df74d8e4c27",
+    "WRAPPED",
+    "0.1,1065.775,213155.08"
+  ],
+  "0xea565ecfddb298f88186692429173781ac176d53:86": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0.1,24696.236294,4939247.258718"
+  ],
+  "0xea5b9e2310abf54f4857455c3c94f5d5a4ad7190:1": [
+    "0x0efa5328fefce96c8d10661bd97403764d477853",
+    "WRAPPED",
+    "0.1,19.323,241.54"
+  ],
+  "0xea5b9e2310abf54f4857455c3c94f5d5a4ad7190:1088": [
+    "0xb2c22a9fb4fc02eb9d1d337655ce079a04a526c7",
+    "WRAPPED",
+    "0.1,1.207,241.54"
+  ],
+  "0xea5b9e2310abf54f4857455c3c94f5d5a4ad7190:137": [
+    "0xa91ac275f21f880d598c25dc801b0a9a3b7dd3dc",
+    "WRAPPED",
+    "0.1,1.207,241.54"
+  ],
+  "0xea5b9e2310abf54f4857455c3c94f5d5a4ad7190:250": [
+    "0x301de15579c37d1e1cc8b46d74324b885a77291b",
+    "WRAPPED",
+    "0.1,1.207,241.54"
+  ],
+  "0xea5b9e2310abf54f4857455c3c94f5d5a4ad7190:43114": [
+    "0xa873e87c2c935fa11c72003231a2eee7d391ce5f",
+    "WRAPPED",
+    "0.1,1.207,241.54"
+  ],
+  "0xea8c5b9c537f3ebbcc8f2df0573f2d084e9e2bdb:1": [
+    "0x7e8539d1e5cb91d63e46b8e188403b3f262a949b",
+    "CANONICAL",
+    "0.1,122000,3050000"
+  ],
+  "0xeac7ec051a0854cfc2bb543c96fad879de545b90:137": [
+    "0x83102ec9b8a4dbf2e6aa41f6e7c8b5863b800681",
+    "WRAPPED",
+    "0.1,732.499,146499.97"
+  ],
+  "0xeac7ec051a0854cfc2bb543c96fad879de545b90:250": [
+    "0x76ce14947f74a2664700e68452fe9166174af9ab",
+    "WRAPPED",
+    "0.1,732.499,146499.97"
+  ],
+  "0xeac7ec051a0854cfc2bb543c96fad879de545b90:43114": [
+    "0x63d6258e3143a1392d8343222d669de204398c8f",
+    "WRAPPED",
+    "0.1,732.499,146499.97"
+  ],
+  "0xeaf26191ac1d35ae30baa19a5ad5558dd8156aef:1": [
+    "0x6e9730ecffbed43fd876a264c982e254ef05a0de",
+    "CANONICAL",
+    "0.1,20,500"
+  ],
+  "0xeb29f65c4daeea6462a2f280e3bf418ec8b3da9b:1": [
+    "0x48844ddba89799dc40ec31728dac629802d407f3",
+    "WRAPPED",
+    "0.1,4000,100000"
+  ],
+  "0xeb29f65c4daeea6462a2f280e3bf418ec8b3da9b:137": [
+    "0x06e2ddd17f1043c0a4cbe72cc7c256e4d8a3e374",
+    "WRAPPED",
+    "0.1,500,100000"
+  ],
+  "0xeb2f197b3467b02dd8f36b09b2d179c250352ff3:1": [
+    "0x2ad402655243203fcfa7dcb62f8a08cc2ba88ae0",
+    "WRAPPED",
+    "0.1,6621,82762"
+  ],
+  "0xeb8cfd9ced7e361b319cc1a66b1d7ccb1ae1fa3c:1": [
+    "0x5c448d21faeb2e8980a1541a7b13bc6435977f7c",
+    "WRAPPED",
+    "0.1,5.4,67"
+  ],
+  "0xeb8cfd9ced7e361b319cc1a66b1d7ccb1ae1fa3c:7363": [
+    "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+    "WRAPPED",
+    "0.1,0.34,67"
+  ],
+  "0xeb9902a19fa1286c8832bf44e9b18e89f682f614:250": [
+    "0x411f3e09c66b30e7facfec45cd823b2e19dfad2d",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xeb9902a19fa1286c8832bf44e9b18e89f682f614:43114": [
+    "0x7fa38f270829a1b98918fa76a96c9ff0592e4d6d",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xeb99ee02d4f0f530b6d56510cd573ef7f9b255e4:1": [
+    "0x16a66f530d0a755d10fd7c232b6b170d8617b168",
+    "WRAPPED",
+    "0.1,800,10000"
+  ],
+  "0xeb99ee02d4f0f530b6d56510cd573ef7f9b255e4:APT": [
+    "0xd6d6372c8bde72a7ab825c00b9edd35e643fb94a61c55d9d94a9db3010098548::match::makedao",
+    "WRAPPED",
+    "0.1,50,10000"
+  ],
+  "0xebaffc2d2ea7c66fb848c48124b753f93a0a90ec:1": [
+    "0xf519381791c03dd7666c142d4e49fd94d3536011",
+    "CANONICAL",
+    "0.1,1222,30536"
+  ],
+  "0xebd49b26169e1b52c04cfd19fcf289405df55f80:1": [
+    "0x944a05c5acc46c9777aca7d8dd92b048b1b6d3e0",
+    "WRAPPED",
+    "0.1,1129.94,14124.29"
+  ],
+  "0xebd49b26169e1b52c04cfd19fcf289405df55f80:25": [
+    "0x9873795f5dab11e1c0342c4a58904c59827ede0c",
+    "WRAPPED",
+    "0.1,187.871751,37574.350245"
+  ],
+  "0xebd49b26169e1b52c04cfd19fcf289405df55f80:250": [
+    "0x3e01b7e242d5af8064cb9a8f9468ac0f8683617c",
+    "WRAPPED",
+    "0.1,70.62,14124.29"
+  ],
+  "0xebd49b26169e1b52c04cfd19fcf289405df55f80:43114": [
+    "0x340fe1d898eccaad394e2ba0fc1f93d27c7b717a",
+    "WRAPPED",
+    "0.1,70.62,14124.29"
+  ],
+  "0xebd949aacfc681787d3d091fa2929e4413e0e4e1:1": [
+    "0xb2cabf797bc907b049e4ccb5b84d13be3a8cfc21",
+    "WRAPPED",
+    "0.1,652.84,16320.93"
+  ],
+  "0xebd949aacfc681787d3d091fa2929e4413e0e4e1:100": [
+    "0xf480f38c366daac4305dc484b2ad7a496ff00cea",
+    "WRAPPED",
+    "0.1,702.429704,140485.940869"
+  ],
+  "0xebd949aacfc681787d3d091fa2929e4413e0e4e1:137": [
+    "0x011734f6ed20e8d011d85cf7894814b897420acf",
+    "WRAPPED",
+    "0.1,32.5,6470"
+  ],
+  "0xebd949aacfc681787d3d091fa2929e4413e0e4e1:2000": [
+    "0x99c409e5f62e4bd2ac142f17cafb6810b8f0baae",
+    "WRAPPED",
+    "0.1,1059.075215,211815.043104"
+  ],
+  "0xebd949aacfc681787d3d091fa2929e4413e0e4e1:250": [
+    "0xf792f5fd59679eda6f3a9b0443dc4c1338a95df1",
+    "WRAPPED",
+    "0.1,85.164,17032.87"
+  ],
+  "0xebd949aacfc681787d3d091fa2929e4413e0e4e1:42161": [
+    "0x5f006745a9a192a7cd1236089f704f9b35d3b9cd",
+    "WRAPPED",
+    "0.1,1404.859409,140485.940869"
+  ],
+  "0xebd949aacfc681787d3d091fa2929e4413e0e4e1:43114": [
+    "0x5f1c76b7a90d88ee5bada971a28aaef514719dbf",
+    "WRAPPED",
+    "0.1,32.5,6470"
+  ],
+  "0xebd949aacfc681787d3d091fa2929e4413e0e4e1:9001": [
+    "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a",
+    "WRAPPED",
+    "0.1,805.269685,161053.936963"
+  ],
+  "0xec181b5f1d7b069192a3554bde509728b16d5d73:43114": [
+    "0x685b63cfe0179b3efb70a01dcb1d648549aa192d",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xec38d4b0b41a52f3ec05ce02cb0c3fcb80305b9e:250": [
+    "0x5157629e486b36f5862d163c119c4e86506ca15e",
+    "WRAPPED",
+    "0.1,15.206813,3041.36253"
+  ],
+  "0xec82f8d35ffe8da987b97c0bf12921ec57f23d3c:1": [
+    "0xac809cdf43a36acbd6d4e6e1676ca56ad8438e28",
+    "CANONICAL",
+    "0.1,28.6,716"
+  ],
+  "0xecc559d2bcc83f3f2110416b4911e082729e8b56:1": [
+    "0x9889799f43a2eb9b34fbdd83bb840eaa42462a77",
+    "WRAPPED",
+    "0.1,65.757028,821.962847"
+  ],
+  "0xecc559d2bcc83f3f2110416b4911e082729e8b56:43114": [
+    "0x700843380021776970a28a7a74da3e5908755fcc",
+    "WRAPPED",
+    "0.1,4.109814,821.962847"
+  ],
+  "0xed08918b059afa36ec8ab2611bdecd2dd7e6508c:1": [
+    "0x26eaf31489662587232990fc6981026d4175cd40",
+    "WRAPPED",
+    "0.1,7.912957,98.911968"
+  ],
+  "0xed08918b059afa36ec8ab2611bdecd2dd7e6508c:10": [
+    "0x82f0b8b456c1a451378467398982d4834b6829c1",
+    "WRAPPED",
+    "0.1,1.147118,114.711787"
+  ],
+  "0xed08918b059afa36ec8ab2611bdecd2dd7e6508c:137": [
+    "0xe1398b5d2f3cef77a13a7ccbae33f2121c217301",
+    "WRAPPED",
+    "0.1,0.49456,98.911968"
+  ],
+  "0xed08918b059afa36ec8ab2611bdecd2dd7e6508c:42161": [
+    "0x74b4db963738a2a95bfcb1833b123495ccc220e2",
+    "WRAPPED",
+    "0.1,1.147118,114.711787"
+  ],
+  "0xed08918b059afa36ec8ab2611bdecd2dd7e6508c:42220": [
+    "0xe5cf1558a1470cb5c166c2e8651ed0f3c5fb8f42",
+    "WRAPPED",
+    "0.1,0.573559,114.711787"
+  ],
+  "0xed77bc3dad55f320f8807586c2aef9285c1a5ed2:250": [
+    "0x2244faab5a2a633cb7f6e3d35e7db8ec0136d3e2",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xed77bc3dad55f320f8807586c2aef9285c1a5ed2:43114": [
+    "0xc57f6549a8c8100e9cc74b8a1124398ddda2aa5a",
+    "WRAPPED",
+    "0.1,5,1000"
+  ],
+  "0xeda21b525ac789eab1a08ef2404dd8505ffb973d:137": [
+    "0xcea59dce6a6d73a24e6d6944cfabc330814c098a",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xeda21b525ac789eab1a08ef2404dd8505ffb973d:250": [
+    "0xac1f25aee575d35c668b0a4d336f20e3e92adcd2",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xeda21b525ac789eab1a08ef2404dd8505ffb973d:43114": [
+    "0xd9a807e9d2f61b0098b4c3f79b2dfb9bc2e181ae",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xede1b2f557942c9132c0ea1b7f20a63f711982d4:1": [
+    "0x56860dbf9437c7109e1b3f66c00c68d33ee12a50",
+    "CANONICAL",
+    "0.1,26.2,1308"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:1": [
+    "0x22648c12acd87912ea1710357b1302c6a4154ebc",
+    "WRAPPED",
+    "0.01,4.9,1000"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:10": [
+    "0x86b3f23b6e90f5bbfac59b5b2661134ef8ffd255",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:128": [
+    "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:137": [
+    "0xe3eeda11f06a656fcaee19de663e84c7e61d3cac",
+    "WRAPPED",
+    "0.01,0.19,1000"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:199": [
+    "0x765277eebeca2e31912c9946eae1021199b39c61",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:25": [
+    "0x739ca6d71365a08f584c8fc4e1029045fa8abc4b",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:250": [
+    "0x2823d10da533d9ee873fed7b16f4a962b2b7f181",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:321": [
+    "0xf390830df829cf22c53c8840554b98eafc5dcbc2",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:42161": [
+    "0x05e481b19129b560e921e487adb281e70bdba463",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:43114": [
+    "0x94977c9888f3d2fafae290d33fab4a5a598ad764",
+    "WRAPPED",
+    "0.01,0.19,1000"
+  ],
+  "0xedf0c420bc3b92b961c6ec411cc810ca81f5f21a:66": [
+    "0x0dcb0cb0120d355cde1ce56040be57add0185baa",
+    "WRAPPED",
+    "0.1,0.19,0.19"
+  ],
+  "0xee6c005fd7fe5949f2326531eccbdea7d2ee86cf:1": [
+    "0x6562e5791da22950c959b8c2febcfbca15ae520c",
+    "WRAPPED",
+    "0.1,69565.217391,869565.217391"
+  ],
+  "0xee6c005fd7fe5949f2326531eccbdea7d2ee86cf:10": [
+    "0x3d4e1981f822e87a1a4c05f2e4b3bcade5406ae3",
+    "WRAPPED",
+    "0.1,32237.26628,3223726.627982"
+  ],
+  "0xee6c005fd7fe5949f2326531eccbdea7d2ee86cf:137": [
+    "0xa833d3a1367d31197fa711cee2d724e5e0e86610",
+    "WRAPPED",
+    "0.1,4347.826087,869565.217391"
+  ],
+  "0xee6c005fd7fe5949f2326531eccbdea7d2ee86cf:2000": [
+    "0x667fd83e24ca1d935d36717d305d54fa0cac991c",
+    "WRAPPED",
+    "0.1,16118.63314,3223726.627982"
+  ],
+  "0xee6c005fd7fe5949f2326531eccbdea7d2ee86cf:25": [
+    "0x5d47baba0d66083c52009271faf3f50dcc01023c",
+    "WRAPPED",
+    "0.1,24822.518989,4964503.797845"
+  ],
+  "0xee6c005fd7fe5949f2326531eccbdea7d2ee86cf:250": [
+    "0xed3516aa436b630b50960a3d19ba7a2e46d0e368",
+    "WRAPPED",
+    "0.1,4708.097928,941619.585687"
+  ],
+  "0xee6c005fd7fe5949f2326531eccbdea7d2ee86cf:43114": [
+    "0x471ea49dd8e60e697f4cac262b5fafcc307506e4",
+    "WRAPPED",
+    "0.1,4401.408451,880281.690141"
+  ],
+  "0xee814f5b2bf700d2e843dc56835d28d095161dd9:137": [
+    "0xbcf339df10d78f2b44aa760ead0f715a7a7d7269",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xee9762352f63f4387af40d58291612067727457d:1": [
+    "0x0563dce613d559a47877ffd1593549fb9d3510d6",
+    "CANONICAL",
+    "0.1,22,550"
+  ],
+  "0xee9d08840554c9f8d30d0e3833d4906d3f39a49e:42220": [
+    "0x46c9757c5497c5b1f2eb73ae79b6b67d119b0b58",
+    "CANONICAL",
+    "0.1,1142,328363"
+  ],
+  "0xeef36c49ee438526d4cc0945ebfded507113e7bc:1": [
+    "0x70fb6418bbb2863e341286b72535bd4828ec863a",
+    "WRAPPED",
+    "0.1,84.874693,1060.933664"
+  ],
+  "0xeef36c49ee438526d4cc0945ebfded507113e7bc:137": [
+    "0x6da4cec4beac3e711ab6487d38190720e62b8914",
+    "WRAPPED",
+    "0.1,5.304668,1060.933664"
+  ],
+  "0xef1d7562a49ac98ba22f5cbeae28ce1ba0238578:1": [
+    "0x4b13a8a95da56773312ca0d4e0670530aa700fcf",
+    "CANONICAL",
+    "0.1,2004,50064"
+  ],
+  "0xef5244ea102a4209e5d3f506cd480ba08e18d62d:137": [
+    "0xe8a978336bd8b2c29e41b2d4ba916441f8cdc5db",
+    "WRAPPED",
+    "0.1,92302.012184,18460402.436773"
+  ],
+  "0xef5c4f92209a5cb59d7b3f949f1bafbe7d844342:66": [
+    "0xcc9b1f919282c255eb9ad2c0757e8036165e0cad",
+    "WRAPPED",
+    "0.1,497.254657,99450.931408"
+  ],
+  "0xeff6fcfbc2383857dd66ddf57efffc00d58b7d9d:1": [
+    "0x1712aad2c773ee04bdc9114b32163c058321cd85",
+    "CANONICAL",
+    "0.1,2.4,60"
+  ],
+  "0xf0a8a368989e1936d5a94d5fb1cb2cd94a7d8e2d:250": [
+    "0x32f1200bfb876fbb8f6e6a2dea8f07f279146422",
+    "WRAPPED",
+    "0.1,5115,1023000"
+  ],
+  "0xf133ed3095a6c3167f140ab26fc1ad6b10096ab1:1": [
+    "0xde22e15c6c21b6a8a1266b171ff7f3905c4b1109",
+    "WRAPPED",
+    "0.1,7.017544,87.719298"
+  ],
+  "0xf16e81dce15b08f326220742020379b855b87df9:1": [
+    "0xf16e81dce15b08f326220742020379b855b87df9",
+    "CANONICAL",
+    "0.1,1.66,42"
+  ],
+  "0xf1cd2b6fc3876619786e9733eeed15518f127aa3:1": [
+    "0x9cf77be84214beb066f26a4ea1c38ddcc2afbcf7",
+    "CANONICAL",
+    "0.1,55000000000,1400000000000"
+  ],
+  "0xf207dbe40068c4f071e731ad1720f1c763fb42d1:1": [
+    "0xb0fdcdd7e920a036331abe9ffc7313322c0abba0",
+    "WRAPPED",
+    "0.1,7.346,91.83"
+  ],
+  "0xf207dbe40068c4f071e731ad1720f1c763fb42d1:1285": [
+    "0x3d51a9fb5dcc87f7b237b04975559b920a9a56ff",
+    "WRAPPED",
+    "0.1,0.459,91.83"
+  ],
+  "0xf207dbe40068c4f071e731ad1720f1c763fb42d1:66": [
+    "0x130966628846bfd36ff31a822705796e8cb8c18d",
+    "WRAPPED",
+    "0.1,1.74216,348.432056"
+  ],
+  "0xf2572fdacf09bfae08ff7d35423870b5a8ac26b7:128": [
+    "0x86b3f23b6e90f5bbfac59b5b2661134ef8ffd255",
+    "WRAPPED",
+    "0.1,60342.746802,12068549.360367"
+  ],
+  "0xf2572fdacf09bfae08ff7d35423870b5a8ac26b7:137": [
+    "0x79637d860380bd28df5a07329749654790fac1df",
+    "WRAPPED",
+    "0.1,172.413,34482.76"
+  ],
+  "0xf2572fdacf09bfae08ff7d35423870b5a8ac26b7:66": [
+    "0xf7428ffcb2581a2804998efbb036a43255c8a8d3",
+    "WRAPPED",
+    "0.1,60342.746802,12068549.360367"
+  ],
+  "0xf276f8a9ddc7ef09ec1aac4565ec4da431626a76:24": [
+    "0xa6d662ddb759f2a3c4240bca2e1cc86d383f9e71",
+    "WRAPPED",
+    "0.1,66.666667,13333.333333"
+  ],
+  "0xf2e28bb41ad0172217d0d219d9beda478467b9ca:137": [
+    "0x3915c77dc839d97e875613a5b64179acc1da97df",
+    "WRAPPED",
+    "0.1,11,2200"
+  ],
+  "0xf35870b6fd9a77d47364d357dd0b16a5e5c956da:1": [
+    "0xa8752333f6a6fe47323a4edac3d09bb1048a0e23",
+    "WRAPPED",
+    "0.1,630,7856"
+  ],
+  "0xf3f64ad6af423be76a06908141217cfeb6f718c6:1": [
+    "0x97cd1cfe2ed5712660bb6c14053c0ecb031bff7d",
+    "WRAPPED",
+    "0.1,0.096,2.4"
+  ],
+  "0xf44fb887334fa17d2c5c0f970b5d320ab53ed557:1": [
+    "0x8185bc4757572da2a610f887561c32298f1a5748",
+    "CANONICAL",
+    "0.1,1021,25525"
+  ],
+  "0xf48fbc59e6b45cff26a7608ff7d5a22ebc40df7f:1": [
+    "0x226f7b842e0f0120b7e194d05432b3fd14773a9d",
+    "CANONICAL",
+    "0.1,6090,152250"
+  ],
+  "0xf4a71809fd0d5715a9685caadb6f0d8beafdf8af:1": [
+    "0x7b69d465c0f9fb22affae56aa86149973e9b0966",
+    "CANONICAL",
+    "0.1,3.2,80"
+  ],
+  "0xf4ed363144981d3a65f42e7d0dc54ff9eef559a1:1": [
+    "0xaef9e3e050d0ef060cdfd5246209b0b6bb66060f",
+    "WRAPPED",
+    "0.1,12,300"
+  ],
+  "0xf4f8b87da4244da566c4b5dcce7f8933505c1871:1285": [
+    "0x07ffde007756192dbfd0b6029b12dc541fc198f7",
+    "WRAPPED",
+    "0.1,3.125,625"
+  ],
+  "0xf532c0174e30823acaaf01c2652862e25f268264:1285": [
+    "0xe6f658118bcc6d344c812826b1af13bd7d59956c",
+    "WRAPPED",
+    "0.1,350.830416,70166.083119"
+  ],
+  "0xf532c0174e30823acaaf01c2652862e25f268264:336": [
+    "0x338726dd694db9e2230ec2bb8624a2d7f566c96d",
+    "WRAPPED",
+    "0.1,350.830416,70166.083119"
+  ],
+  "0xf532c0174e30823acaaf01c2652862e25f268264:592": [
+    "0xabd380327fe66724ffda91a87c772fb8d00be488",
+    "WRAPPED",
+    "0.1,419.73951,83947.901932"
+  ],
+  "0xf5c246975936a0b2fd8c364cc77d77eb7fe0973e:1": [
+    "0x6d46c52805a4f94ef31082634ba75118df9f92e0",
+    "WRAPPED",
+    "0.1,95648.015304,1195600.191296"
+  ],
+  "0xf5c5033b9f9609a067581f014211d9f30f8c024d:1": [
+    "0xa85d8c972e1d54136e4bbed3d108db6e108e98f9",
+    "WRAPPED",
+    "0.1,77071290944.123314,963391136801.541426"
+  ],
+  "0xf5c8054efc6acd25f31a17963462b90e82fdecad:1": [
+    "0x51db5ad35c671a87207d88fc11d593ac0c8415bd",
+    "CANONICAL",
+    "0.1,100,2500"
+  ],
+  "0xf5dadab8381e7d76290380e0108c7a50b68bfae1:1234": [
+    "0xd7c295e399ca928a3a14b01d760e794f1adf8990",
+    "WRAPPED",
+    "0.1,1.818182,363.636364"
+  ],
+  "0xf5dadab8381e7d76290380e0108c7a50b68bfae1:43114": [
+    "0xacd05bfc64bde7b1b4b7733d3c58376928163bad",
+    "WRAPPED",
+    "0.1,1.818182,363.636364"
+  ],
+  "0xf606bd19b1e61574ed625d9ea96c841d4e247a32:250": [
+    "0xbbb63f49fe75cd82513c4a3da2ec80dd36a8448f",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xf63400ee0420ce5b1ebdee0c942d7de1c734a41f:137": [
+    "0xf98f70c265093a3b3adbef84ddc29eace900685b",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xf63400ee0420ce5b1ebdee0c942d7de1c734a41f:43114": [
+    "0x2a9ad452af412d62eff7080c846c52bf9b1c9e91",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xf68c9df95a18b2a5a5fa1124d79eeeffbad0b6fa:32659": [
+    "0x0c74199d22f732039e843366a236ff4f61986b32",
+    "CANONICAL",
+    "0,0,0"
+  ],
+  "0xf70b6d6acd652612f24f7dd2ca2f1727eb20793a:137": [
+    "0xfb40b1efe90d4b786d2d9d9dc799b18bde92923b",
+    "WRAPPED",
+    "0.1,0.020737,4.147485"
+  ],
+  "0xf70b6d6acd652612f24f7dd2ca2f1727eb20793a:250": [
+    "0x3d8e0bb811c45845687baa32b6e092238c919ed9",
+    "WRAPPED",
+    "0.1,0.020737,4.147485"
+  ],
+  "0xf70b6d6acd652612f24f7dd2ca2f1727eb20793a:43114": [
+    "0xde2f7e3c7fbf2d1a68fb7f64acfc05e6d5d7dd83",
+    "WRAPPED",
+    "0.1,0.020737,4.147485"
+  ],
+  "0xf77351d8f4ee853135961a936bb8d2e4ffa75f9d:1": [
+    "0x5cb4b462ca075558ef0343db6b55f590e47482e4",
+    "WRAPPED",
+    "0.1,28171.989,352149.87"
+  ],
+  "0xf77351d8f4ee853135961a936bb8d2e4ffa75f9d:10": [
+    "0xb12c13e66ade1f72f71834f2fc5082db8c091358",
+    "WRAPPED",
+    "0.1,1760.749,352149.87"
+  ],
+  "0xf77351d8f4ee853135961a936bb8d2e4ffa75f9d:137": [
+    "0xfafa220145dfa5c3ec85b6fa8a75aee2451cde5e",
+    "WRAPPED",
+    "0.1,1760.749,352149.87"
+  ],
+  "0xf77351d8f4ee853135961a936bb8d2e4ffa75f9d:42161": [
+    "0x3bd2dfd03bc7c3011ed7fb8c4d0949b382726cee",
+    "WRAPPED",
+    "0.1,3521.5,352149.87"
+  ],
+  "0xf77351d8f4ee853135961a936bb8d2e4ffa75f9d:43114": [
+    "0x4036f3d9c45a20f44f0b8b85dd6ca33005ff9654",
+    "WRAPPED",
+    "0.1,1760.749,352149.87"
+  ],
+  "0xf7b38053a4885c99279c4955cb843797e04455f8:1": [
+    "0x06677dc4fe12d3ba3c7ccfd0df8cd45e4d4095bf",
+    "CANONICAL",
+    "0.1,2260,56500"
+  ],
+  "0xf83a0cdfd0cbfc59ea23c26294251bf2152c7254:1": [
+    "0xa87bdda360932cf11aecf1369e8f08889326814e",
+    "WRAPPED",
+    "0.1,293.79361,3672.420125"
+  ],
+  "0xf83a0cdfd0cbfc59ea23c26294251bf2152c7254:42161": [
+    "0x6b289cceaa8639e3831095d75a3e43520fabf552",
+    "WRAPPED",
+    "0.1,36.724201,3672.420125"
+  ],
+  "0xf8acf86194443dcde55fc5b9e448e183c290d8cb:COLX": [
+    "colx",
+    "CANONICAL",
+    "0.1,13000,520000"
+  ],
+  "0xf8ae4ef55628aacfb9bd6e777b0f5d35c173f624:137": [
+    "0x48844ddba89799dc40ec31728dac629802d407f3",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xf915fdda4c882731c0456a4214548cd13a822886:1": [
+    "0xf009f5531de69067435e32c4b9d36077f4c4a673",
+    "CANONICAL",
+    "0.1,880,22000"
+  ],
+  "0xf96429a7ae52da7d07e60be95a3ece8b042016fb:336": [
+    "0xb12c13e66ade1f72f71834f2fc5082db8c091358",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xf96429a7ae52da7d07e60be95a3ece8b042016fb:592": [
+    "0x2bf9b864cdc97b08b6d79ad4663e71b8ab65c45c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xf9815ea1a246401d2ebf2185f207d7db579a2500:1": [
+    "0xcb9d0b8cfd8371143ba5a794c7218d4766c493e2",
+    "WRAPPED",
+    "0.1,11.661,145.77"
+  ],
+  "0xf9815ea1a246401d2ebf2185f207d7db579a2500:10": [
+    "0x99c409e5f62e4bd2ac142f17cafb6810b8f0baae",
+    "WRAPPED",
+    "0.1,0.728,145.77"
+  ],
+  "0xf9815ea1a246401d2ebf2185f207d7db579a2500:137": [
+    "0x4aa8e7d82ca4038ffc088ef15ec1679dba050c04",
+    "WRAPPED",
+    "0.1,0.834725,166.944908"
+  ],
+  "0xf9815ea1a246401d2ebf2185f207d7db579a2500:250": [
+    "0x58a547ed09684ac2a688610d5caf8e8968b51908",
+    "WRAPPED",
+    "0.1,0.728863,145.772595"
+  ],
+  "0xf9815ea1a246401d2ebf2185f207d7db579a2500:42161": [
+    "0xbc2597d3f1f9565100582cde02e3712d03b8b0f6",
+    "WRAPPED",
+    "0.1,1.669449,166.944908"
+  ],
+  "0xf99fc9f2d4b9f6cc4d6e56b13c5ae7e0030fb406:137": [
+    "0x9bd3fac4d9b051ef7ca9786aa0ef5a7e0558d44c",
+    "WRAPPED",
+    "0.1,522,105000"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:1024": [
+    "0x0cae51e1032e8461f4806e26332c030e34de3adb",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:1111": [
+    "0xc1be9a4d5d45beeacae296a7bd5fadbfc14602c4",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:1234": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:2000": [
+    "0xa649325aa7c5093d12d6f98eb4378deae68ce23f",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:2002": [
+    "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:2109": [
+    "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:2222": [
+    "0xabd380327fe66724ffda91a87c772fb8d00be488",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:24": [
+    "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:24734": [
+    "0x89456efa718884f48b51f4790557b4981ffc0aa2",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:25": [
+    "0x84ec1592eba02db09de04774ef79a1a1e328bce0",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:32520": [
+    "0x922d641a426dcffaef11680e5358f34d97d112e1",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a2462daf87ed43d5449cb4b9f6e4213f980271:61": [
+    "0x0dcb0cb0120d355cde1ce56040be57add0185baa",
+    "WRAPPED",
+    "0.1,0.003,0.003"
+  ],
+  "0xf9a7bbfdc269dc9d338b97670d3e8b6ec8747618:1": [
+    "0x607f4c5bb672230e8672085532f7e901544a7375",
+    "CANONICAL",
+    "0.1,40,954"
+  ],
+  "0xf9d051603fa3a69967e93c5b506ccf0292ccd849:1": [
+    "0x8b92ea35171e29948cc9e49c52ac8db0549b7d6b",
+    "WRAPPED",
+    "0.1,27500000000,343000000000"
+  ],
+  "0xf9d051603fa3a69967e93c5b506ccf0292ccd849:321": [
+    "0xb2c22a9fb4fc02eb9d1d337655ce079a04a526c7",
+    "WRAPPED",
+    "0.1,4122011541.632316,824402308326.463314"
+  ],
+  "0xfa2880bfdd213b76a44b742556eed133bdad08de:1": [
+    "0x21d486f6b7eb7b556978c5a0c96c79a08eb841de",
+    "CANONICAL",
+    "0.1,51620000,1290400000"
+  ],
+  "0xfa363022816abf82f18a9c2809dcd2bb393f6ac5:43114": [
+    "0xe0eb31082bbf8252f7425c6dd72a8c6b3bfbe99f",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xfa6ddbae80dfbf91512fbbedd8a06bb9b25d6988:137": [
+    "0xe8b7e5282b4f53357a24b9fb20cd8fac5763cdc7",
+    "WRAPPED",
+    "0.1,78.5,15700"
+  ],
+  "0xfa850eca95c34aa7dcd4213868ead3ec8927416f:1": [
+    "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
+    "CANONICAL",
+    "0.1,586,14650"
+  ],
+  "0xfa9343c3897324496a05fc75abed6bac29f8a40f:1": [
+    "0x3a8cccb969a61532d1e6005e2ce12c200caece87",
+    "CANONICAL",
+    "0.1,16.4,410"
+  ],
+  "0xfb288d60d3b66f9c3e231a9a39ed3f158a4269aa:1": [
+    "0x054d64b73d3d8a21af3d764efd76bcaa774f3bb2",
+    "CANONICAL",
+    "0.1,748,18700"
+  ],
+  "0xfb32f9581148e588bf92a91a15fdcbc65a68e4c9:1": [
+    "0x83102ec9b8a4dbf2e6aa41f6e7c8b5863b800681",
+    "WRAPPED",
+    "0.1,80,1000"
+  ],
+  "0xfb32f9581148e588bf92a91a15fdcbc65a68e4c9:137": [
+    "0x301355c580e62884b0907dea742f9787fed72217",
+    "WRAPPED",
+    "0.1,4.807,961.54"
+  ],
+  "0xfb32f9581148e588bf92a91a15fdcbc65a68e4c9:43114": [
+    "0x82197d7446a435105d6f3a430d72a6713960e34d",
+    "WRAPPED",
+    "0.1,4.807,961.54"
+  ],
+  "0xfb4ac62d4c6ad358ce679e61281f5eb5a20dd063:1285": [
+    "0xd4143e8db48a8f73afcdf13d7b3305f28da38116",
+    "WRAPPED",
+    "0.1,0.11,22"
+  ],
+  "0xfb4ac62d4c6ad358ce679e61281f5eb5a20dd063:1666600000": [
+    "0xe5cf1558a1470cb5c166c2e8651ed0f3c5fb8f42",
+    "WRAPPED",
+    "0.1,0.11,22"
+  ],
+  "0xfb62ae373aca027177d1c18ee0862817f9080d08:137": [
+    "0x53098a3656de0c1ee8dcf004e6a0e886b2968a2f",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "0xfb9db098a2574c2bbf45259e1028190f1e652eaa:1": [
+    "0x701e67fa3121343c866dfe69ae98534265b65bfa",
+    "WRAPPED",
+    "0.1,4443950672147539.162354,55549383401844239.527344"
+  ],
+  "0xfb9db098a2574c2bbf45259e1028190f1e652eaa:137": [
+    "0xfaa272e69bb1d3cbca7175db5c8b7dd9d6c638c5",
+    "WRAPPED",
+    "0.1,277746917009221.197647,55549383401844239.527344"
+  ],
+  "0xfc0666627a07d7f324824df515628f43098316a3:43114": [
+    "0x97f5a66dbf53036a4b988b2de3003e640602c86f",
+    "WRAPPED",
+    "0.1,14459.224985,2891844.997108"
+  ],
+  "0xfd31c738843283229f1e944bd592a5ae9c9effa7:321": [
+    "0xb153fb3d196a8eb25522705560ac152eeec57901",
+    "WRAPPED",
+    "0.1,38.250279,7650.055845"
+  ],
+  "0xfd5eb9ad72a3fa9ab28007192d58279a21d5b6c8:1": [
+    "0x594207c791afd06a8d087d84d99d1da53ccbd45f",
+    "CANONICAL",
+    "0.1,1226,30628"
+  ],
+  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba:1": [
+    "0xbbc4a8d076f4b1888fec42581b6fc58d242cf2d5",
+    "WRAPPED",
+    "0.1,20,1000"
+  ],
+  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba:10": [
+    "0xb153fb3d196a8eb25522705560ac152eeec57901",
+    "WRAPPED",
+    "0.1,1.9,1.9"
+  ],
+  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba:1088": [
+    "0xd7c295e399ca928a3a14b01d760e794f1adf8990",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba:1285": [
+    "0x0cae51e1032e8461f4806e26332c030e34de3adb",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba:137": [
+    "0x49a0400587a7f65072c87c4910449fdcc5c47242",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba:199": [
+    "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844",
+    "WRAPPED",
+    "0.1,0.5,0.5"
+  ],
+  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba:250": [
+    "0x82f0b8b456c1a451378467398982d4834b6829c1",
+    "WRAPPED",
+    "0.1,0.9,0.9"
+  ],
+  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba:288": [
+    "0x218c3c3d49d0e7b37aff0d8bb079de36ae61a4c0",
+    "WRAPPED",
+    "0.1,1.9,1.9"
+  ],
+  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba:42161": [
+    "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a",
+    "WRAPPED",
+    "0.1,1.9,1.9"
+  ],
+  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba:43114": [
+    "0x130966628846bfd36ff31a822705796e8cb8c18d",
+    "WRAPPED",
+    "0.1,1.9,1.9"
+  ],
+  "0xfe3af7376e412a377358d5894c790bb3e00d0dc1:1": [
+    "0xcb9f441ffae898e7a2f32143fd79ac899517a9dc",
+    "WRAPPED",
+    "0.1,951815,11897680"
+  ],
+  "0xfe4c11f7db2dde18f2952c52f37abbeb120ab728:137": [
+    "0x8419b7410e442478a2f52961578b79e934e0add4",
+    "WRAPPED",
+    "0.1,9,1804"
+  ],
+  "0xfe77d71baf7a6cdabbd63a2ad1e0adb68ca64c06:1": [
+    "0xf2f9a7e93f845b3ce154efbeb64fb9346fcce509",
+    "CANONICAL",
+    "0.1,136.4,3410"
+  ],
+  "0xfe9fe45f26c763df220f15b1edf049b881af3a5a:32520": [
+    "0xd67de0e0a0fd7b15dc8348bb9be742f3c5850454",
+    "WRAPPED",
+    "0.1,10459.813397,2091962.679386"
+  ],
+  "bnb:128": ["0x471e265ab5b8513032721acef0a53b79185ae6f9", "WRAPPED", "0,0,0"],
+  "bnb:1284": [
+    "0xc9baa8cfdde8e328787e29b4b078abf2dadc2055",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "bnb:1285": [
+    "0x2bf9b864cdc97b08b6d79ad4663e71b8ab65c45c",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "bnb:137": ["0xa649325aa7c5093d12d6f98eb4378deae68ce23f", "WRAPPED", "0,0,0"],
+  "bnb:250": ["0xd67de0e0a0fd7b15dc8348bb9be742f3c5850454", "WRAPPED", "0,0,0"],
+  "bnb:30": ["0x6ab6d61428fde76768d7b45d8bfeec19c6ef91a8", "WRAPPED", "0,0,0"],
+  "bnb:321": ["0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c", "WRAPPED", "0,0,0"],
+  "bnb:336": ["0x332730a4f6e03d9c55829435f10360e13cfa41ff", "WRAPPED", "0,0,0"],
+  "bnb:42262": [
+    "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "bnb:43114": [
+    "0x264c1383ea520f73dd837f915ef3a732e204a493",
+    "WRAPPED",
+    "0,0,0"
+  ],
+  "bnb:66": ["0x218c3c3d49d0e7b37aff0d8bb079de36ae61a4c0", "WRAPPED", "0,0,0"]
+}`;

@@ -1,0 +1,49 @@
+{
+  "deployment": "MULTICHAIN_BSC",
+  "network": "bsc",
+  "file": "./src/mappings/handlers.ts",
+  "routers": [
+    {
+      "name": "RouterV3",
+      "address": "0xf9736ec3926703e85c843fc972bd89a7f8e827c0",
+      "abi": "Router",
+      "startBlock": 12159708
+    },
+    {
+      "name": "RouterV3 2",
+      "address": "0xd1c5966f9f5ee6881ff6b261bbeda45972b1b5f3",
+      "abi": "Router",
+      "startBlock": 7910338
+    },
+    {
+      "name": "RouterV4",
+      "address": "0xabd380327fe66724ffda91a87c772fb8d00be488",
+      "abi": "Router",
+      "startBlock": 6576259
+    },
+    {
+      "name": "RouterV6",
+      "address": "0x58892974758A4013377A45fad698D2FF1F08d98E",
+      "abi": "Router",
+      "startBlock": 23327771
+    },
+    {
+      "name": "RouterV6 2",
+      "address": "0x56a6c850cebe23f0c7891a004bef57265cda4d13",
+      "abi": "Router",
+      "startBlock": 22930439
+    },
+    {
+      "name": "RouterV6 3",
+      "address": "0x92c079d3155c2722dbf7e65017a5baf9cd15561c",
+      "abi": "Router",
+      "startBlock": 14755612
+    },
+    {
+      "name": "RouterV6 4",
+      "address": "0xe1d592c3322f1f714ca11f05b6bc0efef1907859",
+      "abi": "Router",
+      "startBlock": 16875960
+    }
+  ]
+}

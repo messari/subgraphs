@@ -20,9 +20,9 @@ import {
 import { bigIntToBigDecimal } from "../../../../../src/common/utils/numbers";
 import { TokenlistAPIResponse } from "./tokenlist-v4";
 
-export class MultichainMainnetConfigurations implements Configurations {
+export class MultichainBscConfigurations implements Configurations {
   getNetwork(): string {
-    return Network.MAINNET;
+    return Network.BSC;
   }
   getProtocolName(): string {
     return PROTOCOL_NAME;
@@ -34,7 +34,7 @@ export class MultichainMainnetConfigurations implements Configurations {
     return "0xfA9dA51631268A30Ec3DDd1CcBf46c65FAD99251";
   }
   getChainID(): BigInt {
-    return BigInt.fromI32(1);
+    return BigInt.fromI32(56);
   }
   getCrosschainTokenAddress(token: Token, crosschainID: string): Address {
     let crosschainToken = ZERO_ADDRESS;

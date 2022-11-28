@@ -1,0 +1,37 @@
+{
+  "deployment": "MULTICHAIN_FANTOM",
+  "network": "fantom",
+  "file": "./src/mappings/handlers.ts",
+  "routers": [
+    {
+      "name": "RouterV3",
+      "address": "0xf3Ce95Ec61114a4b1bFC615C16E6726015913CCC",
+      "abi": "Router",
+      "startBlock": 20338764
+    },
+    {
+      "name": "RouterV4",
+      "address": "0x85fd5f8dbd0c9ef1806e6c7d4b787d438621c1dc",
+      "abi": "Router",
+      "startBlock": 8354003
+    },
+    {
+      "name": "RouterV4 2",
+      "address": "0xb576C9403f39829565BD6051695E2AC7Ecf850E2",
+      "abi": "Router",
+      "startBlock": 16715076
+    },
+    {
+      "name": "RouterV4 3",
+      "address": "0x1CcCA1cE62c62F7Be95d4A67722a8fDbed6EEcb4",
+      "abi": "Router",
+      "startBlock": 8475644
+    },
+    {
+      "name": "RouterV6",
+      "address": "0x0B23341fA1Da0171f52aA8Ef85f3946b44d35ac0",
+      "abi": "Router",
+      "startBlock": 37978260
+    }
+  ]
+}

@@ -4,7 +4,6 @@ import { Address } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/RouterV6/ERC20";
 import { ERC20SymbolBytes } from "../../generated/RouterV6/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/RouterV6/ERC20NameBytes";
-import { NetworkConfigs } from "../../configurations/configure";
 
 export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
@@ -72,12 +71,5 @@ export function isNullEthValue(value: string): boolean {
   return (
     value ==
     "0x0000000000000000000000000000000000000000000000000000000000000001"
-  );
-}
-
-export function isNativeToken(tokenAddress: Address): boolean {
-  return (
-    tokenAddress ==
-    Address.fromString(NetworkConfigs.getNativeToken().get("address")!)
   );
 }
