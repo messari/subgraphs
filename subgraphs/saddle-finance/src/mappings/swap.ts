@@ -15,6 +15,7 @@ import { getOrCreatePool } from "../entities/pool";
 import { createOrUpdateAllFees } from "../entities/fee";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { getOrCreateTokenFromString } from "../entities/token";
+import { LiquidityPool } from "../../generated/schema";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
   createDeposit(
@@ -84,12 +85,23 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 
 export function handleTokenSwap(event: TokenSwap): void {
   const pool = getOrCreatePool(event.address);
-  const tokenIn = getOrCreateTokenFromString(
+  let tokenIn = getOrCreateTokenFromString(
     pool._inputTokensOrdered[event.params.soldId.toI32()]
   );
-  const tokenOut = getOrCreateTokenFromString(
+  let tokenOut = getOrCreateTokenFromString(
     pool._inputTokensOrdered[event.params.boughtId.toI32()]
   );
+
+  if (isLPSwap(event, pool)) {
+    const basePool = getOrCreatePool(Address.fromString(pool._basePool!));
+    const lpToken = getOrCreateTokenFromString(basePool.outputToken!);
+    if (event.params.soldId.gt(event.params.boughtId)) {
+      tokenIn = lpToken;
+    } else {
+      tokenOut = lpToken;
+    }
+  }
+
   createSwap(
     pool,
     event,
@@ -98,6 +110,22 @@ export function handleTokenSwap(event: TokenSwap): void {
     tokenOut,
     event.params.tokensBought,
     event.params.buyer
+  );
+}
+
+// isLPSwap will return true if any of the tokens being swapped is an LP token from
+// another saddle pool. Since metapools can be used to swap against the LP
+// or against its underlying tokens.
+function isLPSwap(event: TokenSwap, pool: LiquidityPool): bool {
+  if (!pool._basePool) {
+    return false;
+  }
+
+  const basePool = getOrCreatePool(Address.fromString(pool._basePool!));
+  const lpTokenIndex = pool.inputTokens.length - basePool.inputTokens.length;
+  return (
+    event.params.soldId.toI32() == lpTokenIndex ||
+    event.params.boughtId.toI32() == lpTokenIndex
   );
 }
 

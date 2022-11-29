@@ -1,553 +1,553 @@
 [
-  {
-    "inputs": [
-      { "internalType": "address", "name": "_governor", "type": "address" },
-      { "internalType": "address", "name": "_mpl", "type": "address" },
-      { "internalType": "address", "name": "_globalAdmin", "type": "address" }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "address", "name": "balancerPool", "type": "address" },
-      { "indexed": false, "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "BalancerPoolSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "decimals", "type": "uint256" },
-      { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" },
-      { "indexed": false, "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "CollateralAssetSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [{ "indexed": true, "internalType": "address", "name": "newGlobalAdmin", "type": "address" }],
-    "name": "GlobalAdminSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "bytes32", "name": "which", "type": "bytes32" },
-      { "indexed": false, "internalType": "address", "name": "addr", "type": "address" }
-    ],
-    "name": "GlobalsAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "bytes32", "name": "which", "type": "bytes32" },
-      { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }
-    ],
-    "name": "GlobalsParamSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [{ "indexed": true, "internalType": "address", "name": "governor", "type": "address" }],
-    "name": "GovernorAccepted",
-    "type": "event"
-  },
-  { "anonymous": false, "inputs": [], "name": "Initialized", "type": "event" },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "decimals", "type": "uint256" },
-      { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" },
-      { "indexed": false, "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "LiquidityAssetSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "oracle", "type": "address" }
-    ],
-    "name": "OracleSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [{ "indexed": true, "internalType": "address", "name": "pendingGovernor", "type": "address" }],
-    "name": "PendingGovernorSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "delegate", "type": "address" },
-      { "indexed": false, "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "PoolDelegateSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [{ "indexed": false, "internalType": "bool", "name": "pause", "type": "bool" }],
-    "name": "ProtocolPaused",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "exemptedContract", "type": "address" },
-      { "indexed": false, "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "TransferRestrictionExemptionSet",
-    "type": "event"
-  },
-  { "inputs": [], "name": "acceptGovernor", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
-  {
-    "inputs": [],
-    "name": "defaultGracePeriod",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "", "type": "address" },
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "name": "defaultUniswapPath",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "fundingPeriod",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "asset", "type": "address" }],
-    "name": "getLatestPrice",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getLpCooldownParams",
-    "outputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "globalAdmin",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "governor",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "investorFee",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "isValidBalancerPool",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "calc", "type": "address" },
-      { "internalType": "uint8", "name": "calcType", "type": "uint8" }
-    ],
-    "name": "isValidCalc",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "isValidCollateralAsset",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "isValidLiquidityAsset",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "isValidLoanFactory",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "isValidPoolDelegate",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "isValidPoolFactory",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "superFactory", "type": "address" },
-      { "internalType": "address", "name": "subFactory", "type": "address" },
-      { "internalType": "uint8", "name": "factoryType", "type": "uint8" }
-    ],
-    "name": "isValidSubFactory",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lpCooldownPeriod",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lpWithdrawWindow",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "mapleTreasury",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "maxSwapSlippage",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "minLoanEquity",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "mpl",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "oracleFor",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "pendingGovernor",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "protocolPaused",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "calc", "type": "address" },
-      { "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "setCalc",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "asset", "type": "address" },
-      { "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "setCollateralAsset",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "_defaultGracePeriod", "type": "uint256" }],
-    "name": "setDefaultGracePeriod",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "from", "type": "address" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "address", "name": "mid", "type": "address" }
-    ],
-    "name": "setDefaultUniswapPath",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "_fundingPeriod", "type": "uint256" }],
-    "name": "setFundingPeriod",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "newGlobalAdmin", "type": "address" }],
-    "name": "setGlobalAdmin",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "_fee", "type": "uint256" }],
-    "name": "setInvestorFee",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "asset", "type": "address" },
-      { "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "setLiquidityAsset",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "newCooldownPeriod", "type": "uint256" }],
-    "name": "setLpCooldownPeriod",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "newLpWithdrawWindow", "type": "uint256" }],
-    "name": "setLpWithdrawWindow",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "_mapleTreasury", "type": "address" }],
-    "name": "setMapleTreasury",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "newMaxSlippage", "type": "uint256" }],
-    "name": "setMaxSwapSlippage",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "_minLoanEquity", "type": "uint256" }],
-    "name": "setMinLoanEquity",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "_pendingGovernor", "type": "address" }],
-    "name": "setPendingGovernor",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "delegate", "type": "address" },
-      { "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "setPoolDelegateAllowlist",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "asset", "type": "address" },
-      { "internalType": "address", "name": "oracle", "type": "address" }
-    ],
-    "name": "setPriceOracle",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "bool", "name": "pause", "type": "bool" }],
-    "name": "setProtocolPause",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "newCooldownPeriod", "type": "uint256" }],
-    "name": "setStakerCooldownPeriod",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "newUnstakeWindow", "type": "uint256" }],
-    "name": "setStakerUnstakeWindow",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "amt", "type": "uint256" }],
-    "name": "setSwapOutRequired",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "_fee", "type": "uint256" }],
-    "name": "setTreasuryFee",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "balancerPool", "type": "address" },
-      { "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "setValidBalancerPool",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "loanFactory", "type": "address" },
-      { "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "setValidLoanFactory",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "poolFactory", "type": "address" },
-      { "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "setValidPoolFactory",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "superFactory", "type": "address" },
-      { "internalType": "address", "name": "subFactory", "type": "address" },
-      { "internalType": "bool", "name": "valid", "type": "bool" }
-    ],
-    "name": "setValidSubFactory",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stakerCooldownPeriod",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stakerUnstakeWindow",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "swapOutRequired",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "treasuryFee",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "validCalcs",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "", "type": "address" },
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "name": "validSubFactories",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  }
+    {
+        "inputs": [
+            { "internalType": "address", "name": "_governor", "type": "address" },
+            { "internalType": "address", "name": "_mpl", "type": "address" },
+            { "internalType": "address", "name": "_globalAdmin", "type": "address" }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "address", "name": "balancerPool", "type": "address" },
+            { "indexed": false, "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "BalancerPoolSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "decimals", "type": "uint256" },
+            { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" },
+            { "indexed": false, "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "CollateralAssetSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": true, "internalType": "address", "name": "newGlobalAdmin", "type": "address" }],
+        "name": "GlobalAdminSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "bytes32", "name": "which", "type": "bytes32" },
+            { "indexed": false, "internalType": "address", "name": "addr", "type": "address" }
+        ],
+        "name": "GlobalsAddressSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "bytes32", "name": "which", "type": "bytes32" },
+            { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }
+        ],
+        "name": "GlobalsParamSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": true, "internalType": "address", "name": "governor", "type": "address" }],
+        "name": "GovernorAccepted",
+        "type": "event"
+    },
+    { "anonymous": false, "inputs": [], "name": "Initialized", "type": "event" },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "decimals", "type": "uint256" },
+            { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" },
+            { "indexed": false, "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "LiquidityAssetSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
+            { "indexed": false, "internalType": "address", "name": "oracle", "type": "address" }
+        ],
+        "name": "OracleSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": true, "internalType": "address", "name": "pendingGovernor", "type": "address" }],
+        "name": "PendingGovernorSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "delegate", "type": "address" },
+            { "indexed": false, "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "PoolDelegateSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": false, "internalType": "bool", "name": "pause", "type": "bool" }],
+        "name": "ProtocolPaused",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "exemptedContract", "type": "address" },
+            { "indexed": false, "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "TransferRestrictionExemptionSet",
+        "type": "event"
+    },
+    { "inputs": [], "name": "acceptGovernor", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+        "inputs": [],
+        "name": "defaultGracePeriod",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "", "type": "address" },
+            { "internalType": "address", "name": "", "type": "address" }
+        ],
+        "name": "defaultUniswapPath",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "fundingPeriod",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "asset", "type": "address" }],
+        "name": "getLatestPrice",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getLpCooldownParams",
+        "outputs": [
+            { "internalType": "uint256", "name": "", "type": "uint256" },
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "globalAdmin",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "governor",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "investorFee",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "name": "isValidBalancerPool",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "calc", "type": "address" },
+            { "internalType": "uint8", "name": "calcType", "type": "uint8" }
+        ],
+        "name": "isValidCalc",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "name": "isValidCollateralAsset",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "name": "isValidLiquidityAsset",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "name": "isValidLoanFactory",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "name": "isValidPoolDelegate",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "name": "isValidPoolFactory",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "superFactory", "type": "address" },
+            { "internalType": "address", "name": "subFactory", "type": "address" },
+            { "internalType": "uint8", "name": "factoryType", "type": "uint8" }
+        ],
+        "name": "isValidSubFactory",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "lpCooldownPeriod",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "lpWithdrawWindow",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "mapleTreasury",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "maxSwapSlippage",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "minLoanEquity",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "mpl",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "name": "oracleFor",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "pendingGovernor",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "protocolPaused",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "calc", "type": "address" },
+            { "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "setCalc",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "asset", "type": "address" },
+            { "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "setCollateralAsset",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "_defaultGracePeriod", "type": "uint256" }],
+        "name": "setDefaultGracePeriod",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "from", "type": "address" },
+            { "internalType": "address", "name": "to", "type": "address" },
+            { "internalType": "address", "name": "mid", "type": "address" }
+        ],
+        "name": "setDefaultUniswapPath",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "_fundingPeriod", "type": "uint256" }],
+        "name": "setFundingPeriod",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "newGlobalAdmin", "type": "address" }],
+        "name": "setGlobalAdmin",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "_fee", "type": "uint256" }],
+        "name": "setInvestorFee",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "asset", "type": "address" },
+            { "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "setLiquidityAsset",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "newCooldownPeriod", "type": "uint256" }],
+        "name": "setLpCooldownPeriod",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "newLpWithdrawWindow", "type": "uint256" }],
+        "name": "setLpWithdrawWindow",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "_mapleTreasury", "type": "address" }],
+        "name": "setMapleTreasury",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "newMaxSlippage", "type": "uint256" }],
+        "name": "setMaxSwapSlippage",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "_minLoanEquity", "type": "uint256" }],
+        "name": "setMinLoanEquity",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "_pendingGovernor", "type": "address" }],
+        "name": "setPendingGovernor",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "delegate", "type": "address" },
+            { "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "setPoolDelegateAllowlist",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "asset", "type": "address" },
+            { "internalType": "address", "name": "oracle", "type": "address" }
+        ],
+        "name": "setPriceOracle",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "bool", "name": "pause", "type": "bool" }],
+        "name": "setProtocolPause",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "newCooldownPeriod", "type": "uint256" }],
+        "name": "setStakerCooldownPeriod",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "newUnstakeWindow", "type": "uint256" }],
+        "name": "setStakerUnstakeWindow",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "amt", "type": "uint256" }],
+        "name": "setSwapOutRequired",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "_fee", "type": "uint256" }],
+        "name": "setTreasuryFee",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "balancerPool", "type": "address" },
+            { "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "setValidBalancerPool",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "loanFactory", "type": "address" },
+            { "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "setValidLoanFactory",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "poolFactory", "type": "address" },
+            { "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "setValidPoolFactory",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "superFactory", "type": "address" },
+            { "internalType": "address", "name": "subFactory", "type": "address" },
+            { "internalType": "bool", "name": "valid", "type": "bool" }
+        ],
+        "name": "setValidSubFactory",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "stakerCooldownPeriod",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "stakerUnstakeWindow",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "swapOutRequired",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "treasuryFee",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "name": "validCalcs",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "", "type": "address" },
+            { "internalType": "address", "name": "", "type": "address" }
+        ],
+        "name": "validSubFactories",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    }
 ]

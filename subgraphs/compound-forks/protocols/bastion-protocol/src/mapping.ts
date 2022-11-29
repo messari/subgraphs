@@ -325,9 +325,6 @@ function getOrCreateProtocol(): LendingProtocol {
     comptrollerAddr,
     "Bastion Protocol",
     "bastion-protocol",
-    "2.0.1",
-    "1.1.7",
-    "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()

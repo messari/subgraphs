@@ -14,16 +14,14 @@ import {
   LendingType,
   Network,
   ProtocolType,
-  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
-  PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SLUG,
-  PROTOCOL_SUBGRAPH_VERSION,
   RiskType,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   TROVE_MANAGER,
 } from "../utils/constants";
+import { Versions } from "../versions";
 import { getOrCreateMarket } from "./market";
 import { getYUSDToken } from "./token";
 
@@ -33,9 +31,6 @@ export function getOrCreateYetiProtocol(): LendingProtocol {
     protocol = new LendingProtocol(TROVE_MANAGER);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.AVALANCHE;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.CDP;
@@ -44,7 +39,7 @@ export function getOrCreateYetiProtocol(): LendingProtocol {
     protocol.totalYUSDLocked = BIGINT_ZERO;
     protocol.totalStablePoolAssetUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
-    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
@@ -53,8 +48,14 @@ export function getOrCreateYetiProtocol(): LendingProtocol {
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeDepositUSD = BIGDECIMAL_ZERO;
     protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 
@@ -103,7 +104,6 @@ export function getOrCreateUsageMetricsHourlySnapshot(
     usageMetrics.hourlyWithdrawCount = INT_ZERO;
     usageMetrics.hourlyRepayCount = INT_ZERO;
     usageMetrics.hourlyLiquidateCount = INT_ZERO;
-
   }
   usageMetrics.blockNumber = event.block.number;
   usageMetrics.timestamp = event.block.timestamp;

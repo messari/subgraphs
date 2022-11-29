@@ -14,7 +14,7 @@ export function getTokenPriceFromSushiSwap(tokenAddr: Address, network: string):
         return new CustomPriceType();
     }
 
-    let tokenPrice: BigDecimal = utils
+    const tokenPrice: BigDecimal = utils
         .readValue<BigInt>(curveContract.try_getPriceUsdc(tokenAddr), constants.BIGINT_ZERO)
         .toBigDecimal();
 

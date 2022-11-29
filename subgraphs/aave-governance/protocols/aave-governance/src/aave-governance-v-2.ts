@@ -33,8 +33,8 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 }
 
 export function handleProposalCreated(event: ProposalCreated): void {
-  let executor = event.params.executor;
-  let quorumVotes = getQuorumFromContract(
+  const executor = event.params.executor;
+  const quorumVotes = getQuorumFromContract(
     event.address,
     executor,
     event.block.number.minus(BIGINT_ONE)
@@ -69,7 +69,7 @@ export function handleProposalQueued(event: ProposalQueued): void {
 }
 
 export function handleVoteEmitted(event: VoteEmitted): void {
-  let proposal = getProposal(event.params.id.toString());
+  const proposal = getProposal(event.params.id.toString());
 
   // if state is pending (i.e. the first vote), set state, quorum, delegates and tokenholders
   if (proposal.state == ProposalState.PENDING) {
@@ -80,7 +80,7 @@ export function handleVoteEmitted(event: VoteEmitted): void {
       Address.fromString(proposal.executor),
       event.block.number.minus(BIGINT_ONE)
     );
-    let governance = getGovernance();
+    const governance = getGovernance();
     proposal.tokenHoldersAtStart = governance.currentTokenHolders;
     proposal.delegatesAtStart = governance.currentDelegates;
   }
@@ -97,7 +97,9 @@ export function handleVoteEmitted(event: VoteEmitted): void {
 
 // VotingDelayChanged (newVotingDelay, initiatorChange)
 export function handleVotingDelayChanged(event: VotingDelayChanged): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
   governanceFramework.votingDelay = event.params.newVotingDelay;
   governanceFramework.save();
 }
@@ -108,8 +110,8 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
-    let contract = AaveGovernanceV2.bind(Address.fromString(contractAddress));
-    governanceFramework.name = contract.NAME();
+    const contract = AaveGovernanceV2.bind(Address.fromString(contractAddress));
+    governanceFramework.name = "aave-governance";
     governanceFramework.type = GOVERNANCE_TYPE;
     governanceFramework.version = NA;
 
@@ -134,20 +136,20 @@ function getQuorumFromContract(
   blockNumber: BigInt
 ): BigInt {
   // Get govStrat contract address
-  let contract = AaveGovernanceV2.bind(contractAddress);
-  let govStratAddress = contract.getGovernanceStrategy();
+  const contract = AaveGovernanceV2.bind(contractAddress);
+  const govStratAddress = contract.getGovernanceStrategy();
   // Get totalVotingSuppy from GovStrat contract
-  let governanceStrategyContract = GovernanceStrategy.bind(govStratAddress);
-  let totalVotingSupply = governanceStrategyContract.getTotalVotingSupplyAt(
+  const governanceStrategyContract = GovernanceStrategy.bind(govStratAddress);
+  const totalVotingSupply = governanceStrategyContract.getTotalVotingSupplyAt(
     blockNumber.minus(BIGINT_ONE)
   );
   // Get minimum voting power from Executor contract
-  let executorContract = Executor.bind(executorAddress);
-  let quorumVotes =
+  const executorContract = Executor.bind(executorAddress);
+  const quorumVotes =
     executorContract.getMinimumVotingPowerNeeded(totalVotingSupply);
 
   // Update quorum at the contract level as well
-  let governanceFramework = getGovernanceFramework(
+  const governanceFramework = getGovernanceFramework(
     contractAddress.toHexString()
   );
   governanceFramework.quorumVotes = quorumVotes;

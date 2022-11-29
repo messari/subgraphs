@@ -10,6 +10,7 @@ interface ProtocolTabProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   protocolType: string;
   protocolFields: { [x: string]: string };
+  subgraphEndpoints: any;
   protocolTableData: { [x: string]: any };
   overlaySchemaData: any;
   protocolSchemaData: any;
@@ -24,6 +25,7 @@ function ProtocolTab({
   entitiesData,
   protocolType,
   protocolFields,
+  subgraphEndpoints,
   protocolTableData,
   overlaySchemaData,
   protocolSchemaData,
@@ -60,6 +62,7 @@ function ProtocolTab({
           key={entityName + "-ProtocolTabEntity"}
           entityName={entityName}
           entitiesData={entitiesData}
+          subgraphEndpoints={subgraphEndpoints}
           currentEntityData={currentEntityData}
           overlaySchemaData={overlaySchemaData}
           protocolSchemaData={protocolSchemaData}

@@ -18,14 +18,12 @@ import {
   DEPLOYER_ADDRESS,
   INT_ZERO,
   ProtocolType,
-  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
-  PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SLUG,
-  PROTOCOL_SUBGRAPH_VERSION,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "../utils/constants";
+import { Versions } from "../versions";
 import {
   getOrCreatePoolDailySnapshot,
   getOrCreatePoolHourlySnapshot,
@@ -37,9 +35,6 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol = new DexAmmProtocol(DEPLOYER_ADDRESS);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -49,8 +44,14 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.totalPoolCount = INT_ZERO;
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 

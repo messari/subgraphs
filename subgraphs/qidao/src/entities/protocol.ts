@@ -17,16 +17,17 @@ import {
   LendingType,
   MAI_TOKEN_ADDRESS,
   ProtocolType,
-  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
-  PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SLUG,
-  PROTOCOL_SUBGRAPH_VERSION,
   RiskType,
   SECONDS_PER_DAY,
 } from "../utils/constants";
 import { uppercaseNetwork } from "../utils/strings";
-import { getOrCreateMarketHourlySnapshot, getOrCreateMarketSnapshot } from "./market";
+import { Versions } from "../versions";
+import {
+  getOrCreateMarketHourlySnapshot,
+  getOrCreateMarketSnapshot,
+} from "./market";
 import { getMaiToken } from "./token";
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
@@ -36,9 +37,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol = new LendingProtocol(id);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.CDP;
@@ -57,8 +55,14 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     protocol.mintedTokenSupplies = [BIGINT_ZERO];
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 
@@ -79,7 +83,7 @@ export function getOrCreateFinancialsSnapshot(
     financialsSnapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
     financialsSnapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
     financialsSnapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
-    
+
     financialsSnapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
     financialsSnapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
   }
@@ -129,14 +133,14 @@ export function addProtocolSideRevenue(
   marketDailySnapshot.dailyProtocolSideRevenueUSD =
     marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(revenueAmountUSD);
   marketDailySnapshot.dailyTotalRevenueUSD =
-    marketDailySnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD)
+    marketDailySnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   marketDailySnapshot.save();
 
   const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
   marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
     marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(revenueAmountUSD);
   marketHourlySnapshot.hourlyTotalRevenueUSD =
-    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(revenueAmountUSD)
+    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(revenueAmountUSD);
   marketHourlySnapshot.save();
 }
 
@@ -151,7 +155,7 @@ export function addSupplySideRevenue(
   protocol.cumulativeTotalRevenueUSD =
     protocol.cumulativeTotalRevenueUSD.plus(revenueAmountUSD);
   protocol.save();
-  
+
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.dailySupplySideRevenueUSD =
     financialsSnapshot.dailySupplySideRevenueUSD.plus(revenueAmountUSD);
@@ -159,24 +163,24 @@ export function addSupplySideRevenue(
     financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
 
-  market.cumulativeSupplySideRevenueUSD = 
+  market.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD.plus(revenueAmountUSD);
-  market.cumulativeTotalRevenueUSD = 
+  market.cumulativeTotalRevenueUSD =
     market.cumulativeTotalRevenueUSD.plus(revenueAmountUSD);
   market.save();
 
   const marketDailySnapshot = getOrCreateMarketSnapshot(event, market);
-  marketDailySnapshot.dailySupplySideRevenueUSD = 
+  marketDailySnapshot.dailySupplySideRevenueUSD =
     marketDailySnapshot.dailySupplySideRevenueUSD.plus(revenueAmountUSD);
-  marketDailySnapshot.dailyTotalRevenueUSD = 
-    marketDailySnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD)
+  marketDailySnapshot.dailyTotalRevenueUSD =
+    marketDailySnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   marketDailySnapshot.save();
 
   const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
   marketHourlySnapshot.hourlySupplySideRevenueUSD =
     marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(revenueAmountUSD);
   marketHourlySnapshot.hourlyTotalRevenueUSD =
-    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(revenueAmountUSD)
+    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(revenueAmountUSD);
   marketHourlySnapshot.save();
 }
 

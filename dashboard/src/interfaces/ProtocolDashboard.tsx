@@ -41,9 +41,10 @@ interface ProtocolProps {
   protocolJSON: any;
   getData: any;
   subgraphEndpoints: any;
+  decentralizedDeployments: any;
 }
 
-function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints }: ProtocolProps) {
+function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentralizedDeployments }: ProtocolProps) {
   const [searchParams] = useSearchParams();
   const subgraphParam = searchParams.get("endpoint") || "";
   const tabString = searchParams.get("tab") || "";
@@ -66,6 +67,12 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints }: Protoco
         subgraphName = searchParams.get("name") || "";
       } else {
         subgraphName = "";
+      }
+    } else if (!subgraphParam.includes('/')) {
+      if (subgraphParam?.toUpperCase()?.split("QM")?.length === 1) {
+        queryURL = "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + subgraphParam;
+      } else {
+        queryURL = "https://api.thegraph.com/subgraphs/id/" + subgraphParam;
       }
     }
   }
@@ -145,6 +152,9 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints }: Protoco
   ] = useLazyQuery(query, { client: overlayDeploymentClient });
 
   useEffect(() => {
+    if (overlayError) {
+      setOverlayError(null);
+    }
     const href = new URL(window.location.href);
     const p = new URLSearchParams(href.search);
     if (overlayDeploymentURL === "") {
@@ -247,18 +257,8 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints }: Protoco
   }
 
   const {
-    entitiesData: overlayEntitiesData,
-    poolData: overlayPoolData,
     query: overlayQuery,
-    events: overlayEvents,
-    protocolFields: overlayProtocolFields,
-    financialsQuery: overlayFinancialsQuery,
-    dailyUsageQuery: overlayDailyUsageQuery,
-    hourlyUsageQuery: overlayHourlyUsageQuery,
-    protocolTableQuery: overlayProtocolTableQuery,
-    poolsQuery: overlayPoolsQuery,
     poolTimeseriesQuery: overlayPoolTimeseriesQuery,
-    positionsQuery: overlayPositionsQuery = "",
   } = schema(overlayProtocolType, overlaySchemaVersion);
 
   const overlayQueryMain = gql`
@@ -650,7 +650,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints }: Protoco
         getPoolsOverviewData2();
       }
     }
-  }, [tabValue, dataPools, poolOverviewLoading]);
+  }, [tabValue, data, dataPools, poolOverviewLoading]);
 
   useEffect(() => {
     if (data?.protocols && dataPools2) {
@@ -1150,9 +1150,11 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints }: Protoco
           poolNames={PoolNames[data.protocols[0].type]}
           poolId={poolId}
           poolData={poolData}
+          decentralizedDeployments={decentralizedDeployments}
           protocolFields={protocolFields}
           protocolTableData={protocolTableData}
           overlaySchemaData={overlaySchemaDataProp}
+          overlayError={overlayError}
           protocolSchemaData={protocolSchemaDataProp}
           subgraphToQueryURL={subgraphToQuery.url}
           skipAmt={skipAmt}

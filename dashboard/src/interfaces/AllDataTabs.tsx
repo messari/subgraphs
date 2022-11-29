@@ -1,6 +1,6 @@
 import { TabContext, TabPanel } from "@mui/lab";
 import { CircularProgress, Tab, Tabs } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import EventsTab from "./tabs/EventsTab";
 import PoolTab from "./tabs/PoolTab";
 import ProtocolTab from "./tabs/ProtocolTab";
@@ -9,9 +9,11 @@ import PoolOverviewTab from "./tabs/PoolOverviewTab";
 import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
 import { PoolName, ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 import PositionTab from "./tabs/PositionTab";
-import { NewClient } from "../utils";
+import { NewClient, schemaMapping } from "../utils";
 import { NormalizedCacheObject, ApolloClient } from "@apollo/client";
 import { DeploymentOverlayDropDown } from "../common/utilComponents/DeploymentOverlayDropDown";
+import { getPendingSubgraphsOnProtocolQuery } from "../queries/subgraphStatusQuery";
+import PendingCalls from "./PendingCalls";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -33,6 +35,7 @@ interface AllDataTabsProps {
   subgraphToQueryURL: string;
   skipAmt: number;
   overlaySchemaData: any;
+  overlayError: any;
   protocolSchemaData: any;
   poolOverviewRequest: { [x: string]: any };
   poolTimeseriesRequest: { [x: string]: any };
@@ -42,6 +45,7 @@ interface AllDataTabsProps {
   protocolTimeseriesError: any;
   overlayProtocolTimeseriesData: any;
   protocolTableData: any;
+  decentralizedDeployments: any;
   poolsListData: { [x: string]: any };
   poolListLoading: any;
   poolsListError: any;
@@ -72,12 +76,14 @@ function AllDataTabs({
   subgraphToQueryURL,
   skipAmt,
   overlaySchemaData,
+  overlayError,
   protocolSchemaData,
   poolOverviewRequest,
   poolTimeseriesRequest,
   protocolTimeseriesData,
   overlayPoolTimeseriesData,
   protocolTableData,
+  decentralizedDeployments,
   poolsListData,
   poolListLoading,
   protocolTimeseriesLoading,
@@ -92,8 +98,23 @@ function AllDataTabs({
   setProtocolId,
   paginate,
   setOverlayDeploymentClient,
-  setOverlayDeploymentURL,
+  setOverlayDeploymentURL
 }: AllDataTabsProps) {
+  const [pendingSubgraphData, setPendingSubgraphData] = useState<any>({});
+  const [pendingQuery, setPendingQuery] = useState<any>(null);
+
+  useEffect(() => {
+    try {
+      if (subgraphEndpoints) {
+        if (subgraphEndpoints[schemaMapping[data.protocols[0]?.type]]) {
+          setPendingQuery(getPendingSubgraphsOnProtocolQuery(subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0]?.slug]));
+        }
+      }
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  }, [subgraphEndpoints]);
+
   let protocolDropDown = null;
   if (data.protocols.length > 1) {
     protocolDropDown = (
@@ -140,49 +161,54 @@ function AllDataTabs({
 
   let showDropDown = false;
   let failedToLoad = false;
-  if (
-    tabValue + "" === "1" &&
-    (protocolTimeseriesData.financialsDailySnapshots || protocolTimeseriesError.financialsDailySnapshots) &&
-    (protocolTimeseriesData.usageMetricsDailySnapshots || protocolTimeseriesError.usageMetricDailySnapshots) &&
-    (protocolTimeseriesData.usageMetricsHourlySnapshots || protocolTimeseriesError.usageMetricsHourlySnapshots)
-  ) {
-    if (
-      (overlayDeploymentURL &&
+  try {
+    if (tabValue + "" === "1" &&
+      (protocolTimeseriesData.financialsDailySnapshots || protocolTimeseriesError.financialsDailySnapshots) &&
+      (protocolTimeseriesData.usageMetricsDailySnapshots || protocolTimeseriesError.usageMetricDailySnapshots) &&
+      (protocolTimeseriesData.usageMetricsHourlySnapshots || protocolTimeseriesError.usageMetricsHourlySnapshots)) {
+      if ((overlayDeploymentURL &&
         overlayProtocolTimeseriesData.financialsDailySnapshots?.length > 0 &&
         overlayProtocolTimeseriesData.usageMetricsDailySnapshots?.length > 0 &&
-        overlayProtocolTimeseriesData.usageMetricsHourlySnapshots?.length > 0) ||
-      !overlayDeploymentURL
-    ) {
-      showDropDown = true;
-    }
-    if (
-      (!protocolTimeseriesData.financialsDailySnapshots &&
+        overlayProtocolTimeseriesData.usageMetricsHourlySnapshots?.length > 0) || !overlayDeploymentURL) {
+        showDropDown = true;
+      }
+      if ((!protocolTimeseriesData.financialsDailySnapshots &&
         !protocolTimeseriesData.usageMetricsDailySnapshots &&
         !protocolTimeseriesData.usageMetricsHourlySnapshots) ||
-      (overlayDeploymentURL &&
-        !overlayProtocolTimeseriesData?.financialsDailySnapshots &&
-        !overlayProtocolTimeseriesData?.usageMetricsDailySnapshots &&
-        !overlayProtocolTimeseriesData?.usageMetricsHourlySnapshots)
-    ) {
-      failedToLoad = true;
+        (overlayDeploymentURL &&
+          !overlayProtocolTimeseriesData?.financialsDailySnapshots &&
+          !overlayProtocolTimeseriesData?.usageMetricsDailySnapshots &&
+          !overlayProtocolTimeseriesData?.usageMetricsHourlySnapshots)) {
+        failedToLoad = true;
+      }
+    } else if (tabValue + "" === "3" && poolTimeseriesRequest.poolTimeseriesData) {
+      if (Object.values(poolTimeseriesRequest.poolTimeseriesData).filter((x: any) => x?.length > 0)?.length === Object.values(poolTimeseriesRequest.poolTimeseriesData).length) {
+        showDropDown = true;
+      } else if (poolTimeseriesRequest.poolTimeseriesError) {
+        failedToLoad = true;
+      }
     }
-  } else if (tabValue + "" === "3" && poolTimeseriesRequest.poolTimeseriesData) {
-    if (
-      Object.values(poolTimeseriesRequest.poolTimeseriesData).filter((x: any) => x?.length > 0)?.length ===
-      Object.values(poolTimeseriesRequest.poolTimeseriesData).length
-    ) {
+
+    if ((tabValue + "" === "1" || tabValue + "" === "3") && overlayError) {
       showDropDown = true;
-    } else if (poolTimeseriesRequest.poolTimeseriesError) {
-      failedToLoad = true;
     }
+  } catch (err: any) {
+    console.error(err.message);
+  }
+
+  if (tabValue + "" !== "1" && tabValue + "" !== "3") {
+    failedToLoad = true;
+  }
+
+  let pendingCalls = null;
+  if (pendingQuery) {
+    pendingCalls = <PendingCalls query={pendingQuery} pendingSubgraphData={pendingSubgraphData} setPendingSubgraphData={setPendingSubgraphData} />
   }
 
   return (
     <>
       <TabContext value={tabValue}>
-        <div
-          style={{ display: "flex", backgroundColor: "#292f38", justifyContent: "space-between", alignItems: "center" }}
-        >
+        <div style={{ display: "flex", backgroundColor: "#292f38", justifyContent: "space-between", alignItems: "center" }}>
           <StyledTabs value={tabValue} onChange={handleTabChange}>
             <Tab label="Protocol" value="1" />
             <Tab label="Pool Overview" value="2" />
@@ -197,16 +223,18 @@ function AllDataTabs({
               setOverlayDeploymentURL(x);
             }}
             subgraphEndpoints={subgraphEndpoints}
+            pendingSubgraphData={pendingSubgraphData}
+            decentralizedDeployments={decentralizedDeployments}
             currentDeploymentURL={overlayDeploymentURL}
             showDropDown={showDropDown}
-            failedToLoad={failedToLoad}
-          />
+            failedToLoad={failedToLoad} />
         </div>
         {protocolDropDown}
         <TabPanel value="1">
           {/* PROTOCOL TAB */}
           <ProtocolTab
             entitiesData={entitiesData}
+            subgraphEndpoints={subgraphEndpoints}
             protocolFields={protocolFields}
             protocolType={data.protocols[0].type}
             protocolTableData={protocolTableData}
@@ -269,6 +297,7 @@ function AllDataTabs({
           </TabPanel>
         )}
       </TabContext>
+      {pendingCalls}
     </>
   );
 }

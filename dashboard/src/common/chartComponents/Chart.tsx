@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import moment from "moment";
 import { useRef } from "react";
 import { Line } from "react-chartjs-2";
@@ -9,6 +9,7 @@ interface ChartProps {
   dataChart: any;
   identifier: string;
   chartRef: any;
+
 }
 
 export const Chart = ({ identifier, datasetLabel, dataChart, chartRef }: ChartProps) => {
@@ -45,55 +46,62 @@ export const Chart = ({ identifier, datasetLabel, dataChart, chartRef }: ChartPr
       labels,
       datasets: datasets,
     };
-    return (
-      <>
-        <Box padding={2} sx={{ border: 1 }}>
-          <Line
-            data={chartData}
-            ref={chartRef}
-            options={{
-              scales: {
-                y: {
-                  grid: {
-                    display: true,
-                    color: "rgba(255, 255, 255, 0.1)",
-                  },
-                  ticks: {
-                    color: "#fff",
-                  },
-                },
-                x: {
-                  grid: {
-                    display: false,
-                  },
-                  ticks: {
-                    color: "#fff",
-                  },
-                },
-              },
-              elements: {
-                point: {
-                  radius: 0,
-                },
-              },
-
-              plugins: {
-                legend: {
+    return (<>
+      <Box padding={2} sx={{ border: 1 }}>
+        <Line
+          data={chartData}
+          ref={chartRef}
+          options={{
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+              mode: 'nearest',
+              axis: 'x',
+              intersect: false,
+            },
+            scales: {
+              y: {
+                grid: {
                   display: true,
-                  labels: {
-                    color: "#fff",
-                  },
+                  color: "rgba(255, 255, 255, 0.1)",
                 },
-                tooltip: {
-                  enabled: true,
-                  position: "nearest",
+                ticks: {
+                  color: "#fff",
                 },
               },
-            }}
-          />
-        </Box>
-      </>
-    );
+              x: {
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  color: "#fff",
+                },
+              },
+            },
+            elements: {
+              point: {
+                radius: 0,
+                hoverRadius: 5,
+                hoverBorderWidth: 4,
+                hoverBorderColor: "white"
+              },
+            },
+            plugins: {
+              legend: {
+                display: true,
+                labels: {
+                  color: "#fff",
+                },
+              },
+              tooltip: {
+                enabled: true,
+                position: "nearest",
+              },
+            },
+          }}
+        />
+      </Box>
+    </>);
   }
-  return null;
+  return <CircularProgress sx={{ my: 5 }} size={40} />;;
 };

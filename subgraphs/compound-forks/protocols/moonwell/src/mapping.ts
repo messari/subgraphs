@@ -350,9 +350,6 @@ function getOrCreateProtocol(): LendingProtocol {
     comptrollerAddr,
     "Moonwell",
     "moonwell",
-    "2.0.1",
-    "1.1.6",
-    "1.0.0",
     Network.MOONRIVER,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()

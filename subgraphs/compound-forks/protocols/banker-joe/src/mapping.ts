@@ -321,9 +321,6 @@ function getOrCreateProtocol(): LendingProtocol {
     comptrollerAddr,
     "Banker Joe",
     "banker-joe",
-    "2.0.1",
-    "1.1.7",
-    "1.0.0",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()

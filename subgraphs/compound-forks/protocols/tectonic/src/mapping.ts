@@ -332,9 +332,6 @@ function getOrCreateProtocol(): LendingProtocol {
     comptrollerAddr,
     "Tectonic",
     "tectonic",
-    "2.0.1",
-    "1.1.7",
-    "1.0.0",
     Network.CRONOS,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()

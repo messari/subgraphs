@@ -32,6 +32,7 @@ import {
   SECONDS_PER_HOUR,
   SECONDS_PER_DAY,
 } from "../common/constants";
+import { Versions } from "../versions";
 
 export function getOrCreateToken(cToken: Address): Token {
   let tokenId: string = cToken.toHexString();
@@ -139,9 +140,6 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol = new LendingProtocol(FACTORY_ADDRESS);
     protocol.name = "Inverse Finance";
     protocol.slug = "inverse-finance";
-    protocol.schemaVersion = "1.3.0";
-    protocol.subgraphVersion = "1.2.4";
-    protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.ETHEREUM;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.CDP;
@@ -165,9 +163,14 @@ export function getOrCreateProtocol(): LendingProtocol {
     //protocol.usageMetrics
     //protocol.financialMetrics
     //protocol.markets
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 

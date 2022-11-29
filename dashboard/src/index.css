@@ -26,7 +26,7 @@ code {
 }
 
 .Menu-Options {
-  color: #6656f8;
+  color: #6656F8;
   cursor: pointer;
   font-size: 20px;
 }
@@ -41,4 +41,12 @@ code {
 
 .rotated {
   transform: rotate(180deg);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.round-image {
+  border-radius: 2px;
 }
