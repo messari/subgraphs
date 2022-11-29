@@ -435,6 +435,35 @@
       }
     }
   },
+  "alpaca-finance-lending": {
+    "schema": "lending",
+    "base": "alpaca-finance-lending",
+    "protocol": "alpaca-finance-lending",
+    "deployments": {
+      "alpaca-finance-lending-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "alpaca.finance.lending.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "alpaca-finance-lending-bsc",
+            "query-id": "alpaca-finance-lending-bsc"
+          }
+        }
+      }
+    }
+  },
   "arrakis-finance": {
     "schema": "yield-aggregator",
     "base": "arrakis-finance",
@@ -2186,8 +2215,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "arweave-mainnet",
-            "query-id": "arweave-mainnet"
+            "slug": "network-arweave-mainnet",
+            "query-id": "network-arweave-mainnet"
           }
         }
       }
@@ -2989,7 +3018,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.3",
+          "subgraph": "1.0.4",
           "methodology": "1.0.0"
         },
         "files": {

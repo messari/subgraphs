@@ -628,7 +628,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         getPoolsOverviewData2();
       }
     }
-  }, [tabValue, dataPools, poolOverviewLoading]);
+  }, [tabValue, data, dataPools, poolOverviewLoading]);
 
   useEffect(() => {
     if (data?.protocols && dataPools2) {
