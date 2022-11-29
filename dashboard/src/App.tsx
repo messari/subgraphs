@@ -17,7 +17,7 @@ function App() {
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
 
-  const [issuesTitles, setIssuesTitles] = useState<any>([]);
+  const [issuesMapping, setIssuesMapping] = useState<any>({});
 
   const getGithubRepoIssues = () => {
     fetch("https://api.github.com/repos/messari/subgraphs/issues?per_page=100&state=open", {
@@ -32,7 +32,12 @@ function App() {
       })
       .then(function (json) {
         if (Array.isArray(json)) {
-          setIssuesTitles(json.map((x: any) => x.title.toUpperCase().split(' ').join(" ")));
+          let newIssuesMapping: any = {};
+          json.forEach((x: any) => {
+            const key: string = x.title.toUpperCase().split(' ').join(" ") || "";
+            newIssuesMapping[key] = x.html_url;
+          });
+          setIssuesMapping(newIssuesMapping);
         }
       })
       .catch((err) => {
@@ -253,7 +258,7 @@ function App() {
       <DashboardVersion />
       <Routes>
         <Route path="/">
-          <Route index element={<DeploymentsPage issuesTitles={issuesTitles} getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} indexingStatusQueries={indexingStatusQueries} endpointSlugs={endpointSlugs} aliasToProtocol={aliasToProtocol} decentralizedDeployments={decentralizedDeployments} />} />
+          <Route index element={<DeploymentsPage issuesMapping={issuesMapping} getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} indexingStatusQueries={indexingStatusQueries} endpointSlugs={endpointSlugs} aliasToProtocol={aliasToProtocol} decentralizedDeployments={decentralizedDeployments} />} />
           <Route path="subgraph" element={<ProtocolDashboard protocolJSON={protocolsToQuery} getData={() => getDeployments()} subgraphEndpoints={subgraphEndpoints} decentralizedDeployments={decentralizedDeployments} />} />
           <Route path="protocols-list" element={<ProtocolsListByTVL protocolsToQuery={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route

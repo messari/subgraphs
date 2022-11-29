@@ -8,7 +8,7 @@ import { convertTokenDecimals, formatIntToFixed2, toPercent } from "../utils";
 
 interface ProtocolSection {
     protocol: { [x: string]: any };
-    issuesTitles: any;
+    issuesMapping: any;
     schemaType: string;
     subgraphName: string;
     clientIndexing: any;
@@ -21,12 +21,14 @@ interface ProtocolSection {
     validationSupported: boolean;
 }
 
-function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
+function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
     const [showDeposDropDown, toggleShowDeposDropDown] = useState<boolean>(false);
     const navigate = useNavigate();
     useEffect(() => {
         toggleShowDeposDropDown(tableExpanded);
     }, [tableExpanded])
+
+    const issuesTitles = Object.keys(issuesMapping);
 
     let hasDecentralizedDepo = false;
     protocol.networks.forEach((depo: any) => {
@@ -35,12 +37,23 @@ function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, cli
         }
     });
     let prodStatusIcon = "https://images.emojiterra.com/twitter/v13.1/512px/2705.png";
-    if (Array.isArray(issuesTitles)) {
-        const hasOpenRepoIssue = !!(issuesTitles.find((x: any) => x.includes(subgraphName.toUpperCase().split('-')[0])));
-        if (hasOpenRepoIssue) {
-            prodStatusIcon = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoseJ8t1vi2kPFznJJSyeIHGYxgvCvbCMgs6a9TMI&s";
+    let prodStatusHover = "Subgraph is frozen";
+    protocol.networks.forEach((depo: any) => {
+        if (Array.isArray(issuesTitles)) {
+            const openRepoIssue = (issuesTitles.find((x: any) => {
+                if (issuesMapping[x].includes('/pull/')) {
+                    return false;
+                }
+                const depoSpecificIssue = x.toUpperCase().includes(subgraphName.toUpperCase()) && x.toUpperCase().includes(depo.chain.toUpperCase());
+                const protocolWideIssue = x.toUpperCase().includes(subgraphName.toUpperCase() + ' ALL');
+                return depoSpecificIssue || protocolWideIssue;
+            }));
+            if (!!openRepoIssue) {
+                prodStatusIcon = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoseJ8t1vi2kPFznJJSyeIHGYxgvCvbCMgs6a9TMI&s";
+                prodStatusHover = "Changes in progress";
+            }
         }
-    }
+    })
     if (showDeposDropDown) {
         const depoRowsOnProtocol = protocol.networks.map((depo: any) => {
             let chainLabel = depo.chain;
@@ -48,7 +61,25 @@ function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, cli
                 chainLabel = depo.deploymentName;
             }
             let pendingRow = null;
+            let depoLevelStatusIcon = "https://images.emojiterra.com/twitter/v13.1/512px/2705.png";
+            let depoLevelStatusHover = "Subgraph is frozen";
+            let depoLevelStatusLink: string | undefined;
             try {
+                if (Array.isArray(issuesTitles)) {
+                    const openRepoIssue = (issuesTitles.find((x: any) => {
+                        if (issuesMapping[x].includes('/pull/')) {
+                            return false;
+                        }
+                        const depoSpecificIssue = x.toUpperCase().includes(subgraphName.toUpperCase()) && x.toUpperCase().includes(depo.chain.toUpperCase());
+                        const protocolWideIssue = x.toUpperCase().includes(subgraphName.toUpperCase() + ' ALL');
+                        return depoSpecificIssue || protocolWideIssue;
+                    }));
+                    if (!!openRepoIssue) {
+                        depoLevelStatusIcon = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoseJ8t1vi2kPFznJJSyeIHGYxgvCvbCMgs6a9TMI&s";
+                        depoLevelStatusHover = "Changes in progress";
+                        depoLevelStatusLink = issuesMapping[openRepoIssue];
+                    }
+                }
                 if (!!depo?.pendingIndexStatus) {
                     const pendingObject = depo!.pendingIndexStatus;
                     let syncedPending = pendingObject?.synced ? pendingObject?.synced : {};
@@ -119,7 +150,7 @@ function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, cli
                                     <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
                                 </TableCell>
                                 <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                    {depo?.status === "prod" ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                    {depo?.status === "prod" ? <Tooltip title={depoLevelStatusHover}><img className="round-image" onClick={() => window.open(depoLevelStatusLink)} src={depoLevelStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
                                 </TableCell>
                                 <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                     <CircularProgress size={20} />
@@ -191,7 +222,7 @@ function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, cli
                                     <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
                                 </TableCell>
                                 <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                    {depo?.status === "prod" ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                    {depo?.status === "prod" ? <Tooltip title={depoLevelStatusHover}><img className="round-image" onClick={() => window.open(depoLevelStatusLink)} src={depoLevelStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
                                 </TableCell>
                                 <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                     {indexedPending ? indexedPending + "%" : "N/A"}
@@ -332,7 +363,7 @@ function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, cli
                                 <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.chain + 'Logo-DECEN'} size={30} network={depo.chain} />
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {depo?.status === "prod" ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                {depo?.status === "prod" ? <Tooltip title={depoLevelStatusHover}><img className="round-image" onClick={() => window.open(depoLevelStatusLink)} src={depoLevelStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {indexedDecen ? indexedDecen + "%" : "N/A"}
@@ -445,7 +476,7 @@ function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, cli
                                 <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {depo?.status === "prod" ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                {depo?.status === "prod" ? <Tooltip title={depoLevelStatusHover}><img className="round-image" onClick={() => window.open(depoLevelStatusLink)} src={depoLevelStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 <CircularProgress size={20} />
@@ -519,7 +550,7 @@ function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, cli
                                 <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {depo?.status === "prod" ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                {depo?.status === "prod" ? <Tooltip title={depoLevelStatusHover}><img className="round-image" onClick={() => window.open(depoLevelStatusLink)} src={depoLevelStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {indexed ? indexed + "%" : "N/A"}
@@ -596,7 +627,7 @@ function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, cli
                     }
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                    {protocol?.status ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                    {protocol?.status ? <Tooltip title={prodStatusHover}><img className="round-image" src={prodStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
                     -
@@ -705,7 +736,7 @@ function ProtocolSection({ protocol, issuesTitles, schemaType, subgraphName, cli
                 </Tooltip>
             </TableCell>
             <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                {protocol?.status ? <img className="round-image" src={prodStatusIcon} height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                {protocol?.status ? <Tooltip title={prodStatusHover}><img className="round-image" src={prodStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
             </TableCell>
             <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
 
