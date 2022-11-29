@@ -3,7 +3,6 @@ import {
   ethereum,
   BigInt,
   DataSourceContext,
-  dataSource,
 } from "@graphprotocol/graph-ts";
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
