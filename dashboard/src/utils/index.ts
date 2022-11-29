@@ -14,14 +14,20 @@ export const tableCellTruncate: any = {
 };
 
 export const schemaMapping: { [x: string]: any } = {
+  "exchanges": "exchanges",
+  "vaults": "vaults",
   "dex-amm": "exchanges",
   "yield-aggregator": "vaults",
   "lending": "lending",
   "generic": "generic",
-  "EXCHANGE": "exchanges",
+  "EXCHANGES": "exchanges",
+  "VAULTS": "vaults",
+  "DEX-AMM": "exchanges",
+  "YIELD-AGGREGATOR": "vaults",
   "LENDING": "lending",
+  "GENERIC": "generic",
+  "EXCHANGE": "exchanges",
   "YIELD": "vaults",
-  "GENERIC": "generic"
 }
 
 export function toDate(timestamp: number, hour: boolean = false) {
@@ -221,7 +227,7 @@ export function csvToJSONConvertor(csv: string, isEntityLevel: boolean) {
   }
 }
 
-export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
+export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string, generateCsvUrl: boolean = true) {
   try {
     const arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
     let CSV = '';
@@ -251,7 +257,11 @@ export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel
     const blob = new Blob([csv], { type: 'text/csv' });
     const csvUrl = window.webkitURL.createObjectURL(blob);
     const filename = (ReportTitle || 'UserExport') + '.csv';
-    return { csvUrl, filename };
+    if (generateCsvUrl) {
+      return { csvUrl, filename };
+    } else {
+      return { blob, filename }
+    }
   } catch (err: any) {
     console.error(err.message);
     return { csvURL: "", filename: "" };
