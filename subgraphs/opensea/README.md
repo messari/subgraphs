@@ -253,9 +253,9 @@ The subgraph call handler flow can be broken down into several steps:
    ```js
    function atomicize (address[] addrs, uint[] values, uint[] calldataLengths, bytes calldatas)
    ```
-
-   Note that there is no need to validate function selector using `validateCallDataFunctionSelector` since `WyvernAtomicizer` only contains one method.
-
+   
+   Note that there is no need to validate function selector using `validateCallDataFunctionSelector` since `WyvernAtomicizer` only contains one method. 
+   
    Decoding the `atomicize` method returns a list of targets (ERC721/ERC1155 contract addresses), `calldata` lengths, and `calldata` blob which can be split up into a list of individual contract calls.
 
    Similar to how single NFTs are decoded, the "atomicized" list of `calldata` can be decoded into individual transfers.

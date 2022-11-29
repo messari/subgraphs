@@ -49,47 +49,47 @@ enum SaleStrategy {
 }
 
 enum _BasicOrderRouteType {
-  " 0: provide Ether (or other native token) to receive offered ERC721 item."
-  ETH_TO_ERC721
+    " 0: provide Ether (or other native token) to receive offered ERC721 item."
+    ETH_TO_ERC721,
 
-  " 1: provide Ether (or other native token) to receive offered ERC1155 item."
-  ETH_TO_ERC1155
+    " 1: provide Ether (or other native token) to receive offered ERC1155 item."
+    ETH_TO_ERC1155,
 
-  " 2: provide ERC20 item to receive offered ERC721 item."
-  ERC20_TO_ERC721
+    " 2: provide ERC20 item to receive offered ERC721 item."
+    ERC20_TO_ERC721,
 
-  " 3: provide ERC20 item to receive offered ERC1155 item."
-  ERC20_TO_ERC1155
+    " 3: provide ERC20 item to receive offered ERC1155 item."
+    ERC20_TO_ERC1155,
 
-  " 4: provide ERC721 item to receive offered ERC20 item."
-  ERC721_TO_ERC20
+    " 4: provide ERC721 item to receive offered ERC20 item."
+    ERC721_TO_ERC20,
 
-  " 5: provide ERC1155 item to receive offered ERC20 item."
-  ERC1155_TO_ERC20
+    " 5: provide ERC1155 item to receive offered ERC20 item."
+    ERC1155_TO_ERC20
 }
 
 " Order fulfillment methods for trades, helps to identify strategy"
 enum _OrderFulfillmentMethod {
-  " Basic order fulfilled using one of the _BasicOrderRouteType routes"
-  FULFILL_BASIC_ORDER
+    " Basic order fulfilled using one of the _BasicOrderRouteType routes"
+    FULFILL_BASIC_ORDER 
 
-  " Fulfill an order with an arbitrary number of items for offer and consideration"
-  FULFILL_ORDER
+    " Fulfill an order with an arbitrary number of items for offer and consideration"
+    FULFILL_ORDER 
 
-  " Fill an order, fully or partially, with an arbitrary number of items for offer and consideration alongside criteria resolvers "
-  FULFILL_ADVANCED_ORDER
+    " Fill an order, fully or partially, with an arbitrary number of items for offer and consideration alongside criteria resolvers "
+    FULFILL_ADVANCED_ORDER 
 
-  " Attempt to fill a group of orders, each with an arbitrary number of items for offer and consideration."
-  FULFILL_AVAILABLE_ORDERS
+    " Attempt to fill a group of orders, each with an arbitrary number of items for offer and consideration."
+    FULFILL_AVAILABLE_ORDERS
 
-  " Attempt to fill a group of orders, fully or partially, with an arbitrary number of items for offer and consideration per order alongside criteria resolvers"
-  FULFILL_AVAILABLE_ADVANCED_ORDERS
+    " Attempt to fill a group of orders, fully or partially, with an arbitrary number of items for offer and consideration per order alongside criteria resolvers"
+    FULFILL_AVAILABLE_ADVANCED_ORDERS
 
-  " Match an arbitrary number of orders, each with an arbitrary number of items for offer and consideration along with a set of fulfillments allocating offer components to consideration components."
-  MATCH_ORDERS
+    " Match an arbitrary number of orders, each with an arbitrary number of items for offer and consideration along with a set of fulfillments allocating offer components to consideration components."
+    MATCH_ORDERS 
 
-  " Match an arbitrary number of full or partial orders, each with an arbitrary number of items for offer and consideration, supplying criteria resolvers"
-  MATCH_ADVANCED_ORDERS
+    " Match an arbitrary number of full or partial orders, each with an arbitrary number of items for offer and consideration, supplying criteria resolvers"
+    MATCH_ADVANCED_ORDERS 
 }
 
 type Marketplace @entity {

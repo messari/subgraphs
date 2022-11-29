@@ -3,9 +3,7 @@ import { errorNotification } from "./messageDiscord.js";
 
 export async function generateEndpoints(data, protocolNameToBaseMapping) {
   try {
-    const protocolNameToBaseMappingCopy = JSON.parse(
-      JSON.stringify(protocolNameToBaseMapping)
-    );
+    const protocolNameToBaseMappingCopy = JSON.parse(JSON.stringify(protocolNameToBaseMapping));
     const subgraphEndpoints = {};
     if (Object.keys(data)?.length > 0) {
       Object.keys(data).forEach((protocolName) => {
@@ -17,11 +15,7 @@ export async function generateEndpoints(data, protocolNameToBaseMapping) {
         if (!Object.keys(subgraphEndpoints).includes(protocol.schema)) {
           subgraphEndpoints[protocol.schema] = {};
         }
-        if (
-          !Object.keys(subgraphEndpoints[protocol.schema]).includes(
-            protocolName
-          )
-        ) {
+        if (!Object.keys(subgraphEndpoints[protocol.schema]).includes(protocolName)) {
           subgraphEndpoints[protocol.schema][protocolName] = {};
         }
         Object.values(protocol.deployments).forEach((depoData) => {
@@ -29,28 +23,22 @@ export async function generateEndpoints(data, protocolNameToBaseMapping) {
           if (!!depoData?.services["hosted-service"]) {
             hostedServiceId = depoData?.services["hosted-service"]?.slug;
           }
-          subgraphEndpoints[protocol.schema][protocolName][depoData.network] =
-            "https://api.thegraph.com/subgraphs/name/messari/" +
-            hostedServiceId;
+          subgraphEndpoints[protocol.schema][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId;
         });
       });
     }
-    return {
-      subgraphEndpoints,
-      protocolNameToBaseMapping: protocolNameToBaseMappingCopy,
-    };
+    return { subgraphEndpoints, protocolNameToBaseMapping: protocolNameToBaseMappingCopy };
   } catch (err) {
     errorNotification("ERROR LOCATION 1 " + err.message);
   }
-}
+};
 
 export async function indexStatusFlow(deployments) {
   try {
     const generateIndexStatus = await generateIndexStatusQuery(deployments);
     deployments = JSON.parse(JSON.stringify(generateIndexStatus.deployments));
 
-    const indexingStatusQueriesArray =
-      generateIndexStatus.indexingStatusQueries;
+    const indexingStatusQueriesArray = generateIndexStatus.indexingStatusQueries;
     const indexData = await getIndexingStatusData(indexingStatusQueriesArray);
     const invalidDeployments = [];
     Object.keys(indexData).forEach((indexDataName) => {
@@ -66,24 +54,20 @@ export async function indexStatusFlow(deployments) {
         deployments[realNameString].hash = indexData[indexDataName]?.subgraph;
       }
 
-      let indexedPercentage =
-        (indexData[indexDataName]?.chains[0]?.latestBlock?.number -
-          indexData[indexDataName]?.chains[0]?.earliestBlock?.number) /
-          (indexData[indexDataName]?.chains[0]?.chainHeadBlock?.number -
-            indexData[indexDataName]?.chains[0]?.earliestBlock?.number) || 0;
+      let indexedPercentage = ((indexData[indexDataName]?.chains[0]?.latestBlock?.number - indexData[indexDataName]?.chains[0]?.earliestBlock?.number) / (indexData[indexDataName]?.chains[0]?.chainHeadBlock?.number - indexData[indexDataName]?.chains[0]?.earliestBlock?.number)) || 0;
       indexedPercentage = indexedPercentage * 100;
       if (indexedPercentage > 99.5) {
         indexedPercentage = 100;
       }
-      deployments[realNameString].indexedPercentage =
-        indexedPercentage.toFixed(2);
+      deployments[realNameString].indexedPercentage = indexedPercentage.toFixed(2);
 
       if (!!indexData[indexDataName]?.fatalError) {
-        deployments[realNameString].indexingError =
-          indexData[indexDataName]?.fatalError?.block?.number;
+        deployments[realNameString].indexingError = indexData[indexDataName]?.fatalError?.block?.number;
       }
 
-      if (!indexData[indexDataName]) {
+      if (
+        !indexData[indexDataName]
+      ) {
         invalidDeployments.push(realNameString);
       }
 
@@ -100,23 +84,23 @@ export async function indexStatusFlow(deployments) {
 export async function getIndexingStatusData(indexingStatusQueriesArray) {
   try {
     const indexingStatusQueries = indexingStatusQueriesArray.map((query) =>
-      axios.post("https://api.thegraph.com/index-node/graphql", {
-        query: query,
-      })
+      axios.post("https://api.thegraph.com/index-node/graphql", { query: query })
     );
     let indexData = [];
     await Promise.all(indexingStatusQueries)
       .then(
         (response) =>
-          (indexData = response.map((resultData) => resultData.data.data))
+        (indexData = response.map(
+          (resultData) => (resultData.data.data)
+        ))
       )
       .catch((err) => {
-        errorNotification("ERROR LOCATION 3 " + err.message);
+        errorNotification("ERROR LOCATION 3 " + err.message)
       });
     indexData = { ...indexData[0], ...indexData[1] };
     return indexData;
   } catch (err) {
-    errorNotification("ERROR LOCATION 4 " + err.message);
+    errorNotification("ERROR LOCATION 4 " + err.message)
   }
 }
 
@@ -145,34 +129,31 @@ export async function generateIndexStatusQuery(deployments) {
   }`;
 
   try {
+
     Object.keys(deployments).forEach((name) => {
       fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += `        
               ${name
-                .split("-")
-                .join(
-                  "_"
-                )}: indexingStatusForCurrentVersion(subgraphName: "messari/${name}") {
+          .split("-")
+          .join(
+            "_"
+          )}: indexingStatusForCurrentVersion(subgraphName: "messari/${name}") {
                 ${queryContents}
               }
           `;
       fullPendingQueryArray[fullPendingQueryArray.length - 1] += `        
             ${name
-              .split("-")
-              .join(
-                "_"
-              )}_pending: indexingStatusForPendingVersion(subgraphName: "messari/${name}") {
+          .split("-")
+          .join(
+            "_"
+          )}_pending: indexingStatusForPendingVersion(subgraphName: "messari/${name}") {
               ${queryContents}
             }
         `;
-      if (
-        fullCurrentQueryArray[fullCurrentQueryArray.length - 1].length > 80000
-      ) {
+      if (fullCurrentQueryArray[fullCurrentQueryArray.length - 1].length > 80000) {
         fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += "}";
         fullCurrentQueryArray.push(" query Status {");
       }
-      if (
-        fullPendingQueryArray[fullPendingQueryArray.length - 1].length > 80000
-      ) {
+      if (fullPendingQueryArray[fullPendingQueryArray.length - 1].length > 80000) {
         fullPendingQueryArray[fullPendingQueryArray.length - 1] += "}";
         fullPendingQueryArray.push(" query Status {");
       }
@@ -181,9 +162,7 @@ export async function generateIndexStatusQuery(deployments) {
     fullPendingQueryArray[fullPendingQueryArray.length - 1] += "}";
     const currentStateDepos = JSON.parse(JSON.stringify(deployments));
     Object.keys(currentStateDepos).forEach((name) => {
-      deployments[name + "-pending"] = JSON.parse(
-        JSON.stringify({ ...deployments[name] })
-      );
+      deployments[name + "-pending"] = JSON.parse(JSON.stringify({ ...deployments[name] }));
       deployments[name + "-pending"].pending = true;
     });
     const indexingStatusQueries = [

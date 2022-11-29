@@ -1,4 +1,9 @@
-import { Address, BigDecimal, BigInt, Wrapped } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  Wrapped,
+} from "@graphprotocol/graph-ts";
 
 import { FEE_DENOMINATOR } from "../common/constants";
 

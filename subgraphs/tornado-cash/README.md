@@ -1,12 +1,11 @@
 # Introduction on Tornado Cash
 
 ## Business Summary
-
-Tornado Cash a decentralised portal for protecting on-chain transaction privacy. It uses a smart contract that accepts ETH & other tokens deposits from one address and enables their withdrawal from a different address. Those smart contracts work as pools that mix all deposited assets, so Tornado Cash is also known as a "mixer".
+Tornado Cash a decentralised portal for protecting on-chain transaction privacy. It uses a smart contract that accepts ETH & other tokens deposits from one address and enables their withdrawal from a different address.  Those smart contracts work as pools that mix all deposited assets, so Tornado Cash is also known as a "mixer".
 
 Anyone can send in a deposit of cryptocurrency and others can withdraw it. To take out the funds, the user must have a “secret” or “note” that is given by the original depositor. This transaction is not publicly linked, and no external observer can tell which deposit links to which withdrawal.
 
-Deposits and withdraws are made in fixed sizes - so that it's not possible to trace the depositor and withdrawor by matching the amount. For instance, ETH deposited and withdrawn into Tornado are in 4 transaction sizes: 0.1 ETH, 1 ETH, 10 ETH and 100 ETH.
+Deposits and withdraws are made in fixed sizes - so that it's not possible to trace the depositor and withdrawor by matching the amount. For instance, ETH deposited and withdrawn into Tornado are in 4 transaction sizes: 0.1 ETH, 1 ETH, 10 ETH and 100 ETH.  
 
 ## Relayer
 
@@ -31,7 +30,6 @@ Due to the OFAC sanction recently, most the web services of Tornado Cash are aff
 - Smart Contracts: https://github.com/Garf1eld99/docs/blob/en/general/tornado-cash-smart-contracts.md
 
 ## Tornado Cash accepted tokens on different chains
-
 - Ethereum Blockchain : ETH (Ethereum), DAI (Dai), cDAI (Compound Dai), USDC (USD Coin), USDT (Tether) & WBTC (Wrapped Bitcoin)
 - Binance Smart Chain: BNB (Binance Coin)
 - Polygon Network: MATIC (Polygon)
@@ -43,7 +41,6 @@ Due to the OFAC sanction recently, most the web services of Tornado Cash are aff
 ## User metrics
 
 The usages of Tornado Cash include:
-
 - Deposit
 - Withdraw by relayer
 - Stake/unstake TORN
@@ -56,32 +53,29 @@ There has been mining programs but ended in Dec 2021.
 ### TVL
 
 TVL of Tornado Cash is the sum of all token balances in Tornado Cash.
-
-> TVL = $\sum$ token price \* token balance in Tornash Cash
+> TVL = $\sum$ token price * token balance in Tornash Cash
 
 E.g the TVL of Tornado Cash on Ethereum is the sum of ETH, DAI, cDAI, USDC, USDT & WBTC balances in the smart contract.
 
 ### Deposit Volume and Withdrawal Volume
 
-> Deposit volume = $\sum$ value of all deposits
+> Deposit volume = $\sum$ value of all deposits 
 
-> Withdrawal volume = $\sum$ value of all withdrawals
+> Withdrawal volume = $\sum$ value of all withdrawals 
 
 ### Revenue
 
 > Total Revenue (in pool token) = $\sum$ Portion of the withdrawn amount paid to a relayer
 
-In a withdrawal transaction, the amount is split into two:
-
+In a withdrawal transaction, the amount is split into two: 
 - one portion (usually the bigger portion) paid to the user
 - the other portion paid to the relayer to cover transaction cost borne by the relayer and relayer's fee
 
-> Protocol-side revenue (in TORN token) = $\sum$ Fee rate when applicable \* Value of withdrawals
+> Protocol-side revenue (in TORN token) = $\sum$ Fee rate when applicable *  Value of withdrawals 
 
-To become a relayer, a user has to stake a minimum of 300 TORN tokens (minimum stake value is decided by governance vote) in governance vault. The protocol collects a fee directly from the relayer’s staked balance for each withdrawal.
-
-- The fee rate, as stated in the Relayer section, is 0.3% or 0% for some pools. The calculated pool fee can be obtained from the `FeeUpdated` [event](https://etherscan.io/address/0xf4B067dD14e95Bab89Be928c07Cb22E3c94E0DAA#code#F33#L80).
-  Pool fee is [updated](https://etherscan.io/address/0xf4B067dD14e95Bab89Be928c07Cb22E3c94E0DAA#code#F33#L87) at every `updateFeeTimeLimit` (currently set to 172800 seconds, or 48 hours) or if the current and the expected fee [deviation](https://etherscan.io/address/0xf4B067dD14e95Bab89Be928c07Cb22E3c94E0DAA#code#F33#L151) is too large.
+To become a relayer, a user has to stake a minimum of 300 TORN tokens (minimum stake value is decided by governance vote) in governance vault. The protocol collects a fee directly from the relayer’s staked balance for each withdrawal. 
+- The fee rate, as stated in the Relayer section, is 0.3% or 0% for some pools. The calculated pool fee can be obtained from the `FeeUpdated` [event](https://etherscan.io/address/0xf4B067dD14e95Bab89Be928c07Cb22E3c94E0DAA#code#F33#L80). 
+Pool fee is [updated](https://etherscan.io/address/0xf4B067dD14e95Bab89Be928c07Cb22E3c94E0DAA#code#F33#L87) at every `updateFeeTimeLimit` (currently set to 172800 seconds, or 48 hours) or if the current and the expected fee [deviation](https://etherscan.io/address/0xf4B067dD14e95Bab89Be928c07Cb22E3c94E0DAA#code#F33#L151) is too large.
 - TORN tokens, equivalent to this calculated pool fee, are [burned](https://etherscan.io/address/0x01e2919679362dFBC9ee1644Ba9C6da6D6245BB1#code#F1#L238) from relayer's staked balance.
 
 > Supply-side revenue = Total Revenue - Protocol-side revenue
@@ -97,4 +91,4 @@ Arguably, the difference between the total revenue and protocol-side revenue her
 
 Rewards in TORN, the platform token, were distributed to depositors before Dec 2021. Rewards were first calculated in terms of Anonymity points for each depositor and then depositors can claim Anonymity points and swap them for TORN tokens. Four pools were eligible for rewards, namely, ETH, WBTC, DAI or cDAI pools.
 
-> Reward Rate = TORN rewards for a qualified pool \* TORN Price / $\sum\$ Balances of every deposit sizes for each qualified pool
+> Reward Rate = TORN rewards for a qualified pool * TORN Price / $\sum\$ Balances of every deposit sizes for each qualified pool

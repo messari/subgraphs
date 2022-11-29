@@ -27,8 +27,9 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
       symbolValue = symbolResultBytes.value.toString();
     } else {
       // try with the static definition
-      let staticTokenDefinition =
-        StaticTokenDefinition.fromAddress(tokenAddress);
+      let staticTokenDefinition = StaticTokenDefinition.fromAddress(
+        tokenAddress
+      );
       if (staticTokenDefinition != null) {
         symbolValue = staticTokenDefinition.symbol;
       }
@@ -57,8 +58,9 @@ export function fetchTokenName(tokenAddress: Address): string {
       nameValue = nameResultBytes.value.toString();
     } else {
       // try with the static definition
-      let staticTokenDefinition =
-        StaticTokenDefinition.fromAddress(tokenAddress);
+      let staticTokenDefinition = StaticTokenDefinition.fromAddress(
+        tokenAddress
+      );
       if (staticTokenDefinition != null) {
         nameValue = staticTokenDefinition.name;
       }

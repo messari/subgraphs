@@ -130,19 +130,11 @@ function PoolTab({
         />
       );
     }
-    let activeMessage = null;
+    let activeMessage = null
     if (data.protocols[0].type === "LENDING") {
-      activeMessage = (
-        <Typography sx={{ color: "lime", my: 3 }} variant="h5">
-          This Market is active.
-        </Typography>
-      );
+      activeMessage = <Typography sx={{ color: "lime", my: 3 }} variant="h5">This Market is active.</Typography>;
       if (!entityData?.isActive) {
-        activeMessage = (
-          <Typography sx={{ color: "red", my: 3 }} variant="h5">
-            This Market is <b>NOT</b> active.
-          </Typography>
-        );
+        activeMessage = <Typography sx={{ color: "red", my: 3 }} variant="h5">This Market is <b>NOT</b> active.</Typography>;
       }
     }
     if (poolTimeseriesData) {

@@ -826,6 +826,7 @@ export const schema200 = (): Schema => {
       }
     }`;
 
+
   const positionsQuery = `
     positions(first: 1000) {
       id
@@ -990,6 +991,6 @@ export const schema200 = (): Schema => {
     hourlyUsageQuery,
     dailyUsageQuery,
     poolTimeseriesQuery,
-    positionsQuery,
+    positionsQuery
   };
 };

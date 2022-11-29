@@ -60,8 +60,9 @@ export function getPriceFromRouter(
   // Construct swap path
   let path: Address[] = [];
   let numberOfJumps: BigInt;
-  const pathOverride =
-    constants.UNISWAP_PATH_OVERRIDES.get(network)!.get(token0Address);
+  const pathOverride = constants.UNISWAP_PATH_OVERRIDES.get(network)!.get(
+    token0Address
+  );
   if (pathOverride) {
     path = pathOverride;
     numberOfJumps = BigInt.fromI32(path.length - 1);
@@ -96,10 +97,12 @@ export function getPriceFromRouter(
   const token0Decimals = utils.getTokenDecimals(token0Address);
   const amountIn = BigInt.fromI32(10).pow(token0Decimals.toI32() as u8);
 
-  const routerAddressV1 =
-    constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(network)!.get("routerV1");
-  const routerAddressV2 =
-    constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(network)!.get("routerV2");
+  const routerAddressV1 = constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(
+    network
+  )!.get("routerV1");
+  const routerAddressV2 = constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(
+    network
+  )!.get("routerV2");
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
   if (routerAddressV1) {

@@ -55,7 +55,9 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 // https://docs.aave.com/developers/v/2.0/glossary
 
 export function rayToWad(a: BigInt): BigInt {
-  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
+  const halfRatio = BigInt.fromI32(10)
+    .pow(9)
+    .div(BigInt.fromI32(2));
   return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
 }
 

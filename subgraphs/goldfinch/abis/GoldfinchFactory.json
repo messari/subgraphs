@@ -2,18 +2,8 @@
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "previousOwner",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      }
+      {"indexed": true, "internalType": "address", "name": "previousOwner", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "newOwner", "type": "address"}
     ],
     "name": "OwnershipTransferred",
     "type": "event"
@@ -21,31 +11,17 @@
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "previousImplementation",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "newImplementation",
-        "type": "address"
-      }
+      {"indexed": true, "internalType": "address", "name": "previousImplementation", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "newImplementation", "type": "address"}
     ],
     "name": "ProxyImplementationUpdated",
     "type": "event"
   },
-  { "stateMutability": "payable", "type": "fallback" },
+  {"stateMutability": "payable", "type": "fallback"},
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "newImplementation",
-        "type": "address"
-      },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
+      {"internalType": "address", "name": "newImplementation", "type": "address"},
+      {"internalType": "bytes", "name": "data", "type": "bytes"}
     ],
     "name": "changeImplementation",
     "outputs": [],
@@ -55,21 +31,19 @@
   {
     "inputs": [],
     "name": "owner",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "bytes4", "name": "id", "type": "bytes4" }],
+    "inputs": [{"internalType": "bytes4", "name": "id", "type": "bytes4"}],
     "name": "supportsInterface",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "newOwner", "type": "address" }
-    ],
+    "inputs": [{"internalType": "address", "name": "newOwner", "type": "address"}],
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -78,50 +52,23 @@
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
+      {"indexed": true, "internalType": "address", "name": "borrower", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "owner", "type": "address"}
     ],
     "name": "BorrowerCreated",
     "type": "event"
   },
   {
     "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
+    "inputs": [{"indexed": false, "internalType": "address", "name": "account", "type": "address"}],
     "name": "Paused",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "pool",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "borrower",
-        "type": "address"
-      }
+      {"indexed": true, "internalType": "address", "name": "pool", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "borrower", "type": "address"}
     ],
     "name": "PoolCreated",
     "type": "event"
@@ -129,24 +76,9 @@
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      }
+      {"indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32"},
+      {"indexed": true, "internalType": "address", "name": "account", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "sender", "type": "address"}
     ],
     "name": "RoleGranted",
     "type": "event"
@@ -154,189 +86,127 @@
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "role",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      }
+      {"indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32"},
+      {"indexed": true, "internalType": "address", "name": "account", "type": "address"},
+      {"indexed": true, "internalType": "address", "name": "sender", "type": "address"}
     ],
     "name": "RoleRevoked",
     "type": "event"
   },
   {
     "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
+    "inputs": [{"indexed": false, "internalType": "address", "name": "account", "type": "address"}],
     "name": "Unpaused",
     "type": "event"
   },
   {
     "inputs": [],
     "name": "DEFAULT_ADMIN_ROLE",
-    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "outputs": [{"internalType": "bytes32", "name": "", "type": "bytes32"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "OWNER_ROLE",
-    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "outputs": [{"internalType": "bytes32", "name": "", "type": "bytes32"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "PAUSER_ROLE",
-    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "outputs": [{"internalType": "bytes32", "name": "", "type": "bytes32"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "owner", "type": "address" }
-    ],
+    "inputs": [{"internalType": "address", "name": "owner", "type": "address"}],
     "name": "__BaseUpgradeablePausable__init",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
-  {
-    "inputs": [],
-    "name": "__PauserPausable__init",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
+  {"inputs": [], "name": "__PauserPausable__init", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
   {
     "inputs": [],
     "name": "config",
-    "outputs": [
-      {
-        "internalType": "contract GoldfinchConfig",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [{"internalType": "contract GoldfinchConfig", "name": "", "type": "address"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "owner", "type": "address" }
-    ],
+    "inputs": [{"internalType": "address", "name": "owner", "type": "address"}],
     "name": "createBorrower",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "createCreditLine",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" },
-      {
-        "internalType": "uint256",
-        "name": "_juniorFeePercent",
-        "type": "uint256"
-      },
-      { "internalType": "uint256", "name": "_limit", "type": "uint256" },
-      { "internalType": "uint256", "name": "_interestApr", "type": "uint256" },
-      {
-        "internalType": "uint256",
-        "name": "_paymentPeriodInDays",
-        "type": "uint256"
-      },
-      { "internalType": "uint256", "name": "_termInDays", "type": "uint256" },
-      { "internalType": "uint256", "name": "_lateFeeApr", "type": "uint256" }
+      {"internalType": "address", "name": "_borrower", "type": "address"},
+      {"internalType": "uint256", "name": "_juniorFeePercent", "type": "uint256"},
+      {"internalType": "uint256", "name": "_limit", "type": "uint256"},
+      {"internalType": "uint256", "name": "_interestApr", "type": "uint256"},
+      {"internalType": "uint256", "name": "_paymentPeriodInDays", "type": "uint256"},
+      {"internalType": "uint256", "name": "_termInDays", "type": "uint256"},
+      {"internalType": "uint256", "name": "_lateFeeApr", "type": "uint256"}
     ],
     "name": "createMigratedPool",
-    "outputs": [
-      { "internalType": "address", "name": "pool", "type": "address" }
-    ],
+    "outputs": [{"internalType": "address", "name": "pool", "type": "address"}],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" },
-      {
-        "internalType": "uint256",
-        "name": "_juniorFeePercent",
-        "type": "uint256"
-      },
-      { "internalType": "uint256", "name": "_limit", "type": "uint256" },
-      { "internalType": "uint256", "name": "_interestApr", "type": "uint256" },
-      {
-        "internalType": "uint256",
-        "name": "_paymentPeriodInDays",
-        "type": "uint256"
-      },
-      { "internalType": "uint256", "name": "_termInDays", "type": "uint256" },
-      { "internalType": "uint256", "name": "_lateFeeApr", "type": "uint256" }
+      {"internalType": "address", "name": "_borrower", "type": "address"},
+      {"internalType": "uint256", "name": "_juniorFeePercent", "type": "uint256"},
+      {"internalType": "uint256", "name": "_limit", "type": "uint256"},
+      {"internalType": "uint256", "name": "_interestApr", "type": "uint256"},
+      {"internalType": "uint256", "name": "_paymentPeriodInDays", "type": "uint256"},
+      {"internalType": "uint256", "name": "_termInDays", "type": "uint256"},
+      {"internalType": "uint256", "name": "_lateFeeApr", "type": "uint256"}
     ],
     "name": "createPool",
-    "outputs": [
-      { "internalType": "address", "name": "pool", "type": "address" }
-    ],
+    "outputs": [{"internalType": "address", "name": "pool", "type": "address"}],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "bytes32", "name": "role", "type": "bytes32" }
-    ],
+    "inputs": [{"internalType": "bytes32", "name": "role", "type": "bytes32"}],
     "name": "getRoleAdmin",
-    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "outputs": [{"internalType": "bytes32", "name": "", "type": "bytes32"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "bytes32", "name": "role", "type": "bytes32" },
-      { "internalType": "uint256", "name": "index", "type": "uint256" }
+      {"internalType": "bytes32", "name": "role", "type": "bytes32"},
+      {"internalType": "uint256", "name": "index", "type": "uint256"}
     ],
     "name": "getRoleMember",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "bytes32", "name": "role", "type": "bytes32" }
-    ],
+    "inputs": [{"internalType": "bytes32", "name": "role", "type": "bytes32"}],
     "name": "getRoleMemberCount",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "bytes32", "name": "role", "type": "bytes32" },
-      { "internalType": "address", "name": "account", "type": "address" }
+      {"internalType": "bytes32", "name": "role", "type": "bytes32"},
+      {"internalType": "address", "name": "account", "type": "address"}
     ],
     "name": "grantRole",
     "outputs": [],
@@ -345,22 +215,18 @@
   },
   {
     "inputs": [
-      { "internalType": "bytes32", "name": "role", "type": "bytes32" },
-      { "internalType": "address", "name": "account", "type": "address" }
+      {"internalType": "bytes32", "name": "role", "type": "bytes32"},
+      {"internalType": "address", "name": "account", "type": "address"}
     ],
     "name": "hasRole",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "owner", "type": "address" },
-      {
-        "internalType": "contract GoldfinchConfig",
-        "name": "_config",
-        "type": "address"
-      }
+      {"internalType": "address", "name": "owner", "type": "address"},
+      {"internalType": "contract GoldfinchConfig", "name": "_config", "type": "address"}
     ],
     "name": "initialize",
     "outputs": [],
@@ -370,28 +236,22 @@
   {
     "inputs": [],
     "name": "isAdmin",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
     "stateMutability": "view",
     "type": "function"
   },
-  {
-    "inputs": [],
-    "name": "pause",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
+  {"inputs": [], "name": "pause", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
   {
     "inputs": [],
     "name": "paused",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "bytes32", "name": "role", "type": "bytes32" },
-      { "internalType": "address", "name": "account", "type": "address" }
+      {"internalType": "bytes32", "name": "role", "type": "bytes32"},
+      {"internalType": "address", "name": "account", "type": "address"}
     ],
     "name": "renounceRole",
     "outputs": [],
@@ -400,26 +260,14 @@
   },
   {
     "inputs": [
-      { "internalType": "bytes32", "name": "role", "type": "bytes32" },
-      { "internalType": "address", "name": "account", "type": "address" }
+      {"internalType": "bytes32", "name": "role", "type": "bytes32"},
+      {"internalType": "address", "name": "account", "type": "address"}
     ],
     "name": "revokeRole",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
-  {
-    "inputs": [],
-    "name": "unpause",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "updateGoldfinchConfig",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
+  {"inputs": [], "name": "unpause", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
+  {"inputs": [], "name": "updateGoldfinchConfig", "outputs": [], "stateMutability": "nonpayable", "type": "function"}
 ]

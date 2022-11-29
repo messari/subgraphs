@@ -1,4 +1,4 @@
-import { json } from "@graphprotocol/graph-ts";
+import {json} from "@graphprotocol/graph-ts"
 
 export const MAINNET_METADATA = json
   .fromString(
@@ -65,4 +65,4 @@ export const MAINNET_METADATA = json
 }
 `
   )
-  .toObject();
+  .toObject()

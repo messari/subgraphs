@@ -160,8 +160,9 @@ export function isBasicToken(tokenAddress: Address, network: string): bool {
     basicTokenIdx++
   ) {
     const basicTokenName = constants.WHITELIST_TOKENS_LIST[basicTokenIdx];
-    const basicTokenAddress =
-      constants.WHITELIST_TOKENS_MAP.get(network)!.get(basicTokenName);
+    const basicTokenAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(
+      basicTokenName
+    );
 
     if (
       basicTokenAddress &&

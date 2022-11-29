@@ -152,7 +152,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
     trade.priceETH = priceETH;
     trade.amount = saleResult.nfts.amounts[i];
     // if it is a basic order then STANDARD_SALE
-    // otherwise ANY_ITEM_FROM_SET.
+    // otherwise ANY_ITEM_FROM_SET. 
     // TODO: ANY_ITEM_FROM_SET correct strategy? Cannot find docs on how to decide
     trade.strategy = tradeStrategy(event);
     trade.buyer = buyer;
@@ -162,8 +162,8 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
     // Save details of how trade was fulfilled
     const orderFulfillment = new _OrderFulfillment(tradeID);
     orderFulfillment.trade = tradeID;
-    orderFulfillment.orderFulfillmentMethod = orderFulfillmentMethod(event);
-    orderFulfillment.save();
+    orderFulfillment.orderFulfillmentMethod = orderFulfillmentMethod(event)
+    orderFulfillment.save()
   }
 
   //

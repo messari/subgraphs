@@ -54,10 +54,7 @@ export function createToken(
   return newToken;
 }
 
-export function updateTokenMetadata(
-  event: ethereum.Event,
-  token: Token
-): Token {
+export function updateTokenMetadata(event: ethereum.Event, token: Token): Token {
   if (token.tokenURI == null) {
     return token;
   }

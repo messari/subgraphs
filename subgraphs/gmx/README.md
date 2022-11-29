@@ -1,6 +1,7 @@
+
 # GMX Protocol Subgraph Metrics Methodology v1.0.1
 
-This is for the Generic Schema of Messari Subgraph.
+This is for the Generic Schema of Messari Subgraph. 
 
 ## Business Summary
 
@@ -14,7 +15,7 @@ The business of the protocol can be divided and summarized as follows:
 
 ### GLP
 
-The GLP Index Composition is made up of a basket of assets that is used as the counter party for swaps and leverage trading. Liquidity providers add liquidity by minting GLP to add assets to the multi-asset pool. LPs then hold GLP, an LP token for the multi-asset pool.
+The GLP Index Composition is made up of a basket of assets that is used as the counter party for swaps and leverage trading. Liquidity providers add liquidity by minting GLP to add assets to the multi-asset pool. LPs then hold GLP, an LP token for the multi-asset pool. 
 
 GLP holders get the balance of the pool, which are affected by trading gans and losss, as well as trading fees, position fees, and borrowing fees.
 
@@ -24,6 +25,7 @@ The token weights of the GLP Index Composition are automatically adjusted based 
 - On Avalanche, GLP holders receive esGMX rewards as well as 70% of platform fees in the form of $AVAX.
 
 GLP holders or the liquidity providers get all the collateral when positions are liquidated.
+
 
 ### Spot & Perpetual Exchange Traders
 
@@ -54,20 +56,17 @@ Note: Referral codes are case-sensitive, and it must be created on both Arbitrum
 ## Useful Links
 
 Protocol:
-
 - https://app.gmx.io/#/trade
 
 Docs:
-
 - https://gmxio.gitbook.io/gmx/
 
 Smart contracts:
-
 - https://gmxio.gitbook.io/gmx/contracts
 
 Tokenomics:
-
 - https://gmxio.gitbook.io/gmx/tokenomics
+
 
 ## Rewards and Fees
 
@@ -75,29 +74,30 @@ Tokenomics:
 
 Stakers earn the GMX emissions per block:
 
-> Reward Rate for GLP holders = Rewards received in esGMX \* GLP Price / Balance of the Staked GLP pool
+> Reward Rate for GLP holders = Rewards received in esGMX * GLP Price / Balance of the Staked GLP pool
 
-> Reward Rate for GMX holders = Rewards received in esGMX \* GMX Price / Balance of the Staked GMX pool
+> Reward Rate for GMX holders = Rewards received in esGMX * GMX Price / Balance of the Staked GMX pool
 
-> Reward Rate for esGMX stakers = Rewards received in esGMX \* GMX Price / Balance of the Staked eGMX pool
+> Reward Rate for esGMX stakers = Rewards received in esGMX * GMX Price / Balance of the Staked eGMX pool
 
-_Note: 30% of the platform fees generated from swaps and leverage trading are converted to ETH or AVAX and distributed to staked GMX tokens. On the other hand, GLP token holders earn 70% of platform fees distributed in ETH or AVAX._
+*Note: 30% of the platform fees generated from swaps and leverage trading are converted to ETH or AVAX and distributed to staked GMX tokens. On the other hand, GLP token holders earn 70% of platform fees distributed in ETH or AVAX.*
 
 ### Fees for opening or closing a position
 
-> Open position fee = 0.1% \* Trader’s position size
+> Open position fee = 0.1% * Trader’s position size
 
-> Close position fee = 0.1% \* Trader’s position size
+> Close position fee = 0.1% * Trader’s position size
 
 - Reference: https://gmxio.gitbook.io/gmx/trading
 
 ### Fees for borrowing
 
-> Borrow fee = (assets borrowed by traders) / (total assets in pool) \* Borrow Fee Rate%
+> Borrow fee = (assets borrowed by traders) / (total assets in pool) * Borrow Fee Rate%
 
 Note: Traders need to pay a borrowing fee every hour. The fee is calculated based on utilization and this similar to money market protocols like AAVE. The max borrow fee would be at 100% utilization which is 0.01% per hour.
 
 - Reference: https://gmxio.gitbook.io/gmx/trading
+
 
 ### Swap Fees for the conversion of the asset to its USD value
 
@@ -110,18 +110,15 @@ Note: This applies for long positions only. It does not also apply for withdrawi
 ## User Metrics
 
 ### Classification of Pools
-
 Each asset or token included in the GLP is a pool in the subgraph. As of writing, there are eight different assets in Arbitrum network and six assets in Avalanche network.
 
 ### GLP
-
 - Mint GLP token by supplying the assets
 - Burn GLP tokens to redeem any index asset
 - Claim rewards
 - Purchase insurance via GMX’s platform
 
 ### Spot & Perpetual Exchange Traders
-
 - Swap tokens
 - Open a long or short position
 - Provide specific amount of collateral in any asset available
@@ -131,7 +128,7 @@ Each asset or token included in the GLP is a pool in the subgraph. As of writing
 
 ### GMX
 
-- Purchase GMX token
+- Purchase GMX token 
 - Stake GMX to receive rewards and platform fees
 - Unstake GMX
 - Stake earned esGMX to increase the amount of rewards
@@ -145,11 +142,11 @@ Please refer to the "Classification of Pools" under User Metrics for Pools.
 
 ### TVL
 
-> TVL of a Pool = ∑ value of the specific asset in the pool
+>TVL of a Pool = ∑ value of the specific asset in the pool
 
-> TVL of the Protocol = ∑ TVL of all single pools
+>TVL of the Protocol = ∑ TVL of all single pools
 
-_Note: The collateral of traders are reserved in the GLP pool. Hence, there are two types of transactions to track the TVL, which are the users who provide liquidity and another one for the traders who provide collaterals before trading._
+*Note: The collateral of traders are reserved in the GLP pool. Hence, there are two types of transactions to track the TVL, which are the users who provide liquidity and another one for the traders who provide collaterals before trading.*
 
 ### Total Revenue
 
@@ -159,15 +156,15 @@ Please refer to the Fee section of details of the fees charged by GMX.
 
 #### Supply Side Revenue
 
-> Supply Side Revenue = 70% \* Total Revenue
+> Supply Side Revenue = 70% * Total Revenue
 
-_Note: The generated fees distributed are based on the amount remaining after deducting rewards and the network costs of keepers, which typically costs around 1% of the total fees._
+*Note: The generated fees distributed are based on the amount remaining after deducting rewards and the network costs of keepers, which typically costs around 1% of the total fees.*
 
 #### Protocol Side Revenue
 
-> Protocol Side Revenue = 30% \* Total Revenue
+> Protocol Side Revenue = 30% * Total Revenue
 
-_Note: The generated fees distributed are based on the amount remaining after deducting referral rewards and the network costs of keepers, which typically costs around 1% of the total fees._
+*Note: The generated fees distributed are based on the amount remaining after deducting referral rewards and the network costs of keepers, which typically costs around 1% of the total fees.*
 
 #### Rewards
 

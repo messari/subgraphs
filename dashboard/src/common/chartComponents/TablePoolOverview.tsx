@@ -257,10 +257,7 @@ export const TablePoolOverview = ({
         let rewardFactorsStr = "N/A";
         let rewardAPRs: string[] = pool?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
           let apr = 0;
-          if (
-            protocolType === "LENDING" &&
-            (pool.rewardTokens[idx]?.type === "BORROW" || pool.rewardTokens[idx]?.token?.type === "BORROW")
-          ) {
+          if (protocolType === "LENDING" && (pool.rewardTokens[idx]?.type === "BORROW" || pool.rewardTokens[idx]?.token?.type === "BORROW")) {
             if (
               !Number(pool.totalBorrowBalanceUSD) &&
               issues.filter(
@@ -269,9 +266,8 @@ export const TablePoolOverview = ({
             ) {
               issues.push({
                 type: "VAL",
-                message: `${
-                  pool.name || "#" + i + 1 + skipAmt
-                } does not have a valid 'totalBorrowBalanceUSD' value. Reward APR (BORROWER) could not be properly calculated.`,
+                message: `${pool.name || "#" + i + 1 + skipAmt
+                  } does not have a valid 'totalBorrowBalanceUSD' value. Reward APR (BORROWER) could not be properly calculated.`,
                 level: "critical",
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
               });
@@ -293,13 +289,11 @@ export const TablePoolOverview = ({
             ) {
               issues.push({
                 type: "VAL",
-                message: `${
-                  pool.name || "#" + i + 1 + skipAmt
-                } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
+                message: `${pool.name || "#" + i + 1 + skipAmt
+                  } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
                 level: "critical",
-                fieldName: `${
-                  pool.name || "#" + i + 1 + skipAmt
-                } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
+                fieldName: `${pool.name || "#" + i + 1 + skipAmt
+                  } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
               });
             } else if (pool.totalDepositBalanceUSD) {
               apr = (Number(val) / Number(pool.totalDepositBalanceUSD)) * 100 * 365;
@@ -398,6 +392,7 @@ export const TablePoolOverview = ({
           returnObj.dailyVolumeUSD = pool?.dailyVolumeUSD;
           returnObj.dailySupplySideRevenueUSD = pool?.dailySupplySideRevenueUSD;
           if (pool?.fees?.length > 0 && !pool?.dailySupplySideRevenueUSD) {
+
             // CURRENTLY THE FEE IS BASED OFF OF THE POOL RATHER THAN THE TIME SERIES. THIS IS TEMPORARY
             const supplierFee = pool.fees.find((fee: { [x: string]: string }) => {
               return fee.feeType === "FIXED_LP_FEE" || fee.feeType === "DYNAMIC_LP_FEE";

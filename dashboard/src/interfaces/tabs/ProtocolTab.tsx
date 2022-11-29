@@ -32,7 +32,7 @@ function ProtocolTab({
   protocolTimeseriesData,
   protocolTimeseriesLoading,
   protocolTimeseriesError,
-  overlayProtocolTimeseriesData,
+  overlayProtocolTimeseriesData
 }: ProtocolTabProps) {
   const [issuesToDisplay, setIssuesToDisplay] = useState<
     { message: string; type: string; level: string; fieldName: string }[]
