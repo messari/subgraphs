@@ -4132,7 +4132,7 @@
     "deployments": {
       "yearn-v2-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.2.2",
@@ -4158,7 +4158,7 @@
       },
       "yearn-v2-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.2.2",
