@@ -40,8 +40,15 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
     let prodStatusHover = "Subgraph is frozen";
     protocol.networks.forEach((depo: any) => {
         if (Array.isArray(issuesTitles)) {
-            const hasOpenRepoIssue = !!(issuesTitles.find((x: any) => x.toUpperCase().includes(subgraphName.toUpperCase().split('-')[0]) && x.toUpperCase().includes(depo.chain.toUpperCase().split('-')[0])));
-            if (hasOpenRepoIssue) {
+            const openRepoIssue = (issuesTitles.find((x: any) => {
+                if (issuesMapping[x].includes('/pull/')) {
+                    return false;
+                }
+                const depoSpecificIssue = x.toUpperCase().includes(subgraphName.toUpperCase()) && x.toUpperCase().includes(depo.chain.toUpperCase());
+                const protocolWideIssue = x.toUpperCase().includes(subgraphName.toUpperCase() + ' ALL');
+                return depoSpecificIssue || protocolWideIssue;
+            }));
+            if (!!openRepoIssue) {
                 prodStatusIcon = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoseJ8t1vi2kPFznJJSyeIHGYxgvCvbCMgs6a9TMI&s";
                 prodStatusHover = "Changes in progress";
             }
@@ -63,8 +70,8 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                         if (issuesMapping[x].includes('/pull/')) {
                             return false;
                         }
-                        const depoSpecificIssue = x.toUpperCase().includes(subgraphName.toUpperCase().split('-')[0]) && x.toUpperCase().includes(depo.chain.toUpperCase().split('-')[0]);
-                        const protocolWideIssue = x.toUpperCase().includes(subgraphName.toUpperCase().split('-')[0] + ' ALL');
+                        const depoSpecificIssue = x.toUpperCase().includes(subgraphName.toUpperCase()) && x.toUpperCase().includes(depo.chain.toUpperCase());
+                        const protocolWideIssue = x.toUpperCase().includes(subgraphName.toUpperCase() + ' ALL');
                         return depoSpecificIssue || protocolWideIssue;
                     }));
                     if (!!openRepoIssue) {
