@@ -178,7 +178,7 @@ export function handleDeposit(call: DepositCall): void {
 
   createLiquidityDepositEvent(
     poolAddress,
-    poolAddress,
+    Address.fromString(poolAddress),
     chainID,
     call.from,
     call.inputs.to,
@@ -196,7 +196,7 @@ export function handleDeposit1(call: Deposit1Call): void {
 
   createLiquidityDepositEvent(
     poolAddress,
-    poolAddress,
+    Address.fromString(poolAddress),
     chainID,
     call.from,
     call.from,
@@ -214,7 +214,7 @@ export function handleDeposit2(call: Deposit2Call): void {
 
   createLiquidityDepositEvent(
     poolAddress,
-    poolAddress,
+    Address.fromString(poolAddress),
     chainID,
     call.from,
     call.from,
@@ -232,7 +232,7 @@ export function handleDepositVault(call: DepositVaultCall): void {
 
   createLiquidityDepositEvent(
     poolAddress,
-    poolAddress,
+    Address.fromString(poolAddress),
     chainID,
     call.from,
     call.inputs.to,
@@ -250,7 +250,7 @@ export function handleWithdraw(call: WithdrawCall): void {
 
   createLiquidityWithdrawEvent(
     poolAddress,
-    poolAddress,
+    Address.fromString(poolAddress),
     chainID,
     call.from,
     call.inputs.to,
@@ -268,7 +268,7 @@ export function handleWithdraw1(call: Withdraw1Call): void {
 
   createLiquidityWithdrawEvent(
     poolAddress,
-    poolAddress,
+    Address.fromString(poolAddress),
     chainID,
     call.from,
     call.from,
@@ -286,7 +286,7 @@ export function handleWithdraw2(call: Withdraw2Call): void {
 
   createLiquidityWithdrawEvent(
     poolAddress,
-    poolAddress,
+    Address.fromString(poolAddress),
     chainID,
     call.from,
     call.from,
@@ -304,7 +304,7 @@ export function handleWithdrawVault(call: WithdrawVaultCall): void {
 
   createLiquidityWithdrawEvent(
     poolAddress,
-    poolAddress,
+    Address.fromString(poolAddress),
     chainID,
     call.inputs.from,
     call.inputs.to,

@@ -72,9 +72,9 @@ export function getOrCreateProtocol(): BridgeProtocol {
     protocol.supportedNetworks = [];
     protocol.totalPoolCount = INT_ZERO;
     protocol.totalPoolRouteCount = INT_ZERO;
-    protocol.canonicalRouteCount = INT_ZERO;
-    protocol.wrappedRouteCount = INT_ZERO;
-    protocol.supportedTokenCount = INT_ZERO;
+    protocol.totalCanonicalRouteCount = INT_ZERO;
+    protocol.totalWrappedRouteCount = INT_ZERO;
+    protocol.totalSupportedTokenCount = INT_ZERO;
     protocol.pools = [];
   }
 
@@ -223,7 +223,7 @@ export function getOrCreatePool(
 
     protocol.pools = addToArrayAtIndex<string>(protocol.pools, pool.id);
     protocol.totalPoolCount += INT_ONE;
-    protocol.supportedTokenCount += INT_ONE;
+    protocol.totalSupportedTokenCount += INT_ONE;
 
     protocol.save();
   }
@@ -269,9 +269,9 @@ export function getOrCreatePoolRoute(
     const protocol = getOrCreateProtocol();
 
     if (crosschainToken.type == CrosschainTokenType.CANONICAL) {
-      protocol.canonicalRouteCount += INT_ONE;
+      protocol.totalCanonicalRouteCount += INT_ONE;
     } else {
-      protocol.wrappedRouteCount += INT_ONE;
+      protocol.totalWrappedRouteCount += INT_ONE;
     }
 
     poolRoute.isSwap = false;
@@ -442,9 +442,9 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics.dailyMessageSentCount = INT_ZERO;
     usageMetrics.totalPoolCount = INT_ZERO;
     usageMetrics.totalPoolRouteCount = INT_ZERO;
-    usageMetrics.canonicalRouteCount = INT_ZERO;
-    usageMetrics.wrappedRouteCount = INT_ZERO;
-    usageMetrics.supportedTokenCount = INT_ZERO;
+    usageMetrics.totalCanonicalRouteCount = INT_ZERO;
+    usageMetrics.totalWrappedRouteCount = INT_ZERO;
+    usageMetrics.totalSupportedTokenCount = INT_ZERO;
 
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;

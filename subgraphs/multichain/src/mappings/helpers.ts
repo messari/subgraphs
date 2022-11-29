@@ -475,9 +475,11 @@ export function updateUsageMetrics(
 
   usageMetricsDaily.totalPoolCount = protocol.totalPoolCount;
   usageMetricsDaily.totalPoolRouteCount = protocol.totalPoolRouteCount;
-  usageMetricsDaily.canonicalRouteCount = protocol.canonicalRouteCount;
-  usageMetricsDaily.wrappedRouteCount = protocol.wrappedRouteCount;
-  usageMetricsDaily.supportedTokenCount = protocol.supportedTokenCount;
+  usageMetricsDaily.totalCanonicalRouteCount =
+    protocol.totalCanonicalRouteCount;
+  usageMetricsDaily.totalWrappedRouteCount = protocol.totalWrappedRouteCount;
+  usageMetricsDaily.totalSupportedTokenCount =
+    protocol.totalSupportedTokenCount;
 
   usageMetricsHourly.save();
   usageMetricsDaily.save();
@@ -536,7 +538,6 @@ export function createBridgeTransferEvent(
   transferEvent.to = event.transaction.to!.toHexString();
   transferEvent.transferFrom = fromAddress.toHexString();
   transferEvent.transferTo = toAddress.toHexString();
-  transferEvent.amount = amount;
   transferEvent.isOutgoing = isOutgoing;
 
   if (isOutgoing) {
@@ -551,6 +552,10 @@ export function createBridgeTransferEvent(
 
   const token = getOrCreateToken(tokenAddress, event.block.number);
   transferEvent.token = token.id;
+  transferEvent.amount = amount;
+  transferEvent.amountUSD = bigIntToBigDecimal(amount, token.decimals).times(
+    token.lastPriceUSD!
+  );
 
   const crosschainToken = getOrCreateCrosschainToken(
     crosschainTokenAddress,
@@ -573,7 +578,7 @@ export function createBridgeTransferEvent(
 
 export function createLiquidityDepositEvent(
   poolAddress: string,
-  tokenAddress: string,
+  tokenAddress: Address,
   chainID: BigInt,
   fromAddress: Address,
   toAddress: Address,
@@ -594,9 +599,15 @@ export function createLiquidityDepositEvent(
   depositEvent.to = toAddress.toHexString();
   depositEvent.from = fromAddress.toHexString();
   depositEvent.pool = poolAddress;
-  depositEvent.token = tokenAddress;
   depositEvent.chainID = chainID;
+
+  const token = getOrCreateToken(tokenAddress, call.block.number);
+  depositEvent.token = token.id;
   depositEvent.amount = amount;
+  depositEvent.amountUSD = bigIntToBigDecimal(amount, token.decimals).times(
+    token.lastPriceUSD!
+  );
+
   depositEvent.blockNumber = call.block.number;
   depositEvent.timestamp = call.block.timestamp;
 
@@ -605,7 +616,7 @@ export function createLiquidityDepositEvent(
 
 export function createLiquidityWithdrawEvent(
   poolAddress: string,
-  tokenAddress: string,
+  tokenAddress: Address,
   chainID: BigInt,
   fromAddress: Address,
   toAddress: Address,
@@ -626,9 +637,15 @@ export function createLiquidityWithdrawEvent(
   withdrawEvent.to = toAddress.toHexString();
   withdrawEvent.from = fromAddress.toHexString();
   withdrawEvent.pool = poolAddress;
-  withdrawEvent.token = tokenAddress;
   withdrawEvent.chainID = chainID;
+
+  const token = getOrCreateToken(tokenAddress, call.block.number);
+  withdrawEvent.token = token.id;
   withdrawEvent.amount = amount;
+  withdrawEvent.amountUSD = bigIntToBigDecimal(amount, token.decimals).times(
+    token.lastPriceUSD!
+  );
+
   withdrawEvent.blockNumber = call.block.number;
   withdrawEvent.timestamp = call.block.timestamp;
 

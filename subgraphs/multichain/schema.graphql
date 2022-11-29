@@ -308,13 +308,13 @@ type BridgeProtocol implements Protocol @entity {
   totalPoolRouteCount: Int!
 
   "  Number of routes where the destination asset is canonical (i.e. it is not wrapped)"
-  canonicalRouteCount: Int!
+  totalCanonicalRouteCount: Int!
 
   " Number of routes where the destination asset is a wrapped version of the source asset, usually minted by the bridge contract "
-  wrappedRouteCount: Int!
+  totalWrappedRouteCount: Int!
 
   " Total number of tokens that can be bridged from or to this chain. Other tokens supported by the bridge but not on this chain are not counted "
-  supportedTokenCount: Int!
+  totalSupportedTokenCount: Int!
 
   ##### Snapshots #####
 
@@ -384,13 +384,13 @@ type UsageMetricsDailySnapshot @entity {
   totalPoolRouteCount: Int!
 
   "  Number of routes where the destination asset is canonical (i.e. it is not wrapped)"
-  canonicalRouteCount: Int!
+  totalCanonicalRouteCount: Int!
 
   " Number of routes where the destination asset is a wrapped version of the source asset, usually minted by the bridge contract "
-  wrappedRouteCount: Int!
+  totalWrappedRouteCount: Int!
 
   " Total number of tokens that can be bridged from or to this chain. Other tokens supported by the bridge but not on this chain are not counted "
-  supportedTokenCount: Int!
+  totalSupportedTokenCount: Int!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -904,6 +904,12 @@ type LiquidityDeposit implements Event @entity {
   " Token deposited in the pool "
   token: Token!
 
+  " Amount of token deposited "
+  amount: BigInt!
+
+  " Amount of token deposited in USD "
+  amountUSD: BigDecimal!
+
   " Id of the chain where this is ocurring (should always be the chain where the subgraph is running) "
   chainID: BigInt!
 
@@ -912,9 +918,6 @@ type LiquidityDeposit implements Event @entity {
 
   " Timestamp of this event "
   timestamp: BigInt!
-
-  " Amount of deposit "
-  amount: BigInt!
 }
 
 type LiquidityWithdraw implements Event @entity {
@@ -942,6 +945,12 @@ type LiquidityWithdraw implements Event @entity {
   " Token withdrawn from the pool "
   token: Token!
 
+  " Amount of token deposited "
+  amount: BigInt!
+
+  " Amount of token deposited in USD "
+  amountUSD: BigDecimal!
+
   " Id of the chain where this is ocurring (should always be the chain where the subgraph is running) "
   chainID: BigInt!
 
@@ -950,16 +959,13 @@ type LiquidityWithdraw implements Event @entity {
 
   " Timestamp of this event "
   timestamp: BigInt!
-
-  " Amount of withdraw "
-  amount: BigInt!
 }
 
 enum TransferType {
-  MINT,
-  BURN,
-  LOCK,
-  RELEASE,
+  MINT
+  BURN
+  LOCK
+  RELEASE
 }
 
 type BridgeTransfer implements Event @entity {
@@ -984,10 +990,10 @@ type BridgeTransfer implements Event @entity {
   " Are we briding in or out? "
   isOutgoing: Boolean!
 
-  " Chain ID from where the message is being sent "
+  " Chain ID from where the transfer is being sent "
   fromChainID: BigInt!
 
-  " Chain ID where the message is being sent to"
+  " Chain ID where the transfer is being sent to "
   toChainID: BigInt!
 
   " This is the address that's receiving the bridged funds (not a pool contract). When bridging out, it will be the address on the destination chain. "
@@ -1008,6 +1014,12 @@ type BridgeTransfer implements Event @entity {
   " The token sent/received in this transfer on the current chain "
   token: Token!
 
+  " Amount of token transferred "
+  amount: BigInt!
+
+  " Amount of token transferred in USD "
+  amountUSD: BigDecimal!
+
   " The equivalent of our token in the other chain "
   crosschainToken: CrosschainToken!
 
@@ -1022,9 +1034,6 @@ type BridgeTransfer implements Event @entity {
 
   " Timestamp of this event "
   timestamp: BigInt!
-
-  " Amount of bridged funds "
-  amount: BigInt!
 }
 
 # Some bridges support sending 
