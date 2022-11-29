@@ -1,5 +1,4 @@
-import { Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { Notional } from "../../generated/Notional/Notional";
+import { ethereum } from "@graphprotocol/graph-ts";
 import {
   Market,
   MarketDailySnapshot,

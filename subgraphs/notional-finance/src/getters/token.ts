@@ -1,5 +1,5 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
-import { ActiveEventAccount, Token } from "../../generated/schema";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Token } from "../../generated/schema";
 import { ERC20 } from "../../generated/Notional/ERC20";
 import { getUsdPricePerToken } from "../prices";
 import {
