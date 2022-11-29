@@ -149,6 +149,10 @@ export function BDChangeDecimals(
   }
 }
 
+export function equalsIgnoreCase(a: string, b: string): boolean {
+  return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
+
 /////////////////////////////
 /////     Addresses     /////
 /////////////////////////////
