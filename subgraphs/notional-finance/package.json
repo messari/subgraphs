@@ -1,16 +1,20 @@
 {
-  "name": "notional-ethereum",
-  "license": "UNLICENSED",
+  "name": "notional",
+  "license": "MIT",
+  "version": "1.0.0",
+  "repository": "https://github.com/messari/subgraphs/blob/master/subgraphs/notional-finance",
   "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ fortysevenlabs/notional-ethereum",
-    "create-local": "graph create --node http://localhost:8020/ fortysevenlabs/notional-ethereum",
-    "remove-local": "graph remove --node http://localhost:8020/ fortysevenlabs/notional-ethereum",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 fortysevenlabs/notion-ethereum"
+    "format": "npx prettier --write .",
+    "codegen": "graph codegen"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.30.4",
-    "@graphprotocol/graph-ts": "0.27.0"
+    "@graphprotocol/graph-cli": "^0.32.0",
+    "@graphprotocol/graph-ts": "^0.27.0",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.6.0",
+    "typescript": "^4.6.2"
   }
 }
