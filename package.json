@@ -9,6 +9,8 @@
     "@typescript-eslint/parser": "^5.38.0",
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-rulesdir": "^0.2.1",
+    "ethereum-address": "^0.0.4",
     "folderslint": "^1.2.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
