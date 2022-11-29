@@ -3,6 +3,7 @@ import {
   ethereum,
   BigInt,
   DataSourceContext,
+  dataSource,
 } from "@graphprotocol/graph-ts";
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
@@ -117,10 +118,12 @@ export function getOrCreateToken(
       token._canonicalToken = canonicalToken.id;
     }
 
+    const network = NetworkByID.get(NetworkConfigs.getChainID().toString());
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     if (
-      !INACURATE_PRICEFEED_TOKENS.includes(
-        Address.fromString(canonicalToken.id)
+      network &&
+      !INACURATE_PRICEFEED_TOKENS.get(network)!.includes(
+        Address.fromString(token.id)
       )
     ) {
       const price = getUsdPricePerToken(Address.fromString(canonicalToken.id));

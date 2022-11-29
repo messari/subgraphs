@@ -1,0 +1,49 @@
+{
+  "deployment": "MULTICHAIN_POLYGON",
+  "network": "matic",
+  "file": "./src/mappings/handlers.ts",
+  "routers": [
+    {
+      "name": "RouterV3",
+      "address": "0xAFAace7138ab3c2BCb2DB4264F8312e1Bbb80653",
+      "abi": "Router",
+      "startBlock": 20697550
+    },
+    {
+      "name": "RouterV4",
+      "address": "0x6fF0609046A38D76Bd40C5863b4D1a2dCe687f73",
+      "abi": "Router",
+      "startBlock": 17355461
+    },
+    {
+      "name": "RouterV4 2",
+      "address": "0x4f3Aff3A747fCADe12598081e80c6605A8be192F",
+      "abi": "Router",
+      "startBlock": 15190030
+    },
+    {
+      "name": "RouterV6",
+      "address": "0xD50380E953603b37A74Dc67c92FC5E19E0B65469",
+      "abi": "Router",
+      "startBlock": 35337626
+    },
+    {
+      "name": "RouterV6 2",
+      "address": "0x84cEbCa6bd17fE11F7864F7003a1A30f2852B1dC",
+      "abi": "Router",
+      "startBlock": 30007475
+    },
+    {
+      "name": "RouterV6 3",
+      "address": "0x72C290f3f13664B024ee611983Aa2d5621Ebe917",
+      "abi": "Router",
+      "startBlock": 36001687
+    },
+    {
+      "name": "RouterV6 4",
+      "address": "0x2eF4A574b72E1f555185AfA8A09c6d1A8AC4025C",
+      "abi": "Router",
+      "startBlock": 23980693
+    }
+  ]
+}

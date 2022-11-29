@@ -1,0 +1,25 @@
+{
+  "deployment": "MULTICHAIN_OPTIMISM",
+  "network": "optimism",
+  "file": "./src/mappings/handlers.ts",
+  "routers": [
+    {
+      "name": "RouterV6",
+      "address": "0x80A16016cC4A2E6a2CACA8a4a498b1699fF0f844",
+      "abi": "Router",
+      "startBlock": 3627880
+    },
+    {
+      "name": "RouterV6 2",
+      "address": "0xDC42728B0eA910349ed3c6e1c9Dc06b5FB591f98",
+      "abi": "Router",
+      "startBlock": 6142619
+    },
+    {
+      "name": "RouterV6 3",
+      "address": "0xF480f38C366dAaC4305dC484b2Ad7a496FF00CeA",
+      "abi": "Router",
+      "startBlock": 8604870
+    }
+  ]
+}

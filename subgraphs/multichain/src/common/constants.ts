@@ -215,6 +215,43 @@ NetworkByID.set("1313161554", Network.AURORA);
 NetworkByID.set("1666600000", Network.HARMONY);
 NetworkByID.set("32520", Network.BITGERT);
 
-export const INACURATE_PRICEFEED_TOKENS = [
-  Address.fromString("0xD9A8bB44968F35282F1b91c353f77a61BaF31A4B"), // GTPS
+const mainnetInacuratePricefeedTokens = [
+  Address.fromString("0x86A298581388bc199e61BFeCDcA8eA22Cf6C0Da3"), // anyGTPS
+
+  Address.fromString("0xb4f89d6a8c113b4232485568e542e646d93cfab1"),
+  Address.fromString("0xb5c827fdbbee6f6e9df3a5cb499aedf5927de1b8"),
+  Address.fromString("0xdc9524a8774dc2956bdb8b55fdf91938757f3185"),
+  Address.fromString("0xc9d7cc5d224119c6a563a2aa2c5a49ebc97444d7"),
+  Address.fromString("0x620e59769085f69d2712a53aa0436821218e1068"),
+  Address.fromString("0xa10d8a7cae8dae8019daa64095f309716264ebca"),
+  Address.fromString("0x1469fd8b056e098d9035d3c7c9109e22a1f4ca86"),
+  Address.fromString("0x04ae3226c80e8c04d35e6e56089345bdd06da6de"),
+  Address.fromString("0x85a8df6564517cd0a8501587db0cc74850f191d6"),
+  Address.fromString("0xca0bc229e2216a6ba6ef0278351ed6aa2303ddf6"),
+  Address.fromString("0xa648904b6e812e2d847b87878a9a3f1d74e5af50"),
+
+  Address.fromString("0x93f9a668dccc090f63b0ec27d809527dc2f0ebba"),
+  Address.fromString("0xc65d2f76c6cc9fde1ceea5d47d5753b889e22412"),
+  Address.fromString("0xe57bcdeb786e163b5e10f0b5ca7b59c8764d1080"),
+  Address.fromString("0x183c9e9c8a787269024a20f2e3788764cd458f72"),
+  Address.fromString("0x36ce6ded1378c83bcb6efe844550af94b90a1979"),
+  Address.fromString("0x302434cc94a5ada01ee23375ff8c61f42f1dabb1"),
+  Address.fromString("0x54bbaa521fa27065e3067b431ce9563dbaf8733b"),
+  Address.fromString("0x4cb7a6dec613f4af9f618cff56354f76115a8023"),
+  Address.fromString("0x9492b0ab0571b2c785c2dad4b3a272dba39d6e61"),
+  Address.fromString("0x5bc2228dc7be251ca5d6068e01fc6d4e7ca3d3a1"),
+  Address.fromString("0xc2ea516ed97778afa2331be021754735796865e8"),
+  Address.fromString("0xa288507d3cae42adf3bef755c37b8605a9f62f25"),
+  Address.fromString("0x123aeafd4ce574be7d417aca0e5cb3122f3e1149"),
+  Address.fromString("0x16c102f12468670c8d2bb03ea6d781cb3394c09e"),
+  Address.fromString("0xb467613d657edb3d3e926aeba0f17386976a9c1f"),
+  Address.fromString("0xa8d0352634d3dec194e48b9878634487a837df0f"),
+  Address.fromString("0xee9c40f27687a6c5de027b102caa31e2ff7a8956"),
+  Address.fromString("0x0aa1a18504a10c1c09732e5859ee2bd1892ac762"),
 ];
+
+export const INACURATE_PRICEFEED_TOKENS = new TypedMap<string, Address[]>();
+INACURATE_PRICEFEED_TOKENS.set(
+  Network.MAINNET,
+  mainnetInacuratePricefeedTokens
+);

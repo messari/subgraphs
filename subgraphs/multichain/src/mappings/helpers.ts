@@ -164,8 +164,8 @@ export function updateVolume(
   pool.cumulativeVolumeInUSD = pool.cumulativeVolumeInUSD.plus(volumeInUSD);
   pool.cumulativeVolumeOut = pool.cumulativeVolumeOut.plus(volumeOut);
   pool.cumulativeVolumeOutUSD = pool.cumulativeVolumeOutUSD.plus(volumeOutUSD);
-  pool.netVolume = pool.cumulativeVolumeOut.plus(pool.cumulativeVolumeIn);
-  pool.netVolumeUSD = pool.cumulativeVolumeOutUSD.plus(
+  pool.netVolume = pool.cumulativeVolumeOut.minus(pool.cumulativeVolumeIn);
+  pool.netVolumeUSD = pool.cumulativeVolumeOutUSD.minus(
     pool.cumulativeVolumeInUSD
   );
 

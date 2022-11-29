@@ -1,0 +1,25 @@
+{
+  "deployment": "MULTICHAIN_CELO",
+  "network": "celo",
+  "file": "./src/mappings/handlers.ts",
+  "routers": [
+    {
+      "name": "RouterV3",
+      "address": "0x7C598c96D02398d89FbCb9d41Eab3DF0C16F227D",
+      "abi": "Router",
+      "startBlock": 9584386
+    },
+    {
+      "name": "RouterV3 2",
+      "address": "0xbbc4A8d076F4B1888fec42581B6fc58d242CF2D5",
+      "abi": "Router",
+      "startBlock": 13321485
+    },
+    {
+      "name": "RouterV3 3",
+      "address": "0xf27Ee99622C3C9b264583dACB2cCE056e194494f",
+      "abi": "Router",
+      "startBlock": 10155435
+    }
+  ]
+}

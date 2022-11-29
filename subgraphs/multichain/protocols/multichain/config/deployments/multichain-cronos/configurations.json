@@ -1,0 +1,25 @@
+{
+  "deployment": "MULTICHAIN_CRONOS",
+  "network": "cronos",
+  "file": "./src/mappings/handlers.ts",
+  "routers": [
+    {
+      "name": "RouterV3",
+      "address": "0xf27Ee99622C3C9b264583dACB2cCE056e194494f",
+      "abi": "Router",
+      "startBlock": 268039
+    },
+    {
+      "name": "RouterV3 2",
+      "address": "0x639A647fbe20b6c8ac19E48E2de44ea792c62c5C",
+      "abi": "Router",
+      "startBlock": 33400
+    },
+    {
+      "name": "RouterV6",
+      "address": "0x1e31E3Ba5e246E2f2390D29C778E33A59F6aA6C6",
+      "abi": "Router",
+      "startBlock": 5707034
+    }
+  ]
+}
