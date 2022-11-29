@@ -4,6 +4,7 @@ import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_TEN,
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
 } from "../constants";
@@ -78,4 +79,15 @@ export function roundToWholeNumber(n: BigDecimal): BigDecimal {
 
 export function percToDec(percentage: BigDecimal): BigDecimal {
   return percentage.div(BIGDECIMAL_HUNDRED);
+}
+
+// Check if tokens are of the same sign
+export function isSameSign(a: BigInt, b: BigInt): boolean {
+  if (
+    (a.gt(BIGINT_ZERO) && b.gt(BIGINT_ZERO)) ||
+    (a.lt(BIGINT_ZERO) && b.lt(BIGINT_ZERO))
+  ) {
+    return true;
+  }
+  return false;
 }

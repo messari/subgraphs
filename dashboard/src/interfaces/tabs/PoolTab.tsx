@@ -9,11 +9,13 @@ import PoolTabEntity from "./PoolTabEntity";
 
 interface PoolTabProps {
   data: any;
+  overlayData: any;
   entitiesData: { [x: string]: { [x: string]: string } };
   protocolData: { [x: string]: any };
   poolTimeseriesData: any;
   poolTimeseriesError: any;
   poolTimeseriesLoading: any;
+  overlayPoolTimeseriesData: any;
   poolId: string;
   poolData: { [x: string]: string };
   poolsList: { [x: string]: any[] };
@@ -25,11 +27,13 @@ interface PoolTabProps {
 
 function PoolTab({
   data,
+  overlayData,
   entitiesData,
   protocolData,
   poolTimeseriesData,
   poolTimeseriesError,
   poolTimeseriesLoading,
+  overlayPoolTimeseriesData,
   poolId,
   poolData,
   poolsList,
@@ -139,7 +143,9 @@ function PoolTab({
           <PoolTabEntity
             key={"poolTabEntity-" + entityName}
             data={data}
+            overlayData={overlayData}
             currentEntityData={poolTimeseriesData[entityName]}
+            overlayPoolTimeseriesData={overlayPoolTimeseriesData[entityName]}
             entityName={entityName}
             entitiesData={entitiesData}
             poolId={poolId}

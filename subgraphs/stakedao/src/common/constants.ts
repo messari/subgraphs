@@ -51,9 +51,6 @@ export namespace RewardTokenType {
 export namespace Protocol {
   export const NAME = "Stake DAO";
   export const SLUG = "stake-dao";
-  export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.3.0";
-  export const METHODOLOGY_VERSION = "1.0.0";
   export const NETWORK = Network.MAINNET;
   export const TYPE = ProtocolType.YIELD;
 }
@@ -63,8 +60,8 @@ export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(1500);
 export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(50);
 
-export const BASE_PARAMS = BigInt.fromString('1000000000');
-export const BASE_TOKENS = BigInt.fromString('1000000000000000000');
+export const BASE_PARAMS = BigInt.fromString("1000000000");
+export const BASE_TOKENS = BigInt.fromString("1000000000000000000");
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);

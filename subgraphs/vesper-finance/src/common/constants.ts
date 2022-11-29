@@ -61,9 +61,6 @@ export namespace NULL {
 export namespace Protocol {
   export const NAME = "Vesper Finance";
   export const SLUG = "vesper-finance";
-  export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.0.0";
-  export const METHODOLOGY_VERSION = "1.0.0";
 }
 
 export const SECONDS_PER_HOUR = 60 * 60;
@@ -87,4 +84,3 @@ export const VUSDC_POOL = Address.fromString(
 export const VWBTC_POOL = Address.fromString(
   "0x4b2e76ebbc9f2923d83f5fbde695d8733db1a17b"
 );
-

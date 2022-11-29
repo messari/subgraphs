@@ -24,6 +24,7 @@ import { Vault as VaultStore } from "../../generated/schema";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/templates/Strategy/ERC20";
+import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -87,9 +88,6 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol = new YieldAggregator(constants.PROTOCOL_ID.toHexString());
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
-    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Network.BSC;
     protocol.type = constants.ProtocolType.YIELD;
 
@@ -101,9 +99,13 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
     protocol._vaultIds = [];
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }

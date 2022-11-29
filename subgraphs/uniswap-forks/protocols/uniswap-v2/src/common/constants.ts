@@ -1,5 +1,5 @@
 ////////////////////
-//////Versions//////
+//////Versions/////
 ////////////////////
 
 export const PROTOCOL_SUBGRAPH_VERSION = "1.1.7";

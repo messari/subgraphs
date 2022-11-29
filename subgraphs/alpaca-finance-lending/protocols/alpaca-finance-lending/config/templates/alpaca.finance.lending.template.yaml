@@ -1,0 +1,77 @@
+# prettier-ignore
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+#These valuts are not generated in a factory mode, so I have to list them here one by one.
+  {{#vaults}}
+  - kind: ethereum
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: Vault
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ConfigurableInterestVaultConfig
+          file: ./abis/ConfigurableInterestVaultConfig.json
+        - name: FairLaunch
+          file: ./abis/FairLaunch.json
+        - name: SimplePriceOracle
+          file: ./abis/SimplePriceOracle.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: AddDebt(indexed uint256,uint256)
+          handler: handleAddDebt
+        - event: RemoveDebt(indexed uint256,uint256)
+          handler: handleRemoveDebt
+        - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: handleKill
+      file: ./src/mappings/vault.ts
+  {{/vaults}}
+  

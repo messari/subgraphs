@@ -2,14 +2,12 @@ import { Protocol } from "../../generated/schema";
 import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_ID,
   Network,
   ProtocolType,
   BIGDECIMAL_ZERO,
 } from "../utils/constants";
+import { Versions } from "../versions";
 
 export function getOrCreateProtocol(): Protocol {
   let protocol = Protocol.load(PROTOCOL_ID);
@@ -20,9 +18,6 @@ export function getOrCreateProtocol(): Protocol {
     // Metadata
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.GENERIC;
 
@@ -34,9 +29,13 @@ export function getOrCreateProtocol(): Protocol {
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }

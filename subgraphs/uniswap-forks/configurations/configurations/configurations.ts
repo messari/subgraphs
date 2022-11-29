@@ -25,6 +25,9 @@ import { MMFinanceCronosConfigurations } from "../../protocols/mm-finance/config
 import { MMFinanceMaticConfigurations } from "../../protocols/mm-finance/config/deployments/mm-finance-polygon/configurations";
 import { HoneyswapXdaiConfigurations } from "../../protocols/honeyswap/config/deployments/honeyswap-gnosis/configurations";
 import { HoneyswapMaticConfigurations } from "../../protocols/honeyswap/config/deployments/honeyswap-polygon/configurations";
+import { PangolinAvalancheConfigurations } from "../../protocols/pangolin/config/deployments/pangolin-avalanche/configurations";
+import { BiswapBscConfigurations } from "../../protocols/biswap/config/deployments/biswap-bsc/configurations";
+
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -114,6 +117,12 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.MM_FINANCE_POLYGON: {
       return new MMFinanceMaticConfigurations();
+    }
+    case Deploy.PANGOLIN_AVALANCHE: {
+      return new PangolinAvalancheConfigurations();
+    }
+    case Deploy.BISWAP_BSC: {
+      return new BiswapBscConfigurations();
     }
     default: {
       log.critical(

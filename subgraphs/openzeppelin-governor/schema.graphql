@@ -105,6 +105,7 @@ enum GovernanceFrameworkType {
   GovernorAlpha
   GovernorBravo
   OZGovernor
+  AaveGovernanceV2
 }
 
 type Proposal @entity {
@@ -219,6 +220,10 @@ type Vote @entity(immutable: true) {
   blockTime: BigInt!
   "Transaction hash of the vote"
   txnHash: String!
+  "Log Index of the event"
+  logIndex: BigInt!
+  "Unique ID based on the blockTime and logIndex"
+  blockTimeId: String!
 }
 
 enum VoteChoice {

@@ -56,8 +56,19 @@ Not applicable to Aave
 
 ## Issues
 
-- The WETH gateways seem to be giving the most trouble on positional entities.
-  - ie, a lot of the withdraw events not found is due to weth gateways acting as a third actor in transactions
+If you find an issue please create a github issue in [messari/subgraphs](https://github.com/messari/subgraphs)
+
+## Notes
+
+- Aave V2 Mainnet (not AMM), Polygon, and Avalanche have a collateral swap feature. This allows a user to switch collateral positions without doing a withdraw and deposit. The contract that is responsible for this is the Paraswap Router (a Paraswap router).
+  - Example transaction: https://snowtrace.io/tx/0x873b4019fa2d77dc9809c57b4c03d2db909d26776129225132c8e14f05c1319b
+  - e.g. aWAVAX is converted to WAVAX, WAVAX is swapped for USDC, USDC is converted to aUSDC then returned to the account executing the transaction
+  - There are also similar features with swapAndRepay routers and swapAndLiquidate routers.
+  - The logic in our subgraph accounts for all of the unique behaviour described above.
+- There is also a feature in Aave V2 to execute transactions on behalf of another account. We do account for this in the mappings. A position and transaction follow the controller of the collateral or debt.
+  - This does not affect any of the position data though.
+- There is also a feature in Aave V2 to execute transactions on behalf of another account. We do account for this in the mappings.
+- WMATIC price on the polygon deployment is funky at block `15783457` so we override it.
 
 ## Useful links and references
 

@@ -1,8 +1,10 @@
 import axios from 'axios';
 import moment from "moment";
 import { protocolErrorMessages } from './errorSchemas.js';
+import { resolveQueriesToAttempt } from './resolutions.js';
 import { monitorVersion, ProtocolTypeEntityName, sleep, colorsArray } from './util.js';
-
+import fs from 'fs';
+import path from 'path';
 // Error handling functions
 
 export async function errorNotification(error, channelId = process.env.CHANNEL_ID) {
@@ -26,6 +28,9 @@ export async function errorNotification(error, channelId = process.env.CHANNEL_I
 export async function getDiscordMessages(messages, channelId = process.env.CHANNEL_ID) {
     try {
         const tempMessages = await fetchMessages(messages[messages.length - 1]?.id || "", channelId);
+        if (!tempMessages) {
+            return [];
+        }
         messages = [...messages, ...tempMessages];
         if (messages.length % 100 === 0 && messages.length !== 0 && tempMessages.length !== 0) {
             await sleep(1000);
@@ -53,6 +58,7 @@ export async function fetchMessages(before, channelId = process.env.CHANNEL_ID) 
         return data.data;
     } catch (err) {
         errorNotification("ERROR LOCATION 8 " + err?.message + ' URL: ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
+        return [];
     }
 }
 
@@ -220,6 +226,12 @@ export async function sendDiscordMessage(messageObjects, protocolName, channelId
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return data;
+
+        // Code that saves the embed json rather than sending it, when testing/debugging main channel
+        // const nowDate = new Date().getMonth().toString() + '-' + new Date().getDate().toString() + '-' + new Date().getFullYear().toString();
+        // const jsonPath = path.join(process.cwd(), 'alerts_' + nowDate + '_' + protocolName + '.json');
+        // fs.writeFileSync(jsonPath, JSON.stringify(messageObjects, null, '\t'));
+        // return null;
     } catch (err) {
         if (err.response.status === 429) {
             return messageObjects;
@@ -241,7 +253,7 @@ export async function startProtocolThread(subject, base, channelId = process.env
     if (base === '') {
         postJSON = JSON.stringify({ "content": subject });
     }
-    let msgId = ""
+    let msgId = "";
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         msgId = data.data.id;
@@ -299,9 +311,17 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
         const indexErrorEmbedDepos = {};
         const indexErrorPendingHash = {};
+        const aggThreadProtocolErrorEmbeds = [];
         deploymentsOnProtocol.forEach((depo) => {
             let networkString = depo.network;
             let issuesSet = [];
+            const protocolErrorEmbed = {
+                title: `Protocol Level Errors on ${protocol}`,
+                color: placeholderColor,
+                description: 'After mapping through all of the subgraph deployments for this protocol, The errors listed in this section were detected within protocol level data.',
+                fields: [],
+                footer: { text: monitorVersion }
+            };
             if (!!issuesOnThread) {
                 issuesSet = issuesOnThread[networkString];
                 if (depo.pending) {
@@ -309,13 +329,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                     networkString += ' (PENDING)';
                 }
             }
-            const protocolErrorEmbed = {
-                title: `Protocol Level Errors on ${protocol}-${networkString}`,
-                color: placeholderColor,
-                description: 'After mapping through all of the subgraph deployments for this protocol, The errors listed in this section were detected within protocol level data.',
-                fields: [],
-                footer: { text: monitorVersion }
-            };
+            protocolErrorEmbed.title = `Protocol Level Errors on ${protocol}-${networkString}`;
             if (!!depo.indexingError) {
                 const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
                 let issueHasBeenAlerted = false;
@@ -343,7 +357,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                         errorsOnDeployment = true;
                     }
                     errorArray.forEach((error) => {
-                        protocolRows.push({ name: 'Field', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`"${ProtocolTypeEntityName[depo.protocolType]}"`), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
+                        protocolRows.push({ name: 'Field', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`${ProtocolTypeEntityName[depo.protocolType]}`).split('Value').join(error), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
                     });
                 }
                 protocolErrorEmbed.fields = [...protocolErrorEmbed.fields, ...protocolRows];
@@ -351,6 +365,9 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             if (protocolErrorEmbed.fields.length > 1) {
                 protocolErrorEmbed.url = `https://subgraphs.messari.io/subgraph?endpoint=${depo.url}&tab=protocol`;
                 embedObjects.push(protocolErrorEmbed);
+                if (depo?.status === 'prod') {
+                    aggThreadProtocolErrorEmbeds.push(protocolErrorEmbed);
+                }
             }
         });
         if (Object.keys(indexErrorEmbedDepos)?.length > 0) {
@@ -369,12 +386,17 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             indexingErrorEmbed.fields[0].value += labelValue;
             indexingErrorEmbed.fields[1].value += failureBlock;
             embedObjects.unshift(indexingErrorEmbed);
+        }
+
+        if (embedObjects.length > 0) {
             if (deploymentsOnProtocol[0]?.status === 'prod') {
                 indexingErrorEmbed.title += ' ' + protocol;
-                aggThreadMsgObjects.push({ embeds: indexingErrorEmbed.fields, protocol: protocol });
+                let indexingErrorEmbedsToAggThread = [];
+                if (indexingErrorEmbed?.fields[1].value.length > 3) {
+                    indexingErrorEmbedsToAggThread = indexingErrorEmbed.fields;
+                }
+                aggThreadMsgObjects.push({ embeds: indexingErrorEmbedsToAggThread, protocol: protocol, protocolErrorEmbeds: aggThreadProtocolErrorEmbeds });
             }
-        }
-        if (embedObjects.length > 0) {
             return embedObjects;
         }
         return null;
@@ -389,10 +411,17 @@ export async function sendMessageToAggThread(aggThreadId, channelId = process.en
         return;
     }
 
-    const aggThreadMsgObjectsToSend = [];
+    const aggThreadQueriesToResolve = [];
     const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
     const currentThreadMessages = await fetchMessages("", aggThreadId);
+    const baseURL = "https://discordapp.com/api/channels/" + aggThreadId + "/messages";
+    const headers = {
+        "Authorization": "Bot " + process.env.BOT_TOKEN,
+        "Content-Type": "application/json",
+    };
     aggThreadMsgObjects.forEach(aggThread => {
+        let aggThreadMsgObjectsToSend = [];
+
         const indexingErrorEmbed = {
             title: "Indexing Errors " + aggThread.protocol,
             description: 'These subgraphs encountered a fatal error in indexing',
@@ -401,45 +430,50 @@ export async function sendMessageToAggThread(aggThreadId, channelId = process.en
         };
         const msg = currentThreadMessages.find(x => {
             return !!x.embeds.find(embed => embed.title.toUpperCase().includes(aggThread.protocol)) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS);
-        })
-        let embedToAdd = false
-        if (!!msg) {
-            const existingEmbed = msg.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
-            const aggThreadNetworkStringsArr = aggThread.embeds[0].value.split('\n').join('-----').split('-----');
-            const aggThreadBlockValueArr = aggThread.embeds[1].value.split('\n').join('-----').split('-----');
-            const existingMessageNetworkStringsArr = existingEmbed.embeds[0].value.fields.split('\n').join('-----').split('-----');
-            const existingMessageBlockValueArr = existingEmbed.embeds[1].value.fields.split('\n').join('-----').split('-----');
-            aggThreadNetworkStringsArr.forEach(networkLine, networkIdx => {
-                const existingMessageIndex = existingMessageNetworkStringsArr.indexOf(networkLine);
-                if (!(existingMessageIndex >= 0 && aggThreadBlockValueArr[networkIdx] === existingMessageBlockValueArr[existingMessageIndex])) {
-                    indexingErrorEmbed.fields[0].value += networkLine;
-                    indexingErrorEmbed.fields[1].value += aggThreadBlockValueArr[networkIdx];
-                    embedToAdd = true;
-                }
-            });
-        } else {
-            indexingErrorEmbed.fields[0].value += aggThread.embeds[0].value;
-            indexingErrorEmbed.fields[1].value += aggThread.embeds[1].value;
-            embedToAdd = true;
+        });
+
+        let embedToAdd = false;
+        if (aggThread.embeds.length > 1) {
+            if (!!msg) {
+                const existingEmbed = msg.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
+                const aggThreadNetworkStringsArr = aggThread.embeds[0].value.split('\n').join('-----').split('-----');
+                const aggThreadBlockValueArr = aggThread.embeds[1].value.split('\n').join('-----').split('-----');
+                const existingMessageNetworkStringsArr = existingEmbed.embeds[0].value.fields.split('\n').join('-----').split('-----');
+                const existingMessageBlockValueArr = existingEmbed.embeds[1].value.fields.split('\n').join('-----').split('-----');
+                aggThreadNetworkStringsArr.forEach(networkLine, networkIdx => {
+                    const existingMessageIndex = existingMessageNetworkStringsArr.indexOf(networkLine);
+                    if (!(existingMessageIndex >= 0 && aggThreadBlockValueArr[networkIdx] === existingMessageBlockValueArr[existingMessageIndex])) {
+                        indexingErrorEmbed.fields[0].value += networkLine;
+                        indexingErrorEmbed.fields[1].value += aggThreadBlockValueArr[networkIdx];
+                        embedToAdd = true;
+                    }
+                });
+            } else if (aggThread?.embeds[0]?.value?.length > 0 && aggThread?.embeds[1]?.value?.length > 0) {
+                indexingErrorEmbed.fields[0].value += aggThread.embeds[0].value;
+                indexingErrorEmbed.fields[1].value += aggThread.embeds[1].value;
+                embedToAdd = true;
+            }
         }
 
-        if (!!embedToAdd) {
+        if (embedToAdd) {
             indexingErrorEmbed.color = colorsArray[Math.floor(Math.random() * 8)];
             aggThreadMsgObjectsToSend.unshift(indexingErrorEmbed);
         }
+
+        if (aggThread.protocolErrorEmbeds) {
+            aggThreadMsgObjectsToSend = [...aggThreadMsgObjectsToSend, ...aggThread.protocolErrorEmbeds]
+        }
+
+        if (aggThreadMsgObjectsToSend.length > 0) {
+            const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on ${aggThread.protocol} subgraphs (prod)**\n`, "embeds": aggThreadMsgObjectsToSend });
+            const query = axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch(err => console.log(aggThread.protocol));
+            aggThreadQueriesToResolve.push(query);
+        }
     })
 
-    const baseURL = "https://discordapp.com/api/channels/" + aggThreadId + "/messages";
-    const headers = {
-        "Authorization": "Bot " + process.env.BOT_TOKEN,
-        "Content-Type": "application/json",
-    };
-
-    const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on prod subgraphs**\n`, "embeds": aggThreadMsgObjectsToSend });
     try {
-        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        await resolveQueriesToAttempt(aggThreadQueriesToResolve);
         aggThreadMsgObjects = [];
-        return data;
     } catch (err) {
         if (err?.response?.status === 429) {
             return aggThreadMsgObjects;

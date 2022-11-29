@@ -95,10 +95,7 @@ export namespace NULL {
 export namespace Protocol {
   export const NAME = "Balancer v2";
   export const SLUG = "balancer-v2";
-  export const NETWORK = Network.MATIC;
-  export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.2.0";
-  export const METHODOLOGY_VERSION = "1.0.0";
+  export const NETWORK = Network.MAINNET;
 }
 
 export namespace MasterChef {
@@ -130,13 +127,15 @@ export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 export const BIGDECIMAL_POINT_FOUR = BigDecimal.fromString("0.4");
 
-export const DEFAULT_DECIMALS_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
+export const DEFAULT_DECIMALS_DENOMINATOR = BigDecimal.fromString(
+  "1000000000000000000"
+);
 export const FEE_DENOMINATOR = DEFAULT_DECIMALS_DENOMINATOR;
 
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
-export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7200);
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 
 /////////////////////////////////////
 ///// Protocol/Network Specific /////
@@ -149,14 +148,16 @@ export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
   "0xce88686553686DA562CE7Cea497CE749DA109f9F"
 );
 export const PROTOCOL_TOKEN_ADDRESS = Address.fromString(
-  "0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3"
+  "0xba100000625a3754423978a60c9317c58a424e3D"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "0x3b8cA519122CdD8efb272b0D3085453404B25bD0"
+  "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD"
 );
 export const AAVE_BOOSTED_POOL_ADDRESS = Address.fromString(
   "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2"
 );
 
-export const INFLATION_INTERVAL = "NONE";
-export const STARTING_INFLATION_RATE = BigDecimal.fromString((0).toString()).times(DEFAULT_DECIMALS_DENOMINATOR);
+export const INFLATION_INTERVAL = "TIMESTAMP";
+export const STARTING_INFLATION_RATE = BigDecimal.fromString(
+  (0.23974867724).toString()
+).times(DEFAULT_DECIMALS_DENOMINATOR);
