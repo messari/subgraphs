@@ -1,6 +1,6 @@
 # Subgraph Schema: Lending Protocol
-# Version: 2.0.1
-# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
+# Version: 3.0.0
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
   ARBITRUM_ONE
@@ -327,7 +327,7 @@ interface Protocol {
   " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
   protocolControlledValueUSD: BigDecimal
 
-  " Number of cumulative unique users "
+  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
@@ -393,9 +393,12 @@ type LendingProtocol implements Protocol @entity {
   " Tokens that can be minted. Only applies to CDP "
   mintedTokens: [Token!]
 
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. "
+  rewardTokens: [RewardToken!]
+
   ##### Quantitative Data #####
 
-  " Number of cumulative unique users "
+  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
 
   " Number of cumulative depositors "
@@ -482,10 +485,10 @@ type UsageMetricsDailySnapshot @entity {
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
 
-  " Number of unique daily active users "
+  " Number of unique daily active users. e.g. accounts that spent gas to interact with this protocol "
   dailyActiveUsers: Int!
 
-  " Number of cumulative unique users "
+  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
 
   " Number of unique daily depositors "
@@ -530,6 +533,15 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of liquidations in a day "
   dailyLiquidateCount: Int!
 
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of positions touched in a day. This includes opening, closing, and modifying positions. "
+  dailyActivePositions: Int!
+
   " Total number of pools "
   totalPoolCount: Int!
 
@@ -550,7 +562,7 @@ type UsageMetricsHourlySnapshot @entity {
   " Number of unique hourly active users "
   hourlyActiveUsers: Int!
 
-  " Number of cumulative unique users "
+  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
 
   " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
@@ -793,7 +805,7 @@ type Market @entity {
 
   ##### Usage Data #####
 
-  " Number of cumulative unique users "
+  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this market "
   cumulativeUniqueUsers: Int!
 
   " Number of cumulative depositors "
@@ -896,6 +908,9 @@ type MarketDailySnapshot @entity {
 
   ##### Incentives #####
 
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
 
@@ -904,17 +919,11 @@ type MarketDailySnapshot @entity {
 
   ##### Quantitative Data #####
 
-  " Token that need to be deposited in this market to take a position in protocol (should be alphabetized) "
-  inputToken: Token!
-
   " Amount of input token in the market (same order as inputTokens) "
   inputTokenBalance: BigInt!
 
   " Prices in USD of the input token (same order as inputTokens) "
   inputTokenPriceUSD: BigDecimal!
-
-  " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
-  outputToken: Token
 
   " Total supply of output token (same order as outputTokens) "
   outputTokenSupply: BigInt
@@ -936,9 +945,6 @@ type MarketDailySnapshot @entity {
 
   " The amount of revenue that is converted to reserves at the current time. 20% reserve factor should be in format 0.20 "
   reserveFactor: BigDecimal
-
-  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
-  borrowedToken: Token
 
   " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
   variableBorrowedTokenBalance: BigInt
@@ -1028,7 +1034,7 @@ type MarketDailySnapshot @entity {
 
   ##### Usage Data #####
 
-  " Number of unique daily active users "
+  " Number of unique daily active users. e.g. accounts that spent gas to interact with this market "
   dailyActiveUsers: Int!
 
   " Number of unique daily depositors "
@@ -1043,8 +1049,8 @@ type MarketDailySnapshot @entity {
   " Number of unique daily liquidatees (accounts that got liquidated) "
   dailyActiveLiquidatees: Int!
 
-  " Number of unique daily transferers (the sender in a Transfer) "
-  dailyActiveTransferers: Int!
+  " Number of unique daily transferrers (the sender in a Transfer) "
+  dailyActiveTransferrers: Int!
 
   " Number of unique daily accounts that executed a flash loan"
   dailyActiveFlashloaners: Int!
@@ -1126,6 +1132,9 @@ type MarketHourlySnapshot @entity {
 
   ##### Incentives #####
 
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
 
@@ -1134,17 +1143,11 @@ type MarketHourlySnapshot @entity {
 
   ##### Quantitative Data #####
 
-  " Token that need to be deposited in this market to take a position in protocol (should be alphabetized) "
-  inputToken: Token!
-
   " Amount of input token in the market (same order as inputTokens) "
   inputTokenBalance: BigInt!
 
   " Prices in USD of the input token (same order as inputTokens) "
   inputTokenPriceUSD: BigDecimal!
-
-  " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
-  outputToken: Token
 
   " Total supply of output token (same order as outputTokens) "
   outputTokenSupply: BigInt
@@ -1163,9 +1166,6 @@ type MarketHourlySnapshot @entity {
 
   " Total amount of reserves (in USD) "
   reserves: BigDecimal
-
-  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
-  borrowedToken: Token
 
   " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
   variableBorrowedTokenBalance: BigInt
@@ -1223,17 +1223,6 @@ type MarketHourlySnapshot @entity {
 
   " Total assets repaid on a given hour, in USD. "
   hourlyRepayUSD: BigDecimal!
-
-  ##### Token Balances #####
-
-  " Balances and relationships of all tokens within this market "
-  tokens: [TokenData!]
-
-  " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
 ##############################
@@ -1418,6 +1407,12 @@ type PositionSnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+}
+
+# Helper entity for calculating daily/hourly active users
+type ActiveAccount @entity(immutable: true) {
+  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
+  id: Bytes!
 }
 
 ############################
