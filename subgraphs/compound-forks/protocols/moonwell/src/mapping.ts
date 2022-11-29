@@ -383,41 +383,45 @@ function initMarketRewards(marketID: string): void {
 
   if (dataSource.network().toUpperCase() == Network.MOONRIVER) {
     // rewardTokens = [MFAM-supply, MOVR-supply, MFAM-borrow, MOVR-borrow]
-    let rewardToken0 = Token.load(MFAMAddr.toHexString());
-    if (!rewardToken0) {
-      rewardToken0 = new Token(MFAMAddr.toHexString());
-      rewardToken0.name = "MFAM";
-      rewardToken0.symbol = "MFAM";
-      rewardToken0.decimals = 18;
-      rewardToken0.save();
+    let _rewardToken0 = Token.load(MFAMAddr.toHexString());
+    if (!_rewardToken0) {
+      _rewardToken0 = new Token(MFAMAddr.toHexString());
+      _rewardToken0.name = "MFAM";
+      _rewardToken0.symbol = "MFAM";
+      _rewardToken0.decimals = 18;
+      _rewardToken0.save();
     }
-    let rewardToken1 = Token.load(MOVRAddr.toHexString());
-    if (!rewardToken1) {
-      rewardToken1 = new Token(MOVRAddr.toHexString());
-      rewardToken1.name = "MOVR";
-      rewardToken1.symbol = "MOVR";
-      rewardToken1.decimals = 18;
-      rewardToken1.save();
+    rewardToken0 = _rewardToken0;
+    let _rewardToken1 = Token.load(MOVRAddr.toHexString());
+    if (!_rewardToken1) {
+      _rewardToken1 = new Token(MOVRAddr.toHexString());
+      _rewardToken1.name = "MOVR";
+      _rewardToken1.symbol = "MOVR";
+      _rewardToken1.decimals = 18;
+      _rewardToken1.save();
     }
+    rewardToken1 = _rewardToken1;
   } else {
     // Moonbeam Reward Tokens
     // rewardTokens = [WELL-supply, GLMR-supply, WELL-borrow, GLMR-borrow]
-    let rewardToken0 = Token.load(WELLAddr.toHexString());
-    if (!rewardToken0) {
-      rewardToken0 = new Token(WELLAddr.toHexString());
-      rewardToken0.name = "WELL";
-      rewardToken0.symbol = "WELL";
-      rewardToken0.decimals = 18;
-      rewardToken0.save();
+    let _rewardToken0 = Token.load(WELLAddr.toHexString());
+    if (!_rewardToken0) {
+      _rewardToken0 = new Token(WELLAddr.toHexString());
+      _rewardToken0.name = "WELL";
+      _rewardToken0.symbol = "WELL";
+      _rewardToken0.decimals = 18;
+      _rewardToken0.save();
     }
-    let rewardToken1 = Token.load(GLMRAddr.toHexString());
-    if (!rewardToken1) {
-      rewardToken1 = new Token(GLMRAddr.toHexString());
-      rewardToken1.name = "GLMR";
-      rewardToken1.symbol = "GLMR";
-      rewardToken1.decimals = 18;
-      rewardToken1.save();
+    rewardToken0 = _rewardToken0;
+    let _rewardToken1 = Token.load(GLMRAddr.toHexString());
+    if (!_rewardToken1) {
+      _rewardToken1 = new Token(GLMRAddr.toHexString());
+      _rewardToken1.name = "GLMR";
+      _rewardToken1.symbol = "GLMR";
+      _rewardToken1.decimals = 18;
+      _rewardToken1.save();
     }
+    rewardToken1 = _rewardToken1;
   }
 
   let supplyRewardToken0 = RewardToken.load(
