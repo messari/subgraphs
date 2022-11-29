@@ -338,7 +338,7 @@ interface Protocol {
   " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
   protocolControlledValueUSD: BigDecimal
 
-  " Number of cumulative unique users "
+  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
@@ -418,7 +418,7 @@ type LendingProtocol implements Protocol @entity {
 
   ##### Quantitative Data #####
 
-  " Number of cumulative unique users "
+  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
 
   " Number of cumulative depositors "
@@ -543,10 +543,10 @@ type UsageMetricsDailySnapshot @entity {
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
 
-  " Number of unique daily active users "
+  " Number of unique daily active users. e.g. accounts that spent gas to interact with this protocol "
   dailyActiveUsers: Int!
 
-  " Number of cumulative unique users "
+  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
 
   " Number of unique daily depositors "
@@ -629,7 +629,7 @@ type UsageMetricsHourlySnapshot @entity {
   " Number of unique hourly active users "
   hourlyActiveUsers: Int!
 
-  " Number of cumulative unique users "
+  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
   cumulativeUniqueUsers: Int!
 
   " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
@@ -922,7 +922,7 @@ type Market @entity {
 
   ##### Usage Data #####
 
-  " Number of cumulative unique users "
+  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this market "
   cumulativeUniqueUsers: Int!
 
   " Number of cumulative depositors "
@@ -1033,6 +1033,9 @@ type MarketDailySnapshot @entity {
   relation: Bytes
 
   ##### Incentives #####
+
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -1173,7 +1176,7 @@ type MarketDailySnapshot @entity {
 
   ##### Usage Data #####
 
-  " Number of unique daily active users "
+  " Number of unique daily active users. e.g. accounts that spent gas to interact with this market "
   dailyActiveUsers: Int!
 
   " Number of unique daily depositors "
@@ -1188,7 +1191,7 @@ type MarketDailySnapshot @entity {
   " Number of unique daily liquidatees (accounts that got liquidated) "
   dailyActiveLiquidatees: Int!
 
-  " Number of unique daily transferers (the sender in a Transfer) "
+  " Number of unique daily transferrers (the sender in a Transfer) "
   dailyActiveTransferrers: Int!
 
   " Number of unique daily accounts that executed a flash loan"
@@ -1262,6 +1265,9 @@ type MarketHourlySnapshot @entity {
   relation: Bytes
 
   ##### Incentives #####
+
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -1567,7 +1573,7 @@ type PositionSnapshot @entity(immutable: true) {
 
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity(immutable: true) {
-  " { daily/hourly }-{ Optional: Transaction Type }-{ Address of the account }-{ Optional: Market Address }-{ Optional: Days/hours since Unix epoch } "
+  " { daily/hourly }-{ Address of the account }-{ Optional: Transaction Type }-{ Optional: Market Address }-{ Optional: Days/hours since Unix epoch } "
   id: ID!
 }
 
