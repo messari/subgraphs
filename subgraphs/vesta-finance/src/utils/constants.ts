@@ -102,13 +102,6 @@ export namespace PositionSide {
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const ETH_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
-
-export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
-export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // created block 10042267
-export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // created block 10093341
-
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
@@ -177,10 +170,17 @@ export const PRICE_ORACLE_V1_ADDRESS =
   "0xc93408bfbea0bf3e53bedbce7d5c1e64db826702";
 
 export const VST_ADDRESS = "0x64343594Ab9b56e99087BfA6F2335Db24c2d1F17";
+export const VSTA_ADDRESS = "0xa684cd057951541187f288294a1e1C2646aA2d24";
+export const WETH_ADDRESS = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1";
+export const USDC_ADDRESS = "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8";
+export const BAL_VSTA_WETH_POOL_ADDRESS =
+  "0xc61ff48f94d801c1ceface0289085197b5ec44f0";
+export const BAL_WETH_WBTC_USDC_POOL_ADDRESS =
+  "0x64541216bafffeec8ea535bb71fbc927831d0595";
 
 export const ACTIVE_POOL_CREATED_TIMESTAMP = BigInt.fromI32(1644224579);
-
 export const ACTIVE_POOL_CREATED_BLOCK = BigInt.fromI32(5559192);
+export const BALANCER_POOL_CREATED_BLOCK = BigInt.fromI32(5671673);
 
 export const MINIMUM_COLLATERAL_RATIO = BigDecimal.fromString("1.1");
 export const MAXIMUM_LTV = BIGDECIMAL_HUNDRED.div(MINIMUM_COLLATERAL_RATIO);
@@ -191,3 +191,5 @@ export const LIQUIDATION_FEE = LIQUIDATION_FEE_PERCENT.div(BIGDECIMAL_HUNDRED);
 export const LIQUIDATION_RESERVE_VST = BigDecimal.fromString("30");
 
 export const BONUS_TO_SP = BigDecimal.fromString("10");
+
+export const MINUTES_PER_DAY = BigInt.fromI32(24 * 60);

@@ -137,6 +137,30 @@ dataSources:
         - event: CollBalanceUpdated(indexed address,uint256)
           handler: handleCollBalanceUpdated
       file: ./src/mapping/CollSurplusPool.ts
+  - kind: ethereum/contract
+    name: CommunityIssuance
+    network: arbitrum-one
+    source:
+      address: "0x626420aE6986A4941DF830F57775aa7df4aAC9D3"
+      abi: CommunityIssuance
+      startBlock: 13469947
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: CommunityIssuance
+          file: ./abis/CommunityIssuance.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
+        - name: Vault
+          file: ./abis/BalancerVault.json
+      eventHandlers:
+        - event: TotalVSTAIssuedUpdated(indexed address,uint256)
+          handler: handleCommunityIssuance
+      file: ./src/mapping/CommunityIssuance.ts
+
 templates:
   - name: PriceFeedV1
     kind: ethereum/contract
@@ -208,4 +232,8 @@ templates:
           handler: handleStabilityPoolAssetBalanceUpdated
         - event: StabilityPoolVSTBalanceUpdated(uint256)
           handler: handleStabilityPoolVSTBalanceUpdated
+        - event: AssetGainWithdrawn(indexed address,uint256,uint256)
+          handler: handleAssetGainWithdrawn
+        - event: UserDepositChanged(indexed address,uint256)
+          handler: handleUserDepositChanged
       file: ./src/mapping/StabilityPool.ts
