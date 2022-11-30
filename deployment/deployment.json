@@ -1580,6 +1580,28 @@
             "query-id": "iron-bank-fantom"
           }
         }
+      },
+      "iron-bank-optimism": {
+        "network": "optimism",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.1.8",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "iron-bank.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "iron-bank-optimism",
+            "query-id": "iron-bank-optimism"
+          }
+        }
       }
     }
   },
