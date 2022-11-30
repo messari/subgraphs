@@ -232,8 +232,4 @@ templates:
           handler: handleStabilityPoolAssetBalanceUpdated
         - event: StabilityPoolVSTBalanceUpdated(uint256)
           handler: handleStabilityPoolVSTBalanceUpdated
-        - event: AssetGainWithdrawn(indexed address,uint256,uint256)
-          handler: handleAssetGainWithdrawn
-        - event: UserDepositChanged(indexed address,uint256)
-          handler: handleUserDepositChanged
       file: ./src/mapping/StabilityPool.ts
