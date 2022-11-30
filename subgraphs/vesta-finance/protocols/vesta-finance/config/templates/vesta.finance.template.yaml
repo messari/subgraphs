@@ -156,9 +156,13 @@ dataSources:
           file: ./abis/BalancerWeightedPool.json
         - name: Vault
           file: ./abis/BalancerVault.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json          
       eventHandlers:
         - event: TotalVSTAIssuedUpdated(indexed address,uint256)
-          handler: handleCommunityIssuance
+          handler: handleTotalVSTAIssuedUpdated
       file: ./src/mapping/CommunityIssuance.ts
 
 templates:

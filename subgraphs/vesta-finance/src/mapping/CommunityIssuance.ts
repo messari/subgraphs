@@ -1,17 +1,8 @@
-import {
-  BigInt,
-  ethereum,
-  Address,
-  log,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
+import { ethereum, Address, log, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   TotalVSTAIssuedUpdated,
   CommunityIssuance,
 } from "../../generated/CommunityIssuance/CommunityIssuance";
-import { getCurrentAssetPrice, getOrCreateAssetToken } from "../entities/token";
-import { updateStabilityPoolUSDLocked } from "../entities/stabilitypool";
-import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
 import {
   getOrCreateMarket,
   getOrCreateMarketHourlySnapshot,
@@ -31,6 +22,8 @@ import {
 import { RewardToken } from "../../generated/schema";
 import { WeightedPool as WeightedPoolContract } from "../../generated/CommunityIssuance/WeightedPool";
 import { Vault as VaultContract } from "../../generated/CommunityIssuance/Vault";
+import { getOrCreateAssetToken } from "../entities/token";
+import { exponentToBigDecimal } from "../utils/numbers";
 
 /*
  * Update reward emssion
