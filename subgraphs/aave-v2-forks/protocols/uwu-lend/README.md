@@ -64,6 +64,6 @@ Not applicable to Aave
 
 ## Resources
 
-App: https://uwulend.fi/
-Docs: https://docs.uwulend.fi/
-Contract Addresses: https://docs.uwulend.fi/contracts
+- [App](https://uwulend.fi/)
+- [Docs](https://docs.uwulend.fi/)
+- [Contract Addresses](https://docs.uwulend.fi/contracts)

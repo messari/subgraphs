@@ -66,16 +66,22 @@ type Spell @entity {
   expiryTime: BigInt!
   "Transaction hash of Spell lift"
   liftedTxnHash: String
+  "Block number spell was lifted in"
+  liftedBlock: BigInt
   "Timestamp of Spell lift"
   liftedTime: BigInt
   "Voting power when lifted"
   liftedWith: BigInt
   "Transaction hash of Spell scheduled"
   scheduledTxnHash: String
+  "Block number spell was scheduled in"
+  scheduledBlock: BigInt
   "Timestamp of Spell scheduled"
   scheduledTime: BigInt
   "Transaction hash of Spell cast"
   castTxnHash: String
+  "Block number spell was cast in"
+  castBlock: BigInt
   "Timestamp of Spell cast"
   castTime: BigInt
   "Voting power when cast"

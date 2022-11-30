@@ -123,6 +123,8 @@ There is nice video that goes over this in more depth:
 
 The `README.md` should contain the methodology for the subgraph. Normally defined by our protocol specialists. An end user should be able to go there and understand how we calculate different metrics in the scope of this protocol. This file needs to live under `./protocols/protocol-name/README.md`.
 
+Some additional fields you may find in a `README.md` include links to important protocol resources and notes about special cases in the subgraph.
+
 ## Forked Subgraph Repository
 
 The directories labeled `protocol-forks` follow the same directory structure, but there are just more protocols under `./protocols`. To learn more about this I encourage you to explore a fork directory and/or watch the previous video! 👾
