@@ -11,7 +11,7 @@ dataSources:
       startBlock: 13492539
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Upgraded
@@ -68,4 +68,3 @@ dataSources:
         - event: LiquidatefCashEvent(indexed address,indexed address,uint16,uint16,int256,uint256[],int256[])
           handler: handleLiquidatefCash
       file: ./src/mappings/notional.ts
- 

@@ -2,11 +2,11 @@
 
 ## Version 1.1.0
 
-\*Note on 7 Sept 2022: Notional Finance is one protocol with two services, a DEX (of fCASH and cTOKENs) and a lending and borrowing protocol. The two services are interwined and not divisible from a product perspective. For the purpose of subgraph, a version computing the statistics of the lending and borrowing services of Notional will be delivered first. In this version, liquidity represented by nTokens (LP liquidity) is not considered as part of lending or borrowing, as they are part of the DEX service.
+\*Note on 7 Sept 2022: Notional Finance is one protocol with two services, a DEX (of fCASH and cTOKENs) and a lending and borrowing protocol. The two services are intertwined and not divisible from a product perspective. For the purpose of subgraph, a version computing the statistics of the lending and borrowing services of Notional will be delivered first. In this version, liquidity represented by nTokens (LP liquidity) is not considered as part of lending or borrowing, as they are part of the DEX service.
 
 ## Overview of Notional Finance
 
-Notional Finance is a protocol for decentralised fixed term, fixed rate lending. For now it only operates on Ethereum.
+Notional Finance is a protocol for decentralized fixed term, fixed rate lending. For now it only operates on Ethereum.
 
 Currently, Notional has the following types of loans and rolls each quarter:
 
@@ -216,7 +216,7 @@ Notional has two types of revenue:
 
 To simplify, the formula of Notional's lending and borrowing revenue is:
 
-> Revenue = $\sum$ value of fCASH transacted _ interest rate annualised _ (loan duration in days / 365)
+> Revenue = $\sum$ value of fCASH transacted _ interest rate annualized _ (loan duration in days / 365)
 
 - Revenue from DEX service (not include in the subgraph for the lending and borrowing service). Fees paid by borrowers and lenders for each trade. Notional charges a fee for each transaction with the liquidity pool, e.g. borrow, repay, lend, withdraw. The fee rate is 0.3% per transaction for a 1-year loan, and pro rata for shorter maturity, i.e. 0.15% for 6-month loan. 80% of the fees go to the protocol and 20% goes to the liquidity provider. In the DEX service, the protocol side revenue of Notional will be the 80% transaction fees generated from the transaction fees. The supply side revenue is the sum of 20% of the transaction fees. Interests paid to lenders are not counted as revenue, as suggested above.
   - Reference: https://docs.notional.finance/governance/overview-of-governance-parameters/selected-parameters#fees-and-incentives
@@ -265,7 +265,7 @@ Notional's interest revenue from borrowers to lenders are different from that of
 
 For example, user A sells a 1-year fDAI to a user B, for a discount of 5%, i.e. 95 cents worth of cDAI for 1 fDAI (which can redeem $1 worth of cDAI in a year). Effectively, A borrows from B 1 DAI at an interest rate of 5%. If both of them hold to maturity, then the interest paid by A to B is 5 cents of DAI, the market value of the differences between cDAI and fDAI in that transaction.
 
-However, in decentralised finance, it's not necessary to have a matching A and B. The liquidity pools serves the purpose. So the above case has actually two transactions: A sells fDAI to the liquidity pool, and B buys the fDAI from the liquidity pool. The gist of the two transactions is still A borrows from B 1 DAI for 5 cents of interest.
+However, in decentralized finance, it's not necessary to have a matching A and B. The liquidity pools serves the purpose. So the above case has actually two transactions: A sells fDAI to the liquidity pool, and B buys the fDAI from the liquidity pool. The gist of the two transactions is still A borrows from B 1 DAI for 5 cents of interest.
 
 As the buying and selling in any liquidity pool usually do not match, so the lending and borrowings amount of any fCASH over a period of time will not match. The liquidity pool served as a counter party for any shortage: when there's more borrowing than lending, the additional borrowing comes from the liquidity pool. Therefore, the amount of actual borrowing/lending in any period is the higher of the borrowing and lending amount during that period.
 
@@ -282,6 +282,6 @@ However, this might be technically cumbersome to recitify this error. In any cas
 
 - Liquidation metrics (e.g. `market.cumulativeLiquidateUSD`, `liquidate.market`, `liquidate.position`): Liquidation events do not report any market info because they are not associated with a market from the perspective of Notional. We cannot update position or market data associated with liquidation events as a result.
 
-- ERC1155: Notional finance represents positions (asset deposits/borrowals) using ERC1155 tokens (currencyfCash-maturityDate pairs). The contracts expose `tokenId` but do not expose any metadata. Therefore, we create token entities with only id param available and set to `ERC1155-{tokenAddress}-{tokenId}`.
+- ERC1155: Notional finance represents positions (asset deposits/borrows) using ERC1155 tokens (currencyfCash-maturityDate pairs). The contracts expose `tokenId` but do not expose any metadata. Therefore, we create token entities with only id param available and set to `ERC1155-{tokenAddress}-{tokenId}`.
 
-- Repay and Deposit, Withdraw and Borrow: Notional team confirmed that these can happen in a single action. However, such actions seem to happen through [BatchActions](https://github.com/notional-finance/contracts-v2/blob/63eb0b46ec37e5fc5447bdde3d951dd90f245741/contracts/external/actions/BatchAction.sol#L78) which should still result in individual LendBorrow trades. Further, I didn't find any occurances of `repay and deposit` and `withdraw and borrow` in single LendBorrow trade based on logging observations. Hence, I include those conditionals for such events and log.warn any such occurances for future.
+- Repay and Deposit, Withdraw and Borrow: Notional team confirmed that these can happen in a single action. However, such actions seem to happen through [BatchActions](https://github.com/notional-finance/contracts-v2/blob/63eb0b46ec37e5fc5447bdde3d951dd90f245741/contracts/external/actions/BatchAction.sol#L78) which should still result in individual LendBorrow trades. Further, I didn't find any occurrences of `repay and deposit` and `withdraw and borrow` in single LendBorrow trade based on logging observations. Hence, I include those conditionals for such events and log.warn any such occurrences for future.

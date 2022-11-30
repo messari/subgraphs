@@ -11,11 +11,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
 
     protocol.name = constants.PROTOCOL_NAME;
     protocol.slug = constants.PROTOCOL_SLUG;
-
-    protocol.schemaVersion = Versions.getSchemaVersion();
-    protocol.subgraphVersion = Versions.getSubgraphVersion();
-    protocol.methodologyVersion = Versions.getMethodologyVersion();
-
     protocol.network = constants.PROTOCOL_NETWORK;
     protocol.type = constants.PROTOCOL_TYPE;
     protocol.lendingType = constants.PROTOCOL_LENDING_TYPE;
@@ -44,9 +39,12 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol._borrowers = [];
     protocol._liquidatees = [];
     protocol._liquidators = [];
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+  protocol.save();
 
   return protocol;
 }
