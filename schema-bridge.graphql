@@ -47,7 +47,7 @@ enum BridgePoolType {
 
 type Token @entity {
   " Smart contract address of the token "
-  id: ID!
+  id: Bytes!
 
   " Name of the token, mirrored from the smart contract "
   name: String!
@@ -74,14 +74,17 @@ type CrosschainToken @entity {
   # We prepend the chainID because it is possible for a token to have the same address on multiple chains.
   # ChainID is the id of the destination chain (not the one the subgraph is running on), and tokenID is the
   # address of the token on the current chain.
-  " {chainID}-{tokenID} "
-  id: ID!
+  " Bytes.fromI32(chainID).concat(tokenAddress) "
+  id: Bytes!
+
+  " The ID commonly used to signal to which chain a transaction is going. List of IDs: https://chainlist.org/ "
+  chainID: Int!
 
   " The network where this token is deployed "
   network: Network!
 
   " The address on the external chain. It is necessary so we can link pools and routes among chans. "
-  address: String!
+  address: Bytes!
 
   " The type of token on the other chain "
   type: CrosschainTokenType!
@@ -99,8 +102,8 @@ enum RewardTokenType {
 }
 
 type RewardToken @entity {
-  " { Reward token type }-{ Smart contract address of the reward token } "
-  id: ID!
+  " Bytes.fromI32(0|1).concat(rewardTokenAddress), where 0 is for deposit and 1 is for borrow "
+  id: Bytes!
 
   " Reference to the actual token "
   token: Token!
@@ -115,7 +118,7 @@ type RewardToken @entity {
 
 interface Protocol {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: ID!
+  id: Bytes!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
@@ -179,7 +182,7 @@ interface Protocol {
 
 type BridgeProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: ID!
+  id: Bytes!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
@@ -300,8 +303,8 @@ type BridgeProtocol implements Protocol @entity {
 ###############################
 
 type UsageMetricsDailySnapshot @entity {
-  " ID is # of days since Unix epoch time "
-  id: ID!
+  " ID is # of days since Unix epoch time (Bytes.fromI32(num)) "
+  id: Bytes!
 
   " Protocol this snapshot is associated with "
   protocol: Protocol!
@@ -362,8 +365,8 @@ type UsageMetricsDailySnapshot @entity {
 }
 
 type UsageMetricsHourlySnapshot @entity {
-  " { # of hours since Unix epoch time } "
-  id: ID!
+  " { Bytes.fromI32(num) } # of hours since Unix epoch time "
+  id: Bytes!
 
   " Protocol this snapshot is associated with "
   protocol: Protocol!
@@ -397,8 +400,8 @@ type UsageMetricsHourlySnapshot @entity {
 }
 
 type FinancialsDailySnapshot @entity {
-  " ID is # of days since Unix epoch time "
-  id: ID!
+  " ID is # of days since Unix epoch time (Bytes.fromI32(num)) "
+  id: Bytes!
 
   " Protocol this snapshot is associated with "
   protocol: Protocol!
@@ -462,7 +465,7 @@ type FinancialsDailySnapshot @entity {
 
 type Pool @entity {
   " Smart contract address of the pool "
-  id: ID!
+  id: Bytes!
 
   " The protocol this pool belongs to "
   protocol: Protocol!
@@ -562,9 +565,8 @@ type Pool @entity {
 }
 
 type PoolRoute @entity {
-  # Still thinking about how to make this ID in a way that allows routes to be linked among chains
-  " {Pool ID}-{lowerChainID}-{greaterChainID} "
-  id: ID!
+  " Bytes.fromUTF(({Pool ID}-{lowerChainID}-{greaterChainID}) "
+  id: Bytes!
 
   " Pool this route belongs to "
   pool: Pool!
@@ -601,8 +603,8 @@ type PoolRoute @entity {
 }
 
 type PoolDailySnapshot @entity {
-  " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
-  id: ID!
+  " poolAddress.concatI32(daysSinceUnix) "
+  id: Bytes!
 
   " The protocol this snapshot belongs to "
   protocol: Protocol!
@@ -680,8 +682,8 @@ type PoolDailySnapshot @entity {
 }
 
 type PoolHourlySnapshot @entity {
-  " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
-  id: ID!
+  " poolAddress.concatI32(hoursSinceUnix) "
+  id: Bytes!
 
   " The protocol this snapshot belongs to "
   protocol: Protocol!
@@ -759,8 +761,8 @@ type PoolHourlySnapshot @entity {
 }
 
 type PoolRouteSnapshot @entity {
-  " {PoolRoute ID}-{poolSnaphotID} "
-  id: ID!
+  " poolRouteID.concat(poolSnapshotID) "
+  id: Bytes!
 
   " PoolRoute this snapshot belongs to "
   poolRoute: PoolRoute!
@@ -809,11 +811,11 @@ store them as events, although they are not technically Ethereum events emitted 
 contracts.
 """
 interface Event {
-  " { Event type }-{ Transaction hash }-{ Log index } "
-  id: ID!
+  " event.transaction.hash.concatI32(event.logIndex) "
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
@@ -822,10 +824,10 @@ interface Event {
   protocol: BridgeProtocol!
 
   " Address that received the tokens "
-  to: String!
+  to: Bytes!
 
   " Address that sent the tokens "
-  from: String!
+  from: Bytes!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -835,11 +837,11 @@ interface Event {
 }
 
 type LiquidityDeposit implements Event @entity {
-  " { Event type }-{ Transaction hash }-{ Log index } "
-  id: ID!
+  " event.transaction.hash.concatI32(event.logIndex) "
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
@@ -848,10 +850,10 @@ type LiquidityDeposit implements Event @entity {
   protocol: BridgeProtocol!
 
   " Address that received the tokens "
-  to: String!
+  to: Bytes!
 
   " Address that sent the tokens "
-  from: String!
+  from: Bytes!
 
   " Pool where the tokens are deposited "
   pool: Pool!
@@ -876,11 +878,11 @@ type LiquidityDeposit implements Event @entity {
 }
 
 type LiquidityWithdraw implements Event @entity {
-  " { Event type }-{ Transaction hash }-{ Log index } "
-  id: ID!
+  " event.transaction.hash.concatI32(event.logIndex) "
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
@@ -889,10 +891,10 @@ type LiquidityWithdraw implements Event @entity {
   protocol: BridgeProtocol!
 
   " Address that received the tokens "
-  to: String!
+  to: Bytes!
 
   " Address that sent the tokens "
-  from: String!
+  from: Bytes!
 
   " Pool where the tokens are withdrawn from "
   pool: Pool!
@@ -924,11 +926,11 @@ enum TransferType {
 }
 
 type BridgeTransfer implements Event @entity {
-  " { Event type }-{ Transaction hash }-{ Log index } "
-  id: ID!
+  " event.transaction.hash.concatI32(event.logIndex) "
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
@@ -937,10 +939,10 @@ type BridgeTransfer implements Event @entity {
   protocol: BridgeProtocol!
 
   " Address that received the tokens "
-  to: String!
+  to: Bytes!
 
   " Address that sent the tokens "
-  from: String!
+  from: Bytes!
 
   " Are we briding in or out? "
   isOutgoing: Boolean!
@@ -952,10 +954,10 @@ type BridgeTransfer implements Event @entity {
   toChainID: Int!
 
   " This is the address that's receiving the bridged funds (not a pool contract). When bridging out, it will be the address on the destination chain. "
-  transferTo: String!
+  transferTo: Bytes!
 
   " This is the address initiating the transfer, where the initial funds came from. It might not match the address initiating the actual EVM transaction. "
-  transferFrom: String!
+  transferFrom: Bytes!
 
   " Indicates how this transfer is ocurring on the current chain "
   type: TransferType!
@@ -982,7 +984,7 @@ type BridgeTransfer implements Event @entity {
   isSwap: Boolean!
 
   " The transaction ID on the other chain, if available "
-  crossTransactionID: String
+  crossTransactionID: Bytes
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -993,11 +995,11 @@ type BridgeTransfer implements Event @entity {
 
 # Some bridges support sending
 type BridgeMessage implements Event @entity {
-  " { Event type }-{ Transaction hash }-{ Log index } "
-  id: ID!
+  " event.transaction.hash.concatI32(event.logIndex) "
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
@@ -1006,10 +1008,10 @@ type BridgeMessage implements Event @entity {
   protocol: BridgeProtocol!
 
   " Address that received the tokens "
-  to: String!
+  to: Bytes!
 
   " Address that sent the tokens "
-  from: String!
+  from: Bytes!
 
   " Is it an ougoing message to some other chain or incoming instead? "
   isOutgoing: Boolean!
@@ -1021,16 +1023,16 @@ type BridgeMessage implements Event @entity {
   toChainID: Int!
 
   " Address sending the message. Here if it is outgoing, or on the other chain if incoming "
-  transferFrom: String
+  transferFrom: Bytes
 
   " Address receiving the message. Here if it is incoming, or on the other chain if outgoing "
-  transferTo: String
+  transferTo: Bytes
 
   " Contents of the message "
   data: Bytes!
 
   " The transaction ID on the other chain, if available "
-  crossTransactionID: String
+  crossTransactionID: Bytes
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1043,7 +1045,7 @@ type BridgeMessage implements Event @entity {
 # Helps to accumulate total unique users
 type Account @entity {
   " Address of the account "
-  id: ID!
+  id: Bytes!
 
   " ChainIDs where this account has sent or received funds through this bridge "
   chains: [Int!]!
@@ -1051,6 +1053,6 @@ type Account @entity {
 
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity {
-  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
-  id: ID!
+  " Bytes.fromI32(0|1).concat(accountAddress).concatI32(days|hoursSinceUnix), where initial 0|1, 0 indicates daily and 1 indicates hourly "
+  id: Bytes!
 }
