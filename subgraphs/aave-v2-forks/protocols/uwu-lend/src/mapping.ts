@@ -167,108 +167,6 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     return;
   }
 
-  // Get UWU rewards for the given pool
-  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  const tryIncentiveController = aTokenContract.try_getIncentivesController();
-  if (!tryIncentiveController.reverted) {
-    const rewardTokens: string[] = [];
-    const rewardEmissionsAmount: BigInt[] = [];
-    const rewardEmissionsUSD: BigDecimal[] = [];
-
-    const incentiveControllerContract = ChefIncentivesController.bind(
-      tryIncentiveController.value
-    );
-    const tryDepPoolInfo = incentiveControllerContract.try_poolInfo(
-      Address.fromString(market.outputToken!)
-    );
-    const tryBorPoolInfo = incentiveControllerContract.try_poolInfo(
-      Address.fromString(market.vToken!)
-    );
-    const tryAllocPoints = incentiveControllerContract.try_totalAllocPoint();
-    const tryRewardsPerSecond =
-      incentiveControllerContract.try_rewardsPerSecond();
-
-    // calculate rewards per pool
-    // Rewards/sec/poolSide = rewardsPerSecond * poolAllocPoints / totalAllocPoints
-
-    if (
-      !tryBorPoolInfo.reverted &&
-      !tryAllocPoints.reverted &&
-      !tryRewardsPerSecond.reverted
-    ) {
-      // set borrow reward tokens
-      const borrowRewardToken = getOrCreateRewardToken(
-        Address.fromString(UWU_TOKEN_ADDRESS),
-        RewardTokenType.BORROW
-      );
-      rewardTokens.push(borrowRewardToken.id); // borrow first bc alphabetized
-
-      const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
-      const poolAllocPoints = tryBorPoolInfo.value.value1;
-
-      const borRewardsPerDay = tryRewardsPerSecond.value
-        .times(BigInt.fromI32(SECONDS_PER_DAY))
-        .toBigDecimal()
-        .div(exponentToBigDecimal(uwuToken.decimals))
-        .times(
-          poolAllocPoints
-            .toBigDecimal()
-            .div(tryAllocPoints.value.toBigDecimal())
-        );
-      const borRewardsPerDayBI = BigInt.fromString(
-        borRewardsPerDay
-          .times(exponentToBigDecimal(uwuToken.decimals))
-          .truncate(0)
-          .toString()
-      );
-
-      const uwuPriceUSD = getUwuPriceUSD();
-      rewardEmissionsAmount.push(borRewardsPerDayBI);
-      rewardEmissionsUSD.push(borRewardsPerDay.times(uwuPriceUSD));
-    }
-
-    if (
-      !tryDepPoolInfo.reverted &&
-      !tryAllocPoints.reverted &&
-      !tryRewardsPerSecond.reverted
-    ) {
-      // set deposit reward tokens
-      const depositRewardToken = getOrCreateRewardToken(
-        Address.fromString(UWU_TOKEN_ADDRESS),
-        RewardTokenType.DEPOSIT
-      );
-      rewardTokens.push(depositRewardToken.id); // deposit second bc alphabetized
-
-      const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
-      const poolAllocPoints = tryDepPoolInfo.value.value1;
-
-      const depRewardsPerDay = tryRewardsPerSecond.value
-        .times(BigInt.fromI32(SECONDS_PER_DAY))
-        .toBigDecimal()
-        .div(exponentToBigDecimal(uwuToken.decimals))
-        .times(
-          poolAllocPoints
-            .toBigDecimal()
-            .div(tryAllocPoints.value.toBigDecimal())
-        );
-      const depRewardsPerDayBI = BigInt.fromString(
-        depRewardsPerDay
-          .times(exponentToBigDecimal(uwuToken.decimals))
-          .truncate(0)
-          .toString()
-      );
-
-      const uwuPriceUSD = getUwuPriceUSD();
-      rewardEmissionsAmount.push(depRewardsPerDayBI);
-      rewardEmissionsUSD.push(depRewardsPerDay.times(uwuPriceUSD));
-    }
-
-    market.rewardTokens = rewardTokens;
-    market.rewardTokenEmissionsAmount = rewardEmissionsAmount;
-    market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
-    market.save();
-  }
-
   const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromString(market.inputToken),
     Address.fromString(protocol.priceOracle)
@@ -284,6 +182,22 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.reserve,
     assetPriceUSD
   );
+
+  // update rewards
+  market.rewardTokens = [
+    getOrCreateRewardToken(
+      Address.fromString(UWU_TOKEN_ADDRESS),
+      RewardTokenType.BORROW
+    ).id,
+    getOrCreateRewardToken(
+      Address.fromString(UWU_TOKEN_ADDRESS),
+      RewardTokenType.DEPOSIT
+    ).id,
+  ];
+  market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+  market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  market.save();
+  updateRewards(market);
 }
 
 export function handleReserveUsedAsCollateralEnabled(
@@ -407,6 +321,94 @@ export function handleStableTransfer(event: StableTransfer): void {
 ///////////////////
 ///// Helpers /////
 ///////////////////
+
+function updateRewards(market: Market): void {
+  // Get UWU rewards for the given pool
+  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  const tryIncentiveController = aTokenContract.try_getIncentivesController();
+  if (!tryIncentiveController.reverted) {
+    const rewardEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+    const rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+
+    const incentiveControllerContract = ChefIncentivesController.bind(
+      tryIncentiveController.value
+    );
+    const tryDepPoolInfo = incentiveControllerContract.try_poolInfo(
+      Address.fromString(market.outputToken!)
+    );
+    const tryBorPoolInfo = incentiveControllerContract.try_poolInfo(
+      Address.fromString(market.vToken!)
+    );
+    const tryAllocPoints = incentiveControllerContract.try_totalAllocPoint();
+    const tryRewardsPerSecond =
+      incentiveControllerContract.try_rewardsPerSecond();
+
+    // calculate rewards per pool
+    // Rewards/sec/poolSide = rewardsPerSecond * poolAllocPoints / totalAllocPoints
+
+    if (
+      !tryBorPoolInfo.reverted &&
+      !tryAllocPoints.reverted &&
+      !tryRewardsPerSecond.reverted
+    ) {
+      const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
+      const poolAllocPoints = tryBorPoolInfo.value.value1;
+
+      const borRewardsPerDay = tryRewardsPerSecond.value
+        .times(BigInt.fromI32(SECONDS_PER_DAY))
+        .toBigDecimal()
+        .div(exponentToBigDecimal(uwuToken.decimals))
+        .times(
+          poolAllocPoints
+            .toBigDecimal()
+            .div(tryAllocPoints.value.toBigDecimal())
+        );
+      const borRewardsPerDayBI = BigInt.fromString(
+        borRewardsPerDay
+          .times(exponentToBigDecimal(uwuToken.decimals))
+          .truncate(0)
+          .toString()
+      );
+
+      const uwuPriceUSD = getUwuPriceUSD();
+      rewardEmissionsAmount[0] = borRewardsPerDayBI;
+      rewardEmissionsUSD[0] = borRewardsPerDay.times(uwuPriceUSD);
+    }
+
+    if (
+      !tryDepPoolInfo.reverted &&
+      !tryAllocPoints.reverted &&
+      !tryRewardsPerSecond.reverted
+    ) {
+      const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
+      const poolAllocPoints = tryDepPoolInfo.value.value1;
+
+      const depRewardsPerDay = tryRewardsPerSecond.value
+        .times(BigInt.fromI32(SECONDS_PER_DAY))
+        .toBigDecimal()
+        .div(exponentToBigDecimal(uwuToken.decimals))
+        .times(
+          poolAllocPoints
+            .toBigDecimal()
+            .div(tryAllocPoints.value.toBigDecimal())
+        );
+      const depRewardsPerDayBI = BigInt.fromString(
+        depRewardsPerDay
+          .times(exponentToBigDecimal(uwuToken.decimals))
+          .truncate(0)
+          .toString()
+      );
+
+      const uwuPriceUSD = getUwuPriceUSD();
+      rewardEmissionsAmount[1] = depRewardsPerDayBI;
+      rewardEmissionsUSD[1] = depRewardsPerDay.times(uwuPriceUSD);
+    }
+
+    market.rewardTokenEmissionsAmount = rewardEmissionsAmount;
+    market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+    market.save();
+  }
+}
 
 function getAssetPriceInUSDC(
   tokenAddress: Address,
