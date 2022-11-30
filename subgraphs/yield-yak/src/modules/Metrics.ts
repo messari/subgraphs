@@ -8,7 +8,7 @@ import {
   getOrCreateVaultsHourlySnapshots,
   getOrCreateYieldAggregator,
 } from "../common/initializers";
-import { ethereum, Address } from "@graphprotocol/graph-ts";
+import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY } from "../helpers/constants";
 import { ActiveAccount } from "../../generated/schema";
 
@@ -129,16 +129,18 @@ export function updateVaultSnapshots(
       i < vaultDailySnapshots.rewardTokenEmissionsAmount!.length;
       i++
     ) {
-      vaultDailySnapshots.rewardAPR!.push(
-        vault.rewardTokenEmissionsAmount![i].divDecimal(
-          vault.totalValueLockedUSD
-        )
-      );
-      vaultHourlySnapshots.rewardAPR!.push(
-        vault.rewardTokenEmissionsAmount![i].divDecimal(
-          vault.totalValueLockedUSD
-        )
-      );
+      if (vault.rewardTokenEmissionsAmount![i].gt(new BigInt(0))) {
+        vaultDailySnapshots.rewardAPR!.push(
+          vault.rewardTokenEmissionsAmount![i].divDecimal(
+            vault.totalValueLockedUSD
+          )
+        );
+        vaultHourlySnapshots.rewardAPR!.push(
+          vault.rewardTokenEmissionsAmount![i].divDecimal(
+            vault.totalValueLockedUSD
+          )
+        );
+      }
     }
   }
 
