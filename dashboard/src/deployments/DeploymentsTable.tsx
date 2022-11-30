@@ -142,6 +142,8 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
         });
     });
 
+
+
     return (
         <>
             {Object.entries(deposToPass).sort().map(([schemaType, subgraph]) => {
