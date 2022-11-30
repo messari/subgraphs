@@ -40,6 +40,7 @@ import {
   RewardTokenType,
   BIGINT_ONE,
   SECONDS_PER_DAY,
+  BIGDECIMAL_ZERO,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -155,6 +156,9 @@ export function handleMarketListed(event: MarketListed): void {
     ),
     event
   );
+
+  // init rewards
+  initRewards(event.address);
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
@@ -350,6 +354,42 @@ function getOrCreateProtocol(): LendingProtocol {
 //// Helpers ////
 /////////////////
 
+class RewardTokenEmission {
+  constructor(
+    public readonly amount: BigInt,
+    public readonly amountUSD: BigDecimal
+  ) {}
+}
+
+function initRewards(marketAddress: Address): void {
+  const market = Market.load(marketAddress.toHexString());
+  if (!market) {
+    log.error("Market not found for address {}", [marketAddress.toHexString()]);
+    return;
+  }
+
+  // rewardTokens = [BORROW-PLY, BORROW-AURORA, DEPOSIT-PLY, DEPOSIT-AURORA]
+  market.rewardTokens = [
+    getOrCreateRewardToken(PLY_TOKEN_ADDRESS, RewardTokenType.BORROW).id,
+    getOrCreateRewardToken(AURORA_TOKEN_ADDRESS, RewardTokenType.BORROW).id,
+    getOrCreateRewardToken(PLY_TOKEN_ADDRESS, RewardTokenType.DEPOSIT).id,
+    getOrCreateRewardToken(AURORA_TOKEN_ADDRESS, RewardTokenType.DEPOSIT).id,
+  ];
+  market.rewardTokenEmissionsAmount = [
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+  ];
+  market.rewardTokenEmissionsUSD = [
+    BIGDECIMAL_ZERO,
+    BIGDECIMAL_ZERO,
+    BIGDECIMAL_ZERO,
+    BIGDECIMAL_ZERO,
+  ];
+  market.save();
+}
+
 // calculate PLY reward speeds
 function updateRewards(event: ethereum.Event, marketID: Address): void {
   const protocol = getOrCreateProtocol();
@@ -371,133 +411,70 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
     return;
   }
 
-  const rewardTokens: string[] = [];
   const rewardsAmount: BigInt[] = [];
   const rewardsAmountUSD: BigDecimal[] = [];
+  let rewards: RewardTokenEmission;
 
-  // PLY Borrow first since Reward tokens will be alphabetized
-  // Ply Borrow, Ply Supply, AURORA Borrow, AURORA Supply
-  // Reward speed of <= 1 is 0
+  // PLY Borrow
+  rewards = getRewardsPerDay(
+    tryRewardSpeeds.value.plyRewardBorrowSpeed,
+    RewardToken.load(market.rewardTokens![0]),
+    getPrice(PLY_MARKET, protocol._priceOracle)
+  );
+  rewardsAmount.push(rewards.amount);
+  rewardsAmountUSD.push(rewards.amountUSD);
 
-  if (tryRewardSpeeds.value.plyRewardBorrowSpeed.gt(BIGINT_ONE)) {
-    const rewardToken = getOrCreateRewardToken(
-      PLY_TOKEN_ADDRESS,
-      RewardTokenType.BORROW
-    );
-    rewardTokens.push(rewardToken.id);
-    const rewards = getRewardsPerDay(
-      tryRewardSpeeds.value.plyRewardBorrowSpeed,
-      rewardToken
-    );
-    const mantissaFactorBD = exponentToBigDecimal(
-      18 - rewards.token.decimals + 18
-    );
-    const priceUSD = getPrice(PLY_MARKET, protocol._priceOracle)
-      .value.toBigDecimal()
-      .div(mantissaFactorBD);
-    rewardsAmount.push(rewards.rewardsPerDayBI);
-    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
-    log.warning("price: {}, token: {}", [
-      priceUSD.toString(),
-      rewards.token.name,
-    ]);
-  }
+  // AURORA Borrow
+  rewards = getRewardsPerDay(
+    tryRewardSpeeds.value.auroraRewardBorrowSpeed,
+    RewardToken.load(market.rewardTokens![1]),
+    getPrice(AURORA_MARKET, protocol._priceOracle)
+  );
+  rewardsAmount.push(rewards.amount);
+  rewardsAmountUSD.push(rewards.amountUSD);
 
-  if (tryRewardSpeeds.value.plyRewardSupplySpeed.gt(BIGINT_ONE)) {
-    const rewardToken = getOrCreateRewardToken(
-      PLY_TOKEN_ADDRESS,
-      RewardTokenType.DEPOSIT
-    );
-    rewardTokens.push(rewardToken.id);
-    const rewards = getRewardsPerDay(
-      tryRewardSpeeds.value.plyRewardSupplySpeed,
-      rewardToken
-    );
-    const mantissaFactorBD = exponentToBigDecimal(
-      18 - rewards.token.decimals + 18
-    );
-    const priceUSD = getPrice(PLY_MARKET, protocol._priceOracle)
-      .value.toBigDecimal()
-      .div(mantissaFactorBD);
-    rewardsAmount.push(rewards.rewardsPerDayBI);
-    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
-    log.warning("price: {}, token: {}", [
-      priceUSD.toString(),
-      rewards.token.name,
-    ]);
-  }
+  // PLY Supply
+  rewards = getRewardsPerDay(
+    tryRewardSpeeds.value.plyRewardSupplySpeed,
+    RewardToken.load(market.rewardTokens![2]),
+    getPrice(PLY_MARKET, protocol._priceOracle)
+  );
+  rewardsAmount.push(rewards.amount);
+  rewardsAmountUSD.push(rewards.amountUSD);
 
-  if (tryRewardSpeeds.value.auroraRewardBorrowSpeed.gt(BIGINT_ONE)) {
-    const rewardToken = getOrCreateRewardToken(
-      AURORA_TOKEN_ADDRESS,
-      RewardTokenType.BORROW
-    );
-    rewardTokens.push(rewardToken.id);
-    const rewards = getRewardsPerDay(
-      tryRewardSpeeds.value.auroraRewardBorrowSpeed,
-      rewardToken
-    );
-    const mantissaFactorBD = exponentToBigDecimal(
-      18 - rewards.token.decimals + 18
-    );
-    const priceUSD = getPrice(AURORA_MARKET, protocol._priceOracle)
-      .value.toBigDecimal()
-      .div(mantissaFactorBD);
-    rewardsAmount.push(rewards.rewardsPerDayBI);
-    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
-    log.warning("price: {}, token: {}", [
-      priceUSD.toString(),
-      rewards.token.name,
-    ]);
-  }
+  // AURORA Supply
+  rewards = getRewardsPerDay(
+    tryRewardSpeeds.value.auroraRewardSupplySpeed,
+    RewardToken.load(market.rewardTokens![3]),
+    getPrice(AURORA_MARKET, protocol._priceOracle)
+  );
+  rewardsAmount.push(rewards.amount);
+  rewardsAmountUSD.push(rewards.amountUSD);
 
-  if (tryRewardSpeeds.value.auroraRewardSupplySpeed.gt(BIGINT_ONE)) {
-    const rewardToken = getOrCreateRewardToken(
-      AURORA_TOKEN_ADDRESS,
-      RewardTokenType.DEPOSIT
-    );
-    rewardTokens.push(rewardToken.id);
-    const rewards = getRewardsPerDay(
-      tryRewardSpeeds.value.auroraRewardSupplySpeed,
-      rewardToken
-    );
-    const mantissaFactorBD = exponentToBigDecimal(
-      18 - rewards.token.decimals + 18
-    );
-    const priceUSD = getPrice(AURORA_MARKET, protocol._priceOracle)
-      .value.toBigDecimal()
-      .div(mantissaFactorBD);
-    rewardsAmount.push(rewards.rewardsPerDayBI);
-    rewardsAmountUSD.push(rewards.rewardsPerDayBD.times(priceUSD));
-    log.warning("price: {}, token: {}", [
-      priceUSD.toString(),
-      rewards.token.name,
-    ]);
-  }
-  market.rewardTokens = rewardTokens;
   market.rewardTokenEmissionsAmount = rewardsAmount;
   market.rewardTokenEmissionsUSD = rewardsAmountUSD;
   market.save();
 }
 
-class RewardSpeeds {
-  constructor(
-    public readonly rewardsPerDayBI: BigInt,
-    public readonly rewardsPerDayBD: BigDecimal,
-    public readonly token: Token
-  ) {}
-}
-
 function getRewardsPerDay(
   rewardSpeed: BigInt,
-  rewardToken: RewardToken
-): RewardSpeeds {
-  const token = getOrCreateToken(Address.fromString(rewardToken.token));
-  const rewardsBI = rewardSpeed.times(BigInt.fromI64(SECONDS_PER_DAY));
-  const rewardsBD = rewardsBI
-    .toBigDecimal()
-    .div(exponentToBigDecimal(token.decimals));
-  return new RewardSpeeds(rewardsBI, rewardsBD, token);
+  rewardToken: RewardToken | null,
+  price: ethereum.CallResult<BigInt>
+): RewardTokenEmission {
+  // Reward speed of <= 1 is 0
+  if (rewardSpeed.gt(BIGINT_ONE) && rewardToken) {
+    const token = getOrCreateToken(Address.fromString(rewardToken.token));
+    const amount = rewardSpeed.times(BigInt.fromI64(SECONDS_PER_DAY));
+    const mantissaFactorBD = exponentToBigDecimal(18 - token.decimals + 18);
+    const priceUSD = price.value.toBigDecimal().div(mantissaFactorBD);
+    const amountUSD = amount
+      .toBigDecimal()
+      .div(exponentToBigDecimal(token.decimals))
+      .times(priceUSD);
+    return new RewardTokenEmission(amount, amountUSD);
+  }
+
+  return new RewardTokenEmission(BIGINT_ZERO, BIGDECIMAL_ZERO);
 }
 
 function getOrCreateRewardToken(
