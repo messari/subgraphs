@@ -406,15 +406,14 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
 }
 
 let aggThreadMsgObjects = [];
-export async function sendMessageToAggThread(aggThreadId, channelId = process.env.CHANNEL_ID) {
-    if (aggThreadMsgObjects.length === 0 || !aggThreadId) {
+export async function sendMessageToAggThread() {
+    if (aggThreadMsgObjects.length === 0) {
         return;
     }
-
     const aggThreadQueriesToResolve = [];
     const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
-    const currentThreadMessages = await fetchMessages("", aggThreadId);
-    const baseURL = "https://discordapp.com/api/channels/" + aggThreadId + "/messages";
+    const currentThreadMessages = await fetchMessages("", process.env.PROD_CHANNEL);
+    const baseURL = "https://discordapp.com/api/channels/" + process.env.PROD_CHANNEL + "/messages";
     const headers = {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",

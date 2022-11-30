@@ -188,13 +188,13 @@ Note: Stakers receive 20% of all RDNT emissions as an incentive for providing li
   Rewards for locked RDNT = Platform fees + Penalty fees
 
 Note: 20% of all RDNT emissions are allocated to Pool2 (RDNT/WETH) rewards.
-Reference: https://docs.radiant.capital/docs/project-info/vesting-and-locking/pool2
+Reference: [https://docs.radiant.capital/docs/project-info/vesting-and-locking/pool2](https://docs.radiant.capital/docs/project-info/vesting-and-locking/pool2)
 
 ## Protocol owned liquidity
 
 There's no protocol owned liquidity for Radiant, but only a treasury.
 3% of RDNT allocation is for Treasury and Liquidity.
-Reference: https://docs.radiant.capital/docs/project-info/rdnt-token
+Reference: [https://docs.radiant.capital/docs/project-info/rdnt-token](https://docs.radiant.capital/docs/project-info/rdnt-token)
 
 ## Positional Notes
 

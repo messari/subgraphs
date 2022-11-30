@@ -1,4 +1,4 @@
-# Autigami Subgraph
+# Aurigami Subgraph
 
 ## Calculation Methodology v1.0.0
 

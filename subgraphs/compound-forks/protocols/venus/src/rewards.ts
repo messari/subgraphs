@@ -1,5 +1,5 @@
 /////////////////////
-// VERSION 1.0.1 ////
+// VERSION 1.0.3 ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The purpose of this program is to dynamically estimate the blocks generated for the 24 HR period following the most recent update. //
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
@@ -32,19 +32,28 @@ export const WINDOW_SIZE_SECONDS = 86400;
 
 // BUFFER_SIZE determined the size of the array
 // Makes the buffer the maximum amount of blocks that can be stored given the block rate and storage interval
-// Recommended value is (RATE_IN_SECODNDS / TIMESTAMP_STORAGE_INTERVAL) - > Round up to nearest even integer
-export const BUFFER_SIZE = 144;
+// Recommended value is (RATE_IN_SECODNDS / TIMESTAMP_STORAGE_INTERVAL) * 2 - > Round up to nearest even integer
+export const BUFFER_SIZE = 288;
 
 // Add this entity to the schema.
-
 // type _CircularBuffer @entity {
-//     id: ID!
-//     blocks: [Int!]!
-//     windowStartIndex: Int!
-//     nextIndex: Int!
-//     bufferSize: Int!
-//     blocksPerDay: BigDecimal!
-// }
+//   " 'CIRCULAR_BUFFER' "
+//   id: ID!
+
+//   " Array of sorted block numbers sorted continuously "
+//   blocks: [Int!]!
+
+//   " The index in the blocks array which will be used with the newest block to calculate block speed (Usally set to about a day before newest block) "
+//   windowStartIndex: Int!
+
+//   " The next index in the blocks array that will be replaced with the newest block "
+//   nextIndex: Int!
+
+//   " This determines the size of the blocks array. Should be set to contain at least a days worth of blocks according to a 1 day window for measuring speed"
+//   bufferSize: Int!
+
+//   " The current calculated number of blocks per day based on calculated block speed "
+//   blocksPerDay: BigDecimal!
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -78,7 +87,7 @@ export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(
  * @param {BigInt} currentBlockNumber  - Block nunmber of current event
  * @param {BigInt} rewardRate          - Rate of reward emissions per reward interval
  * @param {BigInt} rewardType          - Describes whether rewards are given per block or timestamp
- * @returns {BigDecimal}               - Returns estimated rewards for specified rate, per day.
+ * @returns {BigDecimal}               - Returns estimated blocks for specified rate
  */
 export function getRewardsPerDay(
   currentTimestamp: BigInt,
@@ -150,9 +159,24 @@ export function getRewardsPerDay(
   const startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
 
   // Make sure to still have 2 blocks to calculate rate (This shouldn't happen past the beginning).
-  while (
-    abs(circularBuffer.nextIndex - circularBuffer.windowStartIndex) > INT_FOUR
-  ) {
+  while (true) {
+    if (circularBuffer.nextIndex > circularBuffer.windowStartIndex) {
+      if (
+        circularBuffer.nextIndex - circularBuffer.windowStartIndex <=
+        INT_FOUR
+      ) {
+        break;
+      }
+    } else {
+      if (
+        BUFFER_SIZE -
+          circularBuffer.windowStartIndex +
+          circularBuffer.nextIndex <=
+        INT_FOUR
+      ) {
+        break;
+      }
+    }
     const windowIndexBlockTimestamp = blocks[circularBuffer.windowStartIndex];
 
     // Shift the start of the window if the current timestamp moves out of desired rate window
@@ -201,7 +225,7 @@ export function getRewardsPerDay(
   }
 }
 
-export function getOrCreateCircularBuffer(): _CircularBuffer {
+function getOrCreateCircularBuffer(): _CircularBuffer {
   let circularBuffer = _CircularBuffer.load(CIRCULAR_BUFFER);
 
   if (!circularBuffer) {
@@ -241,19 +265,25 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("5");
   } else if (network == Network.FANTOM) {
     return BigDecimal.fromString("1");
+  } else if (network == Network.FUSE) {
+    return BigDecimal.fromString("1");
   } else if (network == Network.OPTIMISM) {
     return BigDecimal.fromString("12.5");
   } else if (network == Network.MATIC) {
     return BigDecimal.fromString("2");
   } else if (network == Network.XDAI) {
     return BigDecimal.fromString("5");
+  } else if (network == Network.MOONBEAM) {
+    return BigDecimal.fromString("13.39");
+  } else if (network == Network.MOONRIVER) {
+    return BigDecimal.fromString("13.39");
+  } else if (network == Network.AVALANCHE) {
+    return BigDecimal.fromString("13.39");
+  } else if (network == Network.CRONOS) {
+    return BigDecimal.fromString("5.5");
   }
-  // Blocks are mined as needed
   // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")
-  // else if (dataSource.network() == "cronos") return BigDecimal.fromString("13.39")
   // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")
-  // else if (dataSource.network() == SubgraphNetwork.MOONBEAM) return BigDecimal.fromString("13.39")
-  // else if (dataSource.network() == SubgraphNetwork.MOONRIVER) return BigDecimal.fromString("13.39")
   else {
     log.warning("getStartingBlockRate(): Network not found", []);
     return BIGDECIMAL_ZERO;
