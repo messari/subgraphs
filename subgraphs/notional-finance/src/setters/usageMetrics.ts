@@ -113,38 +113,42 @@ export function addAccountToProtocol(
   let activeEvent = ActiveEventAccount.load(activeEventId);
   const dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
   if (transactionType == TransactionType.DEPOSIT) {
-    if (protocol.depositors.indexOf(account.id) < 0) {
-      protocol.depositors = addToArrayAtIndex(
-        protocol.depositors,
+    if (protocol._depositors.indexOf(account.id) < 0) {
+      protocol._depositors = addToArrayAtIndex(
+        protocol._depositors,
         account.id,
         0
       );
-      dailySnapshot.cumulativeUniqueDepositors = protocol.depositors.length;
-      protocol.cumulativeUniqueDepositors = protocol.depositors.length;
+      dailySnapshot.cumulativeUniqueDepositors = protocol._depositors.length;
+      protocol.cumulativeUniqueDepositors = protocol._depositors.length;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveDepositors += 1;
     }
   } else if (transactionType == TransactionType.BORROW) {
-    if (protocol.borrowers.indexOf(account.id) < 0) {
-      protocol.borrowers = addToArrayAtIndex(protocol.borrowers, account.id, 0);
-      dailySnapshot.cumulativeUniqueBorrowers = protocol.borrowers.length;
-      protocol.cumulativeUniqueBorrowers = protocol.borrowers.length;
+    if (protocol._borrowers.indexOf(account.id) < 0) {
+      protocol._borrowers = addToArrayAtIndex(
+        protocol._borrowers,
+        account.id,
+        0
+      );
+      dailySnapshot.cumulativeUniqueBorrowers = protocol._borrowers.length;
+      protocol.cumulativeUniqueBorrowers = protocol._borrowers.length;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveBorrowers += 1;
     }
   } else if (transactionType == TransactionType.LIQUIDATOR) {
-    if (protocol.liquidators.indexOf(account.id) < 0) {
-      protocol.liquidators = addToArrayAtIndex(
-        protocol.liquidators,
+    if (protocol._liquidators.indexOf(account.id) < 0) {
+      protocol._liquidators = addToArrayAtIndex(
+        protocol._liquidators,
         account.id,
         0
       );
-      dailySnapshot.cumulativeUniqueLiquidators = protocol.liquidators.length;
-      protocol.cumulativeUniqueLiquidators = protocol.liquidators.length;
+      dailySnapshot.cumulativeUniqueLiquidators = protocol._liquidators.length;
+      protocol.cumulativeUniqueLiquidators = protocol._liquidators.length;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
@@ -152,14 +156,14 @@ export function addAccountToProtocol(
     }
     account.liquidateCount += 1;
   } else if (transactionType == TransactionType.LIQUIDATEE) {
-    if (protocol.liquidatees.indexOf(account.id) < 0) {
-      protocol.liquidatees = addToArrayAtIndex(
-        protocol.liquidatees,
+    if (protocol._liquidatees.indexOf(account.id) < 0) {
+      protocol._liquidatees = addToArrayAtIndex(
+        protocol._liquidatees,
         account.id,
         0
       );
-      dailySnapshot.cumulativeUniqueLiquidatees = protocol.liquidatees.length;
-      protocol.cumulativeUniqueLiquidatees = protocol.liquidatees.length;
+      dailySnapshot.cumulativeUniqueLiquidatees = protocol._liquidatees.length;
+      protocol.cumulativeUniqueLiquidatees = protocol._liquidatees.length;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);

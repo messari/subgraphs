@@ -74,23 +74,11 @@ export function getOrCreateMarket(
     market.createdBlockNumber = event.block.number;
 
     // positions
-    // market.positions - derived
     market.positionCount = INT_ZERO;
     market.openPositionCount = INT_ZERO;
     market.closedPositionCount = INT_ZERO;
     market.lendingPositionCount = INT_ZERO;
     market.borrowingPositionCount = INT_ZERO;
-
-    // snapshots - derived
-    // market.dailySnapshots
-    // market.hourlySnapshots
-
-    // events - derived
-    // market.deposits
-    // market.withdraws
-    // market.borrows
-    // market.repays
-    // market.liquidates
 
     market.save();
   }

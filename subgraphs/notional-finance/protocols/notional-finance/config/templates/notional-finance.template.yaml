@@ -8,8 +8,7 @@ dataSources:
     source:
       address: "0x1344A36A1B56144C3Bc62E7757377D288fDE0369"
       abi: Notional
-      # startBlock: 13094883
-      startBlock: 13532000
+      startBlock: 13492539
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -69,3 +68,4 @@ dataSources:
         - event: LiquidatefCashEvent(indexed address,indexed address,uint16,uint16,int256,uint256[],int256[])
           handler: handleLiquidatefCash
       file: ./src/mappings/notional.ts
+ 

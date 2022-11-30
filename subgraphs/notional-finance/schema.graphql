@@ -300,19 +300,19 @@ type LendingProtocol implements Protocol @entity {
   " Total number of positions (open and closed) "
   cumulativePositionCount: Int!
 
-  ##### Account / Position Data #####
+  ##### Add Ons #####
 
   " Any account that has made a deposit before "
-  depositors: [Account!]!
+  _depositors: [Account!]!
 
   " Any account that has made a borrow before "
-  borrowers: [Account!]!
+  _borrowers: [Account!]!
 
   " Any account that has made a liquidation before "
-  liquidators: [Account!]!
+  _liquidators: [Account!]!
 
   " Any account that has been liquidated before "
-  liquidatees: [Account!]!
+  _liquidatees: [Account!]!
 
   ##### Snapshots #####
 

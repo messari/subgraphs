@@ -175,6 +175,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
 
       // manually update positions to 0
       m.positionCount = 0;
+      m.closedPositionCount += m.openPositionCount;
       m.openPositionCount = 0;
       m.closedPositionCount = 0;
       m.lendingPositionCount = 0;
