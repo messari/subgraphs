@@ -101,7 +101,7 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity {
+type RewardToken @entity(immutable: true) {
   " Bytes.fromI32(0|1).concat(rewardTokenAddress), where 0 is for deposit and 1 is for borrow "
   id: Bytes!
 
@@ -836,7 +836,7 @@ interface Event {
   timestamp: BigInt!
 }
 
-type LiquidityDeposit implements Event @entity {
+type LiquidityDeposit implements Event @entity(immutable: true) {
   " event.transaction.hash.concatI32(event.logIndex) "
   id: Bytes!
 
@@ -877,7 +877,7 @@ type LiquidityDeposit implements Event @entity {
   timestamp: BigInt!
 }
 
-type LiquidityWithdraw implements Event @entity {
+type LiquidityWithdraw implements Event @entity(immutable: true) {
   " event.transaction.hash.concatI32(event.logIndex) "
   id: Bytes!
 
@@ -925,7 +925,7 @@ enum TransferType {
   RELEASE
 }
 
-type BridgeTransfer implements Event @entity {
+type BridgeTransfer implements Event @entity(immutable: true) {
   " event.transaction.hash.concatI32(event.logIndex) "
   id: Bytes!
 
@@ -994,7 +994,7 @@ type BridgeTransfer implements Event @entity {
 }
 
 # Some bridges support sending
-type BridgeMessage implements Event @entity {
+type BridgeMessage implements Event @entity(immutable: true) {
   " event.transaction.hash.concatI32(event.logIndex) "
   id: Bytes!
 
@@ -1052,7 +1052,7 @@ type Account @entity {
 }
 
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity {
+type ActiveAccount @entity(immutable: true) {
   " Bytes.fromI32(0|1).concat(accountAddress).concatI32(days|hoursSinceUnix), where initial 0|1, 0 indicates daily and 1 indicates hourly "
   id: Bytes!
 }
