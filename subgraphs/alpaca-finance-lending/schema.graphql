@@ -318,6 +318,11 @@ type LendingProtocol implements Protocol @entity {
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  ##### Markets #####
+
+  " All markets that belong to this protocol "
+  markets: [Market!]! @derivedFrom(field: "protocol")
 }
 
 ###############################
