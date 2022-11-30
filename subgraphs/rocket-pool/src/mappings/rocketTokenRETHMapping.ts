@@ -6,7 +6,7 @@ import { generalUtilities } from "../utilities/generalUtilities";
 import { stakerUtilities } from "../utilities/stakerUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { ethereum } from "@graphprotocol/graph-ts";
-import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
+import { updateUsageMetrics } from "../updaters/usageMetrics";
 
 /**
  * Occurs when a staker transfer an rETH amount to another staker.

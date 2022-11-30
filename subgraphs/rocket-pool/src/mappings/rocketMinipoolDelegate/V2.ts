@@ -12,7 +12,7 @@ import {
   ROCKET_NODE_DEPOSIT_CONTRACT_ADDRESS_V1,
   ROCKET_NODE_DEPOSIT_CONTRACT_ADDRESS_V2,
 } from "../../constants/contractConstants";
-import { updateUsageMetrics } from "../../entityUpdates/usageMetrics";
+import { updateUsageMetrics } from "../../updaters/usageMetrics";
 /**
  * Occurs when a node operator makes an ETH deposit on his node to create a minipool.
  */

@@ -4,7 +4,7 @@ import {
   MinipoolEnqueued,
 } from "../../generated/rocketMinipoolQueue/rocketMinipoolQueue";
 import { Minipool, Node } from "../../generated/schema";
-import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
+import { updateUsageMetrics } from "../updaters/usageMetrics";
 
 /**
  * Occurs when a node operator makes an ETH deposit on his node to create a minipool.

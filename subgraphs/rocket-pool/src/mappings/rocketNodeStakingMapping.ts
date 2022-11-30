@@ -20,7 +20,7 @@ import { Node } from "../../generated/schema";
 import { ethereum } from "@graphprotocol/graph-ts";
 import { generalUtilities } from "../utilities/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
-import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
+import { updateUsageMetrics } from "../updaters/usageMetrics";
 
 /**
  * Occurs when a node operator stakes RPL on his node to collaterize his minipools.

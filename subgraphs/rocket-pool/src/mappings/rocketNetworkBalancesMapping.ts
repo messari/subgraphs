@@ -18,14 +18,14 @@ import {
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { getOrCreateProtocol } from "../entities/protocol";
 import { getOrCreatePool } from "../entities/pool";
-import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
+import { updateUsageMetrics } from "../updaters/usageMetrics";
 import {
   updateProtocolSideRevenueMetrics,
   updateSnapshotsTvl,
   updateSupplySideRevenueMetrics,
   updateTotalRevenueMetrics,
   updateProtocolAndPoolTvl,
-} from "../entityUpdates/financialMetrics";
+} from "../updaters/financialMetrics";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import {
   BIGDECIMAL_HALF,

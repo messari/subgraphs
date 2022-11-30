@@ -6,7 +6,7 @@ import {
 } from "../../generated/rocketDAONodeTrustedActions/rocketDAONodeTrustedActions";
 import { Node } from "../../generated/schema";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
+import { updateUsageMetrics } from "../updaters/usageMetrics";
 
 /**
  * Occurs when a node operator has put up an RPL bond, a consensus is reached and he gets voted in as an ODAO member.

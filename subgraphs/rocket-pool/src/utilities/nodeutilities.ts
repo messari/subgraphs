@@ -8,7 +8,7 @@ import { generalUtilities } from "./generalUtilities";
 import { NetworkNodeBalanceMinipoolMetadata } from "../models/networkNodeBalanceMinipoolMetadata";
 import { ONE_ETHER_IN_WEI } from "../constants/generalConstants";
 import { NetworkNodeBalanceRPLMetadata } from "../models/networkNodeBalanceRPLMetadata";
-import { updateProtocolAndPoolRewardsTvl } from "../entityUpdates/financialMetrics";
+import { updateProtocolAndPoolRewardsTvl } from "../updaters/financialMetrics";
 
 class NodeUtilities {
   /**

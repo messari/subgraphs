@@ -23,7 +23,7 @@ import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { nodeUtilities } from "../utilities/nodeUtilities";
 import { EffectiveMinipoolRPLBounds } from "../models/effectiveMinipoolRPLBounds";
 import { ONE_ETHER_IN_WEI } from "../constants/generalConstants";
-import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
+import { updateUsageMetrics } from "../updaters/usageMetrics";
 
 /**
  * When enough ODAO members submitted their votes and a consensus threshold is reached, a new RPL price is comitted to the smart contracts.

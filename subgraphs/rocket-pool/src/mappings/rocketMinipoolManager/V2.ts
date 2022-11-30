@@ -16,7 +16,7 @@ import {
   rocketMinipoolDelegateV1,
   rocketMinipoolDelegateV2,
 } from "../../../generated/templates";
-import { updateUsageMetrics } from "../../entityUpdates/usageMetrics";
+import { updateUsageMetrics } from "../../updaters/usageMetrics";
 
 /**
  * Occurs when a node operator makes an ETH deposit on his node to create a minipool.

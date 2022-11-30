@@ -24,11 +24,11 @@ import {
   RPLREWARDCLAIMERTYPE_ODAO,
   RPLREWARDCLAIMERTYPE_NODE,
 } from "../constants/enumConstants";
-import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
+import { updateUsageMetrics } from "../updaters/usageMetrics";
 import {
   updateSnapshotsTvl,
   updateTotalRewardsMetrics,
-} from "../entityUpdates/financialMetrics";
+} from "../updaters/financialMetrics";
 
 /**
  * Occurs when an eligible stakeholder on the protocol claims an RPL reward.

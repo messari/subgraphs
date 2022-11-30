@@ -7,7 +7,7 @@ import {
   NodeRegistered,
   NodeTimezoneLocationSet,
 } from "../../generated/rocketNodeManager/rocketNodeManager";
-import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
+import { updateUsageMetrics } from "../updaters/usageMetrics";
 /**
  * Occurs when a node operator registers his address with the RocketPool protocol.
  */
