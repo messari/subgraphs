@@ -1,15 +1,39 @@
 import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
-import { Account, FinancialsDailySnapshot, RewardToken, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot, Vault, VaultDailySnapshot, VaultHourlySnapshot, YieldAggregator } from "../../generated/schema";
+import {
+  Account,
+  FinancialsDailySnapshot,
+  RewardToken,
+  UsageMetricsDailySnapshot,
+  UsageMetricsHourlySnapshot,
+  Vault,
+  VaultDailySnapshot,
+  VaultHourlySnapshot,
+  YieldAggregator,
+} from "../../generated/schema";
 import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
 import * as utils from "./utils";
-import { DEFUALT_AMOUNT, DEFUALT_DECIMALS, ZERO_BIGINT, ZERO_ADDRESS, ZERO_BIGDECIMAL, YAK_STRATEGY_MANAGER_ADDRESS, ZERO_INT, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../helpers/constants";
+import {
+  DEFUALT_AMOUNT,
+  DEFUALT_DECIMALS,
+  ZERO_BIGINT,
+  ZERO_ADDRESS,
+  ZERO_BIGDECIMAL,
+  YAK_STRATEGY_MANAGER_ADDRESS,
+  ZERO_INT,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+  ZERO_BIGDECIMAL_ARRAY,
+} from "../helpers/constants";
 import { Token } from "../../generated/schema";
 import { YakERC20 } from "../../generated/YakStrategyV2/YakERC20";
 import { VaultFee } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
 import { calculatePriceInUSD } from "./calculators";
 
-export function getOrCreateVault(contractAddress: Address, block: ethereum.Block): Vault {
+export function getOrCreateVault(
+  contractAddress: Address,
+  block: ethereum.Block
+): Vault {
   let vault = Vault.load(contractAddress.toHexString());
 
   if (vault == null) {
@@ -34,7 +58,8 @@ export function getOrCreateVault(contractAddress: Address, block: ethereum.Block
     if (stategyContract.try_MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST().reverted) {
       vault.depositLimit = ZERO_BIGINT;
     } else {
-      vault.depositLimit = stategyContract.MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST();
+      vault.depositLimit =
+        stategyContract.MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST();
     }
 
     if (stategyContract.try_depositToken().reverted) {
@@ -82,9 +107,9 @@ export function getOrCreateVault(contractAddress: Address, block: ethereum.Block
     rewardTokenEmissionsUSDArr.push(ZERO_BIGDECIMAL);
     vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSDArr;
 
-    const adminFee = defineFee(contractAddress, "-adminFee")
-    const developerFee = defineFee(contractAddress, "-developerFee")
-    const reinvestorFee = defineFee(contractAddress, "-reinvestorFee")
+    const adminFee = defineFee(contractAddress, "-adminFee");
+    const developerFee = defineFee(contractAddress, "-developerFee");
+    const reinvestorFee = defineFee(contractAddress, "-reinvestorFee");
 
     vault.fees = [adminFee.id, developerFee.id, reinvestorFee.id];
 
@@ -96,7 +121,10 @@ export function getOrCreateVault(contractAddress: Address, block: ethereum.Block
   return vault;
 }
 
-function defineRewardToken(rewardTokenAddress: Address, blockNumber: BigInt): RewardToken {
+function defineRewardToken(
+  rewardTokenAddress: Address,
+  blockNumber: BigInt
+): RewardToken {
   let rewardToken = RewardToken.load(rewardTokenAddress.toHexString());
   if (rewardToken == null) {
     rewardToken = new RewardToken(rewardTokenAddress.toHexString());
@@ -105,7 +133,7 @@ function defineRewardToken(rewardTokenAddress: Address, blockNumber: BigInt): Re
   rewardToken.type = "DEPOSIT";
   rewardToken.save();
 
-  return rewardToken
+  return rewardToken;
 }
 
 export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
@@ -144,7 +172,9 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
 }
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
-  let protocol = YieldAggregator.load(YAK_STRATEGY_MANAGER_ADDRESS.toHexString());
+  let protocol = YieldAggregator.load(
+    YAK_STRATEGY_MANAGER_ADDRESS.toHexString()
+  );
 
   if (protocol == null) {
     protocol = new YieldAggregator(YAK_STRATEGY_MANAGER_ADDRESS.toHexString());
@@ -159,6 +189,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.cumulativeSupplySideRevenueUSD = ZERO_BIGDECIMAL;
     protocol.cumulativeProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
     protocol.cumulativeTotalRevenueUSD = ZERO_BIGDECIMAL;
+    // protocol.dailyProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
     protocol.cumulativeUniqueUsers = ZERO_INT;
     protocol.totalPoolCount = ZERO_INT;
     protocol._vaultIds = [];
@@ -169,7 +200,9 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
   return protocol;
 }
 
-export function getOrCreateUsageMetricsDailySnapshot(block: ethereum.Block): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricsDailySnapshot(
+  block: ethereum.Block
+): UsageMetricsDailySnapshot {
   let id: string = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
 
@@ -196,8 +229,12 @@ export function getOrCreateUsageMetricsDailySnapshot(block: ethereum.Block): Usa
   return usageMetrics;
 }
 
-export function getOrCreateUsageMetricsHourlySnapshot(block: ethereum.Block): UsageMetricsHourlySnapshot {
-  let metricsID: string = (block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
+export function getOrCreateUsageMetricsHourlySnapshot(
+  block: ethereum.Block
+): UsageMetricsHourlySnapshot {
+  let metricsID: string = (
+    block.timestamp.toI64() / SECONDS_PER_HOUR
+  ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
 
   if (!usageMetrics) {
@@ -220,7 +257,9 @@ export function getOrCreateUsageMetricsHourlySnapshot(block: ethereum.Block): Us
   return usageMetrics;
 }
 
-export function getOrCreateFinancialDailySnapshots(block: ethereum.Block): FinancialsDailySnapshot {
+export function getOrCreateFinancialDailySnapshots(
+  block: ethereum.Block
+): FinancialsDailySnapshot {
   let id = block.timestamp.toI64() / SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
@@ -264,7 +303,10 @@ export function getOrCreateAccount(id: string): Account {
   return account;
 }
 
-export function getOrCreateVaultsDailySnapshots(vaultId: string, block: ethereum.Block): VaultDailySnapshot {
+export function getOrCreateVaultsDailySnapshots(
+  vaultId: string,
+  block: ethereum.Block
+): VaultDailySnapshot {
   let id: string = vaultId
     .concat("-")
     .concat((block.timestamp.toI64() / SECONDS_PER_DAY).toString());
@@ -292,6 +334,8 @@ export function getOrCreateVaultsDailySnapshots(vaultId: string, block: ethereum
     vaultSnapshots.dailyTotalRevenueUSD = ZERO_BIGDECIMAL;
     vaultSnapshots.cumulativeTotalRevenueUSD = ZERO_BIGDECIMAL;
 
+    vaultSnapshots.rewardAPR = ZERO_BIGDECIMAL_ARRAY;
+
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
 
@@ -301,7 +345,10 @@ export function getOrCreateVaultsDailySnapshots(vaultId: string, block: ethereum
   return vaultSnapshots;
 }
 
-export function getOrCreateVaultsHourlySnapshots(vaultId: string, block: ethereum.Block): VaultHourlySnapshot {
+export function getOrCreateVaultsHourlySnapshots(
+  vaultId: string,
+  block: ethereum.Block
+): VaultHourlySnapshot {
   let id: string = vaultId
     .concat("-")
     .concat((block.timestamp.toI64() / SECONDS_PER_HOUR).toString());
@@ -329,6 +376,8 @@ export function getOrCreateVaultsHourlySnapshots(vaultId: string, block: ethereu
     vaultSnapshots.hourlyTotalRevenueUSD = ZERO_BIGDECIMAL;
     vaultSnapshots.cumulativeTotalRevenueUSD = ZERO_BIGDECIMAL;
 
+    vaultSnapshots.rewardAPR = ZERO_BIGDECIMAL_ARRAY;
+
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
 
@@ -347,19 +396,28 @@ export function defineFee(contractAddress: Address, feeType: string): VaultFee {
     if (yakStrategyV2Contract.try_ADMIN_FEE_BIPS().reverted) {
       fee.feePercentage = ZERO_BIGDECIMAL;
     } else {
-      fee.feePercentage = convertBigIntToBigDecimal(yakStrategyV2Contract.ADMIN_FEE_BIPS(), 4);
+      fee.feePercentage = convertBigIntToBigDecimal(
+        yakStrategyV2Contract.ADMIN_FEE_BIPS(),
+        4
+      );
     }
   } else if (feeType == "-developerFee") {
     if (yakStrategyV2Contract.try_DEV_FEE_BIPS().reverted) {
       fee.feePercentage = ZERO_BIGDECIMAL;
     } else {
-      fee.feePercentage = convertBigIntToBigDecimal(yakStrategyV2Contract.DEV_FEE_BIPS(), 4);
+      fee.feePercentage = convertBigIntToBigDecimal(
+        yakStrategyV2Contract.DEV_FEE_BIPS(),
+        4
+      );
     }
   } else if (feeType == "-reinvestorFee") {
     if (yakStrategyV2Contract.try_REINVEST_REWARD_BIPS().reverted) {
       fee.feePercentage = ZERO_BIGDECIMAL;
     } else {
-      fee.feePercentage = convertBigIntToBigDecimal(yakStrategyV2Contract.REINVEST_REWARD_BIPS(), 4);
+      fee.feePercentage = convertBigIntToBigDecimal(
+        yakStrategyV2Contract.REINVEST_REWARD_BIPS(),
+        4
+      );
     }
   }
 
