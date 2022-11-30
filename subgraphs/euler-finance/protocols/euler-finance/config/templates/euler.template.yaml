@@ -82,6 +82,16 @@ dataSources:
       abis:
         - name: EulStakes
           file: ./abis/EulStakes.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: Euler
+          file: ./abis/Euler.json
+        - name: Exec
+          file: ./abis/Exec.json
       eventHandlers:
         - event: Stake(indexed address,indexed address,address,uint256)
           handler: handleStake

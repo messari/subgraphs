@@ -50,7 +50,7 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Liquidations`
 
-`Repayments`
+`Repays`
 
 ### Reward Token Emissions Amount
 

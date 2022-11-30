@@ -367,6 +367,7 @@ export function handleStake(event: Stake): void {
         const stakedAmount = mrkt._stakedAmount;
         if (stakedAmount.gt(BIGINT_ZERO)) {
           updateWeightedStakeAmount(mrkt, epochStartBlock);
+          mrkt._stakeLastUpdateBlock = epochStartBlock;
         }
         marketStakeAmounts.push(mrkt._weightedStakedAmount ? mrkt._weightedStakedAmount! : BIGINT_ZERO);
         if (mrkt.totalBorrowBalanceUSD.gt(BIGDECIMAL_ZERO)) {
@@ -375,11 +376,13 @@ export function handleStake(event: Stake): void {
         sumWeightedBorrowUSD = sumWeightedBorrowUSD.plus(
           mrkt._weightedTotalBorrowUSD ? mrkt._weightedTotalBorrowUSD! : BIGDECIMAL_ZERO,
         );
+        mrkt.save();
+
         log.info("[handleStake]epoch {}: market {} _receivingRewards={} _weightedTotalBorrowUSD={}", [
           prevEpoch.epoch.toString(),
           mrkt.id,
           mrkt._receivingRewards.toString(),
-          mrkt._weightedStakedAmount!.toString(),
+          mrkt._weightedStakedAmount ? mrkt._weightedStakedAmount!.toString() : "null",
         ]);
       }
 
@@ -393,7 +396,7 @@ export function handleStake(event: Stake): void {
 
       const EULToken = getOrCreateToken(Address.fromString(EUL_ADDRESS));
       const rewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
-      const dailyScaler = BigDecimal.fromString((BLOCKS_PER_DAY / BLOCKS_PER_EPOCH).toString());
+      const dailyScaler = BigDecimal.fromString((BLOCKS_PER_DAY / (BLOCKS_PER_EPOCH as f64)).toString());
       for (let i = 0; i < protocol._marketIDs!.length; i++) {
         const mktID = protocol._marketIDs![i];
         const mrkt = getOrCreateMarket(mktID);
@@ -412,12 +415,18 @@ export function handleStake(event: Stake): void {
             .times(EULToken.lastPriceUSD!);
           mrkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
           mrkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
-          log.info("[handleStake]epoch {}: market {} EUL distribution amount={} amountUSD={}", [
-            prevEpoch.epoch.toString(),
-            mrkt.id,
-            rewardTokenEmissionsAmount.toString(),
-            rewardTokenEmissionsUSD.toString(),
-          ]);
+          log.info(
+            "[handleStake]epoch {}: totalRewardAmount={},sumWeightedBorrowUSD={},market {} _weightedTotalBorrowUSD={} distribution amount={} amountUSD={}",
+            [
+              prevEpoch.epoch.toString(),
+              totalRewardAmount.toString(),
+              sumWeightedBorrowUSD.toString(),
+              mrkt.id,
+              mrkt._weightedTotalBorrowUSD!.toString(),
+              rewardTokenEmissionsAmount.toString(),
+              rewardTokenEmissionsUSD.toString(),
+            ],
+          );
         }
 
         // set mkrts receiving rewards in the new epoch
