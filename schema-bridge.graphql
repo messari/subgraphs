@@ -306,6 +306,9 @@ type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time (Bytes.fromI32(num)) "
   id: Bytes!
 
+  " Same as the ID, but readable. Number of days since Unix "
+  day: Int!
+
   " Protocol this snapshot is associated with "
   protocol: Protocol!
 
@@ -368,6 +371,9 @@ type UsageMetricsHourlySnapshot @entity {
   " { Bytes.fromI32(num) } # of hours since Unix epoch time "
   id: Bytes!
 
+  " Same as the ID, but readable. Number of hours since Unix "
+  hour: Int!
+
   " Protocol this snapshot is associated with "
   protocol: Protocol!
 
@@ -402,6 +408,9 @@ type UsageMetricsHourlySnapshot @entity {
 type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time (Bytes.fromI32(num)) "
   id: Bytes!
+
+  " Same as the ID, but readable. Number of days since Unix "
+  day: Int!
 
   " Protocol this snapshot is associated with "
   protocol: Protocol!
@@ -606,6 +615,9 @@ type PoolDailySnapshot @entity {
   " poolAddress.concatI32(daysSinceUnix) "
   id: Bytes!
 
+  " Number of days since Unix "
+  day: Int!
+
   " The protocol this snapshot belongs to "
   protocol: Protocol!
 
@@ -684,6 +696,9 @@ type PoolDailySnapshot @entity {
 type PoolHourlySnapshot @entity {
   " poolAddress.concatI32(hoursSinceUnix) "
   id: Bytes!
+
+  " Same as the ID, but readable. Number of hours since Unix "
+  hour: Int!
 
   " The protocol this snapshot belongs to "
   protocol: Protocol!
