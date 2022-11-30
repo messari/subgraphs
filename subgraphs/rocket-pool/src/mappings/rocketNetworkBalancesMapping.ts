@@ -7,8 +7,8 @@ import {
   RocketPoolProtocol,
   NetworkNodeBalanceCheckpoint,
 } from "../../generated/schema";
-import { generalUtilities } from "../accessories/generalUtilities";
-import { stakerUtilities } from "../accessories/stakerUtilities";
+import { generalUtilities } from "../checkpoints/generalUtilities";
+import { stakerUtilities } from "../checkpoints/stakerUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import {
   ZERO_ADDRESS_STRING,

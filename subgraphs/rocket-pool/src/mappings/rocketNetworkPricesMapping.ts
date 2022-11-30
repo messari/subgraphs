@@ -9,7 +9,7 @@ import {
   NetworkNodeBalanceCheckpoint,
   RocketPoolProtocol,
 } from "../../generated/schema";
-import { generalUtilities } from "../accessories/generalUtilities";
+import { generalUtilities } from "../checkpoints/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { NetworkNodeBalanceMetadata } from "../models/networkNodeBalanceMetadata";
 import {
@@ -20,7 +20,7 @@ import {
   ROCKET_NODE_STAKING_CONTRACT_ADDRESS,
 } from "../constants/contractConstants";
 import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { nodeUtilities } from "../accessories/nodeUtilities";
+import { nodeUtilities } from "../checkpoints/nodeUtilities";
 import { EffectiveMinipoolRPLBounds } from "../models/effectiveMinipoolRPLBounds";
 import { ONE_ETHER_IN_WEI } from "../constants/generalConstants";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
