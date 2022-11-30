@@ -1,5 +1,5 @@
 import { BigInt, Address } from "@graphprotocol/graph-ts";
-import { generalUtilities } from "../utilities/generalUtilities";
+import { generalUtilities } from "../accessories/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { Node, NetworkNodeTimezone } from "../../generated/schema";
 import {

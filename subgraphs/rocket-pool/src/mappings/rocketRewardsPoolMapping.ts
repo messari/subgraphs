@@ -5,7 +5,7 @@ import {
 } from "../../generated/rocketRewardsPool/rocketRewardsPool";
 import { rocketNetworkPrices } from "../../generated/rocketRewardsPool/rocketNetworkprices";
 import { RPLRewardInterval, Node } from "../../generated/schema";
-import { generalUtilities } from "../utilities/generalUtilities";
+import { generalUtilities } from "../accessories/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import {
   ONE_ETHER_IN_WEI,

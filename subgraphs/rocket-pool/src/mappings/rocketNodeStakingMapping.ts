@@ -18,7 +18,7 @@ import {
 } from "../constants/enumConstants";
 import { Node } from "../../generated/schema";
 import { ethereum } from "@graphprotocol/graph-ts";
-import { generalUtilities } from "../utilities/generalUtilities";
+import { generalUtilities } from "../accessories/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
 
