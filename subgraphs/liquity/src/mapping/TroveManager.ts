@@ -236,28 +236,24 @@ export function handleLiquidation(event: Liquidation): void {
     return;
   }
 
-  let lusdBurned: BigInt | null = null;
-  let ethSent: BigInt | null = null;
+  let lusdBurned = BIGINT_ZERO;
+  let ethSent = BIGINT_ZERO;
   for (let i = 0; i < event.receipt!.logs.length; i++) {
     const log = event.receipt!.logs[i];
     const burned = stabilityPoolLUSDBurn(log);
     if (burned) {
-      lusdBurned = burned;
+      lusdBurned = lusdBurned.plus(burned);
       continue;
     }
 
     const ether = etherSentToStabilityPool(log);
     if (ether) {
-      ethSent = ether;
+      ethSent = ethSent.plus(ether);
       continue;
-    }
-
-    if (ethSent && lusdBurned) {
-      break;
     }
   }
 
-  if (!lusdBurned || !ethSent) {
+  if (lusdBurned.equals(BIGINT_ZERO) || ethSent.equals(BIGINT_ZERO)) {
     log.error("no LUSD was burned on this liquidation", []);
     return;
   }

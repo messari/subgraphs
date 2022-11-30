@@ -11,7 +11,6 @@ import {
 } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getUsdPrice } from "../prices";
-import { BIGDECIMAL_ZERO } from "../prices/common/constants";
 
 export function getETHToken(): Token {
   const token = new Token(ETH_ADDRESS);
@@ -65,8 +64,12 @@ export function getCurrentETHPrice(): BigDecimal {
 
 export function getCurrentLUSDPrice(): BigDecimal {
   let price = getUsdPrice(Address.fromString(LUSD_ADDRESS), BIGDECIMAL_ONE);
-  if (price.equals(BIGDECIMAL_ZERO)) {
-    price = BIGDECIMAL_ONE; // default to 1USD if price lib doesn't get a price
+  const half = BigDecimal.fromString("0.5");
+  if (price.lt(half)) {
+    // default to 1USD if price lib doesn't get a price or it is too low
+    // In the early times of LUSD (around may 2021) the price lib returns 0.04.
+    // The lowest it's been is ~0.95, so this should be safe for now.
+    price = BIGDECIMAL_ONE;
   }
 
   const token = Token.load(LUSD_ADDRESS)!;
