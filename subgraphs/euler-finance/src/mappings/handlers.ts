@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -377,13 +377,6 @@ export function handleStake(event: Stake): void {
           mrkt._weightedTotalBorrowUSD ? mrkt._weightedTotalBorrowUSD! : BIGDECIMAL_ZERO,
         );
         mrkt.save();
-
-        log.info("[handleStake]epoch {}: market {} _receivingRewards={} _weightedTotalBorrowUSD={}", [
-          prevEpoch.epoch.toString(),
-          mrkt.id,
-          mrkt._receivingRewards.toString(),
-          mrkt._weightedStakedAmount ? mrkt._weightedStakedAmount!.toString() : "null",
-        ]);
       }
 
       const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
@@ -415,18 +408,6 @@ export function handleStake(event: Stake): void {
             .times(EULToken.lastPriceUSD!);
           mrkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
           mrkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
-          log.info(
-            "[handleStake]epoch {}: totalRewardAmount={},sumWeightedBorrowUSD={},market {} _weightedTotalBorrowUSD={} distribution amount={} amountUSD={}",
-            [
-              prevEpoch.epoch.toString(),
-              totalRewardAmount.toString(),
-              sumWeightedBorrowUSD.toString(),
-              mrkt.id,
-              mrkt._weightedTotalBorrowUSD!.toString(),
-              rewardTokenEmissionsAmount.toString(),
-              rewardTokenEmissionsUSD.toString(),
-            ],
-          );
         }
 
         // set mkrts receiving rewards in the new epoch
