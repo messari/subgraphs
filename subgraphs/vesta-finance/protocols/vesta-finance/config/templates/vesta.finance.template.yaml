@@ -156,6 +156,8 @@ dataSources:
           file: ./abis/BalancerWeightedPool.json
         - name: Vault
           file: ./abis/BalancerVault.json
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
