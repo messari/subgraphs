@@ -24,6 +24,7 @@ import {
   Repay,
   RevenueDetails,
   RewardToken,
+  Token,
   Transfer,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
@@ -34,6 +35,7 @@ import {
   AccountActivity,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  exponentToBigDecimal,
   INT_ONE,
   INT_ZERO,
   LendingType,
@@ -44,7 +46,7 @@ import {
   TransactionType,
 } from "./constants";
 import { ProtocolData } from "./protocol";
-import { getOrCreateToken } from "./token";
+import { TokenClass } from "./token";
 
 /**
  * This file contains schema classes.
@@ -58,12 +60,14 @@ import { getOrCreateToken } from "./token";
  */
 
 export class MarketClass {
-  private event!: ethereum.Event;
+  public event!: ethereum.Event;
 
   // entities
   private protocol!: LendingProtocol;
   private market!: Market;
+  private inputToken!: TokenClass;
   private account!: Account;
+  private oracle!: Oracle;
 
   // snapshots
   private marketHourlySnapshot!: MarketHourlySnapshot;
@@ -93,7 +97,8 @@ export class MarketClass {
       _market.liquidationThreshold = BIGDECIMAL_ZERO; // default
       _market.liquidationPenalty = BIGDECIMAL_ZERO; // default
       _market.canIsolate = false; // default
-      _market.inputToken = getOrCreateToken(inputToken).id;
+      this.inputToken = new TokenClass(inputToken, event);
+      _market.inputToken = this.inputToken.getToken().id;
       _market.inputTokenBalance = BIGINT_ZERO;
       _market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
       _market.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -201,6 +206,14 @@ export class MarketClass {
     protocol.save();
 
     return protocol;
+  }
+
+  getMarket(): Market {
+    return this.market;
+  }
+
+  getInputToken(): Token {
+    return this.inputToken.getToken();
   }
 
   getOrCreateMarketHourlySnapshot(): void {
@@ -471,11 +484,10 @@ export class MarketClass {
 
   getOrCreateOracle(
     oracleAddress: Address,
-    tokenAddress: Address,
     isUSD: boolean,
     source?: string
   ): Oracle {
-    const oracleID = this.market.id.concat(tokenAddress);
+    const oracleID = this.market.id.concat(this.market.inputToken);
     let oracle = Oracle.load(oracleID);
     if (!oracle) {
       oracle = new Oracle(oracleID);
@@ -490,11 +502,20 @@ export class MarketClass {
       oracle.oracleSource = source;
     }
     oracle.save();
+    this.oracle = oracle;
 
     return oracle;
   }
 
-  getOrCreateInterestRate(rateSide: string, rateType: string): InterestRate {
+  getOracleAddress(): Address {
+    return this.oracle.oracleAddress;
+  }
+
+  getOrUpdateRate(
+    rateSide: string,
+    rateType: string,
+    interestRate: BigDecimal
+  ): InterestRate {
     const interestRateID = rateSide
       .concat("-")
       .concat(rateType)
@@ -503,11 +524,20 @@ export class MarketClass {
     let rate = InterestRate.load(interestRateID);
     if (!rate) {
       rate = new InterestRate(interestRateID);
-      rate.rate = BIGDECIMAL_ZERO;
       rate.side = rateSide;
       rate.type = rateType;
-      rate.save();
     }
+    rate.rate = interestRate;
+    rate.save();
+
+    if (!this.market.rates) {
+      this.market.rates = [];
+    }
+
+    if (this.market.rates.indexOf(interestRateID) == -1) {
+      this.market.rates.push(interestRateID);
+    }
+    this.market.save();
 
     return rate;
   }
@@ -646,8 +676,8 @@ export class MarketClass {
     deposit.amountUSD = amountUSD;
     deposit.save();
 
-    this.updateMarketData(TransactionType.DEPOSIT, amount, amountUSD);
-    this.updateAccountData(TransactionType.DEPOSIT, account);
+    this.updateTransactionData(TransactionType.DEPOSIT, amount, amountUSD);
+    this.updateSnapshotUsage(TransactionType.DEPOSIT, account);
 
     return deposit;
   }
@@ -677,8 +707,8 @@ export class MarketClass {
     withdraw.amountUSD = amountUSD;
     withdraw.save();
 
-    this.updateMarketData(TransactionType.WITHDRAW, amount, amountUSD);
-    this.updateAccountData(TransactionType.WITHDRAW, account);
+    this.updateTransactionData(TransactionType.WITHDRAW, amount, amountUSD);
+    this.updateSnapshotUsage(TransactionType.WITHDRAW, account);
 
     return withdraw;
   }
@@ -708,8 +738,8 @@ export class MarketClass {
     borrow.amountUSD = amountUSD;
     borrow.save();
 
-    this.updateMarketData(TransactionType.BORROW, amount, amountUSD);
-    this.updateAccountData(TransactionType.BORROW, account);
+    this.updateTransactionData(TransactionType.BORROW, amount, amountUSD);
+    this.updateSnapshotUsage(TransactionType.BORROW, account);
 
     return borrow;
   }
@@ -739,8 +769,8 @@ export class MarketClass {
     repay.amountUSD = amountUSD;
     repay.save();
 
-    this.updateMarketData(TransactionType.REPAY, amount, amountUSD);
-    this.updateAccountData(TransactionType.REPAY, account);
+    this.updateTransactionData(TransactionType.REPAY, amount, amountUSD);
+    this.updateSnapshotUsage(TransactionType.REPAY, account);
 
     return repay;
   }
@@ -774,9 +804,9 @@ export class MarketClass {
     liquidate.profitUSD = profitUSD;
     liquidate.save();
 
-    this.updateMarketData(TransactionType.LIQUIDATE, amount, amountUSD);
-    this.updateAccountData(TransactionType.LIQUIDATEE, liquidatee);
-    this.updateAccountData(TransactionType.LIQUIDATOR, liquidator);
+    this.updateTransactionData(TransactionType.LIQUIDATE, amount, amountUSD);
+    this.updateSnapshotUsage(TransactionType.LIQUIDATEE, liquidatee);
+    this.updateSnapshotUsage(TransactionType.LIQUIDATOR, liquidator);
 
     return liquidate;
   }
@@ -808,8 +838,8 @@ export class MarketClass {
     transfer.amountUSD = amountUSD;
     transfer.save();
 
-    this.updateMarketData(TransactionType.TRANSFER, amount, amountUSD);
-    this.updateAccountData(TransactionType.TRANSFER, sender);
+    this.updateTransactionData(TransactionType.TRANSFER, amount, amountUSD);
+    this.updateSnapshotUsage(TransactionType.TRANSFER, sender);
 
     return transfer;
   }
@@ -838,8 +868,8 @@ export class MarketClass {
     flashloan.amountUSD = amountUSD;
     flashloan.save();
 
-    this.updateMarketData(TransactionType.FLASHLOAN, amount, amountUSD);
-    this.updateAccountData(TransactionType.FLASHLOAN, account);
+    this.updateTransactionData(TransactionType.FLASHLOAN, amount, amountUSD);
+    this.updateSnapshotUsage(TransactionType.FLASHLOAN, account);
 
     return flashloan;
   }
@@ -848,7 +878,7 @@ export class MarketClass {
   //// Updaters ////
   //////////////////
 
-  updateAccountData(transactionType: string, account: Address): void {
+  private updateSnapshotUsage(transactionType: string, account: Address): void {
     // create Account for total active accounts
     let _account = Account.load(account);
     this.account = this.getOrCreateAccount(account);
@@ -992,7 +1022,7 @@ export class MarketClass {
     this.marketDailySnapshot.save();
   }
 
-  updateMarketData(
+  private updateTransactionData(
     transactionType: string,
     amount: BigInt,
     amountUSD: BigDecimal
@@ -1097,7 +1127,7 @@ export class MarketClass {
         this.financialSnapshot.dailyFlashloanUSD.plus(amountUSD);
       this.usageDailySnapshot.dailyFlashloanCount += INT_ONE;
     } else {
-      log.error("[updateMarketData] Invalid transaction type: {}", [
+      log.error("[updateTransactionData] Invalid transaction type: {}", [
         transactionType,
       ]);
       return;
@@ -1114,6 +1144,77 @@ export class MarketClass {
     this.financialSnapshot.save();
     this.usageDailySnapshot.save();
     this.usageHourlySnapshot.save();
+  }
+
+  // used to update
+  updateMarketAndProtocolData(
+    inputTokenPriceUSD: BigDecimal,
+    newInputTokenBalance: BigInt,
+    newVariableBorrowBalance: BigInt | null = null,
+    newStableBorrowBalance: BigInt | null = null,
+    newReserveBalance: BigInt | null = null,
+    exchangeRate: BigDecimal | null = null
+  ): void {
+    const mantissaFactorBD = exponentToBigDecimal(
+      this.inputToken.getToken().decimals
+    );
+    this.inputToken.updatePrice(inputTokenPriceUSD);
+    this.market.inputTokenPriceUSD = inputTokenPriceUSD;
+    this.market.inputTokenBalance = newInputTokenBalance;
+    if (newVariableBorrowBalance) {
+      this.market.variableBorrowedTokenBalance = newVariableBorrowBalance;
+    }
+    if (newStableBorrowBalance) {
+      this.market.stableBorrowedTokenBalance = newStableBorrowBalance;
+    }
+    if (newReserveBalance) {
+      this.market.reserves = newReserveBalance
+        .toBigDecimal()
+        .div(mantissaFactorBD)
+        .times(inputTokenPriceUSD);
+    }
+    if (exchangeRate) {
+      this.market.exchangeRate = exchangeRate;
+    }
+    const vBorrowAmount = this.market.variableBorrowedTokenBalance
+      ? this.market.variableBorrowedTokenBalance
+          .toBigDecimal()
+          .div(mantissaFactorBD)
+      : BIGDECIMAL_ZERO;
+    const sBorrowAmount = this.market.stableBorrowedTokenBalance
+      ? this.market.stableBorrowedTokenBalance
+          .toBigDecimal()
+          .div(mantissaFactorBD)
+      : BIGDECIMAL_ZERO;
+    const totalBorrowed = vBorrowAmount.plus(sBorrowAmount);
+    this.market.totalValueLockedUSD = newInputTokenBalance
+      .toBigDecimal()
+      .div(mantissaFactorBD)
+      .times(inputTokenPriceUSD);
+    this.market.totalBorrowBalanceUSD = totalBorrowed.times(inputTokenPriceUSD);
+    this.market.save();
+
+    let totalValueLockedUSD = BIGDECIMAL_ZERO;
+    let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    const marketList = this.protocol.markets;
+    for (let i = 0; i < marketList.length; i++) {
+      const _market = Market.load(marketList[i]);
+      if (!_market) {
+        log.error("[updateMarketAndProtocolData] Market not found: {}", [
+          marketList[i].toHexString(),
+        ]);
+        continue;
+      }
+      totalValueLockedUSD = totalValueLockedUSD.plus(
+        _market.totalValueLockedUSD
+      );
+      totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
+        _market.totalBorrowBalanceUSD
+      );
+    }
+    this.protocol.totalValueLockedUSD = totalValueLockedUSD;
+    this.protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
+    this.protocol.save();
   }
 
   updateRevenue(
@@ -1206,20 +1307,4 @@ export class MarketClass {
       this.protocol.save();
     }
   }
-}
-
-export function getOrCreateRewardToken(
-  tokenAddress: Bytes,
-  rewardTokenType: string
-): RewardToken {
-  const rewardTokenID = rewardTokenType.concat("-").concat(rewardTokenType);
-  let rewardToken = RewardToken.load(rewardTokenID);
-  if (!rewardToken) {
-    rewardToken = new RewardToken(rewardTokenID);
-    rewardToken.type = rewardTokenType;
-    rewardToken.token = tokenAddress;
-    rewardToken.save();
-  }
-
-  return rewardToken;
 }

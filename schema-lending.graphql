@@ -53,6 +53,12 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " The type of token the protocol creates for positions "
+  type: TokenType
+
+  " Details about the price oracle used to get this token's price "
+  oracle: Oracle
 }
 
 enum RewardTokenType {
@@ -88,6 +94,27 @@ enum RiskType {
 
   " Isolated risk means each users position in a market or CDP is isolated for risk of liquidation "
   ISOLATED
+}
+
+enum CollateralizationType {
+  " Over collateralized protocols require users to put up more collateral than the amount borrowed. "
+  OVER_COLLATERALIZED
+
+  " Protocols that allow users to borrow more than their collateral locked.  "
+  UNDER_COLLATERALIZED
+
+  " Protocols that allow users to borrow without any collateral. Generally this protocol is KYC'd and only whitelist users can do this "
+  UNCOLLATERALIZED
+}
+
+# This is used for representative token descriptions
+# e.g. collateral or debt tokens in a protocol
+enum TokenType {
+  " Rebasing tokens continuously adjust balances / supply as interest is accrued (e.g. Aave debt balances adjust at each block with interest) "
+  REBASING
+
+  " Non-rebasing token balances / supply do not change as interest is accried (e.g. Compound's cToken's do not adjust balance, the exchange rate changes with interest) "
+  NON_REBASING
 }
 
 enum InterestRateType {
@@ -250,7 +277,7 @@ enum OracleSource {
 # As oracles are a source of truth it is important to understand the details.
 # This entity will help track oracle-related data in a market
 type Oracle @entity {
-  " { Oracle Address } "
+  " { Market ID }-{ Token Address } "
   id: Bytes!
 
   " The market that this oracle is used for pricing "
@@ -708,14 +735,25 @@ type Market @entity {
   " Can the user choose to isolate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
   canIsolate: Boolean!
 
-  " All oracles that have been used for this market "
-  oracles: [Oracle!]! @derivedFrom(field: "market")
-
   " Creation timestamp "
   createdTimestamp: BigInt!
 
   " Creation block number "
   createdBlockNumber: BigInt!
+
+  " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
+  relation: Bytes
+
+  ##### Incentives #####
+
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 
   ##### Quantitative Data #####
 

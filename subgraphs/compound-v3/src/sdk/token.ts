@@ -2,113 +2,166 @@
 import { ERC20 } from "../../generated/Configurator/ERC20";
 import { ERC20SymbolBytes } from "../../generated/Configurator/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/Configurator/ERC20NameBytes";
-import { Address, Bytes } from "@graphprotocol/graph-ts";
-import { Token } from "../../generated/schema";
+import {
+  Address,
+  BigDecimal,
+  Bytes,
+  BigInt,
+  ethereum,
+} from "@graphprotocol/graph-ts";
+import { Oracle, RewardToken, Token } from "../../generated/schema";
+import { BIGDECIMAL_ZERO } from "./constants";
 
-export const INVALID_TOKEN_DECIMALS = 0;
-export const UNKNOWN_TOKEN_VALUE = "unknown";
+export class TokenClass {
+  private INVALID_TOKEN_DECIMALS: i32 = 0;
+  private UNKNOWN_TOKEN_VALUE: string = "unknown";
 
-export function getOrCreateToken(tokenAddress: Bytes): Token {
-  let token = Token.load(tokenAddress);
-  if (!token) {
-    token = new Token(tokenAddress);
-    token.name = fetchTokenName(Address.fromBytes(tokenAddress));
-    token.symbol = fetchTokenSymbol(Address.fromBytes(tokenAddress));
-    token.decimals = fetchTokenDecimals(Address.fromBytes(tokenAddress));
-    token.save();
-  }
+  private token!: Token;
+  private event: ethereum.Event;
 
-  return token;
-}
-
-export function fetchTokenSymbol(tokenAddress: Address): string {
-  let contract = ERC20.bind(tokenAddress);
-  let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);
-
-  // try types string and bytes32 for symbol
-  let symbolValue = UNKNOWN_TOKEN_VALUE;
-  let symbolResult = contract.try_symbol();
-  if (!symbolResult.reverted) {
-    return symbolResult.value;
-  }
-
-  // non-standard ERC20 implementation
-  let symbolResultBytes = contractSymbolBytes.try_symbol();
-  if (!symbolResultBytes.reverted) {
-    // for broken pairs that have no symbol function exposed
-    if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
-      symbolValue = symbolResultBytes.value.toString();
-    } else {
-      // try with the static definition
-      let staticTokenDefinition =
-        StaticTokenDefinition.fromAddress(tokenAddress);
-      if (staticTokenDefinition != null) {
-        symbolValue = staticTokenDefinition.symbol;
+  constructor(tokenAddress: Bytes, event: ethereum.Event, tokenType?: string) {
+    let _token = Token.load(tokenAddress);
+    if (!_token) {
+      _token = new Token(tokenAddress);
+      _token.name = this.fetchTokenName(Address.fromBytes(tokenAddress));
+      _token.symbol = this.fetchTokenSymbol(Address.fromBytes(tokenAddress));
+      _token.decimals = this.fetchTokenDecimals(
+        Address.fromBytes(tokenAddress)
+      );
+      if (tokenType) {
+        _token.type = tokenType;
       }
+      _token.save();
+    }
+
+    this.token = _token;
+    this.event = event;
+  }
+
+  getToken(): Token {
+    return this.token;
+  }
+
+  updatePrice(newPriceUSD: BigDecimal): void {
+    this.token.lastPriceBlockNumber = this.event.block.number;
+    this.token.lastPriceUSD = newPriceUSD;
+    this.token.save();
+  }
+
+  getPriceUSD(): BigDecimal {
+    if (this.token.lastPriceUSD) {
+      return this.token.lastPriceUSD;
+    }
+    return BIGDECIMAL_ZERO;
+  }
+
+  ////////////////////
+  ///// Creators /////
+  ////////////////////
+
+  getOrCreateRewardToken(rewardTokenType: string): RewardToken {
+    const rewardTokenID = rewardTokenType
+      .concat("-")
+      .concat(this.token.id.toHexString());
+    let rewardToken = RewardToken.load(rewardTokenID);
+    if (!rewardToken) {
+      rewardToken = new RewardToken(rewardTokenID);
+      rewardToken.token = this.token.id;
+      rewardToken.type = rewardTokenType;
+      rewardToken.save();
+    }
+    return rewardToken;
+  }
+
+  private fetchTokenSymbol(tokenAddress: Address): string {
+    let contract = ERC20.bind(tokenAddress);
+    let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);
+
+    // try types string and bytes32 for symbol
+    let symbolValue = this.UNKNOWN_TOKEN_VALUE;
+    let symbolResult = contract.try_symbol();
+    if (!symbolResult.reverted) {
+      return symbolResult.value;
+    }
+
+    // non-standard ERC20 implementation
+    let symbolResultBytes = contractSymbolBytes.try_symbol();
+    if (!symbolResultBytes.reverted) {
+      // for broken pairs that have no symbol function exposed
+      if (!this.isNullEthValue(symbolResultBytes.value.toHexString())) {
+        symbolValue = symbolResultBytes.value.toString();
+      } else {
+        // try with the static definition
+        let staticTokenDefinition =
+          StaticTokenDefinition.fromAddress(tokenAddress);
+        if (staticTokenDefinition != null) {
+          symbolValue = staticTokenDefinition.symbol;
+        }
+      }
+    }
+
+    return symbolValue;
+  }
+
+  private fetchTokenName(tokenAddress: Address): string {
+    let contract = ERC20.bind(tokenAddress);
+    let contractNameBytes = ERC20NameBytes.bind(tokenAddress);
+
+    // try types string and bytes32 for name
+    let nameValue = this.UNKNOWN_TOKEN_VALUE;
+    let nameResult = contract.try_name();
+    if (!nameResult.reverted) {
+      return nameResult.value;
+    }
+
+    // non-standard ERC20 implementation
+    let nameResultBytes = contractNameBytes.try_name();
+    if (!nameResultBytes.reverted) {
+      // for broken exchanges that have no name function exposed
+      if (!this.isNullEthValue(nameResultBytes.value.toHexString())) {
+        nameValue = nameResultBytes.value.toString();
+      } else {
+        // try with the static definition
+        let staticTokenDefinition =
+          StaticTokenDefinition.fromAddress(tokenAddress);
+        if (staticTokenDefinition != null) {
+          nameValue = staticTokenDefinition.name;
+        }
+      }
+    }
+
+    return nameValue;
+  }
+
+  private fetchTokenDecimals(tokenAddress: Address): i32 {
+    let contract = ERC20.bind(tokenAddress);
+
+    // try types uint8 for decimals
+    let decimalResult = contract.try_decimals();
+    if (!decimalResult.reverted) {
+      let decimalValue = decimalResult.value;
+      return decimalValue;
+    }
+
+    // try with the static definition
+    let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
+    if (staticTokenDefinition != null) {
+      return staticTokenDefinition.decimals as i32;
+    } else {
+      return this.INVALID_TOKEN_DECIMALS as i32;
     }
   }
 
-  return symbolValue;
-}
-
-export function fetchTokenName(tokenAddress: Address): string {
-  let contract = ERC20.bind(tokenAddress);
-  let contractNameBytes = ERC20NameBytes.bind(tokenAddress);
-
-  // try types string and bytes32 for name
-  let nameValue = UNKNOWN_TOKEN_VALUE;
-  let nameResult = contract.try_name();
-  if (!nameResult.reverted) {
-    return nameResult.value;
+  private isNullEthValue(value: string): boolean {
+    return (
+      value ==
+      "0x0000000000000000000000000000000000000000000000000000000000000001"
+    );
   }
-
-  // non-standard ERC20 implementation
-  let nameResultBytes = contractNameBytes.try_name();
-  if (!nameResultBytes.reverted) {
-    // for broken exchanges that have no name function exposed
-    if (!isNullEthValue(nameResultBytes.value.toHexString())) {
-      nameValue = nameResultBytes.value.toString();
-    } else {
-      // try with the static definition
-      let staticTokenDefinition =
-        StaticTokenDefinition.fromAddress(tokenAddress);
-      if (staticTokenDefinition != null) {
-        nameValue = staticTokenDefinition.name;
-      }
-    }
-  }
-
-  return nameValue;
-}
-
-export function fetchTokenDecimals(tokenAddress: Address): i32 {
-  let contract = ERC20.bind(tokenAddress);
-
-  // try types uint8 for decimals
-  let decimalResult = contract.try_decimals();
-  if (!decimalResult.reverted) {
-    let decimalValue = decimalResult.value;
-    return decimalValue;
-  }
-
-  // try with the static definition
-  let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
-  if (staticTokenDefinition != null) {
-    return staticTokenDefinition.decimals as i32;
-  } else {
-    return INVALID_TOKEN_DECIMALS as i32;
-  }
-}
-
-export function isNullEthValue(value: string): boolean {
-  return (
-    value ==
-    "0x0000000000000000000000000000000000000000000000000000000000000001"
-  );
 }
 
 // Initialize a Token Definition with the attributes
-class StaticTokenDefinition {
+export class StaticTokenDefinition {
   address: Address;
   symbol: string;
   name: string;
