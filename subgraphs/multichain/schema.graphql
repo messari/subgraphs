@@ -1134,7 +1134,7 @@ type BridgeTransfer implements Event @entity(immutable: true) {
   toChainID: Int!
 
   " This is the address that's receiving the bridged funds (not a pool contract). When bridging out, it will be the address on the destination chain. "
-  transferTo: Bytes
+  transferTo: Bytes!
 
   " This is the address initiating the transfer, where the initial funds came from. It might not match the address initiating the actual EVM transaction. "
   transferFrom: Bytes

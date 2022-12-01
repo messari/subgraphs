@@ -14,6 +14,7 @@ import {
   EventType,
   TransferType,
   BridgePoolType,
+  ZERO_ADDRESS,
 } from "../common/constants";
 import {
   getOrCreateProtocol,
@@ -595,13 +596,11 @@ export function createBridgeTransferEvent(
     transferEvent.type = TransferType.MINT;
   }
 
-  if (fromAddress) {
+  transferEvent.transferTo = toAddress;
+  if (fromAddress != Address.fromString(ZERO_ADDRESS)) {
     transferEvent.transferFrom = fromAddress;
   }
-  if (toAddress) {
-    transferEvent.transferTo = toAddress;
-  }
-  if (crossTransactionID) {
+  if (crossTransactionID != Bytes.fromHexString(ZERO_ADDRESS)) {
     transferEvent.crossTransactionID = crossTransactionID;
   }
 
