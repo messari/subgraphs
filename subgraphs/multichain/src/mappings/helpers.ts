@@ -11,8 +11,6 @@ import {
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
-  SECONDS_PER_DAY,
-  SECONDS_PER_HOUR,
   EventType,
   TransferType,
   BridgePoolType,
@@ -29,59 +27,60 @@ import {
   getOrCreatePoolRouteSnapshot,
   getOrCreateToken,
   getOrCreateCrosschainToken,
+  getOrCreateAccount,
 } from "../common/getters";
 import { bigIntToBigDecimal } from "../common/utils/numbers";
 import { addToArrayAtIndex, arrayUnique } from "../common/utils/arrays";
 
 import {
-  Account,
-  AccountTransaction,
   ActiveAccount,
-  ActiveAccountTransaction,
   BridgeTransfer,
-  CrosschainToken,
   LiquidityDeposit,
   LiquidityWithdraw,
-  Token,
 } from "../../generated/schema";
 import { NetworkConfigs } from "../../configurations/configure";
+import {
+  getDaysSinceEpoch,
+  getHoursSinceEpoch,
+} from "../common/utils/datetime";
 
 export function updatePoolMetrics(
-  poolAddress: string,
-  poolRouteAddress: string,
-  token: Token,
-  crosschainToken: CrosschainToken,
+  poolID: string,
+  poolRouteID: string,
+  tokenAddress: Address,
+  crosschainTokenAddress: Address,
   event: ethereum.Event
 ): void {
-  const pool = getOrCreatePool(poolAddress, event);
-  const poolDailySnapshot = getOrCreatePoolDailySnapshot(poolAddress, event);
-  const poolHourlySnapshot = getOrCreatePoolHourlySnapshot(poolAddress, event);
+  const pool = getOrCreatePool(poolID, event);
+  const poolDailySnapshot = getOrCreatePoolDailySnapshot(poolID, event);
+  const poolHourlySnapshot = getOrCreatePoolHourlySnapshot(poolID, event);
+  const token = getOrCreateToken(tokenAddress, event.block.number);
 
-  // pool.inputTokenBalance = token._totalSupply;
-  pool.inputTokenBalances = [token._totalSupply];
+  pool.inputTokenBalance = token._totalSupply;
   pool.totalValueLockedUSD = bigIntToBigDecimal(
     token._totalSupply,
     token.decimals
   ).times(token.lastPriceUSD!);
-  pool.routes = arrayUnique(addToArrayAtIndex(pool.routes, poolRouteAddress));
+  pool.routes = arrayUnique(addToArrayAtIndex(pool.routes, poolRouteID));
   pool.destinationTokens = arrayUnique(
-    addToArrayAtIndex(pool.destinationTokens, crosschainToken.id)
+    addToArrayAtIndex(
+      pool.destinationTokens,
+      crosschainTokenAddress.toHexString()
+    )
   );
 
-  // poolDailySnapshot.inputTokenBalance = pool.inputTokenBalance;
-  poolDailySnapshot.inputTokenBalances = pool.inputTokenBalances;
+  poolDailySnapshot.inputTokenBalance = pool.inputTokenBalance;
   poolDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolDailySnapshot.routes = arrayUnique(
-    addToArrayAtIndex(poolDailySnapshot.routes, poolRouteAddress)
+    addToArrayAtIndex(poolDailySnapshot.routes, poolRouteID)
   );
   poolDailySnapshot.blockNumber = event.block.number;
   poolDailySnapshot.timestamp = event.block.timestamp;
 
-  // poolHourlySnapshot.inputTokenBalance = pool.inputTokenBalance;
-  poolHourlySnapshot.inputTokenBalances = pool.inputTokenBalances;
+  poolHourlySnapshot.inputTokenBalance = pool.inputTokenBalance;
   poolHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolHourlySnapshot.routes = arrayUnique(
-    addToArrayAtIndex(poolHourlySnapshot.routes, poolRouteAddress)
+    addToArrayAtIndex(poolHourlySnapshot.routes, poolRouteID)
   );
   poolHourlySnapshot.blockNumber = event.block.number;
   poolHourlySnapshot.timestamp = event.block.timestamp;
@@ -98,15 +97,27 @@ export function updatePoolMetrics(
 }
 
 export function updateVolume(
-  poolAddress: string,
+  poolID: string,
   amount: BigInt,
   isOutgoing: boolean,
-  token: Token,
+  tokenAddress: Address,
   chainID: BigInt,
   crosschainTokenAddress: Address,
   crosschainID: BigInt,
   event: ethereum.Event
 ): void {
+  const protocol = getOrCreateProtocol();
+  const pool = getOrCreatePool(poolID, event);
+  const token = getOrCreateToken(tokenAddress, event.block.number);
+  const poolRoute = getOrCreatePoolRoute(
+    poolID,
+    tokenAddress,
+    chainID,
+    crosschainTokenAddress,
+    crosschainID,
+    event
+  );
+
   let volumeIn = BIGINT_ZERO;
   let volumeInUSD = BIGDECIMAL_ZERO;
   let volumeOut = BIGINT_ZERO;
@@ -124,24 +135,13 @@ export function updateVolume(
     );
   }
 
-  const protocol = getOrCreateProtocol();
-  const pool = getOrCreatePool(poolAddress, event);
-  const poolRoute = getOrCreatePoolRoute(
-    poolAddress,
-    Address.fromString(token.id),
-    chainID,
-    crosschainTokenAddress,
-    crosschainID,
-    event
-  );
-
-  const poolDailySnapshot = getOrCreatePoolDailySnapshot(poolAddress, event);
+  const poolDailySnapshot = getOrCreatePoolDailySnapshot(poolID, event);
   const poolRouteDailySnapshot = getOrCreatePoolRouteSnapshot(
     poolRoute.id,
     poolDailySnapshot.id,
     event
   );
-  const poolHourlySnapshot = getOrCreatePoolHourlySnapshot(poolAddress, event);
+  const poolHourlySnapshot = getOrCreatePoolHourlySnapshot(poolID, event);
   const poolRouteHourlySnapshot = getOrCreatePoolRouteSnapshot(
     poolRoute.id,
     poolHourlySnapshot.id,
@@ -156,17 +156,17 @@ export function updateVolume(
   protocol.cumulativeTotalVolumeUSD = protocol.cumulativeVolumeOutUSD.plus(
     protocol.cumulativeVolumeInUSD
   );
-  protocol.netVolumeUSD = protocol.cumulativeVolumeOutUSD.minus(
-    protocol.cumulativeVolumeInUSD
+  protocol.netVolumeUSD = protocol.cumulativeVolumeInUSD.minus(
+    protocol.cumulativeVolumeOutUSD
   );
 
   pool.cumulativeVolumeIn = pool.cumulativeVolumeIn.plus(volumeIn);
   pool.cumulativeVolumeInUSD = pool.cumulativeVolumeInUSD.plus(volumeInUSD);
   pool.cumulativeVolumeOut = pool.cumulativeVolumeOut.plus(volumeOut);
   pool.cumulativeVolumeOutUSD = pool.cumulativeVolumeOutUSD.plus(volumeOutUSD);
-  pool.netVolume = pool.cumulativeVolumeOut.minus(pool.cumulativeVolumeIn);
-  pool.netVolumeUSD = pool.cumulativeVolumeOutUSD.minus(
-    pool.cumulativeVolumeInUSD
+  pool.netVolume = pool.cumulativeVolumeIn.minus(pool.cumulativeVolumeOut);
+  pool.netVolumeUSD = pool.cumulativeVolumeInUSD.minus(
+    pool.cumulativeVolumeOutUSD
   );
 
   poolRoute.cumulativeVolumeIn = poolRoute.cumulativeVolumeIn.plus(volumeIn);
@@ -188,12 +188,12 @@ export function updateVolume(
     poolDailySnapshot.dailyVolumeOutUSD.plus(volumeOutUSD);
   poolDailySnapshot.cumulativeVolumeOut = pool.cumulativeVolumeOut;
   poolDailySnapshot.cumulativeVolumeOutUSD = pool.cumulativeVolumeOutUSD;
-  poolDailySnapshot.netDailyVolume = poolDailySnapshot.dailyVolumeOut.minus(
-    poolDailySnapshot.dailyVolumeIn
+  poolDailySnapshot.netDailyVolume = poolDailySnapshot.dailyVolumeIn.minus(
+    poolDailySnapshot.dailyVolumeOut
   );
   poolDailySnapshot.netDailyVolumeUSD =
-    poolDailySnapshot.dailyVolumeOutUSD.minus(
-      poolDailySnapshot.dailyVolumeInUSD
+    poolDailySnapshot.dailyVolumeInUSD.minus(
+      poolDailySnapshot.dailyVolumeOutUSD
     );
   poolDailySnapshot.netCumulativeVolume = pool.netVolume;
   poolDailySnapshot.netCumulativeVolumeUSD = pool.netVolumeUSD;
@@ -223,12 +223,12 @@ export function updateVolume(
     poolHourlySnapshot.hourlyVolumeOutUSD.plus(volumeOutUSD);
   poolHourlySnapshot.cumulativeVolumeOut = pool.cumulativeVolumeOut;
   poolHourlySnapshot.cumulativeVolumeOutUSD = pool.cumulativeVolumeOutUSD;
-  poolHourlySnapshot.netHourlyVolume = poolHourlySnapshot.hourlyVolumeOut.minus(
-    poolHourlySnapshot.hourlyVolumeIn
+  poolHourlySnapshot.netHourlyVolume = poolHourlySnapshot.hourlyVolumeIn.minus(
+    poolHourlySnapshot.hourlyVolumeOut
   );
   poolHourlySnapshot.netHourlyVolumeUSD =
-    poolHourlySnapshot.hourlyVolumeOutUSD.minus(
-      poolHourlySnapshot.hourlyVolumeInUSD
+    poolHourlySnapshot.hourlyVolumeInUSD.minus(
+      poolHourlySnapshot.hourlyVolumeOutUSD
     );
   poolHourlySnapshot.netCumulativeVolume = pool.netVolume;
   poolHourlySnapshot.netCumulativeVolumeUSD = pool.netVolumeUSD;
@@ -252,8 +252,8 @@ export function updateVolume(
   financialMetrics.dailyVolumeOutUSD =
     financialMetrics.dailyVolumeOutUSD.plus(volumeOutUSD);
   financialMetrics.cumulativeVolumeOutUSD = protocol.cumulativeVolumeOutUSD;
-  financialMetrics.dailyNetVolumeUSD = financialMetrics.dailyVolumeOutUSD.minus(
-    financialMetrics.dailyVolumeInUSD
+  financialMetrics.dailyNetVolumeUSD = financialMetrics.dailyVolumeInUSD.minus(
+    financialMetrics.dailyVolumeOutUSD
   );
   financialMetrics.cumulativeNetVolumeUSD = protocol.netVolumeUSD;
 
@@ -268,7 +268,7 @@ export function updateVolume(
 }
 
 export function updateRevenue(
-  poolAddress: string,
+  poolID: string,
   feeUSD: BigDecimal,
   event: ethereum.Event
 ): void {
@@ -280,10 +280,9 @@ export function updateRevenue(
   );
 
   const protocol = getOrCreateProtocol();
-  const pool = getOrCreatePool(poolAddress, event);
-
-  const poolDailySnapshot = getOrCreatePoolDailySnapshot(poolAddress, event);
-  const poolHourlySnapshot = getOrCreatePoolHourlySnapshot(poolAddress, event);
+  const pool = getOrCreatePool(poolID, event);
+  const poolDailySnapshot = getOrCreatePoolDailySnapshot(poolID, event);
+  const poolHourlySnapshot = getOrCreatePoolHourlySnapshot(poolID, event);
   const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
 
   protocol.cumulativeSupplySideRevenueUSD =
@@ -351,127 +350,170 @@ export function updateUsageMetrics(
   block: ethereum.Block,
   transaction: ethereum.Transaction
 ): void {
-  const transactionCount = INT_ONE;
-  const transferCount = eventType == EventType.TRANSFER ? INT_ONE : INT_ZERO;
-  const depositCount = eventType == EventType.DEPOSIT ? INT_ONE : INT_ZERO;
-  const withdrawCount = eventType == EventType.WITHDRAW ? INT_ONE : INT_ZERO;
-  const messageSentCount = eventType == EventType.MESSAGE ? INT_ONE : INT_ZERO;
-
-  const liquidityProviders =
-    eventType == EventType.DEPOSIT ? INT_ONE : INT_ZERO;
-  const messageSenders = eventType == EventType.MESSAGE ? INT_ONE : INT_ZERO;
-
-  const from = transaction.from.toHexString();
-
+  const protocol = getOrCreateProtocol();
   const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(block);
   const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(block);
 
-  const protocol = getOrCreateProtocol();
+  const transactionCount = INT_ONE;
+  const depositCount = eventType == EventType.DEPOSIT ? INT_ONE : INT_ZERO;
+  const withdrawCount = eventType == EventType.WITHDRAW ? INT_ONE : INT_ZERO;
+  const transferInCount =
+    eventType == EventType.TRANSFER_IN ? INT_ONE : INT_ZERO;
+  const transferOutCount =
+    eventType == EventType.TRANSFER_OUT ? INT_ONE : INT_ZERO;
+  const messageInCount = eventType == EventType.MESSAGE_IN ? INT_ONE : INT_ZERO;
+  const messageOutCount =
+    eventType == EventType.MESSAGE_OUT ? INT_ONE : INT_ZERO;
 
   protocol.cumulativeTransactionCount += transactionCount;
-  protocol.cumulativeTransferCount += transferCount;
-  protocol.cumulativeDepositCount += depositCount;
-  protocol.cumulativeWithdrawCount += withdrawCount;
+  protocol.cumulativeLiquidityDepositCount += depositCount;
+  protocol.cumulativeLiquidityWithdrawCount += withdrawCount;
+  protocol.cumulativeTransferInCount += transferInCount;
+  protocol.cumulativeTransferOutCount += transferOutCount;
+  protocol.cumulativeMessageReceivedCount += messageInCount;
+  protocol.cumulativeMessageSentCount += messageOutCount;
+
+  usageMetricsDaily.cumulativeTransactionCount =
+    protocol.cumulativeTransactionCount;
+  usageMetricsDaily.cumulativeLiquidityDepositCount =
+    protocol.cumulativeLiquidityDepositCount;
+  usageMetricsDaily.cumulativeLiquidityWithdrawCount =
+    protocol.cumulativeLiquidityWithdrawCount;
+  usageMetricsDaily.cumulativeTransferInCount =
+    protocol.cumulativeTransferInCount;
+  usageMetricsDaily.cumulativeTransferOutCount =
+    protocol.cumulativeTransferOutCount;
+  usageMetricsDaily.cumulativeMessageReceivedCount =
+    protocol.cumulativeMessageReceivedCount;
+  usageMetricsDaily.cumulativeMessageSentCount =
+    protocol.cumulativeMessageSentCount;
+
+  usageMetricsDaily.dailyTransactionCount += transactionCount;
+  usageMetricsDaily.dailyLiquidityDepositCount += depositCount;
+  usageMetricsDaily.dailyLiquidityWithdrawCount += withdrawCount;
+  usageMetricsDaily.dailyTransferInCount += transferInCount;
+  usageMetricsDaily.dailyTransferOutCount += transferOutCount;
+  usageMetricsDaily.dailyMessageReceivedCount += messageInCount;
+  usageMetricsDaily.dailyMessageSentCount += messageOutCount;
 
   usageMetricsDaily.blockNumber = block.number;
   usageMetricsDaily.timestamp = block.timestamp;
-  usageMetricsDaily.dailyTransactionCount += transactionCount;
-  usageMetricsDaily.dailyTransferCount += transferCount;
-  usageMetricsDaily.dailyDepositCount += depositCount;
-  usageMetricsDaily.dailyWithdrawCount += withdrawCount;
-  usageMetricsDaily.dailyMessageSentCount += messageSentCount;
+
+  usageMetricsHourly.cumulativeTransactionCount =
+    protocol.cumulativeTransactionCount;
+  usageMetricsHourly.cumulativeLiquidityDepositCount =
+    protocol.cumulativeLiquidityDepositCount;
+  usageMetricsHourly.cumulativeLiquidityWithdrawCount =
+    protocol.cumulativeLiquidityWithdrawCount;
+  usageMetricsHourly.cumulativeTransferInCount =
+    protocol.cumulativeTransferInCount;
+  usageMetricsHourly.cumulativeTransferOutCount =
+    protocol.cumulativeTransferOutCount;
+  usageMetricsHourly.cumulativeMessageReceivedCount =
+    protocol.cumulativeMessageReceivedCount;
+  usageMetricsHourly.cumulativeMessageSentCount =
+    protocol.cumulativeMessageSentCount;
+
+  usageMetricsHourly.hourlyTransactionCount += transactionCount;
+  usageMetricsHourly.hourlyLiquidityDepositCount += depositCount;
+  usageMetricsHourly.hourlyLiquidityWithdrawCount += withdrawCount;
+  usageMetricsHourly.hourlyTransferInCount += transferInCount;
+  usageMetricsHourly.hourlyTransferOutCount += transferOutCount;
+  usageMetricsHourly.hourlyMessageReceivedCount += messageInCount;
+  usageMetricsHourly.hourlyMessageSentCount += messageOutCount;
 
   usageMetricsHourly.blockNumber = block.number;
   usageMetricsHourly.timestamp = block.timestamp;
-  usageMetricsHourly.hourlyTransactionCount += transactionCount;
-  usageMetricsHourly.hourlyTransferCount += transferCount;
-  usageMetricsHourly.hourlyDepositCount += depositCount;
-  usageMetricsHourly.hourlyWithdrawCount += withdrawCount;
-  usageMetricsHourly.hourlyMessageSentCount += messageSentCount;
 
-  // Number of days since Unix epoch
-  const day = block.timestamp.toI32() / SECONDS_PER_DAY;
-  const hour = block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const from = transaction.from.toHexString();
+  let account = getOrCreateAccount(from);
 
-  const dayId = day.toString();
-  const hourId = hour.toString();
-
-  // Combine the id, user address and transaction type to generate a unique user id for the day
-  const dailyActiveAccountId = "daily-"
-    .concat(from)
-    .concat("-")
-    .concat(dayId)
-    .concat("-");
-  let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
-  if (!dailyActiveAccount) {
-    dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
-    usageMetricsDaily.dailyActiveUsers += INT_ONE;
-
-    dailyActiveAccount.save();
+  if (account.transferInCount == INT_ZERO) {
+    protocol.cumulativeUniqueTransferReceivers += transferInCount;
+  }
+  if (account.transferOutCount == INT_ZERO) {
+    protocol.cumulativeUniqueTransferSenders += transferOutCount;
+  }
+  if (account.depositCount == INT_ZERO) {
+    protocol.cumulativeUniqueLiquidityProviders += depositCount;
+  }
+  if (account.messageSentCount == INT_ZERO) {
+    protocol.cumulativeUniqueMessageSenders += messageOutCount;
   }
 
-  const dailyActiveAccountTransactionId = "daily-"
-    .concat(from)
-    .concat("-")
-    .concat(dayId)
-    .concat("-")
-    .concat(eventType);
-  let dailyActiveAccountTransaction = ActiveAccountTransaction.load(
-    dailyActiveAccountTransactionId
+  account.depositCount += depositCount;
+  account.withdrawCount += withdrawCount;
+  account.transferInCount += transferInCount;
+  account.transferOutCount += transferOutCount;
+  account.messageReceivedCount += messageInCount;
+  account.messageSentCount += messageOutCount;
+  account.chains = arrayUnique(
+    addToArrayAtIndex(account.chains, crosschainID.toI32())
   );
-  if (!dailyActiveAccountTransaction) {
-    dailyActiveAccountTransaction = new ActiveAccountTransaction(
-      dailyActiveAccountTransactionId
-    );
-    usageMetricsDaily.dailyActiveLiquidityProviders += liquidityProviders;
-    usageMetricsDaily.dailyActiveMessageSenders += messageSenders;
 
-    dailyActiveAccountTransaction.save();
-  }
-
-  const hourlyActiveAccountId = "hourly-"
-    .concat(from)
-    .concat("-")
-    .concat(hourId);
-  let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
-  if (!hourlyActiveAccount) {
-    hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
-    usageMetricsHourly.hourlyActiveUsers += INT_ONE;
-
-    hourlyActiveAccount.save();
-  }
-
-  let account = Account.load(from);
-  if (!account) {
-    account = new Account(from);
-    account.chains = [];
-
-    protocol.cumulativeUniqueUsers += INT_ONE;
-  }
-  account.chains = arrayUnique(addToArrayAtIndex(account.chains, crosschainID));
   account.save();
 
-  const accountTransactionId = from.concat("-").concat(eventType);
-  let accountTransaction = AccountTransaction.load(accountTransactionId);
-  if (!accountTransaction) {
-    accountTransaction = new AccountTransaction(accountTransactionId);
-    accountTransaction.chains = [];
-
-    protocol.cumulativeUniqueLiquidityProviders += liquidityProviders;
-    protocol.cumulativeUniqueMessageSenders += messageSenders;
-  }
-  accountTransaction.chains = arrayUnique(
-    addToArrayAtIndex(accountTransaction.chains, crosschainID)
-  );
-  accountTransaction.save();
-
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  usageMetricsDaily.cumulativeUniqueTransferSenders =
+    protocol.cumulativeUniqueTransferSenders;
+  usageMetricsDaily.cumulativeUniqueTransferReceivers =
+    protocol.cumulativeUniqueTransferReceivers;
   usageMetricsDaily.cumulativeUniqueLiquidityProviders =
     protocol.cumulativeUniqueLiquidityProviders;
   usageMetricsDaily.cumulativeUniqueMessageSenders =
     protocol.cumulativeUniqueMessageSenders;
 
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  usageMetricsHourly.cumulativeUniqueTransferSenders =
+    protocol.cumulativeUniqueTransferSenders;
+  usageMetricsHourly.cumulativeUniqueTransferReceivers =
+    protocol.cumulativeUniqueTransferReceivers;
+  usageMetricsHourly.cumulativeUniqueLiquidityProviders =
+    protocol.cumulativeUniqueLiquidityProviders;
+  usageMetricsHourly.cumulativeUniqueMessageSenders =
+    protocol.cumulativeUniqueMessageSenders;
+
+  const dayId = getDaysSinceEpoch(block.timestamp.toI32());
+  const dailyActiveAccountID = from
+    .concat("-")
+    .concat("daily")
+    .concat("-")
+    .concat(dayId)
+    .concat("-")
+    .concat(eventType);
+
+  let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountID);
+  if (!dailyActiveAccount) {
+    dailyActiveAccount = new ActiveAccount(dailyActiveAccountID);
+  }
+  usageMetricsDaily.dailyActiveUsers += transactionCount;
+  usageMetricsDaily.dailyActiveTransferSenders += messageOutCount;
+  usageMetricsDaily.dailyActiveTransferReceivers += messageInCount;
+  usageMetricsDaily.dailyActiveLiquidityProviders += depositCount;
+  usageMetricsDaily.dailyActiveMessageSenders += messageOutCount;
+
+  dailyActiveAccount.save();
+
+  const hourId = getHoursSinceEpoch(block.timestamp.toI32());
+  const hourlyActiveAccountID = from
+    .concat("-")
+    .concat("hourly")
+    .concat("-")
+    .concat(hourId)
+    .concat("-")
+    .concat(eventType);
+
+  let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountID);
+  if (!hourlyActiveAccount) {
+    hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountID);
+  }
+  usageMetricsHourly.hourlyActiveUsers += transactionCount;
+  usageMetricsHourly.hourlyActiveTransferSenders += messageOutCount;
+  usageMetricsHourly.hourlyActiveTransferReceivers += messageInCount;
+  usageMetricsHourly.hourlyActiveLiquidityProviders += depositCount;
+  usageMetricsHourly.hourlyActiveMessageSenders += messageOutCount;
+
+  hourlyActiveAccount.save();
 
   usageMetricsDaily.totalPoolCount = protocol.totalPoolCount;
   usageMetricsDaily.totalPoolRouteCount = protocol.totalPoolRouteCount;
@@ -508,46 +550,59 @@ export function updateProtocolTVL(event: ethereum.Event): void {
 }
 
 export function createBridgeTransferEvent(
-  poolAddress: string,
+  poolID: string,
   tokenAddress: Address,
   chainID: BigInt,
   crosschainTokenAddress: Address,
   crosschainID: BigInt,
-  poolRouteAddress: string,
+  poolRouteID: string,
   isOutgoing: boolean,
+  amount: BigInt,
+  event: ethereum.Event,
   fromAddress: Address,
   toAddress: Address,
-  crossTransactionID: Bytes,
-  amount: BigInt,
-  event: ethereum.Event
+  crossTransactionID: Bytes
 ): void {
-  const transferEventID = EventType.TRANSFER.concat("-")
-    .concat(event.transaction.hash.toHexString())
+  const transferEventID = event.transaction.hash
+    .toHexString()
     .concat("-")
     .concat(event.logIndex.toString());
 
   const transferEvent = new BridgeTransfer(transferEventID);
 
-  transferEvent.hash = event.transaction.hash.toHexString();
-  transferEvent.logIndex = event.logIndex;
+  transferEvent.hash = event.transaction.hash;
+  transferEvent.logIndex = event.logIndex.toI32();
   transferEvent.protocol = NetworkConfigs.getFactoryAddress();
-  transferEvent.pool = poolAddress;
-  transferEvent.route = poolRouteAddress;
-  transferEvent.crossTransactionID = crossTransactionID.toHexString();
-  transferEvent.from = event.transaction.from.toHexString();
-  transferEvent.to = event.transaction.to!.toHexString();
-  transferEvent.transferFrom = fromAddress.toHexString();
-  transferEvent.transferTo = toAddress.toHexString();
+  transferEvent.to = event.transaction.to!;
+  transferEvent.from = event.transaction.from;
   transferEvent.isOutgoing = isOutgoing;
+  transferEvent.pool = poolID;
+  transferEvent.route = poolRouteID;
 
   if (isOutgoing) {
-    transferEvent.fromChainID = chainID;
-    transferEvent.toChainID = crosschainID;
+    let account = getOrCreateAccount(event.transaction.from.toHexString());
+    transferEvent.account = account.id;
+
+    transferEvent.fromChainID = chainID.toI32();
+    transferEvent.toChainID = crosschainID.toI32();
     transferEvent.type = TransferType.BURN;
   } else {
-    transferEvent.fromChainID = crosschainID;
-    transferEvent.toChainID = chainID;
+    let account = getOrCreateAccount(event.transaction.to!.toHexString());
+    transferEvent.account = account.id;
+
+    transferEvent.fromChainID = crosschainID.toI32();
+    transferEvent.toChainID = chainID.toI32();
     transferEvent.type = TransferType.MINT;
+  }
+
+  if (fromAddress) {
+    transferEvent.transferFrom = fromAddress;
+  }
+  if (toAddress) {
+    transferEvent.transferTo = toAddress;
+  }
+  if (crossTransactionID) {
+    transferEvent.crossTransactionID = crossTransactionID;
   }
 
   const token = getOrCreateToken(tokenAddress, event.block.number);
@@ -563,7 +618,7 @@ export function createBridgeTransferEvent(
     tokenAddress,
     event.block.number
   );
-  transferEvent.crosschainToken = crosschainToken.address;
+  transferEvent.crosschainToken = crosschainToken.id;
 
   transferEvent.isSwap = false;
   if (crosschainToken.token != token.id) {
@@ -577,7 +632,7 @@ export function createBridgeTransferEvent(
 }
 
 export function createLiquidityDepositEvent(
-  poolAddress: string,
+  poolID: string,
   tokenAddress: Address,
   chainID: BigInt,
   fromAddress: Address,
@@ -586,20 +641,23 @@ export function createLiquidityDepositEvent(
   call: ethereum.Call
 ): void {
   const logIndex = BigInt.fromI32(0);
-  const depositEventID = EventType.DEPOSIT.concat("-")
-    .concat(call.transaction.hash.toHexString())
+  const depositEventID = call.transaction.hash
+    .toHexString()
     .concat("-")
     .concat(logIndex.toString());
 
   const depositEvent = new LiquidityDeposit(depositEventID);
 
-  depositEvent.hash = call.transaction.hash.toHexString();
-  depositEvent.logIndex = logIndex;
+  depositEvent.hash = call.transaction.hash;
+  depositEvent.logIndex = logIndex.toI32();
   depositEvent.protocol = NetworkConfigs.getFactoryAddress();
-  depositEvent.to = toAddress.toHexString();
-  depositEvent.from = fromAddress.toHexString();
-  depositEvent.pool = poolAddress;
-  depositEvent.chainID = chainID;
+  depositEvent.to = toAddress;
+  depositEvent.from = fromAddress;
+  depositEvent.pool = poolID;
+  depositEvent.chainID = chainID.toI32();
+
+  const account = getOrCreateAccount(fromAddress.toHexString());
+  depositEvent.account = account.id;
 
   const token = getOrCreateToken(tokenAddress, call.block.number);
   depositEvent.token = token.id;
@@ -615,7 +673,7 @@ export function createLiquidityDepositEvent(
 }
 
 export function createLiquidityWithdrawEvent(
-  poolAddress: string,
+  poolID: string,
   tokenAddress: Address,
   chainID: BigInt,
   fromAddress: Address,
@@ -624,20 +682,23 @@ export function createLiquidityWithdrawEvent(
   call: ethereum.Call
 ): void {
   const logIndex = BigInt.fromI32(0);
-  const withdrawEventID = EventType.WITHDRAW.concat("-")
-    .concat(call.transaction.hash.toHexString())
+  const withdrawEventID = call.transaction.hash
+    .toHexString()
     .concat("-")
     .concat(logIndex.toString());
 
   const withdrawEvent = new LiquidityWithdraw(withdrawEventID);
 
-  withdrawEvent.hash = call.transaction.hash.toHexString();
-  withdrawEvent.logIndex = logIndex;
+  withdrawEvent.hash = call.transaction.hash;
+  withdrawEvent.logIndex = logIndex.toI32();
   withdrawEvent.protocol = NetworkConfigs.getFactoryAddress();
-  withdrawEvent.to = toAddress.toHexString();
-  withdrawEvent.from = fromAddress.toHexString();
-  withdrawEvent.pool = poolAddress;
-  withdrawEvent.chainID = chainID;
+  withdrawEvent.to = toAddress;
+  withdrawEvent.from = fromAddress;
+  withdrawEvent.pool = poolID;
+  withdrawEvent.chainID = chainID.toI32();
+
+  const account = getOrCreateAccount(toAddress.toHexString());
+  withdrawEvent.account = account.id;
 
   const token = getOrCreateToken(tokenAddress, call.block.number);
   withdrawEvent.token = token.id;

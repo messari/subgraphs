@@ -81,6 +81,12 @@ export namespace ProtocolType {
   export const GENERIC = "GENERIC";
 }
 
+export namespace BridgePermissionType {
+  export const PERMISSIONLESS = "PERMISSIONLESS";
+  export const WHITELIST = "WHITELIST";
+  export const PRIVATE = "PRIVATE";
+}
+
 export namespace BridgePoolType {
   export const LOCK_RELEASE = "LOCK_RELEASE";
   export const BURN_MINT = "BURN_MINT";
@@ -95,8 +101,10 @@ export namespace CrosschainTokenType {
 export namespace EventType {
   export const DEPOSIT = "DEPOSIT";
   export const WITHDRAW = "WITHDRAW";
-  export const TRANSFER = "TRANSFER";
-  export const MESSAGE = "MESSAGE";
+  export const TRANSFER_IN = "TRANSFER_IN";
+  export const TRANSFER_OUT = "TRANSFER_OUT";
+  export const MESSAGE_IN = "MESSAGE_IN";
+  export const MESSAGE_OUT = "MESSAGE_OUT";
 }
 
 export namespace TransferType {

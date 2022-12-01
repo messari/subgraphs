@@ -1,4 +1,10 @@
-import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  ByteArray,
+  Bytes,
+  dataSource,
+} from "@graphprotocol/graph-ts";
 
 import {
   createBridgeTransferEvent,
@@ -16,7 +22,7 @@ import {
   getOrCreatePoolRoute,
   getOrCreateToken,
 } from "../common/getters";
-import { EventType } from "../common/constants";
+import { EventType, ZERO_ADDRESS } from "../common/constants";
 import { NetworkConfigs } from "../../configurations/configure";
 
 import { LogAnySwapIn, LogAnySwapOut } from "../../generated/RouterV6/Router";
@@ -32,9 +38,9 @@ import {
 } from "../../generated/RouterV6/anyTOKEN";
 
 export function handleSwapOut(event: LogAnySwapOut): void {
-  const poolAddress = event.params.token.toHexString();
+  const poolID = event.params.token.toHexString();
 
-  const pool = getOrCreatePool(poolAddress, event);
+  const pool = getOrCreatePool(poolID, event);
   const token = getOrCreateToken(
     Address.fromString(pool.id),
     event.block.number
@@ -52,20 +58,26 @@ export function handleSwapOut(event: LogAnySwapOut): void {
     pool.id,
     Address.fromString(token.id),
     event.params.fromChainID,
-    Address.fromString(crosschainToken.address),
+    Address.fromBytes(crosschainToken.address),
     event.params.toChainID,
     event
   );
 
-  updatePoolMetrics(pool.id, poolRoute.id, token, crosschainToken, event);
+  updatePoolMetrics(
+    pool.id,
+    poolRoute.id,
+    Address.fromString(token.id),
+    Address.fromBytes(crosschainToken.address),
+    event
+  );
 
   updateVolume(
     pool.id,
     event.params.amount,
     true,
-    token,
+    Address.fromString(token.id),
     event.params.fromChainID,
-    Address.fromString(crosschainToken.address),
+    Address.fromBytes(crosschainToken.address),
     event.params.toChainID,
     event
   );
@@ -81,7 +93,7 @@ export function handleSwapOut(event: LogAnySwapOut): void {
   );
 
   updateUsageMetrics(
-    EventType.TRANSFER,
+    EventType.TRANSFER_OUT,
     event.params.toChainID,
     event.block,
     event.transaction
@@ -93,22 +105,22 @@ export function handleSwapOut(event: LogAnySwapOut): void {
     pool.id,
     Address.fromString(token.id),
     event.params.fromChainID,
-    Address.fromString(crosschainToken.address),
+    Address.fromBytes(crosschainToken.address),
     event.params.toChainID,
     poolRoute.id,
     true,
+    event.params.amount,
+    event,
     event.params.from,
     event.params.to,
-    event.transaction.hash,
-    event.params.amount,
-    event
+    Bytes.fromHexString(ZERO_ADDRESS)
   );
 }
 
 export function handleSwapIn(event: LogAnySwapIn): void {
-  const poolAddress = event.params.token.toHexString();
+  const poolID = event.params.token.toHexString();
 
-  const pool = getOrCreatePool(poolAddress, event);
+  const pool = getOrCreatePool(poolID, event);
   const token = getOrCreateToken(
     Address.fromString(pool.id),
     event.block.number
@@ -126,26 +138,32 @@ export function handleSwapIn(event: LogAnySwapIn): void {
     pool.id,
     Address.fromString(token.id),
     event.params.toChainID,
-    Address.fromString(crosschainToken.address),
+    Address.fromBytes(crosschainToken.address),
     event.params.fromChainID,
     event
   );
 
-  updatePoolMetrics(pool.id, poolRoute.id, token, crosschainToken, event);
+  updatePoolMetrics(
+    pool.id,
+    poolRoute.id,
+    Address.fromString(token.id),
+    Address.fromBytes(crosschainToken.address),
+    event
+  );
 
   updateVolume(
     pool.id,
     event.params.amount,
     false,
-    token,
+    Address.fromString(token.id),
     event.params.toChainID,
-    Address.fromString(crosschainToken.address),
+    Address.fromBytes(crosschainToken.address),
     event.params.fromChainID,
     event
   );
 
   updateUsageMetrics(
-    EventType.TRANSFER,
+    EventType.TRANSFER_IN,
     event.params.fromChainID,
     event.block,
     event.transaction
@@ -157,28 +175,28 @@ export function handleSwapIn(event: LogAnySwapIn): void {
     pool.id,
     Address.fromString(token.id),
     event.params.toChainID,
-    Address.fromString(crosschainToken.address),
+    Address.fromBytes(crosschainToken.address),
     event.params.fromChainID,
     poolRoute.id,
     false,
-    event.transaction.from, // LogAnySwapIn does not have from address in params
-    event.params.to,
-    event.params.txhash,
     event.params.amount,
-    event
+    event,
+    Address.fromString(ZERO_ADDRESS), // event LogAnySwapIn does not have from address in params
+    event.params.to,
+    event.params.txhash
   );
 }
 
 export function handleDeposit(call: DepositCall): void {
   const context = dataSource.context();
-  const poolAddress = context.getString("poolAddress");
+  const poolID = context.getString("poolID");
   const chainID = BigInt.fromString(context.getString("chainID"));
 
   updateUsageMetrics(EventType.DEPOSIT, chainID, call.block, call.transaction);
 
   createLiquidityDepositEvent(
-    poolAddress,
-    Address.fromString(poolAddress),
+    poolID,
+    Address.fromString(poolID),
     chainID,
     call.from,
     call.inputs.to,
@@ -189,14 +207,14 @@ export function handleDeposit(call: DepositCall): void {
 
 export function handleDeposit1(call: Deposit1Call): void {
   const context = dataSource.context();
-  const poolAddress = context.getString("poolAddress");
+  const poolID = context.getString("poolID");
   const chainID = BigInt.fromString(context.getString("chainID"));
 
   updateUsageMetrics(EventType.DEPOSIT, chainID, call.block, call.transaction);
 
   createLiquidityDepositEvent(
-    poolAddress,
-    Address.fromString(poolAddress),
+    poolID,
+    Address.fromString(poolID),
     chainID,
     call.from,
     call.from,
@@ -207,14 +225,14 @@ export function handleDeposit1(call: Deposit1Call): void {
 
 export function handleDeposit2(call: Deposit2Call): void {
   const context = dataSource.context();
-  const poolAddress = context.getString("poolAddress");
+  const poolID = context.getString("poolID");
   const chainID = BigInt.fromString(context.getString("chainID"));
 
   updateUsageMetrics(EventType.DEPOSIT, chainID, call.block, call.transaction);
 
   createLiquidityDepositEvent(
-    poolAddress,
-    Address.fromString(poolAddress),
+    poolID,
+    Address.fromString(poolID),
     chainID,
     call.from,
     call.from,
@@ -225,14 +243,14 @@ export function handleDeposit2(call: Deposit2Call): void {
 
 export function handleDepositVault(call: DepositVaultCall): void {
   const context = dataSource.context();
-  const poolAddress = context.getString("poolAddress");
+  const poolID = context.getString("poolID");
   const chainID = BigInt.fromString(context.getString("chainID"));
 
   updateUsageMetrics(EventType.DEPOSIT, chainID, call.block, call.transaction);
 
   createLiquidityDepositEvent(
-    poolAddress,
-    Address.fromString(poolAddress),
+    poolID,
+    Address.fromString(poolID),
     chainID,
     call.from,
     call.inputs.to,
@@ -243,14 +261,14 @@ export function handleDepositVault(call: DepositVaultCall): void {
 
 export function handleWithdraw(call: WithdrawCall): void {
   const context = dataSource.context();
-  const poolAddress = context.getString("poolAddress");
+  const poolID = context.getString("poolID");
   const chainID = BigInt.fromString(context.getString("chainID"));
 
   updateUsageMetrics(EventType.WITHDRAW, chainID, call.block, call.transaction);
 
   createLiquidityWithdrawEvent(
-    poolAddress,
-    Address.fromString(poolAddress),
+    poolID,
+    Address.fromString(poolID),
     chainID,
     call.from,
     call.inputs.to,
@@ -261,14 +279,14 @@ export function handleWithdraw(call: WithdrawCall): void {
 
 export function handleWithdraw1(call: Withdraw1Call): void {
   const context = dataSource.context();
-  const poolAddress = context.getString("poolAddress");
+  const poolID = context.getString("poolID");
   const chainID = BigInt.fromString(context.getString("chainID"));
 
   updateUsageMetrics(EventType.WITHDRAW, chainID, call.block, call.transaction);
 
   createLiquidityWithdrawEvent(
-    poolAddress,
-    Address.fromString(poolAddress),
+    poolID,
+    Address.fromString(poolID),
     chainID,
     call.from,
     call.from,
@@ -279,14 +297,14 @@ export function handleWithdraw1(call: Withdraw1Call): void {
 
 export function handleWithdraw2(call: Withdraw2Call): void {
   const context = dataSource.context();
-  const poolAddress = context.getString("poolAddress");
+  const poolID = context.getString("poolID");
   const chainID = BigInt.fromString(context.getString("chainID"));
 
   updateUsageMetrics(EventType.WITHDRAW, chainID, call.block, call.transaction);
 
   createLiquidityWithdrawEvent(
-    poolAddress,
-    Address.fromString(poolAddress),
+    poolID,
+    Address.fromString(poolID),
     chainID,
     call.from,
     call.from,
@@ -297,14 +315,14 @@ export function handleWithdraw2(call: Withdraw2Call): void {
 
 export function handleWithdrawVault(call: WithdrawVaultCall): void {
   const context = dataSource.context();
-  const poolAddress = context.getString("poolAddress");
+  const poolID = context.getString("poolID");
   const chainID = BigInt.fromString(context.getString("chainID"));
 
   updateUsageMetrics(EventType.WITHDRAW, chainID, call.block, call.transaction);
 
   createLiquidityWithdrawEvent(
-    poolAddress,
-    Address.fromString(poolAddress),
+    poolID,
+    Address.fromString(poolID),
     chainID,
     call.inputs.from,
     call.inputs.to,
