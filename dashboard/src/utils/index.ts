@@ -14,14 +14,20 @@ export const tableCellTruncate: any = {
 };
 
 export const schemaMapping: { [x: string]: any } = {
+  "exchanges": "exchanges",
+  "vaults": "vaults",
   "dex-amm": "exchanges",
   "yield-aggregator": "vaults",
   "lending": "lending",
   "generic": "generic",
-  "EXCHANGE": "exchanges",
+  "EXCHANGES": "exchanges",
+  "VAULTS": "vaults",
+  "DEX-AMM": "exchanges",
+  "YIELD-AGGREGATOR": "vaults",
   "LENDING": "lending",
+  "GENERIC": "generic",
+  "EXCHANGE": "exchanges",
   "YIELD": "vaults",
-  "GENERIC": "generic"
 }
 
 export function toDate(timestamp: number, hour: boolean = false) {
@@ -113,43 +119,115 @@ export function formatIntToFixed2(val: number): string {
   return returnStr;
 };
 
-export function csvToJSONConvertor(csv: string) {
-  const lines = csv.split("\n");
-  const result = [];
-  const headers = lines[0].split(",");
-
-  for (let i = 1; i < lines.length; i++) {
+export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
+  const invalidColumns = [".", "..", "...", ",", "-", "_", " ", '"', "'"];
+  try {
+    if (!(headers.length >= 2) || (!headers.map(x => x?.toLowerCase()).includes('date') && !headers.map(x => x?.toLowerCase()).includes('time'))) {
+      throw new Error('Wrong CSV data format. The CSV must have multiple columns, one must be a "date" column.');
+    }
     const obj: any = {};
-    const currentline = lines[i].split(",");
-    for (let j = 0; j < headers.length; j++) {
-      let entry: any = currentline[j];
-      let header = headers[j].toLowerCase();
-      if (header !== 'date') {
-        header = 'value';
-      }
-      if (entry) {
-        if (entry.includes("'")) {
-          entry = entry.split("'").join("");
+    for (let i = 1; i < lines.length; i++) {
+      const currentline = lines[i].split(",");
+      for (let j = 0; j < headers.length; j++) {
+        let entry: any = currentline[j];
+        let header = headers[j].toLowerCase();
+        if (!invalidColumns.includes(header)) {
+          if (header === "time") {
+            header = "date";
+          }
+          header = header.split("  ").join(" ");
+          if (entry) {
+            if (!obj[header]) {
+              obj[header] = [];
+            }
+            if (entry.includes("'")) {
+              entry = entry.split("'").join("");
+            }
+            if (entry.includes('"')) {
+              entry = entry.split('"').join("");
+            }
+            if (header === 'date' && isNaN(entry)) {
+              entry = moment(entry).unix();
+            }
+            if (!isNaN(Number(entry))) {
+              entry = Number(entry);
+            }
+            obj[header].push(entry);
+          }
         }
-        if (entry.includes('"')) {
-          entry = entry.split('"').join("");
-        }
-        if (header === 'date' && isNaN(entry)) {
-          entry = moment(entry).unix();
-        }
-        if (!isNaN(Number(entry))) {
-          entry = Number(entry);
-        }
-        obj[header] = entry;
       }
     }
-    result.push(obj);
+    return (obj);
+  } catch (err: any) {
+    console.error(err.message);
+    return err;
   }
-
-  return (result);
 }
 
-export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
+export function csvToJSONConvertorTwoCol(lines: string[], headers: string[]) {
+  const result = [];
+  try {
+    if (headers.length !== 2 || !headers.map(x => x?.toLowerCase()).includes('date')) {
+      throw new Error('Wrong CSV data format. The CSV must have two columns, one must be a "date" column.');
+    }
+    for (let i = 1; i < lines.length; i++) {
+      const obj: any = {};
+      const currentline = lines[i].split(",");
+      for (let j = 0; j < headers.length; j++) {
+        let entry: any = currentline[j];
+        let header = headers[j].toLowerCase();
+        if (header !== 'date') {
+          header = 'value';
+        }
+        if (entry) {
+          if (entry.includes("'")) {
+            entry = entry.split("'").join("");
+          }
+          if (entry.includes('"')) {
+            entry = entry.split('"').join("");
+          }
+          if (header === 'date' && isNaN(entry)) {
+            entry = moment(entry).unix();
+          }
+          if (!isNaN(Number(entry))) {
+            entry = Number(entry);
+          }
+          obj[header] = entry;
+        }
+      }
+      if (Object.keys(obj)?.length === 2) {
+        result.push(obj);
+      }
+    }
+    return (result);
+  } catch (err: any) {
+    console.error(err.message);
+    return err;
+  }
+}
+
+export function csvToJSONConvertor(csv: string, isEntityLevel: boolean) {
+  try {
+    const lines = csv.split("\n");
+    const headers = lines[0].split(",").map(x => x?.includes('\r') ? x.split('\r').join("") : x);
+    let result: any = null
+    if (headers.length === 2 && !isEntityLevel) {
+      result = csvToJSONConvertorTwoCol(lines, headers);
+    }
+    if (headers.length > 2 || (headers.length === 2 && isEntityLevel)) {
+      result = csvToJSONConvertorMultiCol(lines, headers);
+    }
+    if (result instanceof Error) {
+      throw result;
+    }
+    return (result);
+  } catch (err: any) {
+    console.error(err.message);
+    return new Error("csvToJSONConvertor encountered an JS error while processing: " + err?.message + ".");
+  }
+}
+
+export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string, generateCsvUrl: boolean = true) {
   try {
     const arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
     let CSV = '';
@@ -179,7 +257,11 @@ export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel
     const blob = new Blob([csv], { type: 'text/csv' });
     const csvUrl = window.webkitURL.createObjectURL(blob);
     const filename = (ReportTitle || 'UserExport') + '.csv';
-    return { csvUrl, filename };
+    if (generateCsvUrl) {
+      return { csvUrl, filename };
+    } else {
+      return { blob, filename }
+    }
   } catch (err: any) {
     console.error(err.message);
     return { csvURL: "", filename: "" };
@@ -227,27 +309,38 @@ export function base64toBlobJPEG(dataURI: string) {
   }
 }
 
-export function lineupChartDatapoints(compChart: any, stitchLeftIndex: number, timeKey: string = 'date') {
-  const key1 = Object.keys(compChart)[0];
-  const key2 = Object.keys(compChart)[1];
-  while (toDate(compChart[key1][stitchLeftIndex][timeKey]) !== toDate(compChart[key2][stitchLeftIndex][timeKey])) {
-    if (compChart[key1][stitchLeftIndex][timeKey] < compChart[key2][stitchLeftIndex][timeKey]) {
-      const startIndex = compChart[key1].findIndex((x: any) => x[timeKey] >= compChart[key2][stitchLeftIndex][timeKey]);
-      let newArray = [...compChart[key1].slice(startIndex)];
-      if (stitchLeftIndex > 0) {
-        newArray = [...compChart[key1].slice(0, stitchLeftIndex), ...compChart[key1].slice(startIndex, compChart[key1].length)];
-      }
-      compChart[key1] = newArray;
-    } else {
-      const startIndex = compChart[key2].findIndex((x: any) => x[timeKey] >= compChart[key1][stitchLeftIndex][timeKey]);
-      let newArray = [...compChart[key2].slice(startIndex)];
-      if (stitchLeftIndex > 0) {
-        newArray = [...compChart[key2].slice(0, stitchLeftIndex), ...compChart[key2].slice(startIndex, compChart[key2].length)];
-      }
-      compChart[key2] = newArray;
+export function lineupChartDatapoints(compChart: any) {
+  try {
+    const key1 = Object.keys(compChart)[0];
+    const key2 = Object.keys(compChart)[1];
+
+    let arr1 = compChart[key1].sort((a: any, b: any) => a.date - b.date);
+    let arr2 = compChart[key2].sort((a: any, b: any) => a.date - b.date);
+
+    const arr1StartDate = arr1[0]?.date;
+    const arr2StartDate = arr2[0]?.date;
+
+    if (!arr1StartDate) {
+      throw new Error(`lineupChartDatapoints() error: compChart input key ${key1} was not an array holding objects with valid date properties holding timestamp values.`);
     }
+    if (!arr2StartDate) {
+      throw new Error(`lineupChartDatapoints() error: compChart input key ${key2} was not an array holding objects with valid date properties holding timestamp values.`);
+    }
+
+    if (arr1StartDate > arr2StartDate) {
+      const arr2Index = arr2.findIndex((x: any) => x.date >= arr1StartDate - 86400);
+      arr2 = arr2.slice(arr2Index);
+    } else if (arr1StartDate < arr2StartDate) {
+      const arr1Index = arr1.findIndex((x: any) => x.date >= arr2StartDate - 86400);
+      arr1 = arr1.slice(arr1Index);
+    }
+
+    const matchedStartDatesCompChart = { [key1]: arr1, [key2]: arr2 };
+    return matchedStartDatesCompChart;
+  } catch (err: any) {
+    console.error(err.message);
+    return err;
   }
-  return compChart;
 }
 
 export function upperCaseFirstOfString(str: string) {

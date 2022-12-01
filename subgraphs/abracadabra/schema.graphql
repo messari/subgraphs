@@ -1,6 +1,6 @@
 # Subgraph Schema: Lending Protocol
 # Version: 2.0.1
-# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
   ARBITRUM_ONE

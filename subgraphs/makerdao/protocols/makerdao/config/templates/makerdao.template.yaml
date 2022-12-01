@@ -1,11 +1,14 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
 features:
   - grafting
 graft:
-  base: QmZAk62SejB8wvJ5b23ZzFBu594NAmDfPiWFLh4RaFUxpk
-  block: 15675181  
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   # Vault
   - name: Vat
@@ -42,29 +45,20 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x6924500900000000000000000000000000000000000000000000000000000000"
           handler: handleVatCage
-        # function slip( bytes32 ilk, address usr, int256 wad)
-        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
-          topic0: "0x7cdd3fde00000000000000000000000000000000000000000000000000000000"
-          handler: handleVatSlip
         ### CDP Manipulation ###
         # function frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x7608870300000000000000000000000000000000000000000000000000000000"
           handler: handleVatFrob
+        # function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x870c616d00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatFork
         ### Collect stability fee ###
         # function fold(bytes32 i, address u, int256 rate)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0xb65337df00000000000000000000000000000000000000000000000000000000"
           handler: handleVatFold
-        ## bad debt settlement/issue
-        # function heal(uint256 rad)
-        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
-          topic0: "0xf37ac61c00000000000000000000000000000000000000000000000000000000"
-          handler: handleVatDebtSettlement
-        # function suck(address u, address v, uint256 rad)
-        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
-          topic0: "0xf24e23eb00000000000000000000000000000000000000000000000000000000"
-          handler: handleVatDebtSettlement
 
   # Borrow rate
   - name: Jug
@@ -82,6 +76,8 @@ dataSources:
       abis:
         - name: Jug
           file: ./abis/Jug.json
+        - name: DAI
+          file: ./abis/DAI.json          
       entities:
         - Market
       eventHandlers:
@@ -143,6 +139,8 @@ dataSources:
       abis:
         - name: Spot
           file: ./abis/Spot.json
+        - name: DAI
+          file: ./abis/DAI.json          
       entities:
         - _Ilk
         - LendingProtocol
@@ -267,11 +265,31 @@ dataSources:
       abis:
         - name: CdpManager
           file: ./abis/DssCdpManager.json
+        - name: DAI
+          file: ./abis/DAI.json          
       entities:
         - _Proxy
       eventHandlers:
         - event: NewCdp(indexed address,indexed address,indexed uint256)
           handler: handleNewCdp
+        # Give cdp to a new address
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0xfcafcc6800000000000000000000000000000000000000000000000000000000"
+          handler: handleCdpGive
+        # Move a position from cdpSrc urn to the cdpDst urn
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0xe50322a200000000000000000000000000000000000000000000000000000000"
+          handler: handleCdpShift
+        # Import a position from src urn to the urn owned by cdp
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x7e348b7d00000000000000000000000000000000000000000000000000000000"
+          handler: handleCdpEnter
+        # Quit the Cdp system, migrating the cdp (ink, art) to a dst urn
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x1b0dbf7200000000000000000000000000000000000000000000000000000000"
+          handler: handleCdpQuit
+        # Transfer cdp collateral from the cdp address to a dst address
+
 
   # User may interact w/ maker contracts via a DSProxy contract
   - name: DSProxyFactory
@@ -280,7 +298,7 @@ dataSources:
     source:
       abi: DSProxyFactory
       address: "0xA26e15C895EFc0616177B7c1e7270A4C7D51C997"
-      startBlock: 8928152
+      startBlock: 5834580
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -289,6 +307,8 @@ dataSources:
       abis:
         - name: DSProxyFactory
           file: ./abis/DSProxyFactory.json
+        - name: DAI
+          file: ./abis/DAI.json          
       entities:
         - _Proxy
       eventHandlers:

@@ -97,8 +97,8 @@ import {
 const constant = getNetworkSpecificConstant();
 const comptrollerAddr = constant.comptrollerAddr;
 const network = constant.network;
-const unitPerDay = new BigDecimal(BigInt.fromI32(constant.unitPerDay));
-const unitPerYear = constant.unitPerYear;
+const blocksPerDay = new BigDecimal(BigInt.fromI32(constant.blocksPerDay));
+const blocksPerYear = constant.blocksPerYear;
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
@@ -421,7 +421,7 @@ export function handleUpdateInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    unitPerYear
+    blocksPerYear
   );
 
   _handleAccrueInterest(
@@ -531,6 +531,7 @@ export function handleRewardDistributed(event: RewardDistributed): void {
     ]);
     return;
   }
+
   const decimals = rewardToken.decimals;
   let rewardTokenPrice = rewardToken.lastPriceUSD;
   if (!rewardTokenPrice) {
@@ -544,6 +545,7 @@ export function handleRewardDistributed(event: RewardDistributed): void {
       .div(exponentToBigDecimal(PRICE_BASE));
   }
 
+  // initialized rewardTokenEmissionsAmount and rewardTokenEmissionsUSD
   let rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   rewardTokenEmissionsAmount =
     rewardTokenEmissionsAmount != null
@@ -570,15 +572,13 @@ export function handleRewardDistributed(event: RewardDistributed): void {
     distributorContract.try_distributionSupplySpeed(marketAddr),
     BIGINT_ZERO
   );
-
-  const emissionBorrow = emissionSpeedBorrow.toBigDecimal().times(unitPerDay);
+  const emissionBorrow = emissionSpeedBorrow.toBigDecimal().times(blocksPerDay);
   rewardTokenEmissionsAmount[0] = BigDecimalTruncateToBigInt(emissionBorrow);
   rewardTokenEmissionsUSD[0] = emissionBorrow
     .div(exponentToBigDecimal(decimals))
     .times(distributionFactor)
     .times(rewardTokenPrice);
-
-  const emissionSupply = emissionSpeedSupply.toBigDecimal().times(unitPerDay);
+  const emissionSupply = emissionSpeedSupply.toBigDecimal().times(blocksPerDay);
   rewardTokenEmissionsAmount[1] = BigDecimalTruncateToBigInt(emissionSupply);
   rewardTokenEmissionsUSD[1] = emissionSupply
     .div(exponentToBigDecimal(decimals))

@@ -143,7 +143,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
       Address.fromString(contractAddress)
     );
 
-    governanceFramework.name = contract.name();
+    governanceFramework.name = "idle-governance";
     governanceFramework.type = GovernanceFrameworkType.GOVERNOR_BRAVO;
     governanceFramework.version = NA;
 

@@ -1,0 +1,7 @@
+{
+  "network": "optimism",
+  "factoryAddress": "0xE0B57FEEd45e7D908f2d0DaCd26F113Cf26715BF",
+  "startBlock": 12658427,
+  "rewardsFactoryAddress": "0x35F70CE60f049A8c21721C53a1dFCcB5bF4a1Ea8",
+  "rewardStartBlock": 12661952
+}

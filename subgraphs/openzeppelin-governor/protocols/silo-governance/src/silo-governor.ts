@@ -35,7 +35,7 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
-  let quorumVotes = getQuorumFromContract(
+  const quorumVotes = getQuorumFromContract(
     event.address,
     event.block.number.minus(BIGINT_ONE)
   );
@@ -69,7 +69,9 @@ export function handleProposalQueued(event: ProposalQueued): void {
 }
 
 export function handleProposalThresholdSet(event: ProposalThresholdSet): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
   governanceFramework.proposalThreshold = event.params.newProposalThreshold;
   governanceFramework.save();
 }
@@ -78,14 +80,18 @@ export function handleProposalThresholdSet(event: ProposalThresholdSet): void {
 export function handleQuorumNumeratorUpdated(
   event: QuorumNumeratorUpdated
 ): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
   governanceFramework.quorumNumerator = event.params.newQuorumNumerator;
   governanceFramework.save();
 }
 
 // TimelockChange (address oldTimelock, address newTimelock)
 export function handleTimelockChange(event: TimelockChange): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
   governanceFramework.timelockAddress = event.params.newTimelock.toHexString();
   governanceFramework.save();
 }
@@ -94,7 +100,7 @@ function getLatestProposalValues(
   proposalId: string,
   contractAddress: Address
 ): Proposal {
-  let proposal = getProposal(proposalId);
+  const proposal = getProposal(proposalId);
 
   // On first vote, set state and quorum values
   if (proposal.state == ProposalState.PENDING) {
@@ -104,7 +110,7 @@ function getLatestProposalValues(
       proposal.startBlock
     );
 
-    let governance = getGovernance();
+    const governance = getGovernance();
     proposal.tokenHoldersAtStart = governance.currentTokenHolders;
     proposal.delegatesAtStart = governance.currentDelegates;
   }
@@ -113,7 +119,7 @@ function getLatestProposalValues(
 
 // VoteCast(account, proposalId, support, weight, reason);
 export function handleVoteCast(event: VoteCast): void {
-  let proposal = getLatestProposalValues(
+  const proposal = getLatestProposalValues(
     event.params.proposalId.toString(),
     event.address
   );
@@ -129,13 +135,17 @@ export function handleVoteCast(event: VoteCast): void {
 }
 
 export function handleVotingDelaySet(event: VotingDelaySet): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
   governanceFramework.votingDelay = event.params.newVotingDelay;
   governanceFramework.save();
 }
 
 export function handleVotingPeriodSet(event: VotingPeriodSet): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
   governanceFramework.votingPeriod = event.params.newVotingPeriod;
   governanceFramework.save();
 }
@@ -146,9 +156,9 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
-    let contract = SiloGovernor.bind(Address.fromString(contractAddress));
+    const contract = SiloGovernor.bind(Address.fromString(contractAddress));
 
-    governanceFramework.name = contract.name();
+    governanceFramework.name = "silo-governance";
     governanceFramework.type = GovernanceFrameworkType.OPENZEPPELIN_GOVERNOR;
     governanceFramework.version = contract.version();
 
@@ -170,10 +180,10 @@ function getQuorumFromContract(
   contractAddress: Address,
   blockNumber: BigInt
 ): BigInt {
-  let contract = SiloGovernor.bind(contractAddress);
-  let quorumVotes = contract.quorum(blockNumber);
+  const contract = SiloGovernor.bind(contractAddress);
+  const quorumVotes = contract.quorum(blockNumber);
 
-  let governanceFramework = getGovernanceFramework(
+  const governanceFramework = getGovernanceFramework(
     contractAddress.toHexString()
   );
   governanceFramework.quorumVotes = quorumVotes;
