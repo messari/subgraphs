@@ -11,7 +11,7 @@ const DashboardTag = styled("div")`
   z-index: 2;
 `;
 
-export const dashboardVersion = "v1.8.7";
+export const dashboardVersion = "v1.8.8";
 
 export const DashboardVersion = () => {
   return <DashboardTag>{dashboardVersion}</DashboardTag>;

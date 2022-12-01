@@ -1,5 +1,5 @@
 import https from "https";
-const url = "https://subgraphs.messari.io/deployments.json";
+const url = "subgraphs.xyz/deployments";
 
 https.get(url, (res) => {
     let data = "";

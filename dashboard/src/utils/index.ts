@@ -227,7 +227,7 @@ export function csvToJSONConvertor(csv: string, isEntityLevel: boolean) {
   }
 }
 
-export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string, generateCsvUrl: boolean = true) {
+export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
   try {
     const arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
     let CSV = '';
@@ -254,14 +254,10 @@ export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel
     }
 
     const csv = CSV;
+    const filename = (ReportTitle || 'UserExport') + '.csv';
     const blob = new Blob([csv], { type: 'text/csv' });
     const csvUrl = window.webkitURL.createObjectURL(blob);
-    const filename = (ReportTitle || 'UserExport') + '.csv';
-    if (generateCsvUrl) {
-      return { csvUrl, filename };
-    } else {
-      return { blob, filename }
-    }
+    return { csvUrl, filename };
   } catch (err: any) {
     console.error(err.message);
     return { csvURL: "", filename: "" };
