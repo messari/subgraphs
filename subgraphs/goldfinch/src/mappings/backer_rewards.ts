@@ -9,9 +9,10 @@ import {
 
 import { updateBackerRewardsData } from "../entities/backer_rewards";
 import { calculateApyFromGfiForAllPools } from "../entities/tranched_pool";
-import { getOrCreateMarket, getRewardPrice } from "../common/getters";
+import { getOrCreateMarket, getGFIPrice } from "../common/getters";
 import { bigDecimalToBigInt } from "../common/utils";
 import {
+  BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   GFI_DECIMALS,
   SECONDS_PER_DAY,
@@ -116,10 +117,11 @@ function _handleBackRewardEmission(
     market._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler)
   );
   // Note rewards are recorded when they are claimed
-  const GFIpriceUSD = getRewardPrice(event);
-  const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
-    .divDecimal(GFI_DECIMALS)
-    .times(GFIpriceUSD);
+  const GFIpriceUSD = getGFIPrice(event);
+
+  const rewardTokenEmissionsUSD = !GFIpriceUSD
+    ? BIGDECIMAL_ZERO
+    : rewardTokenEmissionsAmount.divDecimal(GFI_DECIMALS).times(GFIpriceUSD);
   market.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
   market.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
 

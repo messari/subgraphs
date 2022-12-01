@@ -1,4 +1,10 @@
-import { Address, ethereum, BigDecimal, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  ethereum,
+  BigDecimal,
+  log,
+  BigInt,
+} from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/GoldfinchFactory/ERC20";
 import {
   Token,
@@ -40,6 +46,8 @@ import {
   WETH_GFI_UniswapV2_Pair,
   USDC_WETH_UniswapV2_Pair,
   USDC_DECIMALS,
+  WETH_ADDRESS,
+  GFI_DECIMALS,
 } from "./constants";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
 import { UniswapV2Pair } from "../../generated/BackerRewards/UniswapV2Pair";
@@ -592,53 +600,75 @@ export function getNewPosition(
 }
 
 // Goldfinch (GFI) price is generated from WETH-GFI reserve on Uniswap.
-export function getRewardPrice(event: ethereum.Event): BigDecimal {
-  const WETH_GFI_pair = UniswapV2Pair.bind(
-    Address.fromString(WETH_GFI_UniswapV2_Pair)
+export function getGFIPrice(event: ethereum.Event): BigDecimal | null {
+  const GFIPriceInWETH = getToken0PriceInToken1(
+    WETH_GFI_UniswapV2_Pair,
+    GFI_ADDRESS,
+    WETH_ADDRESS
   );
 
-  const reserves1 = WETH_GFI_pair.try_getReserves();
-  if (reserves1.reverted) {
-    log.error("[getRewardPrice] Unable to get price for asset {}", [
-      GFI_ADDRESS,
+  const WETHPriceInUSDC = getToken0PriceInToken1(
+    USDC_WETH_UniswapV2_Pair,
+    WETH_ADDRESS,
+    USDC_ADDRESS
+  );
+
+  if (!GFIPriceInWETH || !WETHPriceInUSDC) {
+    return null;
+  }
+  const GFIPriceInUSD = GFIPriceInWETH.times(WETHPriceInUSDC).times(
+    GFI_DECIMALS.div(USDC_DECIMALS)
+  );
+  log.info("[getGFIPrice]GFI Price USD={} at timestamp {}", [
+    GFIPriceInUSD.toString(),
+    event.block.timestamp.toString(),
+  ]);
+
+  return GFIPriceInUSD;
+}
+
+function getToken0PriceInToken1(
+  pairAddress: string,
+  token0: string,
+  token1: string
+): BigDecimal | null {
+  const pairContract = UniswapV2Pair.bind(Address.fromString(pairAddress));
+  const reserves = pairContract.try_getReserves();
+  if (reserves.reverted) {
+    log.error("[getToken0PriceInToken1]Unable to get reserves for pair {}", [
+      pairAddress,
     ]);
-    return BIGDECIMAL_ZERO;
+    return null;
+  }
+  let token0Amount: BigInt;
+  let token1Amount: BigInt;
+  const pairToken0 = pairContract.token0().toHexString();
+  const pairToken1 = pairContract.token1().toHexString();
+  if (pairToken0 == token0) {
+    if (pairToken1 != token1) {
+      log.error(
+        "[getToken0PriceInToken1]tokens for pair {} = ({}, {}) do not match ({}, {})",
+        [pairAddress, pairToken0, pairToken1, token0, token1]
+      );
+      return null;
+    }
+    token0Amount = reserves.value.value0;
+    token1Amount = reserves.value.value1;
+  } else {
+    if (pairToken0 != token1 || pairToken1 != token0) {
+      log.error(
+        "[getToken0PriceInToken1]tokens for pair {} = ({}, {}) do not match ({}, {})",
+        [pairAddress, pairToken0, pairToken1, token1, token0]
+      );
+      return null;
+    }
+    token0Amount = reserves.value.value1;
+    token1Amount = reserves.value.value0;
   }
 
-  const reserve1WETH = reserves1.value.value0;
-  const reserve1GFI = reserves1.value.value1;
-  const GFIpriceInWETH = reserve1WETH
-    .toBigDecimal()
-    .div(reserve1GFI.toBigDecimal());
-
-  // get WETH price in USDC from Uniswap pair contract.
-  const USDC_WETH_pair = UniswapV2Pair.bind(
-    Address.fromString(USDC_WETH_UniswapV2_Pair)
+  const token0PriceInToken1 = token1Amount.divDecimal(
+    token0Amount.toBigDecimal()
   );
 
-  const reserves2 = USDC_WETH_pair.try_getReserves();
-  if (reserves2.reverted) {
-    log.error("[getRewardPrice] Unable to get price for asset {}", [
-      GFI_ADDRESS,
-    ]);
-    return BIGDECIMAL_ZERO;
-  }
-  const reserve2USDC = reserves2.value.value0;
-  const reserve2WETH = reserves2.value.value1;
-  const WETHpriceInUSDC = reserve2WETH
-    .toBigDecimal()
-    .div(reserve2USDC.toBigDecimal());
-
-  const GFIpriceUSD = GFIpriceInWETH.times(WETHpriceInUSDC).div(USDC_DECIMALS);
-
-  log.info(
-    "[getRewardPrice]GFI price={} at block #{} from inputs: GFIpriceInWETH={}, WETHpriceInUSDC={}",
-    [
-      GFIpriceUSD.toString(),
-      event.block.number.toString(),
-      GFIpriceInWETH.toString(),
-      WETHpriceInUSDC.toString(),
-    ]
-  );
-  return GFIpriceUSD;
+  return token0PriceInToken1;
 }

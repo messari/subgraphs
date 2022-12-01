@@ -14,12 +14,13 @@ import {
   RewardPaid,
 } from "../../generated/StakingRewards/StakingRewards";
 import {
+  BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   GFI_DECIMALS,
   SECONDS_PER_DAY,
   SENIOR_POOL_ADDRESS,
 } from "../common/constants";
-import { getOrCreateMarket, getRewardPrice } from "../common/getters";
+import { getOrCreateMarket, getGFIPrice } from "../common/getters";
 import { bigDecimalToBigInt } from "../common/utils";
 
 import { createTransactionFromEvent } from "../entities/helpers";
@@ -231,10 +232,10 @@ export function handleRewardPaid(event: RewardPaid): void {
     seniorPool._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler)
   );
   // Note rewards are recorded when they are claimed
-  const GFIpriceUSD = getRewardPrice(event);
-  const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
-    .divDecimal(GFI_DECIMALS)
-    .times(GFIpriceUSD);
+  const GFIpriceUSD = getGFIPrice(event);
+  const rewardTokenEmissionsUSD = !GFIpriceUSD
+    ? BIGDECIMAL_ZERO
+    : rewardTokenEmissionsAmount.divDecimal(GFI_DECIMALS).times(GFIpriceUSD);
   seniorPool.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
   seniorPool.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
 
