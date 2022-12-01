@@ -367,7 +367,6 @@ export function handleStake(event: Stake): void {
         const stakedAmount = mrkt._stakedAmount;
         if (stakedAmount.gt(BIGINT_ZERO)) {
           updateWeightedStakeAmount(mrkt, epochStartBlock);
-          mrkt._stakeLastUpdateBlock = epochStartBlock;
         }
         marketStakeAmounts.push(mrkt._weightedStakedAmount ? mrkt._weightedStakedAmount! : BIGINT_ZERO);
         if (mrkt.totalBorrowBalanceUSD.gt(BIGDECIMAL_ZERO)) {
@@ -428,6 +427,5 @@ export function handleStake(event: Stake): void {
 
   updateWeightedStakeAmount(market, event.block.number);
   market._stakedAmount = market._stakedAmount.plus(deltaStakedAmount);
-  market._stakeLastUpdateBlock = event.block.number;
   market.save();
 }

@@ -668,22 +668,22 @@ function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
   return null;
 }
 
-export function updateWeightedBorrow(mrkt: Market, epoch: _Epoch, endBlock: BigInt): void {
+export function updateWeightedBorrow(market: Market, epoch: _Epoch, endBlock: BigInt): void {
   // update total borrow balance USD weighted by blocks lapsed
-  const mktReceivingRewards = mrkt._receivingRewards;
-  log.debug("[updateWeightedBorrow]mrkt {} _receivingRewards={}", [mrkt.id, mktReceivingRewards.toString()]);
-  if (mrkt._receivingRewards) {
-    if (!mrkt._borrowLastUpdateBlock) {
+  const mktReceivingRewards = market._receivingRewards;
+  log.debug("[updateWeightedBorrow]mrkt {} _receivingRewards={}", [market.id, mktReceivingRewards.toString()]);
+  if (market._receivingRewards) {
+    if (!market._borrowLastUpdateBlock) {
       const epochStartBlock = getStartBlockForEpoch(epoch.epoch)!;
-      mrkt._borrowLastUpdateBlock = epochStartBlock;
-      mrkt._weightedTotalBorrowUSD = BIGDECIMAL_ZERO;
+      market._borrowLastUpdateBlock = epochStartBlock;
+      market._weightedTotalBorrowUSD = BIGDECIMAL_ZERO;
     }
 
-    const blocksLapsed = endBlock.minus(mrkt._borrowLastUpdateBlock!);
-    const addWeightedTotalBorrowUSD = mrkt.totalBorrowBalanceUSD.times(blocksLapsed.toBigDecimal());
-    mrkt._weightedTotalBorrowUSD = mrkt._weightedTotalBorrowUSD!.plus(addWeightedTotalBorrowUSD);
-    mrkt._borrowLastUpdateBlock = endBlock;
-    mrkt.save();
+    const blocksLapsed = endBlock.minus(market._borrowLastUpdateBlock!);
+    const addWeightedTotalBorrowUSD = market.totalBorrowBalanceUSD.times(blocksLapsed.toBigDecimal());
+    market._weightedTotalBorrowUSD = market._weightedTotalBorrowUSD!.plus(addWeightedTotalBorrowUSD);
+    market._borrowLastUpdateBlock = endBlock;
+    market.save();
   }
 }
 
@@ -691,5 +691,6 @@ export function updateWeightedStakeAmount(market: Market, endBlock: BigInt): voi
   const blocksLapsed = endBlock.minus(market._stakeLastUpdateBlock!);
   const _weightedStakedAmount = market._weightedStakedAmount!.plus(market._stakedAmount.times(blocksLapsed));
   market._weightedStakedAmount = _weightedStakedAmount;
+  market._stakeLastUpdateBlock = endBlock;
   market.save();
 }
