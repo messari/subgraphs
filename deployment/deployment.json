@@ -4200,10 +4200,6 @@
           "hosted-service": {
             "slug": "yearn-v2-arbitrum",
             "query-id": "yearn-v2-arbitrum"
-          },
-          "decentralized-network": {
-            "slug": "yearn-v2-arbitrum",
-            "query-id": "3CDiQ2hSrftreri8FLqsVAVTv9QNkEBszGZiDdmL4UQJ"
           }
         }
       },
@@ -4226,6 +4222,10 @@
           "hosted-service": {
             "slug": "yearn-v2-ethereum",
             "query-id": "yearn-v2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "yearn-v2-ethereum",
+            "query-id": "3CDiQ2hSrftreri8FLqsVAVTv9QNkEBszGZiDdmL4UQJ"
           }
         }
       },
