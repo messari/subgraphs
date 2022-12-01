@@ -11,7 +11,7 @@ Main PR: [#1265](https://github.com/messari/subgraphs/pull/1265)
 - Used immutable entities where possible for performance (see [here](https://medium.com/edge-node-engineering/two-simple-subgraph-performance-improvements-a76c6b3e7eac)).
 - Used `Bytes!` for entity IDs when possible.
 - Designate difference and balances of variable vs stable borrows.
-- Created a more generic type `TokenData` to support the multiple input / output tokens per market.
+- Created a field `market.relation` to relate multiple markets to each other. This is useful for markets with multiple tokens.
 - Added more nuance to the market fields.
 - Added native balance daily metrics.
 - Added a new entity to track revenue coming from different sources `RevenueDetails`.
