@@ -222,6 +222,8 @@ type Vote @entity(immutable: true) {
   txnHash: String!
   "Log index for the event"
   logIndex: BigInt!
+  "Unique ID based on the blockTime and logIndex"
+  blockTimeId: String!
 }
 
 enum VoteChoice {

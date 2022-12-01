@@ -6,9 +6,6 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export const PROTOCOL_NAME = "Yeti Finance";
 export const PROTOCOL_SLUG = "yeti-finance";
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.2";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.1";
 
 ////////////////////////
 ///// Schema Enums /////

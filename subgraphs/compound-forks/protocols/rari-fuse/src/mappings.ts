@@ -45,12 +45,9 @@ import {
   FMIM_ADDRESS,
   getNetworkSpecificConstant,
   GOHM_ADDRESS,
-  METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  SCHEMA_VERSION,
   SOHM_ADDRESS,
-  SUBGRAPH_VERSION,
   VESPER_V_DOLLAR_ADDRESS,
   ZERO_ADDRESS,
 } from "./constants";
@@ -151,9 +148,6 @@ export function handlePoolRegistered(event: PoolRegistered): void {
     Address.fromString(FACTORY_CONTRACT),
     PROTOCOL_NAME,
     PROTOCOL_SLUG,
-    SCHEMA_VERSION,
-    SUBGRAPH_VERSION,
-    METHODOLOGY_VERSION,
     PROTOCOL_NETWORK,
     troller.try_liquidationIncentiveMantissa(),
     troller.try_oracle()

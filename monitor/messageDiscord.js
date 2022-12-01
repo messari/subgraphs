@@ -28,6 +28,9 @@ export async function errorNotification(error, channelId = process.env.CHANNEL_I
 export async function getDiscordMessages(messages, channelId = process.env.CHANNEL_ID) {
     try {
         const tempMessages = await fetchMessages(messages[messages.length - 1]?.id || "", channelId);
+        if (!tempMessages) {
+            return [];
+        }
         messages = [...messages, ...tempMessages];
         if (messages.length % 100 === 0 && messages.length !== 0 && tempMessages.length !== 0) {
             await sleep(1000);
@@ -55,6 +58,7 @@ export async function fetchMessages(before, channelId = process.env.CHANNEL_ID) 
         return data.data;
     } catch (err) {
         errorNotification("ERROR LOCATION 8 " + err?.message + ' URL: ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
+        return [];
     }
 }
 
@@ -353,7 +357,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                         errorsOnDeployment = true;
                     }
                     errorArray.forEach((error) => {
-                        protocolRows.push({ name: 'Field', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`${ProtocolTypeEntityName[depo.protocolType]}`), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
+                        protocolRows.push({ name: 'Field', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`${ProtocolTypeEntityName[depo.protocolType]}`).split('Value').join(error), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
                     });
                 }
                 protocolErrorEmbed.fields = [...protocolErrorEmbed.fields, ...protocolRows];
@@ -361,7 +365,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             if (protocolErrorEmbed.fields.length > 1) {
                 protocolErrorEmbed.url = `https://subgraphs.messari.io/subgraph?endpoint=${depo.url}&tab=protocol`;
                 embedObjects.push(protocolErrorEmbed);
-                if (deploymentsOnProtocol[0]?.status === 'prod') {
+                if (depo?.status === 'prod') {
                     aggThreadProtocolErrorEmbeds.push(protocolErrorEmbed);
                 }
             }
@@ -402,15 +406,14 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
 }
 
 let aggThreadMsgObjects = [];
-export async function sendMessageToAggThread(aggThreadId, channelId = process.env.CHANNEL_ID) {
-    if (aggThreadMsgObjects.length === 0 || !aggThreadId) {
+export async function sendMessageToAggThread() {
+    if (aggThreadMsgObjects.length === 0) {
         return;
     }
-
     const aggThreadQueriesToResolve = [];
     const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
-    const currentThreadMessages = await fetchMessages("", aggThreadId);
-    const baseURL = "https://discordapp.com/api/channels/" + aggThreadId + "/messages";
+    const currentThreadMessages = await fetchMessages("", process.env.PROD_CHANNEL);
+    const baseURL = "https://discordapp.com/api/channels/" + process.env.PROD_CHANNEL + "/messages";
     const headers = {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",

@@ -51,6 +51,7 @@ import {
 } from "./constants";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 import { CToken } from "../generated/templates/CToken/CToken";
+import { Versions } from "./versions";
 
 enum EventType {
   Deposit,
@@ -70,9 +71,6 @@ export class ProtocolData {
     public readonly comptrollerAddr: Address,
     public readonly name: string,
     public readonly slug: string,
-    public readonly schemaVersion: string,
-    public readonly subgraphVersion: string,
-    public readonly methodologyVersion: string,
     public readonly network: string,
     public readonly liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>,
     public readonly oracleResult: ethereum.CallResult<Address>
@@ -1834,9 +1832,6 @@ export function _getOrCreateProtocol(
     protocol = new LendingProtocol(protocolData.comptrollerAddr.toHexString());
     protocol.name = protocolData.name;
     protocol.slug = protocolData.slug;
-    protocol.schemaVersion = protocolData.schemaVersion;
-    protocol.subgraphVersion = protocolData.subgraphVersion;
-    protocol.methodologyVersion = protocolData.methodologyVersion;
     protocol.network = protocolData.network;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.POOLED;
@@ -1883,8 +1878,14 @@ export function _getOrCreateProtocol(
     } else {
       protocol._priceOracle = protocolData.oracleResult.value.toHexString();
     }
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 

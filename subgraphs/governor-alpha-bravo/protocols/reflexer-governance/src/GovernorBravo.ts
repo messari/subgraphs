@@ -22,6 +22,7 @@ import { GovernorBravo } from "../../../generated/GovernorBravo/GovernorBravo";
 import { GovernanceFramework, Proposal } from "../../../generated/schema";
 import {
   BIGINT_ONE,
+  BIGINT_ZERO,
   GovernanceFrameworkType,
   NA,
   ProposalState,
@@ -36,6 +37,14 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 export function handleProposalCreated(event: ProposalCreated): void {
   const quorumVotes = getQuorumFromContract(event.address);
 
+  // HACK: Reflexer is setting undefined for values and signatures instead of correct values
+  // this results in diff array lengths so we have to add dummy values
+  const values: BigInt[] = [];
+  const signatures: string[] = [];
+  for (let i = 0; i < event.params.targets.length; i++) {
+    values[i] = BIGINT_ZERO;
+    signatures[i] = "";
+  }
   // FIXME: Prefer to use a single object arg for params
   // e.g.  { proposalId: event.params.proposalId, proposer: event.params.proposer, ...}
   // but graph wasm compilation breaks for unknown reasons
@@ -43,8 +52,8 @@ export function handleProposalCreated(event: ProposalCreated): void {
     event.params.id.toString(),
     event.params.proposer.toHexString(),
     event.params.targets,
-    event.params.values,
-    event.params.signatures,
+    values,
+    signatures,
     event.params.calldatas,
     event.params.startBlock,
     event.params.endBlock,

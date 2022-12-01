@@ -60,6 +60,7 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
         "cdp": "CDP",
         "lending": "Lending",
         "dexes": "Exchanges",
+        "bridge": "Bridges",
         "nft lending": "NFT Lending",
         "nft marketplace": "NFT Marketplace",
     }
@@ -85,27 +86,32 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
 
     // Filter defi llama protocols for supported chains, supported schema types, and protocols already accounted for
     const protocolsToDevelop = defiLlamaProtocols.filter((x: any, idx: number) => {
-        let onSupportedChain = false;
-        x.chains.forEach((chain: any) => {
-            if (!!Object.keys(NetworkLogos).includes(chain.toLowerCase())) {
-                onSupportedChain = true;
+        try {
+            let onSupportedChain = false;
+            x.chains.forEach((chain: any) => {
+                if (!!Object.keys(NetworkLogos).includes(chain.toLowerCase())) {
+                    onSupportedChain = true;
+                }
+            });
+            const supportedCategory = Object.keys(categoryTypesSupported).includes(x?.category?.toLowerCase());
+            let slugNotUsed = false;
+            if (!protocolSlugs.includes(x.slug) && !protocolSlugs.includes(x.slug.split('-')[0]) && !protocolSlugs.includes(x.slug + '-finance') && !protocolSlugs.includes(x.slug + '-protocol')) {
+                slugNotUsed = true;
             }
-        })
-        const supportedCategory = Object.keys(categoryTypesSupported).includes(x?.category?.toLowerCase());
-        let slugNotUsed = false;
-        if (!protocolSlugs.includes(x.slug) && !protocolSlugs.includes(x.slug.split('-')[0]) && !protocolSlugs.includes(x.slug + '-finance') && !protocolSlugs.includes(x.slug + '-protocol')) {
-            slugNotUsed = true;
-        }
 
-        let isCurrentProtocolType = categoryTypesSupported[x?.category?.toLowerCase()] === currentProtocolType;
-        if (currentProtocolType === "" || currentProtocolType === "All Protocol Types") {
-            isCurrentProtocolType = true;
-        }
-        if (!protocolTypeList.includes(x?.category?.toLowerCase()) && supportedCategory) {
-            protocolTypeList.push(x?.category?.toLowerCase());
-        }
+            let isCurrentProtocolType = categoryTypesSupported[x?.category?.toLowerCase()] === currentProtocolType;
+            if (currentProtocolType === "" || currentProtocolType === "All Protocol Types") {
+                isCurrentProtocolType = true;
+            }
+            if (!protocolTypeList.includes(x?.category?.toLowerCase()) && supportedCategory) {
+                protocolTypeList.push(x?.category?.toLowerCase());
+            }
 
-        return slugNotUsed && onSupportedChain && supportedCategory && isCurrentProtocolType;
+            return slugNotUsed && onSupportedChain && supportedCategory && isCurrentProtocolType;
+        } catch (err: any) {
+            console.error(err.message)
+            return false;
+        }
     }).sort((a, b) => {
         let aAddedTVL = 0;
         Object.keys(a.chainTvls).forEach(x => {
@@ -171,8 +177,8 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
                         maxWidth = "300px";
                     }
                     return (
-                        <TableCell sx={{ paddingLeft, minWidth, maxWidth }} key={"column" + x}>
-                            <Typography variant="h5" fontSize={14} fontWeight={500} sx={{ margin: "0", width: "100%", textAlign }}>
+                        <TableCell sx={{ paddingLeft, minWidth, maxWidth, paddingRight: 0 }} key={"column" + x}>
+                            <Typography variant="h5" fontSize={14} fontWeight={500} sx={{ margin: "0", textAlign }}>
                                 {x}
                             </Typography>
                         </TableCell>
@@ -198,8 +204,8 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
     }
 
     return (
-        <>
-            <div style={{ display: "flex", justifyContent: "space-between", margin: "40px 16px" }}>
+        <div style={{ overflowX: "hidden" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", margin: "40px 24px 10px 16px" }}>
                 <Button variant="contained" color="primary" onClick={() => navigate("/")}>
                     Back To Deployments List
                 </Button>
@@ -207,7 +213,7 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
             </div>
 
             <TableContainer sx={{ my: 4, mx: 2 }} key={"TableContainer-DefiLlama"}>
-                <div>
+                <div style={{ width: "97.5%" }}>
                     <Typography
                         key={"typography-DefiLlama"}
                         variant="h3"
@@ -239,12 +245,12 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
                         </Button>
                     </div>
                 </div>
-                <Table stickyHeader>
+                <Table sx={{ width: "97.5%" }} stickyHeader>
                     {tableHead}
                     {tableBody}
                 </Table>
             </TableContainer>
-        </>
+        </div>
     );
 }
 

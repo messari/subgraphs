@@ -50,13 +50,16 @@ export class SushiswapFantomConfigurations implements Configurations {
       )
     );
   }
-  getTradeFee(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  getLPFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
@@ -118,6 +121,9 @@ export class SushiswapFantomConfigurations implements Configurations {
       "0x0ebdd4cdc95ec1e20d7fddc8aaedba0c840e4975", // Bull Moon
       "0x6160240896d8039b2d901cd59dea95396c94a1c2", // Adult Entertainment Token
     ];
+  }
+  getBrokenERC20Tokens(): string[] {
+    return [];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND;

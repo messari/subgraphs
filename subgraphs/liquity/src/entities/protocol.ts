@@ -10,15 +10,13 @@ import {
   LendingType,
   Network,
   ProtocolType,
-  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
-  PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SLUG,
-  PROTOCOL_SUBGRAPH_VERSION,
   RiskType,
   SECONDS_PER_DAY,
   TROVE_MANAGER,
 } from "../utils/constants";
+import { Versions } from "../versions";
 import {
   getOrCreateMarket,
   getOrCreateMarketHourlySnapshot,
@@ -32,9 +30,6 @@ export function getOrCreateLiquityProtocol(): LendingProtocol {
     protocol = new LendingProtocol(TROVE_MANAGER);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.CDP;
@@ -58,8 +53,14 @@ export function getOrCreateLiquityProtocol(): LendingProtocol {
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     protocol.openPositionCount = INT_ZERO;
     protocol.cumulativePositionCount = INT_ZERO;
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 

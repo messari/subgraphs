@@ -68,6 +68,7 @@ import {
   equalsIgnoreCase,
   exponentToBigDecimal,
   Network,
+  PositionSide,
   readValue,
   RewardTokenType,
   SECONDS_PER_DAY,
@@ -76,7 +77,9 @@ import { Market } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
 import { StakedAave } from "../../../generated/LendingPool/StakedAave";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
-import { Transfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
+import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
@@ -84,9 +87,6 @@ function getProtocolData(): ProtocolData {
     constants.protocolAddress.toHexString(),
     Protocol.NAME,
     Protocol.SLUG,
-    Protocol.SCHEMA_VERSION,
-    Protocol.SUBGRAPH_VERSION,
-    Protocol.METHODOLOGY_VERSION,
     constants.network
   );
 }
@@ -220,7 +220,8 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
         if (!tryStakedToken.reverted) {
           rewardTokenPriceUSD = getAssetPriceInUSDC(
             tryStakedToken.value,
-            Address.fromString(protocol.priceOracle)
+            Address.fromString(protocol.priceOracle),
+            event.block.number
           );
         }
       }
@@ -229,7 +230,8 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
         rewardTokenPriceUSD = getAssetPriceInUSDC(
           tryRewardAsset.value,
-          Address.fromString(protocol.priceOracle)
+          Address.fromString(protocol.priceOracle),
+          event.block.number
         );
       }
 
@@ -270,7 +272,8 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
   const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromString(market.inputToken),
-    Address.fromString(protocol.priceOracle)
+    Address.fromString(protocol.priceOracle),
+    event.block.number
   );
 
   _handleReserveDataUpdated(
@@ -333,7 +336,7 @@ export function handleWithdraw(event: Withdraw): void {
     event.params.amount,
     event.params.reserve,
     getProtocolData(),
-    event.params.to
+    event.params.user
   );
 }
 
@@ -369,12 +372,38 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   );
 }
 
-//////////////////////
-//// AToken Event ////
-//////////////////////
+/////////////////////////
+//// Transfer Events ////
+/////////////////////////
 
-export function handleTransfer(event: Transfer): void {
-  _handleTransfer(event, event.params.to, event.params.from, getProtocolData());
+export function handleCollateralTransfer(event: CollateralTransfer): void {
+  _handleTransfer(
+    event,
+    getProtocolData(),
+    PositionSide.LENDER,
+    event.params.to,
+    event.params.from
+  );
+}
+
+export function handleVariableTransfer(event: VariableTransfer): void {
+  _handleTransfer(
+    event,
+    getProtocolData(),
+    PositionSide.BORROWER,
+    event.params.to,
+    event.params.from
+  );
+}
+
+export function handleStableTransfer(event: StableTransfer): void {
+  _handleTransfer(
+    event,
+    getProtocolData(),
+    PositionSide.BORROWER,
+    event.params.to,
+    event.params.from
+  );
 }
 
 ///////////////////
@@ -383,7 +412,8 @@ export function handleTransfer(event: Transfer): void {
 
 function getAssetPriceInUSDC(
   tokenAddress: Address,
-  priceOracle: Address
+  priceOracle: Address,
+  blockNumber: BigInt
 ): BigDecimal {
   const oracle = IPriceOracleGetter.bind(priceOracle);
   let oracleResult = readValue<BigInt>(
@@ -419,6 +449,14 @@ function getAssetPriceInUSDC(
 
   // Polygon Oracle returns price in ETH, must convert to USD with following method
   if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
+    // there was misprice at block 15783457 that affects 2 transactions
+    // we will override the price at this block to $1.55615781978
+    // this price is derived using the following method on that block using historical contract calls
+    // The contract calls return 634291527055835 / 407601027988722 = our new price
+    if (blockNumber.equals(BigInt.fromI32(15783457))) {
+      return BigDecimal.fromString("1.55615781978");
+    }
+
     const priceUSDCInEth = readValue<BigInt>(
       oracle.try_getAssetPrice(Address.fromString(USDC_POS_TOKEN_ADDRESS)),
       BIGINT_ZERO
@@ -427,6 +465,7 @@ function getAssetPriceInUSDC(
     if (priceUSDCInEth.equals(BIGINT_ZERO)) {
       return BIGDECIMAL_ZERO;
     } else {
+      // USD price = token oracle result / USDC POS oracle result
       return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
     }
   }

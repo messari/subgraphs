@@ -43,13 +43,16 @@ export class HoneyswapMaticConfigurations implements Configurations {
       Address.fromString("0x03DAa61d8007443a6584e3d8f85105096543C19c")
     );
   }
-  getTradeFee(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.5");
   }
-  getLPFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("2.5");
   }
   getProtocolFeeToOff(): BigDecimal {
@@ -93,6 +96,9 @@ export class HoneyswapMaticConfigurations implements Configurations {
     return [];
   }
   getUntrackedTokens(): string[] {
+    return [];
+  }
+  getBrokenERC20Tokens(): string[] {
     return [];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {

@@ -50,13 +50,16 @@ export class SushiswapMainnetConfigurations implements Configurations {
       )
     );
   }
-  getTradeFee(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  getLPFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
@@ -142,6 +145,9 @@ export class SushiswapMainnetConfigurations implements Configurations {
       "0x1337def16f9b486faed0293eb623dc8395dfe46a", // Armor Token
       "0x4b4d2e899658fb59b1d518b68fe836b100ee8958", // MIS
     ];
+  }
+  getBrokenERC20Tokens(): string[] {
+    return [];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;

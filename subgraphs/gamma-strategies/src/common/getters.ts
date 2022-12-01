@@ -24,12 +24,10 @@ import {
   SECONDS_PER_HOUR,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
   REGISTRY_ADDRESS_MAP,
 } from "../common/constants";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils/datetime";
+import { Versions } from "../versions";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -230,9 +228,6 @@ export function getOrCreateYieldAggregator(
     protocol = new YieldAggregator(registryId);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = ProtocolType.YIELD;
     protocol.totalValueLockedUSD = BigDecimal.zero();
@@ -242,7 +237,13 @@ export function getOrCreateYieldAggregator(
     protocol.cumulativeTotalRevenueUSD = BigDecimal.zero();
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.totalPoolCount = INT_ZERO;
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }

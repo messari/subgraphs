@@ -24,7 +24,6 @@ import {
   ETH_NAME,
   ETH_SYMBOL,
   INT_ZERO,
-  METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_NETWORK,
   PROTOCOL_SLUG,
@@ -34,10 +33,8 @@ import {
   RARI_ETHER_POOL_TOKEN,
   RARI_STABLE_POOL_TOKEN,
   RARI_YIELD_POOL_TOKEN,
-  SCHEMA_VERSION,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
-  SUBGRAPH_VERSION,
   USDC_VAULT_ADDRESS,
   USDC_VAULT_NAME,
   USDC_VAULT_SYMBOL,
@@ -48,6 +45,7 @@ import {
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Versions } from "../versions";
 
 ///////////////////
 //// Snapshots ////
@@ -207,9 +205,6 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol._vaultList = [];
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = SCHEMA_VERSION;
-    protocol.subgraphVersion = SUBGRAPH_VERSION;
-    protocol.methodologyVersion = METHODOLOGY_VERSION;
     protocol.network = PROTOCOL_NETWORK;
     protocol.type = PROTOCOL_TYPE;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -218,9 +213,14 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.totalPoolCount = INT_ZERO;
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 

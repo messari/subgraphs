@@ -1,16 +1,20 @@
-import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
 import { negativeFieldList } from "../../constants";
-import { convertTokenDecimals, downloadCSV } from "../../utils";
+import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import { BigNumber } from "bignumber.js";
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
+import JSZip from "jszip";
+import DefiLlamaComparsionTab from "../DefiLlamaComparisonTab";
+import { UploadFileCSV } from "../../common/utilComponents/UploadFileCSV";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   entityName: string;
   protocolType: string;
+  subgraphEndpoints: any;
   protocolTableData: { [x: string]: any };
   overlaySchemaData: any;
   protocolSchemaData: any;
@@ -27,6 +31,7 @@ function ProtocolTabEntity({
   entitiesData,
   entityName,
   protocolType,
+  subgraphEndpoints,
   protocolTableData,
   overlaySchemaData,
   protocolSchemaData,
@@ -41,18 +46,39 @@ function ProtocolTabEntity({
   const list: { [x: string]: any } = {};
 
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
+  const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
+  const [defiLlamaCompareTVL, setDefiLlamaCompareTVL] = useState<boolean>(false);
+  const [csvJSON, setCsvJSON] = useState<any>(null);
+  const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
+
+  useEffect(() => {
+    if (downloadAllCharts) {
+      if (chartsImageFiles) {
+        if (Object.keys(chartsImageFiles).length > 0) {
+          let zip = new JSZip();
+          Object.keys(chartsImageFiles).forEach(fileName => {
+            const blob = base64toBlobJPEG(chartsImageFiles[fileName]);
+            if (blob) {
+              zip.file(fileName + '.jpeg', blob);
+            }
+          });
+          zip.generateAsync({ type: "base64" }).then(function (content) {
+            const link = document.createElement('a');
+            link.download = "charts.zip";
+            link.href = "data:application/zip;base64," + content;
+            link.click()
+            triggerDownloadAllCharts(false);
+          });
+        }
+      }
+    }
+  }, [chartsImageFiles])
 
   useEffect(() => {
     const issuesToSet = { ...issuesProps };
     issuesToSet[entityName] = issues;
     setIssues(issuesToSet);
   });
-
-  useEffect(() => {
-    if (!!downloadAllCharts) {
-      triggerDownloadAllCharts(false);
-    }
-  }, [downloadAllCharts])
 
   if (!currentTimeseriesLoading && currentEntityData) {
     try {
@@ -71,16 +97,19 @@ function ProtocolTabEntity({
       const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
       // For the current entity, loop through all instances of that entity
       const overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
-
       const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
       for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[x - overlayDifference];
+        let overlayIndex = x;
+        if (overlayDifference > 0) {
+          overlayIndex = x - overlayDifference;
+        }
+        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[overlayIndex];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
           // skip the timestamp field on each entity instance
-          if (fieldName === "timestamp" || fieldName === "id") {
+          if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename") {
             return;
           }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
@@ -332,19 +361,20 @@ function ProtocolTabEntity({
               </Typography>
             </CopyLinkToClipboard>
           </Box>
+          <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} /></Tooltip>
           <div>
-            <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download All Snapshots as csv</div>
+            <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
             <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Chart Images</div>
           </div>
           {Object.keys(dataFields).map((field: string) => {
             // The following checks if the field is required or can be null
             const fieldName = field.split(" [")[0];
-            if (entitiesData[entityName][fieldName]) {
-              const schemaFieldTypeString = entitiesData[entityName][fieldName]?.split("");
-              if (schemaFieldTypeString[schemaFieldTypeString?.length - 1] !== "!") {
-                // return null;
-              }
+            if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
+              return <>
+                <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(false)} >Remove DefiLlama Comparison</div>
+                <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} getData={() => console.log('GET DATA')} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
             }
+
             const label = entityName + "-" + field;
             const elementId = label.split(" ").join("%20");
 
@@ -420,7 +450,7 @@ function ProtocolTabEntity({
               if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
                 issues.push({
                   type: "JS",
-                  message: message,
+                  message: 6 + message,
                   level: "critical",
                   fieldName: entityName + "-" + field,
                 });
@@ -438,13 +468,36 @@ function ProtocolTabEntity({
               );
             }
             let dataChartToPass: any = dataFields[field];
+            const baseKey = `${protocolSchemaData?.protocols[0]?.name}-${protocolSchemaData?.protocols[0]?.network}-${protocolSchemaData?.protocols[0]?.subgraphVersion}`;
             if (overlayDataFields[field]) {
-              const baseKey = `${protocolSchemaData?.protocols[0]?.name}-${protocolSchemaData?.protocols[0]?.network}-${protocolSchemaData?.protocols[0]?.subgraphVersion}`;
               const overlayKey = `${overlaySchemaData?.protocols[0]?.name}-${overlaySchemaData?.protocols[0]?.network}-${overlaySchemaData?.protocols[0]?.subgraphVersion}`;
-              dataChartToPass = { [baseKey]: dataFields[field], [overlayKey]: overlayDataFields[field] };
+              let keyDiff = "";
+              if (baseKey === overlayKey) {
+                keyDiff = ' (Overlay)';
+              }
+              dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
+            }
+            let tvlButton = null;
+            if (fieldName === "totalValueLockedUSD" && entityName === "financialsDailySnapshots") {
+              tvlButton = <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(true)} >Compare TVL To DefiLlama</div>;
             }
             return (
-              <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} />
+              <>
+                {tvlButton}
+                <ChartContainer
+                  csvMetaDataProp={csvMetaData}
+                  csvJSONProp={csvJSON}
+                  baseKey={baseKey}
+                  elementId={elementId}
+                  downloadAllCharts={downloadAllCharts}
+                  identifier={protocolTableData?.slug}
+                  datasetLabel={label}
+                  dataTable={dataFields[field]}
+                  dataChart={dataChartToPass}
+                  chartsImageFiles={chartsImageFiles}
+                  setChartsImageFiles={(x: any) => setChartsImageFiles(x)}
+                />
+              </>
             );
           })}
         </Grid>
@@ -471,13 +524,6 @@ function ProtocolTabEntity({
       </Grid>
     );
   } else {
-    console.log(
-      currentTimeseriesLoading,
-      currentTimeseriesLoading,
-      currentEntityData,
-      currentTimeseriesError,
-      protocolTableData,
-    );
     return (
       <Grid key={entityName}>
         <Box my={3}>

@@ -26,7 +26,7 @@ import {
   DEFAULT_DECIMALS,
   BIGINT_SEVENTY_FIVE,
 } from "../common/constants";
-import { rollbackRevenue, snapshotFinancials, snapshotMarket, updateUsageMetrics } from "./helpers";
+import { snapshotFinancials, snapshotMarket, updateUsageMetrics } from "./helpers";
 import {
   createBorrow,
   createDeposit,
@@ -215,9 +215,6 @@ export function handleLiquidation(event: Liquidation): void {
   updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
   snapshotMarket(event.block, marketId, liquidateUSD, TransactionType.LIQUIDATE);
   snapshotFinancials(event.block, liquidateUSD, TransactionType.LIQUIDATE);
-
-  // Roll back supply side & total revenue calculated from liquidation fee
-  rollbackRevenue(marketId, event, assetStatus);
 }
 
 export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {

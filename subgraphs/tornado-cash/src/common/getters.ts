@@ -1,4 +1,4 @@
-import { Address, ethereum, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 
 import {
   fetchTokenSymbol,
@@ -15,9 +15,6 @@ import {
   RewardTokenType,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
 } from "./constants";
 import { getUsdPricePerToken } from "../prices";
 import { addToArrayAtIndex } from "./utils/arrays";
@@ -37,6 +34,7 @@ import {
   UsageMetricsDailySnapshot,
   FinancialsDailySnapshot,
 } from "../../generated/schema";
+import { Versions } from "../versions";
 
 export function getOrCreateProtocol(): Protocol {
   let protocol = Protocol.load(NetworkConfigs.getFactoryAddress());
@@ -45,9 +43,6 @@ export function getOrCreateProtocol(): Protocol {
     protocol = new Protocol(NetworkConfigs.getFactoryAddress());
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = NetworkConfigs.getNetwork();
     protocol.type = ProtocolType.GENERIC;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -57,9 +52,13 @@ export function getOrCreateProtocol(): Protocol {
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
     protocol.pools = [];
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }
