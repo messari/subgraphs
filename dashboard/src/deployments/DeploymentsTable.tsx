@@ -1,9 +1,11 @@
-import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Button, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import ProtocolSection from "./ProtocolSection";
 import { useEffect, useMemo, useState } from "react";
-import { NewClient, schemaMapping } from "../utils";
+import { downloadCSV, NewClient, schemaMapping } from "../utils";
 import FetchEntityCSV from "./FetchEntityCSV";
-import JSZip from "jszip";
+import { MultiSelectDropDown } from "../common/utilComponents/MultiSelectDropDown";
+import { DateRangePicker } from "../common/utilComponents/DateRangePicker";
+import moment from "moment";
 
 interface DeploymentsTable {
     protocolsToQuery: { [x: string]: any };
@@ -21,38 +23,38 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
     const [tableExpanded, setTableExpanded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
     const [generateEntityCSV, triggerGenerateEntityCSV] = useState<string>("");
     const [resultsObject, setResultsObject] = useState<any>({});
+    const [deposSelected, setDeposSelected] = useState<any>([]);
+    const [dates, setDates] = useState<any>([]);
+    const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (showDatePicker && dates.length === 2) {
+            setShowDatePicker(false);
+        }
+    }, [dates])
+
+    useEffect(() => {
+        if (showDatePicker) {
+            setShowDatePicker(false);
+        }
+    }, [generateEntityCSV])
+
+    useEffect(() => {
+        console.log(deposSelected)
+    }, [deposSelected])
 
     useEffect(() => {
         if (generateEntityCSV.length > 0) {
-            let depoCount = 0;
-            Object.entries(protocolsToQuery).forEach(([protocolName, protocol]) => {
-                if (schemaMapping[protocol.schema] !== schemaMapping[generateEntityCSV]) {
-                    return;
-                }
-                Object.keys(protocol.deployments).forEach((depoKey) => {
-                    const deploymentData: any = protocol.deployments[depoKey];
-                    if (deploymentData?.services) {
-                        if (!!deploymentData["services"]["hosted-service"] || !!deploymentData["services"]["decentralized-network"] || !!deploymentData["services"]["cronos-portal"]) {
-                            depoCount += 1;
-                        }
-                    }
-                });
-            });
             if (resultsObject) {
-                if (Object.keys(resultsObject).length >= depoCount) {
-                    let zip = new JSZip();
+                if (Object.keys(resultsObject).length >= deposSelected.length && deposSelected.length > 0) {
+                    let fullJSON: any[] = [];
                     Object.values(resultsObject).forEach((depo: any) => {
-                        if (depo?.blob) {
-                            zip.file(depo.filename, depo.blob);
+                        if (Array.isArray(depo)) {
+                            fullJSON = [...fullJSON, ...depo];
                         }
                     });
-                    zip.generateAsync({ type: "base64" }).then(function (content) {
-                        const link = document.createElement('a');
-                        link.download = "charts.zip";
-                        link.href = "data:application/zip;base64," + content;
-                        link.click()
-                        triggerGenerateEntityCSV("");
-                    });
+                    downloadCSV(fullJSON, generateEntityCSV, `depoCount${Object.keys(resultsObject).length}`);
+                    triggerGenerateEntityCSV("");
                 }
             }
         }
@@ -142,11 +144,10 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
         });
     });
 
-
-
     return (
         <>
             {Object.entries(deposToPass).sort().map(([schemaType, subgraph]) => {
+                const validDeployments: string[] = [];
                 let validationSupported = true;
                 if (!Object.keys(schemaMapping).includes(schemaType)) {
                     validationSupported = false;
@@ -160,20 +161,35 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
                 const tableRows = Object.keys(subgraph).sort().map((subgraphName) => {
                     const protocol = subgraph[subgraphName];
                     let csvGenerationComponents = null;
-                    if (schemaMapping[generateEntityCSV] === schemaMapping[schemaType] && generateEntityCSV?.length > 0) {
+                    if (schemaMapping[schemaType]) {
                         csvGenerationComponents = protocol.networks.map((depo: any) => {
-                            return (
-                                <FetchEntityCSV
-                                    entityName="financialsDailySnapshots"
-                                    deployment={depo.deploymentName}
-                                    protocolType={schemaType.toUpperCase()}
-                                    schemaVersion={depo.versions.schema}
-                                    timestampLt={1000000000000000000}
-                                    timestampGt={0}
-                                    queryURL={`https://api.thegraph.com/subgraphs/name/messari/${depo.hostedServiceId}`}
-                                    resultsObject={resultsObject}
-                                    setResultsObject={setResultsObject}
-                                />)
+                            if (schemaMapping[generateEntityCSV] === schemaMapping[schemaType] && generateEntityCSV?.length > 0 && (deposSelected.includes(depo.deploymentName) || deposSelected.includes("All"))) {
+                                let timestampLt = 10000000000000;
+                                if (dates.length > 1) {
+                                    timestampLt = moment.utc(dates[1]).unix();
+                                }
+                                let timestampGt = 0;
+                                if (dates.length > 0) {
+                                    timestampGt = moment.utc(dates[0]).unix();
+                                }
+                                return (
+                                    <FetchEntityCSV
+                                        entityName="financialsDailySnapshots"
+                                        deployment={depo.deploymentName}
+                                        protocolType={schemaType.toUpperCase()}
+                                        schemaVersion={depo.versions.schema}
+                                        timestampLt={timestampLt}
+                                        timestampGt={timestampGt}
+                                        queryURL={`https://api.thegraph.com/subgraphs/name/messari/${depo.hostedServiceId}`}
+                                        resultsObject={resultsObject}
+                                        setResultsObject={setResultsObject}
+                                    />)
+                            } else if (depo.status === 'prod') {
+                                validDeployments.push(depo.deploymentName);
+                                return null;
+                            } else {
+                                return null;
+                            }
                         })
                     }
                     return (<>
@@ -194,6 +210,24 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
                             indexQueryErrorPending={indexQueryErrorPending}
                         /></>);
                 });
+                let executeDownloadCSV = null;
+                if (deposSelected.length > 0) {
+                    executeDownloadCSV = (<>
+                        <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white", marginBottom: "10px", cursor: "pointer" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => {
+                            if (generateEntityCSV?.length > 0) {
+                                return;
+                            }
+                            triggerGenerateEntityCSV(schemaType.toUpperCase())
+                        }} >{generateEntityCSV?.length > 0 ? <><CircularProgress size={15} /><span style={{ margin: "0 10px" }}>Loading CSVs...</span></> : "Get Bulk FinancialsDailySnapshots CSV"}</div>
+
+                        <div style={{ position: "relative", zIndex: 1001 }}>
+                            <Button className="Hover-Underline" onClick={() => { setShowDatePicker((prev) => !prev) }}>
+                                {dates.length === 2 ? `${dates[0].format("M/D/YY")} - ${dates[1].format("M/D/YY")}` : "Select Dates"}
+                            </Button>
+                            {showDatePicker && <DateRangePicker dates={dates} setDates={setDates} />}
+                        </div>
+                    </>);
+                }
                 return (
                     <TableContainer sx={{ my: 8 }} key={"TableContainer-" + schemaType.toUpperCase()}>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -220,10 +254,10 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
                                 </span>
                             </Typography>
                         </div>
-                        {schemaMapping[schemaType] ? (<div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => {
-                            triggerGenerateEntityCSV(schemaType.toUpperCase())
-                        }} >Get Bulk FinancialsDailySnapshots CSV</div>) : null}
-
+                        {schemaMapping[schemaType] ? (<>
+                            {executeDownloadCSV}
+                            <MultiSelectDropDown optionsList={validDeployments} optionsSelected={deposSelected} setOptionsSelected={setDeposSelected} label="Deployment Selection" />
+                        </>) : null}
                         <Table stickyHeader>
                             {tableHead}
                             <TableBody>{tableRows}</TableBody>
