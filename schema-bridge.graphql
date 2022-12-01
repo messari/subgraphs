@@ -438,9 +438,6 @@ type UsageMetricsHourlySnapshot @entity {
   " Protocol this snapshot is associated with "
   protocol: Protocol!
 
-  " Number of unique hourly active users "
-  hourlyActiveUsers: Int!
-
   ##### User cumulatives #####
   " Number of cumulative unique addresses that interacted with the contracts on this chain or received funds from other chains. It should not include senders on other chains "
   cumulativeUniqueUsers: Int!
