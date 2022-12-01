@@ -73,11 +73,21 @@ export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 
+export const BSC_BLOCK_RATE = BigDecimal.fromString("3.9");
+
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
+export const BIG_DECIMAL_SECONDS_PER_DAY = BigDecimal.fromString("86400");
+
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(1200);
+export const STRATEGIES_CACHING_BLOCKS = BigInt.fromI32(1200);
 
 export const PROTOCOL_ID = Address.fromString(
   "0xB543248F75fd9f64D10c247b5a57F142EFF88Aac"
+);
+
+export const BELT_TOKEN_ADDRESS = Address.fromString(
+  "0xe0e514c71282b6f4e823703a39374cf58dc3ea4f"
 );

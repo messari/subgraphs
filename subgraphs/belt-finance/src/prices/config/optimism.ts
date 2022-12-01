@@ -2,19 +2,21 @@ import * as constants from "../common/constants";
 import { Configurations } from "../common/types";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-export const NETWORK_STRING = "fantom";
+export const NETWORK_STRING = "optimism";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
 export const YEARN_LENS_CONTRACT_ADDRESS = Address.fromString(
-  "0x57aa88a0810dfe3f9b71a9b179dd8bf5f956c46a"
+  "0xb082d9f4734c535d9d80536f7e87a6f4f471bf65"
 );
 export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const AAVE_ORACLE_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
+  "0xD81eb3728a631871a7eBBaD631b5f424909f0c77"
+);
 export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x44536de2220987d098d1d29d3aafc7f7348e9ee4"
+  "0x5fd3815dcb668200a662114fbc9af13ac0a55b4d"
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -22,12 +24,12 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
 ///////////////////////////////////////////////////////////////////////////
 
 export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x0b53e9df372e72d8fdcdbedfbb56059957a37128"
+  "0x0ffe8434eae67c9838b12c3cd11ac4005daa7227"
 );
 
 export const CURVE_REGISTRY_ADDRESSES: Address[] = [
-  Address.fromString("0x0f854EA9F38ceA4B1c2FC79047E9D0134419D5d6"),
-  Address.fromString("0x4fb93D7d320E8A263F22f62C2059dFC2A8bCbC4c"),
+  Address.fromString("0xC5cfaDA84E902aD92DD40194f0883ad49639b023"),
+  Address.fromString("0x7DA64233Fefb352f8F501B357c018158ED8aA455"),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -35,11 +37,8 @@ export const CURVE_REGISTRY_ADDRESSES: Address[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
-  Address.fromString("0xbe4fc72f8293f9d3512d58b969c98c3f676cb957"), // Uniswap
-  Address.fromString("0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52"), // Spiritswap
-  Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // Sushiswap
+  Address.fromString("0x9c12939390052919aF3155f41Bf4160Fd3666A6f"), // Velodrame
 ];
-
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// BLACKLISTED TOKENS ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -62,13 +61,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0x658b0c7613e890ee50b8c4bc6a3f41ef411208ad"
+  "0x4200000000000000000000000000000000000042"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83"
+  "0x4200000000000000000000000000000000000006"
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
+  "0x7f5c764cbc14f9669b88837ca1490cca17c31607"
 );
 
 export class config implements Configurations {
