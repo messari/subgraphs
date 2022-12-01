@@ -156,9 +156,6 @@ export function handleMarketListed(event: MarketListed): void {
     ),
     event
   );
-
-  // init rewards
-  initRewards(event.address);
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
@@ -361,35 +358,6 @@ class RewardTokenEmission {
   ) {}
 }
 
-function initRewards(marketAddress: Address): void {
-  const market = Market.load(marketAddress.toHexString());
-  if (!market) {
-    log.error("Market not found for address {}", [marketAddress.toHexString()]);
-    return;
-  }
-
-  // rewardTokens = [BORROW-PLY, BORROW-AURORA, DEPOSIT-PLY, DEPOSIT-AURORA]
-  market.rewardTokens = [
-    getOrCreateRewardToken(PLY_TOKEN_ADDRESS, RewardTokenType.BORROW).id,
-    getOrCreateRewardToken(AURORA_TOKEN_ADDRESS, RewardTokenType.BORROW).id,
-    getOrCreateRewardToken(PLY_TOKEN_ADDRESS, RewardTokenType.DEPOSIT).id,
-    getOrCreateRewardToken(AURORA_TOKEN_ADDRESS, RewardTokenType.DEPOSIT).id,
-  ];
-  market.rewardTokenEmissionsAmount = [
-    BIGINT_ZERO,
-    BIGINT_ZERO,
-    BIGINT_ZERO,
-    BIGINT_ZERO,
-  ];
-  market.rewardTokenEmissionsUSD = [
-    BIGDECIMAL_ZERO,
-    BIGDECIMAL_ZERO,
-    BIGDECIMAL_ZERO,
-    BIGDECIMAL_ZERO,
-  ];
-  market.save();
-}
-
 // calculate PLY reward speeds
 function updateRewards(event: ethereum.Event, marketID: Address): void {
   const protocol = getOrCreateProtocol();
@@ -403,6 +371,13 @@ function updateRewards(event: ethereum.Event, marketID: Address): void {
     comptrollerAddr,
     event.address
   );
+
+  market.rewardTokens = [
+    getOrCreateRewardToken(PLY_TOKEN_ADDRESS, RewardTokenType.BORROW).id,
+    getOrCreateRewardToken(AURORA_TOKEN_ADDRESS, RewardTokenType.BORROW).id,
+    getOrCreateRewardToken(PLY_TOKEN_ADDRESS, RewardTokenType.DEPOSIT).id,
+    getOrCreateRewardToken(AURORA_TOKEN_ADDRESS, RewardTokenType.DEPOSIT).id,
+  ];
 
   if (tryRewardSpeeds.reverted) {
     log.warning("Could not get borrow/supply speeds for market {}", [
