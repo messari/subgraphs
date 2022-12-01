@@ -137,9 +137,7 @@ export function BigDecimalTruncateToBigInt(x: BigDecimal): BigInt {
 }
 
 export const iETH_ADDRESS = "0x5acd75f21659a59ffab9aebaf350351a8bfaabc0";
-export const DF_ADDRESS = Address.fromString(
-  "0x431ad2ff6a9c365805ebad47ee021148d6f7dbe0"
-);
+export const DF_ADDRESS = "0x431ad2ff6a9c365805ebad47ee021148d6f7dbe0";
 export const MKR_ADDRESS = "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2";
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const DEFAULT_DECIMALS = 18;

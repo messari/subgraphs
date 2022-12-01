@@ -151,7 +151,7 @@ export function handleMarketAdded(event: MarketAdded): void {
       underlyingName = "Maker";
       underlyingSymbol = "MKR";
       underlyingDecimals = 18;
-    } else if (underlyingTokenAddr == DF_ADDRESS) {
+    } else if (underlyingTokenAddr.toHexString() == DF_ADDRESS) {
       underlyingName = "dForce";
       underlyingSymbol = "DF";
       underlyingDecimals = 18;
@@ -619,19 +619,11 @@ function initRewards(marketAddr: Address): void {
 // reward is always DForce token
 function getOrCreateRewardTokens(): string[] {
   let token = Token.load(rewardTokenAddr.toHexString());
-  if (token == null) {
+  if (!token) {
     token = new Token(rewardTokenAddr.toHexString());
-    // special handle for DF token since its name and symbol is byte32
-    if (rewardTokenAddr == DF_ADDRESS) {
-      token.name = "dForce";
-      token.symbol = "DF";
-      token.decimals = 18;
-    } else {
-      const tokenContract = ERC20.bind(rewardTokenAddr);
-      token.name = getOrElse<string>(tokenContract.try_name(), "unknown");
-      token.symbol = getOrElse<string>(tokenContract.try_symbol(), "unknown");
-      token.decimals = getOrElse<i32>(tokenContract.try_decimals(), 18);
-    }
+    token.name = "dForce";
+    token.symbol = "DF";
+    token.decimals = 18;
     token.save();
   }
 
@@ -688,17 +680,26 @@ function updateRewardPrices(marketAddress: Address): void {
     : tryDistributionFactor.value
         .toBigDecimal()
         .div(exponentToBigDecimal(DEFAULT_DECIMALS));
-  const protocol = getOrCreateProtocol();
-  const oracleContract = PriceOracle.bind(
-    Address.fromString(protocol._priceOracle)
-  );
-  const priceRaw = getOrElse(
-    oracleContract.try_getAssetPrice(Address.fromString(rewardToken.token)),
-    BIGINT_ZERO
-  );
-  const priceUSD = priceRaw
-    .toBigDecimal()
-    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+
+  const token = Token.load(rewardToken.token);
+  if (!token) {
+    log.error("Token not found for reward token {}", [rewardToken.id]);
+    return;
+  }
+  let priceUSD = token.lastPriceUSD;
+  if (!priceUSD) {
+    const protocol = getOrCreateProtocol();
+    const oracleContract = PriceOracle.bind(
+      Address.fromString(protocol._priceOracle)
+    );
+    const priceRaw = getOrElse(
+      oracleContract.try_getAssetPrice(Address.fromString(rewardToken.token)),
+      BIGINT_ZERO
+    );
+    priceUSD = priceRaw
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  }
 
   market.rewardTokenEmissionsUSD = [
     market
