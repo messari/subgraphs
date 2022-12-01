@@ -167,22 +167,6 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     return;
   }
 
-  const assetPriceUSD = getAssetPriceInUSDC(
-    Address.fromString(market.inputToken),
-    Address.fromString(protocol.priceOracle)
-  );
-
-  _handleReserveDataUpdated(
-    event,
-    event.params.liquidityRate,
-    event.params.liquidityIndex,
-    event.params.variableBorrowRate,
-    event.params.stableBorrowRate,
-    protocolData,
-    event.params.reserve,
-    assetPriceUSD
-  );
-
   // update rewards
   market.rewardTokens = [
     getOrCreateRewardToken(
@@ -198,6 +182,22 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
   market.save();
   updateRewards(market);
+
+  const assetPriceUSD = getAssetPriceInUSDC(
+    Address.fromString(market.inputToken),
+    Address.fromString(protocol.priceOracle)
+  );
+
+  _handleReserveDataUpdated(
+    event,
+    event.params.liquidityRate,
+    event.params.liquidityIndex,
+    event.params.variableBorrowRate,
+    event.params.stableBorrowRate,
+    protocolData,
+    event.params.reserve,
+    assetPriceUSD
+  );
 }
 
 export function handleReserveUsedAsCollateralEnabled(
