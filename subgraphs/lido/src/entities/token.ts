@@ -30,6 +30,10 @@ export function getOrCreateToken(
     }
   }
 
+  if (token.lastPriceBlockNumber && token.lastPriceBlockNumber == blockNumber) {
+    return token;
+  }
+
   // Optional lastPriceUSD and lastPriceBlockNumber, but used in financialMetrics
   const price = getUsdPricePerToken(tokenAddress);
   if (price.reverted) {
