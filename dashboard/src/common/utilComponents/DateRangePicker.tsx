@@ -1,7 +1,7 @@
 import { Box, Button, TextField } from "@mui/material";
 import { LocalizationProvider, PickersDay, StaticDatePicker } from "@mui/lab";
 import MomentAdapter from "@material-ui/pickers/adapter/moment";
-import { Moment } from "moment";
+import { Moment, utc } from "moment";
 
 interface DateRangePickerProps {
     dates: any;
@@ -17,10 +17,13 @@ export const DateRangePicker = ({ dates, setDates }: DateRangePickerProps) => {
                         displayStaticWrapperAs="desktop"
                         onChange={(newVal: Moment | null) => {
                             if (newVal) {
-                                if (dates.length <= 1) {
-                                    setDates((prev: Moment[]) => [...prev, newVal].sort((a, b) => (a.isBefore(b) ? -1 : 1)));
-                                } else {
-                                    setDates([newVal]);
+                                if (newVal.isBefore(utc(new Date()))) {
+                                    if (dates.length <= 1) {
+                                        const arrToSet = ([...dates, newVal].sort((a, b) => (a.isBefore(b) ? -1 : 1)));
+                                        setDates(arrToSet);
+                                    } else {
+                                        setDates([newVal]);
+                                    }
                                 }
                             }
                         }}
