@@ -229,7 +229,7 @@ export function handleLiquidation(event: Liquidation): void {
   // sent to the StabilityPool. The USD difference of both amounts will be the
   // StabilityPool revenue.
   if (!event.receipt) {
-    log.info(
+    log.error(
       "Unable to calculate liquidation revenue, no receipt found. Tx Hash: {}",
       [event.transaction.hash.toHexString()]
     );
