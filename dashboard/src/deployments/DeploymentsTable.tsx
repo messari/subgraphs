@@ -23,20 +23,21 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
     const [tableExpanded, setTableExpanded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
     const [generateEntityCSV, triggerGenerateEntityCSV] = useState<string>("");
     const [resultsObject, setResultsObject] = useState<any>({});
-    const [deposSelected, setDeposSelected] = useState<any>([]);
-    const [dates, setDates] = useState<any>([]);
-    const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+    const schemaDatesObject: any = {};
+    const schemaBooleansObject: any = {};
+    const schemaDeposSelected: any = {};
+    const supportedSchemaTypes = Array.from(new Set(Object.values(schemaMapping)));
+    supportedSchemaTypes.forEach((schema: string) => {
+        schemaDatesObject[schema] = [];
+        schemaDeposSelected[schema] = [];
+        schemaBooleansObject[schema] = false;
+    });
+    const [deposSelected, setDeposSelected] = useState<any>({ ...schemaDeposSelected });
+    const [dates, setDates] = useState<any>({ ...schemaDatesObject });
+    const [showDatePicker, setShowDatePicker] = useState<any>({ ...schemaBooleansObject });
 
     useEffect(() => {
-        if (showDatePicker && dates.length === 2) {
-            setShowDatePicker(false);
-        }
-    }, [dates])
-
-    useEffect(() => {
-        if (showDatePicker) {
-            setShowDatePicker(false);
-        }
+        setShowDatePicker({ ...schemaBooleansObject });
     }, [generateEntityCSV])
 
     useEffect(() => {
@@ -46,15 +47,44 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
     useEffect(() => {
         if (generateEntityCSV.length > 0) {
             if (resultsObject) {
-                if (Object.keys(resultsObject).length >= deposSelected.length && deposSelected.length > 0) {
+                if (deposSelected[schemaMapping[generateEntityCSV]].includes('All')) {
+                    let depoCount = 0;
+                    Object.entries(protocolsToQuery).forEach(([protocolName, protocol]) => {
+                        if (schemaMapping[protocol.schema] !== schemaMapping[generateEntityCSV]) {
+                            return;
+                        }
+                        Object.keys(protocol.deployments).forEach((depoKey) => {
+                            const deploymentData: any = protocol.deployments[depoKey];
+                            if (deploymentData?.services) {
+                                if (!!deploymentData["services"]["hosted-service"] || !!deploymentData["services"]["decentralized-network"] || !!deploymentData["services"]["cronos-portal"]) {
+                                    depoCount += 1;
+                                }
+                            }
+                        });
+                    });
+                    if ((Object.keys(resultsObject).length >= depoCount) && deposSelected[schemaMapping[generateEntityCSV]].length > 0) {
+                        let fullJSON: any[] = [];
+                        Object.values(resultsObject).forEach((depo: any) => {
+                            if (Array.isArray(depo)) {
+                                fullJSON = [...fullJSON, ...depo];
+                            }
+                        });
+                        downloadCSV(fullJSON, `depoCount${Object.keys(resultsObject).length}`, generateEntityCSV);
+                        setDates({ ...dates, [schemaMapping[generateEntityCSV]]: [] })
+                        triggerGenerateEntityCSV("");
+                        setResultsObject({});
+                    }
+                } else if ((Object.keys(resultsObject).length >= deposSelected[schemaMapping[generateEntityCSV]].length) && deposSelected[schemaMapping[generateEntityCSV]].length > 0) {
                     let fullJSON: any[] = [];
                     Object.values(resultsObject).forEach((depo: any) => {
                         if (Array.isArray(depo)) {
                             fullJSON = [...fullJSON, ...depo];
                         }
                     });
-                    downloadCSV(fullJSON, generateEntityCSV, `depoCount${Object.keys(resultsObject).length}`);
+                    downloadCSV(fullJSON, `depoCount${Object.keys(resultsObject).length}`, generateEntityCSV);
+                    setDates({ ...dates, [schemaMapping[generateEntityCSV]]: [] })
                     triggerGenerateEntityCSV("");
+                    setResultsObject({});
                 }
             }
         }
@@ -163,14 +193,14 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
                     let csvGenerationComponents = null;
                     if (schemaMapping[schemaType]) {
                         csvGenerationComponents = protocol.networks.map((depo: any) => {
-                            if (schemaMapping[generateEntityCSV] === schemaMapping[schemaType] && generateEntityCSV?.length > 0 && (deposSelected.includes(depo.deploymentName) || deposSelected.includes("All"))) {
+                            if (schemaMapping[generateEntityCSV] === schemaMapping[schemaType] && generateEntityCSV?.length > 0 && (deposSelected[schemaMapping[schemaType]].includes(depo.deploymentName) || deposSelected[schemaMapping[schemaType]].includes("All"))) {
                                 let timestampLt = 10000000000000;
-                                if (dates.length > 1) {
-                                    timestampLt = moment.utc(dates[1]).unix();
+                                if (dates[schemaMapping[schemaType]].length > 1) {
+                                    timestampLt = moment.utc(dates[schemaMapping[schemaType]][1]).unix();
                                 }
                                 let timestampGt = 0;
-                                if (dates.length > 0) {
-                                    timestampGt = moment.utc(dates[0]).unix();
+                                if (dates[schemaMapping[schemaType]].length > 0) {
+                                    timestampGt = moment.utc(dates[schemaMapping[schemaType]][0]).unix();
                                 }
                                 return (
                                     <FetchEntityCSV
@@ -211,25 +241,37 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
                         /></>);
                 });
                 let executeDownloadCSV = null;
-                if (deposSelected.length > 0) {
+                if (deposSelected[schemaMapping[schemaType]]?.length > 0) {
                     executeDownloadCSV = (<>
                         <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white", marginBottom: "10px", cursor: "pointer" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => {
                             if (generateEntityCSV?.length > 0) {
                                 return;
                             }
                             triggerGenerateEntityCSV(schemaType.toUpperCase())
-                        }} >{generateEntityCSV?.length > 0 ? <><CircularProgress size={15} /><span style={{ margin: "0 10px" }}>Loading CSVs...</span></> : "Get Bulk FinancialsDailySnapshots CSV"}</div>
+                        }} >{generateEntityCSV?.length > 0 && schemaMapping[generateEntityCSV] === schemaMapping[schemaType] && !!schemaMapping[schemaType] ? <><CircularProgress size={15} /><span style={{ margin: "0 10px" }}>Loading CSVs...</span></> : "Get Bulk FinancialsDailySnapshots CSV"}</div>
 
                         <div style={{ position: "relative", zIndex: 1001 }}>
-                            <Button className="Hover-Underline" onClick={() => { setShowDatePicker((prev) => !prev) }}>
-                                {dates.length === 2 ? `${dates[0].format("M/D/YY")} - ${dates[1].format("M/D/YY")}` : "Select Dates"}
+                            <Button className="Hover-Underline" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowDatePicker({ ...showDatePicker, [schemaMapping[schemaType]]: !showDatePicker[schemaMapping[schemaType]] })
+                            }}>
+                                {dates[schemaMapping[schemaType]]?.length === 2 && !!schemaMapping[schemaType] ? `${dates[schemaMapping[schemaType]][0].format("M/D/YY")} - ${dates[schemaMapping[schemaType]][1].format("M/D/YY")}` : "Select Dates"}
                             </Button>
-                            {showDatePicker && <DateRangePicker dates={dates} setDates={setDates} />}
+                            {showDatePicker[schemaMapping[schemaType]] && <DateRangePicker dates={dates[schemaMapping[schemaType]]} setDates={(x: any) => {
+                                setDates({ ...dates, [schemaMapping[schemaType]]: x });
+                                if (x?.length === 2) {
+                                    setShowDatePicker({ ...showDatePicker, [schemaMapping[schemaType]]: false });
+                                }
+                            }} />}
                         </div>
                     </>);
                 }
+                let additionalStyles = {};
+                if (showDatePicker[schemaMapping[schemaType]]) {
+                    additionalStyles = { minHeight: "510px", overflow: "hidden" };
+                }
                 return (
-                    <TableContainer sx={{ my: 8 }} key={"TableContainer-" + schemaType.toUpperCase()}>
+                    <TableContainer sx={{ my: 8, ...additionalStyles }} key={"TableContainer-" + schemaType.toUpperCase()}>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                             <Typography
                                 key={"typography-Title-" + schemaType}
@@ -256,7 +298,7 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
                         </div>
                         {schemaMapping[schemaType] ? (<>
                             {executeDownloadCSV}
-                            <MultiSelectDropDown optionsList={validDeployments} optionsSelected={deposSelected} setOptionsSelected={setDeposSelected} label="Deployment Selection" />
+                            <MultiSelectDropDown optionsList={validDeployments} optionsSelected={deposSelected[schemaMapping[schemaType]]} setOptionsSelected={(x: any) => setDeposSelected({ ...deposSelected, [schemaMapping[schemaType]]: x })} label="Deployment Selection" />
                         </>) : null}
                         <Table stickyHeader>
                             {tableHead}
