@@ -14,12 +14,18 @@ import { getOrInitUser } from "./user";
 
 const FIDU_DECIMAL_PLACES = 18;
 const FIDU_DECIMALS = BigInt.fromI32(10).pow(FIDU_DECIMAL_PLACES as u8);
+const USDC_DECIMAL_PLACES = 6;
+const USDC_DECIMALS = BigInt.fromI32(10).pow(USDC_DECIMAL_PLACES as u8);
 const ONE = BigInt.fromString("1");
 const ZERO = BigInt.fromString("0");
 const ONE_HUNDRED = BigDecimal.fromString("100");
 
 export function fiduFromAtomic(amount: BigInt): BigInt {
   return amount.div(FIDU_DECIMALS);
+}
+
+export function usdcWithFiduPrecision(amount: BigInt): BigInt {
+  return amount.times(FIDU_DECIMALS).div(USDC_DECIMALS).times(FIDU_DECIMALS);
 }
 
 export function getTotalDeposited(
@@ -202,10 +208,7 @@ export function estimateJuniorAPY(tranchedPool: TranchedPool): BigDecimal {
 export function createTransactionFromEvent(
   event: ethereum.Event,
   category: string,
-  userAddress: Address,
-  amount: BigInt,
-  amountToken: string = "USDC",
-  pool: string | null = null
+  userAddress: Address
 ): Transaction {
   const transaction = new Transaction(
     event.transaction.hash.concatI32(event.logIndex.toI32())
@@ -215,11 +218,6 @@ export function createTransactionFromEvent(
   transaction.blockNumber = event.block.number.toI32();
   transaction.category = category;
   const user = getOrInitUser(userAddress);
-  if (pool) transaction.tranchedPool = pool;
   transaction.user = user.id;
-  transaction.amount = amount;
-  transaction.amountToken = amountToken;
-  transaction.save();
-
   return transaction;
 }

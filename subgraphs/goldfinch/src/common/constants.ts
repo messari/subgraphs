@@ -172,6 +172,9 @@ export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const FIDU_ADDRESS = "0x6a445e9f40e0b97c92d0b8a3366cef1d67f700bf";
 export const GFI_ADDRESS = "0xdab396ccf3d84cf2d07c4454e10c8a6f5b008d2b";
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+export const STAKING_REWARDS_ADDRESS =
+  "0xfd6ff39da508d281c2d255e9bbbfab34b6be60c3";
+export const POOL_TOKENS_ADDRESS = "0x57686612c601cb5213b01aa8e80afeb24bbd01df";
 export const WETH_GFI_UniswapV2_Pair =
   "0xa0ce0b8fdbed2b63a28e4f2d23e075c7f16a8259";
 export const USDC_WETH_UniswapV2_Pair =

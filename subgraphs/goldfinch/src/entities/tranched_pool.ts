@@ -101,8 +101,6 @@ export function handleDeposit(event: DepositMade): void {
   tranchedPool.remainingCapacity = limit.minus(
     tranchedPool.estimatedTotalAssets
   );
-  tranchedPool.remainingJuniorCapacity =
-    tranchedPool.remainingJuniorCapacity.minus(event.params.amount);
 
   tranchedPool.save();
 
@@ -271,19 +269,6 @@ export function initOrUpdateTranchedPool(
         goldfinchConfigContract
       );
     }
-  }
-
-  tranchedPool.remainingJuniorCapacity = tranchedPool.estimatedLeverageRatio
-    ? limit
-        .minus(
-          tranchedPool.juniorDeposited.times(
-            tranchedPool.estimatedLeverageRatio!.plus(BigInt.fromI32(1))
-          )
-        )
-        .div(tranchedPool.estimatedLeverageRatio!.plus(BigInt.fromI32(1)))
-    : BigInt.zero();
-  if (tranchedPool.remainingJuniorCapacity.lt(BigInt.zero())) {
-    tranchedPool.remainingJuniorCapacity = BigInt.zero();
   }
 
   const getAllowedUIDTypes_callResult = poolContract.try_getAllowedUIDTypes();

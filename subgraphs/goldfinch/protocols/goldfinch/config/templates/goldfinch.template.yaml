@@ -46,7 +46,7 @@ dataSources:
     name: SeniorPool
     network: mainnet
     source:
-      address: "0x8481a6EbAf5c7DABc3F7e09e44A89531fd31F822"
+      address: "0x8481a6ebaf5c7dabc3f7e09e44a89531fd31f822"
       abi: SeniorPool
       startBlock: 13096000
     mapping:
@@ -291,6 +291,27 @@ dataSources:
       file: ./src/mappings/merkle_distributor.ts
 
   - kind: ethereum/contract
+    name: MerkleDirectDistributor
+    network: mainnet
+    source:
+      address: "0x7766e86584069Cf5d1223323d89486e95d9a8C22"
+      abi: MerkleDirectDistributor
+      startBlock: 13941250
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+      abis:
+        - name: MerkleDirectDistributor
+          file: ./abis/MerkleDirectDistributor.json
+      eventHandlers:
+        - event: GrantAccepted(indexed uint256,indexed address,uint256)
+          handler: handleGrantAccepted
+      file: ./src/mappings/merkle_direct_distributor.ts
+
+  - kind: ethereum/contract
     name: BackerMerkleDistributor
     network: mainnet
     source:
@@ -310,6 +331,163 @@ dataSources:
         - event: GrantAccepted(indexed uint256,indexed uint256,indexed address,uint256,uint256,uint256,uint256)
           handler: handleGrantAccepted
       file: ./src/mappings/backer_merkle_distributor.ts
+
+  - kind: ethereum/contract
+    name: BackerMerkleDirectDistributor
+    network: mainnet
+    source:
+      address: "0xE75b8E4da218f21cf0F0CE967ac35276A10aAbDB"
+      abi: BackerMerkleDirectDistributor
+      startBlock: 14130086
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+      abis:
+        - name: BackerMerkleDirectDistributor
+          file: ./abis/BackerMerkleDirectDistributor.json
+      eventHandlers:
+        - event: GrantAccepted(indexed uint256,indexed address,uint256)
+          handler: handleGrantAccepted
+      file: ./src/mappings/backer_merkle_direct_distributor.ts
+
+  - kind: ethereum/contract
+    name: CurveFiduUSDC
+    network: mainnet
+    source:
+      address: "0x80aa1a80a30055DAA084E599836532F3e58c95E2"
+      abi: CurveFiduUSDC
+      startBlock: 14669331
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+      abis:
+        - name: CurveFiduUSDC
+          file: ./abis/CurveFiduUSDC.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleTokenExchange
+      file: ./src/mappings/curve_fidu_usdc.ts
+
+  - kind: ethereum/contract
+    name: MembershipCollector
+    network: mainnet
+    source:
+      address: "0x5ccFa5fec4Db2543D3995DC5419a13b6e99eA7A1"
+      abi: MembershipCollector
+      startBlock: 15992880
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - MembershipEpoch
+        - Membership
+        - MembershipRoster
+        - MembershipRewardDisbursement
+      abis:
+        - name: MembershipCollector
+          file: ./abis/MembershipCollector.json
+      eventHandlers:
+        - event: EpochFinalized(indexed uint256,uint256)
+          handler: handleEpochFinalized
+      file: ./src/mappings/membership/membership_collector.ts
+
+  - kind: ethereum/contract
+    name: GFILedger
+    network: mainnet
+    source:
+      address: "0xbc1081885da00404bd0108B70EC5aC0dbe98A077"
+      abi: GFILedger
+      startBlock: 15992884
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - VaultedGfi
+      abis:
+        - name: GFILedger
+          file: ./abis/GFILedger.json
+      eventHandlers:
+        - event: GFIDeposit(indexed address,indexed uint256,uint256)
+          handler: handleGfiDeposit
+        - event: GFIWithdrawal(indexed address,indexed uint256,uint256,uint256,uint256)
+          handler: handleGfiWithdrawal
+      file: ./src/mappings/membership/gfi_ledger.ts
+
+  - kind: ethereum/contract
+    name: CapitalLedger
+    network: mainnet
+    source:
+      address: "0x94e0bC3aedA93434B848C49752cfC58B1e7c5029"
+      abi: CapitalLedger
+      startBlock: 15992882
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - VaultedGfi
+      abis:
+        - name: CapitalLedger
+          file: ./abis/CapitalLedger.json
+      eventHandlers:
+        - event: CapitalERC721Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleCapitalErc721Deposit
+        - event: CapitalERC721Withdrawal(indexed address,uint256,address,uint256)
+          handler: handleCapitalErc721Withdrawal
+      file: ./src/mappings/membership/capital_ledger.ts
+
+  - kind: ethereum/contract
+    name: MembershipDirector
+    network: mainnet
+    source:
+      address: "0x7E9140557F988d43c76caDab2fD392f9172ced21"
+      abi: MembershipDirector
+      startBlock: 15992878
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+      abis:
+        - name: MembershipDirector
+          file: ./abis/MembershipDirector.json
+      eventHandlers:
+        - event: RewardsClaimed(indexed address,uint256)
+          handler: handleRewardsClaimed
+      file: ./src/mappings/membership/membership_director.ts
+
+  - kind: ethereum/contract
+    name: MembershipVault
+    network: mainnet
+    source:
+      address: "0x375B906B25E00bdD43017400CD4cefb36FBF9c18"
+      abi: MembershipVault
+      startBlock: 15992880
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Membership
+        - MembershipRoster
+      abis:
+        - name: MembershipVault
+          file: ./abis/MembershipVault.json
+      eventHandlers:
+        - event: AdjustedHoldings(indexed address,uint256,uint256)
+          handler: handleAdjustedHoldings
+        - event: VaultTotalUpdate(uint256,uint256)
+          handler: handleVaultTotalUpdate
+      file: ./src/mappings/membership/membership_vault.ts
 
 templates:
   - name: TranchedPool

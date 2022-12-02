@@ -17,6 +17,7 @@ import {
   GFI_DECIMALS,
   SECONDS_PER_DAY,
 } from "../common/constants";
+import { createTransactionFromEvent } from "../entities/helpers";
 
 export function handleSetTotalRewards(
   event: BackerRewardsSetTotalRewards
@@ -46,6 +47,16 @@ export function handleBackerRewardsClaimed(event: BackerRewardsClaimed): void {
   poolToken.rewardsClaimed = event.params.amount;
   poolToken.rewardsClaimable = BigInt.zero();
   poolToken.save();
+
+  const transaction = createTransactionFromEvent(
+    event,
+    "BACKER_REWARDS_CLAIMED",
+    event.params.owner
+  );
+  transaction.receivedAmount = event.params.amount;
+  transaction.receivedToken = "GFI";
+  transaction.tranchedPool = poolToken.tranchedPool;
+  transaction.save();
 }
 
 export function handleBackerRewardsClaimed1(

@@ -35,7 +35,7 @@ export function handleTokenMinted(event: TokenMinted): void {
   if (tranchedPool) {
     const token = new TranchedPoolToken(event.params.tokenId.toString());
     token.mintedAt = event.block.timestamp;
-    token.user = event.params.owner.toHexString();
+    token.user = user.id;
     token.tranchedPool = tranchedPool.id;
     token.tranche = event.params.tranche;
     token.principalAmount = event.params.amount;

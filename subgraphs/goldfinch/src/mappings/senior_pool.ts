@@ -21,15 +21,23 @@ import {
   PositionSide,
   RewardTokenType,
   TransactionType,
+  FIDU_DECIMALS,
   USDC_DECIMALS,
 } from "../common/constants";
-import { createTransactionFromEvent } from "../entities/helpers";
+import {
+  createTransactionFromEvent,
+  usdcWithFiduPrecision,
+} from "../entities/helpers";
 import {
   updatePoolInvestments,
   updatePoolStatus,
 } from "../entities/senior_pool";
 import { handleDeposit } from "../entities/user";
-import { bigIntToBDUseDecimals, getAddressFromConfig } from "../common/utils";
+import {
+  bigDecimalToBigInt,
+  bigIntToBDUseDecimals,
+  getAddressFromConfig,
+} from "../common/utils";
 import {
   getOrCreateAccount,
   getOrCreateMarket,
@@ -156,23 +164,28 @@ export function handleDepositMade(event: DepositMade): void {
   );
 
   // ORIGINAL CODE BELOW
-  /*
-  const rewardTokenAddr = getStakingRewardsAddressFromSeniorPoolAddress(
-    event.address
-  );
-  */
-
   const rewardTokenAddress = Address.fromString(rewardToken.token);
   updatePoolStatus(event.address);
   handleDeposit(event);
   // Purposefully ignore deposits from StakingRewards contract because those will get captured as DepositAndStake events instead
   if (!event.params.capitalProvider.equals(rewardTokenAddress)) {
-    createTransactionFromEvent(
+    const transaction = createTransactionFromEvent(
       event,
       "SENIOR_POOL_DEPOSIT",
-      event.params.capitalProvider,
-      event.params.amount
+      event.params.capitalProvider
     );
+
+    transaction.sentAmount = event.params.amount;
+    transaction.sentToken = "USDC";
+    transaction.receivedAmount = event.params.shares;
+    transaction.receivedToken = "FIDU";
+
+    // usdc / fidu
+    transaction.fiduPrice = usdcWithFiduPrecision(event.params.amount).div(
+      event.params.shares
+    );
+
+    transaction.save();
   }
 }
 
@@ -265,20 +278,34 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
   );
 
   // ORIGINAL CODE BELOW
-
+  updatePoolStatus(event.address);
   const stakingRewardsAddress = getStakingRewardsAddressFromSeniorPoolAddress(
     event.address
   );
-
-  updatePoolStatus(event.address);
   // Purposefully ignore withdrawals made by StakingRewards contract because those will be captured as UnstakeAndWithdraw
   if (!event.params.capitalProvider.equals(stakingRewardsAddress)) {
-    createTransactionFromEvent(
+    const transaction = createTransactionFromEvent(
       event,
       "SENIOR_POOL_WITHDRAWAL",
-      event.params.capitalProvider,
-      event.params.userAmount
+      event.params.capitalProvider
     );
+
+    const seniorPoolContract = SeniorPoolContract.bind(event.address);
+    const sharePrice = seniorPoolContract.sharePrice();
+    const BI_FIDU_DECIMALS = bigDecimalToBigInt(FIDU_DECIMALS);
+    const BI_USDC_DECIMALS = bigDecimalToBigInt(USDC_DECIMALS);
+    transaction.sentAmount = event.params.userAmount
+      .plus(event.params.reserveAmount)
+      .times(BI_FIDU_DECIMALS)
+      .div(BI_USDC_DECIMALS)
+      .times(BI_FIDU_DECIMALS)
+      .div(sharePrice);
+    transaction.sentToken = "FIDU";
+    transaction.receivedAmount = event.params.userAmount;
+    transaction.receivedToken = "USDC";
+    transaction.fiduPrice = sharePrice;
+
+    transaction.save();
   }
 }
 // this event is never emitted in the current version
