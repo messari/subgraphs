@@ -1,5 +1,4 @@
-import { styled } from "../styled";
-import { JSONToCSVConvertor, NewClient } from "../utils";
+import { NewClient } from "../utils";
 import { useEffect, useMemo } from "react";
 import { gql, useLazyQuery } from "@apollo/client";
 import { queryOnEntity } from "../queries/fetchEntityQuery";
@@ -36,8 +35,8 @@ function FetchEntityCSV({ entityName, deployment, protocolType, schemaVersion, t
     useEffect(() => {
         if (entity) {
             // Convert all instances to csv
-            const csv = JSONToCSVConvertor(entity[entityName], deployment + '-' + entityName, deployment + '-' + entityName, false);
-            setResultsObject((prevState: any) => ({ ...prevState, [deployment]: csv }));
+            const entityJSON = entity[entityName].map((x: any) => ({ "protocol-chain": deployment, ...x }))
+            setResultsObject((prevState: any) => ({ ...prevState, [deployment]: entityJSON }));
         }
     }, [entity])
 

@@ -6,37 +6,19 @@ export const schema = (version: string): string => {
   versionGroupArr.pop();
   const versionGroup = versionGroupArr.join(".") + ".0";
   switch (versionGroup) {
-    case Versions.Schema120:
-      return schema120();
-    case Versions.Schema130:
-      return schema130();
+    case Versions.Schema100:
+      return schema100();
     default:
-      return schema130();
+      return schema100();
   }
 };
 
-export const schema120 = (): string => {
-  return `
-    query Data($skipAmt: Int!) {
-    pools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
-      id
-      name
-      symbol
-      totalValueLockedUSD
-      outputTokenSupply
-      stakedOutputTokenAmount
-      rewardTokenEmissionsUSD
-        }
-    }`;
-};
-
-export const schema130 = (): string => {
+export const schema100 = (): string => {
   return `
     query Data($skipAmt: Int!) {
       pools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
         id
         name
-        
         totalValueLockedUSD
         outputTokenSupply
         stakedOutputTokenAmount

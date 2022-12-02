@@ -164,12 +164,13 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
   }
 }
 
-export function csvToJSONConvertorTwoCol(lines: string[], headers: string[]) {
+export function csvToJSONConvertorTwoCol(lines: string[], headers: string[], mmddyyyy: boolean = true): any {
   const result = [];
   try {
     if (headers.length !== 2 || !headers.map(x => x?.toLowerCase()).includes('date')) {
       throw new Error('Wrong CSV data format. The CSV must have two columns, one must be a "date" column.');
     }
+    let returnRecursion = false;
     for (let i = 1; i < lines.length; i++) {
       const obj: any = {};
       const currentline = lines[i].split(",");
@@ -187,7 +188,15 @@ export function csvToJSONConvertorTwoCol(lines: string[], headers: string[]) {
             entry = entry.split('"').join("");
           }
           if (header === 'date' && isNaN(entry)) {
-            entry = moment(entry).unix();
+            if (isNaN(moment(entry).unix()) && mmddyyyy) {
+              returnRecursion = true;
+            } else {
+              if (mmddyyyy) {
+                entry = moment(entry).unix();
+              } else {
+                entry = moment(entry, 'DD/MM/YYYY').unix();
+              }
+            }
           }
           if (!isNaN(Number(entry))) {
             entry = Number(entry);
@@ -198,6 +207,9 @@ export function csvToJSONConvertorTwoCol(lines: string[], headers: string[]) {
       if (Object.keys(obj)?.length === 2) {
         result.push(obj);
       }
+    }
+    if (returnRecursion) {
+      return csvToJSONConvertorTwoCol(lines, headers, false);
     }
     return (result);
   } catch (err: any) {
@@ -227,7 +239,7 @@ export function csvToJSONConvertor(csv: string, isEntityLevel: boolean) {
   }
 }
 
-export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string, generateCsvUrl: boolean = true) {
+export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
   try {
     const arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
     let CSV = '';
@@ -254,14 +266,10 @@ export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel
     }
 
     const csv = CSV;
+    const filename = (ReportTitle || 'UserExport') + '.csv';
     const blob = new Blob([csv], { type: 'text/csv' });
     const csvUrl = window.webkitURL.createObjectURL(blob);
-    const filename = (ReportTitle || 'UserExport') + '.csv';
-    if (generateCsvUrl) {
-      return { csvUrl, filename };
-    } else {
-      return { blob, filename }
-    }
+    return { csvUrl, filename };
   } catch (err: any) {
     console.error(err.message);
     return { csvURL: "", filename: "" };
