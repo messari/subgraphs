@@ -1,6 +1,5 @@
 import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { TransferSingle } from "../../generated/UniqueIdentity/UniqueIdentity";
-import { BIGINT_ZERO } from "../common/constants";
 import { createTransactionFromEvent } from "../entities/helpers";
 import { getOrInitUser } from "../entities/user";
 

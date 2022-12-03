@@ -13,17 +13,14 @@ import { Account } from "../../generated/schema";
 import {
   CONFIG_KEYS_ADDRESSES,
   FIDU_ADDRESS,
-  GFI_ADDRESS,
   INT_ONE,
   INVALID_POOLS,
-  RewardTokenType,
   SENIOR_POOL_ADDRESS,
 } from "../common/constants";
 import {
   getOrCreateMarket,
   getOrCreateProtocol,
   getOrCreateAccount,
-  getOrCreateRewardToken,
   getOrCreateToken,
 } from "../common/getters";
 
@@ -35,16 +32,11 @@ export function handleRoleGranted(event: RoleGranted): void {
   // which sets config to the GoldfinchConfig argument
   if (event.params.role == OWNER_ROLE) {
     getOrCreateProtocol();
-    const rewardToken = getOrCreateRewardToken(
-      Address.fromString(GFI_ADDRESS),
-      RewardTokenType.DEPOSIT
-    );
 
     // senior pool is a market lender can deposit
     const market = getOrCreateMarket(SENIOR_POOL_ADDRESS, event);
     const FiduToken = getOrCreateToken(Address.fromString(FIDU_ADDRESS));
     market.outputToken = FiduToken.id;
-    market.rewardTokens = [rewardToken.id];
     market.save();
   }
 }

@@ -13,21 +13,15 @@ import {
   UnstakedAndWithdrewMultiple,
   RewardPaid,
 } from "../../generated/StakingRewards/StakingRewards";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  GFI_DECIMALS,
-  SECONDS_PER_DAY,
-  SENIOR_POOL_ADDRESS,
-} from "../common/constants";
-import { getOrCreateMarket, getGFIPrice } from "../common/getters";
-import { bigDecimalToBigInt } from "../common/utils";
 
 import {
   createTransactionFromEvent,
   usdcWithFiduPrecision,
 } from "../entities/helpers";
-import { updateCurrentEarnRate } from "../entities/staking_rewards";
+import {
+  updateCurrentEarnRate,
+  updateSeniorPoolRewardTokenEmissions,
+} from "../entities/staking_rewards";
 import { getOrInitUser } from "../entities/user";
 
 function mapStakedPositionTypeToAmountToken(stakedPositionType: i32): string {
@@ -44,6 +38,9 @@ function mapStakedPositionTypeToAmountToken(stakedPositionType: i32): string {
 
 export function handleRewardAdded(event: RewardAdded): void {
   updateCurrentEarnRate(event.address);
+
+  // messari schema
+  updateSeniorPoolRewardTokenEmissions(event);
 }
 
 export function handleStaked(event: Staked): void {
@@ -71,6 +68,9 @@ export function handleStaked(event: Staked): void {
   transaction.receivedNftId = event.params.tokenId.toString();
   transaction.receivedNftType = "STAKING_TOKEN";
   transaction.save();
+
+  // messari schema
+  updateSeniorPoolRewardTokenEmissions(event);
 }
 
 export function handleStaked1(event: Staked1): void {
@@ -109,6 +109,9 @@ export function handleStaked1(event: Staked1): void {
   transaction.receivedNftId = event.params.tokenId.toString();
   transaction.receivedNftType = "STAKING_TOKEN";
   transaction.save();
+
+  // messari schema
+  updateSeniorPoolRewardTokenEmissions(event);
 }
 
 // Note that Unstaked and Unstaked1 refer to two different versions of this event with different signatures.
@@ -135,6 +138,9 @@ export function handleUnstaked(event: Unstaked): void {
     0
   );
   transaction.save();
+
+  // messari schema
+  updateSeniorPoolRewardTokenEmissions(event);
 }
 
 export function handleUnstaked1(event: Unstaked1): void {
@@ -159,6 +165,9 @@ export function handleUnstaked1(event: Unstaked1): void {
     event.params.positionType
   );
   transaction.save();
+
+  // messari schema
+  updateSeniorPoolRewardTokenEmissions(event);
 }
 
 export function handleTransfer(event: Transfer): void {
@@ -255,58 +264,6 @@ export function handleUnstakedAndWithdrewMultiple(
 }
 
 export function handleRewardPaid(event: RewardPaid): void {
-  // set RewardTokenEmission for senior pool
-  // normalized to daily amount
-  const seniorPool = getOrCreateMarket(SENIOR_POOL_ADDRESS, event);
-  seniorPool._cumulativeRewardAmount = seniorPool._cumulativeRewardAmount!.plus(
-    event.params.reward
-  );
-  const currTimestamp = event.block.timestamp;
-  if (!seniorPool._rewardTimestamp) {
-    log.info(
-      "[handleRewardPaid]_rewardTimestamp for senior pool not set, skip updating reward emission, current timestamp={}",
-      [currTimestamp.toString()]
-    );
-    seniorPool._rewardTimestamp = currTimestamp;
-    seniorPool.save();
-    return;
-  }
-
-  // update reward emission every day or longer
-  if (
-    currTimestamp.lt(
-      seniorPool._rewardTimestamp!.plus(BigInt.fromI32(SECONDS_PER_DAY))
-    )
-  ) {
-    log.info(
-      "[handleRewardPaid]Reward emission updated less than 1 day ago (rewardTimestamp={}, current timestamp={}), skip updating reward emission",
-      [seniorPool._rewardTimestamp!.toString(), currTimestamp.toString()]
-    );
-    seniorPool.save();
-    return;
-  }
-
-  const secondsSince = currTimestamp
-    .minus(seniorPool._rewardTimestamp!)
-    .toBigDecimal();
-  const dailyScaler = BigInt.fromI32(SECONDS_PER_DAY).divDecimal(secondsSince);
-  const rewardTokenEmissionsAmount = bigDecimalToBigInt(
-    seniorPool._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler)
-  );
-  // Note rewards are recorded when they are claimed
-  const GFIpriceUSD = getGFIPrice(event);
-  const rewardTokenEmissionsUSD = !GFIpriceUSD
-    ? BIGDECIMAL_ZERO
-    : rewardTokenEmissionsAmount.divDecimal(GFI_DECIMALS).times(GFIpriceUSD);
-  seniorPool.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
-  seniorPool.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
-
-  //reset _cumulativeRewardAmount and _rewardTimestamp for next update
-  seniorPool._rewardTimestamp = currTimestamp;
-  seniorPool._cumulativeRewardAmount = BIGINT_ZERO;
-  seniorPool.save();
-
-  //
   const position = assert(
     SeniorPoolStakedPosition.load(event.params.tokenId.toString())
   );

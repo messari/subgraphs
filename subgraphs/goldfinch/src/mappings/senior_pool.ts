@@ -165,7 +165,7 @@ export function handleDepositMade(event: DepositMade): void {
 
   // ORIGINAL CODE BELOW
   const rewardTokenAddress = Address.fromString(rewardToken.token);
-  updatePoolStatus(event.address);
+  updatePoolStatus(event);
   handleDeposit(event);
   // Purposefully ignore deposits from StakingRewards contract because those will get captured as DepositAndStake events instead
   if (!event.params.capitalProvider.equals(rewardTokenAddress)) {
@@ -278,7 +278,7 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
   );
 
   // ORIGINAL CODE BELOW
-  updatePoolStatus(event.address);
+  updatePoolStatus(event);
   const stakingRewardsAddress = getStakingRewardsAddressFromSeniorPoolAddress(
     event.address
   );
@@ -343,7 +343,7 @@ export function handleInvestmentMadeInJunior(
   );
 
   //
-  updatePoolStatus(event.address);
+  updatePoolStatus(event);
   updatePoolInvestments(event.address, event.params.tranchedPool);
 }
 
@@ -384,7 +384,7 @@ export function handleInvestmentMadeInSenior(
   // not updating usage metrics as this is not a transaction type of interest
 
   // ORIGINAL CODE
-  updatePoolStatus(event.address);
+  updatePoolStatus(event);
   updatePoolInvestments(event.address, event.params.tranchedPool);
 }
 
@@ -423,7 +423,7 @@ export function handleInterestCollected(event: InterestCollected): void {
   );
 
   // ORIGINAL CODE
-  updatePoolStatus(event.address);
+  updatePoolStatus(event);
 }
 
 export function handlePrincipalCollected(event: PrincipalCollected): void {
@@ -442,7 +442,7 @@ export function handlePrincipalCollected(event: PrincipalCollected): void {
   snapshotFinancials(protocol, deltaBorrowUSD, event, null);
 
   // ORIGINAL CODE
-  updatePoolStatus(event.address);
+  updatePoolStatus(event);
 }
 
 export function handlePrincipalWrittenDown(event: PrincipalWrittenDown): void {
@@ -497,7 +497,7 @@ export function handlePrincipalWrittenDown(event: PrincipalWrittenDown): void {
   snapshotFinancials(protocol, amountUSD, event, null);
 
   //
-  updatePoolStatus(event.address);
+  updatePoolStatus(event);
 }
 
 export function handleReserveFundsCollected(
@@ -517,7 +517,7 @@ export function handleReserveFundsCollected(
   );
 
   //
-  updatePoolStatus(event.address);
+  updatePoolStatus(event);
 }
 
 // Helper function to extract the StakingRewards address from the config on Senior Pool

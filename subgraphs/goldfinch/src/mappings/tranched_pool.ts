@@ -22,11 +22,9 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   CONFIG_KEYS_ADDRESSES,
-  GFI_ADDRESS,
   InterestRateSide,
   InterestRateType,
   PositionSide,
-  RewardTokenType,
   SECONDS_PER_YEAR,
   TransactionType,
   USDC_DECIMALS,
@@ -47,7 +45,6 @@ import {
   getOrCreateAccount,
   getOrCreateMarket,
   getOrCreateProtocol,
-  getOrCreateRewardToken,
 } from "../common/getters";
 import { CreditLine } from "../../generated/templates/TranchedPool/CreditLine";
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
@@ -91,12 +88,6 @@ export function handleDepositMade(event: DepositMade): void {
   const configContract = GoldfinchConfigContract.bind(
     tranchedPoolContract.config()
   );
-  const rewardTokenAddress = Address.fromString(GFI_ADDRESS);
-  const rewardToken = getOrCreateRewardToken(
-    rewardTokenAddress,
-    RewardTokenType.DEPOSIT
-  );
-  market.rewardTokens = [rewardToken.id];
 
   if (!market._poolToken) {
     market._poolToken = configContract
@@ -230,9 +221,6 @@ export function handleDrawdownsUnpaused(event: DrawdownsUnpaused): void {
 
 export function handleWithdrawalMade(event: WithdrawalMade): void {
   const marketID = event.address.toHexString();
-  const amount = event.params.principalWithdrawn.plus(
-    event.params.interestWithdrawn
-  );
   const principalAmountUSD =
     event.params.principalWithdrawn.divDecimal(USDC_DECIMALS);
   const owner = event.params.owner.toHexString();
@@ -674,13 +662,6 @@ export function handleSharePriceUpdated(event: SharePriceUpdated): void {
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
   // treat the migration as a one-off deposit
   market.cumulativeDepositUSD = market.totalDepositBalanceUSD;
-
-  const rewardTokenAddress = Address.fromString(GFI_ADDRESS);
-  const rewardToken = getOrCreateRewardToken(
-    rewardTokenAddress,
-    RewardTokenType.DEPOSIT
-  );
-  market.rewardTokens = [rewardToken.id];
 
   const configContract = GoldfinchConfigContract.bind(
     tranchedPoolContract.config()

@@ -1,9 +1,14 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { SeniorPool, SeniorPoolStatus } from "../../generated/schema";
 import { SeniorPool as SeniorPoolContract } from "../../generated/SeniorPool/SeniorPool";
 import { Fidu as FiduContract } from "../../generated/SeniorPool/Fidu";
 import { USDC as UsdcContract } from "../../generated/SeniorPool/USDC";
-import { CONFIG_KEYS_ADDRESSES, SECONDS_PER_YEAR } from "../common/constants";
+import {
+  BIGINT_ZERO,
+  CONFIG_KEYS_ADDRESSES,
+  SECONDS_PER_YEAR,
+  SENIOR_POOL_UPGRADE_BLOCK,
+} from "../common/constants";
 import { calculateEstimatedInterestForTranchedPool } from "./helpers";
 import { getStakingRewards } from "./staking_rewards";
 import { bigDecimalToBigInt, getAddressFromConfig } from "../common/utils";
@@ -68,7 +73,8 @@ export function updateEstimatedApyFromGfiRaw(): void {
   }
 }
 
-export function updatePoolStatus(seniorPoolAddress: Address): void {
+export function updatePoolStatus(event: ethereum.Event): void {
+  const seniorPoolAddress = event.address;
   const seniorPool = getOrInitSeniorPool(seniorPoolAddress);
 
   const seniorPoolContract = SeniorPoolContract.bind(seniorPoolAddress);
@@ -80,7 +86,12 @@ export function updatePoolStatus(seniorPoolAddress: Address): void {
   );
 
   const sharePrice = seniorPoolContract.sharePrice();
-  const compoundBalance = seniorPoolContract.compoundBalance();
+  // SENIOR POOL implement was upgraded with this transaction
+  // // https://etherscan.io/tx/0x0d54c34ffa6a11afd95d42e69f7c171b38b99b3157d26812db165415e4e3b5c4
+  let compoundBalance = BIGINT_ZERO;
+  if (event.block.number.lt(SENIOR_POOL_UPGRADE_BLOCK)) {
+    compoundBalance = seniorPoolContract.compoundBalance();
+  }
   const totalLoansOutstanding = seniorPoolContract.totalLoansOutstanding();
   const totalSupply = fidu_contract.totalSupply();
   const totalPoolAssets = totalSupply.times(sharePrice);

@@ -1,8 +1,27 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 
-import { BackerRewardsData } from "../../generated/schema";
+import { BackerRewardsData, TranchedPool } from "../../generated/schema";
 import { BackerRewards as BackerRewardsContract } from "../../generated/BackerRewards/BackerRewards";
-import { GFI_DECIMALS } from "../common/constants";
+import {
+  BIGDECIMAL_ZERO,
+  DAYS_PER_YEAR,
+  GFI_ADDRESS,
+  GFI_DECIMALS,
+  RewardTokenType,
+} from "../common/constants";
+import {
+  getGFIPrice,
+  getOrCreateMarket,
+  getOrCreateProtocol,
+  getOrCreateRewardToken,
+} from "../common/getters";
+import { bigDecimalToBigInt } from "../common/utils";
 
 const BACKER_REWARDS_ID = "1";
 
@@ -32,4 +51,52 @@ export function updateBackerRewardsData(contractAddress: Address): void {
   backerRewards.maxInterestDollarsEligible =
     contract.maxInterestDollarsEligible();
   backerRewards.save();
+}
+
+export function updateMarketRewardTokenEmissions(event: ethereum.Event): void {
+  const protocol = getOrCreateProtocol();
+  for (let i = 0; i < protocol._marketIDs!.length; i++) {
+    const marketID = protocol._marketIDs![i];
+    // tranchedPool.estimatedJuniorApyFromGfiRaw is updated
+    // in calculateApyFromGfiForAllPools()
+    const tranchedPool = TranchedPool.load(marketID);
+    if (!tranchedPool) {
+      continue;
+    }
+
+    const market = getOrCreateMarket(marketID, event);
+    const rewardTokens = market.rewardTokens;
+    if (!rewardTokens || rewardTokens.length == 0) {
+      // GFI reward token only for depositor (backers)
+      const rewardTokenAddress = Address.fromString(GFI_ADDRESS);
+      const rewardToken = getOrCreateRewardToken(
+        rewardTokenAddress,
+        RewardTokenType.DEPOSIT
+      );
+      market.rewardTokens = [rewardToken.id];
+    }
+
+    // reward token is for junior backers only, but messari
+    // schema doesn't differentiate junor/seniro tranche
+    const rewardTokenEmissionsAmount = bigDecimalToBigInt(
+      market.totalDepositBalanceUSD
+        .times(tranchedPool.estimatedJuniorApyFromGfiRaw)
+        .div(BigDecimal.fromString(DAYS_PER_YEAR.toString()))
+    );
+    const GFIpriceUSD = getGFIPrice(event);
+    const rewardTokenEmissionsUSD = !GFIpriceUSD
+      ? BIGDECIMAL_ZERO
+      : rewardTokenEmissionsAmount.divDecimal(GFI_DECIMALS).times(GFIpriceUSD);
+    market.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
+    market.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+    log.info(
+      "[updateSeniorPoolRewardTokenEmissions]daily emission amout={}, USD={} at tx {}",
+      [
+        rewardTokenEmissionsAmount.toString(),
+        rewardTokenEmissionsUSD.toString(),
+        event.transaction.hash.toHexString(),
+      ]
+    );
+    market.save();
+  }
 }
