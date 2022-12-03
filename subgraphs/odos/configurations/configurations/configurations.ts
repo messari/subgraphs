@@ -2,6 +2,8 @@ import { OdosEthereumConfigurations } from "../../protocols/odos/config/deployme
 import { OdosArbitrumConfigurations } from "../../protocols/odos/config/deployments/odos-arbitrum/configurations";
 import { OdosPolygonConfigurations } from "../../protocols/odos/config/deployments/odos-polygon/configurations";
 import { OdosOptimismConfigurations } from "../../protocols/odos/config/deployments/odos-optimism/configurations";
+import { OdosAvalancheConfigurations } from "../../protocols/odos/config/deployments/odos-avalanche/configurations";
+
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -21,6 +23,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
       return new OdosPolygonConfigurations();
     }
     case Deploy.ODOS_OPTIMISM: {
+      return new OdosOptimismConfigurations();
+    }
+    case Deploy.ODOS_AVALANCHE: {
       return new OdosOptimismConfigurations();
     }
     default: {

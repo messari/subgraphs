@@ -2,7 +2,7 @@ import { Configurations } from "../../../../../configurations/configurations/int
 import { Network } from "../../../../../src/common/constants";
 import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/constants";
 
-export class OdosArbitrumConfigurations implements Configurations {
+export class OdosAvalancheConfigurations implements Configurations {
   getNetwork(): string {
     return Network.AVALANCHE;
   }
