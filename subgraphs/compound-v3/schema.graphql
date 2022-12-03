@@ -1591,7 +1591,54 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-type Deposit @entity(immutable: true) {
+interface Event {
+  " { Transaction hash }-{ Log index } "
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Price of gas in this transaction "
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
+
+  " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
+  gasLimit: BigInt
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  "Account where deposit was executed (e.g. a deposit on behalf of account)"
+  account: Account!
+
+  " The market tokens are deposited to "
+  market: Market!
+
+  " The user position changed by this event "
+  position: Position!
+
+  " Token deposited "
+  asset: Token!
+
+  " Amount of token deposited in native units "
+  amount: BigInt!
+
+  " Amount of token deposited in USD "
+  amountUSD: BigDecimal!
+}
+
+type Deposit implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1641,7 +1688,7 @@ type Deposit @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Withdraw @entity(immutable: true) {
+type Withdraw implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1696,7 +1743,7 @@ type Withdraw @entity(immutable: true) {
 }
 
 # For CDPs, use this for mint events
-type Borrow @entity(immutable: true) {
+type Borrow implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1747,7 +1794,7 @@ type Borrow @entity(immutable: true) {
 }
 
 # For CDPs, use this for burn events
-type Repay @entity(immutable: true) {
+type Repay implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1797,7 +1844,7 @@ type Repay @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Liquidate @entity(immutable: true) {
+type Liquidate implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1854,7 +1901,7 @@ type Liquidate @entity(immutable: true) {
 # e.g. transferring aTokens (collateral) directly, not a deposit.
 # Transfers associated with other transactions in this schema should live there and not here.
 # Note that only one transfer event should be created per transfer.
-type Transfer @entity(immutable: true) {
+type Transfer implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1904,7 +1951,7 @@ type Transfer @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Flashloan @entity(immutable: true) {
+type Flashloan implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
