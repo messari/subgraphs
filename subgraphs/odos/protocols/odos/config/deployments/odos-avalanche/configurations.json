@@ -1,8 +1,8 @@
 {
-  "deployment": "ODOS_ARBITRUM",
-  "network": "arbitrum-one",
+  "deployment": "ODOS_AVALANCHE",
+  "network": "avalanche",
   "factory": {
-    "address": "0xdd94018F54e565dbfc939F7C44a16e163FaAb331",
-    "startBlock": 9592794
+    "address": "0xfE7Ce93ac0F78826CD81D506B07Fe9f459c00214",
+    "startBlock": 22974355
   }
 }

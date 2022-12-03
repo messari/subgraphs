@@ -13,6 +13,6 @@ export class OdosArbitrumConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xdd94018f54e565dbfc939f7c44a16e163faab331";
+    return "0xfe7ce93ac0f78826cd81d506b07fe9f459c00214";
   }
 }
