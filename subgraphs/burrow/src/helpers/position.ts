@@ -1,21 +1,21 @@
 import { near, BigInt } from '@graphprotocol/graph-ts';
-import { Market, Position, PositionSnapshot } from "../../generated/schema";
-import { assets, BI_ZERO, BD_ZERO, ADDRESS_ZERO } from "../utils/const";
-import { getOrCreateAccount } from "./account";
-import { getOrCreateMarket } from "./market";
+import { Position, PositionSnapshot, Account, Market } from '../../generated/schema';
+import { BI_ZERO } from '../utils/const';
+import { getOrCreateAccount } from './account';
+import { getOrCreateMarket } from './market';
 
-export function getOrCreatePosition(account: string, market: string, side: string): Position {
-	let id = account.concat("-").concat(market).concat("-").concat(side).concat('-0');
+export function getOrCreatePosition(account: Account, market: Market, side: string, receipt: near.ReceiptWithOutcome): Position {
+	const id = account.id.concat('-').concat(market.id).concat('-').concat(side).concat('-').concat((account.closedPositionCount + account.openPositionCount).toString());
 	let r = Position.load(id);
 	if (!r) {
 		r = new Position(id);
-		r.account = getOrCreateAccount(account).id;
-		r.market = getOrCreateMarket(market).id;
-		r.hashOpened = "";
+		r.account = account.id;
+		r.market = market.id;
+		r.hashOpened = receipt.receipt.id.toBase58();
 		r.hashClosed = null;
-		r.blockNumberOpened = BI_ZERO;
+		r.blockNumberOpened = BigInt.fromU64(receipt.block.header.height);
 		r.blockNumberClosed = null;
-		r.timestampOpened = BI_ZERO;
+		r.timestampOpened = BigInt.fromU64(receipt.block.header.timestampNanosec/1000000);
 		r.timestampClosed = null;
 		r.side = side;
 		r.isCollateral = true;
@@ -26,12 +26,23 @@ export function getOrCreatePosition(account: string, market: string, side: strin
 		r.repayCount = 0;
 		r.liquidationCount = 0;
 		r.save();
+
+		account.openPositionCount += 1;
+		account.positionCount += 1;
+		
+		market.openPositionCount += 1;
+		market.positionCount += 1;
+		if(side == 'LENDER'){
+			market.lendingPositionCount += 1;
+		} else {
+			market.borrowingPositionCount += 1;
+		}
 	}
 	return r;
 }
 
 export function getOrCreatePositionSnapshot(position: Position, receipt: near.ReceiptWithOutcome): PositionSnapshot {
-	let id = position.id.concat("-").concat(position.timestampOpened.toString());
+	const id = position.id.concat('-').concat(position.timestampOpened.toString());
 	let r = PositionSnapshot.load(id);
 	if (!r) {
 		r = new PositionSnapshot(id);

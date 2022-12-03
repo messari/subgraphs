@@ -1,5 +1,5 @@
-import { BigDecimal, BigInt, near, log } from "@graphprotocol/graph-ts";
-import { BD_ONE, BD_ZERO, BIGDECIMAL_ONE, BIGDECIMAL_SIX, BIGDECIMAL_THREE, BIGDECIMAL_TWELVE, BIGDECIMAL_TWO, BI_ZERO } from "./const";
+import { BigDecimal, BigInt, near, log } from '@graphprotocol/graph-ts';
+import { BD_ONE, BD_ZERO, BIGDECIMAL_ONE, BIGDECIMAL_SIX, BIGDECIMAL_THREE, BIGDECIMAL_TWELVE, BIGDECIMAL_TWO, BI_ZERO } from './const';
 
 // a fast approximation of (1 + rate)^exponent
 export function bigDecimalExponential(
@@ -9,16 +9,16 @@ export function bigDecimalExponential(
 	// binomial expansion to obtain (1 + x)^n : (1 + rate)^exponent
 	// 1 + n *x + (n/2*(n-1))*x**2+(n/6*(n-1)*(n-2))*x**3+(n/12*(n-1)*(n-2)*(n-3))*x**4
 	// this is less precise, but more efficient than `powerBigDecimal` when power is big
-	let firstTerm = exponent.times(rate);
-	let secondTerm = exponent
+	const firstTerm = exponent.times(rate);
+	const secondTerm = exponent
 		.div(BIGDECIMAL_TWO)
 		.times(exponent.minus(BIGDECIMAL_ONE))
 		.times(rate.times(rate));
-	let thirdTerm = exponent
+	const thirdTerm = exponent
 		.div(BIGDECIMAL_SIX)
 		.times(exponent.minus(BIGDECIMAL_TWO))
 		.times(rate.times(rate).times(rate));
-	let fourthTerm = exponent
+	const fourthTerm = exponent
 		.div(BIGDECIMAL_TWELVE)
 		.times(exponent.minus(BIGDECIMAL_THREE))
 		.times(

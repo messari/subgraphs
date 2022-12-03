@@ -1,14 +1,13 @@
-import { near, BigInt, log, BigDecimal } from "@graphprotocol/graph-ts";
+import { near, BigInt } from '@graphprotocol/graph-ts';
 import {
-	LendingProtocol,
 	Deposit,
 	Withdraw,
 	Borrow,
 	Repay,
 	Liquidate,
-} from "../../generated/schema";
-import { assets, BI_ZERO, BD_ZERO, ADDRESS_ZERO } from "../utils/const";
-import { getOrCreateAccount } from "./account";
+} from '../../generated/schema';
+import { BI_ZERO, BD_ZERO, ADDRESS_ZERO } from '../utils/const';
+import { getOrCreateAccount } from './account';
 
 export function getOrCreateDeposit(
 	id: string,
@@ -23,11 +22,11 @@ export function getOrCreateDeposit(
 		d.blockNumber = BigInt.fromI32(receipt.block.header.height as i32);
 		d.timestamp = BigInt.fromString(
 			receipt.block.header.timestampNanosec.toString()
-		).div(BigInt.fromString("1000000000"));
+		).div(BigInt.fromString('1000000000'));
 		d.account = getOrCreateAccount(ADDRESS_ZERO).id;
-		d.market = "";
-		d.position = "";
-		d.asset = "";
+		d.market = '';
+		d.position = '';
+		d.asset = '';
 		d.amount = BI_ZERO;
 		d.amountUSD = BD_ZERO;
 		d.save();
@@ -48,11 +47,11 @@ export function getOrCreateWithdrawal(
 		w.blockNumber = BigInt.fromI32(receipt.block.header.height as i32);
 		w.timestamp = BigInt.fromString(
 			receipt.block.header.timestampNanosec.toString()
-		).div(BigInt.fromString("1000000000"));
+		).div(BigInt.fromString('1000000000'));
 		w.account = getOrCreateAccount(ADDRESS_ZERO).id;
-		w.market = "";
-		w.position = "";
-		w.asset = "";
+		w.market = '';
+		w.position = '';
+		w.asset = '';
 		w.amount = BI_ZERO;
 		w.amountUSD = BD_ZERO;
 		w.save();
@@ -73,11 +72,11 @@ export function getOrCreateBorrow(
 		b.blockNumber = BigInt.fromI32(receipt.block.header.height as i32);
 		b.timestamp = BigInt.fromString(
 			receipt.block.header.timestampNanosec.toString()
-		).div(BigInt.fromString("1000000000"));
+		).div(BigInt.fromString('1000000000'));
 		b.account = getOrCreateAccount(ADDRESS_ZERO).id;
-		b.market = "";
-		b.position = "";
-		b.asset = "";
+		b.market = '';
+		b.position = '';
+		b.asset = '';
 		b.amount = BI_ZERO;
 		b.amountUSD = BD_ZERO;
 		b.save();
@@ -98,11 +97,11 @@ export function getOrCreateRepayment(
 		r.blockNumber = BigInt.fromI32(receipt.block.header.height as i32);
 		r.timestamp = BigInt.fromString(
 			receipt.block.header.timestampNanosec.toString()
-		).div(BigInt.fromString("1000000000"));
+		).div(BigInt.fromString('1000000000'));
 		r.account = getOrCreateAccount(ADDRESS_ZERO).id;
-		r.market = "";
-		r.position = "";
-		r.asset = "";
+		r.market = '';
+		r.position = '';
+		r.asset = '';
 		r.amount = BI_ZERO;
 		r.amountUSD = BD_ZERO;
 		r.save();
@@ -126,9 +125,9 @@ export function getOrCreateLiquidation(
 		).div(BigInt.fromI32(1000));
 		r.liquidatee = getOrCreateAccount(ADDRESS_ZERO).id;
 		r.liquidator = getOrCreateAccount(ADDRESS_ZERO).id;
-		r.market = "";
-		r.position = "";
-		r.asset = "";
+		r.market = '';
+		r.position = '';
+		r.asset = '';
 		r.amount = BI_ZERO;
 		r.amountUSD = BD_ZERO;
 		r.profitUSD = BD_ZERO;

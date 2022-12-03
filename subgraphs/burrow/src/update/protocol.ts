@@ -1,7 +1,7 @@
-import { Market } from "../../generated/schema";
-import { BD_ZERO } from "../utils/const";
-import { getOrCreateProtocol, getOrCreateUsageMetricsDailySnapshot } from "../helpers/protocol";
-import { near } from "@graphprotocol/graph-ts";
+import { Market } from '../../generated/schema';
+import { BD_ZERO } from '../utils/const';
+import { getOrCreateProtocol, getOrCreateUsageMetricsDailySnapshot } from '../helpers/protocol';
+import { near } from '@graphprotocol/graph-ts';
 
 export function updateProtocol(): void {
 	let protocol = getOrCreateProtocol();
@@ -19,7 +19,7 @@ export function updateProtocol(): void {
 	protocol.cumulativePositionCount = 0;
 
 	for (let i = 0; i < protocol._marketIds.length; i++) {
-		let market = Market.load(protocol._marketIds[i]);
+		const market = Market.load(protocol._marketIds[i]);
 		if (market) {
 			// totalValueLockedUSD
 			protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
@@ -69,8 +69,4 @@ export function updateProtocol(): void {
 	}
 
 	protocol.save();
-}
-
-export function updateUsageDailySnapshot(receipt: near.ReceiptWithOutcome): void {
-	let snapshot = getOrCreateUsageMetricsDailySnapshot(receipt);
 }

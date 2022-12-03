@@ -1,8 +1,8 @@
-import { BigInt, log, BigDecimal, near } from "@graphprotocol/graph-ts";
-import { Token, Market, MarketDailySnapshot, MarketHourlySnapshot, FinancialsDailySnapshot } from '../../generated/schema';
-import { compound } from "../utils/compound";
-import { updateApr } from "../utils/rates";
-import { getOrCreateToken } from "../helpers/token";
+import { BigInt, near } from '@graphprotocol/graph-ts';
+import { Market, MarketDailySnapshot, MarketHourlySnapshot, FinancialsDailySnapshot } from '../../generated/schema';
+import { compound } from '../utils/compound';
+import { updateApr } from '../utils/rates';
+import { getOrCreateToken } from '../helpers/token';
 
 export function updateMarket(
 	market: Market,
@@ -11,14 +11,17 @@ export function updateMarket(
 	protocolDailySnapshot: FinancialsDailySnapshot,
 	receipt: near.ReceiptWithOutcome
 ): void {
-	let token = getOrCreateToken(market.inputToken);
+	const token = getOrCreateToken(market.inputToken);
 
 	/*** update apr and compound values ***/
 	updateApr(market, receipt);
-	compound(market, receipt);
-	
+	const revenues = compound(market, receipt);
+	const protocolRevenue = revenues[0].times(market.inputTokenPriceUSD).div(BigInt.fromI32(10).pow((token.decimals + token.extraDecimals) as u8).toBigDecimal()); 
+	const supplyRevenue = revenues[1].times(market.inputTokenPriceUSD).div(BigInt.fromI32(10).pow((token.decimals + token.extraDecimals) as u8).toBigDecimal());
+
 	// inputTokenPriceUSD
 	market.inputTokenPriceUSD = token.lastPriceUSD!;
+
 	// totalDepositBalanceUSD
 	market.totalDepositBalanceUSD = market.inputTokenBalance
 		.toBigDecimal()
@@ -28,32 +31,26 @@ export function updateMarket(
 				.toBigDecimal()
 		)
 		.times(market.inputTokenPriceUSD);
-	// cumulativeDepositUSD
-	market.cumulativeDepositUSD = market._totalDepositedHistory
-		.toBigDecimal()
-		.div(
-			BigInt.fromI32(10)
-				.pow((token.decimals + token.extraDecimals) as u8)
-				.toBigDecimal()
-		)
-		.times(market.inputTokenPriceUSD);
+
 	// totalValueLockedUSD
 	market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
 	// cumulativeSupplySideRevenueUSD, cumulativeTotalRevenueUSD
-	let newRevenue = market._totalReserved.minus(market._added_to_reserve)
-		.divDecimal(BigInt.fromI32(10).pow((token.decimals + token.extraDecimals) as u8).toBigDecimal()
-		).times(market.inputTokenPriceUSD)
-		.minus(market.cumulativeSupplySideRevenueUSD)
+	market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(protocolRevenue);
+	market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(supplyRevenue);
+	market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(protocolRevenue).plus(supplyRevenue);
 
-	market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(newRevenue)
-	market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(newRevenue);
-	dailySnapshot.dailySupplySideRevenueUSD = dailySnapshot.dailySupplySideRevenueUSD.plus(newRevenue);
-	dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(newRevenue);
-	hourlySnapshot.hourlySupplySideRevenueUSD = hourlySnapshot.hourlySupplySideRevenueUSD.plus(newRevenue);
-	hourlySnapshot.hourlyTotalRevenueUSD = hourlySnapshot.hourlyTotalRevenueUSD.plus(newRevenue);
-	protocolDailySnapshot.dailySupplySideRevenueUSD = protocolDailySnapshot.dailySupplySideRevenueUSD.plus(newRevenue);
-	protocolDailySnapshot.dailyTotalRevenueUSD = protocolDailySnapshot.dailyTotalRevenueUSD.plus(newRevenue);
+	dailySnapshot.dailySupplySideRevenueUSD = dailySnapshot.dailySupplySideRevenueUSD.plus(supplyRevenue);
+	dailySnapshot.dailyProtocolSideRevenueUSD = dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenue);
+	dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(supplyRevenue.plus(protocolRevenue));
+
+	hourlySnapshot.hourlySupplySideRevenueUSD = hourlySnapshot.hourlySupplySideRevenueUSD.plus(supplyRevenue);
+	hourlySnapshot.hourlyProtocolSideRevenueUSD = hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(protocolRevenue);
+	hourlySnapshot.hourlyTotalRevenueUSD = hourlySnapshot.hourlyTotalRevenueUSD.plus(supplyRevenue.plus(protocolRevenue));
+
+	protocolDailySnapshot.dailySupplySideRevenueUSD = protocolDailySnapshot.dailySupplySideRevenueUSD.plus(supplyRevenue);
+	protocolDailySnapshot.dailyProtocolSideRevenueUSD = protocolDailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenue);
+	protocolDailySnapshot.dailyTotalRevenueUSD = protocolDailySnapshot.dailyTotalRevenueUSD.plus(supplyRevenue.plus(protocolRevenue));
 
 	// totalBorrowBalanceUSD
 	market.totalBorrowBalanceUSD = market._totalBorrowed
@@ -64,17 +61,9 @@ export function updateMarket(
 				.toBigDecimal()
 		)
 		.times(market.inputTokenPriceUSD);
-	// cumulativeBorrowUSD
-	market.cumulativeBorrowUSD = market._totalBorrowedHistory
-		.toBigDecimal()
-		.div(
-			BigInt.fromI32(10)
-				.pow((token.decimals + token.extraDecimals) as u8)
-				.toBigDecimal()
-		)
-		.times(market.inputTokenPriceUSD);
 
 	// exchangeRate
+	market.inputTokenPriceUSD = token.lastPriceUSD!;
 	market.exchangeRate = market.inputTokenBalance
 		.toBigDecimal()
 		.div(market.outputTokenSupply.toBigDecimal());

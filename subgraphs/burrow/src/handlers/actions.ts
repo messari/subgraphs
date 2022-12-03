@@ -3,42 +3,20 @@ import {
 	BigInt,
 	JSONValue,
 	TypedMap,
-	log,
-	BigDecimal,
-	JSONValueKind,
-	json,
 } from '@graphprotocol/graph-ts';
 import { getOrCreateAccount } from '../helpers/account';
-import { updatePosition } from '../update/position';
 import { getOrCreatePosition, getOrCreatePositionSnapshot } from '../helpers/position';
 
-import { getOrCreateBorrow, getOrCreateDeposit, getOrCreateLiquidation, getOrCreateRepayment, getOrCreateWithdrawal,  } from '../helpers/actions';
+import { getOrCreateBorrow, getOrCreateDeposit, getOrCreateRepayment, getOrCreateWithdrawal,  } from '../helpers/actions';
 import { getOrCreateMarket, getOrCreateMarketDailySnapshot, getOrCreateMarketHourlySnapshot } from '../helpers/market';
 import { getOrCreateToken } from '../helpers/token';
 
 import { updateMarket } from '../update/market';
 import { amount_to_shares } from '../utils/shares';
 import { updateProtocol } from '../update/protocol';
-import { getOrCreateUsageMetricsDailySnapshot, getOrCreateUsageMetricsHourlySnapshot, getOrCreateFinancialDailySnapshot } from '../helpers/protocol';
+import { getOrCreateUsageMetricsDailySnapshot, getOrCreateUsageMetricsHourlySnapshot, getOrCreateFinancialDailySnapshot, getOrCreateProtocol } from '../helpers/protocol';
 import { parse0 } from '../utils/parser';
-
-// ------------------------------------------------------------------
-// ----------------------------- Events -----------------------------
-// ------------------------------------------------------------------
-// deposit_to_reserve     { account_id, amount, token_id }
-// deposit                - same as above
-// withdraw_started       - same as above
-// withdraw_failed        - same as above
-// withdraw_succeeded     - same as above
-// increase_collateral    - same as above
-// decrease_collateral    - same as above
-// borrow                 - same as above
-// repay                  - same as above
-// liquidate              { account_id, liquidation_account_id, collateral_sum, repaid_sum }
-// force_close            { liquidation_account_id, collateral_sum, repaid_sum }
-// booster_stake          { account_id, booster_amount, duration, x_booster_amount, total_booster_amount, total_x_booster_amount }
-// booster_unstake        { account_id, total_booster_amount, total_x_booster_amount }
-// ------------------------------------------------------------------
+import { BI_ZERO } from '../utils/const';
 
 export function handleDeposit(
 	data: TypedMap<string, JSONValue>, 
@@ -47,7 +25,7 @@ export function handleDeposit(
 	method?: string,
 	args?: TypedMap<string, JSONValue>
 ): void {
-	let deposit = getOrCreateDeposit(
+	const deposit = getOrCreateDeposit(
 		receipt.outcome.id
 			.toBase58()
 			.concat('-')
@@ -55,20 +33,24 @@ export function handleDeposit(
 		receipt
 	);
 	deposit.logIndex = logIndex as i32;
-	let parsedData = parse0(data);
-	let account_id = parsedData[0];
-	let amount = parsedData[1];
-	let token_id = parsedData[2];
+	const parsedData = parse0(data);
+	const account_id = parsedData[0];
+	const amount = parsedData[1];
+	const token_id = parsedData[2];
 	
-	let market = getOrCreateMarket(token_id);
-	let dailySnapshot = getOrCreateMarketDailySnapshot(market, receipt);
-	let hourlySnapshot = getOrCreateMarketHourlySnapshot(market, receipt);
-	let usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(receipt);
-	let usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
-	let financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
-	let account = getOrCreateAccount(account_id);
-	let position = getOrCreatePosition(account_id, token_id, "LENDER");
-	let token = getOrCreateToken(token_id);
+	const market = getOrCreateMarket(token_id);
+	const protocol = getOrCreateProtocol();
+
+	const dailySnapshot = getOrCreateMarketDailySnapshot(market, receipt);
+	const hourlySnapshot = getOrCreateMarketHourlySnapshot(market, receipt);
+
+	const usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(receipt);
+	const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
+	const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
+
+	const account = getOrCreateAccount(account_id);
+	const position = getOrCreatePosition(account, market, 'LENDER', receipt);
+	const token = getOrCreateToken(token_id);
 
 	deposit.account = account.id;
 	deposit.amount = BigInt.fromString(amount);
@@ -97,25 +79,16 @@ export function handleDeposit(
 	usageDailySnapshot.dailyTransactionCount += 1;
 	usageHourlySnapshot.hourlyDepositCount += 1;
 	usageHourlySnapshot.hourlyTransactionCount += 1;
-		
-	// update position
-	if (position.balance.isZero()) {
-		account.positionCount += 1;
-		account.openPositionCount += 1;
 
-		market.positionCount += 1;
-		market.lendingPositionCount += 1;
-		market.openPositionCount += 1;
-
-		position.hashOpened = receipt.outcome.id.toBase58();
-		position.timestampOpened = BigInt.fromU64(receipt.block.header.timestampNanosec / 1000000000);
-		position.blockNumberOpened = BigInt.fromU64(receipt.block.header.height);
-	}
 	position.depositCount += 1;
 	position.balance = position.balance.plus(deposit.amount);
 	position._last_active_timestamp = BigInt.fromU64(receipt.block.header.timestampNanosec / 1000000000);
 	
 	// update account
+	if(account.depositCount == 0){
+		protocol.cumulativeUniqueDepositors += 1;
+		protocol.cumulativeUniqueUsers += 1;
+	}
 	account.depositCount += 1;
 	account._last_active_timestamp = BigInt.fromU64(receipt.block.header.timestampNanosec / 1000000000);
 
@@ -125,17 +98,17 @@ export function handleDeposit(
 	
 	// historical
 	market._totalDepositedHistory = market._totalDepositedHistory.plus(deposit.amount);
+	market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(deposit.amountUSD);
 
 	// snapshot
 	dailySnapshot.dailyDepositUSD = dailySnapshot.dailyDepositUSD.plus(deposit.amountUSD);
 	hourlySnapshot.hourlyDepositUSD = hourlySnapshot.hourlyDepositUSD.plus(deposit.amountUSD);
 	financialDailySnapshot.dailyDepositUSD = financialDailySnapshot.dailyDepositUSD.plus(deposit.amountUSD);
 
-	let positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
+	const positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
 	positionSnapshot.logIndex = logIndex as i32;
 
 	updateMarket(market, dailySnapshot, hourlySnapshot, financialDailySnapshot, receipt);
-	updatePosition(position, market);
 
 	positionSnapshot.save();
 	financialDailySnapshot.save();
@@ -147,6 +120,7 @@ export function handleDeposit(
 	account.save();
 	deposit.save();
 	position.save();
+	protocol.save();
 
 	updateProtocol();
 }
@@ -158,14 +132,15 @@ export function handleDepositToReserve(
 	method?: string,
 	args?: TypedMap<string, JSONValue>
 ): void {
-	let parsedData = parse0(data);
-	let account_id = parsedData[0];
-	let amount = parsedData[1];
-	let token_id = parsedData[2];
+	const parsedData = parse0(data);
+	// const account_id = parsedData[0];
+	const amount = parsedData[1];
+	const token_id = parsedData[2];
 
-	let market = getOrCreateMarket(token_id);
+	const market = getOrCreateMarket(token_id);
 
 	market._totalReserved = market._totalReserved.plus(BigInt.fromString(amount));
+	// for revenue calculation
 	market._added_to_reserve = market._added_to_reserve.plus(BigInt.fromString(amount));
 
 	market.save();
@@ -178,7 +153,7 @@ export function handleWithdraw(
 	method?: string,
 	args?: TypedMap<string, JSONValue>
 ): void {
-	let withdraw = getOrCreateWithdrawal(
+	const withdraw = getOrCreateWithdrawal(
 		receipt.outcome.id
 			.toBase58()
 			.concat('-')
@@ -186,36 +161,26 @@ export function handleWithdraw(
 		receipt
 	);
 	withdraw.logIndex = logIndex as i32;
-	let account_id = data.get('account_id');
-	if (!account_id) {
-		log.info('{} data not found', ['account_id']);
-		return;
-	}
-	let amount = data.get('amount');
-	if (!amount) {
-		log.info('{} data not found', ['amount']);
-		return;
-	}
-	let token_id = data.get('token_id');
-	if (!token_id) {
-		log.info('{} data not found', ['token_id']);
-		return;
-	}
+	const parsedData = parse0(data);
+	const account_id = parsedData[0];
+	const amount = parsedData[1];
+	const token_id = parsedData[2];
 
-	let market = getOrCreateMarket(token_id.toString());
-	let dailySnapshot = getOrCreateMarketDailySnapshot(market, receipt);
-	let hourlySnapshot = getOrCreateMarketHourlySnapshot(market, receipt);
-	let usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(receipt);
-	let usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
-	let financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
-	let account = getOrCreateAccount(account_id.toString());
-	let position = getOrCreatePosition(
-		account_id.toString(),
-		token_id.toString(),
-		"LENDER"
+	const market = getOrCreateMarket(token_id.toString());
+	const dailySnapshot = getOrCreateMarketDailySnapshot(market, receipt);
+	const hourlySnapshot = getOrCreateMarketHourlySnapshot(market, receipt);
+	const usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(receipt);
+	const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
+	const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
+	const account = getOrCreateAccount(account_id.toString());
+	const position = getOrCreatePosition(
+		account,
+		market,
+		'LENDER',
+		receipt
 	);
 
-	let token = getOrCreateToken(token_id.toString());
+	const token = getOrCreateToken(token_id.toString());
 	withdraw.account = account.id;
 	withdraw.amount = BigInt.fromString(amount.toString());
 	withdraw.asset = token.id;
@@ -240,15 +205,16 @@ export function handleWithdraw(
 	usageHourlySnapshot.hourlyWithdrawCount += 1;
 	usageHourlySnapshot.hourlyTransactionCount += 1;
 
-	// update position
-	if(position.balance.lt(withdraw.amount)){
+	// withdrawal without deposit
+	if(market.inputTokenBalance.lt(withdraw.amount)){
 		market._added_to_reserve = market._added_to_reserve.minus(position.balance);
 		market._totalReserved = market._totalReserved.minus(position.balance);
 	} else {
-		position.balance = position.balance.minus(withdraw.amount);
 		position.withdrawCount += 1;
+		
 		// close if balance is zero
-		if (position.balance.isZero()) {
+		if (position.balance.lt(withdraw.amount)) {
+			position.balance = BI_ZERO;
 			account.openPositionCount -= 1;
 			account.closedPositionCount += 1;
 	
@@ -273,11 +239,10 @@ export function handleWithdraw(
 	hourlySnapshot.hourlyWithdrawUSD = hourlySnapshot.hourlyWithdrawUSD.plus(withdraw.amountUSD);
 	financialDailySnapshot.dailyWithdrawUSD = financialDailySnapshot.dailyWithdrawUSD.plus(withdraw.amountUSD);
 
-	let positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
+	const positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
 	positionSnapshot.logIndex = logIndex as i32;
 
 	updateMarket(market, dailySnapshot, hourlySnapshot, financialDailySnapshot, receipt);
-	updatePosition(position, market);
 
 	positionSnapshot.save();
 	financialDailySnapshot.save();
@@ -288,6 +253,7 @@ export function handleWithdraw(
     market.save()
 	account.save();
 	withdraw.save();
+	position._last_active_timestamp = BigInt.fromU64(receipt.block.header.timestampNanosec / 1000000000);
 	position.save();
 
 	updateProtocol();
@@ -300,7 +266,7 @@ export function handleBorrow(
 	method?: string,
 	args?: TypedMap<string, JSONValue>
 ): void {
-	let borrow = getOrCreateBorrow(
+	const borrow = getOrCreateBorrow(
 		receipt.outcome.id
 			.toBase58()
 			.concat('-')
@@ -308,36 +274,27 @@ export function handleBorrow(
 		receipt
 	);
 	borrow.logIndex = logIndex as i32;
-	let account_id = data.get('account_id');
-	if (!account_id) {
-		log.info('{} data not found', ['account_id']);
-		return;
-	}
-	let amount = data.get('amount');
-	if (!amount) {
-		log.info('{} data not found', ['amount']);
-		return;
-	}
-	let token_id = data.get('token_id');
-	if (!token_id) {
-		log.info('{} data not found', ['token_id']);
-		return;
-	}
+	const parsedData = parse0(data);
+	const account_id = parsedData[0];
+	const amount = parsedData[1];
+	const token_id = parsedData[2];
 
-	let market = getOrCreateMarket(token_id.toString());
-	let dailySnapshot = getOrCreateMarketDailySnapshot(market, receipt);
-	let hourlySnapshot = getOrCreateMarketHourlySnapshot(market, receipt);
-	let usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(receipt);
-	let usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
-	let financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
-	let account = getOrCreateAccount(account_id.toString());
-	let position = getOrCreatePosition(
-		account_id.toString(),
-		token_id.toString(),
-		"BORROWER"
+	const market = getOrCreateMarket(token_id.toString());
+	const protocol = getOrCreateProtocol();
+	const dailySnapshot = getOrCreateMarketDailySnapshot(market, receipt);
+	const hourlySnapshot = getOrCreateMarketHourlySnapshot(market, receipt);
+	const usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(receipt);
+	const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
+	const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
+	const account = getOrCreateAccount(account_id.toString());
+	const position = getOrCreatePosition(
+		account,
+		market,
+		'BORROWER',
+		receipt
 	);
 
-	let token = getOrCreateToken(token_id.toString());
+	const token = getOrCreateToken(token_id.toString());
 	borrow.account = account.id;
 	borrow.amount = BigInt.fromString(amount.toString());
 	borrow.asset = token.id;
@@ -364,26 +321,19 @@ export function handleBorrow(
 	usageHourlySnapshot.hourlyBorrowCount += 1;
 	usageHourlySnapshot.hourlyTransactionCount += 1;
 
-	// open position if balance is zero
-	if (position.balance.isZero()) {
-		account.positionCount += 1;
-		account.openPositionCount += 1;
-
-		market.positionCount += 1;
-		market.openPositionCount += 1;
-		market.borrowingPositionCount += 1;
-		
-		position.hashOpened = receipt.outcome.id.toBase58();
-		position.timestampOpened = BigInt.fromU64(receipt.block.header.timestampNanosec / 1000000000);
-		position.blockNumberOpened = BigInt.fromU64(receipt.block.header.height);
-	}
 	position.balance = position.balance.plus(borrow.amount);
 
+	if(account.borrowCount == 0){
+		protocol.cumulativeUniqueBorrowers += 1;
+	}
 	account.borrowCount += 1;
+	// asset.borrowed.deposit(borrowed_shares, amount);
 	market._totalBorrowed = market._totalBorrowed.plus(borrow.amount);
 	market._totalBorrowedHistory = market._totalBorrowedHistory.plus(borrow.amount);
+	market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(borrow.amountUSD);
 	
 	// borrowed amount gets withdrawn from the account => so we need to add that to deposits
+	// asset.supplied.deposit(supplied_shares, amount);
 	market.inputTokenBalance = market.inputTokenBalance.plus(borrow.amount);
 	market.outputTokenSupply = market.outputTokenSupply.plus(amount_to_shares(borrow.amount, market.outputTokenSupply, market.inputTokenBalance));
 
@@ -392,11 +342,10 @@ export function handleBorrow(
 	hourlySnapshot.hourlyBorrowUSD = hourlySnapshot.hourlyBorrowUSD.plus(borrow.amountUSD);
 	financialDailySnapshot.dailyBorrowUSD = financialDailySnapshot.dailyBorrowUSD.plus(borrow.amountUSD);
 
-	let positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
+	const positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
 	positionSnapshot.logIndex = logIndex as i32;
 
 	updateMarket(market, dailySnapshot, hourlySnapshot, financialDailySnapshot, receipt);
-	updatePosition(position, market);
 
 	positionSnapshot.save();
 	financialDailySnapshot.save();
@@ -405,9 +354,12 @@ export function handleBorrow(
 	hourlySnapshot.save()
 	dailySnapshot.save();
     market.save()
+	account._last_active_timestamp = BigInt.fromU64(receipt.block.header.timestampNanosec / 1000000000);
 	account.save();
 	borrow.save();
 	position.save();
+	position._last_active_timestamp = BigInt.fromU64(receipt.block.header.timestampNanosec / 1000000000);
+	protocol.save();
 
 	updateProtocol();
 }
@@ -419,7 +371,7 @@ export function handleRepayment(
 	method?: string,
 	args?: TypedMap<string, JSONValue>
 ): void {
-	let repay = getOrCreateRepayment(
+	const repay = getOrCreateRepayment(
 		receipt.outcome.id
 			.toBase58()
 			.concat('-')
@@ -427,37 +379,26 @@ export function handleRepayment(
 		receipt
 	);
 	repay.logIndex = logIndex as i32;
-	let account_id = data.get('account_id');
+	const parsedData = parse0(data);
+	const account_id = parsedData[0];
+	const amount = parsedData[1];
+	const token_id = parsedData[2];
 
-	if (!account_id) {
-		log.info('{} data not found', ['account_id']);
-		return;
-	}
-	let amount = data.get('amount');
-	if (!amount) {
-		log.info('{} data not found', ['amount']);
-		return;
-	}
-	let token_id = data.get('token_id');
-	if (!token_id) {
-		log.info('{} data not found', ['token_id']);
-		return;
-	}
-
-	let market = getOrCreateMarket(token_id.toString());
-	let dailySnapshot = getOrCreateMarketDailySnapshot(market, receipt);
-	let hourlySnapshot = getOrCreateMarketHourlySnapshot(market, receipt);
-	let usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(receipt);
-	let usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
-	let financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
-	let account = getOrCreateAccount(account_id.toString());
-	let position = getOrCreatePosition(
-		account_id.toString(),
-		token_id.toString(),
-		"BORROWER"
+	const market = getOrCreateMarket(token_id.toString());
+	const dailySnapshot = getOrCreateMarketDailySnapshot(market, receipt);
+	const hourlySnapshot = getOrCreateMarketHourlySnapshot(market, receipt);
+	const usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(receipt);
+	const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
+	const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
+	const account = getOrCreateAccount(account_id.toString());
+	const position = getOrCreatePosition(
+		account,
+		market,
+		'BORROWER',
+		receipt
 	);
 
-	let token = getOrCreateToken(token_id.toString());
+	const token = getOrCreateToken(token_id.toString());
 	repay.market = market.id;
 	repay.account = account.id;
 	repay.amount = BigInt.fromString(amount.toString());
@@ -480,8 +421,9 @@ export function handleRepayment(
 	usageHourlySnapshot.hourlyRepayCount += 1;
 	usageHourlySnapshot.hourlyTransactionCount += 1;
 
-	position.balance = position.balance.minus(repay.amount);
-	if (position.balance.isZero()) {
+	
+	if (position.balance.lt(repay.amount)) {
+		position.balance = BI_ZERO;
 		account.openPositionCount -= 1;
 		account.closedPositionCount += 1;
 
@@ -496,23 +438,24 @@ export function handleRepayment(
 
 	account.repayCount += 1;
 
-	market._totalRepaidHistory = market._totalRepaidHistory.plus(repay.amount);
+	// asset.borrowed.withdraw(borrowed_shares, amount);
 	market._totalBorrowed = market._totalBorrowed.minus(repay.amount);
+	market._totalRepaidHistory = market._totalRepaidHistory.plus(repay.amount);
 
 	// minus repay amount from total deposited => because user has to deposit first to repay loan
-	market.outputTokenSupply = market.outputTokenSupply.minus(amount_to_shares(repay.amount, market.outputTokenSupply, market.inputTokenBalance));
+	// asset.supplied.withdraw(supplied_shares, amount);
 	market.inputTokenBalance = market.inputTokenBalance.minus(repay.amount);
+	market.outputTokenSupply = market.outputTokenSupply.minus(amount_to_shares(repay.amount, market.outputTokenSupply, market.inputTokenBalance));
 
 	// snapshot
 	dailySnapshot.dailyRepayUSD = dailySnapshot.dailyRepayUSD.plus(repay.amountUSD);
 	hourlySnapshot.hourlyRepayUSD = hourlySnapshot.hourlyRepayUSD.plus(repay.amountUSD);
 	financialDailySnapshot.dailyRepayUSD = financialDailySnapshot.dailyRepayUSD.plus(repay.amountUSD);
 
-	let positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
+	const positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
 	positionSnapshot.logIndex = logIndex as i32;
 
 	updateMarket(market, dailySnapshot, hourlySnapshot, financialDailySnapshot, receipt);
-	updatePosition(position, market);
 
 	positionSnapshot.save();
 	financialDailySnapshot.save();
@@ -520,9 +463,11 @@ export function handleRepayment(
 	dailySnapshot.save();
 	usageDailySnapshot.save();
 	usageHourlySnapshot.save();
-    market.save()
+    market.save();
+	account._last_active_timestamp = BigInt.fromU64(receipt.block.header.timestampNanosec / 1000000000);
 	account.save();
 	repay.save();
+	position._last_active_timestamp = BigInt.fromU64(receipt.block.header.timestampNanosec / 1000000000);
 	position.save();
 
 	updateProtocol();

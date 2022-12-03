@@ -1,4 +1,4 @@
-import { Account } from "../../generated/schema";
+import { Account } from '../../generated/schema';
 
 export function getOrCreateAccount(account: string): Account {
 	let r = Account.load(account);

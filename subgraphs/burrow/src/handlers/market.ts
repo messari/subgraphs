@@ -5,11 +5,11 @@ import {
 	TypedMap,
 	log,
 	JSONValueKind,
-} from "@graphprotocol/graph-ts";
-import { getOrCreateMarket } from "../helpers/market";
-import { getOrCreateToken } from "../helpers/token";
+} from '@graphprotocol/graph-ts';
+import { getOrCreateMarket } from '../helpers/market';
+import { getOrCreateToken } from '../helpers/token';
 import { assets, BIGDECIMAL_100, BIGDECIMAL_TWO } from '../utils/const';
-import { getOrCreateProtocol } from "../helpers/protocol";
+import { getOrCreateProtocol } from '../helpers/protocol';
 import { BigDecimal } from '@graphprotocol/graph-ts';
 
 export function handleNewAsset(
@@ -18,21 +18,21 @@ export function handleNewAsset(
 	data: TypedMap<string, JSONValue>,
 	receipt: near.ReceiptWithOutcome
 ): void {
-	let token_id = data.get("token_id");
+	let token_id = data.get('token_id');
 	if (!token_id) {
-		log.info("NEW_ASSET::Token ID not found {}", [args]);
+		log.info('NEW_ASSET::Token ID not found {}', [args]);
 		return;
 	}
 	let token = getOrCreateToken(token_id.toString());
 	let market = getOrCreateMarket(token_id.toString());
 
-	let assetConfigObj = data.get("asset_config");
+	let assetConfigObj = data.get('asset_config');
 	if (!assetConfigObj) {
-		log.info("NEW_ASSET::Data not found {}", [args]);
+		log.info('NEW_ASSET::Data not found {}', [args]);
 		return;
 	}
 	if (assetConfigObj.kind != JSONValueKind.OBJECT) {
-		log.info("NEW_ASSET::Incorrect type assetConfigObj {}", [
+		log.info('NEW_ASSET::Incorrect type assetConfigObj {}', [
 			assetConfigObj.kind.toString(),
 		]);
 		return;
@@ -51,9 +51,9 @@ export function handleNewAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                                reserve_ratio                               */
 	/* -------------------------------------------------------------------------- */
-	let reserve_ratio = assetConfig.get("reserve_ratio");
+	let reserve_ratio = assetConfig.get('reserve_ratio');
 	if (!reserve_ratio) {
-		log.info("NEW_ASSET::Reserve ratio not found {}", [args]);
+		log.info('NEW_ASSET::Reserve ratio not found {}', [args]);
 		return;
 	}
 	market._reserveRatio = BigInt.fromI64(reserve_ratio.toI64());
@@ -61,9 +61,9 @@ export function handleNewAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                             target_utilization                             */
 	/* -------------------------------------------------------------------------- */
-	let target_utilization = assetConfig.get("target_utilization");
+	let target_utilization = assetConfig.get('target_utilization');
 	if (!target_utilization) {
-		log.info("NEW_ASSET::Target utilization not found {}", [args]);
+		log.info('NEW_ASSET::Target utilization not found {}', [args]);
 		return;
 	}
 	market._target_utilization = BigInt.fromI64(target_utilization.toI64());
@@ -71,9 +71,9 @@ export function handleNewAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                          _target_utilization_rate                          */
 	/* -------------------------------------------------------------------------- */
-	let target_utilization_rate = assetConfig.get("target_utilization_rate");
+	let target_utilization_rate = assetConfig.get('target_utilization_rate');
 	if (!target_utilization_rate) {
-		log.info("NEW_ASSET::Target utilization rate not found {}", [args]);
+		log.info('NEW_ASSET::Target utilization rate not found {}', [args]);
 		return;
 	}
 	market._target_utilization_rate = BigInt.fromString(
@@ -83,9 +83,9 @@ export function handleNewAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                            max_utilization_ratȩ                           */
 	/* -------------------------------------------------------------------------- */
-	let max_utilization_rate = assetConfig.get("max_utilization_rate");
+	let max_utilization_rate = assetConfig.get('max_utilization_rate');
 	if (!max_utilization_rate) {
-		log.info("NEW_ASSET::Max utilization rate not found {}", [args]);
+		log.info('NEW_ASSET::Max utilization rate not found {}', [args]);
 		return;
 	}
 	market._max_utilization_rate = BigInt.fromString(
@@ -95,9 +95,9 @@ export function handleNewAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                              volatility_ratio                              */
 	/* -------------------------------------------------------------------------- */
-	let volatility_ratio = assetConfig.get("volatility_ratio");
+	let volatility_ratio = assetConfig.get('volatility_ratio');
 	if (!volatility_ratio) {
-		log.info("NEW_ASSET::Volatility ratio not found {}", [args]);
+		log.info('NEW_ASSET::Volatility ratio not found {}', [args]);
 		return;
 	}
 	market.maximumLTV = BigDecimal.fromString(volatility_ratio.toI64().toString()).div(BIGDECIMAL_100);
@@ -108,9 +108,9 @@ export function handleNewAsset(
 	/*                              extra_decimals                                */
 	/* -------------------------------------------------------------------------- */
 	market.inputToken = token.id;
-	let extra_decimals = assetConfig.get("extra_decimals");
+	let extra_decimals = assetConfig.get('extra_decimals');
 	if (!extra_decimals) {
-		log.info("NEW_ASSET::extra_decimals ratio not found {}", [args]);
+		log.info('NEW_ASSET::extra_decimals ratio not found {}', [args]);
 		return;
 	}
 	token.extraDecimals = extra_decimals.toI64() as i32;
@@ -122,9 +122,9 @@ export function handleNewAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                          can_use_as_collateral                             */
 	/* -------------------------------------------------------------------------- */
-	let can_use_as_collateral = assetConfig.get("can_use_as_collateral");
+	let can_use_as_collateral = assetConfig.get('can_use_as_collateral');
 	if (!can_use_as_collateral) {
-		log.info("NEW_ASSET::can_use_as_collateral not found {}", [args]);
+		log.info('NEW_ASSET::can_use_as_collateral not found {}', [args]);
 		return;
 	}
 	market.canUseAsCollateral = can_use_as_collateral.toBool();
@@ -132,9 +132,9 @@ export function handleNewAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                                 can_borrow                                 */
 	/* -------------------------------------------------------------------------- */
-	let can_borrow = assetConfig.get("can_borrow");
+	let can_borrow = assetConfig.get('can_borrow');
 	if (!can_borrow) {
-		log.info("NEW_ASSET::can_borrow not found {}", [args]);
+		log.info('NEW_ASSET::can_borrow not found {}', [args]);
 		return;
 	}
 	market.canBorrowFrom = can_borrow.toBool();
@@ -142,14 +142,14 @@ export function handleNewAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                       can_deposit && can_withdraw                          */
 	/* -------------------------------------------------------------------------- */
-	let can_deposit = assetConfig.get("can_deposit");
+	let can_deposit = assetConfig.get('can_deposit');
 	if (!can_deposit) {
-		log.info("NEW_ASSET::can_deposit not found {}", [args]);
+		log.info('NEW_ASSET::can_deposit not found {}', [args]);
 		return;
 	}
-	let can_withdraw = assetConfig.get("can_withdraw");
+	let can_withdraw = assetConfig.get('can_withdraw');
 	if (!can_withdraw) {
-		log.info("NEW_ASSET::can_withdraw not found {}", [args]);
+		log.info('NEW_ASSET::can_withdraw not found {}', [args]);
 		return;
 	}
 	market.isActive = can_deposit.toBool() && can_withdraw.toBool();
@@ -163,6 +163,8 @@ export function handleNewAsset(
 	let tempMarkets = protocol._marketIds;
 	tempMarkets.push(market.id);
 	protocol._marketIds = tempMarkets;
+
+	protocol.totalPoolCount += 1;
 	protocol.save();
 }
 
@@ -173,21 +175,21 @@ export function handleUpdateAsset(
 	data: TypedMap<string, JSONValue>,
 	receipt: near.ReceiptWithOutcome
 ): void {
-	let token_id = data.get("token_id");
+	let token_id = data.get('token_id');
 	if (!token_id) {
-		log.info("NEW_ASSET::Token ID not found {}", [args]);
+		log.info('NEW_ASSET::Token ID not found {}', [args]);
 		return;
 	}
 	let token = getOrCreateToken(token_id.toString());
 	let market = getOrCreateMarket(token_id.toString());
 
-	let assetConfigObj = data.get("asset_config");
+	let assetConfigObj = data.get('asset_config');
 	if (!assetConfigObj) {
-		log.info("NEW_ASSET::Data not found {}", [args]);
+		log.info('NEW_ASSET::Data not found {}', [args]);
 		return;
 	}
 	if (assetConfigObj.kind != JSONValueKind.OBJECT) {
-		log.info("NEW_ASSET::Incorrect type assetConfigObj {}", [
+		log.info('NEW_ASSET::Incorrect type assetConfigObj {}', [
 			assetConfigObj.kind.toString(),
 		]);
 		return;
@@ -199,9 +201,9 @@ export function handleUpdateAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                                reserve_ratio                               */
 	/* -------------------------------------------------------------------------- */
-	let reserve_ratio = assetConfig.get("reserve_ratio");
+	let reserve_ratio = assetConfig.get('reserve_ratio');
 	if (!reserve_ratio) {
-		log.info("NEW_ASSET::Reserve ratio not found {}", [args]);
+		log.info('NEW_ASSET::Reserve ratio not found {}', [args]);
 		return;
 	}
 	market._reserveRatio = BigInt.fromI64(reserve_ratio.toI64());
@@ -209,9 +211,9 @@ export function handleUpdateAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                             target_utilization                             */
 	/* -------------------------------------------------------------------------- */
-	let target_utilization = assetConfig.get("target_utilization");
+	let target_utilization = assetConfig.get('target_utilization');
 	if (!target_utilization) {
-		log.info("NEW_ASSET::Target utilization not found {}", [args]);
+		log.info('NEW_ASSET::Target utilization not found {}', [args]);
 		return;
 	}
 	market._target_utilization = BigInt.fromI64(target_utilization.toI64());
@@ -219,9 +221,9 @@ export function handleUpdateAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                          _target_utilization_rate                          */
 	/* -------------------------------------------------------------------------- */
-	let target_utilization_rate = assetConfig.get("target_utilization_rate");
+	let target_utilization_rate = assetConfig.get('target_utilization_rate');
 	if (!target_utilization_rate) {
-		log.info("NEW_ASSET::Target utilization rate not found {}", [args]);
+		log.info('NEW_ASSET::Target utilization rate not found {}', [args]);
 		return;
 	}
 	market._target_utilization_rate = BigInt.fromString(
@@ -231,9 +233,9 @@ export function handleUpdateAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                            max_utilization_ratȩ                           */
 	/* -------------------------------------------------------------------------- */
-	let max_utilization_rate = assetConfig.get("max_utilization_rate");
+	let max_utilization_rate = assetConfig.get('max_utilization_rate');
 	if (!max_utilization_rate) {
-		log.info("NEW_ASSET::Max utilization rate not found {}", [args]);
+		log.info('NEW_ASSET::Max utilization rate not found {}', [args]);
 		return;
 	}
 	market._max_utilization_rate = BigInt.fromString(
@@ -243,9 +245,9 @@ export function handleUpdateAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                              volatility_ratio                              */
 	/* -------------------------------------------------------------------------- */
-	let volatility_ratio = assetConfig.get("volatility_ratio");
+	let volatility_ratio = assetConfig.get('volatility_ratio');
 	if (!volatility_ratio) {
-		log.info("NEW_ASSET::Volatility ratio not found {}", [args]);
+		log.info('NEW_ASSET::Volatility ratio not found {}', [args]);
 		return;
 	}
 	market._volatility_ratio = BigInt.fromI64(volatility_ratio.toI64());
@@ -254,9 +256,9 @@ export function handleUpdateAsset(
 	/*                              extra_decimals                                */
 	/* -------------------------------------------------------------------------- */
 	market.inputToken = token.id;
-	let extra_decimals = assetConfig.get("extra_decimals");
+	let extra_decimals = assetConfig.get('extra_decimals');
 	if (!extra_decimals) {
-		log.info("NEW_ASSET::extra_decimals ratio not found {}", [args]);
+		log.info('NEW_ASSET::extra_decimals ratio not found {}', [args]);
 		return;
 	}
 	token.extraDecimals = extra_decimals.toI64() as i32;
@@ -268,9 +270,9 @@ export function handleUpdateAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                          can_use_as_collateral                             */
 	/* -------------------------------------------------------------------------- */
-	let can_use_as_collateral = assetConfig.get("can_use_as_collateral");
+	let can_use_as_collateral = assetConfig.get('can_use_as_collateral');
 	if (!can_use_as_collateral) {
-		log.info("NEW_ASSET::can_use_as_collateral not found {}", [args]);
+		log.info('NEW_ASSET::can_use_as_collateral not found {}', [args]);
 		return;
 	}
 	market.canUseAsCollateral = can_use_as_collateral.toBool();
@@ -278,9 +280,9 @@ export function handleUpdateAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                                 can_borrow                                 */
 	/* -------------------------------------------------------------------------- */
-	let can_borrow = assetConfig.get("can_borrow");
+	let can_borrow = assetConfig.get('can_borrow');
 	if (!can_borrow) {
-		log.info("NEW_ASSET::can_borrow not found {}", [args]);
+		log.info('NEW_ASSET::can_borrow not found {}', [args]);
 		return;
 	}
 	market.canBorrowFrom = can_borrow.toBool();
@@ -288,14 +290,14 @@ export function handleUpdateAsset(
 	/* -------------------------------------------------------------------------- */
 	/*                       can_deposit && can_withdraw                          */
 	/* -------------------------------------------------------------------------- */
-	let can_deposit = assetConfig.get("can_deposit");
+	let can_deposit = assetConfig.get('can_deposit');
 	if (!can_deposit) {
-		log.info("NEW_ASSET::can_deposit not found {}", [args]);
+		log.info('NEW_ASSET::can_deposit not found {}', [args]);
 		return;
 	}
-	let can_withdraw = assetConfig.get("can_withdraw");
+	let can_withdraw = assetConfig.get('can_withdraw');
 	if (!can_withdraw) {
-		log.info("NEW_ASSET::can_withdraw not found {}", [args]);
+		log.info('NEW_ASSET::can_withdraw not found {}', [args]);
 		return;
 	}
 	market.isActive = can_deposit.toBool() && can_withdraw.toBool();
