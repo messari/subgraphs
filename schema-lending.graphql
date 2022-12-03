@@ -499,6 +499,11 @@ type LendingProtocol implements Protocol @entity {
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
+
+  ##### Add Ons #####
+
+  " All markets in this protocol "
+  _markets: [Bytes!]
 }
 
 ###############################

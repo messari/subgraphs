@@ -56,9 +56,6 @@ type Token @entity {
 
   " The type of token the protocol creates for positions "
   type: TokenType
-
-  " Details about the price oracle used to get this token's price "
-  oracle: Oracle
 }
 
 enum RewardTokenType {
@@ -127,7 +124,7 @@ enum TokenType {
   " Rebasing tokens continuously adjust balances / supply as interest is accrued (e.g. Aave debt balances adjust at each block with interest) "
   REBASING
 
-  " Non-rebasing token balances / supply do not change as interest is accried (e.g. Compound's cToken's do not adjust balance, the exchange rate changes with interest) "
+  " Non-rebasing token balances / supply do not change as interest is accrued (e.g. Compound's cToken's do not adjust balance, the exchange rate changes with interest) "
   NON_REBASING
 }
 
@@ -256,7 +253,7 @@ enum OracleSource {
 # As oracles are a source of truth it is important to understand the details.
 # This entity will help track oracle-related data in a market
 type Oracle @entity {
-  " { Market ID }-{ Token Address } "
+  " { Market Address }-{ Token Address } "
   id: Bytes!
 
   oracleAddress: Bytes!
@@ -527,6 +524,11 @@ type LendingProtocol implements Protocol @entity {
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
+
+  ##### Add Ons #####
+
+  " All markets in this protocol "
+  _markets: [Bytes!]!
 }
 
 ###############################
@@ -784,14 +786,14 @@ type Market @entity {
   " Can the user choose to isolate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
   canIsolate: Boolean!
 
-  " All oracles that have been used for this market "
-  oracles: [Oracle!]! @derivedFrom(field: "market")
-
   " Creation timestamp "
   createdTimestamp: BigInt!
 
   " Creation block number "
   createdBlockNumber: BigInt!
+
+  " Details about the price oracle used to get this token's price "
+  oracle: Oracle
 
   " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
   relation: Bytes
@@ -1953,4 +1955,16 @@ type Flashloan @entity(immutable: true) {
 
   " Amount of asset taken by protocol as a fee in USD "
   feeAmountUSD: BigDecimal
+}
+
+###################
+##### Add Ons #####
+###################
+
+type _PositionCounter @entity {
+  " { Account address }-{ Market address }-{ Position Side } "
+  id: ID!
+
+  " Next count "
+  nextCount: Int!
 }

@@ -12,7 +12,7 @@ import {
   PermissionType,
   RiskType,
 } from "../../../src/sdk/constants";
-import { ProtocolData } from "../../../src/sdk/market";
+import { ProtocolData } from "../../../src/sdk/protocol";
 
 //////////////////////////////
 ///// Ethereum Addresses /////
@@ -68,6 +68,7 @@ export function getProtocolData(): ProtocolData {
 ///// Extras /////
 //////////////////
 
+export const MARKET_PREFIX = "Compound V3 ";
 export const ENCODED_TRANSFER_SIGNATURE = crypto.keccak256(
   ByteArray.fromUTF8("Transfer(address,address,uint256)")
 );

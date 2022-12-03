@@ -23,13 +23,16 @@ import {
   Oracle,
   Repay,
   RevenueDetails,
-  RewardToken,
   Token,
   Transfer,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
   Withdraw,
 } from "../../generated/schema";
+import {
+  ApproveThisCall__Inputs,
+  ApproveThisCall__Outputs,
+} from "../../generated/templates/Comet/Comet";
 import { Versions } from "../versions";
 import {
   AccountActivity,
@@ -38,7 +41,6 @@ import {
   exponentToBigDecimal,
   INT_ONE,
   INT_ZERO,
-  LendingType,
   ProtocolType,
   RevenueSource,
   SECONDS_PER_DAY,
@@ -63,7 +65,7 @@ export class MarketClass {
   public event!: ethereum.Event;
 
   // entities
-  private protocol!: LendingProtocol;
+  public protocol!: LendingProtocol;
   private market!: Market;
   private inputToken!: TokenClass;
   private account!: Account;
@@ -84,6 +86,7 @@ export class MarketClass {
     protocolData: ProtocolData
   ) {
     this.protocol = this.getOrCreateLendingProtocol(protocolData);
+    this.inputToken = new TokenClass(inputToken, event);
     let _market = Market.load(marketID);
 
     // create new market
@@ -97,7 +100,6 @@ export class MarketClass {
       _market.liquidationThreshold = BIGDECIMAL_ZERO; // default
       _market.liquidationPenalty = BIGDECIMAL_ZERO; // default
       _market.canIsolate = false; // default
-      this.inputToken = new TokenClass(inputToken, event);
       _market.inputToken = this.inputToken.getToken().id;
       _market.inputTokenBalance = BIGINT_ZERO;
       _market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
@@ -139,7 +141,10 @@ export class MarketClass {
       _market.borrowingPositionCount = INT_ZERO;
       _market.save();
 
-      // add to totalPoolCount
+      // add market to protocol
+      const markets = this.protocol._markets;
+      markets.push(_market.id);
+      this.protocol.markets = markets;
       this.protocol.totalPoolCount += INT_ONE;
       this.protocol.save();
     }
@@ -152,6 +157,11 @@ export class MarketClass {
     this.getOrCreateFinancials();
     this.getOrCreateUsageDailySnapshot();
     this.getOrCreateUsageHourlySnapshot();
+
+    // load oracle
+    if (this.market.oracle) {
+      this.oracle = Oracle.load(this.market.oracle!)!;
+    }
   }
 
   /////////////////
@@ -198,6 +208,7 @@ export class MarketClass {
       protocol.liquidationCount = INT_ZERO;
       protocol.transferCount = INT_ZERO;
       protocol.flashloanCount = INT_ZERO;
+      protocol._markets = [];
     }
 
     protocol.schemaVersion = Versions.getSchemaVersion();
@@ -308,7 +319,7 @@ export class MarketClass {
       snapshot.dailyActiveBorrowers = INT_ZERO;
       snapshot.dailyActiveLiquidators = INT_ZERO;
       snapshot.dailyActiveLiquidatees = INT_ZERO;
-      snapshot.dailyActiveTransferers = INT_ZERO;
+      snapshot.dailyActiveTransferrers = INT_ZERO;
       snapshot.dailyActiveFlashloaners = INT_ZERO;
       snapshot.dailyDepositCount = INT_ZERO;
       snapshot.dailyWithdrawCount = INT_ZERO;
@@ -449,6 +460,7 @@ export class MarketClass {
     snapshot.cumulativeUniqueLiquidatees =
       this.protocol.cumulativeUniqueLiquidatees;
     snapshot.cumulativePositionCount = this.protocol.cumulativePositionCount;
+    snapshot.openPositionCount = this.protocol.openPositionCount;
     snapshot.totalPoolCount = this.protocol.totalPoolCount;
     snapshot.blockNumber = this.event.block.number;
     snapshot.timestamp = this.event.block.timestamp;
@@ -508,7 +520,7 @@ export class MarketClass {
   }
 
   getOracleAddress(): Address {
-    return this.oracle.oracleAddress;
+    return Address.fromBytes(this.oracle.oracleAddress);
   }
 
   getOrUpdateRate(
@@ -534,8 +546,8 @@ export class MarketClass {
       this.market.rates = [];
     }
 
-    if (this.market.rates.indexOf(interestRateID) == -1) {
-      this.market.rates.push(interestRateID);
+    if (this.market.rates!.indexOf(interestRateID) == -1) {
+      this.market.rates!.push(interestRateID);
     }
     this.market.save();
 
@@ -880,10 +892,13 @@ export class MarketClass {
 
   private updateSnapshotUsage(transactionType: string, account: Address): void {
     // create Account for total active accounts
-    let _account = Account.load(account);
-    this.account = this.getOrCreateAccount(account);
-    if (!_account) {
-      this.protocol.cumulativeUniqueUsers += INT_ONE;
+    // liquidatees are not considered users since they are not spending gas for the transaction
+    if (transactionType != TransactionType.LIQUIDATEE) {
+      const _account = Account.load(account);
+      this.account = this.getOrCreateAccount(account);
+      if (!_account) {
+        this.protocol.cumulativeUniqueUsers += INT_ONE;
+      }
     }
 
     const dailyActiveAccountID = AccountActivity.DAILY.concat("-")
@@ -1029,6 +1044,8 @@ export class MarketClass {
   ): void {
     if (transactionType == TransactionType.DEPOSIT) {
       this.protocol.depositCount += INT_ONE;
+      this.protocol.cumulativeDepositUSD =
+        this.protocol.cumulativeDepositUSD.plus(amountUSD);
       this.market.cumulativeDepositUSD =
         this.market.cumulativeDepositUSD.plus(amountUSD);
       this.market.depositCount += INT_ONE;
@@ -1057,6 +1074,8 @@ export class MarketClass {
       this.usageHourlySnapshot.hourlyWithdrawCount += INT_ONE;
     } else if (transactionType == TransactionType.BORROW) {
       this.protocol.borrowCount += INT_ONE;
+      this.protocol.cumulativeBorrowUSD =
+        this.protocol.cumulativeBorrowUSD.plus(amountUSD);
       this.market.cumulativeBorrowUSD =
         this.market.cumulativeBorrowUSD.plus(amountUSD);
       this.market.borrowCount += INT_ONE;
@@ -1085,6 +1104,8 @@ export class MarketClass {
       this.usageHourlySnapshot.hourlyRepayCount += INT_ONE;
     } else if (transactionType == TransactionType.LIQUIDATE) {
       this.protocol.liquidationCount += INT_ONE;
+      this.protocol.cumulativeLiquidateUSD =
+        this.protocol.cumulativeLiquidateUSD.plus(amountUSD);
       this.market.cumulativeLiquidateUSD =
         this.market.cumulativeLiquidateUSD.plus(amountUSD);
       this.market.liquidationCount += INT_ONE;
@@ -1146,7 +1167,7 @@ export class MarketClass {
     this.usageHourlySnapshot.save();
   }
 
-  // used to update
+  // used to update tvl, borrow balance, reserves, etc. in market and protocol
   updateMarketAndProtocolData(
     inputTokenPriceUSD: BigDecimal,
     newInputTokenBalance: BigInt,
@@ -1177,13 +1198,13 @@ export class MarketClass {
       this.market.exchangeRate = exchangeRate;
     }
     const vBorrowAmount = this.market.variableBorrowedTokenBalance
-      ? this.market.variableBorrowedTokenBalance
-          .toBigDecimal()
+      ? this.market
+          .variableBorrowedTokenBalance!.toBigDecimal()
           .div(mantissaFactorBD)
       : BIGDECIMAL_ZERO;
     const sBorrowAmount = this.market.stableBorrowedTokenBalance
-      ? this.market.stableBorrowedTokenBalance
-          .toBigDecimal()
+      ? this.market
+          .stableBorrowedTokenBalance!.toBigDecimal()
           .div(mantissaFactorBD)
       : BIGDECIMAL_ZERO;
     const totalBorrowed = vBorrowAmount.plus(sBorrowAmount);
@@ -1196,7 +1217,7 @@ export class MarketClass {
 
     let totalValueLockedUSD = BIGDECIMAL_ZERO;
     let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-    const marketList = this.protocol.markets;
+    const marketList = this.protocol._markets;
     for (let i = 0; i < marketList.length; i++) {
       const _market = Market.load(marketList[i]);
       if (!_market) {
@@ -1205,6 +1226,7 @@ export class MarketClass {
         ]);
         continue;
       }
+      log.error("asdf tvl: {}", [_market.totalValueLockedUSD.toString()]);
       totalValueLockedUSD = totalValueLockedUSD.plus(
         _market.totalValueLockedUSD
       );

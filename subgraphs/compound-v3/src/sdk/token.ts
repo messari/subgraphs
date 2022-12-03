@@ -2,14 +2,8 @@
 import { ERC20 } from "../../generated/Configurator/ERC20";
 import { ERC20SymbolBytes } from "../../generated/Configurator/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/Configurator/ERC20NameBytes";
-import {
-  Address,
-  BigDecimal,
-  Bytes,
-  BigInt,
-  ethereum,
-} from "@graphprotocol/graph-ts";
-import { Oracle, RewardToken, Token } from "../../generated/schema";
+import { Address, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { RewardToken, Token } from "../../generated/schema";
 import { BIGDECIMAL_ZERO } from "./constants";
 
 export class TokenClass {
@@ -17,9 +11,13 @@ export class TokenClass {
   private UNKNOWN_TOKEN_VALUE: string = "unknown";
 
   private token!: Token;
-  private event: ethereum.Event;
+  private event!: ethereum.Event;
 
-  constructor(tokenAddress: Bytes, event: ethereum.Event, tokenType?: string) {
+  constructor(
+    tokenAddress: Bytes,
+    event: ethereum.Event,
+    tokenType: string | null = null
+  ) {
     let _token = Token.load(tokenAddress);
     if (!_token) {
       _token = new Token(tokenAddress);
@@ -50,7 +48,7 @@ export class TokenClass {
 
   getPriceUSD(): BigDecimal {
     if (this.token.lastPriceUSD) {
-      return this.token.lastPriceUSD;
+      return this.token.lastPriceUSD!;
     }
     return BIGDECIMAL_ZERO;
   }
