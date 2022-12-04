@@ -222,6 +222,13 @@ export function createDeposit(
   tokenInputBalances[0] = tokenInputBalances[0].plus(amount0);
   tokenInputBalances[1] = tokenInputBalances[1].plus(amount1);
   position.inputTokenBalances = tokenInputBalances;
+  let outputTokenBalance = position.outputTokenBalance;
+  if(!outputTokenBalance) {
+    outputTokenBalance = BIGINT_ZERO;
+  }
+  outputTokenBalance = outputTokenBalance.plus(transfer.liquidity!);
+  position.outputTokenBalance = outputTokenBalance;
+  
   position.save();
   deposit.position = position.id;
   deposit.save();
@@ -229,6 +236,7 @@ export function createDeposit(
 
   position.depositCount += 1;
   position.save();
+  
   // create a position snapshot
   createPositionSnapshot(event, position);
   updateDepositHelper(event.address);
@@ -257,6 +265,7 @@ export function createPositionSnapshot(
   snapShot.nonce = event.transaction.nonce;
   snapShot.position = position.id;
   snapShot.inputTokenBalances = position.inputTokenBalances.map<BigInt>(value => value);
+  snapShot.outputTokenBalance = position.outputTokenBalance;
   let cumulativeRewards = position.cumulativeRewardTokenAmounts;
   if(cumulativeRewards) {
     snapShot.cumulativeRewardTokenAmounts = cumulativeRewards.map<BigInt>(value => value);
@@ -323,6 +332,7 @@ export function createWithdraw(
   inputTokenBalances[0] = inputTokenBalances[0].minus(amount0);
   inputTokenBalances[1] = inputTokenBalances[1].minus(amount1);
   position.inputTokenBalances = inputTokenBalances;
+  position.outputTokenBalance = transfer.liquidity!;
     // if input token balances are zero, close the position
   if(inputTokenBalances[0] == BIGINT_ZERO && inputTokenBalances[1] == BIGINT_ZERO) {
     position.hashClosed = event.transaction.hash.toHexString();
