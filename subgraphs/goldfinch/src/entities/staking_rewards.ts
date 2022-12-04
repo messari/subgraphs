@@ -15,6 +15,7 @@ import {
   getOrCreateMarket,
   getOrCreateRewardToken,
 } from "../common/getters";
+import { bigDecimalToBigInt } from "../common/utils";
 
 import { updateEstimatedApyFromGfiRaw } from "./senior_pool";
 
@@ -59,9 +60,12 @@ export function updateSeniorPoolRewardTokenEmissions(
   }
 
   // since FIDU and GFI both have 18 decimals
-  const rewardTokenEmissionsAmount = seniorPool.outputTokenSupply
-    .times(stakingReward.currentEarnRatePerToken)
-    .times(BigInt.fromI32(SECONDS_PER_DAY));
+  const rewardTokenEmissionsAmount = bigDecimalToBigInt(
+    seniorPool.outputTokenSupply
+      .times(stakingReward.currentEarnRatePerToken)
+      .times(BigInt.fromI32(SECONDS_PER_DAY))
+      .divDecimal(GFI_DECIMALS)
+  );
 
   const GFIpriceUSD = getGFIPrice(event);
   const rewardTokenEmissionsUSD = !GFIpriceUSD

@@ -77,11 +77,12 @@ export function updateMarketRewardTokenEmissions(event: ethereum.Event): void {
     }
 
     // reward token is for junior backers only, but messari
-    // schema doesn't differentiate junor/seniro tranche
+    // schema doesn't differentiate junor/senior tranche
     const rewardTokenEmissionsAmount = bigDecimalToBigInt(
       market.totalDepositBalanceUSD
         .times(tranchedPool.estimatedJuniorApyFromGfiRaw)
         .div(BigDecimal.fromString(DAYS_PER_YEAR.toString()))
+        .times(GFI_DECIMALS)
     );
     const GFIpriceUSD = getGFIPrice(event);
     const rewardTokenEmissionsUSD = !GFIpriceUSD
@@ -90,7 +91,7 @@ export function updateMarketRewardTokenEmissions(event: ethereum.Event): void {
     market.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
     market.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
     log.info(
-      "[updateSeniorPoolRewardTokenEmissions]daily emission amout={}, USD={} at tx {}",
+      "[updateMarketRewardTokenEmissions]daily emission amout={}, USD={} at tx {}",
       [
         rewardTokenEmissionsAmount.toString(),
         rewardTokenEmissionsUSD.toString(),
