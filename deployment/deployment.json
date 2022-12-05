@@ -1002,7 +1002,7 @@
     "deployments": {
       "belt-finance-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.2.1",
           "subgraph": "1.1.1",
