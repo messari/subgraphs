@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -363,19 +363,26 @@ export function handleStake(event: Stake): void {
       let sumWeightedBorrowUSD = BIGDECIMAL_ZERO;
       for (let i = 0; i < protocol._marketIDs!.length; i++) {
         const mktID = protocol._marketIDs![i];
-        const mrkt = getOrCreateMarket(mktID);
-        const stakedAmount = mrkt._stakedAmount;
-        if (stakedAmount.gt(BIGINT_ZERO)) {
-          updateWeightedStakeAmount(mrkt, epochStartBlock);
+        const mkt = Market.load(mktID);
+        if (!mkt) {
+          log.error("[handleStake]market {} doesn't exist, but this should not happen | tx ={}", [
+            mktID,
+            event.transaction.hash.toHexString(),
+          ]);
+          return;
         }
-        marketStakeAmounts.push(mrkt._weightedStakedAmount ? mrkt._weightedStakedAmount! : BIGINT_ZERO);
-        if (mrkt.totalBorrowBalanceUSD.gt(BIGDECIMAL_ZERO)) {
-          updateWeightedBorrow(mrkt, prevEpoch, epochStartBlock);
+        const stakedAmount = mkt._stakedAmount;
+        if (stakedAmount.gt(BIGINT_ZERO)) {
+          updateWeightedStakeAmount(mkt, epochStartBlock);
+        }
+        marketStakeAmounts.push(mkt._weightedStakedAmount ? mkt._weightedStakedAmount! : BIGINT_ZERO);
+        if (mkt.totalBorrowBalanceUSD.gt(BIGDECIMAL_ZERO)) {
+          updateWeightedBorrow(mkt, prevEpoch, epochStartBlock);
         }
         sumWeightedBorrowUSD = sumWeightedBorrowUSD.plus(
-          mrkt._weightedTotalBorrowUSD ? mrkt._weightedTotalBorrowUSD! : BIGDECIMAL_ZERO,
+          mkt._weightedTotalBorrowUSD ? mkt._weightedTotalBorrowUSD! : BIGDECIMAL_ZERO,
         );
-        mrkt.save();
+        mkt.save();
       }
 
       const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
@@ -391,30 +398,37 @@ export function handleStake(event: Stake): void {
       const dailyScaler = BigDecimal.fromString((BLOCKS_PER_DAY / (BLOCKS_PER_EPOCH as f64)).toString());
       for (let i = 0; i < protocol._marketIDs!.length; i++) {
         const mktID = protocol._marketIDs![i];
-        const mrkt = getOrCreateMarket(mktID);
-        const mrktRewardToken = mrkt.rewardTokens;
+        const mkt = Market.load(mktID);
+        if (!mkt) {
+          log.error("[handleStake]market {} doesn't exist, but this should not happen | tx ={}", [
+            mktID,
+            event.transaction.hash.toHexString(),
+          ]);
+          return;
+        }
+        const mrktRewardToken = mkt.rewardTokens;
         if (!mrktRewardToken || mrktRewardToken.length == 0) {
-          mrkt.rewardTokens = [rewardToken.id];
+          mkt.rewardTokens = [rewardToken.id];
         }
         // if prev epoch exists, distribute the rewards
         // only for epochs after the START_EPOCH (6)
-        if (sumWeightedBorrowUSD.gt(BIGDECIMAL_ZERO) && mrkt._weightedTotalBorrowUSD) {
+        if (sumWeightedBorrowUSD.gt(BIGDECIMAL_ZERO) && mkt._weightedTotalBorrowUSD) {
           const rewardTokenEmissionsAmount = BigDecimalTruncateToBigInt(
-            mrkt._weightedTotalBorrowUSD!.div(sumWeightedBorrowUSD).times(totalRewardAmount).times(dailyScaler),
+            mkt._weightedTotalBorrowUSD!.div(sumWeightedBorrowUSD).times(totalRewardAmount).times(dailyScaler),
           );
           const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
             .divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
             .times(EULToken.lastPriceUSD!);
-          mrkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
-          mrkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+          mkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
+          mkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
         }
 
         // set mkrts receiving rewards in the new epoch
-        mrkt._receivingRewards = false;
-        if (mrkt._weightedStakedAmount && mrkt._weightedStakedAmount!.ge(cutoffAmount)) {
-          mrkt._receivingRewards = true;
+        mkt._receivingRewards = false;
+        if (mkt._weightedStakedAmount && mkt._weightedStakedAmount!.ge(cutoffAmount)) {
+          mkt._receivingRewards = true;
         }
-        mrkt.save();
+        mkt.save();
       }
     }
   }
