@@ -1,10 +1,9 @@
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
-import { getOrCreateVault } from "../common/initializers";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import { Address, dataSource, log } from "@graphprotocol/graph-ts";
 import { Buyback } from "../../generated/templates/Strategy/Strategy";
+import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
 
 export function handleBuyback(event: Buyback): void {
   if (utils.isBuyBackTransactionPresent(event.transaction)) return;
@@ -18,26 +17,26 @@ export function handleBuyback(event: Buyback): void {
   const harvestedAmount = event.params.earnedAmount;
   const harvestTokenAddress = event.params.earnedAddress;
 
-  let harvestedTokenPrice = getUsdPricePerToken(harvestTokenAddress);
-  let harvestedTokenDecimals = utils.getTokenDecimals(harvestTokenAddress);
+  const harvestedToken = getOrCreateToken(harvestTokenAddress, event.block);
 
-  let harvestedAmountUSD = harvestedAmount
-    .divDecimal(harvestedTokenDecimals)
-    .times(harvestedTokenPrice.usdPrice)
-    .div(harvestedTokenPrice.decimalsBaseTen);
+  const harvestedAmountUSD = harvestedAmount
+    .divDecimal(
+      constants.BIGINT_TEN.pow(harvestedToken.decimals as u8).toBigDecimal()
+    )
+    .times(harvestedToken.lastPriceUSD!);
 
-  let performanceFeesPercentage = utils.getStrategyPerformaceFees(
+  const performanceFeesPercentage = utils.getStrategyPerformaceFees(
     vaultAddress,
     strategyAddress
   );
 
-  let supplySideRevenueUSD = harvestedAmountUSD.times(
+  const supplySideRevenueUSD = harvestedAmountUSD.times(
     constants.BIGDECIMAL_ONE.minus(
       performanceFeesPercentage.feePercentage!.div(constants.BIGDECIMAL_HUNDRED)
     )
   );
 
-  let protocolSideRevenueUSD = harvestedAmountUSD.times(
+  const protocolSideRevenueUSD = harvestedAmountUSD.times(
     performanceFeesPercentage.feePercentage!.div(constants.BIGDECIMAL_HUNDRED)
   );
 

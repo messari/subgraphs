@@ -664,6 +664,15 @@ type Market @entity {
 
   " The amount of borrowed asset in underlying "
   _borrowBalance: BigInt!
+
+  " block timestamp the last time when RewardPaid event emitted (used to calc reward for iron-bank) "
+  _rewardLastUpdatedTimestamp: BigInt
+
+  " cumulative Reward Emission Amount (used to calc reward for iron-bank) "
+  _cumulativeRewardAmount: BigInt
+
+  " Amount of output token staked (used to calc reward for iron-bank) "
+  _stakedOutputTokenAmount: BigInt
 }
 
 #################################

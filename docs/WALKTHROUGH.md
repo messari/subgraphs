@@ -142,3 +142,18 @@ It is not quite done. Review your PR and make sure all of the [contributing guid
 I hate to break it to you, but nothing is ever perfect the first time. There will be more to iterate on, but this is an opportunity to learn and improve from an experienced subgraph developer.
 
 Next the subgraph will be QA'd by a protocol specialist, and if that passes it is `prod` ready. This means we will integrate it into Messari's product that is powered by subgraphs. It is called Protocol Metrics and you can play with it [here](https://messari.io/protocol-explorer/all-protocols) (if you have any feedback don't hesitate to reach out)!
+
+## Production Subgraphs
+
+A production subgraph will have a `status` of `prod` in [`deployment.json`](../deployment/deployment.json). At this point we also want to add the methodology (protocol `README.md`) to the "Methodologies Gitbook".
+
+### Adding Methodologies To GitBook
+
+> Note: Only methodologies for protocols that are supported on protocol metrics should be added to the GitBook.
+
+1. Navigate to [`SUMMARY.MD`](SUMMARY.md)
+2. Find the protocol type section (Lending, DEX, etc.) that the protocol belongs too
+3. Add the protocol in alphabetical order (if the protocol is a fork, make sure to add it under the corresponding fork header and in alphabetical order in relation to the other forks)
+4. To direct the existing methodology to gitbooks, enter the protocol name and repository path in the format: `[protocol name](../subgraphs/protocol/blah/READ.ME)` 
+5. Save changes and make PR
+6. Once PR is merged make sure that methodology is reflected on the [Messari GitBook](https://docs.messari.io/messari/getting-started/about-messari)

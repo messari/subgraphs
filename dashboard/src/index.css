@@ -50,3 +50,7 @@ input[type="file"] {
 .round-image {
   border-radius: 2px;
 }
+
+.PrivatePickersSlideTransition-root {
+  min-height: 200px !important;
+}

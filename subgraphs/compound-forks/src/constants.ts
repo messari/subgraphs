@@ -149,6 +149,15 @@ export function BDChangeDecimals(
   }
 }
 
+export function equalsIgnoreCase(a: string, b: string): boolean {
+  return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
+
+// truncate bigdecimal to bigint (removing numbers right of decimal place)
+export function bigDecimalToBigInt(n: BigDecimal): BigInt {
+  return BigInt.fromString(n.toString().split(".")[0]);
+}
+
 /////////////////////////////
 /////     Addresses     /////
 /////////////////////////////

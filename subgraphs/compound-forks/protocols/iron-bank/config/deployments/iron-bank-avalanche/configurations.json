@@ -1,5 +1,7 @@
 {
   "network": "avalanche",
   "factoryAddress": "0x2eE80614Ccbc5e28654324a66A396458Fa5cD7Cc",
-  "startBlock": 5361428
+  "startBlock": 5361428,
+  "rewardsFactoryAddress": "0x0000000000000000000000000000000000000000",
+  "rewardStartBlock": 5361428
 }
