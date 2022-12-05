@@ -7,7 +7,6 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
-  Account,
   ActiveAccount,
   Borrow,
   Deposit,
@@ -29,11 +28,8 @@ import {
   UsageMetricsHourlySnapshot,
   Withdraw,
 } from "../../generated/schema";
-import {
-  ApproveThisCall__Inputs,
-  ApproveThisCall__Outputs,
-} from "../../generated/templates/Comet/Comet";
 import { Versions } from "../versions";
+import { AccountClass } from "./account";
 import {
   AccountActivity,
   BIGDECIMAL_ZERO,
@@ -41,34 +37,35 @@ import {
   exponentToBigDecimal,
   INT_ONE,
   INT_ZERO,
+  PositionSide,
   ProtocolType,
   RevenueSource,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   TransactionType,
 } from "./constants";
-import { ProtocolData } from "./protocol";
 import { TokenClass } from "./token";
 
 /**
- * This file contains schema classes.
- * These classes are used to get, create, update different pieces of stored data.
- * Each class represents a different entity type
+ * This file contains the MarketClass, which is used to
+ * make all of the storage changes that occur in a given market.
+ *
+ * You can think of this as an abstraction so the developer doesn't
+ * need to think about all of the detailed storage changes that occur.
  *
  * Schema Version: 3.0.0
- * Last Updated: Nov 10, 2022
+ * Last Updated: Dec 4, 2022
  * Author(s):
  *  - @dmelotik
  */
-
 export class MarketClass {
-  public event!: ethereum.Event;
+  private event!: ethereum.Event;
 
   // entities
   public protocol!: LendingProtocol;
   private market!: Market;
   private inputToken!: TokenClass;
-  private account!: Account;
+  private account!: AccountClass;
   private oracle!: Oracle;
 
   // snapshots
@@ -641,24 +638,6 @@ export class MarketClass {
     return details;
   }
 
-  getOrCreateAccount(address: Address): Account {
-    const account = new Account(address);
-    account.positionCount = INT_ZERO;
-    account.openPositionCount = INT_ZERO;
-    account.closedPositionCount = INT_ZERO;
-    account.depositCount = INT_ZERO;
-    account.withdrawCount = INT_ZERO;
-    account.borrowCount = INT_ZERO;
-    account.repayCount = INT_ZERO;
-    account.liquidateCount = INT_ZERO;
-    account.liquidationCount = INT_ZERO;
-    account.transferredCount = INT_ZERO;
-    account.receivedCount = INT_ZERO;
-    account.flashloanCount = INT_ZERO;
-    account.save();
-    return account;
-  }
-
   //////////////////
   //// Creators ////
   //////////////////
@@ -667,8 +646,29 @@ export class MarketClass {
     asset: Address,
     account: Address,
     amount: BigInt,
-    amountUSD: BigDecimal
+    amountUSD: BigDecimal,
+    newBalance: BigInt,
+    interestType: string | null = null
   ): Deposit {
+    this.account = new AccountClass(
+      account,
+      this.market,
+      this.protocol,
+      this.event
+    );
+    if (this.account.newAccount()) {
+      this.protocol.cumulativeUniqueUsers += INT_ONE;
+      this.protocol.save();
+    }
+    this.account.addPosition(
+      this.market.inputToken,
+      newBalance,
+      PositionSide.COLLATERAL,
+      TransactionType.DEPOSIT,
+      this.market.inputTokenPriceUSD,
+      interestType
+    );
+
     const deposit = new Deposit(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
@@ -682,7 +682,7 @@ export class MarketClass {
     deposit.timestamp = this.event.block.timestamp;
     deposit.account = account;
     deposit.market = this.market.id;
-    deposit.position = account; // TODO add position
+    deposit.position = this.account.getPositionID();
     deposit.asset = asset;
     deposit.amount = amount;
     deposit.amountUSD = amountUSD;
@@ -700,6 +700,17 @@ export class MarketClass {
     amount: BigInt,
     amountUSD: BigDecimal
   ): Withdraw {
+    this.account = new AccountClass(
+      account,
+      this.market,
+      this.protocol,
+      this.event
+    );
+    if (this.account.newAccount()) {
+      this.protocol.cumulativeUniqueUsers += INT_ONE;
+      this.protocol.save();
+    }
+
     const withdraw = new Withdraw(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
@@ -731,6 +742,17 @@ export class MarketClass {
     amount: BigInt,
     amountUSD: BigDecimal
   ): Borrow {
+    this.account = new AccountClass(
+      account,
+      this.market,
+      this.protocol,
+      this.event
+    );
+    if (this.account.newAccount()) {
+      this.protocol.cumulativeUniqueUsers += INT_ONE;
+      this.protocol.save();
+    }
+
     const borrow = new Borrow(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
@@ -762,6 +784,17 @@ export class MarketClass {
     amount: BigInt,
     amountUSD: BigDecimal
   ): Repay {
+    this.account = new AccountClass(
+      account,
+      this.market,
+      this.protocol,
+      this.event
+    );
+    if (this.account.newAccount()) {
+      this.protocol.cumulativeUniqueUsers += INT_ONE;
+      this.protocol.save();
+    }
+
     const repay = new Repay(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
@@ -795,6 +828,24 @@ export class MarketClass {
     amountUSD: BigDecimal,
     profitUSD: BigDecimal
   ): Liquidate {
+    this.account = new AccountClass(
+      liquidator,
+      this.market,
+      this.protocol,
+      this.event
+    );
+    if (this.account.newAccount()) {
+      this.protocol.cumulativeUniqueUsers += INT_ONE;
+      this.protocol.save();
+    }
+    const liquidateeAccount = new AccountClass(
+      liquidatee,
+      this.market,
+      this.protocol,
+      this.event
+    );
+    // liquidatees are not considered users since they are not spending gas for the transaction
+
     const liquidate = new Liquidate(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
@@ -830,6 +881,24 @@ export class MarketClass {
     amount: BigInt,
     amountUSD: BigDecimal
   ): Transfer {
+    this.account = new AccountClass(
+      sender,
+      this.market,
+      this.protocol,
+      this.event
+    );
+    if (this.account.newAccount()) {
+      this.protocol.cumulativeUniqueUsers += INT_ONE;
+      this.protocol.save();
+    }
+    const recieverAccount = new AccountClass(
+      receiver,
+      this.market,
+      this.protocol,
+      this.event
+    );
+    // receivers are not considered users since they are not spending gas for the transaction
+
     const transfer = new Transfer(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
@@ -862,6 +931,17 @@ export class MarketClass {
     amount: BigInt,
     amountUSD: BigDecimal
   ): Flashloan {
+    this.account = new AccountClass(
+      account,
+      this.market,
+      this.protocol,
+      this.event
+    );
+    if (this.account.newAccount()) {
+      this.protocol.cumulativeUniqueUsers += INT_ONE;
+      this.protocol.save();
+    }
+
     const flashloan = new Flashloan(
       this.event.transaction.hash.concatI32(this.event.logIndex.toI32())
     );
@@ -891,16 +971,6 @@ export class MarketClass {
   //////////////////
 
   private updateSnapshotUsage(transactionType: string, account: Address): void {
-    // create Account for total active accounts
-    // liquidatees are not considered users since they are not spending gas for the transaction
-    if (transactionType != TransactionType.LIQUIDATEE) {
-      const _account = Account.load(account);
-      this.account = this.getOrCreateAccount(account);
-      if (!_account) {
-        this.protocol.cumulativeUniqueUsers += INT_ONE;
-      }
-    }
-
     const dailyActiveAccountID = AccountActivity.DAILY.concat("-")
       .concat(account.toHexString())
       .concat("-")
@@ -947,22 +1017,25 @@ export class MarketClass {
       dailyActiveAccountTransactionMarketID
     ); // market daily
 
-    if (!dailyActiveAccount) {
+    if (!dailyActiveAccount && transactionType != TransactionType.LIQUIDATEE) {
       dailyActiveAccount = new ActiveAccount(dailyActiveAccountID);
       dailyActiveAccount.save();
       this.usageDailySnapshot.dailyActiveUsers += INT_ONE;
     }
-    if (!dailyActiveAccountMarket) {
+    if (
+      !dailyActiveAccountMarket &&
+      transactionType != TransactionType.LIQUIDATEE
+    ) {
       dailyActiveAccountMarket = new ActiveAccount(dailyActiveAccountMarketID);
       dailyActiveAccountMarket.save();
       this.marketDailySnapshot.dailyActiveUsers += INT_ONE;
     }
-    if (!hourlyActiveAccount) {
+    if (!hourlyActiveAccount && transactionType != TransactionType.LIQUIDATEE) {
       hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountID);
       hourlyActiveAccount.save();
       this.usageHourlySnapshot.hourlyActiveUsers += INT_ONE;
     }
-    if (!activeAccountMarket) {
+    if (!activeAccountMarket && transactionType != TransactionType.LIQUIDATEE) {
       activeAccountMarket = new ActiveAccount(activeAccountMarketID);
       activeAccountMarket.save();
       this.market.cumulativeUniqueUsers += INT_ONE;
@@ -1177,7 +1250,7 @@ export class MarketClass {
     exchangeRate: BigDecimal | null = null
   ): void {
     const mantissaFactorBD = exponentToBigDecimal(
-      this.inputToken.getToken().decimals
+      this.inputToken.getDecimals()
     );
     this.inputToken.updatePrice(inputTokenPriceUSD);
     this.market.inputTokenPriceUSD = inputTokenPriceUSD;
@@ -1329,4 +1402,19 @@ export class MarketClass {
       this.protocol.save();
     }
   }
+}
+
+export class ProtocolData {
+  constructor(
+    public readonly protocolID: Bytes,
+    public readonly protocol: string,
+    public readonly name: string,
+    public readonly slug: string,
+    public readonly network: string,
+    public readonly lendingType: string,
+    public readonly lenderPermissionType: string | null,
+    public readonly borrowerPermissionType: string | null,
+    public readonly collateralizationType: string | null,
+    public readonly riskType: string | null
+  ) {}
 }

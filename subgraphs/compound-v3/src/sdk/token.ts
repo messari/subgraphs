@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import { ERC20 } from "../../generated/Configurator/ERC20";
 import { ERC20SymbolBytes } from "../../generated/Configurator/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/Configurator/ERC20NameBytes";
@@ -6,6 +5,16 @@ import { Address, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../generated/schema";
 import { BIGDECIMAL_ZERO } from "./constants";
 
+/**
+ * This file contains the TokenClass, which acts as
+ * a wrapper for the Token entity making it easier to
+ * use in mappings and get info about the token.
+ *
+ * Schema Version: 3.0.0
+ * Last Updated: Dec 4, 2022
+ * Author(s):
+ *  - @dmelotik
+ */
 export class TokenClass {
   private INVALID_TOKEN_DECIMALS: i32 = 0;
   private UNKNOWN_TOKEN_VALUE: string = "unknown";
@@ -38,6 +47,10 @@ export class TokenClass {
 
   getToken(): Token {
     return this.token;
+  }
+
+  getDecimals(): i32 {
+    return this.token.decimals;
   }
 
   updatePrice(newPriceUSD: BigDecimal): void {

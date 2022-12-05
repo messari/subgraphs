@@ -12,7 +12,7 @@ import {
   PermissionType,
   RiskType,
 } from "../../../src/sdk/constants";
-import { ProtocolData } from "../../../src/sdk/protocol";
+import { ProtocolData } from "../../../src/sdk/market";
 
 //////////////////////////////
 ///// Ethereum Addresses /////

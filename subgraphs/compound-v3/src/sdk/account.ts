@@ -1,15 +1,58 @@
-import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { Account, Position, _PositionCounter } from "../../generated/schema";
-import { BIGINT_ZERO, INT_ONE, INT_ZERO, TransactionType } from "./constants";
-import { MarketClass } from "./market";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  Bytes,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
+import {
+  Account,
+  LendingProtocol,
+  Market,
+  Position,
+  PositionSnapshot,
+  _PositionCounter,
+} from "../../generated/schema";
+import {
+  BIGINT_ZERO,
+  exponentToBigDecimal,
+  INT_ONE,
+  INT_ZERO,
+  TransactionType,
+} from "./constants";
+import { TokenClass } from "./token";
 
+/**
+ * This file contains the AccountClass, which does
+ * the operations on the Account entity. This includes:
+ *  - Creating a new Account
+ *  - Updating an existing Account
+ *  - Making a position
+ *  - Making position snapshots
+ *
+ * Schema Version: 3.0.0
+ * Last Updated: Dec 4, 2022
+ * Author(s):
+ *  - @dmelotik
+ */
 export class AccountClass {
   private isNew!: boolean; // true if the account was created
   private account!: Account;
   private position!: Position;
-  private market!: MarketClass;
+  private market!: Market;
+  private protocol!: LendingProtocol;
+  private event!: ethereum.Event;
 
-  constructor(account: Address, market: MarketClass) {
+  constructor(
+    account: Address,
+    market: Market,
+    protocol: LendingProtocol,
+    event: ethereum.Event
+  ) {
+    this.market = market;
+    this.protocol = protocol;
+    this.event = event;
     let _account = Account.load(account);
     if (!_account) {
       _account = new Account(account);
@@ -31,7 +74,6 @@ export class AccountClass {
       this.isNew = false;
     }
     this.account = _account;
-    this.market = market;
   }
 
   // returns true if the account was created in this instance
@@ -44,15 +86,18 @@ export class AccountClass {
     newBalance: BigInt,
     side: string,
     transactionType: string,
+    priceUSD: BigDecimal,
     interestType: string | null = null
   ): void {
-    const marketEntity = this.market.getMarket();
-    const counterID = this.account.id
+    let counterID = this.account.id
       .toHexString()
       .concat("-")
-      .concat(marketEntity.id.toHexString())
+      .concat(this.market.id.toHexString())
       .concat("-")
       .concat(side);
+    if (interestType) {
+      counterID = counterID.concat("-").concat(interestType);
+    }
     let positionCounter = _PositionCounter.load(counterID);
     if (!positionCounter) {
       positionCounter = new _PositionCounter(counterID);
@@ -68,11 +113,11 @@ export class AccountClass {
     if (openPosition) {
       position = new Position(positionID);
       position.account = this.account.id;
-      position.market = marketEntity.id;
+      position.market = this.market.id;
       position.asset = asset;
-      position.hashOpened = this.market.event.transaction.hash;
-      position.blockNumberOpened = this.market.event.block.number;
-      position.timestampOpened = this.market.event.block.timestamp;
+      position.hashOpened = this.event.transaction.hash;
+      position.blockNumberOpened = this.event.block.number;
+      position.timestampOpened = this.event.block.timestamp;
       position.side = side;
       if (interestType) {
         position.type = interestType;
@@ -109,39 +154,126 @@ export class AccountClass {
       //
       // update market position
       //
-      marketEntity.positionCount += 1;
-      marketEntity.openPositionCount += 1;
+      this.market.positionCount += 1;
+      this.market.openPositionCount += 1;
 
       if (
         transactionType == TransactionType.DEPOSIT ||
         transactionType == TransactionType.TRANSFER
       ) {
-        marketEntity.lendingPositionCount += 1;
+        this.market.lendingPositionCount += 1;
       } else if (transactionType == TransactionType.BORROW) {
-        marketEntity.borrowingPositionCount += 1;
+        this.market.borrowingPositionCount += 1;
       }
-      marketEntity.save();
+      this.market.save();
 
       //
       // update protocol position
       //
-      this.market.protocol.cumulativePositionCount += 1;
-      this.market.protocol.openPositionCount += 1;
-      this.market.protocol.save();
+      this.protocol.cumulativePositionCount += 1;
+      this.protocol.openPositionCount += 1;
+      this.protocol.save();
     }
     this.position = position;
 
     //
     // take position snapshot
     //
-    this.snapshotPosition();
+    this.snapshotPosition(priceUSD);
   }
 
   subtractPosition(
     newBalance: BigInt,
-    positionSide: string,
-    transactionType: string
-  ): void {}
+    side: string,
+    transactionType: string,
+    priceUSD: BigDecimal,
+    interestType: string | null = null
+  ): void {
+    let counterID = this.account.id
+      .toHexString()
+      .concat("-")
+      .concat(this.market.id.toHexString())
+      .concat("-")
+      .concat(side);
+    if (interestType) {
+      counterID = counterID.concat("-").concat(interestType);
+    }
+    const positionCounter = _PositionCounter.load(counterID);
+    if (!positionCounter) {
+      log.warning("[subtractPosition] position counter {} not found", [
+        counterID,
+      ]);
+      return;
+    }
+    const positionID = positionCounter.id
+      .concat("-")
+      .concat(positionCounter.nextCount.toString());
+    const position = Position.load(positionID);
+    if (!position) {
+      log.warning("[subtractPosition] position {} not found", [positionID]);
+      return;
+    }
+
+    position.balance = newBalance;
+
+    if (transactionType == TransactionType.WITHDRAW) {
+      position.withdrawCount += INT_ONE;
+    } else if (transactionType == TransactionType.REPAY) {
+      position.repayCount += INT_ONE;
+    } else if (transactionType == TransactionType.TRANSFER) {
+      position.transferredCount += INT_ONE;
+    } else if (transactionType == TransactionType.LIQUIDATE) {
+      position.liquidationCount += INT_ONE;
+    }
+    position.save();
+
+    const closePosition = position.balance == BIGINT_ZERO;
+    if (closePosition) {
+      //
+      // update position counter
+      //
+      positionCounter.nextCount += INT_ONE;
+      positionCounter.save();
+
+      //
+      // close position
+      //
+      position.hashClosed = this.event.transaction.hash;
+      position.blockNumberClosed = this.event.block.number;
+      position.timestampClosed = this.event.block.timestamp;
+      position.save();
+
+      //
+      // update account position
+      //
+      this.account.openPositionCount -= INT_ONE;
+      this.account.closedPositionCount += INT_ONE;
+      this.account.save();
+
+      //
+      // update market position
+      //
+      this.market.openPositionCount -= INT_ONE;
+      this.market.closedPositionCount += INT_ONE;
+      this.market.save();
+
+      //
+      // update protocol position
+      //
+      this.protocol.openPositionCount -= INT_ONE;
+      this.protocol.save();
+    }
+    this.position = position;
+
+    //
+    // update position snapshot
+    //
+    this.snapshotPosition(priceUSD);
+  }
+
+  getPositionID(): string {
+    return this.position.id;
+  }
 
   setCollateral(isCollateral: boolean): void {
     this.position.isCollateral = isCollateral;
@@ -153,5 +285,27 @@ export class AccountClass {
     this.position.save();
   }
 
-  private snapshotPosition(): void {}
+  private snapshotPosition(priceUSD: BigDecimal): void {
+    const snapshot = new PositionSnapshot(
+      this.position.id
+        .concat("-")
+        .concat(this.event.transaction.hash.toHexString())
+        .concat("-")
+        .concat(this.event.logIndex.toString())
+    );
+    const token = new TokenClass(this.position.asset, this.event);
+    const mantissaFactorBD = exponentToBigDecimal(token.getDecimals());
+    snapshot.hash = this.event.transaction.hash;
+    snapshot.logIndex = this.event.logIndex.toI32();
+    snapshot.nonce = this.event.transaction.nonce;
+    snapshot.position = this.position.id;
+    snapshot.balance = this.position.balance;
+    snapshot.balanceUSD = this.position.balance
+      .toBigDecimal()
+      .div(mantissaFactorBD)
+      .times(priceUSD);
+    snapshot.blockNumber = this.event.block.number;
+    snapshot.timestamp = this.event.block.timestamp;
+    snapshot.save();
+  }
 }

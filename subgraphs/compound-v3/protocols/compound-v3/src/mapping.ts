@@ -4,7 +4,6 @@ import {
   BigInt,
   log,
   BigDecimal,
-  Bytes,
 } from "@graphprotocol/graph-ts";
 import {
   AddAsset,
@@ -268,7 +267,7 @@ export function handleSetBaseTrackingBorrowSpeed(
     event.params.newBaseTrackingBorrowSpeed;
   marketEntity.save();
 
-  updateRewards(marketClass, event.address);
+  updateRewards(marketClass, event.address, event);
 }
 
 //
@@ -299,7 +298,7 @@ export function handleSetBaseTrackingSupplySpeed(
     event.params.newBaseTrackingSupplySpeed;
   marketEntity.save();
 
-  updateRewards(marketClass, event.address);
+  updateRewards(marketClass, event.address, event);
 }
 
 //
@@ -460,7 +459,7 @@ export function handleSupply(event: Supply): void {
     return;
   }
   updateRevenue(market, event.address);
-  updateRewards(market, event.address);
+  updateRewards(market, event.address, event);
 
   const mintAmount = isMint(event);
   if (!mintAmount) {
@@ -534,7 +533,7 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
     return;
   }
   updateRevenue(market, event.address);
-  updateRewards(market, event.address);
+  updateRewards(market, event.address, event);
 
   const deposit = market.createDeposit(
     asset,
@@ -570,7 +569,7 @@ export function handleWithdraw(event: Withdraw): void {
     return;
   }
   updateRevenue(market, event.address);
-  updateRewards(market, event.address);
+  updateRewards(market, event.address, event);
 
   const burnAmount = isBurn(event);
   if (!burnAmount) {
@@ -645,7 +644,7 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
     return;
   }
   updateRevenue(market, event.address);
-  updateRewards(market, event.address);
+  updateRewards(market, event.address, event);
 
   const withdraw = market.createWithdraw(
     asset,
@@ -688,7 +687,7 @@ export function handleTransferCollateral(event: TransferCollateral): void {
     return;
   }
   // no revenue accrued during this event
-  updateRewards(market, event.address);
+  updateRewards(market, event.address, event);
 
   market.createTransfer(
     asset,
@@ -728,7 +727,7 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
     return;
   }
   updateRevenue(market, event.address);
-  updateRewards(market, event.address);
+  updateRewards(market, event.address, event);
 
   market.createLiquidate(
     baseAsset,
@@ -744,7 +743,11 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
 ///// Helpers /////
 ///////////////////
 
-function updateRewards(market: MarketClass, cometAddress: Address): void {
+function updateRewards(
+  market: MarketClass,
+  cometAddress: Address,
+  event: ethereum.Event
+): void {
   const cometContract = Comet.bind(cometAddress);
   const tryTrackingIndexScale = cometContract.try_trackingIndexScale();
   const marketEntity = market.getMarket();
@@ -769,11 +772,8 @@ function updateRewards(market: MarketClass, cometAddress: Address): void {
     return;
   }
 
-  const rewardToken = new TokenClass(
-    tryRewardConfig.value.value0,
-    market.event
-  );
-  const decimals = rewardToken.getToken().decimals;
+  const rewardToken = new TokenClass(tryRewardConfig.value.value0, event);
+  const decimals = rewardToken.getDecimals();
   const borrowRewardToken = rewardToken.getOrCreateRewardToken(
     RewardTokenType.VARIABLE_BORROW
   );

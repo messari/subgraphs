@@ -1448,7 +1448,7 @@ type Account @entity {
 # A position is defined as who has control over the collateral or debt
 type Position @entity {
   " { Account address }-{ Market address }-{ Position Side }-{ Optional: Interest Rate Type}-{ Counter } "
-  id: Bytes!
+  id: ID!
 
   " Account that owns this position "
   account: Account!
@@ -1516,7 +1516,7 @@ type Position @entity {
   " All repay events of this position "
   repays: [Repay!]! @derivedFrom(field: "position")
 
-  " Number of liquidations related to this position (incremented when this position was liquidated) "
+  " Number of liquidations related to this position (incremented when this position is liquidated) "
   liquidationCount: Int!
 
   " Liquidation event related to this position (if exists) "
@@ -1543,7 +1543,7 @@ type Position @entity {
 # Note that we only take snapshot for open positions.
 type PositionSnapshot @entity(immutable: true) {
   " { Position ID }-{ Transaction hash }-{ Log index } "
-  id: Bytes!
+  id: ID!
 
   " Transaction hash of the transaction that triggered this snapshot "
   hash: Bytes!
@@ -1624,9 +1624,6 @@ interface Event {
 
   " The market tokens are deposited to "
   market: Market!
-
-  " The user position changed by this event "
-  position: Position!
 
   " Token deposited "
   asset: Token!
@@ -1979,7 +1976,7 @@ type Flashloan implements Event @entity(immutable: true) {
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that receieves the funds from the flashloan "
+  " Account that receives the funds from the flashloan "
   account: Account!
 
   " Account that initiates the flashloan "
