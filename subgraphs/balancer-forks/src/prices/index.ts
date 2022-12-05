@@ -11,8 +11,8 @@ import * as SushiCalculations from "./calculations/CalculationsSushiswap";
 import { log, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
-  let config = utils.getConfig();
-  let network = dataSource.network();
+  const config = utils.getConfig();
+  const network = dataSource.network();
 
   if (constants.BLACKLISTED_TOKENS.includes(tokenAddr) || !config) {
     return new CustomPriceType();
@@ -26,7 +26,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 1. Yearn Lens Oracle
-  let yearnLensPrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr, network);
+  const yearnLensPrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr, network);
   if (!yearnLensPrice.reverted) {
     log.info("[YearnLensOracle] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -36,7 +36,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 2. ChainLink Feed Registry
-  let chainLinkPrice = ChainLinkFeed.getTokenPriceUSDC(tokenAddr, network);
+  const chainLinkPrice = ChainLinkFeed.getTokenPriceUSDC(tokenAddr, network);
   if (!chainLinkPrice.reverted) {
     log.info("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -46,7 +46,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 3. CalculationsCurve
-  let calculationsCurvePrice = CurveCalculations.getTokenPriceUSDC(
+  const calculationsCurvePrice = CurveCalculations.getTokenPriceUSDC(
     tokenAddr,
     network
   );
@@ -61,7 +61,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 4. CalculationsSushiSwap
-  let calculationsSushiSwapPrice = SushiCalculations.getTokenPriceUSDC(
+  const calculationsSushiSwapPrice = SushiCalculations.getTokenPriceUSDC(
     tokenAddr,
     network
   );
@@ -76,7 +76,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 6. Aave Oracle
-  let aaveOraclePrice = AaveOracle.getTokenPriceUSDC(tokenAddr, network);
+  const aaveOraclePrice = AaveOracle.getTokenPriceUSDC(tokenAddr, network);
   if (!aaveOraclePrice.reverted) {
     log.info("[AaveOracle] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -86,7 +86,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 7. Curve Router
-  let curvePrice = CurveRouter.getCurvePriceUsdc(tokenAddr, network);
+  const curvePrice = CurveRouter.getCurvePriceUsdc(tokenAddr, network);
   if (!curvePrice.reverted) {
     log.info("[CurveRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -96,7 +96,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 8. Uniswap Router
-  let uniswapPrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr, network);
+  const uniswapPrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr, network);
   if (!uniswapPrice.reverted) {
     log.info("[UniswapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -116,7 +116,7 @@ export function getUsdPrice(
   tokenAddr: Address,
   amount: BigDecimal
 ): BigDecimal {
-  let tokenPrice = getUsdPricePerToken(tokenAddr);
+  const tokenPrice = getUsdPricePerToken(tokenAddr);
 
   if (!tokenPrice.reverted) {
     return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);

@@ -36,7 +36,7 @@ export function createSwapTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): SwapTransaction {
-  let transactionId = "swap-"
+  const transactionId = "swap-"
     .concat(transaction.hash.toHexString())
     .concat("-")
     .concat(transaction.index.toString());
@@ -99,10 +99,10 @@ export function Swap(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  let inputTokenBalances: BigInt[] = pool.inputTokenBalances;
+  const inputTokenBalances: BigInt[] = pool.inputTokenBalances;
 
-  let tokenInStore = getOrCreateToken(tokenIn, block.number);
-  let tokenInIndex = pool.inputTokens.indexOf(tokenIn.toHexString());
+  const tokenInStore = getOrCreateToken(tokenIn, block.number);
+  const tokenInIndex = pool.inputTokens.indexOf(tokenIn.toHexString());
 
   let amountInUSD = amountIn
     .divDecimal(
@@ -110,8 +110,8 @@ export function Swap(
     )
     .times(tokenInStore.lastPriceUSD!);
 
-  let tokenOutStore = getOrCreateToken(tokenOut, block.number);
-  let tokenOutIndex = pool.inputTokens.indexOf(tokenOut.toHexString());
+  const tokenOutStore = getOrCreateToken(tokenOut, block.number);
+  const tokenOutIndex = pool.inputTokens.indexOf(tokenOut.toHexString());
 
   let amountOutUSD = amountOut
     .divDecimal(

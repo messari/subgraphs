@@ -40,10 +40,9 @@ export function handleTokensRegistered(event: TokensRegistered): void {
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
 
   const tokens = event.params.tokens;
-  const assetManagers = event.params.assetManagers;
 
-  let inputTokens: string[] = [];
-  let inputTokenLength = tokens.length;
+  const inputTokens: string[] = [];
+  const inputTokenLength = tokens.length;
   for (let idx = 0; idx < inputTokenLength; idx++) {
     // Exception: StablePoolFactory added poolAddress in event params token
     if (tokens.at(idx).equals(poolAddress)) continue;
@@ -73,7 +72,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   const fees = event.params.protocolFeeAmounts;
   const provider = event.params.liquidityProvider;
 
-  let total: BigInt = deltas.reduce<BigInt>(
+  const total: BigInt = deltas.reduce<BigInt>(
     (sum, amount) => sum.plus(amount),
     new BigInt(0)
   );
