@@ -46,24 +46,22 @@ import { CToken } from "../../../generated/Comptroller/CToken";
 import { PriceOracle } from "../../../generated/Comptroller/PriceOracle";
 import {
   CToken as CTokenTemplate,
-  Reward as RewardTemplate,
+  RewardDistributor as RewardDistributorTemplate,
 } from "../../../generated/templates";
 import {
   getNetworkSpecificConstant,
   ZERO_ADDRESS,
-  prefixID,
-  BigDecimalTruncateToBigInt,
   anyTrue,
-  PRICE_BASE,
-  DISTRIBUTIONFACTOR_BASE,
   DF_ADDRESS,
   MKR_ADDRESS,
+  DEFAULT_DECIMALS,
+  BigDecimalTruncateToBigInt,
 } from "./constants";
 import {
   RewardDistributor,
-  RewardDistributed,
-  NewRewardToken,
-} from "../../../generated/templates/Reward/RewardDistributor";
+  DistributionBorrowSpeedUpdated,
+  DistributionSupplySpeedUpdated,
+} from "../../../generated/templates/RewardDistributor/RewardDistributor";
 import {
   stablecoin,
   Transfer as StablecoinTransfer,
@@ -99,6 +97,7 @@ const comptrollerAddr = constant.comptrollerAddr;
 const network = constant.network;
 const blocksPerDay = new BigDecimal(BigInt.fromI32(constant.blocksPerDay));
 const blocksPerYear = constant.blocksPerYear;
+const rewardTokenAddr = constant.rewardTokenAddress;
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
@@ -209,6 +208,8 @@ export function handleMarketAdded(event: MarketAdded): void {
     ),
     event
   );
+
+  initRewards(cTokenAddr);
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
@@ -432,162 +433,8 @@ export function handleUpdateInterest(event: AccrueInterest): void {
     network.toLowerCase() == Network.MAINNET.toLowerCase(),
     event
   );
-}
 
-export function handleNewRewardDistributor(event: NewRewardDistributor): void {
-  // trigger RewardDistributor template
-  RewardTemplate.create(event.params._newRewardDistributor);
-}
-
-function _getOrCreateRewardTokens(tokenAddr: string): string[] {
-  // add reward token to Token if not already there
-  let token = Token.load(tokenAddr);
-  if (token == null) {
-    token = new Token(tokenAddr);
-    // speciall handle for DF token since its name and symbol is byte32
-    if (tokenAddr == DF_ADDRESS) {
-      token.name = "dForce";
-      token.symbol = "DF";
-      token.decimals = 18;
-    } else {
-      const tokenContract = ERC20.bind(Address.fromString(tokenAddr));
-      token.name = getOrElse<string>(tokenContract.try_name(), "unknown");
-      token.symbol = getOrElse<string>(tokenContract.try_symbol(), "unknown");
-      token.decimals = getOrElse<i32>(tokenContract.try_decimals(), 18);
-    }
-    token.save();
-  }
-
-  const borrowRewardTokenId = prefixID(tokenAddr, RewardTokenType.BORROW);
-  let borrowRewardToken = RewardToken.load(borrowRewardTokenId);
-  if (borrowRewardToken == null) {
-    borrowRewardToken = new RewardToken(borrowRewardTokenId);
-    borrowRewardToken.token = tokenAddr;
-    borrowRewardToken.type = RewardTokenType.BORROW;
-    borrowRewardToken.save();
-  }
-
-  const depositRewardTokenId = prefixID(tokenAddr, RewardTokenType.DEPOSIT);
-  let depositRewardToken = RewardToken.load(depositRewardTokenId);
-  if (depositRewardToken == null) {
-    depositRewardToken = new RewardToken(depositRewardTokenId);
-    depositRewardToken.token = tokenAddr;
-    depositRewardToken.type = RewardTokenType.DEPOSIT;
-    depositRewardToken.save();
-  }
-
-  return [borrowRewardTokenId, depositRewardTokenId];
-}
-
-export function handleNewRewardToken(event: NewRewardToken): void {
-  // Add new reward token to the rewardToken entity
-  const tokenAddr = event.params.newRewardToken.toHexString();
-
-  const rewardTokenIds = _getOrCreateRewardTokens(tokenAddr);
-
-  const protocol = getOrCreateProtocol();
-  const markets = protocol._marketIDs;
-  for (let i = 0; i < markets.length; i++) {
-    const marketID = markets[i];
-    const market = Market.load(marketID);
-    if (market == null) {
-      log.warning("[handleNewRewardToken] Market not found: {}", [marketID]);
-      return;
-    }
-    market.rewardTokens = [rewardTokenIds[0], rewardTokenIds[1]];
-    market.save();
-  }
-}
-
-export function handleRewardDistributed(event: RewardDistributed): void {
-  // RewardDistributed event in dforce is emitted when rewards is distributed
-  // to individual account (borrower/depositor)
-  // Since there is no event for market level/protocol level reward emission
-  // we have to do the calculation by ourselves following the logic in
-  // function _updateDistributionState in RewardDistributor.sol
-  // It'd be more efficient to handle the DistributionSpeedsUpdated event
-  // instead, but it was never emitted for some reason
-  const distributorContract = RewardDistributor.bind(event.address);
-
-  const marketID = event.params.iToken.toHexString();
-  const market = Market.load(marketID);
-  if (market == null) {
-    log.warning("[handleRewardDistributed] Market not found: {}", [marketID]);
-    return;
-  }
-
-  const rewardTokens = market.rewardTokens;
-  if (rewardTokens == null || rewardTokens.length == 0) {
-    const rewardTokenAddr = distributorContract.rewardToken().toHexString();
-    market.rewardTokens = _getOrCreateRewardTokens(rewardTokenAddr);
-    market.save();
-  }
-
-  const rewardTokenId = RewardToken.load(market.rewardTokens![0])!.token;
-  const rewardToken = Token.load(rewardTokenId);
-  if (rewardToken == null) {
-    log.warning("[handleRewardDistributed] Token not found: {}", [
-      rewardTokenId,
-    ]);
-    return;
-  }
-
-  const decimals = rewardToken.decimals;
-  let rewardTokenPrice = rewardToken.lastPriceUSD;
-  if (!rewardTokenPrice) {
-    const protocol = getOrCreateProtocol();
-    const oracleContract = PriceOracle.bind(
-      Address.fromString(protocol._priceOracle)
-    );
-    rewardTokenPrice = oracleContract
-      .getAssetPrice(Address.fromString(rewardTokenId))
-      .toBigDecimal()
-      .div(exponentToBigDecimal(PRICE_BASE));
-  }
-
-  // initialized rewardTokenEmissionsAmount and rewardTokenEmissionsUSD
-  let rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
-  rewardTokenEmissionsAmount =
-    rewardTokenEmissionsAmount != null
-      ? rewardTokenEmissionsAmount
-      : [BIGINT_ZERO, BIGINT_ZERO];
-  let rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-  rewardTokenEmissionsUSD =
-    rewardTokenEmissionsUSD != null
-      ? rewardTokenEmissionsUSD
-      : [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-
-  const marketAddr = Address.fromString(marketID);
-  const distributionFactor = distributorContract
-    .distributionFactorMantissa(marketAddr)
-    .toBigDecimal()
-    .div(exponentToBigDecimal(DISTRIBUTIONFACTOR_BASE));
-
-  // rewards is only affected by speed and deltaBlocks
-  const emissionSpeedBorrow = getOrElse<BigInt>(
-    distributorContract.try_distributionSpeed(marketAddr),
-    BIGINT_ZERO
-  );
-  const emissionSpeedSupply = getOrElse<BigInt>(
-    distributorContract.try_distributionSupplySpeed(marketAddr),
-    BIGINT_ZERO
-  );
-  const emissionBorrow = emissionSpeedBorrow.toBigDecimal().times(blocksPerDay);
-  rewardTokenEmissionsAmount[0] = BigDecimalTruncateToBigInt(emissionBorrow);
-  rewardTokenEmissionsUSD[0] = emissionBorrow
-    .div(exponentToBigDecimal(decimals))
-    .times(distributionFactor)
-    .times(rewardTokenPrice);
-  const emissionSupply = emissionSpeedSupply.toBigDecimal().times(blocksPerDay);
-  rewardTokenEmissionsAmount[1] = BigDecimalTruncateToBigInt(emissionSupply);
-  rewardTokenEmissionsUSD[1] = emissionSupply
-    .div(exponentToBigDecimal(decimals))
-    .times(distributionFactor)
-    .times(rewardTokenPrice);
-
-  market.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
-  market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
-  market.save();
+  updateRewardPrices(marketAddress);
 }
 
 // update USX/EUX supply for
@@ -703,4 +550,168 @@ export function getOrCreateMarketStatus(marketId: string): _DforceMarketStatus {
     marketStatus.save();
   }
   return marketStatus;
+}
+
+////////////////////////////
+///// Reward Functions /////
+////////////////////////////
+
+export function handleNewRewardDistributor(event: NewRewardDistributor): void {
+  // trigger RewardDistributor template
+  RewardDistributorTemplate.create(event.params.newRewardDistributor);
+}
+
+export function handleDistributionBorrowSpeedUpdated(
+  event: DistributionBorrowSpeedUpdated
+): void {
+  const market = Market.load(event.params.iToken.toHexString());
+  if (!market) {
+    log.error("Market not found for address {}", [
+      event.params.iToken.toHexString(),
+    ]);
+    return;
+  }
+
+  const emissionsAmount = market.rewardTokenEmissionsAmount!;
+  emissionsAmount[0] = BigDecimalTruncateToBigInt(
+    event.params.borrowSpeed.toBigDecimal().times(blocksPerDay)
+  );
+  market.rewardTokenEmissionsAmount = emissionsAmount;
+  market.save();
+
+  updateRewardPrices(event.params.iToken);
+}
+
+export function handleDistributionSupplySpeedUpdated(
+  event: DistributionSupplySpeedUpdated
+): void {
+  const market = Market.load(event.params.iToken.toHexString());
+  if (!market) {
+    log.error("Market not found for address {}", [
+      event.params.iToken.toHexString(),
+    ]);
+    return;
+  }
+  const emissionsAmount = market.rewardTokenEmissionsAmount!;
+  emissionsAmount[1] = BigDecimalTruncateToBigInt(
+    event.params.supplySpeed.toBigDecimal().times(blocksPerDay)
+  );
+  market.rewardTokenEmissionsAmount = emissionsAmount;
+  market.save();
+
+  updateRewardPrices(event.params.iToken);
+}
+
+function initRewards(marketAddr: Address): void {
+  const market = Market.load(marketAddr.toHexString());
+  if (!market) {
+    log.error("Market not found for address {}", [marketAddr.toHexString()]);
+    return;
+  }
+
+  market.rewardTokens = getOrCreateRewardTokens();
+  market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+  market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  market.save();
+}
+
+// initially create reward tokens
+// reward is always DForce token
+function getOrCreateRewardTokens(): string[] {
+  let token = Token.load(rewardTokenAddr.toHexString());
+  if (!token) {
+    token = new Token(rewardTokenAddr.toHexString());
+    token.name = "dForce";
+    token.symbol = "DF";
+    token.decimals = 18;
+    token.save();
+  }
+
+  const borrowRewardTokenId = RewardTokenType.BORROW.concat("-").concat(
+    token.id
+  );
+  let borrowRewardToken = RewardToken.load(borrowRewardTokenId);
+  if (borrowRewardToken == null) {
+    borrowRewardToken = new RewardToken(borrowRewardTokenId);
+    borrowRewardToken.token = token.id;
+    borrowRewardToken.type = RewardTokenType.BORROW;
+    borrowRewardToken.save();
+  }
+
+  const depositRewardTokenId = RewardTokenType.DEPOSIT.concat("-").concat(
+    token.id
+  );
+  let depositRewardToken = RewardToken.load(depositRewardTokenId);
+  if (depositRewardToken == null) {
+    depositRewardToken = new RewardToken(depositRewardTokenId);
+    depositRewardToken.token = token.id;
+    depositRewardToken.type = RewardTokenType.DEPOSIT;
+    depositRewardToken.save();
+  }
+
+  return [borrowRewardTokenId, depositRewardTokenId];
+}
+
+function updateRewardPrices(marketAddress: Address): void {
+  const market = Market.load(marketAddress.toHexString());
+  if (!market) {
+    log.error("Market not found for address {}", [marketAddress.toHexString()]);
+    return;
+  }
+  const rewardToken = RewardToken.load(market.rewardTokens![0]);
+  if (!rewardToken) {
+    log.error("Reward token not found for market", [market.id]);
+    return;
+  }
+
+  const comptroller = Comptroller.bind(comptrollerAddr);
+  const tryRewardDistributor = comptroller.try_rewardDistributor();
+  if (tryRewardDistributor.reverted) {
+    log.info("Reward distributor not found", []);
+    return;
+  }
+  const distributorContract = RewardDistributor.bind(
+    tryRewardDistributor.value
+  );
+  const tryDistributionFactor =
+    distributorContract.try_distributionFactorMantissa(marketAddress);
+  const distributionFactor = tryDistributionFactor.reverted
+    ? BIGDECIMAL_ZERO
+    : tryDistributionFactor.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+
+  const token = Token.load(rewardToken.token);
+  if (!token) {
+    log.error("Token not found for reward token {}", [rewardToken.id]);
+    return;
+  }
+  let priceUSD = token.lastPriceUSD;
+  if (!priceUSD) {
+    const protocol = getOrCreateProtocol();
+    const oracleContract = PriceOracle.bind(
+      Address.fromString(protocol._priceOracle)
+    );
+    const priceRaw = getOrElse(
+      oracleContract.try_getAssetPrice(Address.fromString(rewardToken.token)),
+      BIGINT_ZERO
+    );
+    priceUSD = priceRaw
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  }
+
+  market.rewardTokenEmissionsUSD = [
+    market
+      .rewardTokenEmissionsAmount![0].toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+      .times(distributionFactor)
+      .times(priceUSD),
+    market
+      .rewardTokenEmissionsAmount![1].toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+      .times(distributionFactor)
+      .times(priceUSD),
+  ];
+  market.save();
 }
