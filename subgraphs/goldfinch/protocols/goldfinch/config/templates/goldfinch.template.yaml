@@ -548,3 +548,5 @@ templates:
           handler: handlePaymentApplied
         - event: SharePriceUpdated(indexed address,indexed uint256,uint256,int256,uint256,int256)
           handler: handleSharePriceUpdated
+        - event: ReserveFundsCollected(indexed address,uint256)
+          handler: handleReserveFundsCollected
