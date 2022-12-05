@@ -66,16 +66,16 @@ export function getRewardsPerDay(
   rewardRate: BigDecimal,
   rewardType: string
 ): BigDecimal {
-  let circularBuffer = getOrCreateCircularBuffer();
+  const circularBuffer = getOrCreateCircularBuffer();
 
   // Create entity for the current block
-  let currentTimestampI32 = currentTimestamp.toI32();
-  let currentBlockNumberI32 = currentBlockNumber.toI32();
+  const currentTimestampI32 = currentTimestamp.toI32();
+  const currentBlockNumberI32 = currentBlockNumber.toI32();
 
-  let blocks = circularBuffer.blocks;
+  const blocks = circularBuffer.blocks;
 
   // Interval between index and the index of the start of the window block
-  let windowWidth = abs(
+  const windowWidth = abs(
     circularBuffer.windowStartIndex - circularBuffer.nextIndex
   );
   if (windowWidth == 0) {
@@ -127,7 +127,7 @@ export function getRewardsPerDay(
     circularBuffer.nextIndex += 2;
   }
   // The timestamp at the start of the window (default 24 hours in seconds).
-  let startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
+  const startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
 
   // Make sure to still have 2 blocks to calculate rate (This shouldn't happen past the beginning).
   while (true) {
@@ -145,7 +145,7 @@ export function getRewardsPerDay(
         break;
       }
     }
-    let windowIndexBlockTimestamp = blocks[circularBuffer.windowStartIndex];
+    const windowIndexBlockTimestamp = blocks[circularBuffer.windowStartIndex];
 
     // Shift the start of the window if the current timestamp moves out of desired rate window
     if (windowIndexBlockTimestamp < startTimestamp) {
@@ -159,24 +159,23 @@ export function getRewardsPerDay(
   }
 
   // Wideness of the window in seconds.
-  let windowSecondsCount = BigDecimal.fromString(
+  const windowSecondsCount = BigDecimal.fromString(
     (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString()
   );
 
   // Wideness of the window in blocks.
-  let windowBlocksCount = BigDecimal.fromString(
+  const windowBlocksCount = BigDecimal.fromString(
     (
       currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + 1]
     ).toString()
   );
 
   // Estimate block speed for the window in seconds.
-  let unnormalizedBlockSpeed = WINDOW_SIZE_SECONDS_BD.div(
-    windowSecondsCount
-  ).times(windowBlocksCount);
+  const unnormalizedBlockSpeed =
+    WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
 
   // block speed converted to specified rate.
-  let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
+  const normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
     WINDOW_SIZE_SECONDS_BD
   ).times(unnormalizedBlockSpeed);
 
@@ -199,7 +198,7 @@ function getOrCreateCircularBuffer(): _CircularBuffer {
   if (!circularBuffer) {
     circularBuffer = new _CircularBuffer(CIRCULAR_BUFFER);
 
-    let blocks = new Array<i32>(BUFFER_SIZE);
+    const blocks = new Array<i32>(BUFFER_SIZE);
     for (let i = 0; i < BUFFER_SIZE; i += 2) {
       blocks[i] = -1;
       blocks[i + 1] = -1;
@@ -222,31 +221,57 @@ function getStartingBlockRate(): BigDecimal {
 
   if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)) {
     return BigDecimal.fromString("13.39");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.ARBITRUM_ONE)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.ARBITRUM_ONE)
+  ) {
     return BigDecimal.fromString("15");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.AURORA)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.AURORA)
+  ) {
     return BigDecimal.fromString("1.03");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.BSC)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.BSC)
+  ) {
     return BigDecimal.fromString("5");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.CELO)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.CELO)
+  ) {
     return BigDecimal.fromString("5");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.FANTOM)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.FANTOM)
+  ) {
     return BigDecimal.fromString("1");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.FUSE)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.FUSE)
+  ) {
     return BigDecimal.fromString("1");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.OPTIMISM)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.OPTIMISM)
+  ) {
     return BigDecimal.fromString("12.5");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MATIC)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.MATIC)
+  ) {
     return BigDecimal.fromString("2");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.XDAI)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.XDAI)
+  ) {
     return BigDecimal.fromString("5");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MOONBEAM)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.MOONBEAM)
+  ) {
     return BigDecimal.fromString("13.39");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MOONRIVER)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.MOONRIVER)
+  ) {
     return BigDecimal.fromString("13.39");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.AVALANCHE)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.AVALANCHE)
+  ) {
     return BigDecimal.fromString("13.39");
-  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.CRONOS)) {
+  } else if (
+    utils.equalsIgnoreCase(dataSource.network(), constants.Network.CRONOS)
+  ) {
     return BigDecimal.fromString("5.5");
   }
 

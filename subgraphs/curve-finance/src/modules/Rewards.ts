@@ -19,18 +19,21 @@ import { Rewards as PoolRewardsContract } from "../../generated/templates/PoolTe
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/LiquidityGauge/Gauge";
 import { GaugeController as GaugeControllereContract } from "../../generated/GaugeController/GaugeController";
 
-export function getRewardsData_v1(gaugeAddress: Address, block: ethereum.Block): RewardsInfoType {
-  let rewardRates: BigInt[] = [];
-  let rewardTokens: Address[] = [];
+export function getRewardsData_v1(
+  gaugeAddress: Address,
+  block: ethereum.Block
+): RewardsInfoType {
+  const rewardRates: BigInt[] = [];
+  const rewardTokens: Address[] = [];
 
-  let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
-  let rewardCount = utils.readValue<BigInt>(
+  const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
+  const rewardCount = utils.readValue<BigInt>(
     gaugeContract.try_reward_count(),
     constants.BIGINT_ZERO
   );
 
   for (let idx = 0; idx < rewardCount.toI32(); idx++) {
-    let rewardToken = utils.readValue<Address>(
+    const rewardToken = utils.readValue<Address>(
       gaugeContract.try_reward_tokens(BigInt.fromI32(idx)),
       constants.NULL.TYPE_ADDRESS
     );
@@ -39,13 +42,13 @@ export function getRewardsData_v1(gaugeAddress: Address, block: ethereum.Block):
 
     rewardTokens.push(rewardToken);
 
-    let rewardRateCall = gaugeContract.try_reward_data(rewardToken);
+    const rewardRateCall = gaugeContract.try_reward_data(rewardToken);
     if (!rewardRateCall.reverted) {
-      let rewardRate = rewardRateCall.value.getRate();
-      let periodFinish = rewardRateCall.value.getPeriod_finish();
-      
+      const rewardRate = rewardRateCall.value.getRate();
+      const periodFinish = rewardRateCall.value.getPeriod_finish();
+
       if (periodFinish.lt(block.timestamp)) {
-        rewardRates.push(constants.BIGINT_ZERO)
+        rewardRates.push(constants.BIGINT_ZERO);
       } else {
         rewardRates.push(rewardRate);
       }
@@ -93,16 +96,16 @@ export function getRewardsData_v2(gaugeAddress: Address): RewardsInfoType {
 }
 
 export function getRewardsData_v3(
-  gaugeAddress: Address, 
+  gaugeAddress: Address,
   block: ethereum.Block
 ): RewardsInfoType {
-  let rewardRates: BigInt[] = [];
-  let rewardTokens: Address[] = [];
+  const rewardRates: BigInt[] = [];
+  const rewardTokens: Address[] = [];
 
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
   for (let idx = 0; idx < 5; idx++) {
-    let rewardToken = utils.readValue<Address>(
+    const rewardToken = utils.readValue<Address>(
       gaugeContract.try_reward_tokens(BigInt.fromI32(idx)),
       constants.NULL.TYPE_ADDRESS
     );
@@ -113,23 +116,23 @@ export function getRewardsData_v3(
 
     rewardTokens.push(rewardToken);
 
-    let rewardRateCall = gaugeContract.try_reward_data(rewardToken);
+    const rewardRateCall = gaugeContract.try_reward_data(rewardToken);
     if (!rewardRateCall.reverted) {
-      let rewardRate = rewardRateCall.value.getRate();
+      const rewardRate = rewardRateCall.value.getRate();
 
       if (rewardRateCall.value.getPeriod_finish().lt(block.timestamp)) {
-        rewardRates.push(constants.BIGINT_ZERO)
+        rewardRates.push(constants.BIGINT_ZERO);
       } else {
         rewardRates.push(rewardRate);
       }
     } else {
-      let rewardRate1Call = gaugeContract.try_reward_data1(rewardToken);
+      const rewardRate1Call = gaugeContract.try_reward_data1(rewardToken);
 
       if (!rewardRate1Call.reverted) {
-        let rewardRate = rewardRate1Call.value.rate;
+        const rewardRate = rewardRate1Call.value.rate;
 
         if (rewardRate1Call.value.period_finish.lt(block.timestamp)) {
-          rewardRates.push(constants.BIGINT_ZERO)
+          rewardRates.push(constants.BIGINT_ZERO);
         } else {
           rewardRates.push(rewardRate);
         }
@@ -150,7 +153,7 @@ export function updateStakedOutputTokenAmount(
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
-  let gaugeTotalSupply = utils.readValue<BigInt>(
+  const gaugeTotalSupply = utils.readValue<BigInt>(
     gaugeContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
@@ -158,7 +161,7 @@ export function updateStakedOutputTokenAmount(
   pool.stakedOutputTokenAmount = gaugeTotalSupply;
 
   if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)) {
-    let gaugeWorkingSupply = utils.readValue<BigInt>(
+    const gaugeWorkingSupply = utils.readValue<BigInt>(
       gaugeContract.try_working_supply(),
       constants.BIGINT_ZERO
     );
@@ -173,8 +176,8 @@ export function updateControllerRewards(
   gaugeAddress: Address,
   block: ethereum.Block
 ): void {
-  let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
-  let gaugeControllerContract = GaugeControllereContract.bind(
+  const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
+  const gaugeControllerContract = GaugeControllereContract.bind(
     constants.GAUGE_CONTROLLER_ADDRESS
   );
 
@@ -199,11 +202,11 @@ export function updateControllerRewards(
   if (
     !utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)
   ) {
-    let lastRequest = utils.readValue<BigInt>(
+    const lastRequest = utils.readValue<BigInt>(
       gaugeControllerContract.try_last_request(gaugeAddress),
       constants.BIGINT_ZERO
     );
-    let weekNumber = lastRequest.div(constants.NUMBER_OF_WEEKS_DENOMINATOR);
+    const weekNumber = lastRequest.div(constants.NUMBER_OF_WEEKS_DENOMINATOR);
 
     inflationRate = utils
       .readValue<BigInt>(
@@ -216,7 +219,7 @@ export function updateControllerRewards(
   }
 
   // Get the rewards per day for this gauge
-  let protocolTokenRewardEmissionsPerDay = inflationRate
+  const protocolTokenRewardEmissionsPerDay = inflationRate
     .times(gaugeRelativeWeight)
     .times(constants.BIG_DECIMAL_SECONDS_PER_DAY);
 
@@ -235,7 +238,7 @@ export function updateFactoryRewards(
   gaugeAddress: Address,
   block: ethereum.Block
 ): void {
-  let rewardsInfo = getRewardsData_v1(gaugeAddress);
+  let rewardsInfo = getRewardsData_v1(gaugeAddress, block);
 
   if (rewardsInfo.isEmpty()) {
     rewardsInfo = getRewardsData_v2(gaugeAddress);
@@ -245,21 +248,21 @@ export function updateFactoryRewards(
     rewardsInfo = getRewardsData_v3(gaugeAddress, block);
   }
 
-  let rewardTokens = rewardsInfo.getRewardTokens;
-  let rewardRates = rewardsInfo.getRewardRates;
+  const rewardTokens = rewardsInfo.getRewardTokens;
+  const rewardRates = rewardsInfo.getRewardRates;
 
   for (let i = 0; i < rewardTokens.length; i += 1) {
-    let rewardToken = rewardTokens[i];
-    let rewardRate = rewardRates[i];
+    const rewardToken = rewardTokens[i];
+    const rewardRate = rewardRates[i];
 
-    let rewardRatePerDay = getRewardsPerDay(
+    const rewardRatePerDay = getRewardsPerDay(
       block.timestamp,
       block.number,
       rewardRate.toBigDecimal(),
       constants.RewardIntervalType.TIMESTAMP
     );
 
-    let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
+    const rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
 
     updateRewardTokenEmissions(rewardToken, poolAddress, rewardPerDay, block);
 
@@ -288,21 +291,20 @@ export function updateRewardTokenEmissions(
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
     rewardTokens = rewardTokens.sort();
-
-    pool.rewardTokens = rewardTokens;
   }
+  pool.rewardTokens = rewardTokens;
 
   const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
 
   if (!pool.rewardTokenEmissionsAmount) {
     pool.rewardTokenEmissionsAmount = [];
   }
-  let rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount!;
+  const rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount!;
 
   if (!pool.rewardTokenEmissionsUSD) {
     pool.rewardTokenEmissionsUSD = [];
   }
-  let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
+  const rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
   const token = getOrCreateToken(rewardTokenAddress, block);
   const tokenPrice = getUsdPricePerToken(rewardTokenAddress);

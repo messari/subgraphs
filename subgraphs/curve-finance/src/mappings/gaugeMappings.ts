@@ -10,7 +10,7 @@ import {
 import { getPoolFromGauge } from "../common/utils";
 
 export function handleDeposit(event: Deposit): void {
-  let gaugeAddress = event.address;
+  const gaugeAddress = event.address;
 
   const poolAddress = getPoolFromGauge(gaugeAddress);
 
@@ -20,7 +20,7 @@ export function handleDeposit(event: Deposit): void {
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  let gaugeAddress = event.address;
+  const gaugeAddress = event.address;
 
   const poolAddress = getPoolFromGauge(gaugeAddress);
 

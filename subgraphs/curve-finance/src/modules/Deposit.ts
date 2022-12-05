@@ -27,7 +27,7 @@ export function createDepositTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): DepositTransaction {
-  let transactionId = "deposit-"
+  const transactionId = "deposit-"
     .concat(transaction.hash.toHexString())
     .concat("-")
     .concat(transaction.index.toString());
@@ -89,19 +89,19 @@ export function Deposit(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  let inputTokenAmounts: BigInt[] = [];
+  const inputTokenAmounts: BigInt[] = [];
   let depositAmountUSD = constants.BIGDECIMAL_ZERO;
-  let outputTokenMintedAmount = totalSupplyAfterDeposit.minus(
+  const outputTokenMintedAmount = totalSupplyAfterDeposit.minus(
     pool.outputTokenSupply!
   );
 
   for (let idx = 0; idx < depositedCoinAmounts.length; idx++) {
-    let inputToken = utils.getOrCreateTokenFromString(
+    const inputToken = utils.getOrCreateTokenFromString(
       pool._inputTokensOrdered[idx],
       block
     );
 
-    let inputTokenDecimals = constants.BIGINT_TEN.pow(
+    const inputTokenDecimals = constants.BIGINT_TEN.pow(
       inputToken.decimals as u8
     ).toBigDecimal();
 

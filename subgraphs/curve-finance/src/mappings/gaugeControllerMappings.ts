@@ -11,12 +11,12 @@ import {
 } from "../../generated/GaugeController/GaugeController";
 
 export function handleNewGauge(event: NewGauge): void {
-  let gaugeAddress = event.params.addr;
+  const gaugeAddress = event.params.addr;
 
-  let lpToken = utils.getLpTokenFromGauge(gaugeAddress);
+  const lpToken = utils.getLpTokenFromGauge(gaugeAddress);
   if (lpToken.equals(constants.NULL.TYPE_ADDRESS)) return;
 
-  let poolAddress = utils.getPoolFromLpToken(lpToken);
+  const poolAddress = utils.getPoolFromLpToken(lpToken);
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
@@ -42,7 +42,7 @@ export function handleDeployedGauge(event: DeployedGauge): void {
   const gaugeAddress = event.params._gauge;
   const lpTokenAddress = event.params._lp_token;
 
-  let poolAddress = utils.getPoolFromLpToken(lpTokenAddress);
+  const poolAddress = utils.getPoolFromLpToken(lpTokenAddress);
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);

@@ -44,16 +44,16 @@ export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
 /////////////////////////// BLACKLISTED TOKENS ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_BLACKLIST: Address[] = new Array();
-export const AAVE_ORACLE_BLACKLIST: Address[] = new Array();
-export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = new Array();
-export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = new Array();
+export const YEARN_LENS_BLACKLIST: Address[] = [];
+export const AAVE_ORACLE_BLACKLIST: Address[] = [];
+export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [];
+export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////////// HARDCODED STABLES ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const HARDCODED_STABLES: Address[] = new Array();
+export const HARDCODED_STABLES: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////

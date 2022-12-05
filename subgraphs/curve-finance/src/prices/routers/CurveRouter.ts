@@ -11,20 +11,20 @@ export function isCurveLpToken(lpAddress: Address): bool {
   const poolAddress = getPoolFromLpToken(lpAddress);
 
   if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return true;
-  
+
   return false;
 }
 
 export function getPoolFromLpToken(lpAddress: Address): Address {
-  let config = utils.getConfig();
+  const config = utils.getConfig();
   const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
-    let curveRegistryContract = CurveRegistryContract.bind(
+    const curveRegistryContract = CurveRegistryContract.bind(
       curveRegistryAdresses[idx]
     );
 
-    let poolAddress = utils.readValue<Address>(
+    const poolAddress = utils.readValue<Address>(
       curveRegistryContract.try_get_pool_from_lp_token(lpAddress),
       constants.NULL.TYPE_ADDRESS
     );
@@ -91,22 +91,22 @@ export function getBasePrice(lpAddress: Address): CustomPriceType {
   if (poolAddress.equals(constants.NULL.TYPE_ADDRESS))
     return new CustomPriceType();
 
-  let underlyingCoinAddress = getUnderlyingCoinFromPool(poolAddress);
-  let basePrice = getPriceUsdcRecommended(underlyingCoinAddress);
+  const underlyingCoinAddress = getUnderlyingCoinFromPool(poolAddress);
+  const basePrice = getPriceUsdcRecommended(underlyingCoinAddress);
 
   return basePrice;
 }
 
 export function getUnderlyingCoinFromPool(poolAddress: Address): Address {
-  let config = utils.getConfig();
+  const config = utils.getConfig();
   const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
-    let curveRegistryContract = CurveRegistryContract.bind(
+    const curveRegistryContract = CurveRegistryContract.bind(
       curveRegistryAdresses[idx]
     );
 
-    let coins = utils.readValue<Address[]>(
+    const coins = utils.readValue<Address[]>(
       curveRegistryContract.try_get_underlying_coins(poolAddress),
       []
     );
@@ -139,15 +139,15 @@ export function getPreferredCoinFromCoins(coins: Address[]): Address {
 }
 
 export function getVirtualPrice(curveLpTokenAddress: Address): BigInt {
-  let config = utils.getConfig();
+  const config = utils.getConfig();
   const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
-    let curveRegistryContract = CurveRegistryContract.bind(
+    const curveRegistryContract = CurveRegistryContract.bind(
       curveRegistryAdresses[idx]
     );
 
-    let virtualPriceCall =
+    const virtualPriceCall =
       curveRegistryContract.try_get_virtual_price_from_lp_token(
         curveLpTokenAddress
       );
@@ -236,9 +236,9 @@ export function cryptoPoolUnderlyingTokensAddressesByPoolAddress(
   const poolContract = CurvePoolContract.bind(poolAddress);
 
   let idx = 0;
-  let coins: Address[] = [];
+  const coins: Address[] = [];
   while (idx >= 0) {
-    let coin = utils.readValue<Address>(
+    const coin = utils.readValue<Address>(
       poolContract.try_coins(BigInt.fromI32(idx)),
       constants.NULL.TYPE_ADDRESS
     );
@@ -267,7 +267,7 @@ export function getPriceUsdc(tokenAddress: Address): CustomPriceType {
     )
     .toBigDecimal();
 
-  let coins: Address[] = [];
+  const coins: Address[] = [];
   for (let i = 0; i < 8; i++) {
     const coin = utils.readValue<Address>(
       poolContract.try_coins(BigInt.fromI32(i)),

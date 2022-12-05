@@ -138,7 +138,6 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 export function handleRemoveLiquidityWithFees(
   event: RemoveLiquidityWithFees
 ): void {
-  const fees = event.params.fees;
   const provider = event.params.provider;
   const liquidityPoolAddress = event.address;
   const withdrawnCoinAmounts = event.params.token_amounts;

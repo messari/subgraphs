@@ -135,11 +135,11 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
 
   const basePool = getOrCreateLiquidityPool(basePoolAddress, event.block);
 
-  let basePoolCoins = basePool._inputTokensOrdered.map<Address>((x) =>
+  const basePoolCoins = basePool._inputTokensOrdered.map<Address>((x) =>
     Address.fromString(x)
   );
 
-  let poolCoins = [basePoolCoins[0], inputCoinAddress];
+  const poolCoins = [basePoolCoins[0], inputCoinAddress];
   const poolAddress = utils.getPoolFromCoins(registryAddress, poolCoins);
 
   if (!poolAddress) return;
