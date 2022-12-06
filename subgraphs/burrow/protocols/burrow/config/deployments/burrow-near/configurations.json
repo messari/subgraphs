@@ -1,0 +1,5 @@
+{
+  "chain": "near",
+  "contract": "contract.main.burrow.near",
+  "startBlock": 62303110
+}
