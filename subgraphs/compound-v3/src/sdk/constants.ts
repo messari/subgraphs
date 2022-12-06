@@ -122,6 +122,16 @@ export namespace RewardTokenType {
   export const STABLE_BORROW = "STABLE_BORROW";
 }
 
+export enum Transaction {
+  DEPOSIT = 0,
+  WITHDRAW = 1,
+  BORROW = 2,
+  REPAY = 3,
+  LIQUIDATE = 4,
+  TRANSFER = 5,
+  FLASHLOAN = 6,
+}
+
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////

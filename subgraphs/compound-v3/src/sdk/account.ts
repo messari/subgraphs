@@ -1,5 +1,4 @@
 import {
-  Address,
   BigDecimal,
   BigInt,
   Bytes,
@@ -21,7 +20,7 @@ import {
   INT_ZERO,
   TransactionType,
 } from "./constants";
-import { TokenClass } from "./token";
+import { TokenManager } from "./token";
 
 /**
  * This file contains the AccountClass, which does
@@ -36,16 +35,16 @@ import { TokenClass } from "./token";
  * Author(s):
  *  - @dmelotik
  */
-export class AccountClass {
-  private isNew!: boolean; // true if the account was created
-  private account!: Account;
+export class AccountManager {
+  private isNew: boolean; // true if the account was created
+  private account: Account;
   private position!: Position;
-  private market!: Market;
-  private protocol!: LendingProtocol;
-  private event!: ethereum.Event;
+  private market: Market;
+  private protocol: LendingProtocol;
+  private event: ethereum.Event;
 
   constructor(
-    account: Address,
+    account: Bytes,
     market: Market,
     protocol: LendingProtocol,
     event: ethereum.Event
@@ -141,6 +140,7 @@ export class AccountClass {
     } else if (transactionType == TransactionType.TRANSFER) {
       position.receivedCount += INT_ONE;
     }
+    // Note: liquidateCount is not incremented here
     position.save();
 
     if (openPosition) {
@@ -271,8 +271,22 @@ export class AccountClass {
     this.snapshotPosition(priceUSD);
   }
 
-  getPositionID(): string {
-    return this.position.id;
+  countFlashloan(): void {
+    this.account.flashloanCount += INT_ONE;
+    this.account.save();
+  }
+
+  // Ensure this is called on the liquidators account
+  countLiquidate(): void {
+    this.account.liquidateCount += INT_ONE;
+    this.account.save();
+  }
+
+  getPositionID(): string | null {
+    if (this.position) {
+      return this.position.id;
+    }
+    return null;
   }
 
   setCollateral(isCollateral: boolean): void {
@@ -293,11 +307,12 @@ export class AccountClass {
         .concat("-")
         .concat(this.event.logIndex.toString())
     );
-    const token = new TokenClass(this.position.asset, this.event);
+    const token = new TokenManager(this.position.asset, this.event);
     const mantissaFactorBD = exponentToBigDecimal(token.getDecimals());
     snapshot.hash = this.event.transaction.hash;
     snapshot.logIndex = this.event.logIndex.toI32();
     snapshot.nonce = this.event.transaction.nonce;
+    snapshot.account = this.account.id;
     snapshot.position = this.position.id;
     snapshot.balance = this.position.balance;
     snapshot.balanceUSD = this.position.balance

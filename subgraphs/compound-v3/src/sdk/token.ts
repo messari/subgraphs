@@ -15,7 +15,7 @@ import { BIGDECIMAL_ZERO } from "./constants";
  * Author(s):
  *  - @dmelotik
  */
-export class TokenClass {
+export class TokenManager {
   private INVALID_TOKEN_DECIMALS: i32 = 0;
   private UNKNOWN_TOKEN_VALUE: string = "unknown";
 
@@ -85,25 +85,25 @@ export class TokenClass {
   }
 
   private fetchTokenSymbol(tokenAddress: Address): string {
-    let contract = ERC20.bind(tokenAddress);
-    let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);
+    const contract = ERC20.bind(tokenAddress);
+    const contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);
 
     // try types string and bytes32 for symbol
     let symbolValue = this.UNKNOWN_TOKEN_VALUE;
-    let symbolResult = contract.try_symbol();
+    const symbolResult = contract.try_symbol();
     if (!symbolResult.reverted) {
       return symbolResult.value;
     }
 
     // non-standard ERC20 implementation
-    let symbolResultBytes = contractSymbolBytes.try_symbol();
+    const symbolResultBytes = contractSymbolBytes.try_symbol();
     if (!symbolResultBytes.reverted) {
       // for broken pairs that have no symbol function exposed
       if (!this.isNullEthValue(symbolResultBytes.value.toHexString())) {
         symbolValue = symbolResultBytes.value.toString();
       } else {
         // try with the static definition
-        let staticTokenDefinition =
+        const staticTokenDefinition =
           StaticTokenDefinition.fromAddress(tokenAddress);
         if (staticTokenDefinition != null) {
           symbolValue = staticTokenDefinition.symbol;
@@ -115,25 +115,25 @@ export class TokenClass {
   }
 
   private fetchTokenName(tokenAddress: Address): string {
-    let contract = ERC20.bind(tokenAddress);
-    let contractNameBytes = ERC20NameBytes.bind(tokenAddress);
+    const contract = ERC20.bind(tokenAddress);
+    const contractNameBytes = ERC20NameBytes.bind(tokenAddress);
 
     // try types string and bytes32 for name
     let nameValue = this.UNKNOWN_TOKEN_VALUE;
-    let nameResult = contract.try_name();
+    const nameResult = contract.try_name();
     if (!nameResult.reverted) {
       return nameResult.value;
     }
 
     // non-standard ERC20 implementation
-    let nameResultBytes = contractNameBytes.try_name();
+    const nameResultBytes = contractNameBytes.try_name();
     if (!nameResultBytes.reverted) {
       // for broken exchanges that have no name function exposed
       if (!this.isNullEthValue(nameResultBytes.value.toHexString())) {
         nameValue = nameResultBytes.value.toString();
       } else {
         // try with the static definition
-        let staticTokenDefinition =
+        const staticTokenDefinition =
           StaticTokenDefinition.fromAddress(tokenAddress);
         if (staticTokenDefinition != null) {
           nameValue = staticTokenDefinition.name;
@@ -145,17 +145,18 @@ export class TokenClass {
   }
 
   private fetchTokenDecimals(tokenAddress: Address): i32 {
-    let contract = ERC20.bind(tokenAddress);
+    const contract = ERC20.bind(tokenAddress);
 
     // try types uint8 for decimals
-    let decimalResult = contract.try_decimals();
+    const decimalResult = contract.try_decimals();
     if (!decimalResult.reverted) {
-      let decimalValue = decimalResult.value;
+      const decimalValue = decimalResult.value;
       return decimalValue;
     }
 
     // try with the static definition
-    let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
+    const staticTokenDefinition =
+      StaticTokenDefinition.fromAddress(tokenAddress);
     if (staticTokenDefinition != null) {
       return staticTokenDefinition.decimals as i32;
     } else {
@@ -188,10 +189,10 @@ export class StaticTokenDefinition {
 
   // Get all tokens with a static defintion
   static getStaticDefinitions(): Array<StaticTokenDefinition> {
-    let staticDefinitions = new Array<StaticTokenDefinition>(6);
+    const staticDefinitions = new Array<StaticTokenDefinition>(6);
 
     // Add DGD
-    let tokenDGD = new StaticTokenDefinition(
+    const tokenDGD = new StaticTokenDefinition(
       Address.fromString("0xe0b7927c4af23765cb51314a0e0521a9645f0e2a"),
       "DGD",
       "DGD",
@@ -200,7 +201,7 @@ export class StaticTokenDefinition {
     staticDefinitions.push(tokenDGD);
 
     // Add AAVE
-    let tokenAAVE = new StaticTokenDefinition(
+    const tokenAAVE = new StaticTokenDefinition(
       Address.fromString("0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9"),
       "AAVE",
       "Aave Token",
@@ -209,7 +210,7 @@ export class StaticTokenDefinition {
     staticDefinitions.push(tokenAAVE);
 
     // Add LIF
-    let tokenLIF = new StaticTokenDefinition(
+    const tokenLIF = new StaticTokenDefinition(
       Address.fromString("0xeb9951021698b42e4399f9cbb6267aa35f82d59d"),
       "LIF",
       "Lif",
@@ -218,7 +219,7 @@ export class StaticTokenDefinition {
     staticDefinitions.push(tokenLIF);
 
     // Add SVD
-    let tokenSVD = new StaticTokenDefinition(
+    const tokenSVD = new StaticTokenDefinition(
       Address.fromString("0xbdeb4b83251fb146687fa19d1c660f99411eefe3"),
       "SVD",
       "savedroid",
@@ -227,7 +228,7 @@ export class StaticTokenDefinition {
     staticDefinitions.push(tokenSVD);
 
     // Add TheDAO
-    let tokenTheDAO = new StaticTokenDefinition(
+    const tokenTheDAO = new StaticTokenDefinition(
       Address.fromString("0xbb9bc244d798123fde783fcc1c72d3bb8c189413"),
       "TheDAO",
       "TheDAO",
@@ -236,7 +237,7 @@ export class StaticTokenDefinition {
     staticDefinitions.push(tokenTheDAO);
 
     // Add HPB
-    let tokenHPB = new StaticTokenDefinition(
+    const tokenHPB = new StaticTokenDefinition(
       Address.fromString("0x38c6a68304cdefb9bec48bbfaaba5c5b47818bb2"),
       "HPB",
       "HPBCoin",
@@ -249,12 +250,12 @@ export class StaticTokenDefinition {
 
   // Helper for hardcoded tokens
   static fromAddress(tokenAddress: Address): StaticTokenDefinition | null {
-    let staticDefinitions = this.getStaticDefinitions();
-    let tokenAddressHex = tokenAddress.toHexString();
+    const staticDefinitions = this.getStaticDefinitions();
+    const tokenAddressHex = tokenAddress.toHexString();
 
     // Search the definition using the address
     for (let i = 0; i < staticDefinitions.length; i++) {
-      let staticDefinition = staticDefinitions[i];
+      const staticDefinition = staticDefinitions[i];
       if (staticDefinition.address.toHexString() == tokenAddressHex) {
         return staticDefinition;
       }

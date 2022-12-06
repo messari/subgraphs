@@ -26,6 +26,7 @@ import {
   WithdrawCollateral,
   AbsorbCollateral,
   TransferCollateral,
+  Transfer,
 } from "../../../generated/templates/Comet/Comet";
 import { ERC20 } from "../../../generated/templates/Comet/ERC20";
 import {
@@ -39,12 +40,14 @@ import {
   InterestRateSide,
   InterestRateType,
   OracleSource,
+  PositionSide,
   RewardTokenType,
   SECONDS_PER_DAY,
   SECONDS_PER_YEAR,
   TokenType,
+  TransactionType,
 } from "../../../src/sdk/constants";
-import { MarketClass } from "../../../src/sdk/market";
+import { DataManager } from "../../../src/sdk/manager";
 import {
   BASE_INDEX_SCALE,
   COMPOUND_DECIMALS,
@@ -58,7 +61,8 @@ import {
 import { Comet as CometTemplate } from "../../../generated/templates";
 import { Token } from "../../../generated/schema";
 import { CometRewards } from "../../../generated/templates/Comet/CometRewards";
-import { TokenClass } from "../../../src/sdk/token";
+import { TokenManager } from "../../../src/sdk/token";
+import { AccountManager } from "../../../src/sdk/account";
 
 ///////////////////////////////
 ///// Configurator Events /////
@@ -76,49 +80,49 @@ export function handleCometDeployed(event: CometDeployed): void {
   const tryBaseOracle = cometContract.try_baseTokenPriceFeed();
   const protocolData = getProtocolData();
 
-  const baseTokenClass = new TokenClass(
+  const baseTokenManager = new TokenManager(
     tryBaseToken.value,
     event,
     TokenType.REBASING
   );
-  const baseToken = baseTokenClass.getToken();
+  const baseToken = baseTokenManager.getToken();
 
   if (!tryBaseToken.reverted) {
     const baseMarketID = event.params.cometProxy.concat(tryBaseToken.value);
-    const marketClass = new MarketClass(
+    const manager = new DataManager(
       baseMarketID,
       tryBaseToken.value,
       event,
       protocolData
     );
 
-    const marketEntity = marketClass.getMarket();
-    marketEntity.canBorrowFrom = true;
+    const market = manager.getMarket();
+    market.canBorrowFrom = true;
 
     // update market
-    marketEntity.name = MARKET_PREFIX.concat(baseToken.symbol)
+    market.name = MARKET_PREFIX.concat(baseToken.symbol)
       .concat(" - ")
       .concat(baseToken.name);
-    marketEntity.outputToken = baseToken.id;
-    marketEntity.outputTokenSupply = BIGINT_ZERO;
-    marketEntity.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    marketEntity.exchangeRate = BIGDECIMAL_ONE;
+    market.outputToken = baseToken.id;
+    market.outputTokenSupply = BIGINT_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.exchangeRate = BIGDECIMAL_ONE;
 
-    marketEntity.relation = event.params.cometProxy;
-    marketEntity._baseTrackingBorrowSpeed = BIGINT_ZERO;
-    marketEntity._baseTrackingSupplySpeed = BIGINT_ZERO;
-    marketEntity.canBorrowFrom = true;
-    marketEntity._baseBorrowIndex = BASE_INDEX_SCALE;
+    market.relation = event.params.cometProxy;
+    market._baseTrackingBorrowSpeed = BIGINT_ZERO;
+    market._baseTrackingSupplySpeed = BIGINT_ZERO;
+    market.canBorrowFrom = true;
+    market._baseBorrowIndex = BASE_INDEX_SCALE;
 
     // create base token Oracle
     if (!tryBaseOracle.reverted) {
-      marketEntity.oracle = marketClass.getOrCreateOracle(
+      market.oracle = manager.getOrCreateOracle(
         tryBaseOracle.value,
         true,
         OracleSource.CHAINLINK
       ).id;
     }
-    marketEntity.save();
+    market.save();
   }
 
   // create collateral token markets
@@ -127,40 +131,40 @@ export function handleCometDeployed(event: CometDeployed): void {
   while (!tryAssetInfo.reverted) {
     const inputTokenID = tryAssetInfo.value.asset;
     const marketID = event.params.cometProxy.concat(inputTokenID);
-    const marketClass = new MarketClass(
+    const manager = new DataManager(
       marketID,
       inputTokenID,
       event,
       protocolData
     );
-    const marketEntity = marketClass.getMarket();
+    const market = manager.getMarket();
 
     // add unique market fields
-    marketEntity.name = MARKET_PREFIX.concat(baseToken.symbol)
+    market.name = MARKET_PREFIX.concat(baseToken.symbol)
       .concat(" - ")
-      .concat(marketClass.getInputToken().name);
-    marketEntity.canUseAsCollateral = true;
-    marketEntity.maximumLTV = bigIntToBigDecimal(
+      .concat(manager.getInputToken().name);
+    market.canUseAsCollateral = true;
+    market.maximumLTV = bigIntToBigDecimal(
       tryAssetInfo.value.borrowCollateralFactor,
       16
     );
-    marketEntity.liquidationThreshold = bigIntToBigDecimal(
+    market.liquidationThreshold = bigIntToBigDecimal(
       tryAssetInfo.value.liquidateCollateralFactor,
       16
     );
-    marketEntity.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
+    market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
       bigIntToBigDecimal(tryAssetInfo.value.liquidationFactor, 16)
     );
-    marketEntity.supplyCap = tryAssetInfo.value.supplyCap;
-    marketEntity.relation = event.params.cometProxy;
+    market.supplyCap = tryAssetInfo.value.supplyCap;
+    market.relation = event.params.cometProxy;
 
     // create token Oracle
-    marketEntity.oracle = marketClass.getOrCreateOracle(
+    market.oracle = manager.getOrCreateOracle(
       tryAssetInfo.value.priceFeed,
       true,
       OracleSource.CHAINLINK
     ).id;
-    marketEntity.save();
+    market.save();
 
     // get next asset info
     assetIndex++;
@@ -176,37 +180,32 @@ export function handleAddAsset(event: AddAsset): void {
 
   const inputTokenID = event.params.assetConfig.asset;
   const marketID = event.params.cometProxy.concat(inputTokenID);
-  const marketClass = new MarketClass(
-    marketID,
-    inputTokenID,
-    event,
-    protocolData
-  );
-  const marketEntity = marketClass.getMarket();
+  const manager = new DataManager(marketID, inputTokenID, event, protocolData);
+  const market = manager.getMarket();
 
   // add unique market fields
-  marketEntity.canUseAsCollateral = true;
-  marketEntity.maximumLTV = bigIntToBigDecimal(
+  market.canUseAsCollateral = true;
+  market.maximumLTV = bigIntToBigDecimal(
     event.params.assetConfig.borrowCollateralFactor,
     16
   );
-  marketEntity.liquidationThreshold = bigIntToBigDecimal(
+  market.liquidationThreshold = bigIntToBigDecimal(
     event.params.assetConfig.liquidateCollateralFactor,
     16
   );
-  marketEntity.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
+  market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
     bigIntToBigDecimal(event.params.assetConfig.liquidationFactor, 16)
   );
-  marketEntity.supplyCap = event.params.assetConfig.supplyCap;
-  marketEntity.relation = event.params.cometProxy;
+  market.supplyCap = event.params.assetConfig.supplyCap;
+  market.relation = event.params.cometProxy;
 
   // create token Oracle
-  marketEntity.oracle = marketClass.getOrCreateOracle(
+  market.oracle = manager.getOrCreateOracle(
     event.params.assetConfig.priceFeed,
     true,
     OracleSource.CHAINLINK
   ).id;
-  marketEntity.save();
+  market.save();
 }
 
 //
@@ -226,13 +225,13 @@ export function handleSetBaseTokenPriceFeed(
   }
 
   const marketID = event.params.cometProxy.concat(tryBaseToken.value);
-  const marketClass = new MarketClass(
+  const manager = new DataManager(
     marketID,
     tryBaseToken.value,
     event,
     getProtocolData()
   );
-  marketClass.getOrCreateOracle(
+  manager.getOrCreateOracle(
     event.params.newBaseTokenPriceFeed,
     true,
     OracleSource.CHAINLINK
@@ -256,18 +255,17 @@ export function handleSetBaseTrackingBorrowSpeed(
   }
 
   const marketID = event.params.cometProxy.concat(tryBaseToken.value);
-  const marketClass = new MarketClass(
+  const manager = new DataManager(
     marketID,
     tryBaseToken.value,
     event,
     getProtocolData()
   );
-  const marketEntity = marketClass.getMarket();
-  marketEntity._baseTrackingBorrowSpeed =
-    event.params.newBaseTrackingBorrowSpeed;
-  marketEntity.save();
+  const market = manager.getMarket();
+  market._baseTrackingBorrowSpeed = event.params.newBaseTrackingBorrowSpeed;
+  market.save();
 
-  updateRewards(marketClass, event.address, event);
+  updateRewards(manager, event.address, event);
 }
 
 //
@@ -287,18 +285,17 @@ export function handleSetBaseTrackingSupplySpeed(
   }
 
   const marketID = event.params.cometProxy.concat(tryBaseToken.value);
-  const marketClass = new MarketClass(
+  const manager = new DataManager(
     marketID,
     tryBaseToken.value,
     event,
     getProtocolData()
   );
-  const marketEntity = marketClass.getMarket();
-  marketEntity._baseTrackingSupplySpeed =
-    event.params.newBaseTrackingSupplySpeed;
-  marketEntity.save();
+  const market = manager.getMarket();
+  market._baseTrackingSupplySpeed = event.params.newBaseTrackingSupplySpeed;
+  market.save();
 
-  updateRewards(marketClass, event.address, event);
+  updateRewards(manager, event.address, event);
 }
 
 //
@@ -308,29 +305,29 @@ export function handleUpdateAsset(event: UpdateAsset): void {
   const marketID = event.params.cometProxy.concat(
     event.params.newAssetConfig.asset
   );
-  const marketClass = new MarketClass(
+  const manager = new DataManager(
     marketID,
     event.params.newAssetConfig.asset,
     event,
     getProtocolData()
   );
-  const marketEntity = marketClass.getMarket();
+  const market = manager.getMarket();
 
   // update market fields
-  marketEntity.canUseAsCollateral = true;
-  marketEntity.maximumLTV = bigIntToBigDecimal(
+  market.canUseAsCollateral = true;
+  market.maximumLTV = bigIntToBigDecimal(
     event.params.newAssetConfig.borrowCollateralFactor,
     16
   );
-  marketEntity.liquidationThreshold = bigIntToBigDecimal(
+  market.liquidationThreshold = bigIntToBigDecimal(
     event.params.newAssetConfig.liquidateCollateralFactor,
     16
   );
-  marketEntity.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
+  market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
     bigIntToBigDecimal(event.params.newAssetConfig.liquidationFactor, 16)
   );
-  marketEntity.supplyCap = event.params.newAssetConfig.supplyCap;
-  marketEntity.save();
+  market.supplyCap = event.params.newAssetConfig.supplyCap;
+  market.save();
 }
 
 //
@@ -340,16 +337,16 @@ export function handleUpdateAssetBorrowCollateralFactor(
   event: UpdateAssetBorrowCollateralFactor
 ): void {
   const marketID = event.params.cometProxy.concat(event.params.asset);
-  const marketClass = new MarketClass(
+  const manager = new DataManager(
     marketID,
     event.params.asset,
     event,
     getProtocolData()
   );
-  const marketEntity = marketClass.getMarket();
+  const market = manager.getMarket();
 
-  marketEntity.maximumLTV = bigIntToBigDecimal(event.params.newBorrowCF, 16);
-  marketEntity.save();
+  market.maximumLTV = bigIntToBigDecimal(event.params.newBorrowCF, 16);
+  market.save();
 }
 
 //
@@ -359,19 +356,19 @@ export function handleUpdateAssetLiquidateCollateralFactor(
   event: UpdateAssetLiquidateCollateralFactor
 ): void {
   const marketID = event.params.cometProxy.concat(event.params.asset);
-  const marketClass = new MarketClass(
+  const manager = new DataManager(
     marketID,
     event.params.asset,
     event,
     getProtocolData()
   );
-  const marketEntity = marketClass.getMarket();
+  const market = manager.getMarket();
 
-  marketEntity.liquidationThreshold = bigIntToBigDecimal(
+  market.liquidationThreshold = bigIntToBigDecimal(
     event.params.newLiquidateCF,
     16
   );
-  marketEntity.save();
+  market.save();
 }
 
 //
@@ -381,18 +378,18 @@ export function handleUpdateAssetLiquidationFactor(
   event: UpdateAssetLiquidationFactor
 ): void {
   const marketID = event.params.cometProxy.concat(event.params.asset);
-  const marketClass = new MarketClass(
+  const manager = new DataManager(
     marketID,
     event.params.asset,
     event,
     getProtocolData()
   );
-  const marketEntity = marketClass.getMarket();
+  const market = manager.getMarket();
 
-  marketEntity.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
+  market.liquidationPenalty = BIGDECIMAL_HUNDRED.minus(
     bigIntToBigDecimal(event.params.newLiquidationFactor, 16)
   );
-  marketEntity.save();
+  market.save();
 }
 
 //
@@ -400,14 +397,14 @@ export function handleUpdateAssetLiquidationFactor(
 // Update the price feed for a collateral asset
 export function handleUpdateAssetPriceFeed(event: UpdateAssetPriceFeed): void {
   const marketID = event.params.cometProxy.concat(event.params.asset);
-  const marketClass = new MarketClass(
+  const manager = new DataManager(
     marketID,
     event.params.asset,
     event,
     getProtocolData()
   );
 
-  marketClass.getOrCreateOracle(
+  manager.getOrCreateOracle(
     event.params.newPriceFeed,
     true,
     OracleSource.CHAINLINK
@@ -419,16 +416,16 @@ export function handleUpdateAssetPriceFeed(event: UpdateAssetPriceFeed): void {
 // Update the supply cap for a given collateral asset
 export function handleUpdateAssetSupplyCap(event: UpdateAssetSupplyCap): void {
   const marketID = event.params.cometProxy.concat(event.params.asset);
-  const marketClass = new MarketClass(
+  const manager = new DataManager(
     marketID,
     event.params.asset,
     event,
     getProtocolData()
   );
-  const marketEntity = marketClass.getMarket();
+  const market = manager.getMarket();
 
-  marketEntity.supplyCap = event.params.newSupplyCap;
-  marketEntity.save();
+  market.supplyCap = event.params.newSupplyCap;
+  market.save();
 }
 
 ////////////////////////
@@ -442,7 +439,7 @@ export function handleSupply(event: Supply): void {
   const cometContract = Comet.bind(event.address);
   const tryBaseToken = cometContract.try_baseToken();
   const marketID = event.address.concat(tryBaseToken.value);
-  const market = new MarketClass(
+  const market = new DataManager(
     marketID,
     tryBaseToken.value,
     event,
@@ -464,22 +461,40 @@ export function handleSupply(event: Supply): void {
   const mintAmount = isMint(event);
   if (!mintAmount) {
     // Repay only
+    const borrowBalance = getUserBalance(
+      cometContract,
+      accountID,
+      null,
+      PositionSide.BORROWER
+    );
     const repay = market.createRepay(
       tryBaseToken.value,
       accountID,
       amount,
-      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+      borrowBalance,
+      null,
+      InterestRateType.VARIABLE
     );
-    repay.accountActor = accountActorID;
-    repay.save();
+    if (repay) {
+      repay.accountActor = accountActorID;
+      repay.save();
+    }
   } else if (mintAmount.le(amount)) {
-    // TODO ensure this is correct
     // deposit only
+    const supplyBalance = getUserBalance(
+      cometContract,
+      accountID,
+      null,
+      PositionSide.COLLATERAL
+    );
     const deposit = market.createDeposit(
       tryBaseToken.value,
       accountID,
       amount,
-      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+      supplyBalance,
+      InterestRateType.VARIABLE
     );
     deposit.accountActor = accountActorID;
     deposit.save();
@@ -488,22 +503,43 @@ export function handleSupply(event: Supply): void {
     // partial deposit and partial repay
     const repayAmount = amount.minus(mintAmount);
     const depositAmount = amount.minus(repayAmount);
+    const borrowBalance = getUserBalance(
+      cometContract,
+      accountID,
+      null,
+      PositionSide.BORROWER
+    );
     const repay = market.createRepay(
       tryBaseToken.value,
       accountID,
       repayAmount,
-      bigIntToBigDecimal(repayAmount, token.decimals).times(token.lastPriceUSD!)
+      bigIntToBigDecimal(repayAmount, token.decimals).times(
+        token.lastPriceUSD!
+      ),
+      borrowBalance,
+      null,
+      InterestRateType.VARIABLE
     );
-    repay.accountActor = accountActorID;
-    repay.save();
+    if (repay) {
+      repay.accountActor = accountActorID;
+      repay.save();
+    }
 
+    const supplyBalance = getUserBalance(
+      cometContract,
+      accountID,
+      null,
+      PositionSide.COLLATERAL
+    );
     const deposit = market.createDeposit(
       tryBaseToken.value,
       accountID,
       depositAmount,
       bigIntToBigDecimal(depositAmount, token.decimals).times(
         token.lastPriceUSD!
-      )
+      ),
+      supplyBalance,
+      InterestRateType.VARIABLE
     );
     deposit.accountActor = accountActorID;
     deposit.save();
@@ -515,7 +551,7 @@ export function handleSupply(event: Supply): void {
 // Supplying collateral tokens
 export function handleSupplyCollateral(event: SupplyCollateral): void {
   const marketID = event.address.concat(event.params.asset);
-  const market = new MarketClass(
+  const market = new DataManager(
     marketID,
     event.params.asset,
     event,
@@ -535,11 +571,14 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
   updateRevenue(market, event.address);
   updateRewards(market, event.address, event);
 
+  const cometContract = Comet.bind(event.address);
+  const supplyBalance = getUserBalance(cometContract, accountID, asset);
   const deposit = market.createDeposit(
     asset,
     accountID,
     amount,
-    bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
+    bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+    supplyBalance
   );
   deposit.accountActor = accountActorID;
   deposit.save();
@@ -552,7 +591,7 @@ export function handleWithdraw(event: Withdraw): void {
   const cometContract = Comet.bind(event.address);
   const tryBaseToken = cometContract.try_baseToken();
   const marketID = event.address.concat(tryBaseToken.value);
-  const market = new MarketClass(
+  const market = new DataManager(
     marketID,
     tryBaseToken.value,
     event,
@@ -574,50 +613,88 @@ export function handleWithdraw(event: Withdraw): void {
   const burnAmount = isBurn(event);
   if (!burnAmount) {
     // Borrow only
+    const borrowBalance = getUserBalance(
+      cometContract,
+      accountID,
+      null,
+      PositionSide.BORROWER
+    );
     const borrow = market.createBorrow(
       tryBaseToken.value,
       accountID,
       amount,
-      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+      borrowBalance,
+      null,
+      InterestRateType.VARIABLE
     );
     borrow.accountActor = accountActorID;
     borrow.save();
   } else if (burnAmount.ge(amount)) {
     // withdraw only
+    const supplyBalance = getUserBalance(
+      cometContract,
+      accountID,
+      null,
+      PositionSide.COLLATERAL
+    );
     const withdraw = market.createWithdraw(
       tryBaseToken.value,
       accountID,
       amount,
-      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+      supplyBalance,
+      InterestRateType.VARIABLE
     );
-    withdraw.accountActor = accountActorID;
-    withdraw.save();
+    if (withdraw) {
+      withdraw.accountActor = accountActorID;
+      withdraw.save();
+    }
   } else {
     // burnAmount < amount
     // partial withdraw and partial borrow
     const borrowAmount = amount.minus(burnAmount);
     const withdrawAmount = amount.minus(borrowAmount);
+    const borrowBalance = getUserBalance(
+      cometContract,
+      accountID,
+      null,
+      PositionSide.BORROWER
+    );
     const borrow = market.createBorrow(
       tryBaseToken.value,
       accountID,
       borrowAmount,
       bigIntToBigDecimal(borrowAmount, token.decimals).times(
         token.lastPriceUSD!
-      )
+      ),
+      borrowBalance,
+      null,
+      InterestRateType.VARIABLE
     );
     borrow.accountActor = accountActorID;
     borrow.save();
 
+    const supplyBalance = getUserBalance(
+      cometContract,
+      accountID,
+      null,
+      PositionSide.COLLATERAL
+    );
     const withdraw = market.createWithdraw(
       tryBaseToken.value,
       accountID,
       withdrawAmount,
       bigIntToBigDecimal(withdrawAmount, token.decimals).times(
         token.lastPriceUSD!
-      )
+      ),
+      supplyBalance,
+      InterestRateType.VARIABLE
     );
-    withdraw.accountActor = accountActorID;
-    withdraw.save();
+    if (withdraw) {
+      withdraw.accountActor = accountActorID;
+      withdraw.save();
+    }
   }
 }
 
@@ -626,7 +703,7 @@ export function handleWithdraw(event: Withdraw): void {
 // Withdraw collateral tokens (cannot be a Borrow)
 export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   const marketID = event.address.concat(event.params.asset);
-  const market = new MarketClass(
+  const market = new DataManager(
     marketID,
     event.params.asset,
     event,
@@ -646,30 +723,32 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   updateRevenue(market, event.address);
   updateRewards(market, event.address, event);
 
+  const cometContract = Comet.bind(event.address);
+  const supplyBalance = getUserBalance(cometContract, accountID, asset);
   const withdraw = market.createWithdraw(
     asset,
     accountID,
     amount,
-    bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
+    bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+    supplyBalance
   );
-  withdraw.accountActor = accountActorID;
-  withdraw.save();
+  if (withdraw) {
+    withdraw.accountActor = accountActorID;
+    withdraw.save();
+  }
 }
 
 //
 //
 // Transfer user base tokens to another account
-// Need to use callHandler
-// export function handleTransfer(call: TransferBaseCall): void {
-// TODO
-// }
+export function handleTransfer(event: Transfer): void {}
 
 //
 //
 // Transfer user collateral to another account
 export function handleTransferCollateral(event: TransferCollateral): void {
   const marketID = event.address.concat(event.params.asset);
-  const market = new MarketClass(
+  const market = new DataManager(
     marketID,
     event.params.asset,
     event,
@@ -689,12 +768,17 @@ export function handleTransferCollateral(event: TransferCollateral): void {
   // no revenue accrued during this event
   updateRewards(market, event.address, event);
 
+  const cometContract = Comet.bind(event.address);
+  const senderBalance = getUserBalance(cometContract, sender, asset);
+  const receiverBalance = getUserBalance(cometContract, receiver, asset);
   market.createTransfer(
     asset,
     sender,
     receiver,
     amount,
-    bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!)
+    bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+    senderBalance,
+    receiverBalance
   );
 }
 
@@ -703,7 +787,7 @@ export function handleTransferCollateral(event: TransferCollateral): void {
 // Sell liquidated collateral at a discount (of liquidation penalty)
 export function handleAbsorbCollateral(event: AbsorbCollateral): void {
   const marketID = event.address.concat(event.params.asset);
-  const market = new MarketClass(
+  const market = new DataManager(
     marketID,
     event.params.asset,
     event,
@@ -729,28 +813,96 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
   updateRevenue(market, event.address);
   updateRewards(market, event.address, event);
 
-  market.createLiquidate(
+  const borrowBalance = getUserBalance(
+    cometContract,
+    borrower,
+    null,
+    PositionSide.BORROWER
+  );
+  const liquidate = market.createLiquidate(
     baseAsset,
     liquidator,
     borrower,
     amount,
     amountUSD,
-    profitUSD
+    profitUSD,
+    borrowBalance,
+    InterestRateType.VARIABLE
   );
+  if (!liquidate) return;
+  const positions = liquidate.positions;
+
+  // update liquidatee collateral positions
+  let assetIndex = 0;
+  let tryAssetInfo = cometContract.try_getAssetInfo(assetIndex);
+  const accountManager = new AccountManager(
+    borrower,
+    marketEntity,
+    market.getProtocol(),
+    event
+  );
+  while (!tryAssetInfo.reverted) {
+    const supplyBalance = getUserBalance(
+      cometContract,
+      borrower,
+      tryAssetInfo.value.asset
+    );
+    const priceUSD = getPrice(tryAssetInfo.value.priceFeed, cometContract);
+    accountManager.subtractPosition(
+      supplyBalance,
+      PositionSide.COLLATERAL,
+      TransactionType.LIQUIDATE,
+      priceUSD
+    );
+    if (accountManager.getPositionID()) {
+      positions.push(accountManager.getPositionID()!);
+    }
+
+    assetIndex++;
+    tryAssetInfo = cometContract.try_getAssetInfo(assetIndex);
+  }
+  liquidate.positions = positions;
+  liquidate.save();
 }
 
 ///////////////////
 ///// Helpers /////
 ///////////////////
 
+//
+//
+// Get user balance
+// leave asset empty if base token, but then you must provide a side
+function getUserBalance(
+  comet: Comet,
+  account: Address,
+  asset: Address | null = null,
+  positionSide: string | null = null
+): BigInt {
+  if (asset) {
+    const tryBalance = comet.try_userCollateral(account, asset);
+    return tryBalance.reverted ? BIGINT_ZERO : tryBalance.value.value0;
+  } else {
+    if (positionSide == PositionSide.COLLATERAL) {
+      const tryBalance = comet.try_balanceOf(account);
+      return tryBalance.reverted ? BIGINT_ZERO : tryBalance.value;
+    }
+    if (positionSide == PositionSide.BORROWER) {
+      const tryBorrowBalance = comet.try_borrowBalanceOf(account);
+      return tryBorrowBalance.reverted ? BIGINT_ZERO : tryBorrowBalance.value;
+    }
+    return BIGINT_ZERO;
+  }
+}
+
 function updateRewards(
-  market: MarketClass,
+  dataManager: DataManager,
   cometAddress: Address,
   event: ethereum.Event
 ): void {
   const cometContract = Comet.bind(cometAddress);
   const tryTrackingIndexScale = cometContract.try_trackingIndexScale();
-  const marketEntity = market.getMarket();
+  const market = dataManager.getMarket();
   const tryBaseToken = cometContract.try_baseToken();
   if (tryBaseToken.reverted) {
     log.error("[updateRewards] Could not get base token", []);
@@ -758,7 +910,7 @@ function updateRewards(
   }
 
   // skip rewards calc if not base token market
-  if (market.getInputToken().id != tryBaseToken.value) {
+  if (dataManager.getInputToken().id != tryBaseToken.value) {
     return;
   }
 
@@ -767,12 +919,12 @@ function updateRewards(
 
   if (tryTrackingIndexScale.reverted || tryRewardConfig.reverted) {
     log.warning("[updateRewards] Contract call(s) reverted on market: {}", [
-      marketEntity.id.toHexString(),
+      market.id.toHexString(),
     ]);
     return;
   }
 
-  const rewardToken = new TokenClass(tryRewardConfig.value.value0, event);
+  const rewardToken = new TokenManager(tryRewardConfig.value.value0, event);
   const decimals = rewardToken.getDecimals();
   const borrowRewardToken = rewardToken.getOrCreateRewardToken(
     RewardTokenType.VARIABLE_BORROW
@@ -784,7 +936,7 @@ function updateRewards(
   // Reward tokens emitted per day as follows:
   // tokens/day = (speed * SECONDS_PER_DAY) / trackingIndexScale
   const supplyRewardPerDay = BigInt.fromString(
-    marketEntity
+    market
       ._baseTrackingBorrowSpeed!.times(BigInt.fromI64(SECONDS_PER_DAY))
       .div(tryTrackingIndexScale.value)
       .toBigDecimal()
@@ -793,7 +945,7 @@ function updateRewards(
       .toString()
   );
   const borrowRewardPerDay = BigInt.fromString(
-    marketEntity
+    market
       ._baseTrackingSupplySpeed!.times(BigInt.fromI64(SECONDS_PER_DAY))
       .div(tryTrackingIndexScale.value)
       .toBigDecimal()
@@ -801,10 +953,7 @@ function updateRewards(
       .truncate(0)
       .toString()
   );
-  marketEntity.rewardTokenEmissionsAmount = [
-    supplyRewardPerDay,
-    borrowRewardPerDay,
-  ]; // supply first to keep alphabetized
+  market.rewardTokenEmissionsAmount = [supplyRewardPerDay, borrowRewardPerDay]; // supply first to keep alphabetized
   const supplyRewardPerDayUSD = bigIntToBigDecimal(
     supplyRewardPerDay,
     decimals
@@ -813,20 +962,20 @@ function updateRewards(
     borrowRewardPerDay,
     decimals
   ).times(rewardToken.getPriceUSD());
-  marketEntity.rewardTokenEmissionsUSD = [
+  market.rewardTokenEmissionsUSD = [
     supplyRewardPerDayUSD,
     borrowRewardPerDayUSD,
   ];
-  marketEntity.rewardTokens = [supplyRewardToken.id, borrowRewardToken.id];
-  marketEntity.save();
+  market.rewardTokens = [supplyRewardToken.id, borrowRewardToken.id];
+  market.save();
 }
 
 //
 //
 // update revenue (only can update base token market revenue)
-function updateRevenue(market: MarketClass, cometAddress: Address): void {
+function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
   const cometContract = Comet.bind(cometAddress);
-  const inputToken = market.getInputToken();
+  const inputToken = dataManager.getInputToken();
   if (cometContract.baseToken() != inputToken.id) {
     log.info(
       "[updateRevenue] Cannot update revenue for non-base token market",
@@ -834,7 +983,7 @@ function updateRevenue(market: MarketClass, cometAddress: Address): void {
     );
     return;
   }
-  const marketEntity = market.getMarket();
+  const market = dataManager.getMarket();
   // TODO use CometExt totalsBasic() for base token TVL and borrow amount
   const tryTotalsBasic = cometContract.try_totalsBasic();
   if (tryTotalsBasic.reverted) {
@@ -846,10 +995,10 @@ function updateRevenue(market: MarketClass, cometAddress: Address): void {
   const newBaseBorrowIndex = tryTotalsBasic.value.baseBorrowIndex;
 
   const baseBorrowIndexDiff = newBaseBorrowIndex.minus(
-    marketEntity._baseBorrowIndex!
+    market._baseBorrowIndex!
   );
-  marketEntity._baseBorrowIndex = newBaseBorrowIndex;
-  marketEntity.save();
+  market._baseBorrowIndex = newBaseBorrowIndex;
+  market.save();
 
   // the reserve factor is dynamic and is essentially
   // the spread between supply and borrow interest rates
@@ -868,7 +1017,7 @@ function updateRevenue(market: MarketClass, cometAddress: Address): void {
   const supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
     protocolRevenueDeltaUSD
   );
-  market.updateRevenue(
+  dataManager.updateRevenue(
     totalRevenueDeltaUSD,
     protocolRevenueDeltaUSD,
     supplySideRevenueDeltaUSD
@@ -879,14 +1028,17 @@ function updateRevenue(market: MarketClass, cometAddress: Address): void {
 //
 // Updates market TVL, borrows, prices
 // @return inputToken
-function updateMarketData(market: MarketClass): Token {
-  const marketEntity = market.getMarket();
-  const cometContract = Comet.bind(Address.fromBytes(marketEntity.relation!));
+function updateMarketData(dataManager: DataManager): Token {
+  const market = dataManager.getMarket();
+  const cometContract = Comet.bind(Address.fromBytes(market.relation!));
   const baseToken = cometContract.baseToken();
 
-  const inputTokenPriceUSD = getPrice(market.getOracleAddress(), cometContract);
+  const inputTokenPriceUSD = getPrice(
+    dataManager.getOracleAddress(),
+    cometContract
+  );
 
-  if (marketEntity.inputToken == baseToken) {
+  if (market.inputToken == baseToken) {
     // update base token market data
     const tryTotalSupply = cometContract.try_totalSupply();
     const tryTotalBorrow = cometContract.try_totalBorrow();
@@ -898,7 +1050,7 @@ function updateMarketData(market: MarketClass): Token {
       reservesBI = tryReserves.value;
     }
 
-    market.updateMarketAndProtocolData(
+    dataManager.updateMarketAndProtocolData(
       inputTokenPriceUSD,
       tryTotalSupply.reverted ? BIGINT_ZERO : tryTotalSupply.value,
       tryTotalBorrow.value ? BIGINT_ZERO : tryTotalBorrow.value,
@@ -907,19 +1059,17 @@ function updateMarketData(market: MarketClass): Token {
     );
   } else {
     // update collateral token market data
-    const collateralERC20 = ERC20.bind(
-      Address.fromBytes(marketEntity.inputToken)
-    );
+    const collateralERC20 = ERC20.bind(Address.fromBytes(market.inputToken));
     const tryBalance = collateralERC20.try_balanceOf(
-      Address.fromBytes(marketEntity.relation!)
+      Address.fromBytes(market.relation!)
     );
 
     // update reserves
     const tryReserves = cometContract.try_getCollateralReserves(
-      Address.fromBytes(marketEntity.inputToken)
+      Address.fromBytes(market.inputToken)
     );
 
-    market.updateMarketAndProtocolData(
+    dataManager.updateMarketAndProtocolData(
       inputTokenPriceUSD,
       tryBalance.reverted ? BIGINT_ZERO : tryBalance.value,
       null,
@@ -929,18 +1079,18 @@ function updateMarketData(market: MarketClass): Token {
   }
 
   // update interest rates if this is the baseToken market
-  if (marketEntity.inputToken == baseToken) {
+  if (market.inputToken == baseToken) {
     const utilization = cometContract.getUtilization();
     const supplyRate = cometContract.getSupplyRate(utilization);
     const borrowRate = cometContract.getBorrowRate(utilization);
-    market.getOrUpdateRate(
+    dataManager.getOrUpdateRate(
       InterestRateSide.BORROWER,
       InterestRateType.VARIABLE,
       bigIntToBigDecimal(borrowRate, DEFAULT_DECIMALS)
         .times(BigDecimal.fromString(SECONDS_PER_YEAR.toString()))
         .times(BIGDECIMAL_HUNDRED)
     );
-    market.getOrUpdateRate(
+    dataManager.getOrUpdateRate(
       InterestRateSide.LENDER,
       InterestRateType.VARIABLE,
       bigIntToBigDecimal(supplyRate, DEFAULT_DECIMALS)
@@ -948,9 +1098,9 @@ function updateMarketData(market: MarketClass): Token {
         .times(BIGDECIMAL_HUNDRED)
     );
   }
-  marketEntity.save();
+  market.save();
 
-  return market.getInputToken();
+  return dataManager.getInputToken();
 }
 
 function getPrice(priceFeed: Address, cometContract: Comet): BigDecimal {

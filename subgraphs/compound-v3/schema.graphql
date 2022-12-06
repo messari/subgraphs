@@ -1619,9 +1619,6 @@ interface Event {
   " Timestamp of this event "
   timestamp: BigInt!
 
-  "Account where deposit was executed (e.g. a deposit on behalf of account)"
-  account: Account!
-
   " The market tokens are deposited to "
   market: Market!
 
