@@ -19,10 +19,15 @@ let protocolNameToBaseMapping = {};
 
 async function executionFlow() {
   console.log('START');
-  const { data } = await axios.get(
-    "https://subgraphs.messari.io/deployment.json"
-  );
-
+  let data = null;
+  try {
+    const result = await axios.get(
+      "https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json"
+    );
+    data = result.data;
+  } catch (err) {
+    console.log(err.message)
+  }
   const loopDeploymentJSON = await generateEndpoints(data, protocolNameToBaseMapping);
   const subgraphEndpoints = loopDeploymentJSON.subgraphEndpoints;
   protocolNameToBaseMapping = loopDeploymentJSON.protocolNameToBaseMapping;
@@ -123,8 +128,13 @@ async function executionFlow() {
     return { message: embeddedMessages, protocolName: protocolName, channel: channelId };
   });
   if (messagesToPost.length > 0) {
-    await clearThread(Date.now() - (86400000), process.env.PROD_THREAD);
-    await sendMessageToAggThread();
+    await clearThread(Date.now() - (86400000), process.env.PROD_CHANNEL);
+    const aggThread = currentDiscordMessages.find(x => x.content.includes('Production Ready Subgraph Indexing Failure'));
+    const aggThreadId = aggThread?.id || "";
+    if (aggThreadId) {
+      await clearThread(Date.now() - (86400000), aggThreadId);
+    }
+    await sendMessageToAggThread(aggThreadId);
     messagesToPost = messagesToPost.filter((msg, idx) => {
       if (!msg?.channel && !!msg) {
         messagesToPost[idx].channel = protocolNameToChannelMapping[msg?.protocolName];
