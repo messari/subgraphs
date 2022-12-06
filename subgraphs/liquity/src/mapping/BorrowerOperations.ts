@@ -1,3 +1,4 @@
+import { Address } from "@graphprotocol/graph-ts";
 import {
   LUSDBorrowingFeePaid,
   TroveUpdated,
@@ -13,6 +14,8 @@ import { getCurrentETHPrice } from "../entities/token";
 import { addProtocolSideRevenue } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { updateUserPositionBalances } from "../entities/position";
+import { getOrCreateMarket } from "../entities/market";
+import { ETH_ADDRESS } from "../utils/constants";
 
 /**
  * Emitted when LUSD is borrowed from trove and a dynamic fee (0.5-5%) is charged (added to debt)
@@ -22,7 +25,7 @@ import { updateUserPositionBalances } from "../entities/position";
 export function handleLUSDBorrowingFeePaid(event: LUSDBorrowingFeePaid): void {
   const feeAmountLUSD = event.params._LUSDFee;
   const feeAmountUSD = bigIntToBigDecimal(feeAmountLUSD);
-  addProtocolSideRevenue(event, feeAmountUSD);
+  addProtocolSideRevenue(event, feeAmountUSD, getOrCreateMarket());
 }
 
 /**
@@ -35,6 +38,8 @@ export function handleTroveUpdated(event: TroveUpdated): void {
   const newCollateral = event.params._coll;
   const newDebt = event.params._debt;
   const trove = getOrCreateTrove(borrower);
+  const market = getOrCreateMarket();
+  const ethAddress = Address.fromString(ETH_ADDRESS);
 
   if (newCollateral == trove.collateral && newDebt == trove.debt) {
     return;
@@ -44,7 +49,14 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     const depositAmountUSD = bigIntToBigDecimal(depositAmountETH).times(
       getCurrentETHPrice()
     );
-    createDeposit(event, depositAmountETH, depositAmountUSD, borrower);
+    createDeposit(
+      event,
+      getOrCreateMarket(),
+      ethAddress,
+      depositAmountETH,
+      depositAmountUSD,
+      borrower
+    );
   } else if (newCollateral < trove.collateral) {
     const withdrawAmountETH = trove.collateral.minus(newCollateral);
     const withdrawAmountUSD = bigIntToBigDecimal(withdrawAmountETH).times(
@@ -52,6 +64,7 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     );
     createWithdraw(
       event,
+      market,
       withdrawAmountETH,
       withdrawAmountUSD,
       borrower,

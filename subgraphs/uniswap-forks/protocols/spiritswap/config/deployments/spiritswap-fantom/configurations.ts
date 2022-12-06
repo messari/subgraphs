@@ -86,14 +86,17 @@ export class SpiritSwapFantomConfigurations implements Configurations {
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
       "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83", // wFTM
+      "0xdc301622e621166BD8E82f2cA0A26c13Ad0BE355", // FRAX
       "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
       "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", // DAI
+      "0x049d68029688eAbF473097a2fC38ef61633A3C7A", // fUSDT
     ]);
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
       "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
       "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", // DAI
+      "0x049d68029688eAbF473097a2fC38ef61633A3C7A", // fUSDT
     ]);
   }
   getStableOraclePools(): string[] {

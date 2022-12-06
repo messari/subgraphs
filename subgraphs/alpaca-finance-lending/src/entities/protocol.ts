@@ -12,12 +12,10 @@ import {
   RiskType,
   SECONDS_PER_DAY,
   PROTOCOL_ID,
-  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
-  PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SLUG,
-  PROTOCOL_SUBGRAPH_VERSION,
 } from "../utils/constants";
+import { Versions } from "../versions";
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
   const id = PROTOCOL_ID;
@@ -26,9 +24,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol = new LendingProtocol(id);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.POOLED;
@@ -51,8 +46,13 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.totalPoolCount = INT_ZERO;
     protocol.openPositionCount = INT_ZERO;
     protocol.cumulativePositionCount = INT_ZERO;
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+  protocol.save();
+
   return protocol;
 }
 

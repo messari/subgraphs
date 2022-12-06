@@ -484,7 +484,19 @@ function ProtocolTabEntity({
             return (
               <>
                 {tvlButton}
-                <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+                <ChartContainer
+                  csvMetaDataProp={csvMetaData}
+                  csvJSONProp={csvJSON}
+                  baseKey={baseKey}
+                  elementId={elementId}
+                  downloadAllCharts={downloadAllCharts}
+                  identifier={protocolTableData?.slug}
+                  datasetLabel={label}
+                  dataTable={dataFields[field]}
+                  dataChart={dataChartToPass}
+                  chartsImageFiles={chartsImageFiles}
+                  setChartsImageFiles={(x: any) => setChartsImageFiles(x)}
+                />
               </>
             );
           })}

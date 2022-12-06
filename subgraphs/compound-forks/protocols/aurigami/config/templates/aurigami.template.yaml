@@ -75,6 +75,8 @@ templates:
           file: ./abis/PriceOracle.json
         - name: Pair
           file: ./abis/aurigami/Pair.json
+        - name: AuriLens
+          file: ./abis/aurigami/AuriLens.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
