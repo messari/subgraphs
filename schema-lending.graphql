@@ -1,6 +1,6 @@
 # Subgraph Schema: Lending Protocol
-# Version: 3.0.0
-# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+# Version: 2.0.1
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
   ARBITRUM_ONE
@@ -53,12 +53,6 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
-
-  " The type of token the protocol creates for positions "
-  type: TokenType
-
-  " Details about the price oracle used to get this token's price "
-  oracle: Oracle
 }
 
 enum RewardTokenType {
@@ -94,27 +88,6 @@ enum RiskType {
 
   " Isolated risk means each users position in a market or CDP is isolated for risk of liquidation "
   ISOLATED
-}
-
-enum CollateralizationType {
-  " Over collateralized protocols require users to put up more collateral than the amount borrowed. "
-  OVER_COLLATERALIZED
-
-  " Protocols that allow users to borrow more than their collateral locked.  "
-  UNDER_COLLATERALIZED
-
-  " Protocols that allow users to borrow without any collateral. Generally this protocol is KYC'd and only whitelist users can do this "
-  UNCOLLATERALIZED
-}
-
-# This is used for representative token descriptions
-# e.g. collateral or debt tokens in a protocol
-enum TokenType {
-  " Rebasing tokens continuously adjust balances / supply as interest is accrued (e.g. Aave debt balances adjust at each block with interest) "
-  REBASING
-
-  " Non-rebasing token balances / supply do not change as interest is accried (e.g. Compound's cToken's do not adjust balance, the exchange rate changes with interest) "
-  NON_REBASING
 }
 
 enum InterestRateType {
@@ -168,153 +141,13 @@ type InterestRate @entity {
   type: InterestRateType!
 }
 
-# There is a wide range of formats of lending protocols
-# And there are many unique mappings when it comes to input / output tokens
-# This generic type will help define the unique relationships between tokens in a market
-# You can think of this as a 1:M relationship between 1 input token and output tokens
-type TokenData @entity {
-  " { Market Address }-{ Input Token Address }-{ Optional: Snapshot ID } "
-  id: Bytes!
-
-  " Can you use the output token as collateral "
-  canUseAsCollateral: Boolean!
-
-  " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
-  maximumLTV: BigDecimal!
-
-  " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
-  liquidationThreshold: BigDecimal!
-
-  " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
-  liquidationPenalty: BigDecimal!
-
-  " Can the user choose to isloate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
-  canIsolate: Boolean!
-
-  ##### Token Data #####
-
-  " Tokens that need to be deposited in this market to take a position in protocol (should be alphabetized) "
-  inputToken: Token!
-
-  " Amount of input tokens in the market (same order as inputTokens) "
-  inputTokenBalance: BigInt!
-
-  " Prices in USD of the input tokens (same order as inputTokens) "
-  inputTokenPriceUSD: BigDecimal!
-
-  " Tokens that are minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist (should be alphabetized) "
-  outputTokens: [Token!]
-
-  " Total supply of output tokens (same order as outputTokens) "
-  outputTokenSupplies: [BigInt!]
-
-  " Prices in USD of the output tokens (same order as outputTokens) "
-  outputTokenPricesUSD: [BigDecimal!]
-
-  " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
-  exchangeRates: [BigDecimal!]
-
-  " All interest rates for this input token. Should be in APR format "
-  rates: [InterestRate!]
-
-  " Total amount of reserves (in USD) "
-  reserves: BigDecimal
-
-  " The amount of revenue that is converted to reserves at the current time. 20% reserve factor should be in format 0.20 "
-  reserveFactor: BigDecimal
-
-  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
-  borrowedToken: Token
-
-  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
-  variableBorrowedTokenBalance: BigInt
-
-  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
-  stableBorrowedTokenBalance: BigInt
-
-  " Allowed limit to how much of the underlying asset can be supplied to this market. "
-  supplyCap: BigInt
-
-  " Allowed limit for how much of the underlying asset can be borrowed from this market. "
-  borrowCap: BigInt
-}
-
-enum RevenueSource {
-  " Revenue that is generated from borrower's interest "
-  BORROW_INTEREST
-
-  " Revenue that is generated from liquidation fees "
-  LIQUIDATION_FEE
-
-  " Revenue that is generated from fees from flashloans "
-  FLASHLOAN_FEE
-}
-
-# This entity offers a more nuanced view of revenue types
-# Use this to provide the sources of revenue and amounts of each
-type RevenueDetails @entity {
-  " { Market/Protocol ID }-{ Optional: Snapshot ID } "
-  id: Bytes!
-
-  " The source of revenue (in alphabetical order) "
-  sources: [RevenueSource!]!
-
-  " The amount of revenue in USD (same order as sources) "
-  amountsUSD: [BigDecimal!]!
-}
-
-enum OracleSource {
-  UNISWAP
-  BALANCER
-  CHAINLINK
-  YEARN
-  SUSHISWAP
-  CURVE
-  ## Can add more
-}
-
-# Most lending protocols get token prices through onchain oracles.
-# As oracles are a source of truth it is important to understand the details.
-# This entity will help track oracle-related data in a market
-type Oracle @entity {
-  " { Market ID }-{ Token Address } "
-  id: Bytes!
-
-  " The market that this oracle is used for pricing "
-  market: Market!
-
-  " The block this oracle was adopted for a market "
-  blockCreated: BigInt!
-
-  " The most recent block that the oracle was updated (Update when an oracle proxy updates the contract, this happens in compound for example) "
-  blockLU: BigInt!
-
-  " The timestamp this oracle was adopted for a market "
-  timestampCreated: BigInt!
-
-  " The most recent timestamp that the oracle was updated (Updated when the oracle address is updated) "
-  timestampLU: BigInt!
-
-  " Is the Oracle currently used as the source of truth for a market"
-  isActive: Boolean!
-
-  " True if the oracle returns prices in USD (e.g. generally the other case is the network's native token) "
-  isUSD: Boolean!
-
-  " The hash where the oracle was no longer used "
-  hashEnded: Bytes
-
-  " The Protocol that is providing the oracle (nullable if non-standard source)"
-  oracleSource: OracleSource
-}
-
 #############################
 ##### Protocol Metadata #####
 #############################
 
 interface Protocol {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: Bytes!
+  id: ID!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
@@ -337,15 +170,6 @@ interface Protocol {
   " The type of protocol (e.g. DEX, Lending, Yield, etc) "
   type: ProtocolType!
 
-  " The specific lending protocol type "
-  lendingType: LendingType
-
-  " The specific permissions required to use the protocol "
-  PermissionType: PermissionType
-
-  " Risk type of the lending protocol "
-  riskType: RiskType
-
   ##### Quantitative Data #####
 
   " Current TVL (Total Value Locked) of the entire protocol "
@@ -354,7 +178,7 @@ interface Protocol {
   " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
   protocolControlledValueUSD: BigDecimal
 
-  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
+  " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
@@ -385,7 +209,7 @@ interface Protocol {
 
 type LendingProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: Bytes!
+  id: ID!
 
   " Name of the protocol, including version. e.g. Aave v2 "
   name: String!
@@ -411,21 +235,15 @@ type LendingProtocol implements Protocol @entity {
   " The specific lending protocol type "
   lendingType: LendingType
 
-  " The specific permissions required to use the protocol "
-  PermissionType: PermissionType
-
   " Risk type of the lending protocol "
   riskType: RiskType
 
   " Tokens that can be minted. Only applies to CDP "
   mintedTokens: [Token!]
 
-  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. "
-  rewardTokens: [RewardToken!]
-
   ##### Quantitative Data #####
 
-  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
+  " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
   " Number of cumulative depositors "
@@ -499,11 +317,6 @@ type LendingProtocol implements Protocol @entity {
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
-
-  ##### Add Ons #####
-
-  " All markets in this protocol "
-  _markets: [Bytes!]!
 }
 
 ###############################
@@ -512,15 +325,15 @@ type LendingProtocol implements Protocol @entity {
 
 type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
-  id: Bytes!
+  id: ID!
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
 
-  " Number of unique daily active users. e.g. accounts that spent gas to interact with this protocol "
+  " Number of unique daily active users "
   dailyActiveUsers: Int!
 
-  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
+  " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
   " Number of unique daily depositors "
@@ -565,15 +378,6 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of liquidations in a day "
   dailyLiquidateCount: Int!
 
-  " Total number of positions (open and closed) "
-  cumulativePositionCount: Int!
-
-  " Total number of open positions "
-  openPositionCount: Int!
-
-  " Total number of positions touched in a day. This includes opening, closing, and modifying positions. "
-  dailyActivePositions: Int!
-
   " Total number of pools "
   totalPoolCount: Int!
 
@@ -586,7 +390,7 @@ type UsageMetricsDailySnapshot @entity {
 
 type UsageMetricsHourlySnapshot @entity {
   " { # of hours since Unix epoch time } "
-  id: Bytes!
+  id: ID!
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
@@ -594,7 +398,7 @@ type UsageMetricsHourlySnapshot @entity {
   " Number of unique hourly active users "
   hourlyActiveUsers: Int!
 
-  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this protocol "
+  " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
   " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
@@ -624,7 +428,7 @@ type UsageMetricsHourlySnapshot @entity {
 
 type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
-  id: Bytes!
+  id: ID!
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
@@ -701,11 +505,6 @@ type FinancialsDailySnapshot @entity {
 ##### Pool-Level Metadata #####
 ###############################
 
-"""
-A market is defined by the input token.
-At a minimum that means being able to deposit/withdraw that token.
-e.g. there may be related markets as they only act as collateral for other markets.
-"""
 type Market @entity {
   " Smart contract address of the market "
   id: ID!
@@ -725,9 +524,6 @@ type Market @entity {
   " Can you borrow from this market "
   canBorrowFrom: Boolean!
 
-  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
-  rewardTokens: [RewardToken!]
-
   " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
   maximumLTV: BigDecimal!
 
@@ -737,60 +533,22 @@ type Market @entity {
   " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
   liquidationPenalty: BigDecimal!
 
-  " Can the user choose to isolate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
-  canIsolate: Boolean!
+  " Token that need to be deposited to take a position in protocol "
+  inputToken: Token!
 
-  " Creation timestamp "
-  createdTimestamp: BigInt!
+  " Token that is minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist "
+  outputToken: Token
 
-  " Creation block number "
-  createdBlockNumber: BigInt!
-
-  " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
-  relation: Bytes
-
-  ##### Incentives #####
-
-  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
-
-  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
 
   ##### Quantitative Data #####
 
-  " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
-  fees: [InterestRate!]
-
-  " Total amount of reserves (in USD) "
-  reserves: BigDecimal
-
-  " The amount of revenue that is converted to reserves at the current time. 20% reserve factor should be in format 0.20 "
-  reserveFactor: BigDecimal
-
-  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
-  borrowedToken: Token
-
-  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
-  variableBorrowedTokenBalance: BigInt
-
-  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
-  stableBorrowedTokenBalance: BigInt
-
-  " Allowed limit to how much of the underlying asset can be supplied to this market. "
-  supplyCap: BigInt
-
-  " Allowed limit for how much of the underlying asset can be borrowed from this market. "
-  borrowCap: BigInt
+  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
+  rates: [InterestRate!]!
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
-
-  " Total amount of reserves in this market (in USD) "
-  totalReservesUSD: BigDecimal
 
   " All revenue generated by the market, accrued to the supply side. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
@@ -816,69 +574,34 @@ type Market @entity {
   " Sum of all historical liquidations in USD "
   cumulativeLiquidateUSD: BigDecimal!
 
-  " Sum of all historical transfers in USD "
-  cumulativeTransferUSD: BigDecimal!
-
-  " Sum of all historical flashloans in USD "
-  cumulativeFlashloanUSD: BigDecimal!
-
-  " Total number of transactions "
-  transactionCount: Int!
-
-  " Total number of deposits "
-  depositCount: Int!
-
-  " Total number of withdrawals "
-  withdrawalCount: Int!
-
-  " Total number of borrows "
-  borrowCount: Int!
-
-  " Total number of repayments "
-  repayCount: Int!
-
-  " Total number of liquidations "
-  liquidationCount: Int!
-
-  " Total number of transfers "
-  transferCount: Int!
-
-  " Total number of flashloans "
-  flashloanCount: Int!
-
-  ##### Usage Data #####
-
-  " Number of cumulative unique users. e.g. accounts that spent gas to interact with this market "
-  cumulativeUniqueUsers: Int!
-
-  " Number of cumulative depositors "
-  cumulativeUniqueDepositors: Int!
-
-  " Number of cumulative borrowers "
-  cumulativeUniqueBorrowers: Int!
-
-  " Number of cumulative liquidators (accounts that performed liquidation) "
-  cumulativeUniqueLiquidators: Int!
-
-  " Number of cumulative liquidatees (accounts that got liquidated) "
-  cumulativeUniqueLiquidatees: Int!
-
-  " Number of cumulative accounts that transferred positions (generally in the form of outputToken transfer) "
-  cumulativeUniqueTransferrers: Int!
-
-  " Number of cumulative accounts that performed flashloans "
-  cumulativeUniqueFlashloaners: Int!
-
   ##### Token Balances #####
 
-  " Balances and relationships of all tokens within this market "
-  tokens: [TokenData!]
+  " Amount of input tokens in the market "
+  inputTokenBalance: BigInt!
+
+  " Price per share of input token in USD "
+  inputTokenPriceUSD: BigDecimal!
+
+  " Total supply of output token "
+  outputTokenSupply: BigInt!
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal!
+
+  " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
+  exchangeRate: BigDecimal
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Creation timestamp "
+  createdTimestamp: BigInt!
+
+  " Creation block number "
+  createdBlockNumber: BigInt!
 
   ##### Account/Position Data #####
 
@@ -946,66 +669,13 @@ type MarketDailySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
-  " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
-  relation: Bytes
-
-  ##### Incentives #####
-
-  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
-  rewardTokens: [RewardToken!]
-
-  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
   ##### Quantitative Data #####
 
-  " Amount of input token in the market (same order as inputTokens) "
-  inputTokenBalance: BigInt!
-
-  " Prices in USD of the input token (same order as inputTokens) "
-  inputTokenPriceUSD: BigDecimal!
-
-  " Total supply of output token (same order as outputTokens) "
-  outputTokenSupply: BigInt
-
-  " Prices in USD of the output token (same order as outputTokens) "
-  outputTokenPriceUSD: BigDecimal
-
-  " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
-  exchangeRate: BigDecimal
-
-  " All interest rates for this input token. Should be in APR format "
-  rates: [InterestRate!]
-
-  " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
-  fees: [Fee!]
-
-  " Total amount of reserves (in USD) "
-  reserves: BigDecimal
-
-  " The amount of revenue that is converted to reserves at the current time. 20% reserve factor should be in format 0.20 "
-  reserveFactor: BigDecimal
-
-  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
-  variableBorrowedTokenBalance: BigInt
-
-  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
-  stableBorrowedTokenBalance: BigInt
-
-  " Allowed limit to how much of the underlying asset can be supplied to this market. "
-  supplyCap: BigInt
-
-  " Allowed limit for how much of the underlying asset can be borrowed from this market. "
-  borrowCap: BigInt
+  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
+  rates: [InterestRate!]!
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
-
-  " Total amount of reserves in this market (in USD) "
-  totalReservesUSD: BigDecimal
 
   " All revenue generated by the market, accrued to the supply side. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
@@ -1057,8 +727,8 @@ type MarketDailySnapshot @entity {
 
   ##### Token Balances #####
 
-  " Total assets transferred on a given day, in USD. "
-  dailyTransferUSD: BigDecimal!
+  " Amount of input token in the market. "
+  inputTokenBalance: BigInt!
 
   " Price per share of input token in USD "
   inputTokenPriceUSD: BigDecimal!
@@ -1069,83 +739,8 @@ type MarketDailySnapshot @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
-  " Total assets flashloaned on a given day, in native units. "
-  dailyNativeFlashloan: BigInt!
-
-  " Sum of all historical flashloans in USD "
-  cumulativeFlashloanUSD: BigDecimal!
-
-  ##### Usage Data #####
-
-  " Number of unique daily active users. e.g. accounts that spent gas to interact with this market "
-  dailyActiveUsers: Int!
-
-  " Number of unique daily depositors "
-  dailyActiveDepositors: Int!
-
-  " Number of unique daily borrowers "
-  dailyActiveBorrowers: Int!
-
-  " Number of unique daily liquidators (accounts that performed liquidation) "
-  dailyActiveLiquidators: Int!
-
-  " Number of unique daily liquidatees (accounts that got liquidated) "
-  dailyActiveLiquidatees: Int!
-
-  " Number of unique daily transferrers (the sender in a Transfer) "
-  dailyActiveTransferrers: Int!
-
-  " Number of unique daily accounts that executed a flash loan"
-  dailyActiveFlashloaners: Int!
-
-  " Total number of deposits in a day "
-  dailyDepositCount: Int!
-
-  " Total number of withdrawals in a day "
-  dailyWithdrawCount: Int!
-
-  " Total number of borrows/mints in a day "
-  dailyBorrowCount: Int!
-
-  " Total number of repayments/burns in a day "
-  dailyRepayCount: Int!
-
-  " Total number of liquidations in a day "
-  dailyLiquidateCount: Int!
-
-  " Total number of transfers in a day "
-  dailyTransferCount: Int!
-
-  " Total number of flashloans in a day "
-  dailyFlashloanCount: Int!
-
-  ##### Account/Position Data #####
-
-  " Number of positions in this market "
-  positionCount: Int!
-
-  " Number of open positions in this market "
-  openPositionCount: Int!
-
-  " Number of closed positions in this market "
-  closedPositionCount: Int!
-
-  " Number of lending positions in this market "
-  lendingPositionCount: Int!
-
-  " Total number of lending positions touched in a day. This includes opening, closing, and modifying positions. "
-  dailyActiveLendingPositionCount: Int!
-
-  " Number of borrowing positions in this market "
-  borrowingPositionCount: Int!
-
-  " Total number of borrow positions touched in a day. This includes opening, closing, and modifying positions. "
-  dailyActiveBorrowingPositionCount: Int!
-
-  ##### Token Balances #####
-
-  " Balances and relationships of all tokens within this market (a list of input token structs) "
-  tokens: [TokenData!]
+  " Amount of input token per full share of output token. Only applies when the output token exists "
+  exchangeRate: BigDecimal
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -1170,51 +765,10 @@ type MarketHourlySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
-  " A unique identifier that can relate multiple markets together. e.g. a common address that they all share. This is useful for markets with multiple input tokens "
-  relation: Bytes
-
-  ##### Incentives #####
-
-  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
-  rewardTokens: [RewardToken!]
-
-  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
   ##### Quantitative Data #####
 
-  " Amount of input token in the market (same order as inputTokens) "
-  inputTokenBalance: BigInt!
-
-  " Prices in USD of the input token (same order as inputTokens) "
-  inputTokenPriceUSD: BigDecimal!
-
-  " Total supply of output token (same order as outputTokens) "
-  outputTokenSupply: BigInt
-
-  " Prices in USD of the output token (same order as outputTokens) "
-  outputTokenPriceUSD: BigDecimal
-
-  " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
-  exchangeRate: BigDecimal
-
-  " All interest rates for this input token. Should be in APR format "
-  rates: [InterestRate!]
-
-  " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
-  fees: [Fee!]
-
-  " Total amount of reserves (in USD) "
-  reserves: BigDecimal
-
-  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
-  variableBorrowedTokenBalance: BigInt
-
-  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
-  stableBorrowedTokenBalance: BigInt
+  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
+  rates: [InterestRate!]!
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -1266,6 +820,29 @@ type MarketHourlySnapshot @entity {
 
   " Total assets repaid on a given hour, in USD. "
   hourlyRepayUSD: BigDecimal!
+
+  ##### Token Balances #####
+
+  " Amount of input token in the market. "
+  inputTokenBalance: BigInt!
+
+  " Price per share of input token in USD "
+  inputTokenPriceUSD: BigDecimal!
+
+  " Total supply of output token "
+  outputTokenSupply: BigInt!
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal!
+
+  " Amount of input token per full share of output token. Only applies when the output token exists "
+  exchangeRate: BigDecimal
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
 ##############################
@@ -1323,24 +900,6 @@ type Account @entity {
 
   " All liquidation events where this account got liquidated "
   liquidations: [Liquidate!]! @derivedFrom(field: "liquidatee")
-
-  " Number of times this account has transferred "
-  transferredCount: Int!
-
-  " All transfer events where this account was the sender "
-  transfers: [Transfer!]! @derivedFrom(field: "sender")
-
-  " Number of times this account has received a transfer "
-  receivedCount: Int!
-
-  " All transfer events where this account was the receiver "
-  receives: [Transfer!]! @derivedFrom(field: "receiver")
-
-  " Number of times this account has executed a flashloan "
-  flashloanCount: Int!
-
-  " All flashloan events where this account executed it "
-  flashloans: [Flashloan!]! @derivedFrom(field: "account")
 }
 
 type Position @entity {
@@ -1433,17 +992,11 @@ type PositionSnapshot @entity {
   " Nonce of the transaction that triggered this snapshot "
   nonce: BigInt!
 
-  " Account that owns this position "
-  account: Account!
-
   " Position of this snapshot "
   position: Position!
 
   " Token balance in this position, in native amounts "
   balance: BigInt!
-
-  " Token balance in this position, in USD "
-  balanceUSD: BigDecimal!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -1452,13 +1005,7 @@ type PositionSnapshot @entity {
   timestamp: BigInt!
 }
 
-# Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity(immutable: true) {
-  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
-  id: Bytes!
-}
-
-############################
+##################################
 ##### Event-Level Data #####
 ##################################
 
@@ -1672,115 +1219,8 @@ type Liquidate @entity {
   profitUSD: BigDecimal!
 }
 
-# This entity is solely for transfers outside of normal protocol interaction
-# e.g. transferring aTokens (collateral) directly, not a deposit.
-# Transfers associated with other transactions in this schema should live there and not here.
-# Note that only one transfer event should be created per transfer.
-type Transfer implements Event @entity(immutable: true) {
-  " { Transaction hash }-{ Log index } "
-  id: Bytes!
-
-  " Transaction hash of the transaction that emitted this event "
-  hash: Bytes!
-
-  " Nonce of the transaction that emitted this event "
-  nonce: BigInt!
-
-  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
-
-  " Price of gas in this transaction "
-  gasPrice: BigInt
-
-  " Gas used in this transaction. (Optional because not every chain will support this) "
-  gasUsed: BigInt
-
-  " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt
-
-  " Block number of this event "
-  blockNumber: BigInt!
-
-  " Timestamp of this event "
-  timestamp: BigInt!
-
-  " The account that sent the tokens "
-  sender: Account!
-
-  " The Account that received the tokens "
-  receiver: Account!
-
-  " The user positions changed by this event "
-  positions: [Position!]!
-
-  " The market associated with the token transfer "
-  market: Market!
-
-  " The asset that was actually transfered. This could also include a debt token. "
-  asset: Token!
-
-  " Amount of token transferred in native units "
-  amount: BigInt!
-
-  " Amount of token transferred in USD "
-  amountUSD: BigDecimal!
-}
-
-type Flashloan implements Event @entity(immutable: true) {
-  " { Transaction hash }-{ Log index } "
-  id: Bytes!
-
-  " Transaction hash of the transaction that emitted this event "
-  hash: Bytes!
-
-  " Nonce of the transaction that emitted this event "
-  nonce: BigInt!
-
-  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
-
-  " Price of gas in this transaction "
-  gasPrice: BigInt
-
-  " Gas used in this transaction. (Optional because not every chain will support this) "
-  gasUsed: BigInt
-
-  " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt
-
-  " Block number of this event "
-  blockNumber: BigInt!
-
-  " Timestamp of this event "
-  timestamp: BigInt!
-
-  " Account that receives the funds from the flashloan "
-  account: Account!
-
-  " Account that initiates the flashloan "
-  accountActor: Account
-
-  " The market in which this flashloan is executed "
-  market: Market!
-
-  " Asset borrowed "
-  asset: Token!
-
-  " Amount of asset borrowed in native units "
-  amount: BigInt!
-
-  " Amount of asset borrowed in USD "
-  amountUSD: BigDecimal!
-
-  " Amount of asset taken by protocol as a fee in native units "
-  feeAmount: BigInt
-
-  " Amount of asset taken by protocol as a fee in USD "
-  feeAmountUSD: BigDecimal
-}
-
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity(immutable: true) {
+type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
-  id: Bytes!
+  id: ID!
 }
