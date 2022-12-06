@@ -68,15 +68,13 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics = new UsageMetricsDailySnapshot(dayId);
 
     usageMetrics.protocol = protocol.id;
-    usageMetrics.totalPoolCount = protocol.totalPoolCount;
 
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
-
-    usageMetrics.blockNumber = block.number;
-    usageMetrics.timestamp = block.timestamp;
   }
+  usageMetrics.blockNumber = block.number;
+  usageMetrics.timestamp = block.timestamp;
 
   usageMetrics.save();
 
@@ -100,10 +98,10 @@ export function getOrCreateUsageMetricsHourlySnapshot(
     usageMetrics.hourlyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.hourlyTransactionCount = 0;
-
-    usageMetrics.blockNumber = block.number;
-    usageMetrics.timestamp = block.timestamp;
   }
+
+  usageMetrics.blockNumber = block.number;
+  usageMetrics.timestamp = block.timestamp;
 
   usageMetrics.save();
 
