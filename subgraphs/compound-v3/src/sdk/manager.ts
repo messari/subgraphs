@@ -320,7 +320,7 @@ export class DataManager {
       this.protocol,
       this.event
     );
-    if (depositor.newAccount()) {
+    if (depositor.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -378,7 +378,7 @@ export class DataManager {
       this.protocol,
       this.event
     );
-    if (withdrawer.newAccount()) {
+    if (withdrawer.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -444,7 +444,7 @@ export class DataManager {
       this.protocol,
       this.event
     );
-    if (borrower.newAccount()) {
+    if (borrower.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -503,7 +503,7 @@ export class DataManager {
       this.protocol,
       this.event
     );
-    if (repayer.newAccount()) {
+    if (repayer.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -570,7 +570,7 @@ export class DataManager {
       this.protocol,
       this.event
     );
-    if (liquidatorAccount.newAccount()) {
+    if (liquidatorAccount.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -583,7 +583,7 @@ export class DataManager {
     );
     liquidateeAccount.subtractPosition(
       newBalance,
-      PositionSide.BORROWER,
+      PositionSide.COLLATERAL,
       TransactionType.LIQUIDATE,
       this.market.inputTokenPriceUSD,
       interestType
@@ -651,7 +651,7 @@ export class DataManager {
       this.protocol,
       this.event
     );
-    if (transferrer.newAccount()) {
+    if (transferrer.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -730,7 +730,7 @@ export class DataManager {
       this.protocol,
       this.event
     );
-    if (flashloaner.newAccount()) {
+    if (flashloaner.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -829,7 +829,6 @@ export class DataManager {
         ]);
         continue;
       }
-      log.error("asdf tvl: {}", [_market.totalValueLockedUSD.toString()]);
       totalValueLockedUSD = totalValueLockedUSD.plus(
         _market.totalValueLockedUSD
       );

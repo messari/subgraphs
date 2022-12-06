@@ -741,7 +741,82 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
 //
 //
 // Transfer user base tokens to another account
-export function handleTransfer(event: Transfer): void {}
+// Note: this will only catch transfer function calls where both transfer's are emitted
+export function handleTransfer(event: Transfer): void {
+  const supplyLog = findTransfer(event);
+  if (!supplyLog) {
+    // second transfer does not exist
+    return;
+  }
+  const fromAddress = ethereum
+    .decode("address", supplyLog.topics.at(1))!
+    .toAddress();
+  if (fromAddress != ZERO_ADDRESS) {
+    // not apart of transferBase() since from address is not null
+    return;
+  }
+
+  // transfer amounts may not be equal so we will act like this is a base token withdraw / supply
+  const cometContract = Comet.bind(event.address);
+  const tryBaseToken = cometContract.try_baseToken();
+  const marketID = event.address.concat(tryBaseToken.value);
+  const market = new DataManager(
+    marketID,
+    tryBaseToken.value,
+    event,
+    getProtocolData()
+  );
+  let amount = event.params.amount;
+  const token = updateMarketData(market);
+  if (!token) {
+    log.warning("[handleWithdraw] Could not find token {}", [
+      tryBaseToken.value.toHexString(),
+    ]);
+    return;
+  }
+  updateRevenue(market, event.address);
+  updateRewards(market, event.address, event);
+
+  let newBalance = getUserBalance(
+    cometContract,
+    event.params.from,
+    null,
+    PositionSide.COLLATERAL
+  );
+  market.createWithdraw(
+    tryBaseToken.value,
+    event.params.from,
+    amount,
+    amount
+      .toBigDecimal()
+      .div(exponentToBigDecimal(token.decimals))
+      .times(token.lastPriceUSD!),
+    newBalance,
+    InterestRateType.VARIABLE
+  );
+
+  amount = ethereum.decode("uint256", supplyLog.data)!.toBigInt();
+  const toAddress = ethereum
+    .decode("address", supplyLog.topics.at(2))!
+    .toAddress();
+  newBalance = getUserBalance(
+    cometContract,
+    toAddress,
+    null,
+    PositionSide.COLLATERAL
+  );
+  market.createDeposit(
+    tryBaseToken.value,
+    toAddress,
+    amount,
+    amount
+      .toBigDecimal()
+      .div(exponentToBigDecimal(token.decimals))
+      .times(token.lastPriceUSD!),
+    newBalance,
+    InterestRateType.VARIABLE
+  );
+}
 
 //
 //
@@ -832,35 +907,30 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
   if (!liquidate) return;
   const positions = liquidate.positions;
 
-  // update liquidatee collateral positions
-  let assetIndex = 0;
-  let tryAssetInfo = cometContract.try_getAssetInfo(assetIndex);
+  // update liquidatee base asset borrow position
   const accountManager = new AccountManager(
     borrower,
     marketEntity,
     market.getProtocol(),
     event
   );
-  while (!tryAssetInfo.reverted) {
-    const supplyBalance = getUserBalance(
-      cometContract,
-      borrower,
-      tryAssetInfo.value.asset
-    );
-    const priceUSD = getPrice(tryAssetInfo.value.priceFeed, cometContract);
-    accountManager.subtractPosition(
-      supplyBalance,
-      PositionSide.COLLATERAL,
-      TransactionType.LIQUIDATE,
-      priceUSD
-    );
-    if (accountManager.getPositionID()) {
-      positions.push(accountManager.getPositionID()!);
-    }
-
-    assetIndex++;
-    tryAssetInfo = cometContract.try_getAssetInfo(assetIndex);
-  }
+  const baseAssetBorrowBalance = getUserBalance(
+    cometContract,
+    borrower,
+    null,
+    PositionSide.BORROWER
+  );
+  const priceUSD = getPrice(cometContract.baseTokenPriceFeed(), cometContract);
+  accountManager.subtractPosition(
+    baseAssetBorrowBalance,
+    PositionSide.BORROWER,
+    TransactionType.LIQUIDATE,
+    priceUSD,
+    InterestRateType.VARIABLE
+  );
+  const positionID = accountManager.getPositionID();
+  if (!positionID) return;
+  positions.push(positionID!);
   liquidate.positions = positions;
   liquidate.save();
 }
@@ -984,7 +1054,6 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
     return;
   }
   const market = dataManager.getMarket();
-  // TODO use CometExt totalsBasic() for base token TVL and borrow amount
   const tryTotalsBasic = cometContract.try_totalsBasic();
   if (tryTotalsBasic.reverted) {
     log.warning("[updateRevenue] Could not get totalBasics()", []);
@@ -998,7 +1067,6 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
     market._baseBorrowIndex!
   );
   market._baseBorrowIndex = newBaseBorrowIndex;
-  market.save();
 
   // the reserve factor is dynamic and is essentially
   // the spread between supply and borrow interest rates
@@ -1007,6 +1075,8 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
   const borrowRate = cometContract.getBorrowRate(utilization).toBigDecimal();
   const supplyRate = cometContract.getSupplyRate(utilization).toBigDecimal();
   const reserveFactor = borrowRate.minus(supplyRate).div(borrowRate);
+  market.reserveFactor = reserveFactor;
+  market.save();
 
   const totalRevenueDeltaUSD = baseBorrowIndexDiff
     .toBigDecimal()
@@ -1053,7 +1123,7 @@ function updateMarketData(dataManager: DataManager): Token {
     dataManager.updateMarketAndProtocolData(
       inputTokenPriceUSD,
       tryTotalSupply.reverted ? BIGINT_ZERO : tryTotalSupply.value,
-      tryTotalBorrow.value ? BIGINT_ZERO : tryTotalBorrow.value,
+      tryTotalBorrow.reverted ? BIGINT_ZERO : tryTotalBorrow.value,
       null,
       reservesBI
     );

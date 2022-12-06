@@ -38,6 +38,7 @@ import { TokenManager } from "./token";
 export class AccountManager {
   private isNew: boolean; // true if the account was created
   private account: Account;
+  private positonError: boolean;
   private position!: Position;
   private market: Market;
   private protocol: LendingProtocol;
@@ -76,7 +77,7 @@ export class AccountManager {
   }
 
   // returns true if the account was created in this instance
-  newAccount(): boolean {
+  isNewAccount(): boolean {
     return this.isNew;
   }
 
@@ -175,6 +176,7 @@ export class AccountManager {
       this.protocol.save();
     }
     this.position = position;
+    this.positonError = false;
 
     //
     // take position snapshot
@@ -203,6 +205,7 @@ export class AccountManager {
       log.warning("[subtractPosition] position counter {} not found", [
         counterID,
       ]);
+      this.positonError = true;
       return;
     }
     const positionID = positionCounter.id
@@ -211,6 +214,7 @@ export class AccountManager {
     const position = Position.load(positionID);
     if (!position) {
       log.warning("[subtractPosition] position {} not found", [positionID]);
+      this.positonError = true;
       return;
     }
 
@@ -264,6 +268,7 @@ export class AccountManager {
       this.protocol.save();
     }
     this.position = position;
+    this.positonError = false;
 
     //
     // update position snapshot
@@ -283,7 +288,7 @@ export class AccountManager {
   }
 
   getPositionID(): string | null {
-    if (this.position) {
+    if (!this.positonError) {
       return this.position.id;
     }
     return null;

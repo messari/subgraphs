@@ -52,26 +52,28 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-TODO
+`Rewards Per Second` \* `Seconds Per Day`
+
+_Note_: this applies to borrow and supply side, only on the base token
 
 ### Protocol Controlled Value
 
 Not applicable to Compound III
 
-## Compound V2 vs Compound III
-
-TODO
-
 ## Notes
 
 - `Comet` is also the collateral token. (ie, it is cUSDCv3)
 - Need to manually add TotalsBasic() to Comet abi to get total Supply of base tokens with interest, interest (revenue), borrows with interest.
-- Base token withdraws act as withdraws and borrows depending on WHAT?? logic
+- Base token withdraws act as withdraws and borrows (depending on the user's position)
 - The base asset cannot be used as collateral
-- reserves factor is dynamic. Essentially just the spread of supply/borrow ir rates at the time
+- Reserve factor is dynamic. Essentially just the spread of supply/borrow ir rates at the time
 - `BuyCollateral()` is a way for external accounts to purchase seized collateral at a discount. The discount being the liquidation penalty for that collateral asset.
   - Compound V3 separates the liquidation callouts from the seized collateral sales.
-- Liquidations technically increase protocol revenue by any leftover collateral that is absorbed by the protocol. Is this what we should be calculating??
+- `handleTransfer()` watches for base token transfers: https://github.com/compound-finance/comet/blob/376fdebaf08d7245edee4e668fa399447464cbdb/contracts/Comet.sol#L941
+  - We are not able to catch if the function does not emit both `transfer` events. This may leave some discrepancies in position data.
+- Position ID is often not found in `subtractPosition()`. Expect base token positions to be off.
+  - This is because the baseToken is so fluid, to fix this we would need to open a supply and borrow position each time a user updates their cUSDC balance.
+  - We need to account for any double counting with this.
 
 ## Reference and Useful Links
 
