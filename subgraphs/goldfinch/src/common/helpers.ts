@@ -29,6 +29,8 @@ import {
   Withdraw,
 } from "../../generated/schema";
 import { ActivityType, SECONDS_PER_HOUR, TransactionType } from "./constants";
+import { MigratedTranchedPool as MigratedTranchedPoolContract } from "../../generated/GoldfinchFactory/MigratedTranchedPool";
+import { PoolCreated } from "../../generated/GoldfinchFactory/GoldfinchFactory";
 
 export function createTransaction(
   transactionType: string,
@@ -119,6 +121,16 @@ export function updateRevenues(
 ): void {
   const newTotalRevenueUSD = newSupplySideRevenueUSD.plus(
     newProtocolSideRevenueUSD
+  );
+  log.info(
+    "[updateRevenues]market={}: newSupplySideRevenueUSD={},newProtocolSideRevenueUSD={},newTotalRevenueUSD={} tx={}",
+    [
+      market.id,
+      newSupplySideRevenueUSD.toString(),
+      newProtocolSideRevenueUSD.toString(),
+      newTotalRevenueUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
   );
   // update market's revenue
   market.cumulativeSupplySideRevenueUSD =
