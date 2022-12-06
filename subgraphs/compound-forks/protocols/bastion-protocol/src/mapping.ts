@@ -335,7 +335,6 @@ function getOrCreateProtocol(): LendingProtocol {
 //
 //
 // Update the rewards arrays in a given market
-// can be done for supply / borrow side triggered by Supply/BorrowSpeedUpdate events
 function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   const market = Market.load(marketAddress.toHexString());
   if (!market) {
