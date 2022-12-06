@@ -101,7 +101,3 @@ templates:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
           receipt: true
-      # callHandlers:
-      #   - function: transferBase(indexed address,indexed address,uint256)
-      #     handler: handleTransferBase
-          # receipt: true
