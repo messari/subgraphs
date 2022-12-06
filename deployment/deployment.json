@@ -1392,7 +1392,7 @@
       },
       "dforce-avalanche": {
         "network": "avalanche",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.2.5",
