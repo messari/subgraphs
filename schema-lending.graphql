@@ -67,6 +67,9 @@ enum RewardTokenType {
 
   " For reward tokens awarded to borrowers of stable debt "
   STABLE_BORROW
+
+  " For reward tokens awarded to stakers "
+  STAKE
 }
 
 type RewardToken @entity(immutable: true) {
@@ -809,6 +812,9 @@ type Market @entity {
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
+  " Total supply of output tokens that are staked. Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
   ##### Quantitative Data #####
 
   " Token that need to be deposited in this market to take a position in protocol (should be alphabetized) "
@@ -1033,6 +1039,9 @@ type MarketDailySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Total supply of output tokens that are staked. Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
 
   ##### Quantitative Data #####
 
@@ -1265,6 +1274,9 @@ type MarketHourlySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Total supply of output tokens that are staked. Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
 
   ##### Quantitative Data #####
 
