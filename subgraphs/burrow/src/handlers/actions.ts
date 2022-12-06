@@ -32,6 +32,10 @@ import { BI_ZERO, BI_BD, BD_ZERO } from "../utils/const";
 import { BigDecimal } from "@graphprotocol/graph-ts";
 import { EventData } from "../utils/type";
 
+/**
+ * Handles deposit events
+ * @param event args {amount, account_id, token_id}
+ */
 export function handleDeposit(event: EventData): void {
   const receipt = event.receipt;
   const logIndex = event.logIndex;
@@ -161,9 +165,13 @@ export function handleDeposit(event: EventData): void {
   updateProtocol();
 }
 
+/**
+ * @dev Handles deposits made to reserve pool
+ * @notice Admin/Owner can deposit to reserve
+ * @param event args {amount, account_id, token_id}
+ */
 export function handleDepositToReserve(event: EventData): void {
   const parsedData = parse0(event.data);
-  // const account_id = parsedData[0];
   const amount = parsedData[1];
   const token_id = parsedData[2];
 
@@ -172,7 +180,8 @@ export function handleDepositToReserve(event: EventData): void {
   market._totalReserved = market._totalReserved.plus(
     BigDecimal.fromString(amount)
   );
-  // for revenue calculation
+
+  // we keep the reserve added to the pool seperately for revenue calculation
   market._added_to_reserve = market._added_to_reserve.plus(
     BigDecimal.fromString(amount)
   );
@@ -180,6 +189,10 @@ export function handleDepositToReserve(event: EventData): void {
   market.save();
 }
 
+/**
+ * Handles withdraws from pool
+ * @param event args {account_id, amount, token_id}
+ */
 export function handleWithdraw(event: EventData): void {
   const receipt = event.receipt;
   const logIndex = event.logIndex;
@@ -265,6 +278,8 @@ export function handleWithdraw(event: EventData): void {
   );
   market._totalDeposited = market._totalDeposited.minus(BI_BD(withdraw.amount));
 
+  // if total deposited is negative, we need to move the negative amount to the reserve
+  // this can [possibly] happen if amount is withdrawn from reserve
   if (market._totalDeposited.lt(BD_ZERO)) {
     market._totalReserved = market._totalReserved.plus(market._totalDeposited);
     market._totalDeposited = BD_ZERO;
@@ -288,6 +303,7 @@ export function handleWithdraw(event: EventData): void {
   const positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
   positionSnapshot.logIndex = logIndex as i32;
 
+  // update market
   updateMarket(
     market,
     dailySnapshot,
@@ -313,6 +329,11 @@ export function handleWithdraw(event: EventData): void {
   updateProtocol();
 }
 
+/**
+ * Handles borrow events
+ * @param event args {account_id, amount, token_id}
+ * @notice Borrowed tokens are added as supplied tokens. Users need to withdraw tokens to have them in wallet
+ */
 export function handleBorrow(event: EventData): void {
   const receipt = event.receipt;
   const logIndex = event.logIndex;
@@ -325,6 +346,7 @@ export function handleBorrow(event: EventData): void {
       .concat((logIndex as i32).toString()),
     receipt
   );
+
   borrow.logIndex = logIndex as i32;
   const parsedData = parse0(data);
   const account_id = parsedData[0];
@@ -394,7 +416,7 @@ export function handleBorrow(event: EventData): void {
     )
   );
 
-  // snapshot
+  // take snapshot
   dailySnapshot.dailyBorrowUSD = dailySnapshot.dailyBorrowUSD.plus(
     borrow.amountUSD
   );
@@ -407,6 +429,7 @@ export function handleBorrow(event: EventData): void {
   const positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
   positionSnapshot.logIndex = logIndex as i32;
 
+  // update market
   updateMarket(
     market,
     dailySnapshot,
@@ -436,6 +459,11 @@ export function handleBorrow(event: EventData): void {
   updateProtocol();
 }
 
+/**
+ * Handles repayments
+ * @param event args {account_id, amount, token_id}
+ * @notice Tokens needed to repay need to be deposited first in supplied balance
+ */
 export function handleRepayment(event: EventData): void {
   const receipt = event.receipt;
   const logIndex = event.logIndex;

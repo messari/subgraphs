@@ -9,6 +9,11 @@ import { getOrCreateRewardToken, getOrCreateToken } from "../helpers/token";
 import { BD_ZERO } from "../utils/const";
 import { EventData } from "../utils/type";
 
+/**
+ * Add farm tokens
+ * @param event EventData
+ * @returns
+ */
 export function handleAddAssetFarmReward(event: EventData): void {
   const data = event.data;
 

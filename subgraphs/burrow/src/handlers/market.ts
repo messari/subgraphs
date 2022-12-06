@@ -6,6 +6,11 @@ import { getOrCreateProtocol } from "../helpers/protocol";
 import { BigDecimal } from "@graphprotocol/graph-ts";
 import { EventData } from "../utils/type";
 
+/**
+ * Handles new market being added
+ * @param event EventData
+ * @returns
+ */
 export function handleNewAsset(event: EventData): void {
   const data = event.data;
   const receipt = event.receipt;

@@ -26,7 +26,11 @@ import { Position } from "../../generated/schema";
 import { BI_ZERO, BI_BD } from "../utils/const";
 import { EventData } from "../utils/type";
 
-// { account_id, liquidation_account_id, collateral_sum, repaid_sum }
+/**
+ * Handles liquidation
+ * @param event args { account_id, liquidation_account_id, collateral_sum, repaid_sum }
+ * @returns
+ */
 export function handleLiquidate(event: EventData): void {
   const receipt = event.receipt;
   const data = event.data;
@@ -275,6 +279,12 @@ export function handleLiquidate(event: EventData): void {
   updateProtocol();
 }
 
+/**
+ * Force close
+ * @notice Repays from reserve and closes position
+ * @param event
+ * @returns
+ */
 export function handleForceClose(event: EventData): void {
   const receipt = event.receipt;
   const data = event.data;
