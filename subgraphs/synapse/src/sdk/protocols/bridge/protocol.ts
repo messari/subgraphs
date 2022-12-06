@@ -3,6 +3,8 @@ import { Versions } from "../../../../../../deployment/context/interface";
 import { BridgeProtocol as BridgeProtocolSchema } from "../../../../generated/schema";
 import { TokenPricer } from "../config";
 import { BridgeConfigurer } from "./config";
+import { ProtocolSnapshot } from "./protocol_snapshot";
+import { Account, AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
 import { TransactionType } from "./constants";
 import {
@@ -14,10 +16,6 @@ import {
 } from "@graphprotocol/graph-ts";
 import { chainIDToNetwork } from "./tokens";
 
-interface ProtocolSnapshot {
-  // todo
-}
-
 /**
  * Bridge is a wrapper around the BridgeProtocolSchema entity that takes care of
  * safely and conveniently updating the entity. Updating the Bridge entity using this
@@ -27,7 +25,7 @@ export class Bridge {
   protocol: BridgeProtocolSchema;
   event: ethereum.Event;
   pricer: TokenPricer;
-  snapshoter: ProtocolSnapshot | null;
+  snapshoter: ProtocolSnapshot;
 
   /**
    * Creates a new Bridge instance. This should only be called by the Bridge.load
@@ -41,7 +39,7 @@ export class Bridge {
     this.protocol = protocol;
     this.event = event;
     this.pricer = pricer;
-    this.snapshoter = null; // todo
+    this.snapshoter = new ProtocolSnapshot(protocol, event);
   }
 
   /**
@@ -118,21 +116,14 @@ export class Bridge {
   }
 
   /**
-   * This will save the entity to storage and update all its dependent snapshots.
+   * This will save the entity to storage. If any other action needs to be performed on
+   * save, it should be added here.
    * It is meant to be used internally. If you need to save the entity from outside the wrapper
    * you should probably be using some of the setters instead.
    * @private
    */
   private save(): void {
-    this.updateSnapshots();
     this.protocol.save();
-  }
-
-  /**
-   * Will update all snapshots for the protocol entity: Financials and Usage, both daily and hourly.
-   */
-  private updateSnapshots(): void {
-    // this.snapshoter.takeSnapshots();
   }
 
   /**
@@ -330,6 +321,46 @@ export class Bridge {
   addMessageSender(count: u8 = 1): void {
     this.protocol.cumulativeUniqueMessageSenders += count;
     this.save();
+  }
+
+  /**
+   * Will increase the hourly and daily active users counters. These will be reflected
+   * on the next Usage snapshot whenever it comes up.
+   */
+  addActiveUser(activity: AccountWasActive): void {
+    this.snapshoter.addActiveUser(activity);
+  }
+
+  /**
+   * Will increase the hourly and daily active transfer senders counters. These will be reflected
+   * on the next Usage snapshot whenever it comes up.
+   */
+  addActiveTransferSender(activity: AccountWasActive): void {
+    this.snapshoter.addActiveTransferSender(activity);
+  }
+
+  /**
+   * Will increase the hourly and daily active transfer receivers counters. These will be reflected
+   * on the next Usage snapshot whenever it comes up.
+   */
+  addActiveTransferReceiver(activity: AccountWasActive): void {
+    this.snapshoter.addActiveTransferReceiver(activity);
+  }
+
+  /**
+   * Will increase the hourly and daily active liquidity providers counters. These will be reflected
+   * on the next Usage snapshot whenever it comes up.
+   */
+  addActiveLiquidityProvider(activity: AccountWasActive): void {
+    this.snapshoter.addActiveLiquidityProvider(activity);
+  }
+
+  /**
+   * Will increase the hourly and daily active message senders counters. These will be reflected
+   * on the next Usage snapshot whenever it comes up.
+   */
+  addActiveMessageSender(activity: AccountWasActive): void {
+    this.snapshoter.addActiveMessageSender(activity);
   }
 
   /**

@@ -6,11 +6,13 @@ import {
   LiquidityDeposit,
   LiquidityWithdraw,
   PoolRoute,
+  ActiveAccount,
 } from "../../../../generated/schema";
 import { Pool } from "./pool";
 import { Bridge } from "./protocol";
 import { Tokens } from "./tokens";
 import { BridgePoolType, TransactionType, TransferType } from "./constants";
+import { getUnixDays, getUnixHours } from "../../util/events";
 
 export class AccountManager {
   protocol: Bridge;
@@ -38,6 +40,19 @@ export class AccountManager {
   }
 }
 
+namespace ActivityType {
+  export const TRANSFER_OUT = "transferOut";
+  export const TRANSFER_IN = "transferIn";
+  export const LIQUIDITY_PROVISIONING = "deposit";
+  export const MESSAGE = "message";
+}
+type ActivityType = string;
+
+export class AccountWasActive {
+  hourly: boolean;
+  daily: boolean;
+}
+
 export class Account {
   account: AccountSchema;
   event: ethereum.Event;
@@ -47,6 +62,37 @@ export class Account {
     this.account = account;
     this.protocol = protocol;
     this.event = protocol.getCurrentEvent();
+  }
+
+  private trackActivity(activityType: ActivityType): AccountWasActive {
+    const days = getUnixDays(this.event);
+    const hours = getUnixHours(this.event);
+
+    const hourlyID = Bytes.fromUTF8(
+      `${this.account.id.toHexString()}-hourly-${hours}-${activityType}`
+    );
+    const dailyID = Bytes.fromUTF8(
+      `${this.account.id.toHexString()}-daily-${days}-${activityType}`
+    );
+
+    let hourly = false;
+    let daily = false;
+    const dAct = ActiveAccount.load(dailyID);
+    if (!dAct) {
+      new ActiveAccount(dailyID).save();
+      daily = true;
+    }
+
+    const hAct = ActiveAccount.load(hourlyID);
+    if (!hAct) {
+      new ActiveAccount(hourlyID).save();
+      hourly = true;
+    }
+
+    return {
+      hourly,
+      daily,
+    };
   }
 
   addChain(chain: u32): void {
@@ -69,6 +115,9 @@ export class Account {
     updateMetrics: boolean = true
   ): BridgeTransfer {
     this.countTransferOut();
+    this.protocol.addActiveTransferSender(
+      this.trackActivity(ActivityType.TRANSFER_OUT)
+    );
     return this.transfer(
       pool,
       route,
@@ -89,6 +138,9 @@ export class Account {
     updateMetrics: boolean = true
   ): BridgeTransfer {
     this.countTransferIn();
+    this.protocol.addActiveTransferReceiver(
+      this.trackActivity(ActivityType.TRANSFER_IN)
+    );
     return this.transfer(
       pool,
       route,
@@ -194,6 +246,9 @@ export class Account {
     deposit.save();
 
     this.countDeposit();
+    this.protocol.addActiveLiquidityProvider(
+      this.trackActivity(ActivityType.LIQUIDITY_PROVISIONING)
+    );
     if (updateMetrics) {
       pool.trackDeposit(deposit);
     }
@@ -228,6 +283,9 @@ export class Account {
     withdraw.save();
 
     this.countWithdraw();
+    this.protocol.addActiveLiquidityProvider(
+      this.trackActivity(ActivityType.LIQUIDITY_PROVISIONING)
+    );
     if (updateMetrics) {
       pool.trackWithdraw(withdraw);
     }
