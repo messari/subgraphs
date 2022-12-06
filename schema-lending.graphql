@@ -503,7 +503,7 @@ type LendingProtocol implements Protocol @entity {
   ##### Add Ons #####
 
   " All markets in this protocol "
-  _markets: [Bytes!]
+  _markets: [Bytes!]!
 }
 
 ###############################
@@ -1676,7 +1676,7 @@ type Liquidate @entity {
 # e.g. transferring aTokens (collateral) directly, not a deposit.
 # Transfers associated with other transactions in this schema should live there and not here.
 # Note that only one transfer event should be created per transfer.
-type Transfer @entity(immutable: true) {
+type Transfer implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1726,7 +1726,7 @@ type Transfer @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Flashloan @entity(immutable: true) {
+type Flashloan implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1754,7 +1754,7 @@ type Flashloan @entity(immutable: true) {
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that receieves the funds from the flashloan "
+  " Account that receives the funds from the flashloan "
   account: Account!
 
   " Account that initiates the flashloan "

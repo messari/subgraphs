@@ -11,7 +11,7 @@ import {
   Market,
   Position,
   PositionSnapshot,
-  _PositionCounter,
+  PositionCounter,
 } from "../../generated/schema";
 import {
   BIGINT_ZERO,
@@ -98,9 +98,9 @@ export class AccountManager {
     if (interestType) {
       counterID = counterID.concat("-").concat(interestType);
     }
-    let positionCounter = _PositionCounter.load(counterID);
+    let positionCounter = PositionCounter.load(counterID);
     if (!positionCounter) {
-      positionCounter = new _PositionCounter(counterID);
+      positionCounter = new PositionCounter(counterID);
       positionCounter.nextCount = 0;
       positionCounter.save();
     }
@@ -200,7 +200,7 @@ export class AccountManager {
     if (interestType) {
       counterID = counterID.concat("-").concat(interestType);
     }
-    const positionCounter = _PositionCounter.load(counterID);
+    const positionCounter = PositionCounter.load(counterID);
     if (!positionCounter) {
       log.warning("[subtractPosition] position counter {} not found", [
         counterID,

@@ -1579,6 +1579,15 @@ type ActiveAccount @entity(immutable: true) {
   id: ID!
 }
 
+# Helper entity for getting positions
+type PositionCounter @entity {
+  " { Account address }-{ Market address }-{ Position Side } "
+  id: ID!
+
+  " Next count "
+  nextCount: Int!
+}
+
 ############################
 ##### Event-Level Data #####
 ############################
@@ -1996,16 +2005,4 @@ type Flashloan implements Event @entity(immutable: true) {
 
   " Amount of asset taken by protocol as a fee in USD "
   feeAmountUSD: BigDecimal
-}
-
-###################
-##### Add Ons #####
-###################
-
-type _PositionCounter @entity {
-  " { Account address }-{ Market address }-{ Position Side } "
-  id: ID!
-
-  " Next count "
-  nextCount: Int!
 }
