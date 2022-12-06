@@ -14,7 +14,7 @@ Sum across all Pools:
 
 `(Pool Borrow Amount * Pool Borrow Rate)`
 
-Note: This currently excludes Liquidations
+> Note: This currently excludes Liquidations
 
 ### Protocol-Side Revenue USD
 
@@ -24,7 +24,7 @@ Sum across all Pools:
 
 `(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
 
-Note: This currently excludes Liquidations
+> Note: This currently excludes Liquidations. Also, reserve factor is dynamic.
 
 ### Supply-Side Revenue USD
 
@@ -34,7 +34,7 @@ Sum across all Pools
 
 `(Pool Outstanding Borrows * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
 
-Note: This currently excludes Liquidations
+> Note: This currently excludes Liquidations
 
 ### Total Unique Users
 
@@ -50,11 +50,13 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Repayments`
 
+`Transfers`
+
 ### Reward Token Emissions Amount
 
 `Rewards Per Second` \* `Seconds Per Day`
 
-_Note_: this applies to borrow and supply side, only on the base token
+> Note: this applies to borrow and supply side, only on the base token
 
 ### Protocol Controlled Value
 
