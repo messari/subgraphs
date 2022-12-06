@@ -114,8 +114,9 @@ export class SnapshotManager {
     snapshot.rewardTokenEmissionsAmount =
       this.market.rewardTokenEmissionsAmount;
     snapshot.rewardTokenEmissionsUSD = this.market.rewardTokenEmissionsUSD;
-    snapshot.save();
+    snapshot.stakedOutputTokenAmount = this.market.stakedOutputTokenAmount;
 
+    snapshot.save();
     this.marketHourlySnapshot = snapshot;
   }
 
@@ -207,6 +208,7 @@ export class SnapshotManager {
     snapshot.rewardTokenEmissionsAmount =
       this.market.rewardTokenEmissionsAmount;
     snapshot.rewardTokenEmissionsUSD = this.market.rewardTokenEmissionsUSD;
+    snapshot.stakedOutputTokenAmount = this.market.stakedOutputTokenAmount;
 
     snapshot.save();
     this.marketDailySnapshot = snapshot;

@@ -120,6 +120,7 @@ export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";
   export const VARIABLE_BORROW = "VARIABLE_BORROW";
   export const STABLE_BORROW = "STABLE_BORROW";
+  export const STAKE = "STAKE";
 }
 
 export enum Transaction {
