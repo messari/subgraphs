@@ -54,13 +54,14 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-Euler Finance distributes EUL tokens by epoch (=every 100,000 blocks) to borrowers in the top 10 voted markets. Users vote for a market by staking their EUL for the underlying in [the EulStakes contract](https://etherscan.io/address/0xc697BB6625D9f7AdcF0fbf0cbd4DcF50D8716cd3#code). The total amount of EUL distributed in each epoch is [pre-determined](https://docs.euler.finance/eul/distribution-1#eul-per-epoch). The amount of distribution each market receives is proportional to time weighted total borrow balance.
+Euler Finance distributes EUL tokens by epoch (=every 100,000 blocks) to borrowers in the top 10 voted markets. Users vote for a market by staking their EUL for the underlying in [the EulStakes contract](https://etherscan.io/address/0xc697BB6625D9f7AdcF0fbf0cbd4DcF50D8716cd3#code). The total amount of EUL distributed in each epoch is [pre-determined](https://docs.euler.finance/eul/distribution-1#eul-per-epoch). The amount of distribution the top 10 staked markets receives is proportional to square root of sum time weighted EUL amount staked for the market .
 
-1. At the start of a new epoch, cumulate EUL amount users staked for each market weighted by number of blocks (~time) the EUL is staked;
-2. When the epoch ends, rank markets by total weighted staked EUL and select top 10 markets to receive EUL emission in the coming epoch;
-3. At the start of another new epoch, besides repeating step 1-2, cumulate total borrow balance for each market weighted by blocks (~time);
-4. When the epoch ends, distribute the total EUL amount for the epoch among the top 10 markets proportional to weighted total borrow balance;
-5. If epoch > 96, exit, else go back to 3.
+#### Epoch 6 - 17
+
+1. At the start of a new epoch, cumulate EUL amount users staked for each market weighted by number of blocks (approximating time) the EUL is staked;
+2. When the epoch ends, rank markets by total weighted EUL amount staked and select top 10 markets to receive EUL emission;
+3. Distribute the total EUL amount for the epoch among the top 10 markets proportional to square root of block weighted EUL amount staked;
+4. If epoch > 96, exit, else go back to 1.
 
 ### Protocol Controlled Value
 

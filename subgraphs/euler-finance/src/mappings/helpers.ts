@@ -668,25 +668,6 @@ function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
   return null;
 }
 
-export function updateWeightedBorrow(market: Market, epoch: _Epoch, endBlock: BigInt): void {
-  // update total borrow balance USD weighted by blocks lapsed
-  const mktReceivingRewards = market._receivingRewards;
-  log.debug("[updateWeightedBorrow]mrkt {} _receivingRewards={}", [market.id, mktReceivingRewards.toString()]);
-  if (market._receivingRewards) {
-    if (!market._borrowLastUpdateBlock) {
-      const epochStartBlock = getStartBlockForEpoch(epoch.epoch)!;
-      market._borrowLastUpdateBlock = epochStartBlock;
-      market._weightedTotalBorrowUSD = BIGDECIMAL_ZERO;
-    }
-
-    const blocksLapsed = endBlock.minus(market._borrowLastUpdateBlock!);
-    const addWeightedTotalBorrowUSD = market.totalBorrowBalanceUSD.times(blocksLapsed.toBigDecimal());
-    market._weightedTotalBorrowUSD = market._weightedTotalBorrowUSD!.plus(addWeightedTotalBorrowUSD);
-    market._borrowLastUpdateBlock = endBlock;
-    market.save();
-  }
-}
-
 export function updateWeightedStakeAmount(market: Market, endBlock: BigInt): void {
   const blocksLapsed = endBlock.minus(market._stakeLastUpdateBlock!);
   const _weightedStakedAmount = market._weightedStakedAmount!.plus(market._stakedAmount.times(blocksLapsed));

@@ -38,6 +38,7 @@ import {
   MAX_EPOCHS,
   START_EPOCH,
   START_EPOCH_BLOCK,
+  BIGINT_ONE,
 } from "../common/constants";
 import { Versions } from "../versions";
 import { Stake } from "../../generated/EulStakes/EulStakes";
@@ -515,7 +516,10 @@ export function getStartBlockForEpoch(epoch: i32): BigInt | null {
     return null;
   }
   const startBlock = BigInt.fromI32((epoch - START_EPOCH) * BLOCKS_PER_EPOCH).plus(START_EPOCH_BLOCK);
-  return startBlock;
+  // according to https://app.euler.finance/gauges, the start block is +1 on top of
+  // block specified in https://docs.euler.finance/eul/distribution-1#eul-per-epoch
+  // e.g. epoch 17 = 16030000, starting block = 16,030,001 on the guage page
+  return startBlock.plus(BIGINT_ONE);
 }
 
 export function getDeltaStakeAmount(event: Stake): BigInt {
