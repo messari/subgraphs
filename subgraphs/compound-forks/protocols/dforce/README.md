@@ -59,7 +59,7 @@ Not applicable.
 
 ## Notes
 
-- Avalanche is not supported on their frontend. We will keep the config for now, but it is not actively being used as far as we know.
+- Avalanche and Fantom is not supported on their frontend. We will keep the config for now, but it is not actively being used as far as we know.
 
 ## Smart Contracts Interactions
 

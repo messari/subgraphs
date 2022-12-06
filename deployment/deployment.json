@@ -1002,9 +1002,9 @@
     "deployments": {
       "belt-finance-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "1.2.1",
+          "schema": "1.3.0",
           "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
@@ -1373,7 +1373,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.4",
+          "subgraph": "1.2.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1395,7 +1395,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.3",
+          "subgraph": "1.2.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1417,7 +1417,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.3",
+          "subgraph": "1.2.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1439,7 +1439,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.3",
+          "subgraph": "1.2.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1465,7 +1465,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.3",
+          "subgraph": "1.2.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1487,7 +1487,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.3",
+          "subgraph": "1.2.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2159,7 +2159,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.1",
+          "subgraph": "1.3.0",
           "methodology": "1.0.1"
         },
         "files": {

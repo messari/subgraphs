@@ -357,7 +357,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newRewardDistributor",
+        "name": "newRewardDistributor",
         "type": "address"
       }
     ],
