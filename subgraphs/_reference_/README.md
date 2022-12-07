@@ -6,9 +6,11 @@
 
 Explain how the main metrics are calculated for this subgraph.
 
+See [Compound](../compound-forks/protocols/compound-v2/README.md) or [Uniswap](../uniswap-forks/protocols/uniswap-v2/README.md) for inspiration.
+
 ## Notes
 
-Any issues, discrepencies, unique logic to report.
+Any issues, discrepancies, unique logic to report.
 
 ## Links
 
