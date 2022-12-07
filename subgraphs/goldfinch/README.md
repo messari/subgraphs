@@ -34,15 +34,15 @@ Sum across all Markets:
 
 Sum across all Markets:
 
-`Reserve Fund Collected`
-
-Note: Goldfinch collect reserve fund from withdraw and interest (from borrowers and extra Senior Pool fund sweeped to compound)
+Reserve Fund Collected, i.e., `ReserveFundCollected.params.amount`
 
 ### Supply-Side Revenue USD
 
 Sum across all Markets
 
 `PaymentApplied.InterestAmount`
+
+Note: Goldfinch collects protocol side revenue from 3 sources: 1.) withdraw fee from senior pool; 2.) a portion of interest received from extra senior pool deposit swept to Compound; 3.) a portion of interest payment made by tranched pool borrowers. All three emits ReserveFundCollected event and thus are accounted in Protocol-Side Revenue method above. While protocol side revenue from tranched pool borrowing interest (source 3) is a fixed ratio (10% of total interest payment as of December 2022) to supply side revenue (90% of total interest payment), other sources of protocol side revenue do not maintain the split.
 
 ### Total Unique Users
 
