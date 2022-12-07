@@ -7,7 +7,6 @@ import {
   BIGINT_ZERO,
   CONFIG_KEYS_ADDRESSES,
   SECONDS_PER_YEAR,
-  SENIOR_POOL_UPGRADE_BLOCK,
 } from "../common/constants";
 import { calculateEstimatedInterestForTranchedPool } from "./helpers";
 import { getStakingRewards } from "./staking_rewards";
