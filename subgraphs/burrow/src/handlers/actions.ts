@@ -70,6 +70,16 @@ export function handleDeposit(event: EventData): void {
   const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
 
   const account = getOrCreateAccount(account_id);
+  // update account
+  if (account.positionCount == 0) {
+    usageDailySnapshot.dailyActiveDepositors += 1;
+    protocol.cumulativeUniqueUsers += 1;
+  }
+  if (account.depositCount == 0) {
+    protocol.cumulativeUniqueDepositors += 1;
+  }
+  account.depositCount += 1;
+
   const counterID = account.id
     .concat("-")
     .concat(market.id)
@@ -118,7 +128,6 @@ export function handleDeposit(event: EventData): void {
       .concat(NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString())
   );
   if (dailyActiveAccount == null) {
-    usageDailySnapshot.dailyActiveDepositors += 1;
     usageDailySnapshot.dailyActiveUsers += 1;
   }
   if (hourlyActiveAccount == null) {
@@ -131,13 +140,6 @@ export function handleDeposit(event: EventData): void {
 
   position.depositCount += 1;
   position.balance = position.balance.plus(deposit.amount);
-
-  // update account
-  if (account.depositCount == 0) {
-    protocol.cumulativeUniqueDepositors += 1;
-    protocol.cumulativeUniqueUsers += 1;
-  }
-  account.depositCount += 1;
 
   // deposit amount
   market.outputTokenSupply = market.outputTokenSupply.plus(
@@ -405,6 +407,9 @@ export function handleBorrow(event: EventData): void {
   const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
   const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
   const account = getOrCreateAccount(account_id.toString());
+  if (account.positionCount == 0) {
+    usageDailySnapshot.dailyActiveBorrowers += 1;
+  }
   const counterID = account.id
     .concat("-")
     .concat(market.id)
@@ -453,7 +458,6 @@ export function handleBorrow(event: EventData): void {
   );
   if (dailyActiveAccount == null) {
     usageDailySnapshot.dailyActiveUsers += 1;
-    usageDailySnapshot.dailyActiveBorrowers += 1;
   }
   if (hourlyActiveAccount == null) {
     usageHourlySnapshot.hourlyActiveUsers += 1;
