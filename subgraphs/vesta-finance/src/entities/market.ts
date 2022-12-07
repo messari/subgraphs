@@ -30,6 +30,7 @@ import { getOrCreateStableBorrowerInterestRate } from "./rate";
 import { EventType } from "./event";
 import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
 import {
+  ACTIVE_POOL_ADDRESS,
   ACTIVE_POOL_CREATED_BLOCK,
   ACTIVE_POOL_CREATED_TIMESTAMP,
   BIGDECIMAL_HUNDRED,
@@ -105,17 +106,18 @@ export function getOrCreateStabilityPool(
 }
 
 export function getOrCreateMarket(asset: Address): Market {
-  const id = asset.toHexString();
-  let market = Market.load(id);
+  const assetAddress = asset.toHexString();
+  const marketID = `${ACTIVE_POOL_ADDRESS}-${assetAddress}`;
+  let market = Market.load(marketID);
   if (!market) {
     const protocol = getOrCreateLendingProtocol();
     protocol.totalPoolCount += INT_ONE;
     protocol.save();
 
     const inputToken = getOrCreateAssetToken(asset);
-    const maxLTV = setMaxLTV(id);
-    const liquidationPenalty = setLiquidationPenalty(id);
-    market = new Market(id);
+    const maxLTV = setMaxLTV(assetAddress);
+    const liquidationPenalty = setLiquidationPenalty(assetAddress);
+    market = new Market(marketID);
     market.protocol = protocol.id;
     market.name = inputToken.name;
     market.isActive = true;
@@ -128,7 +130,7 @@ export function getOrCreateMarket(asset: Address): Market {
     market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-    market.rates = [getOrCreateStableBorrowerInterestRate(id).id];
+    market.rates = [getOrCreateStableBorrowerInterestRate(assetAddress).id];
     market.createdTimestamp = ACTIVE_POOL_CREATED_TIMESTAMP;
     market.createdBlockNumber = ACTIVE_POOL_CREATED_BLOCK;
 
