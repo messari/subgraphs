@@ -111,9 +111,13 @@ export async function clearMessages(channelId) {
             "Authorization": "Bot " + process.env.BOT_TOKEN,
             "Content-Type": "application/json",
         }
-
-        const postJSON = JSON.stringify({ "messages": msgs.map(x => x.id).slice(0, 100) });
-        await axios.post(baseURL + "/messages/bulk-delete", postJSON, { "headers": { ...headers } });
+        const messages = msgs.map(x => x.id).slice(0, 100);
+        const postJSON = JSON.stringify({ "messages": messages });
+        if (messages.length > 1) {
+            await axios.post(baseURL + "/messages/bulk-delete", postJSON, { "headers": { ...headers } });
+        } else if (messages.length === 1) {
+            deleteSingleMessage(messages[0], channelId);
+        }
     } catch (err) {
         errorNotification("ERROR LOCATION 11 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
@@ -376,14 +380,14 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 embedObjects.push(protocolErrorEmbed);
                 if (depo?.status === 'prod') {
                     aggThreadProtocolErrorEmbeds.push(protocolErrorEmbed);
-                    zapierProdThreadProtocols[protocol + '-' + networkString] = { Field: [], Value: [], Description: [] };
+                    zapierProdThreadProtocols[networkString] = { Field: [], Value: [], Description: [] };
                     protocolErrorEmbed.fields.forEach((row) => {
                         if (row.name === 'Field') {
-                            zapierProdThreadProtocols[protocol + '-' + networkString]['Field'].push(row.value);
+                            zapierProdThreadProtocols[networkString]['Field'].push(row.value);
                         } else if (row.name === 'Value') {
-                            zapierProdThreadProtocols[protocol + '-' + networkString]['Value'].push(row.value);
+                            zapierProdThreadProtocols[networkString]['Value'].push(row.value);
                         } else if (row.name === 'Description') {
-                            zapierProdThreadProtocols[protocol + '-' + networkString]['Description'].push(row.value);
+                            zapierProdThreadProtocols[networkString]['Description'].push(row.value);
                         }
                     })
                 }
@@ -394,17 +398,20 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             let failureBlock = "";
 
             Object.keys(indexErrorEmbedDepos)?.forEach(networkString => {
+                let link = '';
                 if (networkString.includes(' (PENDING')) {
-                    labelValue += `\n[${networkString.split(' ')[0]}-PENDING](https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]})\n`;
+                    link = `https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]}`;
+                    labelValue += `\n[${networkString.split(' ')[0]}-PENDING](${link})\n`;
 
                 } else {
-                    labelValue += `\n[${networkString}](https://okgraph.xyz/?q=messari%2F${protocol}-${networkString})\n`;
+                    link = `https://okgraph.xyz/?q=messari%2F${protocol}-${networkString}`;
+                    labelValue += `\n[${networkString}](${link})\n`;
                 }
                 failureBlock += '\n' + indexErrorEmbedDepos[networkString] + '\n';
                 if (prodStatusDepoMapping[networkString] === true) {
                     aggThreadIndexErrorEmbeds[0].value += labelValue;
                     aggThreadIndexErrorEmbeds[1].value += failureBlock;
-                    zapierProdThreadIndexing.push(`${networkString}: ${indexErrorEmbedDepos[networkString]}`);
+                    zapierProdThreadIndexing.push(`${networkString}: ${link}`);
                 }
             })
             indexingErrorEmbed.fields[0].value += labelValue;
@@ -567,9 +574,13 @@ export async function sendMessageToZapierThread(msgObj) {
                 }
             })
             if (validAlerts.length > 0) {
-                messageConstruction += `Protocol Errors on ${deployment}\n\n${validAlerts.join('\n')}`;
+                let link = `https://subgraphs.messari.io/subgraph?endpoint=messari/${msgObj.protocolName}-${deployment}&tab=protocol${deployment.toUpperCase().includes('PENDING') ? '&version=pending' : ""}`;
+                messageConstruction += `\n${deployment}: ${link}\n${validAlerts.join('\n')}`;
             }
         })
+        if (messageConstruction.length > 0) {
+            messageConstruction = `Protocol Errors on ${msgObj.protocolName}\n` + messageConstruction;
+        }
     }
 
     if (messageConstruction.length === 0) {
