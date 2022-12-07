@@ -1251,3 +1251,15 @@ type Liquidate @entity {
   " Amount of profit from liquidation in USD "
   profitUSD: BigDecimal!
 }
+
+# Helper
+type ActiveAccount @entity {
+  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
+  id: ID!
+}
+
+type _PositionCounter @entity {
+  " { account_id }-{ market_id }-{ side }"
+  id: ID!
+  nextCount: Int!
+}

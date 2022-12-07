@@ -5,13 +5,14 @@ import {
   Account,
   Market,
 } from "../../generated/schema";
-import { BI_ZERO } from "../utils/const";
+import { BI_ZERO, NANOSEC_TO_SEC } from "../utils/const";
 
 export function getOrCreatePosition(
   account: Account,
   market: Market,
   side: string,
-  receipt: near.ReceiptWithOutcome
+  receipt: near.ReceiptWithOutcome,
+  count: i32
 ): Position {
   const id = account.id
     .concat("-")
@@ -19,9 +20,7 @@ export function getOrCreatePosition(
     .concat("-")
     .concat(side)
     .concat("-")
-    .concat(
-      (account.closedPositionCount + account.openPositionCount).toString()
-    );
+    .concat(count.toString());
   let r = Position.load(id);
   if (!r) {
     r = new Position(id);
@@ -32,7 +31,7 @@ export function getOrCreatePosition(
     r.blockNumberOpened = BigInt.fromU64(receipt.block.header.height);
     r.blockNumberClosed = null;
     r.timestampOpened = BigInt.fromU64(
-      receipt.block.header.timestampNanosec / 1000000
+      NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
     );
     r.timestampClosed = null;
     r.side = side;
@@ -71,7 +70,7 @@ export function getOrCreatePositionSnapshot(
     r = new PositionSnapshot(id);
     r.position = position.id;
     r.timestamp = BigInt.fromU64(
-      receipt.block.header.timestampNanosec / 1000000000
+      NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
     );
     r.blockNumber = BigInt.fromU64(receipt.block.header.height);
     r.nonce = BI_ZERO;

@@ -9,11 +9,6 @@ import { getOrCreateToken } from "../helpers/token";
 import { BD_ZERO } from "../utils/const";
 import { EventData } from "../utils/type";
 
-/**
- * Update to oracle prices
- * @param event EventData
- * @returns
- */
 export function handleOracleCall(event: EventData): void {
   const data = event.data;
   const receipt = event.receipt;

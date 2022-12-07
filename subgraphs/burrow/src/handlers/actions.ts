@@ -28,14 +28,19 @@ import {
   getOrCreateProtocol,
 } from "../helpers/protocol";
 import { parse0 } from "../utils/parser";
-import { BI_ZERO, BI_BD, BD_ZERO } from "../utils/const";
+import {
+  BI_ZERO,
+  BI_BD,
+  BD_ZERO,
+  NANOS_TO_HOUR,
+  NANOS_TO_DAY,
+  NANOSEC_TO_SEC,
+  PositionSide,
+} from "../utils/const";
 import { BigDecimal } from "@graphprotocol/graph-ts";
 import { EventData } from "../utils/type";
+import { ActiveAccount, _PositionCounter } from "../../generated/schema";
 
-/**
- * Handles deposit events
- * @param event args {amount, account_id, token_id}
- */
 export function handleDeposit(event: EventData): void {
   const receipt = event.receipt;
   const logIndex = event.logIndex;
@@ -65,7 +70,24 @@ export function handleDeposit(event: EventData): void {
   const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
 
   const account = getOrCreateAccount(account_id);
-  const position = getOrCreatePosition(account, market, "LENDER", receipt);
+  const counterID = account.id
+    .concat("-")
+    .concat(market.id)
+    .concat("-")
+    .concat(PositionSide.LENDER);
+  let positionCounter = _PositionCounter.load(counterID);
+  if (!positionCounter) {
+    positionCounter = new _PositionCounter(counterID);
+    positionCounter.nextCount = 0;
+    account.positionCount += 1;
+  }
+  const position = getOrCreatePosition(
+    account,
+    market,
+    PositionSide.LENDER,
+    receipt,
+    positionCounter.nextCount
+  );
   const token = getOrCreateToken(token_id);
 
   deposit.account = account.id;
@@ -83,11 +105,23 @@ export function handleDeposit(event: EventData): void {
     .times(token.lastPriceUSD!);
 
   // usage metrics
-  if (position._last_active_timestamp.lt(usageDailySnapshot.timestamp)) {
+  const hourlyActiveAccount = ActiveAccount.load(
+    "HOURLY-"
+      .concat(account.id)
+      .concat("-")
+      .concat(NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString())
+  );
+  const dailyActiveAccount = ActiveAccount.load(
+    "DAILY-"
+      .concat(account.id)
+      .concat("-")
+      .concat(NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString())
+  );
+  if (dailyActiveAccount == null) {
     usageDailySnapshot.dailyActiveDepositors += 1;
-  }
-  if (account._last_active_timestamp.lt(usageDailySnapshot.timestamp)) {
     usageDailySnapshot.dailyActiveUsers += 1;
+  }
+  if (hourlyActiveAccount == null) {
     usageHourlySnapshot.hourlyActiveUsers += 1;
   }
   usageDailySnapshot.dailyDepositCount += 1;
@@ -97,9 +131,6 @@ export function handleDeposit(event: EventData): void {
 
   position.depositCount += 1;
   position.balance = position.balance.plus(deposit.amount);
-  position._last_active_timestamp = BigInt.fromU64(
-    receipt.block.header.timestampNanosec / 1000000000
-  );
 
   // update account
   if (account.depositCount == 0) {
@@ -107,9 +138,6 @@ export function handleDeposit(event: EventData): void {
     protocol.cumulativeUniqueUsers += 1;
   }
   account.depositCount += 1;
-  account._last_active_timestamp = BigInt.fromU64(
-    receipt.block.header.timestampNanosec / 1000000000
-  );
 
   // deposit amount
   market.outputTokenSupply = market.outputTokenSupply.plus(
@@ -150,6 +178,7 @@ export function handleDeposit(event: EventData): void {
     receipt
   );
 
+  positionCounter.save();
   positionSnapshot.save();
   financialDailySnapshot.save();
   usageDailySnapshot.save();
@@ -165,13 +194,9 @@ export function handleDeposit(event: EventData): void {
   updateProtocol();
 }
 
-/**
- * @dev Handles deposits made to reserve pool
- * @notice Admin/Owner can deposit to reserve
- * @param event args {amount, account_id, token_id}
- */
 export function handleDepositToReserve(event: EventData): void {
   const parsedData = parse0(event.data);
+  // const account_id = parsedData[0];
   const amount = parsedData[1];
   const token_id = parsedData[2];
 
@@ -180,8 +205,7 @@ export function handleDepositToReserve(event: EventData): void {
   market._totalReserved = market._totalReserved.plus(
     BigDecimal.fromString(amount)
   );
-
-  // we keep the reserve added to the pool seperately for revenue calculation
+  // for revenue calculation
   market._added_to_reserve = market._added_to_reserve.plus(
     BigDecimal.fromString(amount)
   );
@@ -189,10 +213,6 @@ export function handleDepositToReserve(event: EventData): void {
   market.save();
 }
 
-/**
- * Handles withdraws from pool
- * @param event args {account_id, amount, token_id}
- */
 export function handleWithdraw(event: EventData): void {
   const receipt = event.receipt;
   const logIndex = event.logIndex;
@@ -218,7 +238,25 @@ export function handleWithdraw(event: EventData): void {
   const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
   const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
   const account = getOrCreateAccount(account_id.toString());
-  const position = getOrCreatePosition(account, market, "LENDER", receipt);
+  const counterID = account.id
+    .concat("-")
+    .concat(market.id)
+    .concat("-")
+    .concat(PositionSide.LENDER);
+  const positionCounter = _PositionCounter.load(counterID);
+  if (!positionCounter) {
+    log.warning("[subtractPosition] position counter {} not found", [
+      counterID,
+    ]);
+    return;
+  }
+  const position = getOrCreatePosition(
+    account,
+    market,
+    PositionSide.LENDER,
+    receipt,
+    positionCounter.nextCount
+  );
 
   const token = getOrCreateToken(token_id.toString());
   withdraw.account = account.id;
@@ -236,8 +274,22 @@ export function handleWithdraw(event: EventData): void {
     .times(token.lastPriceUSD!);
 
   // usage metrics
-  if (account._last_active_timestamp.lt(usageDailySnapshot.timestamp)) {
+  const hourlyActiveAccount = ActiveAccount.load(
+    "HOURLY-"
+      .concat(account.id)
+      .concat("-")
+      .concat(NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString())
+  );
+  const dailyActiveAccount = ActiveAccount.load(
+    "DAILY-"
+      .concat(account.id)
+      .concat("-")
+      .concat(NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString())
+  );
+  if (dailyActiveAccount == null) {
     usageDailySnapshot.dailyActiveUsers += 1;
+  }
+  if (hourlyActiveAccount == null) {
     usageHourlySnapshot.hourlyActiveUsers += 1;
   }
   usageDailySnapshot.dailyWithdrawCount += 1;
@@ -248,7 +300,10 @@ export function handleWithdraw(event: EventData): void {
   position.withdrawCount += 1;
 
   // close if balance is zero
-  if (position.balance.lt(withdraw.amount)) {
+  if (position.balance.le(withdraw.amount)) {
+    positionCounter.nextCount += 1;
+    account.positionCount += 1;
+
     position.balance = BI_ZERO;
     account.openPositionCount -= 1;
     account.closedPositionCount += 1;
@@ -259,7 +314,7 @@ export function handleWithdraw(event: EventData): void {
 
     position.hashClosed = receipt.outcome.id.toBase58();
     position.timestampClosed = BigInt.fromU64(
-      receipt.block.header.timestampNanosec / 1000000000
+      NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
     );
     position.blockNumberClosed = BigInt.fromU64(receipt.block.header.height);
   }
@@ -278,8 +333,6 @@ export function handleWithdraw(event: EventData): void {
   );
   market._totalDeposited = market._totalDeposited.minus(BI_BD(withdraw.amount));
 
-  // if total deposited is negative, we need to move the negative amount to the reserve
-  // this can [possibly] happen if amount is withdrawn from reserve
   if (market._totalDeposited.lt(BD_ZERO)) {
     market._totalReserved = market._totalReserved.plus(market._totalDeposited);
     market._totalDeposited = BD_ZERO;
@@ -303,7 +356,6 @@ export function handleWithdraw(event: EventData): void {
   const positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
   positionSnapshot.logIndex = logIndex as i32;
 
-  // update market
   updateMarket(
     market,
     dailySnapshot,
@@ -312,6 +364,7 @@ export function handleWithdraw(event: EventData): void {
     receipt
   );
 
+  positionCounter.save();
   positionSnapshot.save();
   financialDailySnapshot.save();
   dailySnapshot.save();
@@ -321,19 +374,11 @@ export function handleWithdraw(event: EventData): void {
   market.save();
   account.save();
   withdraw.save();
-  position._last_active_timestamp = BigInt.fromU64(
-    receipt.block.header.timestampNanosec / 1000000000
-  );
   position.save();
 
   updateProtocol();
 }
 
-/**
- * Handles borrow events
- * @param event args {account_id, amount, token_id}
- * @notice Borrowed tokens are added as supplied tokens. Users need to withdraw tokens to have them in wallet
- */
 export function handleBorrow(event: EventData): void {
   const receipt = event.receipt;
   const logIndex = event.logIndex;
@@ -346,7 +391,6 @@ export function handleBorrow(event: EventData): void {
       .concat((logIndex as i32).toString()),
     receipt
   );
-
   borrow.logIndex = logIndex as i32;
   const parsedData = parse0(data);
   const account_id = parsedData[0];
@@ -361,7 +405,24 @@ export function handleBorrow(event: EventData): void {
   const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
   const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
   const account = getOrCreateAccount(account_id.toString());
-  const position = getOrCreatePosition(account, market, "BORROWER", receipt);
+  const counterID = account.id
+    .concat("-")
+    .concat(market.id)
+    .concat("-")
+    .concat(PositionSide.BORROWER);
+  let positionCounter = _PositionCounter.load(counterID);
+  if (!positionCounter) {
+    positionCounter = new _PositionCounter(counterID);
+    positionCounter.nextCount = 0;
+    account.positionCount += 1;
+  }
+  const position = getOrCreatePosition(
+    account,
+    market,
+    PositionSide.BORROWER,
+    receipt,
+    positionCounter.nextCount
+  );
 
   const token = getOrCreateToken(token_id.toString());
   borrow.account = account.id;
@@ -378,11 +439,23 @@ export function handleBorrow(event: EventData): void {
     )
     .times(token.lastPriceUSD!);
 
-  if (position._last_active_timestamp.lt(usageDailySnapshot.timestamp)) {
+  const hourlyActiveAccount = ActiveAccount.load(
+    "HOURLY-"
+      .concat(account.id)
+      .concat("-")
+      .concat(NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString())
+  );
+  const dailyActiveAccount = ActiveAccount.load(
+    "DAILY-"
+      .concat(account.id)
+      .concat("-")
+      .concat(NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString())
+  );
+  if (dailyActiveAccount == null) {
+    usageDailySnapshot.dailyActiveUsers += 1;
     usageDailySnapshot.dailyActiveBorrowers += 1;
   }
-  if (account._last_active_timestamp.lt(usageDailySnapshot.timestamp)) {
-    usageDailySnapshot.dailyActiveUsers += 1;
+  if (hourlyActiveAccount == null) {
     usageHourlySnapshot.hourlyActiveUsers += 1;
   }
   usageDailySnapshot.dailyBorrowCount += 1;
@@ -416,7 +489,7 @@ export function handleBorrow(event: EventData): void {
     )
   );
 
-  // take snapshot
+  // snapshot
   dailySnapshot.dailyBorrowUSD = dailySnapshot.dailyBorrowUSD.plus(
     borrow.amountUSD
   );
@@ -429,7 +502,6 @@ export function handleBorrow(event: EventData): void {
   const positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
   positionSnapshot.logIndex = logIndex as i32;
 
-  // update market
   updateMarket(
     market,
     dailySnapshot,
@@ -438,6 +510,7 @@ export function handleBorrow(event: EventData): void {
     receipt
   );
 
+  positionCounter.save();
   positionSnapshot.save();
   financialDailySnapshot.save();
   usageDailySnapshot.save();
@@ -445,25 +518,14 @@ export function handleBorrow(event: EventData): void {
   hourlySnapshot.save();
   dailySnapshot.save();
   market.save();
-  account._last_active_timestamp = BigInt.fromU64(
-    receipt.block.header.timestampNanosec / 1000000000
-  );
   account.save();
   borrow.save();
   position.save();
-  position._last_active_timestamp = BigInt.fromU64(
-    receipt.block.header.timestampNanosec / 1000000000
-  );
   protocol.save();
 
   updateProtocol();
 }
 
-/**
- * Handles repayments
- * @param event args {account_id, amount, token_id}
- * @notice Tokens needed to repay need to be deposited first in supplied balance
- */
 export function handleRepayment(event: EventData): void {
   const receipt = event.receipt;
   const logIndex = event.logIndex;
@@ -489,7 +551,25 @@ export function handleRepayment(event: EventData): void {
   const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
   const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
   const account = getOrCreateAccount(account_id.toString());
-  const position = getOrCreatePosition(account, market, "BORROWER", receipt);
+  const counterID = account.id
+    .concat("-")
+    .concat(market.id)
+    .concat("-")
+    .concat(PositionSide.BORROWER);
+  const positionCounter = _PositionCounter.load(counterID);
+  if (!positionCounter) {
+    log.warning("[subtractPosition] position counter {} not found", [
+      counterID,
+    ]);
+    return;
+  }
+  const position = getOrCreatePosition(
+    account,
+    market,
+    PositionSide.BORROWER,
+    receipt,
+    positionCounter.nextCount
+  );
 
   const token = getOrCreateToken(token_id.toString());
   repay.market = market.id;
@@ -505,8 +585,22 @@ export function handleRepayment(event: EventData): void {
     )
     .times(token.lastPriceUSD!);
 
-  if (account._last_active_timestamp.lt(usageDailySnapshot.timestamp)) {
+  const hourlyActiveAccount = ActiveAccount.load(
+    "HOURLY-"
+      .concat(account.id)
+      .concat("-")
+      .concat(NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString())
+  );
+  const dailyActiveAccount = ActiveAccount.load(
+    "DAILY-"
+      .concat(account.id)
+      .concat("-")
+      .concat(NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString())
+  );
+  if (dailyActiveAccount == null) {
     usageDailySnapshot.dailyActiveUsers += 1;
+  }
+  if (hourlyActiveAccount == null) {
     usageHourlySnapshot.hourlyActiveUsers += 1;
   }
   usageDailySnapshot.dailyRepayCount += 1;
@@ -514,7 +608,9 @@ export function handleRepayment(event: EventData): void {
   usageHourlySnapshot.hourlyRepayCount += 1;
   usageHourlySnapshot.hourlyTransactionCount += 1;
 
-  if (position.balance.lt(repay.amount)) {
+  if (position.balance.le(repay.amount)) {
+    positionCounter.nextCount += 1;
+
     position.balance = BI_ZERO;
     account.openPositionCount -= 1;
     account.closedPositionCount += 1;
@@ -525,7 +621,7 @@ export function handleRepayment(event: EventData): void {
 
     position.hashClosed = receipt.outcome.id.toBase58();
     position.timestampClosed = BigInt.fromU64(
-      receipt.block.header.timestampNanosec / 1000000000
+      NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
     );
     position.blockNumberClosed = BigInt.fromU64(receipt.block.header.height);
   }
@@ -568,6 +664,7 @@ export function handleRepayment(event: EventData): void {
     receipt
   );
 
+  positionCounter.save();
   positionSnapshot.save();
   financialDailySnapshot.save();
   hourlySnapshot.save();
@@ -575,14 +672,8 @@ export function handleRepayment(event: EventData): void {
   usageDailySnapshot.save();
   usageHourlySnapshot.save();
   market.save();
-  account._last_active_timestamp = BigInt.fromU64(
-    receipt.block.header.timestampNanosec / 1000000000
-  );
   account.save();
   repay.save();
-  position._last_active_timestamp = BigInt.fromU64(
-    receipt.block.header.timestampNanosec / 1000000000
-  );
   position.save();
 
   updateProtocol();

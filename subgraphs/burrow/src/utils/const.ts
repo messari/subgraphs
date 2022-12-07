@@ -12,6 +12,7 @@ export const BI_BD = (n: BigInt): BigDecimal =>
 export const BD_BI = (n: BigDecimal): BigInt =>
   BigInt.fromString(n.truncate(0).toString());
 export const BD = (n: string): BigDecimal => BigDecimal.fromString(n);
+export const BI = (n: string): BigInt => BigInt.fromString(n);
 
 export const BIGDECIMAL_ONE = BD("1");
 export const BIGDECIMAL_TWO = BD("2");
@@ -19,6 +20,146 @@ export const BIGDECIMAL_THREE = BD("3");
 export const BIGDECIMAL_TWELVE = BD("12");
 export const BIGDECIMAL_SIX = BD("6");
 export const BIGDECIMAL_100 = BD("100");
+
+export const NANOSEC_TO_SEC = (time: u64): u64 => (time / 1000000000) as u64;
+export const NANOS_TO_MS = (time: u64): u64 => (time / 1000000) as u64;
+export const NANOS_TO_DAY = (time: u64): u64 =>
+  (time / (1000000000 * 86400)) as u64;
+export const NANOS_TO_HOUR = (time: u64): u64 =>
+  (time / (1000000000 * 3600)) as u64;
+
+////////////////////
+///// Versions /////
+////////////////////
+
+export const PROTOCOL_NAME = "Burrow";
+export const PROTOCOL_SLUG = "burrow-near";
+export const PROTOCOL_SCHEMA_VERSION = "1.0.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "2.0.1";
+export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
+
+////////////////////////
+///// Schema Enums /////
+////////////////////////
+
+// The network names corresponding to the Network enum in the schema.
+// They also correspond to the ones in `dataSource.network()` after converting to lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
+export namespace Network {
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
+  export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
+  export const AURORA = "AURORA";
+  export const AVALANCHE = "AVALANCHE";
+  export const BOBA = "BOBA";
+  export const BSC = "BSC"; // aka BNB Chain
+  export const CELO = "CELO";
+  export const COSMOS = "COSMOS";
+  export const CRONOS = "CRONOS";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
+  export const FANTOM = "FANTOM";
+  export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY";
+  export const JUNO = "JUNO";
+  export const MOONBEAM = "MOONBEAM";
+  export const MOONRIVER = "MOONRIVER";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const OSMOSIS = "OSMOSIS";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
+}
+
+export namespace ProtocolType {
+  export const EXCHANGE = "EXCHANGE";
+  export const LENDING = "LENDING";
+  export const YIELD = "YIELD";
+  export const BRIDGE = "BRIDGE";
+  export const GENERIC = "GENERIC";
+}
+
+export namespace VaultFeeType {
+  export const MANAGEMENT_FEE = "MANAGEMENT_FEE";
+  export const PERFORMANCE_FEE = "PERFORMANCE_FEE";
+  export const DEPOSIT_FEE = "DEPOSIT_FEE";
+  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
+}
+
+export namespace LiquidityPoolFeeType {
+  export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE";
+  export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE";
+  export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE";
+  export const FIXED_LP_FEE = "FIXED_LP_FEE";
+  export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE";
+  export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
+  export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
+}
+
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT";
+  export const BORROW = "BORROW";
+}
+
+export namespace LendingType {
+  export const CDP = "CDP";
+  export const POOLED = "POOLED";
+}
+
+export namespace RiskType {
+  export const GLOBAL = "GLOBAL";
+  export const ISOLATED = "ISOLATED";
+}
+
+export namespace InterestRateType {
+  export const STABLE = "STABLE";
+  export const VARIABLE = "VARIABLE";
+  export const FIXED = "FIXED";
+}
+
+export namespace InterestRateSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
+export namespace PositionSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
+export namespace UsageType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const SWAP = "SWAP";
+}
+
+////////////////////////
+///// Type Helpers /////
+////////////////////////
+
+export const DEFAULT_DECIMALS = 18;
+
+export const USDC_DECIMALS = 6;
+export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
+
+export const BIGINT_ZERO = BigInt.fromI32(0);
+export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_HUNDRED = BigInt.fromI32(100);
+export const BIGINT_THOUSAND = BigInt.fromI32(1000);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
+export const BIGINT_MAX = BigInt.fromString(
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+);
+
+export const INT_NEGATIVE_ONE = -1 as i32;
+export const INT_ZERO = 0 as i32;
+export const INT_ONE = 1 as i32;
+export const INT_TWO = 2 as i32;
+export const INT_FOUR = 4 as i32;
+
+export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+
+export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
 export const assets = new TypedMap<string, TokenMetadata>();
 

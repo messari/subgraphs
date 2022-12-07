@@ -1,5 +1,5 @@
 import { Market } from "../../generated/schema";
-import { BigDecimal, near, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, near } from "@graphprotocol/graph-ts";
 import { BD_ONE, BD_ZERO } from "./const";
 import { getOrCreateBorrowRate, getOrCreateSupplyRate } from "../helpers/rates";
 import { bigDecimalExponential } from "./math";
@@ -43,20 +43,6 @@ export function getRate(market: Market): BigDecimal {
           )
           .div(BD_ONE.minus(target))
       );
-  }
-
-  if (rate.lt(BD_ONE) || rate.gt(BD("1.1"))) {
-    log.warning(
-      "getRate() :: RATE TOO BIG/LOW {} :: Market {} ::Collateral {} Borrowed {} Reserve {}",
-      [
-        rate.toString(),
-        market.name!,
-        market._totalDeposited.toString(),
-        market._totalBorrowed.toString(),
-        market._totalReserved.toString(),
-      ]
-    );
-    // rate = BD_ONE;
   }
 
   return rate;

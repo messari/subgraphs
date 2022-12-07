@@ -9,54 +9,49 @@ import { getOrCreateRewardToken, getOrCreateToken } from "../helpers/token";
 import { BD_ZERO } from "../utils/const";
 import { EventData } from "../utils/type";
 
-/**
- * Add farm tokens
- * @param event EventData
- * @returns
- */
 export function handleAddAssetFarmReward(event: EventData): void {
   const data = event.data;
 
-  const farm_id = data.get("farm_id");
-  if (!farm_id) {
+  const farmId = data.get("farm_id");
+  if (!farmId) {
     log.warning("handleAddAssetFarmReward() :: farm_id not found", []);
     return;
   }
-  if (farm_id.kind != JSONValueKind.OBJECT) {
+  if (farmId.kind != JSONValueKind.OBJECT) {
     log.info("handleAddAssetFarmReward() :: Incorrect type farm_id {}", [
-      farm_id.kind.toString(),
+      farmId.kind.toString(),
     ]);
     return;
   }
-  const farm_id_obj = farm_id.toObject();
-  let farm_id_asset = farm_id_obj.get("Supplied");
+  const farmIdObj = farmId.toObject();
+  let farmIdAsset = farmIdObj.get("Supplied");
   let farmType = "DEPOSIT";
-  if (!farm_id_asset) {
-    farm_id_asset = farm_id_obj.get("Borrowed");
+  if (!farmIdAsset) {
+    farmIdAsset = farmIdObj.get("Borrowed");
     farmType = "BORROW";
-    if (!farm_id_asset) {
+    if (!farmIdAsset) {
       log.warning("handleAddAssetFarmReward() :: farm_id_asset not found", []);
       return;
     }
   }
-  const farm = farm_id_asset.toString();
+  const farm = farmIdAsset.toString();
 
-  const reward_token_id = data.get("reward_token_id");
-  if (!reward_token_id) {
+  const rewardTokenId = data.get("reward_token_id");
+  if (!rewardTokenId) {
     log.warning("handleAddAssetFarmReward() :: reward_token_id not found", []);
     return;
   }
-  const reward_token = reward_token_id.toString();
+  const reward_token = rewardTokenId.toString();
 
-  const new_reward_per_day_ = data.get("new_reward_per_day");
-  if (!new_reward_per_day_) {
+  const newRewardPerDay_ = data.get("new_reward_per_day");
+  if (!newRewardPerDay_) {
     log.warning(
       "handleAddAssetFarmReward() :: new_reward_per_day not found",
       []
     );
     return;
   }
-  const new_reward_per_day = new_reward_per_day_.toString();
+  const newRewardPerDay = newRewardPerDay_.toString();
 
   const new_booster_log_base = data.get("new_booster_log_base");
   if (!new_booster_log_base) {
@@ -76,36 +71,36 @@ export function handleAddAssetFarmReward(event: EventData): void {
   const rewardToken = getOrCreateRewardToken(reward_token, farmType);
 
   const market = getOrCreateMarket(farm);
-  const reward_tokens = market.rewardTokens!;
+  const rewardTokens = market.rewardTokens!;
   // push if reward token does not exists, get index
-  let reward_token_index = reward_tokens.indexOf(rewardToken.id);
+  let reward_token_index = rewardTokens.indexOf(rewardToken.id);
   if (reward_token_index == -1) {
-    reward_tokens.push(rewardToken.id);
-    market.rewardTokens = reward_tokens;
-    reward_token_index = reward_tokens.length - 1;
+    rewardTokens.push(rewardToken.id);
+    market.rewardTokens = rewardTokens;
+    reward_token_index = rewardTokens.length - 1;
   }
 
   // add reward_amount to _reward_remaining_amounts
-  const _reward_remaining_amounts = market._reward_remaining_amounts;
-  if (_reward_remaining_amounts.length <= reward_token_index) {
-    _reward_remaining_amounts.push(BigInt.fromString(reward_amount.toString()));
+  const _rewardRemainingAmounts = market._reward_remaining_amounts;
+  if (_rewardRemainingAmounts.length <= reward_token_index) {
+    _rewardRemainingAmounts.push(BigInt.fromString(reward_amount.toString()));
   } else {
-    _reward_remaining_amounts[reward_token_index] =
+    _rewardRemainingAmounts[reward_token_index] =
       market._reward_remaining_amounts[reward_token_index].plus(
         BigInt.fromString(reward_amount.toString())
       );
   }
-  market._reward_remaining_amounts = _reward_remaining_amounts;
+  market._reward_remaining_amounts = _rewardRemainingAmounts;
 
   // rewardTokenEmissionsAmount
   const rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   if (rewardTokenEmissionsAmount!.length <= reward_token_index) {
     rewardTokenEmissionsAmount!.push(
-      BigInt.fromString(new_reward_per_day.toString())
+      BigInt.fromString(newRewardPerDay.toString())
     );
   } else {
     rewardTokenEmissionsAmount![reward_token_index] = BigInt.fromString(
-      new_reward_per_day.toString()
+      newRewardPerDay.toString()
     );
   }
   market.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
@@ -117,7 +112,7 @@ export function handleAddAssetFarmReward(event: EventData): void {
   if (price.equals(BD_ZERO)) {
     price = BigDecimal.fromString("0.001");
   }
-  const rewardUSD = BigDecimal.fromString(new_reward_per_day.toString())
+  const rewardUSD = BigDecimal.fromString(newRewardPerDay.toString())
     .div(
       BigInt.fromString("10")
         .pow((token.decimals + token.extraDecimals) as u8)

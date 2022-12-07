@@ -56,7 +56,7 @@ function handleAction(
       .slice("EVENT_JSON:".length);
     const jsonData = json.try_fromString(outcomeLog);
     if (jsonData.isError) {
-      log.warning("Error parsing ourcomeLog {}", [outcomeLog]);
+      log.warning("Error parsing outcomeLog {}", [outcomeLog]);
       return;
     }
     const jsonObject = jsonData.value.toObject();

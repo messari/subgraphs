@@ -22,15 +22,11 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
   getOrCreateFinancialDailySnapshot,
 } from "../helpers/protocol";
-import { Position } from "../../generated/schema";
-import { BI_ZERO, BI_BD } from "../utils/const";
+import { Position, _PositionCounter } from "../../generated/schema";
+import { BI_ZERO, BI_BD, NANOSEC_TO_SEC } from "../utils/const";
 import { EventData } from "../utils/type";
 
-/**
- * Handles liquidation
- * @param event args { account_id, liquidation_account_id, collateral_sum, repaid_sum }
- * @returns
- */
+// { account_id, liquidation_account_id, collateral_sum, repaid_sum }
 export function handleLiquidate(event: EventData): void {
   const receipt = event.receipt;
   const data = event.data;
@@ -192,23 +188,50 @@ export function handleLiquidate(event: EventData): void {
 
   if (token_in && token_out && token_in_amount && token_out_amount) {
     const repaidMarket = getOrCreateMarket(token_in);
+    const repaidCounterID = liquidatee.id
+      .concat("-")
+      .concat(repaidMarket.id)
+      .concat("-")
+      .concat("BORROWER");
+    const repaidCounter = _PositionCounter.load(repaidCounterID);
+    if (!repaidCounter) {
+      log.warning("[subtractPosition] position counter {} not found", [
+        repaidCounterID,
+      ]);
+      return;
+    }
     const repaidPosition = getOrCreatePosition(
       liquidatee,
       repaidMarket,
       "BORROWER",
-      receipt
+      receipt,
+      repaidCounter.nextCount
     );
     const dailySnapshot = getOrCreateMarketDailySnapshot(repaidMarket, receipt);
     const hourlySnapshot = getOrCreateMarketHourlySnapshot(
       repaidMarket,
       receipt
     );
+
     const collateralMarket = getOrCreateMarket(token_out);
+    const collateralCounterID = liquidatee.id
+      .concat("-")
+      .concat(collateralMarket.id)
+      .concat("-")
+      .concat("BORROWER");
+    const collateralCounter = _PositionCounter.load(collateralCounterID);
+    if (!collateralCounter) {
+      log.warning("[subtractPosition] position counter {} not found", [
+        collateralCounterID,
+      ]);
+      return;
+    }
     const collateralPosition = getOrCreatePosition(
       liquidatee,
       collateralMarket,
       "LENDER",
-      receipt
+      receipt,
+      collateralCounter.nextCount
     );
 
     repaidPosition.balance = BI_ZERO;
@@ -217,8 +240,9 @@ export function handleLiquidate(event: EventData): void {
       receipt.block.header.height
     );
     repaidPosition.timestampClosed = BigInt.fromU64(
-      receipt.block.header.timestampNanosec / 1000000000
+      NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
     );
+    repaidCounter.nextCount += 1;
 
     collateralPosition.balance = BI_ZERO;
     collateralPosition.hashClosed = receipt.receipt.id.toBase58();
@@ -226,8 +250,9 @@ export function handleLiquidate(event: EventData): void {
       receipt.block.header.height
     );
     collateralPosition.timestampClosed = BigInt.fromU64(
-      receipt.block.header.timestampNanosec / 1000000000
+      NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
     );
+    collateralCounter.nextCount += 1;
 
     liquidatee.openPositionCount -= 1;
     // closing borrowed position
@@ -256,6 +281,8 @@ export function handleLiquidate(event: EventData): void {
     hourlySnapshot.hourlyLiquidateUSD =
       hourlySnapshot.hourlyLiquidateUSD.plus(repaid_sum_value);
 
+    collateralCounter.save();
+    repaidCounter.save();
     collateralPosition.save();
     repaidPosition.save();
     dailySnapshot.save();
@@ -279,12 +306,6 @@ export function handleLiquidate(event: EventData): void {
   updateProtocol();
 }
 
-/**
- * Force close
- * @notice Repays from reserve and closes position
- * @param event
- * @returns
- */
 export function handleForceClose(event: EventData): void {
   const receipt = event.receipt;
   const data = event.data;
@@ -377,7 +398,7 @@ export function handleForceClose(event: EventData): void {
         borrow_position.balance = BI_ZERO;
         borrow_position.hashClosed = receipt.receipt.id.toBase58();
         borrow_position.timestampClosed = BigInt.fromU64(
-          receipt.block.header.timestampNanosec / 1000000000
+          NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
         );
         borrow_position.save();
       }
@@ -393,7 +414,7 @@ export function handleForceClose(event: EventData): void {
         supply_position.balance = BI_ZERO;
         supply_position.hashClosed = receipt.receipt.id.toBase58();
         supply_position.timestampClosed = BigInt.fromU64(
-          receipt.block.header.timestampNanosec / 1000000000
+          NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
         );
         supply_position.save();
       }

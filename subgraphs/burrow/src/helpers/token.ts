@@ -19,7 +19,7 @@ export function getOrCreateToken(id: string): Token {
       token.decimals = metadata.decimals as i32;
       token.symbol = metadata.symbol;
     } else {
-      log.warning("Token metadata not found {}", [id]);
+      log.error("Token metadata need to be added for {}", [id]);
     }
 
     token.save();

@@ -1,16 +1,17 @@
 import { BigInt, log, JSONValueKind } from "@graphprotocol/graph-ts";
 import { getOrCreateMarket } from "../helpers/market";
 import { getOrCreateToken } from "../helpers/token";
-import { assets, BIGDECIMAL_100, BIGDECIMAL_TWO } from "../utils/const";
+import {
+  assets,
+  BIGDECIMAL_100,
+  BIGDECIMAL_TWO,
+  NANOSEC_TO_SEC,
+  NANOS_TO_MS,
+} from "../utils/const";
 import { getOrCreateProtocol } from "../helpers/protocol";
 import { BigDecimal } from "@graphprotocol/graph-ts";
 import { EventData } from "../utils/type";
 
-/**
- * Handles new market being added
- * @param event EventData
- * @returns
- */
 export function handleNewAsset(event: EventData): void {
   const data = event.data;
   const receipt = event.receipt;
@@ -39,11 +40,11 @@ export function handleNewAsset(event: EventData): void {
 
   market.createdBlockNumber = BigInt.fromU64(receipt.block.header.height);
   market.createdTimestamp = BigInt.fromU64(
-    receipt.block.header.timestampNanosec
-  ).div(BigInt.fromI32(1000000000));
+    NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
+  );
 
   market._last_update_timestamp = BigInt.fromU64(
-    receipt.block.header.timestampNanosec / 1000000
+    NANOS_TO_MS(receipt.block.header.timestampNanosec)
   );
 
   /* -------------------------------------------------------------------------- */
@@ -198,7 +199,7 @@ export function handleUpdateAsset(event: EventData): void {
   const assetConfig = assetConfigObj.toObject();
 
   market._last_update_timestamp = BigInt.fromU64(
-    receipt.block.header.timestampNanosec / 1000000
+    NANOS_TO_MS(receipt.block.header.timestampNanosec)
   );
 
   /* -------------------------------------------------------------------------- */

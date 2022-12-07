@@ -1253,8 +1253,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "burrow",
-            "query-id": "burrow"
+            "slug": "burrow-near",
+            "query-id": "burrow-near"
           }
         }
       }

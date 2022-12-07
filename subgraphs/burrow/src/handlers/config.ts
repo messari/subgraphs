@@ -3,12 +3,6 @@ import { getOrCreateToken } from "../helpers/token";
 import { getOrCreateProtocol } from "../helpers/protocol";
 import { EventData } from "../utils/type";
 
-/**
- * Handles protocol configuration
- * @notice emitted by the protocol on deployment or upgrade
- * @param event EventData
- * @returns
- */
 export function handleNew(event: EventData): void {
   const data = event.data;
   const controller = getOrCreateProtocol();
