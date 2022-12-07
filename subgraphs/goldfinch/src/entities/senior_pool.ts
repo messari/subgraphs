@@ -86,12 +86,10 @@ export function updatePoolStatus(event: ethereum.Event): void {
   );
 
   const sharePrice = seniorPoolContract.sharePrice();
-  // SENIOR POOL implement was upgraded with this transaction
-  // // https://etherscan.io/tx/0x0d54c34ffa6a11afd95d42e69f7c171b38b99b3157d26812db165415e4e3b5c4
-  let compoundBalance = BIGINT_ZERO;
-  if (event.block.number.lt(SENIOR_POOL_UPGRADE_BLOCK)) {
-    compoundBalance = seniorPoolContract.compoundBalance();
-  }
+  // SENIOR POOL implement was upgraded with this transaction and deprecated compoundBalance()
+  // https://etherscan.io/tx/0x0d54c34ffa6a11afd95d42e69f7c171b38b99b3157d26812db165415e4e3b5c4
+  const compoundBalanceResult = seniorPoolContract.try_compoundBalance();
+  const compoundBalance = getOrElse<BigInt>(compoundBalanceResult, BIGINT_ZERO);
   const totalLoansOutstanding = seniorPoolContract.totalLoansOutstanding();
   const totalSupply = fidu_contract.totalSupply();
   const totalPoolAssets = totalSupply.times(sharePrice);
@@ -164,4 +162,11 @@ export function recalculateSeniorPoolAPY(poolStatus: SeniorPoolStatus): void {
   }
 
   poolStatus.save();
+}
+
+function getOrElse<T>(result: ethereum.CallResult<T>, defaultValue: T): T {
+  if (result.reverted) {
+    return defaultValue;
+  }
+  return result.value;
 }
