@@ -16,7 +16,6 @@ import {
 import { getOrCreateToken } from "../entities/token";
 import {
   BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
   ETH_ADDRESS,
   RETH_ADDRESS,
   SECONDS_PER_DAY,
