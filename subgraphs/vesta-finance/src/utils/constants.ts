@@ -193,3 +193,5 @@ export const LIQUIDATION_RESERVE_VST = BigDecimal.fromString("30");
 export const BONUS_TO_SP = BigDecimal.fromString("10");
 
 export const MINUTES_PER_DAY = BigInt.fromI32(24 * 60);
+
+export const STABILITYPOOL_ASSET = "StabilityPool_Asset";

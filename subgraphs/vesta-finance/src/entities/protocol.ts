@@ -1,31 +1,44 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import {
   FinancialsDailySnapshot,
   LendingProtocol,
   Market,
 } from "../../generated/schema";
+import { VSTToken as VSTTokenContract } from "../../generated/ActivePool/VSTToken";
 import {
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   EMPTY_STRING,
   INT_ONE,
   INT_ZERO,
   LendingType,
   Network,
+  PRICE_ORACLE_V1_ADDRESS,
   ProtocolType,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   RiskType,
   SECONDS_PER_DAY,
   TROVE_MANAGER,
+  VST_ADDRESS,
 } from "../utils/constants";
+import { bigIntToBigDecimal } from "../utils/numbers";
 import { Versions } from "../versions";
 import { EventType } from "./event";
 import {
   getOrCreateMarket,
   getOrCreateMarketHourlySnapshot,
   getOrCreateMarketSnapshot,
+  getOrCreateStabilityPool,
 } from "./market";
-import { getVSTToken } from "./token";
+import { getOrCreateAssetToken, getVSTToken } from "./token";
+import { PriceFeedV1 } from "../../generated/PriceFeedV1/PriceFeedV1";
 
 export function getLendingProtocol(): LendingProtocol | null {
   return LendingProtocol.load(TROVE_MANAGER);
@@ -62,6 +75,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.cumulativePositionCount = INT_ZERO;
     protocol._priceOracle = EMPTY_STRING;
     protocol._marketAssets = [];
+    protocol._stabilityPools = [];
     protocol._bonusToSPCallEnabled = false;
   }
 
@@ -258,13 +272,16 @@ export function updateProtocolBorrowBalance(
   const protocol = getOrCreateLendingProtocol();
   protocol.totalBorrowBalanceUSD =
     protocol.totalBorrowBalanceUSD.plus(borrowedUSDChange);
-  if (protocol.mintedTokenSupplies == null) {
-    protocol.mintedTokenSupplies = [totalVSTSupplyChange];
-  } else {
-    protocol.mintedTokenSupplies![0] =
-      protocol.mintedTokenSupplies![0].plus(totalVSTSupplyChange);
+
+  const vstTokenContract = VSTTokenContract.bind(
+    Address.fromString(VST_ADDRESS)
+  );
+  const tryVSTTotalSupply = vstTokenContract.try_totalSupply();
+  if (!tryVSTTotalSupply.reverted) {
+    protocol.mintedTokenSupplies = [tryVSTTotalSupply.value];
   }
   protocol.save();
+
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.save();
 }
@@ -324,4 +341,28 @@ export function updateProtocolPriceOracle(priceOracle: string): void {
   const protocol = getOrCreateLendingProtocol();
   protocol._priceOracle = priceOracle;
   protocol.save();
+}
+
+export function updateProtocoVSTLocked(event: ethereum.Event): void {
+  const protocol = getOrCreateLendingProtocol();
+  let totalValueLocked = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol._marketAssets.length; i++) {
+    const mkt = getOrCreateMarket(
+      Address.fromString(protocol._marketAssets[i])
+    );
+    totalValueLocked = totalValueLocked.plus(mkt.totalValueLockedUSD);
+  }
+
+  const stabilityPools = protocol._stabilityPools!;
+  for (let i = 0; i < stabilityPools.length; i++) {
+    const pool = Address.fromString(stabilityPools[i]);
+    const mkt = getOrCreateStabilityPool(pool, null, event);
+    totalValueLocked = totalValueLocked.plus(mkt.totalValueLockedUSD);
+  }
+
+  protocol.totalValueLockedUSD = totalValueLocked;
+  protocol.totalDepositBalanceUSD = totalValueLocked;
+  protocol.save();
+  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
+  financialsSnapshot.save();
 }

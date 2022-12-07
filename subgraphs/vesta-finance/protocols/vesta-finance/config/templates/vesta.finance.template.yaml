@@ -91,7 +91,7 @@ dataSources:
     name: ActivePool
     network: arbitrum-one
     source:
-      address: "0xBE3dE7fB9Aa09B3Fa931868Fb49d5BA5fEe2eBb1"
+      address: "0xbe3de7fb9aa09b3fa931868fb49d5ba5fee2ebb1"
       abi: ActivePool
       startBlock: 5559192
     mapping:
@@ -112,6 +112,8 @@ dataSources:
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: VSTToken
+          file: ./abis/VSTToken.json
       eventHandlers:
         - event: ActivePoolAssetBalanceUpdated(address,uint256)
           handler: handleActivePoolAssetBalanceUpdated
@@ -137,6 +139,7 @@ dataSources:
         - event: CollBalanceUpdated(indexed address,uint256)
           handler: handleCollBalanceUpdated
       file: ./src/mapping/CollSurplusPool.ts
+
   - kind: ethereum/contract
     name: CommunityIssuance
     network: arbitrum-one
@@ -169,12 +172,13 @@ dataSources:
           handler: handleTotalVSTAIssuedUpdated
       file: ./src/mapping/CommunityIssuance.ts
 
-templates:
   - name: PriceFeedV1
     kind: ethereum/contract
     network: arbitrum-one
     source:
+      address: "0xc93408bfbea0bf3e53bedbce7d5c1e64db826702"
       abi: PriceFeedV1
+      startBlock: 5559155
     mapping:
       file: ./src/mapping/PriceFeed.ts
       language: wasm/assemblyscript
@@ -184,20 +188,27 @@ templates:
       abis:
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
-        - name: PriceFeed
-          file: ./abis/PriceFeedV2.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: StabilityPoolManager
+          file: ./abis/StabilityPoolManager.json
+        - name: VestaParameters
+          file: ./abis/VestaParameters.json          
       eventHandlers:
         - event: LastGoodPriceUpdated(indexed address,uint256)
           handler: handleLastGoodPriceUpdated
-  - name: PriceFeed
+        - event: RegisteredNewOracle(address,address,address)
+          handler: handleRegisteredNewOracle
+
+  - name: PriceFeedV2
     kind: ethereum/contract
     network: arbitrum-one
     source:
-      abi: PriceFeed
+      address: "0xd218ba424a6166e37a454f8ece2bf8eb2264ecca"
+      abi: PriceFeedV2
+      startBlock: 8225990
     mapping:
       file: ./src/mapping/PriceFeed.ts
       language: wasm/assemblyscript
@@ -205,17 +216,23 @@ templates:
       apiVersion: 0.0.6
       entities: []
       abis:
-        - name: PriceFeedV1
-          file: ./abis/PriceFeedV1.json
-        - name: PriceFeed
+        - name: PriceFeedV2
           file: ./abis/PriceFeedV2.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: StabilityPoolManager
+          file: ./abis/StabilityPoolManager.json
+        - name: VestaParameters
+          file: ./abis/VestaParameters.json       
       eventHandlers:
         - event: TokenPriceUpdated(indexed address,uint256)
           handler: handleTokenPriceUpdated
+        - event: OracleAdded(indexed address,address,address)
+          handler: handleOracleAdded
+
+templates:
   - name: StabilityPool
     kind: ethereum/contract
     network: arbitrum-one
@@ -235,9 +252,12 @@ templates:
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: VestaParameters
+          file: ./abis/VestaParameters.json          
       eventHandlers:
         - event: StabilityPoolAssetBalanceUpdated(uint256)
           handler: handleStabilityPoolAssetBalanceUpdated
         - event: StabilityPoolVSTBalanceUpdated(uint256)
           handler: handleStabilityPoolVSTBalanceUpdated
       file: ./src/mapping/StabilityPool.ts
+

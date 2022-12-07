@@ -4,18 +4,20 @@ import {
   CommunityIssuance,
 } from "../../generated/CommunityIssuance/CommunityIssuance";
 import {
-  getOrCreateMarket,
   getOrCreateMarketHourlySnapshot,
   getOrCreateMarketSnapshot,
+  getOrCreateStabilityPool,
 } from "../entities/market";
 import {
   BALANCER_POOL_CREATED_BLOCK,
   BAL_VSTA_WETH_POOL_ADDRESS,
   BAL_WETH_WBTC_USDC_POOL_ADDRESS,
   BIGDECIMAL_ZERO,
+  DEFAULT_DECIMALS,
   MINUTES_PER_DAY,
   RewardTokenType,
   USDC_ADDRESS,
+  USDC_DECIMALS,
   VSTA_ADDRESS,
   WETH_ADDRESS,
 } from "../utils/constants";
@@ -41,7 +43,7 @@ function calculateDailyVestaRewards(
   event: ethereum.Event,
   pool: Address
 ): void {
-  const market = getOrCreateMarket(pool);
+  const stabilityPool = getOrCreateStabilityPool(pool, null, event);
   const contract = CommunityIssuance.bind(event.address);
   const stabilityPoolRewardsResult = contract.try_stabilityPoolRewards(pool);
   if (stabilityPoolRewardsResult.reverted) {
@@ -52,7 +54,7 @@ function calculateDailyVestaRewards(
     return;
   }
   const VSTAToken = getOrCreateAssetToken(Address.fromString(VSTA_ADDRESS));
-  const rewardTokens = market.rewardTokens;
+  const rewardTokens = stabilityPool.rewardTokens;
   if (!rewardTokens || rewardTokens.length == 0) {
     let rewardToken = RewardToken.load(VSTA_ADDRESS);
     if (!rewardToken) {
@@ -61,7 +63,7 @@ function calculateDailyVestaRewards(
       rewardToken.type = RewardTokenType.DEPOSIT;
       rewardToken.save();
     }
-    market.rewardTokens = [rewardToken.id];
+    stabilityPool.rewardTokens = [rewardToken.id];
   }
 
   const rewardTokenEmissionAmount = stabilityPoolRewardsResult.value
@@ -77,12 +79,16 @@ function calculateDailyVestaRewards(
     VSTAToken.lastPriceBlockNumber = event.block.number;
     VSTAToken.save();
   }
-  market.rewardTokenEmissionsAmount = [rewardTokenEmissionAmount];
-  market.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
-  market.save();
+  stabilityPool.rewardTokenEmissionsAmount = [rewardTokenEmissionAmount];
+  stabilityPool.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+  stabilityPool.save();
 
-  getOrCreateMarketSnapshot(event, market);
-  getOrCreateMarketHourlySnapshot(event, market);
+  getOrCreateMarketSnapshot(event, stabilityPool);
+  getOrCreateMarketHourlySnapshot(event, stabilityPool);
+
+  VSTAToken.lastPriceUSD = VSTAPriceUSD;
+  VSTAToken.lastPriceBlockNumber = event.block.number;
+  VSTAToken.save();
 }
 
 function getVSTATokenPrice(event: ethereum.Event): BigDecimal | null {
@@ -104,7 +110,9 @@ function getVSTATokenPrice(event: ethereum.Event): BigDecimal | null {
   if (!VSTAPriceInWETH || !WETHPriceInUSD) {
     return null;
   }
-  const VSTAPriceInUSD = VSTAPriceInWETH.times(WETHPriceInUSD);
+  const VSTAPriceInUSD = VSTAPriceInWETH.times(WETHPriceInUSD)
+    .times(exponentToBigDecimal(DEFAULT_DECIMALS))
+    .div(exponentToBigDecimal(USDC_DECIMALS));
   log.info("[getVSTATokenPrice]VSTA Price USD={} at timestamp {}", [
     VSTAPriceInUSD.toString(),
     event.block.timestamp.toString(),

@@ -328,6 +328,9 @@ type LendingProtocol implements Protocol @entity {
 
   " flag to indicate whether the bonusToSP function call is enabled in Vesta Parameters smart contract for the protocol "
   _bonusToSPCallEnabled: Boolean!
+
+  " "
+  _stabilityPools: [Market!]
 }
 
 ###############################

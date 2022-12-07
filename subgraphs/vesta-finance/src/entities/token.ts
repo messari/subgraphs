@@ -1,18 +1,16 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { IERC20Detailed } from "../../generated/TroveManager/IERC20Detailed";
 import { IERC20DetailedBytes } from "../../generated/TroveManager/IERC20DetailedBytes";
-import { PriceFeedV1 } from "../../generated/templates/PriceFeedV1/PriceFeedV1";
-import { Token } from "../../generated/schema";
-import { getLendingProtocol } from "../entities/protocol";
+import { RewardToken, Token } from "../../generated/schema";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
-  EMPTY_STRING,
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
-  PRICE_ORACLE_V1_ADDRESS,
+  RewardTokenType,
+  VSTA_ADDRESS,
   VST_ADDRESS,
 } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
@@ -48,23 +46,8 @@ function getOrCreateToken(tokenAddress: Address): Token {
       token.symbol = fetchTokenSymbol(contract);
       token.decimals = fetchTokenDecimals(contract);
     }
+
     token.lastPriceUSD = BIGDECIMAL_ZERO;
-
-    let priceOracleAddress = PRICE_ORACLE_V1_ADDRESS;
-    const protocol = getLendingProtocol();
-    if (protocol != null && protocol._priceOracle != EMPTY_STRING) {
-      priceOracleAddress = protocol._priceOracle;
-    }
-
-    const priceFeedContract = PriceFeedV1.bind(
-      Address.fromString(priceOracleAddress)
-    );
-    const tryFetchPrice = priceFeedContract.try_fetchPrice(tokenAddress);
-    if (!tryFetchPrice.reverted) {
-      const price = tryFetchPrice.value;
-      token.lastPriceUSD = bigIntToBigDecimal(price);
-    }
-
     token.save();
   }
   return token;
@@ -143,4 +126,18 @@ function fetchTokenDecimals(contract: IERC20Detailed): i32 {
   }
 
   return decimalValue;
+}
+
+export function getOrCreateRewardToken(): RewardToken {
+  const token = getOrCreateToken(Address.fromString(VSTA_ADDRESS));
+  const id = `${RewardTokenType.DEPOSIT}-${token.id}`;
+
+  let rToken = RewardToken.load(id);
+  if (!rToken) {
+    rToken = new RewardToken(id);
+    rToken.type = RewardTokenType.DEPOSIT;
+    rToken.token = token.id;
+    rToken.save();
+  }
+  return rToken;
 }

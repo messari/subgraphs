@@ -21,7 +21,11 @@ import {
   updateProtocolBorrowBalance,
   updateProtocolUSDLocked,
 } from "./protocol";
-import { getOrCreateAssetToken, getCurrentAssetPrice } from "./token";
+import {
+  getOrCreateAssetToken,
+  getCurrentAssetPrice,
+  getOrCreateRewardToken,
+} from "./token";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 import { EventType } from "./event";
 import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
@@ -32,23 +36,87 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   BONUS_TO_SP,
+  INT_ONE,
   INT_ZERO,
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   VESTA_PARAMETERS_ADDRESS,
+  VST_ADDRESS,
 } from "../utils/constants";
+
+export function getOrCreateStabilityPool(
+  pool: Address,
+  asset: Address | null,
+  event: ethereum.Event | null
+): Market {
+  const poolID = pool.toHexString();
+  let market = Market.load(poolID);
+  if (market) {
+    return market;
+  }
+
+  const protocol = getOrCreateLendingProtocol();
+  const assetToken = getOrCreateAssetToken(asset!);
+  market = new Market(poolID);
+  market.protocol = protocol.id;
+  market.name = `${assetToken.symbol} StabilityPool`;
+  market.isActive = true;
+  market.canUseAsCollateral = false;
+  market.canBorrowFrom = false;
+  market.maximumLTV = BIGDECIMAL_ZERO;
+  market.liquidationThreshold = BIGDECIMAL_ZERO;
+  market.liquidationPenalty = BIGDECIMAL_ZERO;
+  market.inputToken = VST_ADDRESS;
+  market.rewardTokens = [getOrCreateRewardToken().id];
+  market.rates = [];
+  market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+  market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+  market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+  market.inputTokenBalance = BIGINT_ZERO;
+  market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+  market.outputTokenSupply = BIGINT_ZERO;
+  market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  market.exchangeRate = BIGDECIMAL_ZERO;
+  market.rewardTokenEmissionsAmount = [];
+  market.rewardTokenEmissionsUSD = [];
+  market.positionCount = 0;
+  market.openPositionCount = 0;
+  market.closedPositionCount = 0;
+  market.lendingPositionCount = 0;
+  market.borrowingPositionCount = 0;
+
+  market.createdTimestamp = event!.block.timestamp;
+  market.createdBlockNumber = event!.block.number;
+  market.save();
+
+  const stabilityPools = protocol._stabilityPools!;
+  stabilityPools.push(market.id);
+  protocol._stabilityPools = stabilityPools;
+  protocol.save();
+
+  return market;
+}
 
 export function getOrCreateMarket(asset: Address): Market {
   const id = asset.toHexString();
   let market = Market.load(id);
   if (!market) {
-    const id = asset.toHexString();
+    const protocol = getOrCreateLendingProtocol();
+    protocol.totalPoolCount += INT_ONE;
+    protocol.save();
+
     const inputToken = getOrCreateAssetToken(asset);
     const maxLTV = setMaxLTV(id);
     const liquidationPenalty = setLiquidationPenalty(id);
     market = new Market(id);
-    market.protocol = getOrCreateLendingProtocol().id;
+    market.protocol = protocol.id;
     market.name = inputToken.name;
     market.isActive = true;
     market.canUseAsCollateral = true;

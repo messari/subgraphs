@@ -1,12 +1,11 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import {
   StabilityPool,
   StabilityPoolAssetBalanceUpdated,
   StabilityPoolVSTBalanceUpdated,
 } from "../../generated/templates/StabilityPool/StabilityPool";
-import { getCurrentAssetPrice } from "../entities/token";
-import { updateStabilityPoolUSDLocked } from "../entities/stabilitypool";
-import { bigIntToBigDecimal } from "../utils/numbers";
+import { updateProtocoVSTLocked } from "../entities/protocol";
+import { updateStabilityPoolTVL } from "../entities/stabilitypool";
 /**
  * Asset balance was updated
  *
@@ -15,7 +14,13 @@ import { bigIntToBigDecimal } from "../utils/numbers";
 export function handleStabilityPoolAssetBalanceUpdated(
   event: StabilityPoolAssetBalanceUpdated
 ): void {
-  handleStabilityPoolBalanceUpdated(event, event.params._newBalance, true);
+  const stabilityPoolContract = StabilityPool.bind(event.address);
+  const asset = stabilityPoolContract.getAssetType();
+  const totalVSTAmount = stabilityPoolContract.getTotalVSTDeposits();
+  const totalAssetAmount = event.params._newBalance;
+
+  updateStabilityPoolTVL(event, totalVSTAmount, totalAssetAmount, asset);
+  updateProtocoVSTLocked(event);
 }
 
 /**
@@ -26,29 +31,11 @@ export function handleStabilityPoolAssetBalanceUpdated(
 export function handleStabilityPoolVSTBalanceUpdated(
   event: StabilityPoolVSTBalanceUpdated
 ): void {
-  handleStabilityPoolBalanceUpdated(event, event.params._newBalance, false);
-}
-
-function handleStabilityPoolBalanceUpdated(
-  event: ethereum.Event,
-  newBalance: BigInt,
-  isAssetBalanceUpdated: bool
-): void {
   const stabilityPoolContract = StabilityPool.bind(event.address);
   const asset = stabilityPoolContract.getAssetType();
-  let totalAssetLocked: BigInt;
-  let totalVSTLocked: BigInt;
+  const totalVSTAmount = event.params._newBalance;
+  const totalAssetAmount = stabilityPoolContract.getAssetBalance();
 
-  if (isAssetBalanceUpdated) {
-    totalAssetLocked = newBalance;
-    totalVSTLocked = stabilityPoolContract.getTotalVSTDeposits();
-  } else {
-    totalAssetLocked = stabilityPoolContract.getAssetBalance();
-    totalVSTLocked = newBalance;
-  }
-
-  const totalValueLocked = bigIntToBigDecimal(totalAssetLocked)
-    .times(getCurrentAssetPrice(asset))
-    .plus(bigIntToBigDecimal(totalVSTLocked));
-  updateStabilityPoolUSDLocked(event, asset, totalValueLocked);
+  updateStabilityPoolTVL(event, totalVSTAmount, totalAssetAmount, asset);
+  updateProtocoVSTLocked(event);
 }
