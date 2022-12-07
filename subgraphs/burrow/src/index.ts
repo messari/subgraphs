@@ -35,20 +35,16 @@ function handleAction(
   const methodArgs = action.toFunctionCall().args;
   const argsData = json.try_fromBytes(methodArgs);
 
-  if (argsData && argsData.isOk) {
-    const argsObject = argsData.value.toObject();
-    const eventData = new EventData(
-      null,
-      methodName,
-      argsObject,
-      receipt,
-      0,
-      null
-    );
-    handleMethod(eventData);
-  } else {
-    log.warning("Invalid args {} {}", [methodName, methodArgs.toString()]);
-  }
+  const argsObject = argsData.value.toObject();
+  const eventData = new EventData(
+    null,
+    methodName,
+    argsObject,
+    receipt,
+    0,
+    null
+  );
+  handleMethod(eventData);
 
   for (let logIndex = 0; logIndex < outcome.logs.length; logIndex++) {
     const outcomeLog = outcome.logs[logIndex]
