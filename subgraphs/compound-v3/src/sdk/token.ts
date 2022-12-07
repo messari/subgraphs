@@ -11,10 +11,10 @@ import { BIGDECIMAL_ZERO } from "./constants";
  * use in mappings and get info about the token.
  *
  * Schema Version: 3.0.0
- * Last Updated: Dec 4, 2022
  * Author(s):
  *  - @dmelotik
  */
+
 export class TokenManager {
   private INVALID_TOKEN_DECIMALS: i32 = 0;
   private UNKNOWN_TOKEN_VALUE: string = "unknown";

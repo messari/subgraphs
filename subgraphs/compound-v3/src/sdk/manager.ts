@@ -39,6 +39,7 @@ import {
 import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
 import { insert } from "./constants";
+import { PositionManager } from "./position";
 
 /**
  * This file contains the DataManager, which is used to
@@ -48,7 +49,6 @@ import { insert } from "./constants";
  * need to think about all of the detailed storage changes that occur.
  *
  * Schema Version: 3.0.0
- * Last Updated: Dec 4, 2022
  * Author(s):
  *  - @dmelotik
  */
@@ -324,23 +324,24 @@ export class DataManager {
     newBalance: BigInt,
     interestType: string | null = null
   ): Deposit {
-    const depositor = new AccountManager(
-      account,
-      this.market,
-      this.protocol,
-      this.event
-    );
+    const depositor = new AccountManager(account);
     if (depositor.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
-    depositor.addPosition(
-      asset,
-      newBalance,
+    const position = new PositionManager(
+      depositor.getAccount(),
+      this.market,
       PositionSide.COLLATERAL,
-      TransactionType.DEPOSIT,
-      this.market.inputTokenPriceUSD,
       interestType
+    );
+    position.addPosition(
+      this.event,
+      asset,
+      this.protocol,
+      newBalance,
+      TransactionType.DEPOSIT,
+      this.market.inputTokenPriceUSD
     );
 
     const deposit = new Deposit(
@@ -358,7 +359,7 @@ export class DataManager {
     deposit.timestamp = this.event.block.timestamp;
     deposit.account = account;
     deposit.market = this.market.id;
-    deposit.position = depositor.getPositionID()!;
+    deposit.position = position.getPositionID()!;
     deposit.asset = asset;
     deposit.amount = amount;
     deposit.amountUSD = amountUSD;
@@ -382,24 +383,25 @@ export class DataManager {
     newBalance: BigInt,
     interestType: string | null = null
   ): Withdraw | null {
-    const withdrawer = new AccountManager(
-      account,
-      this.market,
-      this.protocol,
-      this.event
-    );
+    const withdrawer = new AccountManager(account);
     if (withdrawer.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
-    withdrawer.subtractPosition(
-      newBalance,
+    const position = new PositionManager(
+      withdrawer.getAccount(),
+      this.market,
       PositionSide.COLLATERAL,
-      TransactionType.WITHDRAW,
-      this.market.inputTokenPriceUSD,
       interestType
     );
-    const positionID = withdrawer.getPositionID();
+    position.subtractPosition(
+      this.event,
+      this.protocol,
+      newBalance,
+      TransactionType.WITHDRAW,
+      this.market.inputTokenPriceUSD
+    );
+    const positionID = position.getPositionID();
     if (!positionID) {
       log.error(
         "[createWithdraw] positionID is null for market: {} account: {}",
@@ -448,23 +450,24 @@ export class DataManager {
     tokenPriceUSD: BigDecimal | null = null, // used for different borrow token
     interestType: string | null = null
   ): Borrow {
-    const borrower = new AccountManager(
-      account,
-      this.market,
-      this.protocol,
-      this.event
-    );
+    const borrower = new AccountManager(account);
     if (borrower.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
-    borrower.addPosition(
-      asset,
-      newBalance,
+    const position = new PositionManager(
+      borrower.getAccount(),
+      this.market,
       PositionSide.BORROWER,
-      TransactionType.BORROW,
-      tokenPriceUSD ? tokenPriceUSD : this.market.inputTokenPriceUSD,
       interestType
+    );
+    position.addPosition(
+      this.event,
+      asset,
+      this.protocol,
+      newBalance,
+      TransactionType.BORROW,
+      tokenPriceUSD ? tokenPriceUSD : this.market.inputTokenPriceUSD
     );
 
     const borrow = new Borrow(
@@ -482,7 +485,7 @@ export class DataManager {
     borrow.timestamp = this.event.block.timestamp;
     borrow.account = account;
     borrow.market = this.market.id;
-    borrow.position = borrower.getPositionID()!;
+    borrow.position = position.getPositionID()!;
     borrow.asset = asset;
     borrow.amount = amount;
     borrow.amountUSD = amountUSD;
@@ -507,24 +510,25 @@ export class DataManager {
     tokenPriceUSD: BigDecimal | null = null, // used for different borrow token
     interestType: string | null = null
   ): Repay | null {
-    const repayer = new AccountManager(
-      account,
-      this.market,
-      this.protocol,
-      this.event
-    );
+    const repayer = new AccountManager(account);
     if (repayer.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
-    repayer.subtractPosition(
-      newBalance,
+    const position = new PositionManager(
+      repayer.getAccount(),
+      this.market,
       PositionSide.BORROWER,
-      TransactionType.REPAY,
-      tokenPriceUSD ? tokenPriceUSD : this.market.inputTokenPriceUSD,
       interestType
     );
-    const positionID = repayer.getPositionID();
+    position.subtractPosition(
+      this.event,
+      this.protocol,
+      newBalance,
+      TransactionType.REPAY,
+      tokenPriceUSD ? tokenPriceUSD : this.market.inputTokenPriceUSD
+    );
+    const positionID = position.getPositionID();
     if (!positionID) {
       log.error("[createRepay] positionID is null for market: {} account: {}", [
         this.market.id.toHexString(),
@@ -574,35 +578,31 @@ export class DataManager {
     newBalance: BigInt, // repaid token balance for liquidatee
     interestType: string | null = null
   ): Liquidate | null {
-    const liquidatorAccount = new AccountManager(
-      liquidator,
-      this.market,
-      this.protocol,
-      this.event
-    );
+    const liquidatorAccount = new AccountManager(liquidator);
     if (liquidatorAccount.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
     liquidatorAccount.countLiquidate();
-    const liquidateeAccount = new AccountManager(
-      liquidatee,
+    const liquidateeAccount = new AccountManager(liquidatee);
+    const position = new PositionManager(
+      liquidateeAccount.getAccount(),
       this.market,
-      this.protocol,
-      this.event
-    );
-    liquidateeAccount.subtractPosition(
-      newBalance,
       PositionSide.COLLATERAL,
-      TransactionType.LIQUIDATE,
-      this.market.inputTokenPriceUSD,
       interestType
+    );
+    position.subtractPosition(
+      this.event,
+      this.protocol,
+      newBalance,
+      TransactionType.LIQUIDATE,
+      this.market.inputTokenPriceUSD
     );
     // Note:
     //  - liquidatees are not considered users since they are not spending gas for the transaction
     //  - It is possible in some protocols for the liquidator to incur a position if they are transferred collateral tokens
 
-    const positionID = liquidateeAccount.getPositionID();
+    const positionID = position.getPositionID();
     if (!positionID) {
       log.error(
         "[createLiquidate] positionID is null for market: {} account: {}",
@@ -655,31 +655,42 @@ export class DataManager {
     receiverNewBalance: BigInt,
     interestType: string | null = null
   ): Transfer | null {
-    const transferrer = new AccountManager(
-      sender,
-      this.market,
-      this.protocol,
-      this.event
-    );
+    const transferrer = new AccountManager(sender);
     if (transferrer.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
-    const recieverAccount = new AccountManager(
-      receiver,
+    const transferrerPosition = new PositionManager(
+      transferrer.getAccount(),
       this.market,
-      this.protocol,
-      this.event
-    );
-    // receivers are not considered users since they are not spending gas for the transaction
-    recieverAccount.subtractPosition(
-      senderNewBalance,
       PositionSide.COLLATERAL,
-      TransactionType.TRANSFER,
-      this.market.inputTokenPriceUSD,
       interestType
     );
-    const positionID = recieverAccount.getPositionID();
+    transferrerPosition.addPosition(
+      this.event,
+      asset,
+      this.protocol,
+      senderNewBalance,
+      TransactionType.TRANSFER,
+      this.market.inputTokenPriceUSD
+    );
+
+    const recieverAccount = new AccountManager(receiver);
+    // receivers are not considered users since they are not spending gas for the transaction
+    const receiverPosition = new PositionManager(
+      recieverAccount.getAccount(),
+      this.market,
+      PositionSide.COLLATERAL,
+      interestType
+    );
+    receiverPosition.subtractPosition(
+      this.event,
+      this.protocol,
+      receiverNewBalance,
+      TransactionType.TRANSFER,
+      this.market.inputTokenPriceUSD
+    );
+    const positionID = receiverPosition.getPositionID();
     if (!positionID) {
       log.error(
         "[createTransfer] positionID is null for market: {} account: {}",
@@ -687,14 +698,6 @@ export class DataManager {
       );
       return null;
     }
-    recieverAccount.addPosition(
-      asset,
-      receiverNewBalance,
-      PositionSide.COLLATERAL,
-      TransactionType.TRANSFER,
-      this.market.inputTokenPriceUSD,
-      interestType
-    );
 
     const transfer = new Transfer(
       this.event.transaction.hash
@@ -712,7 +715,7 @@ export class DataManager {
     transfer.sender = sender;
     transfer.receiver = receiver;
     transfer.market = this.market.id;
-    transfer.positions = [transferrer.getPositionID()!, positionID!];
+    transfer.positions = [transferrerPosition.getPositionID()!, positionID!];
     transfer.asset = asset;
     transfer.amount = amount;
     transfer.amountUSD = amountUSD;
@@ -734,12 +737,7 @@ export class DataManager {
     amount: BigInt,
     amountUSD: BigDecimal
   ): Flashloan {
-    const flashloaner = new AccountManager(
-      account,
-      this.market,
-      this.protocol,
-      this.event
-    );
+    const flashloaner = new AccountManager(account);
     if (flashloaner.isNewAccount()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();

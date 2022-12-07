@@ -64,6 +64,7 @@ import { Token } from "../../../generated/schema";
 import { CometRewards } from "../../../generated/templates/Comet/CometRewards";
 import { TokenManager } from "../../../src/sdk/token";
 import { AccountManager } from "../../../src/sdk/account";
+import { PositionManager } from "../../../src/sdk/position";
 
 ///////////////////////////////
 ///// Configurator Events /////
@@ -805,12 +806,7 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
   const positions = liquidate.positions;
 
   // update liquidatee base asset borrow position
-  const accountManager = new AccountManager(
-    borrower,
-    marketEntity,
-    market.getProtocol(),
-    event
-  );
+  const liquidateeAcct = new AccountManager(borrower);
   const baseAssetBorrowBalance = getUserBalance(
     cometContract,
     borrower,
@@ -818,14 +814,27 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
     PositionSide.BORROWER
   );
   const priceUSD = getPrice(cometContract.baseTokenPriceFeed(), cometContract);
-  accountManager.subtractPosition(
-    baseAssetBorrowBalance,
+  const baseMarketID = event.address.concat(baseAsset);
+  const baseMarket = new DataManager(
+    baseMarketID,
+    baseAsset,
+    event,
+    getProtocolData()
+  );
+  const liquidateePosition = new PositionManager(
+    liquidateeAcct.getAccount(),
+    baseMarket.getMarket(),
     PositionSide.BORROWER,
-    TransactionType.LIQUIDATE,
-    priceUSD,
     InterestRateType.VARIABLE
   );
-  const positionID = accountManager.getPositionID();
+  liquidateePosition.subtractPosition(
+    event,
+    baseMarket.getProtocol(),
+    baseAssetBorrowBalance,
+    TransactionType.LIQUIDATE,
+    priceUSD
+  );
+  const positionID = liquidateePosition.getPositionID();
   if (!positionID) return;
   positions.push(positionID!);
   liquidate.positions = positions;

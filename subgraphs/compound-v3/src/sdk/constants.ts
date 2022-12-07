@@ -219,7 +219,7 @@ export function insert<Type>(
   index: i32,
   value: Type
 ): Array<Type> {
-  let result = new Array<Type>(arr.length + 1);
+  const result = new Array<Type>(arr.length + 1);
   for (let i = 0; i < index; i++) {
     result[i] = arr[i];
   }

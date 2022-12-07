@@ -29,6 +29,18 @@ import {
   TransactionType,
 } from "./constants";
 
+/**
+ * This file contains the SnapshotManager, which is used to
+ * make all of the storage changes that occur in lending snapshots.
+ *
+ * You can think of this as an abstraction so the developer doesn't
+ * need to think about all of the detailed storage changes that occur.
+ *
+ * Schema Version: 3.0.0
+ * Author(s):
+ *  - @dmelotik
+ */
+
 export class SnapshotManager {
   private marketHourlySnapshot!: MarketHourlySnapshot;
   private marketDailySnapshot!: MarketDailySnapshot;
