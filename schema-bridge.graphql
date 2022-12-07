@@ -1100,7 +1100,7 @@ type BridgeTransfer implements Event @entity(immutable: true) {
   transferTo: Bytes!
 
   " This is the address initiating the transfer, where the initial funds came from. It might not match the address initiating the actual EVM transaction. "
-  transferFrom: Bytes!
+  transferFrom: Bytes
 
   " Indicates how this transfer is ocurring on the current chain "
   type: TransferType!
@@ -1217,8 +1217,11 @@ type Account @entity {
   " All withdraw events for this account "
   withdraws: [LiquidityWithdraw!]! @derivedFrom(field: "account")
 
-  " Total number of messages this account has sent or received through this bridge "
-  messageCount: Int!
+  " Total number of messages this account has sent through this bridge "
+  messageSentCount: Int!
+
+  " Total number of messages this account has received through this bridge "
+  messageReceivedCount: Int!
 
   " All message events for this account "
   messages: [BridgeMessage!]! @derivedFrom(field: "account")
