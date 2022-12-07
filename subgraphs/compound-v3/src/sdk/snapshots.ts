@@ -604,47 +604,46 @@ export class SnapshotManager {
   }
 
   updateRevenue(
-    newTotalRevenueUSD: BigDecimal,
-    newProtocolRevenueUSD: BigDecimal,
-    newSupplySideRevenueUSD: BigDecimal
+    protocolRevenueDelta: BigDecimal,
+    supplyRevenueDelta: BigDecimal
   ): void {
+    const totalRevenueDelta = protocolRevenueDelta.plus(supplyRevenueDelta);
+
     // update market hourly snapshot
     this.marketHourlySnapshot.hourlyTotalRevenueUSD =
-      this.marketHourlySnapshot.hourlyTotalRevenueUSD.plus(newTotalRevenueUSD);
+      this.marketHourlySnapshot.hourlyTotalRevenueUSD.plus(totalRevenueDelta);
     this.marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
       this.marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-        newProtocolRevenueUSD
+        protocolRevenueDelta
       );
     this.marketHourlySnapshot.hourlySupplySideRevenueUSD =
       this.marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
-        newSupplySideRevenueUSD
+        supplyRevenueDelta
       );
     this.createOrUpdateMarketHourlySnapshot();
 
     // update market daily snapshot
     this.marketDailySnapshot.dailyTotalRevenueUSD =
-      this.marketDailySnapshot.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+      this.marketDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueDelta);
     this.marketDailySnapshot.dailyProtocolSideRevenueUSD =
       this.marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-        newProtocolRevenueUSD
+        protocolRevenueDelta
       );
     this.marketDailySnapshot.dailySupplySideRevenueUSD =
       this.marketDailySnapshot.dailySupplySideRevenueUSD.plus(
-        newSupplySideRevenueUSD
+        supplyRevenueDelta
       );
     this.createOrUpdateMarketDailySnapshot();
 
     // update financials snapshot
     this.financialSnapshot.dailyTotalRevenueUSD =
-      this.financialSnapshot.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+      this.financialSnapshot.dailyTotalRevenueUSD.plus(totalRevenueDelta);
     this.financialSnapshot.dailyProtocolSideRevenueUSD =
       this.financialSnapshot.dailyProtocolSideRevenueUSD.plus(
-        newProtocolRevenueUSD
+        protocolRevenueDelta
       );
     this.financialSnapshot.dailySupplySideRevenueUSD =
-      this.financialSnapshot.dailySupplySideRevenueUSD.plus(
-        newSupplySideRevenueUSD
-      );
+      this.financialSnapshot.dailySupplySideRevenueUSD.plus(supplyRevenueDelta);
     this.createOrUpdateFinancials();
   }
 

@@ -48,7 +48,7 @@ import {
   TokenType,
   TransactionType,
 } from "../../../src/sdk/constants";
-import { DataManager } from "../../../src/sdk/manager";
+import { DataManager, RewardData } from "../../../src/sdk/manager";
 import {
   BASE_INDEX_SCALE,
   COMPOUND_DECIMALS,
@@ -845,7 +845,7 @@ function createBaseTokenTransactions(
   transactionType: string,
   positionSide: string,
   accountActorID: Bytes
-) {
+): void {
   const newBalance = getUserBalance(comet, accountID, null, positionSide);
   if (transactionType == TransactionType.DEPOSIT) {
     const deposit = market.createDeposit(
@@ -987,7 +987,6 @@ function updateRewards(
       .truncate(0)
       .toString()
   );
-  market.rewardTokenEmissionsAmount = [supplyRewardPerDay, borrowRewardPerDay]; // supply first to keep alphabetized
   const supplyRewardPerDayUSD = bigIntToBigDecimal(
     supplyRewardPerDay,
     decimals
@@ -996,12 +995,13 @@ function updateRewards(
     borrowRewardPerDay,
     decimals
   ).times(rewardToken.getPriceUSD());
-  market.rewardTokenEmissionsUSD = [
-    supplyRewardPerDayUSD,
-    borrowRewardPerDayUSD,
-  ];
-  market.rewardTokens = [supplyRewardToken.id, borrowRewardToken.id];
-  market.save();
+
+  dataManager.updateRewards(
+    new RewardData(borrowRewardToken, borrowRewardPerDay, borrowRewardPerDayUSD)
+  );
+  dataManager.updateRewards(
+    new RewardData(supplyRewardToken, supplyRewardPerDay, supplyRewardPerDayUSD)
+  );
 }
 
 //
@@ -1051,11 +1051,7 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
   const supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
     protocolRevenueDeltaUSD
   );
-  dataManager.updateRevenue(
-    totalRevenueDeltaUSD,
-    protocolRevenueDeltaUSD,
-    supplySideRevenueDeltaUSD
-  );
+  dataManager.updateRevenue(protocolRevenueDeltaUSD, supplySideRevenueDeltaUSD);
 }
 
 //

@@ -17,6 +17,7 @@ import {
   Oracle,
   Repay,
   RevenueDetails,
+  RewardToken,
   Token,
   Transfer,
   Withdraw,
@@ -37,6 +38,7 @@ import {
 } from "./constants";
 import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
+import { insert } from "./constants";
 
 /**
  * This file contains the DataManager, which is used to
@@ -63,6 +65,14 @@ export class ProtocolData {
     public readonly borrowerPermissionType: string | null,
     public readonly collateralizationType: string | null,
     public readonly riskType: string | null
+  ) {}
+}
+
+export class RewardData {
+  constructor(
+    public readonly rewardToken: RewardToken,
+    public readonly rewardTokenEmissionsAmount: BigInt,
+    public readonly rewardTokenEmissionsUSD: BigDecimal
   ) {}
 }
 
@@ -770,6 +780,59 @@ export class DataManager {
   //// Updaters ////
   //////////////////
 
+  updateRewards(rewardData: RewardData): void {
+    if (!this.market.rewardTokens) {
+      this.market.rewardTokens = [];
+      this.market.rewardTokenEmissionsAmount = [];
+      this.market.rewardTokenEmissionsUSD = [];
+    }
+
+    // update market reward tokens with rewardData so that it is in alphabetical order
+    let rewardTokens = this.market.rewardTokens!;
+    let rewardTokenEmissionsAmount = this.market.rewardTokenEmissionsAmount!;
+    let rewardTokenEmissionsUSD = this.market.rewardTokenEmissionsUSD!;
+
+    for (let i = 0; i < rewardTokens.length; i++) {
+      const index = rewardData.rewardToken.id.localeCompare(rewardTokens[i]);
+      if (index < 0) {
+        // insert rewardData at index i - 1
+        rewardTokens = insert(rewardTokens, i - 1, rewardData.rewardToken.id);
+        rewardTokenEmissionsAmount = insert(
+          rewardTokenEmissionsAmount,
+          i - 1,
+          rewardData.rewardTokenEmissionsAmount
+        );
+        rewardTokenEmissionsUSD = insert(
+          rewardTokenEmissionsUSD,
+          i - 1,
+          rewardData.rewardTokenEmissionsUSD
+        );
+        break;
+      } else if (index == 0) {
+        // update the rewardData at index i
+        rewardTokens[i] = rewardData.rewardToken.id;
+        rewardTokenEmissionsAmount[i] = rewardData.rewardTokenEmissionsAmount;
+        rewardTokenEmissionsUSD[i] = rewardData.rewardTokenEmissionsUSD;
+        break;
+      } else {
+        if (i == rewardTokens.length - 1) {
+          // insert rewardData at end of array
+          rewardTokens.push(rewardData.rewardToken.id);
+          rewardTokenEmissionsAmount.push(
+            rewardData.rewardTokenEmissionsAmount
+          );
+          rewardTokenEmissionsUSD.push(rewardData.rewardTokenEmissionsUSD);
+          break;
+        }
+      }
+    }
+
+    this.market.rewardTokens = rewardTokens;
+    this.market.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+    this.market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+    this.market.save();
+  }
+
   // used to update tvl, borrow balance, reserves, etc. in market and protocol
   updateMarketAndProtocolData(
     inputTokenPriceUSD: BigDecimal,
@@ -842,31 +905,28 @@ export class DataManager {
   }
 
   updateRevenue(
-    newTotalRevenueUSD: BigDecimal,
-    newProtocolRevenueUSD: BigDecimal,
-    newSupplySideRevenueUSD: BigDecimal,
+    protocolRevenueDelta: BigDecimal,
+    supplyRevenueDelta: BigDecimal,
     revenueSource: string | null = null
   ): void {
+    const totalRevenueDelta = protocolRevenueDelta.plus(supplyRevenueDelta);
+
     // update market
     this.market.cumulativeTotalRevenueUSD =
-      this.market.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+      this.market.cumulativeTotalRevenueUSD.plus(totalRevenueDelta);
     this.market.cumulativeProtocolSideRevenueUSD =
-      this.market.cumulativeProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
+      this.market.cumulativeProtocolSideRevenueUSD.plus(protocolRevenueDelta);
     this.market.cumulativeSupplySideRevenueUSD =
-      this.market.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
+      this.market.cumulativeSupplySideRevenueUSD.plus(supplyRevenueDelta);
     this.market.save();
 
     // update protocol
     this.protocol.cumulativeTotalRevenueUSD =
-      this.protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+      this.protocol.cumulativeTotalRevenueUSD.plus(totalRevenueDelta);
     this.protocol.cumulativeProtocolSideRevenueUSD =
-      this.protocol.cumulativeProtocolSideRevenueUSD.plus(
-        newProtocolRevenueUSD
-      );
+      this.protocol.cumulativeProtocolSideRevenueUSD.plus(protocolRevenueDelta);
     this.protocol.cumulativeSupplySideRevenueUSD =
-      this.protocol.cumulativeSupplySideRevenueUSD.plus(
-        newSupplySideRevenueUSD
-      );
+      this.protocol.cumulativeSupplySideRevenueUSD.plus(supplyRevenueDelta);
     this.protocol.save();
 
     // update RevenueDetails
@@ -875,7 +935,7 @@ export class DataManager {
       let sourceIndex = marketDetails.sources.indexOf(revenueSource);
       if (sourceIndex != -1) {
         marketDetails.amountsUSD[sourceIndex] =
-          marketDetails.amountsUSD[sourceIndex].plus(newTotalRevenueUSD);
+          marketDetails.amountsUSD[sourceIndex].plus(totalRevenueDelta);
         marketDetails.save();
       }
       this.market.revenueDetails = marketDetails.id;
@@ -885,7 +945,7 @@ export class DataManager {
       sourceIndex = protocolDetails.sources.indexOf(revenueSource);
       if (sourceIndex != -1) {
         protocolDetails.amountsUSD[sourceIndex] =
-          protocolDetails.amountsUSD[sourceIndex].plus(newTotalRevenueUSD);
+          protocolDetails.amountsUSD[sourceIndex].plus(totalRevenueDelta);
         protocolDetails.save();
       }
       this.protocol.revenueDetails = protocolDetails.id;
@@ -893,10 +953,6 @@ export class DataManager {
     }
 
     // update revenue in snapshots
-    this.snapshots.updateRevenue(
-      newTotalRevenueUSD,
-      newProtocolRevenueUSD,
-      newSupplySideRevenueUSD
-    );
+    this.snapshots.updateRevenue(protocolRevenueDelta, supplyRevenueDelta);
   }
 }

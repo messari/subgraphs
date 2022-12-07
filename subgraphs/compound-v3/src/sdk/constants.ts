@@ -213,6 +213,23 @@ export function BDChangeDecimals(
   }
 }
 
+// insert value into arr at index
+export function insert<Type>(
+  arr: Array<Type>,
+  index: i32,
+  value: Type
+): Array<Type> {
+  let result = new Array<Type>(arr.length + 1);
+  for (let i = 0; i < index; i++) {
+    result[i] = arr[i];
+  }
+  result[index] = value;
+  for (let i = index; i < arr.length; i++) {
+    result[i + 1] = arr[i];
+  }
+  return result;
+}
+
 /////////////////////////////
 /////     Addresses     /////
 /////////////////////////////
