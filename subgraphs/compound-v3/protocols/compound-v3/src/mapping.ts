@@ -4,6 +4,7 @@ import {
   BigInt,
   log,
   BigDecimal,
+  Bytes,
 } from "@graphprotocol/graph-ts";
 import {
   AddAsset,
@@ -448,101 +449,62 @@ export function handleSupply(event: Supply): void {
   const accountID = event.params.dst;
   const accountActorID = event.params.from;
   const amount = event.params.amount;
-  const token = updateMarketData(market);
-  if (!token) {
-    log.warning("[handleSupply] Could not find token {}", [
-      tryBaseToken.value.toHexString(),
-    ]);
-    return;
-  }
+  const token = market.getInputToken();
+  updateMarketData(market);
   updateRevenue(market, event.address);
   updateRewards(market, event.address, event);
 
   const mintAmount = isMint(event);
   if (!mintAmount) {
     // Repay only
-    const borrowBalance = getUserBalance(
+    createBaseTokenTransactions(
       cometContract,
-      accountID,
-      null,
-      PositionSide.BORROWER
-    );
-    const repay = market.createRepay(
-      tryBaseToken.value,
+      market,
+      token,
       accountID,
       amount,
-      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
-      borrowBalance,
-      null,
-      InterestRateType.VARIABLE
+      TransactionType.REPAY,
+      PositionSide.BORROWER,
+      accountActorID
     );
-    if (repay) {
-      repay.accountActor = accountActorID;
-      repay.save();
-    }
   } else if (mintAmount.le(amount)) {
     // deposit only
-    const supplyBalance = getUserBalance(
+    createBaseTokenTransactions(
       cometContract,
-      accountID,
-      null,
-      PositionSide.COLLATERAL
-    );
-    const deposit = market.createDeposit(
-      tryBaseToken.value,
+      market,
+      token,
       accountID,
       amount,
-      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
-      supplyBalance,
-      InterestRateType.VARIABLE
+      TransactionType.DEPOSIT,
+      PositionSide.COLLATERAL,
+      accountActorID
     );
-    deposit.accountActor = accountActorID;
-    deposit.save();
   } else {
     // mintAmount > amount
     // partial deposit and partial repay
     const repayAmount = amount.minus(mintAmount);
     const depositAmount = amount.minus(repayAmount);
-    const borrowBalance = getUserBalance(
+    createBaseTokenTransactions(
       cometContract,
-      accountID,
-      null,
-      PositionSide.BORROWER
-    );
-    const repay = market.createRepay(
-      tryBaseToken.value,
+      market,
+      token,
       accountID,
       repayAmount,
-      bigIntToBigDecimal(repayAmount, token.decimals).times(
-        token.lastPriceUSD!
-      ),
-      borrowBalance,
-      null,
-      InterestRateType.VARIABLE
+      TransactionType.REPAY,
+      PositionSide.BORROWER,
+      accountActorID
     );
-    if (repay) {
-      repay.accountActor = accountActorID;
-      repay.save();
-    }
 
-    const supplyBalance = getUserBalance(
+    createBaseTokenTransactions(
       cometContract,
-      accountID,
-      null,
-      PositionSide.COLLATERAL
-    );
-    const deposit = market.createDeposit(
-      tryBaseToken.value,
+      market,
+      token,
       accountID,
       depositAmount,
-      bigIntToBigDecimal(depositAmount, token.decimals).times(
-        token.lastPriceUSD!
-      ),
-      supplyBalance,
-      InterestRateType.VARIABLE
+      TransactionType.DEPOSIT,
+      PositionSide.COLLATERAL,
+      accountActorID
     );
-    deposit.accountActor = accountActorID;
-    deposit.save();
   }
 }
 
@@ -561,13 +523,8 @@ export function handleSupplyCollateral(event: SupplyCollateral): void {
   const accountActorID = event.params.from;
   const asset = event.params.asset;
   const amount = event.params.amount;
-  const token = updateMarketData(market);
-  if (!token) {
-    log.warning("[handleSupplyCollateral] Could not find token {}", [
-      asset.toHexString(),
-    ]);
-    return;
-  }
+  const token = market.getInputToken();
+  updateMarketData(market);
   updateRevenue(market, event.address);
   updateRewards(market, event.address, event);
 
@@ -600,101 +557,62 @@ export function handleWithdraw(event: Withdraw): void {
   const accountID = event.params.src;
   const accountActorID = event.params.to;
   const amount = event.params.amount;
-  const token = updateMarketData(market);
-  if (!token) {
-    log.warning("[handleWithdraw] Could not find token {}", [
-      tryBaseToken.value.toHexString(),
-    ]);
-    return;
-  }
+  const token = market.getInputToken();
+  updateMarketData(market);
   updateRevenue(market, event.address);
   updateRewards(market, event.address, event);
 
   const burnAmount = isBurn(event);
   if (!burnAmount) {
     // Borrow only
-    const borrowBalance = getUserBalance(
+    createBaseTokenTransactions(
       cometContract,
-      accountID,
-      null,
-      PositionSide.BORROWER
-    );
-    const borrow = market.createBorrow(
-      tryBaseToken.value,
+      market,
+      token,
       accountID,
       amount,
-      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
-      borrowBalance,
-      null,
-      InterestRateType.VARIABLE
+      TransactionType.BORROW,
+      PositionSide.BORROWER,
+      accountActorID
     );
-    borrow.accountActor = accountActorID;
-    borrow.save();
   } else if (burnAmount.ge(amount)) {
     // withdraw only
-    const supplyBalance = getUserBalance(
+    createBaseTokenTransactions(
       cometContract,
-      accountID,
-      null,
-      PositionSide.COLLATERAL
-    );
-    const withdraw = market.createWithdraw(
-      tryBaseToken.value,
+      market,
+      token,
       accountID,
       amount,
-      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
-      supplyBalance,
-      InterestRateType.VARIABLE
+      TransactionType.WITHDRAW,
+      PositionSide.COLLATERAL,
+      accountActorID
     );
-    if (withdraw) {
-      withdraw.accountActor = accountActorID;
-      withdraw.save();
-    }
   } else {
     // burnAmount < amount
     // partial withdraw and partial borrow
     const borrowAmount = amount.minus(burnAmount);
     const withdrawAmount = amount.minus(borrowAmount);
-    const borrowBalance = getUserBalance(
+    createBaseTokenTransactions(
       cometContract,
-      accountID,
-      null,
-      PositionSide.BORROWER
-    );
-    const borrow = market.createBorrow(
-      tryBaseToken.value,
+      market,
+      token,
       accountID,
       borrowAmount,
-      bigIntToBigDecimal(borrowAmount, token.decimals).times(
-        token.lastPriceUSD!
-      ),
-      borrowBalance,
-      null,
-      InterestRateType.VARIABLE
+      TransactionType.BORROW,
+      PositionSide.BORROWER,
+      accountActorID
     );
-    borrow.accountActor = accountActorID;
-    borrow.save();
 
-    const supplyBalance = getUserBalance(
+    createBaseTokenTransactions(
       cometContract,
-      accountID,
-      null,
-      PositionSide.COLLATERAL
-    );
-    const withdraw = market.createWithdraw(
-      tryBaseToken.value,
+      market,
+      token,
       accountID,
       withdrawAmount,
-      bigIntToBigDecimal(withdrawAmount, token.decimals).times(
-        token.lastPriceUSD!
-      ),
-      supplyBalance,
-      InterestRateType.VARIABLE
+      TransactionType.WITHDRAW,
+      PositionSide.COLLATERAL,
+      accountActorID
     );
-    if (withdraw) {
-      withdraw.accountActor = accountActorID;
-      withdraw.save();
-    }
   }
 }
 
@@ -713,13 +631,8 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   const accountActorID = event.params.to;
   const asset = event.params.asset;
   const amount = event.params.amount;
-  const token = updateMarketData(market);
-  if (!token) {
-    log.warning("[handleWithdrawCollateral] Could not find token {}", [
-      asset.toHexString(),
-    ]);
-    return;
-  }
+  const token = market.getInputToken();
+  updateMarketData(market);
   updateRevenue(market, event.address);
   updateRewards(market, event.address, event);
 
@@ -767,13 +680,8 @@ export function handleTransfer(event: Transfer): void {
     getProtocolData()
   );
   let amount = event.params.amount;
-  const token = updateMarketData(market);
-  if (!token) {
-    log.warning("[handleWithdraw] Could not find token {}", [
-      tryBaseToken.value.toHexString(),
-    ]);
-    return;
-  }
+  const token = market.getInputToken();
+  updateMarketData(market);
   updateRevenue(market, event.address);
   updateRewards(market, event.address, event);
 
@@ -833,13 +741,8 @@ export function handleTransferCollateral(event: TransferCollateral): void {
   const receiver = event.params.to;
   const asset = event.params.asset;
   const amount = event.params.amount;
-  const token = updateMarketData(market);
-  if (!token) {
-    log.warning("[handleWithdrawCollateral] Could not find token {}", [
-      asset.toHexString(),
-    ]);
-    return;
-  }
+  const token = market.getInputToken();
+  updateMarketData(market);
   // no revenue accrued during this event
   updateRewards(market, event.address, event);
 
@@ -878,13 +781,7 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
   const liquidationPenalty =
     marketEntity.liquidationPenalty.div(BIGDECIMAL_HUNDRED);
   const profitUSD = amountUSD.times(liquidationPenalty);
-  const token = updateMarketData(market);
-  if (!token) {
-    log.warning("[handleWithdrawCollateral] Could not find token {}", [
-      baseAsset.toHexString(),
-    ]);
-    return;
-  }
+  updateMarketData(market);
   updateRevenue(market, event.address);
   updateRewards(market, event.address, event);
 
@@ -938,6 +835,73 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
 ///////////////////
 ///// Helpers /////
 ///////////////////
+
+function createBaseTokenTransactions(
+  comet: Comet,
+  market: DataManager,
+  token: Token,
+  accountID: Address,
+  amount: BigInt,
+  transactionType: string,
+  positionSide: string,
+  accountActorID: Bytes
+) {
+  const newBalance = getUserBalance(comet, accountID, null, positionSide);
+  if (transactionType == TransactionType.DEPOSIT) {
+    const deposit = market.createDeposit(
+      token.id,
+      accountID,
+      amount,
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+      newBalance,
+      InterestRateType.VARIABLE
+    );
+    deposit.accountActor = accountActorID;
+    deposit.save();
+  }
+  if (transactionType == TransactionType.WITHDRAW) {
+    const withdraw = market.createWithdraw(
+      token.id,
+      accountID,
+      amount,
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+      newBalance,
+      InterestRateType.VARIABLE
+    );
+    if (withdraw) {
+      withdraw.accountActor = accountActorID;
+      withdraw.save();
+    }
+  }
+  if (transactionType == TransactionType.BORROW) {
+    const borrow = market.createBorrow(
+      token.id,
+      accountID,
+      amount,
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+      newBalance,
+      null,
+      InterestRateType.VARIABLE
+    );
+    borrow.accountActor = accountActorID;
+    borrow.save();
+  }
+  if (transactionType == TransactionType.REPAY) {
+    const repay = market.createRepay(
+      token.id,
+      accountID,
+      amount,
+      bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
+      newBalance,
+      null,
+      InterestRateType.VARIABLE
+    );
+    if (repay) {
+      repay.accountActor = accountActorID;
+      repay.save();
+    }
+  }
+}
 
 //
 //
@@ -1098,7 +1062,7 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
 //
 // Updates market TVL, borrows, prices
 // @return inputToken
-function updateMarketData(dataManager: DataManager): Token {
+function updateMarketData(dataManager: DataManager): void {
   const market = dataManager.getMarket();
   const cometContract = Comet.bind(Address.fromBytes(market.relation!));
   const baseToken = cometContract.baseToken();
@@ -1127,6 +1091,25 @@ function updateMarketData(dataManager: DataManager): Token {
       null,
       reservesBI
     );
+
+    // update rates
+    const utilization = cometContract.getUtilization();
+    const supplyRate = cometContract.getSupplyRate(utilization);
+    const borrowRate = cometContract.getBorrowRate(utilization);
+    dataManager.getOrUpdateRate(
+      InterestRateSide.BORROWER,
+      InterestRateType.VARIABLE,
+      bigIntToBigDecimal(borrowRate, DEFAULT_DECIMALS)
+        .times(BigDecimal.fromString(SECONDS_PER_YEAR.toString()))
+        .times(BIGDECIMAL_HUNDRED)
+    );
+    dataManager.getOrUpdateRate(
+      InterestRateSide.LENDER,
+      InterestRateType.VARIABLE,
+      bigIntToBigDecimal(supplyRate, DEFAULT_DECIMALS)
+        .times(BigDecimal.fromString(SECONDS_PER_YEAR.toString()))
+        .times(BIGDECIMAL_HUNDRED)
+    );
   } else {
     // update collateral token market data
     const collateralERC20 = ERC20.bind(Address.fromBytes(market.inputToken));
@@ -1147,30 +1130,6 @@ function updateMarketData(dataManager: DataManager): Token {
       tryReserves.reverted ? BIGINT_ZERO : tryReserves.value
     );
   }
-
-  // update interest rates if this is the baseToken market
-  if (market.inputToken == baseToken) {
-    const utilization = cometContract.getUtilization();
-    const supplyRate = cometContract.getSupplyRate(utilization);
-    const borrowRate = cometContract.getBorrowRate(utilization);
-    dataManager.getOrUpdateRate(
-      InterestRateSide.BORROWER,
-      InterestRateType.VARIABLE,
-      bigIntToBigDecimal(borrowRate, DEFAULT_DECIMALS)
-        .times(BigDecimal.fromString(SECONDS_PER_YEAR.toString()))
-        .times(BIGDECIMAL_HUNDRED)
-    );
-    dataManager.getOrUpdateRate(
-      InterestRateSide.LENDER,
-      InterestRateType.VARIABLE,
-      bigIntToBigDecimal(supplyRate, DEFAULT_DECIMALS)
-        .times(BigDecimal.fromString(SECONDS_PER_YEAR.toString()))
-        .times(BIGDECIMAL_HUNDRED)
-    );
-  }
-  market.save();
-
-  return dataManager.getInputToken();
 }
 
 function getPrice(priceFeed: Address, cometContract: Comet): BigDecimal {
