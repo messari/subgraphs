@@ -2090,7 +2090,7 @@
     "deployments": {
       "goldfinch-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.1.0",
