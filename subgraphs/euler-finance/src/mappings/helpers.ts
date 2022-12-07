@@ -668,7 +668,7 @@ function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
   return null;
 }
 
-export function updateWeightedStakeAmount(market: Market, endBlock: BigInt): void {
+export function updateWeightedStakedAmount(market: Market, endBlock: BigInt): void {
   const blocksLapsed = endBlock.minus(market._stakeLastUpdateBlock!);
   const _weightedStakedAmount = market._weightedStakedAmount!.plus(market._stakedAmount.times(blocksLapsed));
   market._weightedStakedAmount = _weightedStakedAmount;

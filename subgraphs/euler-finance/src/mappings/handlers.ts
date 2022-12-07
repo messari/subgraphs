@@ -38,8 +38,9 @@ import {
   BLOCKS_PER_DAY,
   BLOCKS_PER_EPOCH,
   BIGINT_ONE,
+  EUL_MARKET_ADDRESS,
 } from "../common/constants";
-import { snapshotFinancials, snapshotMarket, updateUsageMetrics, updateWeightedStakeAmount } from "./helpers";
+import { snapshotFinancials, snapshotMarket, updateUsageMetrics, updateWeightedStakedAmount } from "./helpers";
 import {
   createBorrow,
   createDeposit,
@@ -334,23 +335,21 @@ export function handleStake(event: Stake): void {
     epoch.epoch = epochID;
     epoch.save();
 
-    // rank markets use votes in prev epoch
+    // rank markets in the epoch just ended (prev epoch)
     // find the top ten staked markets; according to the euler guage
     // https://app.euler.finance/gaugeweight
-    // users "vote" for the next epoch
     const prevEpochID = epochID - 1;
     const prevEpoch = _Epoch.load(prevEpochID.toString());
-
-    const protocol = getOrCreateLendingProtocol();
     if (prevEpoch) {
+      const protocol = getOrCreateLendingProtocol();
       // finalize mkt._weightedStakedAmount for prev epoch & distribute rewards
       // The array is needed to select top 10 staked markets
-      const marketWeightedStakeAmounts: BigInt[] = [];
+      const marketWeightedStakedAmounts: BigInt[] = [];
       for (let i = 0; i < protocol._marketIDs!.length; i++) {
         const mktID = protocol._marketIDs![i];
         const mkt = Market.load(mktID);
         if (!mkt) {
-          log.error("[handleStake]market {} doesn't exist, but this should not happen | tx ={}", [
+          log.error("[handleStake]market {} doesn't exist, but this should not happen at tx ={}", [
             mktID,
             event.transaction.hash.toHexString(),
           ]);
@@ -359,30 +358,35 @@ export function handleStake(event: Stake): void {
         const stakedAmount = mkt._stakedAmount;
         if (stakedAmount.gt(BIGINT_ZERO)) {
           // finalized mkt._weightedStakedAmount for the epoch just ended
-          // epochStartBlock.minus(BIGINT_ONE) is the last block of prev epoch
-          updateWeightedStakeAmount(mkt, epochStartBlock.minus(BIGINT_ONE));
+          // epochStartBlock.minus(BIGINT_ONE) is the end block of prev epoch
+          updateWeightedStakedAmount(mkt, epochStartBlock.minus(BIGINT_ONE));
         }
-        marketWeightedStakeAmounts.push(mkt._weightedStakedAmount ? mkt._weightedStakedAmount! : BIGINT_ZERO);
+        marketWeightedStakedAmounts.push(mkt._weightedStakedAmount ? mkt._weightedStakedAmount! : BIGINT_ZERO);
         mkt.save();
       }
 
+      // update EUL token price
       const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
       const execProxyAddress = eulerContract.moduleIdToProxy(MODULEID__EXEC);
-      // update EUL token prices
-      updatePrices(execProxyAddress, market, event);
+      const eulMarket = getOrCreateMarket(EUL_MARKET_ADDRESS);
+      let EULPriceUSD = updatePrices(execProxyAddress, eulMarket, event);
+      if (!EULPriceUSD) {
+        const EULToken = getOrCreateToken(Address.fromString(EUL_ADDRESS));
+        EULPriceUSD = EULToken.lastPriceUSD!;
+      }
 
+      const rewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
+      const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
       // select top 10 staked markets, calculate sqrt(weighted staked amount)
-      const cutoffAmount = getCutoffValue(marketWeightedStakeAmounts, 10);
+      const cutoffAmount = getCutoffValue(marketWeightedStakedAmounts, 10);
       let sumAccumulator = BIGDECIMAL_ZERO;
-      for (let i = 0; i < marketWeightedStakeAmounts.length; i++) {
+      for (let i = 0; i < marketWeightedStakedAmounts.length; i++) {
         // TODO: reflect changes in eIP 24 and 28
-        if (marketWeightedStakeAmounts[i].ge(cutoffAmount)) {
-          sumAccumulator = sumAccumulator.plus(marketWeightedStakeAmounts[i].sqrt().toBigDecimal());
+        if (marketWeightedStakedAmounts[i].ge(cutoffAmount)) {
+          sumAccumulator = sumAccumulator.plus(marketWeightedStakedAmounts[i].sqrt().toBigDecimal());
         }
       }
-      const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
-      const EULToken = getOrCreateToken(Address.fromString(EUL_ADDRESS));
-      const rewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
+
       // scale to daily emission amount
       const dailyScaler = BigDecimal.fromString((BLOCKS_PER_DAY / (BLOCKS_PER_EPOCH as f64)).toString());
       for (let i = 0; i < protocol._marketIDs!.length; i++) {
@@ -395,24 +399,32 @@ export function handleStake(event: Stake): void {
           ]);
           continue;
         }
-        const mrktRewardToken = mkt.rewardTokens;
-        if (!mrktRewardToken || mrktRewardToken.length == 0) {
-          mkt.rewardTokens = [rewardToken.id];
+        if (mkt.rewardTokens && mkt.rewardTokens!.length > 0) {
+          // reset reward emissions for the epoch
+          mkt.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+          mkt.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
         }
-        // If prev epoch exists, distribute the rewards;
-        // Only for epochs after the START_EPOCH (6)
+
+        // distribute the rewards among top 10 staked markets
+        // Only for epochs after START_EPOCH (6)
         const _weightedStakedAmount = mkt._weightedStakedAmount;
         if (_weightedStakedAmount && _weightedStakedAmount.ge(cutoffAmount)) {
+          mkt.rewardTokens = [rewardToken.id];
           const rewardTokenEmissionsAmount = BigDecimalTruncateToBigInt(
             _weightedStakedAmount.sqrt().divDecimal(sumAccumulator).times(totalRewardAmount).times(dailyScaler),
           );
           const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
             .divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
-            .times(EULToken.lastPriceUSD!);
+            .times(EULPriceUSD);
           mkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
           mkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
-          mkt.save();
         }
+
+        // reset mkt._weightedStakedAmount for the new epoch
+        mkt._weightedStakedAmount = BIGINT_ZERO;
+        // EUL staked remains staked for the market until unstaked
+        // so not reset mkt._stakedAmount
+        mkt.save();
       }
     }
   }
@@ -423,7 +435,7 @@ export function handleStake(event: Stake): void {
     market._weightedStakedAmount = BIGINT_ZERO;
   }
   // update _weightedStakeAmount before updating _stakedAmount
-  updateWeightedStakeAmount(market, event.block.number);
+  updateWeightedStakedAmount(market, event.block.number);
   market._stakedAmount = market._stakedAmount.plus(deltaStakedAmount);
   market.save();
 }

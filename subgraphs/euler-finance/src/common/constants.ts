@@ -111,7 +111,9 @@ export const EULER_GENERAL_VIEW_ADDRESS = "0x9D2B3052f5A3c156A34FC32cD08E9F55017
 export const EULER_GENERAL_VIEW_V2_ADDRESS = "0xACC25c4d40651676FEEd43a3467F3169e3E68e42";
 export const CRYPTEX_MARKET_ID = "0x321c2fe4446c7c963dc41dd58879af648838f98d";
 export const EULSTAKES_ADDRESS = "0xc697bb6625d9f7adcf0fbf0cbd4dcf50d8716cd3";
+// EUL token address is the same as EUL market address
 export const EUL_ADDRESS = "0xd9fcd98c322942075a5c3860693e9f4f03aae07b";
+export const EUL_MARKET_ADDRESS = "0xd9fcd98c322942075a5c3860693e9f4f03aae07b";
 export const VIEW_V2_START_BLOCK_NUMBER = BigInt.fromI32(14482429);
 
 ////////////////////////
