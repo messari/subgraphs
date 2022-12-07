@@ -55,9 +55,9 @@ export function getOrCreatePool(
     pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
     pool.outputTokenSupply = BIGINT_ZERO;
     pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    pool.stakedOutputTokenAmount = null;
-    pool.rewardTokenEmissionsAmount = null;
-    pool.rewardTokenEmissionsUSD = null;
+    pool.stakedOutputTokenAmount = BIGINT_ZERO;
+    pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+    pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
 
     pool.save();
 

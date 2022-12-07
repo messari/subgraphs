@@ -94,14 +94,8 @@ export function updateProtocolAndPoolTvl(
 
 export function updateSnapshotsTvl(block: ethereum.Block): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
-  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(
-    Address.fromString(PROTOCOL_ID),
-    block
-  );
-  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(
-    Address.fromString(PROTOCOL_ID),
-    block
-  );
+  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(block);
+  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(block);
   const financialMetrics = getOrCreateFinancialDailyMetrics(block);
 
   // Pool Daily
@@ -124,14 +118,8 @@ export function updateTotalRewardsMetrics(
   additionalRewards: BigInt
 ): void {
   const financialMetrics = getOrCreateFinancialDailyMetrics(block);
-  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(
-    Address.fromString(PROTOCOL_ID),
-    block
-  );
-  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(
-    Address.fromString(PROTOCOL_ID),
-    block
-  );
+  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(block);
+  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(block);
 
   const lastRewardPriceUsd = getOrCreateToken(
     Address.fromString(RPL_ADDRESS),
@@ -191,14 +179,8 @@ export function updateTotalRevenueMetrics(
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
   const financialMetrics = getOrCreateFinancialDailyMetrics(block);
-  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(
-    Address.fromString(PROTOCOL_ID),
-    block
-  );
-  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(
-    Address.fromString(PROTOCOL_ID),
-    block
-  );
+  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(block);
+  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(block);
 
   const additionalRewards = bigIntToBigDecimal(additionalRevenue);
 
@@ -261,14 +243,8 @@ export function updateProtocolSideRevenueMetrics(
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
   const financialMetrics = getOrCreateFinancialDailyMetrics(block);
-  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(
-    Address.fromString(PROTOCOL_ID),
-    block
-  );
-  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(
-    Address.fromString(PROTOCOL_ID),
-    block
-  );
+  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(block);
+  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(block);
   const additionalRewards = additionalRevenue;
 
   const lastPriceUsd = getOrCreateToken(
@@ -320,14 +296,8 @@ export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
   const financialMetrics = getOrCreateFinancialDailyMetrics(block);
-  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(
-    Address.fromString(PROTOCOL_ID),
-    block
-  );
-  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(
-    Address.fromString(PROTOCOL_ID),
-    block
-  );
+  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(block);
+  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(block);
 
   // Pool
   pool.cumulativeSupplySideRevenueUSD =
@@ -411,7 +381,6 @@ export function getOrCreateFinancialDailyMetrics(
 }
 
 export function getOrCreatePoolsDailySnapshot(
-  poolAddress: Address,
   block: ethereum.Block
 ): PoolDailySnapshot {
   const dayId: string = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
@@ -435,8 +404,9 @@ export function getOrCreatePoolsDailySnapshot(
     poolMetrics.inputTokenBalances = pool.inputTokenBalances;
     poolMetrics.outputTokenSupply = pool.outputTokenSupply;
     poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-    poolMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO];
-    poolMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
+    poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+    poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+    poolMetrics.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
   }
 
   // Set block number and timestamp to the latest for snapshots
@@ -449,7 +419,6 @@ export function getOrCreatePoolsDailySnapshot(
 }
 
 export function getOrCreatePoolsHourlySnapshot(
-  poolAddress: Address,
   block: ethereum.Block
 ): PoolHourlySnapshot {
   const hourId: string = (
@@ -476,8 +445,9 @@ export function getOrCreatePoolsHourlySnapshot(
     poolMetrics.inputTokenBalances = pool.inputTokenBalances;
     poolMetrics.outputTokenSupply = pool.outputTokenSupply;
     poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-    poolMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO];
-    poolMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
+    poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+    poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+    poolMetrics.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
   }
 
   // Set block number and timestamp to the latest for snapshots

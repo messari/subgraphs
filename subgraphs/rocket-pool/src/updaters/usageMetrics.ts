@@ -44,6 +44,18 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
     dailyActiveAccount.save();
 
     usageMetricsDailySnapshot.dailyActiveUsers += 1;
+  }
+
+  const hourlyActiveAccountId = (block.timestamp.toI64() / SECONDS_PER_HOUR)
+    .toString()
+    .concat("-")
+    .concat(accountId);
+
+  let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
+  if (!hourlyActiveAccount) {
+    hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
+    hourlyActiveAccount.save();
+
     usageMetricsHourlySnapshot.hourlyActiveUsers += 1;
   }
 
@@ -68,10 +80,13 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics = new UsageMetricsDailySnapshot(dayId);
 
     usageMetrics.protocol = protocol.id;
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
 
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.blockNumber = block.number;
+    usageMetrics.timestamp = block.timestamp;
   }
   usageMetrics.blockNumber = block.number;
   usageMetrics.timestamp = block.timestamp;
@@ -98,6 +113,9 @@ export function getOrCreateUsageMetricsHourlySnapshot(
     usageMetrics.hourlyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.hourlyTransactionCount = 0;
+
+    usageMetrics.blockNumber = block.number;
+    usageMetrics.timestamp = block.timestamp;
   }
 
   usageMetrics.blockNumber = block.number;
