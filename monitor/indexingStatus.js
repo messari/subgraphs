@@ -40,7 +40,7 @@ export async function indexStatusFlow(deployments) {
 
     const indexingStatusQueriesArray = generateIndexStatus.indexingStatusQueries;
     const indexData = await getIndexingStatusData(indexingStatusQueriesArray);
-    const invalidDeployments = [];
+    const invalidDeployments = ["dforce-avalanche"];
     Object.keys(indexData).forEach((indexDataName) => {
       const realNameString = indexDataName.split("_").join("-");
       if (!indexData[indexDataName] && indexDataName.includes("pending")) {
