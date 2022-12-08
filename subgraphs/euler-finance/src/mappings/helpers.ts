@@ -237,10 +237,12 @@ export function updatePrices(execProxyAddress: Address, market: Market, event: e
   }
   market.save();
 
-  const eToken = getOrCreateToken(Address.fromString(market.outputToken!));
-  eToken.lastPriceUSD = market.outputTokenPriceUSD;
-  eToken.lastPriceBlockNumber = blockNumber;
-  eToken.save();
+  if (market.outputToken) {
+    const eToken = getOrCreateToken(Address.fromString(market.outputToken!));
+    eToken.lastPriceUSD = market.outputTokenPriceUSD;
+    eToken.lastPriceBlockNumber = blockNumber;
+    eToken.save();
+  }
 
   if (market._dToken && market._dTokenExchangeRate!.gt(BIGDECIMAL_ZERO)) {
     const dToken = getOrCreateToken(Address.fromString(market._dToken!));
