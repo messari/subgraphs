@@ -6,7 +6,6 @@ import {
 } from "@graphprotocol/graph-ts";
 import { getOrCreateMarket } from "../helpers/market";
 import { getOrCreateRewardToken, getOrCreateToken } from "../helpers/token";
-import { BD_ZERO } from "../utils/const";
 import { EventData } from "../utils/type";
 
 export function handleAddAssetFarmReward(event: EventData): void {
@@ -108,10 +107,8 @@ export function handleAddAssetFarmReward(event: EventData): void {
   // rewardTokenEmissionsUSD
   const rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   const token = getOrCreateToken(rewardToken.token);
-  let price = token.lastPriceUSD!;
-  if (price.equals(BD_ZERO)) {
-    price = BigDecimal.fromString("0.001");
-  }
+  const price = token.lastPriceUSD!;
+
   const rewardUSD = BigDecimal.fromString(newRewardPerDay.toString())
     .div(
       BigInt.fromString("10")

@@ -12,6 +12,8 @@ import {
   NANOSEC_TO_SEC,
   NANOS_TO_DAY,
   NANOS_TO_HOUR,
+  InterestRateSide,
+  InterestRateType,
 } from "../utils/const";
 import { getOrCreateProtocol } from "./protocol";
 import { getOrCreateToken } from "./token";
@@ -35,15 +37,27 @@ export function getOrCreateMarket(id: string): Market {
     market.inputToken = token.id;
     market.outputToken = ADDRESS_ZERO;
 
-    const supplyRate = new InterestRate("SUPPLY-VARIABLE-".concat(id));
+    const supplyRate = new InterestRate(
+      InterestRateSide.LENDER.concat("-")
+        .concat(InterestRateType.VARIABLE)
+        .concat("-")
+        .concat(market.id)
+    );
     supplyRate.rate = BD_ZERO;
-    supplyRate.side = "SUPPLY";
-    supplyRate.type = "VARIABLE";
+    supplyRate.side = InterestRateSide.LENDER;
+    supplyRate.type = InterestRateType.VARIABLE;
+    supplyRate.save();
 
-    const borrowRate = new InterestRate("BORROW-VARIABLE-".concat(id));
+    const borrowRate = new InterestRate(
+      InterestRateSide.BORROWER.concat("-")
+        .concat(InterestRateType.VARIABLE)
+        .concat("-")
+        .concat(market.id)
+    );
     borrowRate.rate = BD_ZERO;
-    borrowRate.side = "BORROW";
-    borrowRate.type = "VARIABLE";
+    borrowRate.side = InterestRateSide.BORROWER;
+    borrowRate.type = InterestRateType.VARIABLE;
+    borrowRate.save();
 
     // quants
     market.rates = [supplyRate.id, borrowRate.id];
@@ -70,15 +84,15 @@ export function getOrCreateMarket(id: string): Market {
     market.outputTokenPriceUSD = BD_ZERO;
     market.exchangeRate = BD_ZERO;
 
-    market.createdTimestamp = BigInt.fromI32(0);
-    market.createdBlockNumber = BigInt.fromI32(0);
+    market.createdTimestamp = BI_ZERO;
+    market.createdBlockNumber = BI_ZERO;
     market.positionCount = 0;
     market.openPositionCount = 0;
     market.closedPositionCount = 0;
     market.lendingPositionCount = 0;
     market.borrowingPositionCount = 0;
 
-    market._last_update_timestamp = BigInt.fromI32(0);
+    market._last_update_timestamp = BI_ZERO;
 
     market._reserveRatio = BI_ZERO;
     market._target_utilization = BI_ZERO;
