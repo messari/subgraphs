@@ -17,7 +17,6 @@ import {
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
   getOrCreateAssetStatus,
-  getStartBlockForEpoch,
 } from "../common/getters";
 import {
   BIGDECIMAL_ONE,
@@ -36,7 +35,7 @@ import {
   UNDERLYING_RESERVES_FEE,
 } from "../common/constants";
 import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
-import { LendingProtocol, Market, _AssetStatus, _Epoch } from "../../generated/schema";
+import { LendingProtocol, Market, _AssetStatus } from "../../generated/schema";
 import { Exec } from "../../generated/euler/Exec";
 import { bigDecimalExponential } from "../common/conversions";
 import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
