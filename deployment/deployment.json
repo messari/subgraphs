@@ -2083,6 +2083,35 @@
       }
     }
   },
+  "goldfinch": {
+    "schema": "lending",
+    "base": "goldfinch",
+    "protocol": "goldfinch",
+    "deployments": {
+      "goldfinch-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.1.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "goldfinch.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "goldfinch-ethereum",
+            "query-id": "goldfinch-ethereum"
+          }
+        }
+      }
+    }
+  },
   "inverse-finance": {
     "schema": "lending",
     "base": "inverse-finance",
