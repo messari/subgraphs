@@ -1002,7 +1002,7 @@
     "deployments": {
       "belt-finance-bsc": {
         "network": "bsc",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.1",
@@ -1421,7 +1421,7 @@
       },
       "dforce-avalanche": {
         "network": "avalanche",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.2.5",
@@ -2107,6 +2107,35 @@
           "decentralized-network": {
             "slug": "euler-finance-ethereum",
             "query-id": "8cLf29KxAedWLVaEqjV8qKomdwwXQxjptBZFrqWNH5u2"
+          }
+        }
+      }
+    }
+  },
+  "goldfinch": {
+    "schema": "lending",
+    "base": "goldfinch",
+    "protocol": "goldfinch",
+    "deployments": {
+      "goldfinch-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.1.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "goldfinch.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "goldfinch-ethereum",
+            "query-id": "goldfinch-ethereum"
           }
         }
       }
