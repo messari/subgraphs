@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Account,
   Market,
@@ -6,15 +6,18 @@ import {
   PositionSnapshot,
   _Trove,
 } from "../../generated/schema";
-import { BIGINT_ZERO, INT_ZERO } from "../utils/constants";
+import { BIGINT_ZERO, INT_ZERO, LUSD_ADDRESS } from "../utils/constants";
 import { PositionSide } from "../utils/constants";
+import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateAccount } from "./account";
+import { createDeposit } from "./event";
 import {
   closeMarketPosition,
   getOrCreateMarket,
   openMarketBorrowerPosition,
   openMarketLenderPosition,
 } from "./market";
+import { getCurrentLUSDPrice } from "./token";
 
 export function getUserPosition(
   account: Account,
@@ -117,6 +120,42 @@ export function incrementPositionRepayCount(position: Position): void {
 export function incrementPositionLiquidationCount(position: Position): void {
   position.liquidationCount += 1;
   position.save();
+}
+
+export function updateSPUserPositionBalances(
+  event: ethereum.Event,
+  sp: Market,
+  depositor: Address,
+  newBalance: BigInt
+): void {
+  const account = getOrCreateAccount(depositor);
+
+  const position = getOrCreateUserPosition(
+    event,
+    account,
+    sp,
+    PositionSide.LENDER
+  );
+
+  const delta = newBalance.minus(position.balance);
+  position.balance = newBalance;
+  if (position.balance.equals(BIGINT_ZERO)) {
+    closePosition(event, account, sp, position);
+  }
+  position.save();
+  getOrCreatePositionSnapshot(event, position);
+
+  const deltaUSD = getCurrentLUSDPrice().times(bigIntToBigDecimal(delta));
+  if (delta.gt(BIGINT_ZERO)) {
+    createDeposit(
+      event,
+      sp,
+      Address.fromString(LUSD_ADDRESS),
+      delta,
+      deltaUSD,
+      depositor
+    );
+  } // negative doesn't imply withdrawal.
 }
 
 export function updateUserPositionBalances(
