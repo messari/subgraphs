@@ -29,7 +29,13 @@ import {
   DEFAULT_DECIMALS,
   BIGINT_SEVENTY_FIVE,
 } from "../common/constants";
-import { snapshotFinancials, snapshotMarket, updateUsageMetrics, updateWeightedStakedAmount } from "./helpers";
+import {
+  snapshotFinancials,
+  snapshotMarket,
+  updateUsageMetrics,
+  updateWeightedStakedAmount,
+  processReward,
+} from "./helpers";
 import {
   createBorrow,
   createDeposit,
@@ -320,9 +326,11 @@ export function handleStake(event: Stake): void {
   let epoch = _Epoch.load(epochID.toString());
   if (!epoch) {
     //Start of a new epoch
-    const epoch = new _Epoch(epochID.toString());
+    epoch = new _Epoch(epochID.toString());
     epoch.epoch = epochID;
     epoch.save();
+
+    processReward(epoch, epochStartBlock, event);
   }
 
   // In a valid epoch (6 <= epoch <=96) with uninitialized market._stakeLastUpdateBlock

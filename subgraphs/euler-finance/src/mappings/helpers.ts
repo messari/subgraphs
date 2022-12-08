@@ -1,5 +1,5 @@
 import { Address, BigDecimal, ethereum, BigInt, log, crypto, ByteArray, Bytes } from "@graphprotocol/graph-ts";
-import { Borrow, Deposit, Liquidation, Repay, Withdraw } from "../../generated/euler/Euler";
+import { Borrow, Deposit, Euler, Liquidation, Repay, Withdraw } from "../../generated/euler/Euler";
 import {
   getOrCreateDeposit,
   getOrCreateToken,
@@ -17,6 +17,8 @@ import {
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
   getOrCreateAssetStatus,
+  getCutoffValue,
+  getOrCreateRewardToken,
 } from "../common/getters";
 import {
   BIGDECIMAL_ONE,
@@ -33,9 +35,21 @@ import {
   SECONDS_PER_DAY,
   DEFAULT_DECIMALS,
   UNDERLYING_RESERVES_FEE,
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  BLOCKS_PER_DAY,
+  BLOCKS_PER_EPOCH,
+  EULER_ADDRESS,
+  EUL_ADDRESS,
+  EUL_DECIMALS,
+  EUL_DIST,
+  EUL_MARKET_ADDRESS,
+  MODULEID__EXEC,
+  RewardTokenType,
+  START_EPOCH,
 } from "../common/constants";
-import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
-import { LendingProtocol, Market, _AssetStatus } from "../../generated/schema";
+import { BigDecimalTruncateToBigInt, bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
+import { LendingProtocol, Market, _AssetStatus, _Epoch } from "../../generated/schema";
 import { Exec } from "../../generated/euler/Exec";
 import { bigDecimalExponential } from "../common/conversions";
 import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
@@ -677,7 +691,7 @@ export function updateWeightedStakedAmount(market: Market, endBlock: BigInt): vo
   market.save();
 }
 
-function _processReward(epoch: _Epoch, epochStartBlock: BigInt, event: ethereum.Event): void {
+export function processReward(epoch: _Epoch, epochStartBlock: BigInt, event: ethereum.Event): void {
   const epochID = epoch.epoch;
   // rank markets in the epoch just ended (prev epoch)
   // find the top ten staked markets; according to the euler guage
@@ -710,7 +724,7 @@ function _processReward(epoch: _Epoch, epochStartBlock: BigInt, event: ethereum.
       mkt.save();
     }
 
-    let EULPriceUSD = getEULPriceUSD(event);
+    const EULPriceUSD = getEULPriceUSD(event);
     const rewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
     const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
     // select top 10 staked markets, calculate sqrt(weighted staked amount)
