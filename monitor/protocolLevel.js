@@ -488,7 +488,7 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                         deploymentsToReturn[depoKey].protocolErrors.protocolEntity.push(ProtocolTypeEntityName[deploymentsToReturn[depoKey].protocolType]);
                     } else {
                         const emptyFields = Object.keys(returnedData[key][0]).filter(field => !returnedData[key][0][field] || returnedData[key][0][field]?.length === 0);
-                        if (emptyFields.length > 0) {
+                        if (emptyFields.length > 0 && !depoKey.toUpperCase().includes('THE-GRAPH')) {
                             deploymentsToReturn[depoKey].protocolErrors.relatedField.push(emptyFields.join(', '));
                         }
                     }

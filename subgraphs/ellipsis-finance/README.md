@@ -13,6 +13,7 @@ Sum across all Pools:
 `(Swap Trading Volume * Pool Swap Fee)`
 
 Note: The Pool Swap Fee + Pool Admin Fees can be dynamically updated from pool-to-pool
+
 ### Protocol-Side Revenue USD
 
 Portion of the Total Revenue allocated to the Protocol
@@ -45,8 +46,8 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-Staking Rewards: 
- 
+Staking Rewards:
+
 `V1 = EPS inflation rate per second * pool relative weight`
 
 `V2 = EPX inflation rate per second * pool relative weight`
