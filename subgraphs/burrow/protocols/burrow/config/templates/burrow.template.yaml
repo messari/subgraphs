@@ -11,8 +11,6 @@ dataSources:
     mapping:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      entities:
-        - ExampleEntity
       receiptHandlers:
         - handler: handleReceipt
       file: ./src/index.ts
