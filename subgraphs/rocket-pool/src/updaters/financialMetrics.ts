@@ -194,9 +194,8 @@ export function updateTotalRevenueMetrics(
     additionalRewards.times(lastPriceUsd)
   );
 
-  if (totalShares.gt(BIGINT_ZERO)) {
-    pool.outputTokenSupply = totalShares;
-  }
+  pool.outputTokenSupply = totalShares;
+
   pool.outputTokenPriceUSD = getOrCreateToken(
     Address.fromString(PROTOCOL_ID),
     block.number
