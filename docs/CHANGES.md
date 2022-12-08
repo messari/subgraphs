@@ -19,6 +19,9 @@ Main PR: [#1265](https://github.com/messari/subgraphs/pull/1265)
 - New transaction entities for `Flashloans` and `Transfers`.
 - Distinguish between `Fees` and `InterestRates`.
 - Added more context to positional data like the `asset` and recording balances in USD at each position snapshot.
+- We added back in the `Event` interface to allow users to see all events in order.
+
+> Note: to support multiple input tokens per market we decided to move away from a `metadata` entity in `Market` and instead add a `relation` field. We made this decision, because the `metadata` field overly catered to the small amount of protocols that have multiple input tokens. We felt the `relation` field was a good in between that made it easier to build subgraphs, allow for the relationship, added more nuance for each field, but adding slightly more complexity for the user.
 
 ## Schema Update 1.3.0
 
