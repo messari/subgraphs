@@ -15,7 +15,6 @@ import {
 } from "../../generated/schema";
 import { getOrCreateToken } from "../entities/token";
 import {
-  BIGINT_ZERO,
   BIGDECIMAL_ZERO,
   ETH_ADDRESS,
   RETH_ADDRESS,

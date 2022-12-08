@@ -27,11 +27,7 @@ import {
   updateProtocolAndPoolTvl,
 } from "../updaters/financialMetrics";
 import { bigIntToBigDecimal } from "../utils/numbers";
-import {
-  BIGDECIMAL_HALF,
-  BIGINT_SIXTEEN,
-  BIGINT_THIRTYTWO,
-} from "../utils/constants";
+import { BIGINT_SIXTEEN, BIGINT_THIRTYTWO } from "../utils/constants";
 
 /**
  * When enough ODAO members votes on a balance and a consensus threshold is reached, the staker beacon chain state is persisted to the smart contracts.
