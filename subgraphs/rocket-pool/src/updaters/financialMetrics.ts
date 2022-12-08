@@ -15,6 +15,7 @@ import {
 } from "../../generated/schema";
 import { getOrCreateToken } from "../entities/token";
 import {
+  BIGINT_ZERO,
   BIGDECIMAL_ZERO,
   ETH_ADDRESS,
   RETH_ADDRESS,
@@ -192,7 +193,10 @@ export function updateTotalRevenueMetrics(
   pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
     additionalRewards.times(lastPriceUsd)
   );
-  pool.outputTokenSupply = totalShares;
+
+  if (totalShares.gt(BIGINT_ZERO)) {
+    pool.outputTokenSupply = totalShares;
+  }
   pool.outputTokenPriceUSD = getOrCreateToken(
     Address.fromString(PROTOCOL_ID),
     block.number
