@@ -259,11 +259,7 @@ function generateStakerBalanceCheckpoints(
 
     const protocolRevenue = bigIntToBigDecimal(
       ethRewardsSincePreviousCheckpoint
-    ).times(
-      BIGDECIMAL_HALF.plus(
-        BIGDECIMAL_HALF.times(bigIntToBigDecimal(averageFeeForActiveMinipools))
-      )
-    );
+    ).times(bigIntToBigDecimal(averageFeeForActiveMinipools));
 
     updateProtocolSideRevenueMetrics(block, protocolRevenue);
     updateSupplySideRevenueMetrics(block);

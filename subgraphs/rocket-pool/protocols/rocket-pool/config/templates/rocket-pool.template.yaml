@@ -6,7 +6,7 @@ dataSources:
     name: rocketTokenRETH
     network: mainnet
     source:
-      address: '0xae78736Cd615f374D3085123A210448E74Fc6393'
+      address: "0xae78736Cd615f374D3085123A210448E74Fc6393"
       abi: rocketTokenRETH
       startBlock: 13325300
     mapping:
@@ -67,7 +67,7 @@ dataSources:
     name: rocketNetworkBalances
     network: mainnet
     source:
-      address: '0x138313f102cE9a0662F826fCA977E3ab4D6e5539'
+      address: "0x138313f102cE9a0662F826fCA977E3ab4D6e5539"
       abi: rocketNetworkBalances
       startBlock: 13325250
     mapping:
@@ -101,7 +101,7 @@ dataSources:
     name: rocketNodeManager
     network: mainnet
     source:
-      address: '0x4477Fbf4Af5b34E49662d9217681a763dDc0a322'
+      address: "0x4477Fbf4Af5b34E49662d9217681a763dDc0a322"
       abi: rocketNodeManager
       startBlock: 13325266
     mapping:
@@ -133,7 +133,7 @@ dataSources:
     name: rocketNodeStaking
     network: mainnet
     source:
-      address: '0x3019227b2b8493e45Bf5d25302139c9a2713BF15'
+      address: "0x3019227b2b8493e45Bf5d25302139c9a2713BF15"
       abi: rocketNodeStaking
       startBlock: 13325267
     mapping:
@@ -166,7 +166,7 @@ dataSources:
     name: rocketRewardsPool
     network: mainnet
     source:
-      address: '0xA3a18348e6E2d3897B6f2671bb8c120e36554802'
+      address: "0xA3a18348e6E2d3897B6f2671bb8c120e36554802"
       abi: rocketRewardsPool
       startBlock: 13325257
     mapping:
@@ -198,7 +198,7 @@ dataSources:
     name: rocketNetworkPrices
     network: mainnet
     source:
-      address: '0xd3f500F550F46e504A4D2153127B47e007e11166'
+      address: "0xd3f500F550F46e504A4D2153127B47e007e11166"
       abi: rocketNetworkPrices
       startBlock: 13325254
     mapping:
@@ -238,7 +238,7 @@ dataSources:
     name: rocketMinipoolManagerV1
     network: mainnet
     source:
-      address: '0xFc1a4a1eaF9e80FA5380ce45d9D12bdF7A81ca18'
+      address: "0xFc1a4a1eaF9e80FA5380ce45d9D12bdF7A81ca18"
       abi: rocketMinipoolManagerV1
       startBlock: 13325242
     mapping:
@@ -273,7 +273,7 @@ dataSources:
     name: rocketMinipoolManagerV2
     network: mainnet
     source:
-      address: '0x6293b8abc1f36afb22406be5f96d893072a8cf3a'
+      address: "0x6293b8abc1f36afb22406be5f96d893072a8cf3a"
       abi: rocketMinipoolManagerV2
       startBlock: 13535419
     mapping:
@@ -308,7 +308,7 @@ dataSources:
     name: rocketMinipoolqueue
     network: mainnet
     source:
-      address: '0x5870dA524635D1310Dc0e6F256Ce331012C9C19E'
+      address: "0x5870dA524635D1310Dc0e6F256Ce331012C9C19E"
       abi: rocketMinipoolqueue
       startBlock: 13325244
     mapping:
@@ -339,7 +339,7 @@ dataSources:
     name: rocketDAONodeTrustedActions
     network: mainnet
     source:
-      address: '0x5b9B2494060138470a2b834f6003c0343a585349'
+      address: "0x5b9B2494060138470a2b834f6003c0343a585349"
       abi: rocketDAONodeTrustedActions
       startBlock: 13325274
     mapping:
