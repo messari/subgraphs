@@ -110,7 +110,10 @@ export const USDC_ERC20_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const EULER_GENERAL_VIEW_ADDRESS = "0x9D2B3052f5A3c156A34FC32cD08E9F5501720ea4";
 export const EULER_GENERAL_VIEW_V2_ADDRESS = "0xACC25c4d40651676FEEd43a3467F3169e3E68e42";
 export const CRYPTEX_MARKET_ID = "0x321c2fe4446c7c963dc41dd58879af648838f98d";
-
+export const EULSTAKES_ADDRESS = "0xc697bb6625d9f7adcf0fbf0cbd4dcf50d8716cd3";
+// EUL token address is the same as EUL market address
+export const EUL_ADDRESS = "0xd9fcd98c322942075a5c3860693e9f4f03aae07b";
+export const EUL_MARKET_ADDRESS = "0xd9fcd98c322942075a5c3860693e9f4f03aae07b";
 export const VIEW_V2_START_BLOCK_NUMBER = BigInt.fromI32(14482429);
 
 ////////////////////////
@@ -169,6 +172,8 @@ export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60)));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const SECONDS_PER_BLOCK = 13;
+export const BLOCKS_PER_DAY = SECONDS_PER_DAY / SECONDS_PER_BLOCK;
 
 ////////////////
 ///// Misc /////
@@ -191,6 +196,7 @@ export const UNDERLYING_RESERVES_FEE = BigDecimal.fromString("0.02").times(DECIM
 // if delta Reverse < delta totalBalances +/- RESERVE_PRECISION
 // consider them equal
 export const RESERVE_PRECISION = BigInt.fromI32(10).pow(9);
+export const EUL_DECIMALS = 1e18;
 
 export const INITIAL_RESERVES = BigInt.fromI32(1e6 as i32);
 export const EXEC_START_BLOCK_NUMBER = BigInt.fromI32(13711556);
@@ -203,3 +209,19 @@ export const MODULEID__EXEC = BigInt.fromI32(5);
 export const MODULEID__RISK_MANAGER = BigInt.fromI32(1000000);
 export const MODULEID__MARKETS = BigInt.fromI32(2);
 export const INITIAL_INTEREST_ACCUMULATOR = BigInt.fromI32(10).pow(27);
+
+// the EulStakes.sol was deployed at block 14975091, or epoch 6
+export const START_EPOCH = 6 as i32;
+export const MAX_EPOCHS = 90;
+export const START_EPOCH_BLOCK = BigInt.fromI32(14930000);
+export const BLOCKS_PER_EPOCH = 100000 as i32;
+export const EUL_DIST = [
+  43231.14, 44800.97, 46564.39, 48541.27, 50752.38, 53219.03, 55962.62, 59004.03, 62362.78, 66056.03, 70097.3, 74494.98,
+  79250.6, 84356.92, 89795.88, 95536.5, 101533.06, 107723.4, 114028.05, 120350.07, 126576.02, 132578.4, 138219.39,
+  143356.23, 147847.72, 151561.68, 154382.67, 156219.3, 157010.35, 156729.02, 155384.87, 153023.12, 149721.46,
+  145584.72, 140738.06, 135319.35, 129471.49, 123335.4, 117044.06, 110718, 104462.21, 98364.54, 92495.32, 86907.93,
+  81640.16, 76715.96, 72147.47, 67937.09, 64079.46, 60563.32, 57373.05, 54490.13, 51894.21, 49564.05, 47478.22,
+  45615.66, 43956.02, 42480, 41169.47, 40007.56, 38978.76, 38068.84, 37264.86, 36555.12, 35929.04, 35377.14, 34890.91,
+  34462.77, 34085.94, 33754.42, 33462.85, 33206.5, 32981.18, 32783.18, 32609.22, 32456.41, 32322.2, 32204.35, 32100.87,
+  32010.02, 31930.27, 31860.26, 31798.82, 31744.89, 31697.56, 31656.03, 31619.58, 31587.6, 31559.53, 17864.18,
+];

@@ -6,7 +6,7 @@ Lending protocols are the life-blood of Decentralized Finance (DeFi) and provide
 
 Euler follows in the footsteps of lending protocols like AAVE and Compound but focuses on the permissionless aspect i.e. it allows users to create their own markets for any Ethereum ERC20 token. This blog from the Euler team provides much more detailed info on the benefits provided by Euler — [https://blog.euler.finance/introducing-euler-8f4422f13848](https://blog.euler.finance/introducing-euler-8f4422f13848).
 
-## Calculation Methodology v1.1.0
+## Calculation Methodology v1.2.0
 
 ### Total Value Locked (TVL) USD
 
@@ -50,11 +50,18 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Liquidations`
 
-`Repayments`
+`Repays`
 
 ### Reward Token Emissions Amount
 
-Not applicable to Euler Finance
+Euler Finance distributes EUL tokens by epoch (=every 100,000 blocks) to borrowers in the top 10 voted markets. Users vote for a market by staking their EUL for the underlying in [the EulStakes contract](https://etherscan.io/address/0xc697BB6625D9f7AdcF0fbf0cbd4DcF50D8716cd3#code). The total amount of EUL distributed in each epoch is [pre-determined](https://docs.euler.finance/eul/distribution-1#eul-per-epoch). The amount of distribution the top 10 staked markets receives is proportional to square root of sum time weighted EUL amount staked for the market .
+
+#### Epoch 6 - 17
+
+1. At the start of a new epoch, cumulate EUL amount users staked for each market weighted by number of blocks (approximating time) the EUL is staked;
+2. When the epoch ends, rank markets by total weighted EUL amount staked and select top 10 markets to receive EUL emission;
+3. Distribute the total EUL amount for the epoch among the top 10 markets proportional to square root of block weighted EUL amount staked;
+4. If epoch > 96, exit, else go back to 1.
 
 ### Protocol Controlled Value
 
