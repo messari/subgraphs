@@ -500,7 +500,7 @@ export function handleDogFile(event: DogFileChopEvent): void {
     }
     const chop = event.params.data;
     const liquidationPenalty = bigIntToBDUseDecimals(chop, RAY).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
-    if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
+    if (liquidationPenalty.ge(BIGDECIMAL_ZERO)) {
       market.liquidationPenalty = liquidationPenalty;
       market.save();
     }
