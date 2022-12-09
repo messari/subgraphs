@@ -194,6 +194,7 @@ export function updateTotalRevenueMetrics(
   );
 
   pool.outputTokenSupply = totalShares;
+  pool.stakedOutputTokenAmount = totalShares;
 
   pool.outputTokenPriceUSD = getOrCreateToken(
     Address.fromString(PROTOCOL_ID),
