@@ -7,7 +7,7 @@ import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault
 export function getPricePerShare(vaultAddress: Address): BigDecimal {
   const vaultContract = VaultContract.bind(vaultAddress);
 
-  let pricePerShare = utils
+  const pricePerShare = utils
     .readValue<BigInt>(
       vaultContract.try_getPricePerFullShare(),
       constants.BIGINT_ZERO
@@ -28,11 +28,11 @@ export function getPriceOfOutputTokens(
     constants.NULL.TYPE_ADDRESS
   );
 
-  let virtualPrice = getPriceUsdcRecommended(tokenAddress);
-  let vaultTokenDecimals = utils.getTokenDecimals(vaultAddress);
+  const virtualPrice = getPriceUsdcRecommended(tokenAddress);
+  const vaultTokenDecimals = utils.getTokenDecimals(vaultAddress);
   const pricePerShare = getPricePerShare(vaultAddress);
 
-  let price = pricePerShare
+  const price = pricePerShare
     .times(amount.toBigDecimal())
     .div(vaultTokenDecimals)
     .div(vaultTokenDecimals)

@@ -16,8 +16,8 @@ export function handleUnlockScheduleSet(event: UnlockScheduleSet): void {
   const vault = getOrCreateVault(vaultAddress, event.block);
 
   if (vault._bribesProcessor != constants.NULL.TYPE_STRING) {
-    let rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
-    let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+    const rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
+    const rewardTokenDecimals = constants.BIGINT_TEN.pow(
       rewardToken.decimals as u8
     ).toBigDecimal();
 

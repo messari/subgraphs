@@ -32,8 +32,8 @@ export function handleHarvest(event: Harvest): void {
 
   if (vaultAddress.equals(constants.BDIGG_VAULT_ADDRESS)) return;
 
-  let wantToken = utils.getStrategyWantToken(strategyAddress, event.block);
-  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+  const wantToken = utils.getStrategyWantToken(strategyAddress, event.block);
+  const wantTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
   ).toBigDecimal();
 
@@ -70,8 +70,8 @@ export function handleFarmHarvest(event: FarmHarvest): void {
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let rewardToken = utils.getStrategyFarmToken(strategyAddress, event.block);
-  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+  const rewardToken = utils.getStrategyFarmToken(strategyAddress, event.block);
+  const rewardTokenDecimals = constants.BIGINT_TEN.pow(
     rewardToken.decimals as u8
   ).toBigDecimal();
 
@@ -111,8 +111,11 @@ export function handleDiggHarvest(event: DiggHarvestState): void {
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let rewardToken = getOrCreateToken(constants.DIGG_TOKEN_ADDRESS, event.block);
-  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+  const rewardToken = getOrCreateToken(
+    constants.DIGG_TOKEN_ADDRESS,
+    event.block
+  );
+  const rewardTokenDecimals = constants.BIGINT_TEN.pow(
     rewardToken.decimals as u8
   ).toBigDecimal();
 
@@ -148,8 +151,11 @@ export function handleHarvestState(event: HarvestState): void {
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let rewardToken = utils.getStrategyXSushiToken(strategyAddress, event.block);
-  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+  const rewardToken = utils.getStrategyXSushiToken(
+    strategyAddress,
+    event.block
+  );
+  const rewardTokenDecimals = constants.BIGINT_TEN.pow(
     rewardToken.decimals as u8
   ).toBigDecimal();
 
@@ -191,8 +197,8 @@ export function handleCurveHarvest(event: CurveHarvest): void {
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let wantToken = getOrCreateToken(constants.CRV_DAO_TOKEN, event.block);
-  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+  const wantToken = getOrCreateToken(constants.CRV_DAO_TOKEN, event.block);
+  const rewardTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
   ).toBigDecimal();
 
@@ -229,7 +235,7 @@ export function handleSetWithdrawalFee(event: SetWithdrawalFee): void {
   const strategyAddress = event.address;
   const vaultAddress = utils.getVaultAddressFromContext();
 
-  let withdrawalFees = utils.getVaultWithdrawalFees(
+  const withdrawalFees = utils.getVaultWithdrawalFees(
     vaultAddress,
     strategyAddress
   );
@@ -253,7 +259,7 @@ export function handleSetBribesProcessor(call: SetBribesProcessorCall): void {
   vault._bribesProcessor = bribesProcessor.toHexString();
   vault.save();
 
-  let context = new DataSourceContext();
+  const context = new DataSourceContext();
   context.setString("vaultAddress", vaultAddress.toHexString());
   BribesProcessorTemplate.createWithContext(bribesProcessor, context);
 
@@ -278,8 +284,8 @@ export function handlePerformanceFeeGovernance(
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let wantToken = getOrCreateToken(tokenAddress, event.block);
-  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+  const wantToken = getOrCreateToken(tokenAddress, event.block);
+  const wantTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
   ).toBigDecimal();
 
@@ -312,7 +318,7 @@ export function handleSetPerformanceFeeGovernance(
   const strategyAddress = event.address;
   const vaultAddress = utils.getVaultAddressFromContext();
 
-  let performanceFees = utils.getVaultPerformanceFees(
+  const performanceFees = utils.getVaultPerformanceFees(
     vaultAddress,
     strategyAddress
   );
@@ -339,8 +345,8 @@ export function handlePerformanceFeeStrategist(
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let wantToken = getOrCreateToken(tokenAddress, event.block);
-  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+  const wantToken = getOrCreateToken(tokenAddress, event.block);
+  const wantTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
   ).toBigDecimal();
 
@@ -373,7 +379,7 @@ export function handleSetPerformanceFeeStrategist(
   const strategyAddress = event.address;
   const vaultAddress = utils.getVaultAddressFromContext();
 
-  let performanceFees = utils.getVaultPerformanceFees(
+  const performanceFees = utils.getVaultPerformanceFees(
     vaultAddress,
     strategyAddress
   );
@@ -397,8 +403,8 @@ export function handleTreeDistribution(event: TreeDistribution): void {
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
-  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+  const rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
+  const rewardTokenDecimals = constants.BIGINT_TEN.pow(
     rewardToken.decimals as u8
   ).toBigDecimal();
 

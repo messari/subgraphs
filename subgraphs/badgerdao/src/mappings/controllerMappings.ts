@@ -47,7 +47,7 @@ export function handleSetStrategy(call: SetStrategyCall): void {
   vault._strategy = strategyAddress.toHexString();
   vault.save();
 
-  let context = new DataSourceContext();
+  const context = new DataSourceContext();
   context.setString("vaultAddress", vaultAddress.toHexString());
   StrategyTemplate.createWithContext(strategyAddress, context);
 

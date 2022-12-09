@@ -13,14 +13,14 @@ import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
 export function handleBribeEmission(event: BribeEmission): void {
   const tokenAddress = event.params.token;
   const bribeEmissionAmount = event.params.amount;
-  
+
   if (bribeEmissionAmount.equals(constants.BIGINT_ZERO)) return;
-  
+
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let wantToken = getOrCreateToken(tokenAddress, event.block);
-  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+  const wantToken = getOrCreateToken(tokenAddress, event.block);
+  const wantTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
   ).toBigDecimal();
 
@@ -58,8 +58,8 @@ export function handlePerformanceFeeGovernance(
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let wantToken = getOrCreateToken(tokenAddress, event.block);
-  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+  const wantToken = getOrCreateToken(tokenAddress, event.block);
+  const wantTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
   ).toBigDecimal();
 
@@ -97,8 +97,8 @@ export function handleSentBribeToGovernance(
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let wantToken = getOrCreateToken(tokenAddress, event.block);
-  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+  const wantToken = getOrCreateToken(tokenAddress, event.block);
+  const wantTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
   ).toBigDecimal();
 
@@ -133,8 +133,8 @@ export function handleSentBribeToTree(event: SentBribeToTree): void {
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
-  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+  const rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
+  const rewardTokenDecimals = constants.BIGINT_TEN.pow(
     rewardToken.decimals as u8
   ).toBigDecimal();
 

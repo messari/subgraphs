@@ -13,14 +13,14 @@ export function updateRewardTokenInfo(
   rewardRate: BigInt,
   block: ethereum.Block
 ): void {
-  let rewardRatePerDay = getRewardsPerDay(
+  const rewardRatePerDay = getRewardsPerDay(
     block.timestamp,
     block.number,
     rewardRate.toBigDecimal(),
     constants.RewardIntervalType.TIMESTAMP
   );
 
-  let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
+  const rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
 
   updateRewardTokenEmissions(
     vault,
@@ -48,7 +48,7 @@ export function updateRewardTokenEmissions(
     vault.rewardTokens = [];
   }
 
-  let rewardTokens = vault.rewardTokens!;
+  const rewardTokens = vault.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
     vault.rewardTokens = rewardTokens.sort();
@@ -59,12 +59,12 @@ export function updateRewardTokenEmissions(
   if (!vault.rewardTokenEmissionsAmount) {
     vault.rewardTokenEmissionsAmount = [];
   }
-  let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
+  const rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
 
   if (!vault.rewardTokenEmissionsUSD) {
     vault.rewardTokenEmissionsUSD = [];
   }
-  let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
+  const rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
 
   const token = getOrCreateToken(rewardTokenAddress, block);
 

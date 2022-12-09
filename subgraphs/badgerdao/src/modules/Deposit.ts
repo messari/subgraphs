@@ -30,7 +30,7 @@ export function createDepositTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): DepositTransaction {
-  let transactionId = "deposit-" + transaction.hash.toHexString();
+  const transactionId = "deposit-" + transaction.hash.toHexString();
 
   let depositTransaction = DepositTransaction.load(transactionId);
 
@@ -87,7 +87,7 @@ export function Deposit(
 
   // calculate deposit amount for depositAll event
   if (depositAmount.equals(constants.BIGINT_NEGATIVE_ONE)) {
-    let totalSupply = utils.readValue<BigInt>(
+    const totalSupply = utils.readValue<BigInt>(
       vaultContract.try_totalSupply(),
       constants.BIGINT_ZERO
     );
@@ -96,18 +96,20 @@ export function Deposit(
   }
 
   // calculate shares minted as per the deposit function in vault contract address
-  let sharesMinted = vault.outputTokenSupply!.isZero()
+  const sharesMinted = vault.outputTokenSupply!.isZero()
     ? depositAmount
     : depositAmount
         .times(vault.outputTokenSupply!)
         .div(vault.inputTokenBalance);
 
-  let inputToken = Token.load(vault.inputToken);
-  let inputTokenAddress = Address.fromString(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
+  const inputToken = Token.load(vault.inputToken);
+  const inputTokenAddress = Address.fromString(vault.inputToken);
+  const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  const inputTokenDecimals = constants.BIGINT_TEN.pow(
+    inputToken!.decimals as u8
+  );
 
-  let depositAmountUSD = depositAmount
+  const depositAmountUSD = depositAmount
     .toBigDecimal()
     .div(inputTokenDecimals.toBigDecimal())
     .times(inputTokenPrice.usdPrice)

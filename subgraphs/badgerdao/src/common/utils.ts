@@ -40,7 +40,7 @@ export function readValue<T>(
 
 export function getTokenDecimals(tokenAddr: Address): BigDecimal {
   const token = ERC20.bind(tokenAddr);
-  let decimals = readValue<i32>(token.try_decimals(), 18);
+  const decimals = readValue<i32>(token.try_decimals(), 18);
 
   return constants.BIGINT_TEN.pow(decimals as u8).toBigDecimal();
 }
@@ -157,7 +157,7 @@ export function getBribesProcessor(
   }
 
   if (bribesProcessor.notEqual(constants.NULL.TYPE_ADDRESS)) {
-    let context = new DataSourceContext();
+    const context = new DataSourceContext();
     context.setString("vaultAddress", vaultAddress.toHexString());
     BribesProcessorTemplate.createWithContext(bribesProcessor, context);
 
@@ -213,7 +213,7 @@ export function getVaultWithdrawalFees(
     );
   }
 
-  let withdrawalFees = getOrCreateVaultFee(
+  const withdrawalFees = getOrCreateVaultFee(
     enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE).concat(
       vaultAddress.toHexString()
     ),
@@ -260,7 +260,7 @@ export function getVaultPerformanceFees(
     );
   }
 
-  let performanceFees = getOrCreateVaultFee(
+  const performanceFees = getOrCreateVaultFee(
     enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE).concat(
       vaultAddress.toHexString()
     ),
@@ -278,9 +278,12 @@ export function getVaultFees(
   vaultAddress: Address,
   strategyAddress: Address
 ): PoolFeesType {
-  let withdrawalFees = getVaultWithdrawalFees(vaultAddress, strategyAddress);
+  const withdrawalFees = getVaultWithdrawalFees(vaultAddress, strategyAddress);
 
-  let performanceFees = getVaultPerformanceFees(vaultAddress, strategyAddress);
+  const performanceFees = getVaultPerformanceFees(
+    vaultAddress,
+    strategyAddress
+  );
 
   return new PoolFeesType(withdrawalFees, performanceFees);
 }
@@ -300,7 +303,7 @@ export function deactivateFinishedRewards(
   if (unlockSchedulesArray.reverted) return;
 
   for (let i = 0; i < unlockSchedulesArray.value.length; i++) {
-    let unlockSchedule = unlockSchedulesArray.value[i];
+    const unlockSchedule = unlockSchedulesArray.value[i];
 
     if (unlockSchedule.end.lt(block.timestamp)) {
       updateRewardTokenInfo(
@@ -333,7 +336,7 @@ export function updateProtocolTotalValueLockedUSD(): void {
 export function updateProtocolAfterNewVault(vaultAddress: Address): void {
   const protocol = getOrCreateYieldAggregator();
 
-  let vaultIds = protocol._vaultIds;
+  const vaultIds = protocol._vaultIds;
   vaultIds.push(vaultAddress.toHexString());
   protocol._vaultIds = vaultIds;
 

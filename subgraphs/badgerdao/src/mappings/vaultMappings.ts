@@ -36,8 +36,8 @@ export function handlePerformanceFeeGovernance(
 
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let wantToken = getOrCreateToken(tokenAddress, event.block);
-  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+  const wantToken = getOrCreateToken(tokenAddress, event.block);
+  const wantTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
   ).toBigDecimal();
 
@@ -75,8 +75,8 @@ export function handlePerformanceFeeStrategist(
 
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let wantToken = getOrCreateToken(tokenAddress, event.block);
-  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+  const wantToken = getOrCreateToken(tokenAddress, event.block);
+  const wantTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
   ).toBigDecimal();
 
@@ -110,8 +110,8 @@ export function handleTreeDistribution(event: TreeDistribution): void {
 
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
-  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+  const rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
+  const rewardTokenDecimals = constants.BIGINT_TEN.pow(
     rewardToken.decimals as u8
   ).toBigDecimal();
 
@@ -145,8 +145,8 @@ export function handleWithdrawalFee(event: WithdrawalFee): void {
 
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let wantToken = getOrCreateToken(wantTokenAddress, event.block);
-  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+  const wantToken = getOrCreateToken(wantTokenAddress, event.block);
+  const wantTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
   ).toBigDecimal();
 
@@ -182,8 +182,8 @@ export function handleHarvested(event: Harvested): void {
   const vaultAddress = event.address;
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  let harvestedToken = getOrCreateToken(harvestTokenAddress, event.block);
-  let harvestedTokenDecimals = constants.BIGINT_TEN.pow(
+  const harvestedToken = getOrCreateToken(harvestTokenAddress, event.block);
+  const harvestedTokenDecimals = constants.BIGINT_TEN.pow(
     harvestedToken.decimals as u8
   ).toBigDecimal();
 
