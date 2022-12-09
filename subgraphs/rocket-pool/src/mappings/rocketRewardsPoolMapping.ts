@@ -94,7 +94,9 @@ export function handleRPLTokensClaimed(event: RPLTokensClaimed): void {
           activeIndexedRewardInterval.intervalStartTime
         );
       if (
-        activeIndexedRewardInterval.intervalDurationActual < BigInt.fromI32(0)
+        activeIndexedRewardInterval.intervalDurationActual!.lt(
+          BigInt.fromI32(0)
+        )
       ) {
         activeIndexedRewardInterval.intervalDurationActual =
           activeIndexedRewardInterval.intervalDuration;
