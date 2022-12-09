@@ -2,3 +2,4 @@ import { clearAllThreads, clearChannel, deleteSingleMessage, getAllThreadsToClea
 import 'dotenv/config'
 
 getAllThreadsToClear(Date.now(), process.env.CHANNEL_ID);
+clearChannel(process.env.PROD_CHANNEL)

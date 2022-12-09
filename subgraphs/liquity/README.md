@@ -60,7 +60,21 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-To be added
+Liquity issues LQTY rewards in 3 different ways:
+
+- Issued to Stability Pool depositors proportionally to their amount deposited.
+- Issued to frontend providers based on the usage they get
+- LP to LUSD:ETH in Uniswap
+
+We are currently tracking the ones issued to Stability Pool depositors only.
+
+These rewards have a yearly halving emission curve. They halve every 1 year, and are recalculated every 1 minute.
+A total of 32M LQTY is allocated to Stability Pool rewards.
+
+More on that here: https://github.com/liquity/dev#lqty-issuance-to-stability-providers
+
+The way these rewards are tracked in the subgraph is by using the same formula than the contracts and the same inputs,
+instead of tracking the actual LQTY transfers or claims. Since the subgraph contains daily emission amounts, we calculate them by storing in each snapshot the amount that will be emitted in the 24 hours since the snapshot is taken.
 
 ### Protocol Controlled Value
 
