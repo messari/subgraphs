@@ -264,7 +264,33 @@ export function updatePrices(execProxyAddress: Address, market: Market, event: e
     dToken.save();
   }
 
+  // update market.rewardTokenEmissionUSD when updating EUL price
+  if (market.inputToken == EUL_ADDRESS) {
+    updateRewardEmissionsUSD(underlyingPriceUSD);
+  }
+
   return underlyingPriceUSD;
+}
+
+function updateRewardEmissionsUSD(underlyingPriceUSD: BigDecimal): void {
+  const protocol = getOrCreateLendingProtocol();
+  for (let i = 0; i < protocol._marketIDs!.length; i++) {
+    const mktID = protocol._marketIDs![i];
+    const mkt = Market.load(mktID);
+    if (
+      !mkt ||
+      !mkt.rewardTokenEmissionsAmount ||
+      mkt.rewardTokenEmissionsAmount!.length == 0 ||
+      mkt.rewardTokenEmissionsAmount![0].equals(BIGINT_ZERO)
+    ) {
+      log.info("[updateRewardEmissionsUSD]Skip upating reward emissions for market {}", [mktID]);
+      continue;
+    }
+    const rewardTokenEmissionUSD = mkt
+      .rewardTokenEmissionsAmount![0].divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
+      .times(underlyingPriceUSD);
+    mkt.rewardTokenEmissionsUSD = [rewardTokenEmissionUSD];
+  }
 }
 
 export function updateInterestRates(
