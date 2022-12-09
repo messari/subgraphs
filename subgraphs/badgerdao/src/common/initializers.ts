@@ -376,15 +376,11 @@ export function getOrCreateVault(
     vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
+    const controllerAddress = utils.getControllerAddress(vaultAddress);
     const strategyAddress = utils.getVaultStrategy(
       vaultAddress,
       inputTokenAddress
     );
-    const bribesAddress = utils.getBribesProcessor(
-      vaultAddress,
-      strategyAddress
-    );
-
     if (strategyAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
       let context = new DataSourceContext();
       context.setString("vaultAddress", vaultAddress.toHexString());
@@ -392,10 +388,16 @@ export function getOrCreateVault(
       StrategyTemplate.createWithContext(strategyAddress, context);
     }
 
+    const bribesAddress = utils.getBribesProcessor(
+      vaultAddress,
+      strategyAddress
+    );
+
     vault.fees = utils.getVaultFees(vaultAddress, strategyAddress).stringIds();
     vault._lastRewardsBlockNumber = block.number;
 
     vault._bribesProcessor = bribesAddress.toHexString();
+    vault._controller = controllerAddress.toHexString();
     vault._strategy = strategyAddress.toHexString();
 
     vault.save();

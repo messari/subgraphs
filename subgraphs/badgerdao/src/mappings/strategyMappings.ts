@@ -9,15 +9,17 @@ import {
   HarvestState,
   CurveHarvest,
   TreeDistribution,
+  SetBribesProcessorCall,
   PerformanceFeeStrategist,
   PerformanceFeeGovernance,
   HarvestState1 as DiggHarvestState,
 } from "../../generated/templates/Strategy/Strategy";
 import * as utils from "../common/utils";
-import { log } from "@graphprotocol/graph-ts";
+import { DataSourceContext, log } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
+import { BribesProcessor as BribesProcessorTemplate } from "../../generated/templates";
 
 export function handleHarvest(event: Harvest): void {
   const strategyAddress = event.address;
@@ -239,6 +241,28 @@ export function handleSetWithdrawalFee(event: SetWithdrawalFee): void {
       strategyAddress.toHexString(),
       withdrawalFees.feePercentage!.toString(),
       event.transaction.hash.toHexString(),
+    ]
+  );
+}
+
+export function handleSetBribesProcessor(call: SetBribesProcessorCall): void {
+  const bribesProcessor = call.inputs.newBribesProcessor;
+  const vaultAddress = utils.getVaultAddressFromContext();
+  const vault = getOrCreateVault(vaultAddress, call.block);
+
+  vault._bribesProcessor = bribesProcessor.toHexString();
+  vault.save();
+
+  let context = new DataSourceContext();
+  context.setString("vaultAddress", vaultAddress.toHexString());
+  BribesProcessorTemplate.createWithContext(bribesProcessor, context);
+
+  log.warning(
+    "[Strategy:NewBribesProcessor] Vault: {}, BribesProcessor: {}, TxnHash: {}",
+    [
+      vaultAddress.toHexString(),
+      bribesProcessor.toHexString(),
+      call.transaction.hash.toHexString(),
     ]
   );
 }

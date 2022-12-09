@@ -1,5 +1,18 @@
 [
   {
+    "inputs": [
+      {
+        "internalType": "contract IBribesProcessor",
+        "name": "newBribesProcessor",
+        "type": "address"
+      }
+    ],
+    "name": "setBribesProcessor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {

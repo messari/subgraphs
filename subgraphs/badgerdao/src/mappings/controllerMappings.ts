@@ -43,6 +43,7 @@ export function handleSetStrategy(call: SetStrategyCall): void {
   const bribesAddress = utils.getBribesProcessor(vaultAddress, strategyAddress);
 
   vault._bribesProcessor = bribesAddress.toHexString();
+  vault._controller = controllerAddress.toHexString();
   vault._strategy = strategyAddress.toHexString();
   vault.save();
 

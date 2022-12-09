@@ -13,13 +13,16 @@ import {
   getOrCreateWantToken,
   getOrCreateYieldAggregator,
 } from "./initializers";
+import {
+  Controller as ControllerTemplate,
+  BribesProcessor as BribesProcessorTemplate,
+} from "../../generated/templates";
 import { PoolFeesType } from "./types";
 import * as constants from "./constants";
 import { updateRewardTokenInfo } from "../modules/Rewards";
 import { ERC20 } from "../../generated/templates/Strategy/ERC20";
 import { Token, Vault as VaultStore, VaultFee } from "../../generated/schema";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
-import { BribesProcessor as BribesProcessorTemplate } from "../../generated/templates";
 import { Strategy as StrategyContract } from "../../generated/templates/Strategy/Strategy";
 import { Controller as ControllerContract } from "../../generated/templates/Strategy/Controller";
 import { RewardsLogger as RewardsLoggerContract } from "../../generated/templates/Strategy/RewardsLogger";
@@ -169,6 +172,20 @@ export function getBribesProcessor(
   }
 
   return bribesProcessor;
+}
+
+export function getControllerAddress(vaultAddress: Address): Address {
+  const vaultContract = VaultContract.bind(vaultAddress);
+
+  const controllerAddress = readValue<Address>(
+    vaultContract.try_controller(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  if (controllerAddress.notEqual(constants.NULL.TYPE_ADDRESS))
+    ControllerTemplate.create(controllerAddress);
+
+  return controllerAddress;
 }
 
 export function getVaultAddressFromContext(): Address {
