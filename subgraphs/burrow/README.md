@@ -58,6 +58,14 @@ For example to create a farm for 30 days and distribute 1000 tokens per day, the
 
 Once the remaining_rewards becomes equal to 0, the farm stops distributing this reward.
 
+## Note
+
+1. Token amounts are expressed in factors of 10^decimals + extra_decimals. Example: for BTC with decimals (8) and extraDecimals (18) if the amount is 43581280584419596 => the actual token amount would be 43581280584419596/(10\*\*(8+10)) = 0.043
+
+2. Since contract calls are not [yet] enabled for NEAR subgraphs, we have stored token metadata under `utils/const.ts`. Though it covers all tokens that currently exists on NEAR, in case of a new market being added - the metadata needs to be added and redeployed.
+
+3. NEAR has upgradable contracts, so function calls and events may change in the future.
+
 ## Reference and Useful Links
 
 Protocol: https://app.burrow.cash/
