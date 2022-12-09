@@ -161,6 +161,10 @@ export function handleLiquidate(event: EventData): void {
   let collateralLiquidated = BD_ZERO;
   let totalRepaidAmount = BD_ZERO;
   let collateralPointer = 0;
+  if (token_out.length == 0) {
+    log.warning("No collateral token found in liquidation", []);
+    return;
+  }
   const collateralToken = getOrCreateToken(token_out[collateralPointer]);
   collateralLiquidated = collateralLiquidated.plus(
     BigDecimal.fromString(token_out_amount[collateralPointer])
@@ -194,7 +198,7 @@ export function handleLiquidate(event: EventData): void {
       .concat(PositionSide.BORROWER);
     const repaidCounter = _PositionCounter.load(repaidCounterID);
     if (!repaidCounter) {
-      log.warning("[subtractPosition] position counter {} not found", [
+      log.warning("Borrowing position counter {} not found in liquidation", [
         repaidCounterID,
       ]);
       return;
@@ -206,7 +210,33 @@ export function handleLiquidate(event: EventData): void {
       receipt,
       repaidCounter.nextCount
     );
+
+    // lending position the liquidator repaid from
+    const liquidatorPositionId = liquidator.id
+      .concat("-")
+      .concat(repaidMarket.id)
+      .concat("-")
+      .concat(PositionSide.LENDER);
+    const liquidatorPositionCounter =
+      _PositionCounter.load(liquidatorPositionId);
+    if (!liquidatorPositionCounter) {
+      log.warning("Lending position counter {} not found in liquidation", [
+        liquidatorPositionId,
+      ]);
+      return;
+    }
+    const liquidatorPosition = getOrCreatePosition(
+      liquidator,
+      repaidMarket,
+      PositionSide.LENDER,
+      receipt,
+      liquidatorPositionCounter.nextCount
+    );
+
     repaidPosition.balance = repaidPosition.balance.minus(
+      BigInt.fromString(token_in_amount[i])
+    );
+    liquidatorPosition.balance = liquidatorPosition.balance.minus(
       BigInt.fromString(token_in_amount[i])
     );
     if (repaidPosition.balance.lt(BI_ZERO)) {
@@ -250,7 +280,10 @@ export function handleLiquidate(event: EventData): void {
     liq.position = repaidPosition.id;
 
     const collateral = getOrCreateMarket(token_out[collateralPointer]);
-    if (totalRepaidAmount.gt(collateralLiquidated)) {
+    if (
+      totalRepaidAmount.gt(collateralLiquidated) &&
+      token_out.length > collateralPointer
+    ) {
       collateralPointer += 1;
       const collateralToken = getOrCreateToken(token_out[collateralPointer]);
       collateralLiquidated = collateralLiquidated.plus(
@@ -268,6 +301,8 @@ export function handleLiquidate(event: EventData): void {
     liq.asset = collateral.id;
 
     liq.save();
+    liquidatorPosition.save();
+    liquidatorPositionCounter.save();
     repaidCounter.save();
     repaidPosition.save();
     dailySnapshot.save();
@@ -284,7 +319,7 @@ export function handleLiquidate(event: EventData): void {
       .concat(PositionSide.LENDER);
     const collateralCounter = _PositionCounter.load(collateralCounterID);
     if (!collateralCounter) {
-      log.warning("[subtractPosition] position counter {} not found", [
+      log.warning("Lender position counter {} not found in liquidation", [
         collateralCounterID,
       ]);
       return;
@@ -297,9 +332,40 @@ export function handleLiquidate(event: EventData): void {
       collateralCounter.nextCount
     );
 
+    // collateral position for liquidator
+    const liquidatorCollateralCounterID = liquidator.id
+      .concat("-")
+      .concat(collateralMarket.id)
+      .concat("-")
+      .concat(PositionSide.LENDER);
+
+    let liquidatorCollateralCounter = _PositionCounter.load(
+      liquidatorCollateralCounterID
+    );
+
+    if (!liquidatorCollateralCounter) {
+      // create new counter
+      liquidatorCollateralCounter = new _PositionCounter(
+        liquidatorCollateralCounterID
+      );
+      liquidatorCollateralCounter.nextCount = 0;
+    }
+
+    const liquidatorCollateralPosition = getOrCreatePosition(
+      liquidator,
+      collateralMarket,
+      PositionSide.LENDER,
+      receipt,
+      liquidatorCollateralCounter.nextCount
+    );
+
     collateralPosition.balance = collateralPosition.balance.minus(
       BigInt.fromString(token_out_amount[i])
     );
+    liquidatorCollateralPosition.balance =
+      liquidatorCollateralPosition.balance.plus(
+        BigInt.fromString(token_out_amount[i])
+      );
     if (collateralPosition.balance.lt(BI_ZERO)) {
       collateralPosition.balance = BI_ZERO;
       collateralPosition.hashClosed = receipt.receipt.id.toBase58();
@@ -315,6 +381,9 @@ export function handleLiquidate(event: EventData): void {
       collateralMarket.closedPositionCount += 1;
       liquidatee.openPositionCount -= 1;
     }
+
+    liquidatorCollateralPosition.save();
+    liquidatorCollateralCounter.save();
     collateralCounter.save();
     collateralPosition.save();
     collateralMarket.save();
@@ -393,7 +462,7 @@ export function handleForceClose(event: EventData): void {
   }
   protocol.save();
 
-  // let all position of liquidatee
+  // all position of liquidatee
   const markets = protocol._marketIds;
   for (let i = 0; i < markets.length; i++) {
     const market = getOrCreateMarket(markets[i]);

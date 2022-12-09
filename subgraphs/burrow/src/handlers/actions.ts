@@ -70,16 +70,6 @@ export function handleDeposit(event: EventData): void {
   const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
 
   const account = getOrCreateAccount(account_id);
-  // update account
-  if (account.positionCount == 0) {
-    usageDailySnapshot.dailyActiveDepositors += 1;
-    protocol.cumulativeUniqueUsers += 1;
-  }
-  if (account.depositCount == 0) {
-    protocol.cumulativeUniqueDepositors += 1;
-  }
-  account.depositCount += 1;
-
   const counterID = account.id
     .concat("-")
     .concat(market.id)
@@ -128,6 +118,7 @@ export function handleDeposit(event: EventData): void {
       .concat(NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString())
   );
   if (dailyActiveAccount == null) {
+    usageDailySnapshot.dailyActiveDepositors += 1;
     usageDailySnapshot.dailyActiveUsers += 1;
   }
   if (hourlyActiveAccount == null) {
@@ -140,6 +131,13 @@ export function handleDeposit(event: EventData): void {
 
   position.depositCount += 1;
   position.balance = position.balance.plus(deposit.amount);
+
+  // update account
+  if (account.depositCount == 0) {
+    protocol.cumulativeUniqueDepositors += 1;
+    protocol.cumulativeUniqueUsers += 1;
+  }
+  account.depositCount += 1;
 
   // deposit amount
   market.outputTokenSupply = market.outputTokenSupply.plus(
@@ -247,7 +245,7 @@ export function handleWithdraw(event: EventData): void {
     .concat(PositionSide.LENDER);
   const positionCounter = _PositionCounter.load(counterID);
   if (!positionCounter) {
-    log.warning("[subtractPosition] position counter {} not found", [
+    log.warning("Lending position counter {} not found in withdraw", [
       counterID,
     ]);
     return;
@@ -407,9 +405,8 @@ export function handleBorrow(event: EventData): void {
   const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
   const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
   const account = getOrCreateAccount(account_id.toString());
-  if (account.positionCount == 0) {
-    usageDailySnapshot.dailyActiveBorrowers += 1;
-  }
+
+  // borrow position
   const counterID = account.id
     .concat("-")
     .concat(market.id)
@@ -427,6 +424,29 @@ export function handleBorrow(event: EventData): void {
     PositionSide.BORROWER,
     receipt,
     positionCounter.nextCount
+  );
+
+  /**
+   * lending position
+   * @dev borrowed amount is deposited to lending position: it needs to be withdrawn to wallet to use
+   */
+  const lendingCounterID = account.id
+    .concat("-")
+    .concat(market.id)
+    .concat("-")
+    .concat(PositionSide.LENDER);
+  let lendingPositionCounter = _PositionCounter.load(lendingCounterID);
+  if (!lendingPositionCounter) {
+    lendingPositionCounter = new _PositionCounter(lendingCounterID);
+    lendingPositionCounter.nextCount = 0;
+    account.positionCount += 1;
+  }
+  const lendingPosition = getOrCreatePosition(
+    account,
+    market,
+    PositionSide.LENDER,
+    receipt,
+    lendingPositionCounter.nextCount
   );
 
   const token = getOrCreateToken(token_id.toString());
@@ -458,6 +478,7 @@ export function handleBorrow(event: EventData): void {
   );
   if (dailyActiveAccount == null) {
     usageDailySnapshot.dailyActiveUsers += 1;
+    usageDailySnapshot.dailyActiveBorrowers += 1;
   }
   if (hourlyActiveAccount == null) {
     usageHourlySnapshot.hourlyActiveUsers += 1;
@@ -468,6 +489,7 @@ export function handleBorrow(event: EventData): void {
   usageHourlySnapshot.hourlyTransactionCount += 1;
 
   position.balance = position.balance.plus(borrow.amount);
+  lendingPosition.balance = lendingPosition.balance.plus(borrow.amount);
 
   if (account.borrowCount == 0) {
     protocol.cumulativeUniqueBorrowers += 1;
@@ -514,7 +536,9 @@ export function handleBorrow(event: EventData): void {
     receipt
   );
 
+  lendingPosition.save();
   positionCounter.save();
+  lendingPositionCounter.save();
   positionSnapshot.save();
   financialDailySnapshot.save();
   usageDailySnapshot.save();
@@ -555,6 +579,13 @@ export function handleRepayment(event: EventData): void {
   const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(receipt);
   const financialDailySnapshot = getOrCreateFinancialDailySnapshot(receipt);
   const account = getOrCreateAccount(account_id.toString());
+
+  const token = getOrCreateToken(token_id.toString());
+  repay.market = market.id;
+  repay.account = account.id;
+  repay.amount = BigInt.fromString(amount.toString());
+  repay.asset = token.id;
+
   const counterID = account.id
     .concat("-")
     .concat(market.id)
@@ -562,7 +593,7 @@ export function handleRepayment(event: EventData): void {
     .concat(PositionSide.BORROWER);
   const positionCounter = _PositionCounter.load(counterID);
   if (!positionCounter) {
-    log.warning("[subtractPosition] position counter {} not found", [
+    log.warning("Borrowing position counter {} not found in repay", [
       counterID,
     ]);
     return;
@@ -574,12 +605,6 @@ export function handleRepayment(event: EventData): void {
     receipt,
     positionCounter.nextCount
   );
-
-  const token = getOrCreateToken(token_id.toString());
-  repay.market = market.id;
-  repay.account = account.id;
-  repay.amount = BigInt.fromString(amount.toString());
-  repay.asset = token.id;
   repay.position = position.id;
   repay.amountUSD = repay.amount
     .divDecimal(

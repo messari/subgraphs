@@ -26,10 +26,7 @@ export function handleOracleCall(event: EventData): void {
     /* -------------------------------------------------------------------------- */
     const priceObj = price.get("price");
 
-    if (priceObj!.isNull()) {
-      log.warning("ORACLE::Price is null {}", [tokenId!.toString()]);
-      continue;
-    } else {
+    if (!priceObj!.isNull()) {
       /* -------------------------------------------------------------------------- */
       /*                                 Multiplier                                 */
       /* -------------------------------------------------------------------------- */

@@ -62,11 +62,6 @@ export function handleAddAssetFarmReward(event: EventData): void {
   }
 
   const reward_amount = data.get("reward_amount");
-  if (!reward_amount) {
-    log.warning("handleAddAssetFarmReward() :: reward_amount not found", []);
-    return;
-  }
-
   const rewardToken = getOrCreateRewardToken(reward_token, farmType);
 
   const market = getOrCreateMarket(farm);
@@ -82,11 +77,11 @@ export function handleAddAssetFarmReward(event: EventData): void {
   // add reward_amount to _reward_remaining_amounts
   const _rewardRemainingAmounts = market._reward_remaining_amounts;
   if (_rewardRemainingAmounts.length <= reward_token_index) {
-    _rewardRemainingAmounts.push(BigInt.fromString(reward_amount.toString()));
+    _rewardRemainingAmounts.push(BigInt.fromString(reward_amount!.toString()));
   } else {
     _rewardRemainingAmounts[reward_token_index] =
       market._reward_remaining_amounts[reward_token_index].plus(
-        BigInt.fromString(reward_amount.toString())
+        BigInt.fromString(reward_amount!.toString())
       );
   }
   market._reward_remaining_amounts = _rewardRemainingAmounts;

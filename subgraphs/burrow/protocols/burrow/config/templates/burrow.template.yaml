@@ -9,6 +9,8 @@ dataSources:
       account: "{{ contract }}"
       startBlock: {{ startBlock }}
     mapping:
+      entities:
+        - LendingProtocol
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       receiptHandlers:
