@@ -282,7 +282,7 @@ export function handleLiquidate(event: EventData): void {
     const collateral = getOrCreateMarket(token_out[collateralPointer]);
     if (
       totalRepaidAmount.gt(collateralLiquidated) &&
-      token_out.length > collateralPointer
+      token_out.length > collateralPointer + 1
     ) {
       collateralPointer += 1;
       const collateralToken = getOrCreateToken(token_out[collateralPointer]);

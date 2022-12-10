@@ -29,7 +29,6 @@ export function getOrCreateDeposit(
     deposit.asset = "";
     deposit.amount = BI_ZERO;
     deposit.amountUSD = BD_ZERO;
-    deposit.save();
   }
   return deposit;
 }
@@ -54,7 +53,6 @@ export function getOrCreateWithdrawal(
     w.asset = "";
     w.amount = BI_ZERO;
     w.amountUSD = BD_ZERO;
-    w.save();
   }
   return w;
 }
@@ -79,7 +77,6 @@ export function getOrCreateBorrow(
     b.asset = "";
     b.amount = BI_ZERO;
     b.amountUSD = BD_ZERO;
-    b.save();
   }
   return b;
 }
@@ -104,7 +101,6 @@ export function getOrCreateRepayment(
     r.asset = "";
     r.amount = BI_ZERO;
     r.amountUSD = BD_ZERO;
-    r.save();
   }
   return r;
 }
@@ -131,7 +127,6 @@ export function getOrCreateLiquidation(
     liquidate.amount = BI_ZERO;
     liquidate.amountUSD = BD_ZERO;
     liquidate.profitUSD = BD_ZERO;
-    liquidate.save();
   }
   return liquidate;
 }
