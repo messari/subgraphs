@@ -23,9 +23,9 @@ import { Versions } from "../versions";
 import * as constants from "./constants";
 import { getUsdPricePerToken } from "../prices";
 import { Vault as VaultStore } from "../../generated/schema";
+import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { ERC20 as ERC20Contract } from "../../generated/templates/Strategy/ERC20";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
-import { Strategy as StrategyTemplate } from "../../generated/templates";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);

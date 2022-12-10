@@ -230,6 +230,8 @@ templates:
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
         - event: Harvest(uint256,indexed uint256)
           handler: handleHarvest
         - event: FarmHarvest(uint256,uint256,uint256,uint256,uint256,uint256)

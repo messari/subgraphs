@@ -5,6 +5,7 @@ import {
 } from "../../generated/templates/Strategy/Vault";
 import {
   Harvest,
+  Upgraded,
   FarmHarvest,
   HarvestState,
   CurveHarvest,
@@ -15,11 +16,33 @@ import {
   HarvestState1 as DiggHarvestState,
 } from "../../generated/templates/Strategy/Strategy";
 import * as utils from "../common/utils";
-import { DataSourceContext, log } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "../modules/Revenue";
+import { DataSourceContext, log } from "@graphprotocol/graph-ts";
 import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
 import { BribesProcessor as BribesProcessorTemplate } from "../../generated/templates";
+
+export function handleUpgraded(event: Upgraded): void {
+  const strategyAddress = event.address;
+  const vaultAddress = utils.getVaultAddressFromContext();
+  const vault = getOrCreateVault(vaultAddress, event.block);
+
+  const bribesProcessor = utils.getBribesProcessor(
+    vaultAddress,
+    strategyAddress
+  );
+  vault._bribesProcessor = bribesProcessor.toHexString();
+  vault.save();
+
+  log.warning(
+    "[Strategy:Upgraded] Vault: {}, BribesProcessor: {}, TxnHash: {}",
+    [
+      vaultAddress.toHexString(),
+      bribesProcessor.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+}
 
 export function handleHarvest(event: Harvest): void {
   const strategyAddress = event.address;
