@@ -37,8 +37,7 @@ import {
   getOrCreateMarketSnapshot,
   getOrCreateStabilityPool,
 } from "./market";
-import { getOrCreateAssetToken, getVSTToken } from "./token";
-import { PriceFeedV1 } from "../../generated/PriceFeedV1/PriceFeedV1";
+import { getVSTToken } from "./token";
 
 export function getLendingProtocol(): LendingProtocol | null {
   return LendingProtocol.load(TROVE_MANAGER);
@@ -127,7 +126,7 @@ export function getOrCreateFinancialsSnapshot(
 
 export function addProtocolSideRevenue(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   revenueAmountUSD: BigDecimal
 ): void {
   const protocol = getOrCreateLendingProtocol();
@@ -144,7 +143,6 @@ export function addProtocolSideRevenue(
     financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
 
-  const market = getOrCreateMarket(asset);
   market.cumulativeProtocolSideRevenueUSD =
     market.cumulativeProtocolSideRevenueUSD.plus(revenueAmountUSD);
   market.cumulativeTotalRevenueUSD =
@@ -168,7 +166,7 @@ export function addProtocolSideRevenue(
 
 export function addSupplySideRevenue(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   revenueAmountUSD: BigDecimal
 ): void {
   const protocol = getOrCreateLendingProtocol();
@@ -185,7 +183,6 @@ export function addSupplySideRevenue(
     financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
 
-  const market = getOrCreateMarket(asset);
   market.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD.plus(revenueAmountUSD);
   market.cumulativeTotalRevenueUSD =

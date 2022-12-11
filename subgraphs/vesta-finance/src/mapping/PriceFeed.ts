@@ -10,15 +10,11 @@ import {
 import { StabilityPoolManager as StabilityPoolManagerContract } from "../../generated/PriceFeedV2/StabilityPoolManager";
 import { StabilityPool as StabilityPoolTemplate } from "../../generated/templates";
 import { VestaParameters } from "../../generated/VestaParameters/VestaParameters";
-import {
-  getOrCreateMarket,
-  getOrCreateStabilityPool,
-} from "../entities/market";
+import { getOrCreateStabilityPool } from "../entities/market";
 import { getOrCreateAssetToken, setCurrentAssetPrice } from "../entities/token";
 import {
   STABILITYPOOL_ASSET,
   STABILITY_POOL_MANAGER,
-  VESTA_PARAMETERS_ADDRESS,
 } from "../utils/constants";
 
 /**
@@ -57,7 +53,7 @@ export function handleOracleAdded(event: OracleAdded): void {
 
 /*
 // ideally, StabilityPool should be created as data source by StabilityPoolManager,
-// But StabilityPoolManager emits no events when a StabilityPool is created
+// But StabilityPoolManager emits no events
 // and hosted service does not support callhander for arbitrum-one
 // Here we utilize the fact that AdminContract calls both vestaParameters.priceFeed().addOracle
 // and stabilityPoolManager.addStabilityPool(_asset, proxyAddress);

@@ -9,6 +9,7 @@ import { getTrove } from "../entities/trove";
 import { getOrCreateLendingProtocol } from "../entities/protocol";
 import { BIGINT_ZERO } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
+import { getOrCreateMarket } from "../entities/market";
 
 /**
  * Whenever a borrower's trove is closed by a non-owner address because of either:
@@ -26,6 +27,7 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
   const contract = CollSurplusPool.bind(event.address);
   let asset: string | null = null;
 
+  // TODO: optimize this
   // As the asset address is not included in the event's paramters, comparing every address's previous
   // balance with current balance to determine which asset the event is related with.
   for (let i = 0; i < assets.length; i++) {
@@ -46,6 +48,7 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
     return;
   }
 
+  const market = getOrCreateMarket(Address.fromString(asset!));
   const collateralSurplusAsset = event.params._newBalance;
   const trove = getTrove(account, Address.fromString(asset!));
   if (trove != null) {
@@ -58,7 +61,7 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
       ).times(getCurrentAssetPrice(Address.fromString(asset!)));
       createWithdraw(
         event,
-        Address.fromString(asset!),
+        market,
         trove.collateralSurplusChange,
         collateralSurplusUSD,
         account,

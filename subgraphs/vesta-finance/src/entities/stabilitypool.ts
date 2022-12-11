@@ -1,20 +1,8 @@
-import {
-  Address,
-  BigDecimal,
-  ethereum,
-  log,
-  BigInt,
-} from "@graphprotocol/graph-ts";
-import { PriceFeedV1 } from "../../generated/PriceFeedV1/PriceFeedV1";
-import {
-  BIGDECIMAL_ONE,
-  PRICE_ORACLE_V1_ADDRESS,
-  VST_ADDRESS,
-} from "../utils/constants";
+import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { VST_ADDRESS } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateStabilityPool } from "./market";
-import { getOrCreateLendingProtocol } from "./protocol";
-import { getOrCreateAssetToken } from "./token";
+import { getOrCreateAssetToken, getVSTTokenPrice } from "./token";
 
 export function updateStabilityPoolTVL(
   event: ethereum.Event,
@@ -40,31 +28,4 @@ export function updateStabilityPoolTVL(
   stabilityPool.totalDepositBalanceUSD = stabilityPoolTVL;
   stabilityPool.inputTokenPriceUSD = VSTPrice;
   stabilityPool.save();
-}
-
-function getVSTTokenPrice(event: ethereum.Event): BigDecimal {
-  const protocol = getOrCreateLendingProtocol();
-  const priceFeedAddress = protocol._priceOracle
-    ? protocol._priceOracle
-    : PRICE_ORACLE_V1_ADDRESS;
-
-  const priceFeedContract = PriceFeedV1.bind(
-    Address.fromString(priceFeedAddress)
-  );
-  const lastGoodPriceResult = priceFeedContract.try_lastGoodPrice(
-    Address.fromString(VST_ADDRESS)
-  );
-
-  let VSTPrice = BIGDECIMAL_ONE;
-  if (lastGoodPriceResult.reverted) {
-    log.warning(
-      "[getVSTTokenPrice]Querying price for VST token with Price Feed {} failed at tx {}; Price set to 1.0",
-      [priceFeedAddress, event.transaction.hash.toString()]
-    );
-  } else {
-    //convert to decimals with 18 decimals
-    VSTPrice = bigIntToBigDecimal(lastGoodPriceResult.value, 18);
-  }
-
-  return VSTPrice;
 }

@@ -10,6 +10,7 @@ import {
   Market,
   MarketDailySnapshot,
   MarketHourlySnapshot,
+  _AssetToStabilityPool,
 } from "../../generated/schema";
 import { VestaParameters } from "../../generated/VestaParameters/VestaParameters";
 import {
@@ -25,6 +26,7 @@ import {
   getOrCreateAssetToken,
   getCurrentAssetPrice,
   getOrCreateRewardToken,
+  getVSTToken,
 } from "./token";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 import { EventType } from "./event";
@@ -43,7 +45,6 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   VESTA_PARAMETERS_ADDRESS,
-  VST_ADDRESS,
 } from "../utils/constants";
 
 export function getOrCreateStabilityPool(
@@ -58,6 +59,7 @@ export function getOrCreateStabilityPool(
   }
 
   const protocol = getOrCreateLendingProtocol();
+  const VSTToken = getVSTToken();
   const assetToken = getOrCreateAssetToken(asset!);
   market = new Market(poolID);
   market.protocol = protocol.id;
@@ -68,7 +70,7 @@ export function getOrCreateStabilityPool(
   market.maximumLTV = BIGDECIMAL_ZERO;
   market.liquidationThreshold = BIGDECIMAL_ZERO;
   market.liquidationPenalty = BIGDECIMAL_ZERO;
-  market.inputToken = VST_ADDRESS;
+  market.inputToken = VSTToken.id;
   market.rewardTokens = [getOrCreateRewardToken().id];
   market.rates = [];
   market.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -95,12 +97,21 @@ export function getOrCreateStabilityPool(
 
   market.createdTimestamp = event!.block.timestamp;
   market.createdBlockNumber = event!.block.number;
+  market._asset = asset!.toHexString();
   market.save();
 
   const stabilityPools = protocol._stabilityPools!;
   stabilityPools.push(market.id);
   protocol._stabilityPools = stabilityPools;
   protocol.save();
+
+  // map asset to stability pool
+  let assetToSP = _AssetToStabilityPool.load(asset!.toHexString());
+  if (!assetToSP) {
+    assetToSP = new _AssetToStabilityPool(asset!.toHexString());
+    assetToSP.stabilityPool = market.id;
+    assetToSP.save();
+  }
 
   return market;
 }
@@ -327,19 +338,18 @@ export function setMarketAssetBalance(
 
 export function addMarketRepayVolume(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   amountUSD: BigDecimal
 ): void {
-  addMarketVolume(event, asset, amountUSD, EventType.Repay);
+  addMarketVolume(event, market, amountUSD, EventType.Repay);
 }
 
 export function addMarketVolume(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   amountUSD: BigDecimal,
   eventType: EventType
 ): void {
-  const market = getOrCreateMarket(asset);
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
 

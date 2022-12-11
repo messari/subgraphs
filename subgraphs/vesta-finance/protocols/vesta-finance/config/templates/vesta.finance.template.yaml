@@ -12,7 +12,7 @@ dataSources:
       startBlock: 5559178
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -31,6 +31,9 @@ dataSources:
           handler: handleRedemption
         - event: TroveLiquidated(indexed address,indexed address,uint256,uint256,uint8)
           handler: handleTroveLiquidated
+        - event: Liquidation(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleLiquidation
+          receipt: true     
       file: ./src/mapping/TroveManager.ts
   - kind: ethereum/contract
     name: BorrowerOperations
@@ -41,7 +44,7 @@ dataSources:
       startBlock: 5559230
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -68,7 +71,7 @@ dataSources:
       file: ./src/mapping/VestaParameters.ts
       language: wasm/assemblyscript
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       entities:
         - Token
       abis:
@@ -96,7 +99,7 @@ dataSources:
       startBlock: 5559192
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -129,7 +132,7 @@ dataSources:
       startBlock: 5559219
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -149,7 +152,7 @@ dataSources:
       startBlock: 13469947
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -183,7 +186,7 @@ dataSources:
       file: ./src/mapping/PriceFeed.ts
       language: wasm/assemblyscript
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       entities: []
       abis:
         - name: PriceFeedV1
@@ -213,7 +216,7 @@ dataSources:
       file: ./src/mapping/PriceFeed.ts
       language: wasm/assemblyscript
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       entities: []
       abis:
         - name: PriceFeedV2
@@ -240,7 +243,7 @@ templates:
       abi: StabilityPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -259,5 +262,9 @@ templates:
           handler: handleStabilityPoolAssetBalanceUpdated
         - event: StabilityPoolVSTBalanceUpdated(uint256)
           handler: handleStabilityPoolVSTBalanceUpdated
+        - event: UserDepositChanged(indexed address,uint256)
+          handler: handleUserDepositChanged
+        - event: AssetGainWithdrawn(indexed address,uint256,uint256)
+          handler: handleAssetGainWithdrawn
       file: ./src/mapping/StabilityPool.ts
 

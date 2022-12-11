@@ -1,4 +1,4 @@
-import { ethereum, Address, log, BigDecimal } from "@graphprotocol/graph-ts";
+import { ethereum, Address, log } from "@graphprotocol/graph-ts";
 import {
   TotalVSTAIssuedUpdated,
   CommunityIssuance,
@@ -9,22 +9,13 @@ import {
   getOrCreateStabilityPool,
 } from "../entities/market";
 import {
-  BALANCER_POOL_CREATED_BLOCK,
-  BAL_VSTA_WETH_POOL_ADDRESS,
-  BAL_WETH_WBTC_USDC_POOL_ADDRESS,
   BIGDECIMAL_ZERO,
-  DEFAULT_DECIMALS,
   MINUTES_PER_DAY,
   RewardTokenType,
-  USDC_ADDRESS,
-  USDC_DECIMALS,
   VSTA_ADDRESS,
-  WETH_ADDRESS,
 } from "../utils/constants";
 import { RewardToken } from "../../generated/schema";
-import { WeightedPool as WeightedPoolContract } from "../../generated/CommunityIssuance/WeightedPool";
-import { Vault as VaultContract } from "../../generated/CommunityIssuance/Vault";
-import { getOrCreateAssetToken } from "../entities/token";
+import { getOrCreateAssetToken, getVSTATokenPrice } from "../entities/token";
 import { exponentToBigDecimal } from "../utils/numbers";
 
 /*
@@ -89,82 +80,4 @@ function calculateDailyVestaRewards(
   VSTAToken.lastPriceUSD = VSTAPriceUSD;
   VSTAToken.lastPriceBlockNumber = event.block.number;
   VSTAToken.save();
-}
-
-function getVSTATokenPrice(event: ethereum.Event): BigDecimal | null {
-  if (event.block.number.lt(BALANCER_POOL_CREATED_BLOCK)) {
-    return null;
-  }
-  const VSTAPriceInWETH = getToken0PriceInToken1(
-    BAL_VSTA_WETH_POOL_ADDRESS,
-    VSTA_ADDRESS,
-    WETH_ADDRESS
-  );
-
-  const WETHPriceInUSD = getToken0PriceInToken1(
-    BAL_WETH_WBTC_USDC_POOL_ADDRESS,
-    WETH_ADDRESS,
-    USDC_ADDRESS
-  );
-
-  if (!VSTAPriceInWETH || !WETHPriceInUSD) {
-    return null;
-  }
-  const VSTAPriceInUSD = VSTAPriceInWETH.times(WETHPriceInUSD)
-    .times(exponentToBigDecimal(DEFAULT_DECIMALS))
-    .div(exponentToBigDecimal(USDC_DECIMALS));
-  log.info("[getVSTATokenPrice]VSTA Price USD={} at timestamp {}", [
-    VSTAPriceInUSD.toString(),
-    event.block.timestamp.toString(),
-  ]);
-
-  return VSTAPriceInUSD;
-}
-
-function getToken0PriceInToken1(
-  poolAddress: string,
-  token0: string,
-  token1: string
-): BigDecimal | null {
-  const poolContract = WeightedPoolContract.bind(
-    Address.fromString(poolAddress)
-  );
-  const vaultAddressResult = poolContract.try_getVault();
-  if (vaultAddressResult.reverted) {
-    return null;
-  }
-  const vaultContract = VaultContract.bind(vaultAddressResult.value);
-
-  const weightsResult = poolContract.try_getNormalizedWeights();
-  if (weightsResult.reverted) {
-    return null;
-  }
-  const poolIDResult = poolContract.try_getPoolId();
-  if (poolIDResult.reverted) {
-    return null;
-  }
-  const poolTokensResult = vaultContract.try_getPoolTokens(poolIDResult.value);
-  if (poolTokensResult.reverted) {
-    return null;
-  }
-  const poolTokenAddrs = poolTokensResult.value.getTokens();
-  const poolTokenBalances = poolTokensResult.value.getBalances();
-  const token0Idx = poolTokenAddrs.indexOf(Address.fromString(token0));
-  const token1Idx = poolTokenAddrs.indexOf(Address.fromString(token1));
-  if (token0Idx < 0 || token1Idx < 0) {
-    // token0 or token1 not found in poolTokenAddrs, should not happen
-    log.error(
-      "[getToken0PriceInToken1]token {} or token {} not found in poolTokens [{}]",
-      [token0, token1, poolTokenAddrs.toString()]
-    );
-    return null;
-  }
-  const token0PriceInToken1 = poolTokenBalances[token1Idx]
-    .times(weightsResult.value[token0Idx])
-    .divDecimal(
-      poolTokenBalances[token0Idx]
-        .times(weightsResult.value[token1Idx])
-        .toBigDecimal()
-    );
-  return token0PriceInToken1;
 }
