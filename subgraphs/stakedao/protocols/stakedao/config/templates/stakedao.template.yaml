@@ -105,7 +105,7 @@ dataSources:
           file: ./abis/Ethereum/gauge.json
         - name: StableMaster
           file: ./abis/Ethereum/StableMaster.json
-        
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################

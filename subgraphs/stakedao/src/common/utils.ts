@@ -11,8 +11,8 @@ import { Vault as VaultContract } from "../../generated/templates/Vault/Vault";
 import { Gauge as GaugeContract } from "../../generated/templates/Gauge/Gauge";
 import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import { Strategy as StrategyContract } from "../../generated/controller/Strategy";
-import { LiquidityLockerStrategy } from "../../generated/curveStrategy/LiquidityLockerStrategy";
 import { EthereumController as ControllerContract } from "../../generated/Controller/EthereumController";
+import { LiquidityLockerStrategy } from "../../generated/curveStrategy/LiquidityLockerStrategy";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -32,7 +32,7 @@ export function readValue<T>(
 export function getTokenDecimals(tokenAddr: Address): BigInt {
   const token = ERC20Contract.bind(tokenAddr);
 
-  let decimals = readValue<BigInt>(
+  const decimals = readValue<BigInt>(
     token.try_decimals(),
     constants.DEFAULT_DECIMALS
   );
@@ -43,7 +43,7 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
 export function getGaugeFromVault(vaultAddress: Address): Address {
   const vaultContract = VaultContract.bind(vaultAddress);
 
-  let gaugeAddress = readValue<Address>(
+  const gaugeAddress = readValue<Address>(
     vaultContract.try_liquidityGauge(),
     constants.NULL.TYPE_ADDRESS
   );
@@ -97,7 +97,7 @@ export function getMultiGaugeFromLiquidityLocker(
     liquidityLockerStrategyAddress
   );
 
-  let multiGaugeAddress = readValue<Address>(
+  const multiGaugeAddress = readValue<Address>(
     liquidityLockerContract.try_multiGauges(gaugeAddress),
     constants.NULL.TYPE_ADDRESS
   );
@@ -108,7 +108,7 @@ export function getMultiGaugeFromLiquidityLocker(
 export function getPricePerFullShare(vaultAddress: Address): BigDecimal {
   const vaultContract = VaultContract.bind(vaultAddress);
 
-  let pricePerShare = readValue<BigInt>(
+  const pricePerShare = readValue<BigInt>(
     vaultContract.try_getPricePerFullShare(),
     constants.BIGINT_ZERO
   ).toBigDecimal();
@@ -119,7 +119,7 @@ export function getPricePerFullShare(vaultAddress: Address): BigDecimal {
 export function getInputTokenFromVault(vaultAddress: Address): Address {
   const vaultContract = VaultContract.bind(vaultAddress);
 
-  let inputTokenAddress = readValue<Address>(
+  const inputTokenAddress = readValue<Address>(
     vaultContract.try_token(),
     constants.NULL.TYPE_ADDRESS
   );
@@ -137,7 +137,7 @@ export function getVaultFromController(
 ): Address {
   const controller = ControllerContract.bind(controllerAddress);
 
-  let vaultAddress = readValue<Address>(
+  const vaultAddress = readValue<Address>(
     controller.try_vaults(inputTokenAddress),
     constants.NULL.TYPE_ADDRESS
   );
@@ -151,7 +151,7 @@ export function getStrategyFromController(
 ): Address {
   const controller = ControllerContract.bind(controllerAddress);
 
-  let strategyAddress = readValue<Address>(
+  const strategyAddress = readValue<Address>(
     controller.try_strategies(inputTokenAddress),
     constants.NULL.TYPE_ADDRESS
   );
@@ -173,7 +173,7 @@ export function getVaultFees(
   const withdrawalFeeId =
     enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE) +
     vaultAddress.toHexString();
-  let withdrawalFeeStore = getOrCreateVaultFee(
+  const withdrawalFeeStore = getOrCreateVaultFee(
     withdrawalFeeId,
     constants.VaultFeeType.WITHDRAWAL_FEE,
     withdrawalFee.divDecimal(constants.BIGDECIMAL_HUNDRED)
@@ -186,7 +186,7 @@ export function getVaultFees(
   const performanceFeeId =
     enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
     vaultAddress.toHexString();
-  let performanceFeeStore = getOrCreateVaultFee(
+  const performanceFeeStore = getOrCreateVaultFee(
     performanceFeeId,
     constants.VaultFeeType.PERFORMANCE_FEE,
     performanceFee.divDecimal(constants.BIGDECIMAL_HUNDRED)
@@ -209,7 +209,7 @@ export function getLiquidityLockersVaultFees(
   const withdrawalFeeId =
     enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE) +
     vaultAddress.toHexString();
-  let withdrawalFeeStore = getOrCreateVaultFee(
+  const withdrawalFeeStore = getOrCreateVaultFee(
     withdrawalFeeId,
     constants.VaultFeeType.WITHDRAWAL_FEE,
     withdrawalFee.divDecimal(constants.BIGDECIMAL_HUNDRED)
@@ -229,22 +229,22 @@ export function getLiquidityLockersVaultFees(
     constants.NULL.TYPE_ADDRESS
   );
 
-  let accumulatorFee = readValue<BigInt>(
+  const accumulatorFee = readValue<BigInt>(
     liquidityLockerContract.try_accumulatorFee(gaugeAddress),
     constants.DEFAULT_ACCUMULATOR_FEE
   );
 
-  let claimerRewardFee = readValue<BigInt>(
+  const claimerRewardFee = readValue<BigInt>(
     liquidityLockerContract.try_claimerRewardFee(gaugeAddress),
     constants.DEFAULT_CLAIMER_REWARD_FEE
   );
 
-  let veSDTFee = readValue<BigInt>(
+  const veSDTFee = readValue<BigInt>(
     liquidityLockerContract.try_veSDTFee(gaugeAddress),
     constants.DEFAULT_VE_SDT_FEE
   );
 
-  let performanceFee = readValue<BigInt>(
+  const performanceFee = readValue<BigInt>(
     liquidityLockerContract.try_perfFee(gaugeAddress),
     constants.DEFAULT_PERFORMANCE_FEE
   );
@@ -252,7 +252,7 @@ export function getLiquidityLockersVaultFees(
   const performanceFeeId =
     enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
     vaultAddress.toHexString();
-  let performanceFeeStore = getOrCreateVaultFee(
+  const performanceFeeStore = getOrCreateVaultFee(
     performanceFeeId,
     constants.VaultFeeType.PERFORMANCE_FEE,
     accumulatorFee
@@ -268,7 +268,7 @@ export function getLiquidityLockersVaultFees(
 export function updateProtocolAfterNewVault(vaultAddress: Address): void {
   const protocol = getOrCreateYieldAggregator();
 
-  let vaultIds = protocol._vaultIds;
+  const vaultIds = protocol._vaultIds;
   vaultIds.push(vaultAddress.toHexString());
 
   protocol._vaultIds = vaultIds;

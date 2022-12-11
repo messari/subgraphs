@@ -1,6 +1,6 @@
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { ChainLinkContract } from "../../../generated/templates/Vault/ChainLinkContract";
 
 export function getChainLinkContract(network: string): ChainLinkContract {
@@ -19,13 +19,13 @@ export function getTokenPriceFromChainLink(
     return new CustomPriceType();
   }
 
-  let result = chainLinkContract.try_latestRoundData(
+  const result = chainLinkContract.try_latestRoundData(
     tokenAddr,
     constants.CHAIN_LINK_USD_ADDRESS
   );
 
   if (!result.reverted) {
-    let decimals = chainLinkContract.try_decimals(
+    const decimals = chainLinkContract.try_decimals(
       tokenAddr,
       constants.CHAIN_LINK_USD_ADDRESS
     );

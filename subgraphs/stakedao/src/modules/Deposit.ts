@@ -29,7 +29,7 @@ export function createDepositTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): DepositTransaction {
-  let transactionId = "deposit-" + transaction.hash.toHexString();
+  const transactionId = "deposit-" + transaction.hash.toHexString();
 
   let depositTransaction = DepositTransaction.load(transactionId);
 
@@ -87,7 +87,7 @@ export function Deposit(
 
   let keeperFee = constants.BIGINT_ZERO;
   if (!depositAmount) {
-    let keeperFeePercentage = utils.readValue(
+    const keeperFeePercentage = utils.readValue(
       vaultContract.try_keeperFee(),
       constants.BIGINT_ZERO
     );
@@ -115,12 +115,12 @@ export function Deposit(
           .div(vault.inputTokenBalance);
   }
 
-  let inputToken = getOrCreateTokenFromString(vault.inputToken, block);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+  const inputToken = getOrCreateTokenFromString(vault.inputToken, block);
+  const inputTokenDecimals = constants.BIGINT_TEN.pow(
     inputToken.decimals as u8
   ).toBigDecimal();
 
-  let depositAmountUSD = depositAmount
+  const depositAmountUSD = depositAmount
     .divDecimal(inputTokenDecimals)
     .times(inputToken.lastPriceUSD!);
 

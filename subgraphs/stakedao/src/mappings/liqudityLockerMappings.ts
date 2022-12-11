@@ -25,7 +25,7 @@ export function handleGaugeSet(event: GaugeSet): void {
   const gaugeAddress = event.params._gauge;
   const liquidityLockerStrategyAddress = event.address;
 
-  let multiGaugeAddress = utils.getMultiGaugeFromLiquidityLocker(
+  const multiGaugeAddress = utils.getMultiGaugeFromLiquidityLocker(
     gaugeAddress,
     liquidityLockerStrategyAddress
   );
@@ -74,8 +74,8 @@ export function handleClaimed(event: Claimed): void {
     vaultAddress
   );
 
-  let earnedToken = getOrCreateToken(tokenAddress, event.block);
-  let earnedTokenDecimals = constants.BIGINT_TEN.pow(
+  const earnedToken = getOrCreateToken(tokenAddress, event.block);
+  const earnedTokenDecimals = constants.BIGINT_TEN.pow(
     earnedToken.decimals as u8
   ).toBigDecimal();
 

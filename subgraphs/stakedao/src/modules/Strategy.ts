@@ -16,22 +16,22 @@ export function Harvested(
 ): void {
   const vault = getOrCreateVault(vaultAddress, block);
 
-  let inputToken = getOrCreateTokenFromString(vault.inputToken, block);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+  const inputToken = getOrCreateTokenFromString(vault.inputToken, block);
+  const inputTokenDecimals = constants.BIGINT_TEN.pow(
     inputToken.decimals as u8
   ).toBigDecimal();
 
-  let vaultFees = utils.getVaultFees(vaultAddress, strategyAddress);
+  const vaultFees = utils.getVaultFees(vaultAddress, strategyAddress);
 
-  let supplySideWantEarned = wantEarned.times(
+  const supplySideWantEarned = wantEarned.times(
     constants.BIGDECIMAL_ONE.minus(vaultFees.getPerformanceFees)
   );
-  let supplySideWantEarnedUSD = supplySideWantEarned
+  const supplySideWantEarnedUSD = supplySideWantEarned
     .div(inputTokenDecimals)
     .times(inputToken.lastPriceUSD!);
 
-  let protocolSideWantEarned = wantEarned.times(vaultFees.getPerformanceFees);
-  let protocolSideWantEarnedUSD = protocolSideWantEarned
+  const protocolSideWantEarned = wantEarned.times(vaultFees.getPerformanceFees);
+  const protocolSideWantEarnedUSD = protocolSideWantEarned
     .div(inputTokenDecimals)
     .times(inputToken.lastPriceUSD!);
 

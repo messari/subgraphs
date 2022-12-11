@@ -31,7 +31,7 @@ export function createWithdrawTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): WithdrawTransaction {
-  let withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
+  const withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
 
   let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
@@ -85,7 +85,7 @@ export function Withdraw(
   block: ethereum.Block
 ): void {
   const vault = getOrCreateVault(vaultAddress, block);
-  let vaultContract = VaultContract.bind(vaultAddress);
+  const vaultContract = VaultContract.bind(vaultAddress);
 
   const strategyAddress = Address.fromString(vault._strategy);
   const strategyContract = StrategyContract.bind(strategyAddress);
@@ -97,8 +97,8 @@ export function Withdraw(
     const collateralMap = stableMasterContract.collateralMap(
       constants.POOL_MANAGER_ADDRESS
     );
-    let sanRate = collateralMap.value5;
-    let slpDataSlippage = collateralMap.value7.slippage;
+    const sanRate = collateralMap.value5;
+    const slpDataSlippage = collateralMap.value7.slippage;
 
     // StableMasterFront: (amount * (BASE_PARAMS - col.slpData.slippage) * col.sanRate) / (BASE_TOKENS * BASE_PARAMS)
     withdrawAmount = sharesBurnt
@@ -133,8 +133,8 @@ export function Withdraw(
     )
     .divDecimal(constants.DENOMINATOR);
 
-  let inputToken = getOrCreateTokenFromString(vault.inputToken, block);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+  const inputToken = getOrCreateTokenFromString(vault.inputToken, block);
+  const inputTokenDecimals = constants.BIGINT_TEN.pow(
     inputToken.decimals as u8
   ).toBigDecimal();
 
@@ -146,7 +146,7 @@ export function Withdraw(
     .divDecimal(inputTokenDecimals)
     .minus(protocolSideWithdrawalAmount);
 
-  let withdrawAmountUSD = supplySideWithdrawalAmount.times(
+  const withdrawAmountUSD = supplySideWithdrawalAmount.times(
     inputToken.lastPriceUSD!
   );
 

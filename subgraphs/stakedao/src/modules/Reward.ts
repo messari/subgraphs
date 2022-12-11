@@ -4,7 +4,6 @@ import {
   getOrCreateRewardToken,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
@@ -12,13 +11,13 @@ import { Address, ethereum, BigInt, log } from "@graphprotocol/graph-ts";
 import { Gauge as GaugeContract } from "../../generated/templates/Gauge/Gauge";
 
 export function getRewardsData_v1(gaugeAddress: Address): RewardsInfoType {
-  let rewardRates: BigInt[] = [];
-  let rewardTokens: Address[] = [];
+  const rewardRates: BigInt[] = [];
+  const rewardTokens: Address[] = [];
 
-  let gaugeContract = GaugeContract.bind(gaugeAddress);
+  const gaugeContract = GaugeContract.bind(gaugeAddress);
 
   for (let idx = 0; idx < 5; idx++) {
-    let rewardToken = utils.readValue<Address>(
+    const rewardToken = utils.readValue<Address>(
       gaugeContract.try_rewardTokens(BigInt.fromI32(idx)),
       constants.NULL.TYPE_ADDRESS
     );
@@ -29,9 +28,9 @@ export function getRewardsData_v1(gaugeAddress: Address): RewardsInfoType {
 
     rewardTokens.push(rewardToken);
 
-    let rewardRateCall = gaugeContract.try_rewardData(rewardToken);
+    const rewardRateCall = gaugeContract.try_rewardData(rewardToken);
     if (!rewardRateCall.reverted) {
-      let rewardRate = rewardRateCall.value.getRewardRate();
+      const rewardRate = rewardRateCall.value.getRewardRate();
 
       rewardRates.push(rewardRate);
     } else {
@@ -43,13 +42,13 @@ export function getRewardsData_v1(gaugeAddress: Address): RewardsInfoType {
 }
 
 export function getRewardsData_v2(gaugeAddress: Address): RewardsInfoType {
-  let rewardRates: BigInt[] = [];
-  let rewardTokens: Address[] = [];
+  const rewardRates: BigInt[] = [];
+  const rewardTokens: Address[] = [];
 
-  let gaugeContract = GaugeContract.bind(gaugeAddress);
+  const gaugeContract = GaugeContract.bind(gaugeAddress);
 
   for (let idx = 0; idx < 10; idx++) {
-    let rewardToken = utils.readValue<Address>(
+    const rewardToken = utils.readValue<Address>(
       gaugeContract.try_reward_tokens(BigInt.fromI32(idx)),
       constants.NULL.TYPE_ADDRESS
     );
@@ -60,9 +59,9 @@ export function getRewardsData_v2(gaugeAddress: Address): RewardsInfoType {
 
     rewardTokens.push(rewardToken);
 
-    let rewardRateCall = gaugeContract.try_reward_data(rewardToken);
+    const rewardRateCall = gaugeContract.try_reward_data(rewardToken);
     if (!rewardRateCall.reverted) {
-      let rewardRate = rewardRateCall.value.getRate();
+      const rewardRate = rewardRateCall.value.getRate();
 
       rewardRates.push(rewardRate);
     } else {
@@ -84,21 +83,21 @@ export function updateRewardToken(
     rewardsInfo = getRewardsData_v2(gaugeAddress);
   }
 
-  let rewardTokens = rewardsInfo.getRewardTokens;
-  let rewardRates = rewardsInfo.getRewardRates;
+  const rewardTokens = rewardsInfo.getRewardTokens;
+  const rewardRates = rewardsInfo.getRewardRates;
 
   for (let i = 0; i < rewardTokens.length; i += 1) {
-    let rewardToken = rewardTokens[i];
-    let rewardRate = rewardRates[i];
+    const rewardToken = rewardTokens[i];
+    const rewardRate = rewardRates[i];
 
-    let rewardRatePerDay = getRewardsPerDay(
+    const rewardRatePerDay = getRewardsPerDay(
       block.timestamp,
       block.number,
       rewardRate.toBigDecimal(),
       constants.RewardIntervalType.TIMESTAMP
     );
 
-    let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
+    const rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
 
     updateRewardTokenEmissions(rewardToken, vaultAddress, rewardPerDay, block);
 
@@ -124,7 +123,7 @@ export function updateRewardTokenEmissions(
     vault.rewardTokens = [];
   }
 
-  let rewardTokens = vault.rewardTokens!;
+  const rewardTokens = vault.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
     vault.rewardTokens = rewardTokens;
@@ -135,12 +134,12 @@ export function updateRewardTokenEmissions(
   if (!vault.rewardTokenEmissionsAmount) {
     vault.rewardTokenEmissionsAmount = [];
   }
-  let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
+  const rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
 
   if (!vault.rewardTokenEmissionsUSD) {
     vault.rewardTokenEmissionsUSD = [];
   }
-  let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
+  const rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay

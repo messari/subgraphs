@@ -1,87 +1,61 @@
-import {
-  VaultFee,
-  Vault as VaultStore,
-  _Strategy as StrategyStore,
-} from "../../generated/schema";
 import * as utils from "../common/utils";
-import { log } from "@graphprotocol/graph-ts";
-import * as constants from "../common/constants";
+import { Harvested } from "../modules/Strategy";
 import {
   SetWithdrawalFeeCall,
   SetPerformanceFeeCall,
   Harvested as HarvestedEvent,
 } from "../../generated/templates/Strategy/Strategy";
-import { _StrategyHarvested } from "../modules/Strategy";
+import { getOrCreateVault } from "../common/initializers";
+import { Address, dataSource, log } from "@graphprotocol/graph-ts";
 
 export function handleSetPerformanceFee(call: SetPerformanceFeeCall): void {
   const strategyAddress = call.to;
-  const strategy = StrategyStore.load(strategyAddress.toHexString());
 
-  if (strategy) {
-    const vaultAddress = strategy.vaultAddress;
+  const context = dataSource.context();
+  const vaultAddress = Address.fromString(context.getString("vaultAddress"));
 
-    const performanceFeeId = utils.prefixID(
-      constants.VaultFeeType.PERFORMANCE_FEE,
-      vaultAddress.toHexString()
-    );
-    const performanceFee = VaultFee.load(performanceFeeId);
+  const vault = getOrCreateVault(vaultAddress, call.block);
 
-    performanceFee!.feePercentage = call.inputs._performanceFee
-      .toBigDecimal()
-      .div(constants.BIGDECIMAL_HUNDRED);
+  vault.fees = utils.getVaultFees(vaultAddress, strategyAddress).stringIds();
+  vault.save();
 
-    performanceFee!.save();
-
-    log.warning("[setPerformanceFee] TxHash: {}, PerformanceFee: {}", [
-      call.transaction.hash.toHexString(),
-      call.inputs._performanceFee.toString(),
-    ]);
-  }
+  log.warning("[setPerformanceFee] Vault: {}, PerformanceFee: {}, TxHash: {}", [
+    vaultAddress.toHexString(),
+    call.inputs._performanceFee.toString(),
+    call.transaction.hash.toHexString(),
+  ]);
 }
 
 export function handleSetWithdrawalFee(call: SetWithdrawalFeeCall): void {
   const strategyAddress = call.to;
-  const strategy = StrategyStore.load(strategyAddress.toHexString());
 
-  if (strategy) {
-    const vaultAddress = strategy.vaultAddress;
+  const context = dataSource.context();
+  const vaultAddress = Address.fromString(context.getString("vaultAddress"));
 
-    const withdrawalFeeId = utils.prefixID(
-      constants.VaultFeeType.WITHDRAWAL_FEE,
-      vaultAddress.toHexString()
-    );
-    const withdrawalFee = VaultFee.load(withdrawalFeeId);
+  const vault = getOrCreateVault(vaultAddress, call.block);
 
-    withdrawalFee!.feePercentage = call.inputs._withdrawalFee
-      .toBigDecimal()
-      .div(constants.BIGDECIMAL_HUNDRED);
+  vault.fees = utils.getVaultFees(vaultAddress, strategyAddress).stringIds();
+  vault.save();
 
-    withdrawalFee!.save();
-
-    log.warning("[setWithdrawalFee] TxHash: {}, withdrawalFee: {}", [
-      call.transaction.hash.toHexString(),
-      call.inputs._withdrawalFee.toString(),
-    ]);
-  }
+  log.warning("[setWithdrawalFee] Vault: {}, withdrawalFee: {}, TxHash: {}", [
+    vaultAddress.toHexString(),
+    call.inputs._withdrawalFee.toString(),
+    call.transaction.hash.toHexString(),
+  ]);
 }
 
 export function handleHarvested(event: HarvestedEvent): void {
   const strategyAddress = event.address;
-  const wantEarned = event.params.wantEarned;
+  const wantEarned = event.params.wantEarned.toBigDecimal();
 
-  const strategy = StrategyStore.load(strategyAddress.toHexString());
-  if (!strategy) return;
+  const context = dataSource.context();
+  const vaultAddress = Address.fromString(context.getString("vaultAddress"));
 
-  const vaultAddress = strategy.vaultAddress;
-  const vault = VaultStore.load(vaultAddress.toHexString());
-
-  if (vault) {
-    _StrategyHarvested(
-      strategyAddress,
-      vault,
-      wantEarned,
-      event.block,
-      event.transaction
-    );
-  }
+  Harvested(
+    vaultAddress,
+    strategyAddress,
+    wantEarned,
+    event.transaction,
+    event.block
+  );
 }

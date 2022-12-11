@@ -101,7 +101,7 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 
-export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000)
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 
 /////////////////////////////////////
 ///// Protocol/Network Specific /////
