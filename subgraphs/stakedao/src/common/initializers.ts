@@ -54,6 +54,10 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.network = constants.Network.MAINNET;
     protocol.type = constants.ProtocolType.YIELD;
 
+    protocol.schemaVersion = Versions.getSchemaVersion();
+    protocol.subgraphVersion = Versions.getSubgraphVersion();
+    protocol.methodologyVersion = Versions.getMethodologyVersion();
+
     //////// Quantitative Data ////////
     protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -65,10 +69,6 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
 
     protocol.save();
   }
-
-  protocol.schemaVersion = Versions.getSchemaVersion();
-  protocol.subgraphVersion = Versions.getSubgraphVersion();
-  protocol.methodologyVersion = Versions.getMethodologyVersion();
 
   return protocol;
 }
