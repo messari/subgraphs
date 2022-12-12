@@ -87,7 +87,6 @@ export class UbeswapCeloConfigurations implements Configurations {
     return toLowerCaseList([
       "0x471ece3750da237f93b8e339c536989b8978a438", //celo
       "0x7037f7296b2fc7908de7b57a89efaa8319f0c500", // mcelo1
-      "0x7d00cd74ff385c955ea3d79e47bf06bd7386387d", // mcelo2
       "0x765de816845861e75a25fca122bb6898b8b1282a", // cusd
       "0xa8d0e6799ff3fd19c6459bf02689ae09c4d78ba7", // mcEUR2
       "0xe273ad7ee11dcfaa87383ad5977ee1504ac07568", // mcEUR2
