@@ -122,3 +122,7 @@ export const STABLE_MASTER_ADDRESS = Address.fromString(
 export const POOL_MANAGER_ADDRESS = Address.fromString(
   "0xe9f183FC656656f1F17af1F2b0dF79b8fF9ad8eD"
 );
+
+export const SDT_TOKEN_ADDRESS = Address.fromString(
+  "0x73968b9a57c6e53d41345fd57a6e6ae27d6cdb2f"
+);

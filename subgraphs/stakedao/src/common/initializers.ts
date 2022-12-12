@@ -1,4 +1,11 @@
 import {
+  BigInt,
+  Address,
+  ethereum,
+  dataSource,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
+import {
   Vault,
   Token,
   Account,
@@ -19,7 +26,7 @@ import * as constants from "../common/constants";
 import { Vault as VaultTemplate } from "../../generated/templates";
 import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
 import { Vault as VaultContract } from "../../generated/templates/Vault/Vault";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { LockersGauge as LockersGaugeContract } from "../../generated/templates/LockersGauge/LockersGauge";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -320,6 +327,58 @@ export function getOrCreateVaultsHourlySnapshots(
   }
 
   return vaultSnapshots;
+}
+
+export function getOrCreateLockerVault(
+  vaultAddress: Address,
+  block: ethereum.Block
+): Vault {
+  let lockerVault = Vault.load(vaultAddress.toHexString());
+
+  if (!lockerVault) {
+    lockerVault = new Vault(vaultAddress.toHexString());
+
+    lockerVault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    lockerVault.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    lockerVault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    lockerVault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+
+    const lockerContract = LockersGaugeContract.bind(vaultAddress);
+
+    lockerVault.name = utils.readValue<string>(lockerContract.try_name(), "");
+    lockerVault.symbol = utils.readValue<string>(
+      lockerContract.try_symbol(),
+      ""
+    );
+    lockerVault.protocol = constants.PROTOCOL_ID;
+
+    lockerVault.depositLimit = constants.BIGINT_ZERO;
+    lockerVault.pricePerShare = constants.BIGDECIMAL_ZERO;
+
+    const context = dataSource.context();
+    const inputTokenAddress = Address.fromString(
+      context.getString("inputToken")
+    );
+    const inputToken = getOrCreateToken(inputTokenAddress, block);
+    lockerVault.inputToken = inputToken.id;
+    lockerVault.inputTokenBalance = constants.BIGINT_ZERO;
+
+    const outputToken = getOrCreateToken(vaultAddress, block);
+    lockerVault.outputToken = outputToken.id;
+    lockerVault.outputTokenSupply = constants.BIGINT_ZERO;
+    lockerVault.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
+
+    lockerVault.createdBlockNumber = block.number;
+    lockerVault.createdTimestamp = block.timestamp;
+    lockerVault._strategy = constants.NULL.TYPE_STRING;
+
+    lockerVault.fees = [];
+    lockerVault.save();
+
+    utils.updateProtocolAfterNewVault(vaultAddress);
+  }
+
+  return lockerVault;
 }
 
 export function getOrCreateVault(

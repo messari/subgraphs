@@ -28,6 +28,38 @@
       "startBlock": "15390294"
     }
   ],
+  "depositors": [
+    {
+      "name": "crvDepositor",
+      "address": "0xc1e3Ca8A3921719bE0aE3690A0e036feB4f69191",
+      "startBlock": "14570972"
+    },
+    {
+      "name": "angleDepositor",
+      "address": "0x8A97e8B3389D431182aC67c0DF7D46FF8DCE7121",
+      "startBlock": "14209711"
+    },
+    {
+      "name": "fxsDepositor",
+      "address": "0xFaF3740167B866b571465B063c6B3A71Ba9b6285",
+      "startBlock": "14209708"
+    },
+    {
+      "name": "balancerDepositor",
+      "address": "0x3e0d44542972859de3CAdaF856B1a4FD351B4D2E",
+      "startBlock": "14848997"
+    },
+    {
+      "name": "apwineDepositor",
+      "address": "0xFe928ca6a9C0cdf658a26A374b7373B9D6CefBCf",
+      "startBlock": "15402143"
+    },
+    {
+      "name": "blackpoolDepositor",
+      "address": "0x219f7496fbD30e1F21A20613F9372d608A279993",
+      "startBlock": "15458687"
+    }
+  ],
 
   "graftEnabled": false,
   "subgraphId": "",
