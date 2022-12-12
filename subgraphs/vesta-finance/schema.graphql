@@ -1269,13 +1269,6 @@ type _Trove @entity {
   collateralSurplusChange: BigInt!
 }
 
-type _StabilityPool @entity {
-  " Stability pool asset address "
-  id: ID!
-  " Total amount of USD value locked in the asset's stability pool "
-  totalValueLocked: BigDecimal!
-}
-
 type _AssetToStabilityPool @entity {
   " asset address "
   id: ID!
