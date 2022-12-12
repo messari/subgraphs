@@ -46,32 +46,32 @@ dataSources:
           topic0: '0x3c278bd500000000000000000000000000000000000000000000000000000000' # lift(address)
           handler: handleLift
       file: ./protocols/maker-governance/src/ds-chief.ts
-  - kind: ethereum
-    name: PollingEmitter
-    network: mainnet
-    source:
-      address: "0xd3a9fe267852281a1e6307a1c37cdfd76d39b133"
-      abi: PollingEmitter
-      startBlock: 11327777
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Slate
-        - Spell
-        - Delegate
-        - DelegateAdmin
-        - Vote
-        - Poll
-        - PollVote
-      abis:
-        - name: PollingEmitter
-          file: ./abis/maker-governance/PollingEmitter.json
-      eventHandlers:
-        - event: Voted(indexed address,indexed uint256,indexed uint256)
-          handler: handlePollVote
-      file: ./protocols/maker-governance/src/polling-emitter.ts
+  # - kind: ethereum
+  #   name: PollingEmitter
+  #   network: mainnet
+  #   source:
+  #     address: "{{ pollingContractAddress }}"
+  #     abi: PollingEmitter
+  #     startBlock: {{ pollingContractStartBlock }}
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.5
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Slate
+  #       - Spell
+  #       - Delegate
+  #       - DelegateAdmin
+  #       - Vote
+  #       - Poll
+  #       - PollVote
+  #     abis:
+  #       - name: PollingEmitter
+  #         file: ./abis/maker-governance/PollingEmitter.json
+  #     eventHandlers:
+  #       - event: Voted(indexed address,indexed uint256,indexed uint256)
+  #         handler: handlePollVote
+  #     file: ./protocols/maker-governance/src/polling-emitter.ts
   # - kind: ethereum
   #   name: DSToken
   #   network:  mainnet

@@ -30,12 +30,12 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (
+  const dailyActiveAccountId = (
     block.timestamp.toI64() / constants.SECONDS_PER_DAY
   )
     .toString()
     .concat("-")
-    .concat(from.toHexString());
+    .concat(account.id);
 
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
 
@@ -55,7 +55,7 @@ export function updateVaultSnapshots(
   vaultAddress: Address,
   block: ethereum.Block
 ): void {
-  let vault = VaultStore.load(vaultAddress.toHexString());
+  const vault = VaultStore.load(vaultAddress.toHexString());
   if (!vault) return;
 
   const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(

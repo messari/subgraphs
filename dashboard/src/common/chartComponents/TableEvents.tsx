@@ -36,6 +36,12 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
       if (currentData?.account) {
         currentData.account = currentData.account.id;
       }
+      if (currentData?.pool) {
+        currentData.pool = currentData.pool.id;
+      }
+      if (currentData?.token) {
+        currentData.token = currentData.token.name;
+      }
       if (currentData?.amountInUSD) {
         currentData.amountInUSD = Number(currentData.amountInUSD);
       }

@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://messari.io/protocol-explorer/all-protocols">
-    <img src="./docs/images/messari-logo.png" alt="Messari Logo" width="600" />
+    <img src="./docs/images/messari-logo.png" alt="Messari Logo" width="460" />
   </a>
 </p>
 

@@ -2,6 +2,7 @@ import {
   Address,
   BigDecimal,
   BigInt,
+  dataSource,
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
@@ -35,11 +36,11 @@ import {
   Network,
   BIGINT_ZERO,
   SECONDS_PER_YEAR,
-  InterestRateSide,
   RewardTokenType,
   BIGDECIMAL_ZERO,
   exponentToBigDecimal,
   SECONDS_PER_DAY,
+  equalsIgnoreCase,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -71,17 +72,8 @@ import {
 import { SolarBeamLPToken } from "../../../generated/templates/CToken/SolarBeamLPToken";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
-import {
-  comptrollerAddr,
-  MFAMAddr,
-  mMOVRAddr,
-  MOVRAddr,
-  nativeCToken,
-  nativeToken,
-  SolarBeamMfamMovrPairAddr,
-  SolarBeamMfamMovrPairStartBlock,
-} from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
+import { getProtocolData } from "./constants";
 
 class RewardTokenEmission {
   amount: BigInt;
@@ -99,8 +91,9 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
+  const protocolData = getProtocolData();
   _handleMarketEntered(
-    comptrollerAddr,
+    protocolData.comptrollerAddress,
     event.params.mToken.toHexString(),
     event.params.account.toHexString(),
     true
@@ -108,8 +101,9 @@ export function handleMarketEntered(event: MarketEntered): void {
 }
 
 export function handleMarketExited(event: MarketExited): void {
+  const protocolData = getProtocolData();
   _handleMarketEntered(
-    comptrollerAddr,
+    protocolData.comptrollerAddress,
     event.params.mToken.toHexString(),
     event.params.account.toHexString(),
     false
@@ -132,11 +126,12 @@ export function handleMarketListed(event: MarketListed): void {
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
-  if (cTokenAddr == nativeCToken.address) {
+  const protocolData = getProtocolData();
+  if (cTokenAddr == protocolData.nativeCToken.address) {
     const marketListedData = new MarketListedData(
       protocol,
-      nativeToken,
-      nativeCToken,
+      protocolData.nativeToken,
+      protocolData.nativeCToken,
       cTokenReserveFactorMantissa
     );
     _handleMarketListed(marketListedData, event);
@@ -221,8 +216,9 @@ export function handleMint(event: Mint): void {
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
+  const protocolData = getProtocolData();
   _handleMint(
-    comptrollerAddr,
+    protocolData.comptrollerAddress,
     minter,
     mintAmount,
     outputTokenSupplyResult,
@@ -239,8 +235,9 @@ export function handleRedeem(event: Redeem): void {
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.redeemer
   );
+  const protocolData = getProtocolData();
   _handleRedeem(
-    comptrollerAddr,
+    protocolData.comptrollerAddress,
     redeemer,
     redeemAmount,
     outputTokenSupplyResult,
@@ -257,8 +254,9 @@ export function handleBorrow(event: BorrowEvent): void {
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
+  const protocolData = getProtocolData();
   _handleBorrow(
-    comptrollerAddr,
+    protocolData.comptrollerAddress,
     borrower,
     borrowAmount,
     borrowBalanceStoredResult,
@@ -276,8 +274,9 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
+  const protocolData = getProtocolData();
   _handleRepayBorrow(
-    comptrollerAddr,
+    protocolData.comptrollerAddress,
     borrower,
     payer,
     repayAmount,
@@ -293,8 +292,9 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   const borrower = event.params.borrower;
   const seizeTokens = event.params.seizeTokens;
   const repayAmount = event.params.repayAmount;
+  const protocolData = getProtocolData();
   _handleLiquidateBorrow(
-    comptrollerAddr,
+    protocolData.comptrollerAddress,
     cTokenCollateral,
     liquidator,
     borrower,
@@ -324,9 +324,10 @@ export function handleAccrueInterest(event: AccrueInterest): void {
 
   const interestAccumulated = event.params.interestAccumulated;
   const totalBorrows = event.params.totalBorrows;
+  const protocolData = getProtocolData();
   _handleAccrueInterest(
     updateMarketData,
-    comptrollerAddr,
+    protocolData.comptrollerAddress,
     interestAccumulated,
     totalBorrows,
     false, // do not update all prices
@@ -335,107 +336,119 @@ export function handleAccrueInterest(event: AccrueInterest): void {
 }
 
 export function handleTransfer(event: Transfer): void {
+  const protocolData = getProtocolData();
   _handleTransfer(
     event,
     event.address.toHexString(),
     event.params.to,
     event.params.from,
-    comptrollerAddr
+    protocolData.comptrollerAddress
   );
 }
 
 function getOrCreateProtocol(): LendingProtocol {
-  const comptroller = Comptroller.bind(comptrollerAddr);
-  const protocolData = new ProtocolData(
-    comptrollerAddr,
+  const protocolData = getProtocolData();
+  const comptroller = Comptroller.bind(protocolData.comptrollerAddress);
+  const data = new ProtocolData(
+    protocolData.comptrollerAddress,
     "Moonwell",
     "moonwell",
-    Network.MOONRIVER,
+    protocolData.network,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()
   );
 
-  return _getOrCreateProtocol(protocolData);
+  return _getOrCreateProtocol(data);
 }
 
-// rewardTokens = [MFAM-supply, MOVR-supply, MFAM-borrow, MOVR-borrow]
 function initMarketRewards(marketID: string): void {
   const market = Market.load(marketID);
   if (!market) {
     log.warning("[initMarketRewards] market not found: {}", [marketID]);
     return;
   }
+  const protocolData = getProtocolData();
 
-  let MFAMToken = Token.load(MFAMAddr.toHexString());
-  if (!MFAMToken) {
-    MFAMToken = new Token(MFAMAddr.toHexString());
-    MFAMToken.name = "MFAM";
-    MFAMToken.symbol = "MFAM";
-    MFAMToken.decimals = 18;
-    MFAMToken.save();
+  // Moonriver rewardTokens = [BORROW-MOVR, BORROW-MFAM, DEPOSIT-MOVR, DEPOSIT-MFAM]
+  // Moonbeam rewardTokens = [BORROW-GLMR, BORROW-WELL, DEPOSIT-GLMR, DEPOSIT-WELL]
+  let _rewardToken0 = Token.load(
+    protocolData.nativeToken.address.toHexString()
+  );
+  if (!_rewardToken0) {
+    _rewardToken0 = new Token(protocolData.nativeToken.address.toHexString());
+    _rewardToken0.name = protocolData.nativeToken.name;
+    _rewardToken0.symbol = protocolData.nativeToken.symbol;
+    _rewardToken0.decimals = protocolData.nativeToken.decimals;
+    _rewardToken0.save();
   }
-  let MOVRToken = Token.load(MOVRAddr.toHexString());
-  if (!MOVRToken) {
-    MOVRToken = new Token(MOVRAddr.toHexString());
-    MOVRToken.name = "MOVR";
-    MOVRToken.symbol = "MOVR";
-    MOVRToken.decimals = 18;
-    MOVRToken.save();
+  const rewardToken0 = _rewardToken0;
+  let _rewardToken1 = Token.load(
+    protocolData.auxilaryRewardToken.address.toHexString()
+  );
+  if (!_rewardToken1) {
+    _rewardToken1 = new Token(
+      protocolData.auxilaryRewardToken.address.toHexString()
+    );
+    _rewardToken1.name = protocolData.auxilaryRewardToken.name;
+    _rewardToken1.symbol = protocolData.auxilaryRewardToken.symbol;
+    _rewardToken1.decimals = protocolData.auxilaryRewardToken.decimals;
+    _rewardToken1.save();
   }
+  const rewardToken1 = _rewardToken1;
 
   let supplyRewardToken0 = RewardToken.load(
-    InterestRateSide.LENDER.concat("-").concat(MFAMAddr.toHexString())
+    RewardTokenType.DEPOSIT.concat("-").concat(rewardToken0.id)
   );
   if (!supplyRewardToken0) {
     supplyRewardToken0 = new RewardToken(
-      InterestRateSide.LENDER.concat("-").concat(MFAMAddr.toHexString())
+      RewardTokenType.DEPOSIT.concat("-").concat(rewardToken0.id)
     );
-    supplyRewardToken0.token = MFAMToken.id;
+    supplyRewardToken0.token = rewardToken0!.id;
     supplyRewardToken0.type = RewardTokenType.DEPOSIT;
     supplyRewardToken0.save();
   }
 
   let supplyRewardToken1 = RewardToken.load(
-    InterestRateSide.LENDER.concat("-").concat(MOVRAddr.toHexString())
+    RewardTokenType.DEPOSIT.concat("-").concat(rewardToken1.id)
   );
   if (!supplyRewardToken1) {
     supplyRewardToken1 = new RewardToken(
-      InterestRateSide.LENDER.concat("-").concat(MOVRAddr.toHexString())
+      RewardTokenType.DEPOSIT.concat("-").concat(rewardToken1.id)
     );
-    supplyRewardToken1.token = MOVRToken.id;
+    supplyRewardToken1.token = rewardToken1!.id;
     supplyRewardToken1.type = RewardTokenType.DEPOSIT;
     supplyRewardToken1.save();
   }
 
   let borrowRewardToken0 = RewardToken.load(
-    InterestRateSide.BORROWER.concat("-").concat(MFAMAddr.toHexString())
+    RewardTokenType.BORROW.concat("-").concat(rewardToken0.id)
   );
   if (!borrowRewardToken0) {
     borrowRewardToken0 = new RewardToken(
-      InterestRateSide.BORROWER.concat("-").concat(MFAMAddr.toHexString())
+      RewardTokenType.BORROW.concat("-").concat(rewardToken0.id)
     );
-    borrowRewardToken0.token = MFAMToken.id;
+    borrowRewardToken0.token = rewardToken0!.id;
     borrowRewardToken0.type = RewardTokenType.BORROW;
     borrowRewardToken0.save();
   }
 
   let borrowRewardToken1 = RewardToken.load(
-    InterestRateSide.BORROWER.concat("-").concat(MOVRAddr.toHexString())
+    RewardTokenType.BORROW.concat("-").concat(rewardToken1.id)
   );
   if (!borrowRewardToken1) {
     borrowRewardToken1 = new RewardToken(
-      InterestRateSide.BORROWER.concat("-").concat(MOVRAddr.toHexString())
+      RewardTokenType.BORROW.concat("-").concat(rewardToken1.id)
     );
-    borrowRewardToken1.token = MOVRToken.id;
+    borrowRewardToken1.token = rewardToken1!.id;
     borrowRewardToken1.type = RewardTokenType.BORROW;
     borrowRewardToken1.save();
   }
 
   market.rewardTokens = [
-    supplyRewardToken0.id,
-    supplyRewardToken1.id,
     borrowRewardToken0.id,
     borrowRewardToken1.id,
+    supplyRewardToken0.id,
+    supplyRewardToken1.id,
   ];
   market.rewardTokenEmissionsAmount = [
     BIGINT_ZERO,
@@ -459,56 +472,63 @@ function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
     log.warning("[setMarketRewards] Market not found: {}", [marketID]);
     return;
   }
+  const protocolData = getProtocolData();
 
-  const MOVRMarket = Market.load(mMOVRAddr.toHexString());
-  if (!MOVRMarket) {
-    log.warning("[setMarketRewards] mMOVR market not found: {}", [
-      mMOVRAddr.toHexString(),
+  const nativeMarket = Market.load(
+    protocolData.nativeCToken.address.toHexString()
+  );
+  if (!nativeMarket) {
+    log.warning("[setMarketRewards] nativeMarket not found: {}", [
+      protocolData.nativeCToken.address.toHexString(),
     ]);
     return;
   }
-
-  const MOVRPriceUSD = MOVRMarket.inputTokenPriceUSD;
-  let MFAMPriceUSD = BIGDECIMAL_ZERO;
-  if (blockNumber >= SolarBeamMfamMovrPairStartBlock) {
-    const oneMFAMInMOVR = getOneMFAMInMOVR();
-    MFAMPriceUSD = MOVRPriceUSD.times(oneMFAMInMOVR);
+  const token0PriceUSD = nativeMarket.inputTokenPriceUSD;
+  let token1PriceUSD = BIGDECIMAL_ZERO;
+  if (blockNumber >= protocolData.nativeLPStartBlock) {
+    let oneAuxillaryInNative = BIGDECIMAL_ZERO;
+    if (equalsIgnoreCase(dataSource.network(), Network.MOONRIVER)) {
+      oneAuxillaryInNative = getOneMFAMInMOVR(protocolData.nativeLPAddress);
+    } else {
+      oneAuxillaryInNative = getOneWELLInGLMR(protocolData.nativeLPAddress);
+    }
+    token1PriceUSD = oneAuxillaryInNative.times(token0PriceUSD);
   }
-  const comptroller = Comptroller.bind(comptrollerAddr);
+  const comptroller = Comptroller.bind(protocolData.comptrollerAddress);
 
-  // In Comptroller, 0 = MFAM, 1 = MOVR
-  const supplyMFAMEmission = getRewardTokenEmission(
-    comptroller.try_supplyRewardSpeeds(0, marketAddress),
-    18,
-    MFAMPriceUSD
-  );
-  const supplyMOVREmission = getRewardTokenEmission(
+  // In Comptroller, 0 = MFAM, 1 = MOVR || 0 = WELL, 1 = GLMR
+  const supplyNativeEmission = getRewardTokenEmission(
     comptroller.try_supplyRewardSpeeds(1, marketAddress),
     18,
-    MOVRPriceUSD
+    token0PriceUSD
   );
-  const borrowMFAMEmission = getRewardTokenEmission(
-    comptroller.try_borrowRewardSpeeds(0, marketAddress),
+  const supplyAuxEmission = getRewardTokenEmission(
+    comptroller.try_supplyRewardSpeeds(0, marketAddress),
     18,
-    MFAMPriceUSD
+    token1PriceUSD
   );
-  const borrowMOVREmission = getRewardTokenEmission(
+  const borrowNativeEmission = getRewardTokenEmission(
     comptroller.try_borrowRewardSpeeds(1, marketAddress),
     18,
-    MOVRPriceUSD
+    token0PriceUSD
+  );
+  const borrowAuxEmission = getRewardTokenEmission(
+    comptroller.try_borrowRewardSpeeds(0, marketAddress),
+    18,
+    token1PriceUSD
   );
 
   market.rewardTokenEmissionsAmount = [
-    supplyMFAMEmission.amount,
-    supplyMOVREmission.amount,
-    borrowMFAMEmission.amount,
-    borrowMOVREmission.amount,
+    borrowNativeEmission.amount,
+    borrowAuxEmission.amount,
+    supplyNativeEmission.amount,
+    supplyAuxEmission.amount,
   ];
   market.rewardTokenEmissionsUSD = [
-    supplyMFAMEmission.USD,
-    supplyMOVREmission.USD,
-    borrowMFAMEmission.USD,
-    borrowMOVREmission.USD,
+    borrowNativeEmission.USD,
+    borrowAuxEmission.USD,
+    supplyNativeEmission.USD,
+    supplyAuxEmission.USD,
   ];
   market.save();
 }
@@ -534,8 +554,8 @@ function getRewardTokenEmission(
 }
 
 // Fetch MFAM vs MOVR price from SolarBeam, as suggested by Luke, Moonwell's CEO.
-function getOneMFAMInMOVR(): BigDecimal {
-  const lpTokenContract = SolarBeamLPToken.bind(SolarBeamMfamMovrPairAddr);
+function getOneMFAMInMOVR(lpAddress: Address): BigDecimal {
+  const lpTokenContract = SolarBeamLPToken.bind(lpAddress);
   const getReservesResult = lpTokenContract.try_getReserves();
   if (getReservesResult.reverted) {
     log.warning("[getOneMFAMInMOVR] result reverted", []);
@@ -544,4 +564,17 @@ function getOneMFAMInMOVR(): BigDecimal {
   const MOVRReserve = getReservesResult.value.value0;
   const MFAMReserve = getReservesResult.value.value1;
   return MOVRReserve.toBigDecimal().div(MFAMReserve.toBigDecimal());
+}
+
+// Fetch WELL vs GLMR price from SolarBeam
+function getOneWELLInGLMR(lpAddress: Address): BigDecimal {
+  const lpTokenContract = SolarBeamLPToken.bind(lpAddress);
+  const getReservesResult = lpTokenContract.try_getReserves();
+  if (getReservesResult.reverted) {
+    log.warning("[getOneWELLInGLMR] result reverted", []);
+    return BIGDECIMAL_ZERO;
+  }
+  const GLMRReserve = getReservesResult.value.value1;
+  const WELLReserve = getReservesResult.value.value0;
+  return GLMRReserve.toBigDecimal().div(WELLReserve.toBigDecimal());
 }

@@ -4,7 +4,10 @@
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix",
-    "codegen": "graph codegen"
+    "codegen": "graph codegen",
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json src/common/constants.mustache > src/common/constants.ts",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.31.0",

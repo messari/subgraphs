@@ -1,5 +1,5 @@
 import { Address, BigDecimal, ethereum, BigInt, log, crypto, ByteArray, Bytes } from "@graphprotocol/graph-ts";
-import { Borrow, Deposit, Liquidation, Repay, Withdraw } from "../../generated/euler/Euler";
+import { Borrow, Deposit, Euler, Liquidation, Repay, Withdraw } from "../../generated/euler/Euler";
 import {
   getOrCreateDeposit,
   getOrCreateToken,
@@ -17,6 +17,8 @@ import {
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
   getOrCreateAssetStatus,
+  getCutoffValue,
+  getOrCreateRewardToken,
 } from "../common/getters";
 import {
   BIGDECIMAL_ONE,
@@ -33,9 +35,21 @@ import {
   SECONDS_PER_DAY,
   DEFAULT_DECIMALS,
   UNDERLYING_RESERVES_FEE,
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  BLOCKS_PER_DAY,
+  BLOCKS_PER_EPOCH,
+  EULER_ADDRESS,
+  EUL_ADDRESS,
+  EUL_DECIMALS,
+  EUL_DIST,
+  EUL_MARKET_ADDRESS,
+  MODULEID__EXEC,
+  RewardTokenType,
+  START_EPOCH,
 } from "../common/constants";
-import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
-import { LendingProtocol, Market, _AssetStatus } from "../../generated/schema";
+import { BigDecimalTruncateToBigInt, bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
+import { LendingProtocol, Market, _AssetStatus, _Epoch } from "../../generated/schema";
 import { Exec } from "../../generated/euler/Exec";
 import { bigDecimalExponential } from "../common/conversions";
 import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
@@ -236,10 +250,12 @@ export function updatePrices(execProxyAddress: Address, market: Market, event: e
   }
   market.save();
 
-  const eToken = getOrCreateToken(Address.fromString(market.outputToken!));
-  eToken.lastPriceUSD = market.outputTokenPriceUSD;
-  eToken.lastPriceBlockNumber = blockNumber;
-  eToken.save();
+  if (market.outputToken) {
+    const eToken = getOrCreateToken(Address.fromString(market.outputToken!));
+    eToken.lastPriceUSD = market.outputTokenPriceUSD;
+    eToken.lastPriceBlockNumber = blockNumber;
+    eToken.save();
+  }
 
   if (market._dToken && market._dTokenExchangeRate!.gt(BIGDECIMAL_ZERO)) {
     const dToken = getOrCreateToken(Address.fromString(market._dToken!));
@@ -248,7 +264,33 @@ export function updatePrices(execProxyAddress: Address, market: Market, event: e
     dToken.save();
   }
 
+  // update market.rewardTokenEmissionUSD when updating EUL price
+  if (market.inputToken == EUL_ADDRESS) {
+    updateRewardEmissionsUSD(underlyingPriceUSD);
+  }
+
   return underlyingPriceUSD;
+}
+
+function updateRewardEmissionsUSD(underlyingPriceUSD: BigDecimal): void {
+  const protocol = getOrCreateLendingProtocol();
+  for (let i = 0; i < protocol._marketIDs!.length; i++) {
+    const mktID = protocol._marketIDs![i];
+    const mkt = Market.load(mktID);
+    if (
+      !mkt ||
+      !mkt.rewardTokenEmissionsAmount ||
+      mkt.rewardTokenEmissionsAmount!.length == 0 ||
+      mkt.rewardTokenEmissionsAmount![0].equals(BIGINT_ZERO)
+    ) {
+      log.info("[updateRewardEmissionsUSD]Skip upating reward emissions for market {}", [mktID]);
+      continue;
+    }
+    const rewardTokenEmissionUSD = mkt
+      .rewardTokenEmissionsAmount![0].divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
+      .times(underlyingPriceUSD);
+    mkt.rewardTokenEmissionsUSD = [rewardTokenEmissionUSD];
+  }
 }
 
 export function updateInterestRates(
@@ -665,4 +707,112 @@ function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
   }
 
   return null;
+}
+
+export function updateWeightedStakedAmount(market: Market, endBlock: BigInt): void {
+  const blocksLapsed = endBlock.minus(market._stakeLastUpdateBlock!);
+  const _weightedStakedAmount = market._weightedStakedAmount!.plus(market._stakedAmount.times(blocksLapsed));
+  market._weightedStakedAmount = _weightedStakedAmount;
+  market._stakeLastUpdateBlock = endBlock;
+  market.save();
+}
+
+export function processReward(epoch: _Epoch, epochStartBlock: BigInt, event: ethereum.Event): void {
+  const epochID = epoch.epoch;
+  // rank markets in the epoch just ended (prev epoch)
+  // find the top ten staked markets; according to the euler guage
+  // https://app.euler.finance/gaugeweight
+  // See the `Reward Token Emissions Amount` in README.md for a description of the method
+  const prevEpochID = epochID - 1;
+  const prevEpoch = _Epoch.load(prevEpochID.toString());
+  if (prevEpoch) {
+    const protocol = getOrCreateLendingProtocol();
+    // finalize mkt._weightedStakedAmount for prev epoch & distribute rewards
+    // The array is needed to select top 10 staked markets
+    const marketWeightedStakedAmounts: BigInt[] = [];
+    for (let i = 0; i < protocol._marketIDs!.length; i++) {
+      const mktID = protocol._marketIDs![i];
+      const mkt = Market.load(mktID);
+      if (!mkt) {
+        log.error("[handleStake]market {} doesn't exist, but this should not happen at tx ={}", [
+          mktID,
+          event.transaction.hash.toHexString(),
+        ]);
+        continue;
+      }
+      const stakedAmount = mkt._stakedAmount;
+      if (stakedAmount.gt(BIGINT_ZERO)) {
+        // finalized mkt._weightedStakedAmount for the epoch just ended
+        // epochStartBlock.minus(BIGINT_ONE) is the end block of prev epoch
+        updateWeightedStakedAmount(mkt, epochStartBlock.minus(BIGINT_ONE));
+      }
+      marketWeightedStakedAmounts.push(mkt._weightedStakedAmount ? mkt._weightedStakedAmount! : BIGINT_ZERO);
+      mkt.save();
+    }
+
+    const EULPriceUSD = getEULPriceUSD(event);
+    const rewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
+    const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
+    // select top 10 staked markets, calculate sqrt(weighted staked amount)
+    const cutoffAmount = getCutoffValue(marketWeightedStakedAmounts, 10);
+    let sumAccumulator = BIGDECIMAL_ZERO;
+    for (let i = 0; i < marketWeightedStakedAmounts.length; i++) {
+      // TODO: reflect changes in eIP 24 and 28
+      if (marketWeightedStakedAmounts[i].ge(cutoffAmount)) {
+        sumAccumulator = sumAccumulator.plus(marketWeightedStakedAmounts[i].sqrt().toBigDecimal());
+      }
+    }
+
+    // scale to daily emission amount
+    const dailyScaler = BigDecimal.fromString((BLOCKS_PER_DAY / (BLOCKS_PER_EPOCH as f64)).toString());
+    for (let i = 0; i < protocol._marketIDs!.length; i++) {
+      const mktID = protocol._marketIDs![i];
+      const mkt = Market.load(mktID);
+      if (!mkt) {
+        log.error("[handleStake]market {} doesn't exist, but this should not happen | tx ={}", [
+          mktID,
+          event.transaction.hash.toHexString(),
+        ]);
+        continue;
+      }
+      if (mkt.rewardTokens && mkt.rewardTokens!.length > 0) {
+        // reset reward emissions for the epoch
+        mkt.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+        mkt.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
+      }
+
+      // distribute the rewards among top 10 staked markets
+      // Only for epochs after START_EPOCH (6)
+      const _weightedStakedAmount = mkt._weightedStakedAmount;
+      if (_weightedStakedAmount && _weightedStakedAmount.ge(cutoffAmount)) {
+        mkt.rewardTokens = [rewardToken.id];
+        const rewardTokenEmissionsAmount = BigDecimalTruncateToBigInt(
+          _weightedStakedAmount.sqrt().divDecimal(sumAccumulator).times(totalRewardAmount).times(dailyScaler),
+        );
+        const rewardTokenEmissionsUSD = rewardTokenEmissionsAmount
+          .divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
+          .times(EULPriceUSD);
+        mkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
+        mkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+      }
+
+      // reset mkt._weightedStakedAmount for the new epoch
+      mkt._weightedStakedAmount = BIGINT_ZERO;
+      // EUL staked remains staked for the market until unstaked
+      // so not reset mkt._stakedAmount
+      mkt.save();
+    }
+  }
+}
+
+function getEULPriceUSD(event: ethereum.Event): BigDecimal {
+  const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
+  const execProxyAddress = eulerContract.moduleIdToProxy(MODULEID__EXEC);
+  const eulMarket = getOrCreateMarket(EUL_MARKET_ADDRESS);
+  let EULPriceUSD = updatePrices(execProxyAddress, eulMarket, event);
+  if (!EULPriceUSD) {
+    const EULToken = getOrCreateToken(Address.fromString(EUL_ADDRESS));
+    EULPriceUSD = EULToken.lastPriceUSD!;
+  }
+  return EULPriceUSD;
 }
