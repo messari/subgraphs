@@ -1,4 +1,4 @@
-import { ethereum, Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts";
 
 // Topic0 of ERC20 Transfer event.
 // Transfer(address,address.uint256)

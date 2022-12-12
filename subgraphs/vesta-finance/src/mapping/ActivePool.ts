@@ -1,21 +1,8 @@
-import { Address } from "@graphprotocol/graph-ts";
 import {
   ActivePoolAssetBalanceUpdated,
   ActivePoolVSTDebtUpdated,
 } from "../../generated/ActivePool/ActivePool";
-import { StabilityPool } from "../../generated/templates";
-import { StabilityPoolManager } from "../../generated/ActivePool/StabilityPoolManager";
 import { setMarketAssetBalance, setMarketVSTDebt } from "../entities/market";
-import {
-  getOrCreateLendingProtocol,
-  updateProtocolPriceOracle,
-} from "../entities/protocol";
-
-import {
-  EMPTY_STRING,
-  PRICE_ORACLE_V1_ADDRESS,
-  STABILITY_POOL_MANAGER,
-} from "../utils/constants";
 
 /**
  * Total Asset collateral was updated

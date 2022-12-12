@@ -6,7 +6,7 @@ import {
   PositionSnapshot,
   _Trove,
 } from "../../generated/schema";
-import { BIGINT_ZERO, INT_ZERO, VST_ADDRESS } from "../utils/constants";
+import { BIGINT_ZERO, INT_ZERO } from "../utils/constants";
 import { PositionSide } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateAccount } from "./account";

@@ -27,7 +27,6 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
   const contract = CollSurplusPool.bind(event.address);
   let asset: string | null = null;
 
-  // TODO: optimize this
   // As the asset address is not included in the event's paramters, comparing every address's previous
   // balance with current balance to determine which asset the event is related with.
   for (let i = 0; i < assets.length; i++) {

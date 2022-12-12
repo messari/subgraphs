@@ -9,7 +9,6 @@ import {
 } from "../../generated/PriceFeedV2/PriceFeedV2";
 import { StabilityPoolManager as StabilityPoolManagerContract } from "../../generated/PriceFeedV2/StabilityPoolManager";
 import { StabilityPool as StabilityPoolTemplate } from "../../generated/templates";
-import { VestaParameters } from "../../generated/VestaParameters/VestaParameters";
 import { getOrCreateStabilityPool } from "../entities/market";
 import { getOrCreateAssetToken, setCurrentAssetPrice } from "../entities/token";
 import {

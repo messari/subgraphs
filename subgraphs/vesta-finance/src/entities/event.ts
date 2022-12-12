@@ -14,8 +14,8 @@ import {
   Withdraw,
 } from "../../generated/schema";
 import { BIGINT_ZERO, PositionSide } from "../utils/constants";
-import { addMarketVolume, getOrCreateMarket } from "./market";
-import { getOrCreateAssetToken, getVSTToken } from "./token";
+import { addMarketVolume } from "./market";
+import { getVSTToken } from "./token";
 import { prefixID } from "../utils/strings";
 import {
   getOrCreateAccount,

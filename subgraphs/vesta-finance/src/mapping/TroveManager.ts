@@ -24,11 +24,7 @@ import {
   LIQUIDATION_RESERVE_VST,
   VST_ADDRESS,
 } from "../utils/constants";
-import {
-  _AssetToStabilityPool,
-  _StabilityPool,
-  _Trove,
-} from "../../generated/schema";
+import { _AssetToStabilityPool, _Trove } from "../../generated/schema";
 import {
   addProtocolSideRevenue,
   addSupplySideRevenue,
@@ -63,7 +59,6 @@ export function handleRedemption(event: Redemption): void {
  * @param event TroveUpdated event
  */
 export function handleTroveUpdated(event: TroveUpdated): void {
-  //const trove = getOrCreateTrove(event.params._borrower);
   const trove = getOrCreateTrove(event.params._borrower, event.params._asset);
   const operation = event.params.operation as TroveManagerOperation;
   switch (operation) {

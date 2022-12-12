@@ -1,10 +1,4 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
   FinancialsDailySnapshot,
   LendingProtocol,
@@ -12,14 +6,12 @@ import {
 } from "../../generated/schema";
 import { VSTToken as VSTTokenContract } from "../../generated/ActivePool/VSTToken";
 import {
-  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   EMPTY_STRING,
   INT_ONE,
   INT_ZERO,
   LendingType,
   Network,
-  PRICE_ORACLE_V1_ADDRESS,
   ProtocolType,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
@@ -28,7 +20,6 @@ import {
   TROVE_MANAGER,
   VST_ADDRESS,
 } from "../utils/constants";
-import { bigIntToBigDecimal } from "../utils/numbers";
 import { Versions } from "../versions";
 import { EventType } from "./event";
 import {
@@ -263,8 +254,7 @@ export function updateProtocolUSDLocked(
 
 export function updateProtocolBorrowBalance(
   event: ethereum.Event,
-  borrowedUSDChange: BigDecimal,
-  totalVSTSupplyChange: BigInt
+  borrowedUSDChange: BigDecimal
 ): void {
   const protocol = getOrCreateLendingProtocol();
   protocol.totalBorrowBalanceUSD =

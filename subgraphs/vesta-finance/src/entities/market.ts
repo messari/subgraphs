@@ -30,7 +30,7 @@ import {
 } from "./token";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 import { EventType } from "./event";
-import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
+import { bigIntToBigDecimal } from "../utils/numbers";
 import {
   ACTIVE_POOL_ADDRESS,
   ACTIVE_POOL_CREATED_BLOCK,
@@ -303,15 +303,12 @@ export function setMarketVSTDebt(
   const debtUSD = bigIntToBigDecimal(debtVST);
   const market = getOrCreateMarket(asset);
   const debtUSDChange = debtUSD.minus(market.totalBorrowBalanceUSD);
-  const debtVSTChange = BigInt.fromString(
-    debtUSDChange.times(exponentToBigDecimal()).toString().split(".")[0]
-  );
   market.totalBorrowBalanceUSD = debtUSD;
   market.save();
 
   getOrCreateMarketSnapshot(event, market);
   getOrCreateMarketHourlySnapshot(event, market);
-  updateProtocolBorrowBalance(event, debtUSDChange, debtVSTChange);
+  updateProtocolBorrowBalance(event, debtUSDChange);
 }
 
 export function setMarketAssetBalance(
