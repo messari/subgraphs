@@ -75,18 +75,30 @@ export function getVaultFromGauge(gaugeAddress: Address): Address {
 export function getVaultBalance(vaultAddress: Address): BigInt {
   const vaultContract = VaultContract.bind(vaultAddress);
 
-  const balance = readValue(vaultContract.try_balance(), constants.BIGINT_ZERO);
+  let balance = readValue(vaultContract.try_balance(), constants.BIGINT_ZERO);
   if (balance.notEqual(constants.BIGINT_ZERO)) return balance;
 
   const gaugeAddress = getGaugeFromVault(vaultAddress);
   const gaugeContract = GaugeContract.bind(gaugeAddress);
 
-  const totalSupply = readValue<BigInt>(
+  balance = readValue<BigInt>(
     gaugeContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
+  if (balance.notEqual(constants.BIGINT_ZERO)) return balance;
 
-  return totalSupply;
+  const staking_token = readValue<Address>(
+    vaultContract.try_staking_token(),
+    constants.NULL.TYPE_ADDRESS
+  );
+  const stakingTokenContract = ERC20Contract.bind(staking_token);
+
+  balance = readValue<BigInt>(
+    stakingTokenContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
+
+  return balance;
 }
 
 export function getMultiGaugeFromLiquidityLocker(

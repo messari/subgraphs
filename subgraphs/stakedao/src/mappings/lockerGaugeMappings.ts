@@ -28,7 +28,7 @@ export function handleDeposit(event: DepositEvent): void {
   Deposit(
     lockerGaugeAddress,
     depositAmount,
-    null,
+    depositAmount,
     event.transaction,
     event.block
   );

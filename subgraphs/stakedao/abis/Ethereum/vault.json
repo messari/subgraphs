@@ -9,6 +9,14 @@
     "type": "constructor"
   },
   {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "staking_token",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address" }],
+    "gas": 3138
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
