@@ -527,11 +527,15 @@ type LendingProtocol implements Protocol @entity {
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
+}
 
-  ##### Add Ons #####
+# helper entity to iterate through all markets
+type _Markets @entity {
+  " Same ID as LendingProtocol "
+  id: Bytes!
 
-  " All markets in this protocol "
-  _markets: [Bytes!]!
+  " IDs of all markets in the LendingProtocol "
+  markets: [Bytes!]!
 }
 
 ###############################
@@ -1575,13 +1579,13 @@ type PositionSnapshot @entity(immutable: true) {
 }
 
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity(immutable: true) {
+type _ActiveAccount @entity(immutable: true) {
   " { daily/hourly }-{ Address of the account }-{ Optional: Transaction Type }-{ Optional: Market Address }-{ Optional: Days/hours since Unix epoch } "
   id: ID!
 }
 
 # Helper entity for getting positions
-type PositionCounter @entity {
+type _PositionCounter @entity {
   " { Account address }-{ Market address }-{ Position Side } "
   id: ID!
 
