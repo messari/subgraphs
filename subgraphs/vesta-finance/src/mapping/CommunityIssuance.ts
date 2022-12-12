@@ -27,13 +27,10 @@ import { exponentToBigDecimal } from "../utils/numbers";
 export function handleTotalVSTAIssuedUpdated(
   event: TotalVSTAIssuedUpdated
 ): void {
-  calculateDailyVestaRewards(event, event.params.stabilityPool);
+  calculateDailyVSTARewards(event, event.params.stabilityPool);
 }
 
-function calculateDailyVestaRewards(
-  event: ethereum.Event,
-  pool: Address
-): void {
+function calculateDailyVSTARewards(event: ethereum.Event, pool: Address): void {
   const stabilityPool = getOrCreateStabilityPool(pool, null, event);
   const contract = CommunityIssuance.bind(event.address);
   const stabilityPoolRewardsResult = contract.try_stabilityPoolRewards(pool);
@@ -44,6 +41,13 @@ function calculateDailyVestaRewards(
     );
     return;
   }
+
+  // read RewardDistributionPerMin from the `DistributionRewards` struct,
+  // not using try_* here
+  const rewardTokenEmissionAmount = stabilityPoolRewardsResult.value
+    .getRewardDistributionPerMin()
+    .times(MINUTES_PER_DAY);
+
   const VSTAToken = getOrCreateAssetToken(Address.fromString(VSTA_ADDRESS));
   const rewardTokens = stabilityPool.rewardTokens;
   if (!rewardTokens || rewardTokens.length == 0) {
@@ -57,9 +61,6 @@ function calculateDailyVestaRewards(
     stabilityPool.rewardTokens = [rewardToken.id];
   }
 
-  const rewardTokenEmissionAmount = stabilityPoolRewardsResult.value
-    .getRewardDistributionPerMin()
-    .times(MINUTES_PER_DAY);
   const VSTAPriceUSD = getVSTATokenPrice(event);
   let rewardTokenEmissionsUSD = BIGDECIMAL_ZERO;
   if (VSTAPriceUSD) {
@@ -74,6 +75,17 @@ function calculateDailyVestaRewards(
   stabilityPool.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
   stabilityPool.save();
 
+  log.info(
+    "[calculateDailyVSTARewards]stability pool {} ({}) daily reward amount={},VSTA price={},rewardUSD={} for tx {}",
+    [
+      stabilityPool.id,
+      stabilityPool.name!,
+      rewardTokenEmissionAmount.toString(),
+      VSTAPriceUSD ? VSTAPriceUSD!.toString() : "null",
+      rewardTokenEmissionsUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
   getOrCreateMarketSnapshot(event, stabilityPool);
   getOrCreateMarketHourlySnapshot(event, stabilityPool);
 

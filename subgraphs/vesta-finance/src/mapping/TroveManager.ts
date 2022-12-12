@@ -264,7 +264,7 @@ export function handleLiquidation(event: Liquidation): void {
   let assetSent = BIGINT_ZERO;
   for (let i = 0; i < event.receipt!.logs.length; i++) {
     const txLog = event.receipt!.logs[i];
-    const burned = stabilityPoolVSTBurn(txLog, event.address);
+    const burned = stabilityPoolVSTBurn(txLog, stabilityPoolAddress);
     if (burned) {
       vstBurned = vstBurned.plus(burned);
       continue;
@@ -278,7 +278,14 @@ export function handleLiquidation(event: Liquidation): void {
   }
 
   if (vstBurned.equals(BIGINT_ZERO) || assetSent.equals(BIGINT_ZERO)) {
-    log.error("no LUSD was burned on this liquidation", []);
+    log.error(
+      "[handleLiquidation]no VST burned {} or asset sent {} on this liquidationtx {}",
+      [
+        vstBurned.toString(),
+        assetSent.toString(),
+        event.transaction.hash.toHexString(),
+      ]
+    );
     return;
   }
 
@@ -295,13 +302,13 @@ export function handleLiquidation(event: Liquidation): void {
   addSupplySideRevenue(event, market, revenue);
 }
 
-// stabilityPoolLUSDBurn will return the amount of VST burned as indicated by this log.
+// stabilityPoolVSTBurn will return the amount of VST burned as indicated by this log.
 // If the log is not a VST burn log, it will return null.
 function stabilityPoolVSTBurn(
-  log: ethereum.Log,
+  txLog: ethereum.Log,
   spAddress: Address
 ): BigInt | null {
-  const transfer = ERC20TransferLog.parse(log);
+  const transfer = ERC20TransferLog.parse(txLog);
   if (!transfer) {
     return null;
   }
@@ -313,6 +320,7 @@ function stabilityPoolVSTBurn(
   ) {
     return transfer.amount;
   }
+
   return null;
 }
 
