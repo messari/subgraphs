@@ -1,0 +1,18 @@
+{
+  "network": "avalanche",
+  "factory": {
+    "startBlock": "4606868",
+    "address": "0xb6A86025F0FE1862B372cb0ca18CE3EDe02A318f"
+  },
+  "lendingPoolConfigurator": {
+    "startBlock": "4607024",
+    "address": "0x230B618aD4C475393A7239aE03630042281BD86e"
+  },
+  "lendingPool": {
+    "startBlock": "4607005",
+    "address": "0x4F01AeD16D97E3aB5ab2B501154DC9bb0F1A5A2C"
+  },
+  "graftEnabled": false,
+  "subgraphId": "QmbEQvJSV6QdaLucfAuQ3x4z5jp1wErdafKK88JYfLm5na",
+  "graftStartBlock": 17825987
+}

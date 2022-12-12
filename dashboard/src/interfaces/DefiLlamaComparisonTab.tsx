@@ -31,7 +31,6 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
       return;
     }
   }
-  const navigate = useNavigate();
 
   ChartJS.register(...registerables);
   ChartJS.register(PointElement);
@@ -43,6 +42,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
 
   const [defiLlamaData, setDefiLlamaData] = useState<{ [x: string]: any }>({});
   const [defiLlamaProtocols, setDefiLlamaProtocols] = useState<any[]>([]);
+  const [defiLlamaProtocolFetchError, setDefiLlamaProtocolFetchError] = useState<boolean>(false);
   const [isMonthly, setIsMonthly] = useState(false);
   const [includeStakedTVL, setIncludeStakedTVL] = useState(true);
   const [includeBorrowedTVL, setIncludeBorrowedTVL] = useState(true);
@@ -154,11 +154,13 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
         setDefiLlamaData(json);
       })
       .catch((err) => {
+        setDefiLlamaProtocolFetchError(true);
         console.log(err);
       });
   };
 
   useEffect(() => {
+    setDefiLlamaProtocolFetchError(false);
     if (defiLlamaSlug.length > 0) {
       setDefiLlamaData({});
       defiLlama();
@@ -198,7 +200,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
         }
       });
 
-      let compChart = {
+      let compChart: any = {
         defiLlama: defiLlamaData.chainTvls[dataset].tvl.map((x: any, idx: number) => {
           let value = x.totalLiquidityUSD;
           const date = toDate(x.date);
@@ -242,23 +244,10 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
         };
       }
 
-      compChart = lineupChartDatapoints({ ...compChart }, 0);
-      compChart.defiLlama
-        .forEach((val: any, i: any) => {
-          const subgraphPoint = compChart.subgraph[i];
-          if (!subgraphPoint) {
-            return;
-          }
-
-          const subgraphTimestamp = subgraphPoint?.date || 0;
-          const llamaDate = toDate(val.date);
-
-          if (Math.abs(subgraphTimestamp - val.date) > 86400) {
-            const dateIndex = compChart.subgraph.findIndex((x: any) => toDate(x.date) === llamaDate || x.date > val.date);
-            compChart.subgraph = [...compChart.subgraph.slice(0, i), ...compChart.subgraph.slice(dateIndex, compChart.subgraph.length)];
-            compChart = lineupChartDatapoints({ ...compChart }, i);
-          }
-        });
+      compChart = lineupChartDatapoints({ ...compChart });
+      if (compChart instanceof Error) {
+        throw new Error(compChart?.message);
+      }
 
       const elementId = `${isMonthly ? "Monthly" : "Daily"} Chart - ${defiLlamaSlug}`;
       chart = (
@@ -279,6 +268,8 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
                 isMonthly={isMonthly}
                 setIsMonthly={(x: boolean) => setIsMonthly(x)}
                 jpegDownloadHandler={() => jpegDownloadHandler()}
+                baseKey="subgraph"
+                overlayKey="defiLlama"
               />
             </Grid>
           </Grid>
@@ -319,6 +310,11 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
       </div>
     );
   }
+
+  if (defiLlamaProtocolFetchError) {
+    chart = null;
+  }
+
   return (
     <>
       <div>

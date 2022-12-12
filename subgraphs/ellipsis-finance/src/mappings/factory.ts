@@ -1,84 +1,69 @@
-import { Address, log } from "@graphprotocol/graph-ts";
-import { BasePoolAdded, MetaPoolDeployed, PlainPoolDeployed } from "../../generated/Factory/Factory";
-import { LiquidityPool } from "../../generated/schema";
-import { FactoryPools } from "../../generated/templates";
-import { ADDRESS_ZERO, PoolType } from "../common/constants";
-import { getOrCreateToken } from "../common/getters";
-import { createNewPool, getBasePool, getLpToken, isLendingPool } from "../services/pool";
+import {
+  BasePoolAdded,
+  MetaPoolDeployed,
+  PlainPoolDeployed,
+  CryptoPoolDeployed,
+} from "../../generated/Factory/Factory";
+import * as utils from "../common/utils";
+import { log } from "@graphprotocol/graph-ts";
 
-function sortCoins(coins: Address[]): string[] {
-  let sorted_coins: string[] = [];
-  for (let i = 0; i < coins.length; i++) {
-    if (coins[i] !== ADDRESS_ZERO) {
-      sorted_coins.push(coins[i].toHexString());
-    }
-  }
-  return sorted_coins;
-}
+import { getOrCreateLiquidityPool } from "../common/initializers";
 
 export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
-  const coins = sortCoins(event.params.coins);
-  const lp_token = event.params.lp_token;
-  const lpTokenEntity = getOrCreateToken(lp_token);
-  let pool = event.params.pool;
-  if (!pool || pool == ADDRESS_ZERO) {
-    log.error('Plain pool deployed with invalid pool address: {}', [pool.toHexString()]);
-    return;
-  }
-  createNewPool(
-    pool,
-    lp_token,
-    lpTokenEntity.name,
-    lpTokenEntity.symbol,
-    event.block.number,
-    event.block.timestamp,
-    getBasePool(pool),
-    coins,
+  const registryAddress = event.address;
+  const poolAddress = event.params.pool;
+
+  if (utils.checkIfPoolExists(poolAddress)) return;
+  getOrCreateLiquidityPool(poolAddress, event.block, registryAddress);
+
+  log.warning(
+    "[PlainPoolDeployed] PoolAddress: {}, Registry: {}, TxnHash: {}",
+    [
+      poolAddress.toHexString(),
+      registryAddress.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]
   );
-  // Create a new pool
-  FactoryPools.create(pool);
-  log.info('New plain pool deployed: {}', [pool.toHexString()]);
 }
 
 export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
-  const coins = sortCoins(event.params.coins);
-  let lp_token = event.params.lp_token;
-  const lpTokenEntity = getOrCreateToken(lp_token);
-  let pool = event.params.pool;
-  if (!pool || pool == ADDRESS_ZERO) {
-    log.error('Meta pool deployed with invalid pool address: {}', [pool.toHexString()]);
-    return;
-  }
-  createNewPool(
-    pool,
-    lp_token,
-    lpTokenEntity.name,
-    lpTokenEntity.symbol,
-    event.block.number,
-    event.block.timestamp,
-    event.params.base_pool,
-    coins,
-    PoolType.METAPOOL,
-  );
-  // Create a new pool
-  FactoryPools.create(pool);
-  log.info('New meta pool deployed: {}', [pool.toHexString()]);
+  const registryAddress = event.address;
+  const poolAddress = event.params.pool;
+
+  if (utils.checkIfPoolExists(poolAddress)) return;
+  getOrCreateLiquidityPool(poolAddress, event.block, registryAddress);
+
+  log.warning("[MetaPoolDeployed] PoolAddress: {}, Registry: {}, TxnHash: {}", [
+    poolAddress.toHexString(),
+    registryAddress.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
 }
 
 export function handleBasePoolAdded(event: BasePoolAdded): void {
-  let pool = LiquidityPool.load(event.params.base_pool.toHexString());
-  if (!pool) {
-    let lpTokenEntity = getOrCreateToken(getLpToken(event.params.base_pool));
-    createNewPool(
-      event.params.base_pool,
-      Address.fromString(lpTokenEntity.id),
-      lpTokenEntity.name,
-      lpTokenEntity.symbol,
-      event.block.number,
-      event.block.timestamp,
-      getBasePool(event.params.base_pool),
-      [],
-      isLendingPool(event.params.base_pool) ? PoolType.LENDING : PoolType.BASEPOOL,
-    );
-  }
+  const registryAddress = event.address;
+  const poolAddress = event.params.base_pool;
+
+  if (utils.checkIfPoolExists(poolAddress)) return;
+  getOrCreateLiquidityPool(poolAddress, event.block, registryAddress);
+
+  log.warning("[BasePoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
+    poolAddress.toHexString(),
+    registryAddress.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
+}
+
+export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
+  const registryAddress = event.address;
+  const poolAddress = event.params.pool;
+
+  if (utils.checkIfPoolExists(poolAddress)) return;
+  getOrCreateLiquidityPool(poolAddress, event.block, registryAddress);
+
+  log.warning("[MetaPoolDeployed] PoolAddress: {}, Registry: {}, TxnHash: {}", [
+    poolAddress.toHexString(),
+    registryAddress.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
 }

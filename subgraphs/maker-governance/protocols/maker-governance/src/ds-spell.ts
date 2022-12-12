@@ -8,6 +8,7 @@ export function handleSchedule(call: ScheduleCall): void {
   if (!spell) return;
   spell.state = SpellState.SCHEDULED;
   spell.scheduledTxnHash = call.transaction.hash.toHexString();
+  spell.scheduledBlock = call.block.number;
   spell.scheduledTime = call.block.timestamp;
   spell.save();
 }
@@ -18,6 +19,7 @@ export function handleCast(call: CastCall): void {
   if (!spell) return;
   spell.state = SpellState.CAST;
   spell.castTxnHash = call.transaction.hash.toHexString();
+  spell.castBlock = call.block.number;
   spell.castTime = call.block.timestamp;
   spell.castWith = spell.totalWeightedVotes;
   spell.save();

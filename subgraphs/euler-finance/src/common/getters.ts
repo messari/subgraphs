@@ -16,6 +16,7 @@ import {
   Liquidate,
   InterestRate,
   _AssetStatus,
+  _AccountStakeAmount,
 } from "../../generated/schema";
 import { getAssetSymbol, getAssetName, getAssetDecimals } from "./tokens";
 import {
@@ -26,7 +27,6 @@ import {
   SECONDS_PER_DAY,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
-  RewardTokenType,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   LendingType,
@@ -34,8 +34,14 @@ import {
   INT_ZERO,
   DEFAULT_RESERVE_FEE,
   BIGDECIMAL_ONE,
+  BLOCKS_PER_EPOCH,
+  MAX_EPOCHS,
+  START_EPOCH,
+  START_EPOCH_BLOCK,
+  BIGINT_ONE,
 } from "../common/constants";
 import { Versions } from "../versions";
+import { Stake } from "../../generated/EulStakes/EulStakes";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -52,13 +58,14 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getOrCreateRewardToken(address: Address): RewardToken {
-  let rewardToken = RewardToken.load(address.toHexString());
+export function getOrCreateRewardToken(address: Address, type: string): RewardToken {
+  const id = `${address.toHexString()}-${type}`;
+  let rewardToken = RewardToken.load(id);
   if (rewardToken == null) {
     const token = getOrCreateToken(address);
-    rewardToken = new RewardToken(address.toHexString());
+    rewardToken = new RewardToken(id);
     rewardToken.token = token.id;
-    rewardToken.type = RewardTokenType.DEPOSIT;
+    rewardToken.type = type;
     rewardToken.save();
 
     return rewardToken as RewardToken;
@@ -313,6 +320,8 @@ export function getOrCreateMarket(id: string): Market {
     market.exchangeRate = BIGDECIMAL_ONE;
     market._totalBorrowBalance = BIGINT_ZERO;
     market._dTokenExchangeRate = BIGDECIMAL_ONE;
+    market._stakedAmount = BIGINT_ZERO;
+    market._receivingRewards = false;
     market.save();
 
     // update protocol.totalPoolCount
@@ -491,4 +500,52 @@ export function getSnapshotRates(rates: string[], timeSuffix: string): string[] 
     snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
+}
+
+export function getCurrentEpoch(event: ethereum.Event): i32 {
+  const blockNum = event.block.number;
+  const epoch = blockNum.minus(START_EPOCH_BLOCK).toI32() / BLOCKS_PER_EPOCH + START_EPOCH;
+  if (epoch < START_EPOCH || epoch > START_EPOCH + MAX_EPOCHS) {
+    return -1;
+  }
+  return epoch;
+}
+
+export function getStartBlockForEpoch(epoch: i32): BigInt | null {
+  if (epoch < START_EPOCH || epoch > START_EPOCH + MAX_EPOCHS) {
+    return null;
+  }
+  const startBlock = BigInt.fromI32((epoch - START_EPOCH) * BLOCKS_PER_EPOCH).plus(START_EPOCH_BLOCK);
+  // according to https://app.euler.finance/gauges, the start block is +1 on top of
+  // block specified in https://docs.euler.finance/eul/distribution-1#eul-per-epoch
+  // e.g. epoch 17 = 16030000, starting block = 16,030,001 on the guage page
+  return startBlock.plus(BIGINT_ONE);
+}
+
+export function getDeltaStakeAmount(event: Stake): BigInt {
+  const underlying = event.params.underlying.toHexString();
+  const account = event.params.who.toHexString();
+  const accountStakeAmount = getOrCreateAccountStakeAmount(underlying, account);
+  const deltaAmount = event.params.newAmount.minus(accountStakeAmount.stakeAmount);
+  accountStakeAmount.stakeAmount = event.params.newAmount;
+  accountStakeAmount.save();
+  return deltaAmount;
+}
+
+export function getOrCreateAccountStakeAmount(underlying: string, account: string): _AccountStakeAmount {
+  const id = `${underlying}-${account}`;
+  let accountStakeAmount = _AccountStakeAmount.load(id);
+  if (!accountStakeAmount) {
+    accountStakeAmount = new _AccountStakeAmount(id);
+    accountStakeAmount.undlerlying = underlying;
+    accountStakeAmount.stakeAmount = BIGINT_ZERO;
+    accountStakeAmount.save();
+  }
+  return accountStakeAmount;
+}
+
+export function getCutoffValue(stakedAmounts: BigInt[], top: i32 = 10): BigInt {
+  const startIdx = stakedAmounts.length < top ? 0 : stakedAmounts.length - top;
+  const topStakeAmounts = stakedAmounts.sort().slice(startIdx);
+  return topStakeAmounts[0];
 }

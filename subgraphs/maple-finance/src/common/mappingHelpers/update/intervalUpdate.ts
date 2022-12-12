@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Market, _MplReward, _StakeLocker } from "../../../../generated/schema";
 import { PoolLib } from "../../../../generated/templates/Pool/PoolLib";
 import { MAPLE_POOL_LIB_ADDRESS, SEC_PER_DAY, TEN_BD, ZERO_BD, ZERO_BI } from "../../constants";
@@ -131,19 +131,29 @@ function intervalUpdateMarket(event: ethereum.Event, market: Market): Market {
 
 function intervalUpdateProtocol(event: ethereum.Event, marketBefore: Market, marketAfter: Market): void {
     const protocol = getOrCreateProtocol();
+    const marketIDs = protocol._marketIDs;
 
-    protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-        marketAfter.totalValueLockedUSD.minus(marketBefore.totalValueLockedUSD)
-    );
+    let totalValueLockedUSD = ZERO_BD;
+    let totalDepositBalanceUSD = ZERO_BD;
+    let totalBorrowBalanceUSD = ZERO_BD;
 
-    protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(
-        marketAfter.totalDepositBalanceUSD.minus(marketBefore.totalDepositBalanceUSD)
-    );
+    for (let i = 0; i < marketIDs.length; i++) {
+        const market = Market.load(marketIDs[i]);
+        if (!market) {
+            // fail safe in case market does not exist for some reason
+            log.warning("[intervalUpdateProtocol] Market does not exist: {}", [marketIDs[i]]);
+            continue;
+        }
 
-    protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(
-        marketAfter.totalBorrowBalanceUSD.minus(marketBefore.totalBorrowBalanceUSD)
-    );
+        totalValueLockedUSD += market.totalValueLockedUSD;
+        totalDepositBalanceUSD += market.totalDepositBalanceUSD;
+        totalBorrowBalanceUSD += market.totalBorrowBalanceUSD;
+    }
+    protocol.totalValueLockedUSD = totalValueLockedUSD;
+    protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
+    protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
 
+    // update protocol revenue
     const deltaRevenueUSD = marketAfter.cumulativeTotalRevenueUSD.minus(marketBefore.cumulativeTotalRevenueUSD);
     protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(deltaRevenueUSD);
 

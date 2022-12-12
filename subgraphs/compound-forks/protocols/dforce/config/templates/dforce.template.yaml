@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
@@ -50,7 +50,6 @@ dataSources:
         - event: NewRewardDistributor(address,address)
           handler: handleNewRewardDistributor
       file: ./protocols/dforce/src/mapping.ts
-
   - kind: ethereum/contract
     name: USX
     network: {{ network }}
@@ -98,7 +97,6 @@ dataSources:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleStablecoinTransfer
       file: ./protocols/dforce/src/mapping.ts
-
 templates:
   - name: CToken
     kind: ethereum/contract
@@ -122,6 +120,8 @@ templates:
           file: ./abis/dforce/Comptroller.json
         - name: PriceOracle
           file: ./abis/dforce/PriceOracle.json
+        - name: RewardDistributor
+          file: ./abis/dforce/RewardDistributor.json
       eventHandlers:
         - event: Mint(address,address,uint256,uint256)
           handler: handleMint
@@ -142,9 +142,8 @@ templates:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./protocols/dforce/src/mapping.ts
-
   - kind: ethereum/contract
-    name: Reward
+    name: RewardDistributor
     network: {{ network }}
     source:
       abi: RewardDistributor
@@ -166,8 +165,8 @@ templates:
         - name: RewardDistributor
           file: ./abis/dforce/RewardDistributor.json
       eventHandlers:
-        - event: RewardDistributed(address,address,uint256,uint256)
-          handler: handleRewardDistributed
-        - event: NewRewardToken(address,address)
-          handler: handleNewRewardToken
+        - event: DistributionBorrowSpeedUpdated(address,uint256)
+          handler: handleDistributionBorrowSpeedUpdated
+        - event: DistributionSupplySpeedUpdated(address,uint256)
+          handler: handleDistributionSupplySpeedUpdated
       file: ./protocols/dforce/src/mapping.ts

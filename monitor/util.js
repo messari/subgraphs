@@ -1,4 +1,4 @@
-export const monitorVersion = "v1.1.7";
+export const monitorVersion = "v1.2.1";
 
 export const sleep = m => new Promise(r => setTimeout(r, m));
 
@@ -24,7 +24,6 @@ export const formatIntToFixed2 = (val) => {
     }
     return returnStr;
 };
-
 
 export const colorsArray = [
     0x32CD32,
