@@ -275,6 +275,15 @@ export function createSwapHandleVolumeAndFees(
   amount0Out: BigInt,
   amount1Out: BigInt
 ): void {
+  if (amount0Out.gt(BIGINT_ZERO) && amount1Out.gt(BIGINT_ZERO)) {
+    // If there are two output tokens with non-zero values, this is an invalid swap. Ignore it.
+    log.error(
+      "Two output tokens - Invalid Swap: amount0Out: {} amount1Out: {}",
+      [amount0Out.toString(), amount1Out.toString()]
+    );
+    return;
+  }
+
   const protocol = getOrCreateProtocol();
   const pool = getLiquidityPool(
     event.address.toHexString(),
@@ -290,7 +299,14 @@ export function createSwapHandleVolumeAndFees(
   const amount1 = amount1In.minus(amount1Out);
 
   // Gets the tokenIn and tokenOut payload based on the amounts
-  const swapTokens = getSwapTokens(token0, token1, amount0, amount1);
+  const swapTokens = getSwapTokens(
+    token0,
+    token1,
+    amount0In,
+    amount0Out,
+    amount1In,
+    amount1Out
+  );
 
   const logIndexI32 = event.logIndex.toI32();
   const transactionHash = event.transaction.hash.toHexString();
@@ -349,37 +365,26 @@ class SwapTokens {
 export function getSwapTokens(
   token0: Token,
   token1: Token,
-  amount0: BigInt,
-  amount1: BigInt
+  amount0In: BigInt,
+  amount0Out: BigInt,
+  amount1In: BigInt,
+  amount1Out: BigInt
 ): SwapTokens {
   let tokenIn: Token;
   let tokenOut: Token;
   let amountIn: BigInt;
   let amountOut: BigInt;
 
-  if (isSameSign(amount0, amount1)) {
-    // if amounts are same sign, we can't determine the direction of the swap
-    log.critical(
-      "Swap amounts have same sign - cannot determine inbound and outbound tokens: token0: {} amount0: {}, token1: {} amount1: {}",
-      [
-        token0.id.toString(),
-        amount0.toString(),
-        token1.id.toString(),
-        amount1.toString(),
-      ]
-    );
-  }
-
-  if (amount0.gt(BIGINT_ZERO)) {
-    tokenIn = token0;
-    tokenOut = token1;
-    amountIn = amount0;
-    amountOut = amount1.times(BIGINT_NEG_ONE);
-  } else {
+  if (amount0Out.gt(BIGINT_ZERO)) {
     tokenIn = token1;
     tokenOut = token0;
-    amountIn = amount1;
-    amountOut = amount0.times(BIGINT_NEG_ONE);
+    amountIn = amount1In.minus(amount1Out);
+    amountOut = amount0In.minus(amount0Out).times(BIGINT_NEG_ONE);
+  } else {
+    tokenIn = token0;
+    tokenOut = token1;
+    amountIn = amount0In.minus(amount0Out);
+    amountOut = amount1In.minus(amount1Out).times(BIGINT_NEG_ONE);
   }
 
   const amountInConverted = convertTokenToDecimal(amountIn, tokenIn.decimals);
