@@ -23,6 +23,7 @@ import {
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
+  PositionSide,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   TransactionType,
@@ -650,6 +651,16 @@ export class SnapshotManager {
     this.financialSnapshot.dailySupplySideRevenueUSD =
       this.financialSnapshot.dailySupplySideRevenueUSD.plus(supplyRevenueDelta);
     this.createOrUpdateFinancials();
+  }
+
+  addDailyActivePosition(side: string): void {
+    if (side == PositionSide.BORROWER) {
+      this.marketDailySnapshot.dailyActiveBorrowingPositionCount += INT_ONE;
+    }
+    if (side == PositionSide.COLLATERAL) {
+      this.marketDailySnapshot.dailyActiveLendingPositionCount += INT_ONE;
+    }
+    this.createOrUpdateMarketDailySnapshot();
   }
 
   ///////////////////

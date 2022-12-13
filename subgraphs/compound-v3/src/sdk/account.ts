@@ -48,8 +48,22 @@ export class AccountManager {
   }
 
   // returns true if the account was created in this instance
-  isNewAccount(): boolean {
-    return this.isNew;
+  isNewUser(): boolean {
+    if (this.isNew) {
+      return true;
+    }
+
+    // true if there have been no transactions submitted by the user
+    // ie, liquidations and receives don't count (did not spend gas)
+    return (
+      this.account.depositCount == INT_ZERO &&
+      this.account.withdrawCount == INT_ZERO &&
+      this.account.borrowCount == INT_ZERO &&
+      this.account.repayCount == INT_ZERO &&
+      this.account.liquidateCount == INT_ZERO &&
+      this.account.transferredCount == INT_ZERO &&
+      this.account.flashloanCount == INT_ZERO
+    );
   }
 
   countFlashloan(): void {

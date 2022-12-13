@@ -220,7 +220,7 @@ export function handleSetBaseTokenPriceFeed(
   const cometContract = Comet.bind(event.params.cometProxy);
   const tryBaseToken = cometContract.try_baseToken();
   if (tryBaseToken.reverted) {
-    log.warning(
+    log.error(
       "[handleSetBaseTokenPriceFeed] Base token not found for comet: {}",
       [event.params.cometProxy.toHexString()]
     );
@@ -250,7 +250,7 @@ export function handleSetBaseTrackingBorrowSpeed(
   const cometContract = Comet.bind(event.params.cometProxy);
   const tryBaseToken = cometContract.try_baseToken();
   if (tryBaseToken.reverted) {
-    log.warning(
+    log.error(
       "[handleSetBaseTrackingBorrowSpeed] Base token not found for comet: {}",
       [event.params.cometProxy.toHexString()]
     );
@@ -280,7 +280,7 @@ export function handleSetBaseTrackingSupplySpeed(
   const cometContract = Comet.bind(event.params.cometProxy);
   const tryBaseToken = cometContract.try_baseToken();
   if (tryBaseToken.reverted) {
-    log.warning(
+    log.error(
       "[handleSetBaseTrackingBorrowSpeed] Base token not found for comet: {}",
       [event.params.cometProxy.toHexString()]
     );
@@ -779,7 +779,10 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
   const borrower = event.params.borrower;
   const baseAsset = cometContract.baseToken();
   const amount = event.params.collateralAbsorbed;
-  const amountUSD = bigIntToBigDecimal(amount, COMPOUND_DECIMALS);
+  const amountUSD = bigIntToBigDecimal(
+    event.params.usdValue,
+    COMPOUND_DECIMALS
+  );
   const liquidationPenalty =
     marketEntity.liquidationPenalty.div(BIGDECIMAL_HUNDRED);
   const profitUSD = amountUSD.times(liquidationPenalty);
@@ -787,21 +790,20 @@ export function handleAbsorbCollateral(event: AbsorbCollateral): void {
   updateRevenue(market, event.address);
   updateRewards(market, event.address, event);
 
-  const borrowBalance = getUserBalance(
+  const collateralBalance = getUserBalance(
     cometContract,
     borrower,
-    null,
-    PositionSide.BORROWER
+    event.params.asset,
+    PositionSide.COLLATERAL
   );
   const liquidate = market.createLiquidate(
-    baseAsset,
+    event.params.asset,
     liquidator,
     borrower,
     amount,
     amountUSD,
     profitUSD,
-    borrowBalance,
-    InterestRateType.VARIABLE
+    collateralBalance
   );
   if (!liquidate) return;
   const positions = liquidate.positions;
@@ -962,7 +964,7 @@ function updateRewards(
   const tryRewardConfig = rewardContract.try_rewardConfig(cometAddress);
 
   if (tryTrackingIndexScale.reverted || tryRewardConfig.reverted) {
-    log.warning("[updateRewards] Contract call(s) reverted on market: {}", [
+    log.error("[updateRewards] Contract call(s) reverted on market: {}", [
       market.id.toHexString(),
     ]);
     return;
@@ -1030,7 +1032,7 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
   const market = dataManager.getMarket();
   const tryTotalsBasic = cometContract.try_totalsBasic();
   if (tryTotalsBasic.reverted) {
-    log.warning("[updateRevenue] Could not get totalBasics()", []);
+    log.error("[updateRevenue] Could not get totalBasics()", []);
     return;
   }
 
@@ -1189,7 +1191,7 @@ function isBurn(event: ethereum.Event): BigInt | null {
 // Find and return transfer (as long as it is one index after the handled event)
 function findTransfer(event: ethereum.Event): ethereum.Log | null {
   if (!event.receipt) {
-    log.warning("[findTransfer] No receipt found for event: {}", [
+    log.error("[findTransfer] No receipt found for event: {}", [
       event.transaction.hash.toHexString(),
     ]);
     return null;

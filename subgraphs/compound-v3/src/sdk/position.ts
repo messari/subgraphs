@@ -18,8 +18,10 @@ import {
   exponentToBigDecimal,
   INT_ONE,
   INT_ZERO,
+  SECONDS_PER_DAY,
   TransactionType,
 } from "./constants";
+import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
 
 /**
@@ -191,6 +193,7 @@ export class PositionManager {
     // take position snapshot
     //
     this.snapshotPosition(event, priceUSD);
+    this.dailyActivePosition(positionCounter, event, protocol);
   }
 
   subtractPosition(
@@ -271,6 +274,7 @@ export class PositionManager {
     // update position snapshot
     //
     this.snapshotPosition(event, priceUSD);
+    this.dailyActivePosition(positionCounter, event, protocol);
   }
 
   private snapshotPosition(event: ethereum.Event, priceUSD: BigDecimal): void {
@@ -294,5 +298,21 @@ export class PositionManager {
     snapshot.blockNumber = event.block.number;
     snapshot.timestamp = event.block.timestamp;
     snapshot.save();
+  }
+
+  private dailyActivePosition(
+    counter: _PositionCounter,
+    event: ethereum.Event,
+    protocol: LendingProtocol
+  ): void {
+    const lastDay = counter.lastTimestamp.toI32() / SECONDS_PER_DAY;
+    const currentDay = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+    if (lastDay == currentDay) {
+      return;
+    }
+
+    // this is a new active position
+    const snapshots = new SnapshotManager(event, protocol, this.market);
+    snapshots.addDailyActivePosition(this.side);
   }
 }

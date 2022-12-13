@@ -48,7 +48,7 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Liquidations`
 
-`Repayments`
+`Repays`
 
 `Transfers`
 
@@ -61,6 +61,17 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 ### Protocol Controlled Value
 
 Not applicable to Compound III
+
+## Compound V2 vs Compound III
+
+Compound III and V2 are very different, aside from the fact that they both come from the compound team and both are lending protocols.
+
+Some of the new features in Compound III not found in V2 are:
+
+- Multiple collateral tokens per market
+- The market's risk is isolated from other markets
+- The "Base Token" in III is the only token you can earn interest on, but it is not used as collateral
+- The collateral-only tokens in Compound V3 have supply caps in order to reduce the amount of risk to a single asset in a market
 
 ## Notes
 

@@ -344,7 +344,7 @@ export class DataManager {
     interestType: string | null = null
   ): Deposit {
     const depositor = new AccountManager(account);
-    if (depositor.isNewAccount()) {
+    if (depositor.isNewUser()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -403,7 +403,7 @@ export class DataManager {
     interestType: string | null = null
   ): Withdraw | null {
     const withdrawer = new AccountManager(account);
-    if (withdrawer.isNewAccount()) {
+    if (withdrawer.isNewUser()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -470,7 +470,7 @@ export class DataManager {
     interestType: string | null = null
   ): Borrow {
     const borrower = new AccountManager(account);
-    if (borrower.isNewAccount()) {
+    if (borrower.isNewUser()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -530,7 +530,7 @@ export class DataManager {
     interestType: string | null = null
   ): Repay | null {
     const repayer = new AccountManager(account);
-    if (repayer.isNewAccount()) {
+    if (repayer.isNewUser()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -598,7 +598,7 @@ export class DataManager {
     interestType: string | null = null
   ): Liquidate | null {
     const liquidatorAccount = new AccountManager(liquidator);
-    if (liquidatorAccount.isNewAccount()) {
+    if (liquidatorAccount.isNewUser()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -675,7 +675,7 @@ export class DataManager {
     interestType: string | null = null
   ): Transfer | null {
     const transferrer = new AccountManager(sender);
-    if (transferrer.isNewAccount()) {
+    if (transferrer.isNewUser()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
@@ -757,7 +757,7 @@ export class DataManager {
     amountUSD: BigDecimal
   ): Flashloan {
     const flashloaner = new AccountManager(account);
-    if (flashloaner.isNewAccount()) {
+    if (flashloaner.isNewUser()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
       this.protocol.save();
     }
