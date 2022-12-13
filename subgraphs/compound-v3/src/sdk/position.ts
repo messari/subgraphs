@@ -107,6 +107,7 @@ export class PositionManager {
     if (!positionCounter) {
       positionCounter = new _PositionCounter(this.counterID);
       positionCounter.nextCount = 0;
+      positionCounter.lastTimestamp = event.block.timestamp;
       positionCounter.save();
     }
     const positionID = positionCounter.id
@@ -314,5 +315,8 @@ export class PositionManager {
     // this is a new active position
     const snapshots = new SnapshotManager(event, protocol, this.market);
     snapshots.addDailyActivePosition(this.side);
+
+    counter.lastTimestamp = event.block.timestamp;
+    counter.save();
   }
 }
