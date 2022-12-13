@@ -1,5 +1,9 @@
 {
   "chain": "bsc",
+  
+  "MasterBeltAddress": "0xd4bbc80b9b102b77b21a06cb77e954049605e6c1",
+  "MasterBeltStartBlock": 5246883,
+  
   "vaults": [
     {
       "name": "beltBTC",

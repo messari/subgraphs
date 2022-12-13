@@ -123,12 +123,8 @@ async function executionFlow() {
     return { message: embeddedMessages, protocolName: protocolName, channel: channelId };
   });
   if (messagesToPost.length > 0) {
-    const aggThread = currentDiscordMessages.find(x => x.content.includes('Production Ready Subgraph Indexing Failure'));
-    const aggThreadId = aggThread?.id || "";
-    if (aggThreadId) {
-      await clearThread(Date.now() - (86400000), aggThreadId);
-    }
-    await sendMessageToAggThread(aggThreadId, channelToProtocolIssuesMapping, protocolNameToChannelMapping);
+    await clearThread(Date.now() - (86400000), process.env.PROD_THREAD);
+    await sendMessageToAggThread();
     messagesToPost = messagesToPost.filter((msg, idx) => {
       if (!msg?.channel && !!msg) {
         messagesToPost[idx].channel = protocolNameToChannelMapping[msg?.protocolName];

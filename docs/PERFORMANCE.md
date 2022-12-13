@@ -10,6 +10,38 @@ There are couple things you can do to significantly improve your indexing speed:
 - Avoid call handlers and block handlers. Also depending on the Ethereum node ran by an indexer, call handlers and block handlers may or may not be supported (esp. on alt-EVM chains).
 - Limit the number of contract calls you perform. If you do need to perform contract calls, save the data, so you won't have to do repeated calls.
 
+### Using Transaction .receipt
+
+In many cases, an event is a part of a transaction emitting many events and it is helpful to get the information from an event upstream or downstream of current event in the same transaction. One example is in the balancer V2 subgraph, needed OutputTokenAmount info was included in the Transfer event preceding the PoolBalanceChanged event; another example is in the Euler subgraph, we need to know whether a Liquidation event is emitted after a AssetStatus event. Transaction receipt allow us the traverse the information of all events in the same transaction and can help improve performance of subgraphs.
+
+Steps to use transaction receipt:
+
+1. Set `apiVersion: 0.0.7` in subgraph.yaml (or in `templates/<protocol>.template.yaml`);
+2. In subgraph.yaml, append a line `receipt: true` after the handler function that uses transaction receipt, see the [euler subgraph.yaml](https://github.com/messari/subgraphs/blob/dc4d674f30fb62efb59664ec7dffb26c5da7b0f3/subgraphs/euler-finance/protocols/euler-finance/config/templates/euler.template.yaml#L49) for an example.
+3. In the handler function, you can get an array of logs with `event.receipt!.logs` and iterate it to access all events in the same transaction.
+
+A few tips of using transaction receipts:
+
+- `let currLog = logs.at(i)` gets the log at index `i`;
+- `currLog.topics.at(0)` is topic0 and matches the keccak256 signature of the event at the corresponding index;
+- topic0 can be checked against the keccak2556 signature of known events to select desired event:
+  ```
+  const liquidationSig = crypto.keccak256(
+      ByteArray.fromUTF8("Liquidation(address,address,address,address,uint256,uint256,uint256,uint256,uint256)"),
+    )
+  if (currLog.topics.at(0).equals(liquidationSig)) {
+    //do something for liquidation event log
+  }
+  ```
+- topic1, topic2, etc corresponds to the indexed arguments of the event and can be accessed with `currLog.topics.at(1)` and decoded with `ethereum.decode("uint256", topic1)`. Un-indexed arguments can be accessed with `currLog.data` and decoded with:
+  ```
+  const decoded = ethereum.decode("(address,uint256)", currLog.data)!.toTuple();
+  const address = decoded.at(0).toAddress();
+  const amount = decoded.at(1).toBigInt();
+  ```
+
+See [euler subgraph](https://github.com/messari/subgraphs/blob/dc4d674f30fb62efb59664ec7dffb26c5da7b0f3/subgraphs/euler-finance/src/mappings/helpers.ts#L631-L668) and [balancer subgraph](https://github.com/nemani/subgraphs/blob/5a8df9d044b51f64e1999572ce3afa466fcce899/subgraphs/balancer-forks-ext/src/common/creators.ts#L334-L364) for examples of transaction receipt used in actual subgraphs.
+
 ## Performance Tests
 
 The following tests are done to compare performance difference with the addition or subtraction of different indexing objectives or the substitution of methods for performing indexing operations.

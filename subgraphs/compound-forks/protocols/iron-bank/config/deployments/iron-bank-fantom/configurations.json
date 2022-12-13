@@ -1,5 +1,7 @@
 {
   "network": "fantom",
   "factoryAddress": "0x4250A6D3BD57455d7C6821eECb6206F507576cD2",
-  "startBlock": 2380512
+  "startBlock": 2380512,
+  "rewardsFactoryAddress": "0x0000000000000000000000000000000000000000",
+  "rewardStartBlock": 2380512
 }
