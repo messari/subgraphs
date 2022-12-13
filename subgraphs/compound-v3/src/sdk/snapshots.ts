@@ -6,8 +6,7 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
-  ActiveAccount,
-  Fee,
+  _ActiveAccount,
   FinancialsDailySnapshot,
   InterestRate,
   LendingProtocol,
@@ -104,9 +103,6 @@ export class SnapshotManager {
     snapshot.rates = this.market.rates
       ? this.getSnapshotRates(this.market.rates!, hours.toString())
       : null;
-    snapshot.fees = this.market.fees
-      ? this.getSnapshotFees(this.market.fees!, hours.toString())
-      : null;
     snapshot.reserves = this.market.reserves;
     snapshot.variableBorrowedTokenBalance =
       this.market.variableBorrowedTokenBalance;
@@ -186,9 +182,6 @@ export class SnapshotManager {
     snapshot.exchangeRate = this.market.exchangeRate;
     snapshot.rates = this.market.rates
       ? this.getSnapshotRates(this.market.rates!, days.toString())
-      : null;
-    snapshot.fees = this.market.fees
-      ? this.getSnapshotFees(this.market.fees!, days.toString())
       : null;
     snapshot.reserves = this.market.reserves;
     snapshot.variableBorrowedTokenBalance =
@@ -373,27 +366,27 @@ export class SnapshotManager {
     const dailyActiveAccountTransactionMarketID = AccountActivity.DAILY.concat(
       "-"
     ).concat(activeAccountTransactionMarketID);
-    let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountID); // usage daily
-    let dailyActiveAccountMarket = ActiveAccount.load(
+    let dailyActiveAccount = _ActiveAccount.load(dailyActiveAccountID); // usage daily
+    let dailyActiveAccountMarket = _ActiveAccount.load(
       dailyActiveAccountMarketID
     ); // market daily
-    let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountID); // usage hourly
-    let activeAccountMarket = ActiveAccount.load(activeAccountMarketID); // market
-    let activeAccountTransaction = ActiveAccount.load(
+    let hourlyActiveAccount = _ActiveAccount.load(hourlyActiveAccountID); // usage hourly
+    let activeAccountMarket = _ActiveAccount.load(activeAccountMarketID); // market
+    let activeAccountTransaction = _ActiveAccount.load(
       activeAccountTransactionID
     ); // lending protocol
-    let dailyActiveAccountTransaction = ActiveAccount.load(
+    let dailyActiveAccountTransaction = _ActiveAccount.load(
       dailyActiveAccountTransactionID
     ); // usage daily
-    let activeAccountTransactionMarket = ActiveAccount.load(
+    let activeAccountTransactionMarket = _ActiveAccount.load(
       activeAccountTransactionMarketID
     ); // market
-    let dailyActiveAccountTransactionMarket = ActiveAccount.load(
+    let dailyActiveAccountTransactionMarket = _ActiveAccount.load(
       dailyActiveAccountTransactionMarketID
     ); // market daily
 
     if (!dailyActiveAccount && transactionType != TransactionType.LIQUIDATEE) {
-      dailyActiveAccount = new ActiveAccount(dailyActiveAccountID);
+      dailyActiveAccount = new _ActiveAccount(dailyActiveAccountID);
       dailyActiveAccount.save();
       this.usageDailySnapshot.dailyActiveUsers += INT_ONE;
     }
@@ -401,22 +394,22 @@ export class SnapshotManager {
       !dailyActiveAccountMarket &&
       transactionType != TransactionType.LIQUIDATEE
     ) {
-      dailyActiveAccountMarket = new ActiveAccount(dailyActiveAccountMarketID);
+      dailyActiveAccountMarket = new _ActiveAccount(dailyActiveAccountMarketID);
       dailyActiveAccountMarket.save();
       this.marketDailySnapshot.dailyActiveUsers += INT_ONE;
     }
     if (!hourlyActiveAccount && transactionType != TransactionType.LIQUIDATEE) {
-      hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountID);
+      hourlyActiveAccount = new _ActiveAccount(hourlyActiveAccountID);
       hourlyActiveAccount.save();
       this.usageHourlySnapshot.hourlyActiveUsers += INT_ONE;
     }
     if (!activeAccountMarket && transactionType != TransactionType.LIQUIDATEE) {
-      activeAccountMarket = new ActiveAccount(activeAccountMarketID);
+      activeAccountMarket = new _ActiveAccount(activeAccountMarketID);
       activeAccountMarket.save();
       this.market.cumulativeUniqueUsers += INT_ONE;
     }
     if (!activeAccountTransaction) {
-      activeAccountTransaction = new ActiveAccount(activeAccountTransactionID);
+      activeAccountTransaction = new _ActiveAccount(activeAccountTransactionID);
       activeAccountTransaction.save();
       if (transactionType == TransactionType.DEPOSIT)
         this.protocol.cumulativeUniqueDepositors += INT_ONE;
@@ -428,7 +421,7 @@ export class SnapshotManager {
         this.protocol.cumulativeUniqueLiquidatees += INT_ONE;
     }
     if (!dailyActiveAccountTransaction) {
-      dailyActiveAccountTransaction = new ActiveAccount(
+      dailyActiveAccountTransaction = new _ActiveAccount(
         dailyActiveAccountTransactionID
       );
       dailyActiveAccountTransaction.save();
@@ -442,7 +435,7 @@ export class SnapshotManager {
         this.usageDailySnapshot.dailyActiveLiquidatees += INT_ONE;
     }
     if (!activeAccountTransactionMarket) {
-      activeAccountTransactionMarket = new ActiveAccount(
+      activeAccountTransactionMarket = new _ActiveAccount(
         activeAccountTransactionMarketID
       );
       activeAccountTransactionMarket.save();
@@ -460,7 +453,7 @@ export class SnapshotManager {
         this.market.cumulativeUniqueFlashloaners += INT_ONE;
     }
     if (!dailyActiveAccountTransactionMarket) {
-      dailyActiveAccountTransactionMarket = new ActiveAccount(
+      dailyActiveAccountTransactionMarket = new _ActiveAccount(
         dailyActiveAccountTransactionMarketID
       );
       dailyActiveAccountTransactionMarket.save();
@@ -508,8 +501,8 @@ export class SnapshotManager {
       this.usageDailySnapshot.dailyDepositCount += INT_ONE;
       this.usageHourlySnapshot.hourlyDepositCount += INT_ONE;
     } else if (transactionType == TransactionType.WITHDRAW) {
-      this.protocol.withdrawalCount += INT_ONE;
-      this.market.withdrawalCount += INT_ONE;
+      this.protocol.withdrawCount += INT_ONE;
+      this.market.withdrawCount += INT_ONE;
       this.marketDailySnapshot.dailyWithdrawUSD =
         this.marketDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
       this.marketDailySnapshot.dailyNativeWithdraw =
@@ -686,28 +679,6 @@ export class SnapshotManager {
       snapshotRates.push(snapshotRateId);
     }
     return snapshotRates;
-  }
-
-  private getSnapshotFees(fees: string[], timeSuffix: string): string[] {
-    const snapshotFees: string[] = [];
-    for (let i = 0; i < fees.length; i++) {
-      const rate = InterestRate.load(fees[i]);
-      if (!rate) {
-        log.error("[getSnapshotFees] fee {} not found, should not happen", [
-          fees[i],
-        ]);
-        continue;
-      }
-
-      // create new snapshot rate
-      const snapshotFeeID = fees[i].concat("-").concat(timeSuffix);
-      const snapshotFee = new Fee(snapshotFeeID);
-      snapshotFee.rate = rate.rate;
-      snapshotFee.type = rate.type;
-      snapshotFee.save();
-      snapshotFees.push(snapshotFee.id);
-    }
-    return snapshotFees;
   }
 
   private getSnapshotRevenueDetails(

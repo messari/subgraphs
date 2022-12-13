@@ -10,7 +10,7 @@ import {
   LendingProtocol,
   Market,
   Position,
-  PositionCounter,
+  _PositionCounter,
   PositionSnapshot,
 } from "../../generated/schema";
 import {
@@ -54,7 +54,7 @@ export class PositionManager {
     if (interestType) {
       this.counterID = this.counterID.concat("-").concat(interestType);
     }
-    const positionCounter = PositionCounter.load(this.counterID);
+    const positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
       log.warning("[PositionManager] position counter {} not found", [
         this.counterID,
@@ -101,9 +101,9 @@ export class PositionManager {
     transactionType: string,
     priceUSD: BigDecimal
   ): void {
-    let positionCounter = PositionCounter.load(this.counterID);
+    let positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
-      positionCounter = new PositionCounter(this.counterID);
+      positionCounter = new _PositionCounter(this.counterID);
       positionCounter.nextCount = 0;
       positionCounter.save();
     }
@@ -200,7 +200,7 @@ export class PositionManager {
     transactionType: string,
     priceUSD: BigDecimal
   ): void {
-    const positionCounter = PositionCounter.load(this.counterID);
+    const positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
       log.warning("[subtractPosition] position counter {} not found", [
         this.counterID,

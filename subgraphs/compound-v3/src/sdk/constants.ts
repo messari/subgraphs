@@ -78,15 +78,18 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
+export namespace FeeType {
+  export const LIQUIDATION_FEE = "LIQUIDATION_FEE";
+  export const ADMIN_FEE = "ADMIN_FEE";
+  export const PROTOCOL_FEE = "PROTOCOL_FEE";
+  export const MINT_FEE = "MINT_FEE";
+  export const WITHDRAW_FEE = "WITHDRAW_FEE";
+  export const OTHER = "OTHER";
+}
+
 export namespace PositionSide {
   export const COLLATERAL = "COLLATERAL";
   export const BORROWER = "BORROWER";
-}
-
-export namespace RevenueSource {
-  export const BORROW_INTEREST = "BORROW_INTEREST";
-  export const LIQUIDATION_FEE = "LIQUIDATION_FEE";
-  export const FLASHLOAN_FEE = "FLASHLOAN_FEE";
 }
 
 export namespace OracleSource {

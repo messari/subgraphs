@@ -9,6 +9,7 @@ import {
 import {
   Borrow,
   Deposit,
+  Fee,
   Flashloan,
   InterestRate,
   LendingProtocol,
@@ -21,6 +22,7 @@ import {
   Token,
   Transfer,
   Withdraw,
+  _Markets,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import { AccountManager } from "./account";
@@ -28,11 +30,11 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   exponentToBigDecimal,
+  FeeType,
   INT_ONE,
   INT_ZERO,
   PositionSide,
   ProtocolType,
-  RevenueSource,
   Transaction,
   TransactionType,
 } from "./constants";
@@ -121,7 +123,7 @@ export class DataManager {
       _market.cumulativeFlashloanUSD = BIGDECIMAL_ZERO;
       _market.transactionCount = INT_ZERO;
       _market.depositCount = INT_ZERO;
-      _market.withdrawalCount = INT_ZERO;
+      _market.withdrawCount = INT_ZERO;
       _market.borrowCount = INT_ZERO;
       _market.repayCount = INT_ZERO;
       _market.liquidationCount = INT_ZERO;
@@ -146,12 +148,8 @@ export class DataManager {
       _market.borrowingPositionCount = INT_ZERO;
       _market.save();
 
-      // add market to protocol
-      const markets = this.protocol._markets;
-      markets.push(_market.id);
-      this.protocol._markets = markets;
-      this.protocol.totalPoolCount += INT_ONE;
-      this.protocol.save();
+      // add to market list
+      this.getOrAddMarketToList(marketID);
     }
     this.market = _market;
     this.event = event;
@@ -203,13 +201,12 @@ export class DataManager {
       protocol.cumulativePositionCount = INT_ZERO;
       protocol.transactionCount = INT_ZERO;
       protocol.depositCount = INT_ZERO;
-      protocol.withdrawalCount = INT_ZERO;
+      protocol.withdrawCount = INT_ZERO;
       protocol.borrowCount = INT_ZERO;
       protocol.repayCount = INT_ZERO;
       protocol.liquidationCount = INT_ZERO;
       protocol.transferCount = INT_ZERO;
       protocol.flashloanCount = INT_ZERO;
-      protocol._markets = [];
     }
 
     protocol.schemaVersion = Versions.getSchemaVersion();
@@ -292,6 +289,32 @@ export class DataManager {
     return rate;
   }
 
+  getOrUpdateFee(
+    feeType: string,
+    flatFee: BigDecimal | null = null,
+    rate: BigDecimal | null = null
+  ): Fee {
+    let fee = Fee.load(feeType);
+    if (!fee) {
+      fee = new Fee(feeType);
+      fee.type = feeType;
+    }
+
+    fee.rate = rate;
+    fee.flatFee = flatFee;
+    fee.save();
+
+    if (!this.protocol.fees) {
+      this.protocol.fees = [];
+    }
+
+    if (this.protocol.fees!.indexOf(feeType) == -1) {
+      this.protocol.fees!.push(feeType);
+    }
+    this.protocol.save();
+    return fee;
+  }
+
   getAddress(): Address {
     return Address.fromBytes(this.market.id);
   }
@@ -300,12 +323,8 @@ export class DataManager {
     let details = RevenueDetails.load(id);
     if (!details) {
       details = new RevenueDetails(id);
-      details.sources = [
-        RevenueSource.BORROW_INTEREST,
-        RevenueSource.FLASHLOAN_FEE,
-        RevenueSource.LIQUIDATION_FEE,
-      ];
-      details.amountsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+      details.sources = [];
+      details.amountsUSD = [];
       details.save();
     }
 
@@ -881,7 +900,7 @@ export class DataManager {
 
     let totalValueLockedUSD = BIGDECIMAL_ZERO;
     let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-    const marketList = this.protocol._markets;
+    const marketList = this.getOrAddMarketToList();
     for (let i = 0; i < marketList.length; i++) {
       const _market = Market.load(marketList[i]);
       if (!_market) {
@@ -902,10 +921,53 @@ export class DataManager {
     this.protocol.save();
   }
 
-  updateRevenue(
+  //
+  //
+  // Update the protocol revenue
+  addProtocolRevenue(
     protocolRevenueDelta: BigDecimal,
+    fee: Fee | null = null
+  ): void {
+    this.updateRevenue(protocolRevenueDelta, BIGDECIMAL_ZERO);
+
+    if (!fee) {
+      fee = this.getOrUpdateFee(FeeType.OTHER);
+    }
+
+    const marketRevDetails = this.getOrCreateRevenueDetails(this.market.id);
+    const protocolRevenueDetails = this.getOrCreateRevenueDetails(
+      this.protocol.id
+    );
+
+    this.insertInOrder(marketRevDetails, protocolRevenueDelta, fee.id);
+    this.insertInOrder(protocolRevenueDetails, protocolRevenueDelta, fee.id);
+  }
+
+  //
+  //
+  // Update the protocol revenue
+  addSupplyRevenue(
     supplyRevenueDelta: BigDecimal,
-    revenueSource: string | null = null
+    fee: Fee | null = null
+  ): void {
+    this.updateRevenue(BIGDECIMAL_ZERO, supplyRevenueDelta);
+
+    if (!fee) {
+      fee = this.getOrUpdateFee(FeeType.OTHER);
+    }
+
+    const marketRevDetails = this.getOrCreateRevenueDetails(this.market.id);
+    const protocolRevenueDetails = this.getOrCreateRevenueDetails(
+      this.protocol.id
+    );
+
+    this.insertInOrder(marketRevDetails, supplyRevenueDelta, fee.id);
+    this.insertInOrder(protocolRevenueDetails, supplyRevenueDelta, fee.id);
+  }
+
+  private updateRevenue(
+    protocolRevenueDelta: BigDecimal,
+    supplyRevenueDelta: BigDecimal
   ): void {
     const totalRevenueDelta = protocolRevenueDelta.plus(supplyRevenueDelta);
 
@@ -927,30 +989,72 @@ export class DataManager {
       this.protocol.cumulativeSupplySideRevenueUSD.plus(supplyRevenueDelta);
     this.protocol.save();
 
-    // update RevenueDetails
-    if (revenueSource) {
-      const marketDetails = this.getOrCreateRevenueDetails(this.market.id);
-      let sourceIndex = marketDetails.sources.indexOf(revenueSource);
-      if (sourceIndex != -1) {
-        marketDetails.amountsUSD[sourceIndex] =
-          marketDetails.amountsUSD[sourceIndex].plus(totalRevenueDelta);
-        marketDetails.save();
-      }
-      this.market.revenueDetails = marketDetails.id;
-      this.market.save();
-
-      const protocolDetails = this.getOrCreateRevenueDetails(this.protocol.id);
-      sourceIndex = protocolDetails.sources.indexOf(revenueSource);
-      if (sourceIndex != -1) {
-        protocolDetails.amountsUSD[sourceIndex] =
-          protocolDetails.amountsUSD[sourceIndex].plus(totalRevenueDelta);
-        protocolDetails.save();
-      }
-      this.protocol.revenueDetails = protocolDetails.id;
-      this.protocol.save();
-    }
-
     // update revenue in snapshots
     this.snapshots.updateRevenue(protocolRevenueDelta, supplyRevenueDelta);
+  }
+
+  //
+  //
+  // Insert revenue in RevenueDetails in order (alphabetized)
+  private insertInOrder(
+    details: RevenueDetails,
+    amountUSD: BigDecimal,
+    associatedSource: string
+  ): void {
+    let sources = details.sources;
+
+    // insert in alphabetical order
+    for (let i = 0; i < sources.length; i++) {
+      const index = associatedSource.localeCompare(sources[i]);
+      if (index < 0) {
+        // insert associatedSource at index i - 1
+        sources = insert(sources, i - 1, associatedSource);
+        details.amountsUSD = insert(
+          details.amountsUSD,
+          i - 1,
+          details.amountsUSD[i].plus(amountUSD)
+        );
+        break;
+      } else if (index > 0) {
+        if (i == sources.length - 1) {
+          // insert associatedSource at end of array
+          sources.push(associatedSource);
+          details.amountsUSD.push(amountUSD);
+          break;
+        }
+      } else {
+        details.amountsUSD[i] = details.amountsUSD[i].plus(amountUSD);
+      }
+    }
+    details.sources = sources;
+    details.save();
+  }
+
+  //
+  //
+  // Get list of markets in the protocol (or add new market if not in there)
+  private getOrAddMarketToList(marketID: Bytes | null = null): Bytes[] {
+    let markets = _Markets.load(this.protocol.id);
+    if (!markets) {
+      markets = new _Markets(this.protocol.id);
+      markets.markets = [];
+    }
+
+    if (!marketID) {
+      return markets.markets;
+    }
+
+    // check if market is already in list
+    if (markets.markets.includes(marketID)) {
+      return markets.markets;
+    }
+
+    // add new market and return
+    const marketList = markets.markets;
+    marketList.push(marketID);
+    markets.markets = marketList;
+    markets.save();
+
+    return marketList;
   }
 }

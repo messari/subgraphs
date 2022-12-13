@@ -38,6 +38,7 @@ import {
   BIGINT_ONE,
   BIGINT_ZERO,
   exponentToBigDecimal,
+  FeeType,
   InterestRateSide,
   InterestRateType,
   OracleSource,
@@ -1060,13 +1061,14 @@ function updateRevenue(dataManager: DataManager, cometAddress: Address): void {
   const supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
     protocolRevenueDeltaUSD
   );
-  dataManager.updateRevenue(protocolRevenueDeltaUSD, supplySideRevenueDeltaUSD);
+  const fee = dataManager.getOrUpdateFee(FeeType.PROTOCOL_FEE);
+  dataManager.addSupplyRevenue(supplySideRevenueDeltaUSD, fee);
+  dataManager.addProtocolRevenue(protocolRevenueDeltaUSD, fee);
 }
 
 //
 //
-// Updates market TVL, borrows, prices
-// @return inputToken
+// Updates market TVL, borrows, prices, reserves
 function updateMarketData(dataManager: DataManager): void {
   const market = dataManager.getMarket();
   const cometContract = Comet.bind(Address.fromBytes(market.relation!));
