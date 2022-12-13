@@ -375,7 +375,7 @@ export function updateUsageMetrics(
   usageMetricsHourly.timestamp = block.timestamp;
 
   const from = transaction.from.toHexString();
-  let account = getOrCreateAccount(protocol, from);
+  const account = getOrCreateAccount(protocol, from);
 
   if (account.transferInCount == INT_ZERO) {
     protocol.cumulativeUniqueTransferReceivers += transferInCount;
@@ -541,7 +541,7 @@ export function createBridgeTransferEvent(
   transferEvent.route = poolRoute.id;
 
   if (isOutgoing) {
-    let account = getOrCreateAccount(
+    const account = getOrCreateAccount(
       protocol,
       event.transaction.from.toHexString()
     );
@@ -551,7 +551,7 @@ export function createBridgeTransferEvent(
     transferEvent.toChainID = crosschainID.toI32();
     transferEvent.type = TransferType.BURN;
   } else {
-    let account = getOrCreateAccount(
+    const account = getOrCreateAccount(
       protocol,
       event.transaction.to!.toHexString()
     );
