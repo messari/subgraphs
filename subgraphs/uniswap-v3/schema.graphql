@@ -656,7 +656,7 @@ interface Event {
   timestamp: BigInt!
 }
 
-type Deposit implements Event @entity {
+type Deposit implements Event @entity @entity(immutable: true) {
   " deposit-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -700,7 +700,7 @@ type Deposit implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity {
+type Withdraw implements Event @entity @entity(immutable: true) {
   " withdraw-{ Transaction hash }-{ Log index }"
   id: ID!
 
@@ -744,7 +744,7 @@ type Withdraw implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Swap implements Event @entity {
+type Swap implements Event @entity @entity(immutable: true) {
   " swap-{ Transaction hash }-{ Log index } "
   id: ID!
 
