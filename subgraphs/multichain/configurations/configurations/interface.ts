@@ -7,11 +7,16 @@ export interface Configurations {
   getProtocolSlug(): string;
   getFactoryAddress(): string;
   getChainID(): BigInt;
-  getCrosschainTokenAddress(token: Token, crosschainID: string): Address;
-  getCrosschainTokenType(token: Token, crosschainID: string): string;
-  getBridgeFeeUSD(
-    amount: BigInt,
-    token: Token,
+  getCrosschainID(tokenID: string): BigInt;
+  getCrosschainTokenAddress(
+    bridgeType: string,
+    tokenID: string,
     crosschainID: string
+  ): Address;
+  getBridgeFeeUSD(
+    bridgeType: string,
+    token: Token,
+    crosschainID: string,
+    amount: BigInt
   ): BigDecimal;
 }

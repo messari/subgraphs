@@ -2,6 +2,7 @@
 # Version: 1.0.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 enum Network {
+  APT
   ARBITRUM_ONE
   ARBITRUM_NOVA
   ASTAR
@@ -9,11 +10,14 @@ enum Network {
   AVALANCHE
   BITGERT
   BITTORRENT
+  BLOCK
   BOBA
   BOBA_2
   BSC
+  BTC
   CELO
   CLOVER
+  COLX
   CONFLUX
   CRONOS
   CUBE
@@ -35,12 +39,14 @@ enum Network {
   KAVA
   KCC
   KLAYTN
+  LTC
   MATIC
   METIS
   MILKOMEDA
   MILKOMEDA_A1
   MOONBEAM
   MOONRIVER
+  NEAR
   OASIS
   OKEXCHAIN
   ONTOLOGY_EVM
@@ -56,6 +62,7 @@ enum Network {
   TOMOCHAIN
   VELAS
   XDAI
+  XRP
   UNKNOWN_NETWORK
 }
 
@@ -87,7 +94,7 @@ enum BridgePermissionType {
 
 type Token @entity {
   " Smart contract address of the token "
-  id: ID!
+  id: Bytes!
 
   " Name of the token, mirrored from the smart contract "
   name: String!
@@ -118,7 +125,7 @@ type CrosschainToken @entity {
   # ChainID is the id of the destination chain (not the one the subgraph is running on), and tokenID is the
   # address of the token on the current chain.
   " Bytes.fromI32(chainID).concat(tokenAddress) "
-  id: ID!
+  id: Bytes!
 
   " The ID commonly used to signal to which chain a transaction is going. List of IDs: https://chainlist.org/ "
   chainID: Int!
@@ -146,7 +153,7 @@ enum RewardTokenType {
 
 type RewardToken @entity(immutable: true) {
   " Bytes.fromI32(0|1).concat(rewardTokenAddress), where 0 is for deposit and 1 is for borrow "
-  id: ID!
+  id: Bytes!
 
   " Reference to the actual token "
   token: Token!
@@ -161,7 +168,7 @@ type RewardToken @entity(immutable: true) {
 
 interface Protocol {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: ID!
+  id: Bytes!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
@@ -225,7 +232,7 @@ interface Protocol {
 
 type BridgeProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: ID!
+  id: Bytes!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
@@ -359,13 +366,13 @@ type BridgeProtocol implements Protocol @entity {
 
 type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time (Bytes.fromI32(num)) "
-  id: ID!
+  id: Bytes!
 
   " Same as the ID, but readable. Number of days since Unix "
   day: Int!
 
   " Protocol this snapshot is associated with "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   ##### User cumulatives #####
   " Number of cumulative unique addresses that interacted with the contracts on this chain or received funds from other chains. It should not include senders on other chains "
@@ -467,13 +474,13 @@ type UsageMetricsDailySnapshot @entity {
 
 type UsageMetricsHourlySnapshot @entity {
   " { Bytes.fromI32(num) } # of hours since Unix epoch time "
-  id: ID!
+  id: Bytes!
 
   " Same as the ID, but readable. Number of hours since Unix "
   hour: Int!
 
   " Protocol this snapshot is associated with "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   ##### User cumulatives #####
   " Number of cumulative unique addresses that interacted with the contracts on this chain or received funds from other chains. It should not include senders on other chains "
@@ -560,13 +567,13 @@ type UsageMetricsHourlySnapshot @entity {
 
 type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time (Bytes.fromI32(num)) "
-  id: ID!
+  id: Bytes!
 
   " Same as the ID, but readable. Number of days since Unix "
   day: Int!
 
   " Protocol this snapshot is associated with "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
@@ -627,10 +634,10 @@ type FinancialsDailySnapshot @entity {
 
 type Pool @entity {
   " Smart contract address of the pool "
-  id: ID!
+  id: Bytes!
 
   " The protocol this pool belongs to "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   " Name of the pool (e.g. Curve.fi DAI/USDC/USDT) "
   name: String
@@ -731,7 +738,7 @@ type Pool @entity {
 
 type PoolRoute @entity {
   " Bytes.fromUTF(({Pool ID}-{lowerChainID}-{greaterChainID}) "
-  id: ID!
+  id: Bytes!
 
   " Pool this route belongs to "
   pool: Pool!
@@ -769,13 +776,13 @@ type PoolRoute @entity {
 
 type PoolDailySnapshot @entity {
   " poolAddress.concatI32(daysSinceUnix) "
-  id: ID!
+  id: Bytes!
 
   " Number of days since Unix "
   day: Int!
 
   " The protocol this snapshot belongs to "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   " The pool this snapshot belongs to "
   pool: Pool!
@@ -851,13 +858,13 @@ type PoolDailySnapshot @entity {
 
 type PoolHourlySnapshot @entity {
   " poolAddress.concatI32(hoursSinceUnix) "
-  id: ID!
+  id: Bytes!
 
   " Same as the ID, but readable. Number of hours since Unix "
   hour: Int!
 
   " The protocol this snapshot belongs to "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   " The pool this snapshot belongs to "
   pool: Pool!
@@ -933,7 +940,7 @@ type PoolHourlySnapshot @entity {
 
 type PoolRouteSnapshot @entity {
   " poolRouteID.concat(poolSnapshotID) "
-  id: ID!
+  id: Bytes!
 
   " PoolRoute this snapshot belongs to "
   poolRoute: PoolRoute!
@@ -983,7 +990,7 @@ contracts.
 """
 interface Event {
   " event.transaction.hash.concatI32(event.logIndex) "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
@@ -1009,7 +1016,7 @@ interface Event {
 
 type LiquidityDeposit implements Event @entity(immutable: true) {
   " event.transaction.hash.concatI32(event.logIndex) "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
@@ -1053,7 +1060,7 @@ type LiquidityDeposit implements Event @entity(immutable: true) {
 
 type LiquidityWithdraw implements Event @entity(immutable: true) {
   " event.transaction.hash.concatI32(event.logIndex) "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
@@ -1104,7 +1111,7 @@ enum TransferType {
 
 type BridgeTransfer implements Event @entity(immutable: true) {
   " event.transaction.hash.concatI32(event.logIndex) "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
@@ -1176,7 +1183,7 @@ type BridgeTransfer implements Event @entity(immutable: true) {
 # Some bridges support sending
 type BridgeMessage implements Event @entity(immutable: true) {
   " event.transaction.hash.concatI32(event.logIndex) "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
@@ -1228,7 +1235,7 @@ type BridgeMessage implements Event @entity(immutable: true) {
 # Helps to accumulate total unique users
 type Account @entity {
   " Address of the account "
-  id: ID!
+  id: Bytes!
 
   " ChainIDs where this account has sent or received funds through this bridge "
   chains: [Int!]!
@@ -1267,5 +1274,5 @@ type Account @entity {
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity(immutable: true) {
   " Bytes.fromUTF( {Address}-{daily|hourly}-{# of day/hour}-{deposit|withdraw|transferIn|transferOut|message} ) "
-  id: ID!
+  id: Bytes!
 }

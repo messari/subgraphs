@@ -16,6 +16,7 @@ export const PROTOCOL_SLUG = "multichain";
 // See below for a complete list:
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
+  export const APT = "APT";
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const ARBITRUM_NOVA = "ARBITRUM_NOVA";
   export const ASTAR = "ASTAR";
@@ -23,11 +24,14 @@ export namespace Network {
   export const AVALANCHE = "AVALANCHE";
   export const BITGERT = "BITGERT";
   export const BITTORRENT = "BITTORRENT";
+  export const BLOCK = "BLOCK";
   export const BOBA = "BOBA";
   export const BOBA_2 = "BOBA_2";
   export const BSC = "BSC"; // aka BNB Chain
+  export const BTC = "BTC";
   export const CELO = "CELO";
   export const CLOVER = "CLOVER";
+  export const COLX = "COLX";
   export const CONFLUX = "CONFLUX";
   export const CRONOS = "CRONOS";
   export const CUBE = "CUBE";
@@ -49,12 +53,14 @@ export namespace Network {
   export const KAVA = "KAVA";
   export const KCC = "KCC";
   export const KLAYTN = "KLAYTN";
+  export const LTC = "LTC";
   export const MATIC = "MATIC"; // aka Polygon
   export const METIS = "METIS";
   export const MILKOMEDA = "MILKOMEDA";
   export const MILKOMEDA_A1 = "MILKOMEDA_A1";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
+  export const NEAR = "NEAR";
   export const OASIS = "OASIS";
   export const OKEXCHAIN = "OKEXCHAIN";
   export const ONTOLOGY_EVM = "ONTOLOGY_EVM";
@@ -70,6 +76,7 @@ export namespace Network {
   export const TOMOCHAIN = "TOMOCHAIN";
   export const VELAS = "VELAS";
   export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const XRP = "XRP";
   export const UNKNOWN_NETWORK = "UNKNOWN_NETWORK";
 }
 
@@ -112,6 +119,11 @@ export namespace TransferType {
   export const BURN = "BURN";
   export const LOCK = "LOCK";
   export const RELEASE = "RELEASE";
+}
+
+export namespace BridgeType {
+  export const BRIDGE = "BRIDGE";
+  export const ROUTER = "ROUTER";
 }
 
 ////////////////////
@@ -222,6 +234,13 @@ NetworkByID.set("71402", Network.GODWOKEN_V1);
 NetworkByID.set("1313161554", Network.AURORA);
 NetworkByID.set("1666600000", Network.HARMONY);
 NetworkByID.set("32520", Network.BITGERT);
+NetworkByID.set("99999", Network.LTC);
+NetworkByID.set("99998", Network.BTC);
+NetworkByID.set("99997", Network.COLX);
+NetworkByID.set("99996", Network.BLOCK);
+NetworkByID.set("99995", Network.NEAR);
+NetworkByID.set("99994", Network.XRP);
+NetworkByID.set("99993", Network.APT);
 
 const mainnetInacuratePricefeedTokens = [
   Address.fromString("0x86A298581388bc199e61BFeCDcA8eA22Cf6C0Da3"), // anyGTPS
@@ -259,7 +278,23 @@ const mainnetInacuratePricefeedTokens = [
 ];
 
 export const INACURATE_PRICEFEED_TOKENS = new TypedMap<string, Address[]>();
+INACURATE_PRICEFEED_TOKENS.set(Network.ARBITRUM_ONE, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.AURORA, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.AVALANCHE, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.BOBA, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.BSC, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.CELO, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.CRONOS, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.FANTOM, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.FUSE, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.XDAI, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.HARMONY, []);
 INACURATE_PRICEFEED_TOKENS.set(
   Network.MAINNET,
   mainnetInacuratePricefeedTokens
 );
+INACURATE_PRICEFEED_TOKENS.set(Network.MOONBEAM, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.MOONRIVER, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.OPTIMISM, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.MATIC, []);
+INACURATE_PRICEFEED_TOKENS.set(Network.UNKNOWN_NETWORK, []);

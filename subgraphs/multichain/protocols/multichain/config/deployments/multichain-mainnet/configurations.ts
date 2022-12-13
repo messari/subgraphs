@@ -4,6 +4,7 @@ import {
   BigDecimal,
   BigInt,
   Address,
+  JSONValue,
 } from "@graphprotocol/graph-ts";
 
 import { Configurations } from "../../../../../configurations/configurations/interface";
@@ -14,11 +15,12 @@ import {
   Network,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  CrosschainTokenType,
   ZERO_ADDRESS,
+  BIGINT_ZERO,
+  BridgeType,
 } from "../../../../../src/common/constants";
 import { bigIntToBigDecimal } from "../../../../../src/common/utils/numbers";
-import { TokenlistAPIResponse } from "./tokenlist-v4";
+import { BridgeAPIResponse, RouterAPIResponse } from "./api";
 
 export class MultichainMainnetConfigurations implements Configurations {
   getNetwork(): string {
@@ -36,14 +38,43 @@ export class MultichainMainnetConfigurations implements Configurations {
   getChainID(): BigInt {
     return BigInt.fromI32(1);
   }
-  getCrosschainTokenAddress(token: Token, crosschainID: string): Address {
-    let crosschainToken = ZERO_ADDRESS;
+  getCrosschainID(tokenID: string): BigInt {
+    let crosschainID = BIGINT_ZERO;
 
-    const key = token.id.toLowerCase().concat(":").concat(crosschainID);
-    const obj = json.fromString(TokenlistAPIResponse).toObject().get(key);
+    const key = tokenID.toLowerCase();
+    const obj = json.fromString(BridgeAPIResponse).toObject().get(key);
 
     if (obj) {
-      crosschainToken = obj.toArray()[0].toString();
+      crosschainID = BigInt.fromString(obj.toArray()[0].toString());
+    } else {
+      log.warning("[getCrosschainID] No crosschainID for key: {}", [key]);
+    }
+
+    return crosschainID;
+  }
+  getCrosschainTokenAddress(
+    bridgeType: string,
+    tokenID: string,
+    crosschainID: string
+  ): Address {
+    let crosschainToken = ZERO_ADDRESS;
+
+    let key: string;
+    let obj: JSONValue | null;
+    let idx: number;
+
+    if (bridgeType == BridgeType.BRIDGE) {
+      key = tokenID.toLowerCase();
+      obj = json.fromString(BridgeAPIResponse).toObject().get(key);
+      idx = 1;
+    } else {
+      key = tokenID.toLowerCase().concat(":").concat(crosschainID);
+      obj = json.fromString(RouterAPIResponse).toObject().get(key);
+      idx = 0;
+    }
+
+    if (obj) {
+      crosschainToken = obj.toArray()[idx as i32].toString();
     } else {
       log.warning(
         "[getCrosschainTokenAddress] No crosschainTokenAddress for key: {}",
@@ -53,35 +84,34 @@ export class MultichainMainnetConfigurations implements Configurations {
 
     return Address.fromString(crosschainToken);
   }
-  getCrosschainTokenType(token: Token, crosschainID: string): string {
-    let crosschainTokenType = CrosschainTokenType.WRAPPED;
-
-    const key = token.id.toLowerCase().concat(":").concat(crosschainID);
-    const obj = json.fromString(TokenlistAPIResponse).toObject().get(key);
-
-    if (obj) {
-      crosschainTokenType = obj.toArray()[1].toString();
-    } else {
-      log.warning(
-        "[getCrosschainTokenType] No crosschainTokenType for key: {}",
-        [key]
-      );
-    }
-
-    return crosschainTokenType;
-  }
   getBridgeFeeUSD(
-    amount: BigInt,
+    bridgeType: string,
     token: Token,
-    crosschainID: string
+    crosschainID: string,
+    amount: BigInt
   ): BigDecimal {
     let feeUSD = BIGDECIMAL_ZERO;
 
-    const key = token.id.toLowerCase().concat(":").concat(crosschainID);
-    const obj = json.fromString(TokenlistAPIResponse).toObject().get(key);
+    let key: string;
+    let obj: JSONValue | null;
+    let idx: number;
+
+    if (bridgeType == BridgeType.BRIDGE) {
+      key = token.id.toHexString().toLowerCase();
+      obj = json.fromString(BridgeAPIResponse).toObject().get(key);
+      idx = 2;
+    } else {
+      key = token.id
+        .toHexString()
+        .toLowerCase()
+        .concat(":")
+        .concat(crosschainID);
+      obj = json.fromString(RouterAPIResponse).toObject().get(key);
+      idx = 1;
+    }
 
     if (obj) {
-      const feeValues = obj.toArray()[2].toString().split(",");
+      const feeValues = obj.toArray()[idx as i32].toString().split(",");
 
       const swapFeeRate = BigDecimal.fromString(feeValues[0]);
       const minFee = BigDecimal.fromString(feeValues[1]);
@@ -100,6 +130,7 @@ export class MultichainMainnetConfigurations implements Configurations {
     } else {
       log.warning("[getBridgeFeeUSD] No fee details for key: {}", [key]);
     }
+
     return feeUSD;
   }
 }

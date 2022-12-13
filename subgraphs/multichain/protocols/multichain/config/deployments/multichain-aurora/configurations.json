@@ -1,6 +1,0 @@
-{
-  "deployment": "MULTICHAIN_AURORA",
-  "network": "aurora",
-  "file": "./src/mappings/handlers.ts",
-  "routers": []
-}

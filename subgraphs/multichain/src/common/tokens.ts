@@ -1,5 +1,7 @@
 /* eslint-disable prefer-const */
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+
+import { BIGINT_ZERO } from "./constants";
 
 import { ERC20 } from "../../generated/RouterV6/ERC20";
 import { ERC20SymbolBytes } from "../../generated/RouterV6/ERC20SymbolBytes";
@@ -65,6 +67,18 @@ export function fetchTokenDecimals(tokenAddress: Address): i32 {
   }
 
   return INVALID_TOKEN_DECIMALS as i32;
+}
+
+export function fetchTokenSupply(tokenAddress: Address): BigInt {
+  const contract = ERC20.bind(tokenAddress);
+
+  const supplyResult = contract.try_totalSupply();
+  if (!supplyResult.reverted) {
+    const supplyValue = supplyResult.value;
+    return supplyValue;
+  }
+
+  return BIGINT_ZERO;
 }
 
 export function isNullEthValue(value: string): boolean {

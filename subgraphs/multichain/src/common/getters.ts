@@ -3,9 +3,16 @@ import {
   ethereum,
   BigInt,
   DataSourceContext,
+  log,
+  Bytes,
 } from "@graphprotocol/graph-ts";
 
-import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
+import {
+  fetchTokenSymbol,
+  fetchTokenName,
+  fetchTokenDecimals,
+  fetchTokenSupply,
+} from "./tokens";
 import {
   INT_ZERO,
   BIGINT_ZERO,
@@ -21,6 +28,7 @@ import {
   Network,
   ZERO_ADDRESS,
   BridgePermissionType,
+  BIGDECIMAL_ONE,
 } from "./constants";
 import { addToArrayAtIndex } from "./utils/arrays";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils/datetime";
@@ -42,14 +50,17 @@ import {
   PoolRouteSnapshot,
   Account,
 } from "../../generated/schema";
-import { PoolTemplate } from "../../generated/templates";
-import { ERC20 } from "../../generated/RouterV6/ERC20";
+import { LiquidityPoolTemplate } from "../../generated/templates";
 import { anyTOKEN } from "../../generated/RouterV6/anyTOKEN";
 
 export function getOrCreateProtocol(): BridgeProtocol {
-  let protocol = BridgeProtocol.load(NetworkConfigs.getFactoryAddress());
+  let protocol = BridgeProtocol.load(
+    Bytes.fromHexString(NetworkConfigs.getFactoryAddress())
+  );
   if (!protocol) {
-    protocol = new BridgeProtocol(NetworkConfigs.getFactoryAddress());
+    protocol = new BridgeProtocol(
+      Bytes.fromHexString(NetworkConfigs.getFactoryAddress())
+    );
 
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
@@ -89,114 +100,151 @@ export function getOrCreateProtocol(): BridgeProtocol {
   protocol.subgraphVersion = Versions.getSubgraphVersion();
   protocol.methodologyVersion = Versions.getMethodologyVersion();
 
-  protocol.save();
+  // protocol.save();
 
   return protocol;
 }
 
 export function getOrCreateToken(
+  protocol: BridgeProtocol,
   tokenAddress: Address,
-  blockNumber: BigInt
+  chainID: BigInt,
+  block: ethereum.Block
 ): Token {
-  let token = Token.load(tokenAddress.toHexString());
+  let token = Token.load(tokenAddress);
   if (!token) {
-    token = new Token(tokenAddress.toHexString());
+    token = new Token(tokenAddress);
 
     token.name = fetchTokenName(tokenAddress);
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.decimals = fetchTokenDecimals(tokenAddress) as i32;
 
-    token.lastPriceBlockNumber = blockNumber;
-    token._totalSupply = BIGINT_ZERO;
+    token.lastPriceBlockNumber = block.number;
+
+    protocol.totalSupportedTokenCount += INT_ONE;
   }
+  token._totalSupply = fetchTokenSupply(tokenAddress);
 
-  if (!token.lastPriceUSD || token.lastPriceBlockNumber! < blockNumber) {
-    let canonicalToken = token;
-
-    const anyTokenContract = anyTOKEN.bind(tokenAddress);
-    const underlyingTokenCall = anyTokenContract.try_underlying();
-    if (
-      !underlyingTokenCall.reverted &&
-      underlyingTokenCall.value != Address.fromString(ZERO_ADDRESS)
-    ) {
-      canonicalToken = getOrCreateToken(underlyingTokenCall.value, blockNumber);
-    }
-
-    const network = NetworkByID.get(NetworkConfigs.getChainID().toString());
+  if (!token.lastPriceUSD || token.lastPriceBlockNumber! < block.number) {
     token.lastPriceUSD = BIGDECIMAL_ZERO;
+
+    const network = NetworkByID.get(chainID.toString())
+      ? NetworkByID.get(chainID.toString())!
+      : Network.UNKNOWN_NETWORK;
+
+    log.warning("[getOrCreateToken] chainID: {} network: {}", [
+      chainID.toString(),
+      network,
+    ]);
+
     if (
-      network &&
       !INACURATE_PRICEFEED_TOKENS.get(network)!.includes(
-        Address.fromString(token.id)
+        Address.fromBytes(token.id)
       )
     ) {
-      const price = getUsdPricePerToken(Address.fromString(canonicalToken.id));
-      if (!price.reverted) {
-        token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+      if (
+        network == Network.ARBITRUM_ONE &&
+        Address.fromBytes(token.id) ==
+          Address.fromHexString("0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a")
+      ) {
+        token.lastPriceUSD = BIGDECIMAL_ONE;
+      } else {
+        let pricedTokenAddress = tokenAddress;
+
+        const anyTokenContract = anyTOKEN.bind(tokenAddress);
+        const underlyingTokenCall = anyTokenContract.try_underlying();
+        if (
+          !underlyingTokenCall.reverted &&
+          underlyingTokenCall.value != Address.fromString(ZERO_ADDRESS)
+        ) {
+          pricedTokenAddress = underlyingTokenCall.value;
+        }
+
+        const price = getUsdPricePerToken(pricedTokenAddress);
+        if (!price.reverted) {
+          token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+        }
       }
     }
-    token.lastPriceBlockNumber = blockNumber;
-
-    const ERC20Contract = ERC20.bind(tokenAddress);
-    const totalSupplyCall = ERC20Contract.try_totalSupply();
-    if (!totalSupplyCall.reverted) {
-      token._totalSupply = totalSupplyCall.value;
-    }
+    token.lastPriceBlockNumber = block.number;
   }
-  token.save();
+
+  // token.save();
+  log.warning("[getOrCreateToken] id: {}", [token.id.toHexString()]);
 
   return token;
 }
 
 export function getOrCreateCrosschainToken(
-  crosschainTokenAddress: Address,
+  token: Token,
   crosschainID: BigInt,
-  tokenAddress: Address,
-  blockNumber: BigInt
+  crosschainTokenAddress: Address,
+  crosschainTokenType: string
 ): CrosschainToken {
-  const crosschainTokenID = crosschainID
-    .toString()
-    .concat("-")
-    .concat(tokenAddress.toHexString());
+  const crosschainTokenID = Bytes.fromByteArray(
+    Bytes.fromBigInt(crosschainID).concat(token.id)
+  );
 
   let crosschainToken = CrosschainToken.load(crosschainTokenID);
   if (!crosschainToken) {
     crosschainToken = new CrosschainToken(crosschainTokenID);
 
-    const token = getOrCreateToken(tokenAddress, blockNumber);
-
     crosschainToken.chainID = crosschainID.toI32();
-    crosschainToken.network = NetworkByID.get(crosschainID.toString())
+    const network = NetworkByID.get(crosschainID.toString())
       ? NetworkByID.get(crosschainID.toString())!
       : Network.UNKNOWN_NETWORK;
+    log.warning("[getOrCreateCrosschainToken] chainID: {} network: {}", [
+      crosschainID.toString(),
+      network,
+    ]);
+
+    crosschainToken.network = network;
     crosschainToken.address = crosschainTokenAddress;
-    crosschainToken.type = NetworkConfigs.getCrosschainTokenType(
-      token,
-      crosschainID.toString()
-    );
+    crosschainToken.type = crosschainTokenType;
     crosschainToken.token = token.id;
-    crosschainToken.save();
+
+    // crosschainToken.save();
   }
+  log.warning("[getOrCreateCrosschainToken] crosschainTokenAddress: {}", [
+    crosschainToken.id.toHexString(),
+  ]);
 
   return crosschainToken;
 }
 
-export function getOrCreatePool(poolID: string, event: ethereum.Event): Pool {
+export function getOrCreatePool(
+  protocol: BridgeProtocol,
+  token: Token,
+  poolID: Bytes,
+  poolType: string,
+  crosschainID: BigInt,
+  block: ethereum.Block
+): Pool {
   let pool = Pool.load(poolID);
   if (!pool) {
     pool = new Pool(poolID);
 
-    const token = getOrCreateToken(
-      Address.fromString(poolID),
-      event.block.number
-    );
     pool.inputToken = token.id;
     pool.inputTokenBalance = BIGINT_ZERO;
 
-    pool.protocol = NetworkConfigs.getFactoryAddress();
+    pool.type = poolType;
+    if (poolType == BridgePoolType.LIQUIDITY) {
+      const context = new DataSourceContext();
+      context.setString("poolID", pool.id.toHexString());
+      context.setString("chainID", NetworkConfigs.getChainID().toString());
+      context.setString("crosschainID", crosschainID.toString());
+
+      LiquidityPoolTemplate.createWithContext(
+        Address.fromBytes(pool.id),
+        context
+      );
+    } else if (poolType == BridgePoolType.BURN_MINT) {
+      pool.mintSupply = token._totalSupply;
+    }
+
+    pool.protocol = protocol.id;
     pool.name = token.name;
     pool.symbol = token.symbol;
-    pool.type = BridgePoolType.LIQUIDITY;
     pool.destinationTokens = [];
     pool.routes = [];
     pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -210,65 +258,49 @@ export function getOrCreatePool(poolID: string, event: ethereum.Event): Pool {
     pool.netVolume = BIGINT_ZERO;
     pool.netVolumeUSD = BIGDECIMAL_ZERO;
 
-    pool.createdTimestamp = event.block.timestamp;
-    pool.createdBlockNumber = event.block.number;
+    pool.createdTimestamp = block.timestamp;
+    pool.createdBlockNumber = block.number;
 
-    pool.save();
+    // pool.save();
 
-    const context = new DataSourceContext();
-    context.setString("poolID", pool.id);
-    context.setString("chainID", NetworkConfigs.getChainID().toString());
-
-    PoolTemplate.createWithContext(Address.fromString(pool.id), context);
-
-    const protocol = getOrCreateProtocol();
-
-    protocol.pools = addToArrayAtIndex<string>(protocol.pools, pool.id);
+    protocol.pools = addToArrayAtIndex<Bytes>(protocol.pools, pool.id);
     protocol.totalPoolCount += INT_ONE;
-    protocol.totalSupportedTokenCount += INT_ONE;
-
-    protocol.save();
   }
 
   return pool;
 }
 
 export function getOrCreatePoolRoute(
-  poolID: string,
-  tokenAddress: Address,
+  protocol: BridgeProtocol,
+  token: Token,
+  crosschainToken: CrosschainToken,
+  pool: Pool,
   chainID: BigInt,
-  crosschainTokenAddress: Address,
-  crosschainID: BigInt,
-  event: ethereum.Event
+  crosschainID: BigInt
 ): PoolRoute {
   const lowerChainID = chainID < crosschainID ? chainID : crosschainID;
   const greaterChainID = chainID > crosschainID ? chainID : crosschainID;
-  const routeID = poolID
-    .concat("-")
-    .concat(lowerChainID.toString())
-    .concat("-")
-    .concat(greaterChainID.toString());
-
+  const routeID = pool.id.concat(
+    Bytes.fromUTF8(
+      "-"
+        .concat(lowerChainID.toString())
+        .concat("-")
+        .concat(greaterChainID.toString())
+    )
+  );
   let poolRoute = PoolRoute.load(routeID);
   if (!poolRoute) {
     poolRoute = new PoolRoute(routeID);
 
-    const pool = getOrCreatePool(poolID, event);
     poolRoute.pool = pool.id;
-
-    const token = getOrCreateToken(tokenAddress, event.block.number);
     poolRoute.inputToken = token.id;
-
-    const crosschainToken = getOrCreateCrosschainToken(
-      crosschainTokenAddress,
-      crosschainID,
-      tokenAddress,
-      event.block.number
-    );
     poolRoute.crossToken = crosschainToken.id;
-    poolRoute.counterType = BridgePoolType.LIQUIDITY;
 
-    const protocol = getOrCreateProtocol();
+    if (pool.type == BridgePoolType.LIQUIDITY) {
+      poolRoute.counterType = BridgePoolType.LIQUIDITY;
+    } else if (pool.type == BridgePoolType.BURN_MINT) {
+      poolRoute.counterType = BridgePoolType.LOCK_RELEASE;
+    }
 
     if (crosschainToken.type == CrosschainTokenType.CANONICAL) {
       protocol.totalCanonicalRouteCount += INT_ONE;
@@ -291,26 +323,28 @@ export function getOrCreatePoolRoute(
 
     protocol.totalPoolRouteCount += INT_ONE;
 
-    poolRoute.save();
-    protocol.save();
+    // poolRoute.save();
   }
+  log.warning("[getOrCreatePoolRoute] id: {}", [poolRoute.id.toHexString()]);
 
   return poolRoute;
 }
 
 export function getOrCreatePoolDailySnapshot(
-  poolID: string,
-  event: ethereum.Event
+  protocol: BridgeProtocol,
+  pool: Pool,
+  block: ethereum.Block
 ): PoolDailySnapshot {
-  const dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const dayId = getDaysSinceEpoch(block.timestamp.toI32());
+  const snapshotID = pool.id.concat(Bytes.fromUTF8("-".concat(dayId)));
 
-  let poolMetrics = PoolDailySnapshot.load(poolID.concat("-").concat(dayId));
+  let poolMetrics = PoolDailySnapshot.load(snapshotID);
   if (!poolMetrics) {
-    poolMetrics = new PoolDailySnapshot(poolID.concat("-").concat(dayId));
+    poolMetrics = new PoolDailySnapshot(snapshotID);
 
     poolMetrics.day = BigInt.fromString(dayId).toI32();
-    poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
-    poolMetrics.pool = poolID;
+    poolMetrics.protocol = protocol.id;
+    poolMetrics.pool = pool.id;
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -333,28 +367,30 @@ export function getOrCreatePoolDailySnapshot(
     poolMetrics.routes = [];
     poolMetrics.inputTokenBalance = BIGINT_ZERO;
 
-    poolMetrics.blockNumber = event.block.number;
-    poolMetrics.timestamp = event.block.timestamp;
+    poolMetrics.blockNumber = block.number;
+    poolMetrics.timestamp = block.timestamp;
 
-    poolMetrics.save();
+    // poolMetrics.save();
   }
 
   return poolMetrics;
 }
 
 export function getOrCreatePoolHourlySnapshot(
-  poolID: string,
-  event: ethereum.Event
+  protocol: BridgeProtocol,
+  pool: Pool,
+  block: ethereum.Block
 ): PoolHourlySnapshot {
-  const hourId = getHoursSinceEpoch(event.block.timestamp.toI32());
+  const hourId = getHoursSinceEpoch(block.timestamp.toI32());
+  const snapshotID = pool.id.concat(Bytes.fromUTF8("-".concat(hourId)));
 
-  let poolMetrics = PoolHourlySnapshot.load(poolID.concat("-").concat(hourId));
+  let poolMetrics = PoolHourlySnapshot.load(snapshotID);
   if (!poolMetrics) {
-    poolMetrics = new PoolHourlySnapshot(poolID.concat("-").concat(hourId));
+    poolMetrics = new PoolHourlySnapshot(snapshotID);
 
     poolMetrics.hour = BigInt.fromString(hourId).toI32();
-    poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
-    poolMetrics.pool = poolID;
+    poolMetrics.protocol = protocol.id;
+    poolMetrics.pool = pool.id;
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -377,27 +413,29 @@ export function getOrCreatePoolHourlySnapshot(
     poolMetrics.routes = [];
     poolMetrics.inputTokenBalance = BIGINT_ZERO;
 
-    poolMetrics.blockNumber = event.block.number;
-    poolMetrics.timestamp = event.block.timestamp;
+    poolMetrics.blockNumber = block.number;
+    poolMetrics.timestamp = block.timestamp;
 
-    poolMetrics.save();
+    // poolMetrics.save();
   }
 
   return poolMetrics;
 }
 
 export function getOrCreatePoolRouteSnapshot(
-  poolRouteID: string,
-  poolSnapshotID: string,
-  event: ethereum.Event
+  poolRoute: PoolRoute,
+  poolSnapshotID: Bytes,
+  block: ethereum.Block
 ): PoolRouteSnapshot {
-  const routeSnapshotID = poolRouteID.concat("-").concat(poolSnapshotID);
+  const routeSnapshotID = poolRoute.id.concat(
+    Bytes.fromUTF8("-").concat(poolSnapshotID)
+  );
 
   let poolRouteSnapshot = PoolRouteSnapshot.load(routeSnapshotID);
   if (!poolRouteSnapshot) {
     poolRouteSnapshot = new PoolRouteSnapshot(routeSnapshotID);
 
-    poolRouteSnapshot.poolRoute = poolRouteID;
+    poolRouteSnapshot.poolRoute = poolRoute.id;
     poolRouteSnapshot.cumulativeVolumeIn = BIGINT_ZERO;
     poolRouteSnapshot.snapshotVolumeIn = BIGINT_ZERO;
     poolRouteSnapshot.cumulativeVolumeInUSD = BIGDECIMAL_ZERO;
@@ -407,26 +445,27 @@ export function getOrCreatePoolRouteSnapshot(
     poolRouteSnapshot.cumulativeVolumeOutUSD = BIGDECIMAL_ZERO;
     poolRouteSnapshot.snapshotVolumeOutUSD = BIGDECIMAL_ZERO;
 
-    poolRouteSnapshot.blockNumber = event.block.number;
-    poolRouteSnapshot.timestamp = event.block.timestamp;
+    poolRouteSnapshot.blockNumber = block.number;
+    poolRouteSnapshot.timestamp = block.timestamp;
 
-    poolRouteSnapshot.save();
+    // poolRouteSnapshot.save();
   }
 
   return poolRouteSnapshot;
 }
 
 export function getOrCreateUsageMetricDailySnapshot(
+  protocol: BridgeProtocol,
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
   const dayId = getDaysSinceEpoch(block.timestamp.toI32());
 
-  let usageMetrics = UsageMetricsDailySnapshot.load(dayId);
+  let usageMetrics = UsageMetricsDailySnapshot.load(Bytes.fromUTF8(dayId));
   if (!usageMetrics) {
-    usageMetrics = new UsageMetricsDailySnapshot(dayId);
+    usageMetrics = new UsageMetricsDailySnapshot(Bytes.fromUTF8(dayId));
 
     usageMetrics.day = BigInt.fromString(dayId).toI32();
-    usageMetrics.protocol = NetworkConfigs.getFactoryAddress();
+    usageMetrics.protocol = protocol.id;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.dailyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueTransferSenders = INT_ZERO;
@@ -460,23 +499,24 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;
 
-    usageMetrics.save();
+    // usageMetrics.save();
   }
 
   return usageMetrics;
 }
 
 export function getOrCreateUsageMetricHourlySnapshot(
+  protocol: BridgeProtocol,
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
   const hourId = getHoursSinceEpoch(block.timestamp.toI32());
 
-  let usageMetrics = UsageMetricsHourlySnapshot.load(hourId);
+  let usageMetrics = UsageMetricsHourlySnapshot.load(Bytes.fromUTF8(hourId));
   if (!usageMetrics) {
-    usageMetrics = new UsageMetricsHourlySnapshot(hourId);
+    usageMetrics = new UsageMetricsHourlySnapshot(Bytes.fromUTF8(hourId));
 
     usageMetrics.hour = BigInt.fromString(hourId).toI32();
-    usageMetrics.protocol = NetworkConfigs.getFactoryAddress();
+    usageMetrics.protocol = protocol.id;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueTransferSenders = INT_ZERO;
@@ -505,23 +545,24 @@ export function getOrCreateUsageMetricHourlySnapshot(
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;
 
-    usageMetrics.save();
+    // usageMetrics.save();
   }
 
   return usageMetrics;
 }
 
 export function getOrCreateFinancialsDailySnapshot(
-  event: ethereum.Event
+  protocol: BridgeProtocol,
+  block: ethereum.Block
 ): FinancialsDailySnapshot {
-  const dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const dayId = getDaysSinceEpoch(block.timestamp.toI32());
 
-  let financialMetrics = FinancialsDailySnapshot.load(dayId);
+  let financialMetrics = FinancialsDailySnapshot.load(Bytes.fromUTF8(dayId));
   if (!financialMetrics) {
-    financialMetrics = new FinancialsDailySnapshot(dayId);
+    financialMetrics = new FinancialsDailySnapshot(Bytes.fromUTF8(dayId));
 
     financialMetrics.day = BigInt.fromString(dayId).toI32();
-    financialMetrics.protocol = NetworkConfigs.getFactoryAddress();
+    financialMetrics.protocol = protocol.id;
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -536,19 +577,22 @@ export function getOrCreateFinancialsDailySnapshot(
     financialMetrics.dailyNetVolumeUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeNetVolumeUSD = BIGDECIMAL_ZERO;
 
-    financialMetrics.blockNumber = event.block.number;
-    financialMetrics.timestamp = event.block.timestamp;
+    financialMetrics.blockNumber = block.number;
+    financialMetrics.timestamp = block.timestamp;
 
-    financialMetrics.save();
+    // financialMetrics.save();
   }
 
   return financialMetrics;
 }
 
-export function getOrCreateAccount(accountID: string): Account {
-  let account = Account.load(accountID);
+export function getOrCreateAccount(
+  protocol: BridgeProtocol,
+  accountID: string
+): Account {
+  let account = Account.load(Bytes.fromUTF8(accountID));
   if (!account) {
-    account = new Account(accountID);
+    account = new Account(Bytes.fromUTF8(accountID));
 
     account.chains = [];
     account.transferOutCount = INT_ZERO;
@@ -560,11 +604,7 @@ export function getOrCreateAccount(accountID: string): Account {
 
     account.save();
 
-    const protocol = getOrCreateProtocol();
-
     protocol.cumulativeUniqueUsers += INT_ONE;
-
-    protocol.save();
   }
 
   return account;

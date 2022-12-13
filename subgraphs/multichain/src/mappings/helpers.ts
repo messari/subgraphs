@@ -15,29 +15,29 @@ import {
   TransferType,
   BridgePoolType,
   ZERO_ADDRESS,
+  NetworkByID,
+  Network,
 } from "../common/constants";
-import {
-  getOrCreateProtocol,
-  getOrCreatePool,
-  getOrCreatePoolDailySnapshot,
-  getOrCreatePoolHourlySnapshot,
-  getOrCreateUsageMetricDailySnapshot,
-  getOrCreateUsageMetricHourlySnapshot,
-  getOrCreateFinancialsDailySnapshot,
-  getOrCreatePoolRoute,
-  getOrCreatePoolRouteSnapshot,
-  getOrCreateToken,
-  getOrCreateCrosschainToken,
-  getOrCreateAccount,
-} from "../common/getters";
+import { getOrCreateAccount } from "../common/getters";
 import { bigIntToBigDecimal } from "../common/utils/numbers";
 import { addToArrayAtIndex, arrayUnique } from "../common/utils/arrays";
 
 import {
   ActiveAccount,
+  BridgeProtocol,
   BridgeTransfer,
+  CrosschainToken,
+  FinancialsDailySnapshot,
   LiquidityDeposit,
   LiquidityWithdraw,
+  Pool,
+  PoolDailySnapshot,
+  PoolHourlySnapshot,
+  PoolRoute,
+  PoolRouteSnapshot,
+  Token,
+  UsageMetricsDailySnapshot,
+  UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
 import { NetworkConfigs } from "../../configurations/configure";
 import {
@@ -46,79 +46,60 @@ import {
 } from "../common/utils/datetime";
 
 export function updatePoolMetrics(
-  poolID: string,
-  poolRouteID: string,
-  tokenAddress: Address,
-  crosschainTokenAddress: Address,
-  event: ethereum.Event
+  token: Token,
+  crosschainToken: CrosschainToken,
+  pool: Pool,
+  poolDailySnapshot: PoolDailySnapshot,
+  poolHourlySnapshot: PoolHourlySnapshot,
+  poolRoute: PoolRoute,
+  block: ethereum.Block
 ): void {
-  const pool = getOrCreatePool(poolID, event);
-  const poolDailySnapshot = getOrCreatePoolDailySnapshot(poolID, event);
-  const poolHourlySnapshot = getOrCreatePoolHourlySnapshot(poolID, event);
-  const token = getOrCreateToken(tokenAddress, event.block.number);
-
   pool.inputTokenBalance = token._totalSupply;
   pool.totalValueLockedUSD = bigIntToBigDecimal(
-    token._totalSupply,
+    pool.inputTokenBalance,
     token.decimals
   ).times(token.lastPriceUSD!);
-  pool.routes = arrayUnique(addToArrayAtIndex(pool.routes, poolRouteID));
+  pool.routes = arrayUnique(addToArrayAtIndex(pool.routes, poolRoute.id));
   pool.destinationTokens = arrayUnique(
-    addToArrayAtIndex(
-      pool.destinationTokens,
-      crosschainTokenAddress.toHexString()
-    )
+    addToArrayAtIndex(pool.destinationTokens, crosschainToken.address)
   );
 
   poolDailySnapshot.inputTokenBalance = pool.inputTokenBalance;
   poolDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolDailySnapshot.routes = arrayUnique(
-    addToArrayAtIndex(poolDailySnapshot.routes, poolRouteID)
+    addToArrayAtIndex(poolDailySnapshot.routes, poolRoute.id)
   );
-  poolDailySnapshot.blockNumber = event.block.number;
-  poolDailySnapshot.timestamp = event.block.timestamp;
+  poolDailySnapshot.blockNumber = block.number;
+  poolDailySnapshot.timestamp = block.timestamp;
 
   poolHourlySnapshot.inputTokenBalance = pool.inputTokenBalance;
   poolHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolHourlySnapshot.routes = arrayUnique(
-    addToArrayAtIndex(poolHourlySnapshot.routes, poolRouteID)
+    addToArrayAtIndex(poolHourlySnapshot.routes, poolRoute.id)
   );
-  poolHourlySnapshot.blockNumber = event.block.number;
-  poolHourlySnapshot.timestamp = event.block.timestamp;
+  poolHourlySnapshot.blockNumber = block.number;
+  poolHourlySnapshot.timestamp = block.timestamp;
 
   if (pool.type == BridgePoolType.BURN_MINT) {
     pool.mintSupply = token._totalSupply;
     poolDailySnapshot.mintSupply = pool.mintSupply;
     poolHourlySnapshot.mintSupply = pool.mintSupply;
   }
-
-  poolHourlySnapshot.save();
-  poolDailySnapshot.save();
-  pool.save();
 }
 
 export function updateVolume(
-  poolID: string,
-  amount: BigInt,
+  protocol: BridgeProtocol,
+  financialMetrics: FinancialsDailySnapshot,
+  token: Token,
+  pool: Pool,
+  poolDailySnapshot: PoolDailySnapshot,
+  poolHourlySnapshot: PoolHourlySnapshot,
+  poolRoute: PoolRoute,
+  poolRouteDailySnapshot: PoolRouteSnapshot,
+  poolRouteHourlySnapshot: PoolRouteSnapshot,
   isOutgoing: boolean,
-  tokenAddress: Address,
-  chainID: BigInt,
-  crosschainTokenAddress: Address,
-  crosschainID: BigInt,
-  event: ethereum.Event
+  amount: BigInt
 ): void {
-  const protocol = getOrCreateProtocol();
-  const pool = getOrCreatePool(poolID, event);
-  const token = getOrCreateToken(tokenAddress, event.block.number);
-  const poolRoute = getOrCreatePoolRoute(
-    poolID,
-    tokenAddress,
-    chainID,
-    crosschainTokenAddress,
-    crosschainID,
-    event
-  );
-
   let volumeIn = BIGINT_ZERO;
   let volumeInUSD = BIGDECIMAL_ZERO;
   let volumeOut = BIGINT_ZERO;
@@ -135,20 +116,6 @@ export function updateVolume(
       token.lastPriceUSD!
     );
   }
-
-  const poolDailySnapshot = getOrCreatePoolDailySnapshot(poolID, event);
-  const poolRouteDailySnapshot = getOrCreatePoolRouteSnapshot(
-    poolRoute.id,
-    poolDailySnapshot.id,
-    event
-  );
-  const poolHourlySnapshot = getOrCreatePoolHourlySnapshot(poolID, event);
-  const poolRouteHourlySnapshot = getOrCreatePoolRouteSnapshot(
-    poolRoute.id,
-    poolHourlySnapshot.id,
-    event
-  );
-  const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
 
   protocol.cumulativeVolumeInUSD =
     protocol.cumulativeVolumeInUSD.plus(volumeInUSD);
@@ -257,21 +224,15 @@ export function updateVolume(
     financialMetrics.dailyVolumeOutUSD
   );
   financialMetrics.cumulativeNetVolumeUSD = protocol.netVolumeUSD;
-
-  financialMetrics.save();
-  poolRouteHourlySnapshot.save();
-  poolHourlySnapshot.save();
-  poolRouteDailySnapshot.save();
-  poolDailySnapshot.save();
-  poolRoute.save();
-  pool.save();
-  protocol.save();
 }
 
 export function updateRevenue(
-  poolID: string,
-  feeUSD: BigDecimal,
-  event: ethereum.Event
+  protocol: BridgeProtocol,
+  financialMetrics: FinancialsDailySnapshot,
+  pool: Pool,
+  poolDailySnapshot: PoolDailySnapshot,
+  poolHourlySnapshot: PoolHourlySnapshot,
+  feeUSD: BigDecimal
 ): void {
   const protocolSideRevenueUSD = feeUSD.times(
     BigDecimal.fromString("55").div(BigDecimal.fromString("100"))
@@ -279,12 +240,6 @@ export function updateRevenue(
   const supplySideRevenueUSD = feeUSD.times(
     BigDecimal.fromString("45").div(BigDecimal.fromString("100"))
   );
-
-  const protocol = getOrCreateProtocol();
-  const pool = getOrCreatePool(poolID, event);
-  const poolDailySnapshot = getOrCreatePoolDailySnapshot(poolID, event);
-  const poolHourlySnapshot = getOrCreatePoolHourlySnapshot(poolID, event);
-  const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
 
   protocol.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
@@ -337,24 +292,17 @@ export function updateRevenue(
     financialMetrics.dailyTotalRevenueUSD.plus(feeUSD);
   financialMetrics.cumulativeTotalRevenueUSD =
     protocol.cumulativeTotalRevenueUSD;
-
-  financialMetrics.save();
-  poolHourlySnapshot.save();
-  poolDailySnapshot.save();
-  pool.save();
-  protocol.save();
 }
 
 export function updateUsageMetrics(
+  protocol: BridgeProtocol,
+  usageMetricsDaily: UsageMetricsDailySnapshot,
+  usageMetricsHourly: UsageMetricsHourlySnapshot,
   eventType: string,
   crosschainID: BigInt,
   block: ethereum.Block,
   transaction: ethereum.Transaction
 ): void {
-  const protocol = getOrCreateProtocol();
-  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(block);
-  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(block);
-
   const transactionCount = INT_ONE;
   const depositCount = eventType == EventType.DEPOSIT ? INT_ONE : INT_ZERO;
   const withdrawCount = eventType == EventType.WITHDRAW ? INT_ONE : INT_ZERO;
@@ -427,7 +375,7 @@ export function updateUsageMetrics(
   usageMetricsHourly.timestamp = block.timestamp;
 
   const from = transaction.from.toHexString();
-  let account = getOrCreateAccount(from);
+  let account = getOrCreateAccount(protocol, from);
 
   if (account.transferInCount == INT_ZERO) {
     protocol.cumulativeUniqueTransferReceivers += transferInCount;
@@ -483,13 +431,17 @@ export function updateUsageMetrics(
     .concat("-")
     .concat(eventType);
 
-  let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountID);
+  let dailyActiveAccount = ActiveAccount.load(
+    Bytes.fromUTF8(dailyActiveAccountID)
+  );
   if (!dailyActiveAccount) {
-    dailyActiveAccount = new ActiveAccount(dailyActiveAccountID);
+    dailyActiveAccount = new ActiveAccount(
+      Bytes.fromUTF8(dailyActiveAccountID)
+    );
   }
   usageMetricsDaily.dailyActiveUsers += transactionCount;
-  usageMetricsDaily.dailyActiveTransferSenders += messageOutCount;
-  usageMetricsDaily.dailyActiveTransferReceivers += messageInCount;
+  usageMetricsDaily.dailyActiveTransferSenders += transferOutCount;
+  usageMetricsDaily.dailyActiveTransferReceivers += transferInCount;
   usageMetricsDaily.dailyActiveLiquidityProviders += depositCount;
   usageMetricsDaily.dailyActiveMessageSenders += messageOutCount;
 
@@ -504,13 +456,17 @@ export function updateUsageMetrics(
     .concat("-")
     .concat(eventType);
 
-  let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountID);
+  let hourlyActiveAccount = ActiveAccount.load(
+    Bytes.fromUTF8(hourlyActiveAccountID)
+  );
   if (!hourlyActiveAccount) {
-    hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountID);
+    hourlyActiveAccount = new ActiveAccount(
+      Bytes.fromUTF8(hourlyActiveAccountID)
+    );
   }
   usageMetricsHourly.hourlyActiveUsers += transactionCount;
-  usageMetricsHourly.hourlyActiveTransferSenders += messageOutCount;
-  usageMetricsHourly.hourlyActiveTransferReceivers += messageInCount;
+  usageMetricsHourly.hourlyActiveTransferSenders += transferOutCount;
+  usageMetricsHourly.hourlyActiveTransferReceivers += transferInCount;
   usageMetricsHourly.hourlyActiveLiquidityProviders += depositCount;
   usageMetricsHourly.hourlyActiveMessageSenders += messageOutCount;
 
@@ -524,71 +480,81 @@ export function updateUsageMetrics(
   usageMetricsDaily.totalSupportedTokenCount =
     protocol.totalSupportedTokenCount;
 
-  usageMetricsHourly.save();
-  usageMetricsDaily.save();
-  protocol.save();
+  const network = NetworkByID.get(crosschainID.toString())
+    ? NetworkByID.get(crosschainID.toString())!
+    : Network.UNKNOWN_NETWORK;
+  protocol.supportedNetworks = arrayUnique(
+    addToArrayAtIndex(protocol.supportedNetworks, network)
+  );
 }
 
-export function updateProtocolTVL(event: ethereum.Event): void {
-  const protocol = getOrCreateProtocol();
-  const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-
+export function updateProtocolTVL(
+  protocol: BridgeProtocol,
+  financialMetrics: FinancialsDailySnapshot,
+  block: ethereum.Block
+): void {
   const pools = protocol.pools;
   let tvl = BIGDECIMAL_ZERO;
   for (let i = 0; i < pools.length; i++) {
-    const pool = getOrCreatePool(pools[i], event);
+    const pool = Pool.load(pools[i])!;
 
     tvl = tvl.plus(pool.totalValueLockedUSD);
   }
   protocol.totalValueLockedUSD = tvl;
 
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.blockNumber = event.block.number;
-  financialMetrics.timestamp = event.block.timestamp;
-
-  financialMetrics.save();
-  protocol.save();
+  financialMetrics.blockNumber = block.number;
+  financialMetrics.timestamp = block.timestamp;
 }
 
 export function createBridgeTransferEvent(
-  poolID: string,
-  tokenAddress: Address,
+  protocol: BridgeProtocol,
+  token: Token,
+  crosschainToken: CrosschainToken,
+  pool: Pool,
+  poolRoute: PoolRoute,
   chainID: BigInt,
-  crosschainTokenAddress: Address,
   crosschainID: BigInt,
-  poolRouteID: string,
   isOutgoing: boolean,
-  amount: BigInt,
-  event: ethereum.Event,
   fromAddress: Address,
   toAddress: Address,
-  crossTransactionID: Bytes
+  amount: BigInt,
+  crossTransactionID: Bytes,
+  event: ethereum.Event
 ): void {
   const transferEventID = event.transaction.hash
     .toHexString()
     .concat("-")
     .concat(event.logIndex.toString());
 
-  const transferEvent = new BridgeTransfer(transferEventID);
+  const transferEvent = new BridgeTransfer(Bytes.fromUTF8(transferEventID));
 
   transferEvent.hash = event.transaction.hash;
   transferEvent.logIndex = event.logIndex.toI32();
-  transferEvent.protocol = NetworkConfigs.getFactoryAddress();
+  transferEvent.protocol = Bytes.fromHexString(
+    NetworkConfigs.getFactoryAddress()
+  );
   transferEvent.to = event.transaction.to!;
   transferEvent.from = event.transaction.from;
   transferEvent.isOutgoing = isOutgoing;
-  transferEvent.pool = poolID;
-  transferEvent.route = poolRouteID;
+  transferEvent.pool = pool.id;
+  transferEvent.route = poolRoute.id;
 
   if (isOutgoing) {
-    let account = getOrCreateAccount(event.transaction.from.toHexString());
+    let account = getOrCreateAccount(
+      protocol,
+      event.transaction.from.toHexString()
+    );
     transferEvent.account = account.id;
 
     transferEvent.fromChainID = chainID.toI32();
     transferEvent.toChainID = crosschainID.toI32();
     transferEvent.type = TransferType.BURN;
   } else {
-    let account = getOrCreateAccount(event.transaction.to!.toHexString());
+    let account = getOrCreateAccount(
+      protocol,
+      event.transaction.to!.toHexString()
+    );
     transferEvent.account = account.id;
 
     transferEvent.fromChainID = crosschainID.toI32();
@@ -604,19 +570,12 @@ export function createBridgeTransferEvent(
     transferEvent.crossTransactionID = crossTransactionID;
   }
 
-  const token = getOrCreateToken(tokenAddress, event.block.number);
   transferEvent.token = token.id;
   transferEvent.amount = amount;
   transferEvent.amountUSD = bigIntToBigDecimal(amount, token.decimals).times(
     token.lastPriceUSD!
   );
 
-  const crosschainToken = getOrCreateCrosschainToken(
-    crosschainTokenAddress,
-    crosschainID,
-    tokenAddress,
-    event.block.number
-  );
   transferEvent.crosschainToken = crosschainToken.id;
 
   transferEvent.isSwap = false;
@@ -631,8 +590,9 @@ export function createBridgeTransferEvent(
 }
 
 export function createLiquidityDepositEvent(
-  poolID: string,
-  tokenAddress: Address,
+  protocol: BridgeProtocol,
+  token: Token,
+  poolID: Bytes,
   chainID: BigInt,
   fromAddress: Address,
   toAddress: Address,
@@ -645,20 +605,21 @@ export function createLiquidityDepositEvent(
     .concat("-")
     .concat(logIndex.toString());
 
-  const depositEvent = new LiquidityDeposit(depositEventID);
+  const depositEvent = new LiquidityDeposit(Bytes.fromUTF8(depositEventID));
 
   depositEvent.hash = call.transaction.hash;
   depositEvent.logIndex = logIndex.toI32();
-  depositEvent.protocol = NetworkConfigs.getFactoryAddress();
+  depositEvent.protocol = Bytes.fromHexString(
+    NetworkConfigs.getFactoryAddress()
+  );
   depositEvent.to = toAddress;
   depositEvent.from = fromAddress;
   depositEvent.pool = poolID;
   depositEvent.chainID = chainID.toI32();
 
-  const account = getOrCreateAccount(fromAddress.toHexString());
+  const account = getOrCreateAccount(protocol, fromAddress.toHexString());
   depositEvent.account = account.id;
 
-  const token = getOrCreateToken(tokenAddress, call.block.number);
   depositEvent.token = token.id;
   depositEvent.amount = amount;
   depositEvent.amountUSD = bigIntToBigDecimal(amount, token.decimals).times(
@@ -672,8 +633,9 @@ export function createLiquidityDepositEvent(
 }
 
 export function createLiquidityWithdrawEvent(
-  poolID: string,
-  tokenAddress: Address,
+  protocol: BridgeProtocol,
+  token: Token,
+  poolID: Bytes,
   chainID: BigInt,
   fromAddress: Address,
   toAddress: Address,
@@ -686,20 +648,21 @@ export function createLiquidityWithdrawEvent(
     .concat("-")
     .concat(logIndex.toString());
 
-  const withdrawEvent = new LiquidityWithdraw(withdrawEventID);
+  const withdrawEvent = new LiquidityWithdraw(Bytes.fromUTF8(withdrawEventID));
 
   withdrawEvent.hash = call.transaction.hash;
   withdrawEvent.logIndex = logIndex.toI32();
-  withdrawEvent.protocol = NetworkConfigs.getFactoryAddress();
+  withdrawEvent.protocol = Bytes.fromHexString(
+    NetworkConfigs.getFactoryAddress()
+  );
   withdrawEvent.to = toAddress;
   withdrawEvent.from = fromAddress;
   withdrawEvent.pool = poolID;
   withdrawEvent.chainID = chainID.toI32();
 
-  const account = getOrCreateAccount(toAddress.toHexString());
+  const account = getOrCreateAccount(protocol, toAddress.toHexString());
   withdrawEvent.account = account.id;
 
-  const token = getOrCreateToken(tokenAddress, call.block.number);
   withdrawEvent.token = token.id;
   withdrawEvent.amount = amount;
   withdrawEvent.amountUSD = bigIntToBigDecimal(amount, token.decimals).times(
