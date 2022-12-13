@@ -21,6 +21,7 @@ import { ethereum } from "@graphprotocol/graph-ts";
 import { generalUtilities } from "../checkpoints/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
+import { updateProtocolAndPoolRewardsTvl } from "../updaters/financialMetrics";
 
 /**
  * Occurs when a node operator stakes RPL on his node to collaterize his minipools.
@@ -36,6 +37,17 @@ export function handleRPLStaked(event: RPLStaked): void {
     event.params.amount
   );
   updateUsageMetrics(event.block, event.params.from);
+  const rocketNodeStakingContract = rocketNodeStaking.bind(
+    Address.fromString(ROCKET_NODE_STAKING_CONTRACT_ADDRESS)
+  );
+  const totalStake = rocketNodeStakingContract.try_getTotalEffectiveRPLStake();
+  if (!totalStake.reverted) {
+    updateProtocolAndPoolRewardsTvl(
+      event.block.number,
+      event.block.timestamp,
+      totalStake.value
+    );
+  }
 }
 
 /**

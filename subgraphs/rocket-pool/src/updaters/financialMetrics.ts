@@ -125,10 +125,6 @@ export function updateTotalRewardsMetrics(
     block.number
   ).lastPriceUSD!;
 
-  log.error("[updateTotalRewardsMetrics] additional Rewards: {}", [
-    additionalRewards.toString(),
-  ]);
-
   const newDailyEmissions =
     poolMetricsDailySnapshot.rewardTokenEmissionsAmount![0].plus(
       additionalRewards
@@ -138,16 +134,6 @@ export function updateTotalRewardsMetrics(
       additionalRewards
     );
 
-  log.error("[updateTotalRewardsMetrics] lastRewardPriceUsd: {}", [
-    lastRewardPriceUsd.toString(),
-  ]);
-  log.error("[updateTotalRewardsMetrics] newDailyEmissions: {}", [
-    newDailyEmissions.toString(),
-  ]);
-  log.error("[updateTotalRewardsMetrics] newHourlyEmissions: {}", [
-    newHourlyEmissions.toString(),
-  ]);
-
   poolMetricsDailySnapshot.rewardTokenEmissionsAmount = [newDailyEmissions];
 
   poolMetricsDailySnapshot.rewardTokenEmissionsUSD = [
@@ -155,11 +141,6 @@ export function updateTotalRewardsMetrics(
   ];
 
   poolMetricsDailySnapshot.save();
-
-  log.error(
-    "[updateTotalRewardsMetrics] poolMetrics reward token emissions: {}",
-    [poolMetricsDailySnapshot.rewardTokenEmissionsUSD![0].toString()]
-  );
 
   poolMetricsHourlySnapshot.rewardTokenEmissionsAmount! = [newHourlyEmissions];
   poolMetricsHourlySnapshot.rewardTokenEmissionsUSD! = [

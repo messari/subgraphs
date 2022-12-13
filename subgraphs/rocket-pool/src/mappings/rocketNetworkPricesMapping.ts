@@ -24,6 +24,7 @@ import { nodeUtilities } from "../checkpoints/nodeUtilities";
 import { EffectiveMinipoolRPLBounds } from "../models/effectiveMinipoolRPLBounds";
 import { ONE_ETHER_IN_WEI } from "../constants/generalConstants";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
+import { updateSnapshotsTvl } from "../updaters/financialMetrics";
 
 /**
  * When enough ODAO members submitted their votes and a consensus threshold is reached, a new RPL price is comitted to the smart contracts.
@@ -86,6 +87,7 @@ export function handlePricesUpdated(event: PricesUpdated): void {
     event.block.number,
     event.block.timestamp
   );
+  updateSnapshotsTvl(event.block);
 
   // Some of the running totals should be set to the ones from the previous checkpoint if they are 0 after generating the individual node balance checkpoints.
   nodeUtilities.coerceRunningTotalsBasedOnPreviousCheckpoint(

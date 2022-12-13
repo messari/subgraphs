@@ -153,6 +153,8 @@ dataSources:
           file: ./abis/RocketStorage.json
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
       eventHandlers:
         - event: RPLStaked(indexed address,uint256,uint256)
           handler: handleRPLStaked
