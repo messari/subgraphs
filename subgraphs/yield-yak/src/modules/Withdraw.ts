@@ -5,7 +5,7 @@ import {
   BigDecimal,
   bigDecimal,
 } from "@graphprotocol/graph-ts";
-import { Vault } from "../../generated/schema";
+import { Token, Vault } from "../../generated/schema";
 import {
   getOrCreateFinancialDailySnapshots,
   getOrCreateUsageMetricsDailySnapshot,
@@ -19,6 +19,8 @@ import {
   DEFUALT_AMOUNT,
   ZERO_BIGINT,
   ZERO_BIGDECIMAL,
+  BIGINT_TEN,
+  BIGDECIMAL_ZERO,
 } from "../helpers/constants";
 import * as utils from "../common/utils";
 import { Withdraw } from "../../generated/schema";
@@ -27,6 +29,10 @@ import {
   calculatePriceInUSD,
   calculateOutputTokenPriceInUSD,
 } from "../common/calculators";
+import { getUsdPrice, getUsdPricePerToken } from "../Prices";
+import { getPriceOfOutputTokens } from "./Price";
+import { getPriceUsdcRecommended } from "../Prices/calculations/CalculationsSushiswap";
+import { NETWORK_STRING } from "../Prices/config/avalanche";
 
 export function _Withdraw(
   contractAddress: Address,
@@ -50,12 +56,13 @@ export function _Withdraw(
     vault.inputTokenBalance = strategyContract.totalDeposits();
     if (strategyContract.try_depositToken().reverted) {
       vault.totalValueLockedUSD = ZERO_BIGDECIMAL;
-    } else {
-      vault.totalValueLockedUSD = calculatePriceInUSD(
-        strategyContract.depositToken(),
-        DEFUALT_AMOUNT
-      ).times(convertBigIntToBigDecimal(strategyContract.totalDeposits(), 18));
     }
+    // else {
+    //   vault.totalValueLockedUSD = getUsdPrice(
+    //     strategyContract.depositToken(),
+    //     ZERO_BIGDECIMAL
+    //   ).times(convertBigIntToBigDecimal(strategyContract.totalDeposits(), 18));
+    // }
   }
 
   if (strategyContract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
@@ -66,7 +73,27 @@ export function _Withdraw(
       18
     );
   }
-  vault.outputTokenPriceUSD = calculateOutputTokenPriceInUSD(contractAddress);
+
+  let inputToken = Token.load(vault.inputToken);
+  let inputTokenAddress = Address.fromString(vault.inputToken);
+  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenDecimals = BIGINT_TEN.pow(
+    inputToken!.decimals as u8
+  ).toBigDecimal();
+
+  vault.totalValueLockedUSD = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
+
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
+
+  vault.outputTokenPriceUSD = getPriceOfOutputTokens(
+    vaultAddress,
+    inputTokenAddress,
+    inputTokenDecimals
+  );
 
   // Update hourly and daily withdraw transaction count
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
@@ -81,10 +108,10 @@ export function _Withdraw(
 
   utils.updateProtocolTotalValueLockedUSD();
 
-  const withdrawAmountUSD = calculatePriceInUSD(
+  const withdrawAmountUSD = getPriceUsdcRecommended(
     strategyContract.depositToken(),
-    withdrawAmount
-  );
+    NETWORK_STRING
+  ).usdPrice;
 
   createWithdrawTransaction(
     contractAddress,

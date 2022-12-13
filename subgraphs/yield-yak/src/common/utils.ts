@@ -1,13 +1,15 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/schema";
+import { YakERC20 } from "../../generated/YakStrategyV2/YakERC20";
 import { ZERO_BIGDECIMAL } from "../helpers/constants";
 import { getOrCreateYieldAggregator } from "./initializers";
+import * as constants from "../helpers/constants";
 
 export function updateProtocolAfterNewVault(vaultAddress: Address): void {
   const protocol = getOrCreateYieldAggregator();
 
   let vaultIds = protocol._vaultIds;
-  vaultIds.push(vaultAddress.toHexString())
+  vaultIds.push(vaultAddress.toHexString());
 
   protocol._vaultIds = vaultIds;
 
@@ -33,4 +35,19 @@ export function updateProtocolTotalValueLockedUSD(): void {
 
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
+}
+
+export function readValue<T>(
+  callResult: ethereum.CallResult<T>,
+  defaultValue: T
+): T {
+  return callResult.reverted ? defaultValue : callResult.value;
+}
+
+export function getTokenDecimals(tokenAddr: Address): BigInt {
+  const token = YakERC20.bind(tokenAddr);
+
+  const tokenValue = readValue<i32>(token.try_decimals(), constants.ZERO_INT);
+
+  return BigInt.fromI32(tokenValue);
 }

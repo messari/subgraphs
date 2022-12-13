@@ -14,7 +14,7 @@ import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
 import * as utils from "./utils";
 import {
   DEFUALT_AMOUNT,
-  DEFUALT_DECIMALS,
+  DEFAULT_DECIMALS,
   ZERO_BIGINT,
   ZERO_ADDRESS,
   ZERO_BIGDECIMAL,
@@ -157,7 +157,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
     }
 
     if (contract.try_decimals().reverted) {
-      token.decimals = DEFUALT_DECIMALS.toI32();
+      token.decimals = DEFAULT_DECIMALS.toI32();
     } else {
       token.decimals = contract.decimals();
     }

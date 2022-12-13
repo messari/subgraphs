@@ -1,6 +1,6 @@
 import { Address, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 
-export const DEFUALT_DECIMALS: BigInt = BigInt.fromString("0");
+export const DEFAULT_DECIMALS: BigInt = BigInt.fromString("0");
 export const DEFUALT_AMOUNT: BigInt = BigInt.fromString("1000000000000000000");
 
 export const ZERO_BIGDECIMAL: BigDecimal = BigDecimal.fromString("0");
@@ -9,6 +9,7 @@ export const ZERO_INT: i32 = 0;
 export const ZERO_BIGDECIMAL_ARRAY: BigDecimal[] = [];
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
+export const BIGDECIMAL_ZERO = new BigDecimal(BigInt.fromI32(0));
 
 export const ZERO_ADDRESS: Address = Address.fromString(
   "0x0000000000000000000000000000000000000000"
