@@ -35,7 +35,7 @@ function ErrorDisplay({
   if (protocolData) {
     protocolSchemaData = protocolData[protocolEntityName];
     if (!protocolSchemaData) {
-      protocolSchemaData = protocolData[protocolEntityNames][0];
+      protocolSchemaData = protocolData[protocolEntityNames]?.[0];
     }
   }
 

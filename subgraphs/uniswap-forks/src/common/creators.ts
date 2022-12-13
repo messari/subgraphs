@@ -1,5 +1,12 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { BigInt, Address, store, ethereum } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Address,
+  store,
+  ethereum,
+  log,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
 import {
   Account,
   _HelperStore,
@@ -9,6 +16,7 @@ import {
   Deposit,
   Withdraw,
   Swap as SwapEvent,
+  Token,
 } from "../../generated/schema";
 import { Pair as PairTemplate } from "../../generated/templates";
 import {
@@ -19,16 +27,17 @@ import {
   LiquidityPoolFeeType,
   FeeSwitch,
   BIGDECIMAL_FIFTY_PERCENT,
+  BIGINT_NEG_ONE,
 } from "./constants";
 import {
   getLiquidityPool,
-  getOrCreateDex,
+  getOrCreateProtocol,
   getOrCreateTransfer,
   getOrCreateToken,
   getOrCreateLPToken,
   getLiquidityPoolAmounts,
 } from "./getters";
-import { convertTokenToDecimal } from "./utils/utils";
+import { convertTokenToDecimal, isSameSign } from "./utils/utils";
 import {
   updateDepositHelper,
   updateTokenWhitelists,
@@ -41,28 +50,44 @@ import { getTrackedVolumeUSD } from "../price/price";
  * Create the fee for a pool depending on the the protocol and network specific fee structure.
  * Specified in the typescript configuration file.
  */
-export function createPoolFees(poolAddress: string): string[] {
-  const poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
-  const poolProtocolFee = new LiquidityPoolFee(
+export function createPoolFees(
+  poolAddress: string,
+  blockNumber: BigInt
+): string[] {
+  // get or create fee entities, set fee types
+  let poolLpFee = LiquidityPoolFee.load(poolAddress.concat("-lp-fee"));
+  if (!poolLpFee) {
+    poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
+    poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
+  }
+
+  let poolProtocolFee = LiquidityPoolFee.load(
     poolAddress.concat("-protocol-fee")
   );
-  const poolTradingFee = new LiquidityPoolFee(
+  if (!poolProtocolFee) {
+    poolProtocolFee = new LiquidityPoolFee(poolAddress.concat("-protocol-fee"));
+    poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
+  }
+
+  let poolTradingFee = LiquidityPoolFee.load(
     poolAddress.concat("-trading-fee")
   );
+  if (!poolTradingFee) {
+    poolTradingFee = new LiquidityPoolFee(poolAddress.concat("-trading-fee"));
+    poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
+  }
 
-  poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
-  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
-  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
-
+  // set fees
   if (NetworkConfigs.getFeeOnOff() == FeeSwitch.ON) {
-    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn();
-    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOn();
+    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn(blockNumber);
+    poolProtocolFee.feePercentage =
+      NetworkConfigs.getProtocolFeeToOn(blockNumber);
   } else {
     poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOff();
     poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOff();
   }
 
-  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee();
+  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee(blockNumber);
 
   poolLpFee.save();
   poolProtocolFee.save();
@@ -78,7 +103,7 @@ export function createLiquidityPool(
   token0Address: string,
   token1Address: string
 ): void {
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
 
   // create the tokens and tokentracker
   const token0 = getOrCreateToken(token0Address);
@@ -95,7 +120,7 @@ export function createLiquidityPool(
   pool.symbol = LPtoken.symbol;
   pool.inputTokens = [token0.id, token1.id];
   pool.outputToken = LPtoken.id;
-  pool.fees = createPoolFees(poolAddress);
+  pool.fees = createPoolFees(poolAddress, event.block.number);
   pool.isSingleSided = false;
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
@@ -151,7 +176,10 @@ export function createDeposit(
 ): void {
   const transfer = getOrCreateTransfer(event);
 
-  const pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
 
   const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
@@ -195,7 +223,10 @@ export function createWithdraw(
 ): void {
   const transfer = getOrCreateTransfer(event);
 
-  const pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
 
   const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
@@ -244,31 +275,38 @@ export function createSwapHandleVolumeAndFees(
   amount0Out: BigInt,
   amount1Out: BigInt
 ): void {
-  const protocol = getOrCreateDex();
-  const pool = getLiquidityPool(event.address.toHexString());
+  if (amount0Out.gt(BIGINT_ZERO) && amount1Out.gt(BIGINT_ZERO)) {
+    // If there are two output tokens with non-zero values, this is an invalid swap. Ignore it.
+    log.error(
+      "Two output tokens - Invalid Swap: amount0Out: {} amount1Out: {}",
+      [amount0Out.toString(), amount1Out.toString()]
+    );
+    return;
+  }
+
+  const protocol = getOrCreateProtocol();
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
   const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
   const token0 = getOrCreateToken(pool.inputTokens[0]);
   const token1 = getOrCreateToken(pool.inputTokens[1]);
 
   // totals for volume updates
-  const amount0Total = amount0Out.plus(amount0In);
-  const amount1Total = amount1Out.plus(amount1In);
+  const amount0 = amount0In.minus(amount0Out);
+  const amount1 = amount1In.minus(amount1Out);
 
-  const amount0TotalConverted = convertTokenToDecimal(
-    amount0Total,
-    token0.decimals
+  // Gets the tokenIn and tokenOut payload based on the amounts
+  const swapTokens = getSwapTokens(
+    token0,
+    token1,
+    amount0In,
+    amount0Out,
+    amount1In,
+    amount1Out
   );
-  const amount1TotalConverted = convertTokenToDecimal(
-    amount1Total,
-    token1.decimals
-  );
-
-  const token0USD = token0.lastPriceUSD!.times(amount0TotalConverted);
-  const token1USD = token1.lastPriceUSD!.times(amount1TotalConverted);
-
-  // /// get total amounts of derived USD for tracking
-  // let derivedAmountUSD = token1USD.plus(token0USD).div(BIGDECIMAL_TWO)
 
   const logIndexI32 = event.logIndex.toI32();
   const transactionHash = event.transaction.hash.toHexString();
@@ -284,12 +322,12 @@ export function createSwapHandleVolumeAndFees(
   swap.from = sender;
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;
-  swap.tokenIn = amount0In != BIGINT_ZERO ? token0.id : token1.id;
-  swap.amountIn = amount0In != BIGINT_ZERO ? amount0Total : amount1Total;
-  swap.amountInUSD = amount0In != BIGINT_ZERO ? token0USD : token1USD;
-  swap.tokenOut = amount0Out != BIGINT_ZERO ? token0.id : token1.id;
-  swap.amountOut = amount0Out != BIGINT_ZERO ? amount0Total : amount1Total;
-  swap.amountOutUSD = amount0Out != BIGINT_ZERO ? token0USD : token1USD;
+  swap.tokenIn = swapTokens.tokenIn.id;
+  swap.amountIn = swapTokens.amountIn;
+  swap.amountInUSD = swapTokens.tokenInUSD;
+  swap.tokenOut = swapTokens.tokenOut.id;
+  swap.amountOut = swapTokens.amountOut;
+  swap.amountOutUSD = swapTokens.tokenOutUSD;
   swap.pool = pool.id;
 
   swap.save();
@@ -297,17 +335,75 @@ export function createSwapHandleVolumeAndFees(
   // only accounts for volume through white listed tokens
   const trackedAmountUSD = getTrackedVolumeUSD(
     poolAmounts,
-    amount0TotalConverted,
-    token0,
-    amount1TotalConverted,
-    token1
+    swapTokens.amountInConverted,
+    swapTokens.tokenIn,
+    swapTokens.amountOutConverted,
+    swapTokens.tokenOut
   );
   updateVolumeAndFees(
     event,
     protocol,
     pool,
     trackedAmountUSD,
-    amount0Total,
-    amount1Total
+    amount0.abs(),
+    amount1.abs()
   );
+}
+
+class SwapTokens {
+  tokenIn: Token;
+  tokenOut: Token;
+  amountIn: BigInt;
+  amountOut: BigInt;
+  amountInConverted: BigDecimal;
+  amountOutConverted: BigDecimal;
+  tokenInUSD: BigDecimal;
+  tokenOutUSD: BigDecimal;
+}
+
+// The purpose of this function is to identity input and output tokens for a swap event
+export function getSwapTokens(
+  token0: Token,
+  token1: Token,
+  amount0In: BigInt,
+  amount0Out: BigInt,
+  amount1In: BigInt,
+  amount1Out: BigInt
+): SwapTokens {
+  let tokenIn: Token;
+  let tokenOut: Token;
+  let amountIn: BigInt;
+  let amountOut: BigInt;
+
+  if (amount0Out.gt(BIGINT_ZERO)) {
+    tokenIn = token1;
+    tokenOut = token0;
+    amountIn = amount1In.minus(amount1Out);
+    amountOut = amount0In.minus(amount0Out).times(BIGINT_NEG_ONE);
+  } else {
+    tokenIn = token0;
+    tokenOut = token1;
+    amountIn = amount0In.minus(amount0Out);
+    amountOut = amount1In.minus(amount1Out).times(BIGINT_NEG_ONE);
+  }
+
+  const amountInConverted = convertTokenToDecimal(amountIn, tokenIn.decimals);
+  const amountOutConverted = convertTokenToDecimal(
+    amountOut,
+    tokenOut.decimals
+  );
+
+  const tokenInUSD = tokenIn.lastPriceUSD!.times(amountInConverted);
+  const tokenOutUSD = tokenOut.lastPriceUSD!.times(amountOutConverted);
+
+  return {
+    tokenIn,
+    tokenOut,
+    amountIn,
+    amountOut,
+    amountInConverted,
+    amountOutConverted,
+    tokenInUSD,
+    tokenOutUSD,
+  };
 }

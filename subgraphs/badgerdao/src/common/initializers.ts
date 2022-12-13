@@ -1,9 +1,4 @@
-import {
-  log,
-  BigInt,
-  Address,
-  ethereum,
-} from "@graphprotocol/graph-ts";
+import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   Token,
   Account,
@@ -21,6 +16,7 @@ import { Vault as VaultStore } from "../../generated/schema";
 import { ERC20 as ERC20Contract } from "../../generated/templates/Strategy/ERC20";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 import { Strategy as StrategyContract } from "../../generated/templates/Strategy/Strategy";
+import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -44,9 +40,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol = new YieldAggregator(constants.PROTOCOL_ID);
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
-    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
+
     protocol.network = constants.Network.MAINNET;
     protocol.type = constants.ProtocolType.YIELD;
 
@@ -58,9 +52,13 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
     protocol._vaultIds = [];
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }
@@ -260,16 +258,19 @@ export function getOrCreateVaultsHourlySnapshots(
   return vaultSnapshots;
 }
 
-export function createWithdrawalFee(vaultAddress: Address, strategyContract: StrategyContract): string {
+export function createWithdrawalFee(
+  vaultAddress: Address,
+  strategyContract: StrategyContract
+): string {
   const withdrawalFeeId =
     utils.enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE) +
     vaultAddress.toHexString();
-  
-    let withdrawalFee = utils.readValue<BigInt>(
+
+  let withdrawalFee = utils.readValue<BigInt>(
     strategyContract.try_withdrawalFee(),
     constants.BIGINT_ZERO
   );
-  
+
   utils.createFeeType(
     withdrawalFeeId,
     constants.VaultFeeType.WITHDRAWAL_FEE,
@@ -279,11 +280,14 @@ export function createWithdrawalFee(vaultAddress: Address, strategyContract: Str
   return withdrawalFeeId;
 }
 
-export function createPerformanceFee(vaultAddress: Address, strategyContract: StrategyContract): string {
+export function createPerformanceFee(
+  vaultAddress: Address,
+  strategyContract: StrategyContract
+): string {
   const performanceFeeId =
     utils.enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
     vaultAddress.toHexString();
-  
+
   let performanceFeeGovernance = utils.readValue<BigInt>(
     strategyContract.try_performanceFeeGovernance(),
     constants.BIGINT_ZERO
@@ -355,23 +359,23 @@ export function getOrCreateVault(
     const strategyContract = StrategyContract.bind(strategyAddress);
 
     const withdrawalFeeId = createWithdrawalFee(vaultAddress, strategyContract);
-    const performanceFeeId = createPerformanceFee(vaultAddress, strategyContract);
-    
+    const performanceFeeId = createPerformanceFee(
+      vaultAddress,
+      strategyContract
+    );
+
     vault.fees = [withdrawalFeeId, performanceFeeId];
 
     vault._strategy = strategyAddress.toHexString();
     vault.save();
 
     utils.updateProtocolAfterNewVault(vaultAddress);
-    
-    log.warning(
-      "[CreateVault] VaultId: {}, inputToken: {}, strategy: {}",
-      [
-        vaultAddress.toHexString(),
-        inputTokenAddress.toHexString(),
-        strategyAddress.toHexString(),
-      ]
-    );
+
+    log.warning("[CreateVault] VaultId: {}, inputToken: {}, strategy: {}", [
+      vaultAddress.toHexString(),
+      inputTokenAddress.toHexString(),
+      strategyAddress.toHexString(),
+    ]);
   }
 
   return vault;

@@ -1,7 +1,5 @@
 import { Address, ethereum, log } from "@graphprotocol/graph-ts";
-
-import { Account, ActiveAccount, Market } from "../../../../generated/schema";
-
+import { Account, ActiveAccount } from "../../../../generated/schema";
 import { ONE_I32, TransactionType } from "../../constants";
 import { getOrCreateUsageDailyMetric, getOrCreateUsageHourlyMetric } from "../getOrCreate/snapshots";
 import { getOrCreateProtocol } from "../getOrCreate/protocol";

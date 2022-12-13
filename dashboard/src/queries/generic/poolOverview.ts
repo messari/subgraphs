@@ -22,7 +22,6 @@ export const schema120 = (): string => {
       id
       name
       symbol
-
       totalValueLockedUSD
       outputTokenSupply
       stakedOutputTokenAmount

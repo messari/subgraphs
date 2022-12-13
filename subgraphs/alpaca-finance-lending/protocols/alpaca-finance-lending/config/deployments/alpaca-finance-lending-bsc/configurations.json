@@ -1,0 +1,50 @@
+{
+  "network": "bsc",
+  "vaults": [
+    {
+      "name": "ibWBNB",
+      "address": "0xd7D069493685A581d27824Fc46EdA46B7EfC0063",
+      "startBlock": 5213456
+    },
+    {
+      "name": "ibBUSD",
+      "address": "0x7C9e73d4C71dae564d41F78d56439bB4ba87592f",
+      "startBlock": 5213616
+    },
+    {
+      "name": "ibETH",
+      "address": "0xbfF4a34A4644a113E8200D7F1D79b3555f723AfE",
+      "startBlock": 6322674
+    },
+    {
+      "name": "ibALPACA",
+      "address": "0xf1bE8ecC990cBcb90e166b71E368299f0116d421",
+      "startBlock": 6865780
+    },
+    {
+      "name": "ibUSDT",
+      "address": "0x158Da805682BdC8ee32d52833aD41E74bb951E59",
+      "startBlock": 7732507
+    },
+    {
+      "name": "ibBTCB",
+      "address": "0x08FC9Ba2cAc74742177e0afC3dC8Aed6961c24e7",
+      "startBlock": 7771427
+    },
+    {
+      "name": "ibTUSD",
+      "address": "0x3282d2a151ca00BfE7ed17Aa16E42880248CD3Cd",
+      "startBlock": 8494541
+    },
+    {
+      "name": "ibUSDC",
+      "address": "0x800933D685E7Dc753758cEb77C8bd34aBF1E26d7",
+      "startBlock": 14151376
+    },
+    {
+      "name": "ibCAKE",
+      "address": "0xfF693450dDa65df7DD6F45B4472655A986b147Eb",
+      "startBlock": 17870362
+    }
+  ]
+}

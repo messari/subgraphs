@@ -1,21 +1,45 @@
-import { LocalizationProvider, PickersDay, StaticDatePicker } from "@mui/lab";
-import MomentAdapter from "@material-ui/pickers/adapter/moment";
 import { Box, Button, TextField } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridAlignment } from "@mui/x-data-grid";
 import { useState } from "react";
-import { toDate, toUnitsSinceEpoch } from "../../../src/utils/index";
+import { downloadCSV, toDate, toUnitsSinceEpoch } from "../../../src/utils/index";
 import { percentageFieldList } from "../../constants";
 import moment, { Moment } from "moment";
+import { DatePicker } from "../utilComponents/DatePicker";
 
 interface TableChartProps {
   datasetLabel: string;
   dataTable: any;
+  jpegDownloadHandler: any;
 }
 
-export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
+export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: TableChartProps) => {
+  const field = datasetLabel.split("-")[1] || datasetLabel;
+  const [sortColumn, setSortColumn] = useState<string>("date");
+  const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showDateString, toggleDateString] = useState(true);
   const [dates, setDates] = useState<any>([]);
+  const [showDateString, toggleDateString] = useState(true);
+
+  function sortFunction(a: any, b: any) {
+    let aVal = a[sortColumn];
+    if (!isNaN(Number(a[sortColumn]))) {
+      aVal = Number(a[sortColumn]);
+    } else if (a[sortColumn].includes("%")) {
+      aVal = Number(a[sortColumn].split("%").join(""));
+    }
+    let bVal = b[sortColumn];
+    if (!isNaN(Number(b[sortColumn]))) {
+      bVal = Number(b[sortColumn]);
+    } else if (b[sortColumn].includes("%")) {
+      bVal = Number(b[sortColumn].split("%").join(""));
+    }
+
+    if (sortOrderAsc) {
+      return (aVal - bVal);
+    } else {
+      return (bVal - aVal);
+    }
+  }
 
   const isPercentageField = percentageFieldList.find((x) => {
     return datasetLabel.toUpperCase().includes(x.toUpperCase());
@@ -36,6 +60,9 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
         field: "value",
         headerName: "Value",
         flex: 1,
+        type: isPercentageField ? "string" : "number",
+        headerAlign: "left" as GridAlignment,
+        align: "left" as GridAlignment,
       },
     ];
     let suffix = "";
@@ -49,7 +76,7 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
         : true,
     );
     const tableData = filteredData.map((val: any, i: any) => {
-      let returnVal = val.value.toLocaleString() + suffix;
+      let returnVal = Number(Number(val.value).toFixed(2)).toLocaleString() + suffix;
       if (isPercentageField && Array.isArray(val.value)) {
         returnVal = val.value.map((ele: string) => ele.toLocaleString() + "%").join(", ");
       }
@@ -60,64 +87,65 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
       return {
         id: i,
         date: dateColumn,
-        value: returnVal,
+        value: isNaN(Number(val.value)) || returnVal.includes('%') ? returnVal : Number(val.value),
       };
     });
 
     return (
       <Box sx={{ height: "100%" }}>
         <Box position="relative" sx={{ marginTop: "-38px" }}>
-          {showDatePicker && (
-            <Box position="absolute" zIndex={2} top={30} right={320} border="1px solid white">
-              <LocalizationProvider dateAdapter={MomentAdapter}>
-                <StaticDatePicker
-                  displayStaticWrapperAs="desktop"
-                  onChange={(newVal: Moment | null) => {
-                    if (newVal) {
-                      setDates((prev: Moment[]) => [...prev, newVal].sort((a, b) => (a.isBefore(b) ? -1 : 1)));
-                    }
-                  }}
-                  value={dates}
-                  renderDay={(day, _selectedDates, pickersDayProps) => {
-                    return (
-                      <div
-                        key={day.format("l")}
-                        onClick={() => {
-                          if (dates.map((date: Moment) => date.format("l")).includes(day.format("l"))) {
-                            setDates(dates.filter((date: Moment) => date.format("l") !== day.format("l")));
-                          }
-                        }}
-                      >
-                        <PickersDay
-                          {...pickersDayProps}
-                          selected={dates.map((date: Moment) => date.format("l")).includes(day.format("l"))}
-                        />
-                      </div>
-                    );
-                  }}
-                  renderInput={(params) => <TextField {...params} />}
-                />
-              </LocalizationProvider>
-              <Box display="flex" flexWrap="wrap" gap={1} sx={{ padding: 1, backgroundColor: "Window" }}>
-                {dates.map((date: Moment) => (
-                  <Button
-                    key={date.format()}
-                    sx={{ border: "1px solid black" }}
-                    onClick={() => setDates(dates.filter((d: Moment) => d !== date))}
-                  >
-                    {date.format("M/D/YY")} 𝘅
-                  </Button>
-                ))}
-              </Box>
-            </Box>
-          )}
+          {showDatePicker && <DatePicker dates={dates} setDates={setDates} />}
 
-          <Button onClick={() => setShowDatePicker((prev) => !prev)}>
-            {showDatePicker ? "Hide" : "Show"} Date Filter
+          <Button className="Hover-Underline" onClick={() => setShowDatePicker((prev) => !prev)}>
+            Date Filter
           </Button>
-          <Button onClick={() => toggleDateString(!showDateString)}>
-            {showDateString ? `Show ${hourly ? "hours" : "days"} since epoch` : "Show Date MM/DD/YYYY"}
+          <Button className="Hover-Underline" onClick={() => toggleDateString(!showDateString)}>
+            {showDateString ? `${hourly ? "hours" : "days"} since epoch` : "Date MM/DD/YYYY"}
           </Button>
+          <Button className="Hover-Underline" onClick={() => {
+            const datesSelectedTimestamps = dates.map((x: any) => x.format("YYYY-MM-DD"));
+            if (!Array.isArray(dataTable)) {
+              let length = dataTable[Object.keys(dataTable)[0]].length;
+              const arrayToSend: any = [];
+              for (let i = 0; i < length; i++) {
+                let objectIteration: any = {};
+                let hasUndefined = false;
+                objectIteration.date = dataTable[Object.keys(dataTable)[0]][i].date;
+                Object.keys(dataTable).forEach((x: any) => {
+                  if (dataTable[x][i]?.value) {
+                    objectIteration[x] = dataTable[x][i]?.value;
+                  } else {
+                    hasUndefined = true;
+                  }
+                });
+                if (!hasUndefined) {
+                  arrayToSend.push(objectIteration);
+                }
+              }
+              return downloadCSV(arrayToSend
+                .sort(sortFunction)
+                .filter((x: any) => {
+                  if (datesSelectedTimestamps.length > 0) {
+                    return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+                  }
+                  return true;
+                })
+                .map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), ...x })), datasetLabel + '-csv', datasetLabel);
+            } else {
+              downloadCSV(dataTable
+                .sort(sortFunction)
+                .filter((x: any) => {
+                  if (datesSelectedTimestamps.length > 0) {
+                    return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+                  }
+                  return true;
+                })
+                .map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel);
+            }
+          }}>
+            Save CSV
+          </Button>
+          {jpegDownloadHandler ? <Button className="Hover-Underline" onClick={() => jpegDownloadHandler()}>Save Chart</Button> : null}
         </Box>
         <DataGrid
           sx={{ textOverflow: "clip" }}
@@ -125,6 +153,10 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
             sorting: {
               sortModel: [{ field: "date", sort: "desc" }],
             },
+          }}
+          onSortModelChange={(x) => {
+            setSortColumn(x[0].field);
+            setSortOrderAsc(x[0].sort === "asc");
           }}
           rows={tableData}
           columns={columns}

@@ -40,6 +40,29 @@ dataSources:
         - event: ActionPaused(address,string,bool)
           handler: handleActionPaused
       file: ./protocols/iron-bank/src/mapping.ts
+
+  - kind: ethereum/contract
+    name: StakingRewardsFactory
+    network: {{ network }}
+    source:
+      address: "{{ rewardsFactoryAddress }}"
+      abi: StakingRewardsFactory
+      startBlock: {{ rewardStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StakingRewardsFactory
+          file: ./abis/iron-bank/StakingRewardsFactory.json
+        - name: StakingRewards
+          file: ./abis/iron-bank/StakingRewards.json
+      eventHandlers:
+        - event: StakingRewardsCreated(indexed address,indexed address)
+          handler: handleStakingRewardsCreated
+      file: ./protocols/iron-bank/src/mapping.ts        
+
 templates:
   - name: CToken
     kind: ethereum/contract
@@ -83,3 +106,33 @@ templates:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./protocols/iron-bank/src/mapping.ts
+
+  - name: StakingRewards
+    kind: ethereum/contract
+    network: {{ network }}
+    source:
+      abi: StakingRewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Market
+      abis:
+        - name: StakingRewards
+          file: ./abis/iron-bank/StakingRewards.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: BeethovenXPool
+          file: ./abis/iron-bank/BeethovenXPool.json
+        - name: BeethovenXVault
+          file: ./abis/iron-bank/BeethovenXVault.json
+      eventHandlers:
+        - event: RewardPaid(indexed address,address,uint256)
+          handler: handleRewardPaid
+        - event: Staked(indexed address,uint256)
+          handler: handleStaked
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleWithdrawn
+      file: ./protocols/iron-bank/src/mapping.ts
+

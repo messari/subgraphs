@@ -6,40 +6,46 @@ export namespace ProtocolType {
   export const GENERIC = "GENERIC";
 }
 export namespace Versions {
+  export const Schema100 = "1.0.0";
   export const Schema120 = "1.2.0";
   export const Schema130 = "1.3.0";
   export const Schema200 = "2.0.0";
   export const Schema201 = "2.0.1";
+  export const Schema300 = "3.0.0";
 
   // Array to list out the different schema versions available
-  export const SchemaVersions = [Schema120, Schema130, Schema201];
+  export const SchemaVersions = [Schema100, Schema120, Schema130, Schema201];
 }
 
-export const latestSchemaVersions = ["1.3.0", "2.0.1"];
+export const latestSchemaVersions = ["1.3.0", "2.0.1", "3.0.0"];
 export const SubgraphBaseUrl = "https://api.thegraph.com/subgraphs/name/";
 export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",
   LENDING: "market",
   YIELD: "vault",
   GENERIC: "pool",
+  BRIDGE: "pool"
 };
 export const PoolNames: Record<string, string> = {
   EXCHANGE: "liquidityPools",
   LENDING: "markets",
   YIELD: "vaults",
   GENERIC: "pools",
+  BRIDGE: "pools"
 };
 export const ProtocolTypeEntityName: Record<string, string> = {
   EXCHANGE: "dexAmmProtocol",
   LENDING: "lendingProtocol",
   YIELD: "yieldAggregator",
   GENERIC: "protocol",
+  BRIDGE: "bridgeProtocol",
 };
 export const ProtocolTypeEntityNames: Record<string, string> = {
   EXCHANGE: "dexAmmProtocols",
   LENDING: "lendingProtocols",
   YIELD: "yieldAggregators",
   GENERIC: "protocols",
+  BRIDGE: "bridgeProtocols"
 };
 export interface Schema {
   entities: string[];

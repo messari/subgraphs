@@ -1,7 +1,7 @@
 import axios from "axios";
-import { constructEmbedMsg, errorNotification, getAllThreadsToClear, getDiscordMessages, sendMessageToAggThread } from "./messageDiscord.js";
+import { clearThread, constructEmbedMsg, errorNotification, getAllThreadsToClear, getDiscordMessages, sendMessageToAggThread } from "./messageDiscord.js";
 import 'dotenv/config'
-import { protocolLevel } from "./protocolLevel.js";
+import { protocolDerivedFields, protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
 import { pullMessagesByThread, resolveQueriesToAttempt, resolveThreadCreation } from "./resolutions.js";
 import { generateEndpoints, indexStatusFlow } from "./indexingStatus.js";
@@ -18,10 +18,16 @@ try {
 let protocolNameToBaseMapping = {};
 
 async function executionFlow() {
-  const { data } = await axios.get(
-    "https://subgraphs.messari.io/deployment.json"
-  );
-
+  console.log('START');
+  let data = null;
+  try {
+    const result = await axios.get(
+      "https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json"
+    );
+    data = result.data;
+  } catch (err) {
+    console.log(err.message)
+  }
   const loopDeploymentJSON = await generateEndpoints(data, protocolNameToBaseMapping);
   const subgraphEndpoints = loopDeploymentJSON.subgraphEndpoints;
   protocolNameToBaseMapping = loopDeploymentJSON.protocolNameToBaseMapping;
@@ -33,7 +39,9 @@ async function executionFlow() {
   Object.entries(subgraphEndpoints).forEach(([protocolType, protocolsOnType]) => {
     Object.entries(protocolsOnType).forEach(([protocolName, protocolObj]) => {
       Object.entries(protocolObj).forEach(([network, deploymentString]) => {
-        const status = Object.values(data[protocolName]?.deployments)?.find(x => x.network === network)?.status || 'dev';
+        const deploymentData = Object.values(data[protocolName]?.deployments)?.find(x => x.network === network);
+        const status = deploymentData?.status || 'dev';
+        const versions = deploymentData?.versions || { "schema": "N/A", "subgraph": "N/A", "methodology": "N/A" };
         const nameStr =
           deploymentString.split("name/")[1];
         const deploymentsKey = nameStr.split("/")[1];
@@ -47,6 +55,7 @@ async function executionFlow() {
           indexedPercentage: 0,
           url: deploymentString,
           protocolType: protocolType,
+          versions: versions,
           network: network
         };
         deployments[deploymentsKey].protocolErrors = JSON.parse(JSON.stringify(protocolErrors));
@@ -68,6 +77,7 @@ async function executionFlow() {
 
   // pass invalid deployments arr to protocolLevel, before execution check if depo key is included in array
   deployments = await protocolLevel(deployments, invalidDeployments);
+  deployments = await protocolDerivedFields(deployments, invalidDeployments);
   const currentDiscordMessages = await getDiscordMessages([]);
 
   const protocolThreadsToStart = [];
@@ -118,9 +128,13 @@ async function executionFlow() {
     return { message: embeddedMessages, protocolName: protocolName, channel: channelId };
   });
   if (messagesToPost.length > 0) {
+    await clearThread(Date.now() - (86400000), process.env.PROD_CHANNEL);
     const aggThread = currentDiscordMessages.find(x => x.content.includes('Production Ready Subgraph Indexing Failure'));
     const aggThreadId = aggThread?.id || "";
-    await sendMessageToAggThread(aggThreadId, channelToProtocolIssuesMapping, protocolNameToChannelMapping);
+    if (aggThreadId) {
+      await clearThread(Date.now() - (86400000), aggThreadId);
+    }
+    await sendMessageToAggThread(aggThreadId);
     messagesToPost = messagesToPost.filter((msg, idx) => {
       if (!msg?.channel && !!msg) {
         messagesToPost[idx].channel = protocolNameToChannelMapping[msg?.protocolName];

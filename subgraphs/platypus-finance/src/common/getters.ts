@@ -31,6 +31,7 @@ import {
 } from "../common/constants";
 import { exponentToBigDecimal } from "./utils/numbers";
 import { getUsdPrice } from "../prices";
+import { Versions } from "../versions";
 
 export function getOrCreateToken(event: ethereum.Event, tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -354,9 +355,6 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol = new DexAmmProtocol(PROTOCOL_ADMIN);
     protocol.name = "Platypus Finance";
     protocol.slug = "platypus-finance";
-    protocol.methodologyVersion = "1.0.0";
-    protocol.schemaVersion = "1.3.0";
-    protocol.subgraphVersion = "1.3.0";
     protocol.network = Network.AVALANCHE;
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -367,8 +365,14 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
     protocol.pools = [];
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 

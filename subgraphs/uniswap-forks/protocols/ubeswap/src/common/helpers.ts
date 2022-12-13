@@ -115,7 +115,10 @@ export function updateRewardEmissions(event: ethereum.Event): void {
   const masterChefPool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEF + "-" + masterChefAddressPidMap.pid.toString()
   )!;
-  const pool = getLiquidityPool(masterChefPool.poolAddress!);
+  const pool = getLiquidityPool(
+    masterChefPool.poolAddress!,
+    event.block.number
+  );
 
   // Return if you have calculated rewards recently - Performance Boost
   if (
@@ -165,7 +168,10 @@ export function updateStakedAmount(
   const masterChefPool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEF + "-" + masterChefAddressPidMap.pid.toString()
   )!;
-  const pool = getLiquidityPool(masterChefPool.poolAddress!);
+  const pool = getLiquidityPool(
+    masterChefPool.poolAddress!,
+    event.block.number
+  );
 
   pool.stakedOutputTokenAmount = !pool.stakedOutputTokenAmount
     ? amount

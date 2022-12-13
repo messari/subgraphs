@@ -2,6 +2,7 @@ import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   FinancialsDailySnapshot,
   LendingProtocol,
+  Market,
 } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
@@ -10,21 +11,21 @@ import {
   LendingType,
   Network,
   ProtocolType,
-  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
-  PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SLUG,
-  PROTOCOL_SUBGRAPH_VERSION,
   RiskType,
   SECONDS_PER_DAY,
   TROVE_MANAGER,
 } from "../utils/constants";
+import { Versions } from "../versions";
 import {
   getOrCreateMarket,
   getOrCreateMarketHourlySnapshot,
   getOrCreateMarketSnapshot,
+  getOrCreateStabilityPool,
 } from "./market";
-import { getLUSDToken } from "./token";
+import { getLUSDToken, getCurrentETHPrice, getCurrentLUSDPrice } from "./token";
+import { bigIntToBigDecimal } from "../utils/numbers";
 
 export function getOrCreateLiquityProtocol(): LendingProtocol {
   let protocol = LendingProtocol.load(TROVE_MANAGER);
@@ -32,9 +33,6 @@ export function getOrCreateLiquityProtocol(): LendingProtocol {
     protocol = new LendingProtocol(TROVE_MANAGER);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.CDP;
@@ -58,8 +56,14 @@ export function getOrCreateLiquityProtocol(): LendingProtocol {
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     protocol.openPositionCount = INT_ZERO;
     protocol.cumulativePositionCount = INT_ZERO;
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 
@@ -102,7 +106,8 @@ export function getOrCreateFinancialsSnapshot(
 
 export function addProtocolSideRevenue(
   event: ethereum.Event,
-  revenueAmountUSD: BigDecimal
+  revenueAmountUSD: BigDecimal,
+  market: Market
 ): void {
   const protocol = getOrCreateLiquityProtocol();
   protocol.cumulativeProtocolSideRevenueUSD =
@@ -118,7 +123,6 @@ export function addProtocolSideRevenue(
     financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
 
-  const market = getOrCreateMarket();
   market.cumulativeProtocolSideRevenueUSD =
     market.cumulativeProtocolSideRevenueUSD.plus(revenueAmountUSD);
   market.cumulativeTotalRevenueUSD =
@@ -142,7 +146,8 @@ export function addProtocolSideRevenue(
 
 export function addSupplySideRevenue(
   event: ethereum.Event,
-  revenueAmountUSD: BigDecimal
+  revenueAmountUSD: BigDecimal,
+  market: Market
 ): void {
   const protocol = getOrCreateLiquityProtocol();
   protocol.cumulativeSupplySideRevenueUSD =
@@ -158,7 +163,6 @@ export function addSupplySideRevenue(
     financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
 
-  const market = getOrCreateMarket();
   market.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD.plus(revenueAmountUSD);
   market.cumulativeTotalRevenueUSD =
@@ -236,8 +240,23 @@ export function updateProtocolUSDLocked(
 
 export function updateProtocolUSDLockedStabilityPool(
   event: ethereum.Event,
-  stabilityPoolTVL: BigDecimal
+  lusdAmount: BigInt,
+  ethAmount: BigInt
 ): void {
+  const lusdPrice = getCurrentLUSDPrice();
+  const LUSDValue = bigIntToBigDecimal(lusdAmount).times(lusdPrice);
+  const totalETHValue = bigIntToBigDecimal(ethAmount).times(
+    getCurrentETHPrice()
+  );
+  const stabilityPoolTVL = LUSDValue.plus(totalETHValue);
+
+  const stabilityPool = getOrCreateStabilityPool(event);
+  stabilityPool.inputTokenBalance = lusdAmount;
+  stabilityPool.totalValueLockedUSD = stabilityPoolTVL;
+  stabilityPool.totalDepositBalanceUSD = stabilityPoolTVL;
+  stabilityPool.inputTokenPriceUSD = lusdPrice;
+  stabilityPool.save();
+
   const protocol = getOrCreateLiquityProtocol();
   const market = getOrCreateMarket();
   const totalValueLocked = market.totalValueLockedUSD.plus(stabilityPoolTVL);

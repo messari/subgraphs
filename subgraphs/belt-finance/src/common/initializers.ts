@@ -20,10 +20,12 @@ import {
 } from "../../generated/schema";
 import * as utils from "./utils";
 import * as constants from "./constants";
+import { getUsdPricePerToken } from "../prices";
 import { Vault as VaultStore } from "../../generated/schema";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/templates/Strategy/ERC20";
+import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -40,12 +42,15 @@ export function getOrCreateAccount(id: string): Account {
   return account;
 }
 
-export function getOrCreateRewardToken(address: Address): RewardToken {
+export function getOrCreateRewardToken(
+  address: Address,
+  block: ethereum.Block
+): RewardToken {
   let rewardToken = RewardToken.load(address.toHexString());
 
   if (!rewardToken) {
     rewardToken = new RewardToken(address.toHexString());
-    const token = getOrCreateToken(address);
+    const token = getOrCreateToken(address, block);
     rewardToken.token = token.id;
     rewardToken.type = constants.RewardTokenType.DEPOSIT;
 
@@ -87,9 +92,6 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol = new YieldAggregator(constants.PROTOCOL_ID.toHexString());
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
-    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Network.BSC;
     protocol.type = constants.ProtocolType.YIELD;
 
@@ -101,14 +103,21 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
     protocol._vaultIds = [];
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }
 
-export function getOrCreateToken(address: Address): Token {
+export function getOrCreateToken(
+  address: Address,
+  block: ethereum.Block
+): Token {
   let token = Token.load(address.toHexString());
 
   if (!token) {
@@ -125,13 +134,34 @@ export function getOrCreateToken(address: Address): Token {
     token.save();
   }
 
+  if (
+    !token.lastPriceUSD ||
+    !token.lastPriceBlockNumber ||
+    block.number
+      .minus(token.lastPriceBlockNumber!)
+      .gt(constants.PRICE_CACHING_BLOCKS)
+  ) {
+    const tokenPrice = getUsdPricePerToken(address);
+    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceBlockNumber = block.number;
+
+    token.save();
+  }
+
   return token;
+}
+
+export function getOrCreateTokenFromString(
+  tokenAddress: string,
+  block: ethereum.Block
+): Token {
+  return getOrCreateToken(Address.fromString(tokenAddress), block);
 }
 
 export function getOrCreateFinancialDailySnapshots(
   block: ethereum.Block
 ): FinancialsDailySnapshot {
-  let id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
+  const id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
   if (!financialMetrics) {
@@ -160,7 +190,7 @@ export function getOrCreateFinancialDailySnapshots(
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let id: string = (
+  const id: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_DAY
   ).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
@@ -190,7 +220,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let metricsID: string = (
+  const metricsID: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_HOUR
   ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
@@ -218,7 +248,7 @@ export function getOrCreateVaultsDailySnapshots(
   vaultId: string,
   block: ethereum.Block
 ): VaultDailySnapshot {
-  let id: string = vaultId
+  const id: string = vaultId
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString());
   let vaultSnapshots = VaultDailySnapshot.load(id);
@@ -256,7 +286,7 @@ export function getOrCreateVaultsHourlySnapshots(
   vaultId: string,
   block: ethereum.Block
 ): VaultHourlySnapshot {
-  let id: string = vaultId
+  const id: string = vaultId
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString());
   let vaultSnapshots = VaultHourlySnapshot.load(id);
@@ -307,11 +337,11 @@ export function getOrCreateVault(
     // There is no deposit limit on Belt Finanace
     vault.depositLimit = constants.BIGINT_ZERO;
 
-    const inputToken = getOrCreateToken(vaultContract.token());
+    const inputToken = getOrCreateToken(vaultContract.token(), block);
     vault.inputToken = inputToken.id;
     vault.inputTokenBalance = constants.BIGINT_ZERO;
 
-    const outputToken = getOrCreateToken(vaultAddress);
+    const outputToken = getOrCreateToken(vaultAddress, block);
     vault.outputToken = outputToken.id;
     vault.outputTokenSupply = constants.BIGINT_ZERO;
 
@@ -327,22 +357,15 @@ export function getOrCreateVault(
     vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
-    let vaultStrategies = utils.getVaultStrategies(vaultAddress);
+    vault.fees = utils.getVaultFees(vaultAddress);
 
-    let vaulFees: string[] = [];
-
-    for (let idx = 0; idx < vaultStrategies.length; idx++) {
-      vaulFees.concat(
-        utils.getStrategyFees(vaultAddress, vaultStrategies.at(idx)).stringIds()
-      );
-    }
-    vault.fees = vaulFees;
+    const vaultStrategies = utils.getVaultStrategies(vaultAddress);
 
     for (let idx = 0; idx < vaultStrategies.length; idx++) {
-      let context = new DataSourceContext();
+      const context = new DataSourceContext();
       context.setString("vaultAddress", vaultAddress.toHexString());
 
-      let underlyingStrategy = utils.getUnderlyingStrategy(
+      const underlyingStrategy = utils.getUnderlyingStrategy(
         vaultStrategies.at(idx)
       );
       StrategyTemplate.createWithContext(underlyingStrategy, context);
@@ -356,6 +379,30 @@ export function getOrCreateVault(
       vault.name!,
       inputToken.id,
     ]);
+  }
+
+  // MultiStrategyVault has a function through which the underlying token can be updated so we check
+  // for new updated strategies after a fixed interval (as BSC does not support call handlers).
+  if (
+    !vault.lastStrategiesBlockNumber ||
+    block.number
+      .minus(vault.lastStrategiesBlockNumber!)
+      .gt(constants.STRATEGIES_CACHING_BLOCKS)
+  ) {
+    const vaultStrategies = utils.getVaultStrategies(vaultAddress);
+
+    for (let idx = 0; idx < vaultStrategies.length; idx++) {
+      const context = new DataSourceContext();
+      context.setString("vaultAddress", vaultAddress.toHexString());
+
+      const underlyingStrategy = utils.getUnderlyingStrategy(
+        vaultStrategies.at(idx)
+      );
+      StrategyTemplate.createWithContext(underlyingStrategy, context);
+    }
+
+    vault.lastStrategiesBlockNumber = block.number;
+    vault.save();
   }
 
   return vault;

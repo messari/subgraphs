@@ -9,7 +9,7 @@ import {
   BeefyStrategy,
   ChargedFees,
   Withdraw,
-} from "../../generated/aave-aave-eol/BeefyStrategy";
+} from "../../generated/Standard/BeefyStrategy";
 import { User, Vault, VaultFee, YieldAggregator } from "../../generated/schema";
 import {
   BIGDECIMAL_HUNDRED,
@@ -59,12 +59,10 @@ export function updateProtocolRevenueFromHarvest(
     .toBigDecimal()
     .times(token.lastPriceUSD)
     .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    transactionRevenue
-  );
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    transactionRevenue
-  );
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD.plus(transactionRevenue);
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(transactionRevenue);
   protocol.save();
 
   vault.fees = getFees(
@@ -96,12 +94,10 @@ export function updateProtocolRevenueFromChargedFees(
     .toBigDecimal()
     .times(token.lastPriceUSD)
     .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    transactionRevenue
-  );
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    transactionRevenue
-  );
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(transactionRevenue);
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(transactionRevenue);
   protocol.save();
 
   updateDailyFinancialSnapshot(event.block, protocol);
@@ -134,12 +130,10 @@ export function updateProtocolRevenueFromWithdraw(
         .div(BIGDECIMAL_HUNDRED)
         .times(token.lastPriceUSD)
         .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
-      protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-        revenue
-      );
-      protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-        revenue
-      );
+      protocol.cumulativeProtocolSideRevenueUSD =
+        protocol.cumulativeProtocolSideRevenueUSD.plus(revenue);
+      protocol.cumulativeTotalRevenueUSD =
+        protocol.cumulativeTotalRevenueUSD.plus(revenue);
       protocol.save();
       break;
     }

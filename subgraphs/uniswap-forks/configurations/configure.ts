@@ -3,7 +3,7 @@ import { getNetworkConfigurations } from "./configurations/configurations";
 import { Deploy } from "./configurations/deploy";
 
 // Select the deployment protocol and network
-const deployment = Deploy.APESWAP_BSC;
+const deployment = Deploy.BISWAP_BSC;
 
 // export const NetworkConfigs = configurationsMap.get(deployment)!
 export const NetworkConfigs = getNetworkConfigurations(deployment);

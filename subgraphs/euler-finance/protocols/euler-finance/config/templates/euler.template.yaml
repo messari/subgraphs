@@ -19,7 +19,7 @@ dataSources:
       startBlock: {{ startBlock }} # this is when the first market was deployed
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - AssetStatus
@@ -33,27 +33,30 @@ dataSources:
       abis:
         - name: Euler
           file: ./abis/Euler.json
-        - name: EulerGeneralView
-          file: ./abis/EulerGeneralView.json
         - name: Exec
           file: ./abis/Exec.json
+        - name: Markets
+          file: ./abis/Markets.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
-        - name: UniswapV3Pool
-          file: ./abis/UniswapV3Pool.json
       eventHandlers:
         - event: AssetStatus(indexed address,uint256,uint256,uint96,uint256,uint256,int96,uint256)
           handler: handleAssetStatus
+          receipt: true
         - event: Borrow(indexed address,indexed address,uint256)
           handler: handleBorrow
         - event: Deposit(indexed address,indexed address,uint256)
           handler: handleDeposit
         - event: GovSetAssetConfig(indexed address,(address,bool,uint32,uint32,uint24))
           handler: handleGovSetAssetConfig
+        - event: GovConvertReserves(indexed address,indexed address,uint256)
+          handler: handleGovConvertReserves
+        - event: GovSetReserveFee(indexed address,uint32)
+          handler: handleGovSetReserveFee
         - event: Liquidation(indexed address,indexed address,indexed address,address,uint256,uint256,uint256,uint256,uint256)
           handler: handleLiquidation
         - event: MarketActivated(indexed address,indexed address,indexed address)
@@ -62,4 +65,35 @@ dataSources:
           handler: handleRepay
         - event: Withdraw(indexed address,indexed address,uint256)
           handler: handleWithdraw
+      file: ./src/mappings/handlers.ts
+
+  - kind: ethereum
+    name: EulStakes
+    network: mainnet
+    source:
+      address: "0xc697BB6625D9f7AdcF0fbf0cbd4DcF50D8716cd3"
+      abi: EulStakes
+      startBlock: 14975091
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: EulStakes
+          file: ./abis/EulStakes.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: Euler
+          file: ./abis/Euler.json
+        - name: Exec
+          file: ./abis/Exec.json
+      eventHandlers:
+        - event: Stake(indexed address,indexed address,address,uint256)
+          handler: handleStake
+          receipt: true
       file: ./src/mappings/handlers.ts

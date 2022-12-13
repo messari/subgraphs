@@ -1,13 +1,18 @@
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
+import moment from "moment";
+import { useRef } from "react";
 import { Line } from "react-chartjs-2";
 import { toDate } from "../../utils";
 
 interface ChartProps {
   datasetLabel: string;
   dataChart: any;
+  identifier: string;
+  chartRef: any;
+
 }
 
-export const Chart = ({ datasetLabel, dataChart }: ChartProps) => {
+export const Chart = ({ identifier, datasetLabel, dataChart, chartRef }: ChartProps) => {
   if (dataChart) {
     let labels: string[] = [];
     let datasets: { data: any; backgroundColor: string; borderColor: string; label: string }[] = [];
@@ -41,11 +46,19 @@ export const Chart = ({ datasetLabel, dataChart }: ChartProps) => {
       labels,
       datasets: datasets,
     };
-    return (
+    return (<>
       <Box padding={2} sx={{ border: 1 }}>
         <Line
           data={chartData}
+          ref={chartRef}
           options={{
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+              mode: 'nearest',
+              axis: 'x',
+              intersect: false,
+            },
             scales: {
               y: {
                 grid: {
@@ -68,9 +81,11 @@ export const Chart = ({ datasetLabel, dataChart }: ChartProps) => {
             elements: {
               point: {
                 radius: 0,
+                hoverRadius: 5,
+                hoverBorderWidth: 4,
+                hoverBorderColor: "white"
               },
             },
-
             plugins: {
               legend: {
                 display: true,
@@ -86,7 +101,7 @@ export const Chart = ({ datasetLabel, dataChart }: ChartProps) => {
           }}
         />
       </Box>
-    );
+    </>);
   }
-  return null;
+  return <CircularProgress sx={{ my: 5 }} size={40} />;;
 };
