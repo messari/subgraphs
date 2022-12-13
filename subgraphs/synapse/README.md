@@ -14,13 +14,14 @@ Liquidity Pools
 Deposit Assets
 Withdraw Assets
 Stake LP position
+Send Messages
 
 
 ## Total Value Locked USD
 
-Synapse operates as an AMM utilizing multiple liquidity pools across many different chains. Liquidity providers of the AMM can stake their LP position with Synapse, to help facilitate cross chain swaps and bridging in return for SYN emissions. 
+Synapse operates as 1) Canonical token bridge, bridging wrapped assets and 2) Liquidity asset bridge, having liquidity pools on either side of the bridge to transfer native assets. Liquidity providers can stake their LP position with Synapse, to help facilitate cross chain swaps and bridging in return for SYN emissions. 
 
-TVL (USD)=`PoolDeposits (USD)`
+TVL (USD)=`TotalDeposits (USD)`
 
 ## Protocol Controlled Value USD
 
