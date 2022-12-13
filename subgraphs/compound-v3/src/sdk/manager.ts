@@ -22,7 +22,7 @@ import {
   Token,
   Transfer,
   Withdraw,
-  _Markets,
+  _MarketList,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import { AccountManager } from "./account";
@@ -1034,9 +1034,9 @@ export class DataManager {
   //
   // Get list of markets in the protocol (or add new market if not in there)
   private getOrAddMarketToList(marketID: Bytes | null = null): Bytes[] {
-    let markets = _Markets.load(this.protocol.id);
+    let markets = _MarketList.load(this.protocol.id);
     if (!markets) {
-      markets = new _Markets(this.protocol.id);
+      markets = new _MarketList(this.protocol.id);
       markets.markets = [];
     }
 
