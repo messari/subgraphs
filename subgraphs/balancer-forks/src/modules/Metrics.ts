@@ -197,7 +197,7 @@ export function updateSnapshotsVolume(
   volumeUSD: BigDecimal,
   block: ethereum.Block
 ): void {
-  const protcol = getOrCreateDexAmmProtocol();
+  const protocol = getOrCreateDexAmmProtocol();
   const financialsDailySnapshot = getOrCreateFinancialDailySnapshots(block);
   const poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
     poolAddress.toHexString(),
@@ -216,13 +216,13 @@ export function updateSnapshotsVolume(
     poolHourlySnaphot.hourlyVolumeUSD.plus(volumeUSD);
 
   if (!constants.BLACKLISTED_PHANTOM_POOLS.includes(poolAddress)) {
-    protcol.cumulativeVolumeUSD = protcol.cumulativeVolumeUSD.plus(volumeUSD);
+    protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(volumeUSD);
   }
 
   financialsDailySnapshot.save();
   poolHourlySnaphot.save();
   poolDailySnaphot.save();
-  protcol.save();
+  protocol.save();
 }
 
 export function updateProtocolRevenue(
