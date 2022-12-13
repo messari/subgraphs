@@ -438,14 +438,15 @@ export function updateUsageMetrics(
     dailyActiveAccount = new ActiveAccount(
       Bytes.fromUTF8(dailyActiveAccountID)
     );
-  }
-  usageMetricsDaily.dailyActiveUsers += transactionCount;
-  usageMetricsDaily.dailyActiveTransferSenders += transferOutCount;
-  usageMetricsDaily.dailyActiveTransferReceivers += transferInCount;
-  usageMetricsDaily.dailyActiveLiquidityProviders += depositCount;
-  usageMetricsDaily.dailyActiveMessageSenders += messageOutCount;
 
-  dailyActiveAccount.save();
+    usageMetricsDaily.dailyActiveUsers += transactionCount;
+    usageMetricsDaily.dailyActiveTransferSenders += transferOutCount;
+    usageMetricsDaily.dailyActiveTransferReceivers += transferInCount;
+    usageMetricsDaily.dailyActiveLiquidityProviders += depositCount;
+    usageMetricsDaily.dailyActiveMessageSenders += messageOutCount;
+
+    dailyActiveAccount.save();
+  }
 
   const hourId = getHoursSinceEpoch(block.timestamp.toI32());
   const hourlyActiveAccountID = from
@@ -463,14 +464,15 @@ export function updateUsageMetrics(
     hourlyActiveAccount = new ActiveAccount(
       Bytes.fromUTF8(hourlyActiveAccountID)
     );
-  }
-  usageMetricsHourly.hourlyActiveUsers += transactionCount;
-  usageMetricsHourly.hourlyActiveTransferSenders += transferOutCount;
-  usageMetricsHourly.hourlyActiveTransferReceivers += transferInCount;
-  usageMetricsHourly.hourlyActiveLiquidityProviders += depositCount;
-  usageMetricsHourly.hourlyActiveMessageSenders += messageOutCount;
 
-  hourlyActiveAccount.save();
+    usageMetricsHourly.hourlyActiveUsers += transactionCount;
+    usageMetricsHourly.hourlyActiveTransferSenders += transferOutCount;
+    usageMetricsHourly.hourlyActiveTransferReceivers += transferInCount;
+    usageMetricsHourly.hourlyActiveLiquidityProviders += depositCount;
+    usageMetricsHourly.hourlyActiveMessageSenders += messageOutCount;
+
+    hourlyActiveAccount.save();
+  }
 
   usageMetricsDaily.totalPoolCount = protocol.totalPoolCount;
   usageMetricsDaily.totalPoolRouteCount = protocol.totalPoolRouteCount;
