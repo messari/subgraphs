@@ -61,7 +61,7 @@ If you find an issue please create a github issue in [messari/subgraphs](https:/
 ## Notes
 
 - Aave V2 Mainnet (not AMM), Polygon, and Avalanche have a collateral swap feature. This allows a user to switch collateral positions without doing a withdraw and deposit. The contract that is responsible for this is the Paraswap Router (a Paraswap router).
-  - Example transaction: https://snowtrace.io/tx/0x873b4019fa2d77dc9809c57b4c03d2db909d26776129225132c8e14f05c1319b
+  - Example transaction: [https://snowtrace.io/tx/0x873b4019fa2d77dc9809c57b4c03d2db909d26776129225132c8e14f05c1319b](https://snowtrace.io/tx/0x873b4019fa2d77dc9809c57b4c03d2db909d26776129225132c8e14f05c1319b)
   - e.g. aWAVAX is converted to WAVAX, WAVAX is swapped for USDC, USDC is converted to aUSDC then returned to the account executing the transaction
   - There are also similar features with swapAndRepay routers and swapAndLiquidate routers.
   - The logic in our subgraph accounts for all of the unique behaviour described above.
@@ -72,16 +72,16 @@ If you find an issue please create a github issue in [messari/subgraphs](https:/
 
 ## Useful links and references
 
-Existing Subgraph: https://thegraph.com/hosted-service/subgraph/aave/protocol-v2
+[Existing Subgraph](https://thegraph.com/hosted-service/subgraph/aave/protocol-v2)
 
-https://docs.aave.com/risk/asset-risk/risk-parameters#reserve-factor
+[Documentation](https://docs.aave.com/risk/asset-risk/risk-parameters#reserve-factor)
 
-AAVE API: https://aave-api-v2.aave.com/
+[AAVE API](https://aave-api-v2.aave.com/)
 
 ### How to use AAVE API
 
 The AAVE API can make historical calls so we can cross reference our subgraph data.
 
-This GET call will return V2 historical data from a certain date: https://aave-api-v2.aave.com/#/data/get_data_liquidity_v2
+This GET call will return V2 historical data from a certain date: [https://aave-api-v2.aave.com/#/data/get_data_liquidity_v2](https://aave-api-v2.aave.com/#/data/get_data_liquidity_v2)
 
-Here is an example https API call for data on Avalanche Markets on 02-20-2022: https://aave-api-v2.aave.com/data/liquidity/v2?poolId=0xb6A86025F0FE1862B372cb0ca18CE3EDe02A318f&date=02-20-2022
+Here is an example https API call for data on Avalanche Markets on 02-20-2022: [https://aave-api-v2.aave.com/data/liquidity/v2?poolId=0xb6A86025F0FE1862B372cb0ca18CE3EDe02A318f&date=02-20-2022](https://aave-api-v2.aave.com/data/liquidity/v2?poolId=0xb6A86025F0FE1862B372cb0ca18CE3EDe02A318f&date=02-20-2022)

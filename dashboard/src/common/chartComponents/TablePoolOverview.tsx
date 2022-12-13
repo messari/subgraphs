@@ -200,7 +200,6 @@ export const TablePoolOverview = ({
       if (pool.inputTokens) {
         inputTokenSymbol = pool.inputTokens.map((tok: any) => tok.symbol).join(", ");
       }
-
       const returnObj: { [x: string]: any } = {
         id: i + 1 + skipAmt,
         idx: i + 1 + skipAmt,

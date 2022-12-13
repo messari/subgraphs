@@ -348,7 +348,7 @@ function PoolTabEntity({
               }
 
               if (fieldName === "rates") {
-                fieldSplitIdentifier = val.id.split("-0x")[0];
+                fieldSplitIdentifier = val.side + '-' + val.type;
               }
               const dataFieldKey = fieldName + " [" + fieldSplitIdentifier + "]";
 
@@ -614,7 +614,7 @@ function PoolTabEntity({
               }
 
               if (fieldName === "rates") {
-                fieldSplitIdentifier = val.id.split("-0x")[0];
+                fieldSplitIdentifier = val.side + '-' + val.type;
               }
               const dataFieldKey = fieldName + " [" + fieldSplitIdentifier + "]";
 
@@ -894,9 +894,10 @@ function PoolTabEntity({
         ) {
           issues.push({ type: "SUM", level: "error", fieldName: entityName + "-" + rate, message: "" });
         }
-        if (data[poolKeySingular].rates[idx]?.side) {
+        const currentRate = data[poolKeySingular].rates[idx];
+        if (currentRate?.side) {
           const val = ratesChart[rate];
-          ratesChart[`${data[poolKeySingular].rates[idx]?.id.split("-0x")[0]} [${idx}]`] = val;
+          ratesChart[`${currentRate?.side}-${currentRate?.type} [${idx}]`] = val;
           delete ratesChart[rate];
         }
       });

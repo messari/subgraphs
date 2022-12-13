@@ -189,6 +189,7 @@ export function handleLift(event: LogNote): void {
   if (!spell) return;
   spell.state = SpellState.LIFTED;
   spell.liftedTxnHash = event.transaction.hash.toHexString();
+  spell.liftedBlock = event.block.number;
   spell.liftedTime = event.block.timestamp;
   spell.liftedWith = spell.totalWeightedVotes;
   spell.save();

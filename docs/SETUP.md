@@ -34,6 +34,17 @@ npm install
 npm uninstall husky && git config --unset core.hooksPath
 ```
 
+## Style Guide
+
+In general we follow Google's styling [guide](https://google.github.io/styleguide/tsguide.html) as best we can. A few pointers to get you started:
+
+- Always opt for `const` over `let` unless you have to change the value of the variable.
+- Use constants when you are hardcoding a value and use `CONSTANT_CASE`.
+- Otherwise most variables should be in `camelCase`
+- File names should be in `camelCase` and we try to keep folder names to one word if possible.
+- To make your code more readable use early returns when things go wrong.
+- When making a contract call you should always your `try...reverted` pattern outlined [here](https://thegraph.com/docs/en/developing/assemblyscript-api/#handling-reverted-calls).
+
 ## What is next?
 
 From here you should be set to build, run, and deploy Messari subgraphs as outlined in [WALKTHROUGH.md](./WALKTHROUGH.md). Next you should familiarize yourself with the project [structure](./STRUCTURE.md) and [tooling](./TOOLING.md). 🚀
