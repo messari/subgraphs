@@ -5734,6 +5734,10 @@
           "hosted-service": {
             "slug": "rocket-pool-ethereum",
             "query-id": "rocket-pool-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "rocket-pool-ethereum",
+            "query-id": "GSjXo5Vd1EPaMGRJBYe6HoBKv7WSq3miCrRRZJbTCHkT"
           }
         },
         "files": {
