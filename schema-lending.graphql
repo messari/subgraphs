@@ -230,7 +230,7 @@ type Fee @entity {
 # This entity offers a more nuanced view of revenue types
 # Use this to provide the sources of revenue and amounts of each
 type RevenueDetails @entity {
-  " { Market/Protocol ID }-{ Optional: Snapshot ID } "
+  " { Market/Protocol ID }{ Optional: Snapshot ID } "
   id: Bytes!
 
   " The source of revenue (in alphabetical order) "
@@ -254,7 +254,7 @@ enum OracleSource {
 # As oracles are a source of truth it is important to understand the details.
 # This entity will help track oracle-related data in a market
 type Oracle @entity {
-  " { Market Address }-{ Token Address } "
+  " { Market Address }{ Token Address } "
   id: Bytes!
 
   oracleAddress: Bytes!
@@ -1010,7 +1010,7 @@ type Market @entity {
 #################################
 
 type MarketDailySnapshot @entity {
-  " { Smart contract address of the market }-{ # of days since Unix epoch time } "
+  " { Smart contract address of the market }{ # of days since Unix epoch time } "
   id: Bytes!
 
   " Number of days since Unix epoch time "
@@ -1242,7 +1242,7 @@ type MarketDailySnapshot @entity {
 }
 
 type MarketHourlySnapshot @entity {
-  " { Smart contract address of the market }-{ # of hours since Unix epoch time } "
+  " { Smart contract address of the market }{ # of hours since Unix epoch time } "
   id: Bytes!
 
   " Number of hours since Unix epoch time "
@@ -1601,7 +1601,7 @@ store them as events, although they are not technically Ethereum events emitted 
 contracts.
 """
 interface Event {
-  " { Transaction hash }-{ Log index } "
+  " { Transaction hash }{ Log index } "
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
@@ -1642,7 +1642,7 @@ interface Event {
 }
 
 type Deposit implements Event @entity(immutable: true) {
-  " { Transaction hash }-{ Log index } "
+  " { Transaction hash }{ Log index } "
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
@@ -1692,7 +1692,7 @@ type Deposit implements Event @entity(immutable: true) {
 }
 
 type Withdraw implements Event @entity(immutable: true) {
-  " { Transaction hash }-{ Log index } "
+  " { Transaction hash }{ Log index } "
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
@@ -1747,7 +1747,7 @@ type Withdraw implements Event @entity(immutable: true) {
 
 # For CDPs, use this for mint events
 type Borrow implements Event @entity(immutable: true) {
-  " { Transaction hash }-{ Log index } "
+  " { Transaction hash }{ Log index } "
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
@@ -1798,7 +1798,7 @@ type Borrow implements Event @entity(immutable: true) {
 
 # For CDPs, use this for burn events
 type Repay implements Event @entity(immutable: true) {
-  " { Transaction hash }-{ Log index } "
+  " { Transaction hash }{ Log index } "
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
@@ -1848,7 +1848,7 @@ type Repay implements Event @entity(immutable: true) {
 }
 
 type Liquidate implements Event @entity(immutable: true) {
-  " { Transaction hash }-{ Log index } "
+  " { Transaction hash }{ Log index } "
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
@@ -1905,7 +1905,7 @@ type Liquidate implements Event @entity(immutable: true) {
 # Transfers associated with other transactions in this schema should live there and not here.
 # Note that only one transfer event should be created per transfer.
 type Transfer implements Event @entity(immutable: true) {
-  " { Transaction hash }-{ Log index } "
+  " { Transaction hash }{ Log index } "
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
@@ -1955,7 +1955,7 @@ type Transfer implements Event @entity(immutable: true) {
 }
 
 type Flashloan implements Event @entity(immutable: true) {
-  " { Transaction hash }-{ Log index } "
+  " { Transaction hash }{ Log index } "
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
