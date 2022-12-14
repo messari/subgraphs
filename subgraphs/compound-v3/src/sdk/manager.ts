@@ -605,14 +605,17 @@ export class DataManager {
       this.protocol.save();
     }
     liquidatorAccount.countLiquidate();
+    // Note: Be careful, some protocols might give the liquidated collateral to the liquidator
+    //       in collateral in the market. But that is not always the case so we don't do it here.
+
     const liquidateeAccount = new AccountManager(liquidatee);
-    const position = new PositionManager(
+    const liquidateePosition = new PositionManager(
       liquidateeAccount.getAccount(),
       this.market,
       PositionSide.COLLATERAL,
       interestType
     );
-    position.subtractPosition(
+    liquidateePosition.subtractPosition(
       this.event,
       this.protocol,
       newBalance,
@@ -623,7 +626,7 @@ export class DataManager {
     //  - liquidatees are not considered users since they are not spending gas for the transaction
     //  - It is possible in some protocols for the liquidator to incur a position if they are transferred collateral tokens
 
-    const positionID = position.getPositionID();
+    const positionID = liquidateePosition.getPositionID();
     if (!positionID) {
       log.error(
         "[createLiquidate] positionID is null for market: {} account: {}",
@@ -687,14 +690,21 @@ export class DataManager {
       PositionSide.COLLATERAL,
       interestType
     );
-    transferrerPosition.addPosition(
+    transferrerPosition.subtractPosition(
       this.event,
-      asset,
       this.protocol,
       senderNewBalance,
       TransactionType.TRANSFER,
       this.market.inputTokenPriceUSD
     );
+    const positionID = transferrerPosition.getPositionID();
+    if (!positionID) {
+      log.error(
+        "[createTransfer] positionID is null for market: {} account: {}",
+        [this.market.id.toHexString(), receiver.toHexString()]
+      );
+      return null;
+    }
 
     const recieverAccount = new AccountManager(receiver);
     // receivers are not considered users since they are not spending gas for the transaction
@@ -704,21 +714,14 @@ export class DataManager {
       PositionSide.COLLATERAL,
       interestType
     );
-    receiverPosition.subtractPosition(
+    receiverPosition.addPosition(
       this.event,
+      asset,
       this.protocol,
       receiverNewBalance,
       TransactionType.TRANSFER,
       this.market.inputTokenPriceUSD
     );
-    const positionID = receiverPosition.getPositionID();
-    if (!positionID) {
-      log.error(
-        "[createTransfer] positionID is null for market: {} account: {}",
-        [this.market.id.toHexString(), receiver.toHexString()]
-      );
-      return null;
-    }
 
     const transfer = new Transfer(
       this.event.transaction.hash
@@ -736,7 +739,7 @@ export class DataManager {
     transfer.sender = sender;
     transfer.receiver = receiver;
     transfer.market = this.market.id;
-    transfer.positions = [transferrerPosition.getPositionID()!, positionID!];
+    transfer.positions = [receiverPosition.getPositionID()!, positionID!];
     transfer.asset = asset;
     transfer.amount = amount;
     transfer.amountUSD = amountUSD;

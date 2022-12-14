@@ -57,11 +57,7 @@ export class PositionManager {
       this.counterID = this.counterID.concat("-").concat(interestType);
     }
     const positionCounter = _PositionCounter.load(this.counterID);
-    if (!positionCounter) {
-      log.warning("[PositionManager] position counter {} not found", [
-        this.counterID,
-      ]);
-    } else {
+    if (positionCounter) {
       const positionID = positionCounter.id
         .concat("-")
         .concat(positionCounter.nextCount.toString());
