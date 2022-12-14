@@ -78,6 +78,54 @@ export function sortByInputTokenOrder(
   return ordered;
 }
 
+export function sortRewardTokens(pool: LiquidityPool): void {
+  if (pool.rewardTokens!.length <= 1) {
+    return;
+  }
+
+  const rewardTokens = pool.rewardTokens;
+  const rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+  const rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+  multiArraySort(
+    rewardTokens!,
+    rewardTokenEmissionsAmount!,
+    rewardTokenEmissionsUSD!
+  );
+
+  pool.rewardTokens = rewardTokens;
+  pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+  pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+}
+
+export function multiArraySort(
+  ref: Array<string>,
+  arr1: Array<BigInt>,
+  arr2: Array<BigDecimal>
+): void {
+  if (ref.length != arr1.length || ref.length != arr2.length) {
+    // cannot sort
+    return;
+  }
+
+  const sorter: Array<Array<string>> = [];
+  for (let i = 0; i < ref.length; i++) {
+    sorter[i] = [ref[i], arr1[i].toString(), arr2[i].toString()];
+  }
+
+  sorter.sort(function (a: Array<string>, b: Array<string>): i32 {
+    if (a[0] < b[0]) {
+      return -1;
+    }
+    return 1;
+  });
+
+  for (let i = 0; i < sorter.length; i++) {
+    ref[i] = sorter[i][0];
+    arr1[i] = BigInt.fromString(sorter[i][1]);
+    arr2[i] = BigDecimal.fromString(sorter[i][2]);
+  }
+}
+
 export function isPoolRegistered(poolAddress: Address): boolean {
   const pool = LiquidityPool.load(poolAddress.toHexString());
 

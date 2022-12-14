@@ -286,14 +286,11 @@ export function updateRewardTokenEmissions(
   if (!pool.rewardTokens) {
     pool.rewardTokens = [];
   }
+  const rewardTokens = pool.rewardTokens!;
 
-  let rewardTokens = pool.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
-    rewardTokens = rewardTokens.sort();
   }
-  pool.rewardTokens = rewardTokens;
-
   const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
 
   if (!pool.rewardTokenEmissionsAmount) {
@@ -314,8 +311,10 @@ export function updateRewardTokenEmissions(
     .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
     .times(tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen));
 
+  pool.rewardTokens = rewardTokens;
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
 
+  utils.sortRewardTokens(pool);
   pool.save();
 }
