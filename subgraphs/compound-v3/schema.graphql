@@ -967,10 +967,10 @@ type Market @entity {
   " Number of closed positions in this market "
   closedPositionCount: Int!
 
-  " Number of lending positions in this market "
+  " Number of lending positions in this market. Note: this is cumulative and strictly increasing "
   lendingPositionCount: Int!
 
-  " Number of borrowing positions in this market "
+  " Number of borrowing positions in this market. Note: this is cumulative and strictly increasing "
   borrowingPositionCount: Int!
 
   ##### Snapshots #####
@@ -1239,13 +1239,13 @@ type MarketDailySnapshot @entity {
   " Number of closed positions in this market "
   closedPositionCount: Int!
 
-  " Number of lending positions in this market "
+  " Number of lending positions in this market. Note: this is cumulative and strictly increasing "
   lendingPositionCount: Int!
 
   " Total number of lending positions touched in a day. This includes opening, closing, and modifying positions. "
   dailyActiveLendingPositionCount: Int!
 
-  " Number of borrowing positions in this market "
+  " Number of borrowing positions in this market. Note: this is cumulative and strictly increasing "
   borrowingPositionCount: Int!
 
   " Total number of borrow positions touched in a day. This includes opening, closing, and modifying positions. "
@@ -1955,7 +1955,7 @@ type Transfer implements Event @entity(immutable: true) {
   " The market associated with the token transfer "
   market: Market!
 
-  " The asset that was actually transfered. This could also include a debt token. "
+  " The asset that was actually transferred. This could also include a debt token. "
   asset: Token!
 
   " Amount of token transferred in native units "
