@@ -100,6 +100,9 @@ enum PermissionType {
 
   " Protocols that do not KYC. Can be used by any account "
   PERMISSIONLESS
+
+  " Only the protocol admin address can make do the defined actions "
+  ADMIN
 }
 
 enum RiskType {
@@ -322,6 +325,9 @@ interface Protocol {
   " The specific permissions required to borrow from this protocol "
   borrowerPermissionType: PermissionType
 
+  " The specific permissions required to create a pool (market) in this protocol "
+  poolCreatorPermissionType: PermissionType
+
   " Risk type of the lending protocol "
   riskType: RiskType
 
@@ -401,6 +407,9 @@ type LendingProtocol implements Protocol @entity {
 
   " The specific permissions required to borrow from this protocol "
   borrowerPermissionType: PermissionType
+
+  " The specific permissions required to create a pool (market) in this protocol "
+  poolCreatorPermissionType: PermissionType
 
   " Risk type of the lending protocol "
   riskType: RiskType
