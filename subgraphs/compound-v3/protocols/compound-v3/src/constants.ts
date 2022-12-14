@@ -44,6 +44,7 @@ export const PROTOCOL_NETWORK = Network.MAINNET;
 export const LENDING_TYPE = LendingType.POOLED;
 export const LENDER_PERMISSION_TYPE = PermissionType.PERMISSIONLESS;
 export const BORROWER_PERMISSION_TYPE = PermissionType.PERMISSIONLESS;
+export const POOL_CREATOR_PERMISSION_TYPE = PermissionType.ADMIN;
 export const COLATERALIZATION_TYPE = CollateralizationType.OVER_COLLATERALIZED;
 export const RISK_TYPE = RiskType.GLOBAL;
 export const COMPOUND_DECIMALS = 8;
@@ -59,6 +60,7 @@ export function getProtocolData(): ProtocolData {
     LENDING_TYPE,
     LENDER_PERMISSION_TYPE,
     BORROWER_PERMISSION_TYPE,
+    POOL_CREATOR_PERMISSION_TYPE,
     COLATERALIZATION_TYPE,
     RISK_TYPE
   );

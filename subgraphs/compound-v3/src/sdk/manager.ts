@@ -65,6 +65,7 @@ export class ProtocolData {
     public readonly lendingType: string,
     public readonly lenderPermissionType: string | null,
     public readonly borrowerPermissionType: string | null,
+    public readonly poolCreatorPermissionType: string | null,
     public readonly collateralizationType: string | null,
     public readonly riskType: string | null
   ) {}
@@ -179,6 +180,7 @@ export class DataManager {
       protocol.lendingType = data.lendingType;
       protocol.lenderPermissionType = data.lenderPermissionType;
       protocol.borrowerPermissionType = data.borrowerPermissionType;
+      protocol.poolCreatorPermissionType = data.poolCreatorPermissionType;
       protocol.riskType = data.riskType;
       protocol.collateralizationType = data.collateralizationType;
 

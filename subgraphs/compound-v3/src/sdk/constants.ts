@@ -49,6 +49,7 @@ export namespace PermissionType {
   export const WHITELIST_ONLY = "WHITELIST_ONLY";
   export const PERMISSIONED = "PERMISSIONED";
   export const PERMISSIONLESS = "PERMISSIONLESS";
+  export const ADMIN = "ADMIN";
 }
 
 export namespace RiskType {
