@@ -5,6 +5,7 @@ import {
   Deposit,
   Euler,
   GovSetAssetConfig,
+  GovSetPricingConfig,
   Liquidation,
   MarketActivated,
   Repay,
@@ -28,13 +29,15 @@ import {
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
   BIGINT_SEVENTY_FIVE,
+  FTT_ADDRESS,
 } from "../common/constants";
 import {
   snapshotFinancials,
   snapshotMarket,
   updateUsageMetrics,
   updateWeightedStakedAmount,
-  processReward,
+  processRewardEpoch6_17,
+  processRewardEpoch18_23,
 } from "./helpers";
 import {
   createBorrow,
@@ -52,6 +55,7 @@ import { GovConvertReserves, GovSetReserveFee } from "../../generated/euler/Exec
 import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
 import { _Epoch } from "../../generated/schema";
 import { Stake } from "../../generated/EulStakes/EulStakes";
+import { Markets as MarketsContract } from "../../generated/euler/Markets";
 
 export function handleAssetStatus(event: AssetStatus): void {
   const underlying = event.params.underlying.toHexString();
@@ -275,6 +279,14 @@ export function handleMarketActivated(event: MarketActivated): void {
   market.inputToken = underlyingToken.id;
   market.outputToken = eToken.id;
   market._dToken = dToken.id;
+
+  // used to determine eligibility of EUL distribution from Epoch 18+
+  const marketContract = MarketsContract.bind(event.address);
+  const assetStorageResult = marketContract.try_getPricingConfig(event.params.underlying);
+  if (!assetStorageResult.reverted) {
+    market._pricingType = assetStorageResult.value.getPricingType();
+  }
+
   market.save();
 
   const assetStatus = getOrCreateAssetStatus(underlyingToken.id);
@@ -306,6 +318,13 @@ export function handleGovSetReserveFee(event: GovSetReserveFee): void {
   );
 }
 
+export function handleGovSetPricingConfig(event: GovSetPricingConfig): void {
+  const assetStatus = getOrCreateAssetStatus(event.params.underlying.toHexString());
+  const market = getOrCreateMarket(assetStatus.eToken!);
+  market._pricingType = event.params.newPricingType;
+  market.save();
+}
+
 export function handleStake(event: Stake): void {
   const underlying = event.params.underlying.toHexString();
   // find market id for underlying
@@ -329,8 +348,11 @@ export function handleStake(event: Stake): void {
     epoch = new _Epoch(epochID.toString());
     epoch.epoch = epochID;
     epoch.save();
-
-    processReward(epoch, epochStartBlock, event);
+    if (epoch.epoch <= 18) {
+      processRewardEpoch6_17(epoch, epochStartBlock, event);
+    } else if (epoch.epoch <= 24) {
+      processRewardEpoch18_23;
+    }
   }
 
   // In a valid epoch (6 <= epoch <=96) with uninitialized market._stakeLastUpdateBlock
