@@ -52,8 +52,8 @@ export function handleAddAssetFarmReward(event: EventData): void {
   }
   const newRewardPerDay = newRewardPerDay_.toString();
 
-  const new_booster_log_base = data.get("new_booster_log_base");
-  if (!new_booster_log_base) {
+  const newBoosterLogBase = data.get("new_booster_log_base");
+  if (!newBoosterLogBase) {
     log.warning(
       "handleAddAssetFarmReward() :: new_booster_log_base not found",
       []
@@ -61,39 +61,39 @@ export function handleAddAssetFarmReward(event: EventData): void {
     return;
   }
 
-  const reward_amount = data.get("reward_amount");
+  const rewardAmount = data.get("reward_amount");
   const rewardToken = getOrCreateRewardToken(reward_token, farmType);
 
   const market = getOrCreateMarket(farm);
   const rewardTokens = market.rewardTokens!;
   // push if reward token does not exists, get index
-  let reward_token_index = rewardTokens.indexOf(rewardToken.id);
-  if (reward_token_index == -1) {
+  let rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
+  if (rewardTokenIndex == -1) {
     rewardTokens.push(rewardToken.id);
     market.rewardTokens = rewardTokens;
-    reward_token_index = rewardTokens.length - 1;
+    rewardTokenIndex = rewardTokens.length - 1;
   }
 
   // add reward_amount to _reward_remaining_amounts
   const _rewardRemainingAmounts = market._reward_remaining_amounts;
-  if (_rewardRemainingAmounts.length <= reward_token_index) {
-    _rewardRemainingAmounts.push(BigInt.fromString(reward_amount!.toString()));
+  if (_rewardRemainingAmounts.length <= rewardTokenIndex) {
+    _rewardRemainingAmounts.push(BigInt.fromString(rewardAmount!.toString()));
   } else {
-    _rewardRemainingAmounts[reward_token_index] =
-      market._reward_remaining_amounts[reward_token_index].plus(
-        BigInt.fromString(reward_amount!.toString())
+    _rewardRemainingAmounts[rewardTokenIndex] =
+      market._reward_remaining_amounts[rewardTokenIndex].plus(
+        BigInt.fromString(rewardAmount!.toString())
       );
   }
   market._reward_remaining_amounts = _rewardRemainingAmounts;
 
   // rewardTokenEmissionsAmount
   const rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
-  if (rewardTokenEmissionsAmount!.length <= reward_token_index) {
+  if (rewardTokenEmissionsAmount!.length <= rewardTokenIndex) {
     rewardTokenEmissionsAmount!.push(
       BigInt.fromString(newRewardPerDay.toString())
     );
   } else {
-    rewardTokenEmissionsAmount![reward_token_index] = BigInt.fromString(
+    rewardTokenEmissionsAmount![rewardTokenIndex] = BigInt.fromString(
       newRewardPerDay.toString()
     );
   }
@@ -111,10 +111,10 @@ export function handleAddAssetFarmReward(event: EventData): void {
         .toBigDecimal()
     )
     .times(price);
-  if (rewardTokenEmissionsUSD!.length <= reward_token_index) {
+  if (rewardTokenEmissionsUSD!.length <= rewardTokenIndex) {
     rewardTokenEmissionsUSD!.push(rewardUSD);
   } else {
-    rewardTokenEmissionsUSD![reward_token_index] = rewardUSD;
+    rewardTokenEmissionsUSD![rewardTokenIndex] = rewardUSD;
   }
   market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
 

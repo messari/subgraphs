@@ -126,10 +126,6 @@ export function getOrCreateMarketDailySnapshot(
     snapshot = new MarketDailySnapshot(id);
     snapshot.protocol = getOrCreateProtocol().id;
     snapshot.market = market.id;
-    snapshot.blockNumber = BigInt.fromU64(receipt.block.header.height);
-    snapshot.timestamp = BigInt.fromU64(
-      NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
-    );
     // supply rate
     const supplyRateMarket = getOrCreateSupplyRate(market);
     const supplyRateToday = getOrCreateSupplyRate(market, receipt);
@@ -141,35 +137,53 @@ export function getOrCreateMarketDailySnapshot(
     const borrowRateToday = getOrCreateBorrowRate(market, receipt);
     borrowRateToday.rate = borrowRateMarket.rate;
     borrowRateToday.save();
-
     snapshot.rates = [supplyRateToday.id, borrowRateToday.id];
-    snapshot.totalValueLockedUSD = market.totalValueLockedUSD;
-    snapshot.cumulativeSupplySideRevenueUSD =
-      market.cumulativeSupplySideRevenueUSD;
     snapshot.dailySupplySideRevenueUSD = BD_ZERO;
-    snapshot.cumulativeProtocolSideRevenueUSD =
-      market.cumulativeProtocolSideRevenueUSD;
     snapshot.dailyProtocolSideRevenueUSD = BD_ZERO;
-    snapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
     snapshot.dailyTotalRevenueUSD = BD_ZERO;
-    snapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
     snapshot.dailyDepositUSD = BD_ZERO;
-    snapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
-    snapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
     snapshot.dailyBorrowUSD = BD_ZERO;
-    snapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
     snapshot.dailyLiquidateUSD = BD_ZERO;
-    snapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
     snapshot.dailyWithdrawUSD = BD_ZERO;
     snapshot.dailyRepayUSD = BD_ZERO;
-    snapshot.inputTokenBalance = market.inputTokenBalance;
-    snapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
-    snapshot.outputTokenSupply = market.outputTokenSupply;
-    snapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
-    snapshot.exchangeRate = market.exchangeRate;
-    snapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
-    snapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   }
+
+  // supply rate
+  const supplyRateMarket = getOrCreateSupplyRate(market);
+  const supplyRateToday = getOrCreateSupplyRate(market, receipt);
+  supplyRateToday.rate = supplyRateMarket.rate;
+  supplyRateToday.save();
+
+  // borrow rate
+  const borrowRateMarket = getOrCreateBorrowRate(market);
+  const borrowRateToday = getOrCreateBorrowRate(market, receipt);
+  borrowRateToday.rate = borrowRateMarket.rate;
+  borrowRateToday.save();
+
+  snapshot.blockNumber = BigInt.fromU64(receipt.block.header.height);
+  snapshot.timestamp = BigInt.fromU64(
+    NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
+  );
+  snapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  snapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  snapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  snapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+  snapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+  snapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
+  snapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+  snapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+
+  snapshot.inputTokenBalance = market.inputTokenBalance;
+  snapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  snapshot.outputTokenSupply = market.outputTokenSupply;
+  snapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  snapshot.exchangeRate = market.exchangeRate;
+  snapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+  snapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+  snapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+
   return snapshot as MarketDailySnapshot;
 }
 

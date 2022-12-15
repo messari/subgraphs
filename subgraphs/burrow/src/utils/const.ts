@@ -34,9 +34,6 @@ export const NANOS_TO_HOUR = (time: u64): u64 =>
 
 export const PROTOCOL_NAME = "Burrow";
 export const PROTOCOL_SLUG = "burrow-near";
-export const PROTOCOL_SCHEMA_VERSION = "1.0.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "2.0.1";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -68,6 +65,11 @@ export namespace Network {
   export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
+}
+
+export namespace AccountTime {
+  export const HOURLY = "HOURLY";
+  export const DAILY = "DAILY";
 }
 
 export namespace ProtocolType {

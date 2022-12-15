@@ -36,6 +36,7 @@ import {
   NANOS_TO_DAY,
   NANOSEC_TO_SEC,
   PositionSide,
+  AccountTime,
 } from "../utils/const";
 import { BigDecimal } from "@graphprotocol/graph-ts";
 import { EventData } from "../utils/type";
@@ -106,16 +107,14 @@ export function handleDeposit(event: EventData): void {
 
   // usage metrics
   const hourlyActiveAccount = ActiveAccount.load(
-    "HOURLY-"
-      .concat(account.id)
-      .concat("-")
-      .concat(NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString())
+    AccountTime.HOURLY.concat(account.id).concat(
+      NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString()
+    )
   );
   const dailyActiveAccount = ActiveAccount.load(
-    "DAILY-"
-      .concat(account.id)
-      .concat("-")
-      .concat(NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString())
+    AccountTime.DAILY.concat(account.id).concat(
+      NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString()
+    )
   );
   if (dailyActiveAccount == null) {
     usageDailySnapshot.dailyActiveDepositors += 1;
@@ -275,16 +274,14 @@ export function handleWithdraw(event: EventData): void {
 
   // usage metrics
   const hourlyActiveAccount = ActiveAccount.load(
-    "HOURLY-"
-      .concat(account.id)
-      .concat("-")
-      .concat(NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString())
+    AccountTime.HOURLY.concat(account.id).concat(
+      NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString()
+    )
   );
   const dailyActiveAccount = ActiveAccount.load(
-    "DAILY-"
-      .concat(account.id)
-      .concat("-")
-      .concat(NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString())
+    AccountTime.DAILY.concat(account.id).concat(
+      NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString()
+    )
   );
   if (dailyActiveAccount == null) {
     usageDailySnapshot.dailyActiveUsers += 1;
@@ -465,16 +462,14 @@ export function handleBorrow(event: EventData): void {
     .times(token.lastPriceUSD!);
 
   const hourlyActiveAccount = ActiveAccount.load(
-    "HOURLY-"
-      .concat(account.id)
-      .concat("-")
-      .concat(NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString())
+    AccountTime.HOURLY.concat(account.id).concat(
+      NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString()
+    )
   );
   const dailyActiveAccount = ActiveAccount.load(
-    "DAILY-"
-      .concat(account.id)
-      .concat("-")
-      .concat(NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString())
+    AccountTime.DAILY.concat(account.id).concat(
+      NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString()
+    )
   );
   if (dailyActiveAccount == null) {
     usageDailySnapshot.dailyActiveUsers += 1;
@@ -615,16 +610,14 @@ export function handleRepayment(event: EventData): void {
     .times(token.lastPriceUSD!);
 
   const hourlyActiveAccount = ActiveAccount.load(
-    "HOURLY-"
-      .concat(account.id)
-      .concat("-")
-      .concat(NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString())
+    AccountTime.HOURLY.concat(account.id).concat(
+      NANOS_TO_HOUR(receipt.block.header.timestampNanosec).toString()
+    )
   );
   const dailyActiveAccount = ActiveAccount.load(
-    "DAILY-"
-      .concat(account.id)
-      .concat("-")
-      .concat(NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString())
+    AccountTime.DAILY.concat(account.id).concat(
+      NANOS_TO_DAY(receipt.block.header.timestampNanosec).toString()
+    )
   );
   if (dailyActiveAccount == null) {
     usageDailySnapshot.dailyActiveUsers += 1;
@@ -681,6 +674,9 @@ export function handleRepayment(event: EventData): void {
   );
   financialDailySnapshot.dailyRepayUSD =
     financialDailySnapshot.dailyRepayUSD.plus(repay.amountUSD);
+
+  // update position balance
+  position.balance = position.balance.minus(repay.amount);
 
   const positionSnapshot = getOrCreatePositionSnapshot(position, receipt);
   positionSnapshot.logIndex = logIndex as i32;
