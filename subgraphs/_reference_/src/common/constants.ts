@@ -6,9 +6,6 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export const PROTOCOL_NAME = "Uniswap v2";
 export const PROTOCOL_SLUG = "uniswap-v2";
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.2";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -132,9 +129,9 @@ export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString('10').pow(18);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 
 export const INT_NEGATIVE_ONE = -1 as i32;
@@ -157,14 +154,16 @@ export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const MS_PER_YEAR = DAYS_PER_YEAR.times(
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+);
 
 ////////////////
 ///// Misc /////
 ////////////////
 
-export const ETH_SYMBOL = "ETH"
-export const ETH_NAME = "Ether"
+export const ETH_SYMBOL = "ETH";
+export const ETH_NAME = "Ether";
 
 /////////////////////////////
 ///// Protocol Specific /////
