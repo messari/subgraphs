@@ -29,7 +29,6 @@ import {
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
   BIGINT_SEVENTY_FIVE,
-  FTT_ADDRESS,
 } from "../common/constants";
 import {
   snapshotFinancials,
@@ -351,7 +350,7 @@ export function handleStake(event: Stake): void {
     if (epoch.epoch <= 18) {
       processRewardEpoch6_17(epoch, epochStartBlock, event);
     } else if (epoch.epoch <= 24) {
-      processRewardEpoch18_23;
+      processRewardEpoch18_23(epoch, epochStartBlock, event);
     }
   }
 

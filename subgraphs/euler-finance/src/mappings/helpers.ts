@@ -284,7 +284,10 @@ function updateRewardEmissionsUSD(underlyingPriceUSD: BigDecimal): void {
     const mktID = protocol._marketIDs![i];
     const mkt = Market.load(mktID);
     if (!mkt || !mkt.rewardTokenEmissionsAmount || mkt.rewardTokenEmissionsAmount!.length == 0) {
-      log.info("[updateRewardEmissionsUSD]Skip upating reward emissionsUSD for market {}", [mktID]);
+      log.info("[updateRewardEmissionsUSD]Skip upating reward emissionsUSD for market {}/{}", [
+        mktID,
+        mkt ? mkt.name! : "null",
+      ]);
       continue;
     }
 
@@ -756,7 +759,7 @@ export function processRewardEpoch6_17(epoch: _Epoch, epochStartBlock: BigInt, e
         mkt._weightedStakedAmount = BIGINT_ZERO;
       }
 
-      let stakedAmount = mkt._stakedAmount;
+      const stakedAmount = mkt._stakedAmount;
       if (stakedAmount.gt(BIGINT_ZERO)) {
         // finalized mkt._weightedStakedAmount for the epoch just ended
         // epochStartBlock.minus(BIGINT_ONE) is the end block of prev epoch
@@ -810,6 +813,13 @@ export function processRewardEpoch6_17(epoch: _Epoch, epochStartBlock: BigInt, e
           .times(EULPriceUSD);
         mkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
         mkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+
+        log.info("[processRewardEpoch6_17]mkt {} rewarded {} EUL tokens ${} for epoch {}", [
+          mkt.name!,
+          mkt.rewardTokenEmissionsAmount!.toString(),
+          mkt.rewardTokenEmissionsUSD!.toString(),
+          prevEpoch.id,
+        ]);
       }
 
       // reset mkt._weightedStakedAmount for the new epoch
@@ -851,7 +861,7 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
         mkt._weightedStakedAmount = BIGINT_ZERO;
       }
 
-      let stakedAmount = mkt._stakedAmount;
+      const stakedAmount = mkt._stakedAmount;
       // eIP24 requires assets with a Chainlink oracle (either now or in the future) + WETH (the reference asset)
       // https://snapshot.org/#/eulerdao.eth/proposal/0x7e65ffa930507d9116ebc83663000ade6ff93fc452f437a3e95d755ccc324f93
       const eligible =

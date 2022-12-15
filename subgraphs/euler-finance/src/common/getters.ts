@@ -544,8 +544,8 @@ export function getOrCreateAccountStakeAmount(underlying: string, account: strin
   return accountStakeAmount;
 }
 
-export function getCutoffValue(stakedAmounts: BigInt[], top: i32 = 10): BigInt {
-  const startIdx = stakedAmounts.length < top ? 0 : stakedAmounts.length - top;
-  const topStakeAmounts = stakedAmounts.sort().slice(startIdx);
-  return topStakeAmounts[0];
+export function getCutoffValue(numArray: BigInt[], top: i32 = 10): BigInt {
+  const startIdx = numArray.length < top ? 0 : numArray.length - top;
+  const topNumArray = numArray.sort().slice(startIdx);
+  return topNumArray[0];
 }
