@@ -892,7 +892,7 @@ function createBaseTokenTransactions(
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
-      null,
+      token.lastPriceUSD!,
       InterestRateType.VARIABLE
     );
     borrow.accountActor = accountActorID;
@@ -905,7 +905,7 @@ function createBaseTokenTransactions(
       amount,
       bigIntToBigDecimal(amount, token.decimals).times(token.lastPriceUSD!),
       newBalance,
-      null,
+      token.lastPriceUSD!,
       InterestRateType.VARIABLE
     );
     if (repay) {

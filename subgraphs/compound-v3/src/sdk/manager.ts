@@ -468,7 +468,7 @@ export class DataManager {
     amount: BigInt,
     amountUSD: BigDecimal,
     newBalance: BigInt,
-    tokenPriceUSD: BigDecimal | null = null, // used for different borrow token
+    tokenPriceUSD: BigDecimal, // used for different borrow token in CDP
     interestType: string | null = null
   ): Borrow {
     const borrower = new AccountManager(account);
@@ -488,7 +488,7 @@ export class DataManager {
       this.protocol,
       newBalance,
       TransactionType.BORROW,
-      tokenPriceUSD ? tokenPriceUSD : this.market.inputTokenPriceUSD
+      tokenPriceUSD
     );
 
     const borrow = new Borrow(
@@ -528,7 +528,7 @@ export class DataManager {
     amount: BigInt,
     amountUSD: BigDecimal,
     newBalance: BigInt,
-    tokenPriceUSD: BigDecimal | null = null, // used for different borrow token
+    tokenPriceUSD: BigDecimal, // used for different borrow token in CDP
     interestType: string | null = null
   ): Repay | null {
     const repayer = new AccountManager(account);
@@ -547,7 +547,7 @@ export class DataManager {
       this.protocol,
       newBalance,
       TransactionType.REPAY,
-      tokenPriceUSD ? tokenPriceUSD : this.market.inputTokenPriceUSD
+      tokenPriceUSD
     );
     const positionID = position.getPositionID();
     if (!positionID) {
