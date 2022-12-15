@@ -1,8 +1,4 @@
-# SDK (Software Development Kit)
-
-This directory contains the source code for our schema SDKs. In an effort to make standard subgraph development easier we wanted SDKs for each schema to be our priority as it speeds up the data management and storage in all subsequent subgraphs.
-
-## Lending SDK
+# Lending SDK
 
 The lending SDK follows the `3.0.0` lending schema. You can learn about each `manager` class in the class headers, but there are a few things to note.
 
