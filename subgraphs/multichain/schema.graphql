@@ -46,6 +46,7 @@ enum Network {
   MILKOMEDA_A1
   MOONBEAM
   MOONRIVER
+  NAS
   NEAR
   OASIS
   OKEXCHAIN
@@ -58,6 +59,7 @@ enum Network {
   SMARTBCH
   SYSCOIN
   TELOS
+  TERRA
   THUNDERCORE
   TOMOCHAIN
   VELAS
@@ -128,7 +130,7 @@ type CrosschainToken @entity {
   id: Bytes!
 
   " The ID commonly used to signal to which chain a transaction is going. List of IDs: https://chainlist.org/ "
-  chainID: Int!
+  chainID: BigInt!
 
   " The network where this token is deployed "
   network: Network!
@@ -1049,7 +1051,7 @@ type LiquidityDeposit implements Event @entity(immutable: true) {
   amountUSD: BigDecimal!
 
   " Id of the chain where this is ocurring (should always be the chain where the subgraph is running) "
-  chainID: Int!
+  chainID: BigInt!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1093,7 +1095,7 @@ type LiquidityWithdraw implements Event @entity(immutable: true) {
   amountUSD: BigDecimal!
 
   " Id of the chain where this is ocurring (should always be the chain where the subgraph is running) "
-  chainID: Int!
+  chainID: BigInt!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1135,10 +1137,10 @@ type BridgeTransfer implements Event @entity(immutable: true) {
   isOutgoing: Boolean!
 
   " Chain ID from where the transfer is being sent "
-  fromChainID: Int!
+  fromChainID: BigInt!
 
   " Chain ID where the transfer is being sent to "
-  toChainID: Int!
+  toChainID: BigInt!
 
   " This is the address that's receiving the bridged funds (not a pool contract). When bridging out, it will be the address on the destination chain. "
   transferTo: Bytes!
@@ -1207,10 +1209,10 @@ type BridgeMessage implements Event @entity(immutable: true) {
   isOutgoing: Boolean!
 
   " Chain ID from where the message is being sent "
-  fromChainID: Int!
+  fromChainID: BigInt!
 
   " Chain ID where the message is being sent to "
-  toChainID: Int!
+  toChainID: BigInt!
 
   " Address sending the message. Here if it is outgoing, or on the other chain if incoming "
   transferFrom: Bytes
@@ -1238,7 +1240,7 @@ type Account @entity {
   id: Bytes!
 
   " ChainIDs where this account has sent or received funds through this bridge "
-  chains: [Int!]!
+  chains: [BigInt!]!
 
   " Total number of transactions this account has sent through this bridge originating from this chain "
   transferOutCount: Int!

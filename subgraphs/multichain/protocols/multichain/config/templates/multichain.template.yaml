@@ -255,5 +255,9 @@ templates:
       callHandlers:
         - function: deposit(uint256,address)
           handler: handleDeposit
+        - function: depositVault(uint256,address)
+          handler: handleDepositVault
         - function: withdraw(uint256,address)
           handler: handleWithdraw
+        - function: withdrawVault(address,uint256,address)
+          handler: handleWithdrawVault

@@ -8,6 +8,7 @@ export interface Configurations {
   getFactoryAddress(): string;
   getChainID(): BigInt;
   getCrosschainID(tokenID: string): BigInt;
+  isWhitelistToken(tokenAddress: Address, crosschainID: string): boolean;
   getCrosschainTokenAddress(
     bridgeType: string,
     tokenID: string,

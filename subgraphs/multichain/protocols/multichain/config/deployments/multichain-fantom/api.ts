@@ -605,7 +605,7 @@ export const BridgeAPIResponse = `{
 		"0.1,39.3,492"
 	],
 	"0xbcacf1c62202a07e6107f250b788b10677045833": [
-		"99999",
+		"1000005002307",
 		"0xffffffffffffffffffffffffffffffffffffffff",
 		"0.1,0.07,0.5"
 	],
@@ -807,7 +807,7 @@ export const RouterAPIResponse = `{
 		"0xdae6c2a48bfaa66b43815c5548b10800919c993e",
 		"0.1,4.672,934.58"
 	],
-	"0x05ec81610ab47a094502bac0d7ec256f06a1c6f8:99998": [
+	"0x05ec81610ab47a094502bac0d7ec256f06a1c6f8:1000004346947": [
 		"0xffffffffffffffffffffffffffffffffffffffff",
 		"0.04,0.00012,0.06"
 	],
@@ -1479,7 +1479,7 @@ export const RouterAPIResponse = `{
 		"0x3cfcd47c94f1d20ae350a5d9b5264537a89396c9",
 		"0.1,20,4015"
 	],
-	"0x4f76664105ba7e35dd4904ec70f2042fc17563d9:99994": [
+	"0x4f76664105ba7e35dd4904ec70f2042fc17563d9:1000005788240": [
 		"0xffffffffffffffffffffffffffffffffffffffff",
 		"0.1,20,4015"
 	],
@@ -2375,7 +2375,7 @@ export const RouterAPIResponse = `{
 		"0xa1051433ec7b5cc249c75fdd5b96bf423f2f4a32",
 		"0.1,73,14504"
 	],
-	"0x9de4b40bdce50ec6a1a668bf85997bbbd324069a:99994": [
+	"0x9de4b40bdce50ec6a1a668bf85997bbbd324069a:1000005788240": [
 		"0xffffffffffffffffffffffffffffffffffffffff",
 		"0.1,73,14504"
 	],

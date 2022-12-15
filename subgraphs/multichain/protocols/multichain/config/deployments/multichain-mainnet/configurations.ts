@@ -52,6 +52,20 @@ export class MultichainMainnetConfigurations implements Configurations {
 
     return crosschainID;
   }
+  isWhitelistToken(tokenAddress: Address, crosschainID: string): boolean {
+    const key = tokenAddress
+      .toHexString()
+      .toLowerCase()
+      .concat(":")
+      .concat(crosschainID);
+
+    if (!json.fromString(RouterAPIResponse).toObject().get(key)) {
+      log.warning("[isWhitelistToken] Not whitelisted key: {}", [key]);
+
+      return false;
+    }
+    return true;
+  }
   getCrosschainTokenAddress(
     bridgeType: string,
     tokenID: string,

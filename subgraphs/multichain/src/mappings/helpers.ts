@@ -396,9 +396,7 @@ export function updateUsageMetrics(
   account.transferOutCount += transferOutCount;
   account.messageReceivedCount += messageInCount;
   account.messageSentCount += messageOutCount;
-  account.chains = arrayUnique(
-    addToArrayAtIndex(account.chains, crosschainID.toI32())
-  );
+  account.chains = arrayUnique(addToArrayAtIndex(account.chains, crosschainID));
 
   account.save();
 
@@ -549,8 +547,8 @@ export function createBridgeTransferEvent(
     );
     transferEvent.account = account.id;
 
-    transferEvent.fromChainID = chainID.toI32();
-    transferEvent.toChainID = crosschainID.toI32();
+    transferEvent.fromChainID = chainID;
+    transferEvent.toChainID = crosschainID;
     transferEvent.type = TransferType.BURN;
   } else {
     const account = getOrCreateAccount(
@@ -559,8 +557,8 @@ export function createBridgeTransferEvent(
     );
     transferEvent.account = account.id;
 
-    transferEvent.fromChainID = crosschainID.toI32();
-    transferEvent.toChainID = chainID.toI32();
+    transferEvent.fromChainID = crosschainID;
+    transferEvent.toChainID = chainID;
     transferEvent.type = TransferType.MINT;
   }
 
@@ -617,7 +615,7 @@ export function createLiquidityDepositEvent(
   depositEvent.to = toAddress;
   depositEvent.from = fromAddress;
   depositEvent.pool = poolID;
-  depositEvent.chainID = chainID.toI32();
+  depositEvent.chainID = chainID;
 
   const account = getOrCreateAccount(protocol, fromAddress.toHexString());
   depositEvent.account = account.id;
@@ -660,7 +658,7 @@ export function createLiquidityWithdrawEvent(
   withdrawEvent.to = toAddress;
   withdrawEvent.from = fromAddress;
   withdrawEvent.pool = poolID;
-  withdrawEvent.chainID = chainID.toI32();
+  withdrawEvent.chainID = chainID;
 
   const account = getOrCreateAccount(protocol, toAddress.toHexString());
   withdrawEvent.account = account.id;

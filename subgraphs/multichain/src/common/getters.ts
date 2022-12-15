@@ -189,7 +189,7 @@ export function getOrCreateCrosschainToken(
   if (!crosschainToken) {
     crosschainToken = new CrosschainToken(crosschainTokenID);
 
-    crosschainToken.chainID = crosschainID.toI32();
+    crosschainToken.chainID = crosschainID;
     const network = NetworkByID.get(crosschainID.toString())
       ? NetworkByID.get(crosschainID.toString())!
       : Network.UNKNOWN_NETWORK;
