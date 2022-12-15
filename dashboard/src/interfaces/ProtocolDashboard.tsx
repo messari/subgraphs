@@ -528,7 +528,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     if (protocolTableData && tabValue === "1") {
       getFinancialsData();
     }
-  }, [protocolTableData, getFinancialsData, tabValue]);
+  }, [protocolTableData, protocolTableError, getFinancialsData, tabValue]);
 
   useEffect(() => {
     if (protocolTableData && tabValue === "1" && overlayDeploymentURL) {
@@ -540,7 +540,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     if (financialsData && tabValue === "1") {
       getDailyUsageData();
     }
-  }, [financialsData, getDailyUsageData]);
+  }, [financialsData, financialsError, getDailyUsageData]);
 
   useEffect(() => {
     if (overlayFinancialsData && tabValue === "1" && overlayDeploymentURL) {
@@ -1089,6 +1089,9 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   }
   if (data) {
     errorDisplayProps = null;
+  }
+  if (protocolTableError) {
+    errorDisplayProps = protocolTableError;
   }
   if (overlayError) {
     errorDisplayProps = overlayError;

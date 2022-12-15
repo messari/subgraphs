@@ -19,7 +19,23 @@ export const schema100 = (): string => {
       pools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
         id
         name
+        inputToken {
+          name
+          symbol
+          id
+        }
+        rewardTokens {
+          id
+          type
+          token {
+            id
+            decimals
+            name
+            symbol
+          }
+        }
         totalValueLockedUSD
+        symbol
         outputTokenSupply
         stakedOutputTokenAmount
         rewardTokenEmissionsUSD
