@@ -38,6 +38,7 @@ export const schema100 = (): Schema => {
       dailyVolumeInUSD: "BigDecimal!",
       dailyVolumeOutUSD: "BigDecimal!",
       cumulativeNetVolumeUSD: "BigDecimal!",
+      timestamp: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",

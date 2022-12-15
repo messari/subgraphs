@@ -328,7 +328,7 @@ type UsageMetricsDailySnapshot @entity {
   day: Int!
 
   " Protocol this snapshot is associated with "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   ##### User cumulatives #####
   " Number of cumulative unique addresses that interacted with the contracts on this chain or received funds from other chains. It should not include senders on other chains "
@@ -436,7 +436,7 @@ type UsageMetricsHourlySnapshot @entity {
   hour: Int!
 
   " Protocol this snapshot is associated with "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   ##### User cumulatives #####
   " Number of cumulative unique addresses that interacted with the contracts on this chain or received funds from other chains. It should not include senders on other chains "
@@ -529,7 +529,7 @@ type FinancialsDailySnapshot @entity {
   day: Int!
 
   " Protocol this snapshot is associated with "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
@@ -593,7 +593,7 @@ type Pool @entity {
   id: Bytes!
 
   " The protocol this pool belongs to "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   " Name of the pool (e.g. Curve.fi DAI/USDC/USDT) "
   name: String
@@ -738,7 +738,7 @@ type PoolDailySnapshot @entity {
   day: Int!
 
   " The protocol this snapshot belongs to "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   " The pool this snapshot belongs to "
   pool: Pool!
@@ -820,7 +820,7 @@ type PoolHourlySnapshot @entity {
   hour: Int!
 
   " The protocol this snapshot belongs to "
-  protocol: Protocol!
+  protocol: BridgeProtocol!
 
   " The pool this snapshot belongs to "
   pool: Pool!
