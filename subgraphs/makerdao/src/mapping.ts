@@ -416,7 +416,7 @@ export function handleCatFile(event: CatNoteEvent): void {
       log.warning("[handleFileDog]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
       return;
     }
-    const liquidationPenalty = bigIntToBDUseDecimals(chop, RAY).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
+    const liquidationPenalty = bigIntToBDUseDecimals(chop, WAD).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
     if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
       market.liquidationPenalty = liquidationPenalty;
       market.save();
@@ -499,15 +499,16 @@ export function handleDogFile(event: DogFileChopEvent): void {
       return;
     }
     const chop = event.params.data;
-    const liquidationPenalty = bigIntToBDUseDecimals(chop, RAY).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
-    if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
+    const liquidationPenalty = bigIntToBDUseDecimals(chop, WAD).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
+    if (liquidationPenalty.ge(BIGDECIMAL_ZERO)) {
       market.liquidationPenalty = liquidationPenalty;
       market.save();
     }
 
-    log.info("[handleCatFile]ilk={}, chop={}, liquidationPenalty={}", [
+    log.info("[handleDogFile]ilk={}, chop={}, liquidationPenalty={}, market.liquidationPenalty={}", [
       ilk.toString(),
       chop.toString(),
+      liquidationPenalty.toString(),
       market.liquidationPenalty.toString(),
     ]);
   }

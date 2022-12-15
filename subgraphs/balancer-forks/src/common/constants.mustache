@@ -154,6 +154,14 @@ export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
 export const AAVE_BOOSTED_POOL_ADDRESS = Address.fromString(
   "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2"
 );
+export const BLACKLISTED_PHANTOM_POOLS: Address[] = [
+  Address.fromString("0x2bbf681cc4eb09218bee85ea2a5d3d13fa40fc0c"), // Balancer Aave Boosted Pool (USDT) OLD
+  Address.fromString("0x804cdb9116a10bb78768d3252355a1b18067bf8f"), // Balancer Aave Boosted Pool (DAI) OLD
+  Address.fromString("0x9210f1204b5a24742eba12f710636d76240df3d0"), // Balancer Aave Boosted Pool (USDC) OLD
+  Address.fromString("0x2f4eb100552ef93840d5adc30560e5513dfffacb"), // Balancer Aave Boosted Pool (USDT)
+  Address.fromString("0xae37d54ae477268b9997d4161b96b8200755935c"), // Balancer Aave Boosted Pool (DAI)
+  Address.fromString("0x82698aecc9e28e9bb27608bd52cf57f704bd1b83"), // Balancer Aave Boosted Pool (USDC)
+];
 
 export const INFLATION_INTERVAL = "{{inflationInterval}}";
 export const STARTING_INFLATION_RATE = BigDecimal.fromString(({{protocolTokenStartingInflationPerIntervalUnit}}).toString()).times(DEFAULT_DECIMALS_DENOMINATOR);

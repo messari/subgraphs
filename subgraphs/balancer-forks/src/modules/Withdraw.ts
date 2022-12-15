@@ -28,7 +28,7 @@ export function createWithdrawTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): WithdrawTransaction {
-  let withdrawTransactionId = "withdraw-"
+  const withdrawTransactionId = "withdraw-"
     .concat(transaction.hash.toHexString())
     .concat("-")
     .concat(transaction.index.toString());
@@ -96,15 +96,15 @@ export function Withdraw(
     x.times(constants.BIGINT_NEGATIVE_ONE)
   );
 
-  let inputTokenAmounts: BigInt[] = [];
-  let inputTokenBalances = pool.inputTokenBalances;
+  const inputTokenAmounts: BigInt[] = [];
+  const inputTokenBalances = pool.inputTokenBalances;
   let withdrawAmountUSD = constants.BIGDECIMAL_ZERO;
 
   for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
     if (inputTokens.at(idx).equals(poolAddress)) continue;
 
-    let inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
-    let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
+    const inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
+    const inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
 
     inputTokenBalances[inputTokenIndex] = inputTokenBalances[
       inputTokenIndex
@@ -121,11 +121,11 @@ export function Withdraw(
     );
   }
 
-  let tokenSupplyAfterWithdrawal = utils.getOutputTokenSupply(
+  const tokenSupplyAfterWithdrawal = utils.getOutputTokenSupply(
     poolAddress,
     pool.outputTokenSupply!
   );
-  let outputTokenBurntAmount = pool.outputTokenSupply!.minus(
+  const outputTokenBurntAmount = pool.outputTokenSupply!.minus(
     tokenSupplyAfterWithdrawal
   );
 
