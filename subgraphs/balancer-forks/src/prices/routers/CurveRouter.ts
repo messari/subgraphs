@@ -2,25 +2,24 @@ import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "..";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { BigInt, Address, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { CurveRegistry as CurveRegistryContract } from "../../../generated/Vault/CurveRegistry";
 
 export function getCurvePriceUsdc(
-  curveLpTokenAddress: Address,
-  network: string
+  curveLpTokenAddress: Address
 ): CustomPriceType {
-  let config = utils.getConfig();
+  const config = utils.getConfig();
   if (!config) return new CustomPriceType();
 
   let price = constants.BIGDECIMAL_ZERO;
   const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
-    let curveRegistry = curveRegistryAdresses[idx];
+    const curveRegistry = curveRegistryAdresses[idx];
 
-    let curveRegistryContract = CurveRegistryContract.bind(curveRegistry);
+    const curveRegistryContract = CurveRegistryContract.bind(curveRegistry);
 
-    let virtualPrice = getVirtualPrice(
+    const virtualPrice = getVirtualPrice(
       curveLpTokenAddress,
       curveRegistryContract
     );
@@ -33,7 +32,7 @@ export function getCurvePriceUsdc(
       ).toBigDecimal()
     );
 
-    let basePrice = getBasePrice(curveLpTokenAddress, curveRegistryContract);
+    const basePrice = getBasePrice(curveLpTokenAddress, curveRegistryContract);
     if (basePrice.reverted) continue;
 
     return CustomPriceType.initialize(
@@ -49,7 +48,7 @@ export function getPoolFromLpToken(
   lpAddress: Address,
   curveRegistry: CurveRegistryContract
 ): Address {
-  let poolAddress = utils.readValue<Address>(
+  const poolAddress = utils.readValue<Address>(
     curveRegistry.try_get_pool_from_lp_token(lpAddress),
     constants.NULL.TYPE_ADDRESS
   );
@@ -67,12 +66,12 @@ export function getBasePrice(
     return new CustomPriceType();
   }
 
-  let underlyingCoinAddress = getUnderlyingCoinFromPool(
+  const underlyingCoinAddress = getUnderlyingCoinFromPool(
     poolAddress,
     curveRegistry
   );
 
-  let basePrice = getPriceUsdcRecommended(underlyingCoinAddress);
+  const basePrice = getPriceUsdcRecommended(underlyingCoinAddress);
 
   return basePrice;
 }
@@ -81,7 +80,7 @@ export function getUnderlyingCoinFromPool(
   poolAddress: Address,
   curveRegistry: CurveRegistryContract
 ): Address {
-  let coinsArray = curveRegistry.try_get_underlying_coins(poolAddress);
+  const coinsArray = curveRegistry.try_get_underlying_coins(poolAddress);
 
   let coins: Address[];
 
@@ -104,7 +103,7 @@ export function getVirtualPrice(
   curveLpTokenAddress: Address,
   curveRegistry: CurveRegistryContract
 ): BigDecimal {
-  let virtualPrice = utils
+  const virtualPrice = utils
     .readValue<BigInt>(
       curveRegistry.try_get_virtual_price_from_lp_token(curveLpTokenAddress),
       constants.BIGINT_ZERO
