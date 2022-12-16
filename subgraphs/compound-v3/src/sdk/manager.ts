@@ -22,6 +22,7 @@ import {
   Token,
   Transfer,
   Withdraw,
+  _ActiveAccount,
   _MarketList,
 } from "../../generated/schema";
 import { Versions } from "../versions";
@@ -42,6 +43,7 @@ import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
 import { insert } from "./constants";
 import { PositionManager } from "./position";
+import { ApproveThisCall__Outputs } from "../../generated/templates/Comet/Comet";
 
 /**
  * This file contains the DataManager, which is used to
@@ -386,12 +388,8 @@ export class DataManager {
     deposit.amountUSD = amountUSD;
     deposit.save();
 
-    this.snapshots.updateTransactionData(
-      TransactionType.DEPOSIT,
-      amount,
-      amountUSD
-    );
-    this.snapshots.updateUsageData(TransactionType.DEPOSIT, account);
+    this.updateTransactionData(TransactionType.DEPOSIT, amount, amountUSD);
+    this.updateUsageData(TransactionType.DEPOSIT, account);
 
     return deposit;
   }
@@ -452,12 +450,8 @@ export class DataManager {
     withdraw.amountUSD = amountUSD;
     withdraw.save();
 
-    this.snapshots.updateTransactionData(
-      TransactionType.WITHDRAW,
-      amount,
-      amountUSD
-    );
-    this.snapshots.updateUsageData(TransactionType.WITHDRAW, account);
+    this.updateTransactionData(TransactionType.WITHDRAW, amount, amountUSD);
+    this.updateUsageData(TransactionType.WITHDRAW, account);
 
     return withdraw;
   }
@@ -512,12 +506,8 @@ export class DataManager {
     borrow.amountUSD = amountUSD;
     borrow.save();
 
-    this.snapshots.updateTransactionData(
-      TransactionType.BORROW,
-      amount,
-      amountUSD
-    );
-    this.snapshots.updateUsageData(TransactionType.BORROW, account);
+    this.updateTransactionData(TransactionType.BORROW, amount, amountUSD);
+    this.updateUsageData(TransactionType.BORROW, account);
 
     return borrow;
   }
@@ -579,12 +569,8 @@ export class DataManager {
     repay.amountUSD = amountUSD;
     repay.save();
 
-    this.snapshots.updateTransactionData(
-      TransactionType.REPAY,
-      amount,
-      amountUSD
-    );
-    this.snapshots.updateUsageData(TransactionType.REPAY, account);
+    this.updateTransactionData(TransactionType.REPAY, amount, amountUSD);
+    this.updateUsageData(TransactionType.REPAY, account);
 
     return repay;
   }
@@ -658,13 +644,9 @@ export class DataManager {
     liquidate.profitUSD = profitUSD;
     liquidate.save();
 
-    this.snapshots.updateTransactionData(
-      TransactionType.LIQUIDATE,
-      amount,
-      amountUSD
-    );
-    this.snapshots.updateUsageData(TransactionType.LIQUIDATEE, liquidatee);
-    this.snapshots.updateUsageData(TransactionType.LIQUIDATOR, liquidator);
+    this.updateTransactionData(TransactionType.LIQUIDATE, amount, amountUSD);
+    this.updateUsageData(TransactionType.LIQUIDATEE, liquidatee);
+    this.updateUsageData(TransactionType.LIQUIDATOR, liquidator);
 
     return liquidate;
   }
@@ -745,12 +727,8 @@ export class DataManager {
     transfer.amountUSD = amountUSD;
     transfer.save();
 
-    this.snapshots.updateTransactionData(
-      TransactionType.TRANSFER,
-      amount,
-      amountUSD
-    );
-    this.snapshots.updateUsageData(TransactionType.TRANSFER, sender);
+    this.updateTransactionData(TransactionType.TRANSFER, amount, amountUSD);
+    this.updateUsageData(TransactionType.TRANSFER, sender);
 
     return transfer;
   }
@@ -788,12 +766,8 @@ export class DataManager {
     flashloan.amountUSD = amountUSD;
     flashloan.save();
 
-    this.snapshots.updateTransactionData(
-      TransactionType.FLASHLOAN,
-      amount,
-      amountUSD
-    );
-    this.snapshots.updateUsageData(TransactionType.FLASHLOAN, account);
+    this.updateTransactionData(TransactionType.FLASHLOAN, amount, amountUSD);
+    this.updateUsageData(TransactionType.FLASHLOAN, account);
 
     return flashloan;
   }
@@ -996,6 +970,133 @@ export class DataManager {
 
     // update revenue in snapshots
     this.snapshots.updateRevenue(protocolRevenueDelta, supplyRevenueDelta);
+  }
+
+  //
+  //
+  // this only updates the usage data for the entities changed in this class
+  // (ie, market and protocol)
+  private updateUsageData(transactionType: string, account: Bytes): void {
+    const activeAccountMarketID = account
+      .toHexString()
+      .concat("-")
+      .concat(this.market.id.toHexString());
+    let activeAccountMarket = _ActiveAccount.load(activeAccountMarketID); // market
+    const activeAccountTransactionID = transactionType
+      .concat("-")
+      .concat(account.toHexString());
+    const activeAccountTransactionMarketID = activeAccountTransactionID
+      .concat("-")
+      .concat(this.market.id.toHexString());
+    let activeAccountTransactionMarket = _ActiveAccount.load(
+      activeAccountTransactionMarketID
+    ); // market
+    let activeAccountTransaction = _ActiveAccount.load(
+      activeAccountTransactionID
+    ); // lending protocol
+    if (!activeAccountMarket && transactionType != TransactionType.LIQUIDATEE) {
+      activeAccountMarket = new _ActiveAccount(activeAccountMarketID);
+      activeAccountMarket.save();
+      this.market.cumulativeUniqueUsers += INT_ONE;
+    }
+    if (!activeAccountTransactionMarket) {
+      activeAccountTransactionMarket = new _ActiveAccount(
+        activeAccountTransactionMarketID
+      );
+      activeAccountTransactionMarket.save();
+      if (transactionType == TransactionType.DEPOSIT)
+        this.market.cumulativeUniqueDepositors += INT_ONE;
+      if (transactionType == TransactionType.BORROW)
+        this.market.cumulativeUniqueBorrowers += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATOR)
+        this.market.cumulativeUniqueLiquidators += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATEE)
+        this.market.cumulativeUniqueLiquidatees += INT_ONE;
+      if (transactionType == TransactionType.TRANSFER)
+        this.market.cumulativeUniqueTransferrers += INT_ONE;
+      if (transactionType == TransactionType.FLASHLOAN)
+        this.market.cumulativeUniqueFlashloaners += INT_ONE;
+    }
+    if (!activeAccountTransaction) {
+      activeAccountTransaction = new _ActiveAccount(activeAccountTransactionID);
+      activeAccountTransaction.save();
+      if (transactionType == TransactionType.DEPOSIT)
+        this.protocol.cumulativeUniqueDepositors += INT_ONE;
+      if (transactionType == TransactionType.BORROW)
+        this.protocol.cumulativeUniqueBorrowers += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATOR)
+        this.protocol.cumulativeUniqueLiquidators += INT_ONE;
+      if (transactionType == TransactionType.LIQUIDATEE)
+        this.protocol.cumulativeUniqueLiquidatees += INT_ONE;
+    }
+
+    this.protocol.save();
+    this.market.save();
+
+    // update the snapshots in their respective class
+    this.snapshots.updateUsageData(transactionType, account);
+  }
+
+  //
+  //
+  // this only updates the usage data for the entities changed in this class
+  // (ie, market and protocol)
+  private updateTransactionData(
+    transactionType: string,
+    amount: BigInt,
+    amountUSD: BigDecimal
+  ): void {
+    if (transactionType == TransactionType.DEPOSIT) {
+      this.protocol.depositCount += INT_ONE;
+      this.protocol.cumulativeDepositUSD =
+        this.protocol.cumulativeDepositUSD.plus(amountUSD);
+      this.market.cumulativeDepositUSD =
+        this.market.cumulativeDepositUSD.plus(amountUSD);
+      this.market.depositCount += INT_ONE;
+    } else if (transactionType == TransactionType.WITHDRAW) {
+      this.protocol.withdrawCount += INT_ONE;
+      this.market.withdrawCount += INT_ONE;
+    } else if (transactionType == TransactionType.BORROW) {
+      this.protocol.borrowCount += INT_ONE;
+      this.protocol.cumulativeBorrowUSD =
+        this.protocol.cumulativeBorrowUSD.plus(amountUSD);
+      this.market.cumulativeBorrowUSD =
+        this.market.cumulativeBorrowUSD.plus(amountUSD);
+      this.market.borrowCount += INT_ONE;
+    } else if (transactionType == TransactionType.REPAY) {
+      this.protocol.repayCount += INT_ONE;
+      this.market.repayCount += INT_ONE;
+    } else if (transactionType == TransactionType.LIQUIDATE) {
+      this.protocol.liquidationCount += INT_ONE;
+      this.protocol.cumulativeLiquidateUSD =
+        this.protocol.cumulativeLiquidateUSD.plus(amountUSD);
+      this.market.cumulativeLiquidateUSD =
+        this.market.cumulativeLiquidateUSD.plus(amountUSD);
+      this.market.liquidationCount += INT_ONE;
+    } else if (transactionType == TransactionType.TRANSFER) {
+      this.protocol.transferCount += INT_ONE;
+      this.market.cumulativeTransferUSD =
+        this.market.cumulativeTransferUSD.plus(amountUSD);
+      this.market.transferCount += INT_ONE;
+    } else if (transactionType == TransactionType.FLASHLOAN) {
+      this.protocol.flashloanCount += INT_ONE;
+      this.market.cumulativeFlashloanUSD =
+        this.market.cumulativeFlashloanUSD.plus(amountUSD);
+      this.market.flashloanCount += INT_ONE;
+    } else {
+      log.error("[updateTransactionData] Invalid transaction type: {}", [
+        transactionType,
+      ]);
+      return;
+    }
+    this.protocol.transactionCount += INT_ONE;
+    this.market.transactionCount += INT_ONE;
+
+    this.protocol.save();
+    this.market.save();
+
+    // update the snapshots in their respective class
+    this.snapshots.updateTransactionData(transactionType, amount, amountUSD);
   }
 
   //
