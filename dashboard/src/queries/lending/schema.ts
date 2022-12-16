@@ -1244,7 +1244,7 @@ export const schema300 = (): Schema => {
     cumulativeFlashloanUSD: "BigDecimal!",
     transactionCount: "Int!",
     depositCount: "Int!",
-    withdrawalCount: "Int!",
+    withdrawCount: "Int!",
     borrowCount: "Int!",
     repayCount: "Int!",
     liquidationCount: "Int!",
@@ -1327,7 +1327,7 @@ export const schema300 = (): Schema => {
         cumulativePositionCount
         transactionCount
         depositCount
-        withdrawalCount
+        withdrawCount
         borrowCount
         repayCount
         liquidationCount
@@ -1451,7 +1451,7 @@ export const schema300 = (): Schema => {
       cumulativePositionCount
       transactionCount
       depositCount
-      withdrawalCount
+      withdrawCount
       borrowCount
       repayCount
       liquidationCount
@@ -1522,7 +1522,7 @@ export const schema300 = (): Schema => {
       cumulativeFlashloanUSD
       transactionCount
       depositCount
-      withdrawalCount
+      withdrawCount
       borrowCount
       repayCount
       liquidationCount
@@ -1559,7 +1559,7 @@ export const schema300 = (): Schema => {
     cumulativePositionCount: "Int!",
     transactionCount: "Int!",
     depositCount: "Int!",
-    withdrawalCount: "Int!",
+    withdrawCount: "Int!",
     borrowCount: "Int!",
     repayCount: "Int!",
     liquidationCount: "Int!",
