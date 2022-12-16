@@ -560,7 +560,10 @@ export async function sendMessageToZapierThread(msgObj) {
             if (threadProtocolAlerts) {
                 threadProtocolAlerts.forEach(alert => {
                     msgObj.protocol[deployment]?.Field?.forEach((fieldName, idx) => {
-                        const valueCondition = alert.toUpperCase().split(fieldName.toUpperCase())[1].split('DESCRIPTION')[0].includes(msgObj.protocol[deployment]?.Value[idx]?.toUpperCase())
+                        const alertStrAfterFieldName = alert?.toUpperCase()?.split(fieldName?.toUpperCase())[1];
+                        const alertStrBeforeDesc = alertStrAfterFieldName?.split('DESCRIPTION')[0];
+                        const alertToBeSent = msgObj?.protocol[deployment]?.Value[idx]?.toUpperCase();
+                        const valueCondition = alertStrBeforeDesc?.includes(alertToBeSent);
                         if (alert.toUpperCase().includes(fieldName.toUpperCase()) && valueCondition) {
                             invalidProtocolAlertIndexes[deployment].push(idx);
                         }
