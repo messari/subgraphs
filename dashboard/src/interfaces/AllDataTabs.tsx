@@ -267,6 +267,7 @@ function AllDataTabs({
             data={data}
             overlayData={overlayData}
             entitiesData={entitiesData}
+            subgraphToQueryURL={subgraphToQueryURL}
             poolTimeseriesData={poolTimeseriesRequest.poolTimeseriesData}
             overlayPoolTimeseriesData={overlayPoolTimeseriesData}
             poolTimeseriesLoading={poolTimeseriesRequest.poolTimeseriesLoading}
