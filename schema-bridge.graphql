@@ -1,5 +1,5 @@
 # Subgraph Schema: Bridge
-# Version: 1.0.1
+# Version: 1.1.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 enum Network {
   ARBITRUM_ONE
@@ -1298,7 +1298,7 @@ type SupportedToken @entity(immutable: true) {
 
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity(immutable: true) {
-  " Bytes.fromUTF( {Address}-{daily|hourly}-{# of day/hour}-[deposit|withdraw|transferIn|transferOut|message] ) "
+  " Bytes.fromUTF( {Address}-{daily|hourly}-{# of day/hour}-[liquidity|transferIn|transferOut|message] ) "
   id: Bytes!
 }
 
@@ -1325,13 +1325,13 @@ type _ActivityHelper @entity {
 type _ProtocolSnapshotHelper @entity {
   id: Bytes!
 
-  _lastDailyFinancialsTimestamp: BigInt!
-  _lastDailyUsageTimestamp: BigInt!
-  _lastHourlyUsageTimestamp: BigInt!
+  lastDailyFinancialsTimestamp: BigInt!
+  lastDailyUsageTimestamp: BigInt!
+  lastHourlyUsageTimestamp: BigInt!
 
-  _lastDailyFinancialsSnapshot: Bytes!
-  _lastDailyUsageSnapshot: Bytes!
-  _lastHourlyUsageSnapshot: Bytes!
+  lastDailyFinancialsSnapshot: Bytes!
+  lastDailyUsageSnapshot: Bytes!
+  lastHourlyUsageSnapshot: Bytes!
 
-  _lastActivityTimestamp: BigInt!
+  lastActivityTimestamp: BigInt!
 }

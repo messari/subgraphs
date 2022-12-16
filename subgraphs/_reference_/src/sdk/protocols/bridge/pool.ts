@@ -28,6 +28,7 @@ import {
   RewardTokenType,
 } from "../../util/constants";
 import { exponentToBigDecimal } from "../../util/numbers";
+import { sortArrayByReference, sortBytesArray } from "../../util/arrays";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import { SDK } from ".";
@@ -610,29 +611,4 @@ function inferCounterType(
   log.error("Unknown pool type at inferCounterType {}", [poolType]);
   log.critical("", []);
   return poolType;
-}
-
-// A function which given 3 arrays of arbitrary types of the same length,
-// where the first one holds the reference order, the second one holds the same elements
-// as the first but in different order, and the third any arbitrary elements. It will return
-// the third array after sorting it according to the order of the first one.
-function sortArrayByReference<T, K>(
-  reference: T[],
-  array: T[],
-  toSort: K[]
-): K[] {
-  const sorted: K[] = new Array<K>();
-  for (let i = 0; i < reference.length; i++) {
-    const index = array.indexOf(reference[i]);
-    sorted.push(toSort[index]);
-  }
-  return sorted;
-}
-
-// sortBytesArray will sort an array of Bytes in ascending order
-// by comparing their hex string representation.
-function sortBytesArray(array: Bytes[]): Bytes[] {
-  const toSort = array.map<string>((item) => item.toHexString());
-  toSort.sort();
-  return toSort.map<Bytes>((item) => Bytes.fromHexString(item));
 }

@@ -1,4 +1,4 @@
-import { ethereum, Bytes, BigInt } from "@graphprotocol/graph-ts";
+import { ethereum, Bytes } from "@graphprotocol/graph-ts";
 import { BridgeProtocol as BridgeProtocolSchema } from "../../../../generated/schema";
 import { AccountWasActive } from "./account";
 import {
@@ -8,7 +8,11 @@ import {
   _ProtocolSnapshotHelper,
   _ActivityHelper,
 } from "../../../../generated/schema";
-import { SECONDS_PER_DAY_BI, SECONDS_PER_HOUR_BI } from "../../util/constants";
+import {
+  BIGINT_ZERO,
+  SECONDS_PER_DAY_BI,
+  SECONDS_PER_HOUR_BI,
+} from "../../util/constants";
 
 const SnapshotHelperID = Bytes.fromUTF8("_ProtocolSnapshotHelper");
 const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
@@ -72,21 +76,21 @@ export class ProtocolSnapshot {
   private takeSnapshots(): void {
     const helper = this.helper;
     if (
-      helper._lastDailyFinancialsTimestamp
+      helper.lastDailyFinancialsTimestamp
         .plus(SECONDS_PER_DAY_BI)
         .lt(this.event.block.timestamp)
     ) {
       this.takeFinancialsDailySnapshot();
     }
     if (
-      helper._lastDailyUsageTimestamp
+      helper.lastDailyUsageTimestamp
         .plus(SECONDS_PER_DAY_BI)
         .lt(this.event.block.timestamp)
     ) {
       this.takeUsageDailySnapshot();
     }
     if (
-      helper._lastHourlyUsageTimestamp
+      helper.lastHourlyUsageTimestamp
         .plus(SECONDS_PER_HOUR_BI)
         .lt(this.event.block.timestamp)
     ) {
@@ -130,7 +134,7 @@ export class ProtocolSnapshot {
     let volumeOutDelta = snapshot.cumulativeVolumeOutUSD;
     let netVolumeDelta = snapshot.cumulativeNetVolumeUSD;
     const previous = FinancialsDailySnapshot.load(
-      helper._lastDailyFinancialsSnapshot
+      helper.lastDailyFinancialsSnapshot
     );
     if (previous) {
       supplySideRevenueDelta = snapshot.cumulativeSupplySideRevenueUSD.minus(
@@ -161,8 +165,8 @@ export class ProtocolSnapshot {
     snapshot.dailyNetVolumeUSD = netVolumeDelta;
     snapshot.save();
 
-    helper._lastDailyFinancialsTimestamp = event.block.timestamp;
-    helper._lastDailyFinancialsSnapshot = snapshot.id;
+    helper.lastDailyFinancialsTimestamp = event.block.timestamp;
+    helper.lastDailyFinancialsSnapshot = snapshot.id;
     helper.save();
   }
 
@@ -227,7 +231,7 @@ export class ProtocolSnapshot {
     let messageSentDelta = snapshot.cumulativeMessageSentCount;
     let messageReceivedDelta = snapshot.cumulativeMessageReceivedCount;
     const previous = UsageMetricsDailySnapshot.load(
-      helper._lastDailyUsageSnapshot
+      helper.lastDailyUsageSnapshot
     );
     if (previous) {
       transactionDelta =
@@ -260,8 +264,8 @@ export class ProtocolSnapshot {
     snapshot.dailyMessageReceivedCount = messageReceivedDelta;
     snapshot.save();
 
-    helper._lastDailyUsageTimestamp = event.block.timestamp;
-    helper._lastDailyUsageSnapshot = snapshot.id;
+    helper.lastDailyUsageTimestamp = event.block.timestamp;
+    helper.lastDailyUsageSnapshot = snapshot.id;
     helper.save();
     activity.dailyActiveUsers = 0;
     activity.dailyActiveTransferSenders = 0;
@@ -325,7 +329,7 @@ export class ProtocolSnapshot {
     let messageSentDelta = snapshot.cumulativeMessageSentCount;
     let messageReceivedDelta = snapshot.cumulativeMessageReceivedCount;
     const previous = UsageMetricsHourlySnapshot.load(
-      helper._lastHourlyUsageSnapshot
+      helper.lastHourlyUsageSnapshot
     );
     if (previous) {
       transactionDelta =
@@ -358,8 +362,8 @@ export class ProtocolSnapshot {
     snapshot.hourlyMessageReceivedCount = messageReceivedDelta;
     snapshot.save();
 
-    helper._lastHourlyUsageTimestamp = event.block.timestamp;
-    helper._lastHourlyUsageSnapshot = snapshot.id;
+    helper.lastHourlyUsageTimestamp = event.block.timestamp;
+    helper.lastHourlyUsageSnapshot = snapshot.id;
     helper.save();
     activity.hourlyActiveUsers = 0;
     activity.hourlyActiveTransferSenders = 0;
@@ -376,13 +380,13 @@ function initProtocolHelper(): _ProtocolSnapshotHelper {
     return helper;
   }
   helper = new _ProtocolSnapshotHelper(SnapshotHelperID);
-  helper._lastActivityTimestamp = BigInt.fromI32(0);
-  helper._lastDailyFinancialsTimestamp = BigInt.fromI32(0);
-  helper._lastDailyFinancialsSnapshot = Bytes.fromI32(0);
-  helper._lastDailyUsageTimestamp = BigInt.fromI32(0);
-  helper._lastDailyUsageSnapshot = Bytes.fromI32(0);
-  helper._lastHourlyUsageTimestamp = BigInt.fromI32(0);
-  helper._lastHourlyUsageSnapshot = Bytes.fromI32(0);
+  helper.lastActivityTimestamp = BIGINT_ZERO;
+  helper.lastDailyFinancialsTimestamp = BIGINT_ZERO;
+  helper.lastDailyFinancialsSnapshot = Bytes.fromI32(0);
+  helper.lastDailyUsageTimestamp = BIGINT_ZERO;
+  helper.lastDailyUsageSnapshot = Bytes.fromI32(0);
+  helper.lastHourlyUsageTimestamp = BIGINT_ZERO;
+  helper.lastHourlyUsageSnapshot = Bytes.fromI32(0);
   helper.save();
   return helper;
 }

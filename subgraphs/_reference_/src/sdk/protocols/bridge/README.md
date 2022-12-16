@@ -3,10 +3,10 @@
 ## Setup
 
 - Copy over the whole SDK folder into your subgraph `src`. You won't need any of the other protocols, so you can safely delete those.
-- You'll need to be using the bridge schema, starting from version `1.0.1`, since that one adds some auxiliary fields and entities that the lib needs.
-- Run `graph codegen` to make sure every import resolves if you want your intelisense and import navidation to work.
+- You'll need to be using the bridge schema, starting from version `1.1.0`, since that one adds some auxiliary fields and entities that the lib needs.
+- Run `graph codegen` to make sure every import resolves if you want your intelisense and import navigation to work.
 
-That's it. To simplify setup we've tried to not make it depend of any contract calls. If it needed to make any, you would need to add the ABI of the given contract to your manifest and change the import paths wherever it is used in the library.
+That's it. To simplify setup we've tried to not make it depend on any contract calls. If it needed to make any, you would need to add the ABI of the given contract to your manifest and change the import paths wherever it is used in the library.
 
 ## How to use
 

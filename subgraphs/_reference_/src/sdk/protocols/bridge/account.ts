@@ -47,7 +47,7 @@ export class AccountManager {
 namespace ActivityType {
   export const TRANSFER_OUT = "transferOut";
   export const TRANSFER_IN = "transferIn";
-  export const LIQUIDITY_PROVISIONING = "deposit";
+  export const LIQUIDITY_PROVISIONING = "liquidity";
   export const MESSAGE = "message";
 }
 type ActivityType = string;
