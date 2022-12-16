@@ -692,6 +692,10 @@ export function handleDeposit(call: DepositCall): void {
     call.inputs.amount,
     call
   );
+
+  usageMetricsHourly.save();
+  usageMetricsDaily.save();
+  protocol.save();
 }
 
 export function handleDepositVault(call: DepositVaultCall): void {
@@ -733,6 +737,10 @@ export function handleDepositVault(call: DepositVaultCall): void {
     call.inputs.amount,
     call
   );
+
+  usageMetricsHourly.save();
+  usageMetricsDaily.save();
+  protocol.save();
 }
 
 export function handleWithdraw(call: WithdrawCall): void {
@@ -774,6 +782,10 @@ export function handleWithdraw(call: WithdrawCall): void {
     call.inputs.amount,
     call
   );
+
+  usageMetricsHourly.save();
+  usageMetricsDaily.save();
+  protocol.save();
 }
 
 export function handleWithdrawVault(call: WithdrawVaultCall): void {
@@ -815,4 +827,8 @@ export function handleWithdrawVault(call: WithdrawVaultCall): void {
     call.inputs.amount,
     call
   );
+
+  usageMetricsHourly.save();
+  usageMetricsDaily.save();
+  protocol.save();
 }
