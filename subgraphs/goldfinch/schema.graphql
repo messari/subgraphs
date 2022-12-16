@@ -663,14 +663,14 @@ type Market @entity {
   " Address of borrower (tranchedPool has one borrower per pool) "
   _borrower: String
 
-  " timestamp when for interest accrual (used for interest rates calculation) "
+  " timestamp when interest rates were last updated "
   _interestTimestamp: BigInt
 
-  " senior pool interest received from Compound "
-  _interestFromCompound: BigDecimal
+  " interest paid by borrowers, including reserve fee if applicable "
+  _borrowerInterestAmountUSD: BigDecimal
 
-  " senior pool interest received from tranched pools "
-  _interestFromTranchedPool: BigDecimal
+  " interest received by lenders "
+  _lenderInterestAmountUSD: BigDecimal
 
   " Is the market a migrated tranched pool "
   _isMigratedTranchedPool: Boolean

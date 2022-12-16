@@ -212,6 +212,10 @@ export function getOrCreateMarket(
 
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
+
+    market._lenderInterestAmountUSD = BIGDECIMAL_ZERO;
+    market._borrowerInterestAmountUSD = BIGDECIMAL_ZERO;
+
     market.save();
 
     let marketIDs = protocol._marketIDs!;

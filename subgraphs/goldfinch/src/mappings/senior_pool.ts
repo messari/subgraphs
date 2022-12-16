@@ -79,6 +79,9 @@ export function handleDepositMade(event: DepositMade): void {
     market.inputTokenBalance.divDecimal(USDC_DECIMALS);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
+  if (!market._interestTimestamp) {
+    market._interestTimestamp = event.block.timestamp;
+  }
 
   const fiduContract = FiduContract.bind(
     Address.fromString(market.outputToken!)
@@ -403,6 +406,7 @@ export function handleInterestCollected(event: InterestCollected): void {
     outputToken.decimals
   );
   market.outputTokenPriceUSD = outputToken.lastPriceUSD!;
+  market.save();
   outputToken.save();
 
   let updateProtocol = false;
@@ -415,29 +419,24 @@ export function handleInterestCollected(event: InterestCollected): void {
     // interest from compound sweep, new revenue not having been accounted
     updateProtocol = true;
 
-    if (!market._interestFromCompound) {
-      market._interestFromCompound = interestAmountUSD;
-    } else {
-      market._interestFromCompound =
-        market._interestFromCompound!.plus(interestAmountUSD);
-    }
+    // cumulate lender interest amount, but not updating rates
+    market._lenderInterestAmountUSD =
+      market._lenderInterestAmountUSD!.plus(interestAmountUSD);
+    market.save();
   } else {
-    const interestFromTranchedPool = market._interestFromTranchedPool
-      ? market._interestFromTranchedPool!.plus(interestAmountUSD)
-      : interestAmountUSD;
-    market._interestFromTranchedPool = interestFromTranchedPool;
-    const interestFromCompound = market._interestFromCompound
-      ? market._interestFromCompound!
-      : BIGDECIMAL_ZERO;
+    market._borrowerInterestAmountUSD =
+      market._borrowerInterestAmountUSD!.plus(interestAmountUSD);
+    market._lenderInterestAmountUSD =
+      market._lenderInterestAmountUSD!.plus(interestAmountUSD);
+    market.save();
 
     updateInterestRates(
       market,
-      interestFromTranchedPool,
-      interestFromTranchedPool.plus(interestFromCompound),
+      market._borrowerInterestAmountUSD!,
+      market._lenderInterestAmountUSD!,
       event
     );
   }
-  market.save();
 
   updateRevenues(
     protocol,

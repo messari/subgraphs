@@ -16,15 +16,6 @@ export function updateInterestRates(
   event: ethereum.Event
 ): void {
   const marketID = market.id;
-  if (!market._interestTimestamp) {
-    log.warning(
-      "[updateInterestRates]market._interestTimestamp for market {} not set for tx {}",
-      [marketID, event.transaction.hash.toHexString()]
-    );
-    market._interestTimestamp = event.block.timestamp;
-    market.save();
-    return;
-  }
 
   const secondsLapsed = event.block.timestamp.minus(market._interestTimestamp!);
   // only update rates in a day or longer
@@ -52,6 +43,8 @@ export function updateInterestRates(
     borrowerInterestRate.save();
 
     rates.push(borrowerInterestRate.id);
+    market._borrowerInterestAmountUSD = BIGDECIMAL_ZERO;
+    market._interestTimestamp = event.block.timestamp;
   } else {
     log.warning(
       "[updateInterestRates]market.totalBorrowBalanceUSD={} for market {} at tx {}, skip updating borrower rates",
@@ -61,6 +54,12 @@ export function updateInterestRates(
         event.transaction.hash.toHexString(),
       ]
     );
+    for (let i = 0; i < market.rates.length; i++) {
+      const interestRate = InterestRate.load(market.rates[i]);
+      if (interestRate && interestRate.side == InterestRateSide.BORROWER) {
+        rates.push(market.rates[i]);
+      }
+    }
   }
 
   // senior and junior rates are different, this is an average of them
@@ -76,8 +75,7 @@ export function updateInterestRates(
     lenderInterestRate.save();
 
     rates.push(lenderInterestRate.id);
-    market._interestFromCompound = BIGDECIMAL_ZERO;
-    market._interestFromTranchedPool = BIGDECIMAL_ZERO;
+    market._lenderInterestAmountUSD = BIGDECIMAL_ZERO;
   } else {
     log.warning(
       "[updateInterestRates]market.totalDepositBalanceUSD={} for market {} at tx {}, skip updating lender rates",
@@ -87,9 +85,14 @@ export function updateInterestRates(
         event.transaction.hash.toHexString(),
       ]
     );
+    for (let i = 0; i < market.rates.length; i++) {
+      const interestRate = InterestRate.load(market.rates[i]);
+      if (interestRate && interestRate.side == InterestRateSide.LENDER) {
+        rates.push(market.rates[i]);
+      }
+    }
   }
 
   market.rates = rates;
-  market._interestTimestamp = event.block.timestamp;
   market.save();
 }

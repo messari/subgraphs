@@ -453,7 +453,7 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     event.params.interestAmount.divDecimal(USDC_DECIMALS);
   const principleAmountUSD =
     event.params.principalAmount.divDecimal(USDC_DECIMALS);
-  const reserveAmount = event.params.reserveAmount.divDecimal(USDC_DECIMALS);
+  const reserveAmountUSD = event.params.reserveAmount.divDecimal(USDC_DECIMALS);
   const payer = event.params.payer.toHexString();
   const tx = event.transaction.hash.toHexString();
 
@@ -472,6 +472,14 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     .balance()
     .divDecimal(USDC_DECIMALS);
 
+  // lenders receive interestAmountUSD - reserveAmountUSD
+  market._borrowerInterestAmountUSD = market
+    ._borrowerInterestAmountUSD!.plus(interestAmountUSD)
+    .plus(reserveAmountUSD);
+  market._lenderInterestAmountUSD =
+    market._lenderInterestAmountUSD!.plus(interestAmountUSD);
+  market.save();
+
   let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
   for (let i = 0; i < protocol._marketIDs!.length; i++) {
     const mktID = protocol._marketIDs![i];
@@ -484,12 +492,11 @@ export function handlePaymentApplied(event: PaymentApplied): void {
 
   updateInterestRates(
     market,
-    interestAmountUSD.plus(reserveAmount),
-    interestAmountUSD,
+    market._borrowerInterestAmountUSD!,
+    market._lenderInterestAmountUSD!,
     event
   );
 
-  market.save();
   protocol.save();
 
   updateRevenues(
