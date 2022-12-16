@@ -6,6 +6,7 @@ import {
   InterestRateType,
   BIGDECIMAL_ZERO,
   BIGDECIMAL_HUNDRED,
+  SECONDS_PER_DAY,
 } from "../common/constants";
 
 export function updateInterestRates(
@@ -25,11 +26,17 @@ export function updateInterestRates(
     return;
   }
 
+  const secondsLapsed = event.block.timestamp.minus(market._interestTimestamp!);
+  // only update rates in a day or longer
+  if (secondsLapsed.lt(BigInt.fromI32(SECONDS_PER_DAY))) {
+    return;
+  }
+
   const rates: string[] = [];
   // scale interest rate to APR
   // since interest is not compounding, apply a linear scaler based on time
   const InterestRateScaler = BigInt.fromI32(SECONDS_PER_YEAR).divDecimal(
-    event.block.timestamp.minus(market._interestTimestamp!).toBigDecimal()
+    secondsLapsed.toBigDecimal()
   );
   // even though borrow rates are supposed to be "STABLE", but there may be late payment, writedown
   // the actual rate may not be stable
@@ -69,6 +76,8 @@ export function updateInterestRates(
     lenderInterestRate.save();
 
     rates.push(lenderInterestRate.id);
+    market._interestFromCompound = BIGDECIMAL_ZERO;
+    market._interestFromTranchedPool = BIGDECIMAL_ZERO;
   } else {
     log.warning(
       "[updateInterestRates]market.totalDepositBalanceUSD={} for market {} at tx {}, skip updating lender rates",

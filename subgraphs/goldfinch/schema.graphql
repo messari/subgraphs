@@ -669,11 +669,8 @@ type Market @entity {
   " senior pool interest received from Compound "
   _interestFromCompound: BigDecimal
 
-  " cumulative Reward Emission Amount "
-  _cumulativeRewardAmount: BigInt
-
-  " timestamp when reward emission started "
-  _rewardTimestamp: BigInt
+  " senior pool interest received from tranched pools "
+  _interestFromTranchedPool: BigDecimal
 
   " Is the market a migrated tranched pool "
   _isMigratedTranchedPool: Boolean

@@ -94,12 +94,6 @@ export function handleDepositMade(event: DepositMade): void {
     inputToken.decimals
   ).div(bigIntToBDUseDecimals(event.params.shares, outputToken.decimals));
 
-  // calculate average daily emission since first deposit
-  if (!market._rewardTimestamp) {
-    market._rewardTimestamp = event.block.timestamp;
-    market._cumulativeRewardAmount = BIGINT_ZERO;
-  }
-
   let marketIDs = protocol._marketIDs!;
   if (marketIDs.indexOf(market.id) < 0) {
     marketIDs = marketIDs.concat([market.id]);
@@ -428,17 +422,20 @@ export function handleInterestCollected(event: InterestCollected): void {
         market._interestFromCompound!.plus(interestAmountUSD);
     }
   } else {
-    const lenderInterestAmountUSD = market._interestFromCompound
-      ? market._interestFromCompound!.plus(interestAmountUSD)
+    const interestFromTranchedPool = market._interestFromTranchedPool
+      ? market._interestFromTranchedPool!.plus(interestAmountUSD)
       : interestAmountUSD;
+    market._interestFromTranchedPool = interestFromTranchedPool;
+    const interestFromCompound = market._interestFromCompound
+      ? market._interestFromCompound!
+      : BIGDECIMAL_ZERO;
+
     updateInterestRates(
       market,
-      interestAmountUSD,
-      lenderInterestAmountUSD,
+      interestFromTranchedPool,
+      interestFromTranchedPool.plus(interestFromCompound),
       event
     );
-    //reset _interestFromCompound for next interest cycle
-    market._interestFromCompound = BIGDECIMAL_ZERO;
   }
   market.save();
 

@@ -113,11 +113,6 @@ export function handleDepositMade(event: DepositMade): void {
   market.totalDepositBalanceUSD =
     market.inputTokenBalance.divDecimal(USDC_DECIMALS);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
-  // calculate average daily emission since first deposit
-  if (!market._rewardTimestamp) {
-    market._rewardTimestamp = event.block.timestamp;
-    market._cumulativeRewardAmount = BIGINT_ZERO;
-  }
   market.save();
 
   const protocol = getOrCreateProtocol();
@@ -630,11 +625,6 @@ export function handleSharePriceUpdated(event: SharePriceUpdated): void {
   const totalBorrowBalance = creditLineContract.balance();
   market.totalBorrowBalanceUSD = totalBorrowBalance.divDecimal(USDC_DECIMALS);
 
-  // calculate average daily emission since first deposit
-  if (!market._rewardTimestamp) {
-    market._rewardTimestamp = event.block.timestamp;
-    market._cumulativeRewardAmount = BIGINT_ZERO;
-  }
   // set _isMigratedTranchedPool to false, so we only process the migration once
   market._isMigratedTranchedPool = false;
   market.save();
