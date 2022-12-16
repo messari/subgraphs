@@ -22,12 +22,12 @@ import {
   Token,
   Transfer,
   Withdraw,
-  _ActiveAccount,
   _MarketList,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import { AccountManager } from "./account";
 import {
+  activityCounter,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   exponentToBigDecimal,
@@ -43,7 +43,6 @@ import { SnapshotManager } from "./snapshots";
 import { TokenManager } from "./token";
 import { insert } from "./constants";
 import { PositionManager } from "./position";
-import { ApproveThisCall__Outputs } from "../../generated/templates/Comet/Comet";
 
 /**
  * This file contains the DataManager, which is used to
@@ -977,58 +976,89 @@ export class DataManager {
   // this only updates the usage data for the entities changed in this class
   // (ie, market and protocol)
   private updateUsageData(transactionType: string, account: Bytes): void {
-    const activeAccountMarketID = account
-      .toHexString()
-      .concat("-")
-      .concat(this.market.id.toHexString());
-    let activeAccountMarket = _ActiveAccount.load(activeAccountMarketID); // market
-    const activeAccountTransactionID = transactionType
-      .concat("-")
-      .concat(account.toHexString());
-    const activeAccountTransactionMarketID = activeAccountTransactionID
-      .concat("-")
-      .concat(this.market.id.toHexString());
-    let activeAccountTransactionMarket = _ActiveAccount.load(
-      activeAccountTransactionMarketID
-    ); // market
-    let activeAccountTransaction = _ActiveAccount.load(
-      activeAccountTransactionID
-    ); // lending protocol
-    if (!activeAccountMarket && transactionType != TransactionType.LIQUIDATEE) {
-      activeAccountMarket = new _ActiveAccount(activeAccountMarketID);
-      activeAccountMarket.save();
-      this.market.cumulativeUniqueUsers += INT_ONE;
-    }
-    if (!activeAccountTransactionMarket) {
-      activeAccountTransactionMarket = new _ActiveAccount(
-        activeAccountTransactionMarketID
+    this.market.cumulativeUniqueUsers += activityCounter(
+      account,
+      transactionType,
+      false,
+      0,
+      this.market.id
+    );
+    if (transactionType == TransactionType.DEPOSIT) {
+      this.market.cumulativeUniqueDepositors += activityCounter(
+        account,
+        transactionType,
+        true,
+        0,
+        this.market.id
       );
-      activeAccountTransactionMarket.save();
-      if (transactionType == TransactionType.DEPOSIT)
-        this.market.cumulativeUniqueDepositors += INT_ONE;
-      if (transactionType == TransactionType.BORROW)
-        this.market.cumulativeUniqueBorrowers += INT_ONE;
-      if (transactionType == TransactionType.LIQUIDATOR)
-        this.market.cumulativeUniqueLiquidators += INT_ONE;
-      if (transactionType == TransactionType.LIQUIDATEE)
-        this.market.cumulativeUniqueLiquidatees += INT_ONE;
-      if (transactionType == TransactionType.TRANSFER)
-        this.market.cumulativeUniqueTransferrers += INT_ONE;
-      if (transactionType == TransactionType.FLASHLOAN)
-        this.market.cumulativeUniqueFlashloaners += INT_ONE;
+      this.protocol.cumulativeUniqueDepositors += activityCounter(
+        account,
+        transactionType,
+        true,
+        0
+      );
     }
-    if (!activeAccountTransaction) {
-      activeAccountTransaction = new _ActiveAccount(activeAccountTransactionID);
-      activeAccountTransaction.save();
-      if (transactionType == TransactionType.DEPOSIT)
-        this.protocol.cumulativeUniqueDepositors += INT_ONE;
-      if (transactionType == TransactionType.BORROW)
-        this.protocol.cumulativeUniqueBorrowers += INT_ONE;
-      if (transactionType == TransactionType.LIQUIDATOR)
-        this.protocol.cumulativeUniqueLiquidators += INT_ONE;
-      if (transactionType == TransactionType.LIQUIDATEE)
-        this.protocol.cumulativeUniqueLiquidatees += INT_ONE;
+    if (transactionType == TransactionType.BORROW) {
+      this.market.cumulativeUniqueBorrowers += activityCounter(
+        account,
+        transactionType,
+        true,
+        0,
+        this.market.id
+      );
+      this.protocol.cumulativeUniqueBorrowers += activityCounter(
+        account,
+        transactionType,
+        true,
+        0
+      );
     }
+    if (transactionType == TransactionType.LIQUIDATOR) {
+      this.market.cumulativeUniqueLiquidators += activityCounter(
+        account,
+        transactionType,
+        true,
+        0,
+        this.market.id
+      );
+      this.protocol.cumulativeUniqueLiquidators += activityCounter(
+        account,
+        transactionType,
+        true,
+        0
+      );
+    }
+    if (transactionType == TransactionType.LIQUIDATEE) {
+      this.market.cumulativeUniqueLiquidatees += activityCounter(
+        account,
+        transactionType,
+        true,
+        0,
+        this.market.id
+      );
+      this.protocol.cumulativeUniqueLiquidatees += activityCounter(
+        account,
+        transactionType,
+        true,
+        0
+      );
+    }
+    if (transactionType == TransactionType.TRANSFER)
+      this.market.cumulativeUniqueTransferrers += activityCounter(
+        account,
+        transactionType,
+        true,
+        0,
+        this.market.id
+      );
+    if (transactionType == TransactionType.FLASHLOAN)
+      this.market.cumulativeUniqueFlashloaners += activityCounter(
+        account,
+        transactionType,
+        true,
+        0,
+        this.market.id
+      );
 
     this.protocol.save();
     this.market.save();

@@ -6,7 +6,6 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
-  _ActiveAccount,
   FinancialsDailySnapshot,
   InterestRate,
   LendingProtocol,
@@ -18,7 +17,7 @@ import {
   UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
 import {
-  AccountActivity,
+  activityCounter,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ONE,
@@ -340,92 +339,100 @@ export class SnapshotManager {
   ////////////////////
 
   updateUsageData(transactionType: string, account: Bytes): void {
-    const dailyActiveAccountID = AccountActivity.DAILY.concat("-")
-      .concat(account.toHexString())
-      .concat("-")
-      .concat(this.marketDailySnapshot.days.toString());
-    const dailyActiveAccountMarketID = dailyActiveAccountID
-      .concat("-")
-      .concat(this.market.id.toHexString());
-    const hourlyActiveAccountID = AccountActivity.HOURLY.concat("-")
-      .concat(account.toHexString())
-      .concat("-")
-      .concat(this.marketHourlySnapshot.hours.toString());
-    const activeAccountTransactionID = transactionType
-      .concat("-")
-      .concat(account.toHexString());
-    const dailyActiveAccountTransactionID = dailyActiveAccountID
-      .concat("-")
-      .concat(this.marketDailySnapshot.days.toString());
-    const activeAccountTransactionMarketID = activeAccountTransactionID
-      .concat("-")
-      .concat(this.market.id.toHexString());
-    const dailyActiveAccountTransactionMarketID = AccountActivity.DAILY.concat(
-      "-"
-    ).concat(activeAccountTransactionMarketID);
-    let dailyActiveAccount = _ActiveAccount.load(dailyActiveAccountID); // usage daily
-    let dailyActiveAccountMarket = _ActiveAccount.load(
-      dailyActiveAccountMarketID
-    ); // market daily
-    let hourlyActiveAccount = _ActiveAccount.load(hourlyActiveAccountID); // usage hourly
-    let dailyActiveAccountTransaction = _ActiveAccount.load(
-      dailyActiveAccountTransactionID
-    ); // usage daily
-
-    let dailyActiveAccountTransactionMarket = _ActiveAccount.load(
-      dailyActiveAccountTransactionMarketID
-    ); // market daily
-
-    if (!dailyActiveAccount && transactionType != TransactionType.LIQUIDATEE) {
-      dailyActiveAccount = new _ActiveAccount(dailyActiveAccountID);
-      dailyActiveAccount.save();
-      this.usageDailySnapshot.dailyActiveUsers += INT_ONE;
-    }
-    if (
-      !dailyActiveAccountMarket &&
-      transactionType != TransactionType.LIQUIDATEE
-    ) {
-      dailyActiveAccountMarket = new _ActiveAccount(dailyActiveAccountMarketID);
-      dailyActiveAccountMarket.save();
-      this.marketDailySnapshot.dailyActiveUsers += INT_ONE;
-    }
-    if (!hourlyActiveAccount && transactionType != TransactionType.LIQUIDATEE) {
-      hourlyActiveAccount = new _ActiveAccount(hourlyActiveAccountID);
-      hourlyActiveAccount.save();
-      this.usageHourlySnapshot.hourlyActiveUsers += INT_ONE;
-    }
-    if (!dailyActiveAccountTransaction) {
-      dailyActiveAccountTransaction = new _ActiveAccount(
-        dailyActiveAccountTransactionID
+    this.usageDailySnapshot.dailyActiveUsers += activityCounter(
+      account,
+      transactionType,
+      false,
+      this.marketDailySnapshot.days
+    );
+    this.marketDailySnapshot.dailyActiveUsers += activityCounter(
+      account,
+      transactionType,
+      false,
+      this.marketDailySnapshot.days,
+      this.market.id
+    );
+    this.usageHourlySnapshot.hourlyActiveUsers += activityCounter(
+      account,
+      transactionType,
+      false,
+      this.marketHourlySnapshot.hours
+    );
+    if (transactionType == TransactionType.DEPOSIT) {
+      this.usageDailySnapshot.dailyActiveDepositors += activityCounter(
+        account,
+        transactionType,
+        true,
+        this.marketDailySnapshot.days
       );
-      dailyActiveAccountTransaction.save();
-      if (transactionType == TransactionType.DEPOSIT)
-        this.usageDailySnapshot.dailyActiveDepositors += INT_ONE;
-      if (transactionType == TransactionType.BORROW)
-        this.usageDailySnapshot.dailyActiveBorrowers += INT_ONE;
-      if (transactionType == TransactionType.LIQUIDATOR)
-        this.usageDailySnapshot.dailyActiveLiquidators += INT_ONE;
-      if (transactionType == TransactionType.LIQUIDATEE)
-        this.usageDailySnapshot.dailyActiveLiquidatees += INT_ONE;
-    }
-    if (!dailyActiveAccountTransactionMarket) {
-      dailyActiveAccountTransactionMarket = new _ActiveAccount(
-        dailyActiveAccountTransactionMarketID
+      this.marketDailySnapshot.dailyActiveDepositors += activityCounter(
+        account,
+        transactionType,
+        true,
+        this.marketDailySnapshot.days,
+        this.market.id
       );
-      dailyActiveAccountTransactionMarket.save();
-      if (transactionType == TransactionType.DEPOSIT)
-        this.marketDailySnapshot.dailyActiveDepositors += INT_ONE;
-      if (transactionType == TransactionType.BORROW)
-        this.marketDailySnapshot.dailyActiveBorrowers += INT_ONE;
-      if (transactionType == TransactionType.LIQUIDATOR)
-        this.marketDailySnapshot.dailyActiveLiquidators += INT_ONE;
-      if (transactionType == TransactionType.LIQUIDATEE)
-        this.marketDailySnapshot.dailyActiveLiquidatees += INT_ONE;
-      if (transactionType == TransactionType.TRANSFER)
-        this.marketDailySnapshot.dailyActiveTransferrers += INT_ONE;
-      if (transactionType == TransactionType.FLASHLOAN)
-        this.marketDailySnapshot.dailyActiveFlashloaners += INT_ONE;
     }
+    if (transactionType == TransactionType.BORROW) {
+      this.usageDailySnapshot.dailyActiveBorrowers += activityCounter(
+        account,
+        transactionType,
+        true,
+        this.marketDailySnapshot.days
+      );
+      this.marketDailySnapshot.dailyActiveBorrowers += activityCounter(
+        account,
+        transactionType,
+        true,
+        this.marketDailySnapshot.days
+      );
+    }
+    if (transactionType == TransactionType.LIQUIDATOR) {
+      this.usageDailySnapshot.dailyActiveLiquidators += activityCounter(
+        account,
+        transactionType,
+        true,
+        this.marketDailySnapshot.days
+      );
+      this.marketDailySnapshot.dailyActiveLiquidators += activityCounter(
+        account,
+        transactionType,
+        true,
+        this.marketDailySnapshot.days,
+        this.market.id
+      );
+    }
+    if (transactionType == TransactionType.LIQUIDATEE) {
+      this.usageDailySnapshot.dailyActiveLiquidatees += activityCounter(
+        account,
+        transactionType,
+        true,
+        this.marketDailySnapshot.days
+      );
+      this.marketDailySnapshot.dailyActiveLiquidatees += activityCounter(
+        account,
+        transactionType,
+        true,
+        this.marketDailySnapshot.days,
+        this.market.id
+      );
+    }
+    if (transactionType == TransactionType.TRANSFER)
+      this.marketDailySnapshot.dailyActiveTransferrers += activityCounter(
+        account,
+        transactionType,
+        true,
+        this.marketDailySnapshot.days,
+        this.market.id
+      );
+    if (transactionType == TransactionType.FLASHLOAN)
+      this.marketDailySnapshot.dailyActiveFlashloaners += activityCounter(
+        account,
+        transactionType,
+        true,
+        this.marketDailySnapshot.days,
+        this.market.id
+      );
 
     this.createOrUpdateUsageDailySnapshot();
     this.createOrUpdateUsageHourlySnapshot();
