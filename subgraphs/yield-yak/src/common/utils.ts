@@ -1,4 +1,4 @@
-import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/schema";
 import { YakERC20 } from "../../generated/YakStrategyV2/YakERC20";
 import { ZERO_BIGDECIMAL } from "../helpers/constants";
@@ -50,4 +50,12 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
   const tokenValue = readValue<i32>(token.try_decimals(), constants.ZERO_INT);
 
   return BigInt.fromI32(tokenValue);
+}
+
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let bigDecimal = BigDecimal.fromString("1");
+  for (let i = 0; i < decimals; i++) {
+    bigDecimal = bigDecimal.times(BigDecimal.fromString("10"));
+  }
+  return bigDecimal;
 }

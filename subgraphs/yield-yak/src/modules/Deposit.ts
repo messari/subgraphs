@@ -21,6 +21,7 @@ import {
 } from "../common/calculators";
 import { getUsdPrice, getUsdPricePerToken } from "../Prices";
 import { getPriceOfOutputTokens } from "./Price";
+import { exponentToBigDecimal } from "../common/utils";
 
 export function _Deposit(
   contractAddress: Address,
@@ -32,6 +33,13 @@ export function _Deposit(
   const vaultAddress = Address.fromString(vault.id);
   const strategyContract = YakStrategyV2.bind(contractAddress);
 
+  let inputToken = Token.load(vault.inputToken);
+  let inputTokenAddress = Address.fromString(vault.inputToken);
+  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenDecimals = BIGINT_TEN.pow(
+    inputToken!.decimals as u8
+  ).toBigDecimal();
+
   if (strategyContract.try_totalSupply().reverted) {
     vault.outputTokenSupply = ZERO_BIGINT;
   } else {
@@ -41,10 +49,18 @@ export function _Deposit(
   if (strategyContract.try_totalDeposits().reverted) {
     vault.inputTokenBalance = ZERO_BIGINT;
   } else {
-    vault.inputTokenBalance = strategyContract.totalDeposits();
+    vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
+    // vault.inputTokenBalance = strategyContract.totalDeposits();
     if (strategyContract.try_depositToken().reverted) {
       vault.totalValueLockedUSD = ZERO_BIGDECIMAL;
     }
+
+    vault.totalValueLockedUSD = inputTokenPrice.usdPrice.times(
+      vault.inputTokenBalance
+        .toBigDecimal()
+        .div(exponentToBigDecimal(inputToken!.decimals))
+        .div(inputTokenPrice.decimalsBaseTen)
+    );
     // else {
     //   vault.totalValueLockedUSD = getUsdPrice(strategyContract.depositToken(), ZERO_BIGDECIMAL).times(convertBigIntToBigDecimal(strategyContract.totalDeposits(), 18));
     // }
@@ -61,26 +77,11 @@ export function _Deposit(
     );
   }
 
-  let inputToken = Token.load(vault.inputToken);
-  let inputTokenAddress = Address.fromString(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = BIGINT_TEN.pow(
-    inputToken!.decimals as u8
-  ).toBigDecimal();
-
-  vault.totalValueLockedUSD = vault.inputTokenBalance
-    .toBigDecimal()
-    .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
-
   let depositAmountUSD = depositAmount
     .toBigDecimal()
     .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
-
-  vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
