@@ -56,6 +56,7 @@ import {
   updateRevenues,
   updateUsageMetrics,
 } from "../common/helpers";
+import { updateInterestRates } from "../entities/market";
 
 export function handleCreditLineMigrated(event: CreditLineMigrated): void {
   const market = getOrCreateMarket(event.address.toHexString(), event);
@@ -457,6 +458,7 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     event.params.interestAmount.divDecimal(USDC_DECIMALS);
   const principleAmountUSD =
     event.params.principalAmount.divDecimal(USDC_DECIMALS);
+  const reserveAmount = event.params.reserveAmount.divDecimal(USDC_DECIMALS);
   const payer = event.params.payer.toHexString();
   const tx = event.transaction.hash.toHexString();
 
@@ -485,71 +487,12 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   }
   protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
 
-  let updateInterestRates = true;
-  if (!market._interestTimestamp) {
-    log.warning(
-      "[handlePaymentApplied]market._interestTimestamp for market {} not set for tx {}",
-      [marketID, tx]
-    );
-    market._interestTimestamp = event.block.timestamp;
-    market.save();
-    updateInterestRates = false;
-  }
-
-  if (updateInterestRates) {
-    // scale interest rate to APR
-    // since interest is not compounding, apply a linear scaler based on time
-    const InterestRateScaler = BigInt.fromI32(SECONDS_PER_YEAR).divDecimal(
-      event.block.timestamp.minus(market._interestTimestamp!).toBigDecimal()
-    );
-    // even though rates are supposed to be "STABLE", but there may be late payment, writedown
-    // the actual rate may not be stable
-    const borrowerInterestRateID = `${marketID}-${InterestRateSide.BORROWER}-${InterestRateType.STABLE}`;
-    const borrowerInterestRate = new InterestRate(borrowerInterestRateID);
-    if (market.totalBorrowBalanceUSD.gt(BIGDECIMAL_ZERO)) {
-      borrowerInterestRate.side = InterestRateSide.BORROWER;
-      borrowerInterestRate.type = InterestRateType.STABLE;
-      borrowerInterestRate.rate = interestAmountUSD
-        .div(market.totalBorrowBalanceUSD)
-        .times(InterestRateScaler)
-        .times(BIGDECIMAL_HUNDRED);
-      borrowerInterestRate.save();
-    } else {
-      log.warning(
-        "[handlePaymentApplied]market.totalBorrowBalanceUSD={} for market {} at tx {}, skip updating borrower rates",
-        [
-          market.totalBorrowBalanceUSD.toString(),
-          marketID,
-          event.transaction.hash.toHexString(),
-        ]
-      );
-    }
-
-    // senior and junior rates are different, this is an average of them
-    const lenderInterestRateID = `${marketID}-${InterestRateSide.LENDER}-${InterestRateType.STABLE}`;
-    const lenderInterestRate = new InterestRate(lenderInterestRateID);
-    if (market.totalDepositBalanceUSD.gt(BIGDECIMAL_ZERO)) {
-      lenderInterestRate.side = InterestRateSide.LENDER;
-      lenderInterestRate.type = InterestRateType.STABLE;
-      lenderInterestRate.rate = interestAmountUSD
-        .div(market.totalDepositBalanceUSD)
-        .times(InterestRateScaler)
-        .times(BIGDECIMAL_HUNDRED);
-      lenderInterestRate.save();
-    } else {
-      log.warning(
-        "[handlePaymentApplied]market.totalDepositBalanceUSD={} for market {} at tx {}, skip updating lender rates",
-        [
-          market.totalDepositBalanceUSD.toString(),
-          marketID,
-          event.transaction.hash.toHexString(),
-        ]
-      );
-    }
-
-    market.rates = [borrowerInterestRate.id, lenderInterestRate.id];
-    market._interestTimestamp = event.block.timestamp;
-  }
+  updateInterestRates(
+    market,
+    interestAmountUSD.plus(reserveAmount),
+    interestAmountUSD,
+    event
+  );
 
   market.save();
   protocol.save();

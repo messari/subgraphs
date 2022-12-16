@@ -54,6 +54,7 @@ import {
   updateRevenues,
   updateUsageMetrics,
 } from "../common/helpers";
+import { updateInterestRates } from "../entities/market";
 
 export function handleDepositMade(event: DepositMade): void {
   const capitalProvider = event.params.capitalProvider.toHexString();
@@ -318,6 +319,9 @@ export function handleInvestmentMadeInJunior(
   market.totalBorrowBalanceUSD =
     market.totalBorrowBalanceUSD.plus(newBorrowUSD);
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(newBorrowUSD);
+  if (!market._interestTimestamp) {
+    market._interestTimestamp = event.block.timestamp;
+  }
   market.save();
 
   snapshotMarket(market, newBorrowUSD, event, TransactionType.BORROW);
@@ -355,6 +359,9 @@ export function handleInvestmentMadeInSenior(
   market.totalBorrowBalanceUSD =
     market.totalBorrowBalanceUSD.plus(newBorrowUSD);
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(newBorrowUSD);
+  if (!market._interestTimestamp) {
+    market._interestTimestamp = event.block.timestamp;
+  }
   market.save();
 
   snapshotMarket(market, newBorrowUSD, event, TransactionType.BORROW);
@@ -402,17 +409,39 @@ export function handleInterestCollected(event: InterestCollected): void {
     outputToken.decimals
   );
   market.outputTokenPriceUSD = outputToken.lastPriceUSD!;
-  market.save();
   outputToken.save();
 
+  let updateProtocol = false;
   // depending on whether the interest is from compound or from a tranched pool
   // if it is from compound, update protocol level revenue
-  // if it is from a tranched pool, the interest revenue has been accounted there
-  let updateProtocol = false;
+  // if it is from a tranched pool, the interest revenue has been accounted there.
+  // Only update rates when interest is collected from tranched pools
+  const interestAmountUSD = event.params.amount.divDecimal(USDC_DECIMALS);
   if (event.params.payer == event.address) {
     // interest from compound sweep, new revenue not having been accounted
     updateProtocol = true;
+
+    if (!market._interestFromCompound) {
+      market._interestFromCompound = interestAmountUSD;
+    } else {
+      market._interestFromCompound =
+        market._interestFromCompound!.plus(interestAmountUSD);
+    }
+  } else {
+    const lenderInterestAmountUSD = market._interestFromCompound
+      ? market._interestFromCompound!.plus(interestAmountUSD)
+      : interestAmountUSD;
+    updateInterestRates(
+      market,
+      interestAmountUSD,
+      lenderInterestAmountUSD,
+      event
+    );
+    //reset _interestFromCompound for next interest cycle
+    market._interestFromCompound = BIGDECIMAL_ZERO;
   }
+  market.save();
+
   updateRevenues(
     protocol,
     market,

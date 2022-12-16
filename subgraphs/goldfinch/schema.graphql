@@ -666,6 +666,9 @@ type Market @entity {
   " timestamp when for interest accrual (used for interest rates calculation) "
   _interestTimestamp: BigInt
 
+  " senior pool interest received from Compound "
+  _interestFromCompound: BigDecimal
+
   " cumulative Reward Emission Amount "
   _cumulativeRewardAmount: BigInt
 
