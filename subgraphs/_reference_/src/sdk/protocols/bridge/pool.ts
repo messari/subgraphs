@@ -29,7 +29,7 @@ import {
 } from "../../util/constants";
 import { exponentToBigDecimal } from "../../util/numbers";
 import { TokenManager } from "./tokens";
-import { PoolSnapshot } from "./pool_snapshot";
+import { PoolSnapshot } from "./poolSnapshot";
 import { SDK } from ".";
 
 type onCreatePoolCallback<T> = (

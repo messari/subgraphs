@@ -1,7 +1,7 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../../../generated/schema";
 import { CrosschainToken, SupportedToken } from "../../../../generated/schema";
-import { chainIDToNetwork } from "./chain-ids";
+import { chainIDToNetwork } from "./chainIds";
 import { Bridge } from "./protocol";
 import { RewardTokenType } from "../../util/constants";
 

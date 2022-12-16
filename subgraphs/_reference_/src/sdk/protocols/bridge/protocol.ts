@@ -3,7 +3,7 @@ import { Versions } from "../../../../../../deployment/context/interface";
 import { BridgeProtocol as BridgeProtocolSchema } from "../../../../generated/schema";
 import { TokenPricer } from "../config";
 import { BridgeConfigurer } from "./config";
-import { ProtocolSnapshot } from "./protocol_snapshot";
+import { ProtocolSnapshot } from "./protocolSnapshot";
 import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
 import { TransactionType } from "./constants";
@@ -15,7 +15,7 @@ import {
   BigDecimal,
   BigInt,
 } from "@graphprotocol/graph-ts";
-import { chainIDToNetwork, networkToChainID } from "./chain-ids";
+import { chainIDToNetwork, networkToChainID } from "./chainIds";
 import { SDK } from ".";
 
 /**
