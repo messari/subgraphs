@@ -347,9 +347,9 @@ export function handleStake(event: Stake): void {
     epoch = new _Epoch(epochID.toString());
     epoch.epoch = epochID;
     epoch.save();
-    if (epoch.epoch <= 18) {
+    if (epoch.epoch <= 17) {
       processRewardEpoch6_17(epoch, epochStartBlock, event);
-    } else if (epoch.epoch <= 24) {
+    } else if (epoch.epoch <= 23) {
       processRewardEpoch18_23(epoch, epochStartBlock, event);
     }
   }

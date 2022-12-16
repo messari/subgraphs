@@ -284,10 +284,7 @@ function updateRewardEmissionsUSD(underlyingPriceUSD: BigDecimal): void {
     const mktID = protocol._marketIDs![i];
     const mkt = Market.load(mktID);
     if (!mkt || !mkt.rewardTokenEmissionsAmount || mkt.rewardTokenEmissionsAmount!.length == 0) {
-      log.info("[updateRewardEmissionsUSD]Skip upating reward emissionsUSD for market {}/{}", [
-        mktID,
-        mkt ? mkt.name! : "null",
-      ]);
+      log.info("[updateRewardEmissionsUSD]Skip upating reward emissionsUSD for market {}", [mktID]);
       continue;
     }
 
@@ -754,7 +751,7 @@ export function processRewardEpoch6_17(epoch: _Epoch, epochStartBlock: BigInt, e
 
       // eIP28 blacklist FTT market from EUL distribution
       // https://snapshot.org/#/eulerdao.eth/proposal/0x40874e40bc18ff33a9504a770d5aadfa4ea8241a64bf24a36777cb5acc3b59a7
-      if (prevEpoch.epoch >= 17 && mkt.inputToken == FTT_ADDRESS) {
+      if (epochID >= 17 && mkt.inputToken == FTT_ADDRESS) {
         mkt._stakedAmount = BIGINT_ZERO;
         mkt._weightedStakedAmount = BIGINT_ZERO;
       }
@@ -771,7 +768,7 @@ export function processRewardEpoch6_17(epoch: _Epoch, epochStartBlock: BigInt, e
 
     const EULPriceUSD = getEULPriceUSD(event);
     const rewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
-    const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
+    const totalRewardAmount = BigDecimal.fromString((EUL_DIST[epochID - START_EPOCH] * EUL_DECIMALS).toString());
     // select top 10 staked markets, calculate sqrt(weighted staked amount)
     const cutoffAmount = getCutoffValue(marketWeightedStakedAmounts, 10);
     let sumAccumulator = BIGDECIMAL_ZERO;
@@ -818,7 +815,7 @@ export function processRewardEpoch6_17(epoch: _Epoch, epochStartBlock: BigInt, e
           mkt.name!,
           mkt.rewardTokenEmissionsAmount!.toString(),
           mkt.rewardTokenEmissionsUSD!.toString(),
-          prevEpoch.id,
+          epoch.id,
         ]);
       }
 
@@ -856,7 +853,7 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
 
       // eIP28 blacklist FTT market from EUL distribution
       // https://snapshot.org/#/eulerdao.eth/proposal/0x40874e40bc18ff33a9504a770d5aadfa4ea8241a64bf24a36777cb5acc3b59a7
-      if (prevEpoch.epoch >= 17 && mkt.inputToken == FTT_ADDRESS) {
+      if (epochID >= 17 && mkt.inputToken == FTT_ADDRESS) {
         mkt._stakedAmount = BIGINT_ZERO;
         mkt._weightedStakedAmount = BIGINT_ZERO;
       }
@@ -881,7 +878,7 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
     const EULPriceUSD = getEULPriceUSD(event);
     const borrowerRewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
     const lenderRewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.DEPOSIT);
-    const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
+    const totalRewardAmount = BigDecimal.fromString((EUL_DIST[epochID - START_EPOCH] * EUL_DECIMALS).toString());
 
     // scale to daily emission amount
     const dailyScaler = BigDecimal.fromString((BLOCKS_PER_DAY / (BLOCKS_PER_EPOCH as f64)).toString());
@@ -949,7 +946,7 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
           mkt.name!,
           rewardTokenAmount.toString(),
           rewardTokenUSD.toString(),
-          prevEpoch.id,
+          epoch.id,
         ]);
       }
 
