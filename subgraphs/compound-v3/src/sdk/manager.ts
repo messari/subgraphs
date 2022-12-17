@@ -152,6 +152,8 @@ export class DataManager {
 
       // add to market list
       this.getOrAddMarketToList(marketID);
+      this.protocol.totalPoolCount += INT_ONE;
+      this.protocol.save();
     }
     this.market = _market;
     this.event = event;
@@ -873,6 +875,7 @@ export class DataManager {
       .toBigDecimal()
       .div(mantissaFactorBD)
       .times(inputTokenPriceUSD);
+    this.market.totalDepositBalanceUSD = this.market.totalValueLockedUSD;
     this.market.totalBorrowBalanceUSD = totalBorrowed.times(inputTokenPriceUSD);
     this.market.save();
 
@@ -895,6 +898,7 @@ export class DataManager {
       );
     }
     this.protocol.totalValueLockedUSD = totalValueLockedUSD;
+    this.protocol.totalDepositBalanceUSD = totalValueLockedUSD;
     this.protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
     this.protocol.save();
   }

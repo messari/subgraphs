@@ -434,9 +434,9 @@ export class SnapshotManager {
         this.market.id
       );
 
-    this.createOrUpdateUsageDailySnapshot();
-    this.createOrUpdateUsageHourlySnapshot();
-    this.createOrUpdateMarketDailySnapshot();
+    this.marketDailySnapshot.save();
+    this.usageDailySnapshot.save();
+    this.usageHourlySnapshot.save();
   }
 
   updateTransactionData(
@@ -528,11 +528,11 @@ export class SnapshotManager {
     this.usageDailySnapshot.dailyTransactionCount += INT_ONE;
     this.usageHourlySnapshot.hourlyTransactionCount += INT_ONE;
 
-    this.createOrUpdateMarketDailySnapshot();
-    this.createOrUpdateMarketHourlySnapshot();
-    this.createOrUpdateFinancials();
-    this.createOrUpdateUsageDailySnapshot();
-    this.createOrUpdateUsageHourlySnapshot();
+    this.usageDailySnapshot.save();
+    this.usageHourlySnapshot.save();
+    this.marketDailySnapshot.save();
+    this.marketHourlySnapshot.save();
+    this.financialSnapshot.save();
   }
 
   updateRevenue(
@@ -552,7 +552,7 @@ export class SnapshotManager {
       this.marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
         supplyRevenueDelta
       );
-    this.createOrUpdateMarketHourlySnapshot();
+    this.marketHourlySnapshot.save();
 
     // update market daily snapshot
     this.marketDailySnapshot.dailyTotalRevenueUSD =
@@ -565,7 +565,7 @@ export class SnapshotManager {
       this.marketDailySnapshot.dailySupplySideRevenueUSD.plus(
         supplyRevenueDelta
       );
-    this.createOrUpdateMarketDailySnapshot();
+    this.marketDailySnapshot.save();
 
     // update financials snapshot
     this.financialSnapshot.dailyTotalRevenueUSD =
@@ -576,7 +576,7 @@ export class SnapshotManager {
       );
     this.financialSnapshot.dailySupplySideRevenueUSD =
       this.financialSnapshot.dailySupplySideRevenueUSD.plus(supplyRevenueDelta);
-    this.createOrUpdateFinancials();
+    this.financialSnapshot.save();
   }
 
   addDailyActivePosition(side: string): void {
@@ -586,7 +586,7 @@ export class SnapshotManager {
     if (side == PositionSide.COLLATERAL) {
       this.marketDailySnapshot.dailyActiveLendingPositionCount += INT_ONE;
     }
-    this.createOrUpdateMarketDailySnapshot();
+    this.marketDailySnapshot.save();
   }
 
   ///////////////////
