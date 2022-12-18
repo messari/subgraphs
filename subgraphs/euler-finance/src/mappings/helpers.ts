@@ -859,12 +859,8 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
       }
 
       const stakedAmount = mkt._stakedAmount;
-      // eIP24 requires assets with a Chainlink oracle (either now or in the future) + WETH (the reference asset)
-      // https://snapshot.org/#/eulerdao.eth/proposal/0x7e65ffa930507d9116ebc83663000ade6ff93fc452f437a3e95d755ccc324f93
-      const eligible =
-        (mkt._pricingType && mkt._pricingType == PRICINGTYPE__CHAINLINK) || mkt.inputToken == WETH_ADDRESS;
       let mktWeightedStakedAmount = BIGINT_ZERO;
-      if (eligible && stakedAmount.gt(BIGINT_ZERO)) {
+      if (isMarketEligible(mkt) && stakedAmount.gt(BIGINT_ZERO)) {
         // finalized mkt._weightedStakedAmount for the epoch just ended
         // epochStartBlock.minus(BIGINT_ONE) is the end block of prev epoch
         updateWeightedStakedAmount(mkt, epochStartBlock.minus(BIGINT_ONE));
@@ -921,12 +917,9 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
       }
 
       // distribute the rewards among eligible staked markets
-      // Only for epochs after START_EPOCH (6)
       const _weightedStakedAmount = mkt._weightedStakedAmount;
-      const eligible =
-        (mkt._pricingType && mkt._pricingType == PRICINGTYPE__CHAINLINK) || mkt.inputToken == WETH_ADDRESS;
 
-      if (eligible && _weightedStakedAmount) {
+      if (isMarketEligible(mkt) && _weightedStakedAmount) {
         if (rewardTokens.length == 0) {
           rewardTokens.push(borrowerRewardToken.id);
         }
@@ -957,6 +950,16 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
       mkt.save();
     }
   }
+}
+
+function isMarketEligible(market: Market): bool {
+  // eIP24 requires assets with a Chainlink oracle (either now or in the future) + WETH (the reference asset)
+  // https://snapshot.org/#/eulerdao.eth/proposal/0x7e65ffa930507d9116ebc83663000ade6ff93fc452f437a3e95d755ccc324f93
+  const pricingType = market._pricingType;
+  if ((pricingType && pricingType == PRICINGTYPE__CHAINLINK) || market.inputToken == WETH_ADDRESS) {
+    return true;
+  }
+  return false;
 }
 
 function getEULPriceUSD(event: ethereum.Event): BigDecimal {

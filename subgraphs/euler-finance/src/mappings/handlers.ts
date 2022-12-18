@@ -29,6 +29,7 @@ import {
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
   BIGINT_SEVENTY_FIVE,
+  PRICINGTYPE__UNKNOWN,
 } from "../common/constants";
 import {
   snapshotFinancials,
@@ -285,7 +286,6 @@ export function handleMarketActivated(event: MarketActivated): void {
   if (!assetStorageResult.reverted) {
     market._pricingType = assetStorageResult.value.getPricingType();
   }
-
   market.save();
 
   const assetStatus = getOrCreateAssetStatus(underlyingToken.id);

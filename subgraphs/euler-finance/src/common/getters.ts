@@ -39,6 +39,7 @@ import {
   START_EPOCH,
   START_EPOCH_BLOCK,
   BIGINT_ONE,
+  PRICINGTYPE__UNKNOWN,
 } from "../common/constants";
 import { Versions } from "../versions";
 import { Stake } from "../../generated/EulStakes/EulStakes";
@@ -322,6 +323,10 @@ export function getOrCreateMarket(id: string): Market {
     market._dTokenExchangeRate = BIGDECIMAL_ONE;
     market._stakedAmount = BIGINT_ZERO;
     market._receivingRewards = false;
+    // Because of a bug in graph-cli in handling Int field
+    // we have to set the default value for all markets
+    // https://github.com/graphprotocol/graph-cli/issues/896
+    market._pricingType = PRICINGTYPE__UNKNOWN;
     market.save();
 
     // update protocol.totalPoolCount

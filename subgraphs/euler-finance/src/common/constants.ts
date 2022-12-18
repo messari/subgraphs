@@ -220,6 +220,7 @@ export const START_EPOCH = 6 as i32;
 export const MAX_EPOCHS = 90;
 export const START_EPOCH_BLOCK = BigInt.fromI32(14930000);
 export const BLOCKS_PER_EPOCH = 100000 as i32;
+export const PRICINGTYPE__UNKNOWN = 0;
 export const PRICINGTYPE__CHAINLINK = 4;
 export const EUL_DIST = [
   41836.14, 43231.14, 44800.97, 46564.39, 48541.27, 50752.38, 53219.03, 55962.62, 59004.03, 62362.78, 66056.03, 70097.3,
