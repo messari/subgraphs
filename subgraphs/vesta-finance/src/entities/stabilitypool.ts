@@ -1,7 +1,11 @@
 import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { VST_ADDRESS } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
-import { getOrCreateStabilityPool } from "./market";
+import {
+  getOrCreateMarketHourlySnapshot,
+  getOrCreateMarketSnapshot,
+  getOrCreateStabilityPool,
+} from "./market";
 import { getOrCreateAssetToken, getVSTTokenPrice } from "./token";
 
 export function updateStabilityPoolTVL(

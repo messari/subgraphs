@@ -20,6 +20,8 @@ dataSources:
           file: ./abis/TroveManager.json
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
@@ -191,6 +193,8 @@ dataSources:
       abis:
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
@@ -219,8 +223,12 @@ dataSources:
       apiVersion: 0.0.7
       entities: []
       abis:
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
         - name: PriceFeedV2
           file: ./abis/PriceFeedV2.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
@@ -251,6 +259,8 @@ templates:
           file: ./abis/StabilityPool.json
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes

@@ -9,7 +9,7 @@ import { IERC20Detailed } from "../../generated/TroveManager/IERC20Detailed";
 import { IERC20DetailedBytes } from "../../generated/TroveManager/IERC20DetailedBytes";
 import { RewardToken, Token } from "../../generated/schema";
 import {
-  BALANCER_POOL_CREATED_BLOCK,
+  VSTA_BALANCER_POOL_CREATED_BLOCK,
   BAL_VSTA_WETH_POOL_ADDRESS,
   BAL_WETH_WBTC_USDC_POOL_ADDRESS,
   BIGDECIMAL_ONE,
@@ -26,6 +26,9 @@ import {
   VSTA_ADDRESS,
   VST_ADDRESS,
   WETH_ADDRESS,
+  VST_BALANCER_POOL_CREATED_BLOCK,
+  BAL_VST_DAI_USDT_USDC_POOL_ADDRESS,
+  BIGINT_ZERO,
 } from "../utils/constants";
 import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
 import { PriceFeedV1 } from "../../generated/PriceFeedV1/PriceFeedV1";
@@ -176,21 +179,62 @@ export function getVSTTokenPrice(event: ethereum.Event): BigDecimal {
   );
 
   let VSTPrice = BIGDECIMAL_ONE;
-  if (lastGoodPriceResult.reverted) {
-    log.warning(
-      "[getVSTTokenPrice]Querying price for VST token with Price Feed {} failed at tx {}; Price set to 1.0",
-      [priceFeedAddress, event.transaction.hash.toString()]
-    );
+  if (
+    lastGoodPriceResult.reverted ||
+    lastGoodPriceResult.value.equals(BIGINT_ZERO)
+  ) {
+    const VSTPriceFromBalancer = getVSTTokenPriceFromBalancer(event);
+    if (!VSTPriceFromBalancer) {
+      log.warning(
+        "[getVSTTokenPrice]Querying price for VST token with Price Feed {} failed at tx {}; Price set to 1.0",
+        [priceFeedAddress, event.transaction.hash.toString()]
+      );
+    } else {
+      VSTPrice = VSTPriceFromBalancer!;
+    }
   } else {
     //convert to decimals with 18 decimals
     VSTPrice = bigIntToBigDecimal(lastGoodPriceResult.value, 18);
   }
 
+  log.info("[getVSTTokenPrice]Price Feed {} VST Price=${} at block {} tx {}", [
+    priceFeedAddress,
+    VSTPrice.toString(),
+    event.block.number.toString(),
+    event.transaction.hash.toHexString(),
+  ]);
+
   return VSTPrice;
 }
 
+export function getVSTTokenPriceFromBalancer(
+  event: ethereum.Event
+): BigDecimal | null {
+  if (event.block.number.lt(VST_BALANCER_POOL_CREATED_BLOCK)) {
+    return null;
+  }
+  const VSTAPriceInUSDC = getToken0PriceInToken1(
+    BAL_VST_DAI_USDT_USDC_POOL_ADDRESS,
+    VST_ADDRESS,
+    USDC_ADDRESS
+  );
+
+  if (!VSTAPriceInUSDC) {
+    return null;
+  }
+  const VSTPriceInUSD = VSTAPriceInUSDC.times(
+    exponentToBigDecimal(DEFAULT_DECIMALS)
+  ).div(exponentToBigDecimal(USDC_DECIMALS));
+  log.info("[getVSTTokenPriceFromBalancer]VST Price USD={} at timestamp {}", [
+    VSTPriceInUSD.toString(),
+    event.block.timestamp.toString(),
+  ]);
+
+  return VSTPriceInUSD;
+}
+
 export function getVSTATokenPrice(event: ethereum.Event): BigDecimal | null {
-  if (event.block.number.lt(BALANCER_POOL_CREATED_BLOCK)) {
+  if (event.block.number.lt(VSTA_BALANCER_POOL_CREATED_BLOCK)) {
     return null;
   }
   const VSTAPriceInWETH = getToken0PriceInToken1(

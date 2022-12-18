@@ -27,6 +27,7 @@ import {
   getCurrentAssetPrice,
   getOrCreateRewardToken,
   getVSTToken,
+  getVSTTokenPrice,
 } from "./token";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 import { EventType } from "./event";
@@ -60,6 +61,7 @@ export function getOrCreateStabilityPool(
 
   const protocol = getOrCreateLendingProtocol();
   const VSTToken = getVSTToken();
+  const VSTPriceUSD = getVSTTokenPrice(event!);
   const assetToken = getOrCreateAssetToken(asset!);
   market = new Market(poolID);
   market.protocol = protocol.id;
@@ -83,7 +85,7 @@ export function getOrCreateStabilityPool(
   market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
   market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
   market.inputTokenBalance = BIGINT_ZERO;
-  market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+  market.inputTokenPriceUSD = VSTPriceUSD;
   market.outputTokenSupply = BIGINT_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.exchangeRate = BIGDECIMAL_ZERO;

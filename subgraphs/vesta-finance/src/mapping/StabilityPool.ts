@@ -7,7 +7,11 @@ import {
   AssetGainWithdrawn,
 } from "../../generated/templates/StabilityPool/StabilityPool";
 import { createWithdraw } from "../entities/event";
-import { getOrCreateStabilityPool } from "../entities/market";
+import {
+  getOrCreateMarketHourlySnapshot,
+  getOrCreateMarketSnapshot,
+  getOrCreateStabilityPool,
+} from "../entities/market";
 import { updateSPUserPositionBalances } from "../entities/position";
 import { updateProtocoVSTLocked } from "../entities/protocol";
 import { updateStabilityPoolTVL } from "../entities/stabilitypool";
@@ -30,6 +34,10 @@ export function handleStabilityPoolAssetBalanceUpdated(
 
   updateStabilityPoolTVL(event, totalVSTAmount, totalAssetAmount, asset);
   updateProtocoVSTLocked(event);
+
+  const market = getOrCreateStabilityPool(event.address, asset, event);
+  getOrCreateMarketSnapshot(event, market);
+  getOrCreateMarketHourlySnapshot(event, market);
 }
 
 /**
@@ -47,6 +55,10 @@ export function handleStabilityPoolVSTBalanceUpdated(
 
   updateStabilityPoolTVL(event, totalVSTAmount, totalAssetAmount, asset);
   updateProtocoVSTLocked(event);
+
+  const market = getOrCreateStabilityPool(event.address, asset, event);
+  getOrCreateMarketSnapshot(event, market);
+  getOrCreateMarketHourlySnapshot(event, market);
 }
 
 /**
@@ -74,6 +86,9 @@ export function handleUserDepositChanged(event: UserDepositChanged): void {
     event.params._depositor,
     event.params._newDeposit
   );
+
+  getOrCreateMarketSnapshot(event, market);
+  getOrCreateMarketHourlySnapshot(event, market);
 }
 
 /**
@@ -109,4 +124,7 @@ export function handleAssetGainWithdrawn(event: AssetGainWithdrawn): void {
     event.params._depositor,
     event.params._depositor
   );
+
+  getOrCreateMarketSnapshot(event, market);
+  getOrCreateMarketHourlySnapshot(event, market);
 }
