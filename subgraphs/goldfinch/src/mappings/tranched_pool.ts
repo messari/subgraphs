@@ -481,12 +481,28 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     .divDecimal(USDC_DECIMALS);
 
   // lenders receive interestAmountUSD - reserveAmountUSD
-  market._borrowerInterestAmountUSD = market
-    ._borrowerInterestAmountUSD!.plus(interestAmountUSD)
-    .plus(reserveAmountUSD);
-  market._lenderInterestAmountUSD =
-    market._lenderInterestAmountUSD!.plus(interestAmountUSD);
-  market.save();
+  if (market._interestTimestamp) {
+    market._borrowerInterestAmountUSD = market
+      ._borrowerInterestAmountUSD!.plus(interestAmountUSD)
+      .plus(reserveAmountUSD);
+    market._lenderInterestAmountUSD =
+      market._lenderInterestAmountUSD!.plus(interestAmountUSD);
+    market.save();
+
+    updateInterestRates(
+      market,
+      market._borrowerInterestAmountUSD!,
+      market._lenderInterestAmountUSD!,
+      event
+    );
+  } else {
+    // for migrated tranched pools, there is no
+    // TrancheLocked or DrawdownMade event, market._interestTimestamp
+    // is not set, ignore the current interest payments and start
+    // interest rates calcuation from now to the next payment
+    market._interestTimestamp = event.block.timestamp;
+    market.save();
+  }
 
   let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
   for (let i = 0; i < protocol._marketIDs!.length; i++) {
@@ -497,14 +513,6 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     );
   }
   protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
-
-  updateInterestRates(
-    market,
-    market._borrowerInterestAmountUSD!,
-    market._lenderInterestAmountUSD!,
-    event
-  );
-
   protocol.save();
 
   updateRevenues(
