@@ -96,6 +96,14 @@ export function handleDepositMade(event: DepositMade): void {
       .toHexString();
   }
 
+  if (!market._interestTimestamp) {
+    market._interestTimestamp = event.block.timestamp;
+    log.debug(
+      "[handleDepositMade]market._interestTimestamp for market {} set to {}",
+      [marketID, event.block.timestamp.toString()]
+    );
+  }
+
   const creditLineAddress = tranchedPoolContract.creditLine();
   const creditLineContract = CreditLineContract.bind(creditLineAddress);
   if (!market._creditLine) {

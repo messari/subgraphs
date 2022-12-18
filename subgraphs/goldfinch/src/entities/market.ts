@@ -23,6 +23,18 @@ export function updateInterestRates(
     return;
   }
 
+  log.info(
+    "[updateInterestRates]market {}/{} borrowerInterestAmountUSD={},lenderInterestAmountUSD={} block {} tx {}",
+    [
+      market.id,
+      market.name!,
+      borrowerInterestAmountUSD.toString(),
+      lenderInterestAmountUSD.toString(),
+      event.block.number.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+
   const rates: string[] = [];
   // scale interest rate to APR
   // since interest is not compounding, apply a linear scaler based on time
