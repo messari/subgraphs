@@ -34,7 +34,6 @@ import {
   createWithdrawTransaction,
 } from "../common/transactions";
 import { CustomFeesType } from "../common/types";
-import { NetworkConfigs } from "../../configurations/configure";
 
 import {
   PoolAdded,
