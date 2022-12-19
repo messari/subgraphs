@@ -1,0 +1,21 @@
+{
+  "name": "osmosis",
+  "license": "MIT",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --access-token 30998ba035284995947a075bb1cfe0f8 --node https://api.staging.thegraph.com/deploy/ --ipfs https://api.staging.thegraph.com/ipfs/ this-username-is-taken/osmosis-test",
+    "create-local": "graph create --node http://localhost:8020/ harsh9200/osmosis",
+    "remove-local": "graph remove --node http://localhost:8020/ harsh9200/osmosis",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 harsh9200/osmosis"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.30.0",
+    "@graphprotocol/graph-ts": "^0.29.0"
+  },
+  "dependencies": {
+    "as-proto": "^0.2.3",
+    "babel-polyfill": "^6.26.0",
+    "babel-register": "^6.26.0"
+  }
+}
