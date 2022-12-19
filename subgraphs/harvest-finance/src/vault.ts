@@ -1,8 +1,9 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigInt, BigDecimal } from '@graphprotocol/graph-ts'
 import {
   Deposit as DepositEvent,
   Transfer as TransferEvent,
   Withdraw as WithdrawEvent,
+  SetStrategyCall,
 } from '../generated/Controller/VaultContract'
 import { Vault } from '../generated/schema'
 import { Token } from '../generated/schema'
@@ -204,4 +205,25 @@ export function handleTransfer(event: TransferEvent): void {
   if (to == Address.zero()) {
     handleBurn(event)
   }
+}
+
+export function handleSetStrategy(call: SetStrategyCall): void {
+  const migrated = vaults.checkIfMigrated(call.inputs._strategy)
+
+  if (!migrated) return
+
+  const vault = Vault.load(call.to.toHexString())
+
+  if (!vault) return
+
+  vault.totalValueLockedUSD = BigDecimal.fromString('0')
+  vault.inputTokenBalance = BigInt.fromI32(0)
+  vault.pricePerShare = BigDecimal.fromString('0')
+  vault.migrated = true
+  vault.save()
+
+  protocols.updateTotalValueLockedUSD(vault.protocol)
+
+  metrics.updateFinancials(call.block)
+  metrics.updateVaultSnapshots(call.to, call.block)
 }

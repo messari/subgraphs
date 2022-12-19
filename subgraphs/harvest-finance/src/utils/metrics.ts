@@ -103,7 +103,6 @@ export namespace metrics {
       account = new Account(id)
       account.save()
 
-      //Review
       const protocol = YieldAggregator.load(constants.PROTOCOL_ID.toHexString())
       if (protocol) {
         protocol.cumulativeUniqueUsers += 1

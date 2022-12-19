@@ -9,7 +9,6 @@ import * as yearnLens from './yearnLens'
 import * as potPool from './potPool'
 import * as megaFactory from './megaFactory'
 import * as controller from './controller'
-import * as strategy from './strategy'
 
 export {
   vault,
@@ -23,5 +22,4 @@ export {
   potPool,
   megaFactory,
   controller,
-  strategy,
 }

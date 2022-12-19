@@ -427,6 +427,10 @@ type Vault @entity {
 
   " All withdrawals made from this vault "
   withdraws: [Withdraw!]! @derivedFrom(field: "vault")
+
+  ##### Aux #####
+  " Whether this vault has been migrated to a new contract "
+  migrated: Boolean!
 }
 
 #################################
@@ -676,13 +680,4 @@ type Account @entity {
 type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
-}
-
-# Helper entity for tracking strategies associated to a vault
-type _Strategy @entity {
-  " Smart contract address of the strategy"
-  id: ID!
-
-  " The vault this strategy belongs to "
-  vault: Vault
 }

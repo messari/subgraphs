@@ -101,6 +101,7 @@ export namespace vaults {
     vault.cumulativeSupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO
     vault.cumulativeProtocolSideRevenueUSD = constants.BIG_DECIMAL_ZERO
     vault.cumulativeTotalRevenueUSD = constants.BIG_DECIMAL_ZERO
+    vault.migrated = false
 
     return vault
   }
@@ -211,5 +212,11 @@ export namespace vaults {
       )
 
     vault.save()
+  }
+
+  export function checkIfMigrated(strategyAddress: Address): bool {
+    return constants.MIGRATION_STRATEGIES.includes(
+      strategyAddress.toHexString()
+    )
   }
 }

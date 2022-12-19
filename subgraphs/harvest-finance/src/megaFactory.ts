@@ -5,7 +5,6 @@ import { rewardTokens } from './utils/rewardTokens'
 import { constants } from './utils/constants'
 import { log } from '@graphprotocol/graph-ts'
 import { vaults } from './utils/vaults'
-import { strategies } from './utils/strategies'
 import { Vault } from '../generated/schema'
 import { PotPool as PotPoolTemplate } from '../generated/templates'
 
@@ -37,11 +36,6 @@ export function handleDeploymentCompleted(event: DeploymentCompleted): void {
   const blockNumber = event.block.number
 
   vaults.createVault(vaultAddress, timestamp, blockNumber)
-
-  const strategyAddress = completedDeployment.value.getNewStrategy()
-  let strategy = strategies.getOrCreateStrategy(strategyAddress)
-  strategy.vault = vaultAddress.toHexString()
-  strategy.save()
 
   // PotPoolContract
   const poolAddress = completedDeployment.value.getNewPool()

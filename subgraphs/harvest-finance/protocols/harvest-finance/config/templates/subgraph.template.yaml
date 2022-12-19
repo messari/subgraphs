@@ -179,36 +179,10 @@ templates:
           handler: handleWithdraw
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+      callHandlers:
+        - function: setStrategy(address)
+          handler: handleSetStrategy
       file: ./src/vault.ts
-
-  - kind: ethereum/contract
-    name: Strategy
-    network: {{ network }}
-    source:
-      abi: Strategy
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - _Strategy
-      abis:
-        - name: Strategy
-          file: ./abis/Strategy.json
-        - name: ERC20Contract
-          file: ./abis/ERC20.json
-        - name: ChainLinkContract
-          file: ./abis/ChainLink.json
-        - name: YearnLensContract
-          file: ./abis/YearnLens.json
-        - name: UniswapRouterContract
-          file: ./abis/UniswapRouter.json
-        - name: UniswapPairContract
-          file: ./abis/UniswapV2Pair.json
-      eventHandlers:
-        - event: ProfitLogInReward(uint256,uint256,uint256)
-          handler: handleProfitLogInReward
-      file: ./src/strategy.ts
 
   - kind: ethereum/contract
     name: PotPool

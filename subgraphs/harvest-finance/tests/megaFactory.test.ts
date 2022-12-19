@@ -1,7 +1,7 @@
 import { Address } from '@graphprotocol/graph-ts'
 import { assert, describe, test, afterEach, clearStore } from 'matchstick-as'
 import { helpers } from './helpers'
-import { RewardToken, _Strategy } from '../generated/schema'
+import { RewardToken } from '../generated/schema'
 import { handleDeploymentCompleted } from '../src/megaFactory'
 import { createVaultAndProtocol } from './helpers/mocking/vault'
 
@@ -80,17 +80,6 @@ describe('MegaFactory', () => {
         vault.id,
         'rewardTokens',
         helpers.toStringArray([tokenAddress.toHexString()])
-      )
-
-      //Assert strategy entity created
-      assert.assertNotNull(_Strategy.load(strategyAddress.toHexString()))
-
-      //Assert strategy has vault
-      assert.fieldEquals(
-        '_Strategy',
-        strategyAddress.toHexString(),
-        'vault',
-        vault.id
       )
     })
   })

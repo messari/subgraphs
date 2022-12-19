@@ -27,7 +27,6 @@ const strategyAddress = Address.fromString(
 const inputTokenAddress = Address.fromString(
   '0x0000000000000000000000000000000000000004'
 )
-import { _Strategy } from '../generated/schema'
 
 describe('Controller', () => {
   afterEach(() => {
@@ -135,18 +134,6 @@ describe('Controller', () => {
         symbol: 'fUSDC',
         decimals: BigInt.fromI32(6),
       })
-
-      // Strategy Assertions
-      //Assert strategy entity created
-      assert.assertNotNull(_Strategy.load(strategyAddress.toHexString()))
-
-      //Assert strategy has vault
-      assert.fieldEquals(
-        '_Strategy',
-        strategyAddress.toHexString(),
-        'vault',
-        vaultAddress.toHexString()
-      )
     })
   })
 
