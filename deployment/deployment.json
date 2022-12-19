@@ -1808,7 +1808,7 @@
         "status": "dev",
         "versions": {
           "schema": "3.0.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
