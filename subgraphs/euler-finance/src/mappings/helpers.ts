@@ -751,7 +751,7 @@ export function processRewardEpoch6_17(epoch: _Epoch, epochStartBlock: BigInt, e
 
       // eIP28 blacklist FTT market from EUL distribution
       // https://snapshot.org/#/eulerdao.eth/proposal/0x40874e40bc18ff33a9504a770d5aadfa4ea8241a64bf24a36777cb5acc3b59a7
-      if (epochID >= 17 && mkt.inputToken == FTT_ADDRESS) {
+      if (epochID >= 16 && mkt.inputToken == FTT_ADDRESS) {
         mkt._stakedAmount = BIGINT_ZERO;
         mkt._weightedStakedAmount = BIGINT_ZERO;
       }
@@ -853,7 +853,7 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
 
       // eIP28 blacklist FTT market from EUL distribution
       // https://snapshot.org/#/eulerdao.eth/proposal/0x40874e40bc18ff33a9504a770d5aadfa4ea8241a64bf24a36777cb5acc3b59a7
-      if (epochID >= 17 && mkt.inputToken == FTT_ADDRESS) {
+      if (epochID >= 16 && mkt.inputToken == FTT_ADDRESS) {
         mkt._stakedAmount = BIGINT_ZERO;
         mkt._weightedStakedAmount = BIGINT_ZERO;
       }
