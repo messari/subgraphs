@@ -42,7 +42,7 @@ export function getTokenPrice(token: Token, blockNumber: BigInt): BigDecimal {
   //In order to improve the performance, only call smart contract to get latest price once per hour.
   if (
     token.lastPriceBlockNumber !== null &&
-    token.lastPriceBlockNumber != BIGINT_ZERO &&
+    token.lastPriceBlockNumber! != BIGINT_ZERO &&
     token.lastPriceBlockNumber!.plus(BLOCKS_PER_HOUR_BSC).gt(blockNumber)
   ) {
     return token.lastPriceUSD!;
