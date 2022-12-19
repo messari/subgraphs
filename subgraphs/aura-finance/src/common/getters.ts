@@ -25,6 +25,7 @@ import { readValue } from "./utils/ethereum";
 import { bigIntToBigDecimal } from "./utils/numbers";
 import { CustomFeesType, PoolInfoType } from "./types";
 import { getPoolTokensInfo, isBPT, getPoolTokenWeights } from "./pools";
+import { Versions } from "../versions";
 
 import {
   Token,
@@ -40,10 +41,9 @@ import {
   _RewardPool,
 } from "../../generated/schema";
 import { RewardPool as RewardPoolTemplate } from "../../generated/templates";
-import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
-import { Booster } from "../../generated/Booster/Booster";
-import { StablePool } from "../../generated/Booster/StablePool";
-import { Versions } from "../versions";
+import { BaseRewardPool } from "../../generated/Booster-v1/BaseRewardPool";
+import { Booster } from "../../generated/Booster-v1/Booster";
+import { StablePool } from "../../generated/Booster-v1/StablePool";
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
   const protocolId = NetworkConfigs.getFactoryAddress();
@@ -337,10 +337,8 @@ export function getOrCreateFeeType(
   return fees;
 }
 
-export function getFees(): CustomFeesType {
-  const boosterContract = Booster.bind(
-    Address.fromString(NetworkConfigs.getFactoryAddress())
-  );
+export function getFees(boosterAddr: Address): CustomFeesType {
+  const boosterContract = Booster.bind(boosterAddr);
 
   const lockIncentive = readValue<BigInt>(
     boosterContract.try_lockIncentive(),
@@ -368,10 +366,12 @@ export function getFees(): CustomFeesType {
 }
 
 export function getOrCreateVault(
+  boosterAddr: Address,
   poolId: BigInt,
   event: ethereum.Event
 ): VaultStore | null {
-  const vaultId = NetworkConfigs.getFactoryAddress()
+  const vaultId = boosterAddr
+    .toHexString()
     .concat("-")
     .concat(poolId.toString());
   let vault = VaultStore.load(vaultId);
@@ -379,9 +379,7 @@ export function getOrCreateVault(
   if (!vault) {
     vault = new VaultStore(vaultId);
 
-    const boosterContract = Booster.bind(
-      Address.fromString(NetworkConfigs.getFactoryAddress())
-    );
+    const boosterContract = Booster.bind(boosterAddr);
 
     const poolInfoCall = boosterContract.try_poolInfo(poolId);
     if (poolInfoCall.reverted) {
@@ -424,13 +422,13 @@ export function getOrCreateVault(
 
     const performanceFeeId = prefixID(
       VaultFeeType.PERFORMANCE_FEE,
-      NetworkConfigs.getFactoryAddress()
+      boosterAddr.toHexString()
     );
 
     getOrCreateFeeType(
       performanceFeeId,
       VaultFeeType.PERFORMANCE_FEE,
-      getFees().totalFees().times(BIGDECIMAL_HUNDRED)
+      getFees(boosterAddr).totalFees().times(BIGDECIMAL_HUNDRED)
     );
 
     vault.fees = [performanceFeeId];

@@ -4,10 +4,10 @@ import { CustomPriceType } from "../common/types";
 import {
   UniswapPair as UniswapPairContract,
   UniswapPair__getReservesResult,
-} from "../../../generated/Booster/UniswapPair";
+} from "../../../generated/Booster-v1/UniswapPair";
 
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { UniswapRouter as UniswapRouterContract } from "../../../generated/Booster/UniswapRouter";
+import { UniswapRouter as UniswapRouterContract } from "../../../generated/Booster-v1/UniswapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
   if (

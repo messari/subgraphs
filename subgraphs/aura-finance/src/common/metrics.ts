@@ -28,7 +28,7 @@ import {
   Account,
   Vault as VaultStore,
 } from "../../generated/schema";
-import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
+import { BaseRewardPool } from "../../generated/Booster-v1/BaseRewardPool";
 
 export function updateProtocolTotalValueLockedUSD(): void {
   const protocol = getOrCreateYieldAggregator();
@@ -140,18 +140,15 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 export function updateVaultSnapshots(
+  boosterAddr: Address,
   poolId: BigInt,
   event: ethereum.Event
 ): void {
-  const vaultId = NetworkConfigs.getFactoryAddress()
-    .concat("-")
-    .concat(poolId.toString());
-
-  const vault = getOrCreateVault(poolId, event);
+  const vault = getOrCreateVault(boosterAddr, poolId, event);
   if (!vault) return;
 
-  const vaultDailySnapshots = getOrCreateVaultDailySnapshots(vaultId, event);
-  const vaultHourlySnapshots = getOrCreateVaultHourlySnapshots(vaultId, event);
+  const vaultDailySnapshots = getOrCreateVaultDailySnapshots(vault.id, event);
+  const vaultHourlySnapshots = getOrCreateVaultHourlySnapshots(vault.id, event);
 
   vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
@@ -202,6 +199,7 @@ export function updateVaultSnapshots(
 }
 
 export function updateRevenue(
+  boosterAddr: Address,
   poolId: BigInt,
   totalRevenueUSD: BigDecimal,
   totalFees: BigDecimal,
@@ -213,7 +211,7 @@ export function updateRevenue(
   );
 
   const protocol = getOrCreateYieldAggregator();
-  const vault = getOrCreateVault(poolId, event);
+  const vault = getOrCreateVault(boosterAddr, poolId, event);
   if (!vault) return;
 
   const financialMetrics = getOrCreateFinancialDailySnapshots(event);
@@ -279,6 +277,7 @@ export function updateRevenue(
 }
 
 export function updateRewards(
+  boosterAddr: Address,
   poolId: BigInt,
   poolRewardsAddress: Address,
   event: ethereum.Event
@@ -300,7 +299,7 @@ export function updateRewards(
     RewardIntervalType.TIMESTAMP
   );
 
-  const vault = getOrCreateVault(poolId, event);
+  const vault = getOrCreateVault(boosterAddr, poolId, event);
   if (!vault) return;
 
   const rewardToken = getOrCreateToken(rewardTokenAddr, event.block.number);
