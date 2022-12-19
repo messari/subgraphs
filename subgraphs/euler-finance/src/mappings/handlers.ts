@@ -29,7 +29,6 @@ import {
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
   BIGINT_SEVENTY_FIVE,
-  PRICINGTYPE__UNKNOWN,
 } from "../common/constants";
 import {
   snapshotFinancials,
