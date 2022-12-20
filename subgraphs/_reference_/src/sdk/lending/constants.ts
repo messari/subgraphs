@@ -1,4 +1,5 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { _ActiveAccount } from "../../generated/schema";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -223,15 +224,50 @@ export function insert<Type>(
   index: i32,
   value: Type
 ): Array<Type> {
-  const result = new Array<Type>(arr.length + 1);
+  const result: Type[] = [];
   for (let i = 0; i < index; i++) {
-    result[i] = arr[i];
+    result.push(arr[i]);
   }
-  result[index] = value;
+  result.push(value);
   for (let i = index; i < arr.length; i++) {
-    result[i + 1] = arr[i];
+    result.push(arr[i]);
   }
   return result;
+}
+
+// returns the increment to update the usage activity by
+// 1 for a new account in the specified period, otherwise 0
+export function activityCounter(
+  account: Bytes,
+  transactionType: string,
+  useTransactionType: boolean,
+  intervalID: i32, // 0 = no intervalID
+  marketID: Bytes | null = null
+): i32 {
+  let activityID = account
+    .toHexString()
+    .concat("-")
+    .concat(intervalID.toString());
+  if (marketID) {
+    activityID = activityID.concat("-").concat(marketID.toHexString());
+  }
+  if (useTransactionType) {
+    activityID = activityID.concat("-").concat(transactionType);
+  }
+  let activeAccount = _ActiveAccount.load(activityID);
+  if (!activeAccount) {
+    // if account / market only + transactionType is LIQUIDATEE
+    // then do not count that account as it did not spend gas to use the protocol
+    if (!useTransactionType && transactionType == TransactionType.LIQUIDATEE) {
+      return INT_ZERO;
+    }
+
+    activeAccount = new _ActiveAccount(activityID);
+    activeAccount.save();
+    return INT_ONE;
+  }
+
+  return INT_ZERO;
 }
 
 /////////////////////////////
