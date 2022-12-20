@@ -904,7 +904,7 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
         rewardTokenAmount[0] = BigDecimalTruncateToBigInt(
           BigDecimal.fromString("8000").times(EUL_DECIMALS_BD).times(dailyScaler),
         );
-        rewardTokenUSD[0] = rewardTokenAmount[1].divDecimal(EUL_DECIMALS_BD).times(EULPriceUSD);
+        rewardTokenUSD[0] = rewardTokenAmount[0].divDecimal(EUL_DECIMALS_BD).times(EULPriceUSD);
       }
 
       // eIP24: 5000 EUL lender staking rewards each for USDC, USDT, WETH
@@ -918,7 +918,6 @@ export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, 
 
       // distribute the rewards among eligible staked markets
       const _weightedStakedAmount = mkt._weightedStakedAmount;
-
       if (isMarketEligible(mkt) && _weightedStakedAmount) {
         if (rewardTokens.length == 0) {
           rewardTokens.push(borrowerRewardToken.id);
