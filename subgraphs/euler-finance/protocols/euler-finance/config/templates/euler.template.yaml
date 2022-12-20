@@ -57,6 +57,8 @@ dataSources:
           handler: handleGovConvertReserves
         - event: GovSetReserveFee(indexed address,uint32)
           handler: handleGovSetReserveFee
+        - event: GovSetPricingConfig(indexed address,uint16,uint32)
+          handler: handleGovSetPricingConfig
         - event: Liquidation(indexed address,indexed address,indexed address,address,uint256,uint256,uint256,uint256,uint256)
           handler: handleLiquidation
         - event: MarketActivated(indexed address,indexed address,indexed address)

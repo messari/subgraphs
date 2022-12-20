@@ -6,11 +6,13 @@ import IssuesDisplay from "../IssuesDisplay";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import PoolTabEntity from "./PoolTabEntity";
+import BridgeOutboundVolChart from "../BridgeOutboundVolChart";
 
 interface PoolTabProps {
   data: any;
   overlayData: any;
   entitiesData: { [x: string]: { [x: string]: string } };
+  subgraphToQueryURL: string;
   protocolData: { [x: string]: any };
   poolTimeseriesData: any;
   poolTimeseriesError: any;
@@ -29,6 +31,7 @@ function PoolTab({
   data,
   overlayData,
   entitiesData,
+  subgraphToQueryURL,
   protocolData,
   poolTimeseriesData,
   poolTimeseriesError,
@@ -200,10 +203,21 @@ function PoolTab({
     }
   }
 
+  // Specific chart routing
+  // This logic renders components that are specific to a given schema type or version
+  const specificCharts: any[] = [];
+  const schemaType = data?.protocols[0]?.type;
+  const schemaVersion = data?.protocols[0]?.version;
+
+  if (schemaType?.toUpperCase() === "BRIDGE") {
+    // specificCharts.push(< BridgeOutboundVolChart poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
+  }
+
   return (
     <>
       {issuesDisplayElement}
       {poolDropDown}
+      {specificCharts}
       {poolDataSection}
     </>
   );

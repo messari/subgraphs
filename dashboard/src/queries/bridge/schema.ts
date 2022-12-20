@@ -100,6 +100,7 @@ export const schema100 = (): Schema => {
       stakedOutputTokenAmount: "BigInt",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
+      mintSupply: "BigInt",
       timestamp: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
@@ -157,6 +158,7 @@ export const schema100 = (): Schema => {
       stakedOutputTokenAmount: "BigInt",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
+      mintSupply: "BigInt",
       timestamp: "BigInt!",
     },
   };
@@ -381,6 +383,13 @@ export const schema100 = (): Schema => {
         decimals
         name
         symbol
+      }
+      mintSupply
+      routes {
+        id
+        crossToken {
+          network
+        }
       }
       rewardTokens {
         id

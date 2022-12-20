@@ -609,6 +609,9 @@ type Market @entity {
 
   " block number when staked amount was last updated "
   _stakeLastUpdateBlock: BigInt
+
+  " Pricing types (for EUL distribution eligibility)  "
+  _pricingType: Int
 }
 
 #################################
