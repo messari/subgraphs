@@ -1278,7 +1278,7 @@ type _PositionCounter @entity {
   nextCount: Int!
 }
 
-type _Membership @entity {
+type _MembershipDirector @entity {
   " owner address "
   id: ID!
   " MembershipScore returned from MembershipDirector.calculateMembershipScore "

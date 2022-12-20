@@ -85,15 +85,15 @@ export class CapitalERC721DepositLog {
   }
 
   static parse(txLog: ethereum.Log): CapitalERC721DepositLog | null {
-    if (!CapitalERC721DepositLog.isAdjustedHoldingsLog(txLog)) {
+    if (!CapitalERC721DepositLog.isCapitalERC721DepositLog(txLog)) {
       return null;
     }
 
     return new CapitalERC721DepositLog(txLog);
   }
 
-  static isAdjustedHoldingsLog(txLog: ethereum.Log): boolean {
-    return txLog.topics[0].equals(AdjustedHoldingsSig);
+  static isCapitalERC721DepositLog(txLog: ethereum.Log): boolean {
+    return txLog.topics[0].equals(DepositSig);
   }
 
   static getOwner(txLog: ethereum.Log): Address {
@@ -194,15 +194,15 @@ export class CapitalERC721WithdrawalLog {
   }
 
   static parse(txLog: ethereum.Log): CapitalERC721WithdrawalLog | null {
-    if (!CapitalERC721WithdrawalLog.isAdjustedHoldingsLog(txLog)) {
+    if (!CapitalERC721WithdrawalLog.isCapitalERC721WithdrawalLog(txLog)) {
       return null;
     }
 
     return new CapitalERC721WithdrawalLog(txLog);
   }
 
-  static isAdjustedHoldingsLog(txLog: ethereum.Log): boolean {
-    return txLog.topics[0].equals(AdjustedHoldingsSig);
+  static isCapitalERC721WithdrawalLog(txLog: ethereum.Log): boolean {
+    return txLog.topics[0].equals(WithdrawSig);
   }
 
   static getOwner(txLog: ethereum.Log): Address {
@@ -240,7 +240,7 @@ export class CapitalERC721WithdrawalLog {
 
   handleWithdraw(txLog: ethereum.Log): void {
     const positionID = this.positionId.toString();
-    let position = _MembershipStakingPosition.load(positionID);
+    const position = _MembershipStakingPosition.load(positionID);
     if (!position) {
       log.error(
         "[processCapitalWithdraw]position {} not existing in _MembershipStakingPosition",

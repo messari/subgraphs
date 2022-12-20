@@ -393,6 +393,8 @@ dataSources:
       abis:
         - name: MembershipCollector
           file: ./abis/MembershipCollector.json
+        - name: MembershipVault
+          file: ./abis/MembershipVault.json
       eventHandlers:
         - event: EpochFinalized(indexed uint256,uint256)
           handler: handleEpochFinalized

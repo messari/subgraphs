@@ -14,7 +14,6 @@ import { Fidu as FiduContract } from "../../generated/SeniorPool/Fidu";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
   CONFIG_KEYS_ADDRESSES,
   FIDU_ADDRESS,
   GFI_ADDRESS,

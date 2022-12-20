@@ -1,12 +1,4 @@
-import {
-  ByteArray,
-  store,
-  crypto,
-  ethereum,
-  log,
-  BigInt,
-  Address,
-} from "@graphprotocol/graph-ts";
+import { store, ethereum, log, BigInt, Address } from "@graphprotocol/graph-ts";
 
 import {
   CapitalERC721Deposit,
@@ -16,18 +8,14 @@ import {
   VaultedStakedPosition,
   VaultedPoolToken,
   TranchedPoolToken,
-  _Membership,
-  _PoolToken,
   _MembershipCapitalStaked,
-  _MembershipStakingTx,
-  _MembershipStakingPosition,
+  _MembershipDirector,
 } from "../../../generated/schema";
 
 import {
   STAKING_REWARDS_ADDRESS,
   POOL_TOKENS_ADDRESS,
   BIGINT_ZERO,
-  SENIOR_POOL_ADDRESS,
 } from "../../common/constants";
 import { getOrCreateMarket } from "../../common/getters";
 import {
@@ -142,9 +130,9 @@ function _handleERC721DepositWithdrawal(
   event: ethereum.Event
 ): void {
   const ownerAddress = owner.toHexString();
-  let membership = _Membership.load(ownerAddress);
+  let membership = _MembershipDirector.load(ownerAddress);
   if (!membership) {
-    membership = new _Membership(ownerAddress);
+    membership = new _MembershipDirector(ownerAddress);
     membership.eligibleAmount = BIGINT_ZERO;
     membership.nextEpochAmount = BIGINT_ZERO;
     membership.totalCapitalStaked = BIGINT_ZERO;
@@ -215,83 +203,6 @@ function _handleERC721DepositWithdrawal(
     deltaTotalCapitalStaked,
     event
   );
-}
-
-// TODO:DELETE
-function processCapitalDeposit(
-  deposit: CapitalERC721DepositLog,
-  currLog: ethereum.Log,
-  marketID: string,
-  usdcEquivalent: BigInt
-): void {
-  const currTxHash = currLog.transactionHash.toHexString();
-  const txLogID = `${currTxHash}-${currLog.logIndex.toString()}`;
-  const positionID = deposit.positionId.toString();
-  let position = _MembershipStakingPosition.load(positionID);
-  if (!position) {
-    position = new _MembershipStakingPosition(positionID);
-    position.market = marketID;
-    position.usdcEquivalent = usdcEquivalent;
-    position.save();
-  }
-
-  let txLogEntity = _MembershipStakingTx.load(txLogID);
-  if (!txLogEntity) {
-    // a new tx that's not been processed
-    txLogEntity = new _MembershipStakingTx(txLogID);
-    txLogEntity.save();
-
-    const stakedID = `${currTxHash}-${marketID}`;
-    let stakedEntity = _MembershipCapitalStaked.load(stakedID);
-    if (!stakedEntity) {
-      stakedEntity = new _MembershipCapitalStaked(stakedID);
-      stakedEntity.market = marketID;
-      stakedEntity.CapitalStakedAmount = BIGINT_ZERO;
-    }
-    stakedEntity.CapitalStakedAmount =
-      stakedEntity.CapitalStakedAmount!.plus(usdcEquivalent);
-    stakedEntity.save();
-  }
-}
-
-function processCapitalWithdraw(
-  withdraw: CapitalERC721WithdrawalLog,
-  currLog: ethereum.Log
-  //marketID: string,
-  //usdcEquivalent: BigInt
-): void {
-  const positionID = withdraw.positionId.toString();
-  let position = _MembershipStakingPosition.load(positionID);
-  if (!position) {
-    log.error(
-      "[processCapitalWithdraw]position {} not existing in _MembershipStakingPosition",
-      [positionID]
-    );
-    return;
-  }
-
-  withdraw.setmarketId(position.market);
-  withdraw.setusdcEquivalent(position.usdcEquivalent);
-
-  const currTxHash = currLog.transactionHash.toHexString();
-  const txLogID = `${currTxHash}-${currLog.logIndex.toString()}`;
-  let txLogEntity = _MembershipStakingTx.load(txLogID);
-  if (!txLogEntity) {
-    // a new tx that's not been processed
-    txLogEntity = new _MembershipStakingTx(txLogID);
-    txLogEntity.save();
-
-    const stakedID = `${currTxHash}-${position.market}`;
-    let stakedEntity = _MembershipCapitalStaked.load(stakedID);
-    if (!stakedEntity) {
-      stakedEntity = new _MembershipCapitalStaked(stakedID);
-      stakedEntity.market = position.market;
-      stakedEntity.CapitalStakedAmount = BIGINT_ZERO;
-    }
-    stakedEntity.CapitalStakedAmount =
-      stakedEntity.CapitalStakedAmount!.minus(usdcEquivalent);
-    stakedEntity.save();
-  }
 }
 
 function allocateAmountToMarket(

@@ -1,4 +1,4 @@
-import { InterestRate, TranchedPool } from "../../generated/schema";
+import { TranchedPool } from "../../generated/schema";
 import { GoldfinchConfig as GoldfinchConfigContract } from "../../generated/templates/TranchedPool/GoldfinchConfig";
 import { CreditLine as CreditLineContract } from "../../generated/templates/TranchedPool/CreditLine";
 import {
@@ -18,14 +18,10 @@ import {
 } from "../../generated/templates/TranchedPool/TranchedPool";
 import { PoolTokens as PoolTokensContract } from "../../generated/templates/TranchedPool/PoolTokens";
 import {
-  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   CONFIG_KEYS_ADDRESSES,
-  InterestRateSide,
-  InterestRateType,
   PositionSide,
-  SECONDS_PER_YEAR,
   TransactionType,
   USDC_DECIMALS,
 } from "../common/constants";
