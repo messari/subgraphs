@@ -19,6 +19,6 @@ It would be ideal to have the library to get setup automatically with the messar
 Refer to each protocol type readme, since requirements might vary:
 
 - [Bridges](./protocols/bridge/README.md)
-- Lending
+- [Lending](./protocols/lending/README.md)
 - DEX
 - Yield

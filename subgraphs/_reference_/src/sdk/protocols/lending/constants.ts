@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { _ActiveAccount } from "../../generated/schema";
+import { _ActiveAccount } from "../../../../generated/schema";
 
 ////////////////////////
 ///// Schema Enums /////
