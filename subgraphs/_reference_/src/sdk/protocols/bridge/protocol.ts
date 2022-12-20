@@ -6,7 +6,7 @@ import { BridgeConfigurer } from "./config";
 import { ProtocolSnapshot } from "./protocolSnapshot";
 import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
-import { TransactionType } from "./constants";
+import { TransactionType } from "./enums";
 import {
   ethereum,
   dataSource,

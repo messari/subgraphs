@@ -1,9 +1,10 @@
 import { Versions } from "../../../../../../deployment/context/interface";
 
 import { ProtocolConfigurer } from "../config";
+import { BridgePermissionType } from "./enums";
 
 export interface BridgeConfigurer extends ProtocolConfigurer {
-  getPermissionType(): string;
+  getPermissionType(): BridgePermissionType;
 }
 
 export class BridgeConfig implements BridgeConfigurer {
@@ -11,7 +12,7 @@ export class BridgeConfig implements BridgeConfigurer {
   name: string;
   slug: string;
   versions: Versions;
-  permissionType: string;
+  permissionType: BridgePermissionType;
 
   constructor(
     id: string,
@@ -43,7 +44,7 @@ export class BridgeConfig implements BridgeConfigurer {
     return this.versions;
   }
 
-  getPermissionType(): string {
+  getPermissionType(): BridgePermissionType {
     return this.permissionType;
   }
 }

@@ -282,6 +282,7 @@ import { SDK } from "./sdk/protocols/bridge";
 import { TokenPricer } from "./sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
 import { Pool } from "./sdk/protocols/bridge/pool";
+import { BridgePermissionType } from "./sdk/protocols/bridge/constants";
 import { BridgeConfig } from "./sdk/protocols/bridge/config";
 import { _ERC20 } from "wherever You have an ABI for it";
 import { Versions } from "./versions";
@@ -293,7 +294,7 @@ class Pricer implements TokenPricer {
     return price.usdPrice;
   }
 
-  getAmountPrice(token: Token, amount: BigInt): BigDecimal {
+  getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
     const _amount = bigIntToBigDecimal(amount, token.decimals);
     return getUsdPrice(Address.fromBytes(token.id), _amount);
   }
@@ -318,7 +319,7 @@ const conf = new BridgeConfig(
   "0x2796317b0fF8538F253012862c06787Adfb8cEb6",
   "Synapse",
   "synapse",
-  "WHITELIST",
+  BridgePermissionType.WHITELIST,
   Versions
 );
 
@@ -331,7 +332,7 @@ export function handleTransferOut(event: TransferOut): void {
     onCreatePool,
     BridgePoolType.LOCK_RELEASE
   );
-  const crossToken = sdk.Tokens.initCrosschainToken(
+  const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     event.params.chainId,
     event.params.token,
     CrosschainTokenType.WRAPPED,
@@ -349,6 +350,16 @@ export function handleTransferOut(event: TransferOut): void {
   );
   pool.addRevenueNative(event.params.protocolFee, event.params.supplyFee);
 }
+
+function onCreatePool(
+  event: PoolCreated,
+  pool: Pool,
+  sdk: SDK,
+  type: BridgePoolType
+): void {
+  // ...
+  pool.initialize(name, symbol, type, inputToken);
+}
 ```
 
 ### Set Reward Emissions
@@ -360,7 +371,7 @@ export function handlePoolRewardsUpdated(event: PoolRewardsUpdated): void {
   const sdk = new SDK(conf, new Pricer(), new TokenInit(), event);
 
   const pool = sdk.Pools.loadPool(event.params.poolAddress);
-  const rewardToken = sdk.Tokens.initToken(rewardTokenAddress);
+  const rewardToken = sdk.Tokens.getOrCreateToken(rewardTokenAddress);
   const dailyEmissions = calculateDailyEmissions(
     event.params.emissionsPerBlock
   );

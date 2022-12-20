@@ -16,11 +16,7 @@ import {
   Token,
 } from "../../../../generated/schema";
 import { Bridge } from "./protocol";
-import {
-  BridgePoolType,
-  CrosschainTokenType,
-  TransactionType,
-} from "./constants";
+import { BridgePoolType, CrosschainTokenType, TransactionType } from "./enums";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_MINUS_ONE,
@@ -91,7 +87,9 @@ export class Pool {
   }
 
   private getInputToken(): Token {
-    return this.tokens.initToken(Address.fromBytes(this.pool.inputToken));
+    return this.tokens.getOrCreateToken(
+      Address.fromBytes(this.pool.inputToken)
+    );
   }
 
   initialize(
@@ -392,8 +390,8 @@ export class Pool {
   addRevenueNative(protocolSide: BigInt, supplySide: BigInt): void {
     const pricer = this.protocol.pricer;
     const inputToken = this.getInputToken();
-    const pAmountUSD = pricer.getAmountPrice(inputToken, protocolSide);
-    const sAmountUSD = pricer.getAmountPrice(inputToken, supplySide);
+    const pAmountUSD = pricer.getAmountValueUSD(inputToken, protocolSide);
+    const sAmountUSD = pricer.getAmountValueUSD(inputToken, supplySide);
     this.addRevenueUSD(pAmountUSD, sAmountUSD);
   }
 
@@ -466,7 +464,7 @@ export class Pool {
     if (!this.pool.outputToken) {
       return;
     }
-    const token = this.tokens.initToken(this.pool.outputToken);
+    const token = this.tokens.getOrCreateToken(this.pool.outputToken);
     const price = this.protocol.pricer.getTokenPrice(token);
 
     this.pool.outputTokenPriceUSD = price;
@@ -486,8 +484,8 @@ export class Pool {
     token: Token,
     amount: BigInt
   ): void {
-    const rToken = this.tokens.initRewardToken(type, token);
-    const amountUSD = this.protocol.pricer.getAmountPrice(token, amount);
+    const rToken = this.tokens.getOrCreateRewardToken(type, token);
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
     if (!this.pool.rewardTokens) {
       this.pool.rewardTokens = [rToken.id];
       this.pool.rewardTokenEmissionsAmount = [amount];

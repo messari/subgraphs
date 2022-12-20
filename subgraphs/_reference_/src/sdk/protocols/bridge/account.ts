@@ -11,7 +11,7 @@ import {
 import { Pool } from "./pool";
 import { Bridge } from "./protocol";
 import { TokenManager } from "./tokens";
-import { BridgePoolType, TransactionType, TransferType } from "./constants";
+import { BridgePoolType, TransactionType, TransferType } from "./enums";
 import { getUnixDays, getUnixHours } from "../../util/events";
 
 export class AccountManager {
@@ -207,7 +207,9 @@ export class Account {
     updateMetrics: boolean
   ): BridgeTransfer {
     const _pool = pool.pool;
-    const token = this.tokens.initToken(Address.fromBytes(_pool.inputToken));
+    const token = this.tokens.getOrCreateToken(
+      Address.fromBytes(_pool.inputToken)
+    );
     const crossToken = CrosschainToken.load(route.crossToken)!;
 
     const transfer = this.transferBoilerplate();
@@ -229,7 +231,7 @@ export class Account {
     transfer.amount = amount;
     transfer.amountUSD = this.protocol
       .getTokenPricer()
-      .getAmountPrice(token, amount);
+      .getAmountValueUSD(token, amount);
     transfer.crosschainToken = crossToken.id;
     transfer.isSwap = route.isSwap;
     transfer.crossTransactionID = transactionID;
@@ -276,7 +278,7 @@ export class Account {
     updateMetrics: boolean = true
   ): LiquidityDeposit {
     const _pool = pool.pool;
-    const token = this.tokens.initToken(_pool.inputToken);
+    const token = this.tokens.getOrCreateToken(_pool.inputToken);
 
     const deposit = new LiquidityDeposit(idFromEvent(this.event));
     deposit.hash = this.event.transaction.hash;
@@ -293,7 +295,7 @@ export class Account {
     deposit.amount = amount;
     deposit.amountUSD = this.protocol
       .getTokenPricer()
-      .getAmountPrice(token, amount);
+      .getAmountValueUSD(token, amount);
     deposit.chainID = this.protocol.getCurrentChainID();
     deposit.save();
 
@@ -317,7 +319,7 @@ export class Account {
     updateMetrics: boolean = true
   ): LiquidityWithdraw {
     const _pool = pool.pool;
-    const token = this.tokens.initToken(_pool.inputToken);
+    const token = this.tokens.getOrCreateToken(_pool.inputToken);
 
     const withdraw = new LiquidityWithdraw(idFromEvent(this.event));
     withdraw.hash = this.event.transaction.hash;
@@ -334,7 +336,7 @@ export class Account {
     withdraw.amount = amount;
     withdraw.amountUSD = this.protocol
       .getTokenPricer()
-      .getAmountPrice(token, amount);
+      .getAmountValueUSD(token, amount);
     withdraw.chainID = this.protocol.getCurrentChainID();
     withdraw.save();
 

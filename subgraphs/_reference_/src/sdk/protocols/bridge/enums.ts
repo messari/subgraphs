@@ -1,4 +1,10 @@
-// todo move to constants
+export namespace BridgePermissionType {
+  export const WHITELIST = "WHITELIST";
+  export const PERMISSIONLESS = "PERMISSIONLESS";
+  export const PRIVATE = "PRIVATE";
+}
+export type BridgePermissionType = string;
+
 export namespace BridgePoolType {
   export const LOCK_RELEASE = "LOCK_RELEASE";
   export const BURN_MINT = "BURN_MINT";

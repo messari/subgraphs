@@ -15,12 +15,12 @@ export class SDK {
   Pricer: TokenPricer;
 
   constructor(
-    conf: BridgeConfigurer,
+    config: BridgeConfigurer,
     pricer: TokenPricer,
     tokenInitializer: TokenInitializer,
     event: ethereum.Event
   ) {
-    this.Protocol = Bridge.load(conf, pricer, event);
+    this.Protocol = Bridge.load(config, pricer, event);
     this.Tokens = new TokenManager(this.Protocol, tokenInitializer);
     this.Accounts = new AccountManager(this.Protocol, this.Tokens);
     this.Pools = new PoolManager(this.Protocol, this.Tokens);

@@ -1,6 +1,10 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-import { RewardToken, Token } from "../../../../generated/schema";
-import { CrosschainToken, SupportedToken } from "../../../../generated/schema";
+import {
+  RewardToken,
+  Token,
+  CrosschainToken,
+  SupportedToken,
+} from "../../../../generated/schema";
 import { chainIDToNetwork } from "./chainIds";
 import { Bridge } from "./protocol";
 import { RewardTokenType } from "../../util/constants";
@@ -24,7 +28,7 @@ export class TokenManager {
     this.initializer = init;
   }
 
-  initToken(address: Address): Token {
+  getOrCreateToken(address: Address): Token {
     let token = Token.load(address);
     if (token) {
       return token;
@@ -39,7 +43,7 @@ export class TokenManager {
     return token;
   }
 
-  initRewardToken(type: RewardTokenType, token: Token): RewardToken {
+  getOrCreateRewardToken(type: RewardTokenType, token: Token): RewardToken {
     const id = Bytes.empty();
     if (type == RewardTokenType.BORROW) {
       id.concatI32(0);
@@ -63,7 +67,7 @@ export class TokenManager {
     return rToken;
   }
 
-  initCrosschainToken(
+  getOrCreateCrosschainToken(
     chainID: BigInt,
     address: Address,
     type: string,
@@ -75,7 +79,7 @@ export class TokenManager {
       return ct;
     }
 
-    const base = this.initToken(token);
+    const base = this.getOrCreateToken(token);
     ct = new CrosschainToken(id);
     ct.chainID = chainID;
     ct.network = chainIDToNetwork(chainID);

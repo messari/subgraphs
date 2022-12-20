@@ -4,6 +4,8 @@ import { Bytes } from "@graphprotocol/graph-ts";
 // where the first one holds the reference order, the second one holds the same elements
 // as the first but in different order, and the third any arbitrary elements. It will return
 // the third array after sorting it according to the order of the first one.
+// For example:
+// sortArrayByReference(['a', 'c', 'b'], ['a', 'b', 'c'], [1, 2, 3]) => [1, 3, 2]
 export function sortArrayByReference<T, K>(
   reference: T[],
   array: T[],
