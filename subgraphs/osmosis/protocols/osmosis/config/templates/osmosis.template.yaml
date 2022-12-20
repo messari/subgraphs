@@ -1,0 +1,29 @@
+specVersion: 0.0.5
+# features:
+#   - grafting
+# # #     #- ipfsOnEthereumContracts
+# graft:
+#   base: QmbhFCG3yHTdjEXgVxUihtBsxQVNWweMh3ejvjk2hAqgrt
+#   block: 4099780
+#block: 4614010
+#   base: QmeJDEgTg8CvqZ8sgxMd58aoBX2ckYfU3LDT9iAedq7Rno # Subgraph ID of base subgraph
+#   block: 6259467 # Block number
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: cosmos
+    name: Osmosis
+    network: osmosis-1
+    source:
+      startBlock: 4102059
+      #4102105
+      #startBlock: 4100001
+      #startBlock: 3900001
+    #startBlock: 6259468
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      transactionHandlers:
+        - handler: handleTx
+      file: ./src/mappings/osmosis.ts
