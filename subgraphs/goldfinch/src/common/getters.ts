@@ -215,6 +215,8 @@ export function getOrCreateMarket(
 
     market._lenderInterestAmountUSD = BIGDECIMAL_ZERO;
     market._borrowerInterestAmountUSD = BIGDECIMAL_ZERO;
+    market._membershipRewardEligibleAmount = BIGINT_ZERO;
+    market._membershipRewardNextEpochAmount = BIGINT_ZERO;
 
     market.save();
 

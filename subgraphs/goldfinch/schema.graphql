@@ -674,6 +674,12 @@ type Market @entity {
 
   " Is the market a migrated tranched pool "
   _isMigratedTranchedPool: Boolean
+
+  " eligibleAmount aggregated to the market "
+  _membershipRewardEligibleAmount: BigInt
+
+  " nextEpochAmount aggregated to the market "
+  _membershipRewardNextEpochAmount: BigInt
 }
 
 #################################
@@ -1270,6 +1276,42 @@ type _PositionCounter @entity {
   id: ID!
   " Next count "
   nextCount: Int!
+}
+
+type _Membership @entity {
+  " owner address "
+  id: ID!
+  " MembershipScore returned from MembershipDirector.calculateMembershipScore "
+  eligibleAmount: BigInt!
+  " MembershipScore for next epoch "
+  nextEpochAmount: BigInt!
+  " total staked USDC Equivalent by the owner "
+  totalCapitalStaked: BigInt!
+}
+
+type _MembershipCapitalStaked @entity {
+  " {owner address}-{market id} "
+  id: ID!
+  " market id (pool address) "
+  market: Market!
+  " total staked USDC Equivalent for the position "
+  CapitalStakedAmount: BigInt!
+}
+
+# Helper entity to avoid count staking transaction more than once
+type _MembershipStakingTx @entity {
+  " {tx hash}-{logIndex} "
+  id: ID!
+}
+
+# Helper entity to avoid count staking transaction more than once
+type _MembershipStakingPosition @entity {
+  " Position ID "
+  id: ID!
+  " market id (pool address) "
+  market: Market!
+  " usdcEquivalent of position "
+  usdcEquivalent: BigInt!
 }
 
 ### Entity below are from goldfinch's official subgraph ###
