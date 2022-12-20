@@ -6,7 +6,7 @@ Lending protocols are the life-blood of Decentralized Finance (DeFi) and provide
 
 Euler follows in the footsteps of lending protocols like AAVE and Compound but focuses on the permissionless aspect i.e. it allows users to create their own markets for any Ethereum ERC20 token. This blog from the Euler team provides much more detailed info on the benefits provided by Euler — [https://blog.euler.finance/introducing-euler-8f4422f13848](https://blog.euler.finance/introducing-euler-8f4422f13848).
 
-## Calculation Methodology v1.2.0
+## Calculation Methodology v1.2.1
 
 ### Total Value Locked (TVL) USD
 
@@ -54,14 +54,22 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-Euler Finance distributes EUL tokens by epoch (=every 100,000 blocks) to borrowers in the top 10 voted markets. Users vote for a market by staking their EUL for the underlying in [the EulStakes contract](https://etherscan.io/address/0xc697BB6625D9f7AdcF0fbf0cbd4DcF50D8716cd3#code). The total amount of EUL distributed in each epoch is [pre-determined](https://docs.euler.finance/eul/distribution-1#eul-per-epoch). The amount of distribution the top 10 staked markets receives is proportional to square root of sum time weighted EUL amount staked for the market .
+Euler Finance distributes EUL tokens by epoch (=every 100,000 blocks) to borrowers in the top 10 voted markets. Users vote for a market by staking their EUL for the underlying in [the EulStakes contract](https://etherscan.io/address/0xc697BB6625D9f7AdcF0fbf0cbd4DcF50D8716cd3#code). The total amount of EUL distributed in each epoch is [pre-determined](https://docs.euler.finance/eul/distribution-1#eul-per-epoch). The amount of distribution the top 10 staked markets receives is proportional to square root of sum time weighted EUL amount staked for the market. [eIP 24](https://snapshot.org/#/eulerdao.eth/proposal/0x7e65ffa930507d9116ebc83663000ade6ff93fc452f437a3e95d755ccc324f93) changes the reward distribution to 8000 EUL for epoch 18-23 (a 3-month trial period) and [eIP 28](https://snapshot.org/#/eulerdao.eth/proposal/0x40874e40bc18ff33a9504a770d5aadfa4ea8241a64bf24a36777cb5acc3b59a7) disqualifies FTT for rewards from epoch 16 after the collapse of FTX.
 
 #### Epoch 6 - 17
 
 1. At the start of a new epoch, cumulate EUL amount users staked for each market weighted by number of blocks (approximating time) the EUL is staked;
-2. When the epoch ends, rank markets by total weighted EUL amount staked and select top 10 markets to receive EUL emission;
+2. At the end of the epoch, rank markets by total weighted EUL amount staked and select top 10 markets to receive EUL emission;
 3. Distribute the total EUL amount for the epoch among the top 10 markets proportional to square root of block weighted EUL amount staked;
 4. If epoch > 96, exit, else go back to 1.
+
+#### Epoch 18 - 23
+
+1. At the start of a new epoch, cumulate EUL amount users staked for each market weighted by number of blocks (approximating time) the EUL is staked;
+2. At the end of the epoch, calcuate the sqrt of sum weighted EUL amount staked for all markets using the Chainlink Oracle and wstETH;
+3. The EUL amount each market receives is proportional to the sqrt of sum weighted EUL amount staked for the market.
+4. 8000 EUL awarded to borrowers in the USDC, USDT, WETH, and wstETH market;
+5. 5000 EUL awarded to lenders staking their output token from USDC, USDT, and WETH market.
 
 ### Protocol Controlled Value
 
