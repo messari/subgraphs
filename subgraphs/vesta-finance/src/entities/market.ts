@@ -318,16 +318,15 @@ export function setMarketAssetBalance(
   asset: Address,
   balanceAsset: BigInt
 ): void {
-  const balanceUSD = bigIntToBigDecimal(balanceAsset).times(
-    getCurrentAssetPrice(asset)
-  );
+  const assetPrice = getCurrentAssetPrice(asset);
+  const balanceUSD = bigIntToBigDecimal(balanceAsset).times(assetPrice);
   const market = getOrCreateMarket(asset);
   const netChangeUSD = balanceUSD.minus(market.totalValueLockedUSD);
   market.totalValueLockedUSD = balanceUSD;
   market.totalDepositBalanceUSD = balanceUSD;
   market.inputToken = asset.toHexString();
   market.inputTokenBalance = balanceAsset;
-  market.inputTokenPriceUSD = getCurrentAssetPrice(asset);
+  market.inputTokenPriceUSD = assetPrice;
   market.save();
 
   getOrCreateMarketSnapshot(event, market);

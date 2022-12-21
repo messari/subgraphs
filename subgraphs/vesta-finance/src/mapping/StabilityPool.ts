@@ -7,15 +7,11 @@ import {
   AssetGainWithdrawn,
 } from "../../generated/templates/StabilityPool/StabilityPool";
 import { createWithdraw } from "../entities/event";
-import {
-  getOrCreateMarketHourlySnapshot,
-  getOrCreateMarketSnapshot,
-  getOrCreateStabilityPool,
-} from "../entities/market";
+import { getOrCreateStabilityPool } from "../entities/market";
 import { updateSPUserPositionBalances } from "../entities/position";
 import { updateProtocoVSTLocked } from "../entities/protocol";
 import { updateStabilityPoolTVL } from "../entities/stabilitypool";
-import { getCurrentAssetPrice } from "../entities/token";
+import { getCurrentAssetPrice, getOrCreateAssetToken } from "../entities/token";
 import { BIGINT_ZERO } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
 
@@ -34,10 +30,6 @@ export function handleStabilityPoolAssetBalanceUpdated(
 
   updateStabilityPoolTVL(event, totalVSTAmount, totalAssetAmount, asset);
   updateProtocoVSTLocked(event);
-
-  const market = getOrCreateStabilityPool(event.address, asset, event);
-  getOrCreateMarketSnapshot(event, market);
-  getOrCreateMarketHourlySnapshot(event, market);
 }
 
 /**
@@ -55,10 +47,6 @@ export function handleStabilityPoolVSTBalanceUpdated(
 
   updateStabilityPoolTVL(event, totalVSTAmount, totalAssetAmount, asset);
   updateProtocoVSTLocked(event);
-
-  const market = getOrCreateStabilityPool(event.address, asset, event);
-  getOrCreateMarketSnapshot(event, market);
-  getOrCreateMarketHourlySnapshot(event, market);
 }
 
 /**
@@ -86,9 +74,6 @@ export function handleUserDepositChanged(event: UserDepositChanged): void {
     event.params._depositor,
     event.params._newDeposit
   );
-
-  getOrCreateMarketSnapshot(event, market);
-  getOrCreateMarketHourlySnapshot(event, market);
 }
 
 /**
@@ -112,8 +97,9 @@ export function handleAssetGainWithdrawn(event: AssetGainWithdrawn): void {
     return;
   }
   const asset = assetAddressResult.value;
+  const token = getOrCreateAssetToken(asset);
   const amountUSD = getCurrentAssetPrice(asset).times(
-    bigIntToBigDecimal(event.params._Asset)
+    bigIntToBigDecimal(event.params._Asset, token.decimals)
   );
   const market = getOrCreateStabilityPool(event.address, asset, event);
   createWithdraw(
@@ -124,7 +110,4 @@ export function handleAssetGainWithdrawn(event: AssetGainWithdrawn): void {
     event.params._depositor,
     event.params._depositor
   );
-
-  getOrCreateMarketSnapshot(event, market);
-  getOrCreateMarketHourlySnapshot(event, market);
 }

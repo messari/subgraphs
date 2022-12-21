@@ -108,6 +108,7 @@ export const ETH_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const DEFAULT_DECIMALS = 18;
 
+export const gOHM_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
@@ -173,12 +174,18 @@ export const VST_ADDRESS = "0x64343594ab9b56e99087bfa6f2335db24c2d1f17";
 export const VSTA_ADDRESS = "0xa684cd057951541187f288294a1e1c2646aa2d24";
 export const WETH_ADDRESS = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1";
 export const USDC_ADDRESS = "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8";
+export const gOHM_ADDRESS = "0x8d9ba570d6cb60c7e3e0f31343efe75ab8e65fb1";
 export const BAL_VSTA_WETH_POOL_ADDRESS =
   "0xc61ff48f94d801c1ceface0289085197b5ec44f0";
 export const BAL_WETH_WBTC_USDC_POOL_ADDRESS =
   "0x64541216bafffeec8ea535bb71fbc927831d0595";
 export const BAL_VST_DAI_USDT_USDC_POOL_ADDRESS =
   "0x5a5884fc31948d59df2aeccca143de900d49e1a3";
+export const SUSHI_gOHM_WETH_PAIR_ADDRESS =
+  "0xaa5bd49f2162ffdc15634c87a77ac67bd51c6a6d";
+export const SUSHI_WETH_USDC_PAIR_ADDRESS =
+  "0x905dfcd5649217c42684f23958568e533c711aa3";
+
 export const ACTIVE_POOL_ADDRESS = "0xbe3de7fb9aa09b3fa931868fb49d5ba5fee2ebb1";
 export const ACTIVE_POOL_CREATED_TIMESTAMP = BigInt.fromI32(1644224579);
 export const ACTIVE_POOL_CREATED_BLOCK = BigInt.fromI32(5559192);

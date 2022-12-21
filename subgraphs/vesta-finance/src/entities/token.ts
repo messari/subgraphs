@@ -7,6 +7,7 @@ import {
 } from "@graphprotocol/graph-ts";
 import { IERC20Detailed } from "../../generated/TroveManager/IERC20Detailed";
 import { IERC20DetailedBytes } from "../../generated/TroveManager/IERC20DetailedBytes";
+import { UniswapV2Pair } from "../../generated/TroveManager/UniswapV2Pair";
 import { RewardToken, Token } from "../../generated/schema";
 import {
   VSTA_BALANCER_POOL_CREATED_BLOCK,
@@ -26,9 +27,11 @@ import {
   VSTA_ADDRESS,
   VST_ADDRESS,
   WETH_ADDRESS,
-  VST_BALANCER_POOL_CREATED_BLOCK,
-  BAL_VST_DAI_USDT_USDC_POOL_ADDRESS,
   BIGINT_ZERO,
+  SUSHI_gOHM_WETH_PAIR_ADDRESS,
+  gOHM_ADDRESS,
+  SUSHI_WETH_USDC_PAIR_ADDRESS,
+  gOHM_DECIMALS,
 } from "../utils/constants";
 import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
 import { PriceFeedV1 } from "../../generated/PriceFeedV1/PriceFeedV1";
@@ -80,8 +83,21 @@ export function setCurrentAssetPrice(
   price: BigInt
 ): void {
   const token = getOrCreateAssetToken(asset);
-  token.lastPriceUSD = bigIntToBigDecimal(price);
+
+  let priceUSD = bigIntToBigDecimal(price);
+  // get gOHM price from SushiSwap arbitrum because
+  // Vesta price feed number is off
+  if (asset.toHexString() == gOHM_ADDRESS) {
+    const gOHMPrice = getgOHMPrice(blockNumber);
+    priceUSD = gOHMPrice ? gOHMPrice : priceUSD;
+  }
+  token.lastPriceUSD = priceUSD;
   token.lastPriceBlockNumber = blockNumber;
+  log.info("[setCurrentAssetPrice]asset {} price set to {} at block {}", [
+    asset.toHexString(),
+    priceUSD.toString(),
+    blockNumber.toString(),
+  ]);
   token.save();
 }
 
@@ -183,15 +199,10 @@ export function getVSTTokenPrice(event: ethereum.Event): BigDecimal {
     lastGoodPriceResult.reverted ||
     lastGoodPriceResult.value.equals(BIGINT_ZERO)
   ) {
-    const VSTPriceFromBalancer = getVSTTokenPriceFromBalancer(event);
-    if (!VSTPriceFromBalancer) {
-      log.warning(
-        "[getVSTTokenPrice]Querying price for VST token with Price Feed {} failed at tx {}; Price set to 1.0",
-        [priceFeedAddress, event.transaction.hash.toString()]
-      );
-    } else {
-      VSTPrice = VSTPriceFromBalancer!;
-    }
+    log.warning(
+      "[getVSTTokenPrice]Querying price for VST token with Price Feed {} failed at tx {}; Price set to 1.0",
+      [priceFeedAddress, event.transaction.hash.toHexString()]
+    );
   } else {
     //convert to decimals with 18 decimals
     VSTPrice = bigIntToBigDecimal(lastGoodPriceResult.value, 18);
@@ -205,32 +216,6 @@ export function getVSTTokenPrice(event: ethereum.Event): BigDecimal {
   ]);
 
   return VSTPrice;
-}
-
-export function getVSTTokenPriceFromBalancer(
-  event: ethereum.Event
-): BigDecimal | null {
-  if (event.block.number.lt(VST_BALANCER_POOL_CREATED_BLOCK)) {
-    return null;
-  }
-  const VSTAPriceInUSDC = getToken0PriceInToken1(
-    BAL_VST_DAI_USDT_USDC_POOL_ADDRESS,
-    VST_ADDRESS,
-    USDC_ADDRESS
-  );
-
-  if (!VSTAPriceInUSDC) {
-    return null;
-  }
-  const VSTPriceInUSD = VSTAPriceInUSDC.times(
-    exponentToBigDecimal(DEFAULT_DECIMALS)
-  ).div(exponentToBigDecimal(USDC_DECIMALS));
-  log.info("[getVSTTokenPriceFromBalancer]VST Price USD={} at timestamp {}", [
-    VSTPriceInUSD.toString(),
-    event.block.timestamp.toString(),
-  ]);
-
-  return VSTPriceInUSD;
 }
 
 export function getVSTATokenPrice(event: ethereum.Event): BigDecimal | null {
@@ -273,20 +258,35 @@ function getToken0PriceInToken1(
   );
   const vaultAddressResult = poolContract.try_getVault();
   if (vaultAddressResult.reverted) {
+    log.info(
+      "[getToken0PriceInToken1]WeightedPoolContract ({}) getVault() call reverted",
+      [poolAddress]
+    );
     return null;
   }
   const vaultContract = VaultContract.bind(vaultAddressResult.value);
-
   const weightsResult = poolContract.try_getNormalizedWeights();
   if (weightsResult.reverted) {
+    log.info(
+      "[getToken0PriceInToken1]VaultContract ({}) getNormalizedWeights() call reverted",
+      [vaultAddressResult.value.toHexString()]
+    );
     return null;
   }
   const poolIDResult = poolContract.try_getPoolId();
   if (poolIDResult.reverted) {
+    log.info(
+      "[getToken0PriceInToken1]WeightedPoolContract ({}) getPoolId() call reverted",
+      [poolAddress]
+    );
     return null;
   }
   const poolTokensResult = vaultContract.try_getPoolTokens(poolIDResult.value);
   if (poolTokensResult.reverted) {
+    log.info(
+      "[getToken0PriceInToken1]VaultContract ({}) getPoolTokens() call reverted",
+      [poolAddress]
+    );
     return null;
   }
   const poolTokenAddrs = poolTokensResult.value.getTokens();
@@ -308,5 +308,78 @@ function getToken0PriceInToken1(
         .times(weightsResult.value[token1Idx])
         .toBigDecimal()
     );
+  return token0PriceInToken1;
+}
+
+// get gOHM price (the price from vesta price feed is off)
+export function getgOHMPrice(blockNumber: BigInt): BigDecimal | null {
+  const gOHMPriceInWETH = getToken0PriceInToken1UniswapV2(
+    SUSHI_gOHM_WETH_PAIR_ADDRESS,
+    gOHM_ADDRESS,
+    WETH_ADDRESS
+  );
+
+  const WETHPriceInUSDC = getToken0PriceInToken1UniswapV2(
+    SUSHI_WETH_USDC_PAIR_ADDRESS,
+    WETH_ADDRESS,
+    USDC_ADDRESS
+  );
+
+  if (!gOHMPriceInWETH || !WETHPriceInUSDC) {
+    return null;
+  }
+
+  const gOHMPriceInUSD = gOHMPriceInWETH
+    .times(WETHPriceInUSDC)
+    .times(exponentToBigDecimal(gOHM_DECIMALS - USDC_DECIMALS));
+
+  return gOHMPriceInUSD;
+}
+
+// get token price from uniswap forks
+function getToken0PriceInToken1UniswapV2(
+  pairAddress: string,
+  token0: string,
+  token1: string
+): BigDecimal | null {
+  const pairContract = UniswapV2Pair.bind(Address.fromString(pairAddress));
+  const reserves = pairContract.try_getReserves();
+  if (reserves.reverted) {
+    log.error(
+      "[getToken0PriceInToken1UniswapV2]Unable to get reserves for pair {}",
+      [pairAddress]
+    );
+    return null;
+  }
+  let token0Amount: BigInt;
+  let token1Amount: BigInt;
+  const pairToken0 = pairContract.token0().toHexString();
+  const pairToken1 = pairContract.token1().toHexString();
+  if (pairToken0 == token0) {
+    if (pairToken1 != token1) {
+      log.error(
+        "[getToken0PriceInToken1UniswapV2]tokens for pair {} = ({}, {}) do not match ({}, {})",
+        [pairAddress, pairToken0, pairToken1, token0, token1]
+      );
+      return null;
+    }
+    token0Amount = reserves.value.value0;
+    token1Amount = reserves.value.value1;
+  } else {
+    if (pairToken0 != token1 || pairToken1 != token0) {
+      log.error(
+        "[getToken0PriceInToken1UniswapV2]tokens for pair {} = ({}, {}) do not match ({}, {})",
+        [pairAddress, pairToken0, pairToken1, token1, token0]
+      );
+      return null;
+    }
+    token0Amount = reserves.value.value1;
+    token1Amount = reserves.value.value0;
+  }
+
+  const token0PriceInToken1 = token1Amount.divDecimal(
+    token0Amount.toBigDecimal()
+  );
+
   return token0PriceInToken1;
 }

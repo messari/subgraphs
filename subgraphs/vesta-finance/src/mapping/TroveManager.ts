@@ -13,7 +13,11 @@ import {
   createWithdraw,
 } from "../entities/event";
 import { getOrCreateTrove } from "../entities/trove";
-import { getCurrentAssetPrice, getVSTTokenPrice } from "../entities/token";
+import {
+  getCurrentAssetPrice,
+  getOrCreateAssetToken,
+  getVSTTokenPrice,
+} from "../entities/token";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import {
   ACTIVE_POOL_ADDRESS,
@@ -285,14 +289,29 @@ export function handleLiquidation(event: Liquidation): void {
   }
 
   const market = getOrCreateStabilityPool(stabilityPoolAddress, null, event);
-  const vstValueUSD = getVSTTokenPrice(event).times(
-    bigIntToBigDecimal(vstBurned)
-  );
-  const assetValueUSD = bigIntToBigDecimal(assetSent).times(
-    getCurrentAssetPrice(asset)
+  const vstPriceUSD = getVSTTokenPrice(event);
+  const vstValueUSD = vstPriceUSD.times(bigIntToBigDecimal(vstBurned));
+
+  const assetPrice = getCurrentAssetPrice(asset);
+  const token = getOrCreateAssetToken(asset);
+  const assetValueUSD = bigIntToBigDecimal(assetSent, token.decimals).times(
+    assetPrice
   );
 
   const revenue = assetValueUSD.minus(vstValueUSD);
+  log.info(
+    "[handleLiquidation]tx {} market {} asset={} revenue={}: vstBurned={},vstPrice={},assetSent={},assetPrice={}",
+    [
+      event.transaction.hash.toHexString(),
+      market.id,
+      asset.toHexString(),
+      revenue.toString(),
+      vstBurned.toString(),
+      vstPriceUSD.toString(),
+      assetSent.toString(),
+      assetPrice.toString(),
+    ]
+  );
 
   addSupplySideRevenue(event, market, revenue);
 }

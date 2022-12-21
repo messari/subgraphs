@@ -44,11 +44,11 @@ export function handleTroveUpdated(event: TroveUpdated): void {
   if (newCollateral == trove.collateral && newDebt == trove.debt) {
     return;
   }
+  const assetPrice = getCurrentAssetPrice(asset);
   if (newCollateral > trove.collateral) {
     const depositAmountAsset = newCollateral.minus(trove.collateral);
-    const depositAmountUSD = bigIntToBigDecimal(depositAmountAsset).times(
-      getCurrentAssetPrice(asset)
-    );
+    const depositAmountUSD =
+      bigIntToBigDecimal(depositAmountAsset).times(assetPrice);
     createDeposit(
       event,
       market,
@@ -58,9 +58,8 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     );
   } else if (newCollateral < trove.collateral) {
     const withdrawAmountAsset = trove.collateral.minus(newCollateral);
-    const withdrawAmountUSD = bigIntToBigDecimal(withdrawAmountAsset).times(
-      getCurrentAssetPrice(asset)
-    );
+    const withdrawAmountUSD =
+      bigIntToBigDecimal(withdrawAmountAsset).times(assetPrice);
     createWithdraw(
       event,
       market,

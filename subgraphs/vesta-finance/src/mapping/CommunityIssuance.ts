@@ -75,17 +75,6 @@ function calculateDailyVSTARewards(event: ethereum.Event, pool: Address): void {
   stabilityPool.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
   stabilityPool.save();
 
-  log.info(
-    "[calculateDailyVSTARewards]stability pool {} ({}) daily reward amount={},VSTA price={},rewardUSD={} for tx {}",
-    [
-      stabilityPool.id,
-      stabilityPool.name!,
-      rewardTokenEmissionAmount.toString(),
-      VSTAPriceUSD ? VSTAPriceUSD!.toString() : "null",
-      rewardTokenEmissionsUSD.toString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
   getOrCreateMarketSnapshot(event, stabilityPool);
   getOrCreateMarketHourlySnapshot(event, stabilityPool);
 

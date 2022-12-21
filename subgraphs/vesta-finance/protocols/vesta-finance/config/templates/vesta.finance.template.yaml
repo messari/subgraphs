@@ -26,6 +26,8 @@ dataSources:
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
       eventHandlers:
         - event: TroveUpdated(indexed address,indexed address,uint256,uint256,uint256,uint8)
           handler: handleTroveUpdated
@@ -81,6 +83,8 @@ dataSources:
           file: ./abis/VestaParameters.json
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
@@ -168,6 +172,8 @@ dataSources:
           file: ./abis/VestaParameters.json
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
@@ -193,6 +199,8 @@ dataSources:
       abis:
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
         - name: WeightedPool
           file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
@@ -227,6 +235,8 @@ dataSources:
           file: ./abis/PriceFeedV1.json
         - name: PriceFeedV2
           file: ./abis/PriceFeedV2.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
         - name: WeightedPool
           file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
@@ -259,6 +269,8 @@ templates:
           file: ./abis/StabilityPool.json
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
         - name: WeightedPool
           file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
