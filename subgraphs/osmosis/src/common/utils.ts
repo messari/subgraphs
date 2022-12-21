@@ -32,45 +32,6 @@ export function readValue<T>(
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
-// export function getOrCreateTokenFromString(
-//   tokenAddress: string,
-//   blockNumber: BigInt
-// ): Token {
-//   return getOrCreateToken(Address.fromString(tokenAddress), blockNumber);
-// }
-
-// export function getTokenDecimals(tokenAddr: Address): BigDecimal {
-//   const token = ERC20Contract.bind(tokenAddr);
-
-//   let decimals = readValue<BigInt>(
-//     token.try_decimals(),
-//     constants.DEFAULT_DECIMALS
-//   );
-
-//   return constants.BIGINT_TEN.pow(decimals.toI32() as u8).toBigDecimal();
-// }
-
-// export function getOutputTokenPriceUSD(
-//   poolAddress: Address,
-//   block: ethereum.Block
-// ): BigDecimal {
-//   const pool = getOrCreateLiquidityPool(poolAddress, block);
-
-//   if (pool.outputTokenSupply!.equals(constants.BIGINT_ZERO))
-//     return constants.BIGDECIMAL_ZERO;
-
-//   let outputToken = getOrCreateToken(poolAddress, block.number);
-
-//   let outputTokenSupply = pool.outputTokenSupply!.divDecimal(
-//     constants.BIGINT_TEN.pow(outputToken.decimals as u8).toBigDecimal()
-//   );
-//   let outputTokenPriceUSD = pool.totalValueLockedUSD.div(outputTokenSupply);
-
-//   outputToken.lastPriceUSD = outputTokenPriceUSD;
-//   outputToken.save();
-
-//   return outputTokenPriceUSD;
-// }
 
 export function calculateAverage(items: BigDecimal[]): BigDecimal {
   let sum = BigDecimal.fromString("0");

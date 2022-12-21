@@ -193,6 +193,9 @@ function swap(
     inputTokenBalances[tokenOutIndex] = inputTokenBalances[tokenOutIndex].minus(
       tokenOutAmount
     );
+    if (inputTokenBalances[tokenOutIndex] <= constants.BIGINT_ZERO) {
+      return;
+    }
     inputTokenAmounts[tokenOutIndex] = tokenOutAmount;
   }
   // log.warning("swap() inputTokenAmounts[0] {} inputTokenAmounts[1] {}", [
@@ -200,49 +203,48 @@ function swap(
   //   inputTokenAmounts[1].toString(),
   // ]);
 
-  if (
-    liquidityPool.inputTokenBalances[1] != constants.BIGINT_ZERO &&
-    inputTokenBalances[1] != constants.BIGINT_ZERO &&
-    inputTokenAmounts[1] != constants.BIGINT_ZERO
-  ) {
-    // if (
-    //   inputTokenBalances[0] >= constants.BIGINT_ZERO &&
-    //   inputTokenBalances[1] >= constants.BIGINT_ZERO
-    // ) {
+  // if (
+  //   liquidityPool.inputTokenBalances[1] != constants.BIGINT_ZERO &&
+  //   inputTokenBalances[1] != constants.BIGINT_ZERO &&
+  //   inputTokenAmounts[1] != constants.BIGINT_ZERO
+  // ) {
+  //   // if (
+  //   //   inputTokenBalances[0] >= constants.BIGINT_ZERO &&
+  //   //   inputTokenBalances[1] >= constants.BIGINT_ZERO
+  //   // ) {
 
-    let price = liquidityPool.inputTokenBalances[0].divDecimal(
-      inputTokenBalances[1].toBigDecimal()
-    );
+  //   let price = liquidityPool.inputTokenBalances[0].divDecimal(
+  //     inputTokenBalances[1].toBigDecimal()
+  //   );
 
-    if (tokenInIndex == 0) {
-      price = inputTokenBalances[0].divDecimal(
-        liquidityPool.inputTokenBalances[1].toBigDecimal()
-      );
-    }
-    log.warning(
-      "swap for pool {} inputTokenBalances before [0] {} [1] {} ratio {} *******after [0] {} [1] {} ratio {} ****** tokenAmount [0] {} [1] {} ratio {} price {}",
-      [
-        liquidityPool.id.toString(),
-        liquidityPool.inputTokenBalances[0].toString(),
-        liquidityPool.inputTokenBalances[1].toString(),
-        liquidityPool.inputTokenBalances[0]
-          .divDecimal(liquidityPool.inputTokenBalances[1].toBigDecimal())
-          .toString(),
-        inputTokenBalances[0].toString(),
-        inputTokenBalances[1].toString(),
-        inputTokenBalances[0]
-          .divDecimal(inputTokenBalances[1].toBigDecimal())
-          .toString(),
-        inputTokenAmounts[0].toString(),
-        inputTokenAmounts[1].toString(),
-        inputTokenAmounts[0]
-          .divDecimal(inputTokenAmounts[1].toBigDecimal())
-          .toString(),
-        price.toString(),
-      ]
-    );
-    // }
-  }
+  //   if (tokenInIndex == 0) {
+  //     price = inputTokenBalances[0].divDecimal(
+  //       liquidityPool.inputTokenBalances[1].toBigDecimal()
+  //     );
+  //   }
+  //   log.warning(
+  //     "swap for pool {} inputTokenBalances before [0] {} [1] {} ratio {} *******after [0] {} [1] {} ratio {} ****** tokenAmount [0] {} [1] {} ratio {} price {}",
+  //     [
+  //       liquidityPool.id.toString(),
+  //       liquidityPool.inputTokenBalances[0].toString(),
+  //       liquidityPool.inputTokenBalances[1].toString(),
+  //       liquidityPool.inputTokenBalances[0]
+  //         .divDecimal(liquidityPool.inputTokenBalances[1].toBigDecimal())
+  //         .toString(),
+  //       inputTokenBalances[0].toString(),
+  //       inputTokenBalances[1].toString(),
+  //       inputTokenBalances[0]
+  //         .divDecimal(inputTokenBalances[1].toBigDecimal())
+  //         .toString(),
+  //       inputTokenAmounts[0].toString(),
+  //       inputTokenAmounts[1].toString(),
+  //       inputTokenAmounts[0]
+  //         .divDecimal(inputTokenAmounts[1].toBigDecimal())
+  //         .toString(),
+  //       price.toString(),
+  //     ]
+  //   );
+  // }
 
   liquidityPool.inputTokenBalances = inputTokenBalances;
   liquidityPool._inputTokenAmounts = inputTokenAmounts;

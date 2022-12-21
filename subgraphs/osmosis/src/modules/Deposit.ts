@@ -84,8 +84,6 @@ export function msgJoinPoolHandler(
     }
   }
   log.warning("msgJoinPoolHandler() at height {} index {}", [
-    // message.tokenInMaxs,
-    // message.shareOutAmount.toString(),
     data.block.header.height.toString(),
     data.tx.index.toString(),
   ]);
@@ -132,16 +130,6 @@ export function msgJoinSwapShareAmountOutHandler(
     MsgJoinSwapShareAmountOut.decode
   );
 
-  // log.warning(
-  //   "msgJoinSwapShareAmountOutHandler() tokenInDenom {} tokenAmount {} at height {} index {}",
-  //   [
-  //     message.tokenInDenom,
-  //     message.tokenInMaxAmount.toString(),
-  //     data.block.header.height.toString(),
-  //     data.tx.index.toString(),
-  //   ]
-  // );
-
   joinSwapHandler(
     message.sender,
     message.poolId,
@@ -183,12 +171,7 @@ function joinSwapHandler(
     return;
   }
 
-  // const tokenInAmountChange = utils.bigDecimalToBigInt(
-  //   tokenInAmount
-  //     .toBigDecimal()
-  //     .times(liquidityPool.inputTokenWeights[tokenInIndex])
-  //     .div(constants.BIGDECIMAL_HUNDRED)
-  // );
+ 
   const tokenInAmountChange = tokenInAmount;
   const inputTokenAmounts = liquidityPool.inputTokenBalances;
   const inputTokenBalances = liquidityPool.inputTokenBalances;
@@ -200,11 +183,6 @@ function joinSwapHandler(
     tokenInAmountChange
   );
   for (let i = 0; i < inputTokenBalances.length; i++) {
-    // if (liquidityPool.outputTokenSupply != constants.BIGINT_ZERO) {
-    //   inputTokenAmounts[i] = inputTokenBalances[i]
-    //     .times(shareOutAmount)
-    //     .div(liquidityPool.outputTokenSupply!);
-    // }
     if (i != tokenInIndex) {
       inputTokenAmounts[i] = tokenInAmountChange
         .times(inputTokenBalances[i])
@@ -212,26 +190,7 @@ function joinSwapHandler(
       inputTokenBalances[i] = inputTokenBalances[i].plus(inputTokenAmounts[i]);
     }
 
-    // if (
-    //   swapInputTokens != null &&
-    //   swapInputTokens[tokenInIndex] != constants.BIGINT_ZERO
-    // ) {
 
-    //   log.warning("joinPoolHandler swapInputTokens {}", [
-    //     swapInputTokens[i]
-    //       .divDecimal(swapInputTokens[tokenInIndex].toBigDecimal())
-    //       .toString(),
-    //   ]);
-    // } else {
-    // if (i != tokenInIndex) {
-    //   inputTokenAmounts[i] = tokenInAmount
-    //     .minus(tokenInAmountChange)
-    //     .times(inputTokenBalances[i])
-    //     .div(inputTokenBalances[tokenInIndex]);
-    //   inputTokenBalances[i] = inputTokenBalances[i].plus(inputTokenAmounts[i]);
-    // }
-
-    // }
   }
 
   joinPoolHandler(

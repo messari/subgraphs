@@ -75,6 +75,7 @@ export function msgExitPoolHandler(
   const inputTokenAmounts = new Array<BigInt>(inputTokenBalances.length).fill(
     constants.BIGINT_ZERO
   );
+  let nonPositiveBalance = false;
   for (let idx = 0; idx < message.tokenOutMins.length; idx++) {
     const tokenOutMin = message.tokenOutMins[idx];
     let inputTokenIndex = liquidityPool.inputTokens.indexOf(tokenOutMin.denom);
@@ -84,9 +85,13 @@ export function msgExitPoolHandler(
       inputTokenBalances[inputTokenIndex] = inputTokenBalances[
         inputTokenIndex
       ].minus(amount);
+      if (inputTokenBalances[inputTokenIndex] <= constants.BIGINT_ZERO) {
+        nonPositiveBalance = true;
+      }
     }
   }
 
+  if (!nonPositiveBalance) {
   exitPoolHandler(
     message.sender,
     liquidityPool,
@@ -95,6 +100,7 @@ export function msgExitPoolHandler(
     message.shareInAmount,
     data
   );
+  }
 }
 
 export function msgExitSwapExternAmountOutHandler(
@@ -147,16 +153,6 @@ function exitSwapHandler(
   shareInAmount: BigInt,
   data: cosmos.TransactionData
 ): void {
-  //log.warning(
-  //   "exitSwapHandler() tokenInDenom {} tokenAmount {} at height {} index {}",
-  //   [
-  //     tokenInDenom,
-  //     tokenInAmount.toString(),
-  //     data.block.header.height.toString(),
-  //     data.tx.index.toString(),
-  //   ]
-  // );
-
   const liquidityPoolId = constants.Protocol.NAME.concat("-").concat(
     poolId.toString()
   );
@@ -169,16 +165,10 @@ function exitSwapHandler(
   if (tokenOutIndex < 0) {
     return;
   }
-  // const tokenOutAmountChange = utils.bigDecimalToBigInt(
-  //   tokenOutAmount
-  //     .toBigDecimal()
-  //     .times(liquidityPool.inputTokenWeights[tokenOutIndex])
-  //     .div(constants.BIGDECIMAL_HUNDRED)
-  // );
+  
   const inputTokenAmounts = liquidityPool.inputTokenBalances;
   const inputTokenBalances = liquidityPool.inputTokenBalances;
-  const prevInputTokenBalance = inputTokenBalances[tokenOutIndex];
-  const swapInputTokens = liquidityPool._inputTokenAmounts;
+  let nonPositiveBalance = false;
   for (let i = 0; i < inputTokenBalances.length; i++) {
     if (liquidityPool.outputTokenSupply != constants.BIGINT_ZERO) {
       inputTokenAmounts[i] = inputTokenBalances[i]
@@ -186,22 +176,12 @@ function exitSwapHandler(
         .div(liquidityPool.outputTokenSupply!);
     }
     inputTokenBalances[i] = inputTokenBalances[i].minus(inputTokenAmounts[i]);
-
-    // if (
-    //   swapInputTokens != null &&
-    //   swapInputTokens[tokenOutIndex] != constants.BIGINT_ZERO
-    // ) {
-    //   inputTokenAmounts[i] = tokenOutAmountChange
-    //     .times(swapInputTokens[i])
-    //     .div(swapInputTokens[tokenOutIndex]);
-    // } else {
-    //   inputTokenAmounts[i] = tokenOutAmountChange
-    //     .times(inputTokenBalances[i])
-    //     .div(prevInputTokenBalance);
-    //   inputTokenBalances[i] = inputTokenBalances[i].minus(inputTokenAmounts[i]);
-    // }
+    if (inputTokenBalances[i] <= constants.BIGINT_ZERO) {
+      nonPositiveBalance = true;
+    }
   }
 
+  if (!nonPositiveBalance) {
   exitPoolHandler(
     sender,
     liquidityPool,
@@ -210,6 +190,7 @@ function exitSwapHandler(
     shareInAmount,
     data
   );
+  }
 }
 
 function exitPoolHandler(

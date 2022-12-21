@@ -7,17 +7,6 @@ export function initRegistry(): void {
   if (_TokenPrice.load("loaded") != null && Token.load("loaded") != null) {
     return;
   }
-  // ipfs.mapJSON(
-  //   "QmREhMw7MWQtx61xX3H87uwtwVHvqHZeQY1aKvCBt1BZa1",
-  //   "loadPrice",
-  //   Value.fromString("")
-  // );
-  // ipfs.map(
-  //   "QmREhMw7MWQtx61xX3H87uwtwVHvqHZeQY1aKvCBt1BZa1",
-  //   "loadPrice",
-  //   Value.fromString(""),
-  //   ["json"]
-  // );
 
   const prices = [
     [18806, 10.0, 4.61],
@@ -1425,36 +1414,3 @@ export function initRegistry(): void {
   }
 }
 
-// export function loadPrice(value: JSONValue, userData: Value): void {
-//   let rawData = value.toArray();
-
-//   let date: string | null = rawData[0].isNull() ? null : rawData[0].toString();
-//   let cosmosPrice: f32 | null = rawData[1].isNull()
-//     ? null
-//     : (rawData[1].toF64() as f32);
-
-//   let osmosisPrice: f32 | null = rawData[2].isNull()
-//     ? null
-//     : (rawData[2].toF64() as f64);
-
-//   if (date != null) {
-//     // Persist token pricedata if it doesn't already exist
-//     let tokenPrice = TokenPrice.load(date);
-
-//     if (tokenPrice == null) {
-//       tokenPrice = new TokenPrice(date);
-//       tokenPrice.cosmos = BigDecimal.fromString(cosmosPrice!.toString());
-//       tokenPrice.osmosis = BigDecimal.fromString(osmosisPrice!.toString());
-
-//       log.warning("Adding token to registry, id: {}, cosmos: {}, osmosis: {}", [
-//         date.toString(),
-//         cosmosPrice!.toString(),
-//         "osmosisPrice!.toString()",
-//       ]);
-
-//       tokenPrice.save();
-//     } else {
-//       log.warning("Token {} already in registry", [date]);
-//     }
-//   }
-// }
