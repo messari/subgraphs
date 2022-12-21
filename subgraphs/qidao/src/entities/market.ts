@@ -34,7 +34,7 @@ import {
   updateProtocolBorrowBalance,
   updateProtocolTVL,
 } from "./protocol";
-import { getMaiToken, getOrCreateToken } from "./token";
+import { getOrCreateToken } from "./token";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 
 export function getMarket(address: Address): Market {
