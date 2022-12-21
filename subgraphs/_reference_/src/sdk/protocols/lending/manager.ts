@@ -23,8 +23,8 @@ import {
   Transfer,
   Withdraw,
   _MarketList,
-} from "../../generated/schema";
-import { Versions } from "../versions";
+} from "../../../../generated/schema";
+import { Versions } from "../../../versions";
 import { AccountManager } from "./account";
 import {
   activityCounter,
