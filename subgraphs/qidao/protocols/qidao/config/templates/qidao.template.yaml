@@ -3,7 +3,7 @@ repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  {{ #maticVault }}
+  {{#maticVault}}
   - kind: ethereum
     name: {{ name }}
     network: {{ chain }}
@@ -61,7 +61,7 @@ dataSources:
           handler: handleBuyRiskyVault
       file: ./src/mappings/QiStablecoin.ts
   {{ /maticVault }}
-  {{ #erc20Vaults }}
+  {{#erc20Vaults}}
   - kind: ethereum
     name: {{ name }}
     network: {{ chain }}
