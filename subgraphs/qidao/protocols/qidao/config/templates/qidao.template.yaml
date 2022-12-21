@@ -60,7 +60,7 @@ dataSources:
         - event: BuyRiskyVault(uint256,address,address,uint256)
           handler: handleBuyRiskyVault
       file: ./src/mappings/QiStablecoin.ts
-  {{ /maticVault }}
+  {{/maticVault}}
   {{#erc20Vaults}}
   - kind: ethereum
     name: {{ name }}
@@ -115,7 +115,7 @@ dataSources:
         - event: WithdrawCollateral(uint256,uint256)
           handler: handleWithdrawCollateral
       file: ./src/mappings/erc20QiStablecoin.ts
-  {{ /erc20Vaults }}
+  {{/erc20Vaults}}
 # Template is only used for imports
 templates:
   - kind: ethereum
