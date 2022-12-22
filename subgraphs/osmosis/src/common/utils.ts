@@ -1,6 +1,7 @@
 import { BigInt, ethereum, BigDecimal, cosmos } from "@graphprotocol/graph-ts";
 import {
   LiquidityPool as LiquidityPoolStore,
+  Token,
   _TokenPrice,
 } from "../../generated/schema";
 import { MsgPoolParams } from "../modules/Decoder";
@@ -32,7 +33,6 @@ export function readValue<T>(
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
-
 export function calculateAverage(items: BigDecimal[]): BigDecimal {
   let sum = BigDecimal.fromString("0");
   for (let i = 0; i < items.length; i++) {
@@ -48,8 +48,36 @@ export function updatePoolTVL(
   liquidityPool: LiquidityPoolStore,
   block: cosmos.HeaderOnlyBlock
 ): bool {
-  let inputTokens = liquidityPool.inputTokens;
-  let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+  const index = updateTokenPrice(liquidityPool, block) as i32;
+  if (index < 0) {
+    return false;
+  }
+
+  const inputTokens = liquidityPool.inputTokens;
+  const token = getOrCreateToken(inputTokens[index]);
+  let lastPrice = constants.BIGDECIMAL_ONE;
+  if (token.lastPriceUSD !== null) {
+    lastPrice = token.lastPriceUSD!;
+  }
+
+  const inputTokenBalances = liquidityPool.inputTokenBalances;
+  const inputTokenWeights = liquidityPool.inputTokenWeights;
+  const amountUSD = inputTokenBalances[index]
+    .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
+    .times(lastPrice);
+  liquidityPool.totalValueLockedUSD = amountUSD
+    .times(constants.BIGDECIMAL_HUNDRED)
+    .div(inputTokenWeights[index]);
+  liquidityPool.save();
+
+  return true;
+}
+
+export function updateTokenPrice(
+  liquidityPool: LiquidityPoolStore,
+  block: cosmos.HeaderOnlyBlock
+): number {
+  const inputTokens = liquidityPool.inputTokens;
   let stableCoinIndex = -1;
   let osmoIndex = -1;
   let atomIndex = -1;
@@ -66,7 +94,7 @@ export function updatePoolTVL(
   }
 
   if (stableCoinIndex < 0 && osmoIndex < 0 && atomIndex < 0) {
-    return false;
+    return -1;
   }
 
   const id = (block.header.time.seconds / constants.SECONDS_PER_DAY).toString();
@@ -83,7 +111,7 @@ export function updatePoolTVL(
   if (
     stableCoinIndex < 0 &&
     block.header.height < (constants.STABLE_COIN_START_BLOCK as u64) &&
-    (token._lastPriceDate == null || token._lastPriceDate != id)
+    (!token._lastPriceDate || token._lastPriceDate != id)
   ) {
     // Load price retrieved from offchain data source
     const tokenPrice = _TokenPrice.load(id);
@@ -99,23 +127,7 @@ export function updatePoolTVL(
     token.save();
   }
 
-  let lastPrice = constants.BIGDECIMAL_ONE;
-  if (token.lastPriceUSD !== null) {
-    lastPrice = token.lastPriceUSD!;
-  }
-
-  let inputTokenBalances = liquidityPool.inputTokenBalances;
-  let inputTokenWeights = liquidityPool.inputTokenWeights;
-  let amountUSD = inputTokenBalances[index]
-    .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
-    .times(lastPrice);
-  totalValueLockedUSD = amountUSD
-    .times(constants.BIGDECIMAL_HUNDRED)
-    .div(inputTokenWeights[index]);
-  liquidityPool.totalValueLockedUSD = totalValueLockedUSD;
-  liquidityPool.save();
-
-  return true;
+  return index;
 }
 
 export function getPoolFees(
@@ -182,4 +194,29 @@ export function updateProtocolAfterNewLiquidityPool(
 // Round BigDecimal to whole number
 export function roundToWholeNumber(n: BigDecimal): BigDecimal {
   return n.truncate(0);
+}
+
+// convert emitted values to tokens count
+export function convertTokenToDecimal(
+  tokenAmount: BigInt,
+  exchangeDecimals: i32
+): BigDecimal {
+  if (exchangeDecimals == 0) {
+    return tokenAmount.toBigDecimal();
+  }
+
+  return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals));
+}
+
+// convert decimals
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let bd = constants.BIGDECIMAL_ONE;
+  for (
+    let i = constants.INT_ZERO;
+    i < (decimals as i32);
+    i = i + constants.INT_ONE
+  ) {
+    bd = bd.times(constants.BIGDECIMAL_TEN);
+  }
+  return bd;
 }

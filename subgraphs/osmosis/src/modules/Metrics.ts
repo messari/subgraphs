@@ -1,10 +1,4 @@
-import {
-  log,
-  BigInt,
-  Address,
-  cosmos,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
+import { BigInt, Address, cosmos, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   Account,
   ActiveAccount,
@@ -13,7 +7,6 @@ import {
 } from "../../generated/schema";
 import * as constants from "../common/constants";
 import {
-  getOrCreateAccount,
   getOrCreateDexAmmProtocol,
   getOrCreateFinancialDailySnapshots,
   getOrCreateUsageMetricsDailySnapshot,
@@ -69,7 +62,7 @@ export function updatePoolSnapshots(
   block: cosmos.HeaderOnlyBlock
 ): void {
   const pool = LiquidityPoolStore.load(liquidityPoolId);
-  if (pool == null) {
+  if (!pool) {
     return;
   }
   const poolDailySnapshots = getOrCreateLiquidityPoolDailySnapshots(
@@ -80,7 +73,7 @@ export function updatePoolSnapshots(
     liquidityPoolId,
     block
   );
-  if (poolDailySnapshots == null || poolHourlySnapshots == null) {
+  if (!poolDailySnapshots || !poolHourlySnapshots) {
     return;
   }
 
@@ -165,7 +158,7 @@ export function updateTokenVolumeAndBalance(
   block: cosmos.HeaderOnlyBlock
 ): void {
   const pool = LiquidityPoolStore.load(liquidityPoolId);
-  if (pool == null) {
+  if (!pool) {
     return;
   }
   const poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
@@ -176,7 +169,7 @@ export function updateTokenVolumeAndBalance(
     liquidityPoolId,
     block
   );
-  if (poolDailySnaphot == null || poolHourlySnaphot == null) {
+  if (!poolDailySnaphot || !poolHourlySnaphot) {
     return;
   }
 
@@ -219,7 +212,7 @@ export function updateSnapshotsVolume(
   const protcol = getOrCreateDexAmmProtocol();
   const financialsDailySnapshot = getOrCreateFinancialDailySnapshots(block);
   const liquidityPool = LiquidityPoolStore.load(liquidityPoolId);
-  if (liquidityPool == null) {
+  if (!liquidityPool) {
     return;
   }
   const poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
@@ -230,7 +223,7 @@ export function updateSnapshotsVolume(
     liquidityPoolId,
     block
   );
-  if (poolDailySnaphot == null || poolHourlySnaphot == null) {
+  if (!poolDailySnaphot || !poolHourlySnaphot) {
     return;
   }
 
@@ -281,51 +274,21 @@ export function updateSnapshotsVolume(
   protcol.save();
 }
 
-export function updateProtocolRevenue(
-  liquidityPoolId: string,
-  volumeUSD: BigDecimal,
-  block: cosmos.HeaderOnlyBlock
-): void {
-  const pool = LiquidityPoolStore.load(liquidityPoolId);
-  if (pool == null) {
-    return;
-  }
-  const poolFees = pool.fees;
-  if (poolFees == null || poolFees.length != 3) {
-    return;
-  }
-  const protocolFee = LiquidityPoolFee.load(poolFees[1]);
-  if (protocolFee == null || protocolFee.feePercentage === null) {
-    return;
-  }
-
-  const protocolSideRevenueUSD = volumeUSD
-    .times(protocolFee.feePercentage!)
-    .div(constants.BIGDECIMAL_HUNDRED);
-
-  updateRevenueSnapshots(
-    pool,
-    constants.BIGDECIMAL_ZERO,
-    protocolSideRevenueUSD,
-    block
-  );
-}
-
 export function updateSupplySideRevenue(
   liquidityPoolId: string,
   volumeUSD: BigDecimal,
   block: cosmos.HeaderOnlyBlock
 ): void {
   const pool = LiquidityPoolStore.load(liquidityPoolId);
-  if (pool == null) {
+  if (!pool) {
     return;
   }
   const poolFees = pool.fees;
-  if (poolFees == null || poolFees.length != 3) {
+  if (!poolFees || poolFees.length != 3) {
     return;
   }
   const tradingFee = LiquidityPoolFee.load(poolFees[0]);
-  if (tradingFee == null || tradingFee.feePercentage === null) {
+  if (!tradingFee || !tradingFee.feePercentage) {
     return;
   }
 
@@ -387,7 +350,7 @@ export function updateMetrics(
   // Combine the id and the user address to generate a unique user id for the day
   const dailyActiveAccountId = from.concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
-  if (dailyActiveAccount == null) {
+  if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
     metricsDailySnapshot.dailyActiveUsers += 1;
     dailyActiveAccount.save();
@@ -395,14 +358,14 @@ export function updateMetrics(
 
   const hourlyActiveAccountId = from.concat("-").concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
-  if (hourlyActiveAccount == null) {
+  if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
     metricsHourlySnapshot.hourlyActiveUsers += 1;
     hourlyActiveAccount.save();
   }
 
   let account = Account.load(from);
-  if (account == null) {
+  if (!account) {
     account = new Account(from);
     protocol.cumulativeUniqueUsers += 1;
     account.save();

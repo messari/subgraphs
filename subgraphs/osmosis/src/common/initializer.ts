@@ -3,7 +3,6 @@ import { BigDecimal, BigInt, cosmos, log } from "@graphprotocol/graph-ts";
 import {
   Account,
   Token,
-  _TokenPrice,
   DexAmmProtocol,
   FinancialsDailySnapshot,
   LiquidityPoolDailySnapshot,
@@ -17,11 +16,12 @@ import * as constants from "../common/constants";
 import * as utils from "../common/utils";
 import { MsgCreateBalancerPool } from "../modules/Decoder";
 import { initRegistry } from "./registry";
+import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
 
-  if (account == null) {
+  if (!account) {
     account = new Account(id);
     account.save();
 
@@ -40,7 +40,7 @@ export function getOrCreateLiquidityPoolFee(
 ): LiquidityPoolFee {
   let fees = LiquidityPoolFee.load(feeId);
 
-  if (fees == null) {
+  if (!fees) {
     fees = new LiquidityPoolFee(feeId);
     fees.feeType = feeType;
     fees.feePercentage = feePercentage;
@@ -59,8 +59,7 @@ export function getOrCreateLiquidityPoolFee(
 export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
   const protocolId = constants.Protocol.NAME;
   let protocol = DexAmmProtocol.load(protocolId);
-
-  if (protocol == null) {
+  if (!protocol) {
     protocol = new DexAmmProtocol(protocolId);
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
@@ -76,11 +75,12 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     protocol.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
-
-    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+  protocol.save();
 
   return protocol;
 }
@@ -88,7 +88,7 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
 export function getOrCreateToken(denom: string): Token {
   let token = Token.load(denom);
 
-  if (token == null) {
+  if (!token) {
     token = new Token(denom);
     token.name = denom;
     token.symbol = denom;
@@ -106,7 +106,7 @@ export function getOrCreateFinancialDailySnapshots(
   const id = block.header.time.seconds / constants.SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
-  if (financialMetrics == null) {
+  if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = constants.Protocol.NAME;
 
@@ -139,7 +139,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
   const id = (block.header.time.seconds / constants.SECONDS_PER_DAY).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
 
-  if (usageMetrics == null) {
+  if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id);
     usageMetrics.protocol = constants.Protocol.NAME;
 
@@ -164,12 +164,12 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: cosmos.HeaderOnlyBlock
 ): UsageMetricsHourlySnapshot {
-  let metricsID: string = (
+  const metricsID: string = (
     block.header.time.seconds / constants.SECONDS_PER_HOUR
   ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
 
-  if (usageMetrics == null) {
+  if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(metricsID);
     usageMetrics.protocol = constants.Protocol.NAME;
 
@@ -198,19 +198,17 @@ export function getOrCreateLiquidityPoolDailySnapshots(
     .concat((block.header.time.seconds / constants.SECONDS_PER_DAY).toString());
   let poolSnapshots = LiquidityPoolDailySnapshot.load(id);
 
-  if (poolSnapshots == null) {
-    const pool = LiquidityPoolStore.load(liquidityPoolId);
-    if (pool == null) {
-      return null;
-    }
+  if (!poolSnapshots) {
     poolSnapshots = new LiquidityPoolDailySnapshot(id);
     poolSnapshots.protocol = constants.Protocol.NAME;
     poolSnapshots.pool = liquidityPoolId;
-
-    const inputTokenLength = pool.inputTokens.length;
-
     poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
+    const pool = LiquidityPoolStore.load(liquidityPoolId);
+    if (!pool) {
+      return null;
+    }
+    const inputTokenLength = pool.inputTokens.length;
     poolSnapshots.dailyVolumeByTokenAmount = new Array<BigInt>(
       inputTokenLength
     ).fill(constants.BIGINT_ZERO);
@@ -262,20 +260,17 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
     );
   let poolSnapshots = LiquidityPoolHourlySnapshot.load(id);
 
-  if (poolSnapshots == null) {
-    const pool = LiquidityPoolStore.load(liquidityPoolId);
-    if (pool == null) {
-      return null;
-    }
-
+  if (!poolSnapshots) {
     poolSnapshots = new LiquidityPoolHourlySnapshot(id);
     poolSnapshots.protocol = constants.Protocol.NAME;
     poolSnapshots.pool = liquidityPoolId;
-
     poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
-    let inputTokenLength = pool.inputTokens.length;
-
+    const pool = LiquidityPoolStore.load(liquidityPoolId);
+    if (!pool) {
+      return null;
+    }
+    const inputTokenLength = pool.inputTokens.length;
     poolSnapshots.hourlyVolumeByTokenAmount = new Array<BigInt>(
       inputTokenLength
     ).fill(constants.BIGINT_ZERO);
@@ -321,16 +316,6 @@ export function msgCreatePoolHandler(
   initRegistry();
 
   const poolId = getPoolId(data.tx.result.events);
-
-  if (poolId != BigInt.fromString("686")) {
-    return;
-  }
-
-  log.warning("new create pool poolId is {} height is {}", [
-    poolId.toString(),
-    data.block.header.height.toString(),
-  ]);
-
   const liquidityPoolId = constants.Protocol.NAME.concat("-").concat(
     poolId.toString()
   );
@@ -347,9 +332,9 @@ export function msgCreatePoolHandler(
   liquidityPool.symbol = "gamm/pool/".concat(poolId.toString());
   liquidityPool.protocol = constants.Protocol.NAME;
 
-  let inputTokens: string[] = [];
-  let inputTokenBalances: BigInt[] = [];
-  let inputTokenWeights: BigDecimal[] = [];
+  const inputTokens: string[] = [];
+  const inputTokenBalances: BigInt[] = [];
+  const inputTokenWeights: BigDecimal[] = [];
   let tokenWeight = constants.BIGDECIMAL_ZERO;
   let totalPoolWeight = constants.BIGDECIMAL_ZERO;
   for (let i = 0; i < message.poolAssets.length; i++) {

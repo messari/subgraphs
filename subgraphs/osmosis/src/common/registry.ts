@@ -520,14 +520,14 @@ export function initRegistry(): void {
     [19314, 9.93, 1.11],
   ];
 
-  if (_TokenPrice.load("loaded") == null) {
-    let priceLoaded = new _TokenPrice("loaded");
+  if (!_TokenPrice.load("loaded")) {
+    const priceLoaded = new _TokenPrice("loaded");
     priceLoaded.save();
 
     for (let i = 0; i < prices.length; i++) {
       let tokenPrice = _TokenPrice.load((prices[i][0] as i32).toString());
 
-      if (tokenPrice == null) {
+      if (!tokenPrice) {
         tokenPrice = new _TokenPrice((prices[i][0] as i32).toString());
         tokenPrice.cosmos = BigDecimal.fromString(prices[i][1].toString());
         tokenPrice.osmosis = BigDecimal.fromString(prices[i][2].toString());
@@ -1388,8 +1388,8 @@ export function initRegistry(): void {
     ],
   ];
 
-  if (Token.load("loaded") == null) {
-    let tokenLoaded = new Token("loaded");
+  if (!Token.load("loaded")) {
+    const tokenLoaded = new Token("loaded");
     tokenLoaded.name = "loaded";
     tokenLoaded.symbol = "loaded";
     tokenLoaded.decimals = 18;
@@ -1398,7 +1398,7 @@ export function initRegistry(): void {
     for (let i = 0; i < tokens.length; i++) {
       const denom = tokens[i][0].toString();
       let token = Token.load(denom);
-      if (token == null) {
+      if (!token) {
         token = new Token(denom);
         token.name = tokens[i][1].toString();
         token.symbol = tokens[i][2].toString();
@@ -1413,4 +1413,3 @@ export function initRegistry(): void {
     }
   }
 }
-

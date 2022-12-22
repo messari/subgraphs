@@ -24,11 +24,6 @@ export function handleTx(data: cosmos.TransactionData): void {
       msgType == constants.Messages.MsgCreatePool ||
       msgType == constants.Messages.MsgCreateBalancerPool
     ) {
-      if (msgType == constants.Messages.MsgCreatePool) {
-        log.warning("new create pool MsgCreatePool", []);
-      } else if (msgType == constants.Messages.MsgCreateBalancerPool) {
-        log.warning("new create pool MsgCreateBalancerPool", []);
-      }
       msgCreatePoolHandler(msgValue, data);
     } else if (
       msgType == constants.Messages.MsgSwapExactAmountIn ||

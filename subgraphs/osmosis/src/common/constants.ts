@@ -93,6 +93,9 @@ export namespace Messages {
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 
+export const INT_ZERO = 0 as i32;
+export const INT_ONE = 1 as i32;
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
 export const BIGINT_ONE = BigInt.fromI32(1);
@@ -102,7 +105,8 @@ export const BIGINT_SECONDS_PER_DAY = BigInt.fromI32(SECONDS_PER_DAY);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
-export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
+export const BIGDECIMAL_TEN = new BigDecimal(BIGINT_TEN);
+export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 export const BIGDECIMAL_SECONDS_PER_DAY = new BigDecimal(
   BigInt.fromI32(SECONDS_PER_DAY)
 );

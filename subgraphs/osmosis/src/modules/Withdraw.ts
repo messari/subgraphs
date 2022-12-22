@@ -23,39 +23,34 @@ function createWithdrawTransaction(
   sharesBurnt: BigInt,
   amountUSD: BigDecimal
 ): void {
-  if (transaction == null) {
+  if (!transaction) {
     return;
   }
   const withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
-  let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
-  if (withdrawTransaction == null) {
-    withdrawTransaction = new WithdrawTransaction(withdrawTransactionId);
+  const withdrawTransaction = new WithdrawTransaction(withdrawTransactionId);
 
-    withdrawTransaction.pool = liquidityPool.id;
-    withdrawTransaction.protocol = getOrCreateDexAmmProtocol().id;
+  withdrawTransaction.pool = liquidityPool.id;
+  withdrawTransaction.protocol = getOrCreateDexAmmProtocol().id;
 
-    withdrawTransaction.to = liquidityPool.id;
-    withdrawTransaction.from = from;
+  withdrawTransaction.to = liquidityPool.id;
+  withdrawTransaction.from = from;
 
-    withdrawTransaction.hash = transaction.hash.toHexString();
-    withdrawTransaction.logIndex = transaction.index;
+  withdrawTransaction.hash = transaction.hash.toHexString();
+  withdrawTransaction.logIndex = transaction.index;
 
-    withdrawTransaction.inputTokens = liquidityPool.inputTokens;
-    withdrawTransaction.outputToken = liquidityPool.outputToken;
-    withdrawTransaction.inputTokenAmounts = inputTokenAmounts;
-    withdrawTransaction.outputTokenAmount = sharesBurnt;
-    withdrawTransaction.amountUSD = amountUSD;
+  withdrawTransaction.inputTokens = liquidityPool.inputTokens;
+  withdrawTransaction.outputToken = liquidityPool.outputToken;
+  withdrawTransaction.inputTokenAmounts = inputTokenAmounts;
+  withdrawTransaction.outputTokenAmount = sharesBurnt;
+  withdrawTransaction.amountUSD = amountUSD;
 
-    withdrawTransaction.blockNumber = BigInt.fromI32(
-      block.header.height as i32
-    );
-    withdrawTransaction.timestamp = BigInt.fromI32(
-      block.header.time.seconds as i32
-    );
+  withdrawTransaction.blockNumber = BigInt.fromI32(block.header.height as i32);
+  withdrawTransaction.timestamp = BigInt.fromI32(
+    block.header.time.seconds as i32
+  );
 
-    withdrawTransaction.save();
-  }
+  withdrawTransaction.save();
 }
 
 export function msgExitPoolHandler(
@@ -67,7 +62,7 @@ export function msgExitPoolHandler(
     message.poolId.toString()
   );
   const liquidityPool = LiquidityPoolStore.load(liquidityPoolId);
-  if (liquidityPool == null) {
+  if (!liquidityPool) {
     return;
   }
 
@@ -78,7 +73,9 @@ export function msgExitPoolHandler(
   let nonPositiveBalance = false;
   for (let idx = 0; idx < message.tokenOutMins.length; idx++) {
     const tokenOutMin = message.tokenOutMins[idx];
-    let inputTokenIndex = liquidityPool.inputTokens.indexOf(tokenOutMin.denom);
+    const inputTokenIndex = liquidityPool.inputTokens.indexOf(
+      tokenOutMin.denom
+    );
     if (inputTokenIndex >= 0) {
       const amount = tokenOutMin.amount;
       inputTokenAmounts[inputTokenIndex] = amount;
@@ -92,14 +89,14 @@ export function msgExitPoolHandler(
   }
 
   if (!nonPositiveBalance) {
-  exitPoolHandler(
-    message.sender,
-    liquidityPool,
-    inputTokenBalances,
-    inputTokenAmounts,
-    message.shareInAmount,
-    data
-  );
+    exitPoolHandler(
+      message.sender,
+      liquidityPool,
+      inputTokenBalances,
+      inputTokenAmounts,
+      message.shareInAmount,
+      data
+    );
   }
 }
 
@@ -111,7 +108,7 @@ export function msgExitSwapExternAmountOutHandler(
     msgValue,
     MsgExitSwapExternAmountOut.decode
   );
-  if (message.tokenOut == null) {
+  if (!message.tokenOut) {
     return;
   }
 
@@ -157,7 +154,7 @@ function exitSwapHandler(
     poolId.toString()
   );
   const liquidityPool = LiquidityPoolStore.load(liquidityPoolId);
-  if (liquidityPool == null) {
+  if (!liquidityPool) {
     return;
   }
 
@@ -165,7 +162,7 @@ function exitSwapHandler(
   if (tokenOutIndex < 0) {
     return;
   }
-  
+
   const inputTokenAmounts = liquidityPool.inputTokenBalances;
   const inputTokenBalances = liquidityPool.inputTokenBalances;
   let nonPositiveBalance = false;
@@ -182,14 +179,14 @@ function exitSwapHandler(
   }
 
   if (!nonPositiveBalance) {
-  exitPoolHandler(
-    sender,
-    liquidityPool,
-    inputTokenBalances,
-    inputTokenAmounts,
-    shareInAmount,
-    data
-  );
+    exitPoolHandler(
+      sender,
+      liquidityPool,
+      inputTokenBalances,
+      inputTokenAmounts,
+      shareInAmount,
+      data
+    );
   }
 }
 

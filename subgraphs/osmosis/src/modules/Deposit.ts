@@ -23,13 +23,13 @@ function createDepositTransaction(
   sharesMinted: BigInt,
   amountUSD: BigDecimal
 ): void {
-  if (transaction == null) {
+  if (!transaction) {
     return;
   }
   const transactionId = "deposit-" + transaction.hash.toHexString();
   let depositTransaction = DepositTransaction.load(transactionId);
 
-  if (depositTransaction == null) {
+  if (!depositTransaction) {
     depositTransaction = new DepositTransaction(transactionId);
 
     depositTransaction.pool = liquidityPool.id;
@@ -64,7 +64,7 @@ export function msgJoinPoolHandler(
     message.poolId.toString()
   );
   const liquidityPool = LiquidityPoolStore.load(liquidityPoolId);
-  if (liquidityPool == null) {
+  if (!liquidityPool) {
     return;
   }
 
@@ -106,7 +106,7 @@ export function msgJoinSwapExternAmountInHandler(
     msgValue,
     MsgJoinSwapExternAmountIn.decode
   );
-  if (message.tokenIn == null) {
+  if (!message.tokenIn) {
     return;
   }
 
@@ -152,31 +152,18 @@ function joinSwapHandler(
     poolId.toString()
   );
   const liquidityPool = LiquidityPoolStore.load(liquidityPoolId);
-  if (liquidityPool == null) {
+  if (!liquidityPool) {
     return;
   }
-
-  log.warning(
-    "joinSwapHandler() tokenInDenom {} tokenAmount {} at height {} index {}",
-    [
-      tokenInDenom,
-      tokenInAmount.toString(),
-      data.block.header.height.toString(),
-      data.tx.index.toString(),
-    ]
-  );
 
   const tokenInIndex = liquidityPool.inputTokens.indexOf(tokenInDenom);
   if (tokenInIndex < 0) {
     return;
   }
 
- 
   const tokenInAmountChange = tokenInAmount;
   const inputTokenAmounts = liquidityPool.inputTokenBalances;
   const inputTokenBalances = liquidityPool.inputTokenBalances;
-  const swapInputTokens = liquidityPool._inputTokenAmounts;
-  const prevInputTokenBalance = inputTokenBalances[tokenInIndex];
 
   inputTokenAmounts[tokenInIndex] = tokenInAmountChange;
   inputTokenBalances[tokenInIndex] = inputTokenBalances[tokenInIndex].plus(
@@ -189,8 +176,6 @@ function joinSwapHandler(
         .div(inputTokenBalances[tokenInIndex]);
       inputTokenBalances[i] = inputTokenBalances[i].plus(inputTokenAmounts[i]);
     }
-
-
   }
 
   joinPoolHandler(
@@ -211,29 +196,6 @@ function joinPoolHandler(
   shareOutAmount: BigInt,
   data: cosmos.TransactionData
 ): void {
-  if (
-    liquidityPool.inputTokenBalances[1] != constants.BIGINT_ZERO &&
-    inputTokenBalances[1] != constants.BIGINT_ZERO &&
-    inputTokenAmounts[1] != constants.BIGINT_ZERO
-  ) {
-    log.warning(
-      "joinPoolHandler for pool {} inputTokenBalances before {} after {} tokenAmount {} at height {}",
-      [
-        liquidityPool.id.toString(),
-        liquidityPool.inputTokenBalances[0]
-          .divDecimal(liquidityPool.inputTokenBalances[1].toBigDecimal())
-          .toString(),
-        inputTokenBalances[0]
-          .divDecimal(inputTokenBalances[1].toBigDecimal())
-          .toString(),
-        inputTokenAmounts[0]
-          .divDecimal(inputTokenAmounts[1].toBigDecimal())
-          .toString(),
-        data.block.header.height.toString(),
-      ]
-    );
-  }
-
   liquidityPool.inputTokenBalances = inputTokenBalances;
   liquidityPool.outputTokenSupply = liquidityPool.outputTokenSupply!.plus(
     shareOutAmount

@@ -23,7 +23,7 @@ export function updateRevenueSnapshots(
     pool.id,
     block
   );
-  if (poolDailySnapshot == null || poolHourlySnapshot == null) {
+  if (!poolDailySnapshot || !poolHourlySnapshot) {
     return;
   }
 
