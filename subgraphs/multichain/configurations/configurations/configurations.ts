@@ -3,7 +3,7 @@ import { log } from "@graphprotocol/graph-ts";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 
-import { MultichainMainnetConfigurations } from "../../protocols/multichain/config/deployments/multichain-mainnet/configurations";
+import { MultichainMainnetConfigurations } from "../../protocols/multichain/config/deployments/multichain-ethereum/configurations";
 import { MultichainFantomConfigurations } from "../../protocols/multichain/config/deployments/multichain-fantom/configurations";
 // import { MultichainBscConfigurations } from "../../protocols/multichain/config/deployments/multichain-bsc/configurations";
 // import { MultichainAvalancheConfigurations } from "../../protocols/multichain/config/deployments/multichain-avalanche/configurations";
