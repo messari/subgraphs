@@ -1,5 +1,5 @@
 import { Protobuf } from "as-proto";
-import { BigDecimal, BigInt, cosmos, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, cosmos } from "@graphprotocol/graph-ts";
 import {
   Account,
   Token,

@@ -11,7 +11,7 @@ import {
 import { msgSwapExactAmountHandler } from "../modules/Swap";
 import { msgCreatePoolHandler } from "../common/initializer";
 import * as constants from "../common/constants";
-import { log, cosmos } from "@graphprotocol/graph-ts";
+import { cosmos } from "@graphprotocol/graph-ts";
 
 export function handleTx(data: cosmos.TransactionData): void {
   const messages = data.tx.tx.body.messages;

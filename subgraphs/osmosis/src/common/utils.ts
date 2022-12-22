@@ -1,7 +1,6 @@
 import { BigInt, ethereum, BigDecimal, cosmos } from "@graphprotocol/graph-ts";
 import {
   LiquidityPool as LiquidityPoolStore,
-  Token,
   _TokenPrice,
 } from "../../generated/schema";
 import { MsgPoolParams } from "../modules/Decoder";
