@@ -97,9 +97,8 @@ export function updateUsageMetrics(event: ethereum.Event): void {
 
 export function updateUsageMetricsAfterDeposit(event: ethereum.Event): void {
   const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
-  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
-    event
-  );
+  const usageMetricsHourlySnapshot =
+    getOrCreateUsageMetricsHourlySnapshot(event);
 
   usageMetricsDailySnapshot.dailyDepositCount += 1;
   usageMetricsHourlySnapshot.hourlyDepositCount += 1;
@@ -110,9 +109,8 @@ export function updateUsageMetricsAfterDeposit(event: ethereum.Event): void {
 
 export function updateUsageMetricsAfterWithdraw(event: ethereum.Event): void {
   const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
-  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
-    event
-  );
+  const usageMetricsHourlySnapshot =
+    getOrCreateUsageMetricsHourlySnapshot(event);
 
   usageMetricsDailySnapshot.dailyWithdrawCount += 1;
   usageMetricsHourlySnapshot.hourlyWithdrawCount += 1;
@@ -206,9 +204,8 @@ export function updateRevenue(
   event: ethereum.Event
 ): void {
   const protocolSideRevenueUSD = totalFees.times(totalRevenueUSD);
-  const supplySideRevenueUSD = BIGDECIMAL_ONE.minus(totalFees).times(
-    totalRevenueUSD
-  );
+  const supplySideRevenueUSD =
+    BIGDECIMAL_ONE.minus(totalFees).times(totalRevenueUSD);
 
   const protocol = getOrCreateYieldAggregator();
   const vault = getOrCreateVault(boosterAddr, poolId, event);
@@ -218,56 +215,43 @@ export function updateRevenue(
   const vaultDailySnapshot = getOrCreateVaultDailySnapshots(vault.id, event);
   const vaultHourlySnapshot = getOrCreateVaultHourlySnapshots(vault.id, event);
 
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  vault.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  vault.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
 
-  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  vaultDailySnapshot.dailySupplySideRevenueUSD = vaultDailySnapshot.dailySupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  vaultHourlySnapshot.hourlySupplySideRevenueUSD = vaultHourlySnapshot.hourlySupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
+  financialMetrics.dailySupplySideRevenueUSD =
+    financialMetrics.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  vaultDailySnapshot.dailySupplySideRevenueUSD =
+    vaultDailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  vaultHourlySnapshot.hourlySupplySideRevenueUSD =
+    vaultHourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSD);
 
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  vault.cumulativeProtocolSideRevenueUSD = vault.cumulativeProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  vault.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
 
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  vaultDailySnapshot.dailyProtocolSideRevenueUSD = vaultDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  vaultHourlySnapshot.hourlyProtocolSideRevenueUSD = vaultHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  financialMetrics.dailyProtocolSideRevenueUSD =
+    financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  vaultDailySnapshot.dailyProtocolSideRevenueUSD =
+    vaultDailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  vaultHourlySnapshot.hourlyProtocolSideRevenueUSD =
+    vaultHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+      protocolSideRevenueUSD
+    );
 
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  vault.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+  vault.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
 
-  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  vaultDailySnapshot.dailyTotalRevenueUSD = vaultDailySnapshot.dailyTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  vaultHourlySnapshot.hourlyTotalRevenueUSD = vaultHourlySnapshot.hourlyTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
+  financialMetrics.dailyTotalRevenueUSD =
+    financialMetrics.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+  vaultDailySnapshot.dailyTotalRevenueUSD =
+    vaultDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+  vaultHourlySnapshot.hourlyTotalRevenueUSD =
+    vaultHourlySnapshot.hourlyTotalRevenueUSD.plus(totalRevenueUSD);
 
   vaultHourlySnapshot.save();
   vaultDailySnapshot.save();
@@ -283,12 +267,19 @@ export function updateRewards(
   event: ethereum.Event
 ): void {
   const poolRewardsContract = BaseRewardPool.bind(poolRewardsAddress);
-
   const rewardTokenAddr = Address.fromString(NetworkConfigs.getRewardToken());
-  const balRewardRate = readValue<BigInt>(
-    poolRewardsContract.try_rewardRate(),
-    BIGINT_ZERO
-  );
+
+  let balRewardRate = BIGINT_ZERO;
+  const periodFinishCall = poolRewardsContract.try_periodFinish();
+  if (
+    !periodFinishCall.reverted &&
+    periodFinishCall.value >= event.block.timestamp
+  ) {
+    balRewardRate = readValue<BigInt>(
+      poolRewardsContract.try_rewardRate(),
+      BIGINT_ZERO
+    );
+  }
 
   const auraRewardRate = getAuraMintAmount(rewardTokenAddr, balRewardRate);
 

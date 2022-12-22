@@ -187,12 +187,14 @@ export function getOrCreateBalancerPoolToken(
       );
 
       if (!tokenRateCall.reverted) {
-        token.lastPriceUSD = bigIntToBigDecimal(
-          tokenRateCall.value,
-          token.decimals
-        );
+        if (token.lastPriceUSD == BIGDECIMAL_ZERO) {
+          token.lastPriceUSD = bigIntToBigDecimal(
+            tokenRateCall.value,
+            token.decimals
+          );
 
-        token.save();
+          token.save();
+        }
       } else {
         isStablePool = false;
       }
