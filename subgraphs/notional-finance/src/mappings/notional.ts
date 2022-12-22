@@ -56,7 +56,10 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   const notional = Notional.bind(Address.fromString(PROTOCOL_ID));
 
   // update input token price
-  market.inputTokenPriceUSD = token.lastPriceUSD!;
+  const tokenPriceUSD = token.lastPriceUSD
+    ? token.lastPriceUSD!
+    : BIGDECIMAL_ZERO;
+  market.inputTokenPriceUSD = tokenPriceUSD;
 
   // update liquidation params
   const rateStorageCall = notional.try_getRateStorage(currencyId);
@@ -239,7 +242,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   const cTokenAmount = event.params.netAssetCash;
   const fCashAmount = event.params.netfCash;
   const amountUSD = bigIntToBigDecimal(cTokenAmount, token.decimals).times(
-    token.lastPriceUSD!
+    tokenPriceUSD
   );
 
   // we need absolute amounts for metrics; fCash is signed
