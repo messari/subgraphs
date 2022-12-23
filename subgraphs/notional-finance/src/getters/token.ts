@@ -31,7 +31,10 @@ export function getOrCreateToken(
   }
 
   // Optional lastPriceUSD and lastPriceBlockNumber, but used in financialMetrics
-  if (token.lastPriceBlockNumber != blockNumber) {
+  if (
+    !token.lastPriceBlockNumber ||
+    token.lastPriceBlockNumber! != blockNumber
+  ) {
     const price = getUsdPricePerToken(tokenAddress);
     if (price.reverted) {
       token.lastPriceUSD = BIGDECIMAL_ZERO;

@@ -72,7 +72,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   const usageMetricsHourlySnapshot =
     getOrCreateUsageMetricsHourlySnapshot(event);
 
-  let accountId = from.toHexString();
+  const accountId = from.toHexString();
   let account = Account.load(accountId);
   if (!account) {
     account = new Account(accountId);
@@ -85,7 +85,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   }
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = `${accountId}-${day}`;
+  const dailyActiveAccountId = `${accountId}-${day}`;
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -93,7 +93,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     usageMetricsDailySnapshot.dailyActiveUsers += 1;
   }
   // Combine the id, user address and hour to generate a unique user id for the hour
-  let hourlyActiveAccountId = `${accountId}-${day}-${hour}`;
+  const hourlyActiveAccountId = `${accountId}-${day}-${hour}`;
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);

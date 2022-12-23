@@ -1,5 +1,5 @@
 # Subgraph Schema: Bridge
-# Version: 1.0.0
+# Version: 1.1.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 enum Network {
   ARBITRUM_ONE
@@ -23,6 +23,67 @@ enum Network {
   OSMOSIS
   MATIC # aka Polygon
   XDAI # aka Gnosis Chain
+  UBIQ
+  SONGBIRD
+  ELASTOS
+  KARDIACHAIN
+  RSK
+  TELOS
+  XDC
+  ZYX
+  CSC
+  SYSCOIN
+  GOCHAIN
+  ETHEREUMCLASSIC
+  OKEXCHAIN
+  HOO
+  METER
+  NOVA_NETWORK
+  TOMOCHAIN
+  VELAS
+  THUNDERCORE
+  HECO
+  XDAIARB
+  ENERGYWEB
+  HPB
+  BOBA
+  KUCOIN
+  SHIDEN
+  THETA
+  SX
+  CANDLE
+  ASTAR
+  CALLISTO
+  WANCHAIN
+  METIS
+  ULTRON
+  STEP
+  DOGECHAIN
+  RONIN
+  KAVA
+  IOTEX
+  XLC
+  NAHMII
+  TOMBCHAIN
+  CANTO
+  KLAYTN
+  EVMOS
+  SMARTBCH
+  BITGERT
+  FUSION
+  OHO
+  ARB_NOVA
+  OASIS
+  REI
+  REICHAIN
+  GODWOKEN
+  POLIS
+  KEKCHAIN
+  VISION
+  HARMONY
+  PALM
+  CURIO
+  UNKNOWN_NETWORK
 }
 
 enum ProtocolType {
@@ -76,15 +137,15 @@ type Token @entity {
 # CrosschainToken might or might not be canonical. It refers to the counterpart of the token on the other chain.
 # If the token is wrapped on the current chain, CrosschainToken will be canonical on the opposite chain.
 # It might also be the case that both the current chain token and its counterpart are canonical, in the case of liquidity bridges.
-type CrosschainToken @entity {
+type CrosschainToken @entity(immutable: true) {
   # We prepend the chainID because it is possible for a token to have the same address on multiple chains.
   # ChainID is the id of the destination chain (not the one the subgraph is running on), and tokenID is the
   # address of the token on the current chain.
-  " Bytes.fromI32(chainID).concat(tokenAddress) "
+  " Bytes.fromI64(chainID).concat(tokenAddress) "
   id: Bytes!
 
   " The ID commonly used to signal to which chain a transaction is going. List of IDs: https://chainlist.org/ "
-  chainID: Int!
+  chainID: BigInt!
 
   " The network where this token is deployed "
   network: Network!
@@ -95,8 +156,8 @@ type CrosschainToken @entity {
   " The type of token on the other chain "
   type: CrosschainTokenType!
 
-  " The underlying token on the network where this subgraph running "
-  token: Token!
+  " The underlying token on the network where this subgraph running. Optional, since it is possible to swap to a token that doesn't exist in this chain. "
+  token: Token
 }
 
 enum RewardTokenType {
@@ -320,7 +381,7 @@ type BridgeProtocol implements Protocol @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity {
+type UsageMetricsDailySnapshot @entity(immutable: true) {
   " ID is # of days since Unix epoch time (Bytes.fromI32(num)) "
   id: Bytes!
 
@@ -428,7 +489,7 @@ type UsageMetricsDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity {
+type UsageMetricsHourlySnapshot @entity(immutable: true) {
   " { Bytes.fromI32(num) } # of hours since Unix epoch time "
   id: Bytes!
 
@@ -521,7 +582,7 @@ type UsageMetricsHourlySnapshot @entity {
   timestamp: BigInt!
 }
 
-type FinancialsDailySnapshot @entity {
+type FinancialsDailySnapshot @entity(immutable: true) {
   " ID is # of days since Unix epoch time (Bytes.fromI32(num)) "
   id: Bytes!
 
@@ -690,10 +751,13 @@ type Pool @entity {
 
   " Pool hourly snapshots "
   hourlySnapshots: [PoolHourlySnapshot!]! @derivedFrom(field: "pool")
+
+  _lastDailySnapshotTimestamp: BigInt
+  _lastHourlySnapshotTimestamp: BigInt
 }
 
 type PoolRoute @entity {
-  " Bytes.fromUTF(({Pool ID}-{lowerChainID}-{greaterChainID}) "
+  " Bytes.fromUTF(({Pool ID}-{crossToken}-{lowerChainID}-{greaterChainID}) "
   id: Bytes!
 
   " Pool this route belongs to "
@@ -730,7 +794,7 @@ type PoolRoute @entity {
   createdBlockNumber: BigInt!
 }
 
-type PoolDailySnapshot @entity {
+type PoolDailySnapshot @entity(immutable: true) {
   " poolAddress.concatI32(daysSinceUnix) "
   id: Bytes!
 
@@ -812,7 +876,7 @@ type PoolDailySnapshot @entity {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
-type PoolHourlySnapshot @entity {
+type PoolHourlySnapshot @entity(immutable: true) {
   " poolAddress.concatI32(hoursSinceUnix) "
   id: Bytes!
 
@@ -894,7 +958,7 @@ type PoolHourlySnapshot @entity {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
-type PoolRouteSnapshot @entity {
+type PoolRouteSnapshot @entity(immutable: true) {
   " poolRouteID.concat(poolSnapshotID) "
   id: Bytes!
 
@@ -1005,7 +1069,7 @@ type LiquidityDeposit implements Event @entity(immutable: true) {
   amountUSD: BigDecimal!
 
   " Id of the chain where this is ocurring (should always be the chain where the subgraph is running) "
-  chainID: Int!
+  chainID: BigInt!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1049,7 +1113,7 @@ type LiquidityWithdraw implements Event @entity(immutable: true) {
   amountUSD: BigDecimal!
 
   " Id of the chain where this is ocurring (should always be the chain where the subgraph is running) "
-  chainID: Int!
+  chainID: BigInt!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1091,10 +1155,10 @@ type BridgeTransfer implements Event @entity(immutable: true) {
   isOutgoing: Boolean!
 
   " Chain ID from where the transfer is being sent "
-  fromChainID: Int!
+  fromChainID: BigInt!
 
   " Chain ID where the transfer is being sent to "
-  toChainID: Int!
+  toChainID: BigInt!
 
   " This is the address that's receiving the bridged funds (not a pool contract). When bridging out, it will be the address on the destination chain. "
   transferTo: Bytes!
@@ -1163,10 +1227,10 @@ type BridgeMessage implements Event @entity(immutable: true) {
   isOutgoing: Boolean!
 
   " Chain ID from where the message is being sent "
-  fromChainID: Int!
+  fromChainID: BigInt!
 
   " Chain ID where the message is being sent to "
-  toChainID: Int!
+  toChainID: BigInt!
 
   " Address sending the message. Here if it is outgoing, or on the other chain if incoming "
   transferFrom: Bytes
@@ -1194,7 +1258,7 @@ type Account @entity {
   id: Bytes!
 
   " ChainIDs where this account has sent or received funds through this bridge "
-  chains: [Int!]!
+  chains: [BigInt!]!
 
   " Total number of transactions this account has sent through this bridge originating from this chain "
   transferOutCount: Int!
@@ -1227,8 +1291,47 @@ type Account @entity {
   messages: [BridgeMessage!]! @derivedFrom(field: "account")
 }
 
+# Supported token helper
+type SupportedToken @entity(immutable: true) {
+  id: Bytes!
+}
+
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity(immutable: true) {
-  " Bytes.fromUTF( {Address}-{daily|hourly}-{# of day/hour}-{deposit|withdraw|transferIn|transferOut|message} ) "
+  " Bytes.fromUTF( {Address}-{daily|hourly}-{# of day/hour}-[liquidity|transferIn|transferOut|message] ) "
   id: Bytes!
+}
+
+type _ActivityHelper @entity {
+  id: Bytes!
+
+  hourlyActiveUsers: Int!
+  dailyActiveUsers: Int!
+
+  hourlyActiveTransferSenders: Int!
+  dailyActiveTransferSenders: Int!
+
+  hourlyActiveTransferReceivers: Int!
+  dailyActiveTransferReceivers: Int!
+
+  hourlyActiveMessageSenders: Int!
+  dailyActiveMessageSenders: Int!
+
+  hourlyActiveLiquidityProviders: Int!
+  dailyActiveLiquidityProviders: Int!
+}
+
+# Snapshot helpers.
+type _ProtocolSnapshotHelper @entity {
+  id: Bytes!
+
+  lastDailyFinancialsTimestamp: BigInt!
+  lastDailyUsageTimestamp: BigInt!
+  lastHourlyUsageTimestamp: BigInt!
+
+  lastDailyFinancialsSnapshot: Bytes!
+  lastDailyUsageSnapshot: Bytes!
+  lastHourlyUsageSnapshot: Bytes!
+
+  lastActivityTimestamp: BigInt!
 }

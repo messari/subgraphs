@@ -6,13 +6,15 @@ import {
   cETH_ADDRESS,
   cUSDC_ADDRESS,
   cWBTC_ADDRESS,
+  ZERO_ADDRESS,
 } from "./constants";
 
 export function getTokenFromCurrency(
   event: ethereum.Event,
   currencyId: string
 ): Token {
-  let tokenAddress: string;
+  // default if no currencyID is recognized
+  let tokenAddress = ZERO_ADDRESS.toHexString();
 
   if (currencyId == "1") {
     tokenAddress = cETH_ADDRESS;
@@ -23,11 +25,11 @@ export function getTokenFromCurrency(
   } else if (currencyId == "4") {
     tokenAddress = cWBTC_ADDRESS;
   } else {
-    log.info(" -- New currency found: {}", [currencyId.toString()]);
+    log.error(" -- New currency found: {}", [currencyId.toString()]);
   }
 
   const token = getOrCreateToken(
-    Address.fromString(tokenAddress!),
+    Address.fromString(tokenAddress),
     event.block.number
   );
 
