@@ -17,6 +17,7 @@ import {
   ZERO_ADDRESS,
   NetworkByID,
   Network,
+  InverseEventType,
 } from "../common/constants";
 import { getOrCreateAccount } from "../common/getters";
 import { bigIntToBigDecimal } from "../common/utils/numbers";
@@ -437,7 +438,22 @@ export function updateUsageMetrics(
       Bytes.fromUTF8(dailyActiveAccountID)
     );
 
-    usageMetricsDaily.dailyActiveUsers += transactionCount;
+    const inverseEventType = InverseEventType.get(eventType)!;
+    const inverseDailyActiveAccountID = from
+      .concat("-")
+      .concat("daily")
+      .concat("-")
+      .concat(dayId)
+      .concat("-")
+      .concat(inverseEventType);
+    const inverseDailyActiveAccount = ActiveAccount.load(
+      Bytes.fromUTF8(inverseDailyActiveAccountID)
+    );
+
+    if (!inverseDailyActiveAccount) {
+      usageMetricsDaily.dailyActiveUsers += transactionCount;
+    }
+
     usageMetricsDaily.dailyActiveTransferSenders += transferOutCount;
     usageMetricsDaily.dailyActiveTransferReceivers += transferInCount;
     usageMetricsDaily.dailyActiveLiquidityProviders += depositCount;
@@ -463,7 +479,22 @@ export function updateUsageMetrics(
       Bytes.fromUTF8(hourlyActiveAccountID)
     );
 
-    usageMetricsHourly.hourlyActiveUsers += transactionCount;
+    const inverseEventType = InverseEventType.get(eventType)!;
+    const inverseHourlyActiveAccountID = from
+      .concat("-")
+      .concat("hourly")
+      .concat("-")
+      .concat(hourId)
+      .concat("-")
+      .concat(inverseEventType);
+    const inverseHourlyActiveAccount = ActiveAccount.load(
+      Bytes.fromUTF8(inverseHourlyActiveAccountID)
+    );
+
+    if (!inverseHourlyActiveAccount) {
+      usageMetricsHourly.hourlyActiveUsers += transactionCount;
+    }
+
     usageMetricsHourly.hourlyActiveTransferSenders += transferOutCount;
     usageMetricsHourly.hourlyActiveTransferReceivers += transferInCount;
     usageMetricsHourly.hourlyActiveLiquidityProviders += depositCount;

@@ -118,6 +118,14 @@ export namespace EventType {
   export const MESSAGE_OUT = "MESSAGE_OUT";
 }
 
+export const InverseEventType = new TypedMap<string, string>();
+InverseEventType.set(EventType.DEPOSIT, EventType.WITHDRAW);
+InverseEventType.set(EventType.WITHDRAW, EventType.DEPOSIT);
+InverseEventType.set(EventType.TRANSFER_IN, EventType.TRANSFER_OUT);
+InverseEventType.set(EventType.TRANSFER_OUT, EventType.TRANSFER_IN);
+InverseEventType.set(EventType.MESSAGE_IN, EventType.MESSAGE_OUT);
+InverseEventType.set(EventType.MESSAGE_OUT, EventType.MESSAGE_IN);
+
 export namespace TransferType {
   export const MINT = "MINT";
   export const BURN = "BURN";
