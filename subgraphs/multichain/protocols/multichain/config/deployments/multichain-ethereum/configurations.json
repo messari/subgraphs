@@ -251,5 +251,13 @@
       "abi": "Router",
       "startBlock": 14698380
     }
+  ],
+  "proxies": [
+    {
+      "name": "BridgeV2-Fantom Proxy",
+      "address": "0x5cbe98480a790554403694b98bff71a525907f5d",
+      "abi": "assetProxy",
+      "startBlock": 11820019
+    }
   ]
 }
