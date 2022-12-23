@@ -231,7 +231,7 @@ interface Protocol {
   ##### Pools #####
 
   " All pools that belong to this protocol "
-  pools: [Pool!]!
+  pools: [Pool!]! @derivedFrom(field: "protocol")
 }
 
 type BridgeProtocol implements Protocol @entity {
@@ -361,7 +361,7 @@ type BridgeProtocol implements Protocol @entity {
   ##### Pools #####
 
   " All pools that belong to this protocol "
-  pools: [Pool!]!
+  pools: [Pool!]! @derivedFrom(field: "protocol")
 }
 
 ###############################

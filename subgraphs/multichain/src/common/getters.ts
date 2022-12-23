@@ -93,7 +93,6 @@ export function getOrCreateProtocol(): BridgeProtocol {
     protocol.totalCanonicalRouteCount = INT_ZERO;
     protocol.totalWrappedRouteCount = INT_ZERO;
     protocol.totalSupportedTokenCount = INT_ZERO;
-    protocol.pools = [];
   }
 
   protocol.schemaVersion = Versions.getSchemaVersion();
@@ -263,7 +262,6 @@ export function getOrCreatePool(
 
     // pool.save();
 
-    protocol.pools = addToArrayAtIndex<Bytes>(protocol.pools, pool.id);
     protocol.totalPoolCount += INT_ONE;
   }
 

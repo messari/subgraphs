@@ -491,16 +491,11 @@ export function updateUsageMetrics(
 export function updateProtocolTVL(
   protocol: BridgeProtocol,
   financialMetrics: FinancialsDailySnapshot,
+  deltaPoolTVL: BigDecimal,
   block: ethereum.Block
 ): void {
-  const pools = protocol.pools;
-  let tvl = BIGDECIMAL_ZERO;
-  for (let i = 0; i < pools.length; i++) {
-    const pool = Pool.load(pools[i])!;
-
-    tvl = tvl.plus(pool.totalValueLockedUSD);
-  }
-  protocol.totalValueLockedUSD = tvl;
+  protocol.totalValueLockedUSD =
+    protocol.totalValueLockedUSD.plus(deltaPoolTVL);
 
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialMetrics.blockNumber = block.number;

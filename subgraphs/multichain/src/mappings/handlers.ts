@@ -123,6 +123,7 @@ export function handlerSwapOutV2(event: LogSwapout): void {
     event.block
   );
 
+  const oldPoolTVL = pool.totalValueLockedUSD;
   updatePoolMetrics(
     token,
     crosschainToken,
@@ -132,6 +133,7 @@ export function handlerSwapOutV2(event: LogSwapout): void {
     poolRoute,
     event.block
   );
+  const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
 
   updateVolume(
     protocol,
@@ -199,7 +201,7 @@ export function handlerSwapOutV2(event: LogSwapout): void {
   usageMetricsHourly.save();
   usageMetricsDaily.save();
 
-  updateProtocolTVL(protocol, financialMetrics, event.block);
+  updateProtocolTVL(protocol, financialMetrics, deltaPoolTVL, event.block);
 
   financialMetrics.save();
   protocol.save();
@@ -283,6 +285,7 @@ export function handlerSwapInV2(event: LogSwapin): void {
     event.block
   );
 
+  const oldPoolTVL = pool.totalValueLockedUSD;
   updatePoolMetrics(
     token,
     crosschainToken,
@@ -292,6 +295,7 @@ export function handlerSwapInV2(event: LogSwapin): void {
     poolRoute,
     event.block
   );
+  const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
 
   updateVolume(
     protocol,
@@ -353,7 +357,7 @@ export function handlerSwapInV2(event: LogSwapin): void {
   usageMetricsHourly.save();
   usageMetricsDaily.save();
 
-  updateProtocolTVL(protocol, financialMetrics, event.block);
+  updateProtocolTVL(protocol, financialMetrics, deltaPoolTVL, event.block);
 
   financialMetrics.save();
   protocol.save();
@@ -435,6 +439,7 @@ export function handleSwapOut(event: LogAnySwapOut): void {
     event.block
   );
 
+  const oldPoolTVL = pool.totalValueLockedUSD;
   updatePoolMetrics(
     token,
     crosschainToken,
@@ -444,6 +449,7 @@ export function handleSwapOut(event: LogAnySwapOut): void {
     poolRoute,
     event.block
   );
+  const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
 
   updateVolume(
     protocol,
@@ -511,7 +517,7 @@ export function handleSwapOut(event: LogAnySwapOut): void {
   usageMetricsHourly.save();
   usageMetricsDaily.save();
 
-  updateProtocolTVL(protocol, financialMetrics, event.block);
+  updateProtocolTVL(protocol, financialMetrics, deltaPoolTVL, event.block);
 
   financialMetrics.save();
   protocol.save();
@@ -593,6 +599,7 @@ export function handleSwapIn(event: LogAnySwapIn): void {
     event.block
   );
 
+  const oldPoolTVL = pool.totalValueLockedUSD;
   updatePoolMetrics(
     token,
     crosschainToken,
@@ -602,6 +609,7 @@ export function handleSwapIn(event: LogAnySwapIn): void {
     poolRoute,
     event.block
   );
+  const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
 
   updateVolume(
     protocol,
@@ -663,7 +671,7 @@ export function handleSwapIn(event: LogAnySwapIn): void {
   usageMetricsHourly.save();
   usageMetricsDaily.save();
 
-  updateProtocolTVL(protocol, financialMetrics, event.block);
+  updateProtocolTVL(protocol, financialMetrics, deltaPoolTVL, event.block);
 
   financialMetrics.save();
   protocol.save();
