@@ -209,7 +209,7 @@ export function updateSnapshotsVolume(
   volumeUSD: BigDecimal,
   block: cosmos.HeaderOnlyBlock
 ): void {
-  const protcol = getOrCreateDexAmmProtocol();
+  const protocol = getOrCreateDexAmmProtocol();
   const financialsDailySnapshot = getOrCreateFinancialDailySnapshots(block);
   const liquidityPool = LiquidityPoolStore.load(liquidityPoolId);
   if (!liquidityPool) {
@@ -230,15 +230,13 @@ export function updateSnapshotsVolume(
   const blockNumber = BigInt.fromI32(block.header.height as i32);
   const timestamp = BigInt.fromI32(block.header.time.seconds as i32);
 
+  protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(volumeUSD);
+
   financialsDailySnapshot.dailyVolumeUSD = financialsDailySnapshot.dailyVolumeUSD.plus(
     volumeUSD
   );
-  financialsDailySnapshot.cumulativeVolumeUSD = financialsDailySnapshot.cumulativeVolumeUSD.plus(
-    volumeUSD
-  );
-  financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(
-    volumeUSD
-  );
+  financialsDailySnapshot.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
+  financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialsDailySnapshot.blockNumber = blockNumber;
   financialsDailySnapshot.timestamp = timestamp;
 
@@ -266,12 +264,10 @@ export function updateSnapshotsVolume(
   poolHourlySnaphot.blockNumber = blockNumber;
   poolHourlySnaphot.timestamp = timestamp;
 
-  protcol.cumulativeVolumeUSD = protcol.cumulativeVolumeUSD.plus(volumeUSD);
-
+  protocol.save();
   financialsDailySnapshot.save();
   poolDailySnaphot.save();
   poolHourlySnaphot.save();
-  protcol.save();
 }
 
 export function updateSupplySideRevenue(

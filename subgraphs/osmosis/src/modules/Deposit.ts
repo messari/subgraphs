@@ -27,32 +27,28 @@ function createDepositTransaction(
     return;
   }
   const transactionId = "deposit-" + transaction.hash.toHexString();
-  let depositTransaction = DepositTransaction.load(transactionId);
+  const depositTransaction = new DepositTransaction(transactionId);
 
-  if (!depositTransaction) {
-    depositTransaction = new DepositTransaction(transactionId);
+  depositTransaction.pool = liquidityPool.id;
+  depositTransaction.protocol = getOrCreateDexAmmProtocol().id;
 
-    depositTransaction.pool = liquidityPool.id;
-    depositTransaction.protocol = getOrCreateDexAmmProtocol().id;
+  depositTransaction.to = liquidityPool.id;
+  depositTransaction.from = from;
+  depositTransaction.hash = transaction.hash.toHexString();
+  depositTransaction.logIndex = transaction.index;
 
-    depositTransaction.to = liquidityPool.id;
-    depositTransaction.from = from;
-    depositTransaction.hash = transaction.hash.toHexString();
-    depositTransaction.logIndex = transaction.index;
+  depositTransaction.inputTokens = liquidityPool.inputTokens;
+  depositTransaction.inputTokenAmounts = inputTokenAmounts;
+  depositTransaction.outputToken = liquidityPool.outputToken;
+  depositTransaction.outputTokenAmount = sharesMinted;
+  depositTransaction.amountUSD = amountUSD;
 
-    depositTransaction.inputTokens = liquidityPool.inputTokens;
-    depositTransaction.inputTokenAmounts = inputTokenAmounts;
-    depositTransaction.outputToken = liquidityPool.outputToken;
-    depositTransaction.outputTokenAmount = sharesMinted;
-    depositTransaction.amountUSD = amountUSD;
+  depositTransaction.blockNumber = BigInt.fromI32(block.header.height as i32);
+  depositTransaction.timestamp = BigInt.fromI32(
+    block.header.time.seconds as i32
+  );
 
-    depositTransaction.blockNumber = BigInt.fromI32(block.header.height as i32);
-    depositTransaction.timestamp = BigInt.fromI32(
-      block.header.time.seconds as i32
-    );
-
-    depositTransaction.save();
-  }
+  depositTransaction.save();
 }
 
 export function msgJoinPoolHandler(

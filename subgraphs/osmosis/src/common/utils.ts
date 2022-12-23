@@ -54,15 +54,15 @@ export function updatePoolTVL(
 
   const inputTokens = liquidityPool.inputTokens;
   const token = getOrCreateToken(inputTokens[index]);
-  let lastPrice = constants.BIGDECIMAL_ONE;
+  let lastPrice = constants.BIGDECIMAL_ZERO;
   if (token.lastPriceUSD !== null) {
     lastPrice = token.lastPriceUSD!;
   }
 
   const inputTokenBalances = liquidityPool.inputTokenBalances;
   const inputTokenWeights = liquidityPool.inputTokenWeights;
-  const amountUSD = inputTokenBalances[index]
-    .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
+  const amountUSD = utils
+    .convertTokenToDecimal(inputTokenBalances[index], token.decimals)
     .times(lastPrice);
   liquidityPool.totalValueLockedUSD = amountUSD
     .times(constants.BIGDECIMAL_HUNDRED)
