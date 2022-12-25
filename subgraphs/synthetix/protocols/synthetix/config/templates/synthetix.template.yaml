@@ -1,0 +1,3380 @@
+specVersion: 0.0.4
+features:
+  - grafting
+description: Synthetix Subgraph
+repository: https://github.com/Synthetixio/synthetix-subgraph
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: WrapperFactory_0
+    network: mainnet
+    source:
+      address: "0x0a6956d554485a43494D69Eca78C5103511a8fEb"
+      startBlock: 13623496
+      abi: WrapperFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: WrapperFactory
+          file: abis/WrapperFactory.json
+      eventHandlers:
+        - event: WrapperCreated(indexed address,indexed bytes32,address)
+          handler: handleWrapperCreated
+  - kind: ethereum/contract
+    name: WrapperFactory_1
+    network: mainnet
+    source:
+      address: "0x02f9bC46beD33acdB9cb002fe346734CeF8a9480"
+      startBlock: 13724370
+      abi: WrapperFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: WrapperFactory
+          file: abis/WrapperFactory.json
+      eventHandlers:
+        - event: WrapperCreated(indexed address,indexed bytes32,address)
+          handler: handleWrapperCreated
+  - kind: ethereum/contract
+    name: EtherWrapper_0
+    network: mainnet
+    source:
+      address: "0xC1AAE9d18bBe386B102435a8632C8063d31e747C"
+      startBlock: 12405729
+      abi: EtherWrapper
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities:
+        - Wrapper
+      abis:
+        - name: EtherWrapper
+          file: abis/EtherWrapper.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: Minted(indexed address,uint256,uint256,uint256)
+          handler: handleMinted
+        - event: Burned(indexed address,uint256,uint256,uint256)
+          handler: handleBurned
+  - kind: ethereum/contract
+    name: SystemSettings_0
+    network: mainnet
+    source:
+      address: "0x26C6C7F10e271Eef0011d07319622F31d22D139c"
+      startBlock: 10756506
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_1
+    network: mainnet
+    source:
+      address: "0x703D37fb776A4C905e28f7Ff23C73102ce36E08B"
+      startBlock: 10996823
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_2
+    network: mainnet
+    source:
+      address: "0x4751775867ebB3b5aa436a2F33D1e1ccA4157F35"
+      startBlock: 11497052
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_3
+    network: mainnet
+    source:
+      address: "0xaC87648CA3b88b6CE566aaC9d7f3c0eB635b3a1e"
+      startBlock: 11639311
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_4
+    network: mainnet
+    source:
+      address: "0xD3C8d372bFCd36c2B452639a7ED6ef7dbFDC56F8"
+      startBlock: 12405729
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_5
+    network: mainnet
+    source:
+      address: "0xb6B476C41Ea01930e6abE1f44b96800de0404c98"
+      startBlock: 13623496
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_6
+    network: mainnet
+    source:
+      address: "0x4D3AF899DF121751422c49Ec3fDe29bE485d220c"
+      startBlock: 13664365
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_7
+    network: mainnet
+    source:
+      address: "0x80d65Bb7b9436A86c1928F93D6E7cc186987Ac54"
+      startBlock: 14124061
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_8
+    network: mainnet
+    source:
+      address: "0x68938Be4c72A77891E99B198F4d31C5582018b40"
+      startBlock: 14439745
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_9
+    network: mainnet
+    source:
+      address: "0xA4339a001c87e2C79B2d8A50D38c16cf12F3D6EE"
+      startBlock: 14752739
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_10
+    network: mainnet
+    source:
+      address: "0xdD3c1c64402A679e8D709FcCf606BD77eE12b567"
+      startBlock: 14773619
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities: []
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: shorts_CollateralShort_0
+    network: mainnet
+    source:
+      address: "0x188C2274B04Ea392B21487b5De299e382Ff84246"
+      startBlock: 11497052
+      abi: CollateralShort
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: shorts_CollateralShort_0/shorts_CollateralShort_0.wasm
+      entities:
+        - Short
+        - ShortLiquidation
+        - ShortCollateralChange
+        - ShortLoanChange
+      abis:
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: CollateralShort
+          file: abis/CollateralShortOVM.json
+      eventHandlers:
+        - event: LoanCreated(indexed address,uint256,uint256,uint256,bytes32,uint256)
+          handler: handleShortLoanCreatedsUSD
+        - event: LoanClosed(indexed address,uint256)
+          handler: handleShortLoanClosedsUSD
+        - event: CollateralDeposited(indexed address,uint256,uint256,uint256)
+          handler: handleShortCollateralDepositedsUSD
+        - event: CollateralWithdrawn(indexed address,uint256,uint256,uint256)
+          handler: handleShortCollateralWithdrawnsUSD
+        - event: LoanRepaymentMade(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleShortLoanRepaymentMadesUSD
+        - event: LoanDrawnDown(indexed address,uint256,uint256)
+          handler: handleShortLoanDrawnDownsUSD
+        - event: LoanPartiallyLiquidated(indexed address,uint256,address,uint256,uint256)
+          handler: handleLoanPartiallyLiquidatedsUSD
+        - event: LoanClosedByLiquidation(indexed address,uint256,indexed address,uint256,uint256)
+          handler: handleLoanClosedByLiquidationsUSD
+        - event: MinCollateralUpdated(uint256)
+          handler: handleMinCollateralUpdatedsUSD
+        - event: IssueFeeRateUpdated(uint256)
+          handler: handleIssueFeeRateUpdatedsUSD
+        - event: CanOpenLoansUpdated(bool)
+          handler: handleCanOpenLoansUpdatedsUSD
+        - event: LoanClosedByRepayment(indexed address,uint256,uint256,uint256)
+          handler: handleLoanClosedByRepayment
+  - kind: ethereum/contract
+    name: shorts_CollateralShort_1
+    network: mainnet
+    source:
+      address: "0x1F2c3a1046c32729862fcB038369696e3273a516"
+      startBlock: 11639311
+      abi: CollateralShort
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: shorts_CollateralShort_0/shorts_CollateralShort_0.wasm
+      entities:
+        - Short
+        - ShortLiquidation
+        - ShortCollateralChange
+        - ShortLoanChange
+      abis:
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: CollateralShort
+          file: abis/CollateralShortOVM.json
+      eventHandlers:
+        - event: LoanCreated(indexed address,uint256,uint256,uint256,bytes32,uint256)
+          handler: handleShortLoanCreatedsUSD
+        - event: LoanClosed(indexed address,uint256)
+          handler: handleShortLoanClosedsUSD
+        - event: CollateralDeposited(indexed address,uint256,uint256,uint256)
+          handler: handleShortCollateralDepositedsUSD
+        - event: CollateralWithdrawn(indexed address,uint256,uint256,uint256)
+          handler: handleShortCollateralWithdrawnsUSD
+        - event: LoanRepaymentMade(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleShortLoanRepaymentMadesUSD
+        - event: LoanDrawnDown(indexed address,uint256,uint256)
+          handler: handleShortLoanDrawnDownsUSD
+        - event: LoanPartiallyLiquidated(indexed address,uint256,address,uint256,uint256)
+          handler: handleLoanPartiallyLiquidatedsUSD
+        - event: LoanClosedByLiquidation(indexed address,uint256,indexed address,uint256,uint256)
+          handler: handleLoanClosedByLiquidationsUSD
+        - event: MinCollateralUpdated(uint256)
+          handler: handleMinCollateralUpdatedsUSD
+        - event: IssueFeeRateUpdated(uint256)
+          handler: handleIssueFeeRateUpdatedsUSD
+        - event: CanOpenLoansUpdated(bool)
+          handler: handleCanOpenLoansUpdatedsUSD
+        - event: LoanClosedByRepayment(indexed address,uint256,uint256,uint256)
+          handler: handleLoanClosedByRepayment
+  - kind: ethereum/contract
+    name: periodicUpdates_ProxyERC20_0
+    network: mainnet
+    source:
+      address: "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F"
+      startBlock: 13000000
+      abi: Proxy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: periodicUpdates_ProxyERC20_0/periodicUpdates_ProxyERC20_0.wasm
+      entities:
+        - DebtState
+        - SystemSetting
+      abis:
+        - name: Proxy
+          file: abis/Proxy.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: SynthetixDebtShare
+          file: abis/SynthetixDebtShare.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      blockHandlers:
+        - handler: handleBlock
+  - kind: ethereum/contract
+    name: loans_EtherCollateral_0
+    network: mainnet
+    source:
+      address: "0x0F3d8ad599Be443A54c7934B433A87464Ed0DFdC"
+      startBlock: 9501009
+      abi: EtherCollateral
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: loans_EtherCollateral_0/loans_EtherCollateral_0.wasm
+      entities:
+        - Loan
+        - LoanCreated
+        - LoanClosed
+        - LoanLiquidated
+      abis:
+        - name: EtherCollateral
+          file: abis/EtherCollateral.json
+      eventHandlers:
+        - event: LoanLiquidated(indexed address,uint256,address)
+          handler: handleLoanLiquidatedLegacy
+        - event: LoanCreated(indexed address,uint256,uint256)
+          handler: handleLoanCreatedEtherLegacy
+        - event: LoanClosed(indexed address,uint256,uint256)
+          handler: handleLoanClosedEtherLegacy
+  - kind: ethereum/contract
+    name: loans_EtherCollateral_1
+    network: mainnet
+    source:
+      address: "0x7133afF303539b0A4F60Ab9bd9656598BF49E272"
+      startBlock: 10540678
+      abi: EtherCollateral
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: loans_EtherCollateral_0/loans_EtherCollateral_0.wasm
+      entities:
+        - Loan
+        - LoanCreated
+        - LoanClosed
+        - LoanLiquidated
+      abis:
+        - name: EtherCollateral
+          file: abis/EtherCollateral.json
+      eventHandlers:
+        - event: LoanLiquidated(indexed address,uint256,address)
+          handler: handleLoanLiquidatedLegacy
+        - event: LoanCreated(indexed address,uint256,uint256)
+          handler: handleLoanCreatedEtherLegacy
+        - event: LoanClosed(indexed address,uint256,uint256)
+          handler: handleLoanClosedEtherLegacy
+  - kind: ethereum/contract
+    name: loans_EtherCollateralsUSD_0
+    network: mainnet
+    source:
+      address: "0xfED77055B40d63DCf17ab250FFD6948FBFF57B82"
+      startBlock: 10907479
+      abi: EtherCollateralsUSD
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: loans_EtherCollateral_0/loans_EtherCollateral_0.wasm
+      entities:
+        - Loan
+        - LoanCreated
+        - LoanClosed
+        - LoanLiquidated
+        - LoanPartiallyLiquidated
+        - CollateralDeposited
+        - CollateralWithdrawn
+        - LoanRepaid
+      abis:
+        - name: EtherCollateralsUSD
+          file: abis/EtherCollateralsUSD.json
+      eventHandlers:
+        - event: LoanLiquidated(indexed address,uint256,address)
+          handler: handleLoanLiquidatedLegacy
+        - event: LoanCreated(indexed address,uint256,uint256)
+          handler: handleLoanCreatedsUSDLegacy
+        - event: LoanClosed(indexed address,uint256,uint256)
+          handler: handleLoanClosedsUSDLegacy
+        - event: LoanPartiallyLiquidated(indexed address,uint256,address,uint256,uint256)
+          handler: handleLoanPartiallyLiquidatedLegacy
+        - event: CollateralDeposited(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralDepositedLegacy
+        - event: CollateralWithdrawn(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralWithdrawnLegacy
+        - event: LoanRepaid(indexed address,uint256,uint256,uint256)
+          handler: handleLoanRepaidLegacy
+  - kind: ethereum/contract
+    name: loans_CollateralEth_0
+    network: mainnet
+    source:
+      address: "0x3FF5c0A14121Ca39211C95f6cEB221b86A90729E"
+      startBlock: 11497052
+      abi: CollateralEth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: loans_EtherCollateral_0/loans_EtherCollateral_0.wasm
+      entities:
+        - Loan
+        - LoanCreated
+        - LoanClosed
+        - LoanLiquidated
+        - LoanPartiallyLiquidated
+        - CollateralDeposited
+        - CollateralWithdrawn
+        - LoanRepaid
+      abis:
+        - name: CollateralEth
+          file: abis/CollateralEth.json
+      eventHandlers:
+        - event: LoanCreated(indexed address,uint256,uint256,uint256,bytes32,uint256)
+          handler: handleLoanCreatedEther
+        - event: LoanClosed(indexed address,uint256)
+          handler: handleLoanClosedEther
+        - event: LoanClosedByLiquidation(indexed address,uint256,indexed address,uint256,uint256)
+          handler: handleLoanClosedByLiquidation
+        - event: LoanPartiallyLiquidated(indexed address,uint256,address,uint256,uint256)
+          handler: handleLoanPartiallyLiquidated
+        - event: LoanRepaymentMade(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleLoanRepaymentMade
+        - event: CollateralDeposited(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralDeposited
+        - event: CollateralWithdrawn(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralWithdrawn
+        - event: LoanDrawnDown(indexed address,uint256,uint256)
+          handler: handleLoanDrawnDown
+  - kind: ethereum/contract
+    name: loans_CollateralEth_1
+    network: mainnet
+    source:
+      address: "0x5c8344bcdC38F1aB5EB5C1d4a35DdEeA522B5DfA"
+      startBlock: 11639311
+      abi: CollateralEth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: loans_EtherCollateral_0/loans_EtherCollateral_0.wasm
+      entities:
+        - Loan
+        - LoanCreated
+        - LoanClosed
+        - LoanLiquidated
+        - LoanPartiallyLiquidated
+        - CollateralDeposited
+        - CollateralWithdrawn
+        - LoanRepaid
+      abis:
+        - name: CollateralEth
+          file: abis/CollateralEth.json
+      eventHandlers:
+        - event: LoanCreated(indexed address,uint256,uint256,uint256,bytes32,uint256)
+          handler: handleLoanCreatedEther
+        - event: LoanClosed(indexed address,uint256)
+          handler: handleLoanClosedEther
+        - event: LoanClosedByLiquidation(indexed address,uint256,indexed address,uint256,uint256)
+          handler: handleLoanClosedByLiquidation
+        - event: LoanPartiallyLiquidated(indexed address,uint256,address,uint256,uint256)
+          handler: handleLoanPartiallyLiquidated
+        - event: LoanRepaymentMade(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleLoanRepaymentMade
+        - event: CollateralDeposited(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralDeposited
+        - event: CollateralWithdrawn(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralWithdrawn
+        - event: LoanDrawnDown(indexed address,uint256,uint256)
+          handler: handleLoanDrawnDown
+  - kind: ethereum/contract
+    name: liquidations_Synthetix_0
+    network: mainnet
+    source:
+      address: "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F"
+      startBlock: 8290604
+      abi: Synthetix
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: liquidations_Synthetix_0/liquidations_Synthetix_0.wasm
+      entities:
+        - AccountLiquidated
+      abis:
+        - name: Synthetix
+          file: abis/Synthetix.json
+      eventHandlers:
+        - event: AccountLiquidated(indexed address,uint256,uint256,address)
+          handler: handleAccountLiquidated
+  - kind: ethereum/contract
+    name: liquidations_Liquidations_0
+    network: mainnet
+    source:
+      address: "0x9f9C7BA80442767e7BeF5E8121cEc53cF8182827"
+      startBlock: 10185450
+      abi: Liquidations
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: liquidations_Synthetix_0/liquidations_Synthetix_0.wasm
+      entities:
+        - AccountFlaggedForLiquidation
+        - AccountRemovedFromLiquidation
+      abis:
+        - name: Liquidations
+          file: abis/Liquidations.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+      eventHandlers:
+        - event: AccountFlaggedForLiquidation(indexed address,uint256)
+          handler: handleAccountFlaggedForLiquidation
+        - event: AccountRemovedFromLiquidation(indexed address,uint256)
+          handler: handleAccountRemovedFromLiquidation
+  - kind: ethereum/contract
+    name: liquidations_Liquidations_1
+    network: mainnet
+    source:
+      address: "0x46338723022deF2c5151e83BE759796A988754a2"
+      startBlock: 10756506
+      abi: Liquidations
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: liquidations_Synthetix_0/liquidations_Synthetix_0.wasm
+      entities:
+        - AccountFlaggedForLiquidation
+        - AccountRemovedFromLiquidation
+      abis:
+        - name: Liquidations
+          file: abis/Liquidations.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+      eventHandlers:
+        - event: AccountFlaggedForLiquidation(indexed address,uint256)
+          handler: handleAccountFlaggedForLiquidation
+        - event: AccountRemovedFromLiquidation(indexed address,uint256)
+          handler: handleAccountRemovedFromLiquidation
+  - kind: ethereum/contract
+    name: liquidations_Liquidations_2
+    network: mainnet
+    source:
+      address: "0xAD95C918af576c82Df740878C3E983CBD175daB6"
+      startBlock: 11497052
+      abi: Liquidations
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: liquidations_Synthetix_0/liquidations_Synthetix_0.wasm
+      entities:
+        - AccountFlaggedForLiquidation
+        - AccountRemovedFromLiquidation
+      abis:
+        - name: Liquidations
+          file: abis/Liquidations.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+      eventHandlers:
+        - event: AccountFlaggedForLiquidation(indexed address,uint256)
+          handler: handleAccountFlaggedForLiquidation
+        - event: AccountRemovedFromLiquidation(indexed address,uint256)
+          handler: handleAccountRemovedFromLiquidation
+  - kind: ethereum/contract
+    name: issuance_Synthetix_0
+    network: mainnet
+    source:
+      address: "0xC011A72400E58ecD99Ee497CF89E3775d4bd732F"
+      startBlock: 5873222
+      abi: Synthetix
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      entities:
+        - SNXTransfer
+      abis:
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSNX
+  - kind: ethereum/contract
+    name: issuance_ERC20_0
+    network: mainnet
+    source:
+      address: "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F"
+      startBlock: 8290604
+      abi: Synthetix
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      entities:
+        - SNXTransfer
+      abis:
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSNX
+  - kind: ethereum/contract
+    name: issuance_FeePool_0
+    network: mainnet
+    source:
+      address: "0xb440DD674e1243644791a4AdfE3A2AbB0A92d309"
+      startBlock: 6817530
+      abi: FeePool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      entities:
+        - FeesClaimed
+        - SNXHolder
+        - FeePeriod
+      abis:
+        - name: FeePool
+          file: abis/FeePool.json
+        - name: FeePoolv217
+          file: abis/FeePool_v2.17.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+      eventHandlers:
+        - event: FeesClaimed(address,uint256,uint256)
+          handler: handleFeesClaimed
+        - event: FeePeriodClosed(uint256)
+          handler: handleFeePeriodClosed
+  - kind: ethereum/contract
+    name: issuance_RewardEscrow_0
+    network: mainnet
+    source:
+      address: "0xb671F2210B1F6621A2607EA63E6B2DC3e2464d1F"
+      startBlock: 7663120
+      abi: RewardEscrow
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      entities:
+        - RewardEscrowHolder
+        - SNXHolder
+      abis:
+        - name: RewardEscrow
+          file: abis/RewardEscrow.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+      eventHandlers:
+        - event: VestingEntryCreated(indexed address,uint256,uint256)
+          handler: handleRewardVestEvent
+        - event: Vested(indexed address,uint256,uint256)
+          handler: handleRewardVestEvent
+  - kind: ethereum/contract
+    name: issuance_SynthsUSD_0
+    network: mainnet
+    source:
+      address: "0x57Ab1E02fEE23774580C119740129eAC7081e9D3"
+      startBlock: 6817530
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      entities:
+        - Issued
+        - Burned
+        - DailyIssued
+        - DailyBurned
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+      eventHandlers:
+        - event: Issued(indexed address,uint256)
+          handler: handleIssuedSynths
+        - event: Burned(indexed address,uint256)
+          handler: handleBurnedSynths
+  - kind: ethereum/contract
+    name: issuance_SynthsUSD_1
+    network: mainnet
+    source:
+      address: "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51"
+      startBlock: 8604691
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      entities:
+        - Issued
+        - Burned
+        - DailyIssued
+        - DailyBurned
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+      eventHandlers:
+        - event: Issued(indexed address,uint256)
+          handler: handleIssuedSynths
+        - event: Burned(indexed address,uint256)
+          handler: handleBurnedSynths
+  - kind: ethereum/contract
+    name: issuance_SynthERC20sUSD_0
+    network: mainnet
+    source:
+      address: "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51"
+      startBlock: 8604691
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      entities:
+        - Issued
+        - Burned
+        - DailyIssued
+        - DailyBurned
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+      eventHandlers:
+        - event: Issued(indexed address,uint256)
+          handler: handleIssuedSynths
+        - event: Burned(indexed address,uint256)
+          handler: handleBurnedSynths
+  - kind: ethereum/contract
+    name: exchanges_Synthetix4_viaOldProxy
+    network: mainnet
+    source:
+      address: "0xc011a72400e58ecd99ee497cf89e3775d4bd732f"
+      abi: Synthetix4
+      startBlock: 6841188
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SynthExchange
+        - FeeRate
+      abis:
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: Synthetix
+          file: abis/Synthetix.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: SynthExchange(indexed address,bytes4,uint256,bytes4,uint256,address)
+          handler: handleSynthExchange
+  - kind: ethereum/contract
+    name: exchanges_Synthetix_viaOldProxy
+    network: mainnet
+    source:
+      address: "0xc011a72400e58ecd99ee497cf89e3775d4bd732f"
+      abi: Synthetix
+      startBlock: 8622911
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SynthExchange
+        - ExchangeReclaim
+        - ExchangeRebate
+        - FeeRate
+      abis:
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: Synthetix
+          file: abis/Synthetix.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: SynthExchange(indexed address,bytes32,uint256,bytes32,uint256,address)
+          handler: handleSynthExchange
+        - event: ExchangeReclaim(indexed address,bytes32,uint256)
+          handler: handleExchangeReclaim
+        - event: ExchangeRebate(indexed address,bytes32,uint256)
+          handler: handleExchangeRebate
+  - kind: ethereum/contract
+    name: exchanges_Synthetix_0
+    network: mainnet
+    source:
+      address: "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F"
+      startBlock: 8290604
+      abi: Synthetix
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SynthExchange
+        - ExchangeReclaim
+        - ExchangeRebate
+        - FeeRate
+      abis:
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: Synthetix
+          file: abis/Synthetix.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: SynthExchange(indexed address,bytes32,uint256,bytes32,uint256,address)
+          handler: handleSynthExchange
+        - event: ExchangeReclaim(indexed address,bytes32,uint256)
+          handler: handleExchangeReclaim
+        - event: ExchangeRebate(indexed address,bytes32,uint256)
+          handler: handleExchangeRebate
+        - event: AtomicSynthExchange(indexed address,bytes32,uint256,bytes32,uint256,address)
+          handler: handleAtomicSynthExchange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_0
+    network: mainnet
+    source:
+      address: "0x26C6C7F10e271Eef0011d07319622F31d22D139c"
+      startBlock: 10756506
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_1
+    network: mainnet
+    source:
+      address: "0x703D37fb776A4C905e28f7Ff23C73102ce36E08B"
+      startBlock: 10996823
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_2
+    network: mainnet
+    source:
+      address: "0x4751775867ebB3b5aa436a2F33D1e1ccA4157F35"
+      startBlock: 11497052
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_3
+    network: mainnet
+    source:
+      address: "0xaC87648CA3b88b6CE566aaC9d7f3c0eB635b3a1e"
+      startBlock: 11639311
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_4
+    network: mainnet
+    source:
+      address: "0xD3C8d372bFCd36c2B452639a7ED6ef7dbFDC56F8"
+      startBlock: 12405729
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_5
+    network: mainnet
+    source:
+      address: "0xb6B476C41Ea01930e6abE1f44b96800de0404c98"
+      startBlock: 13623496
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_6
+    network: mainnet
+    source:
+      address: "0x4D3AF899DF121751422c49Ec3fDe29bE485d220c"
+      startBlock: 13664365
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_7
+    network: mainnet
+    source:
+      address: "0x80d65Bb7b9436A86c1928F93D6E7cc186987Ac54"
+      startBlock: 14124061
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_8
+    network: mainnet
+    source:
+      address: "0x68938Be4c72A77891E99B198F4d31C5582018b40"
+      startBlock: 14439745
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_9
+    network: mainnet
+    source:
+      address: "0xA4339a001c87e2C79B2d8A50D38c16cf12F3D6EE"
+      startBlock: 14752739
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_10
+    network: mainnet
+    source:
+      address: "0xdD3c1c64402A679e8D709FcCf606BD77eE12b567"
+      startBlock: 14773619
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - SystemSettings
+      abis:
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_FuturesMarketManager_0
+    network: mainnet
+    source:
+      address: "0x834Ef6c82D431Ac9A7A6B66325F185b2430780D7"
+      startBlock: 14403043
+      abi: FuturesMarketManager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - FuturesMarket
+      abis:
+        - name: FuturesMarket
+          file: abis/FuturesMarket.json
+        - name: FuturesMarketManager
+          file: abis/FuturesMarketManager.json
+      eventHandlers:
+        - event: MarketAdded(address,indexed bytes32,indexed bytes32)
+          handler: handleMarketAdded
+  - kind: ethereum/contract
+    name: ExchangeRates_0
+    network: mainnet
+    source:
+      address: "0x73b172756BD5DDf0110Ba8D7b88816Eb639Eb21c"
+      startBlock: 6817530
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates_bytes4.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: RatesUpdated(bytes4[],uint256[])
+          handler: handleRatesUpdated
+  - kind: ethereum/contract
+    name: ExchangeRates_1
+    network: mainnet
+    source:
+      address: "0xba34e436C9383aa8FA1e3659D2807ae040592498"
+      startBlock: 7609189
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates_bytes4.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: RatesUpdated(bytes4[],uint256[])
+          handler: handleRatesUpdated
+  - kind: ethereum/contract
+    name: ExchangeRates_2
+    network: mainnet
+    source:
+      address: "0x5cBB53Ca85A9E52B593Baf8ae90282C4B3dB0b25"
+      startBlock: 8058414
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates_bytes4.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: RatesUpdated(bytes4[],uint256[])
+          handler: handleRatesUpdated
+  - kind: ethereum/contract
+    name: ExchangeRates_3
+    network: mainnet
+    source:
+      address: "0x70C629875daDBE702489a5E1E3bAaE60e38924fa"
+      startBlock: 8102887
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates_bytes4.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: RatesUpdated(bytes4[],uint256[])
+          handler: handleRatesUpdated
+  - kind: ethereum/contract
+    name: ExchangeRates_4
+    network: mainnet
+    source:
+      address: "0x99a46c42689720d9118FF7aF7ce80C2a92fC4f97"
+      startBlock: 8605615
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates_bytes4.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: RatesUpdated(bytes4[],uint256[])
+          handler: handleRatesUpdated
+  - kind: ethereum/contract
+    name: ExchangeRates_5
+    network: mainnet
+    source:
+      address: "0x565C9EB432f4AE9633e50e1213AB4f23D8f31f54"
+      startBlock: 8954183
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_6
+    network: mainnet
+    source:
+      address: "0xE95Ef4e7a04d2fB05cb625c62CA58da10112c605"
+      startBlock: 9106133
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_7
+    network: mainnet
+    source:
+      address: "0x9D7F70AF5DF5D5CC79780032d47a34615D1F1d77"
+      startBlock: 9501009
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_8
+    network: mainnet
+    source:
+      address: "0xba727c69636491ecdfE3E6F64cBE9428aD371e48"
+      startBlock: 10347062
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_9
+    network: mainnet
+    source:
+      address: "0xbCc4ac49b8f57079df1029dD3146C8ECD805acd0"
+      startBlock: 10756506
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_10
+    network: mainnet
+    source:
+      address: "0xdB2Ae36C2e9C00070e5bF752Be1FA2d477E98BDa"
+      startBlock: 10907479
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_11
+    network: mainnet
+    source:
+      address: "0xda80E6024bC82C9fe9e4e6760a9769CF0D231E80"
+      startBlock: 10996823
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_12
+    network: mainnet
+    source:
+      address: "0xA68C6020fF9Ea79F05345cDd2CE37DF4b89478ed"
+      startBlock: 11223166
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_13
+    network: mainnet
+    source:
+      address: "0xd69b189020EF614796578AfE4d10378c5e7e1138"
+      startBlock: 11497052
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_14
+    network: mainnet
+    source:
+      address: "0x6d9296Df2ad52F174bF671f555d78628bEBa7752"
+      startBlock: 13623496
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_15
+    network: mainnet
+    source:
+      address: "0xF68ECd50de7733015318361295547D8E939F93E6"
+      startBlock: 14124061
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_16
+    network: mainnet
+    source:
+      address: "0x6fA9E5923CBFDD39F0B625Bf1350Ffb50D5006b9"
+      startBlock: 14403043
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_17
+    network: mainnet
+    source:
+      address: "0xb4dc5ced63C2918c89E491D19BF1C0e92845de7C"
+      startBlock: 14752739
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ChainlinkMultisig
+    network: mainnet
+    source:
+      address: "0x21f73d42eb58ba49ddb685dc29d3bf5c0f0373ca"
+      startBlock: 10500000
+      abi: GnosisSafe
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities: []
+      abis:
+        - name: GnosisSafe
+          file: abis/GnosisSafe.json
+        - name: ProxyERC20
+          file: abis/ProxyERC20.json
+        - name: Synthetix
+          file: abis/Synthetix.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: ExecutionSuccess(bytes32,uint256)
+          handler: handleChainlinkUpdate
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_0
+    network: mainnet
+    source:
+      address: "0x26C6C7F10e271Eef0011d07319622F31d22D139c"
+      startBlock: 10756506
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_1
+    network: mainnet
+    source:
+      address: "0x703D37fb776A4C905e28f7Ff23C73102ce36E08B"
+      startBlock: 10996823
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_2
+    network: mainnet
+    source:
+      address: "0x4751775867ebB3b5aa436a2F33D1e1ccA4157F35"
+      startBlock: 11497052
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_3
+    network: mainnet
+    source:
+      address: "0xaC87648CA3b88b6CE566aaC9d7f3c0eB635b3a1e"
+      startBlock: 11639311
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_4
+    network: mainnet
+    source:
+      address: "0xD3C8d372bFCd36c2B452639a7ED6ef7dbFDC56F8"
+      startBlock: 12405729
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_5
+    network: mainnet
+    source:
+      address: "0xb6B476C41Ea01930e6abE1f44b96800de0404c98"
+      startBlock: 13623496
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_6
+    network: mainnet
+    source:
+      address: "0x4D3AF899DF121751422c49Ec3fDe29bE485d220c"
+      startBlock: 13664365
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_7
+    network: mainnet
+    source:
+      address: "0x80d65Bb7b9436A86c1928F93D6E7cc186987Ac54"
+      startBlock: 14124061
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_8
+    network: mainnet
+    source:
+      address: "0x68938Be4c72A77891E99B198F4d31C5582018b40"
+      startBlock: 14439745
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_9
+    network: mainnet
+    source:
+      address: "0xA4339a001c87e2C79B2d8A50D38c16cf12F3D6EE"
+      startBlock: 14752739
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_10
+    network: mainnet
+    source:
+      address: "0xdD3c1c64402A679e8D709FcCf606BD77eE12b567"
+      startBlock: 14773619
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - FeeRate
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_0
+    network: mainnet
+    source:
+      address: "0x6289fd70d3Dce8DE61896959cdEfcFF3cE46A108"
+      startBlock: 9501009
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_1
+    network: mainnet
+    source:
+      address: "0x271d0C1940fE546e787B273A0CCc780ECD8db461"
+      startBlock: 9758968
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_2
+    network: mainnet
+    source:
+      address: "0x7Dfe5aa8fc36c0Ae788a3a71062728bFc3036216"
+      startBlock: 10185450
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_3
+    network: mainnet
+    source:
+      address: "0xfaDAFb3ece40Eac206404B8dF5aF841F16f60E62"
+      startBlock: 10347062
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_4
+    network: mainnet
+    source:
+      address: "0x439502C922ADA61FE49329248B7A8ecb31C0b329"
+      startBlock: 10540678
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_5
+    network: mainnet
+    source:
+      address: "0x1d53a13D78766C0Db6eF73eC0ae1138eA2b6f5D4"
+      startBlock: 10756506
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_6
+    network: mainnet
+    source:
+      address: "0xc4942df0d3c561c71417BBA09d2DEA7a3CC676Fb"
+      startBlock: 10996823
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_7
+    network: mainnet
+    source:
+      address: "0x300F0f100389282b51F1Bc486D8c2ad22B6C4E42"
+      startBlock: 11223166
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_8
+    network: mainnet
+    source:
+      address: "0xd3970a9D35d2Be3aaf62D2b5B2be3Ee303aC4228"
+      startBlock: 11230469
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_9
+    network: mainnet
+    source:
+      address: "0x93b434b2e21d0F4E3ed1e9efa3Aa254A6D863B2A"
+      startBlock: 11346672
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_10
+    network: mainnet
+    source:
+      address: "0x0bfDc04B38251394542586969E2356d0D731f7DE"
+      startBlock: 11497052
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_11
+    network: mainnet
+    source:
+      address: "0x585fD19eBa8F1a81F37C5eb322FD4b8D911367e8"
+      startBlock: 12266819
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_12
+    network: mainnet
+    source:
+      address: "0x613c773c7a1D85D2F1DCC051B0573D33470762Eb"
+      startBlock: 12719744
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_13
+    network: mainnet
+    source:
+      address: "0x7634F2A1741a683ccda37Dce864c187F990D7B4b"
+      startBlock: 13207835
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_14
+    network: mainnet
+    source:
+      address: "0x2A417C61B8062363e4ff50900779463b45d235f6"
+      startBlock: 13623496
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_15
+    network: mainnet
+    source:
+      address: "0x3e343E89F4fF8057806F54F2208940B1Cd5C40ca"
+      startBlock: 14124061
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_16
+    network: mainnet
+    source:
+      address: "0x426Be4cC70066b2C42Edb1aE838c741069b1972c"
+      startBlock: 14155436
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_17
+    network: mainnet
+    source:
+      address: "0x74E9a032B04D9732E826eECFC5c7A1C183602FB1"
+      startBlock: 14403043
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_18
+    network: mainnet
+    source:
+      address: "0x9aB91BdCE9ae5D66d7d925699743Fa3A503c8eb8"
+      startBlock: 14752739
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_19
+    network: mainnet
+    source:
+      address: "0xD64D83829D92B5bdA881f6f61A4e4E27Fc185387"
+      startBlock: 14773619
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_SynthetixOldTracking
+    network: mainnet
+    source:
+      address: "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F"
+      startBlock: 8290604
+      abi: SynthetixOldTracking
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - DailyExchangePartner
+        - ExchangePartner
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: SynthetixOldTracking
+          file: abis/Synthetix_oldTracking.json
+      eventHandlers:
+        - event: ExchangeTracking(indexed bytes32,bytes32,uint256)
+          handler: handleExchangeTrackingV1
+  - kind: ethereum/contract
+    name: exchanger_Synthetix_0
+    network: mainnet
+    source:
+      address: "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F"
+      startBlock: 12733161
+      abi: Synthetix
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      entities:
+        - DailyExchangePartner
+        - ExchangePartner
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: Synthetix
+          file: abis/Synthetix.json
+      eventHandlers:
+        - event: ExchangeTracking(indexed bytes32,bytes32,uint256,uint256)
+          handler: handleExchangeTrackingV2
+  - kind: ethereum/contract
+    name: delegation_DelegateApprovals_0
+    network: mainnet
+    source:
+      address: "0x97A853e9536Cf7CF123AA14Da726b71a848290cE"
+      startBlock: 7829628
+      abi: DelegateApprovals
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: delegation_DelegateApprovals_0/delegation_DelegateApprovals_0.wasm
+      entities:
+        - DelegatedWallet
+      abis:
+        - name: DelegateApprovals
+          file: abis/DelegateApprovals.json
+      eventHandlers:
+        - event: Approval(indexed address,address,bytes32)
+          handler: handleDelegateApproval
+        - event: WithdrawApproval(indexed address,address,bytes32)
+          handler: handleDelegateWithdrawApproval
+  - kind: ethereum/contract
+    name: delegation_DelegateApprovals_1
+    network: mainnet
+    source:
+      address: "0x15fd6e554874B9e70F832Ed37f231Ac5E142362f"
+      startBlock: 9758968
+      abi: DelegateApprovals
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: delegation_DelegateApprovals_0/delegation_DelegateApprovals_0.wasm
+      entities:
+        - DelegatedWallet
+      abis:
+        - name: DelegateApprovals
+          file: abis/DelegateApprovals.json
+      eventHandlers:
+        - event: Approval(indexed address,address,bytes32)
+          handler: handleDelegateApproval
+        - event: WithdrawApproval(indexed address,address,bytes32)
+          handler: handleDelegateWithdrawApproval
+  - kind: ethereum/contract
+    name: balances_SynthsUSD_0
+    network: mainnet
+    source:
+      address: "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51"
+      startBlock: 8604691
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsEUR_0
+    network: mainnet
+    source:
+      address: "0x3EB064766109D150e4362222df80638BcE00e037"
+      startBlock: 6817530
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsEUR_1
+    network: mainnet
+    source:
+      address: "0xD71eCFF9342A5Ced620049e616c5035F1dB98620"
+      startBlock: 8605615
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsJPY_0
+    network: mainnet
+    source:
+      address: "0x559E848A1b6a7AfC69Ee27F8d20280A42628b2cf"
+      startBlock: 6817530
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsJPY_1
+    network: mainnet
+    source:
+      address: "0xF6b1C627e95BFc3c1b4c9B825a032Ff0fBf3e07d"
+      startBlock: 8605615
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsAUD_0
+    network: mainnet
+    source:
+      address: "0xED4699f180a14B5974c26f494483F9c327Fd381a"
+      startBlock: 6817530
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsAUD_1
+    network: mainnet
+    source:
+      address: "0xF48e200EAF9906362BB1442fca31e0835773b8B4"
+      startBlock: 8605615
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsGBP_0
+    network: mainnet
+    source:
+      address: "0x0C8A7D55ef593A2cAd34894c1523162eE2ffB9aC"
+      startBlock: 6817530
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsGBP_1
+    network: mainnet
+    source:
+      address: "0x97fe22E7341a0Cd8Db6F6C021A24Dc8f4DAD855F"
+      startBlock: 8605615
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsCHF_0
+    network: mainnet
+    source:
+      address: "0x28AF5a2f0cC12F2f19dd946608c945456b52b3F6"
+      startBlock: 6817530
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsCHF_1
+    network: mainnet
+    source:
+      address: "0x0F83287FF768D1c1e17a42F44d644D7F22e8ee1d"
+      startBlock: 8605615
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsKRW_0
+    network: mainnet
+    source:
+      address: "0xdCE506b196B0dF677d07e718f872CAc9Bc368A33"
+      startBlock: 6817530
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsKRW_1
+    network: mainnet
+    source:
+      address: "0x269895a3dF4D73b077Fc823dD6dA1B95f72Aaf9B"
+      startBlock: 12083886
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsBTC_0
+    network: mainnet
+    source:
+      address: "0x9073Ee83b6CE96C444547DdCAf777b9352163581"
+      startBlock: 6817530
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsBTC_1
+    network: mainnet
+    source:
+      address: "0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6"
+      startBlock: 8605615
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsETH_0
+    network: mainnet
+    source:
+      address: "0xaCf5C0101cbBe8476E87c652E0bEF33684Cc94D6"
+      startBlock: 7609189
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsETH_1
+    network: mainnet
+    source:
+      address: "0x5e74c9036fb86bd7ecdcb084a0673efc32ea31cb"
+      startBlock: 8516359
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsETH_2
+    network: mainnet
+    source:
+      address: "0x5e74C9036fb86BD7eCdcb084a0673EFc32eA31cb"
+      startBlock: 8605615
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsLINK_0
+    network: mainnet
+    source:
+      address: "0xbBC455cb4F1B9e4bFC4B73970d360c8f032EfEE6"
+      startBlock: 8954183
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsADA_0
+    network: mainnet
+    source:
+      address: "0xe36E2D3c7c34281FA3bC737950a68571736880A1"
+      startBlock: 9774238
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsAAVE_0
+    network: mainnet
+    source:
+      address: "0xd2dF355C19471c8bd7D8A3aa27Ff4e26A21b4076"
+      startBlock: 11769541
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsDOT_0
+    network: mainnet
+    source:
+      address: "0x1715AC0743102BF5Cd58EfBB6Cf2dC2685d967b6"
+      startBlock: 11769541
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsETHBTC_0
+    network: mainnet
+    source:
+      address: "0x104eDF1da359506548BFc7c25bA1E28C16a70235"
+      startBlock: 13806734
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+templates:
+  - kind: ethereum/contract
+    name: WrapperTemplate
+    network: mainnet
+    source:
+      abi: Wrapper
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: WrapperFactory_0/WrapperFactory_0.wasm
+      entities:
+        - Wrapper
+        - WrapperMint
+        - WrapperBurn
+      abis:
+        - name: Wrapper
+          file: abis/Wrapper.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: Minted(indexed address,uint256,uint256,uint256)
+          handler: handleMinted
+        - event: Burned(indexed address,uint256,uint256,uint256)
+          handler: handleBurned
+  - kind: ethereum/contract
+    name: FuturesMarketTemplate
+    network: mainnet
+    source:
+      abi: FuturesMarket
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      entities:
+        - FuturesMarket
+      abis:
+        - name: FuturesMarket
+          file: abis/FuturesMarket.json
+      eventHandlers:
+        - event: PositionModified(indexed uint256,indexed
+            address,uint256,int256,int256,uint256,uint256,uint256)
+          handler: handlePositionModified
+  - kind: ethereum/contract
+    name: AggregatorProxy
+    network: mainnet
+    source:
+      abi: AggregatorProxy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities: []
+      abis:
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorConfirmed(indexed address,indexed address)
+          handler: handleAggregatorProxyAddressUpdated
+  - kind: ethereum/contract
+    name: SynthAggregatorProxy
+    network: mainnet
+    source:
+      abi: AggregatorProxy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities: []
+      abis:
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorConfirmed(indexed address,indexed address)
+          handler: handleAggregatorProxyAddressUpdated
+  - kind: ethereum/contract
+    name: InverseAggregatorProxy
+    network: mainnet
+    source:
+      abi: AggregatorProxy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities: []
+      abis:
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorConfirmed(indexed address,indexed address)
+          handler: handleAggregatorProxyAddressUpdated
+  - kind: ethereum/contract
+    name: Aggregator
+    network: mainnet
+    source:
+      abi: Aggregator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRates
+      abis:
+        - name: Aggregator
+          file: abis/Aggregator.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
+          handler: handleAggregatorAnswerUpdated
+  - kind: ethereum/contract
+    name: SynthAggregator
+    network: mainnet
+    source:
+      abi: Aggregator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRates
+      abis:
+        - name: Aggregator
+          file: abis/Aggregator.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
+          handler: handleAggregatorAnswerUpdated
+  - kind: ethereum/contract
+    name: InverseAggregator
+    network: mainnet
+    source:
+      abi: Aggregator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ExchangeRates_0/ExchangeRates_0.wasm
+      entities:
+        - LatestRates
+      abis:
+        - name: Aggregator
+          file: abis/Aggregator.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
+          handler: handleInverseAggregatorAnswerUpdated

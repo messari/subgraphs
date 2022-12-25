@@ -1,0 +1,364 @@
+[
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "contract BinaryOptionMarket",
+        "name": "market",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "getAccountMarketData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "long",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "short",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketData.OptionValues",
+            "name": "bids",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "long",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "short",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketData.OptionValues",
+            "name": "claimable",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "long",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "short",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketData.OptionValues",
+            "name": "balances",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct BinaryOptionMarketData.AccountData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xdca5f5c3"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "contract BinaryOptionMarket",
+        "name": "market",
+        "type": "address"
+      }
+    ],
+    "name": "getMarketData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "price",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketData.OraclePriceAndTimestamp",
+            "name": "oraclePriceAndTimestamp",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "long",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "short",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarket.Prices",
+            "name": "prices",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "deposited",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "exercisableDeposits",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketData.Deposits",
+            "name": "deposits",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bool",
+                "name": "resolved",
+                "type": "bool"
+              },
+              {
+                "internalType": "bool",
+                "name": "canResolve",
+                "type": "bool"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketData.Resolution",
+            "name": "resolution",
+            "type": "tuple"
+          },
+          {
+            "internalType": "enum IBinaryOptionMarket.Phase",
+            "name": "phase",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum IBinaryOptionMarket.Side",
+            "name": "result",
+            "type": "uint8"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "long",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "short",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketData.OptionValues",
+            "name": "totalBids",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "long",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "short",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketData.OptionValues",
+            "name": "totalClaimableSupplies",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "long",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "short",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketData.OptionValues",
+            "name": "totalSupplies",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct BinaryOptionMarketData.MarketData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xa30c302d"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "contract BinaryOptionMarket",
+        "name": "market",
+        "type": "address"
+      }
+    ],
+    "name": "getMarketParameters",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "creator",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "contract BinaryOption",
+                "name": "long",
+                "type": "address"
+              },
+              {
+                "internalType": "contract BinaryOption",
+                "name": "short",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarket.Options",
+            "name": "options",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "biddingEnd",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maturity",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "expiry",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarket.Times",
+            "name": "times",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "key",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "strikePrice",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "finalPrice",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarket.OracleDetails",
+            "name": "oracleDetails",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "poolFee",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "creatorFee",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "refundFee",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketManager.Fees",
+            "name": "fees",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "capitalRequirement",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "skewLimit",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct BinaryOptionMarketManager.CreatorLimits",
+            "name": "creatorLimits",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct BinaryOptionMarketData.MarketParameters",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x1216fc7b"
+  }
+]
