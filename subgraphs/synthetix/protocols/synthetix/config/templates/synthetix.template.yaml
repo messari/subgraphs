@@ -17,7 +17,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: WrapperFactory
@@ -36,7 +36,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: WrapperFactory
@@ -55,7 +55,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities:
         - Wrapper
       abis:
@@ -83,7 +83,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -106,7 +106,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -129,7 +129,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -152,7 +152,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -175,7 +175,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -198,7 +198,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -221,7 +221,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -244,7 +244,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -267,7 +267,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -290,7 +290,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -313,7 +313,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities: []
       abis:
         - name: SystemSettings
@@ -336,7 +336,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: shorts_CollateralShort_0/shorts_CollateralShort_0.wasm
+      file: ./src/mapping/shorts.ts
       entities:
         - Short
         - ShortLiquidation
@@ -387,7 +387,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: shorts_CollateralShort_0/shorts_CollateralShort_0.wasm
+      file: ./src/mapping/shorts.ts
       entities:
         - Short
         - ShortLiquidation
@@ -438,7 +438,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: periodicUpdates_ProxyERC20_0/periodicUpdates_ProxyERC20_0.wasm
+      file: ./src/mapping/periodic-updates.ts
       entities:
         - DebtState
         - SystemSetting
@@ -466,7 +466,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: loans_EtherCollateral_0/loans_EtherCollateral_0.wasm
+      file: ./src/mapping/loans.ts
       entities:
         - Loan
         - LoanCreated
@@ -493,7 +493,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: loans_EtherCollateral_0/loans_EtherCollateral_0.wasm
+      file: ./src/mapping/loans.ts
       entities:
         - Loan
         - LoanCreated
@@ -520,7 +520,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: loans_EtherCollateral_0/loans_EtherCollateral_0.wasm
+      file: ./src/mapping/loans.ts
       entities:
         - Loan
         - LoanCreated
@@ -559,7 +559,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: loans_EtherCollateral_0/loans_EtherCollateral_0.wasm
+      file: ./src/mapping/loans.ts
       entities:
         - Loan
         - LoanCreated
@@ -600,7 +600,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: loans_EtherCollateral_0/loans_EtherCollateral_0.wasm
+      file: ./src/mapping/loans.ts
       entities:
         - Loan
         - LoanCreated
@@ -641,7 +641,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: liquidations_Synthetix_0/liquidations_Synthetix_0.wasm
+      file: ./src/mapping/liquidations.ts
       entities:
         - AccountLiquidated
       abis:
@@ -661,7 +661,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: liquidations_Synthetix_0/liquidations_Synthetix_0.wasm
+      file: ./src/mapping/liquidations.ts
       entities:
         - AccountFlaggedForLiquidation
         - AccountRemovedFromLiquidation
@@ -688,7 +688,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: liquidations_Synthetix_0/liquidations_Synthetix_0.wasm
+      file: ./src/mapping/liquidations.ts
       entities:
         - AccountFlaggedForLiquidation
         - AccountRemovedFromLiquidation
@@ -715,7 +715,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: liquidations_Synthetix_0/liquidations_Synthetix_0.wasm
+      file: ./src/mapping/liquidations.ts
       entities:
         - AccountFlaggedForLiquidation
         - AccountRemovedFromLiquidation
@@ -742,7 +742,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      file: ./src/mapping/issuance.ts
       entities:
         - SNXTransfer
       abis:
@@ -772,7 +772,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      file: ./src/mapping/issuance.ts
       entities:
         - SNXTransfer
       abis:
@@ -802,7 +802,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      file: ./src/mapping/issuance.ts
       entities:
         - FeesClaimed
         - SNXHolder
@@ -832,7 +832,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      file: ./src/mapping/issuance.ts
       entities:
         - RewardEscrowHolder
         - SNXHolder
@@ -867,7 +867,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      file: ./src/mapping/issuance.ts
       entities:
         - Issued
         - Burned
@@ -902,7 +902,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      file: ./src/mapping/issuance.ts
       entities:
         - Issued
         - Burned
@@ -937,7 +937,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: issuance_Synthetix_0/issuance_Synthetix_0.wasm
+      file: ./src/mapping/issuance.ts
       entities:
         - Issued
         - Burned
@@ -972,7 +972,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SynthExchange
         - FeeRate
@@ -1005,7 +1005,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SynthExchange
         - ExchangeReclaim
@@ -1042,7 +1042,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SynthExchange
         - ExchangeReclaim
@@ -1083,7 +1083,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1103,7 +1103,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1123,7 +1123,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1143,7 +1143,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1163,7 +1163,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1183,7 +1183,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1203,7 +1203,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1223,7 +1223,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1243,7 +1243,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1263,7 +1263,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1283,7 +1283,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - SystemSettings
       abis:
@@ -1303,7 +1303,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - FuturesMarket
       abis:
@@ -1325,7 +1325,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1348,7 +1348,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1371,7 +1371,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1394,7 +1394,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1417,7 +1417,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1440,7 +1440,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1469,7 +1469,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1498,7 +1498,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1527,7 +1527,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1556,7 +1556,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1585,7 +1585,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1614,7 +1614,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1643,7 +1643,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1672,7 +1672,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1701,7 +1701,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1730,7 +1730,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1759,7 +1759,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1788,7 +1788,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRate
         - InversePricingInfo
@@ -1817,7 +1817,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities: []
       abis:
         - name: GnosisSafe
@@ -1846,7 +1846,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -1870,7 +1870,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -1894,7 +1894,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -1918,7 +1918,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -1942,7 +1942,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -1966,7 +1966,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -1990,7 +1990,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -2014,7 +2014,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -2038,7 +2038,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -2062,7 +2062,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -2086,7 +2086,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - FeeRate
       abis:
@@ -2110,7 +2110,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2136,7 +2136,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2162,7 +2162,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2188,7 +2188,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2214,7 +2214,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2240,7 +2240,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2266,7 +2266,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2292,7 +2292,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2318,7 +2318,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2344,7 +2344,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2370,7 +2370,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2396,7 +2396,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2422,7 +2422,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2448,7 +2448,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2474,7 +2474,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2500,7 +2500,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2526,7 +2526,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2552,7 +2552,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2578,7 +2578,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2604,7 +2604,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - ExchangeEntrySettled
         - ExchangeEntryAppended
@@ -2630,7 +2630,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - DailyExchangePartner
         - ExchangePartner
@@ -2652,7 +2652,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanger_Exchanger_0/exchanger_Exchanger_0.wasm
+      file: ./src/mapping/exchanger.ts
       entities:
         - DailyExchangePartner
         - ExchangePartner
@@ -2674,7 +2674,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: delegation_DelegateApprovals_0/delegation_DelegateApprovals_0.wasm
+      file: ./src/mapping/delegation.ts
       entities:
         - DelegatedWallet
       abis:
@@ -2696,7 +2696,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: delegation_DelegateApprovals_0/delegation_DelegateApprovals_0.wasm
+      file: ./src/mapping/delegation.ts
       entities:
         - DelegatedWallet
       abis:
@@ -2718,7 +2718,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2740,7 +2740,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2762,7 +2762,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2784,7 +2784,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2806,7 +2806,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2828,7 +2828,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2850,7 +2850,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2872,7 +2872,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2894,7 +2894,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2916,7 +2916,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2938,7 +2938,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2960,7 +2960,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2982,7 +2982,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3004,7 +3004,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3026,7 +3026,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3048,7 +3048,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3070,7 +3070,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3092,7 +3092,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3114,7 +3114,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3136,7 +3136,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3158,7 +3158,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3180,7 +3180,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3202,7 +3202,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: balances_SynthsUSD_0/balances_SynthsUSD_0.wasm
+      file: ./src/mapping/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3223,7 +3223,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: WrapperFactory_0/WrapperFactory_0.wasm
+      file: ./src/mapping/wrapper.ts
       entities:
         - Wrapper
         - WrapperMint
@@ -3251,7 +3251,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: exchanges_Synthetix4_viaOldProxy/exchanges_Synthetix4_viaOldProxy.wasm
+      file: ./src/mapping/exchanges.ts
       entities:
         - FuturesMarket
       abis:
@@ -3270,7 +3270,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities: []
       abis:
         - name: AggregatorProxy
@@ -3287,7 +3287,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities: []
       abis:
         - name: AggregatorProxy
@@ -3304,7 +3304,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities: []
       abis:
         - name: AggregatorProxy
@@ -3321,7 +3321,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRates
       abis:
@@ -3343,7 +3343,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRates
       abis:
@@ -3365,7 +3365,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ExchangeRates_0/ExchangeRates_0.wasm
+      file: ./src/mapping/fragments/latest-rates.ts
       entities:
         - LatestRates
       abis:
