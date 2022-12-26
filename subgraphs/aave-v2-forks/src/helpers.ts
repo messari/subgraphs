@@ -1015,9 +1015,7 @@ export function getOrCreateMarket(
     market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     market.inputTokenBalance = BIGINT_ZERO;
-    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.outputTokenSupply = BIGINT_ZERO;
-    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.exchangeRate = BIGDECIMAL_ONE; // this is constant
     market.reserveFactor = BIGDECIMAL_ZERO;
     market.totalStableValueLocked = BIGINT_ZERO;

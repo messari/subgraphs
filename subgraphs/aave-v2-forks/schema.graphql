@@ -53,6 +53,12 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " the market ID for underlying/asset token, aToken, vToken and sToken"
+  _market: Market
+
+  " type of token: aToken, inputToken, sToken, or vToken "
+  _type: String
 }
 
 enum RewardTokenType {
@@ -72,6 +78,8 @@ type RewardToken @entity {
 
   " The type of the reward token "
   type: RewardTokenType!
+
+  _distributionEnd: BigInt
 }
 
 enum LendingType {

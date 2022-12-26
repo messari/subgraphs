@@ -298,7 +298,7 @@
   },
   "aave-v3": {
     "schema": "lending",
-    "base": "aave-v3",
+    "base": "aave-v2-forks",
     "protocol": "aave-v3",
     "deployments": {
       "aave-v3-arbitrum": {
@@ -306,11 +306,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.5",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -328,11 +328,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -350,11 +350,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -372,11 +372,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -394,11 +394,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -416,11 +416,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
