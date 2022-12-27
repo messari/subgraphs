@@ -2,14 +2,14 @@ import {
   LoanCreated as LegacyLoanCreatedEvent,
   LoanClosed as LegacyLoanClosedEvent,
   LoanLiquidated as LegacyLoanLiquidatedEvent,
-} from "../generated/subgraphs/loans/loans_EtherCollateral_0/EtherCollateral";
+} from "../../generated/loans_EtherCollateral_0/EtherCollateral";
 
 import {
   LoanPartiallyLiquidated as LegacyLoanPartiallyLiquidatedEvent,
   CollateralDeposited as LegacyCollateralDepositedEvent,
   CollateralWithdrawn as LegacyCollateralWithdrawnEvent,
   LoanRepaid as LegacyLoanRepaidEvent,
-} from "../generated/subgraphs/loans/loans_EtherCollateralsUSD_0/EtherCollateralsUSD";
+} from "../../generated/loans_EtherCollateralsUSD_0/EtherCollateralsUSD";
 
 import {
   LoanCreated as LoanCreatedEvent,
@@ -20,7 +20,7 @@ import {
   CollateralWithdrawn as CollateralWithdrawnEvent,
   LoanRepaymentMade as LoanRepaymentMadeEvent,
   LoanDrawnDown as LoanDrawnDownEvent,
-} from "../generated/subgraphs/loans/loans_CollateralEth_0/CollateralEth";
+} from "../../generated/loans_CollateralEth_0/CollateralEth";
 
 import {
   Loan,
@@ -29,7 +29,7 @@ import {
   CollateralDeposited,
   CollateralWithdrawn,
   LoanRepaid,
-} from "../generated/subgraphs/loans/schema";
+} from "../../generated/schema";
 
 import { log, BigInt } from "@graphprotocol/graph-ts";
 import { toDecimal } from "./lib/helpers";

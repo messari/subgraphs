@@ -4,20 +4,20 @@ import {
   InversePriceConfigured,
   InversePriceFrozen,
   ExchangeRates,
-} from "../../generated/subgraphs/latest-rates/ExchangeRates_13/ExchangeRates";
+} from "../../../generated/ExchangeRates_13/ExchangeRates";
 
 import {
   AggregatorProxy as AggregatorProxyContract,
   AggregatorConfirmed as AggregatorConfirmedEvent,
-} from "../../generated/subgraphs/latest-rates/ExchangeRates_13/AggregatorProxy";
+} from "../../../generated/ExchangeRates_13/AggregatorProxy";
 
 import {
   ExchangeFeeUpdated,
   AtomicExchangeFeeUpdated,
   SystemSettings,
-} from "../../generated/subgraphs/latest-rates/latestRates-SystemSettings_0/SystemSettings";
+} from "../../../generated/latestRates-SystemSettings_0/SystemSettings";
 
-import { AnswerUpdated as AnswerUpdatedEvent } from "../../generated/subgraphs/latest-rates/templates/Aggregator/Aggregator";
+import { AnswerUpdated as AnswerUpdatedEvent } from "../../../generated/templates/Aggregator/Aggregator";
 
 import {
   AggregatorProxy,
@@ -26,7 +26,7 @@ import {
   Aggregator,
   SynthAggregator,
   InverseAggregator,
-} from "../../generated/subgraphs/latest-rates/templates";
+} from "../../../generated/templates";
 import {
   LatestRate,
   InversePricingInfo,
@@ -34,7 +34,7 @@ import {
   FeeRate,
   DailyCandle,
   Candle,
-} from "../../generated/subgraphs/latest-rates/schema";
+} from "../../../generated/schema";
 
 import {
   BigDecimal,
@@ -54,11 +54,11 @@ import {
   ZERO_ADDRESS,
   CANDLE_PERIODS,
 } from "../lib/helpers";
-import { ProxyERC20 } from "../../generated/subgraphs/latest-rates/ChainlinkMultisig/ProxyERC20";
-import { Synthetix } from "../../generated/subgraphs/latest-rates/ChainlinkMultisig/Synthetix";
-import { ExecutionSuccess } from "../../generated/subgraphs/latest-rates/ChainlinkMultisig/GnosisSafe";
-import { AddressResolver } from "../../generated/subgraphs/latest-rates/ChainlinkMultisig/AddressResolver";
-import { getContractDeployment } from "../../generated/addresses";
+import { ProxyERC20 } from "../../../generated/ChainlinkMultisig/ProxyERC20";
+import { Synthetix } from "../../../generated/ChainlinkMultisig/Synthetix";
+import { ExecutionSuccess } from "../../../generated/ChainlinkMultisig/GnosisSafe";
+import { AddressResolver } from "../../../generated/ChainlinkMultisig/AddressResolver";
+import { getContractDeployment } from "../../../protocols/addresses";
 
 export function addLatestRate(
   synth: string,

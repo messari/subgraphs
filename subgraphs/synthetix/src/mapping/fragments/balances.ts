@@ -2,14 +2,14 @@ import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   Synth as SynthContract,
   Transfer as SynthTransferEvent,
-} from "../../generated/subgraphs/balances/balances_SynthsUSD_0/Synth";
+} from "../../../generated/balances_SynthsUSD_0/Synth";
 
 import {
   Synth,
   SynthBalance,
   LatestSynthBalance,
   SynthByCurrencyKey,
-} from "../../generated/subgraphs/balances/schema";
+} from "../../../generated/schema";
 import { toDecimal, ZERO, ZERO_ADDRESS } from "../lib/helpers";
 
 export function registerSynth(synthAddress: Address): Synth | null {

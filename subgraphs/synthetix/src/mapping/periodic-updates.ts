@@ -1,20 +1,17 @@
 // The latest Synthetix and event invocations
 
-import { Synthetix as SNX } from "../generated/subgraphs/periodic-updates/periodicUpdates_ProxyERC20_0/Synthetix";
-import { SynthetixDebtShare } from "../generated/subgraphs/periodic-updates/periodicUpdates_ProxyERC20_0/SynthetixDebtShare";
-import { SystemSettings as SystemSettingsContract } from "../generated/subgraphs/periodic-updates/periodicUpdates_ProxyERC20_0/SystemSettings";
+import { Synthetix as SNX } from "../../generated/periodicUpdates_ProxyERC20_0/Synthetix";
+import { SynthetixDebtShare } from "../../generated/periodicUpdates_ProxyERC20_0/SynthetixDebtShare";
+import { SystemSettings as SystemSettingsContract } from "../../generated/periodicUpdates_ProxyERC20_0/SystemSettings";
 
 import { CANDLE_PERIODS, strToBytes, toDecimal, ZERO } from "./lib/helpers";
 
 // SynthetixState has not changed ABI since deployment
 
-import {
-  DebtState,
-  SystemSetting,
-} from "../generated/subgraphs/periodic-updates/schema";
+import { DebtState, SystemSetting } from "../../generated/schema";
 
 import { BigInt, ethereum, dataSource, log } from "@graphprotocol/graph-ts";
-import { getContractDeployment } from "../generated/addresses";
+import { getContractDeployment } from "../../protocols/addresses";
 
 export function handleBlock(block: ethereum.Block): void {
   if (block.number.mod(BigInt.fromI32(6000)).equals(BigInt.fromI32(0))) {

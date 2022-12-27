@@ -3,17 +3,17 @@ import {
   AtomicSynthExchange as AtomicSynthExchangeEvent,
   ExchangeReclaim as ExchangeReclaimEvent,
   ExchangeRebate as ExchangeRebateEvent,
-} from "../generated/subgraphs/exchanges/exchanges_Synthetix_0/Synthetix";
+} from "../../generated/exchanges_Synthetix_0/Synthetix";
 
-import { PositionModified as PositionModifiedEvent } from "../generated/subgraphs/exchanges/exchanges_FuturesMarketManager_0/FuturesMarket";
+import { PositionModified as PositionModifiedEvent } from "../../generated/exchanges_FuturesMarketManager_0/FuturesMarket";
 
-import { MarketAdded as MarketAddedEvent } from "../generated/subgraphs/exchanges/exchanges_FuturesMarketManager_0/FuturesMarketManager";
+import { MarketAdded as MarketAddedEvent } from "../../generated/exchanges_FuturesMarketManager_0/FuturesMarketManager";
 
-import { FuturesMarketTemplate } from "../generated/subgraphs/exchanges/templates";
+import { FuturesMarketTemplate } from "../../generated/templates";
 
-import { ExchangeRates } from "../generated/subgraphs/exchanges/ExchangeRates_13/ExchangeRates";
+import { ExchangeRates } from "../../generated/ExchangeRates_13/ExchangeRates";
 
-import { ExchangeFeeUpdated as ExchangeFeeUpdatedEvent } from "../generated/subgraphs/exchanges/exchanges_SystemSettings_0/SystemSettings";
+import { ExchangeFeeUpdated as ExchangeFeeUpdatedEvent } from "../../generated/exchanges_SystemSettings_0/SystemSettings";
 
 import {
   Total,
@@ -25,7 +25,7 @@ import {
   ExchangeFee,
   SynthByCurrencyKey,
   FuturesMarket,
-} from "../generated/subgraphs/exchanges/schema";
+} from "../../generated/schema";
 
 import {
   Address,
@@ -49,8 +49,8 @@ import {
 } from "./lib/helpers";
 import { toDecimal, ZERO_ADDRESS } from "./lib/helpers";
 import { addDollar, addProxyAggregator } from "./fragments/latest-rates";
-import { Synthetix } from "../generated/subgraphs/latest-rates/ChainlinkMultisig/Synthetix";
-import { AddressResolver } from "../generated/subgraphs/latest-rates/ChainlinkMultisig/AddressResolver";
+import { Synthetix } from "../../generated/ChainlinkMultisig/Synthetix";
+import { AddressResolver } from "../../generated/ChainlinkMultisig/AddressResolver";
 
 const MAX_MAGNITUDE = 10;
 const ETHER = BigInt.fromI32(10).pow(18);

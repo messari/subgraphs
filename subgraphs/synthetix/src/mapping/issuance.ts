@@ -2,37 +2,37 @@
 import {
   Synthetix as SNX,
   Transfer as SNXTransferEvent,
-} from "../generated/subgraphs/issuance/issuance_Synthetix_0/Synthetix";
+} from "../../generated/issuance_Synthetix_0/Synthetix";
 
-import { FeePool as FeePoolContract } from "../generated/subgraphs/issuance/issuance_FeePool_0/FeePool";
+import { FeePool as FeePoolContract } from "../../generated/issuance_FeePool_0/FeePool";
 
-import { Synthetix32 } from "../generated/subgraphs/issuance/issuance_Synthetix_0/Synthetix32";
+import { Synthetix32 } from "../../generated/issuance_Synthetix_0/Synthetix32";
 
-import { Synthetix4 } from "../generated/subgraphs/issuance/issuance_Synthetix_0/Synthetix4";
+import { Synthetix4 } from "../../generated/issuance_Synthetix_0/Synthetix4";
 
-import { AddressResolver } from "../generated/subgraphs/issuance/issuance_Synthetix_0/AddressResolver";
+import { AddressResolver } from "../../generated/issuance_Synthetix_0/AddressResolver";
 
 import { sUSD32, sUSD4, toDecimal, ZERO_ADDRESS, ZERO } from "./lib/helpers";
 import { getTimeID, isEscrow } from "./lib/helpers";
 
 // SynthetixState has not changed ABI since deployment
-import { SynthetixState } from "../generated/subgraphs/issuance/issuance_Synthetix_0/SynthetixState";
+import { SynthetixState } from "../../generated/issuance_Synthetix_0/SynthetixState";
 
 import {
   Vested as VestedEvent,
   RewardEscrow,
-} from "../generated/subgraphs/issuance/issuance_RewardEscrow_0/RewardEscrow";
+} from "../../generated/issuance_RewardEscrow_0/RewardEscrow";
 
 import {
   Synth as SynthContract,
   Issued as IssuedEvent,
   Burned as BurnedEvent,
-} from "../generated/subgraphs/issuance/issuance_SynthsUSD_0/Synth";
+} from "../../generated/issuance_SynthsUSD_0/Synth";
 import {
   FeesClaimed as FeesClaimedEvent,
   FeePeriodClosed as FeePeriodClosedEvent,
-} from "../generated/subgraphs/issuance/issuance_FeePool_0/FeePool";
-import { FeePoolv217 } from "../generated/subgraphs/issuance/issuance_FeePool_0/FeePoolv217";
+} from "../../generated/issuance_FeePool_0/FeePool";
+import { FeePoolv217 } from "../../generated/issuance_FeePool_0/FeePoolv217";
 
 import {
   Synthetix,
@@ -49,7 +49,7 @@ import {
   DailyIssued,
   DailyBurned,
   FeePeriod,
-} from "../generated/subgraphs/issuance/schema";
+} from "../../generated/schema";
 
 import {
   store,
@@ -64,9 +64,9 @@ import { strToBytes } from "./lib/helpers";
 
 import { log } from "@graphprotocol/graph-ts";
 import { DAY_SECONDS } from "./lib/helpers";
-import { getContractDeployment } from "../generated/addresses";
+import { getContractDeployment } from "../../protocols/addresses";
 import { registerSynth } from "./fragments/balances";
-import { Synth } from "../generated/subgraphs/balances/schema";
+import { Synth } from "../../generated/schema";
 
 let v219UpgradeBlock = BigInt.fromI32(9518914); // Archernar v2.19.x Feb 20, 2020
 

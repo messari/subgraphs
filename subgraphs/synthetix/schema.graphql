@@ -1517,7 +1517,7 @@ type Exchanger @entity {
   " synth value received in fees in USD units from account "
   totalFeesGeneratedInUSD: BigDecimal!
   " balances "
-  balances: [LatestSynthBalance!]!
+  balances: [LatestSynthBalance!]
   " exchanges "
   exchanges: [SynthExchange!]! @derivedFrom(field: "account")
 }

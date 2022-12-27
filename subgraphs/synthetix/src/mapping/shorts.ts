@@ -12,7 +12,7 @@ import {
   MinCollateralUpdated as MinCollateralUpdatedEvent,
   IssueFeeRateUpdated as IssueFeeRateUpdatedEvent,
   CanOpenLoansUpdated as CanOpenLoansUpdatedEvent,
-} from "../generated/subgraphs/shorts/shorts_CollateralShort_0/CollateralShort";
+} from "../../generated/shorts_CollateralShort_0/CollateralShort";
 
 import {
   Short,
@@ -21,7 +21,7 @@ import {
   ShortLoanChange,
   ShortContract,
   ShortContractUpdate,
-} from "../generated/subgraphs/shorts/schema";
+} from "../../generated/schema";
 
 import {
   BigInt,

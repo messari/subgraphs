@@ -5,25 +5,21 @@ import {
   BigDecimal,
   Address,
 } from "@graphprotocol/graph-ts";
-import {
-  Wrapper,
-  WrapperMint,
-  WrapperBurn,
-} from "../generated/subgraphs/wrapper/schema";
-import { WrapperTemplate } from "../generated/subgraphs/wrapper/templates";
+import { Wrapper, WrapperMint, WrapperBurn } from "../../generated/schema";
+import { WrapperTemplate } from "../../generated/templates";
 import { getLatestRate, strToBytes, toDecimal } from "./lib/helpers";
-import { getContractDeployment } from "../generated/addresses";
-import { AddressResolver } from "../generated/subgraphs/wrapper/SystemSettings_0/AddressResolver";
+import { getContractDeployment } from "../../protocols/addresses";
+import { AddressResolver } from "../../generated/SystemSettings_0/AddressResolver";
 import {
   Burned as BurnedEvent,
   Minted as MintedEvent,
-} from "../generated/subgraphs/wrapper/templates/WrapperTemplate/Wrapper";
+} from "../../generated/templates/WrapperTemplate/Wrapper";
 import {
   WrapperMaxTokenAmountUpdated as WrapperMaxTokenAmountUpdatedEvent,
   EtherWrapperMaxETHUpdated as EtherWrapperMaxETHUpdatedEvent,
-} from "../generated/subgraphs/wrapper/SystemSettings_0/SystemSettings";
-import { Wrapper as WrapperContract } from "../generated/subgraphs/wrapper/templates/WrapperTemplate/Wrapper";
-import { WrapperCreated as WrapperCreatedEvent } from "../generated/subgraphs/wrapper/WrapperFactory_0/WrapperFactory";
+} from "../../generated/SystemSettings_0/SystemSettings";
+import { Wrapper as WrapperContract } from "../../generated/templates/WrapperTemplate/Wrapper";
+import { WrapperCreated as WrapperCreatedEvent } from "../../generated/WrapperFactory_0/WrapperFactory";
 
 export function handleWrapperCreated(event: WrapperCreatedEvent): void {
   let context = new DataSourceContext();

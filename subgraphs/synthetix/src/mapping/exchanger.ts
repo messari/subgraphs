@@ -1,10 +1,10 @@
 import {
   ExchangeEntrySettled as ExchangeEntrySettledEvent,
   ExchangeEntryAppended as ExchangeEntryAppendedEvent,
-} from "../generated/subgraphs/exchanger/exchanger_Exchanger_0/Exchanger";
+} from "../../generated/exchanger_Exchanger_0/Exchanger";
 
-import { ExchangeTracking as ExchangeTrackingEventV2 } from "../generated/subgraphs/exchanger/exchanger_Synthetix_0/Synthetix";
-import { ExchangeTracking as ExchangeTrackingEventV1 } from "../generated/subgraphs/exchanger/exchanger_SynthetixOldTracking/SynthetixOldTracking";
+import { ExchangeTracking as ExchangeTrackingEventV2 } from "../../generated/exchanger_Synthetix_0/Synthetix";
+import { ExchangeTracking as ExchangeTrackingEventV1 } from "../../generated/exchanger_SynthetixOldTracking/SynthetixOldTracking";
 
 import {
   ExchangeEntrySettled,
@@ -13,7 +13,7 @@ import {
   DailyExchangePartner,
   ExchangePartner,
   TemporaryExchangePartnerTracker,
-} from "../generated/subgraphs/exchanger/schema";
+} from "../../generated/schema";
 
 import {
   getTimeID,

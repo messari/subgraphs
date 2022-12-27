@@ -8,12 +8,9 @@ import {
   dataSource,
 } from "@graphprotocol/graph-ts";
 
-import {
-  LatestRate,
-  FeeRate,
-} from "../../generated/subgraphs/latest-rates/schema";
+import { LatestRate, FeeRate } from "../../../generated/schema";
 import { initFeed, initFeeRate } from "../fragments/latest-rates";
-import { getContractDeployment } from "../../generated/addresses";
+import { getContractDeployment } from "../../../protocols/addresses";
 
 export let ZERO = BigInt.fromI32(0);
 export let ONE = BigInt.fromI32(1);

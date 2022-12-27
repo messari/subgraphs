@@ -2718,7 +2718,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2740,7 +2740,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2762,7 +2762,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2784,7 +2784,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2806,7 +2806,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2828,7 +2828,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2850,7 +2850,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2872,7 +2872,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2894,7 +2894,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2916,7 +2916,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2938,7 +2938,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2960,7 +2960,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -2982,7 +2982,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3004,7 +3004,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3026,7 +3026,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3048,7 +3048,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3070,7 +3070,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3092,7 +3092,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3114,7 +3114,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3136,7 +3136,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3158,7 +3158,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3180,7 +3180,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
@@ -3202,7 +3202,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mapping/balances.ts
+      file: ./src/mapping/fragments/balances.ts
       entities:
         - Synth
         - LatestSynthBalance
