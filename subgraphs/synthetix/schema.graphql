@@ -1246,7 +1246,7 @@ type Synth @entity {
   id: ID!
   name: String!
   symbol: String!
-  totalSupply: BigDecimal!
+  totalSupply: BigDecimal
 }
 
 type SynthBalance @entity {
@@ -1401,9 +1401,7 @@ type RateUpdate @entity {
   timestamp: BigInt!
 }
 
-" DEPRECATED: See the Candles entity"
 type DailyCandle @entity {
-  " DEPRECATED: See the Candles entity "
   id: ID!
   synth: String!
   open: BigDecimal!
@@ -1411,6 +1409,9 @@ type DailyCandle @entity {
   low: BigDecimal!
   close: BigDecimal!
   timestamp: BigInt!
+  average: BigDecimal
+  period: BigInt
+  aggregatedPrices: BigInt
 }
 
 " Tracks this event from the Synthetix.sol contract "
@@ -1470,7 +1471,7 @@ type ExchangeRebate @entity {
 }
 
 type Total @entity {
-  " $timestamp-$bucketMagnitude-$synth-$period "
+  " $timestamp-$period-$bucketMagnitude-$synth "
   id: ID!
   " timestamp of the beginning of the time period this represents "
   timestamp: BigInt!
@@ -1546,9 +1547,37 @@ type Candle @entity {
   aggregatedPrices: BigInt!
 }
 
+" The average price of SNX over a 15 minute period "
+type FifteenMinuteSNXPrice @entity {
+  " unix timestamp at beginning of 15 minute period "
+  id: ID!
+  " number of samples averaged in the period "
+  count: BigInt!
+  " calculated average price of all the samples "
+  averagePrice: BigDecimal!
+}
+
+" The average price of SNX over a day "
+type DailySNXPrice @entity {
+  " unix timestamp at beginning of 15 minute period "
+  id: ID!
+  " number of samples averaged in the period "
+  count: BigInt!
+  " calculated average price of all the samples "
+  averagePrice: BigDecimal!
+}
+
 type FuturesMarket @entity {
   " Address of the market "
   id: ID!
+  " time at which these values are recorded "
+  timestamp: BigInt!
+  " representation of total amount of debt issued over time. increases or decreases proportionally whenever synths are minted/burned "
+  debtEntry: BigDecimal!
+  " current value of all issued synths which this debt pool is responsible for. fluctuates based on the synth breakdown of the system * exchange rates "
+  totalIssuedSynths: BigDecimal!
+  " totalIssuedSynths / debtEntry - useful for tracking debt over time "
+  debtRatio: BigDecimal!
 }
 
 " Synthentix is an aggregation entity "
@@ -1751,13 +1780,13 @@ type Loan @entity {
   " the account receiving the loan "
   account: Bytes!
   " the currency of loan amount "
-  currency: String!
-  " the currency of the collateralAmount "
+  currency: String
+  " the type of collateral minted - sUSD or sETH "
   collateralMinted: String!
   " the amount of the loan "
   amount: BigDecimal!
   " the amount of collateral "
-  collateralAmount: BigDecimal!
+  collateralAmount: BigDecimal
   " is the loan still open? "
   isOpen: Boolean!
   " the timestamp the loan was created "
@@ -1846,7 +1875,7 @@ type LoanRepaid @entity {
 type DebtState @entity {
   " Global historical debt entry index "
   id: ID!
-  period: BigInt!
+  period: BigInt
   " time at which these values are recorded "
   timestamp: BigInt!
   " representation of total amount of debt issued over time. increases or decreases proportionally whenever synths are minted/burned "
