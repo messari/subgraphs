@@ -174,33 +174,11 @@ export function getOrCreateBalancerPoolToken(
   let knownPriceForAtleastOnePoolToken = false;
   let knownPricePoolTokenIndex = -1;
 
-  let isStablePool = true;
-  const stablePoolContract = StablePool.bind(poolAddress);
-
   for (let idx = 0; idx < inputTokens.length; idx++) {
     const tokenAddress = Address.fromString(inputTokens[idx]);
     let token = getOrCreateToken(tokenAddress, blockNumber);
 
-    if (isStablePool) {
-      const tokenRateCall = stablePoolContract.try_getTokenRate(
-        Address.fromString(token.id)
-      );
-
-      if (!tokenRateCall.reverted) {
-        if (token.lastPriceUSD == BIGDECIMAL_ZERO) {
-          token.lastPriceUSD = bigIntToBigDecimal(
-            tokenRateCall.value,
-            token.decimals
-          );
-
-          token.save();
-        }
-      } else {
-        isStablePool = false;
-      }
-    }
-
-    if (!isStablePool && isBPT(tokenAddress)) {
+    if (isBPT(tokenAddress)) {
       token = getOrCreateBalancerPoolToken(tokenAddress, blockNumber);
     }
 
