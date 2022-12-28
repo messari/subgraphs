@@ -2,6 +2,7 @@
 name: Bug report
 about: Report a bug in our subgraphs or data
 title: "#bug; concise title"
+deployment: "protocol chain" (ex. Uniswap-V3 Ethereum, Uniswap-V3 All) 
 labels: bug
 assignees: bye43
 
