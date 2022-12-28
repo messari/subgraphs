@@ -101,8 +101,10 @@ function trackMintOrBurn(synthAddress: Address, value: BigDecimal): void {
   }
 
   if (synth != null) {
-    let newSupply = synth.totalSupply.plus(value);
-
+    let newSupply = value;
+    if (synth.totalSupply) {
+      newSupply = synth.totalSupply!.plus(value);
+    }
     if (newSupply.lt(toDecimal(ZERO))) {
       log.warning("totalSupply needs correction, is negative: %s", [
         synth.symbol,

@@ -1786,7 +1786,7 @@ type Loan @entity {
   " the amount of the loan "
   amount: BigDecimal!
   " the amount of collateral "
-  collateralAmount: BigDecimal
+  collateralAmount: BigDecimal!
   " is the loan still open? "
   isOpen: Boolean!
   " the timestamp the loan was created "

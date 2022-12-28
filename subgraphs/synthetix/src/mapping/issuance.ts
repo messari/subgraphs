@@ -377,7 +377,13 @@ export function handleTransferSNX(event: SNXTransferEvent): void {
     );
   } else if (synth != null) {
     // snx is minted
-    synth.totalSupply = synth.totalSupply.plus(toDecimal(event.params.value));
+    if (synth.totalSupply) {
+      synth.totalSupply = synth.totalSupply!.plus(
+        toDecimal(event.params.value)
+      );
+    } else {
+      synth.totalSupply = toDecimal(event.params.value);
+    }
     synth.save();
   }
 
@@ -390,7 +396,13 @@ export function handleTransferSNX(event: SNXTransferEvent): void {
     );
   } else if (synth != null) {
     // snx is burned (only occurs on cross chain transfer)
-    synth.totalSupply = synth.totalSupply.minus(toDecimal(event.params.value));
+    if (synth.totalSupply) {
+      synth.totalSupply = synth.totalSupply!.minus(
+        toDecimal(event.params.value)
+      );
+    } else {
+      synth.totalSupply = toDecimal(event.params.value);
+    }
     synth.save();
   }
 }

@@ -215,6 +215,8 @@ function addLoanEntity(
   loanEntity.hasPartialLiquidations = false;
   loanEntity.isOpen = true;
   loanEntity.createdAt = event.block.timestamp;
+  loanEntity.currency = "";
+  loanEntity.collateralAmount = toDecimal(BigInt.fromI32(0));
   return loanEntity;
 }
 
