@@ -4,9 +4,9 @@ about: Pull request checklist for building a new messari subgraph
 title: "feat(#major); protocol-name; add subgraph"
 ---
 
-**Describe the Changes**
+**Describe the PR**
 
-A clear and concise description of what the bug is. Preferably using bullet points.
+A clear and concise description of the PR. Preferably using bullet points.
 
 - Added [protocol-name] subgraph using [x] schema
 
