@@ -17,7 +17,10 @@ export function getCollateralPrice(
   marketAddress: Address,
   token: Token
 ): BigDecimal {
-  if (token.lastPriceBlockNumber == event.block.number) {
+  if (
+    token.lastPriceBlockNumber &&
+    token.lastPriceBlockNumber!.equals(event.block.number)
+  ) {
     return token.lastPriceUSD!;
   }
   const contract = erc20QiStablecoin.bind(marketAddress);

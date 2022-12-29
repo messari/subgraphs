@@ -1,7 +1,20 @@
-import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount } from "../../generated/schema";
-import { INT_ONE, SECONDS_PER_DAY, SECONDS_PER_HOUR, UsageType } from "./constants";
-import { getLiquidityPool, getOrCreateDex, getOrCreateFinancialsDailySnapshot, getOrCreateLiquidityPoolDailySnapshot, getOrCreateLiquidityPoolHourlySnapshot, getOrCreateUsageMetricDailySnapshot, getOrCreateUsageMetricHourlySnapshot } from "./getters";
+import {
+  INT_ONE,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+  UsageType,
+} from "./constants";
+import {
+  getLiquidityPool,
+  getOrCreateDex,
+  getOrCreateFinancialsDailySnapshot,
+  getOrCreateLiquidityPoolDailySnapshot,
+  getOrCreateLiquidityPoolHourlySnapshot,
+  getOrCreateUsageMetricDailySnapshot,
+  getOrCreateUsageMetricHourlySnapshot,
+} from "./getters";
 
 // These are meant more as boilerplates that'll be filled out depending on the
 // subgraph, and will be different from subgraph to subgraph, hence left
@@ -10,9 +23,9 @@ import { getLiquidityPool, getOrCreateDex, getOrCreateFinancialsDailySnapshot, g
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
-  let financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
+  const financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetricsDaily.blockNumber = event.block.number;
@@ -24,13 +37,17 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 // Update usage metrics entities
-export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, usageType: string): void {
-  let from = fromAddress.toHexString();
+export function updateUsageMetrics(
+  event: ethereum.Event,
+  fromAddress: Address,
+  usageType: string
+): void {
+  const from = fromAddress.toHexString();
 
-  let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
-  let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
+  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
+  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetricsDaily.blockNumber = event.block.number;
@@ -53,14 +70,14 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   }
 
   // Number of days since Unix epoch
-  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-  let dayId = day.toString();
-  let hourId = hour.toString();
+  const dayId = day.toString();
+  const hourId = hour.toString();
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = from.concat("-").concat(dayId);
+  const dailyActiveAccountId = from.concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -68,7 +85,7 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
     dailyActiveAccount.save();
   }
 
-  let hourlyActiveAccountId = from.concat("-").concat(hourId);
+  const hourlyActiveAccountId = from.concat("-").concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -93,10 +110,10 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
 // Update Pool Snapshots entities
 export function updatePoolMetrics(event: ethereum.Event): void {
   // get or create pool metrics
-  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
-  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
+  const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
+  const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
 
-  let pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(event.address.toHexString());
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;

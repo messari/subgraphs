@@ -1045,7 +1045,7 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-type Deposit @entity {
+type Deposit @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1083,7 +1083,7 @@ type Deposit @entity {
   amountUSD: BigDecimal!
 }
 
-type Withdraw @entity {
+type Withdraw @entity(immutable: true) {
   " { Transaction hash }-{ Log index }"
   id: ID!
 
@@ -1126,7 +1126,7 @@ type Withdraw @entity {
 }
 
 # For CDPs, use this for mint events
-type Borrow @entity {
+type Borrow @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1165,7 +1165,7 @@ type Borrow @entity {
 }
 
 # For CDPs, use this for burn events
-type Repay @entity {
+type Repay @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1203,7 +1203,7 @@ type Repay @entity {
   amountUSD: BigDecimal!
 }
 
-type Liquidate @entity {
+type Liquidate @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: ID!
 

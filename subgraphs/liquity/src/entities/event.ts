@@ -9,16 +9,11 @@ import {
   Borrow,
   Deposit,
   Liquidate,
+  Market,
   Repay,
   Withdraw,
 } from "../../generated/schema";
-import {
-  ACTIVE_POOL,
-  BIGINT_ZERO,
-  PositionSide,
-  STABILITY_POOL,
-  ZERO_ADDRESS,
-} from "../utils/constants";
+import { BIGINT_ZERO, PositionSide } from "../utils/constants";
 import {
   addMarketBorrowVolume,
   addMarketDepositVolume,
@@ -52,19 +47,19 @@ import {
   incrementProtocolLiquidateCount,
   incrementProtocolRepayCount,
   incrementProtocolWithdrawCount,
-  updateActiveAccounts,
 } from "./usage";
 
 export function createDeposit(
   event: ethereum.Event,
-  amountETH: BigInt,
+  market: Market,
+  asset: Address,
+  amount: BigInt,
   amountUSD: BigDecimal,
   sender: Address
 ): void {
-  if (amountETH.le(BIGINT_ZERO)) {
-    log.critical("Invalid deposit amount: {}", [amountETH.toString()]);
+  if (amount.le(BIGINT_ZERO)) {
+    log.critical("Invalid deposit amount: {}", [amount.toString()]);
   }
-  const market = getOrCreateMarket();
   const account = getOrCreateAccount(sender);
   const position = getOrCreateUserPosition(
     event,
@@ -86,11 +81,11 @@ export function createDeposit(
   deposit.account = account.id;
   deposit.market = market.id;
   deposit.position = position.id;
-  deposit.asset = getETHToken().id;
-  deposit.amount = amountETH;
+  deposit.asset = asset.toHexString();
+  deposit.amount = amount;
   deposit.amountUSD = amountUSD;
   deposit.save();
-  addMarketDepositVolume(event, amountUSD);
+  addMarketDepositVolume(event, market, amountUSD);
   incrementAccountDepositCount(account);
   incrementPositionDepositCount(position);
   incrementProtocolDepositCount(event, account);
@@ -98,6 +93,7 @@ export function createDeposit(
 
 export function createWithdraw(
   event: ethereum.Event,
+  market: Market,
   amountETH: BigInt,
   amountUSD: BigDecimal,
   user: Address,
@@ -106,7 +102,6 @@ export function createWithdraw(
   if (amountETH.le(BIGINT_ZERO)) {
     log.critical("Invalid withdraw amount: {}", [amountETH.toString()]);
   }
-  const market = getOrCreateMarket();
   const account = getOrCreateAccount(recipient);
   const position = getOrCreateUserPosition(
     event,

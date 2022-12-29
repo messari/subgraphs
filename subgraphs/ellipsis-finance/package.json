@@ -1,13 +1,29 @@
 {
   "name": "ellipsis",
   "license": "UNLICENSED",
-  "type": "module",
   "scripts": {
-    "prettier": "prettier --config ./.prettierrc.json --write \"**/*.{js,json,md,ts}\""
+    "prettier": "prettier --config ./.prettierrc.json --write \"**/*.{js,json,md,ts}\"",
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.template.ts > configurations/configure.ts",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_target}",
+    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs}",
+    "lint": "eslint . --ext .ts",
+    "lint-and-fix": "eslint . --ext .ts --fix",
+    "format": "npx prettier --write ."
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.28.0",
-    "@graphprotocol/graph-ts": "0.26.0",
+    "@graphprotocol/graph-cli": "0.32.0",
+    "@graphprotocol/graph-ts": "0.27.0",
+    "mustache": "^4.2.0",
     "prettier": "^2.6.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "^5.38.0",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "eslint": "^8.23.1",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "husky": "^8.0.1",
+    "typescript": "^4.8.3"
   }
 }

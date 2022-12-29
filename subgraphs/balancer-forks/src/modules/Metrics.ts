@@ -1,10 +1,4 @@
-import {
-  log,
-  BigInt,
-  Address,
-  ethereum,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   ActiveAccount,
   LiquidityPool as LiquidityPoolStore,
@@ -24,7 +18,7 @@ import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
-  const account = getOrCreateAccount(from.toHexString());
+  getOrCreateAccount(from.toHexString());
 
   const protocol = getOrCreateDexAmmProtocol();
   const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block);
@@ -42,7 +36,7 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (
+  const dailyActiveAccountId = (
     block.timestamp.toI64() / constants.SECONDS_PER_DAY
   )
     .toString()
@@ -67,7 +61,7 @@ export function updatePoolSnapshots(
   poolAddress: Address,
   block: ethereum.Block
 ): void {
-  let pool = LiquidityPoolStore.load(poolAddress.toHexString());
+  const pool = LiquidityPoolStore.load(poolAddress.toHexString());
   if (!pool) return;
 
   const poolDailySnapshots = getOrCreateLiquidityPoolDailySnapshots(
@@ -160,31 +154,31 @@ export function updateTokenVolumeAndBalance(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  let poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
+  const poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
     poolAddress.toHexString(),
     block
   );
-  let poolHourlySnaphot = getOrCreateLiquidityPoolHourlySnapshots(
+  const poolHourlySnaphot = getOrCreateLiquidityPoolHourlySnapshots(
     poolAddress.toHexString(),
     block
   );
 
-  let tokenIndex = pool.inputTokens.indexOf(tokenAddress);
+  const tokenIndex = pool.inputTokens.indexOf(tokenAddress);
   if (tokenIndex == -1) return;
 
-  let dailyVolumeByTokenAmount = poolDailySnaphot.dailyVolumeByTokenAmount;
+  const dailyVolumeByTokenAmount = poolDailySnaphot.dailyVolumeByTokenAmount;
   dailyVolumeByTokenAmount[tokenIndex] =
     dailyVolumeByTokenAmount[tokenIndex].plus(tokenAmount);
 
-  let hourlyVolumeByTokenAmount = poolHourlySnaphot.hourlyVolumeByTokenAmount;
+  const hourlyVolumeByTokenAmount = poolHourlySnaphot.hourlyVolumeByTokenAmount;
   hourlyVolumeByTokenAmount[tokenIndex] =
     hourlyVolumeByTokenAmount[tokenIndex].plus(tokenAmount);
 
-  let dailyVolumeByTokenUSD = poolDailySnaphot.dailyVolumeByTokenUSD;
+  const dailyVolumeByTokenUSD = poolDailySnaphot.dailyVolumeByTokenUSD;
   dailyVolumeByTokenUSD[tokenIndex] =
     dailyVolumeByTokenUSD[tokenIndex].plus(tokenAmountUSD);
 
-  let hourlyVolumeByTokenUSD = poolHourlySnaphot.hourlyVolumeByTokenUSD;
+  const hourlyVolumeByTokenUSD = poolHourlySnaphot.hourlyVolumeByTokenUSD;
   hourlyVolumeByTokenUSD[tokenIndex] =
     hourlyVolumeByTokenUSD[tokenIndex].plus(tokenAmountUSD);
 
@@ -203,13 +197,13 @@ export function updateSnapshotsVolume(
   volumeUSD: BigDecimal,
   block: ethereum.Block
 ): void {
-  let protcol = getOrCreateDexAmmProtocol();
-  let financialsDailySnapshot = getOrCreateFinancialDailySnapshots(block);
-  let poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
+  const protocol = getOrCreateDexAmmProtocol();
+  const financialsDailySnapshot = getOrCreateFinancialDailySnapshots(block);
+  const poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
     poolAddress.toHexString(),
     block
   );
-  let poolHourlySnaphot = getOrCreateLiquidityPoolHourlySnapshots(
+  const poolHourlySnaphot = getOrCreateLiquidityPoolHourlySnapshots(
     poolAddress.toHexString(),
     block
   );
@@ -220,12 +214,15 @@ export function updateSnapshotsVolume(
     poolDailySnaphot.dailyVolumeUSD.plus(volumeUSD);
   poolHourlySnaphot.hourlyVolumeUSD =
     poolHourlySnaphot.hourlyVolumeUSD.plus(volumeUSD);
-  protcol.cumulativeVolumeUSD = protcol.cumulativeVolumeUSD.plus(volumeUSD);
+
+  if (!constants.BLACKLISTED_PHANTOM_POOLS.includes(poolAddress)) {
+    protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(volumeUSD);
+  }
 
   financialsDailySnapshot.save();
   poolHourlySnaphot.save();
   poolDailySnaphot.save();
-  protcol.save();
+  protocol.save();
 }
 
 export function updateProtocolRevenue(
@@ -236,11 +233,11 @@ export function updateProtocolRevenue(
   const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
   const poolFees = utils.getPoolFees(liquidityPoolAddress);
 
-  let supplySideRevenueUSD = volumeUSD.times(
+  const supplySideRevenueUSD = volumeUSD.times(
     poolFees.getTradingFees.minus(poolFees.getProtocolFees)
   );
 
-  let protocolSideRevenueUSD = volumeUSD.times(poolFees.getProtocolFees);
+  const protocolSideRevenueUSD = volumeUSD.times(poolFees.getProtocolFees);
 
   updateRevenueSnapshots(
     pool,

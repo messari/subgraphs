@@ -1,5 +1,6 @@
 import { CollBalanceUpdated } from "../../generated/CollSurplusPool/CollSurplusPool";
 import { createWithdraw } from "../entities/event";
+import { getOrCreateMarket } from "../entities/market";
 import { getCurrentETHPrice } from "../entities/token";
 import { getOrCreateTrove } from "../entities/trove";
 import { BIGINT_ZERO } from "../utils/constants";
@@ -27,6 +28,7 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
     ).times(getCurrentETHPrice());
     createWithdraw(
       event,
+      getOrCreateMarket(),
       trove.collateralSurplusChange,
       collateralSurplusUSD,
       borrower,

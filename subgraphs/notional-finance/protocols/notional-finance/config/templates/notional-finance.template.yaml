@@ -1,0 +1,70 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Notional
+    network: mainnet
+    source:
+      address: "0x1344A36A1B56144C3Bc62E7757377D288fDE0369"
+      abi: Notional
+      startBlock: 13492539
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Upgraded
+      abis:
+        ###########################################
+        ########## Notional Finance ###############
+        ###########################################
+        - name: Notional
+          file: ./abis/Notional.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: LendBorrowTrade(indexed address,indexed uint16,uint40,int256,int256)
+          handler: handleLendBorrowTrade
+        - event: LiquidateLocalCurrency(indexed address,indexed address,uint16,int256)
+          handler: handleLiquidateLocalCurrency
+        - event: LiquidateCollateralCurrency(indexed address,indexed address,uint16,uint16,int256,int256,int256)
+          handler: handleLiquidateCollateralCurrency
+        - event: LiquidatefCashEvent(indexed address,indexed address,uint16,uint16,int256,uint256[],int256[])
+          handler: handleLiquidatefCash
+      file: ./src/mappings/notional.ts

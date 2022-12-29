@@ -5,16 +5,20 @@ import {
   Deposit,
   Euler,
   GovSetAssetConfig,
+  GovSetPricingConfig,
   Liquidation,
   MarketActivated,
   Repay,
   Withdraw,
 } from "../../generated/euler/Euler";
 import {
+  getCurrentEpoch,
+  getDeltaStakeAmount,
   getOrCreateAssetStatus,
   getOrCreateLendingProtocol,
   getOrCreateMarket,
   getOrCreateToken,
+  getStartBlockForEpoch,
 } from "../common/getters";
 import {
   EULER_ADDRESS,
@@ -26,7 +30,14 @@ import {
   DEFAULT_DECIMALS,
   BIGINT_SEVENTY_FIVE,
 } from "../common/constants";
-import { snapshotFinancials, snapshotMarket, updateUsageMetrics } from "./helpers";
+import {
+  snapshotFinancials,
+  snapshotMarket,
+  updateUsageMetrics,
+  updateWeightedStakedAmount,
+  processRewardEpoch6_17,
+  processRewardEpoch18_23,
+} from "./helpers";
 import {
   createBorrow,
   createDeposit,
@@ -41,6 +52,9 @@ import { LendingProtocol, Market, Token } from "../../generated/schema";
 import { ERC20 } from "../../generated/euler/ERC20";
 import { GovConvertReserves, GovSetReserveFee } from "../../generated/euler/Exec";
 import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
+import { _Epoch } from "../../generated/schema";
+import { Stake } from "../../generated/EulStakes/EulStakes";
+import { Markets as MarketsContract } from "../../generated/euler/Markets";
 
 export function handleAssetStatus(event: AssetStatus): void {
   const underlying = event.params.underlying.toHexString();
@@ -64,7 +78,6 @@ export function handleAssetStatus(event: AssetStatus): void {
       bigIntToBDUseDecimals(totalBalances, DEFAULT_DECIMALS),
     );
   }
-
   // tvl, totalDepositBalanceUSD and totalBorrowBalanceUSD may be updated again with new price
   updateBalances(token, protocol, market, totalBalances, totalBorrows, totalDepositBalance, totalBorrowBalance);
 
@@ -107,6 +120,7 @@ function updateProtocolTVL(event: AssetStatus, protocol: LendingProtocol): void 
       mrkt.totalBorrowBalanceUSD = bigIntToBDUseDecimals(mrkt._totalBorrowBalance!, tkn.decimals).times(
         underlyingPriceUSD,
       );
+
       mrkt.totalValueLockedUSD = mrkt.totalDepositBalanceUSD;
       mrkt.save();
 
@@ -145,6 +159,7 @@ function updateBalances(
   protocol.save();
 
   market.totalDepositBalanceUSD = newTotalDepositBalanceUSD;
+
   market.totalBorrowBalanceUSD = newTotalBorrowBalanceUSD;
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
@@ -263,6 +278,13 @@ export function handleMarketActivated(event: MarketActivated): void {
   market.inputToken = underlyingToken.id;
   market.outputToken = eToken.id;
   market._dToken = dToken.id;
+
+  // used to determine eligibility of EUL distribution from Epoch 18+
+  const marketContract = MarketsContract.bind(event.address);
+  const assetStorageResult = marketContract.try_getPricingConfig(event.params.underlying);
+  if (!assetStorageResult.reverted) {
+    market._pricingType = assetStorageResult.value.getPricingType();
+  }
   market.save();
 
   const assetStatus = getOrCreateAssetStatus(underlyingToken.id);
@@ -292,4 +314,52 @@ export function handleGovSetReserveFee(event: GovSetReserveFee): void {
     assetStatus.totalBalances,
     event,
   );
+}
+
+export function handleGovSetPricingConfig(event: GovSetPricingConfig): void {
+  const assetStatus = getOrCreateAssetStatus(event.params.underlying.toHexString());
+  const market = getOrCreateMarket(assetStatus.eToken!);
+  market._pricingType = event.params.newPricingType;
+  market.save();
+}
+
+export function handleStake(event: Stake): void {
+  const underlying = event.params.underlying.toHexString();
+  // find market id for underlying
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
+  const market = getOrCreateMarket(marketId);
+  const deltaStakedAmount = getDeltaStakeAmount(event);
+
+  // keep track of staked amount from epoch 1
+  const epochID = getCurrentEpoch(event);
+  if (epochID < 0) {
+    market._stakedAmount = market._stakedAmount.plus(deltaStakedAmount);
+    market.save();
+    return;
+  }
+
+  const epochStartBlock = getStartBlockForEpoch(epochID)!;
+  let epoch = _Epoch.load(epochID.toString());
+  if (!epoch) {
+    //Start of a new epoch
+    epoch = new _Epoch(epochID.toString());
+    epoch.epoch = epochID;
+    epoch.save();
+    if (epoch.epoch <= 17) {
+      processRewardEpoch6_17(epoch, epochStartBlock, event);
+    } else if (epoch.epoch <= 23) {
+      processRewardEpoch18_23(epoch, epochStartBlock, event);
+    }
+  }
+
+  // In a valid epoch (6 <= epoch <=96) with uninitialized market._stakeLastUpdateBlock
+  if (!market._stakeLastUpdateBlock) {
+    market._stakeLastUpdateBlock = epochStartBlock;
+    market._weightedStakedAmount = BIGINT_ZERO;
+  }
+  // update _weightedStakeAmount before updating _stakedAmount
+  updateWeightedStakedAmount(market, event.block.number);
+  market._stakedAmount = market._stakedAmount.plus(deltaStakedAmount);
+  market.save();
 }

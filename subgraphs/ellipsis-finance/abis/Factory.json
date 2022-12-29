@@ -33,6 +33,27 @@
     "type": "event"
   },
   {
+    "name": "CryptoPoolDeployed",
+    "inputs": [
+      { "name": "pool", "type": "address", "indexed": false },
+      { "name": "token", "type": "address", "indexed": false },
+      { "name": "coins", "type": "address[2]", "indexed": false },
+      { "name": "A", "type": "uint256", "indexed": false },
+      { "name": "gamma", "type": "uint256", "indexed": false },
+      { "name": "mid_fee", "type": "uint256", "indexed": false },
+      { "name": "out_fee", "type": "uint256", "indexed": false },
+      { "name": "allowed_extra_profit", "type": "uint256", "indexed": false },
+      { "name": "fee_gamma", "type": "uint256", "indexed": false },
+      { "name": "adjustment_step", "type": "uint256", "indexed": false },
+      { "name": "admin_fee", "type": "uint256", "indexed": false },
+      { "name": "ma_half_time", "type": "uint256", "indexed": false },
+      { "name": "initial_price", "type": "uint256", "indexed": false },
+      { "name": "deployer", "type": "address", "indexed": false }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
     "stateMutability": "nonpayable",
     "type": "constructor",
     "inputs": [
@@ -494,5 +515,12 @@
     "inputs": [{ "name": "arg0", "type": "address" }],
     "outputs": [{ "name": "", "type": "address" }],
     "gas": 4058
+  },
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "get_token",
+    "inputs": [{ "name": "_pool", "type": "address" }],
+    "outputs": [{ "name": "", "type": "address" }]
   }
 ]
