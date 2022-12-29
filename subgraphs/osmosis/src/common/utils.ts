@@ -47,7 +47,7 @@ export function updatePoolTVL(
   liquidityPool: LiquidityPoolStore,
   block: cosmos.HeaderOnlyBlock
 ): bool {
-  const index = updateTokenPrice(liquidityPool, block) as i32;
+  const index = updateBaseTokenPrice(liquidityPool, block) as i32;
   if (index < 0) {
     return false;
   }
@@ -72,7 +72,7 @@ export function updatePoolTVL(
   return true;
 }
 
-export function updateTokenPrice(
+function updateBaseTokenPrice(
   liquidityPool: LiquidityPoolStore,
   block: cosmos.HeaderOnlyBlock
 ): number {

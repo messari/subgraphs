@@ -63,12 +63,12 @@ export function msgSwapExactAmountHandler(
   const events = data.tx.result.events;
   for (let idx = 0; idx < events.length; idx++) {
     if (events[idx].eventType == "token_swapped") {
-      swapEventHandler(events[idx], data.tx, data.block);
+      swapHandler(events[idx], data.tx, data.block);
     }
   }
 }
 
-function swapEventHandler(
+function swapHandler(
   data: cosmos.Event,
   tx: cosmos.TxResult,
   block: cosmos.HeaderOnlyBlock
@@ -98,7 +98,6 @@ function swapEventHandler(
       }
     }
   }
-
   const liquidityPoolId = constants.Protocol.NAME.concat("-").concat(poolId);
   const liquidityPool = LiquidityPoolStore.load(liquidityPoolId);
   if (!liquidityPool) {
@@ -199,46 +198,23 @@ function swap(
   liquidityPool._inputTokenAmounts = inputTokenAmounts;
   liquidityPool.save();
 
-  let amountInUSD = constants.BIGDECIMAL_ZERO;
-  let amountOutUSD = constants.BIGDECIMAL_ZERO;
   let volumeUSD = constants.BIGDECIMAL_ZERO;
   const prevTVL = liquidityPool.totalValueLockedUSD;
-
   const hasPriceData = utils.updatePoolTVL(liquidityPool, block);
   if (hasPriceData) {
-    updatePriceForSwap(
+    volumeUSD = updatePriceForSwap(
+      liquidityPoolId,
       tokenInDenom,
       tokenInAmount,
       tokenOutDenom,
       tokenOutAmount,
       block.header
     );
-
-    const tokenIn = getOrCreateToken(tokenInDenom);
-    const tokenOut = getOrCreateToken(tokenOutDenom);
-    if (
-      tokenIn.lastPriceUSD !== null &&
-      tokenIn.lastPriceUSD > constants.BIGDECIMAL_ZERO
-    ) {
-      amountInUSD = utils
-        .convertTokenToDecimal(tokenInAmount, tokenIn.decimals)
-        .times(tokenIn.lastPriceUSD!);
-    }
-    if (
-      tokenOut.lastPriceUSD !== null &&
-      tokenOut.lastPriceUSD > constants.BIGDECIMAL_ZERO
-    ) {
-      amountOutUSD = utils
-        .convertTokenToDecimal(tokenOutAmount, tokenOut.decimals)
-        .times(tokenOut.lastPriceUSD!);
-    }
-    volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
     liquidityPool.cumulativeVolumeUSD = liquidityPool.cumulativeVolumeUSD.plus(
       volumeUSD
     );
     liquidityPool.save();
   }
-
   const sender = data.getAttributeValue("sender");
   createSwapTransaction(
     sender,
@@ -247,23 +223,23 @@ function swap(
     block,
     tokenInDenom,
     tokenInAmount,
-    amountInUSD,
+    volumeUSD,
     tokenOutDenom,
     tokenOutAmount,
-    amountOutUSD
+    volumeUSD
   );
   updateTokenVolumeAndBalance(
     liquidityPoolId,
     tokenInDenom,
     tokenInAmount,
-    amountInUSD,
+    volumeUSD,
     block
   );
   updateTokenVolumeAndBalance(
     liquidityPoolId,
     tokenOutDenom,
     tokenOutAmount,
-    amountOutUSD,
+    volumeUSD,
     block
   );
   utils.updateProtocolTotalValueLockedUSD(
@@ -275,24 +251,20 @@ function swap(
 }
 
 function updatePriceForSwap(
+  liquidityPoolId: string,
   tokenInDenom: string,
   tokenInAmount: BigInt,
   tokenOutDenom: string,
   tokenOutAmount: BigInt,
   header: cosmos.Header
-): void {
+): BigDecimal {
+  let volumeUSD = constants.BIGDECIMAL_ZERO;
   const tokenIn = getOrCreateToken(tokenInDenom);
   const tokenOut = getOrCreateToken(tokenOutDenom);
 
-  if (
-    tokenIn.id.startsWith("gamm/pool/") ||
-    tokenOut.id.startsWith("gamm/pool/")
-  ) {
-    return;
-  }
-
   if (tokenIn._isStableCoin && !tokenOut._isStableCoin) {
-    updateOtherTokenPrice(
+    volumeUSD = updateOtherTokenPrice(
+      liquidityPoolId,
       tokenIn,
       tokenInAmount,
       tokenOut,
@@ -300,7 +272,8 @@ function updatePriceForSwap(
       header
     );
   } else if (!tokenIn._isStableCoin && tokenOut._isStableCoin) {
-    updateOtherTokenPrice(
+    volumeUSD = updateOtherTokenPrice(
+      liquidityPoolId,
       tokenOut,
       tokenOutAmount,
       tokenIn,
@@ -312,7 +285,8 @@ function updatePriceForSwap(
       tokenOut.id != constants.OSMO_DENOM) ||
     (tokenIn.id == constants.OSMO_DENOM && tokenOut.id != constants.ATOM_DENOM)
   ) {
-    updateOtherTokenPrice(
+    volumeUSD = updateOtherTokenPrice(
+      liquidityPoolId,
       tokenIn,
       tokenInAmount,
       tokenOut,
@@ -324,7 +298,8 @@ function updatePriceForSwap(
       tokenOut.id == constants.OSMO_DENOM) ||
     (tokenIn.id != constants.OSMO_DENOM && tokenOut.id == constants.ATOM_DENOM)
   ) {
-    updateOtherTokenPrice(
+    volumeUSD = updateOtherTokenPrice(
+      liquidityPoolId,
       tokenOut,
       tokenOutAmount,
       tokenIn,
@@ -332,33 +307,41 @@ function updatePriceForSwap(
       header
     );
   }
+  return volumeUSD;
 }
 
 function updateOtherTokenPrice(
+  liquidityPoolId: string,
   baseToken: Token,
   baseTokenAmount: BigInt,
   otherToken: Token,
   otherTokenAmount: BigInt,
   header: cosmos.Header
-): void {
+): BigDecimal {
   const id = (header.time.seconds / constants.SECONDS_PER_DAY).toString();
   if (
     !baseToken.lastPriceUSD ||
-    baseToken.lastPriceUSD <= constants.BIGDECIMAL_ZERO ||
-    (otherToken._lastPriceDate != null && otherToken._lastPriceDate == id)
+    baseToken.lastPriceUSD <= constants.BIGDECIMAL_ZERO
+    // || (otherToken._lastPriceDate != null && otherToken._lastPriceDate == id)
   ) {
-    return;
+    return constants.BIGDECIMAL_ZERO;
   }
 
-  otherToken.lastPriceUSD = baseToken
-    .lastPriceUSD!.times(baseTokenAmount.toBigDecimal())
-    .div(otherTokenAmount.toBigDecimal())
-    .times(
-      constants.BIGINT_TEN.pow(
-        (otherToken.decimals - baseToken.decimals) as u8
-      ).toBigDecimal()
+  const baseTokenAmountInUSD = utils
+    .convertTokenToDecimal(baseTokenAmount, baseToken.decimals)
+    .times(baseToken.lastPriceUSD!);
+
+  if (
+    !otherToken.id.startsWith("gamm/pool/") &&
+    (!otherToken._lastPriceDate || otherToken._lastPriceDate != id)
+  ) {
+    otherToken.lastPriceUSD = baseTokenAmountInUSD.div(
+      utils.convertTokenToDecimal(otherTokenAmount, otherToken.decimals)
     );
-  otherToken.lastPriceBlockNumber = BigInt.fromI32(header.height as i32);
-  otherToken._lastPriceDate = id;
-  otherToken.save();
+    otherToken.lastPriceBlockNumber = BigInt.fromI32(header.height as i32);
+    otherToken._lastPriceDate = id;
+    otherToken.save();
+  }
+
+  return baseTokenAmountInUSD;
 }

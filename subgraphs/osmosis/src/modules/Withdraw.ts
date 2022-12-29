@@ -166,15 +166,21 @@ function exitSwapHandler(
     return;
   }
 
-  const inputTokenAmounts = liquidityPool.inputTokenBalances;
   const inputTokenBalances = liquidityPool.inputTokenBalances;
+  const inputTokenWeights = liquidityPool.inputTokenWeights;
+  const inputTokenAmounts = new Array<BigInt>(inputTokenBalances.length).fill(
+    constants.BIGINT_ZERO
+  );
+  const tokenOutAmountChange = tokenOutAmount
+    .times(utils.bigDecimalToBigInt(inputTokenWeights[tokenOutIndex]))
+    .div(constants.BIGINT_HUNDRED);
   let nonPositiveBalance = false;
+  for (let i = 0; i < inputTokenAmounts.length; i++) {
+    inputTokenAmounts[i] = tokenOutAmountChange
+      .times(inputTokenBalances[i])
+      .div(inputTokenBalances[tokenOutIndex]);
+  }
   for (let i = 0; i < inputTokenBalances.length; i++) {
-    if (liquidityPool.outputTokenSupply != constants.BIGINT_ZERO) {
-      inputTokenAmounts[i] = inputTokenBalances[i]
-        .times(shareInAmount)
-        .div(liquidityPool.outputTokenSupply!);
-    }
     inputTokenBalances[i] = inputTokenBalances[i].minus(inputTokenAmounts[i]);
     if (inputTokenBalances[i] <= constants.BIGINT_ZERO) {
       nonPositiveBalance = true;

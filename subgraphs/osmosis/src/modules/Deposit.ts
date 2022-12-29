@@ -157,21 +157,22 @@ function joinSwapHandler(
     return;
   }
 
-  const tokenInAmountChange = tokenInAmount;
-  const inputTokenAmounts = liquidityPool.inputTokenBalances;
   const inputTokenBalances = liquidityPool.inputTokenBalances;
-
-  inputTokenAmounts[tokenInIndex] = tokenInAmountChange;
-  inputTokenBalances[tokenInIndex] = inputTokenBalances[tokenInIndex].plus(
-    tokenInAmountChange
+  const inputTokenWeights = liquidityPool.inputTokenWeights;
+  const inputTokenAmounts = new Array<BigInt>(inputTokenBalances.length).fill(
+    constants.BIGINT_ZERO
   );
+  const tokenInAmountChange = tokenInAmount
+    .times(utils.bigDecimalToBigInt(inputTokenWeights[tokenInIndex]))
+    .div(constants.BIGINT_HUNDRED);
+  for (let i = 0; i < inputTokenAmounts.length; i++) {
+    inputTokenAmounts[i] = tokenInAmountChange
+      .times(inputTokenBalances[i])
+      .div(inputTokenBalances[tokenInIndex]);
+  }
+
   for (let i = 0; i < inputTokenBalances.length; i++) {
-    if (i != tokenInIndex) {
-      inputTokenAmounts[i] = tokenInAmountChange
-        .times(inputTokenBalances[i])
-        .div(inputTokenBalances[tokenInIndex]);
-      inputTokenBalances[i] = inputTokenBalances[i].plus(inputTokenAmounts[i]);
-    }
+    inputTokenBalances[i] = inputTokenBalances[i].plus(inputTokenAmounts[i]);
   }
 
   joinPoolHandler(
