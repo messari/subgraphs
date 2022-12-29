@@ -16,7 +16,7 @@ import * as constants from "../common/constants";
 import * as utils from "../common/utils";
 import { MsgCreateBalancerPool } from "../modules/Decoder";
 import { initRegistry } from "./registry";
-// import { Versions } from "../versions";
+import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -77,12 +77,9 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     protocol.totalPoolCount = 0;
   }
 
-  protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-  protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-  protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
-  // protocol.schemaVersion = Versions.getSchemaVersion();
-  // protocol.subgraphVersion = Versions.getSubgraphVersion();
-  // protocol.methodologyVersion = Versions.getMethodologyVersion();
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
   protocol.save();
 
   return protocol;
