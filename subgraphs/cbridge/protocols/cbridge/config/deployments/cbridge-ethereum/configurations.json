@@ -1,0 +1,7 @@
+{
+  "network": "mainnet",
+  "Bridge": {
+    "address": "0x5427fefa711eff984124bfbb1ab6fbf5e3da1820",
+    "startBlock": 13719989
+  }
+}

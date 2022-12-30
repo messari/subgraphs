@@ -1,0 +1,75 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: UniswapV2Factory
+    network: {{ network }}
+    source:
+      abi: UniswapV2Factory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: UniswapV2Factory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+      file: ./src/mappings.ts
+
+  - kind: ethereum
+    name: Bridge
+    network: {{ network }}
+    source:
+      address: "{{ Bridge.address }}"
+      startBlock: {{ Bridge.startBlock }}
+      abi: Bridge
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Bridge
+          file: ./abis/Bridge.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Send(bytes32,address,address,address,uint256,uint64,uint64,uint32)
+          handler: handleSend
+        - event: LiquidityAdded(uint64,address,address,uint256)
+          handler: handleLiquidityAdded
+        - event: WithdrawDone(bytes32,uint64,address,address,uint256,bytes32)
+          handler: handleWithdrawDone          
+      file: ./src/mappings.ts

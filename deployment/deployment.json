@@ -6781,7 +6781,7 @@
     "protocol": "multichain",
     "project": "multichain",
     "deployments": {
-      "multichain-ethereum": {
+      "cbridge-ethereum": {
         "network": "ethereum",
         "status": "prod",
         "versions": {
@@ -6789,14 +6789,8 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "services": {
-          "hosted-service": {
-            "slug": "multichain-ethereum",
-            "query-id": "multichain-ethereum"
-          }
-        },
         "files": {
-          "template": "multichain.template.yaml"
+          "template": "cbridge.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -6813,16 +6807,9 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "multichain-fantom",
-            "query-id": "multichain-fantom"
+            "slug": "cbridge-ethereum",
+            "query-id": "cbridge-ethereum"
           }
-        },
-        "files": {
-          "template": "multichain.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
         }
       }
     }
