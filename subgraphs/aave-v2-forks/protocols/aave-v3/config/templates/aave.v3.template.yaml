@@ -102,22 +102,6 @@ dataSources:
       eventHandlers:
         - event: Borrow(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
           handler: handleBorrow
-        - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
-          handler: handleLiquidationCall
-        - event: MintedToTreasury(indexed address,uint256)
-          handler: handleMintedToTreasury
-        - event: Repay(indexed address,indexed address,indexed address,uint256,bool)
-          handler: handleRepay
-        - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
-          handler: handleReserveDataUpdated
-        - event: Supply(indexed address,address,indexed address,uint256,indexed uint16)
-          handler: handleDeposit
-        - event: Withdraw(indexed address,indexed address,indexed address,uint256)
-          handler: handleWithdraw
-        - event: ReserveUsedAsCollateralEnabled(indexed address,indexed address)
-          handler: handleReserveUsedAsCollateralEnabled
-        - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
-          handler: handleReserveUsedAsCollateralDisabled
       file: ./protocols/aave-v3/src/mapping.ts
 
 templates:
@@ -173,19 +157,25 @@ templates:
           file: ./abis/aave-v3/UniswapV3Factory.json
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
+        - name: AToken
+          file: ./abis/aave-v3/AToken.json
+        - name: StableDebtToken
+          file: ./abis/aave-v3/StableDebtToken.json
+        - name: VariableDebtToken
+          file: ./abis/aave-v3/VariableDebtToken.json
       eventHandlers:
         - event: Borrow(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
           handler: handleBorrow
         - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
           handler: handleLiquidationCall
-        - event: MintedToTreasury(indexed address,uint256)
-          handler: handleMintedToTreasury
+        #- event: MintedToTreasury(indexed address,uint256)
+        #  handler: handleMintedToTreasury
         - event: Repay(indexed address,indexed address,indexed address,uint256,bool)
           handler: handleRepay
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleReserveDataUpdated
         - event: Supply(indexed address,address,indexed address,uint256,indexed uint16)
-          handler: handleSupply
+          handler: handleDeposit
         - event: Withdraw(indexed address,indexed address,indexed address,uint256)
           handler: handleWithdraw
         - event: ReserveUsedAsCollateralEnabled(indexed address,indexed address)
@@ -241,19 +231,11 @@ templates:
       abis:
         - name: AToken
           file: ./abis/aave-v3/AToken.json
-        - name: AaveOracle
-          file: ./abis/aave-v3/AaveOracle.json
-        - name: UniswapV3Pool
-          file: ./abis/aave-v3/UniswapV3Pool.json
-        - name: UniswapV3Factory
-          file: ./abis/aave-v3/UniswapV3Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
-        - event: Burn(indexed address,indexed address,uint256,uint256,uint256)
-          handler: handleBurn
-        - event: Mint(indexed address,indexed address,uint256,uint256,uint256)
-          handler: handleMint
-        - event: BalanceTransfer(indexed address,indexed address,uint256,uint256)
-          handler: handleBalanceTransfer
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleCollateralTransfer
       file: ./protocols/aave-v3/src/mapping.ts
   - kind: ethereum
     name: StableDebtToken
@@ -268,17 +250,11 @@ templates:
       abis:
         - name: StableDebtToken
           file: ./abis/aave-v3/StableDebtToken.json
-        - name: AaveOracle
-          file: ./abis/aave-v3/AaveOracle.json
-        - name: UniswapV3Pool
-          file: ./abis/aave-v3/UniswapV3Pool.json
-        - name: UniswapV3Factory
-          file: ./abis/aave-v3/UniswapV3Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
-        - event: Burn(indexed address,uint256,uint256,uint256,uint256,uint256)
-          handler: handleBurn
-        - event: Mint(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleMint
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleStableTransfer
       file: ./protocols/aave-v3/src/mapping.ts
   - kind: ethereum
     name: VariableDebtToken
@@ -293,15 +269,9 @@ templates:
       abis:
         - name: VariableDebtToken
           file: ./abis/aave-v3/VariableDebtToken.json
-        - name: AaveOracle
-          file: ./abis/aave-v3/AaveOracle.json
-        - name: UniswapV3Pool
-          file: ./abis/aave-v3/UniswapV3Pool.json
-        - name: UniswapV3Factory
-          file: ./abis/aave-v3/UniswapV3Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
-        - event: Burn(indexed address,indexed address,uint256,uint256,uint256)
-          handler: handleBurn
-        - event: Mint(indexed address,indexed address,uint256,uint256,uint256)
-          handler: handleMint
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleVariableTransfer
       file: ./protocols/aave-v3/src/mapping.ts
