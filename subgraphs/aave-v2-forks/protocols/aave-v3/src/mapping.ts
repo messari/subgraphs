@@ -33,7 +33,6 @@ import {
 import {
   Borrow,
   LiquidationCall,
-  MintedToTreasury,
   Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
@@ -41,7 +40,6 @@ import {
   Supply,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
-import { AToken } from "../../../generated/templates/AToken/AToken";
 import {
   ProtocolData,
   _handleBorrow,
@@ -50,7 +48,6 @@ import {
   _handleCollateralConfigurationChanged,
   _handleDeposit,
   _handleLiquidate,
-  _handlePaused,
   _handlePriceOracleUpdated,
   _handleRepay,
   _handleReserveActivated,
@@ -61,7 +58,6 @@ import {
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
   _handleTransfer,
-  _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
@@ -81,12 +77,7 @@ import {
   RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
-import {
-  LendingProtocol,
-  Market,
-  RewardToken,
-  Token,
-} from "../../../generated/schema";
+import { Market, RewardToken, Token } from "../../../generated/schema";
 import {
   AddressesProviderRegistered,
   PoolAddressesProviderRegistry,
@@ -96,7 +87,7 @@ import { Transfer as CollateralTransfer } from "../../../generated/templates/ATo
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 import {
-  LendingPool,
+  LendingPool as LendingPoolTemplate,
   LendingPoolAddressesProvider,
   LendingPoolConfigurator,
 } from "../../../generated/templates";
@@ -150,7 +141,7 @@ export function handleProxyCreated(event: ProxyCreated): void {
   );
   const id = event.params.id.toString();
   if ("POOL" == id) {
-    LendingPool.createWithContext(event.params.proxyAddress, context);
+    LendingPoolTemplate.createWithContext(event.params.proxyAddress, context);
   } else if ("POOL_CONFIGURATOR" == id) {
     LendingPoolConfigurator.createWithContext(
       event.params.proxyAddress,
@@ -750,9 +741,9 @@ function sortRewardTokens(market: Market): void {
     return;
   }
 
-  let tokens = market.rewardTokens;
-  let emissions = market.rewardTokenEmissionsAmount;
-  let emissionsUSD = market.rewardTokenEmissionsUSD;
+  const tokens = market.rewardTokens;
+  const emissions = market.rewardTokenEmissionsAmount;
+  const emissionsUSD = market.rewardTokenEmissionsUSD;
   multiArraySort(tokens!, emissions!, emissionsUSD!);
 
   market.rewardTokens = tokens;
@@ -771,7 +762,7 @@ function multiArraySort(
     return;
   }
 
-  let sorter: Array<Array<string>> = [];
+  const sorter: Array<Array<string>> = [];
   for (let i = 0; i < ref.length; i++) {
     sorter[i] = [ref[i], arr1[i].toString(), arr2[i].toString()];
   }
