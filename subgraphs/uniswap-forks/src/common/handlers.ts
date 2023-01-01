@@ -1,7 +1,7 @@
 import { ethereum, BigInt } from "@graphprotocol/graph-ts";
-import { getOrCreateTransfer } from "./getters";
-import { TransferType } from "./constants";
-import { LiquidityPool } from "../../generated/schema";
+import { getOrCreateAccount, getOrCreatePosition, getOrCreateTransfer } from "./getters";
+import { BIGINT_ZERO, TransferType } from "./constants";
+import { LiquidityPool, _PositionCounter } from "../../generated/schema";
 
 // Handle data from transfer event for mints. Used to populate Deposit entity in the Mint event.
 export function handleTransferMint(
@@ -76,4 +76,34 @@ export function handleTransferBurn(
 
   transfer.save();
   pool.save();
+}
+
+export function handleTransferPosition(
+  event: ethereum.Event,
+  pool: LiquidityPool,
+  value: BigInt,
+):void {
+
+  const account = getOrCreateAccount(event);
+  let fromPosition = getOrCreatePosition(event)
+  let toPosition = getOrCreatePosition(event)
+
+  fromPosition.withdrawCount = fromPosition.withdrawCount + 1;
+  fromPosition.outputTokenBalance = fromPosition.outputTokenBalance!.minus(value);
+  if(fromPosition.outputTokenBalance == BIGINT_ZERO) {
+    // close the position
+    fromPosition.blockNumberClosed = event.block.number
+    fromPosition.hashClosed = event.transaction.hash.toHexString();
+    fromPosition.timestampClosed = event.block.timestamp;
+    fromPosition.save();
+    //TODO update position counter entity for this account
+    let counter = _PositionCounter.load(account.id.concat("-").concat(pool.id));
+    counter!.nextCount += 1;
+    counter!.save();
+  }
+
+  toPosition.depositCount = toPosition.depositCount + 1;
+  toPosition.outputTokenBalance = toPosition.outputTokenBalance!.plus(value);
+  toPosition.save()
+
 }
