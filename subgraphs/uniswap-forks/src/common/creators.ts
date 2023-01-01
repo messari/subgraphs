@@ -166,6 +166,7 @@ export function createAndIncrementAccount(accountId: string): i32 {
   let account = Account.load(accountId);
   if (!account) {
     account = new Account(accountId);
+    account.positionCount = 0;
     account.save();
 
     return INT_ONE;
@@ -407,7 +408,10 @@ export function createSwapHandleVolumeAndFees(
   const swap = new SwapEvent(
     transactionHash.concat("-").concat(event.logIndex.toString())
   );
-
+  let transfer = getOrCreateTransfer(event);
+  transfer.sender = to;
+  transfer.save();
+  
   // update swap event
   swap.hash = transactionHash;
   swap.logIndex = logIndexI32;
