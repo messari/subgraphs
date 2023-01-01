@@ -36,7 +36,7 @@ import { createPoolFees } from "./creators";
 
 
 /**
- * Called when a deposit is made into a LiquidityPool
+ * Called when a deposit or withdrawl is made into a LiquidityPool
  * @param event 
  * @param amount0 
  * @param amount1 
@@ -78,6 +78,7 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     position.timestampOpened = event.block.timestamp;
     position.depositCount = INT_ZERO;
     position.inputTokenBalances = new Array<BigInt>(pool.inputTokens.length).map<BigInt>(()=>BIGINT_ZERO);
+    position.outputTokenBalance = BIGINT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.save(); 
   }
