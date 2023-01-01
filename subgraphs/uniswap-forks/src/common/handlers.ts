@@ -82,28 +82,35 @@ export function handleTransferPosition(
   event: ethereum.Event,
   pool: LiquidityPool,
   value: BigInt,
+  toAddress: string,
 ):void {
 
-  const account = getOrCreateAccount(event);
+  const from = getOrCreateAccount(event);
   let fromPosition = getOrCreatePosition(event)
-  let toPosition = getOrCreatePosition(event)
+  const transfer = getOrCreateTransfer(event);
+  transfer.sender = toAddress;
+  transfer.save();
+  let to = getOrCreateAccount(event);
+  let toPosition = getOrCreatePosition(event);
 
   fromPosition.withdrawCount = fromPosition.withdrawCount + 1;
   fromPosition.outputTokenBalance = fromPosition.outputTokenBalance!.minus(value);
+  from.positionCount = from.positionCount - 1;
+  from.save();
   if(fromPosition.outputTokenBalance == BIGINT_ZERO) {
     // close the position
     fromPosition.blockNumberClosed = event.block.number
     fromPosition.hashClosed = event.transaction.hash.toHexString();
     fromPosition.timestampClosed = event.block.timestamp;
     fromPosition.save();
-    //TODO update position counter entity for this account
-    let counter = _PositionCounter.load(account.id.concat("-").concat(pool.id));
+    let counter = _PositionCounter.load(from.id.concat("-").concat(pool.id));
     counter!.nextCount += 1;
     counter!.save();
   }
 
   toPosition.depositCount = toPosition.depositCount + 1;
   toPosition.outputTokenBalance = toPosition.outputTokenBalance!.plus(value);
-  toPosition.save()
-
+  toPosition.save();
+  to.positionCount = to.positionCount + 1;
+  to.save();
 }
