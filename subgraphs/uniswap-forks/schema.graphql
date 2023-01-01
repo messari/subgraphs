@@ -863,11 +863,8 @@ type Swap implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Address that received the tokens "
-  to: String!
-
-  " Address that sent the tokens "
-  from: String!
+  " Account that emitted this event "
+  account: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -900,14 +897,38 @@ type Swap implements Event @entity {
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
 type Account @entity {
-  " Address of the account "
+  " { Account address } "
   id: ID!
+
+  " Number of positions this account has "
+  positionCount: Int!
 
   " All positions that belong to this account "
   positions: [Position!]! @derivedFrom(field: "account")
 
+  # " Number of open positions this account has "
+  # openPositionCount: Int!
+
+  # " Number of closed positions this account has "
+  # closedPositionCount: Int!
+
+  # " Number of deposits this account made "
+  # depositCount: Int!
+
+  # " All deposit events of this account "
+  # deposits: [Deposit!]! @derivedFrom(field: "account")
+
+  # " Number of withdrawals this account made "
+  # withdrawCount: Int!
+
   " All withdraw events of this account "
   withdraws: [Withdraw!]! @derivedFrom(field: "account")
+
+  # " Number of times this account has traded/swapped"
+  # swapCount: Int!
+
+  # " All swap events of this account "
+  # swaps: [Swap!]! @derivedFrom(field: "account")
 }
 
 # Helper entity for calculating daily/hourly active users
