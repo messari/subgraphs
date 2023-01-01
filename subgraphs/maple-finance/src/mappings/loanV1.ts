@@ -3,7 +3,7 @@ import { Address } from "@graphprotocol/graph-ts";
 import {
     Drawdown as DrawdownEvent,
     PaymentMade as PaymentMadeEvent,
-    Liquidation as LiquidationEvent
+    Liquidation as LiquidationEvent,
 } from "../../generated/templates/LoanV1/LoanV1";
 import { ZERO_BI } from "../common/constants";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
@@ -13,7 +13,7 @@ import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protoc
 import {
     getOrCreateFinancialsDailySnapshot,
     getOrCreateMarketDailySnapshot,
-    getOrCreateMarketHourlySnapshot
+    getOrCreateMarketHourlySnapshot,
 } from "../common/mappingHelpers/getOrCreate/snapshots";
 import { createBorrow, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
@@ -67,15 +67,13 @@ export function handleDrawdown(event: DrawdownEvent): void {
     // Update market snapshot
     ////
     const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
-    marketDailySnapshot.dailyProtocolSideRevenueUSD = marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-        protocolRevenueUSD
-    );
+    marketDailySnapshot.dailyProtocolSideRevenueUSD =
+        marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenueUSD);
     marketDailySnapshot.save();
 
     const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-    MarketHourlySnapshot.hourlyProtocolSideRevenueUSD = MarketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-        protocolRevenueUSD
-    );
+    MarketHourlySnapshot.hourlyProtocolSideRevenueUSD =
+        MarketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(protocolRevenueUSD);
     MarketHourlySnapshot.save();
 
     ////

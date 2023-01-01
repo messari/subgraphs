@@ -1,4 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { bigIntToBigDecimal } from "./numbers";
 
 ////////////////////
 ///// Versions /////
@@ -121,6 +122,7 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_MAX = BigInt.fromString(
@@ -163,7 +165,7 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const TROVE_MANAGER = "0xA39739EF8b0231DbFA0DcdA07d7e29faAbCf4bb2";
+export const TROVE_MANAGER = "0xa39739ef8b0231dbfa0dcda07d7e29faabcf4bb2";
 
 export const ACTIVE_POOL_CREATED_TIMESTAMP = BigInt.fromI32(1617600130);
 
@@ -173,7 +175,9 @@ export const ACTIVE_POOL = "0xDf9Eb223bAFBE5c5271415C75aeCD68C21fE3D7F";
 
 export const STABILITY_POOL = "0x66017D22b0f8556afDd19FC67041899Eb65a21bb";
 
-export const LUSD_ADDRESS = "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0";
+export const LUSD_ADDRESS = "0x5f98805a4e8be255a32880fdec7f6728c6568ba0";
+
+export const LQTY_ADDRESS = "0x6dea81c8171d0ba574754ef6f8b412f2ed88c54d";
 
 export const MINIMUM_COLLATERAL_RATIO = BigDecimal.fromString("1.1");
 
@@ -185,3 +189,19 @@ export const LIQUIDATION_FEE_PERCENT = BigDecimal.fromString("0.5");
 export const LIQUIDATION_FEE = LIQUIDATION_FEE_PERCENT.div(BIGDECIMAL_HUNDRED);
 
 export const LIQUIDATION_RESERVE_LUSD = BigDecimal.fromString("200");
+
+// Rewards Calculation Constants
+
+// Issuance factor.
+// https://github.com/liquity/dev/blob/main/packages/contracts/contracts/LQTY/CommunityIssuance.sol#L37
+export const STABILITY_POOL_LQTY_ISSUANCE_FACTOR = bigIntToBigDecimal(
+  BigInt.fromString("999998681227695000")
+);
+
+// 32 Million
+// https://github.com/liquity/dev/blob/main/packages/contracts/contracts/LQTY/CommunityIssuance.sol#L45
+export const STABILITY_POOL_LQTY_BUGDET = BigDecimal.fromString("32000000");
+
+// Timestamp when CommunityIssuance contract was deployed.
+// https://etherscan.io/tx/0xb77963d3d9280625c886b82f593cc742998cdfa69be7fe9946dea429dcebd8bf
+export const STABILITY_POOL_REWARD_START = BigInt.fromI32(1617611537);

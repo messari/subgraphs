@@ -78,11 +78,11 @@ To handle this `CToken` will contain all of the transaction events and new `accr
 
 Protocol: https://compound.finance/
 
-Docs: https://compound.finance/docs
+Docs: https://docs.compound.finance/v2/
 
 Smart contracts: https://github.com/compound-finance/compound-protocol
 
-Deployed addresses: https://compound.finance/docs#networks
+Deployed addresses: https://docs.compound.finance/v2/#networks
 
 Existing subgraphs: https://github.com/graphprotocol/compound-v2-subgraph
 

@@ -11,6 +11,9 @@ export const schema = (version: string): string => {
     case Versions.Schema130:
       return schema130();
     case Versions.Schema201:
+      return schema201();
+    case Versions.Schema300:
+      return schema300();
     default:
       return schema201();
   }
@@ -63,7 +66,6 @@ export const schema201 = (): string => {
         markets(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
             id
             name
-
             rates {
               id
               side
@@ -74,8 +76,31 @@ export const schema201 = (): string => {
             rewardTokenEmissionsUSD
             totalBorrowBalanceUSD
             totalDepositBalanceUSD
+            positionCount
+            openPositionCount
+            closedPositionCount
+            lendingPositionCount
+            borrowingPositionCount
+        }
+    }`;
+};
 
-
+export const schema300 = (): string => {
+  return `
+    query Data($skipAmt: Int!) {
+        markets(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+            id
+            name
+            rates {
+              id
+              side
+              rate
+              type
+            }
+            totalValueLockedUSD
+            rewardTokenEmissionsUSD
+            totalBorrowBalanceUSD
+            totalDepositBalanceUSD
             positionCount
             openPositionCount
             closedPositionCount

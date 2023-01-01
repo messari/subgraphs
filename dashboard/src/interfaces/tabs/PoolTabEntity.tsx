@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Tooltip, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
@@ -7,6 +7,7 @@ import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipb
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
 import JSZip from "jszip";
+import { UploadFileCSV } from "../../common/utilComponents/UploadFileCSV";
 
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
@@ -81,6 +82,8 @@ function PoolTabEntity({
   const list: { [x: string]: any } = {};
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
   const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
+  const [csvJSON, setCsvJSON] = useState<any>(null);
+  const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
 
   useEffect(() => {
     if (downloadAllCharts) {
@@ -345,7 +348,7 @@ function PoolTabEntity({
               }
 
               if (fieldName === "rates") {
-                fieldSplitIdentifier = val.id.split("-0x")[0];
+                fieldSplitIdentifier = val.side + '-' + val.type;
               }
               const dataFieldKey = fieldName + " [" + fieldSplitIdentifier + "]";
 
@@ -611,7 +614,7 @@ function PoolTabEntity({
               }
 
               if (fieldName === "rates") {
-                fieldSplitIdentifier = val.id.split("-0x")[0];
+                fieldSplitIdentifier = val.side + '-' + val.type;
               }
               const dataFieldKey = fieldName + " [" + fieldSplitIdentifier + "]";
 
@@ -866,7 +869,7 @@ function PoolTabEntity({
         rewardAPRElement = null;
       } else {
         rewardAPRElement = (
-          <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+          <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
         );
       }
     }
@@ -891,14 +894,15 @@ function PoolTabEntity({
         ) {
           issues.push({ type: "SUM", level: "error", fieldName: entityName + "-" + rate, message: "" });
         }
-        if (data[poolKeySingular].rates[idx]?.side) {
+        const currentRate = data[poolKeySingular].rates[idx];
+        if (currentRate?.side) {
           const val = ratesChart[rate];
-          ratesChart[`${data[poolKeySingular].rates[idx]?.id.split("-0x")[0]} [${idx}]`] = val;
+          ratesChart[`${currentRate?.side}-${currentRate?.type} [${idx}]`] = val;
           delete ratesChart[rate];
         }
       });
       ratesElement = (
-        <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+        <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
       );
     }
 
@@ -1089,6 +1093,177 @@ function PoolTabEntity({
       return instanceToSave;
     }).sort((a: any, b: any) => (Number(a.timestamp) - Number(b.timestamp)));
 
+    const charts = Object.keys(dataFields).map((field: string) => {
+      const fieldName = field.split(" [")[0];
+      let label = entityName + "-" + field;
+      // Label changes, element id is constant
+      const elementId = label;
+      const linkToElementId = elementId.split(" ").join("%20");
+
+      try {
+        const arrayIndex = Number(field?.split(" [")[1]?.split("]")[0]);
+        // Generate the labeling for different token charts
+        if (fieldName.toUpperCase().includes("INPUTTOKEN")) {
+          if ((arrayIndex || arrayIndex === 0) && data[poolKeySingular]?.inputTokens) {
+            const currentInputToken = data[poolKeySingular].inputTokens[arrayIndex];
+            const name = currentInputToken?.name ? currentInputToken.name : "N/A";
+            const symbol = currentInputToken?.symbol ? currentInputToken.symbol : "N/A";
+            label += " - " + symbol + ": " + name;
+          } else if (data[poolKeySingular]?.inputToken) {
+            const name = data[poolKeySingular].inputToken?.name ? data[poolKeySingular].inputToken.name : "N/A";
+            const symbol = data[poolKeySingular].inputToken?.symbol
+              ? data[poolKeySingular].inputToken.symbol
+              : "N/A";
+            label += " - " + symbol + ": " + name;
+          }
+        } else if (fieldName.toUpperCase().includes("OUTPUTTOKEN")) {
+          const name = data[poolKeySingular]?.outputToken?.name ? data[poolKeySingular]?.outputToken?.name : "N/A";
+          const symbol = data[poolKeySingular]?.outputToken?.symbol
+            ? data[poolKeySingular]?.outputToken?.symbol
+            : "N/A";
+          label += " - " + symbol + ": " + name;
+        } else if (
+          fieldName.toUpperCase().includes("TOKEN") &&
+          data[poolKeySingular]?.inputToken &&
+          !arrayIndex &&
+          arrayIndex !== 0
+        ) {
+          const name = data[poolKeySingular]?.inputToken?.name ? data[poolKeySingular].inputToken.name : "N/A";
+          const symbol = data[poolKeySingular]?.inputToken?.symbol
+            ? data[poolKeySingular].inputToken.symbol
+            : "N/A";
+          label += " - " + symbol + ": " + name;
+        }
+        const isNegativeField = negativeFieldList.find((x: string) => {
+          return field.toUpperCase().includes(x.toUpperCase());
+        });
+        if (
+          dataFieldMetrics[field]?.negative &&
+          !isNegativeField &&
+          issues.filter((x) => x.fieldName === `${entityName}-${field}` && x.type === "NEG").length === 0
+        ) {
+          issues.push({
+            message: JSON.stringify(dataFieldMetrics[field]?.negative),
+            type: "NEG",
+            level: "critical",
+            fieldName: `${entityName}-${field}`,
+          });
+        }
+        if (dataFieldMetrics[field]?.invalidDataPlot) {
+          return (
+            <div key={elementId} id={linkToElementId}>
+              <Box mt={3} mb={1}>
+                <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
+                  <Typography variant="h6">{label}</Typography>
+                </CopyLinkToClipboard>
+              </Box>
+              <Grid container>
+                <Typography variant="body1" color="textSecondary">
+                  {entityName}-{field} timeseries has invalid data. Cannot use{" "}
+                  {dataFieldMetrics[field]?.invalidDataPlot} data types to plot chart. Evaluate how this data is
+                  collected.
+                </Typography>
+              </Grid>
+            </div>
+          );
+        }
+
+        if (
+          dataFieldMetrics[field].sum === 0 &&
+          issues.filter((x) => x.fieldName === label).length === 0 &&
+          !(fieldsList.filter((x) => x.includes(field))?.length > 1)
+        ) {
+          // This array holds field names for fields that trigger a critical level issue rather than just an error level if all values are 0
+          const criticalZeroFields = ["totalValueLockedUSD", "deposit"];
+          let level = null;
+          criticalZeroFields.forEach((criticalField) => {
+            if (field.toUpperCase().includes(criticalField.toUpperCase())) {
+              level = "critical";
+            }
+          });
+
+          if (!level) {
+            const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
+              return field.includes(fieldSchema);
+            });
+            level = "warning";
+            if (schemaField) {
+              const fieldChars = entitiesData[entityName][schemaField].split("");
+              if (fieldChars[fieldChars.length - 1] === "!") {
+                level = "error";
+              }
+            }
+          }
+          issues.push({ type: "SUM", message: "", level, fieldName: label });
+        }
+        if (
+          issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
+          dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
+        ) {
+          issues.push({
+            type: "CUMULATIVE",
+            message: dataFieldMetrics[field]?.cumulative?.hasLowered,
+            level: "error",
+            fieldName: label,
+          });
+        }
+      } catch (err) {
+        let message = "JAVASCRIPT ERROR";
+        if (err instanceof Error) {
+          message = err.message;
+        }
+        console.log(err);
+        if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
+          issues.push({
+            type: "JS",
+            message: message,
+            level: "critical",
+            fieldName: entityName + "-" + field,
+          });
+        }
+        return (
+          <div key={elementId}>
+            <Box mt={3} mb={1}>
+              <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
+                <Typography variant="h6">
+                  {field} - {message}
+                </Typography>
+              </CopyLinkToClipboard>
+            </Box>
+          </div>
+        );
+      }
+      if (dataFields[fieldName]?.length === 0) {
+        return null;
+      }
+      if (
+        fieldName.toUpperCase() === field.toUpperCase() &&
+        fieldsList.filter((x) => x.includes(fieldName))?.length > 1
+      ) {
+        return null;
+      }
+
+      if (fieldName.toUpperCase().includes("REWARD") && !(data[poolKeySingular]?.rewardTokens?.length > 0)) {
+        return null;
+      }
+      if (fieldName.toUpperCase().includes("OUTPUT") && !data[poolKeySingular]?.outputToken) {
+        return null;
+      }
+      let dataChartToPass: any = dataFields[field];
+      let baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}`;
+      if (overlayDataFields[field]) {
+        const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network || ""}-${overlayData?.protocols[0]?.subgraphVersion}`;
+        let keyDiff = "";
+        if (baseKey === overlayKey) {
+          keyDiff = ' (Overlay)';
+        }
+        dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
+      }
+      return (
+        <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+      );
+    })
+
     return (
       <Grid key={entityName}>
         <Box sx={{ marginTop: "24px" }}>
@@ -1096,180 +1271,12 @@ function PoolTabEntity({
             <Typography variant="h4">{entityName}</Typography>
           </CopyLinkToClipboard>
         </Box>
+        <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} /></Tooltip>
         <div>
           <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
           <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Charts</div>
         </div>
-        {Object.keys(dataFields).map((field: string) => {
-          const fieldName = field.split(" [")[0];
-          let label = entityName + "-" + field;
-          // Label changes, element id is constant
-          const elementId = label;
-          const linkToElementId = elementId.split(" ").join("%20");
-
-          try {
-            const arrayIndex = Number(field?.split(" [")[1]?.split("]")[0]);
-            // Generate the labeling for different token charts
-            if (fieldName.toUpperCase().includes("INPUTTOKEN")) {
-              if ((arrayIndex || arrayIndex === 0) && data[poolKeySingular]?.inputTokens) {
-                const currentInputToken = data[poolKeySingular].inputTokens[arrayIndex];
-                const name = currentInputToken?.name ? currentInputToken.name : "N/A";
-                const symbol = currentInputToken?.symbol ? currentInputToken.symbol : "N/A";
-                label += " - " + symbol + ": " + name;
-              } else if (data[poolKeySingular]?.inputToken) {
-                const name = data[poolKeySingular].inputToken?.name ? data[poolKeySingular].inputToken.name : "N/A";
-                const symbol = data[poolKeySingular].inputToken?.symbol
-                  ? data[poolKeySingular].inputToken.symbol
-                  : "N/A";
-                label += " - " + symbol + ": " + name;
-              }
-            } else if (fieldName.toUpperCase().includes("OUTPUTTOKEN")) {
-              const name = data[poolKeySingular]?.outputToken?.name ? data[poolKeySingular]?.outputToken?.name : "N/A";
-              const symbol = data[poolKeySingular]?.outputToken?.symbol
-                ? data[poolKeySingular]?.outputToken?.symbol
-                : "N/A";
-              label += " - " + symbol + ": " + name;
-            } else if (
-              fieldName.toUpperCase().includes("TOKEN") &&
-              data[poolKeySingular]?.inputToken &&
-              !arrayIndex &&
-              arrayIndex !== 0
-            ) {
-              const name = data[poolKeySingular]?.inputToken?.name ? data[poolKeySingular].inputToken.name : "N/A";
-              const symbol = data[poolKeySingular]?.inputToken?.symbol
-                ? data[poolKeySingular].inputToken.symbol
-                : "N/A";
-              label += " - " + symbol + ": " + name;
-            }
-            const isNegativeField = negativeFieldList.find((x: string) => {
-              return field.toUpperCase().includes(x.toUpperCase());
-            });
-            if (
-              dataFieldMetrics[field]?.negative &&
-              !isNegativeField &&
-              issues.filter((x) => x.fieldName === `${entityName}-${field}` && x.type === "NEG").length === 0
-            ) {
-              issues.push({
-                message: JSON.stringify(dataFieldMetrics[field]?.negative),
-                type: "NEG",
-                level: "critical",
-                fieldName: `${entityName}-${field}`,
-              });
-            }
-            if (dataFieldMetrics[field]?.invalidDataPlot) {
-              return (
-                <div key={elementId} id={linkToElementId}>
-                  <Box mt={3} mb={1}>
-                    <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
-                      <Typography variant="h6">{label}</Typography>
-                    </CopyLinkToClipboard>
-                  </Box>
-                  <Grid container>
-                    <Typography variant="body1" color="textSecondary">
-                      {entityName}-{field} timeseries has invalid data. Cannot use{" "}
-                      {dataFieldMetrics[field]?.invalidDataPlot} data types to plot chart. Evaluate how this data is
-                      collected.
-                    </Typography>
-                  </Grid>
-                </div>
-              );
-            }
-
-            if (
-              dataFieldMetrics[field].sum === 0 &&
-              issues.filter((x) => x.fieldName === label).length === 0 &&
-              !(fieldsList.filter((x) => x.includes(field))?.length > 1)
-            ) {
-              // This array holds field names for fields that trigger a critical level issue rather than just an error level if all values are 0
-              const criticalZeroFields = ["totalValueLockedUSD", "deposit"];
-              let level = null;
-              criticalZeroFields.forEach((criticalField) => {
-                if (field.toUpperCase().includes(criticalField.toUpperCase())) {
-                  level = "critical";
-                }
-              });
-
-              if (!level) {
-                const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
-                  return field.includes(fieldSchema);
-                });
-                level = "warning";
-                if (schemaField) {
-                  const fieldChars = entitiesData[entityName][schemaField].split("");
-                  if (fieldChars[fieldChars.length - 1] === "!") {
-                    level = "error";
-                  }
-                }
-              }
-              issues.push({ type: "SUM", message: "", level, fieldName: label });
-            }
-            if (
-              issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
-              dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
-            ) {
-              issues.push({
-                type: "CUMULATIVE",
-                message: dataFieldMetrics[field]?.cumulative?.hasLowered,
-                level: "error",
-                fieldName: label,
-              });
-            }
-          } catch (err) {
-            let message = "JAVASCRIPT ERROR";
-            if (err instanceof Error) {
-              message = err.message;
-            }
-            console.log(err);
-            if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
-              issues.push({
-                type: "JS",
-                message: message,
-                level: "critical",
-                fieldName: entityName + "-" + field,
-              });
-            }
-            return (
-              <div key={elementId}>
-                <Box mt={3} mb={1}>
-                  <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-                    <Typography variant="h6">
-                      {field} - {message}
-                    </Typography>
-                  </CopyLinkToClipboard>
-                </Box>
-              </div>
-            );
-          }
-          if (dataFields[fieldName]?.length === 0) {
-            return null;
-          }
-          if (
-            fieldName.toUpperCase() === field.toUpperCase() &&
-            fieldsList.filter((x) => x.includes(fieldName))?.length > 1
-          ) {
-            return null;
-          }
-
-          if (fieldName.toUpperCase().includes("REWARD") && !(data[poolKeySingular]?.rewardTokens?.length > 0)) {
-            return null;
-          }
-          if (fieldName.toUpperCase().includes("OUTPUT") && !data[poolKeySingular]?.outputToken) {
-            return null;
-          }
-          let dataChartToPass: any = dataFields[field];
-          if (overlayDataFields[field]) {
-            const baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}`;
-            const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network || ""}-${overlayData?.protocols[0]?.subgraphVersion}`;
-            let keyDiff = "";
-            if (baseKey === overlayKey) {
-              keyDiff = ' (Overlay)';
-            }
-            dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
-          }
-          return (
-            <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
-          );
-        })}
+        {charts}
         {ratesElement}
         {rewardAPRElement}
         {tokenWeightComponent}

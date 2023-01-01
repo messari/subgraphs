@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_ONE, BIGINT_TWO, BIGINT_ZERO } from "../constants";
+import { BIGDECIMAL_ONE } from "../constants";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
@@ -30,28 +30,20 @@ export function bigDecimalExponential(
   // binomial expansion to obtain (1 + x)^n : (1 + rate)^exponent
   // 1 + n *x + (n/2*(n-1))*x**2+(n/6*(n-1)*(n-2))*x**3+(n/12*(n-1)*(n-2)*(n-3))*x**4
   // this is less precise, but more efficient than `powerBigDecimal` when power is big
-  let firstTerm = exponent.times(rate);
-  let secondTerm = exponent
+  const firstTerm = exponent.times(rate);
+  const secondTerm = exponent
     .div(BIGDECIMAL_TWO)
     .times(exponent.minus(BIGDECIMAL_ONE))
     .times(rate.times(rate));
-  let thirdTerm = exponent
+  const thirdTerm = exponent
     .div(BIGDECIMAL_SIX)
     .times(exponent.minus(BIGDECIMAL_TWO))
     .times(rate.times(rate).times(rate));
-  let fourthTerm = exponent
+  const fourthTerm = exponent
     .div(BIGDECIMAL_TWELVE)
     .times(exponent.minus(BIGDECIMAL_THREE))
-    .times(
-      rate
-        .times(rate)
-        .times(rate)
-        .times(rate)
-    );
-  return firstTerm
-    .plus(secondTerm)
-    .plus(thirdTerm)
-    .plus(fourthTerm);
+    .times(rate.times(rate).times(rate).times(rate));
+  return firstTerm.plus(secondTerm).plus(thirdTerm).plus(fourthTerm);
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
@@ -66,11 +58,11 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
 }
 
 export function calculateMedian(prices: BigDecimal[]): BigDecimal {
-  let sorted = prices.sort((a, b) => {
+  const sorted = prices.sort((a, b) => {
     return a.equals(b) ? 0 : a.gt(b) ? 1 : -1;
   });
 
-  let mid = Math.ceil(sorted.length / 2) as i32;
+  const mid = Math.ceil(sorted.length / 2) as i32;
   if (sorted.length % 2 == 0) {
     return sorted[mid].plus(sorted[mid - 1]).div(BigDecimal.fromString("2"));
   }
@@ -83,9 +75,7 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 // https://docs.aave.com/developers/v/2.0/glossary
 
 export function rayToWad(a: BigInt): BigInt {
-  const halfRatio = BigInt.fromI32(10)
-    .pow(9)
-    .div(BigInt.fromI32(2));
+  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
   return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
 }
 
@@ -95,8 +85,8 @@ export function wadToRay(a: BigInt): BigInt {
 }
 
 export function round(numberToRound: BigDecimal): BigDecimal {
-  let parsedNumber: number = parseFloat(numberToRound.toString());
-  let roundedNumber: number =
+  const parsedNumber: number = parseFloat(numberToRound.toString());
+  const roundedNumber: number =
     Math.ceil((parsedNumber + Number.EPSILON) * 100) / 100;
   return BigDecimal.fromString(roundedNumber.toString());
 }

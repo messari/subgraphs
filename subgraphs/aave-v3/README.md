@@ -74,12 +74,12 @@ N/A
 
 ## References and Useful Links
 
-- Protocol website: https://aave.com
-- Protocol documentation: https://docs.aave.com/developers/getting-started/readme
-- Smart contracts: https://github.com/aave/aave-v3-core
-  - Rewards contracts: https://github.com/aave/aave-v3-periphery
-- Deployed addresses: https://docs.aave.com/developers/deployed-contracts/v3-mainnet
-- Existing Subgraph: https://github.com/aave/protocol-subgraphs
+- Protocol website: [https://aave.com](https://aave.com)
+- Protocol documentation: [https://docs.aave.com/developers/getting-started/readme](https://docs.aave.com/developers/getting-started/readme)
+- Smart contracts: [https://github.com/aave/aave-v3-core](https://github.com/aave/aave-v3-core)
+  - Rewards contracts: [https://github.com/aave/aave-v3-periphery](https://github.com/aave/aave-v3-periphery)
+- Deployed addresses: [https://docs.aave.com/developers/deployed-contracts/v3-mainnet](https://docs.aave.com/developers/deployed-contracts/v3-mainnet)
+- Existing Subgraph: [https://github.com/aave/protocol-subgraphs](https://github.com/aave/protocol-subgraphs)
 
 ## Usage
 

@@ -7,7 +7,7 @@ import { MiningParametersUpdated } from "../../generated/BalancerTokenAdmin/Bala
 export function handleMiningParametersUpdated(
   event: MiningParametersUpdated
 ): void {
-  let protocolToken = getOrCreateRewardToken(
+  const protocolToken = getOrCreateRewardToken(
     constants.PROTOCOL_TOKEN_ADDRESS,
     constants.RewardTokenType.DEPOSIT,
     event.block

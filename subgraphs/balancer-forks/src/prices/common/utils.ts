@@ -28,7 +28,7 @@ export function readValue<T>(
 export function getTokenDecimals(tokenAddr: Address): BigInt {
   const token = _ERC20.bind(tokenAddr);
 
-  let decimals = readValue<BigInt>(
+  const decimals = readValue<BigInt>(
     token.try_decimals(),
     constants.DEFAULT_DECIMALS
   );
@@ -37,7 +37,7 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
 }
 
 export function getConfig(): Configurations {
-  let network = dataSource.network();
+  const network = dataSource.network();
 
   if (network == XDAI.NETWORK_STRING) {
     return new XDAI.config();

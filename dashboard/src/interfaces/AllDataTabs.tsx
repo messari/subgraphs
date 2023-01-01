@@ -35,6 +35,7 @@ interface AllDataTabsProps {
   subgraphToQueryURL: string;
   skipAmt: number;
   overlaySchemaData: any;
+  overlayError: any;
   protocolSchemaData: any;
   poolOverviewRequest: { [x: string]: any };
   poolTimeseriesRequest: { [x: string]: any };
@@ -75,6 +76,7 @@ function AllDataTabs({
   subgraphToQueryURL,
   skipAmt,
   overlaySchemaData,
+  overlayError,
   protocolSchemaData,
   poolOverviewRequest,
   poolTimeseriesRequest,
@@ -134,7 +136,7 @@ function AllDataTabs({
   const protocolType = data.protocols[0].type;
   const protocolEntityNamesPlural = ProtocolTypeEntityNames[protocolType];
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
-  const network = data[protocolEntityNamesPlural][0].network;
+  const network = data[protocolEntityNamesPlural][0]?.network;
 
   let eventsTab = null;
   let eventsTabButton = null;
@@ -185,6 +187,10 @@ function AllDataTabs({
       } else if (poolTimeseriesRequest.poolTimeseriesError) {
         failedToLoad = true;
       }
+    }
+
+    if ((tabValue + "" === "1" || tabValue + "" === "3") && overlayError) {
+      showDropDown = true;
     }
   } catch (err: any) {
     console.error(err.message);
@@ -261,6 +267,7 @@ function AllDataTabs({
             data={data}
             overlayData={overlayData}
             entitiesData={entitiesData}
+            subgraphToQueryURL={subgraphToQueryURL}
             poolTimeseriesData={poolTimeseriesRequest.poolTimeseriesData}
             overlayPoolTimeseriesData={overlayPoolTimeseriesData}
             poolTimeseriesLoading={poolTimeseriesRequest.poolTimeseriesLoading}

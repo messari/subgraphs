@@ -6,10 +6,10 @@ import {
     MarketDailySnapshot,
     MarketHourlySnapshot,
     UsageMetricsDailySnapshot,
-    UsageMetricsHourlySnapshot
+    UsageMetricsHourlySnapshot,
 } from "../../../../generated/schema";
 
-import { PROTOCOL_ID, SEC_PER_DAY, SEC_PER_HOUR, ZERO_BD, ZERO_BI, ZERO_I32 } from "../../constants";
+import { PROTOCOL_ID, SEC_PER_DAY, SEC_PER_HOUR, ZERO_BD, ZERO_I32 } from "../../constants";
 import { getOrCreateProtocol } from "./protocol";
 
 export function getOrCreateMarketDailySnapshot(event: ethereum.Event, market: Market): MarketDailySnapshot {

@@ -1,0 +1,103 @@
+specVersion: 0.0.5
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum/contract
+    name: Configurator
+    network: {{ network }}
+    source:
+      address: "{{ factoryAddress }}"
+      abi: Configurator
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./protocols/compound-v3/src/mapping.ts
+      entities: []
+      abis:
+        - name: Configurator
+          file: ./abis/Configurator.json
+        - name: Comet
+          file: ./abis/Comet.json
+        - name: CometRewards
+          file: ./abis/CometRewards.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: CometDeployed(indexed address,indexed address)
+          handler: handleCometDeployed
+        - event: AddAsset(indexed address,(address,address,uint8,uint64,uint64,uint64,uint128))
+          handler: handleAddAsset
+        - event: SetBaseTokenPriceFeed(indexed address,indexed address,indexed address)
+          handler: handleSetBaseTokenPriceFeed
+        - event: SetBaseTrackingBorrowSpeed(indexed address,uint64,uint64)
+          handler: handleSetBaseTrackingBorrowSpeed
+        - event: SetBaseTrackingSupplySpeed(indexed address,uint64,uint64)
+          handler: handleSetBaseTrackingSupplySpeed
+        - event: UpdateAsset(indexed address,(address,address,uint8,uint64,uint64,uint64,uint128),(address,address,uint8,uint64,uint64,uint64,uint128))
+          handler: handleUpdateAsset
+        - event: UpdateAssetBorrowCollateralFactor(indexed address,indexed address,uint64,uint64)
+          handler: handleUpdateAssetBorrowCollateralFactor
+        - event: UpdateAssetLiquidateCollateralFactor(indexed address,indexed address,uint64,uint64)
+          handler: handleUpdateAssetLiquidateCollateralFactor
+        - event: UpdateAssetLiquidationFactor(indexed address,indexed address,uint64,uint64)
+          handler: handleUpdateAssetLiquidationFactor
+        - event: UpdateAssetPriceFeed(indexed address,indexed address,address,address)
+          handler: handleUpdateAssetPriceFeed
+        - event: UpdateAssetSupplyCap(indexed address,indexed address,uint128,uint128)
+          handler: handleUpdateAssetSupplyCap
+templates:
+  - name: Comet
+    kind: ethereum/contract
+    network: {{ network }}
+    source:
+      abi: Comet
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./protocols/compound-v3/src/mapping.ts
+      entities: []
+      abis:
+        - name: Comet
+          file: ./abis/Comet.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CometRewards
+          file: ./abis/CometRewards.json
+      eventHandlers:
+        - event: Supply(indexed address,indexed address,uint256)
+          handler: handleSupply
+          receipt: true
+        - event: SupplyCollateral(indexed address,indexed address,indexed address,uint256)
+          handler: handleSupplyCollateral
+          receipt: true
+        - event: Withdraw(indexed address,indexed address,uint256)
+          handler: handleWithdraw
+          receipt: true
+        - event: WithdrawCollateral(indexed address,indexed address,indexed address,uint256)
+          handler: handleWithdrawCollateral
+          receipt: true
+        - event: TransferCollateral(indexed address,indexed address,indexed address,uint256)
+          handler: handleTransferCollateral
+          receipt: true
+        - event: AbsorbCollateral(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleAbsorbCollateral
+          receipt: true
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+          receipt: true

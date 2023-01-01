@@ -59,6 +59,12 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
       } else {
         subgraphName = "";
       }
+    } else if (!subgraphParam.includes('/')) {
+      if (subgraphParam?.toUpperCase()?.split("QM")?.length === 1) {
+        queryURL = "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + subgraphParam;
+      } else {
+        queryURL = "https://api.thegraph.com/subgraphs/id/" + subgraphParam;
+      }
     }
   }
 
@@ -137,6 +143,9 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   }] = useLazyQuery(query, { client: overlayDeploymentClient });
 
   useEffect(() => {
+    if (overlayError) {
+      setOverlayError(null);
+    }
     const href = new URL(window.location.href);
     const p = new URLSearchParams(href.search);
     if (overlayDeploymentURL === "") {
@@ -519,7 +528,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     if (protocolTableData && tabValue === "1") {
       getFinancialsData();
     }
-  }, [protocolTableData, getFinancialsData, tabValue]);
+  }, [protocolTableData, protocolTableError, getFinancialsData, tabValue]);
 
   useEffect(() => {
     if (protocolTableData && tabValue === "1" && overlayDeploymentURL) {
@@ -531,7 +540,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     if (financialsData && tabValue === "1") {
       getDailyUsageData();
     }
-  }, [financialsData, getDailyUsageData]);
+  }, [financialsData, financialsError, getDailyUsageData]);
 
   useEffect(() => {
     if (overlayFinancialsData && tabValue === "1" && overlayDeploymentURL) {
@@ -619,7 +628,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         getPoolsOverviewData2();
       }
     }
-  }, [tabValue, dataPools, poolOverviewLoading]);
+  }, [tabValue, data, dataPools, poolOverviewLoading]);
 
   useEffect(() => {
     if (data?.protocols && dataPools2) {
@@ -1081,6 +1090,9 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   if (data) {
     errorDisplayProps = null;
   }
+  if (protocolTableError) {
+    errorDisplayProps = protocolTableError;
+  }
   if (overlayError) {
     errorDisplayProps = overlayError;
   }
@@ -1123,6 +1135,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
           protocolFields={protocolFields}
           protocolTableData={protocolTableData}
           overlaySchemaData={overlaySchemaDataProp}
+          overlayError={overlayError}
           protocolSchemaData={protocolSchemaDataProp}
           subgraphToQueryURL={subgraphToQuery.url}
           skipAmt={skipAmt}

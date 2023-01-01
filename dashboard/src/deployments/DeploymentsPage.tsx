@@ -2,12 +2,10 @@ import { styled } from "../styled";
 import { useNavigate } from "react-router";
 import { SearchInput } from "../common/utilComponents/SearchInput";
 import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
-import { Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { NewClient } from "../utils";
 import { useEffect, useMemo, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
-import { useQuery } from "@apollo/client";
-import { decentralizedNetworkSubgraphsQuery } from "../queries/decentralizedNetworkSubgraphsQuery";
 import DevCountTable from "./DevCountTable";
 import IndexingCalls from "./IndexingCalls";
 
@@ -23,9 +21,10 @@ interface DeploymentsPageProps {
   endpointSlugs: string[];
   aliasToProtocol: any;
   decentralizedDeployments: any;
+  issuesMapping: any;
 }
 
-function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol, decentralizedDeployments }: DeploymentsPageProps) {
+function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol, decentralizedDeployments, issuesMapping }: DeploymentsPageProps) {
 
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
@@ -38,9 +37,6 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
   const [indexingStatus, setIndexingStatus] = useState<any>(false);
   const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
   const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
-
-
-
 
   useEffect(() => {
     getData();
@@ -150,10 +146,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
           Deployed Subgraphs
         </Typography>
         <div style={{ width: "100%", textAlign: "center" }}>
-          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("/comparison")}>
-            DefiLlama Comparison
-          </span>
-          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderLeft: "#6656F8 2px solid", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
+          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
             {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
           </span>
           <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("protocols-list")}>
@@ -163,6 +156,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         {devCountTable}
         <DeploymentsTable
           getData={() => getData()}
+          issuesMapping={issuesMapping}
           protocolsToQuery={protocolsToQuery}
           decenDeposToSubgraphIds={decenDeposToSubgraphIds}
           indexingStatusLoaded={indexingStatusLoaded}

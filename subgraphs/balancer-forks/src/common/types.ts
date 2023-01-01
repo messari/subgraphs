@@ -25,7 +25,6 @@ export class RewardsInfoType {
   }
 }
 
-
 export class PoolFeesType {
   private _tradingFee: LiquidityPoolFee;
   private _protocolFee: LiquidityPoolFee;
@@ -34,7 +33,7 @@ export class PoolFeesType {
   constructor(
     tradingFee: LiquidityPoolFee,
     protocolFee: LiquidityPoolFee,
-    lpFee: LiquidityPoolFee,
+    lpFee: LiquidityPoolFee
   ) {
     this._tradingFee = tradingFee;
     this._protocolFee = protocolFee;
@@ -66,7 +65,6 @@ export class PoolFeesType {
   }
 }
 
-
 export class PoolTokensType {
   private _tokens: Address[];
   private _balances: BigInt[];
@@ -77,7 +75,7 @@ export class PoolTokensType {
   }
 
   get getInputTokens(): string[] {
-    let inputTokens: string[] = [];
+    const inputTokens: string[] = [];
 
     for (let idx = 0; idx < this._tokens.length; idx++) {
       inputTokens.push(this._tokens.at(idx).toHexString());
