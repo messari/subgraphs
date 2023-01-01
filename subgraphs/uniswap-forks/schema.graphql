@@ -744,7 +744,6 @@ type PositionSnapshot @entity {
   timestamp: BigInt!
 }
 
-type Deposit @entity {
 type Deposit @entity(immutable: true) {
   " deposit-{ Transaction hash }-{ Log index } "
   id: ID!
