@@ -412,8 +412,7 @@ export function createSwapHandleVolumeAndFees(
   swap.hash = transactionHash;
   swap.logIndex = logIndexI32;
   swap.protocol = protocol.id;
-  swap.to = to;
-  swap.from = sender;
+  swap.account = getOrCreateAccount(event).id;
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;
   swap.tokenIn = swapTokens.tokenIn.id;
