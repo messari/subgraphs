@@ -79,7 +79,12 @@ export function handleTransfer(event: Transfer): void {
   }
 
   // At this point it's an account to account transfer. Update the positions.
-  handleTransferPosition(event, pool, event.params.value);
+  handleTransferPosition(
+    event, 
+    pool, 
+    event.params.value, 
+    event.params.to.toHexString()
+  );
 
 }
 
