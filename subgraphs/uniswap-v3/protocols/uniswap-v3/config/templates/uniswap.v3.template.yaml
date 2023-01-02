@@ -89,7 +89,7 @@ templates:
           handler: handleSwap
         - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
           handler: handleMint
-        - event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
-          handler: handleBurn
         - event: Collect(indexed address,address,indexed int24,indexed int24,uint128,uint128)
           handler: handleCollect
+        #- event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          #handler: handleBurn

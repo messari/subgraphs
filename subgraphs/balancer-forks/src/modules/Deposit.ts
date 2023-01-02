@@ -28,7 +28,7 @@ export function createDepositTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): DepositTransaction {
-  let transactionId = "deposit-"
+  const transactionId = "deposit-"
     .concat(transaction.hash.toHexString())
     .concat("-")
     .concat(transaction.index.toString());
@@ -91,16 +91,16 @@ export function Deposit(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  let inputTokenAmounts: BigInt[] = [];
-  let inputTokenBalances = pool.inputTokenBalances;
+  const inputTokenAmounts: BigInt[] = [];
+  const inputTokenBalances = pool.inputTokenBalances;
   let depositAmountUSD = constants.BIGDECIMAL_ZERO;
 
   for (let idx = 0; idx < depositedCoinAmounts.length; idx++) {
     if (inputTokens.at(idx).equals(poolAddress)) continue;
 
-    let inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
+    const inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
 
-    let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
+    const inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
     inputTokenBalances[inputTokenIndex] = inputTokenBalances[
       inputTokenIndex
     ].plus(depositedCoinAmounts[idx].minus(fees[idx]));
@@ -116,11 +116,11 @@ export function Deposit(
     );
   }
 
-  let totalSupplyAfterDeposit = utils.getOutputTokenSupply(
+  const totalSupplyAfterDeposit = utils.getOutputTokenSupply(
     poolAddress,
     pool.outputTokenSupply!
   );
-  let outputTokenMintedAmount = totalSupplyAfterDeposit.minus(
+  const outputTokenMintedAmount = totalSupplyAfterDeposit.minus(
     pool.outputTokenSupply!
   );
 
@@ -130,8 +130,10 @@ export function Deposit(
     pool.inputTokenBalances,
     block
   );
-  let inputTokenWeights =
-    utils.getPoolTokenWeightsForDynamicWeightPools(poolAddress, pool.inputTokens);
+  const inputTokenWeights = utils.getPoolTokenWeightsForDynamicWeightPools(
+    poolAddress,
+    pool.inputTokens
+  );
 
   if (inputTokenWeights.length > 0) {
     pool.inputTokenWeights = inputTokenWeights;

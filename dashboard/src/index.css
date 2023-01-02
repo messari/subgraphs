@@ -42,3 +42,15 @@ code {
 .rotated {
   transform: rotate(180deg);
 }
+
+input[type="file"] {
+  display: none;
+}
+
+.round-image {
+  border-radius: 2px;
+}
+
+.PrivatePickersSlideTransition-root {
+  min-height: 200px !important;
+}

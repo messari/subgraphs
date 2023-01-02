@@ -3,8 +3,9 @@ import { DataGrid, GridColumnHeaderParams } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { blockExplorers } from "../../constants";
+import { formatIntToFixed2, tableCellTruncate } from "../../utils";
 
-interface TableChartProps {
+interface TablePoolOverviewProps {
   datasetLabel: string;
   dataTable: any;
   protocolType: string;
@@ -16,12 +17,6 @@ interface TableChartProps {
   issueProps: { message: string; type: string; level: string; fieldName: string }[];
 }
 
-const tableCellTruncate: any = {
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
-
 export const TablePoolOverview = ({
   datasetLabel,
   dataTable,
@@ -32,7 +27,7 @@ export const TablePoolOverview = ({
   skipAmt,
   setIssues,
   issueProps,
-}: TableChartProps) => {
+}: TablePoolOverviewProps) => {
   const navigate = useNavigate();
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [...issueProps];
   useEffect(() => {
@@ -51,13 +46,15 @@ export const TablePoolOverview = ({
       optionalFields.push({
         field: "baseYield",
         headerName: "Base Yield %",
+        type: "number",
         width: 180,
         renderCell: (params: any) => {
-          const value = Number(params?.value?.toString()?.split("//")[0] || params?.value)?.toFixed(2);
+          let value = Number(params?.value)
+          value = Number(formatIntToFixed2(value));
           const cellStyle = { ...tableCellTruncate };
           cellStyle.width = "100%";
           cellStyle.textAlign = "right";
-          let hoverText = params?.value?.toString()?.split("//")[1];
+          let hoverText = params?.row?.BYFactorsStr;
           if (params?.row?.dailyVolumeUSD === null && params?.row?.dailySupplySideRevenueUSD === null) {
             return (
               <span style={cellStyle}>
@@ -203,7 +200,6 @@ export const TablePoolOverview = ({
       if (pool.inputTokens) {
         inputTokenSymbol = pool.inputTokens.map((tok: any) => tok.symbol).join(", ");
       }
-
       const returnObj: { [x: string]: any } = {
         id: i + 1 + skipAmt,
         idx: i + 1 + skipAmt,
@@ -445,7 +441,8 @@ export const TablePoolOverview = ({
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
               });
             }
-            returnObj.baseYield = value + "//" + factorsStr;
+            returnObj.baseYield = value;
+            returnObj.BYFactorsStr = factorsStr;
           } else if (pool?.dailySupplySideRevenueUSD) {
             let value = (Number(pool?.dailySupplySideRevenueUSD) * 36500) / Number(pool.totalValueLockedUSD);
             const factorsStr = `(${Number(pool?.dailySupplySideRevenueUSD).toFixed(
@@ -466,7 +463,8 @@ export const TablePoolOverview = ({
                 });
               }
             }
-            returnObj.baseYield = value + "//" + factorsStr;
+            returnObj.baseYield = value;
+            returnObj.BYFactorsStr = factorsStr;
           } else {
             if (
               issues.filter(
@@ -498,10 +496,12 @@ export const TablePoolOverview = ({
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
               });
             }
-            returnObj.baseYield = "N/A//Base Yield could not be calculated, no fees or supply side revenue provided.";
+            returnObj.baseYield = "N/A";
+            returnObj.BYFactorsStr = "Base Yield could not be calculated, no fees or supply side revenue provided.";
           }
         } else {
-          returnObj.baseYield = "N/A//Base Yield could not be calculated, no fees or supply side revenue provided.";
+          returnObj.baseYield = "N/A";
+          returnObj.BYFactorsStr = "Base Yield could not be calculated, no fees or supply side revenue provided.";
         }
       }
       return returnObj;

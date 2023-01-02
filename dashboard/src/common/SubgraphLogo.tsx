@@ -80,6 +80,7 @@ const subgraphMap: Record<string, string> = {
   "rari-vaults-v1": "rari",
   "rari-vaults": "rari",
   "compound-v2": "compound",
+  "compound-v3": "compound",
   "yearn-v2": "yearn",
   "stakedao": "stake-dao",
   "curve-finance": "curve",

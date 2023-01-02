@@ -6,14 +6,18 @@ import IssuesDisplay from "../IssuesDisplay";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import PoolTabEntity from "./PoolTabEntity";
+import BridgeOutboundVolChart from "../BridgeOutboundVolChart";
 
 interface PoolTabProps {
   data: any;
+  overlayData: any;
   entitiesData: { [x: string]: { [x: string]: string } };
+  subgraphToQueryURL: string;
   protocolData: { [x: string]: any };
   poolTimeseriesData: any;
   poolTimeseriesError: any;
   poolTimeseriesLoading: any;
+  overlayPoolTimeseriesData: any;
   poolId: string;
   poolData: { [x: string]: string };
   poolsList: { [x: string]: any[] };
@@ -25,11 +29,14 @@ interface PoolTabProps {
 
 function PoolTab({
   data,
+  overlayData,
   entitiesData,
+  subgraphToQueryURL,
   protocolData,
   poolTimeseriesData,
   poolTimeseriesError,
   poolTimeseriesLoading,
+  overlayPoolTimeseriesData,
   poolId,
   poolData,
   poolsList,
@@ -139,7 +146,9 @@ function PoolTab({
           <PoolTabEntity
             key={"poolTabEntity-" + entityName}
             data={data}
+            overlayData={overlayData}
             currentEntityData={poolTimeseriesData[entityName]}
+            overlayPoolTimeseriesData={overlayPoolTimeseriesData[entityName]}
             entityName={entityName}
             entitiesData={entitiesData}
             poolId={poolId}
@@ -194,10 +203,21 @@ function PoolTab({
     }
   }
 
+  // Specific chart routing
+  // This logic renders components that are specific to a given schema type or version
+  const specificCharts: any[] = [];
+  const schemaType = data?.protocols[0]?.type;
+  const schemaVersion = data?.protocols[0]?.version;
+
+  if (schemaType?.toUpperCase() === "BRIDGE") {
+    // specificCharts.push(< BridgeOutboundVolChart poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
+  }
+
   return (
     <>
       {issuesDisplayElement}
       {poolDropDown}
+      {specificCharts}
       {poolDataSection}
     </>
   );

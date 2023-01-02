@@ -68,6 +68,12 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 Not applicable to Geist Finance
 
+## Notes
+
+- The MultiFeeDistribution Contract (0x49c93a95dbcc9A6A4D8f77E59c038ce5020e82f8) tries to send out gTokens and has not opened a position for it before.
+  - This tries to subtract from a position that doesn't exist. Therefore there is no record of tokens going there.
+  - Since this is an internal contract (and not a whale) we are going to leave as is.
+
 ## Links
 
 Protocol: [geist.finance](https://geist.finance/)

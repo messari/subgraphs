@@ -11,6 +11,7 @@ import {
 import * as utils from "../common/utils";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
+import { getOrCreateVault } from "../common/initializers";
 import { DataSourceContext } from "@graphprotocol/graph-ts";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 
@@ -59,7 +60,11 @@ export function handleStrategyAdded(event: StrategyAdded): void {
   const strategyAddress = event.params.strategyAddress;
   const underlyingStrategy = utils.getUnderlyingStrategy(strategyAddress);
 
-  let context = new DataSourceContext();
+  const vault = getOrCreateVault(vaultAddress, event.block);
+  vault.fees = utils.getVaultFees(vaultAddress);
+  vault.save();
+
+  const context = new DataSourceContext();
   context.setString("vaultAddress", vaultAddress.toHexString());
 
   StrategyTemplate.createWithContext(underlyingStrategy, context);

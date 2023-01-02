@@ -4,16 +4,46 @@ import { Route, Routes } from "react-router";
 import { dashboardVersion, DashboardVersion } from "./common/DashboardVersion";
 import IssuesDisplay from "./interfaces/IssuesDisplay";
 import { DashboardHeader } from "./graphs/DashboardHeader";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DefiLlamaComparsionTab from "./interfaces/DefiLlamaComparisonTab";
-import { schemaMapping } from "./utils";
+import { NewClient, schemaMapping } from "./utils";
 import ProtocolsListByTVL from "./deployments/ProtocolsListByTVL";
+import { useQuery } from "@apollo/client";
+import { decentralizedNetworkSubgraphsQuery } from "./queries/decentralizedNetworkSubgraphsQuery";
 
 function App() {
   console.log('RUNNING VERSION ' + dashboardVersion);
   const [protocolsToQuery, setProtocolsToQuery] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
+
+  const [issuesMapping, setIssuesMapping] = useState<any>({});
+
+  const getGithubRepoIssues = () => {
+    fetch("https://api.github.com/repos/messari/subgraphs/issues?per_page=100&state=open", {
+      method: "GET",
+      headers: {
+        Accept: "*/*",
+        Authorization: "Bearer " + process.env.REACT_APP_GITHUB_API_KEY
+      },
+    })
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (json) {
+        if (Array.isArray(json)) {
+          let newIssuesMapping: any = {};
+          json.forEach((x: any) => {
+            const key: string = x.title.toUpperCase().split(' ').join(" ") || "";
+            newIssuesMapping[key] = x.html_url;
+          });
+          setIssuesMapping(newIssuesMapping);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   const getDeployments = () => {
     fetch("https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json", {
@@ -177,24 +207,65 @@ function App() {
       }`];
     }
     indexingStatusQueries[protocolType] = { fullCurrentQueryArray, fullPendingQueryArray };
-  })
+  });
+
+  const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
+    [type: string]: { [network: string]: any };
+  }>({});
+
+  const clientDecentralizedEndpoint = useMemo(
+    () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"),
+    [],
+  );
+
+  const {
+    data: decentralized,
+  } = useQuery(decentralizedNetworkSubgraphsQuery, {
+    client: clientDecentralizedEndpoint,
+  });
+
+  useEffect(() => {
+    getGithubRepoIssues();
+  }, []);
+
+  useEffect(() => {
+    if (decentralized && !Object.keys(decentralizedDeployments)?.length) {
+      const decenDepos: { [x: string]: any } = {};
+      const subs = [...decentralized.graphAccounts[0].subgraphs, ...decentralized.graphAccounts[1].subgraphs];
+      subs.forEach((sub: any, idx: number) => {
+        try {
+          let name = sub.currentVersion?.subgraphDeployment?.originalName?.toLowerCase()?.split(" ");
+          if (!name) {
+            name = sub?.displayName?.toLowerCase()?.split(" ");
+          }
+          name.pop();
+          name = name.join("-");
+          const network = sub.currentVersion.subgraphDeployment.network.id;
+          const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
+          const signalledTokens = sub.currentVersion.subgraphDeployment.signalledTokens;
+          const subgraphId = sub.id;
+          decenDepos[name] = { network, deploymentId, subgraphId, signalledTokens };
+        } catch (err) {
+          return;
+        }
+      });
+      setDecentralizedDeployments(decenDepos);
+    }
+  }, [decentralized]);
+
   return (
     <div>
       <DashboardVersion />
       <Routes>
         <Route path="/">
-          <Route index element={<DeploymentsPage getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} indexingStatusQueries={indexingStatusQueries} endpointSlugs={endpointSlugs} aliasToProtocol={aliasToProtocol} />} />
-          <Route
-            path="comparison"
-            element={<DefiLlamaComparsionTab deploymentJSON={subgraphEndpoints} getData={() => getDeployments()} />}
-          />
-          <Route path="subgraph" element={<ProtocolDashboard />} />
+          <Route index element={<DeploymentsPage issuesMapping={issuesMapping} getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} indexingStatusQueries={indexingStatusQueries} endpointSlugs={endpointSlugs} aliasToProtocol={aliasToProtocol} decentralizedDeployments={decentralizedDeployments} />} />
+          <Route path="subgraph" element={<ProtocolDashboard protocolJSON={protocolsToQuery} getData={() => getDeployments()} subgraphEndpoints={subgraphEndpoints} decentralizedDeployments={decentralizedDeployments} />} />
           <Route path="protocols-list" element={<ProtocolsListByTVL protocolsToQuery={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route
             path="*"
             element={
               <>
-                <DashboardHeader protocolData={undefined} protocolId="" subgraphToQueryURL="" schemaVersion="" />
+                <DashboardHeader protocolData={undefined} versionsJSON={{}} protocolId="" subgraphToQueryURL="" schemaVersion="" />
                 <IssuesDisplay
                   oneLoaded={true}
                   allLoaded={true}

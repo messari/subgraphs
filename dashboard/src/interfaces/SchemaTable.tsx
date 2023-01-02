@@ -97,6 +97,14 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
           issues.push({ type: "TVL+", message: "", level: "critical", fieldName: `${schemaName}-${fieldName}` });
         }
 
+        if (
+          fieldName.toUpperCase() === "TOTALVALUELOCKEDUSD" &&
+          issues.filter((x) => x.fieldName === `${schemaName}-${fieldName}` && x.type === "TVL-").length === 0 &&
+          Number(value) < 1_000
+        ) {
+          issues.push({ type: "TVL-", message: "", level: "critical", fieldName: `${schemaName}-${fieldName}` });
+        }
+
         if (fieldName.toUpperCase().includes("OUTPUTTOKEN")) {
           if (fieldName === "outputTokenSupply" || fieldName === "stakedOutputTokenAmount") {
             value = convertTokenDecimals(value, entityData?.outputToken?.decimals).toString();

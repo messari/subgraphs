@@ -1,5 +1,4 @@
 import {
-  log,
   BigInt,
   Address,
   ethereum,
@@ -19,6 +18,7 @@ import {
   LiquidityPoolHourlySnapshot,
 } from "../../generated/schema";
 import * as utils from "./utils";
+import { Versions } from "../versions";
 import * as constants from "./constants";
 import { getRewardsPerDay } from "./rewards";
 import { getUsdPricePerToken } from "../prices";
@@ -103,9 +103,6 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     protocol = new DexAmmProtocol(constants.VAULT_ADDRESS.toHexString());
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
-    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Protocol.NETWORK;
     protocol.type = constants.ProtocolType.EXCHANGE;
 
@@ -121,6 +118,12 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
 
     protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }
@@ -139,7 +142,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       .readValue<BigInt>(contract.try_decimals(), constants.BIGINT_ZERO)
       .toI32();
 
-    let tokenPrice = getUsdPricePerToken(address);
+    const tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = blockNumber;
     token.save();
@@ -152,7 +155,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       .minus(token.lastPriceBlockNumber!)
       .gt(constants.PRICE_CACHING_BLOCKS)
   ) {
-    let tokenPrice = getUsdPricePerToken(address);
+    const tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = blockNumber;
 
@@ -165,7 +168,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
 export function getOrCreateFinancialDailySnapshots(
   block: ethereum.Block
 ): FinancialsDailySnapshot {
-  let id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
+  const id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
   if (!financialMetrics) {
@@ -196,7 +199,7 @@ export function getOrCreateFinancialDailySnapshots(
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let id: string = (
+  const id: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_DAY
   ).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
@@ -227,7 +230,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let metricsID: string = (
+  const metricsID: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_HOUR
   ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
@@ -256,7 +259,7 @@ export function getOrCreateLiquidityPoolDailySnapshots(
   poolId: string,
   block: ethereum.Block
 ): LiquidityPoolDailySnapshot {
-  let id: string = poolId
+  const id: string = poolId
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString());
   let poolSnapshots = LiquidityPoolDailySnapshot.load(id);
@@ -267,7 +270,7 @@ export function getOrCreateLiquidityPoolDailySnapshots(
     poolSnapshots.pool = poolId;
 
     const pool = getOrCreateLiquidityPool(Address.fromString(poolId), block);
-    let inputTokenLength = pool.inputTokens.length;
+    const inputTokenLength = pool.inputTokens.length;
 
     poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
@@ -313,7 +316,7 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
   poolId: string,
   block: ethereum.Block
 ): LiquidityPoolHourlySnapshot {
-  let id: string = poolId
+  const id: string = poolId
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString());
   let poolSnapshots = LiquidityPoolHourlySnapshot.load(id);
@@ -326,7 +329,7 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
     poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
     const pool = getOrCreateLiquidityPool(Address.fromString(poolId), block);
-    let inputTokenLength = pool.inputTokens.length;
+    const inputTokenLength = pool.inputTokens.length;
 
     poolSnapshots.hourlyVolumeByTokenAmount = new Array<BigInt>(
       inputTokenLength

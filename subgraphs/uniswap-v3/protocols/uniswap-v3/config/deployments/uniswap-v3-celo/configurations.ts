@@ -3,29 +3,14 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   FeeSwitch,
   Network,
-  PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
 } from "../../../../../src/common/constants";
 import { Configurations } from "../../../../../configurations/configurations/interface";
-import {
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
-  PROTOCOL_NAME,
-  PROTOCOL_SLUG,
-} from "../../../src/common/constants";
+import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/common/constants";
 
 export class UniswapV3CeloConfigurations implements Configurations {
   getNetwork(): string {
     return Network.CELO;
-  }
-  getSchemaVersion(): string {
-    return PROTOCOL_SCHEMA_VERSION;
-  }
-  getSubgraphVersion(): string {
-    return PROTOCOL_SUBGRAPH_VERSION;
-  }
-  getMethodologyVersion(): string {
-    return PROTOCOL_METHODOLOGY_VERSION;
   }
   getProtocolName(): string {
     return PROTOCOL_NAME;
@@ -61,7 +46,6 @@ export class UniswapV3CeloConfigurations implements Configurations {
       "0x02de4766c272abc10bc88c220d214a26960a7e92", // NCT
       "0x32a9fe697a32135bfd313a6ac28792dae4d9979d", // cMC02
       "0x66803fb87abd4aac3cbb3fad7c3aa01f6f3fb207", // wETH
-
     ];
   }
   getStableCoins(): string[] {

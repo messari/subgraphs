@@ -1,0 +1,25 @@
+{
+  "name": "governor-alpha-bravo",
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write .",
+    "clean": "rm -rf generated/",
+    "prepare:build": "npm run clean && graph codegen && graph build",
+    "create-local": "graph create --node http://localhost:8020/ ${npm_config_name}",
+    "remove-local": "graph remove --node http://localhost:8020/ ${npm_config_name}",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ${npm_config_name}",
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.template.ts > configurations/configure.ts",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_target}",
+    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs}"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-ts": "^0.27.0",
+    "minimist": "^1.2.6"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.30.1",
+    "mustache": "^4.2.0",
+    "prettier": "^2.6.0"
+  }
+}

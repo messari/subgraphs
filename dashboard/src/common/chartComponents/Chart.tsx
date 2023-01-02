@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import moment from "moment";
 import { useRef } from "react";
 import { Line } from "react-chartjs-2";
@@ -8,29 +8,11 @@ interface ChartProps {
   datasetLabel: string;
   dataChart: any;
   identifier: string;
+  chartRef: any;
+
 }
 
-export const Chart = ({ identifier, datasetLabel, dataChart }: ChartProps) => {
-  function jpegDownloadHandler() {
-    try {
-      const link = document.createElement('a');
-      const field = datasetLabel.split("-")[1] || datasetLabel;
-      let freq = datasetLabel.split("-")[0]?.toUpperCase()?.includes("HOURLY") ? "hourly-" : "";
-      if (datasetLabel.split("-")[0]?.toUpperCase()?.includes("DAILY")) {
-        freq = "daily-";
-      }
-      if (field?.toUpperCase()?.includes("DAILY") || field?.toUpperCase()?.includes("HOURLY")) {
-        freq = "";
-      }
-      link.download = identifier + '-' + freq + field + "-" + moment.utc(Date.now()).format("MMDDYY") + ".jpeg";
-      link.href = chartRef.current?.toBase64Image('image/jpeg', 1);
-      link.click();
-    } catch (err) {
-      return;
-    }
-  }
-
-  const chartRef = useRef<any>(null);
+export const Chart = ({ identifier, datasetLabel, dataChart, chartRef }: ChartProps) => {
   if (dataChart) {
     let labels: string[] = [];
     let datasets: { data: any; backgroundColor: string; borderColor: string; label: string }[] = [];
@@ -65,12 +47,18 @@ export const Chart = ({ identifier, datasetLabel, dataChart }: ChartProps) => {
       datasets: datasets,
     };
     return (<>
-      <Button onClick={() => jpegDownloadHandler()}>Download JPEG</Button>
       <Box padding={2} sx={{ border: 1 }}>
         <Line
           data={chartData}
           ref={chartRef}
           options={{
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+              mode: 'nearest',
+              axis: 'x',
+              intersect: false,
+            },
             scales: {
               y: {
                 grid: {
@@ -93,9 +81,11 @@ export const Chart = ({ identifier, datasetLabel, dataChart }: ChartProps) => {
             elements: {
               point: {
                 radius: 0,
+                hoverRadius: 5,
+                hoverBorderWidth: 4,
+                hoverBorderColor: "white"
               },
             },
-
             plugins: {
               legend: {
                 display: true,
@@ -113,5 +103,5 @@ export const Chart = ({ identifier, datasetLabel, dataChart }: ChartProps) => {
       </Box>
     </>);
   }
-  return null;
+  return <CircularProgress sx={{ my: 5 }} size={40} />;;
 };

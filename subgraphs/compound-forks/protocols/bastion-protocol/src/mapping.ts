@@ -325,9 +325,6 @@ function getOrCreateProtocol(): LendingProtocol {
     comptrollerAddr,
     "Bastion Protocol",
     "bastion-protocol",
-    "2.0.1",
-    "1.1.6",
-    "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()
@@ -338,7 +335,6 @@ function getOrCreateProtocol(): LendingProtocol {
 //
 //
 // Update the rewards arrays in a given market
-// can be done for supply / borrow side triggered by Supply/BorrowSpeedUpdate events
 function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   const market = Market.load(marketAddress.toHexString());
   if (!market) {

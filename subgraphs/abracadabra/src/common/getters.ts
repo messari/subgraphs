@@ -50,12 +50,10 @@ import {
   DEGENBOX_ADDRESS_FANTOM,
   DEGENBOX_ADDRESS_BSC,
   RiskType,
-  schemaVersion,
-  subgraphVersion,
-  methodologyVersion,
   USD_BTC_ETH_ABRA_ADDRESS,
   DEFAULT_DECIMALS,
 } from "./constants";
+import { Versions } from "../versions";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -84,13 +82,13 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 
 export function getOrCreateUsageMetricsHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
   // Number of hours since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
   // Create unique id for the hour
   let usageMetrics = UsageMetricsHourlySnapshot.load(id.toString());
 
   if (!usageMetrics) {
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
     usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
     usageMetrics.protocol = getOrCreateLendingProtocol().id;
     usageMetrics.hourlyActiveUsers = 0;
@@ -110,13 +108,13 @@ export function getOrCreateUsageMetricsHourlySnapshot(event: ethereum.Event): Us
 
 export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
 
   if (!usageMetrics) {
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = getOrCreateLendingProtocol().id;
     usageMetrics.dailyActiveUsers = 0;
@@ -149,11 +147,11 @@ export function getOrCreateMarketHourlySnapshot(
   event: ethereum.Event,
   marketAddress: string,
 ): MarketHourlySnapshot | null {
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let marketMetrics = MarketHourlySnapshot.load(marketAddress.concat("-").concat(id.toString()));
 
   if (!marketMetrics) {
-    let market = getMarket(marketAddress);
+    const market = getMarket(marketAddress);
     if (!market) {
       return null;
     }
@@ -201,11 +199,11 @@ export function getOrCreateMarketDailySnapshot(
   event: ethereum.Event,
   marketAddress: string,
 ): MarketDailySnapshot | null {
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
 
   if (!marketMetrics) {
-    let market = getMarket(marketAddress);
+    const market = getMarket(marketAddress);
     if (!market) {
       return null;
     }
@@ -250,12 +248,12 @@ export function getOrCreateMarketDailySnapshot(
 
 export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
   if (!financialMetrics) {
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = getOrCreateLendingProtocol().id;
     financialMetrics.blockNumber = event.block.number;
@@ -301,9 +299,9 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity = new LendingProtocol(getBentoBoxAddress(dataSource.network()));
   LendingProtocolEntity.name = "Abracadabra Money";
   LendingProtocolEntity.slug = "abracadabra";
-  LendingProtocolEntity.schemaVersion = schemaVersion;
-  LendingProtocolEntity.subgraphVersion = subgraphVersion;
-  LendingProtocolEntity.methodologyVersion = methodologyVersion;
+  LendingProtocolEntity.schemaVersion = Versions.getSchemaVersion();
+  LendingProtocolEntity.subgraphVersion = Versions.getSubgraphVersion();
+  LendingProtocolEntity.methodologyVersion = Versions.getMethodologyVersion();
   if (dataSource.network() == ARB_NETWORK) {
     LendingProtocolEntity.network = Network.ARBITRUM_ONE;
   } else {
@@ -343,7 +341,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
 }
 
 export function getMarket(marketId: string): Market | null {
-  let market = Market.load(marketId);
+  const market = Market.load(marketId);
   if (market) {
     return market;
   }
@@ -356,7 +354,7 @@ export function getMarket(marketId: string): Market | null {
 ///////////////////////////
 
 export function getLiquidateEvent(event: LogRepay): LiquidateProxy | null {
-  let liquidateEvent = LiquidateProxy.load(
+  const liquidateEvent = LiquidateProxy.load(
     "liquidate-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.minus(BIGINT_ONE).toString(),
   );
   if (liquidateEvent) {

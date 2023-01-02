@@ -4,6 +4,7 @@
   "scripts": {
     "format": "npx prettier --write ../balancer-forks",
     "codegen": "graph codegen",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json src/common/constants.mustache > src/common/constants.ts",
     "deploy:local": "yarn prepare:yaml &&  yarn prepare:constants &&    node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
   },
   "dependencies": {

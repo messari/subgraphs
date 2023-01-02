@@ -18,6 +18,7 @@ interface DashboardHeaderProps {
   protocolId: string;
   subgraphToQueryURL: string;
   schemaVersion: string;
+  versionsJSON: { [x: string]: string };
 }
 
 export const DashboardHeader = ({
@@ -25,6 +26,7 @@ export const DashboardHeader = ({
   protocolId,
   subgraphToQueryURL,
   schemaVersion,
+  versionsJSON
 }: DashboardHeaderProps) => {
   return (
     <div>
@@ -45,6 +47,7 @@ export const DashboardHeader = ({
           protocolId={protocolId}
           subgraphToQueryURL={subgraphToQueryURL}
           schemaVersion={schemaVersion}
+          versionsJSON={versionsJSON}
         />
       )}
     </div>

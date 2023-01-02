@@ -13,10 +13,8 @@ import {
 } from "../../generated/schema";
 import { ERC20 } from "../../generated/Staking/ERC20";
 import {
-  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  PROTOCOL_SUBGRAPH_VERSION,
 } from "../../protocols/the-graph/src/constants";
 import { getUsdPricePerToken } from "../prices";
 import {
@@ -25,10 +23,10 @@ import {
   INT_ZERO,
   Network,
   ProtocolType,
-  PROTOCOL_SCHEMA_VERSION,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "./constants";
+import { Versions } from "../versions";
 
 export function getOrCreateProtocol(): Protocol {
   let protocol = Protocol.load(addresses.controller);
@@ -37,9 +35,6 @@ export function getOrCreateProtocol(): Protocol {
     protocol = new Protocol(addresses.controller);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.GENERIC;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -51,9 +46,14 @@ export function getOrCreateProtocol(): Protocol {
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.totalPoolCount = INT_ZERO;
     protocol._totalGRTLocked = BIGINT_ZERO;
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 
