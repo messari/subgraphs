@@ -43,7 +43,6 @@ import {
 import { RewardPool as RewardPoolTemplate } from "../../generated/templates";
 import { BaseRewardPool } from "../../generated/Booster-v1/BaseRewardPool";
 import { Booster } from "../../generated/Booster-v1/Booster";
-import { StablePool } from "../../generated/Booster-v1/StablePool";
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
   const protocolId = NetworkConfigs.getFactoryAddress();
