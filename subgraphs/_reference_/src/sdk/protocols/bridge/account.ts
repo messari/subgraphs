@@ -35,7 +35,8 @@ export class AccountManager {
     acc.transferInCount = 0;
     acc.depositCount = 0;
     acc.withdrawCount = 0;
-    acc.messageCount = 0;
+    acc.messageSentCount = 0;
+    acc.messageReceivedCount = 0;
     acc.save();
 
     this.protocol.addUser();
