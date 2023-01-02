@@ -47,6 +47,12 @@ import {
   MODULEID__EXEC,
   RewardTokenType,
   START_EPOCH,
+  FTT_ADDRESS,
+  PRICINGTYPE__CHAINLINK,
+  WETH_ADDRESS,
+  USDC_ADDRESS,
+  USDT_ADDRESS,
+  WSETH_ADDRESS,
 } from "../common/constants";
 import { BigDecimalTruncateToBigInt, bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
 import { LendingProtocol, Market, _AssetStatus, _Epoch } from "../../generated/schema";
@@ -277,19 +283,21 @@ function updateRewardEmissionsUSD(underlyingPriceUSD: BigDecimal): void {
   for (let i = 0; i < protocol._marketIDs!.length; i++) {
     const mktID = protocol._marketIDs![i];
     const mkt = Market.load(mktID);
-    if (
-      !mkt ||
-      !mkt.rewardTokenEmissionsAmount ||
-      mkt.rewardTokenEmissionsAmount!.length == 0 ||
-      mkt.rewardTokenEmissionsAmount![0].equals(BIGINT_ZERO)
-    ) {
-      log.info("[updateRewardEmissionsUSD]Skip upating reward emissions for market {}", [mktID]);
+    if (!mkt || !mkt.rewardTokenEmissionsAmount || mkt.rewardTokenEmissionsAmount!.length == 0) {
+      log.info("[updateRewardEmissionsUSD]Skip upating reward emissionsUSD for market {}", [mktID]);
       continue;
     }
-    const rewardTokenEmissionUSD = mkt
-      .rewardTokenEmissionsAmount![0].divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
-      .times(underlyingPriceUSD);
-    mkt.rewardTokenEmissionsUSD = [rewardTokenEmissionUSD];
+
+    const rewardEmissionsUSD: BigDecimal[] = [];
+    for (let i = 0; i < mkt.rewardTokenEmissionsAmount!.length; i++) {
+      const amountUSD = mkt
+        .rewardTokenEmissionsAmount![i].divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
+        .times(underlyingPriceUSD);
+      rewardEmissionsUSD.push(amountUSD);
+    }
+
+    mkt.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+    mkt.save();
   }
 }
 
@@ -717,7 +725,7 @@ export function updateWeightedStakedAmount(market: Market, endBlock: BigInt): vo
   market.save();
 }
 
-export function processReward(epoch: _Epoch, epochStartBlock: BigInt, event: ethereum.Event): void {
+export function processRewardEpoch6_17(epoch: _Epoch, epochStartBlock: BigInt, event: ethereum.Event): void {
   const epochID = epoch.epoch;
   // rank markets in the epoch just ended (prev epoch)
   // find the top ten staked markets; according to the euler guage
@@ -740,6 +748,14 @@ export function processReward(epoch: _Epoch, epochStartBlock: BigInt, event: eth
         ]);
         continue;
       }
+
+      // eIP28 blacklist FTT market from EUL distribution
+      // https://snapshot.org/#/eulerdao.eth/proposal/0x40874e40bc18ff33a9504a770d5aadfa4ea8241a64bf24a36777cb5acc3b59a7
+      if (epochID >= 16 && mkt.inputToken == FTT_ADDRESS) {
+        mkt._stakedAmount = BIGINT_ZERO;
+        mkt._weightedStakedAmount = BIGINT_ZERO;
+      }
+
       const stakedAmount = mkt._stakedAmount;
       if (stakedAmount.gt(BIGINT_ZERO)) {
         // finalized mkt._weightedStakedAmount for the epoch just ended
@@ -752,7 +768,7 @@ export function processReward(epoch: _Epoch, epochStartBlock: BigInt, event: eth
 
     const EULPriceUSD = getEULPriceUSD(event);
     const rewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
-    const totalRewardAmount = BigDecimal.fromString((EUL_DIST[prevEpochID - START_EPOCH] * EUL_DECIMALS).toString());
+    const totalRewardAmount = BigDecimal.fromString((EUL_DIST[epochID - START_EPOCH] * EUL_DECIMALS).toString());
     // select top 10 staked markets, calculate sqrt(weighted staked amount)
     const cutoffAmount = getCutoffValue(marketWeightedStakedAmounts, 10);
     let sumAccumulator = BIGDECIMAL_ZERO;
@@ -794,6 +810,13 @@ export function processReward(epoch: _Epoch, epochStartBlock: BigInt, event: eth
           .times(EULPriceUSD);
         mkt.rewardTokenEmissionsAmount = [rewardTokenEmissionsAmount];
         mkt.rewardTokenEmissionsUSD = [rewardTokenEmissionsUSD];
+
+        log.info("[processRewardEpoch6_17]mkt {} rewarded {} EUL tokens ${} for epoch {}", [
+          mkt.name!,
+          mkt.rewardTokenEmissionsAmount!.toString(),
+          mkt.rewardTokenEmissionsUSD!.toString(),
+          epoch.id,
+        ]);
       }
 
       // reset mkt._weightedStakedAmount for the new epoch
@@ -803,6 +826,139 @@ export function processReward(epoch: _Epoch, epochStartBlock: BigInt, event: eth
       mkt.save();
     }
   }
+}
+
+export function processRewardEpoch18_23(epoch: _Epoch, epochStartBlock: BigInt, event: ethereum.Event): void {
+  // eIP24 changes the reward distribution
+  // https://snapshot.org/#/eulerdao.eth/proposal/0x7e65ffa930507d9116ebc83663000ade6ff93fc452f437a3e95d755ccc324f93
+  const epochID = epoch.epoch;
+  const prevEpochID = epochID - 1;
+  const prevEpoch = _Epoch.load(prevEpochID.toString());
+  if (prevEpoch) {
+    const protocol = getOrCreateLendingProtocol();
+    // finalize mkt._weightedStakedAmount for prev epoch & distribute rewards
+    // The array is needed to select top 10 staked markets
+    // const marketWeightedStakedAmounts: BigInt[] = [];
+    let sumAccumulator = BIGDECIMAL_ZERO;
+    for (let i = 0; i < protocol._marketIDs!.length; i++) {
+      const mktID = protocol._marketIDs![i];
+      const mkt = Market.load(mktID);
+      if (!mkt) {
+        log.error("[handleStake]market {} doesn't exist, but this should not happen at tx ={}", [
+          mktID,
+          event.transaction.hash.toHexString(),
+        ]);
+        continue;
+      }
+
+      // eIP28 blacklist FTT market from EUL distribution
+      // https://snapshot.org/#/eulerdao.eth/proposal/0x40874e40bc18ff33a9504a770d5aadfa4ea8241a64bf24a36777cb5acc3b59a7
+      if (epochID >= 16 && mkt.inputToken == FTT_ADDRESS) {
+        mkt._stakedAmount = BIGINT_ZERO;
+        mkt._weightedStakedAmount = BIGINT_ZERO;
+      }
+
+      const stakedAmount = mkt._stakedAmount;
+      let mktWeightedStakedAmount = BIGINT_ZERO;
+      if (isMarketEligible(mkt) && stakedAmount.gt(BIGINT_ZERO)) {
+        // finalized mkt._weightedStakedAmount for the epoch just ended
+        // epochStartBlock.minus(BIGINT_ONE) is the end block of prev epoch
+        updateWeightedStakedAmount(mkt, epochStartBlock.minus(BIGINT_ONE));
+        mktWeightedStakedAmount = mkt._weightedStakedAmount!;
+      }
+      mkt.save();
+
+      sumAccumulator = sumAccumulator.plus(mktWeightedStakedAmount.sqrt().toBigDecimal());
+    }
+
+    const EULPriceUSD = getEULPriceUSD(event);
+    const borrowerRewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.BORROW);
+    const lenderRewardToken = getOrCreateRewardToken(Address.fromString(EUL_ADDRESS), RewardTokenType.DEPOSIT);
+    const totalRewardAmount = BigDecimal.fromString((EUL_DIST[epochID - START_EPOCH] * EUL_DECIMALS).toString());
+
+    // scale to daily emission amount
+    const dailyScaler = BigDecimal.fromString((BLOCKS_PER_DAY / (BLOCKS_PER_EPOCH as f64)).toString());
+    const EUL_DECIMALS_BD = BigDecimal.fromString(EUL_DECIMALS.toString());
+    for (let i = 0; i < protocol._marketIDs!.length; i++) {
+      const mktID = protocol._marketIDs![i];
+      const mkt = Market.load(mktID);
+      if (!mkt) {
+        log.error("[handleStake]market {} doesn't exist, but this should not happen | tx ={}", [
+          mktID,
+          event.transaction.hash.toHexString(),
+        ]);
+        continue;
+      }
+      if (mkt.rewardTokens && mkt.rewardTokens!.length > 0) {
+        // reset reward emissions for the epoch
+        mkt.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+        mkt.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+      }
+
+      const rewardTokens: string[] = [];
+      const rewardTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
+      const rewardTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+      // eIP24: 8000 EUL borrower rewards each for USDC, USDT, WETH, and WstETH
+      if ([USDC_ADDRESS, USDT_ADDRESS, WETH_ADDRESS, WSETH_ADDRESS].includes(mkt.inputToken)) {
+        rewardTokens.push(borrowerRewardToken.id);
+        rewardTokenAmount[0] = BigDecimalTruncateToBigInt(
+          BigDecimal.fromString("8000").times(EUL_DECIMALS_BD).times(dailyScaler),
+        );
+        rewardTokenUSD[0] = rewardTokenAmount[0].divDecimal(EUL_DECIMALS_BD).times(EULPriceUSD);
+      }
+
+      // eIP24: 5000 EUL lender staking rewards each for USDC, USDT, WETH
+      if ([USDC_ADDRESS, USDT_ADDRESS, WETH_ADDRESS].includes(mkt.inputToken)) {
+        rewardTokens.push(lenderRewardToken.id);
+        rewardTokenAmount[1] = BigDecimalTruncateToBigInt(
+          BigDecimal.fromString("5000").times(EUL_DECIMALS_BD).times(dailyScaler),
+        );
+        rewardTokenUSD[1] = rewardTokenAmount[1].divDecimal(EUL_DECIMALS_BD).times(EULPriceUSD);
+      }
+
+      // distribute the rewards among eligible staked markets
+      const _weightedStakedAmount = mkt._weightedStakedAmount;
+      if (isMarketEligible(mkt) && _weightedStakedAmount) {
+        if (rewardTokens.length == 0) {
+          rewardTokens.push(borrowerRewardToken.id);
+        }
+        mkt.rewardTokens = rewardTokens;
+        rewardTokenAmount[0] = rewardTokenAmount[0].plus(
+          BigDecimalTruncateToBigInt(
+            _weightedStakedAmount.sqrt().divDecimal(sumAccumulator).times(totalRewardAmount).times(dailyScaler),
+          ),
+        );
+        rewardTokenUSD[0] = rewardTokenAmount[0]
+          .divDecimal(BigDecimal.fromString(EUL_DECIMALS.toString()))
+          .times(EULPriceUSD);
+        mkt.rewardTokenEmissionsAmount = rewardTokenAmount;
+        mkt.rewardTokenEmissionsUSD = rewardTokenUSD;
+
+        log.info("[processRewardEpoch18_23]mkt {} rewarded {} EUL tokens ${} for epoch {}", [
+          mkt.name!,
+          rewardTokenAmount.toString(),
+          rewardTokenUSD.toString(),
+          epoch.id,
+        ]);
+      }
+
+      // reset mkt._weightedStakedAmount for the new epoch
+      mkt._weightedStakedAmount = BIGINT_ZERO;
+      // EUL staked remains staked for the market until unstaked
+      // so not reset mkt._stakedAmount
+      mkt.save();
+    }
+  }
+}
+
+function isMarketEligible(market: Market): bool {
+  // eIP24 requires assets with a Chainlink oracle (either now or in the future) + WETH (the reference asset)
+  // https://snapshot.org/#/eulerdao.eth/proposal/0x7e65ffa930507d9116ebc83663000ade6ff93fc452f437a3e95d755ccc324f93
+  const pricingType = market._pricingType;
+  if ((pricingType && pricingType == PRICINGTYPE__CHAINLINK) || market.inputToken == WETH_ADDRESS) {
+    return true;
+  }
+  return false;
 }
 
 function getEULPriceUSD(event: ethereum.Event): BigDecimal {

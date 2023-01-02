@@ -15,5 +15,8 @@
       "abi": "Booster",
       "startBlock": 16176240
     }
-  ]
+  ],
+  "graftEnabled": false,
+  "subgraphId": "QmdQdzMnkUayk7kNyf7YapKSD4L1z8mFxHfZrGFewgacxc",
+  "graftStartBlock": 15775503
 }
