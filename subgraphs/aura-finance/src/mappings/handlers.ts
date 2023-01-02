@@ -65,6 +65,7 @@ export function handleWithdrawn(event: Withdrawn): void {
 
 export function handleFeesUpdated(event: FeesUpdated): void {
   const boosterAddr = dataSource.address();
+
   createFeesUpdate(boosterAddr, event);
 }
 

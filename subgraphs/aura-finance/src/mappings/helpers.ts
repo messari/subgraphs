@@ -116,7 +116,7 @@ export function createDeposit(
     BIGINT_ZERO
   );
   vault.outputTokenPriceUSD =
-    vault.outputTokenSupply != BIGINT_ZERO
+    vault.outputTokenSupply !== BIGINT_ZERO
       ? vault.totalValueLockedUSD.div(
           bigIntToBigDecimal(vault.outputTokenSupply!, outputToken.decimals)
         )
@@ -179,7 +179,7 @@ export function createWithdraw(
     BIGINT_ZERO
   );
   vault.outputTokenPriceUSD =
-    vault.outputTokenSupply != BIGINT_ZERO
+    vault.outputTokenSupply !== BIGINT_ZERO
       ? vault.totalValueLockedUSD.div(
           bigIntToBigDecimal(vault.outputTokenSupply!, outputToken.decimals)
         )
