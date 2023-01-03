@@ -110,17 +110,19 @@ export function getOrCreateFinancialDailySnapshots(
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = constants.Protocol.NAME;
 
-    financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    const protocol = getOrCreateDexAmmProtocol();
+    financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
     financialMetrics.dailyVolumeUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
     financialMetrics.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD =
+      protocol.cumulativeSupplySideRevenueUSD;
     financialMetrics.dailyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.cumulativeProtocolSideRevenueUSD =
-      constants.BIGDECIMAL_ZERO;
-
+      protocol.cumulativeProtocolSideRevenueUSD;
     financialMetrics.dailyTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD =
+      protocol.cumulativeTotalRevenueUSD;
 
     financialMetrics.blockNumber = BigInt.fromI32(block.header.height as i32);
     financialMetrics.timestamp = BigInt.fromI32(
@@ -144,13 +146,14 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics.protocol = constants.Protocol.NAME;
 
     usageMetrics.dailyActiveUsers = 0;
-    usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
     usageMetrics.dailyDepositCount = 0;
     usageMetrics.dailyWithdrawCount = 0;
     usageMetrics.dailySwapCount = 0;
 
-    usageMetrics.totalPoolCount = 0;
+    const protocol = getOrCreateDexAmmProtocol();
+    usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
 
     usageMetrics.blockNumber = BigInt.fromI32(block.header.height as i32);
     usageMetrics.timestamp = BigInt.fromI32(block.header.time.seconds as i32);
@@ -174,11 +177,13 @@ export function getOrCreateUsageMetricsHourlySnapshot(
     usageMetrics.protocol = constants.Protocol.NAME;
 
     usageMetrics.hourlyActiveUsers = 0;
-    usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.hourlyTransactionCount = 0;
     usageMetrics.hourlyDepositCount = 0;
     usageMetrics.hourlyWithdrawCount = 0;
     usageMetrics.hourlySwapCount = 0;
+
+    const protocol = getOrCreateDexAmmProtocol();
+    usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
     usageMetrics.blockNumber = BigInt.fromI32(block.header.height as i32);
     usageMetrics.timestamp = BigInt.fromI32(block.header.time.seconds as i32);
@@ -202,12 +207,13 @@ export function getOrCreateLiquidityPoolDailySnapshots(
     poolSnapshots = new LiquidityPoolDailySnapshot(id);
     poolSnapshots.protocol = constants.Protocol.NAME;
     poolSnapshots.pool = liquidityPoolId;
-    poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
     const pool = LiquidityPoolStore.load(liquidityPoolId);
     if (!pool) {
       return null;
     }
+
+    poolSnapshots.totalValueLockedUSD = pool.totalValueLockedUSD;
     const inputTokenLength = pool.inputTokens.length;
     poolSnapshots.dailyVolumeByTokenAmount = new Array<BigInt>(
       inputTokenLength
@@ -219,26 +225,26 @@ export function getOrCreateLiquidityPoolDailySnapshots(
     poolSnapshots.inputTokenBalances = pool.inputTokenBalances;
     poolSnapshots.inputTokenWeights = pool.inputTokenWeights;
 
-    poolSnapshots.outputTokenSupply = BigInt.fromString(
-      "100000000000000000000"
-    );
-    poolSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.outputTokenSupply = pool.outputTokenSupply;
+    poolSnapshots.outputTokenPriceUSD = pool.outputTokenPriceUSD;
 
     poolSnapshots.rewardTokenEmissionsAmount = null;
     poolSnapshots.rewardTokenEmissionsUSD = null;
     poolSnapshots.stakedOutputTokenAmount = null;
 
     poolSnapshots.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.cumulativeSupplySideRevenueUSD =
+      pool.cumulativeSupplySideRevenueUSD;
 
     poolSnapshots.dailyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    poolSnapshots.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.cumulativeProtocolSideRevenueUSD =
+      pool.cumulativeProtocolSideRevenueUSD;
 
     poolSnapshots.dailyTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    poolSnapshots.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
 
     poolSnapshots.dailyVolumeUSD = constants.BIGDECIMAL_ZERO;
-    poolSnapshots.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
 
     poolSnapshots.blockNumber = BigInt.fromI32(block.header.height as i32);
     poolSnapshots.timestamp = BigInt.fromI32(block.header.time.seconds as i32);
@@ -264,12 +270,13 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
     poolSnapshots = new LiquidityPoolHourlySnapshot(id);
     poolSnapshots.protocol = constants.Protocol.NAME;
     poolSnapshots.pool = liquidityPoolId;
-    poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
     const pool = LiquidityPoolStore.load(liquidityPoolId);
     if (!pool) {
       return null;
     }
+
+    poolSnapshots.totalValueLockedUSD = pool.totalValueLockedUSD;
     const inputTokenLength = pool.inputTokens.length;
     poolSnapshots.hourlyVolumeByTokenAmount = new Array<BigInt>(
       inputTokenLength
@@ -281,24 +288,26 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
     poolSnapshots.inputTokenBalances = pool.inputTokenBalances;
     poolSnapshots.inputTokenWeights = pool.inputTokenWeights;
 
-    poolSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    poolSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.outputTokenSupply = pool.outputTokenSupply;
+    poolSnapshots.outputTokenPriceUSD = pool.outputTokenPriceUSD;
 
     poolSnapshots.rewardTokenEmissionsAmount = null;
     poolSnapshots.rewardTokenEmissionsUSD = null;
     poolSnapshots.stakedOutputTokenAmount = null;
 
     poolSnapshots.hourlySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.cumulativeSupplySideRevenueUSD =
+      pool.cumulativeSupplySideRevenueUSD;
 
     poolSnapshots.hourlyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    poolSnapshots.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.cumulativeProtocolSideRevenueUSD =
+      pool.cumulativeProtocolSideRevenueUSD;
 
     poolSnapshots.hourlyTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    poolSnapshots.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
 
     poolSnapshots.hourlyVolumeUSD = constants.BIGDECIMAL_ZERO;
-    poolSnapshots.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
 
     poolSnapshots.blockNumber = BigInt.fromI32(block.header.height as i32);
     poolSnapshots.timestamp = BigInt.fromI32(block.header.time.seconds as i32);
