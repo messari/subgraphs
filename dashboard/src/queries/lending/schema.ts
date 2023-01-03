@@ -1262,7 +1262,7 @@ export const schema300 = (): Schema => {
     stableBorrowedTokenBalance: "BigInt",
     supplyCap: "BigInt",
     borrowCap: "BigInt",
-    revenueDetails: "RevenueDetails",
+    revenueDetail: "RevenueDetail",
   };
 
   const financialsQuery = `
@@ -1294,7 +1294,7 @@ export const schema300 = (): Schema => {
         lenderPermissionType
         borrowerPermissionType
         collateralizationType
-        revenueDetails
+        revenueDetail
         mintedTokens {
           id
           decimals
@@ -1418,7 +1418,7 @@ export const schema300 = (): Schema => {
       lenderPermissionType
       borrowerPermissionType
       collateralizationType
-      revenueDetails
+      revenueDetail
       mintedTokens {
         id
         decimals
@@ -1539,7 +1539,7 @@ export const schema300 = (): Schema => {
       stableBorrowedTokenBalance
       supplyCap
       borrowCap
-      revenueDetails
+      revenueDetail
       ${positionsQuery}
     }
   }`;
