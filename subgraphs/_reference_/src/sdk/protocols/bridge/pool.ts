@@ -464,7 +464,9 @@ export class Pool {
     if (!this.pool.outputToken) {
       return;
     }
-    const token = this.tokens.getOrCreateToken(this.pool.outputToken);
+    const token = this.tokens.getOrCreateToken(
+      Address.fromBytes(this.pool.outputToken)
+    );
     const price = this.protocol.pricer.getTokenPrice(token);
 
     this.pool.outputTokenPriceUSD = price;
