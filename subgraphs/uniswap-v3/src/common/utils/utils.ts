@@ -11,6 +11,7 @@ import {
   BIGINT_ZERO,
   BIGINT_ONE,
   BIGINT_TEN,
+  BIGDECIMAL_NEG_ONE,
 } from "../constants";
 import { getLiquidityPoolFee } from "../getters";
 
@@ -96,4 +97,12 @@ export function toLowerCase(list: string[]): string[] {
     list[i] = list[i].toLowerCase();
   }
   return list;
+}
+
+// Abs BigDecimal
+export function absBigDecimal(value: BigDecimal): BigDecimal {
+  if (value.lt(BIGDECIMAL_ZERO)) {
+    return value.times(BIGDECIMAL_NEG_ONE);
+  }
+  return value;
 }
