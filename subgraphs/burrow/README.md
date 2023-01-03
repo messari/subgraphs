@@ -46,17 +46,9 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-Amount of reward tokens (BRR) distributed each day.
+`NA`
 
-Each farm reward is identified by the asset ID it gives. The reward config includes:
-
-- reward_per_day - the amount of tokens split across farms participants daily based on their number of boosted shares (until there are no more remaining rewards).
-- booster_log_base - the log base for the xbooster amounts. It's used to compute boosted shares per account. The number includes decimals of the xBooster token. E.g. 100 \* 1e18 is the log base of 100, if xBooster has 18 decimals.
-- remaining_rewards - the amount of the remaining tokens to be distributed.
-
-For example to create a farm for 30 days and distribute 1000 tokens per day, the reward_per_day should be set to 1000 and the remaining rewards will be 30000.
-
-Once the remaining_rewards becomes equal to 0, the farm stops distributing this reward.
+> Burrow has rewards, but NEAR subgraphs don't support function calls. So it is impossible to get accurate results here.
 
 ## Note
 

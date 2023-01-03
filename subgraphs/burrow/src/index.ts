@@ -9,10 +9,8 @@ import {
 } from "./handlers/actions";
 import { handleNew } from "./handlers/config";
 import { handleNewAsset, handleUpdateAsset } from "./handlers/market";
-
 import { handleOracleCall } from "./handlers/oracle";
 import { handleLiquidate, handleForceClose } from "./handlers/liquidate";
-import { handleAddAssetFarmReward } from "./handlers/farm";
 import { EventData } from "./utils/type";
 
 export function handleReceipt(receipt: near.ReceiptWithOutcome): void {
@@ -101,7 +99,5 @@ function handleMethod(method: EventData): void {
     handleNewAsset(method);
   } else if (method.methodName == "update_asset") {
     handleUpdateAsset(method);
-  } else if (method.methodName == "add_asset_farm_reward") {
-    handleAddAssetFarmReward(method);
   }
 }
