@@ -22,7 +22,7 @@ import { Wrapper as WrapperContract } from "../../generated/templates/WrapperTem
 import { WrapperCreated as WrapperCreatedEvent } from "../../generated/WrapperFactory_0/WrapperFactory";
 
 export function handleWrapperCreated(event: WrapperCreatedEvent): void {
-  let context = new DataSourceContext();
+  const context = new DataSourceContext();
   context.setString("tokenAddress", event.params.token.toHexString());
   context.setString("currencyKey", event.params.currencyKey.toString());
   WrapperTemplate.createWithContext(event.params.wrapperAddress, context);
@@ -30,7 +30,7 @@ export function handleWrapperCreated(event: WrapperCreatedEvent): void {
 
 export function handleMinted(event: MintedEvent): void {
   // Create Mint
-  let mintEntity = new WrapperMint(
+  const mintEntity = new WrapperMint(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   mintEntity.account = event.params.account.toHexString();
@@ -52,8 +52,8 @@ export function handleMinted(event: MintedEvent): void {
     wrapper.amount = wrapper.amount.plus(toDecimal(event.params.amountIn));
     wrapper.totalFees = wrapper.totalFees.plus(toDecimal(event.params.fee));
 
-    let txHash = event.transaction.hash.toString();
-    let latestRate = getLatestRate(wrapper.currencyKey, txHash);
+    const txHash = event.transaction.hash.toString();
+    const latestRate = getLatestRate(wrapper.currencyKey, txHash);
     if (latestRate) {
       wrapper.amountInUSD = wrapper.amount.times(latestRate);
       wrapper.totalFeesInUSD = wrapper.totalFees.times(latestRate);
@@ -65,7 +65,7 @@ export function handleMinted(event: MintedEvent): void {
 
 export function handleBurned(event: BurnedEvent): void {
   // Create Burn
-  let burnEntity = new WrapperBurn(
+  const burnEntity = new WrapperBurn(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   burnEntity.account = event.params.account.toHex();
@@ -87,8 +87,8 @@ export function handleBurned(event: BurnedEvent): void {
     wrapper.amount = wrapper.amount.minus(toDecimal(event.params.principal));
     wrapper.totalFees = wrapper.totalFees.plus(toDecimal(event.params.fee));
 
-    let txHash = event.transaction.hash.toHexString();
-    let latestRate = getLatestRate(wrapper.currencyKey, txHash);
+    const txHash = event.transaction.hash.toHexString();
+    const latestRate = getLatestRate(wrapper.currencyKey, txHash);
     if (latestRate) {
       wrapper.amountInUSD = wrapper.amount.times(latestRate);
       wrapper.totalFeesInUSD = wrapper.totalFees.times(latestRate);
@@ -101,7 +101,7 @@ export function handleBurned(event: BurnedEvent): void {
 export function handleWrapperMaxTokenAmountUpdated(
   event: WrapperMaxTokenAmountUpdatedEvent
 ): void {
-  let wrapper = Wrapper.load(event.params.wrapper.toHexString());
+  const wrapper = Wrapper.load(event.params.wrapper.toHexString());
   if (wrapper) {
     wrapper.maxAmount = toDecimal(event.params.maxTokenAmount);
     wrapper.save();
@@ -111,21 +111,21 @@ export function handleWrapperMaxTokenAmountUpdated(
 export function handleEtherWrapperMaxETHUpdated(
   event: EtherWrapperMaxETHUpdatedEvent
 ): void {
-  let addressResolverAddress = getContractDeployment(
+  const addressResolverAddress = getContractDeployment(
     "AddressResolver",
     dataSource.network(),
     BigInt.fromI32(1000000000)
   )!;
-  let resolver = AddressResolver.bind(addressResolverAddress);
-  let etherWrapperAddress = resolver.try_getAddress(
+  const resolver = AddressResolver.bind(addressResolverAddress);
+  const etherWrapperAddress = resolver.try_getAddress(
     strToBytes("EtherWrapper", 32)
   );
   if (etherWrapperAddress.reverted) {
     return;
   }
-  let wrapperAddress = etherWrapperAddress.value;
+  const wrapperAddress = etherWrapperAddress.value;
 
-  let wrapper = Wrapper.load(wrapperAddress.toHexString());
+  const wrapper = Wrapper.load(wrapperAddress.toHexString());
   if (wrapper) {
     wrapper.maxAmount = toDecimal(event.params.maxETH);
     wrapper.save();
@@ -141,7 +141,7 @@ function initializeWrapper(wrapper: Wrapper, address: Address): Wrapper {
       address.toHexString() == "0x6202a3b0be1d222971e93aab084c6e584c29db70" ||
       address.toHexString() == "0x8a91e92fdd86e734781c38db52a390e1b99fba7c")
   ) {
-    let wrapperContract = WrapperContract.bind(address);
+    const wrapperContract = WrapperContract.bind(address);
     wrapper.tokenAddress = wrapperContract.token().toHexString();
     wrapper.currencyKey = wrapperContract.currencyKey().toString();
     wrapper.amount = toDecimal(wrapperContract.targetSynthIssued());
@@ -155,10 +155,10 @@ function initializeWrapper(wrapper: Wrapper, address: Address): Wrapper {
   }
 
   // Assign values from context, for template generated Wrapper entities
-  let context = dataSource.context();
+  const context = dataSource.context();
   if (context.get("tokenAddress")) {
-    let tokenAddress = context.getString("tokenAddress");
-    let currencyKey = context.getString("currencyKey");
+    const tokenAddress = context.getString("tokenAddress");
+    const currencyKey = context.getString("currencyKey");
     if (tokenAddress && tokenAddress.length) {
       wrapper.tokenAddress = tokenAddress;
       wrapper.currencyKey = currencyKey;

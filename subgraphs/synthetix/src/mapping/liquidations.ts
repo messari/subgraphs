@@ -21,12 +21,12 @@ import { strToBytes, toDecimal } from "./lib/helpers";
 export function handleAccountFlaggedForLiquidation(
   event: AccountFlaggedForLiquidationEvent
 ): void {
-  let liquidationsContract = Liquidations.bind(event.address);
-  let resolver = AddressResolver.bind(liquidationsContract.resolver());
-  let synthetix = Synthetix32.bind(
+  const liquidationsContract = Liquidations.bind(event.address);
+  const resolver = AddressResolver.bind(liquidationsContract.resolver());
+  const synthetix = Synthetix32.bind(
     resolver.getAddress(strToBytes("Synthetix", 32))
   );
-  let accountFlaggedForLiquidation = new AccountFlaggedForLiquidation(
+  const accountFlaggedForLiquidation = new AccountFlaggedForLiquidation(
     event.params.deadline.toString() + "-" + event.params.account.toHex()
   );
   accountFlaggedForLiquidation.account = event.params.account;
@@ -45,7 +45,7 @@ export function handleAccountFlaggedForLiquidation(
 export function handleAccountRemovedFromLiquidation(
   event: AccountRemovedFromLiquidationEvent
 ): void {
-  let accountRemovedFromLiquidation = new AccountRemovedFromLiquidation(
+  const accountRemovedFromLiquidation = new AccountRemovedFromLiquidation(
     event.params.time.toString() + "-" + event.params.account.toHex()
   );
   accountRemovedFromLiquidation.account = event.params.account;
@@ -54,7 +54,7 @@ export function handleAccountRemovedFromLiquidation(
 }
 
 export function handleAccountLiquidated(event: AccountLiquidatedEvent): void {
-  let entity = new AccountLiquidated(
+  const entity = new AccountLiquidated(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
 

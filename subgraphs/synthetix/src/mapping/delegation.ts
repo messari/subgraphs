@@ -13,9 +13,9 @@ function setDelegateApproval(
   action: Bytes,
   isApproval: boolean
 ): void {
-  let id = authoriser.toHex() + "-" + delegate.toHex();
+  const id = authoriser.toHex() + "-" + delegate.toHex();
   let delegatedWalletEntity = DelegatedWallet.load(id);
-  let actionRight = isApproval ? true : false;
+  const actionRight = isApproval ? true : false;
   if (delegatedWalletEntity == null) {
     if (!isApproval) {
       return;
@@ -24,7 +24,7 @@ function setDelegateApproval(
     delegatedWalletEntity.authoriser = authoriser;
     delegatedWalletEntity.delegate = delegate;
   }
-  let actionAsString = action.toString();
+  const actionAsString = action.toString();
   if (actionAsString == "ApproveAll") {
     delegatedWalletEntity.canMint = actionRight;
     delegatedWalletEntity.canBurn = actionRight;
@@ -50,17 +50,17 @@ function setDelegateApproval(
 }
 
 export function handleDelegateApproval(event: DelegateApprovalEvent): void {
-  let authoriser = event.params.authoriser;
-  let delegate = event.params.delegate;
-  let action = event.params.action;
+  const authoriser = event.params.authoriser;
+  const delegate = event.params.delegate;
+  const action = event.params.action;
   setDelegateApproval(authoriser, delegate, action, true);
 }
 
 export function handleDelegateWithdrawApproval(
   event: DelegateWithdrawApprovalEvent
 ): void {
-  let authoriser = event.params.authoriser;
-  let delegate = event.params.delegate;
-  let action = event.params.action;
+  const authoriser = event.params.authoriser;
+  const delegate = event.params.delegate;
+  const action = event.params.action;
   setDelegateApproval(authoriser, delegate, action, false);
 }

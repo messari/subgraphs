@@ -14,11 +14,11 @@ import { toDecimal, ZERO, ZERO_ADDRESS } from "../lib/helpers";
 
 export function registerSynth(synthAddress: Address): Synth | null {
   // the address associated with the issuer may not be the proxy
-  let synthBackContract = SynthContract.bind(synthAddress);
-  let proxyQuery = synthBackContract.try_proxy();
-  let nameQuery = synthBackContract.try_name();
-  let symbolQuery = synthBackContract.try_symbol();
-  let totalSupplyQuery = synthBackContract.try_totalSupply();
+  const synthBackContract = SynthContract.bind(synthAddress);
+  const proxyQuery = synthBackContract.try_proxy();
+  const nameQuery = synthBackContract.try_name();
+  const symbolQuery = synthBackContract.try_symbol();
+  const totalSupplyQuery = synthBackContract.try_totalSupply();
 
   if (symbolQuery.reverted) {
     log.warning("tried to save invalid synth {}", [synthAddress.toHex()]);
@@ -29,20 +29,20 @@ export function registerSynth(synthAddress: Address): Synth | null {
     synthAddress = proxyQuery.value;
   }
 
-  let newSynth = new Synth(synthAddress.toHex());
+  const newSynth = new Synth(synthAddress.toHex());
   newSynth.name = nameQuery.reverted ? symbolQuery.value : nameQuery.value;
   newSynth.symbol = symbolQuery.value;
   newSynth.totalSupply = toDecimal(totalSupplyQuery.value);
   newSynth.save();
 
   // symbol is same as currencyKey
-  let newSynthByCurrencyKey = new SynthByCurrencyKey(symbolQuery.value);
+  const newSynthByCurrencyKey = new SynthByCurrencyKey(symbolQuery.value);
   newSynthByCurrencyKey.proxyAddress = synthAddress;
   newSynthByCurrencyKey.save();
 
   // legacy sUSD contract uses wrong name
   if (symbolQuery.value == "nUSD") {
-    let newSynthByCurrencyKey = new SynthByCurrencyKey("sUSD");
+    const newSynthByCurrencyKey = new SynthByCurrencyKey("sUSD");
     newSynthByCurrencyKey.proxyAddress = synthAddress;
     newSynthByCurrencyKey.save();
   }
@@ -56,15 +56,15 @@ function trackSynthHolder(
   timestamp: BigInt,
   value: BigDecimal
 ): void {
-  let synth = Synth.load(synthAddress.toHex());
+  const synth = Synth.load(synthAddress.toHex());
 
   if (synth == null) {
     registerSynth(synthAddress);
   }
 
   let totalBalance = toDecimal(ZERO);
-  let latestBalanceID = account.toHex() + "-" + synthAddress.toHex();
-  let oldSynthBalance = LatestSynthBalance.load(latestBalanceID);
+  const latestBalanceID = account.toHex() + "-" + synthAddress.toHex();
+  const oldSynthBalance = LatestSynthBalance.load(latestBalanceID);
 
   if (oldSynthBalance == null || oldSynthBalance.timestamp.equals(timestamp)) {
     totalBalance = toDecimal(
@@ -74,7 +74,7 @@ function trackSynthHolder(
     totalBalance = oldSynthBalance.amount.plus(value);
   }
 
-  let newLatestBalance = new LatestSynthBalance(latestBalanceID);
+  const newLatestBalance = new LatestSynthBalance(latestBalanceID);
   newLatestBalance.address = account;
   newLatestBalance.account = account.toHex();
   newLatestBalance.timestamp = timestamp;
@@ -82,9 +82,9 @@ function trackSynthHolder(
   newLatestBalance.amount = totalBalance;
   newLatestBalance.save();
 
-  let newBalanceID =
+  const newBalanceID =
     timestamp.toString() + "-" + account.toHex() + "-" + synthAddress.toHex();
-  let newBalance = new SynthBalance(newBalanceID);
+  const newBalance = new SynthBalance(newBalanceID);
   newBalance.address = account;
   newBalance.account = account.toHex();
   newBalance.timestamp = timestamp;
@@ -109,7 +109,7 @@ function trackMintOrBurn(synthAddress: Address, value: BigDecimal): void {
       log.warning("totalSupply needs correction, is negative: %s", [
         synth.symbol,
       ]);
-      let synthBackContract = SynthContract.bind(synthAddress);
+      const synthBackContract = SynthContract.bind(synthAddress);
       synth.totalSupply = toDecimal(synthBackContract.totalSupply());
     } else {
       synth.totalSupply = newSupply;

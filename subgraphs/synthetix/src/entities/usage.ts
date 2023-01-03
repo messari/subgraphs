@@ -84,7 +84,7 @@ export function updateActiveAccounts(
   const hour = `${(timestamp % SECONDS_PER_DAY) / SECONDS_PER_HOUR}`;
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = `${account.id}-${day}`;
+  const dailyActiveAccountId = `${account.id}-${day}`;
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     const usageMetricsDailySnapshot = getOrCreateUsageMetricsSnapshot(event);
@@ -94,7 +94,7 @@ export function updateActiveAccounts(
     usageMetricsDailySnapshot.save();
   }
   // Combine the id, user address and hour to generate a unique user id for the hour
-  let hourlyActiveAccountId = `${account.id}-${day}-${hour}`;
+  const hourlyActiveAccountId = `${account.id}-${day}-${hour}`;
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     const usageMetricsHourlySnapshot =
@@ -114,7 +114,7 @@ function isUniqueDailyUser(
   const timestamp = event.block.timestamp.toI64();
   const day = `${timestamp / SECONDS_PER_DAY}`;
   // Combine the id, user address, and action to generate a unique user id for the day
-  let dailyActionActiveAccountId = `daily-${action}-${account.id}-${day}`;
+  const dailyActionActiveAccountId = `daily-${action}-${account.id}-${day}`;
   let dailyActionActiveAccount = ActiveAccount.load(dailyActionActiveAccountId);
   if (!dailyActionActiveAccount) {
     dailyActionActiveAccount = new ActiveAccount(dailyActionActiveAccountId);

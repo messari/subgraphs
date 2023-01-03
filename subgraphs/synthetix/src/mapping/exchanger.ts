@@ -24,13 +24,13 @@ import {
 
 import { BigInt, log, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 
-let partnerProgramStart = BigInt.fromI32(10782000);
-let exchangerContractUpdate = BigInt.fromI32(12733161);
+const partnerProgramStart = BigInt.fromI32(10782000);
+const exchangerContractUpdate = BigInt.fromI32(12733161);
 
 export function handleExchangeEntrySettled(
   event: ExchangeEntrySettledEvent
 ): void {
-  let entity = new ExchangeEntrySettled(
+  const entity = new ExchangeEntrySettled(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   entity.from = event.params.from;
@@ -47,7 +47,7 @@ export function handleExchangeEntrySettled(
 }
 
 function createTempEntity(id: string): TemporaryExchangePartnerTracker {
-  let newTempEntity = new TemporaryExchangePartnerTracker(id);
+  const newTempEntity = new TemporaryExchangePartnerTracker(id);
   newTempEntity.usdVolume = new BigDecimal(BigInt.fromI32(0));
   newTempEntity.usdFees = new BigDecimal(BigInt.fromI32(0));
   newTempEntity.partner = null;
@@ -55,7 +55,7 @@ function createTempEntity(id: string): TemporaryExchangePartnerTracker {
 }
 
 function resetTempEntity(txHash: string): void {
-  let tempEntity = TemporaryExchangePartnerTracker.load(txHash)!;
+  const tempEntity = TemporaryExchangePartnerTracker.load(txHash)!;
   tempEntity.usdVolume = new BigDecimal(BigInt.fromI32(0));
   tempEntity.usdFees = new BigDecimal(BigInt.fromI32(0));
   tempEntity.partner = null;
@@ -63,7 +63,7 @@ function resetTempEntity(txHash: string): void {
 }
 
 function loadNewExchangePartner(id: string): ExchangePartner {
-  let newExchangePartner = new ExchangePartner(id);
+  const newExchangePartner = new ExchangePartner(id);
   newExchangePartner.usdVolume = new BigDecimal(BigInt.fromI32(0));
   newExchangePartner.usdFees = new BigDecimal(BigInt.fromI32(0));
   newExchangePartner.trades = BigInt.fromI32(0);
@@ -100,7 +100,7 @@ function loadNewDailyExchangePartner(
   partnerID: string,
   timestamp: BigInt
 ): DailyExchangePartner {
-  let newDailyExchangePartner = new DailyExchangePartner(id);
+  const newDailyExchangePartner = new DailyExchangePartner(id);
   newDailyExchangePartner.partner = partnerID;
   newDailyExchangePartner.timestamp = timestamp;
   newDailyExchangePartner.usdVolume = new BigDecimal(BigInt.fromI32(0));
@@ -110,15 +110,15 @@ function loadNewDailyExchangePartner(
 }
 
 function getFeeUSDFromVolume(volume: BigDecimal, feeRate: BigInt): BigDecimal {
-  let decimalFee = toDecimal(feeRate);
+  const decimalFee = toDecimal(feeRate);
   return volume.times(decimalFee);
 }
 
 export function handleExchangeEntryAppended(
   event: ExchangeEntryAppendedEvent
 ): void {
-  let txHash = event.transaction.hash.toHex();
-  let entity = new ExchangeEntryAppended(
+  const txHash = event.transaction.hash.toHex();
+  const entity = new ExchangeEntryAppended(
     txHash + "-" + event.logIndex.toString()
   );
   entity.account = event.params.account;
@@ -137,8 +137,8 @@ export function handleExchangeEntryAppended(
     event.block.number > partnerProgramStart &&
     event.block.number < exchangerContractUpdate
   ) {
-    let synth = event.params.src.toString();
-    let latestRate = LatestRate.load(synth);
+    const synth = event.params.src.toString();
+    const latestRate = LatestRate.load(synth);
     if (latestRate == null) {
       log.error(
         "handleExchangeEntryAppended rate missing for volume partner trade with synth: {}, and amount: {} in tx hash: {}",
@@ -153,11 +153,14 @@ export function handleExchangeEntryAppended(
       tempEntity = createTempEntity(txHash);
     }
 
-    let usdVolume = getUSDAmountFromAssetAmount(
+    const usdVolume = getUSDAmountFromAssetAmount(
       event.params.amount,
       latestRate.rate
     );
-    let usdFees = getFeeUSDFromVolume(usdVolume, event.params.exchangeFeeRate);
+    const usdFees = getFeeUSDFromVolume(
+      usdVolume,
+      event.params.exchangeFeeRate
+    );
 
     if (tempEntity.partner != null) {
       let exchangePartner = ExchangePartner.load(tempEntity.partner!);
@@ -170,8 +173,8 @@ export function handleExchangeEntryAppended(
         usdFees
       );
 
-      let timestamp = getTimeID(event.block.timestamp, DAY_SECONDS);
-      let dailyExchangePartnerID =
+      const timestamp = getTimeID(event.block.timestamp, DAY_SECONDS);
+      const dailyExchangePartnerID =
         timestamp.toString() + "-" + tempEntity.partner!;
       let dailyExchangePartner = DailyExchangePartner.load(
         dailyExchangePartnerID
@@ -200,8 +203,8 @@ export function handleExchangeEntryAppended(
 }
 
 export function handleExchangeTrackingV1(event: ExchangeTrackingEventV1): void {
-  let txHash = event.transaction.hash.toHex();
-  let exchangePartnerID = event.params.trackingCode.toString();
+  const txHash = event.transaction.hash.toHex();
+  const exchangePartnerID = event.params.trackingCode.toString();
 
   let tempEntity = TemporaryExchangePartnerTracker.load(txHash);
 
@@ -230,8 +233,8 @@ export function handleExchangeTrackingV1(event: ExchangeTrackingEventV1): void {
     tempEntity.usdFees as BigDecimal
   );
 
-  let timestamp = getTimeID(event.block.timestamp, DAY_SECONDS);
-  let dailyExchangePartnerID = timestamp.toString() + "-" + exchangePartnerID;
+  const timestamp = getTimeID(event.block.timestamp, DAY_SECONDS);
+  const dailyExchangePartnerID = timestamp.toString() + "-" + exchangePartnerID;
   let dailyExchangePartner = DailyExchangePartner.load(dailyExchangePartnerID);
   if (dailyExchangePartner == null) {
     dailyExchangePartner = loadNewDailyExchangePartner(
@@ -251,9 +254,9 @@ export function handleExchangeTrackingV1(event: ExchangeTrackingEventV1): void {
 }
 
 export function handleExchangeTrackingV2(event: ExchangeTrackingEventV2): void {
-  let txHash = event.transaction.hash.toHex();
-  let synth = event.params.toCurrencyKey.toString();
-  let latestRate = LatestRate.load(synth);
+  const txHash = event.transaction.hash.toHex();
+  const synth = event.params.toCurrencyKey.toString();
+  const latestRate = LatestRate.load(synth);
   if (latestRate == null) {
     log.error(
       "handleExchangeEntryAppended rate missing for volume partner trade with synth: {}, and amount: {} in tx hash: {}",
@@ -262,23 +265,23 @@ export function handleExchangeTrackingV2(event: ExchangeTrackingEventV2): void {
     return;
   }
 
-  let exchangePartnerID = event.params.trackingCode.toString();
+  const exchangePartnerID = event.params.trackingCode.toString();
   let exchangePartner = ExchangePartner.load(exchangePartnerID);
   if (exchangePartner == null) {
     exchangePartner = loadNewExchangePartner(exchangePartnerID);
   }
 
-  let usdVolume = getUSDAmountFromAssetAmount(
+  const usdVolume = getUSDAmountFromAssetAmount(
     event.params.toAmount,
     latestRate.rate
   );
 
-  let fee = toDecimal(event.params.fee);
+  const fee = toDecimal(event.params.fee);
 
   updateExchangePartner(exchangePartner as ExchangePartner, usdVolume, fee);
 
-  let timestamp = getTimeID(event.block.timestamp, DAY_SECONDS);
-  let dailyExchangePartnerID = timestamp.toString() + "-" + exchangePartnerID;
+  const timestamp = getTimeID(event.block.timestamp, DAY_SECONDS);
+  const dailyExchangePartnerID = timestamp.toString() + "-" + exchangePartnerID;
   let dailyExchangePartner = DailyExchangePartner.load(dailyExchangePartnerID);
   if (dailyExchangePartner == null) {
     dailyExchangePartner = loadNewDailyExchangePartner(

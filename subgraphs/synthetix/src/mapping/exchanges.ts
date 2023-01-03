@@ -63,7 +63,7 @@ function populateAggregatedTotalEntity(
   synth: string | null
 ): Total {
   const synthName = synth && synth.length ? (synth as string) : "null";
-  let id =
+  const id =
     timestamp.toString() +
     "-" +
     bucketMagnitude.toString() +
@@ -109,7 +109,7 @@ function trackTotals(
     exchangerId = account.toHex() + "-" + entity.id;
   }
 
-  let globalExchanger = Exchanger.load(account.toHex());
+  const globalExchanger = Exchanger.load(account.toHex());
   let exchanger = Exchanger.load(exchangerId);
 
   if (globalExchanger == null) {
@@ -160,15 +160,15 @@ function addMissingSynthRate(currencyBytes: Bytes): BigDecimal {
     return toDecimal(BigInt.fromI32(1));
   }
 
-  let snx = Synthetix.bind(dataSource.address());
-  let snxResolver = snx.try_resolver();
+  const snx = Synthetix.bind(dataSource.address());
+  const snxResolver = snx.try_resolver();
   if (!snxResolver.reverted) {
-    let resolver = AddressResolver.bind(snxResolver.value);
-    let exchangeRatesContract = ExchangeRates.bind(
+    const resolver = AddressResolver.bind(snxResolver.value);
+    const exchangeRatesContract = ExchangeRates.bind(
       resolver.getAddress(strToBytes("ExchangeRates"))
     );
 
-    let aggregatorResult = exchangeRatesContract.aggregators(currencyBytes);
+    const aggregatorResult = exchangeRatesContract.aggregators(currencyBytes);
 
     if (aggregatorResult.equals(ZERO_ADDRESS)) {
       throw new Error(
@@ -186,13 +186,13 @@ function addMissingSynthRate(currencyBytes: Bytes): BigDecimal {
 }
 
 export function handleSynthExchange(event: SynthExchangeEvent): void {
-  let txHash = event.transaction.hash.toHex();
-  let fromCurrencyKey = event.params.fromCurrencyKey.toString();
-  let toCurrencyKey = event.params.toCurrencyKey.toString();
+  const txHash = event.transaction.hash.toHex();
+  const fromCurrencyKey = event.params.fromCurrencyKey.toString();
+  const toCurrencyKey = event.params.toCurrencyKey.toString();
   let latestFromRate = getLatestRate(fromCurrencyKey, txHash);
   let latestToRate = getLatestRate(toCurrencyKey, txHash);
   // this will ensure SNX rate gets added at some point
-  let latestSNXRate = getLatestRate("SNX", txHash);
+  const latestSNXRate = getLatestRate("SNX", txHash);
   if (!latestSNXRate) {
     addMissingSynthRate(strToBytes("SNX"));
   }
@@ -206,31 +206,31 @@ export function handleSynthExchange(event: SynthExchangeEvent): void {
     latestToRate = addMissingSynthRate(event.params.fromCurrencyKey);
   }
 
-  let account = event.params.account;
-  let fromAmountInUSD = getUSDAmountFromAssetAmount(
+  const account = event.params.account;
+  const fromAmountInUSD = getUSDAmountFromAssetAmount(
     event.params.fromAmount,
     latestFromRate
   );
-  let toAmountInUSD = getUSDAmountFromAssetAmount(
+  const toAmountInUSD = getUSDAmountFromAssetAmount(
     event.params.toAmount,
     latestToRate
   );
 
-  let feesInUSD = fromAmountInUSD.times(
+  const feesInUSD = fromAmountInUSD.times(
     getExchangeFee(
       "exchangeFeeRate",
       fromCurrencyKey == "sUSD" ? toCurrencyKey : fromCurrencyKey
     )
   );
 
-  let fromSynth = SynthByCurrencyKey.load(fromCurrencyKey);
-  let toSynth = SynthByCurrencyKey.load(toCurrencyKey);
+  const fromSynth = SynthByCurrencyKey.load(fromCurrencyKey);
+  const toSynth = SynthByCurrencyKey.load(toCurrencyKey);
 
-  let fromSynthAddress =
+  const fromSynthAddress =
     fromSynth != null ? fromSynth.proxyAddress : ZERO_ADDRESS;
-  let toSynthAddress = toSynth != null ? toSynth.proxyAddress : ZERO_ADDRESS;
+  const toSynthAddress = toSynth != null ? toSynth.proxyAddress : ZERO_ADDRESS;
 
-  let eventEntity = new SynthExchange(
+  const eventEntity = new SynthExchange(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   eventEntity.account = account.toHex();
@@ -246,13 +246,13 @@ export function handleSynthExchange(event: SynthExchangeEvent): void {
   eventEntity.gasPrice = event.transaction.gasPrice;
   eventEntity.save();
 
-  let synthOpts: (string | null)[] = [
+  const synthOpts: (string | null)[] = [
     null,
     fromSynthAddress.toHex(),
     toSynthAddress.toHex(),
   ];
 
-  let periods: BigInt[] = [
+  const periods: BigInt[] = [
     YEAR_SECONDS,
     YEAR_SECONDS.div(BigInt.fromI32(4)),
     YEAR_SECONDS.div(BigInt.fromI32(12)),
@@ -263,15 +263,15 @@ export function handleSynthExchange(event: SynthExchangeEvent): void {
   ];
 
   for (let s = 0; s < synthOpts.length; s++) {
-    let synth = synthOpts[s];
+    const synth = synthOpts[s];
 
     for (let p = 0; p < periods.length; p++) {
-      let period = periods[p];
-      let startTimestamp =
+      const period = periods[p];
+      const startTimestamp =
         period == ZERO ? ZERO : getTimeID(event.block.timestamp, period);
 
       for (let m = 0; m < MAX_MAGNITUDE; m++) {
-        let mag = new BigDecimal(
+        const mag = new BigDecimal(
           BigInt.fromI32(<i32>Math.floor(Math.pow(10, m)))
         );
         if (fromAmountInUSD.lt(mag)) {
@@ -299,9 +299,9 @@ export function handleSynthExchange(event: SynthExchangeEvent): void {
 export function handleAtomicSynthExchange(
   event: AtomicSynthExchangeEvent
 ): void {
-  let txHash = event.transaction.hash.toHex();
-  let fromCurrencyKey = event.params.fromCurrencyKey.toString();
-  let toCurrencyKey = event.params.toCurrencyKey.toString();
+  const txHash = event.transaction.hash.toHex();
+  const fromCurrencyKey = event.params.fromCurrencyKey.toString();
+  const toCurrencyKey = event.params.toCurrencyKey.toString();
   let latestFromRate = getLatestRate(fromCurrencyKey, txHash);
   let latestToRate = getLatestRate(toCurrencyKey, txHash);
 
@@ -314,31 +314,31 @@ export function handleAtomicSynthExchange(
     latestToRate = addMissingSynthRate(event.params.fromCurrencyKey);
   }
 
-  let account = event.params.account;
-  let fromAmountInUSD = getUSDAmountFromAssetAmount(
+  const account = event.params.account;
+  const fromAmountInUSD = getUSDAmountFromAssetAmount(
     event.params.fromAmount,
     latestFromRate
   );
-  let toAmountInUSD = getUSDAmountFromAssetAmount(
+  const toAmountInUSD = getUSDAmountFromAssetAmount(
     event.params.toAmount,
     latestToRate
   );
 
-  let fromSynth = SynthByCurrencyKey.load(fromCurrencyKey);
-  let toSynth = SynthByCurrencyKey.load(toCurrencyKey);
+  const fromSynth = SynthByCurrencyKey.load(fromCurrencyKey);
+  const toSynth = SynthByCurrencyKey.load(toCurrencyKey);
 
-  let feesInUSD = fromAmountInUSD.times(
+  const feesInUSD = fromAmountInUSD.times(
     getExchangeFee(
       "atomicExchangeFeeRate",
       fromCurrencyKey == "sUSD" ? toCurrencyKey : fromCurrencyKey
     )
   );
 
-  let fromSynthAddress =
+  const fromSynthAddress =
     fromSynth != null ? fromSynth.proxyAddress : ZERO_ADDRESS;
-  let toSynthAddress = toSynth != null ? toSynth.proxyAddress : ZERO_ADDRESS;
+  const toSynthAddress = toSynth != null ? toSynth.proxyAddress : ZERO_ADDRESS;
 
-  let eventEntity = new AtomicSynthExchange(
+  const eventEntity = new AtomicSynthExchange(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   eventEntity.account = account.toHex();
@@ -357,15 +357,15 @@ export function handleAtomicSynthExchange(
 }
 
 export function handleExchangeReclaim(event: ExchangeReclaimEvent): void {
-  let txHash = event.transaction.hash.toHex();
-  let entity = new ExchangeReclaim(txHash + "-" + event.logIndex.toString());
+  const txHash = event.transaction.hash.toHex();
+  const entity = new ExchangeReclaim(txHash + "-" + event.logIndex.toString());
   entity.account = event.params.account.toHex();
   entity.amount = toDecimal(event.params.amount);
   entity.currencyKey = event.params.currencyKey;
   entity.timestamp = event.block.timestamp;
   entity.block = event.block.number;
   entity.gasPrice = event.transaction.gasPrice;
-  let latestRate = getLatestRate(event.params.currencyKey.toString(), txHash);
+  const latestRate = getLatestRate(event.params.currencyKey.toString(), txHash);
 
   if (!latestRate) {
     log.error("handleExchangeReclaim has an issue in tx hash: {}", [txHash]);
@@ -379,15 +379,15 @@ export function handleExchangeReclaim(event: ExchangeReclaimEvent): void {
 }
 
 export function handleExchangeRebate(event: ExchangeRebateEvent): void {
-  let txHash = event.transaction.hash.toHex();
-  let entity = new ExchangeRebate(txHash + "-" + event.logIndex.toString());
+  const txHash = event.transaction.hash.toHex();
+  const entity = new ExchangeRebate(txHash + "-" + event.logIndex.toString());
   entity.account = event.params.account.toHex();
   entity.amount = toDecimal(event.params.amount);
   entity.currencyKey = event.params.currencyKey;
   entity.timestamp = event.block.timestamp;
   entity.block = event.block.number;
   entity.gasPrice = event.transaction.gasPrice;
-  let latestRate = getLatestRate(event.params.currencyKey.toString(), txHash);
+  const latestRate = getLatestRate(event.params.currencyKey.toString(), txHash);
 
   if (!latestRate) {
     log.error("handleExchangeReclaim has an issue in tx hash: {}", [txHash]);
@@ -401,24 +401,24 @@ export function handleExchangeRebate(event: ExchangeRebateEvent): void {
 }
 
 export function handleFeeChange(event: ExchangeFeeUpdatedEvent): void {
-  let currencyKey = event.params.synthKey.toString();
+  const currencyKey = event.params.synthKey.toString();
 
-  let entity = new ExchangeFee(currencyKey);
+  const entity = new ExchangeFee(currencyKey);
   entity.fee = toDecimal(event.params.newExchangeFeeRate);
   entity.save();
 }
 
 export function handleMarketAdded(event: MarketAddedEvent): void {
-  let market = FuturesMarket.load(event.params.market.toHexString());
+  const market = FuturesMarket.load(event.params.market.toHexString());
   if (!market) {
     FuturesMarketTemplate.create(event.params.market);
   }
 }
 
 export function handlePositionModified(event: PositionModifiedEvent): void {
-  let market = event.transaction.to!.toHex();
+  const market = event.transaction.to!.toHex();
 
-  let periods: BigInt[] = [
+  const periods: BigInt[] = [
     YEAR_SECONDS,
     YEAR_SECONDS.div(BigInt.fromI32(4)),
     YEAR_SECONDS.div(BigInt.fromI32(12)),
@@ -428,22 +428,22 @@ export function handlePositionModified(event: PositionModifiedEvent): void {
     ZERO,
   ];
 
-  let amountInUSD = toDecimal(
+  const amountInUSD = toDecimal(
     event.params.tradeSize.times(event.params.lastPrice).div(ETHER).abs()
   );
 
-  let synthOpts: (string | null)[] = [null, market];
+  const synthOpts: (string | null)[] = [null, market];
 
   for (let s = 0; s < synthOpts.length; s++) {
-    let synth = synthOpts[s];
+    const synth = synthOpts[s];
 
     for (let p = 0; p < periods.length; p++) {
-      let period = periods[p];
-      let startTimestamp =
+      const period = periods[p];
+      const startTimestamp =
         period == ZERO ? ZERO : getTimeID(event.block.timestamp, period);
 
       for (let m = 0; m < MAX_MAGNITUDE; m++) {
-        let mag = new BigDecimal(
+        const mag = new BigDecimal(
           BigInt.fromI32(<i32>Math.floor(Math.pow(10, m)))
         );
         if (amountInUSD.lt(mag)) {

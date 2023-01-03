@@ -35,7 +35,7 @@ import { log, BigInt } from "@graphprotocol/graph-ts";
 import { toDecimal } from "./lib/helpers";
 
 export function handleLoanCreatedEther(event: LoanCreatedEvent): void {
-  let loanEntity = new Loan(event.params.id.toHex() + "-sETH");
+  const loanEntity = new Loan(event.params.id.toHex() + "-sETH");
   loanEntity.txHash = event.transaction.hash.toHex();
   loanEntity.account = event.params.account;
   loanEntity.amount = toDecimal(event.params.amount);
@@ -49,7 +49,7 @@ export function handleLoanCreatedEther(event: LoanCreatedEvent): void {
 }
 
 export function handleLoanClosedEther(event: LoanClosedEvent): void {
-  let loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
+  const loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
 
   if (loanEntity) {
     loanEntity.isOpen = false;
@@ -61,7 +61,7 @@ export function handleLoanClosedEther(event: LoanClosedEvent): void {
 export function handleLoanClosedByLiquidation(
   event: LoanClosedByLiquidation
 ): void {
-  let loanLiquidatedEntity = new LoanLiquidated(
+  const loanLiquidatedEntity = new LoanLiquidated(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   loanLiquidatedEntity.loanId = event.params.id;
@@ -70,7 +70,7 @@ export function handleLoanClosedByLiquidation(
   loanLiquidatedEntity.timestamp = event.block.timestamp;
   loanLiquidatedEntity.save();
 
-  let loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
+  const loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
   if (loanEntity) {
     loanEntity.isOpen = false;
     loanEntity.closedAt = event.block.timestamp;
@@ -82,7 +82,7 @@ export function handleLoanClosedByLiquidation(
 export function handleLoanPartiallyLiquidated(
   event: LoanPartiallyLiquidatedEvent
 ): void {
-  let loanPartiallyLiquidatedEntity = new LoanPartiallyLiquidated(
+  const loanPartiallyLiquidatedEntity = new LoanPartiallyLiquidated(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   loanPartiallyLiquidatedEntity.loanId = event.params.id;
@@ -97,7 +97,7 @@ export function handleLoanPartiallyLiquidated(
   loanPartiallyLiquidatedEntity.timestamp = event.block.timestamp;
   loanPartiallyLiquidatedEntity.save();
 
-  let loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
+  const loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
   if (loanEntity == null) {
     log.error(
       "for handleLoanPartiallyLiquidated there should be a loan entity for this id: {} in this hash: {}",
@@ -116,7 +116,7 @@ export function handleLoanPartiallyLiquidated(
 }
 
 export function handleLoanRepaymentMade(event: LoanRepaymentMadeEvent): void {
-  let loanRepaid = new LoanRepaid(
+  const loanRepaid = new LoanRepaid(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   loanRepaid.repaidAmount = toDecimal(event.params.amountRepaid);
@@ -126,7 +126,7 @@ export function handleLoanRepaymentMade(event: LoanRepaymentMadeEvent): void {
   loanRepaid.timestamp = event.block.timestamp;
   loanRepaid.save();
 
-  let loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
+  const loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
   if (loanEntity == null) {
     log.error(
       "for handleLoanRepaid there should be a loan entity for this id: {} in this hash: {}",
@@ -141,7 +141,7 @@ export function handleLoanRepaymentMade(event: LoanRepaymentMadeEvent): void {
 export function handleCollateralDeposited(
   event: CollateralDepositedEvent
 ): void {
-  let collateralDepositedEntity = new CollateralDeposited(
+  const collateralDepositedEntity = new CollateralDeposited(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   collateralDepositedEntity.collateralAmount = toDecimal(
@@ -155,7 +155,7 @@ export function handleCollateralDeposited(
   collateralDepositedEntity.timestamp = event.block.timestamp;
   collateralDepositedEntity.save();
 
-  let loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
+  const loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
   if (loanEntity) {
     loanEntity.collateralAmount = collateralDepositedEntity.collateralAfter;
     loanEntity.save();
@@ -165,7 +165,7 @@ export function handleCollateralDeposited(
 export function handleCollateralWithdrawn(
   event: CollateralWithdrawnEvent
 ): void {
-  let collateralWithdrawnEntity = new CollateralWithdrawn(
+  const collateralWithdrawnEntity = new CollateralWithdrawn(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   collateralWithdrawnEntity.amountWithdrawn = toDecimal(
@@ -179,7 +179,7 @@ export function handleCollateralWithdrawn(
   collateralWithdrawnEntity.timestamp = event.block.timestamp;
   collateralWithdrawnEntity.save();
 
-  let loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
+  const loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
   if (loanEntity) {
     loanEntity.collateralAmount = collateralWithdrawnEntity.collateralAfter;
     loanEntity.save();
@@ -187,7 +187,7 @@ export function handleCollateralWithdrawn(
 }
 
 export function handleLoanDrawnDown(event: LoanDrawnDownEvent): void {
-  let loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
+  const loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
   if (loanEntity == null) {
     log.error(
       "for handleLoanPartiallyLiquidated there should be a loan entity for this id: {} in this hash: {}",
@@ -206,7 +206,7 @@ function addLoanEntity(
   event: LegacyLoanCreatedEvent,
   collateralMinted: string
 ): Loan {
-  let loanEntity = new Loan(
+  const loanEntity = new Loan(
     event.params.loanID.toHex() + "-" + collateralMinted
   );
   loanEntity.txHash = event.transaction.hash.toHex();
@@ -223,7 +223,7 @@ function addLoanEntity(
 export function handleLoanCreatedEtherLegacy(
   event: LegacyLoanCreatedEvent
 ): void {
-  let loanEntity = addLoanEntity(event, "sETH");
+  const loanEntity = addLoanEntity(event, "sETH");
   loanEntity.collateralMinted = "sETH";
   loanEntity.save();
 }
@@ -231,7 +231,7 @@ export function handleLoanCreatedEtherLegacy(
 export function handleLoanCreatedsUSDLegacy(
   event: LegacyLoanCreatedEvent
 ): void {
-  let loanEntity = addLoanEntity(event, "sUSD");
+  const loanEntity = addLoanEntity(event, "sUSD");
   loanEntity.collateralMinted = "sUSD";
   loanEntity.save();
 }
@@ -240,7 +240,7 @@ function closeLoan(
   event: LegacyLoanClosedEvent,
   collateralMinted: string
 ): void {
-  let loanEntity = Loan.load(
+  const loanEntity = Loan.load(
     event.params.loanID.toHex() + "-" + collateralMinted
   );
 
@@ -265,7 +265,7 @@ export function handleLoanClosedsUSDLegacy(event: LegacyLoanClosedEvent): void {
 export function handleLoanLiquidatedLegacy(
   event: LegacyLoanLiquidatedEvent
 ): void {
-  let loanLiquidatedEntity = new LoanLiquidated(
+  const loanLiquidatedEntity = new LoanLiquidated(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   loanLiquidatedEntity.loanId = event.params.loanID;
@@ -278,7 +278,7 @@ export function handleLoanLiquidatedLegacy(
 export function handleLoanPartiallyLiquidatedLegacy(
   event: LegacyLoanPartiallyLiquidatedEvent
 ): void {
-  let loanPartiallyLiquidatedEntity = new LoanPartiallyLiquidated(
+  const loanPartiallyLiquidatedEntity = new LoanPartiallyLiquidated(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   loanPartiallyLiquidatedEntity.loanId = event.params.loanID;
@@ -293,7 +293,7 @@ export function handleLoanPartiallyLiquidatedLegacy(
   loanPartiallyLiquidatedEntity.timestamp = event.block.timestamp;
   loanPartiallyLiquidatedEntity.save();
 
-  let loanEntity = Loan.load(event.params.loanID.toHex());
+  const loanEntity = Loan.load(event.params.loanID.toHex());
   if (loanEntity == null) {
     log.error(
       "for handleLoanPartiallyLiquidated there should be a loan entity for this id: {} in this hash: {}",
@@ -311,7 +311,7 @@ export function handleLoanPartiallyLiquidatedLegacy(
 export function handleCollateralDepositedLegacy(
   event: LegacyCollateralDepositedEvent
 ): void {
-  let collateralDepositedEntity = new CollateralDeposited(
+  const collateralDepositedEntity = new CollateralDeposited(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   collateralDepositedEntity.collateralAmount = toDecimal(
@@ -329,7 +329,7 @@ export function handleCollateralDepositedLegacy(
 export function handleCollateralWithdrawnLegacy(
   event: LegacyCollateralWithdrawnEvent
 ): void {
-  let collateralWithdrawnEntity = new CollateralWithdrawn(
+  const collateralWithdrawnEntity = new CollateralWithdrawn(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   collateralWithdrawnEntity.amountWithdrawn = toDecimal(
@@ -345,7 +345,7 @@ export function handleCollateralWithdrawnLegacy(
 }
 
 export function handleLoanRepaidLegacy(event: LegacyLoanRepaidEvent): void {
-  let loanRepaid = new LoanRepaid(
+  const loanRepaid = new LoanRepaid(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   loanRepaid.repaidAmount = toDecimal(event.params.repaidAmount);
@@ -355,7 +355,7 @@ export function handleLoanRepaidLegacy(event: LegacyLoanRepaidEvent): void {
   loanRepaid.timestamp = event.block.timestamp;
   loanRepaid.save();
 
-  let loanEntity = Loan.load(event.params.loanID.toHex());
+  const loanEntity = Loan.load(event.params.loanID.toHex());
   if (loanEntity == null) {
     log.error(
       "for handleLoanRepaid there should be a loan entity for this id: {} in this hash: {}",

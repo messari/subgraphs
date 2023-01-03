@@ -54,8 +54,6 @@ import {
   ZERO_ADDRESS,
   CANDLE_PERIODS,
 } from "../lib/helpers";
-import { ProxyERC20 } from "../../../generated/ChainlinkMultisig/ProxyERC20";
-import { Synthetix } from "../../../generated/ChainlinkMultisig/Synthetix";
 import { ExecutionSuccess } from "../../../generated/ChainlinkMultisig/GnosisSafe";
 import { AddressResolver } from "../../../generated/ChainlinkMultisig/AddressResolver";
 import { getContractDeployment } from "../../../protocols/addresses";
@@ -66,7 +64,7 @@ export function addLatestRate(
   aggregator: Address,
   event: ethereum.Event
 ): void {
-  let decimalRate = toDecimal(rate);
+  const decimalRate = toDecimal(rate);
   addLatestRateFromDecimal(synth, decimalRate, aggregator, event);
 }
 
@@ -88,7 +86,9 @@ export function addLatestRateFromDecimal(
   prevLatestRate.rate = rate;
   prevLatestRate.save();
 
-  let rateUpdate = new RateUpdate(event.transaction.hash.toHex() + "-" + synth);
+  const rateUpdate = new RateUpdate(
+    event.transaction.hash.toHex() + "-" + synth
+  );
   rateUpdate.currencyKey = strToBytes(synth);
   rateUpdate.synth = synth;
   rateUpdate.rate = rate;
@@ -106,9 +106,9 @@ function updateCandle(
   rate: BigDecimal
 ): void {
   for (let p = 0; p < CANDLE_PERIODS.length; p++) {
-    let period = CANDLE_PERIODS[p];
-    let periodId = timestamp.div(period);
-    let id = synth + "-" + period.toString() + "-" + periodId.toString();
+    const period = CANDLE_PERIODS[p];
+    const periodId = timestamp.div(period);
+    const id = synth + "-" + period.toString() + "-" + periodId.toString();
     let candle = Candle.load(id);
     if (candle == null) {
       candle = new Candle(id);
@@ -155,7 +155,7 @@ function calculateAveragePrice(
 }
 
 export function addDollar(dollarID: string): void {
-  let dollarRate = new LatestRate(dollarID);
+  const dollarRate = new LatestRate(dollarID);
   dollarRate.rate = new BigDecimal(BigInt.fromI32(1));
   dollarRate.aggregator = ZERO_ADDRESS;
   dollarRate.save();
@@ -165,11 +165,11 @@ export function addProxyAggregator(
   currencyKey: string,
   aggregatorProxyAddress: Address
 ): void {
-  let proxy = AggregatorProxyContract.bind(aggregatorProxyAddress);
-  let underlyingAggregator = proxy.try_aggregator();
+  const proxy = AggregatorProxyContract.bind(aggregatorProxyAddress);
+  const underlyingAggregator = proxy.try_aggregator();
 
   if (!underlyingAggregator.reverted) {
-    let context = new DataSourceContext();
+    const context = new DataSourceContext();
     context.setString("currencyKey", currencyKey);
 
     log.info("adding proxy aggregator for synth {}", [currencyKey]);
@@ -193,7 +193,7 @@ export function addAggregator(
   aggregatorAddress: Address
 ): void {
   // check current aggregator address, and don't add again if its same
-  let latestRate = LatestRate.load(currencyKey);
+  const latestRate = LatestRate.load(currencyKey);
 
   log.info("adding aggregator for synth {}", [currencyKey]);
 
@@ -206,7 +206,7 @@ export function addAggregator(
     latestRate.save();
   }
 
-  let context = new DataSourceContext();
+  const context = new DataSourceContext();
   context.setString("currencyKey", currencyKey);
 
   if (currencyKey.startsWith("s")) {
@@ -223,7 +223,7 @@ export function calculateInverseRate(
   beforeRate: BigDecimal
 ): BigDecimal {
   // since this is inverse pricing, we have to get the latest token information and then apply it to the rate
-  let inversePricingInfo = InversePricingInfo.load(currencyKey);
+  const inversePricingInfo = InversePricingInfo.load(currencyKey);
 
   if (inversePricingInfo == null) {
     log.warning("Missing inverse pricing info for asset {}", [currencyKey]);
@@ -247,25 +247,25 @@ export function calculateInverseRate(
 }
 
 export function initFeed(currencyKey: string): BigDecimal | null {
-  let addressResolverAddress = getContractDeployment(
+  const addressResolverAddress = getContractDeployment(
     "AddressResolver",
     dataSource.network(),
     BigInt.fromI32(1000000000)
   )!;
-  let resolver = AddressResolver.bind(addressResolverAddress);
-  let exchangeRateAddressTry = resolver.try_getAddress(
+  const resolver = AddressResolver.bind(addressResolverAddress);
+  const exchangeRateAddressTry = resolver.try_getAddress(
     strToBytes("ExchangeRates", 32)
   );
 
   if (!exchangeRateAddressTry.reverted) {
-    let er = ExchangeRates.bind(exchangeRateAddressTry.value);
+    const er = ExchangeRates.bind(exchangeRateAddressTry.value);
 
-    let aggregatorAddress = er.try_aggregators(strToBytes(currencyKey, 32));
+    const aggregatorAddress = er.try_aggregators(strToBytes(currencyKey, 32));
 
     if (!aggregatorAddress.reverted) {
       addProxyAggregator(currencyKey, aggregatorAddress.value);
 
-      let r = er.try_rateForCurrency(strToBytes(currencyKey, 32));
+      const r = er.try_rateForCurrency(strToBytes(currencyKey, 32));
 
       if (!r.reverted) {
         return toDecimal(r.value);
@@ -277,19 +277,19 @@ export function initFeed(currencyKey: string): BigDecimal | null {
 }
 
 export function initFeeRate(type: string, currencyKey: string): BigDecimal {
-  let addressResolverAddress = getContractDeployment(
+  const addressResolverAddress = getContractDeployment(
     "AddressResolver",
     dataSource.network(),
     BigInt.fromI32(1000000000)
   )!;
 
-  let resolver = AddressResolver.bind(addressResolverAddress);
-  let systemSettingsAddressTry = resolver.try_getAddress(
+  const resolver = AddressResolver.bind(addressResolverAddress);
+  const systemSettingsAddressTry = resolver.try_getAddress(
     strToBytes("SystemSettings", 32)
   );
 
   if (!systemSettingsAddressTry.reverted) {
-    let ss = SystemSettings.bind(systemSettingsAddressTry.value);
+    const ss = SystemSettings.bind(systemSettingsAddressTry.value);
 
     let result = ss.try_atomicExchangeFeeRate(strToBytes(currencyKey, 32));
     if (type === "exchangeFeeRate") {
@@ -302,7 +302,7 @@ export function initFeeRate(type: string, currencyKey: string): BigDecimal {
     }
 
     if (!result.reverted) {
-      let entity = new FeeRate(type + "-" + currencyKey);
+      const entity = new FeeRate(type + "-" + currencyKey);
       entity.setting = type;
       entity.synth = currencyKey;
       entity.rate = toDecimal(result.value);
@@ -325,7 +325,7 @@ export function handleAggregatorAdded(event: AggregatorAddedEvent): void {
 export function handleAggregatorProxyAddressUpdated(
   event: AggregatorConfirmedEvent
 ): void {
-  let context = dataSource.context();
+  const context = dataSource.context();
   addAggregator(context.getString("currencyKey"), event.params.latest);
 }
 
@@ -333,8 +333,8 @@ export function handleRatesUpdated(event: RatesUpdatedEvent): void {
   addDollar("sUSD");
   addDollar("nUSD");
 
-  let keys = event.params.currencyKeys;
-  let rates = event.params.newRates;
+  const keys = event.params.currencyKeys;
+  const rates = event.params.newRates;
 
   for (let i = 0; i < keys.length; i++) {
     if (keys[i].toString() != "") {
@@ -344,7 +344,7 @@ export function handleRatesUpdated(event: RatesUpdatedEvent): void {
 }
 
 export function handleInverseConfigured(event: InversePriceConfigured): void {
-  let entity = new InversePricingInfo(event.params.currencyKey.toString());
+  const entity = new InversePricingInfo(event.params.currencyKey.toString());
   entity.entryPoint = toDecimal(event.params.entryPoint);
   entity.lowerLimit = toDecimal(event.params.lowerLimit);
   entity.upperLimit = toDecimal(event.params.upperLimit);
@@ -355,11 +355,11 @@ export function handleInverseConfigured(event: InversePriceConfigured): void {
 }
 
 export function handleInverseFrozen(event: InversePriceFrozen): void {
-  let entity = new InversePricingInfo(event.params.currencyKey.toString());
+  const entity = new InversePricingInfo(event.params.currencyKey.toString());
   entity.frozen = true;
   entity.save();
 
-  let curInverseRate = LatestRate.load(event.params.currencyKey.toString());
+  const curInverseRate = LatestRate.load(event.params.currencyKey.toString());
 
   if (!curInverseRate) return;
 
@@ -372,8 +372,8 @@ export function handleInverseFrozen(event: InversePriceFrozen): void {
 }
 
 export function handleAggregatorAnswerUpdated(event: AnswerUpdatedEvent): void {
-  let context = dataSource.context();
-  let rate = event.params.current.times(BigInt.fromI32(10).pow(10));
+  const context = dataSource.context();
+  const rate = event.params.current.times(BigInt.fromI32(10).pow(10));
 
   addDollar("sUSD");
   addLatestRate(context.getString("currencyKey"), rate, event.address, event);
@@ -382,10 +382,10 @@ export function handleAggregatorAnswerUpdated(event: AnswerUpdatedEvent): void {
 export function handleInverseAggregatorAnswerUpdated(
   event: AnswerUpdatedEvent
 ): void {
-  let context = dataSource.context();
-  let rate = event.params.current.times(BigInt.fromI32(10).pow(10));
+  const context = dataSource.context();
+  const rate = event.params.current.times(BigInt.fromI32(10).pow(10));
 
-  let inverseRate = calculateInverseRate(
+  const inverseRate = calculateInverseRate(
     context.getString("currencyKey"),
     toDecimal(rate)
   );
@@ -402,8 +402,9 @@ export function handleInverseAggregatorAnswerUpdated(
 
 // required to rescan all aggregator addresses whenever chainlink settings are updated. This is because of an issue where the chainlink aggregator proxy
 // does not contain an event to track when the aggregator addresses are updated, which means we must scan them manually when it makes sense to do so
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handleChainlinkUpdate(event: ExecutionSuccess): void {
-  let addressResolverAddress = getContractDeployment(
+  const addressResolverAddress = getContractDeployment(
     "AddressResolver",
     dataSource.network(),
     BigInt.fromI32(1000000000)
@@ -424,8 +425,8 @@ export function handleChainlinkUpdate(event: ExecutionSuccess): void {
     return;
   }*/
 
-  let resolverContract = AddressResolver.bind(addressResolverAddress);
-  let ratesAddress = resolverContract.try_getAddress(
+  const resolverContract = AddressResolver.bind(addressResolverAddress);
+  const ratesAddress = resolverContract.try_getAddress(
     strToBytes("ExchangeRates")
   );
 
@@ -434,7 +435,7 @@ export function handleChainlinkUpdate(event: ExecutionSuccess): void {
     return;
   }
 
-  let ratesContract = ExchangeRates.bind(ratesAddress.value);
+  const ratesContract = ExchangeRates.bind(ratesAddress.value);
 
   let aggregatorKey: ethereum.CallResult<Bytes>;
   let index = 0;
@@ -442,7 +443,7 @@ export function handleChainlinkUpdate(event: ExecutionSuccess): void {
     aggregatorKey = ratesContract.try_aggregatorKeys(BigInt.fromI32(index++));
 
     if (!aggregatorKey.reverted) {
-      let aggregatorAddress = ratesContract.try_aggregators(
+      const aggregatorAddress = ratesContract.try_aggregators(
         aggregatorKey.value
       );
 
@@ -464,7 +465,7 @@ export function handleChainlinkUpdate(event: ExecutionSuccess): void {
 }
 
 export function handleExchangeFeeUpdated(event: ExchangeFeeUpdated): void {
-  let entity = new FeeRate(
+  const entity = new FeeRate(
     "exchangeFeeRate-" + event.params.synthKey.toString()
   );
   entity.setting = "exchangeFee";
@@ -477,7 +478,7 @@ export function handleExchangeFeeUpdated(event: ExchangeFeeUpdated): void {
 export function handleAtomicExchangeFeeUpdated(
   event: AtomicExchangeFeeUpdated
 ): void {
-  let entity = new FeeRate(
+  const entity = new FeeRate(
     "atomicExchangeFeeRate-" + event.params.synthKey.toString()
   );
   entity.setting = "atomicExchangeFeeRate";
@@ -493,7 +494,7 @@ function updateDailyCandle(
   synth: string,
   rate: BigDecimal
 ): void {
-  let dayID = timestamp.toI32() / 86400;
+  const dayID = timestamp.toI32() / 86400;
   let newCandle = DailyCandle.load(dayID.toString() + "-" + synth);
   if (newCandle == null) {
     newCandle = new DailyCandle(dayID.toString() + "-" + synth);
