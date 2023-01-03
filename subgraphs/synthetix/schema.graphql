@@ -2027,9 +2027,9 @@ type ShortContract @entity {
   " the fee for issuing a short "
   issueFeeRate: BigDecimal!
   " the max number of loans per account "
-  maxLoansPerAccount: BigInt!
+  maxLoansPerAccount: BigInt
   " Time in seconds that a user must wait between interacting with a loan. Provides front running and flash loan protection. "
-  interactionDelay: BigInt!
+  interactionDelay: BigInt
   " the manager is a contract that ties the shorting contract in with the rest of the Synthetix protocol "
   manager: Bytes!
   " a boolean that prevents new loans on the contract when false "
