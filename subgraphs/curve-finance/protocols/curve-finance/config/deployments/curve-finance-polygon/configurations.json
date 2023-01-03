@@ -1,0 +1,40 @@
+{
+  "network": "matic",
+  "defaultNetwork": "Network.MATIC",
+
+  "priceCaching": 50000,
+
+  "poolInfoContract": "0x7544Fe3d184b6B55D6B36c3FCA1157eE0Ba30287",
+  "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
+  "crvTokenAddress": "0x172370d5cd63279efa6d502dab29171933a610af",
+
+  "gaugeControllerContract": "0xabC000d88f23Bb45525E447528DBF656A9D55bf5",
+  "gaugeControllerStartBlock": "24818942",
+
+  "poolRegistry": [
+    {
+      "name": "MainRegistry",
+      "address": "0x094d12e5b541784701FD8d65F11fc0598FBC6332",
+      "startBlock": "13991825"
+    },
+    {
+      "name": "StableSwapFactory",
+      "address": "0x722272D36ef0Da72FF51c5A65Db7b870E2e8D4ee",
+      "startBlock": "19613852"
+    },
+    {
+      "name": "CryptoSwapRegistry",
+      "address": "0x47bB542B9dE58b970bA50c9dae444DDB4c16751a",
+      "startBlock": "23556360"
+    },
+    {
+      "name": "CryptoPoolFactory",
+      "address": "0xE5De15A9C9bBedb4F5EC13B131E61245f2983A69",
+      "startBlock": "26192231"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}

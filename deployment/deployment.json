@@ -1837,7 +1837,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1845,7 +1845,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1854,12 +1854,12 @@
           }
         }
       },
-      "curve-finance-avalanche": {
-        "network": "avalanche",
+      "curve-finance-aurora": {
+        "network": "aurora",
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1867,7 +1867,29 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-aurora",
+            "query-id": "curve-finance-aurora"
+          }
+        }
+      },
+      "curve-finance-avalanche": {
+        "network": "avalanche",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "curve.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1881,7 +1903,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1889,7 +1911,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1907,7 +1929,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1915,7 +1937,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1929,7 +1951,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1937,7 +1959,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1946,12 +1968,12 @@
           }
         }
       },
-      "curve-finance-optimism": {
-        "network": "optimism",
+      "curve-finance-harmony": {
+        "network": "harmony",
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1959,7 +1981,51 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-harmony",
+            "query-id": "curve-finance-harmony"
+          }
+        }
+      },
+      "curve-finance-moonbeam": {
+        "network": "moonbeam",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "curve.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-moonbeam",
+            "query-id": "curve-finance-moonbeam"
+          }
+        }
+      },
+      "curve-finance-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "curve.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1973,7 +2039,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1981,7 +2047,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
