@@ -1,8 +1,8 @@
 import { Market } from "../../generated/schema";
 import { BigDecimal, near } from "@graphprotocol/graph-ts";
-import { BD_ONE, BD_ZERO } from "./const";
-import { getOrCreateBorrowRate, getOrCreateSupplyRate } from "../helpers/rates";
+import { BD_ONE, BD_ZERO, InterestRateSide, IntervalType } from "./const";
 import { bigDecimalExponential } from "./math";
+import { getOrCreateRate } from "../helpers/rates";
 
 const BD = (n: string): BigDecimal => BigDecimal.fromString(n);
 
@@ -15,29 +15,29 @@ export function getRate(market: Market): BigDecimal {
   );
 
   market._utilization = pos;
-  const target = market._target_utilization.toBigDecimal().div(BD("10000"));
+  const target = market._targetUtilization.toBigDecimal().div(BD("10000"));
   let rate = BD_ZERO;
 
   if (pos.le(target)) {
-    // BigDecimal::one() + pos * (BigDecimal::from(self.target_utilization_rate) - BigDecimal::one())/ target_utilization
-    const highPos = market._target_utilization_rate
+    // BigDecimal::one() + pos * (BigDecimal::from(self._targetUtilizationRate) - BigDecimal::one())/ target_utilization
+    const highPos = market._targetUtilizationRate
       .toBigDecimal()
       .div(BD("1000000000000000000000000000"))
       .minus(BD_ONE)
       .div(target);
     rate = BD_ONE.plus(pos.times(highPos));
   } else {
-    // BigDecimal::from(self.target_utilization_rate) +
-    // (pos - target_utilization) * (BigDecimal::from(self.max_utilization_rate) - BigDecimal::from(self.target_utilization_rate)) / BigDecimal::from_ratio(MAX_POS - self.target_utilization)
-    rate = market._target_utilization_rate
+    // BigDecimal::from(self._targetUtilizationRate) +
+    // (pos - target_utilization) * (BigDecimal::from(self.max_utilization_rate) - BigDecimal::from(self._targetUtilizationRate)) / BigDecimal::from_ratio(MAX_POS - self.target_utilization)
+    rate = market._targetUtilizationRate
       .toBigDecimal()
       .div(BD("1000000000000000000000000000"))
       .plus(
         pos
           .minus(target)
           .times(
-            market._max_utilization_rate
-              .minus(market._target_utilization_rate)
+            market._maxUtilizationRate
+              .minus(market._targetUtilizationRate)
               .toBigDecimal()
               .div(BD("1000000000000000000000000000"))
           )
@@ -76,25 +76,35 @@ export function updateApr(
   /* -------------------------------------------------------------------------- */
   /*                                 Supply Rate                                */
   /* -------------------------------------------------------------------------- */
-  const supply_rate = getOrCreateSupplyRate(market);
+  const supply_rate = getOrCreateRate(market, InterestRateSide.LENDER);
   supply_rate.rate = supply_apr.times(BD("100"));
   supply_rate.save();
 
   /* -------------------------------------------------------------------------- */
   /*                                 Borrow Rate                                */
   /* -------------------------------------------------------------------------- */
-  const borrow_rate = getOrCreateBorrowRate(market);
+  const borrow_rate = getOrCreateRate(market, InterestRateSide.LENDER);
   borrow_rate.rate = borrow_apr.times(BD("100"));
   borrow_rate.save();
 
   /* -------------------------------------------------------------------------- */
   /*                               Daily Snapshot                               */
   /* -------------------------------------------------------------------------- */
-  const supplyRateToday = getOrCreateSupplyRate(market, receipt);
+  const supplyRateToday = getOrCreateRate(
+    market,
+    InterestRateSide.LENDER,
+    IntervalType.DAILY,
+    receipt
+  );
   supplyRateToday.rate = supply_apr.times(BD("100"));
   supplyRateToday.save();
 
-  const borrowRateToday = getOrCreateBorrowRate(market, receipt);
+  const borrowRateToday = getOrCreateRate(
+    market,
+    InterestRateSide.BORROWER,
+    IntervalType.DAILY,
+    receipt
+  );
   borrowRateToday.rate = borrow_rate.rate;
   borrowRateToday.save();
 }

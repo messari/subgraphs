@@ -320,7 +320,8 @@ type LendingProtocol implements Protocol @entity {
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
 
-  " Metadata "
+  ##### Add Ons #####
+
   _oracle: String!
   _maxAssets: Int!
   _booster: String!
@@ -654,26 +655,27 @@ type Market @entity {
   " All liquidations made to this market "
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
 
-  " Metadata for this market "
+  ##### Add Ons #####
+
   _totalDeposited: BigDecimal!
   _totalReserved: BigDecimal!
   _totalBorrowed: BigDecimal!
-  _added_to_reserve: BigDecimal!
+  _addedToReserve: BigDecimal!
   _totalDepositedHistory: BigInt!
   _totalWithrawnHistory: BigInt!
   _totalBorrowedHistory: BigInt!
   _totalRepaidHistory: BigInt!
 
-  _last_update_timestamp: BigInt!
+  _lastUpdateTimestamp: BigInt!
   _utilization: BigDecimal!
 
-  _reward_remaining_amounts: [BigInt!]!
+  _rewardRemainingAmounts: [BigInt!]!
 
   _reserveRatio: BigInt!
-  _target_utilization: BigInt!
-  _target_utilization_rate: BigInt!
-  _max_utilization_rate: BigInt!
-  _volatility_ratio: BigInt!
+  _targetUtilization: BigInt!
+  _targetUtilizationRate: BigInt!
+  _maxUtilizationRate: BigInt!
+  _volatilityRatio: BigInt!
 }
 
 #################################
@@ -928,8 +930,9 @@ type Account @entity {
   " All liquidation events where this account got liquidated "
   liquidations: [Liquidate!]! @derivedFrom(field: "liquidatee")
 
-  " Metadata "
-  _last_active_timestamp: BigInt!
+  ##### Add Ons #####
+
+  _lastActiveTimestamp: BigInt!
 }
 
 type Position @entity {
@@ -1002,8 +1005,9 @@ type Position @entity {
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 
-  " Metadata "
-  _last_active_timestamp: BigInt!
+  ##### Add Ons #####
+
+  _lastActiveTimestamp: BigInt!
 }
 
 # Unlike other snapshots that are taken at a fixed time interval. Position
@@ -1258,6 +1262,7 @@ type ActiveAccount @entity {
   id: ID!
 }
 
+# Helper
 type _PositionCounter @entity {
   " { account_id }-{ market_id }-{ side }"
   id: ID!

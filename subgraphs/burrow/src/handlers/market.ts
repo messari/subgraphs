@@ -43,7 +43,7 @@ export function handleNewAsset(event: EventData): void {
     NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
   );
 
-  market._last_update_timestamp = BigInt.fromU64(
+  market._lastUpdateTimestamp = BigInt.fromU64(
     NANOS_TO_MS(receipt.block.header.timestampNanosec)
   );
 
@@ -65,17 +65,17 @@ export function handleNewAsset(event: EventData): void {
     log.info("NEW_ASSET::Target utilization not found", []);
     return;
   }
-  market._target_utilization = BigInt.fromI64(target_utilization.toI64());
+  market._targetUtilization = BigInt.fromI64(target_utilization.toI64());
 
   /* -------------------------------------------------------------------------- */
-  /*                          _target_utilization_rate                          */
+  /*                          _targetUtilization_rate                          */
   /* -------------------------------------------------------------------------- */
   const target_utilization_rate = assetConfig.get("target_utilization_rate");
   if (!target_utilization_rate) {
     log.info("NEW_ASSET::Target utilization rate not found", []);
     return;
   }
-  market._target_utilization_rate = BigInt.fromString(
+  market._targetUtilizationRate = BigInt.fromString(
     target_utilization_rate.toString()
   );
 
@@ -87,7 +87,7 @@ export function handleNewAsset(event: EventData): void {
     log.info("NEW_ASSET::Max utilization rate not found", []);
     return;
   }
-  market._max_utilization_rate = BigInt.fromString(
+  market._maxUtilizationRate = BigInt.fromString(
     max_utilization_rate.toString()
   );
 
@@ -198,7 +198,7 @@ export function handleUpdateAsset(event: EventData): void {
   }
   const assetConfig = assetConfigObj.toObject();
 
-  market._last_update_timestamp = BigInt.fromU64(
+  market._lastUpdateTimestamp = BigInt.fromU64(
     NANOS_TO_MS(receipt.block.header.timestampNanosec)
   );
 
@@ -220,17 +220,17 @@ export function handleUpdateAsset(event: EventData): void {
     log.info("NEW_ASSET::Target utilization not found {}", []);
     return;
   }
-  market._target_utilization = BigInt.fromI64(target_utilization.toI64());
+  market._targetUtilization = BigInt.fromI64(target_utilization.toI64());
 
   /* -------------------------------------------------------------------------- */
-  /*                          _target_utilization_rate                          */
+  /*                          _targetUtilization_rate                          */
   /* -------------------------------------------------------------------------- */
   const target_utilization_rate = assetConfig.get("target_utilization_rate");
   if (!target_utilization_rate) {
     log.info("NEW_ASSET::Target utilization rate not found {}", []);
     return;
   }
-  market._target_utilization_rate = BigInt.fromString(
+  market._targetUtilizationRate = BigInt.fromString(
     target_utilization_rate.toString()
   );
 
@@ -242,7 +242,7 @@ export function handleUpdateAsset(event: EventData): void {
     log.info("NEW_ASSET::Max utilization rate not found {}", []);
     return;
   }
-  market._max_utilization_rate = BigInt.fromString(
+  market._maxUtilizationRate = BigInt.fromString(
     max_utilization_rate.toString()
   );
 
@@ -254,7 +254,7 @@ export function handleUpdateAsset(event: EventData): void {
     log.info("NEW_ASSET::Volatility ratio not found {}", []);
     return;
   }
-  market._volatility_ratio = BigInt.fromI64(volatility_ratio.toI64());
+  market._volatilityRatio = BigInt.fromI64(volatility_ratio.toI64());
 
   /* -------------------------------------------------------------------------- */
   /*                              extra_decimals                                */

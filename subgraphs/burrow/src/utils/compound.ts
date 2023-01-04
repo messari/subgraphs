@@ -19,7 +19,7 @@ export function compound(
 ): BigDecimal[] {
   const time_diff_ms = BigInt.fromU64(
     NANOS_TO_MS(receipt.block.header.timestampNanosec)
-  ).minus(market._last_update_timestamp);
+  ).minus(market._lastUpdateTimestamp);
 
   if (time_diff_ms.equals(BI_ZERO)) {
     return [BD_ZERO, BD_ZERO];
@@ -54,7 +54,7 @@ export function compound(
   // sub remaining reward
   const rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount!;
   const rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD!;
-  const _reward_remaining_amounts = market._reward_remaining_amounts;
+  const _rewardRemainingAmounts = market._rewardRemainingAmounts;
 
   for (let i = 0; i < rewardTokenEmissionsAmount.length; i++) {
     const dailyRewardTokenEmission = rewardTokenEmissionsAmount[i];
@@ -62,23 +62,22 @@ export function compound(
       BigInt.fromI32(24 * 60 * 60 * 1000)
     ); // in millisec
 
-    _reward_remaining_amounts[i] = _reward_remaining_amounts[i].minus(
+    _rewardRemainingAmounts[i] = _rewardRemainingAmounts[i].minus(
       rewardTokenEmittedEveryMs.times(time_diff_ms)
     );
 
-    if (_reward_remaining_amounts[i].lt(rewardTokenEmissionsAmount[i])) {
+    if (_rewardRemainingAmounts[i].lt(rewardTokenEmissionsAmount[i])) {
       rewardTokenEmissionsAmount[i] = BI_ZERO;
       rewardTokenEmissionsUSD[i] = BD_ZERO;
-      _reward_remaining_amounts[i] = BI_ZERO;
+      _rewardRemainingAmounts[i] = BI_ZERO;
     }
   }
-  market._reward_remaining_amounts = _reward_remaining_amounts;
+  market._rewardRemainingAmounts = _rewardRemainingAmounts;
   market.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
 
   // update timestamp
-  market._last_update_timestamp =
-    market._last_update_timestamp.plus(time_diff_ms);
+  market._lastUpdateTimestamp = market._lastUpdateTimestamp.plus(time_diff_ms);
 
   // protocol revenue, supply revenue
   return [reserved, interest.minus(reserved)];

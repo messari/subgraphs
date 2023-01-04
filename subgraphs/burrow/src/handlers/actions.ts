@@ -4,7 +4,6 @@ import {
   getOrCreatePosition,
   getOrCreatePositionSnapshot,
 } from "../helpers/position";
-
 import {
   getOrCreateBorrow,
   getOrCreateDeposit,
@@ -17,7 +16,6 @@ import {
   getOrCreateMarketHourlySnapshot,
 } from "../helpers/market";
 import { getOrCreateToken } from "../helpers/token";
-
 import { updateMarket } from "../update/market";
 import { amount_to_shares } from "../utils/shares";
 import { updateProtocol } from "../update/protocol";
@@ -195,7 +193,6 @@ export function handleDeposit(event: EventData): void {
 
 export function handleDepositToReserve(event: EventData): void {
   const parsedData = parse0(event.data);
-  // const account_id = parsedData[0];
   const amount = parsedData[1];
   const token_id = parsedData[2];
 
@@ -205,7 +202,7 @@ export function handleDepositToReserve(event: EventData): void {
     BigDecimal.fromString(amount)
   );
   // for revenue calculation
-  market._added_to_reserve = market._added_to_reserve.plus(
+  market._addedToReserve = market._addedToReserve.plus(
     BigDecimal.fromString(amount)
   );
 

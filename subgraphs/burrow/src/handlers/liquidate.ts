@@ -62,7 +62,7 @@ export function handleLiquidate(event: EventData): void {
     protocol.cumulativeUniqueLiquidators =
       protocol.cumulativeUniqueLiquidators + 1;
   }
-  if (liquidator._last_active_timestamp.lt(usageDaily.timestamp)) {
+  if (liquidator._lastActiveTimestamp.lt(usageDaily.timestamp)) {
     usageDaily.dailyActiveLiquidators += 1;
   }
 
@@ -81,7 +81,7 @@ export function handleLiquidate(event: EventData): void {
     protocol.cumulativeUniqueLiquidatees =
       protocol.cumulativeUniqueLiquidatees + 1;
   }
-  if (liquidatee._last_active_timestamp.lt(usageDaily.timestamp)) {
+  if (liquidatee._lastActiveTimestamp.lt(usageDaily.timestamp)) {
     usageDaily.dailyActiveLiquidatees += 1;
   }
   liquidatee.liquidationCount += 1;
@@ -450,14 +450,14 @@ export function handleForceClose(event: EventData): void {
     protocol.cumulativeUniqueLiquidators += 1;
     dailyProtocol.cumulativeUniqueLiquidators += 1;
   }
-  if (liquidator._last_active_timestamp.lt(dailyProtocol.timestamp)) {
+  if (liquidator._lastActiveTimestamp.lt(dailyProtocol.timestamp)) {
     dailyProtocol.dailyActiveLiquidators += 1;
   }
   if (liquidatee.liquidationCount == 0) {
     protocol.cumulativeUniqueLiquidatees += 1;
     dailyProtocol.cumulativeUniqueLiquidatees += 1;
   }
-  if (liquidatee._last_active_timestamp.lt(dailyProtocol.timestamp)) {
+  if (liquidatee._lastActiveTimestamp.lt(dailyProtocol.timestamp)) {
     dailyProtocol.dailyActiveLiquidatees += 1;
   }
   protocol.save();

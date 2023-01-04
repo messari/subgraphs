@@ -134,6 +134,11 @@ export namespace UsageType {
   export const SWAP = "SWAP";
 }
 
+export namespace IntervalType {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
+
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
