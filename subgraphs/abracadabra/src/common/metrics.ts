@@ -32,7 +32,7 @@ import {
 } from "./getters";
 import { bigIntToBigDecimal, exponentToBigDecimal } from "./utils/numbers";
 import { DegenBox } from "../../generated/BentoBox/DegenBox";
-import { readValue } from "./utils/utils";
+import { getSnapshotRates, readValue } from "./utils/utils";
 import { getOrCreateAccount } from "../positions";
 import { Cauldron } from "../../generated/templates/Cauldron/Cauldron";
 
