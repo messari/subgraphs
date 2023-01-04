@@ -456,6 +456,13 @@
     "gas": 2381
   },
   {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "inflation_rate",
+    "inputs": [{ "name": "arg0", "type": "uint256" }],
+    "outputs": [{ "name": "", "type": "uint256" }]
+  },
+  {
     "name": "reward_contract",
     "outputs": [{ "type": "address", "name": "" }],
     "inputs": [],
@@ -528,6 +535,25 @@
       { "name": "integral", "type": "uint256" }
     ],
     "gas": 15003
+  },
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "reward_data",
+    "inputs": [{ "name": "arg0", "type": "address" }],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "components": [
+          { "name": "distributor", "type": "address" },
+          { "name": "period_finish", "type": "uint256" },
+          { "name": "rate", "type": "uint256" },
+          { "name": "last_update", "type": "uint256" },
+          { "name": "integral", "type": "uint256" }
+        ]
+      }
+    ]
   },
   {
     "stateMutability": "view",

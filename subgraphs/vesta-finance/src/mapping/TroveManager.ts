@@ -1,8 +1,9 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Redemption,
   TroveLiquidated,
   TroveUpdated,
+  Liquidation,
 } from "../../generated/TroveManager/TroveManager";
 import {
   createBorrow,
@@ -12,21 +13,32 @@ import {
   createWithdraw,
 } from "../entities/event";
 import { getOrCreateTrove } from "../entities/trove";
-import { getCurrentAssetPrice } from "../entities/token";
+import {
+  getCurrentAssetPrice,
+  getOrCreateAssetToken,
+  getVSTTokenPrice,
+} from "../entities/token";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import {
+  ACTIVE_POOL_ADDRESS,
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   LIQUIDATION_FEE,
   LIQUIDATION_RESERVE_VST,
+  VST_ADDRESS,
 } from "../utils/constants";
-import { _Trove } from "../../generated/schema";
+import { _AssetToStabilityPool, _Trove } from "../../generated/schema";
 import {
   addProtocolSideRevenue,
   addSupplySideRevenue,
 } from "../entities/protocol";
 import { updateUserPositionBalances } from "../entities/position";
+import { AssetSentLog, ERC20TransferLog } from "../utils/logs";
+import {
+  getOrCreateMarket,
+  getOrCreateStabilityPool,
+} from "../entities/market";
 
 enum TroveManagerOperation {
   applyPendingRewards,
@@ -37,11 +49,12 @@ enum TroveManagerOperation {
 
 export function handleRedemption(event: Redemption): void {
   const asset = event.params._asset;
+  const market = getOrCreateMarket(asset);
   const feeAmountAsset = event.params._AssetFee;
   const feeAmountUSD = bigIntToBigDecimal(feeAmountAsset).times(
     getCurrentAssetPrice(event.params._asset)
   );
-  addProtocolSideRevenue(event, asset, feeAmountUSD);
+  addProtocolSideRevenue(event, market, feeAmountUSD);
 }
 
 /**
@@ -50,7 +63,6 @@ export function handleRedemption(event: Redemption): void {
  * @param event TroveUpdated event
  */
 export function handleTroveUpdated(event: TroveUpdated): void {
-  //const trove = getOrCreateTrove(event.params._borrower);
   const trove = getOrCreateTrove(event.params._borrower, event.params._asset);
   const operation = event.params.operation as TroveManagerOperation;
   switch (operation) {
@@ -83,6 +95,7 @@ export function handleTroveUpdated(event: TroveUpdated): void {
 export function handleTroveLiquidated(event: TroveLiquidated): void {
   const trove = getOrCreateTrove(event.params._borrower, event.params._asset);
   const asset = event.params._asset;
+  const market = getOrCreateMarket(asset);
   const borrower = event.params._borrower;
   const newCollateral = event.params._coll;
   const newDebt = event.params._debt;
@@ -107,7 +120,7 @@ export function handleTroveLiquidated(event: TroveLiquidated): void {
     );
     createDeposit(
       event,
-      asset,
+      market,
       collateralRewardAsset,
       collateralRewardUSD,
       borrower
@@ -116,7 +129,7 @@ export function handleTroveLiquidated(event: TroveLiquidated): void {
   const borrowAmountVST = newDebt.minus(trove.debt);
   if (borrowAmountVST.gt(BIGINT_ZERO)) {
     const borrowAmountUSD = bigIntToBigDecimal(borrowAmountVST);
-    createBorrow(event, asset, borrowAmountVST, borrowAmountUSD, borrower);
+    createBorrow(event, market, borrowAmountVST, borrowAmountUSD, borrower);
   }
   trove.asset = event.params._asset.toHexString();
   trove.owner = event.params._borrower.toHexString();
@@ -130,6 +143,7 @@ export function handleTroveLiquidated(event: TroveLiquidated): void {
 // Treat applyPendingRewards as deposit + borrow
 function applyPendingRewards(event: TroveUpdated, trove: _Trove): void {
   const asset = event.params._asset;
+  const market = getOrCreateMarket(asset);
   const borrower = event.params._borrower;
   const newCollateral = event.params._coll;
   const newDebt = event.params._debt;
@@ -140,19 +154,20 @@ function applyPendingRewards(event: TroveUpdated, trove: _Trove): void {
   );
   createDeposit(
     event,
-    asset,
+    market,
     collateralRewardAsset,
     collateralRewardUSD,
     borrower
   );
   const borrowAmountVST = newDebt.minus(trove.debt);
   const borrowAmountUSD = bigIntToBigDecimal(borrowAmountVST);
-  createBorrow(event, asset, borrowAmountVST, borrowAmountUSD, borrower);
+  createBorrow(event, market, borrowAmountVST, borrowAmountUSD, borrower);
 }
 
 // Treat redeemCollateral as repay + withdraw
 function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
   const asset = event.params._asset;
+  const market = getOrCreateMarket(asset);
   const newCollateral = event.params._coll;
   const newDebt = event.params._debt;
 
@@ -160,7 +175,7 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
   const repayAmountUSD = bigIntToBigDecimal(repayAmountVST);
   createRepay(
     event,
-    asset,
+    market,
     repayAmountVST,
     repayAmountUSD,
     Address.fromString(trove.owner),
@@ -180,7 +195,7 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
   );
   createWithdraw(
     event,
-    asset,
+    market,
     withdrawAmountAsset,
     withdrawAmountUSD,
     Address.fromString(trove.owner),
@@ -190,6 +205,7 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
 
 function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
   const asset = event.params._asset;
+  const market = getOrCreateMarket(asset);
   const amountLiquidatedAsset = trove.collateral;
   const amountLiquidatedUSD = bigIntToBigDecimal(amountLiquidatedAsset).times(
     getCurrentAssetPrice(asset)
@@ -199,7 +215,7 @@ function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
     .plus(LIQUIDATION_RESERVE_VST);
   createLiquidate(
     event,
-    asset,
+    market,
     amountLiquidatedAsset,
     amountLiquidatedUSD,
     profitUSD,
@@ -212,7 +228,134 @@ function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
     .minus(liquidatedDebtUSD);
 
   if (supplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    addSupplySideRevenue(event, asset, supplySideRevenueUSD);
+    addSupplySideRevenue(event, market, supplySideRevenueUSD);
   }
-  addProtocolSideRevenue(event, asset, profitUSD);
+  addProtocolSideRevenue(event, market, profitUSD);
+}
+
+/**
+ * Emitted once per transaction containing at least one liquidation.
+ * The event contains the total amount liquidated from all liquidations in the transaction.
+ * We use this event to calculate the amount of VST that was burned from the stability pool
+ * in exchange of how much Asset collateral. From here we calulate StabilityPool revenue.
+ *
+ * @param event Liquidation event
+ */
+export function handleLiquidation(event: Liquidation): void {
+  // To accurately calculate the revenue generated by the Stability pool we
+  // compare the amount of VST that was burned to the amount of Asset that was
+  // sent to the StabilityPool. The USD difference of the amounts will be the
+  // StabilityPool revenue.
+  if (!event.receipt) {
+    log.error(
+      "[handleLiquidation]Unable to calculate liquidation revenue, no receipt found. Tx Hash: {}",
+      [event.transaction.hash.toHexString()]
+    );
+    return;
+  }
+
+  const asset = event.params._asset;
+  const stabilityPoolID = _AssetToStabilityPool.load(asset.toHexString())!
+    .stabilityPool!;
+  const stabilityPoolAddress = Address.fromString(stabilityPoolID);
+
+  let vstBurned = BIGINT_ZERO;
+  let assetSent = BIGINT_ZERO;
+  for (let i = 0; i < event.receipt!.logs.length; i++) {
+    const txLog = event.receipt!.logs[i];
+    const burned = stabilityPoolVSTBurn(txLog, stabilityPoolAddress);
+    if (burned) {
+      vstBurned = vstBurned.plus(burned);
+      continue;
+    }
+
+    const assetAmount = assetSentToStabilityPool(txLog, stabilityPoolAddress);
+    if (assetAmount) {
+      assetSent = assetSent.plus(assetAmount);
+      continue;
+    }
+  }
+
+  if (vstBurned.equals(BIGINT_ZERO) || assetSent.equals(BIGINT_ZERO)) {
+    log.error(
+      "[handleLiquidation]no VST burned {} or asset sent {} on this liquidationtx {}",
+      [
+        vstBurned.toString(),
+        assetSent.toString(),
+        event.transaction.hash.toHexString(),
+      ]
+    );
+    return;
+  }
+
+  const market = getOrCreateStabilityPool(stabilityPoolAddress, null, event);
+  const vstPriceUSD = getVSTTokenPrice(event);
+  const vstValueUSD = vstPriceUSD.times(bigIntToBigDecimal(vstBurned));
+
+  const assetPrice = getCurrentAssetPrice(asset);
+  const token = getOrCreateAssetToken(asset);
+  const assetValueUSD = bigIntToBigDecimal(assetSent, token.decimals).times(
+    assetPrice
+  );
+
+  const revenue = assetValueUSD.minus(vstValueUSD);
+  log.info(
+    "[handleLiquidation]tx {} market {} asset={} revenue={}: vstBurned={},vstPrice={},assetSent={},assetPrice={}",
+    [
+      event.transaction.hash.toHexString(),
+      market.id,
+      asset.toHexString(),
+      revenue.toString(),
+      vstBurned.toString(),
+      vstPriceUSD.toString(),
+      assetSent.toString(),
+      assetPrice.toString(),
+    ]
+  );
+
+  addSupplySideRevenue(event, market, revenue);
+}
+
+// stabilityPoolVSTBurn will return the amount of VST burned as indicated by this log.
+// If the log is not a VST burn log, it will return null.
+function stabilityPoolVSTBurn(
+  txLog: ethereum.Log,
+  spAddress: Address
+): BigInt | null {
+  const transfer = ERC20TransferLog.parse(txLog);
+  if (!transfer) {
+    return null;
+  }
+
+  if (
+    transfer.tokenAddr.equals(Address.fromString(VST_ADDRESS)) &&
+    transfer.from.equals(spAddress) &&
+    transfer.to.equals(Address.zero())
+  ) {
+    return transfer.amount;
+  }
+
+  return null;
+}
+
+// assetSentToStabilityPool will return the amount of asset sent to the StabilityPool.
+// If this log is not AssetSent, or the destination is not the StabilityPool it will
+// return null.
+function assetSentToStabilityPool(
+  log: ethereum.Log,
+  spAddress: Address
+): BigInt | null {
+  const decoded = AssetSentLog.parse(log);
+  if (!decoded) {
+    return null;
+  }
+
+  if (
+    decoded.contractAddr.equals(Address.fromString(ACTIVE_POOL_ADDRESS)) &&
+    decoded.to.equals(spAddress)
+  ) {
+    return decoded.amount;
+  }
+
+  return null;
 }

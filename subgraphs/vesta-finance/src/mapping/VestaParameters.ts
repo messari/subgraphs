@@ -6,21 +6,16 @@ import {
   VestaParameters,
 } from "../../generated/VestaParameters/VestaParameters";
 import { LendingProtocol, Market } from "../../generated/schema";
-import { PriceFeed } from "../../generated/templates";
 import {
   getOrCreateLendingProtocol,
   updateProtocolPriceOracle,
 } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
-import {
-  BIGDECIMAL_HUNDRED,
-  BIGINT_ZERO,
-} from "../utils/constants";
+import { BIGDECIMAL_HUNDRED, BIGINT_ZERO } from "../utils/constants";
 
 export function handlePriceFeedChanged(event: PriceFeedChanged): void {
   const newPriceOracle = event.params.addr;
   updateProtocolPriceOracle(newPriceOracle.toHexString());
-  PriceFeed.create(newPriceOracle);
 }
 
 export function handleMCRChanged(event: MCRChanged): void {

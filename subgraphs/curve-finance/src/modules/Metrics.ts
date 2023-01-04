@@ -1,10 +1,4 @@
-import {
-  log,
-  BigInt,
-  Address,
-  ethereum,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   ActiveAccount,
   LiquidityPool as LiquidityPoolStore,
@@ -24,7 +18,7 @@ import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
-  const account = getOrCreateAccount(from.toHexString());
+  getOrCreateAccount(from.toHexString());
 
   const protocol = getOrCreateDexAmmProtocol();
   const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block);
@@ -42,7 +36,7 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (
+  const dailyActiveAccountId = (
     block.timestamp.toI64() / constants.SECONDS_PER_DAY
   )
     .toString()
@@ -67,7 +61,7 @@ export function updatePoolSnapshots(
   poolAddress: Address,
   block: ethereum.Block
 ): void {
-  let pool = LiquidityPoolStore.load(poolAddress.toHexString());
+  const pool = LiquidityPoolStore.load(poolAddress.toHexString());
   if (!pool) return;
 
   const poolDailySnapshots = getOrCreateLiquidityPoolDailySnapshots(
@@ -98,6 +92,9 @@ export function updatePoolSnapshots(
     pool.rewardTokenEmissionsAmount;
   poolHourlySnapshots.rewardTokenEmissionsAmount =
     pool.rewardTokenEmissionsAmount;
+
+  poolDailySnapshots.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
+  poolHourlySnapshots.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
 
   poolDailySnapshots.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
   poolHourlySnapshots.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
@@ -160,37 +157,33 @@ export function updateTokenVolume(
 
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  let poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
+  const poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
     poolAddress.toHexString(),
     block
   );
-  let poolHourlySnaphot = getOrCreateLiquidityPoolHourlySnapshots(
+  const poolHourlySnaphot = getOrCreateLiquidityPoolHourlySnapshots(
     poolAddress.toHexString(),
     block
   );
 
-  let tokenIndex = pool.inputTokens.indexOf(tokenAddress);
+  const tokenIndex = pool.inputTokens.indexOf(tokenAddress);
   if (tokenIndex == -1 && !underlying) return;
 
-  let dailyVolumeByTokenAmount = poolDailySnaphot.dailyVolumeByTokenAmount;
-  dailyVolumeByTokenAmount[tokenIndex] = dailyVolumeByTokenAmount[
-    tokenIndex
-  ].plus(tokenAmount);
+  const dailyVolumeByTokenAmount = poolDailySnaphot.dailyVolumeByTokenAmount;
+  dailyVolumeByTokenAmount[tokenIndex] =
+    dailyVolumeByTokenAmount[tokenIndex].plus(tokenAmount);
 
-  let hourlyVolumeByTokenAmount = poolHourlySnaphot.hourlyVolumeByTokenAmount;
-  hourlyVolumeByTokenAmount[tokenIndex] = hourlyVolumeByTokenAmount[
-    tokenIndex
-  ].plus(tokenAmount);
+  const hourlyVolumeByTokenAmount = poolHourlySnaphot.hourlyVolumeByTokenAmount;
+  hourlyVolumeByTokenAmount[tokenIndex] =
+    hourlyVolumeByTokenAmount[tokenIndex].plus(tokenAmount);
 
-  let dailyVolumeByTokenUSD = poolDailySnaphot.dailyVolumeByTokenUSD;
-  dailyVolumeByTokenUSD[tokenIndex] = dailyVolumeByTokenUSD[tokenIndex].plus(
-    tokenAmountUSD
-  );
+  const dailyVolumeByTokenUSD = poolDailySnaphot.dailyVolumeByTokenUSD;
+  dailyVolumeByTokenUSD[tokenIndex] =
+    dailyVolumeByTokenUSD[tokenIndex].plus(tokenAmountUSD);
 
-  let hourlyVolumeByTokenUSD = poolHourlySnaphot.hourlyVolumeByTokenUSD;
-  hourlyVolumeByTokenUSD[tokenIndex] = hourlyVolumeByTokenUSD[tokenIndex].plus(
-    tokenAmountUSD
-  );
+  const hourlyVolumeByTokenUSD = poolHourlySnaphot.hourlyVolumeByTokenUSD;
+  hourlyVolumeByTokenUSD[tokenIndex] =
+    hourlyVolumeByTokenUSD[tokenIndex].plus(tokenAmountUSD);
 
   poolDailySnaphot.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
   poolHourlySnaphot.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
@@ -207,26 +200,23 @@ export function updateSnapshotsVolume(
   volumeUSD: BigDecimal,
   block: ethereum.Block
 ): void {
-  let protcol = getOrCreateDexAmmProtocol();
-  let financialsDailySnapshot = getOrCreateFinancialDailySnapshots(block);
-  let poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
+  const protcol = getOrCreateDexAmmProtocol();
+  const financialsDailySnapshot = getOrCreateFinancialDailySnapshots(block);
+  const poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(
     poolAddress.toHexString(),
     block
   );
-  let poolHourlySnaphot = getOrCreateLiquidityPoolHourlySnapshots(
+  const poolHourlySnaphot = getOrCreateLiquidityPoolHourlySnapshots(
     poolAddress.toHexString(),
     block
   );
 
-  financialsDailySnapshot.dailyVolumeUSD = financialsDailySnapshot.dailyVolumeUSD.plus(
-    volumeUSD
-  );
-  poolDailySnaphot.dailyVolumeUSD = poolDailySnaphot.dailyVolumeUSD.plus(
-    volumeUSD
-  );
-  poolHourlySnaphot.hourlyVolumeUSD = poolHourlySnaphot.hourlyVolumeUSD.plus(
-    volumeUSD
-  );
+  financialsDailySnapshot.dailyVolumeUSD =
+    financialsDailySnapshot.dailyVolumeUSD.plus(volumeUSD);
+  poolDailySnaphot.dailyVolumeUSD =
+    poolDailySnaphot.dailyVolumeUSD.plus(volumeUSD);
+  poolHourlySnaphot.hourlyVolumeUSD =
+    poolHourlySnaphot.hourlyVolumeUSD.plus(volumeUSD);
   protcol.cumulativeVolumeUSD = protcol.cumulativeVolumeUSD.plus(volumeUSD);
 
   financialsDailySnapshot.save();
@@ -243,8 +233,8 @@ export function updateProtocolRevenue(
   const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
   const poolFees = utils.getPoolFees(liquidityPoolAddress);
 
-  let supplySideRevenueUSD = poolFees.getLpFees.times(volumeUSD);
-  let protocolSideRevenueUSD = poolFees.getProtocolFees.times(volumeUSD);
+  const supplySideRevenueUSD = poolFees.getLpFees.times(volumeUSD);
+  const protocolSideRevenueUSD = poolFees.getProtocolFees.times(volumeUSD);
 
   updateRevenueSnapshots(
     pool,
