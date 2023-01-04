@@ -32,6 +32,10 @@ function handleAction(
   const methodName = action.toFunctionCall().methodName;
   const methodArgs = action.toFunctionCall().args;
   const argsData = json.try_fromBytes(methodArgs);
+  if (argsData.isError) {
+    log.warning("[handleAction] Error parsing args {}", [methodName]);
+    return;
+  }
 
   const argsObject = argsData.value.toObject();
   const eventData = new EventData(
