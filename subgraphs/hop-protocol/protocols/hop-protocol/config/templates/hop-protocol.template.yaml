@@ -1,0 +1,190 @@
+specVersion: 0.0.6
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+{{#isMainnet}}
+dataSources:
+{{#tokens}}
+  - kind: ethereum/contract
+    name: {{dataSourceName}}
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: Token
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Transfer
+      abis:
+        - name: Token
+          file: ./abis/Token.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/hop-protocol/src/{{network}}/token.ts
+{{/tokens}}
+{{#bridges}}
+  - kind: ethereum/contract
+    name: {{dataSourceName}}
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: L1_Bridge
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - BonderAdded
+        - BonderRemoved
+        - ChallengeResolved
+        - MultipleWithdrawalsSettled
+        - Stake
+        - TransferBondChallenged
+        - TransferRootBonded
+        - TransferRootConfirmed
+        - TransferRootSet
+        - TransferSentToL2
+        - Unstake
+        - WithdrawalBondSettled
+        - WithdrawalBonded
+        - Withdrew
+      abis:
+        - name: L1_Bridge
+          file: ./abis/L1_Bridge.json
+      eventHandlers:
+        - event: BonderAdded(indexed address)
+          handler: handleBonderAdded
+        - event: BonderRemoved(indexed address)
+          handler: handleBonderRemoved
+        - event: ChallengeResolved(indexed bytes32,indexed bytes32,uint256)
+          handler: handleChallengeResolved
+        - event: MultipleWithdrawalsSettled(indexed address,indexed bytes32,uint256)
+          handler: handleMultipleWithdrawalsSettled
+        - event: Stake(indexed address,uint256)
+          handler: handleStake
+        - event: TransferBondChallenged(indexed bytes32,indexed bytes32,uint256)
+          handler: handleTransferBondChallenged
+        - event: TransferRootBonded(indexed bytes32,uint256)
+          handler: handleTransferRootBonded
+        - event: TransferRootConfirmed(indexed uint256,indexed uint256,indexed bytes32,uint256)
+          handler: handleTransferRootConfirmed
+        - event: TransferRootSet(indexed bytes32,uint256)
+          handler: handleTransferRootSet
+        - event: TransferSentToL2(indexed uint256,indexed address,uint256,uint256,uint256,indexed address,uint256)
+          handler: handleTransferSentToL2
+        - event: Unstake(indexed address,uint256)
+          handler: handleUnstake
+        - event: WithdrawalBondSettled(indexed address,indexed bytes32,indexed bytes32)
+          handler: handleWithdrawalBondSettled
+        - event: WithdrawalBonded(indexed bytes32,uint256)
+          handler: handleWithdrawalBonded
+        - event: Withdrew(indexed bytes32,indexed address,uint256,bytes32)
+          handler: handleWithdrew
+      file: ./protocols/hop-protocol/src/{{network}}/bridge.ts
+{{/bridges}}
+{{/isMainnet}}
+
+{{^isMainnet}}
+dataSources:
+{{#amms}}
+  - kind: ethereum/contract
+    name: {{dataSourceName}}
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: L2_Amm
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - TokenSwap
+        - AddLiquidity
+        - RemoveLiquidity
+        - RemoveLiquidityOne
+        - RemoveLiquidityImbalance
+      abis:
+        - name: L2_Amm
+          file: ./abis/L2_Amm.json
+      eventHandlers:
+        - event: TokenSwap(indexed address,uint256,uint256,uint128,uint128)
+          handler: handleTokenSwap
+        - event: AddLiquidity(indexed address,uint256[],uint256[],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: RemoveLiquidityImbalance(indexed address,uint256[],uint256[],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+      file: ./protocols/hop-protocol/src/{{network}}/amm.ts
+{{/amms}}
+{{#bridges}}
+  - kind: ethereum/contract
+    name: {{dataSourceName}}
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: L2_Bridge
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - BonderAdded
+        - BonderRemoved
+        - MultipleWithdrawalsSettled
+        - Stake
+        - TransferFromL1Completed
+        - TransferRootSet
+        - TransferSent
+        - TransfersCommitted
+        - Unstake
+        - WithdrawalBondSettled
+        - WithdrawalBonded
+        - Withdrew
+      abis:
+        - name: L2_Bridge
+          file: ./abis/L2_Bridge.json
+      eventHandlers:
+        - event: BonderAdded(indexed address)
+          handler: handleBonderAdded
+        - event: BonderRemoved(indexed address)
+          handler: handleBonderRemoved
+        - event: MultipleWithdrawalsSettled(indexed address,indexed bytes32,uint256)
+          handler: handleMultipleWithdrawalsSettled
+        - event: Stake(indexed address,uint256)
+          handler: handleStake
+        - event: TransferFromL1Completed(indexed address,uint256,uint256,uint256,indexed address,uint256)
+          handler: handleTransferFromL1Completed
+        - event: TransferRootSet(indexed bytes32,uint256)
+          handler: handleTransferRootSet
+        - event: TransferSent(indexed bytes32,indexed uint256,indexed address,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleTransferSent
+        - event: TransfersCommitted(indexed uint256,indexed bytes32,uint256,uint256)
+          handler: handleTransfersCommitted
+        - event: Unstake(indexed address,uint256)
+          handler: handleUnstake
+        - event: WithdrawalBondSettled(indexed address,indexed bytes32,indexed bytes32)
+          handler: handleWithdrawalBondSettled
+        - event: WithdrawalBonded(indexed bytes32,uint256)
+          handler: handleWithdrawalBonded
+        - event: Withdrew(indexed bytes32,indexed address,uint256,bytes32)
+          handler: handleWithdrew
+      file: ./protocols/hop-protocol/src/{{network}}/bridge.ts
+{{/bridges}}
+{{/isMainnet}}
