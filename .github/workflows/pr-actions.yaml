@@ -57,11 +57,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prettify code check
-        - uses: actions/checkout@v2
-        - uses: actionsx/prettier@v2
-          with:
-            # prettier CLI arguments.
-            args: --check "subgraphs/**/*.ts"
+      - uses: actions/checkout@v2
+      - uses: actionsx/prettier@v2
+        with:
+          args: --check "subgraphs/**/*.ts"
 
   Build:
     runs-on: macos-latest
