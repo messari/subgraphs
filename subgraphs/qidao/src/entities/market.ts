@@ -34,7 +34,7 @@ import {
   updateProtocolBorrowBalance,
   updateProtocolTVL,
 } from "./protocol";
-import { getMaiToken, getOrCreateToken } from "./token";
+import { getOrCreateToken } from "./token";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 
 export function getMarket(address: Address): Market {
@@ -47,7 +47,7 @@ export function createERC20Market(event: ethereum.Event): void {
   let market = Market.load(id);
   if (!market) {
     const contract = erc20QiStablecoin.bind(event.address);
-    const protocol = getOrCreateLendingProtocol()
+    const protocol = getOrCreateLendingProtocol();
     market = new Market(id);
     market.protocol = protocol.id;
     market.name = contract.name();
@@ -88,7 +88,7 @@ export function createMaticMarket(event: ethereum.Event): void {
   let market = Market.load(id);
   if (!market) {
     const contract = QiStablecoin.bind(event.address);
-    const protocol = getOrCreateLendingProtocol()
+    const protocol = getOrCreateLendingProtocol();
     market = new Market(id);
     market.protocol = protocol.id;
     market.name = contract.name();
@@ -152,8 +152,10 @@ export function getOrCreateMarketSnapshot(
   marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
 
-  marketSnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
-  marketSnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketSnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketSnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
   marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
 
   marketSnapshot.inputTokenBalance = market.inputTokenBalance;
@@ -196,8 +198,10 @@ export function getOrCreateMarketHourlySnapshot(
   marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
 
-  marketSnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
-  marketSnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketSnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketSnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
   marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
 
   marketSnapshot.inputTokenBalance = market.inputTokenBalance;
@@ -247,7 +251,7 @@ export function handleMarketWithdraw(
   const protocol = getOrCreateLendingProtocol();
   const financialSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialSnapshot.dailyWithdrawUSD =
-    financialSnapshot.dailyWithdrawUSD.plus(amountUSD)
+    financialSnapshot.dailyWithdrawUSD.plus(amountUSD);
   financialSnapshot.save();
 
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
@@ -268,7 +272,7 @@ export function handleMarketLiquidate(
   token: Token
 ): void {
   const amount = liquidate.amount;
-  const amountUSD = liquidate.amountUSD!;
+  const amountUSD = liquidate.amountUSD;
   market.inputTokenBalance = market.inputTokenBalance.minus(amount);
   updateTVL(event, market, token);
   market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(amountUSD);
@@ -290,7 +294,7 @@ export function handleMarketBorrow(
   market: Market,
   borrow: Borrow
 ): void {
-  const amountUSD = borrow.amountUSD!;
+  const amountUSD = borrow.amountUSD;
   market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(amountUSD);
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
   market.save();
@@ -314,23 +318,21 @@ export function handleMarketRepay(
   updateMarketBorrowBalance(
     event,
     market,
-    BIGDECIMAL_ZERO.minus(repay.amountUSD!)
+    BIGDECIMAL_ZERO.minus(repay.amountUSD)
   );
 
   const protocol = getOrCreateLendingProtocol();
   const financialSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
-  financialSnapshot.dailyRepayUSD = 
-    financialSnapshot.dailyRepayUSD.plus(amountUSD)
+  financialSnapshot.dailyRepayUSD =
+    financialSnapshot.dailyRepayUSD.plus(amountUSD);
   financialSnapshot.save();
 
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
-  dailySnapshot.dailyRepayUSD =
-    dailySnapshot.dailyRepayUSD.plus(amountUSD);
+  dailySnapshot.dailyRepayUSD = dailySnapshot.dailyRepayUSD.plus(amountUSD);
   dailySnapshot.save();
 
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  hourlySnapshot.hourlyRepayUSD =
-    hourlySnapshot.hourlyRepayUSD.plus(amountUSD);
+  hourlySnapshot.hourlyRepayUSD = hourlySnapshot.hourlyRepayUSD.plus(amountUSD);
   hourlySnapshot.save();
 }
 

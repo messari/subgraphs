@@ -9,7 +9,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.10",
+          "subgraph": "1.2.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -31,7 +31,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.10",
+          "subgraph": "1.2.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -53,7 +53,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.10",
+          "subgraph": "1.2.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -75,7 +75,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.10",
+          "subgraph": "1.2.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -97,7 +97,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.10",
+          "subgraph": "1.2.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -130,7 +130,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.17",
+          "subgraph": "1.2.18",
           "methodology": "1.0.0"
         },
         "files": {
@@ -163,7 +163,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.17",
+          "subgraph": "1.2.18",
           "methodology": "1.0.0"
         },
         "files": {
@@ -196,7 +196,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.17",
+          "subgraph": "1.2.18",
           "methodology": "1.0.0"
         },
         "files": {
@@ -229,7 +229,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.16",
+          "subgraph": "1.2.17",
           "methodology": "1.0.0"
         },
         "files": {
@@ -251,7 +251,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.16",
+          "subgraph": "1.2.17",
           "methodology": "1.0.0"
         },
         "files": {
@@ -277,7 +277,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.17",
+          "subgraph": "1.2.18",
           "methodology": "1.0.0"
         },
         "files": {
@@ -445,7 +445,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1067,7 +1067,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.0",
+          "subgraph": "1.2.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1096,7 +1096,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.8",
+          "subgraph": "1.1.9",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1125,7 +1125,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.8",
+          "subgraph": "1.1.9",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1154,7 +1154,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.8",
+          "subgraph": "1.1.9",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1183,7 +1183,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1241,7 +1241,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.7.7",
+          "subgraph": "1.7.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1274,7 +1274,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.8",
+          "subgraph": "1.1.9",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1296,7 +1296,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.5",
+          "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1318,7 +1318,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.5",
+          "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1344,7 +1344,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.5",
+          "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1373,7 +1373,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.5",
+          "subgraph": "1.2.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1395,7 +1395,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.5",
+          "subgraph": "1.2.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1417,7 +1417,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.5",
+          "subgraph": "1.2.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1439,7 +1439,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.5",
+          "subgraph": "1.2.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1465,7 +1465,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.5",
+          "subgraph": "1.2.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1487,7 +1487,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.5",
+          "subgraph": "1.2.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1516,7 +1516,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.8",
+          "subgraph": "1.1.9",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1538,7 +1538,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1564,7 +1564,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1586,7 +1586,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.8",
+          "subgraph": "1.1.9",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1615,7 +1615,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.8",
+          "subgraph": "1.1.9",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1637,7 +1637,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.8",
+          "subgraph": "1.1.9",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1666,7 +1666,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -1695,7 +1695,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1717,7 +1717,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.9",
+          "subgraph": "1.1.10",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1750,7 +1750,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1779,7 +1779,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.1",
+          "subgraph": "1.2.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1808,7 +1808,7 @@
         "status": "dev",
         "versions": {
           "schema": "3.0.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1837,7 +1837,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1845,7 +1845,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1854,12 +1854,12 @@
           }
         }
       },
-      "curve-finance-avalanche": {
-        "network": "avalanche",
+      "curve-finance-aurora": {
+        "network": "aurora",
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1867,7 +1867,29 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-aurora",
+            "query-id": "curve-finance-aurora"
+          }
+        }
+      },
+      "curve-finance-avalanche": {
+        "network": "avalanche",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "curve.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1881,7 +1903,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1889,7 +1911,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1907,7 +1929,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1915,7 +1937,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1929,7 +1951,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1937,7 +1959,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1946,12 +1968,12 @@
           }
         }
       },
-      "curve-finance-optimism": {
-        "network": "optimism",
+      "curve-finance-harmony": {
+        "network": "harmony",
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1959,7 +1981,51 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-harmony",
+            "query-id": "curve-finance-harmony"
+          }
+        }
+      },
+      "curve-finance-moonbeam": {
+        "network": "moonbeam",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "curve.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-moonbeam",
+            "query-id": "curve-finance-moonbeam"
+          }
+        }
+      },
+      "curve-finance-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "curve.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1973,7 +2039,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1981,7 +2047,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -2122,7 +2188,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2151,7 +2217,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.5",
+          "subgraph": "1.2.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2217,7 +2283,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.3.0",
+          "subgraph": "1.3.1",
           "methodology": "1.0.1"
         },
         "files": {
@@ -2250,8 +2316,8 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.1",
-          "methodology": "1.0.0"
+          "subgraph": "1.1.0",
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "vesta.finance.template.yaml"
@@ -2279,7 +2345,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.3",
+          "subgraph": "1.0.4",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2879,7 +2945,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "2.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -2912,7 +2978,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.1.0"
         },
         "files": {
@@ -3069,7 +3135,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.12",
+          "subgraph": "1.0.13",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3098,7 +3164,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.3",
+          "subgraph": "1.0.4",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3127,7 +3193,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.6",
+          "subgraph": "1.0.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3189,7 +3255,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3211,7 +3277,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3233,7 +3299,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3259,7 +3325,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3281,7 +3347,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3310,7 +3376,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.4",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3332,7 +3398,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.4",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3354,7 +3420,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.4",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3376,7 +3442,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.4",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3398,7 +3464,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.4",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3420,7 +3486,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.4",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3442,7 +3508,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.4",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3464,7 +3530,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.4",
           "methodology": "1.0.1"
         },
         "files": {

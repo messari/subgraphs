@@ -189,7 +189,7 @@ export function updatePosition(
   const account = getOrCreateAccount(accountId);
 
   // interest rate side
-  let side: string;
+  let side: string | null = null;
   if (
     [TransactionType.DEPOSIT, TransactionType.WITHDRAW].includes(
       transactionType
@@ -200,6 +200,12 @@ export function updatePosition(
     [TransactionType.BORROW, TransactionType.REPAY].includes(transactionType)
   ) {
     side = InterestRateSide.BORROWER;
+  }
+  if (!side) {
+    log.error("[updatePosition] No side available event: {}", [
+      event.transaction.hash.toHexString(),
+    ]);
+    return;
   }
 
   const position = getOrCreatePosition(event, account, market, side!);

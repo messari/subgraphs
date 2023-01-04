@@ -779,9 +779,14 @@ export class DataManager {
 
   updateRewards(rewardData: RewardData): void {
     if (!this.market.rewardTokens) {
-      this.market.rewardTokens = [];
-      this.market.rewardTokenEmissionsAmount = [];
-      this.market.rewardTokenEmissionsUSD = [];
+      this.market.rewardTokens = [rewardData.rewardToken.id];
+      this.market.rewardTokenEmissionsAmount = [
+        rewardData.rewardTokenEmissionsAmount,
+      ];
+      this.market.rewardTokenEmissionsUSD = [
+        rewardData.rewardTokenEmissionsUSD,
+      ];
+      return; // initial add is manual
     }
 
     // update market reward tokens with rewardData so that it is in alphabetical order
@@ -792,16 +797,16 @@ export class DataManager {
     for (let i = 0; i < rewardTokens.length; i++) {
       const index = rewardData.rewardToken.id.localeCompare(rewardTokens[i]);
       if (index < 0) {
-        // insert rewardData at index i - 1
-        rewardTokens = insert(rewardTokens, i - 1, rewardData.rewardToken.id);
+        // insert rewardData at index i
+        rewardTokens = insert(rewardTokens, i, rewardData.rewardToken.id);
         rewardTokenEmissionsAmount = insert(
           rewardTokenEmissionsAmount,
-          i - 1,
+          i,
           rewardData.rewardTokenEmissionsAmount
         );
         rewardTokenEmissionsUSD = insert(
           rewardTokenEmissionsUSD,
-          i - 1,
+          i,
           rewardData.rewardTokenEmissionsUSD
         );
         break;

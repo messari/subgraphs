@@ -188,8 +188,9 @@ export class SnapshotManager {
       this.market.variableBorrowedTokenBalance;
     snapshot.stableBorrowedTokenBalance =
       this.market.stableBorrowedTokenBalance;
+    snapshot.supplyCap = this.market.supplyCap;
+    snapshot.borrowCap = this.market.borrowCap;
     snapshot.totalValueLockedUSD = this.market.totalValueLockedUSD;
-    snapshot.totalReservesUSD = this.market.totalReservesUSD;
     snapshot.cumulativeSupplySideRevenueUSD =
       this.market.cumulativeSupplySideRevenueUSD;
     snapshot.cumulativeProtocolSideRevenueUSD =

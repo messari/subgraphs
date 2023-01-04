@@ -1,5 +1,12 @@
 [
   {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "last_request",
+    "inputs": [{ "name": "_gauge", "type": "address" }],
+    "outputs": [{ "name": "", "type": "uint256" }]
+  },
+  {
     "name": "CommitOwnership",
     "inputs": [{ "type": "address", "name": "admin", "indexed": false }],
     "anonymous": false,
@@ -59,6 +66,18 @@
       { "type": "address", "name": "addr", "indexed": false },
       { "type": "int128", "name": "gauge_type", "indexed": false },
       { "type": "uint256", "name": "weight", "indexed": false }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "DeployedGauge",
+    "inputs": [
+      { "name": "_implementation", "type": "address", "indexed": true },
+      { "name": "_lp_token", "type": "address", "indexed": true },
+      { "name": "_deployer", "type": "address", "indexed": true },
+      { "name": "_salt", "type": "bytes32", "indexed": false },
+      { "name": "_gauge", "type": "address", "indexed": false }
     ],
     "anonymous": false,
     "type": "event"

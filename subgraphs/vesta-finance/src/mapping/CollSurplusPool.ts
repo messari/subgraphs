@@ -9,6 +9,7 @@ import { getTrove } from "../entities/trove";
 import { getOrCreateLendingProtocol } from "../entities/protocol";
 import { BIGINT_ZERO } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
+import { getOrCreateMarket } from "../entities/market";
 
 /**
  * Whenever a borrower's trove is closed by a non-owner address because of either:
@@ -24,7 +25,7 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
   const assets = protocol._marketAssets;
   const account = event.params._account;
   const contract = CollSurplusPool.bind(event.address);
-  let asset: string | null = null;
+  let assetStr: string | null = null;
 
   // As the asset address is not included in the event's paramters, comparing every address's previous
   // balance with current balance to determine which asset the event is related with.
@@ -36,18 +37,20 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
     const tmpTrove = getTrove(account, Address.fromString(assets[i]));
     if (tmpTrove != null && !tryAssetBalanceResult.reverted) {
       if (tryAssetBalanceResult.value != tmpTrove.collateralSurplus) {
-        asset = assets[i];
+        assetStr = assets[i];
         break;
       }
     }
   }
 
-  if (asset == null) {
+  if (assetStr == null) {
     return;
   }
 
+  const asset = Address.fromString(assetStr!);
+  const market = getOrCreateMarket(asset);
   const collateralSurplusAsset = event.params._newBalance;
-  const trove = getTrove(account, Address.fromString(asset!));
+  const trove = getTrove(account, asset);
   if (trove != null) {
     if (collateralSurplusAsset > trove.collateralSurplus) {
       trove.collateralSurplusChange = collateralSurplusAsset.minus(
@@ -55,10 +58,10 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
       );
       const collateralSurplusUSD = bigIntToBigDecimal(
         trove.collateralSurplusChange
-      ).times(getCurrentAssetPrice(Address.fromString(asset!)));
+      ).times(getCurrentAssetPrice(asset));
       createWithdraw(
         event,
-        Address.fromString(asset!),
+        market,
         trove.collateralSurplusChange,
         collateralSurplusUSD,
         account,

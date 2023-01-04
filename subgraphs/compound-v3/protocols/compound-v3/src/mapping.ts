@@ -255,6 +255,10 @@ export function handleSetBaseTrackingBorrowSpeed(
       [event.params.cometProxy.toHexString()]
     );
     return;
+  } else {
+    log.warning("base speed; {}", [
+      event.params.newBaseTrackingBorrowSpeed.toString(),
+    ]);
   }
 
   const marketID = event.params.cometProxy.concat(tryBaseToken.value);
@@ -970,6 +974,15 @@ function updateRewards(
     return;
   }
 
+  const tryBaseTrackingBorrow = cometContract.try_baseTrackingBorrowSpeed();
+  const tryBaseTrackingSupply = cometContract.try_baseTrackingSupplySpeed();
+  if (tryBaseTrackingBorrow.reverted || tryBaseTrackingSupply.reverted) {
+    log.error(
+      "[updateRewards] Contract call on base tracking speed failed on market: {}",
+      [market.id.toHexString()]
+    );
+  }
+
   const rewardToken = new TokenManager(tryRewardConfig.value.value0, event);
   const decimals = rewardToken.getDecimals();
   const borrowRewardToken = rewardToken.getOrCreateRewardToken(
@@ -978,10 +991,13 @@ function updateRewards(
   const supplyRewardToken = rewardToken.getOrCreateRewardToken(
     RewardTokenType.DEPOSIT
   );
+  market._baseTrackingBorrowSpeed = tryBaseTrackingBorrow.value;
+  market._baseTrackingSupplySpeed = tryBaseTrackingSupply.value;
+  market.save();
 
   // Reward tokens emitted per day as follows:
   // tokens/day = (speed * SECONDS_PER_DAY) / trackingIndexScale
-  const supplyRewardPerDay = BigInt.fromString(
+  const borrowRewardPerDay = BigInt.fromString(
     market
       ._baseTrackingBorrowSpeed!.times(BigInt.fromI64(SECONDS_PER_DAY))
       .div(tryTrackingIndexScale.value)
@@ -990,7 +1006,7 @@ function updateRewards(
       .truncate(0)
       .toString()
   );
-  const borrowRewardPerDay = BigInt.fromString(
+  const supplyRewardPerDay = BigInt.fromString(
     market
       ._baseTrackingSupplySpeed!.times(BigInt.fromI64(SECONDS_PER_DAY))
       .div(tryTrackingIndexScale.value)

@@ -224,13 +224,13 @@ export function insert<Type>(
   index: i32,
   value: Type
 ): Array<Type> {
-  const result = new Array<Type>(arr.length + 1);
+  const result: Type[] = [];
   for (let i = 0; i < index; i++) {
-    result[i] = arr[i];
+    result.push(arr[i]);
   }
-  result[index] = value;
+  result.push(value);
   for (let i = index; i < arr.length; i++) {
-    result[i + 1] = arr[i];
+    result.push(arr[i]);
   }
   return result;
 }

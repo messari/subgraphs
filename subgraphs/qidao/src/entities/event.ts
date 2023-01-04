@@ -174,7 +174,7 @@ export function createLiquidate(
     amountLiquidated,
     collateral.decimals
   ).times(getCollateralPrice(event, event.address, collateral));
-  liquidate.profitUSD = liquidate.amountUSD!.minus(debtRepaidUSD);
+  liquidate.profitUSD = liquidate.amountUSD.minus(debtRepaidUSD);
   liquidate.save();
   updateUsageMetrics(event, liquidator);
   handleMarketClosingFee(event, market, closingFee, collateral);
@@ -185,5 +185,5 @@ export function createLiquidate(
     BIGDECIMAL_ZERO.minus(debtRepaidUSD)
   );
   incrementProtocolLiquidateCount(event);
-  addSupplySideRevenue(event, market, liquidate.profitUSD!);
+  addSupplySideRevenue(event, market, liquidate.profitUSD);
 }
