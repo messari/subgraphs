@@ -72,7 +72,10 @@ export function getOrCreateUsageMetricsDailySnapshot(
   const protocol = getOrCreateProtocol();
   if (!usageMetricsDailySnapshot) {
     usageMetricsDailySnapshot = new UsageMetricsDailySnapshot(id);
+    usageMetricsDailySnapshot.protocol = protocol.id;
     usageMetricsDailySnapshot.dailyActiveUsers = 0;
+    usageMetricsDailySnapshot.dailyActiveDepositors = 0;
+    usageMetricsDailySnapshot.dailyActiveBorrowers = 0;
     usageMetricsDailySnapshot.dailyActiveLiquidators = 0;
     usageMetricsDailySnapshot.dailyActiveLiquidatees = 0;
     usageMetricsDailySnapshot.dailyTransactionCount = 0;
@@ -113,6 +116,7 @@ export function getOrCreateUsageMetricsHourlySnapshot(
   const protocol = getOrCreateProtocol();
   if (!usageMetricsHourlySnapshot) {
     usageMetricsHourlySnapshot = new UsageMetricsHourlySnapshot(id);
+    usageMetricsHourlySnapshot.protocol = protocol.id;
     usageMetricsHourlySnapshot.hourlyActiveUsers = 0;
     usageMetricsHourlySnapshot.hourlyTransactionCount = 0;
     usageMetricsHourlySnapshot.hourlyDepositCount = 0;
@@ -143,7 +147,7 @@ export function getOrCreateFinancialDailySnapshot(
   const protocol = getOrCreateProtocol();
   if (!financialsDailySnapshot) {
     financialsDailySnapshot = new FinancialsDailySnapshot(id);
-    financialsDailySnapshot.protocol = getOrCreateProtocol().id;
+    financialsDailySnapshot.protocol = protocol.id;
     financialsDailySnapshot.protocolControlledValueUSD = BD_ZERO;
     financialsDailySnapshot.dailySupplySideRevenueUSD = BD_ZERO;
     financialsDailySnapshot.dailyProtocolSideRevenueUSD = BD_ZERO;

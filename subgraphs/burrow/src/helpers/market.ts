@@ -74,7 +74,6 @@ export function getOrCreateMarket(id: string): Market {
 
     // reward token
     market.rewardTokens = new Array<string>();
-    market._rewardRemainingAmounts = new Array<BigInt>();
     market.rewardTokenEmissionsAmount = new Array<BigInt>();
     market.rewardTokenEmissionsUSD = new Array<BigDecimal>();
 
@@ -106,8 +105,11 @@ export function getOrCreateMarket(id: string): Market {
 
     market._totalBorrowed = BD_ZERO;
     market._totalDeposited = BD_ZERO;
+    market._totalReserved = BD_ZERO;
+    market._addedToReserve = BD_ZERO;
     market._totalBorrowedHistory = BI_ZERO;
     market._totalRepaidHistory = BI_ZERO;
+    market._utilization = BD_ZERO;
 
     market.save();
   }

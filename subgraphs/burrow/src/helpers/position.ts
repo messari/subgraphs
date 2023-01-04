@@ -21,28 +21,31 @@ export function getOrCreatePosition(
     .concat(side)
     .concat("-")
     .concat(count.toString());
-  let r = Position.load(id);
-  if (!r) {
-    r = new Position(id);
-    r.account = account.id;
-    r.market = market.id;
-    r.hashOpened = receipt.receipt.id.toBase58();
-    r.hashClosed = null;
-    r.blockNumberOpened = BigInt.fromU64(receipt.block.header.height);
-    r.blockNumberClosed = null;
-    r.timestampOpened = BigInt.fromU64(
+  let position = Position.load(id);
+  if (!position) {
+    const currTimestamp = BigInt.fromU64(
       NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
     );
-    r.timestampClosed = null;
-    r.side = side;
-    r.isCollateral = true;
-    r.balance = BI_ZERO;
-    r.depositCount = 0;
-    r.withdrawCount = 0;
-    r.borrowCount = 0;
-    r.repayCount = 0;
-    r.liquidationCount = 0;
-    r.save();
+
+    position = new Position(id);
+    position.account = account.id;
+    position.market = market.id;
+    position.hashOpened = receipt.receipt.id.toBase58();
+    position.hashClosed = null;
+    position.blockNumberOpened = BigInt.fromU64(receipt.block.header.height);
+    position.blockNumberClosed = null;
+    position.timestampOpened = currTimestamp;
+    position.timestampClosed = null;
+    position.side = side;
+    position.isCollateral = true;
+    position.balance = BI_ZERO;
+    position.depositCount = 0;
+    position.withdrawCount = 0;
+    position.borrowCount = 0;
+    position.repayCount = 0;
+    position.liquidationCount = 0;
+    position._lastActiveTimestamp = currTimestamp;
+    position.save();
 
     account.openPositionCount += 1;
     account.positionCount += 1;
@@ -55,7 +58,7 @@ export function getOrCreatePosition(
       market.borrowingPositionCount += 1;
     }
   }
-  return r;
+  return position;
 }
 
 export function getOrCreatePositionSnapshot(
@@ -65,19 +68,19 @@ export function getOrCreatePositionSnapshot(
   const id = position.id
     .concat("-")
     .concat(position.timestampOpened.toString());
-  let r = PositionSnapshot.load(id);
-  if (!r) {
-    r = new PositionSnapshot(id);
-    r.position = position.id;
-    r.timestamp = BigInt.fromU64(
+  let snapshot = PositionSnapshot.load(id);
+  if (!snapshot) {
+    snapshot = new PositionSnapshot(id);
+    snapshot.position = position.id;
+    snapshot.timestamp = BigInt.fromU64(
       NANOSEC_TO_SEC(receipt.block.header.timestampNanosec)
     );
-    r.blockNumber = BigInt.fromU64(receipt.block.header.height);
-    r.nonce = BI_ZERO;
-    r.logIndex = 0;
-    r.hash = receipt.outcome.id.toBase58();
-    r.balance = position.balance;
-    r.save();
+    snapshot.blockNumber = BigInt.fromU64(receipt.block.header.height);
+    snapshot.nonce = BI_ZERO;
+    snapshot.logIndex = 0;
+    snapshot.hash = receipt.outcome.id.toBase58();
+    snapshot.balance = position.balance;
+    snapshot.save();
   }
-  return r;
+  return snapshot;
 }

@@ -51,31 +51,6 @@ export function compound(
   );
   market._totalBorrowed = market._totalBorrowed.plus(interest);
 
-  // sub remaining reward
-  const rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount!;
-  const rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD!;
-  const _rewardRemainingAmounts = market._rewardRemainingAmounts;
-
-  for (let i = 0; i < rewardTokenEmissionsAmount.length; i++) {
-    const dailyRewardTokenEmission = rewardTokenEmissionsAmount[i];
-    const rewardTokenEmittedEveryMs = dailyRewardTokenEmission.div(
-      BigInt.fromI32(24 * 60 * 60 * 1000)
-    ); // in millisec
-
-    _rewardRemainingAmounts[i] = _rewardRemainingAmounts[i].minus(
-      rewardTokenEmittedEveryMs.times(time_diff_ms)
-    );
-
-    if (_rewardRemainingAmounts[i].lt(rewardTokenEmissionsAmount[i])) {
-      rewardTokenEmissionsAmount[i] = BI_ZERO;
-      rewardTokenEmissionsUSD[i] = BD_ZERO;
-      _rewardRemainingAmounts[i] = BI_ZERO;
-    }
-  }
-  market._rewardRemainingAmounts = _rewardRemainingAmounts;
-  market.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
-  market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
-
   // update timestamp
   market._lastUpdateTimestamp = market._lastUpdateTimestamp.plus(time_diff_ms);
 

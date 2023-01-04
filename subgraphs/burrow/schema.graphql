@@ -669,8 +669,6 @@ type Market @entity {
   _lastUpdateTimestamp: BigInt!
   _utilization: BigDecimal!
 
-  _rewardRemainingAmounts: [BigInt!]!
-
   _reserveRatio: BigInt!
   _targetUtilization: BigInt!
   _targetUtilizationRate: BigInt!
