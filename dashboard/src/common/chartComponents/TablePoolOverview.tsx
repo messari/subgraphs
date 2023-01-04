@@ -43,6 +43,8 @@ export const TablePoolOverview = ({
     if (protocolType === "EXCHANGE" || protocolType === "GENERIC") {
       inputTokenLabel = "Input Tokens";
       inputTokenColWidth = 220;
+    }
+    if (protocolType === "EXCHANGE" || protocolType === "GENERIC" || protocolType === "YIELD") {
       optionalFields.push({
         field: "baseYield",
         headerName: "Base Yield %",
