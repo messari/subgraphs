@@ -64,6 +64,7 @@ jobs:
       - name: Prettify code
         uses: creyD/prettier_action@v4.2
         with:
+          prettier_options: --write subgraphs/**/*.ts
           dry: True
 
   Build:
