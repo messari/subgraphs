@@ -154,6 +154,25 @@ function PoolTab({
               value = 0;
             }
           }
+        }
+      })
+    }
+  } else if (schemaType?.toUpperCase() === "YIELD") {
+    if (poolTimeseriesData) {
+      Object.keys(poolTimeseriesData).forEach((entityName: string) => {
+        if (!specificChartsOnEntity[entityName]) {
+          specificChartsOnEntity[entityName] = {};
+        }
+        const currentEntityData = poolTimeseriesData[entityName];
+        for (let x = currentEntityData.length - 1; x >= 0; x--) {
+          const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          let value = 0;
+          // For Yield Agg protocols, calculate the baseYield
+          if (timeseriesInstance.totalValueLockedUSD && timeseriesInstance.dailySupplySideRevenueUSD) {
+            value = Number(timeseriesInstance.dailySupplySideRevenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 365 * 100;
+          } else if (timeseriesInstance.totalValueLockedUSD && timeseriesInstance.hourlySupplySideRevenueUSD) {
+            value = Number(timeseriesInstance.hourlySupplySideRevenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 365 * 100;
+          }
           if (!specificChartsOnEntity[entityName]['baseYield']) {
             specificChartsOnEntity[entityName]['baseYield'] = [];
           } else {
