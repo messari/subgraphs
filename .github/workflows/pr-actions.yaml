@@ -53,6 +53,19 @@ jobs:
       - name: Lint staged files
         run: npm run lint:subgraphs ${{ steps.changed-files-specific.outputs.added_modified }}
 
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get changed files in the subgraphs folder
+        id: changed-files-specific
+        uses: Ana06/get-changed-files@v2.1.0
+        with:
+          filter: 'subgraphs/**/*.ts'
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.2
+        with:
+          dry: True
+
   Build:
     runs-on: macos-latest
     steps: 
