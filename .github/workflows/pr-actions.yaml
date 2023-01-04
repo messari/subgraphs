@@ -56,16 +56,12 @@ jobs:
   prettier:
     runs-on: ubuntu-latest
     steps:
-      - name: Get changed files in the subgraphs folder
-        id: changed-files-specific
-        uses: Ana06/get-changed-files@v2.1.0
-        with:
-          filter: 'subgraphs/**/*.ts'
-      - name: Prettify code
-        uses: creyD/prettier_action@v4.2
-        with:
-          prettier_options: --write subgraphs/**/*.ts
-          dry: True
+      - name: Prettify code check
+        - uses: actions/checkout@v2
+        - uses: actionsx/prettier@v2
+          with:
+            # prettier CLI arguments.
+            args: --check "subgraphs/**/*.ts"
 
   Build:
     runs-on: macos-latest
