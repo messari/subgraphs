@@ -326,6 +326,9 @@ export function getgOHMPrice(blockNumber: BigInt): BigDecimal | null {
   );
 
   if (!gOHMPriceInWETH || !WETHPriceInUSDC) {
+    log.warning("[getgOHMPrice]Failed to get OHM price at block {}", [
+      blockNumber.toString(),
+    ]);
     return null;
   }
 
