@@ -17,7 +17,7 @@ import {
   IntervalType,
 } from "../utils/const";
 import { getOrCreateProtocol } from "./protocol";
-import { getOrCreateRewardToken, getOrCreateToken } from "./token";
+import { getOrCreateToken } from "./token";
 import { getOrCreateRate } from "./rates";
 
 export function getOrCreateMarket(id: string): Market {
