@@ -80,7 +80,7 @@ export class CapitalERC721DepositLog {
     this.assetAddress = CapitalERC721DepositLog.getAssetAddress(txLog);
     this.positionId = CapitalERC721DepositLog.getPositionID(txLog);
     this.assetTokenId = CapitalERC721DepositLog.getAssetTokenId(txLog);
-    this.usdcEquivalent = CapitalERC721DepositLog.getusdcEquivalent(txLog);
+    this.usdcEquivalent = CapitalERC721DepositLog.getUsdcEquivalent(txLog);
     this.marketId = "";
   }
 
@@ -118,7 +118,7 @@ export class CapitalERC721DepositLog {
     return decoded[1].toBigInt();
   }
 
-  static getusdcEquivalent(txLog: ethereum.Log): BigInt {
+  static getUsdcEquivalent(txLog: ethereum.Log): BigInt {
     const decoded = ethereum
       .decode("(uint256,uint256,uint256)", txLog.data)!
       .toTuple();
@@ -234,7 +234,7 @@ export class CapitalERC721WithdrawalLog {
     this.marketId = marketId;
   }
 
-  setusdcEquivalent(usdcEquivalent: BigInt): void {
+  setUsdcEquivalent(usdcEquivalent: BigInt): void {
     this.usdcEquivalent = usdcEquivalent;
   }
 
@@ -250,7 +250,6 @@ export class CapitalERC721WithdrawalLog {
     }
 
     this.setmarketId(position.market);
-    //this.setusdcEquivalent(position.usdcEquivalent);
 
     const currTxHash = txLog.transactionHash.toHexString();
     const txLogID = `${currTxHash}-${txLog.logIndex.toString()}`;
