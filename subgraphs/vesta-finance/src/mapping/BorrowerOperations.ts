@@ -13,6 +13,7 @@ import { getCurrentAssetPrice } from "../entities/token";
 import { addProtocolSideRevenue } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { updateUserPositionBalances } from "../entities/position";
+import { getOrCreateMarket } from "../entities/market";
 
 /**
  * Emitted when VST is borrowed from trove and a dynamic fee (0.5-5%) is charged (added to debt)
@@ -21,9 +22,10 @@ import { updateUserPositionBalances } from "../entities/position";
  */
 export function handleVSTBorrowingFeePaid(event: VSTBorrowingFeePaid): void {
   const asset = event.params._asset;
+  const market = getOrCreateMarket(asset);
   const feeAmountVST = event.params._VSTFee;
   const feeAmountUSD = bigIntToBigDecimal(feeAmountVST);
-  addProtocolSideRevenue(event, asset, feeAmountUSD);
+  addProtocolSideRevenue(event, market, feeAmountUSD);
 }
 
 /**
@@ -33,6 +35,7 @@ export function handleVSTBorrowingFeePaid(event: VSTBorrowingFeePaid): void {
  */
 export function handleTroveUpdated(event: TroveUpdated): void {
   const asset = event.params._asset;
+  const market = getOrCreateMarket(asset);
   const borrower = event.params._borrower;
   const newCollateral = event.params._coll;
   const newDebt = event.params._debt;
@@ -41,20 +44,25 @@ export function handleTroveUpdated(event: TroveUpdated): void {
   if (newCollateral == trove.collateral && newDebt == trove.debt) {
     return;
   }
+  const assetPrice = getCurrentAssetPrice(asset);
   if (newCollateral > trove.collateral) {
     const depositAmountAsset = newCollateral.minus(trove.collateral);
-    const depositAmountUSD = bigIntToBigDecimal(depositAmountAsset).times(
-      getCurrentAssetPrice(asset)
+    const depositAmountUSD =
+      bigIntToBigDecimal(depositAmountAsset).times(assetPrice);
+    createDeposit(
+      event,
+      market,
+      depositAmountAsset,
+      depositAmountUSD,
+      borrower
     );
-    createDeposit(event, asset, depositAmountAsset, depositAmountUSD, borrower);
   } else if (newCollateral < trove.collateral) {
     const withdrawAmountAsset = trove.collateral.minus(newCollateral);
-    const withdrawAmountUSD = bigIntToBigDecimal(withdrawAmountAsset).times(
-      getCurrentAssetPrice(asset)
-    );
+    const withdrawAmountUSD =
+      bigIntToBigDecimal(withdrawAmountAsset).times(assetPrice);
     createWithdraw(
       event,
-      asset,
+      market,
       withdrawAmountAsset,
       withdrawAmountUSD,
       borrower,
@@ -65,13 +73,13 @@ export function handleTroveUpdated(event: TroveUpdated): void {
   if (newDebt > trove.debt) {
     const borrowAmountVST = newDebt.minus(trove.debt);
     const borrowAmountUSD = bigIntToBigDecimal(borrowAmountVST);
-    createBorrow(event, asset, borrowAmountVST, borrowAmountUSD, borrower);
+    createBorrow(event, market, borrowAmountVST, borrowAmountUSD, borrower);
   } else if (newDebt < trove.debt) {
     const repayAmountVST = trove.debt.minus(newDebt);
     const repayAmountUSD = bigIntToBigDecimal(repayAmountVST);
     createRepay(
       event,
-      asset,
+      market,
       repayAmountVST,
       repayAmountUSD,
       borrower,

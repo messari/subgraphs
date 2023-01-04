@@ -31,6 +31,12 @@
   },
   {
     "name": "PoolAdded",
+    "inputs": [{ "name": "pool", "type": "address", "indexed": true }],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "PoolAdded",
     "inputs": [
       { "name": "pool", "type": "address", "indexed": true },
       { "name": "rate_method_id", "type": "bytes", "indexed": false }
