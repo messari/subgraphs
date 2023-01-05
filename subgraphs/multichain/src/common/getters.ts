@@ -3,7 +3,6 @@ import {
   ethereum,
   BigInt,
   DataSourceContext,
-  log,
   Bytes,
 } from "@graphprotocol/graph-ts";
 
@@ -30,7 +29,6 @@ import {
   BridgePermissionType,
   BIGDECIMAL_ONE,
 } from "./constants";
-import { addToArrayAtIndex } from "./utils/arrays";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils/datetime";
 import { Versions } from "../versions";
 import { getUsdPricePerToken } from "../prices";
