@@ -1834,7 +1834,7 @@
     "deployments": {
       "compound-v3-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "3.0.0",
           "subgraph": "1.0.3",
