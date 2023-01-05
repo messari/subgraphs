@@ -505,8 +505,8 @@ export function updatePosition(
     account.openPositionCount += INT_ONE;
     market.positionCount += INT_ONE;
     market.openPositionCount += INT_ONE;
-    protocol.cumulativePositionCount += 1;
-    protocol.openPositionCount += 1;
+    protocol.cumulativePositionCount += INT_ONE;
+    protocol.openPositionCount += INT_ONE;
 
     if (transactionType == TransactionType.DEPOSIT) {
       market.lendingPositionCount += INT_ONE;
@@ -522,7 +522,10 @@ export function updatePosition(
     openPosition.blockNumberClosed = event.block.number;
 
     account.closedPositionCount += INT_ONE;
+    account.openPositionCount -= INT_ONE;
     market.closedPositionCount += INT_ONE;
+    market.openPositionCount -= INT_ONE;
+    protocol.openPositionCount -= INT_ONE;
   }
 
   if (transactionType == TransactionType.DEPOSIT) {
