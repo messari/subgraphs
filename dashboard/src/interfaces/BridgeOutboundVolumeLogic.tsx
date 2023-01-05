@@ -21,7 +21,7 @@ function BridgeOutboundVolumeLogic({
     routes?.forEach((obj: any) => {
         routeIdToChainMapping[obj?.id] = obj?.crossToken?.network;
     })
-    const routeIds = routes.map((x: any) => x.id);
+    const routeIds = routes?.map((x: any) => x?.id);
 
     const routeSnapshotsQueryContent = routeIds.map((id: string) => {
         if (!id) {
