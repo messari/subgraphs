@@ -1,0 +1,4 @@
+.DS_Store
+configure.ts
+src/versions*
+docs/
