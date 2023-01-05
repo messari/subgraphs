@@ -187,7 +187,7 @@ export function getOrCreateBalancerPoolToken(
 
     if (
       !knownPriceForAtleastOnePoolToken &&
-      token.lastPriceUSD !== BIGDECIMAL_ZERO
+      token.lastPriceUSD! != BIGDECIMAL_ZERO
     ) {
       knownPriceForAtleastOnePoolToken = true;
       knownPricePoolTokenIndex = idx;
@@ -201,7 +201,7 @@ export function getOrCreateBalancerPoolToken(
 
     let poolTVL = BIGDECIMAL_ZERO;
     for (let idx = 0; idx < tokens.length; idx++) {
-      if (tokens[idx].lastPriceUSD === BIGDECIMAL_ZERO) {
+      if (tokens[idx].lastPriceUSD! == BIGDECIMAL_ZERO) {
         const unknownPricePoolToken = tokens[idx];
 
         const weights = getPoolTokenWeights(poolAddress, popIndex);
