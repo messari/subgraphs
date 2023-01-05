@@ -5908,7 +5908,7 @@
     }
   },
   "stargate": {
-    "schema": "generic",
+    "schema": "bridge",
     "base": "stargate",
     "protocol": "stargate",
     "deployments": {
