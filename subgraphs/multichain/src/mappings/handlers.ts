@@ -29,7 +29,6 @@ import {
   BridgeType,
   CrosschainTokenType,
   EventType,
-  PROXY_ASSETS,
   ZERO_ADDRESS,
 } from "../common/constants";
 import { NetworkConfigs } from "../../configurations/configure";
@@ -43,7 +42,6 @@ import {
   DepositVaultCall,
   WithdrawVaultCall,
 } from "../../generated/RouterV6/anyTOKEN";
-import { assetProxy } from "../../generated/RouterV6/assetProxy";
 
 export function handlerSwapOutV2(event: LogSwapout): void {
   const protocol = getOrCreateProtocol();
@@ -61,14 +59,7 @@ export function handlerSwapOutV2(event: LogSwapout): void {
   );
 
   const chainID = NetworkConfigs.getChainID();
-  let tokenAddress = dataSource.address();
-  if (PROXY_ASSETS.includes(tokenAddress)) {
-    const assetProxyContract = assetProxy.bind(tokenAddress);
-    const proxyTokenCall = assetProxyContract.try_proxyToken();
-    if (!proxyTokenCall.reverted) {
-      tokenAddress = proxyTokenCall.value;
-    }
-  }
+  const tokenAddress = dataSource.address();
   const token = getOrCreateToken(protocol, tokenAddress, chainID, event.block);
 
   const crosschainID = NetworkConfigs.getCrosschainID(token.id.toHexString());
@@ -223,14 +214,7 @@ export function handlerSwapInV2(event: LogSwapin): void {
   );
 
   const chainID = NetworkConfigs.getChainID();
-  let tokenAddress = dataSource.address();
-  if (PROXY_ASSETS.includes(tokenAddress)) {
-    const assetProxyContract = assetProxy.bind(tokenAddress);
-    const proxyTokenCall = assetProxyContract.try_proxyToken();
-    if (!proxyTokenCall.reverted) {
-      tokenAddress = proxyTokenCall.value;
-    }
-  }
+  const tokenAddress = dataSource.address();
   const token = getOrCreateToken(protocol, tokenAddress, chainID, event.block);
 
   const crosschainID = NetworkConfigs.getCrosschainID(token.id.toHexString());

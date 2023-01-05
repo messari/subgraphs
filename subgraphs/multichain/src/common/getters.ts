@@ -99,8 +99,6 @@ export function getOrCreateProtocol(): BridgeProtocol {
   protocol.subgraphVersion = Versions.getSubgraphVersion();
   protocol.methodologyVersion = Versions.getMethodologyVersion();
 
-  // protocol.save();
-
   return protocol;
 }
 
@@ -131,11 +129,6 @@ export function getOrCreateToken(
       ? NetworkByID.get(chainID.toString())!
       : Network.UNKNOWN_NETWORK;
 
-    log.warning("[getOrCreateToken] chainID: {} network: {}", [
-      chainID.toString(),
-      network,
-    ]);
-
     if (
       !INACURATE_PRICEFEED_TOKENS.get(network)!.includes(
         Address.fromBytes(token.id)
@@ -145,6 +138,13 @@ export function getOrCreateToken(
         network == Network.ARBITRUM_ONE &&
         Address.fromBytes(token.id) ==
           Address.fromHexString("0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a")
+      ) {
+        token.lastPriceUSD = BIGDECIMAL_ONE;
+      } else if (
+        network == Network.MAINNET &&
+        Address.fromBytes(token.id) ==
+          Address.fromHexString("0xbbc4A8d076F4B1888fec42581B6fc58d242CF2D5") &&
+        block.number == BigInt.fromString("14983245")
       ) {
         token.lastPriceUSD = BIGDECIMAL_ONE;
       } else {
@@ -168,9 +168,6 @@ export function getOrCreateToken(
     token.lastPriceBlockNumber = block.number;
   }
 
-  // token.save();
-  log.warning("[getOrCreateToken] id: {}", [token.id.toHexString()]);
-
   return token;
 }
 
@@ -192,21 +189,12 @@ export function getOrCreateCrosschainToken(
     const network = NetworkByID.get(crosschainID.toString())
       ? NetworkByID.get(crosschainID.toString())!
       : Network.UNKNOWN_NETWORK;
-    log.warning("[getOrCreateCrosschainToken] chainID: {} network: {}", [
-      crosschainID.toString(),
-      network,
-    ]);
 
     crosschainToken.network = network;
     crosschainToken.address = crosschainTokenAddress;
     crosschainToken.type = crosschainTokenType;
     crosschainToken.token = token.id;
-
-    // crosschainToken.save();
   }
-  log.warning("[getOrCreateCrosschainToken] crosschainTokenAddress: {}", [
-    crosschainToken.id.toHexString(),
-  ]);
 
   return crosschainToken;
 }
@@ -259,8 +247,6 @@ export function getOrCreatePool(
 
     pool.createdTimestamp = block.timestamp;
     pool.createdBlockNumber = block.number;
-
-    // pool.save();
 
     protocol.totalPoolCount += INT_ONE;
   }
@@ -320,10 +306,7 @@ export function getOrCreatePoolRoute(
     poolRoute.createdBlockNumber = BIGINT_ZERO;
 
     protocol.totalPoolRouteCount += INT_ONE;
-
-    // poolRoute.save();
   }
-  log.warning("[getOrCreatePoolRoute] id: {}", [poolRoute.id.toHexString()]);
 
   return poolRoute;
 }
@@ -367,8 +350,6 @@ export function getOrCreatePoolDailySnapshot(
 
     poolMetrics.blockNumber = block.number;
     poolMetrics.timestamp = block.timestamp;
-
-    // poolMetrics.save();
   }
 
   return poolMetrics;
@@ -413,8 +394,6 @@ export function getOrCreatePoolHourlySnapshot(
 
     poolMetrics.blockNumber = block.number;
     poolMetrics.timestamp = block.timestamp;
-
-    // poolMetrics.save();
   }
 
   return poolMetrics;
@@ -445,8 +424,6 @@ export function getOrCreatePoolRouteSnapshot(
 
     poolRouteSnapshot.blockNumber = block.number;
     poolRouteSnapshot.timestamp = block.timestamp;
-
-    // poolRouteSnapshot.save();
   }
 
   return poolRouteSnapshot;
@@ -496,8 +473,6 @@ export function getOrCreateUsageMetricDailySnapshot(
 
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;
-
-    // usageMetrics.save();
   }
 
   return usageMetrics;
@@ -542,8 +517,6 @@ export function getOrCreateUsageMetricHourlySnapshot(
 
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;
-
-    // usageMetrics.save();
   }
 
   return usageMetrics;
@@ -577,8 +550,6 @@ export function getOrCreateFinancialsDailySnapshot(
 
     financialMetrics.blockNumber = block.number;
     financialMetrics.timestamp = block.timestamp;
-
-    // financialMetrics.save();
   }
 
   return financialMetrics;

@@ -953,5 +953,8 @@
       "abi": "Router",
       "startBlock": 37978260
     }
-  ]
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
 }

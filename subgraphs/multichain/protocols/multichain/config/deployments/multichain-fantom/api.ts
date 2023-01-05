@@ -460,8 +460,8 @@ export const BridgeAPIResponse = `{
 		"0.1,53520,668910"
 	],
 	"0x95dd59343a893637be1c3228060ee6afbf6f0730": [
-		"TERRA",
-		"luna",
+		"1361940275777",
+		"0xffffffffffffffffffffffffffffffffffffffff",
 		"0.1,500,50000"
 	],
 	"0x9611579c926294b0e29e5371a81a3e463650be17": [
@@ -700,7 +700,7 @@ export const BridgeAPIResponse = `{
 		"0.1,0.72,144"
 	],
 	"0xe2d27f06f63d98b8e11b38b5b08a75d0c8dd62b9": [
-		"TERRA", "ust", "0.1,5,1000"],
+		"1361940275777", "0xffffffffffffffffffffffffffffffffffffffff", "0.1,5,1000"],
 	"0xe3eeda11f06a656fcaee19de663e84c7e61d3cac": [
 		"137",
 		"0xf4b0903774532aee5ee567c02aab681a81539e92",
