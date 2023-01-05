@@ -41,7 +41,7 @@ export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
 
 // Handle the addition of a new pool to the MasterChef. New staking pool.
 export function handleLogPoolAddition(event: LogPoolAddition): void {
-  let masterChefV2Pool = createMasterChefStakingPool(
+  const masterChefV2Pool = createMasterChefStakingPool(
     event,
     MasterChef.MASTERCHEFV2,
     event.params.pid,
@@ -59,7 +59,7 @@ export function handleLogPoolAddition(event: LogPoolAddition): void {
 
 // Update the allocation points of the pool.
 export function handleLogSetPool(event: LogSetPool): void {
-  let masterChefV2Pool = _MasterChefStakingPool.load(
+  const masterChefV2Pool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV2 + "-" + event.params.pid.toString()
   )!;
   updateMasterChefTotalAllocation(
@@ -74,7 +74,10 @@ export function handleLogSetPool(event: LogSetPool): void {
 
 // Update the total emissions rate of rewards for the masterchef contract.
 export function handleUpdateEmissionRate(event: UpdateEmissionRate): void {
-  let masterChefV2Pool = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+  const masterChefV2Pool = getOrCreateMasterChef(
+    event,
+    MasterChef.MASTERCHEFV2
+  );
 
   log.warning("NEW REWARD RATE: " + event.params._beetsPerSec.toString(), []);
 

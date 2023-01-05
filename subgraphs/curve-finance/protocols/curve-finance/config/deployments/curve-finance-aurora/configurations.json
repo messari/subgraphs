@@ -1,0 +1,25 @@
+{
+  "network": "aurora",
+  "defaultNetwork": "Network.AURORA",
+
+  "priceCaching": 1000,
+
+  "poolInfoContract": "0x0f9cb53Ebe405d49A0bbdBD291A65Ff571bC83e1",
+  "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
+  "crvTokenAddress": "0x0000000000000000000000000000000000000000",
+
+  "gaugeControllerContract": "0xabC000d88f23Bb45525E447528DBF656A9D55bf5",
+  "gaugeControllerStartBlock": "72229335",
+
+  "poolRegistry": [
+    {
+      "name": "MainRegistry",
+      "address": "0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858",
+      "startBlock": "62440525"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}

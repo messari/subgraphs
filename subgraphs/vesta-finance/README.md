@@ -62,11 +62,13 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Liquidations`
 
-## Usage
+### Reward Token Emissions Amount
 
-### Prepare
+The VESTA finance uses the [CommunityIssuance contract](https://arbiscan.io/address/0x626420aE6986A4941DF830F57775aa7df4aAC9D3) to distribute VESTA governance token to liquidity providers to Stability Pool. The amount distributed to each pool is set as [total weekly amounts](https://docs.vestafinance.xyz/tokenomics/current-emission) and scaled to RewardDistributionPerMin.
 
-`npm run prepare:yaml --TEMPLATE=vesta.finance.template.yaml --PROTOCOL=vesta-finance --NETWORK=arbitrum`
+`CommunityIssuance.stabilityPoolRewards(pool).getRewardDistributionPerMin() * MINUTES_PER_DAY`
+
+Price of VESTA token on arbitrum is obtained from Balancer [VSTA-WETH Pool](https://app.balancer.fi/#/arbitrum/pool/0xc61ff48f94d801c1ceface0289085197b5ec44f000020000000000000000004d) and [WETH-WBTC-USDC Pool](https://app.balancer.fi/#/arbitrum/pool/0x64541216bafffeec8ea535bb71fbc927831d0595000100000000000000000002).
 
 ## Smart Contract Interactions
 

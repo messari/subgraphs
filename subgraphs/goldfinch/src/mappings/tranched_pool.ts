@@ -1,4 +1,4 @@
-import { InterestRate, TranchedPool } from "../../generated/schema";
+import { TranchedPool } from "../../generated/schema";
 import { GoldfinchConfig as GoldfinchConfigContract } from "../../generated/templates/TranchedPool/GoldfinchConfig";
 import { CreditLine as CreditLineContract } from "../../generated/templates/TranchedPool/CreditLine";
 import {
@@ -18,14 +18,10 @@ import {
 } from "../../generated/templates/TranchedPool/TranchedPool";
 import { PoolTokens as PoolTokensContract } from "../../generated/templates/TranchedPool/PoolTokens";
 import {
-  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   CONFIG_KEYS_ADDRESSES,
-  InterestRateSide,
-  InterestRateType,
   PositionSide,
-  SECONDS_PER_YEAR,
   TransactionType,
   USDC_DECIMALS,
 } from "../common/constants";
@@ -56,6 +52,7 @@ import {
   updateRevenues,
   updateUsageMetrics,
 } from "../common/helpers";
+import { updateInterestRates } from "../entities/market";
 
 export function handleCreditLineMigrated(event: CreditLineMigrated): void {
   const market = getOrCreateMarket(event.address.toHexString(), event);
@@ -95,6 +92,14 @@ export function handleDepositMade(event: DepositMade): void {
       .toHexString();
   }
 
+  if (!market._interestTimestamp) {
+    market._interestTimestamp = event.block.timestamp;
+    log.debug(
+      "[handleDepositMade]market._interestTimestamp for market {} set to {}",
+      [marketID, event.block.timestamp.toString()]
+    );
+  }
+
   const creditLineAddress = tranchedPoolContract.creditLine();
   const creditLineContract = CreditLineContract.bind(creditLineAddress);
   if (!market._creditLine) {
@@ -112,11 +117,6 @@ export function handleDepositMade(event: DepositMade): void {
   market.totalDepositBalanceUSD =
     market.inputTokenBalance.divDecimal(USDC_DECIMALS);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
-  // calculate average daily emission since first deposit
-  if (!market._rewardTimestamp) {
-    market._rewardTimestamp = event.block.timestamp;
-    market._cumulativeRewardAmount = BIGINT_ZERO;
-  }
   market.save();
 
   const protocol = getOrCreateProtocol();
@@ -457,6 +457,7 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     event.params.interestAmount.divDecimal(USDC_DECIMALS);
   const principleAmountUSD =
     event.params.principalAmount.divDecimal(USDC_DECIMALS);
+  const reserveAmountUSD = event.params.reserveAmount.divDecimal(USDC_DECIMALS);
   const payer = event.params.payer.toHexString();
   const tx = event.transaction.hash.toHexString();
 
@@ -475,6 +476,30 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     .balance()
     .divDecimal(USDC_DECIMALS);
 
+  // lenders receive interestAmountUSD - reserveAmountUSD
+  if (market._interestTimestamp) {
+    market._borrowerInterestAmountUSD = market
+      ._borrowerInterestAmountUSD!.plus(interestAmountUSD)
+      .plus(reserveAmountUSD);
+    market._lenderInterestAmountUSD =
+      market._lenderInterestAmountUSD!.plus(interestAmountUSD);
+    market.save();
+
+    updateInterestRates(
+      market,
+      market._borrowerInterestAmountUSD!,
+      market._lenderInterestAmountUSD!,
+      event
+    );
+  } else {
+    // for migrated tranched pools, there is no
+    // TrancheLocked or DrawdownMade event, market._interestTimestamp
+    // is not set, ignore the current interest payments and start
+    // interest rates calcuation from now to the next payment
+    market._interestTimestamp = event.block.timestamp;
+    market.save();
+  }
+
   let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
   for (let i = 0; i < protocol._marketIDs!.length; i++) {
     const mktID = protocol._marketIDs![i];
@@ -484,74 +509,6 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     );
   }
   protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
-
-  let updateInterestRates = true;
-  if (!market._interestTimestamp) {
-    log.warning(
-      "[handlePaymentApplied]market._interestTimestamp for market {} not set for tx {}",
-      [marketID, tx]
-    );
-    market._interestTimestamp = event.block.timestamp;
-    market.save();
-    updateInterestRates = false;
-  }
-
-  if (updateInterestRates) {
-    // scale interest rate to APR
-    // since interest is not compounding, apply a linear scaler based on time
-    const InterestRateScaler = BigInt.fromI32(SECONDS_PER_YEAR).divDecimal(
-      event.block.timestamp.minus(market._interestTimestamp!).toBigDecimal()
-    );
-    // even though rates are supposed to be "STABLE", but there may be late payment, writedown
-    // the actual rate may not be stable
-    const borrowerInterestRateID = `${marketID}-${InterestRateSide.BORROWER}-${InterestRateType.STABLE}`;
-    const borrowerInterestRate = new InterestRate(borrowerInterestRateID);
-    if (market.totalBorrowBalanceUSD.gt(BIGDECIMAL_ZERO)) {
-      borrowerInterestRate.side = InterestRateSide.BORROWER;
-      borrowerInterestRate.type = InterestRateType.STABLE;
-      borrowerInterestRate.rate = interestAmountUSD
-        .div(market.totalBorrowBalanceUSD)
-        .times(InterestRateScaler)
-        .times(BIGDECIMAL_HUNDRED);
-      borrowerInterestRate.save();
-    } else {
-      log.warning(
-        "[handlePaymentApplied]market.totalBorrowBalanceUSD={} for market {} at tx {}, skip updating borrower rates",
-        [
-          market.totalBorrowBalanceUSD.toString(),
-          marketID,
-          event.transaction.hash.toHexString(),
-        ]
-      );
-    }
-
-    // senior and junior rates are different, this is an average of them
-    const lenderInterestRateID = `${marketID}-${InterestRateSide.LENDER}-${InterestRateType.STABLE}`;
-    const lenderInterestRate = new InterestRate(lenderInterestRateID);
-    if (market.totalDepositBalanceUSD.gt(BIGDECIMAL_ZERO)) {
-      lenderInterestRate.side = InterestRateSide.LENDER;
-      lenderInterestRate.type = InterestRateType.STABLE;
-      lenderInterestRate.rate = interestAmountUSD
-        .div(market.totalDepositBalanceUSD)
-        .times(InterestRateScaler)
-        .times(BIGDECIMAL_HUNDRED);
-      lenderInterestRate.save();
-    } else {
-      log.warning(
-        "[handlePaymentApplied]market.totalDepositBalanceUSD={} for market {} at tx {}, skip updating lender rates",
-        [
-          market.totalDepositBalanceUSD.toString(),
-          marketID,
-          event.transaction.hash.toHexString(),
-        ]
-      );
-    }
-
-    market.rates = [borrowerInterestRate.id, lenderInterestRate.id];
-    market._interestTimestamp = event.block.timestamp;
-  }
-
-  market.save();
   protocol.save();
 
   updateRevenues(
@@ -687,11 +644,6 @@ export function handleSharePriceUpdated(event: SharePriceUpdated): void {
   const totalBorrowBalance = creditLineContract.balance();
   market.totalBorrowBalanceUSD = totalBorrowBalance.divDecimal(USDC_DECIMALS);
 
-  // calculate average daily emission since first deposit
-  if (!market._rewardTimestamp) {
-    market._rewardTimestamp = event.block.timestamp;
-    market._cumulativeRewardAmount = BIGINT_ZERO;
-  }
   // set _isMigratedTranchedPool to false, so we only process the migration once
   market._isMigratedTranchedPool = false;
   market.save();

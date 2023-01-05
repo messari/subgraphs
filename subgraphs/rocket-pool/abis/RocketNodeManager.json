@@ -1,0 +1,156 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "contract RocketStorageInterface",
+        "name": "_rocketStorageAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "node",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "time",
+        "type": "uint256"
+      }
+    ],
+    "name": "NodeRegistered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "node",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "time",
+        "type": "uint256"
+      }
+    ],
+    "name": "NodeTimezoneLocationSet",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_index", "type": "uint256" }
+    ],
+    "name": "getNodeAt",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getNodeCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "offset", "type": "uint256" },
+      { "internalType": "uint256", "name": "limit", "type": "uint256" }
+    ],
+    "name": "getNodeCountPerTimezone",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "timezone", "type": "string" },
+          { "internalType": "uint256", "name": "count", "type": "uint256" }
+        ],
+        "internalType": "struct RocketNodeManagerInterface.TimezoneCount[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getNodeExists",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getNodePendingWithdrawalAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getNodeTimezoneLocation",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getNodeWithdrawalAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_timezoneLocation",
+        "type": "string"
+      }
+    ],
+    "name": "registerNode",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_timezoneLocation",
+        "type": "string"
+      }
+    ],
+    "name": "setTimezoneLocation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "version",
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

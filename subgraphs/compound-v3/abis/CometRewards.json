@@ -1,0 +1,188 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "governor_", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "AlreadyConfigured",
+    "type": "error"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "InvalidUInt64",
+    "type": "error"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "NotPermitted",
+    "type": "error"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "NotSupported",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "TransferOutFailed",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldGovernor",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newGovernor",
+        "type": "address"
+      }
+    ],
+    "name": "GovernorTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "src",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardClaimed",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "comet", "type": "address" },
+      { "internalType": "address", "name": "src", "type": "address" },
+      { "internalType": "bool", "name": "shouldAccrue", "type": "bool" }
+    ],
+    "name": "claim",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "comet", "type": "address" },
+      { "internalType": "address", "name": "src", "type": "address" },
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "bool", "name": "shouldAccrue", "type": "bool" }
+    ],
+    "name": "claimTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "comet", "type": "address" },
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "getRewardOwed",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "address", "name": "token", "type": "address" },
+          { "internalType": "uint256", "name": "owed", "type": "uint256" }
+        ],
+        "internalType": "struct CometRewards.RewardOwed",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "governor",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "rewardConfig",
+    "outputs": [
+      { "internalType": "address", "name": "token", "type": "address" },
+      { "internalType": "uint64", "name": "rescaleFactor", "type": "uint64" },
+      { "internalType": "bool", "name": "shouldUpscale", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "rewardsClaimed",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "comet", "type": "address" },
+      { "internalType": "address", "name": "token", "type": "address" }
+    ],
+    "name": "setRewardConfig",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newGovernor", "type": "address" }
+    ],
+    "name": "transferGovernor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token", "type": "address" },
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "withdrawToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

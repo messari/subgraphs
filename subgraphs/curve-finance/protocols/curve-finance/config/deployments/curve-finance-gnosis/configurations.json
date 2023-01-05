@@ -1,0 +1,35 @@
+{
+  "network": "xdai",
+  "defaultNetwork": "Network.XDAI",
+
+  "priceCaching": 1000,
+
+  "poolInfoContract": "0xf1755AadB82Dc7A45AB4e754f67412Dc75576DC7",
+  "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
+  "crvTokenAddress": "0x712b3d230f3c1c19db860d80619288b1f0bdd0bd",
+
+  "gaugeControllerContract": "0xabC000d88f23Bb45525E447528DBF656A9D55bf5",
+  "gaugeControllerStartBlock": "20595358",
+
+  "poolRegistry": [
+    {
+      "name": "MainRegistry",
+      "address": "0x55E91365697EB8032F98290601847296eC847210",
+      "startBlock": "20754886"
+    },
+    {
+      "name": "StableSwapFactory",
+      "address": "0xD19Baeadc667Cf2015e395f2B08668Ef120f41F5",
+      "startBlock": "21364050"
+    },
+    {
+      "name": "CryptoSwapRegistry",
+      "address": "0x8A4694401bE8F8FCCbC542a3219aF1591f87CE17",
+      "startBlock": "23334728"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}

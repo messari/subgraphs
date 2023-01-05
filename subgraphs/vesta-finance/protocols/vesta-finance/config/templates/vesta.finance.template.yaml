@@ -12,7 +12,7 @@ dataSources:
       startBlock: 5559178
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -20,10 +20,14 @@ dataSources:
           file: ./abis/TroveManager.json
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
       eventHandlers:
         - event: TroveUpdated(indexed address,indexed address,uint256,uint256,uint256,uint8)
           handler: handleTroveUpdated
@@ -31,6 +35,9 @@ dataSources:
           handler: handleRedemption
         - event: TroveLiquidated(indexed address,indexed address,uint256,uint256,uint8)
           handler: handleTroveLiquidated
+        - event: Liquidation(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleLiquidation
+          receipt: true     
       file: ./src/mapping/TroveManager.ts
   - kind: ethereum/contract
     name: BorrowerOperations
@@ -41,7 +48,7 @@ dataSources:
       startBlock: 5559230
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -68,7 +75,7 @@ dataSources:
       file: ./src/mapping/VestaParameters.ts
       language: wasm/assemblyscript
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       entities:
         - Token
       abis:
@@ -76,6 +83,8 @@ dataSources:
           file: ./abis/VestaParameters.json
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
@@ -91,12 +100,12 @@ dataSources:
     name: ActivePool
     network: arbitrum-one
     source:
-      address: "0xBE3dE7fB9Aa09B3Fa931868Fb49d5BA5fEe2eBb1"
+      address: "0xbe3de7fb9aa09b3fa931868fb49d5ba5fee2ebb1"
       abi: ActivePool
       startBlock: 5559192
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -112,6 +121,8 @@ dataSources:
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: VSTToken
+          file: ./abis/VSTToken.json
       eventHandlers:
         - event: ActivePoolAssetBalanceUpdated(address,uint256)
           handler: handleActivePoolAssetBalanceUpdated
@@ -127,7 +138,7 @@ dataSources:
       startBlock: 5559219
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -137,53 +148,112 @@ dataSources:
         - event: CollBalanceUpdated(indexed address,uint256)
           handler: handleCollBalanceUpdated
       file: ./src/mapping/CollSurplusPool.ts
-templates:
+
+  - kind: ethereum/contract
+    name: CommunityIssuance
+    network: arbitrum-one
+    source:
+      address: "0x626420aE6986A4941DF830F57775aa7df4aAC9D3"
+      abi: CommunityIssuance
+      startBlock: 13469947
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: CommunityIssuance
+          file: ./abis/CommunityIssuance.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
+        - name: Vault
+          file: ./abis/BalancerVault.json
+        - name: VestaParameters
+          file: ./abis/VestaParameters.json
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json          
+      eventHandlers:
+        - event: TotalVSTAIssuedUpdated(indexed address,uint256)
+          handler: handleTotalVSTAIssuedUpdated
+      file: ./src/mapping/CommunityIssuance.ts
+
   - name: PriceFeedV1
     kind: ethereum/contract
     network: arbitrum-one
     source:
+      address: "0xc93408bfbea0bf3e53bedbce7d5c1e64db826702"
       abi: PriceFeedV1
+      startBlock: 5559155
     mapping:
       file: ./src/mapping/PriceFeed.ts
       language: wasm/assemblyscript
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       entities: []
       abis:
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
-        - name: PriceFeed
-          file: ./abis/PriceFeedV2.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: StabilityPoolManager
+          file: ./abis/StabilityPoolManager.json
+        - name: VestaParameters
+          file: ./abis/VestaParameters.json          
       eventHandlers:
         - event: LastGoodPriceUpdated(indexed address,uint256)
           handler: handleLastGoodPriceUpdated
-  - name: PriceFeed
+        - event: RegisteredNewOracle(address,address,address)
+          handler: handleRegisteredNewOracle
+
+  - name: PriceFeedV2
     kind: ethereum/contract
     network: arbitrum-one
     source:
-      abi: PriceFeed
+      address: "0xd218ba424a6166e37a454f8ece2bf8eb2264ecca"
+      abi: PriceFeedV2
+      startBlock: 8225990
     mapping:
       file: ./src/mapping/PriceFeed.ts
       language: wasm/assemblyscript
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       entities: []
       abis:
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
-        - name: PriceFeed
+        - name: PriceFeedV2
           file: ./abis/PriceFeedV2.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: StabilityPoolManager
+          file: ./abis/StabilityPoolManager.json
+        - name: VestaParameters
+          file: ./abis/VestaParameters.json       
       eventHandlers:
         - event: TokenPriceUpdated(indexed address,uint256)
           handler: handleTokenPriceUpdated
+        - event: OracleAdded(indexed address,address,address)
+          handler: handleOracleAdded
+
+templates:
   - name: StabilityPool
     kind: ethereum/contract
     network: arbitrum-one
@@ -191,7 +261,7 @@ templates:
       abi: StabilityPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -199,13 +269,24 @@ templates:
           file: ./abis/StabilityPool.json
         - name: PriceFeedV1
           file: ./abis/PriceFeedV1.json
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: VestaParameters
+          file: ./abis/VestaParameters.json          
       eventHandlers:
         - event: StabilityPoolAssetBalanceUpdated(uint256)
           handler: handleStabilityPoolAssetBalanceUpdated
         - event: StabilityPoolVSTBalanceUpdated(uint256)
           handler: handleStabilityPoolVSTBalanceUpdated
+        - event: UserDepositChanged(indexed address,uint256)
+          handler: handleUserDepositChanged
+        - event: AssetGainWithdrawn(indexed address,uint256,uint256)
+          handler: handleAssetGainWithdrawn
       file: ./src/mapping/StabilityPool.ts
+

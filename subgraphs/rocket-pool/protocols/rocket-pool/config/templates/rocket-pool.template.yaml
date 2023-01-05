@@ -1,0 +1,434 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: rocketTokenRETH
+    network: mainnet
+    source:
+      address: "0xae78736Cd615f374D3085123A210448E74Fc6393"
+      abi: rocketTokenRETH
+      startBlock: 13325300
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Staker
+        - RocketETHTransaction
+      abis:
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: RocketStorage
+          file: ./abis/rocketStorage.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/rocketTokenRETHMapping.ts
+
+  - kind: ethereum/contract
+    name: rocketNetworkBalances
+    network: mainnet
+    source:
+      address: "0x138313f102cE9a0662F826fCA977E3ab4D6e5539"
+      abi: rocketNetworkBalances
+      startBlock: 13325250
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - NetworkStakerBalanceCheckpoint
+        - StakerBalanceCheckpoint
+      abis:
+        - name: rocketNetworkBalances
+          file: ./abis/RocketNetworkBalances.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: rocketDepositPool
+          file: ./abis/RocketDepositPool.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+      eventHandlers:
+        - event: BalancesUpdated(uint256,uint256,uint256,uint256,uint256)
+          handler: handleBalancesUpdated
+      file: ./src/mappings/rocketNetworkBalancesMapping.ts
+
+  - kind: ethereum/contract
+    name: rocketNodeManager
+    network: mainnet
+    source:
+      address: "0x4477Fbf4Af5b34E49662d9217681a763dDc0a322"
+      abi: rocketNodeManager
+      startBlock: 13325266
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Node
+        - NetworkNodeTimezone
+      abis:
+        - name: rocketNodeManager
+          file: ./abis/RocketNodeManager.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+      eventHandlers:
+        - event: NodeRegistered(indexed address,uint256)
+          handler: handleNodeRegister
+        - event: NodeTimezoneLocationSet(indexed address,uint256)
+          handler: handleNodeTimezoneChanged
+      file: ./src/mappings/rocketNodeManager.ts
+
+  - kind: ethereum/contract
+    name: rocketNodeStaking
+    network: mainnet
+    source:
+      address: "0x3019227b2b8493e45Bf5d25302139c9a2713BF15"
+      abi: rocketNodeStaking
+      startBlock: 13325267
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - NodeRPLStakeTransaction
+      abis:
+        - name: rocketNodeStaking
+          file: ./abis/RocketNodeStaking.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+      eventHandlers:
+        - event: RPLStaked(indexed address,uint256,uint256)
+          handler: handleRPLStaked
+        - event: RPLWithdrawn(indexed address,uint256,uint256)
+          handler: handleRPLWithdrawn
+        - event: RPLSlashed(indexed address,uint256,uint256,uint256)
+          handler: handleRPLSlashed
+      file: ./src/mappings/rocketNodeStakingMapping.ts
+
+  - kind: ethereum/contract
+    name: rocketRewardsPool
+    network: mainnet
+    source:
+      address: "0xA3a18348e6E2d3897B6f2671bb8c120e36554802"
+      abi: rocketRewardsPool
+      startBlock: 13325257
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - RPLRewardInterval
+        - RPLRewardClaim
+      abis:
+        - name: rocketRewardsPool
+          file: ./abis/RocketRewardsPool.json
+        - name: rocketDAONodeTrusted
+          file: ./abis/RocketDAONodeTrusted.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+      eventHandlers:
+        - event: RPLTokensClaimed(indexed address,indexed address,uint256,uint256)
+          handler: handleRPLTokensClaimed
+      file: ./src/mappings/rocketRewardsPoolMapping.ts
+
+  - kind: ethereum/contract
+    name: rocketNetworkPrices
+    network: mainnet
+    source:
+      address: "0xd3f500F550F46e504A4D2153127B47e007e11166"
+      abi: rocketNetworkPrices
+      startBlock: 13325254
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - NetworkNodeBalanceCheckpoint
+        - NodeBalanceCheckpoint
+      abis:
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: rocketNetworkFees
+          file: ./abis/RocketNetworkFees.json
+        - name: rocketDAOProtocolSettingsNode
+          file: ./abis/RocketDAOProtocolSettingsNode.json
+        - name: rocketDAOProtocolSettingsMinipoolV1
+          file: ./abis/RocketDAOProtocolSettingsMinipoolV1.json
+        - name: rocketDAOProtocolSettingsMinipoolV2
+          file: ./abis/RocketDAOProtocolSettingsMinipoolV2.json
+        - name: rocketNodeStaking
+          file: ./abis/RocketNodeStaking.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+      eventHandlers:
+        - event: PricesUpdated(uint256,uint256,uint256,uint256)
+          handler: handlePricesUpdated
+      file: ./src/mappings/rocketNetworkPricesMapping.ts
+
+  - kind: ethereum/contract
+    name: rocketMinipoolManagerV1
+    network: mainnet
+    source:
+      address: "0xFc1a4a1eaF9e80FA5380ce45d9D12bdF7A81ca18"
+      abi: rocketMinipoolManagerV1
+      startBlock: 13325242
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Minipool
+      abis:
+        - name: rocketMinipoolManagerV1
+          file: ./abis/RocketMinipoolManagerV1.json
+        - name: rocketNetworkFees
+          file: ./abis/RocketNetworkFees.json
+        - name: rocketNodeStaking
+          file: ./abis/RocketNodeStaking.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+      eventHandlers:
+        - event: MinipoolCreated(indexed address,indexed address,uint256)
+          handler: handleMinipoolCreated
+        - event: MinipoolDestroyed(indexed address,indexed address,uint256)
+          handler: handleMinipoolDestroyed
+      file: ./src/mappings/rocketMinipoolManager/V1.ts
+
+  - kind: ethereum/contract
+    name: rocketMinipoolManagerV2
+    network: mainnet
+    source:
+      address: "0x6293b8abc1f36afb22406be5f96d893072a8cf3a"
+      abi: rocketMinipoolManagerV2
+      startBlock: 13535419
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Minipool
+      abis:
+        - name: rocketMinipoolManagerV2
+          file: ./abis/RocketMinipoolManagerV2.json
+        - name: rocketNetworkFees
+          file: ./abis/RocketNetworkFees.json
+        - name: rocketNodeStaking
+          file: ./abis/RocketNodeStaking.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+      eventHandlers:
+        - event: MinipoolCreated(indexed address,indexed address,uint256)
+          handler: handleMinipoolCreatedV2
+        - event: MinipoolDestroyed(indexed address,indexed address,uint256)
+          handler: handleMinipoolDestroyedV2
+      file: ./src/mappings/rocketMinipoolManager/V2.ts
+
+  - kind: ethereum/contract
+    name: rocketMinipoolqueue
+    network: mainnet
+    source:
+      address: "0x5870dA524635D1310Dc0e6F256Ce331012C9C19E"
+      abi: rocketMinipoolqueue
+      startBlock: 13325244
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Minipool
+      abis:
+        - name: rocketMinipoolqueue
+          file: ./abis/RocketMinipoolqueue.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+      eventHandlers:
+        - event: MinipoolEnqueued(indexed address,indexed bytes32,uint256)
+          handler: handleMinipoolEnqueued
+        - event: MinipoolDequeued(indexed address,indexed bytes32,uint256)
+          handler: handleMinipoolDequeued
+      file: ./src/mappings/rocketMinipoolQueueMapping.ts
+
+  - kind: ethereum/contract
+    name: rocketDAONodeTrustedActions
+    network: mainnet
+    source:
+      address: "0x5b9B2494060138470a2b834f6003c0343a585349"
+      abi: rocketDAONodeTrustedActions
+      startBlock: 13325274
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Node
+      abis:
+        - name: rocketDAONodeTrustedActions
+          file: ./abis/RocketDAONodeTrustedActions.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+      eventHandlers:
+        - event: ActionJoined(indexed address,uint256,uint256)
+          handler: handleOracleNodeJoined
+        - event: ActionLeave(indexed address,uint256,uint256)
+          handler: handleOracleNodeLeft
+        - event: ActionKick(indexed address,uint256,uint256)
+          handler: handleOracleNodeKicked
+        - event: ActionChallengeDecided(indexed address,indexed address,bool,uint256)
+          handler: handleChallengeDecided
+      file: ./src/mappings/rocketDAONodeTrustedActionMapping.ts
+
+templates:
+  - name: rocketMinipoolDelegateV1
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: rocketMinipoolDelegateV1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/rocketMinipoolDelegate/V1.ts
+      entities:
+        - Minipool
+        - Node
+      abis:
+        - name: rocketMinipoolDelegateV1
+          file: ./abis/RocketMinipoolDelegateV1.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+      eventHandlers:
+        - event: StatusUpdated(indexed uint8,uint256)
+          handler: handleStatusUpdated
+        - event: EtherDeposited(indexed address,uint256,uint256)
+          handler: handleEtherDeposited
+
+  - name: rocketMinipoolDelegateV2
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: rocketMinipoolDelegateV2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/rocketMinipoolDelegate/V2.ts
+      entities:
+        - Minipool
+        - Node
+      abis:
+        - name: rocketMinipoolDelegateV2
+          file: ./abis/RocketMinipoolDelegateV2.json
+        - name: rocketNetworkPrices
+          file: ./abis/RocketNetworkPrices.json
+        - name: rocketTokenRETH
+          file: ./abis/RocketTokenRETH.json
+        - name: RocketStorage
+          file: ./abis/RocketStorage.json
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+      eventHandlers:
+        - event: StatusUpdated(indexed uint8,uint256)
+          handler: handleStatusUpdated
+        - event: EtherDeposited(indexed address,uint256,uint256)
+          handler: handleEtherDeposited

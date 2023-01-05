@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { blockExplorers } from "../../constants";
 import { formatIntToFixed2, tableCellTruncate } from "../../utils";
 
-interface TableChartProps {
+interface TablePoolOverviewProps {
   datasetLabel: string;
   dataTable: any;
   protocolType: string;
@@ -27,7 +27,7 @@ export const TablePoolOverview = ({
   skipAmt,
   setIssues,
   issueProps,
-}: TableChartProps) => {
+}: TablePoolOverviewProps) => {
   const navigate = useNavigate();
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [...issueProps];
   useEffect(() => {
@@ -43,6 +43,8 @@ export const TablePoolOverview = ({
     if (protocolType === "EXCHANGE" || protocolType === "GENERIC") {
       inputTokenLabel = "Input Tokens";
       inputTokenColWidth = 220;
+    }
+    if (protocolType === "EXCHANGE" || protocolType === "GENERIC" || protocolType === "YIELD") {
       optionalFields.push({
         field: "baseYield",
         headerName: "Base Yield %",

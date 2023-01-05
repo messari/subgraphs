@@ -53,6 +53,7 @@ interface PoolTabEntityProps {
   currentEntityData: any[];
   entityName: string;
   entitiesData: { [x: string]: { [x: string]: string } };
+  entitySpecificElements: any;
   overlayPoolTimeseriesData: any;
   poolId: string;
   protocolData: { [x: string]: any };
@@ -66,13 +67,13 @@ function PoolTabEntity({
   currentEntityData,
   entityName,
   entitiesData,
+  entitySpecificElements,
   overlayPoolTimeseriesData,
   poolId,
   protocolData,
   setIssues,
   issuesProps,
 }: PoolTabEntityProps) {
-
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   // Get the key name of the pool specific to the protocol type (singular and plural)
   const poolKeySingular = PoolName[data.protocols[0].type];
@@ -148,45 +149,6 @@ function PoolTabEntity({
       const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
       const overlayDifference = currentEntityData.length - overlayPoolTimeseriesData.length;
       const overlayTimeseriesInstance: { [x: string]: any } = overlayPoolTimeseriesData[x - overlayDifference];
-
-      // For exchange protocols, calculate the baseYield
-      if (data.protocols[0].type === "EXCHANGE") {
-        let value = 0;
-        if (Object.keys(data[poolKeySingular]?.fees)?.length > 0 && timeseriesInstance.totalValueLockedUSD) {
-          const revenueUSD =
-            Number(timeseriesInstance.dailySupplySideRevenueUSD) * 365 ||
-            Number(timeseriesInstance.hourlySupplySideRevenueUSD) * 24 * 365;
-          value = (revenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 100;
-          if (!value) {
-            value = 0;
-          }
-        }
-        if (!dataFields.baseYield) {
-          dataFields.baseYield = [];
-          dataFieldMetrics.baseYield = { sum: 0 };
-        } else {
-          dataFields.baseYield.push({ value, date: Number(timeseriesInstance.timestamp) });
-          dataFieldMetrics.baseYield.sum += value;
-        }
-      }
-
-      if (overlayData?.protocols[0]?.type === "EXCHANGE" && overlayTimeseriesInstance) {
-        let value = 0;
-        if (Object.keys(overlayData[poolKeySingular]?.fees)?.length > 0 && overlayTimeseriesInstance.totalValueLockedUSD) {
-          const revenueUSD =
-            Number(overlayTimeseriesInstance.dailySupplySideRevenueUSD) * 365 ||
-            Number(overlayTimeseriesInstance.hourlySupplySideRevenueUSD) * 24 * 365;
-          value = (revenueUSD / Number(overlayTimeseriesInstance.totalValueLockedUSD)) * 100;
-          if (!value) {
-            value = 0;
-          }
-        }
-        if (!overlayDataFields.baseYield) {
-          overlayDataFields.baseYield = [];
-        } else {
-          overlayDataFields.baseYield.push({ value, date: Number(overlayTimeseriesInstance.timestamp) });
-        }
-      }
 
       // Take the given timeseries instance and loop thru the fields of the instance (ie totalValueLockedUSD)
       let skip = false;
@@ -929,13 +891,6 @@ function PoolTabEntity({
       });
     }
 
-    // Move baseYield chart to bottom (above token weights)
-    if (dataFields.baseYield) {
-      const baseYield = dataFields.baseYield;
-      delete dataFields.baseYield;
-      dataFields.baseYield = baseYield;
-    }
-
     const rewardTokensLength = data[poolKeySingular]?.rewardTokens?.length;
     const inputTokensLength = data[poolKeySingular]?.inputTokens?.length;
 
@@ -1036,6 +991,10 @@ function PoolTabEntity({
         delete instanceToSave.rates;
       }
 
+      Object.keys(entitySpecificElements).forEach((key: string) => {
+        instanceToSave[key] = entitySpecificElements[key][entitySpecificElements[key]?.length - idx - 1]?.value || 0;
+      })
+
       for (let tokenIdx = 0; tokenIdx < rewardTokensLength; tokenIdx++) {
         const amt = instance?.rewardTokenEmissionsAmount?.[tokenIdx] || 0;
         instanceToSave["rewardTokenEmissionsAmount [" + tokenIdx + "]"] = amt;
@@ -1074,12 +1033,6 @@ function PoolTabEntity({
         }
       }
 
-      if (!!dataFields.baseYield) {
-        instanceToSave.baseYield = dataFields.baseYield[idx]?.value;
-        if (!dataFields.baseYield[idx]?.value) {
-          instanceToSave.baseYield = 0;
-        }
-      }
 
       delete instanceToSave.rewardTokenEmissionsAmount;
       delete instanceToSave.rewardTokenEmissionsUSD;
@@ -1093,6 +1046,192 @@ function PoolTabEntity({
       return instanceToSave;
     }).sort((a: any, b: any) => (Number(a.timestamp) - Number(b.timestamp)));
 
+    Object.keys(entitySpecificElements).forEach((eleName: string) => {
+      dataFields[eleName] = entitySpecificElements[eleName];
+    })
+
+    const charts = Object.keys(dataFields).map((field: string) => {
+      const fieldName = field.split(" [")[0];
+      let label = entityName + "-" + field;
+      // Label changes, element id is constant
+      const elementId = label;
+      const linkToElementId = elementId.split(" ").join("%20");
+
+      try {
+        const arrayIndex = Number(field?.split(" [")[1]?.split("]")[0]);
+        // Generate the labeling for different token charts
+        if (fieldName.toUpperCase().includes("INPUTTOKEN")) {
+          if ((arrayIndex || arrayIndex === 0) && data[poolKeySingular]?.inputTokens) {
+            const currentInputToken = data[poolKeySingular].inputTokens[arrayIndex];
+            const name = currentInputToken?.name ? currentInputToken.name : "N/A";
+            const symbol = currentInputToken?.symbol ? currentInputToken.symbol : "N/A";
+            label += " - " + symbol + ": " + name;
+          } else if (data[poolKeySingular]?.inputToken) {
+            const name = data[poolKeySingular].inputToken?.name ? data[poolKeySingular].inputToken.name : "N/A";
+            const symbol = data[poolKeySingular].inputToken?.symbol
+              ? data[poolKeySingular].inputToken.symbol
+              : "N/A";
+            label += " - " + symbol + ": " + name;
+          }
+        } else if (fieldName.toUpperCase().includes("OUTPUTTOKEN")) {
+          const name = data[poolKeySingular]?.outputToken?.name ? data[poolKeySingular]?.outputToken?.name : "N/A";
+          const symbol = data[poolKeySingular]?.outputToken?.symbol
+            ? data[poolKeySingular]?.outputToken?.symbol
+            : "N/A";
+          label += " - " + symbol + ": " + name;
+        } else if (
+          fieldName.toUpperCase().includes("TOKEN") &&
+          data[poolKeySingular]?.inputToken &&
+          !arrayIndex &&
+          arrayIndex !== 0
+        ) {
+          const name = data[poolKeySingular]?.inputToken?.name ? data[poolKeySingular].inputToken.name : "N/A";
+          const symbol = data[poolKeySingular]?.inputToken?.symbol
+            ? data[poolKeySingular].inputToken.symbol
+            : "N/A";
+          label += " - " + symbol + ": " + name;
+        }
+        const isNegativeField = negativeFieldList.find((x: string) => {
+          return field.toUpperCase().includes(x.toUpperCase());
+        });
+        if (
+          dataFieldMetrics[field]?.negative &&
+          !isNegativeField &&
+          issues.filter((x) => x.fieldName === `${entityName}-${field}` && x.type === "NEG").length === 0
+        ) {
+          issues.push({
+            message: JSON.stringify(dataFieldMetrics[field]?.negative),
+            type: "NEG",
+            level: "critical",
+            fieldName: `${entityName}-${field}`,
+          });
+        }
+        if (dataFieldMetrics[field]?.invalidDataPlot) {
+          return (
+            <div key={elementId} id={linkToElementId}>
+              <Box mt={3} mb={1}>
+                <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
+                  <Typography variant="h6">{label}</Typography>
+                </CopyLinkToClipboard>
+              </Box>
+              <Grid container>
+                <Typography variant="body1" color="textSecondary">
+                  {entityName}-{field} timeseries has invalid data. Cannot use{" "}
+                  {dataFieldMetrics[field]?.invalidDataPlot} data types to plot chart. Evaluate how this data is
+                  collected.
+                </Typography>
+              </Grid>
+            </div>
+          );
+        }
+
+        if (
+          dataFieldMetrics[field]?.sum === 0 &&
+          issues.filter((x) => x.fieldName === label).length === 0 &&
+          !(fieldsList.filter((x) => x.includes(field))?.length > 1)
+        ) {
+          // This array holds field names for fields that trigger a critical level issue rather than just an error level if all values are 0
+          const criticalZeroFields = ["totalValueLockedUSD", "deposit"];
+          let level = null;
+          criticalZeroFields.forEach((criticalField) => {
+            if (field.toUpperCase().includes(criticalField.toUpperCase())) {
+              level = "critical";
+            }
+          });
+
+          if (!level) {
+            const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
+              return field.includes(fieldSchema);
+            });
+            level = "warning";
+            if (schemaField) {
+              const fieldChars = entitiesData[entityName][schemaField].split("");
+              if (fieldChars[fieldChars.length - 1] === "!") {
+                level = "error";
+              }
+            }
+          }
+          issues.push({ type: "SUM", message: "", level, fieldName: label });
+        }
+        if (
+          issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
+          dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
+        ) {
+          issues.push({
+            type: "CUMULATIVE",
+            message: dataFieldMetrics[field]?.cumulative?.hasLowered,
+            level: "error",
+            fieldName: label,
+          });
+        }
+      } catch (err) {
+        let message = "JAVASCRIPT ERROR";
+        if (err instanceof Error) {
+          message = err.message;
+        }
+        console.log(err);
+        if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
+          issues.push({
+            type: "JS",
+            message: message,
+            level: "critical",
+            fieldName: entityName + "-" + field,
+          });
+        }
+        return (
+          <div key={elementId}>
+            <Box mt={3} mb={1}>
+              <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
+                <Typography variant="h6">
+                  {field} - {message}
+                </Typography>
+              </CopyLinkToClipboard>
+            </Box>
+          </div>
+        );
+      }
+      if (dataFields[fieldName]?.length === 0) {
+        return null;
+      }
+      if (
+        fieldName.toUpperCase() === field.toUpperCase() &&
+        fieldsList.filter((x) => x.includes(fieldName))?.length > 1
+      ) {
+        return null;
+      }
+
+      if (fieldName.toUpperCase().includes("REWARD") && !(data[poolKeySingular]?.rewardTokens?.length > 0)) {
+        return null;
+      }
+      if (fieldName.toUpperCase().includes("OUTPUT") && !data[poolKeySingular]?.outputToken) {
+        return null;
+      }
+      let dataChartToPass: any = dataFields[field];
+      let baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}`;
+      if (overlayDataFields[field]) {
+        const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network || ""}-${overlayData?.protocols[0]?.subgraphVersion}`;
+        let keyDiff = "";
+        if (baseKey === overlayKey) {
+          keyDiff = ' (Overlay)';
+        }
+        dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
+      }
+      return (
+        <ChartContainer
+          csvMetaDataProp={csvMetaData}
+          csvJSONProp={csvJSON}
+          baseKey={baseKey}
+          elementId={elementId}
+          downloadAllCharts={downloadAllCharts}
+          identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id}
+          datasetLabel={label}
+          dataTable={dataFields[field]}
+          dataChart={dataChartToPass}
+          chartsImageFiles={chartsImageFiles}
+          setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+      );
+    })
+
     return (
       <Grid key={entityName}>
         <Box sx={{ marginTop: "24px" }}>
@@ -1105,176 +1244,7 @@ function PoolTabEntity({
           <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
           <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Charts</div>
         </div>
-        {Object.keys(dataFields).map((field: string) => {
-          const fieldName = field.split(" [")[0];
-          let label = entityName + "-" + field;
-          // Label changes, element id is constant
-          const elementId = label;
-          const linkToElementId = elementId.split(" ").join("%20");
-
-          try {
-            const arrayIndex = Number(field?.split(" [")[1]?.split("]")[0]);
-            // Generate the labeling for different token charts
-            if (fieldName.toUpperCase().includes("INPUTTOKEN")) {
-              if ((arrayIndex || arrayIndex === 0) && data[poolKeySingular]?.inputTokens) {
-                const currentInputToken = data[poolKeySingular].inputTokens[arrayIndex];
-                const name = currentInputToken?.name ? currentInputToken.name : "N/A";
-                const symbol = currentInputToken?.symbol ? currentInputToken.symbol : "N/A";
-                label += " - " + symbol + ": " + name;
-              } else if (data[poolKeySingular]?.inputToken) {
-                const name = data[poolKeySingular].inputToken?.name ? data[poolKeySingular].inputToken.name : "N/A";
-                const symbol = data[poolKeySingular].inputToken?.symbol
-                  ? data[poolKeySingular].inputToken.symbol
-                  : "N/A";
-                label += " - " + symbol + ": " + name;
-              }
-            } else if (fieldName.toUpperCase().includes("OUTPUTTOKEN")) {
-              const name = data[poolKeySingular]?.outputToken?.name ? data[poolKeySingular]?.outputToken?.name : "N/A";
-              const symbol = data[poolKeySingular]?.outputToken?.symbol
-                ? data[poolKeySingular]?.outputToken?.symbol
-                : "N/A";
-              label += " - " + symbol + ": " + name;
-            } else if (
-              fieldName.toUpperCase().includes("TOKEN") &&
-              data[poolKeySingular]?.inputToken &&
-              !arrayIndex &&
-              arrayIndex !== 0
-            ) {
-              const name = data[poolKeySingular]?.inputToken?.name ? data[poolKeySingular].inputToken.name : "N/A";
-              const symbol = data[poolKeySingular]?.inputToken?.symbol
-                ? data[poolKeySingular].inputToken.symbol
-                : "N/A";
-              label += " - " + symbol + ": " + name;
-            }
-            const isNegativeField = negativeFieldList.find((x: string) => {
-              return field.toUpperCase().includes(x.toUpperCase());
-            });
-            if (
-              dataFieldMetrics[field]?.negative &&
-              !isNegativeField &&
-              issues.filter((x) => x.fieldName === `${entityName}-${field}` && x.type === "NEG").length === 0
-            ) {
-              issues.push({
-                message: JSON.stringify(dataFieldMetrics[field]?.negative),
-                type: "NEG",
-                level: "critical",
-                fieldName: `${entityName}-${field}`,
-              });
-            }
-            if (dataFieldMetrics[field]?.invalidDataPlot) {
-              return (
-                <div key={elementId} id={linkToElementId}>
-                  <Box mt={3} mb={1}>
-                    <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
-                      <Typography variant="h6">{label}</Typography>
-                    </CopyLinkToClipboard>
-                  </Box>
-                  <Grid container>
-                    <Typography variant="body1" color="textSecondary">
-                      {entityName}-{field} timeseries has invalid data. Cannot use{" "}
-                      {dataFieldMetrics[field]?.invalidDataPlot} data types to plot chart. Evaluate how this data is
-                      collected.
-                    </Typography>
-                  </Grid>
-                </div>
-              );
-            }
-
-            if (
-              dataFieldMetrics[field].sum === 0 &&
-              issues.filter((x) => x.fieldName === label).length === 0 &&
-              !(fieldsList.filter((x) => x.includes(field))?.length > 1)
-            ) {
-              // This array holds field names for fields that trigger a critical level issue rather than just an error level if all values are 0
-              const criticalZeroFields = ["totalValueLockedUSD", "deposit"];
-              let level = null;
-              criticalZeroFields.forEach((criticalField) => {
-                if (field.toUpperCase().includes(criticalField.toUpperCase())) {
-                  level = "critical";
-                }
-              });
-
-              if (!level) {
-                const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
-                  return field.includes(fieldSchema);
-                });
-                level = "warning";
-                if (schemaField) {
-                  const fieldChars = entitiesData[entityName][schemaField].split("");
-                  if (fieldChars[fieldChars.length - 1] === "!") {
-                    level = "error";
-                  }
-                }
-              }
-              issues.push({ type: "SUM", message: "", level, fieldName: label });
-            }
-            if (
-              issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
-              dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
-            ) {
-              issues.push({
-                type: "CUMULATIVE",
-                message: dataFieldMetrics[field]?.cumulative?.hasLowered,
-                level: "error",
-                fieldName: label,
-              });
-            }
-          } catch (err) {
-            let message = "JAVASCRIPT ERROR";
-            if (err instanceof Error) {
-              message = err.message;
-            }
-            console.log(err);
-            if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
-              issues.push({
-                type: "JS",
-                message: message,
-                level: "critical",
-                fieldName: entityName + "-" + field,
-              });
-            }
-            return (
-              <div key={elementId}>
-                <Box mt={3} mb={1}>
-                  <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-                    <Typography variant="h6">
-                      {field} - {message}
-                    </Typography>
-                  </CopyLinkToClipboard>
-                </Box>
-              </div>
-            );
-          }
-          if (dataFields[fieldName]?.length === 0) {
-            return null;
-          }
-          if (
-            fieldName.toUpperCase() === field.toUpperCase() &&
-            fieldsList.filter((x) => x.includes(fieldName))?.length > 1
-          ) {
-            return null;
-          }
-
-          if (fieldName.toUpperCase().includes("REWARD") && !(data[poolKeySingular]?.rewardTokens?.length > 0)) {
-            return null;
-          }
-          if (fieldName.toUpperCase().includes("OUTPUT") && !data[poolKeySingular]?.outputToken) {
-            return null;
-          }
-          let dataChartToPass: any = dataFields[field];
-          let baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}`;
-          if (overlayDataFields[field]) {
-            const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network || ""}-${overlayData?.protocols[0]?.subgraphVersion}`;
-            let keyDiff = "";
-            if (baseKey === overlayKey) {
-              keyDiff = ' (Overlay)';
-            }
-            dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
-          }
-          return (
-            <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
-          );
-        })}
+        {charts}
         {ratesElement}
         {rewardAPRElement}
         {tokenWeightComponent}

@@ -1,0 +1,35 @@
+{
+  "network": "fantom",
+  "defaultNetwork": "Network.FANTOM",
+
+  "priceCaching": 1000,
+
+  "poolInfoContract": "0x8cC6e2144906e81F496429A1590Ef5f86bb7558f",
+  "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
+  "crvTokenAddress": "0x1E4F97b9f9F913c46F1632781732927B9019C68b",
+
+  "gaugeControllerContract": "0xabc000d88f23bb45525e447528dbf656a9d55bf5",
+  "gaugeControllerStartBlock": "30660844",
+
+  "poolRegistry": [
+    {
+      "name": "MainRegistry",
+      "address": "0x0f854EA9F38ceA4B1c2FC79047E9D0134419D5d6",
+      "startBlock": "17077215"
+    },
+    {
+      "name": "Factory",
+      "address": "0x686d67265703D1f124c45E33d47d794c566889Ba",
+      "startBlock": "17079116"
+    },
+    {
+      "name": "CryptoSwapRegistry",
+      "address": "0x4fb93D7d320E8A263F22f62C2059dFC2A8bCbC4c",
+      "startBlock": "27552509"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}

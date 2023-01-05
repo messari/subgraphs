@@ -43,6 +43,24 @@
   file: ./abis/Prices/Calculations/SushiSwap.json
 ```
 
+### Uniswap - Overriding router path
+
+The default behaviour when querying the Uniswap router for non-native token (e.g. ETH on mainnet, MATIC on polygon) prices is to derive the price via two jumps using the native token.
+
+As an example, to get the price of WBTC in USDC on ethereum mainnet, the path used would be WBTC -> WETH -> USDC, deriving the prices from the WBTC/WETH pool and the WETH/USDC pool.
+There may be cases where the price queried with this method is inaccurate due to low liquidity of the intermediate pools, in this case, it is possible to override the router path for tokens on specific networks.
+This is done by adding a new entry to '`UNISWAP_PATH_OVERRIDE` in the `./config/<network>.ts` file.
+
+For example, on polygon there is insufficient liquidity in WBTC/WMATIC at the time of writing. we have overrided the router PATH for WBTC on polygon so that the WBTC/USDC pool is used instead:
+```
+QUICKSWAP_PATH_OVERRIDE.set(
+  Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // Token to override (WBTC)
+  [
+    Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // WBTC
+    Address.fromString("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"),  // USDC
+  ]
+```
+
 ## Usage
 
 Following are some ways through which you can get the prices of tokens:
@@ -149,3 +167,15 @@ Prices
 | [SushiSwap](https://arbiscan.io/address/0x5EA7E501c9A23F4A76Dc7D33a11D995B13a1dD25) | `Calculations` | `2396120` |    ❎     |   🛠    |
 | [Curve](https://arbiscan.io/address/0x445FE580eF8d70FF569aB36e80c647af338db351)     |    `Router`    | `1362056` |    ✅     |   🛠    |
 | [SushiSwap](https://arbiscan.io/address/0x1b02da8cb0d097eb8d57a175b88c7d8b47997506) |    `Router`    | `73` |    ✅     |   🛠    |
+
+
+### Polygon
+
+🔨 = In progress.  
+🛠 = Feature complete. Additional testing required.
+`MultiCall` = If the method uses more than two `JSON RPC Call`.
+
+| Method                                                                               |      Type      | StartBlock | MultiCall | Status |
+| ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |
+| [QuickSwap](https://etherscan.io/address/0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff) |    `Router`    | `4931900`  |    ✅     |   🛠   |
+| [SushiSwap](https://etherscan.io/address/0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506) |    `Router`    | `11333235` |    ✅     |   🛠   |

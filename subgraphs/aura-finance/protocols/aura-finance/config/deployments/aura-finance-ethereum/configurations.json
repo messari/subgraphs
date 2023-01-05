@@ -1,5 +1,8 @@
 {
   "deployment": "AURAFINANCE_MAINNET",
   "network": "mainnet",
-  "file": "./src/mappings/handlers.ts"
+  "file": "./src/mappings/handlers.ts",
+  "graftEnabled": false,
+  "subgraphId": "QmdQdzMnkUayk7kNyf7YapKSD4L1z8mFxHfZrGFewgacxc",
+  "graftStartBlock": 15775503
 }
