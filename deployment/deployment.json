@@ -5906,5 +5906,56 @@
         }
       }
     }
+  },
+  "multichain": {
+    "schema": "bridge",
+    "base": "multichain",
+    "protocol": "multichain",
+    "deployments": {
+      "multichain-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-ethereum",
+            "query-id": "multichain-ethereum"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "multichain-fantom": {
+        "network": "fantom",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-fantom",
+            "query-id": "multichain-fantom"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      }
+    }
   }
 }
