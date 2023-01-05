@@ -7,7 +7,7 @@ import {
 
 import { FEE_DENOMINATOR } from "../common/constants";
 
-import { Booster__poolInfoResult } from "../../generated/Booster/Booster";
+import { Booster__poolInfoResult } from "../../generated/Booster-v1/Booster";
 
 export class PoolInfoType {
   private _lpToken: Wrapped<Address>;

@@ -6,8 +6,8 @@ import * as OPTIMISM from "../config/optimism";
 import * as ARBITRUM_ONE from "../config/arbitrumOne";
 
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
-import { UniswapPair__getReservesResult } from "../../../generated/Booster/UniswapPair";
-import { SushiSwapPair__getReservesResult } from "../../../generated/Booster/SushiSwapPair";
+import { UniswapPair__getReservesResult } from "../../../generated/Booster-v1/UniswapPair";
+import { SushiSwapPair__getReservesResult } from "../../../generated/Booster-v1/SushiSwapPair";
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// COMMON ////////////////////////////////
