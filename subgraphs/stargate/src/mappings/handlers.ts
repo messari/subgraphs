@@ -38,7 +38,6 @@ import {
   Swap,
   SwapRemoteCall,
 } from "../../generated/Router/Pool";
-import { _ERC20 } from "../../generated/Router/_ERC20";
 import { Pool } from "../../generated/Router/Pool";
 import { Factory as StargateFactory } from "../../generated/Router/Factory";
 import { PoolTemplate } from "../../generated/templates";
