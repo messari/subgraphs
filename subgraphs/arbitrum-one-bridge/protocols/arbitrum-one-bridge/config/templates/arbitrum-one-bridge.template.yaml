@@ -1,0 +1,214 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: L1ERC20Gateway
+    network: mainnet
+    source:
+      address: "0xa3A7B6F88361F48403514059F1F16C8E78d60EeC"
+      abi: L1ERC20Gateway
+      startBlock: 12640865
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        # - DepositInitiated
+        # - TxToL2
+        # - WithdrawRedirected
+        - WithdrawalFinalized      
+      abis:
+        - name: L1ERC20Gateway
+          file: ./abis/L1ERC20Gateway.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        # - event: DepositInitiated(address,indexed address,indexed address,indexed uint256,uint256)
+        #   handler: handleDepositInitiated
+        # - event: TxToL2(indexed address,indexed address,indexed uint256,bytes)
+        #   handler: handleTxToL2
+        # - event: WithdrawRedirected(indexed address,indexed address,indexed uint256,bytes,bytes,bool)
+        #   handler: handleWithdrawRedirected
+        - event: WithdrawalFinalized(address,indexed address,indexed address,indexed uint256,uint256)
+          handler: handleTransferIn
+      # file: ./src/handlers/l-1-erc-20-gateway.ts
+      file: ./src/test-sdk.ts
+  # - kind: ethereum
+  #   name: L1CustomGateway
+  #   network: mainnet
+  #   source:
+  #     address: "0xcee284f754e854890e311e3280b767f80797180d"
+  #     abi: L1CustomGateway
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - DepositInitiated
+  #       - TokenSet
+  #       - TxToL2
+  #       - WithdrawRedirected
+  #       - WithdrawalFinalized
+  #     abis:
+  #       - name: L1CustomGateway
+  #         file: ./abis/L1CustomGateway.json
+  #     eventHandlers:
+  #       - event: DepositInitiated(address,indexed address,indexed address,indexed uint256,uint256)
+  #         handler: handleDepositInitiated
+  #       - event: TokenSet(indexed address,indexed address)
+  #         handler: handleTokenSet
+  #       - event: TxToL2(indexed address,indexed address,indexed uint256,bytes)
+  #         handler: handleTxToL2
+  #       - event: WithdrawRedirected(indexed address,indexed address,indexed
+  #           uint256,bytes,bytes,bool)
+  #         handler: handleWithdrawRedirected
+  #       - event: WithdrawalFinalized(address,indexed address,indexed address,indexed
+  #           uint256,uint256)
+  #         handler: handleWithdrawalFinalized
+  #     file: ./src/handlers/l-1-custom-gateway.ts
+  # - kind: ethereum
+  #   name: L1WethGateway
+  #   network: mainnet
+  #   source:
+  #     address: "0xd92023E9d9911199a6711321D1277285e6d4e2db"
+  #     abi: L1WethGateway
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - L1WethGatewayDepositInitiated
+  #       - L1WethGatewayTxToL2
+  #       - L1WethGatewayWithdrawRedirected
+  #       - L1WethGatewayWithdrawalFinalized
+  #     abis:
+  #       - name: L1WethGateway
+  #         file: ./abis/L1WethGateway.json
+  #     eventHandlers:
+  #       - event: L1WethGatewayDepositInitiated(address,indexed address,indexed address,indexed
+  #           uint256,uint256)
+  #         handler: handleL1WethGatewayDepositInitiated
+  #       - event: L1WethGatewayTxToL2(indexed address,indexed address,indexed uint256,bytes)
+  #         handler: handleL1WethGatewayTxToL2
+  #       - event: L1WethGatewayWithdrawRedirected(indexed address,indexed address,indexed
+  #           uint256,bytes,bytes,bool)
+  #         handler: handleL1WethGatewayWithdrawRedirected
+  #       - event: L1WethGatewayWithdrawalFinalized(address,indexed address,indexed address,indexed
+  #           uint256,uint256)
+  #         handler: handleL1WethGatewayWithdrawalFinalized
+  #     file: ./src/handlers/l-1-weth-gateway.ts
+  # - kind: ethereum
+  #   name: L1DaiGateway
+  #   network: mainnet
+  #   source:
+  #     address: "0xD3B5b60020504bc3489D6949d545893982BA3011"
+  #     abi: L1DaiGateway
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Closed
+  #       - Deny
+  #       - L1DaiGatewayDepositInitiated
+  #       - Rely
+  #       - L1DaiGatewayTxToL2
+  #       - L1DaiGatewayWithdrawalFinalized
+  #     abis:
+  #       - name: L1DaiGateway
+  #         file: ./abis/L1DaiGateway.json
+  #     eventHandlers:
+  #       - event: Closed()
+  #         handler: handleClosed
+  #       - event: Deny(indexed address)
+  #         handler: handleDeny
+  #       - event: L1DaiGatewayDepositInitiated(address,indexed address,indexed address,indexed
+  #           uint256,uint256)
+  #         handler: handleL1DaiGatewayDepositInitiated
+  #       - event: Rely(indexed address)
+  #         handler: handleRely
+  #       - event: L1DaiGatewayTxToL2(indexed address,indexed address,indexed uint256,bytes)
+  #         handler: handleL1DaiGatewayTxToL2
+  #       - event: L1DaiGatewayWithdrawalFinalized(address,indexed address,indexed address,indexed
+  #           uint256,uint256)
+  #         handler: handleL1DaiGatewayWithdrawalFinalized
+  #     file: ./src/handlers/l-1-dai-gateway.ts
+  # - kind: ethereum
+  #   name: L1LPTGateway
+  #   network: mainnet
+  #   source:
+  #     address: "0x6142f1C8bBF02E6A6bd074E8d564c9A5420a0676"
+  #     abi: L1LPTGateway
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - L1LPTGatewayDepositInitiated
+  #       - L2CounterpartUpdate
+  #       - MinterUpdate
+  #       - Paused
+  #       - RoleAdminChanged
+  #       - RoleGranted
+  #       - RoleRevoked
+  #       - L1LPTGatewayTxToL2
+  #       - Unpaused
+  #       - L1LPTGatewayWithdrawalFinalized
+  #     abis:
+  #       - name: L1LPTGateway
+  #         file: ./abis/L1LPTGateway.json
+  #     eventHandlers:
+  #       - event: L1LPTGatewayDepositInitiated(address,indexed address,indexed address,indexed
+  #           uint256,uint256)
+  #         handler: handleL1LPTGatewayDepositInitiated
+  #       - event: L2CounterpartUpdate(address)
+  #         handler: handleL2CounterpartUpdate
+  #       - event: MinterUpdate(address)
+  #         handler: handleMinterUpdate
+  #       - event: Paused(address)
+  #         handler: handlePaused
+  #       - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
+  #         handler: handleRoleAdminChanged
+  #       - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+  #         handler: handleRoleGranted
+  #       - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+  #         handler: handleRoleRevoked
+  #       - event: L1LPTGatewayTxToL2(indexed address,indexed address,indexed uint256,bytes)
+  #         handler: handleL1LPTGatewayTxToL2
+  #       - event: Unpaused(address)
+  #          handler: handleUnpaused
+  #        - event: L1LPTGatewayWithdrawalFinalized(address,indexed address,indexed address,indexed
+  #            uint256,uint256)
+  #          handler: handleL1LPTGatewayWithdrawalFinalized
+  #      file: ./src/handlers/l-1-lpt-gateway.ts
