@@ -6,7 +6,7 @@ import IssuesDisplay from "../IssuesDisplay";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import PoolTabEntity from "./PoolTabEntity";
-import BridgeOutboundVolChart from "../BridgeOutboundVolChart";
+import BridgeOutboundVolumeLogic from "../BridgeOutboundVolumeLogic";
 
 interface PoolTabProps {
   data: any;
@@ -114,6 +114,75 @@ function PoolTab({
     );
   }
 
+
+  // Specific chart routing
+  // This logic renders components that are specific to a given schema type or version
+  const specificCharts: any[] = [];
+  const specificChartsOnEntity: any = {};
+
+  // structure entityName > { chartName: chartElement}
+  const schemaType = data?.protocols[0]?.type;
+  const schemaVersion = data?.protocols[0]?.version;
+
+  if (schemaType?.toUpperCase() === "BRIDGE") {
+    const headerComponent = (<Grid key={"Bridge Specific Charts"}>
+      <Box sx={{ marginTop: "24px" }}>
+        <CopyLinkToClipboard link={window.location.href} scrollId={"Bridge Specific Charts"}>
+          <Typography variant="h4">{"Bridge Specific Charts"}</Typography>
+        </CopyLinkToClipboard>
+      </Box>
+    </Grid>);
+    specificCharts.push(headerComponent, <BridgeOutboundVolumeLogic poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
+  } else if (schemaType?.toUpperCase() === "EXCHANGE") {
+    if (poolTimeseriesData) {
+      Object.keys(poolTimeseriesData).forEach((entityName: string) => {
+        if (!specificChartsOnEntity[entityName]) {
+          specificChartsOnEntity[entityName] = {};
+        }
+        const currentEntityData = poolTimeseriesData[entityName];
+        for (let x = currentEntityData.length - 1; x >= 0; x--) {
+          const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+
+          // For exchange protocols, calculate the baseYield
+          let value = 0;
+          if (Object.keys(data[poolKeySingular]?.fees)?.length > 0 && timeseriesInstance.totalValueLockedUSD) {
+            const revenueUSD =
+              Number(timeseriesInstance.dailySupplySideRevenueUSD) * 365 ||
+              Number(timeseriesInstance.hourlySupplySideRevenueUSD) * 24 * 365;
+            value = (revenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 100;
+            if (!value) {
+              value = 0;
+            }
+          }
+        }
+      })
+    }
+  } else if (schemaType?.toUpperCase() === "YIELD") {
+    if (poolTimeseriesData) {
+      Object.keys(poolTimeseriesData).forEach((entityName: string) => {
+        if (!specificChartsOnEntity[entityName]) {
+          specificChartsOnEntity[entityName] = {};
+        }
+        const currentEntityData = poolTimeseriesData[entityName];
+        for (let x = currentEntityData.length - 1; x >= 0; x--) {
+          const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          let value = 0;
+          // For Yield Agg protocols, calculate the baseYield
+          if (timeseriesInstance.totalValueLockedUSD && timeseriesInstance.dailySupplySideRevenueUSD) {
+            value = Number(timeseriesInstance.dailySupplySideRevenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 365 * 100;
+          } else if (timeseriesInstance.totalValueLockedUSD && timeseriesInstance.hourlySupplySideRevenueUSD) {
+            value = Number(timeseriesInstance.hourlySupplySideRevenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 365 * 100;
+          }
+          if (!specificChartsOnEntity[entityName]['baseYield']) {
+            specificChartsOnEntity[entityName]['baseYield'] = [];
+          } else {
+            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: Number(timeseriesInstance.timestamp) });
+          }
+        }
+      })
+    }
+  }
+
   let poolDataSection = null;
   let poolTable = null;
   if (poolId) {
@@ -142,12 +211,17 @@ function PoolTab({
     }
     if (poolTimeseriesData) {
       const poolEntityElements = Object.keys(poolTimeseriesData).map((entityName: string) => {
+        let entitySpecificElements: any = {};
+        if (specificChartsOnEntity[entityName]) {
+          entitySpecificElements = (specificChartsOnEntity[entityName]);
+        }
         return (
           <PoolTabEntity
             key={"poolTabEntity-" + entityName}
             data={data}
             overlayData={overlayData}
             currentEntityData={poolTimeseriesData[entityName]}
+            entitySpecificElements={entitySpecificElements}
             overlayPoolTimeseriesData={overlayPoolTimeseriesData[entityName]}
             entityName={entityName}
             entitiesData={entitiesData}
@@ -203,22 +277,13 @@ function PoolTab({
     }
   }
 
-  // Specific chart routing
-  // This logic renders components that are specific to a given schema type or version
-  const specificCharts: any[] = [];
-  const schemaType = data?.protocols[0]?.type;
-  const schemaVersion = data?.protocols[0]?.version;
-
-  if (schemaType?.toUpperCase() === "BRIDGE") {
-    // specificCharts.push(< BridgeOutboundVolChart poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
-  }
 
   return (
     <>
       {issuesDisplayElement}
       {poolDropDown}
-      {specificCharts}
       {poolDataSection}
+      {specificCharts}
     </>
   );
 }

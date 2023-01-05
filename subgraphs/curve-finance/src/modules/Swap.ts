@@ -36,7 +36,7 @@ export function createSwapTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): SwapTransaction {
-  let transactionId = "swap-"
+  const transactionId = "swap-"
     .concat(transaction.hash.toHexString())
     .concat("-")
     .concat(transaction.index.toString());
@@ -105,25 +105,33 @@ export function Swap(
   let tokenOut: string;
 
   if (!underlying) {
-    tokenIn = pool.inputTokens[sold_id.toI32()];
-    tokenOut = pool.inputTokens[bought_id.toI32()];
+    tokenIn = pool._inputTokensOrdered[sold_id.toI32()];
+    tokenOut = pool._inputTokensOrdered[bought_id.toI32()];
   } else {
-    let underlyingCoins = utils.getPoolUnderlyingCoins(liquidityPoolAddress);
+    const underlyingCoins = utils.getPoolUnderlyingCoinsFromRegistry(
+      liquidityPoolAddress,
+      Address.fromString(pool._registryAddress)
+    );
 
     if (underlyingCoins.length == 0) return;
 
     tokenIn = underlyingCoins[sold_id.toI32()].toHexString();
     tokenOut = underlyingCoins[bought_id.toI32()].toHexString();
+
+    if (bought_id.toI32() == 0) {
+      // Exception: https://etherscan.io/address/0x06cb22615ba53e60d67bf6c341a0fd5e718e1655#code#L750
+      tokenIn = pool._inputTokensOrdered.at(-1);
+    }
   }
 
-  let tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block.number);
+  const tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);
   const amountInUSD = amountIn
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
     )
     .times(tokenInStore.lastPriceUSD!);
 
-  let tokenOutStore = utils.getOrCreateTokenFromString(tokenOut, block.number);
+  const tokenOutStore = utils.getOrCreateTokenFromString(tokenOut, block);
   const amountOutUSD = amountOut
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal()
@@ -145,19 +153,10 @@ export function Swap(
 
   const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
 
-  pool.inputTokenBalances = utils.getPoolBalances(
-    liquidityPoolAddress,
-    pool.inputTokens
-  );
-  pool.totalValueLockedUSD = utils.getPoolTVL(
-    pool.inputTokens,
-    pool.inputTokenBalances,
-    block
-  );
+  pool.inputTokenBalances = utils.getPoolBalances(pool);
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,
-    pool.totalValueLockedUSD,
     block
   );
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(volumeUSD);

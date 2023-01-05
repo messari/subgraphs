@@ -1131,7 +1131,7 @@ export const schema300 = (): Schema => {
       dailyWithdrawUSD: "BigDecimal!",
       dailyRepayUSD: "BigDecimal!",
       dailyTransferUSD: "BigDecimal!",
-      dailyFlashloanUSD: "BigDecimal!"
+      dailyFlashloanUSD: "BigDecimal!",
     },
     usageMetricsDailySnapshots: {
       ...prevSchema.entitiesData.usageMetricsDailySnapshots,
@@ -1146,7 +1146,6 @@ export const schema300 = (): Schema => {
       reserveFactor: "BigDecimal",
       variableBorrowedTokenBalance: "BigInt",
       stableBorrowedTokenBalance: "BigInt",
-      totalReservesUSD: "BigDecimal",
       supplyCap: "BigInt",
       borrowCap: "BigInt",
       dailyNativeDeposit: "BigInt!",
@@ -1170,7 +1169,6 @@ export const schema300 = (): Schema => {
       dailyActiveLendingPositionCount: "Int!",
       borrowingPositionCount: "Int!",
       dailyActiveBorrowingPositionCount: "Int!",
-
     },
     usageMetricsHourlySnapshots: prevSchema.entitiesData.usageMetricsHourlySnapshots,
     marketHourlySnapshots: {
@@ -1232,7 +1230,6 @@ export const schema300 = (): Schema => {
     return baseStr + fields + " }";
   });
 
-
   const poolData: { [x: string]: string } = {
     ...prevSchema.poolData,
     positionCount: "Int!",
@@ -1265,8 +1262,7 @@ export const schema300 = (): Schema => {
     stableBorrowedTokenBalance: "BigInt",
     supplyCap: "BigInt",
     borrowCap: "BigInt",
-    totalReservesUSD: "BigDecimal",
-    revenueDetails: "RevenueDetails",
+    revenueDetail: "RevenueDetail",
   };
 
   const financialsQuery = `
@@ -1298,7 +1294,7 @@ export const schema300 = (): Schema => {
         lenderPermissionType
         borrowerPermissionType
         collateralizationType
-        revenueDetails
+        revenueDetail
         mintedTokens {
           id
           decimals
@@ -1422,7 +1418,7 @@ export const schema300 = (): Schema => {
       lenderPermissionType
       borrowerPermissionType
       collateralizationType
-      revenueDetails
+      revenueDetail
       mintedTokens {
         id
         decimals
@@ -1543,8 +1539,7 @@ export const schema300 = (): Schema => {
       stableBorrowedTokenBalance
       supplyCap
       borrowCap
-      totalReservesUSD
-      revenueDetails
+      revenueDetail
       ${positionsQuery}
     }
   }`;
@@ -1564,7 +1559,7 @@ export const schema300 = (): Schema => {
     repayCount: "Int!",
     liquidationCount: "Int!",
     transferCount: "Int!",
-    flashloanCount: "Int!"
+    flashloanCount: "Int!",
   };
 
   return {

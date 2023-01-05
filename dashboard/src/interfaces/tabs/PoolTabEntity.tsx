@@ -53,6 +53,7 @@ interface PoolTabEntityProps {
   currentEntityData: any[];
   entityName: string;
   entitiesData: { [x: string]: { [x: string]: string } };
+  entitySpecificElements: any;
   overlayPoolTimeseriesData: any;
   poolId: string;
   protocolData: { [x: string]: any };
@@ -66,13 +67,13 @@ function PoolTabEntity({
   currentEntityData,
   entityName,
   entitiesData,
+  entitySpecificElements,
   overlayPoolTimeseriesData,
   poolId,
   protocolData,
   setIssues,
   issuesProps,
 }: PoolTabEntityProps) {
-
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   // Get the key name of the pool specific to the protocol type (singular and plural)
   const poolKeySingular = PoolName[data.protocols[0].type];
@@ -148,45 +149,6 @@ function PoolTabEntity({
       const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
       const overlayDifference = currentEntityData.length - overlayPoolTimeseriesData.length;
       const overlayTimeseriesInstance: { [x: string]: any } = overlayPoolTimeseriesData[x - overlayDifference];
-
-      // For exchange protocols, calculate the baseYield
-      if (data.protocols[0].type === "EXCHANGE") {
-        let value = 0;
-        if (Object.keys(data[poolKeySingular]?.fees)?.length > 0 && timeseriesInstance.totalValueLockedUSD) {
-          const revenueUSD =
-            Number(timeseriesInstance.dailySupplySideRevenueUSD) * 365 ||
-            Number(timeseriesInstance.hourlySupplySideRevenueUSD) * 24 * 365;
-          value = (revenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 100;
-          if (!value) {
-            value = 0;
-          }
-        }
-        if (!dataFields.baseYield) {
-          dataFields.baseYield = [];
-          dataFieldMetrics.baseYield = { sum: 0 };
-        } else {
-          dataFields.baseYield.push({ value, date: Number(timeseriesInstance.timestamp) });
-          dataFieldMetrics.baseYield.sum += value;
-        }
-      }
-
-      if (overlayData?.protocols[0]?.type === "EXCHANGE" && overlayTimeseriesInstance) {
-        let value = 0;
-        if (Object.keys(overlayData[poolKeySingular]?.fees)?.length > 0 && overlayTimeseriesInstance.totalValueLockedUSD) {
-          const revenueUSD =
-            Number(overlayTimeseriesInstance.dailySupplySideRevenueUSD) * 365 ||
-            Number(overlayTimeseriesInstance.hourlySupplySideRevenueUSD) * 24 * 365;
-          value = (revenueUSD / Number(overlayTimeseriesInstance.totalValueLockedUSD)) * 100;
-          if (!value) {
-            value = 0;
-          }
-        }
-        if (!overlayDataFields.baseYield) {
-          overlayDataFields.baseYield = [];
-        } else {
-          overlayDataFields.baseYield.push({ value, date: Number(overlayTimeseriesInstance.timestamp) });
-        }
-      }
 
       // Take the given timeseries instance and loop thru the fields of the instance (ie totalValueLockedUSD)
       let skip = false;
@@ -929,13 +891,6 @@ function PoolTabEntity({
       });
     }
 
-    // Move baseYield chart to bottom (above token weights)
-    if (dataFields.baseYield) {
-      const baseYield = dataFields.baseYield;
-      delete dataFields.baseYield;
-      dataFields.baseYield = baseYield;
-    }
-
     const rewardTokensLength = data[poolKeySingular]?.rewardTokens?.length;
     const inputTokensLength = data[poolKeySingular]?.inputTokens?.length;
 
@@ -1036,6 +991,10 @@ function PoolTabEntity({
         delete instanceToSave.rates;
       }
 
+      Object.keys(entitySpecificElements).forEach((key: string) => {
+        instanceToSave[key] = entitySpecificElements[key][entitySpecificElements[key]?.length - idx - 1]?.value || 0;
+      })
+
       for (let tokenIdx = 0; tokenIdx < rewardTokensLength; tokenIdx++) {
         const amt = instance?.rewardTokenEmissionsAmount?.[tokenIdx] || 0;
         instanceToSave["rewardTokenEmissionsAmount [" + tokenIdx + "]"] = amt;
@@ -1074,12 +1033,6 @@ function PoolTabEntity({
         }
       }
 
-      if (!!dataFields.baseYield) {
-        instanceToSave.baseYield = dataFields.baseYield[idx]?.value;
-        if (!dataFields.baseYield[idx]?.value) {
-          instanceToSave.baseYield = 0;
-        }
-      }
 
       delete instanceToSave.rewardTokenEmissionsAmount;
       delete instanceToSave.rewardTokenEmissionsUSD;
@@ -1092,6 +1045,10 @@ function PoolTabEntity({
       delete instanceToSave.__typename;
       return instanceToSave;
     }).sort((a: any, b: any) => (Number(a.timestamp) - Number(b.timestamp)));
+
+    Object.keys(entitySpecificElements).forEach((eleName: string) => {
+      dataFields[eleName] = entitySpecificElements[eleName];
+    })
 
     const charts = Object.keys(dataFields).map((field: string) => {
       const fieldName = field.split(" [")[0];
@@ -1169,7 +1126,7 @@ function PoolTabEntity({
         }
 
         if (
-          dataFieldMetrics[field].sum === 0 &&
+          dataFieldMetrics[field]?.sum === 0 &&
           issues.filter((x) => x.fieldName === label).length === 0 &&
           !(fieldsList.filter((x) => x.includes(field))?.length > 1)
         ) {
@@ -1260,7 +1217,18 @@ function PoolTabEntity({
         dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
       }
       return (
-        <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey={baseKey} elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+        <ChartContainer
+          csvMetaDataProp={csvMetaData}
+          csvJSONProp={csvJSON}
+          baseKey={baseKey}
+          elementId={elementId}
+          downloadAllCharts={downloadAllCharts}
+          identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id}
+          datasetLabel={label}
+          dataTable={dataFields[field]}
+          dataChart={dataChartToPass}
+          chartsImageFiles={chartsImageFiles}
+          setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
       );
     })
 

@@ -102,6 +102,12 @@ export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 export const BIGDECIMAL_192 = new BigDecimal(BIGINT_192);
 export const BIGDECIMAL_TEN_THOUSAND = new BigDecimal(BIGINT_TEN_THOUSAND);
 export const BIGDECIMAL_MILLION = new BigDecimal(BIGINT_MILLION);
+export const BIGDECIMAL_BILLION = new BigDecimal(
+  BigInt.fromString("1000000000")
+);
+export const BIGDECIMAL_TEN_BILLION = new BigDecimal(
+  BigInt.fromString("10000000000")
+);
 
 export const Q192 = BigInt.fromString(
   "6277101735386680763835789423207666416102355444464034512896"
