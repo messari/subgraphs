@@ -1,4 +1,10 @@
-import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Address,
+  ethereum,
+  BigDecimal,
+  log,
+} from "@graphprotocol/graph-ts";
 import {
   LiquidityPool,
   Token,
@@ -18,8 +24,9 @@ import {
 } from "./getters";
 import { NetworkConfigs } from "../../configurations/configure";
 import {
+  BIGDECIMAL_BILLION,
   BIGDECIMAL_FIFTY,
-  BIGDECIMAL_NEG_ONE,
+  BIGDECIMAL_TEN_BILLION,
   BIGDECIMAL_ZERO,
   BIGINT_NEG_ONE,
   BIGINT_ZERO,
@@ -36,7 +43,11 @@ import {
   updateNativeTokenPriceInUSD,
 } from "./price/price";
 import { updateTokenWhitelists, updateVolumeAndFees } from "./updateMetrics";
-import { convertFeeToPercent, convertTokenToDecimal } from "./utils/utils";
+import {
+  absBigDecimal,
+  convertFeeToPercent,
+  convertTokenToDecimal,
+} from "./utils/utils";
 import { populateEmptyPools } from "./utils/backfill";
 
 // Create a liquidity pool from pairCreated event.
@@ -196,6 +207,16 @@ export function createDeposit(
   // Add pool value back to protocol total value locked
   // reset aggregates with new amounts
   const delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  if (absBigDecimal(delta).gt(BIGDECIMAL_BILLION)) {
+    log.error("Protocol TVL change is too large: Pool: {}, Deposit ID: {}", [
+      pool.id,
+      event.transaction.hash
+        .toHexString()
+        .concat("-")
+        .concat(event.logIndex.toString()),
+    ]);
+    return;
+  }
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
   const deposit = new Deposit(
@@ -276,6 +297,16 @@ export function createWithdraw(
 
   // reset aggregates with new amounts
   const delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  if (absBigDecimal(delta).gt(BIGDECIMAL_BILLION)) {
+    log.error("Protocol TVL change is too large: Pool: {}, Withdraw ID: {}", [
+      pool.id,
+      event.transaction.hash
+        .toHexString()
+        .concat("-")
+        .concat(event.logIndex.toString()),
+    ]);
+    return;
+  }
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
   const withdrawal = new Withdraw(
@@ -332,17 +363,22 @@ export function createSwapHandleVolumeAndFees(
   const amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
 
   // need absolute amounts for volume
-  let amount0Abs = amount0Converted;
-  if (amount0Converted.lt(BIGDECIMAL_ZERO)) {
-    amount0Abs = amount0Converted.times(BIGDECIMAL_NEG_ONE);
-  }
-  let amount1Abs = amount1Converted;
-  if (amount1Converted.lt(BIGDECIMAL_ZERO)) {
-    amount1Abs = amount1Converted.times(BIGDECIMAL_NEG_ONE);
-  }
+  const amount0Abs = absBigDecimal(amount0Converted);
+  const amount1Abs = absBigDecimal(amount1Converted);
 
-  const amount0USD = amount0Abs.times(token0.lastPriceUSD!);
-  const amount1USD = amount1Abs.times(token1.lastPriceUSD!);
+  // Temporary fix for bad pricing
+  const swapID = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.logIndex.toString());
+  const amount0USD = setZeroIfTooLarge(
+    swapID,
+    amount0Abs.times(token0.lastPriceUSD!)
+  );
+  const amount1USD = setZeroIfTooLarge(
+    swapID,
+    amount1Abs.times(token1.lastPriceUSD!)
+  );
 
   // Update the pool with the new active liquidity, price, and tick.
   const poolInputTokenBalances: BigInt[] = [
@@ -386,15 +422,20 @@ export function createSwapHandleVolumeAndFees(
 
   // reset aggregates with new amounts
   const delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  if (absBigDecimal(delta).gt(BIGDECIMAL_BILLION)) {
+    log.error("Protocol TVL change is too large: Pool: {}, Withdraw ID: {}", [
+      pool.id,
+      event.transaction.hash
+        .toHexString()
+        .concat("-")
+        .concat(event.logIndex.toString()),
+    ]);
+    return;
+  }
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
   // create Swap event
-  const swap = new Swap(
-    event.transaction.hash
-      .toHexString()
-      .concat("-")
-      .concat(event.logIndex.toString())
-  );
+  const swap = new Swap(swapID);
 
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();
@@ -434,4 +475,16 @@ export function createSwapHandleVolumeAndFees(
   swap.save();
   token0.save();
   token1.save();
+}
+
+// Set BigDecimal to zero of value is larger than 10 Billion
+function setZeroIfTooLarge(id: string, value: BigDecimal): BigDecimal {
+  if (value.gt(BIGDECIMAL_TEN_BILLION)) {
+    log.warning("Value too large (greater than 10 billion): {}, swap-id {}", [
+      value.toString(),
+      id,
+    ]);
+    return BIGDECIMAL_ZERO;
+  }
+  return value;
 }

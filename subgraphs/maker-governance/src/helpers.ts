@@ -133,6 +133,8 @@ export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
       const expiration = dsSpell.try_expiration();
       if (!expiration.reverted) {
         spell.expiryTime = expiration.value;
+      } else {
+        spell.expiryTime = BIGINT_ZERO;
       }
       spell.governanceFramework = event.address.toHexString();
       spell.totalVotes = BIGINT_ZERO;

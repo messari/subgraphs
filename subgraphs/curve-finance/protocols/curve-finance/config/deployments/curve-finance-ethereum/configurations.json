@@ -1,263 +1,45 @@
 {
-  "chain": "mainnet",
-  "registries": [
+  "network": "mainnet",
+  "defaultNetwork": "Network.MAINNET",
+
+  "priceCaching": 1000,
+
+  "poolInfoContract": "0xe64608E223433E8a03a1DaaeFD8Cb638C14B552C",
+  "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
+  "crvTokenAddress": "0xd533a949740bb3306d119cc777fa900ba034cd52",
+
+  "gaugeControllerContract": "0x2f50d538606fa9edd2b11e2446beb18c9d5846bb",
+  "gaugeControllerStartBlock": "10647875",
+
+  "poolRegistry": [
     {
-      "name": "Pool_Registry",
+      "name": "PoolRegistry",
       "address": "0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5",
       "startBlock": "12195750"
     },
     {
-      "name": "Factory_Registry",
+      "name": "PoolRegistryV2",
+      "address": "0x7d86446ddb609ed0f5f8684acf30380a356b2b4c",
+      "startBlock": "11154794"
+    },
+    {
+      "name": "MetapoolFactory",
       "address": "0xB9fC157394Af804a3578134A6585C0dc9cc990d4",
       "startBlock": "12903979"
     },
     {
-      "name": "Pool_Registry_v2",
+      "name": "CryptoSwapRegistry",
+      "address": "0x8F942C20D02bEfc377D41445793068908E2250D0",
+      "startBlock": "13986752"
+    },
+    {
+      "name": "CryptoPoolFactory",
       "address": "0xF18056Bbd320E96A48e3Fbf8bC061322531aac99",
       "startBlock": "14005321"
     }
   ],
-  "pools": [
-    {
-      "name": "3pool",
-      "address": "0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7",
-      "startBlock": "10809473"
-    },
-    {
-      "name": "aave",
-      "address": "0xDeBF20617708857ebe4F679508E7b7863a8A8EeE",
-      "startBlock": "11497106"
-    },
-    {
-      "name": "aeth",
-      "address": "0xA96A65c051bF88B4095Ee1f2451C2A9d43F53Ae2",
-      "startBlock": "11774139"
-    },
-    {
-      "name": "busd",
-      "address": "0x79a8C46DeA5aDa233ABaFFD40F3A0A2B1e5A4F27",
-      "startBlock": "9567295"
-    },
-    {
-      "name": "compound",
-      "address": "0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56",
-      "startBlock": "9554040"
-    },
-    {
-      "name": "eurs",
-      "address": "0x0Ce6a5fF5217e38315f87032CF90686C96627CAA",
-      "startBlock": "11466871"
-    },
-    {
-      "name": "hbtc",
-      "address": "0x4CA9b3063Ec5866A4B82E437059D2C43d1be596F",
-      "startBlock": "10732328"
-    },
-    {
-      "name": "ib",
-      "address": "0x2dded6Da1BF5DBdF597C45fcFaa3194e53EcfeAF",
-      "startBlock": "11831119"
-    },
-    {
-      "name": "link",
-      "address": "0xF178C0b5Bb7e7aBF4e12A4838C7b7c5bA2C623c0",
-      "startBlock": "11875215"
-    },
-    {
-      "name": "pax",
-      "address": "0x06364f10B501e868329afBc005b3492902d6C763",
-      "startBlock": "10041041"
-    },
-    {
-      "name": "ren",
-      "address": "0x93054188d876f558f4a66B2EF1d97d16eDf0895B",
-      "startBlock": "10151385"
-    },
-    {
-      "name": "saave",
-      "address": "0xEB16Ae0052ed37f479f7fe63849198Df1765a733",
-      "startBlock": "11772500"
-    },
-    {
-      "name": "sbtc",
-      "address": "0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714",
-      "startBlock": "10276641"
-    },
-    {
-      "name": "seth",
-      "address": "0xc5424B857f758E906013F3555Dad202e4bdB4567",
-      "startBlock": "11491884"
-    },
-    {
-      "name": "steth",
-      "address": "0xDC24316b9AE028F1497c275EB9192a3Ea0f67022",
-      "startBlock": "11592551"
-    },
-    {
-      "name": "susd",
-      "address": "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD",
-      "startBlock": "9906598"
-    },
-    {
-      "name": "usdt",
-      "address": "0x52EA46506B9CC5Ef470C5bf89f17Dc28bB35D85C",
-      "startBlock": "9456293"
-    },
-    {
-      "name": "y",
-      "address": "0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51",
-      "startBlock": "9476468"
-    },
-    {
-      "name": "dusd",
-      "address": "0x8038C01A0390a8c547446a0b2c18fc9aEFEcc10c",
-      "startBlock": "11187276"
-    },
-    {
-      "name": "gusd",
-      "address": "0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956",
-      "startBlock": "11005604"
-    },
-    {
-      "name": "husd",
-      "address": "0x3eF6A01A0f81D6046290f3e2A8c5b843e738E604",
-      "startBlock": "11010070"
-    },
-    {
-      "name": "linkusd",
-      "address": "0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171",
-      "startBlock": "11011556"
-    },
-    {
-      "name": "musd",
-      "address": "0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6",
-      "startBlock": "11011940"
-    },
-    {
-      "name": "rsv",
-      "address": "0xC18cC39da8b11dA8c3541C598eE022258F9744da",
-      "startBlock": "11037531"
-    },
-    {
-      "name": "usdk",
-      "address": "0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb",
-      "startBlock": "11010305"
-    },
-    {
-      "name": "usdn",
-      "address": "0x0f9cb53Ebe405d49A0bbdBD291A65Ff571bC83e1",
-      "startBlock": "11010514"
-    },
-    {
-      "name": "usdp",
-      "address": "0x42d7025938bEc20B69cBae5A77421082407f053A",
-      "startBlock": "11922057"
-    },
-    {
-      "name": "ust",
-      "address": "0x890f4e345B1dAED0367A877a1612f86A1f86985f",
-      "startBlock": "11466568"
-    },
-    {
-      "name": "bbtc",
-      "address": "0x071c661B4DeefB59E2a3DdB20Db036821eeE8F4b",
-      "startBlock": "11455022"
-    },
-    {
-      "name": "obtc",
-      "address": "0xd81dA8D904b52208541Bade1bD6595D8a251F8dd",
-      "startBlock": "11459238"
-    },
-    {
-      "name": "pbtc",
-      "address": "0x7F55DDe206dbAD629C080068923b36fe9D6bDBeF",
-      "startBlock": "11421596"
-    },
-    {
-      "name": "tbtc",
-      "address": "0xC25099792E9349C7DD09759744ea681C7de2cb66",
-      "startBlock": "11095928"
-    },
-    {
-      "name": "tusd",
-      "address": "0xEcd5e75AFb02eFa118AF914515D6521aaBd189F1",
-      "startBlock": "12010370"
-    },
-    {
-      "name": "busdv2",
-      "address": "0x4807862AA8b2bF68830e4C8dc86D0e9A998e085a",
-      "startBlock": "12240440"
-    },
-    {
-      "name": "reth",
-      "address": "0xF9440930043eb3997fc70e1339dBb11F341de7A8",
-      "startBlock": "12463576"
-    },
-    {
-      "name": "alusd",
-      "address": "0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c",
-      "startBlock": "11956693"
-    },
-    {
-      "name": "tricrypto",
-      "address": "0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5",
-      "startBlock": "12521538"
-    },
-    {
-      "name": "rai",
-      "address": "0x618788357D0EBd8A37e763ADab3bc575D54c2C7d",
-      "startBlock": "13634171"
-    },
-    {
-      "name": "mim",
-      "address": "0x5a6A4D54456819380173272A5E8E9B9904BdF41B",
-      "startBlock": "12567592"
-    },
-    {
-      "name": "eurt",
-      "address": "0xFD5dB7463a3aB53fD211b4af195c5BCCC1A03890",
-      "startBlock": "12921922"
-    },
-    {
-      "name": "4pool",
-      "address": "0x4e0915C88bC70750D68C481540F081fEFaF22273",
-      "startBlock": "14631356"
-    },
-    {
-      "name": "2pool",
-      "address": "0x1005F7406f32a61BD760CfA14aCCd2737913d546",
-      "startBlock": "14631073"
-    },
-    {
-      "name": "Curve.fi FRAX/USDC",
-      "address": "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2",
-      "startBlock": "14939588"
-    },
-    {
-      "name": "frax",
-      "address": "0xd632f22692FaC7611d2AA1C0D552930D43CAEd3B",
-      "startBlock": "11972002"
-    },
-    {
-      "name": "lusd",
-      "address": "0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA",
-      "startBlock": "12242627"
-    }
-  ],
-  "gaugeController": [
-    {
-      "address": "0x2f50d538606fa9edd2b11e2446beb18c9d5846bb",
-      "startBlock": "10647875"
-    }
-  ],
-  "minter": [
-    {
-      "address": "0xd061d61a4d941c39e5453435b6345dc261c2fce0",
-      "startBlock": "10647887"
-    }
-  ],
 
   "graftEnabled": false,
-  "subgraphId": "QmbaHE6FxXAa9z92sqAKFfDJej3GL37AnNtNhwrJt8FGf4",
-  "graftStartBlock": "10654163"
+  "subgraphId": "",
+  "graftStartBlock": ""
 }

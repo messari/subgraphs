@@ -343,7 +343,11 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 parseFloat(data.totalBorrowBalanceUSD) <=
                 parseFloat(data.totalDepositBalanceUSD)
             ) &&
-            !deploymentName.includes("rari-fuse")
+            !deploymentName.includes("rari-fuse") &&
+            !deploymentName.includes("truefi") &&
+            !deploymentName.includes("maple") &&
+            !deploymentName.includes("goldfinch")
+
         ) {
             issuesArrays.totalBorrowBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalBorrowBalanceUSD)));
         }
