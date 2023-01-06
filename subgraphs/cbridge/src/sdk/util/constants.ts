@@ -1,4 +1,10 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import {
+  BigDecimal,
+  BigInt,
+  log,
+  dataSource,
+  Address,
+} from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -211,12 +217,16 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 export const ETH_SYMBOL = "ETH";
 export const ETH_NAME = "Ether";
 
+export function equalsIgnoreCase(a: string, b: string): boolean {
+  return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
+
 ///////////////////////////////////////
 ///// Protocol specific Constants /////
 ///////////////////////////////////////
 export class NetworkSpecificConstant {
   constructor(
-    public readonly protocolAddress: Address,
+    public readonly protocolId: Bytes,
     public readonly network: string
   ) {}
 }
@@ -225,23 +235,20 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"),
+      Address.fromString("0xcb4a7569a61300c50cf80a2be16329ad9f5f8f9e"),
       Network.MAINNET
     );
   } else if (equalsIgnoreCase(network, Network.AVALANCHE)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0xb6A86025F0FE1862B372cb0ca18CE3EDe02A318f"),
+      Address.fromString(""),
       Network.AVALANCHE
     );
   } else if (equalsIgnoreCase(network, Network.MATIC)) {
-    return new NetworkSpecificConstant(
-      Address.fromString("0xd05e3E715d945B59290df0ae8eF85c1BdB684744"),
-      Network.MATIC
-    );
+    return new NetworkSpecificConstant(Address.fromString(""), Network.MATIC);
   } else {
     log.error("[getNetworkSpecificConstant] Unsupported network: {}", [
       network,
     ]);
-    return new NetworkSpecificConstant(Address.fromString(ZERO_ADDRESS), "");
+    return new NetworkSpecificConstant(Address.zero(), "");
   }
 }

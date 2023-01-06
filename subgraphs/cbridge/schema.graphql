@@ -150,7 +150,7 @@ type CrosschainToken @entity(immutable: true) {
   " The network where this token is deployed "
   network: Network!
 
-  " The address on the external chain. It is necessary so we can link pools and routes among chans. "
+  " The address on the external chain. It is necessary so we can link pools and routes among chains. "
   address: Bytes!
 
   " The type of token on the other chain "
@@ -1334,4 +1334,25 @@ type _ProtocolSnapshotHelper @entity {
   lastHourlyUsageSnapshot: Bytes!
 
   lastActivityTimestamp: BigInt!
+}
+
+type _CrossChainHelper @entity {
+  " refId "
+  id: Bytes!
+  " token id (address) on the source chain "
+  token: Bytes!
+  " sender of transfer on the source chain "
+  sender: Bytes!
+  " receiver of transfer on the destination chain "
+  receiver: Bytes!
+  " amount transfered "
+  amount: BigInt!
+  " pool/contract id (address) on the source chain "
+  pool: Bytes!
+  " transaction ID on the source chain "
+  transactionID: Bytes!
+  " source chain Id "
+  srcChainId: BigInt!
+  " destination chain Id "
+  dstChainId: BigInt
 }

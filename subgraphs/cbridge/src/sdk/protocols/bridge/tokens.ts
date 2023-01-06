@@ -29,7 +29,7 @@ export class TokenManager {
   }
 
   getOrCreateToken(address: Address): Token {
-    let token = Token.load(address);
+    let token = Token.load(Address.fromBytes(address));
     if (token) {
       return token;
     }
