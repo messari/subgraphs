@@ -1891,36 +1891,36 @@ type SystemSetting @entity {
   " time at which these values are recorded "
   timestamp: BigInt!
   " SIP-37 Fee Reclamation: The number of seconds after an exchange is executed that must be waited before settlement. "
-  waitingPeriodSecs: BigInt!
+  waitingPeriodSecs: BigInt
   " SIP-65 Decentralized Circuit Breaker: The factor amount expressed in decimal format E.g. 3e18 = factor 3, meaning movement up to 3x and above or down to 1/3x and below "
-  priceDeviationThresholdFactor: BigDecimal!
+  priceDeviationThresholdFactor: BigDecimal
   " The raio of collateral Expressed in 18 decimals. So 800% cratio is 100/800 = 0.125 (0.125e18) "
-  issuanceRatio: BigDecimal!
+  issuanceRatio: BigDecimal
   " How long a fee period lasts at a minimum. It is required for anyone to roll over the periods, so they are not guaranteed to roll over at exactly this duration, but the contract enforces that they cannot roll over any quicker than this duration. "
-  feePeriodDuration: BigInt!
+  feePeriodDuration: BigInt
   " Users are unable to claim fees if their collateralisation ratio drifts out of target threshold "
-  targetThreshold: BigDecimal!
+  targetThreshold: BigDecimal
   " SIP-15 Liquidations: liquidation time delay after address flagged (seconds) "
-  liquidationDelay: BigInt!
+  liquidationDelay: BigInt
   " SIP-15 Liquidations: issuance ratio when account can be flagged for liquidation (with 18 decimals), e.g 0.5 issuance ratio when flag means 1/0.5 = 200% cratio "
-  liquidationRatio: BigDecimal!
+  liquidationRatio: BigDecimal
   " SIP-15 Liquidations: penalty taken away from target of liquidation (with 18 decimals). E.g. 10% is 0.1e18 "
-  liquidationPenalty: BigDecimal!
+  liquidationPenalty: BigDecimal
   " How long will the ExchangeRates contract assume the rate of any asset is correct "
-  rateStalePeriod: BigInt!
-  minimumStakeTime: BigInt!
-  debtSnapshotStaleTime: BigInt!
-  aggregatorWarningFlags: String!
+  rateStalePeriod: BigInt
+  minimumStakeTime: BigInt
+  debtSnapshotStaleTime: BigInt
+  aggregatorWarningFlags: String
   " SIP 112: ETH Wrappr: The maximum amount of ETH held by the EtherWrapper. "
-  etherWrapperMaxETH: BigDecimal!
+  etherWrapperMaxETH: BigDecimal
   " SIP 112: ETH Wrappr: The fee for depositing ETH into the EtherWrapper. "
-  etherWrapperMintFeeRate: BigDecimal!
+  etherWrapperMintFeeRate: BigDecimal
   " SIP 112: ETH Wrappr: The fee for burning sETH and releasing ETH from the EtherWrapper. "
-  etherWrapperBurnFeeRate: BigDecimal!
+  etherWrapperBurnFeeRate: BigDecimal
   " SIP-120 Atomic exchanges: max allowed volume per block for atomic exchanges "
-  atomicMaxVolumePerBlock: BigInt!
+  atomicMaxVolumePerBlock: BigInt
   " SIP-120 Atomic exchanges: time window (in seconds) for TWAP prices when considered for atomic exchanges "
-  atomicTwapWindow: BigInt!
+  atomicTwapWindow: BigInt
 }
 
 type Short @entity {

@@ -1,6 +1,9 @@
 specVersion: 0.0.4
 features:
-  - grafting
+ - grafting
+graft:
+ base: QmQJbJT6gTQHBZieMSyuTRVC8oYFeiiTkyuGMfx5LEDxoC
+ block: 13001998
 description: Synthetix Subgraph
 repository: https://github.com/Synthetixio/synthetix-subgraph
 schema:

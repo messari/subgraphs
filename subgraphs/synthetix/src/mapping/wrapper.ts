@@ -20,6 +20,7 @@ import {
 } from "../../generated/SystemSettings_0/SystemSettings";
 import { Wrapper as WrapperContract } from "../../generated/templates/WrapperTemplate/Wrapper";
 import { WrapperCreated as WrapperCreatedEvent } from "../../generated/WrapperFactory_0/WrapperFactory";
+import { BIGDECIMAL_ZERO } from "../utils/constants";
 
 export function handleWrapperCreated(event: WrapperCreatedEvent): void {
   const context = new DataSourceContext();
@@ -42,25 +43,19 @@ export function handleMinted(event: MintedEvent): void {
   mintEntity.save();
 
   // Update Wrapper
-  let wrapper = Wrapper.load(event.address.toHexString());
-  if (!wrapper) {
-    wrapper = new Wrapper(event.address.toHexString());
+  const wrapper = getOrCreateWrapper(event.address.toHexString());
+
+  wrapper.amount = wrapper.amount.plus(toDecimal(event.params.amountIn));
+  wrapper.totalFees = wrapper.totalFees.plus(toDecimal(event.params.fee));
+
+  const txHash = event.transaction.hash.toString();
+  const latestRate = getLatestRate(wrapper.currencyKey, txHash);
+  if (latestRate) {
+    wrapper.amountInUSD = wrapper.amount.times(latestRate);
+    wrapper.totalFeesInUSD = wrapper.totalFees.times(latestRate);
   }
-  wrapper = initializeWrapper(wrapper, event.address);
 
-  if (wrapper) {
-    wrapper.amount = wrapper.amount.plus(toDecimal(event.params.amountIn));
-    wrapper.totalFees = wrapper.totalFees.plus(toDecimal(event.params.fee));
-
-    const txHash = event.transaction.hash.toString();
-    const latestRate = getLatestRate(wrapper.currencyKey, txHash);
-    if (latestRate) {
-      wrapper.amountInUSD = wrapper.amount.times(latestRate);
-      wrapper.totalFeesInUSD = wrapper.totalFees.times(latestRate);
-    }
-
-    wrapper.save();
-  }
+  wrapper.save();
 }
 
 export function handleBurned(event: BurnedEvent): void {
@@ -77,25 +72,19 @@ export function handleBurned(event: BurnedEvent): void {
   burnEntity.save();
 
   // Update Wrapper
-  let wrapper = Wrapper.load(event.address.toHexString());
-  if (!wrapper) {
-    wrapper = new Wrapper(event.address.toHexString());
+  const wrapper = getOrCreateWrapper(event.address.toHexString());
+
+  wrapper.amount = wrapper.amount.minus(toDecimal(event.params.principal));
+  wrapper.totalFees = wrapper.totalFees.plus(toDecimal(event.params.fee));
+
+  const txHash = event.transaction.hash.toString();
+  const latestRate = getLatestRate(wrapper.currencyKey, txHash);
+  if (latestRate) {
+    wrapper.amountInUSD = wrapper.amount.times(latestRate);
+    wrapper.totalFeesInUSD = wrapper.totalFees.times(latestRate);
   }
-  wrapper = initializeWrapper(wrapper, event.address);
 
-  if (wrapper) {
-    wrapper.amount = wrapper.amount.minus(toDecimal(event.params.principal));
-    wrapper.totalFees = wrapper.totalFees.plus(toDecimal(event.params.fee));
-
-    const txHash = event.transaction.hash.toHexString();
-    const latestRate = getLatestRate(wrapper.currencyKey, txHash);
-    if (latestRate) {
-      wrapper.amountInUSD = wrapper.amount.times(latestRate);
-      wrapper.totalFeesInUSD = wrapper.totalFees.times(latestRate);
-    }
-
-    wrapper.save();
-  }
+  wrapper.save();
 }
 
 export function handleWrapperMaxTokenAmountUpdated(
@@ -132,36 +121,41 @@ export function handleEtherWrapperMaxETHUpdated(
   }
 }
 
-function initializeWrapper(wrapper: Wrapper, address: Address): Wrapper {
-  // See wrapper.js for more context on the pre-regenesis wrappers
-  // We assume this hasn't been initialized if the maxAmount is 0
-  if (
-    wrapper.amount.toString() == "0" &&
-    (address.toHexString() == "0xad32aa4bff8b61b4ae07e3ba437cf81100af0cd7" ||
-      address.toHexString() == "0x6202a3b0be1d222971e93aab084c6e584c29db70" ||
-      address.toHexString() == "0x8a91e92fdd86e734781c38db52a390e1b99fba7c")
-  ) {
-    const wrapperContract = WrapperContract.bind(address);
-    wrapper.tokenAddress = wrapperContract.token().toHexString();
-    wrapper.currencyKey = wrapperContract.currencyKey().toString();
-    wrapper.amount = toDecimal(wrapperContract.targetSynthIssued());
-    wrapper.maxAmount = toDecimal(wrapperContract.maxTokenAmount());
-    wrapper.totalFees = BigDecimal.fromString("0"); // TBD
-  }
+function getOrCreateWrapper(address: string): Wrapper {
+  let wrapper = Wrapper.load(address);
 
-  // If this still doesn't have a currencyKey, this is the ETH wrapper on mainnet
-  if (!wrapper.currencyKey) {
+  if (!wrapper) {
+    wrapper = new Wrapper(address);
+    wrapper.amount = BIGDECIMAL_ZERO;
+    wrapper.amountInUSD = BIGDECIMAL_ZERO;
+    wrapper.tokenAddress = "";
     wrapper.currencyKey = "ETH";
-  }
+    wrapper.totalFees = BIGDECIMAL_ZERO;
+    wrapper.maxAmount = BIGDECIMAL_ZERO;
+    wrapper.totalFeesInUSD = BIGDECIMAL_ZERO!;
 
-  // Assign values from context, for template generated Wrapper entities
-  const context = dataSource.context();
-  if (context.get("tokenAddress")) {
-    const tokenAddress = context.getString("tokenAddress");
-    const currencyKey = context.getString("currencyKey");
-    if (tokenAddress && tokenAddress.length) {
-      wrapper.tokenAddress = tokenAddress;
-      wrapper.currencyKey = currencyKey;
+    // Assign values from context, for template generated Wrapper entities
+    const context = dataSource.context();
+    if (context.get("tokenAddress")) {
+      const tokenAddress = context.getString("tokenAddress");
+      const currencyKey = context.getString("currencyKey");
+      if (tokenAddress && tokenAddress.length) {
+        wrapper.tokenAddress = tokenAddress;
+        wrapper.currencyKey = currencyKey;
+      }
+    }
+
+    if (
+      address == "0xad32aa4bff8b61b4ae07e3ba437cf81100af0cd7" ||
+      address == "0x6202a3b0be1d222971e93aab084c6e584c29db70" ||
+      address == "0x8a91e92fdd86e734781c38db52a390e1b99fba7c"
+    ) {
+      const wrapperContract = WrapperContract.bind(Address.fromString(address));
+      wrapper.tokenAddress = wrapperContract.token().toHexString();
+      wrapper.currencyKey = wrapperContract.currencyKey().toString();
+      wrapper.amount = toDecimal(wrapperContract.targetSynthIssued());
+      wrapper.maxAmount = toDecimal(wrapperContract.maxTokenAmount());
+      wrapper.totalFees = BigDecimal.fromString("0"); // TBD
     }
   }
 
