@@ -1,29 +1,36 @@
-// import { log } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 import {
   Initialize,
   Mint as MintEvent,
+  Burn as BurnEvent,
   Swap as SwapEvent,
   Collect as CollectEvent,
   SetFeeProtocol,
 } from "../../generated/templates/Pool/Pool";
-import { UsageType } from "../common/constants";
+import { BIGINT_NEG_ONE, BIGINT_ZERO } from "../common/constants";
+import { incrementDepositHelper } from "../common/entities/deposit";
+import { DexEventHandler } from "../common/dex_event_handler";
 import {
-  createDeposit,
-  createWithdraw,
-  createSwapHandleVolumeAndFees,
-} from "../common/creators";
-import {
-  updatePrices,
-  updatePoolMetrics,
+  getOrCreateProtocol,
   updateProtocolFees,
-  updateUsageMetrics,
-  updateFinancials,
-} from "../common/updateMetrics";
+} from "../common/entities/protocol";
+import { updateTokenPrices } from "../common/entities/token";
+import { getAmountUSD, getLiquidityPool } from "../common/entities/pool";
+import {
+  subtractBigDecimalLists,
+  subtractBigIntLists,
+  sumBigDecimalList,
+  sumBigIntListByIndex,
+} from "../common/utils/utils";
+import { getOrCreateTick } from "../common/entities/tick";
+import { CollectProtocol } from "../../generated/Factory/Pool";
+import { getSwapHelperObj } from "../common/entities/swap";
 
 // Emitted when a given liquidity pool is first created.
 export function handleInitialize(event: Initialize): void {
-  updatePrices(event, event.params.sqrtPriceX96);
-  updatePoolMetrics(event);
+  const pool = getLiquidityPool(event.address)!;
+  pool.tick = BigInt.fromI32(event.params.tick);
+  pool.save();
 }
 
 // Update the fees colected by the protocol.
@@ -31,42 +38,179 @@ export function handleSetFeeProtocol(event: SetFeeProtocol): void {
   updateProtocolFees(event);
 }
 
-// Handle a mint event emitted from a pool contract. Considered a deposit into the given liquidity pool.
+// Handle mint event emmitted from a pool contract.
 export function handleMint(event: MintEvent): void {
-  createDeposit(
+  const pool = getLiquidityPool(event.address)!;
+  let activeLiquidityDelta = BIGINT_ZERO;
+  // Make sure the liquidity is within the current tick range to update active liquidity.
+  if (
+    pool.tick !== null &&
+    BigInt.fromI32(event.params.tickLower).le(pool.tick as BigInt) &&
+    BigInt.fromI32(event.params.tickUpper).gt(pool.tick as BigInt)
+  ) {
+    activeLiquidityDelta = event.params.amount;
+  }
+  const dexEventHandler = new DexEventHandler(
     event,
-    event.params.owner,
-    event.params.amount0,
-    event.params.amount1
+    event.transaction.from,
+    pool,
+    false,
+    [event.params.amount0, event.params.amount1],
+    event.params.amount,
+    activeLiquidityDelta,
+    [BIGINT_ZERO, BIGINT_ZERO],
+    [BIGINT_ZERO, BIGINT_ZERO]
   );
-  updateUsageMetrics(event, event.params.owner, UsageType.DEPOSIT);
-  updateFinancials(event);
-  updatePoolMetrics(event);
+  dexEventHandler.createDeposit(
+    event.params.owner,
+    getOrCreateTick(event, pool, BigInt.fromI32(event.params.tickLower)),
+    getOrCreateTick(event, pool, BigInt.fromI32(event.params.tickUpper)),
+    null
+  );
+  dexEventHandler.processLPBalanceChanges();
+  incrementDepositHelper(dexEventHandler.pool.id);
+}
+
+// Handle burn event emmitted from a pool contract.
+export function handleBurn(event: BurnEvent): void {
+  const pool = getLiquidityPool(event.address)!;
+  let activeLiquidityDelta = BIGINT_ZERO;
+  // Make sure the liquidity is within the current tick range to update active liquidity.
+  if (
+    pool.tick !== null &&
+    BigInt.fromI32(event.params.tickLower).le(pool.tick as BigInt) &&
+    BigInt.fromI32(event.params.tickUpper).gt(pool.tick as BigInt)
+  ) {
+    activeLiquidityDelta = event.params.amount.times(BIGINT_NEG_ONE);
+  }
+  pool._totalAmountWithdrawn = sumBigIntListByIndex([
+    pool._totalAmountWithdrawn,
+    [event.params.amount0, event.params.amount1],
+  ]);
+  const dexEventHandler = new DexEventHandler(
+    event,
+    event.transaction.from,
+    pool,
+    false,
+    [
+      event.params.amount0.times(BIGINT_NEG_ONE),
+      event.params.amount1.times(BIGINT_NEG_ONE),
+    ],
+    event.params.amount.times(BIGINT_NEG_ONE),
+    activeLiquidityDelta,
+    [BIGINT_ZERO, BIGINT_ZERO],
+    [BIGINT_ZERO, BIGINT_ZERO]
+  );
+  dexEventHandler.createWithdraw(
+    event.params.owner,
+    getOrCreateTick(event, pool, BigInt.fromI32(event.params.tickLower)),
+    getOrCreateTick(event, pool, BigInt.fromI32(event.params.tickUpper)),
+    null
+  );
+  dexEventHandler.processLPBalanceChanges();
 }
 
 // Handle a swap event emitted from a pool contract.
 export function handleSwap(event: SwapEvent): void {
-  createSwapHandleVolumeAndFees(
-    event,
-    event.params.amount0,
-    event.params.amount1,
-    event.params.recipient,
-    event.transaction.from,
-    event.params.sqrtPriceX96
-  );
-  updateFinancials(event);
-  updatePoolMetrics(event);
-  updateUsageMetrics(event, event.transaction.from, UsageType.SWAP);
-}
-
-export function handleCollect(event: CollectEvent): void {
-  createWithdraw(
-    event,
-    event.params.recipient,
+  updateTokenPrices(event, event.params.sqrtPriceX96);
+  const pool = getLiquidityPool(event.address)!;
+  const swapHelperObj = getSwapHelperObj(
+    pool,
+    event.params.liquidity,
     event.params.amount0,
     event.params.amount1
   );
-  updateFinancials(event);
-  updatePoolMetrics(event);
-  updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
+  pool._totalAmountEarned = sumBigIntListByIndex([
+    pool._totalAmountEarned,
+    swapHelperObj.protocolUncollectedTokenChangesNet,
+    swapHelperObj.supplyUncollectedTokenChangesNet,
+  ]);
+  const dexEventHandler = new DexEventHandler(
+    event,
+    event.transaction.from,
+    pool,
+    true,
+    swapHelperObj.balanceChangesNet,
+    BIGINT_ZERO,
+    swapHelperObj.activeLiquidityDelta,
+    swapHelperObj.supplyUncollectedTokenChangesNet,
+    swapHelperObj.protocolUncollectedTokenChangesNet
+  );
+
+  dexEventHandler.createSwap(
+    swapHelperObj.tokenInIdx,
+    swapHelperObj.tokenOutIdx,
+    event.params.sender,
+    BigInt.fromI32(event.params.tick)
+  );
+  dexEventHandler.processLPBalanceChanges();
+}
+
+// Handle a collect event emitted from a pool contract.
+// Collects uncollectedTokens
+export function handleCollectPool(event: CollectEvent): void {
+  const pool = getLiquidityPool(event.address)!;
+  const protocol = getOrCreateProtocol();
+
+  const oldUncollectedSupplyValuesUSD = pool.uncollectedSupplySideValuesUSD;
+  pool._totalAmountCollected = sumBigIntListByIndex([
+    pool._totalAmountCollected,
+    [event.params.amount0, event.params.amount1],
+  ]);
+  pool.uncollectedSupplySideTokenAmounts = sumBigIntListByIndex([
+    subtractBigIntLists(pool._totalAmountEarned, pool._totalAmountCollected),
+    pool._totalAmountWithdrawn,
+  ]);
+  pool.uncollectedSupplySideValuesUSD = getAmountUSD(
+    event,
+    pool,
+    pool.uncollectedSupplySideTokenAmounts
+  );
+
+  const usdDelta = sumBigDecimalList(
+    subtractBigDecimalLists(
+      pool.uncollectedSupplySideValuesUSD,
+      oldUncollectedSupplyValuesUSD
+    )
+  );
+
+  pool.totalValueLockedUSD = pool.totalValueLockedUSD.plus(usdDelta);
+  protocol.uncollectedSupplySideValueUSD =
+    protocol.uncollectedSupplySideValueUSD.plus(usdDelta);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(usdDelta);
+
+  pool.save();
+  protocol.save();
+}
+
+// Handle protocol fee collection event emitted from a pool contract.
+// Collects uncollectedTokens
+export function handleCollectProtocol(event: CollectProtocol): void {
+  const pool = getLiquidityPool(event.address)!;
+  const protocol = getOrCreateProtocol();
+
+  const oldUncollectedProtocolValueUSD = pool.uncollectedProtocolSideValuesUSD;
+  pool.uncollectedProtocolSideTokenAmounts = subtractBigIntLists(
+    pool.uncollectedProtocolSideTokenAmounts,
+    [event.params.amount0, event.params.amount1]
+  );
+  pool.uncollectedProtocolSideValuesUSD = getAmountUSD(
+    event,
+    pool,
+    pool.uncollectedProtocolSideTokenAmounts
+  );
+
+  const usdDelta = sumBigDecimalList(
+    subtractBigDecimalLists(
+      pool.uncollectedProtocolSideValuesUSD,
+      oldUncollectedProtocolValueUSD
+    )
+  );
+  pool.totalValueLockedUSD = pool.totalValueLockedUSD.plus(usdDelta);
+  protocol.uncollectedProtocolSideValueUSD =
+    protocol.uncollectedProtocolSideValueUSD.plus(usdDelta);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(usdDelta);
+
+  pool.save();
+  protocol.save();
 }

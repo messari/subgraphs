@@ -1,4 +1,4 @@
-import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts";
 import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   FeeSwitch,
@@ -7,7 +7,7 @@ import {
 } from "../../../../../src/common/constants";
 import { Configurations } from "../../../../../configurations/configurations/interface";
 import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/common/constants";
-import { toLowerCase } from "../../../../../src/common/utils/utils";
+import { stringToBytesList } from "../../../../../src/common/utils/utils";
 
 export class UniswapV3MainnetConfigurations implements Configurations {
   getNetwork(): string {
@@ -19,14 +19,12 @@ export class UniswapV3MainnetConfigurations implements Configurations {
   getProtocolSlug(): string {
     return PROTOCOL_SLUG;
   }
-  getFactoryAddress(): string {
-    return "0x1F98431c8aD98523631AE4a59f267346ea31F984".toLowerCase();
+  getFactoryAddress(): Bytes {
+    return Bytes.fromHexString("0x1f98431c8ad98523631ae4a59f267346ea31f984");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString(
-        "0x1F98431c8aD98523631AE4a59f267346ea31F984".toLowerCase()
-      )
+      Address.fromString("0x1f98431c8ad98523631ae4a59f267346ea31f984")
     );
   }
   getFeeOnOff(): string {
@@ -35,14 +33,14 @@ export class UniswapV3MainnetConfigurations implements Configurations {
   getRewardIntervalType(): string {
     return RewardIntervalType.NONE;
   }
-  getReferenceToken(): string {
-    return "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2".toLowerCase();
+  getReferenceToken(): Bytes {
+    return Bytes.fromHexString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
   }
-  getRewardToken(): string {
-    return "";
+  getRewardToken(): Bytes {
+    return Bytes.fromHexString("");
   }
-  getWhitelistTokens(): string[] {
-    return toLowerCase([
+  getWhitelistTokens(): Bytes[] {
+    return stringToBytesList([
       "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", // WETH
       "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
@@ -66,8 +64,8 @@ export class UniswapV3MainnetConfigurations implements Configurations {
       "0xfe2e637202056d30016725477c5da089ab0a043a", // sETH2
     ]);
   }
-  getStableCoins(): string[] {
-    return toLowerCase([
+  getStableCoins(): Bytes[] {
+    return stringToBytesList([
       "0x6b175474e89094c44da98b954eedeac495271d0f",
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "0xdac17f958d2ee523a2206206994597c13d831ec7",
@@ -76,21 +74,21 @@ export class UniswapV3MainnetConfigurations implements Configurations {
       "0x4dd28568d05f09b02220b09c2cb307bfd837cb95",
     ]);
   }
-  getStableOraclePools(): string[] {
-    return toLowerCase([
+  getStableOraclePools(): Bytes[] {
+    return stringToBytesList([
       "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8", // USDC/wETH
     ]);
   }
-  getUntrackedPairs(): string[] {
-    return toLowerCase([
+  getUntrackedPairs(): Bytes[] {
+    return stringToBytesList([
       "0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248", // Mulan/USDT
       "0xfd9715a9f03678975b2e224c938fae8d481b09b2", // Aurora/wETH
       "0x9663f2ca0454accad3e094448ea6f77443880454", // LUSD/wETH
       "0x785d7ff551c9b62562c6767551ffa3e3e562b6ed", // SiFum/USDT
     ]);
   }
-  getUntrackedTokens(): string[] {
-    return toLowerCase([
+  getUntrackedTokens(): Bytes[] {
+    return stringToBytesList([
       "0xc7283b66eb1eb5fb86327f08e1b5816b0720212b", // TRIBE - Price issues
       "0x6b4c7a5e3f0b99fcd83e9c089bddd6c7fce5c611", // Million
       "0x1a4b46696b2bb4794eb3d4c26f1c55f9170fa4c5",
@@ -115,6 +113,7 @@ export class UniswapV3MainnetConfigurations implements Configurations {
       "0x8c6bf16c273636523c29db7db04396143770f6a0", // MoonRabbit
       "0x4da27a545c0c5b758a6ba100e3a049001de870f5", // Staked AAVE
       "0x5938999dd0cc4d480c3b1a451aecc78ae4ddaab5", // SifuM
+      "0x45804880de22913dafe09f4980848ece6ecbaf78", // Paxos Gold
     ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
