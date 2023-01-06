@@ -252,7 +252,7 @@ function getOrCreateCircularBuffer(): _CircularBuffer {
 function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
-  const network = dataSource.network().toUpperCase();
+  const network = dataSource.network().toUpperCase().replace("_", "-");
   if (network == Network.MAINNET) {
     return BigDecimal.fromString("13.39");
   } else if (network == Network.ARBITRUM_ONE) {
