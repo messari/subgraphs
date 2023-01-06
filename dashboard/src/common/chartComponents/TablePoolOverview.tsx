@@ -258,7 +258,7 @@ export const TablePoolOverview = ({
         let rewardFactorsStr = "N/A";
         let rewardAPRs: string[] = pool?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
           let apr = 0;
-          if (protocolType === "LENDING" && (pool.rewardTokens[idx]?.type === "BORROW" || pool.rewardTokens[idx]?.token?.type === "BORROW")) {
+          if (protocolType === "LENDING" && (pool.rewardTokens[idx]?.type?.includes("BORROW") || pool.rewardTokens[idx]?.token?.type?.includes("BORROW"))) {
             if (
               !Number(pool.totalBorrowBalanceUSD) &&
               issues.filter(

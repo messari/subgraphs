@@ -10,9 +10,10 @@ interface TableChartProps {
   datasetLabel: string;
   dataTable: any;
   jpegDownloadHandler: any;
+  isStringField: Boolean;
 }
 
-export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: TableChartProps) => {
+export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler, isStringField = false }: TableChartProps) => {
   const field = datasetLabel.split("-")[1] || datasetLabel;
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
@@ -60,7 +61,7 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
         field: "value",
         headerName: "Value",
         flex: 1,
-        type: isPercentageField ? "string" : "number",
+        type: isPercentageField || isStringField ? "string" : "number",
         headerAlign: "left" as GridAlignment,
         align: "left" as GridAlignment,
       },
@@ -76,18 +77,25 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
         : true,
     );
     const tableData = filteredData.map((val: any, i: any) => {
-      let returnVal = Number(Number(val.value).toFixed(2)).toLocaleString() + suffix;
+      let displayVal = Number(Number(val.value).toFixed(2)).toLocaleString() + suffix;
       if (isPercentageField && Array.isArray(val.value)) {
-        returnVal = val.value.map((ele: string) => ele.toLocaleString() + "%").join(", ");
+        displayVal = val.value.map((ele: string) => ele.toLocaleString() + "%").join(", ");
       }
       let dateColumn = toDate(val.date, hourly);
       if (!showDateString) {
         dateColumn = toUnitsSinceEpoch(dateColumn, hourly);
       }
+
+      let returnVal = isNaN(Number(val.value)) || displayVal.includes('%') ? displayVal : Number(val.value);
+
+      if (isStringField) {
+        returnVal = val.value;
+      }
+
       return {
         id: i,
         date: dateColumn,
-        value: isNaN(Number(val.value)) || returnVal.includes('%') ? returnVal : Number(val.value),
+        value: returnVal,
       };
     });
 
