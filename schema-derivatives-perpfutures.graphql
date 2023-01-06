@@ -33,7 +33,7 @@ enum ProtocolType {
   BRIDGE
   DERIVATIVES
   GENERIC
-  # Will add mor
+  # Will add more
 }
 
 type Token @entity {
