@@ -355,15 +355,15 @@ function PoolTabEntity({
                   const factors = ["rewardTokenEmissionsUSD"];
                   let apr = 0;
                   if (
-                    currentRewardToken?.type === "BORROW" &&
+                    currentRewardToken?.type?.includes("BORROW") &&
                     data.protocols[0]?.type === "LENDING" &&
                     timeseriesInstance?.totalBorrowBalanceUSD
                   ) {
                     apr = (Number(val) / timeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
                     factors.push("snapshot.totalBorrowBalanceUSD");
                   } else if (
-                    currentRewardToken?.type === "BORROW" &&
-                    issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length ===
+                    currentRewardToken?.type?.includes("BORROW") &&
+                    issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x?.type?.includes("BORROW")).length ===
                     0
                   ) {
                     issues.push({
@@ -608,15 +608,15 @@ function PoolTabEntity({
                   const factors = ["rewardTokenEmissionsUSD"];
                   let apr = 0;
                   if (
-                    currentRewardToken?.type === "BORROW" &&
+                    currentRewardToken?.type?.includes("BORROW") &&
                     overlayData.protocols[0]?.type === "LENDING" &&
                     overlayTimeseriesInstance?.totalBorrowBalanceUSD
                   ) {
                     apr = (Number(val) / overlayTimeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
                     factors.push("snapshot.totalBorrowBalanceUSD");
                   } else if (
-                    currentRewardToken?.type === "BORROW" &&
-                    issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length ===
+                    currentRewardToken?.type?.includes("BORROW") &&
+                    issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x?.type?.includes("BORROW")).length ===
                     0
                   ) {
                     issues.push({
