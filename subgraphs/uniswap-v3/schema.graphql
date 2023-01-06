@@ -1175,7 +1175,7 @@ type Deposit @entity(immutable: true) {
   # lower tick of position
   tickLower: BigInt
 
-  # uppper tick of position
+  # upper tick of position
   tickUpper: BigInt
 
   " Block number of this event "
@@ -1231,7 +1231,7 @@ type Withdraw @entity(immutable: true) {
   # lower tick of position
   tickLower: BigInt
 
-  # uppper tick of position
+  # upper tick of position
   tickUpper: BigInt
 
   " The pool involving this event "
