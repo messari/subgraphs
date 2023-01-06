@@ -121,22 +121,6 @@ export function onCreatePool(
 }
 
 export function handleSend(event: Send): void {
-  // we don't have info of the destination pool address,
-  // and we cannot initiate the CrossChainToken, so we save
-  // everything and call _handleTransferOut at the end of the transfer
-  let transferHelper = _CrossChainHelper.load(event.params.transferId);
-  if (!transferHelper) {
-    transferHelper = new _CrossChainHelper(event.params.transferId);
-    transferHelper.srcChainId = networkToChainID(dataSource.network());
-    transferHelper.token = event.params.token;
-    transferHelper.sender = event.params.sender;
-    transferHelper.receiver = event.params.receiver;
-    transferHelper.amount = event.params.amount;
-    transferHelper.pool = event.address;
-    transferHelper.transactionID = event.transaction.hash;
-    transferHelper.save();
-  }
-
   _handleTransferOut(
     event.params.token,
     event.params.sender,
