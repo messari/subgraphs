@@ -67,8 +67,46 @@ type Token @entity {
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
 
+  " Field to track the cumulative volume of the token in native amounts "
+  cumulativeVolume: BigInt!
+
+  " Field to track the cumulative volume of the token in USD "
+  cumulativeVolumeUSD: BigDecimal!
+
   " The type of token the protocol creates for positions "
   type: TokenType
+
+  " All deposit (add liquidity) events occurred in this pool "
+  tokenDailySnapshots: [TokenDailySnapshot!]! @derivedFrom(field: "token")
+}
+
+type TokenDailySnapshot @entity {
+  "  { Smart contract address of the token }-{ # of days since Unix epoch time }  "
+  id: ID!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
+  " Token address "
+  token: Token!
+
+  " Optional field to track the price of a token, mostly for caching purposes "
+  priceUSD: BigDecimal
+
+  " Field to track the daily volume of the token in native amounts "
+  dailyVolume: BigInt!
+
+  " Field to track the cumulative volume of the token in native amounts "
+  cumulativeVolume: BigInt!
+
+  " Field to track the daily volume of the token in USD "
+  dailyVolumeUSD: BigDecimal!
+
+  " Field to track the cumulative volume of the token in USD "
+  cumulativeVolumeUSD: BigDecimal!
 }
 
 enum RewardTokenType {
