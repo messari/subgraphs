@@ -115,8 +115,6 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
     protocol._poolIds = [];
-
-    protocol.save();
   }
 
   protocol.schemaVersion = Versions.getSchemaVersion();
