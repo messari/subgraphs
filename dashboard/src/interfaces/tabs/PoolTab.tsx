@@ -154,6 +154,11 @@ function PoolTab({
               value = 0;
             }
           }
+          if (!specificChartsOnEntity[entityName]['baseYield']) {
+            specificChartsOnEntity[entityName]['baseYield'] = [];
+          } else {
+            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: Number(timeseriesInstance.timestamp) });
+          }
         }
       })
     }
