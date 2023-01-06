@@ -10,7 +10,7 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
 			return new HopProtocolArbitrumConfigurations()
 		}
 		case Deploy.HOP_PROTOCOL_ETHEREUM: {
-			return new HopProtocolEthereumConfigurations()
+			return new HopProtocolArbitrumConfigurations()
 		}
 		default: {
 			log.critical(

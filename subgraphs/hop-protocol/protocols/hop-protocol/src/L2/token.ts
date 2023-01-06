@@ -4,26 +4,42 @@ import {
 	TokenInitializer,
 	TokenParams,
 } from '../../../../src/sdk/protocols/bridge/tokens'
-import {
-	BridgePermissionType,
-	CrosschainTokenType,
-	BridgePoolType,
-} from '../../../../src/sdk/protocols/bridge/enums'
+import { BridgePermissionType } from '../../../../src/sdk/protocols/bridge/enums'
 import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
 import { NetworkConfigs } from '../../../../configurations/configure'
 import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { Transfer } from '../../../../generated/Token/Token'
 import { Token } from '../../../../generated/schema'
-// import {
-// 	getUsdPricePerToken,
-// 	getUsdPrice,
-// } from '../../../../generated/Token/Prices
+import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
 
 export function handleTransfer(event: Transfer): void {
-	let address = event.address.toHexString()
 	if (NetworkConfigs.getTokenList().includes(event.address.toHex())) {
+		const bridgeConfig = NetworkConfigs.getBridgeConfig(
+			event.address.toHexString()
+		)
+
+		const bridgeAddress = bridgeConfig[0]
+		const bridgeName = bridgeConfig[1]
+		const bridgeSlug = bridgeConfig[2]
+
+		const conf = new BridgeConfig(
+			bridgeAddress,
+			bridgeName,
+			bridgeSlug,
+			BridgePermissionType.PERMISSIONLESS,
+			Versions
+		)
+
+		if (
+			!(
+				event.params.to.equals(Address.fromHexString(bridgeAddress)) ||
+				event.params.from.equals(Address.fromHexString(bridgeAddress))
+			)
+		) {
+			return
+		}
 		class Pricer implements TokenPricer {
 			getTokenPrice(token: Token): BigDecimal {
 				const price = getUsdPricePerToken(Address.fromBytes(token.id))
@@ -46,16 +62,8 @@ export function handleTransfer(event: Transfer): void {
 			}
 		}
 
-		const bridgeConfig = NetworkConfigs.getBridgeConfig(address)
-		const conf = new BridgeConfig(
-			bridgeConfig[0],
-			bridgeConfig[1],
-			bridgeConfig[2],
-			BridgePermissionType.PERMISSIONLESS,
-			Versions
-		)
-
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 		sdk.Accounts.loadAccount(event.params.from)
+		sdk.Accounts.loadAccount(event.params.to)
 	}
 }

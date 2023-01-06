@@ -84,33 +84,14 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		}
 	}
 
-	getAmmDetails(address: string): string {
-		if (address == '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8') {
-			return '0x0e0E3d2C5c292161999474247956EF542caBF8dd' // USDC Bridge
-		} else if (address == '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1') {
-			return '0x7aC115536FE3A185100B2c4DE4cb328bf3A58Ba6' // DAI Bridge
-		} else if (address == '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa') {
-			return '0x72209Fe68386b37A40d6bCA04f78356fd342491f' // USDT Bridge
-		} else if (address == '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1') {
-			return '0x3749C4f034022c39ecafFaBA182555d4508caCCC' // ETH Bridge
-		} else if (address == '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f') {
-			return '0x3E4a3a4796d16c0Cd582C382691998f7c06420B6' // WBTC Bridge
-		} else if (address == '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC') {
-			return '0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266' // HOP Bridge
-		} else {
-			log.critical('Token not found', [])
-			return ''
-		}
-	}
-
 	getTokenList(): string[] {
 		return [
-			'0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
-			'0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
-			'0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa',
-			'0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
-			'0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
-			'0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC',
+			'0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8', // USDC
+			'0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
+			'0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa', // USDT
+			'0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', // ETH
+			'0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f', // WBTC
+			'0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC', // HOP
 		]
 	}
 }
