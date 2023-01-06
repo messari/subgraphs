@@ -17,7 +17,7 @@ DeFi users can swap native assets cross-chain on Stargate within a single transa
 
 ### Usage and Transactions
 
-Users of Multichain are people who either transfer assets across blockchains or provide liquidity to the pools.
+Users of Stargate are people who either transfer assets across blockchains or provide liquidity to the pools.
 
 ### TVL
 

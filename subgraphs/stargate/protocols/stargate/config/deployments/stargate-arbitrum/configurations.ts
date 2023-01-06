@@ -1,9 +1,9 @@
 import { Configurations } from "../../../../../configurations/configurations/interface";
 import {
-  Network,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../../../src/common/constants";
+import { Network } from "../../../../../src/sdk/util/constants";
 
 export class StargateArbitrumConfigurations implements Configurations {
   getNetwork(): string {

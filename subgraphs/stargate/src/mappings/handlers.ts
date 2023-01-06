@@ -10,7 +10,6 @@ import { amountLDtoSD } from "./helpers";
 import { Versions } from "../versions";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { crossPoolTokens } from "../common/constants";
-import { getRewardsPerDay, RewardIntervalType } from "../common/rewards";
 import { NetworkConfigs } from "../../configurations/configure";
 
 import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
@@ -25,6 +24,7 @@ import {
 } from "../sdk/protocols/bridge/enums";
 import { BIGINT_ZERO, Network, RewardTokenType } from "../sdk/util/constants";
 import { chainIDToNetwork } from "../sdk/protocols/bridge/chainIds";
+import { getRewardsPerDay, RewardIntervalType } from "../sdk/util/rewards";
 
 import {
   AddLiquidityCall,
