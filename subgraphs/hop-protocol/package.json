@@ -3,7 +3,8 @@
   "scripts": {
     "format": "npx prettier --write .",
     "codegen": "graph codegen",
-    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/hop-protocol/config/templates/hop-protocol.template.yaml > subgraph.yaml"
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts",
+    "b-arb": "messari b hop-protocol-arbitrum -l"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.37.0",

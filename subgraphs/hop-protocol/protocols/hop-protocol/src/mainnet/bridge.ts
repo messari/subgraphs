@@ -1,49 +1,71 @@
-import { SDK } from '../sdk/protocols/bridge'
-import { TokenPricer } from '../sdk/protocols/config'
-import { TokenInitializer, TokenParams } from '../sdk/protocols/bridge/tokens'
-import { Pool } from '../sdk/protocols/bridge/pool'
-import { BridgePermissionType } from '../sdk/protocols/bridge/enums'
-import { BridgeConfig } from '../sdk/protocols/bridge/config'
+import { SDK } from '../../../../src/sdk/protocols/bridge'
+import { TokenPricer } from '../../../../src/sdk/protocols/config'
+import {
+	TokenInitializer,
+	TokenParams,
+} from '../../../../src/sdk/protocols/bridge/tokens'
+import { Pool } from '../../../../src/sdk/protocols/bridge/pool'
+import {
+	BridgePermissionType,
+	CrosschainTokenType,
+	BridgePoolType,
+} from '../../../../src/sdk/protocols/bridge/enums'
+import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { _ERC20 } from 'wherever You have an ABI for it'
-import { Versions } from './versions'
+import { Versions } from '../../../../src/versions'
+import { Address, BigDecimal } from '@graphprotocol/graph-ts'
+import { Token } from '../../../../generated/schema'
+import {
+	BonderAdded,
+	BonderRemoved,
+	MultipleWithdrawalsSettled,
+	Stake,
+	TransferFromL1Completed,
+	TransferRootSet,
+	TransfersCommitted,
+	Unstake,
+	WithdrawalBondSettled,
+	WithdrawalBonded,
+	Withdrew,
+} from '../../../../generated/HopL2Bridge/L2_Bridge'
 
 // Implement TokenPricer to pass it to the SDK constructor
-class Pricer implements TokenPricer {
-	getTokenPrice(token: Token): BigDecimal {
-		const price = getUsdPricePerToken(Address.fromBytes(token.id))
-		return price.usdPrice
-	}
 
-	getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
-		const _amount = bigIntToBigDecimal(amount, token.decimals)
-		return getUsdPrice(Address.fromBytes(token.id), _amount)
-	}
-}
+export function handleBonderAdded(event: BonderAdded): void {
+	class Pricer implements TokenPricer {
+		getTokenPrice(token: Token): BigDecimal {
+			const price = getUsdPricePerToken(Address.fromBytes(token.id))
+			return price.usdPrice
+		}
 
-// Implement TokenInitializer
-class TokenInit implements TokenInitializer {
-	getTokenParams(address: Address): TokenParams {
-		const erc20 = _ERC20.bind(address)
-		const name = erc20.name()
-		const symbol = erc20.symbol()
-		const decimals = erc20.decimals().toI32()
-		return {
-			name,
-			symbol,
-			decimals,
+		getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
+			const _amount = bigIntToBigDecimal(amount, token.decimals)
+			return getUsdPrice(Address.fromBytes(token.id), _amount)
 		}
 	}
-}
 
-const conf = new BridgeConfig(
-	'0x2796317b0fF8538F253012862c06787Adfb8cEb6',
-	'Synapse',
-	'synapse',
-	BridgePermissionType.WHITELIST,
-	Versions
-)
+	// Implement TokenInitializer
+	class TokenInit implements TokenInitializer {
+		getTokenParams(address: Address): TokenParams {
+			const erc20 = _ERC20.bind(address)
+			const name = erc20.name()
+			const symbol = erc20.symbol()
+			const decimals = erc20.decimals().toI32()
+			return {
+				name,
+				symbol,
+				decimals,
+			}
+		}
+	}
 
-export function handleTransferOut(event: TransferOut): void {
+	const conf = new BridgeConfig(
+		'0x2796317b0fF8538F253012862c06787Adfb8cEb6',
+		'Synapse',
+		'synapse',
+		BridgePermissionType.WHITELIST,
+		Versions
+	)
 	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
 	const poolID = event.address
@@ -80,3 +102,16 @@ function onCreatePool(
 	// ...
 	pool.initialize(name, symbol, type, inputToken)
 }
+export function handleBonderRemoved(event: BonderRemoved): void {}
+export function handleTransferFromL1Completed(
+	event: TransferFromL1Completed
+): void {}
+export function handleTransferRootSet(event: TransferRootSet): void {}
+export function handleTransferSent(event: TransferRootSet): void {}
+export function handleTransfersCommitted(event: TransfersCommitted): void {}
+export function handleUnstake(event: Unstake): void {}
+export function handleWithdrawalBondSettled(
+	event: WithdrawalBondSettled
+): void {}
+export function handleWithdrawalBonded(event: WithdrawalBonded): void {}
+export function handleWithdrew(event: Withdrew): void {}

@@ -28,10 +28,12 @@ dataSources:
       abis:
         - name: Token
           file: ./abis/Token.json
+        - name: ERC20
+          file: ./abis/Prices/ERC20.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./protocols/hop-protocol/src/{{network}}/token.ts
+      file: ./protocols/hop-protocol/src/mainnet/bridge.ts
 {{/tokens}}
 {{#bridges}}
   - kind: ethereum/contract
@@ -92,12 +94,36 @@ dataSources:
           handler: handleWithdrawalBonded
         - event: Withdrew(indexed bytes32,indexed address,uint256,bytes32)
           handler: handleWithdrew
-      file: ./protocols/hop-protocol/src/{{network}}/bridge.ts
+      file: ./protocols/hop-protocol/src/mainnet/bridge.ts
 {{/bridges}}
 {{/isMainnet}}
 
 {{^isMainnet}}
 dataSources:
+{{#tokens}}
+  - kind: ethereum/contract
+    name: {{dataSourceName}}
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: Token
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Transfer
+      abis:
+        - name: Token
+          file: ./abis/Token.json
+        - name: ERC20
+          file: ./abis/Prices/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/hop-protocol/src/L2/token.ts
+{{/tokens}}
 {{#amms}}
   - kind: ethereum/contract
     name: {{dataSourceName}}
@@ -130,7 +156,7 @@ dataSources:
           handler: handleRemoveLiquidityOne
         - event: RemoveLiquidityImbalance(indexed address,uint256[],uint256[],uint256,uint256)
           handler: handleRemoveLiquidityImbalance
-      file: ./protocols/hop-protocol/src/{{network}}/amm.ts
+      file: ./protocols/hop-protocol/src/L2/amm.ts
 {{/amms}}
 {{#bridges}}
   - kind: ethereum/contract
@@ -185,6 +211,6 @@ dataSources:
           handler: handleWithdrawalBonded
         - event: Withdrew(indexed bytes32,indexed address,uint256,bytes32)
           handler: handleWithdrew
-      file: ./protocols/hop-protocol/src/{{network}}/bridge.ts
+      file: ./protocols/hop-protocol/src/L2/bridge.ts
 {{/bridges}}
 {{/isMainnet}}

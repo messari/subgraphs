@@ -1,7 +1,11 @@
 {
-  "network": "arbitrum",
+  "network": "arbitrum-one",
   "isMainnet": false,
   "subgraphName": "hop-arbitrum",
+  "deployment-id": "hop-protocol-arbitrum",
+  "graftEnabled": false,
+  "subgraphId": "QmfHRGh3tC4yb2bBRn5A6ctytG32Jwfi9eNo76EFjiWyrf",
+  "graftStartBlock": 15217959,
   "tokens": [
     {
       "dataSourceName": "Token",
