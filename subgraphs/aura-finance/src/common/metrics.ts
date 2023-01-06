@@ -28,7 +28,7 @@ import {
   Account,
   Vault as VaultStore,
 } from "../../generated/schema";
-import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
+import { BaseRewardPool } from "../../generated/Booster-v1/BaseRewardPool";
 
 export function updateProtocolTotalValueLockedUSD(): void {
   const protocol = getOrCreateYieldAggregator();
@@ -97,9 +97,8 @@ export function updateUsageMetrics(event: ethereum.Event): void {
 
 export function updateUsageMetricsAfterDeposit(event: ethereum.Event): void {
   const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
-  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
-    event
-  );
+  const usageMetricsHourlySnapshot =
+    getOrCreateUsageMetricsHourlySnapshot(event);
 
   usageMetricsDailySnapshot.dailyDepositCount += 1;
   usageMetricsHourlySnapshot.hourlyDepositCount += 1;
@@ -110,9 +109,8 @@ export function updateUsageMetricsAfterDeposit(event: ethereum.Event): void {
 
 export function updateUsageMetricsAfterWithdraw(event: ethereum.Event): void {
   const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
-  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
-    event
-  );
+  const usageMetricsHourlySnapshot =
+    getOrCreateUsageMetricsHourlySnapshot(event);
 
   usageMetricsDailySnapshot.dailyWithdrawCount += 1;
   usageMetricsHourlySnapshot.hourlyWithdrawCount += 1;
@@ -140,18 +138,15 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 export function updateVaultSnapshots(
+  boosterAddr: Address,
   poolId: BigInt,
   event: ethereum.Event
 ): void {
-  const vaultId = NetworkConfigs.getFactoryAddress()
-    .concat("-")
-    .concat(poolId.toString());
-
-  const vault = getOrCreateVault(poolId, event);
+  const vault = getOrCreateVault(boosterAddr, poolId, event);
   if (!vault) return;
 
-  const vaultDailySnapshots = getOrCreateVaultDailySnapshots(vaultId, event);
-  const vaultHourlySnapshots = getOrCreateVaultHourlySnapshots(vaultId, event);
+  const vaultDailySnapshots = getOrCreateVaultDailySnapshots(vault.id, event);
+  const vaultHourlySnapshots = getOrCreateVaultHourlySnapshots(vault.id, event);
 
   vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
@@ -202,74 +197,61 @@ export function updateVaultSnapshots(
 }
 
 export function updateRevenue(
+  boosterAddr: Address,
   poolId: BigInt,
   totalRevenueUSD: BigDecimal,
   totalFees: BigDecimal,
   event: ethereum.Event
 ): void {
   const protocolSideRevenueUSD = totalFees.times(totalRevenueUSD);
-  const supplySideRevenueUSD = BIGDECIMAL_ONE.minus(totalFees).times(
-    totalRevenueUSD
-  );
+  const supplySideRevenueUSD =
+    BIGDECIMAL_ONE.minus(totalFees).times(totalRevenueUSD);
 
   const protocol = getOrCreateYieldAggregator();
-  const vault = getOrCreateVault(poolId, event);
+  const vault = getOrCreateVault(boosterAddr, poolId, event);
   if (!vault) return;
 
   const financialMetrics = getOrCreateFinancialDailySnapshots(event);
   const vaultDailySnapshot = getOrCreateVaultDailySnapshots(vault.id, event);
   const vaultHourlySnapshot = getOrCreateVaultHourlySnapshots(vault.id, event);
 
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  vault.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  vault.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
 
-  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  vaultDailySnapshot.dailySupplySideRevenueUSD = vaultDailySnapshot.dailySupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  vaultHourlySnapshot.hourlySupplySideRevenueUSD = vaultHourlySnapshot.hourlySupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
+  financialMetrics.dailySupplySideRevenueUSD =
+    financialMetrics.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  vaultDailySnapshot.dailySupplySideRevenueUSD =
+    vaultDailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  vaultHourlySnapshot.hourlySupplySideRevenueUSD =
+    vaultHourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSD);
 
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  vault.cumulativeProtocolSideRevenueUSD = vault.cumulativeProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  vault.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
 
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  vaultDailySnapshot.dailyProtocolSideRevenueUSD = vaultDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  vaultHourlySnapshot.hourlyProtocolSideRevenueUSD = vaultHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  financialMetrics.dailyProtocolSideRevenueUSD =
+    financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  vaultDailySnapshot.dailyProtocolSideRevenueUSD =
+    vaultDailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  vaultHourlySnapshot.hourlyProtocolSideRevenueUSD =
+    vaultHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+      protocolSideRevenueUSD
+    );
 
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  vault.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+  vault.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
 
-  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  vaultDailySnapshot.dailyTotalRevenueUSD = vaultDailySnapshot.dailyTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  vaultHourlySnapshot.hourlyTotalRevenueUSD = vaultHourlySnapshot.hourlyTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
+  financialMetrics.dailyTotalRevenueUSD =
+    financialMetrics.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+  vaultDailySnapshot.dailyTotalRevenueUSD =
+    vaultDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+  vaultHourlySnapshot.hourlyTotalRevenueUSD =
+    vaultHourlySnapshot.hourlyTotalRevenueUSD.plus(totalRevenueUSD);
 
   vaultHourlySnapshot.save();
   vaultDailySnapshot.save();
@@ -279,17 +261,25 @@ export function updateRevenue(
 }
 
 export function updateRewards(
+  boosterAddr: Address,
   poolId: BigInt,
   poolRewardsAddress: Address,
   event: ethereum.Event
 ): void {
   const poolRewardsContract = BaseRewardPool.bind(poolRewardsAddress);
-
   const rewardTokenAddr = Address.fromString(NetworkConfigs.getRewardToken());
-  const balRewardRate = readValue<BigInt>(
-    poolRewardsContract.try_rewardRate(),
-    BIGINT_ZERO
-  );
+
+  let balRewardRate = BIGINT_ZERO;
+  const periodFinishCall = poolRewardsContract.try_periodFinish();
+  if (
+    !periodFinishCall.reverted &&
+    periodFinishCall.value >= event.block.timestamp
+  ) {
+    balRewardRate = readValue<BigInt>(
+      poolRewardsContract.try_rewardRate(),
+      BIGINT_ZERO
+    );
+  }
 
   const auraRewardRate = getAuraMintAmount(rewardTokenAddr, balRewardRate);
 
@@ -300,7 +290,7 @@ export function updateRewards(
     RewardIntervalType.TIMESTAMP
   );
 
-  const vault = getOrCreateVault(poolId, event);
+  const vault = getOrCreateVault(boosterAddr, poolId, event);
   if (!vault) return;
 
   const rewardToken = getOrCreateToken(rewardTokenAddr, event.block.number);

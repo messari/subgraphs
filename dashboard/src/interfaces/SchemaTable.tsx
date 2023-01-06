@@ -167,7 +167,7 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
             let rewardFactorsStr = "N/A";
             let rewardAPRs: string[] = entityData?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
               let apr = 0;
-              if (protocolType === "LENDING" && (entityData.rewardTokens[idx]?.type === "BORROW" || entityData.rewardTokens[idx]?.token?.type === "BORROW")) {
+              if (protocolType === "LENDING" && (entityData.rewardTokens[idx]?.type?.includes("BORROW") || entityData.rewardTokens[idx]?.token?.type?.includes("BORROW"))) {
                 if (
                   !Number(entityData.totalBorrowBalanceUSD) &&
                   issues.filter(

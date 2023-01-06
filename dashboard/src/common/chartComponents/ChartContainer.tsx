@@ -240,18 +240,8 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                     }
                 })
             }
-            // let datasetMaxLength = 0;
-            // datasets.forEach((dataset: any) => {
-            //     if (dataset?.data?.length > datasetMaxLength) {
-            //         datasetMaxLength = dataset?.data?.length;
-            //     }
-            // })
+
             const datasetsCopy = JSON.parse(JSON.stringify(datasets));
-            // datasets.forEach((dataset: any, idx: number) => {
-            //     while (datasetsCopy[idx]?.data?.length < datasetMaxLength) {
-            //         datasetsCopy[idx].data.unshift(0);
-            //     }
-            // });
 
             const chartData = {
                 labels,
@@ -275,7 +265,7 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
     const staticButtonStyle = chartIsImage ? { backgroundColor: "rgb(102,86,248)", color: "white", border: "1px rgb(102,86,248) solid" } : { backgroundColor: "rgba(0,0,0,0)" };
     const dynamicButtonStyle = !chartIsImage ? { backgroundColor: "rgb(102,86,248)", color: "white", border: "1px rgb(102,86,248) solid" } : { backgroundColor: "rgba(0,0,0,0)" };
 
-    let tableRender = <TableChart datasetLabel={datasetLabel} dataTable={dataTable} jpegDownloadHandler={() => jpegDownloadHandler(false)} />
+    let tableRender = <TableChart datasetLabel={datasetLabel} dataTable={dataTable} jpegDownloadHandler={() => jpegDownloadHandler(false)} isStringField={false} />
     let overlayKey = csvMetaData.fileName?.length > 0 ? csvMetaData.fileName : csvMetaDataProp.fileName;
     if (csvMetaData.columnName) {
         overlayKey += '-' + csvMetaData.columnName;
