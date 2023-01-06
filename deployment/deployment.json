@@ -1231,6 +1231,35 @@
       }
     }
   },
+  "burrow": {
+    "schema": "lending",
+    "base": "burrow",
+    "protocol": "burrow",
+    "deployments": {
+      "burrow-near": {
+        "network": "near-mainnet",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "burrow.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "burrow-near",
+            "query-id": "burrow-near"
+          }
+        }
+      }
+    }
+  },
   "compound-v2": {
     "schema": "lending",
     "base": "compound-forks",
@@ -1805,7 +1834,7 @@
     "deployments": {
       "compound-v3-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "3.0.0",
           "subgraph": "1.0.3",
@@ -1837,7 +1866,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1845,7 +1874,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1854,12 +1883,12 @@
           }
         }
       },
-      "curve-finance-avalanche": {
-        "network": "avalanche",
+      "curve-finance-aurora": {
+        "network": "aurora",
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1867,7 +1896,29 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-aurora",
+            "query-id": "curve-finance-aurora"
+          }
+        }
+      },
+      "curve-finance-avalanche": {
+        "network": "avalanche",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "curve.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1881,7 +1932,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1889,7 +1940,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1907,7 +1958,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1915,7 +1966,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1929,7 +1980,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1937,7 +1988,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1946,12 +1997,12 @@
           }
         }
       },
-      "curve-finance-optimism": {
-        "network": "optimism",
+      "curve-finance-harmony": {
+        "network": "harmony",
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1959,7 +2010,51 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-harmony",
+            "query-id": "curve-finance-harmony"
+          }
+        }
+      },
+      "curve-finance-moonbeam": {
+        "network": "moonbeam",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "curve.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-moonbeam",
+            "query-id": "curve-finance-moonbeam"
+          }
+        }
+      },
+      "curve-finance-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "curve.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -1973,7 +2068,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1981,7 +2076,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -2122,8 +2217,8 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.1",
-          "methodology": "1.0.0"
+          "subgraph": "1.1.2",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "goldfinch.template.yaml"
@@ -2250,8 +2345,8 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.2",
-          "methodology": "1.0.0"
+          "subgraph": "1.1.0",
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "vesta.finance.template.yaml"
@@ -5245,7 +5340,7 @@
     "deployments": {
       "badgerdao-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.0.1",
@@ -5694,7 +5789,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "services": {
@@ -5808,6 +5903,57 @@
             "slug": "cryptopunks-ethereum",
             "query-id": "7vJEsy8pJmRQZQh5kTXNz68SRHXBS859hMq3o5uWF1Ac"
           }
+        }
+      }
+    }
+  },
+  "multichain": {
+    "schema": "bridge",
+    "base": "multichain",
+    "protocol": "multichain",
+    "deployments": {
+      "multichain-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-ethereum",
+            "query-id": "multichain-ethereum"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "multichain-fantom": {
+        "network": "fantom",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "multichain-fantom",
+            "query-id": "multichain-fantom"
+          }
+        },
+        "files": {
+          "template": "multichain.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
         }
       }
     }

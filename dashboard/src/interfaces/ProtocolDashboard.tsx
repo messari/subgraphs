@@ -621,7 +621,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         variables["pool" + (idx + 1) + "Id"] = dataPools[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC") {
+      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC" || data?.protocols[0]?.type === "YIELD") {
         getPoolsSnapshotVolume({ variables });
       }
       if (dataPools[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools2) {
@@ -637,7 +637,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         variables["pool" + (idx + 1) + "Id"] = dataPools2[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens2({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC") {
+      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC" || data?.protocols[0]?.type === "YIELD") {
         getPoolsSnapshotVolume2({ variables });
       }
       if (dataPools2[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools3) {
@@ -653,7 +653,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         variables["pool" + (idx + 1) + "Id"] = dataPools3[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens3({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC") {
+      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC" || data?.protocols[0]?.type === "YIELD") {
         getPoolsSnapshotVolume3({ variables });
       }
       if (dataPools3[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools4) {
@@ -669,7 +669,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         variables["pool" + (idx + 1) + "Id"] = dataPools4[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens4({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC") {
+      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC" || data?.protocols[0]?.type === "YIELD") {
         getPoolsSnapshotVolume4({ variables });
       }
       if (dataPools4[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools5) {
@@ -685,7 +685,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         variables["pool" + (idx + 1) + "Id"] = dataPools5[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens5({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC") {
+      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC" || data?.protocols[0]?.type === "YIELD") {
         getPoolsSnapshotVolume5({ variables });
       }
     }

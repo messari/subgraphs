@@ -109,6 +109,24 @@ export function toPercent(cur: number, total: number): number {
   return parseFloat(((cur / total) * 100).toFixed(2));
 }
 
+export function timestampToDaysSinceEpoch(ts: number): number {
+  if (ts > 20000000000) {
+    ts = ts / 1000;
+  }
+  let days = (ts / 86400).toString();
+
+  if (days.includes(".")) {
+    const tsSplit = days.split("");
+    const tenthElement = tsSplit[tsSplit.indexOf(".") + 1];
+    if (Number(tenthElement) >= 5) {
+      days = (Number(days.split(".")[0]) + 1).toFixed(0);
+    } else {
+      days = Number(days).toFixed(0);
+    }
+  }
+  return Number(days);
+}
+
 export function formatIntToFixed2(val: number): string {
   let returnStr = parseFloat(val.toFixed(2)).toLocaleString();
   if (returnStr.split(".")[1]?.length === 1) {

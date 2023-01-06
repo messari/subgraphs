@@ -393,6 +393,8 @@ dataSources:
       abis:
         - name: MembershipCollector
           file: ./abis/MembershipCollector.json
+        - name: MembershipVault
+          file: ./abis/MembershipVault.json
       eventHandlers:
         - event: EpochFinalized(indexed uint256,uint256)
           handler: handleEpochFinalized
@@ -440,8 +442,10 @@ dataSources:
       eventHandlers:
         - event: CapitalERC721Deposit(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleCapitalErc721Deposit
+          receipt: true
         - event: CapitalERC721Withdrawal(indexed address,uint256,address,uint256)
           handler: handleCapitalErc721Withdrawal
+          receipt: true
       file: ./src/mappings/membership/capital_ledger.ts
 
   - kind: ethereum/contract

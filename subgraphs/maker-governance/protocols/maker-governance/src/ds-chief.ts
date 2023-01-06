@@ -116,11 +116,12 @@ export function handleVote(event: LogNote): void {
 
 export function handleEtch(event: Etch): void {
   let sender = event.transaction.from.toHexString();
+  const to = event.transaction.to;
   // Check if txn is not directly to Chief, it's either to vote delegate or multi-sig + delegate
-  if (event.transaction.to && event.transaction.to != event.address) {
+  if (to && to != event.address) {
     const fromAdmin = DelegateAdmin.load(sender);
     if (!fromAdmin) {
-      const toAdmin = DelegateAdmin.load(event.transaction.to!.toHexString());
+      const toAdmin = DelegateAdmin.load(to!.toHexString());
       if (!toAdmin) {
         log.error("Etch not trigger by a delegate admin. TxnHash: {}", [
           event.transaction.hash.toHexString(),

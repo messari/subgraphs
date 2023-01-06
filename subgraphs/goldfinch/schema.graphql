@@ -663,17 +663,23 @@ type Market @entity {
   " Address of borrower (tranchedPool has one borrower per pool) "
   _borrower: String
 
-  " timestamp when for interest accrual (used for interest rates calculation) "
+  " timestamp when interest rates were last updated "
   _interestTimestamp: BigInt
 
-  " cumulative Reward Emission Amount "
-  _cumulativeRewardAmount: BigInt
+  " interest paid by borrowers, including reserve fee if applicable "
+  _borrowerInterestAmountUSD: BigDecimal
 
-  " timestamp when reward emission started "
-  _rewardTimestamp: BigInt
+  " interest received by lenders "
+  _lenderInterestAmountUSD: BigDecimal
 
   " Is the market a migrated tranched pool "
   _isMigratedTranchedPool: Boolean
+
+  " eligibleAmount aggregated to the market "
+  _membershipRewardEligibleAmount: BigInt
+
+  " nextEpochAmount aggregated to the market "
+  _membershipRewardNextEpochAmount: BigInt
 }
 
 #################################
@@ -1272,6 +1278,42 @@ type _PositionCounter @entity {
   nextCount: Int!
 }
 
+type _MembershipDirector @entity {
+  " owner address "
+  id: ID!
+  " MembershipScore returned from MembershipDirector.calculateMembershipScore "
+  eligibleAmount: BigInt!
+  " MembershipScore for next epoch "
+  nextEpochAmount: BigInt!
+  " total staked USDC Equivalent by the owner "
+  totalCapitalStaked: BigInt!
+}
+
+type _MembershipCapitalStaked @entity {
+  " {owner address}-{market id} "
+  id: ID!
+  " market id (pool address) "
+  market: Market!
+  " total staked USDC Equivalent for the position "
+  CapitalStakedAmount: BigInt!
+}
+
+# Helper entity to avoid count staking transaction more than once
+type _MembershipStakingTx @entity {
+  " {tx hash}-{logIndex} "
+  id: ID!
+}
+
+# Helper entity to avoid count staking transaction more than once
+type _MembershipStakingPosition @entity {
+  " Position ID "
+  id: ID!
+  " market id (pool address) "
+  market: Market!
+  " usdcEquivalent of position "
+  usdcEquivalent: BigInt!
+}
+
 ### Entity below are from goldfinch's official subgraph ###
 """
 Notes
@@ -1309,7 +1351,6 @@ type SeniorPoolStatus @entity {
   """
   id: ID!
   rawBalance: BigInt!
-  compoundBalance: BigInt!
   balance: BigInt!
   """
   The actual amount of USDC associated with the Senior Pool contract, can also be thought of as the Senior Pool's liquidity in USDC
