@@ -754,6 +754,9 @@ type Pool @entity {
 
   _lastDailySnapshotTimestamp: BigInt
   _lastHourlySnapshotTimestamp: BigInt
+
+  _lastRewardTimestamp: BigInt
+  _cumulativeRewardsClaimed: BigInt
 }
 
 type PoolRoute @entity {

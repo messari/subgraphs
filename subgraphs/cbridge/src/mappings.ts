@@ -29,6 +29,7 @@ import {
   Mint as PTBv2Mint,
   Burn as PTBv2Burn,
 } from "../generated/PeggedTokenBridgeV2/PeggedTokenBridgeV2";
+import { FarmingRewardClaimed } from "../generated/FarmingRewards/FarmingRewards";
 import { SDK } from "./sdk/protocols/bridge";
 import { TokenPricer } from "./sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
@@ -41,14 +42,17 @@ import {
 import { BridgeConfig } from "./sdk/protocols/bridge/config";
 import { _ERC20 } from "../generated/PoolBasedBridge/_ERC20";
 import { Versions } from "./versions";
-import { Token, _CrossChainHelper } from "../generated/schema";
+import { Token, Pool as PoolEntity } from "../generated/schema";
 import { bigIntToBigDecimal } from "./sdk/util/numbers";
 import { getUsdPricePerToken, getUsdPrice } from "./prices";
 import { BIGINT_NEGATIVE_ONE } from "../../alpaca-finance-lending/src/utils/constants";
 import { networkToChainID } from "./sdk/protocols/bridge/chainIds";
-import { BIGINT_ZERO } from "./sdk/util/constants";
-
-const PROTOCOL_ID = "";
+import {
+  BIGINT_ZERO,
+  getNetworkSpecificConstant,
+  RewardTokenType,
+  SECONDS_PER_DAY,
+} from "./sdk/util/constants";
 
 // empty handler for prices library
 // eslint-disable-next-line no-unused-vars, no-empty-function
@@ -82,7 +86,8 @@ class TokenInit implements TokenInitializer {
   }
 }
 
-function _getSDK(protocolId: string, event: ethereum.Event): SDK {
+function _getSDK(event: ethereum.Event): SDK {
+  const protocolId = getNetworkSpecificConstant().protocolId.toHexString();
   const conf = new BridgeConfig(
     protocolId,
     "cBridge",
@@ -145,7 +150,7 @@ export function handleSend(event: Send): void {
 }
 
 export function handleLiquidityAdded(event: LiquidityAdded): void {
-  const sdk = _getSDK(event.address.toHexString(), event);
+  const sdk = _getSDK(event);
   const token = sdk.Tokens.getOrCreateToken(event.params.token);
   const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
   const pool = sdk.Pools.loadPool(event.address, onCreatePool, auxArgs);
@@ -199,34 +204,6 @@ export function handleWithdraw(call: WithdrawCall): void {
     event
   );
 }
-
-/*
-export function handleWithdrawDone(event: WithdrawDone): void {
-  event.params.refid;
-  const transferHelper = _CrossChainHelper.load(event.params.refid);
-  if (!transferHelper) {
-    log.error(
-      "[handleWithdrawDone]refId {} not found in _CrossChainHelper for tx {}",
-      [event.params.refid.toHexString(), event.transaction.hash.toHexString()]
-    );
-    return;
-  }
-  event.params;
-
-  const sdk = _getSDK(event.address.toHexString(), event);
-
-  const token = sdk.Tokens.getOrCreateToken(event.params.token);
-  const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
-  const pool = sdk.Pools.loadPool(event.address, onCreatePool, auxArgs);
-  pool.addInputTokenBalance(
-    event.params.amount.times(BIGINT_NEGATIVE_ONE),
-    true
-  );
-
-  const acc = sdk.Accounts.loadAccount(event.params.receiver);
-  acc.liquidityWithdraw(pool, event.params.amount, true);
-}
-*/
 
 // Bridge via the Original Token Vault
 export function handleOTVDeposited(event: OTVDeposited): void {
@@ -301,9 +278,9 @@ export function handlePTBBurn(event: PTBBurn): void {
   _handleTransferOut(
     event.params.token,
     event.params.account,
-    Address.zero(), //TODO: missing
+    Address.zero(), //TODO: receiver missing
     event.params.amount,
-    BIGINT_ZERO, //TODO: missing
+    BIGINT_ZERO, //TODO: dstChainId missing
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event
@@ -321,6 +298,51 @@ export function handlePTBv2Mint(event: PTBv2Mint): void {
     CrosschainTokenType.WRAPPED,
     event
   );
+}
+
+// export function handleWithdrawalRequest(event: WithdrawalRequest): void {}
+
+export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
+  event.params.token;
+  event.params.reward;
+
+  // TODO
+  const POOL_BASED_BRIDGE_ADDRESS = Address.fromString(
+    "0x5427fefa711eff984124bfbb1ab6fbf5e3da1820"
+  );
+  const poolEntity = PoolEntity.load(POOL_BASED_BRIDGE_ADDRESS);
+  if (!poolEntity) {
+    // error
+    return;
+  }
+
+  if (!poolEntity._lastRewardTimestamp) {
+    poolEntity._lastRewardTimestamp = event.block.timestamp;
+    poolEntity._cumulativeRewardsClaimed = event.params.reward;
+    poolEntity.save();
+    return;
+  } else if (
+    event.block.timestamp <
+    poolEntity._lastRewardTimestamp!.plus(BigInt.fromI32(SECONDS_PER_DAY))
+  ) {
+    poolEntity._cumulativeRewardsClaimed =
+      poolEntity._cumulativeRewardsClaimed!.plus(event.params.reward);
+    poolEntity.save();
+    return;
+  }
+
+  const sdk = _getSDK(event);
+  const pool = sdk.Pools.loadPool(event.address);
+  const rToken = sdk.Tokens.getOrCreateToken(event.params.token);
+  pool.setRewardEmissions(
+    RewardTokenType.DEPOSIT,
+    rToken,
+    poolEntity._cumulativeRewardsClaimed!
+  );
+
+  poolEntity._lastRewardTimestamp = event.block.timestamp;
+  poolEntity._cumulativeRewardsClaimed = BIGINT_ZERO;
+  poolEntity.save();
 }
 
 // Pegged Token Bridge V2
@@ -347,7 +369,7 @@ function _handleTransferOut(
   crosschainTokenType: CrosschainTokenType,
   event: ethereum.Event
 ): void {
-  const sdk = _getSDK(PROTOCOL_ID, event);
+  const sdk = _getSDK(event);
   const inputToken = sdk.Tokens.getOrCreateToken(token);
   const auxArgs = new AuxArgs(inputToken, bridgePoolType);
 
@@ -382,7 +404,7 @@ function _handleTransferIn(
   crosschainTokenType: CrosschainTokenType,
   event: ethereum.Event
 ): void {
-  const sdk = _getSDK(PROTOCOL_ID, event);
+  const sdk = _getSDK(event);
   const inputToken = sdk.Tokens.getOrCreateToken(token);
   const auxArgs = new AuxArgs(inputToken, bridgePoolType);
   const pool = sdk.Pools.loadPool(event.address, onCreatePool, auxArgs);

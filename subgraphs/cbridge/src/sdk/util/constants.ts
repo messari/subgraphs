@@ -4,6 +4,7 @@ import {
   log,
   dataSource,
   Address,
+  Bytes,
 } from "@graphprotocol/graph-ts";
 
 ////////////////////////
