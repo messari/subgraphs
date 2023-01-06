@@ -2,7 +2,7 @@
   "network": "mainnet",
   "isMainnet": true,
   "graftEnabled": false,
-  "deployment-id": "hop-protocol-mainnet",
+  "deployment": "hop-protocol-mainnet",
   "subgraphId": "QmfHRGh3tC4yb2bBRn5A6ctytG32Jwfi9eNo76EFjiWyrf",
   "graftStartBlock": 15217959,
   "tokens": [

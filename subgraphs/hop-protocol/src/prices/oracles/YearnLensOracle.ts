@@ -1,35 +1,32 @@
-import * as utils from "../common/utils";
-import * as constants from "../common/constants";
-import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { YearnLensContract } from "../../../generated/UniswapV2Factory/YearnLensContract";
+import * as utils from '../common/utils'
+import * as constants from '../common/constants'
+import { CustomPriceType } from '../common/types'
+import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
+import { YearnLensContract } from '../../../generated/Token/YearnLensContract'
 
 export function getYearnLensContract(
-  contractAddress: Address
+	contractAddress: Address
 ): YearnLensContract | null {
-  if (utils.isNullAddress(contractAddress)) return null;
+	if (utils.isNullAddress(contractAddress)) return null
 
-  return YearnLensContract.bind(contractAddress);
+	return YearnLensContract.bind(contractAddress)
 }
 
 export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
-  const config = utils.getConfig();
+	const config = utils.getConfig()
 
-  if (!config || config.yearnLensBlacklist().includes(tokenAddr))
-    return new CustomPriceType();
+	if (!config || config.yearnLensBlacklist().includes(tokenAddr))
+		return new CustomPriceType()
 
-  const yearnLensContract = getYearnLensContract(config.yearnLens());
-  if (!yearnLensContract) return new CustomPriceType();
+	const yearnLensContract = getYearnLensContract(config.yearnLens())
+	if (!yearnLensContract) return new CustomPriceType()
 
-  const tokenPrice: BigDecimal = utils
-    .readValue<BigInt>(
-      yearnLensContract.try_getPriceUsdcRecommended(tokenAddr),
-      constants.BIGINT_ZERO
-    )
-    .toBigDecimal();
+	const tokenPrice: BigDecimal = utils
+		.readValue<BigInt>(
+			yearnLensContract.try_getPriceUsdcRecommended(tokenAddr),
+			constants.BIGINT_ZERO
+		)
+		.toBigDecimal()
 
-  return CustomPriceType.initialize(
-    tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS
-  );
+	return CustomPriceType.initialize(tokenPrice, constants.DEFAULT_USDC_DECIMALS)
 }

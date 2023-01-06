@@ -14,6 +14,28 @@ import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
 
+class Pricer implements TokenPricer {
+	getTokenPrice(token: Token): BigDecimal {
+		const price = getUsdPricePerToken(Address.fromBytes(token.id))
+		return price.usdPrice
+	}
+
+	getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
+		const _amount = bigIntToBigDecimal(amount, token.decimals)
+		return getUsdPrice(Address.fromBytes(token.id), _amount)
+	}
+}
+
+class TokenInit implements TokenInitializer {
+	getTokenParams(address: Address): TokenParams {
+		const tokenConfig = NetworkConfigs.getTokenDetails(address.toHex())
+		const name = tokenConfig[0]
+		const symbol = tokenConfig[1]
+		const decimals = BigInt.fromString(tokenConfig[2]).toI32()
+		return { name, symbol, decimals }
+	}
+}
+
 export function handleTransfer(event: Transfer): void {
 	if (NetworkConfigs.getTokenList().includes(event.address.toHex())) {
 		const bridgeConfig = NetworkConfigs.getBridgeConfig(
@@ -39,27 +61,6 @@ export function handleTransfer(event: Transfer): void {
 			)
 		) {
 			return
-		}
-		class Pricer implements TokenPricer {
-			getTokenPrice(token: Token): BigDecimal {
-				const price = getUsdPricePerToken(Address.fromBytes(token.id))
-				return price.usdPrice
-			}
-
-			getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
-				const _amount = bigIntToBigDecimal(amount, token.decimals)
-				return getUsdPrice(Address.fromBytes(token.id), _amount)
-			}
-		}
-
-		class TokenInit implements TokenInitializer {
-			getTokenParams(address: Address): TokenParams {
-				const tokenConfig = NetworkConfigs.getTokenDetails(address.toHex())
-				const name = tokenConfig[0]
-				const symbol = tokenConfig[1]
-				const decimals = BigInt.fromString(tokenConfig[2]).toI32()
-				return { name, symbol, decimals }
-			}
 		}
 
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
