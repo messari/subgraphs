@@ -12,7 +12,7 @@ import {
   dataSource,
   Address,
 } from "@graphprotocol/graph-ts";
-import { AuraToken } from "../../generated/Booster/AuraToken";
+import { AuraToken } from "../../generated/Booster-v1/AuraToken";
 import { _CircularBuffer } from "../../generated/schema";
 import { BIGINT_ZERO, Network } from "./constants";
 import {
