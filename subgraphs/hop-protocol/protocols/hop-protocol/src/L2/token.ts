@@ -37,34 +37,42 @@ class TokenInit implements TokenInitializer {
 }
 
 export function handleTransfer(event: Transfer): void {
-	if (NetworkConfigs.getTokenList().includes(event.address.toHex())) {
-		const bridgeConfig = NetworkConfigs.getBridgeConfig(
-			event.address.toHexString()
+	const bridgeConfig = NetworkConfigs.getBridgeConfig(
+		event.address.toHexString()
+	)
+
+	const ammAddress = NetworkConfigs.getAmmAddress(event.address.toHexString())
+
+	const bridgeAddress = bridgeConfig[0]
+	const bridgeName = bridgeConfig[1]
+	const bridgeSlug = bridgeConfig[2]
+
+	const conf = new BridgeConfig(
+		bridgeAddress,
+		bridgeName,
+		bridgeSlug,
+		BridgePermissionType.PERMISSIONLESS,
+		Versions
+	)
+
+	if (
+		!(
+			event.params.to.equals(Address.fromHexString(ammAddress)) ||
+			event.params.from.equals(Address.fromHexString(ammAddress))
 		)
+	) {
+		return
+	}
 
-		const bridgeAddress = bridgeConfig[0]
-		const bridgeName = bridgeConfig[1]
-		const bridgeSlug = bridgeConfig[2]
+	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
-		const conf = new BridgeConfig(
-			bridgeAddress,
-			bridgeName,
-			bridgeSlug,
-			BridgePermissionType.PERMISSIONLESS,
-			Versions
-		)
-
-		if (
-			!(
-				event.params.to.equals(Address.fromHexString(bridgeAddress)) ||
-				event.params.from.equals(Address.fromHexString(bridgeAddress))
-			)
-		) {
-			return
-		}
-
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+	if (event.params.to.equals(Address.fromHexString(ammAddress))) {
 		sdk.Accounts.loadAccount(event.params.from)
+		sdk.Tokens.getOrCreateToken(event.address)
+	}
+
+	if (event.params.from.equals(Address.fromHexString(ammAddress))) {
 		sdk.Accounts.loadAccount(event.params.to)
+		sdk.Tokens.getOrCreateToken(event.address)
 	}
 }

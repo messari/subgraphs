@@ -4,4 +4,6 @@ export interface Configurations {
 	getAmmAddress(address: string): string
 	getTokenDetails(address: string): string[]
 	getTokenList(): string[]
+	getPoolDetails(poolAddress: string): string[]
+	getCorrespondingTokenAddress(poolAddress: string): string
 }
