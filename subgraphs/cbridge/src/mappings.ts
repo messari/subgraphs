@@ -3,7 +3,6 @@ import {
   BigInt,
   Address,
   ethereum,
-  dataSource,
   Bytes,
   log,
 } from "@graphprotocol/graph-ts";
@@ -42,7 +41,7 @@ import {
 import { BridgeConfig } from "./sdk/protocols/bridge/config";
 import { _ERC20 } from "../generated/PoolBasedBridge/_ERC20";
 import { Versions } from "./versions";
-import { Token, Pool as PoolEntity } from "../generated/schema";
+import { Token, Pool as PoolEntity, _Transfer } from "../generated/schema";
 import { bigIntToBigDecimal } from "./sdk/util/numbers";
 import { getUsdPricePerToken, getUsdPrice } from "./prices";
 import { BIGINT_NEGATIVE_ONE } from "../../alpaca-finance-lending/src/utils/constants";
@@ -131,12 +130,19 @@ export function handleSend(event: Send): void {
     CrosschainTokenType.CANONICAL,
     event
   );
+
+  let transfer = _Transfer.load(event.params.transferId);
+  if (!transfer) {
+    transfer = new _Transfer(event.params.transferId);
+    transfer.save();
+  }
 }
 
 export function handleLiquidityAdded(event: LiquidityAdded): void {
   const sdk = _getSDK(event);
   const token = sdk.Tokens.getOrCreateToken(event.params.token);
   const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
+  // TODO: concatenate Pool address and token address for pool id?
   const pool = sdk.Pools.loadPool(event.address, onCreatePool, auxArgs);
   pool.addInputTokenBalance(event.params.amount, true);
   const acc = sdk.Accounts.loadAccount(event.params.provider);
@@ -146,24 +152,8 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
 export function handleWithdraw(call: WithdrawCall): void {
   const buf = call.inputs._wdmsg;
   const wdmsg = decodeWithdrawMsg(buf);
-  /*
-  const fwdmsg = [
-    wdmsg.chainId.toString(),
-    wdmsg.seqnum.toString(),
-    wdmsg.receiver.toHexString(),
-    wdmsg.token.toHexString(),
-    wdmsg.amount.toString(),
-    wdmsg.refId.toHexString(),
-  ];
 
-  log.info("decoding tx {} buf {}:\n wdmsg={}", [
-    call.transaction.hash.toHexString(),
-    buf.toHexString(),
-    fwdmsg.toString(),
-  ]);
-  */
-
-  // "fake" an event for the purpose of calling _handleTransferIn
+  // fake an event for the purpose of calling _handleTransferIn
   const value = new ethereum.Value(ethereum.ValueKind.INT, 0 as u64);
   const eventParameters = [new ethereum.EventParam("value", value)];
   const event = new ethereum.Event(
@@ -177,16 +167,37 @@ export function handleWithdraw(call: WithdrawCall): void {
     null
   );
 
-  _handleTransferIn(
-    wdmsg.token,
-    Address.zero(), //TODO: no sender
-    wdmsg.receiver,
-    wdmsg.amount,
-    wdmsg.chainId,
-    BridgePoolType.LIQUIDITY,
-    CrosschainTokenType.CANONICAL,
-    event
+  const sdk = _getSDK(event);
+  const token = sdk.Tokens.getOrCreateToken(wdmsg.token);
+  const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
+  const pool = sdk.Pools.loadPool(
+    call.to.concat(wdmsg.token),
+    onCreatePool,
+    auxArgs
   );
+  if (wdmsg.refId.equals(Bytes.empty())) {
+    // LP withdraw liquidity: refId == 0x0
+    pool.addInputTokenBalance(wdmsg.amount.times(BIGINT_NEGATIVE_ONE), true);
+    const acc = sdk.Accounts.loadAccount(wdmsg.receiver);
+    acc.liquidityWithdraw(pool, wdmsg.amount, true);
+  } else if (wdmsg.refId.equals(Bytes.fromHexString("0x1"))) {
+    // claim fee: refId == 0x1
+    pool.addRevenueNative(BIGINT_ZERO, wdmsg.amount);
+  } else if (_Transfer.load(wdmsg.refId)) {
+    // refund, refId==xfer_id
+    // TODO: how to handle refund?
+  } else {
+    _handleTransferIn(
+      wdmsg.token,
+      Address.zero(), //TODO: no sender
+      wdmsg.receiver,
+      wdmsg.amount,
+      wdmsg.chainId,
+      BridgePoolType.LIQUIDITY,
+      CrosschainTokenType.CANONICAL,
+      event
+    );
+  }
 }
 
 // Bridge via the Original Token Vault
@@ -287,13 +298,12 @@ export function handlePTBv2Mint(event: PTBv2Mint): void {
 // export function handleWithdrawalRequest(event: WithdrawalRequest): void {}
 
 export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
-  event.params.token;
-  event.params.reward;
-
-  // TODO
+  // TODO: move to constants.ts
   const POOL_BASED_BRIDGE_ADDRESS = Address.fromString(
     "0x5427fefa711eff984124bfbb1ab6fbf5e3da1820"
   );
+  // TODO: with concatenated pool id, we don't know which pool the
+  // rewards belong to
   const poolEntity = PoolEntity.load(POOL_BASED_BRIDGE_ADDRESS);
   if (!poolEntity) {
     // error
@@ -357,7 +367,11 @@ function _handleTransferOut(
   const inputToken = sdk.Tokens.getOrCreateToken(token);
   const auxArgs = new AuxArgs(inputToken, bridgePoolType);
 
-  const pool = sdk.Pools.loadPool(event.address, onCreatePool, auxArgs);
+  const pool = sdk.Pools.loadPool(
+    event.address.concat(token),
+    onCreatePool,
+    auxArgs
+  );
   const dstPool = getPoolAddress(bridgePoolType, dstChainId);
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     dstChainId,
@@ -391,7 +405,11 @@ function _handleTransferIn(
   const sdk = _getSDK(event);
   const inputToken = sdk.Tokens.getOrCreateToken(token);
   const auxArgs = new AuxArgs(inputToken, bridgePoolType);
-  const pool = sdk.Pools.loadPool(event.address, onCreatePool, auxArgs);
+  const pool = sdk.Pools.loadPool(
+    event.address.concat(token),
+    onCreatePool,
+    auxArgs
+  );
   // TODO: add bridge version for OTV - PTB
   const srcPool = getPoolAddress(bridgePoolType, srcChainId);
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(

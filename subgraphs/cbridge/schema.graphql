@@ -1339,23 +1339,8 @@ type _ProtocolSnapshotHelper @entity {
   lastActivityTimestamp: BigInt!
 }
 
-type _CrossChainHelper @entity {
-  " refId "
+# helper for tracking refund
+type _Transfer @entity {
+  " transfer Id "
   id: Bytes!
-  " token id (address) on the source chain "
-  token: Bytes!
-  " sender of transfer on the source chain "
-  sender: Bytes!
-  " receiver of transfer on the destination chain "
-  receiver: Bytes!
-  " amount transfered "
-  amount: BigInt!
-  " pool/contract id (address) on the source chain "
-  pool: Bytes!
-  " transaction ID on the source chain "
-  transactionID: Bytes!
-  " source chain Id "
-  srcChainId: BigInt!
-  " destination chain Id "
-  dstChainId: BigInt
 }
