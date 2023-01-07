@@ -15,29 +15,24 @@ import {
   PROTOCOL_SLUG,
   RiskType,
   SECONDS_PER_DAY,
-  TROVE_MANAGER,
 } from "../utils/constants";
 import { Versions } from "../versions";
 import {
-  getOrCreateMarket,
   getOrCreateMarketHourlySnapshot,
   getOrCreateMarketSnapshot,
-  getOrCreateStabilityPool,
 } from "./market";
-import { getLUSDToken, getCurrentETHPrice, getCurrentLUSDPrice } from "./token";
-import { bigIntToBigDecimal } from "../utils/numbers";
 
-export function getOrCreateLiquityProtocol(): LendingProtocol {
-  let protocol = LendingProtocol.load(TROVE_MANAGER);
+export function getOrCreateProtocol(): LendingProtocol {
+  let protocol = LendingProtocol.load(PROTOCOL_SLUG);
   if (!protocol) {
-    protocol = new LendingProtocol(TROVE_MANAGER);
+    protocol = new LendingProtocol(PROTOCOL_SLUG);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.CDP;
     protocol.riskType = RiskType.ISOLATED;
-    protocol.mintedTokens = [getLUSDToken().id];
+    protocol.mintedTokens = [];
     protocol.totalPoolCount = INT_ONE; // Only one active pool
 
     protocol.cumulativeUniqueUsers = INT_ZERO;
@@ -109,7 +104,7 @@ export function addProtocolSideRevenue(
   revenueAmountUSD: BigDecimal,
   market: Market
 ): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativeProtocolSideRevenueUSD =
     protocol.cumulativeProtocolSideRevenueUSD.plus(revenueAmountUSD);
   protocol.cumulativeTotalRevenueUSD =
@@ -149,7 +144,7 @@ export function addSupplySideRevenue(
   revenueAmountUSD: BigDecimal,
   market: Market
 ): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD.plus(revenueAmountUSD);
   protocol.cumulativeTotalRevenueUSD =
@@ -188,7 +183,7 @@ export function addProtocolBorrowVolume(
   event: ethereum.Event,
   borrowedUSD: BigDecimal
 ): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(borrowedUSD);
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
@@ -201,7 +196,7 @@ export function addProtocolDepositVolume(
   event: ethereum.Event,
   depositedUSD: BigDecimal
 ): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativeDepositUSD =
     protocol.cumulativeDepositUSD.plus(depositedUSD);
   protocol.save();
@@ -215,7 +210,7 @@ export function addProtocolLiquidateVolume(
   event: ethereum.Event,
   liquidatedUSD: BigDecimal
 ): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativeLiquidateUSD =
     protocol.cumulativeLiquidateUSD.plus(liquidatedUSD);
   protocol.save();
@@ -229,37 +224,8 @@ export function updateProtocolUSDLocked(
   event: ethereum.Event,
   netChangeUSD: BigDecimal
 ): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   const totalValueLocked = protocol.totalValueLockedUSD.plus(netChangeUSD);
-  protocol.totalValueLockedUSD = totalValueLocked;
-  protocol.totalDepositBalanceUSD = totalValueLocked;
-  protocol.save();
-  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
-  financialsSnapshot.save();
-}
-
-export function updateProtocolUSDLockedStabilityPool(
-  event: ethereum.Event,
-  lusdAmount: BigInt,
-  ethAmount: BigInt
-): void {
-  const lusdPrice = getCurrentLUSDPrice();
-  const LUSDValue = bigIntToBigDecimal(lusdAmount).times(lusdPrice);
-  const totalETHValue = bigIntToBigDecimal(ethAmount).times(
-    getCurrentETHPrice()
-  );
-  const stabilityPoolTVL = LUSDValue.plus(totalETHValue);
-
-  const stabilityPool = getOrCreateStabilityPool(event);
-  stabilityPool.inputTokenBalance = lusdAmount;
-  stabilityPool.totalValueLockedUSD = stabilityPoolTVL;
-  stabilityPool.totalDepositBalanceUSD = stabilityPoolTVL;
-  stabilityPool.inputTokenPriceUSD = lusdPrice;
-  stabilityPool.save();
-
-  const protocol = getOrCreateLiquityProtocol();
-  const market = getOrCreateMarket();
-  const totalValueLocked = market.totalValueLockedUSD.plus(stabilityPoolTVL);
   protocol.totalValueLockedUSD = totalValueLocked;
   protocol.totalDepositBalanceUSD = totalValueLocked;
   protocol.save();
@@ -270,55 +236,55 @@ export function updateProtocolUSDLockedStabilityPool(
 export function updateProtocolBorrowBalance(
   event: ethereum.Event,
   borrowedUSD: BigDecimal,
-  totalLUSDSupply: BigInt
+  SNXsupply: BigInt
 ): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.totalBorrowBalanceUSD = borrowedUSD;
-  protocol.mintedTokenSupplies = [totalLUSDSupply];
+  protocol.mintedTokenSupplies = [SNXsupply];
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.save();
 }
 
 export function incrementProtocolUniqueUsers(): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativeUniqueUsers += 1;
   protocol.save();
 }
 
 export function incrementProtocolUniqueDepositors(): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativeUniqueDepositors += 1;
   protocol.save();
 }
 
 export function incrementProtocolUniqueBorrowers(): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativeUniqueBorrowers += 1;
   protocol.save();
 }
 
 export function incrementProtocolUniqueLiquidators(): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativeUniqueLiquidators += 1;
   protocol.save();
 }
 
 export function incrementProtocolUniqueLiquidatees(): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativeUniqueLiquidatees += 1;
   protocol.save();
 }
 
 export function incrementProtocolPositionCount(): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.cumulativePositionCount += 1;
   protocol.openPositionCount += 1;
   protocol.save();
 }
 
 export function decrementProtocolOpenPositionCount(): void {
-  const protocol = getOrCreateLiquityProtocol();
+  const protocol = getOrCreateProtocol();
   protocol.openPositionCount -= 1;
   protocol.save();
 }

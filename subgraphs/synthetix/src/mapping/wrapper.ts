@@ -56,6 +56,34 @@ export function handleMinted(event: MintedEvent): void {
   }
 
   wrapper.save();
+
+  // // A mint is basically a deposit + borrow
+  // // Principal + Fee = AmountIn
+  // const market = getOrCreateMarket(wrapper.tokenAddress, event);
+  // market.cumulativeProtocolSideRevenueUSD = wrapper.totalFeesInUSD;
+  // market.cumulativeTotalRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+
+  // market.totalValueLockedUSD = wrapper.amountInUSD;
+  // market.totalDepositBalanceUSD = wrapper.amountInUSD;
+  // market.totalBorrowBalanceUSD = wrapper.amountInUSD;
+
+  // addMarketDepositVolume(event, toDecimal(event.params.amountIn), market);
+  // addMarketBorrowVolume(event, toDecimal(event.params.amountIn), market);
+
+  // market.inputTokenBalance = market.inputTokenBalance.plus(
+  //   event.params.principal
+  // );
+  // market.inputTokenPriceUSD = latestRate!;
+
+  // // principal + fee = (amountOut == amountIn)
+  // // amountOut is minted, fee as outputToken is sent to fee address.
+  // market.outputTokenSupply = market.outputTokenSupply.plus(
+  //   event.params.amountIn
+  // );
+  // market.outputTokenPriceUSD = latestRate!;
+
+  // // Handle Market Positions
+  // market.save();
 }
 
 export function handleBurned(event: BurnedEvent): void {
@@ -85,6 +113,33 @@ export function handleBurned(event: BurnedEvent): void {
   }
 
   wrapper.save();
+
+  // // A burn is basically a repay and withdraw
+  // const market = getOrCreateMarket(wrapper.tokenAddress, event);
+  // market.cumulativeProtocolSideRevenueUSD = wrapper.totalFeesInUSD;
+  // market.cumulativeTotalRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+
+  // market.totalValueLockedUSD = wrapper.amountInUSD;
+  // market.totalDepositBalanceUSD = wrapper.amountInUSD;
+  // market.totalBorrowBalanceUSD = wrapper.amountInUSD;
+
+  // addMarketWithdrawVolume(event, toDecimal(event.params.principal), market);
+  // addMarketRepayVolume(event, toDecimal(event.params.principal), market);
+
+  // market.inputTokenBalance = market.inputTokenBalance.minus(
+  //   event.params.principal
+  // );
+  // market.inputTokenPriceUSD = latestRate!;
+
+  // // principal + fee = (amountOut == amountIn)
+  // // principal is burnt, fee is sent to fee address.
+  // market.outputTokenSupply = market.outputTokenSupply.minus(
+  //   event.params.principal
+  // );
+  // market.outputTokenPriceUSD = latestRate!;
+
+  // // Handle Market Positions
+  // market.save();
 }
 
 export function handleWrapperMaxTokenAmountUpdated(

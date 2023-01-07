@@ -1,23 +1,17 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Account,
   Market,
   Position,
   PositionSnapshot,
-  _Trove,
 } from "../../generated/schema";
-import { BIGINT_ZERO, INT_ZERO, LUSD_ADDRESS } from "../utils/constants";
+import { BIGINT_ZERO, INT_ZERO } from "../utils/constants";
 import { PositionSide } from "../utils/constants";
-import { bigIntToBigDecimal } from "../utils/numbers";
-import { getOrCreateAccount } from "./account";
-import { createDeposit } from "./event";
 import {
   closeMarketPosition,
-  getOrCreateMarket,
   openMarketBorrowerPosition,
   openMarketLenderPosition,
 } from "./market";
-import { getCurrentLUSDPrice } from "./token";
 
 export function getUserPosition(
   account: Account,
@@ -122,56 +116,19 @@ export function incrementPositionLiquidationCount(position: Position): void {
   position.save();
 }
 
-export function updateSPUserPositionBalances(
-  event: ethereum.Event,
-  sp: Market,
-  depositor: Address,
-  newBalance: BigInt
-): void {
-  const account = getOrCreateAccount(depositor);
-
-  const position = getOrCreateUserPosition(
-    event,
-    account,
-    sp,
-    PositionSide.LENDER
-  );
-
-  const delta = newBalance.minus(position.balance);
-  position.balance = newBalance;
-  if (position.balance.equals(BIGINT_ZERO)) {
-    closePosition(event, account, sp, position);
-  }
-  position.save();
-  getOrCreatePositionSnapshot(event, position);
-
-  const deltaUSD = getCurrentLUSDPrice().times(bigIntToBigDecimal(delta));
-  if (delta.gt(BIGINT_ZERO)) {
-    createDeposit(
-      event,
-      sp,
-      Address.fromString(LUSD_ADDRESS),
-      delta,
-      deltaUSD,
-      depositor
-    );
-  } // negative doesn't imply withdrawal.
-}
-
 export function updateUserPositionBalances(
   event: ethereum.Event,
-  trove: _Trove
+  account: Account,
+  delta: BigInt,
+  market: Market
 ): void {
-  const market = getOrCreateMarket();
-  const account = getOrCreateAccount(Address.fromString(trove.id));
-
   const borrowerPosition = getOrCreateUserPosition(
     event,
     account,
     market,
     PositionSide.BORROWER
   );
-  borrowerPosition.balance = trove.debt;
+  borrowerPosition.balance = borrowerPosition.balance.plus(delta);
   if (borrowerPosition.balance.equals(BIGINT_ZERO)) {
     closePosition(event, account, market, borrowerPosition);
   }
@@ -184,7 +141,7 @@ export function updateUserPositionBalances(
     market,
     PositionSide.LENDER
   );
-  lenderPosition.balance = trove.collateral;
+  lenderPosition.balance = lenderPosition.balance.plus(delta);
   if (lenderPosition.balance.equals(BIGINT_ZERO)) {
     closePosition(event, account, market, lenderPosition);
   }

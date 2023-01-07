@@ -5,8 +5,8 @@ import { bigIntToBigDecimal } from "./numbers";
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_NAME = "Liquity";
-export const PROTOCOL_SLUG = "liquity";
+export const PROTOCOL_NAME = "synthetix";
+export const PROTOCOL_SLUG = "synthetix";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -174,10 +174,6 @@ export const ACTIVE_POOL_CREATED_BLOCK = BigInt.fromI32(12178562);
 export const ACTIVE_POOL = "0xDf9Eb223bAFBE5c5271415C75aeCD68C21fE3D7F";
 
 export const STABILITY_POOL = "0x66017D22b0f8556afDd19FC67041899Eb65a21bb";
-
-export const LUSD_ADDRESS = "0x5f98805a4e8be255a32880fdec7f6728c6568ba0";
-
-export const LQTY_ADDRESS = "0x6dea81c8171d0ba574754ef6f8b412f2ed88c54d";
 
 export const MINIMUM_COLLATERAL_RATIO = BigDecimal.fromString("1.1");
 

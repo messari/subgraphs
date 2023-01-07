@@ -10,7 +10,7 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "../utils/constants";
-import { getOrCreateLiquityProtocol } from "./protocol";
+import { getOrCreateProtocol } from "./protocol";
 
 export function getOrCreateUsageMetricsSnapshot(
   event: ethereum.Event
@@ -19,7 +19,7 @@ export function getOrCreateUsageMetricsSnapshot(
   const id = `${event.block.timestamp.toI64() / SECONDS_PER_DAY}`;
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
   if (!usageMetrics) {
-    const protocol = getOrCreateLiquityProtocol();
+    const protocol = getOrCreateProtocol();
     usageMetrics = new UsageMetricsDailySnapshot(id);
     usageMetrics.protocol = protocol.id;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
@@ -57,7 +57,7 @@ export function getOrCreateUsageMetricsHourlySnapshot(
   const id = `${hour}`;
   let usageMetrics = UsageMetricsHourlySnapshot.load(id);
   if (!usageMetrics) {
-    const protocol = getOrCreateLiquityProtocol();
+    const protocol = getOrCreateProtocol();
     usageMetrics = new UsageMetricsHourlySnapshot(id);
     usageMetrics.protocol = protocol.id;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;

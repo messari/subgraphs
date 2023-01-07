@@ -11,6 +11,7 @@ import {
   Liquidate,
   Market,
   Repay,
+  Token,
   Withdraw,
 } from "../../generated/schema";
 import { BIGINT_ZERO, PositionSide } from "../utils/constants";
@@ -20,9 +21,8 @@ import {
   addMarketLiquidateVolume,
   addMarketRepayVolume,
   addMarketWithdrawVolume,
-  getOrCreateMarket,
 } from "./market";
-import { getETHToken, getLUSDToken } from "./token";
+import { getETHToken } from "./token";
 import { prefixID } from "../utils/strings";
 import {
   getOrCreateAccount,
@@ -85,7 +85,7 @@ export function createDeposit(
   deposit.amount = amount;
   deposit.amountUSD = amountUSD;
   deposit.save();
-  addMarketDepositVolume(event, market, amountUSD);
+  addMarketDepositVolume(event, amountUSD, market);
   incrementAccountDepositCount(account);
   incrementPositionDepositCount(position);
   incrementProtocolDepositCount(event, account);
@@ -127,7 +127,7 @@ export function createWithdraw(
   withdraw.amount = amountETH;
   withdraw.amountUSD = amountUSD;
   withdraw.save();
-  addMarketWithdrawVolume(event, amountUSD);
+  addMarketWithdrawVolume(event, amountUSD, market);
   incrementAccountWithdrawCount(account);
   incrementPositionWithdrawCount(position);
   incrementProtocolWithdrawCount(event, account);
@@ -135,14 +135,15 @@ export function createWithdraw(
 
 export function createBorrow(
   event: ethereum.Event,
-  amountLUSD: BigInt,
+  asset: Token,
+  amountToken: BigInt,
   amountUSD: BigDecimal,
-  recipient: Address
+  recipient: Address,
+  market: Market
 ): void {
-  if (amountLUSD.le(BIGINT_ZERO)) {
-    log.critical("Invalid borrow amount: {}", [amountLUSD.toString()]);
+  if (amountToken.le(BIGINT_ZERO)) {
+    log.critical("Invalid borrow amount: {}", [amountToken.toString()]);
   }
-  const market = getOrCreateMarket();
   const account = getOrCreateAccount(recipient);
   const position = getOrCreateUserPosition(
     event,
@@ -164,11 +165,11 @@ export function createBorrow(
   borrow.account = account.id;
   borrow.market = market.id;
   borrow.position = position.id;
-  borrow.asset = getLUSDToken().id;
-  borrow.amount = amountLUSD;
+  borrow.asset = asset.id;
+  borrow.amount = amountToken;
   borrow.amountUSD = amountUSD;
   borrow.save();
-  addMarketBorrowVolume(event, amountUSD);
+  addMarketBorrowVolume(event, amountUSD, market);
   incrementAccountBorrowCount(account);
   incrementPositionBorrowCount(position);
   incrementProtocolBorrowCount(event, account);
@@ -176,15 +177,16 @@ export function createBorrow(
 
 export function createRepay(
   event: ethereum.Event,
-  amountLUSD: BigInt,
+  asset: Token,
+  amountToken: BigInt,
   amountUSD: BigDecimal,
   user: Address,
-  repayer: Address
+  repayer: Address,
+  market: Market
 ): void {
-  if (amountLUSD.le(BIGINT_ZERO)) {
-    log.critical("Invalid repay amount: {}", [amountLUSD.toString()]);
+  if (amountToken.le(BIGINT_ZERO)) {
+    log.critical("Invalid repay amount: {}", [amountToken.toString()]);
   }
-  const market = getOrCreateMarket();
   const account = getOrCreateAccount(repayer);
   const position = getOrCreateUserPosition(
     event,
@@ -206,11 +208,11 @@ export function createRepay(
   repay.account = account.id;
   repay.market = market.id;
   repay.position = position.id;
-  repay.asset = getLUSDToken().id;
-  repay.amount = amountLUSD;
+  repay.asset = asset.id;
+  repay.amount = amountToken;
   repay.amountUSD = amountUSD;
   repay.save();
-  addMarketRepayVolume(event, amountUSD);
+  addMarketRepayVolume(event, amountUSD, market);
   incrementAccountRepayCount(account);
   incrementPositionRepayCount(position);
   incrementProtocolRepayCount(event, account);
@@ -218,13 +220,14 @@ export function createRepay(
 
 export function createLiquidate(
   event: ethereum.Event,
+  asset: Token,
   amountLiquidated: BigInt,
   amountLiquidatedUSD: BigDecimal,
   profitUSD: BigDecimal,
   user: Address,
-  liquidator: Address
+  liquidator: Address,
+  market: Market
 ): void {
-  const market = getOrCreateMarket();
   const account = getOrCreateAccount(user);
   const liquidatorAccount = getOrCreateAccount(liquidator);
   const lenderPosition = getOrCreateUserPosition(
@@ -256,12 +259,12 @@ export function createLiquidate(
   liquidate.market = market.id;
   liquidate.position = borrowerPosition.id;
   liquidate.lenderPosition = lenderPosition.id;
-  liquidate.asset = getLUSDToken().id;
+  liquidate.asset = asset.id;
   liquidate.amount = amountLiquidated;
   liquidate.amountUSD = amountLiquidatedUSD;
   liquidate.profitUSD = profitUSD;
   liquidate.save();
-  addMarketLiquidateVolume(event, amountLiquidatedUSD);
+  addMarketLiquidateVolume(event, amountLiquidatedUSD, market);
   incrementAccountLiquidationCount(account);
   incrementPositionLiquidationCount(borrowerPosition);
   incrementPositionLiquidationCount(lenderPosition);

@@ -749,6 +749,12 @@ dataSources:
       entities:
         - SNXTransfer
       abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
         - name: Synthetix
           file: abis/SynthetixGlobalDebt.json
         - name: Synthetix4
