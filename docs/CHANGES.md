@@ -14,7 +14,7 @@ Main PR: [#1265](https://github.com/messari/subgraphs/pull/1265)
 - Created a field `market.relation` to relate multiple markets to each other. This is useful for markets with multiple tokens.
 - Added more nuance to the market fields.
 - Added native balance daily metrics.
-- Added a new entity to track revenue coming from different sources `RevenueDetails`.
+- Added a new entity to track revenue coming from different sources `RevenueDetail`.
 - Added more nuance and transaction counts to the `LendingProtocol` entity.
 - New transaction entities for `Flashloans` and `Transfers`.
 - Distinguish between `Fees` and `InterestRates`.

@@ -232,7 +232,7 @@ type Fee @entity {
 
 # This entity offers a more nuanced view of revenue types
 # Use this to provide the sources of revenue and amounts of each
-type RevenueDetails @entity {
+type RevenueDetail @entity {
   " { Market/Protocol ID }{ Optional: Snapshot ID } "
   id: Bytes!
 
@@ -459,7 +459,7 @@ type LendingProtocol implements Protocol @entity {
   fees: [Fee!]
 
   " Details of revenue sources and amounts "
-  revenueDetails: RevenueDetails
+  revenueDetail: RevenueDetail
 
   " Current balance of all deposited assets, in USD. Note this metric should be the same as TVL. "
   totalDepositBalanceUSD: BigDecimal!
@@ -722,7 +722,7 @@ type FinancialsDailySnapshot @entity {
   cumulativeTotalRevenueUSD: BigDecimal!
 
   " Details of revenue sources and amounts "
-  revenueDetails: RevenueDetails
+  revenueDetail: RevenueDetail
 
   ##### Lending Activities #####
 
@@ -889,7 +889,7 @@ type Market @entity {
   cumulativeTotalRevenueUSD: BigDecimal!
 
   " Details of revenue sources and amounts "
-  revenueDetails: RevenueDetails
+  revenueDetail: RevenueDetail
 
   " Current balance of all deposited assets (not historical cumulative), in USD "
   totalDepositBalanceUSD: BigDecimal!
@@ -1122,7 +1122,7 @@ type MarketDailySnapshot @entity {
   dailyTotalRevenueUSD: BigDecimal!
 
   " Details of revenue sources and amounts "
-  revenueDetails: RevenueDetails
+  revenueDetail: RevenueDetail
 
   " Current balance of all deposited assets (not historical cumulative), in USD. Same as pool TVL. "
   totalDepositBalanceUSD: BigDecimal!

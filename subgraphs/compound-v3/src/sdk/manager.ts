@@ -17,7 +17,7 @@ import {
   Market,
   Oracle,
   Repay,
-  RevenueDetails,
+  RevenueDetail,
   RewardToken,
   Token,
   Transfer,
@@ -324,10 +324,10 @@ export class DataManager {
     return Address.fromBytes(this.market.id);
   }
 
-  getOrCreateRevenueDetails(id: Bytes): RevenueDetails {
-    let details = RevenueDetails.load(id);
+  getOrCreateRevenueDetail(id: Bytes): RevenueDetail {
+    let details = RevenueDetail.load(id);
     if (!details) {
-      details = new RevenueDetails(id);
+      details = new RevenueDetail(id);
       details.sources = [];
       details.amountsUSD = [];
       details.save();
@@ -921,13 +921,13 @@ export class DataManager {
       fee = this.getOrUpdateFee(FeeType.OTHER);
     }
 
-    const marketRevDetails = this.getOrCreateRevenueDetails(this.market.id);
-    const protocolRevenueDetails = this.getOrCreateRevenueDetails(
+    const marketRevDetails = this.getOrCreateRevenueDetail(this.market.id);
+    const protocolRevenueDetail = this.getOrCreateRevenueDetail(
       this.protocol.id
     );
 
     this.insertInOrder(marketRevDetails, protocolRevenueDelta, fee.id);
-    this.insertInOrder(protocolRevenueDetails, protocolRevenueDelta, fee.id);
+    this.insertInOrder(protocolRevenueDetail, protocolRevenueDelta, fee.id);
   }
 
   //
@@ -943,13 +943,13 @@ export class DataManager {
       fee = this.getOrUpdateFee(FeeType.OTHER);
     }
 
-    const marketRevDetails = this.getOrCreateRevenueDetails(this.market.id);
-    const protocolRevenueDetails = this.getOrCreateRevenueDetails(
+    const marketRevDetails = this.getOrCreateRevenueDetail(this.market.id);
+    const protocolRevenueDetail = this.getOrCreateRevenueDetail(
       this.protocol.id
     );
 
     this.insertInOrder(marketRevDetails, supplyRevenueDelta, fee.id);
-    this.insertInOrder(protocolRevenueDetails, supplyRevenueDelta, fee.id);
+    this.insertInOrder(protocolRevenueDetail, supplyRevenueDelta, fee.id);
   }
 
   private updateRevenue(
@@ -1140,9 +1140,9 @@ export class DataManager {
 
   //
   //
-  // Insert revenue in RevenueDetails in order (alphabetized)
+  // Insert revenue in RevenueDetail in order (alphabetized)
   private insertInOrder(
-    details: RevenueDetails,
+    details: RevenueDetail,
     amountUSD: BigDecimal,
     associatedSource: string
   ): void {
