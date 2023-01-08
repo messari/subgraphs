@@ -83,6 +83,7 @@ export function handleTransfer(event: Transfer): void {
     event, 
     pool, 
     event.params.value, 
+    event.params.from.toHexString(),
     event.params.to.toHexString()
   );
 

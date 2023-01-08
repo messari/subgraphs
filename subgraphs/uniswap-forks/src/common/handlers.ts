@@ -82,12 +82,16 @@ export function handleTransferPosition(
   event: ethereum.Event,
   pool: LiquidityPool,
   value: BigInt,
+  fromAddress: string,
   toAddress: string,
 ):void {
 
+  const transfer = getOrCreateTransfer(event);
+  transfer.sender = fromAddress;
+  transfer.save();
   const from = getOrCreateAccount(event);
   let fromPosition = getOrCreatePosition(event)
-  const transfer = getOrCreateTransfer(event);
+  
   transfer.sender = toAddress;
   transfer.save();
   let to = getOrCreateAccount(event);
