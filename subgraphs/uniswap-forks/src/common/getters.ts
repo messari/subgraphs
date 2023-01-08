@@ -94,6 +94,8 @@ export function getOrCreateAccount(event:ethereum.Event): Account {
   if(!account) {
     account = new Account(transfer.sender!)
     account.positionCount = 0;
+    account.openPositionCount = 0;
+    account.closedPositionCount = 0;
     account.save()
   }
   return account;

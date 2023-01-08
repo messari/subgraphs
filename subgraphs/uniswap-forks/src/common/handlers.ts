@@ -99,7 +99,6 @@ export function handleTransferPosition(
 
   fromPosition.withdrawCount = fromPosition.withdrawCount + 1;
   fromPosition.outputTokenBalance = fromPosition.outputTokenBalance!.minus(value);
-  from.positionCount = from.positionCount - 1;
   from.save();
   if(fromPosition.outputTokenBalance == BIGINT_ZERO) {
     // close the position
@@ -110,11 +109,17 @@ export function handleTransferPosition(
     let counter = _PositionCounter.load(from.id.concat("-").concat(pool.id));
     counter!.nextCount += 1;
     counter!.save();
+    if(from.openPositionCount > 0) {
+      from.openPositionCount -= 1;
+    }
+    from.closedPositionCount += 1;
+    from.save();
   }
 
   toPosition.depositCount = toPosition.depositCount + 1;
   toPosition.outputTokenBalance = toPosition.outputTokenBalance!.plus(value);
   toPosition.save();
-  to.positionCount = to.positionCount + 1;
+  to.positionCount += 1;
+  to.openPositionCount += 1;
   to.save();
 }

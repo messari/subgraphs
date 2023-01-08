@@ -117,6 +117,8 @@ export function updateUsageMetrics(
     account = new Account(from);
     protocol.cumulativeUniqueUsers += INT_ONE;
     account.positionCount = 0;
+    account.openPositionCount = 0;
+    account.closedPositionCount = 0;
     account.save();
   }
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
