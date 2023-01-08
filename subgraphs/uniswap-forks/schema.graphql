@@ -907,10 +907,10 @@ type Account @entity {
   positions: [Position!]! @derivedFrom(field: "account")
 
   # " Number of open positions this account has "
-  # openPositionCount: Int!
+  openPositionCount: Int!
 
   # " Number of closed positions this account has "
-  # closedPositionCount: Int!
+  closedPositionCount: Int!
 
   # " Number of deposits this account made "
   # depositCount: Int!
