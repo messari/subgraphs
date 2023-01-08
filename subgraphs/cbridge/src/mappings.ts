@@ -143,7 +143,11 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   const token = sdk.Tokens.getOrCreateToken(event.params.token);
   const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
   // TODO: concatenate Pool address and token address for pool id?
-  const pool = sdk.Pools.loadPool(event.address, onCreatePool, auxArgs);
+  const pool = sdk.Pools.loadPool<AuxArgs>(
+    event.address.concat(event.params.token),
+    onCreatePool,
+    auxArgs
+  );
   pool.addInputTokenBalance(event.params.amount, true);
   const acc = sdk.Accounts.loadAccount(event.params.provider);
   acc.liquidityDeposit(pool, event.params.amount, true);
@@ -170,7 +174,7 @@ export function handleWithdraw(call: WithdrawCall): void {
   const sdk = _getSDK(event);
   const token = sdk.Tokens.getOrCreateToken(wdmsg.token);
   const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
-  const pool = sdk.Pools.loadPool(
+  const pool = sdk.Pools.loadPool<AuxArgs>(
     call.to.concat(wdmsg.token),
     onCreatePool,
     auxArgs
@@ -302,8 +306,7 @@ export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
   const POOL_BASED_BRIDGE_ADDRESS = Address.fromString(
     "0x5427fefa711eff984124bfbb1ab6fbf5e3da1820"
   );
-  // TODO: with concatenated pool id, we don't know which pool the
-  // rewards belong to
+
   const poolEntity = PoolEntity.load(POOL_BASED_BRIDGE_ADDRESS);
   if (!poolEntity) {
     // error
@@ -326,7 +329,9 @@ export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
   }
 
   const sdk = _getSDK(event);
-  const pool = sdk.Pools.loadPool(event.address);
+  // TODO: with concatenated pool id, we don't know which pool the
+  // rewards belong to
+  const pool = sdk.Pools.loadPool(POOL_BASED_BRIDGE_ADDRESS);
   const rToken = sdk.Tokens.getOrCreateToken(event.params.token);
   pool.setRewardEmissions(
     RewardTokenType.DEPOSIT,
@@ -365,9 +370,9 @@ function _handleTransferOut(
 ): void {
   const sdk = _getSDK(event);
   const inputToken = sdk.Tokens.getOrCreateToken(token);
-  const auxArgs = new AuxArgs(inputToken, bridgePoolType);
+  const auxArgs = new AuxArgs(inputToken, BridgePoolType.LIQUIDITY);
 
-  const pool = sdk.Pools.loadPool(
+  const pool = sdk.Pools.loadPool<AuxArgs>(
     event.address.concat(token),
     onCreatePool,
     auxArgs
@@ -404,8 +409,8 @@ function _handleTransferIn(
 ): void {
   const sdk = _getSDK(event);
   const inputToken = sdk.Tokens.getOrCreateToken(token);
-  const auxArgs = new AuxArgs(inputToken, bridgePoolType);
-  const pool = sdk.Pools.loadPool(
+  const auxArgs = new AuxArgs(inputToken, BridgePoolType.LIQUIDITY);
+  const pool = sdk.Pools.loadPool<AuxArgs>(
     event.address.concat(token),
     onCreatePool,
     auxArgs
