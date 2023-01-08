@@ -56,11 +56,11 @@ dataSources:
           file: ./abis/Prices/Uniswap/Pair.json
         # SushiSwap Contracts
         - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
+          file: ./abis/Prices/Calculations/SushiSwap.json
         - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
+          file: ./abis/Prices/Calculations/SushiSwap.json
         - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
+          file: ./abis/Prices/Calculations/SushiSwap.json
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
@@ -146,11 +146,11 @@ dataSources:
           file: ./abis/Prices/Uniswap/Pair.json
         # SushiSwap Contracts
         - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
+          file: ./abis/Prices/Calculations/SushiSwap.json
         - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
+          file: ./abis/Prices/Calculations/SushiSwap.json
         - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
+          file: ./abis/Prices/Calculations/SushiSwap.json
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
