@@ -2,6 +2,7 @@ import { ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { getOrCreateAccount, getOrCreatePosition, getOrCreateTransfer } from "./getters";
 import { BIGINT_ZERO, TransferType } from "./constants";
 import { LiquidityPool, _PositionCounter } from "../../generated/schema";
+import { ADDRESS_ZERO } from "../../../ellipsis-finance/src/common/constants";
 
 // Handle data from transfer event for mints. Used to populate Deposit entity in the Mint event.
 export function handleTransferMint(
@@ -86,40 +87,39 @@ export function handleTransferPosition(
   toAddress: string,
 ):void {
 
+  if(fromAddress == ADDRESS_ZERO.toHexString()) {
+    return;
+  }
   const transfer = getOrCreateTransfer(event);
   transfer.sender = fromAddress;
   transfer.save();
   const from = getOrCreateAccount(event);
   let fromPosition = getOrCreatePosition(event)
-  
   transfer.sender = toAddress;
   transfer.save();
-  let to = getOrCreateAccount(event);
+  const to = getOrCreateAccount(event);
   let toPosition = getOrCreatePosition(event);
-
   fromPosition.withdrawCount = fromPosition.withdrawCount + 1;
   fromPosition.outputTokenBalance = fromPosition.outputTokenBalance!.minus(value);
-  from.save();
-  if(fromPosition.outputTokenBalance == BIGINT_ZERO) {
+  if(fromPosition.outputTokenBalance == BIGINT_ZERO && ) {
     // close the position
     fromPosition.blockNumberClosed = event.block.number
     fromPosition.hashClosed = event.transaction.hash.toHexString();
     fromPosition.timestampClosed = event.block.timestamp;
     fromPosition.save();
-    let counter = _PositionCounter.load(from.id.concat("-").concat(pool.id));
-    counter!.nextCount += 1;
-    counter!.save();
     if(from.openPositionCount > 0) {
       from.openPositionCount -= 1;
     }
     from.closedPositionCount += 1;
     from.save();
+    let counter = _PositionCounter.load(from.id.concat("-").concat(pool.id));
+    counter!.nextCount += 1;
+    counter!.save();
   }
 
   toPosition.depositCount = toPosition.depositCount + 1;
   toPosition.outputTokenBalance = toPosition.outputTokenBalance!.plus(value);
   toPosition.save();
-  to.positionCount += 1;
-  to.openPositionCount += 1;
-  to.save();
+
+
 }
