@@ -190,7 +190,7 @@ export function handleWithdraw(call: WithdrawCall): void {
     pool.addInputTokenBalance(wdmsg.amount.times(BIGINT_NEGATIVE_ONE), true);
     const acc = sdk.Accounts.loadAccount(wdmsg.receiver);
     acc.liquidityWithdraw(pool, wdmsg.amount, true);
-  } else if (wdmsg.refId.equals(Bytes.fromHexString("0x1"))) {
+  } else if (wdmsg.refId.equals(Bytes.fromI32(1))) {
     // claim fee: refId == 0x1
     pool.addRevenueNative(BIGINT_ZERO, wdmsg.amount);
   } else if (_Transfer.load(wdmsg.refId)) {
