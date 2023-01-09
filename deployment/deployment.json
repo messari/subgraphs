@@ -2235,6 +2235,10 @@
           "hosted-service": {
             "slug": "goldfinch-ethereum",
             "query-id": "goldfinch-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "goldfinch-ethereum",
+            "query-id": "Dtj2HicXKpoUjNB7ffdBkMwt3L9Sz3cbENd67AdHu6Vb"
           }
         }
       }
