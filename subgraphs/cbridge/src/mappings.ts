@@ -113,10 +113,14 @@ export function onCreatePool(
   pool: Pool,
   // eslint-disable-next-line no-unused-vars
   sdk: SDK,
-  aux: AuxArgs
+  aux1: BridgePoolType | null = null,
+  aux2: string | null = null
 ): void {
   //const inputToken = sdk.Tokens.getOrCreateToken(Address.fromBytes(aux.token));
-  pool.initialize("Celer Pool-based Bridge", "", aux.poolType, aux.token);
+  if (aux1 && aux2) {
+    const token = sdk.Tokens.getOrCreateToken(Address.fromString(aux2));
+    pool.initialize("Celer Pool-based Bridge", "", aux1, token);
+  }
 }
 
 export function handleSend(event: Send): void {
@@ -143,10 +147,11 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   const token = sdk.Tokens.getOrCreateToken(event.params.token);
   const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
   // TODO: concatenate Pool address and token address for pool id?
-  const pool = sdk.Pools.loadPool<AuxArgs>(
+  const pool = sdk.Pools.loadPool(
     event.address.concat(event.params.token),
     onCreatePool,
-    auxArgs
+    BridgePoolType.LIQUIDITY,
+    event.params.token.toHexString()
   );
   pool.addInputTokenBalance(event.params.amount, true);
   const acc = sdk.Accounts.loadAccount(event.params.provider);
@@ -173,11 +178,12 @@ export function handleWithdraw(call: WithdrawCall): void {
 
   const sdk = _getSDK(event);
   const token = sdk.Tokens.getOrCreateToken(wdmsg.token);
-  const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
-  const pool = sdk.Pools.loadPool<AuxArgs>(
+  //const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
+  const pool = sdk.Pools.loadPool(
     call.to.concat(wdmsg.token),
     onCreatePool,
-    auxArgs
+    BridgePoolType.LIQUIDITY,
+    wdmsg.token.toHexString()
   );
   if (wdmsg.refId.equals(Bytes.empty())) {
     // LP withdraw liquidity: refId == 0x0
@@ -370,12 +376,13 @@ function _handleTransferOut(
 ): void {
   const sdk = _getSDK(event);
   const inputToken = sdk.Tokens.getOrCreateToken(token);
-  const auxArgs = new AuxArgs(inputToken, BridgePoolType.LIQUIDITY);
+  //const auxArgs = new AuxArgs(inputToken, BridgePoolType.LIQUIDITY);
 
-  const pool = sdk.Pools.loadPool<AuxArgs>(
+  const pool = sdk.Pools.loadPool(
     event.address.concat(token),
     onCreatePool,
-    auxArgs
+    bridgePoolType,
+    inputToken.id.toHexString()
   );
   const dstPool = getPoolAddress(bridgePoolType, dstChainId);
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
@@ -409,11 +416,12 @@ function _handleTransferIn(
 ): void {
   const sdk = _getSDK(event);
   const inputToken = sdk.Tokens.getOrCreateToken(token);
-  const auxArgs = new AuxArgs(inputToken, BridgePoolType.LIQUIDITY);
-  const pool = sdk.Pools.loadPool<AuxArgs>(
+  //const auxArgs = new AuxArgs(inputToken, BridgePoolType.LIQUIDITY);
+  const pool = sdk.Pools.loadPool(
     event.address.concat(token),
     onCreatePool,
-    auxArgs
+    bridgePoolType,
+    token.toHexString()
   );
   // TODO: add bridge version for OTV - PTB
   const srcPool = getPoolAddress(bridgePoolType, srcChainId);

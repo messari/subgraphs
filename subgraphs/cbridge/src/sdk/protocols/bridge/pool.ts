@@ -29,11 +29,12 @@ import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import { SDK } from ".";
 
-type onCreatePoolCallback<T> = (
+type onCreatePoolCallback = (
   event: ethereum.Event,
   pool: Pool,
   sdk: SDK,
-  aux: T | null
+  aux1: BridgePoolType | null,
+  aux2: string | null
 ) => void;
 
 export class PoolManager {
@@ -45,10 +46,11 @@ export class PoolManager {
     this.tokens = tokens;
   }
 
-  loadPool<T>(
+  loadPool(
     id: Bytes,
-    onCreate: onCreatePoolCallback<T> | null = null,
-    aux: T | null = null
+    onCreate: onCreatePoolCallback | null = null,
+    aux1: BridgePoolType | null = null,
+    aux2: string | null = null
   ): Pool {
     let entity = PoolSchema.load(id);
     if (entity) {
@@ -61,7 +63,13 @@ export class PoolManager {
     const pool = new Pool(this.protocol, entity, this.tokens);
     pool.isInitialized = false;
     if (onCreate) {
-      onCreate(this.protocol.getCurrentEvent(), pool, this.protocol.sdk!, aux);
+      onCreate(
+        this.protocol.getCurrentEvent(),
+        pool,
+        this.protocol.sdk!,
+        aux1,
+        aux2
+      );
     }
     return pool;
   }
