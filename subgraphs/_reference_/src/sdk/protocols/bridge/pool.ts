@@ -24,7 +24,7 @@ import {
   RewardTokenType,
 } from "../../util/constants";
 import { exponentToBigDecimal } from "../../util/numbers";
-import { sortArrayByReference, sortBytesArray } from "../../util/arrays";
+import { sortArrayByReference, sortBytesArray, updateArrayAtIndex } from "../../util/arrays";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import { SDK } from ".";
@@ -464,7 +464,9 @@ export class Pool {
     if (!this.pool.outputToken) {
       return;
     }
-    const token = this.tokens.getOrCreateToken(this.pool.outputToken);
+    const token = this.tokens.getOrCreateToken(
+      Address.fromBytes(this.pool.outputToken)
+    );
     const price = this.protocol.pricer.getTokenPrice(token);
 
     this.pool.outputTokenPriceUSD = price;
@@ -496,8 +498,16 @@ export class Pool {
 
     if (this.pool.rewardTokens!.includes(rToken.id)) {
       const index = this.pool.rewardTokens!.indexOf(rToken.id);
-      this.pool.rewardTokenEmissionsAmount![index] = amount;
-      this.pool.rewardTokenEmissionsUSD![index] = amountUSD;
+      this.pool.rewardTokenEmissionsAmount = updateArrayAtIndex(
+        this.pool.rewardTokenEmissionsAmount!,
+        amount,
+        index
+      );
+      this.pool.rewardTokenEmissionsUSD = updateArrayAtIndex(
+        this.pool.rewardTokenEmissionsUSD!,
+        amountUSD,
+        index
+      );
       this.save();
       return;
     }
@@ -564,6 +574,7 @@ export class Pool {
    * @see Account
    */
   trackDeposit(deposit: LiquidityDeposit): void {
+    this.protocol.addTransaction(TransactionType.LIQUIDITY_DEPOSIT);
     this.addInputTokenBalance(deposit.amount);
   }
 
@@ -575,6 +586,7 @@ export class Pool {
    * @see Account
    */
   trackWithdraw(withdraw: LiquidityWithdraw): void {
+    this.protocol.addTransaction(TransactionType.LIQUIDITY_WITHDRAW);
     this.addInputTokenBalance(withdraw.amount.times(BIGINT_MINUS_ONE));
   }
 }

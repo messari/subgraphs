@@ -10,6 +10,7 @@ import {
   Market,
   MarketDailySnapshot,
   MarketHourlySnapshot,
+  _AssetToStabilityPool,
 } from "../../generated/schema";
 import { VestaParameters } from "../../generated/VestaParameters/VestaParameters";
 import {
@@ -21,17 +22,25 @@ import {
   updateProtocolBorrowBalance,
   updateProtocolUSDLocked,
 } from "./protocol";
-import { getOrCreateAssetToken, getCurrentAssetPrice } from "./token";
+import {
+  getOrCreateAssetToken,
+  getCurrentAssetPrice,
+  getOrCreateRewardToken,
+  getVSTToken,
+  getVSTTokenPrice,
+} from "./token";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 import { EventType } from "./event";
-import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
+import { bigIntToBigDecimal } from "../utils/numbers";
 import {
+  ACTIVE_POOL_ADDRESS,
   ACTIVE_POOL_CREATED_BLOCK,
   ACTIVE_POOL_CREATED_TIMESTAMP,
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   BONUS_TO_SP,
+  INT_ONE,
   INT_ZERO,
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
@@ -39,16 +48,90 @@ import {
   VESTA_PARAMETERS_ADDRESS,
 } from "../utils/constants";
 
+export function getOrCreateStabilityPool(
+  pool: Address,
+  asset: Address | null,
+  event: ethereum.Event | null
+): Market {
+  const poolID = pool.toHexString();
+  let market = Market.load(poolID);
+  if (market) {
+    return market;
+  }
+
+  const protocol = getOrCreateLendingProtocol();
+  const VSTToken = getVSTToken();
+  const VSTPriceUSD = getVSTTokenPrice(event!);
+  const assetToken = getOrCreateAssetToken(asset!);
+  market = new Market(poolID);
+  market.protocol = protocol.id;
+  market.name = `${assetToken.symbol} StabilityPool`;
+  market.isActive = true;
+  market.canUseAsCollateral = false;
+  market.canBorrowFrom = false;
+  market.maximumLTV = BIGDECIMAL_ZERO;
+  market.liquidationThreshold = BIGDECIMAL_ZERO;
+  market.liquidationPenalty = BIGDECIMAL_ZERO;
+  market.inputToken = VSTToken.id;
+  market.rewardTokens = [getOrCreateRewardToken().id];
+  market.rates = [];
+  market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+  market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+  market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+  market.inputTokenBalance = BIGINT_ZERO;
+  market.inputTokenPriceUSD = VSTPriceUSD;
+  market.outputTokenSupply = BIGINT_ZERO;
+  market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  market.exchangeRate = BIGDECIMAL_ZERO;
+  market.rewardTokenEmissionsAmount = [];
+  market.rewardTokenEmissionsUSD = [];
+  market.positionCount = 0;
+  market.openPositionCount = 0;
+  market.closedPositionCount = 0;
+  market.lendingPositionCount = 0;
+  market.borrowingPositionCount = 0;
+
+  market.createdTimestamp = event!.block.timestamp;
+  market.createdBlockNumber = event!.block.number;
+  market._asset = asset!.toHexString();
+  market.save();
+
+  const stabilityPools = protocol._stabilityPools!;
+  stabilityPools.push(market.id);
+  protocol._stabilityPools = stabilityPools;
+  protocol.save();
+
+  // map asset to stability pool
+  let assetToSP = _AssetToStabilityPool.load(asset!.toHexString());
+  if (!assetToSP) {
+    assetToSP = new _AssetToStabilityPool(asset!.toHexString());
+    assetToSP.stabilityPool = market.id;
+    assetToSP.save();
+  }
+
+  return market;
+}
+
 export function getOrCreateMarket(asset: Address): Market {
-  const id = asset.toHexString();
-  let market = Market.load(id);
+  const assetAddress = asset.toHexString();
+  const marketID = `${ACTIVE_POOL_ADDRESS}-${assetAddress}`;
+  let market = Market.load(marketID);
   if (!market) {
-    const id = asset.toHexString();
+    const protocol = getOrCreateLendingProtocol();
+    protocol.totalPoolCount += INT_ONE;
+    protocol.save();
+
     const inputToken = getOrCreateAssetToken(asset);
-    const maxLTV = setMaxLTV(id);
-    const liquidationPenalty = setLiquidationPenalty(id);
-    market = new Market(id);
-    market.protocol = getOrCreateLendingProtocol().id;
+    const maxLTV = setMaxLTV(assetAddress);
+    const liquidationPenalty = setLiquidationPenalty(assetAddress);
+    market = new Market(marketID);
+    market.protocol = protocol.id;
     market.name = inputToken.name;
     market.isActive = true;
     market.canUseAsCollateral = true;
@@ -60,7 +143,7 @@ export function getOrCreateMarket(asset: Address): Market {
     market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-    market.rates = [getOrCreateStableBorrowerInterestRate(id).id];
+    market.rates = [getOrCreateStableBorrowerInterestRate(assetAddress).id];
     market.createdTimestamp = ACTIVE_POOL_CREATED_TIMESTAMP;
     market.createdBlockNumber = ACTIVE_POOL_CREATED_BLOCK;
 
@@ -222,15 +305,12 @@ export function setMarketVSTDebt(
   const debtUSD = bigIntToBigDecimal(debtVST);
   const market = getOrCreateMarket(asset);
   const debtUSDChange = debtUSD.minus(market.totalBorrowBalanceUSD);
-  const debtVSTChange = BigInt.fromString(
-    debtUSDChange.times(exponentToBigDecimal()).toString().split(".")[0]
-  );
   market.totalBorrowBalanceUSD = debtUSD;
   market.save();
 
   getOrCreateMarketSnapshot(event, market);
   getOrCreateMarketHourlySnapshot(event, market);
-  updateProtocolBorrowBalance(event, debtUSDChange, debtVSTChange);
+  updateProtocolBorrowBalance(event, debtUSDChange);
 }
 
 export function setMarketAssetBalance(
@@ -238,16 +318,15 @@ export function setMarketAssetBalance(
   asset: Address,
   balanceAsset: BigInt
 ): void {
-  const balanceUSD = bigIntToBigDecimal(balanceAsset).times(
-    getCurrentAssetPrice(asset)
-  );
+  const assetPrice = getCurrentAssetPrice(asset);
+  const balanceUSD = bigIntToBigDecimal(balanceAsset).times(assetPrice);
   const market = getOrCreateMarket(asset);
   const netChangeUSD = balanceUSD.minus(market.totalValueLockedUSD);
   market.totalValueLockedUSD = balanceUSD;
   market.totalDepositBalanceUSD = balanceUSD;
   market.inputToken = asset.toHexString();
   market.inputTokenBalance = balanceAsset;
-  market.inputTokenPriceUSD = getCurrentAssetPrice(asset);
+  market.inputTokenPriceUSD = assetPrice;
   market.save();
 
   getOrCreateMarketSnapshot(event, market);
@@ -257,19 +336,18 @@ export function setMarketAssetBalance(
 
 export function addMarketRepayVolume(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   amountUSD: BigDecimal
 ): void {
-  addMarketVolume(event, asset, amountUSD, EventType.Repay);
+  addMarketVolume(event, market, amountUSD, EventType.Repay);
 }
 
 export function addMarketVolume(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   amountUSD: BigDecimal,
   eventType: EventType
 ): void {
-  const market = getOrCreateMarket(asset);
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
 

@@ -35,7 +35,8 @@ export class AccountManager {
     acc.transferInCount = 0;
     acc.depositCount = 0;
     acc.withdrawCount = 0;
-    acc.messageCount = 0;
+    acc.messageSentCount = 0;
+    acc.messageReceivedCount = 0;
     acc.save();
 
     this.protocol.addUser();
@@ -278,7 +279,9 @@ export class Account {
     updateMetrics: boolean = true
   ): LiquidityDeposit {
     const _pool = pool.pool;
-    const token = this.tokens.getOrCreateToken(_pool.inputToken);
+    const token = this.tokens.getOrCreateToken(
+      Address.fromBytes(_pool.inputToken)
+    );
 
     const deposit = new LiquidityDeposit(idFromEvent(this.event));
     deposit.hash = this.event.transaction.hash;
@@ -319,7 +322,9 @@ export class Account {
     updateMetrics: boolean = true
   ): LiquidityWithdraw {
     const _pool = pool.pool;
-    const token = this.tokens.getOrCreateToken(_pool.inputToken);
+    const token = this.tokens.getOrCreateToken(
+      Address.fromBytes(_pool.inputToken)
+    );
 
     const withdraw = new LiquidityWithdraw(idFromEvent(this.event));
     withdraw.hash = this.event.transaction.hash;

@@ -1,0 +1,13 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write ."
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.37.1",
+    "@graphprotocol/graph-ts": "0.29.1"
+  },
+  "devDependencies": {
+    "prettier": "2.7.1"
+  }
+}

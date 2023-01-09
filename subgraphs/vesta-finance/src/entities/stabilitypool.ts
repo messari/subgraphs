@@ -1,42 +1,31 @@
-import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
-import { _StabilityPool } from "../../generated/schema";
-import { updateProtocolUSDLocked } from "./protocol";
-import { BIGDECIMAL_ZERO } from "../utils/constants";
+import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { VST_ADDRESS } from "../utils/constants";
+import { bigIntToBigDecimal } from "../utils/numbers";
+import { getOrCreateStabilityPool } from "./market";
+import { getOrCreateAssetToken, getVSTTokenPrice } from "./token";
 
-export function getStabilityPool(asset: Address): _StabilityPool | null {
-  const id = asset.toHexString();
-  return _StabilityPool.load(id);
-}
-
-export function createStabilityPool(asset: Address): _StabilityPool {
-  const id = asset.toHexString();
-  const stabilityPool = new _StabilityPool(id);
-  stabilityPool.id = asset.toHexString();
-  stabilityPool.totalValueLocked = BIGDECIMAL_ZERO;
-  stabilityPool.save();
-  return stabilityPool;
-}
-
-export function getOrCreateStabilityPool(asset: Address): _StabilityPool {
-  const id = asset.toHexString();
-  let stabilityPool = _StabilityPool.load(id);
-  if (stabilityPool == null) {
-    stabilityPool = createStabilityPool(asset);
-  }
-  return stabilityPool;
-}
-
-export function updateStabilityPoolUSDLocked(
+export function updateStabilityPoolTVL(
   event: ethereum.Event,
-  asset: Address,
-  totalValueLocked: BigDecimal
+  VSTAmount: BigInt,
+  assetAmount: BigInt,
+  asset: Address
 ): void {
-  const stabilityPool = getOrCreateStabilityPool(asset);
-  const previousTotalValueLocked = stabilityPool.totalValueLocked;
-  stabilityPool.totalValueLocked = totalValueLocked;
-  updateProtocolUSDLocked(
-    event,
-    totalValueLocked.minus(previousTotalValueLocked)
+  const VSTPrice = getVSTTokenPrice(event);
+  const vstToken = getOrCreateAssetToken(Address.fromString(VST_ADDRESS));
+  vstToken.lastPriceUSD = VSTPrice;
+  vstToken.lastPriceBlockNumber = event.block.number;
+  vstToken.save();
+
+  const VSTValue = bigIntToBigDecimal(VSTAmount).times(VSTPrice);
+  const assetToken = getOrCreateAssetToken(asset);
+  const totalAssetValue = bigIntToBigDecimal(assetAmount).times(
+    assetToken.lastPriceUSD!
   );
+  const stabilityPoolTVL = VSTValue.plus(totalAssetValue);
+  const stabilityPool = getOrCreateStabilityPool(event.address, asset, event);
+  stabilityPool.inputTokenBalance = VSTAmount;
+  stabilityPool.totalValueLockedUSD = stabilityPoolTVL;
+  stabilityPool.totalDepositBalanceUSD = stabilityPoolTVL;
+  stabilityPool.inputTokenPriceUSD = VSTPrice;
   stabilityPool.save();
 }

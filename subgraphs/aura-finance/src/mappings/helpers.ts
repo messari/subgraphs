@@ -34,7 +34,6 @@ import {
   createWithdrawTransaction,
 } from "../common/transactions";
 import { CustomFeesType } from "../common/types";
-import { NetworkConfigs } from "../../configurations/configure";
 
 import {
   PoolAdded,
@@ -42,16 +41,16 @@ import {
   Withdrawn,
   FeesUpdated,
   PoolShutdown,
-} from "../../generated/Booster/Booster";
-import { ERC20 } from "../../generated/Booster/ERC20";
-import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
-import { RewardAdded } from "../../generated/Booster/BaseRewardPool";
+} from "../../generated/Booster-v1/Booster";
+import { ERC20 } from "../../generated/Booster-v1/ERC20";
+import { BaseRewardPool } from "../../generated/Booster-v1/BaseRewardPool";
+import { RewardAdded } from "../../generated/Booster-v1/BaseRewardPool";
 
-export function createPoolAdd(event: PoolAdded): void {
+export function createPoolAdd(boosterAddr: Address, event: PoolAdded): void {
   const protocol = getOrCreateYieldAggregator();
 
   const poolId = event.params.pid;
-  const vault = getOrCreateVault(poolId, event);
+  const vault = getOrCreateVault(boosterAddr, poolId, event);
   if (!vault) return;
 
   protocol.totalPoolCount += 1;
@@ -61,11 +60,14 @@ export function createPoolAdd(event: PoolAdded): void {
   protocol.save();
 }
 
-export function createPoolShutdown(event: PoolShutdown): void {
+export function createPoolShutdown(
+  boosterAddr: Address,
+  event: PoolShutdown
+): void {
   const protocol = getOrCreateYieldAggregator();
 
   const poolId = event.params.poolId;
-  const vault = getOrCreateVault(poolId, event);
+  const vault = getOrCreateVault(boosterAddr, poolId, event);
   if (!vault) return;
 
   vault._active = false;
@@ -76,8 +78,12 @@ export function createPoolShutdown(event: PoolShutdown): void {
   protocol.save();
 }
 
-export function createDeposit(poolId: BigInt, event: Deposited): void {
-  const vault = getOrCreateVault(poolId, event);
+export function createDeposit(
+  boosterAddr: Address,
+  poolId: BigInt,
+  event: Deposited
+): void {
+  const vault = getOrCreateVault(boosterAddr, poolId, event);
   if (!vault) return;
 
   const inputToken = getOrCreateBalancerPoolToken(
@@ -110,7 +116,7 @@ export function createDeposit(poolId: BigInt, event: Deposited): void {
     BIGINT_ZERO
   );
   vault.outputTokenPriceUSD =
-    vault.outputTokenSupply != BIGINT_ZERO
+    vault.outputTokenSupply! != BIGINT_ZERO
       ? vault.totalValueLockedUSD.div(
           bigIntToBigDecimal(vault.outputTokenSupply!, outputToken.decimals)
         )
@@ -135,8 +141,12 @@ export function createDeposit(poolId: BigInt, event: Deposited): void {
   updateUsageMetricsAfterDeposit(event);
 }
 
-export function createWithdraw(poolId: BigInt, event: Withdrawn): void {
-  const vault = getOrCreateVault(poolId, event);
+export function createWithdraw(
+  boosterAddr: Address,
+  poolId: BigInt,
+  event: Withdrawn
+): void {
+  const vault = getOrCreateVault(boosterAddr, poolId, event);
   if (!vault) return;
 
   const inputToken = getOrCreateBalancerPoolToken(
@@ -169,7 +179,7 @@ export function createWithdraw(poolId: BigInt, event: Withdrawn): void {
     BIGINT_ZERO
   );
   vault.outputTokenPriceUSD =
-    vault.outputTokenSupply != BIGINT_ZERO
+    vault.outputTokenSupply! != BIGINT_ZERO
       ? vault.totalValueLockedUSD.div(
           bigIntToBigDecimal(vault.outputTokenSupply!, outputToken.decimals)
         )
@@ -194,7 +204,10 @@ export function createWithdraw(poolId: BigInt, event: Withdrawn): void {
   updateUsageMetricsAfterWithdraw(event);
 }
 
-export function createFeesUpdate(event: FeesUpdated): void {
+export function createFeesUpdate(
+  boosterAddr: Address,
+  event: FeesUpdated
+): void {
   const newFees = new CustomFeesType(
     event.params.lockIncentive,
     event.params.earmarkIncentive,
@@ -204,7 +217,7 @@ export function createFeesUpdate(event: FeesUpdated): void {
 
   const performanceFeeId = prefixID(
     VaultFeeType.PERFORMANCE_FEE,
-    NetworkConfigs.getFactoryAddress()
+    boosterAddr.toHexString()
   );
 
   getOrCreateFeeType(
@@ -214,12 +227,16 @@ export function createFeesUpdate(event: FeesUpdated): void {
   );
 }
 
-export function createRewardAdd(poolId: BigInt, event: RewardAdded): void {
+export function createRewardAdd(
+  boosterAddr: Address,
+  poolId: BigInt,
+  event: RewardAdded
+): void {
   const rewardPoolAddr = event.address;
   const rewardPool = getOrCreateRewardPool(poolId, rewardPoolAddr, event.block);
   const rewardsEarned = rewardPool.lastAddedRewards;
 
-  const fees = getFees();
+  const fees = getFees(boosterAddr);
   const totalFees = fees.totalFees();
 
   const totalRewardsEarned = rewardsEarned
@@ -234,6 +251,6 @@ export function createRewardAdd(poolId: BigInt, event: RewardAdded): void {
       .toBigDecimal()
   );
 
-  updateRevenue(poolId, totalRevenueUSD, totalFees, event);
-  updateRewards(poolId, rewardPoolAddr, event);
+  updateRevenue(boosterAddr, poolId, totalRevenueUSD, totalFees, event);
+  updateRewards(boosterAddr, poolId, rewardPoolAddr, event);
 }

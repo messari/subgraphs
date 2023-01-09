@@ -328,6 +328,9 @@ type LendingProtocol implements Protocol @entity {
 
   " flag to indicate whether the bonusToSP function call is enabled in Vesta Parameters smart contract for the protocol "
   _bonusToSPCallEnabled: Boolean!
+
+  " "
+  _stabilityPools: [Market!]
 }
 
 ###############################
@@ -658,6 +661,9 @@ type Market @entity {
 
   " All liquidations made to this market "
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
+
+  " underlying asset for stability pool; null for market "
+  _asset: String
 }
 
 #################################
@@ -1263,9 +1269,9 @@ type _Trove @entity {
   collateralSurplusChange: BigInt!
 }
 
-type _StabilityPool @entity {
-  " Stability pool asset address "
+type _AssetToStabilityPool @entity {
+  " asset address "
   id: ID!
-  " Total amount of USD value locked in the asset's stability pool "
-  totalValueLocked: BigDecimal!
+  " stability pool address "
+  stabilityPool: String
 }
