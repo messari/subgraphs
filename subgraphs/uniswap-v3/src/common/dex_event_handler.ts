@@ -529,6 +529,14 @@ export class DexEventHandler {
     this.pool.uncollectedSupplySideValuesUSD =
       this.uncollectedSupplySideValuesUSD;
 
+    if (this.eventType == EventType.DEPOSIT) {
+      this.pool.cumulativeDepositCount += INT_ONE;
+    } else if (this.eventType == EventType.WITHDRAW) {
+      this.pool.cumulativeWithdrawCount += INT_ONE;
+    } else if (this.eventType == EventType.SWAP) {
+      this.pool.cumulativeSwapCount += INT_ONE;
+    }
+
     this._poolAmounts.inputTokenBalances = this.inputTokenBalancesPoolAmounts;
     this._poolAmounts.save();
 
@@ -624,6 +632,9 @@ export class DexEventHandler {
     let prevCumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     let prevCumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     let prevCumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    let prevCumulativeDepositCount = INT_ZERO;
+    let prevCumulativeWithdrawCount = INT_ZERO;
+    let prevCumulativeSwapCount = INT_ZERO;
 
     if (prevPoolMetrics != null) {
       prevCumulativeVolumeUSD = prevPoolMetrics.cumulativeVolumeUSD;
@@ -635,6 +646,9 @@ export class DexEventHandler {
       prevCumulativeProtocolSideRevenueUSD =
         prevPoolMetrics.cumulativeProtocolSideRevenueUSD;
       prevCumulativeTotalRevenueUSD = prevPoolMetrics.cumulativeTotalRevenueUSD;
+      prevCumulativeDepositCount = prevPoolMetrics.cumulativeDepositCount;
+      prevCumulativeWithdrawCount = prevPoolMetrics.cumulativeWithdrawCount;
+      prevCumulativeSwapCount = prevPoolMetrics.cumulativeSwapCount;
     } else if (this.pool._mostRecentSnapshotsDayID > INT_ZERO) {
       log.critical(
         "Missing pool snapshot at ID that has been snapped: Pool {}, ID {} ",
@@ -701,6 +715,16 @@ export class DexEventHandler {
     poolMetrics.dailyTotalRevenueUSD =
       this.pool.cumulativeTotalRevenueUSD.minus(prevCumulativeTotalRevenueUSD);
 
+    poolMetrics.cumulativeDepositCount = this.pool.cumulativeDepositCount;
+    poolMetrics.dailyDepositCount =
+      this.pool.cumulativeDepositCount - prevCumulativeDepositCount;
+    poolMetrics.cumulativeWithdrawCount = this.pool.cumulativeWithdrawCount;
+    poolMetrics.dailyWithdrawCount =
+      this.pool.cumulativeWithdrawCount - prevCumulativeWithdrawCount;
+    poolMetrics.cumulativeSwapCount = this.pool.cumulativeSwapCount;
+    poolMetrics.dailySwapCount =
+      this.pool.cumulativeSwapCount - prevCumulativeSwapCount;
+
     poolMetrics.positionCount = this.pool.positionCount;
     poolMetrics.openPositionCount = this.pool.openPositionCount;
     poolMetrics.closedPositionCount = this.pool.closedPositionCount;
@@ -728,6 +752,9 @@ export class DexEventHandler {
     let prevCumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     let prevCumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     let prevCumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    let prevCumulativeDepositCount = INT_ZERO;
+    let prevCumulativeWithdrawCount = INT_ZERO;
+    let prevCumulativeSwapCount = INT_ZERO;
 
     if (prevPoolMetrics != null) {
       prevCumulativeVolumeUSD = prevPoolMetrics.cumulativeVolumeUSD;
@@ -739,6 +766,9 @@ export class DexEventHandler {
       prevCumulativeProtocolSideRevenueUSD =
         prevPoolMetrics.cumulativeProtocolSideRevenueUSD;
       prevCumulativeTotalRevenueUSD = prevPoolMetrics.cumulativeTotalRevenueUSD;
+      prevCumulativeDepositCount = prevPoolMetrics.cumulativeDepositCount;
+      prevCumulativeWithdrawCount = prevPoolMetrics.cumulativeWithdrawCount;
+      prevCumulativeSwapCount = prevPoolMetrics.cumulativeSwapCount;
     } else if (this.pool._mostRecentSnapshotsHourID > INT_ZERO) {
       log.critical(
         "Missing pool snapshot at ID that has been snapped: Pool {}, ID {} ",
@@ -804,6 +834,16 @@ export class DexEventHandler {
     poolMetrics.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
     poolMetrics.hourlyTotalRevenueUSD =
       this.pool.cumulativeTotalRevenueUSD.minus(prevCumulativeTotalRevenueUSD);
+
+    poolMetrics.cumulativeDepositCount = this.pool.cumulativeDepositCount;
+    poolMetrics.hourlyDepositCount =
+      this.pool.cumulativeDepositCount - prevCumulativeDepositCount;
+    poolMetrics.cumulativeWithdrawCount = this.pool.cumulativeWithdrawCount;
+    poolMetrics.hourlyWithdrawCount =
+      this.pool.cumulativeWithdrawCount - prevCumulativeWithdrawCount;
+    poolMetrics.cumulativeSwapCount = this.pool.cumulativeSwapCount;
+    poolMetrics.hourlySwapCount =
+      this.pool.cumulativeSwapCount - prevCumulativeSwapCount;
 
     poolMetrics.positionCount = this.pool.positionCount;
     poolMetrics.openPositionCount = this.pool.openPositionCount;

@@ -90,6 +90,10 @@ export function createLiquidityPool(
   pool.uncollectedSupplySideTokenAmounts = [BIGINT_ZERO, BIGINT_ZERO];
   pool.uncollectedSupplySideValuesUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
+  pool.cumulativeDepositCount = INT_ZERO;
+  pool.cumulativeWithdrawCount = INT_ZERO;
+  pool.cumulativeSwapCount = INT_ZERO;
+
   pool.positionCount = INT_ZERO;
   pool.openPositionCount = INT_ZERO;
   pool.closedPositionCount = INT_ZERO;

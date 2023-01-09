@@ -541,6 +541,15 @@ type LiquidityPool @entity {
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
+  " Total number of deposits (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
+
   ##### Account/Position Data #####
 
   " All positions in this market "
@@ -696,6 +705,24 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
+  " Total number of deposits (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of deposits (add liquidity) in a day "
+  dailyDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of withdrawals (remove liquidity) in a day "
+  dailyWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
+
+  " Total number of trades (swaps) in a day "
+  dailySwapCount: Int!
+
   ##### Account/Position Data #####
 
   " Number of positions in this market "
@@ -812,6 +839,24 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Total number of deposits (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of deposits (add liquidity) in an hour "
+  hourlyDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of withdrawals (remove liquidity) in an hour "
+  hourlyWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
+
+  " Total number of trades (swaps) in an hour "
+  hourlySwapCount: Int!
 
   ##### Account/Position Data #####
 
