@@ -202,22 +202,3 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 
 	acc.liquidityWithdraw(pool, event.params.lpTokenAmount)
 }
-
-// initialize(string, string, BridgePoolType, Token): void
-// addDestinationToken(CrosschainToken): void
-// getDestinationTokenRoute(CrosschainToken): PoolRoute
-
-// addRevenueUSD(BigDecimal, BigDecimal): void
-// addRevenueNative(BigInt, BigInt): void
-
-// addStakedOutputTokenAmount(BigInt): void
-// setStakedOutputTokenAmount(BigInt): void
-// setRewardEmissions(RewardTokenType, Token, BigInt): void
-
-// The most relevant methods here are transferIn(), transferOut(), liquidityDeposit() and liquidityWithdraw().
-//  You won't need the rest unless you don't create events via these Account methods.
-
-// When creating an event through these aforementioned methods,
-//  all Account and Protocol counters about unique users,
-//   user activity and transactions will be automatically updated.
-//    If for some reason you don't use these methods, you have countDeposit|Withdraw|transferIn|transferOut available.

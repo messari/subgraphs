@@ -11,19 +11,18 @@ import {
 } from '../../../../src/sdk/protocols/bridge/enums'
 import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
+import { reverseChainIDs } from '../../../../src/sdk/protocols/bridge/chainIds'
 import { NetworkConfigs } from '../../../../configurations/configure'
 import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import {
-	Stake,
 	TransferFromL1Completed,
 	TransferSent,
 	BonderAdded,
-	Withdrew,
-	Unstake,
 } from '../../../../generated/HopL2Bridge/L2_Bridge'
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
+import { Network } from '../../../../src/sdk/util/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -59,8 +58,6 @@ export function handleTransferFromL1Completed(
 	const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
 	const poolConfig = NetworkConfigs.getPoolDetails(inputToken)
 
-	const fee = bigIntToBigDecimal(event.params.relayerFee)
-
 	const poolName = poolConfig[0]
 	const poolSymbol = poolConfig[1]
 
@@ -86,14 +83,12 @@ export function handleTransferFromL1Completed(
 		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 	}
 	const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-		BigInt.fromString('0'),
+		reverseChainIDs.get(Network.MAINNET)!,
 		Address.fromString(inputToken),
 		CrosschainTokenType.CANONICAL,
 		Address.fromString(inputToken)
 	)
-
 	pool.addDestinationToken(crossToken)
-	pool.addProtocolSideRevenueUSD(fee)
 
 	acc.transferOut(
 		pool,
@@ -102,8 +97,6 @@ export function handleTransferFromL1Completed(
 		event.params.amount
 	)
 }
-
-export function handleUnstake(event: Unstake): void {}
 
 export function handleBonderAdded(event: BonderAdded): void {
 	const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
@@ -168,7 +161,7 @@ export function handleTransferSent(event: TransferSent): void {
 	)
 
 	pool.addDestinationToken(crossToken)
-	pool.addProtocolSideRevenueUSD(fee)
+	pool.addSupplySideRevenueUSD(fee)
 
 	acc.transferOut(
 		pool,
@@ -177,5 +170,3 @@ export function handleTransferSent(event: TransferSent): void {
 		event.params.amount
 	)
 }
-export function handleStake(event: Stake): void {}
-export function handleWithdrew(event: Withdrew): void {}

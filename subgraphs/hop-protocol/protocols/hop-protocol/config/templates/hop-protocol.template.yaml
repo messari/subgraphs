@@ -87,14 +87,8 @@ dataSources:
       eventHandlers:
         - event: BonderAdded(indexed address)
           handler: handleBonderAdded
-        - event: Stake(indexed address,uint256)
-          handler: handleStake
         - event: TransferSentToL2(indexed uint256,indexed address,uint256,uint256,uint256,indexed address,uint256)
           handler: handleTransferSentToL2
-        - event: Unstake(indexed address,uint256)
-          handler: handleUnstake
-        - event: Withdrew(indexed bytes32,indexed address,uint256,bytes32)
-          handler: handleWithdrew
       file: ./protocols/hop-protocol/src/mainnet/bridge.ts
 {{/bridges}}
 {{/isMainnet}}
@@ -204,16 +198,10 @@ dataSources:
       eventHandlers:
         - event: BonderAdded(indexed address)
           handler: handleBonderAdded
-        - event: Stake(indexed address,uint256)
-          handler: handleStake
         - event: TransferFromL1Completed(indexed address,uint256,uint256,uint256,indexed address,uint256)
           handler: handleTransferFromL1Completed
         - event: TransferSent(indexed bytes32,indexed uint256,indexed address,uint256,bytes32,uint256,uint256,uint256,uint256)
           handler: handleTransferSent
-        - event: Unstake(indexed address,uint256)
-          handler: handleUnstake
-        - event: Withdrew(indexed bytes32,indexed address,uint256,bytes32)
-          handler: handleWithdrew
       file: ./protocols/hop-protocol/src/L2/bridge.ts
 {{/bridges}}
 {{/isMainnet}}
