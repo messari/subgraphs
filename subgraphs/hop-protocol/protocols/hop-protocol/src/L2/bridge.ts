@@ -103,37 +103,7 @@ export function handleTransferFromL1Completed(
 	)
 }
 
-export function handleUnstake(event: Unstake): void {
-	const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
-		event.address.toHexString()
-	)
-	const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
-	const poolConfig = NetworkConfigs.getPoolDetails(inputToken)
-
-	const poolName = poolConfig[0]
-	const poolSymbol = poolConfig[0]
-
-	const bridgeAddress = bridgeConfig[0]
-	const bridgeName = bridgeConfig[1]
-	const bridgeSlug = bridgeConfig[2]
-
-	const conf = new BridgeConfig(
-		bridgeAddress,
-		bridgeName,
-		bridgeSlug,
-		BridgePermissionType.PERMISSIONLESS,
-		Versions
-	)
-
-	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
-
-	const pool = sdk.Pools.loadPool<string>(event.address)
-	const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
-
-	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
-	}
-}
+export function handleUnstake(event: Unstake): void {}
 
 export function handleBonderAdded(event: BonderAdded): void {
 	const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
@@ -188,7 +158,7 @@ export function handleTransferSent(event: TransferSent): void {
 	const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
 
 	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+		pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
 	}
 	const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
 		event.params.chainId,

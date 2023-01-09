@@ -255,7 +255,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		} else if (
 			poolAddress == '0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase()
 		) {
-			return ['HOP-WBTC', 'hUSDC/WBTC']
+			return ['HOP-WBTC', 'hWBTC/WBTC']
 		} else {
 			log.critical('Token not found', [])
 			return []

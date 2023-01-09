@@ -76,7 +76,7 @@ export function handleTokenSwap(event: TokenSwap): void {
 	sdk.Accounts.loadAccount(event.params.buyer)
 
 	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+		pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
 	}
 
 	pool.addRevenueUSD(fees, amount)
@@ -117,7 +117,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 	const acc = sdk.Accounts.loadAccount(event.params.provider)
 
 	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+		pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
 	}
 
 	acc.liquidityDeposit(pool, amount[0])
@@ -158,7 +158,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 	const acc = sdk.Accounts.loadAccount(event.params.provider)
 
 	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+		pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
 	}
 
 	acc.liquidityWithdraw(pool, amount[0])
@@ -197,7 +197,7 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 	const acc = sdk.Accounts.loadAccount(event.params.provider)
 
 	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+		pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
 	}
 
 	acc.liquidityWithdraw(pool, event.params.lpTokenAmount)
