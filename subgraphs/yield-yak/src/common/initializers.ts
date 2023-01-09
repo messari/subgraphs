@@ -180,7 +180,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol = new YieldAggregator(YAK_STRATEGY_MANAGER_ADDRESS.toHexString());
     protocol.name = "Yield Yak";
     protocol.slug = "yak";
-    protocol.schemaVersion = "1.2.0";
+    protocol.schemaVersion = "1.3.0";
     protocol.subgraphVersion = "1.0.0";
     protocol.methodologyVersion = "1.0.0";
     protocol.network = "AVALANCHE";
