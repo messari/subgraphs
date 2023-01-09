@@ -80,13 +80,13 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
     position.liquidity.toBigDecimal(),
     pool.totalLiquidity.toBigDecimal()
   ).times(pool.totalLiquidityUSD);
-  position.cumulativeDepositedTokenAmounts = sumBigIntListByIndex([
-    position.cumulativeDepositedTokenAmounts,
+  position.cumulativeDepositTokenAmounts = sumBigIntListByIndex([
+    position.cumulativeDepositTokenAmounts,
     [event.params.amount0, event.params.amount1],
   ]);
-  position.cumulativeDepositedUSD = getUSDValueFromNativeTokens(
+  position.cumulativeDepositUSD = getUSDValueFromNativeTokens(
     [token0, token1],
-    position.cumulativeDepositedTokenAmounts
+    position.cumulativeDepositTokenAmounts
   );
   position.depositCount += INT_ONE;
 
@@ -119,13 +119,13 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
     position.liquidity.toBigDecimal(),
     pool.totalLiquidity.toBigDecimal()
   ).times(pool.totalLiquidityUSD);
-  position.cumulativeWithdrawnTokenAmounts = sumBigIntListByIndex([
-    position.cumulativeWithdrawnTokenAmounts,
+  position.cumulativeWithdrawTokenAmounts = sumBigIntListByIndex([
+    position.cumulativeWithdrawTokenAmounts,
     [event.params.amount0, event.params.amount1],
   ]);
-  position.cumulativeWithdrawnUSD = getUSDValueFromNativeTokens(
+  position.cumulativeWithdrawUSD = getUSDValueFromNativeTokens(
     [token0, token1],
-    position.cumulativeWithdrawnTokenAmounts
+    position.cumulativeWithdrawTokenAmounts
   );
   position.withdrawCount += INT_ONE;
 

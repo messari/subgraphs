@@ -9,39 +9,14 @@ import {
 } from "../constants";
 import { percToDecBI } from "../utils/utils";
 import { getLiquidityPoolFee } from "./pool";
+import { RawDeltas } from "../dex_event_handler";
 
-class SwapHelperObj {
-  activeLiquidityDelta: BigInt;
-  balanceChangesNet: BigInt[];
-  supplyUncollectedTokenChangesNet: BigInt[];
-  protocolUncollectedTokenChangesNet: BigInt[];
-  tokenInIdx: i32;
-  tokenOutIdx: i32;
-
-  constructor(
-    activeLiquidityDelta: BigInt,
-    balanceChangesNet: BigInt[],
-    supplyUncollectedTokenChangesNet: BigInt[],
-    protocolUncollectedTokenChangesNet: BigInt[],
-    tokenInIdx: i32,
-    tokenOutIdx: i32
-  ) {
-    this.activeLiquidityDelta = activeLiquidityDelta;
-    this.balanceChangesNet = balanceChangesNet;
-    this.supplyUncollectedTokenChangesNet = supplyUncollectedTokenChangesNet;
-    this.protocolUncollectedTokenChangesNet =
-      protocolUncollectedTokenChangesNet;
-    this.tokenInIdx = tokenInIdx;
-    this.tokenOutIdx = tokenOutIdx;
-  }
-}
-
-export function getSwapHelperObj(
+export function getSwapDeltas(
   pool: LiquidityPool,
   newActiveLiquidity: BigInt,
   amount0: BigInt,
   amount1: BigInt
-): SwapHelperObj {
+): RawDeltas {
   const supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
   const protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
 
@@ -68,13 +43,12 @@ export function getSwapHelperObj(
       supplyFeeAmount.plus(protocolFeeAmount)
     );
 
-    return new SwapHelperObj(
-      newActiveLiquidity.minus(pool.activeLiquidity),
+    return new RawDeltas(
       [tokenInAmount, amount1],
+      BIGINT_ZERO,
+      newActiveLiquidity.minus(pool.activeLiquidity),
       [supplyFeeAmount, BIGINT_ZERO],
-      [protocolFeeAmount, BIGINT_ZERO],
-      0,
-      1
+      [protocolFeeAmount, BIGINT_ZERO]
     );
   }
 
@@ -98,12 +72,11 @@ export function getSwapHelperObj(
     .div(PRECISION);
   const tokenInAmount = amount1.minus(supplyFeeAmount.plus(protocolFeeAmount));
 
-  return new SwapHelperObj(
-    newActiveLiquidity.minus(pool.activeLiquidity),
+  return new RawDeltas(
     [amount0, tokenInAmount],
+    BIGINT_ZERO,
+    newActiveLiquidity.minus(pool.activeLiquidity),
     [BIGINT_ZERO, supplyFeeAmount],
-    [BIGINT_ZERO, protocolFeeAmount],
-    1,
-    0
+    [BIGINT_ZERO, protocolFeeAmount]
   );
 }

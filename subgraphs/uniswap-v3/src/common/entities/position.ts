@@ -41,10 +41,10 @@ export function getOrCreatePosition(
       position.liquidityUSD = BIGDECIMAL_ZERO;
       position.tickLower = position.pool.concatI32(positionResult.value5);
       position.tickUpper = position.pool.concatI32(positionResult.value6);
-      position.cumulativeDepositedTokenAmounts = [BIGINT_ZERO, BIGINT_ZERO];
-      position.cumulativeDepositedUSD = BIGDECIMAL_ZERO;
-      position.cumulativeWithdrawnTokenAmounts = [BIGINT_ZERO, BIGINT_ZERO];
-      position.cumulativeWithdrawnUSD = BIGDECIMAL_ZERO;
+      position.cumulativeDepositTokenAmounts = [BIGINT_ZERO, BIGINT_ZERO];
+      position.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+      position.cumulativeWithdrawTokenAmounts = [BIGINT_ZERO, BIGINT_ZERO];
+      position.cumulativeWithdrawUSD = BIGDECIMAL_ZERO;
       position.depositCount = INT_ZERO;
       position.withdrawCount = INT_ZERO;
       position.save();
@@ -69,12 +69,12 @@ export function savePositionSnapshot(
   positionSnapshot.position = position.id;
   positionSnapshot.liquidity = position.liquidity;
   positionSnapshot.liquidityUSD = position.liquidityUSD;
-  positionSnapshot.cumulativeDepositedTokenAmounts =
-    position.cumulativeDepositedTokenAmounts;
-  positionSnapshot.cumulativeDepositedUSD = position.cumulativeDepositedUSD;
-  positionSnapshot.cumulativeWithdrawnTokenAmounts =
-    position.cumulativeWithdrawnTokenAmounts;
-  positionSnapshot.cumulativeWithdrawnUSD = position.cumulativeWithdrawnUSD;
+  positionSnapshot.cumulativeDepositTokenAmounts =
+    position.cumulativeDepositTokenAmounts;
+  positionSnapshot.cumulativeDepositUSD = position.cumulativeDepositUSD;
+  positionSnapshot.cumulativeWithdrawTokenAmounts =
+    position.cumulativeWithdrawTokenAmounts;
+  positionSnapshot.cumulativeWithdrawUSD = position.cumulativeWithdrawUSD;
   positionSnapshot.depositCount = position.depositCount;
   positionSnapshot.withdrawCount = position.withdrawCount;
   positionSnapshot.blockNumber = event.block.number;

@@ -7,8 +7,10 @@ import {
   Collect as CollectEvent,
   SetFeeProtocol,
 } from "../../generated/templates/Pool/Pool";
-import { BIGINT_NEG_ONE, BIGINT_ZERO } from "../common/constants";
-import { incrementDepositHelper } from "../common/entities/deposit";
+import {
+  getDepositDeltas,
+  incrementDepositHelper,
+} from "../common/entities/deposit";
 import { DexEventHandler } from "../common/dex_event_handler";
 import {
   getOrCreateProtocol,
@@ -24,7 +26,9 @@ import {
 } from "../common/utils/utils";
 import { getOrCreateTick } from "../common/entities/tick";
 import { CollectProtocol } from "../../generated/Factory/Pool";
-import { getSwapHelperObj } from "../common/entities/swap";
+import { getSwapDeltas } from "../common/entities/swap";
+import { getWithdrawDeltas } from "../common/entities/withdraw";
+import { BIGINT_ZERO } from "../common/constants";
 
 // Emitted when a given liquidity pool is first created.
 export function handleInitialize(event: Initialize): void {
@@ -41,26 +45,15 @@ export function handleSetFeeProtocol(event: SetFeeProtocol): void {
 // Handle mint event emmitted from a pool contract.
 export function handleMint(event: MintEvent): void {
   const pool = getLiquidityPool(event.address)!;
-  let activeLiquidityDelta = BIGINT_ZERO;
-  // Make sure the liquidity is within the current tick range to update active liquidity.
-  if (
-    pool.tick !== null &&
-    BigInt.fromI32(event.params.tickLower).le(pool.tick as BigInt) &&
-    BigInt.fromI32(event.params.tickUpper).gt(pool.tick as BigInt)
-  ) {
-    activeLiquidityDelta = event.params.amount;
-  }
-  const dexEventHandler = new DexEventHandler(
-    event,
-    event.transaction.from,
+  const deltas = getDepositDeltas(
     pool,
-    false,
-    [event.params.amount0, event.params.amount1],
     event.params.amount,
-    activeLiquidityDelta,
-    [BIGINT_ZERO, BIGINT_ZERO],
-    [BIGINT_ZERO, BIGINT_ZERO]
+    event.params.amount0,
+    event.params.amount1,
+    BigInt.fromI32(event.params.tickLower),
+    BigInt.fromI32(event.params.tickUpper)
   );
+  const dexEventHandler = new DexEventHandler(event, pool, false, deltas);
   dexEventHandler.createDeposit(
     event.params.owner,
     getOrCreateTick(event, pool, BigInt.fromI32(event.params.tickLower)),
@@ -74,33 +67,19 @@ export function handleMint(event: MintEvent): void {
 // Handle burn event emmitted from a pool contract.
 export function handleBurn(event: BurnEvent): void {
   const pool = getLiquidityPool(event.address)!;
-  let activeLiquidityDelta = BIGINT_ZERO;
-  // Make sure the liquidity is within the current tick range to update active liquidity.
-  if (
-    pool.tick !== null &&
-    BigInt.fromI32(event.params.tickLower).le(pool.tick as BigInt) &&
-    BigInt.fromI32(event.params.tickUpper).gt(pool.tick as BigInt)
-  ) {
-    activeLiquidityDelta = event.params.amount.times(BIGINT_NEG_ONE);
-  }
+  const deltas = getWithdrawDeltas(
+    pool,
+    event.params.amount,
+    event.params.amount0,
+    event.params.amount1,
+    BigInt.fromI32(event.params.tickLower),
+    BigInt.fromI32(event.params.tickUpper)
+  );
   pool._totalAmountWithdrawn = sumBigIntListByIndex([
     pool._totalAmountWithdrawn,
     [event.params.amount0, event.params.amount1],
   ]);
-  const dexEventHandler = new DexEventHandler(
-    event,
-    event.transaction.from,
-    pool,
-    false,
-    [
-      event.params.amount0.times(BIGINT_NEG_ONE),
-      event.params.amount1.times(BIGINT_NEG_ONE),
-    ],
-    event.params.amount.times(BIGINT_NEG_ONE),
-    activeLiquidityDelta,
-    [BIGINT_ZERO, BIGINT_ZERO],
-    [BIGINT_ZERO, BIGINT_ZERO]
-  );
+  const dexEventHandler = new DexEventHandler(event, pool, false, deltas);
   dexEventHandler.createWithdraw(
     event.params.owner,
     getOrCreateTick(event, pool, BigInt.fromI32(event.params.tickLower)),
@@ -114,32 +93,26 @@ export function handleBurn(event: BurnEvent): void {
 export function handleSwap(event: SwapEvent): void {
   updateTokenPrices(event, event.params.sqrtPriceX96);
   const pool = getLiquidityPool(event.address)!;
-  const swapHelperObj = getSwapHelperObj(
+  const deltas = getSwapDeltas(
     pool,
     event.params.liquidity,
     event.params.amount0,
     event.params.amount1
   );
+
   pool._totalAmountEarned = sumBigIntListByIndex([
     pool._totalAmountEarned,
-    swapHelperObj.protocolUncollectedTokenChangesNet,
-    swapHelperObj.supplyUncollectedTokenChangesNet,
+    deltas.uncollectedProtocolSideTokenAmountsDeltas,
+    deltas.uncollectedSupplySideTokenAmountsDeltas,
   ]);
-  const dexEventHandler = new DexEventHandler(
-    event,
-    event.transaction.from,
-    pool,
-    true,
-    swapHelperObj.balanceChangesNet,
-    BIGINT_ZERO,
-    swapHelperObj.activeLiquidityDelta,
-    swapHelperObj.supplyUncollectedTokenChangesNet,
-    swapHelperObj.protocolUncollectedTokenChangesNet
-  );
+  const dexEventHandler = new DexEventHandler(event, pool, true, deltas);
 
+  // 0 if amount0 is positive, 1 if amount1 is positive
+  const tokenInIdx = event.params.amount0.gt(BIGINT_ZERO) ? 0 : 1;
+  const tokenOutIdx = tokenInIdx === 0 ? 1 : 0;
   dexEventHandler.createSwap(
-    swapHelperObj.tokenInIdx,
-    swapHelperObj.tokenOutIdx,
+    tokenInIdx,
+    tokenOutIdx,
     event.params.sender,
     BigInt.fromI32(event.params.tick)
   );

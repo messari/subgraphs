@@ -6,7 +6,6 @@ import {
   BigInt,
   Bytes,
 } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../../configurations/configure";
 import {
   LiquidityPool,
   _LiquidityPoolAmount,
@@ -20,11 +19,9 @@ import {
   INT_ONE,
   INT_ZERO,
   LiquidityPoolFeeType,
-  Network,
   PROTOCOL_FEE_TO_OFF,
   TokenType,
 } from "../constants";
-import { populateEmptyPools } from "../utils/backfill";
 import { convertFeeToPercent, convertTokenToDecimal } from "../utils/utils";
 import { getOrCreateProtocol } from "./protocol";
 import { getOrCreateToken, updateTokenWhitelists } from "./token";
@@ -80,7 +77,7 @@ export function createLiquidityPool(
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
   pool.inputTokenBalancesUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
-  pool.cumulativeTotalVolumeUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeTokenAmounts = [BIGINT_ZERO, BIGINT_ZERO];
   pool.cumulativeVolumesUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
@@ -112,19 +109,11 @@ export function createLiquidityPool(
   poolDeposits.valueInt = INT_ZERO;
 
   protocol.totalPoolCount = protocol.totalPoolCount + INT_ONE;
-  protocol.save();
 
   // Create and track the newly created pool contract based on the template specified in the subgraph.yaml file.
   PoolTemplate.create(poolAddress);
 
-  // populate pre-regenesis pools if needed
-  if (
-    NetworkConfigs.getNetwork() == Network.OPTIMISM &&
-    protocol._regenesis == false
-  ) {
-    populateEmptyPools(event);
-  }
-
+  protocol.save();
   pool.save();
   poolAmounts.save();
   token0.save();

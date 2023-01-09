@@ -21,7 +21,7 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.activeLiquidityUSD = BIGDECIMAL_ZERO;
     protocol.totalLiquidityUSD = BIGDECIMAL_ZERO;
-    protocol.cumulativeTotalVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     protocol.uncollectedProtocolSideValueUSD = BIGDECIMAL_ZERO;
     protocol.uncollectedSupplySideValueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;

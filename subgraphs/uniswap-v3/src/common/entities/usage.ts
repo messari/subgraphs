@@ -18,6 +18,7 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
     usageMetrics.protocol = NetworkConfigs.getFactoryAddress();
 
+    usageMetrics.days = INT_ZERO;
     usageMetrics.dailyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.dailyTransactionCount = INT_ZERO;
@@ -47,6 +48,7 @@ export function getOrCreateUsageMetricHourlySnapshot(
     usageMetrics = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
     usageMetrics.protocol = NetworkConfigs.getFactoryAddress();
 
+    usageMetrics.hours = INT_ZERO;
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.hourlyTransactionCount = INT_ZERO;
