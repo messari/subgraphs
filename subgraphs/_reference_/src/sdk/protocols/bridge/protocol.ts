@@ -25,7 +25,7 @@ import { SDK } from ".";
  */
 export class Bridge {
   protocol: BridgeProtocolSchema;
-  event: ethereum.Event;
+  block: ethereum.Block;
   pricer: TokenPricer;
   snapshoter: ProtocolSnapshot;
   sdk: SDK | null = null;
@@ -36,12 +36,12 @@ export class Bridge {
   private constructor(
     protocol: BridgeProtocolSchema,
     pricer: TokenPricer,
-    event: ethereum.Event
+    block: ethereum.Block
   ) {
     this.protocol = protocol;
-    this.event = event;
+    this.block = block;
     this.pricer = pricer;
-    this.snapshoter = new ProtocolSnapshot(protocol, event);
+    this.snapshoter = new ProtocolSnapshot(protocol, block);
   }
 
   /**
@@ -49,18 +49,18 @@ export class Bridge {
    *
    * @param conf {BridgeConfigurer} An object that implements the BridgeConfigurer interface, to set some of the protocol's properties
    * @param pricer {TokenPricer} An object that implements the TokenPricer interface, to allow the wrapper to access pricing data
-   * @param event {ethereum.Event} The event being handled at a time.
+   * @param block {ethereum.Block} The block being handled at a time.
    * @returns Bridge
    */
   static load(
     conf: BridgeConfigurer,
     pricer: TokenPricer,
-    event: ethereum.Event
+    block: ethereum.Block
   ): Bridge {
     const id = Address.fromString(conf.getID());
     let protocol = BridgeProtocolSchema.load(id);
     if (protocol) {
-      const proto = new Bridge(protocol, pricer, event);
+      const proto = new Bridge(protocol, pricer, block);
       proto.setVersions(conf.getVersions());
       return proto;
     }
@@ -99,7 +99,7 @@ export class Bridge {
     protocol.totalWrappedRouteCount = 0;
     protocol.totalSupportedTokenCount = 0;
 
-    const proto = new Bridge(protocol, pricer, event);
+    const proto = new Bridge(protocol, pricer, block);
     proto.setVersions(conf.getVersions());
     return proto;
   }
@@ -146,10 +146,10 @@ export class Bridge {
 
   /**
    *
-   * @returns {ethereum.Event} the event currently being handled.
+   * @returns {ethereum.Block} the block currently being handled.
    */
-  getCurrentEvent(): ethereum.Event {
-    return this.event;
+  getCurrentBlock(): ethereum.Block {
+    return this.block;
   }
 
   /**

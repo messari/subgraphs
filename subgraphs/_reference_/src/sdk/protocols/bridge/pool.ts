@@ -24,13 +24,17 @@ import {
   RewardTokenType,
 } from "../../util/constants";
 import { exponentToBigDecimal } from "../../util/numbers";
-import { sortArrayByReference, sortBytesArray, updateArrayAtIndex } from "../../util/arrays";
+import {
+  sortArrayByReference,
+  sortBytesArray,
+  updateArrayAtIndex,
+} from "../../util/arrays";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import { SDK } from ".";
 
 type onCreatePoolCallback<T> = (
-  event: ethereum.Event,
+  event: ethereum.Block,
   pool: Pool,
   sdk: SDK,
   aux: T | null
@@ -61,7 +65,7 @@ export class PoolManager {
     const pool = new Pool(this.protocol, entity, this.tokens);
     pool.isInitialized = false;
     if (onCreate) {
-      onCreate(this.protocol.getCurrentEvent(), pool, this.protocol.sdk!, aux);
+      onCreate(this.protocol.getCurrentBlock(), pool, this.protocol.sdk!, aux);
     }
     return pool;
   }
@@ -79,7 +83,7 @@ export class Pool {
     this.pool = pool;
     this.protocol = protocol;
     this.tokens = tokens;
-    this.snapshoter = new PoolSnapshot(pool, protocol.event);
+    this.snapshoter = new PoolSnapshot(pool, protocol.block);
   }
 
   private save(): void {
@@ -102,15 +106,15 @@ export class Pool {
       return;
     }
 
-    const event = this.protocol.getCurrentEvent();
+    const block = this.protocol.getCurrentBlock();
     this.pool.name = name;
     this.pool.symbol = symbol;
     this.pool.type = type;
     this.pool.inputToken = inputToken.id;
     this.pool.destinationTokens = [];
     this.pool.routes = [];
-    this.pool.createdTimestamp = event.block.timestamp;
-    this.pool.createdBlockNumber = event.block.number;
+    this.pool.createdTimestamp = block.timestamp;
+    this.pool.createdBlockNumber = block.number;
 
     if (type == BridgePoolType.BURN_MINT) {
       this.pool.mintSupply = BIGINT_ZERO;
@@ -192,7 +196,7 @@ export class Pool {
       return;
     }
 
-    const event = this.protocol.getCurrentEvent();
+    const block = this.protocol.getCurrentBlock();
     const id = this.routeIDFromCrosschainToken(token);
     route = new PoolRoute(id);
     route.pool = this.pool.id;
@@ -204,8 +208,8 @@ export class Pool {
     route.cumulativeVolumeOut = BIGINT_ZERO;
     route.cumulativeVolumeInUSD = BIGDECIMAL_ZERO;
     route.cumulativeVolumeOutUSD = BIGDECIMAL_ZERO;
-    route.createdTimestamp = event.block.timestamp;
-    route.createdBlockNumber = event.block.number;
+    route.createdTimestamp = block.timestamp;
+    route.createdBlockNumber = block.number;
     route.save();
     this.addRouteAndCrossToken(route, token);
   }

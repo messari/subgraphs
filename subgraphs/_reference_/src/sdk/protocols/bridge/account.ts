@@ -17,16 +17,31 @@ import { getUnixDays, getUnixHours } from "../../util/events";
 export class AccountManager {
   protocol: Bridge;
   tokens: TokenManager;
+  transaction: ethereum.Transaction;
+  logIndex: BigInt;
 
-  constructor(protocol: Bridge, tokens: TokenManager) {
+  constructor(
+    protocol: Bridge,
+    tokens: TokenManager,
+    transaction: ethereum.Transaction,
+    logIndex: BigInt
+  ) {
     this.protocol = protocol;
     this.tokens = tokens;
+    this.transaction = transaction;
+    this.logIndex = logIndex;
   }
 
   loadAccount(address: Address): Account {
     let acc = AccountSchema.load(address);
     if (acc) {
-      return new Account(this.protocol, acc, this.tokens);
+      return new Account(
+        this.protocol,
+        acc,
+        this.tokens,
+        this.transaction,
+        this.logIndex
+      );
     }
 
     acc = new AccountSchema(address);
@@ -41,7 +56,13 @@ export class AccountManager {
 
     this.protocol.addUser();
 
-    return new Account(this.protocol, acc, this.tokens);
+    return new Account(
+      this.protocol,
+      acc,
+      this.tokens,
+      this.transaction,
+      this.logIndex
+    );
   }
 }
 
@@ -60,15 +81,25 @@ export class AccountWasActive {
 
 export class Account {
   account: AccountSchema;
-  event: ethereum.Event;
   protocol: Bridge;
   tokens: TokenManager;
+  block: ethereum.Block;
+  transaction: ethereum.Transaction;
+  logIndex: BigInt;
 
-  constructor(protocol: Bridge, account: AccountSchema, tokens: TokenManager) {
+  constructor(
+    protocol: Bridge,
+    account: AccountSchema,
+    tokens: TokenManager,
+    transaction: ethereum.Transaction,
+    logIndex: BigInt
+  ) {
     this.account = account;
     this.protocol = protocol;
-    this.event = protocol.getCurrentEvent();
     this.tokens = tokens;
+    this.block = protocol.getCurrentBlock();
+    this.transaction = transaction;
+    this.logIndex = logIndex;
   }
 
   private isActiveByActivityID(id: string): boolean {
@@ -82,8 +113,8 @@ export class Account {
   }
 
   private trackActivity(activityType: ActivityType): void {
-    const days = getUnixDays(this.event);
-    const hours = getUnixHours(this.event);
+    const days = getUnixDays(this.block);
+    const hours = getUnixHours(this.block);
 
     const generalHourlyID = `${this.account.id.toHexString()}-hourly-${hours}`;
     const generalDailyID = `${this.account.id.toHexString()}-daily-${days}`;
@@ -253,12 +284,12 @@ export class Account {
   }
 
   private transferBoilerplate(): BridgeTransfer {
-    const id = idFromEvent(this.event);
+    const id = idFromEvent(this.transaction, this.logIndex);
     const transfer = new BridgeTransfer(id);
-    transfer.hash = this.event.transaction.hash;
-    transfer.logIndex = this.event.logIndex.toI32();
-    transfer.blockNumber = this.event.block.number;
-    transfer.timestamp = this.event.block.timestamp;
+    transfer.hash = this.transaction.hash;
+    transfer.logIndex = this.logIndex.toI32();
+    transfer.blockNumber = this.block.number;
+    transfer.timestamp = this.block.timestamp;
 
     transfer.protocol = this.protocol.getBytesID();
     transfer.account = this.account.id;
@@ -283,11 +314,12 @@ export class Account {
       Address.fromBytes(_pool.inputToken)
     );
 
-    const deposit = new LiquidityDeposit(idFromEvent(this.event));
-    deposit.hash = this.event.transaction.hash;
-    deposit.logIndex = this.event.logIndex.toI32();
-    deposit.blockNumber = this.event.block.number;
-    deposit.timestamp = this.event.block.timestamp;
+    const id = idFromEvent(this.transaction, this.logIndex);
+    const deposit = new LiquidityDeposit(id);
+    deposit.hash = this.transaction.hash;
+    deposit.logIndex = this.logIndex.toI32();
+    deposit.blockNumber = this.block.number;
+    deposit.timestamp = this.block.timestamp;
     deposit.protocol = this.protocol.getBytesID();
     deposit.account = this.account.id;
 
@@ -326,11 +358,12 @@ export class Account {
       Address.fromBytes(_pool.inputToken)
     );
 
-    const withdraw = new LiquidityWithdraw(idFromEvent(this.event));
-    withdraw.hash = this.event.transaction.hash;
-    withdraw.logIndex = this.event.logIndex.toI32();
-    withdraw.blockNumber = this.event.block.number;
-    withdraw.timestamp = this.event.block.timestamp;
+    const id = idFromEvent(this.transaction, this.logIndex);
+    const withdraw = new LiquidityWithdraw(id);
+    withdraw.hash = this.transaction.hash;
+    withdraw.logIndex = this.logIndex.toI32();
+    withdraw.blockNumber = this.block.number;
+    withdraw.timestamp = this.block.timestamp;
     withdraw.protocol = this.protocol.getBytesID();
     withdraw.account = this.account.id;
 
@@ -406,8 +439,11 @@ export class Account {
   }
 }
 
-function idFromEvent(event: ethereum.Event): Bytes {
-  return event.transaction.hash.concatI32(event.logIndex.toI32());
+function idFromEvent(
+  transaction: ethereum.Transaction,
+  logIndex: BigInt
+): Bytes {
+  return transaction.hash.concatI32(logIndex.toI32());
 }
 
 function inferTransferType(
