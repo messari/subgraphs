@@ -50,12 +50,24 @@ class TokenInit implements TokenInitializer {
 export function handleTransferFromL1Completed(
 	event: TransferFromL1Completed
 ): void {
-	const bridgeConfig = NetworkConfigs.getBridgeConfig(
+	const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
 		event.address.toHexString()
 	)
+	const poolAddress = NetworkConfigs.getPoolAddressFromBridgeAddress(
+		event.address.toHexString()
+	)
+	const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
+	const poolConfig = NetworkConfigs.getPoolDetails(inputToken)
+
+	const fee = bigIntToBigDecimal(event.params.relayerFee)
+
+	const poolName = poolConfig[0]
+	const poolSymbol = poolConfig[1]
+
 	const bridgeAddress = bridgeConfig[0]
 	const bridgeName = bridgeConfig[1]
 	const bridgeSlug = bridgeConfig[2]
+
 	const conf = new BridgeConfig(
 		bridgeAddress,
 		bridgeName,
@@ -63,7 +75,32 @@ export function handleTransferFromL1Completed(
 		BridgePermissionType.PERMISSIONLESS,
 		Versions
 	)
+
 	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+
+	const acc = sdk.Accounts.loadAccount(event.params.recipient)
+	const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+	const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
+
+	if (!pool.isInitialized) {
+		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+	}
+	const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
+		BigInt.fromString('0'),
+		Address.fromString(inputToken),
+		CrosschainTokenType.CANONICAL,
+		Address.fromString(inputToken)
+	)
+
+	pool.addDestinationToken(crossToken)
+	pool.addProtocolSideRevenueUSD(fee)
+
+	acc.transferOut(
+		pool,
+		pool.getDestinationTokenRoute(crossToken)!,
+		event.params.recipient,
+		event.params.amount
+	)
 }
 
 export function handleUnstake(event: Unstake): void {
@@ -119,6 +156,7 @@ export function handleBonderAdded(event: BonderAdded): void {
 	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 	sdk.Accounts.loadAccount(event.params.newBonder)
 }
+
 export function handleTransferSent(event: TransferSent): void {
 	const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
 		event.address.toHexString()
@@ -148,6 +186,7 @@ export function handleTransferSent(event: TransferSent): void {
 	const acc = sdk.Accounts.loadAccount(event.params.recipient)
 	const pool = sdk.Pools.loadPool<string>(event.address)
 	const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
+
 	if (!pool.isInitialized) {
 		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 	}

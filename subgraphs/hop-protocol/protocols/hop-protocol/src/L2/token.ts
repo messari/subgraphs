@@ -40,11 +40,19 @@ class TokenInit implements TokenInitializer {
 }
 
 export function handleTransfer(event: Transfer): void {
+	const ammAddress = NetworkConfigs.getAmmAddress(event.address.toHexString())
+	if (
+		!(
+			event.params.to.equals(Address.fromHexString(ammAddress)) ||
+			event.params.from.equals(Address.fromHexString(ammAddress))
+		)
+	) {
+		return
+	}
+
 	const bridgeConfig = NetworkConfigs.getBridgeConfig(
 		event.address.toHexString()
 	)
-
-	const ammAddress = NetworkConfigs.getAmmAddress(event.address.toHexString())
 
 	const bridgeAddress = bridgeConfig[0]
 	const bridgeName = bridgeConfig[1]
@@ -57,15 +65,6 @@ export function handleTransfer(event: Transfer): void {
 		BridgePermissionType.PERMISSIONLESS,
 		Versions
 	)
-
-	if (
-		!(
-			event.params.to.equals(Address.fromHexString(ammAddress)) ||
-			event.params.from.equals(Address.fromHexString(ammAddress))
-		)
-	) {
-		return
-	}
 
 	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 

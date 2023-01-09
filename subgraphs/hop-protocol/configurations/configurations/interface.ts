@@ -7,4 +7,5 @@ export interface Configurations {
 	getPoolDetails(poolAddress: string): string[]
 	getTokenAddressFromPoolAddress(poolAddress: string): string
 	getTokenAddressFromBridgeAddress(bridgeAddress: string): string
+	getPoolAddressFromBridgeAddress(bridgeAddress: string): string
 }
