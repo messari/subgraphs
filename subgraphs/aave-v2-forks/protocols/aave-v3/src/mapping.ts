@@ -91,7 +91,8 @@ import {
   LendingPoolAddressesProvider,
   LendingPoolConfigurator,
 } from "../../../generated/templates";
-import { IPriceOracleGetter } from "../../../generated/RewardsController/IPriceOracleGetter";
+import { AaveOracle } from "../../../generated/templates/LendingPool/AaveOracle";
+import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
@@ -158,7 +159,7 @@ export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
   const assetToken = Token.load(assetAddress);
   if (!assetToken || !assetToken._market) {
     log.error(
-      "[handleAssetConfigUpdated]Failed to find token {} or no _market",
+      "[handleAssetConfigUpdated]Failed to find token {} or no assetToken._market is null",
       [assetAddress]
     );
     return;
@@ -173,8 +174,8 @@ export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
     return;
   }
 
-  // There can be more than one reward tokens
-  // for any side, e.g. one reward token for variable borrowing
+  // There can be more than one reward tokens for a side,
+  // e.g. one reward token for variable borrowing
   // and another for stable borrowing
   let rewardTokenType: string;
   let interestRateType: string;
@@ -281,10 +282,9 @@ export function handleReserveActive(event: ReserveActive): void {
 export function handleReserveBorrowing(event: ReserveBorrowing): void {
   const marketId = getMarketIdFromToken(event.params.asset);
   if (!marketId) {
-    log.error(
-      "[handleCollateralConfigurationChanged]Failed to find market for asset {}",
-      [event.params.asset.toHexString()]
-    );
+    log.error("[handleReserveBorrowing]Failed to find market for asset {}", [
+      event.params.asset.toHexString(),
+    ]);
     return;
   }
   if (event.params.enabled) {
@@ -297,10 +297,9 @@ export function handleReserveBorrowing(event: ReserveBorrowing): void {
 export function handleReserveFrozen(event: ReserveFrozen): void {
   const marketId = getMarketIdFromToken(event.params.asset);
   if (!marketId) {
-    log.error(
-      "[handleCollateralConfigurationChanged]Failed to find market for asset {}",
-      [event.params.asset.toHexString()]
-    );
+    log.error("[handleReserveFrozen]Failed to find market for asset {}", [
+      event.params.asset.toHexString(),
+    ]);
     return;
   }
   _handleReserveDeactivated(marketId, protocolData);
@@ -309,10 +308,9 @@ export function handleReserveFrozen(event: ReserveFrozen): void {
 export function handleReservePaused(event: ReservePaused): void {
   const marketId = getMarketIdFromToken(event.params.asset);
   if (!marketId) {
-    log.error(
-      "[handleCollateralConfigurationChanged]Failed to find market for asset {}",
-      [event.params.asset.toHexString()]
-    );
+    log.error("[handleReservePaused]Failed to find market for asset {}", [
+      event.params.asset.toHexString(),
+    ]);
     return;
   }
   _handleReserveDeactivated(marketId, protocolData);
@@ -322,7 +320,7 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
   const marketId = getMarketIdFromToken(event.params.asset);
   if (!marketId) {
     log.error(
-      "[handleCollateralConfigurationChanged]Failed to find market for asset {}",
+      "[handleReserveFactorChanged]Failed to find market for asset {}",
       [event.params.asset.toHexString()]
     );
     return;
@@ -337,7 +335,6 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 ///// Lending Pool Handlers /////
 /////////////////////////////////
-
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   const protocol = getOrCreateLendingProtocol(protocolData);
   const marketId = getMarketIdFromToken(event.params.reserve);
@@ -557,8 +554,31 @@ export function handleStableTransfer(event: StableTransfer): void {
 ///////////////////
 ///// Helpers /////
 ///////////////////
-
 function getAssetPriceInUSDC(
+  tokenAddress: Address,
+  priceOracle: Address,
+  blockNumber: BigInt
+): BigDecimal {
+  const oracle = AaveOracle.bind(priceOracle);
+  const priceDecimals = readValue<BigInt>(
+    oracle.try_BASE_CURRENCY_UNIT(),
+    BigInt.fromI32(10 ** AAVE_DECIMALS)
+  ).toI32();
+
+  const oracleResult = readValue<BigInt>(
+    oracle.try_getAssetPrice(tokenAddress),
+    BIGINT_ZERO
+  );
+
+  if (oracleResult.gt(BIGINT_ZERO)) {
+    return oracleResult.toBigDecimal().div(exponentToBigDecimal(priceDecimals));
+  }
+
+  // fall back to query price oracle using aave-v2
+  return getAssetPriceInUSDCv2(tokenAddress, priceOracle, blockNumber);
+}
+
+function getAssetPriceInUSDCv2(
   tokenAddress: Address,
   priceOracle: Address,
   blockNumber: BigInt
@@ -618,25 +638,18 @@ function getAssetPriceInUSDC(
     }
   }
 
-  // Avalanche Oracle return the price offset by 8 decimals
-  if (equalsIgnoreCase(dataSource.network(), Network.AVALANCHE)) {
-    return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
-  }
-
-  // last resort, should not be touched
-  const inputToken = getOrCreateToken(tokenAddress);
-  return oracleResult
-    .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken.decimals));
+  // Oracle return the price scaled up by 1e8
+  return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
 }
 
 function getMarketIdFromToken(token: Address): Address | null {
   const tokenAddress = token.toHexString();
   const tokenEntity = Token.load(tokenAddress);
   if (!tokenEntity || !tokenEntity._market) {
-    log.error("[getMarketIdFromToken]token {} not exist or _market = null", [
-      tokenAddress,
-    ]);
+    log.error(
+      "[getMarketIdFromToken]token {} not exist or token._market = null",
+      [tokenAddress]
+    );
     return null;
   }
   const marketId = Address.fromString(tokenEntity._market!);

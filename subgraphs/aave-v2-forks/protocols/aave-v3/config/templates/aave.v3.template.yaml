@@ -120,10 +120,8 @@ templates:
           file: ./abis/aave-v3/LendingPoolAddressesProvider.json
         - name: AaveOracle
           file: ./abis/aave-v3/AaveOracle.json
-        - name: UniswapV3Pool
-          file: ./abis/aave-v3/UniswapV3Pool.json
-        - name: UniswapV3Factory
-          file: ./abis/aave-v3/UniswapV3Factory.json
+        - name: IPriceOracleGetter
+          file: ./abis/IPriceOracleGetter.json
       eventHandlers:
         - event: PriceOracleUpdated(indexed address,indexed address)
           handler: handlePriceOracleUpdated
@@ -151,10 +149,6 @@ templates:
           file: ./abis/ERC20SymbolBytes.json
         - name: AaveOracle
           file: ./abis/aave-v3/AaveOracle.json
-        - name: UniswapV3Pool
-          file: ./abis/aave-v3/UniswapV3Pool.json
-        - name: UniswapV3Factory
-          file: ./abis/aave-v3/UniswapV3Factory.json
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
         - name: AToken
