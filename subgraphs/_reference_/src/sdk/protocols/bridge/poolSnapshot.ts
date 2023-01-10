@@ -1,4 +1,5 @@
-import { ethereum, Bytes } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
+import { CustomEventType } from ".";
 import {
   Pool as PoolSchema,
   PoolDailySnapshot,
@@ -10,11 +11,11 @@ import { SECONDS_PER_DAY_BI, SECONDS_PER_HOUR_BI } from "../../util/constants";
 
 export class PoolSnapshot {
   pool: PoolSchema;
-  block: ethereum.Block;
+  event: CustomEventType;
 
-  constructor(pool: PoolSchema, block: ethereum.Block) {
+  constructor(pool: PoolSchema, event: CustomEventType) {
     this.pool = pool;
-    this.block = block;
+    this.event = event;
     this.takeSnapshots();
   }
 
@@ -26,14 +27,14 @@ export class PoolSnapshot {
     if (
       this.pool
         ._lastDailySnapshotTimestamp!.plus(SECONDS_PER_DAY_BI)
-        .lt(this.block.timestamp)
+        .lt(this.event.block.timestamp)
     ) {
       this.takeDailySnapshot();
     }
     if (
       this.pool
         ._lastHourlySnapshotTimestamp!.plus(SECONDS_PER_HOUR_BI)
-        .lt(this.block.timestamp)
+        .lt(this.event.block.timestamp)
     ) {
       this.takeHourlySnapshot();
     }
@@ -47,9 +48,9 @@ export class PoolSnapshot {
   }
 
   private takeHourlySnapshot(): void {
-    const block = this.block;
+    const event = this.event;
     const pool = this.pool;
-    const hour = block.timestamp.div(SECONDS_PER_HOUR_BI).toI32();
+    const hour = event.block.timestamp.div(SECONDS_PER_HOUR_BI).toI32();
     const previousHour = pool
       ._lastHourlySnapshotTimestamp!.div(SECONDS_PER_HOUR_BI)
       .toI32();
@@ -60,8 +61,8 @@ export class PoolSnapshot {
     snapshot.hour = hour;
     snapshot.protocol = pool.protocol;
     snapshot.pool = pool.id;
-    snapshot.timestamp = block.timestamp;
-    snapshot.blockNumber = block.number;
+    snapshot.timestamp = event.block.timestamp;
+    snapshot.blockNumber = event.block.number;
 
     // tvl and balances
     snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -77,7 +78,7 @@ export class PoolSnapshot {
     const routeSnapshots = new Array<Bytes>();
     for (let i = 0; i < pool.routes.length; i++) {
       routeSnapshots.push(
-        this.takeRouteSnapshot(block, snapshot.id, pool.routes[i], previousID)
+        this.takeRouteSnapshot(event, snapshot.id, pool.routes[i], previousID)
       );
     }
     snapshot.routes = routeSnapshots;
@@ -153,14 +154,14 @@ export class PoolSnapshot {
     snapshot.netHourlyVolumeUSD = netVolumeUSDDelta;
     snapshot.save();
 
-    pool._lastHourlySnapshotTimestamp = block.timestamp;
+    pool._lastHourlySnapshotTimestamp = event.block.timestamp;
     pool.save();
   }
 
   private takeDailySnapshot(): void {
-    const block = this.block;
+    const event = this.event;
     const pool = this.pool;
-    const day = block.timestamp.div(SECONDS_PER_DAY_BI).toI32();
+    const day = event.block.timestamp.div(SECONDS_PER_DAY_BI).toI32();
     const previousDay = pool
       ._lastDailySnapshotTimestamp!.div(SECONDS_PER_DAY_BI)
       .toI32();
@@ -171,8 +172,8 @@ export class PoolSnapshot {
     snapshot.day = day;
     snapshot.protocol = pool.protocol;
     snapshot.pool = pool.id;
-    snapshot.timestamp = block.timestamp;
-    snapshot.blockNumber = block.number;
+    snapshot.timestamp = event.block.timestamp;
+    snapshot.blockNumber = event.block.number;
 
     // tvl and balances
     snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -188,7 +189,7 @@ export class PoolSnapshot {
     const routeSnapshots = new Array<Bytes>();
     for (let i = 0; i < pool.routes.length; i++) {
       routeSnapshots.push(
-        this.takeRouteSnapshot(block, snapshot.id, pool.routes[i], previousID)
+        this.takeRouteSnapshot(event, snapshot.id, pool.routes[i], previousID)
       );
     }
     snapshot.routes = routeSnapshots;
@@ -264,12 +265,12 @@ export class PoolSnapshot {
     snapshot.netDailyVolumeUSD = netVolumeUSDDelta;
     snapshot.save();
 
-    pool._lastDailySnapshotTimestamp = block.timestamp;
+    pool._lastDailySnapshotTimestamp = event.block.timestamp;
     pool.save();
   }
 
   private takeRouteSnapshot(
-    block: ethereum.Block,
+    event: CustomEventType,
     snapshotID: Bytes,
     routeId: Bytes,
     previousSnapshotID: Bytes
@@ -278,8 +279,8 @@ export class PoolSnapshot {
     const id = poolRouteSnapshotID(routeId, snapshotID);
     const snapshot = new PoolRouteSnapshot(id);
     snapshot.poolRoute = routeId;
-    snapshot.timestamp = block.timestamp;
-    snapshot.blockNumber = block.number;
+    snapshot.timestamp = event.block.timestamp;
+    snapshot.blockNumber = event.block.number;
     snapshot.cumulativeVolumeIn = route.cumulativeVolumeIn;
     snapshot.cumulativeVolumeInUSD = route.cumulativeVolumeInUSD;
     snapshot.cumulativeVolumeOut = route.cumulativeVolumeOut;

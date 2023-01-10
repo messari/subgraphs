@@ -46,16 +46,11 @@ export class SDK {
     config: BridgeConfigurer,
     pricer: TokenPricer,
     tokenInitializer: TokenInitializer,
-    params: CustomEventType
+    event: CustomEventType
   ) {
-    this.Protocol = Bridge.load(config, pricer, params.block);
+    this.Protocol = Bridge.load(config, pricer, event);
     this.Tokens = new TokenManager(this.Protocol, tokenInitializer);
-    this.Accounts = new AccountManager(
-      this.Protocol,
-      this.Tokens,
-      params.transaction,
-      params.logIndex
-    );
+    this.Accounts = new AccountManager(this.Protocol, this.Tokens);
     this.Pools = new PoolManager(this.Protocol, this.Tokens);
     this.Pricer = pricer;
 
