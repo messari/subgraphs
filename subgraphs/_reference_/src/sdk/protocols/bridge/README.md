@@ -17,12 +17,15 @@ The library is initialized via a single constructor and a single import:
 ```typescript
 import { SDK } from "./sdk/protocols/bridge";
 
-const sdk = new SDK(conf, pricer, tokenInit, event);
+const sdk = SDK.initialize(conf, pricer, tokenInit, event);
+
+// ALSO accepts ethereum.Call
+// const sdk = SDK.initialize(conf, pricer, tokenInit, call);
 ```
 
 Where:
 
-- `event` is the event being handled by the handler making use of the SDK
+- `event`/`call` is the event/function being handled by the handler making use of the SDK
 - `conf` should be an implementation of `BridgeConfigurer`. For convenience you can find an implementation that you can import directly at `./sdk/protocols/bridge/config`
 - `pricer` should be an implementation of `TokenPricer`, found at `./sdk/protocols/config`. It allows the library to automatically calculate prices internally. Implementing it yourself allows you to use any pricing source you'd need.
 - `tokenInit` should be an implementation of `./sdk/protocols/bridge/tokens:TokenInitializer`. It is used to populate the `Token` entity for the first time, and was decided to require it to be implemented to avoid the library depending on ABIs and to give some flexibility in case we need to deal with non-compliant ERC20 tokens.
@@ -52,7 +55,7 @@ Here's the interface for your reference, refer to the jsdoc for more details:
 interface Protocol {
   getID(): string;
   getBytesID(): string;
-  getCurrentEvent(): ethereum.Event;
+  getCurrentEvent(): CustomEventType;
   getTokenPricer(): TokenPricer;
   getCurrentChainID(): BigInt;
   setTotalValueLocked(tvl: BigDecimal): void;
@@ -157,7 +160,7 @@ import { SDK, Pool } from "./sdk/protocols/bridge";
 type PoolType = string;
 
 export function handlePoolCreated(event: PoolCreated): void {
-  const sdk = new SDK(conf, pricer, tokenInit, event);
+  const sdk = SDK.initialize(conf, pricer, tokenInit, event);
 
   const id = event.params.poolAddress;
   const aux: PoolType =
@@ -324,7 +327,7 @@ const conf = new BridgeConfig(
 );
 
 export function handleTransferOut(event: TransferOut): void {
-  const sdk = new SDK(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
   const poolID = event.address;
   const pool = sdk.Pools.loadPool(
@@ -368,7 +371,7 @@ function onCreatePool(
 const rewardTokenAddress = "0x0.....";
 
 export function handlePoolRewardsUpdated(event: PoolRewardsUpdated): void {
-  const sdk = new SDK(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
   const pool = sdk.Pools.loadPool(event.params.poolAddress);
   const rewardToken = sdk.Tokens.getOrCreateToken(rewardTokenAddress);
