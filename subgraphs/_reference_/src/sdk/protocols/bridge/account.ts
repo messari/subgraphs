@@ -61,15 +61,15 @@ export class AccountWasActive {
 
 export class Account {
   account: AccountSchema;
-  protocol: Bridge;
   event: CustomEventType;
+  protocol: Bridge;
   tokens: TokenManager;
 
   constructor(protocol: Bridge, account: AccountSchema, tokens: TokenManager) {
     this.account = account;
     this.protocol = protocol;
-    this.tokens = tokens;
     this.event = protocol.getCurrentEvent();
+    this.tokens = tokens;
   }
 
   private isActiveByActivityID(id: string): boolean {

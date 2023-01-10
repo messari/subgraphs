@@ -1,4 +1,4 @@
-import { ethereum, Bytes } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
 import { AccountWasActive } from "./account";
 import {
   BridgeProtocol as BridgeProtocolSchema,
@@ -101,15 +101,15 @@ export class ProtocolSnapshot {
 
   private takeFinancialsDailySnapshot(): void {
     const helper = this.helper;
-    const block = this.event.block;
+    const event = this.event;
     const protocol = this.protocol;
-    const day = block.timestamp.div(SECONDS_PER_DAY_BI).toI32();
+    const day = event.block.timestamp.div(SECONDS_PER_DAY_BI).toI32();
 
     const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
     snapshot.protocol = protocol.id;
     snapshot.day = day;
-    snapshot.blockNumber = block.number;
-    snapshot.timestamp = block.timestamp;
+    snapshot.blockNumber = event.block.number;
+    snapshot.timestamp = event.block.timestamp;
 
     // tvl
     snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
@@ -166,7 +166,7 @@ export class ProtocolSnapshot {
     snapshot.dailyNetVolumeUSD = netVolumeDelta;
     snapshot.save();
 
-    helper.lastDailyFinancialsTimestamp = block.timestamp;
+    helper.lastDailyFinancialsTimestamp = event.block.timestamp;
     helper.lastDailyFinancialsSnapshot = snapshot.id;
     helper.save();
   }
@@ -174,15 +174,15 @@ export class ProtocolSnapshot {
   private takeUsageDailySnapshot(): void {
     const helper = this.helper;
     const activity = this.activityHelper;
-    const block = this.event.block;
+    const event = this.event;
     const protocol = this.protocol;
-    const day = block.timestamp.div(SECONDS_PER_DAY_BI).toI32();
+    const day = event.block.timestamp.div(SECONDS_PER_DAY_BI).toI32();
 
     const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
     snapshot.protocol = protocol.id;
     snapshot.day = day;
-    snapshot.blockNumber = block.number;
-    snapshot.timestamp = block.timestamp;
+    snapshot.blockNumber = event.block.number;
+    snapshot.timestamp = event.block.timestamp;
 
     // unique users
     snapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
@@ -265,7 +265,7 @@ export class ProtocolSnapshot {
     snapshot.dailyMessageReceivedCount = messageReceivedDelta;
     snapshot.save();
 
-    helper.lastDailyUsageTimestamp = block.timestamp;
+    helper.lastDailyUsageTimestamp = event.block.timestamp;
     helper.lastDailyUsageSnapshot = snapshot.id;
     helper.save();
     activity.dailyActiveUsers = 0;
@@ -279,15 +279,15 @@ export class ProtocolSnapshot {
   private takeUsageHourlySnapshot(): void {
     const helper = this.helper;
     const activity = this.activityHelper;
-    const block = this.event.block;
+    const event = this.event;
     const protocol = this.protocol;
-    const hour = block.timestamp.div(SECONDS_PER_HOUR_BI).toI32();
+    const hour = event.block.timestamp.div(SECONDS_PER_HOUR_BI).toI32();
 
     const snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
     snapshot.protocol = protocol.id;
     snapshot.hour = hour;
-    snapshot.blockNumber = block.number;
-    snapshot.timestamp = block.timestamp;
+    snapshot.blockNumber = event.block.number;
+    snapshot.timestamp = event.block.timestamp;
 
     // unique users
     snapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
@@ -363,7 +363,7 @@ export class ProtocolSnapshot {
     snapshot.hourlyMessageReceivedCount = messageReceivedDelta;
     snapshot.save();
 
-    helper.lastHourlyUsageTimestamp = block.timestamp;
+    helper.lastHourlyUsageTimestamp = event.block.timestamp;
     helper.lastHourlyUsageSnapshot = snapshot.id;
     helper.save();
     activity.hourlyActiveUsers = 0;

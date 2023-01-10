@@ -8,7 +8,6 @@ import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
 import { TransactionType } from "./enums";
 import {
-  ethereum,
   dataSource,
   Address,
   Bytes,
@@ -49,7 +48,7 @@ export class Bridge {
    *
    * @param conf {BridgeConfigurer} An object that implements the BridgeConfigurer interface, to set some of the protocol's properties
    * @param pricer {TokenPricer} An object that implements the TokenPricer interface, to allow the wrapper to access pricing data
-   * @param block {ethereum.Block} The block being handled at a time.
+   * @param event {CustomEventType} The event being handled at a time.
    * @returns Bridge
    */
   static load(
@@ -146,7 +145,7 @@ export class Bridge {
 
   /**
    *
-   * @returns {ethereum.Block} the block currently being handled.
+   * @returns {CustomEventType} the event currently being handled.
    */
   getCurrentEvent(): CustomEventType {
     return this.event;
