@@ -52,7 +52,7 @@ import {
 export function createDeposit(
   event: ethereum.Event,
   market: Market,
-  asset: Address,
+  asset: Token,
   amount: BigInt,
   amountUSD: BigDecimal,
   sender: Address
@@ -81,7 +81,7 @@ export function createDeposit(
   deposit.account = account.id;
   deposit.market = market.id;
   deposit.position = position.id;
-  deposit.asset = asset.toHexString();
+  deposit.asset = asset.id;
   deposit.amount = amount;
   deposit.amountUSD = amountUSD;
   deposit.save();
@@ -94,13 +94,14 @@ export function createDeposit(
 export function createWithdraw(
   event: ethereum.Event,
   market: Market,
-  amountETH: BigInt,
+  asset: Token,
+  amountToken: BigInt,
   amountUSD: BigDecimal,
   user: Address,
   recipient: Address
 ): void {
-  if (amountETH.le(BIGINT_ZERO)) {
-    log.critical("Invalid withdraw amount: {}", [amountETH.toString()]);
+  if (amountToken.le(BIGINT_ZERO)) {
+    log.critical("Invalid withdraw amount: {}", [amountToken.toString()]);
   }
   const account = getOrCreateAccount(recipient);
   const position = getOrCreateUserPosition(
@@ -123,8 +124,8 @@ export function createWithdraw(
   withdraw.account = account.id;
   withdraw.market = market.id;
   withdraw.position = position.id;
-  withdraw.asset = getETHToken().id;
-  withdraw.amount = amountETH;
+  withdraw.asset = asset.id;
+  withdraw.amount = amountToken;
   withdraw.amountUSD = amountUSD;
   withdraw.save();
   addMarketWithdrawVolume(event, amountUSD, market);
@@ -135,11 +136,11 @@ export function createWithdraw(
 
 export function createBorrow(
   event: ethereum.Event,
+  market: Market,
   asset: Token,
   amountToken: BigInt,
   amountUSD: BigDecimal,
-  recipient: Address,
-  market: Market
+  recipient: Address
 ): void {
   if (amountToken.le(BIGINT_ZERO)) {
     log.critical("Invalid borrow amount: {}", [amountToken.toString()]);
@@ -177,12 +178,12 @@ export function createBorrow(
 
 export function createRepay(
   event: ethereum.Event,
+  market: Market,
   asset: Token,
   amountToken: BigInt,
   amountUSD: BigDecimal,
   user: Address,
-  repayer: Address,
-  market: Market
+  repayer: Address
 ): void {
   if (amountToken.le(BIGINT_ZERO)) {
     log.critical("Invalid repay amount: {}", [amountToken.toString()]);
@@ -220,13 +221,13 @@ export function createRepay(
 
 export function createLiquidate(
   event: ethereum.Event,
+  market: Market,
   asset: Token,
   amountLiquidated: BigInt,
   amountLiquidatedUSD: BigDecimal,
-  profitUSD: BigDecimal,
   user: Address,
   liquidator: Address,
-  market: Market
+  profitUSD: BigDecimal
 ): void {
   const account = getOrCreateAccount(user);
   const liquidatorAccount = getOrCreateAccount(liquidator);

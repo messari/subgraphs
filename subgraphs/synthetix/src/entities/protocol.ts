@@ -101,8 +101,8 @@ export function getOrCreateFinancialsSnapshot(
 
 export function addProtocolSideRevenue(
   event: ethereum.Event,
-  revenueAmountUSD: BigDecimal,
-  market: Market
+  market: Market,
+  revenueAmountUSD: BigDecimal
 ): void {
   const protocol = getOrCreateProtocol();
   protocol.cumulativeProtocolSideRevenueUSD =

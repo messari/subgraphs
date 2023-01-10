@@ -178,6 +178,7 @@ export function setMarketTokenBalance(
   const netChangeUSD = balanceUSD.minus(market.totalValueLockedUSD);
   market.totalValueLockedUSD = balanceUSD;
   market.totalDepositBalanceUSD = balanceUSD;
+  market.totalBorrowBalanceUSD = balanceUSD;
   market.inputTokenBalance = balance;
   market.inputTokenPriceUSD = getCurrentETHPrice();
   market.save();
