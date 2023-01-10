@@ -139,7 +139,11 @@ export function handleTransferSent(event: TransferSent): void {
 			event.address.toHexString()
 		)
 		const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
-		const poolConfig = NetworkConfigs.getPoolDetails(inputToken)
+		const poolAddress = NetworkConfigs.getPoolAddressFromBridgeAddress(
+			event.address.toHexString()
+		)
+
+		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 
 		const fee = bigIntToBigDecimal(event.params.bonderFee)
 
@@ -161,7 +165,7 @@ export function handleTransferSent(event: TransferSent): void {
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
 		const acc = sdk.Accounts.loadAccount(event.params.recipient)
-		const pool = sdk.Pools.loadPool<string>(Address.fromString(inputToken))
+		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
 
 		if (!pool.isInitialized) {

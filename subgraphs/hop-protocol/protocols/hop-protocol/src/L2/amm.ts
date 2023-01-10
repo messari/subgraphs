@@ -83,7 +83,7 @@ export function handleTokenSwap(event: TokenSwap): void {
 }
 
 export function handleAddLiquidity(event: AddLiquidity): void {
-	if (NetworkConfigs.getAmmList().includes(event.address.toHexString())) {
+	if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
 		let amount = event.params.tokenAmounts
 		let fees = bigIntToBigDecimal(event.params.fees[0])
 		if (amount.length == 0) {
@@ -128,7 +128,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 	}
 }
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
-	if (NetworkConfigs.getAmmList().includes(event.address.toHexString())) {
+	if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
 		let amount = event.params.tokenAmounts
 		if (amount.length == 0) {
 			return
@@ -171,7 +171,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 	}
 }
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
-	if (NetworkConfigs.getAmmList().includes(event.address.toHexString())) {
+	if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
 		let tokenIndex = event.params.boughtId
 		if (!tokenIndex.equals(BigInt.zero())) {
 			return

@@ -2,9 +2,9 @@ import { log } from '@graphprotocol/graph-ts'
 import { Configurations } from '../../../../../configurations/configurations/interface'
 import { Network } from '../../../../../src/sdk/util/constants'
 
-export class HopProtocolArbitrumConfigurations implements Configurations {
+export class HopProtocolOptimismConfigurations implements Configurations {
 	getNetwork(): string {
-		return Network.ARBITRUM_ONE
+		return Network.OPTIMISM
 	}
 	getPoolAddressFromTokenAddress(tokenAddress: string): string {
 		if (

@@ -6,11 +6,35 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 	getNetwork(): string {
 		return Network.MAINNET
 	}
-	getAmmList(): string[] {
+	getPoolsList(): string[] {
 		return []
 	}
-	getAmmAddress(tokenAddress: string): string {
-		return ''
+
+	getPoolAddressFromTokenAddress(tokenAddress: string): string {
+		if (
+			tokenAddress == '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase()
+		) {
+			return '0x10541b07d8Ad2647Dc6cD67abd4c03575dade261'.toLowerCase() //USDC AMM
+		} else if (
+			tokenAddress == '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase()
+		) {
+			return '0xa5A33aB9063395A90CCbEa2D86a62EcCf27B5742'.toLowerCase() //DAI AMM
+		} else if (
+			tokenAddress == '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase()
+		) {
+			return '0x18f7402B673Ba6Fb5EA4B95768aABb8aaD7ef18a'.toLowerCase() //USDT AMM
+		} else if (
+			tokenAddress == '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase()
+		) {
+			return '0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97'.toLowerCase() //ETH AMM
+		} else if (
+			tokenAddress == '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase()
+		) {
+			return '0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase() //WBTC AMM
+		} else {
+			log.critical('Token not found', [])
+			return ''
+		}
 	}
 	getTokenDetails(tokenAddress: string): string[] {
 		if (
