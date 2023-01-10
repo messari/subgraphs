@@ -22,7 +22,6 @@ import {
   addMarketRepayVolume,
   addMarketWithdrawVolume,
 } from "./market";
-import { getETHToken } from "./token";
 import { prefixID } from "../utils/strings";
 import {
   getOrCreateAccount,

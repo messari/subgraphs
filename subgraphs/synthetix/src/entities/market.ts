@@ -23,8 +23,9 @@ import {
   incrementProtocolPositionCount,
   updateProtocolUSDLocked,
 } from "./protocol";
-import { getCurrentETHPrice, getOrCreateToken } from "./token";
+import { getOrCreateToken } from "./token";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
+import { toDecimal } from "../mapping/lib/helpers";
 
 export function getOrCreateMarket(
   address: string,
@@ -169,22 +170,22 @@ export function getOrCreateMarketHourlySnapshot(
   return marketSnapshot;
 }
 
-export function setMarketTokenBalance(
+export function addMarketTokenBalance(
   event: ethereum.Event,
-  balance: BigInt,
-  balanceUSD: BigDecimal,
-  market: Market
+  market: Market,
+  delta: BigInt,
+  latestRate: BigDecimal
 ): void {
-  const netChangeUSD = balanceUSD.minus(market.totalValueLockedUSD);
-  market.totalValueLockedUSD = balanceUSD;
-  market.totalDepositBalanceUSD = balanceUSD;
-  market.totalBorrowBalanceUSD = balanceUSD;
-  market.inputTokenBalance = balance;
-  market.inputTokenPriceUSD = getCurrentETHPrice();
+  const deltaUSD = toDecimal(delta).times(latestRate);
+  market.totalValueLockedUSD = market.totalValueLockedUSD.plus(deltaUSD);
+  market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(deltaUSD);
+  market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(deltaUSD);
+  market.inputTokenBalance = market.inputTokenBalance.plus(delta);
+  market.inputTokenPriceUSD = latestRate;
   market.save();
   getOrCreateMarketSnapshot(event, market);
   getOrCreateMarketHourlySnapshot(event, market);
-  updateProtocolUSDLocked(event, netChangeUSD);
+  updateProtocolUSDLocked(event, deltaUSD);
 }
 
 export function addMarketDepositVolume(
