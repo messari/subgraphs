@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM (Extended)
-# Version: 3.0.0
+# Version: 3.0.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -242,7 +242,7 @@ type DexAmmProtocol implements Protocol @entity {
   protocolControlledValueUSD: BigDecimal
 
   " All historical volume in USD "
-  cumulativeTotalVolumeUSD: BigDecimal!
+  cumulativeVolumeUSD: BigDecimal!
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
@@ -322,13 +322,13 @@ type UsageMetricsDailySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
-  " Total number of deposits (add liquidity) in an hour "
+  " Total number of deposits (add liquidity) in an day "
   dailyDepositCount: Int!
 
-  " Total number of withdrawals (remove liquidity) in an hour "
+  " Total number of withdrawals (remove liquidity) in an day "
   dailyWithdrawCount: Int!
 
-  " Total number of trades (swaps) in an hour "
+  " Total number of trades (swaps) in an day "
   dailySwapCount: Int!
 }
 
@@ -367,7 +367,7 @@ type UsageMetricsHourlySnapshot @entity {
   timestamp: BigInt!
 }
 
-type FinancialsDailySnapshot @entity {
+type FinancialsDailySnapshot @entity(immutable: true) {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -399,7 +399,7 @@ type FinancialsDailySnapshot @entity {
   dailyVolumeUSD: BigDecimal!
 
   " All historical trade volume in USD "
-  cumulativeTotalVolumeUSD: BigDecimal!
+  cumulativeVolumeUSD: BigDecimal!
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   dailySupplySideRevenueUSD: BigDecimal!
@@ -515,7 +515,7 @@ type LiquidityPool @entity {
   cumulativeVolumesUSD: [BigDecimal!]!
 
   " All historical trade volume occurred in this pool, in USD "
-  cumulativeTotalVolumeUSD: BigDecimal!
+  cumulativeVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -534,6 +534,15 @@ type LiquidityPool @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Total number of deposits (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
 
   ##### Account/Position Data #####
 
@@ -573,7 +582,7 @@ type LiquidityPool @entity {
 ##### Pool-Level Timeseries #####
 #################################
 
-type LiquidityPoolDailySnapshot @entity {
+type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
   id: Bytes!
 
@@ -643,7 +652,7 @@ type LiquidityPoolDailySnapshot @entity {
   dailyTotalRevenueUSD: BigDecimal!
 
   " All historical trade volume occurred in this pool, in USD "
-  cumulativeTotalVolumeUSD: BigDecimal!
+  cumulativeVolumeUSD: BigDecimal!
 
   " All trade volume occurred in a given day, in USD "
   dailyTotalVolumeUSD: BigDecimal!
@@ -678,6 +687,24 @@ type LiquidityPoolDailySnapshot @entity {
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
+  " Total number of deposits (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of deposits (add liquidity) in a day "
+  dailyDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of withdrawals (remove liquidity) in a day "
+  dailyWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
+
+  " Total number of trades (swaps) in a day "
+  dailySwapCount: Int!
+
   ##### Account/Position Data #####
 
   " Number of positions in this market "
@@ -690,7 +717,7 @@ type LiquidityPoolDailySnapshot @entity {
   closedPositionCount: Int!
 }
 
-type LiquidityPoolHourlySnapshot @entity {
+type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -760,7 +787,7 @@ type LiquidityPoolHourlySnapshot @entity {
   hourlyTotalRevenueUSD: BigDecimal!
 
   " All historical trade volume occurred in this pool, in USD "
-  cumulativeTotalVolumeUSD: BigDecimal!
+  cumulativeVolumeUSD: BigDecimal!
 
   " All trade volume occurred in a given day, in USD "
   hourlyTotalVolumeUSD: BigDecimal!
@@ -794,6 +821,24 @@ type LiquidityPoolHourlySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Total number of deposits (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of deposits (add liquidity) in an hour "
+  hourlyDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of withdrawals (remove liquidity) in an hour "
+  hourlyWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
+
+  " Total number of trades (swaps) in an hour "
+  hourlySwapCount: Int!
 
   ##### Account/Position Data #####
 
@@ -847,7 +892,7 @@ type Tick @entity {
 ##### Pool Tick-Level Time Series #####
 #######################################
 
-type TickDailySnapshot @entity {
+type TickDailySnapshot @entity(immutable: true) {
   " { pool address }-{ tick index }-{ day ID } "
   id: Bytes!
 
@@ -879,7 +924,7 @@ type TickDailySnapshot @entity {
   liquidityNetUSD: BigDecimal!
 }
 
-type TickHourlySnapshot @entity {
+type TickHourlySnapshot @entity(immutable: true) {
   " { pool address }-{ tick index }-{ hour ID } "
   id: Bytes!
 
@@ -1033,7 +1078,7 @@ type Position @entity {
 # for positions that are not moving. As we are only recording the balance
 # in token amounts instead of in USD, this will work well.
 # Note that we only take snapshot for open positions
-type PositionSnapshot @entity {
+type PositionSnapshot @entity(immutable: true) {
   " { Position ID }-{ Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1276,44 +1321,6 @@ type Swap @entity(immutable: true) {
 
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
-}
-
-type Stat @entity {
-  " { protocol/pool }-{ [Optional] Pool ID }-{ deposit/withdraw/swap }-{ Days/hours since Unix epoch } "
-  id: Bytes!
-
-  " Total count of event (e.g. total number of swaps) "
-  count: BigInt!
-
-  " Average in native token amount (rounded down)  "
-  meanAmount: BigInt!
-
-  " Average in USD "
-  meanUSD: BigDecimal!
-
-  " Median in native token amount"
-  medianAmount: BigInt!
-
-  " Median in USD "
-  medianUSD: BigDecimal!
-
-  " Maximum in native token amount "
-  maxAmount: BigInt!
-
-  " Maximum in USD "
-  maxUSD: BigDecimal!
-
-  " Minimum in native token amount "
-  minAmount: BigInt!
-
-  " Minimum in USD "
-  minUSD: BigDecimal!
-
-  " Variance for native token amount "
-  varAmount: BigDecimal!
-
-  " Variance for USD "
-  varUSD: BigDecimal!
 }
 
 # Helper entity for calculating daily/hourly active users
