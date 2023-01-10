@@ -67,7 +67,7 @@ export class Bridge {
     protocol = new BridgeProtocolSchema(id);
     protocol.name = conf.getName();
     protocol.slug = conf.getSlug();
-    protocol.network = dataSource.network().toUpperCase();
+    protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = constants.ProtocolType.BRIDGE;
     protocol.permissionType = conf.getPermissionType();
     protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
