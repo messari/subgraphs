@@ -40,6 +40,8 @@ import {
 } from "./sdk/protocols/bridge/enums";
 import { BridgeConfig } from "./sdk/protocols/bridge/config";
 import { _ERC20 } from "../generated/PoolBasedBridge/_ERC20";
+import { ERC20NameBytes } from "../generated/PoolBasedBridge/ERC20NameBytes";
+import { ERC20SymbolBytes } from "../generated/PoolBasedBridge/ERC20SymbolBytes";
 import { Versions } from "./versions";
 import { Token, Pool as PoolEntity, _Transfer } from "../generated/schema";
 import { bigIntToBigDecimal } from "./sdk/util/numbers";
@@ -74,9 +76,40 @@ class Pricer implements TokenPricer {
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
     const erc20 = _ERC20.bind(address);
-    const name = erc20.name();
-    const symbol = erc20.symbol();
     const decimals = erc20.decimals().toI32();
+
+    let name = "Unknown Token";
+    const nameResult = erc20.try_name();
+    if (!nameResult.reverted) {
+      name = nameResult.value;
+    } else {
+      const erc20name = ERC20NameBytes.bind(address);
+      const nameResult = erc20name.try_name();
+      if (!nameResult.reverted) {
+        name = nameResult.value.toString();
+      } else {
+        log.warning("[getTokenParams]Fail to get name for token {}", [
+          address.toHexString(),
+        ]);
+      }
+    }
+
+    let symbol = "Unknown";
+    const symbolResult = erc20.try_symbol();
+    if (!symbolResult.reverted) {
+      symbol = symbolResult.value;
+    } else {
+      const erc20symbol = ERC20SymbolBytes.bind(address);
+      const symbolResult = erc20symbol.try_symbol();
+      if (!symbolResult.reverted) {
+        symbol = symbolResult.value.toString();
+      } else {
+        log.warning("[getTokenParams]Fail to get symbol for token {}", [
+          address.toHexString(),
+        ]);
+      }
+    }
+
     return {
       name,
       symbol,
