@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -51,20 +51,33 @@ export namespace LiquidityPoolFeeType {
 }
 
 export namespace HelperStoreType {
-  export const NATIVE_TOKEN = "NATIVE_TOKEN";
-  export const USERS = "USERS";
+  export const NATIVE_TOKEN = Bytes.fromHexString("NATIVE_TOKEN");
+  export const USERS = Bytes.fromHexString("xUSERS");
   // Pool addresses are also stored in the HelperStore
 }
 
-export namespace UsageType {
-  export const DEPOSIT = "DEPOSIT";
-  export const WITHDRAW = "WITHDRAW";
-  export const SWAP = "SWAP";
+export namespace EventType {
+  export const DEPOSIT = 0;
+  export const WITHDRAW = 1;
+  export const SWAP = 2;
+  export const UNKNOWN = 3;
 }
 
 export namespace FeeSwitch {
   export const ON = "ON";
   export const OFF = "OFF";
+  // Pool addresses are also stored in the HelperStore
+}
+
+export namespace TokenType {
+  export const MULTIPLE = "MULTIPLE";
+  export const UNKNOWN = "UNKNOWN";
+  export const ERC20 = "ERC20";
+  export const ERC721 = "ERC721";
+  export const ERC1155 = "ERC1155";
+  export const BEP20 = "BEP20";
+  export const BEP721 = "BEP721";
+  export const BEP1155 = "BEP1155";
   // Pool addresses are also stored in the HelperStore
 }
 
@@ -74,7 +87,9 @@ export namespace RewardIntervalType {
   export const NONE = "NONE";
 }
 
-export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const ZERO_ADDRESS = Address.fromHexString(
+  "0x0000000000000000000000000000000000000000"
+);
 
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
@@ -113,6 +128,7 @@ export const Q192 = BigInt.fromString(
   "6277101735386680763835789423207666416102355444464034512896"
 );
 export const PRECISION = BigInt.fromString("100000000000000000");
+export const PRECISION_DECIMAL = new BigDecimal(PRECISION);
 
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
@@ -130,3 +146,5 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
 
 export const MOST_RECENT_TRANSACTION = "MOST_RECENT_TRANSACTION";
+
+export const TICK_BASE = BigDecimal.fromString("1.0001");
