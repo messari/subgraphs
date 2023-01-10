@@ -12,7 +12,13 @@ import {
 import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
 import { NetworkConfigs } from '../../../../configurations/configure'
-import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
+import {
+	Address,
+	BigDecimal,
+	BigInt,
+	dataSource,
+	log,
+} from '@graphprotocol/graph-ts'
 import { Transfer } from '../../../../generated/Token/Token'
 import { _ERC20 } from '../../../../generated/Token/_ERC20'
 import { Token } from '../../../../generated/schema'
@@ -96,7 +102,7 @@ export function handleTransfer(event: Transfer): void {
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-			reverseChainIDs.get(Network.ARBITRUM_ONE)!,
+			reverseChainIDs.get(dataSource.network().toUpperCase())!,
 			event.address,
 			CrosschainTokenType.CANONICAL,
 			event.address

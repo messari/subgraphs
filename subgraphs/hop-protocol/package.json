@@ -6,7 +6,15 @@
     "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/hop-protocol/config/templates/hop-protocol.template.yaml > subgraph.yaml",
     "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts",
     "ba": "messari b hop-protocol-arbitrum -l",
-    "bm": "messari b hop-protocol-ethereum -l"
+    "be": "messari b hop-protocol-ethereum -l",
+    "bo": "messari b hop-protocol-optimism -l",
+    "bm": "messari b hop-protocol-matic -l",
+    "bx": "messari b hop-protocol-xdai -l",
+    "da": "messari b hop-protocol-arbitrum -d -r itsjerryokolo -l",
+    "de": "messari b hop-protocol-ethereum -d -r itsjerryokolo -l",
+    "do": "messari b hop-protocol-optimism -d -r itsjerryokolo -l",
+    "dm": "messari b hop-protocol-matic -d -r itsjerryokolo -l",
+    "dx": "messari b hop-protocol-xdai -d -r itsjerryokolo -l"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.37.1",

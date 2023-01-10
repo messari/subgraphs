@@ -2,31 +2,35 @@ import { log } from '@graphprotocol/graph-ts'
 import { Configurations } from '../../../../../configurations/configurations/interface'
 import { Network } from '../../../../../src/sdk/util/constants'
 
-export class HopProtocolArbitrumConfigurations implements Configurations {
+export class HopProtocolxDaiConfigurations implements Configurations {
 	getNetwork(): string {
-		return Network.ARBITRUM_ONE
+		return Network.XDAI
 	}
 	getPoolAddressFromTokenAddress(tokenAddress: string): string {
 		if (
-			tokenAddress == '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase()
+			tokenAddress == '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83'.toLowerCase() //USDC
 		) {
-			return '0x10541b07d8Ad2647Dc6cD67abd4c03575dade261'.toLowerCase() //USDC AMM
+			return '0x5C32143C8B198F392d01f8446b754c181224ac26'.toLowerCase() //USDC AMM
 		} else if (
-			tokenAddress == '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase()
+			tokenAddress == '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'.toLowerCase() //DAI
 		) {
-			return '0xa5A33aB9063395A90CCbEa2D86a62EcCf27B5742'.toLowerCase() //DAI AMM
+			return '0x24afDcA4653042C6D08fb1A754b2535dAcF6Eb24'.toLowerCase() //DAI AMM
 		} else if (
-			tokenAddress == '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase()
+			tokenAddress == '0x4ECaBa5870353805a9F068101A40E0f32ed605C6'.toLowerCase() //USDT
 		) {
-			return '0x18f7402B673Ba6Fb5EA4B95768aABb8aaD7ef18a'.toLowerCase() //USDT AMM
+			return '0x3Aa637D6853f1d9A9354FE4301Ab852A88b237e7'.toLowerCase() //USDT AMM
 		} else if (
-			tokenAddress == '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase()
+			tokenAddress == '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'.toLowerCase() //ETH
 		) {
-			return '0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97'.toLowerCase() //ETH AMM
+			return '0x4014DC015641c08788F15bD6eB20dA4c47D936d8'.toLowerCase() //ETH AMM
 		} else if (
-			tokenAddress == '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase()
+			tokenAddress == '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase() //WBTC
 		) {
-			return '0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase() //WBTC AMM
+			return '0xb07c6505e1E41112494123e40330c5Ac09817CFB'.toLowerCase() //WBTC AMM
+		} else if (
+			tokenAddress == '0x7122d7661c4564b7C6Cd4878B06766489a6028A2'.toLowerCase() //MATIC
+		) {
+			return '0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase() //MATIC AMM
 		} else {
 			log.critical('Token not found', [])
 			return ''
@@ -34,25 +38,29 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 	}
 	getTokenDetails(tokenAddress: string): string[] {
 		if (
-			tokenAddress == '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase()
+			tokenAddress == '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83'.toLowerCase()
 		) {
-			return ['USDC', 'USDC', '18']
+			return ['USDC', 'USD Coin', '6']
 		} else if (
-			tokenAddress == '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase()
+			tokenAddress == '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'.toLowerCase()
 		) {
-			return ['DAI', 'DAI', '18']
+			return ['DAI', 'DAI Stablecoin', '18']
 		} else if (
-			tokenAddress == '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase()
+			tokenAddress == '0x4ECaBa5870353805a9F068101A40E0f32ed605C6'.toLowerCase()
 		) {
-			return ['USDT', 'USDT', '6']
+			return ['USDT', 'Tether USD', '6']
 		} else if (
-			tokenAddress == '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase()
+			tokenAddress == '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'.toLowerCase()
 		) {
-			return ['ETH', 'ETH', '18']
+			return ['ETH', 'Ethereum', '18']
 		} else if (
 			tokenAddress == '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase()
 		) {
-			return ['WBTC', 'WBTC', '18']
+			return ['WBTC', 'Wrapped BTC', '18']
+		} else if (
+			tokenAddress == '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
+		) {
+			return ['MATIC', 'MATIC', '18']
 		} else if (
 			tokenAddress == '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
 		) {
@@ -65,52 +73,60 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 
 	getBridgeConfig(tokenAddress: string): string[] {
 		if (
-			tokenAddress == '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase()
+			tokenAddress == '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83'.toLowerCase()
 		) {
 			return [
-				'0x0e0E3d2C5c292161999474247956EF542caBF8dd'.toLowerCase(), //Token Bridge Address
-				'ARBITRUM_USDC_BRIDGE',
-				'arbitrum_usdc_bridge',
+				'0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8'.toLowerCase(), //Token Bridge Address
+				'XDAI_USDC_BRIDGE',
+				'xdai_usdc_bridge',
 			]
 		} else if (
-			tokenAddress == '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase()
+			tokenAddress == '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'.toLowerCase()
 		) {
 			return [
-				'0x7aC115536FE3A185100B2c4DE4cb328bf3A58Ba6'.toLowerCase(),
-				'ARBITRUM_DAI_BRIDGE',
-				'arbitrum_dai_bridge',
+				'0x0460352b91D7CF42B0E1C1c30f06B602D9ef2238'.toLowerCase(),
+				'XDAI_DAI_BRIDGE',
+				'xdai_dai_bridge',
 			]
 		} else if (
-			tokenAddress == '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase()
+			tokenAddress == '0x4ECaBa5870353805a9F068101A40E0f32ed605C6'.toLowerCase()
 		) {
 			return [
-				'0x72209Fe68386b37A40d6bCA04f78356fd342491f'.toLowerCase(),
-				'ARBITRUM_USDT_BRIDGE',
-				'arbitrum_usdc_bridge',
+				'0xFD5a186A7e8453Eb867A360526c5d987A00ACaC2'.toLowerCase(),
+				'XDAI_USDT_BRIDGE',
+				'xdai_usdt_bridge',
 			]
 		} else if (
-			tokenAddress == '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase()
+			tokenAddress == '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'.toLowerCase()
 		) {
 			return [
-				'0x3749C4f034022c39ecafFaBA182555d4508caCCC'.toLowerCase(),
-				'ARBITRUM_ETH_BRIDGE',
-				'arbitrum_eth_bridge',
-			]
-		} else if (
-			tokenAddress == '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase()
-		) {
-			return [
-				'0x3E4a3a4796d16c0Cd582C382691998f7c06420B6'.toLowerCase(),
-				'ARBITRUM_WBTC_BRIDGE',
-				'arbitrum_wbtc_bridge',
+				'0xD8926c12C0B2E5Cd40cFdA49eCaFf40252Af491B'.toLowerCase(),
+				'XDAI_ETH_BRIDGE',
+				'xdai_eth_bridge',
 			]
 		} else if (
 			tokenAddress == '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
 		) {
 			return [
-				'0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266'.toLowerCase(),
-				'ARBITRUM_HOP_BRIDGE',
-				'arbitrum_hop_bridge',
+				'0x7ac71c29fEdF94BAc5A5C9aB76E1Dd12Ea885CCC'.toLowerCase(),
+				'XDAI_MATIC_BRIDGE',
+				'xdai_matic_bridge',
+			]
+		} else if (
+			tokenAddress == '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase()
+		) {
+			return [
+				'0x07C592684Ee9f71D58853F9387579332d471b6Ca'.toLowerCase(),
+				'XDAI_WBTC_BRIDGE',
+				'xdai_wbtc_bridge',
+			]
+		} else if (
+			tokenAddress == '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
+		) {
+			return [
+				'0x6F03052743CD99ce1b29265E377e320CD24Eb632'.toLowerCase(),
+				'XDAI_HOP_BRIDGE',
+				'xdai_hop_bridge',
 			]
 		} else {
 			log.critical('Token not found', [])
@@ -121,37 +137,43 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 	getTokenAddressFromBridgeAddress(bridgeAddress: string): string {
 		if (
 			bridgeAddress ==
-			'0x0e0E3d2C5c292161999474247956EF542caBF8dd'.toLowerCase()
+			'0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8'.toLowerCase()
 		) {
 			//HOP/USDC
-			return '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase() //USDC
+			return '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83'.toLowerCase() //USDC
 		} else if (
 			bridgeAddress ==
-			'0x7aC115536FE3A185100B2c4DE4cb328bf3A58Ba6'.toLowerCase()
+			'0x0460352b91D7CF42B0E1C1c30f06B602D9ef2238'.toLowerCase()
 		) {
 			//HOP/DAI
-			return '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase() //DAI
+			return '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'.toLowerCase() //DAI
 		} else if (
 			bridgeAddress ==
-			'0x72209Fe68386b37A40d6bCA04f78356fd342491f'.toLowerCase()
+			'0xFD5a186A7e8453Eb867A360526c5d987A00ACaC2'.toLowerCase()
 		) {
 			//HOP/USDT
-			return '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase() //USDT
+			return '0x4ECaBa5870353805a9F068101A40E0f32ed605C6'.toLowerCase() //USDT
 		} else if (
 			bridgeAddress ==
-			'0x3749C4f034022c39ecafFaBA182555d4508caCCC'.toLowerCase()
+			'0xD8926c12C0B2E5Cd40cFdA49eCaFf40252Af491B'.toLowerCase()
 		) {
 			//HOP/ETH
-			return '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase() //ETH
+			return '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'.toLowerCase() //ETH
 		} else if (
 			bridgeAddress ==
-			'0x3E4a3a4796d16c0Cd582C382691998f7c06420B6'.toLowerCase()
+			'0xD8926c12C0B2E5Cd40cFdA49eCaFf40252Af491B'.toLowerCase()
+		) {
+			//HOP/MATIC
+			return '0x7122d7661c4564b7C6Cd4878B06766489a6028A2'.toLowerCase() //MATIC
+		} else if (
+			bridgeAddress ==
+			'0x07C592684Ee9f71D58853F9387579332d471b6Ca'.toLowerCase()
 		) {
 			//HOP/WBTC
 			return '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase() //WBTC
 		} else if (
 			bridgeAddress ==
-			'0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266'.toLowerCase()
+			'0x6F03052743CD99ce1b29265E377e320CD24Eb632'.toLowerCase()
 		) {
 			//HOP BRIDGE
 			return '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase() //HOP
@@ -163,23 +185,27 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 
 	getTokenAddressFromPoolAddress(poolAddress: string): string {
 		if (
-			poolAddress == '0x10541b07d8Ad2647Dc6cD67abd4c03575dade261'.toLowerCase() //HOP/USDC
+			poolAddress == '0x5C32143C8B198F392d01f8446b754c181224ac26'.toLowerCase() //HOP/USDC
 		) {
-			return '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase() //USDC
+			return '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83'.toLowerCase() //USDC
 		} else if (
-			poolAddress == '0xa5A33aB9063395A90CCbEa2D86a62EcCf27B5742'.toLowerCase() //HOP/DAI
+			poolAddress == '0x24afDcA4653042C6D08fb1A754b2535dAcF6Eb24'.toLowerCase() //HOP/DAI
 		) {
-			return '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase() //DAI
+			return '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'.toLowerCase() //DAI
 		} else if (
-			poolAddress == '0x18f7402B673Ba6Fb5EA4B95768aABb8aaD7ef18a'.toLowerCase() //HOP/USDT
+			poolAddress == '0x3Aa637D6853f1d9A9354FE4301Ab852A88b237e7'.toLowerCase() //HOP/USDT
 		) {
-			return '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase() //USDT
+			return '0x4ECaBa5870353805a9F068101A40E0f32ed605C6'.toLowerCase() //USDT
 		} else if (
-			poolAddress == '0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97'.toLowerCase() //HOP/ETH
+			poolAddress == '0x4014DC015641c08788F15bD6eB20dA4c47D936d8'.toLowerCase() //HOP/ETH
 		) {
-			return '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase() //ETH
+			return '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'.toLowerCase() //ETH
 		} else if (
-			poolAddress == '0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase() //HOP/WBTC
+			poolAddress == '0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase() //HOP/MATIC
+		) {
+			return '0x7122d7661c4564b7C6Cd4878B06766489a6028A2'.toLowerCase() //MATIC
+		} else if (
+			poolAddress == '0xb07c6505e1E41112494123e40330c5Ac09817CFB'.toLowerCase() //HOP/WBTC
 		) {
 			return '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase() //WBTC
 		} else {
@@ -191,32 +217,37 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 	getPoolAddressFromBridgeAddress(bridgeAddress: string): string {
 		if (
 			bridgeAddress ==
-			'0x0e0E3d2C5c292161999474247956EF542caBF8dd'.toLowerCase() //USDC POOL
+			'0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8'.toLowerCase() //USDC POOL
 		) {
-			return '0x10541b07d8Ad2647Dc6cD67abd4c03575dade261'.toLowerCase()
+			return '0x5C32143C8B198F392d01f8446b754c181224ac26'.toLowerCase()
 		} else if (
 			bridgeAddress ==
-			'0x7aC115536FE3A185100B2c4DE4cb328bf3A58Ba6'.toLowerCase() //HOP/DAI
+			'0x0460352b91D7CF42B0E1C1c30f06B602D9ef2238'.toLowerCase() //HOP/DAI
 		) {
-			return '0xa5A33aB9063395A90CCbEa2D86a62EcCf27B5742'.toLowerCase() //DAI
+			return '0x24afDcA4653042C6D08fb1A754b2535dAcF6Eb24'.toLowerCase() //DAI
 		} else if (
 			bridgeAddress ==
-			'0x72209Fe68386b37A40d6bCA04f78356fd342491f'.toLowerCase() //HOP/USDT
+			'0xFD5a186A7e8453Eb867A360526c5d987A00ACaC2'.toLowerCase() //HOP/USDT
 		) {
-			return '0x18f7402B673Ba6Fb5EA4B95768aABb8aaD7ef18a'.toLowerCase() //USDT
+			return '0x3Aa637D6853f1d9A9354FE4301Ab852A88b237e7'.toLowerCase() //USDT
 		} else if (
 			bridgeAddress ==
-			'0x3749C4f034022c39ecafFaBA182555d4508caCCC'.toLowerCase() //HOP/ETH
+			'0xD8926c12C0B2E5Cd40cFdA49eCaFf40252Af491B'.toLowerCase() //HOP/ETH
 		) {
-			return '0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97'.toLowerCase() //ETH
+			return '0x4014DC015641c08788F15bD6eB20dA4c47D936d8'.toLowerCase() //ETH
 		} else if (
 			bridgeAddress ==
-			'0x3E4a3a4796d16c0Cd582C382691998f7c06420B6'.toLowerCase() //HOP/WBTC
+			'0x7ac71c29fEdF94BAc5A5C9aB76E1Dd12Ea885CCC'.toLowerCase() //HOP/MATIC
 		) {
-			return '0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase() //WBTC
+			return '0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase() //MATIC
 		} else if (
 			bridgeAddress ==
-			'0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266'.toLowerCase() //HOP BRIDGE
+			'0x07C592684Ee9f71D58853F9387579332d471b6Ca'.toLowerCase() //HOP/WBTC
+		) {
+			return '0xb07c6505e1E41112494123e40330c5Ac09817CFB'.toLowerCase() //WBTC
+		} else if (
+			bridgeAddress ==
+			'0x6F03052743CD99ce1b29265E377e320CD24Eb632'.toLowerCase() //HOP BRIDGE
 		) {
 			return '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase() //HOP
 		} else {
@@ -227,23 +258,27 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 
 	getPoolDetails(poolAddress: string): string[] {
 		if (
-			poolAddress == '0x10541b07d8Ad2647Dc6cD67abd4c03575dade261'.toLowerCase()
+			poolAddress == '0x5C32143C8B198F392d01f8446b754c181224ac26'.toLowerCase()
 		) {
 			return ['HOP-USDC', 'hUSDC/USDC']
 		} else if (
-			poolAddress == '0xa5A33aB9063395A90CCbEa2D86a62EcCf27B5742'.toLowerCase()
+			poolAddress == '0x24afDcA4653042C6D08fb1A754b2535dAcF6Eb24'.toLowerCase()
 		) {
 			return ['HOP-DAI', 'hDAI/DAI']
 		} else if (
-			poolAddress == '0x18f7402B673Ba6Fb5EA4B95768aABb8aaD7ef18a'.toLowerCase()
+			poolAddress == '0x3Aa637D6853f1d9A9354FE4301Ab852A88b237e7'.toLowerCase()
 		) {
 			return ['HOP-USDT', 'hUSDT/USDT']
 		} else if (
-			poolAddress == '0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97'.toLowerCase()
+			poolAddress == '0x4014DC015641c08788F15bD6eB20dA4c47D936d8'.toLowerCase()
 		) {
 			return ['HOP-ETH', 'hETH/ETH']
 		} else if (
-			poolAddress == '0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase()
+			poolAddress == '0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase()
+		) {
+			return ['HOP-MATIC', 'hMATIC/MATIC']
+		} else if (
+			poolAddress == '0xb07c6505e1E41112494123e40330c5Ac09817CFB'.toLowerCase()
 		) {
 			return ['HOP-WBTC', 'hWBTC/WBTC']
 		} else {
@@ -254,31 +289,34 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 
 	getTokenList(): string[] {
 		return [
-			'0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase(), // USDC
-			'0x7aC115536FE3A185100B2c4DE4cb328bf3A58Ba6'.toLowerCase(), // DAI
-			'0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase(), // USDT
-			'0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase(), // ETH
+			'0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83'.toLowerCase(), // USDC
+			'0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'.toLowerCase(), // DAI
+			'0x4ECaBa5870353805a9F068101A40E0f32ed605C6'.toLowerCase(), // USDT
+			'0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'.toLowerCase(), // ETH
+			'0x7122d7661c4564b7C6Cd4878B06766489a6028A2'.toLowerCase(), // MATIC
 			'0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase(), // WBTC
 			'0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase(), // HOP
 		]
 	}
 	getPoolsList(): string[] {
 		return [
-			'0x10541b07d8Ad2647Dc6cD67abd4c03575dade261'.toLowerCase(), // USDC
-			'0xa5A33aB9063395A90CCbEa2D86a62EcCf27B5742'.toLowerCase(), // DAI
-			'0x18f7402B673Ba6Fb5EA4B95768aABb8aaD7ef18a'.toLowerCase(), // USDT
-			'0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97'.toLowerCase(), // ETH
-			'0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase(), // WBTC
+			'0x5C32143C8B198F392d01f8446b754c181224ac26'.toLowerCase(), // USDC
+			'0x24afDcA4653042C6D08fb1A754b2535dAcF6Eb24'.toLowerCase(), // DAI
+			'0x3Aa637D6853f1d9A9354FE4301Ab852A88b237e7'.toLowerCase(), // USDT
+			'0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase(), // MATIC
+			'0x4014DC015641c08788F15bD6eB20dA4c47D936d8'.toLowerCase(), // ETH
+			'0xb07c6505e1E41112494123e40330c5Ac09817CFB'.toLowerCase(), // WBTC
 		]
 	}
 	getBridgeList(): string[] {
 		return [
-			'0x0e0E3d2C5c292161999474247956EF542caBF8dd'.toLowerCase(), // USDC
-			'0x7aC115536FE3A185100B2c4DE4cb328bf3A58Ba6'.toLowerCase(), // DAI
-			'0x72209Fe68386b37A40d6bCA04f78356fd342491f'.toLowerCase(), // USDT
-			'0x3749C4f034022c39ecafFaBA182555d4508caCCC'.toLowerCase(), // ETH
-			'0x3E4a3a4796d16c0Cd582C382691998f7c06420B6'.toLowerCase(), // WBTC
-			'0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266'.toLowerCase(), // HOP
+			'0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8'.toLowerCase(), // USDC
+			'0x0460352b91D7CF42B0E1C1c30f06B602D9ef2238'.toLowerCase(), // DAI
+			'0x7ac71c29fEdF94BAc5A5C9aB76E1Dd12Ea885CCC'.toLowerCase(), // MATIC
+			'0xFD5a186A7e8453Eb867A360526c5d987A00ACaC2'.toLowerCase(), // USDT
+			'0xD8926c12C0B2E5Cd40cFdA49eCaFf40252Af491B'.toLowerCase(), // ETH
+			'0x07C592684Ee9f71D58853F9387579332d471b6Ca'.toLowerCase(), // WBTC
+			'0x6F03052743CD99ce1b29265E377e320CD24Eb632'.toLowerCase(), // HOP
 		]
 	}
 }

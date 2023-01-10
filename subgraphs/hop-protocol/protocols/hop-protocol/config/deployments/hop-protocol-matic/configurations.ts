@@ -2,7 +2,7 @@ import { log } from '@graphprotocol/graph-ts'
 import { Configurations } from '../../../../../configurations/configurations/interface'
 import { Network } from '../../../../../src/sdk/util/constants'
 
-export class HopProtocolArbitrumConfigurations implements Configurations {
+export class HopProtocolMaticConfigurations implements Configurations {
 	getNetwork(): string {
 		return Network.ARBITRUM_ONE
 	}
