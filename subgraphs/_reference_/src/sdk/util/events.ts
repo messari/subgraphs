@@ -1,10 +1,10 @@
 import { ethereum } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./constants";
 
-export function getUnixDays(event: ethereum.Event): i32 {
-  return event.block.timestamp.toI32() / SECONDS_PER_DAY;
+export function getUnixDays(block: ethereum.Block): i32 {
+  return block.timestamp.toI32() / SECONDS_PER_DAY;
 }
 
-export function getUnixHours(event: ethereum.Event): i32 {
-  return event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+export function getUnixHours(block: ethereum.Block): i32 {
+  return block.timestamp.toI32() / SECONDS_PER_HOUR;
 }

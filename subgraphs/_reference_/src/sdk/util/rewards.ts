@@ -6,9 +6,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { _CircularBuffer } from "../../generated/schema";
-import { Network } from "./constants";
+import { _CircularBuffer } from "../../../generated/schema";
 import {
+  Network,
   BIGDECIMAL_ZERO,
   INT_FOUR,
   INT_NEGATIVE_ONE,
