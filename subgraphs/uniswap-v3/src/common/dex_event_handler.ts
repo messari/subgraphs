@@ -348,6 +348,7 @@ export class DexEventHandler {
     sender: Address,
     tick: BigInt | null
   ): void {
+    this.eventType = EventType.SWAP;
     this.pool.tick = tick;
 
     // create Swap event
