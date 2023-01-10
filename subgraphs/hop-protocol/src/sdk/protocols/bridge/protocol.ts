@@ -189,8 +189,9 @@ export class Bridge {
 	 * @param tvl {BigDecimal} The value to add to the protocol's TVL.
 	 */
 	addTotalValueLocked(tvl: BigDecimal): void {
-		this.protocol.totalValueLockedUSD =
-			this.protocol.totalValueLockedUSD.plus(tvl)
+		this.protocol.totalValueLockedUSD = this.protocol.totalValueLockedUSD.plus(
+			tvl
+		)
 		this.save()
 	}
 
@@ -201,10 +202,12 @@ export class Bridge {
 	 * @param rev {BigDecimal} The value to add to the protocol's supplySideRevenue.
 	 */
 	addSupplySideRevenueUSD(rev: BigDecimal): void {
-		this.protocol.cumulativeTotalRevenueUSD =
-			this.protocol.cumulativeTotalRevenueUSD.plus(rev)
-		this.protocol.cumulativeSupplySideRevenueUSD =
-			this.protocol.cumulativeSupplySideRevenueUSD.plus(rev)
+		this.protocol.cumulativeTotalRevenueUSD = this.protocol.cumulativeTotalRevenueUSD.plus(
+			rev
+		)
+		this.protocol.cumulativeSupplySideRevenueUSD = this.protocol.cumulativeSupplySideRevenueUSD.plus(
+			rev
+		)
 		this.save()
 	}
 
@@ -215,10 +218,12 @@ export class Bridge {
 	 * @param rev {BigDecimal} The value to add to the protocol's protocolSideRevenue.
 	 */
 	addProtocolSideRevenueUSD(rev: BigDecimal): void {
-		this.protocol.cumulativeTotalRevenueUSD =
-			this.protocol.cumulativeTotalRevenueUSD.plus(rev)
-		this.protocol.cumulativeProtocolSideRevenueUSD =
-			this.protocol.cumulativeProtocolSideRevenueUSD.plus(rev)
+		this.protocol.cumulativeTotalRevenueUSD = this.protocol.cumulativeTotalRevenueUSD.plus(
+			rev
+		)
+		this.protocol.cumulativeProtocolSideRevenueUSD = this.protocol.cumulativeProtocolSideRevenueUSD.plus(
+			rev
+		)
 		this.save()
 	}
 
@@ -241,8 +246,9 @@ export class Bridge {
 	 * @param vol {BigDecimal} The value to add to the protocol's cumulativeVolumeInUSD.
 	 */
 	addVolumeInUSD(vol: BigDecimal): void {
-		this.protocol.cumulativeVolumeInUSD =
-			this.protocol.cumulativeVolumeInUSD.plus(vol)
+		this.protocol.cumulativeVolumeInUSD = this.protocol.cumulativeVolumeInUSD.plus(
+			vol
+		)
 		this.updateVolumes()
 	}
 
@@ -253,8 +259,9 @@ export class Bridge {
 	 * @param vol {BigDecimal} The value to add to the protocol's cumulativeVolumeOutUSD.
 	 */
 	addVolumeOutUSD(vol: BigDecimal): void {
-		this.protocol.cumulativeVolumeOutUSD =
-			this.protocol.cumulativeVolumeOutUSD.plus(vol)
+		this.protocol.cumulativeVolumeOutUSD = this.protocol.cumulativeVolumeOutUSD.plus(
+			vol
+		)
 		this.updateVolumes()
 	}
 
@@ -268,10 +275,9 @@ export class Bridge {
 		this.protocol.netVolumeUSD = this.protocol.cumulativeVolumeInUSD.minus(
 			this.protocol.cumulativeVolumeOutUSD
 		)
-		this.protocol.cumulativeTotalVolumeUSD =
-			this.protocol.cumulativeVolumeInUSD.plus(
-				this.protocol.cumulativeVolumeOutUSD
-			)
+		this.protocol.cumulativeTotalVolumeUSD = this.protocol.cumulativeVolumeInUSD.plus(
+			this.protocol.cumulativeVolumeOutUSD
+		)
 		this.save()
 	}
 

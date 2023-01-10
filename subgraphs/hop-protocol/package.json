@@ -5,7 +5,8 @@
     "codegen": "graph codegen",
     "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/hop-protocol/config/templates/hop-protocol.template.yaml > subgraph.yaml",
     "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts",
-    "b-arb": "messari b hop-protocol-arbitrum -l"
+    "ba": "messari b hop-protocol-arbitrum -l",
+    "bm": "messari b hop-protocol-ethereum -l"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.37.1",

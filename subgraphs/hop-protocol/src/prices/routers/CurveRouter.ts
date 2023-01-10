@@ -141,10 +141,9 @@ export function getVirtualPrice(curveLpTokenAddress: Address): BigInt {
 			curveRegistryAdresses[idx]
 		)
 
-		const virtualPriceCall =
-			curveRegistryContract.try_get_virtual_price_from_lp_token(
-				curveLpTokenAddress
-			)
+		const virtualPriceCall = curveRegistryContract.try_get_virtual_price_from_lp_token(
+			curveLpTokenAddress
+		)
 
 		if (!virtualPriceCall.reverted) return virtualPriceCall.value
 	}
@@ -176,8 +175,9 @@ export function cryptoPoolLpPriceUsdc(lpAddress: Address): CustomPriceType {
 export function cryptoPoolLpTotalValueUsdc(lpAddress: Address): BigDecimal {
 	const poolAddress = getPoolFromLpToken(lpAddress)
 
-	const underlyingTokensAddresses =
-		cryptoPoolUnderlyingTokensAddressesByPoolAddress(poolAddress)
+	const underlyingTokensAddresses = cryptoPoolUnderlyingTokensAddressesByPoolAddress(
+		poolAddress
+	)
 
 	let totalValue = constants.BIGDECIMAL_ZERO
 

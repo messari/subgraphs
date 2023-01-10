@@ -2,12 +2,12 @@
   "network": "mainnet",
   "isMainnet": true,
   "graftEnabled": false,
-  "deployment": "hop-protocol-mainnet",
+  "deployment": "HOP_PROTOCOL_ETHEREUM",
   "subgraphId": "QmfHRGh3tC4yb2bBRn5A6ctytG32Jwfi9eNo76EFjiWyrf",
   "graftStartBlock": 15217959,
   "tokens": [
     {
-      "dataSourceName": "TokenUSDC",
+      "dataSourceName": "Token",
       "token": "USDC",
       "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "startBlock": 12650032
@@ -63,7 +63,7 @@
   ],
   "bridges": [
     {
-      "dataSourceName": "HopL1BridgeUSDC",
+      "dataSourceName": "HopL1Bridge",
       "token": "USDC",
       "address": "0x3666f603Cc164936C1b87e207F36BEBa4AC5f18a",
       "startBlock": 12650032

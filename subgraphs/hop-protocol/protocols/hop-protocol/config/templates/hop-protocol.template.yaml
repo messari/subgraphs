@@ -84,6 +84,41 @@ dataSources:
       abis:
         - name: L1_Bridge
           file: ./abis/L1_Bridge.json
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: BonderAdded(indexed address)
           handler: handleBonderAdded
@@ -168,6 +203,41 @@ dataSources:
       abis:
         - name: L2_Amm
           file: ./abis/L2_Amm.json
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: TokenSwap(indexed address,uint256,uint256,uint128,uint128)
           handler: handleTokenSwap
@@ -195,13 +265,48 @@ dataSources:
       abis:
         - name: L2_Bridge
           file: ./abis/L2_Bridge.json
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: BonderAdded(indexed address)
           handler: handleBonderAdded
-        - event: TransferFromL1Completed(indexed address,uint256,uint256,uint256,indexed address,uint256)
-          handler: handleTransferFromL1Completed
         - event: TransferSent(indexed bytes32,indexed uint256,indexed address,uint256,bytes32,uint256,uint256,uint256,uint256)
           handler: handleTransferSent
+        - event: TransferFromL1Completed(indexed address,uint256,uint256,uint256,indexed address,uint256)
+          handler: handleTransferFromL1Completed
       file: ./protocols/hop-protocol/src/L2/bridge.ts
 {{/bridges}}
 {{/isMainnet}}

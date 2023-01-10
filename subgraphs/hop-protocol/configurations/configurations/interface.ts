@@ -3,6 +3,8 @@ export interface Configurations {
 	getBridgeConfig(address: string): string[]
 	getAmmAddress(address: string): string
 	getTokenDetails(address: string): string[]
+	getAmmList(): string[]
+	getBridgeList(): string[]
 	getTokenList(): string[]
 	getPoolDetails(poolAddress: string): string[]
 	getTokenAddressFromPoolAddress(poolAddress: string): string

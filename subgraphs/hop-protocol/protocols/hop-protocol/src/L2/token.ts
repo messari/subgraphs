@@ -13,13 +13,11 @@ import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
 import { NetworkConfigs } from '../../../../configurations/configure'
 import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
-import { reverseChainIDs } from '../../../../src/sdk/protocols/bridge/chainIds'
 import { Transfer } from '../../../../generated/Token/Token'
 import { _ERC20 } from '../../../../generated/Token/_ERC20'
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
-import { Network } from '../../../../src/sdk/util/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -46,70 +44,48 @@ class TokenInit implements TokenInitializer {
 }
 
 export function handleTransfer(event: Transfer): void {
-	const bridgeConfig = NetworkConfigs.getBridgeConfig(
-		event.address.toHexString()
-	)
+	if (NetworkConfigs.getTokenList().includes(event.address.toHexString())) {
+		const bridgeConfig = NetworkConfigs.getBridgeConfig(
+			event.address.toHexString()
+		)
 
-	const bridgeAddress = bridgeConfig[0]
-	const bridgeName = bridgeConfig[1]
-	const bridgeSlug = bridgeConfig[2]
+		const bridgeAddress = bridgeConfig[0]
+		const bridgeName = bridgeConfig[1]
+		const bridgeSlug = bridgeConfig[2]
 
-	const conf = new BridgeConfig(
-		bridgeAddress,
-		bridgeName,
-		bridgeSlug,
-		BridgePermissionType.PERMISSIONLESS,
-		Versions
-	)
-
-	if (
-		event.params.to.toHexString() != bridgeAddress ||
-		event.params.from.toHexString() != bridgeAddress
-	) {
-		return
-	}
-
-	log.warning(
-		'bridgeAddress: {}, TokenAddress: {}, fromAddress: {}, toAddress: {}',
-		[
+		const conf = new BridgeConfig(
 			bridgeAddress,
-			event.address.toHexString(),
-			event.params.to.toHexString(),
-			event.params.from.toHexString(),
-		]
-	)
-	const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString())
-	const poolName = poolConfig[0]
-	const poolSymbol = poolConfig[0]
+			bridgeName,
+			bridgeSlug,
+			BridgePermissionType.PERMISSIONLESS,
+			Versions
+		)
 
-	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
-	const pool = sdk.Pools.loadPool<string>(event.address)
-	const token = sdk.Tokens.getOrCreateToken(event.address)
-
-	const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-		reverseChainIDs.get(Network.ARBITRUM_ONE)!,
-		event.address,
-		CrosschainTokenType.CANONICAL,
-		event.address
-	)
-
-	if (event.params.to.toHexString() == bridgeAddress) {
-		sdk.Accounts.loadAccount(event.params.from)
-
-		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+		if (
+			event.params.to.toHexString() != bridgeAddress ||
+			event.params.from.toHexString() != bridgeAddress
+		) {
+			return
 		}
 
-		pool.addDestinationToken(crossToken)
-	}
-	if (event.params.from.toHexString() == bridgeAddress) {
-		const acc = sdk.Accounts.loadAccount(event.params.to)
-
-		acc.transferIn(
-			pool,
-			pool.getDestinationTokenRoute(crossToken)!,
-			event.address,
-			event.params.value
+		log.warning(
+			'bridgeAddress: {}, TokenAddress: {}, fromAddress: {}, toAddress: {}',
+			[
+				bridgeAddress,
+				event.address.toHexString(),
+				event.params.to.toHexString(),
+				event.params.from.toHexString(),
+			]
 		)
+
+		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		sdk.Tokens.getOrCreateToken(event.address)
+
+		if (event.params.to.toHexString() == bridgeAddress) {
+			sdk.Accounts.loadAccount(event.params.from)
+		}
+		if (event.params.from.toHexString() == bridgeAddress) {
+			sdk.Accounts.loadAccount(event.params.to)
+		}
 	}
 }

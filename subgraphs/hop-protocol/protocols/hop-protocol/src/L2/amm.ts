@@ -52,7 +52,7 @@ export function handleTokenSwap(event: TokenSwap): void {
 		event.address.toHexString()
 	)
 	const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
-	const poolConfig = NetworkConfigs.getPoolDetails(inputToken)
+	const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString())
 
 	const poolName = poolConfig[0]
 	const poolSymbol = poolConfig[0]
@@ -83,122 +83,133 @@ export function handleTokenSwap(event: TokenSwap): void {
 }
 
 export function handleAddLiquidity(event: AddLiquidity): void {
-	let amount = event.params.tokenAmounts
-	let fees = bigIntToBigDecimal(event.params.fees[0])
-	if (amount.length == 0) {
-		return
+	if (NetworkConfigs.getAmmList().includes(event.address.toHexString())) {
+		let amount = event.params.tokenAmounts
+		let fees = bigIntToBigDecimal(event.params.fees[0])
+		if (amount.length == 0) {
+			return
+		}
+
+		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
+			event.address.toHexString()
+		)
+		const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
+		const poolConfig = NetworkConfigs.getPoolDetails(
+			event.address.toHexString()
+		)
+
+		const poolName = poolConfig[0]
+		const poolSymbol = poolConfig[0]
+
+		const bridgeAddress = bridgeConfig[0]
+		const bridgeName = bridgeConfig[1]
+		const bridgeSlug = bridgeConfig[2]
+
+		const conf = new BridgeConfig(
+			bridgeAddress,
+			bridgeName,
+			bridgeSlug,
+			BridgePermissionType.PERMISSIONLESS,
+			Versions
+		)
+
+		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+
+		const pool = sdk.Pools.loadPool<string>(event.address)
+		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
+		const acc = sdk.Accounts.loadAccount(event.params.provider)
+
+		if (!pool.isInitialized) {
+			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+		}
+
+		acc.liquidityDeposit(pool, amount[0])
+		pool.addSupplySideRevenueUSD(fees)
 	}
-
-	const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
-		event.address.toHexString()
-	)
-	const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
-	const poolConfig = NetworkConfigs.getPoolDetails(inputToken)
-
-	const poolName = poolConfig[0]
-	const poolSymbol = poolConfig[0]
-
-	const bridgeAddress = bridgeConfig[0]
-	const bridgeName = bridgeConfig[1]
-	const bridgeSlug = bridgeConfig[2]
-
-	const conf = new BridgeConfig(
-		bridgeAddress,
-		bridgeName,
-		bridgeSlug,
-		BridgePermissionType.PERMISSIONLESS,
-		Versions
-	)
-
-	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
-
-	const pool = sdk.Pools.loadPool<string>(event.address)
-	const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
-	const acc = sdk.Accounts.loadAccount(event.params.provider)
-
-	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
-	}
-
-	acc.liquidityDeposit(pool, amount[0])
-	pool.addSupplySideRevenueUSD(fees)
 }
-
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
-	let amount = event.params.tokenAmounts
-	if (amount.length == 0) {
-		return
+	if (NetworkConfigs.getAmmList().includes(event.address.toHexString())) {
+		let amount = event.params.tokenAmounts
+		if (amount.length == 0) {
+			return
+		}
+
+		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
+			event.address.toHexString()
+		)
+		const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
+		const poolConfig = NetworkConfigs.getPoolDetails(
+			event.address.toHexString()
+		)
+
+		const poolName = poolConfig[0]
+		const poolSymbol = poolConfig[0]
+
+		const bridgeAddress = bridgeConfig[0]
+		const bridgeName = bridgeConfig[1]
+		const bridgeSlug = bridgeConfig[2]
+
+		const conf = new BridgeConfig(
+			bridgeAddress,
+			bridgeName,
+			bridgeSlug,
+			BridgePermissionType.PERMISSIONLESS,
+			Versions
+		)
+
+		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+
+		const pool = sdk.Pools.loadPool<string>(event.address)
+		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
+		const acc = sdk.Accounts.loadAccount(event.params.provider)
+
+		if (!pool.isInitialized) {
+			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+		}
+
+		acc.liquidityWithdraw(pool, amount[0])
 	}
-
-	const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
-		event.address.toHexString()
-	)
-	const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
-	const poolConfig = NetworkConfigs.getPoolDetails(inputToken)
-
-	const poolName = poolConfig[0]
-	const poolSymbol = poolConfig[0]
-
-	const bridgeAddress = bridgeConfig[0]
-	const bridgeName = bridgeConfig[1]
-	const bridgeSlug = bridgeConfig[2]
-
-	const conf = new BridgeConfig(
-		bridgeAddress,
-		bridgeName,
-		bridgeSlug,
-		BridgePermissionType.PERMISSIONLESS,
-		Versions
-	)
-
-	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
-
-	const pool = sdk.Pools.loadPool<string>(event.address)
-	const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
-	const acc = sdk.Accounts.loadAccount(event.params.provider)
-
-	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
-	}
-
-	acc.liquidityWithdraw(pool, amount[0])
 }
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
-	let tokenIndex = event.params.boughtId
-	if (!tokenIndex.equals(BigInt.zero())) {
-		return
+	if (NetworkConfigs.getAmmList().includes(event.address.toHexString())) {
+		let tokenIndex = event.params.boughtId
+		if (!tokenIndex.equals(BigInt.zero())) {
+			return
+		}
+
+		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
+			event.address.toHexString()
+		)
+		const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
+		const poolConfig = NetworkConfigs.getPoolDetails(
+			event.address.toHexString()
+		)
+
+		const poolName = poolConfig[0]
+		const poolSymbol = poolConfig[0]
+
+		const bridgeAddress = bridgeConfig[0]
+		const bridgeName = bridgeConfig[1]
+		const bridgeSlug = bridgeConfig[2]
+
+		const conf = new BridgeConfig(
+			bridgeAddress,
+			bridgeName,
+			bridgeSlug,
+			BridgePermissionType.PERMISSIONLESS,
+			Versions
+		)
+
+		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+
+		const pool = sdk.Pools.loadPool<string>(event.address)
+		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
+		const acc = sdk.Accounts.loadAccount(event.params.provider)
+
+		if (!pool.isInitialized) {
+			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+		}
+
+		acc.liquidityWithdraw(pool, event.params.lpTokenAmount)
 	}
-
-	const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
-		event.address.toHexString()
-	)
-	const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
-	const poolConfig = NetworkConfigs.getPoolDetails(inputToken)
-
-	const poolName = poolConfig[0]
-	const poolSymbol = poolConfig[0]
-
-	const bridgeAddress = bridgeConfig[0]
-	const bridgeName = bridgeConfig[1]
-	const bridgeSlug = bridgeConfig[2]
-
-	const conf = new BridgeConfig(
-		bridgeAddress,
-		bridgeName,
-		bridgeSlug,
-		BridgePermissionType.PERMISSIONLESS,
-		Versions
-	)
-
-	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
-
-	const pool = sdk.Pools.loadPool<string>(event.address)
-	const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
-	const acc = sdk.Accounts.loadAccount(event.params.provider)
-
-	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
-	}
-
-	acc.liquidityWithdraw(pool, event.params.lpTokenAmount)
 }
