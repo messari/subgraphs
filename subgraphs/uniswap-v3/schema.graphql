@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM (Extended)
-# Version: 3.0.1
+# Version: 3.0.2
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -271,6 +271,15 @@ type DexAmmProtocol implements Protocol @entity {
   " Total number of positions (open and closed) "
   cumulativePositionCount: Int!
 
+  " Day ID of the most recent snapshot "
+  lastSnapshotsDayID: Int!
+
+  " Timestamp of the most recent snapshot "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the most recent snapshot "
+  lastUpdateBlockNumber: BigInt!
+
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -291,9 +300,6 @@ type DexAmmProtocol implements Protocol @entity {
 
   " This is a boolean to indicate whether or not the pools have been instantiated the were initialized before Optimism regenesis "
   _regenesis: Boolean!
-
-  " Day ID of the most recent snapshot "
-  _mostRecentSnapshotsDayID: Int!
 }
 
 ###############################
@@ -564,6 +570,18 @@ type LiquidityPool @entity {
   " Number of closed positions in this market "
   closedPositionCount: Int!
 
+  " Day ID of the most recent snapshot "
+  lastSnapshotsDayID: Int!
+
+  " Hour ID of the most recent snapshot "
+  lastSnapshotsHourID: Int!
+
+  " Timestamp of the most recent snapshot "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the most recent snapshot "
+  lastUpdateBlockNumber: BigInt!
+
   ##### Snapshots #####
 
   " Liquidity pool daily snapshots "
@@ -588,12 +606,6 @@ type LiquidityPool @entity {
   _totalAmountCollected: [BigInt!]!
 
   _totalAmountEarned: [BigInt!]!
-
-  " Day ID of the most recent snapshot "
-  _mostRecentSnapshotsDayID: Int!
-
-  " Hour ID of the most recent snapshot "
-  _mostRecentSnapshotsHourID: Int!
 }
 
 #################################
@@ -906,10 +918,16 @@ type Tick @entity {
   liquidityNetUSD: BigDecimal!
 
   " Day ID of the most recent snapshot "
-  _mostRecentSnapshotsDayID: Int!
+  lastSnapshotsDayID: Int!
 
   " Hour ID of the most recent snapshot "
-  _mostRecentSnapshotsHourID: Int!
+  lastSnapshotsHourID: Int!
+
+  " Timestamp of the most recent snapshot "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the most recent snapshot "
+  lastUpdateBlockNumber: BigInt!
 }
 
 #######################################

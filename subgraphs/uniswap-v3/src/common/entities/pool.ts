@@ -98,11 +98,14 @@ export function createLiquidityPool(
   pool.openPositionCount = INT_ZERO;
   pool.closedPositionCount = INT_ZERO;
 
+  pool.lastSnapshotsDayID = INT_ZERO;
+  pool.lastSnapshotsHourID = INT_ZERO;
+  pool.lastUpdateBlockNumber = event.block.number;
+  pool.lastUpdateTimestamp = event.block.timestamp;
+
   pool._totalAmountWithdrawn = [BIGINT_ZERO, BIGINT_ZERO];
   pool._totalAmountCollected = [BIGINT_ZERO, BIGINT_ZERO];
   pool._totalAmountEarned = [BIGINT_ZERO, BIGINT_ZERO];
-  pool._mostRecentSnapshotsDayID = INT_ZERO;
-  pool._mostRecentSnapshotsHourID = INT_ZERO;
 
   poolAmounts.inputTokens = [token0.id, token1.id];
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];

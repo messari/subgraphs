@@ -5,6 +5,7 @@ import { Versions } from "../../versions";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   INT_ZERO,
   ProtocolType,
 } from "../constants";
@@ -36,7 +37,9 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalPoolCount = INT_ZERO;
     protocol._regenesis = false;
-    protocol._mostRecentSnapshotsDayID = INT_ZERO;
+    protocol.lastSnapshotsDayID = INT_ZERO;
+    protocol.lastUpdateBlockNumber = BIGINT_ZERO;
+    protocol.lastUpdateTimestamp = BIGINT_ZERO;
   }
 
   protocol.schemaVersion = Versions.getSchemaVersion();

@@ -33,6 +33,7 @@ import {
   SECONDS_PER_HOUR,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  BIGINT_NEG_ONE,
 } from "./constants";
 import { getOrCreateAccount } from "./entities/account";
 import { getLiquidityPoolFee, getLiquidityPoolAmounts } from "./entities/pool";
@@ -241,9 +242,8 @@ export class DexEventHandler {
     this.totalValueLockedUSDDelta = this.totalValueLockedUSD.minus(
       this.pool.totalValueLockedUSD
     );
-
     // Handle volumes
-    if ((trackVolume = true)) {
+    if (trackVolume) {
       // Get the tracked volume and revenue - they are not tracked for non-whitelist token
       this.trackedInputTokenBalanceDeltasUSD = getTrackedVolumeUSD(
         pool,
@@ -253,8 +253,6 @@ export class DexEventHandler {
       this.trackedVolumeUSD = BigDecimalAverage(
         this.trackedInputTokenBalanceDeltasUSD
       );
-      log.warning("TRACKED VOLUME:" + this.trackedVolumeUSD.toString(), []);
-
       this.trackedSupplySideRevenueDeltaUSD = this.trackedVolumeUSD.times(
         percToDec(supplyFee.feePercentage!)
       );
@@ -269,6 +267,16 @@ export class DexEventHandler {
         pool.cumulativeProtocolSideRevenueUSD.plus(
           this.trackedProtocolSideRevenueDeltaUSD
         );
+    } else {
+      // Array with zeros
+      this.trackedInputTokenBalanceDeltasUSD = new Array<BigDecimal>(
+        tokens.length
+      ).fill(BIGDECIMAL_ZERO);
+      this.trackedVolumeUSD = BIGDECIMAL_ZERO;
+      this.trackedSupplySideRevenueDeltaUSD = BIGDECIMAL_ZERO;
+      this.trackedProtocolSideRevenueDeltaUSD = BIGDECIMAL_ZERO;
+      this.trackedSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+      this.trackedProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     }
   }
 
@@ -278,7 +286,7 @@ export class DexEventHandler {
     tickUpper: Tick | null,
     position: Position | null
   ): void {
-    this.eventType = EventType.DEPOSIT;
+    this.eventType = EventType.WITHDRAW;
     this.tickUpper = tickUpper;
     this.tickLower = tickLower;
 
@@ -313,7 +321,7 @@ export class DexEventHandler {
     tickUpper: Tick | null,
     position: Position | null
   ): void {
-    this.eventType = EventType.WITHDRAW;
+    this.eventType = EventType.DEPOSIT;
     this.tickUpper = tickUpper;
     this.tickLower = tickLower;
 
@@ -371,7 +379,8 @@ export class DexEventHandler {
     swap.amountIn = this.inputTokenBalanceDeltas[tokensInIdx];
     swap.amountInUSD = this.inputTokenBalanceDeltasUSD[tokensInIdx];
     swap.tokenOut = this.pool.inputTokens[tokensOutIdx];
-    swap.amountOut = this.inputTokenBalanceDeltas[tokensOutIdx];
+    swap.amountOut =
+      this.inputTokenBalanceDeltas[tokensOutIdx].times(BIGINT_NEG_ONE);
     swap.amountOutUSD = this.inputTokenBalanceDeltasUSD[tokensOutIdx];
 
     swap.save();
@@ -380,50 +389,50 @@ export class DexEventHandler {
 
   // Positions are only snapped once per interval to save space
   processLPBalanceChanges(): void {
-    if (this.protocol._mostRecentSnapshotsDayID != this.dayID) {
+    if (this.protocol.lastSnapshotsDayID != this.dayID) {
       this.updateAndSaveFinancialMetrics();
-      this.protocol._mostRecentSnapshotsDayID = this.dayID;
+      this.protocol.lastSnapshotsDayID = this.dayID;
       this.protocol.save();
     }
 
-    if (this.pool._mostRecentSnapshotsDayID != this.dayID) {
+    if (this.pool.lastSnapshotsDayID != this.dayID) {
       this.updateAndSaveLiquidityPoolDailyMetrics();
-      this.pool._mostRecentSnapshotsDayID = this.dayID;
+      this.pool.lastSnapshotsDayID = this.dayID;
       this.pool.save();
     }
-    if (this.pool._mostRecentSnapshotsHourID != this.hourID) {
+    if (this.pool.lastSnapshotsHourID != this.hourID) {
       this.updateAndSaveLiquidityPoolHourlyMetrics();
-      this.pool._mostRecentSnapshotsHourID = this.hourID;
+      this.pool.lastSnapshotsHourID = this.hourID;
       this.pool.save();
     }
 
     if (this.tickLower || this.tickUpper) {
-      if (this.tickLower!._mostRecentSnapshotsDayID != this.dayID) {
+      if (this.tickLower!.lastSnapshotsDayID != this.dayID) {
         this.updateAndSaveTickDailySnapshotEntity(this.tickLower!);
-        this.tickLower!._mostRecentSnapshotsDayID = this.dayID;
+        this.tickLower!.lastSnapshotsDayID = this.dayID;
         this.tickLower!.save();
       }
       // if the tick is the same, we don't need to update the upper tick
       if (
-        this.tickUpper!._mostRecentSnapshotsDayID != this.dayID &&
+        this.tickUpper!.lastSnapshotsDayID != this.dayID &&
         this.tickUpper!.index != this.tickLower!.index
       ) {
         this.updateAndSaveTickDailySnapshotEntity(this.tickUpper!);
-        this.tickUpper!._mostRecentSnapshotsDayID = this.dayID;
+        this.tickUpper!.lastSnapshotsDayID = this.dayID;
         this.tickUpper!.save();
       }
-      if (this.tickLower!._mostRecentSnapshotsHourID != this.hourID) {
+      if (this.tickLower!.lastSnapshotsHourID != this.hourID) {
         this.updateAndSaveTickHourlySnapshotEntity(this.tickLower!);
-        this.tickLower!._mostRecentSnapshotsHourID = this.hourID;
+        this.tickLower!.lastSnapshotsHourID = this.hourID;
         this.tickLower!.save();
       }
       // if the tick is the same, we don't need to update the upper tick
       if (
-        this.tickUpper!._mostRecentSnapshotsHourID != this.hourID &&
+        this.tickUpper!.lastSnapshotsHourID != this.hourID &&
         this.tickUpper!.index != this.tickLower!.index
       ) {
         this.updateAndSaveTickHourlySnapshotEntity(this.tickUpper!);
-        this.tickUpper!._mostRecentSnapshotsHourID = this.hourID;
+        this.tickUpper!.lastSnapshotsHourID = this.hourID;
         this.tickUpper!.save();
       }
       this.updateAndSaveTickEntity();
@@ -474,7 +483,8 @@ export class DexEventHandler {
         sumBigDecimalList(this.uncollectedProtocolSideValuesDeltasUSD)
       );
 
-    this.protocol.save();
+    this.protocol.lastUpdateBlockNumber = this.event.block.number;
+    this.protocol.lastUpdateTimestamp = this.event.block.timestamp;
 
     if (
       this.account.depositCount == INT_ZERO &&
@@ -538,6 +548,9 @@ export class DexEventHandler {
       this.pool.cumulativeSwapCount += INT_ONE;
     }
 
+    this.pool.lastUpdateBlockNumber = this.event.block.number;
+    this.pool.lastUpdateTimestamp = this.event.block.timestamp;
+
     this._poolAmounts.inputTokenBalances = this.inputTokenBalancesPoolAmounts;
     this._poolAmounts.save();
 
@@ -545,11 +558,11 @@ export class DexEventHandler {
   }
 
   updateAndSaveFinancialMetrics(): void {
-    const id = Bytes.fromI32(this.dayID);
+    const id = Bytes.fromI32(this.pool.lastSnapshotsDayID + 1);
 
     const financialMetrics = new FinancialsDailySnapshot(id);
     const prevFinancialMetrics = FinancialsDailySnapshot.load(
-      Bytes.fromI32(this.protocol._mostRecentSnapshotsDayID)
+      Bytes.fromI32(this.protocol.lastSnapshotsDayID)
     );
 
     let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
@@ -565,17 +578,14 @@ export class DexEventHandler {
         prevFinancialMetrics.cumulativeProtocolSideRevenueUSD;
       prevCumulativeTotalRevenueUSD =
         prevFinancialMetrics.cumulativeTotalRevenueUSD;
-    } else if (this.pool._mostRecentSnapshotsDayID > INT_ZERO) {
+    } else if (this.pool.lastSnapshotsDayID > INT_ZERO) {
       log.critical(
         "Missing pool snapshot at ID that has been snapped: Pool {}, ID {} ",
-        [
-          this.pool.id.toHexString(),
-          this.pool._mostRecentSnapshotsDayID.toString(),
-        ]
+        [this.pool.id.toHexString(), this.pool.lastSnapshotsDayID.toString()]
       );
     }
 
-    financialMetrics.days = this.dayID;
+    financialMetrics.days = this.pool.lastSnapshotsDayID + 1;
     financialMetrics.protocol = NetworkConfigs.getFactoryAddress();
 
     financialMetrics.totalValueLockedUSD = this.protocol.totalValueLockedUSD;
@@ -610,17 +620,17 @@ export class DexEventHandler {
         prevCumulativeTotalRevenueUSD
       );
 
-    financialMetrics.blockNumber = this.event.block.number;
-    financialMetrics.timestamp = this.event.block.timestamp;
+    financialMetrics.blockNumber = this.protocol.lastUpdateBlockNumber;
+    financialMetrics.timestamp = this.protocol.lastUpdateTimestamp;
 
     financialMetrics.save();
   }
 
   updateAndSaveLiquidityPoolDailyMetrics(): void {
-    const id = this.event.address.concatI32(this.dayID);
+    const id = this.event.address.concatI32(this.pool.lastSnapshotsDayID + 1);
     const poolMetrics = new LiquidityPoolDailySnapshot(id);
     const prevPoolMetrics = LiquidityPoolDailySnapshot.load(
-      this.event.address.concatI32(this.pool._mostRecentSnapshotsDayID)
+      this.event.address.concatI32(this.pool.lastSnapshotsDayID)
     );
 
     let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
@@ -650,17 +660,14 @@ export class DexEventHandler {
       prevCumulativeDepositCount = prevPoolMetrics.cumulativeDepositCount;
       prevCumulativeWithdrawCount = prevPoolMetrics.cumulativeWithdrawCount;
       prevCumulativeSwapCount = prevPoolMetrics.cumulativeSwapCount;
-    } else if (this.pool._mostRecentSnapshotsDayID > INT_ZERO) {
+    } else if (this.pool.lastSnapshotsDayID > INT_ZERO) {
       log.critical(
         "Missing pool snapshot at ID that has been snapped: Pool {}, ID {} ",
-        [
-          this.pool.id.toHexString(),
-          this.pool._mostRecentSnapshotsDayID.toString(),
-        ]
+        [this.pool.id.toHexString(), this.pool.lastSnapshotsDayID.toString()]
       );
     }
 
-    poolMetrics.days = this.dayID;
+    poolMetrics.days = this.pool.lastSnapshotsDayID + 1;
     poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
     poolMetrics.pool = this.event.address;
     poolMetrics.tick = this.pool.tick;
@@ -730,17 +737,17 @@ export class DexEventHandler {
     poolMetrics.openPositionCount = this.pool.openPositionCount;
     poolMetrics.closedPositionCount = this.pool.closedPositionCount;
 
-    poolMetrics.blockNumber = this.event.block.number;
-    poolMetrics.timestamp = this.event.block.timestamp;
+    poolMetrics.blockNumber = this.pool.lastUpdateBlockNumber;
+    poolMetrics.timestamp = this.pool.lastUpdateTimestamp;
 
     poolMetrics.save();
   }
 
   updateAndSaveLiquidityPoolHourlyMetrics(): void {
-    const id = this.event.address.concatI32(this.hourID);
+    const id = this.event.address.concatI32(this.pool.lastSnapshotsHourID + 1);
     const poolMetrics = new LiquidityPoolHourlySnapshot(id);
     const prevPoolMetrics = LiquidityPoolHourlySnapshot.load(
-      this.event.address.concatI32(this.pool._mostRecentSnapshotsHourID)
+      this.event.address.concatI32(this.pool.lastSnapshotsHourID)
     );
 
     let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
@@ -770,17 +777,14 @@ export class DexEventHandler {
       prevCumulativeDepositCount = prevPoolMetrics.cumulativeDepositCount;
       prevCumulativeWithdrawCount = prevPoolMetrics.cumulativeWithdrawCount;
       prevCumulativeSwapCount = prevPoolMetrics.cumulativeSwapCount;
-    } else if (this.pool._mostRecentSnapshotsHourID > INT_ZERO) {
+    } else if (this.pool.lastSnapshotsHourID > INT_ZERO) {
       log.critical(
         "Missing pool snapshot at ID that has been snapped: Pool {}, ID {} ",
-        [
-          this.pool.id.toHexString(),
-          this.pool._mostRecentSnapshotsHourID.toString(),
-        ]
+        [this.pool.id.toHexString(), this.pool.lastSnapshotsHourID.toString()]
       );
     }
 
-    poolMetrics.hours = this.hourID;
+    poolMetrics.hours = this.pool.lastSnapshotsHourID + 1;
     poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
     poolMetrics.pool = this.event.address;
     poolMetrics.tick = this.pool.tick;
@@ -850,8 +854,8 @@ export class DexEventHandler {
     poolMetrics.openPositionCount = this.pool.openPositionCount;
     poolMetrics.closedPositionCount = this.pool.closedPositionCount;
 
-    poolMetrics.blockNumber = this.event.block.number;
-    poolMetrics.timestamp = this.event.block.timestamp;
+    poolMetrics.blockNumber = this.pool.lastUpdateBlockNumber;
+    poolMetrics.timestamp = this.pool.lastUpdateTimestamp;
 
     poolMetrics.save();
   }
@@ -886,6 +890,11 @@ export class DexEventHandler {
         this.newLiquidityPricePerUnit
       );
 
+    this.tickUpper!.lastUpdateBlockNumber = this.event.block.number;
+    this.tickUpper!.lastUpdateTimestamp = this.event.block.timestamp;
+    this.tickLower!.lastUpdateBlockNumber = this.event.block.number;
+    this.tickLower!.lastUpdateTimestamp = this.event.block.timestamp;
+
     this.tickLower!.save();
     this.tickUpper!.save();
   }
@@ -893,14 +902,14 @@ export class DexEventHandler {
   updateAndSaveTickDailySnapshotEntity(tick: Tick): void {
     const tickID = this.pool.id
       .concatI32(tick!.index.toI32())
-      .concatI32(this.dayID);
+      .concatI32(this.tickLower!.lastSnapshotsDayID + 1);
 
     const tickSnapshot = new TickDailySnapshot(tickID);
-    tickSnapshot.days = this.dayID;
+    tickSnapshot.days = this.tickLower!.lastSnapshotsDayID + 1;
     tickSnapshot.tick = this.tickLower!.id;
     tickSnapshot.pool = this.pool.id;
-    tickSnapshot.timestamp = this.event.block.timestamp;
-    tickSnapshot.blockNumber = this.event.block.number;
+    tickSnapshot.timestamp = this.tickLower!.lastUpdateTimestamp;
+    tickSnapshot.blockNumber = this.tickLower!.lastUpdateBlockNumber;
     tickSnapshot.liquidityGross = this.tickLower!.liquidityGross;
     tickSnapshot.liquidityGrossUSD = this.tickLower!.liquidityGrossUSD;
     tickSnapshot.liquidityNet = this.tickLower!.liquidityNet;
@@ -911,14 +920,14 @@ export class DexEventHandler {
   updateAndSaveTickHourlySnapshotEntity(tick: Tick): void {
     const tickID = this.pool.id
       .concatI32(tick!.index.toI32())
-      .concatI32(this.hourID);
+      .concatI32(this.tickLower!.lastSnapshotsHourID + 1);
 
     const tickSnapshot = new TickHourlySnapshot(tickID);
-    tickSnapshot.hours = this.hourID;
+    tickSnapshot.hours = this.tickLower!.lastSnapshotsHourID + 1;
     tickSnapshot.tick = this.tickLower!.id;
     tickSnapshot.pool = this.pool.id;
-    tickSnapshot.timestamp = this.event.block.timestamp;
-    tickSnapshot.blockNumber = this.event.block.number;
+    tickSnapshot.timestamp = this.tickLower!.lastUpdateTimestamp;
+    tickSnapshot.blockNumber = this.tickLower!.lastUpdateBlockNumber;
     tickSnapshot.liquidityGross = this.tickLower!.liquidityGross;
     tickSnapshot.liquidityGrossUSD = this.tickLower!.liquidityGrossUSD;
     tickSnapshot.liquidityNet = this.tickLower!.liquidityNet;
