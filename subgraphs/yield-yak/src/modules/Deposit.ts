@@ -15,11 +15,7 @@ import {
 import * as utils from "../common/utils";
 import { Deposit } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
-import {
-  calculatePriceInUSD,
-  calculateOutputTokenPriceInUSD,
-} from "../common/calculators";
-import { getUsdPrice, getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken } from "../Prices";
 import { getPriceOfOutputTokens } from "./Price";
 import { exponentToBigDecimal } from "../common/utils";
 

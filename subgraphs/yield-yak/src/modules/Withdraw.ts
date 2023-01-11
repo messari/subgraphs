@@ -21,19 +21,12 @@ import {
   ZERO_BIGINT,
   ZERO_BIGDECIMAL,
   BIGINT_TEN,
-  BIGDECIMAL_ZERO,
 } from "../helpers/constants";
 import * as utils from "../common/utils";
 import { Withdraw } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
-import {
-  calculatePriceInUSD,
-  calculateOutputTokenPriceInUSD,
-} from "../common/calculators";
-import { getUsdPrice, getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken } from "../Prices";
 import { getPriceOfOutputTokens } from "./Price";
-import { getPriceUsdcRecommended } from "../Prices/calculations/CalculationsSushiswap";
-import { NETWORK_STRING } from "../Prices/config/avalanche";
 import { exponentToBigDecimal } from "../common/utils";
 
 export function _Withdraw(
@@ -79,15 +72,6 @@ export function _Withdraw(
           .div(inputTokenPrice.decimalsBaseTen)
       );
 
-      log.error(
-        "input token price in USD {} tvl in USD {} and token address {} input token balance {}",
-        [
-          inputTokenPrice.usdPrice.toString(),
-          vault.totalValueLockedUSD.toString(),
-          inputTokenAddress.toHexString(),
-          vault.inputTokenBalance.toString(),
-        ]
-      );
       // vault.totalValueLockedUSD = getUsdPrice(
       //   strategyContract.depositToken(),
       //   ZERO_BIGDECIMAL
@@ -130,11 +114,6 @@ export function _Withdraw(
     .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
-
-  // const withdrawAmountUSD = getPriceUsdcRecommended(
-  //   strategyContract.depositToken(),
-  //   NETWORK_STRING
-  // ).usdPrice;
 
   createWithdrawTransaction(
     contractAddress,

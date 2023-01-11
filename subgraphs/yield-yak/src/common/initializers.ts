@@ -1,4 +1,4 @@
-import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 import {
   Account,
   FinancialsDailySnapshot,
@@ -28,7 +28,7 @@ import { Token } from "../../generated/schema";
 import { YakERC20 } from "../../generated/YakStrategyV2/YakERC20";
 import { VaultFee } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
-import { calculatePriceInUSD } from "./calculators";
+import { getUsdPricePerToken } from "../Prices";
 
 export function getOrCreateVault(
   contractAddress: Address,
@@ -63,16 +63,36 @@ export function getOrCreateVault(
     }
 
     if (stategyContract.try_depositToken().reverted) {
-      const inputTokenAddress = ZERO_ADDRESS;
+      let inputTokenAddress = ZERO_ADDRESS;
+      
+      if (stategyContract.name() == "Yield Yak: Aave AVAX") {
+        inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
+      }
+      if (stategyContract.name() == "Yield Yak: Benqi AVAX") {
+        inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
+      }
+
       const inputToken = getOrCreateToken(inputTokenAddress, block.number);
       vault.inputToken = inputToken.id;
     } else {
-      const inputTokenAddress = stategyContract.depositToken();
+      let inputTokenAddress = stategyContract.depositToken();
+      
+      if (stategyContract.name() == "Yield Yak: GMX fsGLP") {
+        inputTokenAddress = Address.fromString("0x9e295B5B976a184B14aD8cd72413aD846C299660")
+      }
+      if (stategyContract.name() == "Yield Yak: Aave AVAX") {
+        inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
+      }
+      if (stategyContract.name() == "Yield Yak: Benqi AVAX") {
+        inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
+      }
+
       const inputToken = getOrCreateToken(inputTokenAddress, block.number);
       vault.inputToken = inputToken.id;
     }
+    
 
-    const outputToken = getOrCreateToken(contractAddress, block.number);
+    const outputToken = getOrCreateToken(ZERO_ADDRESS, block.number);
     vault.outputToken = outputToken.id;
     vault.outputTokenSupply = ZERO_BIGINT;
     vault.fees = [];
@@ -162,7 +182,8 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       token.decimals = contract.decimals();
     }
 
-    token.lastPriceUSD = calculatePriceInUSD(address, DEFUALT_AMOUNT);
+    let fetchPrice = getUsdPricePerToken(Address.fromString(token.id));
+    token.lastPriceUSD = fetchPrice.usdPrice.div(fetchPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = blockNumber;
 
     token.save();

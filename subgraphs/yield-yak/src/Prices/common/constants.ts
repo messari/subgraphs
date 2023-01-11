@@ -39,6 +39,7 @@ export const WRAPPED_BASE_TOKEN_CALCULATIONS_ADDRESS_MAP = new TypedMap<
 export const WHITELIST_TOKENS_LIST: string[] = [
   "WETH",
   "WAVAX",
+  "AVAX",
   "USDT",
   "DAI",
   "USDC",
@@ -51,6 +52,7 @@ export const WHITELIST_TOKENS_LIST: string[] = [
   "fBTC",
   "FRAX",
   "CRV",
+  "fsGLP",
 ];
 
 ///////////////////////////////////////////////////////////////////////////

@@ -15,24 +15,12 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   // TraderJoe Router
   let traderJoePrice = getPriceUsdcTraderJoe(tokenAddr, network);
   if (!traderJoePrice.reverted) {
-    log.warning("[TraderJoeRouter] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      traderJoePrice.usdPrice.div(traderJoePrice.decimalsBaseTen).toString(),
-    ]);
     return traderJoePrice;
   }
-  log.warning(
-    "[Oracle] Failed to Fetch Price with TraderJoe will try sushiswap next, tokenAddr: {}",
-    [tokenAddr.toHexString()]
-  );
 
   // 7. SushiSwap Router
   let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
   if (!sushiswapPrice.reverted) {
-    log.info("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      sushiswapPrice.usdPrice.div(sushiswapPrice.decimalsBaseTen).toString(),
-    ]);
     return sushiswapPrice;
   }
 
