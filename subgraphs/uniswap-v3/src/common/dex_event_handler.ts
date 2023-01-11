@@ -33,6 +33,7 @@ import {
   SECONDS_PER_HOUR,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  BIGINT_NEG_ONE,
 } from "./constants";
 import { getOrCreateAccount } from "./entities/account";
 import { getLiquidityPoolFee, getLiquidityPoolAmounts } from "./entities/pool";
@@ -241,9 +242,8 @@ export class DexEventHandler {
     this.totalValueLockedUSDDelta = this.totalValueLockedUSD.minus(
       this.pool.totalValueLockedUSD
     );
-
     // Handle volumes
-    if ((trackVolume = true)) {
+    if (trackVolume) {
       // Get the tracked volume and revenue - they are not tracked for non-whitelist token
       this.trackedInputTokenBalanceDeltasUSD = getTrackedVolumeUSD(
         pool,
@@ -253,8 +253,6 @@ export class DexEventHandler {
       this.trackedVolumeUSD = BigDecimalAverage(
         this.trackedInputTokenBalanceDeltasUSD
       );
-      log.warning("TRACKED VOLUME:" + this.trackedVolumeUSD.toString(), []);
-
       this.trackedSupplySideRevenueDeltaUSD = this.trackedVolumeUSD.times(
         percToDec(supplyFee.feePercentage!)
       );
@@ -270,6 +268,17 @@ export class DexEventHandler {
           this.trackedProtocolSideRevenueDeltaUSD
         );
     }
+    {
+      // Array with zeros
+      this.trackedInputTokenBalanceDeltasUSD = new Array<BigDecimal>(
+        tokens.length
+      ).fill(BIGDECIMAL_ZERO);
+      this.trackedVolumeUSD = BIGDECIMAL_ZERO;
+      this.trackedSupplySideRevenueDeltaUSD = BIGDECIMAL_ZERO;
+      this.trackedProtocolSideRevenueDeltaUSD = BIGDECIMAL_ZERO;
+      this.trackedSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+      this.trackedProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    }
   }
 
   createWithdraw(
@@ -278,7 +287,7 @@ export class DexEventHandler {
     tickUpper: Tick | null,
     position: Position | null
   ): void {
-    this.eventType = EventType.DEPOSIT;
+    this.eventType = EventType.WITHDRAW;
     this.tickUpper = tickUpper;
     this.tickLower = tickLower;
 
@@ -313,7 +322,7 @@ export class DexEventHandler {
     tickUpper: Tick | null,
     position: Position | null
   ): void {
-    this.eventType = EventType.WITHDRAW;
+    this.eventType = EventType.DEPOSIT;
     this.tickUpper = tickUpper;
     this.tickLower = tickLower;
 
@@ -371,7 +380,8 @@ export class DexEventHandler {
     swap.amountIn = this.inputTokenBalanceDeltas[tokensInIdx];
     swap.amountInUSD = this.inputTokenBalanceDeltasUSD[tokensInIdx];
     swap.tokenOut = this.pool.inputTokens[tokensOutIdx];
-    swap.amountOut = this.inputTokenBalanceDeltas[tokensOutIdx];
+    swap.amountOut =
+      this.inputTokenBalanceDeltas[tokensOutIdx].times(BIGINT_NEG_ONE);
     swap.amountOutUSD = this.inputTokenBalanceDeltasUSD[tokensOutIdx];
 
     swap.save();
