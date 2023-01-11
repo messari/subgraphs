@@ -217,24 +217,24 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 	getPoolAddressFromBridgeAddress(bridgeAddress: string): string {
 		if (
 			bridgeAddress ==
-			'0x0e0E3d2C5c292161999474247956EF542caBF8dd'.toLowerCase() //USDC POOL
+			'0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8'.toLowerCase() //USDC POOL
 		) {
-			return '0x5C32143C8B198F392d01f8446b754c181224ac26'.toLowerCase()
+			return '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'.toLowerCase()
 		} else if (
 			bridgeAddress ==
-			'0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'.toLowerCase() //HOP/DAI
+			'0xEcf268Be00308980B5b3fcd0975D47C4C8e1382a'.toLowerCase() //HOP/DAI
 		) {
-			return '0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266'.toLowerCase() //DAI
+			return '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'.toLowerCase() //DAI
 		} else if (
 			bridgeAddress ==
 			'0x6c9a1ACF73bd85463A46B0AFc076FBdf602b690B'.toLowerCase() //HOP/USDT
 		) {
-			return '0xB2f7d27B21a69a033f85C42d5EB079043BAadC81'.toLowerCase() //USDT
+			return '0xc2132D05D31c914a87C6611C10748AEb04B58e8F'.toLowerCase() //USDT
 		} else if (
 			bridgeAddress ==
 			'0xb98454270065A31D71Bf635F6F7Ee6A518dFb849'.toLowerCase() //HOP/ETH
 		) {
-			return '0x266e2dc3C4c59E42AA07afeE5B09E964cFFe6778'.toLowerCase() //ETH
+			return '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'.toLowerCase() //ETH
 		} else if (
 			bridgeAddress ==
 			'0x553bC791D746767166fA3888432038193cEED5E2'.toLowerCase() //HOP/MATIC
@@ -244,7 +244,7 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 			bridgeAddress ==
 			'0x91Bd9Ccec64fC22475323a0E55d58F7786587905'.toLowerCase() //HOP/WBTC
 		) {
-			return '0x4e9840f3C1ff368a10731D15c11516b9Fe7E1898'.toLowerCase() //WBTC
+			return '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6'.toLowerCase() //WBTC
 		} else if (
 			bridgeAddress ==
 			'0x58c61AeE5eD3D748a1467085ED2650B697A66234'.toLowerCase() //HOP BRIDGE

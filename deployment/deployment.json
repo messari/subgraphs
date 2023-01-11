@@ -7611,7 +7611,7 @@
           "prepare:constants": true
         }
       },
-      "hop-protocol-matic": {
+      "hop-protocol-polygon": {
         "network": "polygon",
         "status": "prod",
         "versions": {
@@ -7621,8 +7621,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "hop-protocol-matic",
-            "query-id": "hop-protocol-matic"
+            "slug": "hop-protocol-polygon",
+            "query-id": "hop-protocol-polygon"
           }
         },
         "files": {
