@@ -267,8 +267,7 @@ export class DexEventHandler {
         pool.cumulativeProtocolSideRevenueUSD.plus(
           this.trackedProtocolSideRevenueDeltaUSD
         );
-    }
-    {
+    } else {
       // Array with zeros
       this.trackedInputTokenBalanceDeltasUSD = new Array<BigDecimal>(
         tokens.length
