@@ -21,6 +21,15 @@ import {
 import { Wrapper as WrapperContract } from "../../generated/templates/WrapperTemplate/Wrapper";
 import { WrapperCreated as WrapperCreatedEvent } from "../../generated/WrapperFactory_0/WrapperFactory";
 import { BIGDECIMAL_ZERO } from "../utils/constants";
+import { addMarketTokenBalance, getOrCreateMarket } from "../entities/market";
+import {
+  createBorrow,
+  createDeposit,
+  createRepay,
+  createWithdraw,
+} from "../entities/event";
+import { getOrCreateToken } from "../entities/token";
+import { addProtocolSideRevenue } from "../entities/protocol";
 
 export function handleWrapperCreated(event: WrapperCreatedEvent): void {
   const context = new DataSourceContext();
@@ -57,33 +66,17 @@ export function handleMinted(event: MintedEvent): void {
 
   wrapper.save();
 
-  // // A mint is basically a deposit + borrow
-  // // Principal + Fee = AmountIn
-  // const market = getOrCreateMarket(wrapper.tokenAddress, event);
-  // market.cumulativeProtocolSideRevenueUSD = wrapper.totalFeesInUSD;
-  // market.cumulativeTotalRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  const address = event.params.account;
+  const token = getOrCreateToken(event.address.toHexString());
+  const amount = event.params.amountIn;
+  const amountUSD = toDecimal(amount).times(latestRate!);
+  const market = getOrCreateMarket(token.id, event);
+  const feeUSD = toDecimal(event.params.fee).times(latestRate!);
 
-  // market.totalValueLockedUSD = wrapper.amountInUSD;
-  // market.totalDepositBalanceUSD = wrapper.amountInUSD;
-  // market.totalBorrowBalanceUSD = wrapper.amountInUSD;
-
-  // addMarketDepositVolume(event, toDecimal(event.params.amountIn), market);
-  // addMarketBorrowVolume(event, toDecimal(event.params.amountIn), market);
-
-  // market.inputTokenBalance = market.inputTokenBalance.plus(
-  //   event.params.principal
-  // );
-  // market.inputTokenPriceUSD = latestRate!;
-
-  // // principal + fee = (amountOut == amountIn)
-  // // amountOut is minted, fee as outputToken is sent to fee address.
-  // market.outputTokenSupply = market.outputTokenSupply.plus(
-  //   event.params.amountIn
-  // );
-  // market.outputTokenPriceUSD = latestRate!;
-
-  // // Handle Market Positions
-  // market.save();
+  createDeposit(event, market, token, amount, amountUSD, address);
+  createBorrow(event, market, token, amount, amountUSD, address);
+  addProtocolSideRevenue(event, market, feeUSD);
+  addMarketTokenBalance(event, market, amount, latestRate!);
 }
 
 export function handleBurned(event: BurnedEvent): void {
@@ -114,32 +107,22 @@ export function handleBurned(event: BurnedEvent): void {
 
   wrapper.save();
 
-  // // A burn is basically a repay and withdraw
-  // const market = getOrCreateMarket(wrapper.tokenAddress, event);
-  // market.cumulativeProtocolSideRevenueUSD = wrapper.totalFeesInUSD;
-  // market.cumulativeTotalRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  const address = event.params.account;
+  const token = getOrCreateToken(event.address.toHexString());
+  const amount = event.params.amountIn;
+  const amountUSD = toDecimal(amount).times(latestRate!);
+  const market = getOrCreateMarket(token.id, event);
+  const feeUSD = toDecimal(event.params.fee).times(latestRate!);
 
-  // market.totalValueLockedUSD = wrapper.amountInUSD;
-  // market.totalDepositBalanceUSD = wrapper.amountInUSD;
-  // market.totalBorrowBalanceUSD = wrapper.amountInUSD;
-
-  // addMarketWithdrawVolume(event, toDecimal(event.params.principal), market);
-  // addMarketRepayVolume(event, toDecimal(event.params.principal), market);
-
-  // market.inputTokenBalance = market.inputTokenBalance.minus(
-  //   event.params.principal
-  // );
-  // market.inputTokenPriceUSD = latestRate!;
-
-  // // principal + fee = (amountOut == amountIn)
-  // // principal is burnt, fee is sent to fee address.
-  // market.outputTokenSupply = market.outputTokenSupply.minus(
-  //   event.params.principal
-  // );
-  // market.outputTokenPriceUSD = latestRate!;
-
-  // // Handle Market Positions
-  // market.save();
+  createWithdraw(event, market, token, amount, amountUSD, address, address);
+  createRepay(event, market, token, amount, amountUSD, address, address);
+  addProtocolSideRevenue(event, market, feeUSD);
+  addMarketTokenBalance(
+    event,
+    market,
+    amount.times(BigInt.fromString("-1")),
+    latestRate!
+  );
 }
 
 export function handleWrapperMaxTokenAmountUpdated(
@@ -187,7 +170,7 @@ function getOrCreateWrapper(address: string): Wrapper {
     wrapper.currencyKey = "ETH";
     wrapper.totalFees = BIGDECIMAL_ZERO;
     wrapper.maxAmount = BIGDECIMAL_ZERO;
-    wrapper.totalFeesInUSD = BIGDECIMAL_ZERO!;
+    wrapper.totalFeesInUSD = BIGDECIMAL_ZERO;
 
     // Assign values from context, for template generated Wrapper entities
     const context = dataSource.context();
