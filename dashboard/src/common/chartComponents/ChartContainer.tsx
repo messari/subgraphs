@@ -71,6 +71,7 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
         }
     }, [csvJSONProp, csvJSON]);
 
+    const hourly = datasetLabel.split("-")[0]?.toUpperCase()?.includes("HOURLY");
 
     let chart = null;
     let csvColumnOptions = null;
@@ -102,10 +103,14 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                     if (typeof dataChartCopy === "object" && !Array.isArray(dataChartCopy)) {
                         iterativeBaseData = dataChartCopy[Object.keys(dataChartCopy)[0]];
                     }
-                    jsonToUse.forEach((x: any) => csvDataPointsByDate[moment.utc(x.date * 1000).format("YYYY-MM-DD")] = x.value);
+                    let formatStr = "YYYY-MM-DD";
+                    // if (hourly) {
+                    //     formatStr = "YYYY-MM-DD hh";
+                    // }
+                    jsonToUse.forEach((x: any) => csvDataPointsByDate[moment.utc(x.date * 1000).format(formatStr)] = x.value);
                     csvArr = iterativeBaseData.map((point: any) => {
                         let csvVal = 0;
-                        let currentDateString = moment.utc(point.date * 1000).format("YYYY-MM-DD");
+                        let currentDateString = moment.utc(point.date * 1000).format(formatStr);
                         if (csvDataPointsByDate[currentDateString]) {
                             csvVal = csvDataPointsByDate[currentDateString];
                         }
@@ -118,6 +123,10 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                     const columnsList = Object.keys(jsonToUse).filter(x => x !== 'date');
                     csvColumnOptions = <CsvOverlayColumnDropDown setSelectedColumn={(x: string) => setCsvMetaData({ ...csvMetaData, columnName: x })} selectedColumn={csvMetaData.columnName} columnsList={columnsList} />
                     if (csvMetaData.columnName) {
+                        let formatStr = "YYYY-MM-DD";
+                        // if (hourly) {
+                        //     formatStr = "YYYY-MM-DD hh";
+                        // }
                         const csvDataPointsByDate: any = {};
                         let iterativeBaseData = dataChartCopy;
                         if (typeof dataChartCopy === "object" && !Array.isArray(dataChartCopy)) {
@@ -125,12 +134,12 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                         }
                         if (jsonToUse) {
                             jsonToUse?.date?.forEach((x: any, idx: number) => {
-                                csvDataPointsByDate[moment.utc(x * 1000).format("YYYY-MM-DD")] = jsonToUse[csvMetaData.columnName][idx]
+                                csvDataPointsByDate[moment.utc(x * 1000).format(formatStr)] = jsonToUse[csvMetaData.columnName][idx]
                             });
                         }
                         csvArr = iterativeBaseData.map((point: any) => {
                             let csvVal = 0;
-                            let currentDateString = moment.utc(point.date * 1000).format("YYYY-MM-DD");
+                            let currentDateString = moment.utc(point.date * 1000).format(formatStr);
                             if (csvDataPointsByDate[currentDateString]) {
                                 csvVal = csvDataPointsByDate[currentDateString];
                             }

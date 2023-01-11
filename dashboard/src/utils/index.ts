@@ -20,6 +20,8 @@ export const schemaMapping: { [x: string]: any } = {
   "yield-aggregator": "vaults",
   "lending": "lending",
   "generic": "generic",
+  "bridge": "bridge",
+  "bridges": "bridge",
   "EXCHANGES": "exchanges",
   "VAULTS": "vaults",
   "DEX-AMM": "exchanges",
@@ -28,6 +30,9 @@ export const schemaMapping: { [x: string]: any } = {
   "GENERIC": "generic",
   "EXCHANGE": "exchanges",
   "YIELD": "vaults",
+  "BRIDGE": "bridge",
+  "BRIDGES": "bridge"
+
 }
 
 export function toDate(timestamp: number, hour: boolean = false) {
