@@ -1,3 +1,5 @@
+import { schemaMapping } from "./utils";
+
 export namespace ProtocolType {
   export const EXCHANGE = "EXCHANGE";
   export const LENDING = "LENDING";
@@ -12,12 +14,33 @@ export namespace Versions {
   export const Schema200 = "2.0.0";
   export const Schema201 = "2.0.1";
   export const Schema300 = "3.0.0";
+  export const Schema301 = "3.0.1";
 
   // Array to list out the different schema versions available
-  export const SchemaVersions = [Schema100, Schema120, Schema130, Schema201];
+  export const SchemaVersions = [Schema100, Schema120, Schema130, Schema201, Schema300];
 }
 
-export const latestSchemaVersions = ["1.3.0", "2.0.1", "3.0.0"];
+export const latestSchemaVersions = (schemaType: string, versionStr: string) => {
+  const schema = schemaMapping[schemaType];
+  if (schema === "exchange") {
+    if ((["3.0.0", "3.0.1"]).includes(versionStr)) {
+      return true;
+    }
+  } else if (schema === "lending") {
+    if ((["3.0.0"]).includes(versionStr)) {
+      return true;
+    }
+  } else if (schema === "vaults" || schema === "generic") {
+    if ((["1.3.0"]).includes(versionStr)) {
+      return true;
+    }
+  } else if (schema === "bridge" || schema === "generic") {
+    if ((["1.1.0"]).includes(versionStr)) {
+      return true;
+    }
+  }
+  return false;
+}
 export const SubgraphBaseUrl = "https://api.thegraph.com/subgraphs/name/";
 export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",

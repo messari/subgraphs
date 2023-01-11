@@ -140,9 +140,17 @@ function PoolTab({
           specificChartsOnEntity[entityName] = {};
         }
         const currentEntityData = poolTimeseriesData[entityName];
+        const tokenWeightData: any = []
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-
+          if (timeseriesInstance.inputTokenWeights) {
+            timeseriesInstance.inputTokenWeights.forEach((weight: any, idx: number) => {
+              if (idx > tokenWeightData.length - 1) {
+                tokenWeightData.push([]);
+              }
+              tokenWeightData[idx].push({ value: Number(weight), date: Number(timeseriesInstance.timestamp) })
+            })
+          }
           // For exchange protocols, calculate the baseYield
           let value = 0;
           if (Object.keys(data[poolKeySingular]?.fees)?.length > 0 && timeseriesInstance.totalValueLockedUSD) {
@@ -160,6 +168,7 @@ function PoolTab({
             specificChartsOnEntity[entityName]['baseYield'].push({ value, date: Number(timeseriesInstance.timestamp) });
           }
         }
+        specificChartsOnEntity[entityName]['inputTokenWeights'] = tokenWeightData;
       })
     }
   } else if (schemaType?.toUpperCase() === "YIELD") {
