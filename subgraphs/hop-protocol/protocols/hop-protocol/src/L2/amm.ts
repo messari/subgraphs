@@ -37,8 +37,8 @@ class Pricer implements TokenPricer {
 class TokenInit implements TokenInitializer {
 	getTokenParams(address: Address): TokenParams {
 		const tokenConfig = NetworkConfigs.getTokenDetails(address.toHex())
-		const name = tokenConfig[0]
-		const symbol = tokenConfig[1]
+		const name = tokenConfig[1]
+		const symbol = tokenConfig[0]
 		const decimals = BigInt.fromString(tokenConfig[2]).toI32()
 		return { name, symbol, decimals }
 	}
@@ -54,7 +54,7 @@ export function handleTokenSwap(event: TokenSwap): void {
 	const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
 	const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString())
 
-	const poolName = poolConfig[0]
+	const poolName = poolConfig[1]
 	const poolSymbol = poolConfig[0]
 
 	const bridgeAddress = bridgeConfig[0]
@@ -79,7 +79,7 @@ export function handleTokenSwap(event: TokenSwap): void {
 		pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
 	}
 
-	pool.addRevenueUSD(fees, amount)
+	pool.addProtocolSideRevenueUSD(fees)
 }
 
 export function handleAddLiquidity(event: AddLiquidity): void {
@@ -143,7 +143,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 		)
 
 		const poolName = poolConfig[0]
-		const poolSymbol = poolConfig[0]
+		const poolSymbol = poolConfig[1]
 
 		const bridgeAddress = bridgeConfig[0]
 		const bridgeName = bridgeConfig[1]
@@ -186,7 +186,7 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 		)
 
 		const poolName = poolConfig[0]
-		const poolSymbol = poolConfig[0]
+		const poolSymbol = poolConfig[1]
 
 		const bridgeAddress = bridgeConfig[0]
 		const bridgeName = bridgeConfig[1]

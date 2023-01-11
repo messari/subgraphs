@@ -39,8 +39,8 @@ class Pricer implements TokenPricer {
 class TokenInit implements TokenInitializer {
 	getTokenParams(address: Address): TokenParams {
 		const tokenConfig = NetworkConfigs.getTokenDetails(address.toHex())
-		const name = tokenConfig[0]
-		const symbol = tokenConfig[1]
+		const name = tokenConfig[1]
+		const symbol = tokenConfig[0]
 		const decimals = BigInt.fromString(tokenConfig[2]).toI32()
 		return { name, symbol, decimals }
 	}
@@ -88,7 +88,7 @@ export function handleTransferFromL1Completed(
 		)
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 
-		const poolName = poolConfig[0]
+		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
 
 		const bridgeAddress = bridgeConfig[0]
@@ -145,7 +145,7 @@ export function handleTransferSent(event: TransferSent): void {
 		const fee = bigIntToBigDecimal(event.params.bonderFee)
 
 		const poolName = poolConfig[0]
-		const poolSymbol = poolConfig[0]
+		const poolSymbol = poolConfig[1]
 
 		const bridgeAddress = bridgeConfig[0]
 		const bridgeName = bridgeConfig[1]

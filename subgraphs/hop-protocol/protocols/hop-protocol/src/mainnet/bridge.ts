@@ -36,8 +36,8 @@ class Pricer implements TokenPricer {
 class TokenInit implements TokenInitializer {
 	getTokenParams(address: Address): TokenParams {
 		const tokenConfig = NetworkConfigs.getTokenDetails(address.toHex())
-		const name = tokenConfig[0]
-		const symbol = tokenConfig[1]
+		const name = tokenConfig[1]
+		const symbol = tokenConfig[0]
 		const decimals = BigInt.fromString(tokenConfig[2]).toI32()
 		return { name, symbol, decimals }
 	}

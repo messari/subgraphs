@@ -85,64 +85,64 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 		) {
 			return [
 				'0xa81D244A1814468C734E5b4101F7b9c0c577a8fC'.toLowerCase(), //Token Bridge Address
-				'ARBITRUM_USDC_BRIDGE',
-				'arbitrum_usdc_bridge',
+				'OPTIMISM_USDC_BRIDGE',
+				'optimism_usdc_bridge',
 			]
 		} else if (
 			tokenAddress == '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase()
 		) {
 			return [
 				'0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase(),
-				'ARBITRUM_DAI_BRIDGE',
-				'arbitrum_dai_bridge',
+				'OPTIMISM_DAI_BRIDGE',
+				'optimism_dai_bridge',
 			]
 		} else if (
 			tokenAddress == '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase()
 		) {
 			return [
 				'0x46ae9BaB8CEA96610807a275EBD36f8e916b5C61'.toLowerCase(),
-				'ARBITRUM_USDT_BRIDGE',
-				'arbitrum_usdc_bridge',
+				'OPTIMISM_USDT_BRIDGE',
+				'optimism_usdc_bridge',
 			]
 		} else if (
 			tokenAddress == '0x4200000000000000000000000000000000000006'.toLowerCase()
 		) {
 			return [
 				'0x83f6244Bd87662118d96D9a6D44f09dffF14b30E'.toLowerCase(),
-				'ARBITRUM_ETH_BRIDGE',
-				'arbitrum_eth_bridge',
+				'OPTIMISM_ETH_BRIDGE',
+				'optimism_eth_bridge',
 			]
 		} else if (
 			tokenAddress == '0x68f180fcCe6836688e9084f035309E29Bf0A2095'.toLowerCase()
 		) {
 			return [
 				'0xB1ea9FeD58a317F81eEEFC18715Dd323FDEf45c4'.toLowerCase(),
-				'ARBITRUM_WBTC_BRIDGE',
-				'arbitrum_wbtc_bridge',
+				'OPTIMISM_WBTC_BRIDGE',
+				'optimism_wbtc_bridge',
 			]
 		} else if (
 			tokenAddress == '0x68f180fcCe6836688e9084f035309E29Bf0A2095'.toLowerCase()
 		) {
 			return [
 				'0x33Fe5bB8DA466dA55a8A32D6ADE2BB104E2C5201'.toLowerCase(),
-				'ARBITRUM_sUSD_BRIDGE',
-				'arbitrum_susd_bridge',
+				'OPTIMISM_sUSD_BRIDGE',
+				'optimism_susd_bridge',
 			]
 		} else if (
 			tokenAddress == '0x68f180fcCe6836688e9084f035309E29Bf0A2095'.toLowerCase()
 		) {
 			return [
 				'0x16284c7323c35F4960540583998C98B1CfC581a7'.toLowerCase(),
-				'ARBITRUM_SNX_BRIDGE',
-				'arbitrum_snx_bridge',
+				'OPTIMISM_SNX_BRIDGE',
+				'optimism_snx_bridge',
 			]
 		} else if (
 			tokenAddress == '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
 		) {
 			return [
 				'0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266'.toLowerCase(),
-				'ARBITRUM_HOP_BRIDGE',
-				'arbitrum_hop_bridge',
+				'OPTIMISM_HOP_BRIDGE',
+				'optimism_hop_bridge',
 			]
 		} else {
 			log.critical('Token not found', [])

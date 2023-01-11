@@ -38,8 +38,8 @@ class TokenInit implements TokenInitializer {
 		const token = _ERC20.bind(address)
 
 		const tokenConfig = NetworkConfigs.getTokenDetails(address.toHexString())
-		const name = tokenConfig[0]
-		const symbol = tokenConfig[1]
+		const symbol = tokenConfig[0]
+		const name = tokenConfig[1]
 		const decimals = BigInt.fromString(tokenConfig[2]).toI32()
 		return { name, symbol, decimals }
 	}
@@ -85,7 +85,7 @@ export function handleTransfer(event: Transfer): void {
 		)
 
 		const poolName = poolConfig[0]
-		const poolSymbol = poolConfig[0]
+		const poolSymbol = poolConfig[1]
 
 		let poolAddress = NetworkConfigs.getPoolAddressFromTokenAddress(
 			event.address.toHexString()

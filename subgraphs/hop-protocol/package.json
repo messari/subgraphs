@@ -14,7 +14,8 @@
     "de": "messari b hop-protocol-ethereum -d -r itsjerryokolo -l",
     "do": "messari b hop-protocol-optimism -d -r itsjerryokolo -l",
     "dp": "messari b hop-protocol-polygon -d -r itsjerryokolo -l",
-    "dx": "messari b hop-protocol-xdai -d -r itsjerryokolo -l"
+    "dx": "messari b hop-protocol-xdai -d -r itsjerryokolo -l",
+    "dl2": "yarn do && yarn dp && yarn dx && yarn da"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.37.1",
