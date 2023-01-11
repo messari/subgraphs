@@ -65,10 +65,10 @@ export function getOrCreateVault(
     if (stategyContract.try_depositToken().reverted) {
       let inputTokenAddress = ZERO_ADDRESS;
       
-      if (stategyContract.name() == "Yield Yak: Aave AVAX") {
+      if (vault.name == "Yield Yak: Aave AVAX") {
         inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
       }
-      if (stategyContract.name() == "Yield Yak: Benqi AVAX") {
+      if (vault.name == "Yield Yak: Benqi AVAX") {
         inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
       }
 
@@ -77,13 +77,13 @@ export function getOrCreateVault(
     } else {
       let inputTokenAddress = stategyContract.depositToken();
       
-      if (stategyContract.name() == "Yield Yak: GMX fsGLP") {
+      if (vault.name == "Yield Yak: GMX fsGLP") {
         inputTokenAddress = Address.fromString("0x9e295B5B976a184B14aD8cd72413aD846C299660")
       }
-      if (stategyContract.name() == "Yield Yak: Aave AVAX") {
+      if (vault.name == "Yield Yak: Aave AVAX") {
         inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
       }
-      if (stategyContract.name() == "Yield Yak: Benqi AVAX") {
+      if (vault.name == "Yield Yak: Benqi AVAX") {
         inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
       }
 
@@ -91,7 +91,6 @@ export function getOrCreateVault(
       vault.inputToken = inputToken.id;
     }
     
-
     const outputToken = getOrCreateToken(ZERO_ADDRESS, block.number);
     vault.outputToken = outputToken.id;
     vault.outputTokenSupply = ZERO_BIGINT;
@@ -182,8 +181,8 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       token.decimals = contract.decimals();
     }
 
-    let fetchPrice = getUsdPricePerToken(Address.fromString(token.id));
-    token.lastPriceUSD = fetchPrice.usdPrice.div(fetchPrice.decimalsBaseTen);
+    let fetchPrice = getUsdPricePerToken(address);
+    token.lastPriceUSD = fetchPrice.usdPrice;
     token.lastPriceBlockNumber = blockNumber;
 
     token.save();
