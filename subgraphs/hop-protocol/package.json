@@ -8,12 +8,12 @@
     "ba": "messari b hop-protocol-arbitrum -l",
     "be": "messari b hop-protocol-ethereum -l",
     "bo": "messari b hop-protocol-optimism -l",
-    "bm": "messari b hop-protocol-matic -l",
     "bx": "messari b hop-protocol-xdai -l",
+    "bp": "messari b hop-protocol-polygon -l",
     "da": "messari b hop-protocol-arbitrum -d -r itsjerryokolo -l",
     "de": "messari b hop-protocol-ethereum -d -r itsjerryokolo -l",
     "do": "messari b hop-protocol-optimism -d -r itsjerryokolo -l",
-    "dm": "messari b hop-protocol-matic -d -r itsjerryokolo -l",
+    "dp": "messari b hop-protocol-polygon -d -r itsjerryokolo -l",
     "dx": "messari b hop-protocol-xdai -d -r itsjerryokolo -l"
   },
   "dependencies": {

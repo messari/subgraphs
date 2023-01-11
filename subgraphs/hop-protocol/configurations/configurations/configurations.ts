@@ -2,7 +2,7 @@ import { HopProtocolArbitrumConfigurations } from '../../protocols/hop-protocol/
 import { HopProtocolEthereumConfigurations } from '../../protocols/hop-protocol/config/deployments/hop-protocol-ethereum/configurations'
 import { HopProtocolOptimismConfigurations } from '../../protocols/hop-protocol/config/deployments/hop-protocol-optimism/configurations'
 import { HopProtocolxDaiConfigurations } from '../../protocols/hop-protocol/config/deployments/hop-protocol-xdai/configurations'
-import { HopProtocolMaticConfigurations } from '../../protocols/hop-protocol/config/deployments/hop-protocol-matic/configurations'
+import { HopProtocolPolygonConfigurations } from '../../protocols/hop-protocol/config/deployments/hop-protocol-polygon/configurations'
 import { Configurations } from './interface'
 import { Deploy } from './deploy'
 import { log } from '@graphprotocol/graph-ts'
@@ -21,8 +21,8 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
 		case Deploy.HOP_PROTOCOL_XDAI: {
 			return new HopProtocolxDaiConfigurations()
 		}
-		case Deploy.HOP_PROTOCOL_MATIC: {
-			return new HopProtocolMaticConfigurations()
+		case Deploy.HOP_PROTOCOL_POLYGON: {
+			return new HopProtocolPolygonConfigurations()
 		}
 		default: {
 			log.critical(

@@ -88,8 +88,6 @@ export function handleTransferFromL1Completed(
 		)
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 
-		const fee = bigIntToBigDecimal(event.params.relayerFee)
-
 		const poolName = poolConfig[0]
 		const poolSymbol = poolConfig[0]
 
@@ -122,7 +120,6 @@ export function handleTransferFromL1Completed(
 		)
 
 		pool.addDestinationToken(crossToken)
-		pool.addSupplySideRevenueUSD(fee)
 
 		acc.transferOut(
 			pool,

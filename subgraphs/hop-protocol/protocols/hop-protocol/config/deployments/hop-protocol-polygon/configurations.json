@@ -1,8 +1,8 @@
 {
   "network": "matic",
   "isMainnet": false,
-  "subgraphName": "hop-matic",
-  "deployment": "HOP_PROTOCOL_MATIC",
+  "subgraphName": "hop-polygon",
+  "deployment": "HOP_PROTOCOL_POLYGON",
   "graftEnabled": false,
   "subgraphId": "QmW2LKee3PozS6PXcVCNsjDgc3GAhCW94wU5wA3KkYsDcn",
   "graftStartBlock": 1091700,

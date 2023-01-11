@@ -24,7 +24,6 @@ import { _ERC20 } from '../../../../generated/Token/_ERC20'
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
-import { Network } from '../../../../src/sdk/util/constants'
 import { reverseChainIDs } from '../../../../src/sdk/protocols/bridge/chainIds'
 
 class Pricer implements TokenPricer {
@@ -102,7 +101,12 @@ export function handleTransfer(event: Transfer): void {
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-			reverseChainIDs.get(dataSource.network().toUpperCase())!,
+			reverseChainIDs.get(
+				dataSource
+					.network()
+					.toUpperCase()
+					.replace('_', '-')
+			)!,
 			event.address,
 			CrosschainTokenType.CANONICAL,
 			event.address
