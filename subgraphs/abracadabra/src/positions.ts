@@ -96,11 +96,15 @@ export function getOrCreatePosition(
   ]);
 
   account.openPositionCount += 1;
+<<<<<<< HEAD
   account.openPositions = addToArrayAtIndex(
     account.openPositions,
     positionId,
     0
   );
+=======
+  account.openPositions.push(positionId);
+>>>>>>> d037538c (try new change)
   account.save();
 
   const market = getMarket(marketId);
