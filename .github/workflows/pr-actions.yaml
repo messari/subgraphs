@@ -67,8 +67,7 @@ jobs:
       - name: Prettify code check
         uses: actionsx/prettier@v2
         with:
-          dry: True
-          prettier_options: --check ${{ steps.changed-files-specific.outputs.added_modified }}
+          args: --check ${{ steps.changed-files-specific.outputs.added_modified }}
 
   Build:
     runs-on: macos-latest
