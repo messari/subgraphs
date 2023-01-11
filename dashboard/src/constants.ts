@@ -15,6 +15,7 @@ export namespace Versions {
   export const Schema201 = "2.0.1";
   export const Schema300 = "3.0.0";
   export const Schema301 = "3.0.1";
+  export const Schema302 = "3.0.2";
 
   // Array to list out the different schema versions available
   export const SchemaVersions = [Schema100, Schema120, Schema130, Schema201, Schema300];
@@ -22,8 +23,8 @@ export namespace Versions {
 
 export const latestSchemaVersions = (schemaType: string, versionStr: string) => {
   const schema = schemaMapping[schemaType];
-  if (schema === "exchange") {
-    if ((["3.0.0", "3.0.1"]).includes(versionStr)) {
+  if (schema === "exchanges") {
+    if ((["3.0.0", "3.0.1", "3.0.2"]).includes(versionStr)) {
       return true;
     }
   } else if (schema === "lending") {
@@ -47,14 +48,28 @@ export const PoolName: Record<string, string> = {
   LENDING: "market",
   YIELD: "vault",
   GENERIC: "pool",
-  BRIDGE: "pool"
+  BRIDGE: "pool",
+  "exchanges": "liquidityPool",
+  "vaults": "vault",
+  "dex-amm": "liquidityPool",
+  "yield-aggregator": "vault",
+  "lending": "pool",
+  "generic": "pool",
+  "bridge": "pool",
 };
 export const PoolNames: Record<string, string> = {
   EXCHANGE: "liquidityPools",
   LENDING: "markets",
   YIELD: "vaults",
   GENERIC: "pools",
-  BRIDGE: "pools"
+  BRIDGE: "pools",
+  "exchanges": "liquidityPools",
+  "vaults": "vaults",
+  "dex-amm": "liquidityPools",
+  "yield-aggregator": "vaults",
+  "lending": "pools",
+  "generic": "pools",
+  "bridge": "pools",
 };
 export const ProtocolTypeEntityName: Record<string, string> = {
   EXCHANGE: "dexAmmProtocol",
