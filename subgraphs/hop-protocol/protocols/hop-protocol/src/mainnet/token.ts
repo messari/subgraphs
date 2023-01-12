@@ -84,8 +84,8 @@ export function handleTransfer(event: Transfer): void {
 			event.address.toHexString()
 		)
 
-		const poolName = poolConfig[0]
-		const poolSymbol = poolConfig[1]
+		const poolName = poolConfig[1]
+		const poolSymbol = poolConfig[0]
 
 		let poolAddress = NetworkConfigs.getPoolAddressFromTokenAddress(
 			event.address.toHexString()

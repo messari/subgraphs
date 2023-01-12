@@ -244,7 +244,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			bridgeAddress ==
 			'0x07C592684Ee9f71D58853F9387579332d471b6Ca'.toLowerCase() //HOP/WBTC
 		) {
-			return '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252'.toLowerCase() //WBTC
+			return '0xb07c6505e1E41112494123e40330c5Ac09817CFB'.toLowerCase() //WBTC
 		} else if (
 			bridgeAddress ==
 			'0x6F03052743CD99ce1b29265E377e320CD24Eb632'.toLowerCase() //HOP BRIDGE
