@@ -130,4 +130,4 @@ export const blockExplorers: Record<string, string> = {
 };
 
 // negativeFieldList contains field names that can be negative
-export const negativeFieldList = [];
+export const negativeFieldList = ["dailyNetVolumeUSD", "netVolumeUSD", "cumulativeNetVolumeUSD"];

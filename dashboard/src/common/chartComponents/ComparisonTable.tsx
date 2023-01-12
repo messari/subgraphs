@@ -9,13 +9,14 @@ interface ComparisonTableProps {
   datasetLabel: string;
   dataTable: any;
   isMonthly: boolean;
+  isHourly: boolean;
   setIsMonthly: any;
   jpegDownloadHandler: any;
   baseKey: string;
   overlayKey: string;
 }
 
-export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonthly, jpegDownloadHandler, baseKey, overlayKey }: ComparisonTableProps) => {
+export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, isHourly, setIsMonthly, jpegDownloadHandler, baseKey, overlayKey }: ComparisonTableProps) => {
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -48,7 +49,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
         {
           field: "date",
           headerName: "Date",
-          minWidth: 100,
+          minWidth: (isHourly ? 130 : 100),
           headerAlign: "right" as GridAlignment,
           align: "right" as GridAlignment,
         },
@@ -84,24 +85,29 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
           },
         },
       ];
-      const datesSelectedTimestamps = dates.map((x: any) => x.format("YYYY-MM-DD"));
+
+      let formatStr = "YYYY-MM-DD";
+      if (isHourly) {
+        formatStr = "YYYY-MM-DD hh";
+      }
+      const datesSelectedTimestamps = dates.map((x: any) => x.format(formatStr));
       const differencePercentageArr: any = [];
       const dataTableCopy = JSON.parse(JSON.stringify({ ...dataTable }));
       dataTableCopy[baseKey] = dataTableCopy[baseKey].filter((x: any) => {
         if (datesSelectedTimestamps.length > 0) {
-          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format(formatStr));
         }
         return true;
       });
       dataTableCopy[overlayKey] = dataTableCopy[overlayKey].filter((x: any) => {
         if (datesSelectedTimestamps.length > 0) {
-          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format(formatStr));
         }
         return true;
       });
       const tableData = dataTableCopy[baseKey]
         .map((val: any, i: any) => {
-          let date = toDate(val.date);
+          let date = toDate(val.date, isHourly);
           if (isMonthly) {
             date = date.split("-").slice(0, 2).join("-");
           }
@@ -109,7 +115,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
             if (isMonthly) {
               return toDate(point?.date)?.split("-")?.slice(0, 2)?.join("-");
             }
-            return toDate(point?.date) === date;
+            return toDate(point?.date, isHourly) === date;
           })?.value;
           if (!overlayVal) {
             overlayVal = 0;
