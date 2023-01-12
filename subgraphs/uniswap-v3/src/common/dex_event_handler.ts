@@ -390,14 +390,16 @@ export class DexEventHandler {
   // Positions are only snapped once per interval to save space
   processLPBalanceChanges(): void {
     const protocolSnapshotDayID =
-      this.protocol.lastUpdateTimestamp.toI32() / 86400;
+      this.protocol.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
     if (protocolSnapshotDayID != this.dayID) {
       this.updateAndSaveFinancialMetrics(protocolSnapshotDayID);
       this.protocol.lastSnapshotDayID = protocolSnapshotDayID;
       this.protocol.save();
     }
-    const poolSnapshotDayID = this.pool.lastUpdateTimestamp.toI32() / 86400;
-    const poolSnapshotHourID = this.pool.lastUpdateTimestamp.toI32() / 3600;
+    const poolSnapshotDayID =
+      this.pool.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
+    const poolSnapshotHourID =
+      this.pool.lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
     if (poolSnapshotDayID != this.dayID) {
       this.updateAndSaveLiquidityPoolDailyMetrics(poolSnapshotDayID);
       this.pool.lastSnapshotDayID = poolSnapshotDayID;
@@ -411,13 +413,13 @@ export class DexEventHandler {
 
     if (this.tickLower || this.tickUpper) {
       const tickLowerSnapshotDayID =
-        this.tickLower!.lastUpdateTimestamp.toI32() / 86400;
+        this.tickLower!.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
       const tickLowerSnapshotHourID =
-        this.tickLower!.lastUpdateTimestamp.toI32() / 3600;
+        this.tickLower!.lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
       const tickUpperSnapshotDayID =
-        this.tickUpper!.lastUpdateTimestamp.toI32() / 86400;
+        this.tickUpper!.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
       const tickUpperSnapshotHourID =
-        this.tickUpper!.lastUpdateTimestamp.toI32() / 3600;
+        this.tickUpper!.lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
       if (tickLowerSnapshotDayID != this.dayID) {
         this.updateAndSaveTickDailySnapshotEntity(
           this.tickLower!,
