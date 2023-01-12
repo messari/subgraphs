@@ -143,7 +143,7 @@ export function handlerSwapOutV2(event: LogSwapout): void {
   const feeUSD = NetworkConfigs.getBridgeFeeUSD(
     BridgeType.BRIDGE,
     token,
-    chainID.toString(),
+    crosschainID.toString(),
     event.params.amount
   );
   updateRevenue(
@@ -452,7 +452,7 @@ export function handleSwapOut(event: LogAnySwapOut): void {
   const feeUSD = NetworkConfigs.getBridgeFeeUSD(
     BridgeType.ROUTER,
     token,
-    chainID.toString(),
+    crosschainID.toString(),
     event.params.amount
   );
   updateRevenue(
