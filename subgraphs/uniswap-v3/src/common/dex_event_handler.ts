@@ -610,7 +610,7 @@ export class DexEventHandler {
       );
     }
 
-    financialMetrics.days = day;
+    financialMetrics.day = day;
     financialMetrics.timestamp = this.event.block.timestamp;
     financialMetrics.blockNumber = this.event.block.number;
     financialMetrics.protocol = NetworkConfigs.getFactoryAddress();
@@ -691,7 +691,7 @@ export class DexEventHandler {
       );
     }
 
-    poolMetrics.days = day;
+    poolMetrics.day = day;
     poolMetrics.timestamp = this.event.block.timestamp;
     poolMetrics.blockNumber = this.event.block.number;
     poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
@@ -810,7 +810,7 @@ export class DexEventHandler {
       );
     }
 
-    poolMetrics.hours = hour;
+    poolMetrics.hour = hour;
     poolMetrics.timestamp = this.event.block.timestamp;
     poolMetrics.blockNumber = this.event.block.number;
     poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
@@ -931,7 +931,7 @@ export class DexEventHandler {
     const tickID = this.pool.id.concatI32(tick.index.toI32()).concatI32(day);
 
     const tickSnapshot = new TickDailySnapshot(tickID);
-    tickSnapshot.days = day;
+    tickSnapshot.day = day;
     tickSnapshot.timestamp = this.event.block.timestamp;
     tickSnapshot.blockNumber = this.event.block.number;
     tickSnapshot.tick = this.tickLower!.id;
@@ -949,7 +949,7 @@ export class DexEventHandler {
     const tickID = this.pool.id.concatI32(tick.index.toI32()).concatI32(hour);
 
     const tickSnapshot = new TickHourlySnapshot(tickID);
-    tickSnapshot.hours = hour;
+    tickSnapshot.hour = hour;
     tickSnapshot.timestamp = this.event.block.timestamp;
     tickSnapshot.blockNumber = this.event.block.number;
     tickSnapshot.tick = tick.id;
@@ -983,13 +983,13 @@ export class DexEventHandler {
     const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(this.event);
 
     // Update the block number and timestamp to that of the last transaction of that day
-    usageMetricsDaily.days = this.dayID;
+    usageMetricsDaily.day = this.dayID;
     usageMetricsDaily.timestamp = this.event.block.timestamp;
     usageMetricsDaily.blockNumber = this.event.block.number;
     usageMetricsDaily.dailyTransactionCount += INT_ONE;
     usageMetricsDaily.totalPoolCount = this.protocol.totalPoolCount;
 
-    usageMetricsHourly.hours = this.hourID;
+    usageMetricsHourly.hour = this.hourID;
     usageMetricsHourly.timestamp = this.event.block.timestamp;
     usageMetricsHourly.blockNumber = this.event.block.number;
     usageMetricsHourly.hourlyTransactionCount += INT_ONE;
