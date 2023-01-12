@@ -188,12 +188,48 @@ interface Protocol {
 
   " All premium paid to withdraw from liquidity pools. "
   cumulativeWithdrawPremiumUSD: BigDecimal!
-
+  
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
 
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
+
+  " Number of cumulative borrowers "
+  cumulativeUniqueBorrowers: Int!
+
+  " Number of cumulative liquidators (accounts that performed liquidation) "
+  cumulativeUniqueLiquidators: Int!
+
+  " Number of cumulative liquidatees (accounts that got liquidated) "
+  cumulativeUniqueLiquidatees: Int!
+
+  " Total number of long positions "
+  longPositionCount: Int!
+
+  " Total number of short positions "
+  shortPositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
+
+  " Total number of transactions "
+  transactionCount: Int!
+
+  " Total number of deposits "
+  depositCount: Int!
+
+  " Total number of withdrawals "
+  withdrawCount: Int!
+
+  " Total number of borrows "
+  borrowCount: Int!
 
   " Total number of pools "
   totalPoolCount: Int!
@@ -281,8 +317,47 @@ type DerivPerpProtocol implements Protocol @entity {
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
 
+ " Number of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Number of cumulative borrowers "
+  cumulativeUniqueBorrowers: Int!
+
+  " Number of cumulative liquidators (accounts that performed liquidation) "
+  cumulativeUniqueLiquidators: Int!
+
+  " Number of cumulative liquidatees (accounts that got liquidated) "
+  cumulativeUniqueLiquidatees: Int!
+
+  " Total number of long positions "
+  longPositionCount: Int!
+
+  " Total number of short positions "
+  shortPositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
+
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
+
+ " Total number of transactions "
+  transactionCount: Int!
+
+  " Total number of deposits "
+  depositCount: Int!
+
+  " Total number of withdrawals "
+  withdrawCount: Int!
+
+  " Total number of borrows "
+  borrowCount: Int!
 
   " Total number of pools "
   totalPoolCount: Int!
@@ -329,6 +404,36 @@ type UsageMetricsDailySnapshot @entity {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  " Total number of long positions "
+  dailylongPositionCount: Int!
+
+  " Total number of long positions "
+  longPositionCount: Int!
+
+  " Total number of short positions "
+  dailyshortPositionCount: Int!
+
+  " Total number of short positions "
+  shortPositionCount: Int!
+
+" Total number of open positions daily "
+  dailyopenPositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  dailyclosedPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  dailycumulativePositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
+
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
   dailyTransactionCount: Int!
 
@@ -338,8 +443,32 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of withdrawals (remove liquidity) in a day "
   dailyWithdrawCount: Int!
 
+" Total number of borrows for leverage in a day "
+  dailyBorrowCount: Int!
+
   " Total number of trades (swaps) in a day "
   dailySwapCount: Int!
+
+  " Number of cumulative depositors "
+  cumulativeUniqueDepositors: Int!
+
+  " Number of unique daily borrowers "
+  dailyActiveBorrowers: Int!
+
+  " Number of cumulative borrowers "
+  cumulativeUniqueBorrowers: Int!
+
+  " Number of unique daily liquidators (accounts that performed liquidation) "
+  dailyActiveLiquidators: Int!
+
+  " Number of cumulative liquidators (accounts that performed liquidation) "
+  cumulativeUniqueLiquidators: Int!
+
+  " Number of unique daily liquidatees (accounts that got liquidated) "
+  dailyActiveLiquidatees: Int!
+
+  " Number of cumulative liquidatees (accounts that got liquidated) "
+  cumulativeUniqueLiquidatees: Int!
 
   " Total number of pools "
   totalPoolCount: Int!
@@ -517,6 +646,9 @@ type LiquidityPool @entity {
   " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
   fees: [LiquidityPoolFee!]!
 
+  " Name of oracle source (e.g. chainlink, uniswap, pyth) "
+  oracle: string
+
   " Whether this pool is single-sided (e.g. Bancor, Platypus's Alternative Pool). The specifics of the implementation depends on the protocol. "
   isSingleSided: Boolean!
 
@@ -557,6 +689,30 @@ type LiquidityPool @entity {
 
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " Number of cumulative borrowers "
+  cumulativeUniqueBorrowers: Int!
+
+  " Number of cumulative liquidators (accounts that performed liquidation) "
+  cumulativeUniqueLiquidators: Int!
+
+  " Number of cumulative liquidatees (accounts that got liquidated) "
+  cumulativeUniqueLiquidatees: Int!
+
+  " Total number of long positions "
+  longPositionCount: Int!
+
+  " Total number of short positions "
+  shortPositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
 
   " All historical trade notional volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
@@ -680,6 +836,54 @@ type LiquidityPoolDailySnapshot @entity {
 
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+ " Number of unique daily borrowers "
+  dailyActiveBorrowers: Int!
+
+  " Number of cumulative borrowers "
+  cumulativeUniqueBorrowers: Int!
+
+  " Number of unique daily liquidators (accounts that performed liquidation) "
+  dailyActiveLiquidators: Int!
+
+  " Number of cumulative liquidators (accounts that performed liquidation) "
+  cumulativeUniqueLiquidators: Int!
+
+  " Number of unique daily liquidatees (accounts that got liquidated) "
+  dailyActiveLiquidatees: Int!
+
+  " Number of cumulative liquidatees (accounts that got liquidated) "
+  cumulativeUniqueLiquidatees: Int!
+
+  " Total number of long positions "
+  dailylongPositionCount: Int!
+
+  " Total number of long positions "
+  longPositionCount: Int!
+
+  " Total number of short positions "
+  dailyshortPositionCount: Int!
+
+  " Total number of short positions "
+  shortPositionCount: Int!
+
+  " Total number of open positions daily "
+  dailyopenPositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  dailyclosedPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  dailycumulativePositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
 
   " All trade notional volume occurred in a given day, in USD "
   dailyVolumeUSD: BigDecimal!

@@ -183,6 +183,12 @@ interface Protocol {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+   " Total number of open positions "
+  openPositionCount: Int!
+
+   " Total number of contracts minted "
+  contractsMintedCount: Int!
+
   " Total number of pools "
   totalPoolCount: Int!
 
@@ -259,6 +265,42 @@ type DerivOptProtocol implements Protocol @entity {
 
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+ " Total number of puts minted "
+  putsMintedCount: Int!
+
+ " Total number of calls minted "
+  callsMintedCount: Int!
+
+ " Total number of contracts minted "
+  contractsMintedCount: Int!
+
+  " Total number of contracts taken "
+  contractsTakenCount: Int!
+
+ " Total number of contracts expired "
+  contractsExpiredCount: Int!
+
+  " Total number of contracts exercised "
+  contractsExercisedCount: Int!
+ 
+ " Total number of contracts exercised+expired "
+  contractsClosedCount: Int!
+
+  " Total number of long positions "
+  longPositionCount: Int!
+
+  " Total number of short positions "
+  shortPositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+   " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
 
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
@@ -437,6 +479,78 @@ type FinancialsDailySnapshot @entity {
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
 
+" Total number of puts minted "
+  dailyputsMintedCount: Int!
+
+  " Total number of puts minted "
+  putsMintedCount: Int!
+
+ " Total number of calls minted "
+  dailycallsMintedCount: Int!
+
+ " Total number of calls minted "
+  callsMintedCount: Int!
+
+ " Total number of contracts minted "
+  dailycontractsMintedCount: Int!
+
+ " Total number of contracts minted "
+  contractsMintedCount: Int!
+
+  " Total number of contracts taken "
+  dailycontractsTakenCount: Int!
+
+  " Total number of contracts taken "
+  contractsTakenCount: Int!
+
+ " Total number of contracts expired "
+  dailycontractsExpiredCount: Int!
+
+ " Total number of contracts expired "
+  contractsExpiredCount: Int!
+ 
+ " Total number of contracts exercised "
+  dailycontractsExercisedCount: Int!
+ 
+  " Total number of contracts exercised "
+  contractsExercisedCount: Int!
+ 
+ " Total number of contracts exercised+expired "
+  dailycontractsClosedCount: Int!
+
+ " Total number of contracts exercised+expired "
+  contractsClosedCount: Int!
+
+  " Total number of long positions "
+  dailylongPositionCount: Int!
+
+  " Total number of long positions "
+  longPositionCount: Int!
+
+  " Total number of short positions "
+  dailyshortPositionCount: Int!
+
+  " Total number of short positions "
+  shortPositionCount: Int!
+
+  " Total number of open positions daily "
+  dailyopenPositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  dailyclosedPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  dailycumulativePositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -472,6 +586,9 @@ type LiquidityPool @entity {
 
   " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
   fees: [LiquidityPoolFee!]!
+
+  " Name of oracle source (e.g. chainlink, uniswap, pyth) "
+  oracle: string
 
   " Whether this pool is single-sided (e.g. Bancor, Platypus's Alternative Pool). The specifics of the implementation depends on the protocol. "
   isSingleSided: Boolean!
@@ -516,6 +633,48 @@ type LiquidityPool @entity {
 
   " All historical trade notional volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
+
+   " Total number of puts minted "
+  putsMintedCount: Int!
+
+ " Total number of calls minted "
+  callsMintedCount: Int!
+
+ " Total number of contracts minted "
+  contractsMintedCount: Int!
+
+  " Total number of contracts taken "
+  contractsTakenCount: Int!
+
+ " Total number of contracts expired "
+  contractsExpiredCount: Int!
+
+  " Total number of contracts exercised "
+  contractsExercisedCount: Int!
+ 
+ " Total number of contracts exercised+expired "
+  contractsClosedCount: Int!
+
+ " Total number of contracts at certain strike price "
+  contractPriceCount: Int!
+  
+" Total number of contracts at certain expiry dates "
+  contractDateCount: Int!
+
+  " Total number of long positions "
+  longPositionCount: Int!
+
+  " Total number of short positions "
+  shortPositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -636,6 +795,84 @@ type LiquidityPoolDailySnapshot @entity {
 
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+   " Total number of puts minted "
+  dailyputsMintedCount: Int!
+
+   " Total number of puts minted "
+  putsMintedCount: Int!
+
+   " Total number of calls minted "
+  dailycallsMintedCount: Int!
+
+ " Total number of calls minted "
+  callsMintedCount: Int!
+
+   " Total number of contracts minted "
+  dailycontractsMintedCount: Int!
+
+ " Total number of contracts minted "
+  contractsMintedCount: Int!
+
+  " Total number of contracts taken "
+  dailycontractsTakenCount: Int!
+
+  " Total number of contracts taken "
+  contractsTakenCount: Int!
+
+ " Total number of contracts expired "
+  dailycontractsExpiredCount: Int!
+
+ " Total number of contracts expired "
+  contractsExpiredCount: Int!
+
+   " Total number of contracts exercised "
+  dailycontractsExercisedCount: Int!
+
+  " Total number of contracts exercised "
+  contractsExercisedCount: Int!
+ 
+ " Total number of contracts exercised+expired "
+  dailycontractsClosedCount: Int!
+
+ " Total number of contracts exercised+expired "
+  contractsClosedCount: Int!
+
+ " Total number of contracts at certain strike price "
+  contractPriceCount: Int!
+  
+" Total number of contracts at certain expiry dates "
+  contractDateCount: Int!
+
+  " Total number of long positions "
+  dailylongPositionCount: Int!
+
+  " Total number of long positions "
+  longPositionCount: Int!
+
+  " Total number of short positions "
+  dailyshortPositionCount: Int!
+
+  " Total number of short positions "
+  shortPositionCount: Int!
+
+  " Total number of open positions daily "
+  dailyopenPositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  dailyclosedPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  dailycumulativePositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
 
   " All trade notional volume occurred in a given day, in USD "
   dailyVolumeUSD: BigDecimal!
