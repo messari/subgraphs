@@ -266,6 +266,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
                 datasetLabel="Data Comparison"
                 dataTable={compChart}
                 isMonthly={isMonthly}
+                isHourly={false}
                 setIsMonthly={(x: boolean) => setIsMonthly(x)}
                 jpegDownloadHandler={() => jpegDownloadHandler()}
                 baseKey="subgraph"

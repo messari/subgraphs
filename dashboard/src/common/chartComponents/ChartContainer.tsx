@@ -104,9 +104,9 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                         iterativeBaseData = dataChartCopy[Object.keys(dataChartCopy)[0]];
                     }
                     let formatStr = "YYYY-MM-DD";
-                    // if (hourly) {
-                    //     formatStr = "YYYY-MM-DD hh";
-                    // }
+                    if (hourly) {
+                        formatStr = "YYYY-MM-DD hh";
+                    }
                     jsonToUse.forEach((x: any) => csvDataPointsByDate[moment.utc(x.date * 1000).format(formatStr)] = x.value);
                     csvArr = iterativeBaseData.map((point: any) => {
                         let csvVal = 0;
@@ -124,9 +124,9 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                     csvColumnOptions = <CsvOverlayColumnDropDown setSelectedColumn={(x: string) => setCsvMetaData({ ...csvMetaData, columnName: x })} selectedColumn={csvMetaData.columnName} columnsList={columnsList} />
                     if (csvMetaData.columnName) {
                         let formatStr = "YYYY-MM-DD";
-                        // if (hourly) {
-                        //     formatStr = "YYYY-MM-DD hh";
-                        // }
+                        if (hourly) {
+                            formatStr = "YYYY-MM-DD hh";
+                        }
                         const csvDataPointsByDate: any = {};
                         let iterativeBaseData = dataChartCopy;
                         if (typeof dataChartCopy === "object" && !Array.isArray(dataChartCopy)) {
@@ -288,11 +288,31 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
             datasetLabel="Custom CSV Comparison"
             dataTable={compChart}
             isMonthly={isMonthly}
+            isHourly={hourly}
             setIsMonthly={(x: boolean) => setIsMonthly(x)}
             jpegDownloadHandler={() => jpegDownloadHandler(false)}
             baseKey={baseKey?.length > 0 ? baseKey : "base"}
             overlayKey={overlayKey}
         />
+    } else if (!Array.isArray(dataChartCopy) && typeof dataChartCopy === 'object' && !Object.keys(dataChartCopy)[1].includes('undefined')) {
+        if (!overlayKey) {
+            overlayKey = Object.keys(dataChartCopy)[1];
+        }
+        const compChart = lineupChartDatapoints({ [baseKey?.length > 0 ? baseKey : "base"]: dataChartCopy[baseKey], [Object.keys(dataChartCopy)[1]]: dataChartCopy[Object.keys(dataChartCopy)[1]] });
+        if (compChart instanceof Error) {
+            throw new Error(compChart?.message);
+        }
+        tableRender = <ComparisonTable
+            datasetLabel="Custom CSV Comparison"
+            dataTable={compChart}
+            isMonthly={isMonthly}
+            isHourly={hourly}
+            setIsMonthly={(x: boolean) => setIsMonthly(x)}
+            jpegDownloadHandler={() => jpegDownloadHandler(false)}
+            baseKey={baseKey?.length > 0 ? baseKey : "base"}
+            overlayKey={overlayKey}
+        />
+
     } else if (dataTable?.length > 0) {
         let compChart: any = {};
         let valueArray = [];
@@ -330,6 +350,7 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                         datasetLabel="Custom CSV Comparison"
                         dataTable={compChart}
                         isMonthly={isMonthly}
+                        isHourly={hourly}
                         setIsMonthly={(x: boolean) => setIsMonthly(x)}
                         jpegDownloadHandler={() => jpegDownloadHandler(false)}
                         baseKey={baseKey?.length > 0 ? baseKey : "base"}

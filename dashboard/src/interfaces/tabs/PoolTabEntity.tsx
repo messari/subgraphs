@@ -18,28 +18,30 @@ function addDataPoint(
   id: string,
 ): { [x: string]: any } {
   dataFields[fieldName].push({ value: value, date: Number(timestamp) });
-  if (dataFieldMetrics[fieldName].sum === null) {
-    dataFieldMetrics[fieldName].sum = 0;
-  }
-  dataFieldMetrics[fieldName].sum += value;
+  if (!!dataFieldMetrics[fieldName]) {
+    if (!dataFieldMetrics[fieldName]?.sum) {
+      dataFieldMetrics[fieldName].sum = 0;
+    }
+    dataFieldMetrics[fieldName].sum += value;
 
-  if (fieldName.includes("umulative")) {
-    if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
-      dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
+    if (fieldName.includes("umulative")) {
+      if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
+        dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
+      }
+      if (value < dataFieldMetrics[fieldName].cumulative.prevVal) {
+        dataFieldMetrics[fieldName].cumulative.hasLowered = id;
+      }
+      dataFieldMetrics[fieldName].cumulative.prevVal = value;
     }
-    if (value < dataFieldMetrics[fieldName].cumulative.prevVal) {
-      dataFieldMetrics[fieldName].cumulative.hasLowered = id;
+    if (fieldName.includes("umulative")) {
+      if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
+        dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
+      }
+      if (Number(value) < dataFieldMetrics[fieldName].cumulative.prevVal) {
+        dataFieldMetrics[fieldName].cumulative.hasLowered = id;
+      }
+      dataFieldMetrics[fieldName].cumulative.prevVal = Number(value);
     }
-    dataFieldMetrics[fieldName].cumulative.prevVal = value;
-  }
-  if (fieldName.includes("umulative")) {
-    if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
-      dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
-    }
-    if (Number(value) < dataFieldMetrics[fieldName].cumulative.prevVal) {
-      dataFieldMetrics[fieldName].cumulative.hasLowered = id;
-    }
-    dataFieldMetrics[fieldName].cumulative.prevVal = Number(value);
   }
   return {
     currentEntityField: dataFields[fieldName],
@@ -333,7 +335,7 @@ function PoolTabEntity({
               }
 
               if (value || value === 0) {
-                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT")) {
+                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT") || capsFieldName.includes("SUPPLYSIDETOKENAMOUNTS") || capsFieldName.includes("VOLUMETOKENAMOUNTS")) {
                   // convert the value with decimals for certain fields
                   value = convertTokenDecimals(val, data[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
                 }
@@ -586,7 +588,7 @@ function PoolTabEntity({
               }
 
               if (value || value === 0) {
-                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT")) {
+                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT") || capsFieldName.includes("SUPPLYSIDETOKENAMOUNTS") || capsFieldName.includes("VOLUMETOKENAMOUNTS")) {
                   // convert the value with decimals for certain fields
                   value = convertTokenDecimals(val, overlayData[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
                 }
@@ -1195,7 +1197,7 @@ function PoolTabEntity({
       let dataChartToPass: any = dataFields[field];
       let baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}`;
       if (overlayDataFields[field]) {
-        const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network || ""}-${overlayData?.protocols[0]?.subgraphVersion}`;
+        const overlayKey = `${overlayData?.protocols[0]?.name || "overlay"}-${overlayData?.protocols[0]?.network || "network"}-${overlayData?.protocols[0]?.subgraphVersion || "v0.0.0"}`;
         let keyDiff = "";
         if (baseKey === overlayKey) {
           keyDiff = ' (Overlay)';

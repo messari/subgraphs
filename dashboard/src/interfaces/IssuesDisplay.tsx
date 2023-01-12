@@ -2,6 +2,7 @@ import { styled } from "../styled";
 import { CircularProgress, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useState } from "react";
+import { negativeFieldList } from "../constants";
 
 const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
   max-height: 230px;
@@ -78,7 +79,7 @@ const messagesByLevel = (
       if (issuesArray[x].type === "NAN") {
         issuesMsg = `'${issuesArray[x].fieldName}' is NaN.`;
       }
-      if (issuesArray[x].type === "RATENEG") {
+      if (issuesArray[x].type === "RATENEG" && !negativeFieldList?.includes(issuesArray[x].fieldName)) {
         issuesMsg = `'${issuesArray[x].fieldName}' has a negative rate.`;
       }
       if (issuesArray[x].type === "RATEZERO") {
