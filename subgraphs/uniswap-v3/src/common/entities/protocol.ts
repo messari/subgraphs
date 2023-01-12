@@ -37,7 +37,7 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalPoolCount = INT_ZERO;
     protocol._regenesis = false;
-    protocol.lastSnapshotsDayID = INT_ZERO;
+    protocol.lastSnapshotDayID = INT_ZERO;
     protocol.lastUpdateBlockNumber = BIGINT_ZERO;
     protocol.lastUpdateTimestamp = BIGINT_ZERO;
   }

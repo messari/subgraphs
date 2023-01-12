@@ -25,9 +25,9 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics.dailyDepositCount = INT_ZERO;
     usageMetrics.dailyWithdrawCount = INT_ZERO;
     usageMetrics.dailySwapCount = INT_ZERO;
-
-    usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
+    usageMetrics.blockNumber = event.block.number;
+
     usageMetrics.totalPoolCount = 0;
     usageMetrics.save();
   }
@@ -55,9 +55,8 @@ export function getOrCreateUsageMetricHourlySnapshot(
     usageMetrics.hourlyDepositCount = INT_ZERO;
     usageMetrics.hourlyWithdrawCount = INT_ZERO;
     usageMetrics.hourlySwapCount = INT_ZERO;
-
-    usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
+    usageMetrics.blockNumber = event.block.number;
 
     usageMetrics.save();
   }

@@ -3291,7 +3291,7 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.2",
+          "schema": "3.0.3",
           "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },
@@ -3313,7 +3313,7 @@
         "network": "celo",
         "status": "prod",
         "versions": {
-          "schema": "3.0.2",
+          "schema": "3.0.3",
           "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },
@@ -3335,7 +3335,7 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.2",
+          "schema": "3.0.3",
           "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },
@@ -3361,7 +3361,7 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "3.0.2",
+          "schema": "3.0.3",
           "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },
@@ -3383,7 +3383,7 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "3.0.2",
+          "schema": "3.0.3",
           "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },

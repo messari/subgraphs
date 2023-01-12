@@ -32,8 +32,8 @@ export function getOrCreateTick(
     tick.liquidityNet = BIGINT_ZERO;
     tick.liquidityNetUSD = BIGDECIMAL_ZERO;
 
-    tick.lastSnapshotsDayID = INT_ZERO;
-    tick.lastSnapshotsHourID = INT_ZERO;
+    tick.lastSnapshotDayID = INT_ZERO;
+    tick.lastSnapshotHourID = INT_ZERO;
     tick.lastUpdateBlockNumber = BIGINT_ZERO;
     tick.lastUpdateTimestamp = BIGINT_ZERO;
 
