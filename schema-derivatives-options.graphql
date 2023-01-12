@@ -396,6 +396,7 @@ type UsageMetricsHourlySnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+}
 
 type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
