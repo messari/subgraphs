@@ -80,8 +80,8 @@ export function handleTransfer(event: Transfer): void {
 			[
 				bridgeAddress,
 				event.address.toHexString(),
-				event.params.to.toHexString(),
 				event.params.from.toHexString(),
+				event.params.to.toHexString(),
 			]
 		)
 

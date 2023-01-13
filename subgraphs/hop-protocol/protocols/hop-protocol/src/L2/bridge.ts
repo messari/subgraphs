@@ -13,7 +13,13 @@ import { reverseChainIDs } from '../../../../src/sdk/protocols/bridge/chainIds'
 import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
 import { NetworkConfigs } from '../../../../configurations/configure'
-import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
+import {
+	Address,
+	BigDecimal,
+	BigInt,
+	dataSource,
+	log,
+} from '@graphprotocol/graph-ts'
 import {
 	TransferSent,
 	TransferFromL1Completed,
@@ -113,7 +119,12 @@ export function handleTransferFromL1Completed(
 			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
 		}
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-			reverseChainIDs.get(Network.MAINNET)!,
+			reverseChainIDs.get(
+				dataSource
+					.network()
+					.toUpperCase()
+					.replace('-', '_')
+			)!,
 			Address.fromString(inputToken),
 			CrosschainTokenType.CANONICAL,
 			Address.fromString(inputToken)
@@ -174,15 +185,23 @@ export function handleTransferSent(event: TransferSent): void {
 			CrosschainTokenType.CANONICAL,
 			Address.fromString(inputToken)
 		)
-
 		pool.addDestinationToken(crossToken)
-		pool.addSupplySideRevenueUSD(fee)
 
-		acc.transferOut(
-			pool,
-			pool.getDestinationTokenRoute(crossToken)!,
-			event.params.recipient,
-			event.params.amount
-		)
+		if (event.params.chainId.toString() == '1') {
+			acc.transferIn(
+				pool,
+				pool.getDestinationTokenRoute(crossToken)!,
+				event.params.recipient,
+				event.params.amount
+			)
+		} else {
+			acc.transferOut(
+				pool,
+				pool.getDestinationTokenRoute(crossToken)!,
+				event.params.recipient,
+				event.params.amount
+			)
+		}
+		pool.addSupplySideRevenueUSD(fee)
 	}
 }

@@ -4,11 +4,7 @@ import {
 	TokenInitializer,
 	TokenParams,
 } from '../../../../src/sdk/protocols/bridge/tokens'
-import {
-	BridgePermissionType,
-	BridgePoolType,
-	CrosschainTokenType,
-} from '../../../../src/sdk/protocols/bridge/enums'
+import { BridgePermissionType } from '../../../../src/sdk/protocols/bridge/enums'
 import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
 import { NetworkConfigs } from '../../../../configurations/configure'
