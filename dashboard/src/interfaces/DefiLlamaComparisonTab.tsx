@@ -43,7 +43,6 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
   const [defiLlamaData, setDefiLlamaData] = useState<{ [x: string]: any }>({});
   const [defiLlamaProtocols, setDefiLlamaProtocols] = useState<any[]>([]);
   const [defiLlamaProtocolFetchError, setDefiLlamaProtocolFetchError] = useState<boolean>(false);
-  const [isMonthly, setIsMonthly] = useState(false);
   const [includeStakedTVL, setIncludeStakedTVL] = useState(true);
   const [includeBorrowedTVL, setIncludeBorrowedTVL] = useState(true);
 
@@ -223,33 +222,13 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
           date: parseInt(x.timestamp),
         })).reverse(),
       };
-      if (isMonthly) {
-        // key number of months from epoch value first val of month
-        const tempChartData: any = { defiLlama: {}, subgraph: {} };
-        compChart.defiLlama.forEach((point: { [x: string]: any }) => {
-          const monthKey = toDate(point.date).split("-").slice(0, 2).join("-");
-          if (!Object.keys(tempChartData.defiLlama).includes(monthKey)) {
-            tempChartData.defiLlama[monthKey] = { value: point.value, date: point.date };
-          }
-        });
-        compChart.subgraph.forEach((point: { [x: string]: any }) => {
-          const monthKey = toDate(point.date).split("-").slice(0, 2).join("-");
-          if (!Object.keys(tempChartData.subgraph).includes(monthKey)) {
-            tempChartData.subgraph[monthKey] = { value: point.value, date: point.date };
-          }
-        });
-        compChart = {
-          defiLlama: Object.values(tempChartData.defiLlama).map((val: any) => ({ date: val.date, value: val.value })),
-          subgraph: Object.values(tempChartData.subgraph).map((val: any) => ({ date: val.date, value: val.value })),
-        };
-      }
 
       compChart = lineupChartDatapoints({ ...compChart });
       if (compChart instanceof Error) {
         throw new Error(compChart?.message);
       }
 
-      const elementId = `${isMonthly ? "Monthly" : "Daily"} Chart - ${defiLlamaSlug}`;
+      const elementId = `Daily Chart - ${defiLlamaSlug}`;
       chart = (
         <div key={elementId} id={elementId}>
           <Box mt={3} mb={1}>
@@ -265,9 +244,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
               <ComparisonTable
                 datasetLabel="Data Comparison"
                 dataTable={compChart}
-                isMonthly={isMonthly}
                 isHourly={false}
-                setIsMonthly={(x: boolean) => setIsMonthly(x)}
                 jpegDownloadHandler={() => jpegDownloadHandler()}
                 baseKey="subgraph"
                 overlayKey="defiLlama"
