@@ -5,7 +5,7 @@
   "startBlock": 5272596,
   "poolManagerAddress": "0x9Ee3600543eCcc85020D6bc77EB553d1747a65D2",
   "poolManagerStartBlock": 6234663,
-  "graftEnabled": false,
-  "subgraphId": "",
-  "graftStartBlock": 0
+  "graftEnabled": true,
+  "subgraphId": "QmbR1pH2V5nb9sSp69mBFWD3BQBa57kDWFXquMbhP17gut",
+  "graftStartBlock": 15486562
 }
