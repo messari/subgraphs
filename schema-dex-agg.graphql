@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AGG
-# Version: 1.0.0
+# Version: 1.0.1
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -76,6 +76,15 @@ type Token @entity {
   " The type of token the protocol creates for positions "
   type: TokenType
 
+  " Day ID of the most recent daily snapshot "
+  lastSnapshotDayID: Int!
+
+  " Timestamp of the last time this entity was updated "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the last time this entity was updated "
+  lastUpdateBlockNumber: BigInt!
+
   " All deposit (add liquidity) events occurred in this pool "
   tokenDailySnapshots: [TokenDailySnapshot!]! @derivedFrom(field: "token")
 }
@@ -83,12 +92,6 @@ type Token @entity {
 type TokenDailySnapshot @entity {
   "  { Smart contract address of the token }-{ # of days since Unix epoch time }  "
   id: ID!
-
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
 
   " Token address "
   token: Token!
@@ -107,6 +110,12 @@ type TokenDailySnapshot @entity {
 
   " Field to track the cumulative volume of the token in USD "
   cumulativeVolumeUSD: BigDecimal!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
 }
 
 enum RewardTokenType {
@@ -241,6 +250,15 @@ type DexAggProtocol implements Protocol @entity {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  " Day ID of the most recent daily snapshot "
+  lastSnapshotDayID: Int!
+
+  " Timestamp of the last time this entity was updated "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the last time this entity was updated "
+  lastUpdateBlockNumber: BigInt!
+
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -312,6 +330,15 @@ type VirtualPool @entity {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  " Day ID of the most recent daily snapshot "
+  lastSnapshotDayID: Int!
+
+  " Timestamp of the last time this entity was updated "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the last time this entity was updated "
+  lastUpdateBlockNumber: BigInt!
+
   ##### Snapshots #####
 
   " Virtual pool daily snapshots "
@@ -328,13 +355,7 @@ type VirtualPoolDailySnapshot @entity {
   id: Bytes!
 
   " Number of days since Unix epoch time "
-  days: Int!
-
-  " Timestamp of the last swap of this type "
-  timestamp: BigInt!
-
-  " Block number of the last block number of this type "
-  blockNumber: BigInt!
+  day: Int!
 
   " VirtualPool "
   virtualPool: VirtualPool!
@@ -394,6 +415,12 @@ type VirtualPoolDailySnapshot @entity {
 
   " Number of unique daily active users "
   dailyActiveUsers: Int!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
 }
 
 ###############################
@@ -405,7 +432,7 @@ type UsageMetricsDailySnapshot @entity {
   id: Bytes!
 
   " Number of days since Unix epoch time "
-  days: Int!
+  day: Int!
 
   " Protocol this snapshot is associated with "
   protocol: DexAggProtocol!
@@ -419,14 +446,14 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
   dailyTransactionCount: Int!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
-
   " Total number of trades (swaps) in an hour "
   dailySwapCount: Int!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
 }
 
 type UsageMetricsHourlySnapshot @entity {
@@ -434,7 +461,7 @@ type UsageMetricsHourlySnapshot @entity {
   id: Bytes!
 
   " Number of hours since Unix epoch time "
-  hours: Int!
+  hour: Int!
 
   " Protocol this snapshot is associated with "
   protocol: DexAggProtocol!
@@ -451,11 +478,11 @@ type UsageMetricsHourlySnapshot @entity {
   " Total number of trades (swaps) in an hour "
   hourlySwapCount: Int!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
   timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
 }
 
 type FinancialsDailySnapshot @entity {
@@ -463,7 +490,7 @@ type FinancialsDailySnapshot @entity {
   id: Bytes!
 
   " Number of days since Unix epoch time "
-  days: Int!
+  day: Int!
 
   " Protocol this snapshot is associated with "
   protocol: DexAggProtocol!
@@ -495,11 +522,11 @@ type FinancialsDailySnapshot @entity {
   " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
   cumulativeTotalRevenueUSD: BigDecimal!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
   timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
 }
 
 ##############################
