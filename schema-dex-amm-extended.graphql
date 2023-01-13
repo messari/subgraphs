@@ -1160,10 +1160,10 @@ type PositionSnapshot @entity(immutable: true) {
   " Number of withdrawals related to this position "
   withdrawCount: Int!
 
-  " Block number of this snapshot "
+  " Timestamp of when this snapshot was taken "
   blockNumber: BigInt!
 
-  " Timestamp of this snapshot "
+  " Timestamp of when this snapshot was taken "
   timestamp: BigInt!
 }
 
