@@ -98,8 +98,8 @@ export function createLiquidityPool(
   pool.openPositionCount = INT_ZERO;
   pool.closedPositionCount = INT_ZERO;
 
-  pool.lastSnapshotsDayID = INT_ZERO;
-  pool.lastSnapshotsHourID = INT_ZERO;
+  pool.lastSnapshotDayID = INT_ZERO;
+  pool.lastSnapshotHourID = INT_ZERO;
   pool.lastUpdateBlockNumber = event.block.number;
   pool.lastUpdateTimestamp = event.block.timestamp;
 
