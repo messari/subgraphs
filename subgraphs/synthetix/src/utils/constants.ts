@@ -102,6 +102,8 @@ export namespace PositionSide {
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const sUSD_ADDRESS = "0x57ab1ec28d129707052df4df418d58a2d46d5f51";
+export const sETH_ADDRESS = "0x5e74C9036fb86BD7eCdcb084a0673EFc32eA31cb";
 
 export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 

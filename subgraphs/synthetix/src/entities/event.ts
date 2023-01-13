@@ -96,7 +96,6 @@ export function createWithdraw(
   asset: Token,
   amountToken: BigInt,
   amountUSD: BigDecimal,
-  user: Address,
   recipient: Address
 ): void {
   if (amountToken.le(BIGINT_ZERO)) {
@@ -105,7 +104,7 @@ export function createWithdraw(
   const account = getOrCreateAccount(recipient);
   const position = getOrCreateUserPosition(
     event,
-    getOrCreateAccount(user),
+    account,
     market,
     PositionSide.LENDER
   );

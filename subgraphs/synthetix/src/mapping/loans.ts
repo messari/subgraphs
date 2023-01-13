@@ -32,8 +32,20 @@ import {
 } from "../../generated/schema";
 
 import { log, BigInt } from "@graphprotocol/graph-ts";
-import { toDecimal } from "./lib/helpers";
+import { bigDecimalToBigInt, getLatestRate, toDecimal } from "./lib/helpers";
+import { ETH_ADDRESS, sETH_ADDRESS, sUSD_ADDRESS } from "../utils/constants";
+import {
+  createDeposit,
+  createBorrow,
+  createRepay,
+  createWithdraw,
+  createLiquidate,
+} from "../entities/event";
+import { getOrCreateMarket, addMarketTokenBalance } from "../entities/market";
+import { getOrCreateToken } from "../entities/token";
 
+// Input token for each and every function is eth, output can be sETH or sUSD,
+// we need to know the collateralMinted
 export function handleLoanCreatedEther(event: LoanCreatedEvent): void {
   const loanEntity = new Loan(event.params.id.toHex() + "-sETH");
   loanEntity.txHash = event.transaction.hash.toHex();
@@ -46,6 +58,39 @@ export function handleLoanCreatedEther(event: LoanCreatedEvent): void {
   loanEntity.currency = event.params.currency.toString();
   loanEntity.collateralAmount = toDecimal(event.params.collateral);
   loanEntity.save();
+
+  // We are depositing ETH and borrowing sETH
+  const txHash = event.transaction.hash.toHex();
+  const address = event.params.account;
+
+  const latestRate = getLatestRate("sETH", txHash);
+
+  const depositToken = getOrCreateToken(ETH_ADDRESS);
+  const depositAmount = event.transaction.value;
+  const depositUSD = toDecimal(depositAmount).times(latestRate!);
+
+  const borrowAmount = event.params.amount;
+  const borrowUSD = toDecimal(borrowAmount).times(latestRate!);
+  // Get sETH rate here
+  const market = getOrCreateMarket(depositToken.id, event);
+
+  createDeposit(
+    event,
+    market,
+    depositToken,
+    depositAmount,
+    depositUSD,
+    address
+  );
+  createBorrow(
+    event,
+    market,
+    getOrCreateToken(sETH_ADDRESS),
+    borrowAmount,
+    borrowUSD,
+    address
+  );
+  addMarketTokenBalance(event, market, depositAmount, latestRate!);
 }
 
 export function handleLoanClosedEther(event: LoanClosedEvent): void {
@@ -71,12 +116,51 @@ export function handleLoanClosedByLiquidation(
   loanLiquidatedEntity.save();
 
   const loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
-  if (loanEntity) {
-    loanEntity.isOpen = false;
-    loanEntity.closedAt = event.block.timestamp;
-    loanEntity.collateralAmount = toDecimal(BigInt.fromI32(0));
-    loanEntity.save();
+  if (loanEntity == null) {
+    log.error(
+      "for handleLoanClosedByLiquidation there should be a loan entity for this id: {} in this hash: {}",
+      [event.params.id.toHex(), event.transaction.hash.toHex()]
+    );
+    return;
   }
+
+  const address = event.params.account;
+
+  const liquidator = event.params.liquidator;
+  const eth = getOrCreateToken(ETH_ADDRESS);
+  const eth_latestRate = getLatestRate("sETH", event.transaction.hash.toHex());
+  const eth_amount = loanEntity!.collateralAmount;
+  const eth_amountUSD = eth_amount.times(eth_latestRate!);
+  const market = getOrCreateMarket(eth.id, event);
+
+  const susd = getOrCreateToken(sUSD_ADDRESS);
+  const susd_latestRate = getLatestRate("sUSD", event.transaction.hash.toHex());
+  const susd_amount = loanEntity!.amount;
+  const susd_amountUSD = susd_amount.times(susd_latestRate!);
+
+  const profitUSD = eth_amountUSD.minus(susd_amountUSD);
+
+  createLiquidate(
+    event,
+    market,
+    susd,
+    bigDecimalToBigInt(susd_amount),
+    susd_amountUSD,
+    address,
+    liquidator,
+    profitUSD
+  );
+  addMarketTokenBalance(
+    event,
+    market,
+    bigDecimalToBigInt(eth_amount).times(BigInt.fromString("-1")),
+    eth_latestRate!
+  );
+
+  loanEntity.isOpen = false;
+  loanEntity.closedAt = event.block.timestamp;
+  loanEntity.collateralAmount = toDecimal(BigInt.fromI32(0));
+  loanEntity.save();
 }
 
 export function handleLoanPartiallyLiquidated(
@@ -113,6 +197,39 @@ export function handleLoanPartiallyLiquidated(
     toDecimal(event.params.collateralLiquidated)
   );
   loanEntity.save();
+
+  const address = event.params.account;
+
+  const liquidator = event.params.liquidator;
+  const eth = getOrCreateToken(ETH_ADDRESS);
+  const eth_latestRate = getLatestRate("sETH", event.transaction.hash.toHex());
+  const eth_amount = event.params.collateralLiquidated;
+  const eth_amountUSD = toDecimal(eth_amount).times(eth_latestRate!);
+  const market = getOrCreateMarket(eth.id, event);
+
+  const susd = getOrCreateToken(sUSD_ADDRESS);
+  const susd_latestRate = getLatestRate("sUSD", event.transaction.hash.toHex());
+  const susd_amount = event.params.amountLiquidated;
+  const susd_amountUSD = toDecimal(susd_amount).times(susd_latestRate!);
+
+  const profitUSD = eth_amountUSD.minus(susd_amountUSD);
+
+  createLiquidate(
+    event,
+    market,
+    susd,
+    susd_amount,
+    susd_amountUSD,
+    address,
+    liquidator,
+    profitUSD
+  );
+  addMarketTokenBalance(
+    event,
+    market,
+    eth_amount.times(BigInt.fromString("-1")),
+    eth_latestRate!
+  );
 }
 
 export function handleLoanRepaymentMade(event: LoanRepaymentMadeEvent): void {
@@ -135,6 +252,29 @@ export function handleLoanRepaymentMade(event: LoanRepaymentMadeEvent): void {
     return;
   }
   loanEntity.amount = loanRepaid.newLoanAmount;
+
+  // We are repaying sETH
+  const txHash = event.transaction.hash.toHex();
+  const address = event.params.account;
+
+  const latestRate = getLatestRate("sUSD", txHash);
+
+  const repayToken = getOrCreateToken(ETH_ADDRESS);
+  const repayAmount = event.transaction.value;
+  const repayUSD = toDecimal(repayAmount).times(latestRate!);
+
+  const market = getOrCreateMarket(repayToken.id, event);
+
+  createRepay(
+    event,
+    market,
+    repayToken,
+    repayAmount,
+    repayUSD,
+    address,
+    event.transaction.from
+  );
+
   loanEntity.save();
 }
 
@@ -160,6 +300,18 @@ export function handleCollateralDeposited(
     loanEntity.collateralAmount = collateralDepositedEntity.collateralAfter;
     loanEntity.save();
   }
+
+  const txHash = event.transaction.hash.toHex();
+  const address = event.params.account;
+
+  const token = getOrCreateToken(ETH_ADDRESS);
+  const amount = event.params.amountDeposited;
+  const latestRate = getLatestRate("sETH", txHash);
+  const amountUSD = toDecimal(amount).times(latestRate!);
+  const market = getOrCreateMarket(token.id, event);
+
+  createDeposit(event, market, token, amount, amountUSD, address);
+  addMarketTokenBalance(event, market, amount, latestRate!);
 }
 
 export function handleCollateralWithdrawn(
@@ -184,10 +336,28 @@ export function handleCollateralWithdrawn(
     loanEntity.collateralAmount = collateralWithdrawnEntity.collateralAfter;
     loanEntity.save();
   }
+
+  const txHash = event.transaction.hash.toHex();
+  const address = event.params.account;
+
+  const token = getOrCreateToken(ETH_ADDRESS);
+  const amount = event.params.amountWithdrawn;
+  const latestRate = getLatestRate("sETH", txHash);
+  const amountUSD = toDecimal(amount).times(latestRate!);
+  const market = getOrCreateMarket(token.id, event);
+
+  createWithdraw(event, market, token, amount, amountUSD, address);
+  addMarketTokenBalance(
+    event,
+    market,
+    amount.times(BigInt.fromString("-1")),
+    latestRate!
+  );
 }
 
+// Drawdown is borrow
 export function handleLoanDrawnDown(event: LoanDrawnDownEvent): void {
-  const loanEntity = Loan.load(event.params.id.toHex() + "-sETH");
+  const loanEntity = Loan.load(event.params.id.toHex() + "-sUSD");
   if (loanEntity == null) {
     log.error(
       "for handleLoanPartiallyLiquidated there should be a loan entity for this id: {} in this hash: {}",
@@ -198,6 +368,25 @@ export function handleLoanDrawnDown(event: LoanDrawnDownEvent): void {
   loanEntity.hasPartialLiquidations = true;
   loanEntity.amount = loanEntity.amount.plus(toDecimal(event.params.amount));
   loanEntity.save();
+
+  // We are depositing ETH and borrowing sETH
+  const txHash = event.transaction.hash.toHex();
+  const address = event.params.account;
+  const latestRate = getLatestRate("sUSD", txHash);
+  const depositToken = getOrCreateToken(ETH_ADDRESS);
+  const borrowAmount = event.params.amount;
+  const borrowUSD = toDecimal(borrowAmount).times(latestRate!);
+  // Get sETH rate here
+  const market = getOrCreateMarket(depositToken.id, event);
+
+  createBorrow(
+    event,
+    market,
+    getOrCreateToken(sETH_ADDRESS),
+    borrowAmount,
+    borrowUSD,
+    address
+  );
 }
 
 // LEGACY FUNCTIONS
@@ -226,6 +415,39 @@ export function handleLoanCreatedEtherLegacy(
   const loanEntity = addLoanEntity(event, "sETH");
   loanEntity.collateralMinted = "sETH";
   loanEntity.save();
+
+  // We are depositing ETH and borrowing sETH
+  const txHash = event.transaction.hash.toHex();
+  const address = event.params.account;
+
+  const latestRate = getLatestRate("sETH", txHash);
+
+  const depositToken = getOrCreateToken(ETH_ADDRESS);
+  const depositAmount = event.transaction.value;
+  const depositUSD = toDecimal(depositAmount).times(latestRate!);
+
+  const borrowAmount = event.params.amount;
+  const borrowUSD = toDecimal(borrowAmount).times(latestRate!);
+  // Get sETH rate here
+  const market = getOrCreateMarket(depositToken.id, event);
+
+  createDeposit(
+    event,
+    market,
+    depositToken,
+    depositAmount,
+    depositUSD,
+    address
+  );
+  createBorrow(
+    event,
+    market,
+    getOrCreateToken(sETH_ADDRESS),
+    borrowAmount,
+    borrowUSD,
+    address
+  );
+  addMarketTokenBalance(event, market, depositAmount, latestRate!);
 }
 
 export function handleLoanCreatedsUSDLegacy(
@@ -234,6 +456,40 @@ export function handleLoanCreatedsUSDLegacy(
   const loanEntity = addLoanEntity(event, "sUSD");
   loanEntity.collateralMinted = "sUSD";
   loanEntity.save();
+
+  // We are depositing ETH and borrowing sETH
+  const txHash = event.transaction.hash.toHex();
+  const address = event.params.account;
+
+  const latestRate = getLatestRate("sETH", txHash);
+
+  const depositToken = getOrCreateToken(ETH_ADDRESS);
+  const depositAmount = event.transaction.value;
+  const depositUSD = toDecimal(depositAmount).times(latestRate!);
+
+  const susd_latestRate = getLatestRate("sUSD", txHash);
+  const borrowAmount = event.params.amount;
+  const borrowUSD = toDecimal(borrowAmount).times(susd_latestRate!);
+  // Get sETH rate here
+  const market = getOrCreateMarket(depositToken.id, event);
+
+  createDeposit(
+    event,
+    market,
+    depositToken,
+    depositAmount,
+    depositUSD,
+    address
+  );
+  createBorrow(
+    event,
+    market,
+    getOrCreateToken(sUSD_ADDRESS),
+    borrowAmount,
+    borrowUSD,
+    address
+  );
+  addMarketTokenBalance(event, market, depositAmount, latestRate!);
 }
 
 function closeLoan(
@@ -261,6 +517,8 @@ export function handleLoanClosedsUSDLegacy(event: LegacyLoanClosedEvent): void {
   closeLoan(event, "sUSD");
 }
 
+// Functions below this use sUSD output and eth input
+
 // NOTE no need to close the loan here as the LoanClosed event was emitted directly prior to this event
 export function handleLoanLiquidatedLegacy(
   event: LegacyLoanLiquidatedEvent
@@ -273,6 +531,48 @@ export function handleLoanLiquidatedLegacy(
   loanLiquidatedEntity.liquidator = event.params.liquidator;
   loanLiquidatedEntity.timestamp = event.block.timestamp;
   loanLiquidatedEntity.save();
+
+  const loanEntity = Loan.load(event.params.loanID.toHex());
+  if (loanEntity == null) {
+    log.error(
+      "for handleLoanPartiallyLiquidated there should be a loan entity for this id: {} in this hash: {}",
+      [event.params.loanID.toHex(), event.transaction.hash.toHex()]
+    );
+    return;
+  }
+
+  const address = event.params.account;
+
+  const liquidator = event.params.liquidator;
+  const eth = getOrCreateToken(ETH_ADDRESS);
+  const eth_latestRate = getLatestRate("sETH", event.transaction.hash.toHex());
+  const eth_amount = loanEntity.collateralAmount;
+  const eth_amountUSD = eth_amount.times(eth_latestRate!);
+  const market = getOrCreateMarket(eth.id, event);
+
+  const susd = getOrCreateToken(sUSD_ADDRESS);
+  const susd_latestRate = getLatestRate("sUSD", event.transaction.hash.toHex());
+  const susd_amount = loanEntity.amount;
+  const susd_amountUSD = susd_amount.times(susd_latestRate!);
+
+  const profitUSD = eth_amountUSD.minus(susd_amountUSD);
+
+  createLiquidate(
+    event,
+    market,
+    susd,
+    bigDecimalToBigInt(susd_amount),
+    susd_amountUSD,
+    address,
+    liquidator,
+    profitUSD
+  );
+  addMarketTokenBalance(
+    event,
+    market,
+    bigDecimalToBigInt(eth_amount).times(BigInt.fromString("-1")),
+    eth_latestRate!
+  );
 }
 
 export function handleLoanPartiallyLiquidatedLegacy(
@@ -306,6 +606,39 @@ export function handleLoanPartiallyLiquidatedLegacy(
     toDecimal(event.params.liquidatedAmount)
   );
   loanEntity.save();
+
+  const address = event.params.account;
+
+  const liquidator = event.params.liquidator;
+  const eth = getOrCreateToken(ETH_ADDRESS);
+  const eth_latestRate = getLatestRate("sETH", event.transaction.hash.toHex());
+  const eth_amount = event.params.liquidatedCollateral;
+  const eth_amountUSD = toDecimal(eth_amount).times(eth_latestRate!);
+  const market = getOrCreateMarket(eth.id, event);
+
+  const susd = getOrCreateToken(sUSD_ADDRESS);
+  const susd_latestRate = getLatestRate("sUSD", event.transaction.hash.toHex());
+  const susd_amount = event.params.liquidatedAmount;
+  const susd_amountUSD = toDecimal(susd_amount).times(susd_latestRate!);
+
+  const profitUSD = eth_amountUSD.minus(susd_amountUSD);
+
+  createLiquidate(
+    event,
+    market,
+    susd,
+    susd_amount,
+    susd_amountUSD,
+    address,
+    liquidator,
+    profitUSD
+  );
+  addMarketTokenBalance(
+    event,
+    market,
+    eth_amount.times(BigInt.fromString("-1")),
+    eth_latestRate!
+  );
 }
 
 export function handleCollateralDepositedLegacy(
@@ -324,6 +657,17 @@ export function handleCollateralDepositedLegacy(
   collateralDepositedEntity.account = event.params.account;
   collateralDepositedEntity.timestamp = event.block.timestamp;
   collateralDepositedEntity.save();
+
+  const address = event.params.account;
+  const token = getOrCreateToken(ETH_ADDRESS);
+  const latestRate = getLatestRate("sETH", event.transaction.hash.toHex());
+
+  const amount = event.params.collateralAmount;
+  const amountUSD = toDecimal(amount).times(latestRate!);
+  const market = getOrCreateMarket(token.id, event);
+
+  createDeposit(event, market, token, amount, amountUSD, address);
+  addMarketTokenBalance(event, market, amount, latestRate!);
 }
 
 export function handleCollateralWithdrawnLegacy(
@@ -342,6 +686,22 @@ export function handleCollateralWithdrawnLegacy(
   collateralWithdrawnEntity.account = event.params.account;
   collateralWithdrawnEntity.timestamp = event.block.timestamp;
   collateralWithdrawnEntity.save();
+
+  const address = event.params.account;
+  const token = getOrCreateToken(ETH_ADDRESS);
+  const latestRate = getLatestRate("sETH", event.transaction.hash.toHex());
+
+  const amount = event.params.amountWithdrawn;
+  const amountUSD = toDecimal(amount).times(latestRate!);
+  const market = getOrCreateMarket(token.id, event);
+
+  createWithdraw(event, market, token, amount, amountUSD, address);
+  addMarketTokenBalance(
+    event,
+    market,
+    amount.times(BigInt.fromString("-1")),
+    latestRate!
+  );
 }
 
 export function handleLoanRepaidLegacy(event: LegacyLoanRepaidEvent): void {
@@ -365,4 +725,14 @@ export function handleLoanRepaidLegacy(event: LegacyLoanRepaidEvent): void {
   }
   loanEntity.amount = loanRepaid.newLoanAmount;
   loanEntity.save();
+
+  const address = event.params.account;
+  const token = getOrCreateToken(ETH_ADDRESS);
+  const sUSDToken = getOrCreateToken(sUSD_ADDRESS);
+  const latestRate = getLatestRate("sUSD", event.transaction.hash.toHex());
+  const amount = event.params.repaidAmount;
+  const amountUSD = toDecimal(amount).times(latestRate!);
+  const market = getOrCreateMarket(token.id, event);
+
+  createRepay(event, market, sUSDToken, amount, amountUSD, address, address);
 }

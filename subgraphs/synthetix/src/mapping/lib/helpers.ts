@@ -106,3 +106,7 @@ export function isEscrow(holder: string, network: string): boolean {
     )!.toHexString() == holder
   );
 }
+
+export function bigDecimalToBigInt(n: BigDecimal): BigInt {
+  return BigInt.fromString(n.toString().split(".")[0]);
+}

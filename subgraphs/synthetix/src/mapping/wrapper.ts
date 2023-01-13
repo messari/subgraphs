@@ -114,7 +114,7 @@ export function handleBurned(event: BurnedEvent): void {
   const market = getOrCreateMarket(token.id, event);
   const feeUSD = toDecimal(event.params.fee).times(latestRate!);
 
-  createWithdraw(event, market, token, amount, amountUSD, address, address);
+  createWithdraw(event, market, token, amount, amountUSD, address);
   createRepay(event, market, token, amount, amountUSD, address, address);
   addProtocolSideRevenue(event, market, feeUSD);
   addMarketTokenBalance(
