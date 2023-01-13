@@ -18,28 +18,30 @@ function addDataPoint(
   id: string,
 ): { [x: string]: any } {
   dataFields[fieldName].push({ value: value, date: Number(timestamp) });
-  if (dataFieldMetrics[fieldName].sum === null) {
-    dataFieldMetrics[fieldName].sum = 0;
-  }
-  dataFieldMetrics[fieldName].sum += value;
+  if (!!dataFieldMetrics[fieldName]) {
+    if (!dataFieldMetrics[fieldName]?.sum) {
+      dataFieldMetrics[fieldName].sum = 0;
+    }
+    dataFieldMetrics[fieldName].sum += value;
 
-  if (fieldName.includes("umulative")) {
-    if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
-      dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
+    if (fieldName.includes("umulative")) {
+      if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
+        dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
+      }
+      if (value < dataFieldMetrics[fieldName].cumulative.prevVal) {
+        dataFieldMetrics[fieldName].cumulative.hasLowered = id;
+      }
+      dataFieldMetrics[fieldName].cumulative.prevVal = value;
     }
-    if (value < dataFieldMetrics[fieldName].cumulative.prevVal) {
-      dataFieldMetrics[fieldName].cumulative.hasLowered = id;
+    if (fieldName.includes("umulative")) {
+      if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
+        dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
+      }
+      if (Number(value) < dataFieldMetrics[fieldName].cumulative.prevVal) {
+        dataFieldMetrics[fieldName].cumulative.hasLowered = id;
+      }
+      dataFieldMetrics[fieldName].cumulative.prevVal = Number(value);
     }
-    dataFieldMetrics[fieldName].cumulative.prevVal = value;
-  }
-  if (fieldName.includes("umulative")) {
-    if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
-      dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
-    }
-    if (Number(value) < dataFieldMetrics[fieldName].cumulative.prevVal) {
-      dataFieldMetrics[fieldName].cumulative.hasLowered = id;
-    }
-    dataFieldMetrics[fieldName].cumulative.prevVal = Number(value);
   }
   return {
     currentEntityField: dataFields[fieldName],
@@ -333,7 +335,7 @@ function PoolTabEntity({
               }
 
               if (value || value === 0) {
-                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT")) {
+                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT") || capsFieldName.includes("SUPPLYSIDETOKENAMOUNTS") || capsFieldName.includes("VOLUMETOKENAMOUNTS")) {
                   // convert the value with decimals for certain fields
                   value = convertTokenDecimals(val, data[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
                 }
@@ -586,7 +588,7 @@ function PoolTabEntity({
               }
 
               if (value || value === 0) {
-                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT")) {
+                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT") || capsFieldName.includes("SUPPLYSIDETOKENAMOUNTS") || capsFieldName.includes("VOLUMETOKENAMOUNTS")) {
                   // convert the value with decimals for certain fields
                   value = convertTokenDecimals(val, overlayData[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
                 }
@@ -731,17 +733,7 @@ function PoolTabEntity({
 
     const ratesChart: { [x: string]: any } = {};
     const rewardChart: { [x: string]: any } = {};
-    const tokenWeightData: { [name: string]: any[] } = {};
     Object.keys(dataFields).forEach((field: string) => {
-      // consolidate tokenweight fields
-      if (field.toUpperCase().includes("TOKENWEIGHTS")) {
-        const fieldName = field.split(" [")[0];
-        if (!tokenWeightData[fieldName]) {
-          tokenWeightData[fieldName] = [];
-        }
-        tokenWeightData[fieldName].push(dataFields[field]);
-        delete dataFields[field];
-      }
 
       // Push the Reward APR fields to the bottom of the charts section
       if (field.toUpperCase().includes("REWARDAPR") && dataFields[field].length > 0) {
@@ -757,28 +749,6 @@ function PoolTabEntity({
         delete dataFields[field];
       }
     });
-
-    if (Object.keys(tokenWeightData)?.length > 0) {
-      tokenWeightData.inputTokenWeights[0].forEach((val: any, idx: number) => {
-        // Looping through all instances of inputToken 0
-        let totalWeightAtIdx = val?.value;
-        for (let i = 1; i < tokenWeightData.inputTokenWeights?.length; i++) {
-          totalWeightAtIdx += tokenWeightData.inputTokenWeights[i][idx]?.value;
-        }
-        if (totalWeightAtIdx > 50) {
-          // If weights are greater than 50, its assumed that the value is denominated out of 100 rather than 1
-          totalWeightAtIdx = totalWeightAtIdx / 100;
-        }
-        if (
-          Math.abs(1 - totalWeightAtIdx) > .01 &&
-          issues.filter((x) => x.fieldName === entityName + "-inputTokenWeights").length === 0
-        ) {
-          const fieldName = entityName + "-inputTokenWeights";
-          const date = toDate(val.date);
-          issues.push({ type: "VAL", level: "error", fieldName, message: entityName + "-inputTokenWeights on " + date + " add up to " + totalWeightAtIdx + '%, which is more than 1% off of 100%. The inputTokenWeights across all tokens should add up to 100% at any given point.' });
-        }
-      })
-    }
 
     // The rewardAPRElement logic is used to take all of the rewardAPR and display their lines on one graph
     let rewardAPRElement = null;
@@ -869,26 +839,44 @@ function PoolTabEntity({
     }
 
     let tokenWeightComponent = null;
-    if (Object.keys(tokenWeightData).length > 0) {
-      tokenWeightComponent = Object.keys(tokenWeightData).map((tokenWeightFieldName) => {
-        const currentTokenWeightArray = tokenWeightData[tokenWeightFieldName];
-        return (
-          <div key={entityName + "-" + tokenWeightFieldName} id={entityName + "-" + tokenWeightFieldName}>
-            <Box mt={3} mb={1}>
-              <CopyLinkToClipboard link={window.location.href} scrollId={entityName + "-" + tokenWeightFieldName}>
-                <Typography variant="h6">{entityName + "-" + tokenWeightFieldName}</Typography>
-              </CopyLinkToClipboard>
-            </Box>
-            <Grid container>
-              <StackedChart
-                tokens={data[poolKeySingular].inputTokens}
-                tokenWeightsArray={currentTokenWeightArray}
-                poolTitle={entityName + "-" + tokenWeightFieldName}
-              />
-            </Grid>
-          </div>
-        );
-      });
+    if (entitySpecificElements['inputTokenWeights']) {
+      entitySpecificElements['inputTokenWeights'][0].forEach((val: any, idx: number) => {
+        // Looping through all instances of inputToken 0
+        let totalWeightAtIdx = val?.value;
+        for (let i = 1; i < entitySpecificElements['inputTokenWeights']?.length; i++) {
+          totalWeightAtIdx += entitySpecificElements['inputTokenWeights'][i][idx]?.value;
+        }
+        if (totalWeightAtIdx > 50) {
+          // If weights are greater than 50, its assumed that the value is denominated out of 100 rather than 1
+          totalWeightAtIdx = totalWeightAtIdx / 100;
+        }
+        if (
+          Math.abs(1 - totalWeightAtIdx) > .01 &&
+          issues.filter((x) => x.fieldName === entityName + "-inputTokenWeights").length === 0
+        ) {
+          const fieldName = entityName + "-inputTokenWeights";
+          const date = toDate(val.date);
+          issues.push({ type: "VAL", level: "error", fieldName, message: entityName + "-inputTokenWeights on " + date + " add up to " + totalWeightAtIdx + '%, which is more than 1% off of 100%. The inputTokenWeights across all tokens should add up to 100% at any given point.' });
+        }
+      })
+      const tokenWeightFieldName = 'inputTokenWeights';
+      tokenWeightComponent = (
+        <div key={entityName + "-" + tokenWeightFieldName} id={entityName + "-" + tokenWeightFieldName}>
+          <Box mt={3} mb={1}>
+            <CopyLinkToClipboard link={window.location.href} scrollId={entityName + "-" + tokenWeightFieldName}>
+              <Typography variant="h6">{entityName + "-" + tokenWeightFieldName}</Typography>
+            </CopyLinkToClipboard>
+          </Box>
+          <Grid container>
+            <StackedChart
+              tokens={data[poolKeySingular].inputTokens}
+              tokenWeightsArray={entitySpecificElements['inputTokenWeights']}
+              poolTitle={entityName + "-" + tokenWeightFieldName}
+            />
+          </Grid>
+        </div>
+      );
+      delete entitySpecificElements['inputTokenWeights'];
     }
 
     const rewardTokensLength = data[poolKeySingular]?.rewardTokens?.length;
@@ -1209,7 +1197,7 @@ function PoolTabEntity({
       let dataChartToPass: any = dataFields[field];
       let baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}`;
       if (overlayDataFields[field]) {
-        const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network || ""}-${overlayData?.protocols[0]?.subgraphVersion}`;
+        const overlayKey = `${overlayData?.protocols[0]?.name || "overlay"}-${overlayData?.protocols[0]?.network || "network"}-${overlayData?.protocols[0]?.subgraphVersion || "v0.0.0"}`;
         let keyDiff = "";
         if (baseKey === overlayKey) {
           keyDiff = ' (Overlay)';

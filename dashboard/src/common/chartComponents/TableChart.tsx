@@ -112,6 +112,10 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler, isStr
           </Button>
           <Button className="Hover-Underline" onClick={() => {
             const datesSelectedTimestamps = dates.map((x: any) => x.format("YYYY-MM-DD"));
+            let formatStr = "YYYY-MM-DD";
+            if (hourly) {
+              formatStr = "YYYY-MM-DD hh:mm:ss";
+            }
             if (!Array.isArray(dataTable)) {
               let length = dataTable[Object.keys(dataTable)[0]].length;
               const arrayToSend: any = [];
@@ -134,21 +138,21 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler, isStr
                 .sort(sortFunction)
                 .filter((x: any) => {
                   if (datesSelectedTimestamps.length > 0) {
-                    return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+                    return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format(formatStr));
                   }
                   return true;
                 })
-                .map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), ...x })), datasetLabel + '-csv', datasetLabel);
+                .map((x: any) => ({ date: moment.utc(x.date * 1000).format(formatStr), ...x })), datasetLabel + '-csv', datasetLabel);
             } else {
               downloadCSV(dataTable
                 .sort(sortFunction)
                 .filter((x: any) => {
                   if (datesSelectedTimestamps.length > 0) {
-                    return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+                    return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format(formatStr));
                   }
                   return true;
                 })
-                .map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel);
+                .map((x: any) => ({ date: moment.utc(x.date * 1000).format(formatStr), [field]: x.value })), datasetLabel + '-csv', datasetLabel);
             }
           }}>
             Save CSV

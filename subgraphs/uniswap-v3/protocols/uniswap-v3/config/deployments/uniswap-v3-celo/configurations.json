@@ -1,7 +1,9 @@
 {
   "network": "celo",
   "factoryAddress": "0xAfE208a311B21f13EF87E33A90049fC17A7acDEc",
-  "startBlock": 13757683,
+  "factoryAddressStartBlock": 13757683,
+  "nonFungiblePositionManagerAddress": "0x3d79EdAaBC0EaB6F08ED885C05Fc0B014290D95A",
+  "nonFungiblePositionManagerAddressStartBlock": 13916372,
   "deployment": "UNISWAP_V3_CELO",
   "graftEnabled": false,
   "subgraphId": "QmSc7pZu9tm455ZCLVK9CDdusdMGR3DfbsBQpvuYyUN13a",
