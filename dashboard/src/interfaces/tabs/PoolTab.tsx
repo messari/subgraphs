@@ -18,6 +18,7 @@ interface PoolTabProps {
   poolTimeseriesError: any;
   poolTimeseriesLoading: any;
   overlayPoolTimeseriesData: any;
+  overlayPoolTimeseriesLoading: boolean;
   poolId: string;
   poolData: { [x: string]: string };
   poolsList: { [x: string]: any[] };
@@ -37,6 +38,7 @@ function PoolTab({
   poolTimeseriesError,
   poolTimeseriesLoading,
   overlayPoolTimeseriesData,
+  overlayPoolTimeseriesLoading,
   poolId,
   poolData,
   poolsList,
@@ -237,6 +239,7 @@ function PoolTab({
             currentEntityData={poolTimeseriesData[entityName]}
             entitySpecificElements={entitySpecificElements}
             overlayPoolTimeseriesData={overlayPoolTimeseriesData[entityName]}
+            overlayPoolTimeseriesLoading={overlayPoolTimeseriesLoading}
             entityName={entityName}
             entitiesData={entitiesData}
             poolId={poolId}
