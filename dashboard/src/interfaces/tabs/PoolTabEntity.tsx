@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Tooltip, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
@@ -57,6 +57,7 @@ interface PoolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   entitySpecificElements: any;
   overlayPoolTimeseriesData: any;
+  overlayPoolTimeseriesLoading: boolean;
   poolId: string;
   protocolData: { [x: string]: any };
   setIssues: React.Dispatch<{ [x: string]: { message: string; type: string; level: string; fieldName: string }[] }>;
@@ -71,6 +72,7 @@ function PoolTabEntity({
   entitiesData,
   entitySpecificElements,
   overlayPoolTimeseriesData,
+  overlayPoolTimeseriesLoading,
   poolId,
   protocolData,
   setIssues,
@@ -550,7 +552,7 @@ function PoolTabEntity({
               }
             });
             continue;
-          } else if (Array.isArray(currentOverlayInstanceField)) {
+          } else if (Array.isArray(currentOverlayInstanceField) && overlayData) {
             // If the instance field overlayData is an array, extrapolate this array into multiple keys (one for each element of the array)
             currentOverlayInstanceField.forEach((val: any, arrayIndex: number) => {
               // Determine the name/label/id of each element to be separated out of the array
@@ -1195,8 +1197,8 @@ function PoolTabEntity({
         return null;
       }
       let dataChartToPass: any = dataFields[field];
-      let baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}`;
-      if (overlayDataFields[field]) {
+      let baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}-${field}`;
+      if (overlayDataFields[field]?.length > 0) {
         const overlayKey = `${overlayData?.protocols[0]?.name || "overlay"}-${overlayData?.protocols[0]?.network || "network"}-${overlayData?.protocols[0]?.subgraphVersion || "v0.0.0"}`;
         let keyDiff = "";
         if (baseKey === overlayKey) {
