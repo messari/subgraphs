@@ -375,6 +375,13 @@ type BridgeProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [Pool!]! @derivedFrom(field: "protocol")
+
+  # for reward emission calculation
+  " IDs of liquidity pools that belong to this protocol "
+  _liquidityPoolIDs: [Bytes!]
+
+  _lastRewardTimestamp: BigInt
+  _cumulativeRewardsClaimed: BigInt
 }
 
 ###############################
@@ -754,9 +761,6 @@ type Pool @entity {
 
   _lastDailySnapshotTimestamp: BigInt
   _lastHourlySnapshotTimestamp: BigInt
-
-  _lastRewardTimestamp: BigInt
-  _cumulativeRewardsClaimed: BigInt
 }
 
 type PoolRoute @entity {
@@ -1343,4 +1347,5 @@ type _ProtocolSnapshotHelper @entity {
 type _Transfer @entity {
   " transfer Id "
   id: Bytes!
+  sender: String!
 }

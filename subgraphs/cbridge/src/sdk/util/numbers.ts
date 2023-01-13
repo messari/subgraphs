@@ -11,6 +11,10 @@ export function bigIntToBigDecimal(
   );
 }
 
+export function bigDecimalToBigInt(x: BigDecimal): BigInt {
+  return BigInt.fromString(x.truncate(0).toString());
+}
+
 // returns 10^exp
 export function exponentToBigDecimal(exp: i32 = 18): BigDecimal {
   let bd = BigDecimal.fromString("1");

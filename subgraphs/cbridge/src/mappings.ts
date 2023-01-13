@@ -5,6 +5,7 @@ import {
   ethereum,
   Bytes,
   log,
+  dataSource,
 } from "@graphprotocol/graph-ts";
 import {
   LiquidityAdded,
@@ -44,16 +45,18 @@ import { ERC20NameBytes } from "../generated/PoolBasedBridge/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../generated/PoolBasedBridge/ERC20SymbolBytes";
 import { Versions } from "./versions";
 import { Token, Pool as PoolEntity, _Transfer } from "../generated/schema";
-import { bigIntToBigDecimal } from "./sdk/util/numbers";
+import { bigDecimalToBigInt, bigIntToBigDecimal } from "./sdk/util/numbers";
 import { getUsdPricePerToken, getUsdPrice } from "./prices";
 import { BIGINT_NEGATIVE_ONE } from "../../alpaca-finance-lending/src/utils/constants";
 import { networkToChainID } from "./sdk/protocols/bridge/chainIds";
 import {
+  BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   getNetworkSpecificConstant,
   RewardTokenType,
   SECONDS_PER_DAY,
 } from "./sdk/util/constants";
+import { Protocol } from "../../badgerdao/src/common/constants";
 
 // empty handler for prices library
 // eslint-disable-next-line no-unused-vars, no-empty-function
@@ -149,10 +152,19 @@ export function onCreatePool(
   aux1: BridgePoolType | null = null,
   aux2: string | null = null
 ): void {
-  //const inputToken = sdk.Tokens.getOrCreateToken(Address.fromBytes(aux.token));
   if (aux1 && aux2) {
     const token = sdk.Tokens.getOrCreateToken(Address.fromString(aux2));
-    pool.initialize("Celer Pool-based Bridge", "", aux1, token);
+    pool.initialize("Celer Pool-based Bridge", token.name, aux1, token);
+    // append pool id to protocol._liquidityPoolIDs
+    const protocol = sdk.Protocol.protocol;
+    let poolIDs = protocol._liquidityPoolIDs;
+    if (!poolIDs) {
+      poolIDs = [pool.getBytesID()];
+    } else {
+      poolIDs.push(pool.getBytesID());
+    }
+    protocol._liquidityPoolIDs = poolIDs;
+    protocol.save();
   }
 }
 
@@ -171,6 +183,7 @@ export function handleSend(event: Send): void {
   let transfer = _Transfer.load(event.params.transferId);
   if (!transfer) {
     transfer = new _Transfer(event.params.transferId);
+    transfer.sender = event.params.sender.toHexString();
     transfer.save();
   }
 }
@@ -218,21 +231,50 @@ export function handleWithdraw(call: WithdrawCall): void {
     BridgePoolType.LIQUIDITY,
     wdmsg.token.toHexString()
   );
+
+  // TODO: remove once supply side revenue running
+  log.info("[handleWithdraw]refid={},tx={}", [
+    wdmsg.refId.toHexString(),
+    call.transaction.hash.toHexString(),
+  ]);
+
+  const transfer = _Transfer.load(wdmsg.refId);
   if (wdmsg.refId.equals(Bytes.empty())) {
     // LP withdraw liquidity: refId == 0x0
     pool.addInputTokenBalance(wdmsg.amount.times(BIGINT_NEGATIVE_ONE), true);
     const acc = sdk.Accounts.loadAccount(wdmsg.receiver);
     acc.liquidityWithdraw(pool, wdmsg.amount, true);
-  } else if (wdmsg.refId.equals(Bytes.fromI32(1))) {
-    // claim fee: refId == 0x1
+  } else if (
+    wdmsg.refId.equals(
+      Bytes.fromHexString(
+        "0x0000000000000000000000000000000000000000000000000000000000000001"
+      )
+    )
+  ) {
+    // claim fee (liquidity provider): refId == 0x1
+    // TODO: remove once supply side revenue running
+    log.info("[handleWithdraw]supplier fee {} collected in token {}", [
+      wdmsg.amount.toString(),
+      wdmsg.token.toHexString(),
+    ]);
     pool.addRevenueNative(BIGINT_ZERO, wdmsg.amount);
-  } else if (_Transfer.load(wdmsg.refId)) {
+  } else if (transfer) {
     // refund, refId==xfer_id
-    // TODO: how to handle refund?
+    // refund is handled with a "transferIn"
+    _handleTransferIn(
+      wdmsg.token,
+      Address.fromString(transfer.sender),
+      wdmsg.receiver,
+      wdmsg.amount,
+      networkToChainID(dataSource.network()),
+      BridgePoolType.LIQUIDITY,
+      CrosschainTokenType.CANONICAL,
+      event
+    );
   } else {
     _handleTransferIn(
       wdmsg.token,
-      Address.zero(), //TODO: no sender
+      wdmsg.receiver, //no sender info is available, assuming to be same as receiver
       wdmsg.receiver,
       wdmsg.amount,
       wdmsg.chainId,
@@ -341,46 +383,50 @@ export function handlePTBv2Mint(event: PTBv2Mint): void {
 // export function handleWithdrawalRequest(event: WithdrawalRequest): void {}
 
 export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
-  // TODO: move to constants.ts
-  const POOL_BASED_BRIDGE_ADDRESS = Address.fromString(
-    "0x5427fefa711eff984124bfbb1ab6fbf5e3da1820"
-  );
+  const sdk = _getSDK(event);
+  const protocol = sdk.Protocol.protocol;
 
-  const poolEntity = PoolEntity.load(POOL_BASED_BRIDGE_ADDRESS);
-  if (!poolEntity) {
-    // error
-    return;
-  }
-
-  if (!poolEntity._lastRewardTimestamp) {
-    poolEntity._lastRewardTimestamp = event.block.timestamp;
-    poolEntity._cumulativeRewardsClaimed = event.params.reward;
-    poolEntity.save();
+  if (!protocol._lastRewardTimestamp) {
+    protocol._lastRewardTimestamp = event.block.timestamp;
+    protocol._cumulativeRewardsClaimed = event.params.reward;
+    protocol.save();
     return;
   } else if (
     event.block.timestamp <
-    poolEntity._lastRewardTimestamp!.plus(BigInt.fromI32(SECONDS_PER_DAY))
+    protocol._lastRewardTimestamp!.plus(BigInt.fromI32(SECONDS_PER_DAY))
   ) {
-    poolEntity._cumulativeRewardsClaimed =
-      poolEntity._cumulativeRewardsClaimed!.plus(event.params.reward);
-    poolEntity.save();
+    // TODO maybe one day is too short & reward amount is jumpy
+    // Increase to 7 days?
+    protocol._cumulativeRewardsClaimed =
+      protocol._cumulativeRewardsClaimed!.plus(event.params.reward);
+    protocol.save();
     return;
   }
 
-  const sdk = _getSDK(event);
-  // TODO: with concatenated pool id, we don't know which pool the
-  // rewards belong to
-  const pool = sdk.Pools.loadPool(POOL_BASED_BRIDGE_ADDRESS);
+  // allocate rewards to pool proportional to tvl
   const rToken = sdk.Tokens.getOrCreateToken(event.params.token);
-  pool.setRewardEmissions(
-    RewardTokenType.DEPOSIT,
-    rToken,
-    poolEntity._cumulativeRewardsClaimed!
-  );
+  const poolIDs = protocol._liquidityPoolIDs!;
+  // first iteration summing tvl
+  let sumTVLUSD = BIGDECIMAL_ZERO;
+  for (let i = 0; i < poolIDs.length; i++) {
+    const poolEntity = PoolEntity.load(poolIDs[i])!;
+    sumTVLUSD = sumTVLUSD.plus(poolEntity.totalValueLockedUSD);
+  }
 
-  poolEntity._lastRewardTimestamp = event.block.timestamp;
-  poolEntity._cumulativeRewardsClaimed = BIGINT_ZERO;
-  poolEntity.save();
+  for (let i = 0; i < poolIDs.length; i++) {
+    const poolEntity = PoolEntity.load(poolIDs[i])!;
+    const pool = sdk.Pools.loadPool(poolIDs[i]);
+    const poolRewardAmount = bigDecimalToBigInt(
+      poolEntity.totalValueLockedUSD
+        .div(sumTVLUSD)
+        .times(protocol._cumulativeRewardsClaimed!.toBigDecimal())
+    );
+    pool.setRewardEmissions(RewardTokenType.DEPOSIT, rToken, poolRewardAmount);
+  }
+
+  protocol._lastRewardTimestamp = event.block.timestamp;
+  protocol._cumulativeRewardsClaimed = BIGINT_ZERO;
+  protocol.save();
 }
 
 // Pegged Token Bridge V2
