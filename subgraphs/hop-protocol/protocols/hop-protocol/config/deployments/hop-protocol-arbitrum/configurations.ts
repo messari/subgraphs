@@ -6,6 +6,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 	getNetwork(): string {
 		return Network.ARBITRUM_ONE
 	}
+
 	getPoolAddressFromTokenAddress(tokenAddress: string): string {
 		if (
 			tokenAddress == '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase()
@@ -255,7 +256,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 	getTokenList(): string[] {
 		return [
 			'0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase(), // USDC
-			'0x7aC115536FE3A185100B2c4DE4cb328bf3A58Ba6'.toLowerCase(), // DAI
+			'0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase(), // DAI
 			'0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase(), // USDT
 			'0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase(), // ETH
 			'0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase(), // WBTC
@@ -280,5 +281,69 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 			'0x3E4a3a4796d16c0Cd582C382691998f7c06420B6'.toLowerCase(), // WBTC
 			'0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266'.toLowerCase(), // HOP
 		]
+	}
+	getArbitrumPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+	getPolygonPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+	getXdaiPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+	getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+
+	getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
+		return ''
+	}
+	getUsdcPools(): string[] {
+		return []
+	}
+	getUsdcTokens(): string[] {
+		return []
+	}
+	getDaiPools(): string[] {
+		return []
+	}
+	getDaiTokens(): string[] {
+		return []
+	}
+	getUsdtPools(): string[] {
+		return []
+	}
+	getUsdtTokens(): string[] {
+		return []
+	}
+	getEthPools(): string[] {
+		return []
+	}
+	getEthTokens(): string[] {
+		return []
+	}
+	getSnxPools(): string[] {
+		return []
+	}
+	getSnxTokens(): string[] {
+		return []
+	}
+	getsUSDPools(): string[] {
+		return []
+	}
+	getsUSDTokens(): string[] {
+		return []
+	}
+	getWbtcPools(): string[] {
+		return []
+	}
+	getWbtcTokens(): string[] {
+		return []
+	}
+	getMaticPools(): string[] {
+		return []
+	}
+	getMaticTokens(): string[] {
+		return []
 	}
 }

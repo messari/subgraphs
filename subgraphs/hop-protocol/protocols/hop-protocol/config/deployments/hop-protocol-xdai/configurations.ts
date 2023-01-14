@@ -6,6 +6,23 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 	getNetwork(): string {
 		return Network.XDAI
 	}
+	getArbitrumPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+	getPolygonPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+	getXdaiPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+	getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+
+	getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
+		return ''
+	}
+
 	getPoolAddressFromTokenAddress(tokenAddress: string): string {
 		if (
 			tokenAddress == '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83'.toLowerCase() //USDC
@@ -318,5 +335,54 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			'0x07C592684Ee9f71D58853F9387579332d471b6Ca'.toLowerCase(), // WBTC
 			'0x6F03052743CD99ce1b29265E377e320CD24Eb632'.toLowerCase(), // HOP
 		]
+	}
+
+	getUsdcPools(): string[] {
+		return []
+	}
+	getUsdcTokens(): string[] {
+		return []
+	}
+	getDaiPools(): string[] {
+		return []
+	}
+	getDaiTokens(): string[] {
+		return []
+	}
+	getUsdtPools(): string[] {
+		return []
+	}
+	getUsdtTokens(): string[] {
+		return []
+	}
+	getEthPools(): string[] {
+		return []
+	}
+	getEthTokens(): string[] {
+		return []
+	}
+	getSnxPools(): string[] {
+		return []
+	}
+	getSnxTokens(): string[] {
+		return []
+	}
+	getsUSDPools(): string[] {
+		return []
+	}
+	getsUSDTokens(): string[] {
+		return []
+	}
+	getWbtcPools(): string[] {
+		return []
+	}
+	getWbtcTokens(): string[] {
+		return []
+	}
+	getMaticPools(): string[] {
+		return []
+	}
+	getMaticTokens(): string[] {
+		return []
 	}
 }

@@ -6,6 +6,22 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 	getNetwork(): string {
 		return Network.OPTIMISM
 	}
+	getArbitrumPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+	getPolygonPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+	getXdaiPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+	getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string {
+		return ''
+	}
+	getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string {
+		return ''
+	}
+
 	getPoolAddressFromTokenAddress(tokenAddress: string): string {
 		if (
 			tokenAddress == '0x7F5c764cBc14f9669B88837ca1490cCa17c31607'.toLowerCase()
@@ -248,6 +264,16 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 			return '0x46fc3Af3A47792cA3ED06fdF3D657145A675a8D8'.toLowerCase() //WBTC
 		} else if (
 			bridgeAddress ==
+			'0x16284c7323c35F4960540583998C98B1CfC581a7'.toLowerCase() //HOP/SNX
+		) {
+			return '0x1990BC6dfe2ef605Bfc08f5A23564dB75642Ad73'.toLowerCase() //SNX
+		} else if (
+			bridgeAddress ==
+			'0x33Fe5bB8DA466dA55a8A32D6ADE2BB104E2C5201'.toLowerCase() //HOP/sUSD
+		) {
+			return '0x8d4063E82A4Db8CdAed46932E1c71e03CA69Bede'.toLowerCase() //sUSD
+		} else if (
+			bridgeAddress ==
 			'0x25FB92E505F752F730cAD0Bd4fa17ecE4A384266'.toLowerCase() //HOP BRIDGE
 		) {
 			return '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase() //HOP
@@ -326,5 +352,54 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 			'0xB1ea9FeD58a317F81eEEFC18715Dd323FDEf45c4'.toLowerCase(), // WBTC
 			'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547'.toLowerCase(), // HOP
 		]
+	}
+
+	getUsdcPools(): string[] {
+		return []
+	}
+	getUsdcTokens(): string[] {
+		return []
+	}
+	getDaiPools(): string[] {
+		return []
+	}
+	getDaiTokens(): string[] {
+		return []
+	}
+	getUsdtPools(): string[] {
+		return []
+	}
+	getUsdtTokens(): string[] {
+		return []
+	}
+	getEthPools(): string[] {
+		return []
+	}
+	getEthTokens(): string[] {
+		return []
+	}
+	getSnxPools(): string[] {
+		return []
+	}
+	getSnxTokens(): string[] {
+		return []
+	}
+	getsUSDPools(): string[] {
+		return []
+	}
+	getsUSDTokens(): string[] {
+		return []
+	}
+	getWbtcPools(): string[] {
+		return []
+	}
+	getWbtcTokens(): string[] {
+		return []
+	}
+	getMaticPools(): string[] {
+		return []
+	}
+	getMaticTokens(): string[] {
+		return []
 	}
 }

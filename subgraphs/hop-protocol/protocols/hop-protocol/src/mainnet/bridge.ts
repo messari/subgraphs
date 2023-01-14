@@ -4,11 +4,15 @@ import {
 	TokenInitializer,
 	TokenParams,
 } from '../../../../src/sdk/protocols/bridge/tokens'
-import { BridgePermissionType } from '../../../../src/sdk/protocols/bridge/enums'
+import {
+	BridgePermissionType,
+	CrosschainTokenType,
+	BridgePoolType,
+} from '../../../../src/sdk/protocols/bridge/enums'
 import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
 import { NetworkConfigs } from '../../../../configurations/configure'
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
 import {
 	TransferSentToL2,
 	BonderAdded,
@@ -68,8 +72,22 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 		const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
 			event.address.toHexString()
 		)
+		log.warning('inputToken: {}, bridgeAddress: {}', [
+			inputToken,
+			event.address.toHexString(),
+		])
 
 		const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
+		const poolAddress = NetworkConfigs.getPoolAddressFromChainId(
+			event.params.chainId.toString(),
+			event.address.toHexString()
+		)
+		log.warning('poolAddress: {}, inputToken: {}', [poolAddress, inputToken])
+
+		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
+
+		const poolName = poolConfig[0]
+		const poolSymbol = poolConfig[1]
 
 		const bridgeAddress = bridgeConfig[0]
 		const bridgeName = bridgeConfig[1]
@@ -85,7 +103,25 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
-		sdk.Accounts.loadAccount(event.params.recipient)
-		sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
+		const acc = sdk.Accounts.loadAccount(event.params.recipient)
+		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
+
+		if (!pool.isInitialized) {
+			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+		}
+		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
+			event.params.chainId,
+			Address.fromString(inputToken),
+			CrosschainTokenType.CANONICAL,
+			Address.fromString(inputToken)
+		)
+		pool.addDestinationToken(crossToken)
+		acc.transferOut(
+			pool,
+			pool.getDestinationTokenRoute(crossToken)!,
+			event.params.recipient,
+			event.params.amount
+		)
 	}
 }

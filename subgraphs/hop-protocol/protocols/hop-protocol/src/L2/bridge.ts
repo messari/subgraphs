@@ -132,7 +132,7 @@ export function handleTransferFromL1Completed(
 
 		pool.addDestinationToken(crossToken)
 
-		acc.transferOut(
+		acc.transferIn(
 			pool,
 			pool.getDestinationTokenRoute(crossToken)!,
 			event.params.recipient,
@@ -186,22 +186,13 @@ export function handleTransferSent(event: TransferSent): void {
 			Address.fromString(inputToken)
 		)
 		pool.addDestinationToken(crossToken)
+		acc.transferOut(
+			pool,
+			pool.getDestinationTokenRoute(crossToken)!,
+			event.params.recipient,
+			event.params.amount
+		)
 
-		if (event.params.chainId.toString() == '1') {
-			acc.transferIn(
-				pool,
-				pool.getDestinationTokenRoute(crossToken)!,
-				event.params.recipient,
-				event.params.amount
-			)
-		} else {
-			acc.transferOut(
-				pool,
-				pool.getDestinationTokenRoute(crossToken)!,
-				event.params.recipient,
-				event.params.amount
-			)
-		}
 		pool.addSupplySideRevenueUSD(fee)
 	}
 }
