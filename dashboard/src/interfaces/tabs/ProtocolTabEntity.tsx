@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
+import { Box, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
 import { negativeFieldList } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
 import { useEffect, useState } from "react";
@@ -496,6 +496,7 @@ function ProtocolTabEntity({
                   dataChart={dataChartToPass}
                   chartsImageFiles={chartsImageFiles}
                   setChartsImageFiles={(x: any) => setChartsImageFiles(x)}
+                  isStringField={false}
                 />
               </>
             );

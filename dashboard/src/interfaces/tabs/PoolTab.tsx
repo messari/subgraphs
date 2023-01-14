@@ -197,6 +197,36 @@ function PoolTab({
         }
       })
     }
+  } else if (schemaType?.toUpperCase() === "LENDING") {
+    if (poolTimeseriesData) {
+      Object.keys(poolTimeseriesData).forEach((entityName: string) => {
+        if (!specificChartsOnEntity[entityName]) {
+          specificChartsOnEntity[entityName] = {};
+        }
+        const currentEntityData = poolTimeseriesData[entityName];
+        const tableVals: { value: any; date: any }[] = [];
+        const ratesChart: any = {};
+        const ratesSums: any = {};
+        data?.market?.rates?.forEach((rate: { [x: string]: string }) => {
+          const rateKey = `${rate?.type || ""}-${rate?.side || ""}`;
+          ratesChart[rateKey] = [];
+          ratesSums[rateKey] = 0;
+        })
+        for (let x = currentEntityData.length - 1; x >= 0; x--) {
+          const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          const initTableValue: any = { value: [], date: timeseriesInstance.timestamp };
+          timeseriesInstance["rates"].forEach((rateElement: any, idx: number) => {
+            const rateKey = `${rateElement.type || ""}-${rateElement.side || ""}`;
+            initTableValue.value.push(`[${idx}]: ${Number(rateElement.rate).toFixed(3)}%`);
+            ratesSums[rateKey] += Number(rateElement.rate);
+            ratesChart[rateKey].push({ value: Number(rateElement.rate), date: timeseriesInstance.timestamp })
+          });
+          tableVals.push({ value: initTableValue.value.join(', '), date: initTableValue.date });
+        }
+        const issues = Object.keys(ratesSums)?.filter(rateLabel => ratesSums[rateLabel] === 0);
+        specificChartsOnEntity[entityName]['rates'] = { dataChart: ratesChart, tableData: tableVals, issues: issues.map(iss => entityName + '-' + iss) };
+      })
+    }
   }
 
   let poolDataSection = null;

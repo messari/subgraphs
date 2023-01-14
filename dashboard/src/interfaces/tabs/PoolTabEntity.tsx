@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
+import { Box, Grid, Tooltip, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
@@ -733,10 +733,8 @@ function PoolTabEntity({
 
     const fieldsList = Object.keys(dataFields);
 
-    const ratesChart: { [x: string]: any } = {};
     const rewardChart: { [x: string]: any } = {};
     Object.keys(dataFields).forEach((field: string) => {
-
       // Push the Reward APR fields to the bottom of the charts section
       if (field.toUpperCase().includes("REWARDAPR") && dataFields[field].length > 0) {
         if ((field.toUpperCase() === "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length === 1) || (field.toUpperCase() !== "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length > 0)) {
@@ -744,10 +742,7 @@ function PoolTabEntity({
           delete dataFields[field];
         }
       }
-
-      // separate all of the rates fields to the ratesChart object
       if (field.toUpperCase().includes("RATES")) {
-        ratesChart[field] = dataFields[field];
         delete dataFields[field];
       }
     });
@@ -768,7 +763,7 @@ function PoolTabEntity({
         if (!date) {
           continue;
         }
-        tableVals.push({ value: [], date });
+        const valArr: string[] = [];
         Object.keys(rewardChart).forEach((reward: any, idx: number) => {
           if (!(fieldsList.filter((x) => x.includes(reward))?.length > 1)) {
             if (
@@ -788,9 +783,10 @@ function PoolTabEntity({
               elementVal = 0;
             }
             elementVal = elementVal?.toFixed(2);
-            tableVals[x]?.value.push(`${symbol}[${idx}]: ${elementVal}`);
+            valArr.push(`${symbol}[${idx}]: ${elementVal}%`);
           }
         });
+        tableVals.push({ value: valArr.join(', '), date });
       }
       Object.keys(rewardChart).forEach((reward: any, idx: number) => {
         const currentRewardToken: { [x: string]: string } = data[poolKeySingular].rewardTokens[idx]?.token;
@@ -803,41 +799,20 @@ function PoolTabEntity({
         rewardAPRElement = null;
       } else {
         rewardAPRElement = (
-          <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+          <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} isStringField={true} />
         );
       }
     }
 
     // The ratesElement logic is used to take all of the rates and display their lines on one graph
     let ratesElement = null;
-    if (Object.keys(ratesChart).length > 0) {
-      const elementId = entityName + "-rates";
-      const tableVals: { value: any; date: any }[] = [];
-      const firstKey = Object.keys(ratesChart)[0];
-      const amountOfInstances = ratesChart[Object.keys(ratesChart)[0]].length;
-      for (let x = 0; x < amountOfInstances; x++) {
-        tableVals.push({ value: [], date: ratesChart[firstKey][x].date });
-        Object.keys(ratesChart).forEach((rate: any, idx: number) => {
-          tableVals[x].value.push(`[${idx}]: ${ratesChart[rate][x].value.toFixed(3)}`);
-        });
-      }
-      Object.keys(ratesChart).forEach((rate: any, idx: number) => {
-        if (
-          dataFieldMetrics[rate].sum === 0 &&
-          issues.filter((x) => x.fieldName === entityName + "-" + rate).length === 0
-        ) {
-          issues.push({ type: "SUM", level: "error", fieldName: entityName + "-" + rate, message: "" });
-        }
-        const currentRate = data[poolKeySingular].rates[idx];
-        if (currentRate?.side) {
-          const val = ratesChart[rate];
-          ratesChart[`${currentRate?.side}-${currentRate?.type} [${idx}]`] = val;
-          delete ratesChart[rate];
+    if (entitySpecificElements['rates']) {
+      ratesElement = <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={"rates"} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={entitySpecificElements['rates']["tableData"]} dataChart={entitySpecificElements['rates']['dataChart']} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} isStringField={true} />
+      entitySpecificElements['rates']?.['issues']?.forEach((iss: any) => {
+        if (issues.filter((x) => x.fieldName === iss).length === 0) {
+          issues.push({ type: "SUM", level: "error", fieldName: iss, message: "" });
         }
       });
-      ratesElement = (
-        <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
-      );
     }
 
     let tokenWeightComponent = null;
@@ -1023,7 +998,6 @@ function PoolTabEntity({
         }
       }
 
-
       delete instanceToSave.rewardTokenEmissionsAmount;
       delete instanceToSave.rewardTokenEmissionsUSD;
       delete instanceToSave.inputTokenBalances;
@@ -1037,7 +1011,9 @@ function PoolTabEntity({
     }).sort((a: any, b: any) => (Number(a.timestamp) - Number(b.timestamp)));
 
     Object.keys(entitySpecificElements).forEach((eleName: string) => {
-      dataFields[eleName] = entitySpecificElements[eleName];
+      if (!Object.keys(entitySpecificElements[eleName])?.includes('dataChart') && !!entitySpecificElements[eleName]) {
+        dataFields[eleName] = entitySpecificElements[eleName];
+      }
     })
 
     const charts = Object.keys(dataFields).map((field: string) => {
@@ -1218,7 +1194,8 @@ function PoolTabEntity({
           dataTable={dataFields[field]}
           dataChart={dataChartToPass}
           chartsImageFiles={chartsImageFiles}
-          setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+          setChartsImageFiles={(x: any) => setChartsImageFiles(x)}
+          isStringField={false} />
       );
     })
 

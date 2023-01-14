@@ -21,11 +21,12 @@ interface ChartContainerProps {
     setChartsImageFiles: any;
     csvJSONProp: any;
     csvMetaDataProp: any;
+    isStringField: boolean;
 }
 
 const colorList = ["rgb(53, 162, 235)", "red", "yellow", "lime", "pink", "black", "orange", "green"];
 
-export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, dataChart, dataTable, downloadAllCharts, chartsImageFiles, setChartsImageFiles, csvJSONProp, csvMetaDataProp }: ChartContainerProps) => {
+export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, dataChart, dataTable, downloadAllCharts, chartsImageFiles, setChartsImageFiles, csvJSONProp, csvMetaDataProp, isStringField = false }: ChartContainerProps) => {
     const chartRef = useRef<any>(null);
     const [chartIsImage, setChartIsImage] = useState<boolean>(false);
     const [csvJSON, setCsvJSON] = useState<any>(null);
@@ -86,11 +87,11 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                     setOverlayKey(overlayKey);
                     setCompChart(compChartToSet);
                 }
-            } else if (!Array.isArray(dataChartCopy) && typeof dataChartCopy === 'object' && Object.keys(dataChartCopy)?.length >= 2) {
+            } else if (!Array.isArray(dataChartCopy) && typeof dataChartCopy === 'object' && Object.keys(dataChartCopy)?.length >= 2 && !!baseKey) {
                 if (!overlayKey) {
                     overlayKey = Object.keys(dataChartCopy)[1];
                 }
-                compChartToSet = lineupChartDatapoints({ [baseKey?.length > 0 ? baseKey : "base"]: dataChartCopy[baseKey], [Object.keys(dataChartCopy)[1]]: dataChartCopy[Object.keys(dataChartCopy)[1]] });
+                compChartToSet = lineupChartDatapoints({ [baseKey]: dataChartCopy[baseKey], [Object.keys(dataChartCopy)[1]]: dataChartCopy[Object.keys(dataChartCopy)[1]] });
                 if (compChartToSet instanceof Error) {
                     throw new Error(compChartToSet?.message);
                 } else {
@@ -339,7 +340,7 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
     const staticButtonStyle = chartIsImage ? { backgroundColor: "rgb(102,86,248)", color: "white", border: "1px rgb(102,86,248) solid" } : { backgroundColor: "rgba(0,0,0,0)" };
     const dynamicButtonStyle = !chartIsImage ? { backgroundColor: "rgb(102,86,248)", color: "white", border: "1px rgb(102,86,248) solid" } : { backgroundColor: "rgba(0,0,0,0)" };
 
-    let tableRender = <TableChart datasetLabel={datasetLabel} dataTable={dataTable} jpegDownloadHandler={() => jpegDownloadHandler(false)} isStringField={false} />
+    let tableRender = <TableChart datasetLabel={datasetLabel} dataTable={dataTable} jpegDownloadHandler={() => jpegDownloadHandler(false)} isStringField={isStringField} />
     if (Object.keys(compChart)?.length > 0) {
         tableRender = <ComparisonTable
             datasetLabel="Custom CSV Comparison"
