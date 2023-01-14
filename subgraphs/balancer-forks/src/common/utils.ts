@@ -219,21 +219,23 @@ export function getOutputTokenSupply(
 ): BigInt {
   const poolContract = WeightedPoolContract.bind(poolAddress);
 
+  // Exception: Boosted Pools
+  // since this pool pre-mints all BPT, `totalSupply` * remains constant,
+  // whereas`getVirtualSupply` increases as users join the pool and decreases as they exit it
+
   let totalSupply = readValue<BigInt>(
-    poolContract.try_totalSupply(),
-    oldSupply
+    poolContract.try_getVirtualSupply(),
+    constants.BIGINT_ZERO
   );
+  if (totalSupply.notEqual(constants.BIGINT_ZERO)) return totalSupply;
 
-  if (poolAddress.equals(constants.AAVE_BOOSTED_POOL_ADDRESS)) {
-    // Exception: Aave Boosted Pool
-    // since this pool pre-mints all BPT, `totalSupply` * remains constant,
-    // whereas`getVirtualSupply` increases as users join the pool and decreases as they exit it
+  totalSupply = readValue<BigInt>(
+    poolContract.try_getActualSupply(),
+    constants.BIGINT_ZERO
+  );
+  if (totalSupply.notEqual(constants.BIGINT_ZERO)) return totalSupply;
 
-    totalSupply = readValue<BigInt>(
-      poolContract.try_getVirtualSupply(),
-      oldSupply
-    );
-  }
+  totalSupply = readValue<BigInt>(poolContract.try_totalSupply(), oldSupply);
 
   return totalSupply;
 }
