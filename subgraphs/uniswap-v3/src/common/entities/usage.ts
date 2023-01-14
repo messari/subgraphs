@@ -18,16 +18,16 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
     usageMetrics.protocol = NetworkConfigs.getFactoryAddress();
 
-    usageMetrics.days = INT_ZERO;
+    usageMetrics.day = INT_ZERO;
     usageMetrics.dailyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.dailyTransactionCount = INT_ZERO;
     usageMetrics.dailyDepositCount = INT_ZERO;
     usageMetrics.dailyWithdrawCount = INT_ZERO;
     usageMetrics.dailySwapCount = INT_ZERO;
-
-    usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
+    usageMetrics.blockNumber = event.block.number;
+
     usageMetrics.totalPoolCount = 0;
     usageMetrics.save();
   }
@@ -48,16 +48,15 @@ export function getOrCreateUsageMetricHourlySnapshot(
     usageMetrics = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
     usageMetrics.protocol = NetworkConfigs.getFactoryAddress();
 
-    usageMetrics.hours = INT_ZERO;
+    usageMetrics.hour = INT_ZERO;
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.hourlyTransactionCount = INT_ZERO;
     usageMetrics.hourlyDepositCount = INT_ZERO;
     usageMetrics.hourlyWithdrawCount = INT_ZERO;
     usageMetrics.hourlySwapCount = INT_ZERO;
-
-    usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
+    usageMetrics.blockNumber = event.block.number;
 
     usageMetrics.save();
   }
