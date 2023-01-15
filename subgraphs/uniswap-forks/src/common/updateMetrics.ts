@@ -119,6 +119,8 @@ export function updateUsageMetrics(
     account.positionCount = 0;
     account.openPositionCount = 0;
     account.closedPositionCount = 0;
+    account.depositCount = 0;
+    account.withdrawCount = 0;
     account.save();
   }
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
