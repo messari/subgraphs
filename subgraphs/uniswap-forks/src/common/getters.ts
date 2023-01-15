@@ -81,13 +81,10 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     position.outputTokenBalance = BIGINT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.save(); 
-    account.positionCount += 1;
     account.openPositionCount += 1;
-    account.save();
-  } else {
     account.positionCount += 1;
     account.save();
-  }
+  } 
 
   return position;
   
