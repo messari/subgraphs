@@ -99,7 +99,7 @@ export function handleTransferPosition(
   transfer.save();
   const to = getOrCreateAccount(event);
   let toPosition = getOrCreatePosition(event);
-  fromPosition.withdrawCount = fromPosition.withdrawCount + 1;
+
   fromPosition.outputTokenBalance = fromPosition.outputTokenBalance!.minus(value);
   if(fromPosition.outputTokenBalance == BIGINT_ZERO) {
     // close the position
@@ -117,7 +117,6 @@ export function handleTransferPosition(
     counter!.save();
   }
 
-  toPosition.depositCount = toPosition.depositCount + 1;
   toPosition.outputTokenBalance = toPosition.outputTokenBalance!.plus(value);
   toPosition.save();
 
