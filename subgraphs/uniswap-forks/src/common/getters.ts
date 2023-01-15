@@ -81,6 +81,12 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     position.outputTokenBalance = BIGINT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.save(); 
+    account.positionCount += 1;
+    account.openPositionCount += 1;
+    account.save();
+  } else {
+    account.positionCount = counter.nextCount();
+    account.save();
   }
 
   return position;
@@ -94,6 +100,8 @@ export function getOrCreateAccount(event:ethereum.Event): Account {
   if(!account) {
     account = new Account(transfer.sender!)
     account.positionCount = 0;
+    account.openPositionCount = 0;
+    account.closedPositionCount = 0;
     account.save()
   }
   return account;

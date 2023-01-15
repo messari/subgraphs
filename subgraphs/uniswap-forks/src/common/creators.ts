@@ -167,6 +167,8 @@ export function createAndIncrementAccount(accountId: string): i32 {
   if (!account) {
     account = new Account(accountId);
     account.positionCount = 0;
+    account.openPositionCount = 0;
+    account.closedPositionCount = 0;
     account.save();
 
     return INT_ONE;
@@ -247,6 +249,7 @@ export function createDeposit(
   position.depositCount += 1;
   position.save();
   
+
   // create a position snapshot
   createPositionSnapshot(event, position);
   updateDepositHelper(event.address);
@@ -344,10 +347,16 @@ export function createWithdraw(
   position.inputTokenBalances = inputTokenBalances;
   position.outputTokenBalance = transfer.liquidity!;
     // if input token balances are zero, close the position
-  if(inputTokenBalances[0] == BIGINT_ZERO && inputTokenBalances[1] == BIGINT_ZERO) {
+  // if(inputTokenBalances[0] == BIGINT_ZERO && inputTokenBalances[1] == BIGINT_ZERO) {
+  if(position.outputTokenBalance == BIGINT_ZERO) {
     position.hashClosed = event.transaction.hash.toHexString();
     position.timestampClosed = event.block.timestamp;
     position.blockNumberClosed = event.block.number;
+    account.closedPositionCount += 1;
+    if(account.openPositionCount > 0) {
+      account.openPositionCount -= 1;
+    }
+    account.save();
     let counter = _PositionCounter.load(account.id.concat("-").concat(pool.id));
     counter!.nextCount += 1;
     counter!.save();
