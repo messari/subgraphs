@@ -352,7 +352,8 @@ export function createWithdraw(
   position.outputTokenBalance = transfer.liquidity!;
     // if input token balances are zero, close the position
   // if(inputTokenBalances[0] == BIGINT_ZERO && inputTokenBalances[1] == BIGINT_ZERO) {
-  if(position.outputTokenBalance == BIGINT_ZERO) {
+    if(position.outputTokenBalance == BIGINT_ZERO && position.inputTokenBalances[0] == BIGINT_ZERO && position.inputTokenBalances[1] == BIGINT_ZERO) {
+    // close the position
     position.hashClosed = event.transaction.hash.toHexString();
     position.timestampClosed = event.block.timestamp;
     position.blockNumberClosed = event.block.number;
@@ -361,6 +362,10 @@ export function createWithdraw(
       account.openPositionCount -= 1;
     }
     account.save();
+    if((account.openPositionCount + account.closedPositionCount) > account.positionCount) {
+      account.positionCount = account.openPositionCount + account.closedPositionCount;
+      account.save();
+    }
     let counter = _PositionCounter.load(account.id.concat("-").concat(pool.id));
     counter!.nextCount += 1;
     counter!.save();
