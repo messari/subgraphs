@@ -1,4 +1,4 @@
-import { ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { ethereum, BigInt, log } from "@graphprotocol/graph-ts";
 import { getOrCreateAccount, getOrCreatePosition, getOrCreateTransfer } from "./getters";
 import { BIGINT_ZERO, TransferType } from "./constants";
 import { LiquidityPool, _PositionCounter } from "../../generated/schema";
@@ -101,7 +101,7 @@ export function handleTransferPosition(
   let toPosition = getOrCreatePosition(event);
 
   fromPosition.outputTokenBalance = fromPosition.outputTokenBalance!.minus(value);
-  if(fromPosition.outputTokenBalance == BIGINT_ZERO) {
+  if(fromPosition.outputTokenBalance == BIGINT_ZERO && fromPosition.inputTokenBalances[0] == BIGINT_ZERO && fromPosition.inputTokenBalances[1] == BIGINT_ZERO) {
     // close the position
     fromPosition.blockNumberClosed = event.block.number
     fromPosition.hashClosed = event.transaction.hash.toHexString();
@@ -110,11 +110,13 @@ export function handleTransferPosition(
     if(from.openPositionCount > 0) {
       from.openPositionCount -= 1;
     }
-    if(from.positionCount == 0) {
-      from.positionCount += 1; 
-    }
+    const oldPositionCount = from.positionCount;
     from.closedPositionCount += 1;
     from.save();
+    if((from.openPositionCount + from.closedPositionCount) > from.positionCount) {
+      from.positionCount = from.openPositionCount + from.closedPositionCount;
+      from.save();
+    }
     let counter = _PositionCounter.load(from.id.concat("-").concat(pool.id));
     counter!.nextCount += 1;
     counter!.save();
