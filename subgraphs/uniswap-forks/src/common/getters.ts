@@ -85,7 +85,7 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     account.openPositionCount += 1;
     account.save();
   } else {
-    account.positionCount = counter.nextCount();
+    account.positionCount += 1;
     account.save();
   }
 
@@ -102,6 +102,8 @@ export function getOrCreateAccount(event:ethereum.Event): Account {
     account.positionCount = 0;
     account.openPositionCount = 0;
     account.closedPositionCount = 0;
+    account.depositCount = 0;
+    account.withdrawCount = 0;
     account.save()
   }
   return account;

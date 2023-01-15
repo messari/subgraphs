@@ -169,6 +169,8 @@ export function createAndIncrementAccount(accountId: string): i32 {
     account.positionCount = 0;
     account.openPositionCount = 0;
     account.closedPositionCount = 0;
+    account.depositCount = 0;
+    account.withdrawCount = 0;
     account.save();
 
     return INT_ONE;
@@ -191,7 +193,8 @@ export function createDeposit(
     event.block.number
   );
 
-  
+  const account = getOrCreateAccount(event);
+
   const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
 
@@ -211,7 +214,6 @@ export function createDeposit(
   deposit.protocol = NetworkConfigs.getFactoryAddress();
   deposit.gasLimit = event.transaction.gasLimit;
   deposit.gasPrice = event.transaction.gasPrice;
-  const account = getOrCreateAccount(event);
   deposit.account = account.id
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
@@ -249,7 +251,8 @@ export function createDeposit(
   position.depositCount += 1;
   position.save();
   
-
+  account.depositCount += 1;
+  account.save();
   // create a position snapshot
   createPositionSnapshot(event, position);
   updateDepositHelper(event.address);
@@ -307,6 +310,8 @@ export function createWithdraw(
   const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
 
+  let account = getOrCreateAccount(event)
+
   // update exchange info (except balances, sync will cover that)
   const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
   const token1Amount = convertTokenToDecimal(amount1, token1.decimals);
@@ -320,7 +325,6 @@ export function createWithdraw(
   withdrawl.hash = transactionHash;
   withdrawl.logIndex = logIndexI32;
   withdrawl.protocol = NetworkConfigs.getFactoryAddress();
-  let account = getOrCreateAccount(event)
   withdrawl.account = account.id;
   withdrawl.nonce = event.transaction.nonce;
   withdrawl.gasLimit = event.transaction.gasLimit;
@@ -367,6 +371,9 @@ export function createWithdraw(
   
   withdrawl.position = position.id; 
   withdrawl.save();
+
+  account.withdrawCount += 1;
+  account.save();
 }
 
 // Handle swaps data and update entities volumes and fees

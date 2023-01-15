@@ -913,13 +913,13 @@ type Account @entity {
   closedPositionCount: Int!
 
   # " Number of deposits this account made "
-  # depositCount: Int!
+  depositCount: Int!
 
   # " All deposit events of this account "
   deposits: [Deposit!]! @derivedFrom(field: "account")
 
   # " Number of withdrawals this account made "
-  # withdrawCount: Int!
+  withdrawCount: Int!
 
   " All withdraw events of this account "
   withdraws: [Withdraw!]! @derivedFrom(field: "account")
