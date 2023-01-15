@@ -916,7 +916,7 @@ type Account @entity {
   # depositCount: Int!
 
   # " All deposit events of this account "
-  # deposits: [Deposit!]! @derivedFrom(field: "account")
+  deposits: [Deposit!]! @derivedFrom(field: "account")
 
   # " Number of withdrawals this account made "
   # withdrawCount: Int!
