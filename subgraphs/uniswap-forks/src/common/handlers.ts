@@ -101,7 +101,7 @@ export function handleTransferPosition(
   let toPosition = getOrCreatePosition(event);
   fromPosition.withdrawCount = fromPosition.withdrawCount + 1;
   fromPosition.outputTokenBalance = fromPosition.outputTokenBalance!.minus(value);
-  if(fromPosition.outputTokenBalance == BIGINT_ZERO && ) {
+  if(fromPosition.outputTokenBalance == BIGINT_ZERO) {
     // close the position
     fromPosition.blockNumberClosed = event.block.number
     fromPosition.hashClosed = event.transaction.hash.toHexString();
