@@ -557,22 +557,22 @@ export class Pool {
     );
     this.protocol.addTransaction(eventType);
 
-    if (this.pool.type == BridgePoolType.BURN_MINT) {
-      let amount = transfer.amount;
-      if (transfer.isOutgoing) {
-        amount = amount.times(BIGINT_MINUS_ONE);
-      }
-      this.addMintSupply(amount);
-    } else if (
-      this.pool.type == BridgePoolType.LIQUIDITY ||
-      this.pool.type == BridgePoolType.LOCK_RELEASE
-    ) {
-      let amount = transfer.amount;
-      if (!transfer.isOutgoing) {
-        amount = amount.times(BIGINT_MINUS_ONE);
-      }
-      this.addInputTokenBalance(amount);
-    }
+    // if (this.pool.type == BridgePoolType.BURN_MINT) {
+    //   let amount = transfer.amount;
+    //   if (transfer.isOutgoing) {
+    //     amount = amount.times(BIGINT_MINUS_ONE);
+    //   }
+    //   this.addMintSupply(amount);
+    // } else if (
+    //   this.pool.type == BridgePoolType.LIQUIDITY ||
+    //   this.pool.type == BridgePoolType.LOCK_RELEASE
+    // ) {
+    //   let amount = transfer.amount;
+    //   if (!transfer.isOutgoing) {
+    //     amount = amount.times(BIGINT_MINUS_ONE);
+    //   }
+    //   this.addInputTokenBalance(amount);
+    // }
   }
 
   /**
