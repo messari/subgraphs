@@ -37,7 +37,7 @@ import {
   ExecuteMessage1Call as ExecuteMessageCall2, // for non-EVM chain
 } from "../generated/MessageBus/MessageBus";
 import { FarmingRewardClaimed } from "../generated/FarmingRewards/FarmingRewards";
-import { SDK } from "./sdk/protocols/bridge";
+import { CustomEventType, SDK } from "./sdk/protocols/bridge";
 import { TokenPricer } from "./sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
 import { Pool } from "./sdk/protocols/bridge/pool";
@@ -63,6 +63,7 @@ import {
   SECONDS_PER_DAY,
   BIGINT_MINUS_ONE,
 } from "./sdk/util/constants";
+import { EventType } from "../../aave-v2-forks/src/constants";
 
 // empty handler for prices library
 // eslint-disable-next-line no-unused-vars, no-empty-function
@@ -127,7 +128,29 @@ class TokenInit implements TokenInitializer {
   }
 }
 
-function _getSDK(event: ethereum.Event): SDK {
+function _getSDK(
+  event: ethereum.Event | null = null,
+  call: ethereum.Call | null = null
+): SDK | null {
+  let customEvent: CustomEventType;
+  if (event) {
+    customEvent = CustomEventType.initialize(
+      event.block,
+      event.transaction,
+      event.transactionLogIndex,
+      event
+    );
+  } else if (call) {
+    customEvent = CustomEventType.initialize(
+      call.block,
+      call.transaction,
+      call.transaction.index
+    );
+  } else {
+    log.error("[_getSDK]either event or call needs to be specified", []);
+    return null;
+  }
+
   const protocolId = getNetworkSpecificConstant().protocolId.toHexString();
   const conf = new BridgeConfig(
     protocolId,
@@ -136,22 +159,12 @@ function _getSDK(event: ethereum.Event): SDK {
     BridgePermissionType.PERMISSIONLESS,
     Versions
   );
-  return new SDK(conf, new Pricer(), new TokenInit(), event);
-}
-
-export class AuxArgs {
-  token: Token;
-  poolType: BridgePoolType;
-
-  constructor(token: Token, poolType: BridgePoolType) {
-    this.token = token;
-    this.poolType = poolType;
-  }
+  return new SDK(conf, new Pricer(), new TokenInit(), customEvent);
 }
 
 export function onCreatePool(
   // eslint-disable-next-line no-unused-vars
-  event: ethereum.Event,
+  event: CustomEventType,
   pool: Pool,
   // eslint-disable-next-line no-unused-vars
   sdk: SDK,
@@ -195,10 +208,8 @@ export function handleSend(event: Send): void {
 }
 
 export function handleLiquidityAdded(event: LiquidityAdded): void {
-  const sdk = _getSDK(event);
+  const sdk = _getSDK(event)!;
   const token = sdk.Tokens.getOrCreateToken(event.params.token);
-  const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
-  // TODO: concatenate Pool address and token address for pool id?
   const pool = sdk.Pools.loadPool(
     event.address.concat(event.params.token),
     onCreatePool,
@@ -214,18 +225,14 @@ export function handleWithdraw(call: WithdrawCall): void {
   const buf = call.inputs._wdmsg;
   const wdmsg = decodeWithdrawMsg(buf);
 
-  // fake an event for the purpose of calling _handleTransferIn
-  const event = _convertCallToEvent(call);
-
-  const sdk = _getSDK(event);
-  const token = sdk.Tokens.getOrCreateToken(wdmsg.token);
-  //const auxArgs = new AuxArgs(token, BridgePoolType.LIQUIDITY);
+  const sdk = _getSDK(null, call)!;
   const pool = sdk.Pools.loadPool(
     call.to.concat(wdmsg.token),
     onCreatePool,
     BridgePoolType.LIQUIDITY,
     wdmsg.token.toHexString()
   );
+  const txId = call.transaction.hash.concatI32(call.transaction.index.toI32());
 
   // TODO: remove once supply side revenue running
   log.info("[handleWithdraw]refid={},tx={}", [
@@ -262,9 +269,12 @@ export function handleWithdraw(call: WithdrawCall): void {
       wdmsg.receiver,
       wdmsg.amount,
       networkToChainID(dataSource.network()),
+      pool.getBytesID(),
       BridgePoolType.LIQUIDITY,
       CrosschainTokenType.CANONICAL,
-      event
+      txId,
+      null,
+      call
     );
   } else {
     _handleTransferIn(
@@ -273,9 +283,12 @@ export function handleWithdraw(call: WithdrawCall): void {
       wdmsg.receiver,
       wdmsg.amount,
       wdmsg.chainId,
+      pool.getBytesID(),
       BridgePoolType.LIQUIDITY,
       CrosschainTokenType.CANONICAL,
-      event
+      txId,
+      null,
+      call
     );
   }
 }
@@ -295,14 +308,18 @@ export function handleOTVDeposited(event: OTVDeposited): void {
 }
 
 export function handleOTVWithdrawn(event: OTVWithdrawn): void {
+  const poolId = event.address.concat(event.params.token);
+  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
   _handleTransferIn(
     event.params.token,
     event.params.burnAccount,
     event.params.receiver,
     event.params.amount,
     event.params.refChainId,
+    poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
+    txId,
     event
   );
 }
@@ -322,28 +339,36 @@ export function handleOTVv2Deposited(event: OTVv2Deposited): void {
 }
 
 export function handleOTVv2Withdrawn(event: OTVv2Withdrawn): void {
+  const poolId = event.address.concat(event.params.token);
+  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
   _handleTransferIn(
     event.params.token,
     event.params.burnAccount,
     event.params.receiver,
     event.params.amount,
     event.params.refChainId,
+    poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
+    txId,
     event
   );
 }
 
 // Pegged Token Bridge V1
 export function handlePTBMint(event: PTBMint): void {
+  const poolId = event.address.concat(event.params.token);
+  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
   _handleTransferIn(
     event.params.token,
     event.params.depositor,
     event.params.account,
     event.params.amount,
     event.params.refChainId,
+    poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
+    txId,
     event
   );
 }
@@ -363,20 +388,24 @@ export function handlePTBBurn(event: PTBBurn): void {
 }
 
 export function handlePTBv2Mint(event: PTBv2Mint): void {
+  const poolId = event.address.concat(event.params.token);
+  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
   _handleTransferIn(
     event.params.token,
     event.params.depositor,
     event.params.account,
     event.params.amount,
     event.params.refChainId,
+    poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
+    txId,
     event
   );
 }
 
 export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
-  const sdk = _getSDK(event);
+  const sdk = _getSDK(event)!;
   const protocol = sdk.Protocol.protocol;
 
   if (!protocol._lastRewardTimestamp) {
@@ -439,7 +468,7 @@ export function handleMessage2(event: Message2): void {
   _handleMessageOut(
     event.params.dstChainId,
     event.params.sender,
-    event.params.receiver,
+    Address.fromBytes(event.params.receiver), //this may truncate addresses for non-EVM chain
     event.params.message,
     event.params.fee,
     event
@@ -474,13 +503,7 @@ export function handleExecuteMessage(call: ExecuteMessageCall): void {
   const receiver = call.inputs._route.at(1).toAddress();
   const srcChainId = call.inputs._route.at(3).toBigInt();
   const data = call.inputs._message;
-  _handleMessageIn(
-    srcChainId,
-    sender,
-    receiver,
-    data,
-    _convertCallToEvent(call)
-  );
+  _handleMessageIn(srcChainId, sender, receiver, data, null, call);
 }
 
 // for non-EVM chain where the address may be more than 20 bytes
@@ -490,13 +513,7 @@ export function handleExecuteMessage2(call: ExecuteMessageCall2): void {
   const receiver = call.inputs._route.at(1).toAddress();
   const srcChainId = call.inputs._route.at(3).toBigInt();
   const data = call.inputs._message;
-  _handleMessageIn(
-    srcChainId,
-    sender,
-    receiver,
-    data,
-    _convertCallToEvent(call)
-  );
+  _handleMessageIn(srcChainId, sender, receiver, data, null, call);
 }
 
 function _handleTransferOut(
@@ -509,9 +526,8 @@ function _handleTransferOut(
   crosschainTokenType: CrosschainTokenType,
   event: ethereum.Event
 ): void {
-  const sdk = _getSDK(event);
+  const sdk = _getSDK(event)!;
   const inputToken = sdk.Tokens.getOrCreateToken(token);
-  //const auxArgs = new AuxArgs(inputToken, BridgePoolType.LIQUIDITY);
 
   const pool = sdk.Pools.loadPool(
     event.address.concat(token),
@@ -544,15 +560,18 @@ function _handleTransferIn(
   receiver: Address,
   amount: BigInt,
   srcChainId: BigInt,
+  poolId: Bytes,
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
-  event: ethereum.Event
+  transactionID: Bytes | null = null,
+  event: ethereum.Event | null = null,
+  call: ethereum.Call | null = null
 ): void {
-  const sdk = _getSDK(event);
+  const sdk = _getSDK(event, call)!;
   const inputToken = sdk.Tokens.getOrCreateToken(token);
-  //const auxArgs = new AuxArgs(inputToken, BridgePoolType.LIQUIDITY);
+
   const pool = sdk.Pools.loadPool(
-    event.address.concat(token),
+    poolId,
     onCreatePool,
     bridgePoolType,
     token.toHexString()
@@ -573,9 +592,8 @@ function _handleTransferIn(
     pool.getDestinationTokenRoute(crossToken)!,
     sender,
     amount,
-    event.transaction.hash
+    transactionID
   );
-  //pool.addRevenueNative(event.params.protocolFee, event.params.supplyFee);
 }
 
 function _handleMessageOut(
@@ -584,9 +602,10 @@ function _handleMessageOut(
   receiver: Address,
   data: Bytes,
   fee: BigInt,
-  event: ethereum.Event
+  event: ethereum.Event | null = null,
+  call: ethereum.Call | null = null
 ): void {
-  const sdk = _getSDK(event);
+  const sdk = _getSDK(event, call)!;
   // Message send/receive on cbridge is not specific to a bridge
   // unless it is sendMessageWithTransfer or executeMessageWithTransfer
   // then in these cases, the transfer is going through the specified bridge
@@ -620,18 +639,13 @@ function _handleMessageIn(
   sender: Address,
   receiver: Address,
   data: Bytes,
-  event: ethereum.Event
+  event: ethereum.Event | null = null,
+  call: ethereum.Call | null = null
 ): void {
-  const sdk = _getSDK(event);
+  const sdk = _getSDK(event, call)!;
   // see doc in _handleMessageOut
   const ethToken = Address.zero();
   const inputToken = sdk.Tokens.getOrCreateToken(ethToken); // gas Token
-  const pool = sdk.Pools.loadPool(
-    sdk.Protocol.getBytesID(),
-    onCreatePool,
-    BridgePoolType.LIQUIDITY,
-    inputToken.id.toHexString()
-  );
 
   const acc = sdk.Accounts.loadAccount(receiver);
   acc.messageIn(srcChainId, sender, data);

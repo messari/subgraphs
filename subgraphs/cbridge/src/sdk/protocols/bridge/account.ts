@@ -285,7 +285,7 @@ export class Account {
       srcChainId,
       this.protocol.getCurrentChainID(),
       source,
-      this.account.id,
+      Address.fromBytes(this.account.id),
       false,
       data
     );
@@ -310,7 +310,7 @@ export class Account {
     return this.message(
       this.protocol.getCurrentChainID(),
       dstChainId,
-      this.account.id,
+      Address.fromBytes(this.account.id),
       destination,
       true,
       data
