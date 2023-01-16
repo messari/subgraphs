@@ -216,31 +216,31 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			'0x3666f603Cc164936C1b87e207F36BEBa4AC5f18a'.toLowerCase()
 		) {
 			//HOP/USDC
-			return '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase() //USDC
+			return '0x10541b07d8Ad2647Dc6cD67abd4c03575dade261'.toLowerCase() //USDC
 		} else if (
 			bridgeAddress ==
 			'0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1'.toLowerCase()
 		) {
 			//HOP/DAI
-			return '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase() //DAI
+			return '0xa5A33aB9063395A90CCbEa2D86a62EcCf27B5742'.toLowerCase() //DAI
 		} else if (
 			bridgeAddress ==
 			'0x3E4a3a4796d16c0Cd582C382691998f7c06420B6'.toLowerCase()
 		) {
 			//HOP/USDT
-			return '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase() //USDT
+			return '0x18f7402B673Ba6Fb5EA4B95768aABb8aaD7ef18a'.toLowerCase() //USDT
 		} else if (
 			bridgeAddress ==
 			'0xb8901acB165ed027E32754E0FFe830802919727f'.toLowerCase()
 		) {
 			//HOP/ETH
-			return '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase() //ETH
+			return '0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97'.toLowerCase() //ETH
 		} else if (
 			bridgeAddress ==
 			'0xb98454270065A31D71Bf635F6F7Ee6A518dFb849'.toLowerCase()
 		) {
 			//HOP/WBTC
-			return '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase() //WBTC
+			return '0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase() //WBTC
 		} else if (
 			bridgeAddress ==
 			'0x914f986a44AcB623A277d6Bd17368171FCbe4273'.toLowerCase()
@@ -274,6 +274,11 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			'0xb8901acB165ed027E32754E0FFe830802919727f'.toLowerCase() //HOP/ETH
 		) {
 			return '0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase() //ETH
+		} else if (
+			bridgeAddress ==
+			'0x22b1cbb8d98a01a3b71d034bb899775a76eb1cc2'.toLowerCase() //HOP/MATIC
+		) {
+			return '0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1'.toLowerCase() //MATIC
 		} else if (
 			bridgeAddress ==
 			'0xb98454270065A31D71Bf635F6F7Ee6A518dFb849'.toLowerCase() //HOP/WBTC
@@ -412,7 +417,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		return [
 			'0x5C32143C8B198F392d01f8446b754c181224ac26'.toLowerCase(), // POLYGON USDC
 			'0x5C32143C8B198F392d01f8446b754c181224ac26'.toLowerCase(), // XDAI USDC
-			'0xdAC17F958D2ee523a2206206994597C13D831ec7'.toLowerCase(), // ARBITRUM USDC
+			'0x10541b07d8Ad2647Dc6cD67abd4c03575dade261'.toLowerCase(), // ARBITRUM USDC
 			'0x3c0FFAca566fCcfD9Cc95139FEF6CBA143795963'.toLowerCase(), // OPTIMISM USDC
 		]
 	}
@@ -456,7 +461,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		return [
 			'0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'.toLowerCase(), // POLYGON USDT
 			'0x4ECaBa5870353805a9F068101A40E0f32ed605C6'.toLowerCase(), // XDAI USDT
-			'0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase(), // ARBITRUM USDT
+			'0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9'.toLowerCase(), // ARBITRUM USDT
 			'0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase(), // OPTIMISM USDT
 			'0xdAC17F958D2ee523a2206206994597C13D831ec7'.toLowerCase(), // MAINNET USDT
 		]
@@ -466,7 +471,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		return [
 			'0x266e2dc3C4c59E42AA07afeE5B09E964cFFe6778'.toLowerCase(), // POLYGON ETH
 			'0x4014DC015641c08788F15bD6eB20dA4c47D936d8'.toLowerCase(), // XDAI ETH
-			'0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase(), // ARBITRUM ETH
+			'0x652d27c0F72771Ce5C76fd400edD61B406Ac6D97'.toLowerCase(), // ARBITRUM ETH
 			'0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase(), // OPTIMISM ETH
 		]
 	}
@@ -474,7 +479,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		return [
 			'0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'.toLowerCase(), // POLYGON ETH
 			'0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'.toLowerCase(), // XDAI ETH
-			'0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase(), // ARBITRUM ETH
+			'0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase(), // ARBITRUM ETH
 			'0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase(), // MAINNET ETH
 			'0x0000000000000000000000000000000000000000'.toLowerCase(), // OPTIMISM ETH
 		]
@@ -507,7 +512,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			'0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6'.toLowerCase(), // POLYGON WBTC
 			'0xb07c6505e1E41112494123e40330c5Ac09817CFB'.toLowerCase(), // XDAI WBTC
 			'0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase(), // ARBITRUM WBTC
-			'0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase(), // OPTIMISM WBTC
+			'0x46fc3Af3A47792cA3ED06fdF3D657145A675a8D8'.toLowerCase(), // OPTIMISM WBTC
 		]
 	}
 	getWbtcTokens(): string[] {
@@ -515,21 +520,21 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			'0x4e9840f3C1ff368a10731D15c11516b9Fe7E1898'.toLowerCase(), // POLYGON WBTC
 			'0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252'.toLowerCase(), // XDAI WBTC
 			'0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f'.toLowerCase(), // ARBITRUM WBTC
-			'0x46fc3Af3A47792cA3ED06fdF3D657145A675a8D8'.toLowerCase(), // OPTIMISM WBTC
+			'0x68f180fcCe6836688e9084f035309E29Bf0A2095'.toLowerCase(), // OPTIMISM WBTC
 			'0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599'.toLowerCase(), // MAINNET WBTC
 		]
 	}
 	getMaticPools(): string[] {
 		return [
-			'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270'.toLowerCase(), // POLYGON MATIC
+			'0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1'.toLowerCase(), // POLYGON MATIC
 			'0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase(), // XDAI MATIC
-			'0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0'.toLowerCase(), // MAINNET MATIC
 		]
 	}
 	getMaticTokens(): string[] {
 		return [
-			'0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1'.toLowerCase(), // POLYGON MATIC
+			'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270'.toLowerCase(), // POLYGON MATIC
 			'0x7122d7661c4564b7C6Cd4878B06766489a6028A2'.toLowerCase(), // XDAI MATIC
+			'0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0'.toLowerCase(), // MAINNET MATIC
 		]
 	}
 

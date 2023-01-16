@@ -72,7 +72,7 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 		const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
 			event.address.toHexString()
 		)
-		log.warning('inputToken: {}, bridgeAddress: {}', [
+		log.warning('inputToken1: {}, bridgeAddress: {}', [
 			inputToken,
 			event.address.toHexString(),
 		])
@@ -82,9 +82,10 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 			event.params.chainId.toString(),
 			event.address.toHexString()
 		)
-		log.warning('poolAddress: {}, inputToken: {}', [poolAddress, inputToken])
+		log.warning('poolAddress2: {}, inputToken: {}', [poolAddress, inputToken])
 
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
+		log.warning('poolAddress3: {}, inputToken: {}', [poolAddress, inputToken])
 
 		const poolName = poolConfig[0]
 		const poolSymbol = poolConfig[1]
@@ -92,6 +93,8 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 		const bridgeAddress = bridgeConfig[0]
 		const bridgeName = bridgeConfig[1]
 		const bridgeSlug = bridgeConfig[2]
+
+		log.warning('poolAddress4: {}, inputToken: {}', [poolAddress, inputToken])
 
 		const conf = new BridgeConfig(
 			bridgeAddress,
