@@ -1,0 +1,15 @@
+{
+  "name": "osmosis",
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write ."
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.33.1",
+    "@graphprotocol/graph-ts": "0.27.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.6.2",
+    "as-proto": "^0.2.3"
+  }
+}

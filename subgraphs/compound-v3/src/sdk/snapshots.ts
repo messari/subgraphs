@@ -12,7 +12,7 @@ import {
   Market,
   MarketDailySnapshot,
   MarketHourlySnapshot,
-  RevenueDetails,
+  RevenueDetail,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
@@ -196,8 +196,8 @@ export class SnapshotManager {
     snapshot.cumulativeProtocolSideRevenueUSD =
       this.market.cumulativeProtocolSideRevenueUSD;
     snapshot.cumulativeTotalRevenueUSD = this.market.cumulativeTotalRevenueUSD;
-    snapshot.revenueDetails = this.market.revenueDetails
-      ? this.getSnapshotRevenueDetails(this.market.revenueDetails!, days)
+    snapshot.revenueDetail = this.market.revenueDetail
+      ? this.getSnapshotRevenueDetail(this.market.revenueDetail!, days)
       : null;
     snapshot.totalDepositBalanceUSD = this.market.totalDepositBalanceUSD;
     snapshot.cumulativeDepositUSD = this.market.cumulativeDepositUSD;
@@ -254,8 +254,8 @@ export class SnapshotManager {
       this.protocol.cumulativeProtocolSideRevenueUSD;
     snapshot.cumulativeTotalRevenueUSD =
       this.protocol.cumulativeTotalRevenueUSD;
-    snapshot.revenueDetails = this.protocol.revenueDetails
-      ? this.getSnapshotRevenueDetails(this.protocol.revenueDetails!, days)
+    snapshot.revenueDetail = this.protocol.revenueDetail
+      ? this.getSnapshotRevenueDetail(this.protocol.revenueDetail!, days)
       : null;
     snapshot.totalDepositBalanceUSD = this.protocol.totalDepositBalanceUSD;
     snapshot.cumulativeDepositUSD = this.protocol.cumulativeDepositUSD;
@@ -619,20 +619,20 @@ export class SnapshotManager {
     return snapshotRates;
   }
 
-  private getSnapshotRevenueDetails(
+  private getSnapshotRevenueDetail(
     currID: Bytes,
     timeSuffix: i32
   ): Bytes | null {
-    const currDetails = RevenueDetails.load(currID);
+    const currDetails = RevenueDetail.load(currID);
     if (!currDetails) {
       log.error(
-        "[getRevenueDetailsSnapshot] Cannot find revenue details id: {}",
+        "[getRevenueDetailSnapshot] Cannot find revenue details id: {}",
         [currID.toHexString()]
       );
       return null;
     }
 
-    const newDetails = new RevenueDetails(
+    const newDetails = new RevenueDetail(
       currDetails.id.concat(Bytes.fromI32(timeSuffix))
     );
     newDetails.sources = currDetails.sources;
