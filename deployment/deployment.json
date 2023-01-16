@@ -1709,6 +1709,10 @@
           "hosted-service": {
             "slug": "notional-finance-ethereum",
             "query-id": "notional-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "notional-finance-ethereum",
+            "query-id": "346UaR2Lgxg8yJ2Vq2r8wid1pWaYQNH6N1GmzGCJkHRV"
           }
         }
       }
