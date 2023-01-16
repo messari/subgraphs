@@ -54,10 +54,6 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: AaveOracle
           file: ./abis/aave-v3/AaveOracle.json
-        - name: UniswapV3Pool
-          file: ./abis/aave-v3/UniswapV3Pool.json
-        - name: UniswapV3Factory
-          file: ./abis/aave-v3/UniswapV3Factory.json
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
       eventHandlers:
@@ -65,12 +61,13 @@ dataSources:
           handler: handleAssetConfigUpdated
       file: ./protocols/aave-v3/src/mapping.ts
 
-  # this is needed to be compatible with aave-v2-forks
+  # this is needed to make import path compatible with aave-v2-forks
   - kind: ethereum
     name: LendingPool
     network: {{ network }}
     source:
       abi: LendingPool
+      startBlock: {{ PoolAddressesProviderRegistry.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -87,10 +84,6 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: AaveOracle
           file: ./abis/aave-v3/AaveOracle.json
-        - name: UniswapV3Pool
-          file: ./abis/aave-v3/UniswapV3Pool.json
-        - name: UniswapV3Factory
-          file: ./abis/aave-v3/UniswapV3Factory.json
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
         - name: AToken
@@ -118,10 +111,13 @@ templates:
       abis:
         - name: LendingPoolAddressesProvider
           file: ./abis/aave-v3/LendingPoolAddressesProvider.json
+<<<<<<< HEAD
         - name: AaveOracle
           file: ./abis/aave-v3/AaveOracle.json
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
+=======
+>>>>>>> 70355e2e (fixed one shot cancelled error)
       eventHandlers:
         - event: PriceOracleUpdated(indexed address,indexed address)
           handler: handlePriceOracleUpdated

@@ -91,7 +91,6 @@ import {
   LendingPoolAddressesProvider,
   LendingPoolConfigurator,
 } from "../../../generated/templates";
-import { AaveOracle } from "../../../generated/templates/LendingPool/AaveOracle";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
 
 function getProtocolData(): ProtocolData {
@@ -637,8 +636,6 @@ function getAssetPriceInUSDCv2(
       return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
     }
   }
-
-  // Oracle return the price scaled up by 1e8
   return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
 }
 
