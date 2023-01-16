@@ -13,6 +13,7 @@ import {
   SECONDS_PER_DAY_BI,
   SECONDS_PER_HOUR_BI,
 } from "../../util/constants";
+import { CustomEventType } from ".";
 
 const SnapshotHelperID = Bytes.fromUTF8("_ProtocolSnapshotHelper");
 const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
@@ -27,13 +28,13 @@ const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
  */
 export class ProtocolSnapshot {
   protocol: BridgeProtocolSchema;
-  block: ethereum.Block;
+  event: CustomEventType;
   helper: _ProtocolSnapshotHelper;
   activityHelper: _ActivityHelper;
 
-  constructor(protocol: BridgeProtocolSchema, block: ethereum.Block) {
+  constructor(protocol: BridgeProtocolSchema, event: CustomEventType) {
     this.protocol = protocol;
-    this.block = block;
+    this.event = event;
     this.helper = initProtocolHelper();
     this.activityHelper = initActivityHelper();
     this.takeSnapshots();
@@ -78,21 +79,21 @@ export class ProtocolSnapshot {
     if (
       helper.lastDailyFinancialsTimestamp
         .plus(SECONDS_PER_DAY_BI)
-        .lt(this.block.timestamp)
+        .lt(this.event.block.timestamp)
     ) {
       this.takeFinancialsDailySnapshot();
     }
     if (
       helper.lastDailyUsageTimestamp
         .plus(SECONDS_PER_DAY_BI)
-        .lt(this.block.timestamp)
+        .lt(this.event.block.timestamp)
     ) {
       this.takeUsageDailySnapshot();
     }
     if (
       helper.lastHourlyUsageTimestamp
         .plus(SECONDS_PER_HOUR_BI)
-        .lt(this.block.timestamp)
+        .lt(this.event.block.timestamp)
     ) {
       this.takeUsageHourlySnapshot();
     }
@@ -100,7 +101,7 @@ export class ProtocolSnapshot {
 
   private takeFinancialsDailySnapshot(): void {
     const helper = this.helper;
-    const block = this.block;
+    const block = this.event.block;
     const protocol = this.protocol;
     const day = block.timestamp.div(SECONDS_PER_DAY_BI).toI32();
 
@@ -173,7 +174,7 @@ export class ProtocolSnapshot {
   private takeUsageDailySnapshot(): void {
     const helper = this.helper;
     const activity = this.activityHelper;
-    const block = this.block;
+    const block = this.event.block;
     const protocol = this.protocol;
     const day = block.timestamp.div(SECONDS_PER_DAY_BI).toI32();
 
@@ -278,7 +279,7 @@ export class ProtocolSnapshot {
   private takeUsageHourlySnapshot(): void {
     const helper = this.helper;
     const activity = this.activityHelper;
-    const block = this.block;
+    const block = this.event.block;
     const protocol = this.protocol;
     const hour = block.timestamp.div(SECONDS_PER_HOUR_BI).toI32();
 

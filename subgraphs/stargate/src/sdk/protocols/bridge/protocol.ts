@@ -16,7 +16,7 @@ import {
   BigInt,
 } from "@graphprotocol/graph-ts";
 import { chainIDToNetwork, networkToChainID } from "./chainIds";
-import { SDK } from ".";
+import { CustomEventType, SDK } from ".";
 
 /**
  * Bridge is a wrapper around the BridgeProtocolSchema entity that takes care of
@@ -25,7 +25,7 @@ import { SDK } from ".";
  */
 export class Bridge {
   protocol: BridgeProtocolSchema;
-  block: ethereum.Block;
+  event: CustomEventType;
   pricer: TokenPricer;
   snapshoter: ProtocolSnapshot;
   sdk: SDK | null = null;
@@ -36,12 +36,12 @@ export class Bridge {
   private constructor(
     protocol: BridgeProtocolSchema,
     pricer: TokenPricer,
-    block: ethereum.Block
+    event: CustomEventType
   ) {
     this.protocol = protocol;
-    this.block = block;
+    this.event = event;
     this.pricer = pricer;
-    this.snapshoter = new ProtocolSnapshot(protocol, block);
+    this.snapshoter = new ProtocolSnapshot(protocol, event);
   }
 
   /**
@@ -55,12 +55,12 @@ export class Bridge {
   static load(
     conf: BridgeConfigurer,
     pricer: TokenPricer,
-    block: ethereum.Block
+    event: CustomEventType
   ): Bridge {
     const id = Address.fromString(conf.getID());
     let protocol = BridgeProtocolSchema.load(id);
     if (protocol) {
-      const proto = new Bridge(protocol, pricer, block);
+      const proto = new Bridge(protocol, pricer, event);
       proto.setVersions(conf.getVersions());
       return proto;
     }
@@ -99,7 +99,7 @@ export class Bridge {
     protocol.totalWrappedRouteCount = 0;
     protocol.totalSupportedTokenCount = 0;
 
-    const proto = new Bridge(protocol, pricer, block);
+    const proto = new Bridge(protocol, pricer, event);
     proto.setVersions(conf.getVersions());
     return proto;
   }
@@ -148,8 +148,8 @@ export class Bridge {
    *
    * @returns {ethereum.Block} the block currently being handled.
    */
-  getCurrentBlock(): ethereum.Block {
-    return this.block;
+  getCurrentEvent(): CustomEventType {
+    return this.event;
   }
 
   /**

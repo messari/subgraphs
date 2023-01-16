@@ -97,17 +97,10 @@ export function handleCreatePool(call: CreatePoolCall): void {
   const poolName = call.inputs._name;
   const poolSymbol = call.inputs._symbol;
 
-  const sdk = new SDK(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    call.block,
-    call.transaction,
-    BIGINT_ZERO
-  );
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), call);
 
   const token = sdk.Tokens.getOrCreateToken(poolAddr);
-  const pool = sdk.Pools.loadPool(poolAddr);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
   if (!pool.isInitialized) {
     pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
   }
@@ -129,16 +122,9 @@ export function handleAddLiquidity(call: AddLiquidityCall): void {
   const poolAddr = getPoolCall.value;
   const amount = amountLDtoSD(poolAddr, call.inputs._amountLD);
 
-  const sdk = new SDK(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    call.block,
-    call.transaction,
-    BIGINT_ZERO
-  );
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), call);
 
-  const pool = sdk.Pools.loadPool(poolAddr);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
 
   const account = sdk.Accounts.loadAccount(call.transaction.from);
   account.liquidityDeposit(pool, amount);
@@ -148,16 +134,9 @@ export function handleRedeemLocal(event: RedeemLocal): void {
   const poolAddr = dataSource.address();
   const amount = event.params.amountSD;
 
-  const sdk = new SDK(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event.block,
-    event.transaction,
-    event.logIndex
-  );
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool(poolAddr);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
 
   const account = sdk.Accounts.loadAccount(event.params.from);
   account.liquidityWithdraw(pool, amount);
@@ -167,16 +146,9 @@ export function handleInstantRedeemLocal(event: InstantRedeemLocal): void {
   const poolAddr = dataSource.address();
   const amount = event.params.amountSD;
 
-  const sdk = new SDK(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event.block,
-    event.transaction,
-    event.logIndex
-  );
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool(poolAddr);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
 
   const account = sdk.Accounts.loadAccount(event.params.from);
   account.liquidityWithdraw(pool, amount);
@@ -187,16 +159,9 @@ export function handleRedeemRemote(event: RedeemRemote): void {
   // event.params.amountSD is infact amountLD
   const amount = amountLDtoSD(poolAddr, event.params.amountSD);
 
-  const sdk = new SDK(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event.block,
-    event.transaction,
-    event.logIndex
-  );
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool(poolAddr);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
 
   const account = sdk.Accounts.loadAccount(event.params.from);
   account.liquidityWithdraw(pool, amount);
@@ -206,16 +171,9 @@ export function handleRedeemLocalCallback(event: RedeemLocalCallback): void {
   const poolAddr = dataSource.address();
   const amount = event.params._amountToMintSD;
 
-  const sdk = new SDK(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event.block,
-    event.transaction,
-    event.logIndex
-  );
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool(poolAddr);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
 
   const account = sdk.Accounts.loadAccount(event.params._to);
   account.liquidityDeposit(pool, amount);
@@ -227,16 +185,9 @@ export function handleSwapOut(event: Swap): void {
   const crosschainID = BigInt.fromI32(event.params.chainId as i32);
   const crossPoolID = event.params.dstPoolId;
 
-  const sdk = new SDK(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event.block,
-    event.transaction,
-    event.logIndex
-  );
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool(poolAddr);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
   const token = sdk.Tokens.getOrCreateToken(
     Address.fromBytes(pool.getInputToken().id)
   );
@@ -277,16 +228,9 @@ export function handleSwapIn(call: SwapRemoteCall): void {
   const amount = amountLDtoSD(poolAddr, call.outputs.amountLD);
   const amountLPFee = call.inputs._s.lpFee;
 
-  const sdk = new SDK(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    call.block,
-    call.transaction,
-    BIGINT_ZERO
-  );
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), call);
 
-  const pool = sdk.Pools.loadPool(poolAddr);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
   const token = sdk.Tokens.getOrCreateToken(
     Address.fromBytes(pool.getInputToken().id)
   );
@@ -338,16 +282,9 @@ export function handleStake(event: Deposit): void {
     .times(allocPoint)
     .div(totalAllocPoint);
 
-  const sdk = new SDK(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event.block,
-    event.transaction,
-    BIGINT_ZERO
-  );
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool(poolAddr);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
   const rewardToken = sdk.Tokens.getOrCreateToken(
     Address.fromString(NetworkConfigs.getRewardToken())
   );
@@ -382,16 +319,9 @@ export function handleUnstake(event: Withdraw): void {
     .times(allocPoint)
     .div(totalAllocPoint);
 
-  const sdk = new SDK(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event.block,
-    event.transaction,
-    BIGINT_ZERO
-  );
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool(poolAddr);
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
   const rewardToken = sdk.Tokens.getOrCreateToken(
     Address.fromString(NetworkConfigs.getRewardToken())
   );
