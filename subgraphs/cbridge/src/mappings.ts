@@ -29,6 +29,13 @@ import {
   Mint as PTBv2Mint,
   Burn as PTBv2Burn,
 } from "../generated/PeggedTokenBridgeV2/PeggedTokenBridgeV2";
+import {
+  Message,
+  Message2,
+  MessageWithTransfer,
+  ExecuteMessageCall,
+  ExecuteMessage1Call as ExecuteMessageCall2, // for non-EVM chain
+} from "../generated/MessageBus/MessageBus";
 import { FarmingRewardClaimed } from "../generated/FarmingRewards/FarmingRewards";
 import { SDK } from "./sdk/protocols/bridge";
 import { TokenPricer } from "./sdk/protocols/config";
@@ -47,7 +54,6 @@ import { Versions } from "./versions";
 import { Token, Pool as PoolEntity, _Transfer } from "../generated/schema";
 import { bigDecimalToBigInt, bigIntToBigDecimal } from "./sdk/util/numbers";
 import { getUsdPricePerToken, getUsdPrice } from "./prices";
-import { BIGINT_NEGATIVE_ONE } from "../../alpaca-finance-lending/src/utils/constants";
 import { networkToChainID } from "./sdk/protocols/bridge/chainIds";
 import {
   BIGDECIMAL_ZERO,
@@ -55,8 +61,8 @@ import {
   getNetworkSpecificConstant,
   RewardTokenType,
   SECONDS_PER_DAY,
+  BIGINT_MINUS_ONE,
 } from "./sdk/util/constants";
-import { Protocol } from "../../badgerdao/src/common/constants";
 
 // empty handler for prices library
 // eslint-disable-next-line no-unused-vars, no-empty-function
@@ -209,18 +215,7 @@ export function handleWithdraw(call: WithdrawCall): void {
   const wdmsg = decodeWithdrawMsg(buf);
 
   // fake an event for the purpose of calling _handleTransferIn
-  const value = new ethereum.Value(ethereum.ValueKind.INT, 0 as u64);
-  const eventParameters = [new ethereum.EventParam("value", value)];
-  const event = new ethereum.Event(
-    call.to,
-    call.transaction.index,
-    call.transaction.index,
-    null,
-    call.block,
-    call.transaction,
-    eventParameters,
-    null
-  );
+  const event = _convertCallToEvent(call);
 
   const sdk = _getSDK(event);
   const token = sdk.Tokens.getOrCreateToken(wdmsg.token);
@@ -241,7 +236,7 @@ export function handleWithdraw(call: WithdrawCall): void {
   const transfer = _Transfer.load(wdmsg.refId);
   if (wdmsg.refId.equals(Bytes.empty())) {
     // LP withdraw liquidity: refId == 0x0
-    pool.addInputTokenBalance(wdmsg.amount.times(BIGINT_NEGATIVE_ONE), true);
+    pool.addInputTokenBalance(wdmsg.amount.times(BIGINT_MINUS_ONE), true);
     const acc = sdk.Accounts.loadAccount(wdmsg.receiver);
     acc.liquidityWithdraw(pool, wdmsg.amount, true);
   } else if (
@@ -380,8 +375,6 @@ export function handlePTBv2Mint(event: PTBv2Mint): void {
   );
 }
 
-// export function handleWithdrawalRequest(event: WithdrawalRequest): void {}
-
 export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
   const sdk = _getSDK(event);
   const protocol = sdk.Protocol.protocol;
@@ -409,15 +402,14 @@ export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
   // first iteration summing tvl
   let sumTVLUSD = BIGDECIMAL_ZERO;
   for (let i = 0; i < poolIDs.length; i++) {
-    const poolEntity = PoolEntity.load(poolIDs[i])!;
-    sumTVLUSD = sumTVLUSD.plus(poolEntity.totalValueLockedUSD);
+    const pool = sdk.Pools.loadPool(poolIDs[i]).pool;
+    sumTVLUSD = sumTVLUSD.plus(pool.totalValueLockedUSD);
   }
 
   for (let i = 0; i < poolIDs.length; i++) {
-    const poolEntity = PoolEntity.load(poolIDs[i])!;
     const pool = sdk.Pools.loadPool(poolIDs[i]);
     const poolRewardAmount = bigDecimalToBigInt(
-      poolEntity.totalValueLockedUSD
+      pool.pool.totalValueLockedUSD
         .div(sumTVLUSD)
         .times(protocol._cumulativeRewardsClaimed!.toBigDecimal())
     );
@@ -440,6 +432,70 @@ export function handlePTBv2Burn(event: PTBv2Burn): void {
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event
+  );
+}
+
+export function handleMessage2(event: Message2): void {
+  _handleMessageOut(
+    event.params.dstChainId,
+    event.params.sender,
+    event.params.receiver,
+    event.params.message,
+    event.params.fee,
+    event
+  );
+}
+
+export function handleMessage(event: Message): void {
+  _handleMessageOut(
+    event.params.dstChainId,
+    event.params.sender,
+    event.params.receiver,
+    event.params.message,
+    event.params.fee,
+    event
+  );
+}
+
+export function handleMessageWithTransfer(event: MessageWithTransfer): void {
+  _handleMessageOut(
+    event.params.dstChainId,
+    event.params.sender,
+    event.params.receiver,
+    event.params.message,
+    event.params.fee,
+    event
+  );
+}
+
+export function handleExecuteMessage(call: ExecuteMessageCall): void {
+  // See https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/message/libraries/MsgDataTypes.sol#L55
+  const sender = call.inputs._route.at(0).toAddress();
+  const receiver = call.inputs._route.at(1).toAddress();
+  const srcChainId = call.inputs._route.at(3).toBigInt();
+  const data = call.inputs._message;
+  _handleMessageIn(
+    srcChainId,
+    sender,
+    receiver,
+    data,
+    _convertCallToEvent(call)
+  );
+}
+
+// for non-EVM chain where the address may be more than 20 bytes
+export function handleExecuteMessage2(call: ExecuteMessageCall2): void {
+  // See https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/message/libraries/MsgDataTypes.sol#L55
+  const sender = call.inputs._route.at(0).toAddress();
+  const receiver = call.inputs._route.at(1).toAddress();
+  const srcChainId = call.inputs._route.at(3).toBigInt();
+  const data = call.inputs._message;
+  _handleMessageIn(
+    srcChainId,
+    sender,
+    receiver,
+    data,
+    _convertCallToEvent(call)
   );
 }
 
@@ -480,7 +536,6 @@ function _handleTransferOut(
     amount,
     event.transaction.hash
   );
-  //pool.addRevenueNative(event.params.protocolFee, event.params.supplyFee);
 }
 
 function _handleTransferIn(
@@ -521,6 +576,65 @@ function _handleTransferIn(
     event.transaction.hash
   );
   //pool.addRevenueNative(event.params.protocolFee, event.params.supplyFee);
+}
+
+function _handleMessageOut(
+  dstChainId: BigInt,
+  sender: Address,
+  receiver: Address,
+  data: Bytes,
+  fee: BigInt,
+  event: ethereum.Event
+): void {
+  const sdk = _getSDK(event);
+  // Message send/receive on cbridge is not specific to a bridge
+  // unless it is sendMessageWithTransfer or executeMessageWithTransfer
+  // then in these cases, the transfer is going through the specified bridge
+  // (Peg V1/V2, or Liquidity), but even then the message is execuated in a
+  // separate step (e.g. https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/message/messagebus/MessageBusReceiver.sol#L105)
+  // Here we assume all messages are associated with the liquidity-based pool (bridge)
+  // because protocol side revenue has to be attributed to a pool, and the liquidity-based
+  // bridge is used for signature verification for all messages:
+  // 1. messageWithTransfer: https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/message/messagebus/MessageBusReceiver.sol#L98
+  // 2. executeMessageWithTransferRefund: https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/message/messagebus/MessageBusReceiver.sol#L151
+  // 3. executeMessage: https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/message/messagebus/MessageBusReceiver.sol#L225
+  // alternatively, it may make sense to create a "MessageBus" pool, and assign
+  // all message revenue to the MessageBus pool, but we still need to specifiy the BridgePoolType
+  // for the MessageBus pool
+  const ethToken = Address.zero();
+  const inputToken = sdk.Tokens.getOrCreateToken(ethToken); // gas Token
+  const pool = sdk.Pools.loadPool(
+    sdk.Protocol.getBytesID(),
+    onCreatePool,
+    BridgePoolType.LIQUIDITY,
+    inputToken.id.toHexString()
+  );
+
+  const acc = sdk.Accounts.loadAccount(sender);
+  acc.messageOut(dstChainId, receiver, data);
+  pool.addRevenueNative(fee, BIGINT_ZERO);
+}
+
+function _handleMessageIn(
+  srcChainId: BigInt,
+  sender: Address,
+  receiver: Address,
+  data: Bytes,
+  event: ethereum.Event
+): void {
+  const sdk = _getSDK(event);
+  // see doc in _handleMessageOut
+  const ethToken = Address.zero();
+  const inputToken = sdk.Tokens.getOrCreateToken(ethToken); // gas Token
+  const pool = sdk.Pools.loadPool(
+    sdk.Protocol.getBytesID(),
+    onCreatePool,
+    BridgePoolType.LIQUIDITY,
+    inputToken.id.toHexString()
+  );
+
+  const acc = sdk.Accounts.loadAccount(receiver);
+  acc.messageIn(srcChainId, sender, data);
 }
 
 export function getPoolAddress(type: string, chainId: BigInt): Address {
@@ -713,4 +827,20 @@ function toBigInt(b: Bytes): BigInt | null {
 
   const retVal = BigInt.fromUnsignedBytes(correctBytes);
   return retVal;
+}
+
+function _convertCallToEvent(call: ethereum.Call): ethereum.Event {
+  const value = new ethereum.Value(ethereum.ValueKind.INT, 0 as u64);
+  const eventParameters = [new ethereum.EventParam("value", value)];
+  const event = new ethereum.Event(
+    call.to,
+    call.transaction.index,
+    call.transaction.index,
+    null,
+    call.block,
+    call.transaction,
+    eventParameters,
+    null
+  );
+  return event;
 }

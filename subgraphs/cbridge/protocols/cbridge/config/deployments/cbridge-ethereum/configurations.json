@@ -28,6 +28,10 @@
     "address": "0x61f85fF2a2f4289Be4bb9B72Fc7010B3142B5f41",
     "startBlock": 13670097
   },
+  "MessageBus": {
+    "address": "0x4066d196a423b2b3b8b054f4f40efb47a74e200c",
+    "startBlock": 16017598
+  },
   "Staking": {
     "address": "0x8a4B4C2aCAdeAa7206Df96F00052e41d74a015CE",
     "startBlock": 13670030
