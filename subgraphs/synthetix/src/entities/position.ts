@@ -120,33 +120,15 @@ export function updateUserPositionBalances(
   event: ethereum.Event,
   account: Account,
   delta: BigInt,
-  market: Market
+  market: Market,
+  position: Position
 ): void {
-  const borrowerPosition = getOrCreateUserPosition(
-    event,
-    account,
-    market,
-    PositionSide.BORROWER
-  );
-  borrowerPosition.balance = borrowerPosition.balance.plus(delta);
-  if (borrowerPosition.balance.equals(BIGINT_ZERO)) {
-    closePosition(event, account, market, borrowerPosition);
+  position.balance = position.balance.plus(delta);
+  if (position.balance.equals(BIGINT_ZERO)) {
+    closePosition(event, account, market, position);
   }
-  borrowerPosition.save();
-  getOrCreatePositionSnapshot(event, borrowerPosition);
-
-  const lenderPosition = getOrCreateUserPosition(
-    event,
-    account,
-    market,
-    PositionSide.LENDER
-  );
-  lenderPosition.balance = lenderPosition.balance.plus(delta);
-  if (lenderPosition.balance.equals(BIGINT_ZERO)) {
-    closePosition(event, account, market, lenderPosition);
-  }
-  lenderPosition.save();
-  getOrCreatePositionSnapshot(event, lenderPosition);
+  position.save();
+  getOrCreatePositionSnapshot(event, position);
 }
 
 function closePosition(

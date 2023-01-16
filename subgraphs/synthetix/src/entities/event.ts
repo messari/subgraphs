@@ -39,6 +39,7 @@ import {
   incrementPositionLiquidationCount,
   incrementPositionRepayCount,
   incrementPositionWithdrawCount,
+  updateUserPositionBalances,
 } from "./position";
 import {
   incrementProtocolBorrowCount,
@@ -56,7 +57,7 @@ export function createDeposit(
   amountUSD: BigDecimal,
   sender: Address
 ): void {
-  if (amount.le(BIGINT_ZERO)) {
+  if (amount.lt(BIGINT_ZERO)) {
     log.critical("Invalid deposit amount: {}", [amount.toString()]);
   }
   const account = getOrCreateAccount(sender);
@@ -88,6 +89,7 @@ export function createDeposit(
   incrementAccountDepositCount(account);
   incrementPositionDepositCount(position);
   incrementProtocolDepositCount(event, account);
+  updateUserPositionBalances(event, account, amount, market, position);
 }
 
 export function createWithdraw(
@@ -98,7 +100,7 @@ export function createWithdraw(
   amountUSD: BigDecimal,
   recipient: Address
 ): void {
-  if (amountToken.le(BIGINT_ZERO)) {
+  if (amountToken.lt(BIGINT_ZERO)) {
     log.critical("Invalid withdraw amount: {}", [amountToken.toString()]);
   }
   const account = getOrCreateAccount(recipient);
@@ -130,6 +132,13 @@ export function createWithdraw(
   incrementAccountWithdrawCount(account);
   incrementPositionWithdrawCount(position);
   incrementProtocolWithdrawCount(event, account);
+  updateUserPositionBalances(
+    event,
+    account,
+    amountToken.times(BigInt.fromString("-1")),
+    market,
+    position
+  );
 }
 
 export function createBorrow(
@@ -140,7 +149,7 @@ export function createBorrow(
   amountUSD: BigDecimal,
   recipient: Address
 ): void {
-  if (amountToken.le(BIGINT_ZERO)) {
+  if (amountToken.lt(BIGINT_ZERO)) {
     log.critical("Invalid borrow amount: {}", [amountToken.toString()]);
   }
   const account = getOrCreateAccount(recipient);
@@ -172,6 +181,7 @@ export function createBorrow(
   incrementAccountBorrowCount(account);
   incrementPositionBorrowCount(position);
   incrementProtocolBorrowCount(event, account);
+  updateUserPositionBalances(event, account, amountToken, market, position);
 }
 
 export function createRepay(
@@ -215,13 +225,21 @@ export function createRepay(
   incrementAccountRepayCount(account);
   incrementPositionRepayCount(position);
   incrementProtocolRepayCount(event, account);
+  updateUserPositionBalances(
+    event,
+    account,
+    amountToken.times(BigInt.fromString("-1")),
+    market,
+    position
+  );
 }
 
 export function createLiquidate(
   event: ethereum.Event,
   market: Market,
   asset: Token,
-  amountLiquidated: BigInt,
+  amountLiquidatedBorrow: BigInt,
+  amountLiquidatedLender: BigInt,
   amountLiquidatedUSD: BigDecimal,
   user: Address,
   liquidator: Address,
@@ -259,7 +277,7 @@ export function createLiquidate(
   liquidate.position = borrowerPosition.id;
   liquidate.lenderPosition = lenderPosition.id;
   liquidate.asset = asset.id;
-  liquidate.amount = amountLiquidated;
+  liquidate.amount = amountLiquidatedBorrow;
   liquidate.amountUSD = amountLiquidatedUSD;
   liquidate.profitUSD = profitUSD;
   liquidate.save();
@@ -269,4 +287,18 @@ export function createLiquidate(
   incrementPositionLiquidationCount(lenderPosition);
   incrementAccountLiquidatorCount(liquidatorAccount);
   incrementProtocolLiquidateCount(event, account, liquidatorAccount);
+  updateUserPositionBalances(
+    event,
+    account,
+    amountLiquidatedBorrow.times(BigInt.fromString("-1")),
+    market,
+    borrowerPosition
+  );
+  updateUserPositionBalances(
+    event,
+    account,
+    amountLiquidatedLender.times(BigInt.fromString("-1")),
+    market,
+    lenderPosition
+  );
 }

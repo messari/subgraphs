@@ -145,6 +145,7 @@ export function handleLoanClosedByLiquidation(
     market,
     susd,
     bigDecimalToBigInt(susd_amount),
+    bigDecimalToBigInt(eth_amount),
     susd_amountUSD,
     address,
     liquidator,
@@ -219,6 +220,7 @@ export function handleLoanPartiallyLiquidated(
     market,
     susd,
     susd_amount,
+    eth_amount,
     susd_amountUSD,
     address,
     liquidator,
@@ -431,6 +433,8 @@ export function handleLoanCreatedEtherLegacy(
   // Get sETH rate here
   const market = getOrCreateMarket(depositToken.id, event);
 
+  // We can use loanID to call getLoan info from the contract
+  // and use that for deposit and withdraw
   createDeposit(
     event,
     market,
@@ -562,6 +566,7 @@ export function handleLoanLiquidatedLegacy(
     market,
     susd,
     bigDecimalToBigInt(susd_amount),
+    bigDecimalToBigInt(eth_amount),
     susd_amountUSD,
     address,
     liquidator,
@@ -628,6 +633,7 @@ export function handleLoanPartiallyLiquidatedLegacy(
     market,
     susd,
     susd_amount,
+    eth_amount,
     susd_amountUSD,
     address,
     liquidator,
