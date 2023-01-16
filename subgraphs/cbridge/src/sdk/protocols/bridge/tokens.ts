@@ -29,7 +29,7 @@ export class TokenManager {
   }
 
   getOrCreateToken(address: Address): Token {
-    let token = Token.load(Address.fromBytes(address));
+    let token = Token.load(address);
     if (token) {
       return token;
     }
@@ -44,16 +44,16 @@ export class TokenManager {
   }
 
   getOrCreateRewardToken(type: RewardTokenType, token: Token): RewardToken {
-    const id = Bytes.empty();
+    let id = Bytes.empty();
     if (type == RewardTokenType.BORROW) {
-      id.concatI32(0);
+      id = id.concatI32(0);
     } else if (type == RewardTokenType.DEPOSIT) {
-      id.concatI32(1);
+      id = id.concatI32(1);
     } else {
       log.error("Unsupported reward token type", []);
       log.critical("", []);
     }
-    id.concat(token.id);
+    id = id.concat(token.id);
 
     let rToken = RewardToken.load(id);
     if (rToken) {

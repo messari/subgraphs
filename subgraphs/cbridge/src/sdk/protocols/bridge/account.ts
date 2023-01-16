@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import {
   Account as AccountSchema,
   BridgeTransfer,
@@ -14,6 +14,7 @@ import { Bridge } from "./protocol";
 import { TokenManager } from "./tokens";
 import { BridgePoolType, TransactionType, TransferType } from "./enums";
 import { getUnixDays, getUnixHours } from "../../util/events";
+import { CustomEventType } from ".";
 
 export class AccountManager {
   protocol: Bridge;
@@ -61,7 +62,7 @@ export class AccountWasActive {
 
 export class Account {
   account: AccountSchema;
-  event: ethereum.Event;
+  event: CustomEventType;
   protocol: Bridge;
   tokens: TokenManager;
 
@@ -83,8 +84,8 @@ export class Account {
   }
 
   private trackActivity(activityType: ActivityType): void {
-    const days = getUnixDays(this.event);
-    const hours = getUnixHours(this.event);
+    const days = getUnixDays(this.event.block);
+    const hours = getUnixHours(this.event.block);
 
     const generalHourlyID = `${this.account.id.toHexString()}-hourly-${hours}`;
     const generalDailyID = `${this.account.id.toHexString()}-daily-${days}`;
@@ -361,7 +362,8 @@ export class Account {
       Address.fromBytes(_pool.inputToken)
     );
 
-    const deposit = new LiquidityDeposit(idFromEvent(this.event));
+    const id = idFromEvent(this.event);
+    const deposit = new LiquidityDeposit(id);
     deposit.hash = this.event.transaction.hash;
     deposit.logIndex = this.event.logIndex.toI32();
     deposit.blockNumber = this.event.block.number;
@@ -404,7 +406,8 @@ export class Account {
       Address.fromBytes(_pool.inputToken)
     );
 
-    const withdraw = new LiquidityWithdraw(idFromEvent(this.event));
+    const id = idFromEvent(this.event);
+    const withdraw = new LiquidityWithdraw(id);
     withdraw.hash = this.event.transaction.hash;
     withdraw.logIndex = this.event.logIndex.toI32();
     withdraw.blockNumber = this.event.block.number;
@@ -513,7 +516,7 @@ export class Account {
   }
 }
 
-function idFromEvent(event: ethereum.Event): Bytes {
+function idFromEvent(event: CustomEventType): Bytes {
   return event.transaction.hash.concatI32(event.logIndex.toI32());
 }
 
