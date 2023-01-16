@@ -1,4 +1,4 @@
-import { ethereum, Bytes } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
 import { AccountWasActive } from "./account";
 import {
   BridgeProtocol as BridgeProtocolSchema,

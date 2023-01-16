@@ -8,7 +8,6 @@ import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
 import { TransactionType } from "./enums";
 import {
-  ethereum,
   dataSource,
   Address,
   Bytes,

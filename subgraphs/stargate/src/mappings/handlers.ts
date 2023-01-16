@@ -22,7 +22,7 @@ import {
   BridgePoolType,
   CrosschainTokenType,
 } from "../sdk/protocols/bridge/enums";
-import { BIGINT_ZERO, Network, RewardTokenType } from "../sdk/util/constants";
+import { Network, RewardTokenType } from "../sdk/util/constants";
 import { chainIDToNetwork } from "../sdk/protocols/bridge/chainIds";
 import { getRewardsPerDay, RewardIntervalType } from "../sdk/util/rewards";
 
