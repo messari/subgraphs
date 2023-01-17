@@ -71,8 +71,7 @@ export function createBorrow(event: Borrow): BigDecimal {
   const underlyingToken = getOrCreateToken(event.params.underlying);
   borrow.market = marketId;
   borrow.asset = underlying;
-  borrow.from = marketId;
-  borrow.to = accountAddress;
+  borrow.account = accountAddress;
   borrow.amount = bigIntChangeDecimals(event.params.amount, DEFAULT_DECIMALS, underlyingToken.decimals);
 
   // catch CRYPTEX outlier price at block 15358330
@@ -114,8 +113,7 @@ export function createDeposit(event: Deposit): BigDecimal {
   const underlyingToken = getOrCreateToken(event.params.underlying);
   deposit.market = marketId;
   deposit.asset = underlying;
-  deposit.from = accountAddress.toHexString();
-  deposit.to = marketId;
+  deposit.account = accountAddress.toHexString();
   deposit.amount = bigIntChangeDecimals(event.params.amount, DEFAULT_DECIMALS, underlyingToken.decimals);
   deposit.amountUSD = bigIntToBDUseDecimals(deposit.amount, underlyingToken.decimals).times(
     underlyingToken.lastPriceUSD!,
@@ -145,8 +143,7 @@ export function createRepay(event: Repay): BigDecimal {
   const underlyingToken = getOrCreateToken(event.params.underlying);
   repay.market = marketId;
   repay.asset = underlying;
-  repay.from = accountAddress.toHexString();
-  repay.to = marketId;
+  repay.account = accountAddress.toHexString();
   repay.amount = bigIntChangeDecimals(event.params.amount, DEFAULT_DECIMALS, underlyingToken.decimals);
   repay.amountUSD = bigIntToBDUseDecimals(repay.amount, underlyingToken.decimals).times(underlyingToken.lastPriceUSD!);
 
@@ -166,8 +163,7 @@ export function createWithdraw(event: Withdraw): BigDecimal {
   const underlyingToken = getOrCreateToken(event.params.underlying);
   withdraw.market = marketId;
   withdraw.asset = underlying;
-  withdraw.from = marketId;
-  withdraw.to = accountAddress.toHexString();
+  withdraw.account = accountAddress.toHexString();
   withdraw.amount = bigIntChangeDecimals(event.params.amount, DEFAULT_DECIMALS, underlyingToken.decimals);
   withdraw.amountUSD = bigIntToBDUseDecimals(withdraw.amount, underlyingToken.decimals).times(
     underlyingToken.lastPriceUSD!,
@@ -187,15 +183,12 @@ export function createLiquidation(event: Liquidation): BigDecimal {
   const seizedToken = getOrCreateToken(event.params.collateral);
 
   // repay token market
-  const underlyingAssetStatus = getOrCreateAssetStatus(underlyingTokenId);
   const collateralAssetStatus = getOrCreateAssetStatus(seizedTokenId);
-  const market = getOrCreateMarket(underlyingAssetStatus.eToken!);
   const collateralMarket = getOrCreateMarket(collateralAssetStatus.eToken!);
 
   liquidation.market = collateralMarket.id;
   liquidation.asset = underlyingTokenId;
-  liquidation.from = event.params.liquidator.toHexString();
-  liquidation.to = market.id; // Market that tokens are repaid to
+  liquidation.liquidator = event.params.liquidator.toHexString();
   liquidation.liquidatee = event.params.violator.toHexString();
   // Amount of collateral liquidated in native units (schema definition)
   // Amount is denominated in collateral

@@ -384,7 +384,7 @@ export function getOrCreateDeposit(event: ethereum.Event): Deposit {
   let entity = Deposit.load(id);
   if (!entity) {
     entity = new Deposit(id);
-    entity.protocol = EULER_ADDRESS;
+    entity.nonce = event.transaction.nonce;
     entity.hash = hash;
     entity.logIndex = logIndex.toI32();
     entity.timestamp = event.block.timestamp;
@@ -400,7 +400,7 @@ export function getOrCreateWithdraw(event: ethereum.Event): Withdraw {
   let entity = Withdraw.load(id);
   if (!entity) {
     entity = new Withdraw(id);
-    entity.protocol = EULER_ADDRESS;
+    entity.nonce = event.transaction.nonce;
     entity.hash = hash;
     entity.logIndex = logIndex.toI32();
     entity.timestamp = event.block.timestamp;
@@ -416,7 +416,7 @@ export function getOrCreateBorrow(event: ethereum.Event): Borrow {
   let entity = Borrow.load(id);
   if (!entity) {
     entity = new Borrow(id);
-    entity.protocol = EULER_ADDRESS;
+    entity.nonce = event.transaction.nonce;
     entity.hash = hash;
     entity.logIndex = logIndex.toI32();
     entity.timestamp = event.block.timestamp;
@@ -432,7 +432,7 @@ export function getOrCreateRepay(event: ethereum.Event): Repay {
   let entity = Repay.load(id);
   if (!entity) {
     entity = new Repay(id);
-    entity.protocol = EULER_ADDRESS;
+    entity.nonce = event.transaction.nonce;
     entity.hash = hash;
     entity.logIndex = logIndex.toI32();
     entity.timestamp = event.block.timestamp;
@@ -448,7 +448,7 @@ export function getOrCreateLiquidate(event: ethereum.Event): Liquidate {
   let entity = Liquidate.load(id);
   if (!entity) {
     entity = new Liquidate(id);
-    entity.protocol = EULER_ADDRESS;
+    entity.nonce = event.transaction.nonce;
     entity.hash = hash;
     entity.logIndex = logIndex.toI32();
     entity.timestamp = event.block.timestamp;
