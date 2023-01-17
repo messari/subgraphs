@@ -1244,14 +1244,14 @@ type Account @entity{
  " Total number of contracts exercised+expired "
   contractsClosedCount: Int!
 
-  " All deposit (add liquidity) events occurred in this pool "
-  deposits: [Deposit!]! @derivedFrom(field: "pool")
+  " All deposit (add liquidity) events occurred in this account "
+  deposits: [Deposit!]! @derivedFrom(field: "account")
 
-  " All withdraw (remove liquidity) events occurred in this pool "
-  withdraws: [Withdraw!]! @derivedFrom(field: "pool")
+  " All withdraw (remove liquidity) events occurred in this account "
+  withdraws: [Withdraw!]! @derivedFrom(field: "account")
 
-  " All Position events occurred in this pool "
-  positions: [Position!]! @derivedFrom(field: "pool")
+  " All Position events occurred in this account "
+  positions: [Position!]! @derivedFrom(field: "account")
 
 }
 
@@ -1261,8 +1261,6 @@ type ActiveAccount @entity{
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: Bytes!
 
-  hourlyActiveUsers: Int!
-  dailyActiveUsers: Int!
 }
 
 #positional data for each account. Can be used to build expiry dates and strike price positions
