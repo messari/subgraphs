@@ -97,7 +97,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.11",
+          "subgraph": "1.2.12",
           "methodology": "1.0.0"
         },
         "files": {
