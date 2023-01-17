@@ -718,7 +718,7 @@ type LiquidityPool @entity{
   " All withdraw (remove liquidity) events occurred in this pool "
   withdraws: [Withdraw!]! @derivedFrom(field: "pool")
 
-  " All trade (swap) events occurred in this pool "
+  " All Position events occurred in this pool "
   positions: [Position!]! @derivedFrom(field: "pool")
 }
 
@@ -1149,7 +1149,7 @@ type Deposit implements Event @entity (immutable: true){
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity{
+type Withdraw implements Event @entity (immutable: true){
   " withdraw-{ Transaction hash }-{ Log index }"
   id: Bytes!
 
@@ -1193,61 +1193,11 @@ type Withdraw implements Event @entity{
   pool: LiquidityPool!
 }
 
-type Swap implements Event @entity{
-  " swap-{ Transaction hash }-{ Log index } "
-  id: Bytes!
-
-  " Transaction hash of the transaction that emitted this event "
-  hash: String!
-
-  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
-
-  " The protocol this transaction belongs to "
-  protocol: DerivOptProtocol!
-
-  " Address that received the tokens "
-  to: String!
-
-  " Address that sent the tokens "
-  from: String!
-
-  " Block number of this event "
-  blockNumber: BigInt!
-
-  " Timestamp of this event "
-  timestamp: BigInt!
-
-  " Token deposited into pool "
-  tokenIn: Token!
-
-  " Amount of token deposited into pool in native units "
-  amountIn: BigInt!
-
-  " Amount of token deposited into pool in USD "
-  amountInUSD: BigDecimal!
-
-  " Token withdrawn from pool "
-  tokenOut: Token!
-
-  " Amount of token withdrawn from pool in native units "
-  amountOut: BigInt!
-
-  " Amount of token withdrawn from pool in USD "
-  amountOutUSD: BigDecimal!
-
-  " The pool involving this transaction "
-  pool: LiquidityPool!
-}
-
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
 type Account @entity{
   " Address of the account "
   id: Bytes!
-
-  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
-  cumulativeSupplySideRevenueUSD: BigDecimal!
 
     " All premium paid to enter a position. "
   cumulativeEntryPremiumUSD: BigDecimal!
@@ -1294,6 +1244,15 @@ type Account @entity{
  " Total number of contracts exercised+expired "
   contractsClosedCount: Int!
 
+  " All deposit (add liquidity) events occurred in this pool "
+  deposits: [Deposit!]! @derivedFrom(field: "pool")
+
+  " All withdraw (remove liquidity) events occurred in this pool "
+  withdraws: [Withdraw!]! @derivedFrom(field: "pool")
+
+  " All Position events occurred in this pool "
+  positions: [Position!]! @derivedFrom(field: "pool")
+
 }
 
 
@@ -1302,7 +1261,7 @@ type ActiveAccount @entity{
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: Bytes!
 
-   hourlyActiveUsers: Int!
+  hourlyActiveUsers: Int!
   dailyActiveUsers: Int!
 }
 
