@@ -20,6 +20,8 @@ export const schemaMapping: { [x: string]: any } = {
   "yield-aggregator": "vaults",
   "lending": "lending",
   "generic": "generic",
+  "bridge": "bridge",
+  "bridges": "bridge",
   "EXCHANGES": "exchanges",
   "VAULTS": "vaults",
   "DEX-AMM": "exchanges",
@@ -28,6 +30,9 @@ export const schemaMapping: { [x: string]: any } = {
   "GENERIC": "generic",
   "EXCHANGE": "exchanges",
   "YIELD": "vaults",
+  "BRIDGE": "bridge",
+  "BRIDGES": "bridge"
+
 }
 
 export function toDate(timestamp: number, hour: boolean = false) {
@@ -41,9 +46,9 @@ export function toDate(timestamp: number, hour: boolean = false) {
 export function toUnitsSinceEpoch(dateStr: string, hour: boolean) {
   const timestamp = moment.utc(dateStr).unix();
   if (hour) {
-    return (timestamp / 3600).toFixed(0);
+    return Math.round(timestamp / 3600).toString();
   }
-  return (timestamp / 86400).toFixed(0);
+  return Math.round(timestamp / 86400).toString();
 };
 
 export function isValidHttpUrl(s: string) {
