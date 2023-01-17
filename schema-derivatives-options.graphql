@@ -183,6 +183,12 @@ interface Protocol {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+    " Number of cumulative unique LPs "
+  cumulativeUniqueLP: Int!
+
+    " Number of cumulative unique Takers "
+  cumulativeUniqueTakers: Int!
+
    " Total number of open positions "
   openPositionCount: Int!
 
@@ -301,6 +307,12 @@ type DerivOptProtocol implements Protocol @entity{
 
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
+
+    " Number of cumulative unique LPs "
+  cumulativeUniqueLP: Int!
+
+    " Number of cumulative unique Takers "
+  cumulativeUniqueTakers: Int!
 
   " Total number of pools "
   totalPoolCount: Int!
@@ -431,7 +443,6 @@ type FinancialsDailySnapshot @entity(immutable: true) {
 
    " All historical notional volume in USD taken of underlying at time of contract closed but not exercised"
   cumulativeClosedVolumeUSD: BigDecimal!
-  
 
   " Daily revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   dailySupplySideRevenueUSD: BigDecimal!
@@ -488,55 +499,55 @@ type FinancialsDailySnapshot @entity(immutable: true) {
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
 
 " Daily number of puts minted "
-  dailyputsMintedCount: Int!
+  dailyPutsMintedCount: Int!
 
   " Total number of puts minted "
   putsMintedCount: Int!
 
  " Daily number of calls minted "
-  dailycallsMintedCount: Int!
+  dailyCallsMintedCount: Int!
 
  " Total number of calls minted "
   callsMintedCount: Int!
 
  " Daily number of contracts minted "
-  dailycontractsMintedCount: Int!
+  dailyContractsMintedCount: Int!
 
  " Total number of contracts minted "
   contractsMintedCount: Int!
 
   " Daily number of contracts taken "
-  dailycontractsTakenCount: Int!
+  dailyContractsTakenCount: Int!
 
   " Total number of contracts taken "
   contractsTakenCount: Int!
 
  " Daily number of contracts expired "
-  dailycontractsExpiredCount: Int!
+  dailyContractsExpiredCount: Int!
 
  " Total number of contracts expired "
   contractsExpiredCount: Int!
  
  " Daily number of contracts exercised "
-  dailycontractsExercisedCount: Int!
+  dailyContractsExercisedCount: Int!
  
   " Total number of contracts exercised "
   contractsExercisedCount: Int!
  
  " Daily number of contracts exercised+expired "
-  dailycontractsClosedCount: Int!
+  dailyContractsClosedCount: Int!
 
  " Total number of contracts exercised+expired "
   contractsClosedCount: Int!
 
   " Daily number of open positions (minted-closed positions) "
-  dailyopenPositionCount: Int!
+  dailyOpenPositionCount: Int!
 
   " Total number of open positions (minted-closed positions) "
   openPositionCount: Int!
 
   " Daily number of closed positions "
-  dailyclosedPositionCount: Int!
+  dailyClosedPositionCount: Int!
 
   " Total number of closed positions "
   closedPositionCount: Int!
@@ -572,9 +583,6 @@ type LiquidityPool @entity{
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 
-  " Token that is locked in contracts issued and represent underlying of contracts taken "
-  ContractToken: Token
-
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
@@ -583,9 +591,6 @@ type LiquidityPool @entity{
 
   " Name of oracle source (e.g. chainlink, uniswap, pyth) "
   oracle: string
-
-  " Whether this pool is single-sided (e.g. Bancor, Platypus's Alternative Pool). The specifics of the implementation depends on the protocol. "
-  isSingleSided: Boolean!
 
   " Creation timestamp "
   createdTimestamp: BigInt!
