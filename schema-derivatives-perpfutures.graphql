@@ -643,10 +643,7 @@ type LiquidityPool @entity {
 
   " Name of oracle source (e.g. chainlink, uniswap, pyth) "
   oracle: string
-
-  " Whether this pool is single-sided (e.g. Bancor, Platypus's Alternative Pool). The specifics of the implementation depends on the protocol. "
-  isSingleSided: Boolean!
-
+  
   " Creation timestamp "
   createdTimestamp: BigInt!
 
