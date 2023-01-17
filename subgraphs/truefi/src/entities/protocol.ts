@@ -60,7 +60,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.rewardTokenEmissionsUSD = BIGDECIMAL_ZERO;
   }
 
-  protocol.schemaVersion = Versions.getSubgraphVersion();
+  protocol.schemaVersion = Versions.getSchemaVersion();
   protocol.subgraphVersion = Versions.getSubgraphVersion();
   protocol.methodologyVersion = Versions.getMethodologyVersion();
 
