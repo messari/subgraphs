@@ -95,6 +95,7 @@ export namespace ActivityType {
   export const DAILY = "DAILY";
   export const HOURLY = "HOURLY";
 }
+export type ActivityType = string;
 
 //////////////////////////////
 ///// Ethereum Addresses /////

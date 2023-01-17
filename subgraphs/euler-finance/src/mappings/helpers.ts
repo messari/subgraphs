@@ -510,8 +510,6 @@ export function snapshotFinancials(
 // update a given UsageMetricDailySnapshot
 export function updateUsageMetrics(event: ethereum.Event, from: Address, transaction: string): void {
   // Number of days since Unix epoch
-  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  const hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   const dailyMetrics = getOrCreateUsageDailySnapshot(event);
   const hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
 
@@ -525,43 +523,138 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   hourlyMetrics.timestamp = event.block.timestamp;
   hourlyMetrics.hourlyTransactionCount += 1;
 
-  const accountId = from.toHexString();
-  let account = Account.load(accountId);
   const protocol = getOrCreateLendingProtocol();
+  const account = getOrCreateAccount(from, protocol);
   dailyMetrics.totalPoolCount = protocol.totalPoolCount;
-  if (!account) {
-    account = new Account(accountId);
-    account.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
   hourlyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   dailyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  // Combine the id and the user address to generate a unique user id for the day
-  const dailyActiveAccountId = ActivityType.DAILY + "-" + from.toHexString() + "-" + id.toString();
-  let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
-  if (!dailyActiveAccount) {
-    dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
-    dailyActiveAccount.save();
+  if (isNewAccountActivity(ActivityType.DAILY, null, account, event.block.timestamp)) {
     dailyMetrics.dailyActiveUsers += 1;
   }
-
-  // create active account for hourlyMetrics
-  const hourlyActiveAccountId = ActivityType.HOURLY + "-" + from.toHexString() + "-" + hour.toString();
-  let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
-  if (!hourlyActiveAccount) {
-    hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
-    hourlyActiveAccount.save();
+  if (isNewAccountActivity(ActivityType.HOURLY, null, account, event.block.timestamp)) {
     hourlyMetrics.hourlyActiveUsers += 1;
+  }
+  if (isNewAccountActivity(ActivityType.DAILY, transaction, account, event.block.timestamp)) {
+    updateDailyTransactionMetrics(dailyMetrics, transaction, false);
+  }
+  if (transaction == TransactionType.LIQUIDATE) {
+    const liq = event as Liquidation;
+    if (
+      isNewAccountActivity(
+        ActivityType.DAILY,
+        transaction,
+        getOrCreateAccount(liq.params.violator, protocol),
+        event.block.timestamp,
+      )
+    ) {
+      updateDailyTransactionMetrics(dailyMetrics, transaction, true);
+    }
   }
 
   // update transaction for daily/hourly metrics
   updateTransactionCount(dailyMetrics, hourlyMetrics, transaction);
+  updateAccountMetrics(protocol, account, transaction, event);
 
   hourlyMetrics.save();
   dailyMetrics.save();
+}
+
+function updateDailyTransactionMetrics(
+  dailyMetrics: UsageMetricsDailySnapshot,
+  transaction: string,
+  updateLiquidatee: boolean = false,
+): void {
+  if (transaction == TransactionType.DEPOSIT) {
+    dailyMetrics.dailyActiveDepositors += 1;
+  }
+  if (transaction == TransactionType.BORROW) {
+    dailyMetrics.dailyActiveBorrowers += 1;
+  }
+  if (transaction == TransactionType.LIQUIDATE) {
+    if (updateLiquidatee) {
+      dailyMetrics.dailyActiveLiquidatees += 1;
+    } else {
+      dailyMetrics.dailyActiveLiquidators += 1;
+    }
+  }
+}
+
+function isNewAccountActivity(
+  actitityType: ActivityType,
+  transaction: string | null,
+  account: Account,
+  timestamp: BigInt,
+): boolean {
+  let period: i64;
+  if (actitityType == ActivityType.DAILY) {
+    period = timestamp.toI64() / SECONDS_PER_DAY;
+  } else {
+    period = timestamp.toI64() / SECONDS_PER_HOUR;
+  }
+
+  const id = actitityType + "-" + (transaction ? transaction + "-" : "") + account.id + "-" + period.toString();
+  const activeAccount = ActiveAccount.load(id);
+  if (activeAccount) {
+    return false;
+  }
+
+  new ActiveAccount(id).save();
+  return true;
+}
+
+function getOrCreateAccount(address: Address, protocol: LendingProtocol): Account {
+  const accountId = address.toHexString();
+  let account = Account.load(accountId);
+  if (account) {
+    return account;
+  }
+
+  account = new Account(accountId);
+  account.save();
+
+  protocol.cumulativeUniqueUsers += 1;
+  protocol.save();
+  return account;
+}
+
+// updateAccountMetrics will update the protocol counters for cumulative user types,
+// the account counters for transaction types,
+function updateAccountMetrics(
+  protocol: LendingProtocol,
+  account: Account,
+  transaction: string,
+  event: ethereum.Event,
+): void {
+  if (transaction == TransactionType.DEPOSIT) {
+    account.depositCount += 1;
+    if (account.depositCount == 1) {
+      protocol.cumulativeUniqueDepositors += 1;
+    }
+  } else if (transaction == TransactionType.WITHDRAW) {
+    account.withdrawCount += 1;
+  } else if (transaction == TransactionType.BORROW) {
+    account.borrowCount += 1;
+    if (account.borrowCount == 1) {
+      protocol.cumulativeUniqueBorrowers += 1;
+    }
+  } else if (transaction == TransactionType.REPAY) {
+    account.repayCount += 1;
+  } else if (transaction == TransactionType.LIQUIDATE) {
+    const liq = event as Liquidation;
+    const liquidator = getOrCreateAccount(liq.params.liquidator, protocol);
+    const liquidatee = getOrCreateAccount(liq.params.violator, protocol);
+    liquidator.liquidateCount += 1;
+    liquidatee.liquidationCount += 1;
+    if (liquidator.liquidateCount == 1) {
+      protocol.cumulativeUniqueLiquidators += 1;
+    }
+    if (liquidatee.liquidationCount == 1) {
+      protocol.cumulativeUniqueLiquidatees += 1;
+    }
+  }
+  account.save();
+  protocol.save();
 }
 
 // update MarketDailySnapshot & MarketHourlySnapshot
