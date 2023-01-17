@@ -36,7 +36,7 @@ enum ProtocolType {
   # Will add more
 }
 
-type Token @entity (mutable: true) {
+type Token @entity{
   " Smart contract address of the token "
   id: Bytes!
 
@@ -108,7 +108,7 @@ enum LiquidityPoolFeeType {
   WITHDRAWAL_FEE
 }
 
-type LiquidityPoolFee @entity(mutable: true) {
+type LiquidityPoolFee @entity{
   " { Fee type }-{ Pool address } "
   id: Bytes!
 
@@ -206,7 +206,7 @@ interface Protocol {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
-type DerivOptProtocol implements Protocol @entity(mutable: true) {
+type DerivOptProtocol implements Protocol @entity{
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: Bytes!
 
@@ -423,17 +423,6 @@ type FinancialsDailySnapshot @entity(immutable: true) {
   " All historical notional volume in USD taken of underlying at time of contract exercise"
   cumulativeExercisedVolumeUSD: BigDecimal!
   
-  " Daily Inflow trade Notional volume in USD "
-  dailyInflowVolumeUSD: BigDecimal!
-
-  " Inflow historical trade Notional volume in USD "
-  cumulativeInflowVolumeUSD: BigDecimal!
-  
-  " Daily Outflow trade Notional volume in USD "
-  dailyOutflowVolumeUSD: BigDecimal!
-
-  " Outflow historical trade Notional volume in USD "
-  cumulativeOutflowVolumeUSD: BigDecimal!
 
   " Daily revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   dailySupplySideRevenueUSD: BigDecimal!
@@ -555,7 +544,7 @@ type FinancialsDailySnapshot @entity(immutable: true) {
 ##### Pool-Level Metadata #####
 ###############################
 
-type LiquidityPool @entity(mutable: true) {
+type LiquidityPool @entity{
   " Smart contract address of the pool "
   id: Bytes!
 
@@ -573,6 +562,9 @@ type LiquidityPool @entity(mutable: true) {
 
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
+
+  " Token that is locked in contracts issued and represent underlying of contracts taken "
+  ContractToken: Token
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
@@ -1070,7 +1062,7 @@ interface Event {
 }
 
 
-type Deposit implements Event @entity(mutable: true) {
+type Deposit implements Event @entity{
   " deposit-{ Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1114,7 +1106,7 @@ type Deposit implements Event @entity(mutable: true) {
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity(mutable: true) {
+type Withdraw implements Event @entity{
   " withdraw-{ Transaction hash }-{ Log index }"
   id: Bytes!
 
@@ -1158,7 +1150,7 @@ type Withdraw implements Event @entity(mutable: true) {
   pool: LiquidityPool!
 }
 
-type Swap implements Event @entity(mutable: true){
+type Swap implements Event @entity{
   " swap-{ Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1207,7 +1199,7 @@ type Swap implements Event @entity(mutable: true){
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-type Account @entity(mutable: true) {
+type Account @entity{
   " Address of the account "
   id: Bytes!
 
@@ -1263,7 +1255,7 @@ type Account @entity(mutable: true) {
 
 
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity(mutable: true) {
+type ActiveAccount @entity{
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: Bytes!
 
@@ -1272,80 +1264,36 @@ type ActiveAccount @entity(mutable: true) {
 }
 
 #positional data for each account. Can be used to build expiry dates and strike price positions
-type position @entity(mutable: true) {
-  " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
+type Contract @entity {
   id: Bytes!
-
-" Account that owns this position "
-  account: Account!
-
-  " The market in which this position was opened "
-  market: Market!
-
-  " The asset in which this position was opened with "
+  pool: LiquidityPool!
   asset: Token!
-
-  " The hash of the transaction that opened this position "
   hashOpened: Bytes!
+  mintedBlockNumber: BigInt!
+  mintedTimestamp: BigInt!
+  expirationTimestamp: BigInt
+  expirationBlockNumber: BigInt
+  positions: [Position] @derivedFrom("contract")
+}
 
-  " The hash of the transaction that closed this position "
-  hashClosed: Bytes
-
-  " Block number of when the position was opened "
-  blockNumberOpened: BigInt!
-
-  " Timestamp when the position was opened "
-  timestampOpened: BigInt!
-
-  " Block number of when the position was closed (0 if still open) "
-  blockNumberClosed: BigInt
-
-  " Timestamp when the position was closed (0 if still open) "
-  timestampClosed: BigInt
-
-  " Side of the position (either LP or trader) "
-  side: PositionSide!
-
-  " Token balance in this position, in native amounts "
-  balance: BigInt!
-
-  " Number of deposits related to this position "
-  depositCount: Int!
-
-  " All deposit events of this position "
-  deposits: [Deposit!]! @derivedFrom(field: "position")
-
-  " Number of withdrawals related to this position "
-  withdrawCount: Int!
-
-  " All withdraw events of this position "
-  withdraws: [Withdraw!]! @derivedFrom(field: "position")
-
-  " Number of calls related to this position  "
-  callCount: Int
-
-  " Call event related to this position "
-  call: [Call] @derivedFrom(field: "position")
-
-  " Number of put related to this position  "
-  putCount: Int
-
-  " Short put related to this position "
-  put: [put] @derivedFrom(field: "position")
- 
-  "Expiry date related to this position"
-  contractDate: Int!
-
-  "Number of contracts expiring for each date"
-  date: [date!]! @derivedFrom(field: "position")
-
-  "Price point repated to this position"
-  contractPrice: Int!
-
-  "Number of contracts for each price point"
-  price: [price!]! @derivedFrom(field: "position")
-  
-  " Position daily snapshots for open positions "
-  snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
+type Position @entity {
+  id: Bytes!
+  contract: Bytes!
+  takenBlockNumber: BigInt!
+  takenTimestamp: BigInt!
+  strikePrice: BigDecimal!
+  takenPrice: BigDecimal! // price of the underlying asset at the time the option is taken
+  exercisedPrice: BigDecimal!
+  account: Account!
+  premium: BigInt! // is the premium always paid in the underlying asset? or can it be in some other asset?
+  premiumUSD: BigDecimal!
+  amount: BigInt!
+  amountUSD: BigDecimal! // underlying amount at the time the option was taken
+  type: OptionType! // put/call
+  exercisedTimestamp: BigInt
+  exercisedBlockNumber: BigInt
+  closedTimestamp: BigInt
+  closedBlockNumber: BigInt
+  closePremium: BigInt
 }
 

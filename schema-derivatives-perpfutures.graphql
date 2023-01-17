@@ -1115,7 +1115,7 @@ interface Event {
   timestamp: BigInt!
 }
 
-type Deposit implements Event @entity(mutable: true) {
+type Deposit implements Event @entity{
   " deposit-{ Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1159,7 +1159,7 @@ type Deposit implements Event @entity(mutable: true) {
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity(mutable: true) {
+type Withdraw implements Event @entity{
   " withdraw-{ Transaction hash }-{ Log index }"
   id: Bytes!
 
@@ -1203,7 +1203,7 @@ type Withdraw implements Event @entity(mutable: true) {
   pool: LiquidityPool!
 }
 
-type Swap implements Event @entity(mutable: true) {
+type Swap implements Event @entity{
   " swap-{ Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1252,7 +1252,7 @@ type Swap implements Event @entity(mutable: true) {
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-type Account @entity(mutable: true) {
+type Account @entity{
   " Address of the account "
   id: Bytes!
 
@@ -1296,7 +1296,7 @@ type Account @entity(mutable: true) {
 
 
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity(mutable: true) {
+type ActiveAccount @entity{
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: Bytes!
 
