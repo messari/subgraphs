@@ -1,0 +1,12 @@
+{
+  "network": "mainnet",
+  "ethereum": {
+    "bridgeAddress": "0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1",
+    "bridgeStartBlock": 12686786,
+    "messengerAddress": "0x25ace71c97b33cc4729cf772ae268934f7ab5fa1",
+    "messengerStartBlock": 12686757
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

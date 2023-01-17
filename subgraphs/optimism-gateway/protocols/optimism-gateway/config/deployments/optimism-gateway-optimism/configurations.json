@@ -1,0 +1,12 @@
+{
+  "network": "optimism",
+  "optimism": {
+    "bridgeAddress": "0x4200000000000000000000000000000000000010",
+    "bridgeStartBlock": 0,
+    "messengerAddress": "0x4200000000000000000000000000000000000007",
+    "messengerStartBlock": 0
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

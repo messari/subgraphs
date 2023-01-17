@@ -1,0 +1,17 @@
+import { Network } from "./sdk/util/constants";
+
+export const ETH_ADDRESS_OPTIMISM =
+  "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000";
+
+export const WETH_ADDRESS_OPTIMISM =
+  "0x4200000000000000000000000000000000000006";
+
+export const BRIDGE_ADDRESS = new Map<string, string>();
+BRIDGE_ADDRESS.set(
+  Network.MAINNET,
+  "0x99C9fc46f92E8a1c0deC1b1747d010903E884bE1"
+);
+BRIDGE_ADDRESS.set(
+  Network.OPTIMISM,
+  "0x4200000000000000000000000000000000000010"
+);
