@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Tooltip, Typography } from "@mui/material";
+import { Box, Grid, Tooltip, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
@@ -18,28 +18,30 @@ function addDataPoint(
   id: string,
 ): { [x: string]: any } {
   dataFields[fieldName].push({ value: value, date: Number(timestamp) });
-  if (dataFieldMetrics[fieldName].sum === null) {
-    dataFieldMetrics[fieldName].sum = 0;
-  }
-  dataFieldMetrics[fieldName].sum += value;
+  if (!!dataFieldMetrics[fieldName]) {
+    if (!dataFieldMetrics[fieldName]?.sum) {
+      dataFieldMetrics[fieldName].sum = 0;
+    }
+    dataFieldMetrics[fieldName].sum += value;
 
-  if (fieldName.includes("umulative")) {
-    if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
-      dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
+    if (fieldName.includes("umulative")) {
+      if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
+        dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
+      }
+      if (value < dataFieldMetrics[fieldName].cumulative.prevVal) {
+        dataFieldMetrics[fieldName].cumulative.hasLowered = id;
+      }
+      dataFieldMetrics[fieldName].cumulative.prevVal = value;
     }
-    if (value < dataFieldMetrics[fieldName].cumulative.prevVal) {
-      dataFieldMetrics[fieldName].cumulative.hasLowered = id;
+    if (fieldName.includes("umulative")) {
+      if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
+        dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
+      }
+      if (Number(value) < dataFieldMetrics[fieldName].cumulative.prevVal) {
+        dataFieldMetrics[fieldName].cumulative.hasLowered = id;
+      }
+      dataFieldMetrics[fieldName].cumulative.prevVal = Number(value);
     }
-    dataFieldMetrics[fieldName].cumulative.prevVal = value;
-  }
-  if (fieldName.includes("umulative")) {
-    if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
-      dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
-    }
-    if (Number(value) < dataFieldMetrics[fieldName].cumulative.prevVal) {
-      dataFieldMetrics[fieldName].cumulative.hasLowered = id;
-    }
-    dataFieldMetrics[fieldName].cumulative.prevVal = Number(value);
   }
   return {
     currentEntityField: dataFields[fieldName],
@@ -55,6 +57,7 @@ interface PoolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   entitySpecificElements: any;
   overlayPoolTimeseriesData: any;
+  overlayPoolTimeseriesLoading: boolean;
   poolId: string;
   protocolData: { [x: string]: any };
   setIssues: React.Dispatch<{ [x: string]: { message: string; type: string; level: string; fieldName: string }[] }>;
@@ -69,6 +72,7 @@ function PoolTabEntity({
   entitiesData,
   entitySpecificElements,
   overlayPoolTimeseriesData,
+  overlayPoolTimeseriesLoading,
   poolId,
   protocolData,
   setIssues,
@@ -333,7 +337,7 @@ function PoolTabEntity({
               }
 
               if (value || value === 0) {
-                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT")) {
+                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT") || capsFieldName.includes("SUPPLYSIDETOKENAMOUNTS") || capsFieldName.includes("VOLUMETOKENAMOUNTS")) {
                   // convert the value with decimals for certain fields
                   value = convertTokenDecimals(val, data[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
                 }
@@ -548,7 +552,7 @@ function PoolTabEntity({
               }
             });
             continue;
-          } else if (Array.isArray(currentOverlayInstanceField)) {
+          } else if (Array.isArray(currentOverlayInstanceField) && overlayData) {
             // If the instance field overlayData is an array, extrapolate this array into multiple keys (one for each element of the array)
             currentOverlayInstanceField.forEach((val: any, arrayIndex: number) => {
               // Determine the name/label/id of each element to be separated out of the array
@@ -586,7 +590,7 @@ function PoolTabEntity({
               }
 
               if (value || value === 0) {
-                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT")) {
+                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT") || capsFieldName.includes("SUPPLYSIDETOKENAMOUNTS") || capsFieldName.includes("VOLUMETOKENAMOUNTS")) {
                   // convert the value with decimals for certain fields
                   value = convertTokenDecimals(val, overlayData[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
                 }
@@ -729,20 +733,8 @@ function PoolTabEntity({
 
     const fieldsList = Object.keys(dataFields);
 
-    const ratesChart: { [x: string]: any } = {};
     const rewardChart: { [x: string]: any } = {};
-    const tokenWeightData: { [name: string]: any[] } = {};
     Object.keys(dataFields).forEach((field: string) => {
-      // consolidate tokenweight fields
-      if (field.toUpperCase().includes("TOKENWEIGHTS")) {
-        const fieldName = field.split(" [")[0];
-        if (!tokenWeightData[fieldName]) {
-          tokenWeightData[fieldName] = [];
-        }
-        tokenWeightData[fieldName].push(dataFields[field]);
-        delete dataFields[field];
-      }
-
       // Push the Reward APR fields to the bottom of the charts section
       if (field.toUpperCase().includes("REWARDAPR") && dataFields[field].length > 0) {
         if ((field.toUpperCase() === "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length === 1) || (field.toUpperCase() !== "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length > 0)) {
@@ -750,35 +742,10 @@ function PoolTabEntity({
           delete dataFields[field];
         }
       }
-
-      // separate all of the rates fields to the ratesChart object
       if (field.toUpperCase().includes("RATES")) {
-        ratesChart[field] = dataFields[field];
         delete dataFields[field];
       }
     });
-
-    if (Object.keys(tokenWeightData)?.length > 0) {
-      tokenWeightData.inputTokenWeights[0].forEach((val: any, idx: number) => {
-        // Looping through all instances of inputToken 0
-        let totalWeightAtIdx = val?.value;
-        for (let i = 1; i < tokenWeightData.inputTokenWeights?.length; i++) {
-          totalWeightAtIdx += tokenWeightData.inputTokenWeights[i][idx]?.value;
-        }
-        if (totalWeightAtIdx > 50) {
-          // If weights are greater than 50, its assumed that the value is denominated out of 100 rather than 1
-          totalWeightAtIdx = totalWeightAtIdx / 100;
-        }
-        if (
-          Math.abs(1 - totalWeightAtIdx) > .01 &&
-          issues.filter((x) => x.fieldName === entityName + "-inputTokenWeights").length === 0
-        ) {
-          const fieldName = entityName + "-inputTokenWeights";
-          const date = toDate(val.date);
-          issues.push({ type: "VAL", level: "error", fieldName, message: entityName + "-inputTokenWeights on " + date + " add up to " + totalWeightAtIdx + '%, which is more than 1% off of 100%. The inputTokenWeights across all tokens should add up to 100% at any given point.' });
-        }
-      })
-    }
 
     // The rewardAPRElement logic is used to take all of the rewardAPR and display their lines on one graph
     let rewardAPRElement = null;
@@ -796,7 +763,7 @@ function PoolTabEntity({
         if (!date) {
           continue;
         }
-        tableVals.push({ value: [], date });
+        const valArr: string[] = [];
         Object.keys(rewardChart).forEach((reward: any, idx: number) => {
           if (!(fieldsList.filter((x) => x.includes(reward))?.length > 1)) {
             if (
@@ -816,9 +783,10 @@ function PoolTabEntity({
               elementVal = 0;
             }
             elementVal = elementVal?.toFixed(2);
-            tableVals[x]?.value.push(`${symbol}[${idx}]: ${elementVal}`);
+            valArr.push(`${symbol}[${idx}]: ${elementVal}%`);
           }
         });
+        tableVals.push({ value: valArr.join(', '), date });
       }
       Object.keys(rewardChart).forEach((reward: any, idx: number) => {
         const currentRewardToken: { [x: string]: string } = data[poolKeySingular].rewardTokens[idx]?.token;
@@ -831,64 +799,61 @@ function PoolTabEntity({
         rewardAPRElement = null;
       } else {
         rewardAPRElement = (
-          <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+          <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} isStringField={true} />
         );
       }
     }
 
     // The ratesElement logic is used to take all of the rates and display their lines on one graph
     let ratesElement = null;
-    if (Object.keys(ratesChart).length > 0) {
-      const elementId = entityName + "-rates";
-      const tableVals: { value: any; date: any }[] = [];
-      const firstKey = Object.keys(ratesChart)[0];
-      const amountOfInstances = ratesChart[Object.keys(ratesChart)[0]].length;
-      for (let x = 0; x < amountOfInstances; x++) {
-        tableVals.push({ value: [], date: ratesChart[firstKey][x].date });
-        Object.keys(ratesChart).forEach((rate: any, idx: number) => {
-          tableVals[x].value.push(`[${idx}]: ${ratesChart[rate][x].value.toFixed(3)}`);
-        });
-      }
-      Object.keys(ratesChart).forEach((rate: any, idx: number) => {
-        if (
-          dataFieldMetrics[rate].sum === 0 &&
-          issues.filter((x) => x.fieldName === entityName + "-" + rate).length === 0
-        ) {
-          issues.push({ type: "SUM", level: "error", fieldName: entityName + "-" + rate, message: "" });
-        }
-        const currentRate = data[poolKeySingular].rates[idx];
-        if (currentRate?.side) {
-          const val = ratesChart[rate];
-          ratesChart[`${currentRate?.side}-${currentRate?.type} [${idx}]`] = val;
-          delete ratesChart[rate];
+    if (entitySpecificElements['rates']) {
+      ratesElement = <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={"rates"} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={entitySpecificElements['rates']["tableData"]} dataChart={entitySpecificElements['rates']['dataChart']} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} isStringField={true} />
+      entitySpecificElements['rates']?.['issues']?.forEach((iss: any) => {
+        if (issues.filter((x) => x.fieldName === iss).length === 0) {
+          issues.push({ type: "SUM", level: "error", fieldName: iss, message: "" });
         }
       });
-      ratesElement = (
-        <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
-      );
     }
 
     let tokenWeightComponent = null;
-    if (Object.keys(tokenWeightData).length > 0) {
-      tokenWeightComponent = Object.keys(tokenWeightData).map((tokenWeightFieldName) => {
-        const currentTokenWeightArray = tokenWeightData[tokenWeightFieldName];
-        return (
-          <div key={entityName + "-" + tokenWeightFieldName} id={entityName + "-" + tokenWeightFieldName}>
-            <Box mt={3} mb={1}>
-              <CopyLinkToClipboard link={window.location.href} scrollId={entityName + "-" + tokenWeightFieldName}>
-                <Typography variant="h6">{entityName + "-" + tokenWeightFieldName}</Typography>
-              </CopyLinkToClipboard>
-            </Box>
-            <Grid container>
-              <StackedChart
-                tokens={data[poolKeySingular].inputTokens}
-                tokenWeightsArray={currentTokenWeightArray}
-                poolTitle={entityName + "-" + tokenWeightFieldName}
-              />
-            </Grid>
-          </div>
-        );
-      });
+    if (entitySpecificElements['inputTokenWeights']) {
+      entitySpecificElements['inputTokenWeights'][0].forEach((val: any, idx: number) => {
+        // Looping through all instances of inputToken 0
+        let totalWeightAtIdx = val?.value;
+        for (let i = 1; i < entitySpecificElements['inputTokenWeights']?.length; i++) {
+          totalWeightAtIdx += entitySpecificElements['inputTokenWeights'][i][idx]?.value;
+        }
+        if (totalWeightAtIdx > 50) {
+          // If weights are greater than 50, its assumed that the value is denominated out of 100 rather than 1
+          totalWeightAtIdx = totalWeightAtIdx / 100;
+        }
+        if (
+          Math.abs(1 - totalWeightAtIdx) > .01 &&
+          issues.filter((x) => x.fieldName === entityName + "-inputTokenWeights").length === 0
+        ) {
+          const fieldName = entityName + "-inputTokenWeights";
+          const date = toDate(val.date);
+          issues.push({ type: "VAL", level: "error", fieldName, message: entityName + "-inputTokenWeights on " + date + " add up to " + totalWeightAtIdx + '%, which is more than 1% off of 100%. The inputTokenWeights across all tokens should add up to 100% at any given point.' });
+        }
+      })
+      const tokenWeightFieldName = 'inputTokenWeights';
+      tokenWeightComponent = (
+        <div key={entityName + "-" + tokenWeightFieldName} id={entityName + "-" + tokenWeightFieldName}>
+          <Box mt={3} mb={1}>
+            <CopyLinkToClipboard link={window.location.href} scrollId={entityName + "-" + tokenWeightFieldName}>
+              <Typography variant="h6">{entityName + "-" + tokenWeightFieldName}</Typography>
+            </CopyLinkToClipboard>
+          </Box>
+          <Grid container>
+            <StackedChart
+              tokens={data[poolKeySingular].inputTokens}
+              tokenWeightsArray={entitySpecificElements['inputTokenWeights']}
+              poolTitle={entityName + "-" + tokenWeightFieldName}
+            />
+          </Grid>
+        </div>
+      );
+      delete entitySpecificElements['inputTokenWeights'];
     }
 
     const rewardTokensLength = data[poolKeySingular]?.rewardTokens?.length;
@@ -1033,7 +998,6 @@ function PoolTabEntity({
         }
       }
 
-
       delete instanceToSave.rewardTokenEmissionsAmount;
       delete instanceToSave.rewardTokenEmissionsUSD;
       delete instanceToSave.inputTokenBalances;
@@ -1047,7 +1011,9 @@ function PoolTabEntity({
     }).sort((a: any, b: any) => (Number(a.timestamp) - Number(b.timestamp)));
 
     Object.keys(entitySpecificElements).forEach((eleName: string) => {
-      dataFields[eleName] = entitySpecificElements[eleName];
+      if (!Object.keys(entitySpecificElements[eleName])?.includes('dataChart') && !!entitySpecificElements[eleName]) {
+        dataFields[eleName] = entitySpecificElements[eleName];
+      }
     })
 
     const charts = Object.keys(dataFields).map((field: string) => {
@@ -1207,9 +1173,9 @@ function PoolTabEntity({
         return null;
       }
       let dataChartToPass: any = dataFields[field];
-      let baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}`;
-      if (overlayDataFields[field]) {
-        const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network || ""}-${overlayData?.protocols[0]?.subgraphVersion}`;
+      let baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}-${field}`;
+      if (overlayDataFields[field]?.length > 0) {
+        const overlayKey = `${overlayData?.protocols[0]?.name || "overlay"}-${overlayData?.protocols[0]?.network || "network"}-${overlayData?.protocols[0]?.subgraphVersion || "v0.0.0"}`;
         let keyDiff = "";
         if (baseKey === overlayKey) {
           keyDiff = ' (Overlay)';
@@ -1228,7 +1194,8 @@ function PoolTabEntity({
           dataTable={dataFields[field]}
           dataChart={dataChartToPass}
           chartsImageFiles={chartsImageFiles}
-          setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+          setChartsImageFiles={(x: any) => setChartsImageFiles(x)}
+          isStringField={false} />
       );
     })
 

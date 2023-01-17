@@ -1209,7 +1209,7 @@
     "deployments": {
       "biswap-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.0.2",
@@ -1709,6 +1709,10 @@
           "hosted-service": {
             "slug": "notional-finance-ethereum",
             "query-id": "notional-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "notional-finance-ethereum",
+            "query-id": "346UaR2Lgxg8yJ2Vq2r8wid1pWaYQNH6N1GmzGCJkHRV"
           }
         }
       }
@@ -1851,6 +1855,10 @@
           "hosted-service": {
             "slug": "compound-v3-ethereum",
             "query-id": "compound-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "compound-v3-ethereum",
+            "query-id": "6PaB6tKFqrL6YoAELEhFGU6Gc39cEynLbo6ETZMF3sCy"
           }
         }
       }
@@ -2231,6 +2239,10 @@
           "hosted-service": {
             "slug": "goldfinch-ethereum",
             "query-id": "goldfinch-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "goldfinch-ethereum",
+            "query-id": "Dtj2HicXKpoUjNB7ffdBkMwt3L9Sz3cbENd67AdHu6Vb"
           }
         }
       }
@@ -3283,8 +3295,8 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "schema": "3.0.3",
+          "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3305,8 +3317,8 @@
         "network": "celo",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "schema": "3.0.3",
+          "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3327,8 +3339,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "schema": "3.0.3",
+          "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3353,8 +3365,8 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "schema": "3.0.3",
+          "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3375,8 +3387,8 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "schema": "3.0.3",
+          "subgraph": "2.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3390,6 +3402,35 @@
           "hosted-service": {
             "slug": "uniswap-v3-polygon",
             "query-id": "uniswap-v3-polygon"
+          }
+        }
+      }
+    }
+  },
+  "osmosis-dex": {
+    "schema": "dex-amm",
+    "base": "osmosis-dex",
+    "protocol": "osmosis-dex",
+    "deployments": {
+      "osmosis-dex-osmosis": {
+        "network": "osmosis",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "osmosis.dex.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "osmosis-dex-osmosis",
+            "query-id": "osmosis-dex-osmosis"
           }
         }
       }

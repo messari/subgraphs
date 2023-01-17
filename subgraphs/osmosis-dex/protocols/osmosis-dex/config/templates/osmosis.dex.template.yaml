@@ -1,0 +1,16 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: cosmos
+    name: Osmosis
+    network: osmosis-1
+    source:
+      startBlock: 0
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      transactionHandlers:
+        - handler: handleTx
+      file: ./src/mappings/osmosis.ts

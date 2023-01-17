@@ -1,7 +1,9 @@
 {
   "network": "mainnet",
   "factoryAddress": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
-  "startBlock": 12369620,
+  "factoryAddressStartBlock": 12369620,
+  "nonFungiblePositionManagerAddress": "0xC36442b4a4522E871399CD717aBDD847Ab11FE88",
+  "nonFungiblePositionManagerAddressStartBlock": 12369650,
   "deployment": "UNISWAP_V3_ETHEREUM",
   "graftEnabled": false,
   "subgraphId": "Qmd4qCceZsR296FKmbZzysuKGoncScX1tdN1pn3MZFSvZa",

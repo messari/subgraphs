@@ -2,7 +2,6 @@ import {
   Bytes,
   BigDecimal,
   BigInt,
-  ethereum,
   Address,
   log,
 } from "@graphprotocol/graph-ts";
@@ -24,13 +23,17 @@ import {
   RewardTokenType,
 } from "../../util/constants";
 import { exponentToBigDecimal } from "../../util/numbers";
-import { sortArrayByReference, sortBytesArray, updateArrayAtIndex } from "../../util/arrays";
+import {
+  sortArrayByReference,
+  sortBytesArray,
+  updateArrayAtIndex,
+} from "../../util/arrays";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
-import { SDK } from ".";
+import { CustomEventType, SDK } from ".";
 
 type onCreatePoolCallback<T> = (
-  event: ethereum.Event,
+  event: CustomEventType,
   pool: Pool,
   sdk: SDK,
   aux: T | null

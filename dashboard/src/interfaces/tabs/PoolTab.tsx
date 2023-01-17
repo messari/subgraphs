@@ -18,6 +18,7 @@ interface PoolTabProps {
   poolTimeseriesError: any;
   poolTimeseriesLoading: any;
   overlayPoolTimeseriesData: any;
+  overlayPoolTimeseriesLoading: boolean;
   poolId: string;
   poolData: { [x: string]: string };
   poolsList: { [x: string]: any[] };
@@ -37,6 +38,7 @@ function PoolTab({
   poolTimeseriesError,
   poolTimeseriesLoading,
   overlayPoolTimeseriesData,
+  overlayPoolTimeseriesLoading,
   poolId,
   poolData,
   poolsList,
@@ -140,9 +142,17 @@ function PoolTab({
           specificChartsOnEntity[entityName] = {};
         }
         const currentEntityData = poolTimeseriesData[entityName];
+        const tokenWeightData: any = []
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-
+          if (timeseriesInstance.inputTokenWeights) {
+            timeseriesInstance.inputTokenWeights.forEach((weight: any, idx: number) => {
+              if (idx > tokenWeightData.length - 1) {
+                tokenWeightData.push([]);
+              }
+              tokenWeightData[idx].push({ value: Number(weight), date: Number(timeseriesInstance.timestamp) })
+            })
+          }
           // For exchange protocols, calculate the baseYield
           let value = 0;
           if (Object.keys(data[poolKeySingular]?.fees)?.length > 0 && timeseriesInstance.totalValueLockedUSD) {
@@ -160,6 +170,7 @@ function PoolTab({
             specificChartsOnEntity[entityName]['baseYield'].push({ value, date: Number(timeseriesInstance.timestamp) });
           }
         }
+        specificChartsOnEntity[entityName]['inputTokenWeights'] = tokenWeightData;
       })
     }
   } else if (schemaType?.toUpperCase() === "YIELD") {
@@ -184,6 +195,36 @@ function PoolTab({
             specificChartsOnEntity[entityName]['baseYield'].push({ value, date: Number(timeseriesInstance.timestamp) });
           }
         }
+      })
+    }
+  } else if (schemaType?.toUpperCase() === "LENDING") {
+    if (poolTimeseriesData) {
+      Object.keys(poolTimeseriesData).forEach((entityName: string) => {
+        if (!specificChartsOnEntity[entityName]) {
+          specificChartsOnEntity[entityName] = {};
+        }
+        const currentEntityData = poolTimeseriesData[entityName];
+        const tableVals: { value: any; date: any }[] = [];
+        const ratesChart: any = {};
+        const ratesSums: any = {};
+        data?.market?.rates?.forEach((rate: { [x: string]: string }) => {
+          const rateKey = `${rate?.type || ""}-${rate?.side || ""}`;
+          ratesChart[rateKey] = [];
+          ratesSums[rateKey] = 0;
+        })
+        for (let x = currentEntityData.length - 1; x >= 0; x--) {
+          const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          const initTableValue: any = { value: [], date: timeseriesInstance.timestamp };
+          timeseriesInstance["rates"].forEach((rateElement: any, idx: number) => {
+            const rateKey = `${rateElement.type || ""}-${rateElement.side || ""}`;
+            initTableValue.value.push(`[${idx}]: ${Number(rateElement.rate).toFixed(3)}%`);
+            ratesSums[rateKey] += Number(rateElement.rate);
+            ratesChart[rateKey].push({ value: Number(rateElement.rate), date: timeseriesInstance.timestamp })
+          });
+          tableVals.push({ value: initTableValue.value.join(', '), date: initTableValue.date });
+        }
+        const issues = Object.keys(ratesSums)?.filter(rateLabel => ratesSums[rateLabel] === 0);
+        specificChartsOnEntity[entityName]['rates'] = { dataChart: ratesChart, tableData: tableVals, issues: issues.map(iss => entityName + '-' + iss) };
       })
     }
   }
@@ -228,6 +269,7 @@ function PoolTab({
             currentEntityData={poolTimeseriesData[entityName]}
             entitySpecificElements={entitySpecificElements}
             overlayPoolTimeseriesData={overlayPoolTimeseriesData[entityName]}
+            overlayPoolTimeseriesLoading={overlayPoolTimeseriesLoading}
             entityName={entityName}
             entitiesData={entitiesData}
             poolId={poolId}

@@ -1,7 +1,8 @@
 import { styled } from "../styled";
 import { CircularProgress, Typography } from "@mui/material";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
+import { negativeFieldList } from "../constants";
 
 const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
   max-height: 230px;
@@ -71,14 +72,14 @@ const messagesByLevel = (
         issuesMsg = `${issuesArray[x].fieldName?.split("///")[0]} array has elements up to index [${issuesArray[x].fieldName?.split("///")[1]
           }], but ${issuesArray[x]?.message?.split("///")[0]} array ${endStr}.`;
       }
-      if (issuesArray[x].type === "NEG") {
+      if (issuesArray[x].type === "NEG" && !negativeFieldList?.includes(issuesArray[x].fieldName)) {
         const msgObj = JSON.parse(issuesArray[x].message);
         issuesMsg = `'${issuesArray[x].fieldName}' has ${msgObj.count} negative values. First instance of a negative value is on snapshot ${msgObj.firstSnapshot} with a value of ${msgObj.value}`;
       }
       if (issuesArray[x].type === "NAN") {
         issuesMsg = `'${issuesArray[x].fieldName}' is NaN.`;
       }
-      if (issuesArray[x].type === "RATENEG") {
+      if (issuesArray[x].type === "RATENEG" && !negativeFieldList?.includes(issuesArray[x].fieldName)) {
         issuesMsg = `'${issuesArray[x].fieldName}' has a negative rate.`;
       }
       if (issuesArray[x].type === "RATEZERO") {
