@@ -6097,5 +6097,54 @@
         }
       }
     }
+  },
+  "optimism-gateway": {
+    "schema": "bridge",
+    "base": "optimism-gateway",
+    "protocol": "optimism-gateway",
+    "deployments": {
+      "optimism-gateway-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "optimism-gateway-ethereum",
+            "query-id": "optimism-gateway-ethereum"
+          }
+        },
+        "files": {
+          "template": "optimism-gateway.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true
+        }
+      },
+      "optimism-gateway-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "optimism-gateway-optimism",
+            "query-id": "optimism-gateway-optimism"
+          }
+        },
+        "files": {
+          "template": "optimism-gateway.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true
+        }
+      }
+    }
   }
 }

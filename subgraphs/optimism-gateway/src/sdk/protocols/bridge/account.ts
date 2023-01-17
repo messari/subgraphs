@@ -7,6 +7,7 @@ import {
   LiquidityWithdraw,
   PoolRoute,
   ActiveAccount,
+  BridgeMessage,
 } from "../../../../generated/schema";
 import { Pool } from "./pool";
 import { Bridge } from "./protocol";
@@ -197,6 +198,37 @@ export class Account {
       transactionID,
       updateMetrics
     );
+  }
+
+  sendMessage(
+    destination: Address,
+    destinationChainID: BigInt,
+    data: Bytes
+  ): BridgeMessage {
+    this.countMessageSent();
+
+    const id = idFromEvent(this.event);
+    const message = new BridgeMessage(id);
+    message.hash = this.event.transaction.hash;
+    message.logIndex = this.event.logIndex.toI32();
+    message.blockNumber = this.event.block.number;
+    message.timestamp = this.event.block.timestamp;
+    message.protocol = this.protocol.getBytesID();
+    message.account = this.account.id;
+
+    message.to = destination;
+    message.from = this.account.id;
+    message.isOutgoing = true;
+    message.fromChainID = this.protocol.getCurrentChainID();
+    message.toChainID = destinationChainID;
+    message.transferFrom = this.account.id;
+    message.transferTo = destination;
+    message.data = data;
+    message.save();
+
+    this.addChain(message.fromChainID);
+    this.addChain(message.toChainID);
+    return message;
   }
 
   private transfer(
@@ -405,6 +437,15 @@ export class Account {
     }
     this.trackActivity(ActivityType.TRANSFER_OUT);
     this.account.transferOutCount += 1;
+    this.account.save();
+  }
+
+  countMessageSent(): void {
+    if (this.account.messageSentCount == 0) {
+      this.protocol.addMessageSender();
+    }
+    this.trackActivity(ActivityType.MESSAGE);
+    this.account.messageSentCount += 1;
     this.account.save();
   }
 }

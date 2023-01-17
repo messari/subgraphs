@@ -90,8 +90,8 @@ dataSources:
         - name: L1CrossDomainMessenger
           file: ./abis/L1CrossDomainMessenger.json
       eventHandlers:
-        - event: RelayedMessage(indexed bytes32)
-          handler: handleRelayedMessage
+        # - event: RelayedMessage(indexed bytes32)
+        #   handler: handleRelayedMessage
         - event: SentMessage(indexed address,address,bytes,uint256,uint256)
           handler: handleSentMessage
       file: ./src/mappings/L1CrossDomainMessenger.ts
@@ -172,8 +172,8 @@ dataSources:
         - name: L2CrossDomainMessenger
           file: ./abis/L2CrossDomainMessenger.json
       eventHandlers:
-        - event: RelayedMessage(indexed bytes32)
-          handler: handleRelayedMessage
+        # - event: RelayedMessage(indexed bytes32)
+        #   handler: handleRelayedMessage
         - event: SentMessage(indexed address,address,bytes,uint256,uint256)
           handler: handleSentMessage
       file: ./src/mappings/L2CrossDomainMessenger.ts
