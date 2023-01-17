@@ -1343,9 +1343,17 @@ type _ProtocolSnapshotHelper @entity {
   lastActivityTimestamp: BigInt!
 }
 
-# helper for tracking refund
-type _Transfer @entity {
+# helper for tracking liquidity-based bridge refund
+type _Refund @entity {
   " transfer Id "
   id: Bytes!
   sender: String!
+}
+
+# helper for tracking burn on PeggeTokenBridge (PTB) v1
+type _PTBv1 @entity {
+  " token Id "
+  id: Bytes!
+  srcChainId: BigInt!
+  refId: Bytes
 }

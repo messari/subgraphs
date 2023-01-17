@@ -51,7 +51,12 @@ import { _ERC20 } from "../generated/PoolBasedBridge/_ERC20";
 import { ERC20NameBytes } from "../generated/PoolBasedBridge/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../generated/PoolBasedBridge/ERC20SymbolBytes";
 import { Versions } from "./versions";
-import { Token, Pool as PoolEntity, _Transfer } from "../generated/schema";
+import {
+  Token,
+  Pool as PoolEntity,
+  _Refund,
+  _PTBv1,
+} from "../generated/schema";
 import { bigDecimalToBigInt, bigIntToBigDecimal } from "./sdk/util/numbers";
 import { getUsdPricePerToken, getUsdPrice } from "./prices";
 import { networkToChainID } from "./sdk/protocols/bridge/chainIds";
@@ -199,9 +204,9 @@ export function handleSend(event: Send): void {
     event
   );
 
-  let transfer = _Transfer.load(event.params.transferId);
+  let transfer = _Refund.load(event.params.transferId);
   if (!transfer) {
-    transfer = new _Transfer(event.params.transferId);
+    transfer = new _Refund(event.params.transferId);
     transfer.sender = event.params.sender.toHexString();
     transfer.save();
   }
@@ -240,7 +245,7 @@ export function handleWithdraw(call: WithdrawCall): void {
     call.transaction.hash.toHexString(),
   ]);
 
-  const transfer = _Transfer.load(wdmsg.refId);
+  const transfer = _Refund.load(wdmsg.refId);
   if (wdmsg.refId.equals(Bytes.empty())) {
     // LP withdraw liquidity: refId == 0x0
     pool.addInputTokenBalance(wdmsg.amount.times(BIGINT_MINUS_ONE), true);
@@ -371,16 +376,30 @@ export function handlePTBMint(event: PTBMint): void {
     txId,
     event
   );
+
+  const ptb = new _PTBv1(event.params.token);
+  ptb.srcChainId = event.params.refChainId;
+  ptb.refId = event.params.refId;
+  ptb.save();
 }
 
 // Pegged Token Bridge V1
 export function handlePTBBurn(event: PTBBurn): void {
+  const ptb = _PTBv1.load(event.params.token);
+  if (!ptb) {
+    log.error(
+      "[handlePTBBurn]No entry found for token {} in _PTBv1; it is needed for finding destination chain",
+      []
+    );
+    return;
+  }
+
   _handleTransferOut(
     event.params.token,
     event.params.account,
-    Address.zero(), //TODO: receiver missing
+    event.params.withdrawAccount,
     event.params.amount,
-    BIGINT_ZERO, //TODO: dstChainId missing
+    ptb.srcChainId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event
@@ -577,7 +596,7 @@ function _handleTransferIn(
     token.toHexString()
   );
   // TODO: add bridge version for OTV - PTB
-  const srcPool = getPoolAddress(bridgePoolType, srcChainId);
+  const srcPool = getPoolAddress(bridgePoolType, srcChainId, version);
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     srcChainId,
     srcPool,
@@ -651,7 +670,12 @@ function _handleMessageIn(
   acc.messageIn(srcChainId, sender, data);
 }
 
-export function getPoolAddress(type: string, chainId: BigInt): Address {
+export function getPoolAddress(
+  type: string,
+  chainId: BigInt,
+  end: string | null = null, // sending | receiving
+  version: string | null = null // for OTV/PTB, v1 | v2
+): Address {
   // TODO
   return Address.zero();
 }
@@ -681,7 +705,7 @@ export class WithdrawMsg {
   }
 }
 
-// This function implements decWithdrawMsg in PbPool.sol (and its dependencies)
+// These functions implement decWithdrawMsg in PbPool.sol (and its dependencies)
 // https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/libraries/PbPool.sol#L20-L45
 export function decodeWithdrawMsg(buf: Bytes): WithdrawMsg {
   const wdmsg = new WithdrawMsg(
@@ -841,20 +865,4 @@ function toBigInt(b: Bytes): BigInt | null {
 
   const retVal = BigInt.fromUnsignedBytes(correctBytes);
   return retVal;
-}
-
-function _convertCallToEvent(call: ethereum.Call): ethereum.Event {
-  const value = new ethereum.Value(ethereum.ValueKind.INT, 0 as u64);
-  const eventParameters = [new ethereum.EventParam("value", value)];
-  const event = new ethereum.Event(
-    call.to,
-    call.transaction.index,
-    call.transaction.index,
-    null,
-    call.block,
-    call.transaction,
-    eventParameters,
-    null
-  );
-  return event;
 }
