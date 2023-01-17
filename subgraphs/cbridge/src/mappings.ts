@@ -201,7 +201,8 @@ export function handleSend(event: Send): void {
     event.params.dstChainId,
     BridgePoolType.LIQUIDITY,
     CrosschainTokenType.CANONICAL,
-    event
+    event,
+    event.params.transferId
   );
 
   let transfer = _Refund.load(event.params.transferId);
@@ -277,6 +278,7 @@ export function handleWithdraw(call: WithdrawCall): void {
       pool.getBytesID(),
       BridgePoolType.LIQUIDITY,
       CrosschainTokenType.CANONICAL,
+      wdmsg.refId,
       txId,
       null,
       call
@@ -291,6 +293,7 @@ export function handleWithdraw(call: WithdrawCall): void {
       pool.getBytesID(),
       BridgePoolType.LIQUIDITY,
       CrosschainTokenType.CANONICAL,
+      wdmsg.refId,
       txId,
       null,
       call
@@ -308,7 +311,8 @@ export function handleOTVDeposited(event: OTVDeposited): void {
     event.params.mintChainId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
-    event
+    event,
+    event.params.depositId
   );
 }
 
@@ -324,6 +328,7 @@ export function handleOTVWithdrawn(event: OTVWithdrawn): void {
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
+    event.params.refId,
     txId,
     event
   );
@@ -339,7 +344,8 @@ export function handleOTVv2Deposited(event: OTVv2Deposited): void {
     event.params.mintChainId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
-    event
+    event,
+    event.params.depositId
   );
 }
 
@@ -356,6 +362,7 @@ export function handleOTVv2Withdrawn(event: OTVv2Withdrawn): void {
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     txId,
+    event.params.refId,
     event
   );
 }
@@ -373,6 +380,7 @@ export function handlePTBMint(event: PTBMint): void {
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
+    event.params.refId,
     txId,
     event
   );
@@ -402,7 +410,8 @@ export function handlePTBBurn(event: PTBBurn): void {
     ptb.srcChainId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
-    event
+    event,
+    event.params.burnId
   );
 }
 
@@ -418,6 +427,7 @@ export function handlePTBv2Mint(event: PTBv2Mint): void {
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
+    event.params.refId,
     txId,
     event
   );
@@ -479,7 +489,8 @@ export function handlePTBv2Burn(event: PTBv2Burn): void {
     event.params.toChainId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
-    event
+    event,
+    event.params.burnId
   );
 }
 
@@ -543,7 +554,8 @@ function _handleTransferOut(
   dstChainId: BigInt,
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
-  event: ethereum.Event
+  event: ethereum.Event,
+  refId: Bytes | null = null
 ): void {
   const sdk = _getSDK(event)!;
   const inputToken = sdk.Tokens.getOrCreateToken(token);
@@ -564,13 +576,18 @@ function _handleTransferOut(
   pool.addDestinationToken(crossToken);
 
   const acc = sdk.Accounts.loadAccount(sender);
-  acc.transferOut(
+  const transfer = acc.transferOut(
     pool,
     pool.getDestinationTokenRoute(crossToken)!,
     receiver,
     amount,
     event.transaction.hash
   );
+
+  if (refId) {
+    transfer._refId = refId;
+    transfer.save();
+  }
 }
 
 function _handleTransferIn(
@@ -582,6 +599,7 @@ function _handleTransferIn(
   poolId: Bytes,
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
+  refId: Bytes | null = null,
   transactionID: Bytes | null = null,
   event: ethereum.Event | null = null,
   call: ethereum.Call | null = null
@@ -606,13 +624,18 @@ function _handleTransferIn(
   pool.addDestinationToken(crossToken);
 
   const acc = sdk.Accounts.loadAccount(receiver);
-  acc.transferIn(
+  const transfer = acc.transferIn(
     pool,
     pool.getDestinationTokenRoute(crossToken)!,
     sender,
     amount,
     transactionID
   );
+
+  if (refId) {
+    transfer._refId = refId;
+    transfer.save();
+  }
 }
 
 function _handleMessageOut(

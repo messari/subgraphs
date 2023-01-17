@@ -1205,6 +1205,9 @@ type BridgeTransfer implements Event @entity(immutable: true) {
 
   " Timestamp of this event "
   timestamp: BigInt!
+
+  " reference id, may be used to join source and destination end of a transfer across different chains "
+  _refId: Bytes
 }
 
 # Some bridges support sending
