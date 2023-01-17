@@ -12,6 +12,7 @@ import {
   getOrCreateVaultsHourlySnapshots,
   getOrCreateYieldAggregator,
 } from "../common/initializers";
+import { updateTokenPrice } from "../common/utils";
 
 export function _Reinvest(
   contractAddress: Address,
@@ -19,6 +20,9 @@ export function _Reinvest(
   vault: Vault,
   newTotalSupply: BigInt
 ): void {
+  const inputTokenAddress = Address.fromString(vault.inputToken);
+  updateTokenPrice(inputTokenAddress, block.number);
+
   const numberOfRewardTokens = vault.rewardTokens!.length;
 
   const distributedReward = calculateDistributedReward(

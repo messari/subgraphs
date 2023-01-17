@@ -1,9 +1,10 @@
 import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
-import { Vault } from "../../generated/schema";
+import { Token, Vault } from "../../generated/schema";
 import { YakERC20 } from "../../generated/YakStrategyV2/YakERC20";
 import { ZERO_BIGDECIMAL } from "../helpers/constants";
-import { getOrCreateYieldAggregator } from "./initializers";
+import { getOrCreateToken, getOrCreateYieldAggregator } from "./initializers";
 import * as constants from "../helpers/constants";
+import { getUsdPricePerToken, getUsdPricePerWrappedToken } from "../Prices";
 
 export function updateProtocolAfterNewVault(vaultAddress: Address): void {
   const protocol = getOrCreateYieldAggregator();
@@ -35,6 +36,20 @@ export function updateProtocolTotalValueLockedUSD(): void {
 
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
+}
+
+// Update token price and return token entity
+export function updateTokenPrice(
+  tokenAddress: Address,
+  blockNumber: BigInt
+): void {
+  let token = getOrCreateToken(tokenAddress, blockNumber);
+  if (blockNumber > token.lastPriceBlockNumber!) {
+    let fetchPrice = getUsdPricePerToken(tokenAddress);
+    token.lastPriceUSD = fetchPrice.usdPrice.div(fetchPrice.decimalsBaseTen);
+    token.lastPriceBlockNumber = blockNumber;
+    token.save();
+  }
 }
 
 export function readValue<T>(

@@ -3,25 +3,21 @@ import { CustomPriceType } from "../common/types";
 import { Address, log, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { TraderJoeRouter as TraderJoeRouterContract } from "../../../generated/YakStrategyV2/TraderJoeRouter";
 import { getTokenDecimals } from "../../common/utils";
+import { ETH_ADDRESS, TRADERJOE_ROUTER_ADDRESS_V1, TRADERJOE_ROUTER_ADDRESS_V2, USDC_ADDRESS, WETH_ADDRESS } from "../config/avalanche";
 
 export function getPriceUsdc(
   tokenAddress: Address,
-  network: string
 ): CustomPriceType {
-  const usdc_address =
-    constants.WHITELIST_TOKENS_MAP.get(network)!.get("USDC")!;
-  return getPriceFromRouter(tokenAddress, usdc_address, network);
+  const usdc_address = USDC_ADDRESS;
+  return getPriceFromRouter(tokenAddress, usdc_address);
 }
 
 export function getPriceFromRouter(
   token0Address: Address,
   token1Address: Address,
-  network: string
 ): CustomPriceType {
-  let wethAddress = constants.SUSHISWAP_WETH_ADDRESS.get(network)!;
-  let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(
-    constants.NETWORK_BASE_TOKEN_MAP.get(network)![0]
-  )!;
+  let wethAddress = WETH_ADDRESS;
+  let ethAddress = ETH_ADDRESS;
 
   // Convert ETH address to WETH
   if (token0Address == ethAddress) {
@@ -54,10 +50,8 @@ export function getPriceFromRouter(
   let token0Decimals = getTokenDecimals(token0Address);
   let amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
-  const routerAddresses = constants.TRADERJOE_ROUTER_ADDRESS_MAP.get(network)!;
-
-  let routerAddressV1 = routerAddresses.get("routerV1");
-  let routerAddressV2 = routerAddresses.get("routerV2");
+  let routerAddressV1 = TRADERJOE_ROUTER_ADDRESS_V1;
+  let routerAddressV2 = TRADERJOE_ROUTER_ADDRESS_V2;
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
 

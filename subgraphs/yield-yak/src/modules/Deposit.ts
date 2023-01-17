@@ -15,7 +15,7 @@ import {
 import * as utils from "../common/utils";
 import { Deposit } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
-import { getUsdPricePerToken } from "../Prices";
+import { getUsdPrice, getUsdPricePerToken } from "../Prices";
 import { getPriceOfOutputTokens } from "./Price";
 import { exponentToBigDecimal } from "../common/utils";
 
@@ -26,11 +26,13 @@ export function _Deposit(
   vault: Vault,
   depositAmount: BigInt
 ): void {
+  const inputTokenAddress = Address.fromString(vault.inputToken);
+  utils.updateTokenPrice(inputTokenAddress, block.number);
+
   const vaultAddress = Address.fromString(vault.id);
   const strategyContract = YakStrategyV2.bind(contractAddress);
 
   let inputToken = Token.load(vault.inputToken);
-  let inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
   let inputTokenDecimals = BIGINT_TEN.pow(
     inputToken!.decimals as u8
@@ -43,27 +45,27 @@ export function _Deposit(
   }
 
   if (strategyContract.try_totalDeposits().reverted) {
-    vault.inputTokenBalance = ZERO_BIGINT;
+    // vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
   } else {
-    vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
-    // vault.inputTokenBalance = strategyContract.totalDeposits();
-    if (strategyContract.try_depositToken().reverted) {
-      vault.totalValueLockedUSD = ZERO_BIGDECIMAL;
-    }
+    // vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
+    vault.inputTokenBalance = strategyContract.totalDeposits();
 
-    vault.totalValueLockedUSD = inputTokenPrice.usdPrice.times(
-      vault.inputTokenBalance
-        .toBigDecimal()
-        .div(exponentToBigDecimal(inputToken!.decimals))
-        .div(inputTokenPrice.decimalsBaseTen)
-    );
-    // else {
-    //   vault.totalValueLockedUSD = getUsdPrice(strategyContract.depositToken(), ZERO_BIGDECIMAL).times(convertBigIntToBigDecimal(strategyContract.totalDeposits(), 18));
-    // }
+    
+
+    // vault.totalValueLockedUSD = inputTokenPrice.usdPrice.times(
+    //   vault.inputTokenBalance
+    //     .toBigDecimal()
+    //     .div(exponentToBigDecimal(inputToken!.decimals))
+    //     .div(inputTokenPrice.decimalsBaseTen)
+    // );
   }
 
-  // vault.totalValueLockedUSD = getUsdPrice(strategyContract.depositToken(), ZERO_BIGDECIMAL).times(convertBigIntToBigDecimal(strategyContract.totalDeposits(), 18));
-
+  vault.totalValueLockedUSD = vault.inputTokenBalance
+      .toBigDecimal()
+      .div(inputTokenDecimals)
+      .times(inputTokenPrice.usdPrice)
+      .div(inputTokenPrice.decimalsBaseTen);
+      
   if (strategyContract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
     vault.pricePerShare = ZERO_BIGDECIMAL;
   } else {
@@ -73,6 +75,7 @@ export function _Deposit(
     );
   }
 
+  // let depositAmountUSD = getUsdPrice(inputTokenAddress, depositAmount.toBigDecimal()).div(inputTokenPrice.decimalsBaseTen)
   let depositAmountUSD = depositAmount
     .toBigDecimal()
     .div(inputTokenDecimals)

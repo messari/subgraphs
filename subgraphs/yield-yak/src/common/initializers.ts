@@ -28,7 +28,7 @@ import { Token } from "../../generated/schema";
 import { YakERC20 } from "../../generated/YakStrategyV2/YakERC20";
 import { VaultFee } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
-import { getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken, getUsdPricePerWrappedToken } from "../Prices";
 
 export function getOrCreateVault(
   contractAddress: Address,
@@ -64,11 +64,17 @@ export function getOrCreateVault(
 
     if (stategyContract.try_depositToken().reverted) {
       let inputTokenAddress = ZERO_ADDRESS;
-      
-      if (stategyContract.name() == "Yield Yak: Aave AVAX") {
+
+      if (vault.name == "Yield Yak: Banker Joe AVAX") {
+        inputTokenAddress = Address.fromString("0x454E67025631C065d3cFAD6d71E6892f74487a15")
+      }
+      // if (vault.name == "Yield Yak: GMX fsGLP") {
+      //   inputTokenAddress = Address.fromString("0x01234181085565ed162a948b6a5e88758CD7c7b8")
+      // }
+      if (vault.name == "Yield Yak: Aave AVAX") {
         inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
       }
-      if (stategyContract.name() == "Yield Yak: Benqi AVAX") {
+      if (vault.name == "Yield Yak: Benqi AVAX") {
         inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
       }
 
@@ -76,21 +82,23 @@ export function getOrCreateVault(
       vault.inputToken = inputToken.id;
     } else {
       let inputTokenAddress = stategyContract.depositToken();
-      
-      if (stategyContract.name() == "Yield Yak: GMX fsGLP") {
-        inputTokenAddress = Address.fromString("0x9e295B5B976a184B14aD8cd72413aD846C299660")
+
+      if (vault.name == "Yield Yak: Banker Joe AVAX") {
+        inputTokenAddress = Address.fromString("0x6e84a6216eA6dACC71eE8E6b0a5B7322EEbC0fDd")
       }
-      if (stategyContract.name() == "Yield Yak: Aave AVAX") {
+      // if (vault.name == "Yield Yak: GMX fsGLP") {
+      //   inputTokenAddress = Address.fromString("0x01234181085565ed162a948b6a5e88758CD7c7b8")
+      // }
+      if (vault.name == "Yield Yak: Aave AVAX") {
         inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
       }
-      if (stategyContract.name() == "Yield Yak: Benqi AVAX") {
+      if (vault.name == "Yield Yak: Benqi AVAX") {
         inputTokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
       }
 
       const inputToken = getOrCreateToken(inputTokenAddress, block.number);
       vault.inputToken = inputToken.id;
     }
-    
 
     const outputToken = getOrCreateToken(ZERO_ADDRESS, block.number);
     vault.outputToken = outputToken.id;
@@ -182,7 +190,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       token.decimals = contract.decimals();
     }
 
-    let fetchPrice = getUsdPricePerToken(Address.fromString(token.id));
+    let fetchPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = fetchPrice.usdPrice.div(fetchPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = blockNumber;
 

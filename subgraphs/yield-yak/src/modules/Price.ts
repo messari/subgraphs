@@ -12,7 +12,7 @@ export function getPriceOfOutputTokens(
 
   let pricePerShare = vaultContract!.pricePerShare!;
 
-  let virtualPrice = getPriceUsdcRecommended(tokenAddress, network);
+  let virtualPrice = getPriceUsdcRecommended(tokenAddress);
 
   return pricePerShare
     .div(_decimals)

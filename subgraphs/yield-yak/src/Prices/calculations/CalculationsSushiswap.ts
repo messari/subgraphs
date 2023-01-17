@@ -4,20 +4,17 @@ import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/YakStrategyV2/CalculationsSushiSwap";
 import { getPriceUsdc } from "../routers/SushiSwapRouter";
+import { SUSHISWAP_CALCULATIONS_ADDRESS } from "../config/avalanche";
 
 export function getSushiSwapContract(
-  network: string
 ): CalculationsSushiContract {
-  return CalculationsSushiContract.bind(
-    constants.SUSHISWAP_CALCULATIONS_ADDRESS_MAP.get(network)!
-  );
+  return CalculationsSushiContract.bind(SUSHISWAP_CALCULATIONS_ADDRESS);
 }
 
 export function getTokenPriceFromSushiSwap(
   tokenAddr: Address,
-  network: string
 ): CustomPriceType {
-  const curveContract = getSushiSwapContract(network);
+  const curveContract = getSushiSwapContract();
   if (!curveContract) {
     return new CustomPriceType();
   }
@@ -33,8 +30,7 @@ export function getTokenPriceFromSushiSwap(
 }
 
 export function getPriceUsdcRecommended(
-  tokenAddress: Address,
-  network: string
+  tokenAddress: Address
 ): CustomPriceType {
-  return getPriceUsdc(tokenAddress, network);
+  return getPriceUsdc(tokenAddress);
 }

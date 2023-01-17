@@ -7,12 +7,11 @@ import {
 } from "../../../generated/YakStrategyV2/SushiSwapPair";
 import { SushiSwapRouter as SushiSwapRouterContract } from "../../../generated/YakStrategyV2/SushiSwapRouter";
 import { getTokenDecimals, readValue } from "../../common/utils";
+import { ETH_ADDRESS, SUSHISWAP_ROUTER_ADDRESS_V1, SUSHISWAP_ROUTER_ADDRESS_V2, USDC_ADDRESS, WETH_ADDRESS } from "../config/avalanche";
 
-export function isLpToken(tokenAddress: Address, network: string): bool {
+export function isLpToken(tokenAddress: Address): bool {
   if (
-    tokenAddress.equals(
-      constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!
-    )
+    tokenAddress.equals(ETH_ADDRESS)
   ) {
     return false;
   }
@@ -32,32 +31,28 @@ export function isLpToken(tokenAddress: Address, network: string): bool {
 
 export function getPriceUsdc(
   tokenAddress: Address,
-  network: string
 ): CustomPriceType {
-  if (isLpToken(tokenAddress, network)) {
-    return getLpTokenPriceUsdc(tokenAddress, network);
+  if (isLpToken(tokenAddress)) {
+    return getLpTokenPriceUsdc(tokenAddress);
   }
-  return getPriceFromRouterUsdc(tokenAddress, network);
+  return getPriceFromRouterUsdc(tokenAddress);
 }
 
 export function getPriceFromRouterUsdc(
   tokenAddress: Address,
-  network: string
 ): CustomPriceType {
   return getPriceFromRouter(
     tokenAddress,
-    constants.WHITELIST_TOKENS_MAP.get(network)!.get("USDC")!,
-    network
+    USDC_ADDRESS,
   );
 }
 
 export function getPriceFromRouter(
   token0Address: Address,
   token1Address: Address,
-  network: string
 ): CustomPriceType {
-  let wethAddress = constants.SUSHISWAP_WETH_ADDRESS.get(network)!;
-  let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
+  let wethAddress = WETH_ADDRESS;
+  let ethAddress = ETH_ADDRESS;
 
   // Convert ETH address to WETH
   if (token0Address == ethAddress) {
@@ -90,10 +85,8 @@ export function getPriceFromRouter(
   let token0Decimals = getTokenDecimals(token0Address);
   let amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
-  const routerAddresses = constants.SUSHISWAP_ROUTER_ADDRESS_MAP.get(network)!;
-
-  let routerAddressV1 = routerAddresses.get("routerV1");
-  let routerAddressV2 = routerAddresses.get("routerV2");
+  let routerAddressV1 = SUSHISWAP_ROUTER_ADDRESS_V1;
+  let routerAddressV2 = SUSHISWAP_ROUTER_ADDRESS_V2;
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
 
@@ -125,13 +118,11 @@ export function getPriceFromRouter(
 
 export function getLpTokenPriceUsdc(
   tokenAddress: Address,
-  network: string
 ): CustomPriceType {
   const sushiswapPair = SushiSwapPairContract.bind(tokenAddress);
 
   let totalLiquidity: CustomPriceType = getLpTokenTotalLiquidityUsdc(
     tokenAddress,
-    network
   );
 
   let totalSupply = readValue<BigInt>(
@@ -156,7 +147,6 @@ export function getLpTokenPriceUsdc(
 
 export function getLpTokenTotalLiquidityUsdc(
   tokenAddress: Address,
-  network: string
 ): CustomPriceType {
   const sushiSwapPair = SushiSwapPairContract.bind(tokenAddress);
 
@@ -184,8 +174,8 @@ export function getLpTokenTotalLiquidityUsdc(
     constants.SUSHISWAP_DEFAULT_RESERVE_CALL
   );
 
-  let token0Price = getPriceUsdc(token0Address, network);
-  let token1Price = getPriceUsdc(token1Address, network);
+  let token0Price = getPriceUsdc(token0Address);
+  let token1Price = getPriceUsdc(token1Address);
 
   if (token0Price.reverted || token1Price.reverted) {
     return new CustomPriceType();
