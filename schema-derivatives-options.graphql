@@ -873,29 +873,29 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " All historical trade notional volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
   
-  " Daily Inflow trade notional volume in USD "
-  dailyInflowVolumeUSD: BigDecimal!
+  " Daily Deposit trade notional volume in USD "
+  dailyDepositedVolumeUSD: BigDecimal!
 
-  " Hourly Inflow trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyInflowVolumeByTokenAmount: [BigInt!]!
+  " Hourly Deposit trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyDepositedVolumeByTokenAmount: [BigInt!]!
 
-  " Hourly Inflow trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyInflowVolumeByTokenUSD: [BigDecimal!]!
+  " Hourly Deposit trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyDepositedVolumeByTokenUSD: [BigDecimal!]!
 
-  " Inflow historical trade notional volume occurred in this pool, in USD "
-  cumulativeInflowVolumeUSD: BigDecimal!
+  " Deposit historical trade notional volume occurred in this pool, in USD "
+  cumulativeDepositedVolumeUSD: BigDecimal!
   
-  " Hourly Outflow trade notional volume occurred in USD "
-  hourlyOutflowVolumeUSD: BigDecimal!
+  " Hourly Withdraw trade notional volume occurred in USD "
+  hourlyWithdrawVolumeUSD: BigDecimal!
 
-  " Hourly Outflow trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyOutflowVolumeByTokenAmount: [BigInt!]!
+  " Hourly Withdraw trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyWithdrawVolumeByTokenAmount: [BigInt!]!
 
-  " Hourly Outflow trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyOutflowVolumeByTokenUSD: [BigDecimal!]!
+  " Hourly Withdraw trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyWithdrawVolumeByTokenUSD: [BigDecimal!]!
 
-  " Outflow historical trade notional volume occurred in this pool, in USD "
-  cumulativeOutflowVolumeUSD: BigDecimal!
+  " Withdraw historical trade notional volume occurred in this pool, in USD "
+  cumulativeWithdrawVolumeUSD: BigDecimal!
 
    " Hourly notional volume in USD taken of underlying at time of contract closed but not exercised"
   hourlyClosedVolumeUSD: BigDecimal!
@@ -908,7 +908,6 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
    " All historical notional volume in USD taken of underlying at time of contract exercised"
   cumulativeExerciseVolumeUSD: BigDecimal!
-
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -1022,29 +1021,29 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " All historical trade notional volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
   
-  " Hourly Inflow trade notional volume occurred in this pool, in USD "
-  hourlyInflowVolumeUSD: BigDecimal!
+  " Hourly Deposit trade notional volume occurred in this pool, in USD "
+  hourlyDepositVolumeUSD: BigDecimal!
 
   " Hourly Inflow trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyInflowVolumeByTokenAmount: [BigInt!]!
+  hourlyDepositVolumeByTokenAmount: [BigInt!]!
 
-  " Hourly Inflow trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyInflowVolumeByTokenUSD: [BigDecimal!]!
+  " Hourly Deposit trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyDepositVolumeByTokenUSD: [BigDecimal!]!
 
-  " Inflow historical trade notional volume occurred in this pool, in USD "
-  cumulativeInflowVolumeUSD: BigDecimal!
+  " Deposit historical trade notional volume occurred in this pool, in USD "
+  cumulativeDepositVolumeUSD: BigDecimal!
   
-  " Hourly Outflow trade notional volume occurred in this pool, in USD "
-  hourlyOutflowVolumeUSD: BigDecimal!
+  " Hourly Withdraw trade notional volume occurred in this pool, in USD "
+  hourlyWithdrawVolumeUSD: BigDecimal!
 
-  " Hourly Outflow trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyOutflowVolumeByTokenAmount: [BigInt!]!
+  " Hourly Withdraw trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyWithdrawVolumeByTokenAmount: [BigInt!]!
 
-  " Hourly Outflow trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyOutflowVolumeByTokenUSD: [BigDecimal!]!
+  " Hourly Withdraw trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyWithdrawVolumeByTokenUSD: [BigDecimal!]!
 
-  " Outflow historical trade notional volume occurred in this pool, in USD "
-  cumulativeVolumeUSD: BigDecimal!
+  " Withdraw historical trade notional volume occurred in this pool, in USD "
+  cumulativeWithdrawVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
