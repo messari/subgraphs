@@ -1342,6 +1342,12 @@ type Position @entity {
   " Side of the position (either LP or trader) "
   side: PositionSide!
 
+  " Funding rate (premium) for position when position open for trader in USD"
+  fundingrateOpen: BigInt
+
+" Funding rate (premium) for position when position closed for trader in USD"
+  fundingrateClosed: BigInt
+
   " Token balance in this position, in native amounts "
   balance: BigInt!
 
@@ -1379,4 +1385,41 @@ type Position @entity {
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
 
+type positionDailySnapshot @entity(immutable: true) {
+  id: ID!
 
+  " Account that owns this position "
+  account: Account!
+
+  " The market in which this position was opened "
+  market: Market!
+
+  " The asset in which this position was opened with "
+  asset: Token!
+
+  " Daily funding rate (premium) for position, can be positive or negative in USD "
+  dailyFundingrate: BigInt
+
+  " Funding rate (premium) for position cumulative in USD"
+  cumulativeFundingrateOpen: BigInt
+
+}
+
+type positionHourlySnapshot @entity(immutable: true) {
+id: ID!
+
+  " Account that owns this position "
+  account: Account!
+
+  " The market in which this position was opened "
+  market: Market!
+
+  " The asset in which this position was opened with "
+  asset: Token!
+
+  " Hourly funding rate (premium) for position, can be positive or negative in USD"
+  hourlyFundingrate: BigInt
+
+  " Funding rate (premium) for position cumulative in USD"
+  cumulativeFundingrateOpen: BigInt
+}
