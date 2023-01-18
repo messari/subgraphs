@@ -335,13 +335,48 @@ export function handleOTVDeposited(event: OTVDeposited): void {
 }
 
 export function handleOTVWithdrawn(event: OTVWithdrawn): void {
+  const sdk = _getSDK(event)!;
   const poolId = event.address.concat(event.params.token);
+  const pool = sdk.Pools.loadPool(poolId);
+  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
+
+  // depending on value of refChainId, the withdraw may be fee withdraw, refund or burn-withdraw
+  // https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/pegged-bridge/OriginalTokenVault.sol#L45
+  const thisChainId = networkToChainID(dataSource.network());
+  const refChainId = event.params.refChainId;
+  if (refChainId == BIGINT_ZERO) {
+    // fee withdraw
+    pool.addRevenueNative(event.params.amount, BIGINT_ZERO);
+    return;
+  }
+  if (refChainId == thisChainId) {
+    // refund
+    // refund is handled with a counter "transferIn"
+    const thisPoolAddress = event.address;
+
+    _handleTransferIn(
+      event.params.token,
+      event.params.burnAccount,
+      event.params.receiver,
+      event.params.amount,
+      thisChainId,
+      thisPoolAddress,
+      pool.getBytesID(),
+      BridgePoolType.BURN_MINT,
+      CrosschainTokenType.CANONICAL,
+      event.params.refId,
+      txId,
+      event
+    );
+    return;
+  }
+
+  // burn-withdraw
   const networkConstants = getNetworkSpecificConstant(event.params.refChainId);
   const srcPoolAddress = networkConstants.getPoolAddress(
     PoolName.PeggedTokenBridge
   );
 
-  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
   _handleTransferIn(
     event.params.token,
     event.params.burnAccount,
@@ -382,13 +417,48 @@ export function handleOTVv2Deposited(event: OTVv2Deposited): void {
 }
 
 export function handleOTVv2Withdrawn(event: OTVv2Withdrawn): void {
+  const sdk = _getSDK(event)!;
   const poolId = event.address.concat(event.params.token);
+  const pool = sdk.Pools.loadPool(poolId);
+  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
+
+  // depending on value of refChainId, the withdraw may be fee withdraw, refund or burn-withdraw
+  // https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/pegged-bridge/OriginalTokenVaultV2.sol#L45
+  const thisChainId = networkToChainID(dataSource.network());
+  const refChainId = event.params.refChainId;
+  if (refChainId == BIGINT_ZERO) {
+    // fee withdraw
+    pool.addRevenueNative(event.params.amount, BIGINT_ZERO);
+    return;
+  }
+  if (refChainId == thisChainId) {
+    // refund
+    // refund is handled with a counter "transferIn"
+    const thisPoolAddress = event.address;
+
+    _handleTransferIn(
+      event.params.token,
+      event.params.burnAccount,
+      event.params.receiver,
+      event.params.amount,
+      thisChainId,
+      thisPoolAddress,
+      pool.getBytesID(),
+      BridgePoolType.BURN_MINT,
+      CrosschainTokenType.CANONICAL,
+      event.params.refId,
+      txId,
+      event
+    );
+    return;
+  }
+
+  // burn-withdraw
   const networkConstants = getNetworkSpecificConstant(event.params.refChainId);
   const srcPoolAddress = networkConstants.getPoolAddress(
     PoolName.PeggedTokenBridgeV2
   );
 
-  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
   _handleTransferIn(
     event.params.token,
     event.params.burnAccount,
