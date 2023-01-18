@@ -66,7 +66,7 @@ import {
 } from "./sdk/util/constants";
 
 // empty handler for prices library
-// eslint-disable-next-line no-unused-vars, no-empty-function
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
 export function handlePairCreated(event: ethereum.Event): void {}
 
 // Implement TokenPricer to pass it to the SDK constructor
