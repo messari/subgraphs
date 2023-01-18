@@ -1,5 +1,5 @@
 import { Box, Grid, Tooltip, Typography } from "@mui/material";
-import { negativeFieldList, PoolName, PoolNames } from "../../constants";
+import { negativeFieldList, PoolName, PoolNames, dateValueKeys } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
 import { useEffect, useState } from "react";
@@ -151,14 +151,36 @@ function PoolTabEntity({
 
     for (let x = currentEntityData.length - 1; x >= 0; x--) {
       const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+      let dateVal: number = Number(timeseriesInstance['timestamp']);
+      dateValueKeys.forEach((key: string) => {
+        let factor = 86400;
+        if (key.includes('hour')) {
+          factor = factor / 24;
+        }
+        if (!!(Number(timeseriesInstance[key]) * factor)) {
+          dateVal = (Number(timeseriesInstance[key]) * factor);
+        }
+      })
+
       const overlayDifference = currentEntityData.length - overlayPoolTimeseriesData.length;
       const overlayTimeseriesInstance: { [x: string]: any } = overlayPoolTimeseriesData[x - overlayDifference];
-
+      let overlayDateVal: number = Number(overlayTimeseriesInstance?.['timestamp']) || 0;
+      if (!!overlayTimeseriesInstance) {
+        dateValueKeys.forEach((key: string) => {
+          let factor = 86400;
+          if (key.includes('hour')) {
+            factor = factor / 24;
+          }
+          if (!!(Number(overlayTimeseriesInstance[key]) * factor)) {
+            overlayDateVal = (Number(overlayTimeseriesInstance[key]) * factor);
+          }
+        })
+      }
       // Take the given timeseries instance and loop thru the fields of the instance (ie totalValueLockedUSD)
       let skip = false;
       for (let z = 0; z < Object.keys(timeseriesInstance).length; z++) {
         const fieldName = Object.keys(timeseriesInstance)[z];
-        if (fieldName === "timestamp" || fieldName === "__typename" || fieldName === "id") {
+        if (fieldName === "timestamp" || fieldName === "__typename" || fieldName === "id" || dateValueKeys.includes(fieldName)) {
           continue;
         }
         const capsFieldName = fieldName.toUpperCase();
@@ -189,7 +211,7 @@ function PoolTabEntity({
               dataFieldMetrics,
               fieldName,
               Number(value),
-              timeseriesInstance.timestamp,
+              dateVal,
               timeseriesInstance.id,
             );
             dataFields[fieldName] = returnedData.currentEntityField;
@@ -237,7 +259,7 @@ function PoolTabEntity({
               dataFieldMetrics,
               fieldName,
               Number(value),
-              timeseriesInstance.timestamp,
+              dateVal,
               timeseriesInstance.id,
             );
             dataFields[fieldName] = returnedData.currentEntityField;
@@ -259,23 +281,23 @@ function PoolTabEntity({
                 dataFieldKey = " [" + idx + "]";
               }
               if (!dataFields[fieldName + dataFieldKey]) {
-                dataFields[fieldName + dataFieldKey] = [{ value: 0, date: Number(timeseriesInstance.timestamp) }];
+                dataFields[fieldName + dataFieldKey] = [{ value: 0, date: dateVal }];
                 dataFieldMetrics[fieldName + dataFieldKey] = { sum: 0 };
               } else {
                 dataFields[fieldName + dataFieldKey].push({
                   value: 0,
-                  date: Number(timeseriesInstance.timestamp),
+                  date: dateVal,
                 });
                 dataFieldMetrics[fieldName + dataFieldKey].sum += 0;
               }
               if (fieldName === "rewardTokenEmissionsUSD") {
                 if (!dataFields["rewardAPR" + dataFieldKey]) {
-                  dataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: Number(timeseriesInstance.timestamp) }];
+                  dataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: dateVal }];
                   dataFieldMetrics["rewardAPR" + dataFieldKey] = { sum: 0 };
                 } else {
                   dataFields["rewardAPR" + dataFieldKey].push({
                     value: 0,
-                    date: Number(timeseriesInstance.timestamp),
+                    date: dateVal,
                   });
                   dataFieldMetrics["rewardAPR" + dataFieldKey].sum += 0;
                 }
@@ -409,7 +431,7 @@ function PoolTabEntity({
                   // Create the reward APR [idx] field
                   if (!dataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
                     dataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
-                      { value: apr, date: Number(timeseriesInstance.timestamp) },
+                      { value: apr, date: dateVal },
                     ];
                     dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"] = {
                       sum: apr,
@@ -418,7 +440,7 @@ function PoolTabEntity({
                   } else {
                     dataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
                       value: apr,
-                      date: Number(timeseriesInstance.timestamp),
+                      date: dateVal,
                     });
                     dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"].sum += apr;
                   }
@@ -431,7 +453,7 @@ function PoolTabEntity({
                 dataFieldMetrics,
                 dataFieldKey,
                 Number(value),
-                timeseriesInstance.timestamp,
+                dateVal,
                 timeseriesInstance.id,
               );
               dataFields[dataFieldKey] = returnedData.currentEntityField;
@@ -455,7 +477,7 @@ function PoolTabEntity({
         }
         if (x < overlayDifference && overlayPoolTimeseriesData.length > 0) {
           overlayDataFields[fieldName] = [
-            { value: 0, date: Number(timeseriesInstance.timestamp) },
+            { value: 0, date: dateVal },
             ...overlayDataFields[fieldName],
           ];
           continue
@@ -481,7 +503,7 @@ function PoolTabEntity({
               dataFieldMetrics,
               fieldName,
               Number(value),
-              overlayTimeseriesInstance.timestamp,
+              overlayDateVal,
               overlayTimeseriesInstance.id,
             );
             overlayDataFields[fieldName] = returnedData.currentEntityField;
@@ -512,7 +534,7 @@ function PoolTabEntity({
               dataFieldMetrics,
               fieldName,
               Number(value),
-              overlayTimeseriesInstance.timestamp,
+              overlayDateVal,
               overlayTimeseriesInstance.id,
             );
             overlayDataFields[fieldName] = returnedData.currentEntityField;
@@ -533,20 +555,20 @@ function PoolTabEntity({
                 dataFieldKey = " [" + idx + "]";
               }
               if (!overlayDataFields[fieldName + dataFieldKey]) {
-                overlayDataFields[fieldName + dataFieldKey] = [{ value: 0, date: Number(overlayTimeseriesInstance.timestamp) }];
+                overlayDataFields[fieldName + dataFieldKey] = [{ value: 0, date: overlayDateVal }];
               } else {
                 overlayDataFields[fieldName + dataFieldKey].push({
                   value: 0,
-                  date: Number(overlayTimeseriesInstance.timestamp),
+                  date: overlayDateVal,
                 });
               }
               if (fieldName === "rewardTokenEmissionsUSD") {
                 if (!overlayDataFields["rewardAPR" + dataFieldKey]) {
-                  overlayDataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: Number(overlayTimeseriesInstance.timestamp) }];
+                  overlayDataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: overlayDateVal }];
                 } else {
                   overlayDataFields["rewardAPR" + dataFieldKey].push({
                     value: 0,
-                    date: Number(overlayTimeseriesInstance.timestamp),
+                    date: overlayDateVal,
                   });
                 }
               }
@@ -662,12 +684,12 @@ function PoolTabEntity({
                   // Create the reward APR [idx] field
                   if (!overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
                     overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
-                      { value: apr, date: Number(overlayTimeseriesInstance.timestamp) },
+                      { value: apr, date: overlayDateVal },
                     ];
                   } else {
                     overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
                       value: apr,
-                      date: Number(overlayTimeseriesInstance.timestamp),
+                      date: overlayDateVal,
                     });
                   }
                 }
@@ -679,7 +701,7 @@ function PoolTabEntity({
                 dataFieldMetrics,
                 dataFieldKey,
                 Number(value),
-                overlayTimeseriesInstance.timestamp,
+                overlayDateVal,
                 overlayTimeseriesInstance.id,
               );
               overlayDataFields[dataFieldKey] = returnedData.currentEntityField;
@@ -947,7 +969,17 @@ function PoolTabEntity({
 
     const mappedCurrentEntityData = currentEntityData.map((instance: any, idx: number) => {
       let instanceToSave: any = {};
-      instanceToSave.date = moment.utc(Number(instance.timestamp) * 1000).format("YYYY-MM-DD");
+      let dateVal: number = Number(instance['timestamp']);
+      dateValueKeys.forEach((key: string) => {
+        let factor = 86400;
+        if (key.includes('hour')) {
+          factor = factor / 24;
+        }
+        if (!!(Number(instance[key]) * factor)) {
+          dateVal = (Number(instance[key]) * factor);
+        }
+      })
+      instanceToSave.date = moment.utc(dateVal).format("YYYY-MM-DD");
       instanceToSave = { ...instanceToSave, ...instance };
       if (!!instance.rates) {
         instance.rates.forEach((rate: any, idx: number) => {

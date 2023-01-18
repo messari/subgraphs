@@ -1123,6 +1123,7 @@ export const schema300 = (): Schema => {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: {
       ...prevSchema.entitiesData.financialsDailySnapshots,
+      days: "BigInt!",
       dailyDepositUSD: "BigDecimal!",
       dailyBorrowUSD: "BigDecimal!",
       cumulativeBorrowUSD: "BigDecimal!",
@@ -1135,6 +1136,7 @@ export const schema300 = (): Schema => {
     },
     usageMetricsDailySnapshots: {
       ...prevSchema.entitiesData.usageMetricsDailySnapshots,
+      days: "BigInt!",
       dailyFlashloanCount: "Int!",
       dailyTransferCount: "Int!",
       cumulativePositionCount: "Int!",
@@ -1142,6 +1144,7 @@ export const schema300 = (): Schema => {
     },
     marketDailySnapshots: {
       ...prevSchema.entitiesData.marketDailySnapshots,
+      days: "BigInt!",
       reserves: "BigDecimal",
       reserveFactor: "BigDecimal",
       variableBorrowedTokenBalance: "BigInt",
@@ -1170,9 +1173,13 @@ export const schema300 = (): Schema => {
       borrowingPositionCount: "Int!",
       dailyActiveBorrowingPositionCount: "Int!",
     },
-    usageMetricsHourlySnapshots: prevSchema.entitiesData.usageMetricsHourlySnapshots,
+    usageMetricsHourlySnapshots: {
+      ...prevSchema.entitiesData.usageMetricsHourlySnapshots,
+      hours: "BigInt!",
+    },
     marketHourlySnapshots: {
       ...prevSchema.entitiesData.marketHourlySnapshots,
+      hours: "BigInt!",
       hourlyTotalRevenueUSD: "BigDecimal!",
       hourlyDepositUSD: "BigDecimal!",
       hourlyBorrowUSD: "BigDecimal!",

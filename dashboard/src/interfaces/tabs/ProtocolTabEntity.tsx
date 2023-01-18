@@ -1,5 +1,5 @@
 import { Box, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
-import { negativeFieldList } from "../../constants";
+import { dateValueKeys, negativeFieldList } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
@@ -15,6 +15,7 @@ interface ProtocolTabEntityProps {
   entityName: string;
   protocolType: string;
   subgraphEndpoints: any;
+  entitySpecificElements: any;
   protocolTableData: { [x: string]: any };
   overlaySchemaData: any;
   protocolSchemaData: any;
@@ -32,6 +33,7 @@ function ProtocolTabEntity({
   entityName,
   protocolType,
   subgraphEndpoints,
+  entitySpecificElements,
   protocolTableData,
   overlaySchemaData,
   protocolSchemaData,
@@ -100,16 +102,40 @@ function ProtocolTabEntity({
       const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
       for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+        let dateVal: number = Number(timeseriesInstance['timestamp']);
+        dateValueKeys.forEach((key: string) => {
+          let factor = 86400;
+          if (key.includes('hour')) {
+            factor = factor / 24;
+          }
+          if (!!(Number(timeseriesInstance[key]) * factor)) {
+            dateVal = (Number(timeseriesInstance[key]) * factor);
+          }
+        })
+
         let overlayIndex = x;
         if (overlayDifference > 0) {
           overlayIndex = x - overlayDifference;
         }
         const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[overlayIndex];
+
+        let overlayDateVal: number = Number(overlayTimeseriesInstance?.['timestamp']) || 0;
+        if (!!overlayTimeseriesInstance) {
+          dateValueKeys.forEach((key: string) => {
+            let factor = 86400;
+            if (key.includes('hour')) {
+              factor = factor / 24;
+            }
+            if (!!(Number(overlayTimeseriesInstance[key]) * factor)) {
+              overlayDateVal = (Number(overlayTimeseriesInstance[key]) * factor);
+            }
+          })
+        }
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
           // skip the timestamp field on each entity instance
-          if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename") {
+          if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename" || dateValueKeys.includes(fieldName)) {
             return;
           }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
@@ -126,13 +152,13 @@ function ProtocolTabEntity({
               // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
               if (!dataFields[fieldName]) {
                 dataFields[fieldName] = [
-                  { value: Number(currentInstanceField), date: Number(timeseriesInstance.timestamp) },
+                  { value: Number(currentInstanceField), date: dateVal },
                 ];
                 dataFieldMetrics[fieldName] = { sum: Number(currentInstanceField) };
               } else {
                 dataFields[fieldName].push({
                   value: Number(currentInstanceField),
-                  date: Number(timeseriesInstance.timestamp),
+                  date: dateVal,
                 });
                 dataFieldMetrics[fieldName].sum += Number(currentInstanceField);
               }
@@ -219,10 +245,10 @@ function ProtocolTabEntity({
                   console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
                 }
                 if (!dataFields[dataFieldKey]) {
-                  dataFields[dataFieldKey] = [{ value: value, date: Number(timeseriesInstance.timestamp) }];
+                  dataFields[dataFieldKey] = [{ value: value, date: dateVal }];
                   dataFieldMetrics[dataFieldKey] = { sum: value };
                 } else {
-                  dataFields[dataFieldKey].push({ value: value, date: Number(timeseriesInstance.timestamp) });
+                  dataFields[dataFieldKey].push({ value: value, date: dateVal });
                   dataFieldMetrics[dataFieldKey].sum += value;
                 }
                 if (Number(value) < 0) {
@@ -259,12 +285,12 @@ function ProtocolTabEntity({
                 // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
                 if (!overlayDataFields[fieldName]) {
                   overlayDataFields[fieldName] = [
-                    { value: Number(currentOverlayInstanceField), date: Number(overlayTimeseriesInstance.timestamp) },
+                    { value: Number(currentOverlayInstanceField), date: overlayDateVal },
                   ];
                 } else {
                   overlayDataFields[fieldName].push({
                     value: Number(currentOverlayInstanceField),
-                    date: Number(overlayTimeseriesInstance.timestamp),
+                    date: overlayDateVal,
                   });
                 }
 
@@ -288,9 +314,9 @@ function ProtocolTabEntity({
                     console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
                   }
                   if (!overlayDataFields[dataFieldKey]) {
-                    overlayDataFields[dataFieldKey] = [{ value: value, date: Number(overlayTimeseriesInstance.timestamp) }];
+                    overlayDataFields[dataFieldKey] = [{ value: value, date: overlayDateVal }];
                   } else {
-                    overlayDataFields[dataFieldKey].push({ value: value, date: Number(overlayTimeseriesInstance.timestamp) });
+                    overlayDataFields[dataFieldKey].push({ value: value, date: overlayDateVal });
                   }
                 }
               }
@@ -344,7 +370,17 @@ function ProtocolTabEntity({
 
       const mappedCurrentEntityData = currentEntityData.map((instance: any, idx: number) => {
         let instanceToSave: any = {};
-        instanceToSave.date = moment.utc(Number(instance.timestamp) * 1000).format("YYYY-MM-DD");
+        let dateVal: number = Number(instance['timestamp']);
+        dateValueKeys.forEach((key: string) => {
+          let factor = 86400;
+          if (key.includes('hour')) {
+            factor = factor / 24;
+          }
+          if (!!(Number(instance[key]) * factor)) {
+            dateVal = (Number(instance[key]) * factor);
+          }
+        })
+        instanceToSave.date = moment.utc(dateVal).format("YYYY-MM-DD");
         instanceToSave = { ...instanceToSave, ...instance };
         delete instanceToSave.__typename;
         return instanceToSave;
