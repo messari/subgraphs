@@ -6,6 +6,11 @@ import {
   Address,
   Bytes,
 } from "@graphprotocol/graph-ts";
+import { Token } from "../../../generated/schema";
+import {
+  chainIDToNetwork,
+  networkToChainID,
+} from "../protocols/bridge/chainIds";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -225,31 +230,564 @@ export function equalsIgnoreCase(a: string, b: string): boolean {
 ///////////////////////////////////////
 ///// Protocol specific Constants /////
 ///////////////////////////////////////
-export class NetworkSpecificConstant {
-  constructor(
-    public readonly protocolId: Bytes,
-    public readonly network: string
-  ) {}
+export namespace PoolName {
+  export const PoolBasedBridge = "PoolBasedBridge";
+  export const OriginalTokenVault = "OriginalTokenVault";
+  export const OriginalTokenVaultV2 = "OriginalTokenVaultV2";
+  export const PeggedTokenBridge = "PeggedTokenBridge";
+  export const PeggedTokenBridgeV2 = "PeggedTokenBridgeV2";
 }
 
-export function getNetworkSpecificConstant(): NetworkSpecificConstant {
-  const network = dataSource.network();
+export type PoolName = string;
+export class NetworkSpecificConstant {
+  constructor(
+    public readonly chainId: BigInt,
+    public readonly gasFeeToken: Token,
+    // assume protocolId is the address of pool-based bridge
+    //public readonly protocolId: Bytes,
+    public readonly poolBasedBridge: Address,
+    public readonly originalTokenVault: Address,
+    public readonly originalTokenVaultV2: Address,
+    public readonly peggedTokenBridge: Address,
+    public readonly peggedTokenBridgeV2: Address
+  ) {}
+
+  getProtocolId(): Bytes {
+    return this.poolBasedBridge;
+  }
+
+  getPoolAddress(poolName: PoolName): Address {
+    if (poolName == PoolName.OriginalTokenVault) return this.originalTokenVault;
+
+    if (poolName == PoolName.OriginalTokenVaultV2)
+      return this.originalTokenVaultV2;
+    if (poolName == PoolName.PeggedTokenBridge) return this.peggedTokenBridge;
+    if (poolName == PoolName.PeggedTokenBridgeV2)
+      return this.peggedTokenBridgeV2;
+    if (poolName == PoolName.PoolBasedBridge) return this.poolBasedBridge;
+
+    return this.poolBasedBridge;
+  }
+}
+
+export function getOrCreateGasFeeToken(
+  id: Bytes,
+  name: string,
+  symbol: string,
+  decimals: i32
+): Token {
+  let token = Token.load(id);
+  if (token) {
+    return token;
+  }
+
+  token = new Token(id);
+  token.name = name;
+  token.symbol = symbol;
+  token.decimals = decimals;
+  token.save();
+  return token;
+}
+
+// https://cbridge-docs.celer.network/reference/contract-addresses
+export function getNetworkSpecificConstant(
+  chainId: BigInt | null = null
+): NetworkSpecificConstant {
+  let network = dataSource.network();
+  if (!chainId) {
+    chainId = networkToChainID(network);
+  } else {
+    network = chainIDToNetwork(chainId);
+  }
+
+  // default gas token
+  const gasFeeToken = getOrCreateGasFeeToken(
+    Address.zero(),
+    `Gas fee token ${network}`,
+    "Unknown",
+    18 as i32
+  );
+
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0xcb4a7569a61300c50cf80a2be16329ad9f5f8f9e"),
-      Network.MAINNET
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString(ETH_ADDRESS),
+        ETH_NAME,
+        ETH_SYMBOL,
+        18 as i32
+      ),
+      Address.fromString("0x5427fefa711eff984124bfbb1ab6fbf5e3da1820"),
+      Address.fromString("0xb37d31b2a74029b5951a2778f959282e2d518595"),
+      Address.fromString("0x7510792a3b1969f9307f3845ce88e39578f2bae1"),
+      Address.fromString("0x16365b45eb269b5b5dacb34b4a15399ec79b95eb"),
+      Address.fromString("0x52e4f244f380f8fa51816c8a10a63105dd4de084")
+    );
+  } else if (equalsIgnoreCase(network, Network.ARB_NOVA)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      gasFeeToken,
+      Address.fromString("0xb3833ecd19d4ff964fa7bc3f8ac070ad5e360e56"),
+      Address.zero(),
+      Address.zero(),
+      Address.zero(),
+      Address.zero()
+    );
+  } else if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      gasFeeToken,
+      Address.fromString("0x1619de6b6b20ed217a58d00f37b9d47c7663feca"),
+      Address.fromString("0xfe31bfc4f7c9b69246a6dc0087d91a91cb040f76"),
+      Address.fromString("0xea4b1b0aa3c110c55f650d28159ce4ad43a4a58b"),
+      Address.fromString("0xbdd2739ae69a054895be33a22b2d2ed71a1de778"),
+      Address.zero()
+    );
+  } else if (equalsIgnoreCase(network, Network.ASTAR)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      gasFeeToken,
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.fromString("0xbcfef6bb4597e724d720735d32a9249e0640aa11"),
+      Address.zero(),
+      Address.fromString("0xbb7684cc5408f4dd0921e5c2cadd547b8f1ad573"),
+      Address.fromString("0x3b53d2c7b44d40be05fa5e2309ffeb6eb2492d88")
+    );
+  } else if (equalsIgnoreCase(network, Network.AURORA)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0xaaaaaa20d9e0e2461697782ef11675f668207961"),
+        "Aurora",
+        "AURORA",
+        18 as i32
+      ),
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.fromString("0xbcfef6bb4597e724d720735d32a9249e0640aa11"),
+      Address.fromString("0x4384d5a9d7354c65ce3aee411337bd40493ad1bc"),
+      Address.fromString("0xbdd2739ae69a054895be33a22b2d2ed71a1de778")
     );
   } else if (equalsIgnoreCase(network, Network.AVALANCHE)) {
     return new NetworkSpecificConstant(
-      Address.fromString(""),
-      Network.AVALANCHE
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x85f138bfEE4ef8e540890CFb48F620571d67Eda3"),
+        // Real address is non-EVM compatible
+        //Address.fromString("FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z"),
+        "Avalanche",
+        "AVAX",
+        9 as i32
+      ),
+      Address.fromString("0xef3c714c9425a8f3697a9c969dc1af30ba82e5d4"),
+      Address.fromString("0x5427fefa711eff984124bfbb1ab6fbf5e3da1820"),
+      Address.fromString("0xb51541df05de07be38dcfc4a80c05389a54502bb"),
+      Address.fromString("0x88dcdc47d2f83a99cf0000fdf667a468bb958a78"),
+      Address.fromString("0xb774c6f82d1d5dbd36894762330809e512fed195")
+    );
+  } else if (equalsIgnoreCase(network, Network.BSC)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x242a1ff6ee06f2131b7924cacb74c7f9e3a5edc9"),
+        "BNB Token",
+        "BNB",
+        18 as i32
+      ),
+      Address.fromString("0xdd90e5e87a2081dcf0391920868ebc2ffb81a1af"),
+      Address.fromString("0x78bc5ee9f11d133a08b331c2e18fe81be0ed02dc"),
+      Address.fromString("0x11a0c9270d88c99e221360bca50c2f6fda44a980"),
+      Address.fromString("0xd443fe6bf23a4c9b78312391a30ff881a097580e"),
+      Address.fromString("0x26c76f7fef00e02a5dd4b5cc8a0f717eb61e1e4b")
+    );
+  } else if (equalsIgnoreCase(network, Network.BOBA)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x42bbfa2e77757c645eeaad1655e0911a7553efbc"),
+        "Boba Token",
+        "BOBA",
+        18 as i32
+      ),
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.fromString("0x8db213be5268a2b8b78af08468ff1ea422073da0"),
+      Address.fromString("0x4c882ec256823ee773b25b414d36f92ef58a7c0c"),
+      Address.fromString("0xc5ef662b833de914b9ba7a3532c6bb008a9b23a6"),
+      Address.zero()
+    );
+  } else if (equalsIgnoreCase(network, Network.CELO)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x471ece3750da237f93b8e339c536989b8978a438"),
+        "Celo Token",
+        "CELO",
+        18 as i32
+      ),
+      Address.fromString("0xbb7684cc5408f4dd0921e5c2cadd547b8f1ad573"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xda1dd66924b0470501ac7736372d4171cdd1162e"),
+      Address.zero()
+    );
+  } /* //Clover, Conflux, and Crab Smart Chain are not included in Network
+  else if (equalsIgnoreCase(network, Network.CLOVER)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0x3b53d2c7b44d40be05fa5e2309ffeb6eb2492d88")
+    );
+  } else if (equalsIgnoreCase(network, Network.CONFLUX)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0x3b53d2c7b44d40be05fa5e2309ffeb6eb2492d88")
+    );
+  } else if (equalsIgnoreCase(network, Network.CRAB)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0x3b53d2c7b44d40be05fa5e2309ffeb6eb2492d88")
+    );
+  } */ else if (equalsIgnoreCase(network, Network.EVMOS)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0xBF183E0d2f06872e10F5DBEc745999aDfcB5f000"),
+        "EVMOS",
+        "EVMOS",
+        18 as i32
+      ),
+      Address.fromString("0x5f52b9d1c0853da636e178169e6b426e4ccfa813"),
+      Address.zero(),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xc1d6e421a062fdbb26c31db4a2113df0f678cd04")
+    );
+  } else if (equalsIgnoreCase(network, Network.FANTOM)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x4e15361fd6b4bb609fa63c81a2be19d873717870"),
+        "Fantom Token",
+        "FTM",
+        18 as i32
+      ),
+      Address.fromString("0x374b8a9f3ec5eb2d97eca84ea27aca45aa1c57ef"),
+      Address.fromString("0x7d91603e79ea89149baf73c9038c51669d8f03e9"),
+      Address.zero(),
+      Address.fromString("0x38d1e20b0039bfbeef4096be00175227f8939e51"),
+      Address.fromString("0x30f7aa65d04d289ce319e88193a33a8eb1857fb9")
+    );
+  } /* // non-EVM chain not supported
+  else if (equalsIgnoreCase(network, Network.FLOW)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      "A.08dd120226ec2213.cBridge",
+      "A.08dd120226ec2213.SafeBox",
+      Address.zero(),
+      Address.zero(),
+      "A.08dd120226ec2213.PegBridge"
+    );
+  } */ else if (equalsIgnoreCase(network, Network.XDAI)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(Address.zero(), "xDAI", "xDAI", 18 as i32),
+      Address.fromString("0x3795c36e7d12a8c252a20c5a7b455f7c57b60283"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xd4c058380d268d85bc7c758072f561e8f2db5975"),
+      Address.zero()
+    );
+  } else if (equalsIgnoreCase(network, Network.HARMONY)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x799a4202c12ca952cB311598a024C80eD371a41e"),
+        "Harmony One",
+        "ONE",
+        18 as i32
+      ),
+      Address.fromString("0x78a21c1d3ed53a82d4247b9ee5bf001f4620ceec"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xdd90e5e87a2081dcf0391920868ebc2ffb81a1af"),
+      Address.zero()
+    );
+  } else if (equalsIgnoreCase(network, Network.HECO)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(Address.zero(), "HECO Token", "HT", 18 as i32),
+      Address.fromString("0xbb7684cc5408f4dd0921e5c2cadd547b8f1ad573"),
+      Address.fromString("0x5d96d4287d1ff115ee50fac0526cf43ecf79bfc6"),
+      Address.zero(),
+      Address.fromString("0x81ecac0d6be0550a00ff064a4f9dd2400585fe9c"),
+      Address.zero()
+    );
+  } else if (equalsIgnoreCase(network, Network.KAVA)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0xB66A437693992d9c94F0C315270F869C016432b9"),
+        "Kava Token",
+        "KAVA",
+        18 as i32
+      ),
+      Address.fromString("0xb51541df05de07be38dcfc4a80c05389a54502bb"),
+      Address.zero(),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xf8bf9988206c4de87f52a3c24486e4367b7088cb")
+    );
+  } else if (equalsIgnoreCase(network, Network.KLAYTN)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x393126c0653F49E079500cc0f218A27c793136A0"),
+        "Klaytn Token",
+        "KLAY",
+        18 as i32
+      ),
+      Address.fromString("0x4c882ec256823ee773b25b414d36f92ef58a7c0c"),
+      Address.zero(),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xb3833ecd19d4ff964fa7bc3f8ac070ad5e360e56")
     );
   } else if (equalsIgnoreCase(network, Network.MATIC)) {
-    return new NetworkSpecificConstant(Address.fromString(""), Network.MATIC);
-  } else {
-    log.error("[getNetworkSpecificConstant] Unsupported network: {}", [
-      network,
-    ]);
-    return new NetworkSpecificConstant(Address.zero(), "");
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x0000000000000000000000000000000000001010"),
+        "Matic Token",
+        "MATIC",
+        18 as i32
+      ),
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0x3bbadff9aeee4a74d3cf6da05c30868c9ff85bb8"),
+      Address.fromString("0xb3833ecd19d4ff964fa7bc3f8ac070ad5e360e56")
+    );
+  } /* // Milkomeda Cardano is not included in Network
+  else if (equalsIgnoreCase(network, Network.MILKOMEDA)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.fromString("0xb51541df05de07be38dcfc4a80c05389a54502bb"),
+      Address.fromString("0x3b53d2c7b44d40be05fa5e2309ffeb6eb2492d88"),
+      Address.fromString("0x3b53d2c7b44d40be05fa5e2309ffeb6eb2492d88")
+    );
+  } */ else if (equalsIgnoreCase(network, Network.MOONBEAM)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x017bE64db48dfc962221c984b9A6937A5d09E81A"),
+        "Moonbeam Token",
+        "GLMR",
+        9 as i32
+      ),
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xbb7684cc5408f4dd0921e5c2cadd547b8f1ad573"),
+      Address.fromString("0x3b53d2c7b44d40be05fa5e2309ffeb6eb2492d88")
+    );
+  } else if (equalsIgnoreCase(network, Network.MOONRIVER)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0xAa4483BD555f6CddfE34C2Ee6A5A798E5C75775A"),
+        "Moonriver Token",
+        "MOVR",
+        18 as i32
+      ),
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0x374b8a9f3ec5eb2d97eca84ea27aca45aa1c57ef"),
+      Address.zero()
+    );
+  } else if (equalsIgnoreCase(network, Network.GODWOKEN)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      gasFeeToken,
+      Address.fromString("0x4c882ec256823ee773b25b414d36f92ef58a7c0c"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xb3833ecd19d4ff964fa7bc3f8ac070ad5e360e56"),
+      Address.fromString("0xb3833ecd19d4ff964fa7bc3f8ac070ad5e360e56")
+    );
+  } else if (equalsIgnoreCase(network, Network.OKEXCHAIN)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0xe302bF71B1f6F3024E7642F9c824Ac86B58436a0"),
+        "OKEx Token",
+        "OKB",
+        18 as i32
+      ),
+      Address.fromString("0x6a2d262d56735dba19dd70682b39f6be9a931d98"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0x48284eb583a1f3058f4bce0a685d44fe29d4539e"),
+      Address.zero()
+    );
+  } else if (equalsIgnoreCase(network, Network.OASIS)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x30589d7c60490c72C2452A04f4d1a95653ba056f"),
+        "Oasis Token",
+        "OAC",
+        18 as i32
+      ),
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xbb7684cc5408f4dd0921e5c2cadd547b8f1ad573"),
+      Address.fromString("0x3b53d2c7b44d40be05fa5e2309ffeb6eb2492d88")
+    );
+  } /* // ONTOLOGY is not included in Network
+  else if (equalsIgnoreCase(network, Network.ONTOLOGY)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xd4c058380d268d85bc7c758072f561e8f2db5975"),
+      Address.fromString("0xd4c058380d268d85bc7c758072f561e8f2db5975")
+    );
+  } */ else if (equalsIgnoreCase(network, Network.OPTIMISM)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0xb2EA9527bF05bC3b73320a1ec18bd4F2Fe88d952"),
+        "Optimism Token",
+        "OP",
+        18 as i32
+      ),
+      Address.fromString("0x9d39fc627a6d9d9f8c831c16995b209548cc3401"),
+      Address.fromString("0xbcfef6bb4597e724d720735d32a9249e0640aa11"),
+      Address.zero(),
+      Address.fromString("0x61f85ff2a2f4289be4bb9b72fc7010b3142b5f41"),
+      Address.zero()
+    );
+  } /* // PlatON is not included in Network
+  else if (equalsIgnoreCase(network, Network.PLATON)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      Address.fromString("0xbf2b2757f0b2a2f70136c4a6627e99d8ec5cc7b9"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xd340bc3ec35e63bcf929c5a9ad3ae5b1ebdbe678"),
+      Address.fromString("0xd340bc3ec35e63bcf929c5a9ad3ae5b1ebdbe678")
+    );
+  } */ else if (equalsIgnoreCase(network, Network.METIS)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x9E32b13ce7f2E80A01932B42553652E053D6ed8e"),
+        "Metis Token",
+        "METIS",
+        18 as i32
+      ),
+      Address.fromString("0x88dcdc47d2f83a99cf0000fdf667a468bb958a78"),
+      Address.fromString("0xc1a2d967dfaa6a10f3461bc21864c23c1dd51eea"),
+      Address.fromString("0x4c882ec256823ee773b25b414d36f92ef58a7c0c"),
+      Address.fromString("0x4d58fdc7d0ee9b674f49a0ade11f26c3c9426f7a"),
+      Address.fromString("0xb51541df05de07be38dcfc4a80c05389a54502bb")
+    );
+  } else if (equalsIgnoreCase(network, Network.REI)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x3E9D9124596af6D8FaaeFc9B3e07b3cE397d34F7"),
+        "REI Token",
+        "REIT",
+        18 as i32
+      ),
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0x9b36f165bab9ebe611d491180418d8de4b8f3a1f"),
+      Address.fromString("0x9b36f165bab9ebe611d491180418d8de4b8f3a1f")
+    );
+  } else if (equalsIgnoreCase(network, Network.SX)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x99fE3B1391503A1bC1788051347A1324bff41452"),
+        "SX Network Token",
+        "SX",
+        18 as i32
+      ),
+      Address.fromString("0x9b36f165bab9ebe611d491180418d8de4b8f3a1f"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0x9bb46d5100d2db4608112026951c9c965b233f4d"),
+      Address.fromString("0x9bb46d5100d2db4608112026951c9c965b233f4d")
+    );
+  } else if (equalsIgnoreCase(network, Network.SHIDEN)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x00E856ee945A49bb73436e719D96910Cd9D116a4"),
+        "SHIDEN Token",
+        "SDN",
+        18 as i32
+      ),
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.fromString("0xbb7684cc5408f4dd0921e5c2cadd547b8f1ad573"),
+      Address.zero(),
+      Address.zero(),
+      Address.zero()
+    );
+  } /* // SWIMMER Network is not included in Network
+  else if (equalsIgnoreCase(network, Network.SWIMMER)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      Address.fromString("0xb51541df05de07be38dcfc4a80c05389a54502bb"),
+      Address.zero(),
+      Address.zero(),
+      Address.fromString("0xf8bf9988206c4de87f52a3c24486e4367b7088cb"),
+      Address.fromString("0xf8bf9988206c4de87f52a3c24486e4367b7088cb")
+    );
+  }*/ else if (equalsIgnoreCase(network, Network.SYSCOIN)) {
+    return new NetworkSpecificConstant(
+      chainId,
+      getOrCreateGasFeeToken(
+        Address.fromString("0x3A0D746B3EA1d8ccDf19aD915913BD68391133Ca"),
+        "Syscoin Token",
+        "SYSX",
+        18 as i32
+      ),
+      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c"),
+      Address.zero(),
+      Address.zero(),
+      Address.zero(),
+      Address.zero()
+    );
   }
+
+  log.error("[getNetworkSpecificConstant] Unsupported network: {}", [network]);
+  return new NetworkSpecificConstant(
+    BIGINT_ZERO,
+    gasFeeToken,
+    Address.zero(),
+    Address.zero(),
+    Address.zero(),
+    Address.zero(),
+    Address.zero()
+  );
 }

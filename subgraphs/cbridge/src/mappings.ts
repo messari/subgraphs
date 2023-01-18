@@ -67,6 +67,7 @@ import {
   RewardTokenType,
   SECONDS_PER_DAY,
   BIGINT_MINUS_ONE,
+  PoolName,
 } from "./sdk/util/constants";
 import { EventType } from "../../aave-v2-forks/src/constants";
 
@@ -156,7 +157,7 @@ function _getSDK(
     return null;
   }
 
-  const protocolId = getNetworkSpecificConstant().protocolId.toHexString();
+  const protocolId = getNetworkSpecificConstant().getProtocolId().toHexString();
   const conf = new BridgeConfig(
     protocolId,
     "cBridge",
@@ -193,12 +194,17 @@ export function onCreatePool(
 }
 
 export function handleSend(event: Send): void {
+  const poolId = event.address.concat(event.params.token);
+  const networkConstants = getNetworkSpecificConstant(event.params.dstChainId);
+  const dstPoolId = networkConstants.getPoolAddress(PoolName.PoolBasedBridge);
   _handleTransferOut(
     event.params.token,
     event.params.sender,
     event.params.receiver,
     event.params.amount,
     event.params.dstChainId,
+    poolId,
+    dstPoolId,
     BridgePoolType.LIQUIDITY,
     CrosschainTokenType.CANONICAL,
     event,
@@ -238,6 +244,8 @@ export function handleWithdraw(call: WithdrawCall): void {
     BridgePoolType.LIQUIDITY,
     wdmsg.token.toHexString()
   );
+
+  const bridgePoolType = BridgePoolType.LIQUIDITY;
   const txId = call.transaction.hash.concatI32(call.transaction.index.toI32());
 
   // TODO: remove once supply side revenue running
@@ -269,14 +277,21 @@ export function handleWithdraw(call: WithdrawCall): void {
   } else if (transfer) {
     // refund, refId==xfer_id
     // refund is handled with a "transferIn"
+    const srcChainId = networkToChainID(dataSource.network());
+    const networkConstants = getNetworkSpecificConstant(srcChainId);
+    const srcPoolAddress = networkConstants.getPoolAddress(
+      PoolName.PoolBasedBridge
+    );
+
     _handleTransferIn(
       wdmsg.token,
       Address.fromString(transfer.sender),
       wdmsg.receiver,
       wdmsg.amount,
-      networkToChainID(dataSource.network()),
+      srcChainId,
+      srcPoolAddress,
       pool.getBytesID(),
-      BridgePoolType.LIQUIDITY,
+      bridgePoolType,
       CrosschainTokenType.CANONICAL,
       wdmsg.refId,
       txId,
@@ -284,14 +299,20 @@ export function handleWithdraw(call: WithdrawCall): void {
       call
     );
   } else {
+    const networkConstants = getNetworkSpecificConstant(wdmsg.chainId);
+    const srcPoolAddress = networkConstants.getPoolAddress(
+      PoolName.PoolBasedBridge
+    );
+
     _handleTransferIn(
       wdmsg.token,
       wdmsg.receiver, //no sender info is available, assuming to be same as receiver
       wdmsg.receiver,
       wdmsg.amount,
       wdmsg.chainId,
+      srcPoolAddress,
       pool.getBytesID(),
-      BridgePoolType.LIQUIDITY,
+      bridgePoolType,
       CrosschainTokenType.CANONICAL,
       wdmsg.refId,
       txId,
@@ -303,12 +324,17 @@ export function handleWithdraw(call: WithdrawCall): void {
 
 // Bridge via the Original Token Vault
 export function handleOTVDeposited(event: OTVDeposited): void {
+  const poolId = event.address.concat(event.params.token);
+  const networkConstants = getNetworkSpecificConstant(event.params.mintChainId);
+  const dstPoolId = networkConstants.getPoolAddress(PoolName.PeggedTokenBridge);
   _handleTransferOut(
     event.params.token,
     event.params.depositor,
     event.params.mintAccount,
     event.params.amount,
     event.params.mintChainId,
+    poolId,
+    dstPoolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event,
@@ -318,6 +344,11 @@ export function handleOTVDeposited(event: OTVDeposited): void {
 
 export function handleOTVWithdrawn(event: OTVWithdrawn): void {
   const poolId = event.address.concat(event.params.token);
+  const networkConstants = getNetworkSpecificConstant(event.params.refChainId);
+  const srcPoolAddress = networkConstants.getPoolAddress(
+    PoolName.PeggedTokenBridge
+  );
+
   const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
   _handleTransferIn(
     event.params.token,
@@ -325,6 +356,7 @@ export function handleOTVWithdrawn(event: OTVWithdrawn): void {
     event.params.receiver,
     event.params.amount,
     event.params.refChainId,
+    srcPoolAddress,
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
@@ -336,12 +368,20 @@ export function handleOTVWithdrawn(event: OTVWithdrawn): void {
 
 // Bridge via the Original Token Vault V2
 export function handleOTVv2Deposited(event: OTVv2Deposited): void {
+  const poolId = event.address.concat(event.params.token);
+  const networkConstants = getNetworkSpecificConstant(event.params.mintChainId);
+  const dstPoolId = networkConstants.getPoolAddress(
+    PoolName.PeggedTokenBridgeV2
+  );
+
   _handleTransferOut(
     event.params.token,
     event.params.depositor,
     event.params.mintAccount,
     event.params.amount,
     event.params.mintChainId,
+    poolId,
+    dstPoolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event,
@@ -351,6 +391,11 @@ export function handleOTVv2Deposited(event: OTVv2Deposited): void {
 
 export function handleOTVv2Withdrawn(event: OTVv2Withdrawn): void {
   const poolId = event.address.concat(event.params.token);
+  const networkConstants = getNetworkSpecificConstant(event.params.refChainId);
+  const srcPoolAddress = networkConstants.getPoolAddress(
+    PoolName.PeggedTokenBridgeV2
+  );
+
   const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
   _handleTransferIn(
     event.params.token,
@@ -358,6 +403,7 @@ export function handleOTVv2Withdrawn(event: OTVv2Withdrawn): void {
     event.params.receiver,
     event.params.amount,
     event.params.refChainId,
+    srcPoolAddress,
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
@@ -370,6 +416,11 @@ export function handleOTVv2Withdrawn(event: OTVv2Withdrawn): void {
 // Pegged Token Bridge V1
 export function handlePTBMint(event: PTBMint): void {
   const poolId = event.address.concat(event.params.token);
+  const networkConstants = getNetworkSpecificConstant(event.params.refChainId);
+  const srcPoolAddress = networkConstants.getPoolAddress(
+    PoolName.OriginalTokenVault
+  );
+
   const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
   _handleTransferIn(
     event.params.token,
@@ -377,6 +428,7 @@ export function handlePTBMint(event: PTBMint): void {
     event.params.account,
     event.params.amount,
     event.params.refChainId,
+    srcPoolAddress,
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
@@ -402,12 +454,20 @@ export function handlePTBBurn(event: PTBBurn): void {
     return;
   }
 
+  const poolId = event.address.concat(event.params.token);
+  const networkConstants = getNetworkSpecificConstant(ptb.srcChainId);
+  const dstPoolId = networkConstants.getPoolAddress(
+    PoolName.OriginalTokenVault
+  );
+
   _handleTransferOut(
     event.params.token,
     event.params.account,
     event.params.withdrawAccount,
     event.params.amount,
     ptb.srcChainId,
+    poolId,
+    dstPoolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event,
@@ -417,6 +477,11 @@ export function handlePTBBurn(event: PTBBurn): void {
 
 export function handlePTBv2Mint(event: PTBv2Mint): void {
   const poolId = event.address.concat(event.params.token);
+  const networkConstants = getNetworkSpecificConstant(event.params.refChainId);
+  const srcPoolAddress = networkConstants.getPoolAddress(
+    PoolName.OriginalTokenVaultV2
+  );
+
   const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
   _handleTransferIn(
     event.params.token,
@@ -424,6 +489,7 @@ export function handlePTBv2Mint(event: PTBv2Mint): void {
     event.params.account,
     event.params.amount,
     event.params.refChainId,
+    srcPoolAddress,
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
@@ -481,12 +547,20 @@ export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
 
 // Pegged Token Bridge V2
 export function handlePTBv2Burn(event: PTBv2Burn): void {
+  const poolId = event.address.concat(event.params.token);
+  const networkConstants = getNetworkSpecificConstant(event.params.toChainId);
+  const dstPoolId = networkConstants.getPoolAddress(
+    PoolName.OriginalTokenVaultV2
+  );
+
   _handleTransferOut(
     event.params.token, //srcToken
     event.params.account,
     event.params.toAccount,
     event.params.amount,
     event.params.toChainId,
+    poolId,
+    dstPoolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event,
@@ -531,7 +605,7 @@ export function handleExecuteMessage(call: ExecuteMessageCall): void {
   // See https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/message/libraries/MsgDataTypes.sol#L55
   const sender = call.inputs._route.at(0).toAddress();
   const receiver = call.inputs._route.at(1).toAddress();
-  const srcChainId = call.inputs._route.at(3).toBigInt();
+  const srcChainId = call.inputs._route.at(2).toBigInt();
   const data = call.inputs._message;
   _handleMessageIn(srcChainId, sender, receiver, data, null, call);
 }
@@ -552,6 +626,8 @@ function _handleTransferOut(
   receiver: Address,
   amount: BigInt,
   dstChainId: BigInt,
+  poolId: Bytes,
+  dstPoolId: Address,
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
   event: ethereum.Event,
@@ -561,15 +637,14 @@ function _handleTransferOut(
   const inputToken = sdk.Tokens.getOrCreateToken(token);
 
   const pool = sdk.Pools.loadPool(
-    event.address.concat(token),
+    poolId,
     onCreatePool,
     bridgePoolType,
     inputToken.id.toHexString()
   );
-  const dstPool = getPoolAddress(bridgePoolType, dstChainId);
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     dstChainId,
-    dstPool,
+    dstPoolId,
     crosschainTokenType,
     token
   );
@@ -596,6 +671,7 @@ function _handleTransferIn(
   receiver: Address,
   amount: BigInt,
   srcChainId: BigInt,
+  srcPoolId: Address,
   poolId: Bytes,
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
@@ -613,11 +689,9 @@ function _handleTransferIn(
     bridgePoolType,
     token.toHexString()
   );
-  // TODO: add bridge version for OTV - PTB
-  const srcPool = getPoolAddress(bridgePoolType, srcChainId, version);
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     srcChainId,
-    srcPool,
+    srcPoolId,
     crosschainTokenType,
     token
   );
@@ -662,13 +736,14 @@ function _handleMessageOut(
   // alternatively, it may make sense to create a "MessageBus" pool, and assign
   // all message revenue to the MessageBus pool, but we still need to specifiy the BridgePoolType
   // for the MessageBus pool
-  const ethToken = Address.zero();
-  const inputToken = sdk.Tokens.getOrCreateToken(ethToken); // gas Token
+  const gasFeeToken = getNetworkSpecificConstant(
+    networkToChainID(dataSource.network())
+  ).gasFeeToken;
   const pool = sdk.Pools.loadPool(
     sdk.Protocol.getBytesID(),
     onCreatePool,
     BridgePoolType.LIQUIDITY,
-    inputToken.id.toHexString()
+    gasFeeToken.id.toHexString()
   );
 
   const acc = sdk.Accounts.loadAccount(sender);
@@ -691,16 +766,6 @@ function _handleMessageIn(
 
   const acc = sdk.Accounts.loadAccount(receiver);
   acc.messageIn(srcChainId, sender, data);
-}
-
-export function getPoolAddress(
-  type: string,
-  chainId: BigInt,
-  end: string | null = null, // sending | receiving
-  version: string | null = null // for OTV/PTB, v1 | v2
-): Address {
-  // TODO
-  return Address.zero();
 }
 
 export class WithdrawMsg {
