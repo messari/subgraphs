@@ -56,7 +56,7 @@
     "address": "0x9b274BC73940d92d0Af292Bde759cbFCCE661a0b",
     "startBlock": 15783099
   },
-  "graftEnabled": false,
-  "subgraphId": "QmbVEYp7cPHVDtxpgpuB3C36fbG7jPYBPTD9FcsYVyqY6S",
-  "graftStartBlock": 14848861
+  "graftEnabled": true,
+  "subgraphId": "QmSixG75WWAMGNsfMrcUYD2LBWckdTMWR5AbAQcnkqTovh",
+  "graftStartBlock": 16019469
 }
