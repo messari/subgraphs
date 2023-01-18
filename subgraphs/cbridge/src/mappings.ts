@@ -11,7 +11,6 @@ import {
   LiquidityAdded,
   Send,
   WithdrawCall,
-  WithdrawDone,
 } from "../generated/PoolBasedBridge/PoolBasedBridge";
 import {
   Deposited as OTVDeposited,
@@ -51,12 +50,7 @@ import { _ERC20 } from "../generated/PoolBasedBridge/_ERC20";
 import { ERC20NameBytes } from "../generated/PoolBasedBridge/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../generated/PoolBasedBridge/ERC20SymbolBytes";
 import { Versions } from "./versions";
-import {
-  Token,
-  Pool as PoolEntity,
-  _Refund,
-  _PTBv1,
-} from "../generated/schema";
+import { Token, _Refund, _PTBv1 } from "../generated/schema";
 import { bigDecimalToBigInt, bigIntToBigDecimal } from "./sdk/util/numbers";
 import { getUsdPricePerToken, getUsdPrice } from "./prices";
 import { networkToChainID } from "./sdk/protocols/bridge/chainIds";
@@ -69,7 +63,6 @@ import {
   BIGINT_MINUS_ONE,
   PoolName,
 } from "./sdk/util/constants";
-import { EventType } from "../../aave-v2-forks/src/constants";
 
 // empty handler for prices library
 // eslint-disable-next-line no-unused-vars, no-empty-function
@@ -221,7 +214,6 @@ export function handleSend(event: Send): void {
 
 export function handleLiquidityAdded(event: LiquidityAdded): void {
   const sdk = _getSDK(event)!;
-  const token = sdk.Tokens.getOrCreateToken(event.params.token);
   const pool = sdk.Pools.loadPool(
     event.address.concat(event.params.token),
     onCreatePool,
@@ -681,7 +673,6 @@ function _handleTransferIn(
   call: ethereum.Call | null = null
 ): void {
   const sdk = _getSDK(event, call)!;
-  const inputToken = sdk.Tokens.getOrCreateToken(token);
 
   const pool = sdk.Pools.loadPool(
     poolId,
@@ -759,11 +750,8 @@ function _handleMessageIn(
   event: ethereum.Event | null = null,
   call: ethereum.Call | null = null
 ): void {
-  const sdk = _getSDK(event, call)!;
   // see doc in _handleMessageOut
-  const ethToken = Address.zero();
-  const inputToken = sdk.Tokens.getOrCreateToken(ethToken); // gas Token
-
+  const sdk = _getSDK(event, call)!;
   const acc = sdk.Accounts.loadAccount(receiver);
   acc.messageIn(srcChainId, sender, data);
 }
