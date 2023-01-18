@@ -327,7 +327,7 @@ export class Pool {
         this.pool.cumulativeVolumeOutUSD.plus(amountUSD);
       this.pool.netVolume = this.pool.netVolume.minus(amount);
       this.pool.netVolumeUSD = this.pool.netVolumeUSD.minus(amountUSD);
-      this.protocol.addVolumeInUSD(amountUSD);
+      this.protocol.addVolumeOutUSD(amountUSD);
     } else {
       route.cumulativeVolumeIn = route.cumulativeVolumeIn.plus(amount);
       route.cumulativeVolumeInUSD = route.cumulativeVolumeInUSD.plus(amountUSD);
@@ -336,7 +336,7 @@ export class Pool {
         this.pool.cumulativeVolumeInUSD.plus(amountUSD);
       this.pool.netVolume = this.pool.netVolume.plus(amount);
       this.pool.netVolumeUSD = this.pool.netVolumeUSD.plus(amountUSD);
-      this.protocol.addVolumeOutUSD(amountUSD);
+      this.protocol.addVolumeInUSD(amountUSD);
     }
     route.save();
     this.save();
