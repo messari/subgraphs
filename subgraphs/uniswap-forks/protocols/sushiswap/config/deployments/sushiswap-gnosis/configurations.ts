@@ -21,9 +21,9 @@ import {
   toLowerCaseList,
 } from "../../../../../src/common/utils/utils";
 
-export class SushiswapXdaiConfigurations implements Configurations {
+export class SushiswapGnosisConfigurations implements Configurations {
   getNetwork(): string {
-    return Network.XDAI;
+    return Network.GNOSIS;
   }
   getSchemaVersion(): string {
     return PROTOCOL_SCHEMA_VERSION;
