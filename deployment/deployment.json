@@ -2843,6 +2843,10 @@
           "hosted-service": {
             "slug": "network-gnosis",
             "query-id": "network-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "network-gnosis",
+            "query-id": "UNKNOWN"
           }
         }
       }
@@ -3614,6 +3618,10 @@
           "hosted-service": {
             "slug": "qidao-gnosis",
             "query-id": "qidao-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "qidao-gnosis",
+            "query-id": "UNKNOWN"
           }
         }
       }
@@ -4140,6 +4148,10 @@
           "hosted-service": {
             "slug": "sushiswap-gnosis",
             "query-id": "sushiswap-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-gnosis",
+            "query-id": "UNKNOWN"
           }
         }
       }
@@ -4314,6 +4326,10 @@
           "hosted-service": {
             "slug": "honeyswap-gnosis",
             "query-id": "honeyswap-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "honeyswap-gnosis",
+            "query-id": "UNKNOWN"
           }
         }
       },
