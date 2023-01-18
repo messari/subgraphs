@@ -62,6 +62,7 @@ import {
   SECONDS_PER_DAY,
   BIGINT_MINUS_ONE,
   PoolName,
+  BIGINT_TWO,
 } from "./sdk/util/constants";
 
 // empty handler for prices library
@@ -204,11 +205,11 @@ export function handleSend(event: Send): void {
     event.params.transferId
   );
 
-  let transfer = _Refund.load(event.params.transferId);
-  if (!transfer) {
-    transfer = new _Refund(event.params.transferId);
-    transfer.sender = event.params.sender.toHexString();
-    transfer.save();
+  let refund = _Refund.load(event.params.transferId);
+  if (!refund) {
+    refund = new _Refund(event.params.transferId);
+    refund.sender = event.params.sender.toHexString();
+    refund.save();
   }
 }
 
@@ -240,12 +241,6 @@ export function handleWithdraw(call: WithdrawCall): void {
   const bridgePoolType = BridgePoolType.LIQUIDITY;
   const txId = call.transaction.hash.concatI32(call.transaction.index.toI32());
 
-  // TODO: remove once supply side revenue running
-  log.info("[handleWithdraw]refid={},tx={}", [
-    wdmsg.refId.toHexString(),
-    call.transaction.hash.toHexString(),
-  ]);
-
   const transfer = _Refund.load(wdmsg.refId);
   if (wdmsg.refId.equals(Bytes.empty())) {
     // LP withdraw liquidity: refId == 0x0
@@ -260,12 +255,9 @@ export function handleWithdraw(call: WithdrawCall): void {
     )
   ) {
     // claim fee (liquidity provider): refId == 0x1
-    // TODO: remove once supply side revenue running
-    log.info("[handleWithdraw]supplier fee {} collected in token {}", [
-      wdmsg.amount.toString(),
-      wdmsg.token.toHexString(),
-    ]);
-    pool.addRevenueNative(BIGINT_ZERO, wdmsg.amount);
+    // Assume fees are divided evenly (50%-50%) between protocol and supply
+    const feeAmount = wdmsg.amount.div(BIGINT_TWO);
+    pool.addRevenueNative(feeAmount, feeAmount);
   } else if (transfer) {
     // refund, refId==xfer_id
     // refund is handled with a "transferIn"
@@ -332,63 +324,23 @@ export function handleOTVDeposited(event: OTVDeposited): void {
     event,
     event.params.depositId
   );
+
+  let refund = _Refund.load(event.params.depositId);
+  if (!refund) {
+    refund = new _Refund(event.params.depositId);
+    refund.sender = event.params.depositor.toHexString();
+    refund.save();
+  }
 }
 
 export function handleOTVWithdrawn(event: OTVWithdrawn): void {
-  const sdk = _getSDK(event)!;
-  const poolId = event.address.concat(event.params.token);
-  const pool = sdk.Pools.loadPool(poolId);
-  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
-
-  // depending on value of refChainId, the withdraw may be fee withdraw, refund or burn-withdraw
-  // https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/pegged-bridge/OriginalTokenVault.sol#L45
-  const thisChainId = networkToChainID(dataSource.network());
-  const refChainId = event.params.refChainId;
-  if (refChainId == BIGINT_ZERO) {
-    // fee withdraw
-    pool.addRevenueNative(event.params.amount, BIGINT_ZERO);
-    return;
-  }
-  if (refChainId == thisChainId) {
-    // refund
-    // refund is handled with a counter "transferIn"
-    const thisPoolAddress = event.address;
-
-    _handleTransferIn(
-      event.params.token,
-      event.params.burnAccount,
-      event.params.receiver,
-      event.params.amount,
-      thisChainId,
-      thisPoolAddress,
-      pool.getBytesID(),
-      BridgePoolType.BURN_MINT,
-      CrosschainTokenType.CANONICAL,
-      event.params.refId,
-      txId,
-      event
-    );
-    return;
-  }
-
-  // burn-withdraw
-  const networkConstants = getNetworkSpecificConstant(event.params.refChainId);
-  const srcPoolAddress = networkConstants.getPoolAddress(
-    PoolName.PeggedTokenBridge
-  );
-
-  _handleTransferIn(
+  _handleOTVWithdrawn(
     event.params.token,
     event.params.burnAccount,
     event.params.receiver,
     event.params.amount,
     event.params.refChainId,
-    srcPoolAddress,
-    poolId,
-    BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
     event.params.refId,
-    txId,
     event
   );
 }
@@ -414,62 +366,22 @@ export function handleOTVv2Deposited(event: OTVv2Deposited): void {
     event,
     event.params.depositId
   );
+
+  let refund = _Refund.load(event.params.depositId);
+  if (!refund) {
+    refund = new _Refund(event.params.depositId);
+    refund.sender = event.params.depositor.toHexString();
+    refund.save();
+  }
 }
 
 export function handleOTVv2Withdrawn(event: OTVv2Withdrawn): void {
-  const sdk = _getSDK(event)!;
-  const poolId = event.address.concat(event.params.token);
-  const pool = sdk.Pools.loadPool(poolId);
-  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
-
-  // depending on value of refChainId, the withdraw may be fee withdraw, refund or burn-withdraw
-  // https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/pegged-bridge/OriginalTokenVaultV2.sol#L45
-  const thisChainId = networkToChainID(dataSource.network());
-  const refChainId = event.params.refChainId;
-  if (refChainId == BIGINT_ZERO) {
-    // fee withdraw
-    pool.addRevenueNative(event.params.amount, BIGINT_ZERO);
-    return;
-  }
-  if (refChainId == thisChainId) {
-    // refund
-    // refund is handled with a counter "transferIn"
-    const thisPoolAddress = event.address;
-
-    _handleTransferIn(
-      event.params.token,
-      event.params.burnAccount,
-      event.params.receiver,
-      event.params.amount,
-      thisChainId,
-      thisPoolAddress,
-      pool.getBytesID(),
-      BridgePoolType.BURN_MINT,
-      CrosschainTokenType.CANONICAL,
-      event.params.refId,
-      txId,
-      event
-    );
-    return;
-  }
-
-  // burn-withdraw
-  const networkConstants = getNetworkSpecificConstant(event.params.refChainId);
-  const srcPoolAddress = networkConstants.getPoolAddress(
-    PoolName.PeggedTokenBridgeV2
-  );
-
-  _handleTransferIn(
+  _handleOTVWithdrawn(
     event.params.token,
     event.params.burnAccount,
     event.params.receiver,
     event.params.amount,
     event.params.refChainId,
-    srcPoolAddress,
-    poolId,
-    BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
-    txId,
     event.params.refId,
     event
   );
@@ -564,7 +476,8 @@ export function handlePTBv2Mint(event: PTBv2Mint): void {
 export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
   const sdk = _getSDK(event)!;
   const protocol = sdk.Protocol.protocol;
-
+  // average reward emission over the duration in days
+  const averageRewardOverDays = 7;
   if (!protocol._lastRewardTimestamp) {
     protocol._lastRewardTimestamp = event.block.timestamp;
     protocol._cumulativeRewardsClaimed = event.params.reward;
@@ -572,10 +485,10 @@ export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
     return;
   } else if (
     event.block.timestamp <
-    protocol._lastRewardTimestamp!.plus(BigInt.fromI32(SECONDS_PER_DAY))
+    protocol._lastRewardTimestamp!.plus(
+      BigInt.fromI32(SECONDS_PER_DAY * averageRewardOverDays)
+    )
   ) {
-    // TODO maybe one day is too short & reward amount is jumpy
-    // Increase to 7 days?
     protocol._cumulativeRewardsClaimed =
       protocol._cumulativeRewardsClaimed!.plus(event.params.reward);
     protocol.save();
@@ -598,6 +511,7 @@ export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
       pool.pool.totalValueLockedUSD
         .div(sumTVLUSD)
         .times(protocol._cumulativeRewardsClaimed!.toBigDecimal())
+        .div(BigDecimal.fromString(averageRewardOverDays.toString()))
     );
     pool.setRewardEmissions(RewardTokenType.DEPOSIT, rToken, poolRewardAmount);
   }
@@ -773,6 +687,74 @@ function _handleTransferIn(
   }
 }
 
+function _handleOTVWithdrawn(
+  token: Address,
+  sender: Address,
+  receiver: Address,
+  amount: BigInt,
+  refChainId: BigInt,
+  refId: Bytes,
+  event: ethereum.Event
+): void {
+  const sdk = _getSDK(event)!;
+  const poolId = event.address.concat(token);
+  const pool = sdk.Pools.loadPool(poolId);
+  const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
+
+  // depending on value of refChainId, the withdraw may be fee withdraw, refund or burn-withdraw
+  // https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/pegged-bridge/OriginalTokenVault.sol#L45
+  // https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/pegged-bridge/OriginalTokenVaultV2.sol#L45
+  const thisChainId = networkToChainID(dataSource.network());
+  if (refChainId == BIGINT_ZERO) {
+    // fee withdraw
+    pool.addRevenueNative(amount, BIGINT_ZERO);
+    return;
+  }
+  const refund = _Refund.load(refId);
+  if (refund && refChainId == thisChainId) {
+    // refund
+    // refund is handled with a counter "transferIn"
+    const thisPoolAddress = event.address;
+
+    _handleTransferIn(
+      token,
+      sender,
+      receiver,
+      amount,
+      thisChainId,
+      thisPoolAddress,
+      pool.getBytesID(),
+      BridgePoolType.BURN_MINT,
+      CrosschainTokenType.CANONICAL,
+      refId,
+      txId,
+      event
+    );
+    return;
+  }
+
+  // burn-withdraw
+  const networkConstants = getNetworkSpecificConstant(refChainId);
+  const srcPoolAddress = networkConstants.getPoolAddress(
+    PoolName.PeggedTokenBridge
+  );
+
+  _handleTransferIn(
+    token,
+    sender,
+    receiver,
+    amount,
+    refChainId,
+    srcPoolAddress,
+    poolId,
+    BridgePoolType.BURN_MINT,
+    CrosschainTokenType.WRAPPED,
+    refId,
+    txId,
+    event
+  );
+}
+
 function _handleMessageOut(
   dstChainId: BigInt,
   sender: Address,
@@ -783,6 +765,9 @@ function _handleMessageOut(
   call: ethereum.Call | null = null
 ): void {
   const sdk = _getSDK(event, call)!;
+  const acc = sdk.Accounts.loadAccount(sender);
+  acc.messageOut(dstChainId, receiver, data);
+
   // Message send/receive on cbridge is not specific to a bridge
   // unless it is sendMessageWithTransfer or executeMessageWithTransfer
   // then in these cases, the transfer is going through the specified bridge
@@ -806,9 +791,6 @@ function _handleMessageOut(
     BridgePoolType.LIQUIDITY,
     gasFeeToken.id.toHexString()
   );
-
-  const acc = sdk.Accounts.loadAccount(sender);
-  acc.messageOut(dstChainId, receiver, data);
   pool.addRevenueNative(fee, BIGINT_ZERO);
 }
 
