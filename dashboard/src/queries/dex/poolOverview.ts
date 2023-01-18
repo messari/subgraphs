@@ -13,8 +13,7 @@ export const schema = (version: string): string => {
     case Versions.Schema200:
       return schema200();
     case Versions.Schema300:
-      if (spec === "1") return schema301();
-      return schema300();
+      return schema303();
     default:
       return schema130();
   }
@@ -78,24 +77,8 @@ export const schema200 = (): string => {
     }`;
 };
 
-export const schema300 = (): string => {
-  return `
-    query Data($skipAmt: Int!) {
-      liquidityPools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
-        id
-        name
-        fees {
-          feePercentage
-          feeType
-        }
-        totalValueLockedUSD
-        cumulativeTotalVolumeUSD
-        rewardTokenEmissionsUSD
-      }
-    }`;
-};
 
-export const schema301 = (): string => {
+export const schema303 = (): string => {
   return `
     query Data($skipAmt: Int!) {
       liquidityPools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {

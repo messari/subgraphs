@@ -462,7 +462,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                                 if (!currentObject?.fatalError) {
                                     window.open(`https://subgraphs.messari.io/subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`, "_blank");
                                 } else {
-                                    window.open("https://okgraph.xyz/?q=" + depo.hostedServiceId, "_blank");
+                                    window.open("https://okgraph.xyz/?q=messari/" + depo.hostedServiceId, "_blank");
                                 }
                             } else {
                                 if (!validationSupported) {
@@ -472,7 +472,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                                 if (!currentObject?.fatalError) {
                                     navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`)
                                 } else {
-                                    window.location.href = "https://okgraph.xyz/?q=" + depo.hostedServiceId;
+                                    window.location.href = "https://okgraph.xyz/?q=messari/" + depo.hostedServiceId;
                                 }
                             }
                             return;
@@ -540,7 +540,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                                 if (!currentObject?.fatalError) {
                                     window.open(`https://subgraphs.messari.io/subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`, "_blank");
                                 } else {
-                                    window.open("https://okgraph.xyz/?q=" + depo.hostedServiceId, "_blank");
+                                    window.open("https://okgraph.xyz/?q=messari/" + depo.hostedServiceId, "_blank");
                                 }
                             } else {
                                 if (!validationSupported) {
@@ -550,7 +550,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                                 if (!currentObject?.fatalError) {
                                     navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`)
                                 } else {
-                                    window.location.href = "https://okgraph.xyz/?q=" + depo.hostedServiceId;
+                                    window.location.href = "https://okgraph.xyz/?q=messari/" + depo.hostedServiceId;
                                 }
                             }
                             return;

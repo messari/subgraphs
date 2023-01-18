@@ -24,7 +24,7 @@ export namespace Versions {
 export const latestSchemaVersions = (schemaType: string, versionStr: string) => {
   const schema = schemaMapping[schemaType];
   if (schema === "exchanges") {
-    if ((["3.0.0", "3.0.1", "3.0.2"]).includes(versionStr)) {
+    if ((["3.0.3"]).includes(versionStr)) {
       return true;
     }
   } else if (schema === "lending") {
@@ -131,3 +131,5 @@ export const blockExplorers: Record<string, string> = {
 
 // negativeFieldList contains field names that can be negative
 export const negativeFieldList = ["dailyNetVolumeUSD", "netVolumeUSD", "cumulativeNetVolumeUSD"];
+
+export const dateValueKeys = ['day', 'days', 'hour', 'hours'];
