@@ -1,5 +1,5 @@
 {
-  "chain": "xdai",
+  "chain": "gnosis",
   "erc20Vaults": [
     {
       "name": "WETH",
