@@ -202,8 +202,24 @@ export function handleSwapOut(event: Swap): void {
     return;
   }
 
-  const poolTokens = crossPoolTokens.get(crosschainNetwork)!;
-  const crosschainTokenAddr = poolTokens.get(crossPoolID)!;
+  const poolTokens = crossPoolTokens.get(crosschainNetwork);
+  if (!poolTokens) {
+    log.warning("[handleSwapOut] No pools for network: {}", [
+      crosschainNetwork,
+    ]);
+
+    return;
+  }
+
+  const crosschainTokenAddr = poolTokens.get(crossPoolID);
+  if (!crosschainTokenAddr) {
+    log.warning(
+      "[handleSwapOut] No crosschainToken for network: {} poolID: {}",
+      [crosschainNetwork, crossPoolID.toString()]
+    );
+
+    return;
+  }
 
   const crosschainToken = sdk.Tokens.getOrCreateCrosschainToken(
     crosschainID,
@@ -247,8 +263,22 @@ export function handleSwapIn(call: SwapRemoteCall): void {
     return;
   }
 
-  const poolTokens = crossPoolTokens.get(crosschainNetwork)!;
-  const crosschainTokenAddr = poolTokens.get(crossPoolID)!;
+  const poolTokens = crossPoolTokens.get(crosschainNetwork);
+  if (!poolTokens) {
+    log.warning("[handleSwapIn] No pools for network: {}", [crosschainNetwork]);
+
+    return;
+  }
+
+  const crosschainTokenAddr = poolTokens.get(crossPoolID);
+  if (!crosschainTokenAddr) {
+    log.warning(
+      "[handleSwapIn] No crosschainToken for network: {} poolID: {}",
+      [crosschainNetwork, crossPoolID.toString()]
+    );
+
+    return;
+  }
 
   const crosschainToken = sdk.Tokens.getOrCreateCrosschainToken(
     crosschainID,

@@ -51,6 +51,14 @@ mainnetPoolIDsToToken.set(
   BigInt.fromI32(16),
   Address.fromString("0x9cef9a0b1bE0D289ac9f4a98ff317c33EAA84eb8")
 );
+mainnetPoolIDsToToken.set(
+  BigInt.fromI32(17),
+  Address.fromString("0xd8772edBF88bBa2667ed011542343b0eDDaCDa47")
+);
+mainnetPoolIDsToToken.set(
+  BigInt.fromI32(19),
+  Address.fromString("0x430Ebff5E3E80A6C58E7e6ADA1d90F5c28AA116d")
+);
 crossPoolTokens.set(Network.MAINNET, mainnetPoolIDsToToken);
 
 export const bscPoolIDsToToken = new TypedMap<BigInt, Address>();
@@ -70,6 +78,14 @@ bscPoolIDsToToken.set(
   BigInt.fromI32(16),
   Address.fromString("0x7BfD7f2498C4796f10b6C611D9db393D3052510C")
 );
+bscPoolIDsToToken.set(
+  BigInt.fromI32(17),
+  Address.fromString("0xD4CEc732b3B135eC52a3c0bc8Ce4b8cFb9dacE46")
+);
+bscPoolIDsToToken.set(
+  BigInt.fromI32(19),
+  Address.fromString("0x68C6c27fB0e02285829e69240BE16f32C5f8bEFe")
+);
 crossPoolTokens.set(Network.BSC, bscPoolIDsToToken);
 
 export const avaxPoolIDsToToken = new TypedMap<BigInt, Address>();
@@ -88,6 +104,10 @@ avaxPoolIDsToToken.set(
 avaxPoolIDsToToken.set(
   BigInt.fromI32(16),
   Address.fromString("0x8736f92646B2542B3e5F3c63590cA7Fe313e283B")
+);
+avaxPoolIDsToToken.set(
+  BigInt.fromI32(19),
+  Address.fromString("0xEAe5c2F6B25933deB62f754f239111413A0A25ef")
 );
 crossPoolTokens.set(Network.AVALANCHE, avaxPoolIDsToToken);
 
@@ -170,3 +190,14 @@ fantomPoolIDsToToken.set(
   Address.fromString("0x04068da6c83afcfa0e13ba15a6696662335d5b75")
 );
 crossPoolTokens.set(Network.FANTOM, fantomPoolIDsToToken);
+
+export const metisPoolIDsToToken = new TypedMap<BigInt, Address>();
+metisPoolIDsToToken.set(
+  BigInt.fromI32(17),
+  Address.fromString("0xAad094F6A75A14417d39f04E690fC216f080A41a")
+);
+metisPoolIDsToToken.set(
+  BigInt.fromI32(19),
+  Address.fromString("0x2b60473a7C41Deb80EDdaafD5560e963440eb632")
+);
+crossPoolTokens.set(Network.METIS, metisPoolIDsToToken);
