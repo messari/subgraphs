@@ -7,7 +7,6 @@ import {
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
-
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
