@@ -200,37 +200,6 @@ export class Account {
     );
   }
 
-  sendMessage(
-    destination: Address,
-    destinationChainID: BigInt,
-    data: Bytes
-  ): BridgeMessage {
-    this.countMessageSent();
-
-    const id = idFromEvent(this.event);
-    const message = new BridgeMessage(id);
-    message.hash = this.event.transaction.hash;
-    message.logIndex = this.event.logIndex.toI32();
-    message.blockNumber = this.event.block.number;
-    message.timestamp = this.event.block.timestamp;
-    message.protocol = this.protocol.getBytesID();
-    message.account = this.account.id;
-
-    message.to = destination;
-    message.from = this.account.id;
-    message.isOutgoing = true;
-    message.fromChainID = this.protocol.getCurrentChainID();
-    message.toChainID = destinationChainID;
-    message.transferFrom = this.account.id;
-    message.transferTo = destination;
-    message.data = data;
-    message.save();
-
-    this.addChain(message.fromChainID);
-    this.addChain(message.toChainID);
-    return message;
-  }
-
   private transfer(
     pool: Pool,
     route: PoolRoute,
@@ -297,6 +266,83 @@ export class Account {
     transfer.account = this.account.id;
 
     return transfer;
+  }
+
+  /**
+   * Creates a BridgeMessage entity for a message arriving to this chain
+   *
+   * @param srcChainId the source chain id
+   * @param source The account sending the message.
+   * @param data Contents of the message
+   * @param transactionID Optional transaction ID on the source chain.
+   * @returns BridgeMessage
+   */
+  messageIn(srcChainId: BigInt, source: Address, data: Bytes): BridgeMessage {
+    this.countMessageIn();
+    this.protocol.addTransaction(TransactionType.MESSAGE_RECEIVED);
+
+    return this.message(
+      srcChainId,
+      this.protocol.getCurrentChainID(),
+      source,
+      Address.fromBytes(this.account.id),
+      false,
+      data
+    );
+  }
+
+  /**
+   * Creates a BridgeMessage entity for a message away from this chain
+   *
+   * @param dstChainId the destination chain id
+   * @param destination The account receiving the message.
+   * @param data Contents of the message
+   * @returns BridgeMessage
+   */
+  messageOut(
+    dstChainId: BigInt,
+    destination: Address,
+    data: Bytes
+  ): BridgeMessage {
+    this.countMessageOut();
+    this.protocol.addTransaction(TransactionType.MESSAGE_SENT);
+
+    return this.message(
+      this.protocol.getCurrentChainID(),
+      dstChainId,
+      Address.fromBytes(this.account.id),
+      destination,
+      true,
+      data
+    );
+  }
+
+  private message(
+    srcChainId: BigInt,
+    dstChainId: BigInt,
+    sender: Address,
+    receiver: Address,
+    isOutgoing: boolean,
+    data: Bytes
+  ): BridgeMessage {
+    const id = idFromEvent(this.event);
+    const message = new BridgeMessage(id);
+    message.hash = this.event.transaction.hash;
+    message.logIndex = this.event.logIndex.toI32();
+    message.blockNumber = this.event.block.number;
+    message.timestamp = this.event.block.timestamp;
+
+    message.protocol = this.protocol.getBytesID();
+    message.account = this.account.id;
+    message.from = sender;
+    message.to = receiver;
+    message.isOutgoing = isOutgoing;
+    message.data = data;
+    message.fromChainID = srcChainId;
+    message.toChainID = dstChainId;
+    message.save();
+
+    return message;
   }
 
   /**
@@ -440,7 +486,27 @@ export class Account {
     this.account.save();
   }
 
-  countMessageSent(): void {
+  /**
+   * Adds 1 to the account total MessageReceived count. (not yet ) If it is the first message received ever
+   * by this account it will also increase the number of unique message receivers in the protocol.
+   */
+  countMessageIn(): void {
+    /*
+    // enable this if it is necessary to track message receivers
+    if (this.account.messageReceivedCount == 0) {
+      this.protocol.addMessageReceiver();
+    }
+    */
+    this.trackActivity(ActivityType.MESSAGE);
+    this.account.messageReceivedCount += 1;
+    this.account.save();
+  }
+
+  /**
+   * Adds 1 to the account total MessageSent count. If it is the first message sent ever
+   * by this account it will also increase the number of unique message senders in the protocol.
+   */
+  countMessageOut(): void {
     if (this.account.messageSentCount == 0) {
       this.protocol.addMessageSender();
     }

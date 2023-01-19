@@ -9,7 +9,9 @@ export namespace NULL {
   export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
 }
 
-export const CHAIN_LINK_USD_ADDRESS = Address.fromString(" ");
+export const CHAIN_LINK_USD_ADDRESS = Address.fromString(
+  "0x0000000000000000000000000000000000000348"
+);
 
 export const PRICE_LIB_VERSION = "1.1.0";
 

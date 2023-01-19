@@ -12,7 +12,7 @@ graft:
 dataSources:
 {{#ethereum}}
   - kind: ethereum/contract
-    name: L1StandardBridge
+    name: {{ name }}
     network: {{ network }}
     source:
       address: "{{ bridgeAddress }}"
@@ -74,6 +74,7 @@ dataSources:
         - event: ETHWithdrawalFinalized(indexed address,indexed address,uint256,bytes)
           handler: handleETHWithdrawalFinalized
       file: ./src/mappings/L1StandardBridge.ts
+  {{#messengerAddress}}
   - kind: ethereum
     name: L1CrossDomainMessenger
     network: {{ network }}
@@ -93,10 +94,11 @@ dataSources:
         - event: SentMessage(indexed address,address,bytes,uint256,uint256)
           handler: handleSentMessage
       file: ./src/mappings/L1CrossDomainMessenger.ts
+  {{/messengerAddress}}
 {{/ethereum}}
 {{#optimism}}
   - kind: ethereum/contract
-    name: L2StandardBridge
+    name: {{ name }}
     network: {{ network }}
     source:
       address: "{{ bridgeAddress }}"
@@ -154,6 +156,7 @@ dataSources:
         - event: WithdrawalInitiated(indexed address,indexed address,indexed address,address,uint256,bytes)
           handler: handleWithdrawalInitiated
       file: ./src/mappings/L2StandardBridge.ts
+  {{#messengerAddress}}
   - kind: ethereum
     name: L2CrossDomainMessenger
     network: {{ network }}
@@ -173,6 +176,7 @@ dataSources:
         - event: SentMessage(indexed address,address,bytes,uint256,uint256)
           handler: handleSentMessage
       file: ./src/mappings/L2CrossDomainMessenger.ts
+  {{/messengerAddress}}
 {{/optimism}}
 templates:
   # Template with all abis to use for imports

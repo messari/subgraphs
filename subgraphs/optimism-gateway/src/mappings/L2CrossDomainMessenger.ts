@@ -6,9 +6,9 @@ import { Network } from "../sdk/util/constants";
 export function handleSentMessage(event: SentMessageEvent): void {
   const sdk = getSDK(event);
   const account = sdk.Accounts.loadAccount(event.transaction.from);
-  account.sendMessage(
-    event.params.target,
+  account.messageOut(
     networkToChainID(Network.MAINNET),
+    event.params.target,
     event.params.message
   );
 }

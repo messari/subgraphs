@@ -1,11 +1,34 @@
 {
   "network": "optimism",
-  "optimism": {
-    "bridgeAddress": "0x4200000000000000000000000000000000000010",
-    "bridgeStartBlock": 0,
-    "messengerAddress": "0x4200000000000000000000000000000000000007",
-    "messengerStartBlock": 0
-  },
+  "optimism": [
+    {
+      "name": "L2StandardBridge",
+      "bridgeAddress": "0x4200000000000000000000000000000000000010",
+      "bridgeStartBlock": 0,
+      "messengerAddress": "0x4200000000000000000000000000000000000007",
+      "messengerStartBlock": 0
+    },
+    {
+      "name": "BitBTCBridge",
+      "bridgeAddress": "0x158F513096923fF2d3aab2BcF4478536de6725e2",
+      "bridgeStartBlock": 320367
+    },
+    {
+      "name": "DAIBridge",
+      "bridgeAddress": "0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65",
+      "bridgeStartBlock": 0
+    },
+    {
+      "name": "dForceUSDBridge",
+      "bridgeAddress": "0xc76cbFbAfD41761279E3EDb23Fd831Ccb74D5D67",
+      "bridgeStartBlock": 878824
+    },
+    {
+      "name": "wstETHBridge",
+      "bridgeAddress": "0x8E01013243a96601a86eb3153F0d9Fa4fbFb6957",
+      "bridgeStartBlock": 17831155
+    }
+  ],
   "graftEnabled": false,
   "subgraphId": "",
   "graftStartBlock": 0
