@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol
-# Version: 1.3.0
+# Version: 1.3.1
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -23,7 +23,7 @@ enum Network {
   OPTIMISM
   OSMOSIS
   MATIC # aka Polygon
-  XDAI # aka Gnosis Chain
+  GNOSIS
 }
 
 enum ProtocolType {

@@ -2,21 +2,19 @@ import { Box, Button } from "@mui/material";
 import { DataGrid, GridAlignment } from "@mui/x-data-grid";
 import moment from "moment";
 import { useState } from "react";
-import { downloadCSV, formatIntToFixed2, tableCellTruncate, toDate, upperCaseFirstOfString } from "../../../src/utils/index";
+import { downloadCSV, formatIntToFixed2, tableCellTruncate, toDate, toUnitsSinceEpoch, upperCaseFirstOfString } from "../../../src/utils/index";
 import { DatePicker } from "../utilComponents/DatePicker";
 
 interface ComparisonTableProps {
   datasetLabel: string;
   dataTable: any;
-  isMonthly: boolean;
   isHourly: boolean;
-  setIsMonthly: any;
   jpegDownloadHandler: any;
   baseKey: string;
   overlayKey: string;
 }
 
-export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, isHourly, setIsMonthly, jpegDownloadHandler, baseKey, overlayKey }: ComparisonTableProps) => {
+export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloadHandler, baseKey, overlayKey }: ComparisonTableProps) => {
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -105,18 +103,17 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, isHourly, 
         }
         return true;
       });
+
+      const dateToValMap: any = {};
+      dataTableCopy[overlayKey].forEach((val: any) => {
+        const key = toUnitsSinceEpoch(toDate(val.date, isHourly), isHourly);
+        dateToValMap[key] = val.value;
+      });
       const tableData = dataTableCopy[baseKey]
         .map((val: any, i: any) => {
           let date = toDate(val.date, isHourly);
-          if (isMonthly) {
-            date = date.split("-").slice(0, 2).join("-");
-          }
-          let overlayVal = dataTableCopy[overlayKey].find((point: any) => {
-            if (isMonthly) {
-              return toDate(point?.date)?.split("-")?.slice(0, 2)?.join("-");
-            }
-            return toDate(point?.date, isHourly) === date;
-          })?.value;
+          const dateKey = toUnitsSinceEpoch(toDate(val.date, isHourly), isHourly);
+          let overlayVal = dateToValMap[dateKey];
           if (!overlayVal) {
             overlayVal = 0;
           }
@@ -198,7 +195,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, isHourly, 
       );
     }
   } catch (err: any) {
-    console.error(err.message);
+    console.error(err);
     return null;
   }
 

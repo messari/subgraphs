@@ -1147,6 +1147,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
           poolOverviewRequest={{ poolOverviewError: anyPoolOverviewError, poolOverviewLoading: anyPoolOverviewLoading }}
           poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
           overlayPoolTimeseriesData={overlayPoolDataToPass}
+          overlayPoolTimeseriesLoading={overlayPoolTimeseriesLoading}
           positionsQuery={positionsQuery}
           protocolTimeseriesData={{
             financialsDailySnapshots: financialsData?.financialsDailySnapshots,
