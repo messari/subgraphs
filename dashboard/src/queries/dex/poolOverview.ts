@@ -6,8 +6,6 @@ export const schema = (version: string): string => {
   const spec = versionGroupArr.pop();
   const versionGroup = versionGroupArr.join(".") + ".0";
   switch (versionGroup) {
-    case Versions.Schema120:
-      return schema120();
     case Versions.Schema130:
       return schema130();
     case Versions.Schema200:
@@ -17,26 +15,6 @@ export const schema = (version: string): string => {
     default:
       return schema130();
   }
-};
-
-export const schema120 = (): string => {
-  return `
-  query Data($skipAmt: Int!) {
-    liquidityPools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
-      id
-      name
-      fees {
-        feePercentage
-        feeType
-      }
-
-      totalValueLockedUSD
-      cumulativeVolumeUSD
-      outputTokenSupply
-      stakedOutputTokenAmount
-      rewardTokenEmissionsUSD
-    }
-  }`;
 };
 
 export const schema130 = (): string => {

@@ -28,11 +28,11 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
 
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
-  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
-  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
 
-  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
-  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
 
   const [indexingStatus, setIndexingStatus] = useState<any>(false);
   const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);

@@ -686,13 +686,14 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
 
     try {
         if (protocol?.schemaVersions?.length > 0) {
-            const schemaColored = protocol?.schemaVersions?.map((x: string, idx: number) => {
-                if (latestSchemaVersions(schemaType, x) || schemaType === "governance") {
-                    return <span>{x}</span>;
+            let schemaColored = {};
+            const schemaVersOnProtocol = protocol?.schemaVersions?.map((x: string) => {
+                if (!(latestSchemaVersions(schemaType, x) || schemaType === "governance")) {
+                    schemaColored = { color: "#FFA500" };
                 }
-                return <span key={subgraphName + "-protocol-schemaVerRow-" + idx} style={{ color: "#FFA500" }}>{x}</span>;
+                return x;
             })
-            schemaCell = <span>{schemaColored}</span>;
+            schemaCell = <span style={schemaColored} >{schemaVersOnProtocol.join(", ")}</span>;
         }
 
         if (hasDecentralizedDepo) {
