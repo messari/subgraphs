@@ -1855,10 +1855,6 @@
           "hosted-service": {
             "slug": "compound-v3-ethereum",
             "query-id": "compound-v3-ethereum"
-          },
-          "decentralized-network": {
-            "slug": "compound-v3-ethereum",
-            "query-id": "6PaB6tKFqrL6YoAELEhFGU6Gc39cEynLbo6ETZMF3sCy"
           }
         }
       }
