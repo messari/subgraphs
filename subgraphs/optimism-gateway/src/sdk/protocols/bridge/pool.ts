@@ -5,7 +5,6 @@ import {
   Bytes,
   log,
 } from "@graphprotocol/graph-ts";
-import { CustomEventType, SDK } from ".";
 import {
   BridgeTransfer,
   CrosschainToken,
