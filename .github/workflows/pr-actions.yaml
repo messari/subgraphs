@@ -64,10 +64,15 @@ jobs:
         with:
           filter: 'subgraphs/**/*.ts'
 
-      - name: Prettify code check
-        uses: actionsx/prettier@v2
-        with:
-          args: --check ${{ steps.changed-files-specific.outputs.added_modified }}
+      - name: Install dependencies
+        run: npm i prettier
+
+      - name: Echo file changes
+        run: |
+          echo Changed files: "${{ steps.changed-files-specific.outputs.added_modified }}"
+
+      - name: Prettify check
+        run: prettier --check ${{ steps.changed-files-specific.outputs.added_modified }}
 
   Build:
     runs-on: macos-latest
