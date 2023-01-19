@@ -5955,7 +5955,7 @@
     "deployments": {
       "multichain-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5977,7 +5977,7 @@
       },
       "multichain-fantom": {
         "network": "fantom",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
