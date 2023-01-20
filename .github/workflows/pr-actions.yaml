@@ -53,31 +53,21 @@ jobs:
       - name: Lint staged files
         run: npm run lint:subgraphs ${{ steps.changed-files-specific.outputs.added_modified }}
 
-  prettier:
+  format:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+    - name: install prettier
+      run: npm install prettier
 
-      - name: Get changed files in the subgraphs folder
-        id: changed-files-specific
-        uses: Ana06/get-changed-files@v2.1.0
-        with:
-          filter: 'subgraphs/**/*.ts'
+    - name: Get changed files
+      run: git diff --name-only HEAD~1 '**.ts'
 
-      - name: Install dependencies
-        run: npm i -g prettier
-
-      # - name: Echo file changes
-      #   run: |
-      #     echo Changed files: "${{ steps.changed-files-specific.outputs.added_modified }}"
-
-      - name: Prettify check
-        run: prettier --check subgraphs/**/*.ts
+    - name: Format changed files
+      run: prettier --check ${{ steps.get_changed_files.outputs.stdout }}
 
   Build:
     runs-on: macos-latest
