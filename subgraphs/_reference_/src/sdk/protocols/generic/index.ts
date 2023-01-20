@@ -1,65 +1,70 @@
 import { ethereum } from "@graphprotocol/graph-ts";
 
+import { AccountManager } from "./account";
 import { ProtocolManager } from "./protocol";
-import { EventsManager } from "./event";
-import { PoolsManager } from "./pool";
-import { AccountsManager } from "./account";
-import { TokensManager, TokenInitializer } from "./token";
+import { PoolManager } from "./pool";
 import { TokenPricer } from "../config";
 import { Config } from "./config";
+import { TokenManager, TokenInitializer } from "./tokens";
+import { BIGINT_ZERO } from "../../util/constants";
+import { CustomEventType } from "../../util/events";
 
 export class SDK {
-  ProtocolManager: ProtocolManager;
-  PoolsManager: PoolsManager;
-  EventsManager: EventsManager;
-  AccountsManager: AccountsManager;
-  TokensManager: TokensManager;
+  Protocol: ProtocolManager;
+  Accounts: AccountManager;
+  Pools: PoolManager;
+  Tokens: TokenManager;
   Pricer: TokenPricer;
-  event: ethereum.Event;
 
   constructor(
     config: Config,
     pricer: TokenPricer,
     tokenInitializer: TokenInitializer,
-    event: ethereum.Event
+    event: CustomEventType
   ) {
-    this.ProtocolManager = new ProtocolManager(config, event);
-    this.TokensManager = new TokensManager(
-      this.ProtocolManager,
-      pricer,
-      tokenInitializer
-    );
-    this.AccountsManager = new AccountsManager(this.ProtocolManager);
-    this.PoolsManager = new PoolsManager(this.ProtocolManager);
-    this.EventsManager = new EventsManager(
-      this.PoolsManager,
-      this.TokensManager
-    );
-    this.event = event;
+    this.Protocol = ProtocolManager.load(config, pricer, event);
+    this.Tokens = new TokenManager(this.Protocol, tokenInitializer);
+    this.Accounts = new AccountManager(this.Protocol, this.Tokens);
+    this.Pools = new PoolManager(this.Protocol, this.Tokens);
+    this.Pricer = pricer;
+
+    this.Protocol.sdk = this;
   }
 
-  create_pool() {
-    this.TokensManager;
+  static initializeFromEvent(
+    config: Config,
+    pricer: TokenPricer,
+    tokenInitializer: TokenInitializer,
+    event: ethereum.Event
+  ): SDK {
+    const customEvent = CustomEventType.initialize(
+      event.block,
+      event.transaction,
+      event.logIndex,
+      event
+    );
+    return new SDK(config, pricer, tokenInitializer, customEvent);
   }
 
-  update_balances(
-    type: Enum,
-    rawDeltas: RawDeltas,
-    poolAddress: string | null
-  ): void {
-    const allDeltas = this.EventsManager.generate(rawDeltas);
-    this.EventsManager.create_swap(poolAddress, this.event, allDeltas);
-    this.PoolsManager.update_on_event(
-      this.event,
-      poolAddress,
-      allDeltas
-    ).take_snapshot();
-    this.TokensManager.update_on_event(
-      this.event,
-      poolAddress,
-      allDeltas
-    ).take_snapshot();
-    this.ProtocolManager.update_on_event(this.event, allDeltas).take_snapshot();
-    this.AccountsManager.update_on_event(this.event, allDeltas);
+  static initializeFromCall(
+    config: Config,
+    pricer: TokenPricer,
+    tokenInitializer: TokenInitializer,
+    event: ethereum.Call
+  ): SDK {
+    const customEvent = CustomEventType.initialize(
+      event.block,
+      event.transaction,
+      BIGINT_ZERO
+    );
+    return new SDK(config, pricer, tokenInitializer, customEvent);
+  }
+
+  static intializeFromCustomEvent(
+    config: Config,
+    pricer: TokenPricer,
+    tokenInitializer: TokenInitializer
+  ): SDK {
+    return new SDK(config, pricer, tokenInitializer, new CustomEventType());
   }
 }
