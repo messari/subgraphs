@@ -193,7 +193,7 @@ export function createRepay(
   user: Address,
   repayer: Address
 ): void {
-  if (amountToken.le(BIGINT_ZERO)) {
+  if (amountToken.lt(BIGINT_ZERO)) {
     log.critical("Invalid repay amount: {}", [amountToken.toString()]);
   }
   const account = getOrCreateAccount(repayer);

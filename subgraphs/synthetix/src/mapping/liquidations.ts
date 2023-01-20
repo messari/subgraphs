@@ -16,7 +16,18 @@ import {
   AccountLiquidated,
 } from "../../generated/schema";
 
-import { strToBytes, toDecimal } from "./lib/helpers";
+import {
+  bigDecimalToBigInt,
+  getLatestRate,
+  strToBytes,
+  toDecimal,
+} from "./lib/helpers";
+
+import { BigInt } from "@graphprotocol/graph-ts";
+import { SNX_ADDRESS, sUSD_ADDRESS } from "../utils/constants";
+import { createLiquidate } from "../entities/event";
+import { getOrCreateMarket, addMarketTokenBalance } from "../entities/market";
+import { getOrCreateToken } from "../entities/token";
 
 export function handleAccountFlaggedForLiquidation(
   event: AccountFlaggedForLiquidationEvent
@@ -65,4 +76,38 @@ export function handleAccountLiquidated(event: AccountLiquidatedEvent): void {
   entity.time = event.block.timestamp;
 
   entity.save();
+
+  const address = event.params.account;
+  const market = getOrCreateMarket(SNX_ADDRESS, event);
+  const liquidator = event.params.liquidator;
+
+  const snx = getOrCreateToken(SNX_ADDRESS);
+  const snx_latestRate = getLatestRate("snx", event.transaction.hash.toHex());
+  const snx_amount = toDecimal(event.params.snxRedeemed);
+  const snx_amountUSD = snx_amount.times(snx_latestRate!);
+
+  const susd = getOrCreateToken(sUSD_ADDRESS);
+  const susd_latestRate = getLatestRate("sUSD", event.transaction.hash.toHex());
+  const susd_amount = toDecimal(event.params.amountLiquidated);
+  const susd_amountUSD = susd_amount.times(susd_latestRate!);
+
+  const profitUSD = snx_amountUSD.minus(susd_amountUSD);
+
+  createLiquidate(
+    event,
+    market,
+    susd,
+    bigDecimalToBigInt(susd_amount),
+    bigDecimalToBigInt(snx_amount),
+    susd_amountUSD,
+    address,
+    liquidator,
+    profitUSD
+  );
+  addMarketTokenBalance(
+    event,
+    market,
+    bigDecimalToBigInt(snx_amount).times(BigInt.fromString("-1")),
+    snx_latestRate!
+  );
 }

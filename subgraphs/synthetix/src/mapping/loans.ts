@@ -129,13 +129,13 @@ export function handleLoanClosedByLiquidation(
   const liquidator = event.params.liquidator;
   const eth = getOrCreateToken(ETH_ADDRESS);
   const eth_latestRate = getLatestRate("sETH", event.transaction.hash.toHex());
-  const eth_amount = loanEntity!.collateralAmount;
+  const eth_amount = loanEntity.collateralAmount;
   const eth_amountUSD = eth_amount.times(eth_latestRate!);
   const market = getOrCreateMarket(eth.id, event);
 
   const susd = getOrCreateToken(sUSD_ADDRESS);
   const susd_latestRate = getLatestRate("sUSD", event.transaction.hash.toHex());
-  const susd_amount = loanEntity!.amount;
+  const susd_amount = loanEntity.amount;
   const susd_amountUSD = susd_amount.times(susd_latestRate!);
 
   const profitUSD = eth_amountUSD.minus(susd_amountUSD);

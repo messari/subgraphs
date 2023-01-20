@@ -11,7 +11,7 @@ import { MarketAdded as MarketAddedEvent } from "../../generated/exchanges_Futur
 
 import { FuturesMarketTemplate } from "../../generated/templates";
 
-import { ExchangeRates } from "../../generated/ExchangeRates_13/ExchangeRates";
+import { ExchangeRates } from "../../generated/ExchangeRates_0/ExchangeRates";
 
 import { ExchangeFeeUpdated as ExchangeFeeUpdatedEvent } from "../../generated/exchanges_SystemSettings_0/SystemSettings";
 
@@ -49,8 +49,8 @@ import {
 } from "./lib/helpers";
 import { toDecimal, ZERO_ADDRESS } from "./lib/helpers";
 import { addDollar, addProxyAggregator } from "./fragments/latest-rates";
-import { Synthetix } from "../../generated/ChainlinkMultisig/Synthetix";
-import { AddressResolver } from "../../generated/ChainlinkMultisig/AddressResolver";
+import { Synthetix } from "../../generated/issuance_Synthetix_0/Synthetix";
+import { AddressResolver } from "../../generated/templates/Aggregator/AddressResolver";
 
 const MAX_MAGNITUDE = 10;
 const ETHER = BigInt.fromI32(10).pow(18);

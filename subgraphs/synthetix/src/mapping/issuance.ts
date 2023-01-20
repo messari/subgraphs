@@ -12,7 +12,15 @@ import { Synthetix4 } from "../../generated/issuance_Synthetix_0/Synthetix4";
 
 import { AddressResolver } from "../../generated/issuance_Synthetix_0/AddressResolver";
 
-import { sUSD32, sUSD4, toDecimal, ZERO_ADDRESS, ZERO } from "./lib/helpers";
+import {
+  sUSD32,
+  sUSD4,
+  toDecimal,
+  ZERO_ADDRESS,
+  ZERO,
+  getLatestRate,
+  bigDecimalToBigInt,
+} from "./lib/helpers";
 import { getTimeID, isEscrow } from "./lib/helpers";
 
 // SynthetixState has not changed ABI since deployment
@@ -49,6 +57,7 @@ import {
   DailyIssued,
   DailyBurned,
   FeePeriod,
+  SynthByCurrencyKey,
 } from "../../generated/schema";
 
 import {
@@ -67,6 +76,16 @@ import { DAY_SECONDS } from "./lib/helpers";
 import { getContractDeployment } from "../../protocols/addresses";
 import { registerSynth } from "./fragments/balances";
 import { Synth } from "../../generated/schema";
+import {
+  createBorrow,
+  createDeposit,
+  createRepay,
+  createWithdraw,
+} from "../entities/event";
+import { addMarketTokenBalance, getOrCreateMarket } from "../entities/market";
+import { getOrCreateToken } from "../entities/token";
+import { SNX_ADDRESS } from "../utils/constants";
+import { BIGDECIMAL_ZERO } from "../prices/common/constants";
 
 const v219UpgradeBlock = BigInt.fromI32(9518914); // Archernar v2.19.x Feb 20, 2020
 
@@ -121,6 +140,7 @@ function trackIssuer(account: Address): void {
 }
 
 function trackSNXHolder(
+  event: ethereum.Event,
   snxContract: Address,
   account: Address,
   block: ethereum.Block,
@@ -244,9 +264,49 @@ function trackSNXHolder(
     decrementMetadata("snxHolders");
   }
 
+  const txHash = event.transaction.hash.toHex();
+
+  const token = getOrCreateToken(SNX_ADDRESS);
+  let latestRate = getLatestRate("snx", txHash);
+  if (!latestRate) {
+    latestRate = BIGDECIMAL_ZERO;
+  }
+  const market = getOrCreateMarket(token.id, event);
+
+  if (snxHolder.collateral) {
+    if (existingSNXHolder) {
+      if (snxHolder.collateral!.gt(existingSNXHolder!.collateral!)) {
+        const amount = bigDecimalToBigInt(
+          snxHolder.collateral!.minus(existingSNXHolder!.collateral!)
+        );
+        const amountUSD = toDecimal(amount).times(latestRate!);
+        createDeposit(event, market, token, amount, amountUSD, account);
+        addMarketTokenBalance(event, market, amount, latestRate!);
+      } else {
+        const amount = bigDecimalToBigInt(
+          existingSNXHolder!.collateral!.minus(snxHolder.collateral!)
+        );
+        const amountUSD = toDecimal(amount).times(latestRate!);
+
+        createWithdraw(event, market, token, amount, amountUSD, account);
+        addMarketTokenBalance(
+          event,
+          market,
+          amount.times(BigInt.fromString("-1")),
+          latestRate!
+        );
+      }
+    } else {
+      const amount = bigDecimalToBigInt(snxHolder!.collateral!);
+      const amountUSD = toDecimal(amount).times(latestRate!);
+      createDeposit(event, market, token, amount, amountUSD, account);
+      addMarketTokenBalance(event, market, amount, latestRate!);
+    }
+  }
   snxHolder.save();
 }
 
+// This function is called when a borrow or repay is made
 function trackDebtSnapshot(event: ethereum.Event): void {
   const snxContract = event.transaction.to!;
   const account = event.transaction.from;
@@ -374,6 +434,7 @@ export function handleTransferSNX(event: SNXTransferEvent): void {
 
   if (event.params.from.toHex() != ZERO_ADDRESS.toHex()) {
     trackSNXHolder(
+      event,
       event.address,
       event.params.from,
       event.block,
@@ -393,6 +454,7 @@ export function handleTransferSNX(event: SNXTransferEvent): void {
 
   if (event.params.to.toHex() != ZERO_ADDRESS.toHex()) {
     trackSNXHolder(
+      event,
       event.address,
       event.params.to,
       event.block,
@@ -427,6 +489,7 @@ export function handleRewardVestEvent(event: VestedEvent): void {
   // now track the SNX holder as this action can impact their collateral
   const synthetixAddress = contract.synthetix();
   trackSNXHolder(
+    event,
     synthetixAddress,
     event.params.beneficiary,
     event.block,
@@ -545,6 +608,7 @@ export function handleIssuedSynths(event: IssuedEvent): void {
 
   // update SNX holder details
   trackSNXHolder(
+    event,
     event.transaction.to!,
     event.transaction.from,
     event.block,
@@ -591,6 +655,29 @@ export function handleIssuedSynths(event: IssuedEvent): void {
     dailyIssuedEntity.totalDebt = toDecimal(totalIssued.value);
     dailyIssuedEntity.save();
   }
+
+  // We are borrowing a synth
+  const txHash = event.transaction.hash.toHex();
+  const address = event.params.account;
+  const market = getOrCreateMarket(SNX_ADDRESS, event);
+
+  const mySynth = SynthByCurrencyKey.load(entity.source);
+  let token = getOrCreateToken(event.address.toHex());
+
+  if (mySynth) {
+    token = getOrCreateToken(mySynth.proxyAddress.toHex());
+  }
+
+  const borrowAmount = event.params.value;
+
+  let latestRate = getLatestRate(entity.source, txHash);
+
+  if (!latestRate) {
+    latestRate = BIGDECIMAL_ZERO;
+  }
+
+  const borrowUSD = toDecimal(borrowAmount).times(latestRate!);
+  createBorrow(event, market, token, borrowAmount, borrowUSD, address);
 }
 
 export function handleBurnedSynths(event: BurnedEvent): void {
@@ -658,6 +745,7 @@ export function handleBurnedSynths(event: BurnedEvent): void {
 
   // update SNX holder details
   trackSNXHolder(
+    event,
     event.transaction.to!,
     event.transaction.from,
     event.block,
@@ -701,6 +789,38 @@ export function handleBurnedSynths(event: BurnedEvent): void {
     dailyBurnedEntity.totalDebt = toDecimal(issuedSynths.value);
     dailyBurnedEntity.save();
   }
+
+  // We are repaying a synth
+  const txHash = event.transaction.hash.toHex();
+  const address = event.params.account;
+  const market = getOrCreateMarket(SNX_ADDRESS, event);
+
+  const mySynth = SynthByCurrencyKey.load(entity.source);
+  let token = getOrCreateToken(event.address.toHex());
+
+  if (mySynth) {
+    token = getOrCreateToken(mySynth.proxyAddress.toHex());
+  }
+
+  const repayAmount = event.params.value;
+
+  let latestRate = getLatestRate(entity.source, txHash);
+
+  if (!latestRate) {
+    latestRate = BIGDECIMAL_ZERO;
+  }
+
+  const repayUSD = toDecimal(repayAmount).times(latestRate!);
+
+  createRepay(
+    event,
+    market,
+    token,
+    repayAmount,
+    repayUSD,
+    address,
+    event.transaction.from
+  );
 }
 
 export function handleFeesClaimed(event: FeesClaimedEvent): void {

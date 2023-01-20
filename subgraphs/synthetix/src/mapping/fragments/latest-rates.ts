@@ -4,12 +4,12 @@ import {
   InversePriceConfigured,
   InversePriceFrozen,
   ExchangeRates,
-} from "../../../generated/ExchangeRates_13/ExchangeRates";
+} from "../../../generated/ExchangeRates_0/ExchangeRates";
 
 import {
   AggregatorProxy as AggregatorProxyContract,
   AggregatorConfirmed as AggregatorConfirmedEvent,
-} from "../../../generated/ExchangeRates_13/AggregatorProxy";
+} from "../../../generated/ExchangeRates_0/AggregatorProxy";
 
 import {
   ExchangeFeeUpdated,
@@ -54,8 +54,8 @@ import {
   ZERO_ADDRESS,
   CANDLE_PERIODS,
 } from "../lib/helpers";
-import { ExecutionSuccess } from "../../../generated/ChainlinkMultisig/GnosisSafe";
-import { AddressResolver } from "../../../generated/ChainlinkMultisig/AddressResolver";
+import { ExecutionSuccess } from "../../../generated/templates/InverseAggregator/GnosisSafe";
+import { AddressResolver } from "../../../generated/templates/Aggregator/AddressResolver";
 import { getContractDeployment } from "../../../protocols/addresses";
 
 export function addLatestRate(

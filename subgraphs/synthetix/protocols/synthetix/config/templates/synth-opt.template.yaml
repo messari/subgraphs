@@ -1,0 +1,2664 @@
+specVersion: 0.0.4
+features:
+  - grafting
+description: Synthetix Subgraph
+repository: https://github.com/Synthetixio/synthetix-subgraph
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: WrapperFactory_0
+    network: optimism
+    source:
+      address: "0x620C8800Ec73aC705151EC8327913c2910cC46B1"
+      startBlock: 0
+      abi: WrapperFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: WrapperFactory
+          file: abis/WrapperFactory.json
+      eventHandlers:
+        - event: WrapperCreated(indexed address,indexed bytes32,address)
+          handler: handleWrapperCreated
+  - kind: ethereum/contract
+    name: WrapperFactory_1
+    network: optimism
+    source:
+      address: "0x27be2EFAd45DeBd732C1EBf5C9F7b49D498D4a93"
+      startBlock: 0
+      abi: WrapperFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: WrapperFactory
+          file: abis/WrapperFactory.json
+      eventHandlers:
+        - event: WrapperCreated(indexed address,indexed bytes32,address)
+          handler: handleWrapperCreated
+  - kind: ethereum/contract
+    name: EtherWrapper_0
+    network: optimism
+    source:
+      address: "0xc3Ee42caBD773A608fa9Ec951982c94BD6F33d59"
+      startBlock: 0
+      abi: EtherWrapper
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities:
+        - Wrapper
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: EtherWrapper
+          file: abis/EtherWrapper.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: Minted(indexed address,uint256,uint256,uint256)
+          handler: handleMinted
+        - event: Burned(indexed address,uint256,uint256,uint256)
+          handler: handleBurned
+  - kind: ethereum/contract
+    name: SystemSettings_0
+    network: optimism
+    source:
+      address: "0x8454190C164e52664Af2c9C24ab58c4e14D6bbE4"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_1
+    network: optimism
+    source:
+      address: "0x46D4504ed0f751309e3c6b1f544ad2E8458537Dc"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_2
+    network: optimism
+    source:
+      address: "0x8f571a7bD9924e25a3d2aC0B7F721C5Ed675c3c8"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_3
+    network: optimism
+    source:
+      address: "0x1a094457F83dA71bF223BFA49E7fa67839285905"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_4
+    network: optimism
+    source:
+      address: "0x3fDccCf40eefe389a8Ba73Ff2AEDA10888ff8F3E"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_5
+    network: optimism
+    source:
+      address: "0x28224ef515d01709916F5ac4D8a72664A7b56e98"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_6
+    network: optimism
+    source:
+      address: "0xd056351FC32b5Ec443305198FB9093057f8e988C"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_7
+    network: optimism
+    source:
+      address: "0x1c7A2E680849bC9C6ab8b437A28885C028739B82"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: SystemSettings_8
+    network: optimism
+    source:
+      address: "0xdE48d4b3B8737446193720ce23ef24f922341155"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: WrapperMaxTokenAmountUpdated(address,uint256)
+          handler: handleWrapperMaxTokenAmountUpdated
+        - event: EtherWrapperMaxETHUpdated(uint256)
+          handler: handleEtherWrapperMaxETHUpdated
+  - kind: ethereum/contract
+    name: daiWrapper
+    network: optimism
+    source:
+      abi: Wrapper
+      address: "0xad32aA4Bff8b61B4aE07E3BA437CF81100AF0cD7"
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities:
+        - Wrapper
+        - WrapperMint
+        - WrapperBurn
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Wrapper
+          file: abis/Wrapper.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: Minted(indexed address,uint256,uint256,uint256)
+          handler: handleMinted
+        - event: Burned(indexed address,uint256,uint256,uint256)
+          handler: handleBurned
+  - kind: ethereum/contract
+    name: ethWrapper
+    network: optimism
+    source:
+      abi: Wrapper
+      address: "0x6202A3B0bE1D222971E93AaB084c6E584C29DB70"
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities:
+        - Wrapper
+        - WrapperMint
+        - WrapperBurn
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Wrapper
+          file: abis/Wrapper.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: Minted(indexed address,uint256,uint256,uint256)
+          handler: handleMinted
+        - event: Burned(indexed address,uint256,uint256,uint256)
+          handler: handleBurned
+  - kind: ethereum/contract
+    name: lusdWrapper
+    network: optimism
+    source:
+      abi: Wrapper
+      address: "0x8a91e92fdd86e734781c38db52a390e1b99fba7c"
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities:
+        - Wrapper
+        - WrapperMint
+        - WrapperBurn
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Wrapper
+          file: abis/Wrapper.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: Minted(indexed address,uint256,uint256,uint256)
+          handler: handleMinted
+        - event: Burned(indexed address,uint256,uint256,uint256)
+          handler: handleBurned
+  - kind: ethereum/contract
+    name: shorts_CollateralShort_0
+    network: optimism
+    source:
+      address: "0xEbCe9728E2fDdC26C9f4B00df5180BdC5e184953"
+      startBlock: 0
+      abi: CollateralShort
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/shorts.ts
+      entities:
+        - Short
+        - ShortLiquidation
+        - ShortCollateralChange
+        - ShortLoanChange
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: CollateralShort
+          file: abis/CollateralShortOVM.json
+      eventHandlers:
+        - event: LoanCreated(indexed address,uint256,uint256,uint256,bytes32,uint256)
+          handler: handleShortLoanCreatedsUSD
+        - event: LoanClosed(indexed address,uint256)
+          handler: handleShortLoanClosedsUSD
+        - event: CollateralDeposited(indexed address,uint256,uint256,uint256)
+          handler: handleShortCollateralDepositedsUSD
+        - event: CollateralWithdrawn(indexed address,uint256,uint256,uint256)
+          handler: handleShortCollateralWithdrawnsUSD
+        - event: LoanRepaymentMade(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleShortLoanRepaymentMadesUSD
+        - event: LoanDrawnDown(indexed address,uint256,uint256)
+          handler: handleShortLoanDrawnDownsUSD
+        - event: LoanPartiallyLiquidated(indexed address,uint256,address,uint256,uint256)
+          handler: handleLoanPartiallyLiquidatedsUSD
+        - event: LoanClosedByLiquidation(indexed address,uint256,indexed address,uint256,uint256)
+          handler: handleLoanClosedByLiquidationsUSD
+        - event: MinCollateralUpdated(uint256)
+          handler: handleMinCollateralUpdatedsUSD
+        - event: IssueFeeRateUpdated(uint256)
+          handler: handleIssueFeeRateUpdatedsUSD
+        - event: CanOpenLoansUpdated(bool)
+          handler: handleCanOpenLoansUpdatedsUSD
+        - event: LoanClosedByRepayment(indexed address,uint256,uint256,uint256)
+          handler: handleLoanClosedByRepayment
+  - kind: ethereum/contract
+    name: shorts_CollateralShort_1
+    network: optimism
+    source:
+      address: "0xeb4b5ABcE7310855319440d936cd3aDd77DFA193"
+      startBlock: 0
+      abi: CollateralShort
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/shorts.ts
+      entities:
+        - Short
+        - ShortLiquidation
+        - ShortCollateralChange
+        - ShortLoanChange
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: CollateralShort
+          file: abis/CollateralShortOVM.json
+      eventHandlers:
+        - event: LoanCreated(indexed address,uint256,uint256,uint256,bytes32,uint256)
+          handler: handleShortLoanCreatedsUSD
+        - event: LoanClosed(indexed address,uint256)
+          handler: handleShortLoanClosedsUSD
+        - event: CollateralDeposited(indexed address,uint256,uint256,uint256)
+          handler: handleShortCollateralDepositedsUSD
+        - event: CollateralWithdrawn(indexed address,uint256,uint256,uint256)
+          handler: handleShortCollateralWithdrawnsUSD
+        - event: LoanRepaymentMade(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleShortLoanRepaymentMadesUSD
+        - event: LoanDrawnDown(indexed address,uint256,uint256)
+          handler: handleShortLoanDrawnDownsUSD
+        - event: LoanPartiallyLiquidated(indexed address,uint256,address,uint256,uint256)
+          handler: handleLoanPartiallyLiquidatedsUSD
+        - event: LoanClosedByLiquidation(indexed address,uint256,indexed address,uint256,uint256)
+          handler: handleLoanClosedByLiquidationsUSD
+        - event: MinCollateralUpdated(uint256)
+          handler: handleMinCollateralUpdatedsUSD
+        - event: IssueFeeRateUpdated(uint256)
+          handler: handleIssueFeeRateUpdatedsUSD
+        - event: CanOpenLoansUpdated(bool)
+          handler: handleCanOpenLoansUpdatedsUSD
+        - event: LoanClosedByRepayment(indexed address,uint256,uint256,uint256)
+          handler: handleLoanClosedByRepayment
+  - kind: ethereum/contract
+    name: periodicUpdates_ProxyERC20_0
+    network: optimism
+    source:
+      address: "0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4"
+      startBlock: 0
+      abi: Proxy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/periodic-updates.ts
+      entities:
+        - DebtState
+        - SystemSetting
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Proxy
+          file: abis/Proxy.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: SynthetixDebtShare
+          file: abis/SynthetixDebtShare.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      blockHandlers:
+        - handler: handleBlock
+  - kind: ethereum/contract
+    name: loans_EtherCollateral_0
+    network: optimism
+    source:
+      address: "0xC8E91c926E04BE1cb94e51c5379d14774D51ae6C"
+      startBlock: 0
+      abi: EtherCollateral
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/loans.ts
+      entities:
+        - Loan
+        - LoanCreated
+        - LoanClosed
+        - LoanLiquidated
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: EtherCollateral
+          file: abis/EtherCollateral.json
+      eventHandlers:
+        - event: LoanLiquidated(indexed address,uint256,address)
+          handler: handleLoanLiquidatedLegacy
+        - event: LoanCreated(indexed address,uint256,uint256)
+          handler: handleLoanCreatedEtherLegacy
+        - event: LoanClosed(indexed address,uint256,uint256)
+          handler: handleLoanClosedEtherLegacy
+  - kind: ethereum/contract
+    name: loans_EtherCollateralsUSD_0
+    network: optimism
+    source:
+      address: "0xC0c66470E766AE2026E6695966C56C90741811AA"
+      startBlock: 0
+      abi: EtherCollateralsUSD
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/loans.ts
+      entities:
+        - Loan
+        - LoanCreated
+        - LoanClosed
+        - LoanLiquidated
+        - LoanPartiallyLiquidated
+        - CollateralDeposited
+        - CollateralWithdrawn
+        - LoanRepaid
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: EtherCollateralsUSD
+          file: abis/EtherCollateralsUSD.json
+      eventHandlers:
+        - event: LoanLiquidated(indexed address,uint256,address)
+          handler: handleLoanLiquidatedLegacy
+        - event: LoanCreated(indexed address,uint256,uint256)
+          handler: handleLoanCreatedsUSDLegacy
+        - event: LoanClosed(indexed address,uint256,uint256)
+          handler: handleLoanClosedsUSDLegacy
+        - event: LoanPartiallyLiquidated(indexed address,uint256,address,uint256,uint256)
+          handler: handleLoanPartiallyLiquidatedLegacy
+        - event: CollateralDeposited(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralDepositedLegacy
+        - event: CollateralWithdrawn(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralWithdrawnLegacy
+        - event: LoanRepaid(indexed address,uint256,uint256,uint256)
+          handler: handleLoanRepaidLegacy
+  - kind: ethereum/contract
+    name: loans_CollateralEth_0
+    network: optimism
+    source:
+      address: "0x308AD16ef90fe7caCb85B784A603CB6E71b1A41a"
+      startBlock: 0
+      abi: CollateralEth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/loans.ts
+      entities:
+        - Loan
+        - LoanCreated
+        - LoanClosed
+        - LoanLiquidated
+        - LoanPartiallyLiquidated
+        - CollateralDeposited
+        - CollateralWithdrawn
+        - LoanRepaid
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: CollateralEth
+          file: abis/CollateralEth.json
+      eventHandlers:
+        - event: LoanCreated(indexed address,uint256,uint256,uint256,bytes32,uint256)
+          handler: handleLoanCreatedEther
+        - event: LoanClosed(indexed address,uint256)
+          handler: handleLoanClosedEther
+        - event: LoanClosedByLiquidation(indexed address,uint256,indexed address,uint256,uint256)
+          handler: handleLoanClosedByLiquidation
+        - event: LoanPartiallyLiquidated(indexed address,uint256,address,uint256,uint256)
+          handler: handleLoanPartiallyLiquidated
+        - event: LoanRepaymentMade(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleLoanRepaymentMade
+        - event: CollateralDeposited(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralDeposited
+        - event: CollateralWithdrawn(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralWithdrawn
+        - event: LoanDrawnDown(indexed address,uint256,uint256)
+          handler: handleLoanDrawnDown
+  - kind: ethereum/contract
+    name: liquidations_Synthetix_0
+    network: optimism
+    source:
+      address: "0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4"
+      startBlock: 0
+      abi: Synthetix
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/liquidations.ts
+      entities:
+        - AccountLiquidated
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synthetix
+          file: abis/Synthetix.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AccountLiquidated(indexed address,uint256,uint256,address)
+          handler: handleAccountLiquidated
+  - kind: ethereum/contract
+    name: liquidations_Liquidations_0
+    network: optimism
+    source:
+      address: "0x14E6f8e6Da00a32C069b11b64e48EA1FEF2361D4"
+      startBlock: 0
+      abi: Liquidations
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/liquidations.ts
+      entities:
+        - AccountFlaggedForLiquidation
+        - AccountRemovedFromLiquidation
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Liquidations
+          file: abis/Liquidations.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+      eventHandlers:
+        - event: AccountFlaggedForLiquidation(indexed address,uint256)
+          handler: handleAccountFlaggedForLiquidation
+        - event: AccountRemovedFromLiquidation(indexed address,uint256)
+          handler: handleAccountRemovedFromLiquidation
+  - kind: ethereum/contract
+    name: issuance_Synthetix_0
+    network: optimism
+    source:
+      address: "0x218067172e9E0460A883458D44BD1f56ea609502"
+      startBlock: 0
+      abi: Synthetix
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/issuance.ts
+      entities:
+        - SNXTransfer
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSNX
+  - kind: ethereum/contract
+    name: issuance_ERC20_0
+    network: optimism
+    source:
+      address: "0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4"
+      startBlock: 0
+      abi: Synthetix
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/issuance.ts
+      entities:
+        - SNXTransfer
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSNX
+  - kind: ethereum/contract
+    name: issuance_FeePool_0
+    network: optimism
+    source:
+      address: "0x4a16A42407AA491564643E1dfc1fd50af29794eF"
+      startBlock: 0
+      abi: FeePool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/issuance.ts
+      entities:
+        - FeesClaimed
+        - SNXHolder
+        - FeePeriod
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: FeePool
+          file: abis/FeePool.json
+        - name: FeePoolv217
+          file: abis/FeePool_v2.17.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+      eventHandlers:
+        - event: FeesClaimed(address,uint256,uint256)
+          handler: handleFeesClaimed
+        - event: FeePeriodClosed(uint256)
+          handler: handleFeePeriodClosed
+  - kind: ethereum/contract
+    name: issuance_RewardEscrow_0
+    network: optimism
+    source:
+      address: "0xd32138018210edA0028240638f35b70ECC0D8C22"
+      startBlock: 0
+      abi: RewardEscrow
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/issuance.ts
+      entities:
+        - RewardEscrowHolder
+        - SNXHolder
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: RewardEscrow
+          file: abis/RewardEscrow.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+      eventHandlers:
+        - event: VestingEntryCreated(indexed address,uint256,uint256)
+          handler: handleRewardVestEvent
+        - event: Vested(indexed address,uint256,uint256)
+          handler: handleRewardVestEvent
+  - kind: ethereum/contract
+    name: issuance_SynthsUSD_0
+    network: optimism
+    source:
+      address: "0xbecc58c6D7Ca71b6FCC4cC8c9c5294A0eA7A0397"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/issuance.ts
+      entities:
+        - Issued
+        - Burned
+        - DailyIssued
+        - DailyBurned
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+      eventHandlers:
+        - event: Issued(indexed address,uint256)
+          handler: handleIssuedSynths
+        - event: Burned(indexed address,uint256)
+          handler: handleBurnedSynths
+  - kind: ethereum/contract
+    name: issuance_SynthERC20sUSD_0
+    network: optimism
+    source:
+      address: "0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/issuance.ts
+      entities:
+        - Issued
+        - Burned
+        - DailyIssued
+        - DailyBurned
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: Synthetix
+          file: abis/SynthetixGlobalDebt.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: SynthetixState
+          file: abis/SynthetixState.json
+      eventHandlers:
+        - event: Issued(indexed address,uint256)
+          handler: handleIssuedSynths
+        - event: Burned(indexed address,uint256)
+          handler: handleBurnedSynths
+  - kind: ethereum/contract
+    name: exchanges_Synthetix_0
+    network: optimism
+    source:
+      address: "0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4"
+      startBlock: 0
+      abi: Synthetix
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - SynthExchange
+        - ExchangeReclaim
+        - ExchangeRebate
+        - FeeRate
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synthetix4
+          file: abis/Synthetix_bytes4.json
+        - name: Synthetix32
+          file: abis/Synthetix_bytes32.json
+        - name: Synthetix
+          file: abis/Synthetix.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: SynthExchange(indexed address,bytes32,uint256,bytes32,uint256,address)
+          handler: handleSynthExchange
+        - event: ExchangeReclaim(indexed address,bytes32,uint256)
+          handler: handleExchangeReclaim
+        - event: ExchangeRebate(indexed address,bytes32,uint256)
+          handler: handleExchangeRebate
+        - event: AtomicSynthExchange(indexed address,bytes32,uint256,bytes32,uint256,address)
+          handler: handleAtomicSynthExchange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_0
+    network: optimism
+    source:
+      address: "0x8454190C164e52664Af2c9C24ab58c4e14D6bbE4"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - SystemSettings
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_1
+    network: optimism
+    source:
+      address: "0x46D4504ed0f751309e3c6b1f544ad2E8458537Dc"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - SystemSettings
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_2
+    network: optimism
+    source:
+      address: "0x8f571a7bD9924e25a3d2aC0B7F721C5Ed675c3c8"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - SystemSettings
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_3
+    network: optimism
+    source:
+      address: "0x1a094457F83dA71bF223BFA49E7fa67839285905"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - SystemSettings
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_4
+    network: optimism
+    source:
+      address: "0x3fDccCf40eefe389a8Ba73Ff2AEDA10888ff8F3E"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - SystemSettings
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_5
+    network: optimism
+    source:
+      address: "0x28224ef515d01709916F5ac4D8a72664A7b56e98"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - SystemSettings
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_6
+    network: optimism
+    source:
+      address: "0xd056351FC32b5Ec443305198FB9093057f8e988C"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - SystemSettings
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_7
+    network: optimism
+    source:
+      address: "0x1c7A2E680849bC9C6ab8b437A28885C028739B82"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - SystemSettings
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_SystemSettings_8
+    network: optimism
+    source:
+      address: "0xdE48d4b3B8737446193720ce23ef24f922341155"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - SystemSettings
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleFeeChange
+  - kind: ethereum/contract
+    name: exchanges_FuturesMarketManager_0
+    network: optimism
+    source:
+      address: "0xc704c9AA89d1ca60F67B3075d05fBb92b3B00B3B"
+      startBlock: 0
+      abi: FuturesMarketManager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - FuturesMarket
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: FuturesMarket
+          file: abis/FuturesMarket.json
+        - name: FuturesMarketManager
+          file: abis/FuturesMarketManager.json
+      eventHandlers:
+        - event: MarketAdded(address,indexed bytes32,indexed bytes32)
+          handler: handleMarketAdded
+  - kind: ethereum/contract
+    name: ExchangeRates_0
+    network: optimism
+    source:
+      address: "0x631E93A0fb06B5eC6d52c0A2D89a3f9672d6Ba64"
+      startBlock: 0
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_1
+    network: optimism
+    source:
+      address: "0xB4437efD22B4CCe7E25B3c47A469BC719cBdB60c"
+      startBlock: 0
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_2
+    network: optimism
+    source:
+      address: "0x1B9d6cD65dDC981410cb93Af91B097667E0Bc7eE"
+      startBlock: 0
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: ExchangeRates_3
+    network: optimism
+    source:
+      address: "0x22602469d704BfFb0936c7A7cfcD18f7aA269375"
+      startBlock: 0
+      abi: ExchangeRates
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - LatestRate
+        - InversePricingInfo
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorAdded(bytes32,address)
+          handler: handleAggregatorAdded
+        - event: RatesUpdated(bytes32[],uint256[])
+          handler: handleRatesUpdated
+        - event: InversePriceConfigured(bytes32,uint256,uint256,uint256)
+          handler: handleInverseConfigured
+        - event: InversePriceFrozen(bytes32,uint256,uint256,address)
+          handler: handleInverseFrozen
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_0
+    network: optimism
+    source:
+      address: "0x8454190C164e52664Af2c9C24ab58c4e14D6bbE4"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - FeeRate
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_1
+    network: optimism
+    source:
+      address: "0x46D4504ed0f751309e3c6b1f544ad2E8458537Dc"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - FeeRate
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_2
+    network: optimism
+    source:
+      address: "0x8f571a7bD9924e25a3d2aC0B7F721C5Ed675c3c8"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - FeeRate
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_3
+    network: optimism
+    source:
+      address: "0x1a094457F83dA71bF223BFA49E7fa67839285905"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - FeeRate
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_4
+    network: optimism
+    source:
+      address: "0x3fDccCf40eefe389a8Ba73Ff2AEDA10888ff8F3E"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - FeeRate
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_5
+    network: optimism
+    source:
+      address: "0x28224ef515d01709916F5ac4D8a72664A7b56e98"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - FeeRate
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_6
+    network: optimism
+    source:
+      address: "0xd056351FC32b5Ec443305198FB9093057f8e988C"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - FeeRate
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_7
+    network: optimism
+    source:
+      address: "0x1c7A2E680849bC9C6ab8b437A28885C028739B82"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - FeeRate
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: latestRates-SystemSettings_8
+    network: optimism
+    source:
+      address: "0xdE48d4b3B8737446193720ce23ef24f922341155"
+      startBlock: 0
+      abi: SystemSettings
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - FeeRate
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+        - name: SystemSettings
+          file: abis/SystemSettings.json
+      eventHandlers:
+        - event: ExchangeFeeUpdated(bytes32,uint256)
+          handler: handleExchangeFeeUpdated
+        - event: AtomicExchangeFeeUpdated(bytes32,uint256)
+          handler: handleAtomicExchangeFeeUpdated
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_0
+    network: optimism
+    source:
+      address: "0xe318E4618E5684668992935d7231Cb837a44E670"
+      startBlock: 0
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_1
+    network: optimism
+    source:
+      address: "0xd48BEc0A784692dde6d2D481eD71911cdC12513A"
+      startBlock: 0
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_2
+    network: optimism
+    source:
+      address: "0x395eC94bf3E3dCd3aFBd82cd03197731411E396B"
+      startBlock: 0
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_3
+    network: optimism
+    source:
+      address: "0xFe06fbe87E9f705B5D337D82dF8Fd812774974F9"
+      startBlock: 0
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_4
+    network: optimism
+    source:
+      address: "0x11Ac553488b2170A9ad751A5455d0C9A134C982f"
+      startBlock: 0
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_5
+    network: optimism
+    source:
+      address: "0x5a439C235C8BB9F813C5b45Dc194A00EC23CB78E"
+      startBlock: 0
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_6
+    network: optimism
+    source:
+      address: "0x059681217E9186E007864AA16893b65A0589718B"
+      startBlock: 0
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_7
+    network: optimism
+    source:
+      address: "0x0a1059c33ce5cd3345BBca557b8e44F4088FC359"
+      startBlock: 0
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_Exchanger_8
+    network: optimism
+    source:
+      address: "0xcC02F000b0aA8a0eFC2B55C9cf2305Fb3531cca1"
+      startBlock: 0
+      abi: Exchanger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - ExchangeEntrySettled
+        - ExchangeEntryAppended
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Exchanger
+          file: abis/Exchanger.json
+      eventHandlers:
+        - event: ExchangeEntrySettled(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntrySettled
+        - event: ExchangeEntryAppended(indexed
+            address,bytes32,uint256,bytes32,uint256,uint256,uint256,uint256)
+          handler: handleExchangeEntryAppended
+  - kind: ethereum/contract
+    name: exchanger_SynthetixOldTracking
+    network: optimism
+    source:
+      address: "0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4"
+      startBlock: 0
+      abi: SynthetixOldTracking
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - DailyExchangePartner
+        - ExchangePartner
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: SynthetixOldTracking
+          file: abis/Synthetix_oldTracking.json
+      eventHandlers:
+        - event: ExchangeTracking(indexed bytes32,bytes32,uint256)
+          handler: handleExchangeTrackingV1
+  - kind: ethereum/contract
+    name: exchanger_Synthetix_0
+    network: optimism
+    source:
+      address: "0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4"
+      startBlock: 0
+      abi: Synthetix
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanger.ts
+      entities:
+        - DailyExchangePartner
+        - ExchangePartner
+        - TemporaryExchangePartnerTracker
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synthetix
+          file: abis/Synthetix.json
+      eventHandlers:
+        - event: ExchangeTracking(indexed bytes32,bytes32,uint256,uint256)
+          handler: handleExchangeTrackingV2
+  - kind: ethereum/contract
+    name: delegation_DelegateApprovals_0
+    network: optimism
+    source:
+      address: "0x2A23bc0EA97A89abD91214E8e4d20F02Fe14743f"
+      startBlock: 0
+      abi: DelegateApprovals
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/delegation.ts
+      entities:
+        - DelegatedWallet
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: DelegateApprovals
+          file: abis/DelegateApprovals.json
+      eventHandlers:
+        - event: Approval(indexed address,address,bytes32)
+          handler: handleDelegateApproval
+        - event: WithdrawApproval(indexed address,address,bytes32)
+          handler: handleDelegateWithdrawApproval
+  - kind: ethereum/contract
+    name: balances_SynthsUSD_0
+    network: optimism
+    source:
+      address: "0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsETH_0
+    network: optimism
+    source:
+      address: "0xE405de8F52ba7559f9df3C368500B6E6ae6Cee49"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsBTC_0
+    network: optimism
+    source:
+      address: "0x298B9B95708152ff6968aafd889c6586e9169f1D"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsLINK_0
+    network: optimism
+    source:
+      address: "0xc5Db22719A06418028A40A9B5E9A7c02959D0d08"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsSOL_0
+    network: optimism
+    source:
+      address: "0x8b2F7Ae8cA8EE8428B6D76dE88326bB413db2766"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsAVAX_0
+    network: optimism
+    source:
+      address: "0xB2b42B231C68cbb0b4bF2FFEbf57782Fd97D3dA4"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsMATIC_0
+    network: optimism
+    source:
+      address: "0x81DDfAc111913d3d5218DEA999216323B7CD6356"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsEUR_0
+    network: optimism
+    source:
+      address: "0xFBc4198702E81aE77c06D58f81b629BDf36f0a71"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsAAVE_0
+    network: optimism
+    source:
+      address: "0x00B8D5a5e1Ac97Cb4341c4Bc4367443c8776e8d9"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsUNI_0
+    network: optimism
+    source:
+      address: "0xf5a6115Aa582Fd1BEEa22BC93B7dC7a785F60d03"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+  - kind: ethereum/contract
+    name: balances_SynthsINR_0
+    network: optimism
+    source:
+      address: "0xa3A538EA5D5838dC32dde15946ccD74bDd5652fF"
+      startBlock: 0
+      abi: Synth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/balances.ts
+      entities:
+        - Synth
+        - LatestSynthBalance
+        - AggregateSynthBalance
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Synth
+          file: abis/Synth.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferSynth
+templates:
+  - kind: ethereum/contract
+    name: WrapperTemplate
+    network: optimism
+    source:
+      abi: Wrapper
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/wrapper.ts
+      entities:
+        - Wrapper
+        - WrapperMint
+        - WrapperBurn
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Wrapper
+          file: abis/Wrapper.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: Minted(indexed address,uint256,uint256,uint256)
+          handler: handleMinted
+        - event: Burned(indexed address,uint256,uint256,uint256)
+          handler: handleBurned
+  - kind: ethereum/contract
+    name: FuturesMarketTemplate
+    network: optimism
+    source:
+      abi: FuturesMarket
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/exchanges.ts
+      entities:
+        - FuturesMarket
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: FuturesMarket
+          file: abis/FuturesMarket.json
+      eventHandlers:
+        - event: PositionModified(indexed uint256,indexed
+            address,uint256,int256,int256,uint256,uint256,uint256)
+          handler: handlePositionModified
+  - kind: ethereum/contract
+    name: AggregatorProxy
+    network: optimism
+    source:
+      abi: AggregatorProxy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorConfirmed(indexed address,indexed address)
+          handler: handleAggregatorProxyAddressUpdated
+  - kind: ethereum/contract
+    name: SynthAggregatorProxy
+    network: optimism
+    source:
+      abi: AggregatorProxy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorConfirmed(indexed address,indexed address)
+          handler: handleAggregatorProxyAddressUpdated
+  - kind: ethereum/contract
+    name: InverseAggregatorProxy
+    network: optimism
+    source:
+      abi: AggregatorProxy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: AggregatorProxy
+          file: abis/AggregatorProxy.json
+      eventHandlers:
+        - event: AggregatorConfirmed(indexed address,indexed address)
+          handler: handleAggregatorProxyAddressUpdated
+  - kind: ethereum/contract
+    name: Aggregator
+    network: optimism
+    source:
+      abi: Aggregator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - LatestRates
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Aggregator
+          file: abis/Aggregator.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
+          handler: handleAggregatorAnswerUpdated
+  - kind: ethereum/contract
+    name: SynthAggregator
+    network: optimism
+    source:
+      abi: Aggregator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - LatestRates
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Aggregator
+          file: abis/Aggregator.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+      eventHandlers:
+        - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
+          handler: handleAggregatorAnswerUpdated
+  - kind: ethereum/contract
+    name: InverseAggregator
+    network: optimism
+    source:
+      abi: Aggregator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping/fragments/latest-rates.ts
+      entities:
+        - LatestRates
+      abis:
+        - name: ERC20
+          file: abis/ERC20.json
+        - name: ERC20NameBytes
+          file: abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: abis/ERC20SymbolBytes.json
+        - name: Aggregator
+          file: abis/Aggregator.json
+        - name: ExchangeRates
+          file: abis/ExchangeRates.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
+        - name: GnosisSafe
+          file: abis/GnosisSafe.json
+      eventHandlers:
+        - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
+          handler: handleInverseAggregatorAnswerUpdated
