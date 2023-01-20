@@ -6,6 +6,7 @@ import {
   DataSourceContext,
   log,
   ethereum,
+  Bytes,
 } from "@graphprotocol/graph-ts";
 import {
   PriceOracleUpdated,
@@ -32,6 +33,7 @@ import {
 } from "../../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
+  LendingPool as LendingPoolContract,
   LiquidationCall,
   Repay,
   ReserveDataUpdated,
@@ -71,6 +73,7 @@ import {
   equalsIgnoreCase,
   exponentToBigDecimal,
   InterestRateType,
+  INT_TWO,
   Network,
   PositionSide,
   readValue,
@@ -92,6 +95,7 @@ import {
   LendingPoolConfigurator,
 } from "../../../generated/templates";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
+import { AaveOracle } from "../../../generated/LendingPool/AaveOracle";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
@@ -444,6 +448,42 @@ export function handleBorrow(event: Borrow): void {
     ]);
     return;
   }
+
+  // Set reserveFactor if not set, as setReserveFactor may be never called
+  const market = getOrCreateMarket(marketId, protocolData);
+  if (market.reserveFactor.equals(BIGDECIMAL_ZERO)) {
+    // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L377
+    // for how to decode configuration data to get reserve factor
+    const reserveFactorMask =
+      "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFF";
+    const reserveFactorStartBitPosition = 64 as u8;
+
+    const maskArray = new Uint8Array(32);
+    maskArray.set(Bytes.fromHexString(reserveFactorMask));
+    // BITWISE NOT
+    for (let i = 0; i < maskArray.length; i++) {
+      maskArray[i] = ~maskArray[i];
+    }
+    // reverse for little endian
+    const reserveFactorMaskBigInt = BigInt.fromUnsignedBytes(
+      Bytes.fromUint8Array(maskArray.reverse())
+    );
+
+    const pool = LendingPoolContract.bind(event.address);
+    const poolConfigData = pool.getConfiguration(event.params.reserve).data;
+    const reserveFactor = poolConfigData
+      .bitAnd(reserveFactorMaskBigInt)
+      .rightShift(reserveFactorStartBitPosition);
+
+    log.info("[handleBorrow]reserveFactor set to {}", [
+      reserveFactor.toString(),
+    ]);
+    market.reserveFactor = reserveFactor
+      .toBigDecimal()
+      .div(exponentToBigDecimal(INT_TWO));
+    market.save();
+  }
+
   _handleBorrow(
     event,
     event.params.amount,
@@ -561,8 +601,8 @@ function getAssetPriceInUSDC(
   const oracle = AaveOracle.bind(priceOracle);
   const priceDecimals = readValue<BigInt>(
     oracle.try_BASE_CURRENCY_UNIT(),
-    BigInt.fromI32(10 ** AAVE_DECIMALS)
-  ).toI32();
+    BigInt.fromI32(10).pow(AAVE_DECIMALS as u8)
+  ).toBigDecimal();
 
   const oracleResult = readValue<BigInt>(
     oracle.try_getAssetPrice(tokenAddress),
@@ -570,14 +610,14 @@ function getAssetPriceInUSDC(
   );
 
   if (oracleResult.gt(BIGINT_ZERO)) {
-    return oracleResult.toBigDecimal().div(exponentToBigDecimal(priceDecimals));
+    return oracleResult.toBigDecimal().div(priceDecimals);
   }
 
-  // fall back to query price oracle using aave-v2
-  return getAssetPriceInUSDCv2(tokenAddress, priceOracle, blockNumber);
+  //fall back to v2 price oracle
+  return getAssetPriceFallback(tokenAddress, priceOracle, blockNumber);
 }
 
-function getAssetPriceInUSDCv2(
+function getAssetPriceFallback(
   tokenAddress: Address,
   priceOracle: Address,
   blockNumber: BigInt

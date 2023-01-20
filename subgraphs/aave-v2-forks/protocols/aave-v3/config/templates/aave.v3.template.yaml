@@ -111,13 +111,6 @@ templates:
       abis:
         - name: LendingPoolAddressesProvider
           file: ./abis/aave-v3/LendingPoolAddressesProvider.json
-<<<<<<< HEAD
-        - name: AaveOracle
-          file: ./abis/aave-v3/AaveOracle.json
-        - name: IPriceOracleGetter
-          file: ./abis/IPriceOracleGetter.json
-=======
->>>>>>> 70355e2e (fixed one shot cancelled error)
       eventHandlers:
         - event: PriceOracleUpdated(indexed address,indexed address)
           handler: handlePriceOracleUpdated
@@ -144,7 +137,7 @@ templates:
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
         - name: AaveOracle
-          file: ./abis/aave-v3/AaveOracle.json
+          file: ./abis/aave-v3/AaveOracle.json      
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
         - name: AToken
@@ -158,8 +151,6 @@ templates:
           handler: handleBorrow
         - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
           handler: handleLiquidationCall
-        #- event: MintedToTreasury(indexed address,uint256)
-        #  handler: handleMintedToTreasury
         - event: Repay(indexed address,indexed address,indexed address,uint256,bool)
           handler: handleRepay
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
