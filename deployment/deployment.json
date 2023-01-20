@@ -2839,6 +2839,10 @@
           "hosted-service": {
             "slug": "network-gnosis",
             "query-id": "network-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "network-gnosis",
+            "query-id": "ANz3TpZdY2syZGQvGA85ANNG7KiSWdPmv55kP4H4sRPJ"
           }
         }
       }
@@ -3610,6 +3614,10 @@
           "hosted-service": {
             "slug": "qidao-gnosis",
             "query-id": "qidao-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "qidao-gnosis",
+            "query-id": "3cMswgcjkpLmuF99ViQRZfCPRyCsnimqQsR9z6mY5e2i"
           }
         }
       }
@@ -4136,6 +4144,10 @@
           "hosted-service": {
             "slug": "sushiswap-gnosis",
             "query-id": "sushiswap-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-gnosis",
+            "query-id": "5YoxED3bbWV9byvn3x3S3ebZ3idrQmQmsJhL5LMyY26v"
           }
         }
       }
@@ -4310,6 +4322,10 @@
           "hosted-service": {
             "slug": "honeyswap-gnosis",
             "query-id": "honeyswap-gnosis"
+          },
+          "decentralized-network": {
+            "slug": "honeyswap-gnosis",
+            "query-id": "GLAu42kvVs7ixfXcmkAsRiS7Xt1NCpgkKsnz3qiriuvV"
           }
         }
       },
