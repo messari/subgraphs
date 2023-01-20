@@ -64,7 +64,7 @@ jobs:
       run: npm install prettier
 
     - name: Get changed files
-      run: git diff --name-only HEAD~1 '**.ts'
+      run: git diff --name-only HEAD~1 -- '**.ts'
 
     - name: Format changed files
       run: prettier --check ${{ steps.get_changed_files.outputs.stdout }}
