@@ -334,7 +334,7 @@ type Pool @entity {
   stakedLiquidity: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissions: [BigInt!]
+  rewardTokenEmissionsAmount: [BigInt!]
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
@@ -409,7 +409,7 @@ type PoolDailySnapshot @entity {
   stakedLiquidity: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissions: [BigInt!]
+  rewardTokenEmissionsAmount: [BigInt!]
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
