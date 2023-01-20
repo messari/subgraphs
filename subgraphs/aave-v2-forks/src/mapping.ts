@@ -934,10 +934,10 @@ export function _handleLiquidate(
   let liquidateeActor = ActorAccount.load(liquidateeActorID);
   if (!liquidateeActor) {
     liquidateeActor = new ActorAccount(liquidateeActorID);
-    liquidateeActor.save();
+    liquidateeActor.save()
 
     protocol.cumulativeUniqueLiquidatees += 1;
-    protocol.save();
+    protocol.save()
   }
 
   const repayTokenMarket = Market.load(repayToken.toHexString());
