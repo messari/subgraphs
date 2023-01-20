@@ -32,8 +32,7 @@ export function trackSystemSettings(block: ethereum.Block): void {
   if (curSystemSettings == null) {
     const systemSettingsAddress = getContractDeployment(
       "SystemSettings",
-      dataSource.network(),
-      block.number
+      dataSource.network()
     )!;
     const systemSettings = SystemSettingsContract.bind(systemSettingsAddress);
     const systemSettingsEntity = new SystemSetting(timeSlot.toString());
@@ -149,8 +148,7 @@ export function trackGlobalDebt(block: ethereum.Block): void {
   if (curDebtState == null) {
     const sdsAddress = getContractDeployment(
       "SynthetixDebtShare",
-      dataSource.network(),
-      block.number
+      dataSource.network()
     )!;
     const sds = SynthetixDebtShare.bind(sdsAddress);
 

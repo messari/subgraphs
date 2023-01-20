@@ -140,8 +140,7 @@ export function handleEtherWrapperMaxETHUpdated(
 ): void {
   const addressResolverAddress = getContractDeployment(
     "AddressResolver",
-    dataSource.network(),
-    BigInt.fromI32(1000000000)
+    dataSource.network()
   )!;
   const resolver = AddressResolver.bind(addressResolverAddress);
   const etherWrapperAddress = resolver.try_getAddress(

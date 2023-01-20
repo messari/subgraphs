@@ -249,8 +249,7 @@ export function calculateInverseRate(
 export function initFeed(currencyKey: string): BigDecimal | null {
   const addressResolverAddress = getContractDeployment(
     "AddressResolver",
-    dataSource.network(),
-    BigInt.fromI32(1000000000)
+    dataSource.network()
   )!;
   const resolver = AddressResolver.bind(addressResolverAddress);
   const exchangeRateAddressTry = resolver.try_getAddress(
@@ -279,8 +278,7 @@ export function initFeed(currencyKey: string): BigDecimal | null {
 export function initFeeRate(type: string, currencyKey: string): BigDecimal {
   const addressResolverAddress = getContractDeployment(
     "AddressResolver",
-    dataSource.network(),
-    BigInt.fromI32(1000000000)
+    dataSource.network()
   )!;
 
   const resolver = AddressResolver.bind(addressResolverAddress);
@@ -406,8 +404,7 @@ export function handleInverseAggregatorAnswerUpdated(
 export function handleChainlinkUpdate(event: ExecutionSuccess): void {
   const addressResolverAddress = getContractDeployment(
     "AddressResolver",
-    dataSource.network(),
-    BigInt.fromI32(1000000000)
+    dataSource.network()
   )!;
   //let synthetixAddress = synthetixProxyContract.try_target();
 

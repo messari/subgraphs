@@ -6010,7 +6010,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "synthetix.template.yaml"
+          "template": "synth-eth.template.yaml"
         },
         "options": {
           "prepare:yaml": true,

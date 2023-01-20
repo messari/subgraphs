@@ -2,7 +2,6 @@ import {
   BigDecimal,
   BigInt,
   Bytes,
-  ByteArray,
   log,
   Address,
   dataSource,
@@ -44,7 +43,7 @@ export function toDecimal(value: BigInt, decimals: u32 = 18): BigDecimal {
   return value.divDecimal(precision);
 }
 
-export function strToBytes(str: string, length: i32 = 32): Bytes {
+export function strToBytes(str: string): Bytes {
   return Bytes.fromByteArray(Bytes.fromUTF8(str));
 }
 
@@ -92,17 +91,15 @@ export function getExchangeFee(type: string, synth: string): BigDecimal {
   return rate.rate;
 }
 
-export function isEscrow(holder: string, network: string): boolean {
+export function isEscrow(holder: string): boolean {
   return (
     getContractDeployment(
       "SynthetixEscrow",
-      dataSource.network(),
-      BigInt.fromI32(1000000000)
+      dataSource.network()
     )!.toHexString() == holder ||
     getContractDeployment(
       "RewardEscrow",
-      dataSource.network(),
-      BigInt.fromI32(1000000000)
+      dataSource.network()
     )!.toHexString() == holder
   );
 }

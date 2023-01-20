@@ -345,8 +345,7 @@ function trackDebtSnapshot(event: ethereum.Event): void {
 
     const addressResolverAddress = getContractDeployment(
       "AddressResolver",
-      dataSource.network(),
-      BigInt.fromI32(1000000000)
+      dataSource.network()
     )!;
     const resolver = AddressResolver.bind(addressResolverAddress);
     const synthetixStateAddressTry = resolver.try_getAddress(
@@ -383,8 +382,7 @@ function trackDebtSnapshot(event: ethereum.Event): void {
 
     const addressResolverAddress = getContractDeployment(
       "AddressResolver",
-      dataSource.network(),
-      BigInt.fromI32(1000000000)
+      dataSource.network()
     )!;
     const resolver = AddressResolver.bind(addressResolverAddress);
 
