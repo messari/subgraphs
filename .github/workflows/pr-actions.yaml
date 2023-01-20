@@ -77,7 +77,7 @@ jobs:
       #     echo Changed files: "${{ steps.changed-files-specific.outputs.added_modified }}"
 
       - name: Prettify check
-        run: prettier --check
+        run: prettier --check subgraphs/**/*.ts
 
   Build:
     runs-on: macos-latest
