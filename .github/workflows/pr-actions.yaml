@@ -53,21 +53,30 @@ jobs:
       - name: Lint staged files
         run: npm run lint:subgraphs ${{ steps.changed-files-specific.outputs.added_modified }}
 
-  format:
+jobs:
+  format-check:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: install prettier
-      run: npm install prettier
+    - name: Get list of changed TypeScript files
+      run: |
+        git diff --name-only HEAD~1 | grep -E '\.ts?$' > changed-files.txt
 
-    - name: Get changed files
-      run: git diff --name-only HEAD~1 -- "**.ts"
+    - name: Format changed TypeScript files with Prettier
+      run: npx prettier --config .prettierrc --list-different $(cat changed-files.txt)
 
-    - name: Format changed files
-      run: prettier --check ${{ steps.get_changed_files.outputs.stdout }}
+    - name: Fail the action if any files were not formatted correctly
+      run: |
+        if [ -s changed-files.txt ]; then
+            echo "The following files were not formatted correctly:"
+            cat changed-files.txt
+            exit 1
+        else
+            echo "All changed TypeScript files are formatted correctly."
+        fi
 
   Build:
     runs-on: macos-latest
