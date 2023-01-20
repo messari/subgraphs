@@ -53,6 +53,7 @@ jobs:
       - name: Lint staged files
         run: npm run lint:subgraphs ${{ steps.changed-files-specific.outputs.added_modified }}
 
+jobs:
   format-check:
     runs-on: ubuntu-latest
 
@@ -62,7 +63,7 @@ jobs:
 
     - name: Get list of changed TypeScript files
       run: |
-        git diff --name-only HEAD~1 | grep -E '\.ts?$' > changed-files.txt
+        git diff --name-only HEAD | grep -E '\.ts?$' > changed-files.txt
 
     - name: Check format of changed TypeScript files with Prettier
       run: npx prettier --config .prettierrc --check $(cat changed-files.txt)
