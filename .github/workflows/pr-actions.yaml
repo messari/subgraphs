@@ -70,14 +70,14 @@ jobs:
           filter: 'subgraphs/**/*.ts'
 
       - name: Install dependencies
-        run: npm i prettier
+        run: npm i -g prettier
 
-      - name: Echo file changes
-        run: |
-          echo Changed files: "${{ steps.changed-files-specific.outputs.added_modified }}"
+      # - name: Echo file changes
+      #   run: |
+      #     echo Changed files: "${{ steps.changed-files-specific.outputs.added_modified }}"
 
       - name: Prettify check
-        run: prettier --check ${{ steps.changed-files-specific.outputs.added_modified }}
+        run: prettier --check
 
   Build:
     runs-on: macos-latest
