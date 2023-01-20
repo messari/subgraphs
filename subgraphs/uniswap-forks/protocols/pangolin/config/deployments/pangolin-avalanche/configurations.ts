@@ -50,7 +50,7 @@ export class PangolinAvalancheConfigurations implements Configurations {
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
-    return BigDecimal.fromString("0.05");
+    return BigDecimal.fromString("0.0075");
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getLPFeeToOn(blockNumber: BigInt): BigDecimal {
@@ -63,7 +63,7 @@ export class PangolinAvalancheConfigurations implements Configurations {
     return BigDecimal.fromString("0.3");
   }
   getFeeOnOff(): string {
-    return FeeSwitch.OFF;
+    return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.TIMESTAMP;
