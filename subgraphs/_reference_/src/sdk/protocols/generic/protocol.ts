@@ -80,7 +80,6 @@ export class ProtocolManager {
     protocol.lastSnapshotDayID = 0;
     protocol.lastSnapshotHourID = 0;
     protocol.lastUpdateTimestamp = BIGINT_ZERO;
-    protocol.lastUpdateBlockNumber = BIGINT_ZERO;
 
     const proto = new ProtocolManager(protocol, pricer, event);
     proto.setVersions(conf.getVersions());

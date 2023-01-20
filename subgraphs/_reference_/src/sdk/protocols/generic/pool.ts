@@ -106,7 +106,6 @@ export class Pool {
     this.pool.lastSnapshotDayID = BIGINT_ZERO;
     this.pool.lastSnapshotHourID = BIGINT_ZERO;
     this.pool.lastUpdateTimestamp = BIGINT_ZERO;
-    this.pool.lastUpdateBlockNumber = BIGINT_ZERO;
     this.save();
 
     this.protocol.addPool();

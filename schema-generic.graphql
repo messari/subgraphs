@@ -147,9 +147,6 @@ type Protocol @entity {
   " Timestamp of the last time this entity was updated "
   lastUpdateTimestamp: BigInt!
 
-  " Block number of the last time this entity was updated "
-  lastUpdateBlockNumber: BigInt!
-
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -347,9 +344,6 @@ type Pool @entity {
 
   " Timestamp of the last time this entity was updated "
   lastUpdateTimestamp: BigInt!
-
-  " Block number of the last time this entity was updated "
-  lastUpdateBlockNumber: BigInt!
 
   ##### Snapshots #####
 
