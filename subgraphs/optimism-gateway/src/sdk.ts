@@ -2,11 +2,10 @@ import {
   Address,
   BigDecimal,
   BigInt,
-  Bytes,
   dataSource,
   ethereum,
 } from "@graphprotocol/graph-ts";
-import { Pool, Token } from "../generated/schema";
+import { Token } from "../generated/schema";
 import { ERC20 } from "../generated/templates/Bridge/ERC20";
 import { ERC20NameBytes } from "../generated/templates/Bridge/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../generated/templates/Bridge/ERC20SymbolBytes";
@@ -17,21 +16,11 @@ import {
 } from "./constants";
 import { getUsdPrice, getUsdPricePerToken } from "./prices";
 import { SDK } from "./sdk/protocols/bridge";
-import { networkToChainID } from "./sdk/protocols/bridge/chainIds";
 import { BridgeConfig } from "./sdk/protocols/bridge/config";
-import {
-  BridgePermissionType,
-  BridgePoolType,
-  CrosschainTokenType,
-} from "./sdk/protocols/bridge/enums";
+import { BridgePermissionType } from "./sdk/protocols/bridge/enums";
 import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
 import { TokenPricer } from "./sdk/protocols/config";
-import {
-  ETH_ADDRESS,
-  ETH_NAME,
-  ETH_SYMBOL,
-  Network,
-} from "./sdk/util/constants";
+import { ETH_ADDRESS, ETH_NAME, ETH_SYMBOL } from "./sdk/util/constants";
 import { bigIntToBigDecimal } from "./sdk/util/numbers";
 import { Versions } from "./versions";
 
