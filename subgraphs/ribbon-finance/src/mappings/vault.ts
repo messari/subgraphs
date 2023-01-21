@@ -131,24 +131,23 @@ export function handleCollectVaultFees(event: CollectVaultFees): void {
 
 export function handleDistributePremium(event: DistributePremium): void {
     const premium = event.params.amount;
-    const vaultAddress = event.transaction.from;
+    const vaultAddress = event.address;
 
     if (vaultAddress == constants.NULL.TYPE_ADDRESS) return;
-    const vaultStore = Vault.load(vaultAddress.toHexString());
-    if (!vaultStore) return;
+    
     const vault = getOrCreateVault(vaultAddress, event.block);
 
-    const inputToken = getOrCreateToken(
-      Address.fromString(vault.inputToken),
-      event.block,
-      vaultAddress,
-      false
-    );
+    const usdcToken = getOrCreateToken(
+    constants.USDC_ADDRESS,
+    event.block,
+    vaultAddress,
+    false
+  );
     const premiumUSD = premium
       .divDecimal(
-        constants.BIGINT_TEN.pow(vault._decimals as u8).toBigDecimal()
+        constants.BIGINT_TEN.pow(6 as u8).toBigDecimal()
       )
-      .times(inputToken.lastPriceUSD!);
+      .times(usdcToken.lastPriceUSD!);
 
     updateVaultSnapshots(vaultAddress, event.block);
 
@@ -158,7 +157,6 @@ export function handleDistributePremium(event: DistributePremium): void {
       constants.BIGDECIMAL_ZERO,
       event.block
     );
-
 }
 
 export function handleRollToNextOption(call: RollToNextOption): void {
@@ -178,7 +176,6 @@ export function handleAuctionCleared(event: AuctionCleared): void {
   const auction = getOrCreateAuction(auctionId);
 
   if (auction.vault == constants.NULL.TYPE_STRING) return;
-
   log.warning("[AuctionCleared] vault {} auction id {}", [
     auctionId.toString(),
     auction.vault,
@@ -385,11 +382,9 @@ export function handlePayOptionYield(event: PayOptionYield): void {
 }
 export function handlePurchaseOption(event: PurchaseOption): void {
   const premium = event.params.premium;
-  const vaultAddress = event.transaction.from;
+  const vaultAddress = event.address;
 
   if (vaultAddress == constants.NULL.TYPE_ADDRESS) return;
-  const vaultStore = Vault.load(vaultAddress.toHexString());
-  if (!vaultStore) return;
   const vault = getOrCreateVault(vaultAddress, event.block);
 
   const inputToken = getOrCreateToken(
@@ -467,15 +462,15 @@ export function handleCollectPerformanceFee(event: CollectPerformanceFee): void 
   const vault = getOrCreateVault(vaultAddress, block);
 
   updateVaultTVL(vaultAddress, block);
-  const vaultAsset = getOrCreateToken(
-    Address.fromString(vault.inputToken),
+  const usdcToken = getOrCreateToken(
+    constants.USDC_ADDRESS,
     block,
     vaultAddress,
     false
   );
   const performanceFeeUSD = performanceFee
-    .divDecimal(constants.BIGINT_TEN.pow(vault._decimals as u8).toBigDecimal())
-    .times(vaultAsset.lastPriceUSD!);
+    .divDecimal(constants.BIGINT_TEN.pow(6 as u8).toBigDecimal())
+    .times(usdcToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
     vault,

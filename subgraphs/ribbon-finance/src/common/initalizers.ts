@@ -310,8 +310,6 @@ export function getOrCreateVault(
     vault.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    vault.rewardTokenEmissionsAmount = []; 
-    vault.rewardTokenEmissionsUSD = [];
     
     const withdrawlFeeId =
       utils.enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE) +

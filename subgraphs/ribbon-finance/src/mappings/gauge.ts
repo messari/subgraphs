@@ -3,7 +3,7 @@ import { Address, log } from "@graphprotocol/graph-ts";
 import {
   updateFactoryRewards,
   updateRbnRewardsInfo,
-  // updateStakedOutputTokenAmount,
+  updateStakedOutputTokenAmount,
 } from "../modules/Rewards";
 import { getOrCreateLiquidityGauge } from "../common/initalizers";
 import {
@@ -24,7 +24,7 @@ export function handleStake(event: Deposit): void {
   const vaultAddress = Address.fromString(liquidityGauge.vault);
   if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
-  // updateStakedOutputTokenAmount(vaultAddress, gaugeAddress, event.block);
+  updateStakedOutputTokenAmount(vaultAddress, gaugeAddress, event.block);
   updateRbnRewardsInfo(gaugeAddress, vaultAddress, event.block);
   updateVaultSnapshots(vaultAddress, event.block);
 
@@ -40,7 +40,7 @@ export function handleUnstake(event: Withdraw): void {
   const vaultAddress = Address.fromString(liquidityGauge.vault);
   if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
-  // updateStakedOutputTokenAmount(vaultAddress, gaugeAddress, event.block);
+  updateStakedOutputTokenAmount(vaultAddress, gaugeAddress, event.block);
   updateRbnRewardsInfo(gaugeAddress, vaultAddress, event.block);
   updateVaultSnapshots(vaultAddress, event.block);
 
@@ -57,7 +57,7 @@ export function handleStaked(event: Staked): void {
   log.warning("[Staked] VaultAddress {}", [vaultAddress.toHexString()]);
   if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
-  // updateStakedOutputTokenAmount(vaultAddress, gaugeAddress, event.block);
+  updateStakedOutputTokenAmount(vaultAddress, gaugeAddress, event.block);
   updateFactoryRewards(vaultAddress, gaugeAddress, event.block);
   updateVaultSnapshots(vaultAddress, event.block);
 }
@@ -72,7 +72,7 @@ export function handleWithdrawn(event: Withdrawn): void {
   log.warning("[Withdrawn] VaultAddress {}", [vaultAddress.toHexString()]);
   if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
-  // updateStakedOutputTokenAmount(vaultAddress, gaugeAddress, event.block);
+  updateStakedOutputTokenAmount(vaultAddress, gaugeAddress, event.block);
   updateFactoryRewards(vaultAddress, gaugeAddress, event.block);
   updateVaultSnapshots(vaultAddress, event.block);
 }

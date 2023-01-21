@@ -7,11 +7,15 @@ import {
   dataSource,
 } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
-import {  Vault } from "../../generated/schema";
+import { Vault } from "../../generated/schema";
 import { ERC20 as ERC20Contract } from "../../generated/ETHCallV2/ERC20";
-import { Otoken as OTokenContract, Otoken } from "../../generated/ETHCallV2/Otoken";
-import { getOrCreateYieldAggregator, getOrCreateToken, getOrCreateVault } from "./initalizers";
-import { OptionTokenV1 as OptionsContractV1} from "../../generated/EthCallV1/OptionTokenV1";
+import { Otoken as OTokenContract } from "../../generated/ETHCallV2/Otoken";
+import {
+  getOrCreateYieldAggregator,
+  getOrCreateToken,
+  getOrCreateVault,
+} from "./initalizers";
+import { OptionTokenV1 as OptionsContractV1 } from "../../generated/EthCallV1/OptionTokenV1";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 import { OptionsPremiumPricer as OptionsPremiumPricerContract } from "../../generated/ETHCallV2/OptionsPremiumPricer";
 
@@ -52,7 +56,6 @@ export function updateProtocolAfterNewVault(vaultAddress: Address): void {
   protocol.save();
 }
 
-
 export function updateProtocolTotalValueLockedUSD(): void {
   const protocol = getOrCreateYieldAggregator();
 
@@ -81,10 +84,7 @@ export function getTokenDecimals(tokenAddr: Address): BigDecimal {
   return constants.BIGINT_TEN.pow(decimals as u8).toBigDecimal();
 }
 
-export function getVaultPricePerShare(
-  vaultAddress: Address,
-  optionToken: Address,
-): BigDecimal {
+export function getVaultPricePerShare(vaultAddress: Address): BigDecimal {
   const vaultContract = VaultContract.bind(vaultAddress);
   const vaultDecimals = readValue(vaultContract.try_decimals(), 18);
 
@@ -93,63 +93,54 @@ export function getVaultPricePerShare(
     constants.BIGINT_ZERO
   ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
 
-  if (vaultPricePerShare.notEqual(constants.BIGDECIMAL_ZERO)) return vaultPricePerShare;
-  if (optionToken.equals(constants.NULL.TYPE_ADDRESS)) return constants.BIGDECIMAL_ZERO;
+  if (vaultPricePerShare.notEqual(constants.BIGDECIMAL_ZERO))
+    return vaultPricePerShare;
 
-  const optionsContract = OptionsContractV1.bind(optionToken);
-  const optionsDecimals = readValue(optionsContract.try_decimals(), 8);
-  
-    const totalTokensDeposits = readValue(
-      vaultContract.try_totalBalance(),
-      constants.BIGINT_ZERO
-    ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
+  const totalTokensDeposits = readValue(
+    vaultContract.try_totalBalance(),
+    constants.BIGINT_ZERO
+  ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
 
-    const totalOptions = readValue(
-      optionsContract.try_totalSupply(),
-      constants.BIGINT_ZERO
-    ).divDecimal(
-      constants.BIGINT_TEN.pow(optionsDecimals as u8).toBigDecimal()
-    );
+  const totalOptions = readValue(
+    vaultContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
 
-    const pricePerShare = totalTokensDeposits.div(totalOptions);
-    
-  
+  const pricePerShare = totalTokensDeposits.div(totalOptions);
+
   return pricePerShare;
-
-
 }
-
 
 export function getOptionTokenPriceUSD(
   vaultAddress: Address,
   optionToken: Address,
-  block:ethereum.Block,
+  block: ethereum.Block
 ): BigDecimal {
-
   const underlyingTokenPriceUSD = getUnderlyingTokenPriceFromOptionsPricer(
     vaultAddress,
     optionToken
   );
-  const vaultPricePerShare = getVaultPricePerShare(vaultAddress,optionToken);
-    let optionsTokenPriceUSD =
-    underlyingTokenPriceUSD.times(vaultPricePerShare);
-    
-  if (optionsTokenPriceUSD.notEqual(constants.BIGDECIMAL_ZERO)) return optionsTokenPriceUSD;
-  
-    const optionsContract = OptionsContractV1.bind(optionToken);
-  
-    const assetAddress = readValue(optionsContract.try_underlyingAsset(), constants.NULL.TYPE_ADDRESS);
-    const token = getOrCreateToken(assetAddress, block, vaultAddress, false);
-    optionsTokenPriceUSD = token.lastPriceUSD!.times(vaultPricePerShare);
+  const vaultPricePerShare = getVaultPricePerShare(vaultAddress);
+  let optionsTokenPriceUSD = underlyingTokenPriceUSD.times(vaultPricePerShare);
 
+  if (optionsTokenPriceUSD.notEqual(constants.BIGDECIMAL_ZERO))
     return optionsTokenPriceUSD;
 
+  const optionsContract = OptionsContractV1.bind(optionToken);
+
+  const assetAddress = readValue(
+    optionsContract.try_underlyingAsset(),
+    constants.NULL.TYPE_ADDRESS
+  );
+  const token = getOrCreateToken(assetAddress, block, vaultAddress, false);
+  optionsTokenPriceUSD = token.lastPriceUSD!.times(vaultPricePerShare);
+
+  return optionsTokenPriceUSD;
 }
 
 export function getUnderlyingTokenPriceFromOptionsPricer(
   vaultAddress: Address,
-  optionToken: Address,
-  
+  optionToken: Address
 ): BigDecimal {
   const vaultContract = VaultContract.bind(vaultAddress);
   const currentOption = optionToken;
@@ -244,18 +235,26 @@ export function searchLiquidityGaugePoolsVaultAddress(
   );
 }
 
-export function getOutputTokenSupply(vaultAddress: Address,block:ethereum.Block): BigInt{
+export function getOutputTokenSupply(
+  vaultAddress: Address,
+  block: ethereum.Block
+): BigInt {
   const vault = getOrCreateVault(vaultAddress, block);
   if (!vault.outputToken) return constants.BIGINT_ZERO;
-  const outputTokenAddress = Address.fromString(vault.outputToken!);
-  const OTokenContract = Otoken.bind(outputTokenAddress);
-  let outputTokenSupply = readValue<BigInt>(OTokenContract.try_totalSupply(), constants.BIGINT_ZERO);
 
-  if (!outputTokenSupply.equals(constants.BIGINT_ZERO)) return outputTokenSupply;
+  // const outputTokenAddress = Address.fromString(vault.outputToken!);
+  // const OTokenContract = Otoken.bind(outputTokenAddress);
+  const vaultContract = VaultContract.bind(vaultAddress);
+  const outputTokenSupply = readValue<BigInt>(
+    vaultContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
 
-  const OptionTokenV1 = OptionsContractV1.bind(outputTokenAddress);
+  // if (!outputTokenSupply.equals(constants.BIGINT_ZERO)) return outputTokenSupply;
 
-  outputTokenSupply = readValue<BigInt>(OptionTokenV1.try_totalSupply(), constants.BIGINT_ZERO);
+  // const OptionTokenV1 = OptionsContractV1.bind(outputTokenAddress);
+
+  // outputTokenSupply = readValue<BigInt>(OptionTokenV1.try_totalSupply(), constants.BIGINT_ZERO);
 
   return outputTokenSupply;
 }
