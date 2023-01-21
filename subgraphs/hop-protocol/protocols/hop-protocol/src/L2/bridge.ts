@@ -28,7 +28,6 @@ import {
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
-import { Network } from '../../../../src/sdk/util/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -92,6 +91,15 @@ export function handleTransferFromL1Completed(
 		const poolAddress = NetworkConfigs.getPoolAddressFromBridgeAddress(
 			event.address.toHexString()
 		)
+		log.warning(
+			'inputToken2: {}, bridgeAddress2: {}, poolAddress2: {}, txHash: {}',
+			[
+				inputToken,
+				event.address.toHexString(),
+				poolAddress,
+				event.transaction.hash.toHexString(),
+			]
+		)
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 
 		const poolName = poolConfig[1]
@@ -116,7 +124,7 @@ export function handleTransferFromL1Completed(
 		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
 
 		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
 			reverseChainIDs.get(
@@ -153,8 +161,6 @@ export function handleTransferSent(event: TransferSent): void {
 
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 
-		const fee = bigIntToBigDecimal(event.params.bonderFee)
-
 		const poolName = poolConfig[0]
 		const poolSymbol = poolConfig[1]
 
@@ -177,7 +183,7 @@ export function handleTransferSent(event: TransferSent): void {
 		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
 
 		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
 			event.params.chainId,
@@ -186,13 +192,16 @@ export function handleTransferSent(event: TransferSent): void {
 			Address.fromString(inputToken)
 		)
 		pool.addDestinationToken(crossToken)
+
+		const feeUsd = sdk.Pricer.getAmountValueUSD(token, event.params.bonderFee)
+
+		pool.addSupplySideRevenueUSD(feeUsd)
+
 		acc.transferOut(
 			pool,
 			pool.getDestinationTokenRoute(crossToken)!,
 			event.params.recipient,
 			event.params.amount
 		)
-
-		pool.addSupplySideRevenueUSD(fee)
 	}
 }

@@ -100,33 +100,15 @@ export function handleTransfer(event: Transfer): void {
 		const token = sdk.Tokens.getOrCreateToken(event.address)
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
-		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-			reverseChainIDs.get(
-				dataSource
-					.network()
-					.toUpperCase()
-					.replace('_', '-')
-			)!,
-			event.address,
-			CrosschainTokenType.CANONICAL,
-			event.address
-		)
-
 		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
 		if (event.params.to.toHexString() == bridgeAddress) {
 			sdk.Accounts.loadAccount(event.params.from)
 		}
 		if (event.params.from.toHexString() == bridgeAddress) {
-			const acc = sdk.Accounts.loadAccount(event.params.to)
-			acc.transferIn(
-				pool,
-				pool.getDestinationTokenRoute(crossToken)!,
-				event.params.to,
-				event.params.value
-			)
+			sdk.Accounts.loadAccount(event.params.to)
 		}
 	}
 }

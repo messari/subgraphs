@@ -4,8 +4,8 @@
   "subgraphName": "hop-xdai",
   "deployment": "HOP_PROTOCOL_XDAI",
   "graftEnabled": false,
-  "subgraphId": "QmeqNJCWNZruzvFcNMT34fnmVZ1q7naicNtqpGov49QXQb",
-  "graftStartBlock": 17444998,
+  "subgraphId": "QmTbUxDHn2rDq9PpKT7MHwx4AJS24c1upo736JvsxkgECJ",
+  "graftStartBlock": 24544140,
   "tokens": [
     {
       "dataSourceName": "Token",
@@ -13,7 +13,7 @@
       "tokenName": "USD Coin",
       "tokenDecimals": 6,
       "address": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-      "startBlock": 16617211
+      "startBlock": 16617210
     },
     {
       "dataSourceName": "TokenUSDT",

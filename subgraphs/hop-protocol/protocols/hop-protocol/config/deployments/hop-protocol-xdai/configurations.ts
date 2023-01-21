@@ -266,7 +266,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			bridgeAddress ==
 			'0x6F03052743CD99ce1b29265E377e320CD24Eb632'.toLowerCase() //HOP BRIDGE
 		) {
-			return '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase() //HOP
+			return '0x0000000000000000000000000000000000000000'.toLowerCase() //HOP
 		} else {
 			log.critical('Address not found', [])
 			return ''
@@ -298,6 +298,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			poolAddress == '0xb07c6505e1E41112494123e40330c5Ac09817CFB'.toLowerCase()
 		) {
 			return ['HOP-WBTC', 'hWBTC/WBTC']
+		} else if (
+			poolAddress == '0x0000000000000000000000000000000000000000'.toLowerCase()
+		) {
+			return ['HOP', 'HOP']
 		} else {
 			log.critical('Token not found', [])
 			return []
@@ -323,6 +327,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			'0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase(), // MATIC
 			'0x4014DC015641c08788F15bD6eB20dA4c47D936d8'.toLowerCase(), // ETH
 			'0xb07c6505e1E41112494123e40330c5Ac09817CFB'.toLowerCase(), // WBTC
+			'0x0000000000000000000000000000000000000000'.toLowerCase(), // HOP
 		]
 	}
 	getBridgeList(): string[] {

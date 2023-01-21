@@ -11,7 +11,7 @@ import {
 import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
 import { NetworkConfigs } from '../../../../configurations/configure'
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
 import {
 	TokenSwap,
 	AddLiquidity,
@@ -45,8 +45,10 @@ class TokenInit implements TokenInitializer {
 }
 
 export function handleTokenSwap(event: TokenSwap): void {
-	const amount = bigIntToBigDecimal(event.params.tokensSold)
-	const fees = amount.times(BigDecimal.fromString('0.0004'))
+	const amount = event.params.tokensSold
+
+	const bp = BigInt.fromString('4').div(BigInt.fromString('10000'))
+	const fees = amount.times(bp)
 
 	const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
 		event.address.toHexString()
@@ -76,16 +78,16 @@ export function handleTokenSwap(event: TokenSwap): void {
 	sdk.Accounts.loadAccount(event.params.buyer)
 
 	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 	}
 
-	pool.addSupplySideRevenueUSD(fees)
+	const amountUsd = sdk.Pricer.getAmountValueUSD(token, fees)
+	pool.addSupplySideRevenueUSD(amountUsd)
 }
 
 export function handleAddLiquidity(event: AddLiquidity): void {
 	if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
 		let amount = event.params.tokenAmounts
-		let fees = bigIntToBigDecimal(event.params.fees[0])
 		if (amount.length == 0) {
 			return
 		}
@@ -120,11 +122,21 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 		const acc = sdk.Accounts.loadAccount(event.params.provider)
 
 		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
 		acc.liquidityDeposit(pool, amount[0])
-		pool.addSupplySideRevenueUSD(fees)
+
+		const feeUsd = sdk.Pricer.getAmountValueUSD(token, event.params.fees[0])
+
+		pool.setTotalValueLocked(bigIntToBigDecimal(event.params.lpTokenSupply))
+		pool.addSupplySideRevenueUSD(feeUsd)
+
+		log.warning('LA - lpTokenSupply: {}, amount: {},  feeUsd: {}', [
+			bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
+			amount[0].toString(),
+			feeUsd.toString(),
+		])
 	}
 }
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
@@ -164,10 +176,16 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 		const acc = sdk.Accounts.loadAccount(event.params.provider)
 
 		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
 		acc.liquidityWithdraw(pool, amount[0])
+		pool.setTotalValueLocked(bigIntToBigDecimal(event.params.lpTokenSupply))
+
+		log.warning('LWITH lpTokenSupply: {}, amount: {}', [
+			event.params.lpTokenSupply.toString(),
+			amount[0].toString(),
+		])
 	}
 }
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
@@ -207,9 +225,15 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 		const acc = sdk.Accounts.loadAccount(event.params.provider)
 
 		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
 		acc.liquidityWithdraw(pool, event.params.lpTokenAmount)
+		pool.setTotalValueLocked(bigIntToBigDecimal(event.params.lpTokenSupply))
+
+		log.warning('LWITHONE lpTokenSupply: {}, amount: {}', [
+			event.params.lpTokenSupply.toString(),
+			event.params.lpTokenAmount.toString(),
+		])
 	}
 }

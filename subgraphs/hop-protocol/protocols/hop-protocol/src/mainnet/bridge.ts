@@ -45,6 +45,8 @@ class TokenInit implements TokenInitializer {
 
 export function handleBonderAdded(event: BonderAdded): void {
 	if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
+		log.warning('bridgeAddress: {}', [event.address.toHexString()])
+
 		const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
 			event.address.toHexString()
 		)
@@ -82,9 +84,14 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 			event.params.chainId.toString(),
 			event.address.toHexString()
 		)
-		log.warning('poolAddress2: {}, inputToken: {}', [poolAddress, inputToken])
+		log.warning('poolAddress2: {}, inputToken: {}, chainId: {}', [
+			poolAddress,
+			inputToken,
+			event.params.chainId.toString(),
+		])
 
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
+
 		log.warning('poolAddress3: {}, inputToken: {}', [poolAddress, inputToken])
 
 		const poolName = poolConfig[0]
@@ -111,7 +118,7 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
 
 		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.BURN_MINT, token)
+			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
 			event.params.chainId,
@@ -120,6 +127,7 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 			Address.fromString(inputToken)
 		)
 		pool.addDestinationToken(crossToken)
+
 		acc.transferOut(
 			pool,
 			pool.getDestinationTokenRoute(crossToken)!,

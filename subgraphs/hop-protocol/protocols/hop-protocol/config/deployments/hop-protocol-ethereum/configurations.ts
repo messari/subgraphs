@@ -34,6 +34,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			return ['sUSD', 'sUSD', '18']
 		} else if (this.getEthTokens().includes(tokenAddress)) {
 			return ['ETH', 'Ethereum', '18']
+		} else if (tokenAddress == '0xc5102fe9359fd9a28f877a67e36b0f050d81a3cc') {
+			return ['HOP', 'HOP Token', '18']
 		} else {
 			log.critical('Token not found', [])
 			return []
@@ -57,6 +59,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			return ['HOP-sUSD', 'hsUSD/sUSD']
 		} else if (this.getEthPools().includes(poolAddress)) {
 			return ['HOP-ETH', 'hETH/ETH']
+		} else if (poolAddress == '0x0000000000000000000000000000000000000000') {
+			return ['HOP-POOL', 'HOP-POOL']
 		} else {
 			log.critical('Pool not found', [])
 			return []
@@ -185,9 +189,9 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		} //HOP/sUSD
 		else if (
 			bridgeAddress ==
-			'0x57Ab1ec28D129707052df4dF418D58a2D46d5f51'.toLowerCase()
+			'0x36443fC70E073fe9D50425f82a3eE19feF697d62'.toLowerCase()
 		) {
-			return '0x36443fC70E073fe9D50425f82a3eE19feF697d62'.toLowerCase() //sUSD
+			return '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51'.toLowerCase() //sUSD
 		} //HOP/MATIC
 		else if (
 			bridgeAddress ==
@@ -246,7 +250,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			'0x914f986a44AcB623A277d6Bd17368171FCbe4273'.toLowerCase()
 		) {
 			//HOP BRIDGE
-			return '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase() //HOP
+			return '0x0000000000000000000000000000000000000000'.toLowerCase() //HOP
 		} else {
 			log.critical('Token not found', [])
 		}
@@ -288,7 +292,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			bridgeAddress ==
 			'0x914f986a44AcB623A277d6Bd17368171FCbe4273'.toLowerCase() //HOP BRIDGE
 		) {
-			return '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase() //HOP
+			return '0x0000000000000000000000000000000000000000'.toLowerCase() //HOP
 		} else {
 			log.critical('Address not found', [])
 			return ''
@@ -330,7 +334,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			bridgeAddress ==
 			'0x914f986a44AcB623A277d6Bd17368171FCbe4273'.toLowerCase() //HOP BRIDGE
 		) {
-			return '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase() //HOP
+			return '0x0000000000000000000000000000000000000000'.toLowerCase() //HOP
 		} else {
 			log.critical('Address not found', [])
 			return ''
@@ -377,7 +381,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			bridgeAddress ==
 			'0x914f986a44AcB623A277d6Bd17368171FCbe4273'.toLowerCase() //HOP BRIDGE
 		) {
-			return '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase() //HOP
+			return '0x0000000000000000000000000000000000000000'.toLowerCase() //HOP
 		} else {
 			log.critical('Address not found', [])
 			return ''

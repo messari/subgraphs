@@ -32,7 +32,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 		) {
 			return '0xF181eD90D6CfaC84B8073FdEA6D34Aa744B41810'.toLowerCase() //DAI AMM
 		} else if (
-			tokenAddress == '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase()
+			tokenAddress == '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58'.toLowerCase()
 		) {
 			return '0xeC4B41Af04cF917b54AEb6Df58c0f8D78895b5Ef'.toLowerCase() //USDT AMM
 		} else if (
@@ -66,7 +66,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 		) {
 			return ['DAI', 'DAI', '18']
 		} else if (
-			tokenAddress == '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase()
+			tokenAddress == '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58'.toLowerCase()
 		) {
 			return ['USDT', 'USDT', '6']
 		} else if (
@@ -113,7 +113,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 				'optimism_dai_bridge',
 			]
 		} else if (
-			tokenAddress == '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase()
+			tokenAddress == '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58'.toLowerCase()
 		) {
 			return [
 				'0x46ae9BaB8CEA96610807a275EBD36f8e916b5C61'.toLowerCase(),
@@ -184,7 +184,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 			'0x46ae9BaB8CEA96610807a275EBD36f8e916b5C61'.toLowerCase()
 		) {
 			//HOP/USDT
-			return '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase() //USDT
+			return '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58'.toLowerCase() //USDT
 		} else if (
 			bridgeAddress ==
 			'0x83f6244Bd87662118d96D9a6D44f09dffF14b30E'.toLowerCase()
@@ -221,7 +221,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 		} else if (
 			poolAddress == '0xeC4B41Af04cF917b54AEb6Df58c0f8D78895b5Ef'.toLowerCase() //HOP/USDT
 		) {
-			return '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase() //USDT
+			return '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58'.toLowerCase() //USDT
 		} else if (
 			poolAddress == '0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase() //HOP/ETH
 		) {
@@ -322,7 +322,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 		return [
 			'0x7F5c764cBc14f9669B88837ca1490cCa17c31607'.toLowerCase(), // USDC
 			'0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase(), // DAI
-			'0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'.toLowerCase(), // USDT
+			'0x94b008aA00579c1307B0EF2c499aD98a8ce58e58'.toLowerCase(), // USDT
 			'0x4200000000000000000000000000000000000006'.toLowerCase(), // ETH
 			'0x68f180fcCe6836688e9084f035309E29Bf0A2095'.toLowerCase(), // WBTC
 			'0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4'.toLowerCase(), // SNX
