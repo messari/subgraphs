@@ -19,6 +19,6 @@ export class StargateOptimismConfigurations implements Configurations {
     return "0xE3B53AF74a4BF62Ae5511055290838050bf764Df";
   }
   getRewardToken(): string {
-    return "0x296F55F8Fb28E498B858d0BcDA06D955B2Cb3f97";
+    return "0x4200000000000000000000000000000000000042";
   }
 }

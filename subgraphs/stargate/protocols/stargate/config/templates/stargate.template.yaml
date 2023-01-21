@@ -28,6 +28,8 @@ dataSources:
           file: ./abis/Stargate/Bridge.json
         - name: LPStaking
           file: ./abis/Stargate/LPStaking.json
+        - name: LPStakingTime
+          file: ./abis/Stargate/LPStakingTime.json
         - name: Pool
           file: ./abis/Stargate/Pool.json
         - name: Router
@@ -88,7 +90,7 @@ dataSources:
     network: {{ network }}
     source:
       address: "{{ lpStaking.address }}"
-      abi: LPStaking
+      abi: {{ lpStaking.abi }}
       startBlock: {{ lpStaking.startBlock }}
     mapping:
       kind: ethereum/events
@@ -101,6 +103,8 @@ dataSources:
           file: ./abis/Stargate/Bridge.json
         - name: LPStaking
           file: ./abis/Stargate/LPStaking.json
+        - name: LPStakingTime
+          file: ./abis/Stargate/LPStakingTime.json
         - name: Pool
           file: ./abis/Stargate/Pool.json
         - name: Router
@@ -170,6 +174,8 @@ templates:
           file: ./abis/Stargate/Bridge.json
         - name: LPStaking
           file: ./abis/Stargate/LPStaking.json
+        - name: LPStakingTime
+          file: ./abis/Stargate/LPStakingTime.json
         - name: Pool
           file: ./abis/Stargate/Pool.json
         - name: Router

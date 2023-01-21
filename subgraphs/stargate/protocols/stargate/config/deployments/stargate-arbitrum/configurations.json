@@ -8,7 +8,8 @@
   },
   "lpStaking": {
     "address": "0xeA8DfEE1898a7e0a59f7527F076106d7e44c2176",
-    "startBlock": 8040516
+    "startBlock": 8040516,
+    "abi": "LPStaking"
   },
   "graftEnabled": false,
   "subgraphId": "",

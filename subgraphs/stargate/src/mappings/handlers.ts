@@ -47,6 +47,7 @@ import {
   LPStaking,
   Withdraw,
 } from "../../generated/LPStaking/LPStaking";
+import { LPStakingTime } from "../../generated/LPStaking/LPStakingTime";
 
 const conf = new BridgeConfig(
   NetworkConfigs.getFactoryAddress(),
@@ -299,31 +300,60 @@ export function handleStake(event: Deposit): void {
   const lpStakingContractAddr = dataSource.address();
   const poolID = event.params.pid;
 
-  const lpStakingContract = LPStaking.bind(lpStakingContractAddr);
-
-  const poolInfo = lpStakingContract.poolInfo(poolID);
-  const poolAddr = poolInfo.value0;
-  const allocPoint = poolInfo.value1;
-
-  const stargatePerBlock = lpStakingContract.stargatePerBlock();
-  const totalAllocPoint = lpStakingContract.totalAllocPoint();
-
-  const stargatePerBlockForPool = stargatePerBlock
-    .times(allocPoint)
-    .div(totalAllocPoint);
-
   const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool<string>(poolAddr);
   const rewardToken = sdk.Tokens.getOrCreateToken(
     Address.fromString(NetworkConfigs.getRewardToken())
   );
-  const rewardsPerDay = getRewardsPerDay(
-    event.block.timestamp,
-    event.block.number,
-    stargatePerBlockForPool.toBigDecimal(),
-    RewardIntervalType.BLOCK
-  );
+
+  let poolAddr: Address;
+  let rewardsPerDay: BigDecimal;
+
+  const network = dataSource.network().toUpperCase();
+
+  if (network != Network.OPTIMISM) {
+    const lpStakingContract = LPStaking.bind(lpStakingContractAddr);
+
+    const poolInfo = lpStakingContract.poolInfo(poolID);
+    poolAddr = poolInfo.value0;
+    const allocPoint = poolInfo.value1;
+
+    const stargatePerBlock = lpStakingContract.stargatePerBlock();
+    const totalAllocPoint = lpStakingContract.totalAllocPoint();
+
+    const stargatePerBlockForPool = stargatePerBlock
+      .times(allocPoint)
+      .div(totalAllocPoint);
+
+    rewardsPerDay = getRewardsPerDay(
+      event.block.timestamp,
+      event.block.number,
+      stargatePerBlockForPool.toBigDecimal(),
+      RewardIntervalType.BLOCK
+    );
+  } else {
+    const lpStakingContract = LPStakingTime.bind(lpStakingContractAddr);
+
+    const poolInfo = lpStakingContract.poolInfo(poolID);
+    poolAddr = poolInfo.value0;
+    const allocPoint = poolInfo.value1;
+
+    const stargatePerSecond = lpStakingContract.eTokenPerSecond();
+    const totalAllocPoint = lpStakingContract.totalAllocPoint();
+
+    const stargatePerSecondForPool = stargatePerSecond
+      .times(allocPoint)
+      .div(totalAllocPoint);
+
+    rewardsPerDay = getRewardsPerDay(
+      event.block.timestamp,
+      event.block.number,
+      stargatePerSecondForPool.toBigDecimal(),
+      RewardIntervalType.TIMESTAMP
+    );
+  }
+
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
 
   pool.setRewardEmissions(
     RewardTokenType.DEPOSIT,
