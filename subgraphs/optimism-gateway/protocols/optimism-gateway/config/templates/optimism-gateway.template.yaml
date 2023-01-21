@@ -11,13 +11,14 @@ graft:
 {{/graftEnabled}}
 dataSources:
 {{#ethereum}}
+  {{#standardBridge}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ network }}
     source:
-      address: "{{ bridgeAddress }}"
+      address: "{{ address }}"
       abi: L1StandardBridge
-      startBlock: {{ bridgeStartBlock }}
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -74,14 +75,15 @@ dataSources:
         - event: ETHWithdrawalFinalized(indexed address,indexed address,uint256,bytes)
           handler: handleETHWithdrawalFinalized
       file: ./src/mappings/L1StandardBridge.ts
-  {{#messengerAddress}}
+  {{/standardBridge}}
+  {{#messenger}}
   - kind: ethereum
     name: L1CrossDomainMessenger
     network: {{ network }}
     source:
-      address: "{{ messengerAddress }}"
+      address: "{{ address }}"
       abi: L1CrossDomainMessenger
-      startBlock: {{ messengerStartBlock }}
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -94,16 +96,46 @@ dataSources:
         - event: SentMessage(indexed address,address,bytes,uint256,uint256)
           handler: handleSentMessage
       file: ./src/mappings/L1CrossDomainMessenger.ts
-  {{/messengerAddress}}
+  {{/messenger}}
+  {{#snxBridge}}
+  - kind: ethereum
+    name: SynthetixBridgeToOptimism
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: SynthetixBridgeToOptimism
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: SynthetixBridgeToOptimism
+          file: ./abis/SynthetixBridgeToOptimism.json
+      eventHandlers:
+        - event: DepositInitiated(indexed address,address,uint256)
+          handler: handleDepositInitiated
+        - event: FinalizeSynthTransfer(indexed bytes32,indexed address,uint256)
+          handler: handleFinalizeSynthTransfer
+        - event: InitiateSynthTransfer(indexed bytes32,indexed address,uint256)
+          handler: handleInitiateSynthTransfer
+        - event: RewardDepositInitiated(indexed address,uint256)
+          handler: handleRewardDepositInitiated
+        - event: WithdrawalFinalized(indexed address,uint256)
+          handler: handleWithdrawalFinalized
+      file: ./src/mappings/SynthetixBridgeToOptimism.ts
+  {{/snxBridge}}
 {{/ethereum}}
 {{#optimism}}
+  {{#standardBridge}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ network }}
     source:
-      address: "{{ bridgeAddress }}"
+      address: "{{ address }}"
       abi: L2StandardBridge
-      startBlock: {{ bridgeStartBlock }}
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -156,14 +188,15 @@ dataSources:
         - event: WithdrawalInitiated(indexed address,indexed address,indexed address,address,uint256,bytes)
           handler: handleWithdrawalInitiated
       file: ./src/mappings/L2StandardBridge.ts
-  {{#messengerAddress}}
+  {{/standardBridge}}
+  {{#messenger}}
   - kind: ethereum
     name: L2CrossDomainMessenger
     network: {{ network }}
     source:
-      address: "{{ messengerAddress }}"
+      address: "{{ address }}"
       abi: L2CrossDomainMessenger
-      startBlock: {{ messengerStartBlock }}
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -176,7 +209,34 @@ dataSources:
         - event: SentMessage(indexed address,address,bytes,uint256,uint256)
           handler: handleSentMessage
       file: ./src/mappings/L2CrossDomainMessenger.ts
-  {{/messengerAddress}}
+  {{/messenger}}
+  {{#snxBridge}}
+  - kind: ethereum
+    name: SynthetixBridgeToBase
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: SynthetixBridgeToBase
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: SynthetixBridgeToBase
+          file: ./abis/SynthetixBridgeToBase.json
+      eventHandlers:
+        - event: DepositFinalized(indexed address,uint256)
+          handler: handleDepositFinalized
+        - event: FinalizeSynthTransfer(indexed bytes32,indexed address,uint256)
+          handler: handleFinalizeSynthTransfer
+        - event: InitiateSynthTransfer(indexed bytes32,indexed address,uint256)
+          handler: handleInitiateSynthTransfer
+        - event: WithdrawalInitiated(indexed address,address,uint256)
+          handler: handleWithdrawalInitiated
+      file: ./src/mappings/SynthetixBridgeToBase.ts
+  {{/snxBridge}}
 {{/optimism}}
 templates:
   # Template with all abis to use for imports
@@ -199,6 +259,10 @@ templates:
           file: ./abis/L2StandardBridge.json
         - name: L2CrossDomainMessenger
           file: ./abis/L2CrossDomainMessenger.json
+        - name: SynthetixBridgeToOptimism
+          file: ./abis/SynthetixBridgeToOptimism.json
+        - name: SynthetixBridgeToBase
+          file: ./abis/SynthetixBridgeToBase.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20NameBytes

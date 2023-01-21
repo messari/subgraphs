@@ -20,16 +20,14 @@ export function handleDepositFinalized(event: DepositFinalizedEvent): void {
   }
 
   let l1Token = event.params._l1Token;
-  let crosschainTokenType = CrosschainTokenType.WRAPPED;
   // ETH deposits/withdrawals have l1Token set to zero
   if (l1Token.toHexString() == ZERO_ADDRESS) {
     l1Token = Address.fromString(ETH_ADDRESS);
-    crosschainTokenType = CrosschainTokenType.CANONICAL;
   }
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     networkToChainID(Network.MAINNET),
     l1Token,
-    crosschainTokenType,
+    CrosschainTokenType.CANONICAL,
     event.params._l2Token
   );
   pool.addDestinationToken(crossToken);
@@ -54,16 +52,14 @@ export function handleWithdrawalInitiated(
   }
 
   let l1Token = event.params._l1Token;
-  let crosschainTokenType = CrosschainTokenType.WRAPPED;
   // ETH deposits/withdrawals have l1Token set to zero
   if (l1Token.toHexString() == ZERO_ADDRESS) {
     l1Token = Address.fromString(ETH_ADDRESS);
-    crosschainTokenType = CrosschainTokenType.CANONICAL;
   }
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     networkToChainID(Network.MAINNET),
     l1Token,
-    crosschainTokenType,
+    CrosschainTokenType.CANONICAL,
     event.params._l2Token
   );
   pool.addDestinationToken(crossToken);
