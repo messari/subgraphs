@@ -158,8 +158,6 @@ dataSources:
           handler: handleFinalizeSynthTransfer
         - event: InitiateSynthTransfer(indexed bytes32,indexed address,uint256)
           handler: handleInitiateSynthTransfer
-        - event: RewardDepositInitiated(indexed address,uint256)
-          handler: handleRewardDepositInitiated
         - event: WithdrawalFinalized(indexed address,uint256)
           handler: handleWithdrawalFinalized
       file: ./src/mappings/SynthetixBridgeToOptimism.ts
