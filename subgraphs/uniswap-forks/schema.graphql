@@ -277,6 +277,9 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of deposits (add liquidity) in a day "
   dailyDepositCount: Int!
 
+  " Statistics around deposit events "
+  depositStats: Stat!
+
   " Total number of withdrawals (remove liquidity) in a day "
   dailyWithdrawCount: Int!
 
@@ -291,6 +294,44 @@ type UsageMetricsDailySnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+}
+
+type Stat @entity {
+  " { protocol/pool }-{ [Optional] Pool ID }-{ deposit/withdraw/swap }-{ Days/hours since Unix epoch } "
+  id: ID!
+
+  " Total count of event (e.g. total number of swaps) "
+  count: BigInt!
+
+  # " Average in native token amount (rounded down)  "
+  # meanAmount: BigInt!
+
+  # " Average in USD "
+  # meanUSD: BigDecimal!
+
+  # " Median in native token amount"
+  # medianAmount: BigInt!
+
+  # " Median in USD "
+  # medianUSD: BigDecimal!
+
+  # " Maximum in native token amount "
+  # maxAmount: BigInt!
+
+  # " Maximum in USD "
+  # maxUSD: BigDecimal!
+
+  # " Minimum in native token amount "
+  # minAmount: BigInt!
+
+  # " Minimum in USD "
+  # minUSD: BigDecimal!
+
+  # " Variance for native token amount "
+  # varAmount: BigDecimal!
+
+  # " Variance for USD "
+  # varUSD: BigDecimal!
 }
 
 type UsageMetricsHourlySnapshot @entity {
@@ -1111,7 +1152,6 @@ type _CircularBuffer @entity {
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
 }
-
 
 type _PositionCounter @entity {
   " { Account address }-{ Market address }"

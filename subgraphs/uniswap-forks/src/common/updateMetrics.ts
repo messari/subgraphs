@@ -4,6 +4,7 @@ import {
   ActiveAccount,
   DexAmmProtocol,
   LiquidityPool,
+  Stat,
   Token,
   _HelperStore,
 } from "../../generated/schema";
@@ -22,6 +23,7 @@ import {
 } from "./getters";
 import {
   BIGDECIMAL_ZERO,
+  BIGINT_ONE,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
   INT_ONE,
@@ -77,7 +79,25 @@ export function updateUsageMetrics(
   usageMetricsHourly.timestamp = event.block.timestamp;
   usageMetricsHourly.hourlyTransactionCount += INT_ONE;
 
+
+    // Number of days since Unix epoch
+    const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+    const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  
+    const dayId = day.toString();
+    const hourId = hour.toString();
+
   if (usageType == UsageType.DEPOSIT) {
+    // TODO: Change deposit counts to Stat entities
+    const depositStatId = protocol.id.concat("-deposit-").concat(dayId);
+    let depositStat =  Stat.load(depositStatId);
+    if(!depositStat) {
+      depositStat = new Stat(depositStatId)
+      depositStat.count = BIGINT_ZERO;
+      depositStat.save();
+    } 
+    depositStat.count = depositStat.count.plus(BIGINT_ONE);
+    depositStat.save();
     usageMetricsDaily.dailyDepositCount += INT_ONE;
     usageMetricsHourly.hourlyDepositCount += INT_ONE;
   } else if (usageType == UsageType.WITHDRAW) {
@@ -88,12 +108,7 @@ export function updateUsageMetrics(
     usageMetricsHourly.hourlySwapCount += INT_ONE;
   }
 
-  // Number of days since Unix epoch
-  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-  const dayId = day.toString();
-  const hourId = hour.toString();
 
   // Combine the id and the user address to generate a unique user id for the day
   const dailyActiveAccountId = from.concat("-").concat(dayId);
