@@ -171,6 +171,7 @@ export function createAndIncrementAccount(accountId: string): i32 {
     account.closedPositionCount = 0;
     account.depositCount = 0;
     account.withdrawCount = 0;
+    account.swapCount = 0;
     account.save();
 
     return INT_ONE;
@@ -362,10 +363,8 @@ export function createWithdraw(
       account.openPositionCount -= 1;
     }
     account.save();
-    if((account.openPositionCount + account.closedPositionCount) > account.positionCount) {
-      account.positionCount = account.openPositionCount + account.closedPositionCount;
-      account.save();
-    }
+    account.positionCount = account.openPositionCount + account.closedPositionCount;
+    account.save();
     let counter = _PositionCounter.load(account.id.concat("-").concat(pool.id));
     counter!.nextCount += 1;
     counter!.save();
@@ -375,6 +374,7 @@ export function createWithdraw(
   store.remove("_Transfer", transfer.id);
   
   withdrawl.position = position.id; 
+  withdrawl.account = account.id; 
   withdrawl.save();
 
   account.withdrawCount += 1;
@@ -432,7 +432,8 @@ export function createSwapHandleVolumeAndFees(
   let transfer = getOrCreateTransfer(event);
   transfer.sender = to;
   transfer.save();
-  
+  let account = getOrCreateAccount(event);
+
   // update swap event
   swap.hash = transactionHash;
   swap.logIndex = logIndexI32;
@@ -447,8 +448,11 @@ export function createSwapHandleVolumeAndFees(
   swap.amountOut = swapTokens.amountOut;
   swap.amountOutUSD = swapTokens.tokenOutUSD;
   swap.pool = pool.id;
-
+  swap.account = account.id;
   swap.save();
+
+  account.swapCount +=1;
+  account.save();
 
   // only accounts for volume through white listed tokens
   const trackedAmountUSD = getTrackedVolumeUSD(

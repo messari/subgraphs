@@ -110,13 +110,10 @@ export function handleTransferPosition(
     if(from.openPositionCount > 0) {
       from.openPositionCount -= 1;
     }
-    const oldPositionCount = from.positionCount;
     from.closedPositionCount += 1;
     from.save();
-    if((from.openPositionCount + from.closedPositionCount) > from.positionCount) {
-      from.positionCount = from.openPositionCount + from.closedPositionCount;
-      from.save();
-    }
+    from.positionCount = from.openPositionCount + from.closedPositionCount;
+    from.save();
     let counter = _PositionCounter.load(from.id.concat("-").concat(pool.id));
     counter!.nextCount += 1;
     counter!.save();

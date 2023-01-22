@@ -101,6 +101,7 @@ export function getOrCreateAccount(event:ethereum.Event): Account {
     account.closedPositionCount = 0;
     account.depositCount = 0;
     account.withdrawCount = 0;
+    account.swapCount = 0;
     account.save()
   }
   return account;
