@@ -3,9 +3,7 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
   MINIMUM_LIQUIDITY_TEN_THOUSAND,
-  MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
@@ -128,6 +126,6 @@ export class UbeswapCeloConfigurations implements Configurations {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
   getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
-    return MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND;
+    return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
 }
