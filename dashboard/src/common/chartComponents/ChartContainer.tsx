@@ -135,7 +135,7 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
         } catch (err) {
             console.log(err);
         }
-    }, [dataTable, dataChart, csvJSONProp])
+    }, [dataTable, dataChart, csvJSONProp, csvJSON])
 
     const hourly = datasetLabel.split("-")[0]?.toUpperCase()?.includes("HOURLY");
 
