@@ -286,11 +286,14 @@ type Pool @entity {
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols don't mint any tokens to track ownership, in that case outputToken is null.
 
-  " Token that is to represent ownership of liquidity "
-  liquidityToken: Token
+  " Token that is minted to track ownership of position in protocol "
+  outputToken: Token
 
-  " Type of token used to track liquidity "
-  liquidityTokenType: TokenType
+  " Type of token used to track ownership "
+  outputTokenType: TokenType
+
+  " Specify if the output token is used to track liquidity position in the protocol "
+  isLiquidityToken: Boolean!
 
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
@@ -321,14 +324,14 @@ type Pool @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
-  " The sum of all active and non-active liquidity for this pool. "
-  totalLiquidity: BigInt
+  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
+  outputTokenSupply: BigInt
 
-  " The sum of all active and non-active liquidity in USD for this pool. "
-  totalLiquidityUSD: BigDecimal
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
 
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedLiquidity: BigInt
+  stakedOutputTokenAmount: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -393,14 +396,14 @@ type PoolDailySnapshot @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
-  " The sum of all active and non-active liquidity for this pool. "
-  totalLiquidity: BigInt
+  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
+  outputTokenSupply: BigInt
 
-  " The sum of all active and non-active liquidity in USD for this pool. "
-  totalLiquidityUSD: BigDecimal
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
 
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedLiquidity: BigInt
+  stakedOutputTokenAmount: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -454,14 +457,14 @@ type PoolHourlySnapshot @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
-  " The sum of all active and non-active liquidity for this pool. "
-  totalLiquidity: BigInt
+  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
+  outputTokenSupply: BigInt
 
-  " The sum of all active and non-active liquidity in USD for this pool. "
-  totalLiquidityUSD: BigDecimal
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
 
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedLiquidity: BigInt
+  stakedOutputTokenAmount: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]

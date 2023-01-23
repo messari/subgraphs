@@ -84,7 +84,13 @@ export class Pool {
     );
   }
 
-  initialize(name: string, symbol: string, inputToken: Token): void {
+  initialize(
+    name: string,
+    symbol: string,
+    inputToken: Token,
+    outputToken: Token | null,
+    isLiquidity: bool | null
+  ): void {
     if (this.isInitialized) {
       return;
     }
@@ -94,6 +100,8 @@ export class Pool {
     this.pool.name = name;
     this.pool.symbol = symbol;
     this.pool.inputToken = inputToken.id;
+    this.pool.outputToken = outputToken ? outputToken.id : null;
+    this.pool.isLiquidity = isLiquidity ? isLiquidity : null;
     this.pool.createdTimestamp = event.block.timestamp;
     this.pool.createdBlockNumber = event.block.number;
 

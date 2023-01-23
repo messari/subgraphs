@@ -67,4 +67,33 @@ export class SDK {
   ): SDK {
     return new SDK(config, pricer, tokenInitializer, new CustomEventType());
   }
+
+  /**
+   * @deprecated Use initializeFromEvent or initializeFromCall instead
+   */
+  static initialize<T>(
+    config: BridgeConfigurer,
+    pricer: TokenPricer,
+    tokenInitializer: TokenInitializer,
+    event: T
+  ): SDK {
+    if (event instanceof ethereum.Event) {
+      const customEvent = CustomEventType.initialize(
+        event.block,
+        event.transaction,
+        event.logIndex,
+        event
+      );
+      return new SDK(config, pricer, tokenInitializer, customEvent);
+    }
+    if (event instanceof ethereum.Call) {
+      const customEvent = CustomEventType.initialize(
+        event.block,
+        event.transaction,
+        BIGINT_ZERO
+      );
+      return new SDK(config, pricer, tokenInitializer, customEvent);
+    }
+    return new SDK(config, pricer, tokenInitializer, new CustomEventType());
+  }
 }
