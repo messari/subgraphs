@@ -3,6 +3,7 @@ import { OdosArbitrumConfigurations } from "../../protocols/odos/config/deployme
 import { OdosPolygonConfigurations } from "../../protocols/odos/config/deployments/odos-polygon/configurations";
 import { OdosOptimismConfigurations } from "../../protocols/odos/config/deployments/odos-optimism/configurations";
 import { OdosAvalancheConfigurations } from "../../protocols/odos/config/deployments/odos-avalanche/configurations";
+import { OdosBscConfigurations } from "../../protocols/odos/config/deployments/odos-bsc/configurations";
 
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
@@ -26,7 +27,10 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
       return new OdosOptimismConfigurations();
     }
     case Deploy.ODOS_AVALANCHE: {
-      return new OdosOptimismConfigurations();
+      return new OdosAvalancheConfigurations();
+    }
+    case Deploy.ODOS_BSC: {
+      return new OdosBscConfigurations();
     }
     default: {
       log.critical(

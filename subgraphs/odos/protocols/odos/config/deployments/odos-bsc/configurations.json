@@ -1,0 +1,8 @@
+{
+  "deployment": "ODOS_BSC",
+  "network": "bsc",
+  "factory": {
+    "address": "0x9f138be5aA5cC442Ea7cC7D18cD9E30593ED90b9",
+    "startBlock": 24623222
+  }
+}

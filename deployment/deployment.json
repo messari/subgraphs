@@ -5445,6 +5445,28 @@
           "prepare:constants": true
         }
       },
+      "odos-bsc": {
+        "network": "bsc",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "odos-bsc",
+            "query-id": "odos-bsc"
+          }
+        },
+        "files": {
+          "template": "odos.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
       "odos-optimism": {
         "network": "optimism",
         "status": "dev",
