@@ -30,6 +30,7 @@ import {
   EventType,
   BIGINT_ZERO,
   InterestRateSide,
+  PositionSide,
 } from "./common/constants";
 import { bigIntToBigDecimal } from "./common/utils/numbers";
 import {
@@ -120,10 +121,12 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   );
   depositEvent.amountUSD = amountUSD;
   depositEvent.position = updatePositions(
-    market.id,
+    PositionSide.LENDER,
+    getOrCreateLendingProtocol(),
+    market,
     EventType.DEPOSIT,
     depositEvent.account,
-    event
+    event,
   );
   depositEvent.save();
 
@@ -184,7 +187,9 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   );
   withdrawalEvent.amountUSD = amountUSD;
   withdrawalEvent.position = updatePositions(
-    market.id,
+    PositionSide.LENDER,
+    getOrCreateLendingProtocol(),
+    market,
     EventType.WITHDRAW,
     withdrawalEvent.account,
     event,
@@ -239,10 +244,12 @@ export function handleLogBorrow(event: LogBorrow): void {
   borrowEvent.amount = event.params.amount;
   borrowEvent.amountUSD = amountUSD;
   borrowEvent.position = updatePositions(
-    market.id,
+    PositionSide.BORROWER,
+    getOrCreateLendingProtocol(),
+    market,
     EventType.BORROW,
     borrowEvent.account,
-    event
+    event,
   );
   borrowEvent.save();
 
@@ -344,12 +351,7 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.amount = collateralAmount;
   liquidateEvent.amountUSD = collateralAmountUSD;
   liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
-  liquidateEvent.position = getOrCreatePosition(
-    InterestRateSide.BORROW,
-    market.id,
-    event.params.to.toHexString(),
-    event
-  ).id;
+  liquidateEvent.position = getLiquidatePosition(InterestRateSide.BORROW, market.id, event.params.to.toHexString());
   liquidateEvent.save();
 
   usageHourlySnapshot.hourlyLiquidateCount += 1;
@@ -440,11 +442,13 @@ export function handleLogRepay(event: LogRepay): void {
   repayEvent.amount = event.params.amount;
   repayEvent.amountUSD = amountUSD;
   repayEvent.position = updatePositions(
-    market.id,
+    PositionSide.BORROWER,
+    getOrCreateLendingProtocol(),
+    market,
     EventType.REPAY,
     repayEvent.account,
     event,
-    liquidation
+    liquidation,
   );
   repayEvent.save();
 
