@@ -659,7 +659,7 @@ export function createBlock(blockData: BlockData): void {
   block.transactionCount = blockData.transactionCount;
   block.rewards = blockData.rewards;
 
-  if (block.gasLimit && block.gasLimit > BIGINT_ZERO && block.gasUsed) {
+  if (block.gasLimit && block.gasLimit! > BIGINT_ZERO && block.gasUsed) {
     block.blockUtilization = block
       .gasUsed!.toBigDecimal()
       .div(block.gasLimit!.toBigDecimal())
