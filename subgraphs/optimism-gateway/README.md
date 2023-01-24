@@ -10,7 +10,7 @@ Number of users that have either sent or received tokens or ETH through the brid
 
 `Unique Message Senders`
 
-Number of users that have sent messages through the bridge. Note that a message is also sent during a transfer.
+Number of users that have sent messages through the bridge. Note that a messages sent during bridge transfers are excluded.
 
 `Active Users` & `Total Unique Users`
 
