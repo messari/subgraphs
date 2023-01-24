@@ -736,9 +736,6 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Number of days since Unix epoch time "
   days: Int!
 
-  " Number of days since Unix epoch time "
-  days: Int!
-
   " The protocol this snapshot belongs to "
   protocol: DerivOptProtocol!
 
