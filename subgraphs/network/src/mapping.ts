@@ -67,13 +67,13 @@ export class UpdateNetworkData {
 ////////////////////////
 
 export function handleArweaveBlock(block: arweave.Block): void {
-  let blockDifficulty = BigInt.fromString(
+  const blockDifficulty = BigInt.fromString(
     BigDecimal.fromString(parseInt(block.diff.toHexString(), 16).toString())
       .truncate(0)
       .toString()
   );
 
-  let blockSize = BigInt.fromString(
+  const blockSize = BigInt.fromString(
     BigDecimal.fromString(
       parseInt(block.blockSize.toHexString(), 16).toString()
     )
@@ -81,7 +81,7 @@ export function handleArweaveBlock(block: arweave.Block): void {
       .toString()
   );
 
-  let blockData = new BlockData(
+  const blockData = new BlockData(
     BigInt.fromI64(block.height),
     block.indepHash,
     BigInt.fromI64(block.timestamp),
@@ -101,7 +101,7 @@ export function handleArweaveBlock(block: arweave.Block): void {
   createBlock(blockData);
 
   // update network entity
-  let updateNetworkData = new UpdateNetworkData(
+  const updateNetworkData = new UpdateNetworkData(
     BigInt.fromI64(block.height),
     BigInt.fromI64(block.timestamp),
     blockDifficulty,
@@ -113,7 +113,7 @@ export function handleArweaveBlock(block: arweave.Block): void {
     blockSize,
     null
   );
-  let network = updateNetwork(updateNetworkData);
+  const network = updateNetwork(updateNetworkData);
 
   // update author entity
   updateAuthors(block.rewardAddr, network, blockDifficulty);
@@ -123,9 +123,9 @@ export function handleArweaveBlock(block: arweave.Block): void {
 }
 
 export function handleCosmosBlock(block: cosmos.Block): void {
-  let header = block.header;
+  const header = block.header;
 
-  let blockData = new BlockData(
+  const blockData = new BlockData(
     BigInt.fromI64(header.height),
     header.hash,
     BigInt.fromI64(header.time.seconds),
@@ -145,7 +145,7 @@ export function handleCosmosBlock(block: cosmos.Block): void {
   createBlock(blockData);
 
   // update network entity
-  let updateNetworkData = new UpdateNetworkData(
+  const updateNetworkData = new UpdateNetworkData(
     BigInt.fromI64(header.height),
     BigInt.fromI64(header.time.seconds),
     null,
@@ -157,7 +157,7 @@ export function handleCosmosBlock(block: cosmos.Block): void {
     null,
     null
   );
-  let network = updateNetwork(updateNetworkData);
+  const network = updateNetwork(updateNetworkData);
 
   // update author entity
   updateAuthors(header.validatorsHash, network, null);
@@ -167,11 +167,11 @@ export function handleCosmosBlock(block: cosmos.Block): void {
 }
 
 export function handleEvmBlock(block: ethereum.Block): void {
-  let burntFees = block.baseFeePerGas
+  const burntFees = block.baseFeePerGas
     ? block.baseFeePerGas!.times(block.gasUsed)
     : null;
 
-  let blockData = new BlockData(
+  const blockData = new BlockData(
     block.number,
     block.hash,
     block.timestamp,
@@ -192,7 +192,7 @@ export function handleEvmBlock(block: ethereum.Block): void {
   createBlock(blockData);
 
   // update network entity
-  let updateNetworkData = new UpdateNetworkData(
+  const updateNetworkData = new UpdateNetworkData(
     block.number,
     block.timestamp,
     block.difficulty,
@@ -204,7 +204,7 @@ export function handleEvmBlock(block: ethereum.Block): void {
     block.size,
     null
   );
-  let network = updateNetwork(updateNetworkData);
+  const network = updateNetwork(updateNetworkData);
 
   // update author entity
   updateAuthors(block.author, network, block.difficulty);
@@ -214,21 +214,21 @@ export function handleEvmBlock(block: ethereum.Block): void {
 }
 
 export function handleNearBlock(block: near.Block): void {
-  let chunks = block.chunks;
-  let header = block.header;
+  const chunks = block.chunks;
+  const header = block.header;
 
   // get timestamp in seconds (from nano seconds)
-  let timestampBD = BigDecimal.fromString(
+  const timestampBD = BigDecimal.fromString(
     header.timestampNanosec.toString()
   ).div(exponentToBigDecimal(INT_NINE));
-  let timestamp = BigInt.fromString(timestampBD.truncate(0).toString());
+  const timestamp = BigInt.fromString(timestampBD.truncate(0).toString());
 
   // add up gasLimit / gasUsed / burntFees
   let gasLimit = BIGINT_ZERO;
   let gasUsed = BIGINT_ZERO;
   let burntFees = BIGINT_ZERO;
   for (let i = 0; i < chunks.length; i++) {
-    let chunk = new Chunk(chunks[i].chunkHash);
+    const chunk = new Chunk(chunks[i].chunkHash);
     chunk.block = header.height.toString();
     chunk.gasUsed = BigInt.fromI64(chunks[i].gasUsed);
     chunk.gasLimit = BigInt.fromI64(chunks[i].gasLimit);
@@ -243,7 +243,7 @@ export function handleNearBlock(block: near.Block): void {
     burntFees = burntFees.plus(chunk.burntFees!);
   }
 
-  let blockData = new BlockData(
+  const blockData = new BlockData(
     BigInt.fromI64(header.height),
     header.hash,
     timestamp,
@@ -263,7 +263,7 @@ export function handleNearBlock(block: near.Block): void {
   createBlock(blockData);
 
   // update network entity
-  let updateNetworkData = new UpdateNetworkData(
+  const updateNetworkData = new UpdateNetworkData(
     BigInt.fromI64(header.height),
     timestamp,
     null,
@@ -275,7 +275,7 @@ export function handleNearBlock(block: near.Block): void {
     null,
     header.totalSupply
   );
-  let network = updateNetwork(updateNetworkData);
+  const network = updateNetwork(updateNetworkData);
 
   // update author entity
   updateAuthors(Bytes.fromHexString(block.author), network, null);

@@ -31,7 +31,7 @@ import { Versions } from "./versions";
 //////////////////
 
 export function updateNetwork(networkData: UpdateNetworkData): Network {
-  let network = getOrCreateNetwork(NETWORK_NAME);
+  const network = getOrCreateNetwork(NETWORK_NAME);
   network.blockHeight = networkData.height.toI32();
   if (networkData.newDifficulty) {
     if (!network.cumulativeDifficulty) {
@@ -93,12 +93,12 @@ export function updateMetrics(blockData: BlockData, network: Network): void {
 }
 
 function updateDailySnapshot(blockData: BlockData, network: Network): void {
-  let snapshotId = (blockData.timestamp.toI64() / SECONDS_PER_DAY).toString();
-  let snapshot = getOrCreateDailySnapshot(blockData.timestamp);
+  const snapshotId = (blockData.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  const snapshot = getOrCreateDailySnapshot(blockData.timestamp);
 
   // grab block interval before updating timestamp
   // newTimestamp - oldTimestamp = interval
-  let blockInterval = blockData.timestamp.minus(snapshot.timestamp);
+  const blockInterval = blockData.timestamp.minus(snapshot.timestamp);
 
   // update overlapping fields for snapshot
   snapshot.blockHeight = network.blockHeight;
@@ -109,7 +109,7 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
   if (blockData.author) {
     // check for new hourly authors
-    let id =
+    const id =
       IntervalType.DAILY +
       "-" +
       blockData.author!.toHexString() +
@@ -218,11 +218,13 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
 }
 
 function updateHourlySnapshot(blockData: BlockData, network: Network): void {
-  let snapshotId = (blockData.timestamp.toI64() / SECONDS_PER_HOUR).toString();
-  let snapshot = getOrCreateHourlySnapshot(blockData.timestamp);
+  const snapshotId = (
+    blockData.timestamp.toI64() / SECONDS_PER_HOUR
+  ).toString();
+  const snapshot = getOrCreateHourlySnapshot(blockData.timestamp);
 
   // grab block interval before updating timestamp
-  let blockInterval = blockData.timestamp.minus(snapshot.timestamp);
+  const blockInterval = blockData.timestamp.minus(snapshot.timestamp);
 
   // update overlapping fields for snapshot
   snapshot.blockHeight = network.blockHeight;
@@ -233,7 +235,7 @@ function updateHourlySnapshot(blockData: BlockData, network: Network): void {
   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
   if (blockData.author) {
     // check for new hourly authors
-    let id =
+    const id =
       IntervalType.HOURLY +
       "-" +
       blockData.author!.toHexString() +
@@ -371,7 +373,7 @@ export function updateAuthors(
 // Update Stats entity and return the id
 // calculate the variance, q1, q3 once the daily/hourly snapshot is done
 function updateStats(id: string, dataType: string, value: BigInt): string {
-  let stats = getOrCreateStats(id, dataType);
+  const stats = getOrCreateStats(id, dataType);
 
   // basic fields
   stats.count++;
@@ -382,7 +384,7 @@ function updateStats(id: string, dataType: string, value: BigInt): string {
   stats.min = value.lt(stats.min) ? value : stats.min;
 
   // update mean / median
-  let values = stats.values;
+  const values = stats.values;
   values.push(value);
   stats.values = values;
   stats.mean = stats.sum
@@ -407,13 +409,13 @@ function getMedian(list: BigInt[]): BigDecimal {
 
   if (list.length % 2 == 1) {
     // list length is odd
-    let index = (list.length - 1) / 2;
+    const index = (list.length - 1) / 2;
     return list[index].toBigDecimal();
   } else {
     // list length is even
-    let index1 = list.length / 2;
-    let index2 = index1 + 1;
-    let sum = list[index1].toBigDecimal().plus(list[index2].toBigDecimal());
+    const index1 = list.length / 2;
+    const index2 = index1 + 1;
+    const sum = list[index1].toBigDecimal().plus(list[index2].toBigDecimal());
     return sum.div(BIGDECIMAL_TWO);
   }
 }
@@ -422,7 +424,7 @@ function getMedian(list: BigInt[]): BigDecimal {
 //
 // update the previous daily snapshots statistical data
 function updatePreviousDailySnapshot(snapshot: DailySnapshot): void {
-  let network = getOrCreateNetwork(NETWORK_NAME);
+  const network = getOrCreateNetwork(NETWORK_NAME);
 
   // update network dailyBlock stats
   updateStats(
@@ -531,7 +533,7 @@ function updateStatisicalData(statsEntity: Stats): void {
   // find first and second half arrays
   let firstHalf: BigInt[];
   let secondHalf: BigInt[];
-  let middleIndex = Math.round(statsEntity.values.length / 2) as i32;
+  const middleIndex = Math.round(statsEntity.values.length / 2) as i32;
 
   if (statsEntity.values.length % 2 == 1) {
     // list length is odd
@@ -555,9 +557,9 @@ function updateStatisicalData(statsEntity: Stats): void {
 function findVariance(mean: BigDecimal, values: BigInt[]): BigDecimal {
   let sumOfDeviationSquared = BIGDECIMAL_ZERO;
   for (let i = 0; i < values.length; i++) {
-    let value = values[i].toBigDecimal();
-    let deviation = value.minus(mean);
-    let deviationSquared = deviation.times(deviation);
+    const value = values[i].toBigDecimal();
+    const deviation = value.minus(mean);
+    const deviationSquared = deviation.times(deviation);
     sumOfDeviationSquared = sumOfDeviationSquared.plus(deviationSquared);
   }
 
@@ -573,7 +575,7 @@ function findVariance(mean: BigDecimal, values: BigInt[]): BigDecimal {
 /////////////////
 
 function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
-  let id = (timestamp.toI64() / SECONDS_PER_DAY).toString();
+  const id = (timestamp.toI64() / SECONDS_PER_DAY).toString();
   let dailySnapshot = DailySnapshot.load(id);
   if (!dailySnapshot) {
     dailySnapshot = new DailySnapshot(id);
@@ -588,11 +590,11 @@ function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
     // update variance, q1, q3 of previous snapshot
     // update dailyBlocks stats in network
     // we know that the previous snapshot exists because we are handling every block
-    let previousSnapshotId = (
+    const previousSnapshotId = (
       timestamp.toI64() / SECONDS_PER_DAY -
       1
     ).toString();
-    let previousSnapshot = DailySnapshot.load(previousSnapshotId);
+    const previousSnapshot = DailySnapshot.load(previousSnapshotId);
     if (!previousSnapshot) {
       log.warning(
         "[getOrCreateDailySnapshot] previous snapshot not found at timestamp: {}",
@@ -607,7 +609,7 @@ function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
 }
 
 function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
-  let id = (timestamp.toI64() / SECONDS_PER_HOUR).toString();
+  const id = (timestamp.toI64() / SECONDS_PER_HOUR).toString();
   let hourlySnapshot = HourlySnapshot.load(id);
   if (!hourlySnapshot) {
     hourlySnapshot = new HourlySnapshot(id);
@@ -621,11 +623,11 @@ function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
 
     // update variance, q1, q3 of previous snapshot
     // we know that the previous snapshot exists because we are handling every block
-    let previousSnapshotId = (
+    const previousSnapshotId = (
       timestamp.toI64() / SECONDS_PER_HOUR -
       1
     ).toString();
-    let previousSnapshot = HourlySnapshot.load(previousSnapshotId);
+    const previousSnapshot = HourlySnapshot.load(previousSnapshotId);
     log.warning("previous hourly: {}", [previousSnapshotId]);
     if (!previousSnapshot) {
       log.warning(
@@ -641,7 +643,7 @@ function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
 }
 
 export function createBlock(blockData: BlockData): void {
-  let block = new Block(blockData.height.toString());
+  const block = new Block(blockData.height.toString());
 
   block.hash = blockData.hash;
   block.timestamp = blockData.timestamp;
@@ -688,7 +690,7 @@ function getOrCreateNetwork(id: string): Network {
 }
 
 function getOrCreateStats(snapshot: string, dataType: string): Stats {
-  let id = snapshot.concat("-").concat(dataType);
+  const id = snapshot.concat("-").concat(dataType);
   let stats = Stats.load(id);
   if (!stats) {
     stats = new Stats(id);
