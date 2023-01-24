@@ -24,7 +24,7 @@ function addDataPoint(
     }
     dataFieldMetrics[fieldName].sum += value;
 
-    if (fieldName.includes("umulative")) {
+    if (fieldName?.toUpperCase()?.includes("CUMULATIVE")) {
       if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
         dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
       }
@@ -33,7 +33,7 @@ function addDataPoint(
       }
       dataFieldMetrics[fieldName].cumulative.prevVal = value;
     }
-    if (fieldName.includes("umulative")) {
+    if (fieldName?.toUpperCase()?.includes("CUMULATIVE")) {
       if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
         dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
       }
@@ -1238,7 +1238,9 @@ function PoolTabEntity({
             <Typography variant="h4">{entityName}</Typography>
           </CopyLinkToClipboard>
         </Box>
-        <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} /></Tooltip>
+        <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}>
+          <UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} />
+        </Tooltip>
         <div>
           <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
           <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Charts</div>
