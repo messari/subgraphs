@@ -11,7 +11,13 @@ import {
 import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
 import { NetworkConfigs } from '../../../../configurations/configure'
-import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
+import {
+	Address,
+	BigDecimal,
+	BigInt,
+	log,
+	dataSource,
+} from '@graphprotocol/graph-ts'
 import {
 	TokenSwap,
 	AddLiquidity,
@@ -33,6 +39,28 @@ class Pricer implements TokenPricer {
 		return getUsdPrice(Address.fromBytes(token.id), _amount)
 	}
 }
+
+const conf = new BridgeConfig(
+	'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547',
+	'HOP-'
+		.concat(
+			dataSource
+				.network()
+				.toUpperCase()
+				.replace('-', '_')
+		)
+		.concat('-BRIDGE'),
+	'hop-'.concat(dataSource.network().replace('-', '_')).concat('-bridge'),
+	BridgePermissionType.PERMISSIONLESS,
+	Versions
+)
+
+const genesisHashes = [
+	'0x9dab44e187e3bbbdfea0ca8cddea8ba78eb6f4d94a0725bc3c76ab5187d266e2',
+	'0x1aaddc57d3e9f4157728536f368c5d69a6be268e2258593efa592938395410a1',
+	'0x03a61cb0acb761bee98a0a42718ab606f875d49d1bb694755e5d70cb9890d478',
+	'0x0de91b478c4724233e3d83ae4f5ed4ecbf4b301b48dbc1ade42e0c6f6b66fc6b',
+]
 
 class TokenInit implements TokenInitializer {
 	getTokenParams(address: Address): TokenParams {
@@ -81,8 +109,7 @@ export function handleTokenSwap(event: TokenSwap): void {
 		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 	}
 
-	const amountUsd = sdk.Pricer.getAmountValueUSD(token, fees)
-	pool.addSupplySideRevenueUSD(amountUsd)
+	pool.addRevenueNative(BigInt.zero(), fees)
 }
 
 export function handleAddLiquidity(event: AddLiquidity): void {
@@ -91,29 +118,17 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 		if (amount.length == 0) {
 			return
 		}
+		const liquidity = amount[1].plus(amount[0])
 
 		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
 			event.address.toHexString()
 		)
-		const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
 		const poolConfig = NetworkConfigs.getPoolDetails(
 			event.address.toHexString()
 		)
 
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
-
-		const bridgeAddress = bridgeConfig[0]
-		const bridgeName = bridgeConfig[1]
-		const bridgeSlug = bridgeConfig[2]
-
-		const conf = new BridgeConfig(
-			bridgeAddress,
-			bridgeName,
-			bridgeSlug,
-			BridgePermissionType.PERMISSIONLESS,
-			Versions
-		)
 
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
@@ -125,18 +140,24 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
-		acc.liquidityDeposit(pool, amount[0])
+		if (
+			genesisHashes.includes(event.transaction.hash.toHexString().toLowerCase())
+		) {
+			pool.setInputTokenBalance(event.params.lpTokenSupply.minus(liquidity))
+		}
+		pool.setOutputTokenSupply(event.params.lpTokenSupply)
+		pool.addRevenueNative(BigInt.zero(), event.params.fees[0])
+		acc.liquidityDeposit(pool, liquidity)
 
-		const feeUsd = sdk.Pricer.getAmountValueUSD(token, event.params.fees[0])
-
-		pool.setTotalValueLocked(bigIntToBigDecimal(event.params.lpTokenSupply))
-		pool.addSupplySideRevenueUSD(feeUsd)
-
-		log.warning('LA - lpTokenSupply: {}, amount: {},  feeUsd: {}', [
-			bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
-			amount[0].toString(),
-			feeUsd.toString(),
-		])
+		log.warning(
+			`LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  feeUsd: {}`,
+			[
+				bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
+				bigIntToBigDecimal(liquidity, 6).toString(),
+				event.transaction.hash.toHexString(),
+				bigIntToBigDecimal(event.params.fees[0], 6).toString(),
+			]
+		)
 	}
 }
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
@@ -146,28 +167,17 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 			return
 		}
 
+		const liquidity = amount[0].plus(amount[1])
+
 		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
 			event.address.toHexString()
 		)
-		const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
 		const poolConfig = NetworkConfigs.getPoolDetails(
 			event.address.toHexString()
 		)
 
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
-
-		const bridgeAddress = bridgeConfig[0]
-		const bridgeName = bridgeConfig[1]
-		const bridgeSlug = bridgeConfig[2]
-
-		const conf = new BridgeConfig(
-			bridgeAddress,
-			bridgeName,
-			bridgeSlug,
-			BridgePermissionType.PERMISSIONLESS,
-			Versions
-		)
 
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
@@ -179,13 +189,20 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
-		acc.liquidityWithdraw(pool, amount[0])
-		pool.setTotalValueLocked(bigIntToBigDecimal(event.params.lpTokenSupply))
+		acc.liquidityWithdraw(pool, liquidity)
+		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 
-		log.warning('LWITH lpTokenSupply: {}, amount: {}', [
-			event.params.lpTokenSupply.toString(),
-			amount[0].toString(),
-		])
+		log.warning(
+			'LWITH lpTokenSupply: {}, amount6-0: {}, amount18-0: {}, amount6-1: {}, amount18-1: {}, hash: {}',
+			[
+				bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
+				bigIntToBigDecimal(amount[0], 6).toString(),
+				bigIntToBigDecimal(amount[0]).toString(),
+				bigIntToBigDecimal(amount[1], 6).toString(),
+				bigIntToBigDecimal(amount[1]).toString(),
+				event.transaction.hash.toHexString(),
+			]
+		)
 	}
 }
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
@@ -198,25 +215,12 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
 			event.address.toHexString()
 		)
-		const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
 		const poolConfig = NetworkConfigs.getPoolDetails(
 			event.address.toHexString()
 		)
 
 		const poolName = poolConfig[0]
 		const poolSymbol = poolConfig[1]
-
-		const bridgeAddress = bridgeConfig[0]
-		const bridgeName = bridgeConfig[1]
-		const bridgeSlug = bridgeConfig[2]
-
-		const conf = new BridgeConfig(
-			bridgeAddress,
-			bridgeName,
-			bridgeSlug,
-			BridgePermissionType.PERMISSIONLESS,
-			Versions
-		)
 
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
@@ -229,7 +233,6 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 		}
 
 		acc.liquidityWithdraw(pool, event.params.lpTokenAmount)
-		pool.setTotalValueLocked(bigIntToBigDecimal(event.params.lpTokenSupply))
 
 		log.warning('LWITHONE lpTokenSupply: {}, amount: {}', [
 			event.params.lpTokenSupply.toString(),

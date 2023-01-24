@@ -37,7 +37,7 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		if (
 			tokenAddress == '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase()
 		) {
-			return ['USDC', 'USDC', '18']
+			return ['USDC', 'USDC', '6']
 		} else if (
 			tokenAddress == '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase()
 		) {

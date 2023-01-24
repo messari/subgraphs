@@ -70,16 +70,24 @@ export function handleBonderAdded(event: BonderAdded): void {
 }
 
 export function handleTransferSentToL2(event: TransferSentToL2): void {
+	if (event.params.chainId.toString() == '42170') return
+
 	if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
 		const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
 			event.address.toHexString()
 		)
-		log.warning('inputToken1: {}, bridgeAddress: {}', [
+
+		log.warning('inputToken1: {}, bridgeAddress: {}, chainId: {}', [
 			inputToken,
 			event.address.toHexString(),
+			event.params.chainId.toHexString(),
 		])
 
 		const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
+		log.warning('inputToken 1.5: {}, bridgeAddress: {}', [
+			inputToken,
+			event.address.toHexString(),
+		])
 		const poolAddress = NetworkConfigs.getPoolAddressFromChainId(
 			event.params.chainId.toString(),
 			event.address.toHexString()

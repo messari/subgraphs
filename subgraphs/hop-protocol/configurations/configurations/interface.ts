@@ -1,6 +1,5 @@
 export interface Configurations {
 	getNetwork(): string
-	getBridgeConfig(address: string): string[]
 	getTokenDetails(address: string): string[]
 	getBridgeList(): string[]
 	getTokenList(): string[]
@@ -15,6 +14,13 @@ export interface Configurations {
 	getXdaiPoolAddressFromBridgeAddress(bridgeAddress: string): string
 	getOptimismPoolAddressFromBridgeAddress(bridgeAddress: string): string
 	getPoolAddressFromChainId(chainId: string, bridgeAddress: string): string
+	getCrossTokenAddress(chainId: string, tokenAddress: string): string
+	getXdaiCrossTokenFromTokenAddress(tokenAddress: string): string
+	getOptimismCrossTokenFromTokenAddress(tokenAddress: string): string
+	getArbitrumCrossTokenFromTokenAddress(tokenAddress: string): string
+	getMainnetCrossTokenFromTokenAddress(tokenAddress: string): string
+	getPolygonCrossTokenFromTokenAddress(tokenAddress: string): string
+
 	getUsdcPools(): string[]
 	getUsdcTokens(): string[]
 	getDaiPools(): string[]
