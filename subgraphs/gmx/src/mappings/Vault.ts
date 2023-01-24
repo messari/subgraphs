@@ -48,8 +48,7 @@ export function handleIncreasePoolAmount(event: IncreasePoolAmount): void {
     event.params.token,
     event.params.amount,
     event.block,
-    true,
-    event.address
+    true
   );
 }
 
@@ -58,8 +57,7 @@ export function handleDecreasePoolAmount(event: DecreasePoolAmount): void {
     event.params.token,
     event.params.amount,
     event.block,
-    false,
-    event.address
+    false
   );
 }
 
@@ -67,8 +65,7 @@ function handleChangePoolAmount(
   token: Address,
   amount: BigInt,
   block: ethereum.Block,
-  isIncreasePoolAmount: bool,
-  vault: Address
+  isIncreasePoolAmount: bool
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const inputToken = getOrCreateToken(token, block.number);

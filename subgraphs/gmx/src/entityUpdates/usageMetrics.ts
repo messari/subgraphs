@@ -34,7 +34,7 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsHourlySnapshot.cumulativeUniqueUsers =
     protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (block.timestamp.toI64() / SECONDS_PER_DAY)
+  const dailyActiveAccountId = (block.timestamp.toI64() / SECONDS_PER_DAY)
     .toString()
     .concat("-")
     .concat(accountId);
@@ -61,7 +61,7 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let dayId: string = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  const dayId: string = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(dayId);
 
   if (!usageMetrics) {
@@ -87,7 +87,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let hourId: string = (block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
+  const hourId: string = (block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(hourId);
 
   if (!usageMetrics) {

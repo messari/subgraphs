@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 import { Pool } from "../../generated/schema";
 import { getOrCreateProtocol } from "./protocol";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../utils/constants";
@@ -8,7 +8,7 @@ export function getOrCreatePool(
   blockNumber: BigInt,
   blockTimestamp: BigInt
 ): Pool {
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
   let pool = Pool.load(protocol.id);
 
   if (!pool) {
