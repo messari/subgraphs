@@ -97,6 +97,7 @@ export function getOrCreatePosition(
 
   account.openPositionCount += 1;
 <<<<<<< HEAD
+<<<<<<< HEAD
   account.openPositions = addToArrayAtIndex(
     account.openPositions,
     positionId,
@@ -105,6 +106,11 @@ export function getOrCreatePosition(
 =======
   account.openPositions.push(positionId);
 >>>>>>> d037538c (try new change)
+=======
+  const acctPositions = account.openPositions;
+  acctPositions.push(positionId);
+  account.openPositions = acctPositions;
+>>>>>>> dec01d31 (fix array population error)
   account.save();
 
   const market = getMarket(marketId);
@@ -339,6 +345,7 @@ export function takePositionSnapshot(
   snapshot.save();
 }
 
+<<<<<<< HEAD
 export function closePosition(
   position: Position,
   account: Account,
@@ -346,6 +353,24 @@ export function closePosition(
   event: ethereum.Event
 ): void {
   const account_index = account.openPositions.indexOf(position.id);
+=======
+export function closePosition(position: Position, account: Account, market: Market, event: ethereum.Event): void {
+  const accounts = account.openPositions;
+  const positionIndex = accounts.indexOf(position.id);
+  if (positionIndex < 0) {
+    log.error("[closePosition] position {} not found on account {}", [position.id, account.id]);
+    return;
+  }
+  // attempt to delete position from array
+  const deletedItemArr = accounts.splice(positionIndex, 1);
+  if (deletedItemArr.length != 1) {
+    log.error("[closePosition] position {} not deleted from account.openPositions in account {}", [
+      position.id,
+      account.id,
+    ]);
+    return;
+  }
+>>>>>>> dec01d31 (fix array population error)
   account.openPositionCount -= 1;
   account.openPositions = removeFromArrayAtIndex(
     account.openPositions,
