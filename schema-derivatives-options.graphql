@@ -383,11 +383,7 @@ type UsageMetricsDailySnapshot @entity(immutable: true) {
   " Total number of pools "
   totalPoolCount: Int!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
+  
 }
 
 type UsageMetricsHourlySnapshot @entity(immutable: true) {
@@ -424,11 +420,6 @@ type UsageMetricsHourlySnapshot @entity(immutable: true) {
   " Total number of trades (swaps) in an hour "
   hourlySwapCount: Int!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
 }
 
 type FinancialsDailySnapshot @entity(immutable: true) {
@@ -570,12 +561,6 @@ type FinancialsDailySnapshot @entity(immutable: true) {
   " Total number of closed positions "
   closedPositionCount: Int!
 
-
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
 }
 
 ###############################
@@ -742,11 +727,6 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
 
   ##### Quantitative Data #####
 
@@ -943,12 +923,6 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
 
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
-
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
 
   ##### Quantitative Data #####
 
