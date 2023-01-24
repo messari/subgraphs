@@ -231,9 +231,34 @@ export function updatePositions(
   event: ethereum.Event,
   liquidation: boolean = false
 ): string {
-  const market = getMarket(marketId);
-  if (!market) {
-    return "";
+  const account = getOrCreateAccount(accountId);
+
+  if (
+    eventType == EventType.DEPOSIT ||
+    eventType == EventType.BORROW ||
+    eventType == EventType.LIQUIDATOR ||
+    eventType == EventType.LIQUIDATEE
+  ) {
+    addAccountToProtocol(eventType, account, event);
+  }
+
+  const balance = getAccountBalance(Address.fromString(market.id), Address.fromString(accountId), side);
+
+  if (eventType == EventType.DEPOSIT || eventType == EventType.BORROW) {
+    // add position
+
+    return addPosition(protocol, market, account, balance, eventType, side, event).id;
+  } else {
+    const position = subtractPosition(protocol, market, account, balance, side, eventType, event);
+    if (!position) {
+      return "";
+    }
+    if (liquidation) {
+      position.liquidationCount += 1;
+      position.save();
+    }
+
+    return position.id;
   }
   let position = getOrCreatePosition(
     InterestRateSide.LENDER,
