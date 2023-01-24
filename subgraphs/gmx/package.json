@@ -1,0 +1,14 @@
+{
+  "name": "gmx",
+  "license": "MIT",
+  "scripts": {
+    "codegen": "graph codegen"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.32.0",
+    "@graphprotocol/graph-ts": "0.27.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.6.2"
+  }
+}
