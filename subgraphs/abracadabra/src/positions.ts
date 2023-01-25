@@ -1,9 +1,27 @@
 import { ethereum, BigInt, log, Address } from "@graphprotocol/graph-ts";
-import { Account, ActiveEventAccount, Market, Position, PositionSnapshot } from "../generated/schema";
+import {
+  Account,
+  ActiveEventAccount,
+  Market,
+  Position,
+  PositionSnapshot,
+} from "../generated/schema";
 import { Cauldron } from "../generated/templates/Cauldron/Cauldron";
-import { BIGINT_ZERO, EventType, InterestRateSide, SECONDS_PER_DAY } from "./common/constants";
-import { getMarket, getOrCreateLendingProtocol, getOrCreateUsageMetricsDailySnapshot } from "./common/getters";
-import { addToArrayAtIndex, removeFromArrayAtIndex } from "./common/utils/arrays";
+import {
+  BIGINT_ZERO,
+  EventType,
+  InterestRateSide,
+  SECONDS_PER_DAY,
+} from "./common/constants";
+import {
+  getMarket,
+  getOrCreateLendingProtocol,
+  getOrCreateUsageMetricsDailySnapshot,
+} from "./common/getters";
+import {
+  addToArrayAtIndex,
+  removeFromArrayAtIndex,
+} from "./common/utils/arrays";
 
 export function getOrCreateAccount(accountId: string): Account {
   let account = Account.load(accountId);
@@ -26,7 +44,7 @@ export function getOrCreateAccount(accountId: string): Account {
     account.liquidationCount = 0;
     account.save();
 
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
     protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
@@ -37,22 +55,25 @@ export function getOrCreatePosition(
   side: string,
   marketId: string,
   accountId: string,
-  event: ethereum.Event,
+  event: ethereum.Event
 ): Position {
-  let positionIdPrefix = `${accountId}-${marketId}-${side}`;
-  let account = getOrCreateAccount(accountId);
+  const positionIdPrefix = `${accountId}-${marketId}-${side}`;
+  const account = getOrCreateAccount(accountId);
 
-  log.info("[getOrCreatePosition][Hash:{}][Prefix:{}]OpenCount:{}|Pos:{}|ClosedPos:{}|Pos:{}", [
-    event.transaction.hash.toHexString(),
-    positionIdPrefix.toString(),
-    account.openPositionCount.toString(),
-    account.openPositions.toString(),
-    account.closedPositionCount.toString(),
-    account.closedPositions.toString(),
-  ]);
+  log.info(
+    "[getOrCreatePosition][Hash:{}][Prefix:{}]OpenCount:{}|Pos:{}|ClosedPos:{}|Pos:{}",
+    [
+      event.transaction.hash.toHexString(),
+      positionIdPrefix.toString(),
+      account.openPositionCount.toString(),
+      account.openPositions.toString(),
+      account.closedPositionCount.toString(),
+      account.closedPositions.toString(),
+    ]
+  );
 
   for (let curr = 0; curr < account.openPositionCount; curr += 1) {
-    let op = account.openPositions.at(curr);
+    const op = account.openPositions.at(curr);
     if (op.startsWith(positionIdPrefix)) {
       return Position.load(op)!;
     }
@@ -60,22 +81,29 @@ export function getOrCreatePosition(
 
   let count = 0;
   for (let curr = 0; curr < account.closedPositionCount; curr += 1) {
-    let cp = account.closedPositions.at(curr);
+    const cp = account.closedPositions.at(curr);
     if (cp.startsWith(positionIdPrefix)) {
       count += 1;
     }
   }
 
-  let positionId = `${accountId}-${marketId}-${side}-${count}`;
-  let position = new Position(positionId);
+  const positionId = `${accountId}-${marketId}-${side}-${count}`;
+  const position = new Position(positionId);
 
-  log.info("[getOrCreatePosition][Hash:{}][ID:{}] Created!", [event.transaction.hash.toHexString(), positionId]);
+  log.info("[getOrCreatePosition][Hash:{}][ID:{}] Created!", [
+    event.transaction.hash.toHexString(),
+    positionId,
+  ]);
 
   account.openPositionCount += 1;
-  account.openPositions = addToArrayAtIndex(account.openPositions, positionId, 0);
+  account.openPositions = addToArrayAtIndex(
+    account.openPositions,
+    positionId,
+    0
+  );
   account.save();
 
-  let market = getMarket(marketId);
+  const market = getMarket(marketId);
   market!.positionCount += 1;
   market!.openPositionCount += 1;
   if (side == "LENDER") {
@@ -85,7 +113,7 @@ export function getOrCreatePosition(
   }
   market!.save();
 
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
   protocol.openPositionCount += 1;
   protocol.cumulativePositionCount += 1;
   protocol.save();
@@ -108,29 +136,43 @@ export function getOrCreatePosition(
   position.liquidationCount = 0;
   position.save();
 
-  log.info("created new position {}, protocol openCount: {}, account openCount: {}, Txhash: {}", [
-    positionId,
-    protocol.openPositionCount.toString(),
-    account.openPositionCount.toString(),
-    event.transaction.hash.toHexString(),
-  ]);
+  log.info(
+    "created new position {}, protocol openCount: {}, account openCount: {}, Txhash: {}",
+    [
+      positionId,
+      protocol.openPositionCount.toString(),
+      account.openPositionCount.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
   return position;
 }
 
-export function addAccountToProtocol(eventType: string, account: Account, event: ethereum.Event): void {
-  let protocol = getOrCreateLendingProtocol();
-  let dailyId: string = (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+export function addAccountToProtocol(
+  eventType: string,
+  account: Account,
+  event: ethereum.Event
+): void {
+  const protocol = getOrCreateLendingProtocol();
+  const dailyId: string = (
+    event.block.timestamp.toI64() / SECONDS_PER_DAY
+  ).toString();
 
-  let activeEventId = `daily-${account.id}-${dailyId}-${eventType}`;
+  const activeEventId = `daily-${account.id}-${dailyId}-${eventType}`;
   let activeEvent = ActiveEventAccount.load(activeEventId);
 
-  let dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
+  const dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
 
   if (eventType == EventType.DEPOSIT) {
     if (protocol.depositors.indexOf(account.id) < 0) {
-      protocol.depositors = addToArrayAtIndex(protocol.depositors, account.id, 0);
+      protocol.depositors = addToArrayAtIndex(
+        protocol.depositors,
+        account.id,
+        0
+      );
       protocol.cumulativeUniqueDepositors += 1;
-      dailySnapshot.cumulativeUniqueDepositors = protocol.cumulativeUniqueDepositors;
+      dailySnapshot.cumulativeUniqueDepositors =
+        protocol.cumulativeUniqueDepositors;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
@@ -141,7 +183,8 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
     if (protocol.borrowers.indexOf(account.id) < 0) {
       protocol.borrowers = addToArrayAtIndex(protocol.borrowers, account.id, 0);
       protocol.cumulativeUniqueBorrowers += 1;
-      dailySnapshot.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
+      dailySnapshot.cumulativeUniqueBorrowers =
+        protocol.cumulativeUniqueBorrowers;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
@@ -150,9 +193,14 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
     dailySnapshot.save();
   } else if (eventType == EventType.LIQUIDATOR) {
     if (protocol.liquidators.indexOf(account.id) < 0) {
-      protocol.liquidators = addToArrayAtIndex(protocol.liquidators, account.id, 0);
+      protocol.liquidators = addToArrayAtIndex(
+        protocol.liquidators,
+        account.id,
+        0
+      );
       protocol.cumulativeUniqueLiquidators += 1;
-      dailySnapshot.cumulativeUniqueLiquidators = protocol.cumulativeUniqueLiquidators;
+      dailySnapshot.cumulativeUniqueLiquidators =
+        protocol.cumulativeUniqueLiquidators;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
@@ -161,9 +209,14 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
     dailySnapshot.save();
   } else if (eventType == EventType.LIQUIDATEE) {
     if (protocol.liquidatees.indexOf(account.id) < 0) {
-      protocol.liquidatees = addToArrayAtIndex(protocol.liquidatees, account.id, 0);
+      protocol.liquidatees = addToArrayAtIndex(
+        protocol.liquidatees,
+        account.id,
+        0
+      );
       protocol.cumulativeUniqueLiquidatees += 1;
-      dailySnapshot.cumulativeUniqueLiquidatees = protocol.cumulativeUniqueLiquidatees;
+      dailySnapshot.cumulativeUniqueLiquidatees =
+        protocol.cumulativeUniqueLiquidatees;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
@@ -180,20 +233,30 @@ export function updatePositions(
   eventType: string,
   accountId: string,
   event: ethereum.Event,
-  liquidation: boolean = false,
+  liquidation: boolean = false
 ): string {
-  let market = getMarket(marketId);
+  const market = getMarket(marketId);
   if (!market) {
     return "";
   }
-  let position = getOrCreatePosition(InterestRateSide.LENDER, marketId, accountId, event);
+  let position = getOrCreatePosition(
+    InterestRateSide.LENDER,
+    marketId,
+    accountId,
+    event
+  );
   if ([EventType.BORROW, EventType.REPAY].includes(eventType)) {
-    position = getOrCreatePosition(InterestRateSide.BORROW, marketId, accountId, event);
+    position = getOrCreatePosition(
+      InterestRateSide.BORROW,
+      marketId,
+      accountId,
+      event
+    );
   }
   //  position is the current open position or a newly create open position
 
   let closePositionToggle = false;
-  let account = getOrCreateAccount(accountId);
+  const account = getOrCreateAccount(accountId);
 
   if (eventType == EventType.DEPOSIT) {
     addAccountToProtocol(eventType, account, event);
@@ -202,7 +265,7 @@ export function updatePositions(
     position.balance = getAccountBalance(
       Address.fromString(marketId),
       Address.fromString(accountId),
-      InterestRateSide.LENDER,
+      InterestRateSide.LENDER
     );
   } else if (eventType == EventType.WITHDRAW) {
     account.withdrawCount = account.depositCount + 1;
@@ -210,7 +273,7 @@ export function updatePositions(
     position.balance = getAccountBalance(
       Address.fromString(marketId),
       Address.fromString(accountId),
-      InterestRateSide.LENDER,
+      InterestRateSide.LENDER
     );
     if (liquidation) {
       position.liquidationCount = position.liquidationCount + 1;
@@ -225,7 +288,7 @@ export function updatePositions(
     position.balance = getAccountBalance(
       Address.fromString(marketId),
       Address.fromString(accountId),
-      InterestRateSide.BORROW,
+      InterestRateSide.BORROW
     );
   } else if (eventType == EventType.REPAY) {
     account.repayCount = account.repayCount + 1;
@@ -233,7 +296,7 @@ export function updatePositions(
     position.balance = getAccountBalance(
       Address.fromString(marketId),
       Address.fromString(accountId),
-      InterestRateSide.BORROW,
+      InterestRateSide.BORROW
     );
     if (liquidation) {
       position.liquidationCount = position.liquidationCount + 1;
@@ -253,10 +316,13 @@ export function updatePositions(
   return position.id;
 }
 
-export function takePositionSnapshot(position: Position, event: ethereum.Event): void {
-  let hash = event.transaction.hash.toHexString();
-  let txLogIndex = event.transactionLogIndex.toI32();
-  let snapshot = new PositionSnapshot(`${position.id}-${hash}-${txLogIndex}`);
+export function takePositionSnapshot(
+  position: Position,
+  event: ethereum.Event
+): void {
+  const hash = event.transaction.hash.toHexString();
+  const txLogIndex = event.transactionLogIndex.toI32();
+  const snapshot = new PositionSnapshot(`${position.id}-${hash}-${txLogIndex}`);
 
   snapshot.position = position.id;
   snapshot.hash = hash;
@@ -269,19 +335,31 @@ export function takePositionSnapshot(position: Position, event: ethereum.Event):
   snapshot.save();
 }
 
-export function closePosition(position: Position, account: Account, market: Market, event: ethereum.Event): void {
-  let account_index = account.openPositions.indexOf(position.id);
+export function closePosition(
+  position: Position,
+  account: Account,
+  market: Market,
+  event: ethereum.Event
+): void {
+  const account_index = account.openPositions.indexOf(position.id);
   account.openPositionCount -= 1;
-  account.openPositions = removeFromArrayAtIndex(account.openPositions, account_index);
+  account.openPositions = removeFromArrayAtIndex(
+    account.openPositions,
+    account_index
+  );
   account.closedPositionCount += 1;
-  account.closedPositions = addToArrayAtIndex(account.closedPositions, position.id, 0);
+  account.closedPositions = addToArrayAtIndex(
+    account.closedPositions,
+    position.id,
+    0
+  );
   account.save();
 
   market.openPositionCount -= 1;
   market.closedPositionCount += 1;
   market.save();
 
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
   protocol.openPositionCount -= 1;
   protocol.save();
 
@@ -292,8 +370,12 @@ export function closePosition(position: Position, account: Account, market: Mark
 }
 
 // grab an individual accounts balances on a market
-function getAccountBalance(marketAddress: Address, accountAddress: Address, positionSide: string): BigInt {
-  let cauldronContract = Cauldron.bind(marketAddress);
+function getAccountBalance(
+  marketAddress: Address,
+  accountAddress: Address,
+  positionSide: string
+): BigInt {
+  const cauldronContract = Cauldron.bind(marketAddress);
 
   let tryBalance: ethereum.CallResult<BigInt>;
   if (positionSide == InterestRateSide.BORROW) {
