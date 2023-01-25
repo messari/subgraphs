@@ -148,7 +148,7 @@ function trackSNXHolder(
 ): void {
   const holder = account.toHex();
   // ignore escrow accounts
-  if (isEscrow(holder, dataSource.network())) {
+  if (isEscrow(holder)) {
     return;
   }
   const existingSNXHolder = SNXHolder.load(holder);
@@ -312,7 +312,7 @@ function trackDebtSnapshot(event: ethereum.Event): void {
   const account = event.transaction.from;
 
   // ignore escrow accounts
-  if (isEscrow(account.toHex(), dataSource.network())) {
+  if (isEscrow(account.toHex())) {
     return;
   }
 

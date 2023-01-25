@@ -788,6 +788,8 @@ dataSources:
           file: abis/ERC20SymbolBytes.json
         - name: Synthetix
           file: abis/Synthetix.json
+        - name: AddressResolver
+          file: abis/AddressResolver.json
       eventHandlers:
         - event: AccountLiquidated(indexed address,uint256,uint256,address)
           handler: handleAccountLiquidated
@@ -4194,6 +4196,8 @@ templates:
           file: abis/ExchangeRates.json
         - name: AddressResolver
           file: abis/AddressResolver.json
+        - name: GnosisSafe
+          file: abis/GnosisSafe.json
       eventHandlers:
         - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
           handler: handleInverseAggregatorAnswerUpdated

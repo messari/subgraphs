@@ -2,6 +2,7 @@ import {
   BigDecimal,
   BigInt,
   Bytes,
+  ByteArray,
   log,
   Address,
   dataSource,
@@ -43,8 +44,16 @@ export function toDecimal(value: BigInt, decimals: u32 = 18): BigDecimal {
   return value.divDecimal(precision);
 }
 
-export function strToBytes(str: string): Bytes {
-  return Bytes.fromByteArray(Bytes.fromUTF8(str));
+export function strToBytes(str: string, length: i32 = 32): Bytes {
+  let bts = ByteArray.fromUTF8(str);
+  const arr = ByteArray.fromUTF8(str);
+  if (arr.length < length) {
+    bts = new ByteArray(length);
+    for (let i: i32 = 0; i < arr.length; i++) {
+      bts[i] = arr[i];
+    }
+  }
+  return Bytes.fromByteArray(bts);
 }
 
 export const sUSD32 = strToBytes("sUSD", 32);
@@ -104,6 +113,8 @@ export function isEscrow(holder: string): boolean {
   );
 }
 
-export function bigDecimalToBigInt(n: BigDecimal): BigInt {
-  return BigInt.fromString(n.toString().split(".")[0]);
+// bigDecimalToBigInt will plainly convert a BigDecimal to BigInt
+// by truncating all the digits after the period.
+export function bigDecimalToBigInt(num: BigDecimal): BigInt {
+  return BigInt.fromString(num.truncate(0).toString());
 }

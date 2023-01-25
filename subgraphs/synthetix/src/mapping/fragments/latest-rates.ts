@@ -4,12 +4,12 @@ import {
   InversePriceConfigured,
   InversePriceFrozen,
   ExchangeRates,
-} from "../../../generated/ExchangeRates_0/ExchangeRates";
+} from "../../../generated/EtherWrapper_0/ExchangeRates";
 
 import {
   AggregatorProxy as AggregatorProxyContract,
   AggregatorConfirmed as AggregatorConfirmedEvent,
-} from "../../../generated/ExchangeRates_0/AggregatorProxy";
+} from "../../../generated/EtherWrapper_0/AggregatorProxy";
 
 import {
   ExchangeFeeUpdated,

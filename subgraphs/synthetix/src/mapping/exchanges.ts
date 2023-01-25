@@ -11,7 +11,7 @@ import { MarketAdded as MarketAddedEvent } from "../../generated/exchanges_Futur
 
 import { FuturesMarketTemplate } from "../../generated/templates";
 
-import { ExchangeRates } from "../../generated/ExchangeRates_0/ExchangeRates";
+import { ExchangeRates } from "../../generated/EtherWrapper_0/ExchangeRates";
 
 import { ExchangeFeeUpdated as ExchangeFeeUpdatedEvent } from "../../generated/exchanges_SystemSettings_0/SystemSettings";
 
