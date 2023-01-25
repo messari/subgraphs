@@ -104,7 +104,7 @@ export function Swap(
   const tokenInStore = getOrCreateToken(tokenIn, block.number);
   const tokenInIndex = pool.inputTokens.indexOf(tokenIn.toHexString());
 
-  let amountInUSD = amountIn
+  const amountInUSD = amountIn
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
     )
@@ -113,25 +113,17 @@ export function Swap(
   const tokenOutStore = getOrCreateToken(tokenOut, block.number);
   const tokenOutIndex = pool.inputTokens.indexOf(tokenOut.toHexString());
 
-  let amountOutUSD = amountOut
+  const amountOutUSD = amountOut
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal()
     )
     .times(tokenOutStore.lastPriceUSD!);
 
-  if (tokenInIndex != -1) {
-    inputTokenBalances[tokenInIndex] =
-      inputTokenBalances[tokenInIndex].plus(amountIn);
-  } else {
-    amountInUSD = constants.BIGDECIMAL_ZERO;
-  }
+  inputTokenBalances[tokenInIndex] =
+    inputTokenBalances[tokenInIndex].plus(amountIn);
 
-  if (tokenOutIndex != -1) {
-    inputTokenBalances[tokenOutIndex] =
-      inputTokenBalances[tokenOutIndex].minus(amountOut);
-  } else {
-    amountOutUSD = constants.BIGDECIMAL_ZERO;
-  }
+  inputTokenBalances[tokenOutIndex] =
+    inputTokenBalances[tokenOutIndex].minus(amountOut);
 
   const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
 
