@@ -14,7 +14,7 @@ const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
 
 /**
  * Helper class to manage Financials and Usage snapshots.
- * It is not meant to be used directly, but rather by the Bridge and Account lib classes.
+ * It is not meant to be used directly, but rather by the Protocol and Account lib classes.
  * Whenever it is instantiated it will check if it is time to take any of the
  * dailyFinancials, dailyUsage or hourlyUsage snapshots.
  *

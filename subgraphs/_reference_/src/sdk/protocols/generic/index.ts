@@ -3,8 +3,7 @@ import { ethereum } from "@graphprotocol/graph-ts";
 import { AccountManager } from "./account";
 import { ProtocolManager } from "./protocol";
 import { PoolManager } from "./pool";
-import { TokenPricer } from "../config";
-import { Config } from "./config";
+import { ProtocolConfigurer, TokenPricer } from "../config";
 import { TokenManager, TokenInitializer } from "./tokens";
 import { BIGINT_ZERO } from "../../util/constants";
 import { CustomEventType } from "../../util/events";
@@ -17,7 +16,7 @@ export class SDK {
   Pricer: TokenPricer;
 
   constructor(
-    config: Config,
+    config: ProtocolConfigurer,
     pricer: TokenPricer,
     tokenInitializer: TokenInitializer,
     event: CustomEventType
@@ -32,7 +31,7 @@ export class SDK {
   }
 
   static initializeFromEvent(
-    config: Config,
+    config: ProtocolConfigurer,
     pricer: TokenPricer,
     tokenInitializer: TokenInitializer,
     event: ethereum.Event
@@ -47,7 +46,7 @@ export class SDK {
   }
 
   static initializeFromCall(
-    config: Config,
+    config: ProtocolConfigurer,
     pricer: TokenPricer,
     tokenInitializer: TokenInitializer,
     event: ethereum.Call
@@ -61,7 +60,7 @@ export class SDK {
   }
 
   static intializeFromCustomEvent(
-    config: Config,
+    config: ProtocolConfigurer,
     pricer: TokenPricer,
     tokenInitializer: TokenInitializer
   ): SDK {

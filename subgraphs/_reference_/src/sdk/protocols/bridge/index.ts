@@ -60,16 +60,8 @@ export class SDK {
     return new SDK(config, pricer, tokenInitializer, customEvent);
   }
 
-  static intializeFromCustomEvent(
-    config: BridgeConfigurer,
-    pricer: TokenPricer,
-    tokenInitializer: TokenInitializer
-  ): SDK {
-    return new SDK(config, pricer, tokenInitializer, new CustomEventType());
-  }
-
   /**
-   * @deprecated Use initializeFromEvent or initializeFromCall instead
+   * @deprecated https://github.com/messari/subgraphs/pull/1595: Use initializeFromEvent or initializeFromCall instead
    */
   static initialize<T>(
     config: BridgeConfigurer,

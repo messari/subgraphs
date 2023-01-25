@@ -44,10 +44,7 @@ export class PoolSnapshot {
   }
 
   private isInitialized(): boolean {
-    return !!(
-      this.pool._lastDailySnapshotTimestamp &&
-      this.pool._lastHourlySnapshotTimestamp
-    );
+    return this.pool.lastSnapshotDayID && this.pool.lastSnapshotHourID;
   }
 
   private takeHourlySnapshot(hour: i32): void {

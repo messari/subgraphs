@@ -1,8 +1,7 @@
 import { Versions } from "../../../../../../deployment/context/interface";
 
 import { Protocol as ProtocolSchema } from "../../../../generated/schema";
-import { TokenPricer } from "../config";
-import { Config } from "./config";
+import { ProtocolConfigurer, TokenPricer } from "../config";
 import { ProtocolSnapshot } from "./protocolSnapshot";
 import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
@@ -17,8 +16,8 @@ import { BIGINT_ZERO } from "../lending/constants";
 import { CustomEventType } from "../../util/events";
 
 /**
- * Bridge is a wrapper around the BridgeProtocolSchema entity that takes care of
- * safely and conveniently updating the entity. Updating the Bridge entity using this
+ * ProtocolManager is a wrapper around the ProtocolSchema entity that takes care of
+ * safely and conveniently updating the entity. Updating the Protocol entity using this
  * wrapper also takes care of the Financials and Usage snapshots.
  */
 export class ProtocolManager {
@@ -28,7 +27,7 @@ export class ProtocolManager {
   snapshoter: ProtocolSnapshot;
   sdk: SDK | null = null;
   /**
-   * Creates a new Bridge instance. This should only be called by the Bridge.load
+   * Creates a new Protocol instance. This should only be called by the Protocol.load
    * @private
    */
   private constructor(
@@ -43,15 +42,15 @@ export class ProtocolManager {
   }
 
   /**
-   * This is the main function to instantiate a Bridge entity. Most times it is not called directly, but from the SDK initializer.
+   * This is the main function to instantiate a Protocol entity. Most times it is not called directly, but from the SDK initializer.
    *
-   * @param conf {BridgeConfigurer} An object that implements the BridgeConfigurer interface, to set some of the protocol's properties
+   * @param conf {ProtocolConfigurer} An object that implements the ProtocolConfigurer interface, to set some of the protocol's properties
    * @param pricer {TokenPricer} An object that implements the TokenPricer interface, to allow the wrapper to access pricing data
    * @param event {CustomEventType} The event being handled at a time.
-   * @returns Bridge
+   * @returns Protocol
    */
   static load(
-    conf: Config,
+    conf: ProtocolConfigurer,
     pricer: TokenPricer,
     event: CustomEventType
   ): ProtocolManager {

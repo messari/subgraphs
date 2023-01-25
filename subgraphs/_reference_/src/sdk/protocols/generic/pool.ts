@@ -255,15 +255,6 @@ export class Pool {
   }
 
   /**
-   * Adds a given amount to the pool's mintSupply. It should only be used for pools of type BURN_MINT.
-   * @param amount {BigInt} The amount to add to the pool's mintSupply. It can be positive or negative.
-   */
-  addMintSupply(amount: BigInt): void {
-    this.pool.mintSupply = this.pool.mintSupply!.plus(amount);
-    this.save();
-  }
-
-  /**
    * Adds a given amount to the pool's outputTokenSupply. It should only be used for pools
    * of type LIQUIDITY. Or pools that emit some kind of LP token on deposit.
    * @param amount
