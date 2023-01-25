@@ -29,7 +29,7 @@ dataSources:
         - name: Comptroller
           file: ./abis/Comptroller.json
         - name: CToken
-          file: ./abis/aurigami/CToken.json
+          file: ./abis/sonne-finance/CToken.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
@@ -66,7 +66,7 @@ templates:
         - Liquidate
       abis:
         - name: CToken
-          file: ./abis/aurigami/CToken.json
+          file: ./abis/sonne-finance/CToken.json
         - name: Comptroller
           file: ./abis/Comptroller.json
         - name: ERC20
@@ -75,8 +75,6 @@ templates:
           file: ./abis/PriceOracle.json
         - name: Pair
           file: ./abis/aurigami/Pair.json
-        - name: AuriLens
-          file: ./abis/aurigami/AuriLens.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint

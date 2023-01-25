@@ -35,7 +35,6 @@ import {
   cTokenDecimals,
   Network,
   BIGINT_ZERO,
-  SECONDS_PER_YEAR,
   exponentToBigDecimal,
   RewardTokenType,
   BIGINT_ONE,
@@ -75,6 +74,7 @@ import {
   DEFAULT_DECIMALS,
   nativeCToken,
   nativeToken,
+  OPTIMISM_BLOCKS_PER_YEAR,
   SONNE_ADDRESS,
   SONNE_USDC_LP,
   USDC_DECIMALS,
@@ -266,7 +266,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  const cTokenCollateral = event.params.auTokenCollateral;
+  const cTokenCollateral = event.params.cTokenCollateral;
   const liquidator = event.params.liquidator;
   const borrower = event.params.borrower;
   const seizeTokens = event.params.seizeTokens;
@@ -289,10 +289,10 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
-    cTokenContract.try_supplyRatePerTimestamp(),
-    cTokenContract.try_borrowRatePerTimestamp(),
+    cTokenContract.try_supplyRatePerBlock(),
+    cTokenContract.try_borrowRatePerBlock(),
     getPrice(marketAddress, protocol._priceOracle),
-    SECONDS_PER_YEAR
+    OPTIMISM_BLOCKS_PER_YEAR
   );
 
   const interestAccumulated = event.params.interestAccumulated;
