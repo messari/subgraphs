@@ -62,8 +62,8 @@ import {
 } from "./common/setters";
 import {
   addAccountToProtocol,
+  getLiquidatePosition,
   getOrCreateAccount,
-  getOrCreatePosition,
   updatePositions,
 } from "./positions";
 
@@ -126,7 +126,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
     market,
     EventType.DEPOSIT,
     depositEvent.account,
-    event,
+    event
   );
   depositEvent.save();
 
@@ -249,7 +249,7 @@ export function handleLogBorrow(event: LogBorrow): void {
     market,
     EventType.BORROW,
     borrowEvent.account,
-    event,
+    event
   );
   borrowEvent.save();
 
@@ -351,7 +351,11 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.amount = collateralAmount;
   liquidateEvent.amountUSD = collateralAmountUSD;
   liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
-  liquidateEvent.position = getLiquidatePosition(InterestRateSide.BORROW, market.id, event.params.to.toHexString());
+  liquidateEvent.position = getLiquidatePosition(
+    InterestRateSide.BORROW,
+    market.id,
+    event.params.to.toHexString()
+  );
   liquidateEvent.save();
 
   usageHourlySnapshot.hourlyLiquidateCount += 1;
@@ -448,7 +452,7 @@ export function handleLogRepay(event: LogRepay): void {
     EventType.REPAY,
     repayEvent.account,
     event,
-    liquidation,
+    liquidation
   );
   repayEvent.save();
 

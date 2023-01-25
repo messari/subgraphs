@@ -8,14 +8,19 @@ export function readValue<T>(
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
-// create seperate InterestRate Entities for each market snapshot
+// create separate InterestRate Entities for each market snapshot
 // this is needed to prevent snapshot rates from being pointers to the current rate
-export function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
+export function getSnapshotRates(
+  rates: string[],
+  timeSuffix: string
+): string[] {
   const snapshotRates: string[] = [];
   for (let i = 0; i < rates.length; i++) {
     const rate = InterestRate.load(rates[i]);
     if (!rate) {
-      log.warning("[getSnapshotRates] rate {} not found, should not happen", [rates[i]]);
+      log.warning("[getSnapshotRates] rate {} not found, should not happen", [
+        rates[i],
+      ]);
       continue;
     }
 

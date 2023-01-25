@@ -203,7 +203,10 @@ export function getOrCreateMarketHourlySnapshot(
     marketMetrics.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
     marketMetrics.hourlyRepayUSD = BIGDECIMAL_ZERO;
 
-    marketMetrics.rates = getSnapshotRates(market.rates, (event.block.timestamp.toI32() / SECONDS_PER_HOUR).toString());
+    marketMetrics.rates = getSnapshotRates(
+      market.rates,
+      (event.block.timestamp.toI32() / SECONDS_PER_HOUR).toString()
+    );
     marketMetrics.blockNumber = event.block.number;
     marketMetrics.timestamp = event.block.timestamp;
     marketMetrics.save();
@@ -261,7 +264,10 @@ export function getOrCreateMarketDailySnapshot(
     marketMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
     marketMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
 
-    marketMetrics.rates = getSnapshotRates(market.rates, (event.block.timestamp.toI32() / SECONDS_PER_DAY).toString());
+    marketMetrics.rates = getSnapshotRates(
+      market.rates,
+      (event.block.timestamp.toI32() / SECONDS_PER_DAY).toString()
+    );
     marketMetrics.blockNumber = event.block.number;
     marketMetrics.timestamp = event.block.timestamp;
     marketMetrics.save();
