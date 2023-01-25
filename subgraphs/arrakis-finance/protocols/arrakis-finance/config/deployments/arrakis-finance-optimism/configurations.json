@@ -2,8 +2,8 @@
   "network": "optimism",
   "factory": [
     {
-      "address": "0x2845c6929d621e32B7596520C8a1E5a37e616F09",
-      "startBlock": 2146721
+      "address": "0x44C546A5136021853393aF36627d623b2B0ed388",
+      "startBlock": 22436214
     }
   ],
   "hasLiquidityGauge": false
