@@ -14,15 +14,6 @@ import {
 } from "../../util/arrays";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
-import { SDK } from ".";
-import { CustomEventType } from "../../util/events";
-
-type onCreatePoolCallback<T> = (
-  event: CustomEventType,
-  pool: Pool,
-  sdk: SDK,
-  aux: T | null
-) => void;
 
 export class PoolManager {
   protocol: ProtocolManager;
@@ -33,11 +24,7 @@ export class PoolManager {
     this.tokens = tokens;
   }
 
-  loadPool<T>(
-    id: Bytes,
-    onCreate: onCreatePoolCallback<T> | null = null,
-    aux: T | null = null
-  ): Pool {
+  loadPool(id: Bytes): Pool {
     let entity = PoolSchema.load(id);
     if (entity) {
       return new Pool(this.protocol, entity, this.tokens);
@@ -48,9 +35,6 @@ export class PoolManager {
 
     const pool = new Pool(this.protocol, entity, this.tokens);
     pool.isInitialized = false;
-    if (onCreate) {
-      onCreate(this.protocol.getCurrentEvent(), pool, this.protocol.sdk!, aux);
-    }
     return pool;
   }
 }
