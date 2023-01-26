@@ -1,5 +1,5 @@
 # Subgraph Schema: NFT Marketplace
-# Version: 2.0.2
+# Version: 2.1.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
