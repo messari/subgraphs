@@ -31,7 +31,8 @@ enum ProtocolType {
   LENDING
   YIELD
   BRIDGE
-  DERIVATIVES
+  OPTION
+  PERPETUAL
   GENERIC
   # Will add more
 }
