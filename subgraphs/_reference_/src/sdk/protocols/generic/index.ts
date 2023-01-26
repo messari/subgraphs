@@ -58,12 +58,4 @@ export class SDK {
     );
     return new SDK(config, pricer, tokenInitializer, customEvent);
   }
-
-  static intializeFromCustomEvent(
-    config: ProtocolConfigurer,
-    pricer: TokenPricer,
-    tokenInitializer: TokenInitializer
-  ): SDK {
-    return new SDK(config, pricer, tokenInitializer, new CustomEventType());
-  }
 }
