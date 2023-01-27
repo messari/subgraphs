@@ -2,31 +2,34 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { AaveOracleContract } from "../../../generated/YakStrategyV2/AaveOracleContract";
+import { YearnLensContract } from "../../../generated/YakStrategyV2/YearnLensContract";
 
-export function getAaveOracleContract(
+export function getYearnLensContract(
   contractAddress: Address
-): AaveOracleContract | null {
+): YearnLensContract | null {
   if (utils.isNullAddress(contractAddress)) return null;
 
-  return AaveOracleContract.bind(contractAddress);
+  return YearnLensContract.bind(contractAddress);
 }
 
 export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
   const config = utils.getConfig();
 
-  if (!config || config.aaveOracleBlacklist().includes(tokenAddr))
+  if (!config || config.yearnLensBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
-  const aaveOracleContract = getAaveOracleContract(config.aaveOracle());
-  if (!aaveOracleContract) return new CustomPriceType();
+  const yearnLensContract = getYearnLensContract(config.yearnLens());
+  if (!yearnLensContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
-      aaveOracleContract.try_getAssetPrice(tokenAddr),
+      yearnLensContract.try_getPriceUsdcRecommended(tokenAddr),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
 
-  return CustomPriceType.initialize(tokenPrice, constants.AAVE_ORACLE_DECIMALS);
+  return CustomPriceType.initialize(
+    tokenPrice,
+    constants.DEFAULT_USDC_DECIMALS
+  );
 }

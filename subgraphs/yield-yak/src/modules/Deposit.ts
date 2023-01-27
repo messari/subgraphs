@@ -15,9 +15,7 @@ import {
 import * as utils from "../common/utils";
 import { Deposit } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
-import { getUsdPrice, getUsdPricePerToken } from "../Prices";
-import { getPriceOfOutputTokens } from "./Price";
-import { exponentToBigDecimal } from "../common/utils";
+import { updateProtocolTotalValueLockedUSD } from "../common/utils";
 
 export function _Deposit(
   contractAddress: Address,
@@ -33,7 +31,7 @@ export function _Deposit(
   const strategyContract = YakStrategyV2.bind(contractAddress);
 
   let inputToken = Token.load(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenPrice = inputToken!.lastPriceUSD;
   let inputTokenDecimals = BIGINT_TEN.pow(
     inputToken!.decimals as u8
   ).toBigDecimal();
@@ -44,28 +42,12 @@ export function _Deposit(
     vault.outputTokenSupply = strategyContract.totalSupply();
   }
 
-  if (strategyContract.try_totalDeposits().reverted) {
-    // vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
-  } else {
-    // vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
-    vault.inputTokenBalance = strategyContract.totalDeposits();
-
-    
-
-    // vault.totalValueLockedUSD = inputTokenPrice.usdPrice.times(
-    //   vault.inputTokenBalance
-    //     .toBigDecimal()
-    //     .div(exponentToBigDecimal(inputToken!.decimals))
-    //     .div(inputTokenPrice.decimalsBaseTen)
-    // );
-  }
+  vault.inputTokenBalance = strategyContract.totalDeposits();
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
-      .toBigDecimal()
-      .div(inputTokenDecimals)
-      .times(inputTokenPrice.usdPrice)
-      .div(inputTokenPrice.decimalsBaseTen);
-      
+    .divDecimal(inputTokenDecimals)
+    .times(inputTokenPrice!);
+
   if (strategyContract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
     vault.pricePerShare = ZERO_BIGDECIMAL;
   } else {
@@ -75,18 +57,10 @@ export function _Deposit(
     );
   }
 
-  // let depositAmountUSD = getUsdPrice(inputTokenAddress, depositAmount.toBigDecimal()).div(inputTokenPrice.decimalsBaseTen)
   let depositAmountUSD = depositAmount
     .toBigDecimal()
     .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
-
-  vault.outputTokenPriceUSD = getPriceOfOutputTokens(
-    vaultAddress,
-    inputTokenAddress,
-    inputTokenDecimals
-  );
+    .times(inputTokenPrice!);
 
   // Update hourly and daily deposit transaction count
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
@@ -99,8 +73,6 @@ export function _Deposit(
   metricsHourlySnapshot.save();
   vault.save();
 
-  utils.updateProtocolTotalValueLockedUSD();
-
   createDepositTransaction(
     contractAddress,
     vaultAddress,
@@ -110,6 +82,8 @@ export function _Deposit(
     depositAmount,
     depositAmountUSD
   );
+
+  updateProtocolTotalValueLockedUSD();
 }
 
 export function createDepositTransaction(

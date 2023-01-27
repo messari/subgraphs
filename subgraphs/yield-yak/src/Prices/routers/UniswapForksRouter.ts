@@ -1,10 +1,9 @@
+import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { UniswapPair as UniswapPairContract } from "../../../generated/YakStrategyV2/UniswapPair";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/YakStrategyV2/UniswapRouter";
-import * as utils from '../common/utils';
-import { ETH_ADDRESS, UNISWAP_FORKS_ROUTER_ADDRESSES, USDC_ADDRESS, USDC_TOKEN_DECIMALS, WETH_ADDRESS } from "../config/avalanche";
 
 export function isLpToken(tokenAddress: Address, ethAddress: Address): bool {
   if (tokenAddress.equals(ethAddress)) return false;
@@ -15,17 +14,17 @@ export function isLpToken(tokenAddress: Address, ethAddress: Address): bool {
     constants.NULL.TYPE_ADDRESS
   );
 
-  if (isFactoryAvailable.equals(constants.NULL.TYPE_ADDRESS)) {
-    log.error("ERROR: {}", [tokenAddress.toHexString()]);
-    return false;
-  }
+  if (isFactoryAvailable.equals(constants.NULL.TYPE_ADDRESS)) return false;
 
   return true;
 }
 
 export function getTokenPriceUSDC(tokenAddress: Address): CustomPriceType {
-  const ethAddress = ETH_ADDRESS;
-  const usdcAddress = USDC_ADDRESS;
+  const config = utils.getConfig();
+  if (!config) return new CustomPriceType();
+
+  const ethAddress = config.ethAddress();
+  const usdcAddress = config.usdcAddress();
 
   if (isLpToken(tokenAddress, ethAddress)) {
     return getLpTokenPriceUsdc(tokenAddress);
@@ -35,17 +34,19 @@ export function getTokenPriceUSDC(tokenAddress: Address): CustomPriceType {
 
 export function getPriceFromRouterUSDC(
   tokenAddress: Address,
-  usdcAddress: Address,
+  usdcAddress: Address
 ): CustomPriceType {
   return getPriceFromRouter(tokenAddress, usdcAddress);
 }
 
 export function getPriceFromRouter(
   token0Address: Address,
-  token1Address: Address,
+  token1Address: Address
 ): CustomPriceType {
-  const ethAddress = ETH_ADDRESS;
-  const wethAddress = WETH_ADDRESS;
+  const config = utils.getConfig();
+
+  const ethAddress = config.ethAddress();
+  const wethAddress = config.wethAddress();
 
   // Construct swap path
   const path: Address[] = [];
@@ -76,9 +77,11 @@ export function getPriceFromRouter(
   const token0Decimals = utils.getTokenDecimals(token0Address);
   const amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
+  const routerAddresses = config.uniswapForks();
+
   let amountOut = constants.BIGINT_ZERO;
-  for (let idx = 0; idx < UNISWAP_FORKS_ROUTER_ADDRESSES.length; idx++) {
-    const routerAddress = UNISWAP_FORKS_ROUTER_ADDRESSES.at(idx);
+  for (let idx = 0; idx < routerAddresses.length; idx++) {
+    const routerAddress = routerAddresses.at(idx);
 
     const uniswapForkRouter = UniswapRouterContract.bind(routerAddress);
     const amountOutArray = uniswapForkRouter.try_getAmountsOut(amountIn, path);
@@ -98,7 +101,7 @@ export function getPriceFromRouter(
 
   return CustomPriceType.initialize(
     amountOutBigDecimal,
-    USDC_TOKEN_DECIMALS.toI32() as u8
+    config.usdcTokenDecimals().toI32() as u8
   );
 }
 

@@ -4,8 +4,6 @@ import {
   getOrCreateVaultsHourlySnapshots,
   getOrCreateFinancialDailySnapshots,
 } from "../common/initializers";
-import { Vault as VaultStore } from "../../generated/schema";
-import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 
 export function updateRevenueSnapshots(
   vault: VaultStore,

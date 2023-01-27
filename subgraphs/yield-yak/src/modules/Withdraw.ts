@@ -3,16 +3,11 @@ import {
   ethereum,
   BigInt,
   BigDecimal,
-  bigDecimal,
-  log,
 } from "@graphprotocol/graph-ts";
 import { Token, Vault } from "../../generated/schema";
 import {
-  getOrCreateFinancialDailySnapshots,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
-  getOrCreateVaultsDailySnapshots,
-  getOrCreateVaultsHourlySnapshots,
   getOrCreateYieldAggregator,
 } from "../common/initializers";
 import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
@@ -25,9 +20,8 @@ import {
 import * as utils from "../common/utils";
 import { Withdraw } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
-import { getUsdPrice, getUsdPricePerToken } from "../Prices";
-import { getPriceOfOutputTokens } from "./Price";
-import { exponentToBigDecimal } from "../common/utils";
+import { getUsdPricePerToken } from "../Prices";
+import { updateProtocolTotalValueLockedUSD } from "../common/utils";
 
 export function _Withdraw(
   contractAddress: Address,
@@ -43,7 +37,7 @@ export function _Withdraw(
   const strategyContract = YakStrategyV2.bind(contractAddress);
 
   let inputToken = Token.load(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenPrice = inputToken!.lastPriceUSD;
   let inputTokenDecimals = BIGINT_TEN.pow(
     inputToken!.decimals as u8
   ).toBigDecimal();
@@ -54,25 +48,11 @@ export function _Withdraw(
     vault.outputTokenSupply = strategyContract.totalSupply();
   }
 
-  if (strategyContract.try_totalDeposits().reverted) {
-    // vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
-  } else {
-    // vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
-    vault.inputTokenBalance = strategyContract.totalDeposits();
-
-    // vault.totalValueLockedUSD = inputTokenPrice.usdPrice.times(
-    //   vault.inputTokenBalance
-    //     .toBigDecimal()
-    //     .div(exponentToBigDecimal(inputToken!.decimals))
-    //     .div(inputTokenPrice.decimalsBaseTen)
-    // );
-  }
+  vault.inputTokenBalance = strategyContract.totalDeposits();
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
-    .toBigDecimal()
-    .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .divDecimal(inputTokenDecimals)
+    .times(inputTokenPrice!);
 
   if (strategyContract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
     vault.pricePerShare = ZERO_BIGDECIMAL;
@@ -83,31 +63,13 @@ export function _Withdraw(
     );
   }
 
-  vault.outputTokenPriceUSD = getPriceOfOutputTokens(
-    vaultAddress,
-    inputTokenAddress,
-    inputTokenDecimals
-  );
-
-  // Update hourly and daily withdraw transaction count
-  const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
-  const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
-
-  metricsDailySnapshot.dailyWithdrawCount += 1;
-  metricsHourlySnapshot.hourlyWithdrawCount += 1;
-
-  metricsDailySnapshot.save();
-  metricsHourlySnapshot.save();
+  vault.outputTokenPriceUSD = getUsdPricePerToken(Address.fromString(vault.outputToken!)).usdPrice;
   vault.save();
 
-  utils.updateProtocolTotalValueLockedUSD();
-
-  // const withdrawAmountUSD = getUsdPrice(inputTokenAddress, withdrawAmount.toBigDecimal()).div(inputTokenPrice.decimalsBaseTen)
   const withdrawAmountUSD = withdrawAmount
     .toBigDecimal()
     .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputTokenPrice!);
 
   createWithdrawTransaction(
     contractAddress,
@@ -119,94 +81,19 @@ export function _Withdraw(
     withdrawAmountUSD
   );
 
-  let protocolSideFee: BigDecimal;
-  let protocolSideRevenueUSD: BigDecimal;
-
-  if (strategyContract.try_DEV_FEE_BIPS().reverted) {
-    protocolSideFee = ZERO_BIGDECIMAL;
-    protocolSideRevenueUSD = ZERO_BIGDECIMAL;
-  } else {
-    protocolSideFee = strategyContract
-      .DEV_FEE_BIPS()
-      .toBigDecimal()
-      .div(bigDecimal.fromString("10000"));
-
-    protocolSideRevenueUSD = withdrawAmountUSD.times(protocolSideFee);
-  }
-
-  updateUsageMetricsAfterWithdraw(block, protocolSideRevenueUSD, vault);
+  updateProtocolTotalValueLockedUSD();
+  updateUsageMetricsAfterWithdrawNew(vault, block);
 }
 
-export function updateUsageMetricsAfterWithdraw(
-  block: ethereum.Block,
-  protocolSideRevenueUSD: BigDecimal,
-  vault: Vault
-): void {
-  const financialMetrics = getOrCreateFinancialDailySnapshots(block);
-  const protocol = getOrCreateYieldAggregator();
-  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(vault.id, block);
-  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    vault.id,
-    block
-  );
+export function updateUsageMetricsAfterWithdrawNew(vault: Vault, block: ethereum.Block): void {
+  const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
+  const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
 
-  vaultDailySnapshots.cumulativeSupplySideRevenueUSD =
-    vault.cumulativeSupplySideRevenueUSD.plus(protocolSideRevenueUSD);
-  vaultDailySnapshots.cumulativeProtocolSideRevenueUSD =
-    vault.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
-  vaultDailySnapshots.cumulativeTotalRevenueUSD =
-    vault.cumulativeTotalRevenueUSD.plus(protocolSideRevenueUSD);
+  metricsDailySnapshot.dailyWithdrawCount += 1;
+  metricsHourlySnapshot.hourlyWithdrawCount += 1;
 
-  vaultHourlySnapshots.cumulativeSupplySideRevenueUSD =
-    vault.cumulativeSupplySideRevenueUSD.plus(protocolSideRevenueUSD);
-  vaultHourlySnapshots.cumulativeProtocolSideRevenueUSD =
-    vault.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
-  vaultHourlySnapshots.cumulativeTotalRevenueUSD =
-    vault.cumulativeTotalRevenueUSD.plus(protocolSideRevenueUSD);
-
-  vaultDailySnapshots.dailySupplySideRevenueUSD =
-    vaultDailySnapshots.dailySupplySideRevenueUSD.plus(protocolSideRevenueUSD);
-  vaultDailySnapshots.dailyProtocolSideRevenueUSD =
-    vaultDailySnapshots.dailyProtocolSideRevenueUSD.plus(
-      protocolSideRevenueUSD
-    );
-  vaultDailySnapshots.dailyTotalRevenueUSD =
-    vaultDailySnapshots.dailyTotalRevenueUSD.plus(protocolSideRevenueUSD);
-
-  vaultHourlySnapshots.hourlySupplySideRevenueUSD =
-    vaultHourlySnapshots.hourlySupplySideRevenueUSD.plus(
-      protocolSideRevenueUSD
-    );
-  vaultHourlySnapshots.hourlyProtocolSideRevenueUSD =
-    vaultHourlySnapshots.hourlyProtocolSideRevenueUSD.plus(
-      protocolSideRevenueUSD
-    );
-  vaultHourlySnapshots.hourlyTotalRevenueUSD =
-    vaultHourlySnapshots.hourlyTotalRevenueUSD.plus(protocolSideRevenueUSD);
-
-  financialMetrics.dailyTotalRevenueUSD =
-    financialMetrics.dailyTotalRevenueUSD.plus(protocolSideRevenueUSD);
-
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-
-  financialMetrics.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD;
-
-  financialMetrics.dailyProtocolSideRevenueUSD =
-    financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
-
-  protocol.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
-
-  financialMetrics.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-
-  vaultDailySnapshots.save();
-  vaultHourlySnapshots.save();
-  financialMetrics.save();
-  protocol.save();
+  metricsDailySnapshot.save();
+  metricsHourlySnapshot.save();
 }
 
 export function createWithdrawTransaction(

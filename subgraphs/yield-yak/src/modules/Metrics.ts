@@ -9,20 +9,17 @@ import {
   getOrCreateYieldAggregator,
 } from "../common/initializers";
 import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts";
-import { SECONDS_PER_DAY } from "../helpers/constants";
-import { ActiveAccount } from "../../generated/schema";
+import { Account, ActiveAccount } from "../../generated/schema";
+import { getDaysSinceEpoch, getHoursSinceEpoch } from "../common/datetime";
 
 export function updateFinancials(block: ethereum.Block): void {
   const financialMetrics = getOrCreateFinancialDailySnapshots(block);
   const protocol = getOrCreateYieldAggregator();
 
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
 
   financialMetrics.blockNumber = block.number;
   financialMetrics.timestamp = block.timestamp;
@@ -46,29 +43,38 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsDaily.dailyTransactionCount += 1;
   usageMetricsHourly.hourlyTransactionCount += 1;
 
-  usageMetricsDaily.dailyDepositCount += 1;
-  usageMetricsHourly.hourlyDepositCount += 1;
-
-  usageMetricsDaily.dailyWithdrawCount += 1;
-  usageMetricsHourly.hourlyWithdrawCount += 1;
-
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (block.timestamp.toI64() / SECONDS_PER_DAY)
-    .toString()
-    .concat("-")
-    .concat(from.toHexString());
+  const fromAddress = from.toHexString();
+  const dayId = getDaysSinceEpoch(block.timestamp.toI32());
+  const hourId = getHoursSinceEpoch(block.timestamp.toI32());
 
+  const dailyActiveAccountId = fromAddress.concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
-
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
-    dailyActiveAccount.save();
-
     usageMetricsDaily.dailyActiveUsers += 1;
-    usageMetricsHourly.hourlyActiveUsers += 1;
+    dailyActiveAccount.save();
   }
+
+  const hourlyActiveAccountId = fromAddress.concat("-").concat(hourId);
+  let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
+  if (!hourlyActiveAccount) {
+    hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
+    usageMetricsHourly.hourlyActiveUsers += 1;
+    hourlyActiveAccount.save();
+  }
+
+  let account = Account.load(fromAddress);
+  if (!account) {
+    account = new Account(fromAddress);
+    protocol.cumulativeUniqueUsers += 1;
+    account.save();
+  }
+
+  usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
   usageMetricsDaily.save();
   usageMetricsHourly.save();
@@ -82,60 +88,48 @@ export function updateVaultSnapshots(
 
   let vault = getOrCreateVault(contractAddress, block);
 
-  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(vaultId, block);
-  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(vaultId, block);
+  const vaultDailySnapshot = getOrCreateVaultsDailySnapshots(vaultId, block);
+  const vaultHourlySnapshot = getOrCreateVaultsHourlySnapshots(vaultId, block);
 
-  vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
-  vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultDailySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultHourlySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
 
-  vaultDailySnapshots.cumulativeSupplySideRevenueUSD =
-    vault.cumulativeSupplySideRevenueUSD;
-  vaultHourlySnapshots.cumulativeSupplySideRevenueUSD =
-    vault.cumulativeSupplySideRevenueUSD;
+  vaultDailySnapshot.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD;
+  vaultHourlySnapshot.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD;
 
-  vaultDailySnapshots.cumulativeProtocolSideRevenueUSD =
-    vault.cumulativeProtocolSideRevenueUSD;
-  vaultHourlySnapshots.cumulativeProtocolSideRevenueUSD =
-    vault.cumulativeProtocolSideRevenueUSD;
+  vaultDailySnapshot.cumulativeProtocolSideRevenueUSD = vault.cumulativeProtocolSideRevenueUSD;
+  vaultHourlySnapshot.cumulativeProtocolSideRevenueUSD = vault.cumulativeProtocolSideRevenueUSD;
 
-  vaultDailySnapshots.cumulativeTotalRevenueUSD =
-    vault.cumulativeTotalRevenueUSD;
-  vaultHourlySnapshots.cumulativeTotalRevenueUSD =
-    vault.cumulativeTotalRevenueUSD;
+  vaultDailySnapshot.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
+  vaultHourlySnapshot.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
 
-  vaultDailySnapshots.inputTokenBalance = vault.inputTokenBalance;
-  vaultHourlySnapshots.inputTokenBalance = vault.inputTokenBalance;
+  vaultDailySnapshot.inputTokenBalance = vault.inputTokenBalance;
+  vaultHourlySnapshot.inputTokenBalance = vault.inputTokenBalance;
 
-  vaultDailySnapshots.outputTokenSupply = vault.outputTokenSupply;
-  vaultHourlySnapshots.outputTokenSupply = vault.outputTokenSupply;
+  vaultDailySnapshot.outputTokenSupply = vault.outputTokenSupply;
+  vaultHourlySnapshot.outputTokenSupply = vault.outputTokenSupply;
 
-  vaultDailySnapshots.outputTokenPriceUSD = vault.outputTokenPriceUSD;
-  vaultHourlySnapshots.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  vaultDailySnapshot.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  vaultHourlySnapshot.outputTokenPriceUSD = vault.outputTokenPriceUSD;
 
-  vaultDailySnapshots.pricePerShare = vault.pricePerShare;
-  vaultHourlySnapshots.pricePerShare = vault.pricePerShare;
+  vaultDailySnapshot.pricePerShare = vault.pricePerShare;
+  vaultHourlySnapshot.pricePerShare = vault.pricePerShare;
 
-  vaultDailySnapshots.rewardTokenEmissionsAmount =
-    vault.rewardTokenEmissionsAmount;
-  vaultHourlySnapshots.rewardTokenEmissionsAmount =
-    vault.rewardTokenEmissionsAmount;
+  vaultDailySnapshot.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  vaultHourlySnapshot.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
 
-  vaultDailySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
-  vaultHourlySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+  vaultDailySnapshot.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+  vaultHourlySnapshot.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
 
-  if (vaultDailySnapshots.rewardTokenEmissionsAmount!.length > 0) {
-    for (
-      let i = 0;
-      i < vaultDailySnapshots.rewardTokenEmissionsAmount!.length;
-      i++
-    ) {
+  if (vaultDailySnapshot.rewardTokenEmissionsAmount!.length > 0) {
+    for (let i = 0; i < vaultDailySnapshot.rewardTokenEmissionsAmount!.length; i++) {
       if (vault.rewardTokenEmissionsAmount![i].gt(new BigInt(0))) {
-        vaultDailySnapshots.rewardAPR!.push(
+        vaultDailySnapshot.rewardAPR!.push(
           vault.rewardTokenEmissionsAmount![i].divDecimal(
             vault.totalValueLockedUSD
           )
         );
-        vaultHourlySnapshots.rewardAPR!.push(
+        vaultHourlySnapshot.rewardAPR!.push(
           vault.rewardTokenEmissionsAmount![i].divDecimal(
             vault.totalValueLockedUSD
           )
@@ -144,12 +138,12 @@ export function updateVaultSnapshots(
     }
   }
 
-  vaultDailySnapshots.blockNumber = block.number;
-  vaultHourlySnapshots.blockNumber = block.number;
+  vaultDailySnapshot.blockNumber = block.number;
+  vaultHourlySnapshot.blockNumber = block.number;
 
-  vaultDailySnapshots.timestamp = block.timestamp;
-  vaultHourlySnapshots.timestamp = block.timestamp;
+  vaultDailySnapshot.timestamp = block.timestamp;
+  vaultHourlySnapshot.timestamp = block.timestamp;
 
-  vaultDailySnapshots.save();
-  vaultHourlySnapshots.save();
+  vaultDailySnapshot.save();
+  vaultHourlySnapshot.save();
 }

@@ -2,30 +2,30 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/YakStrategyV2/CalculationsSushiSwap";
+import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/YakStrategyV2/CalculationsCurve";
 
-export function getSushiSwapContract(
+export function getCalculationsCurveContract(
   contractAddress: Address
-): CalculationsSushiContract | null {
+): CalculationsCurveContract | null {
   if (utils.isNullAddress(contractAddress)) return null;
 
-  return CalculationsSushiContract.bind(contractAddress);
+  return CalculationsCurveContract.bind(contractAddress);
 }
 
 export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
   const config = utils.getConfig();
 
-  if (!config || config.sushiCalculationsBlacklist().includes(tokenAddr))
+  if (!config || config.curveCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
-  const sushiContract = getSushiSwapContract(config.sushiCalculations());
-  if (!sushiContract) {
-    return new CustomPriceType();
-  }
+  const calculationCurveContract = getCalculationsCurveContract(
+    config.curveCalculations()
+  );
+  if (!calculationCurveContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
-      sushiContract.try_getPriceUsdc(tokenAddr),
+      calculationCurveContract.try_getCurvePriceUsdc(tokenAddr),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();

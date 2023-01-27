@@ -5,7 +5,6 @@ import { CustomPriceType } from "../common/types";
 import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { CurvePool as CurvePoolContract } from "../../../generated/YakStrategyV2/CurvePool";
 import { CurveRegistry as CurveRegistryContract } from "../../../generated/YakStrategyV2/CurveRegistry";
-import { CURVE_REGISTRY_ADDRESSES, USDC_TOKEN_DECIMALS } from "../config/avalanche";
 
 export function isCurveLpToken(lpAddress: Address): bool {
   const poolAddress = getPoolFromLpToken(lpAddress);
@@ -15,7 +14,8 @@ export function isCurveLpToken(lpAddress: Address): bool {
 }
 
 export function getPoolFromLpToken(lpAddress: Address): Address {
-  const curveRegistryAdresses = CURVE_REGISTRY_ADDRESSES;
+  const config = utils.getConfig();
+  const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
     const curveRegistryContract = CurveRegistryContract.bind(
@@ -65,8 +65,11 @@ export function getCurvePriceUsdc(lpAddress: Address): CustomPriceType {
   const basePrice = getBasePrice(lpAddress);
   const virtualPrice = getVirtualPrice(lpAddress).toBigDecimal();
 
+  const config = utils.getConfig();
+  const usdcTokenDecimals = config.usdcTokenDecimals();
+
   const decimalsAdjustment =
-    constants.DEFAULT_DECIMALS.minus(USDC_TOKEN_DECIMALS);
+    constants.DEFAULT_DECIMALS.minus(usdcTokenDecimals);
   const priceUsdc = virtualPrice
     .times(basePrice.usdPrice)
     .times(
@@ -92,9 +95,12 @@ export function getBasePrice(lpAddress: Address): CustomPriceType {
 }
 
 export function getUnderlyingCoinFromPool(poolAddress: Address): Address {
-  for (let idx = 0; idx < CURVE_REGISTRY_ADDRESSES.length; idx++) {
+  const config = utils.getConfig();
+  const curveRegistryAdresses = config.curveRegistry();
+
+  for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
     const curveRegistryContract = CurveRegistryContract.bind(
-      CURVE_REGISTRY_ADDRESSES[idx]
+      curveRegistryAdresses[idx]
     );
 
     const coins = utils.readValue<Address[]>(
@@ -130,9 +136,12 @@ export function getPreferredCoinFromCoins(coins: Address[]): Address {
 }
 
 export function getVirtualPrice(curveLpTokenAddress: Address): BigInt {
-  for (let idx = 0; idx < CURVE_REGISTRY_ADDRESSES.length; idx++) {
+  const config = utils.getConfig();
+  const curveRegistryAdresses = config.curveRegistry();
+
+  for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
     const curveRegistryContract = CurveRegistryContract.bind(
-      CURVE_REGISTRY_ADDRESSES[idx]
+      curveRegistryAdresses[idx]
     );
 
     const virtualPriceCall =

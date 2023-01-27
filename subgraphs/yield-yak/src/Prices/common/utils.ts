@@ -1,3 +1,6 @@
+import * as AVALANCHE from "../config/avalanche";
+
+import { Configurations } from "./types";
 import * as constants from "./constants";
 import { _ERC20 } from "../../../generated/YakStrategyV2/_ERC20";
 import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
@@ -40,4 +43,8 @@ export function getTokenSupply(tokenAddr: Address): BigInt {
   );
 
   return totalSupply;
+}
+
+export function getConfig(): Configurations {
+  return new AVALANCHE.config();
 }

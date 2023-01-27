@@ -17,15 +17,13 @@ export function handleDeposit(event: DepositEvent): void {
   let contractAddress = event.address;
   let vault = getOrCreateVault(contractAddress, event.block);
 
-  if (vault) {
-    _Deposit(
-      contractAddress,
-      event.transaction,
-      event.block,
-      vault,
-      event.params.amount,
-    );
-  }
+  _Deposit(
+    contractAddress,
+    event.transaction,
+    event.block,
+    vault,
+    event.params.amount,
+  );
 
   updateFinancials(event.block);
   updateUsageMetrics(event.block, event.transaction.from);
@@ -36,17 +34,15 @@ export function handleWithdraw(event: WithdrawEvent): void {
   let contractAddress = event.address;
   let vault = getOrCreateVault(contractAddress, event.block);
 
-  if (vault) {
-    let withdrawAmount = event.params.amount;
+  let withdrawAmount = event.params.amount;
 
-    _Withdraw(
-      contractAddress,
-      event.transaction,
-      event.block,
-      vault,
-      withdrawAmount
-    );
-  }
+  _Withdraw(
+    contractAddress,
+    event.transaction,
+    event.block,
+    vault,
+    withdrawAmount
+  );
 
   updateFinancials(event.block);
   updateUsageMetrics(event.block, event.transaction.from);
@@ -57,16 +53,14 @@ export function handleReinvest(event: ReinvestEvent): void {
   let contractAddress = event.address;
   let vault = getOrCreateVault(contractAddress, event.block);
 
-  if (vault) {
-    _Reinvest(
-      contractAddress,
-      event.block,
-      vault,
-      event.params.newTotalSupply
-    )
-  }
+  _Reinvest(
+    contractAddress,
+    event.block,
+    vault,
+    event.params.newTotalSupply
+  )
 
-  updateFinancials(event.block);
+  // updateFinancials(event.block);
   updateUsageMetrics(event.block, event.transaction.from);
   updateVaultSnapshots(contractAddress, event.block);
 }
