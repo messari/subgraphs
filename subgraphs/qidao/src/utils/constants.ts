@@ -37,7 +37,7 @@ export namespace Network {
   export const OPTIMISM = "OPTIMISM";
   export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
-  export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const GNOSIS = "GNOSIS"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {
@@ -199,7 +199,7 @@ MAI_TOKEN_ADDRESS.set(
   "0x3f56e0c36d275367b8c502090edf38289b3dea0d"
 );
 MAI_TOKEN_ADDRESS.set(
-  Network.XDAI,
+  Network.GNOSIS,
   "0x3f56e0c36d275367b8c502090edf38289b3dea0d"
 );
 MAI_TOKEN_ADDRESS.set(

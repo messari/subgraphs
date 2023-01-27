@@ -142,13 +142,14 @@ export function formatIntToFixed2(val: number): string {
   return returnStr;
 };
 
-export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
+export function csvToJSONConvertorMultiCol(lines: string[], headers: string[], mmddyyyy: boolean = true): any {
   const invalidColumns = [".", "..", "...", ",", "-", "_", " ", '"', "'"];
   try {
     if (!(headers.length >= 2) || (!headers.map(x => x?.toLowerCase()).includes('date') && !headers.map(x => x?.toLowerCase()).includes('time'))) {
       throw new Error('Wrong CSV data format. The CSV must have multiple columns, one must be a "date" column.');
     }
     const obj: any = {};
+    let returnRecursion = false;
     for (let i = 1; i < lines.length; i++) {
       const currentline = lines[i].split(",");
       for (let j = 0; j < headers.length; j++) {
@@ -170,7 +171,15 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
               entry = entry.split('"').join("");
             }
             if (header === 'date' && isNaN(entry)) {
-              entry = moment(entry).unix();
+              if (isNaN(moment(entry).unix()) && mmddyyyy) {
+                returnRecursion = true;
+              } else {
+                if (mmddyyyy) {
+                  entry = moment(entry).unix();
+                } else {
+                  entry = moment(entry, 'DD/MM/YYYY').unix();
+                }
+              }
             }
             if (!isNaN(Number(entry))) {
               entry = Number(entry);
@@ -179,6 +188,9 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
           }
         }
       }
+    }
+    if (returnRecursion) {
+      return csvToJSONConvertorMultiCol(lines, headers, false);
     }
     return (obj);
   } catch (err: any) {
