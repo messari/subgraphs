@@ -53,9 +53,7 @@ export function handleTransferOut(event: WithdrawalFinalized): void {
 
   // -- ACCOUNT
 
-  const acc = sdk.Accounts.loadAccount(event.params._to);
-
-  // arb -> eth
+  const acc = sdk.Accounts.loadAccount(event.params._from);
   acc.transferOut(
     pool,
     pool.getDestinationTokenRoute(crossToken)!,

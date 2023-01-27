@@ -53,9 +53,7 @@ export function handleTransferIn(event: L1DaiGatewayWithdrawalFinalized): void {
 
   // -- ACCOUNT
 
-  const acc = sdk.Accounts.loadAccount(event.params.to);
-
-  // arb -> eth
+  const acc = sdk.Accounts.loadAccount(event.params.from);
   acc.transferOut(
     pool,
     pool.getDestinationTokenRoute(crossToken)!,

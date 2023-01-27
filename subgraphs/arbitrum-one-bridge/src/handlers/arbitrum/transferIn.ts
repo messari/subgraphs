@@ -64,7 +64,7 @@ export function handleTransferIn(event: DepositFinalized): void {
 
   // -- ACCOUNT
 
-  const acc = sdk.Accounts.loadAccount(event.params._from);
+  const acc = sdk.Accounts.loadAccount(event.params._to);
   acc.transferIn(
     pool,
     pool.getDestinationTokenRoute(crossToken)!,
