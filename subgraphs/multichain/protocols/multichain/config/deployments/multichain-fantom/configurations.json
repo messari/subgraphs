@@ -1,0 +1,960 @@
+{
+  "deployment": "MULTICHAIN_FANTOM",
+  "network": "fantom",
+  "file": "./src/mappings/handlers.ts",
+  "bridges": [
+    {
+      "name": "BridgeV2-Spice",
+      "address": "0x01c3d9cbcf40482ba0d5206f63e3f04ef9e134d9",
+      "abi": "anyTOKEN",
+      "startBlock": 2957420
+    },
+    {
+      "name": "BridgeV2-USD Coin",
+      "address": "0x04068da6c83afcfa0e13ba15a6696662335d5b75",
+      "abi": "anyTOKEN",
+      "startBlock": 2299270
+    },
+    {
+      "name": "BridgeV2-Scoobi-Doge",
+      "address": "0x0452dd4d9b5b0be57b9e98b825051833f20271ac",
+      "abi": "anyTOKEN",
+      "startBlock": 30428522
+    },
+    {
+      "name": "BridgeV2-Frapped USDT",
+      "address": "0x049d68029688eabf473097a2fc38ef61633a3c7a",
+      "abi": "anyTOKEN",
+      "startBlock": 2670697
+    },
+    {
+      "name": "BridgeV2-START Vesting",
+      "address": "0x05e481b19129b560e921e487adb281e70bdba463",
+      "abi": "anyTOKEN",
+      "startBlock": 15462133
+    },
+    {
+      "name": "BridgeV2-CocktailBar",
+      "address": "0x0802d66f029c46e042b74d543fc43b6705ccb4ba",
+      "abi": "anyTOKEN",
+      "startBlock": 29068552
+    },
+    {
+      "name": "BridgeV2-Melodity",
+      "address": "0x0914d4ccc4154ca864637b0b653bc5fd5e1d3ecf",
+      "abi": "anyTOKEN",
+      "startBlock": 27731283
+    },
+    {
+      "name": "BridgeV2-Bitfinex LEO Token",
+      "address": "0x0b322577569418b166cd98ea8ae7c681e4a820eb",
+      "abi": "anyTOKEN",
+      "startBlock": 10239492
+    },
+    {
+      "name": "BridgeV2-Synth sUSD",
+      "address": "0x0e1694483ebb3b74d3054e383840c6cf011e518e",
+      "abi": "anyTOKEN",
+      "startBlock": 2301108
+    },
+    {
+      "name": "BridgeV2-X",
+      "address": "0x10864cd0c4250f7de15dd3cd3788dc704cdb6706",
+      "abi": "anyTOKEN",
+      "startBlock": 27232502
+    },
+    {
+      "name": "BridgeV2-Tranche Finance",
+      "address": "0x123706cdd8e60324e610e9a2cc7012d0f45a5b8e",
+      "abi": "anyTOKEN",
+      "startBlock": 24324387
+    },
+    {
+      "name": "BridgeV2-Binance Scorum",
+      "address": "0x133bf038277fda5eaa2b5fc4cc4e6e15bc5cace3",
+      "abi": "anyTOKEN",
+      "startBlock": 14877496
+    },
+    {
+      "name": "BridgeV2-Popcorn",
+      "address": "0x1608278e54fb9e070cb109234d111ff3a359612b",
+      "abi": "anyTOKEN",
+      "startBlock": 22291579
+    },
+    {
+      "name": "BridgeV2-Tether USD",
+      "address": "0x1b27a9de6a775f98aaa5b90b62a4e2a0b84dbdd9",
+      "abi": "anyTOKEN",
+      "startBlock": 2300995
+    },
+    {
+      "name": "BridgeV2-Tempus",
+      "address": "0x1c174f6ab0753162befbb916c69def2cc1bfdec1",
+      "abi": "anyTOKEN",
+      "startBlock": 30428726
+    },
+    {
+      "name": "BridgeV2-MIMO Parallel Governance Token",
+      "address": "0x1d1764f04de29da6b90ffbef372d1a45596c4855",
+      "abi": "anyTOKEN",
+      "startBlock": 20912851
+    },
+    {
+      "name": "BridgeV2-Curve DAO",
+      "address": "0x1e4f97b9f9f913c46f1632781732927b9019c68b",
+      "abi": "anyTOKEN",
+      "startBlock": 2301138
+    },
+    {
+      "name": "BridgeV2-Badger Sett Badger",
+      "address": "0x1f7216fdb338247512ec99715587bb97bbf96eae",
+      "abi": "anyTOKEN",
+      "startBlock": 2632880
+    },
+    {
+      "name": "BridgeV2-USDT-ERC20",
+      "address": "0x1ffbd1e3584f139ca42d77ef99ef99550ecf46a8",
+      "abi": "anyTOKEN",
+      "startBlock": 1151176
+    },
+    {
+      "name": "BridgeV2-UniDex",
+      "address": "0x2130d2a1e51112d349ccf78d2a1ee65843ba36e0",
+      "abi": "anyTOKEN",
+      "startBlock": 13132452
+    },
+    {
+      "name": "BridgeV2-DSLA",
+      "address": "0x25a528af62e56512a19ce8c3cab427807c28cc19",
+      "abi": "anyTOKEN",
+      "startBlock": 17080238
+    },
+    {
+      "name": "BridgeV2-Space Token 2",
+      "address": "0x273a4ffceb31b8473d51051ad2a2edbb7ac8ce02",
+      "abi": "anyTOKEN",
+      "startBlock": 28419216
+    },
+    {
+      "name": "BridgeV2-OnX.finance",
+      "address": "0x27749e79ad796c4251e0a0564aef45235493a0b6",
+      "abi": "anyTOKEN",
+      "startBlock": 20913019
+    },
+    {
+      "name": "BridgeV2-yearn.finance",
+      "address": "0x29b0da86e484e1c0029b56e817912d778ac0ec69",
+      "abi": "anyTOKEN",
+      "startBlock": 2301048
+    },
+    {
+      "name": "BridgeV2-Keep3r",
+      "address": "0x2a5062d22adcfaafbd5c541d4da82e4b450d4212",
+      "abi": "anyTOKEN",
+      "startBlock": 2301246
+    },
+    {
+      "name": "BridgeV2-CRE8R DAO",
+      "address": "0x2ad402655243203fcfa7dcb62f8a08cc2ba88ae0",
+      "abi": "anyTOKEN",
+      "startBlock": 25677826
+    },
+    {
+      "name": "BridgeV2-Celsius",
+      "address": "0x2c78f1b70ccf63cdee49f9233e9faa99d43aa07e",
+      "abi": "anyTOKEN",
+      "startBlock": 4684542
+    },
+    {
+      "name": "BridgeV2-Unblocked Ledger Token",
+      "address": "0x2eaa12c0c76ea8192d82b63f8dbbb7ec2a270295",
+      "abi": "anyTOKEN",
+      "startBlock": 19564692
+    },
+    {
+      "name": "BridgeV2-zLOT",
+      "address": "0x2f60c28fb2fdc90a2a5644442d0f6d8998101e76",
+      "abi": "anyTOKEN",
+      "startBlock": 2632909
+    },
+    {
+      "name": "BridgeV2-Dola USD Stablecoin",
+      "address": "0x3129662808bec728a27ab6a6b9afd3cbaca8a43c",
+      "abi": "anyTOKEN",
+      "startBlock": 17911088
+    },
+    {
+      "name": "BridgeV2-Bitcoin",
+      "address": "0x321162cd933e2be498cd2267a90534a804051b11",
+      "abi": "anyTOKEN",
+      "startBlock": 2300896
+    },
+    {
+      "name": "BridgeV2-Foundry Logistics Token",
+      "address": "0x332730a4f6e03d9c55829435f10360e13cfa41ff",
+      "abi": "anyTOKEN",
+      "startBlock": 5411159
+    },
+    {
+      "name": "BridgeV2-JPY Coin",
+      "address": "0x354bcec10cfd5c8ce285c73093b3edb7bb3c4888",
+      "abi": "anyTOKEN",
+      "startBlock": 2632830
+    },
+    {
+      "name": "BridgeV2-88mph.app",
+      "address": "0x37b9a2d62db25501a366f708399546c02be151d0",
+      "abi": "anyTOKEN",
+      "startBlock": 21722234
+    },
+    {
+      "name": "BridgeV2-Plasma",
+      "address": "0x3b42fd538597fd049648c9f017208bf712195b73",
+      "abi": "anyTOKEN",
+      "startBlock": 23643933
+    },
+    {
+      "name": "BridgeV2-ANGLE",
+      "address": "0x3b9e3b5c616a1a038fdc190758bbe9bab6c7a857",
+      "abi": "anyTOKEN",
+      "startBlock": 27729965
+    },
+    {
+      "name": "BridgeV2-PAR Stablecoin",
+      "address": "0x3c1748d647e6a56b37b66fcd2b5626d0461d3aa0",
+      "abi": "anyTOKEN",
+      "startBlock": 22976393
+    },
+    {
+      "name": "BridgeV2-Wolves Of Wall Street",
+      "address": "0x3d8f74620857dd8ed6d0da02ceb13fd0ed8ba678",
+      "abi": "anyTOKEN",
+      "startBlock": 19564268
+    },
+    {
+      "name": "BridgeV2-MATIC",
+      "address": "0x40df1ae6074c35047bff66675488aa2f9f6384f3",
+      "abi": "anyTOKEN",
+      "startBlock": 19566881
+    },
+    {
+      "name": "BridgeV2-Staked FEED",
+      "address": "0x411f3e09c66b30e7facfec45cd823b2e19dfad2d",
+      "abi": "anyTOKEN",
+      "startBlock": 25680198
+    },
+    {
+      "name": "BridgeV2-Pepedex",
+      "address": "0x4272dd51961a5181ace0dc7eb6f9807311345559",
+      "abi": "anyTOKEN",
+      "startBlock": 2592400
+    },
+    {
+      "name": "BridgeV2-Metric.exchange",
+      "address": "0x44293e446d4fe519f177ee221055cb9e5dc4ac5b",
+      "abi": "anyTOKEN",
+      "startBlock": 20912611
+    },
+    {
+      "name": "BridgeV2-Hegic",
+      "address": "0x44b26e839eb3572c5e959f994804a5de66600349",
+      "abi": "anyTOKEN",
+      "startBlock": 2301257
+    },
+    {
+      "name": "BridgeV2-VesperToken",
+      "address": "0x461d52769884ca6235b685ef2040f47d30c94eb5",
+      "abi": "anyTOKEN",
+      "startBlock": 3666521
+    },
+    {
+      "name": "BridgeV2-Band",
+      "address": "0x46e7628e8b4350b2716ab470ee0ba1fa9e76c6c5",
+      "abi": "anyTOKEN",
+      "startBlock": 2301162
+    },
+    {
+      "name": "BridgeV2-Bat True Dollar",
+      "address": "0x4792c1ecb969b036eb51330c63bd27899a13d84e",
+      "abi": "anyTOKEN",
+      "startBlock": 7117462
+    },
+    {
+      "name": "BridgeV2-BelugaToken",
+      "address": "0x4a13a2cf881f5378def61e430139ed26d843df9a",
+      "abi": "anyTOKEN",
+      "startBlock": 18979224
+    },
+    {
+      "name": "BridgeV2-LunaChow",
+      "address": "0x4b6f0494b08d6f387b392cb9f56539b238de3367",
+      "abi": "anyTOKEN",
+      "startBlock": 22976786
+    },
+    {
+      "name": "BridgeV2-Fusion",
+      "address": "0x50eb82cc284e3d35936827023b048106aaecfc5f",
+      "abi": "anyTOKEN",
+      "startBlock": 1151225
+    },
+    {
+      "name": "BridgeV2-Propel",
+      "address": "0x5444c30210d8a0a156178cfb8048b4137c0d40d1",
+      "abi": "anyTOKEN",
+      "startBlock": 17081928
+    },
+    {
+      "name": "BridgeV2-Potluck Protocol Token",
+      "address": "0x546d10c1378febef063b72ae4865496ad801c386",
+      "abi": "anyTOKEN",
+      "startBlock": 16137056
+    },
+    {
+      "name": "BridgeV2-Synthetix Network",
+      "address": "0x56ee926bd8c72b2d5fa1af4d9e4cbb515a1e3adc",
+      "abi": "anyTOKEN",
+      "startBlock": 2301065
+    },
+    {
+      "name": "BridgeV2-Balancer",
+      "address": "0x58a547ed09684ac2a688610d5caf8e8968b51908",
+      "abi": "anyTOKEN",
+      "startBlock": 20237493
+    },
+    {
+      "name": "BridgeV2-Route",
+      "address": "0x58c1bbb508e96cfec1787acf6afe1c7008a5b064",
+      "abi": "anyTOKEN",
+      "startBlock": 17911357
+    },
+    {
+      "name": "BridgeV2-Feeder.finance",
+      "address": "0x5d5530eb3147152fe78d5c4bfeede054c8d1442a",
+      "abi": "anyTOKEN",
+      "startBlock": 20915959
+    },
+    {
+      "name": "BridgeV2-archangel",
+      "address": "0x5e2e2d3ee4944d0e6c0b663625859cf8cc45ca88",
+      "abi": "anyTOKEN",
+      "startBlock": 30428902
+    },
+    {
+      "name": "BridgeV2-Space Token",
+      "address": "0x5f7f94a1dd7b15594d17543beb8b30b111dd464c",
+      "abi": "anyTOKEN",
+      "startBlock": 20915840
+    },
+    {
+      "name": "BridgeV2-Unit Protocol",
+      "address": "0x602a3ad311e66b6f5e567a13016b712aba0625c6",
+      "abi": "anyTOKEN",
+      "startBlock": 2592398
+    },
+    {
+      "name": "BridgeV2-Cryptokek.com",
+      "address": "0x627524d78b4fc840c887ffec90563c7a42b671fd",
+      "abi": "anyTOKEN",
+      "startBlock": 2632785
+    },
+    {
+      "name": "BridgeV2-Octo.fi",
+      "address": "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c",
+      "abi": "anyTOKEN",
+      "startBlock": 3588075
+    },
+    {
+      "name": "BridgeV2-moda",
+      "address": "0x6496994241804d7fe2b032901931e03bcd82301f",
+      "abi": "anyTOKEN",
+      "startBlock": 22292649
+    },
+    {
+      "name": "BridgeV2-Cream",
+      "address": "0x657a1861c15a3ded9af0b6799a195a249ebdcbc6",
+      "abi": "anyTOKEN",
+      "startBlock": 2301224
+    },
+    {
+      "name": "BridgeV2-TETU Reward Token",
+      "address": "0x65c9d9d080714cda7b5d58989dc27f897f165179",
+      "abi": "anyTOKEN",
+      "startBlock": 22295113
+    },
+    {
+      "name": "BridgeV2-SHIBA INU",
+      "address": "0x65e66a61d0a8f1e686c2d6083ad611a10d84d97a",
+      "abi": "anyTOKEN",
+      "startBlock": 5892286
+    },
+    {
+      "name": "BridgeV2-Wootrade Network",
+      "address": "0x6626c47c00f1d87902fc13eecfac3ed06d5e8d8a",
+      "abi": "anyTOKEN",
+      "startBlock": 16653376
+    },
+    {
+      "name": "BridgeV2-Aave",
+      "address": "0x6a07a792ab2965c72a5b8088d3a069a7ac3a993b",
+      "abi": "anyTOKEN",
+      "startBlock": 2301053
+    },
+    {
+      "name": "BridgeV2-CyberFi Token",
+      "address": "0x6a545f9c64d8f7b957d8d2e6410b52095a9e6c29",
+      "abi": "anyTOKEN",
+      "startBlock": 2632796
+    },
+    {
+      "name": "BridgeV2-ZCore Finance",
+      "address": "0x6ed51c44d0a9e1c23f729fcd00b5a06051c502a5",
+      "abi": "anyTOKEN",
+      "startBlock": 13737513
+    },
+    {
+      "name": "BridgeV2-ChainLink Token",
+      "address": "0x6f43ff82cca38001b6699a8ac47a2d0e66939407",
+      "abi": "anyTOKEN",
+      "startBlock": 2146113
+    },
+    {
+      "name": "BridgeV2-eSwapping",
+      "address": "0x735abe48e8782948a37c7765ecb76b98cde97b0f",
+      "abi": "anyTOKEN",
+      "startBlock": 6338743
+    },
+    {
+      "name": "BridgeV2-Ethereum",
+      "address": "0x74b23882a30290451a17c44f4f05243b6b58c76d",
+      "abi": "anyTOKEN",
+      "startBlock": 2300940
+    },
+    {
+      "name": "BridgeV2-Vox.Finance",
+      "address": "0x74b4db963738a2a95bfcb1833b123495ccc220e2",
+      "abi": "anyTOKEN",
+      "startBlock": 17080761
+    },
+    {
+      "name": "BridgeV2-Badger",
+      "address": "0x753fbc5800a8c8e3fb6dc6415810d627a387dfc9",
+      "abi": "anyTOKEN",
+      "startBlock": 2632886
+    },
+    {
+      "name": "BridgeV2-wibBTC",
+      "address": "0x782617249085aa28a367feb49cf811434660cee5",
+      "abi": "anyTOKEN",
+      "startBlock": 27232319
+    },
+    {
+      "name": "BridgeV2-DFYN Token",
+      "address": "0x7a4b1abc1409c69c2ed71ab34dae43e2ff6f9928",
+      "abi": "anyTOKEN",
+      "startBlock": 17911560
+    },
+    {
+      "name": "BridgeV2-Billion Happiness",
+      "address": "0x7beb05cf5681f402e762f8569c2fc138a2172978",
+      "abi": "anyTOKEN",
+      "startBlock": 16654185
+    },
+    {
+      "name": "BridgeV2-Nexo",
+      "address": "0x7c598c96d02398d89fbcb9d41eab3df0c16f227d",
+      "abi": "anyTOKEN",
+      "startBlock": 4682429
+    },
+    {
+      "name": "BridgeV2-Pepemon",
+      "address": "0x8063115941e612021692f28748ab1ff56c23e4c6",
+      "abi": "anyTOKEN",
+      "startBlock": 2592402
+    },
+    {
+      "name": "BridgeV2-AtariToken",
+      "address": "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+      "abi": "anyTOKEN",
+      "startBlock": 3666405
+    },
+    {
+      "name": "BridgeV2-Frax Share",
+      "address": "0x82f8cb20c14f134fe6ebf7ac3b903b2117aafa62",
+      "abi": "anyTOKEN",
+      "startBlock": 2632920
+    },
+    {
+      "name": "BridgeV2-Wirex Token",
+      "address": "0x84ae7b0ff2bc523969fb3162e04149a419196f4b",
+      "abi": "anyTOKEN",
+      "startBlock": 22976607
+    },
+    {
+      "name": "BridgeV2-Bifrost",
+      "address": "0x84c882a4d8eb448ce086ea19418ca0f32f106117",
+      "abi": "anyTOKEN",
+      "startBlock": 2672950
+    },
+    {
+      "name": "BridgeV2-DefyCoinV2",
+      "address": "0x89d45ccdae300e9a2a725eec8ec76dda571d6e2b",
+      "abi": "anyTOKEN",
+      "startBlock": 16137285
+    },
+    {
+      "name": "BridgeV2-Statera",
+      "address": "0x89d5e71e275b4be094df9551627bcf4e3b24ce22",
+      "abi": "anyTOKEN",
+      "startBlock": 20636455
+    },
+    {
+      "name": "BridgeV2-Dai Stablecoin 2",
+      "address": "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e",
+      "abi": "anyTOKEN",
+      "startBlock": 2299245
+    },
+    {
+      "name": "BridgeV2-Zeedex",
+      "address": "0x8d34a11f49172c057d11833cf92aff97f28fc595",
+      "abi": "anyTOKEN",
+      "startBlock": 25677728
+    },
+    {
+      "name": "BridgeV2-DEAPCOIN",
+      "address": "0x8dfdc61c7c7551d0deec950a2822eb59cddb8f59",
+      "abi": "anyTOKEN",
+      "startBlock": 21619162
+    },
+    {
+      "name": "BridgeV2-Strudel BTC",
+      "address": "0x9049198f6b21acf1e050cfcf36a6879a07b0bbe4",
+      "abi": "anyTOKEN",
+      "startBlock": 24324518
+    },
+    {
+      "name": "BridgeV2-Leo Token",
+      "address": "0x90f615bb7b2def7bd14c507f90ff42b6acacf86e",
+      "abi": "anyTOKEN",
+      "startBlock": 21118999
+    },
+    {
+      "name": "BridgeV2-VideoCoin",
+      "address": "0x922d641a426dcffaef11680e5358f34d97d112e1",
+      "abi": "anyTOKEN",
+      "startBlock": 3666493
+    },
+    {
+      "name": "BridgeV2-UNION Protocol Governance Token",
+      "address": "0x92df60c51c710a1b1c20e42d85e221f3a1bfc7f2",
+      "abi": "anyTOKEN",
+      "startBlock": 36677675
+    },
+    {
+      "name": "BridgeV2-Luna",
+      "address": "0x95dd59343a893637be1c3228060ee6afbf6f0730",
+      "abi": "anyTOKEN",
+      "startBlock": 25199839
+    },
+    {
+      "name": "BridgeV2-PieDAO Balanced Crypto Pie",
+      "address": "0x9611579c926294b0e29e5371a81a3e463650be17",
+      "abi": "anyTOKEN",
+      "startBlock": 2632808
+    },
+    {
+      "name": "BridgeV2-Kishu Inu",
+      "address": "0x97513e975a7fa9072c72c92d8000b0db90b163c5",
+      "abi": "anyTOKEN",
+      "startBlock": 6900695
+    },
+    {
+      "name": "BridgeV2-EQUOS Origin",
+      "address": "0x97a80aca3f578e3119b132e9c3205406d7717cf4",
+      "abi": "anyTOKEN",
+      "startBlock": 17080399
+    },
+    {
+      "name": "BridgeV2-Yak Token",
+      "address": "0x985aa5568afb9306d9c3fb04b207f0b116631948",
+      "abi": "anyTOKEN",
+      "startBlock": 31111342
+    },
+    {
+      "name": "BridgeV2-TrueUSD",
+      "address": "0x9879abdea01a879644185341f7af7d8343556b7a",
+      "abi": "anyTOKEN",
+      "startBlock": 18987626
+    },
+    {
+      "name": "BridgeV2-Eggplant Finance",
+      "address": "0x99f7d752745f270e100233cc05768b4a12bd09f0",
+      "abi": "anyTOKEN",
+      "startBlock": 20915366
+    },
+    {
+      "name": "BridgeV2-KittenFinance",
+      "address": "0x9d3e3624b3de482331f4f091fd8b76d3f344bd8c",
+      "abi": "anyTOKEN",
+      "startBlock": 15461455
+    },
+    {
+      "name": "BridgeV2-OpenOcean",
+      "address": "0x9d8f97a3c2f9f397b6d46cbe2d39cc1d8cf19010",
+      "abi": "anyTOKEN",
+      "startBlock": 20912338
+    },
+    {
+      "name": "BridgeV2-SAVAGE Token",
+      "address": "0xa097c96acc9587d140ad8aeaac13d9db2c6cc07f",
+      "abi": "anyTOKEN",
+      "startBlock": 27927583
+    },
+    {
+      "name": "BridgeV2-AUTOv2",
+      "address": "0xa1150db5105987cec5fd092273d1e3cbb22b378b",
+      "abi": "anyTOKEN",
+      "startBlock": 18579010
+    },
+    {
+      "name": "BridgeV2-Flex Ungovernance Token",
+      "address": "0xa6e822e865fbe37d6ebc6d721947afbbd9f95c19",
+      "abi": "anyTOKEN",
+      "startBlock": 25677647
+    },
+    {
+      "name": "BridgeV2-Rai Reflex Index",
+      "address": "0xa71353bb71dda105d383b02fc2dd172c4d39ef8b",
+      "abi": "anyTOKEN",
+      "startBlock": 14316056
+    },
+    {
+      "name": "BridgeV2-WalletNow",
+      "address": "0xa9cad0165c155f3998b0001b3ef30bca0aa6b591",
+      "abi": "anyTOKEN",
+      "startBlock": 18979558
+    },
+    {
+      "name": "BridgeV2-0xMonero",
+      "address": "0xab41861399eb56896b24fbaabaa8bce45e4a626b",
+      "abi": "anyTOKEN",
+      "startBlock": 11645827
+    },
+    {
+      "name": "BridgeV2-HappinessToken",
+      "address": "0xac1f25aee575d35c668b0a4d336f20e3e92adcd2",
+      "abi": "anyTOKEN",
+      "startBlock": 17913225
+    },
+    {
+      "name": "BridgeV2-Eleven.finance",
+      "address": "0xacd7b3d9c10e97d0efa418903c0c7669e702e4c0",
+      "abi": "anyTOKEN",
+      "startBlock": 7209189
+    },
+    {
+      "name": "BridgeV2-BiFi",
+      "address": "0xad260f380c9a30b1d60e4548a75010ede630b665",
+      "abi": "anyTOKEN",
+      "startBlock": 2672941
+    },
+    {
+      "name": "BridgeV2-Sushi",
+      "address": "0xae75a438b2e0cb8bb01ec1e1e376de11d44477cc",
+      "abi": "anyTOKEN",
+      "startBlock": 2300973
+    },
+    {
+      "name": "BridgeV2-Frax",
+      "address": "0xaf319e5789945197e365e7f7fbfc56b130523b33",
+      "abi": "anyTOKEN",
+      "startBlock": 2366013
+    },
+    {
+      "name": "BridgeV2-Cover Protocol Governance",
+      "address": "0xb01e8419d842beebf1b70a7b5f7142abbaf7159d",
+      "abi": "anyTOKEN",
+      "startBlock": 2301197
+    },
+    {
+      "name": "BridgeV2-ChainLink",
+      "address": "0xb3654dc3d10ea7645f8319668e8f54d2574fbdc8",
+      "abi": "anyTOKEN",
+      "startBlock": 2301027
+    },
+    {
+      "name": "BridgeV2-ANY Ethereum",
+      "address": "0xb688e18f34e6e424c44b247318f22367ed7df3e2",
+      "abi": "anyTOKEN",
+      "startBlock": 1151172
+    },
+    {
+      "name": "BridgeV2-Refugees Token",
+      "address": "0xb808d767ddf0f61ca62331c1bbbebe0530b41079",
+      "abi": "anyTOKEN",
+      "startBlock": 31111168
+    },
+    {
+      "name": "BridgeV2-Inverse DAO",
+      "address": "0xb84527d59b6ecb96f433029ecc890d4492c5dce1",
+      "abi": "anyTOKEN",
+      "startBlock": 19564956
+    },
+    {
+      "name": "BridgeV2-Oh! Finance",
+      "address": "0xb8930bd2dd53d449f83466705827f3dbf90ea7fc",
+      "abi": "anyTOKEN",
+      "startBlock": 20913307
+    },
+    {
+      "name": "BridgeV2-Bishu Finance",
+      "address": "0xbb2ce458f78bc1e320e69fd568882f89be0d6bff",
+      "abi": "anyTOKEN",
+      "startBlock": 20913179
+    },
+    {
+      "name": "BridgeV2-Guardian",
+      "address": "0xbbb63f49fe75cd82513c4a3da2ec80dd36a8448f",
+      "abi": "anyTOKEN",
+      "startBlock": 32409644
+    },
+    {
+      "name": "BridgeV2-Font",
+      "address": "0xbbc4a8d076f4b1888fec42581b6fc58d242cf2d5",
+      "abi": "anyTOKEN",
+      "startBlock": 7959717
+    },
+    {
+      "name": "BridgeV2-ANY Litecoin",
+      "address": "0xbcacf1c62202a07e6107f250b788b10677045833",
+      "abi": "anyTOKEN",
+      "startBlock": 1398498
+    },
+    {
+      "name": "BridgeV2-MMToken",
+      "address": "0xbfaf328fe059c53d936876141f38089df0d1503d",
+      "abi": "anyTOKEN",
+      "startBlock": 2632914
+    },
+    {
+      "name": "BridgeV2-YFI-ERC20",
+      "address": "0xc396b190f251d7f79c583fd06347a09781f085c9",
+      "abi": "anyTOKEN",
+      "startBlock": 1152003
+    },
+    {
+      "name": "BridgeV2-BRToken",
+      "address": "0xc4bb7277a74678f053259cb1f96140347efbfd46",
+      "abi": "anyTOKEN",
+      "startBlock": 20915508
+    },
+    {
+      "name": "BridgeV2-Binance USD",
+      "address": "0xc931f61b1534eb21d8c11b24f3f5ab2471d4ab50",
+      "abi": "anyTOKEN",
+      "startBlock": 6901594
+    },
+    {
+      "name": "BridgeV2-yieldwatch",
+      "address": "0xc976be9ddbb3e2b2effd9af4845c38b6195dab71",
+      "abi": "anyTOKEN",
+      "startBlock": 29270774
+    },
+    {
+      "name": "BridgeV2-Wrapped STA",
+      "address": "0xceebde49ec95e21f7ee63c5c6f98cab3519570de",
+      "abi": "anyTOKEN",
+      "startBlock": 2632827
+    },
+    {
+      "name": "BridgeV2-Rari Governance Token",
+      "address": "0xcf726a06f3dcec8ef2b033336d138caa0eae5af2",
+      "abi": "anyTOKEN",
+      "startBlock": 2592394
+    },
+    {
+      "name": "BridgeV2-Woofy",
+      "address": "0xd0660cd418a64a1d44e9214ad8e459324d8157f1",
+      "abi": "anyTOKEN",
+      "startBlock": 6146773
+    },
+    {
+      "name": "BridgeV2-MEME Inu.",
+      "address": "0xd1790c5435b9fb7c9444c749cefe53d40d751eac",
+      "abi": "anyTOKEN",
+      "startBlock": 22976955
+    },
+    {
+      "name": "BridgeV2-Bison",
+      "address": "0xd2f38621c3c65300ecaba7020c05d1350f9c265c",
+      "abi": "anyTOKEN",
+      "startBlock": 18979754
+    },
+    {
+      "name": "BridgeV2-YEL Token",
+      "address": "0xd3b71117e6c1558c1553305b44988cd944e97300",
+      "abi": "anyTOKEN",
+      "startBlock": 10912879
+    },
+    {
+      "name": "BridgeV2-kogecoin.io",
+      "address": "0xd4d026322c88c2d49942a75dff920fcfbc5614c1",
+      "abi": "anyTOKEN",
+      "startBlock": 18979955
+    },
+    {
+      "name": "BridgeV2-Beefy.Finance",
+      "address": "0xd6070ae98b8069de6b494332d1a1a81b6179d960",
+      "abi": "anyTOKEN",
+      "startBlock": 6903757
+    },
+    {
+      "name": "BridgeV2-Binance",
+      "address": "0xd67de0e0a0fd7b15dc8348bb9be742f3c5850454",
+      "abi": "anyTOKEN",
+      "startBlock": 5893294
+    },
+    {
+      "name": "BridgeV2-Hakka Finance",
+      "address": "0xda803c6ad8078c51c5334b51aa4cc3f440d56d5f",
+      "abi": "anyTOKEN",
+      "startBlock": 38202824
+    },
+    {
+      "name": "BridgeV2-Anyswap",
+      "address": "0xddcb3ffd12750b45d32e084887fdf1aabab34239",
+      "abi": "anyTOKEN",
+      "startBlock": 1152379
+    },
+    {
+      "name": "BridgeV2-Launchpool token",
+      "address": "0xdf00960e0adfea78ee29da7fcca17cfdddc0a4ca",
+      "abi": "anyTOKEN",
+      "startBlock": 17080862
+    },
+    {
+      "name": "BridgeV2-Morphose Token",
+      "address": "0xe069af87450fb51fc0d0e044617f1c134163e591",
+      "abi": "anyTOKEN",
+      "startBlock": 13737775
+    },
+    {
+      "name": "BridgeV2-TerraUSD",
+      "address": "0xe2d27f06f63d98b8e11b38b5b08a75d0c8dd62b9",
+      "abi": "anyTOKEN",
+      "startBlock": 22793055
+    },
+    {
+      "name": "BridgeV2-PolyGaj Token",
+      "address": "0xe3eeda11f06a656fcaee19de663e84c7e61d3cac",
+      "abi": "anyTOKEN",
+      "startBlock": 17081809
+    },
+    {
+      "name": "BridgeV2-Modefi",
+      "address": "0xe64b9fd040d1f9d4715c645e0d567ef69958d3d9",
+      "abi": "anyTOKEN",
+      "startBlock": 2592388
+    },
+    {
+      "name": "BridgeV2-Gemini dollar",
+      "address": "0xe6f658118bcc6d344c812826b1af13bd7d59956c",
+      "abi": "anyTOKEN",
+      "startBlock": 12193079
+    },
+    {
+      "name": "BridgeV2-Lory Token",
+      "address": "0xe84cea9df2d6a6010c0bd74b803f6372534e75e9",
+      "abi": "anyTOKEN",
+      "startBlock": 25680344
+    },
+    {
+      "name": "BridgeV2-Nord Token",
+      "address": "0xeaf26191ac1d35ae30baa19a5ad5558dd8156aef",
+      "abi": "anyTOKEN",
+      "startBlock": 2632854
+    },
+    {
+      "name": "BridgeV2-Sheesha Finance",
+      "address": "0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
+      "abi": "anyTOKEN",
+      "startBlock": 3666439
+    },
+    {
+      "name": "BridgeV2-JulSwap",
+      "address": "0xeff6fcfbc2383857dd66ddf57efffc00d58b7d9d",
+      "abi": "anyTOKEN",
+      "startBlock": 20245682
+    },
+    {
+      "name": "BridgeV2-IceToken",
+      "address": "0xf16e81dce15b08f326220742020379b855b87df9",
+      "abi": "anyTOKEN",
+      "startBlock": 3040314
+    },
+    {
+      "name": "BridgeV2-Million",
+      "address": "0xf1b9c667a53a800b48b55b14f7612d2638607288",
+      "abi": "anyTOKEN",
+      "startBlock": 19564454
+    },
+    {
+      "name": "BridgeV2-Dai Stablecoin",
+      "address": "0xf5c8054efc6acd25f31a17963462b90e82fdecad",
+      "abi": "anyTOKEN",
+      "startBlock": 2270225
+    },
+    {
+      "name": "BridgeV2-Levolution.io Token",
+      "address": "0xf8a363cf116b6b633faedf66848ed52895ce703b",
+      "abi": "anyTOKEN",
+      "startBlock": 27729869
+    },
+    {
+      "name": "BridgeV2-MakiSwap",
+      "address": "0xfa0ca21da6a94623d953034f140372613f102346",
+      "abi": "anyTOKEN",
+      "startBlock": 20717513
+    },
+    {
+      "name": "BridgeV2-Stone Token",
+      "address": "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+      "abi": "anyTOKEN",
+      "startBlock": 3666365
+    },
+    {
+      "name": "BridgeV2-miMATIC",
+      "address": "0xfb98b335551a418cd0737375a2ea0ded62ea213b",
+      "abi": "anyTOKEN",
+      "startBlock": 16653942
+    }
+  ],
+  "routers": [
+    {
+      "name": "RouterV3",
+      "address": "0xf3Ce95Ec61114a4b1bFC615C16E6726015913CCC",
+      "abi": "Router",
+      "startBlock": 20338764
+    },
+    {
+      "name": "RouterV4 2",
+      "address": "0xb576C9403f39829565BD6051695E2AC7Ecf850E2",
+      "abi": "Router",
+      "startBlock": 16715076
+    },
+    {
+      "name": "RouterV4 3",
+      "address": "0x1CcCA1cE62c62F7Be95d4A67722a8fDbed6EEcb4",
+      "abi": "Router",
+      "startBlock": 8475644
+    },
+    {
+      "name": "RouterV6",
+      "address": "0x0B23341fA1Da0171f52aA8Ef85f3946b44d35ac0",
+      "abi": "Router",
+      "startBlock": 37978260
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

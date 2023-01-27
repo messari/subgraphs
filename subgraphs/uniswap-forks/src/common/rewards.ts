@@ -280,7 +280,7 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("12.5");
   } else if (NetworkConfigs.getNetwork() == Network.MATIC) {
     return BigDecimal.fromString("2");
-  } else if (NetworkConfigs.getNetwork() == Network.XDAI) {
+  } else if (NetworkConfigs.getNetwork() == Network.GNOSIS) {
     return BigDecimal.fromString("5");
   } else if (NetworkConfigs.getNetwork() == Network.MOONBEAM) {
     return BigDecimal.fromString("13.39");

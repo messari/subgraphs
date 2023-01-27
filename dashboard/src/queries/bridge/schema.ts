@@ -25,6 +25,7 @@ export const schema100 = (): Schema => {
   const entitiesData = {
     financialsDailySnapshots: {
       id: "ID!",
+      day: "BigInt!",
       totalValueLockedUSD: "BigDecimal!",
       dailySupplySideRevenueUSD: "BigDecimal!",
       cumulativeSupplySideRevenueUSD: "BigDecimal!",
@@ -42,6 +43,7 @@ export const schema100 = (): Schema => {
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
+      day: "BigInt!",
       cumulativeUniqueUsers: "Int!",
       cumulativeUniqueTransferSenders: "Int!",
       cumulativeUniqueTransferReceivers: "Int!",
@@ -75,6 +77,7 @@ export const schema100 = (): Schema => {
     },
     poolDailySnapshots: {
       id: "ID!",
+      day: "BigInt!",
       totalValueLockedUSD: "BigDecimal!",
       cumulativeSupplySideRevenueUSD: "BigDecimal!",
       dailySupplySideRevenueUSD: "BigDecimal!",
@@ -105,6 +108,7 @@ export const schema100 = (): Schema => {
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
+      hour: "BigInt!",
       cumulativeUniqueUsers: "Int!",
       hourlyActiveUsers: "Int!",
       cumulativeUniqueTransferSenders: "Int!",
@@ -133,6 +137,7 @@ export const schema100 = (): Schema => {
     },
     poolHourlySnapshots: {
       id: "ID!",
+      hour: "Int!",
       totalValueLockedUSD: "BigDecimal!",
       cumulativeSupplySideRevenueUSD: "BigDecimal!",
       hourlySupplySideRevenueUSD: "BigDecimal!",

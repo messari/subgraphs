@@ -10,13 +10,14 @@ features:
   - grafting
 {{/graftEnabled}}
 dataSources:
+  {{#booster}}
   - kind: ethereum
-    name: Booster
+    name: {{ name }}
     network: {{ network }}
     source:
-      address: "0x7818A1DA7BD1E64c199029E86Ba244a9798eEE10"
-      abi: Booster
-      startBlock: 14932175
+      address: "{{ address }}"
+      abi: {{ abi }}
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -111,6 +112,7 @@ dataSources:
         - event: FeesUpdated(uint256,uint256,uint256,uint256)
           handler: handleFeesUpdated
       file: {{{ file }}}
+  {{/booster}}
 templates:
   - name: RewardPool
     kind: ethereum

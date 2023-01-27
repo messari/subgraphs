@@ -1,6 +1,6 @@
 # Subgraph Schema: DEX AMM (Extended)
-# Version: 2.0.0
-# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
+# Version: 3.0.4
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
   ARBITRUM_ONE
@@ -23,7 +23,7 @@ enum Network {
   OPTIMISM
   OSMOSIS
   MATIC # aka Polygon
-  XDAI # aka Gnosis Chain
+  GNOSIS
 }
 
 enum ProtocolType {
@@ -35,9 +35,21 @@ enum ProtocolType {
   # Will add more
 }
 
+enum TokenType {
+  MULTIPLE
+  UNKNOWN
+  ERC20
+  ERC721
+  ERC1155
+  BEP20
+  BEP721
+  BEP1155
+  # Will add more
+}
+
 type Token @entity {
   " Smart contract address of the token "
-  id: ID!
+  id: Bytes!
 
   " Name of the token, mirrored from the smart contract "
   name: String!
@@ -63,9 +75,9 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity {
+type RewardToken @entity(immutable: true) {
   " { Reward token type }-{ Smart contract address of the reward token } "
-  id: ID!
+  id: Bytes!
 
   " Reference to the actual token "
   token: Token!
@@ -109,7 +121,7 @@ enum LiquidityPoolFeeType {
 
 type LiquidityPoolFee @entity {
   " { Fee type }-{ Pool address } "
-  id: ID!
+  id: Bytes!
 
   " Fee as a percentage of the trade (swap) amount. Does not always apply "
   feePercentage: BigDecimal
@@ -124,7 +136,7 @@ type LiquidityPoolFee @entity {
 
 interface Protocol {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: ID!
+  id: Bytes!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
@@ -186,7 +198,7 @@ interface Protocol {
 
 type DexAmmProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: ID!
+  id: Bytes!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
@@ -213,6 +225,18 @@ type DexAmmProtocol implements Protocol @entity {
 
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
+
+  " The sum of all active and non-active liquidity in USD for this pool. "
+  totalLiquidityUSD: BigDecimal!
+
+  " All liquidity in USD that is active. Will be equal to totalLiquidity except for in concentrated liquidity - where activeLiquidity is all liquidity positions that contain the pools current tick. "
+  activeLiquidityUSD: BigDecimal!
+
+  " All protocol-side value locking in USD that remains uncollected and unused in the protocol. "
+  uncollectedProtocolSideValueUSD: BigDecimal!
+
+  " All supply-side value locking in USD that remains uncollected and unused in the protocol. "
+  uncollectedSupplySideValueUSD: BigDecimal!
 
   " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
   protocolControlledValueUSD: BigDecimal
@@ -247,6 +271,15 @@ type DexAmmProtocol implements Protocol @entity {
   " Total number of positions (open and closed) "
   cumulativePositionCount: Int!
 
+  " Day ID of the most recent daily snapshot "
+  lastSnapshotDayID: Int!
+
+  " Timestamp of the last time this entity was updated "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the last time this entity was updated "
+  lastUpdateBlockNumber: BigInt!
+
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -272,7 +305,10 @@ type DexAmmProtocol implements Protocol @entity {
 
 type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
-  id: ID!
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  day: Int!
 
   " Protocol this snapshot is associated with "
   protocol: DexAmmProtocol!
@@ -289,27 +325,28 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of pools "
   totalPoolCount: Int!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
+  " Total number of deposits (add liquidity) in an day "
+  dailyDepositCount: Int!
 
-  " Timestamp of this snapshot "
+  " Total number of withdrawals (remove liquidity) in an day "
+  dailyWithdrawCount: Int!
+
+  " Total number of trades (swaps) in an day "
+  dailySwapCount: Int!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
   timestamp: BigInt!
 
-  #### Statistics #####
-
-  " Statistics around swap events "
-  swapStats: Stat!
-
-  " Statistics around deposit events "
-  depositStats: Stat!
-
-  " Statistics around withdraw events "
-  withdrawStats: Stat!
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
 }
 
 type UsageMetricsHourlySnapshot @entity {
   " { # of hours since Unix epoch time } "
-  id: ID!
+  id: Bytes!
+
+  " Number of hours since Unix epoch time "
+  hour: Int!
 
   " Protocol this snapshot is associated with "
   protocol: DexAmmProtocol!
@@ -332,22 +369,37 @@ type UsageMetricsHourlySnapshot @entity {
   " Total number of trades (swaps) in an hour "
   hourlySwapCount: Int!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
   timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
 }
 
-type FinancialsDailySnapshot @entity {
+type FinancialsDailySnapshot @entity(immutable: true) {
   " ID is # of days since Unix epoch time "
-  id: ID!
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  day: Int!
 
   " Protocol this snapshot is associated with "
   protocol: DexAmmProtocol!
 
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
+
+  " The sum of all active and non-active liquidity in USD for this pool. "
+  totalLiquidityUSD: BigDecimal!
+
+  " All liquidity in USD that is active. Will be equal to totalLiquidity except for in concentrated liquidity - where activeLiquidity is all liquidity positions that contain the pools current tick. "
+  activeLiquidityUSD: BigDecimal!
+
+  " All protocol-side value locking in USD that remains uncollected and unused in the protocol. "
+  uncollectedProtocolSideValueUSD: BigDecimal!
+
+  " All supply-side value locking in USD that remains uncollected and unused in the protocol. "
+  uncollectedSupplySideValueUSD: BigDecimal!
 
   " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
   protocolControlledValueUSD: BigDecimal
@@ -376,11 +428,11 @@ type FinancialsDailySnapshot @entity {
   " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
   cumulativeTotalRevenueUSD: BigDecimal!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
   timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
 }
 
 ###############################
@@ -389,7 +441,7 @@ type FinancialsDailySnapshot @entity {
 
 type LiquidityPool @entity {
   " Smart contract address of the pool "
-  id: ID!
+  id: Bytes!
 
   " The protocol this pool belongs to "
   protocol: DexAmmProtocol!
@@ -400,13 +452,16 @@ type LiquidityPool @entity {
   " Symbol of liquidity pool (e.g. 3CRV) "
   symbol: String
 
+  " Token that is to represent ownership of liquidity "
+  liquidityToken: Token
+
+  " Type of token used to track liquidity "
+  liquidityTokenType: TokenType
+
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
 
-  " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
-
-  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  " Additional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
   " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
@@ -423,8 +478,35 @@ type LiquidityPool @entity {
 
   ##### Quantitative Data #####
 
+  " Current tick representing the price of token0/token1 "
+  tick: BigInt
+
   " Current TVL (Total Value Locked) of this pool in USD "
   totalValueLockedUSD: BigDecimal!
+
+  " The sum of all active and non-active liquidity for this pool. "
+  totalLiquidity: BigInt!
+
+  " The sum of all active and non-active liquidity in USD for this pool. "
+  totalLiquidityUSD: BigDecimal!
+
+  " All liquidity `k` that is active. Will be equal to totalLiquidity except for in concentrated liquidity - where activeLiquidity is all liquidity positions that contain the pools current tick. "
+  activeLiquidity: BigInt!
+
+  " All liquidity in USD that is active. Will be equal to totalLiquidity except for in concentrated liquidity - where activeLiquidity is all liquidity positions that contain the pools current tick. "
+  activeLiquidityUSD: BigDecimal!
+
+  " All protocol-side value locked in token amounts that remains uncollected and unused in the pool. "
+  uncollectedProtocolSideTokenAmounts: [BigInt!]!
+
+  " All protocol-side value locking in USD that remains uncollected and unused in the pool. "
+  uncollectedProtocolSideValuesUSD: [BigDecimal!]!
+
+  " All supply-side value locked in token amounts that remains uncollected and unused in the pool. "
+  uncollectedSupplySideTokenAmounts: [BigInt!]!
+
+  " All supply-side value locked in USD that remains uncollected and unused in the pool. "
+  uncollectedSupplySideValuesUSD: [BigDecimal!]!
 
   " All revenue generated by the liquidity pool, accrued to the supply side. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
@@ -435,20 +517,23 @@ type LiquidityPool @entity {
   " All revenue generated by the liquidity pool. "
   cumulativeTotalRevenueUSD: BigDecimal!
 
+  " All trade volume occurred for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeTokenAmounts: [BigInt!]!
+
+  " All trade volume occurred for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumesUSD: [BigDecimal!]!
+
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
+  " Amount of input tokens in USD in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalancesUSD: [BigDecimal!]!
+
   " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
-
-  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
 
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   stakedOutputTokenAmount: BigInt
@@ -458,6 +543,15 @@ type LiquidityPool @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Total number of deposits (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
 
   ##### Account/Position Data #####
 
@@ -472,6 +566,18 @@ type LiquidityPool @entity {
 
   " Number of closed positions in this market "
   closedPositionCount: Int!
+
+  " Day ID of the most recent daily snapshot "
+  lastSnapshotDayID: Int!
+
+  " Hour ID of the most recent hourly snapshot "
+  lastSnapshotHourID: Int!
+
+  " Timestamp of the last time this entity was updated "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the last time this entity was updated "
+  lastUpdateBlockNumber: BigInt!
 
   ##### Snapshots #####
 
@@ -497,9 +603,12 @@ type LiquidityPool @entity {
 ##### Pool-Level Timeseries #####
 #################################
 
-type LiquidityPoolDailySnapshot @entity {
+type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
-  id: ID!
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  day: Int!
 
   " The protocol this snapshot belongs to "
   protocol: DexAmmProtocol!
@@ -507,16 +616,37 @@ type LiquidityPoolDailySnapshot @entity {
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
-
   ##### Quantitative Data #####
+
+  " Current tick representing the price of token0/token1 "
+  tick: BigInt
 
   " Current TVL (Total Value Locked) of this pool "
   totalValueLockedUSD: BigDecimal!
+
+  " The sum of all active and non-active liquidity for this pool. "
+  totalLiquidity: BigInt!
+
+  " The sum of all active and non-active liquidity in USD for this pool. "
+  totalLiquidityUSD: BigDecimal!
+
+  " All liquidity `k` that is active. Will be equal to totalLiquidity except for in concentrated liquidity - where activeLiquidity is all liquidity positions that contain the pools current tick. "
+  activeLiquidity: BigInt!
+
+  " All liquidity in USD that is active. Will be equal to totalLiquidity except for in concentrated liquidity - where activeLiquidity is all liquidity positions that contain the pools current tick. "
+  activeLiquidityUSD: BigDecimal!
+
+  " All protocol-side value locked in token amounts that remains uncollected and unused in the pool. "
+  uncollectedProtocolSideTokenAmounts: [BigInt!]!
+
+  " All protocol-side value locking in USD that remains uncollected and unused in the pool. "
+  uncollectedProtocolSideValuesUSD: [BigDecimal!]!
+
+  " All supply-side value locked in token amounts that remains uncollected and unused in the pool. "
+  uncollectedSupplySideTokenAmounts: [BigInt!]!
+
+  " All supply-side value locked in USD that remains uncollected and unused in the pool. "
+  uncollectedSupplySideValuesUSD: [BigDecimal!]!
 
   " All revenue generated by the liquidity pool, accrued to the supply side. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
@@ -536,29 +666,32 @@ type LiquidityPoolDailySnapshot @entity {
   " Daily revenue generated by the liquidity pool. "
   dailyTotalRevenueUSD: BigDecimal!
 
-  " All trade volume occurred in a given day, in USD "
-  dailyVolumeUSD: BigDecimal!
-
-  " All trade volume occurred in a given day for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  dailyVolumeByTokenAmount: [BigInt!]!
-
-  " All trade volume occurred in a given day for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  dailyVolumeByTokenUSD: [BigDecimal!]!
-
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
+
+  " All trade volume occurred in a given day, in USD "
+  dailyTotalVolumeUSD: BigDecimal!
+
+  " All trade volume , in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeTokenAmounts: [BigInt!]!
+
+  " All trade volume occurred in a given day for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyVolumeTokenAmounts: [BigInt!]!
+
+  " All trade volume, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumesUSD: [BigDecimal!]!
+
+  " All trade volume occurred in a given day for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyVolumesUSD: [BigDecimal!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
+  " Amount of input tokens in USD in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalancesUSD: [BigDecimal!]!
+
   " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
-
-  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
 
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   stakedOutputTokenAmount: BigInt
@@ -569,21 +702,48 @@ type LiquidityPoolDailySnapshot @entity {
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
-  #### Statistics #####
+  " Total number of deposits (add liquidity) "
+  cumulativeDepositCount: Int!
 
-  " Statistics around swap events "
-  swapStats: Stat!
+  " Total number of deposits (add liquidity) in a day "
+  dailyDepositCount: Int!
 
-  " Statistics around deposit events "
-  depositStats: Stat!
+  " Total number of withdrawals (remove liquidity) "
+  cumulativeWithdrawCount: Int!
 
-  " Statistics around withdraw events "
-  withdrawStats: Stat!
+  " Total number of withdrawals (remove liquidity) in a day "
+  dailyWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
+
+  " Total number of trades (swaps) in a day "
+  dailySwapCount: Int!
+
+  ##### Account/Position Data #####
+
+  " Number of positions in this market "
+  positionCount: Int!
+
+  " Number of open positions in this market "
+  openPositionCount: Int!
+
+  " Number of closed positions in this market "
+  closedPositionCount: Int!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
 }
 
-type LiquidityPoolHourlySnapshot @entity {
+type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
-  id: ID!
+  id: Bytes!
+
+  " Number of hours since Unix epoch time "
+  hour: Int!
 
   " The protocol this snapshot belongs to "
   protocol: DexAmmProtocol!
@@ -591,16 +751,37 @@ type LiquidityPoolHourlySnapshot @entity {
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
-
   ##### Quantitative Data #####
+
+  " Current tick representing the price of token0/token1 "
+  tick: BigInt
 
   " Current TVL (Total Value Locked) of this pool "
   totalValueLockedUSD: BigDecimal!
+
+  " The sum of all active and non-active liquidity for this pool. "
+  totalLiquidity: BigInt!
+
+  " The sum of all active and non-active liquidity in USD for this pool. "
+  totalLiquidityUSD: BigDecimal!
+
+  " All liquidity `k` that is active. Will be equal to totalLiquidity except for in concentrated liquidity - where activeLiquidity is all liquidity positions that contain the pools current tick. "
+  activeLiquidity: BigInt!
+
+  " All liquidity in USD that is active. Will be equal to totalLiquidity except for in concentrated liquidity - where activeLiquidity is all liquidity positions that contain the pools current tick. "
+  activeLiquidityUSD: BigDecimal!
+
+  " All protocol-side value locked in token amounts that remains uncollected and unused in the pool. "
+  uncollectedProtocolSideTokenAmounts: [BigInt!]!
+
+  " All protocol-side value locking in USD that remains uncollected and unused in the pool. "
+  uncollectedProtocolSideValuesUSD: [BigDecimal!]!
+
+  " All supply-side value locked in token amounts that remains uncollected and unused in the pool. "
+  uncollectedSupplySideTokenAmounts: [BigInt!]!
+
+  " All supply-side value locked in USD that remains uncollected and unused in the pool. "
+  uncollectedSupplySideValuesUSD: [BigDecimal!]!
 
   " All revenue generated by the liquidity pool, accrued to the supply side. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
@@ -620,29 +801,32 @@ type LiquidityPoolHourlySnapshot @entity {
   " Hourly revenue generated by the liquidity pool. "
   hourlyTotalRevenueUSD: BigDecimal!
 
-  " All trade volume occurred in a given hour, in USD "
-  hourlyVolumeUSD: BigDecimal!
-
-  " All trade volume occurred in a given hour for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyVolumeByTokenAmount: [BigInt!]!
-
-  " All trade volume occurred in a given hour for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  hourlyVolumeByTokenUSD: [BigDecimal!]!
-
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
+
+  " All trade volume occurred in a given day, in USD "
+  hourlyTotalVolumeUSD: BigDecimal!
+
+  " All trade volume , in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeTokenAmounts: [BigInt!]!
+
+  " All trade volume occurred in a given day for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyVolumeTokenAmounts: [BigInt!]!
+
+  " All trade volume, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumesUSD: [BigDecimal!]!
+
+  " All trade volume occurred in a given day for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyVolumesUSD: [BigDecimal!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
+  " Amount of input tokens in USD in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalancesUSD: [BigDecimal!]!
+
   " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
-
-  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
 
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   stakedOutputTokenAmount: BigInt
@@ -652,6 +836,157 @@ type LiquidityPoolHourlySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Total number of deposits (add liquidity) "
+  cumulativeDepositCount: Int!
+
+  " Total number of deposits (add liquidity) in an hour "
+  hourlyDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) "
+  cumulativeWithdrawCount: Int!
+
+  " Total number of withdrawals (remove liquidity) in an hour "
+  hourlyWithdrawCount: Int!
+
+  " Total number of trades (swaps) "
+  cumulativeSwapCount: Int!
+
+  " Total number of trades (swaps) in an hour "
+  hourlySwapCount: Int!
+
+  ##### Account/Position Data #####
+
+  " Number of positions in this market "
+  positionCount: Int!
+
+  " Number of open positions in this market "
+  openPositionCount: Int!
+
+  " Number of closed positions in this market "
+  closedPositionCount: Int!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
+}
+
+####################################
+##### Pool Tick-Level Metadata #####
+####################################
+
+type Tick @entity {
+  " { pool address }-{ tick index } "
+  id: Bytes!
+
+  " tick index "
+  index: BigInt!
+
+  " Liquidity pool this tick belongs to "
+  pool: LiquidityPool!
+
+  " Creation timestamp "
+  createdTimestamp: BigInt!
+
+  " Creation block number "
+  createdBlockNumber: BigInt!
+
+  " calculated price of token0 of tick within this pool - constant "
+  prices: [BigDecimal!]!
+
+  " total liquidity pool has as tick lower or upper "
+  liquidityGross: BigInt!
+
+  " total liquidity in USD pool has as tick lower or upper "
+  liquidityGrossUSD: BigDecimal!
+
+  " how much liquidity changes when tick crossed "
+  liquidityNet: BigInt!
+
+  " how much liquidity in USD changes when tick crossed "
+  liquidityNetUSD: BigDecimal!
+
+  " Day ID of the most recent daily snapshot "
+  lastSnapshotDayID: Int!
+
+  " Hour ID of the most recent hourly snapshot "
+  lastSnapshotHourID: Int!
+
+  " Timestamp of the last time this entity was updated "
+  lastUpdateTimestamp: BigInt!
+
+  " Block number of the last time this entity was updated "
+  lastUpdateBlockNumber: BigInt!
+}
+
+#######################################
+##### Pool Tick-Level Time Series #####
+#######################################
+
+type TickDailySnapshot @entity(immutable: true) {
+  " { pool address }-{ tick index }-{ day ID } "
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  day: Int!
+
+  " tick index "
+  tick: Tick!
+
+  " liquidity pool this tick belongs to "
+  pool: LiquidityPool!
+
+  " total liquidity pool has as tick lower or upper "
+  liquidityGross: BigInt!
+
+  " total liquidity in USD pool has as tick lower or upper "
+  liquidityGrossUSD: BigDecimal!
+
+  " how much liquidity changes when tick crossed "
+  liquidityNet: BigInt!
+
+  " how much liquidity in USD changes when tick crossed "
+  liquidityNetUSD: BigDecimal!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
+}
+
+type TickHourlySnapshot @entity(immutable: true) {
+  " { pool address }-{ tick index }-{ hour ID } "
+  id: Bytes!
+
+  " Number of hours since Unix epoch time "
+  hour: Int!
+
+  " tick index "
+  tick: Tick!
+
+  " liquidity pool this tick belongs to "
+  pool: LiquidityPool!
+
+  " total liquidity pool has as tick lower or upper "
+  liquidityGross: BigInt!
+
+  " total liquidity in USD pool has as tick lower or upper "
+  liquidityGrossUSD: BigDecimal!
+
+  " how much liquidity changes when tick crossed "
+  liquidityNet: BigInt!
+
+  " how much liquidity in USD changes when tick crossed "
+  liquidityNetUSD: BigDecimal!
+
+  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  timestamp: BigInt!
+
+  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
+  blockNumber: BigInt!
 }
 
 ##############################
@@ -660,7 +995,7 @@ type LiquidityPoolHourlySnapshot @entity {
 
 type Account @entity {
   " { Account address } "
-  id: ID!
+  id: Bytes!
 
   " Number of positions this account has "
   positionCount: Int!
@@ -695,7 +1030,7 @@ type Account @entity {
 
 type Position @entity {
   " { Account address }-{ Market address }-{ Count } "
-  id: ID!
+  id: Bytes!
 
   " Account that owns this position "
   account: Account!
@@ -704,10 +1039,10 @@ type Position @entity {
   pool: LiquidityPool!
 
   " The hash of the transaction that opened this position "
-  hashOpened: String!
+  hashOpened: Bytes!
 
   " The hash of the transaction that closed this position "
-  hashClosed: String
+  hashClosed: Bytes
 
   " Block number of when the position was opened "
   blockNumberOpened: BigInt!
@@ -721,14 +1056,38 @@ type Position @entity {
   " Timestamp when the position was closed (0 if still open) "
   timestampClosed: BigInt
 
-  " Input token balances in this position, in native amounts "
-  inputTokenBalances: [BigInt!]!
+  " lower tick of the position "
+  tickLower: Tick
 
-  " Output token balance in this position, in native amounts "
-  outputTokenBalance: BigInt
+  " upper tick of the position "
+  tickUpper: Tick
 
-  " Total reward token accumulated under this position, in native amounts "
-  cumulativeRewardTokenAmounts: [BigInt!]
+  " Token that is to represent ownership of liquidity "
+  liquidityToken: Token
+
+  " Type of token used to track liquidity "
+  liquidityTokenType: TokenType
+
+  " total position liquidity "
+  liquidity: BigInt!
+
+  " total position liquidity in USD "
+  liquidityUSD: BigDecimal!
+
+  " amount of tokens ever deposited to position "
+  cumulativeDepositTokenAmounts: [BigInt!]!
+
+  " amount of tokens in USD deposited to position "
+  cumulativeDepositUSD: BigDecimal!
+
+  " amount of tokens ever withdrawn from position (without fees) "
+  cumulativeWithdrawTokenAmounts: [BigInt!]!
+
+  " amount of tokens in USD withdrawn from position (without fees) "
+  cumulativeWithdrawUSD: BigDecimal!
+
+  " Total reward token accumulated under this position, in USD "
+  cumulativeRewardUSD: [BigInt!]
 
   " Number of deposits related to this position "
   depositCount: Int!
@@ -752,12 +1111,12 @@ type Position @entity {
 # for positions that are not moving. As we are only recording the balance
 # in token amounts instead of in USD, this will work well.
 # Note that we only take snapshot for open positions
-type PositionSnapshot @entity {
+type PositionSnapshot @entity(immutable: true) {
   " { Position ID }-{ Transaction hash }-{ Log index } "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that triggered this snapshot "
-  hash: String!
+  hash: Bytes!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
@@ -768,19 +1127,43 @@ type PositionSnapshot @entity {
   " Position of this snapshot "
   position: Position!
 
-  " Input token balances in this position, in native amounts "
-  inputTokenBalances: [BigInt!]!
+  " Type of token used to track liquidity "
+  liquidityTokenType: TokenType
 
-  " Output token balance in this position, in native amounts "
-  outputTokenBalance: BigInt
+  " total position liquidity "
+  liquidity: BigInt
+
+  " total position liquidity in USD "
+  liquidityUSD: BigDecimal
+
+  " amount of tokens ever deposited to position "
+  cumulativeDepositTokenAmounts: [BigInt!]!
+
+  " amount of tokens in USD deposited to position "
+  cumulativeDepositUSD: BigDecimal!
+
+  " amount of tokens ever withdrawn from position (without fees) "
+  cumulativeWithdrawTokenAmounts: [BigInt!]!
+
+  " amount of tokens in USD withdrawn from position (without fees) "
+  cumulativeWithdrawUSD: BigDecimal!
 
   " Total reward token accumulated under this position, in native amounts "
   cumulativeRewardTokenAmounts: [BigInt!]
 
-  " Block number of this snapshot "
+  " Total reward token accumulated under this position, in USD "
+  cumulativeRewardUSD: [BigInt!]
+
+  " Number of deposits related to this position "
+  depositCount: Int!
+
+  " Number of withdrawals related to this position "
+  withdrawCount: Int!
+
+  " Timestamp of when this snapshot was taken "
   blockNumber: BigInt!
 
-  " Timestamp of this snapshot "
+  " Timestamp of when this snapshot was taken "
   timestamp: BigInt!
 }
 
@@ -796,12 +1179,12 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-type Deposit @entity {
-  " deposit-{ Transaction hash }-{ Log index } "
-  id: ID!
+type Deposit @entity(immutable: true) {
+  " { Transaction hash }-{ Log index } "
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Nonce of the transaction that emitted this event "
   nonce: BigInt!
@@ -810,10 +1193,13 @@ type Deposit @entity {
   logIndex: Int!
 
   " Gas limit of the transaction that emitted this event "
-  gasLimit: BigInt!
+  gasLimit: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas price of the transaction that emitted this event "
-  gasPrice: BigInt!
+  gasPrice: BigInt
 
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
@@ -822,10 +1208,16 @@ type Deposit @entity {
   account: Account!
 
   " The user position changed by this event "
-  position: Position!
+  position: Position
 
   " The pool involving this event "
   pool: LiquidityPool!
+
+  " lower tick of position "
+  tickLower: BigInt
+
+  " upper tick of position "
+  tickUpper: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -833,28 +1225,25 @@ type Deposit @entity {
   " Timestamp of this event "
   timestamp: BigInt!
 
+  " Amount of liquidity minted "
+  liquidity: BigInt!
+
   " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
   inputTokens: [Token!]!
 
-  " Output token of the pool. E.g. the UNI-LP token "
-  outputToken: Token
-
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
-
-  " Amount of output tokens in the token's native unit "
-  outputTokenAmount: BigInt
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
 }
 
-type Withdraw @entity {
-  " withdraw-{ Transaction hash }-{ Log index }"
-  id: ID!
+type Withdraw @entity(immutable: true) {
+  " { Transaction hash }-{ Log index }"
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Nonce of the transaction that emitted this event "
   nonce: BigInt!
@@ -863,10 +1252,13 @@ type Withdraw @entity {
   logIndex: Int!
 
   " Gas limit of the transaction that emitted this event "
-  gasLimit: BigInt!
+  gasLimit: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas price of the transaction that emitted this event "
-  gasPrice: BigInt!
+  gasPrice: BigInt
 
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
@@ -875,7 +1267,13 @@ type Withdraw @entity {
   account: Account!
 
   " The user position changed by this event "
-  position: Position!
+  position: Position
+
+  " lower tick of position "
+  tickLower: BigInt
+
+  " upper tick of position "
+  tickUpper: BigInt
 
   " The pool involving this event "
   pool: LiquidityPool!
@@ -886,28 +1284,25 @@ type Withdraw @entity {
   " Timestamp of this event "
   timestamp: BigInt!
 
+  " Amount of liquidity burned "
+  liquidity: BigInt!
+
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
 
-  " Output token of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
-  outputToken: Token
-
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
-
-  " Amount of output tokens in the token's native unit "
-  outputTokenAmount: BigInt
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
 }
 
-type Swap @entity {
-  " swap-{ Transaction hash }-{ Log index } "
-  id: ID!
+type Swap @entity(immutable: true) {
+  " { Transaction hash }-{ Log index } "
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Nonce of the transaction that emitted this event "
   nonce: BigInt!
@@ -916,19 +1311,19 @@ type Swap @entity {
   logIndex: Int!
 
   " Gas limit of the transaction that emitted this event "
-  gasLimit: BigInt!
+  gasLimit: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas price of the transaction that emitted this event "
-  gasPrice: BigInt!
+  gasPrice: BigInt
 
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
   " Account that emitted this event "
   account: Account!
-
-  " The user position changed by this event "
-  position: Position!
 
   " The pool involving this event "
   pool: LiquidityPool!
@@ -938,6 +1333,9 @@ type Swap @entity {
 
   " Timestamp of this event "
   timestamp: BigInt!
+
+  " the tick after the swap "
+  tick: BigInt
 
   " Token deposited into pool "
   tokenIn: Token!
@@ -958,46 +1356,8 @@ type Swap @entity {
   amountOutUSD: BigDecimal!
 }
 
-type Stat @entity {
-  " { protocol/pool }-{ [Optional] Pool ID }-{ deposit/withdraw/swap }-{ Days/hours since Unix epoch } "
-  id: ID!
-
-  " Total count of event (e.g. total number of swaps) "
-  count: BigInt!
-
-  " Average in native token amount (rounded down)  "
-  meanAmount: BigInt!
-
-  " Average in USD "
-  meanUSD: BigDecimal!
-
-  " Median in native token amount"
-  medianAmount: BigInt!
-
-  " Median in USD "
-  medianUSD: BigDecimal!
-
-  " Maximum in native token amount "
-  maxAmount: BigInt!
-
-  " Maximum in USD "
-  maxUSD: BigDecimal!
-
-  " Minimum in native token amount "
-  minAmount: BigInt!
-
-  " Minimum in USD "
-  minUSD: BigDecimal!
-
-  " Variance for native token amount "
-  varAmount: BigDecimal!
-
-  " Variance for USD "
-  varUSD: BigDecimal!
-}
-
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity {
+type ActiveAccount @entity(immutable: true) {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
-  id: ID!
+  id: Bytes!
 }
