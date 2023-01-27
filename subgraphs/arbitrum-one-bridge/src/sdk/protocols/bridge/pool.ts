@@ -2,7 +2,6 @@ import {
   Bytes,
   BigDecimal,
   BigInt,
-  ethereum,
   Address,
   log,
 } from "@graphprotocol/graph-ts";
@@ -24,13 +23,17 @@ import {
   RewardTokenType,
 } from "../../util/constants";
 import { exponentToBigDecimal } from "../../util/numbers";
-import { sortArrayByReference, sortBytesArray } from "../../util/arrays";
+import {
+  sortArrayByReference,
+  sortBytesArray,
+  updateArrayAtIndex,
+} from "../../util/arrays";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
-import { SDK } from ".";
+import { CustomEventType, SDK } from ".";
 
 type onCreatePoolCallback<T> = (
-  event: ethereum.Event,
+  event: CustomEventType,
   pool: Pool,
   sdk: SDK,
   aux: T | null
@@ -324,7 +327,7 @@ export class Pool {
         this.pool.cumulativeVolumeOutUSD.plus(amountUSD);
       this.pool.netVolume = this.pool.netVolume.minus(amount);
       this.pool.netVolumeUSD = this.pool.netVolumeUSD.minus(amountUSD);
-      this.protocol.addVolumeInUSD(amountUSD);
+      this.protocol.addVolumeOutUSD(amountUSD);
     } else {
       route.cumulativeVolumeIn = route.cumulativeVolumeIn.plus(amount);
       route.cumulativeVolumeInUSD = route.cumulativeVolumeInUSD.plus(amountUSD);
@@ -333,7 +336,7 @@ export class Pool {
         this.pool.cumulativeVolumeInUSD.plus(amountUSD);
       this.pool.netVolume = this.pool.netVolume.plus(amount);
       this.pool.netVolumeUSD = this.pool.netVolumeUSD.plus(amountUSD);
-      this.protocol.addVolumeOutUSD(amountUSD);
+      this.protocol.addVolumeInUSD(amountUSD);
     }
     route.save();
     this.save();
@@ -498,8 +501,16 @@ export class Pool {
 
     if (this.pool.rewardTokens!.includes(rToken.id)) {
       const index = this.pool.rewardTokens!.indexOf(rToken.id);
-      this.pool.rewardTokenEmissionsAmount![index] = amount;
-      this.pool.rewardTokenEmissionsUSD![index] = amountUSD;
+      this.pool.rewardTokenEmissionsAmount = updateArrayAtIndex(
+        this.pool.rewardTokenEmissionsAmount!,
+        amount,
+        index
+      );
+      this.pool.rewardTokenEmissionsUSD = updateArrayAtIndex(
+        this.pool.rewardTokenEmissionsUSD!,
+        amountUSD,
+        index
+      );
       this.save();
       return;
     }
@@ -566,6 +577,7 @@ export class Pool {
    * @see Account
    */
   trackDeposit(deposit: LiquidityDeposit): void {
+    this.protocol.addTransaction(TransactionType.LIQUIDITY_DEPOSIT);
     this.addInputTokenBalance(deposit.amount);
   }
 
@@ -577,6 +589,7 @@ export class Pool {
    * @see Account
    */
   trackWithdraw(withdraw: LiquidityWithdraw): void {
+    this.protocol.addTransaction(TransactionType.LIQUIDITY_WITHDRAW);
     this.addInputTokenBalance(withdraw.amount.times(BIGINT_MINUS_ONE));
   }
 }

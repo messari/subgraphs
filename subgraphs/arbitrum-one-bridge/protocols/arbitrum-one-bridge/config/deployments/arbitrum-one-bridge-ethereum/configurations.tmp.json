@@ -1,54 +1,45 @@
 {
   "deployment": "ARBITRUM_ONE_MAINNET",
   "network": "mainnet",
-  "L1Bridge": [
-    {
-      "name": "L1Bridge",
-      "address": "0x8315177aB297bA92A06054cE80a67Ed4DBd7ed3a",
-      "startBlock": 15411056,
-      "abi": "Bridge",
-      "file": "./src/handlers/ethereum/messagesAndEthDeposits.ts"
-    }
-  ],
   "L1Gateways": [
     {
       "name": "ERC20Gateway",
       "address": "0xa3A7B6F88361F48403514059F1F16C8E78d60EeC",
-      "abi": "TokenGateway",
+      "abi": "L1ERC20Gateway",
       "startBlock": 12640865,
-      "file": "./src/handlers/ethereum/transferOut.ts",
+      "file": "./src/handlers/transferOut.ts",
       "eventPrefix": ""
     },
     {
       "name": "CustomGateway",
       "address": "0xcee284f754e854890e311e3280b767f80797180d",
-      "abi": "TokenGateway",
+      "abi": "L1CustomGateway",
       "startBlock": 12647126,
-      "file": "./src/handlers/ethereum/transferOut.ts",
+      "file": "./src/handlers/transferOut.ts",
       "eventPrefix": ""
     },
     {
       "name": "WethGateway",
       "address": "0xd92023E9d9911199a6711321D1277285e6d4e2db",
-      "abi": "TokenGateway",
+      "abi": "L1WethGateway",
       "startBlock": 12724750,
-      "file": "./src/handlers/ethereum/transferOut.ts",
+      "file": "./src/handlers/transferOut.ts",
       "eventPrefix": "L1WethGateway"
     },
     {
       "name": "DaiGateway",
       "address": "0xD3B5b60020504bc3489D6949d545893982BA3011",
-      "abi": "TokenGateway",
+      "abi": "L1DaiGateway",
       "startBlock": 13262087,
-      "file": "./src/handlers/ethereum/transferOutDai.ts",
+      "file": "./src/handlers/transferOutDai.ts",
       "eventPrefix": "L1DaiGateway"
     },
     {
       "name": "LPTGateway",
       "address": "0x6142f1C8bBF02E6A6bd074E8d564c9A5420a0676",
-      "abi": "TokenGateway",
+      "abi": "L1LPTGateway",
       "startBlock": 14199457,
-      "file": "./src/handlers/ethereum/transferOut.ts",
+      "file": "./src/handlers/transferOut.ts",
       "eventPrefix": "L1LPTGateway"
     }
   ]

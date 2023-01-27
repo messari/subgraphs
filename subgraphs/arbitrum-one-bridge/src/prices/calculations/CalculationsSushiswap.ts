@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/L1ERC20Gateway/CalculationsSushiSwap";
+import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/DaiGateway/CalculationsSushiSwap";
 
 export function getSushiSwapContract(
   contractAddress: Address

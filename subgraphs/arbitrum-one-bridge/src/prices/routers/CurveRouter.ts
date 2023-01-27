@@ -3,8 +3,8 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { CurvePool as CurvePoolContract } from "../../../generated/L1ERC20Gateway/CurvePool";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/L1ERC20Gateway/CurveRegistry";
+import { CurvePool as CurvePoolContract } from "../../../generated/DaiGateway/CurvePool";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/DaiGateway/CurveRegistry";
 
 export function isCurveLpToken(lpAddress: Address): bool {
   const poolAddress = getPoolFromLpToken(lpAddress);

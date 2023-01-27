@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { YearnLensContract } from "../../../generated/L1ERC20Gateway/YearnLensContract";
+import { YearnLensContract } from "../../../generated/DaiGateway/YearnLensContract";
 
 export function getYearnLensContract(
   contractAddress: Address

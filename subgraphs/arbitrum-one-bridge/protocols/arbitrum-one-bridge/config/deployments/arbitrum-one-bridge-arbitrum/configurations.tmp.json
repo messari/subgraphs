@@ -1,0 +1,37 @@
+{
+  "deployment": "ARBITRUM_ONE_ARBITRUM",
+  "network": "arbitrum",
+  "file": "./src/handlers/transferIn.ts",
+  "Gateways": [
+    {
+      "name": "ERC20Gateway",
+      "address": "0x09e9222E96E7B4AE2a407B98d48e330053351EEe",
+      "abi": "ERC20Gateway",
+      "startBlock": 2107
+    },
+    {
+      "name": "CustomGateway",
+      "address": "0x096760F208390250649E3e8763348E783AEF5562",
+      "abi": "CustomGateway",
+      "startBlock": 2598
+    },
+    {
+      "name": "WethGateway",
+      "address": "0x6c411aD3E74De3E7Bd422b94A27770f5B86C623B",
+      "abi": "WethGateway",
+      "startBlock": 38495
+    },
+    {
+      "name": "DaiGateway",
+      "address": "0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65",
+      "abi": "DaiGateway",
+      "startBlock": 1336834
+    },
+    {
+      "name": "LPTGateway",
+      "address": "0x6D2457a4ad276000A615295f7A80F79E48CcD318",
+      "abi": "LPTGateway",
+      "startBlock": 5864786
+    }
+  ]
+}
