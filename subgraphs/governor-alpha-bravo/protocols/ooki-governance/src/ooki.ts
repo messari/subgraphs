@@ -1,9 +1,5 @@
 import { Transfer } from "../../../generated/Ooki/Ooki";
-import {
-  _handleDelegateChanged,
-  _handleDelegateVotesChanged,
-  _handleTransfer,
-} from "../../../src/tokenHandlers";
+import { _handleTransfer } from "../../../src/tokenHandlers";
 
 // DelegateChanged(indexed address,indexed address,indexed address)
 // export function handleDelegateChanged(event: DelegateChanged): void {
