@@ -878,14 +878,8 @@ type Account @entity {
   " All positions that belong to this account "
   positions: [Position!]! @derivedFrom(field: "account")
 
-  " All open positions this account has "
-  openPositions: [Position!]!
-
   " Number of open positions this account has "
   openPositionCount: Int!
-
-  " All closed positions this account has "
-  closedPositions: [Position!]!
 
   " Number of closed positions this account has "
   closedPositionCount: Int!
@@ -1256,6 +1250,14 @@ type LiquidateProxy @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
   amount: BigInt!
+}
+
+type PositionCounter @entity {
+  " { Account address }-{ Market address }-{ Position Side } "
+  id: ID!
+
+  " Next count "
+  nextCount: Int!
 }
 
 # Helper entity for calculating daily/hourly active users

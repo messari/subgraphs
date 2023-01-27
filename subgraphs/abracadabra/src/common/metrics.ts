@@ -6,7 +6,7 @@ import {
   dataSource,
   log,
 } from "@graphprotocol/graph-ts";
-import { ActiveAccount, InterestRate, Market } from "../../generated/schema";
+import { ActiveAccount, Market } from "../../generated/schema";
 import {
   SECONDS_PER_DAY,
   BIGDECIMAL_ZERO,
@@ -32,7 +32,7 @@ import {
 } from "./getters";
 import { bigIntToBigDecimal, exponentToBigDecimal } from "./utils/numbers";
 import { DegenBox } from "../../generated/BentoBox/DegenBox";
-import { readValue } from "./utils/utils";
+import { getSnapshotRates, readValue } from "./utils/utils";
 import { getOrCreateAccount } from "../positions";
 import { Cauldron } from "../../generated/templates/Cauldron/Cauldron";
 
@@ -478,31 +478,6 @@ export function updateMarketStats(
   marketDailySnapshot.save();
   financialsDailySnapshot.save();
   protocol.save();
-}
-
-// create seperate InterestRate Entities for each market snapshot
-// this is needed to prevent snapshot rates from being pointers to the current rate
-function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
-  const snapshotRates: string[] = [];
-  for (let i = 0; i < rates.length; i++) {
-    const rate = InterestRate.load(rates[i]);
-    if (!rate) {
-      log.warning("[getSnapshotRates] rate {} not found, should not happen", [
-        rates[i],
-      ]);
-      continue;
-    }
-
-    // create new snapshot rate
-    const snapshotRateId = rates[i].concat("-").concat(timeSuffix);
-    const snapshotRate = new InterestRate(snapshotRateId);
-    snapshotRate.side = rate.side;
-    snapshotRate.type = rate.type;
-    snapshotRate.rate = rate.rate;
-    snapshotRate.save();
-    snapshotRates.push(snapshotRateId);
-  }
-  return snapshotRates;
 }
 
 // update borrow amount for the given market
