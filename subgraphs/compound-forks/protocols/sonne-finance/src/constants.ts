@@ -1,13 +1,9 @@
 import { Address } from "@graphprotocol/graph-ts";
-import {
-  cTokenDecimals,
-  ETHEREUM_BLOCKS_PER_YEAR,
-} from "../../../src/constants";
+import { cTokenDecimals } from "../../../src/constants";
 import { TokenData } from "../../../src/mapping";
 
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
-export const OPTIMISM_BLOCKS_PER_YEAR = ETHEREUM_BLOCKS_PER_YEAR;
 
 //////////////////////////////
 /////     Addresses      /////

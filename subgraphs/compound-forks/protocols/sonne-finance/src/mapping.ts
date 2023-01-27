@@ -40,6 +40,7 @@ import {
   BIGINT_ONE,
   SECONDS_PER_DAY,
   BIGDECIMAL_ZERO,
+  SECONDS_PER_YEAR,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -74,7 +75,6 @@ import {
   DEFAULT_DECIMALS,
   nativeCToken,
   nativeToken,
-  OPTIMISM_BLOCKS_PER_YEAR,
   SONNE_ADDRESS,
   SONNE_USDC_LP,
   USDC_DECIMALS,
@@ -292,7 +292,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     getPrice(marketAddress, protocol._priceOracle),
-    OPTIMISM_BLOCKS_PER_YEAR
+    SECONDS_PER_YEAR
   );
 
   const interestAccumulated = event.params.interestAccumulated;
