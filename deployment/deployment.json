@@ -5150,6 +5150,93 @@
       }
     }
   },
+  "lilnouns-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "lilnouns-governance",
+    "deployments": {
+      "lilnouns-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "lilnouns-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "lilnouns-governance",
+            "query-id": "lilnouns-governance"
+          }
+        }
+      }
+    }
+  },
+  "nouns-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "nouns-governance",
+    "deployments": {
+      "nouns-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "nouns-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "nouns-governance",
+            "query-id": "nouns-governance"
+          }
+        }
+      }
+    }
+  },
+  "ooki-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "ooki-governance",
+    "deployments": {
+      "ooki-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "ooki-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "ooki-governance",
+            "query-id": "ooki-governance"
+          }
+        }
+      }
+    }
+  },
   "pooltogether-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
