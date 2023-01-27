@@ -1841,7 +1841,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.0",
-          "subgraph": "1.0.5",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
