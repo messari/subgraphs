@@ -8,9 +8,15 @@ import {
   dataSource,
 } from "@graphprotocol/graph-ts";
 
-import { LatestRate, FeeRate } from "../../../generated/schema";
+import {
+  LatestRate,
+  FeeRate,
+  Synth,
+  SynthByCurrencyKey,
+} from "../../../generated/schema";
 import { initFeed, initFeeRate } from "../fragments/latest-rates";
 import { getContractDeployment } from "../../../protocols/addresses";
+import { getUsdPricePerToken } from "../../prices";
 
 export const ZERO = BigInt.fromI32(0);
 export const ONE = BigInt.fromI32(1);
@@ -84,8 +90,18 @@ export function getLatestRate(
     ]);
 
     // load feed for the first time, and use contract call to get rate
-    return initFeed(synth);
+    const rate = initFeed(synth);
+
+    if (!rate) {
+      const Synth = SynthByCurrencyKey.load(synth);
+      if (Synth && Synth.proxyAddress) {
+        return getUsdPricePerToken(Synth.proxyAddress).usdPrice;
+      }
+    }
+
+    return rate;
   }
+
   return latestRate.rate;
 }
 
