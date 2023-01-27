@@ -21,7 +21,7 @@
   },
   "scripts": {
     "prettier": "prettier --loglevel silent --write \"**/*.{md,jsx,tsx,ts,json,html,css,js}\"",
-    "prettier-check": "prettier --loglevel silent --write --check \"**/*.{md,jsx,tsx,ts,json,html,css,js}\"",
+    "prettier-check": "prettier --check",
     "lint:fix": "npx eslint --fix --max-warnings 0",
     "lint": "npx eslint",
     "lint:subgraphs": "npx eslint -c subgraphs/.eslintrc.js",
