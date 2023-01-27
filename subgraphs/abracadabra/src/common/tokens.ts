@@ -85,7 +85,10 @@ export function fetchTokenDecimals(tokenAddress: Address): i32 {
 }
 
 export function isNullEthValue(value: string): boolean {
-  if (value == "0x0000000000000000000000000000000000000001" || value == "0x0000000000000000000000000000000000000000")
+  if (
+    value == "0x0000000000000000000000000000000000000001" ||
+    value == "0x0000000000000000000000000000000000000000"
+  )
     return true;
   return false;
 }
@@ -95,7 +98,7 @@ class StaticTokenDefinition {
     public readonly address: Address,
     public readonly symbol: string,
     public readonly name: string,
-    public readonly decimals: i32,
+    public readonly decimals: i32
   ) {}
 }
 
@@ -108,7 +111,7 @@ function getStaticDefinitions(): StaticTokenDefinition[] {
     Address.fromString("0xe0b7927c4af23765cb51314a0e0521a9645f0e2a"),
     "DGD",
     "DGD",
-    9 as i32,
+    9 as i32
   );
   staticDefinitions.push(tokenDGD);
 
@@ -117,7 +120,7 @@ function getStaticDefinitions(): StaticTokenDefinition[] {
     Address.fromString("0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9"),
     "AAVE",
     "Aave Token",
-    18 as i32,
+    18 as i32
   );
   staticDefinitions.push(tokenAAVE);
 
@@ -126,7 +129,7 @@ function getStaticDefinitions(): StaticTokenDefinition[] {
     Address.fromString("0xeb9951021698b42e4399f9cbb6267aa35f82d59d"),
     "LIF",
     "Lif",
-    18 as i32,
+    18 as i32
   );
   staticDefinitions.push(tokenLIF);
 
@@ -135,7 +138,7 @@ function getStaticDefinitions(): StaticTokenDefinition[] {
     Address.fromString("0xbdeb4b83251fb146687fa19d1c660f99411eefe3"),
     "SVD",
     "savedroid",
-    18 as i32,
+    18 as i32
   );
   staticDefinitions.push(tokenSVD);
 
@@ -144,7 +147,7 @@ function getStaticDefinitions(): StaticTokenDefinition[] {
     Address.fromString("0xbb9bc244d798123fde783fcc1c72d3bb8c189413"),
     "TheDAO",
     "TheDAO",
-    16 as i32,
+    16 as i32
   );
   staticDefinitions.push(tokenTheDAO);
 
@@ -153,7 +156,7 @@ function getStaticDefinitions(): StaticTokenDefinition[] {
     Address.fromString("0x38c6a68304cdefb9bec48bbfaaba5c5b47818bb2"),
     "HPB",
     "HPBCoin",
-    18 as i32,
+    18 as i32
   );
   staticDefinitions.push(tokenHPB);
 
