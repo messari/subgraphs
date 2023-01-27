@@ -235,7 +235,7 @@ export function getLiquidatePosition(
 
 // A series of side effects on position added
 // They include:
-// * Create a new position when needed or reuse the exisitng position
+// * Create a new position when needed or reuse the existing position
 // * Update position related data in protocol, market, account
 // * Take position snapshot
 function addPosition(
@@ -264,27 +264,37 @@ function addPosition(
 
   let position = Position.load(positionID);
   const openPosition = position == null;
-  if (openPosition) {
-    position = new Position(positionID);
-    position.account = account.id;
-    position.market = market.id;
-    position.hashOpened = event.transaction.hash.toHexString();
-    position.blockNumberOpened = event.block.number;
-    position.timestampOpened = event.block.timestamp;
-    position.side = side;
-    if (side == PositionSide.LENDER) {
-      position.isCollateral = market.canUseAsCollateral;
+  if (!openPosition) {
+    position = position!;
+    position.balance = newBalance;
+    if (eventType == EventType.DEPOSIT) {
+      position.depositCount += 1;
+    } else if (eventType == EventType.BORROW) {
+      position.borrowCount += 1;
     }
-    position.balance = BIGINT_ZERO;
-    position.depositCount = 0;
-    position.withdrawCount = 0;
-    position.borrowCount = 0;
-    position.repayCount = 0;
-    position.liquidationCount = 0;
     position.save();
+
+    snapshotPosition(position, event);
+    return position;
   }
-  position = position!;
+
+  // open a new position
+  position = new Position(positionID);
+  position.account = account.id;
+  position.market = market.id;
+  position.hashOpened = event.transaction.hash.toHexString();
+  position.blockNumberOpened = event.block.number;
+  position.timestampOpened = event.block.timestamp;
+  position.side = side;
+  if (side == PositionSide.LENDER) {
+    position.isCollateral = market.canUseAsCollateral;
+  }
   position.balance = newBalance;
+  position.depositCount = 0;
+  position.withdrawCount = 0;
+  position.borrowCount = 0;
+  position.repayCount = 0;
+  position.liquidationCount = 0;
   if (eventType == EventType.DEPOSIT) {
     position.depositCount += 1;
   } else if (eventType == EventType.BORROW) {
@@ -292,34 +302,32 @@ function addPosition(
   }
   position.save();
 
-  if (openPosition) {
-    //
-    // update account position
-    //
-    account.positionCount += 1;
-    account.openPositionCount += 1;
-    account.save();
+  //
+  // update account position
+  //
+  account.positionCount += 1;
+  account.openPositionCount += 1;
+  account.save();
 
-    //
-    // update market position
-    //
-    market.positionCount += 1;
-    market.openPositionCount += 1;
+  //
+  // update market position
+  //
+  market.positionCount += 1;
+  market.openPositionCount += 1;
 
-    if (eventType == EventType.DEPOSIT) {
-      market.lendingPositionCount += 1;
-    } else if (eventType == EventType.BORROW) {
-      market.borrowingPositionCount += 1;
-    }
-    market.save();
-
-    //
-    // update protocol position
-    //
-    protocol.cumulativePositionCount += 1;
-    protocol.openPositionCount += 1;
-    protocol.save();
+  if (eventType == EventType.DEPOSIT) {
+    market.lendingPositionCount += 1;
+  } else if (eventType == EventType.BORROW) {
+    market.borrowingPositionCount += 1;
   }
+  market.save();
+
+  //
+  // update protocol position
+  //
+  protocol.cumulativePositionCount += 1;
+  protocol.openPositionCount += 1;
+  protocol.save();
 
   //
   // take position snapshot
