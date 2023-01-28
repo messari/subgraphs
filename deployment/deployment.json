@@ -432,6 +432,28 @@
             "query-id": "aave-v3-optimism"
           }
         }
+      },
+      "aave-v3-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "aave-v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v3-ethereum",
+            "query-id": "aave-v3-ethereum"
+          }
+        }
       }
     }
   },
