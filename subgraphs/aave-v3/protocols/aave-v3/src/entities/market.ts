@@ -454,9 +454,9 @@ function sortRewardTokens(market: Market): void {
     return;
   }
 
-  let tokens = market.rewardTokens;
-  let emissions = market.rewardTokenEmissionsAmount;
-  let emissionsUSD = market.rewardTokenEmissionsUSD;
+  const tokens = market.rewardTokens;
+  const emissions = market.rewardTokenEmissionsAmount;
+  const emissionsUSD = market.rewardTokenEmissionsUSD;
   multiArraySort(tokens!, emissions!, emissionsUSD!);
 
   market.rewardTokens = tokens;
@@ -474,7 +474,7 @@ function multiArraySort(
     return;
   }
 
-  let sorter: Array<Array<string>> = [];
+  const sorter: Array<Array<string>> = [];
   for (let i = 0; i < ref.length; i++) {
     sorter[i] = [ref[i], arr1[i].toString(), arr2[i].toString()];
   }
