@@ -50,7 +50,7 @@ export class PangolinAvalancheConfigurations implements Configurations {
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
-    return BigDecimal.fromString("0.0075");
+    return BigDecimal.fromString("0.05");
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getLPFeeToOn(blockNumber: BigInt): BigDecimal {
@@ -63,7 +63,12 @@ export class PangolinAvalancheConfigurations implements Configurations {
     return BigDecimal.fromString("0.3");
   }
   getFeeOnOff(): string {
-    return FeeSwitch.ON;
+    const contract = this.getFactoryContract();
+    const feeToResult = contract.try_feeTo();
+    if (!feeToResult.reverted && feeToResult.value != Address.zero()) {
+      return FeeSwitch.ON;
+    }
+    return FeeSwitch.OFF;
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.TIMESTAMP;
