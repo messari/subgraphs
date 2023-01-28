@@ -53,12 +53,16 @@ export function handleTransferIn(event: DepositFinalized): void {
   // -- POOL
 
   const poolId = event.address;
+  const pool = sdk.Pools.loadPool(poolId, null, null);
 
-  const pool = sdk.Pools.loadPool(
-    poolId,
-    onCreatePool,
-    BridgePoolType.LOCK_RELEASE
-  );
+  if (!pool.isInitialized) {
+    pool.initialize(
+      poolId.toString(),
+      "ERC20",
+      BridgePoolType.LOCK_RELEASE,
+      sdk.Tokens.getOrCreateToken(event.params.l1Token)
+    );
+  }
 
   pool.addDestinationToken(crossToken);
 
@@ -74,17 +78,17 @@ export function handleTransferIn(event: DepositFinalized): void {
   );
 }
 
-function onCreatePool(
-  event: CustomEventType,
-  pool: Pool,
-  sdk: SDK,
-  type: BridgePoolType
-): void {
-  const myEvent: DepositFinalized = event.event as DepositFinalized;
-  pool.initialize(
-    pool.pool.id.toString(),
-    "ERC20",
-    type,
-    sdk.Tokens.getOrCreateToken(myEvent.params.l1Token)
-  );
-}
+// function onCreatePool(
+//   event: CustomEventType,
+//   pool: Pool,
+//   sdk: SDK,
+//   type: BridgePoolType
+// ): void {
+//   const myEvent: DepositFinalized = event.event as DepositFinalized;
+//   pool.initialize(
+//     pool.pool.id.toString(),
+//     "ERC20",
+//     type,
+//     sdk.Tokens.getOrCreateToken(myEvent.params.l1Token)
+//   );
+// }

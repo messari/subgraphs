@@ -39,11 +39,7 @@ export function handleL2ToL1Transaction(event: L2ToL1Transaction): void {
     BridgePermissionType.WHITELIST,
     Versions
   );
-
   const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
-
-  // -- ACCOUNT
-
   const acc = sdk.Accounts.loadAccount(event.params.caller);
 
   // -- ETH TRANSFER
@@ -59,14 +55,20 @@ export function handleL2ToL1Transaction(event: L2ToL1Transaction): void {
     // -- POOL
 
     const poolId = event.address;
+    const pool = sdk.Pools.loadPool(poolId);
 
-    const pool = sdk.Pools.loadPool(
-      poolId,
-      onCreatePool,
-      BridgePoolType.LOCK_RELEASE
-    );
+    if (!pool.isInitialized) {
+      pool.initialize(
+        poolId.toString(),
+        ETH_SYMBOL,
+        BridgePoolType.LOCK_RELEASE,
+        sdk.Tokens.getOrCreateToken(ethAddress)
+      );
+    }
 
     pool.addDestinationToken(crossToken);
+
+    // -- ACCOUNT
 
     acc.transferOut(
       pool,
@@ -108,8 +110,6 @@ export function handleL2ToL1Tx(event: L2ToL1Tx): void {
 
   const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  // -- ACCOUNT
-
   const acc = sdk.Accounts.loadAccount(event.params.caller);
 
   // -- ETH TRANSFER
@@ -124,15 +124,31 @@ export function handleL2ToL1Tx(event: L2ToL1Tx): void {
 
     // -- POOL
 
-    const poolId = event.address;
+    // const poolId = event.address;
+    //
+    // const pool = sdk.Pools.loadPool(
+    //   poolId,
+    //   onCreatePool,
+    //   BridgePoolType.LOCK_RELEASE
+    // );
+    //
+    // pool.addDestinationToken(crossToken);
 
-    const pool = sdk.Pools.loadPool(
-      poolId,
-      onCreatePool,
-      BridgePoolType.LOCK_RELEASE
-    );
+    const poolId = event.address;
+    const pool = sdk.Pools.loadPool(poolId);
+
+    if (!pool.isInitialized) {
+      pool.initialize(
+        poolId.toString(),
+        ETH_SYMBOL,
+        BridgePoolType.LOCK_RELEASE,
+        sdk.Tokens.getOrCreateToken(ethAddress)
+      );
+    }
 
     pool.addDestinationToken(crossToken);
+
+    // -- ACCOUNT
 
     acc.transferOut(
       pool,
@@ -155,16 +171,16 @@ export function handleL2ToL1Tx(event: L2ToL1Tx): void {
   }
 }
 
-function onCreatePool(
-  event: CustomEventType,
-  pool: Pool,
-  sdk: SDK,
-  type: BridgePoolType
-): void {
-  pool.initialize(
-    pool.pool.id.toString(),
-    ETH_SYMBOL,
-    type,
-    sdk.Tokens.getOrCreateToken(ethAddress)
-  );
-}
+// function onCreatePool(
+//   event: CustomEventType,
+//   pool: Pool,
+//   sdk: SDK,
+//   type: BridgePoolType
+// ): void {
+//   pool.initialize(
+//     pool.pool.id.toString(),
+//     ETH_SYMBOL,
+//     type,
+//     sdk.Tokens.getOrCreateToken(ethAddress)
+//   );
+// }

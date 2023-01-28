@@ -18,8 +18,6 @@ const ethAddress = Address.fromString(ETH_ADDRESS);
 export function handleL1MessageDelivered(event: MessageDelivered): void {
   // -- BRIDGECONFIG
 
-  // BridgeConfig based on different gateways
-  // Can we pass custom variables in a handler
   const conf = new BridgeConfig(
     event.address.toHexString(),
     "arbitrum-one",
@@ -27,10 +25,7 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
     BridgePermissionType.WHITELIST,
     Versions
   );
-
   const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
-
-  // -- ACCOUNT
   const acc = sdk.Accounts.loadAccount(event.params.sender);
 
   // Nitro
@@ -53,15 +48,29 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
 
     // -- POOL
 
+    // const poolId = event.address;
+    // const pool = sdk.Pools.loadPool(
+    //   poolId,
+    //   onCreatePool,
+    //   BridgePoolType.LOCK_RELEASE
+    // );
+    //
+    // pool.addDestinationToken(crossToken);
+
     const poolId = event.address;
-    const pool = sdk.Pools.loadPool(
-      poolId,
-      onCreatePool,
-      BridgePoolType.LOCK_RELEASE
+    const pool = sdk.Pools.loadPool(poolId);
+
+    pool.initialize(
+      poolId.toString(),
+      ETH_SYMBOL,
+      BridgePoolType.LOCK_RELEASE,
+      sdk.Tokens.getOrCreateToken(ethAddress)
     );
+
     pool.addDestinationToken(crossToken);
 
-    // eth -> arb
+    // -- ACCOUNT
+
     acc.transferIn(
       pool,
       pool.getDestinationTokenRoute(crossToken)!,
@@ -71,7 +80,6 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
     );
   } else if (event.params.kind == 3) {
     // ----> if event.params.kind == 3
-    // -----------------------> update BridgeMessage
     // -----------------------> update account message counts
 
     acc.messageIn(
@@ -83,16 +91,16 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
   }
 }
 
-function onCreatePool(
-  event: CustomEventType,
-  pool: Pool,
-  sdk: SDK,
-  type: BridgePoolType
-): void {
-  pool.initialize(
-    pool.pool.id.toString(),
-    ETH_SYMBOL,
-    type,
-    sdk.Tokens.getOrCreateToken(ethAddress)
-  );
-}
+// function onCreatePool(
+//   event: CustomEventType,
+//   pool: Pool,
+//   sdk: SDK,
+//   type: BridgePoolType
+// ): void {
+//   pool.initialize(
+//     pool.pool.id.toString(),
+//     ETH_SYMBOL,
+//     type,
+//     sdk.Tokens.getOrCreateToken(ethAddress)
+//   );
+// }

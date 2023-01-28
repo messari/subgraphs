@@ -34,12 +34,14 @@
       "name": "DaiGateway",
       "address": "0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65",
       "abi": "DaiGateway",
+      "file": "./src/handlers/arbitrum/transferInDai.ts",
       "startBlock": 1336834
     },
     {
       "name": "LPTGateway",
       "address": "0x6D2457a4ad276000A615295f7A80F79E48CcD318",
       "abi": "LPTGateway",
+      "file": "./src/handlers/arbitrum/transferInLPT.ts",
       "startBlock": 5864786
     }
   ]

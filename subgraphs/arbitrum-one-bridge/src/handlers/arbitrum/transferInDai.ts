@@ -1,6 +1,9 @@
 import { Address, log } from "@graphprotocol/graph-ts";
 import { BridgeConfig } from "../../sdk/protocols/bridge/config";
-import { DepositFinalized } from "../../../generated/DaiGateway/DaiGateway";
+import {
+  DepositFinalized,
+  DaiGateway,
+} from "../../../generated/DaiGateway/DaiGateway";
 import {
   BridgePermissionType,
   BridgePoolType,
@@ -12,7 +15,6 @@ import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
 import { Pool } from "../../sdk/protocols/bridge/pool";
 import { Pricer, TokenInit } from "../../common/utils";
 import { Network } from "../../sdk/util/constants";
-import { TokenGateway } from "../../../generated/ERC20Gateway/TokenGateway";
 
 export function handleTransferIn(event: DepositFinalized): void {
   const gatewayContractAddress = event.address.toHexString();
@@ -31,7 +33,7 @@ export function handleTransferIn(event: DepositFinalized): void {
 
   // -- TOKENS
 
-  const gatewayContract = TokenGateway.bind(event.address);
+  const gatewayContract = DaiGateway.bind(event.address);
   const inputTokenAddress = event.params.l1Token;
   let crossTokenAddress: Address;
 
@@ -53,12 +55,16 @@ export function handleTransferIn(event: DepositFinalized): void {
   // -- POOL
 
   const poolId = event.address;
+  const pool = sdk.Pools.loadPool(poolId);
 
-  const pool = sdk.Pools.loadPool(
-    poolId,
-    onCreatePool,
-    BridgePoolType.LOCK_RELEASE
-  );
+  if (!pool.isInitialized) {
+    pool.initialize(
+      poolId.toString(),
+      "ERC20",
+      BridgePoolType.LOCK_RELEASE,
+      sdk.Tokens.getOrCreateToken(event.params.l1Token)
+    );
+  }
 
   pool.addDestinationToken(crossToken);
 
@@ -74,17 +80,17 @@ export function handleTransferIn(event: DepositFinalized): void {
   );
 }
 
-function onCreatePool(
-  event: CustomEventType,
-  pool: Pool,
-  sdk: SDK,
-  type: BridgePoolType
-): void {
-  const myEvent: DepositFinalized = event.event as DepositFinalized;
-  pool.initialize(
-    pool.pool.id.toString(),
-    "DAI",
-    type,
-    sdk.Tokens.getOrCreateToken(myEvent.params.l1Token)
-  );
-}
+// function onCreatePool(
+//   event: CustomEventType,
+//   pool: Pool,
+//   sdk: SDK,
+//   type: BridgePoolType
+// ): void {
+//   const myEvent: DepositFinalized = event.event as DepositFinalized;
+//   pool.initialize(
+//     pool.pool.id.toString(),
+//     "DAI",
+//     type,
+//     sdk.Tokens.getOrCreateToken(myEvent.params.l1Token)
+//   );
+// }

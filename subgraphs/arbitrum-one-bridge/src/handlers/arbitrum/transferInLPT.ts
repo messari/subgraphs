@@ -1,6 +1,9 @@
 import { Address, log } from "@graphprotocol/graph-ts";
 import { BridgeConfig } from "../../sdk/protocols/bridge/config";
-import { DepositFinalized } from "../../../generated/LPTGateway/LPTGateway";
+import {
+  DepositFinalized,
+  LPTGateway,
+} from "../../../generated/LPTGateway/LPTGateway";
 import {
   BridgePermissionType,
   BridgePoolType,
@@ -13,7 +16,6 @@ import { Pool } from "../../sdk/protocols/bridge/pool";
 import { CustomEventType } from "../../sdk/protocols/bridge";
 import { Network } from "../../sdk/util/constants";
 import { Pricer, TokenInit } from "../../common/utils";
-import { TokenGateway } from "../../../generated/ERC20Gateway/TokenGateway";
 
 export function handleTransferIn(event: DepositFinalized): void {
   const gatewayContractAddress = event.address.toHexString();
@@ -32,7 +34,7 @@ export function handleTransferIn(event: DepositFinalized): void {
 
   // -- TOKENS
 
-  const gatewayContract = TokenGateway.bind(event.address);
+  const gatewayContract = LPTGateway.bind(event.address);
   const inputTokenAddress = event.params._l1Token;
   let crossTokenAddress: Address;
 
@@ -54,12 +56,16 @@ export function handleTransferIn(event: DepositFinalized): void {
   // -- POOL
 
   const poolId = event.address;
+  const pool = sdk.Pools.loadPool(poolId);
 
-  const pool = sdk.Pools.loadPool(
-    poolId,
-    onCreatePool,
-    BridgePoolType.LOCK_RELEASE
-  );
+  if (!pool.isInitialized) {
+    pool.initialize(
+      poolId.toString(),
+      "ERC20",
+      BridgePoolType.LOCK_RELEASE,
+      sdk.Tokens.getOrCreateToken(event.params.l1Token)
+    );
+  }
 
   pool.addDestinationToken(crossToken);
 
@@ -75,17 +81,17 @@ export function handleTransferIn(event: DepositFinalized): void {
   );
 }
 
-function onCreatePool(
-  event: CustomEventType,
-  pool: Pool,
-  sdk: SDK,
-  type: BridgePoolType
-): void {
-  const myEvent: DepositFinalized = event.event as DepositFinalized;
-  pool.initialize(
-    pool.pool.id.toString(),
-    "LPT",
-    type,
-    sdk.Tokens.getOrCreateToken(myEvent.params._l1Token)
-  );
-}
+// function onCreatePool(
+//   event: CustomEventType,
+//   pool: Pool,
+//   sdk: SDK,
+//   type: BridgePoolType
+// ): void {
+//   const myEvent: DepositFinalized = event.event as DepositFinalized;
+//   pool.initialize(
+//     pool.pool.id.toString(),
+//     "LPT",
+//     type,
+//     sdk.Tokens.getOrCreateToken(myEvent.params._l1Token)
+//   );
+// }

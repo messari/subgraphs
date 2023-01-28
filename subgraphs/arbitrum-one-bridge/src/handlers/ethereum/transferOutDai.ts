@@ -18,6 +18,7 @@ import { Network } from "../../sdk/util/constants";
 
 export function handleTransferIn(event: L1DaiGatewayWithdrawalFinalized): void {
   // -- BRIDGECONFIG
+
   const conf = new BridgeConfig(
     event.address.toHexString(),
     "arbitrum-one",
@@ -41,12 +42,35 @@ export function handleTransferIn(event: L1DaiGatewayWithdrawalFinalized): void {
 
   // -- POOL
 
-  const poolId = event.address;
+  // const poolId = event.address;
 
-  const pool = sdk.Pools.loadPool(
-    poolId,
-    onCreatePool,
-    BridgePoolType.LOCK_RELEASE
+  // const pool = sdk.Pools.loadPool(
+  //   poolId,
+  //   onCreatePool,
+  //   BridgePoolType.LOCK_RELEASE
+  // );
+  //
+  // pool.addDestinationToken(crossToken);
+
+  const gatewayContract = TokenGateway.bind(event.address);
+
+  let inputTokenAddress: Address;
+  const inputTokenAddressResult =
+    gatewayContract.try_calculateL2TokenAddress(crossTokenAddress);
+  if (inputTokenAddressResult.reverted) {
+    log.info("calculate cross token address call reverted", []);
+  } else {
+    inputTokenAddress = inputTokenAddressResult.value;
+  }
+
+  const poolId = event.address;
+  const pool = sdk.Pools.loadPool(poolId);
+
+  pool.initialize(
+    poolId.toString(),
+    "DAI",
+    BridgePoolType.LOCK_RELEASE,
+    sdk.Tokens.getOrCreateToken(inputTokenAddress!)
   );
 
   pool.addDestinationToken(crossToken);
@@ -63,30 +87,30 @@ export function handleTransferIn(event: L1DaiGatewayWithdrawalFinalized): void {
   );
 }
 
-function onCreatePool(
-  event: CustomEventType,
-  pool: Pool,
-  sdk: SDK,
-  type: BridgePoolType
-): void {
-  const myEvent: L1DaiGatewayWithdrawalFinalized =
-    event.event as L1DaiGatewayWithdrawalFinalized;
-  const crossTokenAddress = myEvent.params.l1Token;
-  const gatewayContract = TokenGateway.bind(myEvent.address);
+// function onCreatePool(
+//   event: CustomEventType,
+//   pool: Pool,
+//   sdk: SDK,
+//   type: BridgePoolType
+// ): void {
+//   const myEvent: L1DaiGatewayWithdrawalFinalized =
+//     event.event as L1DaiGatewayWithdrawalFinalized;
+//   const crossTokenAddress = myEvent.params.l1Token;
+//   const gatewayContract = TokenGateway.bind(myEvent.address);
 
-  let inputTokenAddress: Address;
-  const inputTokenAddressResult =
-    gatewayContract.try_calculateL2TokenAddress(crossTokenAddress);
-  if (inputTokenAddressResult.reverted) {
-    log.info("calculate cross token address call reverted", []);
-  } else {
-    inputTokenAddress = inputTokenAddressResult.value;
-  }
+//   let inputTokenAddress: Address;
+//   const inputTokenAddressResult =
+//     gatewayContract.try_calculateL2TokenAddress(crossTokenAddress);
+//   if (inputTokenAddressResult.reverted) {
+//     log.info("calculate cross token address call reverted", []);
+//   } else {
+//     inputTokenAddress = inputTokenAddressResult.value;
+//   }
 
-  pool.initialize(
-    pool.pool.id.toString(),
-    "DAI",
-    type,
-    sdk.Tokens.getOrCreateToken(inputTokenAddress!)
-  );
-}
+//   pool.initialize(
+//     pool.pool.id.toString(),
+//     "DAI",
+//     type,
+//     sdk.Tokens.getOrCreateToken(inputTokenAddress!)
+//   );
+// }
