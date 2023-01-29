@@ -3,8 +3,8 @@
   "isMainnet": true,
   "graftEnabled": false,
   "deployment": "HOP_PROTOCOL_ETHEREUM",
-  "subgraphId": "QmX8pwyPcruF4BXmMf5nB7tvB3cQEooHh2YmpgwZCSMPjM",
-  "graftStartBlock": 16423245,
+  "subgraphId": "QmYN2xPb16jcYKCcd5ov85PoydSR4eLb8ZU5k6rzfXVQ2y",
+  "graftStartBlock": 13083729,
   "tokens": [
     {
       "dataSourceName": "Token",
@@ -12,7 +12,7 @@
       "tokenName": "USD Coin",
       "tokenDecimals": 6,
       "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      "startBlock": 12650032
+      "startBlock": 12650031
     },
     {
       "dataSourceName": "TokenUSDT",
@@ -20,7 +20,7 @@
       "tokenName": "Tether USD",
       "tokenDecimals": 6,
       "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-      "startBlock": 12860139
+      "startBlock": 12860138
     },
     {
       "dataSourceName": "TokenMATIC",

@@ -3,13 +3,13 @@ import { Configurations } from '../../../../../configurations/configurations/int
 import {
 	ArbitrumToken,
 	MainnetToken,
-	Network,
 	OptimismToken,
 	PolygonBridge,
 	XdaiToken,
 	PolygonAmm,
 	PolygonToken,
-} from '../../../../../src/sdk/util/constants'
+} from '../../constants/constant'
+import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolPolygonConfigurations implements Configurations {
 	getNetwork(): string {
 		return Network.MATIC
@@ -53,7 +53,7 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 		if (tokenAddress == PolygonToken.USDC) {
 			return ['USDC', 'USD Coin', '6', PolygonBridge.USDC]
 		} else if (tokenAddress == PolygonToken.DAI) {
-			return ['DAI', 'DAI Stablecoin', '18']
+			return ['DAI', 'DAI Stablecoin', '18', PolygonBridge.DAI]
 		} else if (tokenAddress == PolygonToken.USDT) {
 			return ['USDT', 'Tether USD', '6', PolygonBridge.USDT]
 		} else if (tokenAddress == PolygonToken.ETH) {

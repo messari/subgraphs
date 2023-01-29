@@ -136,7 +136,11 @@ export function handleTransferFromL1Completed(
 			event.params.amount,
 			event.transaction.hash
 		)
-		pool.addInputTokenBalance(event.params.amount)
+
+		log.warning('TransferIN - TokenAddress: {},  txHash: {}', [
+			event.address.toHexString(),
+			event.transaction.hash.toHexString(),
+		])
 	}
 }
 
@@ -184,6 +188,9 @@ export function handleTransferSent(event: TransferSent): void {
 		)
 		pool.addRevenueNative(BigInt.zero(), event.params.bonderFee)
 
-		pool.addInputTokenBalance(event.params.amount.times(BigInt.fromI32(-1)))
+		log.warning('TransferOUT - TokenAddress: {},  txHash: {},', [
+			event.address.toHexString(),
+			event.transaction.hash.toHexString(),
+		])
 	}
 }

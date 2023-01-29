@@ -3,14 +3,14 @@ import { Configurations } from '../../../../../configurations/configurations/int
 import {
 	ArbitrumToken,
 	MainnetToken,
-	Network,
 	OptimismToken,
 	OptimismBridge,
 	XdaiToken,
 	PolygonToken,
 	ZERO_ADDRESS,
 	OptimismAmm,
-} from '../../../../../src/sdk/util/constants'
+} from '../../constants/constant'
+import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolOptimismConfigurations implements Configurations {
 	getNetwork(): string {
 		return Network.OPTIMISM
@@ -121,6 +121,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 	}
 
 	getOptimismCrossTokenFromTokenAddress(tokenAddress: string): string {
+		log.critical('CrossToken not found', [])
 		return ''
 	}
 
@@ -176,9 +177,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 		else if (bridgeAddress == OptimismBridge.WBTC) return OptimismAmm.WBTC
 		else if (bridgeAddress == OptimismBridge.SNX) return OptimismAmm.SNX
 		else if (bridgeAddress == OptimismBridge.sUSD) return OptimismAmm.sUSD
-		else if (bridgeAddress == OptimismBridge.HOP) {
-			return ZERO_ADDRESS
-		} else {
+		else if (bridgeAddress == OptimismBridge.HOP) return ZERO_ADDRESS
+		else {
 			log.critical('Address not found', [])
 			return ''
 		}

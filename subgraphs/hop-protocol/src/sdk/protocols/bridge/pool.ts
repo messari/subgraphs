@@ -231,6 +231,7 @@ export class Pool {
 	setTotalValueLocked(newTVL: BigDecimal): void {
 		const delta = newTVL.minus(this.pool.totalValueLockedUSD)
 		this.addTotalValueLocked(delta)
+
 		this.save()
 	}
 
@@ -242,6 +243,11 @@ export class Pool {
 	 */
 	addTotalValueLocked(delta: BigDecimal): void {
 		this.pool.totalValueLockedUSD = this.pool.totalValueLockedUSD.plus(delta)
+
+		if (this.pool.totalValueLockedUSD.toString().includes('-')) {
+			log.warning('Negative value found. -> Delta: {}', [delta.toString()])
+			log.critical('Negative value found. -> Delta: {}', [delta.toString()])
+		}
 		this.protocol.addTotalValueLocked(delta)
 		this.save()
 	}
@@ -268,7 +274,7 @@ export class Pool {
 	 * @param amount amount to be added to the pool's input token balance.
 	 * @param updateMetrics optional parameter to indicate whether to update the pool's and protocol's total value locked.
 	 */
-	addInputTokenBalance(amount: BigInt, updateMetrics: boolean = true): void {
+	addInputTokenBalance(amount: BigInt, updateMetrics: boolean = false): void {
 		const newBalance = this.pool.inputTokenBalance.plus(amount)
 		this.setInputTokenBalance(newBalance, updateMetrics)
 	}

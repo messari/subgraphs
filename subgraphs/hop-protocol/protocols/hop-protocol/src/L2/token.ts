@@ -120,5 +120,9 @@ export function handleTransfer(event: Transfer): void {
 				event.transaction.hash
 			)
 		}
+		log.warning('TransferIN - TokenAddress: {},  txHash: {},', [
+			event.address.toHexString(),
+			event.transaction.hash.toHexString(),
+		])
 	}
 }

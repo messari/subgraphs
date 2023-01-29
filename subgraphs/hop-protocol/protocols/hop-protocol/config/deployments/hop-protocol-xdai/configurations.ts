@@ -3,14 +3,14 @@ import { Configurations } from '../../../../../configurations/configurations/int
 import {
 	ArbitrumToken,
 	MainnetToken,
-	Network,
 	OptimismToken,
 	XdaiAmm,
 	XdaiBridge,
 	XdaiToken,
 	PolygonToken,
 	ZERO_ADDRESS,
-} from '../../../../../src/sdk/util/constants'
+} from '../../constants/constant'
+import { Network } from '../../../../../src/sdk/util/constants'
 
 export class HopProtocolxDaiConfigurations implements Configurations {
 	getNetwork(): string {
@@ -51,17 +51,17 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 	}
 
 	getCrossTokenAddress(chainId: string, tokenAddress: string): string {
-		if (chainId == '42161') {
-			return this.getArbitrumCrossTokenFromTokenAddress(tokenAddress) //Arbitrum
-		} else if (chainId == '10') {
-			return this.getOptimismCrossTokenFromTokenAddress(tokenAddress) //Optimism
-		} else if (chainId == '100') {
-			return this.getXdaiCrossTokenFromTokenAddress(tokenAddress) //Xdai
-		} else if (chainId == '137') {
-			return this.getPolygonCrossTokenFromTokenAddress(tokenAddress) //Polygon
-		} else if (chainId == '1') {
-			return this.getMainnetCrossTokenFromTokenAddress(tokenAddress) //Mainnet
-		} else {
+		if (chainId == '42161')
+			return this.getArbitrumCrossTokenFromTokenAddress(tokenAddress)
+		else if (chainId == '10')
+			return this.getOptimismCrossTokenFromTokenAddress(tokenAddress)
+		else if (chainId == '100')
+			return this.getXdaiCrossTokenFromTokenAddress(tokenAddress)
+		else if (chainId == '137')
+			return this.getPolygonCrossTokenFromTokenAddress(tokenAddress)
+		else if (chainId == '1')
+			return this.getMainnetCrossTokenFromTokenAddress(tokenAddress)
+		else {
 			log.critical('Chain not found', [])
 			return ''
 		}
@@ -127,103 +127,69 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 	}
 
 	getMainnetCrossTokenFromTokenAddress(tokenAddress: string): string {
-		if (tokenAddress == XdaiToken.USDC) {
-			return MainnetToken.USDC
-		} else if (tokenAddress == XdaiToken.DAI) {
-			return MainnetToken.DAI
-		} else if (tokenAddress == XdaiToken.USDT) {
-			return MainnetToken.USDT
-		} else if (tokenAddress == XdaiToken.MATIC) {
-			return MainnetToken.MATIC
-		} else if (tokenAddress == XdaiToken.ETH) {
-			return MainnetToken.ETH
-		} else if (tokenAddress == XdaiToken.WBTC) {
-			return MainnetToken.WBTC
-		} else if (tokenAddress == XdaiToken.HOP) {
-			return MainnetToken.HOP
-		} else {
+		if (tokenAddress == XdaiToken.USDC) return MainnetToken.USDC
+		else if (tokenAddress == XdaiToken.DAI) return MainnetToken.DAI
+		else if (tokenAddress == XdaiToken.USDT) return MainnetToken.USDT
+		else if (tokenAddress == XdaiToken.MATIC) return MainnetToken.MATIC
+		else if (tokenAddress == XdaiToken.ETH) return MainnetToken.ETH
+		else if (tokenAddress == XdaiToken.WBTC) return MainnetToken.WBTC
+		else if (tokenAddress == XdaiToken.HOP) return MainnetToken.HOP
+		else {
 			log.critical('Token not found', [])
 		}
 		return ''
 	}
 
 	getTokenAddressFromBridgeAddress(bridgeAddress: string): string {
-		if (bridgeAddress == XdaiBridge.USDC) {
-			return XdaiToken.USDC //USDC
-		} else if (bridgeAddress == XdaiBridge.DAI) {
-			return XdaiToken.DAI //DAI
-		} else if (bridgeAddress == XdaiBridge.USDT) {
-			return XdaiToken.USDT //USDT
-		} else if (bridgeAddress == XdaiBridge.ETH) {
-			return XdaiToken.ETH //ETH
-		} else if (bridgeAddress == XdaiBridge.MATIC) {
-			return XdaiToken.MATIC //MATIC
-		} else if (bridgeAddress == XdaiBridge.WBTC) {
-			return XdaiToken.WBTC //WBTC
-		} else if (bridgeAddress == XdaiBridge.HOP) {
-			return XdaiToken.HOP //HOP
-		} else {
+		if (bridgeAddress == XdaiBridge.USDC) return XdaiToken.USDC
+		else if (bridgeAddress == XdaiBridge.DAI) return XdaiToken.DAI
+		else if (bridgeAddress == XdaiBridge.USDT) return XdaiToken.USDT
+		else if (bridgeAddress == XdaiBridge.ETH) return XdaiToken.ETH
+		else if (bridgeAddress == XdaiBridge.MATIC) return XdaiToken.MATIC
+		else if (bridgeAddress == XdaiBridge.WBTC) return XdaiToken.WBTC
+		else if (bridgeAddress == XdaiBridge.HOP) return XdaiToken.HOP
+		else {
 			log.critical('Token not found', [])
 			return ''
 		}
 	}
 
 	getTokenAddressFromPoolAddress(poolAddress: string): string {
-		if (poolAddress == XdaiAmm.USDC) {
-			return XdaiToken.USDC
-		} else if (poolAddress == XdaiAmm.DAI) {
-			return XdaiToken.DAI
-		} else if (poolAddress == XdaiAmm.USDT) {
-			return XdaiToken.USDT
-		} else if (poolAddress == XdaiAmm.ETH) {
-			return XdaiToken.ETH
-		} else if (poolAddress == XdaiAmm.MATIC) {
-			return XdaiToken.MATIC
-		} else if (poolAddress == XdaiAmm.WBTC) {
-			return XdaiToken.WBTC
-		} else {
+		if (poolAddress == XdaiAmm.USDC) return XdaiToken.USDC
+		else if (poolAddress == XdaiAmm.DAI) return XdaiToken.DAI
+		else if (poolAddress == XdaiAmm.USDT) return XdaiToken.USDT
+		else if (poolAddress == XdaiAmm.ETH) return XdaiToken.ETH
+		else if (poolAddress == XdaiAmm.MATIC) return XdaiToken.MATIC
+		else if (poolAddress == XdaiAmm.WBTC) return XdaiToken.WBTC
+		else {
 			log.critical('Token not found', [])
 			return ''
 		}
 	}
 
 	getPoolAddressFromBridgeAddress(bridgeAddress: string): string {
-		if (bridgeAddress == XdaiBridge.USDC) {
-			return XdaiAmm.USDC
-		} else if (bridgeAddress == XdaiBridge.DAI) {
-			return XdaiAmm.DAI
-		} else if (bridgeAddress == XdaiBridge.USDT) {
-			return XdaiAmm.USDT
-		} else if (bridgeAddress == XdaiBridge.ETH) {
-			return XdaiAmm.ETH
-		} else if (bridgeAddress == XdaiBridge.MATIC) {
-			return XdaiAmm.MATIC
-		} else if (bridgeAddress == XdaiBridge.WBTC) {
-			return XdaiAmm.WBTC
-		} else if (bridgeAddress == XdaiBridge.HOP) {
-			return ZERO_ADDRESS
-		} else {
+		if (bridgeAddress == XdaiBridge.USDC) return XdaiAmm.USDC
+		else if (bridgeAddress == XdaiBridge.DAI) return XdaiAmm.DAI
+		else if (bridgeAddress == XdaiBridge.USDT) return XdaiAmm.USDT
+		else if (bridgeAddress == XdaiBridge.ETH) return XdaiAmm.ETH
+		else if (bridgeAddress == XdaiBridge.MATIC) return XdaiAmm.MATIC
+		else if (bridgeAddress == XdaiBridge.WBTC) return XdaiAmm.WBTC
+		else if (bridgeAddress == XdaiBridge.HOP) return ZERO_ADDRESS
+		else {
 			log.critical('Address not found', [])
 			return ''
 		}
 	}
 
 	getPoolDetails(poolAddress: string): string[] {
-		if (poolAddress == XdaiAmm.USDC) {
-			return ['HOP-USDC', 'hUSDC/USDC']
-		} else if (poolAddress == XdaiAmm.DAI) {
-			return ['HOP-DAI', 'hDAI/DAI']
-		} else if (poolAddress == XdaiAmm.USDT) {
-			return ['HOP-USDT', 'hUSDT/USDT']
-		} else if (poolAddress == XdaiAmm.ETH) {
-			return ['HOP-ETH', 'hETH/ETH']
-		} else if (poolAddress == XdaiAmm.MATIC) {
-			return ['HOP-MATIC', 'hMATIC/MATIC']
-		} else if (poolAddress == XdaiAmm.WBTC) {
-			return ['HOP-WBTC', 'hWBTC/WBTC']
-		} else if (poolAddress == ZERO_ADDRESS) {
-			return ['HOP', 'HOP']
-		} else {
+		if (poolAddress == XdaiAmm.USDC) return ['HOP-USDC', 'hUSDC/USDC']
+		else if (poolAddress == XdaiAmm.DAI) return ['HOP-DAI', 'hDAI/DAI']
+		else if (poolAddress == XdaiAmm.USDT) return ['HOP-USDT', 'hUSDT/USDT']
+		else if (poolAddress == XdaiAmm.ETH) return ['HOP-ETH', 'hETH/ETH']
+		else if (poolAddress == XdaiAmm.MATIC) return ['HOP-MATIC', 'hMATIC/MATIC']
+		else if (poolAddress == XdaiAmm.WBTC) return ['HOP-WBTC', 'hWBTC/WBTC']
+		else if (poolAddress == ZERO_ADDRESS) return ['HOP', 'HOP']
+		else {
 			log.critical('Pool not found', [])
 			return []
 		}

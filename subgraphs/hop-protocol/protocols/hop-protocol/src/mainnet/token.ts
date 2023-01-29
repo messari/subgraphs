@@ -8,7 +8,13 @@ import { BridgePermissionType } from '../../../../src/sdk/protocols/bridge/enums
 import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
 import { NetworkConfigs } from '../../../../configurations/configure'
-import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
+import {
+	Address,
+	BigDecimal,
+	BigInt,
+	dataSource,
+	log,
+} from '@graphprotocol/graph-ts'
 import { Transfer } from '../../../../generated/Token/Token'
 import { _ERC20 } from '../../../../generated/Token/_ERC20'
 import { Token } from '../../../../generated/schema'
@@ -39,28 +45,28 @@ class TokenInit implements TokenInitializer {
 	}
 }
 
+const conf = new BridgeConfig(
+	'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547',
+	'HOP-'
+		.concat(
+			dataSource
+				.network()
+				.toUpperCase()
+				.replace('-', '_')
+		)
+		.concat('-BRIDGE'),
+	'hop-'.concat(dataSource.network().replace('-', '_')).concat('-bridge'),
+	BridgePermissionType.PERMISSIONLESS,
+	Versions
+)
+
 export function handleTransfer(event: Transfer): void {
 	if (NetworkConfigs.getTokenList().includes(event.address.toHexString())) {
-		const bridgeConfig = NetworkConfigs.getBridgeConfig(
+		const bridgeAddress = NetworkConfigs.getTokenDetails(
 			event.address.toHexString()
-		)
+		)[3]
 
-		const bridgeAddress = bridgeConfig[0]
-		const bridgeName = bridgeConfig[1]
-		const bridgeSlug = bridgeConfig[2]
-
-		const conf = new BridgeConfig(
-			bridgeAddress,
-			bridgeName,
-			bridgeSlug,
-			BridgePermissionType.PERMISSIONLESS,
-			Versions
-		)
-
-		if (
-			event.params.to.toHexString() != bridgeAddress ||
-			event.params.from.toHexString() != bridgeAddress
-		) {
+		if (event.params.from.toHexString() != bridgeAddress) {
 			return
 		}
 
@@ -78,11 +84,10 @@ export function handleTransfer(event: Transfer): void {
 
 		sdk.Tokens.getOrCreateToken(event.address)
 
-		if (event.params.to.toHexString() == bridgeAddress) {
-			sdk.Accounts.loadAccount(event.params.from)
-		}
 		if (event.params.from.toHexString() == bridgeAddress) {
-			sdk.Accounts.loadAccount(event.params.to)
+			const acc = sdk.Accounts.loadAccount(event.params.to)
+
+			acc.countTransferIn()
 		}
 	}
 }

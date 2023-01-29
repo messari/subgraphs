@@ -4,8 +4,8 @@
   "subgraphName": "hop-xdai",
   "deployment": "HOP_PROTOCOL_XDAI",
   "graftEnabled": false,
-  "subgraphId": "QmTbUxDHn2rDq9PpKT7MHwx4AJS24c1upo736JvsxkgECJ",
-  "graftStartBlock": 24544140,
+  "subgraphId": "QmSf289ubRSFw1GFLag5DYFxqvfP5d2nQ5V5aT34XvHb8J",
+  "graftStartBlock": 19351400,
   "tokens": [
     {
       "dataSourceName": "Token",
@@ -144,6 +144,18 @@
       "token": "HOP",
       "address": "0x6F03052743CD99ce1b29265E377e320CD24Eb632",
       "startBlock": 24309494
+    }
+  ],
+  "messenger": [
+    {
+      "dataSourceName": "HopXdaiL1Messenger",
+      "address": "0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e",
+      "startBlock": 12650032
+    },
+    {
+      "dataSourceName": "HopXdaiL2Messenger",
+      "address": "0x75Df5AF045d91108662D8080fD1FEFAd6aA0bb59",
+      "startBlock": 0
     }
   ]
 }

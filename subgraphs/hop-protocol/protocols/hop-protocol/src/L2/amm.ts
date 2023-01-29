@@ -20,6 +20,7 @@ import {
 } from '@graphprotocol/graph-ts'
 import {
 	TokenSwap,
+	L2_Amm,
 	AddLiquidity,
 	RemoveLiquidity,
 	RemoveLiquidityOne,
@@ -27,6 +28,10 @@ import {
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
+import {
+	BIGINT_TEN_TO_EIGHTEENTH,
+	USDC_DENOMINATOR_BI,
+} from '../../../../src/sdk/util/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -55,13 +60,14 @@ const conf = new BridgeConfig(
 	Versions
 )
 
-const genesisHashes = [
-	'0x9dab44e187e3bbbdfea0ca8cddea8ba78eb6f4d94a0725bc3c76ab5187d266e2',
-	'0x1aaddc57d3e9f4157728536f368c5d69a6be268e2258593efa592938395410a1',
-	'0x03a61cb0acb761bee98a0a42718ab606f875d49d1bb694755e5d70cb9890d478',
-	'0x0de91b478c4724233e3d83ae4f5ed4ecbf4b301b48dbc1ade42e0c6f6b66fc6b',
+const genesisHashesDecimal6 = [
+	'0x1aaddc57d3e9f4157728536f368c5d69a6be268e2258593efa592938395410a1', //USDT
+	'0x03a61cb0acb761bee98a0a42718ab606f875d49d1bb694755e5d70cb9890d478', //USDC
 ]
-
+const genesisHashesDecimal18 = [
+	'0x9dab44e187e3bbbdfea0ca8cddea8ba78eb6f4d94a0725bc3c76ab5187d266e2', //ETH
+	'0x0de91b478c4724233e3d83ae4f5ed4ecbf4b301b48dbc1ade42e0c6f6b66fc6b', //DAI
+]
 class TokenInit implements TokenInitializer {
 	getTokenParams(address: Address): TokenParams {
 		const tokenConfig = NetworkConfigs.getTokenDetails(address.toHex())
@@ -73,52 +79,11 @@ class TokenInit implements TokenInitializer {
 }
 
 export function handleTokenSwap(event: TokenSwap): void {
-	const amount = event.params.tokensSold
-
-	const bp = BigInt.fromString('4').div(BigInt.fromString('10000'))
-	const fees = amount.times(bp)
-
-	const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
-		event.address.toHexString()
-	)
-	const bridgeConfig = NetworkConfigs.getBridgeConfig(inputToken)
-	const poolConfig = NetworkConfigs.getPoolDetails(event.address.toHexString())
-
-	const poolName = poolConfig[1]
-	const poolSymbol = poolConfig[0]
-
-	const bridgeAddress = bridgeConfig[0]
-	const bridgeName = bridgeConfig[1]
-	const bridgeSlug = bridgeConfig[2]
-
-	const conf = new BridgeConfig(
-		bridgeAddress,
-		bridgeName,
-		bridgeSlug,
-		BridgePermissionType.PERMISSIONLESS,
-		Versions
-	)
-
-	const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
-
-	const pool = sdk.Pools.loadPool<string>(event.address)
-	const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
-	sdk.Accounts.loadAccount(event.params.buyer)
-
-	if (!pool.isInitialized) {
-		pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
-	}
-
-	pool.addRevenueNative(BigInt.zero(), fees)
-}
-
-export function handleAddLiquidity(event: AddLiquidity): void {
 	if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
-		let amount = event.params.tokenAmounts
-		if (amount.length == 0) {
-			return
-		}
-		const liquidity = amount[1].plus(amount[0])
+		const amount = event.params.tokensSold
+
+		const bp = BigInt.fromString('4').div(BigInt.fromString('10000'))
+		const fees = amount.times(bp)
 
 		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
 			event.address.toHexString()
@@ -134,39 +99,22 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 
 		const pool = sdk.Pools.loadPool<string>(event.address)
 		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
-		const acc = sdk.Accounts.loadAccount(event.params.provider)
+		sdk.Accounts.loadAccount(event.params.buyer)
 
 		if (!pool.isInitialized) {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
-		if (
-			genesisHashes.includes(event.transaction.hash.toHexString().toLowerCase())
-		) {
-			pool.setInputTokenBalance(event.params.lpTokenSupply.minus(liquidity))
-		}
-		pool.setOutputTokenSupply(event.params.lpTokenSupply)
-		pool.addRevenueNative(BigInt.zero(), event.params.fees[0])
-		acc.liquidityDeposit(pool, liquidity)
-
-		log.warning(
-			`LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  feeUsd: {}`,
-			[
-				bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
-				bigIntToBigDecimal(liquidity, 6).toString(),
-				event.transaction.hash.toHexString(),
-				bigIntToBigDecimal(event.params.fees[0], 6).toString(),
-			]
-		)
+		pool.addRevenueNative(BigInt.zero(), fees)
 	}
 }
-export function handleRemoveLiquidity(event: RemoveLiquidity): void {
+
+export function handleAddLiquidity(event: AddLiquidity): void {
 	if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
 		let amount = event.params.tokenAmounts
 		if (amount.length == 0) {
 			return
 		}
-
 		const liquidity = amount[0].plus(amount[1])
 
 		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
@@ -189,7 +137,109 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
-		acc.liquidityWithdraw(pool, liquidity)
+		if (
+			genesisHashesDecimal6.includes(
+				event.transaction.hash.toHexString().toLowerCase()
+			)
+		) {
+			pool.setInputTokenBalance(
+				event.params.lpTokenSupply.div(USDC_DENOMINATOR_BI)
+			)
+		}
+		if (
+			genesisHashesDecimal18.includes(
+				event.transaction.hash.toHexString().toLowerCase()
+			)
+		) {
+			pool.setInputTokenBalance(
+				event.params.lpTokenSupply.div(BIGINT_TEN_TO_EIGHTEENTH)
+			)
+		}
+
+		let val = L2_Amm.bind(event.address)
+
+		let call = val.try_getVirtualPrice()
+		let price: BigInt
+		if (!call.reverted) {
+			price = call.value
+		} else {
+			log.warning('Contract call reverted', [])
+		}
+		pool.setOutputTokenSupply(event.params.lpTokenSupply)
+		pool.addRevenueNative(BigInt.zero(), event.params.fees[0])
+		acc.liquidityDeposit(pool, liquidity, false)
+
+		pool.setInputTokenBalance(
+			event.params.lpTokenSupply.div(BIGINT_TEN_TO_EIGHTEENTH),
+			false
+		)
+		pool.setTotalValueLocked(
+			bigIntToBigDecimal(
+				event.params.lpTokenSupply.times(price).div(BIGINT_TEN_TO_EIGHTEENTH)
+			)
+		)
+
+		log.warning(
+			`LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  tvl: {},  feeUsd: {}`,
+			[
+				bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
+				bigIntToBigDecimal(liquidity, 6).toString(),
+				event.transaction.hash.toHexString(),
+				event.params.lpTokenSupply.div(USDC_DENOMINATOR_BI).toString(),
+				bigIntToBigDecimal(event.params.fees[0], 6).toString(),
+			]
+		)
+	}
+}
+export function handleRemoveLiquidity(event: RemoveLiquidity): void {
+	if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
+		let amount = event.params.tokenAmounts
+		if (amount.length == 0) {
+			return
+		}
+
+		const liquidity = amount[0].plus(amount[1])
+
+		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
+			event.address.toHexString()
+		)
+		const poolConfig = NetworkConfigs.getPoolDetails(
+			event.address.toHexString()
+		)
+
+		let val = L2_Amm.bind(event.address)
+
+		let call = val.try_getVirtualPrice()
+		let price: BigInt
+		if (!call.reverted) {
+			price = call.value
+		} else {
+			log.warning('Contract call reverted', [])
+		}
+
+		const poolName = poolConfig[1]
+		const poolSymbol = poolConfig[0]
+
+		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+
+		const pool = sdk.Pools.loadPool<string>(event.address)
+		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
+		const acc = sdk.Accounts.loadAccount(event.params.provider)
+
+		if (!pool.isInitialized) {
+			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+		}
+
+		acc.liquidityWithdraw(pool, liquidity, false)
+		pool.setInputTokenBalance(
+			event.params.lpTokenSupply.div(BIGINT_TEN_TO_EIGHTEENTH),
+			false
+		)
+		pool.setTotalValueLocked(
+			bigIntToBigDecimal(
+				event.params.lpTokenSupply.times(price).div(BIGINT_TEN_TO_EIGHTEENTH)
+			)
+		)
 		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 
 		log.warning(
@@ -207,9 +257,25 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 }
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 	if (NetworkConfigs.getPoolsList().includes(event.address.toHexString())) {
+		log.warning('LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}', [
+			event.params.lpTokenSupply.toString(),
+			event.transaction.hash.toHexString(),
+			bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
+		])
+
 		let tokenIndex = event.params.boughtId
 		if (!tokenIndex.equals(BigInt.zero())) {
 			return
+		}
+
+		let val = L2_Amm.bind(event.address)
+
+		let call = val.try_getVirtualPrice()
+		let price: BigInt
+		if (!call.reverted) {
+			price = call.value
+		} else {
+			log.warning('Contract call reverted', [])
 		}
 
 		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
@@ -232,11 +298,27 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
-		acc.liquidityWithdraw(pool, event.params.lpTokenAmount)
+		acc.liquidityWithdraw(pool, event.params.lpTokenAmount, false)
+		pool.setInputTokenBalance(
+			event.params.lpTokenSupply.div(BIGINT_TEN_TO_EIGHTEENTH),
+			false
+		)
+		pool.setTotalValueLocked(
+			bigIntToBigDecimal(
+				event.params.lpTokenSupply.times(price).div(BIGINT_TEN_TO_EIGHTEENTH)
+			)
+		)
+		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 
-		log.warning('LWITHONE lpTokenSupply: {}, amount: {}', [
-			event.params.lpTokenSupply.toString(),
-			event.params.lpTokenAmount.toString(),
-		])
+		log.warning(
+			'LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}, virtualPrice: {}, tvl: {}',
+			[
+				event.params.lpTokenSupply.toString(),
+				bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
+				event.transaction.hash.toHexString(),
+				price.toString(),
+				bigIntToBigDecimal(event.params.lpTokenSupply.times(price)).toString(),
+			]
+		)
 	}
 }
