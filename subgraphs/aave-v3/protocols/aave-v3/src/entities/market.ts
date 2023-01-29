@@ -56,7 +56,7 @@ export function createMarket(
     market = new Market(id);
     market.protocol = getOrCreateLendingProtocol().id;
     market.name = token.name;
-    market.isActive = false;
+    market.isActive = true;
     market.canUseAsCollateral = false;
     market.canBorrowFrom = false;
     market.maximumLTV = BIGDECIMAL_ZERO;
@@ -381,7 +381,7 @@ export function updateMarketRewardTokens(
   market.rewardTokens = rewardTokens;
   market.rewardTokenEmissionsAmount = rewardTokenEmissions;
   market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
-  
+
   sortRewardTokens(market);
   updateMarketRewardTokenEmissions(event, market);
 }
@@ -454,9 +454,9 @@ function sortRewardTokens(market: Market): void {
     return;
   }
 
-  let tokens = market.rewardTokens;
-  let emissions = market.rewardTokenEmissionsAmount;
-  let emissionsUSD = market.rewardTokenEmissionsUSD;
+  const tokens = market.rewardTokens;
+  const emissions = market.rewardTokenEmissionsAmount;
+  const emissionsUSD = market.rewardTokenEmissionsUSD;
   multiArraySort(tokens!, emissions!, emissionsUSD!);
 
   market.rewardTokens = tokens;
@@ -464,18 +464,22 @@ function sortRewardTokens(market: Market): void {
   market.rewardTokenEmissionsUSD = emissionsUSD;
 }
 
-function multiArraySort(ref: Array<string>, arr1: Array<BigInt>, arr2: Array<BigDecimal>): void {
+function multiArraySort(
+  ref: Array<string>,
+  arr1: Array<BigInt>,
+  arr2: Array<BigDecimal>
+): void {
   if (ref.length != arr1.length || ref.length != arr2.length) {
     // cannot sort
     return;
   }
 
-  let sorter : Array<Array<string>> = [];
+  const sorter: Array<Array<string>> = [];
   for (let i = 0; i < ref.length; i++) {
     sorter[i] = [ref[i], arr1[i].toString(), arr2[i].toString()];
   }
 
-  sorter.sort(function(a: Array<string>, b: Array<string>): i32 {
+  sorter.sort(function (a: Array<string>, b: Array<string>): i32 {
     if (a[0] < b[0]) {
       return -1;
     }
