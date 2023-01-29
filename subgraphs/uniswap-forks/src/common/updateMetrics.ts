@@ -206,17 +206,13 @@ function updateHourlyDepositUsageMetrics(event: ethereum.Event): string {
     .concat(
       DepositValueEntitySuffix.HOURLY_DEPOSITS_USD_ID
     ));
-  log.debug('>>>>>>>> updateHourlyDepositUsageMetrics depositValues.id {}', [depositValues.id]);
   const statId = protocol.id.concat("-deposit-").concat(hourId);
   let stat =  Stat.load(statId);
   if(!stat) {
-    log.debug('>>>>>>>> updateHourlyDepositUsageMetrics creating new stat with id = ', [statId]);
     stat = createStat(statId);
-    log.debug('>>>>>>>> updateHourlyDepositUsageMetrics resetting deposit values', []);
     depositValues.depositsUSD = [BIGDECIMAL_ZERO];
     depositValues.save();
   } 
-  log.debug('>>>>>>>> updateHourlyDepositUsageMetrics stat.id {}', [stat.id]);
   const transactionHash = event.transaction.hash.toHexString();
   const deposit = Deposit.load(
     transactionHash.concat("-").concat(event.logIndex.toString())
@@ -224,7 +220,6 @@ function updateHourlyDepositUsageMetrics(event: ethereum.Event): string {
 
   if(deposit && deposit.amountUSD) {
     const amountUSD = deposit.amountUSD;
-    log.debug('>>>>>>>> updateHourlyDepositUsageMetrics deposit USD =  {}', [amountUSD.toString()]);
     let deposits = [BIGDECIMAL_ZERO];
     if(depositValues.depositsUSD) {
       deposits = depositValues.depositsUSD!;
@@ -233,12 +228,10 @@ function updateHourlyDepositUsageMetrics(event: ethereum.Event): string {
     depositValues.depositsUSD = deposits;
     depositValues.save();
     stat.meanUSD = meanBigDecimalArray(deposits);
-    log.debug('>>>>>>>> updateHourlyDepositUsageMetrics stat.meanUSD =  {}', [stat.meanUSD.toString()]);
   }
   
   stat.count = stat.count.plus(BIGINT_ONE);
   stat.save();
-  log.debug('>>>>>>>> updateHourlyDepositUsageMetrics returns {}', [stat.id]);
   return stat.id;
 }
 
