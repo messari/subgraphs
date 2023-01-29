@@ -33,7 +33,7 @@ import {
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
 } from "./constants";
-import { createPoolFees } from "./creators";
+import { createPoolFees, createStat } from "./creators";
 
 
 /**
@@ -198,12 +198,8 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.dailyTransactionCount = INT_ZERO;
     const depositStatId = protocol.id.concat("-deposit-").concat(dayId);
-    let depositStat =  new Stat(depositStatId);
-    depositStat.count = BIGINT_ZERO;
-    depositStat.meanUSD = BIGDECIMAL_ZERO;
-    depositStat.save();
+    let depositStat =  createStat(depositStatId);
     usageMetrics.depositStats = depositStat.id;
-    usageMetrics.dailyDepositCount = INT_ZERO;
     usageMetrics.dailyWithdrawCount = INT_ZERO;
     usageMetrics.dailySwapCount = INT_ZERO;
 
@@ -220,6 +216,7 @@ export function getOrCreateUsageMetricDailySnapshot(
 export function getOrCreateUsageMetricHourlySnapshot(
   event: ethereum.Event
 ): UsageMetricsHourlySnapshot {
+  const protocol = getOrCreateProtocol();
   // Number of days since Unix epoch
   const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
   const hourId = hour.toString();
@@ -233,8 +230,12 @@ export function getOrCreateUsageMetricHourlySnapshot(
 
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
+
+    const depositStatId = protocol.id.concat("-deposit-").concat(hourId);
+    let depositStat =  createStat(depositStatId);
+    usageMetrics.depositStats = depositStat.id;
+
     usageMetrics.hourlyTransactionCount = INT_ZERO;
-    usageMetrics.hourlyDepositCount = INT_ZERO;
     usageMetrics.hourlyWithdrawCount = INT_ZERO;
     usageMetrics.hourlySwapCount = INT_ZERO;
 
@@ -416,3 +417,5 @@ export function getOrCreateRewardToken(address: string): RewardToken {
   }
   return rewardToken as RewardToken;
 }
+
+

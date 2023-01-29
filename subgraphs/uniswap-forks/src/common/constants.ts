@@ -110,7 +110,7 @@ export namespace MasterChef {
 
 export namespace DepositValueEntitySuffix {
   export const DAILY_DEPOSITS_USD_ID = "-daily-deposits-usd";
-  export const HOURLY_DEPOSITS_USD_ID = "hourly-deposits-usd";
+  export const HOURLY_DEPOSITS_USD_ID = "-hourly-deposits-usd";
 }
 
 export namespace DepositValueEntityNames {
