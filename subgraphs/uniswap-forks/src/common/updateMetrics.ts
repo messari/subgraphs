@@ -1,11 +1,13 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log, store } from "@graphprotocol/graph-ts";
 import {
   Account,
   ActiveAccount,
+  Deposit,
   DexAmmProtocol,
   LiquidityPool,
   Stat,
   Token,
+  _dailyDepositValesUSD,
   _HelperStore,
 } from "../../generated/schema";
 import {
@@ -32,8 +34,9 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   UsageType,
+  DepositValueEntitySuffix,
 } from "./constants";
-import { convertTokenToDecimal, percToDec } from "./utils/utils";
+import { meanBigDecimalArray, convertTokenToDecimal, percToDec } from "./utils/utils";
 import {
   findUSDPricePerToken,
   updateNativeTokenPriceInUSD,
@@ -79,25 +82,67 @@ export function updateUsageMetrics(
   usageMetricsHourly.timestamp = event.block.timestamp;
   usageMetricsHourly.hourlyTransactionCount += INT_ONE;
 
+  // Number of days since Unix epoch
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-    // Number of days since Unix epoch
-    const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-    const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
-  
-    const dayId = day.toString();
-    const hourId = hour.toString();
+  const dayId = day.toString();
+  const hourId = hour.toString();
 
   if (usageType == UsageType.DEPOSIT) {
     // TODO: Change deposit counts to Stat entities
+    // If entity already exists the new one will 
+    // be merged with it: https://thegraph.com/docs/en/developing/assemblyscript-api/#updating-existing-entities
+    let depositValues = new _dailyDepositValesUSD(protocol.id
+      .concat(
+        DepositValueEntitySuffix.DAILY_DEPOSITS_USD_ID
+      ));
+ 
     const depositStatId = protocol.id.concat("-deposit-").concat(dayId);
     let depositStat =  Stat.load(depositStatId);
     if(!depositStat) {
       depositStat = new Stat(depositStatId)
       depositStat.count = BIGINT_ZERO;
+      depositStat.meanUSD = BIGDECIMAL_ZERO;
       depositStat.save();
+
+      // It's a new snapshot so reset deposit values array
+      if(!depositValues) {
+        log.debug('>>>>>>> DEPOSIT VALUES IS NULL LINE 111', [])
+      }
+      if(!depositValues.depositsUSD) {
+        log.debug('>>>>>> DEPOSITS USD IS NULL FOR ID {} LINE 114', [depositValues.id]);
+      }
+      depositValues.depositsUSD = [BIGDECIMAL_ZERO];
+      depositValues.save();
     } 
+    const transactionHash = event.transaction.hash.toHexString();
+    const deposit = Deposit.load(
+      transactionHash.concat("-").concat(event.logIndex.toString())
+    );
+
+    if(deposit && deposit.amountUSD) {
+      const amountUSD = deposit.amountUSD;
+      let deposits = [BIGDECIMAL_ZERO];
+      if(!depositValues) {
+        log.debug('>>>>>>> DEPOSIT VALUES IS NULL LINE 128', [])
+      }
+      if(!depositValues.depositsUSD) {
+        log.debug('>>>>>> DEPOSITS USD IS NULL FOR ID {} LINE 131', [depositValues.id]);
+      }
+      if(depositValues.depositsUSD) {
+        deposits = depositValues.depositsUSD!;
+      }
+      deposits.push(amountUSD);
+      depositValues.depositsUSD = deposits;
+      depositValues.save();
+      depositStat.meanUSD = meanBigDecimalArray(deposits);
+    }
+    
     depositStat.count = depositStat.count.plus(BIGINT_ONE);
     depositStat.save();
+
+    usageMetricsDaily.depositStats = depositStat.id;
     usageMetricsDaily.dailyDepositCount += INT_ONE;
     usageMetricsHourly.hourlyDepositCount += INT_ONE;
   } else if (usageType == UsageType.WITHDRAW) {
@@ -446,4 +491,26 @@ export function updateDepositHelper(poolAddress: Address): void {
   const poolDeposits = _HelperStore.load(poolAddress.toHexString())!;
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE;
   poolDeposits.save();
+}
+
+export function updateMetricsDepositsHelper(event:ethereum.Event, valueUSD:BigDecimal): void {
+  const protocol = getOrCreateProtocol();
+
+  // Number of days since Unix epoch
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+
+  const dayId = day.toString();
+  const hourId = hour.toString();
+
+  // create new daily usd deposits
+  let depositValues = _dailyDepositValesUSD.load(protocol.id
+                                                  .concat(
+                                                    DepositValueEntitySuffix.DAILY_DEPOSITS_USD_ID
+                                                  ));
+  // It's a new day so reset deposit values array
+  depositValues.depositsUSD = new Array<BigDecimal>();
+  depositValues.save();
+
+
 }

@@ -296,6 +296,15 @@ type UsageMetricsDailySnapshot @entity {
   timestamp: BigInt!
 }
 
+# Daily deposit usd values used to calculate averages, get reset at start of each new day
+type _dailyDepositValesUSD @entity {
+  " id is {protocol/pool}-daily-deposits-usd"
+  id: ID!
+
+  " USD value of each deposit in the day "
+  depositsUSD: [BigDecimal!]
+}
+
 type Stat @entity {
   " { protocol/pool }-{ [Optional] Pool ID }-{ deposit/withdraw/swap }-{ Days/hours since Unix epoch } "
   id: ID!
@@ -306,8 +315,8 @@ type Stat @entity {
   # " Average in native token amount (rounded down)  "
   # meanAmount: BigInt!
 
-  # " Average in USD "
-  # meanUSD: BigDecimal!
+  " Average in USD "
+  meanUSD: BigDecimal!
 
   # " Median in native token amount"
   # medianAmount: BigInt!
