@@ -109,6 +109,15 @@ export namespace MasterChef {
   export const MASTERCHEFV3 = "MASTERCHEFV3";
 }
 
+export namespace DepositValueEntitySuffix {
+  export const DAILY_DEPOSITS_USD_ID = "-daily-deposits-usd";
+  export const HOURLY_DEPOSITS_USD_ID = "hourly-deposits-usd";
+}
+
+export namespace DepositValueEntityNames {
+  export const DAILY_DEPOSITS_USD = "_dailyDepositValesUSD";
+}
+
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");

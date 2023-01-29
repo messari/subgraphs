@@ -91,3 +91,19 @@ export function isSameSign(a: BigInt, b: BigInt): boolean {
   }
   return false;
 }
+
+/**
+ * Calculates the average value for an array of BigDecimals
+ * @param toMean
+ * @returns the average value or BIGDECIMAL_ZERO for an empty array
+ */
+export function meanBigDecimalArray(toMean: Array<BigDecimal>): BigDecimal {
+  if(toMean.length == 0) {
+    return BIGDECIMAL_ZERO;
+  }
+  let sum = BIGDECIMAL_ZERO;
+  for(let i = 0; i < toMean.length; i++) {
+    sum = sum.plus(toMean[i])
+  }
+  return sum.div(new BigDecimal(BigInt.fromI32(toMean.length)));
+}

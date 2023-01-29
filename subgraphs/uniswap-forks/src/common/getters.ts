@@ -20,6 +20,7 @@ import {
   Position,
   PositionSnapshot,
   _PositionCounter,
+  Stat,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
@@ -182,6 +183,7 @@ export function getOrCreateTransfer(event: ethereum.Event): _Transfer {
 export function getOrCreateUsageMetricDailySnapshot(
   event: ethereum.Event
 ): UsageMetricsDailySnapshot {
+  const protocol = getOrCreateProtocol();
   // Number of days since Unix epoch
   const id = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   const dayId = id.toString();
@@ -195,6 +197,12 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics.dailyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.dailyTransactionCount = INT_ZERO;
+    const depositStatId = protocol.id.concat("-deposit-").concat(dayId);
+    let depositStat =  new Stat(depositStatId);
+    depositStat.count = BIGINT_ZERO;
+    depositStat.meanUSD = BIGDECIMAL_ZERO;
+    depositStat.save();
+    usageMetrics.depositStats = depositStat.id;
     usageMetrics.dailyDepositCount = INT_ZERO;
     usageMetrics.dailyWithdrawCount = INT_ZERO;
     usageMetrics.dailySwapCount = INT_ZERO;
@@ -202,7 +210,6 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
 
-    const protocol = getOrCreateProtocol();
     usageMetrics.totalPoolCount = protocol.totalPoolCount;
 
     usageMetrics.save();
