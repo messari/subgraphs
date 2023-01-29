@@ -479,6 +479,59 @@ type PoolHourlySnapshot @entity {
   blockNumber: BigInt!
 }
 
+    ##### Event Data #####
+    ##### Different Protocols will emit varying events #####
+    ##### The Event interface can be used for querying an activity feed #####
+
+interface Event {
+  " { Transaction hash }-{ Log index } "
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. "
+  logIndex: Int!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Account that caused the event to be emitted "
+  account: Account!
+
+  " Amount of token transferred for the event in native units, null if the event does not emit some type of value "
+  amount: BigInt
+}
+
+## This sample event should be duplicated for each of the events that would be desirable for an activity log for the protocol ##
+## E.g. deposits, withdrawals, staking, swaps, delegations, votes, etc. ##
+## Events that implement the Event interface can be extended for unique properties ##
+type SampleEvent implements Event @entity(immutable: true) {
+   " { Transaction hash }-{ Log index } "
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. "
+  logIndex: Int!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Account that caused the event to be emitted "
+  account: Account!
+
+  " Amount of token transferred for the event in native units, null if the event does not emit some type of value "
+  amount: BigInt
+}
+
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
 type Account @entity {
