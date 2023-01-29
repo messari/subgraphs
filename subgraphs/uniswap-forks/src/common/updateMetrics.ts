@@ -9,6 +9,7 @@ import {
   Token,
   _dailyDepositValesUSD,
   _HelperStore,
+  _hourlyDepositValesUSD,
 } from "../../generated/schema";
 import {
   getLiquidityPool,
@@ -34,7 +35,7 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   UsageType,
-  DepositValueEntitySuffix,
+  DepositValueEntitySuffix
 } from "./constants";
 import { meanBigDecimalArray, convertTokenToDecimal, percToDec } from "./utils/utils";
 import {
@@ -42,6 +43,7 @@ import {
   updateNativeTokenPriceInUSD,
 } from "../price/price";
 import { NetworkConfigs } from "../../configurations/configure";
+import { createStat } from "./creators";
 
 // Update FinancialsDailySnapshots entity
 // Updated on Swap, Burn, and Mint events.
@@ -90,61 +92,9 @@ export function updateUsageMetrics(
   const hourId = hour.toString();
 
   if (usageType == UsageType.DEPOSIT) {
-    // TODO: Change deposit counts to Stat entities
-    // If entity already exists the new one will 
-    // be merged with it: https://thegraph.com/docs/en/developing/assemblyscript-api/#updating-existing-entities
-    let depositValues = new _dailyDepositValesUSD(protocol.id
-      .concat(
-        DepositValueEntitySuffix.DAILY_DEPOSITS_USD_ID
-      ));
- 
-    const depositStatId = protocol.id.concat("-deposit-").concat(dayId);
-    let depositStat =  Stat.load(depositStatId);
-    if(!depositStat) {
-      depositStat = new Stat(depositStatId)
-      depositStat.count = BIGINT_ZERO;
-      depositStat.meanUSD = BIGDECIMAL_ZERO;
-      depositStat.save();
 
-      // It's a new snapshot so reset deposit values array
-      if(!depositValues) {
-        log.debug('>>>>>>> DEPOSIT VALUES IS NULL LINE 111', [])
-      }
-      if(!depositValues.depositsUSD) {
-        log.debug('>>>>>> DEPOSITS USD IS NULL FOR ID {} LINE 114', [depositValues.id]);
-      }
-      depositValues.depositsUSD = [BIGDECIMAL_ZERO];
-      depositValues.save();
-    } 
-    const transactionHash = event.transaction.hash.toHexString();
-    const deposit = Deposit.load(
-      transactionHash.concat("-").concat(event.logIndex.toString())
-    );
-
-    if(deposit && deposit.amountUSD) {
-      const amountUSD = deposit.amountUSD;
-      let deposits = [BIGDECIMAL_ZERO];
-      if(!depositValues) {
-        log.debug('>>>>>>> DEPOSIT VALUES IS NULL LINE 128', [])
-      }
-      if(!depositValues.depositsUSD) {
-        log.debug('>>>>>> DEPOSITS USD IS NULL FOR ID {} LINE 131', [depositValues.id]);
-      }
-      if(depositValues.depositsUSD) {
-        deposits = depositValues.depositsUSD!;
-      }
-      deposits.push(amountUSD);
-      depositValues.depositsUSD = deposits;
-      depositValues.save();
-      depositStat.meanUSD = meanBigDecimalArray(deposits);
-    }
-    
-    depositStat.count = depositStat.count.plus(BIGINT_ONE);
-    depositStat.save();
-
-    usageMetricsDaily.depositStats = depositStat.id;
-    usageMetricsDaily.dailyDepositCount += INT_ONE;
-    usageMetricsHourly.hourlyDepositCount += INT_ONE;
+    usageMetricsHourly.depositStats = updateHourlyDepositUsageMetrics(event);
+    usageMetricsDaily.depositStats = updateDailyDepositUsageMetrics(event);
   } else if (usageType == UsageType.WITHDRAW) {
     usageMetricsDaily.dailyWithdrawCount += INT_ONE;
     usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
@@ -152,8 +102,6 @@ export function updateUsageMetrics(
     usageMetricsDaily.dailySwapCount += INT_ONE;
     usageMetricsHourly.hourlySwapCount += INT_ONE;
   }
-
-
 
   // Combine the id and the user address to generate a unique user id for the day
   const dailyActiveAccountId = from.concat("-").concat(dayId);
@@ -191,6 +139,109 @@ export function updateUsageMetrics(
   usageMetricsHourly.save();
   protocol.save();
 }
+
+/**
+ * Updates daily deposit usage metrics stats for a given day
+ * @param event 
+ * @returns string the id of the stat entity for the given day
+ */
+function updateDailyDepositUsageMetrics(event: ethereum.Event): string {
+
+  const protocol = getOrCreateProtocol();
+
+  // Number of days since Unix epoch
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+
+  const dayId = day.toString();
+  // If entity already exists the new one will 
+  // be merged with it: https://thegraph.com/docs/en/developing/assemblyscript-api/#updating-existing-entities
+  let depositValues = new _dailyDepositValesUSD(protocol.id
+    .concat(
+      DepositValueEntitySuffix.DAILY_DEPOSITS_USD_ID
+    ));
+
+  const statId = protocol.id.concat("-deposit-").concat(dayId);
+  let stat = Stat.load(statId);
+  if(!stat) {
+    stat = createStat(statId)
+    depositValues.depositsUSD = [BIGDECIMAL_ZERO];
+    depositValues.save();
+  }
+  const transactionHash = event.transaction.hash.toHexString();
+  const deposit = Deposit.load(
+    transactionHash.concat("-").concat(event.logIndex.toString())
+  );
+
+  if(deposit && deposit.amountUSD) {
+    const amountUSD = deposit.amountUSD;
+    let deposits = [BIGDECIMAL_ZERO];
+    if(depositValues.depositsUSD) {
+      deposits = depositValues.depositsUSD!;
+    }
+    deposits.push(amountUSD);
+    depositValues.depositsUSD = deposits;
+    depositValues.save();
+    stat.meanUSD = meanBigDecimalArray(deposits);
+  }
+  
+  stat.count = stat.count.plus(BIGINT_ONE);
+  stat.save();
+  return stat.id;
+}
+
+/**
+ * Updates hourly deposit usage metrics stats for a given day
+ * @param event 
+ * @returns string the id of the stat entity for the given hour
+ */
+function updateHourlyDepositUsageMetrics(event: ethereum.Event): string {
+
+  const protocol = getOrCreateProtocol();
+
+  // Number of days since Unix epoch
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const hourId = hour.toString();
+
+  let depositValues = new _hourlyDepositValesUSD(protocol.id
+    .concat(
+      DepositValueEntitySuffix.HOURLY_DEPOSITS_USD_ID
+    ));
+  log.debug('>>>>>>>> updateHourlyDepositUsageMetrics depositValues.id {}', [depositValues.id]);
+  const statId = protocol.id.concat("-deposit-").concat(hourId);
+  let stat =  Stat.load(statId);
+  if(!stat) {
+    log.debug('>>>>>>>> updateHourlyDepositUsageMetrics creating new stat with id = ', [statId]);
+    stat = createStat(statId);
+    log.debug('>>>>>>>> updateHourlyDepositUsageMetrics resetting deposit values', []);
+    depositValues.depositsUSD = [BIGDECIMAL_ZERO];
+    depositValues.save();
+  } 
+  log.debug('>>>>>>>> updateHourlyDepositUsageMetrics stat.id {}', [stat.id]);
+  const transactionHash = event.transaction.hash.toHexString();
+  const deposit = Deposit.load(
+    transactionHash.concat("-").concat(event.logIndex.toString())
+  );
+
+  if(deposit && deposit.amountUSD) {
+    const amountUSD = deposit.amountUSD;
+    log.debug('>>>>>>>> updateHourlyDepositUsageMetrics deposit USD =  {}', [amountUSD.toString()]);
+    let deposits = [BIGDECIMAL_ZERO];
+    if(depositValues.depositsUSD) {
+      deposits = depositValues.depositsUSD!;
+    }
+    deposits.push(amountUSD);
+    depositValues.depositsUSD = deposits;
+    depositValues.save();
+    stat.meanUSD = meanBigDecimalArray(deposits);
+    log.debug('>>>>>>>> updateHourlyDepositUsageMetrics stat.meanUSD =  {}', [stat.meanUSD.toString()]);
+  }
+  
+  stat.count = stat.count.plus(BIGINT_ONE);
+  stat.save();
+  log.debug('>>>>>>>> updateHourlyDepositUsageMetrics returns {}', [stat.id]);
+  return stat.id;
+}
+
 
 // Update UsagePoolDailySnapshot entity
 // Updated on Swap, Burn, and Mint events.

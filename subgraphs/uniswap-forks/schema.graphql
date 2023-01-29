@@ -274,12 +274,6 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
   dailyTransactionCount: Int!
 
-  " Total number of deposits (add liquidity) in a day "
-  dailyDepositCount: Int!
-
-  " Statistics around deposit events "
-  depositStats: Stat!
-
   " Total number of withdrawals (remove liquidity) in a day "
   dailyWithdrawCount: Int!
 
@@ -294,16 +288,61 @@ type UsageMetricsDailySnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+
+  #### Statistics #####
+
+  # " Statistics around swap events "
+  # swapStats: Stat!
+
+  " Statistics around deposit events "
+  depositStats: Stat!
+
+  # " Statistics around withdraw events "
+  # withdrawStats: Stat!
+
 }
 
-# Daily deposit usd values used to calculate averages, get reset at start of each new day
-type _dailyDepositValesUSD @entity {
-  " id is {protocol/pool}-daily-deposits-usd"
+type UsageMetricsHourlySnapshot @entity {
+  " { # of hours since Unix epoch time } "
   id: ID!
 
-  " USD value of each deposit in the day "
-  depositsUSD: [BigDecimal!]
+  " Protocol this snapshot is associated with "
+  protocol: DexAmmProtocol!
+
+  " Number of unique hourly active users "
+  hourlyActiveUsers: Int!
+
+  " Number of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
+  hourlyTransactionCount: Int!
+
+  " Total number of withdrawals (remove liquidity) in an hour "
+  hourlyWithdrawCount: Int!
+
+  " Total number of trades (swaps) in an hour "
+  hourlySwapCount: Int!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
+  #### Statistics #####
+
+  # " Statistics around swap events "
+  # swapStats: Stat!
+
+  " Statistics around deposit events "
+  depositStats: Stat!
+
+  # " Statistics around withdraw events "
+  # withdrawStats: Stat!
+
 }
+
 
 type Stat @entity {
   " { protocol/pool }-{ [Optional] Pool ID }-{ deposit/withdraw/swap }-{ Days/hours since Unix epoch } "
@@ -343,37 +382,7 @@ type Stat @entity {
   # varUSD: BigDecimal!
 }
 
-type UsageMetricsHourlySnapshot @entity {
-  " { # of hours since Unix epoch time } "
-  id: ID!
 
-  " Protocol this snapshot is associated with "
-  protocol: DexAmmProtocol!
-
-  " Number of unique hourly active users "
-  hourlyActiveUsers: Int!
-
-  " Number of cumulative unique users "
-  cumulativeUniqueUsers: Int!
-
-  " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
-  hourlyTransactionCount: Int!
-
-  " Total number of deposits (add liquidity) in an hour "
-  hourlyDepositCount: Int!
-
-  " Total number of withdrawals (remove liquidity) in an hour "
-  hourlyWithdrawCount: Int!
-
-  " Total number of trades (swaps) in an hour "
-  hourlySwapCount: Int!
-
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
-}
 
 type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
@@ -988,7 +997,6 @@ type ActiveAccount @entity {
 }
 
 #Added Entities
-
 type _MasterChef @entity {
   " MasterChef Type - pid referenced in the MasterChef Contract "
   id: ID!
@@ -1168,4 +1176,22 @@ type _PositionCounter @entity {
   " Next count "
   # Increment this when a position is closed
   nextCount: Int!
+}
+
+# Daily deposit usd values used to calculate averages, get reset at start of each new day
+type _dailyDepositValesUSD @entity {
+  " id is {protocol/pool}-daily-deposits-usd"
+  id: ID!
+
+  " USD value of each deposit in the day "
+  depositsUSD: [BigDecimal!]
+}
+
+# Daily deposit usd values used to calculate averages, get reset at start of each new day
+type _hourlyDepositValesUSD @entity {
+  " id is {protocol/pool}-hourly-deposits-usd"
+  id: ID!
+
+  " USD value of each deposit in the day "
+  depositsUSD: [BigDecimal!]
 }

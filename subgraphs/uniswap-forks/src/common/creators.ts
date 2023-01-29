@@ -529,3 +529,14 @@ export function getSwapTokens(
     tokenOutUSD,
   };
 }
+
+export function createStat(id:string): Stat {
+  let stat =  Stat.load(id); // just in case it already exists
+  if(!stat) {
+    stat = new Stat(id)
+    stat.count = BIGINT_ZERO;
+    stat.meanUSD = BIGDECIMAL_ZERO;
+    stat.save();
+  } 
+  return stat;
+}
