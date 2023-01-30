@@ -100,7 +100,7 @@ export const CVX_TOKEN_ADDRESS = Address.fromString(
 
 export const BVECVX_VAULT_ADDRESS = Address.fromString(
   "0xfd05D3C7fe2924020620A8bE4961bBaA747e6305"
-)
+);
 
 export const CRV_DAO_TOKEN = Address.fromString(
   "0xd533a949740bb3306d119cc777fa900ba034cd52"

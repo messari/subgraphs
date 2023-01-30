@@ -6,10 +6,7 @@ export class PoolFeesType {
   private _withdrawalFees: VaultFee;
   private _performanceFees: VaultFee;
 
-  constructor(
-    withdrawalFees: VaultFee,
-    performanceFees: VaultFee
-  ) {
+  constructor(withdrawalFees: VaultFee, performanceFees: VaultFee) {
     this._withdrawalFees = withdrawalFees;
     this._performanceFees = performanceFees;
   }
@@ -33,9 +30,6 @@ export class PoolFeesType {
   }
 
   stringIds(): string[] {
-    return [
-      this.getWithdrawalFeesId,
-      this.getPerformanceFeesId,
-    ];
+    return [this.getWithdrawalFeesId, this.getPerformanceFeesId];
   }
 }
