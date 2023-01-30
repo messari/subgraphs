@@ -479,13 +479,20 @@ type PoolHourlySnapshot @entity {
   blockNumber: BigInt!
 }
 
-    ##### Event Data #####
-    ##### Different Protocols will emit varying events #####
-    ##### The Event interface can be used for querying an activity feed #####
+##### Event Data #####
+##### Different Protocols will emit varying events #####
+##### The Event interface can be used for querying an activity feed #####
+
+enum Event {
+  SampleEvent
+}
 
 interface Event {
   " { Transaction hash }-{ Log index } "
   id: ID!
+  
+  " The Event Name "
+  event: Event!
 
   " Transaction hash of the transaction that emitted this event "
   hash: String!
@@ -512,6 +519,8 @@ interface Event {
 type SampleEvent implements Event @entity(immutable: true) {
    " { Transaction hash }-{ Log index } "
   id: ID!
+  
+  event: Event!
 
   " Transaction hash of the transaction that emitted this event "
   hash: String!
