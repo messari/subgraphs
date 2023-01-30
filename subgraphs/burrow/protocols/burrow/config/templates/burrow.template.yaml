@@ -1,0 +1,26 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: near
+    name: Contract
+    network: {{ chain }}
+    source:
+      account: "{{ contract }}"
+      startBlock: {{ startBlock }}
+    mapping:
+      entities:
+        - LendingProtocol
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      receiptHandlers:
+        - handler: handleReceipt
+      file: ./src/index.ts

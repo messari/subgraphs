@@ -1,0 +1,271 @@
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+features:
+  - grafting
+{{/graftEnabled}}
+dataSources:
+  {{#bridges}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: {{ abi }}
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: {{{ file }}}
+      entities:
+        - BridgeProtocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - Token
+        - CrosschainToken
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - PoolRoute
+        - PoolRouteSnapshot
+      abis:
+        - name: Router
+          file: ./abis/Multichain/Router.json
+        - name: anyTOKEN
+          file: ./abis/Multichain/anyTOKEN.json
+
+        ###########################################
+        ################# Tokens ##################
+        ###########################################
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: LogSwapin(indexed bytes32,indexed address,uint256)
+          handler: handlerSwapInV2
+        - event: LogSwapout(indexed address,indexed address,uint256)
+          handler: handlerSwapOutV2
+  {{/bridges}}
+  {{#routers}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: {{ abi }}
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: {{{ file }}}
+      entities:
+        - BridgeProtocol
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - Token
+        - CrosschainToken
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+        - PoolRoute
+        - PoolRouteSnapshot
+      abis:
+        - name: Router
+          file: ./abis/Multichain/Router.json
+        - name: anyTOKEN
+          file: ./abis/Multichain/anyTOKEN.json
+
+        ###########################################
+        ################# Tokens ##################
+        ###########################################
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: LogAnySwapIn(indexed bytes32,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleSwapIn
+        - event: LogAnySwapOut(indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleSwapOut
+  {{/routers}}
+templates:
+  - name: LiquidityPoolTemplate
+    kind: ethereum
+    network: {{ network }}
+    source:
+      abi: anyTOKEN
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: {{{ file }}}
+      entities:
+        - BridgeProtocol
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - Token
+      abis:
+        - name: Router
+          file: ./abis/Multichain/Router.json
+        - name: anyTOKEN
+          file: ./abis/Multichain/anyTOKEN.json
+
+        ###########################################
+        ################# Tokens ##################
+        ###########################################
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256,address)
+          handler: handleDeposit
+        - function: depositVault(uint256,address)
+          handler: handleDepositVault
+        - function: withdraw(uint256,address)
+          handler: handleWithdraw
+        - function: withdrawVault(address,uint256,address)
+          handler: handleWithdrawVault

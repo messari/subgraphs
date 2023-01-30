@@ -2,20 +2,19 @@ import { Box, Button } from "@mui/material";
 import { DataGrid, GridAlignment } from "@mui/x-data-grid";
 import moment from "moment";
 import { useState } from "react";
-import { downloadCSV, formatIntToFixed2, tableCellTruncate, toDate, upperCaseFirstOfString } from "../../../src/utils/index";
+import { downloadCSV, formatIntToFixed2, tableCellTruncate, toDate, toUnitsSinceEpoch, upperCaseFirstOfString } from "../../../src/utils/index";
 import { DatePicker } from "../utilComponents/DatePicker";
 
 interface ComparisonTableProps {
   datasetLabel: string;
   dataTable: any;
-  isMonthly: boolean;
-  setIsMonthly: any;
+  isHourly: boolean;
   jpegDownloadHandler: any;
   baseKey: string;
   overlayKey: string;
 }
 
-export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonthly, jpegDownloadHandler, baseKey, overlayKey }: ComparisonTableProps) => {
+export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloadHandler, baseKey, overlayKey }: ComparisonTableProps) => {
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -48,7 +47,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
         {
           field: "date",
           headerName: "Date",
-          minWidth: 100,
+          minWidth: (isHourly ? 130 : 100),
           headerAlign: "right" as GridAlignment,
           align: "right" as GridAlignment,
         },
@@ -84,33 +83,37 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
           },
         },
       ];
-      const datesSelectedTimestamps = dates.map((x: any) => x.format("YYYY-MM-DD"));
+
+      let formatStr = "YYYY-MM-DD";
+      if (isHourly) {
+        formatStr = "YYYY-MM-DD hh";
+      }
+      const datesSelectedTimestamps = dates.map((x: any) => x.format(formatStr));
       const differencePercentageArr: any = [];
       const dataTableCopy = JSON.parse(JSON.stringify({ ...dataTable }));
       dataTableCopy[baseKey] = dataTableCopy[baseKey].filter((x: any) => {
         if (datesSelectedTimestamps.length > 0) {
-          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format(formatStr));
         }
         return true;
       });
       dataTableCopy[overlayKey] = dataTableCopy[overlayKey].filter((x: any) => {
         if (datesSelectedTimestamps.length > 0) {
-          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format(formatStr));
         }
         return true;
       });
+
+      const dateToValMap: any = {};
+      dataTableCopy[overlayKey].forEach((val: any) => {
+        const key = toUnitsSinceEpoch(toDate(val.date, isHourly), isHourly);
+        dateToValMap[key] = val.value;
+      });
       const tableData = dataTableCopy[baseKey]
         .map((val: any, i: any) => {
-          let date = toDate(val.date);
-          if (isMonthly) {
-            date = date.split("-").slice(0, 2).join("-");
-          }
-          let overlayVal = dataTableCopy[overlayKey].find((point: any) => {
-            if (isMonthly) {
-              return toDate(point?.date)?.split("-")?.slice(0, 2)?.join("-");
-            }
-            return toDate(point?.date) === date;
-          })?.value;
+          let date = toDate(val.date, isHourly);
+          const dateKey = toUnitsSinceEpoch(toDate(val.date, isHourly), isHourly);
+          let overlayVal = dateToValMap[dateKey];
           if (!overlayVal) {
             overlayVal = 0;
           }
@@ -192,7 +195,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
       );
     }
   } catch (err: any) {
-    console.error(err.message);
+    console.error(err);
     return null;
   }
 

@@ -1,0 +1,237 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "contract RocketStorageInterface",
+        "name": "_rocketStorageAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_confirmDisableBootstrapMode",
+        "type": "bool"
+      }
+    ],
+    "name": "bootstrapDisable",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_id", "type": "string" },
+      { "internalType": "string", "name": "_url", "type": "string" },
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "bootstrapMember",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_settingContractName",
+        "type": "string"
+      },
+      { "internalType": "string", "name": "_settingPath", "type": "string" },
+      { "internalType": "bool", "name": "_value", "type": "bool" }
+    ],
+    "name": "bootstrapSettingBool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_settingContractName",
+        "type": "string"
+      },
+      { "internalType": "string", "name": "_settingPath", "type": "string" },
+      { "internalType": "uint256", "name": "_value", "type": "uint256" }
+    ],
+    "name": "bootstrapSettingUint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_type", "type": "string" },
+      { "internalType": "string", "name": "_name", "type": "string" },
+      { "internalType": "string", "name": "_contractAbi", "type": "string" },
+      {
+        "internalType": "address",
+        "name": "_contractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "bootstrapUpgrade",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "decrementMemberUnbondedValidatorCount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getBootstrapModeDisabled",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_index", "type": "uint256" }
+    ],
+    "name": "getMemberAt",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getMemberCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getMemberID",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getMemberIsChallenged",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getMemberIsValid",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getMemberJoinedTime",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getMemberLastProposalTime",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getMemberMinRequired",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_proposalType", "type": "string" },
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getMemberProposalExecutedTime",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getMemberQuorumVotesRequired",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getMemberRPLBondAmount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getMemberUnbondedValidatorCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "getMemberUrl",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_nodeAddress", "type": "address" }
+    ],
+    "name": "incrementMemberUnbondedValidatorCount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_id", "type": "string" },
+      { "internalType": "string", "name": "_url", "type": "string" }
+    ],
+    "name": "memberJoinRequired",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "version",
+    "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

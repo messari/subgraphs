@@ -40,6 +40,7 @@ interface AllDataTabsProps {
   poolOverviewRequest: { [x: string]: any };
   poolTimeseriesRequest: { [x: string]: any };
   overlayPoolTimeseriesData: any;
+  overlayPoolTimeseriesLoading: boolean;
   protocolTimeseriesData: any;
   protocolTimeseriesLoading: any;
   protocolTimeseriesError: any;
@@ -82,6 +83,7 @@ function AllDataTabs({
   poolTimeseriesRequest,
   protocolTimeseriesData,
   overlayPoolTimeseriesData,
+  overlayPoolTimeseriesLoading,
   protocolTableData,
   decentralizedDeployments,
   poolsListData,
@@ -136,7 +138,7 @@ function AllDataTabs({
   const protocolType = data.protocols[0].type;
   const protocolEntityNamesPlural = ProtocolTypeEntityNames[protocolType];
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
-  const network = data[protocolEntityNamesPlural][0].network;
+  const network = data[protocolEntityNamesPlural][0]?.network;
 
   let eventsTab = null;
   let eventsTabButton = null;
@@ -267,8 +269,10 @@ function AllDataTabs({
             data={data}
             overlayData={overlayData}
             entitiesData={entitiesData}
+            subgraphToQueryURL={subgraphToQueryURL}
             poolTimeseriesData={poolTimeseriesRequest.poolTimeseriesData}
             overlayPoolTimeseriesData={overlayPoolTimeseriesData}
+            overlayPoolTimeseriesLoading={overlayPoolTimeseriesLoading}
             poolTimeseriesLoading={poolTimeseriesRequest.poolTimeseriesLoading}
             poolTimeseriesError={poolTimeseriesRequest.poolTimeseriesError}
             poolId={poolId}

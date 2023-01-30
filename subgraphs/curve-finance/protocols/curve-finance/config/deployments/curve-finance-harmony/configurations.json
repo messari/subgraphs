@@ -1,0 +1,25 @@
+{
+  "network": "harmony",
+  "defaultNetwork": "Network.HARMONY",
+
+  "priceCaching": 1000,
+
+  "poolInfoContract": "0xb17b674D9c5CB2e441F8e196a2f048A81355d031",
+  "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
+  "crvTokenAddress": "0x352cd428efd6f31b5cae636928b7b84149cf369f",
+
+  "gaugeControllerContract": "0xabC000d88f23Bb45525E447528DBF656A9D55bf5",
+  "gaugeControllerStartBlock": "22875218",
+
+  "poolRegistry": [
+    {
+      "name": "MainRegistry",
+      "address": "0x0a53FaDa2d943057C47A301D25a4D9b3B8e01e8E",
+      "startBlock": "18003250"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}

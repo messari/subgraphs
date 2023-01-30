@@ -25,6 +25,7 @@ export const schema100 = (): Schema => {
   const entitiesData = {
     financialsDailySnapshots: {
       id: "ID!",
+      day: "BigInt!",
       totalValueLockedUSD: "BigDecimal!",
       dailySupplySideRevenueUSD: "BigDecimal!",
       cumulativeSupplySideRevenueUSD: "BigDecimal!",
@@ -34,27 +35,15 @@ export const schema100 = (): Schema => {
       cumulativeTotalRevenueUSD: "BigDecimal!",
       cumulativeVolumeInUSD: "BigDecimal!",
       cumulativeVolumeOutUSD: "BigDecimal!",
-      cumulativeTotalVolumeUSD: "BigDecimal!",
-      netVolumeUSD: "BigDecimal!",
-      cumulativeUniqueTransferSenders: "Int!",
-      cumulativeUniqueTransferReceivers: "Int!",
-      cumulativeUniqueLiquidityProviders: "Int!",
-      cumulativeUniqueMessageSenders: "Int!",
-      cumulativeTransactionCount: "Int!",
-      cumulativeTransferOutCount: "Int!",
-      cumulativeTransferInCount: "Int!",
-      cumulativeLiquidityDepositCount: "Int!",
-      cumulativeLiquidityWithdrawCount: "Int!",
-      cumulativeMessageSentCount: "Int!",
-      cumulativeMessageReceivedCount: "Int!",
-      totalPoolCount: "Int!",
-      totalPoolRouteCount: "Int!",
-      totalCanonicalRouteCount: "Int!",
-      totalWrappedRouteCount: "Int!",
-      totalSupportedTokenCount: "Int!",
+      dailyNetVolumeUSD: "BigDecimal!",
+      dailyVolumeInUSD: "BigDecimal!",
+      dailyVolumeOutUSD: "BigDecimal!",
+      cumulativeNetVolumeUSD: "BigDecimal!",
+      timestamp: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       id: "ID!",
+      day: "BigInt!",
       cumulativeUniqueUsers: "Int!",
       cumulativeUniqueTransferSenders: "Int!",
       cumulativeUniqueTransferReceivers: "Int!",
@@ -88,6 +77,7 @@ export const schema100 = (): Schema => {
     },
     poolDailySnapshots: {
       id: "ID!",
+      day: "BigInt!",
       totalValueLockedUSD: "BigDecimal!",
       cumulativeSupplySideRevenueUSD: "BigDecimal!",
       dailySupplySideRevenueUSD: "BigDecimal!",
@@ -113,10 +103,12 @@ export const schema100 = (): Schema => {
       stakedOutputTokenAmount: "BigInt",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
+      mintSupply: "BigInt",
       timestamp: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       id: "ID!",
+      hour: "BigInt!",
       cumulativeUniqueUsers: "Int!",
       hourlyActiveUsers: "Int!",
       cumulativeUniqueTransferSenders: "Int!",
@@ -145,6 +137,7 @@ export const schema100 = (): Schema => {
     },
     poolHourlySnapshots: {
       id: "ID!",
+      hour: "Int!",
       totalValueLockedUSD: "BigDecimal!",
       cumulativeSupplySideRevenueUSD: "BigDecimal!",
       hourlySupplySideRevenueUSD: "BigDecimal!",
@@ -164,12 +157,13 @@ export const schema100 = (): Schema => {
       netCumulativeVolumeUSD: "BigDecimal!",
       netHourlyVolume: "BigInt!",
       netHourlyVolumeUSD: "BigDecimal!",
-      inputTokenBalances: "BigInt!",
+      inputTokenBalance: "BigInt!",
       outputTokenSupply: "BigInt",
       outputTokenPriceUSD: "BigDecimal",
       stakedOutputTokenAmount: "BigInt",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
+      mintSupply: "BigInt",
       timestamp: "BigInt!",
     },
   };
@@ -228,8 +222,26 @@ export const schema100 = (): Schema => {
     rewardTokenEmissionsUSD: "[BigDecimal!]",
   };
 
+  const eventsFields = ["hash", "timestamp", "account{id}"];
+
   // Query pool(pool) entity and events entities
-  let events: string[] = [];
+  const events: string[] = ["bridgeTransfers", "bridgeMessages", "liquidityDeposits", "liquidityWithdraws"];
+  const eventsQuery: any[] = events.map((event) => {
+    let options = "";
+    let fields = eventsFields.join(", ");
+    if (event !== "bridgeMessages") {
+      fields += ', amount, amountUSD, pool{id}';
+      options = ", where: {pool: $poolId}";
+    }
+    const baseStr =
+      event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
+    if (event === "bridgeTransfers" || event === "bridgeMessages") {
+      fields += ", fromChainID, toChainID, crossTransactionID";
+    } else if (event === "liquidityDeposits" || event === "liquidityWithdraws") {
+      fields += ", chainID, token{name}";
+    }
+    return baseStr + fields + " }";
+  });
 
   const financialsQuery = `
     query Data {
@@ -246,7 +258,7 @@ export const schema100 = (): Schema => {
 
   const protocolTableQuery = `
     query Data($protocolId: String) {
-      protocol(id: $protocolId) {
+      bridgeProtocol(id: $protocolId) {
         id
         name
         slug
@@ -255,13 +267,34 @@ export const schema100 = (): Schema => {
         methodologyVersion
         network
         type
+        permissionType
         totalValueLockedUSD
+        protocolControlledValueUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
+        cumulativeVolumeInUSD
+        cumulativeVolumeOutUSD
+        cumulativeTotalVolumeUSD
+        netVolumeUSD
         cumulativeUniqueUsers
-        protocolControlledValueUSD
+        cumulativeUniqueTransferSenders
+        cumulativeUniqueTransferReceivers
+        cumulativeUniqueLiquidityProviders
+        cumulativeUniqueMessageSenders
+        cumulativeTransactionCount
+        cumulativeTransferOutCount
+        cumulativeTransferInCount
+        cumulativeLiquidityDepositCount
+        cumulativeLiquidityWithdrawCount
+        cumulativeMessageSentCount
+        cumulativeMessageReceivedCount
+        supportedNetworks
         totalPoolCount
+        totalPoolRouteCount
+        totalCanonicalRouteCount
+        totalWrappedRouteCount
+        totalSupportedTokenCount
       }
     }`;
 
@@ -300,6 +333,45 @@ export const schema100 = (): Schema => {
       subgraphVersion
     }
 
+    bridgeProtocols {
+      id
+      name
+      slug
+      schemaVersion
+      subgraphVersion
+      methodologyVersion
+      network
+      type
+      permissionType
+      totalValueLockedUSD
+      protocolControlledValueUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeTotalRevenueUSD
+      cumulativeVolumeInUSD
+      cumulativeVolumeOutUSD
+      cumulativeTotalVolumeUSD
+      netVolumeUSD
+      cumulativeUniqueUsers
+      cumulativeUniqueTransferSenders
+      cumulativeUniqueTransferReceivers
+      cumulativeUniqueLiquidityProviders
+      cumulativeUniqueMessageSenders
+      cumulativeTransactionCount
+      cumulativeTransferOutCount
+      cumulativeTransferInCount
+      cumulativeLiquidityDepositCount
+      cumulativeLiquidityWithdrawCount
+      cumulativeMessageSentCount
+      cumulativeMessageReceivedCount
+      supportedNetworks
+      totalPoolCount
+      totalPoolRouteCount
+      totalCanonicalRouteCount
+      totalWrappedRouteCount
+      totalSupportedTokenCount
+    }
+    ${eventsQuery}
     pool(id: $poolId){
       id
       name
@@ -316,6 +388,13 @@ export const schema100 = (): Schema => {
         decimals
         name
         symbol
+      }
+      mintSupply
+      routes {
+        id
+        crossToken {
+          network
+        }
       }
       rewardTokens {
         id

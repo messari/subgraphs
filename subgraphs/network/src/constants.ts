@@ -30,7 +30,7 @@ export namespace Network {
   export const OPTIMISM = "OPTIMISM";
   export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
-  export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const GNOSIS = "GNOSIS"; // aka Gnosis Chain
 }
 
 // This is how the Network displays on thegraph.com
@@ -57,7 +57,7 @@ export namespace SubgraphNetwork {
   export const OPTIMISM = "optimism";
   export const OSMOSIS = "osmosis-1";
   export const POLYGON = "matic";
-  export const XDAI = "xdai";
+  export const GNOSIS = "gnosis";
 }
 
 export namespace DataType {

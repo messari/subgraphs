@@ -9,12 +9,13 @@ import {
   Borrow,
   Deposit,
   Liquidate,
+  Market,
   Repay,
   Withdraw,
 } from "../../generated/schema";
 import { BIGINT_ZERO, PositionSide } from "../utils/constants";
-import { addMarketVolume, getOrCreateMarket } from "./market";
-import { getOrCreateAssetToken, getVSTToken } from "./token";
+import { addMarketVolume } from "./market";
+import { getVSTToken } from "./token";
 import { prefixID } from "../utils/strings";
 import {
   getOrCreateAccount,
@@ -52,7 +53,7 @@ export enum EventType {
 
 export function createDeposit(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   amountAsset: BigInt,
   amountUSD: BigDecimal,
   sender: Address
@@ -61,7 +62,6 @@ export function createDeposit(
     log.warning("Invalid deposit amount: {}", [amountAsset.toString()]);
     return;
   }
-  const market = getOrCreateMarket(asset);
   const account = getOrCreateAccount(sender);
   const position = getOrCreateUserPosition(
     event,
@@ -83,11 +83,11 @@ export function createDeposit(
   deposit.account = account.id;
   deposit.market = market.id;
   deposit.position = position.id;
-  deposit.asset = getOrCreateAssetToken(asset).id;
+  deposit.asset = market.inputToken;
   deposit.amount = amountAsset;
   deposit.amountUSD = amountUSD;
   deposit.save();
-  addMarketVolume(event, asset, amountUSD, EventType.Deposit);
+  addMarketVolume(event, market, amountUSD, EventType.Deposit);
   incrementAccountDepositCount(account);
   incrementPositionDepositCount(position);
   incrementProtocolDepositCount(event, account);
@@ -95,7 +95,7 @@ export function createDeposit(
 
 export function createWithdraw(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   amountAsset: BigInt,
   amountUSD: BigDecimal,
   user: Address,
@@ -105,7 +105,6 @@ export function createWithdraw(
     log.warning("Invalid withdraw amount: {}", [amountAsset.toString()]);
     return;
   }
-  const market = getOrCreateMarket(asset);
   const account = getOrCreateAccount(recipient);
   const position = getOrCreateUserPosition(
     event,
@@ -127,11 +126,11 @@ export function createWithdraw(
   withdraw.account = account.id;
   withdraw.market = market.id;
   withdraw.position = position.id;
-  withdraw.asset = getOrCreateAssetToken(asset).id;
+  withdraw.asset = market.inputToken;
   withdraw.amount = amountAsset;
   withdraw.amountUSD = amountUSD;
   withdraw.save();
-  addMarketVolume(event, asset, amountUSD, EventType.Withdraw);
+  addMarketVolume(event, market, amountUSD, EventType.Withdraw);
   incrementAccountWithdrawCount(account);
   incrementPositionWithdrawCount(position);
   incrementProtocolWithdrawCount(event, account);
@@ -139,7 +138,7 @@ export function createWithdraw(
 
 export function createBorrow(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   amountVST: BigInt,
   amountUSD: BigDecimal,
   recipient: Address
@@ -148,7 +147,7 @@ export function createBorrow(
     log.warning("Invalid borrow amount: {}", [amountVST.toString()]);
     return;
   }
-  const market = getOrCreateMarket(asset);
+
   const account = getOrCreateAccount(recipient);
   const position = getOrCreateUserPosition(
     event,
@@ -174,7 +173,7 @@ export function createBorrow(
   borrow.amount = amountVST;
   borrow.amountUSD = amountUSD;
   borrow.save();
-  addMarketVolume(event, asset, amountUSD, EventType.Borrow);
+  addMarketVolume(event, market, amountUSD, EventType.Borrow);
   incrementAccountBorrowCount(account);
   incrementPositionBorrowCount(position);
   incrementProtocolBorrowCount(event, account);
@@ -182,7 +181,7 @@ export function createBorrow(
 
 export function createRepay(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   amountVST: BigInt,
   amountUSD: BigDecimal,
   user: Address,
@@ -192,7 +191,6 @@ export function createRepay(
     log.warning("Invalid repay amount: {}", [amountVST.toString()]);
     return;
   }
-  const market = getOrCreateMarket(asset);
   const account = getOrCreateAccount(repayer);
   const position = getOrCreateUserPosition(
     event,
@@ -218,7 +216,7 @@ export function createRepay(
   repay.amount = amountVST;
   repay.amountUSD = amountUSD;
   repay.save();
-  addMarketVolume(event, asset, amountUSD, EventType.Repay);
+  addMarketVolume(event, market, amountUSD, EventType.Repay);
   incrementAccountRepayCount(account);
   incrementPositionRepayCount(position);
   incrementProtocolRepayCount(event, account);
@@ -226,14 +224,13 @@ export function createRepay(
 
 export function createLiquidate(
   event: ethereum.Event,
-  asset: Address,
+  market: Market,
   amountLiquidated: BigInt,
   amountLiquidatedUSD: BigDecimal,
   profitUSD: BigDecimal,
   user: Address,
   liquidator: Address
 ): void {
-  const market = getOrCreateMarket(asset);
   const account = getOrCreateAccount(user);
   const liquidatorAccount = getOrCreateAccount(liquidator);
   const lenderPosition = getOrCreateUserPosition(
@@ -270,7 +267,7 @@ export function createLiquidate(
   liquidate.amountUSD = amountLiquidatedUSD;
   liquidate.profitUSD = profitUSD;
   liquidate.save();
-  addMarketVolume(event, asset, amountLiquidatedUSD, EventType.Liquidate);
+  addMarketVolume(event, market, amountLiquidatedUSD, EventType.Liquidate);
   incrementAccountLiquidationCount(account);
   incrementPositionLiquidationCount(borrowerPosition);
   incrementPositionLiquidationCount(lenderPosition);

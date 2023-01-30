@@ -7,13 +7,29 @@ Because of a regenesis event on Optimism, many of the liquidity pools have to be
 More Info:
 https://blog.synthetix.io/optimism-mainnet-upgrade-scheduled-downtime-and-regenesis/
 
+## TVL Corrections
+
+DEXs can be very difficult with composing accurate prices from the liquidity pools. For this reason, there are some measures in place to correct highly inaccurate prices. These are:
+
+- Blacklisting Tokens
+- Blacklisting Pools
+- Ignoring TVL changes that have a delta of more than 1 Billion USD
+
+Each of these measures are taken on a case by case basis and are selected in order to solve the problem the most reliably while still providing a good representation of the TVL. Ingoring of TVL changes with delta of mroe than 1 Billion is a temporary fix, and will be removed once the underlying issue is better resolved in 2.0.0.
+
 ## Calculation Methodology v1.0.0
+
+### Positions
+
+Positions may or may not be created through the NFT manager contract. Positions are only tracked if they are created through the NFT manager contract. Most positions are created through the NFT manager contract, but some are created through the pool contract. It would be very difficult to track positions that bypass the NFT manager contract, so I decided not to track them.
 
 ### Total Value Locked (TVL) USD
 
 Sum across all Pools:
 
-`Liquidity Pool TVL`
+`Liquidity Pool TVL` = `Active Liquidity` + `Inactive Liquidity` + `Uncollected Fees`
+
+Changes whenever there is a swap, deposit, withdraw, or uncollected fees are removed from the pool.
 
 ### Total Revenue USD
 
