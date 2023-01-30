@@ -147,7 +147,7 @@ export function getOrCreateRewardToken(
 export function getOrCreateVaultFee(
   feeId: string,
   feeType: string,
-  feePercentage: BigDecimal = constants.BIGDECIMAL_ZERO
+  feePercentage: BigDecimal | null = null
 ): VaultFee {
   let fees = VaultFee.load(feeId);
 
@@ -160,7 +160,7 @@ export function getOrCreateVaultFee(
     fees.save();
   }
 
-  if (feePercentage.notEqual(constants.BIGDECIMAL_ZERO)) {
+  if (feePercentage) {
     fees.feePercentage = feePercentage;
 
     fees.save();
