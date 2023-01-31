@@ -1,20 +1,20 @@
-import { BigDecimal } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal } from "@graphprotocol/graph-ts";
 import { Factory } from "../../generated/Factory/Factory";
 
 export interface Configurations {
   getNetwork(): string;
   getProtocolName(): string;
   getProtocolSlug(): string;
-  getFactoryAddress(): string;
+  getFactoryAddress(): Bytes;
   getFactoryContract(): Factory;
   getFeeOnOff(): string;
   getRewardIntervalType(): string;
-  getReferenceToken(): string;
-  getRewardToken(): string;
-  getWhitelistTokens(): string[];
-  getStableCoins(): string[];
-  getStableOraclePools(): string[];
-  getUntrackedPairs(): string[];
-  getUntrackedTokens(): string[];
+  getReferenceToken(): Bytes;
+  getRewardToken(): Bytes;
+  getWhitelistTokens(): Bytes[];
+  getStableCoins(): Bytes[];
+  getStableOraclePools(): Bytes[];
+  getUntrackedPairs(): Bytes[];
+  getUntrackedTokens(): Bytes[];
   getMinimumLiquidityThreshold(): BigDecimal;
 }

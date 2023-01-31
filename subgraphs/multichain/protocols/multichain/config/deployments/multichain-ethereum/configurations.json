@@ -1,0 +1,258 @@
+{
+  "deployment": "MULTICHAIN_MAINNET",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "bridges": [
+    {
+      "name": "BridgeV2-Shiden",
+      "address": "0x00e856ee945a49bb73436e719d96910cd9d116a4",
+      "abi": "anyTOKEN",
+      "startBlock": 13305723
+    },
+    {
+      "name": "BridgeV2-ANY Litecoin",
+      "address": "0x0abcfbfa8e3fda8b7fba18721caf7d5cf55cf5f5",
+      "abi": "anyTOKEN",
+      "startBlock": 11405162
+    },
+    {
+      "name": "BridgeV2-BSCstarter",
+      "address": "0x1d7ca62f6af49ec66f6680b8606e634e55ef22c1",
+      "abi": "anyTOKEN",
+      "startBlock": 12957206
+    },
+    {
+      "name": "BridgeV2-Manga token ",
+      "address": "0x2cf51e73c3516f3d86e9c0b4de0971dbf0766fd4",
+      "abi": "anyTOKEN",
+      "startBlock": 13675793
+    },
+    {
+      "name": "BridgeV2-JustYours",
+      "address": "0x3053ad3b31600074e9a90440770f78d5e8fc5a54",
+      "abi": "anyTOKEN",
+      "startBlock": 13229596
+    },
+    {
+      "name": "BridgeV2-Loud Market",
+      "address": "0x3129662808bec728a27ab6a6b9afd3cbaca8a43c",
+      "abi": "anyTOKEN",
+      "startBlock": 13719623
+    },
+    {
+      "name": "BridgeV2-WOWswap",
+      "address": "0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
+      "abi": "anyTOKEN",
+      "startBlock": 12657052
+    },
+    {
+      "name": "BridgeV2-Kampay",
+      "address": "0x3907e6ff436e2b2b05d6b929fb05f14c0ee18d90",
+      "abi": "anyTOKEN",
+      "startBlock": 13093776
+    },
+    {
+      "name": "BridgeV2-MANUFACTORY",
+      "address": "0x39fc9e94caeacb435842fadedecb783589f50f5f",
+      "abi": "anyTOKEN",
+      "startBlock": 13763050
+    },
+    {
+      "name": "BridgeV2-JumpToken",
+      "address": "0x420a24c9c65bd44c48bfb1cc8d6cd1ea8b1ac840",
+      "abi": "anyTOKEN",
+      "startBlock": 14222468
+    },
+    {
+      "name": "BridgeV2-Travala.com Token",
+      "address": "0x442b153f6f61c0c99a33aa4170dcb31e1abda1d0",
+      "abi": "anyTOKEN",
+      "startBlock": 13086244
+    },
+    {
+      "name": "BridgeV2-SeedifyFund",
+      "address": "0x461d52769884ca6235b685ef2040f47d30c94eb5",
+      "abi": "anyTOKEN",
+      "startBlock": 12520773
+    },
+    {
+      "name": "BridgeV2-ANY Bitcoin",
+      "address": "0x51600b0cff6bbf79e7767158c41fd15e968ec404",
+      "abi": "anyTOKEN",
+      "startBlock": 11267957
+    },
+    {
+      "name": "BridgeV2-Wakanda Inu Token",
+      "address": "0x5444c30210d8a0a156178cfb8048b4137c0d40d1",
+      "abi": "anyTOKEN",
+      "startBlock": 13675819
+    },
+    {
+      "name": "BridgeV2-SpookyToken",
+      "address": "0x55af5865807b196bd0197e0902746f31fbccfa58",
+      "abi": "anyTOKEN",
+      "startBlock": 13229565
+    },
+    {
+      "name": "BridgeV2-Pirate Coin",
+      "address": "0x5f006745a9a192a7cd1236089f704f9b35d3b9cd",
+      "abi": "anyTOKEN",
+      "startBlock": 13587364
+    },
+    {
+      "name": "BridgeV2-Collector Coin",
+      "address": "0x667fd83e24ca1d935d36717d305d54fa0cac991c",
+      "abi": "anyTOKEN",
+      "startBlock": 12835925
+    },
+    {
+      "name": "BridgeV2-PETS Token",
+      "address": "0x6afcff9189e8ed3fcc1cffa184feb1276f6a82a5",
+      "abi": "anyTOKEN",
+      "startBlock": 13453032
+    },
+    {
+      "name": "BridgeV2-SpiritSwap Token",
+      "address": "0x6ccf12b480a99c54b23647c995f4525d544a7e72",
+      "abi": "anyTOKEN",
+      "startBlock": 13229588
+    },
+    {
+      "name": "BridgeV2-Metti Inu",
+      "address": "0x84b67e43474a403cde9aa181b02ba07399a54573",
+      "abi": "anyTOKEN",
+      "startBlock": 13989940
+    },
+    {
+      "name": "BridgeV2-ColossusXT",
+      "address": "0x95bf7e307bc1ab0ba38ae10fc27084bc36fcd605",
+      "abi": "anyTOKEN",
+      "startBlock": 12702582
+    },
+    {
+      "name": "BridgeV2-Fusion",
+      "address": "0x979aca85ba37c675e78322ed5d97fa980b9bdf00",
+      "abi": "anyTOKEN",
+      "startBlock": 11267718
+    },
+    {
+      "name": "BridgeV2-FevrToken",
+      "address": "0x9fb83c0635de2e815fd1c21b3a292277540c2e8d",
+      "abi": "anyTOKEN",
+      "startBlock": 13086547
+    },
+    {
+      "name": "BridgeV2-PolyGaj Token",
+      "address": "0x9fda7ceec4c18008096c2fe2b85f05dc300f94d0",
+      "abi": "anyTOKEN",
+      "startBlock": 12957869
+    },
+    {
+      "name": "BridgeV2-MAGICToken",
+      "address": "0xa384bc7cdc0a93e686da9e7b8c0807cd040f4e0b",
+      "abi": "anyTOKEN",
+      "startBlock": 13280843
+    },
+    {
+      "name": "BridgeV2-Risq Protocol",
+      "address": "0xaac2bb703093eca3ce9b97434fd16f2765951c0e",
+      "abi": "anyTOKEN",
+      "startBlock": 13511453
+    },
+    {
+      "name": "BridgeV2-FaraCrystal",
+      "address": "0xaef9e3e050d0ef060cdfd5246209b0b6bb66060f",
+      "abi": "anyTOKEN",
+      "startBlock": 13453011
+    },
+    {
+      "name": "BridgeV2-Impossible Finance",
+      "address": "0xb0e1fc65c1a741b4662b813eb787d369b8614af1",
+      "abi": "anyTOKEN",
+      "startBlock": 12324494
+    },
+    {
+      "name": "BridgeV2-Coin of the champions",
+      "address": "0xc4bb7277a74678f053259cb1f96140347efbfd46",
+      "abi": "anyTOKEN",
+      "startBlock": 13943580
+    },
+    {
+      "name": "BridgeV2-Shar Pei",
+      "address": "0xcb9f441ffae898e7a2f32143fd79ac899517a9dc",
+      "abi": "anyTOKEN",
+      "startBlock": 13675853
+    },
+    {
+      "name": "BridgeV2-Investintoken",
+      "address": "0xd22a58f79e9481d1a88e00c343885a588b34b68b",
+      "abi": "anyTOKEN",
+      "startBlock": 12944491
+    },
+    {
+      "name": "BridgeV2-NASDEX Token",
+      "address": "0xe069af87450fb51fc0d0e044617f1c134163e591",
+      "abi": "anyTOKEN",
+      "startBlock": 13408673
+    },
+    {
+      "name": "BridgeV2-ANY Blocknet",
+      "address": "0xe692c8d72bd4ac7764090d54842a305546dd1de5",
+      "abi": "anyTOKEN",
+      "startBlock": 11456760
+    },
+    {
+      "name": "BridgeV2-Anyswap",
+      "address": "0xf99d58e463a2e07e5692127302c20a191861b4d6",
+      "abi": "anyTOKEN",
+      "startBlock": 11267788
+    },
+    {
+      "name": "BridgeV2-Bat True Dollar",
+      "address": "0xfbdd194376de19a88118e84e279b977f165d01b8",
+      "abi": "anyTOKEN",
+      "startBlock": 12520861
+    }
+  ],
+  "routers": [
+    {
+      "name": "RouterV3",
+      "address": "0xe95fd76cf16008c12ff3b3a937cb16cd9cc20284",
+      "abi": "Router",
+      "startBlock": 13644533
+    },
+    {
+      "name": "RouterV4",
+      "address": "0x6b7a87899490EcE95443e979cA9485CBE7E71522",
+      "abi": "Router",
+      "startBlock": 12657964
+    },
+    {
+      "name": "RouterV4 2",
+      "address": "0x765277EebeCA2e31912C9946eAe1021199B39C61",
+      "abi": "Router",
+      "startBlock": 12242619
+    },
+    {
+      "name": "RouterV6",
+      "address": "0xBa8Da9dcF11B50B03fd5284f164Ef5cdEF910705",
+      "abi": "Router",
+      "startBlock": 14215845
+    },
+    {
+      "name": "RouterV6 2",
+      "address": "0x7E78d327B15f2A36a22c5955d3a23D99DbCCD8E0",
+      "abi": "Router",
+      "startBlock": 15838392
+    },
+    {
+      "name": "RouterV6 3",
+      "address": "0x7782046601e7b9B05cA55A3899780CE6EE6B8B2B",
+      "abi": "Router",
+      "startBlock": 14698380
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

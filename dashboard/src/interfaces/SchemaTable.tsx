@@ -1,6 +1,6 @@
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 import { useEffect } from "react";
-import { percentageFieldList } from "../constants";
+import { negativeFieldList, percentageFieldList } from "../constants";
 import { convertTokenDecimals, formatIntToFixed2 } from "../utils";
 import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
 
@@ -24,7 +24,7 @@ function checkValueFalsey(
     valueMsg = "empty";
   } else if (!value || Number(value) === 0) {
     valueMsg = value;
-  } else if (Number(value) < 0) {
+  } else if (Number(value) < 0 && !negativeFieldList.includes(fieldName)) {
     valueMsg = "negative";
     level = "critical";
   }
@@ -167,7 +167,7 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
             let rewardFactorsStr = "N/A";
             let rewardAPRs: string[] = entityData?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
               let apr = 0;
-              if (protocolType === "LENDING" && (entityData.rewardTokens[idx]?.type === "BORROW" || entityData.rewardTokens[idx]?.token?.type === "BORROW")) {
+              if (protocolType === "LENDING" && (entityData.rewardTokens[idx]?.type?.includes("BORROW") || entityData.rewardTokens[idx]?.token?.type?.includes("BORROW"))) {
                 if (
                   !Number(entityData.totalBorrowBalanceUSD) &&
                   issues.filter(

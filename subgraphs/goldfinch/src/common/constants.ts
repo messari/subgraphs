@@ -108,6 +108,7 @@ export const DAYS_PER_YEAR = 365;
 export const SECONDS_PER_YEAR = 60 * 60 * 24 * DAYS_PER_YEAR;
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const SECONDS_PER_HOUR = 60 * 60; // 3600
+export const DAYS_PER_EPOCH = 7;
 
 export const ETHEREUM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 13; // 13 = seconds per block
 export const AVALANCHE_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 2; // 2 = seconds per block. This is NOT ideal since avalanche has variable block time.
@@ -172,6 +173,8 @@ export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const FIDU_ADDRESS = "0x6a445e9f40e0b97c92d0b8a3366cef1d67f700bf";
 export const GFI_ADDRESS = "0xdab396ccf3d84cf2d07c4454e10c8a6f5b008d2b";
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+export const MEMBERSHIP_VAULT_ADDRESS =
+  "0x375b906b25e00bdd43017400cd4cefb36fbf9c18";
 export const STAKING_REWARDS_ADDRESS =
   "0xfd6ff39da508d281c2d255e9bbbfab34b6be60c3";
 export const POOL_TOKENS_ADDRESS = "0x57686612c601cb5213b01aa8e80afeb24bbd01df";

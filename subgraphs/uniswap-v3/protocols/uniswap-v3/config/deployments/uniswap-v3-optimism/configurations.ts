@@ -1,4 +1,4 @@
-import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts";
 import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   FeeSwitch,
@@ -7,7 +7,7 @@ import {
 } from "../../../../../src/common/constants";
 import { Configurations } from "../../../../../configurations/configurations/interface";
 import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/common/constants";
-import { toLowerCase } from "../../../../../src/common/utils/utils";
+import { stringToBytesList } from "../../../../../src/common/utils/utils";
 
 export class UniswapV3OptimismConfigurations implements Configurations {
   getNetwork(): string {
@@ -19,14 +19,12 @@ export class UniswapV3OptimismConfigurations implements Configurations {
   getProtocolSlug(): string {
     return PROTOCOL_SLUG;
   }
-  getFactoryAddress(): string {
-    return "0x1F98431c8aD98523631AE4a59f267346ea31F984".toLowerCase();
+  getFactoryAddress(): Bytes {
+    return Bytes.fromHexString("0x1f98431c8ad98523631ae4a59f267346ea31f984");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString(
-        "0x1F98431c8aD98523631AE4a59f267346ea31F984".toLowerCase()
-      )
+      Address.fromString("0x1f98431c8ad98523631ae4a59f267346ea31f984")
     );
   }
   getFeeOnOff(): string {
@@ -35,45 +33,44 @@ export class UniswapV3OptimismConfigurations implements Configurations {
   getRewardIntervalType(): string {
     return RewardIntervalType.NONE;
   }
-  getReferenceToken(): string {
-    return "0x4200000000000000000000000000000000000006".toLowerCase();
+  getReferenceToken(): Bytes {
+    return Bytes.fromHexString("0x4200000000000000000000000000000000000006");
   }
-  getRewardToken(): string {
-    return "";
+  getRewardToken(): Bytes {
+    return Bytes.fromHexString("");
   }
-  getWhitelistTokens(): string[] {
-    return toLowerCase([
-      "0x4200000000000000000000000000000000000006", // WETH
-      "0x7F5c764cBc14f9669B88837ca1490cCa17c31607", // USDC
-      "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", // TUSD
-      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
-      "0x68f180fcCe6836688e9084f035309E29Bf0A2095", // wBTC
-      "0x9e1028F5F1D5eDE59748FFceE5532509976840E0", // PERP
-      "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb", // LYRA
-      "0x61BAADcF22d2565B0F471b291C475db5555e0b76", // AELIN
+  getWhitelistTokens(): Bytes[] {
+    return stringToBytesList([
+      "0x7f5c764cbc14f9669b88837ca1490cca17c31607", // usdc
+      "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58", // tusd
+      "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1", // dai
+      "0x68f180fcce6836688e9084f035309e29bf0a2095", // wbtc
+      "0x9e1028f5f1d5ede59748ffcee5532509976840e0", // perp
+      "0x50c5725949a6f0c72e6c4a641f24049a917db0cb", // lyra
+      "0x61baadcf22d2565b0f471b291c475db5555e0b76", // aelin
     ]);
   }
-  getStableCoins(): string[] {
-    return toLowerCase([
-      "0x7F5c764cBc14f9669B88837ca1490cCa17c31607", // USDC
-      "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", // TUSD
-      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
+  getStableCoins(): Bytes[] {
+    return stringToBytesList([
+      "0x7f5c764cbc14f9669b88837ca1490cca17c31607", // usdc
+      "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58", // tusd
+      "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1", // dai
     ]);
   }
-  getStableOraclePools(): string[] {
-    return toLowerCase([
-      "0x03aF20bDAaFfB4cC0A521796a223f7D85e2aAc31", // wETH/DAI
-      "0xB589969D38CE76D3d7AA319De7133bC9755fD840", // wETH/USDC - 0.30
-      "0x85149247691df622eaF1a8Bd0CaFd40BC45154a9", // wETH/USDC - 0.05
+  getStableOraclePools(): Bytes[] {
+    return stringToBytesList([
+      "0x03af20bdaaffb4cc0a521796a223f7d85e2aac31", // weth/dai
+      "0xb589969d38ce76d3d7aa319de7133bc9755fd840", // weth/usdc - 0.30
+      "0x85149247691df622eaf1a8bd0cafd40bc45154a9", // weth/usdc - 0.05
     ]);
   }
-  getUntrackedPairs(): string[] {
-    return toLowerCase([]);
+  getUntrackedPairs(): Bytes[] {
+    return stringToBytesList([]);
   }
-  getUntrackedTokens(): string[] {
-    return toLowerCase([
-      "0x296f55f8fb28e498b858d0bcda06d955b2cb3f97", // StargateToken
-      "0x2e3d870790dc77a83dd1d18184acc7439a53f475", // Frax
+  getUntrackedTokens(): Bytes[] {
+    return stringToBytesList([
+      "0x296f55f8fb28e498b858d0bcda06d955b2cb3f97", // stargatetoken
+      "0x2e3d870790dc77a83dd1d18184acc7439a53f475", // frax
     ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {

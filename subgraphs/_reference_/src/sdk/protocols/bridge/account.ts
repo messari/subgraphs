@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import {
   Account as AccountSchema,
   BridgeTransfer,
@@ -7,12 +7,14 @@ import {
   LiquidityWithdraw,
   PoolRoute,
   ActiveAccount,
+  BridgeMessage,
 } from "../../../../generated/schema";
 import { Pool } from "./pool";
 import { Bridge } from "./protocol";
 import { TokenManager } from "./tokens";
 import { BridgePoolType, TransactionType, TransferType } from "./enums";
 import { getUnixDays, getUnixHours } from "../../util/events";
+import { CustomEventType } from ".";
 
 export class AccountManager {
   protocol: Bridge;
@@ -60,7 +62,7 @@ export class AccountWasActive {
 
 export class Account {
   account: AccountSchema;
-  event: ethereum.Event;
+  event: CustomEventType;
   protocol: Bridge;
   tokens: TokenManager;
 
@@ -82,8 +84,8 @@ export class Account {
   }
 
   private trackActivity(activityType: ActivityType): void {
-    const days = getUnixDays(this.event);
-    const hours = getUnixHours(this.event);
+    const days = getUnixDays(this.event.block);
+    const hours = getUnixHours(this.event.block);
 
     const generalHourlyID = `${this.account.id.toHexString()}-hourly-${hours}`;
     const generalDailyID = `${this.account.id.toHexString()}-daily-${days}`;
@@ -267,6 +269,83 @@ export class Account {
   }
 
   /**
+   * Creates a BridgeMessage entity for a message arriving to this chain
+   *
+   * @param srcChainId the source chain id
+   * @param source The account sending the message.
+   * @param data Contents of the message
+   * @param transactionID Optional transaction ID on the source chain.
+   * @returns BridgeMessage
+   */
+  messageIn(srcChainId: BigInt, source: Address, data: Bytes): BridgeMessage {
+    this.countMessageIn();
+    this.protocol.addTransaction(TransactionType.MESSAGE_RECEIVED);
+
+    return this.message(
+      srcChainId,
+      this.protocol.getCurrentChainID(),
+      source,
+      Address.fromBytes(this.account.id),
+      false,
+      data
+    );
+  }
+
+  /**
+   * Creates a BridgeMessage entity for a message away from this chain
+   *
+   * @param dstChainId the destination chain id
+   * @param destination The account receiving the message.
+   * @param data Contents of the message
+   * @returns BridgeMessage
+   */
+  messageOut(
+    dstChainId: BigInt,
+    destination: Address,
+    data: Bytes
+  ): BridgeMessage {
+    this.countMessageOut();
+    this.protocol.addTransaction(TransactionType.MESSAGE_SENT);
+
+    return this.message(
+      this.protocol.getCurrentChainID(),
+      dstChainId,
+      Address.fromBytes(this.account.id),
+      destination,
+      true,
+      data
+    );
+  }
+
+  private message(
+    srcChainId: BigInt,
+    dstChainId: BigInt,
+    sender: Address,
+    receiver: Address,
+    isOutgoing: boolean,
+    data: Bytes
+  ): BridgeMessage {
+    const id = idFromEvent(this.event);
+    const message = new BridgeMessage(id);
+    message.hash = this.event.transaction.hash;
+    message.logIndex = this.event.logIndex.toI32();
+    message.blockNumber = this.event.block.number;
+    message.timestamp = this.event.block.timestamp;
+
+    message.protocol = this.protocol.getBytesID();
+    message.account = this.account.id;
+    message.from = sender;
+    message.to = receiver;
+    message.isOutgoing = isOutgoing;
+    message.data = data;
+    message.fromChainID = srcChainId;
+    message.toChainID = dstChainId;
+    message.save();
+
+    return message;
+  }
+
+  /**
    *
    * @param pool The pool where the liquidity was deposited.
    * @param amount The amount deposited of inputToken.
@@ -283,7 +362,8 @@ export class Account {
       Address.fromBytes(_pool.inputToken)
     );
 
-    const deposit = new LiquidityDeposit(idFromEvent(this.event));
+    const id = idFromEvent(this.event);
+    const deposit = new LiquidityDeposit(id);
     deposit.hash = this.event.transaction.hash;
     deposit.logIndex = this.event.logIndex.toI32();
     deposit.blockNumber = this.event.block.number;
@@ -326,7 +406,8 @@ export class Account {
       Address.fromBytes(_pool.inputToken)
     );
 
-    const withdraw = new LiquidityWithdraw(idFromEvent(this.event));
+    const id = idFromEvent(this.event);
+    const withdraw = new LiquidityWithdraw(id);
     withdraw.hash = this.event.transaction.hash;
     withdraw.logIndex = this.event.logIndex.toI32();
     withdraw.blockNumber = this.event.block.number;
@@ -404,9 +485,38 @@ export class Account {
     this.account.transferOutCount += 1;
     this.account.save();
   }
+
+  /**
+   * Adds 1 to the account total MessageReceived count. (not yet ) If it is the first message received ever
+   * by this account it will also increase the number of unique message receivers in the protocol.
+   */
+  countMessageIn(): void {
+    /*
+    // enable this if it is necessary to track message receivers
+    if (this.account.messageReceivedCount == 0) {
+      this.protocol.addMessageReceiver();
+    }
+    */
+    this.trackActivity(ActivityType.MESSAGE);
+    this.account.messageReceivedCount += 1;
+    this.account.save();
+  }
+
+  /**
+   * Adds 1 to the account total MessageSent count. If it is the first message sent ever
+   * by this account it will also increase the number of unique message senders in the protocol.
+   */
+  countMessageOut(): void {
+    if (this.account.messageSentCount == 0) {
+      this.protocol.addMessageSender();
+    }
+    this.trackActivity(ActivityType.MESSAGE);
+    this.account.messageSentCount += 1;
+    this.account.save();
+  }
 }
 
-function idFromEvent(event: ethereum.Event): Bytes {
+function idFromEvent(event: CustomEventType): Bytes {
   return event.transaction.hash.concatI32(event.logIndex.toI32());
 }
 

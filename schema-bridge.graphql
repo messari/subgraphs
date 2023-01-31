@@ -1,5 +1,5 @@
 # Subgraph Schema: Bridge
-# Version: 1.1.0
+# Version: 1.1.1
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 enum Network {
   ARBITRUM_ONE
@@ -22,7 +22,7 @@ enum Network {
   OPTIMISM
   OSMOSIS
   MATIC # aka Polygon
-  XDAI # aka Gnosis Chain
+  GNOSIS
   UBIQ
   SONGBIRD
   ELASTOS
@@ -1334,4 +1334,25 @@ type _ProtocolSnapshotHelper @entity {
   lastHourlyUsageSnapshot: Bytes!
 
   lastActivityTimestamp: BigInt!
+}
+
+# Helper entity for calculating reward emissions
+type _CircularBuffer @entity {
+  " 'CIRCULAR_BUFFER' "
+  id: ID!
+
+  " Array of sorted block numbers sorted continuously "
+  blocks: [Int!]!
+
+  " The index in the blocks array which will be used with the newest block to calculate block speed (Usally set to about a day before newest block) "
+  windowStartIndex: Int!
+
+  " The next index in the blocks array that will be replaced with the newest block "
+  nextIndex: Int!
+
+  " This determines the size of the blocks array. Should be set to contain at least a days worth of blocks according to a 1 day window for measuring speed"
+  bufferSize: Int!
+
+  " The current calculated number of blocks per day based on calculated block speed "
+  blocksPerDay: BigDecimal!
 }

@@ -19,11 +19,17 @@ Each of these measures are taken on a case by case basis and are selected in ord
 
 ## Calculation Methodology v1.0.0
 
+### Positions
+
+Positions may or may not be created through the NFT manager contract. Positions are only tracked if they are created through the NFT manager contract. Most positions are created through the NFT manager contract, but some are created through the pool contract. It would be very difficult to track positions that bypass the NFT manager contract, so I decided not to track them.
+
 ### Total Value Locked (TVL) USD
 
 Sum across all Pools:
 
-`Liquidity Pool TVL`
+`Liquidity Pool TVL` = `Active Liquidity` + `Inactive Liquidity` + `Uncollected Fees`
+
+Changes whenever there is a swap, deposit, withdraw, or uncollected fees are removed from the pool.
 
 ### Total Revenue USD
 

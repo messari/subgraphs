@@ -51,11 +51,25 @@ function ProtocolTab({
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
   let protocolDataRender: any[] = [];
 
+  const specificCharts: any[] = [];
+  const specificChartsOnEntity: any = {};
+
   if (protocolTimeseriesData) {
     protocolDataRender = Object.keys(protocolTimeseriesData).map((entityName: string) => {
       const currentEntityData = protocolTimeseriesData[entityName];
+      if (!specificChartsOnEntity[entityName]) {
+        specificChartsOnEntity[entityName] = {};
+      }
+      // Specific chart routing
+      // This logic renders components that are specific to a given schema type or version
+
       const currentOverlayEntityData = overlayProtocolTimeseriesData[entityName];
       if (!currentEntityData) return null;
+
+      let entitySpecificElements: any = {};
+      if (specificChartsOnEntity[entityName]) {
+        entitySpecificElements = (specificChartsOnEntity[entityName]);
+      }
 
       return (
         <ProtocolTabEntity
@@ -65,6 +79,7 @@ function ProtocolTab({
           subgraphEndpoints={subgraphEndpoints}
           currentEntityData={currentEntityData}
           overlaySchemaData={overlaySchemaData}
+          entitySpecificElements={entitySpecificElements}
           protocolSchemaData={protocolSchemaData}
           currentOverlayEntityData={currentOverlayEntityData}
           currentTimeseriesLoading={protocolTimeseriesLoading[entityName]}
@@ -119,6 +134,7 @@ function ProtocolTab({
         setIssues={(x) => setTableIssues(x)}
       />
       {protocolDataRender}
+      {specificCharts}
     </>
   );
 }
