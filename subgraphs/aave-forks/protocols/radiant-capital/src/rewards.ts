@@ -26,8 +26,8 @@ export function updateMarketRewards(
 ): void {
   const TWELVE_HOURS = BigInt.fromI32(SECONDS_PER_DAY / 2);
   if (
-    market.lastRewardsUpdated &&
-    !event.block.timestamp.minus(market.lastRewardsUpdated!).gt(TWELVE_HOURS)
+    market._lastRewardsUpdated &&
+    !event.block.timestamp.minus(market._lastRewardsUpdated!).gt(TWELVE_HOURS)
   ) {
     return;
   }
@@ -44,7 +44,7 @@ export function updateMarketRewards(
     Address.fromString(market.outputToken!)
   );
   const tryBorPoolInfo = incentiveController.try_poolInfo(
-    Address.fromString(market.vToken!)
+    Address.fromString(market._vToken!)
   );
   const tryTotalAllocPoint = incentiveController.try_totalAllocPoint();
   const tryTotalRewardsPerSecond = incentiveController.try_rewardsPerSecond();
@@ -101,7 +101,7 @@ export function updateMarketRewards(
     depositRewardsPerDay,
   ];
   market.rewardTokenEmissionsUSD = [borRewardsPerDayUSD, depRewardsPerDayUSD];
-  market.lastRewardsUpdated = event.block.timestamp;
+  market._lastRewardsUpdated = event.block.timestamp;
   market.save();
 }
 

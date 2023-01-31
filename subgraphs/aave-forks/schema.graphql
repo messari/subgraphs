@@ -329,10 +329,10 @@ type LendingProtocol implements Protocol @entity {
   ##### Add Ons #####
 
   " String of the address of the current price oracle on the protocol "
-  priceOracle: String!
+  _priceOracle: String!
 
   " A list of all markets in the snapshot "
-  marketIDs: [String!]!
+  _marketIDs: [String!]!
 }
 
 ###############################
@@ -667,28 +667,22 @@ type Market @entity {
   ##### Add Ons #####
 
   " The reserve factor as a percentage "
-  reserveFactor: BigDecimal!
-
-  " Total amount of tokens locked up in stable rate borrows "
-  totalStableValueLocked: BigInt!
-
-  " Total amount of tokens locked up in variable rate borrows "
-  totalVariableValueLocked: BigInt!
+  _reserveFactor: BigDecimal!
 
   " The variable debt token address correlated to the reserve asset "
-  vToken: Token
+  _vToken: Token
 
   " The stable debt token address correlated to the reserve asset "
-  sToken: Token
+  _sToken: Token
 
   " An aggregate metric of the average borrow rate across all borrows "
-  liquidityIndex: BigInt!
+  _liquidityIndex: BigInt!
 
   " The state of the protocol prior to being paused (isActive / canUseAsCollateral / canBorrowFrom) "
-  prePauseState: [Boolean!]!
+  _prePauseState: [Boolean!]!
 
   " Aux: Timestamp of the last time rewards were calculated for this market. "
-  lastRewardsUpdated: BigInt
+  _lastRewardsUpdated: BigInt
 }
 
 #################################
@@ -946,7 +940,7 @@ type Account @entity {
   ##### Add Ons #####
 
   " Markets that the account is using as collateral "
-  enabledCollaterals: [Market!]!
+  _enabledCollaterals: [Market!]!
 }
 
 type Position @entity {

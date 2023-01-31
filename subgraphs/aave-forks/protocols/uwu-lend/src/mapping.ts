@@ -185,7 +185,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
   const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromString(market.inputToken),
-    Address.fromString(protocol.priceOracle)
+    Address.fromString(protocol._priceOracle)
   );
 
   _handleReserveDataUpdated(
@@ -337,7 +337,7 @@ function updateRewards(market: Market): void {
       Address.fromString(market.outputToken!)
     );
     const tryBorPoolInfo = incentiveControllerContract.try_poolInfo(
-      Address.fromString(market.vToken!)
+      Address.fromString(market._vToken!)
     );
     const tryAllocPoints = incentiveControllerContract.try_totalAllocPoint();
     const tryRewardsPerSecond =
@@ -460,7 +460,7 @@ function getUwuPriceUSD(): BigDecimal {
   const protocol = getOrCreateLendingProtocol(getProtocolData());
   const wethPriceUSD = getAssetPriceInUSDC(
     Address.fromString(WETH_TOKEN_ADDRESS),
-    Address.fromString(protocol.priceOracle)
+    Address.fromString(protocol._priceOracle)
   );
 
   const uwuPriceUSD = wethPriceUSD.div(

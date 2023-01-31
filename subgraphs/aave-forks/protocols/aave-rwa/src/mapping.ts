@@ -184,7 +184,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       tryIncentiveController.value
     );
     const tryBorrowRewards = incentiveControllerContract.try_assets(
-      Address.fromString(market.vToken!)
+      Address.fromString(market._vToken!)
     );
     const trySupplyRewards = incentiveControllerContract.try_assets(
       Address.fromString(market.outputToken!)
@@ -218,7 +218,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
         if (!tryStakedToken.reverted) {
           rewardTokenPriceUSD = getAssetPriceInUSDC(
             tryStakedToken.value,
-            Address.fromString(protocol.priceOracle)
+            Address.fromString(protocol._priceOracle)
           );
         }
       }
@@ -227,7 +227,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
         rewardTokenPriceUSD = getAssetPriceInUSDC(
           tryRewardAsset.value,
-          Address.fromString(protocol.priceOracle)
+          Address.fromString(protocol._priceOracle)
         );
       }
 
@@ -268,7 +268,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
   const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromString(market.inputToken),
-    Address.fromString(protocol.priceOracle)
+    Address.fromString(protocol._priceOracle)
   );
 
   _handleReserveDataUpdated(

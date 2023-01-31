@@ -351,7 +351,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   const market = Market.load(marketId.toHexString())!;
   const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromString(market.inputToken),
-    Address.fromString(protocol.priceOracle),
+    Address.fromString(protocol._priceOracle),
     event.block.number
   );
 
@@ -451,7 +451,7 @@ export function handleBorrow(event: Borrow): void {
 
   // Set reserveFactor if not set, as setReserveFactor may be never called
   const market = getOrCreateMarket(marketId, protocolData);
-  if (market.reserveFactor.equals(BIGDECIMAL_ZERO)) {
+  if (market._reserveFactor.equals(BIGDECIMAL_ZERO)) {
     // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L377
     // for how to decode configuration data to get reserve factor
     const reserveFactorMask =
@@ -478,7 +478,7 @@ export function handleBorrow(event: Borrow): void {
     log.info("[handleBorrow]reserveFactor set to {}", [
       reserveFactor.toString(),
     ]);
-    market.reserveFactor = reserveFactor
+    market._reserveFactor = reserveFactor
       .toBigDecimal()
       .div(exponentToBigDecimal(INT_TWO));
     market.save();
@@ -771,7 +771,7 @@ function updateMarketRewardEmissions(
       let rewardTokenPriceUSD = token.lastPriceUSD;
       rewardTokenPriceUSD = getAssetPriceInUSDC(
         Address.fromString(token.id),
-        Address.fromString(protocol.priceOracle),
+        Address.fromString(protocol._priceOracle),
         event.block.number
       );
 

@@ -87,8 +87,8 @@ export function getOrCreateLendingProtocol(
     lendingProtocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-    lendingProtocol.priceOracle = ZERO_ADDRESS;
-    lendingProtocol.marketIDs = [];
+    lendingProtocol._priceOracle = ZERO_ADDRESS;
+    lendingProtocol._marketIDs = [];
   }
 
   lendingProtocol.schemaVersion = Versions.getSchemaVersion();
@@ -587,7 +587,7 @@ export function addPosition(
     position.side = side;
     if (side == PositionSide.LENDER) {
       position.isCollateral =
-        account.enabledCollaterals.indexOf(market.id) >= 0;
+        account._enabledCollaterals.indexOf(market.id) >= 0;
     }
     position.balance = BIGINT_ZERO;
     position.depositCount = 0;
@@ -776,7 +776,7 @@ export function createAccount(accountID: string): Account {
   account.repayCount = 0;
   account.liquidateCount = 0;
   account.liquidationCount = 0;
-  account.enabledCollaterals = [];
+  account._enabledCollaterals = [];
   account.save();
   return account;
 }
@@ -789,8 +789,8 @@ export function getMarketByAuxillaryToken(
 ): Market | null {
   const protocol = getOrCreateLendingProtocol(protocolData);
 
-  for (let i = 0; i < protocol.marketIDs.length; i++) {
-    const market = Market.load(protocol.marketIDs[i]);
+  for (let i = 0; i < protocol._marketIDs.length; i++) {
+    const market = Market.load(protocol._marketIDs[i]);
 
     if (!market) {
       continue;
@@ -801,14 +801,14 @@ export function getMarketByAuxillaryToken(
       return market;
     }
     if (
-      market.vToken &&
-      market.vToken!.toLowerCase() == auxillaryToken.toLowerCase()
+      market._vToken &&
+      market._vToken!.toLowerCase() == auxillaryToken.toLowerCase()
     ) {
       return market;
     }
     if (
-      market.sToken &&
-      market.sToken!.toLowerCase() == auxillaryToken.toLowerCase()
+      market._sToken &&
+      market._sToken!.toLowerCase() == auxillaryToken.toLowerCase()
     ) {
       return market;
     }
@@ -986,9 +986,9 @@ export function getOrCreateMarket(
     // get protocol
     const protocol = getOrCreateLendingProtocol(protocolData);
     protocol.totalPoolCount++;
-    const markets = protocol.marketIDs;
+    const markets = protocol._marketIDs;
     markets.push(marketId.toHexString());
-    protocol.marketIDs = markets;
+    protocol._marketIDs = markets;
     protocol.save();
 
     // create inputToken
@@ -1017,13 +1017,11 @@ export function getOrCreateMarket(
     market.inputTokenBalance = BIGINT_ZERO;
     market.outputTokenSupply = BIGINT_ZERO;
     market.exchangeRate = BIGDECIMAL_ONE; // this is constant
-    market.reserveFactor = BIGDECIMAL_ZERO;
-    market.totalStableValueLocked = BIGINT_ZERO;
-    market.totalVariableValueLocked = BIGINT_ZERO;
+    market._reserveFactor = BIGDECIMAL_ZERO;
     market.rewardTokens = []; // updated once used
     market.rewardTokenEmissionsAmount = [];
     market.rewardTokenEmissionsUSD = [];
-    market.liquidityIndex = BIGINT_ONE; // this is init to 1e27
+    market._liquidityIndex = BIGINT_ONE; // this is init to 1e27
     // these are set in reserveInitialized()
     market.createdTimestamp = BIGINT_ZERO;
     market.createdBlockNumber = BIGINT_ZERO;
@@ -1035,7 +1033,7 @@ export function getOrCreateMarket(
     market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.rates = []; // calculated in event ReserveDataUpdated
-    market.prePauseState = [true, true, true];
+    market._prePauseState = [true, true, true];
 
     market.save();
   }
@@ -1051,8 +1049,8 @@ export function getBorrowBalance(
   let vDebtTokenBalance = BIGINT_ZERO;
 
   // get account's balance of variable debt
-  if (market.vToken) {
-    const vTokenContract = AToken.bind(Address.fromString(market.vToken!));
+  if (market._vToken) {
+    const vTokenContract = AToken.bind(Address.fromString(market._vToken!));
     const tryVDebtTokenBalance = vTokenContract.try_balanceOf(account);
     vDebtTokenBalance = tryVDebtTokenBalance.reverted
       ? BIGINT_ZERO
@@ -1060,8 +1058,8 @@ export function getBorrowBalance(
   }
 
   // get account's balance of stable debt
-  if (market.sToken) {
-    const sTokenContract = AToken.bind(Address.fromString(market.sToken!));
+  if (market._sToken) {
+    const sTokenContract = AToken.bind(Address.fromString(market._sToken!));
     const trySDebtTokenBalance = sTokenContract.try_balanceOf(account);
     sDebtTokenBalance = trySDebtTokenBalance.reverted
       ? BIGINT_ZERO
