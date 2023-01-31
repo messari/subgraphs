@@ -21,5 +21,8 @@
       "address": "0x60dDe8BBE160fe033fACB3446Cf7795cC575B171",
       "startBlock": 32934658
     }
-  ]
+  ],
+  "graftEnabled": false,
+  "subgraphId": "QmZnCmiy4kz6jCm9VBxq8XScAWXTRakbVM4KfdqhGHUFgr",
+  "graftStartBlock": 34488000
 }

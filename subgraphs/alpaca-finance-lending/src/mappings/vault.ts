@@ -58,12 +58,12 @@ export function handleTransfer(event: Transfer): void {
   }
 
   if (event.params.from == Address.fromString(ZERO_ADDRESS)) {
-    handleMint(event);
+    _handleMint(event);
     return;
   }
 
   if (event.params.to == Address.fromString(ZERO_ADDRESS)) {
-    handleBurn(event);
+    _handleBurn(event);
     return;
   }
 
@@ -105,7 +105,7 @@ export function handleTransfer(event: Transfer): void {
   );
 }
 
-function handleMint(event: Transfer): void {
+function _handleMint(event: Transfer): void {
   const contract = Vault.bind(event.address);
   const tryTokenResult = contract.try_token();
   if (tryTokenResult.reverted) {
@@ -137,7 +137,7 @@ function handleMint(event: Transfer): void {
   updateTokenSupply(event, market, event.params.value);
 }
 
-function handleBurn(event: Transfer): void {
+function _handleBurn(event: Transfer): void {
   const market = getMarket(event.address);
   updateInterest(event, market);
   const contract = Vault.bind(event.address);
@@ -299,18 +299,25 @@ export function updateInterest(event: ethereum.Event, market: Market): void {
     return;
   }
 
-  const poolTokenAmount = tryTotalToken.value
-    .plus(tryReservePool.value)
-    .minus(tryVaultDebtVal.value);
+  const vaultDebtVal = tryVaultDebtVal.value;
+  const totalTokenAmount = tryTotalToken.value;
+  let floating = totalTokenAmount.minus(vaultDebtVal);
+  // config.getInterestRate(vaultDebtVal, floating) matches
+  // to how alpaca front end calculates APY, but floating may
+  // be negative, in this case, add back reservePool
+  if (floating.lt(BIGINT_ZERO)) {
+    floating = floating.plus(tryReservePool.value);
+  }
+
   const configContract = ConfigurableInterestVaultConfig.bind(tryConfig.value);
   const tryGetInterestRate = configContract.try_getInterestRate(
-    tryVaultDebtVal.value,
-    poolTokenAmount
+    vaultDebtVal,
+    totalTokenAmount
   );
   if (
     tryGetInterestRate.reverted ||
-    tryVaultDebtVal.value.equals(BIGINT_ZERO) ||
-    market.inputTokenBalance.equals(BIGINT_ZERO)
+    vaultDebtVal.equals(BIGINT_ZERO) ||
+    totalTokenAmount.equals(BIGINT_ZERO)
   ) {
     log.warning("[updateInterest] could not update interest rate", []);
     return;
@@ -321,13 +328,22 @@ export function updateInterest(event: ethereum.Event, market: Market): void {
     ratePerSec.times(SECONDS_PER_YEAR)
   ).times(BIGDECIMAL_HUNDRED);
   const lenderAPY = borrowerAPY
+    .times(vaultDebtVal.toBigDecimal())
     .times(BIGDECIMAL_ONE.minus(PROTOCOL_LENDING_FEE.div(BIGDECIMAL_HUNDRED)))
-    .times(tryVaultDebtVal.value.toBigDecimal())
-    .div(market.inputTokenBalance.toBigDecimal());
+    .div(totalTokenAmount.toBigDecimal());
   updateMarketRates(event, market, borrowerAPY, lenderAPY);
-
+  log.info(
+    "[updateInterestRate]market={},RatePerSec={},borrowerAPY={},lenderAPY={},tx={}",
+    [
+      market.id,
+      ratePerSec.toString(),
+      borrowerAPY.toString(),
+      lenderAPY.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
   const dailyInterest = ratePerSec
-    .times(tryVaultDebtVal.value)
+    .times(vaultDebtVal)
     .times(BIGINT_SECONDS_PER_DAY)
     .div(BIGINT_TEN_TO_EIGHTEENTH);
   const protocolSideProfitUSD = amountInUSD(
