@@ -325,13 +325,8 @@ function PoolTab({
       );
     } else if (poolTimeseriesError) {
       poolDataSection = (
-        <Grid>
-          <Box my={3}>
-            <CopyLinkToClipboard link={window.location.href}>
-              <Typography variant="h4">{poolTimeseriesError?.message}</Typography>
-            </CopyLinkToClipboard>
-          </Box>
-          <CircularProgress sx={{ margin: 6 }} size={50} />
+        <Grid key={"poolTabEntityError"}>
+          <h3>Query Could not Return Successfully - {poolTimeseriesError?.message}</h3>
         </Grid>
       );
     } else {

@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import IssuesDisplay from "../IssuesDisplay";
 import { TablePoolOverview } from "../../common/chartComponents/TablePoolOverview";
 import { styled } from "../../styled";
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Grid, Typography } from "@mui/material";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useNavigate } from "react-router";
+import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 
 const ChangePageEle = styled("div")`
   display: flex;
@@ -53,15 +54,6 @@ function PoolOverviewTab({
   const [currentPage, setCurrentPage] = useState(skipAmtParam ? (parseInt(skipAmtParam) + 50) / 50 : 1);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
 
-  if (poolOverviewRequest.poolOverviewError && issues.filter((x) => x.fieldName === "Pool Overview Tab").length === 0) {
-    issues.push({
-      message: poolOverviewRequest?.poolOverviewError?.message + ". Refresh and try again.",
-      type: "",
-      fieldName: "Pool Overview Tab",
-      level: "critical",
-    });
-  }
-
   let morePages = false;
   if (totalPoolCount) {
     if (currentPage !== Math.ceil(totalPoolCount / 50)) {
@@ -70,25 +62,6 @@ function PoolOverviewTab({
   }
 
   let loadingEle = null;
-  if (poolOverviewRequest.poolOverviewLoading) {
-    loadingEle = (
-      <div>
-        <CircularProgress sx={{ margin: 6 }} size={50} />
-      </div>
-    );
-    if (pools.length === 0 || !pools) {
-      return loadingEle;
-    } else if (morePages) {
-      loadingEle = (
-        <div style={{ marginLeft: "16px", marginBottom: "15px" }}>
-          <div>
-            <CircularProgress sx={{ margin: 6 }} size={50} />
-          </div>
-          <span>Loading results...</span>
-        </div>
-      );
-    }
-  }
 
   let nextButton = null;
   if (pools.length === 50 || morePages) {
@@ -144,9 +117,49 @@ function PoolOverviewTab({
     );
   }
 
-  return (
-    <>
-      <IssuesDisplay issuesArrayProps={tableIssues} allLoaded={true} oneLoaded={true} />
+  let table = null;
+
+  if (poolOverviewRequest.poolOverviewError) {
+    if (issues.filter((x) => x.fieldName === "Pool Overview Tab").length === 0) {
+      issues.push({
+        message: poolOverviewRequest?.poolOverviewError?.message + ". Refresh and try again.",
+        type: "",
+        fieldName: "Pool Overview Tab",
+        level: "critical",
+      });
+    }
+
+    table = (
+      (
+        <Grid key={"tableID"}>
+          <Box my={3}>
+            <CopyLinkToClipboard link={window.location.href} scrollId={"tableID"}>
+              <Typography variant="h4" id={"tableID"}>
+                {poolOverviewRequest?.poolOverviewError?.message}
+              </Typography>
+            </CopyLinkToClipboard>
+          </Box>
+        </Grid>
+      )
+    )
+  } else if (poolOverviewRequest.poolOverviewLoading) {
+    table = (
+      <div>
+        <CircularProgress sx={{ margin: 6 }} size={50} />
+      </div>
+    );
+    if (!!pools && pools?.length > 0) {
+      table = (
+        <div style={{ marginLeft: "16px", marginBottom: "15px" }}>
+          <div>
+            <CircularProgress sx={{ margin: 6 }} size={50} />
+          </div>
+          <span>Loading results...</span>
+        </div>
+      );
+    }
+  } else {
+    table = (
       <TablePoolOverview
         datasetLabel=""
         dataTable={pools}
@@ -160,6 +173,13 @@ function PoolOverviewTab({
           setTableIssues(x);
         }}
       />
+    )
+  }
+
+  return (
+    <>
+      <IssuesDisplay issuesArrayProps={tableIssues} allLoaded={true} oneLoaded={true} />
+      {table}
       {loadingEle}
       <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
         {prevButton}

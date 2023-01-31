@@ -410,7 +410,7 @@ function ProtocolTabEntity({
             if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
               return <>
                 <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(false)} >Remove DefiLlama Comparison</div>
-                <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} getData={() => console.log('GET DATA')} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
+                <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
             }
 
             const label = entityName + "-" + field;
@@ -549,7 +549,14 @@ function ProtocolTabEntity({
         return <h3>JAVASCRIPT ERROR - PROTOCOL TAB</h3>;
       }
     }
-  } else if (currentTimeseriesLoading || (!currentTimeseriesLoading && !currentEntityData && !currentTimeseriesError)) {
+  } else if (currentTimeseriesError) {
+    issues.push({
+      type: "VAL",
+      message: currentTimeseriesError?.message,
+      level: "critical",
+      fieldName: entityName + "-" + currentTimeseriesError?.message,
+    });
+
     return (
       <Grid key={entityName}>
         <Box my={3}>
@@ -559,7 +566,7 @@ function ProtocolTabEntity({
             </Typography>
           </CopyLinkToClipboard>
         </Box>
-        <CircularProgress sx={{ margin: 6 }} size={50} />
+        <h3>{currentTimeseriesError?.message}</h3>
       </Grid>
     );
   } else {
