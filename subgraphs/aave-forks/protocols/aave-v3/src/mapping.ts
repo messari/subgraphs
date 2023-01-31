@@ -505,24 +505,6 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   );
 }
 
-/* //TODO: needed?
-
-export function handleMintedToTreasury(event: MintedToTreasury): void {
-  const pool = Pool.bind(event.address);
-  const accruedToTreasury = rayDiv(
-    event.params.amountMinted,
-    pool.getReserveNormalizedIncome(event.params.reserve)
-  );
-  updateReserveAccruedToTreasury(
-    event,
-    event.params.reserve,
-    accruedToTreasury
-  );
-  updateReserveAccruedToTreasury(event, event.params.reserve, BIGINT_ZERO);
-}
-
-*/
-
 /////////////////////////
 //// Transfer Events ////
 /////////////////////////
