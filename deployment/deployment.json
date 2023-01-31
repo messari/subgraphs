@@ -452,6 +452,10 @@
           "hosted-service": {
             "slug": "aave-v3-ethereum",
             "query-id": "aave-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-ethereum",
+            "query-id": "UNKNOWN"
           }
         }
       }
