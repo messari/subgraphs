@@ -49,7 +49,13 @@ export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 //////////////////////////// HARDCODED STABLES ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const HARDCODED_STABLES: Address[] = [];
+export const HARDCODED_STABLES: Address[] = [
+  Address.fromString("0x1a13f4ca1d028320a707d99520abfefca3998b7f"), // Aave Matic Market USDC
+  Address.fromString("0x27f8d03b3a2196956ed754badc28d73be8830a6e"), // Aave Matic Market DAI
+  Address.fromString("0x60d55f02a771d515e077c9c2403a1ef324885cec"), // Aave Matic Market USDT
+  Address.fromString("0xe2aa7db6da1dae97c5f5c6914d285fbfcc32a128"), // PAR Stablecoin (PAR)
+  Address.fromString("0x7bdf330f423ea880ff95fc41a280fd5ecfd3d09f"), // Euro Tether (PoS)
+];
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////

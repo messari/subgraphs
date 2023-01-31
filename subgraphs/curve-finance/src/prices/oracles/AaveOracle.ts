@@ -30,6 +30,6 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS
+    constants.DEFAULT_AAVE_ORACLE_DECIMALS
   );
 }

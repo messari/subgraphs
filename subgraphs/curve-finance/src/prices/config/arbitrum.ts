@@ -38,6 +38,7 @@ export const CURVE_REGISTRY_ADDRESSES: Address[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
+  Address.fromString("0xcDAeC65495Fa5c0545c5a405224214e3594f30d8"), // SwapFish
   Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // SushiSwap
 ];
 
