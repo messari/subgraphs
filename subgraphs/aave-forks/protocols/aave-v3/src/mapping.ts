@@ -160,9 +160,9 @@ export function handleProxyCreated(event: ProxyCreated): void {
 export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
   const assetAddress = event.params.asset.toHexString();
   const assetToken = Token.load(assetAddress);
-  if (!assetToken || !assetToken._market) {
+  if (!assetToken || !assetToken._market || !assetToken._type) {
     log.error(
-      "[handleAssetConfigUpdated]Failed to find token {} or no assetToken._market is null",
+      "[handleAssetConfigUpdated]Failed to find token {} or assetToken._market/assetToken._type is null",
       [assetAddress]
     );
     return;
