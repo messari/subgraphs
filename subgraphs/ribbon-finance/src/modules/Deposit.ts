@@ -21,7 +21,6 @@ import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 
-
 export function createDepositTransaction(
   vault: VaultStore,
   amount: BigInt,
@@ -80,8 +79,11 @@ export function Deposit(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
-  log.warning("[Deposit] vaultAddress {} transactionHash {}", [vaultAddress.toHexString(), transaction.hash.toHexString()])
-  
+  log.warning("[Deposit] vaultAddress {} transactionHash {}", [
+    vaultAddress.toHexString(),
+    transaction.hash.toHexString(),
+  ]);
+
   const vault = getOrCreateVault(vaultAddress, block);
   const vaultContract = VaultContract.bind(vaultAddress);
 
@@ -96,7 +98,7 @@ export function Deposit(
     .toBigDecimal()
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenDecimals.toBigDecimal());
-  
+
   vault.outputTokenSupply = utils.getOutputTokenSupply(vaultAddress, block);
 
   const totalValue = utils.readValue<BigInt>(
@@ -105,7 +107,7 @@ export function Deposit(
   );
 
   vault.inputTokenBalance = totalValue;
-  
+
   if (totalValue.notEqual(constants.BIGINT_ZERO)) {
     vault.totalValueLockedUSD = vault.inputTokenBalance
       .toBigDecimal()
@@ -113,12 +115,10 @@ export function Deposit(
       .div(inputTokenDecimals.toBigDecimal());
   }
 
- 
-  
   const pricePerShare = utils.getVaultPricePerShare(vaultAddress);
   log.warning("[PricePerShare] pricePershare {}", [pricePerShare.toString()]);
   vault.pricePerShare = pricePerShare;
-  vault.outputTokenPriceUSD = utils.getOptionTokenPriceUSD(vaultAddress,block);
+  vault.outputTokenPriceUSD = utils.getOptionTokenPriceUSD(vaultAddress, block);
 
   vault.save();
 
@@ -132,7 +132,7 @@ export function Deposit(
 
   utils.updateProtocolTotalValueLockedUSD();
   UpdateMetricsAfterDeposit(block);
-  
+
   log.info(
     "[Deposit] vault: {}, depositAmount: {}, depositAmountUSD: {}, TxnHash: {}",
     [

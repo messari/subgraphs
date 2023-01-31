@@ -15,8 +15,8 @@ import { Vault } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
-import { LiquidityGaugeV5 as LiquidityGaugeContract } from "../../generated/rETHThetaGauge/LiquidityGaugeV5";
 import { GaugeController as GaugeControllerContract } from "../../generated/rETHThetaGauge/GaugeController";
+import { LiquidityGaugeV5 as LiquidityGaugeContract } from "../../generated/rETHThetaGauge/LiquidityGaugeV5";
 
 export function getRewardsData_v1(
   gaugeAddress: Address,
@@ -135,25 +135,27 @@ export function updateRbnRewardsInfo(
     )
     .toBigDecimal();
 
-
   // rewards = inflation_rate * gauge_relative_weight * 86_400 * 0.4
   const crvRewardEmissionsPerDay = inflationRate
     .times(gaugeRelativeWeight.div(constants.BIGINT_TEN.pow(18).toBigDecimal()))
     .times(BigDecimal.fromString(constants.SECONDS_PER_DAY.toString()))
     .times(BigDecimal.fromString("0.4"));
-  
-    updateRewardTokenEmissions(
-      constants.RBN_TOKEN,
-      BigInt.fromString(crvRewardEmissionsPerDay.truncate(0).toString()),
-      vaultAddress,
-      block
-    );
-    log.warning("[updateRbnRewardsInfo] inflationRate {} gaugeRelativeWeight {} emissionsPerDay {} vault {}", [
-    inflationRate.toString(),
-    gaugeRelativeWeight.toString(),
-    crvRewardEmissionsPerDay.toString(),
-    vault.id,
-  ]);
+
+  updateRewardTokenEmissions(
+    constants.RBN_TOKEN,
+    BigInt.fromString(crvRewardEmissionsPerDay.truncate(0).toString()),
+    vaultAddress,
+    block
+  );
+  log.warning(
+    "[updateRbnRewardsInfo] inflationRate {} gaugeRelativeWeight {} emissionsPerDay {} vault {}",
+    [
+      inflationRate.toString(),
+      gaugeRelativeWeight.toString(),
+      crvRewardEmissionsPerDay.toString(),
+      vault.id,
+    ]
+  );
 }
 
 export function updateRewardTokenEmissions(

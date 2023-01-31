@@ -1,10 +1,3 @@
-import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
-import { LiquidityGaugeV5 as GaugeContract } from "../../generated/rETHThetaGauge/LiquidityGaugeV5";
-import { ERC20 as ERC20Contract } from "../../generated/ETHCallV2/ERC20";
-import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
-import { getUsdPricePerToken } from "../prices";
-import * as constants from "./constants";
-import * as utils from "./utils";
 import {
   Account,
   FinancialsDailySnapshot,
@@ -21,7 +14,13 @@ import {
   VaultFee,
   _SwapOffer,
 } from "../../generated/schema";
-
+import * as utils from "./utils";
+import * as constants from "./constants";
+import { getUsdPricePerToken } from "../prices";
+import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { ERC20 as ERC20Contract } from "../../generated/ETHCallV2/ERC20";
+import { LiquidityGaugeV5 as GaugeContract } from "../../generated/rETHThetaGauge/LiquidityGaugeV5";
+import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 
 export function getOrCreateToken(
   address: Address,
@@ -60,8 +59,8 @@ export function getOrCreateToken(
       );
       token._isOtoken = true;
       token._vaultId = vault.toHexString();
-      
-      token.lastPriceUSD = utils.getOptionTokenPriceUSD(vault,block);
+
+      token.lastPriceUSD = utils.getOptionTokenPriceUSD(vault, block);
       token.lastPriceBlockNumber = block.number;
     }
     token.save();
@@ -80,7 +79,7 @@ export function getOrCreateToken(
         token.lastPriceBlockNumber = block.number;
       }
       if (token._isOtoken) {
-        token.lastPriceUSD = utils.getOptionTokenPriceUSD(vault,block);
+        token.lastPriceUSD = utils.getOptionTokenPriceUSD(vault, block);
         token.lastPriceBlockNumber = block.number;
       }
 
@@ -110,7 +109,6 @@ export function getOrCreateFee(
 
   return fees;
 }
-
 
 export function getOrCreateRewardToken(
   tokenAddress: Address,
@@ -192,7 +190,6 @@ export function getOrCreateFinancialDailySnapshots(
   return financialMetrics;
 }
 
-
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
@@ -250,8 +247,6 @@ export function getOrCreateUsageMetricsHourlySnapshot(
   return usageMetrics;
 }
 
-
-
 export function getOrCreateVault(
   vaultAddress: Address,
   block: ethereum.Block
@@ -266,13 +261,16 @@ export function getOrCreateVault(
     vault.symbol = utils.readValue<string>(vaultContract.try_symbol(), "");
     vault.protocol = constants.PROTOCOL_ID;
 
-    vault._decimals = utils.readValue(vaultContract.try_decimals() , 0);
+    vault._decimals = utils.readValue(vaultContract.try_decimals(), 0);
 
     vault.depositLimit = utils.readValue<BigInt>(
       vaultContract.try_cap(),
       constants.BIGINT_ZERO
     );
-    let asset = utils.readValue<Address>(vaultContract.try_asset(), constants.NULL.TYPE_ADDRESS);
+    let asset = utils.readValue<Address>(
+      vaultContract.try_asset(),
+      constants.NULL.TYPE_ADDRESS
+    );
     if (asset.equals(constants.NULL.TYPE_ADDRESS)) {
       const vaultParams = vaultContract.try_vaultParams();
       if (!vaultParams.reverted) {
@@ -283,20 +281,24 @@ export function getOrCreateVault(
         if (!vaultParamsEarnVault.reverted) {
           asset = vaultParamsEarnVault.value.getAsset();
         }
-        
       }
     }
-    const inputToken = getOrCreateToken(asset,block,vaultAddress);
+    const inputToken = getOrCreateToken(asset, block, vaultAddress);
     vault.inputToken = inputToken.id;
     vault.inputTokenBalance = constants.BIGINT_ZERO;
-    
+
     const outputTokenAddress = vaultAddress;
 
     if (outputTokenAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
-      const outputToken = getOrCreateToken(outputTokenAddress, block, vaultAddress, true);
+      const outputToken = getOrCreateToken(
+        outputTokenAddress,
+        block,
+        vaultAddress,
+        true
+      );
       vault.outputToken = outputToken.id;
     }
-    
+
     vault.outputTokenSupply = constants.BIGINT_ZERO;
 
     vault.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
@@ -310,7 +312,7 @@ export function getOrCreateVault(
     vault.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    
+
     const withdrawlFeeId =
       utils.enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE) +
       vaultAddress.toHexString();
@@ -328,7 +330,7 @@ export function getOrCreateVault(
       vaultAddress.toHexString();
 
     getOrCreateFee(managementFeeId, constants.VaultFeeType.MANAGEMENT_FEE);
-    
+
     vault.fees = [withdrawlFeeId, performanceFeeId, managementFeeId];
     utils.updateProtocolAfterNewVault(vaultAddress);
 
@@ -342,7 +344,7 @@ export function getOrCreateAuction(
   auctionId: BigInt,
   vaultAddress: Address = constants.NULL.TYPE_ADDRESS,
   optionToken: Address = constants.NULL.TYPE_ADDRESS,
-  biddingToken: Address = constants.NULL.TYPE_ADDRESS,
+  biddingToken: Address = constants.NULL.TYPE_ADDRESS
 ): _Auction {
   let auction = _Auction.load(auctionId.toString());
   if (!auction) {
@@ -352,7 +354,7 @@ export function getOrCreateAuction(
     auction.vault = vaultAddress.toHexString();
     auction.save();
   }
-  
+
   return auction;
 }
 
@@ -401,18 +403,19 @@ export function getOrCreateLiquidityGauge(
       gaugeContract.try_decimals(),
       constants.BIGINT_ZERO
     );
-    let vaultAddress = utils
-      .readValue(gaugeContract.try_lp_token(), constants.NULL.TYPE_ADDRESS);
-    
+    let vaultAddress = utils.readValue(
+      gaugeContract.try_lp_token(),
+      constants.NULL.TYPE_ADDRESS
+    );
+
     if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) {
       vaultAddress = utils.readValue(
         gaugeContract.try_stakingToken(),
         constants.NULL.TYPE_ADDRESS
       );
-    
     }
-      gauge.vault = vaultAddress.toHexString()
-    
+    gauge.vault = vaultAddress.toHexString();
+
     gauge.symbol = utils.readValue(gaugeContract.try_symbol(), "");
     gauge.save();
   }

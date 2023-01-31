@@ -85,9 +85,7 @@ export function Withdraw(
 
   const inputTokenAddress = Address.fromString(vault.inputToken);
   const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  const vaultDecimals = constants.BIGINT_TEN.pow(
-    vault._decimals as u8
-  );
+  const vaultDecimals = constants.BIGINT_TEN.pow(vault._decimals as u8);
 
   const withdrawAmountUSD = withdrawAmount
     .toBigDecimal()

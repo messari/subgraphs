@@ -72,8 +72,6 @@ export namespace NULL {
   export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
 }
 
-
-
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const MAX_BPS = BigInt.fromI32(10000);
@@ -87,7 +85,6 @@ export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
-
 
 export const PANCAKE_FACTORY_ADDRESS = Address.fromString(
   "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73"

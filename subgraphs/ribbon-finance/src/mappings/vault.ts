@@ -322,6 +322,7 @@ export function handleAirswap(event: Airswap): void {
     ]
   );
 }
+
 export function handleOpenLoan(event: OpenLoan): void {
   utils.updateProtocolTotalValueLockedUSD();
 
@@ -329,6 +330,7 @@ export function handleOpenLoan(event: OpenLoan): void {
     event.transaction.hash.toHexString(),
   ]);
 }
+
 export function handleCloseLoan(event: CloseLoan): void {
   utils.updateProtocolTotalValueLockedUSD();
 
@@ -336,6 +338,7 @@ export function handleCloseLoan(event: CloseLoan): void {
     event.transaction.hash.toHexString(),
   ]);
 }
+
 export function handleOpenShortV1(event: OpenShortV1): void {
   utils.updateProtocolTotalValueLockedUSD();
 
@@ -343,6 +346,7 @@ export function handleOpenShortV1(event: OpenShortV1): void {
     event.transaction.hash.toHexString(),
   ]);
 }
+
 export function handleCloseShortV1(event: CloseShortV1): void {
   utils.updateProtocolTotalValueLockedUSD();
 
@@ -350,6 +354,7 @@ export function handleCloseShortV1(event: CloseShortV1): void {
     event.transaction.hash.toHexString(),
   ]);
 }
+
 export function handlePayOptionYield(event: PayOptionYield): void {
   const netYield = event.params.netYield;
   const vaultAddress = event.address;
@@ -377,6 +382,7 @@ export function handlePayOptionYield(event: PayOptionYield): void {
     event.block
   );
 }
+
 export function handlePurchaseOption(event: PurchaseOption): void {
   const premium = event.params.premium;
   const vaultAddress = event.address;

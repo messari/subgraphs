@@ -1,11 +1,8 @@
-import * as constants from "../common/constants";
-import { Address, log } from "@graphprotocol/graph-ts";
 import {
   updateFactoryRewards,
   updateRbnRewardsInfo,
   updateStakedOutputTokenAmount,
 } from "../modules/Rewards";
-import { getOrCreateLiquidityGauge } from "../common/initalizers";
 import {
   Deposit,
   Withdraw,
@@ -13,7 +10,10 @@ import {
   Staked,
   RewardPaid,
 } from "../../generated/rAAVEThetaGauge/LiquidityGaugeV5";
+import * as constants from "../common/constants";
+import { Address, log } from "@graphprotocol/graph-ts";
 import { updateVaultSnapshots } from "../modules/Metrics";
+import { getOrCreateLiquidityGauge } from "../common/initalizers";
 
 export function handleStake(event: Deposit): void {
   const gaugeAddress = event.address;

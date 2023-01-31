@@ -171,7 +171,6 @@ export function updateVaultTVL(
   );
 
   vault.inputTokenBalance = totalValue;
-
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .toBigDecimal()
     .div(inputTokenDecimals.toBigDecimal())
@@ -186,7 +185,5 @@ export function updateVaultTVL(
     );
     vault.outputTokenPriceUSD = outputToken.lastPriceUSD;
   }
-  // Protocol Side Revenue USD
-
   vault.save();
 }
