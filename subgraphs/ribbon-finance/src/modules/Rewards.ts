@@ -60,7 +60,7 @@ export function updateStakedOutputTokenAmount(
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
   const gaugeWorkingSupply = utils.readValue<BigInt>(
-    gaugeContract.try_working_supply(),
+    gaugeContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
   vault.stakedOutputTokenAmount = gaugeWorkingSupply;
@@ -135,26 +135,23 @@ export function updateRbnRewardsInfo(
     )
     .toBigDecimal();
 
-  const gaugeWorkingSupply = utils.readValue<BigInt>(
-    gaugeContract.try_working_supply(),
-    constants.BIGINT_ZERO
-  );
 
   // rewards = inflation_rate * gauge_relative_weight * 86_400 * 0.4
   const crvRewardEmissionsPerDay = inflationRate
     .times(gaugeRelativeWeight.div(constants.BIGINT_TEN.pow(18).toBigDecimal()))
     .times(BigDecimal.fromString(constants.SECONDS_PER_DAY.toString()))
     .times(BigDecimal.fromString("0.4"));
-
-  updateRewardTokenEmissions(
-    constants.RBN_TOKEN,
-    BigInt.fromString(crvRewardEmissionsPerDay.truncate(0).toString()),
-    vaultAddress,
-    block
-  );
-  vault.save();
-  log.warning("[updateRbnRewardsInfo] stakedOutputTokenAmount {} vault {}", [
-    gaugeWorkingSupply.toString(),
+  
+    updateRewardTokenEmissions(
+      constants.RBN_TOKEN,
+      BigInt.fromString(crvRewardEmissionsPerDay.truncate(0).toString()),
+      vaultAddress,
+      block
+    );
+    log.warning("[updateRbnRewardsInfo] inflationRate {} gaugeRelativeWeight {} emissionsPerDay {} vault {}", [
+    inflationRate.toString(),
+    gaugeRelativeWeight.toString(),
+    crvRewardEmissionsPerDay.toString(),
     vault.id,
   ]);
 }

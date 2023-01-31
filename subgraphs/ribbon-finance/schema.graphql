@@ -693,6 +693,15 @@ type _Auction @entity {
 
   vault: String!
 }
+type _SwapOffer @entity {
+  id: ID!
+
+  optionToken: String!
+
+  biddingToken: String!
+
+  vault: String!
+}
 
 type _LiquidityGauge @entity {
   id: ID!

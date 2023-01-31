@@ -113,15 +113,12 @@ export function Deposit(
       .div(inputTokenDecimals.toBigDecimal());
   }
 
-  const outputTokenAddress = utils.readValue<Address>(
-    vaultContract.try_currentOption(),
-    constants.NULL.TYPE_ADDRESS
-    );
+ 
   
   const pricePerShare = utils.getVaultPricePerShare(vaultAddress);
   log.warning("[PricePerShare] pricePershare {}", [pricePerShare.toString()]);
   vault.pricePerShare = pricePerShare;
-  vault.outputTokenPriceUSD = utils.getOptionTokenPriceUSD(vaultAddress,outputTokenAddress,block);
+  vault.outputTokenPriceUSD = utils.getOptionTokenPriceUSD(vaultAddress,block);
 
   vault.save();
 

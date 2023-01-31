@@ -1,6 +1,5 @@
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 import { LiquidityGaugeV5 as GaugeContract } from "../../generated/rETHThetaGauge/LiquidityGaugeV5";
-import { Otoken as OtokenContract } from "../../generated/ETHCallV2/Otoken";
 import { ERC20 as ERC20Contract } from "../../generated/ETHCallV2/ERC20";
 import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { getUsdPricePerToken } from "../prices";
@@ -20,6 +19,7 @@ import {
   VaultHourlySnapshot,
   VaultDailySnapshot,
   VaultFee,
+  _SwapOffer,
 } from "../../generated/schema";
 
 
@@ -51,7 +51,7 @@ export function getOrCreateToken(
     }
 
     if (isOToken) {
-      const contract = OtokenContract.bind(address);
+      const contract = VaultContract.bind(address);
       token.name = utils.readValue<string>(contract.try_name(), "");
       token.symbol = utils.readValue<string>(contract.try_symbol(), "");
       token.decimals = utils.readValue<i32>(
@@ -61,7 +61,7 @@ export function getOrCreateToken(
       token._isOtoken = true;
       token._vaultId = vault.toHexString();
       
-      token.lastPriceUSD = utils.getOptionTokenPriceUSD(vault, address,block);
+      token.lastPriceUSD = utils.getOptionTokenPriceUSD(vault,block);
       token.lastPriceBlockNumber = block.number;
     }
     token.save();
@@ -80,7 +80,7 @@ export function getOrCreateToken(
         token.lastPriceBlockNumber = block.number;
       }
       if (token._isOtoken) {
-        token.lastPriceUSD = utils.getOptionTokenPriceUSD(vault, address,block);
+        token.lastPriceUSD = utils.getOptionTokenPriceUSD(vault,block);
         token.lastPriceBlockNumber = block.number;
       }
 
@@ -279,7 +279,7 @@ export function getOrCreateVault(
         asset = vaultParams.value.getAsset();
       }
       if (asset.equals(constants.NULL.TYPE_ADDRESS)) {
-        const vaultParamsEarnVault = vaultContract.try_vaultParams();
+        const vaultParamsEarnVault = vaultContract.try_vaultParams1();
         if (!vaultParamsEarnVault.reverted) {
           asset = vaultParamsEarnVault.value.getAsset();
         }
@@ -290,7 +290,7 @@ export function getOrCreateVault(
     vault.inputToken = inputToken.id;
     vault.inputTokenBalance = constants.BIGINT_ZERO;
     
-    const outputTokenAddress = utils.readValue<Address>(vaultContract.try_currentOption(), constants.NULL.TYPE_ADDRESS);
+    const outputTokenAddress = vaultAddress;
 
     if (outputTokenAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
       const outputToken = getOrCreateToken(outputTokenAddress, block, vaultAddress, true);
@@ -352,7 +352,26 @@ export function getOrCreateAuction(
     auction.vault = vaultAddress.toHexString();
     auction.save();
   }
+  
   return auction;
+}
+
+export function getOrCreateSwap(
+  swapId: BigInt,
+  vaultAddress: Address = constants.NULL.TYPE_ADDRESS,
+  optionToken: Address = constants.NULL.TYPE_ADDRESS,
+  biddingToken: Address = constants.NULL.TYPE_ADDRESS
+): _SwapOffer {
+  let swapOffer = _SwapOffer.load(swapId.toString());
+  if (!swapOffer) {
+    swapOffer = new _SwapOffer(swapId.toString());
+    swapOffer.optionToken = optionToken.toHexString();
+    swapOffer.biddingToken = biddingToken.toHexString();
+    swapOffer.vault = vaultAddress.toHexString();
+    swapOffer.save();
+  }
+
+  return swapOffer;
 }
 
 export function getOrCreateAccount(id: string): Account {

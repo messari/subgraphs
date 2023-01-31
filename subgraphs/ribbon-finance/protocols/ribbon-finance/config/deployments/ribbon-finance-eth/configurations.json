@@ -86,7 +86,6 @@
       "startBlock": 12696707
     }
   ],
-
   "liquidityGauges": [
     {
       "name": "rAAVEThetaGauge",
@@ -148,6 +147,6 @@
   ],
 
   "graftEnabled": false,
-  "subgraphId": "QmWce6AisJ4JrY76De2zXhm6eAF7PP39ej7uMKFXDVYknr",
-  "graftStartBlock": 15018080
+  "subgraphId": "QmcXW2VTtLDiJsE7tqqFW3NSxsDtFRNWUJDBxPzbS131tQ",
+  "graftStartBlock": 14788076
 }
