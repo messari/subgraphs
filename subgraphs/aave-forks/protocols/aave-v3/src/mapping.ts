@@ -449,40 +449,7 @@ export function handleBorrow(event: Borrow): void {
     return;
   }
 
-  // Set reserveFactor if not set, as setReserveFactor may be never called
-  const market = getOrCreateMarket(marketId, protocolData);
-  if (market._reserveFactor.equals(BIGDECIMAL_ZERO)) {
-    // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L377
-    // for how to decode configuration data to get reserve factor
-    const reserveFactorMask =
-      "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFF";
-    const reserveFactorStartBitPosition = 64 as u8;
-
-    const maskArray = new Uint8Array(32);
-    maskArray.set(Bytes.fromHexString(reserveFactorMask));
-    // BITWISE NOT
-    for (let i = 0; i < maskArray.length; i++) {
-      maskArray[i] = ~maskArray[i];
-    }
-    // reverse for little endian
-    const reserveFactorMaskBigInt = BigInt.fromUnsignedBytes(
-      Bytes.fromUint8Array(maskArray.reverse())
-    );
-
-    const pool = LendingPoolContract.bind(event.address);
-    const poolConfigData = pool.getConfiguration(event.params.reserve).data;
-    const reserveFactor = poolConfigData
-      .bitAnd(reserveFactorMaskBigInt)
-      .rightShift(reserveFactorStartBitPosition);
-
-    log.info("[handleBorrow]reserveFactor set to {}", [
-      reserveFactor.toString(),
-    ]);
-    market._reserveFactor = reserveFactor
-      .toBigDecimal()
-      .div(exponentToBigDecimal(INT_TWO));
-    market.save();
-  }
+  setReserveFactor(marketId, event.address, event.params.reserve);
 
   _handleBorrow(
     event,
@@ -828,5 +795,46 @@ function multiArraySort(
     ref[i] = sorter[i][0];
     arr1[i] = BigInt.fromString(sorter[i][1]);
     arr2[i] = BigDecimal.fromString(sorter[i][2]);
+  }
+}
+
+function setReserveFactor(
+  marketId: Address,
+  poolAddress: Address,
+  reserve: Address
+): void {
+  // Set reserveFactor if not set, as setReserveFactor may be never called
+  const market = getOrCreateMarket(marketId, protocolData);
+  if (market._reserveFactor.equals(BIGDECIMAL_ZERO)) {
+    // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L377
+    // for how to decode configuration data to get reserve factor
+    const reserveFactorMask =
+      "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFF";
+    const reserveFactorStartBitPosition = 64 as u8;
+
+    const maskArray = new Uint8Array(32);
+    maskArray.set(Bytes.fromHexString(reserveFactorMask));
+    // BITWISE NOT
+    for (let i = 0; i < maskArray.length; i++) {
+      maskArray[i] = ~maskArray[i];
+    }
+    // reverse for little endian
+    const reserveFactorMaskBigInt = BigInt.fromUnsignedBytes(
+      Bytes.fromUint8Array(maskArray.reverse())
+    );
+
+    const pool = LendingPoolContract.bind(poolAddress);
+    const poolConfigData = pool.getConfiguration(reserve).data;
+    const reserveFactor = poolConfigData
+      .bitAnd(reserveFactorMaskBigInt)
+      .rightShift(reserveFactorStartBitPosition);
+
+    log.info("[setReserveFactor]reserveFactor set to {}", [
+      reserveFactor.toString(),
+    ]);
+    market._reserveFactor = reserveFactor
+      .toBigDecimal()
+      .div(exponentToBigDecimal(INT_TWO));
+    market.save();
   }
 }
