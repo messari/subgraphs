@@ -47,28 +47,33 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
     );
   } else if (equalsIgnoreCase(network, Network.AVALANCHE)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0x770ef9f4fe897e59daCc474EF11238303F9552b6"),
+      Address.fromString("0x770ef9f4fe897e59dacc474ef11238303f9552b6"),
       Network.AVALANCHE
     );
   } else if (equalsIgnoreCase(network, Network.FANTOM)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0x770ef9f4fe897e59daCc474EF11238303F9552b6"),
+      Address.fromString("0x770ef9f4fe897e59dacc474ef11238303f9552b6"),
       Network.FANTOM
     );
   } else if (equalsIgnoreCase(network, Network.HARMONY)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0x770ef9f4fe897e59daCc474EF11238303F9552b6"),
+      Address.fromString("0x770ef9f4fe897e59dacc474ef11238303f9552b6"),
       Network.HARMONY
     );
   } else if (equalsIgnoreCase(network, Network.MATIC)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0x770ef9f4fe897e59daCc474EF11238303F9552b6"),
+      Address.fromString("0x770ef9f4fe897e59dacc474ef11238303f9552b6"),
       Network.MATIC
     );
   } else if (equalsIgnoreCase(network, Network.OPTIMISM)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0x770ef9f4fe897e59daCc474EF11238303F9552b6"),
+      Address.fromString("0x770ef9f4fe897e59dacc474ef11238303f9552b6"),
       Network.OPTIMISM
+    );
+  } else if (equalsIgnoreCase(network, Network.MAINNET)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0xbaa999ac55eace41ccae355c77809e68bb345170"),
+      Network.MAINNET
     );
   } else {
     log.error("[getNetworkSpecificConstant] Unsupported network: {}", [
