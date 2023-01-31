@@ -111,6 +111,13 @@ export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // c
 export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // created block 10042267
 export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // created block 10093341
 
+export const STAKEDAO_STETH_VAULT = Address.fromHexString(
+  "0xcc61Ee649A95F2E2f0830838681f839BDb7CB823"
+);
+export const YEARN_STETH_VAULT = Address.fromHexString(
+  "0x82e90eb7034c1df646bd06afb9e67281aab5ed28"
+);
+
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
