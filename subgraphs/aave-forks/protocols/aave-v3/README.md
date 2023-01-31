@@ -1,54 +1,38 @@
 # Aave V3 Subgraph
 
-## Calculation Methodology v1.0.0
+## Calculation Methodology v1.0.1
+
+Methodology version 1.0.1 updates the calculation methodology for aave-v3 to use aave-forks implementation, especially for protocol-side revenue. This change happens as the aave-v3 is refactored as one of aave-forks to consolidate code and address issues in the previous aave-v3 subgraph (subgraph version 1.0.5): [#966](https://github.com/messari/subgraphs/issues/966) and [#1285](https://github.com/messari/subgraphs/issues/1285).
 
 ### Total Value Locked (TVL) USD
 
-Sum across all Reserves:
+Sum across all Pools:
 
 `Pool Deposit TVL`
 
-Includes supply interest earned
-
 ### Total Revenue USD
 
-Sum across all Reserves:
+Sum across all Pools:
 
-`Borrow interest + Flash loan premium + Bridge fee + Liquidation bonus`
+`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate)`
+
+Note: This currently excludes Flash Loans
 
 ### Protocol-Side Revenue USD
 
 Portion of the Total Revenue allocated to the Protocol
 
-Sum across all Reserves:
+Sum across all Pools:
 
-`(Borrow interest * reserve factor) + Flash loan protocol premium + Bridge protocol fee + Liquidation protocol bonus`
-
-Calculated using:
-
-- aToken transfers to treasury address (liquidation bonus)
-- `Pool.getReserveData(asset).accruedToTreasury`
+`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
 
 ### Supply-Side Revenue USD
 
 Portion of the Total Revenue allocated to the Supply-Side
 
-Sum across all Reserves:
+Sum across all Pools:
 
-`Supply APY + Flash loan LP premium + Bridge LP fee + Liquidation LP bonus`
-
-Calculated using:
-
-- `(aToken liquidity index change * scaled total supply)`
-- Liquidate.profitUSD
-
-### Total Borrow Balance
-
-Sum across all Reserves:
-
-`VariableDebtToken total supply + StableDebtToken total supply`
-
-Includes accrued interest
+`(Pool Outstanding Borrow Amount * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
 
 ### Total Unique Users
 
@@ -80,8 +64,6 @@ N/A
   - Rewards contracts: [https://github.com/aave/aave-v3-periphery](https://github.com/aave/aave-v3-periphery)
 - Deployed addresses: [https://docs.aave.com/developers/deployed-contracts/v3-mainnet](https://docs.aave.com/developers/deployed-contracts/v3-mainnet)
 - Existing Subgraph: [https://github.com/aave/protocol-subgraphs](https://github.com/aave/protocol-subgraphs)
-
-## Usage
 
 ### Prepare
 
