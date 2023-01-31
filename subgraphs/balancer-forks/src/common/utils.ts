@@ -95,6 +95,29 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   );
 }
 
+export function getPoolInputTokenBalances(
+  poolAddress: Address,
+  poolId: Bytes
+): BigInt[] {
+  const poolContract = WeightedPoolContract.bind(poolAddress);
+  const poolTokensInfo = getPoolTokensInfo(poolId);
+
+  let poolBalances = poolTokensInfo.getBalances;
+
+  const bptTokenIndex = readValue<BigInt>(
+    poolContract.try_getBptIndex(),
+    constants.BIGINT_NEG_ONE
+  );
+
+  if (bptTokenIndex != constants.BIGINT_NEG_ONE) {
+    poolBalances = poolBalances.splice(
+      bptTokenIndex.plus(constants.BIGINT_ONE).toI32() as u8
+    );
+  }
+
+  return poolBalances;
+}
+
 export function getPoolScalingFactors(
   poolAddress: Address,
   inputTokens: string[]
@@ -115,6 +138,17 @@ export function getPoolScalingFactors(
 
   if (scales.every((item) => item.isZero())) {
     scales = readValue<BigInt[]>(poolContract.try_getScalingFactors(), scales);
+
+    const bptTokenIndex = readValue<BigInt>(
+      poolContract.try_getBptIndex(),
+      constants.BIGINT_NEG_ONE
+    );
+
+    if (bptTokenIndex != constants.BIGINT_NEG_ONE) {
+      scales = scales.splice(
+        bptTokenIndex.plus(constants.BIGINT_ONE).toI32() as u8
+      );
+    }
   }
 
   return scales;
