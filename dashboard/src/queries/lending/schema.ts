@@ -169,6 +169,74 @@ export const schema130 = (): Schema => {
     return baseStr + fields + " }";
   });
 
+  const protocolFields: any = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    lendingType: "LendingType",
+    riskType: "RiskType",
+    cumulativeUniqueUsers: "Int!",
+    totalValueLockedUSD: "BigDecimal!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    protocolControlledValueUSD: "BigDecimal",
+    totalPoolCount: "Int!",
+    totalDepositBalanceUSD: "BigDecimal!",
+    cumulativeDepositUSD: "BigDecimal!",
+    totalBorrowBalanceUSD: "BigDecimal!",
+    cumulativeBorrowUSD: "BigDecimal!",
+    cumulativeLiquidateUSD: "BigDecimal!",
+  };
+
+  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+
+  const financialsQuery = `
+    query Data {
+      ${finanQuery}
+    }`;
+  const hourlyUsageQuery = `
+    query Data {
+      ${usageHourlyQuery}
+    }`;
+  const dailyUsageQuery = `
+    query Data {
+      ${usageDailyQuery}
+    }`;
+
+  const protocolTableQuery = `
+    query Data($protocolId: String) {
+      lendingProtocol(id:$protocolId) {
+        ${protocolQueryFields}
+        mintedTokens {
+          id
+          decimals
+        }
+        mintedTokenSupplies
+      }
+    }`;
+
+  const poolsQuery = `
+      query Data {
+        markets(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
+          id
+          name
+        }
+      }
+    `;
+
+  const poolTimeseriesQuery = `
+  query Data($poolId: String) {
+    ${marketDailyQuery}
+    ${marketHourlyQuery}
+  }
+  `;
+
   const poolData: { [x: string]: string } = {
     id: "ID!",
     name: "String",
@@ -200,71 +268,6 @@ export const schema130 = (): Schema => {
     rewardTokenEmissionsUSD: "[BigDecimal!]",
   };
 
-  const financialsQuery = `
-    query Data {
-      ${finanQuery}
-    }`;
-  const hourlyUsageQuery = `
-    query Data {
-      ${usageHourlyQuery}
-    }`;
-  const dailyUsageQuery = `
-    query Data {
-      ${usageDailyQuery}
-    }`;
-
-  const protocolTableQuery = `
-    query Data($protocolId: String) {
-      lendingProtocol(id:$protocolId) {
-        id      
-        name
-        slug
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        network
-        type
-        lendingType
-        riskType
-        mintedTokens {
-          id
-          decimals
-        }
-        cumulativeUniqueUsers
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        protocolControlledValueUSD
-        totalPoolCount
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        totalDepositBalanceUSD
-        cumulativeDepositUSD
-        totalBorrowBalanceUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
-        mintedTokenSupplies
-      }
-    }`;
-
-  const poolsQuery = `
-      query Data {
-        markets(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
-          id
-          name
-        }
-      }
-    `;
-
-  const poolTimeseriesQuery = `
-  query Data($poolId: String) {
-    ${marketDailyQuery}
-    ${marketHourlyQuery}
-  }
-  `;
-
   const query = `
   query Data($poolId: String, $protocolId: String){
     _meta {
@@ -284,31 +287,11 @@ export const schema130 = (): Schema => {
     }
     
     lendingProtocols {
-      id      
-      name
-      slug
-      schemaVersion
-      subgraphVersion
-      methodologyVersion
-      network
-      type
-      lendingType
-      riskType
+      ${protocolQueryFields}
       mintedTokens {
         id
         decimals
       }
-      cumulativeUniqueUsers
-      totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-      totalPoolCount
-      totalDepositBalanceUSD
-      cumulativeDepositUSD
-      totalBorrowBalanceUSD
-      cumulativeBorrowUSD
-      cumulativeLiquidateUSD
       mintedTokenSupplies
     }
 
@@ -369,32 +352,8 @@ export const schema130 = (): Schema => {
     }
   }`;
 
-  const protocolFields = {
-    id: "ID!",
-    name: "String!",
-    slug: "String!",
-    schemaVersion: "String!",
-    subgraphVersion: "String!",
-    methodologyVersion: "String!",
-    network: "Network!",
-    type: "ProtocolType!",
-    lendingType: "LendingType",
-    riskType: "RiskType",
-    mintedTokens: "[Token!]",
-    cumulativeUniqueUsers: "Int!",
-    totalValueLockedUSD: "BigDecimal!",
-    cumulativeSupplySideRevenueUSD: "BigDecimal!",
-    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-    cumulativeTotalRevenueUSD: "BigDecimal!",
-    protocolControlledValueUSD: "BigDecimal",
-    totalPoolCount: "Int!",
-    totalDepositBalanceUSD: "BigDecimal!",
-    cumulativeDepositUSD: "BigDecimal!",
-    totalBorrowBalanceUSD: "BigDecimal!",
-    cumulativeBorrowUSD: "BigDecimal!",
-    cumulativeLiquidateUSD: "BigDecimal!",
-    mintedTokenSupplies: "[BigInt!]",
-  };
+  protocolFields["mintedTokens"] = "[Token!]";
+  protocolFields["mintedTokenSupplies"] = "[BigInt!]";
 
   return {
     entities,
@@ -477,92 +436,86 @@ export const schema201 = (): Schema => {
     return baseStr + fields + " }";
   });
 
-  const poolData: { [x: string]: string } = {
-    ...prevSchema.poolData,
-    positionCount: "Int!",
+  const protocolFields: any = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    lendingType: "LendingType",
+    riskType: "RiskType",
+    cumulativeUniqueUsers: "Int!",
+    totalValueLockedUSD: "BigDecimal!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    protocolControlledValueUSD: "BigDecimal",
+    totalPoolCount: "Int!",
+    totalDepositBalanceUSD: "BigDecimal!",
+    cumulativeDepositUSD: "BigDecimal!",
+    totalBorrowBalanceUSD: "BigDecimal!",
+    cumulativeBorrowUSD: "BigDecimal!",
+    cumulativeLiquidateUSD: "BigDecimal!",
+    cumulativeUniqueDepositors: "Int!",
+    cumulativeUniqueBorrowers: "Int!",
+    cumulativeUniqueLiquidators: "Int!",
+    cumulativeUniqueLiquidatees: "Int!",
     openPositionCount: "Int!",
-    closedPositionCount: "Int!",
-    lendingPositionCount: "Int!",
-    borrowingPositionCount: "Int!",
+    cumulativePositionCount: "Int!",
   };
 
+  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+
   const financialsQuery = `
-    query Data {
+  query Data {
       ${finanQuery}
     }`;
   const hourlyUsageQuery = `
-    query Data {
-      ${usageHourlyQuery}
-    }`;
+  query Data {
+    ${usageHourlyQuery}
+  }`;
   const dailyUsageQuery = `
-    query Data {
-      ${usageDailyQuery}
-    }`;
+  query Data {
+    ${usageDailyQuery}
+  }`;
 
   const protocolTableQuery = `
-    query Data($protocolId: String) {
-      lendingProtocol(id:$protocolId) {
-        id      
-        name
-        slug
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        network
-        type
-        lendingType
-        riskType
-        mintedTokens {
-          id
+  query Data($protocolId: String) {
+    lendingProtocol(id:$protocolId) {
+      ${protocolQueryFields}
+      mintedTokens {
+        id
           decimals
         }
-        cumulativeUniqueUsers
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        totalPoolCount
-        protocolControlledValueUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        totalDepositBalanceUSD
-        cumulativeDepositUSD
-        totalBorrowBalanceUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
         mintedTokenSupplies
-        cumulativeUniqueDepositors
-        cumulativeUniqueBorrowers
-        cumulativeUniqueLiquidators
-        cumulativeUniqueLiquidatees
-        openPositionCount
-        cumulativePositionCount
       }
     }`;
 
   const poolsQuery = `
-      query Data {
-        markets(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
-          id
-          name
-        }
+    query Data {
+      markets(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
+        id
+        name
       }
+    }
     `;
 
   const poolTimeseriesQuery = `
-  query Data($poolId: String) {
-    ${marketDailyQuery}
-    ${marketHourlyQuery}
-  }
-  `;
+    query Data($poolId: String) {
+      ${marketDailyQuery}
+      ${marketHourlyQuery}
+    }
+    `;
 
   const positionsQuery = `
-      positions(first: 1000) {
+    positions(first: 1000) {
+      id
+      account {
         id
-        account {
-          id
-        }
+      }
         hashOpened
         hashClosed
         timestampOpened
@@ -593,65 +546,42 @@ export const schema201 = (): Schema => {
           hash
         }
       }
-  `;
+      `;
+
+  const poolData: { [x: string]: string } = {
+    ...prevSchema.poolData,
+    positionCount: "Int!",
+    openPositionCount: "Int!",
+    closedPositionCount: "Int!",
+    lendingPositionCount: "Int!",
+    borrowingPositionCount: "Int!",
+  };
 
   const query = `
-  query Data($poolId: String, $protocolId: String){
-    _meta {
-      block {
-        number
-      }
-      deployment
-    }
-    protocols {
-      id
-      name
-      slug
-      type
-      schemaVersion
-      subgraphVersion
-      methodologyVersion
-    }
+      query Data($poolId: String, $protocolId: String){
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
+        protocols {
+          id
+          name
+          slug
+          type
+          schemaVersion
+          subgraphVersion
+          methodologyVersion
+        }
     
     lendingProtocols {
-      id      
-      name
-      slug
-      schemaVersion
-      subgraphVersion
-      methodologyVersion
-      network
-      type
-      lendingType
-      riskType
+      ${protocolQueryFields}
       mintedTokens {
         id
         decimals
       }
-      cumulativeUniqueUsers
-      cumulativeUniqueDepositors
-      cumulativeUniqueBorrowers
-      cumulativeUniqueLiquidators
-      cumulativeUniqueLiquidatees
-      openPositionCount
-      cumulativePositionCount
-      totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-      totalPoolCount
-      totalDepositBalanceUSD
-      cumulativeDepositUSD
-      totalBorrowBalanceUSD
-      cumulativeBorrowUSD
-      cumulativeLiquidateUSD
       mintedTokenSupplies
-      cumulativeUniqueDepositors
-      cumulativeUniqueBorrowers
-      cumulativeUniqueLiquidators
-      cumulativeUniqueLiquidatees
-      openPositionCount
-      cumulativePositionCount
     }
 
     ${eventsQuery}
@@ -717,15 +647,8 @@ export const schema201 = (): Schema => {
     }
   }`;
 
-  const protocolFields = {
-    ...prevSchema.protocolFields,
-    cumulativeUniqueDepositors: "Int!",
-    cumulativeUniqueBorrowers: "Int!",
-    cumulativeUniqueLiquidators: "Int!",
-    cumulativeUniqueLiquidatees: "Int!",
-    openPositionCount: "Int!",
-    cumulativePositionCount: "Int!",
-  };
+  protocolFields["mintedTokens"] = "[Token!]";
+  protocolFields["mintedTokenSupplies"] = "[BigInt!]";
 
   return {
     entities,
@@ -865,15 +788,35 @@ export const schema300 = (): Schema => {
     return baseStr + fields + " }";
   });
 
-  const poolData: { [x: string]: string } = {
-    ...prevSchema.poolData,
-    positionCount: "Int!",
+  const protocolFields: any = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    lendingType: "LendingType",
+    riskType: "RiskType",
+    cumulativeUniqueUsers: "Int!",
+    totalValueLockedUSD: "BigDecimal!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    protocolControlledValueUSD: "BigDecimal",
+    totalPoolCount: "Int!",
+    totalDepositBalanceUSD: "BigDecimal!",
+    cumulativeDepositUSD: "BigDecimal!",
+    totalBorrowBalanceUSD: "BigDecimal!",
+    cumulativeBorrowUSD: "BigDecimal!",
+    cumulativeLiquidateUSD: "BigDecimal!",
+    cumulativeUniqueDepositors: "Int!",
+    cumulativeUniqueBorrowers: "Int!",
+    cumulativeUniqueLiquidators: "Int!",
+    cumulativeUniqueLiquidatees: "Int!",
     openPositionCount: "Int!",
-    closedPositionCount: "Int!",
-    lendingPositionCount: "Int!",
-    borrowingPositionCount: "Int!",
-    cumulativeTransferUSD: "BigDecimal!",
-    cumulativeFlashloanUSD: "BigDecimal!",
+    cumulativePositionCount: "Int!",
     transactionCount: "Int!",
     depositCount: "Int!",
     withdrawCount: "Int!",
@@ -882,26 +825,12 @@ export const schema300 = (): Schema => {
     liquidationCount: "Int!",
     transferCount: "Int!",
     flashloanCount: "Int!",
-    cumulativeUniqueDepositors: "Int!",
-    cumulativeUniqueBorrowers: "Int!",
-    cumulativeUniqueLiquidators: "Int!",
-    cumulativeUniqueLiquidatees: "Int!",
-    cumulativeUniqueTransferrers: "Int!",
-    cumulativeUniqueFlashloaners: "Int!",
-    oracle: "Oracle",
-    canIsolate: "Boolean!",
-    reserves: "BigDecimal",
-    reserveFactor: "BigDecimal",
-    borrowedToken: "Token",
-    variableBorrowedTokenBalance: "BigInt",
-    stableBorrowedTokenBalance: "BigInt",
-    supplyCap: "BigInt",
-    borrowCap: "BigInt",
-    revenueDetail: "RevenueDetail",
   };
 
+  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+
   const financialsQuery = `
-    query Data {
+  query Data {
       ${finanQuery}
     }`;
   const hourlyUsageQuery = `
@@ -916,72 +845,30 @@ export const schema300 = (): Schema => {
   const protocolTableQuery = `
     query Data($protocolId: String) {
       lendingProtocol(id:$protocolId) {
-        id
-        name
-        slug
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        network
-        type
-        lendingType
-        riskType
-        lenderPermissionType
-        borrowerPermissionType
-        collateralizationType
-        revenueDetail
+        ${protocolQueryFields}
         mintedTokens {
           id
           decimals
         }
-        cumulativeUniqueUsers
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        totalPoolCount
-        protocolControlledValueUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        totalDepositBalanceUSD
-        cumulativeDepositUSD
-        totalBorrowBalanceUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
         mintedTokenSupplies
-        cumulativeUniqueDepositors
-        cumulativeUniqueBorrowers
-        cumulativeUniqueLiquidators
-        cumulativeUniqueLiquidatees
-        openPositionCount
-        cumulativePositionCount
-        transactionCount
-        depositCount
-        withdrawCount
-        borrowCount
-        repayCount
-        liquidationCount
-        transferCount
-        flashloanCount
       }
     }`;
 
   const poolsQuery = `
-      query Data {
-        markets(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
-          id
+    query Data {
+      markets(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
+        id
           name
         }
       }
-    `;
+      `;
 
   const poolTimeseriesQuery = `
-  query Data($poolId: String) {
-    ${marketDailyQuery}
-    ${marketHourlyQuery}
-  }
-  `;
+      query Data($poolId: String) {
+        ${marketDailyQuery}
+        ${marketHourlyQuery}
+      }
+      `;
 
   const positionsQuery = `
       positions(first: 1000) {
@@ -1019,10 +906,45 @@ export const schema300 = (): Schema => {
           hash
         }
       }
-  `;
+      `;
+
+  const poolData: { [x: string]: string } = {
+    ...prevSchema.poolData,
+    positionCount: "Int!",
+    openPositionCount: "Int!",
+    closedPositionCount: "Int!",
+    lendingPositionCount: "Int!",
+    borrowingPositionCount: "Int!",
+    cumulativeTransferUSD: "BigDecimal!",
+    cumulativeFlashloanUSD: "BigDecimal!",
+    transactionCount: "Int!",
+    depositCount: "Int!",
+    withdrawCount: "Int!",
+    borrowCount: "Int!",
+    repayCount: "Int!",
+    liquidationCount: "Int!",
+    transferCount: "Int!",
+    flashloanCount: "Int!",
+    cumulativeUniqueDepositors: "Int!",
+    cumulativeUniqueBorrowers: "Int!",
+    cumulativeUniqueLiquidators: "Int!",
+    cumulativeUniqueLiquidatees: "Int!",
+    cumulativeUniqueTransferrers: "Int!",
+    cumulativeUniqueFlashloaners: "Int!",
+    oracle: "Oracle",
+    canIsolate: "Boolean!",
+    reserves: "BigDecimal",
+    reserveFactor: "BigDecimal",
+    borrowedToken: "Token",
+    variableBorrowedTokenBalance: "BigInt",
+    stableBorrowedTokenBalance: "BigInt",
+    supplyCap: "BigInt",
+    borrowCap: "BigInt",
+    revenueDetail: "RevenueDetail",
+  };
 
   const query = `
-  query Data($poolId: String, $protocolId: String){
+      query Data($poolId: String, $protocolId: String){
     _meta {
       block {
         number
@@ -1040,54 +962,12 @@ export const schema300 = (): Schema => {
     }
     
     lendingProtocols {
-      id      
-      name
-      slug
-      schemaVersion
-      subgraphVersion
-      methodologyVersion
-      network
-      type
-      lendingType
-      riskType
-      lenderPermissionType
-      borrowerPermissionType
-      collateralizationType
-      revenueDetail
+      ${protocolQueryFields}
       mintedTokens {
         id
         decimals
       }
-      cumulativeUniqueUsers
-      totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-      totalPoolCount
-      protocolControlledValueUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-      totalDepositBalanceUSD
-      cumulativeDepositUSD
-      totalBorrowBalanceUSD
-      cumulativeBorrowUSD
-      cumulativeLiquidateUSD
       mintedTokenSupplies
-      cumulativeUniqueDepositors
-      cumulativeUniqueBorrowers
-      cumulativeUniqueLiquidators
-      cumulativeUniqueLiquidatees
-      openPositionCount
-      cumulativePositionCount
-      transactionCount
-      depositCount
-      withdrawCount
-      borrowCount
-      repayCount
-      liquidationCount
-      transferCount
-      flashloanCount
     }
 
     ${eventsQuery}
@@ -1179,23 +1059,8 @@ export const schema300 = (): Schema => {
     }
   }`;
 
-  const protocolFields = {
-    ...prevSchema.protocolFields,
-    cumulativeUniqueDepositors: "Int!",
-    cumulativeUniqueBorrowers: "Int!",
-    cumulativeUniqueLiquidators: "Int!",
-    cumulativeUniqueLiquidatees: "Int!",
-    openPositionCount: "Int!",
-    cumulativePositionCount: "Int!",
-    transactionCount: "Int!",
-    depositCount: "Int!",
-    withdrawCount: "Int!",
-    borrowCount: "Int!",
-    repayCount: "Int!",
-    liquidationCount: "Int!",
-    transferCount: "Int!",
-    flashloanCount: "Int!",
-  };
+  protocolFields["mintedTokens"] = "[Token!]";
+  protocolFields["mintedTokenSupplies"] = "[BigInt!]";
 
   return {
     entities,
