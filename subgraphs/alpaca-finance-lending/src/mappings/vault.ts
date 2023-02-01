@@ -1,5 +1,12 @@
 import { Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { Vault, Work, Kill, Transfer } from "../../generated/ibALPACA/Vault";
+import {
+  Vault,
+  Work,
+  Kill,
+  Transfer,
+  RemoveDebt,
+  AddDebt,
+} from "../../generated/ibALPACA/Vault";
 import { ConfigurableInterestVaultConfig } from "../../generated/ibALPACA/ConfigurableInterestVaultConfig";
 import { FairLaunch } from "../../generated/ibALPACA/FairLaunch";
 import { Market, MarketDailySnapshot } from "../../generated/schema";
@@ -171,6 +178,11 @@ function _handleBurn(event: Transfer): void {
 }
 
 export function handleAddDebt(event: Work): void {
+  log.info("[handleAddDebt]address={},tx={},logIndex={}", [
+    event.address.toHexString(),
+    event.transaction.hash.toHexString(),
+    event.transactionLogIndex.toString(),
+  ]);
   const market = getMarket(event.address);
   updateInterest(event, market);
   const contract = Vault.bind(event.address);
@@ -201,6 +213,11 @@ export function handleAddDebt(event: Work): void {
 }
 
 export function handleRemoveDebt(event: Work): void {
+  log.info("[handleRemoveDebt]address={},tx={},logIndex={}", [
+    event.address.toHexString(),
+    event.transaction.hash.toHexString(),
+    event.transactionLogIndex.toString(),
+  ]);
   const market = getMarket(event.address);
   updateInterest(event, market);
   const contract = Vault.bind(event.address);
@@ -312,13 +329,9 @@ export function updateInterest(event: ethereum.Event, market: Market): void {
   const configContract = ConfigurableInterestVaultConfig.bind(tryConfig.value);
   const tryGetInterestRate = configContract.try_getInterestRate(
     vaultDebtVal,
-    totalTokenAmount
+    floating
   );
-  if (
-    tryGetInterestRate.reverted ||
-    vaultDebtVal.equals(BIGINT_ZERO) ||
-    totalTokenAmount.equals(BIGINT_ZERO)
-  ) {
+  if (tryGetInterestRate.reverted || totalTokenAmount.equals(BIGINT_ZERO)) {
     log.warning("[updateInterest] could not update interest rate", []);
     return;
   }
@@ -333,9 +346,11 @@ export function updateInterest(event: ethereum.Event, market: Market): void {
     .div(totalTokenAmount.toBigDecimal());
   updateMarketRates(event, market, borrowerAPY, lenderAPY);
   log.info(
-    "[updateInterestRate]market={},RatePerSec={},borrowerAPY={},lenderAPY={},tx={}",
+    "[updateInterestRate]market={},vaultDebtValu={},totalToken={},RatePerSec={},borrowerAPY={},lenderAPY={},tx={}",
     [
       market.id,
+      vaultDebtVal.toString(),
+      totalTokenAmount.toString(),
       ratePerSec.toString(),
       borrowerAPY.toString(),
       lenderAPY.toString(),
