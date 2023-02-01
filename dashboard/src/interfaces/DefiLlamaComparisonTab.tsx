@@ -5,20 +5,18 @@ import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboar
 import { Chart } from "../common/chartComponents/Chart";
 import { ComparisonTable } from "../common/chartComponents/ComparisonTable";
 import { lineupChartDatapoints, toDate } from "../utils";
-import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery } from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { DeploymentsDropDown } from "../common/utilComponents/DeploymentsDropDown";
 import { Chart as ChartJS, registerables, PointElement } from "chart.js";
-import { useNavigate } from "react-router";
 import moment from "moment";
 
 interface DefiLlamaComparsionTabProps {
   subgraphEndpoints: { [x: string]: any };
-  getData: any;
   financialsData: any;
 }
 
 // This component is for each individual subgraph
-function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: DefiLlamaComparsionTabProps) {
+function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlamaComparsionTabProps) {
 
   function jpegDownloadHandler() {
     try {
@@ -54,13 +52,6 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: 
       cache: new InMemoryCache(),
     });
   }, [deploymentURL]);
-
-  useEffect(() => {
-    if (!subgraphEndpoints || Object.keys(subgraphEndpoints).length === 0) {
-      getData();
-    }
-  }, []);
-
 
   const chartRef = useRef<any>(null);
   const deploymentNameToUrlMapping: any = {};
