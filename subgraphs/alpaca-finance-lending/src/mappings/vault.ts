@@ -1,7 +1,6 @@
 import { Address, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Vault,
-  Work,
   Kill,
   Transfer,
   RemoveDebt,
@@ -177,17 +176,17 @@ function _handleBurn(event: Transfer): void {
   );
 }
 
-export function handleAddDebt(event: Work): void {
-  log.info("[handleAddDebt]address={},tx={},logIndex={}", [
-    event.address.toHexString(),
-    event.transaction.hash.toHexString(),
-    event.transactionLogIndex.toString(),
-  ]);
+export function handleAddDebt(event: AddDebt): void {
   const market = getMarket(event.address);
   updateInterest(event, market);
   const contract = Vault.bind(event.address);
   const trytoken = contract.try_token();
-  if (trytoken.reverted) {
+  const tryDebtVal = contract.try_debtShareToVal(event.params.debtShare);
+  if (trytoken.reverted || tryDebtVal.reverted) {
+    log.error("[handleAddDebt]Failed to handle add debt for market {} tx={}", [
+      market.id,
+      event.transaction.hash.toHexString(),
+    ]);
     return;
   }
   const tryPositions = contract.try_positions(event.params.id);
@@ -199,30 +198,30 @@ export function handleAddDebt(event: Work): void {
     market,
     trytoken.value,
     tryPositions.value.getOwner(),
-    event.params.loan
+    tryDebtVal.value
   );
-  changeMarketBorrowBalance(event, market, event.params.loan);
+  changeMarketBorrowBalance(event, market, tryDebtVal.value);
   updateUserPosition(
     event,
     tryPositions.value.getOwner(),
     market,
-    event.params.loan,
+    tryDebtVal.value,
     PositionSide.BORROWER,
     false
   );
 }
 
-export function handleRemoveDebt(event: Work): void {
-  log.info("[handleRemoveDebt]address={},tx={},logIndex={}", [
-    event.address.toHexString(),
-    event.transaction.hash.toHexString(),
-    event.transactionLogIndex.toString(),
-  ]);
+export function handleRemoveDebt(event: RemoveDebt): void {
   const market = getMarket(event.address);
   updateInterest(event, market);
   const contract = Vault.bind(event.address);
   const trytoken = contract.try_token();
-  if (trytoken.reverted) {
+  const tryDebtVal = contract.try_debtShareToVal(event.params.debtShare);
+  if (trytoken.reverted || tryDebtVal.reverted) {
+    log.error(
+      "[handleRemoveDebt]Failed to handle remove debt from market {} tx={}",
+      [market.id, event.transaction.hash.toHexString()]
+    );
     return;
   }
   const tryPositions = contract.try_positions(event.params.id);
@@ -234,18 +233,18 @@ export function handleRemoveDebt(event: Work): void {
     market,
     trytoken.value,
     tryPositions.value.getOwner(),
-    event.params.loan
+    tryDebtVal.value
   );
   changeMarketBorrowBalance(
     event,
     market,
-    event.params.loan.times(BIGINT_NEGATIVE_ONE)
+    tryDebtVal.value.times(BIGINT_NEGATIVE_ONE)
   );
   updateUserPosition(
     event,
     tryPositions.value.getOwner(),
     market,
-    event.params.loan,
+    tryDebtVal.value,
     PositionSide.BORROWER,
     false
   );
