@@ -63,7 +63,7 @@ export function handleTransferIn(event: DepositFinalized): void {
       poolId.toString(),
       "ERC20",
       BridgePoolType.LOCK_RELEASE,
-      sdk.Tokens.getOrCreateToken(event.params.l1Token)
+      sdk.Tokens.getOrCreateToken(event.params._l1Token)
     );
   }
 
