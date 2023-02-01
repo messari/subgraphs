@@ -190,6 +190,103 @@ export const schema100 = (): Schema => {
     Object.keys(entitiesData.poolHourlySnapshots).join(",") +
     "}";
 
+  const eventsFields = ["hash", "timestamp", "account{id}"];
+
+  // Query pool(pool) entity and events entities
+  const events: string[] = ["bridgeTransfers", "bridgeMessages", "liquidityDeposits", "liquidityWithdraws"];
+  const eventsQuery: any[] = events.map((event) => {
+    let options = "";
+    let fields = eventsFields.join(", ");
+    if (event !== "bridgeMessages") {
+      fields += ', amount, amountUSD, pool{id}';
+      options = ", where: {pool: $poolId}";
+    }
+    const baseStr =
+      event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
+    if (event === "bridgeTransfers" || event === "bridgeMessages") {
+      fields += ", fromChainID, toChainID, crossTransactionID";
+    } else if (event === "liquidityDeposits" || event === "liquidityWithdraws") {
+      fields += ", chainID, token{name}";
+    }
+    return baseStr + fields + " }";
+  });
+
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalValueLockedUSD: "BigDecimal!",
+    protocolControlledValueUSD: "BigDecimal",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    cumulativeVolumeInUSD: "BigDecimal!",
+    cumulativeVolumeOutUSD: "BigDecimal!",
+    cumulativeTotalVolumeUSD: "BigDecimal!",
+    netVolumeUSD: "BigDecimal!",
+    cumulativeUniqueUsers: "Int!",
+    cumulativeUniqueTransferSenders: "Int!",
+    cumulativeUniqueTransferReceivers: "Int!",
+    cumulativeUniqueLiquidityProviders: "Int!",
+    cumulativeUniqueMessageSenders: "Int!",
+    cumulativeTransactionCount: "Int!",
+    cumulativeTransferOutCount: "Int!",
+    cumulativeTransferInCount: "Int!",
+    cumulativeLiquidityDepositCount: "Int!",
+    cumulativeLiquidityWithdrawCount: "Int!",
+    cumulativeMessageSentCount: "Int!",
+    cumulativeMessageReceivedCount: "Int!",
+    supportedNetworks: "[Network!]!",
+    totalPoolCount: "Int!",
+    totalPoolRouteCount: "Int!",
+    totalCanonicalRouteCount: "Int!",
+    totalWrappedRouteCount: "Int!",
+    totalSupportedTokenCount: "Int!"
+  };
+
+  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+
+  const financialsQuery = `
+    query Data {
+      ${finanQuery}
+    }`;
+  const hourlyUsageQuery = `
+    query Data {
+      ${usageHourlyQuery}
+    }`;
+  const dailyUsageQuery = `
+    query Data {
+      ${usageDailyQuery}
+    }`;
+
+  const protocolTableQuery = `
+    query Data($protocolId: String) {
+      bridgeProtocol(id: $protocolId) {
+        ${protocolQueryFields}
+      }
+    }`;
+
+  const poolsQuery = `
+      query Data {
+        pools(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
+          id
+          name
+        }
+      }
+    `;
+
+  const poolTimeseriesQuery = `
+      query Data($poolId: String) {
+        ${poolDailyQuery}
+        ${poolHourlyQuery}
+      }
+      `;
+
   const poolData: { [x: string]: string } = {
     id: "ID!",
     name: "String",
@@ -222,98 +319,6 @@ export const schema100 = (): Schema => {
     rewardTokenEmissionsUSD: "[BigDecimal!]",
   };
 
-  const eventsFields = ["hash", "timestamp", "account{id}"];
-
-  // Query pool(pool) entity and events entities
-  const events: string[] = ["bridgeTransfers", "bridgeMessages", "liquidityDeposits", "liquidityWithdraws"];
-  const eventsQuery: any[] = events.map((event) => {
-    let options = "";
-    let fields = eventsFields.join(", ");
-    if (event !== "bridgeMessages") {
-      fields += ', amount, amountUSD, pool{id}';
-      options = ", where: {pool: $poolId}";
-    }
-    const baseStr =
-      event + "(first: 1000, orderBy: timestamp, orderDirection: desc" + options + ") { ";
-    if (event === "bridgeTransfers" || event === "bridgeMessages") {
-      fields += ", fromChainID, toChainID, crossTransactionID";
-    } else if (event === "liquidityDeposits" || event === "liquidityWithdraws") {
-      fields += ", chainID, token{name}";
-    }
-    return baseStr + fields + " }";
-  });
-
-  const financialsQuery = `
-    query Data {
-      ${finanQuery}
-    }`;
-  const hourlyUsageQuery = `
-    query Data {
-      ${usageHourlyQuery}
-    }`;
-  const dailyUsageQuery = `
-    query Data {
-      ${usageDailyQuery}
-    }`;
-
-  const protocolTableQuery = `
-    query Data($protocolId: String) {
-      bridgeProtocol(id: $protocolId) {
-        id
-        name
-        slug
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        network
-        type
-        permissionType
-        totalValueLockedUSD
-        protocolControlledValueUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        cumulativeVolumeInUSD
-        cumulativeVolumeOutUSD
-        cumulativeTotalVolumeUSD
-        netVolumeUSD
-        cumulativeUniqueUsers
-        cumulativeUniqueTransferSenders
-        cumulativeUniqueTransferReceivers
-        cumulativeUniqueLiquidityProviders
-        cumulativeUniqueMessageSenders
-        cumulativeTransactionCount
-        cumulativeTransferOutCount
-        cumulativeTransferInCount
-        cumulativeLiquidityDepositCount
-        cumulativeLiquidityWithdrawCount
-        cumulativeMessageSentCount
-        cumulativeMessageReceivedCount
-        supportedNetworks
-        totalPoolCount
-        totalPoolRouteCount
-        totalCanonicalRouteCount
-        totalWrappedRouteCount
-        totalSupportedTokenCount
-      }
-    }`;
-
-  const poolsQuery = `
-      query Data {
-        pools(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
-          id
-          name
-        }
-      }
-    `;
-
-  const poolTimeseriesQuery = `
-      query Data($poolId: String) {
-        ${poolDailyQuery}
-        ${poolHourlyQuery}
-      }
-      `;
-
   let query = `
   query Data($poolId: String, $protocolId: String){
     _meta {
@@ -334,42 +339,7 @@ export const schema100 = (): Schema => {
     }
 
     bridgeProtocols {
-      id
-      name
-      slug
-      schemaVersion
-      subgraphVersion
-      methodologyVersion
-      network
-      type
-      permissionType
-      totalValueLockedUSD
-      protocolControlledValueUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-      cumulativeVolumeInUSD
-      cumulativeVolumeOutUSD
-      cumulativeTotalVolumeUSD
-      netVolumeUSD
-      cumulativeUniqueUsers
-      cumulativeUniqueTransferSenders
-      cumulativeUniqueTransferReceivers
-      cumulativeUniqueLiquidityProviders
-      cumulativeUniqueMessageSenders
-      cumulativeTransactionCount
-      cumulativeTransferOutCount
-      cumulativeTransferInCount
-      cumulativeLiquidityDepositCount
-      cumulativeLiquidityWithdrawCount
-      cumulativeMessageSentCount
-      cumulativeMessageReceivedCount
-      supportedNetworks
-      totalPoolCount
-      totalPoolRouteCount
-      totalCanonicalRouteCount
-      totalWrappedRouteCount
-      totalSupportedTokenCount
+      ${protocolQueryFields}
     }
     ${eventsQuery}
     pool(id: $poolId){
@@ -418,44 +388,6 @@ export const schema100 = (): Schema => {
       rewardTokenEmissionsUSD
     }
   }`;
-
-  const protocolFields = {
-    id: "ID!",
-    name: "String!",
-    slug: "String!",
-    schemaVersion: "String!",
-    subgraphVersion: "String!",
-    methodologyVersion: "String!",
-    network: "Network!",
-    type: "ProtocolType!",
-    totalValueLockedUSD: "BigDecimal!",
-    protocolControlledValueUSD: "BigDecimal",
-    cumulativeSupplySideRevenueUSD: "BigDecimal!",
-    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-    cumulativeTotalRevenueUSD: "BigDecimal!",
-    cumulativeVolumeInUSD: "BigDecimal!",
-    cumulativeVolumeOutUSD: "BigDecimal!",
-    cumulativeTotalVolumeUSD: "BigDecimal!",
-    netVolumeUSD: "BigDecimal!",
-    cumulativeUniqueUsers: "Int!",
-    cumulativeUniqueTransferSenders: "Int!",
-    cumulativeUniqueTransferReceivers: "Int!",
-    cumulativeUniqueLiquidityProviders: "Int!",
-    cumulativeUniqueMessageSenders: "Int!",
-    cumulativeTransactionCount: "Int!",
-    cumulativeTransferOutCount: "Int!",
-    cumulativeTransferInCount: "Int!",
-    cumulativeLiquidityDepositCount: "Int!",
-    cumulativeLiquidityWithdrawCount: "Int!",
-    cumulativeMessageSentCount: "Int!",
-    cumulativeMessageReceivedCount: "Int!",
-    supportedNetworks: "[Network!]!",
-    totalPoolCount: "Int!",
-    totalPoolRouteCount: "Int!",
-    totalCanonicalRouteCount: "Int!",
-    totalWrappedRouteCount: "Int!",
-    totalSupportedTokenCount: "Int!"
-  };
 
   return {
     entities,
