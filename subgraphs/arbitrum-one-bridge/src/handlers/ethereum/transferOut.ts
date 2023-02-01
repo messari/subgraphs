@@ -64,7 +64,7 @@ export function handleTransferOut(event: WithdrawalFinalized): void {
   }
 
   const poolId = event.address;
-  const pool = sdk.Pools.loadPool(poolId);
+  const pool = sdk.Pools.loadPool<string>(poolId);
 
   pool.initialize(
     poolId.toString(),

@@ -53,7 +53,7 @@ export function handleTransferIn(event: DepositFinalized): void {
   // -- POOL
 
   const poolId = event.address;
-  const pool = sdk.Pools.loadPool(poolId, null, null);
+  const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
     pool.initialize(

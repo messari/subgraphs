@@ -55,7 +55,7 @@ export function handleL2ToL1Transaction(event: L2ToL1Transaction): void {
     // -- POOL
 
     const poolId = event.address;
-    const pool = sdk.Pools.loadPool(poolId);
+    const pool = sdk.Pools.loadPool<string>(poolId);
 
     if (!pool.isInitialized) {
       pool.initialize(
@@ -135,7 +135,7 @@ export function handleL2ToL1Tx(event: L2ToL1Tx): void {
     // pool.addDestinationToken(crossToken);
 
     const poolId = event.address;
-    const pool = sdk.Pools.loadPool(poolId);
+    const pool = sdk.Pools.loadPool<string>(poolId);
 
     if (!pool.isInitialized) {
       pool.initialize(

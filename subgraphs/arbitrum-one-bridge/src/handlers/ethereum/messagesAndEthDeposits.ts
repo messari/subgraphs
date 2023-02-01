@@ -58,7 +58,7 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
     // pool.addDestinationToken(crossToken);
 
     const poolId = event.address;
-    const pool = sdk.Pools.loadPool(poolId);
+    const pool = sdk.Pools.loadPool<string>(poolId);
 
     pool.initialize(
       poolId.toString(),
