@@ -5,7 +5,6 @@ import { dashboardVersion, DashboardVersion } from "./common/DashboardVersion";
 import IssuesDisplay from "./interfaces/IssuesDisplay";
 import { DashboardHeader } from "./graphs/DashboardHeader";
 import { useEffect, useMemo, useState } from "react";
-import DefiLlamaComparsionTab from "./interfaces/DefiLlamaComparisonTab";
 import { NewClient, schemaMapping } from "./utils";
 import ProtocolsListByTVL from "./deployments/ProtocolsListByTVL";
 import { useQuery } from "@apollo/client";

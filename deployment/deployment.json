@@ -9,7 +9,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.11",
+          "subgraph": "1.2.12",
           "methodology": "1.0.0"
         },
         "files": {
@@ -31,7 +31,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.11",
+          "subgraph": "1.2.12",
           "methodology": "1.0.0"
         },
         "files": {
@@ -53,7 +53,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.11",
+          "subgraph": "1.2.12",
           "methodology": "1.0.0"
         },
         "files": {
@@ -75,7 +75,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.11",
+          "subgraph": "1.2.12",
           "methodology": "1.0.0"
         },
         "files": {
@@ -114,7 +114,7 @@
           },
           "decentralized-network": {
             "slug": "abracadabra-money-ethereum",
-            "query-id": "3Gkei7B24o9C2bCoAbQpApZqMStPta7oCAnNhmNv5dab"
+            "query-id": "95nyAWFFaiz6gykko3HtBCyhRuP5vZzuKYsZiLxHxLhr"
           }
         }
       }
@@ -430,6 +430,28 @@
           "hosted-service": {
             "slug": "aave-v3-optimism",
             "query-id": "aave-v3-optimism"
+          }
+        }
+      },
+      "aave-v3-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "aave-v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v3-ethereum",
+            "query-id": "aave-v3-ethereum"
           }
         }
       }
@@ -1853,6 +1875,35 @@
       }
     }
   },
+  "sonne-finance": {
+    "schema": "lending",
+    "base": "compound-forks",
+    "protocol": "sonne-finance",
+    "deployments": {
+      "sonne-finance-optimism": {
+        "network": "optimism",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "sonne.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sonne-finance-optimism",
+            "query-id": "sonne-finance-optimism"
+          }
+        }
+      }
+    }
+  },
   "venus": {
     "schema": "lending",
     "base": "compound-forks",
@@ -1892,7 +1943,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.0",
-          "subgraph": "1.0.5",
+          "subgraph": "2.0.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3346,8 +3397,8 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.3",
-          "subgraph": "2.1.0",
+          "schema": "1.3.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3368,8 +3419,8 @@
         "network": "celo",
         "status": "prod",
         "versions": {
-          "schema": "3.0.3",
-          "subgraph": "2.1.0",
+          "schema": "1.3.0",
+          "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3390,8 +3441,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.3",
-          "subgraph": "2.1.0",
+          "schema": "1.3.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3416,8 +3467,8 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "3.0.3",
-          "subgraph": "2.1.0",
+          "schema": "1.3.0",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3438,8 +3489,8 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "3.0.3",
-          "subgraph": "2.1.0",
+          "schema": "1.3.0",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5196,6 +5247,93 @@
           "hosted-service": {
             "slug": "indexed-governance",
             "query-id": "indexed-governance"
+          }
+        }
+      }
+    }
+  },
+  "lilnouns-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "lilnouns-governance",
+    "deployments": {
+      "lilnouns-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "lilnouns-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "lilnouns-governance",
+            "query-id": "lilnouns-governance"
+          }
+        }
+      }
+    }
+  },
+  "nouns-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "nouns-governance",
+    "deployments": {
+      "nouns-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "nouns-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "nouns-governance",
+            "query-id": "nouns-governance"
+          }
+        }
+      }
+    }
+  },
+  "ooki-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "ooki-governance",
+    "deployments": {
+      "ooki-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "ooki-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "ooki-governance",
+            "query-id": "ooki-governance"
           }
         }
       }

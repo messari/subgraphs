@@ -53,6 +53,32 @@ jobs:
       - name: Lint staged files
         run: npm run lint:subgraphs ${{ steps.changed-files-specific.outputs.added_modified }}
 
+  ValidateFormatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Get changed files in the subgraphs folder
+        id: changed-files-specific
+        uses: Ana06/get-changed-files@v2.1.0
+        with:
+          filter: 'subgraphs/**/*.ts'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Echo file changes
+        run: |
+          echo Changed files: "${{ steps.changed-files-specific.outputs.added_modified }}"
+
+      - name: Validate Formatting
+        run: npm run prettier-check ${{ steps.changed-files-specific.outputs.added_modified }}
+
   Build:
     runs-on: macos-latest
     steps: 
