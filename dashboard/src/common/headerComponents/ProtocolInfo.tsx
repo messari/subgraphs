@@ -1,6 +1,6 @@
-import { styled } from "../styled";
+import { styled } from "../../styled";
 import { Box, Chip, Link, Tooltip, Typography } from "@mui/material";
-import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
+import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
 
 const ProtocolContainer = styled("div")`
   background: rgba(32, 37, 44, 1);

@@ -3,7 +3,7 @@ import DeploymentsPage from "./deployments/DeploymentsPage";
 import { Route, Routes } from "react-router";
 import { dashboardVersion, DashboardVersion } from "./common/DashboardVersion";
 import IssuesDisplay from "./interfaces/IssuesDisplay";
-import { DashboardHeader } from "./graphs/DashboardHeader";
+import { DashboardHeader } from "./common/headerComponents/DashboardHeader";
 import { useEffect, useMemo, useState } from "react";
 import { NewClient, schemaMapping } from "./utils";
 import ProtocolsListByTVL from "./deployments/ProtocolsListByTVL";

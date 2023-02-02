@@ -1,7 +1,6 @@
 import ProtocolInfo from "./ProtocolInfo";
-import React from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { styled } from "../styled";
+import { styled } from "../../styled";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { Box, Link } from "@mui/material";
 
