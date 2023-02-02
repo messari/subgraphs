@@ -1,26 +1,18 @@
-import { styled } from "../styled";
-import { NewClient } from "../utils";
+import { NewClient } from "../../utils";
 import { useEffect, useMemo } from "react";
-import { gql, useLazyQuery } from "@apollo/client";
-
-const DeploymentsLayout = styled("div")`
-  padding: 0;
-`;
+import { useLazyQuery } from "@apollo/client";
 
 interface PendingCallsProps {
     query: any;
-    pendingSubgraphData: any;
     setPendingSubgraphData: any;
 }
 
-function PendingCalls({ query, pendingSubgraphData, setPendingSubgraphData }: PendingCallsProps) {
+function PendingCalls({ query, setPendingSubgraphData }: PendingCallsProps) {
     const clientPending = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
 
     // Generate query from subgraphEndpoints
     const [fetchPending, {
         data: pendingRequest,
-        loading: pendingRequestLoading,
-        error: pendingRequestError
     }] = useLazyQuery(query, {
         client: clientPending,
     });
@@ -45,7 +37,7 @@ function PendingCalls({ query, pendingSubgraphData, setPendingSubgraphData }: Pe
         }
     }, [pendingRequest])
     // No need to return a JSX element to render, function needed for state management
-    return (null);
+    return null;
 }
 
 export default PendingCalls;

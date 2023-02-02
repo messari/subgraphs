@@ -2,10 +2,10 @@ import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery } from "@apoll
 import { Box, CircularProgress, Grid, Typography } from "@mui/material";
 import moment from "moment";
 import { useEffect, useMemo, useRef } from "react";
-import { BridgeOutboundChart } from "../common/chartComponents/BridgeOutboundChart";
-import { DynamicColumnTableChart } from "../common/chartComponents/DynamicColumnTableChart";
-import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
-import { timestampToDaysSinceEpoch } from "../utils";
+import { BridgeOutboundChart } from "../chartComponents/BridgeOutboundChart";
+import { DynamicColumnTableChart } from "../chartComponents/DynamicColumnTableChart";
+import { CopyLinkToClipboard } from "./CopyLinkToClipboard";
+import { timestampToDaysSinceEpoch } from "../../utils";
 
 interface BridgeOutboundVolumeLogicProps {
     poolId: string;

@@ -13,6 +13,7 @@ interface TablePoolOverviewProps {
   handleTabChange: (event: any, newValue: string) => void;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
   skipAmt: number;
+  tablePoolOverviewLoading: boolean;
   setIssues: React.Dispatch<{ message: string; type: string; level: string; fieldName: string }[]>;
   issueProps: { message: string; type: string; level: string; fieldName: string }[];
 }
@@ -25,6 +26,7 @@ export const TablePoolOverview = ({
   handleTabChange,
   setPoolId,
   skipAmt,
+  tablePoolOverviewLoading,
   setIssues,
   issueProps,
 }: TablePoolOverviewProps) => {
@@ -508,7 +510,7 @@ export const TablePoolOverview = ({
       }
       return returnObj;
     });
-    if (dataTable.length === 0) {
+    if (dataTable.length === 0 && tablePoolOverviewLoading) {
       if (issues.filter((x) => x.fieldName === "poolOverview").length === 0) {
         issues.push({
           message: "No pools returned in pool overview.",

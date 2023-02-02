@@ -10,6 +10,24 @@ import { schema as yieldPoolOverview } from "./yield/poolOverview";
 import { schema as lendingPoolOverview } from "./lending/poolOverview";
 import { schema as bridgePoolOverview } from "./bridge/poolOverview";
 import { schema as genericOverview } from "./generic/poolOverview";
+import { gql } from "@apollo/client";
+
+export const metaDataQuery = gql`
+{
+  protocols {
+    type
+    schemaVersion
+    subgraphVersion
+    methodologyVersion
+    name
+    id
+    network
+  }
+  _meta {
+    deployment
+  }
+}
+`;
 
 export const schema = (type: string, version: string): Schema => {
   switch (type) {

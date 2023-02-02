@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import IssuesDisplay from "./IssuesDisplay";
+import IssuesDisplay from "../../interfaces/IssuesDisplay";
 import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
-import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
-import { Chart } from "../common/chartComponents/Chart";
-import { ComparisonTable } from "../common/chartComponents/ComparisonTable";
-import { lineupChartDatapoints, toDate } from "../utils";
+import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
+import { Chart } from "./Chart";
+import { ComparisonTable } from "./ComparisonTable";
+import { lineupChartDatapoints, toDate } from "../../utils";
 import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
-import { DeploymentsDropDown } from "../common/utilComponents/DeploymentsDropDown";
+import { DeploymentsDropDown } from "../utilComponents/DeploymentsDropDown";
 import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 import moment from "moment";
 
