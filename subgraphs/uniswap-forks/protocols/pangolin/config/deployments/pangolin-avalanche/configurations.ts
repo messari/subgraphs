@@ -63,6 +63,11 @@ export class PangolinAvalancheConfigurations implements Configurations {
     return BigDecimal.fromString("0.3");
   }
   getFeeOnOff(): string {
+    const contract = this.getFactoryContract();
+    const feeToResult = contract.try_feeTo();
+    if (!feeToResult.reverted && feeToResult.value != Address.zero()) {
+      return FeeSwitch.ON;
+    }
     return FeeSwitch.OFF;
   }
   getRewardIntervalType(): string {

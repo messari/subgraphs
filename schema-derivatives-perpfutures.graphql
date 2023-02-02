@@ -1,5 +1,5 @@
 # Subgraph Schema: Derivatives Perpetual Futures 
-# Version: 1.0.0
+# Version: 1.0.1
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -184,7 +184,7 @@ interface Protocol {
   " All premium paid. "
   cumulativeTotalPremiumUSD: BigDecimal!
 
-    " All premium paid to deposit in liquidity pools. "
+ " All premium paid to deposit in liquidity pools. "
   cumulativeDepositPremiumUSD: BigDecimal!
 
   " All premium paid to withdraw from liquidity pools. "
@@ -204,6 +204,9 @@ interface Protocol {
 
   " Number of cumulative liquidatees (accounts that got liquidated) "
   cumulativeUniqueLiquidatees: Int!
+
+  " Notional value of all open positions "
+  openInterestUSD: Int!
 
   " Total number of long positions "
   longPositionCount: Int!
@@ -304,7 +307,7 @@ type DerivPerpProtocol implements Protocol @entity {
   " All premium paid. "
   cumulativeTotalPremiumUSD: BigDecimal!
 
-    " All premium paid to deposit in liquidity pools. "
+  " All premium paid to deposit in liquidity pools. "
   cumulativeDepositPremiumUSD: BigDecimal!
 
   " All premium paid to withdraw from liquidity pools. "
@@ -354,6 +357,12 @@ type DerivPerpProtocol implements Protocol @entity {
 
   " Total number of borrows "
   borrowCount: Int!
+
+  " Total number of collateral In from traders "
+  collateralInCount: Int!
+
+  " Total number of collateral Out from traders "
+  collateralOutCount: Int!
 
   " Total number of pools "
   totalPoolCount: Int!
@@ -467,6 +476,18 @@ type UsageMetricsDailySnapshot @entity (immutable: true) {
   " Number of cumulative liquidatees (accounts that got liquidated) "
   cumulativeUniqueLiquidatees: Int!
 
+  " Daily number of collateral In from traders "
+  dailyCollateralIn: Int!
+
+  " Cumulative number of collateral In from traders "
+  cumulativeCollateralIn: Int!
+
+  " Daily number of collateral Out from traders "
+  dailyCollateralOut: Int!
+
+  " Cumulative number of collateral Out from traders "
+  cumulativeCollateralOut: Int!
+
   " Total number of pools "
   totalPoolCount: Int!
 
@@ -538,6 +559,9 @@ type FinancialsDailySnapshot @entity (immutable: true) {
 
   " Outflow historical trade Notional volume in USD, based on value of underlying assets coming out of protocol from trade "
   cumulativeOutflowVolumeUSD: BigDecimal!
+
+  " Daily Notional value of all open positions "
+  dailyOpenInterestUSD: Int!
 
   " Daily revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   dailySupplySideRevenueUSD: BigDecimal!
@@ -680,6 +704,9 @@ type LiquidityPool @entity {
   " Number of cumulative liquidatees (accounts that got liquidated) "
   cumulativeUniqueLiquidatees: Int!
 
+  " Notional value of all open positions "
+  openInterestUSD: Int!
+
   " Total number of long positions "
   longPositionCount: Int!
 
@@ -782,6 +809,9 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
   " Daily funding rate based on rate given by protocol, inform us if this is not provided."
   dailyFundingrate: [BigDecimal!]!
+
+  " Daily Notional value of all open positions "
+  dailyOpenInterestUSD: Int!
 
   " Daily premium paid to enter a position. "
   dailyEntryPremiumUSD: BigDecimal!
@@ -977,6 +1007,9 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " Hourly funding rate based on rate given by protocol, inform us if this is not provided."
   hourlyFundingrate: [BigDecimal!]!
 
+  " Hourly Notional value of all open positions "
+  hourlyOpenInterestUSD: Int!
+
   " All premium paid to enter a position. "
   hourlyEntryPremiumUSD: BigDecimal!
 
@@ -1121,7 +1154,98 @@ interface Event {
   timestamp: BigInt!
 }
 
+"Deposits in liquidity pool"
 type Deposit implements Event @entity(immutable: true) {
+  " deposit-{ Transaction hash }-{ Log index } "
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: DerivPerpProtocol!
+
+  " Address that received the tokens "
+  to: String!
+
+  " Address that sent the tokens "
+  from: String!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
+  inputTokens: [Token!]!
+
+  " Output token of the pool. E.g. the UNI-LP token "
+  outputToken: Token
+
+  " Amount of input tokens in the token's native unit "
+  inputTokenAmounts: [BigInt!]!
+
+  " Amount of output tokens in the token's native unit "
+  outputTokenAmount: BigInt
+
+  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
+  amountUSD: BigDecimal!
+
+  " The pool involving this transaction "
+  pool: LiquidityPool!
+}
+
+"Withdraw in liquidity pool"
+type Withdraw implements Event @entity (immutable: true) {
+  " withdraw-{ Transaction hash }-{ Log index }"
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: DerivPerpProtocol!
+
+  " Address that received the tokens "
+  to: String!
+
+  " Address that sent the tokens "
+  from: String!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
+  inputTokens: [Token!]!
+
+  " Output token of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
+  outputToken: Token
+
+  " Amount of input tokens in the token's native unit "
+  inputTokenAmounts: [BigInt!]!
+
+  " Amount of output tokens in the token's native unit "
+  outputTokenAmount: BigInt
+
+  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
+  amountUSD: BigDecimal!
+
+  " The pool involving this transaction "
+  pool: LiquidityPool!
+}
+
+"Collateral In for trading"
+type CollateralIn implements Event @entity(immutable: true) {
   " deposit-{ Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1168,7 +1292,8 @@ type Deposit implements Event @entity(immutable: true) {
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity (immutable: true) {
+"Collateral out for trading"
+type CollateralOut implements Event @entity (immutable: true) {
   " withdraw-{ Transaction hash }-{ Log index }"
   id: Bytes!
 
@@ -1310,6 +1435,12 @@ type Account @entity{
   " All withdraw (remove liquidity) events occurred in this account "
   withdraws: [Withdraw!]! @derivedFrom(field: "account")
 
+  " All collateral put into protocol for trading events occurred in this account "
+  collateralIn: [CollateralIn!]! @derivedFrom(field: "account")
+
+  " All collateral taken out from trading events occurred in this account "
+  collateralOut: [CollateralOut!]! @derivedFrom(field: "account")
+
   " All Position events occurred in this account "
   positions: [Position!]! @derivedFrom(field: "account")
 
@@ -1377,6 +1508,18 @@ type Position @entity {
 
   " All withdraw events of this position "
   withdraws: [Withdraw!]! @derivedFrom(field: "position")
+
+  " Number of collateral in related to this position "
+  collateralInCount: Int!
+
+  " All collateral put into protocol for trading events occurred in this account "
+  collateralIn: [CollateralIn!]! @derivedFrom(field: "position")
+
+  " Number of collateral out related to this position "
+  collateralOutCount: Int!
+
+  " All collateral taken out from trading events occurred in this account "
+  collateralOut: [CollateralOut!]! @derivedFrom(field: "position")
 
   " Liquidation event related to this position (if exists) "
   liquidation: Liquidate
