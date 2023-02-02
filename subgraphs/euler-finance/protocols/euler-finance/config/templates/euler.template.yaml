@@ -43,6 +43,10 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: EToken
+          file: ./abis/EToken.json
+        - name: DToken
+          file: ./abis/DToken.json
       eventHandlers:
         - event: AssetStatus(indexed address,uint256,uint256,uint96,uint256,uint256,int96,uint256)
           handler: handleAssetStatus
@@ -99,3 +103,43 @@ dataSources:
           handler: handleStake
           receipt: true
       file: ./src/mappings/handlers.ts
+
+templates:
+  - kind: ethereum/contract
+    name: EToken
+    network: mainnet
+    source:
+      abi: EToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: EToken
+          file: ./abis/EToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleCollateralTransfer
+      file: ./src/mappings/collateralHandlers.ts
+  - kind: ethereum/contract
+    name: DToken
+    network: mainnet
+    source:
+      abi: DToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: DToken
+          file: ./abis/DToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleDebtTransfer
+      file: ./src/mappings/collateralHandlers.ts

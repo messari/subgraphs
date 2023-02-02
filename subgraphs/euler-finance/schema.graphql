@@ -1300,3 +1300,17 @@ type _AccountStakeAmount @entity {
   undlerlying: String!
   stakeAmount: BigInt!
 }
+
+type _PositionCounter @entity {
+  " { Account address }-{ Market address }-{ Position Side } "
+  id: ID!
+  " Next count "
+  nextCount: Int!
+}
+
+type _MarketByToken @entity {
+  " { Address of eToken or dToken for a given market } "
+  id: ID!
+  " Market this token belongs to "
+  market: Market!
+}

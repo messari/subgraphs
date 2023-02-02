@@ -48,13 +48,14 @@ import {
   updatePrices,
   updateRevenue,
 } from "./helpers";
-import { LendingProtocol, Market, Token } from "../../generated/schema";
+import { LendingProtocol, Market, Token, _MarketByToken } from "../../generated/schema";
 import { ERC20 } from "../../generated/euler/ERC20";
 import { GovConvertReserves, GovSetReserveFee } from "../../generated/euler/Exec";
 import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
 import { _Epoch } from "../../generated/schema";
 import { Stake } from "../../generated/EulStakes/EulStakes";
 import { Markets as MarketsContract } from "../../generated/euler/Markets";
+import { DToken as DTokenTemplate, EToken as ETokenTemplate } from "../../generated/templates";
 
 export function handleAssetStatus(event: AssetStatus): void {
   const underlying = event.params.underlying.toHexString();
@@ -291,6 +292,19 @@ export function handleMarketActivated(event: MarketActivated): void {
   assetStatus.eToken = eToken.id;
   assetStatus.dToken = dToken.id;
   assetStatus.save();
+
+  saveMarketByToken(eToken, market);
+  saveMarketByToken(dToken, market);
+
+  // subscribe to transfer events on debt and collateral token
+  DTokenTemplate.create(Address.fromString(dToken.id));
+  ETokenTemplate.create(Address.fromString(eToken.id));
+}
+
+function saveMarketByToken(token: Token, market: Market): void {
+  const mbt = new _MarketByToken(token.id);
+  mbt.market = market.id;
+  mbt.save();
 }
 
 export function handleGovConvertReserves(event: GovConvertReserves): void {

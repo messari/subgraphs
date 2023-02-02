@@ -91,6 +91,22 @@ export namespace TransactionType {
   export const REPAY = "REPAY";
 }
 
+export namespace PositionSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+export type PositionSide = string;
+
+export namespace EventType {
+  export const DEPOSIT = 1;
+  export const WITHDRAW = 2;
+  export const BORROW = 3;
+  export const REPAY = 4;
+  export const LIQUIDATOR = 5;
+  export const LIQUIDATEE = 6;
+}
+export type EventType = i32;
+
 export namespace ActivityType {
   export const DAILY = "DAILY";
   export const HOURLY = "HOURLY";

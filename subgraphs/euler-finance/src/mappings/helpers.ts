@@ -1,5 +1,6 @@
 import { Address, BigDecimal, ethereum, BigInt, log, crypto, ByteArray, Bytes } from "@graphprotocol/graph-ts";
 import { Borrow, Deposit, Euler, Liquidation, Repay, Withdraw } from "../../generated/euler/Euler";
+import { EToken } from "../../generated/euler/EToken";
 import {
   getOrCreateDeposit,
   getOrCreateToken,
@@ -53,6 +54,8 @@ import {
   USDC_ADDRESS,
   USDT_ADDRESS,
   WSETH_ADDRESS,
+  PositionSide,
+  EventType,
 } from "../common/constants";
 import { BigDecimalTruncateToBigInt, bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
 import { LendingProtocol, Market, _AssetStatus, _Epoch } from "../../generated/schema";
@@ -60,6 +63,8 @@ import { Exec } from "../../generated/euler/Exec";
 import { bigDecimalExponential } from "../common/conversions";
 import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
 import { ActivityType, SECONDS_PER_HOUR, TransactionType } from "../common/constants";
+import { addPosition, subtractPosition } from "./position";
+import { DToken } from "../../generated/templates/DToken/DToken";
 
 export function createBorrow(event: Borrow): BigDecimal {
   const borrow = getOrCreateBorrow(event);
@@ -90,8 +95,6 @@ export function createBorrow(event: Borrow): BigDecimal {
     );
   }
 
-  borrow.save();
-
   const market = getOrCreateMarket(marketId);
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(borrow.amountUSD);
   market.save();
@@ -100,7 +103,27 @@ export function createBorrow(event: Borrow): BigDecimal {
   protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(borrow.amountUSD);
   protocol.save();
 
+  const account = getOrCreateAccount(event.params.account, protocol);
+  const positionId = addPosition(
+    protocol,
+    market,
+    account,
+    getBorrowBalance(market, account), // try getting balance of account in debt market
+    PositionSide.BORROWER,
+    EventType.BORROW,
+    event,
+  );
+  borrow.position = positionId;
+  borrow.save();
+
+  countAccountBorrow(account, protocol);
+
   return borrow.amountUSD;
+}
+
+function getBorrowBalance(market: Market, account: Account): BigInt {
+  const dToken = DToken.bind(Address.fromString(market._dToken!));
+  return dToken.balanceOf(Address.fromString(account.id));
 }
 
 export function createDeposit(event: Deposit): BigDecimal {
@@ -119,8 +142,6 @@ export function createDeposit(event: Deposit): BigDecimal {
     underlyingToken.lastPriceUSD!,
   );
 
-  deposit.save();
-
   const market = getOrCreateMarket(marketId);
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(deposit.amountUSD);
   market.save();
@@ -128,6 +149,16 @@ export function createDeposit(event: Deposit): BigDecimal {
   const protocol = getOrCreateLendingProtocol();
   protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(deposit.amountUSD);
   protocol.save();
+
+  const acc = getOrCreateAccount(accountAddress, protocol);
+  const etoken = EToken.bind(Address.fromString(market.outputToken!));
+  const balance = etoken.balanceOfUnderlying(accountAddress);
+  const positionId = addPosition(protocol, market, acc, balance, PositionSide.LENDER, EventType.DEPOSIT, event);
+
+  deposit.position = positionId;
+  deposit.save();
+
+  countAccountDeposit(acc, protocol);
 
   return deposit.amountUSD;
 }
@@ -146,6 +177,28 @@ export function createRepay(event: Repay): BigDecimal {
   repay.account = accountAddress.toHexString();
   repay.amount = bigIntChangeDecimals(event.params.amount, DEFAULT_DECIMALS, underlyingToken.decimals);
   repay.amountUSD = bigIntToBDUseDecimals(repay.amount, underlyingToken.decimals).times(underlyingToken.lastPriceUSD!);
+
+  const protocol = getOrCreateLendingProtocol();
+  const account = getOrCreateAccount(accountAddress, protocol);
+  const positionId = subtractPosition(
+    protocol,
+    market,
+    account,
+    getBorrowBalance(market, account), // try getting balance of account in debt market
+    PositionSide.BORROWER,
+    EventType.REPAY,
+    event,
+  );
+  if (positionId === null) {
+    log.error("[createRepay] Position not found for account: {} in transaction: {}", [
+      account.id,
+      event.transaction.hash.toHexString(),
+    ]);
+    return repay.amountUSD;
+  }
+  repay.position = positionId;
+
+  countAccountRepay(account);
 
   repay.save();
   market.save();
@@ -169,7 +222,32 @@ export function createWithdraw(event: Withdraw): BigDecimal {
     underlyingToken.lastPriceUSD!,
   );
 
+  const protocol = getOrCreateLendingProtocol();
+  const account = getOrCreateAccount(accountAddress, protocol);
+  const market = getOrCreateMarket(marketId);
+  const etoken = EToken.bind(Address.fromString(market.outputToken!));
+  const balance = etoken.balanceOfUnderlying(accountAddress);
+  const positionId = subtractPosition(
+    protocol,
+    market,
+    account,
+    balance,
+    PositionSide.LENDER,
+    EventType.WITHDRAW,
+    event,
+  );
+  if (positionId === null) {
+    log.error("[createWithdraw] Position not found for account: {} in transaction: {}", [
+      account.id,
+      event.transaction.hash.toHexString(),
+    ]);
+    return withdraw.amountUSD;
+  }
+
+  withdraw.position = positionId;
   withdraw.save();
+
+  countAccountWithdraw(account);
 
   return withdraw.amountUSD;
 }
@@ -201,7 +279,6 @@ export function createLiquidation(event: Liquidation): BigDecimal {
     underlyingToken.lastPriceUSD!,
   );
   liquidation.profitUSD = liquidation.amountUSD.minus(repayUSD);
-  liquidation.save();
 
   collateralMarket.cumulativeLiquidateUSD = collateralMarket.cumulativeLiquidateUSD.plus(liquidation.amountUSD);
   collateralMarket.save();
@@ -209,6 +286,46 @@ export function createLiquidation(event: Liquidation): BigDecimal {
   const protocol = getOrCreateLendingProtocol();
   protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidation.amountUSD);
   protocol.save();
+
+  // borrow repaid
+  const violator = getOrCreateAccount(event.params.violator, protocol);
+  const positionId = subtractPosition(
+    protocol,
+    collateralMarket,
+    violator, // the borrower
+    getBorrowBalance(collateralMarket, violator), // try getting balance of account in debt market
+    PositionSide.BORROWER,
+    EventType.LIQUIDATEE,
+    event,
+  );
+  if (positionId === null) {
+    log.error("[createLiquidation] Position not found for account: {} in transaction: {}", [
+      violator.id,
+      event.transaction.hash.toHexString(),
+    ]);
+    return liquidation.amountUSD;
+  }
+
+  liquidation.position = positionId;
+  liquidation.save();
+
+  // account for liquidator gaining collateral
+  const liquidator = getOrCreateAccount(event.params.liquidator, protocol);
+  const liquidatorBalance = EToken.bind(Address.fromString(collateralMarket.outputToken!)).balanceOfUnderlying(
+    event.params.liquidator,
+  );
+  addPosition(
+    protocol,
+    collateralMarket, // collateral market
+    liquidator,
+    liquidatorBalance,
+    PositionSide.LENDER,
+    -1, // TODO: how do we classify a liquidator gaining collateral
+    event,
+  );
+
+  countAccountLiquidate(liquidator, protocol);
+  countAccountLiquidatee(violator, protocol);
 
   return liquidation.amountUSD;
 }
@@ -526,8 +643,13 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   const protocol = getOrCreateLendingProtocol();
   const account = getOrCreateAccount(from, protocol);
   dailyMetrics.totalPoolCount = protocol.totalPoolCount;
+
   hourlyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   dailyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  dailyMetrics.cumulativeUniqueDepositors = protocol.cumulativeUniqueDepositors;
+  dailyMetrics.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
+  dailyMetrics.cumulativeUniqueLiquidators = protocol.cumulativeUniqueLiquidators;
+  dailyMetrics.cumulativeUniqueLiquidatees = protocol.cumulativeUniqueLiquidatees;
 
   if (isNewAccountActivity(ActivityType.DAILY, null, account, event.block.timestamp)) {
     dailyMetrics.dailyActiveUsers += 1;
@@ -539,7 +661,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
     updateDailyTransactionMetrics(dailyMetrics, transaction, false);
   }
   if (transaction == TransactionType.LIQUIDATE) {
-    const liq = event as Liquidation;
+    const liq = eventToLiquidation(event);
     if (
       isNewAccountActivity(
         ActivityType.DAILY,
@@ -603,7 +725,7 @@ function isNewAccountActivity(
   return true;
 }
 
-function getOrCreateAccount(address: Address, protocol: LendingProtocol): Account {
+export function getOrCreateAccount(address: Address, protocol: LendingProtocol): Account {
   const accountId = address.toHexString();
   let account = Account.load(accountId);
   if (account) {
@@ -611,6 +733,15 @@ function getOrCreateAccount(address: Address, protocol: LendingProtocol): Accoun
   }
 
   account = new Account(accountId);
+  account.positionCount = 0;
+  account.openPositionCount = 0;
+  account.closedPositionCount = 0;
+  account.depositCount = 0;
+  account.withdrawCount = 0;
+  account.borrowCount = 0;
+  account.repayCount = 0;
+  account.liquidateCount = 0;
+  account.liquidationCount = 0;
   account.save();
 
   protocol.cumulativeUniqueUsers += 1;
@@ -641,7 +772,7 @@ function updateAccountMetrics(
   } else if (transaction == TransactionType.REPAY) {
     account.repayCount += 1;
   } else if (transaction == TransactionType.LIQUIDATE) {
-    const liq = event as Liquidation;
+    const liq = eventToLiquidation(event);
     const liquidator = getOrCreateAccount(liq.params.liquidator, protocol);
     const liquidatee = getOrCreateAccount(liq.params.violator, protocol);
     liquidator.liquidateCount += 1;
@@ -655,6 +786,19 @@ function updateAccountMetrics(
   }
   account.save();
   protocol.save();
+}
+
+function eventToLiquidation(event: ethereum.Event): Liquidation {
+  return new Liquidation(
+    event.address,
+    event.logIndex,
+    event.transactionLogIndex,
+    event.logType,
+    event.block,
+    event.transaction,
+    event.parameters,
+    event.receipt,
+  );
 }
 
 // update MarketDailySnapshot & MarketHourlySnapshot
@@ -1057,4 +1201,50 @@ function getEULPriceUSD(event: ethereum.Event): BigDecimal {
     EULPriceUSD = EULToken.lastPriceUSD!;
   }
   return EULPriceUSD;
+}
+
+function countAccountBorrow(account: Account, protocol: LendingProtocol): void {
+  account.borrowCount += 1;
+  if (account.borrowCount == 1) {
+    protocol.cumulativeUniqueBorrowers += 1;
+  }
+  account.save();
+  protocol.save();
+}
+
+function countAccountRepay(account: Account): void {
+  account.repayCount += 1;
+  account.save();
+}
+
+function countAccountDeposit(account: Account, protocol: LendingProtocol): void {
+  account.depositCount += 1;
+  if (account.depositCount == 1) {
+    protocol.cumulativeUniqueDepositors += 1;
+  }
+  account.save();
+  protocol.save();
+}
+
+function countAccountWithdraw(account: Account): void {
+  account.withdrawCount += 1;
+  account.save();
+}
+
+function countAccountLiquidate(liquidator: Account, protocol: LendingProtocol): void {
+  liquidator.liquidateCount += 1;
+  if (liquidator.liquidateCount == 1) {
+    protocol.cumulativeUniqueLiquidators += 1;
+  }
+  liquidator.save();
+  protocol.save();
+}
+
+function countAccountLiquidatee(liquidatee: Account, protocol: LendingProtocol): void {
+  liquidatee.liquidationCount += 1;
+  if (liquidatee.liquidationCount == 1) {
+    protocol.cumulativeUniqueLiquidatees += 1;
+  }
+  liquidatee.save();
+  protocol.save();
 }
