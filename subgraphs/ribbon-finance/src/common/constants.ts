@@ -126,6 +126,8 @@ export const BIGINT_NEGATIVE_ONE = BigInt.fromString("-1");
 
 export const BIG_DECIMAL_SECONDS_PER_DAY = BigDecimal.fromString("86400");
 
+export const BIG_DECIMAL_RIBBON_WEEKLY_REWARD_TOKEN_EMISSIONS = BigDecimal.fromString("250000");
+
 export const FEE_DENOMINATOR_BIGINT = BIGINT_TEN.pow(10);
 export const FEE_DENOMINATOR = BigDecimal.fromString("10000000000");
 

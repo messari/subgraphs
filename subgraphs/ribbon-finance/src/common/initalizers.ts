@@ -359,7 +359,7 @@ export function getOrCreateAuction(
 }
 
 export function getOrCreateSwap(
-  swapId: BigInt,
+  swapId: string,
   vaultAddress: Address = constants.NULL.TYPE_ADDRESS,
   optionToken: Address = constants.NULL.TYPE_ADDRESS,
   biddingToken: Address = constants.NULL.TYPE_ADDRESS

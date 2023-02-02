@@ -232,9 +232,13 @@ export function handleNewOffer(event: NewOffer): void {
   const optionToken = event.params.oToken;
   const biddingToken = event.params.biddingToken;
   const vaultAddress = event.params.seller;
+  const swapOfferContractAddress = event.address.toHexString();
+  const swapOfferId = swapOfferContractAddress
+    .concat("-")
+    .concat(swapId.toString());
 
   getOrCreateToken(biddingToken, event.block, vaultAddress, false);
-  getOrCreateSwap(swapId, vaultAddress, optionToken, biddingToken);
+  getOrCreateSwap(swapOfferId, vaultAddress, optionToken, biddingToken);
   getOrCreateVault(vaultAddress, event.block);
   updateVaultSnapshots(vaultAddress, event.block);
   log.warning("[NewOffer] transaction hash {}", [
@@ -245,8 +249,12 @@ export function handleNewOffer(event: NewOffer): void {
 export function handleSwap(event: Swap): void {
   const swapId = event.params.swapId;
   const soldAmount = event.params.signerAmount;
-  const swapOffer = getOrCreateSwap(swapId);
-
+  const swapOfferContractAddress = event.address.toHexString();
+  const swapOfferId = swapOfferContractAddress
+    .concat("-")
+    .concat(swapId.toString());
+  
+  const swapOffer = getOrCreateSwap(swapOfferId);
   if (swapOffer.vault == constants.NULL.TYPE_STRING) return;
   const vaultAddress = Address.fromString(swapOffer.vault);
   const vault = getOrCreateVault(vaultAddress, event.block);
@@ -257,7 +265,7 @@ export function handleSwap(event: Swap): void {
     false
   );
   const soldAmountUSD = soldAmount
-    .divDecimal(constants.BIGINT_TEN.pow(18).toBigDecimal())
+    .divDecimal(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
     .times(inputToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -436,6 +444,7 @@ export function handleCollectManagementFee(event: CollectManagementFee): void {
   const vaultAddress = event.address;
   const block = event.block;
   const vault = getOrCreateVault(vaultAddress, block);
+  
 
   updateVaultTVL(vaultAddress, block);
   const vaultAsset = getOrCreateToken(
