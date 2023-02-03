@@ -122,7 +122,7 @@
   },
   "aave-arc": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "aave-arc",
     "deployments": {
       "aave-arc-ethereum": {
@@ -155,7 +155,7 @@
   },
   "aave-amm": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "aave-amm",
     "deployments": {
       "aave-amm-ethereum": {
@@ -188,7 +188,7 @@
   },
   "aave-rwa": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "aave-rwa",
     "deployments": {
       "aave-rwa-ethereum": {
@@ -221,7 +221,7 @@
   },
   "aave-v2": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "aave-v2",
     "deployments": {
       "aave-v2-avalanche": {
@@ -298,7 +298,7 @@
   },
   "aave-v3": {
     "schema": "lending",
-    "base": "aave-v3",
+    "base": "aave-forks",
     "protocol": "aave-v3",
     "deployments": {
       "aave-v3-arbitrum": {
@@ -306,11 +306,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.5",
-          "methodology": "1.0.0"
+          "subgraph": "1.1.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -328,11 +328,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
-          "methodology": "1.0.0"
+          "subgraph": "1.1.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -350,11 +350,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
-          "methodology": "1.0.0"
+          "subgraph": "1.1.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -372,11 +372,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
-          "methodology": "1.0.0"
+          "subgraph": "1.1.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -394,11 +394,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
-          "methodology": "1.0.0"
+          "subgraph": "1.1.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -416,11 +416,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
-          "methodology": "1.0.0"
+          "subgraph": "1.1.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -439,10 +439,10 @@
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3219,7 +3219,7 @@
   },
   "geist-finance": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "geist-finance",
     "deployments": {
       "geist-finance-fantom": {
@@ -3248,7 +3248,7 @@
   },
   "radiant": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "radiant-capital",
     "deployments": {
       "radiant-capital-arbitrum": {
@@ -3277,7 +3277,7 @@
   },
   "uwu-lend": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "uwu-lend",
     "deployments": {
       "uwu-lend-ethereum": {

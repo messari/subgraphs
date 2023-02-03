@@ -1,0 +1,18 @@
+{
+  "network": "fantom",
+  "PoolAddressesProviderRegistry": {
+    "address": "0x770ef9f4fe897e59daCc474EF11238303F9552b6",
+    "startBlock": 33131990
+  },
+  "RewardsController": {
+    "address": "0x929EC64c34a17401F460460D4B9390518E5B473e",
+    "startBlock": 33496901
+  },
+  "LendingPool": {
+    "address": "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
+    "startBlock": 33142113
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 53025756
+}
