@@ -3577,6 +3577,10 @@
           "hosted-service": {
             "slug": "qidao-ethereum",
             "query-id": "qidao-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "qidao-ethereum",
+            "query-id": "EXuutY6qkZbXjYeJZdiDBf2imJswTNdfm8YZCqhAthfW"
           }
         }
       },
