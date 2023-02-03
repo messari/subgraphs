@@ -100,8 +100,6 @@ export function Swap(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  const inputTokenBalances: BigInt[] = pool.inputTokenBalances;
-
   const tokenInStore = getOrCreateToken(tokenIn, block.number);
   const tokenInIndex = pool.inputTokens.indexOf(tokenIn.toHexString());
 
@@ -123,12 +121,6 @@ export function Swap(
     .times(tokenOutStore.lastPriceUSD!);
 
   if (tokenOutIndex == -1) amountOutUSD = constants.BIGDECIMAL_ZERO;
-
-  inputTokenBalances[tokenInIndex] =
-    inputTokenBalances[tokenInIndex].plus(amountIn);
-
-  inputTokenBalances[tokenOutIndex] =
-    inputTokenBalances[tokenOutIndex].minus(amountOut);
 
   const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
 
