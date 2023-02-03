@@ -135,7 +135,7 @@ export function updateRbnRewardsInfo(
     )
     .toBigDecimal();
 
-  // rewards = inflation_rate * gauge_relative_weight * seconds_per_day 
+  // rewards = inflation_rate * gauge_relative_weight * seconds_per_day
   const rbnRewardEmissionsPerDay = inflationRate
     .times(gaugeRelativeWeight.div(constants.BIGINT_TEN.pow(18).toBigDecimal()))
     .times(BigDecimal.fromString(constants.SECONDS_PER_DAY.toString()));

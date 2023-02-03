@@ -253,7 +253,7 @@ export function handleSwap(event: Swap): void {
   const swapOfferId = swapOfferContractAddress
     .concat("-")
     .concat(swapId.toString());
-  
+
   const swapOffer = getOrCreateSwap(swapOfferId);
   if (swapOffer.vault == constants.NULL.TYPE_STRING) return;
   const vaultAddress = Address.fromString(swapOffer.vault);
@@ -265,7 +265,9 @@ export function handleSwap(event: Swap): void {
     false
   );
   const soldAmountUSD = soldAmount
-    .divDecimal(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
+    .divDecimal(
+      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+    )
     .times(inputToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -444,7 +446,6 @@ export function handleCollectManagementFee(event: CollectManagementFee): void {
   const vaultAddress = event.address;
   const block = event.block;
   const vault = getOrCreateVault(vaultAddress, block);
-  
 
   updateVaultTVL(vaultAddress, block);
   const vaultAsset = getOrCreateToken(

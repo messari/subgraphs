@@ -116,9 +116,7 @@ export function Deposit(
   }
 
   const pricePerShare = utils.getVaultPricePerShare(vaultAddress);
-  vault.pricePerShare = pricePerShare.times(
-    inputTokenDecimals.toBigDecimal()
-  );
+  vault.pricePerShare = pricePerShare.times(inputTokenDecimals.toBigDecimal());
   vault.outputTokenPriceUSD = utils.getOptionTokenPriceUSD(vaultAddress, block);
 
   vault.save();
