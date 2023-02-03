@@ -1,6 +1,5 @@
-import { Configurations } from "../common/types";
-import * as constants from "../common/constants";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Configurations, OracleContract } from "../common/types";
 
 export const NETWORK_STRING: string = "xdai";
 
@@ -8,28 +7,28 @@ export const NETWORK_STRING: string = "xdai";
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const AAVE_ORACLE_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract();
+export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract();
+export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract();
+export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
 
-export const CURVE_REGISTRY_ADDRESSES: Address[] = [
-  Address.fromString("0x55E91365697EB8032F98290601847296eC847210"),
-  Address.fromString("0x8A4694401bE8F8FCCbC542a3219aF1591f87CE17"),
+export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
+  new OracleContract("0x55E91365697EB8032F98290601847296eC847210", 20754886),
+  new OracleContract("0x8A4694401bE8F8FCCbC542a3219aF1591f87CE17", 23334728),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"), // SushiSwap
+export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
+  new OracleContract("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506", 14735910), // SushiSwap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -68,41 +67,41 @@ export class config implements Configurations {
     return NETWORK_STRING;
   }
 
-  yearnLens(): Address {
+  yearnLens(): OracleContract {
     return YEARN_LENS_CONTRACT_ADDRESS;
   }
-  chainLink(): Address {
+  chainLink(): OracleContract {
     return CHAIN_LINK_CONTRACT_ADDRESS;
   }
   yearnLensBlacklist(): Address[] {
     return YEARN_LENS_BLACKLIST;
   }
 
-  aaveOracle(): Address {
+  aaveOracle(): OracleContract {
     return AAVE_ORACLE_CONTRACT_ADDRESS;
   }
   aaveOracleBlacklist(): Address[] {
     return AAVE_ORACLE_BLACKLIST;
   }
 
-  curveCalculations(): Address {
+  curveCalculations(): OracleContract {
     return CURVE_CALCULATIONS_ADDRESS;
   }
   curveCalculationsBlacklist(): Address[] {
     return CURVE_CALCULATIONS_BLACKSLIST;
   }
 
-  sushiCalculations(): Address {
+  sushiCalculations(): OracleContract {
     return SUSHISWAP_CALCULATIONS_ADDRESS;
   }
   sushiCalculationsBlacklist(): Address[] {
     return SUSHI_CALCULATIONS_BLACKSLIST;
   }
 
-  uniswapForks(): Address[] {
+  uniswapForks(): OracleContract[] {
     return UNISWAP_FORKS_ROUTER_ADDRESSES;
   }
-  curveRegistry(): Address[] {
+  curveRegistry(): OracleContract[] {
     return CURVE_REGISTRY_ADDRESSES;
   }
 
