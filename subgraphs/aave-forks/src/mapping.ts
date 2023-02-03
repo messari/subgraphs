@@ -878,7 +878,8 @@ export function _handleLiquidate(
   protocolData: ProtocolData,
   liquidator: Address,
   borrower: Address, // account liquidated
-  repayToken: Address // token repaid to cover debt
+  debtToken: Address, // token repaid to cover debt,
+  debtToCover: BigInt // the amount of debt repaid by liquidator
 ): void {
   const market = Market.load(marketId.toHexString());
   if (!market) {
@@ -940,10 +941,10 @@ export function _handleLiquidate(
     protocol.save();
   }
 
-  const repayTokenMarket = Market.load(repayToken.toHexString());
+  const repayTokenMarket = Market.load(debtToken.toHexString());
   if (!repayTokenMarket) {
     log.warning("[Liquidate] Repay token market not found on protocol: {}", [
-      repayToken.toHexString(),
+      debtToken.toHexString(),
     ]);
     return;
   }
@@ -989,6 +990,14 @@ export function _handleLiquidate(
     event
   );
 
+  const debtAsset = Token.load(debtToken.toHexString());
+  if (!debtAsset) {
+    log.warning("[Liquidate] Debt asset not found on protocol: {}", [
+      debtToken.toHexString(),
+    ]);
+    return;
+  }
+
   liquidate.position = positionId;
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
@@ -998,14 +1007,17 @@ export function _handleLiquidate(
   liquidate.hash = event.transaction.hash.toHexString();
   liquidate.nonce = event.transaction.nonce;
   liquidate.logIndex = event.logIndex.toI32();
-  liquidate.asset = inputToken!.id;
+  liquidate.asset = debtAsset!.id;
   liquidate.amount = amount;
   liquidate.amountUSD = amount
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
-  liquidate.profitUSD = liquidate.amountUSD.times(
-    market.liquidationPenalty.div(BIGDECIMAL_HUNDRED)
+  liquidate.profitUSD = liquidate.amountUSD.minus(
+    debtToCover
+      .toBigDecimal()
+      .div(exponentToBigDecimal(debtAsset.decimals))
+      .times(repayTokenMarket.inputTokenPriceUSD)
   );
   liquidate.save();
 
