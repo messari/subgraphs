@@ -1,0 +1,18 @@
+{
+  "network": "optimism",
+  "PoolAddressesProviderRegistry": {
+    "address": "0x770ef9f4fe897e59daCc474EF11238303F9552b6",
+    "startBlock": 4364783
+  },
+  "RewardsController": {
+    "address": "0x929EC64c34a17401F460460D4B9390518E5B473e",
+    "startBlock": 4468687
+  },
+  "LendingPool": {
+    "address": "0x794a61358d6845594f94dc1db02a252b5b4814ad",
+    "startBlock": 4365693
+  },
+  "graftEnabled": false,
+  "subgraphId": "QmUVgiVhM5SmDhLwTA2XgqgVo9tyVLqdk71atAsacqF67G",
+  "graftStartBlock": 19414159
+}

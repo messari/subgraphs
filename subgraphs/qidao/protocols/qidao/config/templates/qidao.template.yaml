@@ -2,8 +2,16 @@ specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+features:
+  - grafting
+{{/graftEnabled}}
 dataSources:
-  {{ #maticVault }}
+  {{#maticVault}}
   - kind: ethereum
     name: {{ name }}
     network: {{ chain }}
@@ -60,8 +68,8 @@ dataSources:
         - event: BuyRiskyVault(uint256,address,address,uint256)
           handler: handleBuyRiskyVault
       file: ./src/mappings/QiStablecoin.ts
-  {{ /maticVault }}
-  {{ #erc20Vaults }}
+  {{/maticVault}}
+  {{#erc20Vaults}}
   - kind: ethereum
     name: {{ name }}
     network: {{ chain }}
@@ -115,7 +123,7 @@ dataSources:
         - event: WithdrawCollateral(uint256,uint256)
           handler: handleWithdrawCollateral
       file: ./src/mappings/erc20QiStablecoin.ts
-  {{ /erc20Vaults }}
+  {{/erc20Vaults}}
 # Template is only used for imports
 templates:
   - kind: ethereum

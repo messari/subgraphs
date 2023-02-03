@@ -14,14 +14,25 @@ export const tableCellTruncate: any = {
 };
 
 export const schemaMapping: { [x: string]: any } = {
+  "exchanges": "exchanges",
+  "vaults": "vaults",
   "dex-amm": "exchanges",
   "yield-aggregator": "vaults",
   "lending": "lending",
   "generic": "generic",
-  "EXCHANGE": "exchanges",
+  "bridge": "bridge",
+  "bridges": "bridge",
+  "EXCHANGES": "exchanges",
+  "VAULTS": "vaults",
+  "DEX-AMM": "exchanges",
+  "YIELD-AGGREGATOR": "vaults",
   "LENDING": "lending",
+  "GENERIC": "generic",
+  "EXCHANGE": "exchanges",
   "YIELD": "vaults",
-  "GENERIC": "generic"
+  "BRIDGE": "bridge",
+  "BRIDGES": "bridge"
+
 }
 
 export function toDate(timestamp: number, hour: boolean = false) {
@@ -35,9 +46,9 @@ export function toDate(timestamp: number, hour: boolean = false) {
 export function toUnitsSinceEpoch(dateStr: string, hour: boolean) {
   const timestamp = moment.utc(dateStr).unix();
   if (hour) {
-    return (timestamp / 3600).toFixed(0);
+    return Math.round(timestamp / 3600).toString();
   }
-  return (timestamp / 86400).toFixed(0);
+  return Math.round(timestamp / 86400).toString();
 };
 
 export function isValidHttpUrl(s: string) {
@@ -103,6 +114,24 @@ export function toPercent(cur: number, total: number): number {
   return parseFloat(((cur / total) * 100).toFixed(2));
 }
 
+export function timestampToDaysSinceEpoch(ts: number): number {
+  if (ts > 20000000000) {
+    ts = ts / 1000;
+  }
+  let days = (ts / 86400).toString();
+
+  if (days.includes(".")) {
+    const tsSplit = days.split("");
+    const tenthElement = tsSplit[tsSplit.indexOf(".") + 1];
+    if (Number(tenthElement) >= 5) {
+      days = (Number(days.split(".")[0]) + 1).toFixed(0);
+    } else {
+      days = Number(days).toFixed(0);
+    }
+  }
+  return Number(days);
+}
+
 export function formatIntToFixed2(val: number): string {
   let returnStr = parseFloat(val.toFixed(2)).toLocaleString();
   if (returnStr.split(".")[1]?.length === 1) {
@@ -113,13 +142,14 @@ export function formatIntToFixed2(val: number): string {
   return returnStr;
 };
 
-export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
+export function csvToJSONConvertorMultiCol(lines: string[], headers: string[], mmddyyyy: boolean = true): any {
   const invalidColumns = [".", "..", "...", ",", "-", "_", " ", '"', "'"];
   try {
     if (!(headers.length >= 2) || (!headers.map(x => x?.toLowerCase()).includes('date') && !headers.map(x => x?.toLowerCase()).includes('time'))) {
       throw new Error('Wrong CSV data format. The CSV must have multiple columns, one must be a "date" column.');
     }
     const obj: any = {};
+    let returnRecursion = false;
     for (let i = 1; i < lines.length; i++) {
       const currentline = lines[i].split(",");
       for (let j = 0; j < headers.length; j++) {
@@ -141,7 +171,15 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
               entry = entry.split('"').join("");
             }
             if (header === 'date' && isNaN(entry)) {
-              entry = moment(entry).unix();
+              if (isNaN(moment(entry).unix()) && mmddyyyy) {
+                returnRecursion = true;
+              } else {
+                if (mmddyyyy) {
+                  entry = moment(entry).unix();
+                } else {
+                  entry = moment(entry, 'DD/MM/YYYY').unix();
+                }
+              }
             }
             if (!isNaN(Number(entry))) {
               entry = Number(entry);
@@ -151,6 +189,9 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
         }
       }
     }
+    if (returnRecursion) {
+      return csvToJSONConvertorMultiCol(lines, headers, false);
+    }
     return (obj);
   } catch (err: any) {
     console.error(err.message);
@@ -158,12 +199,13 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[]) {
   }
 }
 
-export function csvToJSONConvertorTwoCol(lines: string[], headers: string[]) {
+export function csvToJSONConvertorTwoCol(lines: string[], headers: string[], mmddyyyy: boolean = true): any {
   const result = [];
   try {
     if (headers.length !== 2 || !headers.map(x => x?.toLowerCase()).includes('date')) {
       throw new Error('Wrong CSV data format. The CSV must have two columns, one must be a "date" column.');
     }
+    let returnRecursion = false;
     for (let i = 1; i < lines.length; i++) {
       const obj: any = {};
       const currentline = lines[i].split(",");
@@ -181,7 +223,15 @@ export function csvToJSONConvertorTwoCol(lines: string[], headers: string[]) {
             entry = entry.split('"').join("");
           }
           if (header === 'date' && isNaN(entry)) {
-            entry = moment(entry).unix();
+            if (isNaN(moment(entry).unix()) && mmddyyyy) {
+              returnRecursion = true;
+            } else {
+              if (mmddyyyy) {
+                entry = moment(entry).unix();
+              } else {
+                entry = moment(entry, 'DD/MM/YYYY').unix();
+              }
+            }
           }
           if (!isNaN(Number(entry))) {
             entry = Number(entry);
@@ -192,6 +242,9 @@ export function csvToJSONConvertorTwoCol(lines: string[], headers: string[]) {
       if (Object.keys(obj)?.length === 2) {
         result.push(obj);
       }
+    }
+    if (returnRecursion) {
+      return csvToJSONConvertorTwoCol(lines, headers, false);
     }
     return (result);
   } catch (err: any) {
@@ -248,9 +301,9 @@ export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel
     }
 
     const csv = CSV;
+    const filename = (ReportTitle || 'UserExport') + '.csv';
     const blob = new Blob([csv], { type: 'text/csv' });
     const csvUrl = window.webkitURL.createObjectURL(blob);
-    const filename = (ReportTitle || 'UserExport') + '.csv';
     return { csvUrl, filename };
   } catch (err: any) {
     console.error(err.message);

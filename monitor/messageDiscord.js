@@ -16,7 +16,8 @@ export async function errorNotification(error, channelId = process.env.CHANNEL_I
             "Content-Type": "application/json",
         }
         const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor from ${process.env.CHANNEL_ID} on Channel ${channelId}- Errors detected**\n` + error });
-        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        console.log(postJSON)
+        // const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return null;
     } catch (err) {
         errorNotification("ERROR LOCATION 6 " + err.message);
@@ -79,7 +80,7 @@ export async function getChannel(channelId = process.env.CHANNEL_ID) {
 
 // functions involved with deleting messages/threads/channels
 
-export async function clearChannel(channelId = process.env.CHANNEL_ID) {
+export async function clearChannel(channelId) {
     // This function is called to clear the main channel of all threads within it
     try {
         const msgs = await getDiscordMessages([], channelId);
@@ -100,7 +101,7 @@ export async function clearChannel(channelId = process.env.CHANNEL_ID) {
     }
 }
 
-export async function clearMessages(channelId = process.env.CHANNEL_ID) {
+export async function clearMessages(channelId) {
     // This function is called to clear all the messages within a thread or channel
     // Note that this does not delete threads but only the message which heads the thread
     try {
@@ -110,16 +111,21 @@ export async function clearMessages(channelId = process.env.CHANNEL_ID) {
             "Authorization": "Bot " + process.env.BOT_TOKEN,
             "Content-Type": "application/json",
         }
-
-        const postJSON = JSON.stringify({ "messages": msgs.map(x => x.id).slice(0, 100) });
-        await axios.post(baseURL + "/messages/bulk-delete", postJSON, { "headers": { ...headers } });
+        const messages = msgs.map(x => x.id).slice(0, 100);
+        const postJSON = JSON.stringify({ "messages": messages });
+        if (messages.length > 1) {
+            await axios.post(baseURL + "/messages/bulk-delete", postJSON, { "headers": { ...headers } });
+        } else if (messages.length === 1) {
+            deleteSingleMessage(messages[0], channelId);
+        }
     } catch (err) {
         errorNotification("ERROR LOCATION 11 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
-export async function getAllThreadsToClear(deleteMsgsFromBeforeTS, channelId = process.env.CHANNEL_ID) {
+export async function getAllThreadsToClear(deleteMsgsFromBeforeTS, channelId) {
     const msgs = await getDiscordMessages([], channelId);
+    msgs.push({ id: process.env.PROD_CHANNEL });
     await clearAllThreads(msgs, deleteMsgsFromBeforeTS);
 }
 
@@ -140,7 +146,7 @@ export async function clearAllThreads(msgs, deleteMsgsFromBeforeTS) {
     return;
 }
 
-export async function clearThread(deleteMsgsFromBeforeTS, channelId = process.env.CHANNEL_ID) {
+export async function clearThread(deleteMsgsFromBeforeTS, channelId) {
     // This function is called to clear all the messages within a provided thread(channel)
     // Delete all messages (except fr head message) older than 7d
     let messages = []
@@ -311,9 +317,16 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
         const indexErrorEmbedDepos = {};
         const indexErrorPendingHash = {};
+        const prodStatusDepoMapping = {};
         const aggThreadProtocolErrorEmbeds = [];
+        const aggThreadIndexErrorEmbeds = JSON.parse(JSON.stringify([...indexingErrorEmbed.fields]));
+        let zapierProdThreadIndexing = [];
+        let zapierProdThreadProtocols = {};
         deploymentsOnProtocol.forEach((depo) => {
             let networkString = depo.network;
+            if (depo.status === 'prod') {
+                prodStatusDepoMapping[networkString] = true;
+            }
             let issuesSet = [];
             const protocolErrorEmbed = {
                 title: `Protocol Level Errors on ${protocol}`,
@@ -362,11 +375,21 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 }
                 protocolErrorEmbed.fields = [...protocolErrorEmbed.fields, ...protocolRows];
             });
-            if (protocolErrorEmbed.fields.length > 1) {
+            if (protocolErrorEmbed.fields.length >= 3) {
                 protocolErrorEmbed.url = `https://subgraphs.messari.io/subgraph?endpoint=${depo.url}&tab=protocol`;
                 embedObjects.push(protocolErrorEmbed);
                 if (depo?.status === 'prod') {
                     aggThreadProtocolErrorEmbeds.push(protocolErrorEmbed);
+                    zapierProdThreadProtocols[networkString] = { Field: [], Value: [], Description: [] };
+                    protocolErrorEmbed.fields.forEach((row) => {
+                        if (row.name === 'Field') {
+                            zapierProdThreadProtocols[networkString]['Field'].push(row.value);
+                        } else if (row.name === 'Value') {
+                            zapierProdThreadProtocols[networkString]['Value'].push(row.value);
+                        } else if (row.name === 'Description') {
+                            zapierProdThreadProtocols[networkString]['Description'].push(row.value);
+                        }
+                    })
                 }
             }
         });
@@ -375,28 +398,42 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             let failureBlock = "";
 
             Object.keys(indexErrorEmbedDepos)?.forEach(networkString => {
+                let link = '';
                 if (networkString.includes(' (PENDING')) {
-                    labelValue += `\n[${networkString.split(' ')[0]}-PENDING](https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]})\n`;
+                    link = `https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]}`;
+                    labelValue += `\n[${networkString.split(' ')[0]}-PENDING](${link})\n`;
 
                 } else {
-                    labelValue += `\n[${networkString}](https://okgraph.xyz/?q=messari%2F${protocol}-${networkString})\n`;
+                    link = `https://okgraph.xyz/?q=messari%2F${protocol}-${networkString}`;
+                    labelValue += `\n[${networkString}](${link})\n`;
                 }
                 failureBlock += '\n' + indexErrorEmbedDepos[networkString] + '\n';
+                if (prodStatusDepoMapping[networkString] === true) {
+                    aggThreadIndexErrorEmbeds[0].value += labelValue;
+                    aggThreadIndexErrorEmbeds[1].value += failureBlock;
+                    zapierProdThreadIndexing.push(`${networkString}: ${link}`);
+                }
             })
             indexingErrorEmbed.fields[0].value += labelValue;
             indexingErrorEmbed.fields[1].value += failureBlock;
             embedObjects.unshift(indexingErrorEmbed);
         }
 
-        if (embedObjects.length > 0) {
-            if (deploymentsOnProtocol[0]?.status === 'prod') {
-                indexingErrorEmbed.title += ' ' + protocol;
-                let indexingErrorEmbedsToAggThread = [];
-                if (indexingErrorEmbed?.fields[1].value.length > 3) {
-                    indexingErrorEmbedsToAggThread = indexingErrorEmbed.fields;
-                }
-                aggThreadMsgObjects.push({ embeds: indexingErrorEmbedsToAggThread, protocol: protocol, protocolErrorEmbeds: aggThreadProtocolErrorEmbeds });
+        if (Object.keys(zapierProdThreadProtocols).length > 0 || zapierProdThreadIndexing.length > 0) {
+            if (zapierProdThreadIndexing.length > 0) {
+                sendMessageToZapierThread({ indexing: zapierProdThreadIndexing, protocolName: protocol });
+            };
+            if (Object.keys(zapierProdThreadProtocols).length > 0) {
+                sendMessageToZapierThread({ protocol: zapierProdThreadProtocols, protocolName: protocol });
             }
+        }
+
+        if (embedObjects.length > 0) {
+            let indexingErrorEmbedsToAggThread = [];
+            if (aggThreadIndexErrorEmbeds[1].value.length > 3) {
+                indexingErrorEmbedsToAggThread = aggThreadIndexErrorEmbeds;
+            }
+            aggThreadMsgObjects.push({ embeds: indexingErrorEmbedsToAggThread, protocol: protocol, protocolErrorEmbeds: aggThreadProtocolErrorEmbeds });
             return embedObjects;
         }
         return null;
@@ -406,11 +443,10 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
 }
 
 let aggThreadMsgObjects = [];
-export async function sendMessageToAggThread(aggThreadId, channelId = process.env.CHANNEL_ID) {
+export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHANNEL) {
     if (aggThreadMsgObjects.length === 0 || !aggThreadId) {
         return;
     }
-
     const aggThreadQueriesToResolve = [];
     const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
     const currentThreadMessages = await fetchMessages("", aggThreadId);
@@ -429,25 +465,27 @@ export async function sendMessageToAggThread(aggThreadId, channelId = process.en
             footer: { text: monitorVersion }
         };
         const msg = currentThreadMessages.find(x => {
-            return !!x.embeds.find(embed => embed.title.toUpperCase().includes(aggThread.protocol)) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS);
+            return !!x.embeds.find(embed => embed.title.toUpperCase().includes(aggThread.protocol.toUpperCase())) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS);
         });
 
         let embedToAdd = false;
         if (aggThread.embeds.length > 1) {
             if (!!msg) {
                 const existingEmbed = msg.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
-                const aggThreadNetworkStringsArr = aggThread.embeds[0].value.split('\n').join('-----').split('-----');
-                const aggThreadBlockValueArr = aggThread.embeds[1].value.split('\n').join('-----').split('-----');
-                const existingMessageNetworkStringsArr = existingEmbed.embeds[0].value.fields.split('\n').join('-----').split('-----');
-                const existingMessageBlockValueArr = existingEmbed.embeds[1].value.fields.split('\n').join('-----').split('-----');
-                aggThreadNetworkStringsArr.forEach(networkLine, networkIdx => {
-                    const existingMessageIndex = existingMessageNetworkStringsArr.indexOf(networkLine);
-                    if (!(existingMessageIndex >= 0 && aggThreadBlockValueArr[networkIdx] === existingMessageBlockValueArr[existingMessageIndex])) {
-                        indexingErrorEmbed.fields[0].value += networkLine;
-                        indexingErrorEmbed.fields[1].value += aggThreadBlockValueArr[networkIdx];
-                        embedToAdd = true;
-                    }
-                });
+                if (existingEmbed) {
+                    const aggThreadNetworkStringsArr = aggThread.embeds[0].value.split('\n').join('-----').split('-----');
+                    const aggThreadBlockValueArr = aggThread.embeds[1].value.split('\n').join('-----').split('-----');
+                    const existingMessageNetworkStringsArr = existingEmbed.fields[0].value.split('\n').join('-----').split('-----');
+                    const existingMessageBlockValueArr = existingEmbed.fields[1].value.split('\n').join('-----').split('-----');
+                    aggThreadNetworkStringsArr.forEach((networkLine, networkIdx) => {
+                        const existingMessageIndex = existingMessageNetworkStringsArr.indexOf(networkLine);
+                        if (!(existingMessageIndex >= 0 && aggThreadBlockValueArr[networkIdx] === existingMessageBlockValueArr[existingMessageIndex])) {
+                            indexingErrorEmbed.fields[0].value += networkLine;
+                            indexingErrorEmbed.fields[1].value += aggThreadBlockValueArr[networkIdx];
+                            embedToAdd = true;
+                        }
+                    });
+                }
             } else if (aggThread?.embeds[0]?.value?.length > 0 && aggThread?.embeds[1]?.value?.length > 0) {
                 indexingErrorEmbed.fields[0].value += aggThread.embeds[0].value;
                 indexingErrorEmbed.fields[1].value += aggThread.embeds[1].value;
@@ -475,10 +513,97 @@ export async function sendMessageToAggThread(aggThreadId, channelId = process.en
         await resolveQueriesToAttempt(aggThreadQueriesToResolve);
         aggThreadMsgObjects = [];
     } catch (err) {
+        console.log(err?.response?.config?.data);
         if (err?.response?.status === 429) {
             return aggThreadMsgObjects;
         } else {
-            errorNotification("ERROR LOCATION 26 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
+            errorNotification("ERROR LOCATION 26 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message);
+            return null;
+        }
+    }
+}
+
+export async function sendMessageToZapierThread(msgObj) {
+    const currentThreadMessages = await fetchMessages("", process.env.PROD_CHANNEL);
+    const currentThreadMessagesContent = currentThreadMessages.map(x => x.content);
+    const baseURL = "https://discordapp.com/api/channels/" + process.env.PROD_CHANNEL + "/messages";
+    const headers = {
+        "Authorization": "Bot " + process.env.BOT_TOKEN,
+        "Content-Type": "application/json",
+    };
+
+    let messageConstruction = ``;
+
+    if (Object.keys(msgObj).includes('indexing')) {
+        let invalidIndexingAlertIndexes = [];
+        const threadIndexingAlerts = currentThreadMessagesContent.filter(x => x.toUpperCase().includes('INDEXING') && x.toUpperCase().includes(msgObj.protocolName.toUpperCase()) && (!msgObj.protocolName.toUpperCase().includes('PENDING') && !x.toUpperCase().includes('PENDING') || msgObj.protocolName.toUpperCase().includes('PENDING') && x.toUpperCase().includes('PENDING')));
+
+        threadIndexingAlerts.forEach(indexingThread => {
+            msgObj.indexing.forEach((indexingAlert, idx) => {
+                if (indexingThread.toUpperCase().includes(indexingAlert.toUpperCase())) {
+                    invalidIndexingAlertIndexes.push(idx);
+                }
+            })
+        });
+        const validAlerts = msgObj.indexing.filter((x, idx) => !invalidIndexingAlertIndexes.includes(idx));
+        if (validAlerts.length > 0) {
+            messageConstruction += `Indexing errors on ${msgObj.protocolName}\n\n`;
+            messageConstruction += validAlerts.join('\n');
+        }
+    } else if (Object.keys(msgObj).includes('protocol')) {
+        const invalidProtocolAlertIndexes = {};
+        Object.keys(msgObj.protocol).forEach(deployment => {
+            invalidProtocolAlertIndexes[deployment] = [];
+            const threadProtocolAlerts = currentThreadMessagesContent.filter(x => {
+                return x.toUpperCase().includes('PROTOCOL') && x.toUpperCase().includes(deployment.toUpperCase()) && (!deployment.toUpperCase().includes('PENDING') && !x.toUpperCase().includes('PENDING') || deployment.toUpperCase().includes('PENDING') && x.toUpperCase().includes('PENDING'));
+            });
+            if (threadProtocolAlerts) {
+                threadProtocolAlerts.forEach(alert => {
+                    msgObj.protocol[deployment]?.Field?.forEach((fieldName, idx) => {
+                        const alertStrAfterFieldName = alert?.toUpperCase()?.split(fieldName?.toUpperCase())[1];
+                        const alertStrBeforeDesc = alertStrAfterFieldName?.split('DESCRIPTION')[0];
+                        const alertToBeSent = msgObj?.protocol[deployment]?.Value[idx]?.toUpperCase();
+                        const valueCondition = alertStrBeforeDesc?.includes(alertToBeSent);
+                        if (alert.toUpperCase().includes(fieldName.toUpperCase()) && valueCondition) {
+                            invalidProtocolAlertIndexes[deployment].push(idx);
+                        }
+                    })
+                })
+            }
+            const validAlerts = []
+            msgObj.protocol[deployment]?.Field?.forEach((x, idx) => {
+                if (!invalidProtocolAlertIndexes[deployment].includes(idx)) {
+                    validAlerts.push(`Field: ${x}\nValue: ${msgObj.protocol[deployment]?.Value[idx]}\nDescription: ${msgObj.protocol[deployment]?.Description[idx]}\n`);
+                }
+            })
+            if (validAlerts.length > 0) {
+                let link = `https://subgraphs.messari.io/subgraph?endpoint=messari/${msgObj.protocolName}-${deployment}&tab=protocol${deployment.toUpperCase().includes('PENDING') ? '&version=pending' : ""}`;
+                messageConstruction += `\n${deployment}: ${link}\n${validAlerts.join('\n')}`;
+            }
+        })
+        if (messageConstruction.length > 0) {
+            messageConstruction = `Protocol Errors on ${msgObj.protocolName}\n` + messageConstruction;
+        }
+    }
+
+    if (messageConstruction.length === 0) {
+        return null;
+    }
+
+    const postJSON = JSON.stringify({ "content": messageConstruction });
+
+    try {
+        const req = await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch(async function (err1) {
+            await sleep(5000);
+            await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch((err) => console.log("ERROR ZAPIER MSG # " + err?.response?.data?.message + err?.response?.data?.retry_after + err?.response?.config?.data))
+        });
+        return req;
+    } catch (err) {
+        console.log(err?.response?.config?.data)
+        if (err?.response?.status === 429) {
+            return null;
+        } else {
+            errorNotification("ERROR LOCATION 29 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message);
             return null;
         }
     }

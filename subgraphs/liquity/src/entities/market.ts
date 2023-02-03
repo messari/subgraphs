@@ -15,6 +15,7 @@ import {
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
+  STABILITY_POOL,
 } from "../utils/constants";
 import {
   addProtocolBorrowVolume,
@@ -27,7 +28,12 @@ import {
   updateProtocolBorrowBalance,
   updateProtocolUSDLocked,
 } from "./protocol";
-import { getETHToken, getCurrentETHPrice } from "./token";
+import {
+  getETHToken,
+  getCurrentETHPrice,
+  getRewardToken,
+  getLUSDToken,
+} from "./token";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 
@@ -71,6 +77,53 @@ export function getOrCreateMarket(): Market {
     market.borrowingPositionCount = INT_ZERO;
     market.save();
   }
+  return market;
+}
+
+export function getOrCreateStabilityPool(event: ethereum.Event): Market {
+  let market = Market.load(STABILITY_POOL);
+  if (market) {
+    return market;
+  }
+
+  const protocol = getOrCreateLiquityProtocol();
+  market = new Market(STABILITY_POOL);
+  market.protocol = protocol.id;
+  market.name = "Stability Pool";
+  market.isActive = true;
+  market.canUseAsCollateral = false;
+  market.canBorrowFrom = false;
+  market.maximumLTV = BIGDECIMAL_ZERO;
+  market.liquidationThreshold = BIGDECIMAL_ZERO;
+  market.liquidationPenalty = BIGDECIMAL_ZERO;
+  market.inputToken = getLUSDToken().id;
+  market.rewardTokens = [getRewardToken().id];
+  market.rates = [];
+  market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+  market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+  market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+  market.inputTokenBalance = BIGINT_ZERO;
+  market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+  market.outputTokenSupply = BIGINT_ZERO;
+  market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  market.exchangeRate = BIGDECIMAL_ZERO;
+  market.rewardTokenEmissionsAmount = [];
+  market.rewardTokenEmissionsUSD = [];
+  market.positionCount = 0;
+  market.openPositionCount = 0;
+  market.closedPositionCount = 0;
+  market.lendingPositionCount = 0;
+  market.borrowingPositionCount = 0;
+
+  market.createdTimestamp = event.block.timestamp;
+  market.createdBlockNumber = event.block.number;
+  market.save();
   return market;
 }
 
@@ -201,9 +254,9 @@ export function setMarketETHBalance(
 
 export function addMarketDepositVolume(
   event: ethereum.Event,
+  market: Market,
   depositedUSD: BigDecimal
 ): void {
-  const market = getOrCreateMarket();
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(depositedUSD);
   market.save();
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);

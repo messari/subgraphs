@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { blockExplorers } from "../../constants";
 import { formatIntToFixed2, tableCellTruncate } from "../../utils";
 
-interface TableChartProps {
+interface TablePoolOverviewProps {
   datasetLabel: string;
   dataTable: any;
   protocolType: string;
@@ -13,6 +13,7 @@ interface TableChartProps {
   handleTabChange: (event: any, newValue: string) => void;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
   skipAmt: number;
+  tablePoolOverviewLoading: boolean;
   setIssues: React.Dispatch<{ message: string; type: string; level: string; fieldName: string }[]>;
   issueProps: { message: string; type: string; level: string; fieldName: string }[];
 }
@@ -25,9 +26,10 @@ export const TablePoolOverview = ({
   handleTabChange,
   setPoolId,
   skipAmt,
+  tablePoolOverviewLoading,
   setIssues,
   issueProps,
-}: TableChartProps) => {
+}: TablePoolOverviewProps) => {
   const navigate = useNavigate();
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [...issueProps];
   useEffect(() => {
@@ -43,6 +45,8 @@ export const TablePoolOverview = ({
     if (protocolType === "EXCHANGE" || protocolType === "GENERIC") {
       inputTokenLabel = "Input Tokens";
       inputTokenColWidth = 220;
+    }
+    if (protocolType === "EXCHANGE" || protocolType === "GENERIC" || protocolType === "YIELD") {
       optionalFields.push({
         field: "baseYield",
         headerName: "Base Yield %",
@@ -200,7 +204,6 @@ export const TablePoolOverview = ({
       if (pool.inputTokens) {
         inputTokenSymbol = pool.inputTokens.map((tok: any) => tok.symbol).join(", ");
       }
-
       const returnObj: { [x: string]: any } = {
         id: i + 1 + skipAmt,
         idx: i + 1 + skipAmt,
@@ -257,7 +260,7 @@ export const TablePoolOverview = ({
         let rewardFactorsStr = "N/A";
         let rewardAPRs: string[] = pool?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
           let apr = 0;
-          if (protocolType === "LENDING" && (pool.rewardTokens[idx]?.type === "BORROW" || pool.rewardTokens[idx]?.token?.type === "BORROW")) {
+          if (protocolType === "LENDING" && (pool.rewardTokens[idx]?.type?.includes("BORROW") || pool.rewardTokens[idx]?.token?.type?.includes("BORROW"))) {
             if (
               !Number(pool.totalBorrowBalanceUSD) &&
               issues.filter(
@@ -507,7 +510,7 @@ export const TablePoolOverview = ({
       }
       return returnObj;
     });
-    if (dataTable.length === 0) {
+    if (dataTable.length === 0 && tablePoolOverviewLoading) {
       if (issues.filter((x) => x.fieldName === "poolOverview").length === 0) {
         issues.push({
           message: "No pools returned in pool overview.",

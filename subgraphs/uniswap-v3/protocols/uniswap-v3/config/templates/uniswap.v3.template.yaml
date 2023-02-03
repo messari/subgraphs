@@ -17,7 +17,7 @@ dataSources:
     source:
       address: "{{factoryAddress}}"
       abi: Factory
-      startBlock: {{startBlock}}
+      startBlock: {{factoryAddressStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -45,6 +45,38 @@ dataSources:
       eventHandlers:
         - event: PoolCreated(indexed address,indexed address,indexed uint24,int24,address)
           handler: handlePoolCreated
+
+  - kind: ethereum/contract
+    name: NonfungiblePositionManager
+    network: {{network}}
+    source:
+      address: "{{nonFungiblePositionManagerAddress}}"
+      abi: NonfungiblePositionManager
+      startBlock: {{nonFungiblePositionManagerAddressStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/position-manager.ts
+      entities:
+        - Position
+      abis:
+        - name: NonfungiblePositionManager
+          file: ./abis/NonfungiblePositionManager.json
+        - name: Pool
+          file: ./abis/pool.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: IncreaseLiquidity(indexed uint256,uint128,uint256,uint256)
+          handler: handleIncreaseLiquidity
+        - event: DecreaseLiquidity(indexed uint256,uint128,uint256,uint256)
+          handler: handleDecreaseLiquidity
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+
 templates:
   - kind: ethereum/contract
     name: Pool
@@ -85,11 +117,11 @@ templates:
           handler: handleInitialize
         - event: SetFeeProtocol(uint8,uint8,uint8,uint8)
           handler: handleSetFeeProtocol
+        - event: Collect(indexed address,address,indexed int24,indexed int24,uint128,uint128)
+          handler: handleCollectPool
         - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
           handler: handleSwap
         - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
           handler: handleMint
-        - event: Collect(indexed address,address,indexed int24,indexed int24,uint128,uint128)
-          handler: handleCollect
-        #- event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
-          #handler: handleBurn
+        - event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleBurn 

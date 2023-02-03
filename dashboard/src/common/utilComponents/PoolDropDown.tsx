@@ -11,19 +11,16 @@ import { ComboBoxInput } from "./ComboBoxInput";
  * @returns
  */
 const isAddress = (input: string) => {
-  return input.startsWith("0x") && input.length === 42;
+  return (input.startsWith("0x") && input.length === 42) || input.includes('.near');
 };
 
 interface PoolDropDownProps {
   poolId: string;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
-  setIssues: React.Dispatch<
-    React.SetStateAction<{ message: string; type: string; level: string; fieldName: string }[]>
-  >;
   pools: { [x: string]: any }[];
 }
 
-export const PoolDropDown = ({ poolId, setPoolId, setIssues, pools }: PoolDropDownProps) => {
+export const PoolDropDown = ({ poolId, setPoolId, pools }: PoolDropDownProps) => {
   const navigate = useNavigate();
   // Create the array of pool selections in the drop down
   const options = pools.map((market: any) => {
@@ -50,7 +47,6 @@ export const PoolDropDown = ({ poolId, setPoolId, setIssues, pools }: PoolDropDo
           // Upon selecting a pool from the list, get the pool id and navigate to the routing for that pool
           const href = new URL(window.location.href);
           const p = new URLSearchParams(href.search);
-          setIssues([]);
           const targEle = event?.target as HTMLLIElement;
           setTextInput(targEle.innerText);
           p.delete("view");

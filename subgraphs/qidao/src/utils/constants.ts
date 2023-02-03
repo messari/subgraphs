@@ -37,7 +37,7 @@ export namespace Network {
   export const OPTIMISM = "OPTIMISM";
   export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
-  export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const GNOSIS = "GNOSIS"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {
@@ -110,6 +110,13 @@ export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
 export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // created block 10042267
 export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // created block 10093341
+
+export const STAKEDAO_STETH_VAULT = Address.fromHexString(
+  "0xcc61Ee649A95F2E2f0830838681f839BDb7CB823"
+);
+export const YEARN_STETH_VAULT = Address.fromHexString(
+  "0x82e90eb7034c1df646bd06afb9e67281aab5ed28"
+);
 
 ////////////////////////
 ///// Type Helpers /////
@@ -199,7 +206,7 @@ MAI_TOKEN_ADDRESS.set(
   "0x3f56e0c36d275367b8c502090edf38289b3dea0d"
 );
 MAI_TOKEN_ADDRESS.set(
-  Network.XDAI,
+  Network.GNOSIS,
   "0x3f56e0c36d275367b8c502090edf38289b3dea0d"
 );
 MAI_TOKEN_ADDRESS.set(
@@ -209,6 +216,14 @@ MAI_TOKEN_ADDRESS.set(
 MAI_TOKEN_ADDRESS.set(
   Network.OPTIMISM,
   "0xdfa46478f9e5ea86d57387849598dbfb2e964b02"
+);
+MAI_TOKEN_ADDRESS.set(
+  Network.MAINNET,
+  "0x8D6CeBD76f18E1558D4DB88138e2DeFB3909fAD6"
+);
+MAI_TOKEN_ADDRESS.set(
+  Network.HARMONY,
+  "0x3F56e0c36d275367b8C502090EDF38289b3dEa0d"
 );
 
 export const COLLATERAL_PRICE_DECIMALS = new Map<string, i32>();

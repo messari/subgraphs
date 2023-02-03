@@ -1,0 +1,8 @@
+{
+  "network": "optimism",
+  "factoryAddress": "0x60cf091cd3f50420d50fd7f707414d0df4751c58",
+  "startBlock": "26050083",
+  "graftEnabled": false,
+  "subgraphId": "QmShQGQuHXwPQit3T3E6E6AFkxpGH1kYidh5KsFxKmCDkh",
+  "graftStartBlock": 64549288
+}

@@ -1,30 +1,25 @@
 import {
-  updateCrvRewardsInfo,
-  updateRewardTokenInfo,
-} from "../modules/Rewards";
+  getOrCreateLiquidityPool,
+  getOrCreateLiquidityGauge,
+} from "../common/initializers";
 import * as utils from "../common/utils";
+import { log } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
-import { Address } from "@graphprotocol/graph-ts";
-import { NewGauge } from "../../generated/GaugeController/GaugeController";
-import { getOrCreateLiquidityGauge, getOrCreateLiquidityPool, getOrCreateLpToken } from "../common/initializers";
+import {
+  NewGauge,
+  DeployedGauge,
+} from "../../generated/GaugeController/GaugeController";
 
 export function handleNewGauge(event: NewGauge): void {
-  let gaugeAddress = event.params.addr;
+  const gaugeAddress = event.params.addr;
 
-  let lpToken = utils.getLpTokenFromGauge(gaugeAddress);
+  const lpToken = utils.getLpTokenFromGauge(gaugeAddress);
   if (lpToken.equals(constants.NULL.TYPE_ADDRESS)) return;
 
-  let poolAddress = utils.getPoolFromLpToken(lpToken);
-  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) {
-    let lpTokenStore = getOrCreateLpToken(lpToken, constants.NULL.TYPE_ADDRESS);
+  const poolAddress = utils.getPoolFromLpToken(lpToken);
 
-    if (lpTokenStore.poolAddress == constants.NULL.TYPE_STRING) return;
-
-    poolAddress = Address.fromString(lpTokenStore.poolAddress);
-  }
-
-  const gauge = getOrCreateLiquidityGauge(gaugeAddress);
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
 
   pool._gaugeAddress = gauge.id;
   gauge.poolAddress = pool.id;
@@ -32,6 +27,39 @@ export function handleNewGauge(event: NewGauge): void {
   gauge.save();
   pool.save();
 
-  updateCrvRewardsInfo(poolAddress, gaugeAddress, event.block);
-  updateRewardTokenInfo(poolAddress, gaugeAddress, event.block);
+  log.warning(
+    "[NewGauge] PoolAddress: {}, GaugeAddress: {}, lpToken:{}, TxnHash: {}",
+    [
+      pool.id,
+      gauge.id,
+      lpToken.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+}
+
+export function handleDeployedGauge(event: DeployedGauge): void {
+  const gaugeAddress = event.params._gauge;
+  const lpTokenAddress = event.params._lp_token;
+
+  const poolAddress = utils.getPoolFromLpToken(lpTokenAddress);
+
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
+
+  pool._gaugeAddress = gauge.id;
+  gauge.poolAddress = pool.id;
+
+  gauge.save();
+  pool.save();
+
+  log.warning(
+    "[DeployedGauge] PoolAddress: {}, GaugeAddress: {}, lpToken:{}, TxnHash: {}",
+    [
+      pool.id,
+      gauge.id,
+      lpTokenAddress.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
 }

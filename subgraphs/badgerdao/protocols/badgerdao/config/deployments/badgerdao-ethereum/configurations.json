@@ -1,5 +1,9 @@
 {
   "chain": "mainnet",
+  
+  "rewardsLoggerAddress": "0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec",
+  "rewardsLoggerStartBlock": "12325490",
+
   "vaults": [
     {
       "name": "bBADGER",
@@ -145,138 +149,41 @@
       "name": "graviAura",
       "address": "0xBA485b556399123261a5F9c95d413B4f93107407",
       "startBlock": "14973521"
-    }
-  ],
-  "strategies": [
-    {
-      "name": "bBADGER_Strategy",
-      "address": "0x75b8E21BD623012Efb3b69E1B562465A68944eE6",
-      "startBlock": "11380898"
     },
     {
-      "name": "bcrvRenBTC_Strategy",
-      "address": "0x61e16b46F74aEd8f9c2Ec6CB2dCb2258Bdfc7071",
-      "startBlock": "13545116"
+      "name": "AuraBAL",
+      "address": "0x37d9D2C6035b744849C15F1BFEE8F268a20fCBd8",
+      "startBlock": "15044464"
     },
     {
-      "name": "bcrvSBTC_Strategy",
-      "address": "0xCce0D2d1Eb2310F7e67e128bcFE3CE870A3D3a3d",
-      "startBlock": "13544479"
+      "name": "20WBTC-80BADGER",
+      "address": "0x63ad745506BD6a3E57F764409A47ed004BEc40b1",
+      "startBlock": "15083920"
     },
     {
-      "name": "bcrvTBTC_Strategy",
-      "address": "0xAB73Ec65a1Ef5a2e5b56D5d6F36Bee4B2A1D3FFb",
-      "startBlock": "13544509"
+      "name": "BalancerAaveBoosted",
+      "address": "0x06D756861De0724FAd5B5636124e0f252d3C1404",
+      "startBlock": "15082852"
     },
     {
-      "name": "bharvestcrvRenBTC_Strategy",
-      "address": "0xaaE82E3c89e15E6F26F60724f115d5012363e030",
-      "startBlock": "11380940"
+      "name": "33auraBAL-33graviAURA-33WETH",
+      "address": "0xf8f5677B6bCecdb9be94AE8f6770a05a6C53C378",
+      "startBlock": "15103063"
     },
     {
-      "name": "buniWbtcBadger_Strategy",
-      "address": "0x95826C65EB1f2d2F0EDBb7EcB176563B61C60bBf",
-      "startBlock": "11380928"
+      "name": "40WBTC-40DIGG-20graviAURA",
+      "address": "0x371B7C451858bd88eAf392B383Df8bd7B8955d5a",
+      "startBlock": "15168418"
     },
     {
-      "name": "bslpWbtcBadger_Strategy",
-      "address": "0x3a494D79AA78118795daad8AeFF5825C6c8dF7F1",
-      "startBlock": "11539647"
+      "name": "Balancer-stETH",
+      "address": "0x41466b8ec544e3192Aa1aA30f65fC60FAb4D52Bf",
+      "startBlock": "15528247"
     },
     {
-      "name": "bslpWbtcibBTC_Strategy",
-      "address": "0xf4146A176b09C664978e03d28d07Db4431525dAd",
-      "startBlock": "12389370"
-    },
-    {
-      "name": "bslpWbtcDigg_Strategy",
-      "address": "0xaa8dddfe7DFA3C3269f1910d89E4413dD006D08a",
-      "startBlock": "11681031"
-    },
-    {
-      "name": "bslpWbtcEth_Strategy",
-      "address": "0x7A56d65254705B4Def63c68488C0182968C452ce",
-      "startBlock": "11537603"
-    },
-    {
-      "name": "bcrvHBTC_Strategy",
-      "address": "0x8c26D9B6B80684CC642ED9eb1Ac1729Af3E819eE",
-      "startBlock": "13544540"
-    },
-    {
-      "name": "bcrvPBTC_Strategy",
-      "address": "0xA9A646668Df5Cec5344941646F5c6b269551e53D",
-      "startBlock": "13544723"
-    },
-    {
-      "name": "bcrvOBTC_Strategy",
-      "address": "0x5dd69c6D81f0a403c03b99C5a44Ef2D49b66d388",
-      "startBlock": "13544871"
-    },
-    {
-      "name": "bcrvBBTC_Strategy",
-      "address": "0xF2F3AB09E2D8986fBECbBa59aE838a5418a6680c",
-      "startBlock": "13544912"
-    },
-    {
-      "name": "bcrvIbBTC_Strategy",
-      "address": "0x6D4BA00Fd7BB73b5aa5b3D6180c6f1B0c89f70D1",
-      "startBlock": "13616629"
-    },
-    {
-      "name": "bcrvTricrypto_Strategy",
-      "address": "0x05eC4356e1acd89CC2d16adC7415c8c95E736AC1",
-      "startBlock": "12679121"
-    },
-    {
-      "name": "bcrvTricrypto2_Strategy",
-      "address": "0x647eeb5C5ED5A71621183f09F6CE8fa66b96827d",
-      "startBlock": "13544974"
-    },
-    {
-      "name": "bcvxCRV_Strategy",
-      "address": "0x826048381d65a65DAa51342C51d464428d301896",
-      "startBlock": "12691828"
-    },
-    {
-      "name": "bCVX_Strategy",
-      "address": "0xBCee2c6CfA7A4e29892c3665f464Be5536F16D95",
-      "startBlock": "12691828"
-    },
-    {
-      "name": "bveCVX_Strategy",
-      "address": "0x898111d1F4eB55025D0036568212425EE2274082",
-      "startBlock": "14379068"
-    },
-    {
-      "name": "bimBTC_Strategy",
-      "address": "0xd409C506742b7f76f164909025Ab29A47e06d30A",
-      "startBlock": "12850838"
-    },
-    {
-      "name": "bFpMbtcHbtc_Strategy",
-      "address": "0x54D06A0E1cE55a7a60Ee175AbCeaC7e363f603f3",
-      "startBlock": "12850844"
-    },
-    {
-      "name": "bbveCVX-CVX-f_Strategy",
-      "address": "0x98Ca7AFa876f0e15494E76E92C5b3658cdE1Ffe1",
-      "startBlock": "13495973"
-    },
-    {
-      "name": "bMIM-3LP3CRV-f_Strategy",
-      "address": "0x6D1de7B7F586f17d573BB57ce39159ff6245A285",
-      "startBlock": "14032406"
-    },
-    {
-      "name": "bFRAX3CRV-f_Strategy",
-      "address": "0xf1e6aB438136D391fdafff5263f129d434BC6efB",
-      "startBlock": "14032413"
-    },
-    {
-      "name": "bcrvBADGER_Strategy",
-      "address": "0x1905FD2D2D09792eE058C2b46a05F11630a1EcA1",
-      "startBlock": "14412273"
+      "name": "Balancer-rETH",
+      "address": "0xA484427CF91bbd945c39eF87dF0A02Bb8625dC97",
+      "startBlock": "15528239"
     }
   ]
 }

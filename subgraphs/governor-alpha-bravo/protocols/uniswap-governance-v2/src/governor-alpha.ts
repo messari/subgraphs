@@ -109,7 +109,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework = new GovernanceFramework(contractAddress);
     const contract = GovernorAlpha.bind(Address.fromString(contractAddress));
 
-    governanceFramework.name = "uniswap-governance-v1";
+    governanceFramework.name = "uniswap-governance-v2";
     governanceFramework.type = GovernanceFrameworkType.GOVERNOR_ALPHA;
     governanceFramework.version = "1";
 

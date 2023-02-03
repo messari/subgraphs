@@ -210,8 +210,9 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
         if (
             !(
                 data.totalValueLockedUSD >= 0 &&
-                data.totalValueLockedUSD < 100000000000
-            )
+                data.totalValueLockedUSD < 10000000000
+            ) &&
+            deployment.protocolType === 'dex-amm'
         ) {
             issuesArrays.totalValueLockedUSD.push('$' + formatIntToFixed2(parseFloat(data.totalValueLockedUSD)));
         }
@@ -343,7 +344,11 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 parseFloat(data.totalBorrowBalanceUSD) <=
                 parseFloat(data.totalDepositBalanceUSD)
             ) &&
-            !deploymentName.includes("rari-fuse")
+            !deploymentName.includes("rari-fuse") &&
+            !deploymentName.includes("truefi") &&
+            !deploymentName.includes("maple") &&
+            !deploymentName.includes("goldfinch")
+
         ) {
             issuesArrays.totalBorrowBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalBorrowBalanceUSD)));
         }
@@ -488,7 +493,7 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                         deploymentsToReturn[depoKey].protocolErrors.protocolEntity.push(ProtocolTypeEntityName[deploymentsToReturn[depoKey].protocolType]);
                     } else {
                         const emptyFields = Object.keys(returnedData[key][0]).filter(field => !returnedData[key][0][field] || returnedData[key][0][field]?.length === 0);
-                        if (emptyFields.length > 0) {
+                        if (emptyFields.length > 0 && !depoKey.toUpperCase().includes('THE-GRAPH')) {
                             deploymentsToReturn[depoKey].protocolErrors.relatedField.push(emptyFields.join(', '));
                         }
                     }

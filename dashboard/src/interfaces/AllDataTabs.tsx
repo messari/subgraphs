@@ -13,7 +13,7 @@ import { NewClient, schemaMapping } from "../utils";
 import { NormalizedCacheObject, ApolloClient } from "@apollo/client";
 import { DeploymentOverlayDropDown } from "../common/utilComponents/DeploymentOverlayDropDown";
 import { getPendingSubgraphsOnProtocolQuery } from "../queries/subgraphStatusQuery";
-import PendingCalls from "./PendingCalls";
+import PendingCalls from "../common/utilComponents/PendingCalls";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -40,6 +40,7 @@ interface AllDataTabsProps {
   poolOverviewRequest: { [x: string]: any };
   poolTimeseriesRequest: { [x: string]: any };
   overlayPoolTimeseriesData: any;
+  overlayPoolTimeseriesLoading: boolean;
   protocolTimeseriesData: any;
   protocolTimeseriesLoading: any;
   protocolTimeseriesError: any;
@@ -50,7 +51,6 @@ interface AllDataTabsProps {
   poolListLoading: any;
   poolsListError: any;
   positionsQuery?: string;
-  overlayDeploymentClient: ApolloClient<NormalizedCacheObject>;
   overlayDeploymentURL: string;
   handleTabChange: (event: any, newValue: string) => void;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
@@ -82,6 +82,7 @@ function AllDataTabs({
   poolTimeseriesRequest,
   protocolTimeseriesData,
   overlayPoolTimeseriesData,
+  overlayPoolTimeseriesLoading,
   protocolTableData,
   decentralizedDeployments,
   poolsListData,
@@ -91,7 +92,6 @@ function AllDataTabs({
   overlayProtocolTimeseriesData,
   poolsListError,
   positionsQuery,
-  overlayDeploymentClient,
   overlayDeploymentURL,
   handleTabChange,
   setPoolId,
@@ -136,7 +136,7 @@ function AllDataTabs({
   const protocolType = data.protocols[0].type;
   const protocolEntityNamesPlural = ProtocolTypeEntityNames[protocolType];
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
-  const network = data[protocolEntityNamesPlural][0].network;
+  const network = data[protocolEntityNamesPlural][0]?.network;
 
   let eventsTab = null;
   let eventsTabButton = null;
@@ -202,7 +202,7 @@ function AllDataTabs({
 
   let pendingCalls = null;
   if (pendingQuery) {
-    pendingCalls = <PendingCalls query={pendingQuery} pendingSubgraphData={pendingSubgraphData} setPendingSubgraphData={setPendingSubgraphData} />
+    pendingCalls = <PendingCalls query={pendingQuery} setPendingSubgraphData={setPendingSubgraphData} />
   }
 
   return (
@@ -267,8 +267,10 @@ function AllDataTabs({
             data={data}
             overlayData={overlayData}
             entitiesData={entitiesData}
+            subgraphToQueryURL={subgraphToQueryURL}
             poolTimeseriesData={poolTimeseriesRequest.poolTimeseriesData}
             overlayPoolTimeseriesData={overlayPoolTimeseriesData}
+            overlayPoolTimeseriesLoading={overlayPoolTimeseriesLoading}
             poolTimeseriesLoading={poolTimeseriesRequest.poolTimeseriesLoading}
             poolTimeseriesError={poolTimeseriesRequest.poolTimeseriesError}
             poolId={poolId}

@@ -945,7 +945,7 @@ interface Event {
     timestamp: BigInt!
 }
 
-type Deposit implements Event @entity {
+type Deposit implements Event @entity(immutable: true) {
     " { Transaction hash }-{ Log index } "
     id: ID!
 
@@ -990,7 +990,7 @@ type Deposit implements Event @entity {
     _amountMPT: BigInt!
 }
 
-type Withdraw implements Event @entity {
+type Withdraw implements Event @entity(immutable: true) {
     " { Transaction hash }-{ Log index }"
     id: ID!
 
@@ -1043,7 +1043,7 @@ type Withdraw implements Event @entity {
 }
 
 # For CDPs, use this for mint events
-type Borrow implements Event @entity {
+type Borrow implements Event @entity(immutable: true) {
     " { Transaction hash }-{ Log index } "
     id: ID!
 
@@ -1095,7 +1095,7 @@ type Borrow implements Event @entity {
 }
 
 # For CDPs, use this for burn events
-type Repay implements Event @entity {
+type Repay implements Event @entity(immutable: true) {
     " { Transaction hash }-{ Log index } "
     id: ID!
 
@@ -1152,7 +1152,7 @@ type Repay implements Event @entity {
     _treasuryFeePaidUSD: BigDecimal!
 }
 
-type Liquidate implements Event @entity {
+type Liquidate implements Event @entity(immutable: true) {
     " { Transaction hash }-{ Log index } "
     id: ID!
 

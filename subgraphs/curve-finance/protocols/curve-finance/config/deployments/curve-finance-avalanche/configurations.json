@@ -1,0 +1,35 @@
+{
+  "network": "avalanche",
+  "defaultNetwork": "Network.AVALANCHE",
+
+  "priceCaching": 1000,
+
+  "poolInfoContract": "0xADf698e4d8Df08b3E2c79682891636eF00F6e205",
+  "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
+  "crvTokenAddress": "0x249848beca43ac405b8102ec90dd5f22ca513c06",
+
+  "gaugeControllerContract": "0xabC000d88f23Bb45525E447528DBF656A9D55bf5",
+  "gaugeControllerStartBlock": "10786607",
+
+  "poolRegistry": [
+    {
+      "name": "MainRegistry",
+      "address": "0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6",
+      "startBlock": "5254206"
+    },
+    {
+      "name": "StableSwapFactory",
+      "address": "0xb17b674D9c5CB2e441F8e196a2f048A81355d031",
+      "startBlock": "6571428"
+    },
+    {
+      "name": "CryptoSwapRegistry",
+      "address": "0x90f421832199e93d01b64DaF378b183809EB0988",
+      "startBlock": "9384663"
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}

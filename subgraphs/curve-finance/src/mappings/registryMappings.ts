@@ -1,9 +1,11 @@
 import {
+  getOrCreateLpToken,
   getOrCreateLiquidityPool,
   getOrCreateLiquidityGauge,
 } from "../common/initializers";
 import {
   PoolAdded,
+  PoolAdded1,
   BasePoolAdded,
   MetaPoolDeployed,
   PlainPoolDeployed,
@@ -12,60 +14,114 @@ import {
   LiquidityGaugeDeployed as LiquidityGaugeDeployedWithToken,
 } from "../../generated/templates/PoolTemplate/Registry";
 import * as utils from "../common/utils";
-import * as constants from "../common/constants";
 import { Address, log } from "@graphprotocol/graph-ts";
-import { PoolTemplate } from "../../generated/templates";
-import { updateCrvRewardsInfo, updateRewardTokenInfo } from "../modules/Rewards";
-import { LiquidityGauge as LiquidityGaugeTemplate } from "../../generated/templates";
 
 export function handlePoolAdded(event: PoolAdded): void {
-  let registryAddress = event.address;
-  let poolAddress = event.params.pool;
+  const registryAddress = event.address;
+  const poolAddress = event.params.pool;
 
-  if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block);
+  if (utils.isPoolRegistered(poolAddress)) return;
 
-  PoolTemplate.create(poolAddress);
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+
+  let lpToken = utils.getLpTokenFromRegistry(
+    poolAddress,
+    registryAddress,
+    event.block
+  );
+
+  if (!lpToken)
+    lpToken = utils.getOrCreateTokenFromString(pool.outputToken!, event.block);
+
+  const lpTokenStore = getOrCreateLpToken(Address.fromString(lpToken.id));
+
+  lpTokenStore.registryAddress = registryAddress.toHexString();
+  lpTokenStore.poolAddress = poolAddress.toHexString();
+
+  pool.name = lpToken.name;
+  pool.symbol = lpToken.symbol;
+  pool.outputToken = lpToken.id;
+  pool._registryAddress = registryAddress.toHexString();
+
+  lpTokenStore.save();
+  pool.save();
 
   log.warning("[PoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
-    poolAddress.toHexString(),
+    pool.id,
+    registryAddress.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
+}
+
+export function handlePoolAddedWithRate(event: PoolAdded1): void {
+  const registryAddress = event.address;
+  const poolAddress = event.params.pool;
+
+  if (utils.isPoolRegistered(poolAddress)) return;
+
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+
+  let lpToken = utils.getLpTokenFromRegistry(
+    poolAddress,
+    registryAddress,
+    event.block
+  );
+
+  if (!lpToken)
+    lpToken = utils.getOrCreateTokenFromString(pool.outputToken!, event.block);
+
+  const lpTokenStore = getOrCreateLpToken(Address.fromString(lpToken.id));
+
+  lpTokenStore.registryAddress = registryAddress.toHexString();
+  lpTokenStore.poolAddress = poolAddress.toHexString();
+
+  pool._registryAddress = registryAddress.toHexString();
+  pool.name = lpToken.name;
+  pool.symbol = lpToken.symbol;
+  pool.outputToken = lpToken.id;
+
+  lpTokenStore.save();
+  pool.save();
+
+  log.warning("[PoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
+    pool.id,
     registryAddress.toHexString(),
     event.transaction.hash.toHexString(),
   ]);
 }
 
 export function handleBasePoolAdded(event: BasePoolAdded): void {
-  let registryAddress = event.address;
-  let poolAddress = event.params.base_pool;
+  const poolAddress = event.params.base_pool;
+  const registryAddress = event.address.toHexString();
 
-  if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block);
+  if (utils.isPoolRegistered(poolAddress)) return;
 
-  PoolTemplate.create(poolAddress);
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+  pool._registryAddress = registryAddress;
+  pool.save();
 
   log.warning("[BasePoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
-    poolAddress.toHexString(),
-    registryAddress.toHexString(),
+    pool.id,
+    registryAddress,
     event.transaction.hash.toHexString(),
   ]);
 }
 
 export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
-  let coins = event.params.coins;
-  let registryAddress = event.address;
+  const coins = event.params.coins;
+  const registryAddress = event.address;
 
-  let poolAddress = utils.getPoolFromCoins(registryAddress, coins);
-  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+  const poolAddress = utils.getPoolFromCoins(registryAddress, coins);
+  if (!poolAddress) return;
 
-  if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block);
-
-  PoolTemplate.create(poolAddress);
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+  pool._registryAddress = registryAddress.toHexString();
+  pool.save();
 
   log.warning(
     "[PlainPoolDeployed] PoolAddress: {}, Registry: {}, TxnHash: {}",
     [
-      poolAddress.toHexString(),
+      pool.id,
       registryAddress.toHexString(),
       event.transaction.hash.toHexString(),
     ]
@@ -73,25 +129,30 @@ export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
 }
 
 export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
-  let registryAddress = event.address;
+  const registryAddress = event.address;
+  const inputCoinAddress = event.params.coin;
+  const basePoolAddress = event.params.base_pool;
 
-  let basePoolAddress = event.params.base_pool;
-  let basePool = getOrCreateLiquidityPool(basePoolAddress, event.block);
-  let basePoolCoins = basePool.inputTokens.map<Address>((x) => Address.fromString(x));
-  let poolCoins = [event.params.coin].concat(basePoolCoins);
+  const basePool = getOrCreateLiquidityPool(basePoolAddress, event.block);
 
-  let poolAddress = utils.getPoolFromCoins(registryAddress, poolCoins);
-  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+  const basePoolCoins = basePool._inputTokensOrdered.map<Address>((x) =>
+    Address.fromString(x)
+  );
 
-  if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block);
+  const poolCoins = [basePoolCoins[0], inputCoinAddress];
+  const poolAddress = utils.getPoolFromCoins(registryAddress, poolCoins);
 
-  PoolTemplate.create(poolAddress);
+  if (!poolAddress) return;
+
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+  pool._registryAddress = registryAddress.toHexString();
+  pool.save();
 
   log.warning(
-    "[MetaPoolDeployed] PoolAddress: {}, basePoolAddress: {}, TxnHash: {}",
+    "[MetaPoolDeployed] PoolAddress: {}, registryAddress: {}, basePoolAddress: {}, TxnHash: {}",
     [
-      poolAddress.toHexString(),
+      pool.id,
+      registryAddress.toHexString(),
       basePoolAddress.toHexString(),
       event.transaction.hash.toHexString(),
     ]
@@ -99,22 +160,24 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
 }
 
 export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
-  let lpToken = event.params.token;
-  let poolCoins = event.params.coins;
-  let registryAddress = event.address;
+  const lpToken = event.params.token;
+  const poolCoins = event.params.coins;
+  const registryAddress = event.address;
 
-  let poolAddress = utils.getPoolFromCoins(registryAddress, poolCoins);
-  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+  const poolAddress = utils.getPoolFromCoins(registryAddress, poolCoins);
+  if (!poolAddress) return;
 
-  if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block);
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
 
-  PoolTemplate.create(poolAddress);
+  pool._registryAddress = registryAddress.toHexString();
+  pool.outputToken = lpToken.toHexString();
+  pool.save();
 
   log.warning(
-    "[CryptoPoolDeployed] PoolAddress: {}, TxnHash: {}",
+    "[CryptoPoolDeployed] PoolAddress: {}, registryAddress: {}, TxnHash: {}",
     [
-      poolAddress.toHexString(),
+      pool.id,
+      registryAddress.toHexString(),
       event.transaction.hash.toHexString(),
     ]
   );
@@ -123,28 +186,22 @@ export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
 export function handleLiquidityGaugeDeployed(
   event: LiquidityGaugeDeployed
 ): void {
+  const registryAddress = event.address;
   const poolAddress = event.params.pool;
-  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
-
   const gaugeAddress = event.params.gauge;
-  const gauge = getOrCreateLiquidityGauge(gaugeAddress);
 
-  pool._gaugeAddress = gauge.id;
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
+
   gauge.poolAddress = pool.id;
-
   gauge.save();
-  pool.save();
-
-  LiquidityGaugeTemplate.create(gaugeAddress);
-
-  updateCrvRewardsInfo(poolAddress, gaugeAddress, event.block);
-  updateRewardTokenInfo(poolAddress, gaugeAddress, event.block);
 
   log.warning(
-    "[LiquidityGaugeDeployed] GaugeAddress: {}, PoolAddress: {}, TxnHash: {}",
+    "[LiquidityGaugeDeployed] GaugeAddress: {}, PoolAddress: {}, registryAddress: {}, TxnHash: {}",
     [
       gaugeAddress.toHexString(),
       poolAddress.toHexString(),
+      registryAddress.toHexString(),
       event.transaction.hash.toHexString(),
     ]
   );
@@ -154,29 +211,25 @@ export function handleLiquidityGaugeDeployedWithToken(
   event: LiquidityGaugeDeployedWithToken
 ): void {
   const lpToken = event.params.token;
+  const registryAddress = event.address;
   const poolAddress = event.params.pool;
-  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
-
   const gaugeAddress = event.params.gauge;
-  const gauge = getOrCreateLiquidityGauge(gaugeAddress);
+
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
 
   pool.outputToken = lpToken.toHexString();
-  pool._gaugeAddress = gauge.id;
   gauge.poolAddress = pool.id;
 
   gauge.save();
   pool.save();
 
-  LiquidityGaugeTemplate.create(gaugeAddress);
-
-  updateCrvRewardsInfo(poolAddress, gaugeAddress, event.block);
-  updateRewardTokenInfo(poolAddress, gaugeAddress, event.block);
-
   log.warning(
-    "[LiquidityGaugeDeployedWithToken] GaugeAddress: {}, PoolAddress: {}, lpToken:{}, TxnHash: {}",
+    "[LiquidityGaugeDeployedWithToken] GaugeAddress: {}, PoolAddress: {}, registryAddress: {}, lpToken:{}, TxnHash: {}",
     [
       gaugeAddress.toHexString(),
       poolAddress.toHexString(),
+      registryAddress.toHexString(),
       lpToken.toHexString(),
       event.transaction.hash.toHexString(),
     ]

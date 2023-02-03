@@ -18,7 +18,12 @@ export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
-export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000")
+export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000");
 
 export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
+
+export const BLACKLISTED_TOKENS: Address[] = [
+  NULL.TYPE_ADDRESS,
+  Address.fromString("0xbc6e06778708177a18210181b073da747c88490a"), // SYNR Token
+];

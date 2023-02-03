@@ -2,12 +2,10 @@ import { styled } from "../styled";
 import { useNavigate } from "react-router";
 import { SearchInput } from "../common/utilComponents/SearchInput";
 import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
-import { Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { NewClient } from "../utils";
 import { useEffect, useMemo, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
-import { useQuery } from "@apollo/client";
-import { decentralizedNetworkSubgraphsQuery } from "../queries/decentralizedNetworkSubgraphsQuery";
 import DevCountTable from "./DevCountTable";
 import IndexingCalls from "./IndexingCalls";
 
@@ -23,18 +21,18 @@ interface DeploymentsPageProps {
   endpointSlugs: string[];
   aliasToProtocol: any;
   decentralizedDeployments: any;
-  issuesTitles: any;
+  issuesMapping: any;
 }
 
-function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol, decentralizedDeployments, issuesTitles }: DeploymentsPageProps) {
+function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol, decentralizedDeployments, issuesMapping }: DeploymentsPageProps) {
 
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
-  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
-  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
 
-  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
-  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
 
   const [indexingStatus, setIndexingStatus] = useState<any>(false);
   const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
@@ -158,7 +156,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         {devCountTable}
         <DeploymentsTable
           getData={() => getData()}
-          issuesTitles={issuesTitles}
+          issuesMapping={issuesMapping}
           protocolsToQuery={protocolsToQuery}
           decenDeposToSubgraphIds={decenDeposToSubgraphIds}
           indexingStatusLoaded={indexingStatusLoaded}
