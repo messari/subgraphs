@@ -1,12 +1,12 @@
 import { Box, CircularProgress, Grid, Typography } from "@mui/material";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
-import { PoolName, PoolNames } from "../../constants";
+import { dateValueKeys, PoolName, PoolNames } from "../../constants";
 import SchemaTable from "../SchemaTable";
 import IssuesDisplay from "../IssuesDisplay";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import PoolTabEntity from "./PoolTabEntity";
-import BridgeOutboundVolumeLogic from "../BridgeOutboundVolumeLogic";
+import BridgeOutboundVolumeLogic from "../../common/utilComponents/BridgeOutboundVolumeLogic";
 
 interface PoolTabProps {
   data: any;
@@ -98,24 +98,16 @@ function PoolTab({
     poolDropDown = (
       <PoolDropDown
         poolId={poolId}
-        setPoolId={(x) => setPoolId(x)}
-        setIssues={(x) => {
-          setTableIssues(x);
+        setPoolId={(x) => {
+          setTableIssues([]);
+          setPoolId(x);
         }}
         pools={poolsList[poolNames]}
       />
     );
-  } else if (poolListLoading) {
+  } else if (poolListLoading || !poolId) {
     poolDropDown = <CircularProgress sx={{ margin: 6 }} size={50} />;
-  } else if (!poolId) {
-    poolDropDown = (
-      <h3>
-        Hold on! This subgraph has alot of entities, it may take a minute for the query to return. After 2 minutes of
-        waiting, refresh the page and the results should appear promptly.
-      </h3>
-    );
   }
-
 
   // Specific chart routing
   // This logic renders components that are specific to a given schema type or version
@@ -145,12 +137,22 @@ function PoolTab({
         const tokenWeightData: any = []
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          let dateVal: number = Number(timeseriesInstance['timestamp']);
+          dateValueKeys.forEach((key: string) => {
+            let factor = 86400;
+            if (key.includes('hour')) {
+              factor = factor / 24;
+            }
+            if (!!(Number(timeseriesInstance[key]) * factor)) {
+              dateVal = (Number(timeseriesInstance[key]) * factor);
+            }
+          })
           if (timeseriesInstance.inputTokenWeights) {
             timeseriesInstance.inputTokenWeights.forEach((weight: any, idx: number) => {
               if (idx > tokenWeightData.length - 1) {
                 tokenWeightData.push([]);
               }
-              tokenWeightData[idx].push({ value: Number(weight), date: Number(timeseriesInstance.timestamp) })
+              tokenWeightData[idx].push({ value: Number(weight), date: dateVal })
             })
           }
           // For exchange protocols, calculate the baseYield
@@ -167,7 +169,7 @@ function PoolTab({
           if (!specificChartsOnEntity[entityName]['baseYield']) {
             specificChartsOnEntity[entityName]['baseYield'] = [];
           } else {
-            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: Number(timeseriesInstance.timestamp) });
+            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: dateVal });
           }
         }
         specificChartsOnEntity[entityName]['inputTokenWeights'] = tokenWeightData;
@@ -182,6 +184,16 @@ function PoolTab({
         const currentEntityData = poolTimeseriesData[entityName];
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          let dateVal: number = Number(timeseriesInstance['timestamp']);
+          dateValueKeys.forEach((key: string) => {
+            let factor = 86400;
+            if (key.includes('hour')) {
+              factor = factor / 24;
+            }
+            if (!!(Number(timeseriesInstance[key]) * factor)) {
+              dateVal = (Number(timeseriesInstance[key]) * factor);
+            }
+          })
           let value = 0;
           // For Yield Agg protocols, calculate the baseYield
           if (timeseriesInstance.totalValueLockedUSD && timeseriesInstance.dailySupplySideRevenueUSD) {
@@ -192,7 +204,7 @@ function PoolTab({
           if (!specificChartsOnEntity[entityName]['baseYield']) {
             specificChartsOnEntity[entityName]['baseYield'] = [];
           } else {
-            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: Number(timeseriesInstance.timestamp) });
+            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: dateVal });
           }
         }
       })
@@ -214,12 +226,22 @@ function PoolTab({
         })
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-          const initTableValue: any = { value: [], date: timeseriesInstance.timestamp };
+          let dateVal: number = Number(timeseriesInstance['timestamp']);
+          dateValueKeys.forEach((key: string) => {
+            let factor = 86400;
+            if (key.includes('hour')) {
+              factor = factor / 24;
+            }
+            if (!!(Number(timeseriesInstance[key]) * factor)) {
+              dateVal = (Number(timeseriesInstance[key]) * factor);
+            }
+          })
+          const initTableValue: any = { value: [], date: dateVal };
           timeseriesInstance["rates"].forEach((rateElement: any, idx: number) => {
             const rateKey = `${rateElement.type || ""}-${rateElement.side || ""}`;
             initTableValue.value.push(`[${idx}]: ${Number(rateElement.rate).toFixed(3)}%`);
             ratesSums[rateKey] += Number(rateElement.rate);
-            ratesChart[rateKey].push({ value: Number(rateElement.rate), date: timeseriesInstance.timestamp })
+            ratesChart[rateKey].push({ value: Number(rateElement.rate), date: dateVal })
           });
           tableVals.push({ value: initTableValue.value.join(', '), date: initTableValue.date });
         }
@@ -295,13 +317,8 @@ function PoolTab({
       );
     } else if (poolTimeseriesError) {
       poolDataSection = (
-        <Grid>
-          <Box my={3}>
-            <CopyLinkToClipboard link={window.location.href}>
-              <Typography variant="h4">{poolTimeseriesError?.message}</Typography>
-            </CopyLinkToClipboard>
-          </Box>
-          <CircularProgress sx={{ margin: 6 }} size={50} />
+        <Grid key={"poolTabEntityError"}>
+          <h3>Query Could not Return Successfully - {poolTimeseriesError?.message}</h3>
         </Grid>
       );
     } else {
@@ -323,7 +340,6 @@ function PoolTab({
       );
     }
   }
-
 
   return (
     <>

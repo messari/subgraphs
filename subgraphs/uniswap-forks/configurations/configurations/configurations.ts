@@ -11,7 +11,7 @@ import { SushiswapMainnetConfigurations } from "../../protocols/sushiswap/config
 import { SushiswapMaticConfigurations } from "../../protocols/sushiswap/config/deployments/sushiswap-polygon/configurations";
 import { SushiswapMoonbeamConfigurations } from "../../protocols/sushiswap/config/deployments/sushiswap-moonbeam/configurations";
 import { SushiswapMoonriverConfigurations } from "../../protocols/sushiswap/config/deployments/sushiswap-moonriver/configurations";
-import { SushiswapXdaiConfigurations } from "../../protocols/sushiswap/config/deployments/sushiswap-gnosis/configurations";
+import { SushiswapGnosisConfigurations } from "../../protocols/sushiswap/config/deployments/sushiswap-gnosis/configurations";
 import { SushiswapHarmonyConfigurations } from "../../protocols/sushiswap/config/deployments/sushiswap-harmony/configurations";
 import { SpookyswapFantomConfigurations } from "../../protocols/spookyswap/config/deployments/spookyswap-fantom/configurations";
 import { UbeswapCeloConfigurations } from "../../protocols/ubeswap/config/deployments/ubeswap-celo/configurations";
@@ -23,7 +23,7 @@ import { TrisolarisAuroraConfigurations } from "../../protocols/trisolaris/confi
 import { VSSFinanceCronosConfigurations } from "../../protocols/vvs-finance/config/deployments/vvs-finance-cronos/configurations";
 import { MMFinanceCronosConfigurations } from "../../protocols/mm-finance/config/deployments/mm-finance-cronos/configurations";
 import { MMFinanceMaticConfigurations } from "../../protocols/mm-finance/config/deployments/mm-finance-polygon/configurations";
-import { HoneyswapXdaiConfigurations } from "../../protocols/honeyswap/config/deployments/honeyswap-gnosis/configurations";
+import { HoneyswapGnosisConfigurations } from "../../protocols/honeyswap/config/deployments/honeyswap-gnosis/configurations";
 import { HoneyswapMaticConfigurations } from "../../protocols/honeyswap/config/deployments/honeyswap-polygon/configurations";
 import { PangolinAvalancheConfigurations } from "../../protocols/pangolin/config/deployments/pangolin-avalanche/configurations";
 import { BiswapBscConfigurations } from "../../protocols/biswap/config/deployments/biswap-bsc/configurations";
@@ -74,7 +74,7 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
       return new SushiswapMoonriverConfigurations();
     }
     case Deploy.SUSHISWAP_GNOSIS: {
-      return new SushiswapXdaiConfigurations();
+      return new SushiswapGnosisConfigurations();
     }
     case Deploy.SUSHISWAP_HARMONY: {
       return new SushiswapHarmonyConfigurations();
@@ -107,7 +107,7 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
       return new UbeswapCeloConfigurations();
     }
     case Deploy.HONEYSWAP_GNOSIS: {
-      return new HoneyswapXdaiConfigurations();
+      return new HoneyswapGnosisConfigurations();
     }
     case Deploy.HONEYSWAP_POLYGON: {
       return new HoneyswapMaticConfigurations();

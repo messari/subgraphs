@@ -1,5 +1,5 @@
 # Subgraph Schema: Network
-# Version: 1.1.1
+# Version: 1.1.2
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum SubgraphNetwork {
@@ -24,7 +24,7 @@ enum SubgraphNetwork {
   OPTIMISM
   OSMOSIS
   MATIC # aka Polygon
-  XDAI # aka Gnosis Chain
+  GNOSIS
 }
 
 enum DataType {

@@ -302,7 +302,7 @@ export function updateUsageMetrics(
   eventType: string,
   crosschainID: BigInt,
   block: ethereum.Block,
-  transaction: ethereum.Transaction
+  accountAddr: Address
 ): void {
   const transactionCount = INT_ONE;
   const depositCount = eventType == EventType.DEPOSIT ? INT_ONE : INT_ZERO;
@@ -375,8 +375,7 @@ export function updateUsageMetrics(
   usageMetricsHourly.blockNumber = block.number;
   usageMetricsHourly.timestamp = block.timestamp;
 
-  const from = transaction.from.toHexString();
-  const account = getOrCreateAccount(protocol, from);
+  const account = getOrCreateAccount(protocol, accountAddr.toHexString());
 
   if (account.transferInCount == INT_ZERO) {
     protocol.cumulativeUniqueTransferReceivers += transferInCount;
@@ -422,7 +421,8 @@ export function updateUsageMetrics(
     protocol.cumulativeUniqueMessageSenders;
 
   const dayId = getDaysSinceEpoch(block.timestamp.toI32());
-  const dailyActiveAccountID = from
+  const dailyActiveAccountID = accountAddr
+    .toHexString()
     .concat("-")
     .concat("daily")
     .concat("-")
@@ -439,7 +439,8 @@ export function updateUsageMetrics(
     );
 
     const inverseEventType = InverseEventType.get(eventType)!;
-    const inverseDailyActiveAccountID = from
+    const inverseDailyActiveAccountID = accountAddr
+      .toHexString()
       .concat("-")
       .concat("daily")
       .concat("-")
@@ -463,7 +464,8 @@ export function updateUsageMetrics(
   }
 
   const hourId = getHoursSinceEpoch(block.timestamp.toI32());
-  const hourlyActiveAccountID = from
+  const hourlyActiveAccountID = accountAddr
+    .toHexString()
     .concat("-")
     .concat("hourly")
     .concat("-")
@@ -480,7 +482,8 @@ export function updateUsageMetrics(
     );
 
     const inverseEventType = InverseEventType.get(eventType)!;
-    const inverseHourlyActiveAccountID = from
+    const inverseHourlyActiveAccountID = accountAddr
+      .toHexString()
       .concat("-")
       .concat("hourly")
       .concat("-")

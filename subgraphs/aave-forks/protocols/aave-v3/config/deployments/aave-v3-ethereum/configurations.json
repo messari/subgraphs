@@ -1,0 +1,18 @@
+{
+  "network": "mainnet",
+  "PoolAddressesProviderRegistry": {
+    "address": "0xbaA999AC55EAce41CcAE355c77809e68Bb345170",
+    "startBlock": 16291006
+  },
+  "RewardsController": {
+    "address": "0x8164Cc65827dcFe994AB23944CBC90e0aa80bFcb",
+    "startBlock": 16291136
+  },
+  "LendingPool": {
+    "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+    "startBlock": 16291127
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 16291006
+}

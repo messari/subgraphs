@@ -1,10 +1,11 @@
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Grid, Typography } from "@mui/material";
 import { useState } from "react";
 import { ProtocolTypeEntityName } from "../../constants";
 import SchemaTable from "../SchemaTable";
 import IssuesDisplay from "../IssuesDisplay";
 import { useEffect } from "react";
 import ProtocolTabEntity from "./ProtocolTabEntity";
+import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 
 interface ProtocolTabProps {
   entitiesData: { [x: string]: { [x: string]: string } };
@@ -51,11 +52,56 @@ function ProtocolTab({
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
   let protocolDataRender: any[] = [];
 
+  const specificCharts: any[] = [];
+  const specificChartsOnEntity: any = {};
+
   if (protocolTimeseriesData) {
-    protocolDataRender = Object.keys(protocolTimeseriesData).map((entityName: string) => {
+    protocolDataRender = Object.keys(protocolTimeseriesData).map((entityName: string, index: number) => {
       const currentEntityData = protocolTimeseriesData[entityName];
+      if (!specificChartsOnEntity[entityName]) {
+        specificChartsOnEntity[entityName] = {};
+      }
+      // Specific chart routing
+      // This logic renders components that are specific to a given schema type or version
+
       const currentOverlayEntityData = overlayProtocolTimeseriesData[entityName];
-      if (!currentEntityData) return null;
+
+      let entitySpecificElements: any = {};
+      if (specificChartsOnEntity[entityName]) {
+        entitySpecificElements = (specificChartsOnEntity[entityName]);
+      }
+
+      const prevEntityName = Object.keys(protocolTimeseriesData)[index - 1];
+
+      if (protocolTimeseriesLoading[entityName] || protocolTimeseriesLoading[prevEntityName]) {
+        return (
+          <Grid key={entityName}>
+            <Box my={3}>
+              <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
+                <Typography variant="h4" id={entityName}>
+                  {entityName}
+                </Typography>
+              </CopyLinkToClipboard>
+            </Box>
+            <CircularProgress sx={{ margin: 6 }} size={50} />
+          </Grid>
+        );
+      }
+
+      if (!currentEntityData && !protocolTimeseriesError[entityName] && protocolTimeseriesError[prevEntityName]) {
+        return (
+          <Grid key={entityName}>
+            <Box my={3}>
+              <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
+                <Typography variant="h4" id={entityName}>
+                  {entityName}
+                </Typography>
+              </CopyLinkToClipboard>
+            </Box>
+            <h3>{entityName} timeseries query could not trigger</h3>
+          </Grid>
+        );
+      }
 
       return (
         <ProtocolTabEntity
@@ -65,6 +111,7 @@ function ProtocolTab({
           subgraphEndpoints={subgraphEndpoints}
           currentEntityData={currentEntityData}
           overlaySchemaData={overlaySchemaData}
+          entitySpecificElements={entitySpecificElements}
           protocolSchemaData={protocolSchemaData}
           currentOverlayEntityData={currentOverlayEntityData}
           currentTimeseriesLoading={protocolTimeseriesLoading[entityName]}
@@ -119,6 +166,7 @@ function ProtocolTab({
         setIssues={(x) => setTableIssues(x)}
       />
       {protocolDataRender}
+      {specificCharts}
     </>
   );
 }
