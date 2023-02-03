@@ -1,37 +1,47 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { CustomPriceType, OracleContract } from "../common/types";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/UniswapV2Factory/CalculationsSushiSwap";
 
 export function getSushiSwapContract(
-  contractAddress: Address
+  contract: OracleContract,
+  block: ethereum.Block
 ): CalculationsSushiContract | null {
-  if (utils.isNullAddress(contractAddress)) return null;
+  if (
+    contract.startBlock.lt(block.number) ||
+    utils.isNullAddress(contract.address)
+  )
+    return null;
 
-  return CalculationsSushiContract.bind(contractAddress);
+  return CalculationsSushiContract.bind(contract.address);
 }
 
-export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
+export function getTokenPriceUSDC(
+  tokenAddr: Address,
+  block: ethereum.Block
+): CustomPriceType {
   const config = utils.getConfig();
 
   if (!config || config.sushiCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
-  const sushiContract = getSushiSwapContract(config.sushiCalculations());
-  if (!sushiContract) {
-    return new CustomPriceType();
-  }
+  const calculationSushiContract = getSushiSwapContract(
+    config.sushiCalculations(),
+    block
+  );
+  if (!calculationSushiContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
-      sushiContract.try_getPriceUsdc(tokenAddr),
+      calculationSushiContract.try_getPriceUsdc(tokenAddr),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS
+    constants.DEFAULT_USDC_DECIMALS,
+    "CalculationsSushiswap"
   );
 }
