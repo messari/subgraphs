@@ -21,7 +21,7 @@ dataSources:
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Transfer
@@ -78,12 +78,18 @@ dataSources:
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
         - name: L1_Bridge
           file: ./abis/L1_Bridge.json
+        - name: L1_Optimism_Messenger
+          file: ./abis/L1_Optimism_Messenger.json
+        - name: L1_Polygon_Messenger
+          file: ./abis/L1_Polygon_Messenger.json
+        - name: L1_Xdai_Messenger
+          file: ./abis/L1_Xdai_Messenger.json
         # ERC20
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
@@ -140,7 +146,7 @@ dataSources:
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Transfer
@@ -197,7 +203,7 @@ dataSources:
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -259,12 +265,16 @@ dataSources:
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
         - name: L2_Bridge
           file: ./abis/L2_Bridge.json
+        - name: L2_Optimism_Messenger
+          file: ./abis/L2_Optimism_Messenger.json
+        - name: L2_Xdai_Messenger
+          file: ./abis/L2_Xdai_Messenger.json
         # ERC20
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
@@ -305,8 +315,12 @@ dataSources:
           handler: handleBonderAdded
         - event: TransferSent(indexed bytes32,indexed uint256,indexed address,uint256,bytes32,uint256,uint256,uint256,uint256)
           handler: handleTransferSent
+          receipt: true
         - event: TransferFromL1Completed(indexed address,uint256,uint256,uint256,indexed address,uint256)
           handler: handleTransferFromL1Completed
+          receipt: true
       file: ./protocols/hop-protocol/src/L2/bridge.ts
 {{/bridges}}
 {{/isMainnet}}
+
+

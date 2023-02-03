@@ -53,12 +53,7 @@ class TokenInit implements TokenInitializer {
 const conf = new BridgeConfig(
 	'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547',
 	'HOP-'
-		.concat(
-			dataSource
-				.network()
-				.toUpperCase()
-				.replace('-', '_')
-		)
+		.concat(dataSource.network().toUpperCase().replace('-', '_'))
 		.concat('-BRIDGE'),
 	'hop-'.concat(dataSource.network().replace('-', '_')).concat('-bridge'),
 	BridgePermissionType.PERMISSIONLESS,
@@ -67,26 +62,43 @@ const conf = new BridgeConfig(
 
 export function handleTransfer(event: Transfer): void {
 	if (NetworkConfigs.getTokenList().includes(event.address.toHexString())) {
-		const bridgeAddress = NetworkConfigs.getTokenDetails(
-			event.address.toHexString()
-		)[3]
-		if (event.params.from.toHexString() != bridgeAddress) {
+		if (
+			!NetworkConfigs.getBridgeList().includes(event.params.from.toHexString())
+		) {
 			return
 		}
-		const poolAddress = NetworkConfigs.getPoolAddressFromTokenAddress(
-			event.address.toHexString()
-		)
-		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
-
 		log.warning(
-			'TransferIN - bridgeAddress: {}, TokenAddress: {}, fromAddress: {}, toAddress: {}',
+			'TransferIN 1 - TokenAddress: {}, fromAddress: {}, toAddress: {}',
 			[
-				bridgeAddress,
 				event.address.toHexString(),
 				event.params.from.toHexString(),
 				event.params.to.toHexString(),
 			]
 		)
+
+		const tokenDetails = NetworkConfigs.getTokenDetails(
+			event.address.toHexString()
+		)
+
+		log.warning(
+			'TransferIN 2 - bridgeAddress: {}, TokenAddress: {}, fromAddress: {}, toAddress: {}',
+			[
+				tokenDetails[3],
+				event.address.toHexString(),
+				event.params.from.toHexString(),
+				event.params.to.toHexString(),
+			]
+		)
+		const poolAddress = NetworkConfigs.getPoolAddressFromTokenAddress(
+			event.address.toHexString()
+		)
+		log.warning('TransferIN 3 - poolAddress: {}', [poolAddress])
+		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
+
+		log.warning('TransferIN 4 - poolDetails 1: {}, poolDetails 2: {}', [
+			poolConfig[0],
+			poolConfig[1],
+		])
 		const poolName = poolConfig[0]
 		const poolSymbol = poolConfig[1]
 
@@ -98,28 +110,23 @@ export function handleTransfer(event: Transfer): void {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
-		if (event.params.from.toHexString() == bridgeAddress) {
-			let acc = sdk.Accounts.loadAccount(event.params.to)
-			const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-				reverseChainIDs.get(
-					dataSource
-						.network()
-						.toUpperCase()
-						.replace('-', '_')
-				)!,
-				event.address,
-				CrosschainTokenType.CANONICAL,
-				event.address
-			)
+		let acc = sdk.Accounts.loadAccount(event.params.to)
+		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
+			reverseChainIDs.get(
+				dataSource.network().toUpperCase().replace('-', '_')
+			)!,
+			event.address,
+			CrosschainTokenType.CANONICAL,
+			event.address
+		)
 
-			acc.transferIn(
-				pool,
-				pool.getDestinationTokenRoute(crossToken)!,
-				event.transaction.from,
-				event.params.value,
-				event.transaction.hash
-			)
-		}
+		acc.transferIn(
+			pool,
+			pool.getDestinationTokenRoute(crossToken)!,
+			event.transaction.from,
+			event.params.value,
+			event.transaction.hash
+		)
 		log.warning('TransferIN - TokenAddress: {},  txHash: {},', [
 			event.address.toHexString(),
 			event.transaction.hash.toHexString(),

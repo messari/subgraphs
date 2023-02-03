@@ -28,10 +28,8 @@ import {
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
-import {
-	BIGINT_TEN_TO_EIGHTEENTH,
-	USDC_DENOMINATOR_BI,
-} from '../../../../src/sdk/util/constants'
+import { BIGINT_TEN_TO_EIGHTEENTH } from '../../../../src/sdk/util/constants'
+import { priceTokens } from '../../config/constants/constant'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -48,26 +46,13 @@ class Pricer implements TokenPricer {
 const conf = new BridgeConfig(
 	'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547',
 	'HOP-'
-		.concat(
-			dataSource
-				.network()
-				.toUpperCase()
-				.replace('-', '_')
-		)
+		.concat(dataSource.network().toUpperCase().replace('-', '_'))
 		.concat('-BRIDGE'),
 	'hop-'.concat(dataSource.network().replace('-', '_')).concat('-bridge'),
 	BridgePermissionType.PERMISSIONLESS,
 	Versions
 )
 
-const genesisHashesDecimal6 = [
-	'0x1aaddc57d3e9f4157728536f368c5d69a6be268e2258593efa592938395410a1', //USDT
-	'0x03a61cb0acb761bee98a0a42718ab606f875d49d1bb694755e5d70cb9890d478', //USDC
-]
-const genesisHashesDecimal18 = [
-	'0x9dab44e187e3bbbdfea0ca8cddea8ba78eb6f4d94a0725bc3c76ab5187d266e2', //ETH
-	'0x0de91b478c4724233e3d83ae4f5ed4ecbf4b301b48dbc1ade42e0c6f6b66fc6b', //DAI
-]
 class TokenInit implements TokenInitializer {
 	getTokenParams(address: Address): TokenParams {
 		const tokenConfig = NetworkConfigs.getTokenDetails(address.toHex())
@@ -137,34 +122,6 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
-		if (
-			genesisHashesDecimal6.includes(
-				event.transaction.hash.toHexString().toLowerCase()
-			)
-		) {
-			pool.setInputTokenBalance(
-				event.params.lpTokenSupply.div(USDC_DENOMINATOR_BI)
-			)
-		}
-		if (
-			genesisHashesDecimal18.includes(
-				event.transaction.hash.toHexString().toLowerCase()
-			)
-		) {
-			pool.setInputTokenBalance(
-				event.params.lpTokenSupply.div(BIGINT_TEN_TO_EIGHTEENTH)
-			)
-		}
-
-		let val = L2_Amm.bind(event.address)
-
-		let call = val.try_getVirtualPrice()
-		let price: BigInt
-		if (!call.reverted) {
-			price = call.value
-		} else {
-			log.warning('Contract call reverted', [])
-		}
 		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 		pool.addRevenueNative(BigInt.zero(), event.params.fees[0])
 		acc.liquidityDeposit(pool, liquidity, false)
@@ -173,19 +130,37 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 			event.params.lpTokenSupply.div(BIGINT_TEN_TO_EIGHTEENTH),
 			false
 		)
-		pool.setTotalValueLocked(
-			bigIntToBigDecimal(
-				event.params.lpTokenSupply.times(price).div(BIGINT_TEN_TO_EIGHTEENTH)
-			)
-		)
+
+		const Amm = L2_Amm.bind(event.address)
+		const virtualPriceCall = Amm.try_getVirtualPrice()
+		if (!virtualPriceCall.reverted) {
+			const price = virtualPriceCall.value
+			if (priceTokens.includes(inputToken)) {
+				const tokenPrice = sdk.Pricer.getTokenPrice(token)
+				const lpAmount = event.params.lpTokenSupply
+					.times(price)
+					.div(BIGINT_TEN_TO_EIGHTEENTH)
+
+				pool.setTotalValueLocked(tokenPrice.times(bigIntToBigDecimal(lpAmount)))
+			} else {
+				pool.setTotalValueLocked(
+					bigIntToBigDecimal(
+						event.params.lpTokenSupply
+							.times(price)
+							.div(BIGINT_TEN_TO_EIGHTEENTH)
+					)
+				)
+			}
+		} else {
+			log.warning('Contract call reverted', [])
+		}
 
 		log.warning(
-			`LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  tvl: {},  feeUsd: {}`,
+			`LA ${token.id.toHexString()} - lpTokenSupply: {}, amount: {}, hash: {},  feeUsd: {}`,
 			[
 				bigIntToBigDecimal(event.params.lpTokenSupply).toString(),
 				bigIntToBigDecimal(liquidity, 6).toString(),
 				event.transaction.hash.toHexString(),
-				event.params.lpTokenSupply.div(USDC_DENOMINATOR_BI).toString(),
 				bigIntToBigDecimal(event.params.fees[0], 6).toString(),
 			]
 		)
@@ -207,16 +182,6 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 			event.address.toHexString()
 		)
 
-		let val = L2_Amm.bind(event.address)
-
-		let call = val.try_getVirtualPrice()
-		let price: BigInt
-		if (!call.reverted) {
-			price = call.value
-		} else {
-			log.warning('Contract call reverted', [])
-		}
-
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
 
@@ -230,17 +195,36 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
+		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 		acc.liquidityWithdraw(pool, liquidity, false)
+
 		pool.setInputTokenBalance(
 			event.params.lpTokenSupply.div(BIGINT_TEN_TO_EIGHTEENTH),
 			false
 		)
-		pool.setTotalValueLocked(
-			bigIntToBigDecimal(
-				event.params.lpTokenSupply.times(price).div(BIGINT_TEN_TO_EIGHTEENTH)
-			)
-		)
-		pool.setOutputTokenSupply(event.params.lpTokenSupply)
+		const Amm = L2_Amm.bind(event.address)
+		const virtualPriceCall = Amm.try_getVirtualPrice()
+		if (!virtualPriceCall.reverted) {
+			const price = virtualPriceCall.value
+			if (priceTokens.includes(inputToken)) {
+				const tokenPrice = sdk.Pricer.getTokenPrice(token)
+				const lpAmount = event.params.lpTokenSupply
+					.times(price)
+					.div(BIGINT_TEN_TO_EIGHTEENTH)
+
+				pool.setTotalValueLocked(tokenPrice.times(bigIntToBigDecimal(lpAmount)))
+			} else {
+				pool.setTotalValueLocked(
+					bigIntToBigDecimal(
+						event.params.lpTokenSupply
+							.times(price)
+							.div(BIGINT_TEN_TO_EIGHTEENTH)
+					)
+				)
+			}
+		} else {
+			log.warning('Contract call reverted', [])
+		}
 
 		log.warning(
 			'LWITH lpTokenSupply: {}, amount6-0: {}, amount18-0: {}, amount6-1: {}, amount18-1: {}, hash: {}',
@@ -268,16 +252,6 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 			return
 		}
 
-		let val = L2_Amm.bind(event.address)
-
-		let call = val.try_getVirtualPrice()
-		let price: BigInt
-		if (!call.reverted) {
-			price = call.value
-		} else {
-			log.warning('Contract call reverted', [])
-		}
-
 		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
 			event.address.toHexString()
 		)
@@ -299,26 +273,40 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 		}
 
 		acc.liquidityWithdraw(pool, event.params.lpTokenAmount, false)
+		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 		pool.setInputTokenBalance(
 			event.params.lpTokenSupply.div(BIGINT_TEN_TO_EIGHTEENTH),
 			false
 		)
-		pool.setTotalValueLocked(
-			bigIntToBigDecimal(
-				event.params.lpTokenSupply.times(price).div(BIGINT_TEN_TO_EIGHTEENTH)
-			)
-		)
-		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 
-		log.warning(
-			'LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}, virtualPrice: {}, tvl: {}',
-			[
-				event.params.lpTokenSupply.toString(),
-				bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
-				event.transaction.hash.toHexString(),
-				price.toString(),
-				bigIntToBigDecimal(event.params.lpTokenSupply.times(price)).toString(),
-			]
-		)
+		const Amm = L2_Amm.bind(event.address)
+		const virtualPriceCall = Amm.try_getVirtualPrice()
+		if (!virtualPriceCall.reverted) {
+			const price = virtualPriceCall.value
+			if (priceTokens.includes(inputToken)) {
+				const tokenPrice = sdk.Pricer.getTokenPrice(token)
+				const lpAmount = event.params.lpTokenSupply
+					.times(price)
+					.div(BIGINT_TEN_TO_EIGHTEENTH)
+
+				pool.setTotalValueLocked(tokenPrice.times(bigIntToBigDecimal(lpAmount)))
+			} else {
+				pool.setTotalValueLocked(
+					bigIntToBigDecimal(
+						event.params.lpTokenSupply
+							.times(price)
+							.div(BIGINT_TEN_TO_EIGHTEENTH)
+					)
+				)
+			}
+		} else {
+			log.warning('Contract call reverted', [])
+		}
+
+		log.warning('LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}', [
+			event.params.lpTokenSupply.toString(),
+			bigIntToBigDecimal(event.params.lpTokenAmount).toString(),
+			event.transaction.hash.toHexString(),
+		])
 	}
 }

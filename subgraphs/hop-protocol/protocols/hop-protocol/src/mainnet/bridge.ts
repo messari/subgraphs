@@ -24,6 +24,8 @@ import {
 	BonderAdded,
 	WithdrawalBonded,
 } from '../../../../generated/HopL1Bridge/L1_Bridge'
+
+import { AffirmationCompleted } from '../../../../generated/HopXdaiL2Messenger/L2_Messenger'
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
@@ -163,3 +165,10 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 // 		event.transaction.hash.toHexString(),
 // 	])
 // }
+
+export function handleAffirmationCompleted(event: AffirmationCompleted): void {
+	log.warning('WB --> transferId: {}, txHash: {}, d1: {}', [
+		event.params.messageId.toHexString(),
+		event.transaction.hash.toHexString(),
+	])
+}

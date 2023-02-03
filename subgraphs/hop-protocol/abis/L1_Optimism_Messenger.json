@@ -1,114 +1,16 @@
 [
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "dataLength", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxDataLength", "type": "uint256" }
-    ],
-    "name": "DataTooLarge",
-    "type": "error"
-  },
-  { "inputs": [], "name": "GasLimitTooLarge", "type": "error" },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "expected", "type": "uint256" },
-      { "internalType": "uint256", "name": "actual", "type": "uint256" }
-    ],
-    "name": "InsufficientSubmissionCost",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "expected", "type": "uint256" },
-      { "internalType": "uint256", "name": "actual", "type": "uint256" }
-    ],
-    "name": "InsufficientValue",
-    "type": "error"
-  },
-  { "inputs": [], "name": "L1Forked", "type": "error" },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "origin", "type": "address" }
-    ],
-    "name": "NotAllowedOrigin",
-    "type": "error"
-  },
-  { "inputs": [], "name": "NotForked", "type": "error" },
-  { "inputs": [], "name": "NotOrigin", "type": "error" },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "sender", "type": "address" },
-      { "internalType": "address", "name": "owner", "type": "address" }
-    ],
-    "name": "NotOwner",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "sender", "type": "address" },
-      { "internalType": "address", "name": "rollup", "type": "address" },
-      { "internalType": "address", "name": "owner", "type": "address" }
-    ],
-    "name": "NotRollupOrOwner",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "from", "type": "address" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "l2CallValue", "type": "uint256" },
-      { "internalType": "uint256", "name": "deposit", "type": "uint256" },
-      {
-        "internalType": "uint256",
-        "name": "maxSubmissionCost",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "excessFeeRefundAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "callValueRefundAddress",
-        "type": "address"
-      },
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
-    ],
-    "name": "RetryableData",
-    "type": "error"
-  },
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
   {
     "anonymous": false,
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "val",
-        "type": "bool"
+        "internalType": "bytes32",
+        "name": "msgHash",
+        "type": "bytes32"
       }
     ],
-    "name": "AllowListAddressSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "isEnabled",
-        "type": "bool"
-      }
-    ],
-    "name": "AllowListEnabledUpdated",
+    "name": "FailedRelayedMessage",
     "type": "event"
   },
   {
@@ -116,18 +18,12 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "messageNum",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes",
-        "name": "data",
-        "type": "bytes"
+        "internalType": "bytes32",
+        "name": "_xDomainCalldataHash",
+        "type": "bytes32"
       }
     ],
-    "name": "InboxMessageDelivered",
+    "name": "MessageAllowed",
     "type": "event"
   },
   {
@@ -135,12 +31,31 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "messageNum",
-        "type": "uint256"
+        "internalType": "bytes32",
+        "name": "_xDomainCalldataHash",
+        "type": "bytes32"
       }
     ],
-    "name": "InboxMessageDeliveredFromOrigin",
+    "name": "MessageBlocked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
     "type": "event"
   },
   {
@@ -160,6 +75,56 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "msgHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "RelayedMessage",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "message",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "messageNonce",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "gasLimit",
+        "type": "uint256"
+      }
+    ],
+    "name": "SentMessage",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": false,
         "internalType": "address",
         "name": "account",
@@ -170,111 +135,43 @@
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "allowListEnabled",
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_xDomainCalldataHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "allowMessage",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "_xDomainCalldataHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "blockMessage",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "blockedMessages",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "bridge",
-    "outputs": [
-      { "internalType": "contract IBridge", "name": "", "type": "address" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "dataLength", "type": "uint256" },
-      { "internalType": "uint256", "name": "baseFee", "type": "uint256" }
-    ],
-    "name": "calculateRetryableSubmissionFee",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "l2CallValue", "type": "uint256" },
-      {
-        "internalType": "uint256",
-        "name": "maxSubmissionCost",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "excessFeeRefundAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "callValueRefundAddress",
-        "type": "address"
-      },
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
-    ],
-    "name": "createRetryableTicket",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "l2CallValue", "type": "uint256" },
-      {
-        "internalType": "uint256",
-        "name": "maxSubmissionCost",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "excessFeeRefundAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "callValueRefundAddress",
-        "type": "address"
-      },
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
-    ],
-    "name": "createRetryableTicketNoRefundAliasRewrite",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "name": "depositEth",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "depositEth",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
-        "internalType": "contract IBridge",
-        "name": "_bridge",
-        "type": "address"
-      },
-      {
-        "internalType": "contract ISequencerInbox",
-        "name": "_sequencerInbox",
+        "internalType": "address",
+        "name": "_libAddressManager",
         "type": "address"
       }
     ],
@@ -284,9 +181,22 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "isAllowed",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "inputs": [],
+    "name": "libAddressManager",
+    "outputs": [
+      {
+        "internalType": "contract Lib_AddressManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -306,216 +216,142 @@
   },
   {
     "inputs": [
-      { "internalType": "contract IBridge", "name": "", "type": "address" }
+      { "internalType": "address", "name": "_target", "type": "address" },
+      { "internalType": "address", "name": "_sender", "type": "address" },
+      { "internalType": "bytes", "name": "_message", "type": "bytes" },
+      { "internalType": "uint256", "name": "_messageNonce", "type": "uint256" },
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "stateRoot", "type": "bytes32" },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "batchIndex",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "batchRoot",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "batchSize",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "prevTotalElements",
+                "type": "uint256"
+              },
+              { "internalType": "bytes", "name": "extraData", "type": "bytes" }
+            ],
+            "internalType": "struct Lib_OVMCodec.ChainBatchHeader",
+            "name": "stateRootBatchHeader",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              { "internalType": "uint256", "name": "index", "type": "uint256" },
+              {
+                "internalType": "bytes32[]",
+                "name": "siblings",
+                "type": "bytes32[]"
+              }
+            ],
+            "internalType": "struct Lib_OVMCodec.ChainInclusionProof",
+            "name": "stateRootProof",
+            "type": "tuple"
+          },
+          {
+            "internalType": "bytes",
+            "name": "stateTrieWitness",
+            "type": "bytes"
+          },
+          {
+            "internalType": "bytes",
+            "name": "storageTrieWitness",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct IL1CrossDomainMessenger.L2MessageInclusionProof",
+        "name": "_proof",
+        "type": "tuple"
+      }
     ],
-    "name": "postUpgradeInit",
+    "name": "relayMessage",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "relayedMessages",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "value", "type": "uint256" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
+      { "internalType": "address", "name": "_target", "type": "address" },
+      { "internalType": "address", "name": "_sender", "type": "address" },
+      { "internalType": "bytes", "name": "_message", "type": "bytes" },
+      { "internalType": "uint256", "name": "_queueIndex", "type": "uint256" },
+      { "internalType": "uint32", "name": "_oldGasLimit", "type": "uint32" },
+      { "internalType": "uint32", "name": "_newGasLimit", "type": "uint32" }
     ],
-    "name": "sendContractTransaction",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "replayMessage",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
-    ],
-    "name": "sendL1FundedContractTransaction",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "uint256", "name": "nonce", "type": "uint256" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
-    ],
-    "name": "sendL1FundedUnsignedTransaction",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "uint256", "name": "nonce", "type": "uint256" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
-    ],
-    "name": "sendL1FundedUnsignedTransactionToFork",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "bytes", "name": "messageData", "type": "bytes" }
-    ],
-    "name": "sendL2Message",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "bytes", "name": "messageData", "type": "bytes" }
-    ],
-    "name": "sendL2MessageFromOrigin",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "uint256", "name": "nonce", "type": "uint256" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "value", "type": "uint256" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
-    ],
-    "name": "sendUnsignedTransaction",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "uint256", "name": "nonce", "type": "uint256" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "value", "type": "uint256" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
-    ],
-    "name": "sendUnsignedTransactionToFork",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "uint256", "name": "nonce", "type": "uint256" },
-      { "internalType": "uint256", "name": "value", "type": "uint256" },
-      { "internalType": "address", "name": "withdrawTo", "type": "address" }
-    ],
-    "name": "sendWithdrawEthToFork",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "sequencerInbox",
-    "outputs": [
-      {
-        "internalType": "contract ISequencerInbox",
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "inputs": [{ "internalType": "string", "name": "_name", "type": "string" }],
+    "name": "resolve",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address[]", "name": "user", "type": "address[]" },
-      { "internalType": "bool[]", "name": "val", "type": "bool[]" }
+      { "internalType": "address", "name": "_target", "type": "address" },
+      { "internalType": "bytes", "name": "_message", "type": "bytes" },
+      { "internalType": "uint32", "name": "_gasLimit", "type": "uint32" }
     ],
-    "name": "setAllowList",
+    "name": "sendMessage",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "bool", "name": "_allowListEnabled", "type": "bool" }
-    ],
-    "name": "setAllowListEnabled",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "successfulMessages",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "l2CallValue", "type": "uint256" },
-      {
-        "internalType": "uint256",
-        "name": "maxSubmissionCost",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "excessFeeRefundAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "callValueRefundAddress",
-        "type": "address"
-      },
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
+      { "internalType": "address", "name": "newOwner", "type": "address" }
     ],
-    "name": "uniswapCreateRetryableTicket",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "payable",
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "unpause",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "l2CallValue", "type": "uint256" },
-      {
-        "internalType": "uint256",
-        "name": "maxSubmissionCost",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "excessFeeRefundAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "callValueRefundAddress",
-        "type": "address"
-      },
-      { "internalType": "uint256", "name": "gasLimit", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxFeePerGas", "type": "uint256" },
-      { "internalType": "bytes", "name": "data", "type": "bytes" }
-    ],
-    "name": "unsafeCreateRetryableTicket",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "payable",
+    "name": "xDomainMessageSender",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

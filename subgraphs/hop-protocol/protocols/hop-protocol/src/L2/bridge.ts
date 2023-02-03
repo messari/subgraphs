@@ -17,7 +17,9 @@ import {
 	Address,
 	BigDecimal,
 	BigInt,
+	Bytes,
 	dataSource,
+	ethereum,
 	log,
 } from '@graphprotocol/graph-ts'
 import {
@@ -28,6 +30,11 @@ import {
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
+import {
+	MESSENGER_ADDRESSES,
+	MESSENGER_EVENT_SIGNATURES,
+} from '../../config/constants/constant'
+import { Network } from '../../../../src/sdk/util/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -53,12 +60,7 @@ class TokenInit implements TokenInitializer {
 const conf = new BridgeConfig(
 	'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547',
 	'HOP-'
-		.concat(
-			dataSource
-				.network()
-				.toUpperCase()
-				.replace('-', '_')
-		)
+		.concat(dataSource.network().toUpperCase().replace('-', '_'))
 		.concat('-BRIDGE'),
 	'hop-'.concat(dataSource.network().replace('-', '_')).concat('-bridge'),
 	BridgePermissionType.PERMISSIONLESS,
@@ -67,9 +69,6 @@ const conf = new BridgeConfig(
 
 export function handleBonderAdded(event: BonderAdded): void {
 	if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
-		const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
-			event.address.toHexString()
-		)
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 		sdk.Accounts.loadAccount(event.params.newBonder)
 	}
@@ -116,10 +115,7 @@ export function handleTransferFromL1Completed(
 
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
 			reverseChainIDs.get(
-				dataSource
-					.network()
-					.toUpperCase()
-					.replace('-', '_')
+				dataSource.network().toUpperCase().replace('-', '_')
 			)!,
 			Address.fromString(
 				NetworkConfigs.getMainnetCrossTokenFromTokenAddress(inputToken)
@@ -136,12 +132,58 @@ export function handleTransferFromL1Completed(
 			event.params.amount,
 			event.transaction.hash
 		)
+		//MESSAGES
+		let receipt = event.receipt
 
-		log.warning('TransferIN - TokenAddress: {},  txHash: {}', [
-			event.address.toHexString(),
-			event.transaction.hash.toHexString(),
-		])
+		if (receipt) {
+			for (let index = 0; index < receipt.logs.length; index++) {
+				const _topic0 = receipt.logs[index].topics[0].toHexString()
+				const _optimismData = receipt.logs[index].topics[1]
+				const _address = receipt.logs[index].address
+				const _data = receipt.logs[index].data
+
+				const data = Bytes.fromUint8Array(_data.subarray(0))
+
+				if (!MESSENGER_EVENT_SIGNATURES.includes(_topic0)) continue
+
+				log.warning(
+					'MessageINDT - emittingContractaddress: {}, topic0: {}, logAddress: {}, data: {}',
+					[
+						event.address.toHexString(),
+						_topic0,
+						_address.toHexString(),
+						data.toHexString(),
+					]
+				)
+				if (
+					_topic0 ==
+					'0x4641df4a962071e12719d8c8c8e5ac7fc4d97b927346a3d7a335b1f7517e133c'
+				) {
+					acc.messageIn(
+						reverseChainIDs.get(Network.MAINNET)!,
+						event.params.recipient,
+						_optimismData
+					)
+				} else {
+					acc.messageIn(
+						reverseChainIDs.get(Network.MAINNET)!,
+						event.params.recipient,
+						data
+					)
+				}
+
+				log.warning('MessageIN - TokenAddress: {}, data: {}', [
+					event.address.toHexString(),
+					data.toHexString(),
+				])
+			}
+		}
 	}
+
+	log.warning('TransferIN - TokenAddress: {},  txHash: {}', [
+		event.address.toHexString(),
+		event.transaction.hash.toHexString(),
+	])
 }
 
 export function handleTransferSent(event: TransferSent): void {
@@ -188,9 +230,44 @@ export function handleTransferSent(event: TransferSent): void {
 		)
 		pool.addRevenueNative(BigInt.zero(), event.params.bonderFee)
 
-		log.warning('TransferOUT - TokenAddress: {},  txHash: {},', [
-			event.address.toHexString(),
-			event.transaction.hash.toHexString(),
-		])
+		//MESSAGES
+		let receipt = event.receipt
+
+		if (receipt) {
+			for (let index = 0; index < receipt.logs.length; index++) {
+				const _topic0 = receipt.logs[index].topics[0].toHexString()
+				const _address = receipt.logs[index].address
+				const _data = receipt.logs[index].data
+				const _optimismData = receipt.logs[index].topics[1]
+
+				if (!MESSENGER_EVENT_SIGNATURES.includes(_topic0)) continue
+
+				const data = Bytes.fromUint8Array(_data.subarray(0))
+
+				log.warning(
+					'MessageOUTDT - emittingContractaddress: {}, topic0: {},  logAddress: {}, data: {}',
+					[
+						event.address.toHexString(),
+						_topic0,
+						_address.toHexString(),
+						data.toHexString(),
+					]
+				)
+
+				if (MESSENGER_EVENT_SIGNATURES.includes(_topic0)) {
+					acc.messageOut(event.params.chainId, event.params.recipient, data)
+				}
+
+				log.warning('MessageOUTDT2 - TokenAddress: {},  data: {}', [
+					event.address.toHexString(),
+					data.toHexString(),
+				])
+			}
+		}
 	}
+
+	log.warning('TransferOUT - TokenAddress: {},  txHash: {},', [
+		event.address.toHexString(),
+		event.transaction.hash.toHexString(),
+	])
 }

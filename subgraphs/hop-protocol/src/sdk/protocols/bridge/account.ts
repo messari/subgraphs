@@ -14,6 +14,7 @@ import { Bridge } from './protocol'
 import { TokenManager } from './tokens'
 import { BridgePoolType, TransactionType, TransferType } from './enums'
 import { getUnixDays, getUnixHours } from '../../util/events'
+import { BIGDECIMAL_ONE, BIGINT_ONE } from '../../util/constants'
 
 export class AccountManager {
 	protocol: Bridge
@@ -362,6 +363,8 @@ export class Account {
 		if (this.account.depositCount == 0 && this.account.withdrawCount == 0) {
 			this.protocol.addLiquidityProvider()
 		}
+		this.protocol.addTransaction(TransactionType.LIQUIDITY_DEPOSIT)
+
 		this.trackActivity(ActivityType.LIQUIDITY_PROVISIONING)
 		this.account.depositCount += 1
 		this.account.save()
@@ -375,6 +378,8 @@ export class Account {
 		if (this.account.depositCount == 0 && this.account.withdrawCount == 0) {
 			this.protocol.addLiquidityProvider()
 		}
+		this.protocol.addTransaction(TransactionType.LIQUIDITY_WITHDRAW)
+
 		this.trackActivity(ActivityType.LIQUIDITY_PROVISIONING)
 		this.account.withdrawCount += 1
 		this.account.save()
@@ -454,8 +459,11 @@ export class Account {
 		isOutgoing: boolean,
 		data: Bytes
 	): BridgeMessage {
-		const id = idFromEvent(this.event)
-		const message = new BridgeMessage(id)
+		const message = new BridgeMessage(
+			this.event.transaction.hash.concatI32(
+				this.event.logIndex.plus(BIGINT_ONE).toI32()
+			)
+		)
 		message.hash = this.event.transaction.hash
 		message.logIndex = this.event.logIndex.toI32()
 		message.blockNumber = this.event.block.number
@@ -475,12 +483,10 @@ export class Account {
 	}
 
 	countMessageIn(): void {
-		/*
-    // enable this if it is necessary to track message receivers
-    if (this.account.messageReceivedCount == 0) {
-      this.protocol.addMessageReceiver();
-    }
-    */
+		// enable this if it is necessary to track message receivers
+		// if (this.account.messageReceivedCount == 0) {
+		// 	this.protocol.addMessageReceiver()
+		// }
 		this.trackActivity(ActivityType.MESSAGE)
 		this.account.messageReceivedCount += 1
 		this.account.save()

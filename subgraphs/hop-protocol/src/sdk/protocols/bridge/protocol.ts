@@ -68,10 +68,7 @@ export class Bridge {
 		protocol = new BridgeProtocolSchema(id)
 		protocol.name = conf.getName()
 		protocol.slug = conf.getSlug()
-		protocol.network = dataSource
-			.network()
-			.toUpperCase()
-			.replace('-', '_')
+		protocol.network = dataSource.network().toUpperCase().replace('-', '_')
 		protocol.type = constants.ProtocolType.BRIDGE
 		protocol.permissionType = conf.getPermissionType()
 		protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO
@@ -192,9 +189,8 @@ export class Bridge {
 	 * @param tvl {BigDecimal} The value to add to the protocol's TVL.
 	 */
 	addTotalValueLocked(tvl: BigDecimal): void {
-		this.protocol.totalValueLockedUSD = this.protocol.totalValueLockedUSD.plus(
-			tvl
-		)
+		this.protocol.totalValueLockedUSD =
+			this.protocol.totalValueLockedUSD.plus(tvl)
 		this.save()
 	}
 
@@ -205,12 +201,10 @@ export class Bridge {
 	 * @param rev {BigDecimal} The value to add to the protocol's supplySideRevenue.
 	 */
 	addSupplySideRevenueUSD(rev: BigDecimal): void {
-		this.protocol.cumulativeTotalRevenueUSD = this.protocol.cumulativeTotalRevenueUSD.plus(
-			rev
-		)
-		this.protocol.cumulativeSupplySideRevenueUSD = this.protocol.cumulativeSupplySideRevenueUSD.plus(
-			rev
-		)
+		this.protocol.cumulativeTotalRevenueUSD =
+			this.protocol.cumulativeTotalRevenueUSD.plus(rev)
+		this.protocol.cumulativeSupplySideRevenueUSD =
+			this.protocol.cumulativeSupplySideRevenueUSD.plus(rev)
 		this.save()
 	}
 
@@ -221,12 +215,10 @@ export class Bridge {
 	 * @param rev {BigDecimal} The value to add to the protocol's protocolSideRevenue.
 	 */
 	addProtocolSideRevenueUSD(rev: BigDecimal): void {
-		this.protocol.cumulativeTotalRevenueUSD = this.protocol.cumulativeTotalRevenueUSD.plus(
-			rev
-		)
-		this.protocol.cumulativeProtocolSideRevenueUSD = this.protocol.cumulativeProtocolSideRevenueUSD.plus(
-			rev
-		)
+		this.protocol.cumulativeTotalRevenueUSD =
+			this.protocol.cumulativeTotalRevenueUSD.plus(rev)
+		this.protocol.cumulativeProtocolSideRevenueUSD =
+			this.protocol.cumulativeProtocolSideRevenueUSD.plus(rev)
 		this.save()
 	}
 
@@ -249,9 +241,8 @@ export class Bridge {
 	 * @param vol {BigDecimal} The value to add to the protocol's cumulativeVolumeInUSD.
 	 */
 	addVolumeInUSD(vol: BigDecimal): void {
-		this.protocol.cumulativeVolumeInUSD = this.protocol.cumulativeVolumeInUSD.plus(
-			vol
-		)
+		this.protocol.cumulativeVolumeInUSD =
+			this.protocol.cumulativeVolumeInUSD.plus(vol)
 		this.updateVolumes()
 	}
 
@@ -262,9 +253,8 @@ export class Bridge {
 	 * @param vol {BigDecimal} The value to add to the protocol's cumulativeVolumeOutUSD.
 	 */
 	addVolumeOutUSD(vol: BigDecimal): void {
-		this.protocol.cumulativeVolumeOutUSD = this.protocol.cumulativeVolumeOutUSD.plus(
-			vol
-		)
+		this.protocol.cumulativeVolumeOutUSD =
+			this.protocol.cumulativeVolumeOutUSD.plus(vol)
 		this.updateVolumes()
 	}
 
@@ -278,9 +268,10 @@ export class Bridge {
 		this.protocol.netVolumeUSD = this.protocol.cumulativeVolumeInUSD.minus(
 			this.protocol.cumulativeVolumeOutUSD
 		)
-		this.protocol.cumulativeTotalVolumeUSD = this.protocol.cumulativeVolumeInUSD.plus(
-			this.protocol.cumulativeVolumeOutUSD
-		)
+		this.protocol.cumulativeTotalVolumeUSD =
+			this.protocol.cumulativeVolumeInUSD.plus(
+				this.protocol.cumulativeVolumeOutUSD
+			)
 		this.save()
 	}
 
@@ -334,6 +325,10 @@ export class Bridge {
 		this.save()
 	}
 
+	addMessageReceiver(count: u8 = 1): void {
+		this.protocol.cumulativeUniqueMessageSenders += count
+		this.save()
+	}
 	/**
 	 * Will increase the hourly and daily active users counters. These will be reflected
 	 * on the next Usage snapshot whenever it comes up.
@@ -373,6 +368,14 @@ export class Bridge {
 	addActiveMessageSender(activity: AccountWasActive): void {
 		this.snapshoter.addActiveMessageSender(activity)
 	}
+
+	/**
+	 * Will increase the hourly and daily active message senders counters. These will be reflected
+	 * on the next Usage snapshot whenever it comes up.
+	 */
+	// addActiveMessageReceiver(activity: AccountWasActive): void {
+	// 	this.snapshoter.addActiveMessageReceiver(activity)
+	// }
 
 	/**
 	 * Adds 1 to the cumulativeTransactionCount counter and adds 1 to the counter corresponding the given transaction type.
