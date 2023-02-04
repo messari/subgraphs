@@ -1,4 +1,4 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { BridgeConfig } from "../../sdk/protocols/bridge/config";
 import {
   DepositFinalized,
@@ -10,11 +10,23 @@ import {
   CrosschainTokenType,
 } from "../../sdk/protocols/bridge/enums";
 import { Versions } from "../../versions";
-import { CustomEventType, SDK } from "../../sdk/protocols/bridge";
+import { SDK } from "../../sdk/protocols/bridge";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
-import { Pool } from "../../sdk/protocols/bridge/pool";
 import { Pricer, TokenInit } from "../../common/utils";
 import { Network } from "../../sdk/util/constants";
+
+export function handleTransferIn3pGateway(event: DepositFinalized): void {
+  log.error("[3p Gateway] We are in transferIn3pGateway", []);
+
+  const l1Token = new ethereum.EventParam("l1token", event.parameters[0].value);
+  const _from = new ethereum.EventParam("_from", event.parameters[1].value);
+  const _to = new ethereum.EventParam("_to", event.parameters[2].value);
+  const _amount = new ethereum.EventParam("_amount", event.parameters[3].value);
+
+  const params: ethereum.EventParam[] = [l1Token, _from, _to, _amount];
+  const depositFinalized = new DepositFinalized(event.address, event.logIndex, event.transactionLogIndex, event.logType, event.block, event.transaction, params, event.receipt);
+  handleTransferIn(depositFinalized);
+}
 
 export function handleTransferIn(event: DepositFinalized): void {
   // --- BRIDGECONFIG

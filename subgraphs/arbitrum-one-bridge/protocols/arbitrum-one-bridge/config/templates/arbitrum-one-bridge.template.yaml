@@ -205,7 +205,7 @@ dataSources:
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
         - event: DepositFinalized(indexed address,indexed address,indexed address,uint256)
-          handler: handleTransferIn
+          handler: handleTransferIn{{ handlerSuffix }}
   {{/L2Gateways}}
   {{#L2ArbSys}}
   - kind: ethereum

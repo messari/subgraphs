@@ -1,6 +1,7 @@
 {
   "deployment": "ARBITRUM_ONE_ARBITRUM",
   "network": "arbitrum-one",
+  "abi": "TokenGateway",
   "file": "./src/handlers/arbitrum/transferIn.ts",
   "L2ArbSys": [
     {
@@ -15,34 +16,32 @@
     {
       "name": "ERC20Gateway",
       "address": "0x09e9222E96E7B4AE2a407B98d48e330053351EEe",
-      "abi": "TokenGateway",
-      "startBlock": 2107
+      "startBlock": 2107,
+      "handlerSuffix": ""
     },
     {
       "name": "CustomGateway",
       "address": "0x096760F208390250649E3e8763348E783AEF5562",
-      "abi": "TokenGateway",
-      "startBlock": 2598
+      "startBlock": 2598,
+      "handlerSuffix": ""
     },
     {
       "name": "WethGateway",
       "address": "0x6c411aD3E74De3E7Bd422b94A27770f5B86C623B",
-      "abi": "TokenGateway",
-      "startBlock": 38495
+      "startBlock": 38495,
+      "handlerSuffix": ""
     },
     {
       "name": "DaiGateway",
       "address": "0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65",
-      "abi": "DaiGateway",
-      "file": "./src/handlers/arbitrum/transferInDai.ts",
-      "startBlock": 1336834
+      "startBlock": 1336834,
+      "handlerSuffix": "3pGateway"
     },
     {
       "name": "LPTGateway",
       "address": "0x6D2457a4ad276000A615295f7A80F79E48CcD318",
-      "abi": "LPTGateway",
-      "file": "./src/handlers/arbitrum/transferInLPT.ts",
-      "startBlock": 5864786
+      "startBlock": 5864786,
+      "handlerSuffix": "3pGateway"
     }
   ]
 }
