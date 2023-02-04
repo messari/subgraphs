@@ -16,6 +16,6 @@ export class StargateBscConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xe7Ec689f432f29383f217e36e680B5C855051f25";
+    return "0xe7ec689f432f29383f217e36e680b5c855051f25";
   }
 }

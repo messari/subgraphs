@@ -16,6 +16,6 @@ export class StargateMetisConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xAF54BE5B6eEc24d6BFACf1cce4eaF680A8239398";
+    return "0xaf54be5b6eec24d6bfacf1cce4eaf680a8239398";
   }
 }

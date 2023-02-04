@@ -16,6 +16,6 @@ export class StargateArbitrumConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x55bDb4164D28FBaF0898e0eF14a589ac09Ac9970";
+    return "0x55bdb4164d28fbaf0898e0ef14a589ac09ac9970";
   }
 }
