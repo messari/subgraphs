@@ -18,7 +18,4 @@ export class StargateBscConfigurations implements Configurations {
   getFactoryAddress(): string {
     return "0xe7Ec689f432f29383f217e36e680B5C855051f25";
   }
-  getRewardToken(): string {
-    return "0xB0D502E938ed5f4df2E681fE6E419ff29631d62b";
-  }
 }

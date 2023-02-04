@@ -18,7 +18,4 @@ export class StargateOptimismConfigurations implements Configurations {
   getFactoryAddress(): string {
     return "0xE3B53AF74a4BF62Ae5511055290838050bf764Df";
   }
-  getRewardToken(): string {
-    return "0x4200000000000000000000000000000000000042";
-  }
 }

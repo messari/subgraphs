@@ -5,9 +5,9 @@ import {
 } from "../../../../../src/common/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 
-export class StargateAvalancheConfigurations implements Configurations {
+export class StargateMetisConfigurations implements Configurations {
   getNetwork(): string {
-    return Network.AVALANCHE;
+    return Network.METIS;
   }
   getProtocolName(): string {
     return PROTOCOL_NAME;
@@ -16,6 +16,6 @@ export class StargateAvalancheConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x808d7c71ad2ba3FA531b068a2417C63106BC0949";
+    return "0xAF54BE5B6eEc24d6BFACf1cce4eaF680A8239398";
   }
 }

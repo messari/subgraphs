@@ -18,7 +18,4 @@ export class StargateArbitrumConfigurations implements Configurations {
   getFactoryAddress(): string {
     return "0x55bDb4164D28FBaF0898e0eF14a589ac09Ac9970";
   }
-  getRewardToken(): string {
-    return "0x6694340fc020c5E6B96567843da2df01b2CE1eb6";
-  }
 }

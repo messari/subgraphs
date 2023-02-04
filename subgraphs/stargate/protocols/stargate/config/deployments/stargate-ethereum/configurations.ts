@@ -18,7 +18,4 @@ export class StargateMainnetConfigurations implements Configurations {
   getFactoryAddress(): string {
     return "0x06D538690AF257Da524f25D0CD52fD85b1c2173E";
   }
-  getRewardToken(): string {
-    return "0xAf5191B0De278C7286d6C7CC6ab6BB8A73bA2Cd6";
-  }
 }
