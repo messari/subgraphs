@@ -1591,7 +1591,7 @@ type Position @entity {
 }
 
 type PositionSnapshot @entity(immutable: true) {
-  id: String!
+  id: Bytes!
 
   "Position this snapshot refers to"
   position: Position!
