@@ -69,8 +69,8 @@ enum RewardTokenType {
 }
 
 type RewardToken @entity(immutable: true) {
-  " { Reward token type }-{ Smart contract address of the reward token } "
-  id: String!
+  " Bytes.fromI32(0|1).concat(rewardTokenAddress), where 0 is for deposit and 1 is for borrow "
+  id: Bytes!
 
   " Reference to the actual token "
   token: Token!
@@ -396,7 +396,7 @@ type DerivPerpProtocol implements Protocol @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity(immutable: false) {
+type UsageMetricsDailySnapshot @entity(immutable: true) {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -496,7 +496,7 @@ type UsageMetricsDailySnapshot @entity(immutable: false) {
   totalPoolCount: Int!
 }
 
-type UsageMetricsHourlySnapshot @entity(immutable: false) {
+type UsageMetricsHourlySnapshot @entity(immutable: true) {
   " { # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -1531,8 +1531,8 @@ enum PositionSide {
 
 # A position is defined as who has what position in the protocol and distribution of longs and shorts at a positional level
 type Position @entity {
-  " { Account address }-{ Market address }-{ Position Side }-{ Optional: Interest Rate Type}-{ Counter } "
-  id: String!
+  " { Account address }-{ Market address }-{ Position Side }-{ Counter } "
+  id: Bytes!
 
   " Account that owns this position "
   account: Account!
