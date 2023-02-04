@@ -1,0 +1,17 @@
+{
+  "deployment": "STARGATE_OPTIMISM",
+  "network": "optimism",
+  "file": "./src/mappings/handlers.ts",
+  "router": {
+    "address": "0xB0D502E938ed5f4df2E681fE6E419ff29631d62b",
+    "startBlock": 4535212
+  },
+  "lpStaking": {
+    "address": "0x4DeA9e918c6289a52cd469cAC652727B7b412Cd2",
+    "startBlock": 17500609,
+    "abi": "LPStakingTime"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

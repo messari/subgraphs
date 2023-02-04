@@ -1,22 +1,31 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { Address } from "@graphprotocol/graph-ts";
-import { CustomPriceType } from "../common/types";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { CustomPriceType, OracleContract } from "../common/types";
 import { ChainLinkContract } from "../../../generated/UniswapV2Factory/ChainLinkContract";
 
-export function getChainLinkContract(): ChainLinkContract | null {
-  const config = utils.getConfig();
-  if (!config || utils.isNullAddress(config.chainLink())) return null;
+export function getChainLinkContract(
+  contract: OracleContract,
+  block: ethereum.Block
+): ChainLinkContract | null {
+  if (
+    contract.startBlock.lt(block.number) ||
+    utils.isNullAddress(contract.address)
+  )
+    return null;
 
-  return ChainLinkContract.bind(config.chainLink());
+  return ChainLinkContract.bind(contract.address);
 }
 
-export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
-  const chainLinkContract = getChainLinkContract();
+export function getTokenPriceUSDC(
+  tokenAddr: Address,
+  block: ethereum.Block
+): CustomPriceType {
+  const config = utils.getConfig();
+  if (!config) return new CustomPriceType();
 
-  if (!chainLinkContract) {
-    return new CustomPriceType();
-  }
+  const chainLinkContract = getChainLinkContract(config.chainLink(), block);
+  if (!chainLinkContract) return new CustomPriceType();
 
   const result = chainLinkContract.try_latestRoundData(
     tokenAddr,
@@ -35,7 +44,8 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
 
     return CustomPriceType.initialize(
       result.value.value1.toBigDecimal(),
-      decimals.value
+      decimals.value,
+      "ChainlinkFeed"
     );
   }
 

@@ -96,22 +96,6 @@ export const schema120 = (): Schema => {
     Object.keys(entitiesData.poolHourlySnapshots).join(",") +
     "}";
 
-  const poolData: { [x: string]: string } = {
-    id: "ID!",
-    name: "String",
-    symbol: "String",
-    inputTokens: "[Token!]!",
-    outputToken: "Token",
-    rewardTokens: "[RewardToken!]",
-    totalValueLockedUSD: "BigDecimal!",
-    inputTokenBalances: "[BigInt!]!",
-    outputTokenSupply: "BigInt",
-    outputTokenPriceUSD: "BigDecimal",
-    stakedOutputTokenAmount: "BigInt",
-    rewardTokenEmissionsAmount: "[BigInt!]",
-    rewardTokenEmissionsUSD: "[BigDecimal!]",
-  };
-
   // Query pool(pool) entity and events entities
   let events: string[] = [];
 
@@ -128,23 +112,28 @@ export const schema120 = (): Schema => {
       ${usageDailyQuery}
     }`;
 
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalValueLockedUSD: "BigDecimal!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    cumulativeUniqueUsers: "Int!",
+  };
+
+  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+
   const protocolTableQuery = `
     query Data($protocolId: String) {
       protocol(id: $protocolId) {
-        id
-        name
-        slug
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        network
-        type
-        totalValueLockedUSD
-        protocolControlledValueUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        cumulativeUniqueUsers
+        ${protocolQueryFields}
       }
     }`;
 
@@ -164,6 +153,22 @@ export const schema120 = (): Schema => {
       }
       `;
 
+  const poolData: { [x: string]: string } = {
+    id: "ID!",
+    name: "String",
+    symbol: "String",
+    inputTokens: "[Token!]!",
+    outputToken: "Token",
+    rewardTokens: "[RewardToken!]",
+    totalValueLockedUSD: "BigDecimal!",
+    inputTokenBalances: "[BigInt!]!",
+    outputTokenSupply: "BigInt",
+    outputTokenPriceUSD: "BigDecimal",
+    stakedOutputTokenAmount: "BigInt",
+    rewardTokenEmissionsAmount: "[BigInt!]",
+    rewardTokenEmissionsUSD: "[BigDecimal!]",
+  };
+
   let query = `
   query Data($poolId: String, $protocolId: String){
     _meta {
@@ -173,14 +178,7 @@ export const schema120 = (): Schema => {
       deployment
     }
     protocols {
-      id
-      methodologyVersion
-      network
-      name
-      slug
-      type
-      schemaVersion
-      subgraphVersion
+      ${protocolQueryFields}
     }
 
     pool(id: $poolId){
@@ -219,22 +217,6 @@ export const schema120 = (): Schema => {
       rewardTokenEmissionsUSD
     }
   }`;
-
-  const protocolFields = {
-    id: "ID!",
-    name: "String!",
-    slug: "String!",
-    schemaVersion: "String!",
-    subgraphVersion: "String!",
-    methodologyVersion: "String!",
-    network: "Network!",
-    type: "ProtocolType!",
-    totalValueLockedUSD: "BigDecimal!",
-    cumulativeSupplySideRevenueUSD: "BigDecimal!",
-    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-    cumulativeTotalRevenueUSD: "BigDecimal!",
-    cumulativeUniqueUsers: "Int!",
-  };
 
   return {
     entities,
@@ -346,6 +328,65 @@ export const schema130 = (): Schema => {
     Object.keys(entitiesData.poolHourlySnapshots).join(",") +
     "}";
 
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalValueLockedUSD: "BigDecimal!",
+    totalPoolCount: "Int!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    cumulativeUniqueUsers: "Int!",
+    protocolControlledValueUSD: "BigDecimal",
+  };
+
+  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+
+  // Query pool(pool) entity and events entities
+  let events: string[] = [];
+
+  const financialsQuery = `
+    query Data {
+      ${finanQuery}
+    }`;
+  const hourlyUsageQuery = `
+    query Data {
+      ${usageHourlyQuery}
+    }`;
+  const dailyUsageQuery = `
+    query Data {
+      ${usageDailyQuery}
+    }`;
+
+  const protocolTableQuery = `
+    query Data($protocolId: String) {
+      protocol(id: $protocolId) {
+        ${protocolQueryFields}
+      }
+    }`;
+
+  const poolsQuery = `
+      query Data {
+        pools(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
+          id
+          name
+        }
+      }
+    `;
+
+  const poolTimeseriesQuery = `
+      query Data($poolId: String) {
+        ${poolDailyQuery}
+        ${poolHourlyQuery}
+      }
+      `;
+
   const poolData: { [x: string]: string } = {
     id: "ID!",
     name: "String",
@@ -367,59 +408,6 @@ export const schema130 = (): Schema => {
     rewardTokenEmissionsUSD: "[BigDecimal!]",
   };
 
-  // Query pool(pool) entity and events entities
-  let events: string[] = [];
-
-  const financialsQuery = `
-    query Data {
-      ${finanQuery}
-    }`;
-  const hourlyUsageQuery = `
-    query Data {
-      ${usageHourlyQuery}
-    }`;
-  const dailyUsageQuery = `
-    query Data {
-      ${usageDailyQuery}
-    }`;
-
-  const protocolTableQuery = `
-    query Data($protocolId: String) {
-      protocol(id: $protocolId) {
-        id
-        name
-        slug
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        network
-        type
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        cumulativeUniqueUsers
-        protocolControlledValueUSD
-        totalPoolCount
-      }
-    }`;
-
-  const poolsQuery = `
-      query Data {
-        pools(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
-          id
-          name
-        }
-      }
-    `;
-
-  const poolTimeseriesQuery = `
-      query Data($poolId: String) {
-        ${poolDailyQuery}
-        ${poolHourlyQuery}
-      }
-      `;
-
   let query = `
   query Data($poolId: String, $protocolId: String){
     _meta {
@@ -429,14 +417,7 @@ export const schema130 = (): Schema => {
       deployment
     }
     protocols {
-      id
-      methodologyVersion
-      network
-      name
-      type
-      slug
-      schemaVersion
-      subgraphVersion
+      ${protocolQueryFields}
     }
 
     pool(id: $poolId){
@@ -478,24 +459,6 @@ export const schema130 = (): Schema => {
       rewardTokenEmissionsUSD
     }
   }`;
-
-  const protocolFields = {
-    id: "ID!",
-    name: "String!",
-    slug: "String!",
-    schemaVersion: "String!",
-    subgraphVersion: "String!",
-    methodologyVersion: "String!",
-    network: "Network!",
-    type: "ProtocolType!",
-    totalValueLockedUSD: "BigDecimal!",
-    totalPoolCount: "Int!",
-    cumulativeSupplySideRevenueUSD: "BigDecimal!",
-    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-    cumulativeTotalRevenueUSD: "BigDecimal!",
-    cumulativeUniqueUsers: "Int!",
-    protocolControlledValueUSD: "BigDecimal",
-  };
 
   return {
     entities,
