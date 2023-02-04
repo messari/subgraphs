@@ -5,6 +5,12 @@ import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { _ERC20 } from "../../generated/ERC20Gateway/_ERC20";
+import {
+  BridgePermissionType,
+} from "../sdk/protocols/bridge/enums";
+import { BridgeConfig } from "../sdk/protocols/bridge/config";
+import { Versions } from "../versions";
+import { ETH_ADDRESS } from "../sdk/util/constants";
 
 export class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -61,3 +67,25 @@ export class TokenInit implements TokenInitializer {
     }
   }
 }
+
+// -- PROXY ADMIN (TODO: address ok?)
+// ProxyAdmin 1 - 0x554723262467F125Ac9e1cDFa9Ce15cc53822dbD
+// ProxyAdmin 2 - 0x9aD46fac0Cf7f790E5be05A0F15223935A0c0aDa
+export const ethSideConf = new BridgeConfig(
+  "0x554723262467F125Ac9e1cDFa9Ce15cc53822dbD",
+  "arbitrum-one",
+  "arbitrum-one",
+  BridgePermissionType.WHITELIST,
+  Versions
+);
+
+// TODO: address, temp arbsys 0x0000000000000000000000000000000000000064
+export const arbSideConf = new BridgeConfig(
+  "0x0000000000000000000000000000000000000064",
+  "arbitrum-one",
+  "arbitrum-one",
+  BridgePermissionType.WHITELIST,
+  Versions
+);
+
+export const ethAddress = Address.fromString(ETH_ADDRESS);

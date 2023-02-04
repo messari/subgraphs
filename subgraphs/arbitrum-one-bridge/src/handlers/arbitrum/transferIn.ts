@@ -12,7 +12,7 @@ import {
 import { Versions } from "../../versions";
 import { SDK } from "../../sdk/protocols/bridge";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
-import { Pricer, TokenInit } from "../../common/utils";
+import { arbSideConf, Pricer, TokenInit } from "../../common/utils";
 import { Network } from "../../sdk/util/constants";
 
 export function handleTransferIn3pGateway(event: DepositFinalized): void {
@@ -29,17 +29,9 @@ export function handleTransferIn3pGateway(event: DepositFinalized): void {
 }
 
 export function handleTransferIn(event: DepositFinalized): void {
-  // --- BRIDGECONFIG
+  // -- SDK
 
-  const gatewayContractAddress = event.address.toHexString();
-  const conf = new BridgeConfig(
-    gatewayContractAddress,
-    "arbitrum-one",
-    "arbitrum-one",
-    BridgePermissionType.WHITELIST,
-    Versions
-  );
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initialize(arbSideConf, new Pricer(), new TokenInit(), event);
 
   // -- TOKENS
 
@@ -89,18 +81,3 @@ export function handleTransferIn(event: DepositFinalized): void {
     event.transaction.hash
   );
 }
-
-// function onCreatePool(
-//   event: CustomEventType,
-//   pool: Pool,
-//   sdk: SDK,
-//   type: BridgePoolType
-// ): void {
-//   const myEvent: DepositFinalized = event.event as DepositFinalized;
-//   pool.initialize(
-//     pool.pool.id.toString(),
-//     "ERC20",
-//     type,
-//     sdk.Tokens.getOrCreateToken(myEvent.params.l1Token)
-//   );
-// }
