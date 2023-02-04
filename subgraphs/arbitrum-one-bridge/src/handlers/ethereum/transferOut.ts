@@ -6,17 +6,56 @@ import {
 } from "../../sdk/protocols/bridge/enums";
 import { BridgeConfig } from "../../sdk/protocols/bridge/config";
 import { Versions } from "../../versions";
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, log, ethereum } from "@graphprotocol/graph-ts";
 import {
   TokenGateway,
-  WithdrawalFinalized,
+  WithdrawalFinalized
 } from "../../../generated/ERC20Gateway/TokenGateway";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
 import { Network } from "../../sdk/util/constants";
 import { Pricer, TokenInit } from "../../common/utils";
-import { Pool } from "../../sdk/protocols/bridge/pool";
+
+
+      // public address: Address,
+      // public logIndex: BigInt,
+      // public transactionLogIndex: BigInt,
+      // public logType: string | null,
+      // public block: Block,
+      // public transaction: Transaction,
+      // public parameters: Array<EventParam>,
+      // public receipt: TransactionReceipt | null,
+
+export function handleTransferOut3pGateway(event: WithdrawalFinalized): void {
+  log.error("[3p Gateway] We are in transferOut3pGateway", []);
+
+  const l1Token = new ethereum.EventParam("l1token", event.parameters[0].value);
+  const _from = new ethereum.EventParam("_from", event.parameters[1].value);
+  const _to = new ethereum.EventParam("_to", event.parameters[2].value);
+  const _exitNum = new ethereum.EventParam("_exitNum", event.parameters[3].value);
+  const _amount = new ethereum.EventParam("_amount", event.parameters[4].value);
+
+  const params: ethereum.EventParam[] = [l1Token, _from, _to, _exitNum, _amount];
+  const withdrawalFinalized = new WithdrawalFinalized(event.address, event.logIndex, event.transactionLogIndex, event.logType, event.block, event.transaction, params, event.receipt);
+  handleTransferOut(withdrawalFinalized);
+}
+
+// export function handleTransferOutL1LPTGateway(event: WithdrawalFinalized): void {
+//   log.error("[LPT] We are in transferOutLPT", []);
+
+//   const l1Token = new ethereum.EventParam("l1token", event.parameters[0].value);
+//   const _from = new ethereum.EventParam("_from", event.parameters[1].value);
+//   const _to = new ethereum.EventParam("_to", event.parameters[2].value);
+//   const _exitNum = new ethereum.EventParam("_exitNum", event.parameters[3].value);
+//   const _amount = new ethereum.EventParam("_amount", event.parameters[4].value);
+
+//   const params: ethereum.EventParam[] = [l1Token, _from, _to, _exitNum, _amount];
+//   const withdrawalFinalized = new WithdrawalFinalized(event.address, event.logIndex, event.transactionLogIndex, event.logType, event.block, event.transaction, params, event.receipt);
+  
+//   handleTransferOut(withdrawalFinalized);
+// }
 
 export function handleTransferOut(event: WithdrawalFinalized): void {
+  log.error("[+] We are in transferOut", []);
   // -- BRIDGECONFIG
 
   const conf = new BridgeConfig(
@@ -66,12 +105,15 @@ export function handleTransferOut(event: WithdrawalFinalized): void {
   const poolId = event.address;
   const pool = sdk.Pools.loadPool<string>(poolId);
 
-  pool.initialize(
-    poolId.toString(),
-    "ERC20",
-    BridgePoolType.LOCK_RELEASE,
-    sdk.Tokens.getOrCreateToken(inputTokenAddress!)
-  );
+  // TODO: update symbol?
+  if (!pool.isInitialized) {
+    pool.initialize(
+      poolId.toString(),
+      "ERC20",
+      BridgePoolType.LOCK_RELEASE,
+      sdk.Tokens.getOrCreateToken(inputTokenAddress!)
+    );
+  }
 
   pool.addDestinationToken(crossToken);
 

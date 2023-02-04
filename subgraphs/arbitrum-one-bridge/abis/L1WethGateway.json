@@ -33,7 +33,7 @@
         "type": "uint256"
       }
     ],
-    "name": "L1WethGatewayDepositInitiated",
+    "name": "DepositInitiated",
     "type": "event"
   },
   {
@@ -64,7 +64,7 @@
         "type": "bytes"
       }
     ],
-    "name": "L1WethGatewayTxToL2",
+    "name": "TxToL2",
     "type": "event"
   },
   {
@@ -107,7 +107,7 @@
         "type": "bool"
       }
     ],
-    "name": "L1WethGatewayWithdrawRedirected",
+    "name": "WithdrawRedirected",
     "type": "event"
   },
   {
@@ -144,7 +144,7 @@
         "type": "uint256"
       }
     ],
-    "name": "L1WethGatewayWithdrawalFinalized",
+    "name": "WithdrawalFinalized",
     "type": "event"
   },
   {

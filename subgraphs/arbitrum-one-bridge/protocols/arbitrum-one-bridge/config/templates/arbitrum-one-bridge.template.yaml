@@ -68,8 +68,8 @@ dataSources:
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
-        - event: {{ eventPrefix }}WithdrawalFinalized(address,indexed address,indexed address,indexed uint256,uint256)
-          handler: handleTransferOut
+        - event: WithdrawalFinalized(address,indexed address,indexed address,indexed uint256,uint256)
+          handler: handleTransferOut{{ handlerSuffix }}
   {{/L1Gateways}}
   {{#L1Bridge}}
   - kind: ethereum

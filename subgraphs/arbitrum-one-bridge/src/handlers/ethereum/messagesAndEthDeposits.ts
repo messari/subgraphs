@@ -6,16 +6,16 @@ import {
 } from "../../sdk/protocols/bridge/enums";
 import { BridgeConfig } from "../../sdk/protocols/bridge/config";
 import { Versions } from "../../versions";
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
 import { ETH_ADDRESS, ETH_SYMBOL, Network } from "../../sdk/util/constants";
-import { Pool } from "../../sdk/protocols/bridge/pool";
 import { MessageDelivered } from "../../../generated/L1Bridge/Bridge";
 import { Pricer, TokenInit } from "../../common/utils";
 
 const ethAddress = Address.fromString(ETH_ADDRESS);
 
 export function handleL1MessageDelivered(event: MessageDelivered): void {
+  log.error("[depositEth] We are in message delivered", []);
   // -- BRIDGECONFIG
 
   const conf = new BridgeConfig(
@@ -60,12 +60,14 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
     const poolId = event.address;
     const pool = sdk.Pools.loadPool<string>(poolId);
 
-    pool.initialize(
-      poolId.toString(),
-      ETH_SYMBOL,
-      BridgePoolType.LOCK_RELEASE,
-      sdk.Tokens.getOrCreateToken(ethAddress)
-    );
+    if (!pool.isInitialized) {
+      pool.initialize(
+        poolId.toString(),
+        ETH_SYMBOL,
+        BridgePoolType.LOCK_RELEASE,
+        sdk.Tokens.getOrCreateToken(ethAddress)
+      );
+    }
 
     pool.addDestinationToken(crossToken);
 

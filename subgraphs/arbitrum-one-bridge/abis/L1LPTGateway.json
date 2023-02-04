@@ -44,7 +44,7 @@
         "type": "uint256"
       }
     ],
-    "name": "L1LPTGatewayDepositInitiated",
+    "name": "DepositInitiated",
     "type": "event"
   },
   {
@@ -189,7 +189,7 @@
         "type": "bytes"
       }
     ],
-    "name": "L1LPTGatewayTxToL2",
+    "name": "TxToL2",
     "type": "event"
   },
   {
@@ -239,7 +239,7 @@
         "type": "uint256"
       }
     ],
-    "name": "L1LPTGatewayWithdrawalFinalized",
+    "name": "WithdrawalFinalized",
     "type": "event"
   },
   {
