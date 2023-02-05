@@ -28,8 +28,8 @@ export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
 );
 
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x0f854EA9F38ceA4B1c2FC79047E9D0134419D5d6", 5655918),
-  new OracleContract("0x4fb93D7d320E8A263F22f62C2059dFC2A8bCbC4c", 27552509),
+  new OracleContract("0x0f854ea9f38cea4b1c2fc79047e9d0134419d5d6", 5655918),
+  new OracleContract("0x4fb93d7d320e8a263f22f62c2059dfc2a8bcbc4c", 27552509),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
   new OracleContract("0xbe4fc72f8293f9d3512d58b969c98c3f676cb957", 3796241), // Uniswap v2
-  new OracleContract("0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52", 4250168), // Spiritswap
+  new OracleContract("0x16327e3fbdaca3bcf7e38f5af2599d2ddc33ae52", 4250168), // Spiritswap
   new OracleContract("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506", 2457904), // Sushiswap
 ];
 

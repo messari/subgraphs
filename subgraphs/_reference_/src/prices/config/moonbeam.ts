@@ -19,7 +19,7 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
 
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0xC2b1DF84112619D190193E48148000e3990Bf627", 1452049),
+  new OracleContract("0xc2b1df84112619d190193e48148000e3990bf627", 1452049),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x445FE580eF8d70FF569aB36e80c647af338db351", 503734), // SushiSwap
+  new OracleContract("0x445fe580ef8d70ff569ab36e80c647af338db351", 503734), // SushiSwap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
