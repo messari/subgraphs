@@ -65,6 +65,7 @@ import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySn
 import { ActivityType, SECONDS_PER_HOUR, TransactionType } from "../common/constants";
 import { addPosition, subtractPosition } from "./position";
 import { DToken } from "../../generated/templates/DToken/DToken";
+import { readCallValue } from "../common/utils";
 
 export function createBorrow(event: Borrow): BigDecimal {
   const borrow = getOrCreateBorrow(event);
@@ -123,7 +124,7 @@ export function createBorrow(event: Borrow): BigDecimal {
 
 function getBorrowBalance(market: Market, account: Account): BigInt {
   const dToken = DToken.bind(Address.fromString(market._dToken!));
-  return dToken.balanceOf(Address.fromString(account.id));
+  return readCallValue<BigInt>(dToken.try_balanceOf(Address.fromString(account.id)), BIGINT_ZERO);
 }
 
 export function createDeposit(event: Deposit): BigDecimal {
@@ -152,7 +153,7 @@ export function createDeposit(event: Deposit): BigDecimal {
 
   const acc = getOrCreateAccount(accountAddress, protocol);
   const etoken = EToken.bind(Address.fromString(market.outputToken!));
-  const balance = etoken.balanceOfUnderlying(accountAddress);
+  const balance = readCallValue<BigInt>(etoken.try_balanceOfUnderlying(accountAddress), BIGINT_ZERO);
   const positionId = addPosition(protocol, market, acc, balance, PositionSide.LENDER, EventType.DEPOSIT, event);
 
   deposit.position = positionId;
@@ -189,14 +190,14 @@ export function createRepay(event: Repay): BigDecimal {
     EventType.REPAY,
     event,
   );
-  if (positionId === null) {
+  if (!positionId) {
     log.error("[createRepay] Position not found for account: {} in transaction: {}", [
       account.id,
       event.transaction.hash.toHexString(),
     ]);
     return repay.amountUSD;
   }
-  repay.position = positionId;
+  repay.position = positionId!;
 
   countAccountRepay(account);
 
@@ -226,7 +227,7 @@ export function createWithdraw(event: Withdraw): BigDecimal {
   const account = getOrCreateAccount(accountAddress, protocol);
   const market = getOrCreateMarket(marketId);
   const etoken = EToken.bind(Address.fromString(market.outputToken!));
-  const balance = etoken.balanceOfUnderlying(accountAddress);
+  const balance = readCallValue<BigInt>(etoken.try_balanceOfUnderlying(accountAddress), BIGINT_ZERO);
   const positionId = subtractPosition(
     protocol,
     market,
@@ -236,7 +237,7 @@ export function createWithdraw(event: Withdraw): BigDecimal {
     EventType.WITHDRAW,
     event,
   );
-  if (positionId === null) {
+  if (!positionId) {
     log.error("[createWithdraw] Position not found for account: {} in transaction: {}", [
       account.id,
       event.transaction.hash.toHexString(),
@@ -244,7 +245,7 @@ export function createWithdraw(event: Withdraw): BigDecimal {
     return withdraw.amountUSD;
   }
 
-  withdraw.position = positionId;
+  withdraw.position = positionId!;
   withdraw.save();
 
   countAccountWithdraw(account);
@@ -298,7 +299,7 @@ export function createLiquidation(event: Liquidation): BigDecimal {
     EventType.LIQUIDATEE,
     event,
   );
-  if (positionId === null) {
+  if (!positionId) {
     log.error("[createLiquidation] Position not found for account: {} in transaction: {}", [
       violator.id,
       event.transaction.hash.toHexString(),
@@ -306,14 +307,13 @@ export function createLiquidation(event: Liquidation): BigDecimal {
     return liquidation.amountUSD;
   }
 
-  liquidation.position = positionId;
+  liquidation.position = positionId!;
   liquidation.save();
 
   // account for liquidator gaining collateral
   const liquidator = getOrCreateAccount(event.params.liquidator, protocol);
-  const liquidatorBalance = EToken.bind(Address.fromString(collateralMarket.outputToken!)).balanceOfUnderlying(
-    event.params.liquidator,
-  );
+  const etoken = EToken.bind(Address.fromString(collateralMarket.outputToken!));
+  const liquidatorBalance = readCallValue<BigInt>(etoken.try_balanceOfUnderlying(event.params.liquidator), BIGINT_ZERO);
   addPosition(
     protocol,
     collateralMarket, // collateral market
