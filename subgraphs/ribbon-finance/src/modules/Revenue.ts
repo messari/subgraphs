@@ -3,7 +3,7 @@ import {
   getOrCreateVaultsDailySnapshots,
   getOrCreateVaultsHourlySnapshots,
   getOrCreateFinancialDailySnapshots,
-} from "../common/initalizers";
+} from "../common/initializers";
 import { Vault as VaultStore } from "../../generated/schema";
 import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 

@@ -19,6 +19,7 @@ import * as constants from "./constants";
 import { getUsdPricePerToken } from "../prices";
 import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/ETHCallV2/ERC20";
+import { LiquidityGauge as LiquidityGaugeTemplate } from "../../generated/templates";
 import { LiquidityGaugeV5 as GaugeContract } from "../../generated/rETHThetaGauge/LiquidityGaugeV5";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 
@@ -26,14 +27,14 @@ export function getOrCreateToken(
   address: Address,
   block: ethereum.Block,
   vault: Address = constants.NULL.TYPE_ADDRESS,
-  isOToken: bool = false
+  isOutputToken: bool = false
 ): Token {
   let token = Token.load(address.toHexString());
 
   if (!token) {
     token = new Token(address.toHexString());
 
-    if (!isOToken) {
+    if (!isOutputToken) {
       const contract = ERC20Contract.bind(address);
 
       token.name = utils.readValue<string>(contract.try_name(), "");
@@ -42,14 +43,14 @@ export function getOrCreateToken(
         contract.try_decimals(),
         constants.DEFAULT_DECIMALS.toI32() as u8
       );
-      token._isOtoken = false;
+      token._isOutputToken = false;
       token._vaultId = vault.toHexString();
 
       token.lastPriceUSD = getUsdPricePerToken(address).usdPrice;
       token.lastPriceBlockNumber = block.number;
     }
 
-    if (isOToken) {
+    if (isOutputToken) {
       const contract = VaultContract.bind(address);
       token.name = utils.readValue<string>(contract.try_name(), "");
       token.symbol = utils.readValue<string>(contract.try_symbol(), "");
@@ -57,10 +58,10 @@ export function getOrCreateToken(
         contract.try_decimals(),
         constants.DEFAULT_DECIMALS.toI32() as u8
       );
-      token._isOtoken = true;
+      token._isOutputToken = true;
       token._vaultId = vault.toHexString();
 
-      token.lastPriceUSD = utils.getOptionTokenPriceUSD(vault, block);
+      token.lastPriceUSD = utils.getOutputTokenPriceUSD(vault, block);
       token.lastPriceBlockNumber = block.number;
     }
     token.save();
@@ -74,12 +75,12 @@ export function getOrCreateToken(
       .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
   ) {
     if (token._vaultId) {
-      if (!token._isOtoken) {
+      if (!token._isOutputToken) {
         token.lastPriceUSD = getUsdPricePerToken(address).usdPrice;
         token.lastPriceBlockNumber = block.number;
       }
-      if (token._isOtoken) {
-        token.lastPriceUSD = utils.getOptionTokenPriceUSD(vault, block);
+      if (token._isOutputToken) {
+        token.lastPriceUSD = utils.getOutputTokenPriceUSD(vault, block);
         token.lastPriceBlockNumber = block.number;
       }
 
@@ -403,21 +404,16 @@ export function getOrCreateLiquidityGauge(
       gaugeContract.try_decimals(),
       constants.BIGINT_ZERO
     );
-    let vaultAddress = utils.readValue(
+    const vaultAddress = utils.readValue(
       gaugeContract.try_lp_token(),
       constants.NULL.TYPE_ADDRESS
     );
 
-    if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) {
-      vaultAddress = utils.readValue(
-        gaugeContract.try_stakingToken(),
-        constants.NULL.TYPE_ADDRESS
-      );
-    }
     gauge.vault = vaultAddress.toHexString();
 
     gauge.symbol = utils.readValue(gaugeContract.try_symbol(), "");
     gauge.save();
+    LiquidityGaugeTemplate.create(gaugeAddress);
   }
   return gauge;
 }

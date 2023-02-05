@@ -15,7 +15,7 @@ import {
   getOrCreateYieldAggregator,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
-} from "../common/initalizers";
+} from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";

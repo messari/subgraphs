@@ -1,4 +1,9 @@
 import {
+  Token,
+  ActiveAccount,
+  Vault as VaultStore,
+} from "../../generated/schema";
+import {
   getOrCreateVault,
   getOrCreateToken,
   getOrCreateAccount,
@@ -8,16 +13,11 @@ import {
   getOrCreateFinancialDailySnapshots,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
-} from "../common/initalizers";
+} from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { getUsdPricePerToken } from "../prices/index";
 import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
-import {
-  Token,
-  ActiveAccount,
-  Vault as VaultStore,
-} from "../../generated/schema";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {

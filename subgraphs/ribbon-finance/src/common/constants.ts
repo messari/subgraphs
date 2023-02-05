@@ -4,8 +4,8 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_NAME = "Ribbon Finance";
-export const PROTOCOL_SLUG = "ribbon-finance";
+export const PROTOCOL_NAME = "Ribbon Finance V2";
+export const PROTOCOL_SLUG = "ribbon-finance-v2";
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
@@ -86,58 +86,15 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 
-export const PANCAKE_FACTORY_ADDRESS = Address.fromString(
-  "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73"
-);
-export const WBNB_ADDRESS = Address.fromString(
-  "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
-);
-export const BUSD_ADDRESS = Address.fromString(
-  "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
-);
 export const USDC_ADDRESS = Address.fromString(
   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 );
-export const BBTC_ADDRESS = Address.fromString(
-  "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c"
-);
-export const EPS_ADDRESS = Address.fromString(
-  "0xA7f552078dcC247C2684336020c03648500C6d9F"
-);
-export const EPX_ADDRESS = Address.fromString(
-  "0xaf41054c1487b0e5e2b9250c0332ecbce6ce9d71"
-);
-
-export const TRICRYPTO_LP_TOKEN = Address.fromString(
-  "0xaF4dE8E872131AE328Ce21D909C74705d3Aaf452"
-);
-
-export const POOL_FEE = BigDecimal.fromString("0.0004");
-export const ADMIN_FEE = BigDecimal.fromString("0.5");
-
-export namespace PoolType {
-  export const LENDING = "LENDING";
-  export const PLAIN = "PLAIN";
-  export const METAPOOL = "METAPOOL";
-  export const BASEPOOL = "BASEPOOL";
-}
 
 export const BIGINT_NEGATIVE_ONE = BigInt.fromString("-1");
-
 export const BIG_DECIMAL_SECONDS_PER_DAY = BigDecimal.fromString("86400");
-
-export const BIG_DECIMAL_RIBBON_WEEKLY_REWARD_TOKEN_EMISSIONS =
-  BigDecimal.fromString("250000");
-
 export const FEE_DENOMINATOR_BIGINT = BIGINT_TEN.pow(10);
 export const FEE_DENOMINATOR = BigDecimal.fromString("10000000000");
 
-export const DEFAULT_POOL_FEE = BigInt.fromString("4000000");
-export const DEFAULT_ADMIN_FEE = BigInt.fromString("5000000000");
-
-export const MARGIN_POOL = Address.fromString(
-  "0x5934807cC0654d46755eBd2848840b616256C6Ef"
-);
 export const ETH_CALL_V2_CONTRACT = Address.fromString(
   "0x25751853Eab4D0eB3652B5eB6ecB102A2789644B"
 );

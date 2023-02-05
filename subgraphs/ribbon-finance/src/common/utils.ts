@@ -1,12 +1,12 @@
-import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   getOrCreateYieldAggregator,
   getOrCreateVault,
   getOrCreateToken,
-} from "./initalizers";
+} from "./initializers";
 import * as constants from "./constants";
 import { Vault } from "../../generated/schema";
 import { ERC20 as ERC20Contract } from "../../generated/ETHCallV2/ERC20";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
@@ -76,32 +76,15 @@ export function getTokenDecimals(tokenAddr: Address): BigDecimal {
 
 export function getVaultPricePerShare(vaultAddress: Address): BigDecimal {
   const vaultContract = VaultContract.bind(vaultAddress);
-  const vaultDecimals = readValue(vaultContract.try_decimals(), 18);
-
   const vaultPricePerShare = readValue(
     vaultContract.try_pricePerShare(),
     constants.BIGINT_ZERO
-  ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
+  ).toBigDecimal();
 
-  if (vaultPricePerShare.notEqual(constants.BIGDECIMAL_ZERO))
-    return vaultPricePerShare;
-
-  const totalTokensDeposits = readValue(
-    vaultContract.try_totalBalance(),
-    constants.BIGINT_ZERO
-  ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
-
-  const totalOptions = readValue(
-    vaultContract.try_totalSupply(),
-    constants.BIGINT_ZERO
-  ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
-
-  const pricePerShare = totalTokensDeposits.div(totalOptions);
-
-  return pricePerShare;
+  return vaultPricePerShare;
 }
 
-export function getOptionTokenPriceUSD(
+export function getOutputTokenPriceUSD(
   vaultAddress: Address,
   block: ethereum.Block
 ): BigDecimal {

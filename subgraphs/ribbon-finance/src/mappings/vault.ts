@@ -9,37 +9,25 @@ import {
   getOrCreateVault,
   getOrCreateAuction,
   getOrCreateSwap,
-} from "../common/initalizers";
+} from "../common/initializers";
 import {
   NewOffer,
-  OpenLoan,
-  CloseLoan,
-  OpenShort,
-  CloseShort,
   PurchaseOption,
   PayOptionYield,
   InstantWithdraw,
   CollectVaultFees,
-  DistributePremium,
   CollectManagementFee,
   CollectPerformanceFee,
   InitiateGnosisAuction,
   Deposit as DepositEvent,
-  OpenShort1 as OpenShortV1,
   Withdraw as WithdrawEvent,
-  Withdraw1 as WithdrawWithFee,
-  CloseShort1 as CloseShortV1,
-  RollToNextOptionCall as RollToNextOption,
 } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
-import * as utils from "../common/utils";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
 import { Vault } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { Address, log } from "@graphprotocol/graph-ts";
 import { updateRevenueSnapshots } from "../modules/Revenue";
-import { rollToNextOption } from "../modules/VaultLifecycle";
-import { Swap as Airswap } from "../../generated/Airswap/Airswap";
 import { Swap } from "../../generated/RibbonSwapOld/SwapContract";
 import { AuctionCleared } from "../../generated/GnosisAuction/GnosisAuction";
 
@@ -52,7 +40,6 @@ export function handleInitiateGnosisAuction(
   const vaultAddress = event.address;
 
   getOrCreateToken(biddingToken, event.block, vaultAddress, false);
-  getOrCreateToken(optionToken, event.block, vaultAddress, true);
   getOrCreateAuction(auctionId, vaultAddress, optionToken, biddingToken);
   getOrCreateVault(vaultAddress, event.block);
   updateVaultSnapshots(vaultAddress, event.block);
@@ -168,70 +155,14 @@ export function handleCollectVaultFees(event: CollectVaultFees): void {
   ]);
 }
 
-export function handleDistributePremium(event: DistributePremium): void {
-  const premium = event.params.amount;
-  const vaultAddress = event.address;
-
-  if (vaultAddress == constants.NULL.TYPE_ADDRESS) return;
-
-  const vault = getOrCreateVault(vaultAddress, event.block);
-
-  const usdcToken = getOrCreateToken(
-    constants.USDC_ADDRESS,
-    event.block,
-    vaultAddress,
-    false
-  );
-  const premiumUSD = premium
-    .divDecimal(constants.BIGINT_TEN.pow(6 as u8).toBigDecimal())
-    .times(usdcToken.lastPriceUSD!);
-
-  updateVaultSnapshots(vaultAddress, event.block);
-
-  updateRevenueSnapshots(
-    vault,
-    premiumUSD,
-    constants.BIGDECIMAL_ZERO,
-    event.block
-  );
-  log.warning(
-    "[DistributePremium] transaction hash {} premium {} premiumUSD {}",
-    [
-      event.transaction.hash.toHexString(),
-      premium.toString(),
-      premiumUSD.toString(),
-    ]
-  );
-}
-
-export function handleRollToNextOption(call: RollToNextOption): void {
-  const vaultAddress = call.to;
-  const block = call.block;
-  rollToNextOption(vaultAddress, block);
-  log.warning("[HandleRollToNextOption] transaction hash {}", [
-    call.transaction.hash.toHexString(),
-  ]);
-}
-
-export function handleOpenShort(event: OpenShort): void {
-  utils.updateProtocolTotalValueLockedUSD();
-
-  log.warning("[OpenShort] transaction hash {}", [
-    event.transaction.hash.toHexString(),
-  ]);
-}
-
-export function handleCloseShort(event: CloseShort): void {
-  log.warning("[CloseShort] transaction hash {}", [
-    event.transaction.hash.toHexString(),
-  ]);
-}
-
 export function handleNewOffer(event: NewOffer): void {
   const swapId = event.params.swapId;
   const optionToken = event.params.oToken;
   const biddingToken = event.params.biddingToken;
   const vaultAddress = event.params.seller;
+  const vault = Vault.load(vaultAddress.toHexString());
+  if (!vault) return;
+
   const swapOfferContractAddress = event.address.toHexString();
   const swapOfferId = swapOfferContractAddress
     .concat("-")
@@ -291,80 +222,6 @@ export function handleSwap(event: Swap): void {
   );
 }
 
-export function handleAirswap(event: Airswap): void {
-  const vaultAddress = event.params.senderWallet;
-  const soldAmount = event.params.signerAmount;
-
-  if (vaultAddress == constants.NULL.TYPE_ADDRESS) return;
-  const vaultStore = Vault.load(vaultAddress.toHexString());
-  if (!vaultStore) return;
-
-  const vault = getOrCreateVault(vaultAddress, event.block);
-  const inputToken = getOrCreateToken(
-    Address.fromString(vault.inputToken),
-    event.block,
-    vaultAddress,
-    false
-  );
-  const soldAmountUSD = soldAmount
-    .divDecimal(
-      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-    )
-    .times(inputToken.lastPriceUSD!);
-
-  updateRevenueSnapshots(
-    vault,
-    soldAmountUSD,
-    constants.BIGDECIMAL_ZERO,
-    event.block
-  );
-  updateVaultSnapshots(vaultAddress, event.block);
-
-  log.warning(
-    "[AirSwap] transaction hash {} soldamountUSD {} soldTokenAmount{} tokenPrice {} vault {} vaultDecimals {}",
-    [
-      event.transaction.hash.toHexString(),
-      soldAmountUSD.toString(),
-      soldAmount.toString(),
-      inputToken.lastPriceUSD!.toString(),
-      vault.id,
-      vault._decimals.toString(),
-    ]
-  );
-}
-
-export function handleOpenLoan(event: OpenLoan): void {
-  utils.updateProtocolTotalValueLockedUSD();
-
-  log.warning("[OpenLoan] transaction hash {}", [
-    event.transaction.hash.toHexString(),
-  ]);
-}
-
-export function handleCloseLoan(event: CloseLoan): void {
-  utils.updateProtocolTotalValueLockedUSD();
-
-  log.warning("[CloseShort] transaction hash {}", [
-    event.transaction.hash.toHexString(),
-  ]);
-}
-
-export function handleOpenShortV1(event: OpenShortV1): void {
-  utils.updateProtocolTotalValueLockedUSD();
-
-  log.warning("[OpenShort] transaction hash {}", [
-    event.transaction.hash.toHexString(),
-  ]);
-}
-
-export function handleCloseShortV1(event: CloseShortV1): void {
-  utils.updateProtocolTotalValueLockedUSD();
-
-  log.warning("[CloseShort] transaction hash {}", [
-    event.transaction.hash.toHexString(),
-  ]);
-}
-
 export function handlePayOptionYield(event: PayOptionYield): void {
   const netYield = event.params.netYield;
   const vaultAddress = event.address;
@@ -417,27 +274,6 @@ export function handlePurchaseOption(event: PurchaseOption): void {
     premiumUSD,
     constants.BIGDECIMAL_ZERO,
     event.block
-  );
-}
-
-export function handleWithdrawWithFee(event: WithdrawWithFee): void {
-  const vaultAddress = event.address;
-  const block = event.block;
-  const withdrawAmount = event.params.amount;
-  const feeAmount = event.params.fee;
-
-  getOrCreateVault(vaultAddress, event.block);
-  updateVaultTVL(vaultAddress, block);
-  updateUsageMetrics(event.block, event.params.account);
-  updateFinancials(block);
-  updateVaultSnapshots(vaultAddress, block);
-
-  Withdraw(
-    vaultAddress,
-    withdrawAmount,
-    event.transaction,
-    event.block,
-    feeAmount
   );
 }
 

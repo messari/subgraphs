@@ -54,7 +54,7 @@ type Token @entity {
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
 
-  _isOtoken: Boolean
+  _isOutputToken: Boolean
 
   _vaultId: String
 }
@@ -693,6 +693,7 @@ type _Auction @entity {
 
   vault: String!
 }
+
 type _SwapOffer @entity {
   id: ID!
 

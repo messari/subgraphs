@@ -15,7 +15,7 @@ import {
   getOrCreateYieldAggregator,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
-} from "../common/initalizers";
+} from "../common/initializers";
 import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
@@ -115,9 +115,8 @@ export function Deposit(
       .div(inputTokenDecimals.toBigDecimal());
   }
 
-  const pricePerShare = utils.getVaultPricePerShare(vaultAddress);
-  vault.pricePerShare = pricePerShare.times(inputTokenDecimals.toBigDecimal());
-  vault.outputTokenPriceUSD = utils.getOptionTokenPriceUSD(vaultAddress, block);
+  vault.pricePerShare = utils.getVaultPricePerShare(vaultAddress);
+  vault.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(vaultAddress, block);
 
   vault.save();
 
