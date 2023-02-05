@@ -21,7 +21,7 @@ import {
 } from "../../generated/schema";
 import * as utils from "./utils";
 import { Versions } from "../versions";
-import { getUsdPricePerToken } from "../Prices";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { Vault as VaultTemplate } from "../../generated/templates";
 import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
@@ -99,8 +99,8 @@ export function getOrCreateToken(
       .minus(token.lastPriceBlockNumber!)
       .gt(constants.PRICE_CACHING_BLOCKS)
   ) {
-    const tokenPrice = getUsdPricePerToken(address);
-    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    const tokenPrice = getUsdPricePerToken(address, block);
+    token.lastPriceUSD = tokenPrice.usdPrice;
     token.lastPriceBlockNumber = block.number;
 
     token.save();

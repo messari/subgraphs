@@ -136,11 +136,7 @@ export function Deposit(
     .divDecimal(inputTokenDecimals)
     .times(inputToken.lastPriceUSD!);
 
-  vault.outputTokenPriceUSD = getPriceOfOutputTokens(
-    vaultAddress,
-    Address.fromString(vault.inputToken),
-    inputTokenDecimals
-  );
+  vault.outputTokenPriceUSD = getPriceOfOutputTokens(vaultAddress, inputToken);
   vault.pricePerShare = utils.getPricePerFullShare(vaultAddress);
 
   vault.save();

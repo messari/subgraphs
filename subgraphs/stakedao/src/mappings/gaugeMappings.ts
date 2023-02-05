@@ -1,15 +1,17 @@
 import * as utils from "../common/utils";
 import {
-  RewardAdded,
-  RewardDataUpdate,
+  RewardPaid,
   Gauge as GaugeContract,
 } from "../../generated/templates/Gauge/Gauge";
 import * as constants from "../common/constants";
 import { Address } from "@graphprotocol/graph-ts";
-import { updateRewardToken } from "../modules/Reward";
+import { updateRevenueSnapshots } from "../modules/Revenue";
+import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
 
-export function handleRewardAdded(event: RewardAdded): void {
+export function handleRewardPaid(event: RewardPaid): void {
   const gaugeAddress = event.address;
+  const rewardTokenAmount = event.params.reward;
+  const rewardTokenAddress = event.params.rewardsToken;
 
   const gaugeContract = GaugeContract.bind(gaugeAddress);
   const vaultAddress = utils.readValue<Address>(
@@ -17,13 +19,21 @@ export function handleRewardAdded(event: RewardAdded): void {
     constants.NULL.TYPE_ADDRESS
   );
 
-  updateRewardToken(vaultAddress, gaugeAddress, event.block);
-}
+  const vault = getOrCreateVault(vaultAddress, event.block);
 
-export function handleRewardDataUpdate(event: RewardDataUpdate): void {
-  const gaugeAddress = event.address;
-  const vaultAddress = utils.getVaultFromGauge(gaugeAddress);
-  if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+  const rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
+  const rewardTokenDecimals = constants.BIGINT_TEN.pow(
+    rewardToken.decimals as u8
+  ).toBigDecimal();
 
-  updateRewardToken(vaultAddress, gaugeAddress, event.block);
+  const supplySideRevenue = rewardTokenAmount
+    .divDecimal(rewardTokenDecimals)
+    .times(rewardToken.lastPriceUSD!);
+
+  updateRevenueSnapshots(
+    vault,
+    supplySideRevenue,
+    constants.BIGDECIMAL_ZERO,
+    event.block
+  );
 }
