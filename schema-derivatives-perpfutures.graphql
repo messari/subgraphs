@@ -1,5 +1,5 @@
-# Subgraph Schema: Derivatives Perpetual Futures 
-# Version: 1.0.1
+# Subgraph Schema: Derivatives Perpetual Futures
+# Version: 1.0.2
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -63,13 +63,13 @@ enum RewardTokenType {
 
   " For reward tokens awarded to borrowers "
   BORROW
-  
+
   " For reward tokens awarded to stakers "
   STAKE
 }
 
-type RewardToken @entity (immutable: true) {
-  " { Reward token type }-{ Smart contract address of the reward token } "
+type RewardToken @entity(immutable: true) {
+  " Bytes.fromI32(0|1).concat(rewardTokenAddress), where 0 is for deposit and 1 is for borrow "
   id: Bytes!
 
   " Reference to the actual token "
@@ -104,7 +104,7 @@ enum LiquidityPoolFeeType {
 
   " Some protocols use dynamic protocol fees. Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
   DYNAMIC_PROTOCOL_FEE
-  
+
   " Fixed fee that's paid to the stakers, as a percentage of the traded amount. e.g. 15% of all fees on GMX to stakers. "
   FIXED_STAKE_FEE
 
@@ -162,6 +162,9 @@ interface Protocol {
 
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
+  
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 70% of fees on GMX). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
@@ -206,7 +209,7 @@ interface Protocol {
   cumulativeUniqueLiquidatees: Int!
 
   " Notional value of all open positions "
-  openInterestUSD: Int!
+  openInterestUSD: BigDecimal!
 
   " Total number of long positions "
   longPositionCount: Int!
@@ -283,6 +286,9 @@ type DerivPerpProtocol implements Protocol @entity {
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
+
   " All historical Notional volume in USD "
   cumulativeVolumeUSD: BigDecimal!
 
@@ -316,7 +322,7 @@ type DerivPerpProtocol implements Protocol @entity {
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
 
- " Number of cumulative unique users "
+  " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
   " Number of cumulative borrowers "
@@ -328,6 +334,9 @@ type DerivPerpProtocol implements Protocol @entity {
   " Number of cumulative liquidatees (accounts that got liquidated) "
   cumulativeUniqueLiquidatees: Int!
 
+  " Notional value of all open positions "
+  openInterestUSD: BigDecimal!
+  
   " Total number of long positions "
   longPositionCount: Int!
 
@@ -343,10 +352,7 @@ type DerivPerpProtocol implements Protocol @entity {
   " Total number of positions (open and closed) "
   cumulativePositionCount: Int!
 
-  " Number of cumulative unique users "
-  cumulativeUniqueUsers: Int!
-
- " Total number of transactions "
+  " Total number of transactions "
   transactionCount: Int!
 
   " Total number of deposits "
@@ -366,7 +372,6 @@ type DerivPerpProtocol implements Protocol @entity {
 
   " Total number of pools "
   totalPoolCount: Int!
-
 
   ##### Snapshots #####
 
@@ -391,7 +396,7 @@ type DerivPerpProtocol implements Protocol @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-type UsageMetricsDailySnapshot @entity (immutable: true) {
+type UsageMetricsDailySnapshot @entity(immutable: true) {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -399,7 +404,7 @@ type UsageMetricsDailySnapshot @entity (immutable: true) {
   days: Int!
 
   " Protocol this snapshot is associated with "
-  protocol: DerivPerprotocol!
+  protocol: DerivPerpProtocol!
 
   " Number of unique daily active users "
   dailyActiveUsers: Int!
@@ -419,7 +424,7 @@ type UsageMetricsDailySnapshot @entity (immutable: true) {
   " Total number of short positions "
   shortPositionCount: Int!
 
- " Daily number of open positions "
+  " Daily number of open positions "
   dailyopenPositionCount: Int!
 
   " Total number of open positions "
@@ -487,13 +492,11 @@ type UsageMetricsDailySnapshot @entity (immutable: true) {
 
   " Cumulative number of collateral Out from traders "
   cumulativeCollateralOut: Int!
-
   " Total number of pools "
   totalPoolCount: Int!
-
 }
 
-type UsageMetricsHourlySnapshot @entity (immutable: true) {
+type UsageMetricsHourlySnapshot @entity(immutable: true) {
   " { # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -520,10 +523,9 @@ type UsageMetricsHourlySnapshot @entity (immutable: true) {
 
   " Total number of trades (swaps) in an hour "
   hourlySwapCount: Int!
-
 }
 
-type FinancialsDailySnapshot @entity (immutable: true) {
+type FinancialsDailySnapshot @entity(immutable: true) {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -536,12 +538,15 @@ type FinancialsDailySnapshot @entity (immutable: true) {
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
+
   " Daily trade Notional volume, in USD "
   dailyVolumeUSD: BigDecimal!
 
   " All historical trade Notional volume in USD "
   cumulativeVolumeUSD: BigDecimal!
-  
+
   " Daily Inflow trade Notional volume, in USD, based on value of underlying assets coming into protocol at the time of position open "
   dailyInflowVolumeUSD: BigDecimal!
 
@@ -553,7 +558,7 @@ type FinancialsDailySnapshot @entity (immutable: true) {
 
   " Inflow historical trade Notional volume in USD, based on value of underlying assets coming into protocol from trade at the time of position closed "
   cumulativeClosedInflowVolumeUSD: BigDecimal!
-  
+
   " Daily Outflow trade Notional volume, in USD, based on value of underlying assets coming out of protocol from trade "
   dailyOutflowVolumeUSD: BigDecimal!
 
@@ -561,7 +566,7 @@ type FinancialsDailySnapshot @entity (immutable: true) {
   cumulativeOutflowVolumeUSD: BigDecimal!
 
   " Daily Notional value of all open positions "
-  dailyOpenInterestUSD: Int!
+  dailyOpenInterestUSD: BigDecimal!
 
   " Daily revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   dailySupplySideRevenueUSD: BigDecimal!
@@ -622,7 +627,6 @@ type FinancialsDailySnapshot @entity (immutable: true) {
 
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
-
 }
 
 ###############################
@@ -655,7 +659,7 @@ type LiquidityPool @entity {
   fees: [LiquidityPoolFee!]!
 
   " Name of oracle source (e.g. chainlink, uniswap, pyth) "
-  oracle: string
+  oracle: String
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -705,7 +709,7 @@ type LiquidityPool @entity {
   cumulativeUniqueLiquidatees: Int!
 
   " Notional value of all open positions "
-  openInterestUSD: Int!
+  openInterestUSD: BigDecimal!
 
   " Total number of long positions "
   longPositionCount: Int!
@@ -764,6 +768,7 @@ type LiquidityPool @entity {
 
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
+
 }
 
 #################################
@@ -782,7 +787,6 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
-
 
   ##### Quantitative Data #####
 
@@ -811,7 +815,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   dailyFundingrate: [BigDecimal!]!
 
   " Daily Notional value of all open positions "
-  dailyOpenInterestUSD: Int!
+  dailyOpenInterestUSD: BigDecimal!
 
   " Daily premium paid to enter a position. "
   dailyEntryPremiumUSD: BigDecimal!
@@ -849,7 +853,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
 
- " Number of unique daily borrowers "
+  " Number of unique daily borrowers "
   dailyActiveBorrowers: Int!
 
   " Number of cumulative borrowers "
@@ -908,10 +912,10 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
   " All historical trade notional volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
-  
+
   " Daily Inflow trade notional volume in this pool, in USD, based on value of underlying assets coming into protocol from trade, at time of position open"
   dailyInflowVolumeUSD: BigDecimal!
- 
+
   " Daily Inflow trade notional volume occurred in in this pool for a specific input token, in native amount, at time of position open. The ordering should be the same as the pool's `inputTokens` field. "
   dailyInflowVolumeByTokenAmount: [BigInt!]!
 
@@ -923,7 +927,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
   " Daily Inflow trade notional volume in this pool, in USD, based on value of underlying assets coming into protocol from trade, at time of position closed"
   dailyClosedInflowVolumeUSD: BigDecimal!
- 
+
   " Daily Inflow trade notional volume occurred in in this pool for a specific input token, in native amount, at time of position closed The ordering should be the same as the pool's `inputTokens` field. "
   dailyClosedInflowVolumeByTokenAmount: [BigInt!]!
 
@@ -932,7 +936,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
   " Inflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming into protocol from trade, at the time of position closed. "
   cumulativeClosedInflowVolumeUSD: BigDecimal!
-  
+
   " Daily Outflow trade notional volume occurred in this pool in USD, based on value of underlying assets coming out of protocol from trade "
   dailyOutflowVolumeUSD: BigDecimal!
 
@@ -980,7 +984,6 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
 
-
   ##### Quantitative Data #####
 
   " Current TVL (Total Value Locked) of this pool "
@@ -1006,9 +1009,9 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
 
   " Hourly funding rate based on rate given by protocol, inform us if this is not provided."
   hourlyFundingrate: [BigDecimal!]!
-
+  
   " Hourly Notional value of all open positions "
-  hourlyOpenInterestUSD: Int!
+  hourlyOpenInterestUSD: BigDecimal!
 
   " All premium paid to enter a position. "
   hourlyEntryPremiumUSD: BigDecimal!
@@ -1057,7 +1060,7 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
 
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
-  
+
   " Hourly Inflow trade notional volume, in USD, at time position open. "
   hourlyInflowVolumeUSD: BigDecimal!
 
@@ -1081,7 +1084,7 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
 
   " Inflow historical trade notional volume occurred in this pool, in USD, at time position closed. "
   cumulativeClosedInflowVolumeUSD: BigDecimal!
-  
+
   " Hourly Outflow trade notional volume occurred in this pool, in USD "
   hourlyOutflowVolumeUSD: BigDecimal!
 
@@ -1167,12 +1170,14 @@ type Deposit implements Event @entity(immutable: true) {
 
   " The protocol this transaction belongs to "
   protocol: DerivPerpProtocol!
-
   " Address that received the tokens "
   to: String!
 
   " Address that sent the tokens "
   from: String!
+
+  " Account that controls this transaction "
+  account: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1200,7 +1205,7 @@ type Deposit implements Event @entity(immutable: true) {
 }
 
 "Withdraw in liquidity pool"
-type Withdraw implements Event @entity (immutable: true) {
+type Withdraw implements Event @entity(immutable: true) {
   " withdraw-{ Transaction hash }-{ Log index }"
   id: Bytes!
 
@@ -1212,12 +1217,14 @@ type Withdraw implements Event @entity (immutable: true) {
 
   " The protocol this transaction belongs to "
   protocol: DerivPerpProtocol!
-
   " Address that received the tokens "
   to: String!
 
   " Address that sent the tokens "
   from: String!
+
+  " Account that controls this transaction "
+  account: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1244,6 +1251,7 @@ type Withdraw implements Event @entity (immutable: true) {
   pool: LiquidityPool!
 }
 
+
 "Collateral In for trading"
 type CollateralIn implements Event @entity(immutable: true) {
   " deposit-{ Transaction hash }-{ Log index } "
@@ -1266,6 +1274,9 @@ type CollateralIn implements Event @entity(immutable: true) {
 
   " Address that sent the tokens "
   from: String!
+
+  " Account that controls this transaction "
+  account: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1315,6 +1326,9 @@ type CollateralOut implements Event @entity (immutable: true) {
   " Address that sent the tokens "
   from: String!
 
+  " Account that controls this transaction "
+  account: Account!
+
   " Block number of this event "
   blockNumber: BigInt!
 
@@ -1340,7 +1354,8 @@ type CollateralOut implements Event @entity (immutable: true) {
   pool: LiquidityPool!
 }
 
-type Swap implements Event @entity{ #This only applies to protocols that have a DEX (e.g. DYDX) and not to protocols that use oracle prices (e.g. GMX).
+type Swap implements Event
+  @entity { #This only applies to protocols that have a DEX (e.g. DYDX) and not to protocols that use oracle prices (e.g. GMX).
   " swap-{ Transaction hash }-{ Log index } "
   id: Bytes!
 
@@ -1353,14 +1368,14 @@ type Swap implements Event @entity{ #This only applies to protocols that have a 
   " The protocol this transaction belongs to "
   protocol: DerivPerpProtocol!
 
-  " The position this swap belongs to"
-  position: Position!
-
   " Address that received the tokens "
   to: String!
 
   " Address that sent the tokens "
   from: String!
+
+  " Account that controls this transaction "
+  account: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1388,15 +1403,68 @@ type Swap implements Event @entity{ #This only applies to protocols that have a 
 
   " The contract address for the trading pair or pool "
   tradingPair: Bytes!
+
+  " The pool involving this transaction "
+  pool: LiquidityPool!
+}
+
+type Liquidate implements Event @entity(immutable: true) {
+  " liquidate-{ Transaction hash }-{ Log index }"
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: DerivPerpProtocol!
+
+  " The position this Liquidate belongs to"
+  position: Position!
+
+  " Address that received the tokens "
+  to: String!
+
+  " Address that sent the tokens "
+  from: String!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Account that carried out the liquidation "
+  liquidator: Account!
+
+  " Account that got liquidated "
+  liquidatee: Account!
+
+  " Asset repaid (borrowed) "
+  asset: Token!
+
+  " Amount of collateral liquidated in native units "
+  amount: BigInt!
+
+  " Amount of collateral liquidated in USD "
+  amountUSD: BigDecimal!
+
+  " Amount of profit from liquidation in USD "
+  profitUSD: BigDecimal!
+
+  " The pool involving this transaction "
+  pool: LiquidityPool!
 }
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-type Account @entity{
+type Account @entity {
   " Address of the account "
   id: Bytes!
 
-    " All premium paid to enter a position. "
+  " All premium paid to enter a position. "
   cumulativeEntryPremiumUSD: BigDecimal!
 
   " All premium paid to exit a position. "
@@ -1440,32 +1508,37 @@ type Account @entity{
 
   " All collateral taken out from trading events occurred in this account "
   collateralOut: [CollateralOut!]! @derivedFrom(field: "account")
-
   " All Position events occurred in this account "
   positions: [Position!]! @derivedFrom(field: "account")
 
   " All swaps events occurred in this account "
   swaps: [Swap!]! @derivedFrom(field: "account")
-
 }
 
-
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity (immutable:true) {
+type ActiveAccount @entity(immutable: true) {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: Bytes!
 }
 
+enum PositionSide {
+  " Position opened as long "
+  LONG
+
+  " Position opened as short "
+  SHORT
+}
+
 # A position is defined as who has what position in the protocol and distribution of longs and shorts at a positional level
 type Position @entity {
-  " { Account address }-{ Market address }-{ Position Side }-{ Optional: Interest Rate Type}-{ Counter } "
+  " { Account address }-{ Market address }-{ Position Side }-{ Counter } "
   id: Bytes!
 
   " Account that owns this position "
   account: Account!
 
   " The market in which this position was opened "
-  liquidityPool: liquidityPool!
+  liquidityPool: LiquidityPool!
 
   " The asset in which this position was used as collateral "
   collateral: Token!
@@ -1497,18 +1570,6 @@ type Position @entity {
   " Notional value of collateral position, in USD "
   collateralBalanceUSD: BigDecimal!
 
-  " Number of deposits related to this position "
-  depositCount: Int!
-
-  " All deposit events of this position "
-  deposits: [Deposit!]! @derivedFrom(field: "position")
-
-  " Number of withdrawals related to this position "
-  withdrawCount: Int!
-
-  " All withdraw events of this position "
-  withdraws: [Withdraw!]! @derivedFrom(field: "position")
-
   " Number of collateral in related to this position "
   collateralInCount: Int!
 
@@ -1522,13 +1583,10 @@ type Position @entity {
   collateralOut: [CollateralOut!]! @derivedFrom(field: "position")
 
   " Liquidation event related to this position (if exists) "
-  liquidation: Liquidate
+  liquidation: Liquidate @derivedFrom(field: "position")
 
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
-
-  " All swaps events occurred in this position "
-  swaps: [Swap!]! @derivedFrom(field: "position")
 
 }
 
@@ -1541,7 +1599,7 @@ type PositionSnapshot @entity(immutable: true) {
   " Account that owns this position "
   account: Account!
 
- " Funding rate given by protocol at the time of position at snapshot, inform us if this is not provided. "
+  " Funding rate given by protocol at the time of position at snapshot, inform us if this is not provided. "
   fundingrate: BigDecimal
 
   " Notional value of position, in asset units "
@@ -1555,11 +1613,10 @@ type PositionSnapshot @entity(immutable: true) {
 
   " Notional value of collateral position, in USD "
   collateralBalanceUSD: BigDecimal!
- 
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
-
 }

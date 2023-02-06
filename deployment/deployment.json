@@ -487,6 +487,28 @@
             "query-id": "alpaca-finance-lending-bsc"
           }
         }
+      },
+      "alpaca-finance-lending-fantom": {
+        "network": "fantom",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "alpaca.finance.lending.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "alpaca-finance-lending-fantom",
+            "query-id": "alpaca-finance-lending-fantom"
+          }
+        }
       }
     }
   },
