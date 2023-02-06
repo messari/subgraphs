@@ -1,32 +1,24 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType, OracleContract } from "../common/types";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { CustomPriceType } from "../common/types";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { YearnLensContract } from "../../../generated/ERC20Gateway/YearnLensContract";
 
 export function getYearnLensContract(
-  contract: OracleContract,
-  block: ethereum.Block
+  contractAddress: Address
 ): YearnLensContract | null {
-  if (
-    contract.startBlock.lt(block.number) ||
-    utils.isNullAddress(contract.address)
-  )
-    return null;
+  if (utils.isNullAddress(contractAddress)) return null;
 
-  return YearnLensContract.bind(contract.address);
+  return YearnLensContract.bind(contractAddress);
 }
 
-export function getTokenPriceUSDC(
-  tokenAddr: Address,
-  block: ethereum.Block
-): CustomPriceType {
+export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
   const config = utils.getConfig();
 
   if (!config || config.yearnLensBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
-  const yearnLensContract = getYearnLensContract(config.yearnLens(), block);
+  const yearnLensContract = getYearnLensContract(config.yearnLens());
   if (!yearnLensContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
@@ -38,7 +30,6 @@ export function getTokenPriceUSDC(
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS,
-    "YearnLensOracle"
+    constants.DEFAULT_USDC_DECIMALS
   );
 }

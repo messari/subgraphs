@@ -1,5 +1,6 @@
+import { Configurations } from "../common/types";
+import * as constants from "../common/constants";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Configurations, OracleContract } from "../common/types";
 
 export const NETWORK_STRING = "optimism";
 
@@ -7,40 +8,36 @@ export const NETWORK_STRING = "optimism";
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract(
-  "0xb082d9f4734c535d9d80536f7e87a6f4f471bf65",
-  18109291
+export const YEARN_LENS_CONTRACT_ADDRESS = Address.fromString(
+  "0xb082d9f4734c535d9d80536f7e87a6f4f471bf65"
 );
-export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract();
-export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract(
-  "0xD81eb3728a631871a7eBBaD631b5f424909f0c77",
-  4365625
+export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
+  "0xD81eb3728a631871a7eBBaD631b5f424909f0c77"
 );
-export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
-  "0x5fd3815dcb668200a662114fbc9af13ac0a55b4d",
-  18216910
+export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
+  "0x5fd3815dcb668200a662114fbc9af13ac0a55b4d"
 );
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
-  "0x0ffe8434eae67c9838b12c3cd11ac4005daa7227",
-  18368996
+export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
+  "0x0ffe8434eae67c9838b12c3cd11ac4005daa7227"
 );
 
-export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0xC5cfaDA84E902aD92DD40194f0883ad49639b023", 2373837),
-  new OracleContract("0x445FE580eF8d70FF569aB36e80c647af338db351", 3729171),
+export const CURVE_REGISTRY_ADDRESSES: Address[] = [
+  Address.fromString("0xC5cfaDA84E902aD92DD40194f0883ad49639b023"),
+  Address.fromString("0x7DA64233Fefb352f8F501B357c018158ED8aA455"),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x9c12939390052919aF3155f41Bf4160Fd3666A6f", 19702709), // Velodrame
+export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
+  Address.fromString("0x9c12939390052919aF3155f41Bf4160Fd3666A6f"), // Velodrame
 ];
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// BLACKLISTED TOKENS ////////////////////////////
@@ -78,41 +75,41 @@ export class config implements Configurations {
     return NETWORK_STRING;
   }
 
-  yearnLens(): OracleContract {
+  yearnLens(): Address {
     return YEARN_LENS_CONTRACT_ADDRESS;
   }
-  chainLink(): OracleContract {
+  chainLink(): Address {
     return CHAIN_LINK_CONTRACT_ADDRESS;
   }
   yearnLensBlacklist(): Address[] {
     return YEARN_LENS_BLACKLIST;
   }
 
-  aaveOracle(): OracleContract {
+  aaveOracle(): Address {
     return AAVE_ORACLE_CONTRACT_ADDRESS;
   }
   aaveOracleBlacklist(): Address[] {
     return AAVE_ORACLE_BLACKLIST;
   }
 
-  curveCalculations(): OracleContract {
+  curveCalculations(): Address {
     return CURVE_CALCULATIONS_ADDRESS;
   }
   curveCalculationsBlacklist(): Address[] {
     return CURVE_CALCULATIONS_BLACKSLIST;
   }
 
-  sushiCalculations(): OracleContract {
+  sushiCalculations(): Address {
     return SUSHISWAP_CALCULATIONS_ADDRESS;
   }
   sushiCalculationsBlacklist(): Address[] {
     return SUSHI_CALCULATIONS_BLACKSLIST;
   }
 
-  uniswapForks(): OracleContract[] {
+  uniswapForks(): Address[] {
     return UNISWAP_FORKS_ROUTER_ADDRESSES;
   }
-  curveRegistry(): OracleContract[] {
+  curveRegistry(): Address[] {
     return CURVE_REGISTRY_ADDRESSES;
   }
 

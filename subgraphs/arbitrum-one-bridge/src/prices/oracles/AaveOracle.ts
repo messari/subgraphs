@@ -1,32 +1,24 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType, OracleContract } from "../common/types";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { CustomPriceType } from "../common/types";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { AaveOracleContract } from "../../../generated/ERC20Gateway/AaveOracleContract";
 
 export function getAaveOracleContract(
-  contract: OracleContract,
-  block: ethereum.Block
+  contractAddress: Address
 ): AaveOracleContract | null {
-  if (
-    contract.startBlock.lt(block.number) ||
-    utils.isNullAddress(contract.address)
-  )
-    return null;
+  if (utils.isNullAddress(contractAddress)) return null;
 
-  return AaveOracleContract.bind(contract.address);
+  return AaveOracleContract.bind(contractAddress);
 }
 
-export function getTokenPriceUSDC(
-  tokenAddr: Address,
-  block: ethereum.Block
-): CustomPriceType {
+export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
   const config = utils.getConfig();
 
   if (!config || config.aaveOracleBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
-  const aaveOracleContract = getAaveOracleContract(config.aaveOracle(), block);
+  const aaveOracleContract = getAaveOracleContract(config.aaveOracle());
   if (!aaveOracleContract) return new CustomPriceType();
 
   const tokenPrice: BigDecimal = utils
@@ -36,9 +28,5 @@ export function getTokenPriceUSDC(
     )
     .toBigDecimal();
 
-  return CustomPriceType.initialize(
-    tokenPrice,
-    constants.AAVE_ORACLE_DECIMALS,
-    "AaveOracle"
-  );
+  return CustomPriceType.initialize(tokenPrice, constants.AAVE_ORACLE_DECIMALS);
 }

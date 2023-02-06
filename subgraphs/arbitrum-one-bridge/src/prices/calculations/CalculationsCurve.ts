@@ -1,34 +1,25 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { CustomPriceType, OracleContract } from "../common/types";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { CustomPriceType } from "../common/types";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/ERC20Gateway/CalculationsCurve";
 
 export function getCalculationsCurveContract(
-  contract: OracleContract,
-  block: ethereum.Block
+  contractAddress: Address
 ): CalculationsCurveContract | null {
-  if (
-    contract.startBlock.lt(block.number) ||
-    utils.isNullAddress(contract.address)
-  )
-    return null;
+  if (utils.isNullAddress(contractAddress)) return null;
 
-  return CalculationsCurveContract.bind(contract.address);
+  return CalculationsCurveContract.bind(contractAddress);
 }
 
-export function getTokenPriceUSDC(
-  tokenAddr: Address,
-  block: ethereum.Block
-): CustomPriceType {
+export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
   const config = utils.getConfig();
 
   if (!config || config.curveCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
   const calculationCurveContract = getCalculationsCurveContract(
-    config.curveCalculations(),
-    block
+    config.curveCalculations()
   );
   if (!calculationCurveContract) return new CustomPriceType();
 
@@ -41,7 +32,6 @@ export function getTokenPriceUSDC(
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS,
-    "CalculationsCurve"
+    constants.DEFAULT_USDC_DECIMALS
   );
 }
