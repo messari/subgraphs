@@ -56,13 +56,13 @@ export function handleTransferIn(event: DepositFinalized): void {
 
   // -- POOL
 
-  const poolId = event.address;
+  const poolId = event.address.concat(crossToken.symbol);
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
     pool.initialize(
       poolId.toString(),
-      "ERC20",
+      crossToken.symbol,
       BridgePoolType.LOCK_RELEASE,
       sdk.Tokens.getOrCreateToken(event.params.l1Token)
     );
