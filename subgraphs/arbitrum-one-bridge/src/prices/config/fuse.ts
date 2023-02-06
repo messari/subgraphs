@@ -1,7 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Configurations, OracleContract } from "../common/types";
 
-export const NETWORK_STRING = "harmony";
+export const NETWORK_STRING = "fuse";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
@@ -9,11 +9,8 @@ export const NETWORK_STRING = "harmony";
 
 export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract();
 export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract();
+export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract();
 export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
-export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract(
-  "0xb56c2F0B653B2e0b10C9b928C8580Ac5Df02C7C7",
-  23930344
-);
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
@@ -21,16 +18,15 @@ export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract(
 
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
 
-export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x0a53FaDa2d943057C47A301D25a4D9b3B8e01e8E", 18003250),
-];
+export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506", 11256069), // SushiSwap
+  new OracleContract("0xE3F85aAd0c8DD7337427B9dF5d0fB741d65EEEB5", 15645719), // Voltage Finance
+  new OracleContract("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506", 12936314), // Sushiswap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -55,13 +51,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0x6983D1E6DEf3690C4d616b13597A09e6193EA013"
+  "0xa722c13135930332Eb3d749B2F0906559D2C5b99"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a"
+  "0x0BE9e53fd7EDaC9F859882AfdDa116645287C629" // Wrapped Fuse (WFUSE)
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x985458E523dB3d53125813eD68c274899e9DfAb4"
+  "0x620fd5fa44BE6af63715Ef4E65DDFA0387aD13F5"
 );
 
 export class config implements Configurations {
