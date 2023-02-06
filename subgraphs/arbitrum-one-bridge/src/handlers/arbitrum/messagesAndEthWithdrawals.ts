@@ -6,11 +6,7 @@ import {
 
 import { ethereum } from "@graphprotocol/graph-ts";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
-import {
-  BIGINT_ZERO,
-  ETH_SYMBOL,
-  Network,
-} from "../../sdk/util/constants";
+import { BIGINT_ZERO, ETH_SYMBOL, Network } from "../../sdk/util/constants";
 import {
   L2ToL1Tx,
   L2ToL1Transaction,
@@ -20,27 +16,40 @@ import { Pricer, TokenInit, arbSideConf, ethAddress } from "../../common/utils";
 export function handleL2ToL1Tx(event: L2ToL1Tx): void {
   // build params
   const caller = new ethereum.EventParam("caller", event.parameters[0].value);
-  const destination = new ethereum.EventParam("destination", event.parameters[1].value);
-  const callvalue = new ethereum.EventParam("callvalue", event.parameters[7].value);
+  const destination = new ethereum.EventParam(
+    "destination",
+    event.parameters[1].value
+  );
+  const callvalue = new ethereum.EventParam(
+    "callvalue",
+    event.parameters[7].value
+  );
   const data = new ethereum.EventParam("data", event.parameters[8].value);
 
   const params: ethereum.EventParam[] = [caller, destination, callvalue, data];
 
   // build event
-  const l2ToL1Transaction = new L2ToL1Transaction(event.address, event.logIndex, event.transactionLogIndex, event.logType, event.block, event.transaction, params, event.receipt);
+  const l2ToL1Transaction = new L2ToL1Transaction(
+    event.address,
+    event.logIndex,
+    event.transactionLogIndex,
+    event.logType,
+    event.block,
+    event.transaction,
+    params,
+    event.receipt
+  );
 
   // primary handler
   handleL2ToL1Transaction(l2ToL1Transaction);
 }
 
 export function handleL2ToL1Transaction(event: L2ToL1Transaction): void {
-
   // -- SDK
   const sdk = SDK.initialize(arbSideConf, new Pricer(), new TokenInit(), event);
 
   // -- ACCOUNT
   const acc = sdk.Accounts.loadAccount(event.params.caller);
-
 
   if (event.params.callvalue > BIGINT_ZERO) {
     // ETH TRANSFER

@@ -25,11 +25,10 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
 
   // Nitro
   // Message Types - https://github.com/OffchainLabs/nitro/blob/master/contracts/src/libraries/MessageTypes.sol#L10
-  const L1MessageType_ethDeposit = 12
-  const L2_MSG = 3
+  const L1MessageType_ethDeposit = 12;
+  const L2_MSG = 3;
 
   if (event.params.kind == L1MessageType_ethDeposit) {
-
     // -- TOKENS
 
     // source and destination token == ethAddress

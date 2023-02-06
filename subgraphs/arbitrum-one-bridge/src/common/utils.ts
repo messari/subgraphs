@@ -5,9 +5,7 @@ import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { _ERC20 } from "../../generated/ERC20Gateway/_ERC20";
-import {
-  BridgePermissionType,
-} from "../sdk/protocols/bridge/enums";
+import { BridgePermissionType } from "../sdk/protocols/bridge/enums";
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
 import { Versions } from "../versions";
 import { ETH_ADDRESS } from "../sdk/util/constants";

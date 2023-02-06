@@ -21,7 +21,16 @@ export function handleTransferIn3pGateway(event: DepositFinalized): void {
   const _amount = new ethereum.EventParam("_amount", event.parameters[3].value);
 
   const params: ethereum.EventParam[] = [l1Token, _from, _to, _amount];
-  const depositFinalized = new DepositFinalized(event.address, event.logIndex, event.transactionLogIndex, event.logType, event.block, event.transaction, params, event.receipt);
+  const depositFinalized = new DepositFinalized(
+    event.address,
+    event.logIndex,
+    event.transactionLogIndex,
+    event.logType,
+    event.block,
+    event.transaction,
+    params,
+    event.receipt
+  );
   handleTransferIn(depositFinalized);
 }
 
