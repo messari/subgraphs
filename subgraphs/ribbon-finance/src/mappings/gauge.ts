@@ -75,4 +75,3 @@ export function handleWithdrawn(event: Withdrawn): void {
   updateFactoryRewards(vaultAddress, gaugeAddress, event.block);
   updateVaultSnapshots(vaultAddress, event.block);
 }
-

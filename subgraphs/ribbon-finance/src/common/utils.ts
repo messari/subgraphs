@@ -96,7 +96,9 @@ export function getVaultPricePerShare(vaultAddress: Address): BigDecimal {
     constants.BIGINT_ZERO
   ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
 
-  const pricePerShare = totalTokensDeposits.div(totalOptions).times(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
+  const pricePerShare = totalTokensDeposits
+    .div(totalOptions)
+    .times(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
 
   return pricePerShare;
 }

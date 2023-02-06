@@ -22,7 +22,6 @@ import {
   Deposit as DepositEvent,
   Withdraw as WithdrawEvent,
   Withdraw1 as WithdrawWithFee,
-
 } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
