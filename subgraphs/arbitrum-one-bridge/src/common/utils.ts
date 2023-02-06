@@ -72,7 +72,7 @@ export class TokenInit implements TokenInitializer {
 // ProxyAdmin 1 - 0x554723262467F125Ac9e1cDFa9Ce15cc53822dbD
 // ProxyAdmin 2 - 0x9aD46fac0Cf7f790E5be05A0F15223935A0c0aDa
 export const ethSideConf = new BridgeConfig(
-  "0x554723262467F125Ac9e1cDFa9Ce15cc53822dbD",
+  "0x554723262467f125ac9e1cdfa9ce15cc53822dbd",
   "arbitrum-one",
   "arbitrum-one",
   BridgePermissionType.WHITELIST,

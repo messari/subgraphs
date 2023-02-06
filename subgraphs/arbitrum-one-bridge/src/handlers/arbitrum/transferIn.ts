@@ -1,15 +1,12 @@
 import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
-import { BridgeConfig } from "../../sdk/protocols/bridge/config";
 import {
   DepositFinalized,
   TokenGateway,
 } from "../../../generated/ERC20Gateway/TokenGateway";
 import {
-  BridgePermissionType,
   BridgePoolType,
   CrosschainTokenType,
 } from "../../sdk/protocols/bridge/enums";
-import { Versions } from "../../versions";
 import { SDK } from "../../sdk/protocols/bridge";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
 import { arbSideConf, Pricer, TokenInit } from "../../common/utils";
