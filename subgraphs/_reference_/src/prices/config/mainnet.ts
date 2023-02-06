@@ -12,12 +12,12 @@ export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract(
   12242339
 );
 export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract(
-  "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf",
+  "0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf",
   12864088
 );
 export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract();
 export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
-  "0x8263e161A855B644f582d9C164C66aABEe53f927",
+  "0x8263e161a855b644f582d9c164c66aabee53f927",
   12692284
 );
 
@@ -26,13 +26,13 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
 ///////////////////////////////////////////////////////////////////////////
 
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
-  "0x25BF7b72815476Dd515044F9650Bf79bAd0Df655",
+  "0x25bf7b72815476dd515044f9650bf79bad0df655",
   12370088
 );
 
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x7D86446dDb609eD0F5f8684AcF30380a356b2B4c", 11154794),
-  new OracleContract("0x8F942C20D02bEfc377D41445793068908E2250D0", 13986752),
+  new OracleContract("0x7d86446ddb609ed0f5f8684acf30380a356b2b4c", 11154794),
+  new OracleContract("0x8f942c20d02befc377d41445793068908e2250d0", 13986752),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F", 10794261), // SushiSwap
+  new OracleContract("0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f", 10794261), // SushiSwap
   new OracleContract("0x7a250d5630b4cf539739df2c5dacb4c659f2488d", 10207858), // Uniswap
 ];
 
@@ -102,7 +102,7 @@ export const HARDCODED_STABLES: Address[] = [
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 );
 export const WETH_ADDRESS = Address.fromString(
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"

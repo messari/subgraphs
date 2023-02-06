@@ -19,8 +19,8 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
 
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x55E91365697EB8032F98290601847296eC847210", 20754886),
-  new OracleContract("0x8A4694401bE8F8FCCbC542a3219aF1591f87CE17", 23334728),
+  new OracleContract("0x55e91365697eb8032f98290601847296ec847210", 20754886),
+  new OracleContract("0x8a4694401be8f8fccbc542a3219af1591f87ce17", 23334728),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506", 14735910), // SushiSwap
+  new OracleContract("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506", 14735910), // SushiSwap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ export const ETH_ADDRESS = Address.fromString(
   "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
+  "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d"
 );
 export const USDC_ADDRESS = Address.fromString(
   "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83"

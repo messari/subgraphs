@@ -19,7 +19,7 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
 
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858", 62440526),
+  new OracleContract("0x5b5cfe992adac0c9d48e05854b2d91c73a003858", 62440526),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x2CB45Edb4517d5947aFdE3BEAbF95A582506858B", 49607893), // TriSolaris
+  new OracleContract("0x2cb45edb4517d5947afde3beabf95a582506858b", 49607893), // TriSolaris
 ];
 
 ///////////////////////////////////////////////////////////////////////////
