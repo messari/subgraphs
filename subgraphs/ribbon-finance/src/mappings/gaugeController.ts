@@ -1,6 +1,6 @@
-import { getOrCreateLiquidityGauge } from "../common/initializers";
-import { Address, log } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
+import { Address, log } from "@graphprotocol/graph-ts";
+import { getOrCreateLiquidityGauge } from "../common/initializers";
 import { NewGauge } from "../../generated/GaugeController/GaugeController";
 
 export function handleNewGauge(event: NewGauge): void {

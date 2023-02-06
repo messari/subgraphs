@@ -21,6 +21,7 @@ import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
 import { getUsdPricePerToken } from "../prices/index";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
+
 export function createWithdrawTransaction(
   vault: VaultStore,
   amount: BigInt,

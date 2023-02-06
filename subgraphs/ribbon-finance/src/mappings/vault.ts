@@ -21,6 +21,8 @@ import {
   InitiateGnosisAuction,
   Deposit as DepositEvent,
   Withdraw as WithdrawEvent,
+  Withdraw1 as WithdrawWithFee,
+
 } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
@@ -28,6 +30,7 @@ import { Vault } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { Address, log } from "@graphprotocol/graph-ts";
 import { updateRevenueSnapshots } from "../modules/Revenue";
+import { Swap as Airswap } from "../../generated/Airswap/Airswap";
 import { Swap } from "../../generated/RibbonSwapOld/SwapContract";
 import { AuctionCleared } from "../../generated/GnosisAuction/GnosisAuction";
 
@@ -40,6 +43,7 @@ export function handleInitiateGnosisAuction(
   const vaultAddress = event.address;
 
   getOrCreateToken(biddingToken, event.block, vaultAddress, false);
+  getOrCreateToken(optionToken, event.block, vaultAddress, true);
   getOrCreateAuction(auctionId, vaultAddress, optionToken, biddingToken);
   getOrCreateVault(vaultAddress, event.block);
   updateVaultSnapshots(vaultAddress, event.block);
@@ -160,8 +164,8 @@ export function handleNewOffer(event: NewOffer): void {
   const optionToken = event.params.oToken;
   const biddingToken = event.params.biddingToken;
   const vaultAddress = event.params.seller;
-  const vault = Vault.load(vaultAddress.toHexString());
-  if (!vault) return;
+  const vaultStore = Vault.load(vaultAddress.toHexString());
+  if (!vaultStore) return;
 
   const swapOfferContractAddress = event.address.toHexString();
   const swapOfferId = swapOfferContractAddress
@@ -211,6 +215,48 @@ export function handleSwap(event: Swap): void {
 
   log.warning(
     "[Swap] transaction hash {} soldamountUSD {} soldTokenAmount{} tokenPrice {} vault {} vaultDecimals {}",
+    [
+      event.transaction.hash.toHexString(),
+      soldAmountUSD.toString(),
+      soldAmount.toString(),
+      inputToken.lastPriceUSD!.toString(),
+      vault.id,
+      vault._decimals.toString(),
+    ]
+  );
+}
+
+export function handleAirswap(event: Airswap): void {
+  const vaultAddress = event.params.senderWallet;
+  const soldAmount = event.params.signerAmount;
+
+  if (vaultAddress == constants.NULL.TYPE_ADDRESS) return;
+  const vaultStore = Vault.load(vaultAddress.toHexString());
+  if (!vaultStore) return;
+
+  const vault = getOrCreateVault(vaultAddress, event.block);
+  const inputToken = getOrCreateToken(
+    Address.fromString(vault.inputToken),
+    event.block,
+    vaultAddress,
+    false
+  );
+  const soldAmountUSD = soldAmount
+    .divDecimal(
+      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+    )
+    .times(inputToken.lastPriceUSD!);
+
+  updateRevenueSnapshots(
+    vault,
+    soldAmountUSD,
+    constants.BIGDECIMAL_ZERO,
+    event.block
+  );
+  updateVaultSnapshots(vaultAddress, event.block);
+
+  log.warning(
+    "[AirSwap] transaction hash {} soldamountUSD {} soldTokenAmount{} tokenPrice {} vault {} vaultDecimals {}",
     [
       event.transaction.hash.toHexString(),
       soldAmountUSD.toString(),
@@ -274,6 +320,27 @@ export function handlePurchaseOption(event: PurchaseOption): void {
     premiumUSD,
     constants.BIGDECIMAL_ZERO,
     event.block
+  );
+}
+
+export function handleWithdrawWithFee(event: WithdrawWithFee): void {
+  const vaultAddress = event.address;
+  const block = event.block;
+  const withdrawAmount = event.params.amount;
+  const feeAmount = event.params.fee;
+
+  getOrCreateVault(vaultAddress, event.block);
+  updateVaultTVL(vaultAddress, block);
+  updateUsageMetrics(event.block, event.params.account);
+  updateFinancials(block);
+  updateVaultSnapshots(vaultAddress, block);
+
+  Withdraw(
+    vaultAddress,
+    withdrawAmount,
+    event.transaction,
+    event.block,
+    feeAmount
   );
 }
 

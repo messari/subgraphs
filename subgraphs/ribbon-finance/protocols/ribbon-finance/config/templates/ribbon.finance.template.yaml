@@ -88,9 +88,84 @@ dataSources:
         - event: PayOptionYield(uint256,uint256,indexed address)
           handler: handlePayOptionYield
         - event: PurchaseOption(uint256,indexed address)
-          handler: handlePurchaseOption         
+          handler: handlePurchaseOption
+          #V1
+        - event: Withdraw(indexed address,uint256,uint256,uint256)
+          handler: handleWithdrawWithFee
+
   {{/vaults}}
-  
+    
+  {{#liquidityGauges}}
+  - kind: ethereum/contract
+    name: "{{name}}"
+    network: mainnet
+    source:
+      address: "{{address}}"
+      abi: LiquidityGaugeV5
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/gauge.ts
+      entities:
+        - Vault
+        - VaultTransaction
+        - VaultAccount
+      abis:
+        - name: RibbonThetaVaultWithSwap
+          file: ./abis/RibbonThetaVaultWithSwap.json
+        - name: LiquidityGaugeV5
+          file: ./abis/LiquidityGaugeV5.json
+        - name: RibbonVaultPauser
+          file: ./abis/RibbonVaultPauser.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Deposit(indexed address,uint256)
+          handler: handleStake
+        - event: Withdraw(indexed address,uint256)
+          handler: handleUnstake
+        - event: Staked(indexed address,uint256)
+          handler: handleStaked
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleWithdrawn
+  {{/liquidityGauges}}
+
   - kind: ethereum/contract
     name: GnosisAuction
     network: mainnet
@@ -217,7 +292,6 @@ dataSources:
           handler: handleSwap
         - event: NewOffer(uint256,address,address,address,uint256,uint256,uint256)
           handler: handleNewOffer
-
   - kind: ethereum/contract
     name: RibbonSwap
     network: mainnet
@@ -285,6 +359,62 @@ dataSources:
         - event: NewOffer(uint256,address,address,address,uint256,uint256,uint256)
           handler: handleNewOffer   
 
+  - kind: ethereum/contract
+    name: Airswap
+    network: mainnet
+    source:
+      address: "0x4572f2554421Bd64Bef1c22c8a81840E8D496BeA"
+      abi: Airswap
+      startBlock: 11938402
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/vault.ts
+      entities:
+        - Vault
+    
+      abis:
+        - name: Airswap
+          file: ./abis/Airswap.json
+        - name: RibbonThetaVaultWithSwap
+          file: ./abis/RibbonThetaVaultWithSwap.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Swap(indexed uint256,uint256,indexed address,uint256,uint256,address,indexed address,uint256,uint256,address,address,uint256,uint256,address)
+          handler: handleAirswap
+
   - name: GaugeController
     kind: ethereum/contract
     network: mainnet
@@ -297,6 +427,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
+      file: ./src/mappings/gaugeController.ts
       abis:
         - name: RibbonThetaVaultWithSwap
           file: ./abis/RibbonThetaVaultWithSwap.json
@@ -345,7 +476,6 @@ dataSources:
       eventHandlers:
         - event: NewGauge(address,int128,uint256)
           handler: handleNewGauge
-      file: ./src/mappings/gaugeController.ts
 
 templates:
   - name: LiquidityGauge
@@ -410,4 +540,8 @@ templates:
           handler: handleStake
         - event: Withdraw(indexed address,uint256)
           handler: handleUnstake
+        - event: Staked(indexed address,uint256)
+          handler: handleStaked
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleWithdrawn
 

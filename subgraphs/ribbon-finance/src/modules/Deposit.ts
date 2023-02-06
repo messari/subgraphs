@@ -115,6 +115,7 @@ export function Deposit(
       .div(inputTokenDecimals.toBigDecimal());
   }
 
+
   vault.pricePerShare = utils.getVaultPricePerShare(vaultAddress);
   vault.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(vaultAddress, block);
 

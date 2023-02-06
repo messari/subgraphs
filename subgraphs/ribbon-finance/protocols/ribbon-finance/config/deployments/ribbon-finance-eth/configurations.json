@@ -44,6 +44,44 @@
       "name": "rEarnSTETHVault",
       "address": "0xCE5513474E077F5336cf1B33c1347FDD8D48aE8c",
       "startBlock": 16043013
+    },
+    {
+      "name": "EthCallV1",
+      "address": "0x0FABaF48Bbf864a3947bdd0Ba9d764791a60467A",
+      "startBlock": 11938402
+    },
+    {
+      "name": "WBTCcallV1",
+      "address": "0x8b5876f5B0Bf64056A89Aa7e97511644758c3E8c",
+      "startBlock": 11938402
+    },
+    {
+      "name": "USDCEthPutV1",
+      "address": "0x16772a7f4a3ca291C21B8AcE76F9332dDFfbb5Ef",
+      "startBlock": 12369554
+    },
+    {
+      "name": "RibbonYearnETHPutV1",
+      "address": "0x8FE74471F198E426e96bE65f40EeD1F8BA96e54f",
+      "startBlock": 12696707
+    }
+  ],
+  "liquidityGauges": [
+    {
+      "name": " RibbonETHCallLiquidityMining",
+      "address": "0xd46f9546ebAbAAC44DC1B6D0Ac1eeb357D34FBeB",
+      "startBlock": 12632454
+    },
+
+    {
+      "name": "RibbonWBTCCallLiquidityMining",
+      "address": "0x1d27a3A92330693B897db9B1C26290Ba381049b1",
+      "startBlock": 12632497
+    },
+    {
+      "name": "RibbonETHPutLiquidityMining",
+      "address": "0xe79734461499246b6A8C8e768B96bebd0C891f63",
+      "startBlock": 12632353
     }
   ],
 

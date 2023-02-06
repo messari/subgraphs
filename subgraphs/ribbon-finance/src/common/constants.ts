@@ -4,8 +4,8 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_NAME = "Ribbon Finance V2";
-export const PROTOCOL_SLUG = "ribbon-finance-v2";
+export const PROTOCOL_NAME = "Ribbon Finance";
+export const PROTOCOL_SLUG = "ribbon-finance";
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
