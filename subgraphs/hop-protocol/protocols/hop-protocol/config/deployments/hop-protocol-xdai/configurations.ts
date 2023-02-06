@@ -176,7 +176,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		else if (bridgeAddress == XdaiBridge.WBTC) return XdaiAmm.WBTC
 		else if (bridgeAddress == XdaiBridge.HOP) return ZERO_ADDRESS
 		else {
-			log.critical('Address not found', [])
+			log.critical('Bridge Address not found', [])
 			return ''
 		}
 	}

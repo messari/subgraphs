@@ -37,10 +37,10 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			return ['sUSD', 'sUSD', '18', MainnetBridge.sUSD]
 		} else if (this.getEthTokens().includes(tokenAddress)) {
 			return ['ETH', 'Ethereum', '18', MainnetBridge.ETH]
-		} else if (tokenAddress == MainnetBridge.HOP) {
+		} else if (tokenAddress == MainnetToken.HOP) {
 			return ['HOP', 'HOP Token', '18', MainnetBridge.HOP]
 		} else {
-			log.critical('Token not found', [])
+			log.critical('Token details not found', [])
 			return []
 		}
 	}
@@ -106,9 +106,9 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (bridgeAddress == MainnetBridge.MATIC) return PolygonAmm.MATIC
 		else if (bridgeAddress == MainnetBridge.ETH) return PolygonAmm.ETH
 		else if (bridgeAddress == MainnetBridge.WBTC) return PolygonAmm.WBTC
-		else if (bridgeAddress == MainnetBridge.HOP) return PolygonAmm.HOP
+		else if (bridgeAddress == MainnetBridge.HOP) return ZERO_ADDRESS
 		else {
-			log.critical('Xdai Pool not found', [])
+			log.critical('Polygon Pool not found', [])
 
 			return ''
 		}
@@ -135,6 +135,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (bridgeAddress == MainnetBridge.USDT) return OptimismAmm.USDT
 		else if (bridgeAddress == MainnetBridge.ETH) return OptimismAmm.ETH
 		else if (bridgeAddress == MainnetBridge.WBTC) return OptimismAmm.WBTC
+		else if (bridgeAddress == MainnetBridge.sUSD) return OptimismAmm.sUSD
+		else if (bridgeAddress == MainnetBridge.SNX) return OptimismAmm.SNX
 		else if (bridgeAddress == MainnetBridge.HOP) return ZERO_ADDRESS
 		else {
 			log.critical('Optimism Pool not found', [])
@@ -331,6 +333,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (tokenAddress == MainnetToken.USDT) return OptimismToken.USDT
 		else if (tokenAddress == MainnetToken.ETH) return OptimismToken.ETH
 		else if (tokenAddress == MainnetToken.WBTC) return OptimismToken.WBTC
+		else if (tokenAddress == MainnetToken.sUSD) return OptimismToken.sUSD
+		else if (tokenAddress == MainnetToken.SNX) return OptimismToken.SNX
 		else if (tokenAddress == MainnetToken.HOP) return OptimismToken.HOP
 		else {
 			log.critical('Optimism Crosstoken not found', [])

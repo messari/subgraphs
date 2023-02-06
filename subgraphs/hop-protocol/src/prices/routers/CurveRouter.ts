@@ -3,7 +3,7 @@ import * as utils from '../common/utils'
 import * as constants from '../common/constants'
 import { CustomPriceType } from '../common/types'
 import { BigInt, Address, BigDecimal } from '@graphprotocol/graph-ts'
-import { CurvePool as CurvePoolContract } from '../../../generated/Token/CurvePool'
+import { CurvePoolRegistry as CurvePoolContract } from '../../../generated/Token/CurvePoolRegistry'
 import { CurveRegistry as CurveRegistryContract } from '../../../generated/Token/CurveRegistry'
 
 export function isCurveLpToken(lpAddress: Address): bool {
@@ -141,9 +141,10 @@ export function getVirtualPrice(curveLpTokenAddress: Address): BigInt {
 			curveRegistryAdresses[idx]
 		)
 
-		const virtualPriceCall = curveRegistryContract.try_get_virtual_price_from_lp_token(
-			curveLpTokenAddress
-		)
+		const virtualPriceCall =
+			curveRegistryContract.try_get_virtual_price_from_lp_token(
+				curveLpTokenAddress
+			)
 
 		if (!virtualPriceCall.reverted) return virtualPriceCall.value
 	}
@@ -175,9 +176,8 @@ export function cryptoPoolLpPriceUsdc(lpAddress: Address): CustomPriceType {
 export function cryptoPoolLpTotalValueUsdc(lpAddress: Address): BigDecimal {
 	const poolAddress = getPoolFromLpToken(lpAddress)
 
-	const underlyingTokensAddresses = cryptoPoolUnderlyingTokensAddressesByPoolAddress(
-		poolAddress
-	)
+	const underlyingTokensAddresses =
+		cryptoPoolUnderlyingTokensAddressesByPoolAddress(poolAddress)
 
 	let totalValue = constants.BIGDECIMAL_ZERO
 

@@ -8,6 +8,7 @@ import {
 	XdaiToken,
 	PolygonAmm,
 	PolygonToken,
+	ZERO_ADDRESS,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolPolygonConfigurations implements Configurations {
@@ -117,6 +118,8 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 			return XdaiToken.USDT
 		} else if (tokenAddress == PolygonToken.ETH) {
 			return XdaiToken.ETH
+		} else if (tokenAddress == PolygonToken.MATIC) {
+			return XdaiToken.MATIC
 		} else if (tokenAddress == PolygonToken.WBTC) {
 			return XdaiToken.WBTC
 		} else if (tokenAddress == PolygonToken.HOP) {
@@ -178,7 +181,7 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 		} else if (tokenAddress == PolygonToken.WBTC) {
 			return MainnetToken.WBTC //MAINNET WBTC
 		} else if (tokenAddress == PolygonToken.HOP) {
-			return PolygonToken.HOP //MAINNET HOP
+			return MainnetToken.HOP //MAINNET HOP
 		} else {
 			log.critical('Token not found', [])
 		}
@@ -194,7 +197,7 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 			return PolygonToken.USDT
 		} else if (poolAddress == PolygonAmm.ETH) {
 			return PolygonToken.ETH
-		} else if (poolAddress == PolygonToken.MATIC) {
+		} else if (poolAddress == PolygonAmm.MATIC) {
 			return PolygonToken.MATIC
 		} else if (poolAddress == PolygonAmm.WBTC) {
 			return PolygonToken.WBTC
@@ -214,11 +217,11 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 		} else if (bridgeAddress == PolygonBridge.ETH) {
 			return PolygonAmm.ETH
 		} else if (bridgeAddress == PolygonBridge.MATIC) {
-			return PolygonToken.MATIC
+			return PolygonAmm.MATIC
 		} else if (bridgeAddress == PolygonBridge.WBTC) {
 			return PolygonAmm.WBTC
 		} else if (bridgeAddress == PolygonBridge.HOP) {
-			return PolygonAmm.HOP
+			return ZERO_ADDRESS
 		} else {
 			log.critical('Address not found', [])
 			return ''
@@ -234,7 +237,7 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 			return ['HOP-USDT', 'hUSDT/USDT']
 		} else if (poolAddress == PolygonAmm.ETH) {
 			return ['HOP-ETH', 'hETH/ETH']
-		} else if (poolAddress == PolygonToken.MATIC) {
+		} else if (poolAddress == PolygonAmm.MATIC) {
 			return ['HOP-MATIC', 'hMATIC/MATIC']
 		} else if (poolAddress == PolygonAmm.WBTC) {
 			return ['HOP-WBTC', 'hWBTC/WBTC']
@@ -260,9 +263,10 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 			PolygonAmm.USDC,
 			PolygonAmm.DAI,
 			PolygonAmm.USDT,
-			PolygonToken.MATIC,
+			PolygonAmm.MATIC,
 			PolygonAmm.ETH,
 			PolygonAmm.WBTC,
+			ZERO_ADDRESS,
 		]
 	}
 	getBridgeList(): string[] {

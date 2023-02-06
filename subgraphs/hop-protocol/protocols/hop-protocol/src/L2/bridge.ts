@@ -32,6 +32,8 @@ import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
 import {
 	MESSENGER_ADDRESSES,
+	XDAI_L2_SIGNATURE,
+	OPTIMISM_L2_SIGNATURE,
 	MESSENGER_EVENT_SIGNATURES,
 } from '../../config/constants/constant'
 import { Network } from '../../../../src/sdk/util/constants'
@@ -77,6 +79,10 @@ export function handleBonderAdded(event: BonderAdded): void {
 export function handleTransferFromL1Completed(
 	event: TransferFromL1Completed
 ): void {
+	log.warning('TransferFromL1 - bridgeAddress: {},  hash: {}', [
+		event.address.toHexString(),
+		event.transaction.hash.toHexString(),
+	])
 	if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
 		const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
 			event.address.toHexString()
@@ -138,13 +144,13 @@ export function handleTransferFromL1Completed(
 		if (receipt) {
 			for (let index = 0; index < receipt.logs.length; index++) {
 				const _topic0 = receipt.logs[index].topics[0].toHexString()
+				if (!MESSENGER_EVENT_SIGNATURES.includes(_topic0)) continue
+
 				const _optimismData = receipt.logs[index].topics[1]
 				const _address = receipt.logs[index].address
 				const _data = receipt.logs[index].data
 
 				const data = Bytes.fromUint8Array(_data.subarray(0))
-
-				if (!MESSENGER_EVENT_SIGNATURES.includes(_topic0)) continue
 
 				log.warning(
 					'MessageINDT - emittingContractaddress: {}, topic0: {}, logAddress: {}, data: {}',
@@ -155,16 +161,13 @@ export function handleTransferFromL1Completed(
 						data.toHexString(),
 					]
 				)
-				if (
-					_topic0 ==
-					'0x4641df4a962071e12719d8c8c8e5ac7fc4d97b927346a3d7a335b1f7517e133c'
-				) {
+				if (_topic0 == OPTIMISM_L2_SIGNATURE) {
 					acc.messageIn(
 						reverseChainIDs.get(Network.MAINNET)!,
 						event.params.recipient,
 						_optimismData
 					)
-				} else {
+				} else if (_topic0 == XDAI_L2_SIGNATURE) {
 					acc.messageIn(
 						reverseChainIDs.get(Network.MAINNET)!,
 						event.params.recipient,
@@ -178,15 +181,23 @@ export function handleTransferFromL1Completed(
 				])
 			}
 		}
-	}
 
-	log.warning('TransferIN - TokenAddress: {},  txHash: {}', [
-		event.address.toHexString(),
-		event.transaction.hash.toHexString(),
-	])
+		log.warning('TransferIN - TokenAddress: {},  txHash: {}', [
+			event.address.toHexString(),
+			event.transaction.hash.toHexString(),
+		])
+	}
 }
 
 export function handleTransferSent(event: TransferSent): void {
+	log.warning(
+		'TransferSent - bridgeAddress: {},  hash: {}, outgoingChainId: {}',
+		[
+			event.address.toHexString(),
+			event.transaction.hash.toHexString(),
+			event.params.chainId.toString(),
+		]
+	)
 	if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
 		const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
 			event.address.toHexString()
@@ -196,7 +207,10 @@ export function handleTransferSent(event: TransferSent): void {
 		)
 
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
-
+		log.warning('S1 - inputToken: {},  poolAddress: {}', [
+			inputToken,
+			poolAddress,
+		])
 		const poolName = poolConfig[0]
 		const poolSymbol = poolConfig[1]
 
@@ -209,6 +223,10 @@ export function handleTransferSent(event: TransferSent): void {
 		if (!pool.isInitialized) {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
+		log.warning('S2 - inputToken: {},  poolAddress: {}', [
+			inputToken,
+			poolAddress,
+		])
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
 			event.params.chainId,
 			Address.fromString(
@@ -220,6 +238,10 @@ export function handleTransferSent(event: TransferSent): void {
 			CrosschainTokenType.CANONICAL,
 			Address.fromString(inputToken)
 		)
+		log.warning('S3 - inputToken: {},  poolAddress: {}', [
+			inputToken,
+			poolAddress,
+		])
 		pool.addDestinationToken(crossToken)
 		acc.transferOut(
 			pool,
@@ -236,11 +258,10 @@ export function handleTransferSent(event: TransferSent): void {
 		if (receipt) {
 			for (let index = 0; index < receipt.logs.length; index++) {
 				const _topic0 = receipt.logs[index].topics[0].toHexString()
+				if (!MESSENGER_EVENT_SIGNATURES.includes(_topic0)) continue
+
 				const _address = receipt.logs[index].address
 				const _data = receipt.logs[index].data
-				const _optimismData = receipt.logs[index].topics[1]
-
-				if (!MESSENGER_EVENT_SIGNATURES.includes(_topic0)) continue
 
 				const data = Bytes.fromUint8Array(_data.subarray(0))
 
@@ -253,21 +274,18 @@ export function handleTransferSent(event: TransferSent): void {
 						data.toHexString(),
 					]
 				)
-
-				if (MESSENGER_EVENT_SIGNATURES.includes(_topic0)) {
+				if (_topic0 == XDAI_L2_SIGNATURE || _topic0 == OPTIMISM_L2_SIGNATURE) {
 					acc.messageOut(event.params.chainId, event.params.recipient, data)
 				}
-
 				log.warning('MessageOUTDT2 - TokenAddress: {},  data: {}', [
 					event.address.toHexString(),
 					data.toHexString(),
 				])
 			}
 		}
+		log.warning('TransferOUT - TokenAddress: {},  txHash: {},', [
+			event.address.toHexString(),
+			event.transaction.hash.toHexString(),
+		])
 	}
-
-	log.warning('TransferOUT - TokenAddress: {},  txHash: {},', [
-		event.address.toHexString(),
-		event.transaction.hash.toHexString(),
-	])
 }

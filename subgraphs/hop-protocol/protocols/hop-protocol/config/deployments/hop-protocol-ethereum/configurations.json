@@ -1,10 +1,10 @@
 {
   "network": "mainnet",
   "isMainnet": true,
-  "graftEnabled": false,
+  "graftEnabled": true,
   "deployment": "HOP_PROTOCOL_ETHEREUM",
-  "subgraphId": "QmYUEA4xYrsHzH9GWErjSdcGZi8FCH1Y1frSuqYTN5hQCJ",
-  "graftStartBlock": 15634367,
+  "subgraphId": "QmaYEjHsiQPGtP3ZhzhDqQd8JKC5jq4nVnMhaFpkAfZDL9",
+  "graftStartBlock": 16228403,
   "tokens": [
     {
       "dataSourceName": "Token",
