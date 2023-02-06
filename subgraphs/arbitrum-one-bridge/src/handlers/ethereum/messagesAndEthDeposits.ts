@@ -25,10 +25,10 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
 
   // Nitro
   // Message Types - https://github.com/OffchainLabs/nitro/blob/master/contracts/src/libraries/MessageTypes.sol#L10
-  // L1MessageType_ethDeposit = 12
-  // L2_MSG = 3
+  const L1MessageType_ethDeposit = 12
+  const L2_MSG = 3
 
-  if (event.params.kind == 12) {
+  if (event.params.kind == L1MessageType_ethDeposit) {
 
     // -- TOKENS
 
@@ -65,12 +65,11 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
       event.transaction.value,
       event.transaction.hash
     );
-  } else if (event.params.kind == 3) {
+  } else if (event.params.kind == L2_MSG) {
     acc.messageIn(
       networkToChainID(Network.ARBITRUM_ONE),
       event.params.sender,
       event.params.messageDataHash
-      // event.transaction.hash   // bug: no optional transactionID param
     );
   }
 }
