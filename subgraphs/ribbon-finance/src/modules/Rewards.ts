@@ -63,6 +63,7 @@ export function updateStakedOutputTokenAmount(
     gaugeContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
+  
   vault.stakedOutputTokenAmount = gaugeWorkingSupply;
 
   if (gaugeWorkingSupply.equals(constants.BIGINT_ZERO)) {

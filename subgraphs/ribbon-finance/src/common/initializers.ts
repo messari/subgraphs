@@ -404,13 +404,19 @@ export function getOrCreateLiquidityGauge(
       gaugeContract.try_decimals(),
       constants.BIGINT_ZERO
     );
-    const vaultAddress = utils.readValue(
+    let vaultAddress = utils.readValue(
       gaugeContract.try_lp_token(),
       constants.NULL.TYPE_ADDRESS
     );
 
-    gauge.vault = vaultAddress.toHexString();
+    if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) {
+      vaultAddress = utils.readValue(
+        gaugeContract.try_stakingToken(),
+        constants.NULL.TYPE_ADDRESS
+      );
+    }
 
+    gauge.vault = vaultAddress.toHexString();
     gauge.symbol = utils.readValue(gaugeContract.try_symbol(), "");
     gauge.save();
     LiquidityGaugeTemplate.create(gaugeAddress);
