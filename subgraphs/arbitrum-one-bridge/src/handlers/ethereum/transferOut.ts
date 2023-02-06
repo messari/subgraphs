@@ -3,7 +3,7 @@ import {
   BridgePoolType,
   CrosschainTokenType,
 } from "../../sdk/protocols/bridge/enums";
-import { Address, log, ethereum } from "@graphprotocol/graph-ts";
+import { Address, log, ethereum, Bytes } from "@graphprotocol/graph-ts";
 import {
   TokenGateway,
   WithdrawalFinalized
@@ -59,7 +59,7 @@ export function handleTransferOut(event: WithdrawalFinalized): void {
 
   // -- POOL
 
-  const poolId = event.address.concat(inputToken.symbol);
+  const poolId = event.address.concat(Bytes.fromUTF8(inputToken.symbol));
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {

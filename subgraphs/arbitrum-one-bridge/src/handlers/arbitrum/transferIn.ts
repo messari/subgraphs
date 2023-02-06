@@ -1,4 +1,4 @@
-import { Address, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { BridgeConfig } from "../../sdk/protocols/bridge/config";
 import {
   DepositFinalized,
@@ -36,7 +36,10 @@ export function handleTransferIn(event: DepositFinalized): void {
   // -- TOKENS
 
   const gatewayContract = TokenGateway.bind(event.address);
+
   const inputTokenAddress = event.params.l1Token;
+  const inputToken = sdk.Tokens.getOrCreateToken(inputTokenAddress);
+
   let crossTokenAddress: Address;
 
   const crossTokenAddressResult =
@@ -56,15 +59,15 @@ export function handleTransferIn(event: DepositFinalized): void {
 
   // -- POOL
 
-  const poolId = event.address.concat(crossToken.symbol);
+  const poolId = event.address.concat(Bytes.fromUTF8(inputToken.symbol));
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
     pool.initialize(
       poolId.toString(),
-      crossToken.symbol,
+      inputToken.symbol,
       BridgePoolType.LOCK_RELEASE,
-      sdk.Tokens.getOrCreateToken(event.params.l1Token)
+      inputToken
     );
   }
 
