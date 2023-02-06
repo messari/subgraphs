@@ -30,7 +30,8 @@ import {
 } from "../../util/arrays";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
-import { CustomEventType, SDK } from ".";
+import { SDK } from ".";
+import { CustomEventType } from "../../util/events";
 
 type onCreatePoolCallback<T> = (
   event: CustomEventType,

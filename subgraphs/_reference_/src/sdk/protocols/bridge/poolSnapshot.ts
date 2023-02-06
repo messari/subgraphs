@@ -1,5 +1,5 @@
 import { Bytes } from "@graphprotocol/graph-ts";
-import { CustomEventType } from ".";
+import { CustomEventType } from "../../util/events";
 import {
   Pool as PoolSchema,
   PoolDailySnapshot,

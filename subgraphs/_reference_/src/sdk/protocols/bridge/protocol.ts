@@ -15,7 +15,8 @@ import {
   BigInt,
 } from "@graphprotocol/graph-ts";
 import { chainIDToNetwork, networkToChainID } from "./chainIds";
-import { CustomEventType, SDK } from ".";
+import { SDK } from ".";
+import { CustomEventType } from "../../util/events";
 
 /**
  * Bridge is a wrapper around the BridgeProtocolSchema entity that takes care of
