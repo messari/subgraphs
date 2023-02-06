@@ -374,7 +374,7 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: RewardsPaid(indexed address)
+        - event: RewardPaid(indexed address,uint256)
           handler: handleRewardsPaid
       file: ./protocols/hop-protocol/src/L2/reward.ts
 {{/rewards}}

@@ -9,6 +9,7 @@ import {
 	PolygonAmm,
 	PolygonToken,
 	ZERO_ADDRESS,
+	PolygonRewardToken,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolPolygonConfigurations implements Configurations {
@@ -51,15 +52,15 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 		}
 	}
 	getTokenDetails(tokenAddress: string): string[] {
-		if (tokenAddress == PolygonToken.USDC) {
+		if (this.getUsdcTokens().includes(tokenAddress)) {
 			return ['USDC', 'USD Coin', '6', PolygonBridge.USDC]
-		} else if (tokenAddress == PolygonToken.DAI) {
+		} else if (this.getDaiTokens().includes(tokenAddress)) {
 			return ['DAI', 'DAI Stablecoin', '18', PolygonBridge.DAI]
-		} else if (tokenAddress == PolygonToken.USDT) {
+		} else if (this.getUsdtTokens().includes(tokenAddress)) {
 			return ['USDT', 'Tether USD', '6', PolygonBridge.USDT]
-		} else if (tokenAddress == PolygonToken.ETH) {
+		} else if (this.getEthTokens().includes(tokenAddress)) {
 			return ['ETH', 'ETH', '18', PolygonBridge.ETH]
-		} else if (tokenAddress == PolygonToken.MATIC) {
+		} else if (this.getMaticTokens().includes(tokenAddress)) {
 			return ['MATIC', 'MATIC', '18', PolygonBridge.MATIC]
 		} else if (tokenAddress == PolygonToken.WBTC) {
 			return ['WBTC', 'WBTC', '18', PolygonBridge.WBTC]
@@ -68,6 +69,22 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 		} else {
 			log.critical('Token not found', [])
 			return []
+		}
+	}
+
+	getPoolAddressFromRewardTokenAddress(rewardToken: string): string {
+		if (rewardToken == PolygonRewardToken.USDC_A) return PolygonAmm.USDC
+		else if (rewardToken == PolygonRewardToken.USDC_B) return PolygonAmm.USDC
+		else if (rewardToken == PolygonRewardToken.USDT_A) return PolygonAmm.USDT
+		else if (rewardToken == PolygonRewardToken.USDT_A) return PolygonAmm.USDT
+		else if (rewardToken == PolygonRewardToken.ETH_A) return PolygonAmm.ETH
+		else if (rewardToken == PolygonRewardToken.ETH_B) return PolygonAmm.ETH
+		else if (rewardToken == PolygonRewardToken.DAI_A) return PolygonAmm.DAI
+		else if (rewardToken == PolygonRewardToken.DAI_B) return PolygonAmm.DAI
+		else if (rewardToken == PolygonRewardToken.MATIC) return PolygonAmm.MATIC
+		else {
+			log.critical('RewardToken not found', [])
+			return ''
 		}
 	}
 
@@ -284,29 +301,58 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 	getPolygonCrossTokenFromTokenAddress(tokenAddress: string): string {
 		return ''
 	}
+
+	getRewardTokenList(): string[] {
+		return [
+			PolygonRewardToken.DAI_A,
+			PolygonRewardToken.DAI_B,
+			PolygonRewardToken.ETH_A,
+			PolygonRewardToken.ETH_B,
+			PolygonRewardToken.USDC_A,
+			PolygonRewardToken.USDC_B,
+			PolygonRewardToken.USDT_A,
+			PolygonRewardToken.USDT_B,
+		]
+	}
 	getUsdcPools(): string[] {
 		return []
 	}
 	getUsdcTokens(): string[] {
-		return []
+		return [
+			PolygonRewardToken.USDC_A,
+			PolygonRewardToken.USDC_B,
+			PolygonToken.USDC,
+		]
 	}
 	getDaiPools(): string[] {
 		return []
 	}
 	getDaiTokens(): string[] {
-		return []
+		return [
+			PolygonRewardToken.DAI_B,
+			PolygonRewardToken.DAI_A,
+			PolygonToken.DAI,
+		]
 	}
 	getUsdtPools(): string[] {
 		return []
 	}
 	getUsdtTokens(): string[] {
-		return []
+		return [
+			PolygonRewardToken.USDT_A,
+			PolygonRewardToken.USDT_B,
+			PolygonToken.USDT,
+		]
 	}
 	getEthPools(): string[] {
 		return []
 	}
 	getEthTokens(): string[] {
-		return []
+		return [
+			PolygonRewardToken.ETH_A,
+			PolygonRewardToken.ETH_B,
+			PolygonToken.ETH,
+		]
 	}
 	getSnxPools(): string[] {
 		return []
@@ -330,6 +376,6 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 		return []
 	}
 	getMaticTokens(): string[] {
-		return []
+		return [PolygonRewardToken.MATIC, PolygonToken.MATIC]
 	}
 }

@@ -19,20 +19,13 @@ import {
 	dataSource,
 } from '@graphprotocol/graph-ts'
 import {
-	TokenSwap,
-	L2_Amm,
-	AddLiquidity,
-	RemoveLiquidity,
-	RemoveLiquidityOne,
-} from '../../../../generated/HopL2Amm/L2_Amm'
+	L2_Reward,
+	RewardPaid,
+} from '../../../../generated/HopL2Rewards/L2_Reward'
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
-import {
-	BIGINT_TEN_TO_EIGHTEENTH,
-	RewardTokenType,
-} from '../../../../src/sdk/util/constants'
-import { priceTokens } from '../../config/constants/constant'
+import { RewardTokenType } from '../../../../src/sdk/util/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -66,51 +59,46 @@ class TokenInit implements TokenInitializer {
 	}
 }
 
-export function handleRewardsPaid(event: RewardsPaid): void {
+export function handleRewardsPaid(event: RewardPaid): void {
 	if (
 		NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
 	) {
-		let amount = event.params.tokenAmounts
+		let amount = event.params.reward
 
 		const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
 			event.address.toHexString()
 		)
-		log.warning('RewardsPaid--> emitter: {}, poolAddress: {}, inputToken: {}', [
+		log.warning('RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}', [
 			event.address.toHexString(),
 			poolAddress,
-			amount,
+			amount.toString(),
 		])
-		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
-			event.address.toHexString()
-		)
-		log.warning('RewardsPaid--> poolAddress: {}, inputToken: {}', [
-			poolAddress,
-			inputToken,
-		])
+
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
+		log.warning('RewardsPaid --> poolAddress: {},', [poolAddress])
 
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
 
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
-		const pool = sdk.Pools.loadPool<string>(event.address)
-		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
-		sdk.Accounts.loadAccount(event.params.provider)
+		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+		const token = sdk.Tokens.getOrCreateToken(event.address)
+		sdk.Accounts.loadAccount(event.params.user)
 
 		if (!pool.isInitialized) {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 
 		const Reward = L2_Reward.bind(event.address)
-		const rewardRateCall = Rewards.try_rewardRate()
+		const rewardRateCall = Reward.try_rewardRate()
 		if (!rewardRateCall.reverted) {
 			const rewardRate = rewardRateCall.value
 			const dailyEmission = BigInt.fromI32(2419200).div(rewardRate)
 			pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
 
 			log.warning(
-				'RewardsPaid--> txHash: {}, rewardRate: {}, dailyEmission: {}',
+				'RewardsPaid --> txHash: {}, rewardRate: {}, dailyEmission: {}',
 				[
 					event.transaction.hash.toHexString(),
 					rewardRate.toString(),

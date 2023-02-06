@@ -3,9 +3,9 @@
   "isMainnet": false,
   "subgraphName": "hop-polygon",
   "deployment": "HOP_PROTOCOL_POLYGON",
-  "graftEnabled": false,
-  "subgraphId": "QmQXd7WzKeU43SiHJbVF7zeyRt3KZkr9syEA3d1dTX1W2C",
-  "graftStartBlock": 17698620,
+  "graftEnabled": true,
+  "subgraphId": "QmdkEpFoQABWNgSzAxRjtFH1zcpTkzAfM84HFrhkcvgtGZ",
+  "graftStartBlock": 16761065,
   "tokens": [
     {
       "dataSourceName": "Token",
@@ -144,6 +144,62 @@
       "token": "HOP",
       "address": "0x58c61AeE5eD3D748a1467085ED2650B697A66234",
       "startBlock": 33447834
+    }
+  ],
+  "rewards": [
+    {
+      "dataSourceName": "HopL2Rewards",
+      "token": "USDC",
+      "address": "0x2C2Ab81Cf235e86374468b387e241DF22459A265",
+      "startBlock": 16761065
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDC_B",
+      "token": "USDC",
+      "address": "0x7811737716942967Ae6567B26a5051cC72af550E",
+      "startBlock": 34505750
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDT_A",
+      "token": "USDT",
+      "address": "0x07932e9A5AB8800922B2688FB1FA0DAAd8341772",
+      "startBlock": 17540994
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDT_B",
+      "token": "USDT",
+      "address": "0x297E5079DF8173Ae1696899d3eACD708f0aF82Ce",
+      "startBlock": 34505757
+    },
+    {
+      "dataSourceName": "HopL2RewardsDAI_A",
+      "token": "DAI",
+      "address": "0x4Aeb0B5B1F3e74314A7Fa934dB090af603E8289b",
+      "startBlock": 27094057
+    },
+    {
+      "dataSourceName": "HopL2RewardsDAI_B",
+      "token": "DAI",
+      "address": "0xd6dC6F69f81537Fe9DEcc18152b7005B45Dc2eE7",
+      "startBlock": 34505754
+    },
+    {
+      "dataSourceName": "HopL2RewardsETH_A",
+      "token": "ETH",
+      "address": "0x7bCeDA1Db99D64F25eFA279BB11CE48E15Fda427",
+      "startBlock": 20261272
+    },
+    {
+      "dataSourceName": "HopL2RewardsETH_B",
+      "token": "ETH",
+      "address": "0xAA7b3a4A084e6461D486E53a03CF45004F0963b7",
+      "startBlock": 34505746
+    },
+    {
+      "dataSourceName": "HopL2RewardsMATIC",
+      "token": "MATIC",
+      "address": "0x7dEEbCaD1416110022F444B03aEb1D20eB4Ea53f",
+      "startBlock": 17840131
     }
   ]
 }

@@ -29,7 +29,24 @@ export namespace XdaiToken {
 	export const WBTC = '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252'.toLowerCase()
 	export const HOP = '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
 }
-
+export namespace XdaiRewardToken {
+	export const USDC_A =
+		'0x5D13179c5fa40b87D53Ff67ca26245D3D5B2F872'.toLowerCase()
+	export const USDC_B =
+		'0x636A7ee78faCd079DaBC8f81EDA1D09AA9D440A7'.toLowerCase()
+	export const USDT_A =
+		'0x12a3a66720dD925fa93f7C895bC20Ca9560AdFe7'.toLowerCase()
+	export const USDT_B =
+		'0xBF7a02d963b23D84313F07a04ad663409CEE5A92'.toLowerCase()
+	export const DAI_A =
+		'0x12a3a66720dD925fa93f7C895bC20Ca9560AdFe7'.toLowerCase()
+	export const DAI_B =
+		'0xBF7a02d963b23D84313F07a04ad663409CEE5A92'.toLowerCase()
+	export const ETH_A =
+		'0xC61bA16e864eFbd06a9fe30Aab39D18B8F63710a'.toLowerCase()
+	export const ETH_B =
+		'0x712F0cf37Bdb8299D0666727F73a5cAbA7c1c24c'.toLowerCase()
+}
 export namespace MainnetToken {
 	export const USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'.toLowerCase()
 	export const USDT = '0xdAC17F958D2ee523a2206206994597C13D831ec7'.toLowerCase()
@@ -83,6 +100,13 @@ export namespace ArbitrumToken {
 	export const HOP = '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
 }
 
+export namespace ArbitrumRewardToken {
+	export const USDC = '0xb0CabFE930642AD3E7DECdc741884d8C3F7EbC70'.toLowerCase()
+	export const USDT = '0x9Dd8685463285aD5a94D2c128bda3c5e8a6173c8'.toLowerCase()
+	export const DAI = '0xd4D28588ac1D9EF272aa29d4424e3E2A03789D1E'.toLowerCase()
+	export const ETH = '0x755569159598f3702bdD7DFF6233A317C156d3Dd'.toLowerCase()
+}
+
 export namespace OptimismBridge {
 	export const USDC = '0xa81D244A1814468C734E5b4101F7b9c0c577a8fC'.toLowerCase()
 	export const USDT = '0x46ae9BaB8CEA96610807a275EBD36f8e916b5C61'.toLowerCase()
@@ -112,6 +136,17 @@ export namespace OptimismToken {
 	export const sUSD = '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9'.toLowerCase()
 	export const SNX = '0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4'.toLowerCase()
 	export const HOP = '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
+}
+
+export namespace OptimismRewardToken {
+	export const USDC = '0xf587B9309c603feEdf0445aF4D3B21300989e93a'.toLowerCase()
+	export const USDT = '0xAeB1b49921E0D2D96FcDBe0D486190B2907B3e0B'.toLowerCase()
+	export const DAI = '0x392B9780cFD362bD6951edFA9eBc31e68748b190'.toLowerCase()
+	export const ETH = '0x95d6A95BECfd98a7032Ed0c7d950ff6e0Fa8d697'.toLowerCase()
+	export const SNX_A =
+		'0x25a5A48C35e75BD2EFf53D94f0BB60d5A00E36ea'.toLowerCase()
+	export const SNX_B =
+		'0x09992Dd7B32f7b35D347DE9Bdaf1919a57d38E82'.toLowerCase()
 }
 
 export namespace PolygonBridge {
@@ -144,6 +179,26 @@ export namespace PolygonToken {
 	export const MATIC =
 		'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270'.toLowerCase()
 	export const HOP = '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
+}
+export namespace PolygonRewardToken {
+	export const USDC_A =
+		'0x2C2Ab81Cf235e86374468b387e241DF22459A265'.toLowerCase()
+	export const USDC_B =
+		'0x7811737716942967Ae6567B26a5051cC72af550E'.toLowerCase()
+	export const USDT_A =
+		'0x07932e9A5AB8800922B2688FB1FA0DAAd8341772'.toLowerCase()
+	export const USDT_B =
+		'0x297E5079DF8173Ae1696899d3eACD708f0aF82Ce'.toLowerCase()
+	export const DAI_A =
+		'0x4Aeb0B5B1F3e74314A7Fa934dB090af603E8289b'.toLowerCase()
+	export const DAI_B =
+		'0xd6dC6F69f81537Fe9DEcc18152b7005B45Dc2eE7'.toLowerCase()
+	export const ETH_A =
+		'0x7bCeDA1Db99D64F25eFA279BB11CE48E15Fda427'.toLowerCase()
+	export const ETH_B =
+		'0xAA7b3a4A084e6461D486E53a03CF45004F0963b7'.toLowerCase()
+	export const MATIC =
+		'0x7dEEbCaD1416110022F444B03aEb1D20eB4Ea53f'.toLowerCase()
 }
 
 export const priceTokens = [

@@ -70,6 +70,13 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		}
 	}
 
+	getRewardTokenList(): string[] {
+		return []
+	}
+	getPoolAddressFromRewardTokenAddress(rewardToken: string): string {
+		return ''
+	}
+
 	getTokenAddressFromBridgeAddress(bridgeAddress: string): string {
 		if (bridgeAddress == MainnetBridge.USDC) return MainnetToken.USDC
 		else if (bridgeAddress == MainnetBridge.DAI) return MainnetToken.DAI

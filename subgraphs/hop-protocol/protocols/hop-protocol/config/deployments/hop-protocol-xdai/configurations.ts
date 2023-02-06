@@ -9,6 +9,7 @@ import {
 	XdaiToken,
 	PolygonToken,
 	ZERO_ADDRESS,
+	XdaiRewardToken,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 
@@ -30,20 +31,20 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		}
 	}
 	getTokenDetails(tokenAddress: string): string[] {
-		if (tokenAddress == XdaiToken.USDC) {
+		if (this.getUsdcTokens().includes(tokenAddress)) {
 			return ['USDC', 'USD Coin', '6', XdaiBridge.USDC]
-		} else if (tokenAddress == XdaiToken.DAI) {
+		} else if (this.getDaiTokens().includes(tokenAddress)) {
 			return ['DAI', 'DAI Stablecoin', '18', XdaiBridge.DAI]
-		} else if (tokenAddress == XdaiToken.USDT) {
+		} else if (this.getUsdtTokens().includes(tokenAddress)) {
 			return ['USDT', 'Tether USD', '6', XdaiBridge.USDT]
-		} else if (tokenAddress == XdaiToken.ETH) {
-			return ['ETH', 'Ethereum', '18', XdaiBridge.USDC]
+		} else if (this.getEthTokens().includes(tokenAddress)) {
+			return ['ETH', 'ETH', '18', XdaiBridge.ETH]
 		} else if (tokenAddress == XdaiToken.WBTC) {
 			return ['WBTC', 'Wrapped BTC', '18', XdaiBridge.WBTC]
 		} else if (tokenAddress == XdaiToken.MATIC) {
 			return ['MATIC', 'MATIC', '18', XdaiBridge.MATIC]
 		} else if (tokenAddress == XdaiToken.HOP) {
-			return ['HOP', 'HOP', '18']
+			return ['HOP', 'HOP', '18', ZERO_ADDRESS]
 		} else {
 			log.critical('Token not found', [])
 			return []
@@ -195,6 +196,21 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		}
 	}
 
+	getPoolAddressFromRewardTokenAddress(rewardToken: string): string {
+		if (rewardToken == XdaiRewardToken.USDC_A) return XdaiAmm.USDC
+		else if (rewardToken == XdaiRewardToken.USDC_B) return XdaiAmm.USDC
+		else if (rewardToken == XdaiRewardToken.USDT_A) return XdaiAmm.USDT
+		else if (rewardToken == XdaiRewardToken.USDT_A) return XdaiAmm.USDT
+		else if (rewardToken == XdaiRewardToken.ETH_A) return XdaiAmm.ETH
+		else if (rewardToken == XdaiRewardToken.ETH_B) return XdaiAmm.ETH
+		else if (rewardToken == XdaiRewardToken.DAI_A) return XdaiAmm.DAI
+		else if (rewardToken == XdaiRewardToken.DAI_B) return XdaiAmm.DAI
+		else {
+			log.critical('RewardToken not found', [])
+			return ''
+		}
+	}
+
 	getTokenList(): string[] {
 		return [
 			XdaiToken.USDC,
@@ -229,6 +245,19 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		]
 	}
 
+	getRewardTokenList(): string[] {
+		return [
+			XdaiRewardToken.DAI_A,
+			XdaiRewardToken.DAI_B,
+			XdaiRewardToken.ETH_A,
+			XdaiRewardToken.ETH_B,
+			XdaiRewardToken.USDC_A,
+			XdaiRewardToken.USDC_B,
+			XdaiRewardToken.USDT_A,
+			XdaiRewardToken.USDT_B,
+		]
+	}
+
 	getXdaiCrossTokenFromTokenAddress(tokenAddress: string): string {
 		return ''
 	}
@@ -253,25 +282,25 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		return []
 	}
 	getUsdcTokens(): string[] {
-		return []
+		return [XdaiRewardToken.USDC_A, XdaiRewardToken.USDC_B, XdaiToken.USDC]
 	}
 	getDaiPools(): string[] {
 		return []
 	}
 	getDaiTokens(): string[] {
-		return []
+		return [XdaiRewardToken.DAI_A, XdaiRewardToken.DAI_B, XdaiToken.DAI]
 	}
 	getUsdtPools(): string[] {
 		return []
 	}
 	getUsdtTokens(): string[] {
-		return []
+		return [XdaiRewardToken.USDT_A, XdaiRewardToken.USDT_B, XdaiToken.USDT]
 	}
 	getEthPools(): string[] {
 		return []
 	}
 	getEthTokens(): string[] {
-		return []
+		return [XdaiRewardToken.ETH_A, XdaiRewardToken.ETH_B, XdaiToken.ETH]
 	}
 	getSnxPools(): string[] {
 		return []

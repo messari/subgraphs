@@ -20,7 +20,8 @@ export interface Configurations {
 	getArbitrumCrossTokenFromTokenAddress(tokenAddress: string): string
 	getMainnetCrossTokenFromTokenAddress(tokenAddress: string): string
 	getPolygonCrossTokenFromTokenAddress(tokenAddress: string): string
-
+	getRewardTokenList(): string[]
+	getPoolAddressFromRewardTokenAddress(rewardToken: string): string
 	getUsdcPools(): string[]
 	getUsdcTokens(): string[]
 	getDaiPools(): string[]

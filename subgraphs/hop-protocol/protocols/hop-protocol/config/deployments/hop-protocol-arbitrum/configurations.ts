@@ -8,6 +8,7 @@ import {
 	XdaiToken,
 	PolygonToken,
 	OptimismToken,
+	ArbitrumRewardToken,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolArbitrumConfigurations implements Configurations {
@@ -27,13 +28,13 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		}
 	}
 	getTokenDetails(tokenAddress: string): string[] {
-		if (tokenAddress == ArbitrumToken.USDC) {
+		if (this.getUsdcTokens().includes(tokenAddress)) {
 			return ['USDC', 'USDC', '6', ArbitrumBridge.USDC]
-		} else if (tokenAddress == ArbitrumToken.DAI) {
+		} else if (this.getUsdcTokens().includes(tokenAddress)) {
 			return ['DAI', 'DAI', '18', ArbitrumBridge.DAI]
-		} else if (tokenAddress == ArbitrumToken.USDT) {
+		} else if (this.getUsdtTokens().includes(tokenAddress)) {
 			return ['USDT', 'USDT', '6', ArbitrumBridge.USDT]
-		} else if (tokenAddress == ArbitrumToken.ETH) {
+		} else if (this.getEthTokens().includes(tokenAddress)) {
 			return ['ETH', 'ETH', '18', ArbitrumBridge.ETH]
 		} else if (tokenAddress == ArbitrumToken.WBTC) {
 			return ['WBTC', 'WBTC', '18', ArbitrumBridge.WBTC]
@@ -233,24 +234,24 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		return []
 	}
 	getUsdcTokens(): string[] {
-		return []
-	}
-	getDaiPools(): string[] {
-		return []
+		return [ArbitrumToken.USDC, ArbitrumRewardToken.USDC]
 	}
 	getDaiTokens(): string[] {
+		return [ArbitrumToken.DAI, ArbitrumRewardToken.DAI]
+	}
+	getUsdtTokens(): string[] {
+		return [ArbitrumToken.USDT, ArbitrumRewardToken.USDT]
+	}
+	getEthTokens(): string[] {
+		return [ArbitrumToken.ETH, ArbitrumRewardToken.ETH]
+	}
+	getDaiPools(): string[] {
 		return []
 	}
 	getUsdtPools(): string[] {
 		return []
 	}
-	getUsdtTokens(): string[] {
-		return []
-	}
 	getEthPools(): string[] {
-		return []
-	}
-	getEthTokens(): string[] {
 		return []
 	}
 	getSnxPools(): string[] {
@@ -276,5 +277,24 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 	}
 	getMaticTokens(): string[] {
 		return []
+	}
+
+	getRewardTokenList(): string[] {
+		return [
+			ArbitrumRewardToken.DAI,
+			ArbitrumRewardToken.ETH,
+			ArbitrumRewardToken.USDC,
+			ArbitrumRewardToken.USDT,
+		]
+	}
+	getPoolAddressFromRewardTokenAddress(rewardToken: string): string {
+		if (rewardToken == ArbitrumRewardToken.DAI) return ArbitrumAmm.USDC
+		else if (rewardToken == ArbitrumRewardToken.ETH) return ArbitrumAmm.USDT
+		else if (rewardToken == ArbitrumRewardToken.USDC) return ArbitrumAmm.ETH
+		else if (rewardToken == ArbitrumRewardToken.USDT) return ArbitrumAmm.ETH
+		else {
+			log.critical('RewardToken not found', [])
+			return ''
+		}
 	}
 }

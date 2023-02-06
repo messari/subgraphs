@@ -9,6 +9,7 @@ import {
 	PolygonToken,
 	ZERO_ADDRESS,
 	OptimismAmm,
+	OptimismRewardToken,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolOptimismConfigurations implements Configurations {
@@ -44,18 +45,31 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 			return ''
 		}
 	}
+
+	getPoolAddressFromRewardTokenAddress(rewardToken: string): string {
+		if (rewardToken == OptimismRewardToken.SNX_A) return OptimismAmm.USDC
+		else if (rewardToken == OptimismRewardToken.SNX_B) return OptimismAmm.USDC
+		else if (rewardToken == OptimismRewardToken.DAI) return OptimismAmm.USDT
+		else if (rewardToken == OptimismRewardToken.ETH) return OptimismAmm.USDT
+		else if (rewardToken == OptimismRewardToken.USDC) return OptimismAmm.ETH
+		else if (rewardToken == OptimismRewardToken.USDT) return OptimismAmm.ETH
+		else {
+			log.critical('RewardToken not found', [])
+			return ''
+		}
+	}
 	getTokenDetails(tokenAddress: string): string[] {
-		if (tokenAddress == OptimismToken.USDC) {
+		if (this.getUsdcTokens().includes(tokenAddress)) {
 			return ['USDC', 'USD Coin', '6', OptimismBridge.USDC]
-		} else if (tokenAddress == OptimismToken.DAI) {
+		} else if (this.getDaiTokens().includes(tokenAddress)) {
 			return ['DAI', 'DAI Stablecoin', '18', OptimismBridge.DAI]
-		} else if (tokenAddress == OptimismToken.USDT) {
+		} else if (this.getUsdtTokens().includes(tokenAddress)) {
 			return ['USDT', 'Tether USD', '6', OptimismBridge.USDT]
-		} else if (tokenAddress == OptimismToken.ETH) {
+		} else if (this.getEthTokens().includes(tokenAddress)) {
 			return ['ETH', 'Ethereum', '18', OptimismBridge.USDC]
 		} else if (tokenAddress == OptimismToken.WBTC) {
 			return ['WBTC', 'Wrapped BTC', '18', OptimismBridge.WBTC]
-		} else if (tokenAddress == OptimismToken.SNX) {
+		} else if (this.getSnxTokens().includes(tokenAddress)) {
 			return ['SNX', 'SNX', '18', OptimismBridge.SNX]
 		} else if (tokenAddress == OptimismToken.sUSD) {
 			return ['sUSD', 'sUSD', '18', OptimismBridge.sUSD]
@@ -240,36 +254,50 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 			OptimismBridge.HOP,
 		]
 	}
+	getRewardTokenList(): string[] {
+		return [
+			OptimismRewardToken.SNX_A,
+			OptimismRewardToken.SNX_B,
+			OptimismRewardToken.DAI,
+			OptimismRewardToken.ETH,
+			OptimismRewardToken.USDC,
+			OptimismRewardToken.USDT,
+		]
+	}
 
 	getUsdcPools(): string[] {
 		return []
 	}
 	getUsdcTokens(): string[] {
-		return []
+		return [OptimismRewardToken.USDC, OptimismToken.USDC]
 	}
 	getDaiPools(): string[] {
 		return []
 	}
 	getDaiTokens(): string[] {
-		return []
+		return [OptimismRewardToken.DAI, OptimismToken.DAI]
 	}
 	getUsdtPools(): string[] {
 		return []
 	}
 	getUsdtTokens(): string[] {
-		return []
+		return [OptimismRewardToken.USDT, OptimismToken.USDT]
 	}
 	getEthPools(): string[] {
 		return []
 	}
 	getEthTokens(): string[] {
-		return []
+		return [OptimismRewardToken.ETH, OptimismToken.ETH]
 	}
 	getSnxPools(): string[] {
 		return []
 	}
 	getSnxTokens(): string[] {
-		return []
+		return [
+			OptimismRewardToken.SNX_A,
+			OptimismToken.USDT,
+			OptimismRewardToken.SNX_B,
+		]
 	}
 	getsUSDPools(): string[] {
 		return []

@@ -3,9 +3,9 @@
   "isMainnet": false,
   "subgraphName": "hop-xdai",
   "deployment": "HOP_PROTOCOL_XDAI",
-  "graftEnabled": false,
-  "subgraphId": "QmXcGuzoE4LfDFzTgcWR5oGwwmTgw3p1sDMfQe2xL6CUJt",
-  "graftStartBlock": 16815308,
+  "graftEnabled": true,
+  "subgraphId": "QmWJZ1hKmWPW5QqjxMfVca36set7gQAsHfXUCNnjqKBorf",
+  "graftStartBlock": 16761065,
   "tokens": [
     {
       "dataSourceName": "Token",
@@ -144,6 +144,56 @@
       "token": "HOP",
       "address": "0x6F03052743CD99ce1b29265E377e320CD24Eb632",
       "startBlock": 24309494
+    }
+  ],
+  "rewards": [
+    {
+      "dataSourceName": "HopL2Rewards",
+      "token": "USDC",
+      "address": "0x5D13179c5fa40b87D53Ff67ca26245D3D5B2F872",
+      "startBlock": 20383705
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDC_B",
+      "token": "USDC",
+      "address": "0x636A7ee78faCd079DaBC8f81EDA1D09AA9D440A7",
+      "startBlock": 24646599
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDT_A",
+      "token": "USDT",
+      "address": "0x12a3a66720dD925fa93f7C895bC20Ca9560AdFe7",
+      "startBlock": 20895527
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDT_B",
+      "token": "USDT",
+      "address": "0xBF7a02d963b23D84313F07a04ad663409CEE5A92",
+      "startBlock": 24646600
+    },
+    {
+      "dataSourceName": "HopL2RewardsDAI_A",
+      "token": "DAI",
+      "address": "0x12a3a66720dD925fa93f7C895bC20Ca9560AdFe7",
+      "startBlock": 20383718
+    },
+    {
+      "dataSourceName": "HopL2RewardsDAI_B",
+      "token": "DAI",
+      "address": "0xBF7a02d963b23D84313F07a04ad663409CEE5A92",
+      "startBlock": 24646600
+    },
+    {
+      "dataSourceName": "HopL2RewardsETH_A",
+      "token": "ETH",
+      "address": "0xC61bA16e864eFbd06a9fe30Aab39D18B8F63710a",
+      "startBlock": 20383666
+    },
+    {
+      "dataSourceName": "HopL2RewardsETH_B",
+      "token": "ETH",
+      "address": "0x712F0cf37Bdb8299D0666727F73a5cAbA7c1c24c",
+      "startBlock": 24646599
     }
   ]
 }

@@ -3,9 +3,9 @@
   "isMainnet": false,
   "subgraphName": "hop-optimism",
   "deployment": "HOP_PROTOCOL_OPTIMISM",
-  "graftEnabled": false,
-  "subgraphId": "QmW2LKee3PozS6PXcVCNsjDgc3GAhCW94wU5wA3KkYsDcn",
-  "graftStartBlock": 1091700,
+  "graftEnabled": true,
+  "subgraphId": "QmShVMsi6w83Y2VQFWf6CafYiywgFJ9Qy7MypBjAhAjB7A",
+  "graftStartBlock": 13838432,
   "tokens": [
     {
       "dataSourceName": "Token",
@@ -164,6 +164,44 @@
       "token": "HOP",
       "address": "0x03D7f750777eC48d39D080b020D83Eb2CB4e3547",
       "startBlock": 24710333
+    }
+  ],
+  "rewards": [
+    {
+      "dataSourceName": "HopL2Rewards",
+      "token": "USDC",
+      "address": "0xf587B9309c603feEdf0445aF4D3B21300989e93a",
+      "startBlock": 30117285
+    },
+    {
+      "dataSourceName": "HopL2RewardsUSDT",
+      "token": "USDT",
+      "address": "0xAeB1b49921E0D2D96FcDBe0D486190B2907B3e0B",
+      "startBlock": 30117312
+    },
+    {
+      "dataSourceName": "HopL2RewardsDAI",
+      "token": "DAI",
+      "address": "0x392B9780cFD362bD6951edFA9eBc31e68748b190",
+      "startBlock": 30117302
+    },
+    {
+      "dataSourceName": "HopL2RewardsETH",
+      "token": "ETH",
+      "address": "0x95d6A95BECfd98a7032Ed0c7d950ff6e0Fa8d697",
+      "startBlock": 30117251
+    },
+    {
+      "dataSourceName": "HopL2RewardsSNX_A",
+      "token": "ETH",
+      "address": "0x25a5A48C35e75BD2EFf53D94f0BB60d5A00E36ea",
+      "startBlock": 30117322
+    },
+    {
+      "dataSourceName": "HopL2RewardsSNX_B",
+      "token": "ETH",
+      "address": "0x09992Dd7B32f7b35D347DE9Bdaf1919a57d38E82",
+      "startBlock": 30297161
     }
   ]
 }
