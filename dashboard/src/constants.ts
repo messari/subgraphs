@@ -1,4 +1,9 @@
 import { schemaMapping } from "./utils";
+import { versionsList as versionsListDex } from "./queries/dex/schema";
+import { versionsList as versionsListLending } from "./queries/lending/schema";
+import { versionsList as versionsListYield } from "./queries/yield/schema";
+import { versionsList as versionsListGeneric } from "./queries/generic/schema";
+import { versionsList as versionsListBridge } from "./queries/bridge/schema";
 
 export namespace ProtocolType {
   export const EXCHANGE = "EXCHANGE";
@@ -9,6 +14,7 @@ export namespace ProtocolType {
 }
 export namespace Versions {
   export const Schema100 = "1.0.0";
+  export const Schema110 = "1.1.0";
   export const Schema120 = "1.2.0";
   export const Schema130 = "1.3.0";
   export const Schema200 = "2.0.0";
@@ -16,9 +22,6 @@ export namespace Versions {
   export const Schema300 = "3.0.0";
   export const Schema301 = "3.0.1";
   export const Schema302 = "3.0.2";
-
-  // Array to list out the different schema versions available
-  export const SchemaVersions = [Schema100, Schema120, Schema130, Schema201, Schema300];
 }
 
 export const latestSchemaVersions = (schemaType: string, versionStr: string) => {
@@ -42,6 +45,22 @@ export const latestSchemaVersions = (schemaType: string, versionStr: string) => 
   }
   return false;
 }
+
+export const listSchemaVersionsByType: { [x: string]: string[] } = {
+  EXCHANGE: versionsListDex,
+  LENDING: versionsListLending,
+  YIELD: versionsListYield,
+  GENERIC: versionsListGeneric,
+  BRIDGE: versionsListBridge,
+  "exchanges": versionsListDex,
+  "vaults": versionsListYield,
+  "dex-amm": versionsListDex,
+  "yield-aggregator": versionsListYield,
+  "lending": versionsListLending,
+  "generic": versionsListGeneric,
+  "bridge": versionsListBridge,
+}
+
 export const SubgraphBaseUrl = "https://api.thegraph.com/subgraphs/name/";
 export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",
@@ -53,7 +72,7 @@ export const PoolName: Record<string, string> = {
   "vaults": "vault",
   "dex-amm": "liquidityPool",
   "yield-aggregator": "vault",
-  "lending": "pool",
+  "lending": "market",
   "generic": "pool",
   "bridge": "pool",
 };
@@ -67,7 +86,7 @@ export const PoolNames: Record<string, string> = {
   "vaults": "vaults",
   "dex-amm": "liquidityPools",
   "yield-aggregator": "vaults",
-  "lending": "pools",
+  "lending": "markets",
   "generic": "pools",
   "bridge": "pools",
 };
