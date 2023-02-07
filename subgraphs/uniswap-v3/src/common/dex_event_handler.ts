@@ -281,7 +281,7 @@ export class DexEventHandler {
   }
 
   createWithdraw(
-    owner: Address,
+    from: Address,
     tickLower: Tick | null,
     tickUpper: Tick | null,
     position: Position | null
@@ -302,7 +302,7 @@ export class DexEventHandler {
     withdraw.protocol = this.protocol.id;
     withdraw.pool = this.pool.id;
     withdraw.position = position ? position.id : null;
-    withdraw.account = owner;
+    withdraw.account = from;
     withdraw.blockNumber = this.event.block.number;
     withdraw.timestamp = this.event.block.timestamp;
     withdraw.liquidity = this.totalLiquidityDelta.abs();
@@ -316,7 +316,7 @@ export class DexEventHandler {
   }
 
   createDeposit(
-    owner: Address,
+    from: Address,
     tickLower: Tick | null,
     tickUpper: Tick | null,
     position: Position | null
@@ -337,7 +337,7 @@ export class DexEventHandler {
     deposit.protocol = this.protocol.id;
     deposit.pool = this.pool.id;
     deposit.position = position ? position.id : null;
-    deposit.account = owner;
+    deposit.account = from;
     deposit.blockNumber = this.event.block.number;
     deposit.timestamp = this.event.block.timestamp;
     deposit.liquidity = this.totalLiquidityDelta.abs();
@@ -353,7 +353,7 @@ export class DexEventHandler {
   createSwap(
     tokensInIdx: i32,
     tokensOutIdx: i32,
-    sender: Address,
+    from: Address,
     tick: BigInt | null
   ): void {
     this.eventType = EventType.SWAP;
@@ -370,7 +370,7 @@ export class DexEventHandler {
     swap.gasLimit = this.event.transaction.gasLimit;
     swap.gasPrice = this.event.transaction.gasPrice;
     swap.protocol = this.protocol.id;
-    swap.account = sender;
+    swap.account = from;
     swap.pool = this.pool.id;
     swap.blockNumber = this.event.block.number;
     swap.timestamp = this.event.block.timestamp;

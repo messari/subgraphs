@@ -55,7 +55,7 @@ export function handleMint(event: MintEvent): void {
   );
   const dexEventHandler = new DexEventHandler(event, pool, false, deltas);
   dexEventHandler.createDeposit(
-    event.params.owner,
+    event.transaction.from,
     getOrCreateTick(event, pool, BigInt.fromI32(event.params.tickLower)),
     getOrCreateTick(event, pool, BigInt.fromI32(event.params.tickUpper)),
     null
@@ -81,7 +81,7 @@ export function handleBurn(event: BurnEvent): void {
   ]);
   const dexEventHandler = new DexEventHandler(event, pool, false, deltas);
   dexEventHandler.createWithdraw(
-    event.params.owner,
+    event.transaction.from,
     getOrCreateTick(event, pool, BigInt.fromI32(event.params.tickLower)),
     getOrCreateTick(event, pool, BigInt.fromI32(event.params.tickUpper)),
     null
@@ -113,7 +113,7 @@ export function handleSwap(event: SwapEvent): void {
   dexEventHandler.createSwap(
     tokenInIdx,
     tokenOutIdx,
-    event.params.sender,
+    event.transaction.from,
     BigInt.fromI32(event.params.tick)
   );
   dexEventHandler.processLPBalanceChanges();
@@ -130,10 +130,11 @@ export function handleCollectPool(event: CollectEvent): void {
     pool._totalAmountCollected,
     [event.params.amount0, event.params.amount1],
   ]);
-  pool.uncollectedSupplySideTokenAmounts = sumBigIntListByIndex([
-    subtractBigIntLists(pool._totalAmountEarned, pool._totalAmountCollected),
-    pool._totalAmountWithdrawn,
-  ]);
+  pool.uncollectedSupplySideTokenAmounts = subtractBigIntLists(
+    pool._totalAmountEarned,
+    subtractBigIntLists(pool._totalAmountCollected, pool._totalAmountWithdrawn)
+  );
+
   pool.uncollectedSupplySideValuesUSD = getAmountUSD(
     event,
     pool,

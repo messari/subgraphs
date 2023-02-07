@@ -31,7 +31,7 @@ export function getOrCreatePosition(
 
       position = new Position(id);
       // Gets updated on transfer events
-      position.account = ZERO_ADDRESS;
+      position.account = event.transaction.from;
       position.pool = poolAddress;
       position.hashOpened = event.transaction.hash;
       position.blockNumberOpened = event.block.number;

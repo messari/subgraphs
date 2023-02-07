@@ -61,6 +61,8 @@ export function populateEmptyPools(event: ethereum.Event): void {
 
     pool.inputTokenBalances = [tvlToken0Raw, tvlToken1Raw];
     poolAmounts.inputTokenBalances = [tvlToken0Adjusted, tvlToken1Adjusted];
+    pool.totalLiquidity = poolContract.liquidity();
+    pool.activeLiquidity = pool.totalLiquidity;
 
     poolAmounts.save();
     pool.save();
