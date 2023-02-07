@@ -1,5 +1,7 @@
 import { Schema, Versions } from "../../constants";
 
+export const versionsList = ["1.3.0", "2.0.0", "3.0.3"];
+
 export const schema = (version: string): Schema => {
   // The version group uses the first two digits  of the schema version and defaults to that schema.
   const versionGroupArr = version.split(".");
