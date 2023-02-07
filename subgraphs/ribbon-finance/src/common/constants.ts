@@ -96,7 +96,7 @@ export const FEE_DENOMINATOR_BIGINT = BIGINT_TEN.pow(10);
 export const FEE_DENOMINATOR = BigDecimal.fromString("10000000000");
 
 export const ETH_CALL_V2_CONTRACT = Address.fromString(
-  "0x25751853Eab4D0eB3652B5eB6ecB102A2789644B"
+  "0x25751853eab4d0eb3652b5eb6ecb102a2789644b"
 );
 
 export const RBN_TOKEN = Address.fromString(
@@ -105,7 +105,7 @@ export const RBN_TOKEN = Address.fromString(
 export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromString("92000");
 
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "0x0cb9cc35cEFa5622E8d25aF36dD56DE142eF6415"
+  "0x0cb9cc35cefa5622e8d25af36dd56de142ef6415"
 );
 export const RIBBON_PLATFORM_ID = "ribbon";
-export const PROTOCOL_ID = "0x25751853Eab4D0eB3652B5eB6ecB102A2789644B";
+export const PROTOCOL_ID = "0x25751853eab4d0eb3652b5eb6ecb102a2789644b";
