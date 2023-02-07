@@ -626,18 +626,17 @@ export function createLiquidityDepositEvent(
   fromAddress: Address,
   toAddress: Address,
   amount: BigInt,
-  call: ethereum.Call
+  event: ethereum.Event
 ): void {
-  const logIndex = BigInt.fromI32(0);
-  const depositEventID = call.transaction.hash
+  const depositEventID = event.transaction.hash
     .toHexString()
     .concat("-")
-    .concat(logIndex.toString());
+    .concat(event.logIndex.toString());
 
   const depositEvent = new LiquidityDeposit(Bytes.fromUTF8(depositEventID));
 
-  depositEvent.hash = call.transaction.hash;
-  depositEvent.logIndex = logIndex.toI32();
+  depositEvent.hash = event.transaction.hash;
+  depositEvent.logIndex = event.logIndex.toI32();
   depositEvent.protocol = Bytes.fromHexString(
     NetworkConfigs.getFactoryAddress()
   );
@@ -655,8 +654,8 @@ export function createLiquidityDepositEvent(
     token.lastPriceUSD!
   );
 
-  depositEvent.blockNumber = call.block.number;
-  depositEvent.timestamp = call.block.timestamp;
+  depositEvent.blockNumber = event.block.number;
+  depositEvent.timestamp = event.block.timestamp;
 
   depositEvent.save();
 }
@@ -669,18 +668,17 @@ export function createLiquidityWithdrawEvent(
   fromAddress: Address,
   toAddress: Address,
   amount: BigInt,
-  call: ethereum.Call
+  event: ethereum.Event
 ): void {
-  const logIndex = BigInt.fromI32(0);
-  const withdrawEventID = call.transaction.hash
+  const withdrawEventID = event.transaction.hash
     .toHexString()
     .concat("-")
-    .concat(logIndex.toString());
+    .concat(event.logIndex.toString());
 
   const withdrawEvent = new LiquidityWithdraw(Bytes.fromUTF8(withdrawEventID));
 
-  withdrawEvent.hash = call.transaction.hash;
-  withdrawEvent.logIndex = logIndex.toI32();
+  withdrawEvent.hash = event.transaction.hash;
+  withdrawEvent.logIndex = event.logIndex.toI32();
   withdrawEvent.protocol = Bytes.fromHexString(
     NetworkConfigs.getFactoryAddress()
   );
@@ -698,8 +696,8 @@ export function createLiquidityWithdrawEvent(
     token.lastPriceUSD!
   );
 
-  withdrawEvent.blockNumber = call.block.number;
-  withdrawEvent.timestamp = call.block.timestamp;
+  withdrawEvent.blockNumber = event.block.number;
+  withdrawEvent.timestamp = event.block.timestamp;
 
   withdrawEvent.save();
 }

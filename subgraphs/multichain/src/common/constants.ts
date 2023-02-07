@@ -16,6 +16,7 @@ export const PROTOCOL_SLUG = "multichain";
 // See below for a complete list:
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
+  export const ADA = "ADA";
   export const APT = "APT";
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const ARBITRUM_NOVA = "ARBITRUM_NOVA";
@@ -72,6 +73,7 @@ export namespace Network {
   export const RSK = "RSK";
   export const SHIDEN = "SHIDEN";
   export const SMARTBCH = "SMARTBCH";
+  export const SOL = "SOL";
   export const SYSCOIN = "SYSCOIN";
   export const TELOS = "TELOS";
   export const TERRA = "TERRA";
@@ -257,6 +259,9 @@ NetworkByID.set("1000005788240", Network.XRP);
 NetworkByID.set("1000004280404", Network.APT);
 NetworkByID.set("1000005128531", Network.NAS);
 NetworkByID.set("1361940275777", Network.TERRA);
+NetworkByID.set("1000004277313", Network.ADA);
+NetworkByID.set("1000005459788", Network.SOL);
+NetworkByID.set("0", Network.UNKNOWN_NETWORK);
 
 const mainnetInacuratePricefeedTokens = [
   Address.fromString("0x86A298581388bc199e61BFeCDcA8eA22Cf6C0Da3"), // anyGTPS

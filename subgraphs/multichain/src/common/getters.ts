@@ -49,7 +49,7 @@ import {
   Account,
 } from "../../generated/schema";
 import { LiquidityPoolTemplate } from "../../generated/templates";
-import { anyTOKEN } from "../../generated/RouterV6/anyTOKEN";
+import { anyToken } from "../../generated/Router-0/anyToken";
 
 export function getOrCreateProtocol(): BridgeProtocol {
   let protocol = BridgeProtocol.load(
@@ -148,7 +148,7 @@ export function getOrCreateToken(
       } else {
         let pricedTokenAddress = tokenAddress;
 
-        const anyTokenContract = anyTOKEN.bind(tokenAddress);
+        const anyTokenContract = anyToken.bind(tokenAddress);
         const underlyingTokenCall = anyTokenContract.try_underlying();
         if (
           !underlyingTokenCall.reverted &&
@@ -157,9 +157,9 @@ export function getOrCreateToken(
           pricedTokenAddress = underlyingTokenCall.value;
         }
 
-        const price = getUsdPricePerToken(pricedTokenAddress);
+        const price = getUsdPricePerToken(pricedTokenAddress, block);
         if (!price.reverted) {
-          token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+          token.lastPriceUSD = price.usdPrice;
         }
       }
     }
