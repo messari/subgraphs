@@ -20,7 +20,7 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 
 export const CURVE_REGISTRY_ADDRESSES: Address[] = [
-  Address.fromString("0xC2b1DF84112619D190193E48148000e3990Bf627"),
+  Address.fromString("0xc2b1df84112619d190193e48148000e3990bf627"),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ export const CURVE_REGISTRY_ADDRESSES: Address[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"), // SushiSwap
+  Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // SushiSwap
 ];
 
 ///////////////////////////////////////////////////////////////////////////

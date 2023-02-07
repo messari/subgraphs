@@ -36,7 +36,7 @@ export function handleUnstake(event: Withdraw): void {
 
   const liquidityGauge = getOrCreateLiquidityGauge(gaugeAddress);
   const vaultAddress = Address.fromString(liquidityGauge.vault);
-  
+
   if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
   updateStakedOutputTokenAmount(vaultAddress, gaugeAddress, event.block);
