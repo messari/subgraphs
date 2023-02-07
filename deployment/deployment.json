@@ -130,7 +130,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.18",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -163,7 +163,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.18",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -196,7 +196,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.18",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -229,7 +229,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.17",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -251,7 +251,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.17",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -277,7 +277,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.18",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -306,7 +306,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.1"
         },
         "files": {
@@ -328,7 +328,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.1"
         },
         "files": {
@@ -350,7 +350,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.1"
         },
         "files": {
@@ -372,7 +372,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.1"
         },
         "files": {
@@ -394,7 +394,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.1"
         },
         "files": {
@@ -416,7 +416,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.1"
         },
         "files": {
@@ -438,7 +438,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.1"
         },
         "files": {
@@ -485,6 +485,28 @@
           "hosted-service": {
             "slug": "alpaca-finance-lending-bsc",
             "query-id": "alpaca-finance-lending-bsc"
+          }
+        }
+      },
+      "alpaca-finance-lending-fantom": {
+        "network": "fantom",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "alpaca.finance.lending.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "alpaca-finance-lending-fantom",
+            "query-id": "alpaca-finance-lending-fantom"
           }
         }
       }
@@ -3231,7 +3253,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.13",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3260,7 +3282,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3289,7 +3311,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.7",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6160,7 +6182,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.0.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6182,7 +6204,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.0.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6230,7 +6252,7 @@
       },
       "stargate-avalanche": {
         "network": "avalanche",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -6252,7 +6274,7 @@
       },
       "stargate-bsc": {
         "network": "bsc",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -6274,7 +6296,7 @@
       },
       "stargate-arbitrum": {
         "network": "arbitrum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -6296,7 +6318,7 @@
       },
       "stargate-polygon": {
         "network": "polygon",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -6318,7 +6340,7 @@
       },
       "stargate-optimism": {
         "network": "optimism",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",

@@ -501,7 +501,8 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     protocolData,
     event.params.liquidator,
     event.params.user,
-    debtMarketId
+    debtMarketId,
+    event.params.debtToCover
   );
 }
 

@@ -12,7 +12,7 @@ export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract(
   2396321
 );
 export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract(
-  "0xb56c2F0B653B2e0b10C9b928C8580Ac5Df02C7C7",
+  "0xb56c2f0b653b2e0b10c9b928c8580ac5df02c7c7",
   7740843
 );
 export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
@@ -31,8 +31,8 @@ export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
 );
 
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x445FE580eF8d70FF569aB36e80c647af338db351", 1362056),
-  new OracleContract("0x0E9fBb167DF83EdE3240D6a5fa5d40c6C6851e15", 4530115),
+  new OracleContract("0x445fe580ef8d70ff569ab36e80c647af338db351", 1362056),
+  new OracleContract("0x0e9fbb167df83ede3240d6a5fa5d40c6c6851e15", 4530115),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 );
 export const WETH_ADDRESS = Address.fromString(
   "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
