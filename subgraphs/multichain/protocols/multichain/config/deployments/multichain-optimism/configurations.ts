@@ -33,7 +33,7 @@ export class MultichainOptimismConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xfA9dA51631268A30Ec3DDd1CcBf46c65FAD99251";
+    return "0xfa9da51631268a30ec3ddd1ccbf46c65fad99251";
   }
   getChainID(): BigInt {
     return BigInt.fromI32(10);

@@ -148,7 +148,7 @@ export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 export const ETH_DECIMALS = 18;
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 ////////////////////////
 ///// Type Helpers /////
@@ -264,7 +264,7 @@ NetworkByID.set("1000005459788", Network.SOL);
 NetworkByID.set("0", Network.UNKNOWN_NETWORK);
 
 const mainnetInacuratePricefeedTokens = [
-  Address.fromString("0x86A298581388bc199e61BFeCDcA8eA22Cf6C0Da3"), // anyGTPS
+  Address.fromString("0x86a298581388bc199e61bfecdca8ea22cf6c0da3"), // anyGTPS
 ];
 
 export const INACURATE_PRICEFEED_TOKENS = new TypedMap<string, Address[]>();
