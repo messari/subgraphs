@@ -6,7 +6,7 @@ import {
   DailySnapshot,
   HourlySnapshot,
   Network,
-  Stats,
+  Stat,
 } from "../generated/schema";
 import {
   BIGDECIMAL_ZERO,
@@ -93,7 +93,9 @@ export function updateMetrics(blockData: BlockData, network: Network): void {
 }
 
 function updateDailySnapshot(blockData: BlockData, network: Network): void {
-  const snapshotId = (blockData.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  const snapshotId = Bytes.fromI64(
+    blockData.timestamp.toI64() / SECONDS_PER_DAY
+  );
   const snapshot = getOrCreateDailySnapshot(blockData.timestamp);
 
   // grab block interval before updating timestamp
@@ -370,7 +372,7 @@ export function updateAuthors(
 }
 
 //
-// Update Stats entity and return the id
+// Update Stat entity and return the id
 // calculate the variance, q1, q3 once the daily/hourly snapshot is done
 function updateStats(id: string, dataType: string, value: BigInt): string {
   const stats = getOrCreateStats(id, dataType);
@@ -432,46 +434,46 @@ function updatePreviousDailySnapshot(snapshot: DailySnapshot): void {
     DataType.BLOCKS,
     BigInt.fromI32(snapshot.dailyBlocks)
   );
-  updateStatisicalData(getOrCreateStats(network.id, DataType.BLOCKS));
+  updateStatisticalData(getOrCreateStats(network.id, DataType.BLOCKS));
 
   // calculate var, q1, and q3 for prev snapshots
   if (snapshot.dailyUniqueAuthors) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.AUTHORS));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.AUTHORS));
   }
   if (snapshot.dailyDifficulty) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.DIFFICULTY));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.DIFFICULTY));
   }
   if (snapshot.dailyGasUsed) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_USED));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.GAS_USED));
   }
   if (snapshot.dailyGasLimit) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_LIMIT));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.GAS_LIMIT));
   }
   if (snapshot.dailyBurntFees) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.BURNT_FEES));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.BURNT_FEES));
   }
   if (snapshot.dailyRewards) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.REWARDS));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.REWARDS));
   }
   if (snapshot.dailySize) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SIZE));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.SIZE));
   }
   if (snapshot.dailyChunks) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.CHUNKS));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.CHUNKS));
   }
   if (snapshot.dailySupply) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SUPPLY));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.SUPPLY));
   }
   if (snapshot.dailyTransactions) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
   }
   if (snapshot.dailyBlockInterval) {
-    updateStatisicalData(
+    updateStatisticalData(
       getOrCreateStats(snapshot.id, DataType.BLOCK_INTERVAL)
     );
   }
   if (snapshot.dailyGasPrice) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
   }
 }
 
@@ -481,49 +483,49 @@ function updatePreviousDailySnapshot(snapshot: DailySnapshot): void {
 function updatePreviousHourlySnapshot(snapshot: HourlySnapshot): void {
   // calculate var, q1, and q3 for prev snapshots
   if (snapshot.hourlyUniqueAuthors) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.AUTHORS));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.AUTHORS));
   }
   if (snapshot.hourlyDifficulty) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.DIFFICULTY));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.DIFFICULTY));
   }
   if (snapshot.hourlyGasUsed) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_USED));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.GAS_USED));
   }
   if (snapshot.hourlyGasLimit) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_LIMIT));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.GAS_LIMIT));
   }
   if (snapshot.hourlyBurntFees) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.BURNT_FEES));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.BURNT_FEES));
   }
   if (snapshot.hourlyRewards) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.REWARDS));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.REWARDS));
   }
   if (snapshot.hourlySize) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SIZE));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.SIZE));
   }
   if (snapshot.hourlyChunks) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.CHUNKS));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.CHUNKS));
   }
   if (snapshot.hourlySupply) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SUPPLY));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.SUPPLY));
   }
   if (snapshot.hourlyTransactions) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
   }
   if (snapshot.hourlyBlockInterval) {
-    updateStatisicalData(
+    updateStatisticalData(
       getOrCreateStats(snapshot.id, DataType.BLOCK_INTERVAL)
     );
   }
   if (snapshot.hourlyGasPrice) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
+    updateStatisticalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
   }
 }
 
 //
 //
 // This function updates a snapshots variance, q1, and q3
-function updateStatisicalData(statsEntity: Stats): void {
+function updateStatisticalData(statsEntity: Stat): void {
   // sort values array
   statsEntity.values = statsEntity.values.sort();
 
@@ -689,11 +691,11 @@ function getOrCreateNetwork(id: string): Network {
   return network;
 }
 
-function getOrCreateStats(snapshot: string, dataType: string): Stats {
-  const id = snapshot.concat("-").concat(dataType);
-  let stats = Stats.load(id);
+function getOrCreateStats(snapshot: string, dataType: string): Stat {
+  const id = Bytes.fromUTF8(snapshot.concat("-").concat(dataType));
+  let stats = Stat.load(id);
   if (!stats) {
-    stats = new Stats(id);
+    stats = new Stat(id);
     stats.count = INT_ZERO;
     stats.mean = BIGDECIMAL_ZERO;
     stats.max = BIGINT_ZERO;
@@ -701,7 +703,6 @@ function getOrCreateStats(snapshot: string, dataType: string): Stats {
     stats.variance = BIGDECIMAL_ZERO;
     stats.q3 = BIGDECIMAL_ZERO;
     stats.q1 = BIGDECIMAL_ZERO;
-    stats.values = [];
     stats.sum = BIGINT_ZERO;
     stats.save();
   }

@@ -1,5 +1,5 @@
 # Subgraph Schema: Network
-# Version: 1.1.2
+# Version: 1.2.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum SubgraphNetwork {
@@ -44,9 +44,9 @@ enum DataType {
 }
 
 # Stores statistical analytics for given metrics
-type Stats @entity {
+type Stat @entity {
   " { id of the snapshot this belongs to } - { DataType } "
-  id: ID!
+  id: Bytes!
 
   " Number of times entity has been used in a time data entity "
   count: Int!
@@ -59,9 +59,6 @@ type Stats @entity {
 
   " The minimum value in this data set "
   min: BigInt!
-
-  " List of values in order from smallest to largest "
-  values: [BigInt!]!
 
   " The sum of all the values "
   sum: BigInt!
@@ -145,7 +142,7 @@ type Network @entity {
 
 type DailySnapshot @entity {
   " { number of days since UNIX epoch time } "
-  id: ID!
+  id: Bytes!
 
   " ID of the network this snapshot belongs to "
   network: Network!
@@ -227,7 +224,7 @@ type DailySnapshot @entity {
 
 type HourlySnapshot @entity {
   " { number of hours since UNIX epoch time } "
-  id: ID!
+  id: Bytes!
 
   " ID of the network this snapshot belongs to "
   network: Network!
@@ -313,7 +310,7 @@ type HourlySnapshot @entity {
 
 type Block @entity(immutable: true) {
   " { block number } "
-  id: ID!
+  id: Bytes!
 
   " Hash of this block "
   hash: Bytes!
@@ -380,7 +377,7 @@ type Author @entity {
 # Helper entity for calculating daily/hourly active authors
 type ActiveAuthor @entity(immutable: true) {
   " { daily/hourly }-{ Address of the author }-{ Days/hours since Unix epoch } "
-  id: ID!
+  id: Bytes!
 }
 
 # Helper entitiy for NEAR protocol to keep track of chunks for metric aggregation
