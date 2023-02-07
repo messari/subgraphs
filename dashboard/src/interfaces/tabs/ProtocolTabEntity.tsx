@@ -7,7 +7,7 @@ import { BigNumber } from "bignumber.js";
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
 import JSZip from "jszip";
-import DefiLlamaComparsionTab from "../DefiLlamaComparisonTab";
+import DefiLlamaComparsionTab from "../../common/chartComponents/DefiLlamaComparison";
 import { UploadFileCSV } from "../../common/utilComponents/UploadFileCSV";
 
 interface ProtocolTabEntityProps {
@@ -579,8 +579,6 @@ function ProtocolTabEntity({
             </Typography>
           </CopyLinkToClipboard>
         </Box>
-        <h3>Hold on! This subgraph has alot of entities, it may take a minute for the query to return.</h3>
-        <CircularProgress sx={{ margin: 6 }} size={50} />
       </Grid>
     );
   }

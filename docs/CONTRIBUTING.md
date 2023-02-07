@@ -73,7 +73,7 @@ To keep PRs small follow these guidelines, and use them to make educated choices
 - If you are formatting code outside of the scope of your PR it should be in a separate PR
 - Isolate bug fixes into individual PRs, do not combine them. If they depend on each other use your judgement if they should be together or not. You can always branch off a `feature-branch`
 - Use a single PR for each feature (ie, a new subgraph has its own PR)
-- Update the subgraph version according to our versioning outlined [below](#naming-conventions).
+- Update the subgraph version according to our versioning outlined in the discussion [here](https://github.com/messari/subgraphs/issues/1379)
 
 ### Merging
 
@@ -99,19 +99,19 @@ It is nice to have a consistent naming convention for pull requests. Oftentimes 
 
 PR names also drive the commit name once a PR is merged into `master`. In this way it is easier to tell what was changed in each commit.
 
-The impact level identifiers are based on semver versioning. So you can use #`name` to help prefix and categorize your PR. Read more about semver changes [here](https://semver.org/#summary).
+The impact level identifiers are based on semver versioning. So you can use #`name` to help prefix and categorize your PR. Our subgraph versioning has resemblance from [semver](https://semver.org/#summary) versioning, with our own twist as discussed [here](https://github.com/messari/subgraphs/issues/1379).
 
 ### #patch
 
-This change is generally a bug fix, and does not break anything. ie, it is backwards compatible.
+Changes that affect the developer. This may include linting, formatting, small refactors, docs, etc. This does not require a redeploy.
 
 ### #minor
 
-This is a change that adds a new feature, but still remains backwards compatible.
+This is a change that does not seriously affect data on Protocol Metrics. It may be a refactor, performance improvement, or new feature. There is developer discretion when it comes to what is considered a minor vs major change. This may require a redeploy, but it is not urgent/dire.
 
 ### #major
 
-This change is usually a big update as it will not be backwards compatible with the previous code.
+This is a code change that seriously affects data on Protocol Metrics. These changes will make noticeable differences in the data and should be redeployed and backfilled ASAP.
 
 ### Additional identifiers
 
@@ -143,9 +143,9 @@ Examples:
 - "chore(); README; update comp version"
 - "fix(#patch); abracadabra; fixing issue #420"
 - "docs(); contributing; add Contributing.md"
-- "refactor(#patch); aave-v2-forks; update reward logic"
+- "refactor(#minor); aave-v2-forks; update reward logic"
 - "style(); uniswap; format code"
-- "perf(#patch); spookyswap; find value without contract call"
+- "perf(#minor); spookyswap; find value without contract call"
 
 > Notice: some of the names don't have a #`semver` name. This is because they don't actually affect the versioning on any of the subgraphs / dashboard. A good way to know which semver identifier to use is to notice which part of the version you are updating. And it looks like this (MAJOR.MINOR.PATCH)!
 

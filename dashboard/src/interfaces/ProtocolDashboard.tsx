@@ -3,14 +3,14 @@ import { ApolloClient, ApolloError, gql, HttpLink, InMemoryCache, NormalizedCach
 
 import { Chart as ChartJS, registerables } from "chart.js";
 import React, { useEffect, useMemo, useState } from "react";
-import { poolOverview, schema } from "../queries/schema";
+import { metaDataQuery, poolOverview, schema } from "../queries/schema";
 import { PoolName, PoolNames, ProtocolType, SubgraphBaseUrl } from "../constants";
 import ErrorDisplay from "./ErrorDisplay";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router";
 import { isValidHttpUrl, NewClient, schemaMapping } from "../utils";
 import AllDataTabs from "./AllDataTabs";
-import { DashboardHeader } from "../graphs/DashboardHeader";
+import { DashboardHeader } from "../common/headerComponents/DashboardHeader";
 import { getPendingSubgraphId, nameQuery } from "../queries/subgraphStatusQuery";
 import { getSnapshotDailyVolume } from "../queries/snapshotDailyVolumeQuery";
 import { styled } from "../styled";
@@ -111,36 +111,20 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
       cache: new InMemoryCache(),
     });
   }, [subgraphToQuery.url]);
-  const query = gql`
-    {
-      protocols {
-        type
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        name
-        id
-        network
-      }
-      _meta {
-        deployment
-      }
-    }
-  `;
 
   // This query is to fetch data about the protocol. This helps select the proper schema to make the full query
   const {
     data: protocolSchemaData,
     loading: protocolSchemaQueryLoading,
     error: protocolSchemaQueryError,
-  } = useQuery(query, { client });
+  } = useQuery(metaDataQuery, { client });
 
 
   const [getOverlaySchemaData, {
     data: overlaySchemaData,
     loading: overlaySchemaQueryLoading,
     error: overlaySchemaQueryError,
-  }] = useLazyQuery(query, { client: overlayDeploymentClient });
+  }] = useLazyQuery(metaDataQuery, { client: overlayDeploymentClient });
 
   useEffect(() => {
     if (overlayError) {
@@ -195,11 +179,6 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
       overlaySchemaVersion = overlaySchemaData?.protocols[0]?.schemaVersion;
       getOverlayMainQueryData();
     }
-    if (overlaySchemaVersion !== schemaVersion && !overlaySchemaQueryLoading && overlayDeploymentURL) {
-      // setOverlayError(new ApolloError({
-      //   errorMessage: `OVERLAY ERROR - Current subgraph ${subgraphToQuery.url} has a schema version of ${schemaVersion} while the overlay subgraph ${overlayDeploymentURL} has a schema version of ${overlaySchemaVersion}. In order to do an overlay comparison, these versions have to match.`,
-      // }));
-    }
     if (overlayProtocolType !== protocolType && !overlaySchemaQueryLoading && overlayDeploymentURL) {
       setOverlayError(new ApolloError({
         errorMessage: `OVERLAY ERROR - Current subgraph ${subgraphToQuery.url} has a schema type of ${protocolType} while the overlay subgraph ${overlayDeploymentURL} has a schema type of ${overlayProtocolType}. In order to do an overlay comparison, these types have to match.`,
@@ -208,8 +187,6 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   }, [overlaySchemaData, overlaySchemaQueryError])
 
   const [protocolId, setprotocolId] = useState<string>(protocolIdToUse);
-
-  // The following section fetches the full data from the subgraph. It routes to query selection and then makes the request
 
   const {
     entitiesData,
@@ -287,7 +264,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     { client },
   );
 
-  const [getProtocolTableData, { data: protocolTableData, loading: protocolTableLoading, error: protocolTableError }] =
+  const [getProtocolTableData, { data: protocolTableData, error: protocolTableError }] =
     useLazyQuery(
       gql`
         ${protocolTableQuery}
@@ -295,11 +272,15 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
       { client, variables: { protocolId: protocolIdToUse } },
     );
 
-  const [getOverlayMainQueryData, { data: overlayData, loading: overlayLoading, error: overlayMainError }] = useLazyQuery(overlayQueryMain, { variables: { poolId, protocolId }, client: overlayDeploymentClient });
+  const [getOverlayMainQueryData, { data: overlayData }] =
+    useLazyQuery(
+      overlayQueryMain,
+      { variables: { poolId, protocolId }, client: overlayDeploymentClient }
+    );
 
   const [
     getOverlayFinancialsData,
-    { data: overlayFinancialsData, loading: overlayFinancialsLoading, error: overlayFinancialsError },
+    { data: overlayFinancialsData },
   ] = useLazyQuery(
     gql`
         ${overlayFinancialsQuery}
@@ -308,7 +289,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   );
   const [
     getOverlayDailyUsageData,
-    { data: overlayDailyUsageData, loading: overlayDailyUsageLoading, error: overlayDailyUsageError },
+    { data: overlayDailyUsageData, loading: overlayDailyUsageLoading },
   ] = useLazyQuery(
     gql`
         ${overlayDailyUsageQuery}
@@ -317,21 +298,13 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   );
   const [
     getOverlayHourlyUsageData,
-    { data: overlayHourlyUsageData, loading: overlayHourlyUsageLoading, error: overlayHourlyUsageError },
+    { data: overlayHourlyUsageData },
   ] = useLazyQuery(
     gql`
         ${overlayHourlyUsageQuery}
       `,
     { client: overlayDeploymentClient },
   );
-
-  const [getOverlayProtocolTableData, { data: overlayProtocolTableData, loading: overlayProtocolTableLoading, error: overlayProtocolTableError }] =
-    useLazyQuery(
-      gql`
-          ${overlayProtocolTableQuery}
-        `,
-      { client: overlayDeploymentClient, variables: { protocolId: protocolIdToUse } },
-    );
 
   const [
     getPoolsListData,
@@ -581,12 +554,14 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   useEffect(() => {
     if (financialsError && tabValue === "1") {
       financialsRefetch();
+      getDailyUsageData();
     }
   }, [financialsError]);
 
   useEffect(() => {
     if (dailyUsageError && tabValue === "1") {
       dailyUsageRefetch();
+      getHourlyUsageData();
     }
   }, [dailyUsageError]);
 
@@ -716,7 +691,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     }
   }, [error, protocolSchemaQueryError]);
 
-  let protocolKey = Object.keys(protocolJSON).find(x => subgraphName.includes(x))
+  let protocolKey = Object.keys(protocolJSON).find(x => subgraphName.includes(x));
   let depoKey: any = "";
   if (!!protocolKey) {
     depoKey = Object.keys(protocolJSON[protocolKey].deployments).find(x => subgraphName.includes(x));
@@ -1165,7 +1140,6 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
             usageMetricsHourlySnapshots: hourlyUsageError,
           }}
           overlayProtocolTimeseriesData={overlayProtocolData}
-          overlayDeploymentClient={overlayDeploymentClient}
           overlayDeploymentURL={overlayDeploymentURL}
           setPoolId={(x) => setPoolId(x)}
           handleTabChange={(x, y) => handleTabChange(x, y)}

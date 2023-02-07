@@ -1,0 +1,20 @@
+{
+  "chain": "harmony",
+  "erc20Vaults": [
+    {
+      "name": "WETH",
+      "address": "0x46469f995A5CB60708200C25EaD3cF1667Ed36d6",
+      "startBlock": 20392769
+    },
+    {
+      "name": "ONE",
+      "address": "0x12FcB286D664F37981a42cbAce92eAf28d1dA94f",
+      "startBlock": 20393247
+    },
+    {
+      "name": "WBTC",
+      "address": "0x9f4E3d01c634441F284beb92bBAEeb76133BbB28",
+      "startBlock": 20397735
+    }
+  ]
+}

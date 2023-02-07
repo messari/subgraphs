@@ -3,6 +3,14 @@ specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}  
 dataSources:
 #These valuts are not generated in a factory mode, so I have to list them here one by one.
   {{#vaults}}

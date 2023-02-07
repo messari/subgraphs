@@ -166,6 +166,7 @@ function PoolOverviewTab({
         protocolType={protocolType}
         protocolNetwork={protocolNetwork}
         skipAmt={skipAmt}
+        tablePoolOverviewLoading={poolOverviewRequest.poolOverviewLoading}
         issueProps={tableIssues}
         setPoolId={(x) => setPoolId(x)}
         handleTabChange={(x, y) => handleTabChange(x, y)}

@@ -1,3 +1,7 @@
+
+const rulesDirPlugin = require('eslint-plugin-rulesdir');
+rulesDirPlugin.RULES_DIR = ['subgraphs/_eslint-rules'];
+
 module.exports = {
   env: {
     browser: true,
@@ -21,7 +25,7 @@ module.exports = {
     project: "./tsconfig.json",
     tsconfigRootDir: __dirname,
   },
-  plugins: ["@typescript-eslint"],
+  plugins: ["@typescript-eslint", "rulesdir"],
   ignorePatterns: ["**/build", "**/generated"],
   rules: {
     // Give the power to the people! We decided to leave this decision up to the dev.
@@ -46,5 +50,11 @@ module.exports = {
         extendDefaults: true,
       },
     ],
+
+    // CUSTOM RULES, find them in subgraphs/_eslint-rules
+    // -----------------------------------------------
+    
+    // encourage address literals to be all lowercase to comparison errors when using strings.
+    "rulesdir/no-checksum-addresses": "error",
   },
 };

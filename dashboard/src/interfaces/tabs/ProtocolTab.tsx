@@ -56,7 +56,7 @@ function ProtocolTab({
   const specificChartsOnEntity: any = {};
 
   if (protocolTimeseriesData) {
-    protocolDataRender = Object.keys(protocolTimeseriesData).map((entityName: string) => {
+    protocolDataRender = Object.keys(protocolTimeseriesData).map((entityName: string, index: number) => {
       const currentEntityData = protocolTimeseriesData[entityName];
       if (!specificChartsOnEntity[entityName]) {
         specificChartsOnEntity[entityName] = {};
@@ -71,7 +71,9 @@ function ProtocolTab({
         entitySpecificElements = (specificChartsOnEntity[entityName]);
       }
 
-      if (protocolTimeseriesLoading[entityName]) {
+      const prevEntityName = Object.keys(protocolTimeseriesData)[index - 1];
+
+      if (protocolTimeseriesLoading[entityName] || protocolTimeseriesLoading[prevEntityName]) {
         return (
           <Grid key={entityName}>
             <Box my={3}>
@@ -86,7 +88,7 @@ function ProtocolTab({
         );
       }
 
-      if (!currentEntityData && !protocolTimeseriesError[entityName]) {
+      if (!currentEntityData && !protocolTimeseriesError[entityName] && protocolTimeseriesError[prevEntityName]) {
         return (
           <Grid key={entityName}>
             <Box my={3}>

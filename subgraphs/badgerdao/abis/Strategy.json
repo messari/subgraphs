@@ -1,5 +1,31 @@
 [
   {
+    "inputs": [
+      {
+        "internalType": "contract IBribesProcessor",
+        "name": "newBribesProcessor",
+        "type": "address"
+      }
+    ],
+    "name": "setBribesProcessor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -1241,6 +1267,19 @@
     "inputs": [],
     "name": "pid",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "bribesProcessor",
+    "outputs": [
+      {
+        "internalType": "contract IBribesProcessor",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   }

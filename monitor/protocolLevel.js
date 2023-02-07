@@ -210,8 +210,9 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
         if (
             !(
                 data.totalValueLockedUSD >= 0 &&
-                data.totalValueLockedUSD < 100000000000
-            )
+                data.totalValueLockedUSD < 10000000000
+            ) &&
+            deployment.protocolType === 'dex-amm'
         ) {
             issuesArrays.totalValueLockedUSD.push('$' + formatIntToFixed2(parseFloat(data.totalValueLockedUSD)));
         }

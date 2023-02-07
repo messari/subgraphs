@@ -114,7 +114,7 @@
           },
           "decentralized-network": {
             "slug": "abracadabra-money-ethereum",
-            "query-id": "95nyAWFFaiz6gykko3HtBCyhRuP5vZzuKYsZiLxHxLhr"
+            "query-id": "3Gkei7B24o9C2bCoAbQpApZqMStPta7oCAnNhmNv5dab"
           }
         }
       }
@@ -122,7 +122,7 @@
   },
   "aave-arc": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "aave-arc",
     "deployments": {
       "aave-arc-ethereum": {
@@ -130,7 +130,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.18",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -155,7 +155,7 @@
   },
   "aave-amm": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "aave-amm",
     "deployments": {
       "aave-amm-ethereum": {
@@ -163,7 +163,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.18",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -188,7 +188,7 @@
   },
   "aave-rwa": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "aave-rwa",
     "deployments": {
       "aave-rwa-ethereum": {
@@ -196,7 +196,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.18",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -221,7 +221,7 @@
   },
   "aave-v2": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "aave-v2",
     "deployments": {
       "aave-v2-avalanche": {
@@ -229,7 +229,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.17",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -251,7 +251,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.17",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -277,7 +277,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.18",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -298,7 +298,7 @@
   },
   "aave-v3": {
     "schema": "lending",
-    "base": "aave-v3",
+    "base": "aave-forks",
     "protocol": "aave-v3",
     "deployments": {
       "aave-v3-arbitrum": {
@@ -306,11 +306,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.5",
-          "methodology": "1.0.0"
+          "subgraph": "1.2.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -328,11 +328,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
-          "methodology": "1.0.0"
+          "subgraph": "1.2.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -350,11 +350,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
-          "methodology": "1.0.0"
+          "subgraph": "1.2.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -372,11 +372,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
-          "methodology": "1.0.0"
+          "subgraph": "1.2.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -394,11 +394,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
-          "methodology": "1.0.0"
+          "subgraph": "1.2.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -416,11 +416,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
-          "methodology": "1.0.0"
+          "subgraph": "1.2.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -438,11 +438,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "subgraph": "1.1.0",
+          "methodology": "1.0.1"
         },
         "files": {
-          "template": "aave-v3.template.yaml"
+          "template": "aave.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -452,6 +452,10 @@
           "hosted-service": {
             "slug": "aave-v3-ethereum",
             "query-id": "aave-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-ethereum",
+            "query-id": "HB1Z2EAw4rtPRYVb2Nz8QGFLHCpym6ByBX6vbCViuE9F"
           }
         }
       }
@@ -481,6 +485,28 @@
           "hosted-service": {
             "slug": "alpaca-finance-lending-bsc",
             "query-id": "alpaca-finance-lending-bsc"
+          }
+        }
+      },
+      "alpaca-finance-lending-fantom": {
+        "network": "fantom",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "alpaca.finance.lending.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "alpaca-finance-lending-fantom",
+            "query-id": "alpaca-finance-lending-fantom"
           }
         }
       }
@@ -2371,7 +2397,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.3.1",
+          "subgraph": "1.4.0",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3219,7 +3245,7 @@
   },
   "geist-finance": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "geist-finance",
     "deployments": {
       "geist-finance-fantom": {
@@ -3227,7 +3253,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.13",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3248,7 +3274,7 @@
   },
   "radiant": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "radiant-capital",
     "deployments": {
       "radiant-capital-arbitrum": {
@@ -3256,7 +3282,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.4",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3277,7 +3303,7 @@
   },
   "uwu-lend": {
     "schema": "lending",
-    "base": "aave-v2-forks",
+    "base": "aave-forks",
     "protocol": "uwu-lend",
     "deployments": {
       "uwu-lend-ethereum": {
@@ -3285,7 +3311,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.7",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3558,6 +3584,32 @@
           }
         }
       },
+      "qidao-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-ethereum",
+            "query-id": "qidao-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "qidao-ethereum",
+            "query-id": "EXuutY6qkZbXjYeJZdiDBf2imJswTNdfm8YZCqhAthfW"
+          }
+        }
+      },
       "qidao-fantom": {
         "network": "fantom",
         "status": "prod",
@@ -3669,6 +3721,28 @@
           "decentralized-network": {
             "slug": "qidao-gnosis",
             "query-id": "3cMswgcjkpLmuF99ViQRZfCPRyCsnimqQsR9z6mY5e2i"
+          }
+        }
+      },
+      "qidao-harmony": {
+        "network": "harmony",
+        "status": "prod",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.1"
+        },
+        "files": {
+          "template": "qidao.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-harmony",
+            "query-id": "qidao-harmony"
           }
         }
       }
@@ -6013,7 +6087,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.3",
+          "subgraph": "1.0.4",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6196,7 +6270,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.0.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6218,7 +6292,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.0.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6299,6 +6373,167 @@
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        }
+      }
+    }
+  },
+  "stargate": {
+    "schema": "bridge",
+    "base": "stargate",
+    "protocol": "stargate",
+    "deployments": {
+      "stargate-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stargate.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stargate-ethereum",
+            "query-id": "stargate-ethereum"
+          }
+        }
+      },
+      "stargate-avalanche": {
+        "network": "avalanche",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stargate.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stargate-avalanche",
+            "query-id": "stargate-avalanche"
+          }
+        }
+      },
+      "stargate-bsc": {
+        "network": "bsc",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stargate.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stargate-bsc",
+            "query-id": "stargate-bsc"
+          }
+        }
+      },
+      "stargate-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stargate.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stargate-arbitrum",
+            "query-id": "stargate-arbitrum"
+          }
+        }
+      },
+      "stargate-polygon": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stargate.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stargate-polygon",
+            "query-id": "stargate-polygon"
+          }
+        }
+      },
+      "stargate-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stargate.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stargate-optimism",
+            "query-id": "stargate-optimism"
+          }
+        }
+      },
+      "stargate-fantom": {
+        "network": "fantom",
+        "status": "prod",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "stargate.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stargate-fantom",
+            "query-id": "stargate-fantom"
+          }
         }
       }
     }

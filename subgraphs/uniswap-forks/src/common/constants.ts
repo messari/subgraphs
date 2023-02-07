@@ -1,10 +1,11 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Versions } from "../../src/versions";
 
 ////////////////////
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_SCHEMA_VERSION = Versions.getSchemaVersion();
 
 /////////////////////
 ///// Protocols /////
