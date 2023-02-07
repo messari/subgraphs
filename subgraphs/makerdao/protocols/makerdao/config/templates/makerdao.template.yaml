@@ -48,6 +48,10 @@ dataSources:
         ### CDP Manipulation ###
         # function frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x7cdd3fde00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatSlip
+        # function frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x7608870300000000000000000000000000000000000000000000000000000000"
           handler: handleVatFrob
         # function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
@@ -58,7 +62,7 @@ dataSources:
         # function fold(bytes32 i, address u, int256 rate)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0xb65337df00000000000000000000000000000000000000000000000000000000"
-          handler: handleVatFold
+          handler: handleVatFold  
 
   # Borrow rate
   - name: Jug

@@ -1,4 +1,4 @@
-import { Bytes, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, ethereum, log, Address, BigInt } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../generated/Vat/ERC20";
 import { GemJoin } from "../generated/Vat/GemJoin";
 import { Vat, LogNote as VatNoteEvent } from "../generated/Vat/Vat";
@@ -14,7 +14,18 @@ import { CdpManager, NewCdp, LogNote as CdpNoteEvent } from "../generated/CdpMan
 import { Created } from "../generated/DSProxyFactory/DSProxyFactory";
 import { BuyGem, SellGem, PSM } from "../generated/PSM-USDC-A/PSM";
 import { getOwnerAddress, getOrCreatePositionCounter } from "./common/getters";
-import { _FlipBidsStore, _ClipTakeStore, _Urn, _Proxy, Position, Market, _Cdpi } from "../generated/schema";
+import {
+  _FlipBidsStore,
+  _ClipTakeStore,
+  _Urn,
+  _Proxy,
+  Position,
+  Market,
+  _Cdpi,
+  _TokenInOut,
+  _gem,
+  _gemSnapshot,
+} from "../generated/schema";
 import {
   bigIntToBDUseDecimals,
   bigDecimalExponential,
@@ -163,7 +174,116 @@ export function handleVatCage(event: VatNoteEvent): void {
   }
 }
 
-// Borrow/Repay// Deposit/Withdraw
+function logTokenInOut(
+  ilk: Bytes,
+  market: Market,
+  amount: BigInt,
+  event: ethereum.Event,
+  handler: string,
+  urn: string,
+  v: string = "",
+  w: string = "",
+): void {
+  const inputTokenBal = market.inputTokenBalance;
+  const WETH_ADDRESS = Address.fromString("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
+  const wethContract = ERC20.bind(WETH_ADDRESS);
+  const onChainBal = wethContract.balanceOf(Address.fromString(market.id));
+  const tx = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
+  const block = event.block.number;
+  log.info("[logTokenInOut]{} tx {} block {}: ilk {} token {} amount={} inputTokenBal={} onChainBal={} [{}]", [
+    handler,
+    tx,
+    block.toString(),
+    ilk.toString(),
+    market.inputToken,
+    amount.toString(),
+    inputTokenBal.toString(),
+    onChainBal.toString(),
+    [urn, v, w].toString(),
+  ]);
+
+  let _tokenInOut = _TokenInOut.load(tx);
+  if (!_tokenInOut) {
+    _tokenInOut = new _TokenInOut(tx);
+    _tokenInOut.ilk = ilk.toString();
+    _tokenInOut.block = block;
+    _tokenInOut.handler = handler;
+    _tokenInOut.token = market.inputToken;
+    _tokenInOut.amount = amount;
+    _tokenInOut.inputTokenBalance_ = inputTokenBal;
+    _tokenInOut.onChainWETHBalance = onChainBal;
+    _tokenInOut.urn = urn;
+    _tokenInOut.v = v;
+    _tokenInOut.w = w;
+    _tokenInOut.save();
+  } else {
+    log.error(
+      "[logTokenInOut]{} tx {} already exists block {}: ilk {} token {} amount={} inputTokenBal={} onChainBal={} [{}]",
+      [
+        _tokenInOut.handler,
+        _tokenInOut.id,
+        _tokenInOut.block.toString(),
+        _tokenInOut.ilk,
+        _tokenInOut.token,
+        _tokenInOut.amount.toString(),
+        _tokenInOut.inputTokenBalance_.toString(),
+        _tokenInOut.onChainWETHBalance.toString(),
+        [_tokenInOut.urn, _tokenInOut.v, _tokenInOut.w].toString(),
+      ],
+    );
+  }
+}
+
+function logGem(ilk: Bytes, wad: BigInt, event: ethereum.Event, handler: string): void {
+  const gemId = ilk.toHexString();
+  let gem = _gem.load(gemId);
+  if (!gem) {
+    gem = new _gem(gemId);
+    gem.balance = BIGINT_ZERO;
+    gem.block = event.block.number;
+    gem.save();
+  }
+  gem.balance = gem.balance.plus(wad);
+  gem.block = event.block.number;
+  gem.save();
+
+  const snapshotId = gemId.concat("-").concat(event.block.number.toString());
+  let gemSnapshot = _gemSnapshot.load(snapshotId);
+  if (!gemSnapshot) {
+    gemSnapshot = new _gemSnapshot(snapshotId);
+  }
+  gemSnapshot.balance = gem.balance;
+  gemSnapshot.block = event.block.number;
+  gemSnapshot.save();
+
+  log.info("[logGem]{} tx {} block {}: ilk {} amount={} gemBal={}", [
+    handler,
+    event.transaction.hash.toHexString(),
+    event.block.number.toString(),
+    ilk.toString(),
+    wad.toString(),
+    gem.balance.toString(),
+  ]);
+}
+
+// Deposit/Withdraw
+export function handleVatSlip(event: VatNoteEvent): void {
+  let ilk = event.params.arg1;
+  if (ilk.toString() == "TELEPORT-FW-A") {
+    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    return;
+  }
+  //let usr = bytes32ToAddressHexString(event.params.arg2);
+  let wad = bytesToSignedBigInt(event.params.arg3);
+
+  let market: Market = getMarketFromIlk(ilk)!;
+
+  const urn = bytes32ToAddressHexString(event.params.arg2);
+  logTokenInOut(ilk, market, wad, event, "slip", urn);
+  logGem(ilk, wad, event, "slip");
+}
+
+// Borrow/Repay
 export function handleVatFrob(event: VatNoteEvent): void {
   const ilk = event.params.arg1;
   if (ilk.toString() == "TELEPORT-FW-A") {
@@ -208,24 +328,12 @@ export function handleVatFrob(event: VatNoteEvent): void {
     ]);
 
     return;
-    /*} 
-    else {
-      // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L140-L144
-      // u, v, w is urns[cdp]; keep urn, but replace u,v,w with the actual owner
-      // because cdpManager.give() hasn't yet been called
-      // https://github.com/makerdao/scd-mcd-migration/blob/96b0e1f54a3b646fa15fd4c895401cf8545fda60/src/ScdMcdMigration.sol#L158
-      //urn = u;
-      u = v = w = migrationCaller!;
-    }
-    */
   }
 
   // translate possible UrnHandler/DSProxy address to its owner address
   u = getOwnerAddress(u);
   v = getOwnerAddress(v);
   w = getOwnerAddress(w);
-
-  log.info("[DEBUGx]urn={},u={},tx={}", [urn, u, tx]);
 
   const market = getMarketFromIlk(ilk);
   if (market == null) {
@@ -258,6 +366,9 @@ export function handleVatFrob(event: VatNoteEvent): void {
   updateProtocol(deltaCollateralUSD, deltaDebtUSD);
   //this needs to after updateProtocol as it uses protocol to do the update
   updateFinancialsSnapshot(event, deltaCollateralUSD, deltaDebtUSD);
+
+  logTokenInOut(ilk, market, dink, event, "frob", urn, v, w);
+  logGem(ilk, dink, event, "frob");
 }
 
 // function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
@@ -705,11 +816,14 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
     }
   }
 
+  const deltaCollateral = liquidate.amount.times(BIGINT_NEG_ONE);
+  const deltaCollateralUSD = liquidate.amountUSD.times(BIGDECIMAL_NEG_ONE);
+  const deltaDebtUSD = bigIntToBDUseDecimals(flipBidsStore.art, RAD).times(BIGDECIMAL_NEG_ONE);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   liquidatePosition(event, flipBidsStore.urn, ilk, liquidate.amount, flipBidsStore.art);
-  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
+  updateProtocol(deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
+  updateFinancialsSnapshot(event, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
 }
 
 // Auction used by Dog (new liquidation contract)
@@ -825,11 +939,14 @@ export function handleClipTakeBid(event: TakeEvent): void {
     clipTakeStore.art.times(deltaTab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
   ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
+  const deltaCollateral = liquidate.amount.times(BIGINT_NEG_ONE);
+  const deltaCollateralUSD = liquidate.amountUSD.times(BIGDECIMAL_NEG_ONE);
+  const deltaDebtUSD = bigIntToBDUseDecimals(debtRepaid, RAD).times(BIGDECIMAL_NEG_ONE);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.amount, debtRepaid);
-  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
+  updateProtocol(deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
+  updateFinancialsSnapshot(event, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
 }
 
 // cancel auction
@@ -893,11 +1010,14 @@ export function handleClipYankBid(event: ClipYankEvent): void {
     clipTakeStore.art.times(tab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
   ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
+  const deltaCollateral = liquidate.amount.times(BIGINT_NEG_ONE);
+  const deltaCollateralUSD = liquidate.amountUSD.times(BIGDECIMAL_NEG_ONE);
+  const deltaDebtUSD = bigIntToBDUseDecimals(debtRepaid, RAD).times(BIGDECIMAL_NEG_ONE);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.amount, debtRepaid);
-  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
+  updateProtocol(deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
+  updateFinancialsSnapshot(event, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
 }
 
 // Setting mat & par in the Spot contract

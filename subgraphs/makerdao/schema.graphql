@@ -1369,3 +1369,32 @@ type _PositionCounter @entity {
   " Next count "
   nextCount: Int!
 }
+
+type _TokenInOut @entity {
+  " tx hash-logIndex "
+  id: ID!
+  ilk: String!
+  block: BigInt!
+  handler: String!
+  token: String!
+  urn: String
+  v: String
+  w: String
+  amount: BigInt!
+  inputTokenBalance_: BigInt!
+  onChainWETHBalance: BigInt!
+}
+
+type _gem @entity {
+  " ilk "
+  id: ID!
+  block: BigInt!
+  balance: BigInt!
+}
+
+type _gemSnapshot @entity {
+  " ilk-block# "
+  id: ID!
+  block: BigInt!
+  balance: BigInt!
+}
