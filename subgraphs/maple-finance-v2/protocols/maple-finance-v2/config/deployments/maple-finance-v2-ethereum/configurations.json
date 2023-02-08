@@ -1,0 +1,7 @@
+{
+  "network": "mainnet",
+  "poolManager": {
+    "startBlock": 16127003,
+    "address": "0xe463cd473ecc1d1a4ecf20b62624d84dd20a8339"
+  }
+}

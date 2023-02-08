@@ -1,0 +1,51 @@
+specVersion: 0.0.6
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum/contract
+    name: PoolManagerFactory
+    network: {{ network }}
+    source:
+      address: "{{ poolManager.address }}"
+      abi: PoolManagerFactory
+      startBlock: {{ poolManager.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+      abis:
+        - name: PoolManagerFactory
+          file: ./abis/PoolManagerFactory.json
+      eventHandlers:
+        - event: InstanceDeployed(uint256,indexed address,bytes)
+          handler: handleManagerInstanceDeployed
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+templates:
+  - kind: ethereum/contract
+    name: PoolManager
+    network: {{ network }}
+    source:
+      abi: PoolManager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+      abis:
+        - name: PoolManager
+          file: ./abis/PoolManager.json
+        - name: Pool
+          file: ./abis/Pool.json
+      eventHandlers:
+        - event: SetAsActive(bool)
+          handler: handleSetAsActive
+      file: ./protocols/maple-finance-v2/src/mapping.ts
