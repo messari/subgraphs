@@ -23,9 +23,11 @@ import {
   Withdraw as WithdrawEvent,
   Withdraw1 as WithdrawWithFee,
 } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
+import * as utils from "../common/utils";
 import { Transaction } from "../modules/Transaction";
 import { Vault } from "../../generated/schema";
 import * as constants from "../common/constants";
+
 import { Address, log } from "@graphprotocol/graph-ts";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import { Swap as Airswap } from "../../generated/Airswap/Airswap";
@@ -69,8 +71,8 @@ export function handleAuctionCleared(event: AuctionCleared): void {
     Address.fromString(auction.vault),
     false
   );
-  const soldAmountUSD = soldAmount
-    .divDecimal(constants.BIGINT_TEN.pow(vault._decimals as u8).toBigDecimal())
+  const soldAmountUSD = utils
+    .bigIntToBigDecimal(soldAmount, vault._decimals)
     .times(inputToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -164,8 +166,8 @@ export function handleCollectVaultFees(event: CollectVaultFees): void {
     vaultAddress,
     false
   );
-  const totalFeeUSD = totalFee
-    .divDecimal(constants.BIGINT_TEN.pow(vault._decimals as u8).toBigDecimal())
+  const totalFeeUSD = utils
+    .bigIntToBigDecimal(totalFee, vault._decimals)
     .times(vaultAsset.lastPriceUSD!);
 
   updateRevenueSnapshots(vault, constants.BIGDECIMAL_ZERO, totalFeeUSD, block);
@@ -215,10 +217,8 @@ export function handleSwap(event: Swap): void {
     Address.fromString(swapOffer.vault),
     false
   );
-  const soldAmountUSD = soldAmount
-    .divDecimal(
-      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-    )
+  const soldAmountUSD = utils
+    .bigIntToBigDecimal(soldAmount, inputToken.decimals)
     .times(inputToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -257,10 +257,8 @@ export function handleAirswap(event: Airswap): void {
     vaultAddress,
     false
   );
-  const soldAmountUSD = soldAmount
-    .divDecimal(
-      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-    )
+  const soldAmountUSD = utils
+    .bigIntToBigDecimal(soldAmount, inputToken.decimals)
     .times(inputToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -297,10 +295,8 @@ export function handlePayOptionYield(event: PayOptionYield): void {
     vaultAddress,
     false
   );
-  const netYieldUSD = netYield
-    .divDecimal(
-      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-    )
+  const netYieldUSD = utils
+    .bigIntToBigDecimal(netYield, inputToken.decimals)
     .times(inputToken.lastPriceUSD!);
 
   updateVaultSnapshots(vaultAddress, event.block);
@@ -325,8 +321,8 @@ export function handlePurchaseOption(event: PurchaseOption): void {
     vaultAddress,
     false
   );
-  const premiumUSD = premium
-    .divDecimal(constants.BIGINT_TEN.pow(vault._decimals as u8).toBigDecimal())
+  const premiumUSD = utils
+    .bigIntToBigDecimal(premium, vault._decimals)
     .times(inputToken.lastPriceUSD!);
 
   updateVaultSnapshots(vaultAddress, event.block);
@@ -374,8 +370,8 @@ export function handleCollectManagementFee(event: CollectManagementFee): void {
     vaultAddress,
     false
   );
-  const managementFeeUSD = managementFee
-    .divDecimal(constants.BIGINT_TEN.pow(vault._decimals as u8).toBigDecimal())
+  const managementFeeUSD = utils
+    .bigIntToBigDecimal(managementFee, vault._decimals)
     .times(vaultAsset.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -410,8 +406,8 @@ export function handleCollectPerformanceFee(
     vaultAddress,
     false
   );
-  const performanceFeeUSD = performanceFee
-    .divDecimal(constants.BIGINT_TEN.pow(6 as u8).toBigDecimal())
+  const performanceFeeUSD = utils
+    .bigIntToBigDecimal(performanceFee, 6)
     .times(usdcToken.lastPriceUSD!);
 
   updateRevenueSnapshots(

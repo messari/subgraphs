@@ -156,12 +156,8 @@ export function updateVaultTVL(
   const vault = getOrCreateVault(vaultAddress, block);
   const vaultContract = VaultContract.bind(vaultAddress);
 
-  const inputToken = Token.load(vault.inputToken);
   const inputTokenAddress = Address.fromString(vault.inputToken);
   const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  const inputTokenDecimals = constants.BIGINT_TEN.pow(
-    inputToken!.decimals as u8
-  );
 
   vault.outputTokenSupply = utils.getOutputTokenSupply(vaultAddress, block);
 
@@ -171,9 +167,8 @@ export function updateVaultTVL(
   );
 
   vault.inputTokenBalance = totalValue;
-  vault.totalValueLockedUSD = vault.inputTokenBalance
-    .toBigDecimal()
-    .div(inputTokenDecimals.toBigDecimal())
+  vault.totalValueLockedUSD = utils
+    .bigIntToBigDecimal(vault.inputTokenBalance, vault._decimals)
     .times(inputTokenPrice.usdPrice);
 
   if (vault.outputToken) {

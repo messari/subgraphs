@@ -129,16 +129,14 @@ export function updateRbnRewardsInfo(
     )
     .toBigDecimal();
 
-  const gaugeRelativeWeight = utils
-    .readValue<BigInt>(
-      gaugeControllerContract.try_gauge_relative_weight(gaugeAddress),
-      constants.BIGINT_ZERO
-    )
-    .toBigDecimal();
+  const gaugeRelativeWeight = utils.readValue<BigInt>(
+    gaugeControllerContract.try_gauge_relative_weight(gaugeAddress),
+    constants.BIGINT_ZERO
+  );
 
   // rewards = inflation_rate * gauge_relative_weight * seconds_per_day
   const rbnRewardEmissionsPerDay = inflationRate
-    .times(gaugeRelativeWeight.div(constants.BIGINT_TEN.pow(18).toBigDecimal()))
+    .times(utils.bigIntToBigDecimal(gaugeRelativeWeight, 18))
     .times(BigDecimal.fromString(constants.SECONDS_PER_DAY.toString()));
 
   updateRewardTokenEmissions(
@@ -203,9 +201,8 @@ export function updateRewardTokenEmissions(
   );
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
-  rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
-    .toBigDecimal()
-    .div(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
+  rewardTokenEmissionsUSD[rewardTokenIndex] = utils
+    .bigIntToBigDecimal(rewardTokenPerDay, token.decimals)
     .times(token.lastPriceUSD!);
 
   vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;

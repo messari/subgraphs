@@ -30,10 +30,11 @@ export function getVaultBalance(
 ): BigDecimal {
   const vaultContract = VaultContract.bind(vaultAddress);
 
-  const vaultBalance = readValue<BigInt>(
-    vaultContract.try_totalBalance(),
-    constants.BIGINT_ZERO
-  ).divDecimal(constants.BIGINT_TEN.pow(decimals as u8).toBigDecimal());
+  const vaultBalance = bigIntToBigDecimal(
+    readValue<BigInt>(vaultContract.try_totalBalance(), constants.BIGINT_ZERO),
+    decimals
+  );
+
   return vaultBalance;
 }
 
@@ -63,17 +64,6 @@ export function updateProtocolTotalValueLockedUSD(): void {
   protocol.save();
 }
 
-export function getTokenDecimals(tokenAddr: Address): BigDecimal {
-  const token = ERC20Contract.bind(tokenAddr);
-
-  const decimals = readValue<number>(
-    token.try_decimals(),
-    constants.DEFAULT_DECIMALS.toI64()
-  );
-
-  return constants.BIGINT_TEN.pow(decimals as u8).toBigDecimal();
-}
-
 export function getVaultPricePerShare(vaultAddress: Address): BigDecimal {
   const vaultContract = VaultContract.bind(vaultAddress);
   const vaultDecimals = readValue(vaultContract.try_decimals(), 18);
@@ -86,19 +76,19 @@ export function getVaultPricePerShare(vaultAddress: Address): BigDecimal {
   if (vaultPricePerShare.notEqual(constants.BIGDECIMAL_ZERO))
     return vaultPricePerShare;
 
-  const totalTokensDeposits = readValue(
-    vaultContract.try_totalBalance(),
-    constants.BIGINT_ZERO
-  ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
+  const totalTokensDeposits = bigIntToBigDecimal(
+    readValue(vaultContract.try_totalBalance(), constants.BIGINT_ZERO),
+    vaultDecimals
+  );
 
-  const totalOptions = readValue(
-    vaultContract.try_totalSupply(),
-    constants.BIGINT_ZERO
-  ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
+  const totalSupply = bigIntToBigDecimal(
+    readValue(vaultContract.try_totalSupply(), constants.BIGINT_ZERO),
+    vaultDecimals
+  );
 
   const pricePerShare = totalTokensDeposits
-    .div(totalOptions)
-    .times(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
+    .times(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal())
+    .div(totalSupply);
 
   return pricePerShare;
 }
@@ -128,17 +118,17 @@ export function getOutputTokenPriceUSD(
   }
   const inputToken = getOrCreateToken(asset, block, vaultAddress);
 
-  const vaultTotalBalance = readValue(
-    vaultContract.try_totalSupply(),
-    constants.BIGINT_ZERO
-  ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
+  const vaultTotalBalance = bigIntToBigDecimal(
+    readValue(vaultContract.try_totalBalance(), constants.BIGINT_ZERO),
+    vaultDecimals
+  );
 
   const vaultTVL = vaultTotalBalance.times(inputToken.lastPriceUSD!);
 
-  const vaultTotalSupply = readValue(
-    vaultContract.try_totalSupply(),
-    constants.BIGINT_ZERO
-  ).divDecimal(constants.BIGINT_TEN.pow(vaultDecimals as u8).toBigDecimal());
+  const vaultTotalSupply = bigIntToBigDecimal(
+    readValue(vaultContract.try_totalSupply(), constants.BIGINT_ZERO),
+    vaultDecimals
+  );
   if (vaultTotalSupply.equals(constants.BIGDECIMAL_ZERO))
     return constants.BIGDECIMAL_ZERO;
   const outputTokenPriceUSD = vaultTVL.div(vaultTotalSupply);
@@ -161,4 +151,13 @@ export function getOutputTokenSupply(
   );
 
   return outputTokenSupply;
+}
+
+export function bigIntToBigDecimal(
+  bigInt: BigInt,
+  decimals: number
+): BigDecimal {
+  return bigInt.divDecimal(
+    constants.BIGINT_TEN.pow(decimals as u8).toBigDecimal()
+  );
 }

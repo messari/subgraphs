@@ -130,12 +130,10 @@ export function Transaction(
 
   const inputTokenAddress = Address.fromString(vault.inputToken);
   const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  const vaultDecimals = constants.BIGINT_TEN.pow(vault._decimals as u8);
 
-  const amountUSD = amount
-    .toBigDecimal()
-    .times(inputTokenPrice.usdPrice)
-    .div(vaultDecimals.toBigDecimal());
+  const amountUSD = utils
+    .bigIntToBigDecimal(amount, vault._decimals)
+    .times(inputTokenPrice.usdPrice);
 
   vault.outputTokenSupply = utils.getOutputTokenSupply(vaultAddress, block);
 
@@ -147,10 +145,9 @@ export function Transaction(
   vault.inputTokenBalance = totalValue;
 
   if (totalValue.notEqual(constants.BIGINT_ZERO)) {
-    vault.totalValueLockedUSD = vault.inputTokenBalance
-      .toBigDecimal()
-      .times(inputTokenPrice.usdPrice)
-      .div(vaultDecimals.toBigDecimal());
+    vault.totalValueLockedUSD = utils
+      .bigIntToBigDecimal(vault.inputTokenBalance, vault._decimals)
+      .times(inputTokenPrice.usdPrice);
   }
 
   vault.pricePerShare = utils.getVaultPricePerShare(vaultAddress);
@@ -165,9 +162,8 @@ export function Transaction(
   if (type == constants.TransactionType.WITHDRAW) {
     createWithdrawTransaction(vault, amount, amountUSD, transaction, block);
     if (feeAmount.notEqual(constants.BIGINT_ZERO)) {
-      const withdrawalFeeUSD = feeAmount
-        .toBigDecimal()
-        .div(vaultDecimals.toBigDecimal())
+      const withdrawalFeeUSD = utils
+        .bigIntToBigDecimal(feeAmount, vault._decimals)
         .times(inputTokenPrice.usdPrice);
       updateRevenueSnapshots(
         vault,
