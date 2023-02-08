@@ -284,7 +284,21 @@ export const schema130 = (): Schema => {
   const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
 
   // Query pool(pool) entity and events entities
-  let events: string[] = [];
+  const events: string[] = ["deposits", "withdraws", "collateralIns", "collateralOuts", "swaps", "liquidates"];
+  const eventsFields: string[] = ["hash", "to", "from", "blockNumber"]
+  const eventsQuery: any[] = events.map((event) => {
+    let fields = eventsFields.join(", ");
+    if (event === "deposits" || event === "withdraws" || event === "collateralIns" || event === "collateralOuts") {
+      fields += ', amountUSD';
+    } else if (event === "swaps") {
+      fields += ", amountIn, amountInUSD, amountOut, amountOutUSD";
+    } else if (event === "liquidates") {
+      fields += ", liquidator{id}, liquidatee{id}, amount, amountUSD, profitUSD";
+    }
+    const baseStr =
+      event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) { ";
+    return baseStr + fields + " }";
+  });
 
   const financialsQuery = `
     query Data {
@@ -381,7 +395,7 @@ export const schema130 = (): Schema => {
     derivPerpProtocols {
       ${protocolQueryFields}
     }
-
+    ${eventsQuery}
     liquidityPool(id: $poolId){
       id
       name
