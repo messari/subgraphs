@@ -376,6 +376,10 @@ dataSources:
       eventHandlers:
         - event: RewardPaid(indexed address,uint256)
           handler: handleRewardsPaid
+        - event: Staked(indexed address,uint256)
+          handler: handleStaked
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleWithdrawn
       file: ./protocols/hop-protocol/src/L2/reward.ts
 {{/rewards}}
 {{/isMainnet}}

@@ -4,8 +4,8 @@
   "subgraphName": "hop-polygon",
   "deployment": "HOP_PROTOCOL_POLYGON",
   "graftEnabled": true,
-  "subgraphId": "QmdkEpFoQABWNgSzAxRjtFH1zcpTkzAfM84HFrhkcvgtGZ",
-  "graftStartBlock": 16761065,
+  "subgraphId": "QmYDZkWKBriAbfQzkqKnr6Zs54jsHQFJQ4PVTKG8WK6EdM",
+  "graftStartBlock": 16786170,
   "tokens": [
     {
       "dataSourceName": "Token",
