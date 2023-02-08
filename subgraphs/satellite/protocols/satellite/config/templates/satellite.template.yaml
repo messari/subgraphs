@@ -98,15 +98,22 @@ dataSources:
           handler: handleTokenSend
         - event: TokenDeployed(string,address)
           handler: handleTokenDeployed
+        # outgoing messages
         - event: ContractCallWithToken(indexed address,string,string,indexed bytes32,bytes,string,uint256)
           handler: handleContractCallWithToken
         - event: ContractCall(indexed address,string,string,indexed bytes32,bytes)
           handler: handleContractCall
+        # incoming messages
+        - event: ContractCallApprovedWithMint(indexed bytes32,string,string,indexed address,indexed bytes32,string,uint256,bytes32,uint256)
+          handler: handleContractCallApprovedWithMint
+        - event: ContractCallApproved(indexed bytes32,string,string,indexed address,indexed bytes32,bytes32,uint256)
+          handler: handleContractCallApproved
       callHandlers:
         - function: mintToken(bytes,bytes32)
           handler: handleMintToken
         - function: burnToken(bytes,bytes32)
           handler: handleBurnToken
+
       file: ./src/mappings.ts
 
 templates:

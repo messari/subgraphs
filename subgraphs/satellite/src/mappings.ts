@@ -215,36 +215,7 @@ export function handleContractCall(event: ContractCall): void {
   acc.messageOut(dstChainId, dstAccount, event.params.payload);
 }
 
-export function handleContractCallApprovedWithMint(
-  event: ContractCallApprovedWithMint
-): void {
-  const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol)!;
-  const tokenAddress = tokenSymbol.tokenAddress;
-  const poolId = event.address;
-  const srcChainId = BigInt.fromString(event.params.sourceChain);
-  const srcNetworkConstants = getNetworkSpecificConstant(srcChainId);
-  const srcPoolId = srcNetworkConstants.getPoolAddress();
-  const srcAccount = Address.fromString(event.params.sourceAddress);
-  _handleTransferIn(
-    Address.fromString(tokenAddress),
-    srcAccount,
-    event.params.contractAddress,
-    event.params.amount,
-    srcChainId,
-    srcPoolId,
-    poolId,
-    BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
-    event.params.commandId,
-    event.params.sourceTxHash.concatI32(event.params.sourceEventIndex.toI32()),
-    event
-  );
-
-  // contract call
-  const sdk = _getSDK(event)!;
-  const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
-  acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
-}
+export function handleTokenTransfer(event: Transfer): void {}
 
 export function handleContractCallApproved(event: ContractCallApproved): void {
   // contract call
@@ -328,8 +299,6 @@ export function handleBurnToken(call: BurnTokenCall): void {
     call.inputs.value1
   );
 }
-
-export function handleTokenTransfer(event: Transfer): void {}
 
 //////////////////////////////// HELPER FUNCTIONS //////////////////////////////
 /**
