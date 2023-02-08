@@ -67,6 +67,11 @@ export namespace RewardIntervalType {
   export const TIMESTAMP = "TIMESTAMP";
 }
 
+export namespace TransactionType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+}
+
 export namespace NULL {
   export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
   export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);

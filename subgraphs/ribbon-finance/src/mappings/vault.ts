@@ -23,8 +23,7 @@ import {
   Withdraw as WithdrawEvent,
   Withdraw1 as WithdrawWithFee,
 } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
-import { Deposit } from "../modules/Deposit";
-import { Withdraw } from "../modules/Withdraw";
+import { Transaction } from "../modules/Transaction";
 import { Vault } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { Address, log } from "@graphprotocol/graph-ts";
@@ -104,7 +103,13 @@ export function handleDeposit(event: DepositEvent): void {
   updateFinancials(block);
   updateVaultSnapshots(vaultAddress, event.block);
 
-  Deposit(vaultAddress, depositAmount, event.transaction, event.block);
+  Transaction(
+    vaultAddress,
+    depositAmount,
+    event.transaction,
+    event.block,
+    constants.TransactionType.DEPOSIT
+  );
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {
@@ -118,7 +123,13 @@ export function handleWithdraw(event: WithdrawEvent): void {
   updateFinancials(block);
   updateVaultSnapshots(vaultAddress, event.block);
 
-  Withdraw(vaultAddress, withdrawAmount, event.transaction, event.block);
+  Transaction(
+    vaultAddress,
+    withdrawAmount,
+    event.transaction,
+    event.block,
+    constants.TransactionType.WITHDRAW
+  );
 }
 
 export function handleInstantWithdraw(event: InstantWithdraw): void {
@@ -131,7 +142,13 @@ export function handleInstantWithdraw(event: InstantWithdraw): void {
   updateFinancials(block);
   updateVaultSnapshots(vaultAddress, event.block);
 
-  Withdraw(vaultAddress, withdrawAmount, event.transaction, event.block);
+  Transaction(
+    vaultAddress,
+    withdrawAmount,
+    event.transaction,
+    event.block,
+    constants.TransactionType.WITHDRAW
+  );
 }
 
 export function handleCollectVaultFees(event: CollectVaultFees): void {
@@ -334,11 +351,12 @@ export function handleWithdrawWithFee(event: WithdrawWithFee): void {
   updateFinancials(block);
   updateVaultSnapshots(vaultAddress, block);
 
-  Withdraw(
+  Transaction(
     vaultAddress,
     withdrawAmount,
     event.transaction,
     event.block,
+    constants.TransactionType.WITHDRAW,
     feeAmount
   );
 }
