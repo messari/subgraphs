@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
+import { Box, Grid, Tooltip, Typography } from "@mui/material";
 import { dateValueKeys, negativeFieldList } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
 import { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import moment from "moment";
 import JSZip from "jszip";
 import DefiLlamaComparsionTab from "../../common/chartComponents/DefiLlamaComparison";
 import { UploadFileCSV } from "../../common/utilComponents/UploadFileCSV";
+import { useSearchParams } from "react-router-dom";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
@@ -47,9 +48,18 @@ function ProtocolTabEntity({
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   const list: { [x: string]: any } = {};
 
+  const [searchParams] = useSearchParams();
+  const defiLlamaNetworkParam = searchParams.get("defillamanetwork") || null;
+  const defiLlamaProtocolParam = searchParams.get("defillamaprotocol") || null;
+
+  let defiLlamaCompareTVLDefault = false;
+  if (defiLlamaProtocolParam || defiLlamaNetworkParam) {
+    defiLlamaCompareTVLDefault = true;
+  }
+
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
   const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
-  const [defiLlamaCompareTVL, setDefiLlamaCompareTVL] = useState<boolean>(false);
+  const [defiLlamaCompareTVL, setDefiLlamaCompareTVL] = useState<boolean>(defiLlamaCompareTVLDefault);
   const [csvJSON, setCsvJSON] = useState<any>(null);
   const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
 

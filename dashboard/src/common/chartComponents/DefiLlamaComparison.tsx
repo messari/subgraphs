@@ -132,10 +132,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlama
 
   const defiLlama = () => {
     fetch("https://api.llama.fi/protocol/" + defiLlamaSlug?.split(" (")[0].split(" ").join("-"), {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+      method: "GET"
     })
       .then(function (res) {
         return res.json();
