@@ -21,12 +21,22 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      entities:
+      entities: []
       abis:
         - name: PoolManagerFactory
           file: ./abis/PoolManagerFactory.json
+        - name: PoolManager
+          file: ./abis/PoolManager.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
       eventHandlers:
-        - event: InstanceDeployed(uint256,indexed address,bytes)
+        - event: InstanceDeployed(indexed uint256,indexed address,bytes)
           handler: handleManagerInstanceDeployed
       file: ./protocols/maple-finance-v2/src/mapping.ts
 templates:
@@ -39,7 +49,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      entities:
+      entities: []
       abis:
         - name: PoolManager
           file: ./abis/PoolManager.json

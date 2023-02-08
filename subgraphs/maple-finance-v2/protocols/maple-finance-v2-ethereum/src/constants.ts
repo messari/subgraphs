@@ -31,7 +31,6 @@ export const LIQUIDATOR_FACTORY = "0xa2091116649b070d2a27fc5c85c9820302114c63";
 export const WITHDRAWAL_MANAGER_FACTORY =
   "0xb9e25b584dc4a7c9d47aef577f111fbe5705773b";
 export const MAPLE_LOAN_FACTORY = "0x36a7350309b2eb30f3b908ab0154851b5ed81db0"; //TODO do we need this?
-export const MAPLE_GLOBALS = "0x0ad92cb3fc4cd6697e0f14fb75f3d7da3bb2e056";
 
 /////////////////////////////
 ///// Protocol Specific /////
