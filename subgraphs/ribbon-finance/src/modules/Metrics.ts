@@ -1,8 +1,4 @@
-import {
-  Token,
-  ActiveAccount,
-  Vault as VaultStore,
-} from "../../generated/schema";
+import { ActiveAccount, Vault as VaultStore } from "../../generated/schema";
 import {
   getOrCreateVault,
   getOrCreateToken,

@@ -6,7 +6,6 @@ import {
 } from "./initializers";
 import * as constants from "./constants";
 import { Vault } from "../../generated/schema";
-import { ERC20 as ERC20Contract } from "../../generated/ETHCallV2/ERC20";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
