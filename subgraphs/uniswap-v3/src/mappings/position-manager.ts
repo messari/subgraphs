@@ -157,7 +157,7 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
 }
 
 export function handleTransfer(event: Transfer): void {
-  const account = getOrCreateAccount(event.transaction.from);
+  const account = getOrCreateAccount(event.params.to);
   const position = getOrCreatePosition(event, event.params.tokenId);
 
   // position was not able to be fetched
@@ -168,10 +168,11 @@ export function handleTransfer(event: Transfer): void {
     const protocol = getOrCreateProtocol();
     protocol.cumulativeUniqueUsers += INT_ONE;
     protocol.save();
-    account.save();
   }
 
   position.account = event.params.to;
+
+  account.save();
   position.save();
 }
 
