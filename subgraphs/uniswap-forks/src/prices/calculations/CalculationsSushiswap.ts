@@ -9,7 +9,7 @@ export function getSushiSwapContract(
   block: ethereum.Block
 ): CalculationsSushiContract | null {
   if (
-    contract.startBlock.lt(block.number) ||
+    contract.startBlock.gt(block.number) ||
     utils.isNullAddress(contract.address)
   )
     return null;
@@ -42,6 +42,6 @@ export function getTokenPriceUSDC(
   return CustomPriceType.initialize(
     tokenPrice,
     constants.DEFAULT_USDC_DECIMALS,
-    "CalculationsSushiswap"
+    constants.OracleType.SUSHI_CALCULATIONS
   );
 }

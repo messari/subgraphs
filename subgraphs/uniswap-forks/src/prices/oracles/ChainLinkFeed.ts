@@ -9,7 +9,7 @@ export function getChainLinkContract(
   block: ethereum.Block
 ): ChainLinkContract | null {
   if (
-    contract.startBlock.lt(block.number) ||
+    contract.startBlock.gt(block.number) ||
     utils.isNullAddress(contract.address)
   )
     return null;
@@ -45,7 +45,7 @@ export function getTokenPriceUSDC(
     return CustomPriceType.initialize(
       result.value.value1.toBigDecimal(),
       decimals.value,
-      "ChainlinkFeed"
+      constants.OracleType.CHAINLINK_FEED
     );
   }
 
