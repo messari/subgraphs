@@ -9,7 +9,7 @@ export function getAaveOracleContract(
   block: ethereum.Block
 ): AaveOracleContract | null {
   if (
-    contract.startBlock.lt(block.number) ||
+    contract.startBlock.gt(block.number) ||
     utils.isNullAddress(contract.address)
   )
     return null;
@@ -39,6 +39,6 @@ export function getTokenPriceUSDC(
   return CustomPriceType.initialize(
     tokenPrice,
     constants.AAVE_ORACLE_DECIMALS,
-    "AaveOracle"
+    constants.OracleType.AAVE_ORACLE
   );
 }

@@ -9,7 +9,7 @@ export function getYearnLensContract(
   block: ethereum.Block
 ): YearnLensContract | null {
   if (
-    contract.startBlock.lt(block.number) ||
+    contract.startBlock.gt(block.number) ||
     utils.isNullAddress(contract.address)
   )
     return null;
@@ -39,6 +39,6 @@ export function getTokenPriceUSDC(
   return CustomPriceType.initialize(
     tokenPrice,
     constants.DEFAULT_USDC_DECIMALS,
-    "YearnLensOracle"
+    constants.OracleType.YEARN_LENS_ORACLE
   );
 }
