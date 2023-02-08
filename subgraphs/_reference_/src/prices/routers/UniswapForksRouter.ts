@@ -87,7 +87,7 @@ export function getPriceFromRouter(
   let amountOut = constants.BIGINT_ZERO;
   for (let idx = 0; idx < routerAddresses.length; idx++) {
     const routerAddress = routerAddresses[idx];
-    if (routerAddress.startBlock.lt(block.number)) continue;
+    if (routerAddress.startBlock.gt(block.number)) continue;
 
     const uniswapForkRouter = UniswapRouterContract.bind(routerAddress.address);
     const amountOutArray = uniswapForkRouter.try_getAmountsOut(amountIn, path);
@@ -108,7 +108,7 @@ export function getPriceFromRouter(
   return CustomPriceType.initialize(
     amountOutBigDecimal,
     config.usdcTokenDecimals().toI32() as u8,
-    "UniswapForks"
+    constants.OracleType.UNISWAP_FORKS_ROUTER
   );
 }
 
@@ -151,7 +151,7 @@ export function getLpTokenPriceUsdc(
   return CustomPriceType.initialize(
     pricePerLpTokenUsdc,
     constants.DEFAULT_USDC_DECIMALS,
-    "UniswapForks"
+    constants.OracleType.UNISWAP_FORKS_ROUTER
   );
 }
 
@@ -214,7 +214,7 @@ export function getLpTokenTotalLiquidityUsdc(
     return CustomPriceType.initialize(
       totalLiquidity,
       constants.DEFAULT_USDC_DECIMALS,
-      "UniswapForks"
+      constants.OracleType.UNISWAP_FORKS_ROUTER
     );
   }
   return new CustomPriceType();

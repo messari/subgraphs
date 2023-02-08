@@ -25,7 +25,7 @@ export function getPoolFromLpToken(
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
     const curveRegistry = curveRegistryAdresses[idx];
-    if (curveRegistry.startBlock.lt(block.number)) continue;
+    if (curveRegistry.startBlock.gt(block.number)) continue;
 
     const curveRegistryContract = CurveRegistryContract.bind(
       curveRegistry.address
@@ -93,7 +93,7 @@ export function getCurvePriceUsdc(
   return CustomPriceType.initialize(
     priceUsdc,
     decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8,
-    "CurveRouter"
+    constants.OracleType.CURVE_ROUTER
   );
 }
 
@@ -121,7 +121,7 @@ export function getUnderlyingCoinFromPool(
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
     const curveRegistry = curveRegistryAdresses[idx];
-    if (curveRegistry.startBlock.lt(block.number)) continue;
+    if (curveRegistry.startBlock.gt(block.number)) continue;
 
     const curveRegistryContract = CurveRegistryContract.bind(
       curveRegistry.address
@@ -168,7 +168,7 @@ export function getVirtualPrice(
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
     const curveRegistry = curveRegistryAdresses[idx];
-    if (curveRegistry.startBlock.lt(block.number)) continue;
+    if (curveRegistry.startBlock.gt(block.number)) continue;
 
     const curveRegistryContract = CurveRegistryContract.bind(
       curveRegistry.address
@@ -207,7 +207,11 @@ export function cryptoPoolLpPriceUsdc(
     )
     .div(totalSupply.toBigDecimal());
 
-  return CustomPriceType.initialize(priceUsdc, 0, "CurveRouter");
+  return CustomPriceType.initialize(
+    priceUsdc,
+    0,
+    constants.OracleType.CURVE_ROUTER
+  );
 }
 
 export function cryptoPoolLpTotalValueUsdc(
@@ -317,6 +321,6 @@ export function getPriceUsdc(
   return CustomPriceType.initialize(
     price.usdPrice.times(virtualPrice),
     constants.DEFAULT_DECIMALS.toI32() as u8,
-    "CurveRouter"
+    constants.OracleType.CURVE_ROUTER
   );
 }
