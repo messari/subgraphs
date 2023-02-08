@@ -106,8 +106,8 @@ export function createLiquidityPool(
   const protocol = getOrCreateProtocol();
 
   // create the tokens and tokentracker
-  const token0 = getOrCreateToken(token0Address);
-  const token1 = getOrCreateToken(token1Address);
+  const token0 = getOrCreateToken(event, token0Address);
+  const token1 = getOrCreateToken(event, token1Address);
   const LPtoken = getOrCreateLPToken(poolAddress, token0, token1);
 
   updateTokenWhitelists(token0, token1, poolAddress);
@@ -181,8 +181,8 @@ export function createDeposit(
     event.block.number
   );
 
-  const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
-  const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
+  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
+  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
 
   // update exchange info (except balances, sync will cover that)
   const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
@@ -228,8 +228,8 @@ export function createWithdraw(
     event.block.number
   );
 
-  const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
-  const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
+  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
+  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
 
   // update exchange info (except balances, sync will cover that)
   const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
@@ -291,8 +291,8 @@ export function createSwapHandleVolumeAndFees(
   );
   const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
-  const token0 = getOrCreateToken(pool.inputTokens[0]);
-  const token1 = getOrCreateToken(pool.inputTokens[1]);
+  const token0 = getOrCreateToken(event, pool.inputTokens[0]);
+  const token1 = getOrCreateToken(event, pool.inputTokens[1]);
 
   // totals for volume updates
   const amount0 = amount0In.minus(amount0Out);

@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { TokenABI } from "../../generated/Factory/TokenABI";
 import {
@@ -16,6 +16,7 @@ import {
   RewardToken,
   LiquidityPoolHourlySnapshot,
   UsageMetricsHourlySnapshot,
+  PriceSnapshot,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
@@ -27,8 +28,17 @@ import {
   RewardTokenType,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
+  BIGDECIMAL_NEG_ONE,
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_TWENTY,
+  BIGINT_ONE,
 } from "./constants";
 import { createPoolFees } from "./creators";
+import {
+  findUSDPricePerToken,
+  updateNativeTokenPriceInUSD,
+} from "../price/price";
+import { getUsdPricePerToken } from "../prices";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.getFactoryAddress());
@@ -272,7 +282,11 @@ export function getOrCreateFinancialsDailySnapshot(
   return financialMetrics;
 }
 
-export function getOrCreateToken(address: string): Token {
+export function getOrCreateToken(
+  event: ethereum.Event,
+  address: string,
+  retrieve_price: bool = true
+): Token {
   let token = Token.load(address);
   if (!token) {
     token = new Token(address);
@@ -283,6 +297,8 @@ export function getOrCreateToken(address: string): Token {
       token.name = "";
       token.symbol = "";
       token.decimals = DEFAULT_DECIMALS;
+      token._harshOracleZero = BIGINT_ZERO;
+      token._lpOracleZero = BIGINT_ZERO;
       token.save();
 
       return token as Token;
@@ -296,10 +312,63 @@ export function getOrCreateToken(address: string): Token {
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
     token.name = name.reverted ? "" : name.value;
     token.symbol = symbol.reverted ? "" : symbol.value;
+    token._lpOracleZero = BIGINT_ZERO;
+    token._harshOracleZero = BIGINT_ZERO;
 
     token.save();
   }
+
+  if (event.block.number != token.lastPriceBlockNumber! && retrieve_price) {
+    const nativeToken = updateNativeTokenPriceInUSD(event);
+    token.lastPriceUSD = findUSDPricePerToken(event, token, nativeToken);
+    const harshOraclePrice = getUsdPricePerToken(
+      Address.fromString(token.id),
+      event.block
+    );
+    token._harshOraclePriceUSD = harshOraclePrice.usdPrice;
+    token._harshOracleUsed = harshOraclePrice.oracleType;
+
+    if (harshOraclePrice.usdPrice == BIGDECIMAL_ZERO) {
+      token._harshOracleZero = token._harshOracleZero.plus(BIGINT_ONE);
+    }
+    if (token.lastPriceUSD == BIGDECIMAL_ZERO) {
+      token._lpOracleZero = token._lpOracleZero.plus(BIGINT_ONE);
+    }
+    token.lastPriceBlockNumber = event.block.number;
+    nativeToken.save();
+
+    // Check if price difference is greater than 5% between lastPriceUSD and harshOraclePrice
+    if (
+      token.lastPriceUSD!.notEqual(BIGDECIMAL_ZERO) &&
+      harshOraclePrice.usdPrice.notEqual(BIGDECIMAL_ZERO)
+    ) {
+      const percentageDifference = abs(
+        token
+          .lastPriceUSD!.minus(harshOraclePrice.usdPrice)
+          .div(token.lastPriceUSD!)
+      );
+
+      if (percentageDifference.gt(BIGDECIMAL_ONE.div(BIGDECIMAL_TWENTY))) {
+        const priceSnapshot = new PriceSnapshot(event.block.number.toString());
+        priceSnapshot.lpOraclePrice = token.lastPriceUSD!;
+        priceSnapshot.harshOraclePrice = harshOraclePrice.usdPrice;
+        priceSnapshot.harshOracleUsed = harshOraclePrice.oracleType;
+        priceSnapshot.percentageDifference = percentageDifference;
+        priceSnapshot.token = token.id;
+        priceSnapshot.blockNumber = event.block.number;
+        priceSnapshot.timestamp = event.block.timestamp;
+        priceSnapshot.save();
+      }
+    }
+
+    token.save();
+  }
+
   return token as Token;
+}
+
+function abs(x: BigDecimal): BigDecimal {
+  return x.gt(BIGDECIMAL_ZERO) ? x : x.times(BIGDECIMAL_NEG_ONE);
 }
 
 export function getOrCreateLPToken(
@@ -316,15 +385,20 @@ export function getOrCreateLPToken(
     token.decimals = DEFAULT_DECIMALS;
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
+    token._lpOracleZero = BIGINT_ZERO;
+    token._harshOracleZero = BIGINT_ZERO;
     token.save();
   }
   return token;
 }
 
-export function getOrCreateRewardToken(address: string): RewardToken {
+export function getOrCreateRewardToken(
+  event: ethereum.Event,
+  address: string
+): RewardToken {
   let rewardToken = RewardToken.load(address);
   if (rewardToken == null) {
-    const token = getOrCreateToken(address);
+    const token = getOrCreateToken(event, address);
     rewardToken = new RewardToken(RewardTokenType.DEPOSIT + "-" + address);
     rewardToken.token = token.id;
     rewardToken.type = RewardTokenType.DEPOSIT;

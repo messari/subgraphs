@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts/index";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts/index";
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
@@ -18,14 +18,19 @@ import {
 } from "../common/constants";
 import { safeDiv } from "../common/utils/utils";
 import { NetworkConfigs } from "../../configurations/configure";
+import { FinaliseCall } from "../../../rocket-pool/generated/templates/rocketMinipoolDelegateV2/rocketMinipoolDelegateV2";
 
 // Update the token price of the native token for the specific protocol/network (see network specific configs)
 // Update the token by referencing the native token against pools with the reference token and a stable coin
 // Estimate the price against the pool with the highest liquidity
-export function updateNativeTokenPriceInUSD(): Token {
+export function updateNativeTokenPriceInUSD(event: ethereum.Event): Token {
   let nativeAmount = BIGDECIMAL_ZERO;
   let stableAmount = BIGDECIMAL_ZERO;
-  const nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
+  const nativeToken = getOrCreateToken(
+    event,
+    NetworkConfigs.getReferenceToken(),
+    false
+  );
   // fetch average price of NATIVE_TOKEN_ADDRESS from STABLE_ORACLES
   for (let i = 0; i < NetworkConfigs.getStableOraclePools().length; i++) {
     const pool = _LiquidityPoolAmount.load(
@@ -53,9 +58,9 @@ export function updateNativeTokenPriceInUSD(): Token {
  * You can find the possible whitelisted tokens used for comparision in the network configuration typescript file.
  **/
 export function findUSDPricePerToken(
+  event: ethereum.Event,
   token: Token,
-  nativeToken: Token,
-  blockNumber: BigInt
+  nativeToken: Token
 ): BigDecimal {
   if (token.id == NetworkConfigs.getReferenceToken()) {
     return nativeToken.lastPriceUSD!;
@@ -77,7 +82,7 @@ export function findUSDPricePerToken(
     for (let i = 0; i < whiteList.length; ++i) {
       const poolAddress = whiteList[i];
       const poolAmounts = getLiquidityPoolAmounts(poolAddress);
-      const pool = getLiquidityPool(poolAddress, blockNumber);
+      const pool = getLiquidityPool(poolAddress, event.block.number);
 
       if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
         if (
@@ -87,7 +92,11 @@ export function findUSDPricePerToken(
           )
         ) {
           // whitelist token is token1
-          const whitelistToken = getOrCreateToken(pool.inputTokens[1]);
+          const whitelistToken = getOrCreateToken(
+            event,
+            pool.inputTokens[1],
+            false
+          );
           // get the derived NativeToken in pool
           const whitelistTokenLocked = poolAmounts.inputTokenBalances[1].times(
             whitelistToken.lastPriceUSD!
@@ -107,7 +116,11 @@ export function findUSDPricePerToken(
             NetworkConfigs.getMinimumLiquidityThresholdTrackPrice()
           )
         ) {
-          const whitelistToken = getOrCreateToken(pool.inputTokens[0]);
+          const whitelistToken = getOrCreateToken(
+            event,
+            pool.inputTokens[0],
+            false
+          );
           // get the derived nativeToken in pool
           const whitelistTokenLocked = poolAmounts.inputTokenBalances[0].times(
             whitelistToken.lastPriceUSD!

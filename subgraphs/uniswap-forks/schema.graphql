@@ -53,6 +53,14 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  _harshOraclePriceUSD: BigDecimal
+
+  _harshOracleUsed: String
+
+  _harshOracleZero: BigInt!
+
+  _lpOracleZero: BigInt!
 }
 
 enum RewardTokenType {
@@ -974,4 +982,25 @@ type _CircularBuffer @entity {
 
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
+}
+
+type PriceSnapshot @entity {
+  " tokenAddress + blockNumber "
+  id: ID!
+
+  token: String!
+
+  percentageDifference: BigDecimal!
+
+  lpOraclePrice: BigDecimal!
+
+  harshOracleUsed: String!
+
+  harshOraclePrice: BigDecimal!
+
+  priceDivergenceFromLPOracle: BigDecimal!
+
+  timestamp: BigInt!
+
+  blockNumber: BigInt!
 }

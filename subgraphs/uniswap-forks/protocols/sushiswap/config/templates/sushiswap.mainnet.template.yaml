@@ -27,6 +27,37 @@ dataSources:
           file: ./abis/sushiswap/Factory.json
         - name: TokenABI
           file: ./abis/sushiswap/ERC20.json
+        
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Factory/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Factory/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Factory/Pair.json
+        
+        - name: CalculationsSushiswap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
@@ -48,6 +79,37 @@ dataSources:
           file: ./abis/sushiswap/MasterChefSushiswap.json
         - name: TokenABI
           file: ./abis/sushiswap/ERC20.json
+        
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Factory/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Factory/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Factory/Pair.json
+        
+        - name: CalculationsSushiswap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
           handler: handleDeposit
@@ -74,6 +136,37 @@ dataSources:
           file: ./abis/sushiswap/MasterChefV2Sushiswap.json
         - name: TokenABI
           file: ./abis/sushiswap/ERC20.json
+        
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Factory/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Factory/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Factory/Pair.json
+        
+        - name: CalculationsSushiswap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
           handler: handleDeposit
@@ -105,6 +198,37 @@ templates:
           file: ./abis/sushiswap/Factory.json
         - name: TokenABI
           file: ./abis/sushiswap/ERC20.json
+        
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Factory/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Factory/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Factory/Pair.json
+        
+        - name: CalculationsSushiswap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint
