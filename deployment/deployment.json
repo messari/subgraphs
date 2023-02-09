@@ -5994,5 +5994,34 @@
         }
       }
     }
+  },
+  "portal": {
+    "schema": "bridge",
+    "base": "portal",
+    "protocol": "portal",
+    "deployments": {
+      "portal-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "portal-ethereum",
+            "query-id": "portal-ethereum"
+          }
+        },
+        "files": {
+          "template": "portal.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      }
+    }
   }
 }
