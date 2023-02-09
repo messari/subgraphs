@@ -9,6 +9,16 @@ export namespace NULL {
   export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
 }
 
+export namespace OracleType {
+  export const AAVE_ORACLE = "AaveOracle";
+  export const CURVE_ROUTER = "CurveRouter";
+  export const CHAINLINK_FEED = "ChainlinkFeed";
+  export const YEARN_LENS_ORACLE = "YearnLensOracle";
+  export const CURVE_CALCULATIONS = "CurveCalculations";
+  export const UNISWAP_FORKS_ROUTER = "UniswapForksRouter";
+  export const SUSHI_CALCULATIONS = "SushiswapCalculations";
+}
+
 export const CHAIN_LINK_USD_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000348"
 );

@@ -26,8 +26,8 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x10ED43C718714eb63d5aA57B78B54704E256024E", 6810080), // PancakeSwap v2
-  new OracleContract("0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F", 586899), // PancakeSwap v1
+  new OracleContract("0x10ed43c718714eb63d5aa57b78b54704e256024e", 6810080), // PancakeSwap v2
+  new OracleContract("0x05ff2b0db69458a0750badebc4f9e13add608c7f", 586899), // PancakeSwap v1
 ];
 
 ///////////////////////////////////////////////////////////////////////////

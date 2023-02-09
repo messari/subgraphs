@@ -126,7 +126,9 @@ function PoolTab({
         </CopyLinkToClipboard>
       </Box>
     </Grid>);
-    specificCharts.push(headerComponent, <BridgeOutboundVolumeLogic poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
+    if (data[poolKeySingular]?.routes?.length > 0) {
+      specificCharts.push(headerComponent, <BridgeOutboundVolumeLogic poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
+    }
   } else if (schemaType?.toUpperCase() === "EXCHANGE") {
     if (poolTimeseriesData) {
       Object.keys(poolTimeseriesData).forEach((entityName: string) => {

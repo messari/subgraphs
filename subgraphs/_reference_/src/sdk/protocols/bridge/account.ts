@@ -14,7 +14,7 @@ import { Bridge } from "./protocol";
 import { TokenManager } from "./tokens";
 import { BridgePoolType, TransactionType, TransferType } from "./enums";
 import { getUnixDays, getUnixHours } from "../../util/events";
-import { CustomEventType } from ".";
+import { CustomEventType } from "../../util/events";
 
 export class AccountManager {
   protocol: Bridge;

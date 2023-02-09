@@ -352,7 +352,7 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
               if (
                 !Number(val.decimals) &&
                 Number(val.decimals) !== 0 &&
-                issues.filter((x) => x.fieldName === label).length === 0
+                issues.filter((x) => x.fieldName === label)?.length === 0
               ) {
                 issues.push({ message: "", type: "DEC", level: "critical", fieldName: label });
               }
@@ -396,6 +396,13 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
               return entityData.inputTokens[idx].name || "TOKEN [" + idx + "]";
             });
             dataType += " [" + tokenNames.join(",") + "]";
+          } else if (fieldName.toUpperCase() === "ROUTES") {
+            value = value.map((val: { [x: string]: any }) => {
+              return {
+                id: val.id,
+                network: val.crossToken.network
+              };
+            });
           } else if (fieldName.toUpperCase() === "POSITIONS") {
             // ignore positions
             return null;

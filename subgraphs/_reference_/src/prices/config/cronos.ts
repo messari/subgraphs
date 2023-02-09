@@ -25,7 +25,7 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x145863Eb42Cf62847A6Ca784e6416C1682b1b2Ae", 5247), // VVS Finance
+  new OracleContract("0x145863eb42cf62847a6ca784e6416c1682b1b2ae", 5247), // VVS Finance
 ];
 
 ///////////////////////////////////////////////////////////////////////////

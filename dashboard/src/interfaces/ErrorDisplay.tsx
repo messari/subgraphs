@@ -2,7 +2,7 @@ import { ApolloError } from "@apollo/client";
 import { Button } from "@mui/material";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import { ProtocolTypeEntityName, ProtocolTypeEntityNames, Versions } from "../constants";
+import { listSchemaVersionsByType, ProtocolTypeEntityName, ProtocolTypeEntityNames, Versions } from "../constants";
 import { isValidHttpUrl } from "../utils";
 import IssuesDisplay from "./IssuesDisplay";
 
@@ -39,6 +39,8 @@ function ErrorDisplay({
     }
   }
 
+  const schemaType: string = protocolSchemaData?.type || "";
+
   const subgraphParam = searchParams.get("subgraph");
   const errorMsgs = [];
   let errorTotalCount = 0;
@@ -65,19 +67,19 @@ function ErrorDisplay({
       errorMsgs.push(
         <h3>
           Required schema fields are missing from this subgraph. Verify that your schema has all of the fields that are
-          in the common {protocolSchemaData?.type} {protocolSchemaData?.version} schema.
+          in the common {schemaType} {protocolSchemaData?.version} schema.
         </h3>,
       );
     } else {
       // If there are more than 5 query errors, it is possible the schemaVersion on the protocol entity was not updated. Allow the user to select querying on a different schema version
+      const versionsOnType: any = listSchemaVersionsByType[schemaType];
       errorMsgs.push(
         <>
           <h2>
-            Queried {protocolSchemaData?.type} schema version {protocolSchemaData?.schemaVersion} - Select a different
+            Queried {schemaType} schema version {protocolSchemaData?.schemaVersion} - Select a different
             schema to query below:
           </h2>
-          {/* Create a button for every other schema version */}
-          {Versions.SchemaVersions.map((version: string) => {
+          {versionsOnType.map((version: string) => {
             if (version === protocolSchemaData?.schemaVersion) {
               return null;
             }

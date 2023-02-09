@@ -6303,7 +6303,7 @@
       },
       "stargate-avalanche": {
         "network": "avalanche",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -6325,7 +6325,7 @@
       },
       "stargate-bsc": {
         "network": "bsc",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -6347,7 +6347,7 @@
       },
       "stargate-arbitrum": {
         "network": "arbitrum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -6369,7 +6369,7 @@
       },
       "stargate-polygon": {
         "network": "polygon",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -6391,7 +6391,7 @@
       },
       "stargate-optimism": {
         "network": "optimism",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
