@@ -49,7 +49,7 @@ export function handleTransferOut3pGateway(event: WithdrawalFinalized): void {
 export function handleTransferOut(event: WithdrawalFinalized): void {
   // -- SDK
 
-  const sdk = SDK.initialize(ethSideConf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initialize(ethSideConf, new Pricer(event.block), new TokenInit(), event);
 
   // -- TOKENS
 

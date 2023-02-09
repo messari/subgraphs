@@ -3,7 +3,7 @@ import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import { TokenPricer } from "../sdk/protocols/config";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _ERC20 } from "../../generated/ERC20Gateway/_ERC20";
 import { BridgePermissionType } from "../sdk/protocols/bridge/enums";
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
@@ -11,14 +11,20 @@ import { Versions } from "../versions";
 import { ETH_ADDRESS } from "../sdk/util/constants";
 
 export class Pricer implements TokenPricer {
+  block: ethereum.Block;
+
+  constructor(block: ethereum.Block) {
+    this.block = block;
+  }
+
   getTokenPrice(token: Token): BigDecimal {
-    const price = getUsdPricePerToken(Address.fromBytes(token.id));
+    const price = getUsdPricePerToken(Address.fromBytes(token.id), this.block);
     return price.usdPrice;
   }
 
   getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
     const _amount = bigIntToBigDecimal(amount, token.decimals);
-    return getUsdPrice(Address.fromBytes(token.id), _amount);
+    return getUsdPrice(Address.fromBytes(token.id), _amount, this.block);
   }
 }
 

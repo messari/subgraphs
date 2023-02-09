@@ -15,7 +15,7 @@ const ethAddress = Address.fromString(ETH_ADDRESS);
 export function handleL1MessageDelivered(event: MessageDelivered): void {
   // -- SDK
 
-  const sdk = SDK.initialize(ethSideConf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initialize(ethSideConf, new Pricer(event.block), new TokenInit(), event);
 
   // -- ACCOUNT
 

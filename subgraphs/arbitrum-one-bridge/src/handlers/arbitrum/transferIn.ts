@@ -37,7 +37,7 @@ export function handleTransferIn3pGateway(event: DepositFinalized): void {
 export function handleTransferIn(event: DepositFinalized): void {
   // -- SDK
 
-  const sdk = SDK.initialize(arbSideConf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initialize(arbSideConf, new Pricer(event.block), new TokenInit(), event);
 
   // -- TOKENS
 
