@@ -80,7 +80,6 @@ class TokenInit implements TokenInitializer {
 export function handleSwapOut(event: LogMessagePublished): void {
   const payload = event.params.payload;
 
-  let payloadID: i32;
   let amount: BigInt;
   let tokenAddress: Bytes;
   let tokenChain: i32;
@@ -102,7 +101,6 @@ export function handleSwapOut(event: LogMessagePublished): void {
 
     const transferStruct = parseTransferWithPayloadCall.value;
 
-    payloadID = transferStruct.payloadID;
     amount = transferStruct.amount;
     tokenAddress = transferStruct.tokenAddress;
     tokenChain = transferStruct.tokenChain;
@@ -111,7 +109,6 @@ export function handleSwapOut(event: LogMessagePublished): void {
   } else {
     const transferStruct = parseTransferCall.value;
 
-    payloadID = transferStruct.payloadID;
     amount = transferStruct.amount;
     tokenAddress = transferStruct.tokenAddress;
     tokenChain = transferStruct.tokenChain;
@@ -191,12 +188,10 @@ export function handleSwapIn(call: CompleteTransferCall): void {
   }
 
   const transferStruct = parseTransferCall.value;
-  const payloadID = transferStruct.payloadID;
   let amount = transferStruct.amount;
   let tokenAddress = transferStruct.tokenAddress;
   const tokenChain = transferStruct.tokenChain;
   const to = transferStruct.to;
-  const toChain = transferStruct.toChain;
 
   const chainID = NetworkConfigs.getNetworkID();
 
@@ -268,12 +263,10 @@ export function handleSwapInWithPayload(
   }
 
   const transferStruct = parseTransferCall.value;
-  const payloadID = transferStruct.payloadID;
   let amount = transferStruct.amount;
   let tokenAddress = transferStruct.tokenAddress;
   const tokenChain = transferStruct.tokenChain;
   const to = transferStruct.to;
-  const toChain = transferStruct.toChain;
 
   const chainID = NetworkConfigs.getNetworkID();
 
@@ -344,12 +337,10 @@ export function handleSwapInNative(
   }
 
   const transferStruct = parseTransferCall.value;
-  const payloadID = transferStruct.payloadID;
   let amount = transferStruct.amount;
   let tokenAddress = transferStruct.tokenAddress;
   const tokenChain = transferStruct.tokenChain;
   const to = transferStruct.to;
-  const toChain = transferStruct.toChain;
 
   const chainID = NetworkConfigs.getNetworkID();
 
@@ -421,12 +412,10 @@ export function handleSwapInNativeWithPayload(
   }
 
   const transferStruct = parseTransferCall.value;
-  const payloadID = transferStruct.payloadID;
   let amount = transferStruct.amount;
   let tokenAddress = transferStruct.tokenAddress;
   const tokenChain = transferStruct.tokenChain;
   const to = transferStruct.to;
-  const toChain = transferStruct.toChain;
 
   const chainID = NetworkConfigs.getNetworkID();
 

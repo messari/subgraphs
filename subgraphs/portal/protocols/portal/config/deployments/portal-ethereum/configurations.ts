@@ -21,9 +21,9 @@ export class PortalMainnetConfigurations implements Configurations {
     return BigInt.fromI32(2);
   }
   getFactoryAddress(): Address {
-    return Address.fromString("0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B");
+    return Address.fromString("0x98f3c9e6e3face36baad05fe09d375ef1464288b");
   }
   getBridgeAddress(): Address {
-    return Address.fromString("0x3ee18B2214AFF97000D974cf647E7C347E8fa585");
+    return Address.fromString("0x3ee18b2214aff97000d974cf647e7c347e8fa585");
   }
 }
