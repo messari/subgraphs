@@ -468,9 +468,20 @@ export function handleCatBite(event: BiteEvent): void {
   const tab = event.params.tab;
 
   const market = getMarketFromIlk(ilk)!;
-
+  const token = getOrCreateToken(market.inputToken);
+  const collateral = bigIntChangeDecimals(lot, WAD, token.decimals);
+  const collateralUSD = bigIntToBDUseDecimals(collateral, token.decimals).times(token.lastPriceUSD!);
+  const deltaCollateral = collateral.times(BIGINT_NEG_ONE);
+  const deltaCollateralUSD = collateralUSD.times(BIGDECIMAL_NEG_ONE);
   const deltaDebtUSD = bigIntToBDUseDecimals(art, WAD).times(BIGDECIMAL_NEG_ONE);
-  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
+
+  // Here we remove all collateral and close positions, even though partial collateral may be returned
+  // to the urn, it is no longer "locked", the user would need to call `vat.frob` again to move the collateral
+  // from gem to urn (locked); so it is clearer to remove all collateral at initiation of liquidation
+  liquidatePosition(event, urn, ilk, collateral, art);
+  updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD);
+  updateProtocol();
+  updateFinancialsSnapshot(event);
 
   const liquidationRevenueUSD = bigIntToBDUseDecimals(tab, RAD).times(
     market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
@@ -556,13 +567,20 @@ export function handleDogBark(event: BarkEvent): void {
   const due = event.params.due; //including interest, but not penalty
 
   const market = getMarketFromIlk(ilk)!;
-  const storeID = clip.toHexString().concat("-").concat(id.toString());
-
-  // remove borrowed amount from borrowed balance
-  // collateral/tvl update is taken care of when it exits vat
-  // via the slip() function/event
+  const token = getOrCreateToken(market.inputToken);
+  const collateral = bigIntChangeDecimals(lot, WAD, token.decimals);
+  const collateralUSD = bigIntToBDUseDecimals(collateral, token.decimals).times(token.lastPriceUSD!);
+  const deltaCollateral = collateral.times(BIGINT_NEG_ONE);
+  const deltaCollateralUSD = collateralUSD.times(BIGDECIMAL_NEG_ONE);
   const deltaDebtUSD = bigIntToBDUseDecimals(art, WAD).times(BIGDECIMAL_NEG_ONE);
-  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
+
+  // Here we remove all collateral and close positions, even though partial collateral may be returned
+  // to the urn, it is no longer "locked", the user would need to call `vat.frob` again to move the collateral
+  // from gem to urn (locked); so it is clearer to remove all collateral at initiation of liquidation
+  liquidatePosition(event, urn.toHexString(), ilk, collateral, art);
+  updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD);
+  updateProtocol();
+  updateFinancialsSnapshot(event);
 
   const liquidationRevenueUSD = bigIntToBDUseDecimals(due, RAD).times(
     market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
@@ -570,6 +588,7 @@ export function handleDogBark(event: BarkEvent): void {
 
   updateRevenue(event, market.id, liquidationRevenueUSD, BIGDECIMAL_ZERO, ProtocolSideRevenueType.LIQUIDATION);
 
+  const storeID = clip.toHexString().concat("-").concat(id.toString());
   log.info("[handleDogBark]storeID={}, ilk={}, urn={}: lot={}, art={}, due={}, liquidation revenue=${}", [
     storeID,
     ilk.toString(),
@@ -811,19 +830,15 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
           position.hashClosed ? position.hashClosed! : "null",
         ]);
       } else {
-        log.info("[handleFlipEndAuction]{}: position not existing", [positionID]);
+        log.info("[handleFlipEndAuction]{}: position not exist", [positionID]);
       }
     }
   }
 
-  const deltaCollateral = liquidate.amount.times(BIGINT_NEG_ONE);
-  const deltaCollateralUSD = liquidate.amountUSD.times(BIGDECIMAL_NEG_ONE);
-  const deltaDebtUSD = bigIntToBDUseDecimals(flipBidsStore.art, RAD).times(BIGDECIMAL_NEG_ONE);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
-  liquidatePosition(event, flipBidsStore.urn, ilk, liquidate.amount, flipBidsStore.art);
-  updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
-  updateProtocol(deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
-  updateFinancialsSnapshot(event, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
 
 // Auction used by Dog (new liquidation contract)
@@ -939,14 +954,10 @@ export function handleClipTakeBid(event: TakeEvent): void {
     clipTakeStore.art.times(deltaTab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
   ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
-  const deltaCollateral = liquidate.amount.times(BIGINT_NEG_ONE);
-  const deltaCollateralUSD = liquidate.amountUSD.times(BIGDECIMAL_NEG_ONE);
-  const deltaDebtUSD = bigIntToBDUseDecimals(debtRepaid, RAD).times(BIGDECIMAL_NEG_ONE);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
-  liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.amount, debtRepaid);
-  updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
-  updateProtocol(deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
-  updateFinancialsSnapshot(event, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
 
 // cancel auction
@@ -1010,14 +1021,10 @@ export function handleClipYankBid(event: ClipYankEvent): void {
     clipTakeStore.art.times(tab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
   ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
-  const deltaCollateral = liquidate.amount.times(BIGINT_NEG_ONE);
-  const deltaCollateralUSD = liquidate.amountUSD.times(BIGDECIMAL_NEG_ONE);
-  const deltaDebtUSD = bigIntToBDUseDecimals(debtRepaid, RAD).times(BIGDECIMAL_NEG_ONE);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
-  liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.amount, debtRepaid);
-  updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
-  updateProtocol(deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
-  updateFinancialsSnapshot(event, deltaCollateralUSD, deltaDebtUSD, liquidate.amountUSD);
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
 
 // Setting mat & par in the Spot contract
