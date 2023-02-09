@@ -1,0 +1,8 @@
+{
+  "deployment": "PORTAL_MAINNET",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
