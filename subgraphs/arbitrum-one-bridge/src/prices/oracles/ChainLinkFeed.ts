@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { CustomPriceType, OracleContract } from "../common/types";
-import { ChainLinkContract } from "../../../generated/UniswapV2Factory/ChainLinkContract";
+import { ChainLinkContract } from "../../../generated/ERC20Gateway/ChainLinkContract";
 
 export function getChainLinkContract(
   contract: OracleContract,
