@@ -1,0 +1,645 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_pricer", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "BribeEmission",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "PerformanceFeeGovernance",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "SentBribeToGovernance",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "SentBribeToTree",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "AURA",
+    "outputs": [
+      { "internalType": "contract IERC20", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "BADGER",
+    "outputs": [
+      { "internalType": "contract IERC20", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "BADGER_TREE",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "BALANCE_ERC20",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "BVE_AURA",
+    "outputs": [
+      { "internalType": "contract IVault", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DEV_MULTI",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "HARVEST_FORWARDER",
+    "outputs": [
+      {
+        "internalType": "contract IHarvestForwarder",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "KIND_SELL",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_BPS",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_MANAGER_IDLE_TIME",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "OPS_FEE",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "RELAYER",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SETTLEMENT",
+    "outputs": [
+      {
+        "internalType": "contract ICowSettlement",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "STRATEGY",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "TREASURY",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "WETH",
+    "outputs": [
+      { "internalType": "contract IERC20", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IERC20",
+            "name": "sellToken",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IERC20",
+            "name": "buyToken",
+            "type": "address"
+          },
+          { "internalType": "address", "name": "receiver", "type": "address" },
+          {
+            "internalType": "uint256",
+            "name": "sellAmount",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "buyAmount", "type": "uint256" },
+          { "internalType": "uint32", "name": "validTo", "type": "uint32" },
+          { "internalType": "bytes32", "name": "appData", "type": "bytes32" },
+          { "internalType": "uint256", "name": "feeAmount", "type": "uint256" },
+          { "internalType": "bytes32", "name": "kind", "type": "bytes32" },
+          {
+            "internalType": "bool",
+            "name": "partiallyFillable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "sellTokenBalance",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "buyTokenBalance",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct CowSwapSeller.Data",
+        "name": "orderData",
+        "type": "tuple"
+      },
+      { "internalType": "bytes", "name": "orderUid", "type": "bytes" }
+    ],
+    "name": "checkCowswapOrder",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "domainSeparator",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "emitBadger",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IERC20",
+            "name": "sellToken",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IERC20",
+            "name": "buyToken",
+            "type": "address"
+          },
+          { "internalType": "address", "name": "receiver", "type": "address" },
+          {
+            "internalType": "uint256",
+            "name": "sellAmount",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "buyAmount", "type": "uint256" },
+          { "internalType": "uint32", "name": "validTo", "type": "uint32" },
+          { "internalType": "bytes32", "name": "appData", "type": "bytes32" },
+          { "internalType": "uint256", "name": "feeAmount", "type": "uint256" },
+          { "internalType": "bytes32", "name": "kind", "type": "bytes32" },
+          {
+            "internalType": "bool",
+            "name": "partiallyFillable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "sellTokenBalance",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "buyTokenBalance",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct CowSwapSeller.Data",
+        "name": "order",
+        "type": "tuple"
+      },
+      { "internalType": "bytes32", "name": "separator", "type": "bytes32" }
+    ],
+    "name": "getHash",
+    "outputs": [
+      { "internalType": "bytes32", "name": "orderDigest", "type": "bytes32" }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IERC20",
+            "name": "sellToken",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IERC20",
+            "name": "buyToken",
+            "type": "address"
+          },
+          { "internalType": "address", "name": "receiver", "type": "address" },
+          {
+            "internalType": "uint256",
+            "name": "sellAmount",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "buyAmount", "type": "uint256" },
+          { "internalType": "uint32", "name": "validTo", "type": "uint32" },
+          { "internalType": "bytes32", "name": "appData", "type": "bytes32" },
+          { "internalType": "uint256", "name": "feeAmount", "type": "uint256" },
+          { "internalType": "bytes32", "name": "kind", "type": "bytes32" },
+          {
+            "internalType": "bool",
+            "name": "partiallyFillable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "sellTokenBalance",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "buyTokenBalance",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct CowSwapSeller.Data",
+        "name": "orderData",
+        "type": "tuple"
+      }
+    ],
+    "name": "getOrderID",
+    "outputs": [{ "internalType": "bytes", "name": "", "type": "bytes" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lastBribeAction",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "manager",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "notifyNewRound",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes", "name": "orderUid", "type": "bytes" },
+      { "internalType": "bytes32", "name": "orderDigest", "type": "bytes32" },
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "uint32", "name": "validTo", "type": "uint32" }
+    ],
+    "name": "packOrderUidParams",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pricer",
+    "outputs": [
+      {
+        "internalType": "contract OnChainPricing",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract IERC20", "name": "token", "type": "address" },
+      { "internalType": "bool", "name": "sendToGovernance", "type": "bool" }
+    ],
+    "name": "ragequit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IERC20",
+            "name": "sellToken",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IERC20",
+            "name": "buyToken",
+            "type": "address"
+          },
+          { "internalType": "address", "name": "receiver", "type": "address" },
+          {
+            "internalType": "uint256",
+            "name": "sellAmount",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "buyAmount", "type": "uint256" },
+          { "internalType": "uint32", "name": "validTo", "type": "uint32" },
+          { "internalType": "bytes32", "name": "appData", "type": "bytes32" },
+          { "internalType": "uint256", "name": "feeAmount", "type": "uint256" },
+          { "internalType": "bytes32", "name": "kind", "type": "bytes32" },
+          {
+            "internalType": "bool",
+            "name": "partiallyFillable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "sellTokenBalance",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "buyTokenBalance",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct CowSwapSeller.Data",
+        "name": "orderData",
+        "type": "tuple"
+      },
+      { "internalType": "bytes", "name": "orderUid", "type": "bytes" }
+    ],
+    "name": "sellBribeForWeth",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token", "type": "address" },
+      { "internalType": "uint256", "name": "newAllowance", "type": "uint256" }
+    ],
+    "name": "setCustomAllowance",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newManager", "type": "address" }
+    ],
+    "name": "setManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract OnChainPricing",
+        "name": "newPricer",
+        "type": "address"
+      }
+    ],
+    "name": "setPricer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "swapAURATobveAURAAndEmit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IERC20",
+            "name": "sellToken",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IERC20",
+            "name": "buyToken",
+            "type": "address"
+          },
+          { "internalType": "address", "name": "receiver", "type": "address" },
+          {
+            "internalType": "uint256",
+            "name": "sellAmount",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "buyAmount", "type": "uint256" },
+          { "internalType": "uint32", "name": "validTo", "type": "uint32" },
+          { "internalType": "bytes32", "name": "appData", "type": "bytes32" },
+          { "internalType": "uint256", "name": "feeAmount", "type": "uint256" },
+          { "internalType": "bytes32", "name": "kind", "type": "bytes32" },
+          {
+            "internalType": "bool",
+            "name": "partiallyFillable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "sellTokenBalance",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "buyTokenBalance",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct CowSwapSeller.Data",
+        "name": "orderData",
+        "type": "tuple"
+      },
+      { "internalType": "bytes", "name": "orderUid", "type": "bytes" }
+    ],
+    "name": "swapWethForAURA",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IERC20",
+            "name": "sellToken",
+            "type": "address"
+          },
+          {
+            "internalType": "contract IERC20",
+            "name": "buyToken",
+            "type": "address"
+          },
+          { "internalType": "address", "name": "receiver", "type": "address" },
+          {
+            "internalType": "uint256",
+            "name": "sellAmount",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "buyAmount", "type": "uint256" },
+          { "internalType": "uint32", "name": "validTo", "type": "uint32" },
+          { "internalType": "bytes32", "name": "appData", "type": "bytes32" },
+          { "internalType": "uint256", "name": "feeAmount", "type": "uint256" },
+          { "internalType": "bytes32", "name": "kind", "type": "bytes32" },
+          {
+            "internalType": "bool",
+            "name": "partiallyFillable",
+            "type": "bool"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "sellTokenBalance",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "buyTokenBalance",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct CowSwapSeller.Data",
+        "name": "orderData",
+        "type": "tuple"
+      },
+      { "internalType": "bytes", "name": "orderUid", "type": "bytes" }
+    ],
+    "name": "swapWethForBadger",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

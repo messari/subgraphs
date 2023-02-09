@@ -462,7 +462,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                                 if (!currentObject?.fatalError) {
                                     window.open(`https://subgraphs.messari.io/subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`, "_blank");
                                 } else {
-                                    window.open("https://okgraph.xyz/?q=" + depo.hostedServiceId, "_blank");
+                                    window.open("https://okgraph.xyz/?q=messari/" + depo.hostedServiceId, "_blank");
                                 }
                             } else {
                                 if (!validationSupported) {
@@ -472,7 +472,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                                 if (!currentObject?.fatalError) {
                                     navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`)
                                 } else {
-                                    window.location.href = "https://okgraph.xyz/?q=" + depo.hostedServiceId;
+                                    window.location.href = "https://okgraph.xyz/?q=messari/" + depo.hostedServiceId;
                                 }
                             }
                             return;
@@ -540,7 +540,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                                 if (!currentObject?.fatalError) {
                                     window.open(`https://subgraphs.messari.io/subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`, "_blank");
                                 } else {
-                                    window.open("https://okgraph.xyz/?q=" + depo.hostedServiceId, "_blank");
+                                    window.open("https://okgraph.xyz/?q=messari/" + depo.hostedServiceId, "_blank");
                                 }
                             } else {
                                 if (!validationSupported) {
@@ -550,7 +550,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                                 if (!currentObject?.fatalError) {
                                     navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`)
                                 } else {
-                                    window.location.href = "https://okgraph.xyz/?q=" + depo.hostedServiceId;
+                                    window.location.href = "https://okgraph.xyz/?q=messari/" + depo.hostedServiceId;
                                 }
                             }
                             return;
@@ -686,13 +686,14 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
 
     try {
         if (protocol?.schemaVersions?.length > 0) {
-            const schemaColored = protocol?.schemaVersions?.map((x: string, idx: number) => {
-                if (latestSchemaVersions(schemaType, x) || schemaType === "governance") {
-                    return <span>{x}</span>;
+            let schemaColored = {};
+            const schemaVersOnProtocol = protocol?.schemaVersions?.map((x: string) => {
+                if (!(latestSchemaVersions(schemaType, x) || schemaType === "governance")) {
+                    schemaColored = { color: "#FFA500" };
                 }
-                return <span key={subgraphName + "-protocol-schemaVerRow-" + idx} style={{ color: "#FFA500" }}>{x}</span>;
+                return x;
             })
-            schemaCell = <span>{schemaColored}</span>;
+            schemaCell = <span style={schemaColored} >{schemaVersOnProtocol.join(", ")}</span>;
         }
 
         if (hasDecentralizedDepo) {

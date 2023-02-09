@@ -16,9 +16,9 @@ import {
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
 
-export class HoneyswapXdaiConfigurations implements Configurations {
+export class HoneyswapGnosisConfigurations implements Configurations {
   getNetwork(): string {
-    return Network.XDAI;
+    return Network.GNOSIS;
   }
   getSchemaVersion(): string {
     return PROTOCOL_SCHEMA_VERSION;
