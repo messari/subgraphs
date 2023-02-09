@@ -26,6 +26,7 @@ import {
 import { getOrCreateToken } from "./token";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 import { toDecimal } from "../mapping/lib/helpers";
+import { bigIntToBigDecimal } from "../utils/numbers";
 
 export function getOrCreateMarket(
   address: string,
@@ -177,11 +178,13 @@ export function addMarketTokenBalance(
   latestRate: BigDecimal
 ): void {
   const deltaUSD = toDecimal(delta).times(latestRate);
-  market.totalValueLockedUSD = market.totalValueLockedUSD.plus(deltaUSD);
   market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(deltaUSD);
   market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(deltaUSD);
   market.inputTokenBalance = market.inputTokenBalance.plus(delta);
   market.inputTokenPriceUSD = latestRate;
+  market.totalValueLockedUSD = latestRate.times(
+    bigIntToBigDecimal(market.inputTokenBalance)
+  );
   market.save();
   getOrCreateMarketSnapshot(event, market);
   getOrCreateMarketHourlySnapshot(event, market);

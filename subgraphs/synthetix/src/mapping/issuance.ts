@@ -267,7 +267,7 @@ function trackSNXHolder(
   const txHash = event.transaction.hash.toHex();
 
   const token = getOrCreateToken(SNX_ADDRESS);
-  let latestRate = getLatestRate("snx", txHash);
+  let latestRate = getLatestRate("SNX", txHash);
   if (!latestRate) {
     latestRate = BIGDECIMAL_ZERO;
   }

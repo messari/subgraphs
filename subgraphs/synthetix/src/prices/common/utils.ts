@@ -13,7 +13,7 @@ import * as ARBITRUM_ONE from "../config/arbitrum";
 import { Configurations } from "./types";
 import * as constants from "./constants";
 import * as TEMPLATE from "../config/template";
-import { ERC20 } from "../../../generated/issuance_ERC20_0/ERC20";
+import { _ERC20 as ERC20 } from "../../../generated/issuance_ERC20_0/_ERC20";
 import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 
 export function isNullAddress(tokenAddr: Address): boolean {

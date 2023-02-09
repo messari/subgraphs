@@ -81,7 +81,7 @@ export function handleAccountLiquidated(event: AccountLiquidatedEvent): void {
   const market = getOrCreateMarket(SNX_ADDRESS, event);
   const liquidator = event.params.liquidator;
 
-  const snx_latestRate = getLatestRate("snx", event.transaction.hash.toHex());
+  const snx_latestRate = getLatestRate("SNX", event.transaction.hash.toHex());
   const snx_amount = toDecimal(event.params.snxRedeemed);
   const snx_amountUSD = snx_amount.times(snx_latestRate!);
 

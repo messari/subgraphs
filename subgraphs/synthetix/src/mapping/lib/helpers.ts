@@ -11,7 +11,6 @@ import {
 import {
   LatestRate,
   FeeRate,
-  Synth,
   SynthByCurrencyKey,
 } from "../../../generated/schema";
 import { initFeed, initFeeRate } from "../fragments/latest-rates";
@@ -95,7 +94,8 @@ export function getLatestRate(
     if (!rate) {
       const Synth = SynthByCurrencyKey.load(synth);
       if (Synth && Synth.proxyAddress) {
-        return getUsdPricePerToken(Synth.proxyAddress).usdPrice;
+        const addd = Address.fromBytes(Synth.proxyAddress);
+        return getUsdPricePerToken(addd).usdPrice;
       }
     }
 
