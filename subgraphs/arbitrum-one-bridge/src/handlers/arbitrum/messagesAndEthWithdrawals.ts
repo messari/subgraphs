@@ -46,7 +46,12 @@ export function handleL2ToL1Tx(event: L2ToL1Tx): void {
 
 export function handleL2ToL1Transaction(event: L2ToL1Transaction): void {
   // -- SDK
-  const sdk = SDK.initialize(arbSideConf, new Pricer(event.block), new TokenInit(), event);
+  const sdk = SDK.initialize(
+    arbSideConf,
+    new Pricer(event.block),
+    new TokenInit(),
+    event
+  );
 
   // -- ACCOUNT
   const acc = sdk.Accounts.loadAccount(event.params.caller);
