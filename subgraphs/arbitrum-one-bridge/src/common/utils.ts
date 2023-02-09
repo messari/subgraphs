@@ -66,7 +66,7 @@ export class TokenInit implements TokenInitializer {
   }
 }
 
-// -- PROXY ADMIN (TODO: address ok?)
+// Note: Using one of the proxy admin contracts as bridge id
 // ProxyAdmin 1 - 0x554723262467F125Ac9e1cDFa9Ce15cc53822dbD
 // ProxyAdmin 2 - 0x9aD46fac0Cf7f790E5be05A0F15223935A0c0aDa
 export const ethSideConf = new BridgeConfig(
@@ -77,7 +77,6 @@ export const ethSideConf = new BridgeConfig(
   Versions
 );
 
-// TODO: address, temp arbsys 0x0000000000000000000000000000000000000064
 export const arbSideConf = new BridgeConfig(
   "0x0000000000000000000000000000000000000064",
   "arbitrum-one",
