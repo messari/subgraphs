@@ -14,9 +14,9 @@ dataSources:
     name: PoolManagerFactory
     network: {{ network }}
     source:
-      address: "{{ poolManager.address }}"
+      address: "{{ poolManagerFactory.address }}"
       abi: PoolManagerFactory
-      startBlock: {{ poolManager.startBlock }}
+      startBlock: {{ poolManagerFactory.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -39,6 +39,25 @@ dataSources:
         - event: InstanceDeployed(indexed uint256,indexed address,bytes)
           handler: handleManagerInstanceDeployed
       file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
+    name: MapleLoanFactory
+    network: {{ network }}
+    source:
+      address: "{{ mapleLoanFactory.address }}"
+      abi: MapleLoanFactory
+      startBlock: {{ mapleLoanFactory.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MapleLoanFactory
+          file: ./abis/MapleLoanFactory.json
+      eventHandlers:
+        - event: InstanceDeployed(indexed uint256,indexed address,bytes)
+          handler: handleLoanInstanceDeployed
+      file: ./protocols/maple-finance-v2/src/mapping.ts
 templates:
   - kind: ethereum/contract
     name: PoolManager
@@ -58,4 +77,23 @@ templates:
       eventHandlers:
         - event: SetAsActive(bool)
           handler: handleSetAsActive
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
+    name: MapleLoan
+    network: {{ network }}
+    source:
+      abi: MapleLoan
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MapleLoan
+          file: ./abis/MapleLoan.json
+        - name: MapleGlobals
+          file: ./abis/MapleGlobals.json
+      eventHandlers:
+        - event: Initialized(indexed address,indexed address,address[2],uint256[3],uint256[3],uint256[4],uint256[2])
+          handler: handleLoanInitialized
       file: ./protocols/maple-finance-v2/src/mapping.ts

@@ -1,7 +1,11 @@
 {
   "network": "mainnet",
-  "poolManager": {
+  "poolManagerFactory": {
     "startBlock": 16127003,
     "address": "0xe463cd473ecc1d1a4ecf20b62624d84dd20a8339"
+  },
+  "mapleLoanFactory": {
+    "startBlock": 113997864,
+    "address": "0x36a7350309b2eb30f3b908ab0154851b5ed81db0"
   }
 }

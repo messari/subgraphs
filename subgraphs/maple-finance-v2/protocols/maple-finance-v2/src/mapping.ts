@@ -1,7 +1,15 @@
 import { Bytes, log } from "@graphprotocol/graph-ts";
-import { InstanceDeployed } from "../../../generated//PoolManagerFactory/PoolManagerFactory";
-import { PoolManager as PoolManagerTemplate } from "../../../generated/templates";
-import { PoolManager } from "../../../generated/templates//PoolManager//PoolManager";
+import { InstanceDeployed as ManagerInstanceDeployed } from "../../../generated//PoolManagerFactory/PoolManagerFactory";
+import { InstanceDeployed as LoanInstanceDeployed } from "../../../generated/MapleLoanFactory/MapleLoanFactory";
+import { Initialized } from "../../../generated/templates/MapleLoan/MapleLoan";
+import {
+  PoolManager as PoolManagerTemplate,
+  MapleLoan as MapleLoanTemplate,
+} from "../../../generated/templates";
+import {
+  PoolManager,
+  SetAsActive,
+} from "../../../generated/templates/PoolManager/PoolManager";
 import { Pool } from "../../../generated/templates/PoolManager/Pool";
 import {
   BIGDECIMAL_ZERO,
@@ -14,9 +22,15 @@ import { DataManager } from "../../../src/sdk/manager";
 import { TokenManager } from "../../../src/sdk/token";
 import { getProtocolData } from "./constants";
 
+/////////////////////
+//// Pool Events ////
+/////////////////////
+
 //
 // Pool created event
-export function handleManagerInstanceDeployed(event: InstanceDeployed): void {
+export function handleManagerInstanceDeployed(
+  event: ManagerInstanceDeployed
+): void {
   PoolManagerTemplate.create(event.params.instance_);
 
   const poolManagerContract = PoolManager.bind(event.params.instance_);
@@ -77,3 +91,47 @@ export function handleManagerInstanceDeployed(event: InstanceDeployed): void {
   market.save();
   // TODO: price oracle?
 }
+
+//
+// Sets the pool as active or not (isActive / canBorrowFrom)
+// canUseAsCollateral is not affected bc it is never available
+export function handleSetAsActive(event: SetAsActive): void {
+  // get input token
+  const poolManagerContract = PoolManager.bind(event.address);
+  const tryAsset = poolManagerContract.try_asset();
+  if (tryAsset.reverted) {
+    log.error(
+      "[handleSetAsActive] PoolManager contract {} does not have an asset",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+
+  const manager = new DataManager(
+    Bytes.fromHexString(event.address.toHexString()),
+    Bytes.fromHexString(tryAsset.value.toHexString()),
+    event,
+    getProtocolData()
+  );
+  const market = manager.getMarket();
+  market.isActive = event.params.active_;
+  market.canBorrowFrom = event.params.active_;
+  market.save();
+}
+
+/////////////////////
+//// Loan Events ////
+/////////////////////
+
+// TODO: how do we associate a loan with a market??
+// LoanManager interacts with Loans on PoolManager's behalf
+
+//
+// Create MapleLoan instance to watch loan contract
+export function handleLoanInstanceDeployed(event: LoanInstanceDeployed): void {
+  MapleLoanTemplate.create(event.params.instance_);
+}
+
+//
+// create loan (ie borrow position in a market)
+export function handleLoanInitialized(event: Initialized): void {}
