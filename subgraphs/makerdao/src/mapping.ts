@@ -471,7 +471,7 @@ export function handleCatBite(event: BiteEvent): void {
   // Here we remove all collateral and close positions, even though partial collateral may be returned
   // to the urn, it is no longer "locked", the user would need to call `vat.frob` again to move the collateral
   // from gem to urn (locked); so it is clearer to remove all collateral at initiation of liquidation
-  liquidatePosition(event, urn, ilk, collateral, art);
+  const liquidatedPositionIds = liquidatePosition(event, urn, ilk, collateral, art);
   updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD);
   updateProtocol();
   updateFinancialsSnapshot(event);
@@ -507,6 +507,7 @@ export function handleCatBite(event: BiteEvent): void {
   flipBidsStore.ilk = ilk.toHexString();
   flipBidsStore.market = market.id;
   flipBidsStore.ended = false;
+  flipBidsStore.positions = liquidatedPositionIds;
   flipBidsStore.save();
 
   // auction
@@ -570,7 +571,7 @@ export function handleDogBark(event: BarkEvent): void {
   // Here we remove all collateral and close positions, even though partial collateral may be returned
   // to the urn, it is no longer "locked", the user would need to call `vat.frob` again to move the collateral
   // from gem to urn (locked); so it is clearer to remove all collateral at initiation of liquidation
-  liquidatePosition(event, urn.toHexString(), ilk, collateral, art);
+  const liquidatedPositionIds = liquidatePosition(event, urn.toHexString(), ilk, collateral, art);
   updateMarket(event, market, deltaCollateral, deltaCollateralUSD, deltaDebtUSD);
   updateProtocol();
   updateFinancialsSnapshot(event);
@@ -602,6 +603,7 @@ export function handleDogBark(event: BarkEvent): void {
   clipTakeStore.art = art;
   clipTakeStore.tab = due; //not including penalty
   clipTakeStore.tab0 = due;
+  clipTakeStore.positions = liquidatedPositionIds;
   clipTakeStore.save();
 
   Clip.create(clip);
@@ -767,6 +769,10 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
     amountUSD,
     profitUSD,
   );
+  //TODO: this should be an array/list including both borrowerPosition and lenderPosition
+  liquidate.position = flipBidsStore.positions![0];
+  //liquidate._finalized = true;
+  liquidate.save();
 
   log.info(
     "[handleFlipEndAuction]storeID={}, flip.id={} final: liquidate.id={}, amount={}, price={}, amountUSD={}, profitUSD={}",
@@ -798,8 +804,6 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
       ],
     );
   }
-  //liquidate._finalized = true;
-  liquidate.save();
 
   flipBidsStore.ended = true;
   flipBidsStore.save();
@@ -894,23 +898,9 @@ export function handleClipTakeBid(event: TakeEvent): void {
     amountUSD,
     profitUSD,
   );
-
-  clipTakeStore.lot = lot;
-  clipTakeStore.tab = tab;
-  clipTakeStore.save();
-
-  log.info(
-    "[handleClipTakeBid]liquidateID={}, storeID={}, clip.id={}, slice #{} final: amount={}, amountUSD={}, profitUSD={}",
-    [
-      liquidate.id,
-      clipTakeStore.id, //storeID
-      id.toString(),
-      clipTakeStore.slice.toString(),
-      liquidate.amount.toString(),
-      liquidate.amountUSD.toString(),
-      liquidate.profitUSD.toString(),
-    ],
-  );
+  //TODO: this should be an array/list including both borrowerPosition and lenderPosition
+  liquidate.position = clipTakeStore.positions![0];
+  liquidate.save();
 
   if (
     liquidate.amount.le(BIGINT_ZERO) ||
@@ -931,6 +921,23 @@ export function handleClipTakeBid(event: TakeEvent): void {
     );
   }
 
+  clipTakeStore.lot = lot;
+  clipTakeStore.tab = tab;
+  clipTakeStore.save();
+
+  log.info(
+    "[handleClipTakeBid]liquidateID={}, storeID={}, clip.id={}, slice #{} final: amount={}, amountUSD={}, profitUSD={}",
+    [
+      liquidate.id,
+      clipTakeStore.id, //storeID
+      id.toString(),
+      clipTakeStore.slice.toString(),
+      liquidate.amount.toString(),
+      liquidate.amountUSD.toString(),
+      liquidate.profitUSD.toString(),
+    ],
+  );
+
   log.info("[handleClipTakeBid]storeID={}, clip.id={} clipTakeStatus: lot={}, tab={}, price={}", [
     storeID, //storeID
     id.toString(),
@@ -948,6 +955,12 @@ export function handleClipTakeBid(event: TakeEvent): void {
 // cancel auction
 export function handleClipYankBid(event: ClipYankEvent): void {
   const id = event.params.id;
+  const storeID = event.address //clip contract
+    .toHexString()
+    .concat("-")
+    .concat(id.toString());
+  const clipTakeStore = _ClipTakeStore.load(storeID)!;
+
   const clipContract = ClipContract.bind(event.address);
   const ilk = clipContract.ilk();
   const sales = clipContract.sales(id);
@@ -976,6 +989,9 @@ export function handleClipYankBid(event: ClipYankEvent): void {
     amountUSD,
     profitUSD,
   );
+  //TODO: this should be an array/list including both borrowerPosition and lenderPosition
+  liquidate.position = clipTakeStore.positions![0];
+  liquidate.save();
 
   log.info(
     "[handleClipYankBid]auction for liquidation {} (id {}) cancelled, assuming the msg sender {} won at ${} (profit ${})",
@@ -993,7 +1009,6 @@ export function handleClipYankBid(event: ClipYankEvent): void {
       liquidate.profitUSD.toString(),
     ]);
   }
-  liquidate.save();
 
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
