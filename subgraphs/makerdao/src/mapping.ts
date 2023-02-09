@@ -26,12 +26,7 @@ import {
   _gem,
   _gemSnapshot,
 } from "../generated/schema";
-import {
-  bigIntToBDUseDecimals,
-  bigDecimalExponential,
-  BigDecimalTruncateToBigInt,
-  bigIntChangeDecimals,
-} from "./utils/numbers";
+import { bigIntToBDUseDecimals, bigDecimalExponential, bigIntChangeDecimals } from "./utils/numbers";
 import { getOrCreateChi, getOrCreateInterestRate } from "./common/getters";
 import {
   bytes32ToAddress,
@@ -44,7 +39,6 @@ import {
   WAD,
   RAY,
   RAD,
-  BIGINT_ONE,
   ILK_SAI,
   ZERO_ADDRESS,
   BIGINT_ZERO,
@@ -185,7 +179,7 @@ function logTokenInOut(
   w: string = "",
 ): void {
   const inputTokenBal = market.inputTokenBalance;
-  const WETH_ADDRESS = Address.fromString("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
+  const WETH_ADDRESS = Address.fromString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
   const wethContract = ERC20.bind(WETH_ADDRESS);
   const onChainBal = wethContract.balanceOf(Address.fromString(market.id));
   const tx = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
@@ -266,17 +260,16 @@ function logGem(ilk: Bytes, wad: BigInt, event: ethereum.Event, handler: string)
   ]);
 }
 
-// Deposit/Withdraw
+//TODO: REMOVE Deposit/Withdraw
 export function handleVatSlip(event: VatNoteEvent): void {
-  let ilk = event.params.arg1;
+  const ilk = event.params.arg1;
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
   }
   //let usr = bytes32ToAddressHexString(event.params.arg2);
-  let wad = bytesToSignedBigInt(event.params.arg3);
-
-  let market: Market = getMarketFromIlk(ilk)!;
+  const wad = bytesToSignedBigInt(event.params.arg3);
+  const market: Market = getMarketFromIlk(ilk)!;
 
   const urn = bytes32ToAddressHexString(event.params.arg2);
   logTokenInOut(ilk, market, wad, event, "slip", urn);
@@ -851,9 +844,6 @@ export function handleClipTakeBid(event: TakeEvent): void {
   const tab = event.params.tab;
   const owe = event.params.owe;
 
-  const clipContract = ClipContract.bind(event.address);
-  const ilk = clipContract.ilk();
-
   const liquidator = event.transaction.from.toHexString();
   // translate possible proxy/urn handler address to owner address
   liquidatee = getOwnerAddress(liquidatee);
@@ -889,7 +879,6 @@ export function handleClipTakeBid(event: TakeEvent): void {
   );
 
   const deltaLot = clipTakeStore.lot.minus(lot);
-  const deltaTab = clipTakeStore.tab.minus(tab);
   const amount = bigIntChangeDecimals(deltaLot, WAD, token.decimals);
   const amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
   const profitUSD = amountUSD.minus(bigIntToBDUseDecimals(owe, RAD));
@@ -950,10 +939,6 @@ export function handleClipTakeBid(event: TakeEvent): void {
     token.lastPriceUSD!.toString(),
   ]);
 
-  const debtRepaid = BigDecimalTruncateToBigInt(
-    clipTakeStore.art.times(deltaTab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
-  ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
-
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
@@ -973,13 +958,6 @@ export function handleClipYankBid(event: ClipYankEvent): void {
   const liquidator = event.transaction.from.toHexString();
   // translate possible proxy/urn handler address to owner address
   liquidatee = getOwnerAddress(liquidatee);
-
-  const storeID = event.address //clip contract
-    .toHexString()
-    .concat("-")
-    .concat(id.toString());
-  const clipTakeStore = _ClipTakeStore.load(storeID)!;
-
   const market = getMarketFromIlk(ilk)!;
   const token = getOrCreateToken(market.inputToken);
 
@@ -1016,10 +994,6 @@ export function handleClipYankBid(event: ClipYankEvent): void {
     ]);
   }
   liquidate.save();
-
-  const debtRepaid = BigDecimalTruncateToBigInt(
-    clipTakeStore.art.times(tab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
-  ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
