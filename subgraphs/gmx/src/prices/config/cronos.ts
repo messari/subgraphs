@@ -1,8 +1,7 @@
-import * as constants from "../common/constants";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Configurations, OracleContract } from "../common/types";
 
-export const NETWORK_STRING = "default";
+export const NETWORK_STRING = "cronos";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
@@ -18,13 +17,16 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 ///////////////////////////////////////////////////////////////////////////
 
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
+
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [];
+export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
+  new OracleContract("0x145863eb42cf62847a6ca784e6416c1682b1b2ae", 5247), // VVS Finance
+];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// BLACKLISTED TOKENS ////////////////////////////
@@ -47,9 +49,15 @@ export const HARDCODED_STABLES: Address[] = [];
 
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
-export const ETH_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const WETH_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const USDC_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const ETH_ADDRESS = Address.fromString(
+  "0xe44fd7fcb2b1581822d0c862b68222998a0c299a"
+);
+export const WETH_ADDRESS = Address.fromString(
+  "0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23" // Wrapped CRO (WCRO)
+);
+export const USDC_ADDRESS = Address.fromString(
+  "0xc21223249ca28397b4b6541dffaecc539bff0c59"
+);
 
 export class config implements Configurations {
   network(): string {

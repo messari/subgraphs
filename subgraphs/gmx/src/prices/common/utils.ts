@@ -1,5 +1,8 @@
 import * as BSC from "../config/bsc";
+import * as CELO from "../config/celo";
+import * as FUSE from "../config/fuse";
 import * as XDAI from "../config/gnosis";
+import * as CRONOS from "../config/cronos";
 import * as AURORA from "../config/aurora";
 import * as FANTOM from "../config/fantom";
 import * as POLYGON from "../config/polygon";
@@ -13,8 +16,7 @@ import * as ARBITRUM_ONE from "../config/arbitrum";
 import { Configurations } from "./types";
 import * as constants from "./constants";
 import * as TEMPLATE from "../config/template";
-
-import { _ERC20 } from "../../../generated/GlpManager/_ERC20";
+import { _ERC20 } from "../../../generated/Vault/_ERC20";
 import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 
 export function isNullAddress(tokenAddr: Address): boolean {
@@ -82,6 +84,12 @@ export function getConfig(): Configurations {
     return new AVALANCHE.config();
   } else if (network == ARBITRUM_ONE.NETWORK_STRING) {
     return new ARBITRUM_ONE.config();
+  } else if (network == CRONOS.NETWORK_STRING) {
+    return new CRONOS.config();
+  } else if (network == CELO.NETWORK_STRING) {
+    return new CELO.config();
+  } else if (network == FUSE.NETWORK_STRING) {
+    return new FUSE.config();
   }
 
   return new TEMPLATE.config();

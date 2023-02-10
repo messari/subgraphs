@@ -97,7 +97,7 @@ export function getOrCreateUserPosition(
   indexTokenAddress: Address,
   positionSide: string
 ): Position {
-  let position = getUserPosition(
+  const position = getUserPosition(
     event,
     account,
     pool,
@@ -130,7 +130,7 @@ export function updateUserPosition(
   positionSide: string,
   eventType: EventType
 ): Position {
-  let position = getOrCreateUserPosition(
+  const position = getOrCreateUserPosition(
     event,
     account,
     pool,
@@ -270,7 +270,7 @@ function closePosition(
     .concat(Bytes.fromUTF8(position.side))
     .concat(position.collateral)
     .concat(position.asset);
-  let positionCounter = _PositionCounter.load(counterID);
+  const positionCounter = _PositionCounter.load(counterID);
   if (positionCounter) {
     positionCounter.nextCount += INT_ONE;
     positionCounter.save();

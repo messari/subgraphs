@@ -1,8 +1,7 @@
-import * as constants from "../common/constants";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Configurations, OracleContract } from "../common/types";
 
-export const NETWORK_STRING = "default";
+export const NETWORK_STRING = "celo";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
@@ -18,13 +17,17 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract();
 ///////////////////////////////////////////////////////////////////////////
 
 export const CURVE_CALCULATIONS_ADDRESS = new OracleContract();
+
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [];
+export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
+  new OracleContract("0xe3d8bd6aed4f159bc8000a9cd47cffdb95f96121", 5272598), // Ubeswap
+  new OracleContract("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506", 7254057), // Sushiswap
+];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// BLACKLISTED TOKENS ////////////////////////////
@@ -47,9 +50,15 @@ export const HARDCODED_STABLES: Address[] = [];
 
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
-export const ETH_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const WETH_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const USDC_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const ETH_ADDRESS = Address.fromString(
+  "0x122013fd7df1c6f636a5bb8f03108e876548b455"
+);
+export const WETH_ADDRESS = Address.fromString(
+  "0x471ece3750da237f93b8e339c536989b8978a438" // Celo native asset (CELO)
+);
+export const USDC_ADDRESS = Address.fromString(
+  "0x37f750b7cc259a2f741af45294f6a16572cf5cad"
+);
 
 export class config implements Configurations {
   network(): string {

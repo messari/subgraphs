@@ -49,7 +49,7 @@ export function getOrCreateToken(
     // There is not price info from Oracle for some tokens, so not to try to get price for them here.
     token.lastPriceUSD = BIGDECIMAL_ONE;
   } else {
-    const price = getUsdPricePerToken(tokenAddress);
+    const price = getUsdPricePerToken(tokenAddress, event.block);
     if (!price.reverted) {
       token.lastPriceUSD = price.usdPrice;
     }

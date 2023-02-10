@@ -2,24 +2,33 @@ import { getUsdPricePerToken } from "..";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { CurvePool as CurvePoolContract } from "../../../generated/GlpManager/CurvePool";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/GlpManager/CurveRegistry";
+import { BigInt, Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { CurvePool as CurvePoolContract } from "../../../generated/Vault/CurvePool";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/Vault/CurveRegistry";
 
-export function isCurveLpToken(lpAddress: Address): bool {
-  const poolAddress = getPoolFromLpToken(lpAddress);
+export function isCurveLpToken(
+  lpAddress: Address,
+  block: ethereum.Block
+): bool {
+  const poolAddress = getPoolFromLpToken(lpAddress, block);
   if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return true;
 
   return false;
 }
 
-export function getPoolFromLpToken(lpAddress: Address): Address {
+export function getPoolFromLpToken(
+  lpAddress: Address,
+  block: ethereum.Block
+): Address {
   const config = utils.getConfig();
   const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
+    const curveRegistry = curveRegistryAdresses[idx];
+    if (curveRegistry.startBlock.gt(block.number)) continue;
+
     const curveRegistryContract = CurveRegistryContract.bind(
-      curveRegistryAdresses[idx]
+      curveRegistry.address
     );
 
     const poolAddress = utils.readValue<Address>(
@@ -33,8 +42,11 @@ export function getPoolFromLpToken(lpAddress: Address): Address {
   return constants.NULL.TYPE_ADDRESS;
 }
 
-export function isLpCryptoPool(lpAddress: Address): bool {
-  const poolAddress = getPoolFromLpToken(lpAddress);
+export function isLpCryptoPool(
+  lpAddress: Address,
+  block: ethereum.Block
+): bool {
+  const poolAddress = getPoolFromLpToken(lpAddress, block);
 
   if (poolAddress != constants.NULL.TYPE_ADDRESS) {
     return isPoolCryptoPool(poolAddress);
@@ -57,13 +69,15 @@ export function isPoolCryptoPool(poolAddress: Address): bool {
   return false;
 }
 
-export function getCurvePriceUsdc(lpAddress: Address): CustomPriceType {
-  if (isLpCryptoPool(lpAddress)) {
-    return cryptoPoolLpPriceUsdc(lpAddress);
-  }
+export function getCurvePriceUsdc(
+  lpAddress: Address,
+  block: ethereum.Block
+): CustomPriceType {
+  if (isLpCryptoPool(lpAddress, block))
+    return cryptoPoolLpPriceUsdc(lpAddress, block);
 
-  const basePrice = getBasePrice(lpAddress);
-  const virtualPrice = getVirtualPrice(lpAddress).toBigDecimal();
+  const basePrice = getBasePrice(lpAddress, block);
+  const virtualPrice = getVirtualPrice(lpAddress, block).toBigDecimal();
 
   const config = utils.getConfig();
   const usdcTokenDecimals = config.usdcTokenDecimals();
@@ -78,29 +92,39 @@ export function getCurvePriceUsdc(lpAddress: Address): CustomPriceType {
 
   return CustomPriceType.initialize(
     priceUsdc,
-    decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8
+    decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8,
+    constants.OracleType.CURVE_ROUTER
   );
 }
 
-export function getBasePrice(lpAddress: Address): CustomPriceType {
-  const poolAddress = getPoolFromLpToken(lpAddress);
+export function getBasePrice(
+  lpAddress: Address,
+  block: ethereum.Block
+): CustomPriceType {
+  const poolAddress = getPoolFromLpToken(lpAddress, block);
 
   if (poolAddress.equals(constants.NULL.TYPE_ADDRESS))
     return new CustomPriceType();
 
-  const underlyingCoinAddress = getUnderlyingCoinFromPool(poolAddress);
-  const basePrice = getPriceUsdcRecommended(underlyingCoinAddress);
+  const underlyingCoinAddress = getUnderlyingCoinFromPool(poolAddress, block);
+  const basePrice = getPriceUsdcRecommended(underlyingCoinAddress, block);
 
   return basePrice;
 }
 
-export function getUnderlyingCoinFromPool(poolAddress: Address): Address {
+export function getUnderlyingCoinFromPool(
+  poolAddress: Address,
+  block: ethereum.Block
+): Address {
   const config = utils.getConfig();
   const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
+    const curveRegistry = curveRegistryAdresses[idx];
+    if (curveRegistry.startBlock.gt(block.number)) continue;
+
     const curveRegistryContract = CurveRegistryContract.bind(
-      curveRegistryAdresses[idx]
+      curveRegistry.address
     );
 
     const coins = utils.readValue<Address[]>(
@@ -135,13 +159,19 @@ export function getPreferredCoinFromCoins(coins: Address[]): Address {
   return preferredCoinAddress;
 }
 
-export function getVirtualPrice(curveLpTokenAddress: Address): BigInt {
+export function getVirtualPrice(
+  curveLpTokenAddress: Address,
+  block: ethereum.Block
+): BigInt {
   const config = utils.getConfig();
   const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
+    const curveRegistry = curveRegistryAdresses[idx];
+    if (curveRegistry.startBlock.gt(block.number)) continue;
+
     const curveRegistryContract = CurveRegistryContract.bind(
-      curveRegistryAdresses[idx]
+      curveRegistry.address
     );
 
     const virtualPriceCall =
@@ -156,15 +186,19 @@ export function getVirtualPrice(curveLpTokenAddress: Address): BigInt {
 }
 
 export function getPriceUsdcRecommended(
-  tokenAddress: Address
+  tokenAddress: Address,
+  block: ethereum.Block
 ): CustomPriceType {
-  return getUsdPricePerToken(tokenAddress);
+  return getUsdPricePerToken(tokenAddress, block);
 }
 
-export function cryptoPoolLpPriceUsdc(lpAddress: Address): CustomPriceType {
+export function cryptoPoolLpPriceUsdc(
+  lpAddress: Address,
+  block: ethereum.Block
+): CustomPriceType {
   const totalSupply = utils.getTokenSupply(lpAddress);
 
-  const totalValueUsdc = cryptoPoolLpTotalValueUsdc(lpAddress);
+  const totalValueUsdc = cryptoPoolLpTotalValueUsdc(lpAddress, block);
   const priceUsdc = totalValueUsdc
     .times(
       constants.BIGINT_TEN.pow(
@@ -173,11 +207,18 @@ export function cryptoPoolLpPriceUsdc(lpAddress: Address): CustomPriceType {
     )
     .div(totalSupply.toBigDecimal());
 
-  return CustomPriceType.initialize(priceUsdc, 0);
+  return CustomPriceType.initialize(
+    priceUsdc,
+    0,
+    constants.OracleType.CURVE_ROUTER
+  );
 }
 
-export function cryptoPoolLpTotalValueUsdc(lpAddress: Address): BigDecimal {
-  const poolAddress = getPoolFromLpToken(lpAddress);
+export function cryptoPoolLpTotalValueUsdc(
+  lpAddress: Address,
+  block: ethereum.Block
+): BigDecimal {
+  const poolAddress = getPoolFromLpToken(lpAddress, block);
 
   const underlyingTokensAddresses =
     cryptoPoolUnderlyingTokensAddressesByPoolAddress(poolAddress);
@@ -192,7 +233,8 @@ export function cryptoPoolLpTotalValueUsdc(lpAddress: Address): BigDecimal {
     const tokenValueUsdc = cryptoPoolTokenAmountUsdc(
       poolAddress,
       underlyingTokensAddresses[tokenIdx],
-      BigInt.fromI32(tokenIdx)
+      BigInt.fromI32(tokenIdx),
+      block
     );
     totalValue = totalValue.plus(tokenValueUsdc);
   }
@@ -203,7 +245,8 @@ export function cryptoPoolLpTotalValueUsdc(lpAddress: Address): BigDecimal {
 export function cryptoPoolTokenAmountUsdc(
   poolAddress: Address,
   tokenAddress: Address,
-  tokenIdx: BigInt
+  tokenIdx: BigInt,
+  block: ethereum.Block
 ): BigDecimal {
   const poolContract = CurvePoolContract.bind(poolAddress);
 
@@ -215,7 +258,7 @@ export function cryptoPoolTokenAmountUsdc(
     .toBigDecimal();
 
   const tokenDecimals = utils.getTokenDecimals(tokenAddress);
-  const tokenPrice = getPriceUsdcRecommended(tokenAddress);
+  const tokenPrice = getPriceUsdcRecommended(tokenAddress, block);
   const tokenValueUsdc = tokenBalance
     .times(tokenPrice.usdPrice)
     .div(constants.BIGINT_TEN.pow(tokenDecimals.toI32() as u8).toBigDecimal());
@@ -247,10 +290,12 @@ export function cryptoPoolUnderlyingTokensAddressesByPoolAddress(
   return coins;
 }
 
-export function getPriceUsdc(tokenAddress: Address): CustomPriceType {
-  if (isCurveLpToken(tokenAddress)) {
-    return getCurvePriceUsdc(tokenAddress);
-  }
+export function getPriceUsdc(
+  tokenAddress: Address,
+  block: ethereum.Block
+): CustomPriceType {
+  if (isCurveLpToken(tokenAddress, block))
+    return getCurvePriceUsdc(tokenAddress, block);
 
   const poolContract = CurvePoolContract.bind(tokenAddress);
   const virtualPrice = utils
@@ -271,10 +316,11 @@ export function getPriceUsdc(tokenAddress: Address): CustomPriceType {
   }
 
   const preferredCoin = getPreferredCoinFromCoins(coins);
-  const price = getPriceUsdcRecommended(preferredCoin);
+  const price = getPriceUsdcRecommended(preferredCoin, block);
 
   return CustomPriceType.initialize(
     price.usdPrice.times(virtualPrice),
-    constants.DEFAULT_DECIMALS.toI32() as u8
+    constants.DEFAULT_DECIMALS.toI32() as u8,
+    constants.OracleType.CURVE_ROUTER
   );
 }

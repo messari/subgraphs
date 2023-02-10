@@ -302,9 +302,8 @@ export function updatePoolInputTokenBalance(
 ): void {
   const pool = getOrCreateLiquidityPool(event);
 
-  let inputTokens = pool.inputTokens;
-  let inputTokenBalances = pool.inputTokenBalances;
-
+  const inputTokens = pool.inputTokens;
+  const inputTokenBalances = pool.inputTokenBalances;
   const inputTokenIndex = inputTokens.indexOf(inputToken.id);
   if (inputTokenIndex >= 0) {
     if (isIncrease) {
@@ -315,8 +314,8 @@ export function updatePoolInputTokenBalance(
         inputTokenBalances[inputTokenIndex].minus(inputTokenAmount);
     }
   } else {
-    let inputTokenWeights = pool.inputTokenWeights;
-    let fundingrates = pool._fundingrate;
+    const inputTokenWeights = pool.inputTokenWeights;
+    const fundingrates = pool._fundingrate;
 
     inputTokens.push(inputToken.id);
     inputTokenBalances.push(inputTokenAmount);
@@ -356,9 +355,9 @@ export function updatePoolRewardToken(
   tokensPerDayUSD: BigDecimal
 ): void {
   const pool = getOrCreateLiquidityPool(event);
-  let rewardTokens = pool.rewardTokens!;
-  let rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount!;
-  let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
+  const rewardTokens = pool.rewardTokens!;
+  const rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount!;
+  const rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
   const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
   if (rewardTokenIndex >= 0) {
@@ -391,8 +390,8 @@ export function updatePoolFundingRate(
   fundingrate: BigDecimal
 ): void {
   const pool = getOrCreateLiquidityPool(event);
-  let fundingTokens = pool.inputTokens;
-  let fundingrates = pool._fundingrate;
+  const fundingTokens = pool.inputTokens;
+  const fundingrates = pool._fundingrate;
   const fundingTokenIndex = fundingTokens.indexOf(fundingToken.id);
   if (fundingTokenIndex >= 0) {
     fundingrates[fundingTokenIndex] = fundingrate;

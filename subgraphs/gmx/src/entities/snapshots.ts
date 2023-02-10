@@ -122,6 +122,12 @@ export function takeLiquidityPoolDailySnapshot(
       prevPoolMetrics.cumulativeClosedInflowVolumeUSD;
     prevCumulativeOutflowVolumeUSD = prevPoolMetrics.cumulativeOutflowVolumeUSD;
 
+    prevCumulativeUniqueBorrowers = prevPoolMetrics.cumulativeUniqueBorrowers;
+    prevCumulativeUniqueLiquidators =
+      prevPoolMetrics.cumulativeUniqueLiquidators;
+    prevCumulativeUniqueLiquidatees =
+      prevPoolMetrics.cumulativeUniqueLiquidatees;
+
     prevLongPositionCount = prevPoolMetrics.longPositionCount;
     prevShortPositionCount = prevPoolMetrics.shortPositionCount;
     prevOpenPositionCount = prevPoolMetrics.openPositionCount;
@@ -649,7 +655,7 @@ export function takeUsageMetricsHourlySnapshot(
   usageMetrics.hours = hour;
   usageMetrics.protocol = protocol.id;
 
-  let tempUsageMetrics = _TempUsageMetricsHourlySnapshot.load(id);
+  const tempUsageMetrics = _TempUsageMetricsHourlySnapshot.load(id);
   if (tempUsageMetrics) {
     usageMetrics.hourlyActiveUsers = tempUsageMetrics.hourlyActiveUsers;
     usageMetrics.hourlyTransactionCount =
