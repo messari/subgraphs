@@ -440,7 +440,7 @@ export function takeFinancialDailySnapshot(
   let prevCumulativeWithdrawPremiumUSD = BIGDECIMAL_ZERO;
   let prevCumulativeTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
 
-  if (prevFinancialMetrics != null) {
+  if (prevFinancialMetrics) {
     prevCumulativeVolumeUSD = prevFinancialMetrics.cumulativeVolumeUSD;
     prevCumulativeInflowVolumeUSD =
       prevFinancialMetrics.cumulativeInflowVolumeUSD;
