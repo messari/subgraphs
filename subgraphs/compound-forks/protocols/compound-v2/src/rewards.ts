@@ -228,7 +228,7 @@ export function getOrCreateCircularBuffer(): _CircularBuffer {
 function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
-  const network = dataSource.network();
+  const network = dataSource.network().toLowerCase().replace("_", "-");
   if (network == SubgraphNetwork.ETHEREUM) {
     return BigDecimal.fromString("13.39");
   } else if (network == SubgraphNetwork.ARBITRUM) {
