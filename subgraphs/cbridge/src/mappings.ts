@@ -61,14 +61,13 @@ import {
   getNetworkSpecificConstant,
   RewardTokenType,
   SECONDS_PER_DAY,
-  BIGINT_MINUS_ONE,
   PoolName,
   BIGINT_TWO,
 } from "./sdk/util/constants";
 
 // empty handler for prices library
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-export function handlePairCreated(event: ethereum.Event): void {}
+export function handlePairCreated(): void {}
 
 // Implement TokenPricer to pass it to the SDK constructor
 class Pricer implements TokenPricer {
@@ -174,7 +173,12 @@ export function onCreatePool(
 ): void {
   if (aux1 && aux2) {
     const token = sdk.Tokens.getOrCreateToken(Address.fromString(aux2));
-    pool.initialize(`Pool-based Bridge ${token.name}`, token.name, aux1, token);
+    pool.initialize(
+      `Pool-based Bridge: ${token.name}`,
+      token.name,
+      aux1,
+      token
+    );
     // append pool id to protocol._liquidityPoolIDs
     const protocol = sdk.Protocol.protocol;
     let poolIDs = protocol._liquidityPoolIDs;
@@ -212,25 +216,6 @@ export function handleSend(event: Send): void {
     refund.sender = event.params.sender.toHexString();
     refund.save();
   }
-
-  // debugging TVL
-  const sdk = _getSDK(event)!;
-  const pool = sdk.Pools.loadPool(poolId);
-  const erc20Contract = _ERC20.bind(event.params.token);
-  const bal = erc20Contract.balanceOf(event.address);
-  const tx = event.transaction.hash
-    .toHexString()
-    .concat("-")
-    .concat(event.transactionLogIndex.toString());
-  logTokenBalance(
-    "Send",
-    tx,
-    event.params.token,
-    event.params.amount,
-    pool,
-    bal,
-    event.block.number
-  );
 }
 
 export function handleLiquidityAdded(event: LiquidityAdded): void {
@@ -242,25 +227,8 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
     event.params.token.toHexString()
   );
 
-  //pool.addInputTokenBalance(event.params.amount, true);
   const acc = sdk.Accounts.loadAccount(event.params.provider);
   acc.liquidityDeposit(pool, event.params.amount, true);
-  // debugging TVL
-  const erc20Contract = _ERC20.bind(event.params.token);
-  const bal = erc20Contract.balanceOf(event.address);
-  const tx = event.transaction.hash
-    .toHexString()
-    .concat("-")
-    .concat(event.transactionLogIndex.toString());
-  logTokenBalance(
-    "Addliquidity",
-    tx,
-    event.params.token,
-    event.params.amount,
-    pool,
-    bal,
-    event.block.number
-  );
 }
 
 export function handleWithdraw(call: WithdrawCall): void {
@@ -279,7 +247,6 @@ export function handleWithdraw(call: WithdrawCall): void {
   const txId = call.transaction.hash.concatI32(call.transaction.index.toI32());
   const refund = _Refund.load(wdmsg.refId);
 
-  // debugging TVL
   const tx = call.transaction.hash
     .toHexString()
     .concat("-")
@@ -292,23 +259,10 @@ export function handleWithdraw(call: WithdrawCall): void {
     call.block.number.toString(),
   ]);
 
-  const erc20Contract = _ERC20.bind(wdmsg.token);
-  const bal = erc20Contract.balanceOf(call.to);
   if (wdmsg.refId.equals(Bytes.empty())) {
     // LP withdraw liquidity: refId == 0x0
-    //pool.addInputTokenBalance(wdmsg.amount.times(BIGINT_MINUS_ONE), true);
     const acc = sdk.Accounts.loadAccount(wdmsg.receiver);
     acc.liquidityWithdraw(pool, wdmsg.amount, true);
-    // debugging TVL
-    logTokenBalance(
-      "Removeliquidity",
-      tx,
-      wdmsg.token,
-      wdmsg.amount.times(BIGINT_MINUS_ONE),
-      pool,
-      bal,
-      call.block.number
-    );
   } else if (
     wdmsg.refId.equals(
       Bytes.fromHexString(
@@ -344,17 +298,6 @@ export function handleWithdraw(call: WithdrawCall): void {
       null,
       call
     );
-
-    // debugging TVL
-    logTokenBalance(
-      "Refund",
-      tx,
-      wdmsg.token,
-      wdmsg.amount.times(BIGINT_MINUS_ONE),
-      pool,
-      bal,
-      call.block.number
-    );
   } else {
     const networkConstants = getNetworkSpecificConstant(wdmsg.chainId);
     const srcPoolAddress = networkConstants.getPoolAddress(
@@ -375,17 +318,6 @@ export function handleWithdraw(call: WithdrawCall): void {
       txId,
       null,
       call
-    );
-
-    //debug TVL
-    logTokenBalance(
-      "Receive",
-      tx,
-      wdmsg.token,
-      wdmsg.amount.times(BIGINT_MINUS_ONE),
-      pool,
-      bal,
-      call.block.number
     );
   }
 }
@@ -423,69 +355,6 @@ export function handleRelay(event: Relay): void {
     event,
     null
   );
-
-  // debugging TVL
-  const tx = event.transaction.hash
-    .toHexString()
-    .concat("-")
-    .concat(event.transactionLogIndex.toString());
-  const erc20Contract = _ERC20.bind(event.params.token);
-  const bal = erc20Contract.balanceOf(event.address);
-  logTokenBalance(
-    "Relay",
-    tx,
-    event.params.token,
-    event.params.amount.times(BIGINT_MINUS_ONE),
-    pool,
-    bal,
-    event.block.number
-  );
-}
-
-function logTokenBalance(
-  action: string,
-  tx: string,
-  token: Address,
-  amount: BigInt,
-  pool: Pool,
-  onChainBalance: BigInt,
-  block: BigInt
-): void {
-  const poolBalance = pool.pool.inputTokenBalance;
-  log.info(
-    "[logTokenBalance] {} tx={}: token={} amount={} poolBalance={} onChainBalance={} block={}",
-    [
-      action,
-      tx,
-      token.toHexString(),
-      amount.toString(),
-      poolBalance.toString(),
-      onChainBalance.toString(),
-      block.toString(),
-    ]
-  );
-  let _erc20 = _ERC20Bal.load(tx);
-  if (!_erc20) {
-    _erc20 = new _ERC20Bal(tx);
-    _erc20.token = token.toHexString();
-    _erc20.amount = amount;
-    _erc20.poolBalance = poolBalance;
-    _erc20.onChainBalance = onChainBalance;
-    _erc20.block = block;
-    _erc20.save();
-  } else {
-    log.error(
-      "[logTokenBalance]tx {} already exists: token={} amount={} poolBalance={} onChainBalance={} block={}",
-      [
-        tx,
-        _erc20.token,
-        _erc20.amount.toString(),
-        _erc20.poolBalance.toString(),
-        _erc20.onChainBalance.toString(),
-        _erc20.block.toString(),
-      ]
-    );
-  }
 }
 
 // Bridge via the Original Token Vault
