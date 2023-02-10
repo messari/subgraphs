@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Table, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { schemaMapping } from "../utils";
 import { Chart as ChartJS, registerables, PointElement } from "chart.js";
-import { listSchemaVersionsByType, latestSchemaVersions } from "../constants";
-import FetchSchemaVersion from "./FetchSchemaVersion";
+import FetchSubgraphVersion from "./FetchSubgraphVersion";
 import { useNavigate } from "react-router";
 
 interface OutOfSyncListProps {
@@ -22,7 +21,6 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
     const slugToVersionJSON: any = {};
     const slugsListByType: any = {};
     const slugToQueryString: any = {};
-    const protocolSlugs = Object.keys(protocolsToQuery);
 
     useEffect(() => {
         if (!protocolsToQuery || Object.keys(protocolsToQuery).length === 0) {
@@ -30,44 +28,40 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
         }
     }, []);
 
-    protocolSlugs.forEach(protocol => {
+    Object.keys(protocolsToQuery).forEach(protocol => {
         Object.keys(protocolsToQuery[protocol].deployments).forEach(depo => {
             if (protocolsToQuery[protocol].deployments[depo].status === "prod") {
                 const schemaName = schemaMapping[protocolsToQuery[protocol].schema];
                 if (schemaName) {
-                    const isLatestSchemaVersion = latestSchemaVersions(schemaName, protocolsToQuery[protocol].deployments[depo].versions.schema);
-                    if (!isLatestSchemaVersion) {
-                        prodDeploymentsToQuery.push(protocolsToQuery[protocol].deployments[depo]);
-                        const depoData = protocolsToQuery[protocol].deployments[depo];
-                        let slug = depoData?.["services"]?.["hosted-service"]?.["slug"];
-                        if (depoData.network === "cronos") {
-                            slug = depoData?.["services"]?.["cronos-portal"]?.["slug"];
-                        }
-                        if (!slugsListByType[schemaName]) {
-                            slugsListByType[schemaName] = [];
-                        }
-                        slugToVersionJSON[slug] = protocolsToQuery[protocol].deployments[depo].versions.schema;
-                        slugsListByType[schemaName].push(slug);
+                    prodDeploymentsToQuery.push(protocolsToQuery[protocol].deployments[depo]);
+                    const depoData = protocolsToQuery[protocol].deployments[depo];
+                    let slug = depoData?.["services"]?.["hosted-service"]?.["slug"];
+                    if (depoData.network === "cronos") {
+                        slug = depoData?.["services"]?.["cronos-portal"]?.["slug"];
                     }
+                    if (!slugsListByType[schemaName]) {
+                        slugsListByType[schemaName] = [];
+                    }
+                    slugToVersionJSON[slug] = protocolsToQuery[protocol].deployments[depo].versions.subgraph;
+                    slugsListByType[schemaName].push(slug);
                 }
             }
         })
     })
 
-    let fetchSchemaVersionExecute = null;
+    let fetchVersionComponent = null;
 
     if (prodDeploymentsToQuery.length > 0) {
-        fetchSchemaVersionExecute = (<>
+        fetchVersionComponent = (<>
             {prodDeploymentsToQuery.map((depo: any) => {
-                let prefix = 'messari/';
                 let slug = depo?.["services"]?.["hosted-service"]?.["slug"];
+                let endpoint = "https://api.thegraph.com/subgraphs/name/messari/" + slug;
                 if (depo.network === "cronos") {
-                    prefix = 'cronos/';
                     slug = depo?.["services"]?.["cronos-portal"]?.["slug"];
+                    endpoint = "https://graph.cronoslabs.com/subgraphs/name/messari/" + slug;
                 }
-                const endpoint = "https://api.thegraph.com/subgraphs/name/" + prefix + slug;
-                slugToQueryString[slug] = prefix + slug;
-                return <FetchSchemaVersion subgraphEndpoint={endpoint} slug={slug} setSchemaDeployments={setSubgraphVersionMapping} />
+                slugToQueryString[slug] = 'messari/' + slug;
+                return <FetchSubgraphVersion subgraphEndpoint={endpoint} slug={slug} setDeployments={setSubgraphVersionMapping} />
             })}
         </>)
     }
@@ -75,8 +69,8 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
     const columnLabels: string[] = [
         "Deployment",
         "Schema Type",
-        "Schema Version",
-        "Current Schema Version"
+        "Subgraph Version on Protocol Entity",
+        "Subgraph Version on JSON"
     ];
 
     const tableHead = (
@@ -109,8 +103,7 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
 
     const tablesBySchemaType = Object.keys(slugsListByType).map(type => {
         const rowsOnTypeTable = slugsListByType[type].map((depo: string) => {
-            const isLatestVersion = latestSchemaVersions(type, subgraphVersionMapping[depo]);
-            if (!isLatestVersion) {
+            if (subgraphVersionMapping[depo] !== slugToVersionJSON[depo]) {
                 return (
                     <TableRow onClick={() => window.location.href = "https://subgraphs.xyz/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol"} key={depo + "PROTOCOLLISTROW"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px" }}>
@@ -120,17 +113,21 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
                             {type}
                         </TableCell>
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right" }}>
-                            {subgraphVersionMapping[depo] || slugToVersionJSON[depo]}
+                            {subgraphVersionMapping[depo] || 'N/A'}
                         </TableCell>
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right" }}>
-                            {listSchemaVersionsByType[type]?.[listSchemaVersionsByType[type]?.length - 1] || 'N/A'}
+                            {slugToVersionJSON[depo] || 'N/A'}
                         </TableCell>
                     </TableRow>
                 )
             } else {
-                return null;
+                return null
             }
         });
+
+        if (rowsOnTypeTable.filter((x: any) => !!x)?.length === 0) {
+            return null;
+        }
 
         return (
             <TableContainer sx={{ my: 4, mx: 2 }} key={"TableContainer-OutOfSyncList"}>
@@ -160,7 +157,7 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
                     Back To Deployments List
                 </Button>
             </div>
-            {fetchSchemaVersionExecute}
+            {fetchVersionComponent}
             {tablesBySchemaType}
         </div>
     );
