@@ -1,9 +1,9 @@
 import {
+  Bytes,
   BigInt,
   Address,
   ethereum,
   BigDecimal,
-  Bytes,
 } from "@graphprotocol/graph-ts";
 import {
   getOrCreateToken,
@@ -56,7 +56,6 @@ export function getPoolTokensInfo(poolId: Bytes): PoolTokensType {
   const vaultContract = VaultContract.bind(constants.VAULT_ADDRESS);
 
   const poolTokens = vaultContract.try_getPoolTokens(poolId);
-
   if (poolTokens.reverted) return new PoolTokensType();
 
   return new PoolTokensType(
@@ -102,7 +101,7 @@ export function getPoolInputTokenBalances(
   const poolContract = WeightedPoolContract.bind(poolAddress);
   const poolTokensInfo = getPoolTokensInfo(poolId);
 
-  let poolBalances = poolTokensInfo.getBalances;
+  const poolBalances = poolTokensInfo.getBalances;
 
   const bptTokenIndex = readValue<BigInt>(
     poolContract.try_getBptIndex(),
@@ -110,8 +109,9 @@ export function getPoolInputTokenBalances(
   );
 
   if (bptTokenIndex != constants.BIGINT_NEG_ONE) {
-    poolBalances = poolBalances.splice(
-      bptTokenIndex.plus(constants.BIGINT_ONE).toI32() as u8
+    poolBalances.splice(
+      bptTokenIndex.toI32() as u8,
+      constants.BIGINT_ONE.toI32() as u8
     );
   }
 
@@ -145,8 +145,9 @@ export function getPoolScalingFactors(
     );
 
     if (bptTokenIndex != constants.BIGINT_NEG_ONE) {
-      scales = scales.splice(
-        bptTokenIndex.plus(constants.BIGINT_ONE).toI32() as u8
+      scales.splice(
+        bptTokenIndex.toI32() as u8,
+        constants.BIGINT_ONE.toI32() as u8
       );
     }
   }
