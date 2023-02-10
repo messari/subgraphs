@@ -144,15 +144,15 @@ export namespace AccountActiity {
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 
 export const COMPTROLLER_ADDRESS = "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b";
 export const PRICE_ORACLE1_ADDRESS =
-  "0x02557a5E05DeFeFFD4cAe6D83eA3d173B272c904";
+  "0x02557a5e05defeffd4cae6d83ea3d173b272c904";
 export const SAI_ADDRESS = "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359";
-export const USDC_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const CUSDC_ADDRESS = "0x39aa39c021dfbae8fac545936693ac917d5e7563";
 export const CETH_ADDRESS = "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5";
 export const COMP_ADDRESS = "0xc00e94cb662c3520282e6f5717214004a7f26888";
