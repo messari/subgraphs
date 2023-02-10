@@ -1,12 +1,13 @@
 import ProtocolDashboard from "./interfaces/ProtocolDashboard";
 import DeploymentsPage from "./deployments/DeploymentsPage";
-import { Route, Routes } from "react-router";
-import { dashboardVersion, DashboardVersion } from "./common/DashboardVersion";
 import IssuesDisplay from "./interfaces/IssuesDisplay";
+import ProtocolsListByTVL from "./deployments/ProtocolsListByTVL";
+import OutOfSyncList from "./deployments/OutOfSyncList";
 import { DashboardHeader } from "./common/headerComponents/DashboardHeader";
+import { dashboardVersion, DashboardVersion } from "./common/DashboardVersion";
+import { Route, Routes } from "react-router";
 import { useEffect, useMemo, useState } from "react";
 import { NewClient, schemaMapping } from "./utils";
-import ProtocolsListByTVL from "./deployments/ProtocolsListByTVL";
 import { useQuery } from "@apollo/client";
 import { decentralizedNetworkSubgraphsQuery } from "./queries/decentralizedNetworkSubgraphsQuery";
 
@@ -131,8 +132,6 @@ function App() {
   }
 
   // Generate indexing queries
-
-
   const queryContents = `
   subgraph
   synced
@@ -260,6 +259,7 @@ function App() {
           <Route index element={<DeploymentsPage issuesMapping={issuesMapping} getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} indexingStatusQueries={indexingStatusQueries} endpointSlugs={endpointSlugs} aliasToProtocol={aliasToProtocol} decentralizedDeployments={decentralizedDeployments} />} />
           <Route path="subgraph" element={<ProtocolDashboard protocolJSON={protocolsToQuery} getData={() => getDeployments()} subgraphEndpoints={subgraphEndpoints} decentralizedDeployments={decentralizedDeployments} />} />
           <Route path="protocols-list" element={<ProtocolsListByTVL protocolsToQuery={protocolsToQuery} getData={() => getDeployments()} />} />
+          <Route path="out-of-sync" element={<OutOfSyncList protocolsToQuery={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route
             path="*"
             element={
