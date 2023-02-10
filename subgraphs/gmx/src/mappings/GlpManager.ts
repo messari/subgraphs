@@ -18,6 +18,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
       pool.save();
     }
   }
+
   updateProtocolAndPoolTvl(
     event.block,
     event.params.aumInUsdg,

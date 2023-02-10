@@ -7,7 +7,6 @@ import {
   DecreasePosition,
   CollectSwapFees,
   CollectMarginFees,
-  Vault,
 } from "../../generated/Vault/Vault";
 import { getOrCreatePool } from "../entities/pool";
 import { getOrCreateToken } from "../entities/token";
@@ -17,7 +16,10 @@ import {
   updateProtocolSideRevenueMetrics,
   updateTotalRevenueMetrics,
 } from "../entityUpdates/financialMetrics";
-import { PROTOCOL_SIDE_REVENUE_PERCENT } from "../utils/constants";
+import {
+  PRICE_PRECISION,
+  PROTOCOL_SIDE_REVENUE_PERCENT,
+} from "../utils/constants";
 import { insert } from "../utils/numbers";
 
 export function handleSwap(event: Swap): void {
@@ -36,11 +38,11 @@ export function handleDecreasePosition(event: DecreasePosition): void {
 }
 
 export function handleCollectSwapFees(event: CollectSwapFees): void {
-  handleCollectFees(event.address, event.block, event.params.feeUsd);
+  handleCollectFees(event.block, event.params.feeUsd);
 }
 
 export function handleCollectMarginFees(event: CollectMarginFees): void {
-  handleCollectFees(event.address, event.block, event.params.feeUsd);
+  handleCollectFees(event.block, event.params.feeUsd);
 }
 
 export function handleIncreasePoolAmount(event: IncreasePoolAmount): void {
@@ -118,18 +120,8 @@ function handleChangePoolAmount(
   pool.save();
 }
 
-function handleCollectFees(
-  vault: Address,
-  block: ethereum.Block,
-  feeUsd: BigInt
-): void {
-  const vaultContract = Vault.bind(vault);
-  const tryPricePrecision = vaultContract.try_PRICE_PRECISION();
-  if (tryPricePrecision.reverted) {
-    return;
-  }
-  const totalFee = feeUsd.div(tryPricePrecision.value).toBigDecimal();
-
+function handleCollectFees(block: ethereum.Block, feeUsd: BigInt): void {
+  const totalFee = feeUsd.div(PRICE_PRECISION).toBigDecimal();
   updateTotalRevenueMetrics(block, totalFee);
   updateProtocolSideRevenueMetrics(
     block,

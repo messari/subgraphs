@@ -112,25 +112,22 @@ export function updateTotalRevenueMetrics(
   const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(block);
 
   // Pool
-  pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
-    amountUSD
-  );
+  pool.cumulativeTotalRevenueUSD =
+    pool.cumulativeTotalRevenueUSD.plus(amountUSD);
   pool.save();
 
   // Pool Daily
   poolMetricsDailySnapshot.cumulativeTotalRevenueUSD =
     pool.cumulativeTotalRevenueUSD;
-  poolMetricsDailySnapshot.dailyTotalRevenueUSD = poolMetricsDailySnapshot.dailyTotalRevenueUSD.plus(
-    amountUSD
-  );
+  poolMetricsDailySnapshot.dailyTotalRevenueUSD =
+    poolMetricsDailySnapshot.dailyTotalRevenueUSD.plus(amountUSD);
   poolMetricsDailySnapshot.save();
 
   // Pool Hourly
   poolMetricsHourlySnapshot.cumulativeTotalRevenueUSD =
     pool.cumulativeTotalRevenueUSD;
-  poolMetricsHourlySnapshot.hourlyTotalRevenueUSD = poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.plus(
-    amountUSD
-  );
+  poolMetricsHourlySnapshot.hourlyTotalRevenueUSD =
+    poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.plus(amountUSD);
   poolMetricsHourlySnapshot.save();
 
   // Protocol
@@ -155,25 +152,22 @@ export function updateProtocolSideRevenueMetrics(
   const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(block);
 
   // Pool
-  pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(
-    amountUSD
-  );
+  pool.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD.plus(amountUSD);
   pool.save();
 
   // Pool Daily
   poolMetricsDailySnapshot.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
-  poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD = poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-    amountUSD
-  );
+  poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD =
+    poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD.plus(amountUSD);
   poolMetricsDailySnapshot.save();
 
   // Pool Hourly
   poolMetricsHourlySnapshot.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
-  poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD = poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-    amountUSD
-  );
+  poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD =
+    poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(amountUSD);
   poolMetricsHourlySnapshot.save();
 
   // Protocol
@@ -184,9 +178,8 @@ export function updateProtocolSideRevenueMetrics(
   // Financial Daily
   financialMetrics.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
-    amountUSD
-  );
+  financialMetrics.dailyProtocolSideRevenueUSD =
+    financialMetrics.dailyProtocolSideRevenueUSD.plus(amountUSD);
   financialMetrics.save();
 }
 

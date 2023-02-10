@@ -164,4 +164,5 @@ export const PROTOCOL_ID = "GMX";
 export const GLP_SYMBOL = "GLP";
 export const USDG_SYMBOL = "USDG";
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
+export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
 export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.3");
