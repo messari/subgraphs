@@ -1360,3 +1360,13 @@ type _PTBv1 @entity {
   srcChainId: BigInt!
   refId: Bytes
 }
+
+type _ERC20Bal @entity {
+  " tx-logIndex "
+  id: ID!
+  block: BigInt!
+  token: String!
+  amount: BigInt!
+  poolBalance: BigInt!
+  onChainBalance: BigInt!
+}

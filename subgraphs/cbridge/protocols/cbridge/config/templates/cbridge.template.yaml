@@ -96,6 +96,8 @@ dataSources:
           handler: handleSend
         - event: LiquidityAdded(uint64,address,address,uint256)
           handler: handleLiquidityAdded
+        - event: Relay(bytes32,address,address,address,uint256,uint64,bytes32)
+          handler: handleRelay
         # we cannot use WithdrawDone because it doesn't have info of source chain
       callHandlers:
         - function: withdraw(bytes,bytes[],address[],uint256[])

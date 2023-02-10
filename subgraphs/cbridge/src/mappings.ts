@@ -9,6 +9,7 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   LiquidityAdded,
+  Relay,
   Send,
   WithdrawCall,
 } from "../generated/PoolBasedBridge/PoolBasedBridge";
@@ -50,7 +51,7 @@ import { _ERC20 } from "../generated/PoolBasedBridge/_ERC20";
 import { ERC20NameBytes } from "../generated/PoolBasedBridge/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../generated/PoolBasedBridge/ERC20SymbolBytes";
 import { Versions } from "./versions";
-import { Token, _Refund, _PTBv1 } from "../generated/schema";
+import { Token, _Refund, _PTBv1, _ERC20Bal } from "../generated/schema";
 import { bigDecimalToBigInt, bigIntToBigDecimal } from "./sdk/util/numbers";
 import { getUsdPricePerToken, getUsdPrice } from "./prices";
 import { networkToChainID } from "./sdk/protocols/bridge/chainIds";
@@ -173,7 +174,7 @@ export function onCreatePool(
 ): void {
   if (aux1 && aux2) {
     const token = sdk.Tokens.getOrCreateToken(Address.fromString(aux2));
-    pool.initialize("Celer Pool-based Bridge", token.name, aux1, token);
+    pool.initialize(`Pool-based Bridge ${token.name}`, token.name, aux1, token);
     // append pool id to protocol._liquidityPoolIDs
     const protocol = sdk.Protocol.protocol;
     let poolIDs = protocol._liquidityPoolIDs;
@@ -211,6 +212,25 @@ export function handleSend(event: Send): void {
     refund.sender = event.params.sender.toHexString();
     refund.save();
   }
+
+  // debugging TVL
+  const sdk = _getSDK(event)!;
+  const pool = sdk.Pools.loadPool(poolId);
+  const erc20Contract = _ERC20.bind(event.params.token);
+  const bal = erc20Contract.balanceOf(event.address);
+  const tx = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.transactionLogIndex.toString());
+  logTokenBalance(
+    "Send",
+    tx,
+    event.params.token,
+    event.params.amount,
+    pool,
+    bal,
+    event.block.number
+  );
 }
 
 export function handleLiquidityAdded(event: LiquidityAdded): void {
@@ -221,9 +241,26 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
     BridgePoolType.LIQUIDITY,
     event.params.token.toHexString()
   );
-  pool.addInputTokenBalance(event.params.amount, true);
+
+  //pool.addInputTokenBalance(event.params.amount, true);
   const acc = sdk.Accounts.loadAccount(event.params.provider);
   acc.liquidityDeposit(pool, event.params.amount, true);
+  // debugging TVL
+  const erc20Contract = _ERC20.bind(event.params.token);
+  const bal = erc20Contract.balanceOf(event.address);
+  const tx = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.transactionLogIndex.toString());
+  logTokenBalance(
+    "Addliquidity",
+    tx,
+    event.params.token,
+    event.params.amount,
+    pool,
+    bal,
+    event.block.number
+  );
 }
 
 export function handleWithdraw(call: WithdrawCall): void {
@@ -240,13 +277,38 @@ export function handleWithdraw(call: WithdrawCall): void {
 
   const bridgePoolType = BridgePoolType.LIQUIDITY;
   const txId = call.transaction.hash.concatI32(call.transaction.index.toI32());
+  const refund = _Refund.load(wdmsg.refId);
 
-  const transfer = _Refund.load(wdmsg.refId);
+  // debugging TVL
+  const tx = call.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(call.transaction.index.toString());
+  log.info("[handleWithdraw]token={} refId={} amount={} tx={} block={}", [
+    wdmsg.token.toHexString(),
+    wdmsg.refId.toHexString(),
+    wdmsg.amount.toString(),
+    tx,
+    call.block.number.toString(),
+  ]);
+
+  const erc20Contract = _ERC20.bind(wdmsg.token);
+  const bal = erc20Contract.balanceOf(call.to);
   if (wdmsg.refId.equals(Bytes.empty())) {
     // LP withdraw liquidity: refId == 0x0
-    pool.addInputTokenBalance(wdmsg.amount.times(BIGINT_MINUS_ONE), true);
+    //pool.addInputTokenBalance(wdmsg.amount.times(BIGINT_MINUS_ONE), true);
     const acc = sdk.Accounts.loadAccount(wdmsg.receiver);
     acc.liquidityWithdraw(pool, wdmsg.amount, true);
+    // debugging TVL
+    logTokenBalance(
+      "Removeliquidity",
+      tx,
+      wdmsg.token,
+      wdmsg.amount.times(BIGINT_MINUS_ONE),
+      pool,
+      bal,
+      call.block.number
+    );
   } else if (
     wdmsg.refId.equals(
       Bytes.fromHexString(
@@ -258,7 +320,7 @@ export function handleWithdraw(call: WithdrawCall): void {
     // Assume fees are divided evenly (50%-50%) between protocol and supply
     const feeAmount = wdmsg.amount.div(BIGINT_TWO);
     pool.addRevenueNative(feeAmount, feeAmount);
-  } else if (transfer) {
+  } else if (refund) {
     // refund, refId==xfer_id
     // refund is handled with a "transferIn"
     const srcChainId = networkToChainID(dataSource.network());
@@ -269,7 +331,7 @@ export function handleWithdraw(call: WithdrawCall): void {
 
     _handleTransferIn(
       wdmsg.token,
-      Address.fromString(transfer.sender),
+      Address.fromString(refund.sender),
       wdmsg.receiver,
       wdmsg.amount,
       srcChainId,
@@ -281,6 +343,17 @@ export function handleWithdraw(call: WithdrawCall): void {
       txId,
       null,
       call
+    );
+
+    // debugging TVL
+    logTokenBalance(
+      "Refund",
+      tx,
+      wdmsg.token,
+      wdmsg.amount.times(BIGINT_MINUS_ONE),
+      pool,
+      bal,
+      call.block.number
     );
   } else {
     const networkConstants = getNetworkSpecificConstant(wdmsg.chainId);
@@ -302,6 +375,115 @@ export function handleWithdraw(call: WithdrawCall): void {
       txId,
       null,
       call
+    );
+
+    //debug TVL
+    logTokenBalance(
+      "Receive",
+      tx,
+      wdmsg.token,
+      wdmsg.amount.times(BIGINT_MINUS_ONE),
+      pool,
+      bal,
+      call.block.number
+    );
+  }
+}
+
+export function handleRelay(event: Relay): void {
+  const sdk = _getSDK(event)!;
+  const pool = sdk.Pools.loadPool(
+    event.address.concat(event.params.token),
+    onCreatePool,
+    BridgePoolType.LIQUIDITY,
+    event.params.token.toHexString()
+  );
+
+  const txId = event.transaction.hash.concatI32(
+    event.transaction.index.toI32()
+  );
+  const networkConstants = getNetworkSpecificConstant(event.params.srcChainId);
+  const srcPoolAddress = networkConstants.getPoolAddress(
+    PoolName.PoolBasedBridge
+  );
+  const bridgePoolType = BridgePoolType.LIQUIDITY;
+
+  _handleTransferIn(
+    event.params.token,
+    event.params.sender,
+    event.params.receiver,
+    event.params.amount,
+    event.params.srcChainId,
+    srcPoolAddress,
+    pool.getBytesID(),
+    bridgePoolType,
+    CrosschainTokenType.CANONICAL,
+    event.params.srcTransferId,
+    txId,
+    event,
+    null
+  );
+
+  // debugging TVL
+  const tx = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.transactionLogIndex.toString());
+  const erc20Contract = _ERC20.bind(event.params.token);
+  const bal = erc20Contract.balanceOf(event.address);
+  logTokenBalance(
+    "Relay",
+    tx,
+    event.params.token,
+    event.params.amount.times(BIGINT_MINUS_ONE),
+    pool,
+    bal,
+    event.block.number
+  );
+}
+
+function logTokenBalance(
+  action: string,
+  tx: string,
+  token: Address,
+  amount: BigInt,
+  pool: Pool,
+  onChainBalance: BigInt,
+  block: BigInt
+): void {
+  const poolBalance = pool.pool.inputTokenBalance;
+  log.info(
+    "[logTokenBalance] {} tx={}: token={} amount={} poolBalance={} onChainBalance={} block={}",
+    [
+      action,
+      tx,
+      token.toHexString(),
+      amount.toString(),
+      poolBalance.toString(),
+      onChainBalance.toString(),
+      block.toString(),
+    ]
+  );
+  let _erc20 = _ERC20Bal.load(tx);
+  if (!_erc20) {
+    _erc20 = new _ERC20Bal(tx);
+    _erc20.token = token.toHexString();
+    _erc20.amount = amount;
+    _erc20.poolBalance = poolBalance;
+    _erc20.onChainBalance = onChainBalance;
+    _erc20.block = block;
+    _erc20.save();
+  } else {
+    log.error(
+      "[logTokenBalance]tx {} already exists: token={} amount={} poolBalance={} onChainBalance={} block={}",
+      [
+        tx,
+        _erc20.token,
+        _erc20.amount.toString(),
+        _erc20.poolBalance.toString(),
+        _erc20.onChainBalance.toString(),
+        _erc20.block.toString(),
+      ]
     );
   }
 }
