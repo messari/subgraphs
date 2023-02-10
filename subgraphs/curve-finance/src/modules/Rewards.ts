@@ -153,20 +153,11 @@ export function updateStakedOutputTokenAmount(
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
-  const gaugeTotalSupply = utils.readValue<BigInt>(
-    gaugeContract.try_totalSupply(),
+  const gaugeWorkingSupply = utils.readValue<BigInt>(
+    gaugeContract.try_working_supply(),
     constants.BIGINT_ZERO
   );
-
-  pool.stakedOutputTokenAmount = gaugeTotalSupply;
-
-  if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)) {
-    const gaugeWorkingSupply = utils.readValue<BigInt>(
-      gaugeContract.try_working_supply(),
-      constants.BIGINT_ZERO
-    );
-    pool.stakedOutputTokenAmount = gaugeWorkingSupply;
-  }
+  pool.stakedOutputTokenAmount = gaugeWorkingSupply;
 
   pool.save();
 }
