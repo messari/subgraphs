@@ -230,7 +230,7 @@ export function handleContractCallApproved(event: ContractCallApproved): void {
 export function handleMintToken(call: MintTokenCall): void {
   // (symbol, account, amount)
   const params = ethereum
-    .decode("[string, address, uint256]", call.inputs.params)!
+    .decode("(string, address, uint256)", call.inputs.params)!
     .toTuple();
   const tokenSymbol = getOrCreateTokenSymbol(params[0].toString())!;
   const tokenAddress = tokenSymbol.tokenAddress;
@@ -257,11 +257,21 @@ export function handleMintToken(call: MintTokenCall): void {
 }
 
 export function handleBurnToken(call: BurnTokenCall): void {
-  // (symbol, salt)
-  const params = ethereum
-    .decode("[string, bytes32]", call.inputs.params)!
-    .toTuple();
+  log.info("[handleBurnToken]call.inputs.params {}", [
+    call.inputs.params.toHexString(),
+  ]);
 
+  // (symbol, salt)
+  const params = ethereum.decode("string,bytes32", call.inputs.params)!;
+
+  log.info("[handleBurnToken]decoded: {}", [
+    params.toString(),
+    //params[1].toBytes().toHexString(),
+  ]);
+
+  log.critical("Stop", []);
+
+  /*
   const tokenSymbol = getOrCreateTokenSymbol(params[0].toString())!;
   const tokenAddress = tokenSymbol.tokenAddress;
   const tokenContract = TokenContract.bind(Address.fromString(tokenAddress));
@@ -298,6 +308,7 @@ export function handleBurnToken(call: BurnTokenCall): void {
     call,
     call.inputs.value1
   );
+  */
 }
 
 //////////////////////////////// HELPER FUNCTIONS //////////////////////////////
