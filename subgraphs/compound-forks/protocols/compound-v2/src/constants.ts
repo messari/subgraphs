@@ -10,27 +10,86 @@ import { Address } from "@graphprotocol/graph-ts";
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
-  export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
-  export const AURORA = "AURORA";
   export const AVALANCHE = "AVALANCHE";
-  export const BOBA = "BOBA";
+  export const AURORA = "AURORA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const COSMOS = "COSMOS";
-  export const CRONOS = "CRONOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
-  export const HARMONY = "HARMONY";
-  export const JUNO = "JUNO";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
-  export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
+
+  // other networks
+  export const UBIQ = "UBIQ";
+  export const SONGBIRD = "SONGBIRD";
+  export const ELASTOS = "ELASTOS";
+  export const KARDIACHAIN = "KARDIACHAIN";
+  export const CRONOS = "CRONOS";
+  export const RSK = "RSK";
+  export const TELOS = "TELOS";
+  export const XDC = "XDC";
+  export const ZYX = "ZYX";
+  export const CSC = "CSC";
+  export const SYSCOIN = "SYSCOIN";
+  export const GOCHAIN = "GOCHAIN";
+  export const ETHEREUMCLASSIC = "ETHEREUMCLASSIC";
+  export const OKEXCHAIN = "OKEXCHAIN";
+  export const HOO = "HOO";
+  export const METER = "METER";
+  export const NOVA_NETWORK = "NOVA_NETWORK";
+  export const TOMOCHAIN = "TOMOCHAIN";
+  export const VELAS = "VELAS";
+  export const THUNDERCORE = "THUNDERCORE";
+  export const HECO = "HECO";
+  export const XDAIARB = "XDAIARB";
+  export const ENERGYWEB = "ENERGYWEB";
+  export const HPB = "HPB";
+  export const BOBA = "BOBA";
+  export const KUCOIN = "KUCOIN";
+  export const SHIDEN = "SHIDEN";
+  export const THETA = "THETA";
+  export const SX = "SX";
+  export const CANDLE = "CANDLE";
+  export const ASTAR = "ASTAR";
+  export const CALLISTO = "CALLISTO";
+  export const WANCHAIN = "WANCHAIN";
+  export const METIS = "METIS";
+  export const ULTRON = "ULTRON";
+  export const STEP = "STEP";
+  export const DOGECHAIN = "DOGECHAIN";
+  export const RONIN = "RONIN";
+  export const KAVA = "KAVA";
+  export const IOTEX = "IOTEX";
+  export const XLC = "XLC";
+  export const NAHMII = "NAHMII";
+  export const TOMBCHAIN = "TOMBCHAIN";
+  export const CANTO = "CANTO";
+  export const KLAYTN = "KLAYTN";
+  export const EVMOS = "EVMOS";
+  export const SMARTBCH = "SMARTBCH";
+  export const BITGERT = "BITGERT";
+  export const FUSION = "FUSION";
+  export const OHO = "OHO";
+  export const ARB_NOVA = "ARB_NOVA";
+  export const OASIS = "OASIS";
+  export const REI = "REI";
+  export const REICHAIN = "REICHAIN";
+  export const GODWOKEN = "GODWOKEN";
+  export const POLIS = "POLIS";
+  export const KEKCHAIN = "KEKCHAIN";
+  export const VISION = "VISION";
+  export const HARMONY = "HARMONY";
+  export const PALM = "PALM";
+  export const CURIO = "CURIO";
+
+  export const UNKNOWN_NETWORK = "UNKNOWN_NETWORK";
 }
+export type Network = string;
 
 export namespace ProtocolType {
   export const EXCHANGE = "EXCHANGE";
@@ -38,28 +97,6 @@ export namespace ProtocolType {
   export const YIELD = "YIELD";
   export const BRIDGE = "BRIDGE";
   export const GENERIC = "GENERIC";
-}
-
-// The network names corresponding to the ones in `dataSource.network()`
-// They should mainly be used for the ease of comparison.
-// Note that they cannot be used as enums since they are lower case.
-// See below for a complete list:
-// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
-export namespace SubgraphNetwork {
-  export const ARBITRUM = "arbitrum-one";
-  export const AVALANCHE = "avalanche";
-  export const AURORA = "aurora";
-  export const BSC = "bnb";
-  export const CELO = "celo";
-  export const ETHEREUM = "mainnet";
-  export const FANTOM = "fantom";
-  export const FUSE = "fuse";
-  export const MOONBEAM = "moonbeam";
-  export const MOONRIVER = "moonriver";
-  export const NEAR = "near-mainnet";
-  export const OPTIMISM = "optimism";
-  export const POLYGON = "matic";
-  export const XDAI = "xdai";
 }
 
 export namespace RewardTokenType {
