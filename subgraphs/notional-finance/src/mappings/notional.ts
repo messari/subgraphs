@@ -40,6 +40,7 @@ import { getTokenFromCurrency } from "../common/util";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
 import { getOrCreateInterestRate } from "../getters/InterestRate";
 import { getOrCreateERC1155Token } from "../getters/token";
+import { updateFinancials } from "../setters/financialMetrics";
 
 export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   // params
@@ -129,6 +130,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
         // set active markets for currency
         activeMarkets = activeMarkets.concat([currencyMarket]);
 
+        // set/update current market attributes
         if (currencyMarket == market.id) {
           const mkt = getOrCreateMarket(event, currencyMarket);
 
@@ -168,6 +170,13 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
     if (!activeMarkets.includes(allMarkets.activeMarkets[k])) {
       const m = getOrCreateMarket(event, allMarkets.activeMarkets[k]);
 
+      // calculate supply side revenue before we set market to inactive
+      if (m.lendRates && m.lendRates!.length != 0) {
+        const avgInterestRate = avg(m.lendRates!);
+        updateFinancials(event, m.id, avgInterestRate);
+      }
+
+      // market status
       m.isActive = false;
       m.canBorrowFrom = false;
 
@@ -334,4 +343,11 @@ export function handleLiquidatefCash(event: LiquidatefCashEvent): void {
   const amount = event.params.netLocalFromLiquidator;
 
   createLiquidate(event, currencyId, liquidator, liquidatee, amount);
+}
+
+let item: BigDecimal = BIGDECIMAL_ZERO;
+export function avg(arr: Array<BigDecimal>): BigDecimal {
+  arr.forEach(value => { item = item.plus(value) });
+  const arrLength = BigDecimal.fromString(arr.length.toString());
+  return item.div(arrLength);
 }

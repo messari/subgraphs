@@ -9,10 +9,7 @@ import { ERC20 } from "../../generated/Notional/ERC20";
 import { Notional } from "../../generated/Notional/Notional";
 import {
   BIGDECIMAL_ZERO,
-  NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE,
-  NOTIONAL_PROTOCOL_SIDE_REVENUE_SHARE,
   TransactionType,
-  NOTIONAL_TRADE_FEES,
   PROTOCOL_ID,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
@@ -29,24 +26,19 @@ import { getOrCreateToken } from "../getters/token";
 
 export function updateFinancials(
   event: ethereum.Event,
-  amountUSD: BigDecimal,
-  marketId: string
+  marketId: string,
+  avgInterestRate: BigDecimal
 ): void {
-  const financialsDailySnapshots = getOrCreateFinancialsDailySnapshot(event);
+  const market = getOrCreateMarket(event, marketId);
   const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, marketId);
   const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, marketId);
   const protocol = getOrCreateLendingProtocol();
-  const market = getOrCreateMarket(event, marketId);
+  const financialsDailySnapshots = getOrCreateFinancialsDailySnapshot(event);
 
-  // fees and revenue amounts
-  const feesUSD = amountUSD.times(NOTIONAL_TRADE_FEES);
-  const totalRevenueUSD = feesUSD;
-  const supplySideRevenueUSD = feesUSD.times(
-    NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE
-  );
-  const protocolSideRevenueUSD = feesUSD.times(
-    NOTIONAL_PROTOCOL_SIDE_REVENUE_SHARE
-  );
+  // revenue calculation
+  const supplySideRevenueUSD = market.totalDepositBalanceUSD.times(avgInterestRate);
+  const protocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  const totalRevenueUSD = supplySideRevenueUSD.plus(protocolSideRevenueUSD);
 
   // market cumulatives
   market.cumulativeTotalRevenueUSD =
@@ -120,10 +112,6 @@ export function updateFinancials(
     market.cumulativeSupplySideRevenueUSD;
   marketHourlySnapshot.cumulativeProtocolSideRevenueUSD =
     market.cumulativeProtocolSideRevenueUSD;
-
-  // cannot associate liquidation event with a market without maturity info
-  financialsDailySnapshots.cumulativeLiquidateUSD =
-    protocol.cumulativeLiquidateUSD;
 
   financialsDailySnapshots.save();
   marketDailySnapshot.save();

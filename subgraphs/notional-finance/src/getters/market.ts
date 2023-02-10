@@ -1,4 +1,4 @@
-import { ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
   Market,
   MarketDailySnapshot,
@@ -55,6 +55,7 @@ export function getOrCreateMarket(
     const interestRate = getOrCreateInterestRate(market.id);
     market.rates = [interestRate.id];
     market.exchangeRate = BIGDECIMAL_ZERO;
+    market.lendRates = [];
 
     // revenue
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;

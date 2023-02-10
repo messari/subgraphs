@@ -167,9 +167,10 @@ export const PROTOCOL_INTEREST_RATE_SIDE = InterestRateSide.BORROWER;
 export const PROTOCOL_ID = "0x1344A36A1B56144C3Bc62E7757377D288fDE0369";
 
 // revenue
-export const NOTIONAL_TRADE_FEES = BigDecimal.fromString("0.003");
-export const NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE = BigDecimal.fromString("0.80");
-export const NOTIONAL_PROTOCOL_SIDE_REVENUE_SHARE = BIGDECIMAL_ZERO;
+// note: not being used, fee amounts left for reference
+// export const NOTIONAL_TRADE_FEES = BigDecimal.fromString("0.003");
+// export const NOTIONAL_SUPPLY_SIDE_REVENUE_SHARE = BIGDECIMAL_ZERO;
+// export const NOTIONAL_PROTOCOL_SIDE_REVENUE_SHARE = BIGDECIMAL_ZERO;
 
 export const RATE_PRECISION = 1000000000;
 export const RATE_PRECISION_DECIMALS: i32 = 9;

@@ -561,6 +561,9 @@ type Market @entity {
   " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
   rates: [InterestRate!]!
 
+  " Keep track of rates for all deposit trades to calculate supply side revenue "
+  lendRates: [BigDecimal!]
+
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
 
