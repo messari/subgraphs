@@ -29,6 +29,6 @@ export class GMXArbitrumConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getVaultAddress(): Bytes {
-    return Bytes.fromHexString("0x489ee077994B6658eAfA855C308275EAd8097C4A");
+    return Bytes.fromHexString("0x489ee077994b6658eafa855c308275ead8097c4a");
   }
 }

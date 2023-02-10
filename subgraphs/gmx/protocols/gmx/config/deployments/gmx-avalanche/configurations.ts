@@ -29,6 +29,6 @@ export class GMXAvalancheConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getVaultAddress(): Bytes {
-    return Bytes.fromHexString("0x9ab2De34A33fB459b538c43f251eB825645e8595");
+    return Bytes.fromHexString("0x9ab2de34a33fb459b538c43f251eb825645e8595");
   }
 }
