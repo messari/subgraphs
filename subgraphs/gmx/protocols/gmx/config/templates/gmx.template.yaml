@@ -167,12 +167,18 @@ dataSources:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
+        - event: UpdateFundingRate(address,uint256)
+          handler: handleUpdateFundingRate
         - event: Swap(address,address,address,uint256,uint256,uint256,uint256)
           handler: handleSwap
         - event: IncreasePosition(bytes32,address,address,address,uint256,uint256,bool,uint256,uint256)
           handler: handleIncreasePosition
         - event: DecreasePosition(bytes32,address,address,address,uint256,uint256,bool,uint256,uint256)
           handler: handleDecreasePosition
+        - event: ClosePosition(bytes32,uint256,uint256,uint256,uint256,uint256,int256)
+          handler: handleClosePosition
+        - event: LiquidatePosition(bytes32,address,address,address,bool,uint256,uint256,uint256,int256,uint256)
+          handler: handleLiquidatePosition
         - event: CollectSwapFees(address,uint256,uint256)
           handler: handleCollectSwapFees
         - event: CollectMarginFees(address,uint256,uint256)

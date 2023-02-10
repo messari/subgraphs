@@ -1,39 +1,108 @@
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   AddLiquidity,
   RemoveLiquidity,
   GlpManager,
 } from "../../generated/GlpManager/GlpManager";
-import { getOrCreateToken } from "../entities/token";
-import { getOrCreatePool } from "../entities/pool";
-import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
-import { updateProtocolAndPoolTvl } from "../entityUpdates/financialMetrics";
+import { incrementProtocolEventCount } from "../entities/protocol";
+import {
+  getOrCreateLiquidityPool,
+  updatePoolTvl,
+  updatePoolOutputToken,
+  increasePoolVolume,
+} from "../entities/pool";
+import { createDeposit, createWithdraw, EventType } from "../entities/event";
+import {
+  getOrCreateAccount,
+  incrementAccountEventCount,
+} from "../entities/account";
+import { takeSnapshots, updateTempUsageMetrics } from "../entities/snapshots";
+import { convertTokenToDecimal } from "../utils/numbers";
+import { DEFAULT_DECIMALS, INT_ZERO } from "../utils/constants";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
-  const pool = getOrCreatePool(event.block.number, event.block.timestamp);
-  if (!pool.outputToken) {
-    const glpManagerContract = GlpManager.bind(event.address);
-    const tryGlp = glpManagerContract.try_glp();
-    if (!tryGlp.reverted) {
-      pool.outputToken = getOrCreateToken(tryGlp.value, event.block.number).id;
-      pool.save();
-    }
-  }
-
-  updateProtocolAndPoolTvl(
-    event.block,
+  handleUpdateLiquidityEvent(
+    event,
+    event.params.account,
+    event.params.token,
+    event.params.amount,
+    event.params.usdgAmount,
+    event.params.mintAmount,
+    event.params.glpSupply,
     event.params.aumInUsdg,
-    event.params.glpSupply
+    EventType.Deposit
   );
-
-  updateUsageMetrics(event.block, event.params.account);
 }
 
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
-  updateProtocolAndPoolTvl(
-    event.block,
+  handleUpdateLiquidityEvent(
+    event,
+    event.params.account,
+    event.params.token,
+    event.params.amountOut,
+    event.params.usdgAmount,
+    event.params.glpAmount,
+    event.params.glpSupply,
     event.params.aumInUsdg,
-    event.params.glpSupply
+    EventType.Withdraw
+  );
+}
+
+function handleUpdateLiquidityEvent(
+  event: ethereum.Event,
+  accountAddress: Address,
+  inputTokenAddress: Address,
+  inputTokenAmount: BigInt,
+  usdgAmount: BigInt,
+  glpAmount: BigInt,
+  glpSupply: BigInt,
+  aumInUsdg: BigInt,
+  eventType: EventType
+): void {
+  takeSnapshots(event);
+
+  const account = getOrCreateAccount(event, accountAddress);
+  incrementAccountEventCount(event, account, eventType);
+  incrementProtocolEventCount(event, eventType);
+
+  const pool = getOrCreateLiquidityPool(event);
+  const usdAmount = convertTokenToDecimal(usdgAmount, DEFAULT_DECIMALS);
+  if (eventType == EventType.Deposit) {
+    if (!pool.outputToken) {
+      const glpManagerContract = GlpManager.bind(event.address);
+      const tryGlp = glpManagerContract.try_glp();
+      if (!tryGlp.reverted) {
+        updatePoolOutputToken(event, pool, tryGlp.value);
+      }
+    }
+
+    createDeposit(
+      event,
+      accountAddress,
+      inputTokenAddress,
+      inputTokenAmount,
+      usdAmount,
+      glpAmount
+    );
+  } else if (eventType == EventType.Withdraw) {
+    createWithdraw(
+      event,
+      accountAddress,
+      inputTokenAddress,
+      inputTokenAmount,
+      usdAmount,
+      glpAmount
+    );
+  }
+
+  updatePoolTvl(
+    event,
+    pool,
+    convertTokenToDecimal(aumInUsdg, DEFAULT_DECIMALS),
+    glpSupply
   );
 
-  updateUsageMetrics(event.block, event.params.account);
+  increasePoolVolume(event, pool, usdAmount, eventType);
+
+  updateTempUsageMetrics(event, accountAddress, eventType, INT_ZERO, null);
 }

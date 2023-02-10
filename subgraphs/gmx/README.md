@@ -1,6 +1,6 @@
-# GMX Protocol Subgraph Metrics Methodology v1.0.1
+# GMX Protocol Subgraph Metrics Methodology v1.0.0
 
-This is for the Generic Schema of Messari GMX Subgraph.
+This is for GMX Subgraph based on Messari Derivatives Perpetual Schema .
 
 ## Business Summary
 
@@ -96,6 +96,14 @@ The usage metrics for GMX take the following user activities into accout.
 > TVL of the Protocol = ∑ TVL of the multi-asset pool
 
 _Note: The collateral of traders are also reserved in the GLP pool. Hence, there are two types of transactions to deposit tokens to the pool, which are the users who provide liquidity and another one for the traders who provide collaterals before trading. The subgraph only counts the tokens to be provided as liqiudity into TVL and does not add positions' collaterals to the pool's TVL, in order to be consistent with GMX official measurement._
+
+### Volume
+
+Total volumes in this subgraph includes perp trading volume, token swap volume and token deposit/withdrawal volume. Meanwhile, there are three types of volumes for perp trading: InflowVolume, OutflowVolume and ClosedInflowVolume:
+
+- Inflows are all funds that entered the protocol as part of long/short positions being opened.
+- Outflows are all funds that left the protocol because of positions being closed.
+- And then inflows at close: when a position closes, if it results in a gain to the protocol balance (the trader lost), whatever is the net increase would go here. If the trader wins (removing funds from the protocol balance) then this is untouched. It would be like the "settled inflow", which allows users to know if the protocol is making or losing money during a given period.
 
 ### Total Revenue
 

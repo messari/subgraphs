@@ -4,6 +4,9 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
+export const PROTOCOL_SCHEMA_VERSION = "1.0.2";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
+export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_NAME = "GMX";
 export const PROTOCOL_SLUG = "gmx";
 
@@ -44,6 +47,8 @@ export namespace ProtocolType {
   export const LENDING = "LENDING";
   export const YIELD = "YIELD";
   export const BRIDGE = "BRIDGE";
+  export const OPTION = "OPTION";
+  export const PERPETUAL = "PERPETUAL";
   export const GENERIC = "GENERIC";
 }
 
@@ -62,6 +67,10 @@ export namespace LiquidityPoolFeeType {
   export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE";
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
+  export const FIXED_STAKE_FEE = "FIXED_STAKE_FEE";
+  export const DYNAMIC_STAKE_FEE = "DYNAMIC_STAKE_FEE";
+  export const DEPOSIT_FEE = "DEPOSIT_FEE";
+  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
 }
 
 export namespace RewardTokenType {
@@ -88,6 +97,11 @@ export namespace InterestRateType {
 export namespace InterestRateSide {
   export const LENDER = "LENDER";
   export const BORROWER = "BORROWER";
+}
+
+export namespace PositionSide {
+  export const LONG = "LONG";
+  export const SHORT = "SHORT";
 }
 
 //////////////////////////////
@@ -134,6 +148,7 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
 export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
+export const BIGDECIMAL_THOUSAND = new BigDecimal(BIGINT_THOUSAND);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -166,3 +181,4 @@ export const USDG_SYMBOL = "USDG";
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
 export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.3");
+export const FUNDING_PRECISION = BigDecimal.fromString("1000000");

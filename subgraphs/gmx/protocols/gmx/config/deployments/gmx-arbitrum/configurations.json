@@ -9,5 +9,6 @@
   "FeeGlpRewardDistributorAddr": "0x5C04a12EB54A093c396f61355c6dA0B15890150d",
   "FeeGlpRewardDistributorStartBlock": 218204,
   "EsgmxGlpRewardDistributorAddr": "0x60519b48ec4183a61ca2B8e37869E675FD203b34",
-  "EsgmxGlpRewardDistributorStartBlock": 218208
+  "EsgmxGlpRewardDistributorStartBlock": 218208,
+  "deployment": "GMX_ARBITRUM"
 }

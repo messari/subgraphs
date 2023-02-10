@@ -9,5 +9,6 @@
   "FeeGlpRewardDistributorAddr": "0x1de098faf30bd74f22753c28db17a2560d4f5554",
   "FeeGlpRewardDistributorStartBlock": 8353442,
   "EsgmxGlpRewardDistributorAddr": "0xdd593cf40734199afc9207ebe9fff23da4bf7720",
-  "EsgmxGlpRewardDistributorStartBlock": 8353460
+  "EsgmxGlpRewardDistributorStartBlock": 8353460,
+  "deployment": "GMX_AVALANCHE"
 }

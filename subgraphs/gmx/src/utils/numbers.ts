@@ -1,14 +1,21 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { INT_ZERO } from "./constants";
 
-export function bigIntToBigDecimal(
-  quantity: BigInt,
-  decimals: i32 = 18
+export function bigDecimalToBigInt(input: BigDecimal): BigInt {
+  const str = input.truncate(0).toString();
+  return BigInt.fromString(str);
+}
+
+// convert emitted values to tokens count
+export function convertTokenToDecimal(
+  tokenAmount: BigInt,
+  exchangeDecimals: i32 = 18
 ): BigDecimal {
-  return quantity.divDecimal(
-    BigInt.fromI32(10)
-      .pow(decimals as u8)
-      .toBigDecimal()
-  );
+  if (exchangeDecimals == INT_ZERO) {
+    return tokenAmount.toBigDecimal();
+  }
+
+  return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals));
 }
 
 // returns 10^exp
@@ -67,13 +74,40 @@ export function insert<Type>(
 // https://docs.aave.com/developers/v/2.0/glossary
 
 export function rayToWad(a: BigInt): BigInt {
-  const halfRatio = BigInt.fromI32(10)
-    .pow(9)
-    .div(BigInt.fromI32(2));
+  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
   return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
 }
 
 export function wadToRay(a: BigInt): BigInt {
   const result = a.times(BigInt.fromI32(10).pow(9));
   return result;
+}
+
+export function multiArraySort(
+  ref: Array<Bytes>,
+  arr1: Array<BigInt>,
+  arr2: Array<BigDecimal>
+): void {
+  if (ref.length != arr1.length || ref.length != arr2.length) {
+    // cannot sort
+    return;
+  }
+
+  const sorter: Array<Array<string>> = [];
+  for (let i = 0; i < ref.length; i++) {
+    sorter[i] = [ref[i].toHexString(), arr1[i].toString(), arr2[i].toString()];
+  }
+
+  sorter.sort(function (a: Array<string>, b: Array<string>): i32 {
+    if (a[0] < b[0]) {
+      return -1;
+    }
+    return 1;
+  });
+
+  for (let i = 0; i < sorter.length; i++) {
+    ref[i] = Bytes.fromHexString(sorter[i][0]);
+    arr1[i] = BigInt.fromString(sorter[i][1]);
+    arr2[i] = BigDecimal.fromString(sorter[i][2]);
+  }
 }
