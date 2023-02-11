@@ -180,13 +180,19 @@ export function getRewardsPerDay(
   );
 
   // Estimate block speed for the window in seconds.
-  const unnormalizedBlockSpeed =
-    WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
+  let unnormalizedBlockSpeed = BIGDECIMAL_ZERO;
+  if (windowSecondsCount != BIGDECIMAL_ZERO) {
+    unnormalizedBlockSpeed =
+      WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
+  }
 
   // block speed converted to specified rate.
-  const normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
-    WINDOW_SIZE_SECONDS_BD
-  ).times(unnormalizedBlockSpeed);
+  let normalizedBlockSpeed = BIGDECIMAL_ZERO;
+  if (unnormalizedBlockSpeed != BIGDECIMAL_ZERO) {
+    normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD).times(
+      unnormalizedBlockSpeed
+    );
+  }
 
   // Update BlockTracker with new values.
   circularBuffer.blocksPerDay = normalizedBlockSpeed;
@@ -255,7 +261,7 @@ function getStartingBlockRate(): BigDecimal {
   // else if (dataSource.network() == Network.MOONBEAM) return BigDecimal.fromString("13.39")
   // else if (dataSource.network() == Network.MOONRIVER) return BigDecimal.fromString("13.39")
   else {
-    log.warning("getStartingBlockRate(): Network not found: {}", [
+    log.critical("getStartingBlockRate(): Network not found: {}", [
       dataSource.network(),
     ]);
     return BIGDECIMAL_ZERO;
