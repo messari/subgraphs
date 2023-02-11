@@ -437,10 +437,17 @@ export function updatePosition(
     }
 
     lenderPosition.balance = lenderPosition.balance.plus(deltaCollateral);
-    assert(
-      lenderPosition.balance.ge(BIGINT_ZERO),
-      `[updatePosition]balance for position ${lenderPosition.id} ${lenderPosition.balance} < 0`,
-    );
+    if (lenderPosition.balance.le(BIGINT_ZERO)) {
+      if (lenderPosition.balance.ge(BIGINT_NEG_HUNDRED)) {
+        // a small negative lender position, likely due to rounding
+        lenderPosition.balance = BIGINT_ZERO;
+      } else {
+        log.error("[updatePosition]balance for position {} = {} < 0", [
+          lenderPosition.id,
+          lenderPosition.balance.toString(),
+        ]);
+      }
+    }
 
     if (deltaCollateral.gt(BIGINT_ZERO)) {
       // deposit
@@ -466,7 +473,6 @@ export function updatePosition(
 
         account.openPositionCount -= INT_ONE;
         account.closedPositionCount += INT_ONE;
-        //account.withdrawCount += INT_ONE;
       }
 
       // link event to position (createTransactions needs to be called first)

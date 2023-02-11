@@ -292,8 +292,9 @@ export function handleVatFrob(event: VatNoteEvent): void {
   const dink = bytesToSignedBigInt(extractCallData(event.params.data, 132, 164)); // change to collateral
   // 6th arg dart: start = 4 (signature) + 4 * 32, end = start + 32
   const dart = bytesToSignedBigInt(extractCallData(event.params.data, 164, 196)); // change to debt
-
-  log.info("[handleVatFrob]block#={}, ilk={}, u={}, v={}, w={}, dink={}, dart={}", [
+  const tx = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
+  log.info("[handleVatFrob]tx {} block {}: ilk={}, u={}, v={}, w={}, dink={}, dart={}", [
+    tx,
     event.block.number.toString(),
     ilk.toString(),
     u,
@@ -304,7 +305,6 @@ export function handleVatFrob(event: VatNoteEvent): void {
   ]);
 
   const urn = u;
-  const tx = event.transaction.hash.toHexString();
   const migrationCaller = getMigrationCaller(u, v, w, event);
   if (migrationCaller != null && ilk.toString() == "SAI") {
     // Ignore vat.frob calls not of interest
@@ -337,6 +337,14 @@ export function handleVatFrob(event: VatNoteEvent): void {
   const token = getOrCreateToken(market.inputToken);
   const deltaCollateral = bigIntChangeDecimals(dink, WAD, token.decimals);
   const deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
+
+  log.info("[handleVatFrob]tx {} block {}: token.decimals={}, deltaCollateral={}, deltaCollateralUSD={}", [
+    tx,
+    event.block.number.toString(),
+    token.decimals.toString(),
+    deltaCollateral.toString(),
+    deltaCollateralUSD.toString(),
+  ]);
 
   market.inputTokenPriceUSD = token.lastPriceUSD!;
   // change in borrowing amount
@@ -812,6 +820,7 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
   const ilk = Bytes.fromHexString(flipBidsStore.ilk);
   const urn = flipBidsStore.urn;
   const sides = [PositionSide.LENDER, PositionSide.BORROWER];
+  //TODO: remove
   log.info("[]txhash={}", [event.transaction.hash.toHexString()]);
   for (let si = 0; si <= 1; si++) {
     const side = sides[si];
