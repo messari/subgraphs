@@ -1,4 +1,4 @@
-import { Bytes, BigDecimal, ethereum, log, Address, BigInt } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../generated/Vat/ERC20";
 import { GemJoin } from "../generated/Vat/GemJoin";
 import { Vat, LogNote as VatNoteEvent } from "../generated/Vat/Vat";
@@ -13,19 +13,8 @@ import { Pot, LogNote as PotNoteEvent } from "../generated/Pot/Pot";
 import { CdpManager, NewCdp, LogNote as CdpNoteEvent } from "../generated/CdpManager/CdpManager";
 import { Created } from "../generated/DSProxyFactory/DSProxyFactory";
 import { BuyGem, SellGem, PSM } from "../generated/PSM-USDC-A/PSM";
-import { getOwnerAddress, getOrCreatePositionCounter } from "./common/getters";
-import {
-  _FlipBidsStore,
-  _ClipTakeStore,
-  _Urn,
-  _Proxy,
-  Position,
-  Market,
-  _Cdpi,
-  _TokenInOut,
-  _gem,
-  _gemSnapshot,
-} from "../generated/schema";
+import { getOwnerAddress } from "./common/getters";
+import { _FlipBidsStore, _ClipTakeStore, _Urn, _Proxy, Market, _Cdpi } from "../generated/schema";
 import { bigIntToBDUseDecimals, bigDecimalExponential, bigIntChangeDecimals } from "./utils/numbers";
 import { getOrCreateChi, getOrCreateInterestRate } from "./common/getters";
 import {
@@ -168,119 +157,7 @@ export function handleVatCage(event: VatNoteEvent): void {
   }
 }
 
-function logTokenInOut(
-  ilk: Bytes,
-  market: Market,
-  amount: BigInt,
-  event: ethereum.Event,
-  handler: string,
-  urn: string,
-  v: string = "",
-  w: string = "",
-): void {
-  const inputTokenBal = market.inputTokenBalance;
-  const WETH_ADDRESS = Address.fromString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
-  const wethContract = ERC20.bind(WETH_ADDRESS);
-  const onChainBal = wethContract.balanceOf(Address.fromString(market.id));
-  const tx = event.transaction.hash.toHexString().concat("-").concat(event.transactionLogIndex.toString());
-  const block = event.block.number;
-  log.info("[logTokenInOut]{} tx {} block {}: ilk {} token {} amount={} inputTokenBal={} onChainBal={} [{}]", [
-    handler,
-    tx,
-    block.toString(),
-    ilk.toString(),
-    market.inputToken,
-    amount.toString(),
-    inputTokenBal.toString(),
-    onChainBal.toString(),
-    [urn, v, w].toString(),
-  ]);
-
-  let _tokenInOut = _TokenInOut.load(tx);
-  if (!_tokenInOut) {
-    _tokenInOut = new _TokenInOut(tx);
-    _tokenInOut.ilk = ilk.toString();
-    _tokenInOut.block = block;
-    _tokenInOut.handler = handler;
-    _tokenInOut.token = market.inputToken;
-    _tokenInOut.amount = amount;
-    _tokenInOut.inputTokenBalance_ = inputTokenBal;
-    _tokenInOut.onChainWETHBalance = onChainBal;
-    _tokenInOut.urn = urn;
-    _tokenInOut.v = v;
-    _tokenInOut.w = w;
-    _tokenInOut.save();
-  } else {
-    log.error(
-      "[logTokenInOut]{} tx {} already exists block {}: ilk {} token {} amount={} inputTokenBal={} onChainBal={} [{}]",
-      [
-        _tokenInOut.handler,
-        _tokenInOut.id,
-        _tokenInOut.block.toString(),
-        _tokenInOut.ilk,
-        _tokenInOut.token,
-        _tokenInOut.amount.toString(),
-        _tokenInOut.inputTokenBalance_.toString(),
-        _tokenInOut.onChainWETHBalance.toString(),
-        [_tokenInOut.urn, _tokenInOut.v, _tokenInOut.w].toString(),
-      ],
-    );
-  }
-}
-
-function logGem(ilk: Bytes, wad: BigInt, event: ethereum.Event, handler: string): void {
-  const gemId = ilk.toHexString();
-  let gem = _gem.load(gemId);
-  if (!gem) {
-    gem = new _gem(gemId);
-    gem.balance = BIGINT_ZERO;
-    gem.block = event.block.number;
-    gem.save();
-  }
-  gem.balance = gem.balance.plus(wad);
-  gem.block = event.block.number;
-  gem.save();
-
-  const snapshotId = gemId.concat("-").concat(event.block.number.toString());
-  let gemSnapshot = _gemSnapshot.load(snapshotId);
-  if (!gemSnapshot) {
-    gemSnapshot = new _gemSnapshot(snapshotId);
-  }
-  gemSnapshot.balance = gem.balance;
-  gemSnapshot.block = event.block.number;
-  gemSnapshot.save();
-
-  log.info("[logGem]{} tx {} block {}: ilk {} amount={} gemBal={}", [
-    handler,
-    event.transaction.hash.toHexString(),
-    event.block.number.toString(),
-    ilk.toString(),
-    wad.toString(),
-    gem.balance.toString(),
-  ]);
-}
-
-//TODO: REMOVE Deposit/Withdraw
-export function handleVatSlip(event: VatNoteEvent): void {
-  const ilk = event.params.arg1;
-  if (ilk.toString() == "TELEPORT-FW-A") {
-    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
-    return;
-  }
-  //let usr = bytes32ToAddressHexString(event.params.arg2);
-  const wad = bytesToSignedBigInt(event.params.arg3);
-  const market = getMarketFromIlk(ilk);
-  if (!market) {
-    log.warning("[handleVatSlip]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
-    return;
-  }
-
-  const urn = bytes32ToAddressHexString(event.params.arg2);
-  logTokenInOut(ilk, market, wad, event, "slip", urn);
-  logGem(ilk, wad, event, "slip");
-}
-
-// Borrow/Repay
+// Borrow/Repay/Deposit/Withdraw
 export function handleVatFrob(event: VatNoteEvent): void {
   const ilk = event.params.arg1;
   if (ilk.toString() == "TELEPORT-FW-A") {
@@ -371,9 +248,6 @@ export function handleVatFrob(event: VatNoteEvent): void {
   updateProtocol(deltaCollateralUSD, deltaDebtUSD);
   //this needs to after updateProtocol as it uses protocol to do the update
   updateFinancialsSnapshot(event, deltaCollateralUSD, deltaDebtUSD);
-
-  logTokenInOut(ilk, market, dink, event, "frob", urn, v, w);
-  logGem(ilk, dink, event, "frob");
 }
 
 // function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
@@ -819,31 +693,6 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
 
   flipBidsStore.ended = true;
   flipBidsStore.save();
-
-  // update positions
-  const ilk = Bytes.fromHexString(flipBidsStore.ilk);
-  const urn = flipBidsStore.urn;
-  const sides = [PositionSide.LENDER, PositionSide.BORROWER];
-  //TODO: remove
-  log.info("[]txhash={}", [event.transaction.hash.toHexString()]);
-  for (let si = 0; si <= 1; si++) {
-    const side = sides[si];
-    const counterEnity = getOrCreatePositionCounter(urn, ilk, side);
-    for (let counter = counterEnity.nextCount; counter >= 0; counter--) {
-      const positionID = `${urn}-${marketID}-${side}-${counter}`;
-      const position = Position.load(positionID);
-      if (position) {
-        log.info("[handleFlipEndAuction]{}: balance={}, account={}, hashClosed={}", [
-          positionID,
-          position.balance.toString(),
-          position.account,
-          position.hashClosed ? position.hashClosed! : "null",
-        ]);
-      } else {
-        log.info("[handleFlipEndAuction]{}: position not exist", [positionID]);
-      }
-    }
-  }
 
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
