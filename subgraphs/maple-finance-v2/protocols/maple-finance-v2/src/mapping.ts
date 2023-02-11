@@ -2,6 +2,7 @@ import { Address, BigDecimal, Bytes, log } from "@graphprotocol/graph-ts";
 import { InstanceDeployed } from "../../../generated/PoolManagerFactory/ContractFactory";
 import { Initialized } from "../../../generated/templates/MapleLoan/MapleLoan";
 import { MapleGlobals } from "../../../generated/templates/MapleLoan/MapleGlobals";
+import { LoanManager } from "../../../generated/LoanManagerFactory/LoanManager";
 import {
   PoolManager as PoolManagerTemplate,
   MapleLoan as MapleLoanTemplate,
@@ -161,9 +162,35 @@ export function handleWithdrawalInstanceDeployed(
 //// Loan Manager Events /////
 //////////////////////////////
 
-// export function handleLoanManagerInstanceDeployed(event: InstanceDeployed): void {
-//   LoanManagerTemplate.create(event.params.instance_);
-// }
+export function handleLoanManagerInstanceDeployed(
+  event: InstanceDeployed
+): void {
+  const loanManagerContract = LoanManager.bind(event.params.instance_);
+  const tryPool = loanManagerContract.try_pool();
+  const tryAsset = loanManagerContract.try_fundsAsset();
+  if (tryPool.reverted || tryAsset.reverted) {
+    log.error(
+      "[handleLoanManagerInstanceDeployed] LoanManager contract {} does not have a pool or fundsAsset",
+      [event.params.instance_.toHexString()]
+    );
+    return;
+  }
+
+  const manager = new DataManager(
+    Bytes.fromHexString(tryPool.value.toHexString()),
+    Bytes.fromHexString(tryAsset.value.toHexString()),
+    event,
+    getProtocolData()
+  );
+  const protocol = manager.getProtocol();
+  if (!protocol._loanManagers) {
+    protocol._loanManagers = [];
+  }
+  const loanManagers = protocol._loanManagers!;
+  loanManagers.push(Bytes.fromHexString(event.params.instance_.toHexString()));
+  protocol._loanManagers = loanManagers;
+  protocol.save();
+}
 
 ///////////////////////////
 //// Liquidator Events ////

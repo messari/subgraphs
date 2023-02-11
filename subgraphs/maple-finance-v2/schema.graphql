@@ -537,6 +537,9 @@ type LendingProtocol implements Protocol @entity {
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
+
+  " List of all loan managers in this protocol "
+  _loanManagers: [Bytes!]
 }
 
 # helper entity to iterate through all markets
@@ -2008,4 +2011,21 @@ type Flashloan implements Event @entity(immutable: true) {
 
   " Amount of asset taken by protocol as a fee in USD "
   feeAmountUSD: BigDecimal
+}
+
+type _Loan @entity(immutable: true) {
+  " Smart contract address of the MapleLoan "
+  id: Bytes!
+
+  " The market this loan belongs to "
+  market: Market!
+
+  " The loan manager this loan belongs to "
+  loanManager: Bytes!
+
+  " The interest rates hold for this loan. The last one is the current rate. "
+  rates: [InterestRate!]!
+
+  " The transaction hash where the loan was created "
+  transactionCreated: Bytes!
 }
