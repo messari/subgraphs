@@ -5,12 +5,12 @@ import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 import FetchSubgraphVersion from "./FetchSubgraphVersion";
 import { useNavigate } from "react-router";
 
-interface OutOfSyncListProps {
+interface VersionComparisonProps {
     protocolsToQuery: { [x: string]: any };
     getData: any;
 }
 
-function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
+function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps) {
     ChartJS.register(...registerables);
     ChartJS.register(PointElement);
 
@@ -44,6 +44,10 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
                     }
                     slugToVersionJSON[slug] = protocolsToQuery[protocol].deployments[depo].versions.subgraph;
                     slugsListByType[schemaName].push(slug);
+
+                    if (depoData?.["services"]?.["decentralized-network"]) {
+                        slugsListByType[schemaName].push(slug + " (Decentralized)");
+                    }
                 }
             }
         })
@@ -61,7 +65,13 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
                     endpoint = "https://graph.cronoslabs.com/subgraphs/name/messari/" + slug;
                 }
                 slugToQueryString[slug] = 'messari/' + slug;
-                return <FetchSubgraphVersion subgraphEndpoint={endpoint} slug={slug} setDeployments={setSubgraphVersionMapping} />
+                let decentralizedFetch = null;
+                if (depo?.["services"]?.["decentralized-network"]) {
+                    let decenEndpoint = "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + depo?.["services"]?.["decentralized-network"]?.["query-id"];
+                    slugToQueryString[slug + " (Decentralized)"] = decenEndpoint;
+                    decentralizedFetch = <FetchSubgraphVersion subgraphEndpoint={decenEndpoint} slug={slug + " (Decentralized)"} queryString={""} setDeployments={setSubgraphVersionMapping} />
+                }
+                return <><FetchSubgraphVersion subgraphEndpoint={endpoint} slug={slug} queryString={slugToQueryString[slug]} setDeployments={setSubgraphVersionMapping} />{decentralizedFetch}</>
             })}
         </>)
     }
@@ -69,8 +79,10 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
     const columnLabels: string[] = [
         "Deployment",
         "Schema Type",
-        "Subgraph Version on Protocol Entity",
-        "Subgraph Version on JSON"
+        "Pending",
+        "Decentralized",
+        "Hosted Service",
+        "JSON"
     ];
 
     const tableHead = (
@@ -102,8 +114,29 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
     );
 
     const tablesBySchemaType = Object.keys(slugsListByType).map(type => {
+        const failedQueryRows: any = [];
+        const decenDepos: any = {};
+        slugsListByType[type].forEach((depo: string) => {
+            if (depo.includes(' (Decentralized)')) {
+                const hostedServiceSlug: string = depo.split(' (Decentralized)').join('')
+                decenDepos[hostedServiceSlug] = subgraphVersionMapping[depo];
+            }
+        })
+
         const rowsOnTypeTable = slugsListByType[type].map((depo: string) => {
-            if (subgraphVersionMapping[depo] !== slugToVersionJSON[depo]) {
+            if (depo.includes(' (Decentralized)') || subgraphVersionMapping[depo] === slugToVersionJSON[depo]) {
+                return null;
+            }
+            if (subgraphVersionMapping[depo]?.includes('.') && slugToVersionJSON[depo]?.includes('.')) {
+                const versionChangesEntity = subgraphVersionMapping[depo].split('.');
+                const versionChangesJSON = slugToVersionJSON[depo].split('.');
+                let priorityColor = 'yellow';
+                if (versionChangesEntity[1] !== versionChangesJSON[1]) {
+                    priorityColor = "orange";
+                }
+                if (versionChangesEntity[0] !== versionChangesJSON[0]) {
+                    priorityColor = '#B8301C';
+                }
                 return (
                     <TableRow onClick={() => window.location.href = "https://subgraphs.xyz/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol"} key={depo + "PROTOCOLLISTROW"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px" }}>
@@ -112,17 +145,46 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "left" }}>
                             {type}
                         </TableCell>
-                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right" }}>
-                            {subgraphVersionMapping[depo] || 'N/A'}
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: priorityColor }}>
+                            {subgraphVersionMapping[depo + ' (Pending)'] || ""}
                         </TableCell>
-                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right" }}>
-                            {slugToVersionJSON[depo] || 'N/A'}
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: priorityColor }}>
+                            {decenDepos[depo] || ""}
+                        </TableCell>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: priorityColor }}>
+                            {subgraphVersionMapping[depo] || ""}
+                        </TableCell>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: priorityColor }}>
+                            {slugToVersionJSON[depo] || ""}
                         </TableCell>
                     </TableRow>
                 )
             } else {
-                return null
+                failedQueryRows.push(
+                    <TableRow onClick={() => window.location.href = "https://okgraph.xyz/?q=" + slugToQueryString[depo]} key={depo + "PROTOCOLLISTROW"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                        <TableCell sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px" }}>
+                            {depo}
+                        </TableCell>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "left" }}>
+                            {type}
+                        </TableCell>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
+                            {subgraphVersionMapping[depo + ' (Pending)'] || ""}
+                        </TableCell>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
+                            {decenDepos[depo] || ""}
+                        </TableCell>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
+                            {subgraphVersionMapping[depo] || ""}
+                        </TableCell>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
+                            {slugToVersionJSON[depo] || ""}
+                        </TableCell>
+                    </TableRow>
+                )
+                return null;
             }
+
         });
 
         if (rowsOnTypeTable.filter((x: any) => !!x)?.length === 0) {
@@ -130,7 +192,7 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
         }
 
         return (
-            <TableContainer sx={{ my: 4, mx: 2 }} key={"TableContainer-OutOfSyncList"}>
+            <TableContainer sx={{ my: 4, mx: 2 }} key={"TableContainer-VersionComparison"}>
                 <div style={{ width: "97.5%" }}>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                         <Typography
@@ -145,6 +207,7 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
                 <Table sx={{ width: "97.5%" }} stickyHeader>
                     {tableHead}
                     {rowsOnTypeTable}
+                    {failedQueryRows}
                 </Table>
             </TableContainer>
         )
@@ -163,4 +226,4 @@ function OutOfSyncList({ protocolsToQuery, getData }: OutOfSyncListProps) {
     );
 }
 
-export default OutOfSyncList;
+export default VersionComparison;
