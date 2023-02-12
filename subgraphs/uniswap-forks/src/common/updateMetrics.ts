@@ -6,6 +6,7 @@ import {
   DexAmmProtocol,
   LiquidityPool,
   Stat,
+  Swap,
   Token,
   Withdraw,
   _dailyDepositValesUSD,
@@ -112,6 +113,14 @@ export function updateUsageMetrics(
   } else if (usageType == UsageType.SWAP) {
     usageMetricsDaily.dailySwapCount += INT_ONE;
     usageMetricsHourly.hourlySwapCount += INT_ONE;
+    usageMetricsDaily.swapStats = updateSwapUsageMetricsUSD(dayId, 
+      protocol.id, 
+      StatValueEntitySuffix.DAILY_SWAP_USD_ID,
+      event);
+    usageMetricsHourly.swapStats = updateSwapUsageMetricsUSD(hourId, 
+      protocol.id, 
+      StatValueEntitySuffix.HOURLY_SWAP_USD_ID,
+      event)
   }
 
   // Combine the id and the user address to generate a unique user id for the day
@@ -298,6 +307,56 @@ function updateWithdrawUsageMetricsUSD(timeStampId: string, protocolId: string, 
   stat.save();
   return stat.id;
 }
+
+/*
+ * Updates swap usage metrics stats for the day or hour
+ * @param timeStampId
+ * @param protocolId
+ * @param valuesSuffix
+ * @param event 
+ * @returns string the id of the stat entity 
+ */
+function updateSwapUsageMetricsUSD(timeStampId: string, protocolId: string, valuesSuffix: string, event: ethereum.Event): string {
+
+  let statValues = _statValuesUSD.load(protocolId.concat(valuesSuffix));
+  if(!statValues) {
+    statValues = new _statValuesUSD(protocolId.concat(valuesSuffix));
+    statValues.valuesUSD = new Array<BigDecimal>();
+    statValues.save();
+  }
+  const statId = protocolId.concat("-swap-").concat(timeStampId);
+  let stat = Stat.load(statId);
+  if (!stat) {
+    stat = createStat(statId);
+    // reset stat values as we're at the top of the clock
+    statValues.valuesUSD = new Array<BigDecimal>(); 
+    statValues.save();
+  }
+  const transactionHash = event.transaction.hash.toHexString();
+  const swap = Swap.load(
+    transactionHash.concat("-").concat(event.logIndex.toString())
+  );
+
+  if (swap && swap.amountInUSD) {
+    const amountUSD = swap.amountInUSD;
+    let values = statValues.valuesUSD!;
+    values.push(amountUSD);
+    statValues.valuesUSD = values;
+    statValues.save();
+    const meanUsd = BigDecimalArray.mean(values);
+    stat.meanUSD = meanUsd;
+    stat.medianUSD = BigDecimalArray.median(values);
+    stat.maxUSD = BigDecimalArray.maxValue(values);
+    stat.minUSD = BigDecimalArray.minValue(values);
+  }
+
+  stat.count = stat.count.plus(BIGINT_ONE);
+  stat.save();
+  return stat.id;
+}
+
+
+
 
 // Update UsagePoolDailySnapshot entity
 // Updated on Swap, Burn, and Mint events.

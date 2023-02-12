@@ -206,6 +206,10 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics.withdrawStats = withdrawStat.id;
 
     usageMetrics.dailyWithdrawCount = INT_ZERO;
+
+    const swapStatId = protocol.id.concat("-swap-").concat(dayId);
+    let swapStat = createStat(swapStatId);
+    usageMetrics.swapStats = swapStat.id
     usageMetrics.dailySwapCount = INT_ZERO;
 
     usageMetrics.blockNumber = event.block.number;
@@ -246,6 +250,10 @@ export function getOrCreateUsageMetricHourlySnapshot(
 
     usageMetrics.hourlyTransactionCount = INT_ZERO;
     usageMetrics.hourlyWithdrawCount = INT_ZERO;
+
+    const swapStatId = protocol.id.concat("-swap-").concat(hourId);
+    let swapStat = createStat(swapStatId);
+    usageMetrics.swapStats = swapStat.id
     usageMetrics.hourlySwapCount = INT_ZERO;
 
     usageMetrics.blockNumber = event.block.number;

@@ -291,8 +291,8 @@ type UsageMetricsDailySnapshot @entity {
 
   #### Statistics #####
 
-  # " Statistics around swap events "
-  # swapStats: Stat!
+  " Statistics around swap events "
+  swapStats: Stat!
 
   " Statistics around deposit events "
   depositStats: Stat!
@@ -332,8 +332,8 @@ type UsageMetricsHourlySnapshot @entity {
 
   #### Statistics #####
 
-  # " Statistics around swap events "
-  # swapStats: Stat!
+  " Statistics around swap events "
+  swapStats: Stat!
 
   " Statistics around deposit events "
   depositStats: Stat!
@@ -351,20 +351,11 @@ type Stat @entity {
   " Total count of event (e.g. total number of swaps) "
   count: BigInt!
 
-  # " Average in native token amount (rounded down)  "
-  # meanAmount: BigInt!
-
   " Average in USD "
   meanUSD: BigDecimal!
 
-  # " Median in native token amount"
-  # medianAmount: BigInt!
-
   " Median in USD "
   medianUSD: BigDecimal!
-
-  # " Maximum in native token amount "
-  # maxAmount: BigInt!
 
   " Maximum in USD "
   maxUSD: BigDecimal!
@@ -374,9 +365,6 @@ type Stat @entity {
 
   " Minimum in USD "
   minUSD: BigDecimal!
-
-  # " Variance for native token amount "
-  # varAmount: BigDecimal!
 
   # " Variance for USD "
   # varUSD: BigDecimal!
