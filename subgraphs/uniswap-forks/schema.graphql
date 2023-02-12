@@ -297,8 +297,8 @@ type UsageMetricsDailySnapshot @entity {
   " Statistics around deposit events "
   depositStats: Stat!
 
-  # " Statistics around withdraw events "
-  # withdrawStats: Stat!
+  " Statistics around withdraw events "
+  withdrawStats: Stat!
 
 }
 
@@ -338,8 +338,8 @@ type UsageMetricsHourlySnapshot @entity {
   " Statistics around deposit events "
   depositStats: Stat!
 
-  # " Statistics around withdraw events "
-  # withdrawStats: Stat!
+  " Statistics around withdraw events "
+  withdrawStats: Stat!
 
 }
 
@@ -1187,11 +1187,29 @@ type _dailyDepositValesUSD @entity {
   depositsUSD: [BigDecimal!]
 }
 
-# Daily deposit usd values used to calculate averages, get reset at start of each new day
+# Hourly deposit usd values used to calculate averages, get reset at start of each new day
 type _hourlyDepositValesUSD @entity {
   " id is {protocol/pool}-hourly-deposits-usd"
   id: ID!
 
   " USD value of each deposit in the day "
   depositsUSD: [BigDecimal!]
+}
+
+# Hourly withdraw usd values used to calculate averages, get reset at start of each new day
+type _hourlyWithdrawValesUSD @entity {
+  " id is {protocol/pool}-hourly-deposits-usd"
+  id: ID!
+
+  " USD value of each deposit in the day "
+  depositsUSD: [BigDecimal!]
+}
+
+# Tracks stats for withdrawls by day or hour, resets at the top of the clock
+type _statValuesUSD @entity {
+  " id is {protocol/pool}-{hourly/daily}-{deposit/withdraw/swap}-usd"
+  id: ID!
+
+  " USD values for the time period [hourly/daily]"
+  valuesUSD: [BigDecimal!]
 }

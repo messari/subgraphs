@@ -113,6 +113,15 @@ export namespace DepositValueEntitySuffix {
   export const HOURLY_DEPOSITS_USD_ID = "-hourly-deposits-usd";
 }
 
+export namespace StatValueEntitySuffix {
+  export const DAILY_DEPOSITS_USD_ID = "-daily-deposits-usd";
+  export const HOURLY_DEPOSITS_USD_ID = "-hourly-deposits-usd";
+  export const DAILY_WITHDRAW_USD_ID =  "-daily-withdraw-usd";
+  export const HOURLY_WITHDRAW_USD_ID = "-hourly-withdraw-usd";
+  export const DAILY_SWAP_USD_ID =  "-daily-swap-usd";
+  export const HOURLY_SWAP_USD_ID = "-hourly-swap-usd";
+}
+
 export namespace DepositValueEntityNames {
   export const DAILY_DEPOSITS_USD = "_dailyDepositValesUSD";
 }
