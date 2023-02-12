@@ -1,4 +1,4 @@
-import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { ethereum } from "@graphprotocol/graph-ts";
 import {
   Market,
   MarketDailySnapshot,

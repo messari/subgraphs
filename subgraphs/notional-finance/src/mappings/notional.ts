@@ -40,7 +40,6 @@ import { getTokenFromCurrency } from "../common/util";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
 import { getOrCreateInterestRate } from "../getters/InterestRate";
 import { getOrCreateERC1155Token } from "../getters/token";
-import { updateFinancials } from "../setters/financialMetrics";
 
 export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   // params
@@ -341,7 +340,9 @@ export function handleLiquidatefCash(event: LiquidatefCashEvent): void {
 
 let item: BigDecimal = BIGDECIMAL_ZERO;
 export function avg(arr: Array<BigDecimal>): BigDecimal {
-  arr.forEach(value => { item = item.plus(value) });
+  arr.forEach((value) => {
+    item = item.plus(value);
+  });
   const arrLength = BigDecimal.fromString(arr.length.toString());
   return item.div(arrLength);
 }
