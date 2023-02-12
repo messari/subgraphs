@@ -301,8 +301,11 @@ export function createDeposit(
   // update lending rates for deposit trades
   // used for supply side revenue calculations
   const mkt = getOrCreateMarket(event, market.id);
-  const interestRate = getOrCreateInterestRate(market.rates[0]).rate;
-  mkt.lendRates!.push(interestRate);
+  const interestRate = getOrCreateInterestRate(mkt.id);
+  log.error("[+] For market: {}, interestRateString: {}, interestRateID: {}, interestRate: {}", [mkt.id, market.rates[0], interestRate.id, interestRate.rate.toString()]);
+  let rates = mkt._lendRates;
+  rates!.push(interestRate.rate);
+  mkt._lendRates = rates;
   mkt.save();
 
   updatePosition(

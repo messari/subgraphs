@@ -171,9 +171,11 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
       const m = getOrCreateMarket(event, allMarkets.activeMarkets[k]);
 
       // calculate supply side revenue before we set market to inactive
-      if (m.lendRates && m.lendRates!.length != 0) {
-        const avgInterestRate = avg(m.lendRates!);
+      if (m._lendRates && m._lendRates!.length != 0) {
+        const avgInterestRate = avg(m._lendRates!);
+        log.error("[-] BEFORE - Market: {}, AvgInterestRate: {}, cumSupRev: {}", [m.id, avgInterestRate.toString(), m.cumulativeSupplySideRevenueUSD.toString()]);
         updateFinancials(event, m.id, avgInterestRate);
+        log.error("[-] AFTER - Market: {}, AvgInterestRate: {}, cumSupRev: {}", [m.id, avgInterestRate.toString(), m.cumulativeSupplySideRevenueUSD.toString()]);
       }
 
       // market status

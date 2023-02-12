@@ -55,7 +55,7 @@ export function getOrCreateMarket(
     const interestRate = getOrCreateInterestRate(market.id);
     market.rates = [interestRate.id];
     market.exchangeRate = BIGDECIMAL_ZERO;
-    market.lendRates = [];
+    market._lendRates = [];
 
     // revenue
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
