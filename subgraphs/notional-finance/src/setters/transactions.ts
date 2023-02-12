@@ -24,6 +24,7 @@ import {
   PROTOCOL_ID,
   BIGDECIMAL_HUNDRED,
   INT_HUNDRED,
+  BIGDECIMAL_ONE,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
 import { addAccountToProtocol, updateUsageMetrics } from "./usageMetrics";
@@ -32,6 +33,7 @@ import { getOrCreateAccount } from "../getters/account";
 import { getOrCreateMarket } from "../getters/market";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
 import {
+  updateFinancials,
   updateMarket,
   updateTVLAndBalances,
 } from "./financialMetrics";
@@ -302,11 +304,11 @@ export function createDeposit(
   // used for supply side revenue calculations
   const mkt = getOrCreateMarket(event, market.id);
   const interestRate = getOrCreateInterestRate(mkt.id);
-  log.error("[+] For market: {}, interestRateString: {}, interestRateID: {}, interestRate: {}", [mkt.id, market.rates[0], interestRate.id, interestRate.rate.toString()]);
-  let rates = mkt._lendRates;
-  rates!.push(interestRate.rate);
-  mkt._lendRates = rates;
+  mkt._lendRatesSum = mkt._lendRatesSum.plus(interestRate.rate);
+  mkt._lendCount = mkt._lendCount.plus(BIGDECIMAL_ONE);
   mkt.save();
+  const avgInterestRate = mkt._lendRatesSum.div(mkt._lendCount);
+  updateFinancials(event, mkt.id, avgInterestRate);
 
   updatePosition(
     market.id,

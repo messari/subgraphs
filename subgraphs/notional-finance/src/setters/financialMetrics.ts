@@ -11,6 +11,7 @@ import {
   BIGDECIMAL_ZERO,
   TransactionType,
   PROTOCOL_ID,
+  BIGDECIMAL_HUNDRED,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
 import { getTokenFromCurrency } from "../common/util";
@@ -35,38 +36,42 @@ export function updateFinancials(
   const protocol = getOrCreateLendingProtocol();
   const financialsDailySnapshots = getOrCreateFinancialsDailySnapshot(event);
 
-  // revenue calculation
-  const supplySideRevenueUSD = market.totalDepositBalanceUSD.times(avgInterestRate);
+  // total/cumulative revenue calculation
+  const supplySideRevenueUSD = market.totalDepositBalanceUSD.times(avgInterestRate).div(BIGDECIMAL_HUNDRED);
   const protocolSideRevenueUSD = BIGDECIMAL_ZERO;
   const totalRevenueUSD = supplySideRevenueUSD.plus(protocolSideRevenueUSD);
 
+  // revenue changes
+  const changeInSupplySideRevenueUSD = supplySideRevenueUSD.minus(market.cumulativeSupplySideRevenueUSD);
+  const changeInProtocolSideRevenueUSD = protocolSideRevenueUSD.minus(market.cumulativeProtocolSideRevenueUSD);
+  const changeInTotalRevenueUSD = totalRevenueUSD.minus(market.cumulativeTotalRevenueUSD);
+
   // market cumulatives
-  market.cumulativeTotalRevenueUSD =
-    market.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+  market.cumulativeTotalRevenueUSD = totalRevenueUSD;
   market.cumulativeSupplySideRevenueUSD =
-    market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
+    supplySideRevenueUSD;
   market.cumulativeProtocolSideRevenueUSD =
-    market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+    protocolSideRevenueUSD;
   market.save();
 
   // protocol cumulatives
   protocol.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+    protocol.cumulativeTotalRevenueUSD.plus(changeInTotalRevenueUSD);
   protocol.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
+    protocol.cumulativeSupplySideRevenueUSD.plus(changeInSupplySideRevenueUSD);
   protocol.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+    protocol.cumulativeProtocolSideRevenueUSD.plus(changeInProtocolSideRevenueUSD);
 
   // financials daily - daily revenues
   financialsDailySnapshots.dailyTotalRevenueUSD =
-    financialsDailySnapshots.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+    financialsDailySnapshots.dailyTotalRevenueUSD.plus(changeInTotalRevenueUSD);
   financialsDailySnapshots.dailySupplySideRevenueUSD =
     financialsDailySnapshots.dailySupplySideRevenueUSD.plus(
-      supplySideRevenueUSD
+      changeInSupplySideRevenueUSD
     );
   financialsDailySnapshots.dailyProtocolSideRevenueUSD =
     financialsDailySnapshots.dailyProtocolSideRevenueUSD.plus(
-      protocolSideRevenueUSD
+      changeInProtocolSideRevenueUSD
     );
 
   // financials daily - cumulative revenues
@@ -79,12 +84,12 @@ export function updateFinancials(
 
   // market daily - daily revenues
   marketDailySnapshot.dailyTotalRevenueUSD =
-    marketDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+    marketDailySnapshot.dailyTotalRevenueUSD.plus(changeInTotalRevenueUSD);
   marketDailySnapshot.dailySupplySideRevenueUSD =
-    marketDailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
+    marketDailySnapshot.dailySupplySideRevenueUSD.plus(changeInSupplySideRevenueUSD);
   marketDailySnapshot.dailyProtocolSideRevenueUSD =
     marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-      protocolSideRevenueUSD
+      changeInProtocolSideRevenueUSD
     );
 
   // market daily - cumulative revenues
@@ -97,12 +102,12 @@ export function updateFinancials(
 
   // market hourly - hourly revenues
   marketHourlySnapshot.hourlyTotalRevenueUSD =
-    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(totalRevenueUSD);
+    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(changeInTotalRevenueUSD);
   marketHourlySnapshot.hourlySupplySideRevenueUSD =
-    marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSD);
+    marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(changeInSupplySideRevenueUSD);
   marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
     marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-      protocolSideRevenueUSD
+      changeInProtocolSideRevenueUSD
     );
 
   // market hourly - cumulative revenues
