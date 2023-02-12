@@ -288,7 +288,6 @@ function updateWithdrawUsageMetricsUSD(timeStampId: string, protocolId: string, 
     statValues.valuesUSD = values;
     statValues.save();
     const meanUsd = BigDecimalArray.mean(values);
-    log.debug(">>>>>>>>>>>>>  stat {}, meanUsd = {} ", [statId, meanUsd.toString()])
     stat.meanUSD = meanUsd;
     stat.medianUSD = BigDecimalArray.median(values);
     stat.maxUSD = BigDecimalArray.maxValue(values);
