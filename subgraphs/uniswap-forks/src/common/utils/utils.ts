@@ -111,7 +111,6 @@ export namespace BigDecimalArray {
     for(let i = 0; i < toMean.length; i++) {
       sum = sum.plus(toMean[i])
     }
-    log.debug(">>>>>>> sum is {}, length is {}",[sum.toString(), toMean.length.toString()])
     return sum.div(new BigDecimal(BigInt.fromI32(toMean.length)));
   }
 
