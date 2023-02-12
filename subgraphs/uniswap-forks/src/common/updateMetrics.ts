@@ -7,9 +7,11 @@ import {
   LiquidityPool,
   Stat,
   Token,
+  Withdraw,
   _dailyDepositValesUSD,
   _HelperStore,
   _hourlyDepositValesUSD,
+  _statValuesUSD,
 } from "../../generated/schema";
 import {
   getLiquidityPool,
@@ -35,9 +37,10 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   UsageType,
-  DepositValueEntitySuffix
+  DepositValueEntitySuffix,
+  StatValueEntitySuffix
 } from "./constants";
-import {convertTokenToDecimal, percToDec, BigDecimalArray } from "./utils/utils";
+import { convertTokenToDecimal, percToDec, BigDecimalArray } from "./utils/utils";
 import {
   findUSDPricePerToken,
   updateNativeTokenPriceInUSD,
@@ -97,7 +100,15 @@ export function updateUsageMetrics(
     usageMetricsDaily.depositStats = updateDailyDepositUsageMetricsUSD(event);
   } else if (usageType == UsageType.WITHDRAW) {
     usageMetricsDaily.dailyWithdrawCount += INT_ONE;
+    usageMetricsDaily.withdrawStats = updateWithdrawUsageMetricsUSD(dayId, 
+      protocol.id, 
+      StatValueEntitySuffix.DAILY_WITHDRAW_USD_ID,
+      event);
     usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
+    usageMetricsHourly.withdrawStats = updateWithdrawUsageMetricsUSD(hourId,
+      protocol.id,
+      StatValueEntitySuffix.HOURLY_WITHDRAW_USD_ID,
+      event);
   } else if (usageType == UsageType.SWAP) {
     usageMetricsDaily.dailySwapCount += INT_ONE;
     usageMetricsHourly.hourlySwapCount += INT_ONE;
@@ -162,7 +173,7 @@ function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
 
   const statId = protocol.id.concat("-deposit-").concat(dayId);
   let stat = Stat.load(statId);
-  if(!stat) {
+  if (!stat) {
     stat = createStat(statId)
     depositValues.depositsUSD = [BIGDECIMAL_ZERO]
     depositValues.save();
@@ -172,11 +183,11 @@ function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
     transactionHash.concat("-").concat(event.logIndex.toString())
   );
 
-  if(deposit && deposit.amountUSD) {
+  if (deposit && deposit.amountUSD) {
     const amountUSD = deposit.amountUSD;
-    
+
     let deposits = new Array<BigDecimal>();
-    if(depositValues.depositsUSD) {
+    if (depositValues.depositsUSD) {
       deposits = depositValues.depositsUSD!;
     }
     deposits.push(amountUSD);
@@ -187,7 +198,7 @@ function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
     stat.maxUSD = BigDecimalArray.maxValue(deposits);
     stat.minUSD = BigDecimalArray.minValue(deposits);
   }
-  
+
   stat.count = stat.count.plus(BIGINT_ONE);
   stat.save();
   return stat.id;
@@ -211,37 +222,83 @@ function updateHourlyDepositUsageMetricsUSD(event: ethereum.Event): string {
       DepositValueEntitySuffix.HOURLY_DEPOSITS_USD_ID
     ));
   const statId = protocol.id.concat("-deposit-").concat(hourId);
-  let stat =  Stat.load(statId);
-  if(!stat) {
+  let stat = Stat.load(statId);
+  if (!stat) {
     stat = createStat(statId);
     depositValues.depositsUSD = [BIGDECIMAL_ZERO];
     depositValues.save();
-  } 
+  }
   const transactionHash = event.transaction.hash.toHexString();
   const deposit = Deposit.load(
     transactionHash.concat("-").concat(event.logIndex.toString())
   );
 
-  if(deposit && deposit.amountUSD) {
+  if (deposit && deposit.amountUSD) {
     const amountUSD = deposit.amountUSD;
     let deposits = [BIGDECIMAL_ZERO];
-    if(depositValues.depositsUSD) {
+    if (depositValues.depositsUSD) {
       deposits = depositValues.depositsUSD!;
     }
     deposits.push(amountUSD);
     depositValues.depositsUSD = deposits;
     depositValues.save();
-    stat.meanUSD = BigDecimalArray.mean(deposits);    
+    stat.meanUSD = BigDecimalArray.mean(deposits);
     stat.medianUSD = BigDecimalArray.median(deposits);
     stat.maxUSD = BigDecimalArray.maxValue(deposits);
     stat.minUSD = BigDecimalArray.minValue(deposits);
   }
-  
+
   stat.count = stat.count.plus(BIGINT_ONE);
   stat.save();
   return stat.id;
 }
+/*
+ * Updates withdraw usage metrics stats for the day or hour
+ * @param timeStampId
+ * @param protocolId
+ * @param valuesSuffix
+ * @param event 
+ * @returns string the id of the stat entity 
+ */
+function updateWithdrawUsageMetricsUSD(timeStampId: string, protocolId: string, valuesSuffix: string, event: ethereum.Event): string {
 
+  let statValues = _statValuesUSD.load(protocolId.concat(valuesSuffix));
+  if(!statValues) {
+    statValues = new _statValuesUSD(protocolId.concat(valuesSuffix));
+    statValues.valuesUSD = new Array<BigDecimal>();
+    statValues.save();
+  }
+  const statId = protocolId.concat("-withdraw-").concat(timeStampId);
+  let stat = Stat.load(statId);
+  if (!stat) {
+    stat = createStat(statId);
+    // reset stat values as we're at the top of the clock
+    statValues.valuesUSD = new Array<BigDecimal>(); 
+    statValues.save();
+  }
+  const transactionHash = event.transaction.hash.toHexString();
+  const withdraw = Withdraw.load(
+    transactionHash.concat("-").concat(event.logIndex.toString())
+  );
+
+  if (withdraw && withdraw.amountUSD) {
+    const amountUSD = withdraw.amountUSD;
+    let values = statValues.valuesUSD!;
+    values.push(amountUSD);
+    statValues.valuesUSD = values;
+    statValues.save();
+    const meanUsd = BigDecimalArray.mean(values);
+    log.debug(">>>>>>>>>>>>>  stat {}, meanUsd = {} ", [statId, meanUsd.toString()])
+    stat.meanUSD = meanUsd;
+    stat.medianUSD = BigDecimalArray.median(values);
+    stat.maxUSD = BigDecimalArray.maxValue(values);
+    stat.minUSD = BigDecimalArray.minValue(values);
+  }
+
+  stat.count = stat.count.plus(BIGINT_ONE);
+  stat.save();
+  return stat.id;
+}
 
 // Update UsagePoolDailySnapshot entity
 // Updated on Swap, Burn, and Mint events.
@@ -544,7 +601,7 @@ export function updateDepositHelper(poolAddress: Address): void {
   poolDeposits.save();
 }
 
-export function updateMetricsDepositsHelper(event:ethereum.Event, valueUSD:BigDecimal): void {
+export function updateMetricsDepositsHelper(event: ethereum.Event, valueUSD: BigDecimal): void {
   const protocol = getOrCreateProtocol();
 
   // Number of days since Unix epoch
@@ -556,9 +613,9 @@ export function updateMetricsDepositsHelper(event:ethereum.Event, valueUSD:BigDe
 
   // create new daily usd deposits
   let depositValues = _dailyDepositValesUSD.load(protocol.id
-                                                  .concat(
-                                                    DepositValueEntitySuffix.DAILY_DEPOSITS_USD_ID
-                                                  ));
+    .concat(
+      DepositValueEntitySuffix.DAILY_DEPOSITS_USD_ID
+    ));
   // It's a new day so reset deposit values array
   depositValues.depositsUSD = new Array<BigDecimal>();
   depositValues.save();

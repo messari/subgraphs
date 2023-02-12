@@ -200,6 +200,11 @@ export function getOrCreateUsageMetricDailySnapshot(
     const depositStatId = protocol.id.concat("-deposit-").concat(dayId);
     let depositStat =  createStat(depositStatId);
     usageMetrics.depositStats = depositStat.id;
+
+    const withdrawStatId = protocol.id.concat("-withdraw-").concat(dayId);
+    let withdrawStat =  createStat(withdrawStatId);
+    usageMetrics.withdrawStats = withdrawStat.id;
+
     usageMetrics.dailyWithdrawCount = INT_ZERO;
     usageMetrics.dailySwapCount = INT_ZERO;
 
@@ -234,6 +239,10 @@ export function getOrCreateUsageMetricHourlySnapshot(
     const depositStatId = protocol.id.concat("-deposit-").concat(hourId);
     let depositStat =  createStat(depositStatId);
     usageMetrics.depositStats = depositStat.id;
+
+    const withdrawStatId = protocol.id.concat("-withdraw-").concat(hourId);
+    let withdrawStat =  createStat(withdrawStatId);
+    usageMetrics.withdrawStats = withdrawStat.id;
 
     usageMetrics.hourlyTransactionCount = INT_ZERO;
     usageMetrics.hourlyWithdrawCount = INT_ZERO;
@@ -417,5 +426,3 @@ export function getOrCreateRewardToken(address: string): RewardToken {
   }
   return rewardToken as RewardToken;
 }
-
-
