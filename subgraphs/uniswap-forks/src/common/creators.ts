@@ -536,6 +536,9 @@ export function createStat(id:string): Stat {
     stat = new Stat(id)
     stat.count = BIGINT_ZERO;
     stat.meanUSD = BIGDECIMAL_ZERO;
+    stat.medianUSD = BIGDECIMAL_ZERO;
+    stat.maxUSD = BIGDECIMAL_ZERO;
+    stat.minUSD = BIGDECIMAL_ZERO;
     stat.save();
   } 
   return stat;

@@ -360,20 +360,20 @@ type Stat @entity {
   # " Median in native token amount"
   # medianAmount: BigInt!
 
-  # " Median in USD "
-  # medianUSD: BigDecimal!
+  " Median in USD "
+  medianUSD: BigDecimal!
 
   # " Maximum in native token amount "
   # maxAmount: BigInt!
 
-  # " Maximum in USD "
-  # maxUSD: BigDecimal!
+  " Maximum in USD "
+  maxUSD: BigDecimal!
 
   # " Minimum in native token amount "
   # minAmount: BigInt!
 
-  # " Minimum in USD "
-  # minUSD: BigDecimal!
+  " Minimum in USD "
+  minUSD: BigDecimal!
 
   # " Variance for native token amount "
   # varAmount: BigDecimal!

@@ -1,8 +1,9 @@
-import { BigInt, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, BigDecimal, Bytes, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
   BIGDECIMAL_TEN,
+  BIGDECIMAL_TWO,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ONE,
@@ -92,18 +93,85 @@ export function isSameSign(a: BigInt, b: BigInt): boolean {
   return false;
 }
 
-/**
- * Calculates the average value for an array of BigDecimals
- * @param toMean
- * @returns the average value or BIGDECIMAL_ZERO for an empty array
- */
-export function meanBigDecimalArray(toMean: Array<BigDecimal>): BigDecimal {
-  if(toMean.length == 0) {
-    return BIGDECIMAL_ZERO;
+export namespace BigDecimalArray {
+
+  /**
+   * Calculates the average value for an array of BigDecimals
+   * @param toMean
+   * @returns the average value or BIGDECIMAL_ZERO for an empty array
+   */
+  export function mean(toMean: Array<BigDecimal>): BigDecimal {
+    if(toMean.length == 0) {
+      return BIGDECIMAL_ZERO;
+    }
+    if(toMean.length == 1) {
+      return toMean[0];
+    }
+    let sum = BIGDECIMAL_ZERO;
+    for(let i = 0; i < toMean.length; i++) {
+      sum = sum.plus(toMean[i])
+    }
+    return sum.div(new BigDecimal(BigInt.fromI32(toMean.length)));
   }
-  let sum = BIGDECIMAL_ZERO;
-  for(let i = 0; i < toMean.length; i++) {
-    sum = sum.plus(toMean[i])
+
+
+  export function maxValue(toMax: Array<BigDecimal>): BigDecimal {
+    toMax = sortArray(toMax);
+    return toMax[toMax.length-1];
   }
-  return sum.div(new BigDecimal(BigInt.fromI32(toMean.length)));
+
+  export function minValue(toMin: Array<BigDecimal>): BigDecimal {
+    toMin = sortArray(toMin);
+    return toMin[0];
+  }
+
+  export function median(toMedian: Array<BigDecimal>): BigDecimal {
+    if(toMedian.length == 0) {
+      return BIGDECIMAL_ZERO;
+    }
+    if(toMedian.length == 1) {
+      return toMedian[0];
+    }
+    toMedian.sort((a,b)=> {
+      let res = a.minus(b)
+      if(res == BIGDECIMAL_ZERO) {
+        return 0;
+      }
+      if(res.gt(BIGDECIMAL_ZERO)) {
+        return 1;
+      }
+      if(res.lt(BIGDECIMAL_ZERO)){
+        return -1;
+      }
+      return -1;
+    })
+    const mid = Math.floor(toMedian.length / 2) as i32;
+    
+    const median:BigDecimal = toMedian.length % 2 == 1 ? toMedian[mid] : toMedian[mid].plus(toMedian[mid -1 ]).div(BIGDECIMAL_TWO);
+    return median;
+  }
+
+  function sortArray(toSort: Array<BigDecimal>):Array<BigDecimal> {
+
+    if(toSort.length <= 1) {
+      return toSort;
+    }  
+  
+    toSort.sort((a,b)=>{
+      let res = a.minus(b)
+      if(res == BIGDECIMAL_ZERO) {
+        return 0;
+      }
+      if(res.gt(BIGDECIMAL_ZERO)) {
+        return 1;
+      }
+      if(res.lt(BIGDECIMAL_ZERO)){
+        return -1;
+      }
+      return -1;
+    })
+    return toSort;
+  }
+
 }
+

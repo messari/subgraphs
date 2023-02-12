@@ -37,7 +37,7 @@ import {
   UsageType,
   DepositValueEntitySuffix
 } from "./constants";
-import { meanBigDecimalArray, convertTokenToDecimal, percToDec } from "./utils/utils";
+import {convertTokenToDecimal, percToDec, BigDecimalArray } from "./utils/utils";
 import {
   findUSDPricePerToken,
   updateNativeTokenPriceInUSD,
@@ -93,8 +93,8 @@ export function updateUsageMetrics(
 
   if (usageType == UsageType.DEPOSIT) {
 
-    usageMetricsHourly.depositStats = updateHourlyDepositUsageMetrics(event);
-    usageMetricsDaily.depositStats = updateDailyDepositUsageMetrics(event);
+    usageMetricsHourly.depositStats = updateHourlyDepositUsageMetricsUSD(event);
+    usageMetricsDaily.depositStats = updateDailyDepositUsageMetricsUSD(event);
   } else if (usageType == UsageType.WITHDRAW) {
     usageMetricsDaily.dailyWithdrawCount += INT_ONE;
     usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
@@ -145,7 +145,7 @@ export function updateUsageMetrics(
  * @param event 
  * @returns string the id of the stat entity for the given day
  */
-function updateDailyDepositUsageMetrics(event: ethereum.Event): string {
+function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
 
   const protocol = getOrCreateProtocol();
 
@@ -164,7 +164,7 @@ function updateDailyDepositUsageMetrics(event: ethereum.Event): string {
   let stat = Stat.load(statId);
   if(!stat) {
     stat = createStat(statId)
-    depositValues.depositsUSD = [BIGDECIMAL_ZERO];
+    depositValues.depositsUSD = [BIGDECIMAL_ZERO]
     depositValues.save();
   }
   const transactionHash = event.transaction.hash.toHexString();
@@ -174,14 +174,18 @@ function updateDailyDepositUsageMetrics(event: ethereum.Event): string {
 
   if(deposit && deposit.amountUSD) {
     const amountUSD = deposit.amountUSD;
-    let deposits = [BIGDECIMAL_ZERO];
+    
+    let deposits = new Array<BigDecimal>();
     if(depositValues.depositsUSD) {
       deposits = depositValues.depositsUSD!;
     }
     deposits.push(amountUSD);
     depositValues.depositsUSD = deposits;
     depositValues.save();
-    stat.meanUSD = meanBigDecimalArray(deposits);
+    stat.meanUSD = BigDecimalArray.mean(deposits);
+    stat.medianUSD = BigDecimalArray.median(deposits);
+    stat.maxUSD = BigDecimalArray.maxValue(deposits);
+    stat.minUSD = BigDecimalArray.minValue(deposits);
   }
   
   stat.count = stat.count.plus(BIGINT_ONE);
@@ -194,7 +198,7 @@ function updateDailyDepositUsageMetrics(event: ethereum.Event): string {
  * @param event 
  * @returns string the id of the stat entity for the given hour
  */
-function updateHourlyDepositUsageMetrics(event: ethereum.Event): string {
+function updateHourlyDepositUsageMetricsUSD(event: ethereum.Event): string {
 
   const protocol = getOrCreateProtocol();
 
@@ -227,7 +231,10 @@ function updateHourlyDepositUsageMetrics(event: ethereum.Event): string {
     deposits.push(amountUSD);
     depositValues.depositsUSD = deposits;
     depositValues.save();
-    stat.meanUSD = meanBigDecimalArray(deposits);
+    stat.meanUSD = BigDecimalArray.mean(deposits);    
+    stat.medianUSD = BigDecimalArray.median(deposits);
+    stat.maxUSD = BigDecimalArray.maxValue(deposits);
+    stat.minUSD = BigDecimalArray.minValue(deposits);
   }
   
   stat.count = stat.count.plus(BIGINT_ONE);
