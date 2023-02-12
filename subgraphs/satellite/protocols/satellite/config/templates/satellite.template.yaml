@@ -96,8 +96,8 @@ dataSources:
       eventHandlers:
         - event: TokenSent(indexed address,string,string,string,uint256)
           handler: handleTokenSend
-        - event: TokenDeployed(string,address)
-          handler: handleTokenDeployed
+        #- event: TokenDeployed(string,address)
+        #  handler: handleTokenDeployed
         # outgoing messages
         - event: ContractCallWithToken(indexed address,string,string,indexed bytes32,bytes,string,uint256)
           handler: handleContractCallWithToken
@@ -109,11 +109,12 @@ dataSources:
         - event: ContractCallApproved(indexed bytes32,string,string,indexed address,indexed bytes32,bytes32,uint256)
           handler: handleContractCallApproved
       callHandlers:
+        - function: deployToken(bytes,bytes32)
+          handler: handleDeployToken
         - function: mintToken(bytes,bytes32)
           handler: handleMintToken
         - function: burnToken(bytes,bytes32)
           handler: handleBurnToken
-
       file: ./src/mappings.ts
 
 templates:

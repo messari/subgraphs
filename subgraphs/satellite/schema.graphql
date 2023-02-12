@@ -1351,7 +1351,9 @@ type _TokenSymbol @entity {
   " token symbol "
   id: ID!
   " token address "
-  tokenAddress: String!
+  tokenAddress: String
+  " Token Type "
+  tokenType: String
 }
 
 # helper for tracking liquidity-based bridge refund

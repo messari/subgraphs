@@ -16,6 +16,7 @@ import {
   ContractCallApproved,
   MintTokenCall,
   BurnTokenCall,
+  DeployTokenCall,
 } from "../generated/AxelarGateway/AxelarGateway";
 import { BurnableMintableCappedERC20 as TokenContract } from "../generated/AxelarGateway/BurnableMintableCappedERC20";
 import { BurnableMintableCappedERC20 as ERC20Template } from "../generated/templates";
@@ -41,6 +42,7 @@ import {
   BIGINT_ZERO,
   getNetworkSpecificConstant,
   Network,
+  TokenType,
 } from "./sdk/util/constants";
 
 // empty handler for prices library
@@ -143,15 +145,65 @@ function _getSDK(
   return new SDK(conf, new Pricer(), new TokenInit(), customEvent);
 }
 
+export function handleDeployToken(call: DeployTokenCall): void {
+  const decimals = bytesToUnsignedBigInt(
+    Bytes.fromUint8Array(call.inputs.params.subarray(64, 96))
+  );
+  const cap = bytesToUnsignedBigInt(
+    Bytes.fromUint8Array(call.inputs.params.subarray(96, 128))
+  );
+  const tokenAddress = bytes32ToAddress(
+    Bytes.fromUint8Array(call.inputs.params.subarray(128, 160))
+  );
+  const mintLimit = bytesToUnsignedBigInt(
+    Bytes.fromUint8Array(call.inputs.params.subarray(160, 192))
+  );
+  const name = Bytes.fromUint8Array(
+    call.inputs.params.subarray(192, 224)
+  ).toString();
+  const symbol = Bytes.fromUint8Array(
+    call.inputs.params.subarray(256, 288)
+  ).toString();
+
+  log.info(
+    "[handleMintToken]decode call.inputs.params {}: name={}, symbol={}, decimals={}, cap={}, tokenAddress={}, mintLimit={}",
+    [
+      call.inputs.params.toHexString(),
+      name,
+      symbol,
+      decimals.toString(),
+      cap.toString(),
+      tokenAddress.toHexString(),
+      mintLimit.toString(),
+    ]
+  );
+  // derived tokenType from tokenAddress param
+  let tokenType: string;
+  if (tokenAddress != Address.zero()) {
+    tokenType = TokenType.EXTERNAL;
+  } else {
+    tokenType = TokenType.INTERNAL_BURNABLEFROM;
+
+    //TokenType.InternalBurnable is never assigned
+  }
+
+  getOrCreateTokenSymbol(symbol, null, tokenType);
+}
+
 export function handleTokenDeployed(event: TokenDeployed): void {
-  getOrCreateTokenSymbol(event.params.symbol, event.params.tokenAddresses);
+  const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
+  // it may be possible to calculate tokenAddress, but the logic is complicated
+  // get it from the TokenDeployed event
+  tokenSymbol.tokenAddress = event.params.tokenAddresses.toHexString();
+  tokenSymbol.save();
+
   ERC20Template.create(event.params.tokenAddresses);
 }
 
 export function handleTokenSent(event: TokenSent): void {
   // the token should have already been deployed
-  const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol)!;
-  const tokenAddress = tokenSymbol.tokenAddress;
+  const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
+  const tokenAddress = tokenSymbol.tokenAddress!;
   const poolId = event.address.concat(Address.fromString(tokenAddress));
   const dstChainId = BigInt.fromString(event.params.destinationChain);
   const dstNetworkConstants = getNetworkSpecificConstant(dstChainId);
@@ -174,8 +226,8 @@ export function handleTokenSent(event: TokenSent): void {
 export function handleContractCallWithToken(
   event: ContractCallWithToken
 ): void {
-  const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol)!;
-  const tokenAddress = tokenSymbol.tokenAddress;
+  const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
+  const tokenAddress = tokenSymbol.tokenAddress!;
   const poolId = event.address.concat(Address.fromString(tokenAddress));
   const dstChainId = BigInt.fromString(event.params.destinationChain);
   const dstNetworkConstants = getNetworkSpecificConstant(dstChainId);
@@ -227,23 +279,75 @@ export function handleContractCallApproved(event: ContractCallApproved): void {
   acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
 }
 
+export function handleContractCallApprovedWithMint(
+  event: ContractCallApprovedWithMint
+): void {
+  // contract call
+  const srcChainId = BigInt.fromString(event.params.sourceChain);
+  const srcAccount = Address.fromString(event.params.sourceAddress);
+
+  const sdk = _getSDK(event)!;
+  const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
+  acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
+
+  const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
+  const tokenAddress = tokenSymbol.tokenAddress!;
+  const poolId = event.address.concat(Address.fromString(tokenAddress));
+  const srcNetworkConstants = getNetworkSpecificConstant(srcChainId);
+  const srcPoolId = srcNetworkConstants.getPoolAddress();
+
+  _handleTransferIn(
+    Address.fromString(tokenAddress),
+    Address.fromString(event.params.sourceAddress),
+    event.params.contractAddress,
+    event.params.amount,
+    srcChainId,
+    srcPoolId,
+    poolId,
+    BridgePoolType.BURN_MINT,
+    CrosschainTokenType.WRAPPED,
+    event.params.commandId,
+    event.transaction.hash.concatI32(event.transactionLogIndex.toI32()),
+    event,
+    null
+  );
+}
+
 export function handleMintToken(call: MintTokenCall): void {
-  // (symbol, account, amount)
-  const params = ethereum
-    .decode("(string, address, uint256)", call.inputs.params)!
-    .toTuple();
-  const tokenSymbol = getOrCreateTokenSymbol(params[0].toString())!;
-  const tokenAddress = tokenSymbol.tokenAddress;
-  const receiver = params[1].toAddress();
+  // decode symbol, account, amount
+  const account = bytes32ToAddress(
+    Bytes.fromUint8Array(call.inputs.params.subarray(32, 64))
+  );
+  const amount = bytesToUnsignedBigInt(
+    Bytes.fromUint8Array(call.inputs.params.subarray(64, 96))
+  );
+  const symbol = Bytes.fromUint8Array(
+    call.inputs.params.subarray(128, 160)
+  ).toString();
+
+  log.info(
+    "[handleMintToken]decode call.inputs.params {}: symbol={}, account={}, amount={}",
+    [
+      call.inputs.params.toHexString(),
+      symbol,
+      account.toHexString(),
+      amount.toString(),
+    ]
+  );
+
+  const tokenSymbol = getOrCreateTokenSymbol(symbol);
+  const tokenAddress = tokenSymbol.tokenAddress!;
+  //const tokenType = tokenSymbol.tokenType!;
+  const receiver = account;
   const poolId = call.to;
   const srcChainId = networkToChainID(Network.UNKNOWN_NETWORK);
   const srcPoolId = Address.zero(); // Not available
-  const srcAccount = params[1].toAddress(); //Not available, assumed to be the same as receiver
+  const srcAccount = account; //Not available, assumed to be the same as receiver
   _handleTransferIn(
     Address.fromString(tokenAddress),
     srcAccount,
     receiver,
-    params[2].toBigInt(),
+    amount,
     srcChainId,
     srcPoolId,
     poolId,
@@ -261,24 +365,28 @@ export function handleBurnToken(call: BurnTokenCall): void {
     call.inputs.params.toHexString(),
   ]);
 
-  // (symbol, salt)
-  const params = ethereum.decode("string,bytes32", call.inputs.params)!;
+  // decode salt, symbol
+  const salt = Bytes.fromUint8Array(call.inputs.params.subarray(32, 64));
+  const symbol = Bytes.fromUint8Array(
+    call.inputs.params.subarray(96, 128)
+  ).toString();
 
-  log.info("[handleBurnToken]decoded: {}", [
-    params.toString(),
-    //params[1].toBytes().toHexString(),
+  // (symbol, salt)
+  //const params = ethereum.decode("string,bytes32", call.inputs.params)!;
+
+  log.info("[handleBurnToken]decoded: symbol={} salt={}", [
+    symbol,
+    salt.toHexString(),
   ]);
 
-  log.critical("Stop", []);
+  /* //TODO: needed?
 
-  /*
-  const tokenSymbol = getOrCreateTokenSymbol(params[0].toString())!;
+  const tokenSymbol = getOrCreateTokenSymbol(symbol)!;
   const tokenAddress = tokenSymbol.tokenAddress;
   const tokenContract = TokenContract.bind(Address.fromString(tokenAddress));
-  const depositAddressResult = tokenContract.try_depositAddress(
-    params[1].toBytes()
-  );
+  const depositAddressResult = tokenContract.try_depositAddress(salt);
   if (depositAddressResult.reverted) {
+    // TODO this  an external token
     log.error(
       "[handleBurnToken]Unable to get depositAddress for token {} at tx {}",
       [tokenAddress, call.transaction.hash.toHexString()]
@@ -293,7 +401,7 @@ export function handleBurnToken(call: BurnTokenCall): void {
   const poolId = call.to;
   const dstChainId = networkToChainID(Network.UNKNOWN_NETWORK);
   const dstPoolId = Address.zero(); // Not available
-  const dstAccount = params[1].toAddress(); //Not available, assumed to be the same as sender
+  const dstAccount = sender; //Not available, assumed to be the same as sender
   _handleTransferOut(
     Address.fromString(tokenAddress),
     sender,
@@ -323,25 +431,14 @@ export function handleBurnToken(call: BurnTokenCall): void {
  */
 function getOrCreateTokenSymbol(
   symbol: string,
-  tokenAddress: Address | null = null,
-  contractAddress: Address | null = null
-): _TokenSymbol | null {
+  tokenAddress: string | null = null,
+  tokenType: string | null = null
+): _TokenSymbol {
   let tokenSymbol = _TokenSymbol.load(symbol);
   if (!tokenSymbol) {
-    if (!tokenAddress) {
-      // find tokenAddress on-chain from the AlexarGateway contract
-      const contract = AxelarGatewayContract.bind(contractAddress!);
-      const tokenAddressResult = contract.try_tokenAddresses(symbol);
-      if (tokenAddressResult.reverted) {
-        log.error("[handleTokenSent]Failed to get token address for {}", [
-          tokenAddressResult.value.toHexString(),
-        ]);
-        return null;
-      }
-      tokenAddress = tokenAddressResult.value;
-    }
     tokenSymbol = new _TokenSymbol(symbol);
-    tokenSymbol.tokenAddress = tokenAddress.toHexString();
+    tokenSymbol.tokenAddress = tokenAddress;
+    tokenSymbol.tokenType = tokenType;
     tokenSymbol.save();
   }
   return tokenSymbol;
@@ -465,4 +562,25 @@ function _handleMessageIn(
   const sdk = _getSDK(event, call)!;
   const acc = sdk.Accounts.loadAccount(receiver);
   acc.messageIn(srcChainId, sender, data);
+}
+
+export function bytesToUnsignedBigInt(
+  bytes: Bytes,
+  bigEndian: boolean = true
+): BigInt {
+  // Caution: this function changes the input bytes for bigEndian
+  return BigInt.fromUnsignedBytes(
+    bigEndian ? Bytes.fromUint8Array(bytes.reverse()) : bytes
+  );
+}
+
+export function bytes32ToAddress(bytes: Bytes): Address {
+  //take the last 40 hexstring & convert it to address (20 bytes)
+  const address = bytes32ToAddressHexString(bytes);
+  return Address.fromString(address);
+}
+
+export function bytes32ToAddressHexString(bytes: Bytes): string {
+  //take the last 40 hexstring: 0x + 32 bytes/64 hex characters
+  return `0x${bytes.toHexString().slice(26).toLowerCase()}`;
 }

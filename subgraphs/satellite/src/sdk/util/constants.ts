@@ -161,6 +161,12 @@ export namespace UsageType {
   export const SWAP = "SWAP";
 }
 
+export namespace TokenType {
+  export const INTERNAL_BURNABLE = "INTERNAL_BURNABLE";
+  export const INTERNAL_BURNABLEFROM = "INTERNAL_BURNABLEFROM";
+  export const EXTERNAL = "EXTERNAL";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
