@@ -1,5 +1,5 @@
 {
-  "chain": "xdai",
+  "chain": "gnosis",
   "erc20Vaults": [
     {
       "name": "WETH",
@@ -11,5 +11,8 @@
       "address": "0x014a177e9642d1b4e970418f894985dc1b85657f",
       "startBlock": 21666284
     }
-  ]
+  ],
+  "graftEnabled": false,
+  "subgraphId": "QmeDVCBsAN72oHaqMvnPdfXt9p8GHTv7gG9mDM3X7ZVt21",
+  "graftStartBlock": 26030934
 }

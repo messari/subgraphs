@@ -1,0 +1,28 @@
+{
+  "network": "fantom",
+  "vaults": [
+    {
+      "name": "ibFTM",
+      "address": "0xc1018f4Bba361A1Cc60407835e156595e92EF7Ad",
+      "startBlock": 30359865
+    },
+    {
+      "name": "ibUSDC",
+      "address": "0x831332f94C4A0092040b28ECe9377AfEfF34B25a",
+      "startBlock": 30360730
+    },
+    {
+      "name": "ibALPACA",
+      "address": "0x2E7f32e38EA5a5fcb4494d9B626d2d393B176B1E",
+      "startBlock": 31161333
+    },
+    {
+      "name": "ibTOMB",
+      "address": "0x60dDe8BBE160fe033fACB3446Cf7795cC575B171",
+      "startBlock": 32934658
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "QmZnCmiy4kz6jCm9VBxq8XScAWXTRakbVM4KfdqhGHUFgr",
+  "graftStartBlock": 34488000
+}

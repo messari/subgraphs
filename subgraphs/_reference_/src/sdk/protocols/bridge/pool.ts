@@ -30,7 +30,8 @@ import {
 } from "../../util/arrays";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
-import { CustomEventType, SDK } from ".";
+import { SDK } from ".";
+import { CustomEventType } from "../../util/events";
 
 type onCreatePoolCallback<T> = (
   event: CustomEventType,
@@ -327,7 +328,7 @@ export class Pool {
         this.pool.cumulativeVolumeOutUSD.plus(amountUSD);
       this.pool.netVolume = this.pool.netVolume.minus(amount);
       this.pool.netVolumeUSD = this.pool.netVolumeUSD.minus(amountUSD);
-      this.protocol.addVolumeInUSD(amountUSD);
+      this.protocol.addVolumeOutUSD(amountUSD);
     } else {
       route.cumulativeVolumeIn = route.cumulativeVolumeIn.plus(amount);
       route.cumulativeVolumeInUSD = route.cumulativeVolumeInUSD.plus(amountUSD);
@@ -336,7 +337,7 @@ export class Pool {
         this.pool.cumulativeVolumeInUSD.plus(amountUSD);
       this.pool.netVolume = this.pool.netVolume.plus(amount);
       this.pool.netVolumeUSD = this.pool.netVolumeUSD.plus(amountUSD);
-      this.protocol.addVolumeOutUSD(amountUSD);
+      this.protocol.addVolumeInUSD(amountUSD);
     }
     route.save();
     this.save();

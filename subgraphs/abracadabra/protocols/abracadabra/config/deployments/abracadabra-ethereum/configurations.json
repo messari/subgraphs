@@ -13,6 +13,6 @@
   "OffchainAggregatorAddress": "0x18f0112E30769961AF90FDEe0D1c6B27E6d72D92",
   "OffchainAggregatorStartBlock": "12505995",
   "graftEnabled": false,
-  "subgraphId": "QmQZX9TNpPWguYZBEF9Zq4SPrcn8iMRotMp8FGwgrV5N2W",
-  "graftStartBlock": 15436152
+  "subgraphId": "QmUUZcZDxLtmKwqr9dkvMmxiZwhXXiQ58VKjNv6o2KULvz",
+  "graftStartBlock": 16421184
 }

@@ -36,6 +36,12 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
     const dataChartPropKeys = Object.keys(dataChart);
     let dataChartCopy = JSON.parse(JSON.stringify(dataChart));
 
+    useEffect(() => {
+        if (!!compChart && !csvJSONProp && !csvJSON && Array.isArray(dataChart)) {
+            setCompChart({})
+        }
+    }, [dataChart, csvJSONProp, csvJSON])
+
     function jpegDownloadHandler(downloadInZip: boolean) {
         try {
             const link = document.createElement('a');
@@ -135,7 +141,7 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
         } catch (err) {
             console.log(err);
         }
-    }, [dataTable, dataChart, csvJSONProp])
+    }, [dataTable, dataChart, csvJSONProp, csvJSON, csvMetaDataProp, csvMetaData])
 
     const hourly = datasetLabel.split("-")[0]?.toUpperCase()?.includes("HOURLY");
 
@@ -369,7 +375,16 @@ export const ChartContainer = ({ identifier, elementId, baseKey, datasetLabel, d
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         {csvColumnOptions}
                         <div style={{ marginLeft: "35px" }}>
-                            <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{}} csvMetaData={csvMetaData} field={datasetLabel} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} isEntityLevel={false} /></Tooltip>
+                            <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}>
+                                <UploadFileCSV style={{}} csvMetaData={csvMetaData} field={datasetLabel} csvJSON={csvJSON} setCsvJSON={(x: any) => {
+                                    if (!x) {
+                                        setCompChart({})
+                                        setCsvJSON(null)
+                                    } else {
+                                        setCsvJSON(x);
+                                    }
+                                }} setCsvMetaData={setCsvMetaData} isEntityLevel={false} />
+                            </Tooltip>
                             <Tooltip placement="top" title={"Chart can be dragged and dropped to another tab"}><Button onClick={() => setChartIsImage(true)} style={{ margin: "1.5px 0 0 0", padding: "6px 8px 5px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", ...staticButtonStyle }}>Static</Button></Tooltip>
                             <Tooltip placement="top" title={"Show plot points on hover"}><Button onClick={() => setChartIsImage(false)} style={{ margin: "1.5px 0 0 0", padding: "6px 8px 5px 8px", borderRadius: "0", border: "1px rgb(102,86,248) solid", ...dynamicButtonStyle }}>Dynamic</Button></Tooltip>
                         </div>

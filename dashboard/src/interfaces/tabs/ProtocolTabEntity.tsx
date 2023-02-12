@@ -1,5 +1,5 @@
-import { Box, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
-import { negativeFieldList } from "../../constants";
+import { Box, Grid, Tooltip, Typography } from "@mui/material";
+import { dateValueKeys, negativeFieldList } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
@@ -7,14 +7,16 @@ import { BigNumber } from "bignumber.js";
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
 import JSZip from "jszip";
-import DefiLlamaComparsionTab from "../DefiLlamaComparisonTab";
+import DefiLlamaComparsionTab from "../../common/chartComponents/DefiLlamaComparison";
 import { UploadFileCSV } from "../../common/utilComponents/UploadFileCSV";
+import { useSearchParams } from "react-router-dom";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   entityName: string;
   protocolType: string;
   subgraphEndpoints: any;
+  entitySpecificElements: any;
   protocolTableData: { [x: string]: any };
   overlaySchemaData: any;
   protocolSchemaData: any;
@@ -32,6 +34,7 @@ function ProtocolTabEntity({
   entityName,
   protocolType,
   subgraphEndpoints,
+  entitySpecificElements,
   protocolTableData,
   overlaySchemaData,
   protocolSchemaData,
@@ -45,9 +48,18 @@ function ProtocolTabEntity({
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   const list: { [x: string]: any } = {};
 
+  const [searchParams] = useSearchParams();
+  const defiLlamaNetworkParam = searchParams.get("defillamanetwork") || null;
+  const defiLlamaProtocolParam = searchParams.get("defillamaprotocol") || null;
+
+  let defiLlamaCompareTVLDefault = false;
+  if (defiLlamaProtocolParam || defiLlamaNetworkParam) {
+    defiLlamaCompareTVLDefault = true;
+  }
+
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
   const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
-  const [defiLlamaCompareTVL, setDefiLlamaCompareTVL] = useState<boolean>(false);
+  const [defiLlamaCompareTVL, setDefiLlamaCompareTVL] = useState<boolean>(defiLlamaCompareTVLDefault);
   const [csvJSON, setCsvJSON] = useState<any>(null);
   const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
 
@@ -100,16 +112,40 @@ function ProtocolTabEntity({
       const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
       for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+        let dateVal: number = Number(timeseriesInstance['timestamp']);
+        dateValueKeys.forEach((key: string) => {
+          let factor = 86400;
+          if (key.includes('hour')) {
+            factor = factor / 24;
+          }
+          if (!!(Number(timeseriesInstance[key]) * factor)) {
+            dateVal = (Number(timeseriesInstance[key]) * factor);
+          }
+        })
+
         let overlayIndex = x;
         if (overlayDifference > 0) {
           overlayIndex = x - overlayDifference;
         }
         const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[overlayIndex];
+
+        let overlayDateVal: number = Number(overlayTimeseriesInstance?.['timestamp']) || 0;
+        if (!!overlayTimeseriesInstance) {
+          dateValueKeys.forEach((key: string) => {
+            let factor = 86400;
+            if (key.includes('hour')) {
+              factor = factor / 24;
+            }
+            if (!!(Number(overlayTimeseriesInstance[key]) * factor)) {
+              overlayDateVal = (Number(overlayTimeseriesInstance[key]) * factor);
+            }
+          })
+        }
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
           // skip the timestamp field on each entity instance
-          if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename") {
+          if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename" || dateValueKeys.includes(fieldName)) {
             return;
           }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
@@ -126,13 +162,13 @@ function ProtocolTabEntity({
               // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
               if (!dataFields[fieldName]) {
                 dataFields[fieldName] = [
-                  { value: Number(currentInstanceField), date: Number(timeseriesInstance.timestamp) },
+                  { value: Number(currentInstanceField), date: dateVal },
                 ];
                 dataFieldMetrics[fieldName] = { sum: Number(currentInstanceField) };
               } else {
                 dataFields[fieldName].push({
                   value: Number(currentInstanceField),
-                  date: Number(timeseriesInstance.timestamp),
+                  date: dateVal,
                 });
                 dataFieldMetrics[fieldName].sum += Number(currentInstanceField);
               }
@@ -190,7 +226,7 @@ function ProtocolTabEntity({
                   };
                 }
               }
-              if (fieldName.includes("umulative")) {
+              if (fieldName?.toUpperCase()?.includes("CUMULATIVE")) {
                 if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
                   dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
                 }
@@ -219,10 +255,10 @@ function ProtocolTabEntity({
                   console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
                 }
                 if (!dataFields[dataFieldKey]) {
-                  dataFields[dataFieldKey] = [{ value: value, date: Number(timeseriesInstance.timestamp) }];
+                  dataFields[dataFieldKey] = [{ value: value, date: dateVal }];
                   dataFieldMetrics[dataFieldKey] = { sum: value };
                 } else {
-                  dataFields[dataFieldKey].push({ value: value, date: Number(timeseriesInstance.timestamp) });
+                  dataFields[dataFieldKey].push({ value: value, date: dateVal });
                   dataFieldMetrics[dataFieldKey].sum += value;
                 }
                 if (Number(value) < 0) {
@@ -236,7 +272,7 @@ function ProtocolTabEntity({
                   }
                   dataFieldMetrics[fieldName].negative.count += 1;
                 }
-                if (dataFieldKey.includes("umulative")) {
+                if (dataFieldKey?.toUpperCase()?.includes("CUMULATIVE")) {
                   if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes("cumulative")) {
                     dataFieldMetrics[dataFieldKey].cumulative = { prevVal: 0, hasLowered: "" };
                   }
@@ -259,12 +295,12 @@ function ProtocolTabEntity({
                 // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
                 if (!overlayDataFields[fieldName]) {
                   overlayDataFields[fieldName] = [
-                    { value: Number(currentOverlayInstanceField), date: Number(overlayTimeseriesInstance.timestamp) },
+                    { value: Number(currentOverlayInstanceField), date: overlayDateVal },
                   ];
                 } else {
                   overlayDataFields[fieldName].push({
                     value: Number(currentOverlayInstanceField),
-                    date: Number(overlayTimeseriesInstance.timestamp),
+                    date: overlayDateVal,
                   });
                 }
 
@@ -288,9 +324,9 @@ function ProtocolTabEntity({
                     console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
                   }
                   if (!overlayDataFields[dataFieldKey]) {
-                    overlayDataFields[dataFieldKey] = [{ value: value, date: Number(overlayTimeseriesInstance.timestamp) }];
+                    overlayDataFields[dataFieldKey] = [{ value: value, date: overlayDateVal }];
                   } else {
-                    overlayDataFields[dataFieldKey].push({ value: value, date: Number(overlayTimeseriesInstance.timestamp) });
+                    overlayDataFields[dataFieldKey].push({ value: value, date: overlayDateVal });
                   }
                 }
               }
@@ -344,7 +380,17 @@ function ProtocolTabEntity({
 
       const mappedCurrentEntityData = currentEntityData.map((instance: any, idx: number) => {
         let instanceToSave: any = {};
-        instanceToSave.date = moment.utc(Number(instance.timestamp) * 1000).format("YYYY-MM-DD");
+        let dateVal: number = Number(instance['timestamp']);
+        dateValueKeys.forEach((key: string) => {
+          let factor = 86400;
+          if (key.includes('hour')) {
+            factor = factor / 24;
+          }
+          if (!!(Number(instance[key]) * factor)) {
+            dateVal = (Number(instance[key]) * factor);
+          }
+        })
+        instanceToSave.date = moment.utc(dateVal).format("YYYY-MM-DD");
         instanceToSave = { ...instanceToSave, ...instance };
         delete instanceToSave.__typename;
         return instanceToSave;
@@ -361,7 +407,9 @@ function ProtocolTabEntity({
               </Typography>
             </CopyLinkToClipboard>
           </Box>
-          <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} /></Tooltip>
+          <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}>
+            <UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} />
+          </Tooltip>
           <div>
             <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
             <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Chart Images</div>
@@ -372,7 +420,7 @@ function ProtocolTabEntity({
             if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
               return <>
                 <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(false)} >Remove DefiLlama Comparison</div>
-                <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} getData={() => console.log('GET DATA')} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
+                <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
             }
 
             const label = entityName + "-" + field;
@@ -511,7 +559,14 @@ function ProtocolTabEntity({
         return <h3>JAVASCRIPT ERROR - PROTOCOL TAB</h3>;
       }
     }
-  } else if (currentTimeseriesLoading || (!currentTimeseriesLoading && !currentEntityData && !currentTimeseriesError)) {
+  } else if (currentTimeseriesError) {
+    issues.push({
+      type: "VAL",
+      message: currentTimeseriesError?.message,
+      level: "critical",
+      fieldName: entityName + "-" + currentTimeseriesError?.message,
+    });
+
     return (
       <Grid key={entityName}>
         <Box my={3}>
@@ -521,7 +576,7 @@ function ProtocolTabEntity({
             </Typography>
           </CopyLinkToClipboard>
         </Box>
-        <CircularProgress sx={{ margin: 6 }} size={50} />
+        <h3>{currentTimeseriesError?.message}</h3>
       </Grid>
     );
   } else {
@@ -534,8 +589,6 @@ function ProtocolTabEntity({
             </Typography>
           </CopyLinkToClipboard>
         </Box>
-        <h3>Hold on! This subgraph has alot of entities, it may take a minute for the query to return.</h3>
-        <CircularProgress sx={{ margin: 6 }} size={50} />
       </Grid>
     );
   }

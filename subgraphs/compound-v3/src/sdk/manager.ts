@@ -282,13 +282,15 @@ export class DataManager {
     rate.rate = interestRate;
     rate.save();
 
-    if (!this.market.rates) {
-      this.market.rates = [];
+    let marketRates = this.market.rates;
+    if (!marketRates) {
+      marketRates = [];
     }
 
-    if (this.market.rates!.indexOf(interestRateID) == -1) {
-      this.market.rates!.push(interestRateID);
+    if (marketRates.indexOf(interestRateID) == -1) {
+      marketRates.push(interestRateID);
     }
+    this.market.rates = marketRates;
     this.market.save();
 
     return rate;
@@ -309,14 +311,17 @@ export class DataManager {
     fee.flatFee = flatFee;
     fee.save();
 
-    if (!this.protocol.fees) {
-      this.protocol.fees = [];
+    let protocolFees = this.protocol.fees;
+    if (!protocolFees) {
+      protocolFees = [];
     }
 
-    if (this.protocol.fees!.indexOf(feeType) == -1) {
-      this.protocol.fees!.push(feeType);
+    if (protocolFees.indexOf(feeType) == -1) {
+      protocolFees!.push(feeType);
     }
+    this.protocol.fees = protocolFees;
     this.protocol.save();
+
     return fee;
   }
 

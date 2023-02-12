@@ -12,7 +12,7 @@ import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { ActiveAccount, Vault as VaultStore } from "../../generated/schema";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
-  const account = getOrCreateAccount(from.toHexString());
+  getOrCreateAccount(from.toHexString());
 
   const protocol = getOrCreateYieldAggregator();
   const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block);
@@ -30,7 +30,7 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (
+  const dailyActiveAccountId = (
     block.timestamp.toI64() / constants.SECONDS_PER_DAY
   )
     .toString()
@@ -55,7 +55,7 @@ export function updateVaultSnapshots(
   vaultAddress: Address,
   block: ethereum.Block
 ): void {
-  let vault = VaultStore.load(vaultAddress.toHexString());
+  const vault = VaultStore.load(vaultAddress.toHexString());
   if (!vault) return;
 
   const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
@@ -79,8 +79,10 @@ export function updateVaultSnapshots(
   vaultDailySnapshots.outputTokenPriceUSD = vault.outputTokenPriceUSD;
   vaultHourlySnapshots.outputTokenPriceUSD = vault.outputTokenPriceUSD;
 
-  vaultDailySnapshots.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
-  vaultHourlySnapshots.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  vaultDailySnapshots.rewardTokenEmissionsAmount =
+    vault.rewardTokenEmissionsAmount;
+  vaultHourlySnapshots.rewardTokenEmissionsAmount =
+    vault.rewardTokenEmissionsAmount;
 
   vaultDailySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
   vaultHourlySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
@@ -88,14 +90,20 @@ export function updateVaultSnapshots(
   vaultDailySnapshots.pricePerShare = vault.pricePerShare;
   vaultHourlySnapshots.pricePerShare = vault.pricePerShare;
 
-  vaultDailySnapshots.cumulativeProtocolSideRevenueUSD = vault.cumulativeProtocolSideRevenueUSD;
-  vaultHourlySnapshots.cumulativeProtocolSideRevenueUSD = vault.cumulativeProtocolSideRevenueUSD;
+  vaultDailySnapshots.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD;
+  vaultHourlySnapshots.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD;
 
-  vaultDailySnapshots.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD;
-  vaultHourlySnapshots.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD;
+  vaultDailySnapshots.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD;
+  vaultHourlySnapshots.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD;
 
-  vaultDailySnapshots.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
-  vaultHourlySnapshots.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
+  vaultDailySnapshots.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD;
+  vaultHourlySnapshots.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD;
 
   vaultDailySnapshots.blockNumber = block.number;
   vaultHourlySnapshots.blockNumber = block.number;

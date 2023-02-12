@@ -1,3 +1,6 @@
 {
-  "network": "optimism"
+  "network": "optimism",
+  "graftEnabled": false,
+  "subgraphId": "QmerxiKCAwrmTtP8CeuaKXdNu5uSrfG3vikeJfG1YtAm86",
+  "graftStartBlock": 7682723
 }
