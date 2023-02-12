@@ -2,7 +2,7 @@
   "network": "mainnet",
   "factoryAddress": "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B",
   "startBlock": "7710671",
-  "graftEnabled": false,
-  "subgraphId": "QmRfsjMrwCgvuFfKsgUMgB5zZXCd1EaQbYExRZYs9uSvaQ",
-  "graftStartBlock": 11068799
+  "graftEnabled": true,
+  "subgraphId": "QmZNu4iHCG3y8cdbGpDKusjZN4F9oAJtC3intqRuezEqiU",
+  "graftStartBlock": 16594510
 }

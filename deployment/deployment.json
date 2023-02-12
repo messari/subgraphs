@@ -1318,7 +1318,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.7.8",
+          "subgraph": "1.8.0",
           "methodology": "1.0.0"
         },
         "files": {
