@@ -269,7 +269,11 @@ export function handleVatSlip(event: VatNoteEvent): void {
   }
   //let usr = bytes32ToAddressHexString(event.params.arg2);
   const wad = bytesToSignedBigInt(event.params.arg3);
-  const market: Market = getMarketFromIlk(ilk)!;
+  const market = getMarketFromIlk(ilk);
+  if (!market) {
+    log.warning("[handleVatSlip]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
+    return;
+  }
 
   const urn = bytes32ToAddressHexString(event.params.arg2);
   logTokenInOut(ilk, market, wad, event, "slip", urn);
