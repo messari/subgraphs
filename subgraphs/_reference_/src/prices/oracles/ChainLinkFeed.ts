@@ -6,10 +6,10 @@ import { ChainLinkContract } from "../../../generated/UniswapV2Factory/ChainLink
 
 export function getChainLinkContract(
   contract: OracleContract,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): ChainLinkContract | null {
   if (
-    contract.startBlock.gt(block.number) ||
+    (block && contract.startBlock.gt(block.number)) ||
     utils.isNullAddress(contract.address)
   )
     return null;
@@ -19,7 +19,7 @@ export function getChainLinkContract(
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const config = utils.getConfig();
   if (!config) return new CustomPriceType();
