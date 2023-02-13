@@ -6,7 +6,7 @@ import { CalculationsCurve as CalculationsCurveContract } from "../../../generat
 
 export function getCalculationsCurveContract(
   contract: OracleContract,
-  block?: ethereum.Block
+  block: ethereum.Block | null = null
 ): CalculationsCurveContract | null {
   if (
     (block && contract.startBlock.gt(block.number)) ||
@@ -19,7 +19,7 @@ export function getCalculationsCurveContract(
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,
-  block?: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const config = utils.getConfig();
 

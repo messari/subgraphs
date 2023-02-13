@@ -6,7 +6,7 @@ import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../gen
 
 export function getSushiSwapContract(
   contract: OracleContract,
-  block?: ethereum.Block
+  block: ethereum.Block | null = null
 ): CalculationsSushiContract | null {
   if (
     (block && contract.startBlock.gt(block.number)) ||
@@ -19,7 +19,7 @@ export function getSushiSwapContract(
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,
-  block?: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const config = utils.getConfig();
 
