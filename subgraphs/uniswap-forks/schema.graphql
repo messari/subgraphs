@@ -232,8 +232,20 @@ type DexAmmProtocol implements Protocol @entity {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  # " Number of cumulative liquidity providers "
+  # cumulativeUniqueLPs: Int!
+
+  # " Number of cumulative traders "
+  # cumulativeUniqueTraders: Int!
+
   " Total number of pools "
   totalPoolCount: Int!
+
+  # " Total number of open positions "
+  # openPositionCount: Int!
+
+  # " Total number of positions (open and closed) "
+  # cumulativePositionCount: Int!
 
   ##### Snapshots #####
 
@@ -274,12 +286,6 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
   dailyTransactionCount: Int!
 
-  " Total number of withdrawals (remove liquidity) in a day "
-  dailyWithdrawCount: Int!
-
-  " Total number of trades (swaps) in a day "
-  dailySwapCount: Int!
-
   " Total number of pools "
   totalPoolCount: Int!
 
@@ -299,7 +305,6 @@ type UsageMetricsDailySnapshot @entity {
 
   " Statistics around withdraw events "
   withdrawStats: Stat!
-
 }
 
 type UsageMetricsHourlySnapshot @entity {
@@ -318,6 +323,9 @@ type UsageMetricsHourlySnapshot @entity {
   " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
   hourlyTransactionCount: Int!
 
+  " Total number of deposits (add liquidity) in an hour "
+  hourlyDepositCount: Int!
+
   " Total number of withdrawals (remove liquidity) in an hour "
   hourlyWithdrawCount: Int!
 
@@ -329,18 +337,6 @@ type UsageMetricsHourlySnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
-
-  #### Statistics #####
-
-  " Statistics around swap events "
-  swapStats: Stat!
-
-  " Statistics around deposit events "
-  depositStats: Stat!
-
-  " Statistics around withdraw events "
-  withdrawStats: Stat!
-
 }
 
 
@@ -436,6 +432,7 @@ type LiquidityPool @entity {
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
 
+
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 
@@ -474,6 +471,9 @@ type LiquidityPool @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
+  " Total USD value of the pools component tokens. Order should be the same as teh pools `inputTokens` field. "
+  inputTokenBalancesUSD: [BigDecimal!]!
+
   " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
 
@@ -491,6 +491,20 @@ type LiquidityPool @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  ##### Account/Position Data #####
+
+  " All positions in this market "
+  positions: [Position!]! @derivedFrom(field: "pool")
+
+  " Number of positions in this market "
+  positionCount: Int!
+
+  " Number of open positions in this market "
+  openPositionCount: Int!
+
+  " Number of closed positions in this market "
+  closedPositionCount: Int!
 
   ##### Snapshots #####
 
@@ -587,6 +601,17 @@ type LiquidityPoolDailySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  #### Statistics #####
+
+  # " Statistics around swap events "
+  # swapStats: Stat!
+
+  # " Statistics around deposit events "
+  # depositStats: Stat!
+
+  # " Statistics around withdraw events "
+  # withdrawStats: Stat!
 }
 
 type LiquidityPoolHourlySnapshot @entity {
@@ -746,8 +771,8 @@ type Position @entity {
   " Number of withdrawals related to this position "
   withdrawCount: Int!
 
-  # " All withdraw events of this position "
-  # withdraws: [Withdraw!]! @derivedFrom(field: "position")
+  " All withdraw events of this position "
+  withdraws: [Withdraw!]! @derivedFrom(field: "position")
 
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
@@ -791,7 +816,19 @@ type PositionSnapshot @entity {
   timestamp: BigInt!
 }
 
-type Deposit @entity(immutable: true) {
+##################################
+##### Event-Level Data ###########
+##################################
+
+"""
+An event is any user action that occurs in a protocol. Generally, they are Ethereum events
+emitted by a function in the smart contracts, stored in transaction receipts as event logs.
+However, some user actions of interest are function calls that don't emit events. For example,
+the deposit and withdraw functions in Yearn do not emit any events. In our subgraphs, we still
+store them as events, although they are not technically Ethereum events emitted by smart
+contracts.
+"""
+type Deposit @entity {
   " deposit-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -844,7 +881,7 @@ type Deposit @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Withdraw @entity(immutable: true) {
+type Withdraw @entity {
   " withdraw-{ Transaction hash }-{ Log index }"
   id: ID!
 
@@ -897,21 +934,36 @@ type Withdraw @entity(immutable: true) {
   amountUSD: BigDecimal!
 }
 
-type Swap @entity(immutable: true) {
+type Swap @entity {
   " swap-{ Transaction hash }-{ Log index } "
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
   hash: String!
 
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
+  " Gas limit of the transaction that emitted this event "
+  gasLimit: BigInt!
+
+  " Gas price of the transaction that emitted this event "
+  gasPrice: BigInt!
 
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
   " Account that emitted this event "
   account: Account!
+
+  # " The user position changed by this event "
+  # position: Position!
+
+  " The pool involving this event "
+  pool: LiquidityPool!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -936,9 +988,6 @@ type Swap @entity(immutable: true) {
 
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
-
-  " The pool involving this transaction "
-  pool: LiquidityPool!
 }
 
 # An account is a unique Ethereum address

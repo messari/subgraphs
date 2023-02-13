@@ -82,6 +82,8 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     position.outputTokenBalance = BIGINT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.save(); 
+    pool.positionCount += 1;
+    pool.openPositionCount += 1; 
     account.openPositionCount += 1;
     account.positionCount += 1;
     account.save();
@@ -205,12 +207,9 @@ export function getOrCreateUsageMetricDailySnapshot(
     let withdrawStat =  createStat(withdrawStatId);
     usageMetrics.withdrawStats = withdrawStat.id;
 
-    usageMetrics.dailyWithdrawCount = INT_ZERO;
-
     const swapStatId = protocol.id.concat("-swap-").concat(dayId);
     let swapStat = createStat(swapStatId);
     usageMetrics.swapStats = swapStat.id
-    usageMetrics.dailySwapCount = INT_ZERO;
 
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
@@ -240,20 +239,12 @@ export function getOrCreateUsageMetricHourlySnapshot(
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
 
-    const depositStatId = protocol.id.concat("-deposit-").concat(hourId);
-    let depositStat =  createStat(depositStatId);
-    usageMetrics.depositStats = depositStat.id;
-
-    const withdrawStatId = protocol.id.concat("-withdraw-").concat(hourId);
-    let withdrawStat =  createStat(withdrawStatId);
-    usageMetrics.withdrawStats = withdrawStat.id;
+    usageMetrics.hourlyDepositCount = INT_ZERO;
+    usageMetrics.hourlyWithdrawCount = INT_ZERO;
 
     usageMetrics.hourlyTransactionCount = INT_ZERO;
     usageMetrics.hourlyWithdrawCount = INT_ZERO;
 
-    const swapStatId = protocol.id.concat("-swap-").concat(hourId);
-    let swapStat = createStat(swapStatId);
-    usageMetrics.swapStats = swapStat.id
     usageMetrics.hourlySwapCount = INT_ZERO;
 
     usageMetrics.blockNumber = event.block.number;

@@ -151,6 +151,12 @@ export function createLiquidityPool(
   protocol.totalPoolCount += 1;
   protocol.save();
 
+  pool.positionCount = INT_ZERO;
+  pool.openPositionCount = INT_ZERO;
+  pool.closedPositionCount = INT_ZERO;
+
+  pool.inputTokenBalancesUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO]
+
   // Create and track the newly created pool contract based on the template specified in the subgraph.yaml file.
   PairTemplate.create(Address.fromString(poolAddress));
 
@@ -244,7 +250,7 @@ export function createDeposit(
   }
   outputTokenBalance = outputTokenBalance.plus(transfer.liquidity!);
   position.outputTokenBalance = outputTokenBalance;
-  
+
   position.save();
   deposit.position = position.id;
   deposit.save();
@@ -366,6 +372,14 @@ export function createWithdraw(
     account.save();
     account.positionCount = account.openPositionCount + account.closedPositionCount;
     account.save();
+
+    pool.closedPositionCount += 1;
+    if(pool.openPositionCount > 0) {
+      pool.openPositionCount =+ 1;
+    }
+    pool.positionCount = pool.openPositionCount + pool.closedPositionCount; 
+    pool.save() 
+
     let counter = _PositionCounter.load(account.id.concat("-").concat(pool.id));
     counter!.nextCount += 1;
     counter!.save();
@@ -437,7 +451,10 @@ export function createSwapHandleVolumeAndFees(
 
   // update swap event
   swap.hash = transactionHash;
+  swap.nonce = event.transaction.nonce;
   swap.logIndex = logIndexI32;
+  swap.gasLimit = event.transaction.gasLimit;
+  swap.gasPrice = event.transaction.gasPrice;
   swap.protocol = protocol.id;
   swap.account = getOrCreateAccount(event).id;
   swap.blockNumber = event.block.number;
