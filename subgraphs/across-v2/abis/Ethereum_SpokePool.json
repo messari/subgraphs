@@ -1,0 +1,792 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_hubPool", "type": "address" },
+      { "internalType": "address", "name": "_wethAddress", "type": "address" },
+      { "internalType": "address", "name": "timerAddress", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "rootBundleId",
+        "type": "uint256"
+      }
+    ],
+    "name": "EmergencyDeleteRootBundle",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "originToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "destinationChainId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "EnabledDepositRoute",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountToReturn",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "chainId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "refundAmounts",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "rootBundleId",
+        "type": "uint32"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "leafId",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "l2TokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "refundAddresses",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      }
+    ],
+    "name": "ExecutedRelayerRefundRoot",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalFilledAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "fillAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "repaymentChainId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "originChainId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "destinationChainId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "relayerFeePct",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "appliedRelayerFeePct",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "realizedLpFeePct",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "depositId",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "destinationToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "relayer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "depositor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isSlowRelay",
+        "type": "bool"
+      }
+    ],
+    "name": "FilledRelay",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "originChainId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "destinationChainId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "relayerFeePct",
+        "type": "uint64"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "depositId",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "quoteTimestamp",
+        "type": "uint32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "originToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "depositor",
+        "type": "address"
+      }
+    ],
+    "name": "FundsDeposited",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "rootBundleId",
+        "type": "uint32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "relayerRefundRoot",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "slowRelayRoot",
+        "type": "bytes32"
+      }
+    ],
+    "name": "RelayedRootBundle",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "newRelayerFeePct",
+        "type": "uint64"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "depositId",
+        "type": "uint32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "depositor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "depositorSignature",
+        "type": "bytes"
+      }
+    ],
+    "name": "RequestedSpeedUpDeposit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newBuffer",
+        "type": "uint32"
+      }
+    ],
+    "name": "SetDepositQuoteTimeBuffer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newHubPool",
+        "type": "address"
+      }
+    ],
+    "name": "SetHubPool",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "SetXDomainAdmin",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountToReturn",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "chainId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint32",
+        "name": "leafId",
+        "type": "uint32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "l2TokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      }
+    ],
+    "name": "TokensBridged",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "chainId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "crossDomainAdmin",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "recipient", "type": "address" },
+      { "internalType": "address", "name": "originToken", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "destinationChainId",
+        "type": "uint256"
+      },
+      { "internalType": "uint64", "name": "relayerFeePct", "type": "uint64" },
+      { "internalType": "uint32", "name": "quoteTimestamp", "type": "uint32" }
+    ],
+    "name": "deposit",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "depositQuoteTimeBuffer",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "rootBundleId", "type": "uint256" }
+    ],
+    "name": "emergencyDeleteRootBundle",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "enabledDepositRoutes",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint32", "name": "rootBundleId", "type": "uint32" },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "amountToReturn",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "chainId", "type": "uint256" },
+          {
+            "internalType": "uint256[]",
+            "name": "refundAmounts",
+            "type": "uint256[]"
+          },
+          { "internalType": "uint32", "name": "leafId", "type": "uint32" },
+          {
+            "internalType": "address",
+            "name": "l2TokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address[]",
+            "name": "refundAddresses",
+            "type": "address[]"
+          }
+        ],
+        "internalType": "struct SpokePoolInterface.RelayerRefundLeaf",
+        "name": "relayerRefundLeaf",
+        "type": "tuple"
+      },
+      { "internalType": "bytes32[]", "name": "proof", "type": "bytes32[]" }
+    ],
+    "name": "executeRelayerRefundLeaf",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "depositor", "type": "address" },
+      { "internalType": "address", "name": "recipient", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "destinationToken",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      { "internalType": "uint256", "name": "originChainId", "type": "uint256" },
+      {
+        "internalType": "uint64",
+        "name": "realizedLpFeePct",
+        "type": "uint64"
+      },
+      { "internalType": "uint64", "name": "relayerFeePct", "type": "uint64" },
+      { "internalType": "uint32", "name": "depositId", "type": "uint32" },
+      { "internalType": "uint32", "name": "rootBundleId", "type": "uint32" },
+      { "internalType": "bytes32[]", "name": "proof", "type": "bytes32[]" }
+    ],
+    "name": "executeSlowRelayLeaf",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "depositor", "type": "address" },
+      { "internalType": "address", "name": "recipient", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "destinationToken",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "maxTokensToSend",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "repaymentChainId",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "originChainId", "type": "uint256" },
+      {
+        "internalType": "uint64",
+        "name": "realizedLpFeePct",
+        "type": "uint64"
+      },
+      { "internalType": "uint64", "name": "relayerFeePct", "type": "uint64" },
+      { "internalType": "uint32", "name": "depositId", "type": "uint32" }
+    ],
+    "name": "fillRelay",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "depositor", "type": "address" },
+      { "internalType": "address", "name": "recipient", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "destinationToken",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "maxTokensToSend",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "repaymentChainId",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "originChainId", "type": "uint256" },
+      {
+        "internalType": "uint64",
+        "name": "realizedLpFeePct",
+        "type": "uint64"
+      },
+      { "internalType": "uint64", "name": "relayerFeePct", "type": "uint64" },
+      {
+        "internalType": "uint64",
+        "name": "newRelayerFeePct",
+        "type": "uint64"
+      },
+      { "internalType": "uint32", "name": "depositId", "type": "uint32" },
+      { "internalType": "bytes", "name": "depositorSignature", "type": "bytes" }
+    ],
+    "name": "fillRelayWithUpdatedFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCurrentTime",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "hubPool",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes[]", "name": "data", "type": "bytes[]" }
+    ],
+    "name": "multicall",
+    "outputs": [
+      { "internalType": "bytes[]", "name": "results", "type": "bytes[]" }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "numberOfDeposits",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "relayFills",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "relayerRefundRoot",
+        "type": "bytes32"
+      },
+      { "internalType": "bytes32", "name": "slowRelayRoot", "type": "bytes32" }
+    ],
+    "name": "relayRootBundle",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "rootBundles",
+    "outputs": [
+      { "internalType": "bytes32", "name": "slowRelayRoot", "type": "bytes32" },
+      {
+        "internalType": "bytes32",
+        "name": "relayerRefundRoot",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newCrossDomainAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "setCrossDomainAdmin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "time", "type": "uint256" }
+    ],
+    "name": "setCurrentTime",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "newDepositQuoteTimeBuffer",
+        "type": "uint32"
+      }
+    ],
+    "name": "setDepositQuoteTimeBuffer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "originToken", "type": "address" },
+      {
+        "internalType": "uint256",
+        "name": "destinationChainId",
+        "type": "uint256"
+      },
+      { "internalType": "bool", "name": "enabled", "type": "bool" }
+    ],
+    "name": "setEnableRoute",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newHubPool", "type": "address" }
+    ],
+    "name": "setHubPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "depositor", "type": "address" },
+      {
+        "internalType": "uint64",
+        "name": "newRelayerFeePct",
+        "type": "uint64"
+      },
+      { "internalType": "uint32", "name": "depositId", "type": "uint32" },
+      { "internalType": "bytes", "name": "depositorSignature", "type": "bytes" }
+    ],
+    "name": "speedUpDeposit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "timerAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "wrappedNativeToken",
+    "outputs": [
+      { "internalType": "contract WETH9", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  { "stateMutability": "payable", "type": "receive" }
+]

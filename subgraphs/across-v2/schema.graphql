@@ -1,0 +1,6 @@
+type ExampleEntity @entity {
+  id: ID!
+  count: BigInt!
+  newBondToken: Bytes! # address
+  newBondAmount: BigInt! # uint256
+}

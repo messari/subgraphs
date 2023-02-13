@@ -1,0 +1,74 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "message",
+        "type": "bytes"
+      }
+    ],
+    "name": "MessageRelayed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "l1Token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "l2Token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      }
+    ],
+    "name": "TokensRelayed",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "target", "type": "address" },
+      { "internalType": "bytes", "name": "message", "type": "bytes" }
+    ],
+    "name": "relayMessage",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "l1Token", "type": "address" },
+      { "internalType": "address", "name": "l2Token", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      { "internalType": "address", "name": "to", "type": "address" }
+    ],
+    "name": "relayTokens",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+]
