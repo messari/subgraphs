@@ -8,26 +8,33 @@ import {
 import { chainIDToNetwork } from "./chainIds";
 import { Bridge } from "./protocol";
 import { RewardTokenType } from "../../util/constants";
-import { NetworkConfigs } from "../../../../configurations/configure";
 
 export interface TokenInitializer {
   getTokenParams(address: Address): TokenParams;
+}
+
+export interface TokenPresaver {
+  preSaveToken(token: Token): Token;
 }
 
 export class TokenParams {
   name: string;
   symbol: string;
   decimals: i32;
-  underlying: Address;
 }
 
 export class TokenManager {
   protocol: Bridge;
   initializer: TokenInitializer;
+  presaver: TokenPresaver | null;
 
   constructor(protocol: Bridge, init: TokenInitializer) {
     this.protocol = protocol;
     this.initializer = init;
+  }
+
+  setTokenPresaver(presaver: TokenPresaver): void {
+    this.presaver = presaver;
   }
 
   getOrCreateToken(address: Address): Token {
@@ -36,17 +43,14 @@ export class TokenManager {
       return token;
     }
 
+    const params = this.initializer.getTokenParams(address);
     token = new Token(address);
-    if (address == Address.fromString(NetworkConfigs.getRewardToken())) {
-      token.name = "StargateToken";
-      token.symbol = "STG";
-      token.decimals = 18;
-    } else {
-      const params = this.initializer.getTokenParams(address);
-      token.name = params.name;
-      token.symbol = params.symbol;
-      token.decimals = params.decimals;
-      token._underlying = params.underlying;
+    token.name = params.name;
+    token.symbol = params.symbol;
+    token.decimals = params.decimals;
+
+    if (this.presaver) {
+      token = this.presaver!.preSaveToken(token);
     }
     token.save();
     return token;

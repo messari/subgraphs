@@ -6545,8 +6545,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "schema": "1.2.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6567,8 +6567,8 @@
         "network": "avalanche",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "schema": "1.2.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6589,8 +6589,8 @@
         "network": "bsc",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "schema": "1.2.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6611,8 +6611,8 @@
         "network": "arbitrum",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "schema": "1.2.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6633,8 +6633,8 @@
         "network": "polygon",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "schema": "1.2.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6655,8 +6655,8 @@
         "network": "optimism",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "schema": "1.2.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6677,8 +6677,8 @@
         "network": "fantom",
         "status": "prod",
         "versions": {
-          "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "schema": "1.2.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {

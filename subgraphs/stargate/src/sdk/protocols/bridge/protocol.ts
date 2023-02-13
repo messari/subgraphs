@@ -15,7 +15,8 @@ import {
   BigInt,
 } from "@graphprotocol/graph-ts";
 import { chainIDToNetwork, networkToChainID } from "./chainIds";
-import { CustomEventType, SDK } from ".";
+import { SDK } from ".";
+import { CustomEventType } from "../../util/events";
 
 /**
  * Bridge is a wrapper around the BridgeProtocolSchema entity that takes care of
@@ -48,7 +49,7 @@ export class Bridge {
    *
    * @param conf {BridgeConfigurer} An object that implements the BridgeConfigurer interface, to set some of the protocol's properties
    * @param pricer {TokenPricer} An object that implements the TokenPricer interface, to allow the wrapper to access pricing data
-   * @param block {ethereum.Block} The block being handled at a time.
+   * @param event {CustomEventType} The event being handled at a time.
    * @returns Bridge
    */
   static load(
@@ -67,10 +68,12 @@ export class Bridge {
     protocol = new BridgeProtocolSchema(id);
     protocol.name = conf.getName();
     protocol.slug = conf.getSlug();
-    protocol.network = dataSource.network().toUpperCase();
+    protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = constants.ProtocolType.BRIDGE;
     protocol.permissionType = conf.getPermissionType();
     protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    protocol.totalValueExportedUSD = constants.BIGDECIMAL_ZERO;
+    protocol.totalValueImportedUSD = constants.BIGDECIMAL_ZERO;
     protocol.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -145,7 +148,7 @@ export class Bridge {
 
   /**
    *
-   * @returns {ethereum.Block} the block currently being handled.
+   * @returns {CustomEventType} the event currently being handled.
    */
   getCurrentEvent(): CustomEventType {
     return this.event;
@@ -190,6 +193,28 @@ export class Bridge {
   addTotalValueLocked(tvl: BigDecimal): void {
     this.protocol.totalValueLockedUSD =
       this.protocol.totalValueLockedUSD.plus(tvl);
+    this.save();
+  }
+
+  addTotalValueExportedUSD(tve: BigDecimal): void {
+    this.protocol.totalValueExportedUSD =
+      this.protocol.totalValueExportedUSD.plus(tve);
+    this.save();
+  }
+
+  setTotalValueExportedUSD(tve: BigDecimal): void {
+    this.protocol.totalValueExportedUSD = tve;
+    this.save();
+  }
+
+  addTotalValueImportedUSD(tvi: BigDecimal): void {
+    this.protocol.totalValueImportedUSD =
+      this.protocol.totalValueImportedUSD.plus(tvi);
+    this.save();
+  }
+
+  setTotalValueImportedUSD(tvi: BigDecimal): void {
+    this.protocol.totalValueImportedUSD = tvi;
     this.save();
   }
 

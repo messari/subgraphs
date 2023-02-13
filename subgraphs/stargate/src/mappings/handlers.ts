@@ -16,7 +16,11 @@ import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
 import { SDK } from "../sdk/protocols/bridge";
 import { TokenPricer } from "../sdk/protocols/config";
-import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
+import {
+  TokenInitializer,
+  TokenParams,
+  TokenPresaver,
+} from "../sdk/protocols/bridge/tokens";
 import {
   BridgePermissionType,
   BridgePoolType,
@@ -76,20 +80,41 @@ class Pricer implements TokenPricer {
   }
 }
 
-class TokenInit implements TokenInitializer {
+class TokenInit implements TokenInitializer, TokenPresaver {
   getTokenParams(address: Address): TokenParams {
+    if (this.isSTGToken(address)) {
+      return {
+        name: "StargateToken",
+        symbol: "STG",
+        decimals: 18,
+      };
+    }
+
     const wrappedERC20 = Pool.bind(address);
     const name = wrappedERC20.name();
     const symbol = wrappedERC20.symbol();
     const decimals = wrappedERC20.decimals().toI32();
-    const underlying = wrappedERC20.token();
 
     return {
       name,
       symbol,
       decimals,
-      underlying,
     };
+  }
+
+  preSaveToken(token: Token): Token {
+    if (this.isSTGToken(Address.fromBytes(token.id))) {
+      return token;
+    }
+
+    const wrappedERC20 = Pool.bind(Address.fromBytes(token.id));
+    const underlying = wrappedERC20.token();
+    token._underlying = underlying;
+    return token;
+  }
+
+  isSTGToken(address: Address): boolean {
+    return address == Address.fromString(NetworkConfigs.getRewardToken());
   }
 }
 
@@ -98,7 +123,8 @@ export function handleCreatePool(call: CreatePoolCall): void {
   const poolName = call.inputs._name;
   const poolSymbol = call.inputs._symbol;
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), call);
+  const sdk = SDK.initializeFromCall(conf, new Pricer(), new TokenInit(), call);
+  sdk.Tokens.setTokenPresaver(new TokenInit());
 
   const token = sdk.Tokens.getOrCreateToken(poolAddr);
   const pool = sdk.Pools.loadPool<string>(poolAddr);
@@ -123,7 +149,8 @@ export function handleAddLiquidity(call: AddLiquidityCall): void {
   const poolAddr = getPoolCall.value;
   const amount = amountLDtoSD(poolAddr, call.inputs._amountLD);
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), call);
+  const sdk = SDK.initializeFromCall(conf, new Pricer(), new TokenInit(), call);
+  sdk.Tokens.setTokenPresaver(new TokenInit());
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
 
@@ -135,7 +162,13 @@ export function handleRedeemLocal(event: RedeemLocal): void {
   const poolAddr = dataSource.address();
   const amount = event.params.amountSD;
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  sdk.Tokens.setTokenPresaver(new TokenInit());
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
 
@@ -147,7 +180,13 @@ export function handleInstantRedeemLocal(event: InstantRedeemLocal): void {
   const poolAddr = dataSource.address();
   const amount = event.params.amountSD;
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  sdk.Tokens.setTokenPresaver(new TokenInit());
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
 
@@ -160,7 +199,13 @@ export function handleRedeemRemote(event: RedeemRemote): void {
   // event.params.amountSD is infact amountLD
   const amount = amountLDtoSD(poolAddr, event.params.amountSD);
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  sdk.Tokens.setTokenPresaver(new TokenInit());
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
 
@@ -172,7 +217,13 @@ export function handleRedeemLocalCallback(event: RedeemLocalCallback): void {
   const poolAddr = dataSource.address();
   const amount = event.params._amountToMintSD;
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  sdk.Tokens.setTokenPresaver(new TokenInit());
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
 
@@ -186,7 +237,13 @@ export function handleSwapOut(event: Swap): void {
   const crosschainID = BigInt.fromI32(event.params.chainId as i32);
   const crossPoolID = event.params.dstPoolId;
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  sdk.Tokens.setTokenPresaver(new TokenInit());
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
   const token = sdk.Tokens.getOrCreateToken(
@@ -245,7 +302,8 @@ export function handleSwapIn(call: SwapRemoteCall): void {
   const amount = amountLDtoSD(poolAddr, call.outputs.amountLD);
   const amountLPFee = call.inputs._s.lpFee;
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), call);
+  const sdk = SDK.initializeFromCall(conf, new Pricer(), new TokenInit(), call);
+  sdk.Tokens.setTokenPresaver(new TokenInit());
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
   const token = sdk.Tokens.getOrCreateToken(
@@ -300,7 +358,13 @@ export function handleStake(event: Deposit): void {
   const lpStakingContractAddr = dataSource.address();
   const poolID = event.params.pid;
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  sdk.Tokens.setTokenPresaver(new TokenInit());
 
   const rewardToken = sdk.Tokens.getOrCreateToken(
     Address.fromString(NetworkConfigs.getRewardToken())
@@ -379,7 +443,13 @@ export function handleUnstake(event: Withdraw): void {
     .times(allocPoint)
     .div(totalAllocPoint);
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+  sdk.Tokens.setTokenPresaver(new TokenInit());
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
   const rewardToken = sdk.Tokens.getOrCreateToken(
