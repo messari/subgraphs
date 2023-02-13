@@ -18,14 +18,14 @@ export function isCurveLpToken(
 
 export function getPoolFromLpToken(
   lpAddress: Address,
-  block: ethereum.Block | null = null
+  block: ethereum.Block
 ): Address {
   const config = utils.getConfig();
   const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
     const curveRegistry = curveRegistryAdresses[idx];
-    if (block && curveRegistry.startBlock.gt(block.number)) continue;
+    if (curveRegistry.startBlock.gt(block.number)) continue;
 
     const curveRegistryContract = CurveRegistryContract.bind(
       curveRegistry.address
@@ -44,7 +44,7 @@ export function getPoolFromLpToken(
 
 export function isLpCryptoPool(
   lpAddress: Address,
-  block: ethereum.Block | null = null
+  block: ethereum.Block
 ): bool {
   const poolAddress = getPoolFromLpToken(lpAddress, block);
 
@@ -71,7 +71,7 @@ export function isPoolCryptoPool(poolAddress: Address): bool {
 
 export function getCurvePriceUsdc(
   lpAddress: Address,
-  block: ethereum.Block | null = null
+  block: ethereum.Block
 ): CustomPriceType {
   if (isLpCryptoPool(lpAddress, block))
     return cryptoPoolLpPriceUsdc(lpAddress, block);
@@ -99,7 +99,7 @@ export function getCurvePriceUsdc(
 
 export function getBasePrice(
   lpAddress: Address,
-  block: ethereum.Block | null = null
+  block: ethereum.Block
 ): CustomPriceType {
   const poolAddress = getPoolFromLpToken(lpAddress, block);
 
@@ -114,14 +114,14 @@ export function getBasePrice(
 
 export function getUnderlyingCoinFromPool(
   poolAddress: Address,
-  block: ethereum.Block | null = null
+  block: ethereum.Block
 ): Address {
   const config = utils.getConfig();
   const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
     const curveRegistry = curveRegistryAdresses[idx];
-    if (block && curveRegistry.startBlock.gt(block.number)) continue;
+    if (curveRegistry.startBlock.gt(block.number)) continue;
 
     const curveRegistryContract = CurveRegistryContract.bind(
       curveRegistry.address
@@ -161,14 +161,14 @@ export function getPreferredCoinFromCoins(coins: Address[]): Address {
 
 export function getVirtualPrice(
   curveLpTokenAddress: Address,
-  block: ethereum.Block | null = null
+  block: ethereum.Block
 ): BigInt {
   const config = utils.getConfig();
   const curveRegistryAdresses = config.curveRegistry();
 
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
     const curveRegistry = curveRegistryAdresses[idx];
-    if (block && curveRegistry.startBlock.gt(block.number)) continue;
+    if (curveRegistry.startBlock.gt(block.number)) continue;
 
     const curveRegistryContract = CurveRegistryContract.bind(
       curveRegistry.address
@@ -187,14 +187,14 @@ export function getVirtualPrice(
 
 export function getPriceUsdcRecommended(
   tokenAddress: Address,
-  block: ethereum.Block | null = null
+  block: ethereum.Block
 ): CustomPriceType {
   return getUsdPricePerToken(tokenAddress, block);
 }
 
 export function cryptoPoolLpPriceUsdc(
   lpAddress: Address,
-  block: ethereum.Block | null = null
+  block: ethereum.Block
 ): CustomPriceType {
   const totalSupply = utils.getTokenSupply(lpAddress);
 
@@ -216,7 +216,7 @@ export function cryptoPoolLpPriceUsdc(
 
 export function cryptoPoolLpTotalValueUsdc(
   lpAddress: Address,
-  block: ethereum.Block | null = null
+  block: ethereum.Block
 ): BigDecimal {
   const poolAddress = getPoolFromLpToken(lpAddress, block);
 
@@ -246,7 +246,7 @@ export function cryptoPoolTokenAmountUsdc(
   poolAddress: Address,
   tokenAddress: Address,
   tokenIdx: BigInt,
-  block: ethereum.Block | null = null
+  block: ethereum.Block
 ): BigDecimal {
   const poolContract = CurvePoolContract.bind(poolAddress);
 
