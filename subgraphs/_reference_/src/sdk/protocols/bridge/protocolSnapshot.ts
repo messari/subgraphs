@@ -113,6 +113,8 @@ export class ProtocolSnapshot {
 
     // tvl
     snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+    snapshot.totalValueExportedUSD = protocol.totalValueExportedUSD;
+    snapshot.totalValueImportedUSD = protocol.totalValueImportedUSD;
     snapshot.protocolControlledValueUSD = protocol.protocolControlledValueUSD;
 
     // revenues
