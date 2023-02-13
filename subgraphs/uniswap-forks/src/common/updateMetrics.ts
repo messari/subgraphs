@@ -97,30 +97,20 @@ export function updateUsageMetrics(
 
   if (usageType == UsageType.DEPOSIT) {
 
-    usageMetricsHourly.depositStats = updateHourlyDepositUsageMetricsUSD(event);
+    usageMetricsHourly.hourlyDepositCount += 1;
     usageMetricsDaily.depositStats = updateDailyDepositUsageMetricsUSD(event);
   } else if (usageType == UsageType.WITHDRAW) {
-    usageMetricsDaily.dailyWithdrawCount += INT_ONE;
     usageMetricsDaily.withdrawStats = updateWithdrawUsageMetricsUSD(dayId, 
       protocol.id, 
       StatValueEntitySuffix.DAILY_WITHDRAW_USD_ID,
       event);
     usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
-    usageMetricsHourly.withdrawStats = updateWithdrawUsageMetricsUSD(hourId,
-      protocol.id,
-      StatValueEntitySuffix.HOURLY_WITHDRAW_USD_ID,
-      event);
   } else if (usageType == UsageType.SWAP) {
-    usageMetricsDaily.dailySwapCount += INT_ONE;
     usageMetricsHourly.hourlySwapCount += INT_ONE;
     usageMetricsDaily.swapStats = updateSwapUsageMetricsUSD(dayId, 
       protocol.id, 
       StatValueEntitySuffix.DAILY_SWAP_USD_ID,
       event);
-    usageMetricsHourly.swapStats = updateSwapUsageMetricsUSD(hourId, 
-      protocol.id, 
-      StatValueEntitySuffix.HOURLY_SWAP_USD_ID,
-      event)
   }
 
   // Combine the id and the user address to generate a unique user id for the day
@@ -173,13 +163,16 @@ function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
   const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
 
   const dayId = day.toString();
-  // If entity already exists the new one will 
-  // be merged with it: https://thegraph.com/docs/en/developing/assemblyscript-api/#updating-existing-entities
-  let depositValues = new _dailyDepositValesUSD(protocol.id
-    .concat(
-      DepositValueEntitySuffix.DAILY_DEPOSITS_USD_ID
-    ));
-
+  let depositValuesId = protocol.id
+  .concat(
+    DepositValueEntitySuffix.DAILY_DEPOSITS_USD_ID
+  );
+  let depositValues = _dailyDepositValesUSD.load(depositValuesId)
+  if(!depositValues){
+    depositValues = new _dailyDepositValesUSD(depositValuesId);
+    depositValues.depositsUSD = new Array<BigDecimal>(); 
+    depositValues.save(); 
+  }
   const statId = protocol.id.concat("-deposit-").concat(dayId);
   let stat = Stat.load(statId);
   if (!stat) {
@@ -213,54 +206,7 @@ function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
   return stat.id;
 }
 
-/**
- * Updates hourly deposit usage metrics stats for a given day
- * @param event 
- * @returns string the id of the stat entity for the given hour
- */
-function updateHourlyDepositUsageMetricsUSD(event: ethereum.Event): string {
 
-  const protocol = getOrCreateProtocol();
-
-  // Number of days since Unix epoch
-  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
-  const hourId = hour.toString();
-
-  let depositValues = new _hourlyDepositValesUSD(protocol.id
-    .concat(
-      DepositValueEntitySuffix.HOURLY_DEPOSITS_USD_ID
-    ));
-  const statId = protocol.id.concat("-deposit-").concat(hourId);
-  let stat = Stat.load(statId);
-  if (!stat) {
-    stat = createStat(statId);
-    depositValues.depositsUSD = [BIGDECIMAL_ZERO];
-    depositValues.save();
-  }
-  const transactionHash = event.transaction.hash.toHexString();
-  const deposit = Deposit.load(
-    transactionHash.concat("-").concat(event.logIndex.toString())
-  );
-
-  if (deposit && deposit.amountUSD) {
-    const amountUSD = deposit.amountUSD;
-    let deposits = [BIGDECIMAL_ZERO];
-    if (depositValues.depositsUSD) {
-      deposits = depositValues.depositsUSD!;
-    }
-    deposits.push(amountUSD);
-    depositValues.depositsUSD = deposits;
-    depositValues.save();
-    stat.meanUSD = BigDecimalArray.mean(deposits);
-    stat.medianUSD = BigDecimalArray.median(deposits);
-    stat.maxUSD = BigDecimalArray.maxValue(deposits);
-    stat.minUSD = BigDecimalArray.minValue(deposits);
-  }
-
-  stat.count = stat.count.plus(BIGINT_ONE);
-  stat.save();
-  return stat.id;
-}
 /*
  * Updates withdraw usage metrics stats for the day or hour
  * @param timeStampId
@@ -455,6 +401,15 @@ export function updateInputTokenBalances(
   poolAmounts.inputTokenBalances = [tokenDecimal0, tokenDecimal1];
   pool.inputTokenBalances = [reserve0, reserve1];
 
+  const nativeToken = updateNativeTokenPriceInUSD();
+
+  const token0PriceUSD = findUSDPricePerToken(token0, nativeToken, blockNumber);
+  const token1PriceUSD = findUSDPricePerToken(token1, nativeToken, blockNumber);
+
+  let token0BalanceUSD = token0PriceUSD.times(convertTokenToDecimal(reserve0, token0.decimals));
+  let token1BalanceUSD = token1PriceUSD.times(convertTokenToDecimal(reserve1, token1.decimals));
+
+  pool.inputTokenBalancesUSD = [token0BalanceUSD, token1BalanceUSD];
   poolAmounts.save();
   pool.save();
 }
