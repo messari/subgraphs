@@ -103,8 +103,6 @@ dataSources:
       eventHandlers:
         - event: BalancesUpdated(uint256,uint256,uint256,uint256,uint256)
           handler: handleBalancesUpdated
-        - event: BalancesSubmitted(indexed address,uint256,uint256,uint256,uint256,uint256)
-          handler: handleBalancesSubmitted
       file: ./src/mappings/rocketNetworkBalancesMapping.ts
 
   - kind: ethereum/contract

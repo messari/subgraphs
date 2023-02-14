@@ -27,75 +27,80 @@ import {
   updateProtocolAndPoolTvl,
 } from "../updaters/financialMetrics";
 import { bigIntToBigDecimal } from "../utils/numbers";
-import { BIGINT_SIXTEEN, BIGINT_THIRTYTWO } from "../utils/constants";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_SIXTEEN,
+  BIGINT_THIRTYTWO,
+  BIGINT_ZERO,
+} from "../utils/constants";
 
-export function handleBalancesSubmitted(event: BalancesUpdated): void {
-  let protocol = generalUtilities.getRocketPoolProtocolEntity();
-  if (!protocol) {
-    protocol = rocketPoolEntityFactory.createRocketPoolProtocol();
-  }
-  if (!protocol) return;
-  const rETHContract = rocketTokenRETH.bind(
-    Address.fromString(ROCKET_TOKEN_RETH_CONTRACT_ADDRESS)
-  );
-  const rocketDepositPoolContract = rocketDepositPool.bind(
-    Address.fromString(ROCKET_DEPOSIT_POOL_CONTRACT_ADDRESS)
-  );
-  const depositPoolExcessBalance = rocketDepositPoolContract.getExcessBalance();
+// export function handleBalancesSubmitted(event: BalancesUpdated): void {
+//   let protocol = generalUtilities.getRocketPoolProtocolEntity();
+//   if (!protocol) {
+//     protocol = rocketPoolEntityFactory.createRocketPoolProtocol();
+//   }
+//   if (!protocol) return;
+//   const rETHContract = rocketTokenRETH.bind(
+//     Address.fromString(ROCKET_TOKEN_RETH_CONTRACT_ADDRESS)
+//   );
+//   const rocketDepositPoolContract = rocketDepositPool.bind(
+//     Address.fromString(ROCKET_DEPOSIT_POOL_CONTRACT_ADDRESS)
+//   );
+//   const depositPoolExcessBalance = rocketDepositPoolContract.getExcessBalance();
 
-  const depositPoolBalance = rocketDepositPoolContract.getBalance();
-  const stakerETHInRocketETHContract = getRocketETHBalance(
-    depositPoolExcessBalance,
-    rETHContract.getTotalCollateral()
-  );
-  const rETHExchangeRate = rETHContract.getExchangeRate();
+//   const depositPoolBalance = rocketDepositPoolContract.getBalance();
+//   const stakerETHInRocketETHContract = getRocketETHBalance(
+//     depositPoolExcessBalance,
+//     rETHContract.getTotalCollateral()
+//   );
+//   const rETHExchangeRate = rETHContract.getExchangeRate();
 
-  const checkpoint =
-    rocketPoolEntityFactory.createNetworkStakerBalanceCheckpoint(
-      generalUtilities.extractIdForEntity(event),
-      protocol.lastNetworkStakerBalanceCheckPoint,
-      event,
-      depositPoolBalance,
-      stakerETHInRocketETHContract,
-      rETHExchangeRate
-    );
-  if (checkpoint === null) return;
+//   const checkpoint =
+//     rocketPoolEntityFactory.createNetworkStakerBalanceCheckpoint(
+//       generalUtilities.extractIdForEntity(event),
+//       protocol.lastNetworkStakerBalanceCheckPoint,
+//       event,
+//       depositPoolBalance,
+//       stakerETHInRocketETHContract,
+//       rETHExchangeRate
+//     );
+//   if (checkpoint === null) return;
 
-  const previousCheckpointId = protocol.lastNetworkStakerBalanceCheckPoint;
-  let previousTotalStakerETHRewards = BigInt.fromI32(0);
-  let previousTotalStakersWithETHRewards = BigInt.fromI32(0);
-  let previousRETHExchangeRate = BigInt.fromI32(1);
-  let previousCheckpoint: NetworkStakerBalanceCheckpoint | null = null;
-  if (previousCheckpointId) {
-    previousCheckpoint =
-      NetworkStakerBalanceCheckpoint.load(previousCheckpointId);
-    if (previousCheckpoint) {
-      previousTotalStakerETHRewards = previousCheckpoint.totalStakerETHRewards;
-      previousTotalStakersWithETHRewards =
-        previousCheckpoint.totalStakersWithETHRewards;
-      previousRETHExchangeRate = previousCheckpoint.rETHExchangeRate;
-      previousCheckpoint.nextCheckpointId = checkpoint.id;
-    }
-  }
-  const balanceCheckpoint = NetworkNodeBalanceCheckpoint.load(
-    protocol.lastNetworkNodeBalanceCheckPoint!
-  );
-  const averageFeeForActiveMinipools =
-    balanceCheckpoint!.averageFeeForActiveMinipools;
+//   const previousCheckpointId = protocol.lastNetworkStakerBalanceCheckPoint;
+//   let previousTotalStakerETHRewards = BigInt.fromI32(0);
+//   let previousTotalStakersWithETHRewards = BigInt.fromI32(0);
+//   let previousRETHExchangeRate = BigInt.fromI32(1);
+//   let previousCheckpoint: NetworkStakerBalanceCheckpoint | null = null;
+//   if (previousCheckpointId) {
+//     previousCheckpoint =
+//       NetworkStakerBalanceCheckpoint.load(previousCheckpointId);
+//     if (previousCheckpoint) {
+//       previousTotalStakerETHRewards = previousCheckpoint.totalStakerETHRewards;
+//       previousTotalStakersWithETHRewards =
+//         previousCheckpoint.totalStakersWithETHRewards;
+//       previousRETHExchangeRate = previousCheckpoint.rETHExchangeRate;
+//       previousCheckpoint.nextCheckpointId = checkpoint.id;
+//     }
+//   }
+//   const balanceCheckpoint = NetworkNodeBalanceCheckpoint.load(
+//     protocol.lastNetworkNodeBalanceCheckPoint!
+//   );
+//   const averageFeeForActiveMinipools =
+//     balanceCheckpoint!.averageFeeForActiveMinipools;
 
-  // Handle the staker impact.
-  generateStakerBalanceCheckpoints(
-    event.block,
-    protocol.activeStakers,
-    checkpoint,
-    previousCheckpoint !== null ? previousCheckpoint : null,
-    previousRETHExchangeRate,
-    event.block.number,
-    event.block.timestamp,
-    protocol,
-    averageFeeForActiveMinipools
-  );
-}
+//   // Handle the staker impact.
+//   generateStakerBalanceCheckpoints(
+//     event.block,
+//     protocol.activeStakers,
+//     checkpoint,
+//     previousCheckpoint !== null ? previousCheckpoint : null,
+//     previousRETHExchangeRate,
+//     event.block.number,
+//     event.block.timestamp,
+//     protocol,
+//     averageFeeForActiveMinipools
+//   );
+// }
 
 /**
  * When enough ODAO members votes on a balance and a consensus threshold is reached, the staker beacon chain state is persisted to the smart contracts.
@@ -157,40 +162,40 @@ export function handleBalancesUpdated(event: BalancesUpdated): void {
   if (checkpoint === null) return;
 
   // Retrieve previous checkpoint.
-  // const previousCheckpointId = protocol.lastNetworkStakerBalanceCheckPoint;
+  const previousCheckpointId = protocol.lastNetworkStakerBalanceCheckPoint;
   let previousTotalStakerETHRewards = BigInt.fromI32(0);
   let previousTotalStakersWithETHRewards = BigInt.fromI32(0);
-  // let previousRETHExchangeRate = BigInt.fromI32(1);
+  let previousRETHExchangeRate = BigInt.fromI32(1);
   let previousCheckpoint: NetworkStakerBalanceCheckpoint | null = null;
-  // if (previousCheckpointId) {
-  //   previousCheckpoint =
-  //     NetworkStakerBalanceCheckpoint.load(previousCheckpointId);
-  //   if (previousCheckpoint) {
-  //     previousTotalStakerETHRewards = previousCheckpoint.totalStakerETHRewards;
-  //     previousTotalStakersWithETHRewards =
-  //       previousCheckpoint.totalStakersWithETHRewards;
-  //     previousRETHExchangeRate = previousCheckpoint.rETHExchangeRate;
-  //     previousCheckpoint.nextCheckpointId = checkpoint.id;
-  //   }
-  // }
+  if (previousCheckpointId) {
+    previousCheckpoint =
+      NetworkStakerBalanceCheckpoint.load(previousCheckpointId);
+    if (previousCheckpoint) {
+      previousTotalStakerETHRewards = previousCheckpoint.totalStakerETHRewards;
+      previousTotalStakersWithETHRewards =
+        previousCheckpoint.totalStakersWithETHRewards;
+      previousRETHExchangeRate = previousCheckpoint.rETHExchangeRate;
+      previousCheckpoint.nextCheckpointId = checkpoint.id;
+    }
+  }
   const balanceCheckpoint = NetworkNodeBalanceCheckpoint.load(
     protocol.lastNetworkNodeBalanceCheckPoint!
   );
-  // const averageFeeForActiveMinipools =
-  //   balanceCheckpoint!.averageFeeForActiveMinipools;
+  const averageFeeForActiveMinipools =
+    balanceCheckpoint!.averageFeeForActiveMinipools;
 
   // Handle the staker impact.
-  // generateStakerBalanceCheckpoints(
-  //   event.block,
-  //   protocol.activeStakers,
-  //   checkpoint,
-  //   previousCheckpoint !== null ? previousCheckpoint : null,
-  //   previousRETHExchangeRate,
-  //   event.block.number,
-  //   event.block.timestamp,
-  //   protocol,
-  //   averageFeeForActiveMinipools
-  // );
+  generateStakerBalanceCheckpoints(
+    event.block,
+    protocol.activeStakers,
+    checkpoint,
+    previousCheckpoint !== null ? previousCheckpoint : null,
+    previousRETHExchangeRate,
+    event.block.number,
+    event.block.timestamp,
+    protocol,
+    averageFeeForActiveMinipools
+  );
 
   // If for some reason the running summary totals up to this checkpoint was 0, then we try to set it based on the previous checkpoint.
   if (checkpoint.totalStakerETHRewards == BigInt.fromI32(0)) {
@@ -281,6 +286,9 @@ function generateStakerBalanceCheckpoints(
     protocol
   );
 
+  let protocolRevenue = BIGDECIMAL_ZERO;
+  let ethRewards = BIGINT_ZERO;
+
   // Loop through all the staker id's in the protocol.
   for (let index = 0; index < activeStakerIds.length; index++) {
     // Determine current staker ID.
@@ -315,19 +323,14 @@ function generateStakerBalanceCheckpoints(
       networkCheckpoint,
       protocol
     );
-    updateTotalRevenueMetrics(
-      block,
-      ethRewardsSincePreviousCheckpoint,
-      networkCheckpoint.totalRETHSupply
+
+    protocolRevenue = protocolRevenue.plus(
+      bigIntToBigDecimal(ethRewardsSincePreviousCheckpoint).times(
+        bigIntToBigDecimal(averageFeeForActiveMinipools)
+      )
     );
 
-    const protocolRevenue = bigIntToBigDecimal(
-      ethRewardsSincePreviousCheckpoint
-    ).times(bigIntToBigDecimal(averageFeeForActiveMinipools));
-
-    updateProtocolSideRevenueMetrics(block, protocolRevenue);
-    updateSupplySideRevenueMetrics(block);
-    updateSnapshotsTvl(block);
+    ethRewards = ethRewards.plus(ethRewardsSincePreviousCheckpoint);
 
     // Create a new staker balance checkpoint
     const stakerBalanceCheckpoint =
@@ -348,6 +351,19 @@ function generateStakerBalanceCheckpoints(
     stakerBalanceCheckpoint.save();
     staker.save();
   }
+
+  // update all rev/snapshots at once
+  // this was moved outside of the loop to reduce the memory usage
+  // we were getting a "oneshot called" error
+  updateTotalRevenueMetrics(
+    block,
+    ethRewards,
+    networkCheckpoint.totalRETHSupply
+  );
+
+  updateProtocolSideRevenueMetrics(block, protocolRevenue);
+  updateSupplySideRevenueMetrics(block);
+  updateSnapshotsTvl(block);
 }
 
 /**
