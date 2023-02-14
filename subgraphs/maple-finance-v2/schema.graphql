@@ -2013,18 +2013,22 @@ type Flashloan implements Event @entity(immutable: true) {
   feeAmountUSD: BigDecimal
 }
 
-type _Loan @entity(immutable: true) {
+# Helper entity to keep track of Maple loans and their metadata
+type _Loan {
   " Smart contract address of the MapleLoan "
   id: Bytes!
 
   " The market this loan belongs to "
-  market: Market!
+  market: Market
 
   " The loan manager this loan belongs to "
-  loanManager: Bytes!
+  loanManager: Bytes
+
+  " The account that took out the loan "
+  borrower: Account
 
   " The interest rates hold for this loan. The last one is the current rate. "
-  rates: [InterestRate!]!
+  rates: [InterestRate!]
 
   " The transaction hash where the loan was created "
   transactionCreated: Bytes!

@@ -1,4 +1,10 @@
-import { Address, BigDecimal, Bytes, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  Bytes,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { InstanceDeployed } from "../../../generated/PoolManagerFactory/ContractFactory";
 import { Initialized } from "../../../generated/templates/MapleLoan/MapleLoan";
 import { MapleGlobals } from "../../../generated/templates/MapleLoan/MapleGlobals";
@@ -13,7 +19,9 @@ import {
 import {
   PoolManager,
   SetAsActive,
+  WithdrawalProcessed,
 } from "../../../generated/templates/PoolManager/PoolManager";
+import { PortionLiquidated } from "../../../generated/templates/Liquidator/Liquidator";
 import { Pool } from "../../../generated/templates/PoolManager/Pool";
 import {
   BIGDECIMAL_ZERO,
@@ -26,7 +34,7 @@ import {
 import { DataManager } from "../../../src/sdk/manager";
 import { TokenManager } from "../../../src/sdk/token";
 import { getProtocolData, MAPLE_GLOBALS } from "./constants";
-import { Token } from "../../../generated/schema";
+import { Token, _Loan } from "../../../generated/schema";
 
 /////////////////////
 //// Pool Events ////
@@ -142,6 +150,7 @@ export function handleSetAsActive(event: SetAsActive): void {
 // Create MapleLoan instance to watch loan contract
 export function handleLoanInstanceDeployed(event: InstanceDeployed): void {
   MapleLoanTemplate.create(event.params.instance_);
+  const loan = getOrCreateLoan(event.params.instance_, event);
 }
 
 //
@@ -157,6 +166,8 @@ export function handleWithdrawalInstanceDeployed(
 ): void {
   WithdrawalManagerTemplate.create(event.params.instance_);
 }
+
+export function handleWithdrawalProcessed(event: WithdrawalProcessed): void {}
 
 //////////////////////////////
 //// Loan Manager Events /////
@@ -202,6 +213,8 @@ export function handleLiquidatorInstanceDeployed(
   LiquidatorTemplate.create(event.params.instance_);
 }
 
+export function handlePortionLiquidated(event: PortionLiquidated): void {}
+
 /////////////////
 //// Helpers ////
 /////////////////
@@ -228,4 +241,15 @@ function getPriceUSD(asset: Address): BigDecimal {
   return tryPrice.value
     .toBigDecimal()
     .div(exponentToBigDecimal(token.decimals));
+}
+
+function getOrCreateLoan(loanId: Bytes, event: ethereum.Event): _Loan {
+  let loan = _Loan.load(loanId);
+  if (!loan) {
+    loan = new _Loan(loanId);
+    loan.rates = [];
+    loan.transactionCreated = event.transaction.hash;
+    loan.save();
+  }
+  return loan;
 }
