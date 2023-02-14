@@ -44,10 +44,11 @@ import {
   Network,
   TokenType,
 } from "./sdk/util/constants";
+import { Pool } from "./sdk/protocols/bridge/pool";
 
 // empty handler for prices library
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-export function handlePairCreated(event: ethereum.Event): void {}
+export function handlehandleSetFeeTo(call: ethereum.Call): void {}
 
 // Implement TokenPricer to pass it to the SDK constructor
 class Pricer implements TokenPricer {
@@ -145,6 +146,34 @@ function _getSDK(
   return new SDK(conf, new Pricer(), new TokenInit(), customEvent);
 }
 
+export function onCreatePool(
+  // eslint-disable-next-line no-unused-vars
+  event: CustomEventType,
+  pool: Pool,
+  // eslint-disable-next-line no-unused-vars
+  sdk: SDK,
+  aux1: BridgePoolType | null = null,
+  aux2: string | null = null
+): void {
+  if (aux1 && aux2) {
+    const token = sdk.Tokens.getOrCreateToken(Address.fromString(aux2));
+    pool.initialize(`Axelar Bridge: ${token.name}`, token.name, aux1, token);
+
+    // append pool id to protocol._liquidityPoolIDs
+    /*
+    const protocol = sdk.Protocol.protocol;
+    let poolIDs = protocol._liquidityPoolIDs;
+    if (!poolIDs) {
+      poolIDs = [pool.getBytesID()];
+    } else {
+      poolIDs.push(pool.getBytesID());
+    }
+    protocol._liquidityPoolIDs = poolIDs;
+    protocol.save();
+    */
+  }
+}
+
 export function handleDeployToken(call: DeployTokenCall): void {
   const decimals = bytesToUnsignedBigInt(
     Bytes.fromUint8Array(call.inputs.params.subarray(64, 96))
@@ -166,7 +195,7 @@ export function handleDeployToken(call: DeployTokenCall): void {
   ).toString();
 
   log.info(
-    "[handleMintToken]decode call.inputs.params {}: name={}, symbol={}, decimals={}, cap={}, tokenAddress={}, mintLimit={}",
+    "[handleDeployToken]decode call.inputs.params {}: name={}, symbol={}, decimals={}, cap={}, tokenAddress={}, mintLimit={}",
     [
       call.inputs.params.toHexString(),
       name,
@@ -186,18 +215,23 @@ export function handleDeployToken(call: DeployTokenCall): void {
 
     //TokenType.InternalBurnable is never assigned
   }
-
+  // tokenAddress will be computed by deployToken()
   getOrCreateTokenSymbol(symbol, null, tokenType);
 }
 
 export function handleTokenDeployed(event: TokenDeployed): void {
   const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
-  // it may be possible to calculate tokenAddress, but the logic is complicated
+  // it may be possible to calculate tokenAddress, but the logic is complicated;
   // get it from the TokenDeployed event
   tokenSymbol.tokenAddress = event.params.tokenAddresses.toHexString();
   tokenSymbol.save();
 
-  ERC20Template.create(event.params.tokenAddresses);
+  log.info("[handleTokenDeployed]symbol={} tokenAddress={}", [
+    tokenSymbol.id,
+    tokenSymbol.tokenAddress!,
+  ]);
+
+  //ERC20Template.create(event.params.tokenAddresses);
 }
 
 export function handleTokenSent(event: TokenSent): void {
@@ -205,7 +239,9 @@ export function handleTokenSent(event: TokenSent): void {
   const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
   const tokenAddress = tokenSymbol.tokenAddress!;
   const poolId = event.address.concat(Address.fromString(tokenAddress));
-  const dstChainId = BigInt.fromString(event.params.destinationChain);
+  const dstChainId = networkToChainID(
+    event.params.destinationChain.toUpperCase()
+  );
   const dstNetworkConstants = getNetworkSpecificConstant(dstChainId);
   const dstPoolId = dstNetworkConstants.getPoolAddress();
   _handleTransferOut(
@@ -229,7 +265,9 @@ export function handleContractCallWithToken(
   const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
   const tokenAddress = tokenSymbol.tokenAddress!;
   const poolId = event.address.concat(Address.fromString(tokenAddress));
-  const dstChainId = BigInt.fromString(event.params.destinationChain);
+  const dstChainId = networkToChainID(
+    event.params.destinationChain.toUpperCase()
+  );
   const dstNetworkConstants = getNetworkSpecificConstant(dstChainId);
   const dstPoolId = dstNetworkConstants.getPoolAddress();
   const dstAccount = Address.fromString(
@@ -249,15 +287,17 @@ export function handleContractCallWithToken(
     null
   );
 
-  // contract call
-  const sdk = _getSDK(event)!;
-  const acc = sdk.Accounts.loadAccount(event.params.sender);
-  acc.messageOut(dstChainId, dstAccount, event.params.payload);
+  // TODO: message share the same id as transfer
+  //const sdk = _getSDK(event)!;
+  //const acc = sdk.Accounts.loadAccount(event.params.sender);
+  //acc.messageOut(dstChainId, dstAccount, event.params.payload);
 }
 
 export function handleContractCall(event: ContractCall): void {
   // contract call
-  const dstChainId = BigInt.fromString(event.params.destinationChain);
+  const dstChainId = networkToChainID(
+    event.params.destinationChain.toUpperCase()
+  );
   const dstAccount = Address.fromString(
     event.params.destinationContractAddress
   );
@@ -271,7 +311,7 @@ export function handleTokenTransfer(event: Transfer): void {}
 
 export function handleContractCallApproved(event: ContractCallApproved): void {
   // contract call
-  const srcChainId = BigInt.fromString(event.params.sourceChain);
+  const srcChainId = networkToChainID(event.params.sourceChain.toUpperCase());
   const srcAccount = Address.fromString(event.params.sourceAddress);
 
   const sdk = _getSDK(event)!;
@@ -283,13 +323,8 @@ export function handleContractCallApprovedWithMint(
   event: ContractCallApprovedWithMint
 ): void {
   // contract call
-  const srcChainId = BigInt.fromString(event.params.sourceChain);
+  const srcChainId = networkToChainID(event.params.sourceChain.toUpperCase());
   const srcAccount = Address.fromString(event.params.sourceAddress);
-
-  const sdk = _getSDK(event)!;
-  const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
-  acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
-
   const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
   const tokenAddress = tokenSymbol.tokenAddress!;
   const poolId = event.address.concat(Address.fromString(tokenAddress));
@@ -311,6 +346,11 @@ export function handleContractCallApprovedWithMint(
     event,
     null
   );
+
+  // TODO: message shares the same id as transfer
+  //const sdk = _getSDK(event)!;
+  //const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
+  //acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
 }
 
 export function handleMintToken(call: MintTokenCall): void {
@@ -336,7 +376,21 @@ export function handleMintToken(call: MintTokenCall): void {
   );
 
   const tokenSymbol = getOrCreateTokenSymbol(symbol);
-  const tokenAddress = tokenSymbol.tokenAddress!;
+  let tokenAddress = tokenSymbol.tokenAddress;
+  if (!tokenAddress) {
+    // find tokenAddress on-chain from the AlexarGateway contract
+    const contract = AxelarGatewayContract.bind(call.to);
+    const tokenAddressResult = contract.try_tokenAddresses(symbol);
+    if (tokenAddressResult.reverted) {
+      log.error("[handleMintToken]Failed to get token address for {}", [
+        tokenAddressResult.value.toHexString(),
+      ]);
+      return;
+    } else {
+      tokenAddress = tokenAddressResult.value.toHexString();
+    }
+  }
+
   //const tokenType = tokenSymbol.tokenType!;
   const receiver = account;
   const poolId = call.to;
@@ -344,7 +398,7 @@ export function handleMintToken(call: MintTokenCall): void {
   const srcPoolId = Address.zero(); // Not available
   const srcAccount = account; //Not available, assumed to be the same as receiver
   _handleTransferIn(
-    Address.fromString(tokenAddress),
+    Address.fromString(tokenAddress!),
     srcAccount,
     receiver,
     amount,
@@ -463,7 +517,7 @@ function _handleTransferOut(
 
   const pool = sdk.Pools.loadPool(
     poolId,
-    null,
+    onCreatePool,
     bridgePoolType,
     inputToken.id.toHexString()
   );
@@ -509,10 +563,11 @@ function _handleTransferIn(
 
   const pool = sdk.Pools.loadPool(
     poolId,
-    null,
+    onCreatePool,
     bridgePoolType,
     token.toHexString()
   );
+
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     srcChainId,
     srcPoolId,

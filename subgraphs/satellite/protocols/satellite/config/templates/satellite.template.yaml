@@ -10,12 +10,13 @@ graft:
   block: {{graftStartBlock}} # Block number
 {{/graftEnabled}}
 dataSources:
-  # this section is for price oracle
+  # this section is for price oracle import path
   - kind: ethereum
     name: UniswapV2Factory
     network: {{ network }}
     source:
       abi: UniswapV2Factory
+      address: "0x0000000000000000000000000000000000000000"
       startBlock: {{ AxelarGateway.startBlock }}
     mapping:
       kind: ethereum/events
@@ -45,9 +46,9 @@ dataSources:
           file: ./abis/Prices/Calculations/Curve.json
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: PairCreated(indexed address,indexed address,address,uint256)
-          handler: handlePairCreated
+      callHandlers:
+        - function: setFeeTo(address)
+          handler: handleSetFeeTo
       file: ./src/mappings.ts
 
   - kind: ethereum
@@ -95,9 +96,9 @@ dataSources:
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: TokenSent(indexed address,string,string,string,uint256)
-          handler: handleTokenSend
-        #- event: TokenDeployed(string,address)
-        #  handler: handleTokenDeployed
+          handler: handleTokenSent
+        - event: TokenDeployed(string,address)
+          handler: handleTokenDeployed
         # outgoing messages
         - event: ContractCallWithToken(indexed address,string,string,indexed bytes32,bytes,string,uint256)
           handler: handleContractCallWithToken
