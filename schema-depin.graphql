@@ -117,11 +117,8 @@ type Protocol @entity {
 
   ##### Quantitative Data #####
 
- " Current TVS (Total Value Staked) of the entire protocol "
-  totalValueStakedUSD: BigDecimal!
-
-  " Current TS (Total Staked) of the entire protocol in native token "
-  totalStakedToken: BigDecimal!
+ " Current TVL (Total Value Locked) of the entire protocol "
+  totalValueLockedUSD: BigDecimal!
 
   " Current TVS (Total Value Staked) of Nodes "
   totalValueStakedNodesUSD: BigDecimal!
@@ -135,14 +132,35 @@ type Protocol @entity {
   " Current TS (Total Staked) of Delegators "
   totalStakedDelegatorsToken: BigDecimal!
 
-  " Current TVS (Total Value Staked) of Helpers, could be subgraphs or  transcoders"
-  totalValueStakedHelpersUSD: BigDecimal
+  " Current TB (Total Balance) of Helpers, This is a generalized term, they could be staking or bonding, they could be curator bonding to subgraphs or transcoders"
+  totalHelpersBalanceUSD: BigDecimal
 
-  " Current TVS (Total  Staked) of Helpers, could be subgraphs or  transcoders"
-  totalStakedHelpersToken: BigDecimal
+  " Current TB (Total Balance) of Helpers, could be curator bonding to subgraphs or transcoders, in native token"
+  totalHelpersTokenBalance: BigDecimal
 
-  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  " Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers "
   cumulativeSupplySideRevenueUSD: BigDecimal!
+
+  " Token Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers "
+  cumulativeSupplySideRevenueToken: BigDecimal!
+
+  " Revenue claimed by Nodes "
+  cumulativeNodesRevenueUSD: BigDecimal!
+
+  " Revenue claimed by Nodes, in token "
+  cumulativeDelegatorsRevenueToken: BigDecimal!
+
+  " Revenue claimed by Delegators "
+  cumulativeDelegatorsRevenueUSD: BigDecimal!
+
+  " Revenue claimed by Delegators, in token "
+  cumulativeDelegatorsRevenueToken: BigDecimal!
+
+  " Revenue claimed by Helpers "
+  cumulativeHelpersRevenueUSD: BigDecimal
+
+  " Revenue claimed by Helpers, in token "
+  cumulativeHelpersRevenueToken: BigDecimal
 
   " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
   cumulativeProtocolSideRevenueUSD: BigDecimal
@@ -159,7 +177,7 @@ type Protocol @entity {
   " Number of cumulative unique delegators "
   cumulativeUniqueDelegators: Int!
 
-   " Number of cumulative unique subgraphs (graph) or transcoders (livepeer), a third `helper` option in addition to nodes and delegators"
+  " Number of cumulative unique subgraphs (graph) or transcoders (livepeer), a third `helper` option in addition to nodes and delegators"
   cumulativeUniqueHelpers: Int
 
   " Total number of pools "
@@ -213,29 +231,29 @@ type UsageMetricsDailySnapshot @entity {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
-  " Number of unique daily active Nodes, that do a job on a daily basis "
-  dailyActiveNodes: Int!
+  " Number of unique nodes that are staked, this is more of a cumulative perimeter"
+  openNodes: Int!
 
-  " Number of unique daily inactive Nodes, active nodes-cumulative node snapshot"
-  dailyInactiveNodes: Int!
+  " Number of nodes that are open with some activity on them "
+  dailyActiveNodes: Int
 
-   " Number of cumulative unique Nodes "
+  " Number of cumulative unique Nodes "
   cumulativeUniqueNodes: Int!
 
-  " Number of unique daily active Delegators, that do a job on a daily basis "
-  dailyActiveDelegators: Int!
+  " Number of unique delegators that are staked, this is more of a cumulative perimeter"
+  openDelegators: Int!
 
-  " Number of unique daily inactive Delegators, active delegatrors-cumulative delegators snapshot"
-  dailyInactiveDelegators: Int!
+  " Number of unique daily active Delegators, that part of a node that does a job on a daily basis, this metric is optional "
+  dailyActiveDelegators: Int
 
   " Number of cumulative unique delegators "
   cumulativeUniqueDelegators: Int!
 
-  " Number of unique daily active Helpers, that do a job on a daily basis "
-  dailyActiveHelpers: Int!
+  " Number of unique helpers that have a balance, this is more of a cumulative perimeter"
+  openHelpers: Int
 
-  " Number of unique daily inactive Helpers, active Helpers-cumulative delegators snapshot"
-  dailyInactiveHelpers: Int!
+  " Number of unique daily active Helpers, that do a job on a daily basis "
+  dailyActiveHelpers: Int
 
    " Number of cumulative unique subgraphs (graph) or transcoders (livepeer), a third `helper` option in addition to nodes and delegators"
   cumulativeUniqueHelpers: Int
@@ -269,20 +287,20 @@ type UsageMetricsHourlySnapshot @entity {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
-    " Number of unique daily active Nodes, that do a job on a daily basis "
+  " Number of unique daily active Nodes, that do a job on a daily basis "
   hourlyActiveNodes: Int!
 
-  " Number of unique daily inactive Nodes, active nodes-cumulative node snapshot"
-  hourlyInactiveNodes: Int!
+  " Number of unique nodes that are staked, this is more of a cumulative perimeter"
+  openNodes: Int!
 
-   " Number of cumulative unique Nodes "
+  " Number of cumulative unique Nodes "
   cumulativeUniqueNodes: Int!
 
   " Number of unique daily active Delegators, that do a job on a daily basis "
   hourlyActiveDelegators: Int!
 
-  " Number of unique daily inactive Delegators, active delegatrors-cumulative delegators snapshot"
-  hourlyInactiveDelegators: Int!
+  " Number of unique delegators that are staked, this is more of a cumulative perimeter"
+  openDelegators: Int!
 
   " Number of cumulative unique delegators "
   cumulativeUniqueDelegators: Int!
@@ -290,10 +308,10 @@ type UsageMetricsHourlySnapshot @entity {
   " Number of unique daily active Helpers, that do a job on a daily basis "
   hourlyActiveHelpers: Int!
 
-  " Number of unique daily inactive Helpers, active Helpers-cumulative delegators snapshot"
-  hourlyInactiveHelpers: Int!
+  " Number of unique helpers that have a balance, this is more of a cumulative perimeter"
+  openHelpers: Int
 
-   " Number of cumulative unique subgraphs (graph) or transcoders (livepeer), a third `helper` option in addition to nodes and delegators"
+  " Number of cumulative unique subgraphs (graph) or transcoders (livepeer), a third `helper` option in addition to nodes and delegators"
   cumulativeUniqueHelpers: Int
 
   " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
@@ -316,11 +334,11 @@ type FinancialsDailySnapshot @entity {
   " Protocol this snapshot is associated with "
   protocol: Protocol!
 
-  " Current TVS (Total Value Staked) of the entire protocol "
-  totalValueStakedUSD: BigDecimal!
+  " Current TVL (Total Value Locked) of the entire protocol "
+  totalValueLockedUSD: BigDecimal!
 
-  " Current TS (Total Staked) of the entire protocol in native token "
-  totalStakedToken: BigDecimal!
+  " Current TVL (Total Value locked) of the entire protocol in native token "
+  totalValueLockedToken: BigDecimal!
 
   " Current TVS (Total Value Staked) of Nodes "
   totalValueStakedNodesUSD: BigDecimal!
@@ -334,14 +352,11 @@ type FinancialsDailySnapshot @entity {
   " Current TS (Total Staked) of Delegators "
   totalStakedDelegatorsToken: BigDecimal!
 
-  " Current TVS (Total Value Staked) of Helpers, could be subgraphs or  transcoders"
-  totalValueStakedHelpersUSD: BigDecimal
+  " Current TB (Total Balance) of Helpers, This is a generalized term, they could be staking or bonding, they could be curator bonding to subgraphs or transcoders"
+  totalHelpersBalanceUSD: BigDecimal
 
-  " Current TVS (Total  Staked) of Helpers, could be subgraphs or  transcoders"
-  totalStakedHelpersToken: BigDecimal
-
-  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
-  protocolControlledValueUSD: BigDecimal
+  " Current TB (Total Balance) of Helpers, could be curator bonding to subgraphs or transcoders, in native token"
+  totalHelpersTokenBalance: BigDecimal
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   dailySupplySideRevenueUSD: BigDecimal!
@@ -369,220 +384,21 @@ type FinancialsDailySnapshot @entity {
 }
 
 ###########################
-##### Pool-Level Data #####
+##### Node-Level Data #####
 ###########################
 
-type Pool @entity {
-  " Smart contract address of the pool "
+type Node @entity {
+  " Smart contract address of the Node "
   id: Bytes!
 
   " The protocol this pool belongs to "
   protocol: Protocol!
 
-  " Name of the pool (e.g. Curve.fi DAI/USDC/USDT) "
+  " Name of the Node "
   name: String
-
-  " Symbol of liquidity pool (e.g. 3CRV) "
-  symbol: String
 
  " Geographic location of node "
   location: String
-
-
-  # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null.
-
-  " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
-
-  " Type of token used to track ownership "
-  outputTokenType: TokenType
-
-  " Specify if the output token is used to track liquidity position in the protocol "
-  isLiquidityToken: Boolean!
-
-  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
-  inputTokens: [Token!]!
-
-  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
-  rewardTokens: [RewardToken!]
-
-  " Creation timestamp "
-  createdTimestamp: BigInt!
-
-  " Creation block number "
-  createdBlockNumber: BigInt!
-
-  ##### Quantitative Data #####
-
-  " Current TVS (Total Value Staked) of this pool in USD "
-  totalValueStakedUSD: BigDecimal!
-
-  " All revenue generated by the pool, accrued to the supply side. "
-  cumulativeSupplySideRevenueUSD: BigDecimal!
-
-  " All revenue generated by the pool, accrued to the protocol. "
-  cumulativeProtocolSideRevenueUSD: BigDecimal!
-
-  " All revenue generated by the pool. "
-  cumulativeTotalRevenueUSD: BigDecimal!
-
-  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
-
-  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
-
-  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt
-
-  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
-  " Day ID of the most recent daily snapshot "
-  lastSnapshotDayID: Int!
-
-  " Hour ID of the most recent hourly snapshot "
-  lastSnapshotHourID: Int!
-
-  " Timestamp of the last time this entity was updated "
-  lastUpdateTimestamp: BigInt!
-
-  ##### Snapshots #####
-
-  " Pool daily snapshots "
-  dailySnapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
-
-  " Pool hourly snapshots "
-  hourlySnapshots: [PoolHourlySnapshot!]! @derivedFrom(field: "pool")
-}
-
-type PoolDailySnapshot @entity {
-  " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
-  id: Bytes!
-
-  " Number of days since Unix epoch time "
-  day: Int!
-
-  " The protocol this snapshot belongs to "
-  protocol: Protocol!
-
-  " The pool this snapshot belongs to "
-  pool: Pool!
-
-  ##### Quantitative Data #####
-
-  " Current TVL (Total Value Staked) of this pool "
-  totalValueStakedUSD: BigDecimal!
-
-  " All revenue generated by the pool, accrued to the supply side. "
-  cumulativeSupplySideRevenueUSD: BigDecimal!
-
-  " Daily revenue generated by the pool, accrued to the supply side. "
-  dailySupplySideRevenueUSD: BigDecimal!
-
-  " All revenue generated by the pool, accrued to the protocol. "
-  cumulativeProtocolSideRevenueUSD: BigDecimal!
-
-  " Daily revenue generated by the pool, accrued to the protocol. "
-  dailyProtocolSideRevenueUSD: BigDecimal!
-
-  " All revenue generated by the pool. "
-  cumulativeTotalRevenueUSD: BigDecimal!
-
-  " Daily revenue generated by the pool. "
-  dailyTotalRevenueUSD: BigDecimal!
-
-  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
-
-  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
-
-  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt
-
-  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
-  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  timestamp: BigInt!
-
-  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  blockNumber: BigInt!
-}
-
-type PoolHourlySnapshot @entity {
-  " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
-  id: Bytes!
-
-  " Number of days since Unix epoch time "
-  hours: Int!
-
-  " The protocol this snapshot belongs to "
-  protocol: Protocol!
-
-  " The pool this snapshot belongs to "
-  pool: Pool!
-
-  ##### Quantitative Data #####
-
-  " Current TVL (Total Value Staked) of this pool "
-  totalValueStakedUSD: BigDecimal!
-
-  " All revenue generated by the pool, accrued to the supply side. "
-  cumulativeSupplySideRevenueUSD: BigDecimal!
-
-  " Hourly revenue generated by the pool, accrued to the supply side. "
-  hourlySupplySideRevenueUSD: BigDecimal!
-
-  " All revenue generated by the pool, accrued to the protocol. "
-  cumulativeProtocolSideRevenueUSD: BigDecimal!
-
-  " Hourly revenue generated by the pool, accrued to the protocol. "
-  hourlyProtocolSideRevenueUSD: BigDecimal!
-
-  " All revenue generated by the pool. "
-  cumulativeTotalRevenueUSD: BigDecimal!
-
-  " Hourly revenue generated by the pool. "
-  hourlyTotalRevenueUSD: BigDecimal!
-
-  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
-
-  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
-
-  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt
-
-  " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
-  " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  timestamp: BigInt!
-
-  " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
-  blockNumber: BigInt!
 }
 
 # An account is a unique Ethereum address
