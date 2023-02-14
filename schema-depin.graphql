@@ -138,34 +138,34 @@ type Protocol @entity {
   " Current TB (Total Balance) of Helpers, could be curator bonding to subgraphs or transcoders, in native token"
   totalHelpersTokenBalance: BigDecimal
 
-  " Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers "
+  " Revenue claimed by suppliers to the protocol. Revenue is paid into the system, e.g. query fees. Supply side can be subdivided into nodes, delegators and helpers "
   cumulativeSupplySideRevenueUSD: BigDecimal!
 
-  " Token Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers "
-  cumulativeSupplySideRevenueToken: BigDecimal!
+  " Token Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers; IF collected in native token "
+  cumulativeSupplySideRevenueToken: BigDecimal
 
   " Revenue claimed by Nodes "
   cumulativeNodesRevenueUSD: BigDecimal!
 
-  " Revenue claimed by Nodes, in token "
-  cumulativeNodesRevenueToken: BigDecimal!
+  " Revenue claimed by Nodes, in token; IF collected in native token "
+  cumulativeNodesRevenueToken: BigDecimal
 
   " Revenue claimed by Delegators "
   cumulativeDelegatorsRevenueUSD: BigDecimal!
 
-  " Revenue claimed by Delegators, in token "
-  cumulativeDelegatorsRevenueToken: BigDecimal!
+  " Revenue claimed by Delegators, in token; IF collected in native token "
+  cumulativeDelegatorsRevenueToken: BigDecimal
 
   " Revenue claimed by Helpers "
   cumulativeHelpersRevenueUSD: BigDecimal
 
-  " Revenue claimed by Helpers, in token "
+  " Revenue claimed by Helpers, in token ; IF collected in native token "
   cumulativeHelpersRevenueToken: BigDecimal
 
   " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
   cumulativeProtocolSideRevenueUSD: BigDecimal
 
-  " All rewards claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers "
+  " All rewards claimed by suppliers to the protocol. Rewards are inflationary incentives. Supply side can be subdivided into nodes, delegators and helpers "
   cumulativeRewardsUSD: BigDecimal!
 
   " Token Rewards claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers "
@@ -201,13 +201,13 @@ type Protocol @entity {
   " Number of cumulative unique subgraphs (graph) or transcoders (livepeer), a third `helper` option in addition to nodes and delegators"
   cumulativeUniqueHelpers: Int
 
-  " Number of demand side jobs requested, e.g. API Calls for The Graph and transcoding requests for Livepeer. Not always Onchain"
+  " Number of demand side jobs requested, e.g. API Calls for The Graph and transcoding requests for Livepeer. Not always Onchain, so may not be available"
   cumulativeJobsRequested: Int
 
-  " Number of demand side jobs Completed, e.g. API Calls for The Graph and transcoding requests for Livepeer. Not always Onchain"
+  " Number of demand side jobs Completed, e.g. API Calls for The Graph and transcoding requests for Livepeer. Not always Onchain, so may not be available"
   cumulativeJobsCompleted: Int
 
-  " Resources used to complete jobs, e.g. Minutes transcoded in Livepeer, cpu power used or data transmitted. Not always Onchain"
+  " Resources used to complete jobs, e.g. Minutes transcoded in Livepeer, cpu power used or data transmitted. Not always Onchain, so may not be available"
   cumulativeJobsResources: BigDecimal
 
   " Total number of pools "
@@ -274,7 +274,7 @@ type UsageMetricsDailySnapshot @entity {
   openDelegators: Int!
 
   " Number of unique daily active Delegators, that part of a node that does a job on a daily basis, this metric is optional "
-  dailyActiveDelegators: Int
+  dailyActiveDelegators: Int!
 
   " Number of cumulative unique delegators "
   cumulativeUniqueDelegators: Int!
@@ -403,73 +403,73 @@ type FinancialsDailySnapshot @entity {
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
-  " Current TVL (Total Value locked) of the entire protocol in native token "
-  totalValueLockedToken: BigDecimal!
+  " Current TVL (Total Value locked) of the entire protocol in native token, only if in native token "
+  totalValueLockedToken: BigDecimal
 
   " Current TVS (Total Value Staked) of Nodes "
   totalValueStakedNodesUSD: BigDecimal!
 
-  " Current TS (Total Staked) of Nodes "
-  totalStakedNodesToken: BigDecimal!
+  " Current TS (Total Staked) of Nodes, only if in native token "
+  totalStakedNodesToken: BigDecimal
 
   " Current TVS (Total Value Staked) of Delegators "
   totalValueStakedDelegatorsUSD: BigDecimal!
 
-  " Current TS (Total Staked) of Delegators "
-  totalStakedDelegatorsToken: BigDecimal!
+  " Current TS (Total Staked) of Delegators, only if in native token "
+  totalStakedDelegatorsToken: BigDecimal
 
   " Current TB (Total Balance) of Helpers, This is a generalized term, they could be staking or bonding, they could be curator bonding to subgraphs or transcoders"
   totalHelpersBalanceUSD: BigDecimal
 
-  " Current TB (Total Balance) of Helpers, could be curator bonding to subgraphs or transcoders, in native token"
+  " Current TB (Total Balance) of Helpers, could be curator bonding to subgraphs or transcoders, only if in native token"
   totalHelpersTokenBalance: BigDecimal
 
   " Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers "
   dailySupplySideRevenueUSD: BigDecimal!
 
-  " Token Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers "
-  dailySupplySideRevenueToken: BigDecimal!
+  " Token Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers, if only paid in native token "
+  dailySupplySideRevenueToken: BigDecimal
 
   " Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers "
   cumulativeSupplySideRevenueUSD: BigDecimal!
 
-  " Token Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers "
-  cumulativeSupplySideRevenueToken: BigDecimal!
+  " Token Revenue claimed by suppliers to the protocol. Supply side can be subdivided into nodes, delegators and helpers, if only paid in native token "
+  cumulativeSupplySideRevenueToken: BigDecimal
 
   " Revenue claimed by Nodes "
   dailyNodesRevenueUSD: BigDecimal!
 
-  " Revenue claimed by Nodes, in token "
-  dailyNodesRevenueToken: BigDecimal!
+  " Revenue claimed by Nodes, in token, if only paid in native token "
+  dailyNodesRevenueToken: BigDecimal
 
   " Revenue claimed by Nodes "
   cumulativeNodesRevenueUSD: BigDecimal!
 
-  " Revenue claimed by Nodes, in token "
-  cumulativeNodesRevenueToken: BigDecimal!
+  " Revenue claimed by Nodes, in token, if only paid in native token "
+  cumulativeNodesRevenueToken: BigDecimal
 
   " Revenue claimed by Delegators "
   dailyDelegatorsRevenueUSD: BigDecimal!
 
-  " Revenue claimed by Delegators, in token "
-  dailyDelegatorsRevenueToken: BigDecimal!
+  " Revenue claimed by Delegators, in token, if only paid in native token "
+  dailyDelegatorsRevenueToken: BigDecimal
 
   " Revenue claimed by Delegators "
   cumulativeDelegatorsRevenueUSD: BigDecimal!
 
-  " Revenue claimed by Delegators, in token "
-  cumulativeDelegatorsRevenueToken: BigDecimal!
+  " Revenue claimed by Delegators, in token, if only paid in native token "
+  cumulativeDelegatorsRevenueToken: BigDecimal
 
   " Revenue claimed by Helpers "
   dailyHelpersRevenueUSD: BigDecimal!
 
-  " Revenue claimed by Helpers, in token "
-  dailyHelpersRevenueToken: BigDecimal!
+  " Revenue claimed by Helpers, in token, if only paid in native token "
+  dailyHelpersRevenueToken: BigDecimal
 
   " Revenue claimed by Helpers "
   cumulativeHelpersRevenueUSD: BigDecimal
 
-  " Revenue claimed by Helpers, in token "
+  " Revenue claimed by Helpers, in token, if only paid in native token "
   cumulativeHelpersRevenueToken: BigDecimal
 
   " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
@@ -521,10 +521,10 @@ type FinancialsDailySnapshot @entity {
   cumulativeDelegatorsRewardsToken: BigDecimal!
 
   " Rewards claimed by Helpers "
-  dailyHelpersRewardsUSD: BigDecimal!
+  dailyHelpersRewardsUSD: BigDecimal
 
   " Rewards claimed by Helpers, in token "
-  dailyHelpersRewardsToken: BigDecimal!
+  dailyHelpersRewardsToken: BigDecimal
 
   " Rewards claimed by Helpers "
   cumulativeHelpersRewardsUSD: BigDecimal
