@@ -1,5 +1,15 @@
 import { Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./constants";
+import {
+  DexAmmProtocol,
+  UsageMetricsDailySnapshot,
+  FinancialsDailySnapshot,
+  UsageMetricsHourlySnapshot,
+  LiquidityPoolDailySnapshot,
+  LiquidityPoolHourlySnapshot,
+  LiquidityPool,
+  _ActivityHelper,
+} from "../../generated/schema";
 
 const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
 
@@ -194,8 +204,8 @@ function takeLiquidityPoolHourlySnapshot(
   pool: LiquidityPool,
   hour: i32
 ): void {
-  const snapshot = new PoolHourlySnapshot(pool.id.concatI32(hour));
-  const previousSnapshot = PoolHourlySnapshot.load(
+  const snapshot = new LiquidityPoolHourlySnapshot(pool.id.concatI32(hour));
+  const previousSnapshot = LiquidityPoolHourlySnapshot.load(
     pool.id.concatI32(pool.lastSnapshotHourID)
   );
 
@@ -248,8 +258,8 @@ function takeLiquidityPoolDailySnapshot(
   pool: LiquidityPool,
   day: i32
 ): void {
-  const snapshot = new PoolDailySnapshot(pool.id.concatI32(day));
-  const previousSnapshot = PoolDailySnapshot.load(
+  const snapshot = new LiquidityPoolDailySnapshot(pool.id.concatI32(day));
+  const previousSnapshot = LiquidityPoolDailySnapshot.load(
     pool.id.concatI32(pool.lastSnapshotDayID)
   );
 
