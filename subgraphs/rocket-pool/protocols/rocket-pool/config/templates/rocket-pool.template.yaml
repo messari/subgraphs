@@ -1,6 +1,14 @@
 specVersion: 0.0.5
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum/contract
     name: rocketTokenRETH
@@ -95,6 +103,8 @@ dataSources:
       eventHandlers:
         - event: BalancesUpdated(uint256,uint256,uint256,uint256,uint256)
           handler: handleBalancesUpdated
+        - event: BalancesSubmitted(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleBalancesSubmitted
       file: ./src/mappings/rocketNetworkBalancesMapping.ts
 
   - kind: ethereum/contract
