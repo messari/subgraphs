@@ -9,10 +9,7 @@ import {
   Swap,
   Token,
   Withdraw,
-  _dailyDepositValesUSD,
   _HelperStore,
-  _hourlyDepositValesUSD,
-  _statValuesUSD,
 } from "../../generated/schema";
 import {
   getLiquidityPool,
@@ -161,24 +158,12 @@ function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
 
   // Number of days since Unix epoch
   const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-
   const dayId = day.toString();
-  let depositValuesId = protocol.id
-  .concat(
-    DepositValueEntitySuffix.DAILY_DEPOSITS_USD_ID
-  );
-  let depositValues = _dailyDepositValesUSD.load(depositValuesId)
-  if(!depositValues){
-    depositValues = new _dailyDepositValesUSD(depositValuesId);
-    depositValues.depositsUSD = new Array<BigDecimal>(); 
-    depositValues.save(); 
-  }
+
   const statId = protocol.id.concat("-deposit-").concat(dayId);
   let stat = Stat.load(statId);
   if (!stat) {
     stat = createStat(statId)
-    depositValues.depositsUSD = [BIGDECIMAL_ZERO]
-    depositValues.save();
   }
   const transactionHash = event.transaction.hash.toHexString();
   const deposit = Deposit.load(
@@ -188,17 +173,13 @@ function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
   if (deposit && deposit.amountUSD) {
     const amountUSD = deposit.amountUSD;
 
-    let deposits = new Array<BigDecimal>();
-    if (depositValues.depositsUSD) {
-      deposits = depositValues.depositsUSD!;
-    }
-    deposits.push(amountUSD);
-    depositValues.depositsUSD = deposits;
-    depositValues.save();
-    stat.meanUSD = BigDecimalArray.mean(deposits);
-    stat.medianUSD = BigDecimalArray.median(deposits);
-    stat.maxUSD = BigDecimalArray.maxValue(deposits);
-    stat.minUSD = BigDecimalArray.minValue(deposits);
+    let valuesUSD = stat._valuesUSD;
+    valuesUSD.push(amountUSD);
+    stat._valuesUSD = valuesUSD;
+    stat.meanUSD = BigDecimalArray.mean(valuesUSD);
+    stat.medianUSD = BigDecimalArray.median(valuesUSD);
+    stat.maxUSD = BigDecimalArray.maxValue(valuesUSD);
+    stat.minUSD = BigDecimalArray.minValue(valuesUSD);
   }
 
   stat.count = stat.count.plus(BIGINT_ONE);
@@ -217,19 +198,10 @@ function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
  */
 function updateWithdrawUsageMetricsUSD(timeStampId: string, protocolId: string, valuesSuffix: string, event: ethereum.Event): string {
 
-  let statValues = _statValuesUSD.load(protocolId.concat(valuesSuffix));
-  if(!statValues) {
-    statValues = new _statValuesUSD(protocolId.concat(valuesSuffix));
-    statValues.valuesUSD = new Array<BigDecimal>();
-    statValues.save();
-  }
   const statId = protocolId.concat("-withdraw-").concat(timeStampId);
   let stat = Stat.load(statId);
   if (!stat) {
     stat = createStat(statId);
-    // reset stat values as we're at the top of the clock
-    statValues.valuesUSD = new Array<BigDecimal>(); 
-    statValues.save();
   }
   const transactionHash = event.transaction.hash.toHexString();
   const withdraw = Withdraw.load(
@@ -238,15 +210,12 @@ function updateWithdrawUsageMetricsUSD(timeStampId: string, protocolId: string, 
 
   if (withdraw && withdraw.amountUSD) {
     const amountUSD = withdraw.amountUSD;
-    let values = statValues.valuesUSD!;
-    values.push(amountUSD);
-    statValues.valuesUSD = values;
-    statValues.save();
-    const meanUsd = BigDecimalArray.mean(values);
-    stat.meanUSD = meanUsd;
-    stat.medianUSD = BigDecimalArray.median(values);
-    stat.maxUSD = BigDecimalArray.maxValue(values);
-    stat.minUSD = BigDecimalArray.minValue(values);
+    let valuesUSD = stat._valuesUSD;
+    valuesUSD.push(amountUSD);
+    stat.meanUSD = BigDecimalArray.mean(valuesUSD);
+    stat.medianUSD = BigDecimalArray.median(valuesUSD);
+    stat.maxUSD = BigDecimalArray.maxValue(valuesUSD);
+    stat.minUSD = BigDecimalArray.minValue(valuesUSD);
   }
 
   stat.count = stat.count.plus(BIGINT_ONE);
@@ -264,19 +233,10 @@ function updateWithdrawUsageMetricsUSD(timeStampId: string, protocolId: string, 
  */
 function updateSwapUsageMetricsUSD(timeStampId: string, protocolId: string, valuesSuffix: string, event: ethereum.Event): string {
 
-  let statValues = _statValuesUSD.load(protocolId.concat(valuesSuffix));
-  if(!statValues) {
-    statValues = new _statValuesUSD(protocolId.concat(valuesSuffix));
-    statValues.valuesUSD = new Array<BigDecimal>();
-    statValues.save();
-  }
   const statId = protocolId.concat("-swap-").concat(timeStampId);
   let stat = Stat.load(statId);
   if (!stat) {
     stat = createStat(statId);
-    // reset stat values as we're at the top of the clock
-    statValues.valuesUSD = new Array<BigDecimal>(); 
-    statValues.save();
   }
   const transactionHash = event.transaction.hash.toHexString();
   const swap = Swap.load(
@@ -284,16 +244,16 @@ function updateSwapUsageMetricsUSD(timeStampId: string, protocolId: string, valu
   );
 
   if (swap && swap.amountInUSD) {
-    const amountUSD = swap.amountInUSD;
-    let values = statValues.valuesUSD!;
-    values.push(amountUSD);
-    statValues.valuesUSD = values;
-    statValues.save();
-    const meanUsd = BigDecimalArray.mean(values);
+    const amountUSD = swap.amountInUSD
+    let valuesUSD = stat._valuesUSD;
+    valuesUSD.push(amountUSD)
+    stat._valuesUSD = valuesUSD;
+    stat.count = stat.count.plus(BIGINT_ONE);
+    const meanUsd = BigDecimalArray.mean(valuesUSD);
     stat.meanUSD = meanUsd;
-    stat.medianUSD = BigDecimalArray.median(values);
-    stat.maxUSD = BigDecimalArray.maxValue(values);
-    stat.minUSD = BigDecimalArray.minValue(values);
+    stat.medianUSD = BigDecimalArray.median(valuesUSD);
+    stat.maxUSD = BigDecimalArray.maxValue(valuesUSD);
+    stat.minUSD = BigDecimalArray.minValue(valuesUSD);
   }
 
   stat.count = stat.count.plus(BIGINT_ONE);

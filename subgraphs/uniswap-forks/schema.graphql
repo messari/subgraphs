@@ -364,6 +364,9 @@ type Stat @entity {
 
   # " Variance for USD "
   # varUSD: BigDecimal!
+
+  " values in USD used to calculate the stats "
+  _valuesUSD: [BigDecimal!]!
 }
 
 
@@ -1213,40 +1216,4 @@ type _PositionCounter @entity {
   " Next count "
   # Increment this when a position is closed
   nextCount: Int!
-}
-
-# Daily deposit usd values used to calculate averages, get reset at start of each new day
-type _dailyDepositValesUSD @entity {
-  " id is {protocol/pool}-daily-deposits-usd"
-  id: ID!
-
-  " USD value of each deposit in the day "
-  depositsUSD: [BigDecimal!]
-}
-
-# Hourly deposit usd values used to calculate averages, get reset at start of each new day
-type _hourlyDepositValesUSD @entity {
-  " id is {protocol/pool}-hourly-deposits-usd"
-  id: ID!
-
-  " USD value of each deposit in the day "
-  depositsUSD: [BigDecimal!]
-}
-
-# Hourly withdraw usd values used to calculate averages, get reset at start of each new day
-type _hourlyWithdrawValesUSD @entity {
-  " id is {protocol/pool}-hourly-deposits-usd"
-  id: ID!
-
-  " USD value of each deposit in the day "
-  depositsUSD: [BigDecimal!]
-}
-
-# Tracks stats for withdrawls by day or hour, resets at the top of the clock
-type _statValuesUSD @entity {
-  " id is {protocol/pool}-{hourly/daily}-{deposit/withdraw/swap}-usd"
-  id: ID!
-
-  " USD values for the time period [hourly/daily]"
-  valuesUSD: [BigDecimal!]
 }

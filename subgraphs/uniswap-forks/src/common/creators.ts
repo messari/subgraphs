@@ -557,6 +557,7 @@ export function createStat(id:string): Stat {
     stat.medianUSD = BIGDECIMAL_ZERO;
     stat.maxUSD = BIGDECIMAL_ZERO;
     stat.minUSD = BIGDECIMAL_ZERO;
+    stat._valuesUSD = new Array<BigDecimal>(); 
     stat.save();
   } 
   return stat;
