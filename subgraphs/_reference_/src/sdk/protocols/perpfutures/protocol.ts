@@ -5,6 +5,7 @@ import {
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import { SDK } from ".";
+import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
 import { CustomEventType } from "../../util/events";
 import { ProtocolSnapshot } from "./protocolSnapshot";
@@ -417,6 +418,8 @@ export class Perpetual {
 
     this.protocol.transactionCount += 1;
     this.save();
+
+    this.snapshoter.addTransaction(type);
   }
 
   /**
@@ -430,6 +433,14 @@ export class Perpetual {
   }
 
   /**
+   * Will increase the hourly and daily active users counters. These will be reflected
+   * on the next Usage snapshot whenever it comes up.
+   */
+  addActiveUser(activity: AccountWasActive): void {
+    this.snapshoter.addActiveUser(activity);
+  }
+
+  /**
    * Adds some value to the cumulativeUniqueBorrowers counter. If the value is omitted it will default to 1.
    * If you are loading accounts with the AccountManager you won't need to use this method.
    * @param count {u8} The value to add to the counter.
@@ -440,14 +451,29 @@ export class Perpetual {
   }
 
   /**
+   * Will increase the hourly and daily active borrowers counters. These will be reflected
+   * on the next Usage snapshot whenever it comes up.
+   */
+  addActiveBorrower(activity: AccountWasActive): void {
+    this.snapshoter.addActiveBorrower(activity);
+  }
+
+  /**
    * Adds some value to the cumulativeUniqueDepositors counter. If the value is omitted it will default to 1.
    * If you are loading accounts with the AccountManager you won't need to use this method.
    * @param count {u8} The value to add to the counter.
    */
   addDepositor(count: u8 = 1): void {
-    // TODO: Missing field from protocol entity
-    // this.protocol.cumulativeUniqueDepositors += count;
+    this.protocol.cumulativeUniqueDepositors += count;
     this.save();
+  }
+
+  /**
+   * Will increase the hourly and daily active depositors counters. These will be reflected
+   * on the next Usage snapshot whenever it comes up.
+   */
+  addActiveDepositor(activity: AccountWasActive): void {
+    this.snapshoter.addActiveDepositor(activity);
   }
 
   /**
@@ -461,6 +487,14 @@ export class Perpetual {
   }
 
   /**
+   * Will increase the hourly and daily active liquidators counters. These will be reflected
+   * on the next Usage snapshot whenever it comes up.
+   */
+  addActiveLiquidator(activity: AccountWasActive): void {
+    this.snapshoter.addActiveLiquidator(activity);
+  }
+
+  /**
    * Adds some value to the cumulativeUniqueLiquidatees counter. If the value is omitted it will default to 1.
    * If you are loading accounts with the AccountManager you won't need to use this method.
    * @param count {u8} The value to add to the counter.
@@ -468,6 +502,14 @@ export class Perpetual {
   addLiquidatee(count: u8 = 1): void {
     this.protocol.cumulativeUniqueLiquidatees += count;
     this.save();
+  }
+
+  /**
+   * Will increase the hourly and daily active liquidatees counters. These will be reflected
+   * on the next Usage snapshot whenever it comes up.
+   */
+  addActiveLiquidatee(activity: AccountWasActive): void {
+    this.snapshoter.addActiveLiquidatee(activity);
   }
 
   /**

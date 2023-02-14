@@ -5,12 +5,11 @@ import {
   UsageMetricsHourlySnapshot,
   DerivPerpProtocol as PerpetualSchema,
 } from "../../../../generated/schema";
+import { TransactionType } from "./enums";
 import { AccountWasActive } from "./account";
 import { Bytes } from "@graphprotocol/graph-ts";
 import * as constants from "../../util/constants";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
-
-const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
 
 export class ProtocolSnapshot {
   protocol: PerpetualSchema;
@@ -31,6 +30,41 @@ export class ProtocolSnapshot {
   addActiveUser(activity: AccountWasActive): void {
     this.activityHelper.dailyActiveUsers += activity.daily ? 1 : 0;
     this.activityHelper.hourlyActiveUsers += activity.hourly ? 1 : 0;
+    this.activityHelper.save();
+  }
+
+  addActiveDepositor(activity: AccountWasActive): void {
+    this.activityHelper.dailyActiveDepositors += activity.daily ? 1 : 0;
+    this.activityHelper.save();
+  }
+
+  addActiveBorrower(activity: AccountWasActive): void {
+    this.activityHelper.dailyActiveBorrowers += activity.daily ? 1 : 0;
+    this.activityHelper.save();
+  }
+
+  addActiveLiquidator(activity: AccountWasActive): void {
+    this.activityHelper.dailyActiveLiquidators += activity.daily ? 1 : 0;
+    this.activityHelper.save();
+  }
+
+  addActiveLiquidatee(activity: AccountWasActive): void {
+    this.activityHelper.dailyActiveLiquidatees += activity.daily ? 1 : 0;
+    this.activityHelper.save();
+  }
+
+  addTransaction(type: TransactionType): void {
+    if (type == TransactionType.DEPOSIT) {
+      this.activityHelper.dailyDepositCount += 1;
+    } else if (type == TransactionType.WITHDRAW) {
+      this.activityHelper.dailyWithdrawCount += 1;
+    } else if (type == TransactionType.BORROW) {
+      this.activityHelper.dailyBorrowCount += 1;
+    } else if (type == TransactionType.SWAP) {
+      this.activityHelper.dailySwapCount += 1;
+    }
+
+    this.activityHelper.dailyTransactionCount += 1;
     this.activityHelper.save();
   }
 
@@ -56,6 +90,7 @@ export class ProtocolSnapshot {
 
   private takeFinancialsDailySnapshot(day: i32): void {
     const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
+
     const previousSnapshot = FinancialsDailySnapshot.load(
       Bytes.fromI32(this.protocol._lastSnapshotDayID)
     );
@@ -63,10 +98,33 @@ export class ProtocolSnapshot {
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;
 
-    snapshot.cumulativeVolumeUSD = this.protocol.cumulativeVolumeUSD;
     snapshot.totalValueLockedUSD = this.protocol.totalValueLockedUSD;
+    snapshot.dailyOpenInterestUSD = this.protocol.openInterestUSD;
     snapshot.protocolControlledValueUSD =
       this.protocol.protocolControlledValueUSD;
+
+    snapshot.dailyVolumeUSD = previousSnapshot
+      ? this.protocol.cumulativeVolumeUSD.minus(
+          previousSnapshot.cumulativeVolumeUSD
+        )
+      : this.protocol.cumulativeVolumeUSD;
+    snapshot.cumulativeVolumeUSD = this.protocol.cumulativeVolumeUSD;
+
+    snapshot.dailyInflowVolumeUSD = previousSnapshot
+      ? this.protocol.cumulativeInflowVolumeUSD.minus(
+          previousSnapshot.cumulativeInflowVolumeUSD
+        )
+      : this.protocol.cumulativeInflowVolumeUSD;
+    snapshot.dailyClosedInflowVolumeUSD = previousSnapshot
+      ? this.protocol.cumulativeClosedInflowVolumeUSD.minus(
+          previousSnapshot.cumulativeClosedInflowVolumeUSD
+        )
+      : this.protocol.cumulativeClosedInflowVolumeUSD;
+    snapshot.dailyOutflowVolumeUSD = previousSnapshot
+      ? this.protocol.cumulativeOutflowVolumeUSD.minus(
+          previousSnapshot.cumulativeOutflowVolumeUSD
+        )
+      : this.protocol.cumulativeOutflowVolumeUSD;
 
     snapshot.cumulativeInflowVolumeUSD =
       this.protocol.cumulativeInflowVolumeUSD;
@@ -75,14 +133,51 @@ export class ProtocolSnapshot {
     snapshot.cumulativeOutflowVolumeUSD =
       this.protocol.cumulativeOutflowVolumeUSD;
 
+    snapshot.dailySupplySideRevenueUSD = previousSnapshot
+      ? this.protocol.cumulativeSupplySideRevenueUSD.minus(
+          previousSnapshot.cumulativeSupplySideRevenueUSD
+        )
+      : this.protocol.cumulativeSupplySideRevenueUSD;
+    snapshot.dailyProtocolSideRevenueUSD = previousSnapshot
+      ? this.protocol.cumulativeProtocolSideRevenueUSD.minus(
+          previousSnapshot.cumulativeProtocolSideRevenueUSD
+        )
+      : this.protocol.cumulativeProtocolSideRevenueUSD;
+    snapshot.dailyStakeSideRevenueUSD = previousSnapshot
+      ? this.protocol.cumulativeStakeSideRevenueUSD.minus(
+          previousSnapshot.cumulativeStakeSideRevenueUSD
+        )
+      : this.protocol.cumulativeStakeSideRevenueUSD;
+    snapshot.dailyTotalRevenueUSD = previousSnapshot
+      ? this.protocol.cumulativeTotalRevenueUSD.minus(
+          previousSnapshot.cumulativeTotalRevenueUSD
+        )
+      : this.protocol.cumulativeTotalRevenueUSD;
+
     snapshot.cumulativeSupplySideRevenueUSD =
       this.protocol.cumulativeSupplySideRevenueUSD;
-    snapshot.cumulativeProtocolSideRevenueUSD =
-      this.protocol.cumulativeProtocolSideRevenueUSD;
     snapshot.cumulativeStakeSideRevenueUSD =
       this.protocol.cumulativeStakeSideRevenueUSD;
+    snapshot.cumulativeProtocolSideRevenueUSD =
+      this.protocol.cumulativeProtocolSideRevenueUSD;
     snapshot.cumulativeTotalRevenueUSD =
       this.protocol.cumulativeTotalRevenueUSD;
+
+    snapshot.dailyEntryPremiumUSD = previousSnapshot
+      ? this.protocol.cumulativeEntryPremiumUSD.minus(
+          previousSnapshot.cumulativeEntryPremiumUSD
+        )
+      : this.protocol.cumulativeEntryPremiumUSD;
+    snapshot.dailyExitPremiumUSD = previousSnapshot
+      ? this.protocol.cumulativeExitPremiumUSD.minus(
+          previousSnapshot.cumulativeExitPremiumUSD
+        )
+      : this.protocol.cumulativeExitPremiumUSD;
+    snapshot.dailyTotalPremiumUSD = previousSnapshot
+      ? this.protocol.cumulativeTotalPremiumUSD.minus(
+          previousSnapshot.cumulativeTotalPremiumUSD
+        )
+      : this.protocol.cumulativeTotalPremiumUSD;
 
     snapshot.cumulativeEntryPremiumUSD =
       this.protocol.cumulativeEntryPremiumUSD;
@@ -90,101 +185,28 @@ export class ProtocolSnapshot {
     snapshot.cumulativeTotalPremiumUSD =
       this.protocol.cumulativeTotalPremiumUSD;
 
+    snapshot.dailyDepositPremiumUSD = previousSnapshot
+      ? this.protocol.cumulativeDepositPremiumUSD.minus(
+          previousSnapshot.cumulativeDepositPremiumUSD
+        )
+      : this.protocol.cumulativeDepositPremiumUSD;
+    snapshot.dailyWithdrawPremiumUSD = previousSnapshot
+      ? this.protocol.cumulativeWithdrawPremiumUSD.minus(
+          previousSnapshot.cumulativeWithdrawPremiumUSD
+        )
+      : this.protocol.cumulativeWithdrawPremiumUSD;
+    snapshot.dailyTotalLiquidityPremiumUSD = previousSnapshot
+      ? this.protocol.cumulativeTotalLiquidityPremiumUSD.minus(
+          previousSnapshot.cumulativeTotalLiquidityPremiumUSD
+        )
+      : this.protocol.cumulativeTotalLiquidityPremiumUSD;
+
     snapshot.cumulativeDepositPremiumUSD =
       this.protocol.cumulativeDepositPremiumUSD;
     snapshot.cumulativeWithdrawPremiumUSD =
       this.protocol.cumulativeWithdrawPremiumUSD;
     snapshot.cumulativeTotalLiquidityPremiumUSD =
       this.protocol.cumulativeTotalLiquidityPremiumUSD;
-
-    let volumeDelta = snapshot.cumulativeVolumeUSD;
-    let supplySideRevenueDelta = snapshot.cumulativeSupplySideRevenueUSD;
-    let protocolSideRevenueDelta = snapshot.cumulativeProtocolSideRevenueUSD;
-    let stakeSideRevenueDelta = snapshot.cumulativeStakeSideRevenueUSD;
-    let totalRevenueDelta = snapshot.cumulativeTotalRevenueUSD;
-
-    let inflowVolumeDelta = snapshot.cumulativeInflowVolumeUSD;
-    let outflowVolumeDelta = snapshot.cumulativeOutflowVolumeUSD;
-    let closedInflowVolumeDelta = snapshot.cumulativeClosedInflowVolumeUSD;
-
-    let entryPremiumDelta = snapshot.cumulativeEntryPremiumUSD;
-    let exitPremiumDelta = snapshot.cumulativeExitPremiumUSD;
-    let totalPremiumDelta = snapshot.cumulativeTotalPremiumUSD;
-
-    let depositPremiumDelta = snapshot.cumulativeDepositPremiumUSD;
-    let withdrawPremiumDelta = snapshot.cumulativeWithdrawPremiumUSD;
-    let totalLiquidityPremiumDelta =
-      snapshot.cumulativeTotalLiquidityPremiumUSD;
-
-    if (previousSnapshot) {
-      volumeDelta = snapshot.cumulativeVolumeUSD.minus(
-        previousSnapshot.cumulativeVolumeUSD
-      );
-      supplySideRevenueDelta = snapshot.cumulativeSupplySideRevenueUSD.minus(
-        previousSnapshot.cumulativeSupplySideRevenueUSD
-      );
-      protocolSideRevenueDelta =
-        snapshot.cumulativeProtocolSideRevenueUSD.minus(
-          previousSnapshot.cumulativeProtocolSideRevenueUSD
-        );
-      stakeSideRevenueDelta = snapshot.cumulativeStakeSideRevenueUSD.minus(
-        previousSnapshot.cumulativeStakeSideRevenueUSD
-      );
-      totalRevenueDelta = snapshot.cumulativeTotalRevenueUSD.minus(
-        previousSnapshot.cumulativeTotalRevenueUSD
-      );
-
-      inflowVolumeDelta = snapshot.cumulativeInflowVolumeUSD.minus(
-        previousSnapshot.cumulativeInflowVolumeUSD
-      );
-      outflowVolumeDelta = snapshot.cumulativeOutflowVolumeUSD.minus(
-        previousSnapshot.cumulativeOutflowVolumeUSD
-      );
-      closedInflowVolumeDelta = snapshot.cumulativeClosedInflowVolumeUSD.minus(
-        previousSnapshot.cumulativeClosedInflowVolumeUSD
-      );
-
-      entryPremiumDelta = snapshot.cumulativeEntryPremiumUSD.minus(
-        previousSnapshot.cumulativeEntryPremiumUSD
-      );
-      exitPremiumDelta = snapshot.cumulativeExitPremiumUSD.minus(
-        previousSnapshot.cumulativeExitPremiumUSD
-      );
-      totalPremiumDelta = snapshot.cumulativeTotalPremiumUSD.minus(
-        previousSnapshot.cumulativeTotalPremiumUSD
-      );
-
-      depositPremiumDelta = snapshot.cumulativeDepositPremiumUSD.minus(
-        previousSnapshot.cumulativeDepositPremiumUSD
-      );
-      withdrawPremiumDelta = snapshot.cumulativeWithdrawPremiumUSD.minus(
-        previousSnapshot.cumulativeWithdrawPremiumUSD
-      );
-      totalLiquidityPremiumDelta =
-        snapshot.cumulativeTotalLiquidityPremiumUSD.minus(
-          previousSnapshot.cumulativeTotalLiquidityPremiumUSD
-        );
-    }
-
-    snapshot.dailyVolumeUSD = volumeDelta;
-    snapshot.dailyOpenInterestUSD = this.protocol.openInterestUSD;
-
-    snapshot.dailyInflowVolumeUSD = inflowVolumeDelta;
-    snapshot.dailyClosedInflowVolumeUSD = closedInflowVolumeDelta;
-    snapshot.dailyOutflowVolumeUSD = outflowVolumeDelta;
-
-    snapshot.dailySupplySideRevenueUSD = supplySideRevenueDelta;
-    snapshot.dailyProtocolSideRevenueUSD = protocolSideRevenueDelta;
-    snapshot.dailyStakeSideRevenueUSD = stakeSideRevenueDelta;
-    snapshot.dailyTotalRevenueUSD = totalRevenueDelta;
-
-    snapshot.dailyEntryPremiumUSD = entryPremiumDelta;
-    snapshot.dailyExitPremiumUSD = exitPremiumDelta;
-    snapshot.dailyTotalPremiumUSD = totalPremiumDelta;
-
-    snapshot.dailyDepositPremiumUSD = depositPremiumDelta;
-    snapshot.dailyWithdrawPremiumUSD = withdrawPremiumDelta;
-    snapshot.dailyTotalLiquidityPremiumUSD = totalLiquidityPremiumDelta;
 
     snapshot.save();
   }
@@ -200,100 +222,83 @@ export class ProtocolSnapshot {
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;
 
+    snapshot.dailyActiveUsers = activity.dailyActiveUsers;
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
-    snapshot.cumulativePositionCount = this.protocol.cumulativePositionCount;
-    snapshot.totalPoolCount = this.protocol.totalPoolCount;
 
+    snapshot.dailylongPositionCount = previousSnapshot
+      ? this.protocol.longPositionCount - previousSnapshot.longPositionCount
+      : this.protocol.longPositionCount;
     snapshot.longPositionCount = this.protocol.longPositionCount;
+
+    snapshot.dailyshortPositionCount = previousSnapshot
+      ? this.protocol.shortPositionCount - previousSnapshot.shortPositionCount
+      : this.protocol.shortPositionCount;
     snapshot.shortPositionCount = this.protocol.shortPositionCount;
+
+    snapshot.dailyopenPositionCount = previousSnapshot
+      ? this.protocol.openPositionCount - previousSnapshot.openPositionCount
+      : this.protocol.openPositionCount;
     snapshot.openPositionCount = this.protocol.openPositionCount;
+
+    snapshot.dailyclosedPositionCount = previousSnapshot
+      ? this.protocol.closedPositionCount - previousSnapshot.closedPositionCount
+      : this.protocol.closedPositionCount;
     snapshot.closedPositionCount = this.protocol.closedPositionCount;
 
+    snapshot.dailycumulativePositionCount = previousSnapshot
+      ? this.protocol.cumulativePositionCount -
+        previousSnapshot.cumulativePositionCount
+      : this.protocol.cumulativePositionCount;
+    snapshot.cumulativePositionCount = this.protocol.cumulativePositionCount;
+
+    snapshot.dailyTransactionCount = activity.dailyTransactionCount;
+    snapshot.dailyDepositCount = activity.dailyDepositCount;
+    snapshot.dailyWithdrawCount = activity.dailyWithdrawCount;
+    snapshot.dailyBorrowCount = activity.dailyBorrowCount;
+    snapshot.dailySwapCount = activity.dailySwapCount;
+
+    snapshot.dailyActiveDepositors = activity.dailyActiveDepositors;
     snapshot.cumulativeUniqueDepositors =
       this.protocol.cumulativeUniqueDepositors;
+
+    snapshot.dailyActiveBorrowers = activity.dailyActiveBorrowers;
     snapshot.cumulativeUniqueBorrowers =
       this.protocol.cumulativeUniqueBorrowers;
 
+    snapshot.dailyActiveLiquidators = activity.dailyActiveLiquidators;
     snapshot.cumulativeUniqueLiquidators =
       this.protocol.cumulativeUniqueLiquidators;
+
+    snapshot.dailyActiveLiquidatees = activity.dailyActiveLiquidatees;
     snapshot.cumulativeUniqueLiquidatees =
       this.protocol.cumulativeUniqueLiquidatees;
 
+    snapshot.dailyCollateralIn = previousSnapshot
+      ? this.protocol.collateralInCount -
+        previousSnapshot.cumulativeCollateralIn
+      : this.protocol.collateralInCount;
     snapshot.cumulativeCollateralIn = this.protocol.collateralInCount;
+
+    snapshot.dailyCollateralOut = previousSnapshot
+      ? this.protocol.collateralOutCount -
+        previousSnapshot.cumulativeCollateralOut
+      : this.protocol.collateralOutCount;
     snapshot.cumulativeCollateralOut = this.protocol.collateralOutCount;
 
-    let longPositionCountDelta = snapshot.longPositionCount;
-    let shortPositionCountDelta = snapshot.shortPositionCount;
-    let openPositionCountDelta = snapshot.openPositionCount;
-    let closedPositionCountDelta = snapshot.closedPositionCount;
-    let positionCountDelta = snapshot.cumulativePositionCount;
-
-    // helper.dailyTransactionCount = 0;
-    // helper.dailyDepositCount = 0;
-    // helper.dailyWithdrawCount = 0;
-    // helper.dailyBorrowCount = 0;
-    // helper.dailySwapCount = 0;
-
-    // helper.hourlyTransactionCount = 0;
-    // helper.hourlyDepositCount = 0;
-    // helper.hourlyWithdrawCount = 0;
-    // helper.hourlySwapCount = 0;
-
-    // helper.dailyCollateralIn = 0;
-    // helper.dailyCollateralOut = 0;
-
-    let transactionCountDelta = this.protocol.transactionCount;
-    let depositCountDelta = this.protocol.depositCount;
-    let withdrawCountDelta = this.protocol.withdrawCount;
-    let borrowCountDelta = this.protocol.borrowCount;
-    let swapCountDelta = this.protocol.swapCount;
-
-    if (previousSnapshot) {
-      longPositionCountDelta =
-        snapshot.longPositionCount - previousSnapshot.longPositionCount;
-      shortPositionCountDelta =
-        snapshot.shortPositionCount - previousSnapshot.shortPositionCount;
-      openPositionCountDelta =
-        snapshot.openPositionCount - previousSnapshot.openPositionCount;
-      closedPositionCountDelta =
-        snapshot.closedPositionCount - previousSnapshot.closedPositionCount;
-      positionCountDelta =
-        snapshot.cumulativePositionCount -
-        previousSnapshot.cumulativePositionCount;
-
-      transactionCountDelta =
-        snapshot. -
-        previousSnapshot.cumulativeCollateralIn;
-      positionCountDelta =
-        snapshot.cumulativePositionCount -
-        previousSnapshot.cumulativePositionCount;
-      positionCountDelta =
-        snapshot.cumulativePositionCount -
-        previousSnapshot.cumulativePositionCount;
-    }
-
-    snapshot.dailylongPositionCount = longPositionCountDelta;
-    snapshot.dailyshortPositionCount = shortPositionCountDelta;
-    snapshot.dailyopenPositionCount = openPositionCountDelta;
-    snapshot.dailyclosedPositionCount = closedPositionCountDelta;
-    snapshot.dailycumulativePositionCount = positionCountDelta;
-
-    snapshot.dailyTransactionCount;
-    snapshot.dailyDepositCount;
-    snapshot.dailyWithdrawCount;
-    snapshot.dailyBorrowCount;
-    snapshot.dailySwapCount;
-
-    snapshot.dailyCollateralIn;
-    snapshot.dailyCollateralOut;
-
-    snapshot.dailyActiveUsers = activity.dailyActiveUsers;
-    snapshot.dailyActiveDepositors = activity.dailyActiveDepositors;
-    snapshot.dailyActiveBorrowers = activity.dailyActiveBorrowers;
-    snapshot.dailyActiveLiquidators = activity.dailyActiveLiquidators;
-    snapshot.dailyActiveLiquidatees = activity.dailyActiveLiquidatees;
-
+    snapshot.totalPoolCount = this.protocol.totalPoolCount;
     snapshot.save();
+
+    activity.dailyActiveUsers = 0;
+    activity.dailyActiveDepositors = 0;
+    activity.dailyActiveBorrowers = 0;
+    activity.dailyActiveLiquidators = 0;
+    activity.dailyActiveLiquidatees = 0;
+
+    activity.dailyTransactionCount = 0;
+    activity.dailyDepositCount = 0;
+    activity.dailyWithdrawCount = 0;
+    activity.dailyBorrowCount = 0;
+    activity.dailySwapCount = 0;
     activity.save();
   }
 
@@ -308,22 +313,31 @@ export class ProtocolSnapshot {
     snapshot.hours = hour;
     snapshot.protocol = this.protocol.id;
 
-    snapshot.hourlyActiveUsers;
+    snapshot.hourlyActiveUsers = previousSnapshot
+      ? this.protocol.cumulativeUniqueUsers -
+        previousSnapshot.cumulativeUniqueUsers
+      : this.protocol.cumulativeUniqueUsers;
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
 
-    snapshot.hourlyTransactionCount;
-    snapshot.hourlyDepositCount;
-    snapshot.hourlyWithdrawCount;
-    snapshot.hourlySwapCount;
-
+    snapshot.hourlyTransactionCount = activity.hourlyTransactionCount;
+    snapshot.hourlyDepositCount = activity.hourlyDepositCount;
+    snapshot.hourlyWithdrawCount = activity.hourlyWithdrawCount;
+    snapshot.hourlyBorrowCount = activity.hourlyBorrowCount;
+    snapshot.hourlySwapCount = activity.hourlySwapCount;
     snapshot.save();
 
     activity.hourlyActiveUsers = 0;
+    activity.hourlyTransactionCount = 0;
+    activity.hourlyDepositCount = 0;
+    activity.hourlyWithdrawCount = 0;
+    activity.hourlyBorrowCount = 0;
+    activity.hourlySwapCount = 0;
     activity.save();
   }
 }
 
 function initActivityHelper(): _ActivityHelper {
+  const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
   let helper = _ActivityHelper.load(ActivityHelperID);
   if (helper) return helper;
 
@@ -335,6 +349,18 @@ function initActivityHelper(): _ActivityHelper {
   helper.dailyActiveBorrowers = 0;
   helper.dailyActiveLiquidators = 0;
   helper.dailyActiveLiquidatees = 0;
+
+  helper.dailyTransactionCount = 0;
+  helper.hourlyTransactionCount = 0;
+  helper.dailyDepositCount = 0;
+  helper.hourlyDepositCount = 0;
+  helper.dailyWithdrawCount = 0;
+  helper.hourlyWithdrawCount = 0;
+  helper.dailyBorrowCount = 0;
+  helper.hourlyBorrowCount = 0;
+  helper.dailySwapCount = 0;
+  helper.hourlySwapCount = 0;
+
   helper.save();
 
   return helper;

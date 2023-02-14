@@ -130,6 +130,16 @@ export class Pool {
     return this.pool.id;
   }
 
+  getInputTokens(): Bytes[] {
+    return this.pool.inputTokens;
+  }
+
+  getOutputToken(): Bytes {
+    if (!this.pool.outputToken) return Bytes.empty();
+
+    return this.pool.outputToken;
+  }
+
   /**
    * Updates the total value locked for this pool to the given value.
    * Will also update the protocol's total value locked based on the change in this pool's.

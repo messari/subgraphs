@@ -120,7 +120,7 @@ export namespace LiquidityPoolFeeType {
 
 export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";
-  export const BORROW = "BORROW";
+  export const  BORROW = "BORROW";
   export const STAKE = "STAKE";
 }
 export type RewardTokenType = string;

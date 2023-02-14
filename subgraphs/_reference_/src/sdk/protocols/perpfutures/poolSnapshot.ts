@@ -58,29 +58,117 @@ export class PoolSnapshot {
     snapshot.pool = this.pool.id;
     snapshot.protocol = this.pool.protocol;
 
+    snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
+
     snapshot.cumulativeSupplySideRevenueUSD =
       this.pool.cumulativeSupplySideRevenueUSD;
+    snapshot.hourlySupplySideRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeSupplySideRevenueUSD.minus(
+          previousSnapshot.cumulativeSupplySideRevenueUSD
+        )
+      : snapshot.cumulativeSupplySideRevenueUSD;
+
     snapshot.cumulativeProtocolSideRevenueUSD =
       this.pool.cumulativeProtocolSideRevenueUSD;
+    snapshot.hourlyProtocolSideRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeProtocolSideRevenueUSD.minus(
+          previousSnapshot.cumulativeProtocolSideRevenueUSD
+        )
+      : snapshot.cumulativeProtocolSideRevenueUSD;
+
     snapshot.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
+    snapshot.hourlyTotalRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeTotalRevenueUSD.minus(
+          previousSnapshot.cumulativeTotalRevenueUSD
+        )
+      : snapshot.cumulativeTotalRevenueUSD;
+
+    snapshot.hourlyFundingrate = this.pool._fundingrate;
+    snapshot.hourlyOpenInterestUSD = this.pool.openInterestUSD;
 
     snapshot.cumulativeEntryPremiumUSD = this.pool.cumulativeEntryPremiumUSD;
+    snapshot.hourlyEntryPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeEntryPremiumUSD.minus(
+          previousSnapshot.cumulativeEntryPremiumUSD
+        )
+      : snapshot.cumulativeEntryPremiumUSD;
+
     snapshot.cumulativeExitPremiumUSD = this.pool.cumulativeExitPremiumUSD;
+    snapshot.hourlyExitPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeExitPremiumUSD.minus(
+          previousSnapshot.cumulativeExitPremiumUSD
+        )
+      : snapshot.cumulativeExitPremiumUSD;
+
     snapshot.cumulativeTotalPremiumUSD = this.pool.cumulativeTotalPremiumUSD;
+    snapshot.hourlyTotalPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeTotalPremiumUSD.minus(
+          previousSnapshot.cumulativeTotalPremiumUSD
+        )
+      : snapshot.cumulativeTotalPremiumUSD;
 
     snapshot.cumulativeDepositPremiumUSD =
       this.pool.cumulativeDepositPremiumUSD;
+    snapshot.hourlyDepositPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeDepositPremiumUSD.minus(
+          previousSnapshot.cumulativeDepositPremiumUSD
+        )
+      : snapshot.cumulativeDepositPremiumUSD;
+
     snapshot.cumulativeWithdrawPremiumUSD =
       this.pool.cumulativeWithdrawPremiumUSD;
+    snapshot.hourlyWithdrawPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeWithdrawPremiumUSD.minus(
+          previousSnapshot.cumulativeWithdrawPremiumUSD
+        )
+      : snapshot.cumulativeWithdrawPremiumUSD;
+
     snapshot.cumulativeTotalLiquidityPremiumUSD =
       this.pool.cumulativeTotalLiquidityPremiumUSD;
+    snapshot.hourlyTotalLiquidityPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeTotalLiquidityPremiumUSD.minus(
+          previousSnapshot.cumulativeTotalLiquidityPremiumUSD
+        )
+      : snapshot.cumulativeTotalLiquidityPremiumUSD;
 
-    snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
+    snapshot.hourlyVolumeByTokenUSD = [];
+    snapshot.hourlyVolumeByTokenAmount = [];
+
     snapshot.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD;
+    snapshot.hourlyVolumeUSD = previousSnapshot
+      ? snapshot.cumulativeVolumeUSD.minus(previousSnapshot.cumulativeVolumeUSD)
+      : snapshot.cumulativeVolumeUSD;
+
+    snapshot.hourlyInflowVolumeByTokenUSD = [];
+    snapshot.hourlyInflowVolumeByTokenAmount = [];
+
     snapshot.cumulativeInflowVolumeUSD = this.pool.cumulativeInflowVolumeUSD;
+    snapshot.hourlyInflowVolumeUSD = previousSnapshot
+      ? snapshot.cumulativeInflowVolumeUSD.minus(
+          previousSnapshot.cumulativeInflowVolumeUSD
+        )
+      : snapshot.cumulativeInflowVolumeUSD;
+
+    snapshot.hourlyClosedInflowVolumeByTokenUSD = [];
+    snapshot.hourlyClosedInflowVolumeByTokenAmount = [];
+
     snapshot.cumulativeClosedInflowVolumeUSD =
       this.pool.cumulativeClosedInflowVolumeUSD;
+    snapshot.hourlyClosedInflowVolumeUSD = previousSnapshot
+      ? snapshot.cumulativeClosedInflowVolumeUSD.minus(
+          previousSnapshot.cumulativeClosedInflowVolumeUSD
+        )
+      : snapshot.cumulativeClosedInflowVolumeUSD;
+
+    snapshot.hourlyOutflowVolumeByTokenUSD = [];
+    snapshot.hourlyOutflowVolumeByTokenAmount = [];
+
     snapshot.cumulativeOutflowVolumeUSD = this.pool.cumulativeOutflowVolumeUSD;
+    snapshot.hourlyOutflowVolumeUSD = previousSnapshot
+      ? snapshot.cumulativeOutflowVolumeUSD.minus(
+          previousSnapshot.cumulativeOutflowVolumeUSD
+        )
+      : snapshot.cumulativeOutflowVolumeUSD;
 
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenWeights = this.pool.inputTokenWeights;
@@ -89,103 +177,6 @@ export class PoolSnapshot {
     snapshot.stakedOutputTokenAmount = this.pool.stakedOutputTokenAmount;
     snapshot.rewardTokenEmissionsAmount = this.pool.rewardTokenEmissionsAmount;
     snapshot.rewardTokenEmissionsUSD = this.pool.rewardTokenEmissionsUSD;
-
-    let volumeDelta = snapshot.cumulativeVolumeUSD;
-    let supplySideRevenueDelta = snapshot.cumulativeSupplySideRevenueUSD;
-    let protocolSideRevenueDelta = snapshot.cumulativeProtocolSideRevenueUSD;
-    let totalRevenueDelta = snapshot.cumulativeTotalRevenueUSD;
-
-    let entryPremiumDelta = snapshot.cumulativeEntryPremiumUSD;
-    let exitPremiumDelta = snapshot.cumulativeExitPremiumUSD;
-    let totalPremiumDelta = snapshot.cumulativeTotalPremiumUSD;
-
-    let depositPremiumDelta = snapshot.cumulativeDepositPremiumUSD;
-    let withdrawPremiumDelta = snapshot.cumulativeWithdrawPremiumUSD;
-    let totalLiquidityPremiumDelta =
-      snapshot.cumulativeTotalLiquidityPremiumUSD;
-
-    let inflowVolumeDelta = snapshot.cumulativeInflowVolumeUSD;
-    let outflowVolumeDelta = snapshot.cumulativeOutflowVolumeUSD;
-    let closedInflowVolumeDelta = snapshot.cumulativeClosedInflowVolumeUSD;
-
-    if (previousSnapshot) {
-      volumeDelta = snapshot.cumulativeVolumeUSD.minus(
-        previousSnapshot.cumulativeVolumeUSD
-      );
-      supplySideRevenueDelta = snapshot.cumulativeSupplySideRevenueUSD.minus(
-        previousSnapshot.cumulativeSupplySideRevenueUSD
-      );
-      protocolSideRevenueDelta =
-        snapshot.cumulativeProtocolSideRevenueUSD.minus(
-          previousSnapshot.cumulativeProtocolSideRevenueUSD
-        );
-      totalRevenueDelta = snapshot.cumulativeTotalRevenueUSD.minus(
-        previousSnapshot.cumulativeTotalRevenueUSD
-      );
-
-      entryPremiumDelta = snapshot.cumulativeEntryPremiumUSD.minus(
-        previousSnapshot.cumulativeEntryPremiumUSD
-      );
-      exitPremiumDelta = snapshot.cumulativeExitPremiumUSD.minus(
-        previousSnapshot.cumulativeExitPremiumUSD
-      );
-      totalPremiumDelta = snapshot.cumulativeTotalPremiumUSD.minus(
-        previousSnapshot.cumulativeTotalPremiumUSD
-      );
-
-      depositPremiumDelta = snapshot.cumulativeDepositPremiumUSD.minus(
-        previousSnapshot.cumulativeDepositPremiumUSD
-      );
-      withdrawPremiumDelta = snapshot.cumulativeWithdrawPremiumUSD.minus(
-        previousSnapshot.cumulativeWithdrawPremiumUSD
-      );
-      totalLiquidityPremiumDelta =
-        snapshot.cumulativeTotalLiquidityPremiumUSD.minus(
-          previousSnapshot.cumulativeTotalLiquidityPremiumUSD
-        );
-
-      inflowVolumeDelta = snapshot.cumulativeInflowVolumeUSD.minus(
-        previousSnapshot.cumulativeInflowVolumeUSD
-      );
-      outflowVolumeDelta = snapshot.cumulativeOutflowVolumeUSD.minus(
-        previousSnapshot.cumulativeOutflowVolumeUSD
-      );
-      closedInflowVolumeDelta = snapshot.cumulativeClosedInflowVolumeUSD.minus(
-        previousSnapshot.cumulativeClosedInflowVolumeUSD
-      );
-    }
-
-    snapshot.hourlySupplySideRevenueUSD = supplySideRevenueDelta;
-    snapshot.hourlyProtocolSideRevenueUSD = protocolSideRevenueDelta;
-    snapshot.hourlyTotalRevenueUSD = totalRevenueDelta;
-
-    snapshot.hourlyFundingrate = this.pool._fundingrate;
-    snapshot.hourlyOpenInterestUSD = this.pool.openInterestUSD;
-
-    snapshot.hourlyEntryPremiumUSD = entryPremiumDelta;
-    snapshot.hourlyExitPremiumUSD = exitPremiumDelta;
-    snapshot.hourlyTotalPremiumUSD = totalPremiumDelta;
-
-    snapshot.hourlyDepositPremiumUSD = depositPremiumDelta;
-    snapshot.hourlyWithdrawPremiumUSD = withdrawPremiumDelta;
-    snapshot.hourlyTotalLiquidityPremiumUSD = totalLiquidityPremiumDelta;
-
-    // TODO: Add logic for hourlyVolumeByTokenUSD
-    snapshot.hourlyVolumeByTokenUSD = [];
-    snapshot.hourlyVolumeByTokenAmount = [];
-    snapshot.hourlyVolumeUSD = volumeDelta;
-
-    snapshot.hourlyInflowVolumeUSD = inflowVolumeDelta;
-    snapshot.hourlyInflowVolumeByTokenAmount;
-    snapshot.hourlyInflowVolumeByTokenUSD;
-
-    snapshot.hourlyClosedInflowVolumeByTokenUSD = [];
-    snapshot.hourlyClosedInflowVolumeByTokenAmount = [];
-    snapshot.hourlyClosedInflowVolumeUSD = closedInflowVolumeDelta;
-
-    snapshot.hourlyOutflowVolumeByTokenUSD = [];
-    snapshot.hourlyOutflowVolumeByTokenAmount = [];
-    snapshot.hourlyOutflowVolumeUSD = outflowVolumeDelta;
 
     snapshot.save();
   }
@@ -202,29 +193,163 @@ export class PoolSnapshot {
     snapshot.pool = this.pool.id;
     snapshot.protocol = this.pool.protocol;
 
+    snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
+
     snapshot.cumulativeSupplySideRevenueUSD =
       this.pool.cumulativeSupplySideRevenueUSD;
+    snapshot.dailySupplySideRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeSupplySideRevenueUSD.minus(
+          previousSnapshot.cumulativeSupplySideRevenueUSD
+        )
+      : snapshot.cumulativeSupplySideRevenueUSD;
+
     snapshot.cumulativeProtocolSideRevenueUSD =
       this.pool.cumulativeProtocolSideRevenueUSD;
+    snapshot.dailyProtocolSideRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeProtocolSideRevenueUSD.minus(
+          previousSnapshot.cumulativeProtocolSideRevenueUSD
+        )
+      : snapshot.cumulativeProtocolSideRevenueUSD;
+
     snapshot.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
+    snapshot.dailyTotalRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeTotalRevenueUSD.minus(
+          previousSnapshot.cumulativeTotalRevenueUSD
+        )
+      : snapshot.cumulativeTotalRevenueUSD;
+
+    snapshot.dailyFundingrate = this.pool._fundingrate;
+    snapshot.dailyOpenInterestUSD = this.pool.openInterestUSD;
 
     snapshot.cumulativeEntryPremiumUSD = this.pool.cumulativeEntryPremiumUSD;
+    snapshot.dailyEntryPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeEntryPremiumUSD.minus(
+          previousSnapshot.cumulativeEntryPremiumUSD
+        )
+      : snapshot.cumulativeEntryPremiumUSD;
+
     snapshot.cumulativeExitPremiumUSD = this.pool.cumulativeExitPremiumUSD;
+    snapshot.dailyExitPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeExitPremiumUSD.minus(
+          previousSnapshot.cumulativeExitPremiumUSD
+        )
+      : snapshot.cumulativeExitPremiumUSD;
+
     snapshot.cumulativeTotalPremiumUSD = this.pool.cumulativeTotalPremiumUSD;
+    snapshot.dailyTotalPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeTotalPremiumUSD.minus(
+          previousSnapshot.cumulativeTotalPremiumUSD
+        )
+      : snapshot.cumulativeTotalPremiumUSD;
 
     snapshot.cumulativeDepositPremiumUSD =
       this.pool.cumulativeDepositPremiumUSD;
+    snapshot.dailyDepositPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeDepositPremiumUSD.minus(
+          previousSnapshot.cumulativeDepositPremiumUSD
+        )
+      : snapshot.cumulativeDepositPremiumUSD;
+
     snapshot.cumulativeWithdrawPremiumUSD =
       this.pool.cumulativeWithdrawPremiumUSD;
+    snapshot.dailyWithdrawPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeWithdrawPremiumUSD.minus(
+          previousSnapshot.cumulativeWithdrawPremiumUSD
+        )
+      : snapshot.cumulativeWithdrawPremiumUSD;
+
     snapshot.cumulativeTotalLiquidityPremiumUSD =
       this.pool.cumulativeTotalLiquidityPremiumUSD;
+    snapshot.dailyTotalLiquidityPremiumUSD = previousSnapshot
+      ? snapshot.cumulativeTotalLiquidityPremiumUSD.minus(
+          previousSnapshot.cumulativeTotalLiquidityPremiumUSD
+        )
+      : snapshot.cumulativeTotalLiquidityPremiumUSD;
 
-    snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
+    snapshot.dailyVolumeByTokenUSD = [];
+    snapshot.dailyVolumeByTokenAmount = [];
+
     snapshot.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD;
+    snapshot.dailyVolumeUSD = previousSnapshot
+      ? snapshot.cumulativeVolumeUSD.minus(previousSnapshot.cumulativeVolumeUSD)
+      : snapshot.cumulativeVolumeUSD;
+
+    snapshot.dailyInflowVolumeByTokenUSD = [];
+    snapshot.dailyInflowVolumeByTokenAmount = [];
+
     snapshot.cumulativeInflowVolumeUSD = this.pool.cumulativeInflowVolumeUSD;
+    snapshot.dailyInflowVolumeUSD = previousSnapshot
+      ? snapshot.cumulativeInflowVolumeUSD.minus(
+          previousSnapshot.cumulativeInflowVolumeUSD
+        )
+      : snapshot.cumulativeInflowVolumeUSD;
+
+    snapshot.dailyClosedInflowVolumeByTokenUSD = [];
+    snapshot.dailyClosedInflowVolumeByTokenAmount = [];
+
     snapshot.cumulativeClosedInflowVolumeUSD =
       this.pool.cumulativeClosedInflowVolumeUSD;
+    snapshot.dailyClosedInflowVolumeUSD = previousSnapshot
+      ? snapshot.cumulativeClosedInflowVolumeUSD.minus(
+          previousSnapshot.cumulativeClosedInflowVolumeUSD
+        )
+      : snapshot.cumulativeClosedInflowVolumeUSD;
+
+    snapshot.dailyOutflowVolumeByTokenUSD = [];
+    snapshot.dailyOutflowVolumeByTokenAmount = [];
+
     snapshot.cumulativeOutflowVolumeUSD = this.pool.cumulativeOutflowVolumeUSD;
+    snapshot.dailyOutflowVolumeUSD = previousSnapshot
+      ? snapshot.cumulativeOutflowVolumeUSD.minus(
+          previousSnapshot.cumulativeOutflowVolumeUSD
+        )
+      : snapshot.cumulativeOutflowVolumeUSD;
+
+    snapshot.cumulativeUniqueBorrowers = this.pool.cumulativeUniqueBorrowers;
+    snapshot.dailyActiveBorrowers = previousSnapshot
+      ? snapshot.cumulativeUniqueBorrowers -
+        previousSnapshot.cumulativeUniqueBorrowers
+      : snapshot.cumulativeUniqueBorrowers;
+
+    snapshot.cumulativeUniqueLiquidators =
+      this.pool.cumulativeUniqueLiquidators;
+    snapshot.dailyActiveLiquidators = previousSnapshot
+      ? snapshot.cumulativeUniqueLiquidators -
+        previousSnapshot.cumulativeUniqueLiquidators
+      : snapshot.cumulativeUniqueLiquidators;
+
+    snapshot.cumulativeUniqueLiquidatees =
+      this.pool.cumulativeUniqueLiquidatees;
+    snapshot.dailyActiveLiquidatees = previousSnapshot
+      ? snapshot.cumulativeUniqueLiquidatees -
+        previousSnapshot.cumulativeUniqueLiquidatees
+      : snapshot.cumulativeUniqueLiquidatees;
+
+    snapshot.longPositionCount = this.pool.longPositionCount;
+    snapshot.dailylongPositionCount = previousSnapshot
+      ? snapshot.longPositionCount - previousSnapshot.longPositionCount
+      : snapshot.longPositionCount;
+
+    snapshot.shortPositionCount = this.pool.shortPositionCount;
+    snapshot.dailyshortPositionCount = previousSnapshot
+      ? snapshot.shortPositionCount - previousSnapshot.shortPositionCount
+      : snapshot.shortPositionCount;
+
+    snapshot.openPositionCount = this.pool.openPositionCount;
+    snapshot.dailyopenPositionCount = previousSnapshot
+      ? snapshot.openPositionCount - previousSnapshot.openPositionCount
+      : snapshot.openPositionCount;
+
+    snapshot.closedPositionCount = this.pool.closedPositionCount;
+    snapshot.dailyclosedPositionCount = previousSnapshot
+      ? snapshot.closedPositionCount - previousSnapshot.closedPositionCount
+      : snapshot.closedPositionCount;
+
+    snapshot.cumulativePositionCount = this.pool.cumulativePositionCount;
+    snapshot.dailycumulativePositionCount = previousSnapshot
+      ? snapshot.cumulativePositionCount -
+        previousSnapshot.cumulativePositionCount
+      : snapshot.cumulativePositionCount;
 
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenWeights = this.pool.inputTokenWeights;
@@ -233,156 +358,6 @@ export class PoolSnapshot {
     snapshot.stakedOutputTokenAmount = this.pool.stakedOutputTokenAmount;
     snapshot.rewardTokenEmissionsAmount = this.pool.rewardTokenEmissionsAmount;
     snapshot.rewardTokenEmissionsUSD = this.pool.rewardTokenEmissionsUSD;
-
-    snapshot.cumulativeUniqueBorrowers = this.pool.cumulativeUniqueBorrowers;
-    snapshot.cumulativeUniqueLiquidators =
-      this.pool.cumulativeUniqueLiquidators;
-    snapshot.cumulativeUniqueLiquidatees =
-      this.pool.cumulativeUniqueLiquidatees;
-
-    snapshot.longPositionCount = this.pool.longPositionCount;
-    snapshot.shortPositionCount = this.pool.shortPositionCount;
-    snapshot.openPositionCount = this.pool.openPositionCount;
-    snapshot.closedPositionCount = this.pool.closedPositionCount;
-    snapshot.cumulativePositionCount = this.pool.cumulativePositionCount;
-
-    let volumeDelta = snapshot.cumulativeVolumeUSD;
-    let supplySideRevenueDelta = snapshot.cumulativeSupplySideRevenueUSD;
-    let protocolSideRevenueDelta = snapshot.cumulativeProtocolSideRevenueUSD;
-    let totalRevenueDelta = snapshot.cumulativeTotalRevenueUSD;
-
-    let entryPremiumDelta = snapshot.cumulativeEntryPremiumUSD;
-    let exitPremiumDelta = snapshot.cumulativeExitPremiumUSD;
-    let totalPremiumDelta = snapshot.cumulativeTotalPremiumUSD;
-
-    let depositPremiumDelta = snapshot.cumulativeDepositPremiumUSD;
-    let withdrawPremiumDelta = snapshot.cumulativeWithdrawPremiumUSD;
-    let totalLiquidityPremiumDelta =
-      snapshot.cumulativeTotalLiquidityPremiumUSD;
-
-    let inflowVolumeDelta = snapshot.cumulativeInflowVolumeUSD;
-    let outflowVolumeDelta = snapshot.cumulativeOutflowVolumeUSD;
-    let closedInflowVolumeDelta = snapshot.cumulativeClosedInflowVolumeUSD;
-
-    let uniqueBorrowersDelta = snapshot.cumulativeUniqueBorrowers;
-    let uniqueLiquidatorsDelta = snapshot.cumulativeUniqueLiquidators;
-    let uniqueLiquidateesDelta = snapshot.cumulativeUniqueLiquidatees;
-
-    let longPositionCountDelta = snapshot.longPositionCount;
-    let shortPositionCountDelta = snapshot.shortPositionCount;
-    let openPositionCountDelta = snapshot.openPositionCount;
-    let closedPositionCountDelta = snapshot.closedPositionCount;
-    let positionCountDelta = snapshot.cumulativePositionCount;
-
-    if (previousSnapshot) {
-      volumeDelta = snapshot.cumulativeVolumeUSD.minus(
-        previousSnapshot.cumulativeVolumeUSD
-      );
-      supplySideRevenueDelta = snapshot.cumulativeSupplySideRevenueUSD.minus(
-        previousSnapshot.cumulativeSupplySideRevenueUSD
-      );
-      protocolSideRevenueDelta =
-        snapshot.cumulativeProtocolSideRevenueUSD.minus(
-          previousSnapshot.cumulativeProtocolSideRevenueUSD
-        );
-      totalRevenueDelta = snapshot.cumulativeTotalRevenueUSD.minus(
-        previousSnapshot.cumulativeTotalRevenueUSD
-      );
-
-      entryPremiumDelta = snapshot.cumulativeEntryPremiumUSD.minus(
-        previousSnapshot.cumulativeEntryPremiumUSD
-      );
-      exitPremiumDelta = snapshot.cumulativeExitPremiumUSD.minus(
-        previousSnapshot.cumulativeExitPremiumUSD
-      );
-      totalPremiumDelta = snapshot.cumulativeTotalPremiumUSD.minus(
-        previousSnapshot.cumulativeTotalPremiumUSD
-      );
-
-      depositPremiumDelta = snapshot.cumulativeDepositPremiumUSD.minus(
-        previousSnapshot.cumulativeDepositPremiumUSD
-      );
-      withdrawPremiumDelta = snapshot.cumulativeWithdrawPremiumUSD.minus(
-        previousSnapshot.cumulativeWithdrawPremiumUSD
-      );
-      totalLiquidityPremiumDelta =
-        snapshot.cumulativeTotalLiquidityPremiumUSD.minus(
-          previousSnapshot.cumulativeTotalLiquidityPremiumUSD
-        );
-
-      inflowVolumeDelta = snapshot.cumulativeInflowVolumeUSD.minus(
-        previousSnapshot.cumulativeInflowVolumeUSD
-      );
-      outflowVolumeDelta = snapshot.cumulativeOutflowVolumeUSD.minus(
-        previousSnapshot.cumulativeOutflowVolumeUSD
-      );
-      closedInflowVolumeDelta = snapshot.cumulativeClosedInflowVolumeUSD.minus(
-        previousSnapshot.cumulativeClosedInflowVolumeUSD
-      );
-
-      uniqueBorrowersDelta =
-        snapshot.cumulativeUniqueBorrowers -
-        previousSnapshot.cumulativeUniqueBorrowers;
-      uniqueLiquidatorsDelta =
-        snapshot.cumulativeUniqueLiquidators -
-        previousSnapshot.cumulativeUniqueLiquidators;
-      uniqueLiquidateesDelta =
-        snapshot.cumulativeUniqueLiquidatees -
-        previousSnapshot.cumulativeUniqueLiquidatees;
-
-      longPositionCountDelta =
-        snapshot.longPositionCount - previousSnapshot.longPositionCount;
-      shortPositionCountDelta =
-        snapshot.shortPositionCount - previousSnapshot.shortPositionCount;
-      openPositionCountDelta =
-        snapshot.openPositionCount - previousSnapshot.openPositionCount;
-      closedPositionCountDelta =
-        snapshot.closedPositionCount - previousSnapshot.closedPositionCount;
-      positionCountDelta =
-        snapshot.cumulativePositionCount -
-        previousSnapshot.cumulativePositionCount;
-    }
-
-    snapshot.dailySupplySideRevenueUSD = supplySideRevenueDelta;
-    snapshot.dailyProtocolSideRevenueUSD = protocolSideRevenueDelta;
-    snapshot.dailyTotalRevenueUSD = totalRevenueDelta;
-
-    snapshot.dailyFundingrate = this.pool._fundingrate;
-    snapshot.dailyOpenInterestUSD = this.pool.openInterestUSD;
-
-    snapshot.dailyEntryPremiumUSD = entryPremiumDelta;
-    snapshot.dailyExitPremiumUSD = exitPremiumDelta;
-    snapshot.dailyTotalPremiumUSD = totalPremiumDelta;
-
-    snapshot.dailyDepositPremiumUSD = depositPremiumDelta;
-    snapshot.dailyWithdrawPremiumUSD = withdrawPremiumDelta;
-    snapshot.dailyTotalLiquidityPremiumUSD = totalLiquidityPremiumDelta;
-
-    snapshot.dailyVolumeByTokenUSD = [];
-    snapshot.dailyVolumeByTokenAmount = [];
-    snapshot.dailyVolumeUSD = volumeDelta;
-
-    snapshot.dailyInflowVolumeUSD = inflowVolumeDelta;
-    snapshot.dailyInflowVolumeByTokenAmount;
-    snapshot.dailyInflowVolumeByTokenUSD;
-
-    snapshot.dailyClosedInflowVolumeByTokenUSD = [];
-    snapshot.dailyClosedInflowVolumeByTokenAmount = [];
-    snapshot.dailyClosedInflowVolumeUSD = closedInflowVolumeDelta;
-
-    snapshot.dailyOutflowVolumeByTokenUSD = [];
-    snapshot.dailyOutflowVolumeByTokenAmount = [];
-    snapshot.dailyOutflowVolumeUSD = outflowVolumeDelta;
-
-    snapshot.dailyActiveBorrowers = uniqueBorrowersDelta;
-    snapshot.dailyActiveLiquidators = uniqueLiquidatorsDelta;
-    snapshot.dailyActiveLiquidatees = uniqueLiquidateesDelta;
-
-    snapshot.dailylongPositionCount = longPositionCountDelta;
-    snapshot.dailyshortPositionCount = shortPositionCountDelta;
-    snapshot.dailyopenPositionCount = openPositionCountDelta;
-    snapshot.dailyclosedPositionCount = closedPositionCountDelta;
-    snapshot.dailycumulativePositionCount = positionCountDelta;
 
     snapshot.save();
   }
