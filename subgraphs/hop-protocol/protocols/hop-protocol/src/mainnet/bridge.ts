@@ -18,6 +18,7 @@ import {
 	BigInt,
 	Bytes,
 	dataSource,
+	ethereum,
 	log,
 } from '@graphprotocol/graph-ts'
 import {
@@ -241,9 +242,12 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 	}
 }
 
-// export function handleWithdrawalBonded(event: WithdrawalBonded): void {
-// 	log.warning('WB --> transferId: {}, txHash: {}, d1: {}', [
-// 		event.params.transferId.toHexString(),
-// 		event.transaction.hash.toHexString(),
-// 	])
-// }
+export function handleWithdrawalBonded(event: WithdrawalBonded): void {
+	log.warning('WB --> transferId: {}, txHash: {}', [
+		event.params.transferId.toHexString(),
+		event.transaction.hash.toHexString(),
+	])
+	// let val = ethereum.decode('bytes32', event.params.transferId)
+
+	// log.warning('WB2 --> transferId: {}', [val.toString()])
+}

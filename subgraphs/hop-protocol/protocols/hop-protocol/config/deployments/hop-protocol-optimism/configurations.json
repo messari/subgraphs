@@ -3,9 +3,9 @@
   "isMainnet": false,
   "subgraphName": "hop-optimism",
   "deployment": "HOP_PROTOCOL_OPTIMISM",
-  "graftEnabled": true,
-  "subgraphId": "QmXMz3MYST9ZCAf1hqzkWPLiFCZZzPTHjCX9EZC7zcjNUy",
-  "graftStartBlock": 13838432,
+  "graftEnabled": false,
+  "subgraphId": "QmYSoe4KvMETzMs6JuS4bUhDUr6924p8i9WKWv8pJP4Xfy",
+  "graftStartBlock": 28567374,
   "tokens": [
     {
       "dataSourceName": "Token",

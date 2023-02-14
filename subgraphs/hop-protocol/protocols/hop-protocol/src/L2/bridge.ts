@@ -31,7 +31,6 @@ import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
 import {
-	MESSENGER_ADDRESSES,
 	XDAI_L2_SIGNATURE,
 	OPTIMISM_L2_SIGNATURE,
 	MESSENGER_EVENT_SIGNATURES,

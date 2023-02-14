@@ -35,9 +35,9 @@ export namespace XdaiRewardToken {
 	export const USDC_B =
 		'0x636A7ee78faCd079DaBC8f81EDA1D09AA9D440A7'.toLowerCase()
 	export const USDT_A =
-		'0x12a3a66720dD925fa93f7C895bC20Ca9560AdFe7'.toLowerCase()
+		'0x2C2Ab81Cf235e86374468b387e241DF22459A265'.toLowerCase()
 	export const USDT_B =
-		'0xBF7a02d963b23D84313F07a04ad663409CEE5A92'.toLowerCase()
+		'0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1'.toLowerCase()
 	export const DAI_A =
 		'0x12a3a66720dD925fa93f7C895bC20Ca9560AdFe7'.toLowerCase()
 	export const DAI_B =

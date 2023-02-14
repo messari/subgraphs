@@ -79,6 +79,8 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			poolAddress,
 			amount.toString(),
 		])
+		const inputToken =
+			NetworkConfigs.getTokenAddressFromPoolAddress(poolAddress)
 
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 		log.warning('RewardsPaid 1 --> poolAddress: {},', [poolAddress])
@@ -89,8 +91,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
-		const token = sdk.Tokens.getOrCreateToken(event.address)
-		sdk.Accounts.loadAccount(event.params.user)
+		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
 
 		if (!pool.isInitialized) {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)

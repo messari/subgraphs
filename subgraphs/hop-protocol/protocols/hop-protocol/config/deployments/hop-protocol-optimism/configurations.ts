@@ -66,7 +66,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 		} else if (this.getUsdtTokens().includes(tokenAddress)) {
 			return ['USDT', 'Tether USD', '6', OptimismBridge.USDT]
 		} else if (this.getEthTokens().includes(tokenAddress)) {
-			return ['ETH', 'Ethereum', '18', OptimismBridge.USDC]
+			return ['ETH', 'Ethereum', '18', OptimismBridge.ETH]
 		} else if (tokenAddress == OptimismToken.WBTC) {
 			return ['WBTC', 'Wrapped BTC', '18', OptimismBridge.WBTC]
 		} else if (this.getSnxTokens().includes(tokenAddress)) {
@@ -213,6 +213,8 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 			return ['HOP-SNX', 'hSNX/SNX']
 		} else if (poolAddress == OptimismAmm.WBTC) {
 			return ['HOP-WBTC', 'hWBTC/WBTC']
+		} else if (poolAddress == ZERO_ADDRESS) {
+			return ['HOP-POOL', 'HOP/HOP']
 		} else {
 			log.critical('Token not found', [])
 			return []
@@ -240,6 +242,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 			OptimismAmm.sUSD,
 			OptimismAmm.ETH,
 			OptimismAmm.WBTC,
+			ZERO_ADDRESS,
 		]
 	}
 	getBridgeList(): string[] {
@@ -295,7 +298,7 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 	getSnxTokens(): string[] {
 		return [
 			OptimismRewardToken.SNX_A,
-			OptimismToken.USDT,
+			OptimismToken.SNX,
 			OptimismRewardToken.SNX_B,
 		]
 	}
