@@ -1,10 +1,4 @@
-import {
-  log,
-  BigInt,
-  Address,
-  ethereum,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   getOrCreateVault,
   getOrCreateToken,
@@ -109,7 +103,7 @@ export function updateRbnRewardsInfo(
   vaultAddress: Address,
   block: ethereum.Block
 ): void {
-  const vault = getOrCreateVault(vaultAddress, block);
+  getOrCreateVault(vaultAddress, block);
 
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
   const gaugeControllerContract = GaugeControllerContract.bind(
