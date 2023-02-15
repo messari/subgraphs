@@ -152,8 +152,8 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
           <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("protocols-list")}>
             Protocols To Develop
           </span>
-          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("out-of-sync")}>
-            Out Of Sync Deployments
+          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("version-comparison")}>
+            Version Comparison
           </span>
         </div>
         {devCountTable}

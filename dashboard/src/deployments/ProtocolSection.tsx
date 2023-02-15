@@ -714,7 +714,6 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
             <TableCell
                 sx={{ padding: "0 0 0 6px", verticalAlign: "middle", display: "flex", height: "35px" }}
             >
-
                 <Tooltip title="Click To View All Deployments On This Protocol" placement="top" >
                     <SubgraphLogo name={subgraphName} size={30} />
                 </Tooltip>
