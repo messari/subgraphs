@@ -15,8 +15,8 @@ import { Vault } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
-import { GaugeController as GaugeControllerContract } from "../../generated/rETHThetaGauge/GaugeController";
-import { LiquidityGaugeV5 as LiquidityGaugeContract } from "../../generated/rETHThetaGauge/LiquidityGaugeV5";
+import { GaugeController as GaugeControllerContract } from "../../generated/GaugeController/GaugeController";
+import { LiquidityGaugeV5 as LiquidityGaugeContract } from "../../generated/GaugeController/LiquidityGaugeV5";
 
 export function getRewardsData_v1(
   gaugeAddress: Address,
@@ -101,12 +101,6 @@ export function updateFactoryRewards(
 
     const rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
     updateRewardTokenEmissions(rewardToken, rewardPerDay, vaultAddress, block);
-
-    log.warning("[Rewards] Vault: {}, RewardToken: {}, RewardRate: {}", [
-      vaultAddress.toHexString(),
-      rewardToken.toHexString(),
-      rewardRatePerDay.toString(),
-    ]);
   }
 }
 
@@ -144,15 +138,6 @@ export function updateRbnRewardsInfo(
     BigInt.fromString(rbnRewardEmissionsPerDay.truncate(0).toString()),
     vaultAddress,
     block
-  );
-  log.warning(
-    "[updateRbnRewardsInfo] inflationRate {} gaugeRelativeWeight {} emissionsPerDay {} vault {}",
-    [
-      inflationRate.toString(),
-      gaugeRelativeWeight.toString(),
-      rbnRewardEmissionsPerDay.toString(),
-      vault.id,
-    ]
   );
 }
 
@@ -208,16 +193,4 @@ export function updateRewardTokenEmissions(
   vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   vault.save();
-
-  log.warning(
-    "[updateRewardTokenEmmission] rewardTokenEmissionsAmount {} RewardTokenEmissionUSD {} RewardTokenIndex {} vault {} rewardTokenEmissionsAmountLength {} rewardTokenEmissionsUSDLength {}",
-    [
-      rewardTokenEmissionsAmount.toString(),
-      rewardTokenEmissionsUSD.toString(),
-      rewardTokenIndex.toString(),
-      vault.id,
-      vault.rewardTokenEmissionsAmount!.length.toString(),
-      vault.rewardTokenEmissionsUSD!.length.toString(),
-    ]
-  );
 }

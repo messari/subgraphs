@@ -12,7 +12,7 @@ dataSources:
   {{#vaults}}
   - kind: ethereum/contract
     name: "{{name}}"
-    network: mainnet
+    network: {{network}}
     source:
       address: "{{address}}"
       abi: RibbonThetaVaultWithSwap
@@ -84,6 +84,8 @@ dataSources:
           handler: handleInitiateGnosisAuction
         - event: CollectVaultFees(uint256,uint256,uint256,indexed address)
           handler: handleCollectVaultFees
+        - event: CapSet(uint256,uint256)
+          handler: handleCapSet
           #Earn Vaults
         - event: PayOptionYield(uint256,uint256,indexed address)
           handler: handlePayOptionYield
@@ -92,13 +94,14 @@ dataSources:
           #V1
         - event: Withdraw(indexed address,uint256,uint256,uint256)
           handler: handleWithdrawWithFee
-
+        - event: CapSet(uint256,uint256,address)
+          handler: handleCapSetWithManager
   {{/vaults}}
     
   {{#liquidityGauges}}
   - kind: ethereum/contract
     name: "{{name}}"
-    network: mainnet
+    network: {{network}}
     source:
       address: "{{address}}"
       abi: LiquidityGaugeV5
@@ -157,22 +160,22 @@ dataSources:
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
         - event: Deposit(indexed address,uint256)
-          handler: handleStake
+          handler: handleGaugeDeposit
         - event: Withdraw(indexed address,uint256)
-          handler: handleUnstake
+          handler: handleGaugeWithdraw
         - event: Staked(indexed address,uint256)
-          handler: handleStaked
+          handler: handleMiningDeposit
         - event: Withdrawn(indexed address,uint256)
-          handler: handleWithdrawn
+          handler: handleMiningWithdraw
   {{/liquidityGauges}}
 
   - kind: ethereum/contract
     name: GnosisAuction
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0x0b7fFc1f4AD541A4Ed16b40D8c37f0929158D101"
+      address: "{{gnosisAuctionAddress}}"
       abi: GnosisAuction
-      startBlock: 13195539
+      startBlock: {{gnosisAuctionStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -228,11 +231,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: RibbonSwapOld
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0xF0E5c92cEdd66C7985C354C35e2bC37E685b99Da"
+      address: "{{swapOldAddress}}"
       abi: SwapContract
-      startBlock: 14740669
+      startBlock: {{swapOldStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -247,8 +250,6 @@ dataSources:
         - BalanceUpdate
         - SwapOffer
       abis:
-        - name: RibbonThetaVaultWithSwap
-          file: ./abis/RibbonThetaVaultWithSwap.json
         - name: RibbonThetaVaultWithSwap
           file: ./abis/RibbonThetaVaultWithSwap.json
         - name: SwapContract
@@ -294,11 +295,11 @@ dataSources:
           handler: handleNewOffer
   - kind: ethereum/contract
     name: RibbonSwap
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0xEb8CAB2F4663247db8eAfb556F498c861bB4e161"
+      address: "{{swapNewAddress}}"
       abi: SwapContract
-      startBlock: 15126067
+      startBlock: {{swapNewStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -306,15 +307,8 @@ dataSources:
       file: ./src/mappings/vault.ts
       entities:
         - Vault
-        - VaultShortPosition
-        - VaultOptionTrade
-        - VaultTransaction
-        - VaultAccount
-        - BalanceUpdate
         - SwapOffer
       abis:
-        - name: RibbonThetaVaultWithSwap
-          file: ./abis/RibbonThetaVaultWithSwap.json
         - name: RibbonThetaVaultWithSwap
           file: ./abis/RibbonThetaVaultWithSwap.json
         - name: SwapContract
@@ -361,11 +355,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: Airswap
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0x4572f2554421Bd64Bef1c22c8a81840E8D496BeA"
+      address: "{{airswapAddress}}"
       abi: Airswap
-      startBlock: 11938402
+      startBlock: {{airswapStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -415,13 +409,14 @@ dataSources:
         - event: Swap(indexed uint256,uint256,indexed address,uint256,uint256,address,indexed address,uint256,uint256,address,address,uint256,uint256,address)
           handler: handleAirswap
 
+{{#isGaugeController}}
   - name: GaugeController
     kind: ethereum/contract
-    network: mainnet
+    network: {{network}}
     source:
       abi: GaugeController
-      address: "0x0cb9cc35cEFa5622E8d25aF36dD56DE142eF6415"
-      startBlock: 14285271
+      address: "{{gaugeControllerAddress}}"
+      startBlock: {{gaugeControllerStartBlock}}
 
     mapping:
       kind: ethereum/events
@@ -429,14 +424,8 @@ dataSources:
       language: wasm/assemblyscript
       file: ./src/mappings/gaugeController.ts
       abis:
-        - name: RibbonThetaVaultWithSwap
-          file: ./abis/RibbonThetaVaultWithSwap.json
         - name: LiquidityGaugeV5
           file: ./abis/LiquidityGaugeV5.json
-        - name: RibbonVaultPauser
-          file: ./abis/RibbonVaultPauser.json
-        - name: ERC20
-          file: ./abis/ERC20.json
         - name: GaugeController
           file: ./abis/GaugeController.json
         ###########################################
@@ -476,11 +465,12 @@ dataSources:
       eventHandlers:
         - event: NewGauge(address,int128,uint256)
           handler: handleNewGauge
+{{/isGaugeController}}
 
 templates:
   - name: LiquidityGauge
     kind: ethereum/contract
-    network: mainnet
+    network: {{network}}
     source:
       abi: LiquidityGaugeV5
     mapping:
@@ -490,15 +480,11 @@ templates:
       file: ./src/mappings/gauge.ts
       entities:
         - Vault
-        - VaultTransaction
-        - VaultAccount
       abis:
         - name: RibbonThetaVaultWithSwap
           file: ./abis/RibbonThetaVaultWithSwap.json
         - name: LiquidityGaugeV5
           file: ./abis/LiquidityGaugeV5.json
-        - name: RibbonVaultPauser
-          file: ./abis/RibbonVaultPauser.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: GaugeController
@@ -537,11 +523,11 @@ templates:
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
         - event: Deposit(indexed address,uint256)
-          handler: handleStake
+          handler: handleGaugeDeposit
         - event: Withdraw(indexed address,uint256)
-          handler: handleUnstake
+          handler: handleGaugeWithdraw
         - event: Staked(indexed address,uint256)
-          handler: handleStaked
+          handler: handleMiningDeposit
         - event: Withdrawn(indexed address,uint256)
-          handler: handleWithdrawn
+          handler: handleMiningWithdraw
 

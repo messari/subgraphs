@@ -5,12 +5,14 @@ import {
   updateVaultSnapshots,
 } from "../modules/Metrics";
 import {
-  getOrCreateToken,
-  getOrCreateVault,
-  getOrCreateAuction,
   getOrCreateSwap,
+  getOrCreateVault,
+  getOrCreateToken,
+  getOrCreateAuction,
 } from "../common/initializers";
 import {
+  CapSet,
+  CapSet1 as CapSetWithManager,
   NewOffer,
   PurchaseOption,
   PayOptionYield,
@@ -24,11 +26,10 @@ import {
   Withdraw1 as WithdrawWithFee,
 } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 import * as utils from "../common/utils";
-import { Transaction } from "../modules/Transaction";
 import { Vault } from "../../generated/schema";
 import * as constants from "../common/constants";
-
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
+import { Transaction, updateVaultFees } from "../modules/Transaction";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import { Swap as Airswap } from "../../generated/Airswap/Airswap";
 import { Swap } from "../../generated/RibbonSwapOld/SwapContract";
@@ -52,15 +53,10 @@ export function handleInitiateGnosisAuction(
 export function handleAuctionCleared(event: AuctionCleared): void {
   //gives supply side revenue
   const auctionId = event.params.auctionId;
-  const tokensSold = event.params.soldAuctioningTokens; //options sold
   const soldAmount = event.params.soldBiddingTokens;
   const auction = getOrCreateAuction(auctionId);
 
   if (auction.vault == constants.NULL.TYPE_STRING) return;
-  log.warning("[AuctionCleared] vault {} auction id {}", [
-    auctionId.toString(),
-    auction.vault,
-  ]);
   const vault = getOrCreateVault(
     Address.fromString(auction.vault),
     event.block
@@ -82,16 +78,6 @@ export function handleAuctionCleared(event: AuctionCleared): void {
     event.block
   );
   updateVaultSnapshots(Address.fromString(auction.vault), event.block);
-
-  log.warning(
-    "[AuctionCleared] transaction hash {} difference {} tokensSold {} soldAmountETH {}",
-    [
-      event.transaction.hash.toHexString(),
-      soldAmountUSD.toString(),
-      tokensSold.toString(),
-      soldAmount.toString(),
-    ]
-  );
 }
 
 export function handleDeposit(event: DepositEvent): void {
@@ -172,9 +158,7 @@ export function handleCollectVaultFees(event: CollectVaultFees): void {
 
   updateRevenueSnapshots(vault, constants.BIGDECIMAL_ZERO, totalFeeUSD, block);
   updateVaultSnapshots(vaultAddress, event.block);
-  log.warning("[CollectVaultFees] transaction hash {}", [
-    event.transaction.hash.toHexString(),
-  ]);
+  updateVaultFees(vaultAddress, block);
 }
 
 export function handleNewOffer(event: NewOffer): void {
@@ -194,9 +178,6 @@ export function handleNewOffer(event: NewOffer): void {
   getOrCreateSwap(swapOfferId, vaultAddress, optionToken, biddingToken);
   getOrCreateVault(vaultAddress, event.block);
   updateVaultSnapshots(vaultAddress, event.block);
-  log.warning("[NewOffer] transaction hash {}", [
-    event.transaction.hash.toHexString(),
-  ]);
 }
 
 export function handleSwap(event: Swap): void {
@@ -228,18 +209,6 @@ export function handleSwap(event: Swap): void {
     event.block
   );
   updateVaultSnapshots(vaultAddress, event.block);
-
-  log.warning(
-    "[Swap] transaction hash {} soldamountUSD {} soldTokenAmount{} tokenPrice {} vault {} vaultDecimals {}",
-    [
-      event.transaction.hash.toHexString(),
-      soldAmountUSD.toString(),
-      soldAmount.toString(),
-      inputToken.lastPriceUSD!.toString(),
-      vault.id,
-      vault._decimals.toString(),
-    ]
-  );
 }
 
 export function handleAirswap(event: Airswap): void {
@@ -268,18 +237,6 @@ export function handleAirswap(event: Airswap): void {
     event.block
   );
   updateVaultSnapshots(vaultAddress, event.block);
-
-  log.warning(
-    "[AirSwap] transaction hash {} soldamountUSD {} soldTokenAmount{} tokenPrice {} vault {} vaultDecimals {}",
-    [
-      event.transaction.hash.toHexString(),
-      soldAmountUSD.toString(),
-      soldAmount.toString(),
-      inputToken.lastPriceUSD!.toString(),
-      vault.id,
-      vault._decimals.toString(),
-    ]
-  );
 }
 
 export function handlePayOptionYield(event: PayOptionYield): void {
@@ -381,14 +338,6 @@ export function handleCollectManagementFee(event: CollectManagementFee): void {
     block
   );
   updateVaultSnapshots(vaultAddress, event.block);
-  log.warning(
-    "[CollectManagementFee] transaction hash {} managementFee {} managementFeeUSD {}",
-    [
-      event.transaction.hash.toHexString(),
-      managementFee.toString(),
-      managementFeeUSD.toString(),
-    ]
-  );
 }
 
 export function handleCollectPerformanceFee(
@@ -417,12 +366,20 @@ export function handleCollectPerformanceFee(
     block
   );
   updateVaultSnapshots(vaultAddress, event.block);
-  log.warning(
-    "[CollectPerformanceFee] transaction hash {} performanceFee {} performanceFeeUSD {}",
-    [
-      event.transaction.hash.toHexString(),
-      performanceFee.toString(),
-      performanceFeeUSD.toString(),
-    ]
-  );
+}
+
+export function handleCapSet(event: CapSet): void {
+  const vaultAddress = event.address;
+  if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+  const vault = getOrCreateVault(vaultAddress, event.block);
+  vault.depositLimit = event.params.newCap;
+  vault.save();
+}
+
+export function handleCapSetWithManager(event: CapSetWithManager): void {
+  const vaultAddress = event.address;
+  if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+  const vault = getOrCreateVault(vaultAddress, event.block);
+  vault.depositLimit = event.params.newCap;
+  vault.save();
 }

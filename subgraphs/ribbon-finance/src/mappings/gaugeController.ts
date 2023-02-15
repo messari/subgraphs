@@ -7,12 +7,4 @@ export function handleNewGauge(event: NewGauge): void {
   const gaugeAddress = event.params.addr;
   if (gaugeAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
   const liquidityGauge = getOrCreateLiquidityGauge(gaugeAddress);
-  const vaultAddress = Address.fromString(liquidityGauge.vault);
-  if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
-
-  log.warning("[NewGauge]  GaugeAddress: {}, vaultAddress:{}, TxnHash: {}", [
-    gaugeAddress.toHexString(),
-    vaultAddress.toHexString(),
-    event.transaction.hash.toHexString(),
-  ]);
 }

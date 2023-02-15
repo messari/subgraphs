@@ -1,4 +1,17 @@
 {
+  "gnosisAuctionAddress": "0x0b7fFc1f4AD541A4Ed16b40D8c37f0929158D101",
+  "gnosisAuctionStartBlock": 13195539,
+  "swapOldAddress": "0xF0E5c92cEdd66C7985C354C35e2bC37E685b99Da",
+  "swapOldStartBlock": 14740669,
+  "swapNewAddress": "0xEb8CAB2F4663247db8eAfb556F498c861bB4e161",
+  "swapNewStartBlock": 15126067,
+  "airswapAddress": "0x4572f2554421Bd64Bef1c22c8a81840E8D496BeA",
+  "airswapStartBlock": 11938402,
+  "gaugeControllerAddress": "0x0cb9cc35cEFa5622E8d25aF36dD56DE142eF6415",
+  "gaugeControllerStartBlock": 14285271,
+  "isGaugeController": true,
+  "network": "mainnet",
+
   "vaults": [
     {
       "name": "ETHCallV2",

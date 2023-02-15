@@ -17,11 +17,18 @@ import {
 import * as utils from "./utils";
 import * as constants from "./constants";
 import { getUsdPricePerToken } from "../prices";
-import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  ethereum,
+  BigInt,
+  BigDecimal,
+  dataSource,
+} from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/ETHCallV2/ERC20";
 import { LiquidityGauge as LiquidityGaugeTemplate } from "../../generated/templates";
-import { LiquidityGaugeV5 as GaugeContract } from "../../generated/rETHThetaGauge/LiquidityGaugeV5";
+import { LiquidityGaugeV5 as GaugeContract } from "../../generated/GaugeController/LiquidityGaugeV5";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
+import { Versions } from "../versions";
 
 export function getOrCreateToken(
   address: Address,
@@ -33,59 +40,36 @@ export function getOrCreateToken(
 
   if (!token) {
     token = new Token(address.toHexString());
-
-    if (!isOutputToken) {
-      const contract = ERC20Contract.bind(address);
-
-      token.name = utils.readValue<string>(contract.try_name(), "");
-      token.symbol = utils.readValue<string>(contract.try_symbol(), "");
-      token.decimals = utils.readValue<i32>(
-        contract.try_decimals(),
-        constants.DEFAULT_DECIMALS.toI32() as u8
-      );
+    const contract = ERC20Contract.bind(address);
+    token.name = utils.readValue<string>(contract.try_name(), "");
+    token.symbol = utils.readValue<string>(contract.try_symbol(), "");
+    token.decimals = utils.readValue<i32>(
+      contract.try_decimals(),
+      constants.DEFAULT_DECIMALS.toI32() as u8
+    );
+    token._vaultId = vault.toHexString();
+    token.lastPriceBlockNumber = block.number;
+    if (isOutputToken) {
+      token._isOutputToken = true;
+      token.lastPriceUSD = utils.getOutputTokenPriceUSD(vault, block);
+    } else {
       token._isOutputToken = false;
-      token._vaultId = vault.toHexString();
+      token.lastPriceUSD = getUsdPricePerToken(address).usdPrice;
+    }
 
+    token.save();
+  }
+
+  if (token._vaultId) {
+    if (!token._isOutputToken) {
       token.lastPriceUSD = getUsdPricePerToken(address).usdPrice;
       token.lastPriceBlockNumber = block.number;
     }
-
-    if (isOutputToken) {
-      const contract = VaultContract.bind(address);
-      token.name = utils.readValue<string>(contract.try_name(), "");
-      token.symbol = utils.readValue<string>(contract.try_symbol(), "");
-      token.decimals = utils.readValue<i32>(
-        contract.try_decimals(),
-        constants.DEFAULT_DECIMALS.toI32() as u8
-      );
-      token._isOutputToken = true;
-      token._vaultId = vault.toHexString();
-
+    if (token._isOutputToken) {
       token.lastPriceUSD = utils.getOutputTokenPriceUSD(vault, block);
       token.lastPriceBlockNumber = block.number;
     }
     token.save();
-  }
-
-  if (
-    !token.lastPriceUSD ||
-    !token.lastPriceBlockNumber ||
-    block.number
-      .minus(token.lastPriceBlockNumber!)
-      .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
-  ) {
-    if (token._vaultId) {
-      if (!token._isOutputToken) {
-        token.lastPriceUSD = getUsdPricePerToken(address).usdPrice;
-        token.lastPriceBlockNumber = block.number;
-      }
-      if (token._isOutputToken) {
-        token.lastPriceUSD = utils.getOutputTokenPriceUSD(vault, block);
-        token.lastPriceBlockNumber = block.number;
-      }
-
-      token.save();
-    }
   }
 
   return token;
@@ -93,7 +77,7 @@ export function getOrCreateToken(
 export function getOrCreateFee(
   feeId: string,
   feeType: string,
-  feePercentage: BigInt = constants.BIGINT_ZERO
+  feePercentage: BigDecimal = constants.BIGDECIMAL_ZERO
 ): VaultFee {
   let fees = VaultFee.load(feeId);
 
@@ -101,9 +85,7 @@ export function getOrCreateFee(
     fees = new VaultFee(feeId);
 
     fees.feeType = feeType;
-    fees.feePercentage = feePercentage
-      .toBigDecimal()
-      .div(constants.BIGDECIMAL_HUNDRED);
+    fees.feePercentage = feePercentage;
 
     fees.save();
   }
@@ -141,7 +123,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol = new YieldAggregator(constants.PROTOCOL_ID);
     protocol.name = constants.PROTOCOL_NAME;
     protocol.slug = constants.PROTOCOL_SLUG;
-    protocol.network = constants.Network.MAINNET;
+    protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = constants.ProtocolType.YIELD;
 
     //////// Quantitative Data ////////
@@ -154,9 +136,9 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol._vaultIds = [];
   }
 
-  protocol.schemaVersion = constants.PROTOCOL_SCHEMA_VERSION;
-  protocol.subgraphVersion = constants.PROTOCOL_SUBGRAPH_VERSION;
-  protocol.methodologyVersion = constants.PROTOCOL_METHODOLOGY_VERSION;
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
 
   protocol.save();
 

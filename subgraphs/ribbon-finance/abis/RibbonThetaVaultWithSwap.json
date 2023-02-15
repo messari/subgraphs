@@ -238,7 +238,7 @@
     "name": "CollectVaultFees",
     "type": "event"
   },
-  
+
   {
     "anonymous": false,
     "inputs": [
@@ -556,6 +556,31 @@
       }
     ],
     "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldCap",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newCap",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "manager",
+        "type": "address"
+      }
+    ],
+    "name": "CapSet",
     "type": "event"
   },
   {
@@ -1143,7 +1168,7 @@
     "stateMutability": "nonpayable",
     "type": "function"
   },
-    {
+  {
     "anonymous": false,
     "inputs": [
       {

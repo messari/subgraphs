@@ -1,10 +1,4 @@
-import {
-  log,
-  BigInt,
-  Address,
-  ethereum,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   Vault as VaultStore,
   Deposit as DepositTransaction,
@@ -15,9 +9,10 @@ import {
   getOrCreateYieldAggregator,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
+  getOrCreateToken,
+  getOrCreateFee,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
 import { updateRevenueSnapshots } from "./Revenue";
 import * as constants from "../common/constants";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
@@ -129,11 +124,11 @@ export function Transaction(
   const vaultContract = VaultContract.bind(vaultAddress);
 
   const inputTokenAddress = Address.fromString(vault.inputToken);
-  const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  const inputToken = getOrCreateToken(inputTokenAddress, block);
 
   const amountUSD = utils
     .bigIntToBigDecimal(amount, vault._decimals)
-    .times(inputTokenPrice.usdPrice);
+    .times(inputToken.lastPriceUSD!);
 
   vault.outputTokenSupply = utils.getOutputTokenSupply(vaultAddress, block);
 
@@ -147,7 +142,7 @@ export function Transaction(
   if (totalValue.notEqual(constants.BIGINT_ZERO)) {
     vault.totalValueLockedUSD = utils
       .bigIntToBigDecimal(vault.inputTokenBalance, vault._decimals)
-      .times(inputTokenPrice.usdPrice);
+      .times(inputToken.lastPriceUSD!);
   }
 
   vault.pricePerShare = utils.getVaultPricePerShare(vaultAddress);
@@ -164,7 +159,7 @@ export function Transaction(
     if (feeAmount.notEqual(constants.BIGINT_ZERO)) {
       const withdrawalFeeUSD = utils
         .bigIntToBigDecimal(feeAmount, vault._decimals)
-        .times(inputTokenPrice.usdPrice);
+        .times(inputToken.lastPriceUSD!);
       updateRevenueSnapshots(
         vault,
         constants.BIGDECIMAL_ZERO,
@@ -176,16 +171,58 @@ export function Transaction(
 
   UpdateMetricsAfterTransaction(block, type);
   utils.updateProtocolTotalValueLockedUSD();
-
-  log.info(
-    "[Transaction] vault: {}, fee: {},  amount: {}, amountUSD: {}, outputTokenPriceUSD: {}, TxnHash: {}",
-    [
-      vaultAddress.toHexString(),
-      feeAmount.toString(),
-      amount.toString(),
-      amountUSD.toString(),
-      vault.outputTokenPriceUSD!.toString(),
-      transaction.hash.toHexString(),
-    ]
+}
+export function updateWithdrawlFees(
+  vaultAddress: Address,
+  feeAmount: BigInt,
+  withdrawAmount: BigInt
+): void {
+  const withdrawFeePercentage = feeAmount
+    .divDecimal(withdrawAmount.toBigDecimal())
+    .times(constants.BIGDECIMAL_HUNDRED);
+  const withdrawlFeeId =
+    utils.enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE) +
+    vaultAddress.toHexString();
+  const withdrawlFeeStore = getOrCreateFee(
+    withdrawlFeeId,
+    constants.VaultFeeType.WITHDRAWAL_FEE,
+    withdrawFeePercentage
   );
+  withdrawlFeeStore.save();
+}
+export function updateVaultFees(
+  vaultAddress: Address,
+  block: ethereum.Block
+): void {
+  const vault = getOrCreateVault(vaultAddress, block);
+  const vaultContract = VaultContract.bind(vaultAddress);
+  const performanceFee = utils.bigIntToBigDecimal(
+    utils.readValue(vaultContract.try_performanceFee(), constants.BIGINT_ZERO),
+    6
+  );
+  const managementFee = utils.bigIntToBigDecimal(
+    utils.readValue(vaultContract.try_managementFee(), constants.BIGINT_ZERO),
+    vault._decimals
+  );
+
+  const performanceFeeId =
+    utils.enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE) +
+    vaultAddress.toHexString();
+  const managementFeeId =
+    utils.enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE) +
+    vaultAddress.toHexString();
+
+  const performanceFeeStore = getOrCreateFee(
+    performanceFeeId,
+    constants.VaultFeeType.PERFORMANCE_FEE
+  );
+  const managementFeeStore = getOrCreateFee(
+    managementFeeId,
+    constants.VaultFeeType.MANAGEMENT_FEE
+  );
+
+  performanceFeeStore.feePercentage = performanceFee;
+  managementFeeStore.feePercentage = managementFee;
+  performanceFeeStore.save();
+  managementFeeStore.save();
 }

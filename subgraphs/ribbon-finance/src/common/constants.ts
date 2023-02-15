@@ -6,9 +6,6 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export const PROTOCOL_NAME = "Ribbon Finance";
 export const PROTOCOL_SLUG = "ribbon-finance";
-export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -107,7 +104,6 @@ export const ETH_CALL_V2_CONTRACT = Address.fromString(
 export const RBN_TOKEN = Address.fromString(
   "0x6123b0049f904d730db3c36a31167d9d4121fa6b"
 );
-export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromString("92000");
 
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
   "0x0cb9cc35cefa5622e8d25af36dd56de142ef6415"

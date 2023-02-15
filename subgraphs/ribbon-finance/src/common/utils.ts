@@ -1,4 +1,3 @@
-import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   getOrCreateYieldAggregator,
   getOrCreateVault,
@@ -6,6 +5,7 @@ import {
 } from "./initializers";
 import * as constants from "./constants";
 import { Vault } from "../../generated/schema";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 
 export function equalsIgnoreCase(a: string, b: string): boolean {

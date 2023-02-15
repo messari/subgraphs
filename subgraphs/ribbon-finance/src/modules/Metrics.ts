@@ -12,7 +12,6 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { getUsdPricePerToken } from "../prices/index";
 import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
 
@@ -50,6 +49,20 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
     dailyActiveAccount.save();
 
     usageMetricsDaily.dailyActiveUsers += 1;
+  }
+  const hourlyActiveAccountId = (
+    block.timestamp.toI64() / constants.SECONDS_PER_HOUR
+  )
+    .toString()
+    .concat("-")
+    .concat(from.toHexString());
+
+  let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
+
+  if (!hourlyActiveAccount) {
+    hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
+    hourlyActiveAccount.save();
+
     usageMetricsHourly.hourlyActiveUsers += 1;
   }
 
@@ -153,7 +166,7 @@ export function updateVaultTVL(
   const vaultContract = VaultContract.bind(vaultAddress);
 
   const inputTokenAddress = Address.fromString(vault.inputToken);
-  const inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  const inputToken = getOrCreateToken(inputTokenAddress, block);
 
   vault.outputTokenSupply = utils.getOutputTokenSupply(vaultAddress, block);
 
@@ -165,7 +178,7 @@ export function updateVaultTVL(
   vault.inputTokenBalance = totalValue;
   vault.totalValueLockedUSD = utils
     .bigIntToBigDecimal(vault.inputTokenBalance, vault._decimals)
-    .times(inputTokenPrice.usdPrice);
+    .times(inputToken.lastPriceUSD!);
 
   if (vault.outputToken) {
     const outputToken = getOrCreateToken(

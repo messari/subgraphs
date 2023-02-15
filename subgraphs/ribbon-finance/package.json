@@ -5,7 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --product hosted-service shashwats22/ribbon-finance-generic",
-    "prepare:yaml": "mustache protocols/ribbon-finance/config/deployments/ribbon-finance-eth/configurations.json protocols/ribbon-finance/config/templates/ribbon.finance.template.yaml > subgraph.yaml",
+    "prepare:yaml": "mustache protocols/ribbon-finance/config/deployments/ribbon-finance-ethereum/configurations.json protocols/ribbon-finance/config/templates/ribbon.finance.template.yaml > subgraph.yaml",
     "create-local": "graph create --node http://localhost:8020/ shashwatS22/ribbon-generic",
     "remove-local": "graph remove --node http://localhost:8020/ shashwatS22/ribbon-generic",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 shashwatS22/ribbon-generic"
