@@ -34,74 +34,6 @@ import {
   BIGINT_ZERO,
 } from "../utils/constants";
 
-// export function handleBalancesSubmitted(event: BalancesUpdated): void {
-//   let protocol = generalUtilities.getRocketPoolProtocolEntity();
-//   if (!protocol) {
-//     protocol = rocketPoolEntityFactory.createRocketPoolProtocol();
-//   }
-//   if (!protocol) return;
-//   const rETHContract = rocketTokenRETH.bind(
-//     Address.fromString(ROCKET_TOKEN_RETH_CONTRACT_ADDRESS)
-//   );
-//   const rocketDepositPoolContract = rocketDepositPool.bind(
-//     Address.fromString(ROCKET_DEPOSIT_POOL_CONTRACT_ADDRESS)
-//   );
-//   const depositPoolExcessBalance = rocketDepositPoolContract.getExcessBalance();
-
-//   const depositPoolBalance = rocketDepositPoolContract.getBalance();
-//   const stakerETHInRocketETHContract = getRocketETHBalance(
-//     depositPoolExcessBalance,
-//     rETHContract.getTotalCollateral()
-//   );
-//   const rETHExchangeRate = rETHContract.getExchangeRate();
-
-//   const checkpoint =
-//     rocketPoolEntityFactory.createNetworkStakerBalanceCheckpoint(
-//       generalUtilities.extractIdForEntity(event),
-//       protocol.lastNetworkStakerBalanceCheckPoint,
-//       event,
-//       depositPoolBalance,
-//       stakerETHInRocketETHContract,
-//       rETHExchangeRate
-//     );
-//   if (checkpoint === null) return;
-
-//   const previousCheckpointId = protocol.lastNetworkStakerBalanceCheckPoint;
-//   let previousTotalStakerETHRewards = BigInt.fromI32(0);
-//   let previousTotalStakersWithETHRewards = BigInt.fromI32(0);
-//   let previousRETHExchangeRate = BigInt.fromI32(1);
-//   let previousCheckpoint: NetworkStakerBalanceCheckpoint | null = null;
-//   if (previousCheckpointId) {
-//     previousCheckpoint =
-//       NetworkStakerBalanceCheckpoint.load(previousCheckpointId);
-//     if (previousCheckpoint) {
-//       previousTotalStakerETHRewards = previousCheckpoint.totalStakerETHRewards;
-//       previousTotalStakersWithETHRewards =
-//         previousCheckpoint.totalStakersWithETHRewards;
-//       previousRETHExchangeRate = previousCheckpoint.rETHExchangeRate;
-//       previousCheckpoint.nextCheckpointId = checkpoint.id;
-//     }
-//   }
-//   const balanceCheckpoint = NetworkNodeBalanceCheckpoint.load(
-//     protocol.lastNetworkNodeBalanceCheckPoint!
-//   );
-//   const averageFeeForActiveMinipools =
-//     balanceCheckpoint!.averageFeeForActiveMinipools;
-
-//   // Handle the staker impact.
-//   generateStakerBalanceCheckpoints(
-//     event.block,
-//     protocol.activeStakers,
-//     checkpoint,
-//     previousCheckpoint !== null ? previousCheckpoint : null,
-//     previousRETHExchangeRate,
-//     event.block.number,
-//     event.block.timestamp,
-//     protocol,
-//     averageFeeForActiveMinipools
-//   );
-// }
-
 /**
  * When enough ODAO members votes on a balance and a consensus threshold is reached, the staker beacon chain state is persisted to the smart contracts.
  */
@@ -360,7 +292,6 @@ function generateStakerBalanceCheckpoints(
     ethRewards,
     networkCheckpoint.totalRETHSupply
   );
-
   updateProtocolSideRevenueMetrics(block, protocolRevenue);
   updateSupplySideRevenueMetrics(block);
   updateSnapshotsTvl(block);
