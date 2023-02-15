@@ -503,6 +503,7 @@ type UsageMetricsDailySnapshot @entity(immutable: true) {
 
   " Cumulative number of collateral Out from traders "
   cumulativeCollateralOut: Int!
+
   " Total number of pools "
   totalPoolCount: Int!
 }
