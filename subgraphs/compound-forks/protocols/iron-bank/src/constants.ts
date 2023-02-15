@@ -1,10 +1,15 @@
 import { Address, dataSource, log, BigInt } from "@graphprotocol/graph-ts";
 import {
-  AVALANCHE_BLOCKS_PER_YEAR,
   ETHEREUM_BLOCKS_PER_YEAR,
   FANTOM_BLOCKS_PER_YEAR,
   Network,
+  SECONDS_PER_YEAR,
 } from "../../../src/constants";
+
+// See https://github.com/messari/subgraphs/issues/1746 for
+// reason why this is the casef
+const AVALANCHE_BLOCKS_PER_YEAR = SECONDS_PER_YEAR;
+const OPTIMISM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR;
 
 export class NetworkSpecificConstant {
   comptrollerAddr: Address;
@@ -16,8 +21,6 @@ export class NetworkSpecificConstant {
     this.unitPerYear = unitPerYear;
   }
 }
-
-const OPTIMISM_BLOCKS_PER_YEAR = ETHEREUM_BLOCKS_PER_YEAR;
 
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   const network = dataSource.network();
