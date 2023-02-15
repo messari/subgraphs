@@ -3,8 +3,8 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { CurvePool as CurvePoolContract } from "../../../generated/ETHCallV2/CurvePool";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/ETHCallV2/CurveRegistry";
+import { CurvePool as CurvePoolContract } from "../../../generated/templates/LiquidityGauge/CurvePool";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/templates/LiquidityGauge/CurveRegistry";
 
 export function isCurveLpToken(lpAddress: Address): bool {
   const poolAddress = getPoolFromLpToken(lpAddress);

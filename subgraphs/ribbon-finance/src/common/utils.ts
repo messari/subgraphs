@@ -6,7 +6,7 @@ import {
 import * as constants from "./constants";
 import { Vault } from "../../generated/schema";
 import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
-import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
+import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/templates/LiquidityGauge/RibbonThetaVaultWithSwap";
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();

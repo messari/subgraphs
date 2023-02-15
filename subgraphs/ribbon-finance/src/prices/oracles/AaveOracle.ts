@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { AaveOracleContract } from "../../../generated/ETHCallV2/AaveOracleContract";
+import { AaveOracleContract } from "../../../generated/templates/LiquidityGauge/AaveOracleContract";
 
 export function getAaveOracleContract(
   contractAddress: Address

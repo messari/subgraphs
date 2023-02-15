@@ -13,7 +13,7 @@ import {
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
-import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
+import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/templates/LiquidityGauge/RibbonThetaVaultWithSwap";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

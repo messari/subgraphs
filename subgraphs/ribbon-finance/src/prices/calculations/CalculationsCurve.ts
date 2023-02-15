@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/ETHCallV2/CalculationsCurve";
+import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/templates/LiquidityGauge/CalculationsCurve";
 
 export function getCalculationsCurveContract(
   contractAddress: Address

@@ -15,7 +15,7 @@ import {
 import * as utils from "../common/utils";
 import { updateRevenueSnapshots } from "./Revenue";
 import * as constants from "../common/constants";
-import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
+import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/templates/LiquidityGauge/RibbonThetaVaultWithSwap";
 
 export function createWithdrawTransaction(
   vault: VaultStore,

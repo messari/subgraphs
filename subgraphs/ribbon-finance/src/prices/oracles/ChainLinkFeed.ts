@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { Address } from "@graphprotocol/graph-ts";
 import { CustomPriceType } from "../common/types";
-import { ChainLinkContract } from "../../../generated/ETHCallV2/ChainLinkContract";
+import { ChainLinkContract } from "../../../generated/templates/LiquidityGauge/ChainLinkContract";
 
 export function getChainLinkContract(): ChainLinkContract | null {
   const config = utils.getConfig();

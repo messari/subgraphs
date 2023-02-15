@@ -8,7 +8,7 @@ import {
   Withdraw,
   Withdrawn,
   Staked,
-} from "../../generated/GaugeController/LiquidityGaugeV5";
+} from "../../generated/templates/LiquidityGauge/LiquidityGaugeV5";
 import * as constants from "../common/constants";
 import { Address } from "@graphprotocol/graph-ts";
 import { updateVaultSnapshots } from "../modules/Metrics";

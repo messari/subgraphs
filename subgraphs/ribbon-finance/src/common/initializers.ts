@@ -24,10 +24,10 @@ import {
   BigDecimal,
   dataSource,
 } from "@graphprotocol/graph-ts";
-import { ERC20 as ERC20Contract } from "../../generated/ETHCallV2/ERC20";
+import { ERC20 as ERC20Contract } from "../../generated/templates/LiquidityGauge/ERC20";
 import { LiquidityGauge as LiquidityGaugeTemplate } from "../../generated/templates";
-import { LiquidityGaugeV5 as GaugeContract } from "../../generated/GaugeController/LiquidityGaugeV5";
-import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
+import { LiquidityGaugeV5 as GaugeContract } from "../../generated/templates/LiquidityGauge/LiquidityGaugeV5";
+import { RibbonThetaVaultWithSwap as VaultContract } from "../../generated/templates/LiquidityGauge/RibbonThetaVaultWithSwap";
 import { Versions } from "../versions";
 
 export function getOrCreateToken(

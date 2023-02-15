@@ -9,8 +9,8 @@ import { Vault } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
-import { GaugeController as GaugeControllerContract } from "../../generated/GaugeController/GaugeController";
-import { LiquidityGaugeV5 as LiquidityGaugeContract } from "../../generated/GaugeController/LiquidityGaugeV5";
+import { GaugeController as GaugeControllerContract } from "../../generated/templates/LiquidityGauge/GaugeController";
+import { LiquidityGaugeV5 as LiquidityGaugeContract } from "../../generated/templates/LiquidityGauge/LiquidityGaugeV5";
 
 export function getRewardsData_v1(
   gaugeAddress: Address,

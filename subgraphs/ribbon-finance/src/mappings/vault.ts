@@ -24,7 +24,7 @@ import {
   Deposit as DepositEvent,
   Withdraw as WithdrawEvent,
   Withdraw1 as WithdrawWithFee,
-} from "../../generated/ETHCallV2/RibbonThetaVaultWithSwap";
+} from "../../generated/templates/LiquidityGauge/RibbonThetaVaultWithSwap";
 import * as utils from "../common/utils";
 import { Vault } from "../../generated/schema";
 import * as constants from "../common/constants";
