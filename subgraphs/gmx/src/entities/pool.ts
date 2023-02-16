@@ -35,6 +35,8 @@ import {
   INT_ONE,
   LiquidityPoolFeeType,
   BIGDECIMAL_THOUSAND,
+  POOL_NAME,
+  POOL_SYMBOL,
 } from "../utils/constants";
 import { convertTokenToDecimal, multiArraySort } from "../utils/numbers";
 import { enumToPrefix } from "../utils/strings";
@@ -49,8 +51,8 @@ export function getOrCreateLiquidityPool(event: ethereum.Event): LiquidityPool {
 
     // Metadata
     pool.protocol = protocol.id;
-    pool.name = "GMXVault";
-    pool.symbol = "VAULT";
+    pool.name = POOL_NAME;
+    pool.symbol = POOL_SYMBOL;
     pool.createdTimestamp = event.block.timestamp;
     pool.createdBlockNumber = event.block.number;
 
@@ -210,20 +212,11 @@ export function decrementPoolOpenPositionCount(
   positionSide: string
 ): void {
   if (PositionSide.LONG == positionSide) {
-    pool.longPositionCount =
-      pool.longPositionCount - INT_ONE >= INT_ZERO
-        ? pool.longPositionCount - INT_ONE
-        : INT_ZERO;
+    pool.longPositionCount -= INT_ONE;
   } else {
-    pool.shortPositionCount =
-      pool.shortPositionCount - INT_ONE >= INT_ZERO
-        ? pool.shortPositionCount - INT_ONE
-        : INT_ZERO;
+    pool.shortPositionCount -= INT_ONE;
   }
-  pool.openPositionCount =
-    pool.openPositionCount - INT_ONE >= INT_ZERO
-      ? pool.openPositionCount - INT_ONE
-      : INT_ZERO;
+  pool.openPositionCount -= INT_ONE;
   pool.closedPositionCount += INT_ONE;
 
   pool._lastUpdateTimestamp = event.block.timestamp;

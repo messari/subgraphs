@@ -65,20 +65,11 @@ export function decrementAccountOpenPositionCount(
   positionSide: string
 ): void {
   if (PositionSide.LONG == positionSide) {
-    account.longPositionCount =
-      account.longPositionCount - INT_ONE >= INT_ZERO
-        ? account.longPositionCount - INT_ONE
-        : INT_ZERO;
+    account.longPositionCount -= INT_ONE;
   } else {
-    account.shortPositionCount =
-      account.shortPositionCount - INT_ONE >= INT_ZERO
-        ? account.shortPositionCount - INT_ONE
-        : INT_ZERO;
+    account.shortPositionCount -= INT_ONE;
   }
-  account.openPositionCount =
-    account.openPositionCount - INT_ONE >= INT_ZERO
-      ? account.openPositionCount - INT_ONE
-      : INT_ZERO;
+  account.openPositionCount -= INT_ONE;
   account.closedPositionCount += INT_ONE;
 
   account.save();

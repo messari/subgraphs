@@ -6,8 +6,6 @@ export interface Configurations {
   getNetwork(): string;
   getProtocolName(): string;
   getProtocolSlug(): string;
-  getSchemaVersion(): string;
-  getSubgraphVersion(): string;
-  getMethodologyVersion(): string;
   getVaultAddress(): Bytes;
+  getGLPAddress(): Bytes;
 }

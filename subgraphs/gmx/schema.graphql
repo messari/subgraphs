@@ -403,10 +403,10 @@ type DerivPerpProtocol implements Protocol @entity {
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 
   " Day ID of the most recent daily snapshot "
-  _lastSnapshotDayID: Int!
+  _lastSnapshotDayID: Int
 
   " Timestamp of the last time this entity was updated "
-  _lastUpdateTimestamp: BigInt!
+  _lastUpdateTimestamp: BigInt
 }
 
 ###############################
@@ -543,7 +543,7 @@ type UsageMetricsHourlySnapshot @entity(immutable: true) {
   hourlySwapCount: Int!
 }
 
-type _TempUsageMetricsDailySnapshot @entity(immutable: false) {
+type _TempUsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: Bytes!
 
@@ -605,7 +605,7 @@ type _TempUsageMetricsDailySnapshot @entity(immutable: false) {
   dailyCollateralOut: Int!
 }
 
-type _TempUsageMetricsHourlySnapshot @entity(immutable: false) {
+type _TempUsageMetricsHourlySnapshot @entity {
   " { # of hours since Unix epoch time } "
   id: Bytes!
 
@@ -888,13 +888,13 @@ type LiquidityPool @entity {
   _fundingrate: [BigDecimal!]!
 
   " Day ID of the most recent daily snapshot "
-  _lastSnapshotDayID: Int!
+  _lastSnapshotDayID: Int
 
   " Hour ID of the most recent hourly snapshot "
-  _lastSnapshotHourID: Int!
+  _lastSnapshotHourID: Int
 
   " Timestamp of the last time this entity was updated "
-  _lastUpdateTimestamp: BigInt!
+  _lastUpdateTimestamp: BigInt
 }
 
 #################################

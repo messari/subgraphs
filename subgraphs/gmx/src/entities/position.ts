@@ -1,4 +1,10 @@
-import { ethereum, Bytes, Address, BigDecimal } from "@graphprotocol/graph-ts";
+import {
+  ethereum,
+  Bytes,
+  Address,
+  BigDecimal,
+  log,
+} from "@graphprotocol/graph-ts";
 import {
   Account,
   LiquidityPool,
@@ -33,7 +39,6 @@ export function getUserPosition(
   positionSide: string
 ): Position | null {
   const positionId = getPositionID(
-    event,
     account,
     pool,
     collateralTokenAddress,
@@ -52,7 +57,6 @@ export function createUserPosition(
   positionSide: string
 ): Position {
   const positionId = getPositionID(
-    event,
     account,
     pool,
     collateralTokenAddress,
@@ -206,12 +210,22 @@ function validatePosition(
   position: Position
 ): void {
   if (position.balanceUSD.le(BIGDECIMAL_ZERO)) {
+    if (position.balanceUSD.lt(BIGDECIMAL_ZERO)) {
+      log.error("Negative balance in position {}, balanceUSD: {}", [
+        position.id.toHexString(),
+        position.balanceUSD.toString(),
+      ]);
+    }
     closePosition(event, account, pool, position);
     return;
   }
 
   // balanceUSD is more accurate data as it comes from event data, re-calcuate balance with balanceUSD in case there is problem with balance.
   if (position.balance < BIGINT_ZERO) {
+    log.error("Negative balance in position {}, balance: {}", [
+      position.id.toHexString(),
+      position.balance.toString(),
+    ]);
     position.balance = BIGINT_ZERO;
     const indexToken = getOrCreateToken(
       event,
@@ -281,7 +295,6 @@ function closePosition(
 }
 
 function getPositionID(
-  event: ethereum.Event,
   account: Account,
   pool: LiquidityPool,
   collateralTokenAddress: Address,

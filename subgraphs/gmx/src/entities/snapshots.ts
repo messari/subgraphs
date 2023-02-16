@@ -34,9 +34,9 @@ export function takeSnapshots(event: ethereum.Event): void {
 
   const protocol = getOrCreateProtocol();
   const protocolSnapshotDayID =
-    protocol._lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
+    protocol._lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
   const protocolSnapshotHourID =
-    protocol._lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
+    protocol._lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
   if (protocolSnapshotDayID != dayID) {
     takeFinancialDailySnapshot(protocol, protocolSnapshotDayID);
     takeUsageMetricsDailySnapshot(protocol, protocolSnapshotDayID);
@@ -47,9 +47,10 @@ export function takeSnapshots(event: ethereum.Event): void {
   }
 
   const pool = getOrCreateLiquidityPool(event);
-  const poolSnapshotDayID = pool._lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
+  const poolSnapshotDayID =
+    pool._lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
   const poolSnapshotHourID =
-    pool._lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
+    pool._lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
   if (poolSnapshotDayID != dayID) {
     takeLiquidityPoolDailySnapshot(pool, poolSnapshotDayID);
     updatePoolSnapshotDayID(event, poolSnapshotDayID);

@@ -78,6 +78,7 @@ export function handleSwap(event: Swap): void {
     event.params.amountIn,
     inputToken.decimals
   ).times(inputToken.lastPriceUSD!);
+
   const outputToken = getOrCreateToken(event, event.params.tokenOut);
   const outputTokenAmountUSD = convertTokenToDecimal(
     event.params.amountOutAfterFees,
@@ -332,6 +333,7 @@ export function handleClosePosition(event: ClosePosition): void {
     return;
   }
   takeSnapshots(event);
+
   const pool = getOrCreateLiquidityPool(event);
   increasePoolVolume(
     event,

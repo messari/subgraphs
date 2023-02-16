@@ -1,6 +1,6 @@
 # GMX Protocol Subgraph Metrics Methodology v1.0.0
 
-This is for GMX Subgraph based on Messari Derivatives Perpetual Schema .
+This is for GMX Subgraph based on Messari Derivatives Perpetual Schema.
 
 ## Business Summary
 

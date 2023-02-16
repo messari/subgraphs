@@ -1,9 +1,6 @@
 import { Bytes } from "@graphprotocol/graph-ts";
 import {
   Network,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../../../src/utils/constants";
@@ -13,15 +10,6 @@ export class GMXAvalancheConfigurations implements Configurations {
   getNetwork(): string {
     return Network.AVALANCHE;
   }
-  getSchemaVersion(): string {
-    return PROTOCOL_SCHEMA_VERSION;
-  }
-  getSubgraphVersion(): string {
-    return PROTOCOL_SUBGRAPH_VERSION;
-  }
-  getMethodologyVersion(): string {
-    return PROTOCOL_METHODOLOGY_VERSION;
-  }
   getProtocolName(): string {
     return PROTOCOL_NAME;
   }
@@ -30,5 +18,8 @@ export class GMXAvalancheConfigurations implements Configurations {
   }
   getVaultAddress(): Bytes {
     return Bytes.fromHexString("0x9ab2de34a33fb459b538c43f251eb825645e8595");
+  }
+  getGLPAddress(): Bytes {
+    return Bytes.fromHexString("0x01234181085565ed162a948b6a5e88758cd7c7b8");
   }
 }

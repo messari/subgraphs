@@ -4,9 +4,6 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_SCHEMA_VERSION = "1.0.2";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_NAME = "GMX";
 export const PROTOCOL_SLUG = "gmx";
 
@@ -176,8 +173,8 @@ export const ETH_NAME = "Ether";
 /////////////////////////////
 
 export const PROTOCOL_ID = "GMX";
-export const GLP_SYMBOL = "GLP";
-export const USDG_SYMBOL = "USDG";
+export const POOL_NAME = "GMXVault";
+export const POOL_SYMBOL = "VAULT";
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
 export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.3");
