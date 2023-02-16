@@ -1257,9 +1257,6 @@ type Position @entity {
   " The liquidity pool this options contract belongs to "
   pool: LiquidityPool!
 
-  " The asset this option contract is associated with "
-  asset: Token!
-
   " The type of option this position is. e.g. put/call "
   type: OptionType!
 
