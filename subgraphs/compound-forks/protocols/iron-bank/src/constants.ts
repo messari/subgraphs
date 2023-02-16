@@ -1,7 +1,6 @@
 import { Address, dataSource, log, BigInt } from "@graphprotocol/graph-ts";
 import {
   ETHEREUM_BLOCKS_PER_YEAR,
-  FANTOM_BLOCKS_PER_YEAR,
   Network,
   SECONDS_PER_YEAR,
 } from "../../../src/constants";
