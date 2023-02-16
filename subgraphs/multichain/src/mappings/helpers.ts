@@ -563,7 +563,7 @@ export function createBridgeTransferEvent(
   transferEvent.protocol = Bytes.fromHexString(
     NetworkConfigs.getFactoryAddress()
   );
-  transferEvent.to = event.transaction.to!;
+  transferEvent.to = event.transaction.to ? event.transaction.to! : toAddress;
   transferEvent.from = event.transaction.from;
   transferEvent.isOutgoing = isOutgoing;
   transferEvent.pool = pool.id;
