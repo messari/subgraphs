@@ -1245,7 +1245,7 @@ type ActiveAccount @entity {
   id: Bytes!
 }
 
-# A position describes option contracts that users have taken (either a call/put)
+# A position describes a contract that a user has taken (either a call/put)
 # Note: A position snapshot is not necessary because the position is opened and closed with no other interaction
 #       All of the data we would get from a snapshot is already available in the position.
 type Position @entity {
