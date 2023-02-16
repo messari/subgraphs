@@ -21,7 +21,7 @@ export async function getGithubIssues() {
         method: "GET",
         headers: {
             Accept: "*/*",
-            Authorization: "Bearer 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"
+            Authorization: "Bearer " + process.env.GH_TOKEN
         },
     })
 
