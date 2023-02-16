@@ -550,7 +550,7 @@ export async function sendMessageToZapierThread(msgObj) {
         if (validAlerts.length > 0) {
             messageConstruction += `Indexing errors on ${msgObj.protocolName}\n\n`;
             messageConstruction += validAlerts.join('\n');
-            ghIssuePromiseArray.push(postGithubIssue("[" + msgObj.protocolName + "]: Indexing Errors", validAlerts.join('\n'), postedIssues));
+            ghIssuePromiseArray.push(postGithubIssue(msgObj.protocolName + ": Indexing Errors", validAlerts.join('\n'), postedIssues));
         }
     } else if (Object.keys(msgObj).includes('protocol')) {
         const invalidProtocolAlertIndexes = {};
@@ -577,7 +577,7 @@ export async function sendMessageToZapierThread(msgObj) {
                 if (!invalidProtocolAlertIndexes[deployment].includes(idx)) {
                     const alertBody = `Field: ${x}\nValue: ${msgObj.protocol[deployment]?.Value[idx]}\nDescription: ${msgObj.protocol[deployment]?.Description[idx]}\n`;
                     validAlerts.push(alertBody);
-                    ghIssuePromiseArray.push(postGithubIssue("[" + msgObj.protocolName + "-" + deployment + "]: Protocol Error [" + x + "]", alertBody, postedIssues));
+                    ghIssuePromiseArray.push(postGithubIssue(msgObj.protocolName + " " + deployment + ": Protocol Error " + x, alertBody, postedIssues));
                 }
             })
             if (validAlerts.length > 0) {
