@@ -121,7 +121,7 @@ export function handleEtch(event: Etch): void {
   if (to && to != event.address) {
     const fromAdmin = DelegateAdmin.load(sender);
     if (!fromAdmin) {
-      const toAdmin = DelegateAdmin.load(to!.toHexString());
+      const toAdmin = DelegateAdmin.load(to.toHexString());
       if (!toAdmin) {
         log.error("Etch not trigger by a delegate admin. TxnHash: {}", [
           event.transaction.hash.toHexString(),
