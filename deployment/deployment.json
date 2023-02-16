@@ -6410,6 +6410,94 @@
           "prepare:yaml": true,
           "prepare:constants": true
         }
+      },
+      "portal-fantom": {
+        "network": "fantom",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "portal-fantom",
+            "query-id": "portal-fantom"
+          }
+        },
+        "files": {
+          "template": "portal.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "portal-bsc": {
+        "network": "bsc",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "portal-bsc",
+            "query-id": "portal-bsc"
+          }
+        },
+        "files": {
+          "template": "portal.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "portal-polygon": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "portal-polygon",
+            "query-id": "portal-polygon"
+          }
+        },
+        "files": {
+          "template": "portal.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "portal-avalanche": {
+        "network": "avalanche",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "portal-avalanche",
+            "query-id": "portal-avalanche"
+          }
+        },
+        "files": {
+          "template": "portal.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
       }
     }
   }

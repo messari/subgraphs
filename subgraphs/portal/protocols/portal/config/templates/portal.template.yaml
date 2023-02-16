@@ -14,9 +14,9 @@ dataSources:
     name: Core
     network: {{ network }}
     source:
-      address: "0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B"
+      address: "{{ core.address }}"
       abi: Core
-      startBlock: 12959638
+      startBlock: {{ core.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -72,13 +72,14 @@ dataSources:
         - event: LogMessagePublished(indexed address,uint64,uint32,bytes,uint8)
           handler: handleSwapOut
       file: {{{ file }}}
+  {{#supportsCallHandlers}}
   - kind: ethereum
     name: Bridge
     network: {{ network }}
     source:
-      address: "0x3ee18B2214AFF97000D974cf647E7C347E8fa585"
+      address: "{{ tokenBridge.address }}"
       abi: Bridge
-      startBlock: 13217349
+      startBlock: {{ tokenBridge.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -140,3 +141,4 @@ dataSources:
         - function: completeTransferAndUnwrapETHWithPayload(bytes)
           handler: handleSwapInNativeWithPayload
       file: {{{ file }}}
+  {{/supportsCallHandlers}}

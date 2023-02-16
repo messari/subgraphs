@@ -1,0 +1,17 @@
+{
+  "deployment": "PORTAL_FANTOM",
+  "network": "fantom",
+  "file": "./src/mappings/handlers.ts",
+  "core": {
+    "address": "0x126783A6Cb203a3E35344528B26ca3a0489a1485",
+    "startBlock": 31817467
+  },
+  "tokenBridge": {
+    "address": "0x7C9Fc5741288cDFdD83CeB07f3ea7e22618D79D2",
+    "startBlock": 31890357
+  },
+  "supportsCallHandlers": true,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
