@@ -6,11 +6,6 @@ import {
   SECONDS_PER_YEAR,
 } from "../../../src/constants";
 
-// See https://github.com/messari/subgraphs/issues/1746 for
-// reason why this is the casef
-const AVALANCHE_BLOCKS_PER_YEAR = SECONDS_PER_YEAR;
-const OPTIMISM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR;
-
 export class NetworkSpecificConstant {
   comptrollerAddr: Address;
   network: string;
@@ -34,19 +29,25 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
     return new NetworkSpecificConstant(
       Address.fromString("0x4250a6d3bd57455d7c6821eecb6206f507576cd2"),
       Network.FANTOM,
-      FANTOM_BLOCKS_PER_YEAR
+      // Iron bank on fantom actually calculates interest based on timestamp
+      // See https://github.com/messari/subgraphs/issues/1746 for details
+      SECONDS_PER_YEAR
     );
   } else if (equalsIgnoreCase(network, Network.AVALANCHE)) {
     return new NetworkSpecificConstant(
       Address.fromString("0x2ee80614ccbc5e28654324a66a396458fa5cd7cc"),
       Network.AVALANCHE,
-      AVALANCHE_BLOCKS_PER_YEAR
+      // Iron bank on avalance actually calculates interest based on timestamp
+      // See https://github.com/messari/subgraphs/issues/1746 for details
+      SECONDS_PER_YEAR
     );
   } else if (equalsIgnoreCase(network, Network.OPTIMISM)) {
     return new NetworkSpecificConstant(
       Address.fromString("0xe0b57feed45e7d908f2d0dacd26f113cf26715bf"),
       Network.OPTIMISM,
-      OPTIMISM_BLOCKS_PER_YEAR
+      // Iron bank on optimism actually calculates interest based on timestamp
+      // See https://github.com/messari/subgraphs/issues/1746 for details
+      SECONDS_PER_YEAR
     );
   } else {
     log.error("[getNetworkSpecificConstant] Unsupported network {}", [network]);
