@@ -1,6 +1,8 @@
 
+const path =  require("path");
 const rulesDirPlugin = require('eslint-plugin-rulesdir');
-rulesDirPlugin.RULES_DIR = ['subgraphs/_eslint-rules'];
+
+rulesDirPlugin.RULES_DIR = [path.join(__dirname, '_eslint-rules')];
 
 module.exports = {
   env: {
