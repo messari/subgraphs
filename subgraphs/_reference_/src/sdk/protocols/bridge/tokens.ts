@@ -13,6 +13,10 @@ export interface TokenInitializer {
   getTokenParams(address: Address): TokenParams;
 }
 
+export interface TokenPresaver {
+  preSaveToken(token: Token): Token;
+}
+
 export class TokenParams {
   name: string;
   symbol: string;
@@ -22,10 +26,15 @@ export class TokenParams {
 export class TokenManager {
   protocol: Bridge;
   initializer: TokenInitializer;
+  presaver: TokenPresaver | null;
 
   constructor(protocol: Bridge, init: TokenInitializer) {
     this.protocol = protocol;
     this.initializer = init;
+  }
+
+  setTokenPresaver(presaver: TokenPresaver): void {
+    this.presaver = presaver;
   }
 
   getOrCreateToken(address: Address): Token {
@@ -39,6 +48,10 @@ export class TokenManager {
     token.name = params.name;
     token.symbol = params.symbol;
     token.decimals = params.decimals;
+
+    if (this.presaver) {
+      token = this.presaver!.preSaveToken(token);
+    }
     token.save();
     return token;
   }
