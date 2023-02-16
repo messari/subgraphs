@@ -256,10 +256,11 @@ export function handleTransferSent(event: TransferSent): void {
 
 		if (receipt) {
 			for (let index = 0; index < receipt.logs.length; index++) {
+				const _address = receipt.logs[index].address
+				if (receipt.logs[index].topics.length == 0) continue
+
 				const _topic0 = receipt.logs[index].topics[0].toHexString()
 				if (!MESSENGER_EVENT_SIGNATURES.includes(_topic0)) continue
-
-				const _address = receipt.logs[index].address
 				const _data = receipt.logs[index].data
 
 				const data = Bytes.fromUint8Array(_data.subarray(0))

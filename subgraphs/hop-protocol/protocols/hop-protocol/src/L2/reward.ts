@@ -118,7 +118,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
 				]
 			)
 		} else {
-			log.warning('Contract call reverted', [])
+			log.warning('Rewards rate call reverted', [])
 		}
 	}
 }
@@ -137,6 +137,8 @@ export function handleStaked(event: Staked): void {
 			amount.toString(),
 		])
 
+		const inputToken =
+			NetworkConfigs.getTokenAddressFromPoolAddress(poolAddress)
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 		log.warning('Staked 1 --> poolAddress: {},', [poolAddress])
 
@@ -146,7 +148,7 @@ export function handleStaked(event: Staked): void {
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
-		const token = sdk.Tokens.getOrCreateToken(event.address)
+		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
 		sdk.Accounts.loadAccount(event.params.user)
 
 		if (!pool.isInitialized) {
@@ -171,7 +173,8 @@ export function handleWithdrawn(event: Withdrawn): void {
 			poolAddress,
 			amount.toString(),
 		])
-
+		const inputToken =
+			NetworkConfigs.getTokenAddressFromPoolAddress(poolAddress)
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 		log.warning('UnStaked 1 --> poolAddress: {},', [poolAddress])
 
@@ -181,7 +184,7 @@ export function handleWithdrawn(event: Withdrawn): void {
 		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
 
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
-		const token = sdk.Tokens.getOrCreateToken(event.address)
+		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
 		sdk.Accounts.loadAccount(event.params.user)
 
 		if (!pool.isInitialized) {

@@ -124,7 +124,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 
 		let reserve = uniSwapPair.try_getReserves()
 		if (!reserve.reverted) {
-			price = reserve.value.value0.div(reserve.value.value1)
+			price = reserve.value.value1.div(reserve.value.value0)
 			log.warning(
 				'[UniswapV2Matic] tokenAddress: {}, Reserve1: {}, Reserve0: {}, Price: {}',
 				[
@@ -139,8 +139,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 			if (!x.reverted) {
 				return x
 			}
-		} else {
-			return new CustomPriceType()
 		}
 	}
 	// 10. Uniswap Router

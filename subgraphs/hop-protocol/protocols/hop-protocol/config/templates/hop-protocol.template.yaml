@@ -34,7 +34,7 @@ dataSources:
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
+        - name: CurvePool
           file: ./abis/Prices/Curve/Pool.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
@@ -128,8 +128,6 @@ dataSources:
       eventHandlers:
         - event: BonderAdded(indexed address)
           handler: handleBonderAdded
-        - event: WithdrawalBonded(indexed bytes32,uint256)
-          handler: handleWithdrawalBonded
         - event: TransferSentToL2(indexed uint256,indexed address,uint256,uint256,uint256,indexed address,uint256)
           handler: handleTransferSentToL2
           receipt: true

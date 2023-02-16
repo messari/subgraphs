@@ -16,6 +16,7 @@ import {
 	Address,
 	BigDecimal,
 	BigInt,
+	ByteArray,
 	Bytes,
 	dataSource,
 	ethereum,
@@ -240,14 +241,4 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 			event.transaction.hash.toHexString(),
 		])
 	}
-}
-
-export function handleWithdrawalBonded(event: WithdrawalBonded): void {
-	log.warning('WB --> transferId: {}, txHash: {}', [
-		event.params.transferId.toHexString(),
-		event.transaction.hash.toHexString(),
-	])
-	// let val = ethereum.decode('bytes32', event.params.transferId)
-
-	// log.warning('WB2 --> transferId: {}', [val.toString()])
 }
