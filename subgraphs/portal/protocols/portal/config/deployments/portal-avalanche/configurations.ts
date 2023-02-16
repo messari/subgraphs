@@ -21,9 +21,9 @@ export class PortalAvalancheConfigurations implements Configurations {
     return BigInt.fromI32(6);
   }
   getFactoryAddress(): Address {
-    return Address.fromString("0x54a8e5f9c4CbA08F9943965859F6c34eAF03E26c");
+    return Address.fromString("0x54a8e5f9c4cba08f9943965859f6c34eaf03e26c");
   }
   getBridgeAddress(): Address {
-    return Address.fromString("0x0e082F06FF657D94310cB8cE8B0D9a04541d8052");
+    return Address.fromString("0x0e082f06ff657d94310cb8ce8b0d9a04541d8052");
   }
 }

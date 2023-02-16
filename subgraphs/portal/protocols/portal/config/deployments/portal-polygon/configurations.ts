@@ -21,9 +21,9 @@ export class PortalPolygonConfigurations implements Configurations {
     return BigInt.fromI32(5);
   }
   getFactoryAddress(): Address {
-    return Address.fromString("0x7A4B5a56256163F07b2C80A7cA55aBE66c4ec4d7");
+    return Address.fromString("0x7a4b5a56256163f07b2c80a7ca55abe66c4ec4d7");
   }
   getBridgeAddress(): Address {
-    return Address.fromString("0x5a58505a96D1dbf8dF91cB21B54419FC36e93fdE");
+    return Address.fromString("0x5a58505a96d1dbf8df91cb21b54419fc36e93fde");
   }
 }

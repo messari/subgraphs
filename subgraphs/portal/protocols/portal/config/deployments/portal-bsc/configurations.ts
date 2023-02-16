@@ -21,9 +21,9 @@ export class PortalBscConfigurations implements Configurations {
     return BigInt.fromI32(4);
   }
   getFactoryAddress(): Address {
-    return Address.fromString("0x98f3c9e6E3fAce36bAAd05FE09d375Ef1464288B");
+    return Address.fromString("0x98f3c9e6e3face36baad05fe09d375ef1464288b");
   }
   getBridgeAddress(): Address {
-    return Address.fromString("0xB6F6D86a8f9879A9c87f643768d9efc38c1Da6E7");
+    return Address.fromString("0xb6f6d86a8f9879a9c87f643768d9efc38c1da6e7");
   }
 }
