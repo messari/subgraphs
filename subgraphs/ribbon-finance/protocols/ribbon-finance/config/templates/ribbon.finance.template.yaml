@@ -96,6 +96,9 @@ dataSources:
           handler: handleWithdrawWithFee
         - event: CapSet(uint256,uint256,address)
           handler: handleCapSetWithManager
+        - event: Migrate(address,address,uint256,uint256)
+          handler: handleMigrate
+
   {{/vaults}}
     
   {{#liquidityGauges}}

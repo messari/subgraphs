@@ -67,6 +67,7 @@ export namespace RewardIntervalType {
 export namespace TransactionType {
   export const DEPOSIT = "DEPOSIT";
   export const WITHDRAW = "WITHDRAW";
+  export const REFRESH = "REFRESH";
 }
 
 export namespace NULL {

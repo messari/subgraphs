@@ -12,7 +12,7 @@ import {
 } from "../common/initializers";
 import {
   CapSet,
-  CapSet1 as CapSetWithManager,
+  Migrate,
   NewOffer,
   PurchaseOption,
   PayOptionYield,
@@ -24,6 +24,7 @@ import {
   Deposit as DepositEvent,
   Withdraw as WithdrawEvent,
   Withdraw1 as WithdrawWithFee,
+  CapSet1 as CapSetWithManager,
 } from "../../generated/templates/LiquidityGauge/RibbonThetaVaultWithSwap";
 import * as utils from "../common/utils";
 import { Vault } from "../../generated/schema";
@@ -382,4 +383,15 @@ export function handleCapSetWithManager(event: CapSetWithManager): void {
   const vault = getOrCreateVault(vaultAddress, event.block);
   vault.depositLimit = event.params.newCap;
   vault.save();
+}
+
+export function handleMigrate(event: Migrate): void {
+  const vaultAddress = event.address;
+  Transaction(
+    vaultAddress,
+    constants.BIGINT_ZERO,
+    event.transaction,
+    event.block,
+    constants.TransactionType.REFRESH
+  );
 }

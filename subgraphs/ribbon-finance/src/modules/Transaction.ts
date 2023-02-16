@@ -126,10 +126,6 @@ export function Transaction(
   const inputTokenAddress = Address.fromString(vault.inputToken);
   const inputToken = getOrCreateToken(inputTokenAddress, block);
 
-  const amountUSD = utils
-    .bigIntToBigDecimal(amount, vault._decimals)
-    .times(inputToken.lastPriceUSD!);
-
   vault.outputTokenSupply = utils.getOutputTokenSupply(vaultAddress, block);
 
   const totalValue = utils.readValue<BigInt>(
@@ -149,6 +145,12 @@ export function Transaction(
   vault.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(vaultAddress, block);
 
   vault.save();
+  if (type == constants.TransactionType.REFRESH) {
+    return;
+  }
+  const amountUSD = utils
+    .bigIntToBigDecimal(amount, vault._decimals)
+    .times(inputToken.lastPriceUSD!);
 
   if (type == constants.TransactionType.DEPOSIT) {
     createDepositTransaction(vault, amount, amountUSD, transaction, block);

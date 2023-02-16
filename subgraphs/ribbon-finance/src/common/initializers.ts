@@ -49,11 +49,11 @@ export function getOrCreateToken(
     );
     token._vaultId = vault.toHexString();
     token.lastPriceBlockNumber = block.number;
+    token._isOutputToken = isOutputToken ? true : false; //Added the ternary condition to remove type error
+
     if (isOutputToken) {
-      token._isOutputToken = true;
       token.lastPriceUSD = utils.getOutputTokenPriceUSD(vault, block);
     } else {
-      token._isOutputToken = false;
       token.lastPriceUSD = getUsdPricePerToken(address).usdPrice;
     }
 
