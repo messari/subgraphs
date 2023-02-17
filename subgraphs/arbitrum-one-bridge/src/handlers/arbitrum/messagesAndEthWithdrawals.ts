@@ -14,7 +14,7 @@ import {
 import { Pricer, TokenInit, arbSideConf, ethAddress } from "../../common/utils";
 
 export function handleL2ToL1Tx(event: L2ToL1Tx): void {
-  // build params
+  // params used in handleL2ToL1Transaction
   const caller = new ethereum.EventParam("caller", event.parameters[0].value);
   const destination = new ethereum.EventParam(
     "destination",
@@ -26,7 +26,46 @@ export function handleL2ToL1Tx(event: L2ToL1Tx): void {
   );
   const data = new ethereum.EventParam("data", event.parameters[8].value);
 
-  const params: ethereum.EventParam[] = [caller, destination, callvalue, data];
+  // unused params; but required for properly building the params array
+  // (note: some variables don't exactly map 1:1 between L2ToL1Tx and L2ToL1Transaction)
+  const uniqueId = new ethereum.EventParam(
+    "uniqueId",
+    event.parameters[2].value
+  );
+  const batchNumber = new ethereum.EventParam(
+    "batchNumber",
+    event.parameters[2].value
+  );
+  const indexInBatch = new ethereum.EventParam(
+    "arbBlockNum",
+    event.parameters[3].value
+  );
+  const arbBlockNum = new ethereum.EventParam(
+    "arbBlockNum",
+    event.parameters[4].value
+  );
+  const ethBlockNum = new ethereum.EventParam(
+    "ethBlockNum",
+    event.parameters[5].value
+  );
+  const timestamp = new ethereum.EventParam(
+    "timestamp",
+    event.parameters[6].value
+  );
+
+  // build param
+  const params: ethereum.EventParam[] = [
+    caller,
+    destination,
+    uniqueId,
+    batchNumber,
+    indexInBatch,
+    arbBlockNum,
+    ethBlockNum,
+    timestamp,
+    callvalue,
+    data,
+  ];
 
   // build event
   const l2ToL1Transaction = new L2ToL1Transaction(
