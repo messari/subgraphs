@@ -3,9 +3,12 @@ import {
   ProposalCanceled,
   ProposalCreated,
   ProposalExecuted,
+  ProposalThresholdSet,
   QuorumNumeratorUpdated,
   VoteCast,
   VoteCastWithParams,
+  VotingDelaySet,
+  VotingPeriodSet,
 } from "../../../generated/OptimismGovernorV2/OptimismGovernorV2";
 import {
   _handleProposalCreated,
@@ -57,6 +60,15 @@ export function handleProposalCreated(event: ProposalCreated): void {
 // ProposalExecuted(proposalId)
 export function handleProposalExecuted(event: ProposalExecuted): void {
   _handleProposalExecuted(event.params.proposalId.toString(), event);
+}
+
+// ProposalThresholdSet(oldProposalThreshold,newProposalThreshold)
+export function handleProposalThresholdSet(event: ProposalThresholdSet): void {
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
+  governanceFramework.proposalThreshold = event.params.newProposalThreshold;
+  governanceFramework.save();
 }
 
 // QuorumNumeratorUpdated(oldQuorumNumerator, newQuorumNumerator)
@@ -124,6 +136,24 @@ export function handleVoteCastWithParams(event: VoteCastWithParams): void {
     event.params.support,
     event
   );
+}
+
+// VotingDelaySet(oldVotingDelay,newVotingDelay)
+export function handleVotingDelaySet(event: VotingDelaySet): void {
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
+  governanceFramework.votingDelay = event.params.newVotingDelay;
+  governanceFramework.save();
+}
+
+// VotingDelaySet(oldVotingPeriod,newVotingPeriod)
+export function handleVotingPeriodSet(event: VotingPeriodSet): void {
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
+  governanceFramework.votingPeriod = event.params.newVotingPeriod;
+  governanceFramework.save();
 }
 
 // Helper function that imports and binds the contract
