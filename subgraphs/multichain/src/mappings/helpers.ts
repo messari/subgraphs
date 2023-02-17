@@ -563,7 +563,7 @@ export function createBridgeTransferEvent(
   transferEvent.protocol = Bytes.fromHexString(
     NetworkConfigs.getFactoryAddress()
   );
-  transferEvent.to = event.transaction.to!;
+  transferEvent.to = event.transaction.to ? event.transaction.to! : toAddress;
   transferEvent.from = event.transaction.from;
   transferEvent.isOutgoing = isOutgoing;
   transferEvent.pool = pool.id;
@@ -572,7 +572,7 @@ export function createBridgeTransferEvent(
   if (isOutgoing) {
     const account = getOrCreateAccount(
       protocol,
-      event.transaction.from.toHexString()
+      transferEvent.from.toHexString()
     );
     transferEvent.account = account.id;
 
@@ -582,7 +582,7 @@ export function createBridgeTransferEvent(
   } else {
     const account = getOrCreateAccount(
       protocol,
-      event.transaction.to!.toHexString()
+      transferEvent.to.toHexString()
     );
     transferEvent.account = account.id;
 

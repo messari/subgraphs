@@ -27,7 +27,12 @@ import {
   updateProtocolAndPoolTvl,
 } from "../updaters/financialMetrics";
 import { bigIntToBigDecimal } from "../utils/numbers";
-import { BIGINT_SIXTEEN, BIGINT_THIRTYTWO } from "../utils/constants";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_SIXTEEN,
+  BIGINT_THIRTYTWO,
+  BIGINT_ZERO,
+} from "../utils/constants";
 
 /**
  * When enough ODAO members votes on a balance and a consensus threshold is reached, the staker beacon chain state is persisted to the smart contracts.
@@ -213,10 +218,13 @@ function generateStakerBalanceCheckpoints(
     protocol
   );
 
+  let protocolRevenue = BIGDECIMAL_ZERO;
+  let ethRewards = BIGINT_ZERO;
+
   // Loop through all the staker id's in the protocol.
   for (let index = 0; index < activeStakerIds.length; index++) {
     // Determine current staker ID.
-    const stakerId = <string>activeStakerIds[index];
+    const stakerId = activeStakerIds[index];
     if (stakerId == null || stakerId == ZERO_ADDRESS_STRING) continue;
 
     // Load the indexed staker.
@@ -227,7 +235,7 @@ function generateStakerBalanceCheckpoints(
 
     // Get the current & previous balances for this staker and update the staker balance for the current exchange rate.
     const stakerBalance = stakerUtilities.getStakerBalance(
-      <Staker>staker,
+      staker,
       networkCheckpoint.rETHExchangeRate
     );
     staker.ethBalance = stakerBalance.currentETHBalance;
@@ -243,23 +251,18 @@ function generateStakerBalanceCheckpoints(
       );
     stakerUtilities.handleEthRewardsSincePreviousCheckpoint(
       ethRewardsSincePreviousCheckpoint,
-      <Staker>staker,
+      staker,
       networkCheckpoint,
       protocol
     );
-    updateTotalRevenueMetrics(
-      block,
-      ethRewardsSincePreviousCheckpoint,
-      networkCheckpoint.totalRETHSupply
+
+    protocolRevenue = protocolRevenue.plus(
+      bigIntToBigDecimal(ethRewardsSincePreviousCheckpoint).times(
+        bigIntToBigDecimal(averageFeeForActiveMinipools)
+      )
     );
 
-    const protocolRevenue = bigIntToBigDecimal(
-      ethRewardsSincePreviousCheckpoint
-    ).times(bigIntToBigDecimal(averageFeeForActiveMinipools));
-
-    updateProtocolSideRevenueMetrics(block, protocolRevenue);
-    updateSupplySideRevenueMetrics(block);
-    updateSnapshotsTvl(block);
+    ethRewards = ethRewards.plus(ethRewardsSincePreviousCheckpoint);
 
     // Create a new staker balance checkpoint
     const stakerBalanceCheckpoint =
@@ -280,6 +283,18 @@ function generateStakerBalanceCheckpoints(
     stakerBalanceCheckpoint.save();
     staker.save();
   }
+
+  // update all rev/snapshots at once
+  // this was moved outside of the loop to reduce the memory usage
+  // we were getting a "oneshot called" error
+  updateTotalRevenueMetrics(
+    block,
+    ethRewards,
+    networkCheckpoint.totalRETHSupply
+  );
+  updateProtocolSideRevenueMetrics(block, protocolRevenue);
+  updateSupplySideRevenueMetrics(block);
+  updateSnapshotsTvl(block);
 }
 
 /**

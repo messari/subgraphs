@@ -1,0 +1,21 @@
+{
+  "name": "ribbon-generic",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --product hosted-service shashwats22/ribbon-finance-avalanche",
+    "prepare:yaml": "mustache protocols/ribbon-finance/config/deployments/ribbon-finance-avalanche/configurations.json protocols/ribbon-finance/config/templates/ribbon.finance.template.yaml > subgraph.yaml",
+    "create-local": "graph create --node http://localhost:8020/ shashwatS22/ribbon-generic",
+    "remove-local": "graph remove --node http://localhost:8020/ shashwatS22/ribbon-generic",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 shashwatS22/ribbon-generic"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.32.0",
+    "@graphprotocol/graph-ts": "0.27.0",
+    "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "prettier": "2.8.3"
+  }
+}
