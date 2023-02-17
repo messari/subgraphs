@@ -26,10 +26,12 @@ import {
   BridgePoolType,
   CrosschainTokenType,
 } from "../sdk/protocols/bridge/enums";
-import { Network, RewardTokenType } from "../sdk/util/constants";
-import { chainIDToNetwork } from "../sdk/protocols/bridge/chainIds";
+import {
+  BIGINT_HUNDRED,
+  Network,
+  RewardTokenType,
+} from "../sdk/util/constants";
 import { getRewardsPerDay, RewardIntervalType } from "../sdk/util/rewards";
-
 import {
   AddLiquidityCall,
   CreatePoolCall,
@@ -250,7 +252,7 @@ export function handleSwapOut(event: Swap): void {
     Address.fromBytes(pool.getInputToken().id)
   );
 
-  const crosschainNetwork = chainIDToNetwork(crosschainID);
+  const crosschainNetwork = stargateChainIDToChainID(crosschainID);
   if (crosschainNetwork == Network.UNKNOWN_NETWORK) {
     log.warning("[handleSwapOut] Network unknown for chainID: {} tx_hash: {}", [
       crosschainID.toString(),
@@ -312,7 +314,7 @@ export function handleSwapIn(call: SwapRemoteCall): void {
   const crosschainID = BigInt.fromI32(call.inputs._srcChainId as i32);
   const crossPoolID = call.inputs._srcPoolId;
 
-  const crosschainNetwork = chainIDToNetwork(crosschainID);
+  const crosschainNetwork = stargateChainIDToChainID(crosschainID);
   if (crosschainNetwork == Network.UNKNOWN_NETWORK) {
     log.warning("[handleSwapIn] Network unknown for chainID: {} tx_hash: {}", [
       crosschainID.toString(),
@@ -467,4 +469,51 @@ export function handleUnstake(event: Withdraw): void {
     rewardToken,
     bigDecimalToBigInt(rewardsPerDay)
   );
+}
+
+// stargate uses its own chainIDs, different than the ones in chainlist.org.
+// Here we map from stargate chainIDs to our own, which match the SDK.
+function stargateChainIDToChainID(chainID: BigInt): Network {
+  const STARGATE_MAINNET = BigInt.fromI32(101);
+  const STARGATE_BSC = BigInt.fromI32(102);
+  const STARGATE_AVALANCHE = BigInt.fromI32(106);
+  const STARGATE_POLYGON = BigInt.fromI32(109);
+  const STARGATE_ARBITRUM = BigInt.fromI32(110);
+  const STARGATE_OPTIMISM = BigInt.fromI32(111);
+  const STARGATE_FANTOM = BigInt.fromI32(112);
+  const STARGATE_METIS = BigInt.fromI32(151);
+
+  // sometimes stargat chainID comes with 100 added to it, sometimes without
+  if (chainID.lt(BIGINT_HUNDRED)) {
+    chainID = chainID.plus(BIGINT_HUNDRED);
+  }
+
+  if (chainID.equals(STARGATE_MAINNET)) {
+    return Network.MAINNET;
+  }
+  if (chainID.equals(STARGATE_BSC)) {
+    return Network.BSC;
+  }
+  if (chainID.equals(STARGATE_AVALANCHE)) {
+    return Network.AVALANCHE;
+  }
+  if (chainID.equals(STARGATE_POLYGON)) {
+    return Network.MATIC;
+  }
+  if (chainID.equals(STARGATE_ARBITRUM)) {
+    return Network.ARBITRUM_ONE;
+  }
+  if (chainID.equals(STARGATE_OPTIMISM)) {
+    return Network.OPTIMISM;
+  }
+  if (chainID.equals(STARGATE_FANTOM)) {
+    return Network.FANTOM;
+  }
+  if (chainID.equals(STARGATE_METIS)) {
+    return Network.METIS;
+  }
+
+  log.error("Unknown stargate chainID: {}", [chainID.toString()]);
+  log.critical("", []);
+  return Network.UNKNOWN_NETWORK;
 }
