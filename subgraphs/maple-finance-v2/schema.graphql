@@ -2014,7 +2014,7 @@ type Flashloan implements Event @entity(immutable: true) {
 }
 
 # Helper entity to keep track of Maple loans and their metadata
-type _Loan {
+type _Loan @entity {
   " Smart contract address of the MapleLoan "
   id: Bytes!
 
