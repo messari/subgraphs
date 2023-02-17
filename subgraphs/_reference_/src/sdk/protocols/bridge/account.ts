@@ -66,11 +66,18 @@ export class Account {
   protocol: Bridge;
   tokens: TokenManager;
 
+  /**
+   * Tracks the number of event entities created by this account during the current ethereum.Event
+   * in case multiple ones need to be created at once, to avoid ID collissions.
+   */
+  private eventCount: u8;
+
   constructor(protocol: Bridge, account: AccountSchema, tokens: TokenManager) {
     this.account = account;
     this.protocol = protocol;
     this.event = protocol.getCurrentEvent();
     this.tokens = tokens;
+    this.eventCount = 0;
   }
 
   private isActiveByActivityID(id: string): boolean {
@@ -255,7 +262,7 @@ export class Account {
   }
 
   private transferBoilerplate(): BridgeTransfer {
-    const id = idFromEvent(this.event);
+    const id = this.idFromEvent(this.event);
     const transfer = new BridgeTransfer(id);
     transfer.hash = this.event.transaction.hash;
     transfer.logIndex = this.event.logIndex.toI32();
@@ -325,7 +332,7 @@ export class Account {
     isOutgoing: boolean,
     data: Bytes
   ): BridgeMessage {
-    const id = idFromEvent(this.event);
+    const id = this.idFromEvent(this.event);
     const message = new BridgeMessage(id);
     message.hash = this.event.transaction.hash;
     message.logIndex = this.event.logIndex.toI32();
@@ -362,7 +369,7 @@ export class Account {
       Address.fromBytes(_pool.inputToken)
     );
 
-    const id = idFromEvent(this.event);
+    const id = this.idFromEvent(this.event);
     const deposit = new LiquidityDeposit(id);
     deposit.hash = this.event.transaction.hash;
     deposit.logIndex = this.event.logIndex.toI32();
@@ -406,7 +413,7 @@ export class Account {
       Address.fromBytes(_pool.inputToken)
     );
 
-    const id = idFromEvent(this.event);
+    const id = this.idFromEvent(this.event);
     const withdraw = new LiquidityWithdraw(id);
     withdraw.hash = this.event.transaction.hash;
     withdraw.logIndex = this.event.logIndex.toI32();
@@ -514,10 +521,13 @@ export class Account {
     this.account.messageSentCount += 1;
     this.account.save();
   }
-}
 
-function idFromEvent(event: CustomEventType): Bytes {
-  return event.transaction.hash.concatI32(event.logIndex.toI32());
+  idFromEvent(event: CustomEventType): Bytes {
+    this.eventCount += 1;
+    return event.transaction.hash
+      .concatI32(event.logIndex.toI32())
+      .concatI32(this.eventCount);
+  }
 }
 
 function inferTransferType(
