@@ -10,7 +10,7 @@ import { Bridge } from "./protocol";
 import { RewardTokenType } from "../../util/constants";
 
 export interface TokenInitializer {
-  getTokenParams(address: Address): TokenParams;
+  getTokenParams(address: Bytes): TokenParams;
 }
 
 export class TokenParams {
@@ -28,7 +28,7 @@ export class TokenManager {
     this.initializer = init;
   }
 
-  getOrCreateToken(address: Address): Token {
+  getOrCreateToken(address: Bytes): Token {
     let token = Token.load(address);
     if (token) {
       return token;
@@ -69,9 +69,9 @@ export class TokenManager {
 
   getOrCreateCrosschainToken(
     chainID: BigInt,
-    address: Address,
+    address: Bytes,
     type: string,
-    token: Address
+    token: Bytes
   ): CrosschainToken {
     const id = changetype<Bytes>(Bytes.fromBigInt(chainID)).concat(address);
     let ct = CrosschainToken.load(id);

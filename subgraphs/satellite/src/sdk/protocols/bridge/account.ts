@@ -151,7 +151,7 @@ export class Account {
   transferOut(
     pool: Pool,
     route: PoolRoute,
-    destination: Address,
+    destination: Bytes,
     amount: BigInt,
     transactionID: Bytes | null = null,
     updateMetrics: boolean = true
@@ -183,7 +183,7 @@ export class Account {
   transferIn(
     pool: Pool,
     route: PoolRoute,
-    source: Address,
+    source: Bytes,
     amount: BigInt,
     transactionID: Bytes | null = null,
     updateMetrics: boolean = true
@@ -203,7 +203,7 @@ export class Account {
   private transfer(
     pool: Pool,
     route: PoolRoute,
-    counterparty: Address,
+    counterparty: Bytes,
     amount: BigInt,
     isOutgoing: boolean,
     transactionID: Bytes | null,

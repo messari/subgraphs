@@ -247,7 +247,7 @@ export function handleTokenSent(event: TokenSent): void {
   _handleTransferOut(
     Address.fromString(tokenAddress),
     event.params.sender,
-    Address.fromString(event.params.destinationAddress),
+    Address.fromUTF8(event.params.destinationAddress),
     event.params.amount,
     dstChainId,
     poolId,
@@ -270,9 +270,7 @@ export function handleContractCallWithToken(
   );
   const dstNetworkConstants = getNetworkSpecificConstant(dstChainId);
   const dstPoolId = dstNetworkConstants.getPoolAddress();
-  const dstAccount = Address.fromString(
-    event.params.destinationContractAddress
-  );
+  const dstAccount = Address.fromUTF8(event.params.destinationContractAddress);
   _handleTransferOut(
     Address.fromString(tokenAddress),
     event.params.sender,
@@ -324,7 +322,8 @@ export function handleContractCallApprovedWithMint(
 ): void {
   // contract call
   const srcChainId = networkToChainID(event.params.sourceChain.toUpperCase());
-  const srcAccount = Address.fromString(event.params.sourceAddress);
+  // this is needed to support transferIn from non-EVM chain
+  const srcAccount = Bytes.fromUTF8(event.params.sourceAddress);
   const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
   const tokenAddress = tokenSymbol.tokenAddress!;
   const poolId = event.address.concat(Address.fromString(tokenAddress));
@@ -333,7 +332,7 @@ export function handleContractCallApprovedWithMint(
 
   _handleTransferIn(
     Address.fromString(tokenAddress),
-    Address.fromString(event.params.sourceAddress),
+    srcAccount,
     event.params.contractAddress,
     event.params.amount,
     srcChainId,
@@ -433,10 +432,10 @@ export function handleBurnToken(call: BurnTokenCall): void {
     salt.toHexString(),
   ]);
 
-  /* //TODO: needed?
+  //TODO: needed?
 
-  const tokenSymbol = getOrCreateTokenSymbol(symbol)!;
-  const tokenAddress = tokenSymbol.tokenAddress;
+  const tokenSymbol = getOrCreateTokenSymbol(symbol);
+  const tokenAddress = tokenSymbol.tokenAddress!;
   const tokenContract = TokenContract.bind(Address.fromString(tokenAddress));
   const depositAddressResult = tokenContract.try_depositAddress(salt);
   if (depositAddressResult.reverted) {
@@ -470,7 +469,6 @@ export function handleBurnToken(call: BurnTokenCall): void {
     call,
     call.inputs.value1
   );
-  */
 }
 
 //////////////////////////////// HELPER FUNCTIONS //////////////////////////////
@@ -483,6 +481,7 @@ export function handleBurnToken(call: BurnTokenCall): void {
  * @param contractAddress address of AxelarGatewayMultiSig contract
  *
  */
+
 function getOrCreateTokenSymbol(
   symbol: string,
   tokenAddress: string | null = null,
@@ -501,7 +500,7 @@ function getOrCreateTokenSymbol(
 function _handleTransferOut(
   token: Address,
   sender: Address,
-  receiver: Address,
+  receiver: Bytes,
   amount: BigInt,
   dstChainId: BigInt,
   poolId: Bytes,
@@ -546,7 +545,7 @@ function _handleTransferOut(
 
 function _handleTransferIn(
   token: Address,
-  sender: Address,
+  sender: Bytes,
   receiver: Address,
   amount: BigInt,
   srcChainId: BigInt,
