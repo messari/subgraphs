@@ -1058,7 +1058,8 @@
   "belt-finance": {
     "schema": "yield-aggregator",
     "base": "belt-finance",
-    "protocol": "belt",
+    "protocol": "belt-finance",
+    "project": "belt",
     "deployments": {
       "belt-finance-bsc": {
         "network": "bsc",
@@ -1152,7 +1153,7 @@
     "schema": "lending",
     "base": "compound-forks",
     "protocol": "banker-joe",
-    "project": "banker-joe",
+    "project": "trader-joe",
     "deployments": {
       "banker-joe-avalanche": {
         "network": "avalanche",
@@ -1796,7 +1797,7 @@
     "schema": "lending",
     "base": "compound-forks",
     "protocol": "rari-fuse",
-    "project": "rari",
+    "project": "rari-capital",
     "deployments": {
       "rari-fuse-arbitrum": {
         "network": "arbitrum",
@@ -3138,7 +3139,7 @@
     "schema": "lending",
     "base": "maple-finance",
     "protocol": "maple-finance",
-    "project": "maple-finance",
+    "project": "maple",
     "deployments": {
       "maple-finance-ethereum": {
         "network": "ethereum",
@@ -4130,7 +4131,7 @@
     "schema": "yield-aggregator",
     "base": "rari-vaults",
     "protocol": "rari-vaults",
-    "project": "rari",
+    "project": "rari-capital",
     "deployments": {
       "rari-vaults-ethereum": {
         "network": "ethereum",
@@ -4668,7 +4669,7 @@
     "schema": "dex-amm",
     "base": "uniswap-forks",
     "protocol": "trader-joe",
-    "project": "joe",
+    "project": "trader-joe",
     "deployments": {
       "trader-joe-avalanche": {
         "network": "avalanche",
@@ -4981,7 +4982,7 @@
     "schema": "governance",
     "base": "maker-governance",
     "protocol": "maker-governance",
-    "project": "maker",
+    "project": "makerdao",
     "deployments": {
       "maker-governance-ethereum": {
         "network": "ethereum",
@@ -7252,7 +7253,8 @@
   "orbit-bridge": {
     "schema": "bridge",
     "base": "orbit-bridge",
-    "protocol": "orbit",
+    "protocol": "orbit-bridge",
+    "project": "orbit",
     "deployments": {
       "orbit-bridge-ethereum": {
         "network": "ethereum",
