@@ -53,6 +53,8 @@ export function updatePoolMetrics(
   poolDailySnapshot: PoolDailySnapshot,
   poolHourlySnapshot: PoolHourlySnapshot,
   poolRoute: PoolRoute,
+  poolRouteDailySnapshotID: Bytes,
+  poolRouteHourlySnapshotID: Bytes,
   block: ethereum.Block
 ): void {
   pool.inputTokenBalance = token._totalSupply;
@@ -68,7 +70,7 @@ export function updatePoolMetrics(
   poolDailySnapshot.inputTokenBalance = pool.inputTokenBalance;
   poolDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolDailySnapshot.routes = arrayUnique(
-    addToArrayAtIndex(poolDailySnapshot.routes, poolRoute.id)
+    addToArrayAtIndex(poolDailySnapshot.routes, poolRouteDailySnapshotID)
   );
   poolDailySnapshot.blockNumber = block.number;
   poolDailySnapshot.timestamp = block.timestamp;
@@ -76,7 +78,7 @@ export function updatePoolMetrics(
   poolHourlySnapshot.inputTokenBalance = pool.inputTokenBalance;
   poolHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolHourlySnapshot.routes = arrayUnique(
-    addToArrayAtIndex(poolHourlySnapshot.routes, poolRoute.id)
+    addToArrayAtIndex(poolHourlySnapshot.routes, poolRouteHourlySnapshotID)
   );
   poolHourlySnapshot.blockNumber = block.number;
   poolHourlySnapshot.timestamp = block.timestamp;
@@ -170,7 +172,7 @@ export function updateVolume(
   poolRouteDailySnapshot.snapshotVolumeIn =
     poolRouteDailySnapshot.snapshotVolumeIn.plus(volumeIn);
   poolRouteDailySnapshot.snapshotVolumeInUSD =
-    poolRouteDailySnapshot.cumulativeVolumeInUSD.plus(volumeInUSD);
+    poolRouteDailySnapshot.snapshotVolumeInUSD.plus(volumeInUSD);
   poolRouteDailySnapshot.cumulativeVolumeIn = pool.cumulativeVolumeIn;
   poolRouteDailySnapshot.cumulativeVolumeInUSD = pool.cumulativeVolumeInUSD;
   poolRouteDailySnapshot.snapshotVolumeOut =
@@ -205,7 +207,7 @@ export function updateVolume(
   poolRouteHourlySnapshot.snapshotVolumeIn =
     poolRouteHourlySnapshot.snapshotVolumeIn.plus(volumeIn);
   poolRouteHourlySnapshot.snapshotVolumeInUSD =
-    poolRouteHourlySnapshot.cumulativeVolumeInUSD.plus(volumeInUSD);
+    poolRouteHourlySnapshot.snapshotVolumeInUSD.plus(volumeInUSD);
   poolRouteHourlySnapshot.cumulativeVolumeIn = pool.cumulativeVolumeIn;
   poolRouteHourlySnapshot.cumulativeVolumeInUSD = pool.cumulativeVolumeInUSD;
   poolRouteHourlySnapshot.snapshotVolumeOut =
