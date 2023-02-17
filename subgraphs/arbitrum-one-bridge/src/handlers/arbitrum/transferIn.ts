@@ -65,7 +65,7 @@ export function handleTransferIn(event: DepositFinalized): void {
     networkToChainID(Network.ARBITRUM_ONE),
     crossTokenAddress!,
     CrosschainTokenType.CANONICAL,
-    crossTokenAddress!
+    inputTokenAddress!
   );
 
   // -- POOL

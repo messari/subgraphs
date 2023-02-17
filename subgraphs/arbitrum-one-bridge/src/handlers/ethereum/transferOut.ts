@@ -60,16 +60,8 @@ export function handleTransferOut(event: WithdrawalFinalized): void {
 
   const crossTokenAddress: Address = event.params.l1Token;
 
-  const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-    networkToChainID(Network.ARBITRUM_ONE),
-    crossTokenAddress!,
-    CrosschainTokenType.CANONICAL,
-    crossTokenAddress!
-  );
-
-  const gatewayContract = TokenGateway.bind(event.address);
-
   let inputTokenAddress: Address;
+  const gatewayContract = TokenGateway.bind(event.address);
   const inputTokenAddressResult =
     gatewayContract.try_calculateL2TokenAddress(crossTokenAddress);
   if (inputTokenAddressResult.reverted) {
@@ -77,8 +69,14 @@ export function handleTransferOut(event: WithdrawalFinalized): void {
   } else {
     inputTokenAddress = inputTokenAddressResult.value;
   }
-
   const inputToken = sdk.Tokens.getOrCreateToken(inputTokenAddress!);
+
+  const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
+    networkToChainID(Network.ARBITRUM_ONE),
+    crossTokenAddress!,
+    CrosschainTokenType.CANONICAL,
+    inputTokenAddress!
+  );
 
   // -- POOL
 
