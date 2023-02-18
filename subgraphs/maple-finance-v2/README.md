@@ -22,6 +22,9 @@ Maple Finance brings legacy financial markets to the blockchain to be secured by
 - The maple loan manager was deployed before the protocol was "launched".
   - We believe it was used in Maple Finance V1, so a lot of loans that were open in Maple Finance V1 were transitioned to Maple Finance V2.
 - Revenue (interest) is interest paid, not outstanding interest accrued.
+- Borrow rates are calculated based off the volume weighted average of the current outstanding loans.
+- Deposit rates are calculated based off interest paid on the current outstanding loans (minus fees).
+- Borrow balance is the true outstanding balance of the loan (including interest).
 
 ## Links
 

@@ -133,6 +133,10 @@ templates:
           file: ./abis/Pool.json
         - name: MapleGlobals
           file: ./abis/MapleGlobals.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -163,6 +167,8 @@ templates:
           handler: handleLoanFunded
         - event: SetAsActive(bool)
           handler: handleSetAsActive
+        - event: LiquidityCapSet(uint256)
+          handler: handleLiquidityCapSet
       file: ./protocols/maple-finance-v2/src/mapping.ts
   - kind: ethereum/contract
     name: MapleLoan

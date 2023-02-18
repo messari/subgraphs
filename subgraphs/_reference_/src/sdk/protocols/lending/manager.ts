@@ -667,7 +667,7 @@ export class DataManager {
   }
 
   createTransfer(
-    asset: Address,
+    asset: Bytes,
     sender: Address,
     receiver: Address,
     amount: BigInt,

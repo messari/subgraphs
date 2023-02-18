@@ -22,6 +22,8 @@ export const ETH_SYMBOL = "ETH";
 export const ETH_DECIMALS = 18;
 export const DEFAULT_DECIMALS = 18;
 
+export const CHAINLINK_DECIMALS = 8;
+
 // factory contract
 export const POOL_MANAGER_FACTORY =
   "0xe463cd473ecc1d1a4ecf20b62624d84dd20a8339";
@@ -31,7 +33,7 @@ export const LIQUIDATOR_FACTORY = "0xa2091116649b070d2a27fc5c85c9820302114c63";
 export const WITHDRAWAL_MANAGER_FACTORY =
   "0xb9e25b584dc4a7c9d47aef577f111fbe5705773b";
 export const MAPLE_LOAN_FACTORY = "0x36a7350309b2eb30f3b908ab0154851b5ed81db0"; //TODO do we need this?
-export const MAPLE_GLOBALS = "0x804a6F5F667170F545Bf14e5DDB48C70B788390C"; // price from getLatestPrice()
+export const MAPLE_GLOBALS = "0x804a6f5f667170f545bf14e5ddb48c70b788390c"; // price from getLatestPrice()
 
 /////////////////////////////
 ///// Protocol Specific /////

@@ -1,6 +1,7 @@
 import {
   Address,
   BigDecimal,
+  BigInt,
   Bytes,
   ethereum,
   log,
@@ -19,9 +20,9 @@ import {
   WithdrawalManager as WithdrawalManagerTemplate,
   Liquidator as LiquidatorTemplate,
   Pool as PoolTemplate,
-  // LoanManager as LoanManagerTemplate,
 } from "../../../generated/templates";
 import {
+  LiquidityCapSet,
   LoanFunded,
   PoolManager,
   SetAsActive,
@@ -39,9 +40,14 @@ import {
 } from "../../../src/sdk/constants";
 import { DataManager } from "../../../src/sdk/manager";
 import { TokenManager } from "../../../src/sdk/token";
-import { getProtocolData, MAPLE_GLOBALS, ZERO_ADDRESS } from "./constants";
+import {
+  CHAINLINK_DECIMALS,
+  getProtocolData,
+  MAPLE_GLOBALS,
+  ZERO_ADDRESS,
+} from "./constants";
 import { Token, _Loan } from "../../../generated/schema";
-import { Transfer } from "../../../generated/PoolManagerFactory/ERC20";
+import { ERC20, Transfer } from "../../../generated/PoolManagerFactory/ERC20";
 
 /////////////////////
 //// Pool Events ////
@@ -164,10 +170,7 @@ export function handleLoanFunded(event: LoanFunded): void {
   );
 
   const inputTokenPriceUSD = getPriceUSD(tryInputToken.value);
-  const inputTokenDecimals = new TokenManager(
-    Bytes.fromHexString(tryInputToken.value.toHexString()),
-    event
-  ).getToken().decimals;
+  const inputTokenDecimals = manager.getInputToken().decimals;
   manager.createBorrow(
     Bytes.fromHexString(tryInputToken.value.toHexString()),
     tryBorrower.value,
@@ -200,17 +203,56 @@ export function handleTransfer(event: Transfer): void {
     event,
     getProtocolData()
   );
+  updateMarketAndProtocol(manager);
 
-  // TODO: update everything (ie, prices, balances, tvl, borrow amt, exchange rate, etc)
-  // TODO: get amount using exchange rate
+  const market = manager.getMarket();
+  const inputTokenDecimals = manager.getInputToken().decimals;
+
+  // get amount (in inputToken) by using the exchange rate
+  const amount = BigInt.fromString(
+    event.params.value
+      .toBigDecimal()
+      .times(market.exchangeRate!)
+      .truncate(0)
+      .toString()
+  );
+  const amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputTokenDecimals))
+    .times(market.inputTokenPriceUSD);
 
   if (event.params.from == ZERO_ADDRESS) {
     // tokens created (Deposit)
-    manager.createDeposit;
+    manager.createDeposit(
+      market.inputToken,
+      event.params.to,
+      amount,
+      amountUSD,
+      getBalanceOf(event.address, event.params.to),
+      InterestRateType.VARIABLE
+    );
   } else if (event.params.to == ZERO_ADDRESS) {
     // tokens destroyed (Withdrawal)
+    manager.createWithdraw(
+      market.inputToken,
+      event.params.from,
+      amount,
+      amountUSD,
+      getBalanceOf(event.address, event.params.from),
+      InterestRateType.VARIABLE
+    );
   } else {
     // tokens transferred (Transfer)
+    manager.createTransfer(
+      market.inputToken,
+      event.params.from,
+      event.params.to,
+      amount,
+      amountUSD,
+      getBalanceOf(event.address, event.params.from),
+      getBalanceOf(event.address, event.params.to),
+      InterestRateType.VARIABLE
+    );
   }
 }
 
@@ -249,12 +291,42 @@ export function handleSetAsActive(event: SetAsActive): void {
   market.save();
 }
 
+//
+// Set the supplyCap
+export function handleLiquidityCapSet(event: LiquidityCapSet): void {
+  // get input token
+  const poolManagerContract = PoolManager.bind(event.address);
+  const tryAsset = poolManagerContract.try_asset();
+  if (tryAsset.reverted) {
+    log.error(
+      "[handleSetAsActive] PoolManager contract {} does not have an asset",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+  const tryPool = poolManagerContract.try_pool();
+  if (tryPool.reverted) {
+    log.error(
+      "[handleSetAsActive] PoolManager contract {} does not have a pool",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+
+  const manager = new DataManager(
+    Bytes.fromHexString(tryPool.value.toHexString()),
+    Bytes.fromHexString(tryAsset.value.toHexString()),
+    event,
+    getProtocolData()
+  );
+  const market = manager.getMarket();
+  market.supplyCap = event.params.liquidityCap_;
+  market.save();
+}
+
 /////////////////////
 //// Loan Events ////
 /////////////////////
-
-// TODO: how do we associate a loan with a market??
-// LoanManager interacts with Loans on PoolManager's behalf
 
 //
 // Create MapleLoan instance to watch loan contract
@@ -289,6 +361,7 @@ export function handlePaymentMade(event: PaymentMade): void {
     event,
     getProtocolData()
   );
+  updateMarketAndProtocol(manager);
 
   const mapleLoanContract = MapleLoan.bind(event.address);
   const tryPrinciple = mapleLoanContract.try_principal();
@@ -311,10 +384,7 @@ export function handlePaymentMade(event: PaymentMade): void {
   const repayAmount = event.params.principalPaid_.plus(
     event.params.interestPaid_
   );
-  const inputTokenDecimals = new TokenManager(
-    Bytes.fromHexString(tryAsset.value.toHexString()),
-    event
-  ).getToken().decimals;
+  const inputTokenDecimals = manager.getInputToken().decimals;
   manager.createRepay(
     Bytes.fromHexString(tryAsset.value.toHexString()),
     Bytes.fromHexString(tryBorrower.value.toHexString()),
@@ -420,29 +490,73 @@ export function handlePortionLiquidated(event: PortionLiquidated): void {
 //// Helpers ////
 /////////////////
 
-// TODO: supply cap = poolManager.liquidityCap()
-
+//
+// Updates the market and protocol with latest data
+// Prices, balances, exchange rate, TVL, rates
+// TODO; update rates
 function updateMarketAndProtocol(manager: DataManager): void {
   const market = manager.getMarket();
-  if (!market._loanManager || !market._poolManager) {
+  if (!market._loanManager) {
     log.error(
-      "[updateMarketAndProtocol] Market {} does not have a loan or pool manager",
-      [market.id]
+      "[updateMarketAndProtocol] Market {} does not have a loan manager",
+      [market.id.toHexString()]
     );
     return;
   }
-  const loanManagerContract = LoanManager.bind(market._loanManager);
-  const poolManagerContract = PoolManager.bind(market._poolManager);
+  const loanManagerContract = LoanManager.bind(
+    Address.fromBytes(market._loanManager!)
+  );
+  const poolContract = Pool.bind(Address.fromBytes(market.id));
 
-  manager
-    .updateMarketAndProtocolData
-    // inputtokenpriceusd
-    // inputtokenbalance
-    // variable borrow balance
-    // stable borrow balance
-    // reserve balance
-    // exchange rate
-    ();
+  const tryBalance = poolContract.try_totalAssets(); // input tokens
+  const tryTotalSupply = poolContract.try_totalSupply(); // output tokens
+  if (tryBalance.reverted || tryTotalSupply.reverted) {
+    log.error(
+      "[updateMarketAndProtocol] Pool contract {} does not have a totalAssets or totalSupply",
+      [market.id.toHexString()]
+    );
+    return;
+  }
+
+  const tryAUM = loanManagerContract.try_assetsUnderManagement();
+  if (tryAUM.reverted) {
+    log.error(
+      "[updateMarketAndProtocol] LoanManager contract {} does not have a assetsUnderManagement",
+      [market._loanManager!.toHexString()]
+    );
+    return;
+  }
+
+  const exchangeRate = tryBalance.value
+    .div(tryTotalSupply.value)
+    .toBigDecimal();
+  const inputTokenPriceUSD = getPriceUSD(
+    Address.fromBytes(manager.getInputToken().id)
+  );
+
+  manager.updateMarketAndProtocolData(
+    inputTokenPriceUSD,
+    tryBalance.value,
+    tryAUM.value,
+    null,
+    null,
+    exchangeRate
+  );
+}
+
+//
+// get the account balance of an account for any erc20 token
+function getBalanceOf(erc20Contract: Address, account: Address): BigInt {
+  const contract = ERC20.bind(erc20Contract);
+  const tryBalance = contract.try_balanceOf(account);
+  if (tryBalance.reverted) {
+    log.error(
+      "[getBalanceOf] Could not get balance of contract {} for account {}",
+      [contract._address.toHexString(), account.toHexString()]
+    );
+    return BIGINT_ZERO;
+  }
+  return tryBalance.value;
 }
 
 function getPriceUSD(asset: Address): BigDecimal {
@@ -466,7 +580,7 @@ function getPriceUSD(asset: Address): BigDecimal {
 
   return tryPrice.value
     .toBigDecimal()
-    .div(exponentToBigDecimal(token.decimals));
+    .div(exponentToBigDecimal(CHAINLINK_DECIMALS));
 }
 
 function getOrCreateLoan(loanId: Bytes, event: ethereum.Event): _Loan {
