@@ -3186,10 +3186,10 @@
   "maple-finance-v1": {
     "schema": "lending",
     "base": "maple-finance-v1",
-    "protocol": "maple-finance",
+    "protocol": "maple-finance-v1",
     "project": "maple",
     "deployments": {
-      "maple-finance-ethereum": {
+      "maple-finance-v1-ethereum": {
         "network": "ethereum",
         "status": "prod",
         "versions": {
