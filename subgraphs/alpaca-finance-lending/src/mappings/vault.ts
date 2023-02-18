@@ -9,11 +9,7 @@ import {
 import { ConfigurableInterestVaultConfig } from "../../generated/ibALPACA/ConfigurableInterestVaultConfig";
 import { FairLaunch } from "../../generated/ibALPACA/FairLaunch";
 import { Market, MarketDailySnapshot } from "../../generated/schema";
-import {
-  getOrCreateToken,
-  getOrCreateRewardToken,
-  getTokenById,
-} from "../entities/token";
+import { getOrCreateToken, getOrCreateRewardToken } from "../entities/token";
 import {
   createDeposit,
   createWithdraw,
@@ -210,12 +206,7 @@ export function handleAddDebt(event: AddDebt): void {
     tryPositions.value.getOwner(),
     tryDeltaDebtVal.value
   );
-  changeMarketBorrowBalance(
-    event,
-    market,
-    tryTotalDebtVal.value,
-    tryDeltaDebtVal.value
-  );
+  changeMarketBorrowBalance(event, market, tryTotalDebtVal.value);
   updateUserPosition(
     event,
     tryPositions.value.getOwner(),
@@ -256,12 +247,7 @@ export function handleRemoveDebt(event: RemoveDebt): void {
     tryPositions.value.getOwner(),
     tryDeltaDebtVal.value
   );
-  changeMarketBorrowBalance(
-    event,
-    market,
-    tryTotalDebtVal.value,
-    tryDeltaDebtVal.value.times(BIGINT_NEGATIVE_ONE)
-  );
+  changeMarketBorrowBalance(event, market, tryTotalDebtVal.value);
   updateUserPosition(
     event,
     tryPositions.value.getOwner(),

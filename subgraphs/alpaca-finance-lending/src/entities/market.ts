@@ -303,11 +303,9 @@ export function addMarketVolume(
 export function changeMarketBorrowBalance(
   event: ethereum.Event,
   market: Market,
-  borrowBalance: BigInt,
-  balanceChange: BigInt
+  borrowBalance: BigInt
 ): void {
   const token = getTokenById(market.inputToken);
-  const changeUSD = amountInUSD(balanceChange, token, event.block.number);
   const totalBBUSD = amountInUSD(borrowBalance, token, event.block.number);
   // this can change because of balance and price
   const deltaTotalBBUSD = totalBBUSD.minus(market.totalBorrowBalanceUSD);
