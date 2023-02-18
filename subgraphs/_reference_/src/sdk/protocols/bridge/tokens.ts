@@ -23,14 +23,21 @@ export class TokenParams {
   decimals: i32;
 }
 
+class NoOpPresaver implements TokenPresaver {
+  preSaveToken(token: Token): Token {
+    return token;
+  }
+}
+
 export class TokenManager {
   protocol: Bridge;
   initializer: TokenInitializer;
-  presaver: TokenPresaver | null;
+  presaver: TokenPresaver;
 
   constructor(protocol: Bridge, init: TokenInitializer) {
     this.protocol = protocol;
     this.initializer = init;
+    this.presaver = new NoOpPresaver();
   }
 
   setTokenPresaver(presaver: TokenPresaver): void {
@@ -48,10 +55,7 @@ export class TokenManager {
     token.name = params.name;
     token.symbol = params.symbol;
     token.decimals = params.decimals;
-
-    if (this.presaver) {
-      token = this.presaver!.preSaveToken(token);
-    }
+    this.presaver.preSaveToken(token);
     token.save();
     return token;
   }
