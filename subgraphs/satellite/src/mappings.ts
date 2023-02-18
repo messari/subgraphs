@@ -433,7 +433,7 @@ export function handleBurnToken(call: BurnTokenCall): void {
   ]);
 
   //TODO: needed?
-
+  /*
   const tokenSymbol = getOrCreateTokenSymbol(symbol);
   const tokenAddress = tokenSymbol.tokenAddress!;
   const tokenContract = TokenContract.bind(Address.fromString(tokenAddress));
@@ -469,6 +469,7 @@ export function handleBurnToken(call: BurnTokenCall): void {
     call,
     call.inputs.value1
   );
+  */
 }
 
 //////////////////////////////// HELPER FUNCTIONS //////////////////////////////
@@ -511,7 +512,7 @@ function _handleTransferOut(
   call: ethereum.Call | null,
   refId: Bytes | null = null
 ): void {
-  const sdk = _getSDK(event)!;
+  const sdk = _getSDK(event, call)!;
   const inputToken = sdk.Tokens.getOrCreateToken(token);
 
   const pool = sdk.Pools.loadPool(
