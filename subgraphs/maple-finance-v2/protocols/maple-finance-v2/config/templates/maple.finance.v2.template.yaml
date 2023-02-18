@@ -119,6 +119,25 @@ dataSources:
       file: ./protocols/maple-finance-v2/src/mapping.ts
 templates:
   - kind: ethereum/contract
+    name: Pool
+    network: {{ network }}
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: MapleGlobals
+          file: ./abis/MapleGlobals.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
     name: PoolManager
     network: {{ network }}
     source:
@@ -131,9 +150,17 @@ templates:
       abis:
         - name: PoolManager
           file: ./abis/PoolManager.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+        - name: MapleLoan
+          file: ./abis/MapleLoan.json
+        - name: MapleGlobals
+          file: ./abis/MapleGlobals.json
         - name: Pool
           file: ./abis/Pool.json
       eventHandlers:
+        - event: LoanFunded(indexed address,indexed address,uint256)
+          handler: handleLoanFunded
         - event: SetAsActive(bool)
           handler: handleSetAsActive
       file: ./protocols/maple-finance-v2/src/mapping.ts
@@ -155,6 +182,8 @@ templates:
       eventHandlers:
         - event: Initialized(indexed address,indexed address,address[2],uint256[3],uint256[3],uint256[4],uint256[2])
           handler: handleLoanInitialized
+        - event: PaymentMade(uint256,uint256,uint256)
+          handler: handlePaymentMade
       file: ./protocols/maple-finance-v2/src/mapping.ts
   - kind: ethereum/contract
     name: WithdrawalManager

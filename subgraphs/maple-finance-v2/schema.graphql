@@ -1012,6 +1012,12 @@ type Market @entity {
 
   " All flashloans made in this market"
   flashloans: [Flashloan!]! @derivedFrom(field: "market")
+
+  ##### Helpers #####
+
+  _poolManager: Bytes
+
+  _loanManager: Bytes
 }
 
 #################################

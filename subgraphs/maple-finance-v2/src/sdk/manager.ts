@@ -317,7 +317,7 @@ export class DataManager {
     }
 
     if (protocolFees.indexOf(feeType) == -1) {
-      protocolFees!.push(feeType);
+      protocolFees.push(feeType);
     }
     this.protocol.fees = protocolFees;
     this.protocol.save();
