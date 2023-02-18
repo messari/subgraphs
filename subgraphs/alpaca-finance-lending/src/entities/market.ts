@@ -303,15 +303,16 @@ export function addMarketVolume(
 export function changeMarketBorrowBalance(
   event: ethereum.Event,
   market: Market,
+  borrowBalance: BigInt,
   balanceChange: BigInt
 ): void {
-  const changeUSD = amountInUSD(
-    balanceChange,
-    getTokenById(market.inputToken),
-    event.block.number
-  );
-  const previousTotalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
-  market.totalBorrowBalanceUSD = previousTotalBorrowBalanceUSD.plus(changeUSD);
+  const token = getTokenById(market.inputToken);
+  const changeUSD = amountInUSD(balanceChange, token, event.block.number);
+  const totalBBUSD = amountInUSD(borrowBalance, token, event.block.number);
+  // this can change because of balance and price
+  const deltaTotalBBUSD = totalBBUSD.minus(market.totalBorrowBalanceUSD);
+  market.totalBorrowBalanceUSD = totalBBUSD;
+
   if (market.totalBorrowBalanceUSD.lt(BIGDECIMAL_ZERO)) {
     log.warning(
       "[changeMarketBorrowBalance] totalBorrowBalanceUSD {} is negative, should not happen",
@@ -323,10 +324,7 @@ export function changeMarketBorrowBalance(
 
   getOrCreateMarketSnapshot(event, market);
   getOrCreateMarketHourlySnapshot(event, market);
-  updateProtocolBorrowBalance(
-    event,
-    market.totalBorrowBalanceUSD.minus(previousTotalBorrowBalanceUSD)
-  );
+  updateProtocolBorrowBalance(event, deltaTotalBBUSD);
 }
 
 export function updateMarketRates(
