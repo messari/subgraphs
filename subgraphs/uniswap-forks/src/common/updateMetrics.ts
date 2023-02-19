@@ -94,20 +94,14 @@ export function updateUsageMetrics(
 
   if (usageType == UsageType.DEPOSIT) {
 
-    usageMetricsHourly.hourlyDepositCount += 1;
-    usageMetricsDaily.depositStats = updateDailyDepositUsageMetricsUSD(event);
+    usageMetricsHourly.hourlyDepositCount += INT_ONE;
+    usageMetricsDaily.depositStats = updateDepositMetricsUSD(protocol.id, event);
   } else if (usageType == UsageType.WITHDRAW) {
-    usageMetricsDaily.withdrawStats = updateWithdrawUsageMetricsUSD(dayId, 
-      protocol.id, 
-      StatValueEntitySuffix.DAILY_WITHDRAW_USD_ID,
-      event);
     usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
+    usageMetricsDaily.withdrawStats = updateWithdrawMetricsUSD(protocol.id, event);
   } else if (usageType == UsageType.SWAP) {
     usageMetricsHourly.hourlySwapCount += INT_ONE;
-    usageMetricsDaily.swapStats = updateSwapUsageMetricsUSD(dayId, 
-      protocol.id, 
-      StatValueEntitySuffix.DAILY_SWAP_USD_ID,
-      event);
+    usageMetricsDaily.swapStats = updateSwapMetricsUSD(protocol.id, event);
   }
 
   // Combine the id and the user address to generate a unique user id for the day
@@ -131,12 +125,12 @@ export function updateUsageMetrics(
   if (!account) {
     account = new Account(from);
     protocol.cumulativeUniqueUsers += INT_ONE;
-    account.positionCount = 0;
-    account.openPositionCount = 0;
-    account.closedPositionCount = 0;
-    account.depositCount = 0;
-    account.withdrawCount = 0;
-    account.swapCount = 0;
+    account.positionCount = INT_ZERO;
+    account.openPositionCount = INT_ZERO;
+    account.closedPositionCount = INT_ZERO;
+    account.depositCount = INT_ZERO;
+    account.withdrawCount = INT_ZERO;
+    account.swapCount = INT_ZERO;
     account.save();
   }
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
@@ -152,15 +146,13 @@ export function updateUsageMetrics(
  * @param event 
  * @returns string the id of the stat entity for the given day
  */
-function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
-
-  const protocol = getOrCreateProtocol();
+function updateDepositMetricsUSD(statTypeId:string, event: ethereum.Event): string {
 
   // Number of days since Unix epoch
   const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   const dayId = day.toString();
 
-  const statId = protocol.id.concat("-deposit-").concat(dayId);
+  const statId = statTypeId.concat("-deposit-").concat(dayId);
   let stat = Stat.load(statId);
   if (!stat) {
     stat = createStat(statId)
@@ -196,9 +188,12 @@ function updateDailyDepositUsageMetricsUSD(event: ethereum.Event): string {
  * @param event 
  * @returns string the id of the stat entity 
  */
-function updateWithdrawUsageMetricsUSD(timeStampId: string, protocolId: string, valuesSuffix: string, event: ethereum.Event): string {
+function updateWithdrawMetricsUSD(statTypeId: string, event: ethereum.Event): string {
 
-  const statId = protocolId.concat("-withdraw-").concat(timeStampId);
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const dayId = day.toString();
+
+  const statId = statTypeId.concat("-withdraw-").concat(dayId);
   let stat = Stat.load(statId);
   if (!stat) {
     stat = createStat(statId);
@@ -231,9 +226,12 @@ function updateWithdrawUsageMetricsUSD(timeStampId: string, protocolId: string, 
  * @param event 
  * @returns string the id of the stat entity 
  */
-function updateSwapUsageMetricsUSD(timeStampId: string, protocolId: string, valuesSuffix: string, event: ethereum.Event): string {
+function updateSwapMetricsUSD(statTypeId: string, event: ethereum.Event): string {
 
-  const statId = protocolId.concat("-swap-").concat(timeStampId);
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const dayId = day.toString();
+
+  const statId = statTypeId.concat("-swap-").concat(dayId);
   let stat = Stat.load(statId);
   if (!stat) {
     stat = createStat(statId);
@@ -276,6 +274,8 @@ export function updatePoolMetrics(event: ethereum.Event): void {
     event.block.number
   );
 
+
+
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsDaily.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
@@ -312,6 +312,9 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetricsHourly.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
 
+  poolMetricsDaily.depositStats = updateDepositMetricsUSD(pool.id, event);
+  poolMetricsDaily.withdrawStats = updateWithdrawMetricsUSD(pool.id, event);
+  poolMetricsDaily.swapStats = updateSwapMetricsUSD(pool.id, event)
   poolMetricsDaily.save();
   poolMetricsHourly.save();
 }
@@ -583,15 +586,5 @@ export function updateMetricsDepositsHelper(event: ethereum.Event, valueUSD: Big
 
   const dayId = day.toString();
   const hourId = hour.toString();
-
-  // create new daily usd deposits
-  let depositValues = _dailyDepositValesUSD.load(protocol.id
-    .concat(
-      DepositValueEntitySuffix.DAILY_DEPOSITS_USD_ID
-    ));
-  // It's a new day so reset deposit values array
-  depositValues.depositsUSD = new Array<BigDecimal>();
-  depositValues.save();
-
 
 }
