@@ -36,7 +36,7 @@ export function updateFinancials(
   const protocol = getOrCreateLendingProtocol();
   const financialsDailySnapshots = getOrCreateFinancialsDailySnapshot(event);
 
-  // total/cumulative revenue calculation
+  // total/cumulative revenue calculation (at event time)
   const supplySideRevenueUSD = market.totalDepositBalanceUSD
     .times(avgInterestRate)
     .div(BIGDECIMAL_HUNDRED);
@@ -55,9 +55,15 @@ export function updateFinancials(
   );
 
   // market cumulatives
-  market.cumulativeTotalRevenueUSD = totalRevenueUSD;
-  market.cumulativeSupplySideRevenueUSD = supplySideRevenueUSD;
-  market.cumulativeProtocolSideRevenueUSD = protocolSideRevenueUSD;
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(
+    changeInTotalRevenueUSD
+  );
+  market.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD.plus(changeInSupplySideRevenueUSD);
+  market.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD.plus(
+      changeInProtocolSideRevenueUSD
+    );
   market.save();
 
   // protocol cumulatives
