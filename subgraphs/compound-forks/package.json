@@ -4,7 +4,7 @@
     "format": "npx prettier --write ."
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.37.1",
-    "@graphprotocol/graph-ts": "0.29.1"
+    "@graphprotocol/graph-cli": "0.37.7",
+    "@graphprotocol/graph-ts": "0.29.2"
   }
 }

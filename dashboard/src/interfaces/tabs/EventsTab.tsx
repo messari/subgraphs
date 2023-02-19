@@ -40,8 +40,10 @@ function EventsTab({
       <PoolDropDown
         poolId={poolId}
         pools={poolsList[poolNames]}
-        setPoolId={(x) => setPoolId(x)}
-        setIssues={(x) => setIssues(x)}
+        setPoolId={(x) => {
+          setIssues([]);
+          setPoolId(x);
+        }}
       />
     );
   } else if (poolListLoading) {

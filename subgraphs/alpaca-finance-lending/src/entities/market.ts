@@ -29,7 +29,7 @@ import {
 import { getOrCreateToken, getTokenById } from "./token";
 import { incrementProtocolTotalPoolCount } from "./usage";
 import { EventType } from "./event";
-import { getOrCreateInterestRates } from "./rate";
+import { getOrCreateInterestRateIds } from "./rate";
 import {
   BIGDECIMAL_NEGATIVE_ONE,
   BIGDECIMAL_ONE,
@@ -335,7 +335,7 @@ export function updateMarketRates(
   borrowerInterestRate: BigDecimal,
   lenderInterestRate: BigDecimal
 ): void {
-  const newRates = getOrCreateInterestRates(
+  const newRates = getOrCreateInterestRateIds(
     market.id,
     borrowerInterestRate,
     lenderInterestRate

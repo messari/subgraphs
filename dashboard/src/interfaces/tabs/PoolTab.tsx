@@ -6,7 +6,7 @@ import IssuesDisplay from "../IssuesDisplay";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import PoolTabEntity from "./PoolTabEntity";
-import BridgeOutboundVolumeLogic from "../BridgeOutboundVolumeLogic";
+import BridgeOutboundVolumeLogic from "../../common/utilComponents/BridgeOutboundVolumeLogic";
 
 interface PoolTabProps {
   data: any;
@@ -98,24 +98,16 @@ function PoolTab({
     poolDropDown = (
       <PoolDropDown
         poolId={poolId}
-        setPoolId={(x) => setPoolId(x)}
-        setIssues={(x) => {
-          setTableIssues(x);
+        setPoolId={(x) => {
+          setTableIssues([]);
+          setPoolId(x);
         }}
         pools={poolsList[poolNames]}
       />
     );
-  } else if (poolListLoading) {
+  } else if (poolListLoading || !poolId) {
     poolDropDown = <CircularProgress sx={{ margin: 6 }} size={50} />;
-  } else if (!poolId) {
-    poolDropDown = (
-      <h3>
-        Hold on! This subgraph has alot of entities, it may take a minute for the query to return. After 2 minutes of
-        waiting, refresh the page and the results should appear promptly.
-      </h3>
-    );
   }
-
 
   // Specific chart routing
   // This logic renders components that are specific to a given schema type or version
@@ -134,7 +126,9 @@ function PoolTab({
         </CopyLinkToClipboard>
       </Box>
     </Grid>);
-    specificCharts.push(headerComponent, <BridgeOutboundVolumeLogic poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
+    if (data[poolKeySingular]?.routes?.length > 0) {
+      specificCharts.push(headerComponent, <BridgeOutboundVolumeLogic poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
+    }
   } else if (schemaType?.toUpperCase() === "EXCHANGE") {
     if (poolTimeseriesData) {
       Object.keys(poolTimeseriesData).forEach((entityName: string) => {
@@ -325,13 +319,8 @@ function PoolTab({
       );
     } else if (poolTimeseriesError) {
       poolDataSection = (
-        <Grid>
-          <Box my={3}>
-            <CopyLinkToClipboard link={window.location.href}>
-              <Typography variant="h4">{poolTimeseriesError?.message}</Typography>
-            </CopyLinkToClipboard>
-          </Box>
-          <CircularProgress sx={{ margin: 6 }} size={50} />
+        <Grid key={"poolTabEntityError"}>
+          <h3>Query Could not Return Successfully - {poolTimeseriesError?.message}</h3>
         </Grid>
       );
     } else {
@@ -353,7 +342,6 @@ function PoolTab({
       );
     }
   }
-
 
   return (
     <>

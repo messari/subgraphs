@@ -57,19 +57,20 @@ Polygon Treasury [0xc63c477465a792537d291adb32ed15c0095e106b](https://debank.com
 
 The total revenue can be calculated by summing the
 
-1. Vault Incentive Emissions
-2. Yield from LP Pools
-3. Interaction fees (repay, swap, lp deposit, liquidations)
 
-`Total Revenue (USD) = Vault Incentives + Pool Yield + Fees`
+1. Yield from LP Pools
+2. Interaction fees (repay, swap, lp deposit, liquidations)
+
+`Total Revenue (USD) =  Pool Yield + Fees`
+
+or `Total Revenue (USD) =  Supply Side Revenue (USD) + Protocol Revenue (USD)`
 
 **Supply Side Revenue USD**
 
-Supply side revenue can be determined by omitting the interaction fees that go to the protocol, but adding rewards for QI stakers. In the Qi Powah Boost program, stakers are rewarded 30% of repayment fees (when a user repays their loan), and 100% of Qi-MATIC pool rewards (see Protocol Revenue for protocol fee breakdown). [WMATIC-QI Pair on QuickSwap](https://info.quickswap.exchange/#/pair/0x9a8b2601760814019b7e6ee0052e25f1c623d1e6)
+Supply side revenue can be determined by omitting the interaction fees that go to the protocol. 
 
-`Supply Side Revenue (USD) = Vault Incentives + Pool Yield + Staking Rewards`
+`Supply Side Revenue (USD) = supply side Interaction fees + supply side Pool Yield`
 
-(See Protocol Revenue below for staking rewards calculation.)
 
 **Protocol Revenue USD**
 
@@ -87,19 +88,15 @@ The DAO also holds a small amount of PCV in the form of LP.
 
 Protocol Revenue equation:
 
-`Protocol Revenue (USD) = Repayment Fees - Staking Rewards + Swap Fees + LP Deposit Fees + PCV Yield`
-
-With 30% of Repayment Fees awarded to Qi stakers and 100% of Qi-MATIC yield,
-
-`Staking Rewards = (0.3 * Repayment Fees) + QiMaticYield`
-
-`Protocol Revenue (USD) = (0.7 * Repayment Fees) - QiMaticRewards + SwapFees + LPDepositFees + PCVYield`
+`Protocol Revenue (USD) = Repayment Fees + Swap Fees + LP Deposit Fees + PCV Yield`
 
 Substituting in fee breakdown, we can rearrange to
 
-`Protocol Revenue (USD) = 0.7 * (RepaymentVolume * 0.005) + (SwapVolume * 0.01) + (LPDepositVolume * 0.005) + PCVYield - QiMaticYield`
+`Protocol Revenue (USD) = 0.7 * (RepaymentVolume * 0.005) + (SwapVolume * 0.01) + (LPDepositVolume * 0.005)`
 
 where percentage multipliers, and staking reward LP pool share are subject to change with DAO policy.
+
+Rewards are currently calculated offchain. 
 
 ## Pool-Level Metrics
 

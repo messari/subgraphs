@@ -1,5 +1,11 @@
 import { Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { Vault, Work, Kill, Transfer } from "../../generated/ibALPACA/Vault";
+import {
+  Vault,
+  Kill,
+  Transfer,
+  RemoveDebt,
+  AddDebt,
+} from "../../generated/ibALPACA/Vault";
 import { ConfigurableInterestVaultConfig } from "../../generated/ibALPACA/ConfigurableInterestVaultConfig";
 import { FairLaunch } from "../../generated/ibALPACA/FairLaunch";
 import { Market, MarketDailySnapshot } from "../../generated/schema";
@@ -58,12 +64,12 @@ export function handleTransfer(event: Transfer): void {
   }
 
   if (event.params.from == Address.fromString(ZERO_ADDRESS)) {
-    handleMint(event);
+    _handleMint(event);
     return;
   }
 
   if (event.params.to == Address.fromString(ZERO_ADDRESS)) {
-    handleBurn(event);
+    _handleBurn(event);
     return;
   }
 
@@ -105,7 +111,7 @@ export function handleTransfer(event: Transfer): void {
   );
 }
 
-function handleMint(event: Transfer): void {
+function _handleMint(event: Transfer): void {
   const contract = Vault.bind(event.address);
   const tryTokenResult = contract.try_token();
   if (tryTokenResult.reverted) {
@@ -137,7 +143,7 @@ function handleMint(event: Transfer): void {
   updateTokenSupply(event, market, event.params.value);
 }
 
-function handleBurn(event: Transfer): void {
+function _handleBurn(event: Transfer): void {
   const market = getMarket(event.address);
   updateInterest(event, market);
   const contract = Vault.bind(event.address);
@@ -170,12 +176,17 @@ function handleBurn(event: Transfer): void {
   );
 }
 
-export function handleAddDebt(event: Work): void {
+export function handleAddDebt(event: AddDebt): void {
   const market = getMarket(event.address);
   updateInterest(event, market);
   const contract = Vault.bind(event.address);
   const trytoken = contract.try_token();
-  if (trytoken.reverted) {
+  const tryDebtVal = contract.try_debtShareToVal(event.params.debtShare);
+  if (trytoken.reverted || tryDebtVal.reverted) {
+    log.error("[handleAddDebt]Failed to handle add debt for market {} tx={}", [
+      market.id,
+      event.transaction.hash.toHexString(),
+    ]);
     return;
   }
   const tryPositions = contract.try_positions(event.params.id);
@@ -187,25 +198,30 @@ export function handleAddDebt(event: Work): void {
     market,
     trytoken.value,
     tryPositions.value.getOwner(),
-    event.params.loan
+    tryDebtVal.value
   );
-  changeMarketBorrowBalance(event, market, event.params.loan);
+  changeMarketBorrowBalance(event, market, tryDebtVal.value);
   updateUserPosition(
     event,
     tryPositions.value.getOwner(),
     market,
-    event.params.loan,
+    tryDebtVal.value,
     PositionSide.BORROWER,
     false
   );
 }
 
-export function handleRemoveDebt(event: Work): void {
+export function handleRemoveDebt(event: RemoveDebt): void {
   const market = getMarket(event.address);
   updateInterest(event, market);
   const contract = Vault.bind(event.address);
   const trytoken = contract.try_token();
-  if (trytoken.reverted) {
+  const tryDebtVal = contract.try_debtShareToVal(event.params.debtShare);
+  if (trytoken.reverted || tryDebtVal.reverted) {
+    log.error(
+      "[handleRemoveDebt]Failed to handle remove debt from market {} tx={}",
+      [market.id, event.transaction.hash.toHexString()]
+    );
     return;
   }
   const tryPositions = contract.try_positions(event.params.id);
@@ -217,18 +233,18 @@ export function handleRemoveDebt(event: Work): void {
     market,
     trytoken.value,
     tryPositions.value.getOwner(),
-    event.params.loan
+    tryDebtVal.value
   );
   changeMarketBorrowBalance(
     event,
     market,
-    event.params.loan.times(BIGINT_NEGATIVE_ONE)
+    tryDebtVal.value.times(BIGINT_NEGATIVE_ONE)
   );
   updateUserPosition(
     event,
     tryPositions.value.getOwner(),
     market,
-    event.params.loan,
+    tryDebtVal.value,
     PositionSide.BORROWER,
     false
   );
@@ -299,19 +315,22 @@ export function updateInterest(event: ethereum.Event, market: Market): void {
     return;
   }
 
-  const poolTokenAmount = tryTotalToken.value
-    .plus(tryReservePool.value)
-    .minus(tryVaultDebtVal.value);
+  const vaultDebtVal = tryVaultDebtVal.value;
+  const totalTokenAmount = tryTotalToken.value;
+  let floating = totalTokenAmount.minus(vaultDebtVal);
+  // config.getInterestRate(vaultDebtVal, floating) matches
+  // to how alpaca front end calculates APY, but floating may
+  // be negative, in this case, add back reservePool
+  if (floating.lt(BIGINT_ZERO)) {
+    floating = floating.plus(tryReservePool.value);
+  }
+
   const configContract = ConfigurableInterestVaultConfig.bind(tryConfig.value);
   const tryGetInterestRate = configContract.try_getInterestRate(
-    tryVaultDebtVal.value,
-    poolTokenAmount
+    vaultDebtVal,
+    floating
   );
-  if (
-    tryGetInterestRate.reverted ||
-    tryVaultDebtVal.value.equals(BIGINT_ZERO) ||
-    market.inputTokenBalance.equals(BIGINT_ZERO)
-  ) {
+  if (tryGetInterestRate.reverted || totalTokenAmount.equals(BIGINT_ZERO)) {
     log.warning("[updateInterest] could not update interest rate", []);
     return;
   }
@@ -321,13 +340,24 @@ export function updateInterest(event: ethereum.Event, market: Market): void {
     ratePerSec.times(SECONDS_PER_YEAR)
   ).times(BIGDECIMAL_HUNDRED);
   const lenderAPY = borrowerAPY
+    .times(vaultDebtVal.toBigDecimal())
     .times(BIGDECIMAL_ONE.minus(PROTOCOL_LENDING_FEE.div(BIGDECIMAL_HUNDRED)))
-    .times(tryVaultDebtVal.value.toBigDecimal())
-    .div(market.inputTokenBalance.toBigDecimal());
+    .div(totalTokenAmount.toBigDecimal());
   updateMarketRates(event, market, borrowerAPY, lenderAPY);
-
+  log.info(
+    "[updateInterestRate]market={},vaultDebtValu={},totalToken={},RatePerSec={},borrowerAPY={},lenderAPY={},tx={}",
+    [
+      market.id,
+      vaultDebtVal.toString(),
+      totalTokenAmount.toString(),
+      ratePerSec.toString(),
+      borrowerAPY.toString(),
+      lenderAPY.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
   const dailyInterest = ratePerSec
-    .times(tryVaultDebtVal.value)
+    .times(vaultDebtVal)
     .times(BIGINT_SECONDS_PER_DAY)
     .div(BIGINT_TEN_TO_EIGHTEENTH);
   const protocolSideProfitUSD = amountInUSD(

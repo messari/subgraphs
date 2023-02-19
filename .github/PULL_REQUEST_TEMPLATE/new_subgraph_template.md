@@ -25,6 +25,7 @@ Where can we see the subgraph deployment? The best place to link is [`okgraph.xy
 - [ ] General aggregate metrics can be similar to known sources like the protocol or defi llama (The detailed QA will be done by a protocol specialist)
 - [ ] Assigned the proper reviewers. If you are unsure, ask in our discord!
 - [ ] Followed docs, especially [`WALKTHROUGH.md`](https://github.com/messari/subgraphs/blob/master/docs/WALKTHROUGH.md)
+- [ ] Update versioning according to our standards discussed [here](https://github.com/messari/subgraphs/issues/1379)
 
 **New Developer Checklist**
 
