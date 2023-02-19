@@ -58,6 +58,10 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetricsDaily.timestamp = event.block.timestamp;
   financialMetricsDaily.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialMetricsDaily.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
+  financialMetricsDaily.activeLiquidity = protocol.activeLiquidity;
+  financialMetricsDaily.activeLiquidityUSD = protocol.activeLiquidityUSD;
+  financialMetricsDaily.totalLiquidity = protocol.totalLiquidity;
+  financialMetricsDaily.totalLiquidityUSD = protocol.totalLiquidityUSD;
 
   financialMetricsDaily.save();
 }
