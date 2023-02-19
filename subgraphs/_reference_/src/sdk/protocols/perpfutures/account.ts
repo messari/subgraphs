@@ -167,7 +167,7 @@ export class Account {
     updateMetrics: bool = true
   ): Deposit {
     const depositId = this.getIdFromEvent(EventType.DEPOSIT);
-    let deposit = new Deposit(depositId);
+    const deposit = new Deposit(depositId);
 
     deposit.hash = this.event.transaction.hash;
     deposit.logIndex = this.event.logIndex.toI32();
@@ -204,7 +204,7 @@ export class Account {
     updateMetrics: bool = true
   ): Withdraw {
     const withdrawId = this.getIdFromEvent(EventType.WITHDRAW);
-    let withdraw = new Withdraw(withdrawId);
+    const withdraw = new Withdraw(withdrawId);
 
     withdraw.hash = this.event.transaction.hash;
     withdraw.logIndex = this.event.logIndex.toI32();
@@ -247,7 +247,7 @@ export class Account {
     updateMetrics: bool = true
   ): Swap {
     const swapId = this.getIdFromEvent(EventType.SWAP);
-    let swap = new Swap(swapId);
+    const swap = new Swap(swapId);
 
     swap.hash = this.event.transaction.hash;
     swap.logIndex = this.event.logIndex.toI32();
@@ -297,7 +297,7 @@ export class Account {
     updateMetrics: bool = true
   ): Borrow {
     const borrowId = this.getIdFromEvent(EventType.SWAP);
-    let borrow = new Borrow(borrowId);
+    const borrow = new Borrow(borrowId);
 
     borrow.hash = this.event.transaction.hash;
     borrow.logIndex = this.event.logIndex.toI32();
@@ -338,7 +338,7 @@ export class Account {
     updateMetrics: bool = true
   ): CollateralIn {
     const collateralId = this.getIdFromEvent(EventType.DEPOSIT);
-    let collateralIn = new CollateralIn(collateralId);
+    const collateralIn = new CollateralIn(collateralId);
 
     collateralIn.hash = this.event.transaction.hash;
     collateralIn.logIndex = this.event.logIndex.toI32();
@@ -379,7 +379,7 @@ export class Account {
     updateMetrics: bool = true
   ): CollateralOut {
     const collateralId = this.getIdFromEvent(EventType.WITHDRAW);
-    let collateralOut = new CollateralOut(collateralId);
+    const collateralOut = new CollateralOut(collateralId);
 
     collateralOut.hash = this.event.transaction.hash;
     collateralOut.logIndex = this.event.logIndex.toI32();
@@ -428,7 +428,7 @@ export class Account {
     updateMetrics: bool = true
   ): Liquidate {
     const liquidateId = this.getIdFromEvent(EventType.LIQUIDATE);
-    let liquidate = new Liquidate(liquidateId);
+    const liquidate = new Liquidate(liquidateId);
 
     liquidate.hash = this.event.transaction.hash;
     liquidate.logIndex = this.event.logIndex.toI32();

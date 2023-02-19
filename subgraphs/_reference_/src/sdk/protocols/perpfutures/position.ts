@@ -5,7 +5,7 @@ import {
   Position as PositionSchema,
 } from "../../../../generated/schema";
 import { Pool } from "./pool";
-import { Account, AccountManager } from "./account";
+import { Account } from "./account";
 import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
 import * as constants from "../../util/constants";
