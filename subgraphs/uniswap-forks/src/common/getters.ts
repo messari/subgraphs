@@ -32,6 +32,7 @@ import {
   RewardTokenType,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
+  INT_ONE,
 } from "./constants";
 import { createPoolFees, createStat } from "./creators";
 
@@ -51,6 +52,7 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     event.address.toHexString(),
     event.block.number
   );
+  const protocol = getOrCreateProtocol();
 
   const account = getOrCreateAccount(event);
 
@@ -61,7 +63,7 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
   // Open position always ends with zero
   if(!counter) {
     counter = new _PositionCounter(counterId)
-    counter.nextCount = 0;
+    counter.nextCount = INT_ZERO;
     counter.save();
   }
   const positionId = account.id
@@ -82,11 +84,15 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     position.outputTokenBalance = BIGINT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.save(); 
-    pool.positionCount += 1;
-    pool.openPositionCount += 1; 
-    account.openPositionCount += 1;
-    account.positionCount += 1;
+    pool.positionCount += INT_ONE;
+    pool.openPositionCount += INT_ONE; 
+    account.openPositionCount += INT_ONE;
+    account.positionCount += INT_ONE;
     account.save();
+    protocol.openPositionCount += INT_ONE;
+    protocol.cumulativePositionCount += INT_ONE;
+    protocol.cumulativeUniqueLPs += INT_ONE;
+    protocol.save();  
   } 
 
   return position;
@@ -99,12 +105,12 @@ export function getOrCreateAccount(event:ethereum.Event): Account {
   let account = Account.load(transfer.sender!)
   if(!account) {
     account = new Account(transfer.sender!)
-    account.positionCount = 0;
-    account.openPositionCount = 0;
-    account.closedPositionCount = 0;
-    account.depositCount = 0;
-    account.withdrawCount = 0;
-    account.swapCount = 0;
+    account.positionCount = INT_ZERO;
+    account.openPositionCount = INT_ZERO;
+    account.closedPositionCount = INT_ZERO;
+    account.depositCount = INT_ZERO;
+    account.withdrawCount = INT_ZERO;
+    account.swapCount = INT_ZERO;
     account.save()
   }
   return account;
@@ -123,6 +129,12 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
+    protocol.cumulativePositionCount = INT_ZERO;
+    protocol.cumulativeUniqueLPs = INT_ZERO;
+    protocol.cumulativeUniqueTraders = INT_ZERO;
+    protocol.openPositionCount = INT_ZERO;
+    protocol.cumulativePositionCount = INT_ZERO;
+
     protocol.network = NetworkConfigs.getNetwork();
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalPoolCount = INT_ZERO;
@@ -264,6 +276,10 @@ export function getOrCreateLiquidityPoolDailySnapshot(
   let poolMetrics = LiquidityPoolDailySnapshot.load(
     event.address.toHexString().concat("-").concat(dayId)
   );
+  let depositStatId = event.address.toHexString().concat("-deposit-").concat(dayId);
+  let withdrawStatId = event.address.toHexString().concat("-withdraw-").concat(dayId);
+  let swapStatId = event.address.toHexString().concat("-swap-").concat(dayId);
+
 
   if (!poolMetrics) {
     poolMetrics = new LiquidityPoolDailySnapshot(
@@ -288,6 +304,12 @@ export function getOrCreateLiquidityPoolDailySnapshot(
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;
 
+    let depositStatId = event.address.toHexString().concat("-deposit-").concat(dayId);
+    let withdrawStatId = event.address.toHexString().concat("-withdraw-").concat(dayId);
+    let swapStatId = event.address.toHexString().concat("-swap-").concat(dayId);
+    poolMetrics.depositStats = createStat(depositStatId).id;
+    poolMetrics.withdrawStats = createStat(withdrawStatId).id;
+    poolMetrics.swapStats = createStat(swapStatId).id;
     poolMetrics.save();
   }
 

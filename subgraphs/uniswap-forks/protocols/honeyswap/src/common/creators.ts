@@ -95,6 +95,8 @@ export function createLiquidityPool(
     BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
   ];
   pool.outputTokenSupply = BIGINT_ZERO;
+  pool.activeLiquidity = BIGINT_ZERO;
+  pool.totalLiquidity = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.rewardTokens = [];
   pool.stakedOutputTokenAmount = BIGINT_ZERO;

@@ -232,20 +232,20 @@ type DexAmmProtocol implements Protocol @entity {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
-  # " Number of cumulative liquidity providers "
-  # cumulativeUniqueLPs: Int!
+  " Number of cumulative liquidity providers "
+  cumulativeUniqueLPs: Int!
 
-  # " Number of cumulative traders "
-  # cumulativeUniqueTraders: Int!
+  " Number of cumulative traders "
+  cumulativeUniqueTraders: Int!
 
   " Total number of pools "
   totalPoolCount: Int!
 
-  # " Total number of open positions "
-  # openPositionCount: Int!
+  " Total number of open positions "
+  openPositionCount: Int!
 
-  # " Total number of positions (open and closed) "
-  # cumulativePositionCount: Int!
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
 
   ##### Snapshots #####
 
@@ -486,6 +486,18 @@ type LiquidityPool @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal
 
+  " Total liquidity in the pool "
+  totalLiquidity: BigInt
+
+  " USD value of total liquidity in the pool"
+  totalLiquidityUSD: BigDecimal
+
+  " Active liquidity in the pool "
+  activeLiquidity: BigInt
+
+  " USD value of active liquidity in the pool"
+  activeLiquidityUSD: BigDecimal
+
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   stakedOutputTokenAmount: BigInt
 
@@ -607,14 +619,14 @@ type LiquidityPoolDailySnapshot @entity {
 
   #### Statistics #####
 
-  # " Statistics around swap events "
-  # swapStats: Stat!
+  " Statistics around swap events "
+  swapStats: Stat!
 
-  # " Statistics around deposit events "
-  # depositStats: Stat!
+  " Statistics around deposit events "
+  depositStats: Stat!
 
-  # " Statistics around withdraw events "
-  # withdrawStats: Stat!
+  " Statistics around withdraw events "
+  withdrawStats: Stat!
 }
 
 type LiquidityPoolHourlySnapshot @entity {

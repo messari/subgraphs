@@ -1,8 +1,9 @@
 import { ethereum, BigInt, log } from "@graphprotocol/graph-ts";
 import { getOrCreateAccount, getOrCreatePosition, getOrCreateTransfer } from "./getters";
-import { BIGINT_ZERO, TransferType } from "./constants";
-import { LiquidityPool, _PositionCounter } from "../../generated/schema";
+import { BIGINT_ZERO, DEFAULT_DECIMALS, TransferType } from "./constants";
+import { LiquidityPool, Token, _PositionCounter } from "../../generated/schema";
 import { ADDRESS_ZERO } from "../../../ellipsis-finance/src/common/constants";
+import { convertTokenToDecimal } from "./utils/utils";
 
 // Handle data from transfer event for mints. Used to populate Deposit entity in the Mint event.
 export function handleTransferMint(
@@ -15,6 +16,29 @@ export function handleTransferMint(
 
   // Tracks supply of minted LP tokens
   pool.outputTokenSupply = pool.outputTokenSupply!.plus(value);
+  
+  const token = pool.outputToken ? Token.load(pool.outputToken!) : null;
+  let decimals = token ? token.decimals : DEFAULT_DECIMALS;
+
+  const outputTokenSupply = convertTokenToDecimal(
+    pool.outputTokenSupply!,
+    decimals
+  );
+    
+  let outputTokenSupplyUSD = pool.outputTokenPriceUSD!.times(outputTokenSupply);
+  if(!pool.activeLiquidity) {
+    pool.activeLiquidity = BIGINT_ZERO;
+  }
+
+  pool.activeLiquidity = pool.activeLiquidity!.plus(value);
+  pool.activeLiquidityUSD = outputTokenSupplyUSD;
+
+  if(!pool.totalLiquidity) {
+    pool.totalLiquidity = BIGINT_ZERO;
+  }
+
+  pool.totalLiquidity = pool.totalLiquidity!.plus(value);
+  pool.activeLiquidityUSD = outputTokenSupplyUSD;
 
   // if - create new mint if no mints so far or if last one is done already
   // else - This is done to remove a potential feeto mint --- Not active
@@ -65,6 +89,28 @@ export function handleTransferBurn(
 
   // Tracks supply of minted LP tokens
   pool.outputTokenSupply = pool.outputTokenSupply!.minus(value);
+  
+  const token = pool.outputToken ? Token.load(pool.outputToken!) : null;
+  let decimals = token ? token.decimals : DEFAULT_DECIMALS;
+  
+  const outputTokenSupply = convertTokenToDecimal(
+    pool.outputTokenSupply!,
+    decimals
+  );
+    
+  let outputTokenSupplyUSD = pool.outputTokenPriceUSD!.times(outputTokenSupply);
+  
+  if(!pool.activeLiquidity) {
+    pool.activeLiquidity = BIGINT_ZERO;
+  }
+  pool.activeLiquidity = pool.activeLiquidity!.minus(value);
+  pool.activeLiquidityUSD = outputTokenSupplyUSD;
+
+  if(!pool.totalLiquidity) {
+    pool.totalLiquidity = BIGINT_ZERO;
+  }
+  pool.totalLiquidity = pool.totalLiquidity!.minus(value);
+  pool.totalLiquidityUSD = outputTokenSupplyUSD
 
   // Uses address from the transfer to pool part of the burn. Set transfer type from this handler.
   if (transfer.type == TransferType.BURN) {

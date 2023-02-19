@@ -375,10 +375,15 @@ export function createWithdraw(
 
     pool.closedPositionCount += 1;
     if(pool.openPositionCount > 0) {
-      pool.openPositionCount =+ 1;
+      pool.openPositionCount -= 1;
     }
     pool.positionCount = pool.openPositionCount + pool.closedPositionCount; 
     pool.save() 
+
+    let protocol = getOrCreateProtocol();
+    if(protocol.openPositionCount > 0) {
+      protocol.openPositionCount -= 1; 
+    }
 
     let counter = _PositionCounter.load(account.id.concat("-").concat(pool.id));
     counter!.nextCount += 1;
@@ -468,10 +473,13 @@ export function createSwapHandleVolumeAndFees(
   swap.pool = pool.id;
   swap.account = account.id;
   swap.save();
-
+  
   account.swapCount +=1;
   account.save();
 
+  protocol.cumulativeUniqueTraders += 1;
+  protocol.save()
+  
   // only accounts for volume through white listed tokens
   const trackedAmountUSD = getTrackedVolumeUSD(
     poolAmounts,
