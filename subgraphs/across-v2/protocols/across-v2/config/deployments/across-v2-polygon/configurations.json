@@ -1,0 +1,11 @@
+{
+  "deployment": "ACROSS_V2_POLYGON",
+  "SpokePool": [
+    {
+      "chain": "Polygon",
+      "network": "matic",
+      "address": "0x69B5c72837769eF1e7C164Abc6515DcFf217F920",
+      "startBlock": 28604263
+    }
+  ]
+}

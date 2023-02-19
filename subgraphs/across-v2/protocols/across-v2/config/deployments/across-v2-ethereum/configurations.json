@@ -1,1 +1,11 @@
-{}
+{
+  "deployment": "ACROSS_V2_ETHEREUM",
+  "SpokePool": [
+    {
+      "chain": "Ethereum",
+      "network": "mainnet",
+      "address": "0x4D9079Bb4165aeb4084c526a32695dCfd2F77381",
+      "startBlock": 14819486
+    }
+  ]
+}

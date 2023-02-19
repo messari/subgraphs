@@ -1,0 +1,11 @@
+{
+  "deployment": "ACROSS_V2_ARBITRUM",
+  "SpokePool": [
+    {
+      "chain": "Arbitrum",
+      "network": "arbitrum-one",
+      "address": "0xB88690461dDbaB6f04Dfad7df66B7725942FEb9C",
+      "startBlock": 69579
+    }
+  ]
+}

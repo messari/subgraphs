@@ -1,0 +1,11 @@
+{
+  "deployment": "ACROSS_V2_OPTIMISM",
+  "SpokePool": [
+    {
+      "chain": "Optimism",
+      "network": "optimism",
+      "address": "0xa420b2d1c0841415A695b81E5B867BCD07Dff8C9",
+      "startBlock": 8747136
+    }
+  ]
+}
