@@ -410,6 +410,15 @@ type DerivPerpProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
+
+  " Day ID of the most recent daily snapshot "
+  _lastSnapshotDayID: Int
+
+  " Hour ID of the most recent hourly snapshot "
+  _lastSnapshotHourID: Int
+
+  " Timestamp of the last time this entity was updated "
+  _lastUpdateTimestamp: BigInt
 }
 
 ###############################
@@ -819,6 +828,15 @@ type LiquidityPool @entity {
 
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
+
+  " Day ID of the most recent daily snapshot "
+  _lastSnapshotDayID: Int
+
+  " Hour ID of the most recent hourly snapshot "
+  _lastSnapshotHourID: Int
+
+  " Timestamp of the last time this entity was updated "
+  _lastUpdateTimestamp: BigInt
 }
 
 #################################
@@ -1802,4 +1820,75 @@ type PositionSnapshot @entity(immutable: true) {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+}
+
+type _ActivityHelper @entity {
+  id: Bytes!
+
+  dailyActiveUsers: Int!
+  hourlyActiveUsers: Int!
+
+  dailyActiveDepositors: Int!
+  dailyActiveBorrowers: Int!
+  dailyActiveLiquidators: Int!
+  dailyActiveLiquidatees: Int!
+
+  dailyTransactionCount: Int!
+  hourlyTransactionCount: Int!
+
+  dailyDepositCount: Int!
+  hourlyDepositCount: Int!
+
+  dailyWithdrawCount: Int!
+  hourlyWithdrawCount: Int!
+
+  dailyBorrowCount: Int!
+  hourlyBorrowCount: Int!
+
+  dailySwapCount: Int!
+  hourlySwapCount: Int!
+}
+
+# Helper entity for getting snapshots volume
+type _VolumeDailyTracker @entity {
+  " ID is # of days since Unix epoch time "
+  id: Bytes!
+
+  dailyVolumeByTokenAmount: [BigInt!]!
+  dailyVolumeByTokenUSD: [BigDecimal!]!
+
+  dailyInflowVolumeByTokenAmount: [BigInt!]!
+  dailyInflowVolumeByTokenUSD: [BigDecimal!]!
+
+  dailyClosedInflowVolumeByTokenAmount: [BigInt!]!
+  dailyClosedInflowVolumeByTokenUSD: [BigDecimal!]!
+
+  dailyOutflowVolumeByTokenAmount: [BigInt!]!
+  dailyOutflowVolumeByTokenUSD: [BigDecimal!]!
+}
+
+type _VolumeHourlyTracker @entity {
+  " ID is # of hours since Unix epoch time "
+  id: Bytes!
+
+  hourlyVolumeByTokenAmount: [BigInt!]!
+  hourlyVolumeByTokenUSD: [BigDecimal!]!
+
+  hourlyInflowVolumeByTokenAmount: [BigInt!]!
+  hourlyInflowVolumeByTokenUSD: [BigDecimal!]!
+
+  hourlyClosedInflowVolumeByTokenAmount: [BigInt!]!
+  hourlyClosedInflowVolumeByTokenUSD: [BigDecimal!]!
+
+  hourlyOutflowVolumeByTokenAmount: [BigInt!]!
+  hourlyOutflowVolumeByTokenUSD: [BigDecimal!]!
+}
+
+# Helper entity for getting positions
+type _PositionCounter @entity {
+  " { Account address }-{ Pool address }-{ Position Side } "
+  id: Bytes!
+
+  " Next count "
+  nextCount: Int!
 }
