@@ -4,6 +4,7 @@ import { schemaMapping } from "../utils";
 import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 import FetchSubgraphVersion from "./FetchSubgraphVersion";
 import { useNavigate } from "react-router";
+import FetchIndexingStatusForType from "./FetchIndexingStatusForType";
 
 interface VersionComparisonProps {
     protocolsToQuery: { [x: string]: any };
@@ -69,9 +70,9 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
                 if (depo?.["services"]?.["decentralized-network"]) {
                     let decenEndpoint = "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + depo?.["services"]?.["decentralized-network"]?.["query-id"];
                     slugToQueryString[slug + " (Decentralized)"] = decenEndpoint;
-                    decentralizedFetch = <FetchSubgraphVersion subgraphEndpoint={decenEndpoint} slug={slug + " (Decentralized)"} queryString={""} setDeployments={setSubgraphVersionMapping} />
+                    decentralizedFetch = <FetchSubgraphVersion subgraphEndpoint={decenEndpoint} slug={slug + " (Decentralized)"} setDeployments={setSubgraphVersionMapping} />
                 }
-                return <><FetchSubgraphVersion subgraphEndpoint={endpoint} slug={slug} queryString={slugToQueryString[slug]} setDeployments={setSubgraphVersionMapping} />{decentralizedFetch}</>
+                return <><FetchSubgraphVersion subgraphEndpoint={endpoint} slug={slug} setDeployments={setSubgraphVersionMapping} />{decentralizedFetch}</>
             })}
         </>)
     }
@@ -138,7 +139,7 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
                     priorityColor = '#B8301C';
                 }
                 return (
-                    <TableRow onClick={() => window.location.href = "https://subgraphs.xyz/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol"} key={depo + "PROTOCOLLISTROW"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                    <TableRow onClick={() => window.location.href = "https://subgraphs.xyz/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol"} key={depo + "RowComp"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px" }}>
                             {depo}
                         </TableCell>
@@ -159,9 +160,9 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
                         </TableCell>
                     </TableRow>
                 )
-            } else {
+            } else if (subgraphVersionMapping[depo]) {
                 failedQueryRows.push(
-                    <TableRow onClick={() => window.location.href = "https://okgraph.xyz/?q=" + slugToQueryString[depo]} key={depo + "PROTOCOLLISTROW"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                    <TableRow onClick={() => window.location.href = "https://okgraph.xyz/?q=" + slugToQueryString[depo]} key={depo + "RowComp"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px" }}>
                             {depo}
                         </TableCell>
@@ -175,7 +176,7 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
                             {decenDepos[depo] || ""}
                         </TableCell>
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
-                            {subgraphVersionMapping[depo] || ""}
+                            {subgraphVersionMapping[depo]}
                         </TableCell>
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
                             {slugToVersionJSON[depo] || ""}
@@ -192,7 +193,7 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
         }
 
         return (
-            <TableContainer sx={{ my: 4, mx: 2 }} key={"TableContainer-VersionComparison"}>
+            <TableContainer sx={{ my: 4, mx: 2 }} key={"TableContainer-VersionComparison-" + type}>
                 <div style={{ width: "97.5%" }}>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                         <Typography
@@ -204,6 +205,7 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
                         </Typography>
                     </div>
                 </div>
+                <FetchIndexingStatusForType slugs={slugsListByType[type].filter((x: string) => !x.includes(' (Decentralized)'))} setDeployments={setSubgraphVersionMapping} />
                 <Table sx={{ width: "97.5%" }} stickyHeader>
                     {tableHead}
                     {rowsOnTypeTable}
