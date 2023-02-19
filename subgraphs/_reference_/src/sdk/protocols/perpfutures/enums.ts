@@ -5,14 +5,13 @@ export namespace TransactionType {
   export const SWAP = "SWAP";
   export const COLLATERAL_IN = "COLLATERAL_IN";
   export const COLLATERAL_OUT = "COLLATERAL_OUT";
+  export const LIQUIDATE = "LIQUIDATE";
 }
 export type TransactionType = string;
 
 export namespace PositionType {
   export const LONG = "LONG";
   export const SHORT = "SHORT";
-  export const OPEN = "OPEN";
-  export const CLOSED = "CLOSED";
 }
 export type PositionType = string;
 

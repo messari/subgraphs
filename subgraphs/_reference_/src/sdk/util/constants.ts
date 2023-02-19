@@ -117,10 +117,11 @@ export namespace LiquidityPoolFeeType {
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
+export type LiquidityPoolFeeType = string;
 
 export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";
-  export const  BORROW = "BORROW";
+  export const BORROW = "BORROW";
   export const STAKE = "STAKE";
 }
 export type RewardTokenType = string;

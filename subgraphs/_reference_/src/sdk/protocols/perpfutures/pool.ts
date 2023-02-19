@@ -4,6 +4,7 @@ import {
   sortArrayByReference,
 } from "../../util/arrays";
 import {
+  LiquidityPoolFee,
   Token as TokenSchema,
   LiquidityPool as LiquidityPoolSchema,
 } from "../../../../generated/schema";
@@ -13,7 +14,7 @@ import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import * as constants from "../../util/constants";
 import { exponentToBigDecimal } from "../../util/numbers";
-import { Bytes, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
 export class PoolManager {
   protocol: Perpetual;
@@ -41,7 +42,7 @@ export class Pool {
   pool: LiquidityPoolSchema;
   protocol: Perpetual;
   tokens: TokenManager;
-  snapshoter: PoolSnapshot | null = null;
+  snapshoter: PoolSnapshot;
 
   public isInitialized: boolean = true;
 
@@ -78,6 +79,7 @@ export class Pool {
     this.pool.createdBlockNumber = event.block.number;
 
     this.pool.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    this.pool.fundingrate = [];
     this.pool.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
 
     this.pool.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -105,6 +107,10 @@ export class Pool {
     this.pool.closedPositionCount = 0;
     this.pool.cumulativePositionCount = 0;
 
+    this.pool.cumulativeInflowVolumeUSD = constants.BIGDECIMAL_ZERO;
+    this.pool.cumulativeClosedInflowVolumeUSD = constants.BIGDECIMAL_ZERO;
+    this.pool.cumulativeOutflowVolumeUSD = constants.BIGDECIMAL_ZERO;
+
     this.pool.inputTokenBalances = new Array<BigInt>(inputTokens.length).fill(
       constants.BIGINT_ZERO
     );
@@ -118,6 +124,10 @@ export class Pool {
     this.pool.stakedOutputTokenAmount = constants.BIGINT_ZERO;
     this.pool.rewardTokenEmissionsAmount = null;
     this.pool.rewardTokenEmissionsUSD = null;
+
+    this.pool._lastSnapshotDayID = 0;
+    this.pool._lastSnapshotHourID = 0;
+    this.pool._lastUpdateTimestamp = event.block.timestamp;
 
     this.save();
   }
@@ -138,6 +148,32 @@ export class Pool {
     if (!this.pool.outputToken) return Bytes.empty();
 
     return this.pool.outputToken;
+  }
+
+  setPoolFee(
+    feeType: constants.LiquidityPoolFeeType,
+    feePercentage: BigDecimal | null = null
+  ): void {
+    const feeId = Bytes.fromUTF8(feeType)
+      .concat(Bytes.fromUTF8("-"))
+      .concat(this.getBytesID());
+
+    let fees = LiquidityPoolFee.load(feeId);
+    if (!fees) {
+      fees = new LiquidityPoolFee(feeId);
+      fees.feeType = feeType;
+
+      if (!this.pool.fees.includes(feeId)) {
+        const poolFees = this.pool.fees;
+        poolFees.push(feeId);
+
+        this.pool.fees = poolFees;
+        this.save();
+      }
+    }
+
+    fees.feePercentage = feePercentage;
+    fees.save();
   }
 
   /**
@@ -348,6 +384,42 @@ export class Pool {
   }
 
   /**
+   * Adds a given USD value to the pool InflowVolumeUSD. It can be a positive or negative amount.
+   * @param volume {BigDecimal} The value to add to the pool's InflowVolumeUSD.
+   */
+  addInflowVolumeUSD(volume: BigDecimal): void {
+    this.pool.cumulativeInflowVolumeUSD =
+      this.pool.cumulativeInflowVolumeUSD.plus(volume);
+    this.save();
+
+    this.protocol.addInflowVolumeUSD(volume);
+  }
+
+  /**
+   * Adds a given USD value to the pool ClosedInflowVolumeUSD. It can be a positive or negative amount.
+   * @param volume {BigDecimal} The value to add to the pool's ClosedInflowVolumeUSD.
+   */
+  addClosedInflowVolumeUSD(volume: BigDecimal): void {
+    this.pool.cumulativeClosedInflowVolumeUSD =
+      this.pool.cumulativeClosedInflowVolumeUSD.plus(volume);
+    this.save();
+
+    this.protocol.addClosedInflowVolumeUSD(volume);
+  }
+
+  /**
+   * Adds a given USD value to the pool OutflowVolumeUSD. It can be a positive or negative amount.
+   * @param volume {BigDecimal} The value to add to the pool's OutflowVolumeUSD.
+   */
+  addOutflowVolumeUSD(volume: BigDecimal): void {
+    this.pool.cumulativeOutflowVolumeUSD =
+      this.pool.cumulativeOutflowVolumeUSD.plus(volume);
+    this.save();
+
+    this.protocol.addOutflowVolumeUSD(volume);
+  }
+
+  /**
    * Adds a given amount to the pool's outputTokenSupply. It should only be used for pools
    * of type LIQUIDITY. Or pools that emit some kind of LP token on deposit.
    * @param amount
@@ -505,17 +577,6 @@ export class Pool {
   }
 
   /**
-   * Adds some value to the cumulativeUniqueDepositors counter. If the value is omitted it will default to 1.
-   * If you are loading accounts with the AccountManager you won't need to use this method.
-   * @param count {u8} The value to add to the counter.
-   */
-  addDepositor(count: u8 = 1): void {
-    // TODO: Missing field from Pool entity
-    // this.protocol.cumulativeUniqueDepositors += count;
-    this.save();
-  }
-
-  /**
    * Adds some value to the cumulativeUniqueLiquidators counter. If the value is omitted it will default to 1.
    * If you are loading accounts with the AccountManager you won't need to use this method.
    * @param count {u8} The value to add to the counter.
@@ -538,22 +599,212 @@ export class Pool {
   /**
    * Adds 1 to the cumulativePositionCount counter and adds 1 to the counter corresponding the given position type.
    * If you are creating transaction entities from the Account class you won't need to use this method.
-   * @param type {PositionType} The type of transaction to add.
+   * @param positionSide {PositionType} The type of transaction to add.
    * @see PositionType
    * @see Account
    */
-  addPosition(type: PositionType): void {
-    if (type == PositionType.LONG) {
+  openPosition(positionSide: PositionType): void {
+    if (positionSide == PositionType.LONG) {
       this.pool.longPositionCount += 1;
-    } else if (type == PositionType.SHORT) {
+    } else if (positionSide == PositionType.SHORT) {
       this.pool.shortPositionCount += 1;
-    } else if (type == PositionType.OPEN) {
-      this.pool.openPositionCount += 1;
-    } else if (type == PositionType.CLOSED) {
-      this.pool.closedPositionCount += 1;
     }
 
+    this.pool.openPositionCount += 1;
     this.pool.cumulativePositionCount += 1;
     this.save();
+
+    this.protocol.addPosition(positionSide);
+  }
+
+  /**
+   * Subtracts 1 to the cumulativePositionCount counter and adds 1 to the counter corresponding the given position type.
+   * If you are creating transaction entities from the Account class you won't need to use this method.
+   * @param positionSide {PositionType} The type of transaction to add.
+   * @see PositionType
+   * @see Account
+   */
+  closePosition(positionSide: PositionType): void {
+    if (positionSide == PositionType.LONG) {
+      this.pool.longPositionCount -= 1;
+    } else if (positionSide == PositionType.SHORT) {
+      this.pool.shortPositionCount -= 1;
+    }
+
+    this.pool.openPositionCount -= 1;
+    this.pool.closedPositionCount += 1;
+    this.save();
+
+    this.protocol.closePosition(positionSide);
+  }
+
+  addVolumeByToken(tokenAddress: Address, amount: BigInt): void {
+    const token = this.tokens.getOrCreateToken(tokenAddress);
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+
+    const tokenIndex = this.pool.inputTokens.indexOf(tokenAddress);
+    if (tokenIndex == -1) return;
+
+    const volumeDailyTracker = this.snapshoter.getVolumeDailyTracker();
+    const volumeHourlyTracker = this.snapshoter.getVolumeHourlyTracker();
+
+    const dailyVolumeByTokenUSD = volumeDailyTracker.dailyVolumeByTokenUSD;
+    dailyVolumeByTokenUSD[tokenIndex] =
+      dailyVolumeByTokenUSD[tokenIndex].plus(amountUSD);
+
+    const dailyVolumeByTokenAmount =
+      volumeDailyTracker.dailyVolumeByTokenAmount;
+    dailyVolumeByTokenAmount[tokenIndex] =
+      dailyVolumeByTokenAmount[tokenIndex].plus(amount);
+
+    volumeDailyTracker.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
+    volumeDailyTracker.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
+
+    const hourlyVolumeByTokenUSD = volumeHourlyTracker.hourlyVolumeByTokenUSD;
+    hourlyVolumeByTokenUSD[tokenIndex] =
+      hourlyVolumeByTokenUSD[tokenIndex].plus(amountUSD);
+
+    const hourlyVolumeByTokenAmount =
+      volumeHourlyTracker.hourlyVolumeByTokenAmount;
+    hourlyVolumeByTokenAmount[tokenIndex] =
+      hourlyVolumeByTokenAmount[tokenIndex].plus(amount);
+
+    volumeHourlyTracker.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
+    volumeHourlyTracker.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
+
+    volumeDailyTracker.save();
+    volumeHourlyTracker.save();
+  }
+
+  addInflowVolumeByToken(tokenAddress: Address, amount: BigInt): void {
+    const token = this.tokens.getOrCreateToken(tokenAddress);
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+
+    const tokenIndex = this.pool.inputTokens.indexOf(tokenAddress);
+    if (tokenIndex == -1) return;
+
+    const volumeDailyTracker = this.snapshoter.getVolumeDailyTracker();
+    const volumeHourlyTracker = this.snapshoter.getVolumeHourlyTracker();
+
+    const dailyInflowVolumeByTokenUSD =
+      volumeDailyTracker.dailyInflowVolumeByTokenUSD;
+    dailyInflowVolumeByTokenUSD[tokenIndex] =
+      dailyInflowVolumeByTokenUSD[tokenIndex].plus(amountUSD);
+
+    const dailyInflowVolumeByTokenAmount =
+      volumeDailyTracker.dailyInflowVolumeByTokenAmount;
+    dailyInflowVolumeByTokenAmount[tokenIndex] =
+      dailyInflowVolumeByTokenAmount[tokenIndex].plus(amount);
+
+    volumeDailyTracker.dailyInflowVolumeByTokenUSD =
+      dailyInflowVolumeByTokenUSD;
+    volumeDailyTracker.dailyInflowVolumeByTokenAmount =
+      dailyInflowVolumeByTokenAmount;
+
+    const hourlyInflowVolumeByTokenUSD =
+      volumeHourlyTracker.hourlyInflowVolumeByTokenUSD;
+    hourlyInflowVolumeByTokenUSD[tokenIndex] =
+      hourlyInflowVolumeByTokenUSD[tokenIndex].plus(amountUSD);
+
+    const hourlyInflowVolumeByTokenAmount =
+      volumeHourlyTracker.hourlyInflowVolumeByTokenAmount;
+    hourlyInflowVolumeByTokenAmount[tokenIndex] =
+      hourlyInflowVolumeByTokenAmount[tokenIndex].plus(amount);
+
+    volumeHourlyTracker.hourlyInflowVolumeByTokenUSD =
+      hourlyInflowVolumeByTokenUSD;
+    volumeHourlyTracker.hourlyVolumeByTokenAmount =
+      hourlyInflowVolumeByTokenAmount;
+
+    volumeDailyTracker.save();
+    volumeHourlyTracker.save();
+  }
+
+  addOutflowVolumeByToken(tokenAddress: Address, amount: BigInt): void {
+    const token = this.tokens.getOrCreateToken(tokenAddress);
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+
+    const tokenIndex = this.pool.inputTokens.indexOf(tokenAddress);
+    if (tokenIndex == -1) return;
+
+    const volumeDailyTracker = this.snapshoter.getVolumeDailyTracker();
+    const volumeHourlyTracker = this.snapshoter.getVolumeHourlyTracker();
+
+    const dailyOutflowVolumeByTokenUSD =
+      volumeDailyTracker.dailyOutflowVolumeByTokenUSD;
+    dailyOutflowVolumeByTokenUSD[tokenIndex] =
+      dailyOutflowVolumeByTokenUSD[tokenIndex].plus(amountUSD);
+
+    const dailyOutflowVolumeByTokenAmount =
+      volumeDailyTracker.dailyOutflowVolumeByTokenAmount;
+    dailyOutflowVolumeByTokenAmount[tokenIndex] =
+      dailyOutflowVolumeByTokenAmount[tokenIndex].plus(amount);
+
+    volumeDailyTracker.dailyOutflowVolumeByTokenUSD =
+      dailyOutflowVolumeByTokenUSD;
+    volumeDailyTracker.dailyOutflowVolumeByTokenAmount =
+      dailyOutflowVolumeByTokenAmount;
+
+    const hourlyOutflowVolumeByTokenUSD =
+      volumeHourlyTracker.hourlyOutflowVolumeByTokenUSD;
+    hourlyOutflowVolumeByTokenUSD[tokenIndex] =
+      hourlyOutflowVolumeByTokenUSD[tokenIndex].plus(amountUSD);
+
+    const hourlyOutflowVolumeByTokenAmount =
+      volumeHourlyTracker.hourlyOutflowVolumeByTokenAmount;
+    hourlyOutflowVolumeByTokenAmount[tokenIndex] =
+      hourlyOutflowVolumeByTokenAmount[tokenIndex].plus(amount);
+
+    volumeHourlyTracker.hourlyOutflowVolumeByTokenUSD =
+      hourlyOutflowVolumeByTokenUSD;
+    volumeHourlyTracker.hourlyVolumeByTokenAmount =
+      hourlyOutflowVolumeByTokenAmount;
+
+    volumeDailyTracker.save();
+    volumeHourlyTracker.save();
+  }
+
+  addClosedInflowVolumeByToken(tokenAddress: Address, amount: BigInt): void {
+    const token = this.tokens.getOrCreateToken(tokenAddress);
+    const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+
+    const tokenIndex = this.pool.inputTokens.indexOf(tokenAddress);
+    if (tokenIndex == -1) return;
+
+    const volumeDailyTracker = this.snapshoter.getVolumeDailyTracker();
+    const volumeHourlyTracker = this.snapshoter.getVolumeHourlyTracker();
+
+    const dailyClosedInflowVolumeByTokenUSD =
+      volumeDailyTracker.dailyClosedInflowVolumeByTokenUSD;
+    dailyClosedInflowVolumeByTokenUSD[tokenIndex] =
+      dailyClosedInflowVolumeByTokenUSD[tokenIndex].plus(amountUSD);
+
+    const dailyClosedInflowVolumeByTokenAmount =
+      volumeDailyTracker.dailyClosedInflowVolumeByTokenAmount;
+    dailyClosedInflowVolumeByTokenAmount[tokenIndex] =
+      dailyClosedInflowVolumeByTokenAmount[tokenIndex].plus(amount);
+
+    volumeDailyTracker.dailyClosedInflowVolumeByTokenUSD =
+      dailyClosedInflowVolumeByTokenUSD;
+    volumeDailyTracker.dailyClosedInflowVolumeByTokenAmount =
+      dailyClosedInflowVolumeByTokenAmount;
+
+    const hourlyClosedInflowVolumeByTokenUSD =
+      volumeHourlyTracker.hourlyClosedInflowVolumeByTokenUSD;
+    hourlyClosedInflowVolumeByTokenUSD[tokenIndex] =
+      hourlyClosedInflowVolumeByTokenUSD[tokenIndex].plus(amountUSD);
+
+    const hourlyClosedInflowVolumeByTokenAmount =
+      volumeHourlyTracker.hourlyClosedInflowVolumeByTokenAmount;
+    hourlyClosedInflowVolumeByTokenAmount[tokenIndex] =
+      hourlyClosedInflowVolumeByTokenAmount[tokenIndex].plus(amount);
+
+    volumeHourlyTracker.hourlyClosedInflowVolumeByTokenUSD =
+      hourlyClosedInflowVolumeByTokenUSD;
+    volumeHourlyTracker.hourlyVolumeByTokenAmount =
+      hourlyClosedInflowVolumeByTokenAmount;
+
+    volumeDailyTracker.save();
+    volumeHourlyTracker.save();
   }
 }

@@ -1,9 +1,12 @@
 import {
+  _VolumeDailyTracker,
+  _VolumeHourlyTracker,
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
   LiquidityPool as PoolSchema,
 } from "../../../../generated/schema";
 import * as constants from "../../util/constants";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 export class PoolSnapshot {
@@ -22,6 +25,7 @@ export class PoolSnapshot {
 
   private takeSnapshots(): void {
     if (!this.isInitialized()) return;
+    if (!this.pool._lastUpdateTimestamp) return;
 
     const snapshotDayID =
       this.pool._lastUpdateTimestamp.toI32() / constants.SECONDS_PER_DAY;
@@ -53,6 +57,7 @@ export class PoolSnapshot {
     const previousSnapshot = LiquidityPoolHourlySnapshot.load(
       this.pool.id.concatI32(this.pool._lastSnapshotHourID)
     );
+    const volumeTracker = getOrCreateVolumeHourlyTracker(hour, this.pool);
 
     snapshot.hours = hour;
     snapshot.pool = this.pool.id;
@@ -83,7 +88,7 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeTotalRevenueUSD;
 
-    snapshot.hourlyFundingrate = this.pool._fundingrate;
+    snapshot.hourlyFundingrate = this.pool.fundingrate;
     snapshot.hourlyOpenInterestUSD = this.pool.openInterestUSD;
 
     snapshot.cumulativeEntryPremiumUSD = this.pool.cumulativeEntryPremiumUSD;
@@ -131,16 +136,19 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeTotalLiquidityPremiumUSD;
 
-    snapshot.hourlyVolumeByTokenUSD = [];
-    snapshot.hourlyVolumeByTokenAmount = [];
+    snapshot.hourlyVolumeByTokenUSD = volumeTracker.hourlyVolumeByTokenUSD;
+    snapshot.hourlyVolumeByTokenAmount =
+      volumeTracker.hourlyVolumeByTokenAmount;
 
     snapshot.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD;
     snapshot.hourlyVolumeUSD = previousSnapshot
       ? snapshot.cumulativeVolumeUSD.minus(previousSnapshot.cumulativeVolumeUSD)
       : snapshot.cumulativeVolumeUSD;
 
-    snapshot.hourlyInflowVolumeByTokenUSD = [];
-    snapshot.hourlyInflowVolumeByTokenAmount = [];
+    snapshot.hourlyInflowVolumeByTokenUSD =
+      volumeTracker.hourlyInflowVolumeByTokenUSD;
+    snapshot.hourlyInflowVolumeByTokenAmount =
+      volumeTracker.hourlyInflowVolumeByTokenAmount;
 
     snapshot.cumulativeInflowVolumeUSD = this.pool.cumulativeInflowVolumeUSD;
     snapshot.hourlyInflowVolumeUSD = previousSnapshot
@@ -149,8 +157,10 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeInflowVolumeUSD;
 
-    snapshot.hourlyClosedInflowVolumeByTokenUSD = [];
-    snapshot.hourlyClosedInflowVolumeByTokenAmount = [];
+    snapshot.hourlyClosedInflowVolumeByTokenUSD =
+      volumeTracker.hourlyClosedInflowVolumeByTokenUSD;
+    snapshot.hourlyClosedInflowVolumeByTokenAmount =
+      volumeTracker.hourlyClosedInflowVolumeByTokenAmount;
 
     snapshot.cumulativeClosedInflowVolumeUSD =
       this.pool.cumulativeClosedInflowVolumeUSD;
@@ -160,8 +170,10 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeClosedInflowVolumeUSD;
 
-    snapshot.hourlyOutflowVolumeByTokenUSD = [];
-    snapshot.hourlyOutflowVolumeByTokenAmount = [];
+    snapshot.hourlyOutflowVolumeByTokenUSD =
+      volumeTracker.hourlyOutflowVolumeByTokenUSD;
+    snapshot.hourlyOutflowVolumeByTokenAmount =
+      volumeTracker.hourlyOutflowVolumeByTokenAmount;
 
     snapshot.cumulativeOutflowVolumeUSD = this.pool.cumulativeOutflowVolumeUSD;
     snapshot.hourlyOutflowVolumeUSD = previousSnapshot
@@ -188,6 +200,7 @@ export class PoolSnapshot {
     const previousSnapshot = LiquidityPoolDailySnapshot.load(
       this.pool.id.concatI32(this.pool._lastSnapshotDayID)
     );
+    const volumeTracker = getOrCreateVolumeDailyTracker(day, this.pool);
 
     snapshot.days = day;
     snapshot.pool = this.pool.id;
@@ -218,7 +231,7 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeTotalRevenueUSD;
 
-    snapshot.dailyFundingrate = this.pool._fundingrate;
+    snapshot.dailyFundingrate = this.pool.fundingrate;
     snapshot.dailyOpenInterestUSD = this.pool.openInterestUSD;
 
     snapshot.cumulativeEntryPremiumUSD = this.pool.cumulativeEntryPremiumUSD;
@@ -266,16 +279,18 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeTotalLiquidityPremiumUSD;
 
-    snapshot.dailyVolumeByTokenUSD = [];
-    snapshot.dailyVolumeByTokenAmount = [];
+    snapshot.dailyVolumeByTokenUSD = volumeTracker.dailyVolumeByTokenUSD;
+    snapshot.dailyVolumeByTokenAmount = volumeTracker.dailyVolumeByTokenAmount;
 
     snapshot.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD;
     snapshot.dailyVolumeUSD = previousSnapshot
       ? snapshot.cumulativeVolumeUSD.minus(previousSnapshot.cumulativeVolumeUSD)
       : snapshot.cumulativeVolumeUSD;
 
-    snapshot.dailyInflowVolumeByTokenUSD = [];
-    snapshot.dailyInflowVolumeByTokenAmount = [];
+    snapshot.dailyInflowVolumeByTokenUSD =
+      volumeTracker.dailyInflowVolumeByTokenUSD;
+    snapshot.dailyInflowVolumeByTokenAmount =
+      volumeTracker.dailyInflowVolumeByTokenAmount;
 
     snapshot.cumulativeInflowVolumeUSD = this.pool.cumulativeInflowVolumeUSD;
     snapshot.dailyInflowVolumeUSD = previousSnapshot
@@ -284,8 +299,10 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeInflowVolumeUSD;
 
-    snapshot.dailyClosedInflowVolumeByTokenUSD = [];
-    snapshot.dailyClosedInflowVolumeByTokenAmount = [];
+    snapshot.dailyClosedInflowVolumeByTokenUSD =
+      volumeTracker.dailyClosedInflowVolumeByTokenUSD;
+    snapshot.dailyClosedInflowVolumeByTokenAmount =
+      volumeTracker.dailyClosedInflowVolumeByTokenAmount;
 
     snapshot.cumulativeClosedInflowVolumeUSD =
       this.pool.cumulativeClosedInflowVolumeUSD;
@@ -295,8 +312,10 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeClosedInflowVolumeUSD;
 
-    snapshot.dailyOutflowVolumeByTokenUSD = [];
-    snapshot.dailyOutflowVolumeByTokenAmount = [];
+    snapshot.dailyOutflowVolumeByTokenUSD =
+      volumeTracker.dailyOutflowVolumeByTokenUSD;
+    snapshot.dailyOutflowVolumeByTokenAmount =
+      volumeTracker.dailyOutflowVolumeByTokenAmount;
 
     snapshot.cumulativeOutflowVolumeUSD = this.pool.cumulativeOutflowVolumeUSD;
     snapshot.dailyOutflowVolumeUSD = previousSnapshot
@@ -326,27 +345,27 @@ export class PoolSnapshot {
       : snapshot.cumulativeUniqueLiquidatees;
 
     snapshot.longPositionCount = this.pool.longPositionCount;
-    snapshot.dailylongPositionCount = previousSnapshot
+    snapshot.dailyLongPositionCount = previousSnapshot
       ? snapshot.longPositionCount - previousSnapshot.longPositionCount
       : snapshot.longPositionCount;
 
     snapshot.shortPositionCount = this.pool.shortPositionCount;
-    snapshot.dailyshortPositionCount = previousSnapshot
+    snapshot.dailyShortPositionCount = previousSnapshot
       ? snapshot.shortPositionCount - previousSnapshot.shortPositionCount
       : snapshot.shortPositionCount;
 
     snapshot.openPositionCount = this.pool.openPositionCount;
-    snapshot.dailyopenPositionCount = previousSnapshot
+    snapshot.dailyOpenPositionCount = previousSnapshot
       ? snapshot.openPositionCount - previousSnapshot.openPositionCount
       : snapshot.openPositionCount;
 
     snapshot.closedPositionCount = this.pool.closedPositionCount;
-    snapshot.dailyclosedPositionCount = previousSnapshot
+    snapshot.dailyClosedPositionCount = previousSnapshot
       ? snapshot.closedPositionCount - previousSnapshot.closedPositionCount
       : snapshot.closedPositionCount;
 
     snapshot.cumulativePositionCount = this.pool.cumulativePositionCount;
-    snapshot.dailycumulativePositionCount = previousSnapshot
+    snapshot.dailyCumulativePositionCount = previousSnapshot
       ? snapshot.cumulativePositionCount -
         previousSnapshot.cumulativePositionCount
       : snapshot.cumulativePositionCount;
@@ -361,4 +380,102 @@ export class PoolSnapshot {
 
     snapshot.save();
   }
+
+  getVolumeHourlyTracker(): _VolumeHourlyTracker {
+    const hourID =
+      this.pool._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_HOUR;
+
+    return getOrCreateVolumeHourlyTracker(hourID, this.pool);
+  }
+
+  getVolumeDailyTracker(): _VolumeDailyTracker {
+    const dayID =
+      this.pool._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_DAY;
+
+    return getOrCreateVolumeDailyTracker(dayID, this.pool);
+  }
+}
+
+function getOrCreateVolumeHourlyTracker(
+  hour: i32,
+  pool: PoolSchema
+): _VolumeHourlyTracker {
+  let tracker = _VolumeHourlyTracker.load(pool.id.concatI32(hour));
+
+  if (!tracker) {
+    tracker = new _VolumeHourlyTracker(pool.id.concatI32(hour));
+    tracker.hourlyVolumeByTokenAmount = new Array<BigInt>(
+      pool.inputTokens.length
+    ).fill(constants.BIGINT_ZERO);
+    tracker.hourlyVolumeByTokenUSD = new Array<BigDecimal>(
+      pool.inputTokens.length
+    ).fill(constants.BIGDECIMAL_ZERO);
+
+    tracker.hourlyInflowVolumeByTokenAmount = new Array<BigInt>(
+      pool.inputTokens.length
+    ).fill(constants.BIGINT_ZERO);
+    tracker.hourlyInflowVolumeByTokenUSD = new Array<BigDecimal>(
+      pool.inputTokens.length
+    ).fill(constants.BIGDECIMAL_ZERO);
+
+    tracker.hourlyClosedInflowVolumeByTokenAmount = new Array<BigInt>(
+      pool.inputTokens.length
+    ).fill(constants.BIGINT_ZERO);
+    tracker.hourlyClosedInflowVolumeByTokenUSD = new Array<BigDecimal>(
+      pool.inputTokens.length
+    ).fill(constants.BIGDECIMAL_ZERO);
+
+    tracker.hourlyOutflowVolumeByTokenAmount = new Array<BigInt>(
+      pool.inputTokens.length
+    ).fill(constants.BIGINT_ZERO);
+    tracker.hourlyOutflowVolumeByTokenUSD = new Array<BigDecimal>(
+      pool.inputTokens.length
+    ).fill(constants.BIGDECIMAL_ZERO);
+
+    tracker.save();
+  }
+
+  return tracker;
+}
+
+function getOrCreateVolumeDailyTracker(
+  day: i32,
+  pool: PoolSchema
+): _VolumeDailyTracker {
+  let tracker = _VolumeDailyTracker.load(pool.id.concatI32(day));
+
+  if (!tracker) {
+    tracker = new _VolumeDailyTracker(pool.id.concatI32(day));
+    tracker.dailyVolumeByTokenAmount = new Array<BigInt>(
+      pool.inputTokens.length
+    ).fill(constants.BIGINT_ZERO);
+    tracker.dailyVolumeByTokenUSD = new Array<BigDecimal>(
+      pool.inputTokens.length
+    ).fill(constants.BIGDECIMAL_ZERO);
+
+    tracker.dailyInflowVolumeByTokenAmount = new Array<BigInt>(
+      pool.inputTokens.length
+    ).fill(constants.BIGINT_ZERO);
+    tracker.dailyInflowVolumeByTokenUSD = new Array<BigDecimal>(
+      pool.inputTokens.length
+    ).fill(constants.BIGDECIMAL_ZERO);
+
+    tracker.dailyClosedInflowVolumeByTokenAmount = new Array<BigInt>(
+      pool.inputTokens.length
+    ).fill(constants.BIGINT_ZERO);
+    tracker.dailyClosedInflowVolumeByTokenUSD = new Array<BigDecimal>(
+      pool.inputTokens.length
+    ).fill(constants.BIGDECIMAL_ZERO);
+
+    tracker.dailyOutflowVolumeByTokenAmount = new Array<BigInt>(
+      pool.inputTokens.length
+    ).fill(constants.BIGINT_ZERO);
+    tracker.dailyOutflowVolumeByTokenUSD = new Array<BigDecimal>(
+      pool.inputTokens.length
+    ).fill(constants.BIGDECIMAL_ZERO);
+
+    tracker.save();
+  }
+
+  return tracker;
 }

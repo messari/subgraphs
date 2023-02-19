@@ -69,6 +69,8 @@ export class ProtocolSnapshot {
   }
 
   private takeSnapshots(): void {
+    if (!this.protocol._lastUpdateTimestamp) return;
+
     const snapshotDayID =
       this.protocol._lastUpdateTimestamp.toI32() / constants.SECONDS_PER_DAY;
     const snapshotHourID =
@@ -225,27 +227,27 @@ export class ProtocolSnapshot {
     snapshot.dailyActiveUsers = activity.dailyActiveUsers;
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
 
-    snapshot.dailylongPositionCount = previousSnapshot
+    snapshot.dailyLongPositionCount = previousSnapshot
       ? this.protocol.longPositionCount - previousSnapshot.longPositionCount
       : this.protocol.longPositionCount;
     snapshot.longPositionCount = this.protocol.longPositionCount;
 
-    snapshot.dailyshortPositionCount = previousSnapshot
+    snapshot.dailyShortPositionCount = previousSnapshot
       ? this.protocol.shortPositionCount - previousSnapshot.shortPositionCount
       : this.protocol.shortPositionCount;
     snapshot.shortPositionCount = this.protocol.shortPositionCount;
 
-    snapshot.dailyopenPositionCount = previousSnapshot
+    snapshot.dailyOpenPositionCount = previousSnapshot
       ? this.protocol.openPositionCount - previousSnapshot.openPositionCount
       : this.protocol.openPositionCount;
     snapshot.openPositionCount = this.protocol.openPositionCount;
 
-    snapshot.dailyclosedPositionCount = previousSnapshot
+    snapshot.dailyClosedPositionCount = previousSnapshot
       ? this.protocol.closedPositionCount - previousSnapshot.closedPositionCount
       : this.protocol.closedPositionCount;
     snapshot.closedPositionCount = this.protocol.closedPositionCount;
 
-    snapshot.dailycumulativePositionCount = previousSnapshot
+    snapshot.dailyCumulativePositionCount = previousSnapshot
       ? this.protocol.cumulativePositionCount -
         previousSnapshot.cumulativePositionCount
       : this.protocol.cumulativePositionCount;
@@ -304,19 +306,12 @@ export class ProtocolSnapshot {
 
   private takeUsageHourlySnapshot(hour: i32): void {
     const activity = this.activityHelper;
-
     const snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
-    const previousSnapshot = UsageMetricsHourlySnapshot.load(
-      Bytes.fromI32(this.protocol._lastSnapshotHourID)
-    );
 
     snapshot.hours = hour;
     snapshot.protocol = this.protocol.id;
 
-    snapshot.hourlyActiveUsers = previousSnapshot
-      ? this.protocol.cumulativeUniqueUsers -
-        previousSnapshot.cumulativeUniqueUsers
-      : this.protocol.cumulativeUniqueUsers;
+    snapshot.hourlyActiveUsers = activity.hourlyActiveUsers;
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
 
     snapshot.hourlyTransactionCount = activity.hourlyTransactionCount;

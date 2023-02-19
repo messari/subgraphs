@@ -1,80 +1,239 @@
 import {
   Token,
-  Account,
+  PositionSnapshot,
+  _PositionCounter,
   Position as PositionSchema,
-  LiquidityPool as LiquidityPoolSchema,
 } from "../../../../generated/schema";
 import { Pool } from "./pool";
+import { Account, AccountManager } from "./account";
 import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
-import { Bytes } from "@graphprotocol/graph-ts";
 import * as constants from "../../util/constants";
+import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
-export class PositionManager {
+export class Position {
   protocol: Perpetual;
   tokens: TokenManager;
+  position: PositionSchema | null;
+  account: Account | null;
+  pool: Pool | null;
 
   constructor(protocol: Perpetual, tokens: TokenManager) {
     this.protocol = protocol;
     this.tokens = tokens;
-  }
-
-  loadPosition(id: Bytes): Pool {
-    let entity = LiquidityPoolSchema.load(id);
-    if (entity) return new Pool(this.protocol, entity, this.tokens);
-
-    entity = new LiquidityPoolSchema(id);
-    entity.protocol = this.protocol.getBytesID();
-
-    const pool = new Pool(this.protocol, entity, this.tokens);
-    pool.isInitialized = false;
-    return pool;
-  }
-}
-
-export class Position {
-  pool: Pool;
-  protocol: Perpetual;
-  position: PositionSchema;
-
-  constructor(pool: Pool, protocol: Perpetual, position: PositionSchema) {
-    this.pool = pool;
-    this.protocol = protocol;
-    this.position = position;
+    this.pool = null;
+    this.account = null;
+    this.position = null;
   }
 
   private save(): void {
-    this.position.save();
+    this.position!.save();
   }
 
-  initialize(
+  private getPositionId(
+    pool: Pool,
+    account: Account,
+    positionSide: constants.PositionSide
+  ): Bytes {
+    const positionId = account
+      .getBytesId()
+      .concat(Bytes.fromUTF8("-"))
+      .concat(pool.getBytesID())
+      .concat(Bytes.fromUTF8("-"))
+      .concat(Bytes.fromUTF8(positionSide));
+
+    return getPositionIdWithCounter(positionId);
+  }
+
+  load(
+    pool: Pool,
     account: Account,
     asset: Token,
     collateral: Token,
     positionSide: constants.PositionSide
   ): void {
-    // " { Account address }-{ Market address }-{ Position Side }-{ Counter } "
-    const positionId = Bytes.empty();
-    let position = new PositionSchema(positionId);
+    this.pool = pool;
+    this.account = account;
 
-    position.account = account.id;
-    position.liquidityPool = this.pool.getBytesID();
-    position.collateral = collateral.id;
-    position.asset = asset.id;
-    position.side = positionSide;
-    position.fundingrateOpen = constants.BIGDECIMAL_ZERO;
-    position.fundingrateClosed = constants.BIGDECIMAL_ZERO;
-    position.leverage = constants.BIGDECIMAL_ZERO;
+    const positionId = this.getPositionId(pool, account, positionSide);
 
-    position.balance = constants.BIGINT_ZERO;
-    position.balanceUSD = constants.BIGDECIMAL_ZERO;
+    this.position = PositionSchema.load(positionId);
+    if (this.position) return;
 
-    position.collateralBalance = constants.BIGINT_ZERO;
-    position.collateralBalanceUSD = constants.BIGDECIMAL_ZERO;
+    this.position = new PositionSchema(positionId);
+    this.position.account = account.getBytesId();
+    this.position.liquidityPool = pool.getBytesID();
+    this.position.collateral = collateral.id;
+    this.position.asset = asset.id;
 
-    position.collateralInCount = 0;
-    position.collateralOutCount = 0;
+    const event = this.protocol.getCurrentEvent();
+    this.position.hashOpened = event.transaction.hash;
+    this.position.blockNumberOpened = event.block.number;
+    this.position.timestampOpened = event.block.timestamp;
+
+    this.position.side = positionSide;
+    this.position.fundingrateOpen = constants.BIGDECIMAL_ZERO;
+    this.position.fundingrateClosed = constants.BIGDECIMAL_ZERO;
+    this.position.leverage = constants.BIGDECIMAL_ZERO;
+
+    this.position.balance = constants.BIGINT_ZERO;
+    this.position.balanceUSD = constants.BIGDECIMAL_ZERO;
+
+    this.position.collateralBalance = constants.BIGINT_ZERO;
+    this.position.collateralBalanceUSD = constants.BIGDECIMAL_ZERO;
+
+    this.position.collateralInCount = 0;
+    this.position.collateralOutCount = 0;
+    this.position.liquidationCount = 0;
 
     this.save();
+
+    this.account.openPosition(this.position.side);
+    this.pool.openPosition(this.position.side);
   }
+
+  /**
+   * Sets the position's fundingrateOpen value.
+   * @param amount
+   */
+  setFundingrateOpen(amount: BigDecimal): void {
+    if (!this.position) return;
+
+    this.position.fundingrateOpen = amount;
+    this.save();
+  }
+
+  /**
+   * Sets the position's fundingrateClosed value.
+   * @param amount
+   */
+  setFundingrateClosed(amount: BigDecimal): void {
+    if (!this.position) return;
+
+    this.position.fundingrateClosed = amount;
+    this.save();
+  }
+
+  /**
+   * Sets the position's leverage value.
+   * @param amount
+   */
+  setLeverage(amount: BigDecimal): void {
+    if (!this.position) return;
+
+    this.position.leverage = amount;
+    this.save();
+  }
+
+  /**
+   * Sets the position's balance value.
+   * @param token
+   * @param amount
+   */
+  setBalance(token: Address, amount: BigInt): void {
+    if (!this.position) return;
+
+    this.position.balance = amount;
+    this.position.balanceUSD = this.protocol
+      .getTokenPricer()
+      .getAmountValueUSD(this.tokens.getOrCreateToken(token), amount);
+    this.save();
+  }
+
+  /**
+   * Sets the position's collateralBalance value.
+   * @param collateralToken
+   * @param amount
+   */
+  setcollateralBalance(collateralToken: Address, amount: BigInt): void {
+    if (!this.position) return;
+
+    this.position.collateralBalance = amount;
+    this.position.collateralBalanceUSD = this.protocol
+      .getTokenPricer()
+      .getAmountValueUSD(this.tokens.getOrCreateToken(collateralToken), amount);
+    this.save();
+  }
+
+  /**
+   * Adds 1 to the account position collateralIn count.
+   */
+  addCollateralIn(): void {
+    if (!this.position) return;
+
+    this.position.collateralInCount += 1;
+    this.save();
+  }
+
+  /**
+   * Adds 1 to the account position collateralOut count.
+   */
+  addCollateralOut(): void {
+    if (!this.position) return;
+
+    this.position.collateralOutCount += 1;
+    this.save();
+  }
+
+  /**
+   * Adds 1 to the account position liquidation count.
+   */
+  addLiquidation(): void {
+    if (!this.position) return;
+
+    this.position.liquidationCount += 1;
+    this.save();
+  }
+
+  closePosition(): void {
+    if (!this.position) return;
+
+    const event = this.protocol.getCurrentEvent();
+    this.position.hashClosed = event.transaction.hash;
+    this.position.blockNumberClosed = event.block.number;
+    this.position.timestampClosed = event.block.timestamp;
+    this.save();
+
+    if (this.account) this.account.closePosition(this.position.side);
+    if (this.pool) this.pool.closePosition(this.position.side);
+  }
+
+  takePositionSnapshot(): void {
+    if (!this.position) return;
+
+    const event = this.protocol.getCurrentEvent();
+    const snapshotId = this.position!.id.concat(event.transaction.hash).concat(
+      Bytes.fromBigInt(event.transaction.index)
+    );
+    const snapshot = new PositionSnapshot(snapshotId);
+
+    snapshot.hash = event.transaction.hash;
+    snapshot.logIndex = event.transaction.index.toI32();
+    snapshot.nonce = event.transaction.nonce;
+
+    snapshot.position = this.position!.id;
+    snapshot.account = this.position!.account;
+    snapshot.fundingrate = this.position!.fundingrateOpen;
+    snapshot.balance = this.position!.balance;
+    snapshot.collateralBalance = this.position!.collateralBalance;
+    snapshot.balanceUSD = this.position!.balanceUSD;
+    snapshot.collateralBalanceUSD = this.position!.collateralBalanceUSD;
+    snapshot.blockNumber = this.protocol.event.block.number;
+    snapshot.timestamp = this.protocol.event.block.timestamp;
+
+    snapshot.save();
+  }
+}
+
+function getPositionIdWithCounter(counterId: Bytes): Bytes {
+  let positionCounter = _PositionCounter.load(counterId);
+  if (!positionCounter) {
+    positionCounter = new _PositionCounter(counterId);
+    positionCounter.nextCount = 0;
+    positionCounter.save();
+  }
+
+  return positionCounter.id
+    .concat(Bytes.fromUTF8("-"))
+    .concatI32(positionCounter.nextCount);
 }

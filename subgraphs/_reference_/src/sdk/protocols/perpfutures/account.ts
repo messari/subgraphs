@@ -1,5 +1,6 @@
 import {
   Swap,
+  Borrow,
   Deposit,
   Withdraw,
   Liquidate,
@@ -11,8 +12,8 @@ import {
 import { Pool } from "./pool";
 import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
-import { EventType, ActivityType } from "./enums";
 import * as constants from "../../util/constants";
+import { EventType, ActivityType, TransactionType } from "./enums";
 import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
@@ -43,6 +44,13 @@ export class AccountManager {
       account.openPositionCount = 0;
       account.closedPositionCount = 0;
       account.cumulativeUniqueLiquidatees = 0;
+
+      account.depositCount = 0;
+      account.withdrawCount = 0;
+      account.collateralInCount = 0;
+      account.collateralOutCount = 0;
+      account.liquidateCount = 0;
+      account.liquidationCount = 0;
 
       account.save();
 
@@ -140,6 +148,10 @@ export class Account {
     this.protocol.addActiveUser(generalActivity);
   }
 
+  getBytesId(): Bytes {
+    return this.account.id;
+  }
+
   /**
    *
    * @param pool The pool where the liquidity was deposited.
@@ -157,11 +169,11 @@ export class Account {
     const depositId = this.getIdFromEvent(EventType.DEPOSIT);
     let deposit = new Deposit(depositId);
 
-    deposit.hash = this.event.transaction.hash.toHexString();
+    deposit.hash = this.event.transaction.hash;
     deposit.logIndex = this.event.logIndex.toI32();
     deposit.protocol = this.protocol.getBytesID();
-    deposit.to = pool.getBytesID().toHexString();
-    deposit.from = this.account.id.toHexString();
+    deposit.to = pool.getBytesID();
+    deposit.from = this.account.id;
     deposit.account = this.account.id;
     deposit.blockNumber = this.event.block.number;
     deposit.timestamp = this.event.block.timestamp;
@@ -171,9 +183,9 @@ export class Account {
     deposit.outputTokenAmount = sharesMinted;
     deposit.amountUSD = this.getAmountUSD(pool.getInputTokens(), amounts);
     deposit.pool = pool.getBytesID();
+    deposit.save();
 
-    if (updateMetrics) pool.addDepositor();
-
+    if (updateMetrics) this.protocol.addTransaction(TransactionType.DEPOSIT);
     return deposit;
   }
 
@@ -194,11 +206,11 @@ export class Account {
     const withdrawId = this.getIdFromEvent(EventType.WITHDRAW);
     let withdraw = new Withdraw(withdrawId);
 
-    withdraw.hash = this.event.transaction.hash.toHexString();
+    withdraw.hash = this.event.transaction.hash;
     withdraw.logIndex = this.event.logIndex.toI32();
     withdraw.protocol = this.protocol.getBytesID();
-    withdraw.to = this.account.id.toHexString();
-    withdraw.from = pool.getBytesID().toHexString();
+    withdraw.to = this.account.id;
+    withdraw.from = pool.getBytesID();
     withdraw.account = this.account.id;
     withdraw.blockNumber = this.event.block.number;
     withdraw.timestamp = this.event.block.timestamp;
@@ -208,7 +220,9 @@ export class Account {
     withdraw.outputTokenAmount = sharesBurnt;
     withdraw.amountUSD = this.getAmountUSD(pool.getInputTokens(), amounts);
     withdraw.pool = pool.getBytesID();
+    withdraw.save();
 
+    if (updateMetrics) this.protocol.addTransaction(TransactionType.WITHDRAW);
     return withdraw;
   }
 
@@ -235,11 +249,11 @@ export class Account {
     const swapId = this.getIdFromEvent(EventType.SWAP);
     let swap = new Swap(swapId);
 
-    swap.hash = this.event.transaction.hash.toHexString();
+    swap.hash = this.event.transaction.hash;
     swap.logIndex = this.event.logIndex.toI32();
     swap.protocol = this.protocol.getBytesID();
-    swap.to = pool.getBytesID().toHexString();
-    swap.from = this.account.id.toHexString();
+    swap.to = pool.getBytesID();
+    swap.from = this.account.id;
     swap.account = this.account.id;
     swap.blockNumber = this.event.block.number;
     swap.timestamp = this.event.block.timestamp;
@@ -258,8 +272,53 @@ export class Account {
 
     swap.tradingPair = tradingPair;
     swap.pool = pool.getBytesID();
+    swap.save();
 
+    if (updateMetrics) this.protocol.addTransaction(TransactionType.SWAP);
     return swap;
+  }
+
+  /**
+   *
+   * @param pool The pool where the liquidity was swapped.
+   * @param tokenIn The token deposited into the pool.
+   * @param amountIn The token amount deposited into the pool.
+   * @param tokenIn The token withdrawn from the pool.
+   * @param amountIn The token amount withdrawn from the pool.
+   * @param tradingPair  The contract address for the trading pair or pool.
+   * @param updateMetrics Optional, defaults to true. If true it will update the pool and protocol TVL and inputTokenBalance.
+   * @returns Borrow
+   */
+  borrow(
+    pool: Pool,
+    position: Bytes,
+    asset: Address,
+    amount: BigInt,
+    updateMetrics: bool = true
+  ): Borrow {
+    const borrowId = this.getIdFromEvent(EventType.SWAP);
+    let borrow = new Borrow(borrowId);
+
+    borrow.hash = this.event.transaction.hash;
+    borrow.logIndex = this.event.logIndex.toI32();
+    borrow.protocol = this.protocol.getBytesID();
+    borrow.position = position;
+    borrow.to = pool.getBytesID();
+    borrow.from = this.account.id;
+    borrow.blockNumber = this.event.block.number;
+    borrow.timestamp = this.event.block.timestamp;
+    borrow.account = this.account.id;
+
+    borrow.asset = asset;
+    borrow.amount = amount;
+    borrow.amountUSD = this.protocol
+      .getTokenPricer()
+      .getAmountValueUSD(this.tokens.getOrCreateToken(asset), amount);
+    borrow.pool = pool.getBytesID();
+    borrow.save();
+
+    if (updateMetrics) this.protocol.addTransaction(TransactionType.BORROW);
+    return borrow;
   }
 
   /**
@@ -281,12 +340,12 @@ export class Account {
     const collateralId = this.getIdFromEvent(EventType.DEPOSIT);
     let collateralIn = new CollateralIn(collateralId);
 
-    collateralIn.hash = this.event.transaction.hash.toHexString();
+    collateralIn.hash = this.event.transaction.hash;
     collateralIn.logIndex = this.event.logIndex.toI32();
     collateralIn.protocol = this.protocol.getBytesID();
     collateralIn.position = position;
-    collateralIn.to = pool.getBytesID().toHexString();
-    collateralIn.from = this.account.id.toHexString();
+    collateralIn.to = pool.getBytesID();
+    collateralIn.from = this.account.id;
     collateralIn.account = this.account.id;
     collateralIn.blockNumber = this.event.block.number;
     collateralIn.timestamp = this.event.block.timestamp;
@@ -296,7 +355,10 @@ export class Account {
     collateralIn.outputTokenAmount = sharesMinted;
     collateralIn.amountUSD = this.getAmountUSD(pool.getInputTokens(), amounts);
     collateralIn.pool = pool.getBytesID();
+    collateralIn.save();
 
+    if (updateMetrics)
+      this.protocol.addTransaction(TransactionType.COLLATERAL_IN);
     return collateralIn;
   }
 
@@ -319,12 +381,12 @@ export class Account {
     const collateralId = this.getIdFromEvent(EventType.WITHDRAW);
     let collateralOut = new CollateralOut(collateralId);
 
-    collateralOut.hash = this.event.transaction.hash.toHexString();
+    collateralOut.hash = this.event.transaction.hash;
     collateralOut.logIndex = this.event.logIndex.toI32();
     collateralOut.protocol = this.protocol.getBytesID();
     collateralOut.position = position;
-    collateralOut.to = this.account.id.toHexString();
-    collateralOut.from = pool.getBytesID().toHexString();
+    collateralOut.to = this.account.id;
+    collateralOut.from = pool.getBytesID();
     collateralOut.account = this.account.id;
     collateralOut.blockNumber = this.event.block.number;
     collateralOut.timestamp = this.event.block.timestamp;
@@ -334,20 +396,23 @@ export class Account {
     collateralOut.outputTokenAmount = sharesBurnt;
     collateralOut.amountUSD = this.getAmountUSD(pool.getInputTokens(), amounts);
     collateralOut.pool = pool.getBytesID();
+    collateralOut.save();
 
+    if (updateMetrics)
+      this.protocol.addTransaction(TransactionType.COLLATERAL_OUT);
     return collateralOut;
   }
 
   /**
    *
-   * @param pool
-   * @param asset
-   * @param collateralToken
-   * @param amountLiquidated
-   * @param liquidator
-   * @param liquidatee
-   * @param position
-   * @param profitUSD
+   * @param pool The pool where the liquidation happened.
+   * @param asset Asset repaid (borrowed)
+   * @param collateralToken Token which was the collateral
+   * @param amountLiquidated Amount of collateral liquidated in native units
+   * @param liquidator Account that carried out the liquidation
+   * @param liquidatee Account that got liquidated
+   * @param position The position this Liquidate belongs to
+   * @param profitUSD Amount of profit from liquidation in USD
    * @param updateMetrics Optional, defaults to true. If true it will update the pool and protocol TVL and inputTokenBalance.
    * @returns Liquidate
    */
@@ -365,12 +430,12 @@ export class Account {
     const liquidateId = this.getIdFromEvent(EventType.LIQUIDATE);
     let liquidate = new Liquidate(liquidateId);
 
-    liquidate.hash = this.event.transaction.hash.toHexString();
+    liquidate.hash = this.event.transaction.hash;
     liquidate.logIndex = this.event.logIndex.toI32();
     liquidate.protocol = this.protocol.getBytesID();
     liquidate.position = position;
-    liquidate.to = liquidator.toHexString();
-    liquidate.from = liquidatee.toHexString();
+    liquidate.to = liquidator;
+    liquidate.from = liquidatee;
     liquidate.blockNumber = this.event.block.number;
     liquidate.timestamp = this.event.block.timestamp;
     liquidate.liquidator = liquidator;
@@ -385,7 +450,9 @@ export class Account {
       );
     liquidate.profitUSD = profitUSD;
     liquidate.pool = pool.getBytesID();
+    liquidate.save();
 
+    if (updateMetrics) this.protocol.addTransaction(TransactionType.LIQUIDATE);
     return liquidate;
   }
 
@@ -395,26 +462,44 @@ export class Account {
    * the number of unique depositors in the protocol.
    */
   countDeposit(): void {
-    if (this.account._depositCount == 0) this.protocol.addDepositor();
+    if (this.account.depositCount == 0) this.protocol.addDepositor();
 
-    this.account._depositCount += 1;
+    this.account.depositCount += 1;
     this.account.save();
 
     this.trackActivity(ActivityType.DEPOSIT);
   }
 
   /**
-   * Adds 1 to the account total borrow count. If it is the first borrow ever
-   * and the account has not withdrawn before it will also increase
-   * the number of unique borrowers in the protocol.
+   * Adds 1 to the account total withdraw count.
    */
-  countBorrow(): void {
-    if (this.account._borrowCount == 0) this.protocol.addBorrower();
-
-    this.account._borrowCount += 1;
+  countWithdraw(): void {
+    this.account.withdrawCount += 1;
     this.account.save();
+  }
 
-    this.trackActivity(ActivityType.BORROW);
+  /**
+   * Adds 1 to the account total swap count.
+   */
+  countSwap(): void {
+    this.account.swapCount += 1;
+    this.account.save();
+  }
+
+  /**
+   * Adds 1 to the account total collateralIn count.
+   */
+  countCollateralIn(): void {
+    this.account.collateralInCount += 1;
+    this.account.save();
+  }
+
+  /**
+   * Adds 1 to the account total collateralOut count.
+   */
+  countCollateralOut(): void {
+    this.account.collateralOutCount += 1;
+    this.account.save();
   }
 
   /**
@@ -423,9 +508,9 @@ export class Account {
    * the number of unique liquidation in the protocol.
    */
   countLiquidator(): void {
-    if (this.account._liquidationCount == 0) this.protocol.addLiquidator();
+    if (this.account.liquidateCount == 0) this.protocol.addLiquidator();
 
-    this.account._liquidationCount += 1;
+    this.account.liquidateCount += 1;
     this.account.save();
 
     this.trackActivity(ActivityType.LIQUIDATOR);
@@ -437,11 +522,33 @@ export class Account {
    * the number of unique liquidatee in the protocol.
    */
   countLiquidatee(): void {
-    if (this.account._liquidateCount == 0) this.protocol.addLiquidatee();
+    if (this.account.liquidationCount == 0) this.protocol.addLiquidatee();
 
-    this.account._liquidateCount += 1;
+    this.account.liquidationCount += 1;
     this.account.save();
 
     this.trackActivity(ActivityType.LIQUIDATEE);
+  }
+
+  openPosition(positionSide: constants.PositionSide): void {
+    if (positionSide == constants.PositionSide.LONG) {
+      this.account.longPositionCount += 1;
+    } else {
+      this.account.shortPositionCount += 1;
+    }
+    this.account.openPositionCount += 1;
+    this.account.save();
+  }
+
+  closePosition(positionSide: constants.PositionSide): void {
+    if (positionSide == constants.PositionSide.LONG) {
+      this.account.longPositionCount -= 1;
+    } else {
+      this.account.shortPositionCount -= 1;
+    }
+    this.account.openPositionCount -= 1;
+    this.account.closedPositionCount += 1;
+
+    this.account.save();
   }
 }

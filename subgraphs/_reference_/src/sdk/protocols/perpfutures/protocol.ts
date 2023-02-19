@@ -66,6 +66,10 @@ export class Perpetual {
       protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
       protocol.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
 
+      protocol.cumulativeInflowVolumeUSD = constants.BIGDECIMAL_ZERO;
+      protocol.cumulativeClosedInflowVolumeUSD = constants.BIGDECIMAL_ZERO;
+      protocol.cumulativeOutflowVolumeUSD = constants.BIGDECIMAL_ZERO;
+
       protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
       protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
       protocol.cumulativeStakeSideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -82,6 +86,7 @@ export class Perpetual {
       protocol.openInterestUSD = constants.BIGDECIMAL_ZERO;
 
       protocol.cumulativeUniqueUsers = 0;
+      protocol.cumulativeUniqueDepositors = 0;
       protocol.cumulativeUniqueBorrowers = 0;
       protocol.cumulativeUniqueLiquidators = 0;
       protocol.cumulativeUniqueLiquidatees = 0;
@@ -100,6 +105,10 @@ export class Perpetual {
       protocol.collateralOutCount = 0;
 
       protocol.totalPoolCount = 0;
+
+      protocol._lastSnapshotDayID = 0;
+      protocol._lastSnapshotHourID = 0;
+      protocol._lastUpdateTimestamp = constants.BIGINT_ZERO;
     }
 
     const proto = new Perpetual(protocol, pricer, event);
@@ -225,6 +234,36 @@ export class Perpetual {
    */
   setOpenInterest(openInterest: BigDecimal): void {
     this.protocol.openInterestUSD = openInterest;
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol InflowVolumeUSD. It can be a positive or negative amount.
+   * @param volume {BigDecimal} The value to add to the protocol's InflowVolumeUSD.
+   */
+  addInflowVolumeUSD(volume: BigDecimal): void {
+    this.protocol.cumulativeInflowVolumeUSD =
+      this.protocol.cumulativeInflowVolumeUSD.plus(volume);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol ClosedInflowVolumeUSD. It can be a positive or negative amount.
+   * @param volume {BigDecimal} The value to add to the protocol's ClosedInflowVolumeUSD.
+   */
+  addClosedInflowVolumeUSD(volume: BigDecimal): void {
+    this.protocol.cumulativeClosedInflowVolumeUSD =
+      this.protocol.cumulativeClosedInflowVolumeUSD.plus(volume);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol OutflowVolumeUSD. It can be a positive or negative amount.
+   * @param volume {BigDecimal} The value to add to the protocol's OutflowVolumeUSD.
+   */
+  addOutflowVolumeUSD(volume: BigDecimal): void {
+    this.protocol.cumulativeOutflowVolumeUSD =
+      this.protocol.cumulativeOutflowVolumeUSD.plus(volume);
     this.save();
   }
 
@@ -377,22 +416,38 @@ export class Perpetual {
   /**
    * Adds 1 to the cumulativePositionCount counter and adds 1 to the counter corresponding the given position type.
    * If you are creating transaction entities from the Account class you won't need to use this method.
-   * @param type {PositionType} The type of transaction to add.
+   * @param positionSide {PositionType} The type of transaction to add.
    * @see PositionType
    * @see Account
    */
-  addPosition(type: PositionType): void {
-    if (type == PositionType.LONG) {
+  addPosition(positionSide: PositionType): void {
+    if (positionSide == PositionType.LONG) {
       this.protocol.longPositionCount += 1;
-    } else if (type == PositionType.SHORT) {
+    } else if (positionSide == PositionType.SHORT) {
       this.protocol.shortPositionCount += 1;
-    } else if (type == PositionType.OPEN) {
-      this.protocol.openPositionCount += 1;
-    } else if (type == PositionType.CLOSED) {
-      this.protocol.closedPositionCount += 1;
     }
 
+    this.protocol.openPositionCount += 1;
     this.protocol.cumulativePositionCount += 1;
+    this.save();
+  }
+
+  /**
+   * Subtracts 1 from the cumulativePositionCount counter and adds 1 to the counter corresponding the given position type.
+   * If you are creating transaction entities from the Account class you won't need to use this method.
+   * @param positionSide {PositionType} The type of transaction to add.
+   * @see PositionType
+   * @see Account
+   */
+  closePosition(positionSide: PositionType): void {
+    if (positionSide == PositionType.LONG) {
+      this.protocol.longPositionCount -= 1;
+    } else if (positionSide == PositionType.SHORT) {
+      this.protocol.shortPositionCount -= 1;
+    }
+
+    this.protocol.openPositionCount -= 1;
+    this.protocol.closedPositionCount += 1;
     this.save();
   }
 
@@ -414,6 +469,7 @@ export class Perpetual {
       this.protocol.collateralInCount += 1;
     } else if (type == TransactionType.COLLATERAL_OUT) {
       this.protocol.collateralOutCount += 1;
+    } else if (type == TransactionType.LIQUIDATE) {
     }
 
     this.protocol.transactionCount += 1;

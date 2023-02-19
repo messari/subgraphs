@@ -1,4 +1,5 @@
 import { PoolManager } from "./pool";
+import { Position } from "./position";
 import { Perpetual } from "./protocol";
 import { AccountManager } from "./account";
 import * as constants from "../../util/constants";
@@ -11,6 +12,7 @@ export class SDK {
   Protocol: Perpetual;
   Accounts: AccountManager;
   Pools: PoolManager;
+  Position: Position;
   Tokens: TokenManager;
   Pricer: TokenPricer;
 
@@ -24,6 +26,7 @@ export class SDK {
     this.Tokens = new TokenManager(this.Protocol, tokenInitializer);
     this.Accounts = new AccountManager(this.Protocol, this.Tokens);
     this.Pools = new PoolManager(this.Protocol, this.Tokens);
+    this.Position = new Position(this.Protocol, this.Tokens);
     this.Pricer = pricer;
 
     this.Protocol.sdk = this;
