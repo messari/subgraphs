@@ -20,25 +20,21 @@ export function handleTransferMint(
   const token = pool.outputToken ? Token.load(pool.outputToken!) : null;
   let decimals = token ? token.decimals : DEFAULT_DECIMALS;
 
-  const outputTokenSupply = convertTokenToDecimal(
-    pool.outputTokenSupply!,
+  const liquidity = convertTokenToDecimal(
+    value,
     decimals
   );
     
-  let outputTokenSupplyUSD = pool.outputTokenPriceUSD!.times(outputTokenSupply);
+  let liquidityUSD = pool.outputTokenPriceUSD!.times(liquidity);
   if(!pool.activeLiquidity) {
     pool.activeLiquidity = BIGINT_ZERO;
   }
 
   pool.activeLiquidity = pool.activeLiquidity!.plus(value);
-  pool.activeLiquidityUSD = outputTokenSupplyUSD;
+  pool.activeLiquidityUSD = pool.activeLiquidityUSD!.plus(liquidityUSD);
 
-  if(!pool.totalLiquidity) {
-    pool.totalLiquidity = BIGINT_ZERO;
-  }
-
-  pool.totalLiquidity = pool.totalLiquidity!.plus(value);
-  pool.activeLiquidityUSD = outputTokenSupplyUSD;
+  pool.totalLiquidity = pool.activeLiquidity;
+  pool.totalLiquidityUSD = pool.activeLiquidityUSD;
 
   // if - create new mint if no mints so far or if last one is done already
   // else - This is done to remove a potential feeto mint --- Not active
@@ -93,24 +89,21 @@ export function handleTransferBurn(
   const token = pool.outputToken ? Token.load(pool.outputToken!) : null;
   let decimals = token ? token.decimals : DEFAULT_DECIMALS;
   
-  const outputTokenSupply = convertTokenToDecimal(
-    pool.outputTokenSupply!,
+  const liquidity = convertTokenToDecimal(
+    value,
     decimals
   );
     
-  let outputTokenSupplyUSD = pool.outputTokenPriceUSD!.times(outputTokenSupply);
+  let liquidityUSD = pool.outputTokenPriceUSD!.times(liquidity);
   
   if(!pool.activeLiquidity) {
     pool.activeLiquidity = BIGINT_ZERO;
   }
   pool.activeLiquidity = pool.activeLiquidity!.minus(value);
-  pool.activeLiquidityUSD = outputTokenSupplyUSD;
+  pool.activeLiquidityUSD = pool.activeLiquidityUSD!.minus(liquidityUSD);
 
-  if(!pool.totalLiquidity) {
-    pool.totalLiquidity = BIGINT_ZERO;
-  }
-  pool.totalLiquidity = pool.totalLiquidity!.minus(value);
-  pool.totalLiquidityUSD = outputTokenSupplyUSD
+  pool.totalLiquidity = pool.activeLiquidity;
+  pool.totalLiquidityUSD = pool.activeLiquidityUSD;
 
   // Uses address from the transfer to pool part of the burn. Set transfer type from this handler.
   if (transfer.type == TransferType.BURN) {
