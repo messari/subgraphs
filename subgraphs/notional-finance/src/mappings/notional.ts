@@ -337,12 +337,3 @@ export function handleLiquidatefCash(event: LiquidatefCashEvent): void {
 
   createLiquidate(event, currencyId, liquidator, liquidatee, amount);
 }
-
-let item: BigDecimal = BIGDECIMAL_ZERO;
-export function avg(arr: Array<BigDecimal>): BigDecimal {
-  arr.forEach((value) => {
-    item = item.plus(value);
-  });
-  const arrLength = BigDecimal.fromString(arr.length.toString());
-  return item.div(arrLength);
-}
