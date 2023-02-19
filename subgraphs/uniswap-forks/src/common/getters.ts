@@ -134,6 +134,10 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.cumulativeUniqueTraders = INT_ZERO;
     protocol.openPositionCount = INT_ZERO;
     protocol.cumulativePositionCount = INT_ZERO;
+    protocol.activeLiquidity = BIGINT_ZERO;
+    protocol.activeLiquidityUSD = BIGDECIMAL_ZERO;
+    protocol.totalLiquidity = BIGINT_ZERO;
+    protocol.totalLiquidityUSD = BIGDECIMAL_ZERO;
 
     protocol.network = NetworkConfigs.getNetwork();
     protocol.type = ProtocolType.EXCHANGE;
