@@ -17,12 +17,15 @@ The library is initialized via a single constructor and a single import:
 ```typescript
 import { SDK } from "./sdk/protocols/bridge";
 
-const sdk = new SDK(conf, pricer, tokenInit, event);
+const sdk = SDK.initialize(conf, pricer, tokenInit, event);
+
+// ALSO accepts ethereum.Call
+// const sdk = SDK.initialize(conf, pricer, tokenInit, call);
 ```
 
 Where:
 
-- `event` is the event being handled by the handler making use of the SDK
+- `event`/`call` is the event/function being handled by the handler making use of the SDK
 - `conf` should be an implementation of `BridgeConfigurer`. For convenience you can find an implementation that you can import directly at `./sdk/protocols/bridge/config`
 - `pricer` should be an implementation of `TokenPricer`, found at `./sdk/protocols/config`. It allows the library to automatically calculate prices internally. Implementing it yourself allows you to use any pricing source you'd need.
 - `tokenInit` should be an implementation of `./sdk/protocols/bridge/tokens:TokenInitializer`. It is used to populate the `Token` entity for the first time, and was decided to require it to be implemented to avoid the library depending on ABIs and to give some flexibility in case we need to deal with non-compliant ERC20 tokens.
@@ -52,11 +55,15 @@ Here's the interface for your reference, refer to the jsdoc for more details:
 interface Protocol {
   getID(): string;
   getBytesID(): string;
-  getCurrentEvent(): ethereum.Event;
+  getCurrentEvent(): CustomEventType;
   getTokenPricer(): TokenPricer;
   getCurrentChainID(): BigInt;
   setTotalValueLocked(tvl: BigDecimal): void;
   addTotalValueLocked(tvl: BigDecimal): void;
+  addTotalValueExportedUSD(tve: BigDecimal): void;
+  setTotalValueExportedUSD(tve: BigDecimal): void;
+  addTotalValueImportedUSD(tvi: BigDecimal): void;
+  setTotalValueImportedUSD(tvi: BigDecimal): void;
   addSupplySideRevenueUSD(rev: BigDecimal): void;
   addProtocolSideRevenueUSD(rev: BigDecimal): void;
   addRevenueUSD(protocolSide: BigDecimal, supplySide: BigDecimal): void;
@@ -157,7 +164,7 @@ import { SDK, Pool } from "./sdk/protocols/bridge";
 type PoolType = string;
 
 export function handlePoolCreated(event: PoolCreated): void {
-  const sdk = new SDK(conf, pricer, tokenInit, event);
+  const sdk = SDK.initialize(conf, pricer, tokenInit, event);
 
   const id = event.params.poolAddress;
   const aux: PoolType =
@@ -218,6 +225,9 @@ interface Pool {
   refreshTotalValueLocked(): void;
   setTotalValueLocked(newTVL: BigDecimal): void;
   addTotalValueLocked(delta: BigDecimal): void;
+  setNetValueExportedUSD(newNetValueExported: BigDecimal): void;
+  addNetValueExportedUSD(delta: BigDecimal): void;
+  refreshNetValueExportedUSD(): void;
   getInputTokenAmountPrice(amount: BigInt): BigDecimal;
   addInputTokenBalance(amount: BigInt, updateMetrics: bool = true): void;
   setInputTokenBalance(newBalance: BigInt, updateMetrics: bool = true): void;
@@ -266,6 +276,8 @@ All the rest you probably won't need unless you don't create transfers|deposits|
 ### _sdk.Tokens_
 
 This is a simple utility class to instantiate tokens and crossChainTokens easily. It also exposes a `registerSupportedToken`, which you probably don't need, since it is called as part of the `Pool.initialize`.
+
+It also exposes an optional method `setTokenPresaver(presaver: TokenPresaver)`, which allows you to inject a class that implements `TokenPresaver`. What this will do is to call `preSaveToken(token: Token): Token` when initializing a new token right before calling `.save()`. This allows you to add extra context to the Token entity if you need to do so.
 
 ### _sdk.Pricer_
 
@@ -324,7 +336,7 @@ const conf = new BridgeConfig(
 );
 
 export function handleTransferOut(event: TransferOut): void {
-  const sdk = new SDK(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
   const poolID = event.address;
   const pool = sdk.Pools.loadPool(
@@ -368,7 +380,7 @@ function onCreatePool(
 const rewardTokenAddress = "0x0.....";
 
 export function handlePoolRewardsUpdated(event: PoolRewardsUpdated): void {
-  const sdk = new SDK(conf, new Pricer(), new TokenInit(), event);
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
   const pool = sdk.Pools.loadPool(event.params.poolAddress);
   const rewardToken = sdk.Tokens.getOrCreateToken(rewardTokenAddress);

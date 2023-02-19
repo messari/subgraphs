@@ -1,10 +1,11 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Versions } from "../../src/versions";
 
 ////////////////////
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_SCHEMA_VERSION = Versions.getSchemaVersion();
 
 /////////////////////
 ///// Protocols /////
@@ -38,7 +39,7 @@ export namespace Network {
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
   export const MATIC = "MATIC"; // aka Polygon
-  export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const GNOSIS = "GNOSIS"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {

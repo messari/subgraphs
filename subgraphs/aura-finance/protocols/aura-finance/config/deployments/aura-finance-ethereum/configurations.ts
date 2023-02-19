@@ -16,7 +16,7 @@ export class AuraFinanceMainnetConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x7818A1DA7BD1E64c199029E86Ba244a9798eEE10";
+    return "0xA57b8d98dAE62B26Ec3bcC4a365338157060B234";
   }
   getRewardToken(): string {
     return "0xC0c293ce456fF0ED870ADd98a0828Dd4d2903DBF";

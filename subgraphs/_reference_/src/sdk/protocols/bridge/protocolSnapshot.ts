@@ -1,4 +1,4 @@
-import { ethereum, Bytes } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
 import { AccountWasActive } from "./account";
 import {
   BridgeProtocol as BridgeProtocolSchema,
@@ -13,6 +13,7 @@ import {
   SECONDS_PER_DAY_BI,
   SECONDS_PER_HOUR_BI,
 } from "../../util/constants";
+import { CustomEventType } from "../../util/events";
 
 const SnapshotHelperID = Bytes.fromUTF8("_ProtocolSnapshotHelper");
 const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
@@ -27,11 +28,11 @@ const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
  */
 export class ProtocolSnapshot {
   protocol: BridgeProtocolSchema;
-  event: ethereum.Event;
+  event: CustomEventType;
   helper: _ProtocolSnapshotHelper;
   activityHelper: _ActivityHelper;
 
-  constructor(protocol: BridgeProtocolSchema, event: ethereum.Event) {
+  constructor(protocol: BridgeProtocolSchema, event: CustomEventType) {
     this.protocol = protocol;
     this.event = event;
     this.helper = initProtocolHelper();
@@ -112,6 +113,8 @@ export class ProtocolSnapshot {
 
     // tvl
     snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+    snapshot.totalValueExportedUSD = protocol.totalValueExportedUSD;
+    snapshot.totalValueImportedUSD = protocol.totalValueImportedUSD;
     snapshot.protocolControlledValueUSD = protocol.protocolControlledValueUSD;
 
     // revenues

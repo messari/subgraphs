@@ -43,7 +43,7 @@ import {
   getOrCreatePosition,
   getOrCreateAccount,
 } from "./getters";
-import { convertTokenToDecimal, isSameSign } from "./utils/utils";
+import { convertTokenToDecimal } from "./utils/utils";
 import {
   updateDepositHelper,
   updateTokenWhitelists,

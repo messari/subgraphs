@@ -1,6 +1,6 @@
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 import { useEffect } from "react";
-import { percentageFieldList } from "../constants";
+import { negativeFieldList, percentageFieldList } from "../constants";
 import { convertTokenDecimals, formatIntToFixed2 } from "../utils";
 import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
 
@@ -24,7 +24,7 @@ function checkValueFalsey(
     valueMsg = "empty";
   } else if (!value || Number(value) === 0) {
     valueMsg = value;
-  } else if (Number(value) < 0) {
+  } else if (Number(value) < 0 && !negativeFieldList.includes(fieldName)) {
     valueMsg = "negative";
     level = "critical";
   }
@@ -167,7 +167,7 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
             let rewardFactorsStr = "N/A";
             let rewardAPRs: string[] = entityData?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
               let apr = 0;
-              if (protocolType === "LENDING" && (entityData.rewardTokens[idx]?.type === "BORROW" || entityData.rewardTokens[idx]?.token?.type === "BORROW")) {
+              if (protocolType === "LENDING" && (entityData.rewardTokens[idx]?.type?.includes("BORROW") || entityData.rewardTokens[idx]?.token?.type?.includes("BORROW"))) {
                 if (
                   !Number(entityData.totalBorrowBalanceUSD) &&
                   issues.filter(
@@ -352,7 +352,7 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
               if (
                 !Number(val.decimals) &&
                 Number(val.decimals) !== 0 &&
-                issues.filter((x) => x.fieldName === label).length === 0
+                issues.filter((x) => x.fieldName === label)?.length === 0
               ) {
                 issues.push({ message: "", type: "DEC", level: "critical", fieldName: label });
               }
@@ -396,6 +396,13 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
               return entityData.inputTokens[idx].name || "TOKEN [" + idx + "]";
             });
             dataType += " [" + tokenNames.join(",") + "]";
+          } else if (fieldName.toUpperCase() === "ROUTES") {
+            value = value.map((val: { [x: string]: any }) => {
+              return {
+                id: val.id,
+                network: val.crossToken.network
+              };
+            });
           } else if (fieldName.toUpperCase() === "POSITIONS") {
             // ignore positions
             return null;

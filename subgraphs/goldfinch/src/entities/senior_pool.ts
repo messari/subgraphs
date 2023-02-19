@@ -3,11 +3,7 @@ import { SeniorPool, SeniorPoolStatus } from "../../generated/schema";
 import { SeniorPool as SeniorPoolContract } from "../../generated/SeniorPool/SeniorPool";
 import { Fidu as FiduContract } from "../../generated/SeniorPool/Fidu";
 import { USDC as UsdcContract } from "../../generated/SeniorPool/USDC";
-import {
-  BIGINT_ZERO,
-  CONFIG_KEYS_ADDRESSES,
-  SECONDS_PER_YEAR,
-} from "../common/constants";
+import { CONFIG_KEYS_ADDRESSES, SECONDS_PER_YEAR } from "../common/constants";
 import { calculateEstimatedInterestForTranchedPool } from "./helpers";
 import { getStakingRewards } from "./staking_rewards";
 import { bigDecimalToBigInt, getAddressFromConfig } from "../common/utils";
@@ -37,7 +33,6 @@ export function getOrInitSeniorPoolStatus(): SeniorPoolStatus {
   if (!poolStatus) {
     poolStatus = new SeniorPoolStatus(SENIOR_POOL_STATUS_ID);
     poolStatus.rawBalance = new BigInt(0);
-    poolStatus.compoundBalance = new BigInt(0);
     poolStatus.balance = new BigInt(0);
     poolStatus.totalShares = new BigInt(0);
     poolStatus.sharePrice = new BigInt(0);
@@ -85,10 +80,6 @@ export function updatePoolStatus(event: ethereum.Event): void {
   );
 
   const sharePrice = seniorPoolContract.sharePrice();
-  // SENIOR POOL implement was upgraded with this transaction and deprecated compoundBalance()
-  // https://etherscan.io/tx/0x0d54c34ffa6a11afd95d42e69f7c171b38b99b3157d26812db165415e4e3b5c4
-  const compoundBalanceResult = seniorPoolContract.try_compoundBalance();
-  const compoundBalance = getOrElse<BigInt>(compoundBalanceResult, BIGINT_ZERO);
   const totalLoansOutstanding = seniorPoolContract.totalLoansOutstanding();
   const totalSupply = fidu_contract.totalSupply();
   const totalPoolAssets = totalSupply.times(sharePrice);
@@ -108,7 +99,6 @@ export function updatePoolStatus(event: ethereum.Event): void {
   const poolStatus = SeniorPoolStatus.load(
     seniorPool.latestPoolStatus
   ) as SeniorPoolStatus;
-  poolStatus.compoundBalance = compoundBalance;
   poolStatus.totalLoansOutstanding = totalLoansOutstanding;
   poolStatus.totalShares = totalSupply;
   poolStatus.balance = balance;
@@ -161,11 +151,4 @@ export function recalculateSeniorPoolAPY(poolStatus: SeniorPoolStatus): void {
   }
 
   poolStatus.save();
-}
-
-function getOrElse<T>(result: ethereum.CallResult<T>, defaultValue: T): T {
-  if (result.reverted) {
-    return defaultValue;
-  }
-  return result.value;
 }

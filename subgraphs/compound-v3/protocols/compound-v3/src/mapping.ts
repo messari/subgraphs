@@ -59,9 +59,11 @@ import {
   DEFAULT_DECIMALS,
   REWARDS_ADDRESS,
   MARKET_PREFIX,
+  USDC_COMET_WETH_MARKET_ID,
+  WETH_COMET_ADDRESS,
 } from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
-import { Token } from "../../../generated/schema";
+import { Market, Token } from "../../../generated/schema";
 import { CometRewards } from "../../../generated/templates/Comet/CometRewards";
 import { TokenManager } from "../../../src/sdk/token";
 import { AccountManager } from "../../../src/sdk/account";
@@ -255,6 +257,10 @@ export function handleSetBaseTrackingBorrowSpeed(
       [event.params.cometProxy.toHexString()]
     );
     return;
+  } else {
+    log.warning("base speed; {}", [
+      event.params.newBaseTrackingBorrowSpeed.toString(),
+    ]);
   }
 
   const marketID = event.params.cometProxy.concat(tryBaseToken.value);
@@ -970,6 +976,15 @@ function updateRewards(
     return;
   }
 
+  const tryBaseTrackingBorrow = cometContract.try_baseTrackingBorrowSpeed();
+  const tryBaseTrackingSupply = cometContract.try_baseTrackingSupplySpeed();
+  if (tryBaseTrackingBorrow.reverted || tryBaseTrackingSupply.reverted) {
+    log.error(
+      "[updateRewards] Contract call on base tracking speed failed on market: {}",
+      [market.id.toHexString()]
+    );
+  }
+
   const rewardToken = new TokenManager(tryRewardConfig.value.value0, event);
   const decimals = rewardToken.getDecimals();
   const borrowRewardToken = rewardToken.getOrCreateRewardToken(
@@ -978,10 +993,13 @@ function updateRewards(
   const supplyRewardToken = rewardToken.getOrCreateRewardToken(
     RewardTokenType.DEPOSIT
   );
+  market._baseTrackingBorrowSpeed = tryBaseTrackingBorrow.value;
+  market._baseTrackingSupplySpeed = tryBaseTrackingSupply.value;
+  market.save();
 
   // Reward tokens emitted per day as follows:
   // tokens/day = (speed * SECONDS_PER_DAY) / trackingIndexScale
-  const supplyRewardPerDay = BigInt.fromString(
+  const borrowRewardPerDay = BigInt.fromString(
     market
       ._baseTrackingBorrowSpeed!.times(BigInt.fromI64(SECONDS_PER_DAY))
       .div(tryTrackingIndexScale.value)
@@ -990,7 +1008,7 @@ function updateRewards(
       .truncate(0)
       .toString()
   );
-  const borrowRewardPerDay = BigInt.fromString(
+  const supplyRewardPerDay = BigInt.fromString(
     market
       ._baseTrackingSupplySpeed!.times(BigInt.fromI64(SECONDS_PER_DAY))
       .div(tryTrackingIndexScale.value)
@@ -1147,7 +1165,27 @@ function getPrice(priceFeed: Address, cometContract: Comet): BigDecimal {
     return BIGDECIMAL_ZERO;
   }
 
+  // The WETH market was deployed at block 16400710: https://etherscan.io/tx/0xfd5e08c8c8a524fcfa3f481b452067d41033644175bc5c3be6a8397847df27fa
+  // In this market the price is returned in ETH, so we need to convert to USD
+  // Comet address: 0xA17581A9E3356d9A858b789D68B4d866e593aE94
+  if (cometContract._address == Address.fromHexString(WETH_COMET_ADDRESS)) {
+    const wethPriceUSD = getWETHPriceUSD();
+    return bigIntToBigDecimal(tryPrice.value, COMPOUND_DECIMALS).times(
+      wethPriceUSD
+    );
+  }
+
   return bigIntToBigDecimal(tryPrice.value, COMPOUND_DECIMALS);
+}
+
+// get the price of WETH in USD
+function getWETHPriceUSD(): BigDecimal {
+  const market = Market.load(Bytes.fromHexString(USDC_COMET_WETH_MARKET_ID));
+  if (!market) {
+    return BIGDECIMAL_ZERO;
+  }
+
+  return market.inputTokenPriceUSD;
 }
 
 function isMint(event: ethereum.Event): BigInt | null {

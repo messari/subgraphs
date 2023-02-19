@@ -391,6 +391,9 @@ type LiquidityPool @entity {
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
 
+  " inputTokens in native (contract) order "
+  _inputTokensOrdered: [String!]!
+
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 
@@ -465,6 +468,9 @@ type LiquidityPool @entity {
 
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
+
+  " Registry that deployed this pool "
+  _registryAddress: String!
 
   " Liquidity Gauge assocaited with this pool "
   _gaugeAddress: String!
@@ -819,8 +825,11 @@ type _LpToken @entity {
   " { Address of the LP Token } "
   id: ID!
 
-  " Address of the pool associated with this liquidity gauge "
+  " Address of the pool associated with this token "
   poolAddress: String!
+
+  " Address of the registry associated with this token "
+  registryAddress: String!
 }
 
 type _CircularBuffer @entity {

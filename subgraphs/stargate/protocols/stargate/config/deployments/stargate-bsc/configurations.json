@@ -1,0 +1,17 @@
+{
+  "deployment": "STARGATE_BSC",
+  "network": "bsc",
+  "file": "./src/mappings/handlers.ts",
+  "router": {
+    "address": "0x4a364f8c717cAAD9A442737Eb7b8A55cc6cf18D8",
+    "startBlock": 16132205
+  },
+  "lpStaking": {
+    "address": "0x3052A0F6ab15b4AE1df39962d5DdEFacA86DaB47",
+    "startBlock": 16132220,
+    "abi": "LPStaking"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

@@ -28,11 +28,11 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
 
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
-  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
-  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
 
-  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
-  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
 
   const [indexingStatus, setIndexingStatus] = useState<any>(false);
   const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
@@ -149,8 +149,11 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
           <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
             {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
           </span>
-          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("protocols-list")}>
+          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("protocols-list")}>
             Protocols To Develop
+          </span>
+          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("version-comparison")}>
+            Version Comparison
           </span>
         </div>
         {devCountTable}

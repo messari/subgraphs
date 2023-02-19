@@ -17,14 +17,14 @@ import {
   Market,
   Oracle,
   Repay,
-  RevenueDetails,
+  RevenueDetail,
   RewardToken,
   Token,
   Transfer,
   Withdraw,
   _MarketList,
-} from "../../../../generated/schema";
-import { Versions } from "../../../versions";
+} from "../../generated/schema";
+import { Versions } from "../versions";
 import { AccountManager } from "./account";
 import {
   activityCounter,
@@ -282,13 +282,15 @@ export class DataManager {
     rate.rate = interestRate;
     rate.save();
 
-    if (!this.market.rates) {
-      this.market.rates = [];
+    let marketRates = this.market.rates;
+    if (!marketRates) {
+      marketRates = [];
     }
 
-    if (this.market.rates!.indexOf(interestRateID) == -1) {
-      this.market.rates!.push(interestRateID);
+    if (marketRates.indexOf(interestRateID) == -1) {
+      marketRates.push(interestRateID);
     }
+    this.market.rates = marketRates;
     this.market.save();
 
     return rate;
@@ -309,14 +311,17 @@ export class DataManager {
     fee.flatFee = flatFee;
     fee.save();
 
-    if (!this.protocol.fees) {
-      this.protocol.fees = [];
+    let protocolFees = this.protocol.fees;
+    if (!protocolFees) {
+      protocolFees = [];
     }
 
-    if (this.protocol.fees!.indexOf(feeType) == -1) {
-      this.protocol.fees!.push(feeType);
+    if (protocolFees.indexOf(feeType) == -1) {
+      protocolFees!.push(feeType);
     }
+    this.protocol.fees = protocolFees;
     this.protocol.save();
+
     return fee;
   }
 
@@ -324,10 +329,10 @@ export class DataManager {
     return Address.fromBytes(this.market.id);
   }
 
-  getOrCreateRevenueDetails(id: Bytes): RevenueDetails {
-    let details = RevenueDetails.load(id);
+  getOrCreateRevenueDetail(id: Bytes): RevenueDetail {
+    let details = RevenueDetail.load(id);
     if (!details) {
-      details = new RevenueDetails(id);
+      details = new RevenueDetail(id);
       details.sources = [];
       details.amountsUSD = [];
       details.save();
@@ -921,13 +926,13 @@ export class DataManager {
       fee = this.getOrUpdateFee(FeeType.OTHER);
     }
 
-    const marketRevDetails = this.getOrCreateRevenueDetails(this.market.id);
-    const protocolRevenueDetails = this.getOrCreateRevenueDetails(
+    const marketRevDetails = this.getOrCreateRevenueDetail(this.market.id);
+    const protocolRevenueDetail = this.getOrCreateRevenueDetail(
       this.protocol.id
     );
 
     this.insertInOrder(marketRevDetails, protocolRevenueDelta, fee.id);
-    this.insertInOrder(protocolRevenueDetails, protocolRevenueDelta, fee.id);
+    this.insertInOrder(protocolRevenueDetail, protocolRevenueDelta, fee.id);
   }
 
   //
@@ -943,13 +948,13 @@ export class DataManager {
       fee = this.getOrUpdateFee(FeeType.OTHER);
     }
 
-    const marketRevDetails = this.getOrCreateRevenueDetails(this.market.id);
-    const protocolRevenueDetails = this.getOrCreateRevenueDetails(
+    const marketRevDetails = this.getOrCreateRevenueDetail(this.market.id);
+    const protocolRevenueDetail = this.getOrCreateRevenueDetail(
       this.protocol.id
     );
 
     this.insertInOrder(marketRevDetails, supplyRevenueDelta, fee.id);
-    this.insertInOrder(protocolRevenueDetails, supplyRevenueDelta, fee.id);
+    this.insertInOrder(protocolRevenueDetail, supplyRevenueDelta, fee.id);
   }
 
   private updateRevenue(
@@ -1140,9 +1145,9 @@ export class DataManager {
 
   //
   //
-  // Insert revenue in RevenueDetails in order (alphabetized)
+  // Insert revenue in RevenueDetail in order (alphabetized)
   private insertInOrder(
-    details: RevenueDetails,
+    details: RevenueDetail,
     amountUSD: BigDecimal,
     associatedSource: string
   ): void {
