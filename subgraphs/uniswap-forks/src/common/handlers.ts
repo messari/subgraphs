@@ -1,6 +1,6 @@
 import { ethereum, BigInt, log } from "@graphprotocol/graph-ts";
 import { getOrCreateAccount, getOrCreatePosition, getOrCreateProtocol, getOrCreateTransfer } from "./getters";
-import { BIGINT_ZERO, DEFAULT_DECIMALS, TransferType } from "./constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, TransferType } from "./constants";
 import { LiquidityPool, Token, _PositionCounter } from "../../generated/schema";
 import { ADDRESS_ZERO } from "../../../ellipsis-finance/src/common/constants";
 import { convertTokenToDecimal } from "./utils/utils";
@@ -30,6 +30,9 @@ export function handleTransferMint(
   if(!pool.activeLiquidity) {
     pool.activeLiquidity = BIGINT_ZERO;
   }
+  if(!pool.activeLiquidityUSD) {
+    pool.activeLiquidityUSD = BIGDECIMAL_ZERO;
+  }
 
   pool.activeLiquidity = pool.activeLiquidity!.plus(value);
   pool.activeLiquidityUSD = pool.activeLiquidityUSD!.plus(liquidityUSD);
@@ -37,8 +40,8 @@ export function handleTransferMint(
   pool.totalLiquidity = pool.activeLiquidity;
   pool.totalLiquidityUSD = pool.activeLiquidityUSD;
 
-  protocol.activeLiquidity = protocol.activeLiquidity!.minus(value);
-  protocol.activeLiquidityUSD = protocol.activeLiquidityUSD!.minus(liquidityUSD)
+  protocol.activeLiquidity = protocol.activeLiquidity!.plus(value);
+  protocol.activeLiquidityUSD = protocol.activeLiquidityUSD!.plus(liquidityUSD)
   protocol.totalLiquidity = protocol.activeLiquidity;
   protocol.totalLiquidityUSD = protocol.activeLiquidityUSD;
 
