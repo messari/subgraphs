@@ -1,5 +1,5 @@
 import { ethereum, BigInt, log } from "@graphprotocol/graph-ts";
-import { getOrCreateAccount, getOrCreatePosition, getOrCreateTransfer } from "./getters";
+import { getOrCreateAccount, getOrCreatePosition, getOrCreateProtocol, getOrCreateTransfer } from "./getters";
 import { BIGINT_ZERO, DEFAULT_DECIMALS, TransferType } from "./constants";
 import { LiquidityPool, Token, _PositionCounter } from "../../generated/schema";
 import { ADDRESS_ZERO } from "../../../ellipsis-finance/src/common/constants";
@@ -13,6 +13,7 @@ export function handleTransferMint(
   to: string
 ): void {
   const transfer = getOrCreateTransfer(event);
+  const protocol = getOrCreateProtocol();
 
   // Tracks supply of minted LP tokens
   pool.outputTokenSupply = pool.outputTokenSupply!.plus(value);
@@ -36,6 +37,11 @@ export function handleTransferMint(
   pool.totalLiquidity = pool.activeLiquidity;
   pool.totalLiquidityUSD = pool.activeLiquidityUSD;
 
+  protocol.activeLiquidity = protocol.activeLiquidity!.minus(value);
+  protocol.activeLiquidityUSD = protocol.activeLiquidityUSD!.minus(liquidityUSD)
+  protocol.totalLiquidity = protocol.activeLiquidity;
+  protocol.totalLiquidityUSD = protocol.activeLiquidityUSD;
+
   // if - create new mint if no mints so far or if last one is done already
   // else - This is done to remove a potential feeto mint --- Not active
   if (!transfer.type) {
@@ -53,6 +59,7 @@ export function handleTransferMint(
 
   transfer.save();
   pool.save();
+  protocol.save();
 }
 
 /**
@@ -82,6 +89,7 @@ export function handleTransferBurn(
   from: string
 ): void {
   const transfer = getOrCreateTransfer(event);
+  const protocol = getOrCreateProtocol();
 
   // Tracks supply of minted LP tokens
   pool.outputTokenSupply = pool.outputTokenSupply!.minus(value);
@@ -105,6 +113,11 @@ export function handleTransferBurn(
   pool.totalLiquidity = pool.activeLiquidity;
   pool.totalLiquidityUSD = pool.activeLiquidityUSD;
 
+  protocol.activeLiquidity = protocol.activeLiquidity!.minus(value);
+  protocol.activeLiquidityUSD = protocol.activeLiquidityUSD!.minus(liquidityUSD)
+  protocol.totalLiquidity = protocol.activeLiquidity;
+  protocol.totalLiquidityUSD = protocol.activeLiquidityUSD;
+
   // Uses address from the transfer to pool part of the burn. Set transfer type from this handler.
   if (transfer.type == TransferType.BURN) {
     transfer.liquidity = value;
@@ -116,6 +129,7 @@ export function handleTransferBurn(
 
   transfer.save();
   pool.save();
+  protocol.save();
 }
 
 export function handleTransferPosition(
