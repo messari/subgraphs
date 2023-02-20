@@ -8,13 +8,11 @@ import FetchPendingSubgraphVersion from "./FetchPendingSubgraphVersion";
 interface FetchSubgraphVersionProps {
     subgraphEndpoint: string;
     slug: string;
-    queryString: string;
     setDeployments: any;
 }
 
-function FetchSubgraphVersion({ subgraphEndpoint, slug, queryString, setDeployments }: FetchSubgraphVersionProps) {
+function FetchSubgraphVersion({ subgraphEndpoint, slug, setDeployments }: FetchSubgraphVersionProps) {
     const client = useMemo(() => NewClient(subgraphEndpoint), []);
-    const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
 
     // Generate query from subgraphEndpoints
     const [fetchProtocolMeta, {
@@ -24,18 +22,8 @@ function FetchSubgraphVersion({ subgraphEndpoint, slug, queryString, setDeployme
         client: client,
     });
 
-    const [fetchPendingIndexData, {
-        data: pendingIndexData,
-    }] = useLazyQuery(getPendingSubgraphId, {
-        variables: { subgraphName: queryString },
-        client: clientIndexing,
-    });
-
     useEffect(() => {
         fetchProtocolMeta();
-        if (queryString) {
-            fetchPendingIndexData();
-        }
     }, [])
 
     useEffect(() => {
@@ -52,10 +40,6 @@ function FetchSubgraphVersion({ subgraphEndpoint, slug, queryString, setDeployme
         }
     }, [protocolMetaError])
 
-    // No need to return a JSX element to render, function needed for state management
-    if (pendingIndexData?.indexingStatusForPendingVersion?.subgraph) {
-        return <FetchPendingSubgraphVersion subgraphEndpoint={"https://api.thegraph.com/subgraphs/id/" + pendingIndexData?.indexingStatusForPendingVersion?.subgraph} slug={slug + " (Pending)"} setDeployments={setDeployments} />
-    }
     return null;
 }
 

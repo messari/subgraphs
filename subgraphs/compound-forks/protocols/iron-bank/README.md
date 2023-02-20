@@ -68,6 +68,10 @@ Price of IB token on Optimism is obtained from [Beethoven X rETH-IB Pool](https:
 
 Not applicable.
 
+## Notes
+
+- The Avalanche deployment of Iron Bank has market names like `Cream Asset` because that is what the contract call `name()` returned when the contract was initially deployed.
+
 ## Resources
 
 - Protocol: https://app.ib.xyz/
