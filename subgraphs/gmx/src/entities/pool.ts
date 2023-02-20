@@ -25,6 +25,7 @@ import {
   increaseProtocolSideRevenue,
   increaseProtocolSupplySideRevenue,
   updateProtocolOpenInterestUSD,
+  incrementProtocolUniqueUsers,
 } from "./protocol";
 import { getOrCreateToken, updateTokenPrice } from "./token";
 import {
@@ -37,8 +38,13 @@ import {
   BIGDECIMAL_THOUSAND,
   POOL_NAME,
   POOL_SYMBOL,
+  INT_NEGATIVE_ONE,
 } from "../utils/constants";
-import { convertTokenToDecimal, multiArraySort } from "../utils/numbers";
+import {
+  convertTokenToDecimal,
+  multiArraySort,
+  poolArraySort,
+} from "../utils/numbers";
 import { enumToPrefix } from "../utils/strings";
 
 export function getOrCreateLiquidityPool(event: ethereum.Event): LiquidityPool {
@@ -97,11 +103,20 @@ export function getOrCreateLiquidityPool(event: ethereum.Event): LiquidityPool {
     pool.rewardTokenEmissionsUSD = [];
 
     pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    pool._cumulativeInflowVolumeUSD = BIGDECIMAL_ZERO;
-    pool._cumulativeClosedInflowVolumeUSD = BIGDECIMAL_ZERO;
-    pool._cumulativeOutflowVolumeUSD = BIGDECIMAL_ZERO;
+    pool._cumulativeVolumeByTokenAmount = [];
+    pool._cumulativeVolumeByTokenUSD = [];
+    pool.cumulativeInflowVolumeUSD = BIGDECIMAL_ZERO;
+    pool._cumulativeInflowVolumeByTokenAmount = [];
+    pool._cumulativeInflowVolumeByTokenUSD = [];
+    pool.cumulativeClosedInflowVolumeUSD = BIGDECIMAL_ZERO;
+    pool._cumulativeClosedInflowVolumeByTokenAmount = [];
+    pool._cumulativeClosedInflowVolumeByTokenUSD = [];
+    pool.cumulativeOutflowVolumeUSD = BIGDECIMAL_ZERO;
+    pool._cumulativeOutflowVolumeByTokenAmount = [];
+    pool._cumulativeOutflowVolumeByTokenUSD = [];
 
-    pool._fundingrate = [];
+    pool.fundingrate = [];
+    pool.cumulativeUniqueUsers = INT_ZERO;
     pool._lastSnapshotDayID = INT_ZERO;
     pool._lastSnapshotHourID = INT_ZERO;
     pool._lastUpdateTimestamp = BIGINT_ZERO;
@@ -119,32 +134,114 @@ export function getOrCreateLiquidityPool(event: ethereum.Event): LiquidityPool {
 export function increasePoolVolume(
   event: ethereum.Event,
   pool: LiquidityPool,
-  amountUSD: BigDecimal,
+  sizeUSDDelta: BigDecimal,
+  collateralTokenAddress: Address | null,
+  collateralTokenAmountDelta: BigInt,
+  collateralUSDDelta: BigDecimal,
   eventType: EventType
 ): void {
+  let collateralTokenIndex = INT_NEGATIVE_ONE;
+  if (collateralTokenAddress) {
+    collateralTokenIndex = pool.inputTokens.indexOf(collateralTokenAddress);
+  }
+
   switch (eventType) {
     case EventType.CollateralIn:
-      pool._cumulativeInflowVolumeUSD =
-        pool._cumulativeInflowVolumeUSD.plus(amountUSD);
+      pool.cumulativeInflowVolumeUSD =
+        pool.cumulativeInflowVolumeUSD.plus(collateralUSDDelta);
+      pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(sizeUSDDelta);
+
+      const cumulativeInflowVolumeByTokenAmount =
+        pool._cumulativeInflowVolumeByTokenAmount;
+      const cumulativeInflowVolumeByTokenUSD =
+        pool._cumulativeInflowVolumeByTokenUSD;
+      if (collateralTokenIndex >= 0) {
+        cumulativeInflowVolumeByTokenAmount[collateralTokenIndex] =
+          cumulativeInflowVolumeByTokenAmount[collateralTokenIndex].plus(
+            collateralTokenAmountDelta
+          );
+        cumulativeInflowVolumeByTokenUSD[collateralTokenIndex] =
+          cumulativeInflowVolumeByTokenUSD[collateralTokenIndex].plus(
+            collateralUSDDelta
+          );
+      }
+      pool._cumulativeInflowVolumeByTokenAmount =
+        cumulativeInflowVolumeByTokenAmount;
+      pool._cumulativeInflowVolumeByTokenUSD = cumulativeInflowVolumeByTokenUSD;
+
       break;
     case EventType.CollateralOut:
-      pool._cumulativeOutflowVolumeUSD =
-        pool._cumulativeOutflowVolumeUSD.plus(amountUSD);
+      pool.cumulativeOutflowVolumeUSD =
+        pool.cumulativeOutflowVolumeUSD.plus(collateralUSDDelta);
+      pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(sizeUSDDelta);
+
+      const cumulativeOutflowVolumeByTokenAmount =
+        pool._cumulativeOutflowVolumeByTokenAmount;
+      const cumulativeOutflowVolumeByTokenUSD =
+        pool._cumulativeOutflowVolumeByTokenUSD;
+      if (collateralTokenIndex >= 0) {
+        cumulativeOutflowVolumeByTokenAmount[collateralTokenIndex] =
+          cumulativeOutflowVolumeByTokenAmount[collateralTokenIndex].plus(
+            collateralTokenAmountDelta
+          );
+        cumulativeOutflowVolumeByTokenUSD[collateralTokenIndex] =
+          cumulativeOutflowVolumeByTokenUSD[collateralTokenIndex].plus(
+            collateralUSDDelta
+          );
+      }
+      pool._cumulativeOutflowVolumeByTokenAmount =
+        cumulativeOutflowVolumeByTokenAmount;
+      pool._cumulativeOutflowVolumeByTokenUSD =
+        cumulativeOutflowVolumeByTokenUSD;
+
       break;
     case EventType.ClosePosition:
     case EventType.Liquidated:
-      pool._cumulativeClosedInflowVolumeUSD =
-        pool._cumulativeClosedInflowVolumeUSD.plus(amountUSD);
+      pool.cumulativeClosedInflowVolumeUSD =
+        pool.cumulativeClosedInflowVolumeUSD.plus(collateralUSDDelta);
+
+      const cumulativeClosedInflowVolumeByTokenAmount =
+        pool._cumulativeClosedInflowVolumeByTokenAmount;
+      const cumulativeClosedInflowVolumeByTokenUSD =
+        pool._cumulativeClosedInflowVolumeByTokenUSD;
+      if (collateralTokenIndex >= 0) {
+        cumulativeClosedInflowVolumeByTokenAmount[collateralTokenIndex] =
+          cumulativeClosedInflowVolumeByTokenAmount[collateralTokenIndex].plus(
+            collateralTokenAmountDelta
+          );
+        cumulativeClosedInflowVolumeByTokenUSD[collateralTokenIndex] =
+          cumulativeClosedInflowVolumeByTokenUSD[collateralTokenIndex].plus(
+            collateralUSDDelta
+          );
+      }
+      pool._cumulativeClosedInflowVolumeByTokenAmount =
+        cumulativeClosedInflowVolumeByTokenAmount;
+      pool._cumulativeClosedInflowVolumeByTokenUSD =
+        cumulativeClosedInflowVolumeByTokenUSD;
+
       break;
 
     default:
       break;
   }
-  pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(amountUSD);
+
+  const cumulativeVolumeByTokenAmount = pool._cumulativeVolumeByTokenAmount;
+  const cumulativeVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
+  if (collateralTokenIndex >= 0) {
+    cumulativeVolumeByTokenAmount[collateralTokenIndex] =
+      cumulativeVolumeByTokenAmount[collateralTokenIndex].plus(
+        collateralTokenAmountDelta
+      );
+    cumulativeVolumeByTokenUSD[collateralTokenIndex] =
+      cumulativeVolumeByTokenUSD[collateralTokenIndex].plus(collateralUSDDelta);
+  }
+  pool._cumulativeVolumeByTokenAmount = cumulativeVolumeByTokenAmount;
+  pool._cumulativeVolumeByTokenUSD = cumulativeVolumeByTokenUSD;
+
   pool._lastUpdateTimestamp = event.block.timestamp;
   pool.save();
 
-  increaseProtocolVolume(event, amountUSD, eventType);
+  increaseProtocolVolume(event, sizeUSDDelta, collateralUSDDelta, eventType);
 }
 
 export function increasePoolPremium(
@@ -308,14 +405,48 @@ export function updatePoolInputTokenBalance(
     }
   } else {
     const inputTokenWeights = pool.inputTokenWeights;
-    const fundingrates = pool._fundingrate;
+    const fundingrates = pool.fundingrate;
+    const cumulativeVolumeByTokenAmount = pool._cumulativeVolumeByTokenAmount;
+    const cumulativeVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
+    const cumulativeInflowVolumeByTokenAmount =
+      pool._cumulativeInflowVolumeByTokenAmount;
+    const cumulativeInflowVolumeByTokenUSD =
+      pool._cumulativeInflowVolumeByTokenUSD;
+    const cumulativeClosedInflowVolumeByTokenAmount =
+      pool._cumulativeClosedInflowVolumeByTokenAmount;
+    const cumulativeClosedInflowVolumeByTokenUSD =
+      pool._cumulativeClosedInflowVolumeByTokenUSD;
+    const cumulativeOutflowVolumeByTokenAmount =
+      pool._cumulativeOutflowVolumeByTokenAmount;
+    const cumulativeOutflowVolumeByTokenUSD =
+      pool._cumulativeOutflowVolumeByTokenUSD;
 
     inputTokens.push(inputToken.id);
     inputTokenBalances.push(inputTokenAmount);
     fundingrates.push(BIGDECIMAL_ZERO);
     inputTokenWeights.push(BIGDECIMAL_ZERO);
+    cumulativeVolumeByTokenAmount.push(BIGINT_ZERO);
+    cumulativeVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
+    cumulativeInflowVolumeByTokenAmount.push(BIGINT_ZERO);
+    cumulativeInflowVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
+    cumulativeClosedInflowVolumeByTokenAmount.push(BIGINT_ZERO);
+    cumulativeClosedInflowVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
+    cumulativeOutflowVolumeByTokenAmount.push(BIGINT_ZERO);
+    cumulativeOutflowVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
 
-    multiArraySort(inputTokens, inputTokenBalances, fundingrates);
+    poolArraySort(
+      inputTokens,
+      inputTokenBalances,
+      fundingrates,
+      cumulativeVolumeByTokenAmount,
+      cumulativeVolumeByTokenUSD,
+      cumulativeInflowVolumeByTokenAmount,
+      cumulativeInflowVolumeByTokenUSD,
+      cumulativeClosedInflowVolumeByTokenAmount,
+      cumulativeClosedInflowVolumeByTokenUSD,
+      cumulativeOutflowVolumeByTokenAmount,
+      cumulativeOutflowVolumeByTokenUSD
+    );
 
     const vaultContract = Vault.bind(event.address);
     for (let i = 0; i < inputTokens.length; i++) {
@@ -330,8 +461,20 @@ export function updatePoolInputTokenBalance(
       }
     }
 
-    pool._fundingrate = fundingrates;
     pool.inputTokenWeights = inputTokenWeights;
+    pool.fundingrate = fundingrates;
+    pool._cumulativeVolumeByTokenAmount = cumulativeVolumeByTokenAmount;
+    pool._cumulativeVolumeByTokenUSD = cumulativeVolumeByTokenUSD;
+    pool._cumulativeInflowVolumeByTokenAmount =
+      cumulativeInflowVolumeByTokenAmount;
+    pool._cumulativeInflowVolumeByTokenUSD = cumulativeInflowVolumeByTokenUSD;
+    pool._cumulativeClosedInflowVolumeByTokenAmount =
+      cumulativeClosedInflowVolumeByTokenAmount;
+    pool._cumulativeClosedInflowVolumeByTokenUSD =
+      cumulativeClosedInflowVolumeByTokenUSD;
+    pool._cumulativeOutflowVolumeByTokenAmount =
+      cumulativeOutflowVolumeByTokenAmount;
+    pool._cumulativeOutflowVolumeByTokenUSD = cumulativeOutflowVolumeByTokenUSD;
   }
 
   pool.inputTokens = inputTokens;
@@ -384,12 +527,12 @@ export function updatePoolFundingRate(
 ): void {
   const pool = getOrCreateLiquidityPool(event);
   const fundingTokens = pool.inputTokens;
-  const fundingrates = pool._fundingrate;
+  const fundingrates = pool.fundingrate;
   const fundingTokenIndex = fundingTokens.indexOf(fundingToken.id);
   if (fundingTokenIndex >= 0) {
     fundingrates[fundingTokenIndex] = fundingrate;
   }
-  pool._fundingrate = fundingrates;
+  pool.fundingrate = fundingrates;
   pool._lastUpdateTimestamp = event.block.timestamp;
   pool.save();
 }
@@ -434,6 +577,16 @@ export function increasePoolSupplySideRevenue(
 
   // Protocol
   increaseProtocolSupplySideRevenue(event, amountChangeUSD);
+}
+
+export function incrementPoolUniqueUsers(event: ethereum.Event): void {
+  const pool = getOrCreateLiquidityPool(event);
+  pool.cumulativeUniqueUsers += INT_ONE;
+  pool._lastUpdateTimestamp = event.block.timestamp;
+  pool.save();
+
+  // Protocol
+  incrementProtocolUniqueUsers(event);
 }
 
 export function updatePoolSnapshotDayID(

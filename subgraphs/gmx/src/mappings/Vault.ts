@@ -12,6 +12,7 @@ import {
   UpdateFundingRate,
 } from "../../generated/Vault/Vault";
 import {
+  createBorrow,
   createCollateralIn,
   createCollateralOut,
   createLiquidate,
@@ -59,6 +60,8 @@ import {
 } from "../utils/numbers";
 
 export function handleUpdateFundingRate(event: UpdateFundingRate): void {
+  takeSnapshots(event);
+
   const token = getOrCreateToken(event, event.params.token);
   updatePoolFundingRate(
     event,
@@ -71,7 +74,9 @@ export function handleUpdateFundingRate(event: UpdateFundingRate): void {
 export function handleSwap(event: Swap): void {
   takeSnapshots(event);
 
-  getOrCreateAccount(event, event.params.account);
+  const account = getOrCreateAccount(event, event.params.account);
+  incrementAccountEventCount(event, account, EventType.Swap, BIGINT_ZERO);
+  incrementProtocolEventCount(event, EventType.Swap, BIGINT_ZERO);
 
   const inputToken = getOrCreateToken(event, event.params.tokenIn);
   const inputTokenAmountUSD = convertTokenToDecimal(
@@ -96,12 +101,6 @@ export function handleSwap(event: Swap): void {
     outputTokenAmountUSD
   );
 
-  increasePoolVolume(
-    event,
-    getOrCreateLiquidityPool(event),
-    inputTokenAmountUSD,
-    EventType.Swap
-  );
   updateTempUsageMetrics(
     event,
     event.params.account,
@@ -175,8 +174,8 @@ export function handleUpdatePositionEvent(
   takeSnapshots(event);
 
   const account = getOrCreateAccount(event, accountAddress);
-  incrementAccountEventCount(event, account, eventType);
-  incrementProtocolEventCount(event, eventType);
+  incrementAccountEventCount(event, account, eventType, sizeDelta);
+  incrementProtocolEventCount(event, eventType, sizeDelta);
 
   const indexToken = getOrCreateToken(event, indexTokenAddress);
   updateTokenPrice(
@@ -225,13 +224,11 @@ export function handleUpdatePositionEvent(
     account,
     pool,
     collateralTokenAddress,
-    collateralUSDDelta,
     indexTokenAddress,
-    sizeUSDDelta,
     positionSide,
     eventType
   );
-  if (position._timestampClosed > BIGINT_ZERO) {
+  if (!position.timestampClosed) {
     OpenPositionCount = INT_NEGATIVE_ONE;
   }
 
@@ -242,7 +239,15 @@ export function handleUpdatePositionEvent(
     eventType
   );
 
-  increasePoolVolume(event, pool, sizeUSDDelta, eventType);
+  increasePoolVolume(
+    event,
+    pool,
+    sizeUSDDelta,
+    collateralTokenAddress,
+    collateralTokenAmountDelta,
+    collateralUSDDelta,
+    eventType
+  );
 
   switch (eventType) {
     case EventType.CollateralIn:
@@ -257,6 +262,28 @@ export function handleUpdatePositionEvent(
         BIGINT_ZERO,
         position
       );
+
+      if (sizeUSDDelta > BIGDECIMAL_ZERO) {
+        let indexTokenAmountDelta = BIGINT_ZERO;
+        if (
+          indexToken.lastPriceUSD &&
+          indexToken.lastPriceUSD != BIGDECIMAL_ZERO
+        ) {
+          indexTokenAmountDelta = bigDecimalToBigInt(
+            sizeUSDDelta
+              .times(exponentToBigDecimal(indexToken.decimals))
+              .div(indexToken.lastPriceUSD!)
+          );
+        }
+        createBorrow(
+          event,
+          accountAddress,
+          indexTokenAddress,
+          indexTokenAmountDelta,
+          sizeUSDDelta,
+          position
+        );
+      }
 
       updateTempUsageMetrics(
         event,
@@ -305,7 +332,12 @@ export function handleUpdatePositionEvent(
         event,
         event.transaction.from
       );
-      incrementAccountEventCount(event, liquidatorAccount, EventType.Liquidate);
+      incrementAccountEventCount(
+        event,
+        liquidatorAccount,
+        EventType.Liquidate,
+        BIGINT_ZERO
+      );
 
       updateTempUsageMetrics(
         event,
@@ -338,6 +370,9 @@ export function handleClosePosition(event: ClosePosition): void {
   increasePoolVolume(
     event,
     pool,
+    BIGDECIMAL_ZERO,
+    null,
+    BIGINT_ZERO,
     BIGINT_NEGONE.times(event.params.realisedPnl)
       .div(PRICE_PRECISION)
       .toBigDecimal(),

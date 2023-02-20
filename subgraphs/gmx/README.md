@@ -99,7 +99,7 @@ _Note: The collateral of traders are also reserved in the GLP pool. Hence, there
 
 ### Volume
 
-Total volumes in this subgraph includes perp trading volume, token swap volume and token deposit/withdrawal volume. Meanwhile, there are three types of volumes for perp trading: InflowVolume, OutflowVolume and ClosedInflowVolume:
+Total volumes in this subgraph refer to perp trading volume. Meanwhile, there are three types of volumes for perp trading: InflowVolume, OutflowVolume and ClosedInflowVolume:
 
 - Inflows are all funds that entered the protocol as part of long/short positions being opened.
 - Outflows are all funds that left the protocol because of positions being closed.

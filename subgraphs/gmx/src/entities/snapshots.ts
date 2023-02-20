@@ -1,4 +1,11 @@
-import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  Bytes,
+  BigInt,
+  ethereum,
+  log,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
 import {
   ActiveAccount,
   DerivPerpProtocol,
@@ -25,6 +32,7 @@ import {
   SECONDS_PER_HOUR,
   SECONDS_PER_DAY,
   PositionSide,
+  BIGINT_ZERO,
 } from "../utils/constants";
 
 // snapshots are only snapped once per interval for efficiency.
@@ -37,12 +45,13 @@ export function takeSnapshots(event: ethereum.Event): void {
     protocol._lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
   const protocolSnapshotHourID =
     protocol._lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
-  if (protocolSnapshotDayID != dayID) {
+
+  if (protocolSnapshotDayID != dayID && protocolSnapshotDayID != INT_ZERO) {
     takeFinancialDailySnapshot(protocol, protocolSnapshotDayID);
     takeUsageMetricsDailySnapshot(protocol, protocolSnapshotDayID);
     updateProtocolSnapshotDayID(protocolSnapshotDayID);
   }
-  if (protocolSnapshotHourID != hourID) {
+  if (protocolSnapshotHourID != hourID && protocolSnapshotHourID != INT_ZERO) {
     takeUsageMetricsHourlySnapshot(protocol, protocolSnapshotHourID);
   }
 
@@ -51,11 +60,11 @@ export function takeSnapshots(event: ethereum.Event): void {
     pool._lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
   const poolSnapshotHourID =
     pool._lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
-  if (poolSnapshotDayID != dayID) {
+  if (poolSnapshotDayID != dayID && poolSnapshotDayID != INT_ZERO) {
     takeLiquidityPoolDailySnapshot(pool, poolSnapshotDayID);
     updatePoolSnapshotDayID(event, poolSnapshotDayID);
   }
-  if (poolSnapshotHourID != hourID) {
+  if (poolSnapshotHourID != hourID && poolSnapshotHourID != INT_ZERO) {
     takeLiquidityPoolHourlySnapshot(pool, poolSnapshotHourID);
     updatePoolSnapshotHourID(event, poolSnapshotHourID);
   }
@@ -73,6 +82,7 @@ export function takeLiquidityPoolDailySnapshot(
   const prevPoolMetrics = LiquidityPoolDailySnapshot.load(
     pool.id.concatI32(pool._lastSnapshotDayID)
   );
+  const inputTokenLength = pool.inputTokens.length;
 
   let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -85,9 +95,34 @@ export function takeLiquidityPoolDailySnapshot(
   let prevCumulativeWithdrawPremiumUSD = BIGDECIMAL_ZERO;
   let prevCumulativeTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
 
+  let prevInputTokens: Bytes[] = [];
   let prevCumulativeInflowVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeClosedInflowVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeOutflowVolumeUSD = BIGDECIMAL_ZERO;
+  let prevCumulativeVolumeByTokenAmount = new Array<BigInt>(
+    inputTokenLength
+  ).fill(BIGINT_ZERO);
+  let prevCumulativeVolumeByTokenUSD = new Array<BigDecimal>(
+    inputTokenLength
+  ).fill(BIGDECIMAL_ZERO);
+  let prevCumulativeInflowVolumeByTokenAmount = new Array<BigInt>(
+    inputTokenLength
+  ).fill(BIGINT_ZERO);
+  let prevCumulativeInflowVolumeByTokenUSD = new Array<BigDecimal>(
+    inputTokenLength
+  ).fill(BIGDECIMAL_ZERO);
+  let prevCumulativeOutflowVolumeByTokenAmount = new Array<BigInt>(
+    inputTokenLength
+  ).fill(BIGINT_ZERO);
+  let prevCumulativeOutflowVolumeByTokenUSD = new Array<BigDecimal>(
+    inputTokenLength
+  ).fill(BIGDECIMAL_ZERO);
+  let prevCumulativeClosedInflowVolumeByTokenAmount = new Array<BigInt>(
+    inputTokenLength
+  ).fill(BIGINT_ZERO);
+  let prevCumulativeClosedInflowVolumeByTokenUSD = new Array<BigDecimal>(
+    inputTokenLength
+  ).fill(BIGDECIMAL_ZERO);
 
   let prevCumulativeUniqueBorrowers = INT_ZERO;
   let prevCumulativeUniqueLiquidators = INT_ZERO;
@@ -118,10 +153,27 @@ export function takeLiquidityPoolDailySnapshot(
     prevCumulativeTotalLiquidityPremiumUSD =
       prevPoolMetrics.cumulativeTotalLiquidityPremiumUSD;
 
+    prevInputTokens = prevPoolMetrics.inputTokens;
     prevCumulativeInflowVolumeUSD = prevPoolMetrics.cumulativeInflowVolumeUSD;
     prevCumulativeClosedInflowVolumeUSD =
       prevPoolMetrics.cumulativeClosedInflowVolumeUSD;
     prevCumulativeOutflowVolumeUSD = prevPoolMetrics.cumulativeOutflowVolumeUSD;
+    prevCumulativeVolumeByTokenAmount =
+      prevPoolMetrics._cumulativeVolumeByTokenAmount;
+    prevCumulativeVolumeByTokenUSD =
+      prevPoolMetrics._cumulativeVolumeByTokenUSD;
+    prevCumulativeInflowVolumeByTokenAmount =
+      prevPoolMetrics._cumulativeInflowVolumeByTokenAmount;
+    prevCumulativeInflowVolumeByTokenUSD =
+      prevPoolMetrics._cumulativeInflowVolumeByTokenUSD;
+    prevCumulativeOutflowVolumeByTokenAmount =
+      prevPoolMetrics._cumulativeOutflowVolumeByTokenAmount;
+    prevCumulativeOutflowVolumeByTokenUSD =
+      prevPoolMetrics._cumulativeOutflowVolumeByTokenUSD;
+    prevCumulativeClosedInflowVolumeByTokenAmount =
+      prevPoolMetrics._cumulativeClosedInflowVolumeByTokenAmount;
+    prevCumulativeClosedInflowVolumeByTokenUSD =
+      prevPoolMetrics._cumulativeClosedInflowVolumeByTokenUSD;
 
     prevCumulativeUniqueBorrowers = prevPoolMetrics.cumulativeUniqueBorrowers;
     prevCumulativeUniqueLiquidators =
@@ -148,6 +200,15 @@ export function takeLiquidityPoolDailySnapshot(
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetrics.dailyOpenInterestUSD = pool.openInterestUSD;
 
+  poolMetrics.inputTokens = pool.inputTokens;
+  poolMetrics.inputTokenBalances = pool.inputTokenBalances;
+  poolMetrics.inputTokenWeights = pool.inputTokenWeights;
+  poolMetrics.outputTokenSupply = pool.outputTokenSupply;
+  poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetrics.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
+  poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+  poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+
   poolMetrics.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
   poolMetrics.dailySupplySideRevenueUSD =
@@ -165,7 +226,7 @@ export function takeLiquidityPoolDailySnapshot(
     prevCumulativeTotalRevenueUSD
   );
 
-  poolMetrics.dailyFundingrate = pool._fundingrate;
+  poolMetrics.dailyFundingrate = pool.fundingrate;
   poolMetrics.dailyEntryPremiumUSD = pool.cumulativeEntryPremiumUSD.minus(
     prevCumulativeEntryPremiumUSD
   );
@@ -196,29 +257,93 @@ export function takeLiquidityPoolDailySnapshot(
   poolMetrics.dailyVolumeUSD = pool.cumulativeVolumeUSD.minus(
     prevCumulativeVolumeUSD
   );
-  poolMetrics.dailyVolumeByTokenAmount = [];
-  poolMetrics.dailyVolumeByTokenUSD = [];
   poolMetrics.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
-  poolMetrics.dailyInflowVolumeUSD = pool._cumulativeInflowVolumeUSD.minus(
+  poolMetrics.dailyInflowVolumeUSD = pool.cumulativeInflowVolumeUSD.minus(
     prevCumulativeInflowVolumeUSD
   );
-  poolMetrics.dailyInflowVolumeByTokenAmount = [];
-  poolMetrics.dailyInflowVolumeByTokenUSD = [];
-  poolMetrics.cumulativeInflowVolumeUSD = pool._cumulativeInflowVolumeUSD;
+  poolMetrics.cumulativeInflowVolumeUSD = pool.cumulativeInflowVolumeUSD;
   poolMetrics.dailyClosedInflowVolumeUSD =
-    pool._cumulativeClosedInflowVolumeUSD.minus(
+    pool.cumulativeClosedInflowVolumeUSD.minus(
       prevCumulativeClosedInflowVolumeUSD
     );
-  poolMetrics.dailyClosedInflowVolumeByTokenAmount = [];
-  poolMetrics.dailyClosedInflowVolumeByTokenUSD = [];
   poolMetrics.cumulativeClosedInflowVolumeUSD =
-    pool._cumulativeClosedInflowVolumeUSD;
-  poolMetrics.dailyOutflowVolumeUSD = pool._cumulativeOutflowVolumeUSD.minus(
+    pool.cumulativeClosedInflowVolumeUSD;
+  poolMetrics.dailyOutflowVolumeUSD = pool.cumulativeOutflowVolumeUSD.minus(
     prevCumulativeOutflowVolumeUSD
   );
-  poolMetrics.dailyOutflowVolumeByTokenAmount = [];
-  poolMetrics.dailyOutflowVolumeByTokenUSD = [];
-  poolMetrics.cumulativeOutflowVolumeUSD = pool._cumulativeOutflowVolumeUSD;
+  poolMetrics.cumulativeOutflowVolumeUSD = pool.cumulativeOutflowVolumeUSD;
+  poolMetrics._cumulativeVolumeByTokenAmount =
+    pool._cumulativeVolumeByTokenAmount;
+  poolMetrics._cumulativeVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
+  poolMetrics._cumulativeInflowVolumeByTokenAmount =
+    pool._cumulativeInflowVolumeByTokenAmount;
+  poolMetrics._cumulativeInflowVolumeByTokenUSD =
+    pool._cumulativeInflowVolumeByTokenUSD;
+  poolMetrics._cumulativeOutflowVolumeByTokenAmount =
+    pool._cumulativeOutflowVolumeByTokenAmount;
+  poolMetrics._cumulativeOutflowVolumeByTokenUSD =
+    pool._cumulativeOutflowVolumeByTokenUSD;
+  poolMetrics._cumulativeClosedInflowVolumeByTokenAmount =
+    pool._cumulativeClosedInflowVolumeByTokenAmount;
+  poolMetrics._cumulativeClosedInflowVolumeByTokenUSD =
+    pool._cumulativeClosedInflowVolumeByTokenUSD;
+  const dailyVolumeByTokenAmount = pool._cumulativeVolumeByTokenAmount;
+  const dailyVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
+  const dailyInflowVolumeByTokenAmount =
+    pool._cumulativeInflowVolumeByTokenAmount;
+  const dailyInflowVolumeByTokenUSD = pool._cumulativeInflowVolumeByTokenUSD;
+  const dailyClosedInflowVolumeByTokenAmount =
+    pool._cumulativeClosedInflowVolumeByTokenAmount;
+  const dailyClosedInflowVolumeByTokenUSD =
+    pool._cumulativeClosedInflowVolumeByTokenUSD;
+  const dailyOutflowVolumeByTokenAmount =
+    pool._cumulativeOutflowVolumeByTokenAmount;
+  const dailyOutflowVolumeByTokenUSD = pool._cumulativeOutflowVolumeByTokenUSD;
+
+  for (let i = 0; i < inputTokenLength; i++) {
+    for (let j = 0; j < prevInputTokens.length; j++) {
+      if (pool.inputTokens[i] == prevInputTokens[j]) {
+        dailyVolumeByTokenAmount[i] = dailyVolumeByTokenAmount[i].minus(
+          prevCumulativeVolumeByTokenAmount[j]
+        );
+        dailyVolumeByTokenUSD[i] = dailyVolumeByTokenUSD[i].minus(
+          prevCumulativeVolumeByTokenUSD[j]
+        );
+        dailyInflowVolumeByTokenAmount[i] = dailyInflowVolumeByTokenAmount[
+          i
+        ].minus(prevCumulativeInflowVolumeByTokenAmount[j]);
+
+        dailyInflowVolumeByTokenUSD[i] = dailyInflowVolumeByTokenUSD[i].minus(
+          prevCumulativeInflowVolumeByTokenUSD[j]
+        );
+        dailyClosedInflowVolumeByTokenAmount[i] =
+          dailyClosedInflowVolumeByTokenAmount[i].minus(
+            prevCumulativeClosedInflowVolumeByTokenAmount[j]
+          );
+        dailyClosedInflowVolumeByTokenUSD[i] =
+          dailyClosedInflowVolumeByTokenUSD[i].minus(
+            prevCumulativeClosedInflowVolumeByTokenUSD[j]
+          );
+        dailyOutflowVolumeByTokenAmount[i] = dailyOutflowVolumeByTokenAmount[
+          i
+        ].minus(prevCumulativeOutflowVolumeByTokenAmount[j]);
+        dailyOutflowVolumeByTokenUSD[i] = dailyOutflowVolumeByTokenUSD[i].minus(
+          prevCumulativeOutflowVolumeByTokenUSD[j]
+        );
+      }
+    }
+  }
+
+  poolMetrics.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
+  poolMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
+  poolMetrics.dailyInflowVolumeByTokenAmount = dailyInflowVolumeByTokenAmount;
+  poolMetrics.dailyInflowVolumeByTokenUSD = dailyInflowVolumeByTokenUSD;
+  poolMetrics.dailyClosedInflowVolumeByTokenAmount =
+    dailyClosedInflowVolumeByTokenAmount;
+  poolMetrics.dailyClosedInflowVolumeByTokenUSD =
+    dailyClosedInflowVolumeByTokenUSD;
+  poolMetrics.dailyOutflowVolumeByTokenAmount = dailyOutflowVolumeByTokenAmount;
+  poolMetrics.dailyOutflowVolumeByTokenUSD = dailyOutflowVolumeByTokenUSD;
 
   poolMetrics.dailyActiveBorrowers =
     pool.cumulativeUniqueBorrowers - prevCumulativeUniqueBorrowers;
@@ -230,35 +355,27 @@ export function takeLiquidityPoolDailySnapshot(
     pool.cumulativeUniqueLiquidatees - prevCumulativeUniqueLiquidatees;
   poolMetrics.cumulativeUniqueLiquidatees = pool.cumulativeUniqueLiquidatees;
 
-  poolMetrics.dailylongPositionCount =
+  poolMetrics.dailyLongPositionCount =
     pool.longPositionCount - prevLongPositionCount >= 0
       ? pool.longPositionCount - prevLongPositionCount
       : INT_ZERO;
   poolMetrics.longPositionCount = pool.longPositionCount;
-  poolMetrics.dailyshortPositionCount =
+  poolMetrics.dailyShortPositionCount =
     pool.shortPositionCount - prevShortPositionCount >= 0
       ? pool.shortPositionCount - prevShortPositionCount
       : INT_ZERO;
   poolMetrics.shortPositionCount = pool.shortPositionCount;
-  poolMetrics.dailyopenPositionCount =
+  poolMetrics.dailyOpenPositionCount =
     pool.openPositionCount - prevOpenPositionCount >= 0
       ? pool.openPositionCount - prevOpenPositionCount
       : INT_ZERO;
   poolMetrics.openPositionCount = pool.openPositionCount;
-  poolMetrics.dailyclosedPositionCount =
+  poolMetrics.dailyClosedPositionCount =
     pool.closedPositionCount - prevClosedPositionCount;
   poolMetrics.closedPositionCount = pool.closedPositionCount;
-  poolMetrics.dailycumulativePositionCount =
+  poolMetrics.dailyCumulativePositionCount =
     pool.cumulativePositionCount - prevCumulativePositionCount;
   poolMetrics.cumulativePositionCount = pool.cumulativePositionCount;
-
-  poolMetrics.inputTokenBalances = pool.inputTokenBalances;
-  poolMetrics.inputTokenWeights = pool.inputTokenWeights;
-  poolMetrics.outputTokenSupply = pool.outputTokenSupply;
-  poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  poolMetrics.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
-  poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
-  poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
 
   poolMetrics.save();
 }
@@ -275,6 +392,7 @@ export function takeLiquidityPoolHourlySnapshot(
   const prevPoolMetrics = LiquidityPoolHourlySnapshot.load(
     pool.id.concatI32(pool._lastSnapshotHourID)
   );
+  const inputTokenLength = pool.inputTokens.length;
 
   let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -287,9 +405,34 @@ export function takeLiquidityPoolHourlySnapshot(
   let prevCumulativeWithdrawPremiumUSD = BIGDECIMAL_ZERO;
   let prevCumulativeTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
 
+  let prevInputTokens: Bytes[] = [];
   let prevCumulativeInflowVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeClosedInflowVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeOutflowVolumeUSD = BIGDECIMAL_ZERO;
+  let prevCumulativeVolumeByTokenAmount = new Array<BigInt>(
+    inputTokenLength
+  ).fill(BIGINT_ZERO);
+  let prevCumulativeVolumeByTokenUSD = new Array<BigDecimal>(
+    inputTokenLength
+  ).fill(BIGDECIMAL_ZERO);
+  let prevCumulativeInflowVolumeByTokenAmount = new Array<BigInt>(
+    inputTokenLength
+  ).fill(BIGINT_ZERO);
+  let prevCumulativeInflowVolumeByTokenUSD = new Array<BigDecimal>(
+    inputTokenLength
+  ).fill(BIGDECIMAL_ZERO);
+  let prevCumulativeOutflowVolumeByTokenAmount = new Array<BigInt>(
+    inputTokenLength
+  ).fill(BIGINT_ZERO);
+  let prevCumulativeOutflowVolumeByTokenUSD = new Array<BigDecimal>(
+    inputTokenLength
+  ).fill(BIGDECIMAL_ZERO);
+  let prevCumulativeClosedInflowVolumeByTokenAmount = new Array<BigInt>(
+    inputTokenLength
+  ).fill(BIGINT_ZERO);
+  let prevCumulativeClosedInflowVolumeByTokenUSD = new Array<BigDecimal>(
+    inputTokenLength
+  ).fill(BIGDECIMAL_ZERO);
 
   let prevCumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
@@ -311,10 +454,27 @@ export function takeLiquidityPoolHourlySnapshot(
     prevCumulativeTotalLiquidityPremiumUSD =
       prevPoolMetrics.cumulativeTotalLiquidityPremiumUSD;
 
+    prevInputTokens = prevPoolMetrics.inputTokens;
     prevCumulativeInflowVolumeUSD = prevPoolMetrics.cumulativeInflowVolumeUSD;
     prevCumulativeClosedInflowVolumeUSD =
       prevPoolMetrics.cumulativeClosedInflowVolumeUSD;
     prevCumulativeOutflowVolumeUSD = prevPoolMetrics.cumulativeOutflowVolumeUSD;
+    prevCumulativeVolumeByTokenAmount =
+      prevPoolMetrics._cumulativeVolumeByTokenAmount;
+    prevCumulativeVolumeByTokenUSD =
+      prevPoolMetrics._cumulativeVolumeByTokenUSD;
+    prevCumulativeInflowVolumeByTokenAmount =
+      prevPoolMetrics._cumulativeInflowVolumeByTokenAmount;
+    prevCumulativeInflowVolumeByTokenUSD =
+      prevPoolMetrics._cumulativeInflowVolumeByTokenUSD;
+    prevCumulativeOutflowVolumeByTokenAmount =
+      prevPoolMetrics._cumulativeOutflowVolumeByTokenAmount;
+    prevCumulativeOutflowVolumeByTokenUSD =
+      prevPoolMetrics._cumulativeOutflowVolumeByTokenUSD;
+    prevCumulativeClosedInflowVolumeByTokenAmount =
+      prevPoolMetrics._cumulativeClosedInflowVolumeByTokenAmount;
+    prevCumulativeClosedInflowVolumeByTokenUSD =
+      prevPoolMetrics._cumulativeClosedInflowVolumeByTokenUSD;
   } else if (pool._lastSnapshotHourID > INT_ZERO) {
     log.error(
       "Missing hourly pool snapshot at ID that has been snapped: Pool {}, ID {} ",
@@ -328,6 +488,15 @@ export function takeLiquidityPoolHourlySnapshot(
 
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetrics.hourlyOpenInterestUSD = pool.openInterestUSD;
+
+  poolMetrics.inputTokens = pool.inputTokens;
+  poolMetrics.inputTokenBalances = pool.inputTokenBalances;
+  poolMetrics.inputTokenWeights = pool.inputTokenWeights;
+  poolMetrics.outputTokenSupply = pool.outputTokenSupply;
+  poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetrics.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
+  poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+  poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
 
   poolMetrics.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
@@ -346,7 +515,7 @@ export function takeLiquidityPoolHourlySnapshot(
     prevCumulativeTotalRevenueUSD
   );
 
-  poolMetrics.hourlyFundingrate = pool._fundingrate;
+  poolMetrics.hourlyFundingrate = pool.fundingrate;
   poolMetrics.hourlyEntryPremiumUSD = pool.cumulativeEntryPremiumUSD.minus(
     prevCumulativeEntryPremiumUSD
   );
@@ -376,37 +545,92 @@ export function takeLiquidityPoolHourlySnapshot(
   poolMetrics.hourlyVolumeUSD = pool.cumulativeVolumeUSD.minus(
     prevCumulativeVolumeUSD
   );
-  poolMetrics.hourlyVolumeByTokenAmount = [];
-  poolMetrics.hourlyVolumeByTokenUSD = [];
   poolMetrics.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
-  poolMetrics.hourlyInflowVolumeUSD = pool._cumulativeInflowVolumeUSD.minus(
+  poolMetrics.hourlyInflowVolumeUSD = pool.cumulativeInflowVolumeUSD.minus(
     prevCumulativeInflowVolumeUSD
   );
-  poolMetrics.hourlyInflowVolumeByTokenAmount = [];
-  poolMetrics.hourlyInflowVolumeByTokenUSD = [];
-  poolMetrics.cumulativeInflowVolumeUSD = pool._cumulativeInflowVolumeUSD;
+  poolMetrics.cumulativeInflowVolumeUSD = pool.cumulativeInflowVolumeUSD;
   poolMetrics.hourlyClosedInflowVolumeUSD =
-    pool._cumulativeClosedInflowVolumeUSD.minus(
+    pool.cumulativeClosedInflowVolumeUSD.minus(
       prevCumulativeClosedInflowVolumeUSD
     );
-  poolMetrics.hourlyClosedInflowVolumeByTokenAmount = [];
-  poolMetrics.hourlyClosedInflowVolumeByTokenUSD = [];
   poolMetrics.cumulativeClosedInflowVolumeUSD =
-    pool._cumulativeClosedInflowVolumeUSD;
-  poolMetrics.hourlyOutflowVolumeUSD = pool._cumulativeOutflowVolumeUSD.minus(
+    pool.cumulativeClosedInflowVolumeUSD;
+  poolMetrics.hourlyOutflowVolumeUSD = pool.cumulativeOutflowVolumeUSD.minus(
     prevCumulativeOutflowVolumeUSD
   );
-  poolMetrics.hourlyOutflowVolumeByTokenAmount = [];
-  poolMetrics.hourlyOutflowVolumeByTokenUSD = [];
-  poolMetrics.cumulativeOutflowVolumeUSD = pool._cumulativeOutflowVolumeUSD;
+  poolMetrics.cumulativeOutflowVolumeUSD = pool.cumulativeOutflowVolumeUSD;
+  poolMetrics._cumulativeVolumeByTokenAmount =
+    pool._cumulativeVolumeByTokenAmount;
+  poolMetrics._cumulativeVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
+  poolMetrics._cumulativeInflowVolumeByTokenAmount =
+    pool._cumulativeInflowVolumeByTokenAmount;
+  poolMetrics._cumulativeInflowVolumeByTokenUSD =
+    pool._cumulativeInflowVolumeByTokenUSD;
+  poolMetrics._cumulativeOutflowVolumeByTokenAmount =
+    pool._cumulativeOutflowVolumeByTokenAmount;
+  poolMetrics._cumulativeOutflowVolumeByTokenUSD =
+    pool._cumulativeOutflowVolumeByTokenUSD;
+  poolMetrics._cumulativeClosedInflowVolumeByTokenAmount =
+    pool._cumulativeClosedInflowVolumeByTokenAmount;
+  poolMetrics._cumulativeClosedInflowVolumeByTokenUSD =
+    pool._cumulativeClosedInflowVolumeByTokenUSD;
+  const hourlyVolumeByTokenAmount = pool._cumulativeVolumeByTokenAmount;
+  const hourlyVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
+  const hourlyInflowVolumeByTokenAmount =
+    pool._cumulativeInflowVolumeByTokenAmount;
+  const hourlyInflowVolumeByTokenUSD = pool._cumulativeInflowVolumeByTokenUSD;
+  const hourlyClosedInflowVolumeByTokenAmount =
+    pool._cumulativeClosedInflowVolumeByTokenAmount;
+  const hourlyClosedInflowVolumeByTokenUSD =
+    pool._cumulativeClosedInflowVolumeByTokenUSD;
+  const hourlyOutflowVolumeByTokenAmount =
+    pool._cumulativeOutflowVolumeByTokenAmount;
+  const hourlyOutflowVolumeByTokenUSD = pool._cumulativeOutflowVolumeByTokenUSD;
 
-  poolMetrics.inputTokenBalances = pool.inputTokenBalances;
-  poolMetrics.inputTokenWeights = pool.inputTokenWeights;
-  poolMetrics.outputTokenSupply = pool.outputTokenSupply;
-  poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  poolMetrics.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
-  poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
-  poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+  for (let i = 0; i < inputTokenLength; i++) {
+    for (let j = 0; j < prevInputTokens.length; j++) {
+      if (pool.inputTokens[i] == prevInputTokens[j]) {
+        hourlyVolumeByTokenAmount[i] = hourlyVolumeByTokenAmount[i].minus(
+          prevCumulativeVolumeByTokenAmount[j]
+        );
+        hourlyVolumeByTokenUSD[i] = hourlyVolumeByTokenUSD[i].minus(
+          prevCumulativeVolumeByTokenUSD[j]
+        );
+        hourlyInflowVolumeByTokenAmount[i] = hourlyInflowVolumeByTokenAmount[
+          i
+        ].minus(prevCumulativeInflowVolumeByTokenAmount[j]);
+        hourlyInflowVolumeByTokenUSD[i] = hourlyInflowVolumeByTokenUSD[i].minus(
+          prevCumulativeInflowVolumeByTokenUSD[j]
+        );
+        hourlyClosedInflowVolumeByTokenAmount[i] =
+          hourlyClosedInflowVolumeByTokenAmount[i].minus(
+            prevCumulativeClosedInflowVolumeByTokenAmount[j]
+          );
+        hourlyClosedInflowVolumeByTokenUSD[i] =
+          hourlyClosedInflowVolumeByTokenUSD[i].minus(
+            prevCumulativeClosedInflowVolumeByTokenUSD[j]
+          );
+        hourlyOutflowVolumeByTokenAmount[i] = hourlyOutflowVolumeByTokenAmount[
+          i
+        ].minus(prevCumulativeOutflowVolumeByTokenAmount[j]);
+        hourlyOutflowVolumeByTokenUSD[i] = hourlyOutflowVolumeByTokenUSD[
+          i
+        ].minus(prevCumulativeOutflowVolumeByTokenUSD[j]);
+      }
+    }
+  }
+  poolMetrics.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
+  poolMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
+  poolMetrics.hourlyInflowVolumeByTokenAmount = hourlyInflowVolumeByTokenAmount;
+  poolMetrics.hourlyInflowVolumeByTokenUSD = hourlyInflowVolumeByTokenUSD;
+  poolMetrics.hourlyClosedInflowVolumeByTokenAmount =
+    hourlyClosedInflowVolumeByTokenAmount;
+  poolMetrics.hourlyClosedInflowVolumeByTokenUSD =
+    hourlyClosedInflowVolumeByTokenUSD;
+  poolMetrics.hourlyOutflowVolumeByTokenAmount =
+    hourlyOutflowVolumeByTokenAmount;
+  poolMetrics.hourlyOutflowVolumeByTokenUSD = hourlyOutflowVolumeByTokenUSD;
 
   poolMetrics.save();
 }
@@ -486,19 +710,19 @@ export function takeFinancialDailySnapshot(
     prevCumulativeVolumeUSD
   );
   financialMetrics.cumulativeInflowVolumeUSD =
-    protocol._cumulativeInflowVolumeUSD;
+    protocol.cumulativeInflowVolumeUSD;
   financialMetrics.dailyInflowVolumeUSD =
-    protocol._cumulativeInflowVolumeUSD.minus(prevCumulativeInflowVolumeUSD);
+    protocol.cumulativeInflowVolumeUSD.minus(prevCumulativeInflowVolumeUSD);
   financialMetrics.cumulativeClosedInflowVolumeUSD =
-    protocol._cumulativeClosedInflowVolumeUSD;
+    protocol.cumulativeClosedInflowVolumeUSD;
   financialMetrics.dailyClosedInflowVolumeUSD =
-    protocol._cumulativeClosedInflowVolumeUSD.minus(
+    protocol.cumulativeClosedInflowVolumeUSD.minus(
       prevCumulativeClosedInflowVolumeUSD
     );
   financialMetrics.cumulativeOutflowVolumeUSD =
-    protocol._cumulativeOutflowVolumeUSD;
+    protocol.cumulativeOutflowVolumeUSD;
   financialMetrics.dailyOutflowVolumeUSD =
-    protocol._cumulativeOutflowVolumeUSD.minus(prevCumulativeOutflowVolumeUSD);
+    protocol.cumulativeOutflowVolumeUSD.minus(prevCumulativeOutflowVolumeUSD);
   financialMetrics.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD;
   financialMetrics.dailySupplySideRevenueUSD =
@@ -569,16 +793,16 @@ export function takeUsageMetricsDailySnapshot(
 
   const tempUsageMetrics = _TempUsageMetricsDailySnapshot.load(id);
   if (tempUsageMetrics) {
-    usageMetrics.dailylongPositionCount =
-      tempUsageMetrics.dailylongPositionCount;
-    usageMetrics.dailyshortPositionCount =
-      tempUsageMetrics.dailyshortPositionCount;
-    usageMetrics.dailyopenPositionCount =
-      tempUsageMetrics.dailyopenPositionCount;
-    usageMetrics.dailyclosedPositionCount =
-      tempUsageMetrics.dailyclosedPositionCount;
-    usageMetrics.dailycumulativePositionCount =
-      tempUsageMetrics.dailycumulativePositionCount;
+    usageMetrics.dailyLongPositionCount =
+      tempUsageMetrics.dailyLongPositionCount;
+    usageMetrics.dailyShortPositionCount =
+      tempUsageMetrics.dailyShortPositionCount;
+    usageMetrics.dailyOpenPositionCount =
+      tempUsageMetrics.dailyOpenPositionCount;
+    usageMetrics.dailyClosedPositionCount =
+      tempUsageMetrics.dailyClosedPositionCount;
+    usageMetrics.dailyCumulativePositionCount =
+      tempUsageMetrics.dailyCumulativePositionCount;
 
     usageMetrics.dailyTransactionCount = tempUsageMetrics.dailyTransactionCount;
     usageMetrics.dailyDepositCount = tempUsageMetrics.dailyDepositCount;
@@ -597,11 +821,11 @@ export function takeUsageMetricsDailySnapshot(
     usageMetrics.dailyCollateralIn = tempUsageMetrics.dailyCollateralIn;
     usageMetrics.dailyCollateralOut = tempUsageMetrics.dailyCollateralOut;
   } else {
-    usageMetrics.dailylongPositionCount = INT_ZERO;
-    usageMetrics.dailyshortPositionCount = INT_ZERO;
-    usageMetrics.dailyopenPositionCount = INT_ZERO;
-    usageMetrics.dailyclosedPositionCount = INT_ZERO;
-    usageMetrics.dailycumulativePositionCount = INT_ZERO;
+    usageMetrics.dailyLongPositionCount = INT_ZERO;
+    usageMetrics.dailyShortPositionCount = INT_ZERO;
+    usageMetrics.dailyOpenPositionCount = INT_ZERO;
+    usageMetrics.dailyClosedPositionCount = INT_ZERO;
+    usageMetrics.dailyCumulativePositionCount = INT_ZERO;
 
     usageMetrics.dailyTransactionCount = INT_ZERO;
     usageMetrics.dailyDepositCount = INT_ZERO;
@@ -625,8 +849,7 @@ export function takeUsageMetricsDailySnapshot(
   usageMetrics.closedPositionCount = protocol.closedPositionCount;
   usageMetrics.cumulativePositionCount = protocol.cumulativePositionCount;
 
-  usageMetrics.cumulativeUniqueDepositors =
-    protocol._cumulativeUniqueDepositors;
+  usageMetrics.cumulativeUniqueDepositors = protocol.cumulativeUniqueDepositors;
   usageMetrics.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
   usageMetrics.cumulativeUniqueLiquidators =
     protocol.cumulativeUniqueLiquidators;
@@ -664,12 +887,14 @@ export function takeUsageMetricsHourlySnapshot(
     usageMetrics.hourlyDepositCount = tempUsageMetrics.hourlyDepositCount;
     usageMetrics.hourlyWithdrawCount = tempUsageMetrics.hourlyWithdrawCount;
     usageMetrics.hourlySwapCount = tempUsageMetrics.hourlySwapCount;
+    usageMetrics.hourlyBorrowCount = tempUsageMetrics.hourlyBorrowCount;
   } else {
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.hourlyTransactionCount = INT_ZERO;
     usageMetrics.hourlyDepositCount = INT_ZERO;
     usageMetrics.hourlyWithdrawCount = INT_ZERO;
     usageMetrics.hourlySwapCount = INT_ZERO;
+    usageMetrics.hourlyBorrowCount = INT_ZERO;
   }
 
   usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
@@ -694,11 +919,11 @@ export function getOrCreateTempUsageMetricsDailySnapshot(
     usageMetrics.days = day;
     usageMetrics.protocol = protocol.id;
 
-    usageMetrics.dailylongPositionCount = INT_ZERO;
-    usageMetrics.dailyshortPositionCount = INT_ZERO;
-    usageMetrics.dailyopenPositionCount = INT_ZERO;
-    usageMetrics.dailyclosedPositionCount = INT_ZERO;
-    usageMetrics.dailycumulativePositionCount = INT_ZERO;
+    usageMetrics.dailyLongPositionCount = INT_ZERO;
+    usageMetrics.dailyShortPositionCount = INT_ZERO;
+    usageMetrics.dailyOpenPositionCount = INT_ZERO;
+    usageMetrics.dailyClosedPositionCount = INT_ZERO;
+    usageMetrics.dailyCumulativePositionCount = INT_ZERO;
 
     usageMetrics.dailyTransactionCount = INT_ZERO;
     usageMetrics.dailyDepositCount = INT_ZERO;
@@ -741,6 +966,7 @@ export function getOrCreateTempUsageMetricsHourlySnapshot(
     usageMetrics.hourlyDepositCount = INT_ZERO;
     usageMetrics.hourlyWithdrawCount = INT_ZERO;
     usageMetrics.hourlySwapCount = INT_ZERO;
+    usageMetrics.hourlyBorrowCount = INT_ZERO;
 
     usageMetrics.save();
   }
@@ -777,6 +1003,7 @@ export function updateTempUsageMetrics(
     case EventType.CollateralIn:
       usageMetricsDaily.dailyCollateralIn += INT_ONE;
       usageMetricsDaily.dailyBorrowCount += INT_ONE;
+      usageMetricsHourly.hourlyBorrowCount += INT_ONE;
       if (isUniqueDailyUser(event, fromAddress, eventType)) {
         usageMetricsDaily.dailyActiveBorrowers += INT_ONE;
       }
@@ -826,14 +1053,14 @@ export function updateTempUsageMetrics(
 
   if (openPositionCount > INT_ZERO) {
     if (PositionSide.LONG == positionSide) {
-      usageMetricsDaily.dailylongPositionCount += INT_ONE;
+      usageMetricsDaily.dailyLongPositionCount += INT_ONE;
     } else {
-      usageMetricsDaily.dailyshortPositionCount += INT_ONE;
+      usageMetricsDaily.dailyShortPositionCount += INT_ONE;
     }
-    usageMetricsDaily.dailyopenPositionCount += INT_ONE;
-    usageMetricsDaily.dailycumulativePositionCount += INT_ONE;
+    usageMetricsDaily.dailyOpenPositionCount += INT_ONE;
+    usageMetricsDaily.dailyCumulativePositionCount += INT_ONE;
   } else if (openPositionCount < INT_ZERO) {
-    usageMetricsDaily.dailyclosedPositionCount += INT_ONE;
+    usageMetricsDaily.dailyClosedPositionCount += INT_ONE;
   }
 
   usageMetricsDaily.save();

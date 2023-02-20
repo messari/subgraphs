@@ -1,10 +1,4 @@
-import {
-  ethereum,
-  Bytes,
-  Address,
-  BigDecimal,
-  log,
-} from "@graphprotocol/graph-ts";
+import { ethereum, Bytes, Address } from "@graphprotocol/graph-ts";
 import {
   Account,
   LiquidityPool,
@@ -12,6 +6,8 @@ import {
   PositionSnapshot,
   _PositionCounter,
 } from "../../generated/schema";
+import { Vault } from "../../generated/Vault/Vault";
+import { NetworkConfigs } from "../../configurations/configure";
 import {
   decrementAccountOpenPositionCount,
   incrementAccountOpenPositionCount,
@@ -27,6 +23,8 @@ import {
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
+  PositionSide,
+  PRICE_PRECISION,
 } from "../utils/constants";
 import { bigDecimalToBigInt, exponentToBigDecimal } from "../utils/numbers";
 
@@ -66,6 +64,9 @@ export function createUserPosition(
   const position = new Position(positionId);
   position.account = account.id;
   position.liquidityPool = pool.id;
+  position.hashOpened = event.transaction.hash;
+  position.blockNumberOpened = event.block.number;
+  position.timestampOpened = event.block.timestamp;
   position.collateral = collateralTokenAddress;
   position.asset = indexTokenAddress;
   position.side = positionSide;
@@ -73,7 +74,7 @@ export function createUserPosition(
   position.fundingrateOpen = BIGDECIMAL_ZERO;
   const fundingTokenIndex = pool.inputTokens.indexOf(collateralTokenAddress);
   if (fundingTokenIndex >= 0) {
-    position.fundingrateOpen = pool._fundingrate[fundingTokenIndex];
+    position.fundingrateOpen = pool.fundingrate[fundingTokenIndex];
   }
 
   position.fundingrateClosed = BIGDECIMAL_ZERO;
@@ -84,7 +85,7 @@ export function createUserPosition(
   position.collateralBalanceUSD = BIGDECIMAL_ZERO;
   position.collateralInCount = INT_ZERO;
   position.collateralOutCount = INT_ZERO;
-  position._timestampClosed = BIGINT_ZERO;
+  position.liquidationCount = INT_ZERO;
   position.save();
 
   incrementAccountOpenPositionCount(account, positionSide);
@@ -128,9 +129,7 @@ export function updateUserPosition(
   account: Account,
   pool: LiquidityPool,
   collateralTokenAddress: Address,
-  collateralTokenAmountUSD: BigDecimal,
   indexTokenAddress: Address,
-  indexTokenAmountUSD: BigDecimal,
   positionSide: string,
   eventType: EventType
 ): Position {
@@ -145,36 +144,73 @@ export function updateUserPosition(
 
   switch (eventType) {
     case EventType.CollateralIn:
-      position.balanceUSD = position.balanceUSD.plus(indexTokenAmountUSD);
-      position.collateralBalanceUSD = position.collateralBalanceUSD.plus(
-        collateralTokenAmountUSD
-      );
       position.collateralInCount += INT_ONE;
-
       break;
     case EventType.CollateralOut:
-      position.balanceUSD = position.balanceUSD.minus(indexTokenAmountUSD);
-      position.collateralBalanceUSD = position.collateralBalanceUSD.minus(
-        collateralTokenAmountUSD
-      );
       position.collateralOutCount += INT_ONE;
-      validatePosition(event, account, pool, position);
-
       break;
     case EventType.Liquidated:
-      closePosition(event, account, pool, position);
-
+      position.liquidationCount += INT_ONE;
       break;
-
     default:
       break;
   }
 
-  if (position.collateralBalanceUSD != BIGDECIMAL_ZERO) {
-    position.leverage = position.balanceUSD.div(position.collateralBalanceUSD);
+  let isLong = true;
+  if (position.side == PositionSide.SHORT) {
+    isLong = false;
+  }
+  const vaultContract = Vault.bind(
+    Address.fromBytes(NetworkConfigs.getVaultAddress())
+  );
+  const tryGetPosition = vaultContract.try_getPosition(
+    Address.fromBytes(account.id),
+    collateralTokenAddress,
+    indexTokenAddress,
+    isLong
+  );
+  if (!tryGetPosition.reverted) {
+    position.balanceUSD = tryGetPosition.value
+      .getValue0()
+      .div(PRICE_PRECISION)
+      .toBigDecimal();
+    position.collateralBalanceUSD = tryGetPosition.value
+      .getValue1()
+      .div(PRICE_PRECISION)
+      .toBigDecimal();
+
+    const indexToken = getOrCreateToken(event, indexTokenAddress);
+    if (indexToken.lastPriceUSD && indexToken.lastPriceUSD != BIGDECIMAL_ZERO) {
+      position.balance = bigDecimalToBigInt(
+        position.balanceUSD
+          .times(exponentToBigDecimal(indexToken.decimals))
+          .div(indexToken.lastPriceUSD!)
+      );
+    }
+    const collateralToken = getOrCreateToken(event, collateralTokenAddress);
+    if (
+      collateralToken.lastPriceUSD &&
+      collateralToken.lastPriceUSD != BIGDECIMAL_ZERO
+    ) {
+      position.collateralBalance = bigDecimalToBigInt(
+        position.collateralBalanceUSD
+          .times(exponentToBigDecimal(collateralToken.decimals))
+          .div(collateralToken.lastPriceUSD!)
+      );
+    }
+
+    if (position.collateralBalanceUSD != BIGDECIMAL_ZERO) {
+      position.leverage = position.balanceUSD.div(
+        position.collateralBalanceUSD
+      );
+    }
   }
 
   position.save();
+
+  if (position.balanceUSD == BIGDECIMAL_ZERO) {
+    closePosition(event, account, pool, position);
+  }
 
   createPositionSnapshot(event, position);
 
@@ -191,6 +227,9 @@ export function createPositionSnapshot(
   const snapshot = new PositionSnapshot(id);
 
   snapshot.account = position.account;
+  snapshot.hash = event.transaction.hash;
+  snapshot.logIndex = event.transactionLogIndex.toI32();
+  snapshot.nonce = event.transaction.nonce;
   snapshot.position = position.id;
   snapshot.fundingrate = position.fundingrateOpen;
   snapshot.balance = position.balance;
@@ -203,64 +242,6 @@ export function createPositionSnapshot(
   snapshot.save();
 }
 
-function validatePosition(
-  event: ethereum.Event,
-  account: Account,
-  pool: LiquidityPool,
-  position: Position
-): void {
-  if (position.balanceUSD.le(BIGDECIMAL_ZERO)) {
-    if (position.balanceUSD.lt(BIGDECIMAL_ZERO)) {
-      log.error("Negative balance in position {}, balanceUSD: {}", [
-        position.id.toHexString(),
-        position.balanceUSD.toString(),
-      ]);
-    }
-    closePosition(event, account, pool, position);
-    return;
-  }
-
-  // balanceUSD is more accurate data as it comes from event data, re-calcuate balance with balanceUSD in case there is problem with balance.
-  if (position.balance < BIGINT_ZERO) {
-    log.error("Negative balance in position {}, balance: {}", [
-      position.id.toHexString(),
-      position.balance.toString(),
-    ]);
-    position.balance = BIGINT_ZERO;
-    const indexToken = getOrCreateToken(
-      event,
-      Address.fromBytes(position.asset)
-    );
-    if (indexToken.lastPriceUSD && indexToken.lastPriceUSD != BIGDECIMAL_ZERO) {
-      position.balance = bigDecimalToBigInt(
-        position.balanceUSD
-          .times(exponentToBigDecimal(indexToken.decimals))
-          .div(indexToken.lastPriceUSD!)
-      );
-    }
-  }
-
-  if (position.collateralBalance < BIGINT_ZERO) {
-    position.collateralBalance = BIGINT_ZERO;
-    const collateralToken = getOrCreateToken(
-      event,
-      Address.fromBytes(position.collateral)
-    );
-    if (
-      collateralToken.lastPriceUSD &&
-      collateralToken.lastPriceUSD != BIGDECIMAL_ZERO
-    ) {
-      position.collateralBalance = bigDecimalToBigInt(
-        position.collateralBalanceUSD
-          .times(exponentToBigDecimal(collateralToken.decimals))
-          .div(collateralToken.lastPriceUSD!)
-      );
-    }
-  }
-
-  position.save();
-}
-
 function closePosition(
   event: ethereum.Event,
   account: Account,
@@ -269,14 +250,16 @@ function closePosition(
 ): void {
   const fundingTokenIndex = pool.inputTokens.indexOf(position.collateral);
   if (fundingTokenIndex >= 0) {
-    position.fundingrateClosed = pool._fundingrate[fundingTokenIndex];
+    position.fundingrateClosed = pool.fundingrate[fundingTokenIndex];
   }
   position.leverage = BIGDECIMAL_ZERO;
   position.balance = BIGINT_ZERO;
   position.balanceUSD = BIGDECIMAL_ZERO;
   position.collateralBalance = BIGINT_ZERO;
   position.collateralBalanceUSD = BIGDECIMAL_ZERO;
-  position._timestampClosed = event.block.timestamp;
+  position.hashClosed = event.transaction.hash;
+  position.blockNumberClosed = event.block.number;
+  position.timestampClosed = event.block.timestamp;
   position.save();
 
   const counterID = account.id

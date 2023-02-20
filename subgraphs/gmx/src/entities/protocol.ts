@@ -1,4 +1,4 @@
-import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { DerivPerpProtocol } from "../../generated/schema";
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
@@ -44,7 +44,7 @@ export function getOrCreateProtocol(): DerivPerpProtocol {
     protocol.cumulativeUniqueBorrowers = INT_ZERO;
     protocol.cumulativeUniqueLiquidators = INT_ZERO;
     protocol.cumulativeUniqueLiquidatees = INT_ZERO;
-    protocol._cumulativeUniqueDepositors = INT_ZERO;
+    protocol.cumulativeUniqueDepositors = INT_ZERO;
 
     protocol.openInterestUSD = BIGDECIMAL_ZERO;
     protocol.longPositionCount = INT_ZERO;
@@ -59,12 +59,13 @@ export function getOrCreateProtocol(): DerivPerpProtocol {
     protocol.collateralInCount = INT_ZERO;
     protocol.collateralOutCount = INT_ZERO;
     protocol.borrowCount = INT_ZERO;
+    protocol.swapCount = INT_ZERO;
 
     protocol.totalPoolCount = INT_ZERO;
 
-    protocol._cumulativeInflowVolumeUSD = BIGDECIMAL_ZERO;
-    protocol._cumulativeClosedInflowVolumeUSD = BIGDECIMAL_ZERO;
-    protocol._cumulativeOutflowVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeInflowVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeClosedInflowVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeOutflowVolumeUSD = BIGDECIMAL_ZERO;
     protocol._lastSnapshotDayID = INT_ZERO;
     protocol._lastUpdateTimestamp = BIGINT_ZERO;
   }
@@ -92,27 +93,33 @@ export function increaseSupplySideRevenue(
 
 export function increaseProtocolVolume(
   event: ethereum.Event,
-  amountUSD: BigDecimal,
+  sizeUSDDelta: BigDecimal,
+  collateralUSDDelta: BigDecimal,
   eventType: EventType
 ): void {
   const protocol = getOrCreateProtocol();
   switch (eventType) {
     case EventType.CollateralIn:
-      protocol._cumulativeInflowVolumeUSD =
-        protocol._cumulativeInflowVolumeUSD.plus(amountUSD);
-      break;
-    case EventType.ClosePosition:
-      protocol._cumulativeClosedInflowVolumeUSD =
-        protocol._cumulativeClosedInflowVolumeUSD.plus(amountUSD);
+      protocol.cumulativeInflowVolumeUSD =
+        protocol.cumulativeInflowVolumeUSD.plus(collateralUSDDelta);
+      protocol.cumulativeVolumeUSD =
+        protocol.cumulativeVolumeUSD.plus(sizeUSDDelta);
       break;
     case EventType.CollateralOut:
-      protocol._cumulativeOutflowVolumeUSD =
-        protocol._cumulativeOutflowVolumeUSD.plus(amountUSD);
+      protocol.cumulativeOutflowVolumeUSD =
+        protocol.cumulativeOutflowVolumeUSD.plus(collateralUSDDelta);
+      protocol.cumulativeVolumeUSD =
+        protocol.cumulativeVolumeUSD.plus(sizeUSDDelta);
+      break;
+    case EventType.ClosePosition:
+    case EventType.Liquidated:
+      protocol.cumulativeClosedInflowVolumeUSD =
+        protocol.cumulativeClosedInflowVolumeUSD.plus(collateralUSDDelta);
       break;
     default:
       break;
   }
-  protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(amountUSD);
+
   protocol._lastUpdateTimestamp = event.block.timestamp;
   protocol.save();
 }
@@ -190,7 +197,8 @@ export function updateProtocolOpenInterestUSD(
 
 export function incrementProtocolEventCount(
   event: ethereum.Event,
-  eventType: EventType
+  eventType: EventType,
+  sizeDelta: BigInt
 ): void {
   const protocol = getOrCreateProtocol();
   switch (eventType) {
@@ -202,10 +210,15 @@ export function incrementProtocolEventCount(
       break;
     case EventType.CollateralIn:
       protocol.collateralInCount += INT_ONE;
-      protocol.borrowCount += INT_ONE;
+      if (sizeDelta > BIGINT_ZERO) {
+        protocol.borrowCount += INT_ONE;
+      }
       break;
     case EventType.CollateralOut:
       protocol.collateralOutCount += INT_ONE;
+      break;
+    case EventType.Swap:
+      protocol.swapCount += INT_ONE;
       break;
     default:
       break;

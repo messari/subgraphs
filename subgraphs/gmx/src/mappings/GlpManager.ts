@@ -9,7 +9,6 @@ import {
   getOrCreateLiquidityPool,
   updatePoolTvl,
   updatePoolOutputToken,
-  increasePoolVolume,
 } from "../entities/pool";
 import { createDeposit, createWithdraw, EventType } from "../entities/event";
 import {
@@ -18,7 +17,7 @@ import {
 } from "../entities/account";
 import { takeSnapshots, updateTempUsageMetrics } from "../entities/snapshots";
 import { convertTokenToDecimal } from "../utils/numbers";
-import { DEFAULT_DECIMALS, INT_ZERO } from "../utils/constants";
+import { BIGINT_ZERO, DEFAULT_DECIMALS, INT_ZERO } from "../utils/constants";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
   handleUpdateLiquidityEvent(
@@ -62,8 +61,8 @@ function handleUpdateLiquidityEvent(
   takeSnapshots(event);
 
   const account = getOrCreateAccount(event, accountAddress);
-  incrementAccountEventCount(event, account, eventType);
-  incrementProtocolEventCount(event, eventType);
+  incrementAccountEventCount(event, account, eventType, BIGINT_ZERO);
+  incrementProtocolEventCount(event, eventType, BIGINT_ZERO);
 
   const pool = getOrCreateLiquidityPool(event);
   const usdAmount = convertTokenToDecimal(usdgAmount, DEFAULT_DECIMALS);
@@ -101,8 +100,6 @@ function handleUpdateLiquidityEvent(
     convertTokenToDecimal(aumInUsdg, DEFAULT_DECIMALS),
     glpSupply
   );
-
-  increasePoolVolume(event, pool, usdAmount, eventType);
 
   updateTempUsageMetrics(event, accountAddress, eventType, INT_ZERO, null);
 }
