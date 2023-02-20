@@ -11,8 +11,9 @@ export function bigIntToBigDecimal(
   );
 }
 
-export function bigDecimalToBigInt(x: BigDecimal): BigInt {
-  return BigInt.fromString(x.truncate(0).toString());
+export function bigDecimalToBigInt(input: BigDecimal): BigInt {
+  const str = input.truncate(0).toString();
+  return BigInt.fromString(str);
 }
 
 // returns 10^exp

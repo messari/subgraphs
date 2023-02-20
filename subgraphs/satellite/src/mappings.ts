@@ -21,7 +21,8 @@ import {
 import { BurnableMintableCappedERC20 as TokenContract } from "../generated/AxelarGateway/BurnableMintableCappedERC20";
 import { BurnableMintableCappedERC20 as ERC20Template } from "../generated/templates";
 import { Transfer } from "../generated/templates/BurnableMintableCappedERC20/BurnableMintableCappedERC20";
-import { CustomEventType, SDK } from "./sdk/protocols/bridge";
+import { SDK } from "./sdk/protocols/bridge";
+import { CustomEventType } from "./sdk/util/events";
 import { TokenPricer } from "./sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
 import {
@@ -34,7 +35,7 @@ import { _ERC20 } from "../generated/AxelarGateway/_ERC20";
 import { ERC20NameBytes } from "../generated/AxelarGateway/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../generated/AxelarGateway/ERC20SymbolBytes";
 import { Versions } from "./versions";
-import { Token, _Refund, _TokenSymbol } from "../generated/schema";
+import { Token, _TokenSymbol } from "../generated/schema";
 import { bigIntToBigDecimal } from "./sdk/util/numbers";
 import { getUsdPricePerToken, getUsdPrice } from "./prices";
 import { networkToChainID } from "./sdk/protocols/bridge/chainIds";
@@ -244,10 +245,19 @@ export function handleTokenSent(event: TokenSent): void {
   );
   const dstNetworkConstants = getNetworkSpecificConstant(dstChainId);
   const dstPoolId = dstNetworkConstants.getPoolAddress();
+
+  const dstAddress1 = Bytes.fromUTF8(event.params.destinationAddress);
+  const dstAddress2 = Address.fromString(event.params.destinationAddress);
+  log.info("[handleTokenSent]original={},dstAddress1={},dstAddress2={}", [
+    event.params.destinationAddress,
+    dstAddress1.toHexString(),
+    dstAddress2.toHexString(),
+  ]);
+
   _handleTransferOut(
     Address.fromString(tokenAddress),
     event.params.sender,
-    Address.fromUTF8(event.params.destinationAddress),
+    Bytes.fromUTF8(event.params.destinationAddress),
     event.params.amount,
     dstChainId,
     poolId,
@@ -285,10 +295,9 @@ export function handleContractCallWithToken(
     null
   );
 
-  // TODO: message share the same id as transfer
-  //const sdk = _getSDK(event)!;
-  //const acc = sdk.Accounts.loadAccount(event.params.sender);
-  //acc.messageOut(dstChainId, dstAccount, event.params.payload);
+  const sdk = _getSDK(event)!;
+  const acc = sdk.Accounts.loadAccount(event.params.sender);
+  //TODO: acc.messageOut(dstChainId, dstAccount, event.params.payload);
 }
 
 export function handleContractCall(event: ContractCall): void {
@@ -346,10 +355,9 @@ export function handleContractCallApprovedWithMint(
     null
   );
 
-  // TODO: message shares the same id as transfer
-  //const sdk = _getSDK(event)!;
-  //const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
-  //acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
+  const sdk = _getSDK(event)!;
+  const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
+  //TODO: acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
 }
 
 export function handleMintToken(call: MintTokenCall): void {
