@@ -3,7 +3,9 @@
   "network": "arbitrum-one",
 
   "BentoBoxAddress": "0x74c764D41B77DBbb4fe771daB1939B00b146894A",
-  "DegenBoxEnabled": false,
+ "DegenBoxEnabled": true,
+  "DegenBoxAddress": "0x7c8fef8ea9b1fe46a7689bfb8149341c90431d38",
+  "DegenBoxStartBlock": "15370694",
   "SpellEnabled": true,
   "SpellAddress": "0x3E6648C5a70A150A88bCE65F4aD4d506Fe15d2AF",
   "SpellStartBlock": "821891",
