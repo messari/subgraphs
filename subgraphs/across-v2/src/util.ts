@@ -69,7 +69,6 @@ export class TokenInit implements TokenInitializer {
 }
 
 // Constants
-// TODO: lowercase the address
 export const ACROSS_PROTOCOL_NAME = "across-v2";
 export const ACROSS_HUB_POOL_CONTRACT =
   "0xc186fa914353c44b2e33ebe05f21846f1048beda";

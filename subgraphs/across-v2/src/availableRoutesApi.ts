@@ -924,6 +924,6 @@ export function findOriginToken(
       return route.originToken;
     }
   }
-  // TODO: should we return null?
+
   return destinationToken;
 }
