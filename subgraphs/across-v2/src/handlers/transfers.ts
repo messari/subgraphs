@@ -24,7 +24,6 @@ import {
   CrosschainTokenType,
 } from "../sdk/protocols/bridge/enums";
 
-import { _ERC20 } from "../../generated/SpokePool/_ERC20";
 import { FilledRelay } from "../../generated/SpokePool/SpokePool";
 import { AcceleratingDistributor } from "../../generated/SpokePool/AcceleratingDistributor";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
