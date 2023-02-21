@@ -1,0 +1,37 @@
+{
+  "gnosisAuctionAddress": "0xb5D00F83680ea5E078e911995c64b43Fbfd1eE61",
+  "gnosisAuctionStartBlock": 7347475,
+  "swapOldAddress": "0x907a3535EE5275e4af7E6c8A642c0F9443da1Dc2",
+  "swapOldStartBlock": 16406297,
+  "swapNewAddress": "0x15988ceA1F11D62e63bAa02B0e8B3046942983c0",
+  "swapNewStartBlock": 17220043,
+  "airswapAddress": "0x4572f2554421Bd64Bef1c22c8a81840E8D496BeA",
+  "airswapStartBlock": 11938402,
+  "gaugeControllerAddress": "",
+  "gaugeControllerStartBlock": 14285271,
+  "isGaugeController": false,
+  "network": "avalanche",
+
+  "vaults": [
+    {
+      "name": "RibbonAVAXCoveredCall",
+      "address": "0x98d03125c62DaE2328D9d3cb32b7B969e6a87787",
+      "startBlock": 7957363
+    },
+    {
+      "name": "RibbonsAVAXCoveredCall",
+      "address": "0x6BF686d99A4cE17798C45d09C21181fAc29A9fb3",
+      "startBlock": 11305836
+    },
+    {
+      "name": "RibbonUSDCAVAXPut",
+      "address": "0x9DD6be071b4292cc88B8190aB718329adEA3E3a3",
+      "startBlock": 8599821
+    }
+  ],
+  "liquidityGauges": [],
+
+  "graftEnabled": false,
+  "subgraphId": "QmTohsuueVrzG6MtghRWSDscYBKv88A21FVVnG6rmmF8L6",
+  "graftStartBlock": 14185606
+}
