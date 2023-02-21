@@ -9,7 +9,7 @@ import {
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
-  BIGINT_HUNDRED,
+  BIGINT_TEN,
 } from "../constants";
 import {
   findUSDPricePerToken,
@@ -57,7 +57,7 @@ export function getOrCreateToken(
   }
 
   if (
-    event.block.number.minus(token.lastPriceBlockNumber!).gt(BIGINT_HUNDRED) &&
+    event.block.number.minus(token.lastPriceBlockNumber!).gt(BIGINT_TEN) &&
     getNewPrice
   ) {
     const newPrice = findUSDPricePerToken(event, token);
