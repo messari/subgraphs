@@ -5,6 +5,8 @@ import {
   ethereum,
   Bytes,
   log,
+  crypto,
+  ByteArray,
 } from "@graphprotocol/graph-ts";
 import {
   TokenSent,
@@ -17,10 +19,8 @@ import {
   MintTokenCall,
   BurnTokenCall,
   DeployTokenCall,
+  Executed,
 } from "../generated/AxelarGateway/AxelarGateway";
-import { BurnableMintableCappedERC20 as TokenContract } from "../generated/AxelarGateway/BurnableMintableCappedERC20";
-import { BurnableMintableCappedERC20 as ERC20Template } from "../generated/templates";
-import { Transfer } from "../generated/templates/BurnableMintableCappedERC20/BurnableMintableCappedERC20";
 import { SDK } from "./sdk/protocols/bridge";
 import { CustomEventType } from "./sdk/util/events";
 import { TokenPricer } from "./sdk/protocols/config";
@@ -35,12 +35,13 @@ import { _ERC20 } from "../generated/AxelarGateway/_ERC20";
 import { ERC20NameBytes } from "../generated/AxelarGateway/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../generated/AxelarGateway/ERC20SymbolBytes";
 import { Versions } from "./versions";
-import { Token, _TokenSymbol } from "../generated/schema";
+import { Token, _Command, _TokenSymbol } from "../generated/schema";
 import { bigIntToBigDecimal } from "./sdk/util/numbers";
 import { getUsdPricePerToken, getUsdPrice } from "./prices";
 import { networkToChainID } from "./sdk/protocols/bridge/chainIds";
 import {
   BIGINT_ZERO,
+  BIGINT_ONE,
   getNetworkSpecificConstant,
   Network,
   TokenType,
@@ -159,19 +160,6 @@ export function onCreatePool(
   if (aux1 && aux2) {
     const token = sdk.Tokens.getOrCreateToken(Address.fromString(aux2));
     pool.initialize(`Axelar Bridge: ${token.name}`, token.name, aux1, token);
-
-    // append pool id to protocol._liquidityPoolIDs
-    /*
-    const protocol = sdk.Protocol.protocol;
-    let poolIDs = protocol._liquidityPoolIDs;
-    if (!poolIDs) {
-      poolIDs = [pool.getBytesID()];
-    } else {
-      poolIDs.push(pool.getBytesID());
-    }
-    protocol._liquidityPoolIDs = poolIDs;
-    protocol.save();
-    */
   }
 }
 
@@ -314,7 +302,7 @@ export function handleContractCall(event: ContractCall): void {
   acc.messageOut(dstChainId, dstAccount, event.params.payload);
 }
 
-export function handleTokenTransfer(event: Transfer): void {}
+//export function handleTokenTransfer(event: Transfer): void {}
 
 export function handleContractCallApproved(event: ContractCallApproved): void {
   // contract call
@@ -421,63 +409,145 @@ export function handleMintToken(call: MintTokenCall): void {
   );
 }
 
-export function handleBurnToken(call: BurnTokenCall): void {
-  log.info("[handleBurnToken]call.inputs.params {}", [
-    call.inputs.params.toHexString(),
-  ]);
-
-  // decode salt, symbol
-  const salt = Bytes.fromUint8Array(call.inputs.params.subarray(32, 64));
-  const symbol = Bytes.fromUint8Array(
-    call.inputs.params.subarray(96, 128)
-  ).toString();
-
-  // (symbol, salt)
-  //const params = ethereum.decode("string,bytes32", call.inputs.params)!;
-
-  log.info("[handleBurnToken]decoded: symbol={} salt={}", [
-    symbol,
-    salt.toHexString(),
-  ]);
-
-  //TODO: needed?
-  /*
-  const tokenSymbol = getOrCreateTokenSymbol(symbol);
-  const tokenAddress = tokenSymbol.tokenAddress!;
-  const tokenContract = TokenContract.bind(Address.fromString(tokenAddress));
-  const depositAddressResult = tokenContract.try_depositAddress(salt);
-  if (depositAddressResult.reverted) {
-    // TODO this  an external token
-    log.error(
-      "[handleBurnToken]Unable to get depositAddress for token {} at tx {}",
-      [tokenAddress, call.transaction.hash.toHexString()]
-    );
+export function handleCommandExecuted(event: Executed): void {
+  const receipt = event.receipt;
+  if (!receipt) {
+    log.error("[handleCommandExecuted]No receipt for tx {}", [
+      event.transaction.hash.toHexString(),
+    ]);
     return;
   }
-  //balanceOf
-  const amount = BIGINT_ZERO;
 
-  //this actually is the depositHandler contract address
-  const sender = depositAddressResult.value;
-  const poolId = call.to;
-  const dstChainId = networkToChainID(Network.UNKNOWN_NETWORK);
-  const dstPoolId = Address.zero(); // Not available
-  const dstAccount = sender; //Not available, assumed to be the same as sender
-  _handleTransferOut(
-    Address.fromString(tokenAddress),
-    sender,
+  const transferSignature = crypto.keccak256(
+    ByteArray.fromUTF8("Transfer(address,address,uint256)")
+  );
+
+  let tokenAddress = Address.zero();
+  let account = Address.zero();
+  let amount = BIGINT_ZERO;
+  const logs = event.receipt!.logs;
+  //Transfer should have an index that's below event.logIndex
+  const transferLogIndex = event.logIndex.minus(BIGINT_ONE);
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs[i];
+    if (thisLog.logIndex.gt(transferLogIndex)) {
+      return;
+    }
+    // topics[0] - signature
+    // topics[1] - from address
+    // topics[2] - to address
+    const logSignature = thisLog.topics[0];
+    if (
+      transferLogIndex.equals(thisLog.logIndex) &&
+      logSignature == transferSignature
+    ) {
+      const fromAddress = ethereum
+        .decode("address", thisLog.topics[1])!
+        .toAddress();
+      const toAddress = ethereum
+        .decode("address", thisLog.topics[2])!
+        .toAddress();
+
+      log.info("[handleCommandExecuted]thisLog.data={} tx={} logIndex={}", [
+        thisLog.data.toHexString(),
+        thisLog.transactionHash.toHexString(),
+        thisLog.logIndex.toString(),
+      ]);
+      const transferAmount = ethereum
+        .decode("uint256", thisLog.data)!
+        .toBigInt();
+
+      // transfer to burn
+      if (toAddress.equals(Address.zero())) {
+        tokenAddress = thisLog.address;
+        account = fromAddress;
+        amount = transferAmount;
+      }
+    }
+  }
+
+  if (
+    tokenAddress.equals(Address.zero()) ||
+    account.equals(Address.zero()) ||
+    amount.equals(BIGINT_ZERO)
+  ) {
+    log.info("[handleCommandExecuted]tx {} not a burn transaction", [
+      event.transaction.hash.toHexString(),
+    ]);
+    return;
+  }
+
+  log.info("[]tokenAddress={},account={},amoun{}, tx={}", [
+    tokenAddress.toHexString(),
+    account.toHexString(),
+    amount.toString(),
+    event.transaction.hash.toHexString(),
+  ]);
+
+  // this may be a burnToken tx that has already been handled by
+  // handleContractCallWithToken and handleTokenSent
+  const commandId = event.params.commandId;
+  let command = _Command.load(commandId);
+  if (!command) {
+    command = new _Command(commandId);
+    command.isBurnToken = false;
+    command.isProcessed = false;
+    command.tokenAddress = tokenAddress;
+    command.account = account;
+    command.amount = amount;
+    command.save();
+    return;
+  }
+
+  if (!command.isBurnToken || command.isProcessed) {
+    return;
+  }
+
+  _handleBurnToken(
+    commandId,
+    tokenAddress,
+    account,
+    amount,
+    command,
+    event,
+    null
+  );
+}
+
+export function handleBurnTokenCall(call: BurnTokenCall): void {
+  log.info("[handleBurnTokenCall]call.inputs.params {}, commandId={}", [
+    call.inputs.params.toHexString(),
+    call.inputs.value1.toHexString(),
+  ]);
+
+  const commandId = call.inputs.value1;
+  let command = _Command.load(commandId);
+  if (!command) {
+    command = new _Command(commandId);
+    command.isBurnToken = true;
+    command.isProcessed = false;
+    command.save();
+  }
+  command.isBurnToken = true;
+  command.save();
+
+  if (command.isProcessed) {
+    return;
+  }
+
+  const tokenAddress = Address.fromBytes(command.tokenAddress!);
+  const sender = Address.fromBytes(command.account!);
+  const amount = command.amount!;
+
+  _handleBurnToken(
+    commandId,
+    tokenAddress,
     sender,
     amount,
-    dstChainId,
-    dstPoolId,
-    poolId,
-    BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
+    command,
     null,
-    call,
-    call.inputs.value1
+    call
   );
-  */
 }
 
 //////////////////////////////// HELPER FUNCTIONS //////////////////////////////
@@ -625,6 +695,39 @@ function _handleMessageIn(
   const sdk = _getSDK(event, call)!;
   const acc = sdk.Accounts.loadAccount(receiver);
   acc.messageIn(srcChainId, sender, data);
+}
+
+function _handleBurnToken(
+  commandId: Bytes,
+  tokenAddress: Address,
+  account: Address,
+  amount: BigInt,
+  burnToken: _Command,
+  event: ethereum.Event | null,
+  call: ethereum.Call | null
+): void {
+  const sender = account;
+  const poolId = event ? event.address : call!.to;
+  const dstChainId = networkToChainID(Network.UNKNOWN_NETWORK);
+  const dstPoolId = Address.zero(); // Not available
+  const receiver = sender; //Not available, assumed to be the same as sender
+  _handleTransferOut(
+    Address.fromBytes(tokenAddress),
+    sender,
+    receiver,
+    amount,
+    dstChainId,
+    dstPoolId,
+    poolId,
+    BridgePoolType.BURN_MINT,
+    CrosschainTokenType.WRAPPED,
+    event,
+    call,
+    commandId
+  );
+
+  burnToken.isProcessed = true;
+  burnToken.save();
 }
 
 export function bytesToUnsignedBigInt(

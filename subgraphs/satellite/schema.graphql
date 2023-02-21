@@ -1393,3 +1393,19 @@ type _TokenSymbol @entity {
   " Token Type "
   tokenType: String
 }
+
+# helper for handling burnToken Command
+type _Command @entity {
+  " commandId "
+  id: Bytes!
+  " Is this a burnToken command? "
+  isBurnToken: Boolean!
+  " Has it been processed? "
+  isProcessed: Boolean!
+  " account address "
+  account: Bytes
+  " token address "
+  tokenAddress: Bytes
+  " burn amount "
+  amount: BigInt
+}
