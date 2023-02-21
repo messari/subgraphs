@@ -66,6 +66,7 @@ export class PoolSnapshot {
 
     // tvl and balances
     snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
+    snapshot.netValueExportedUSD = pool.netValueExportedUSD;
     snapshot.mintSupply = pool.mintSupply;
     snapshot.inputTokenBalance = pool.inputTokenBalance;
     snapshot.outputTokenSupply = pool.outputTokenSupply;
@@ -177,6 +178,7 @@ export class PoolSnapshot {
 
     // tvl and balances
     snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
+    snapshot.netValueExportedUSD = pool.netValueExportedUSD;
     snapshot.mintSupply = pool.mintSupply;
     snapshot.inputTokenBalance = pool.inputTokenBalance;
     snapshot.outputTokenSupply = pool.outputTokenSupply;
