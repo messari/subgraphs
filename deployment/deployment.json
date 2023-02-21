@@ -4699,6 +4699,7 @@
     "schema": "dex-amm",
     "base": "uniswap-forks",
     "protocol": "trisolaris",
+    "project": "trisolaris",
     "deployments": {
       "trisolaris-aurora": {
         "network": "aurora",
