@@ -7,8 +7,6 @@ import {
 } from "../common/getters";
 import {
   Token,
-  _HelperStore,
-  _LiquidityPoolAmount,
 } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,

@@ -13,9 +13,9 @@ export function handlePairCreated(event: PairCreated): void {
   ]);
   createLiquidityPool(
     event,
-    event.params.pair.toHexString(),
-    event.params.token0.toHexString(),
-    event.params.token1.toHexString()
+    event.params.pair,
+    event.params.token0,
+    event.params.token1
   );
 }
 

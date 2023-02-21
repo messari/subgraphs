@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { TokenABI } from "../../generated/Factory/TokenABI";
 import {
@@ -9,9 +9,6 @@ import {
   UsageMetricsDailySnapshot,
   LiquidityPoolDailySnapshot,
   FinancialsDailySnapshot,
-  _LiquidityPoolAmount,
-  _Transfer,
-  _TokenWhitelist,
   LiquidityPoolFee,
   Token,
   RewardToken,
@@ -19,8 +16,6 @@ import {
   UsageMetricsHourlySnapshot,
   Position,
   PositionSnapshot,
-  _PositionCounter,
-  Stat,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
@@ -34,7 +29,7 @@ import {
   SECONDS_PER_HOUR,
   INT_ONE,
 } from "./constants";
-import { createPoolFees, createStat } from "./creators";
+import { createPoolFees } from "./creators";
 
 
 /**
@@ -117,10 +112,9 @@ export function getOrCreateAccount(event:ethereum.Event): Account {
 }
 
 export function getOrCreateProtocol(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(NetworkConfigs.getFactoryAddress());
-
+  let protocol = DexAmmProtocol.load(Address.fromString(NetworkConfigs.getFactoryAddress()));
   if (!protocol) {
-    protocol = new DexAmmProtocol(NetworkConfigs.getFactoryAddress());
+    protocol = new DexAmmProtocol(Address.fromString(NetworkConfigs.getFactoryAddress()));
     protocol.name = NetworkConfigs.getProtocolName();
     protocol.slug = NetworkConfigs.getProtocolSlug();
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -134,9 +128,7 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.cumulativeUniqueTraders = INT_ZERO;
     protocol.openPositionCount = INT_ZERO;
     protocol.cumulativePositionCount = INT_ZERO;
-    protocol.activeLiquidity = BIGINT_ZERO;
     protocol.activeLiquidityUSD = BIGDECIMAL_ZERO;
-    protocol.totalLiquidity = BIGINT_ZERO;
     protocol.totalLiquidityUSD = BIGDECIMAL_ZERO;
 
     protocol.network = NetworkConfigs.getNetwork();
@@ -278,7 +270,7 @@ export function getOrCreateLiquidityPoolDailySnapshot(
   const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   const dayId = day.toString();
   let poolMetrics = LiquidityPoolDailySnapshot.load(
-    event.address.toHexString().concat("-").concat(dayId)
+    Address.fromString(event.address.toHexString().concat("-").concat(dayId))
   );
   let depositStatId = event.address.toHexString().concat("-deposit-").concat(dayId);
   let withdrawStatId = event.address.toHexString().concat("-withdraw-").concat(dayId);
@@ -287,10 +279,10 @@ export function getOrCreateLiquidityPoolDailySnapshot(
 
   if (!poolMetrics) {
     poolMetrics = new LiquidityPoolDailySnapshot(
-      event.address.toHexString().concat("-").concat(dayId)
+      Address.fromString(event.address.toHexString().concat("-").concat(dayId))
     );
     poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
-    poolMetrics.pool = event.address.toHexString();
+    poolMetrics.pool = event.address;
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyVolumeByTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
@@ -391,14 +383,14 @@ export function getOrCreateFinancialsDailySnapshot(
   return financialMetrics;
 }
 
-export function getOrCreateToken(address: string): Token {
+export function getOrCreateToken(address: Bytes): Token {
   let token = Token.load(address);
   if (!token) {
     token = new Token(address);
 
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
-    if (NetworkConfigs.getBrokenERC20Tokens().includes(address)) {
+    if (NetworkConfigs.getBrokenERC20Tokens().includes(address.toHexString())) {
       token.name = "";
       token.symbol = "";
       token.decimals = DEFAULT_DECIMALS;
@@ -406,7 +398,7 @@ export function getOrCreateToken(address: string): Token {
 
       return token as Token;
     }
-    const erc20Contract = TokenABI.bind(Address.fromString(address));
+    const erc20Contract = TokenABI.bind(Address.fromBytes(address));
     const decimals = erc20Contract.try_decimals();
     // Using try_cause some values might be missing
     const name = erc20Contract.try_name();
@@ -422,7 +414,7 @@ export function getOrCreateToken(address: string): Token {
 }
 
 export function getOrCreateLPToken(
-  tokenAddress: string,
+  tokenAddress: Bytes,
   token0: Token,
   token1: Token
 ): Token {

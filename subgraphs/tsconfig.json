@@ -2,6 +2,7 @@
   "extends": "@graphprotocol/graph-ts/types/tsconfig.base.json",
   "include": ["**/src", "**/protocols", "**/configurations"],
   "compilerOptions": {
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "lib": ["ES2016"]
   }
 }
