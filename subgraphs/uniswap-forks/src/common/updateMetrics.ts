@@ -5,11 +5,9 @@ import {
   Deposit,
   DexAmmProtocol,
   LiquidityPool,
-  Stat,
   Swap,
   Token,
   Withdraw,
-  _HelperStore,
 } from "../../generated/schema";
 import {
   getLiquidityPool,
@@ -19,8 +17,6 @@ import {
   getOrCreateFinancialsDailySnapshot,
   getOrCreateLiquidityPoolDailySnapshot,
   getOrCreateLiquidityPoolHourlySnapshot,
-  getOrCreateToken,
-  getOrCreateTokenWhitelist,
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
@@ -35,16 +31,12 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   UsageType,
-  DepositValueEntitySuffix,
-  StatValueEntitySuffix
 } from "./constants";
 import { convertTokenToDecimal, percToDec, BigDecimalArray } from "./utils/utils";
 import {
   findUSDPricePerToken,
   updateNativeTokenPriceInUSD,
 } from "../price/price";
-import { NetworkConfigs } from "../../configurations/configure";
-import { createStat } from "./creators";
 
 // Update FinancialsDailySnapshots entity
 // Updated on Swap, Burn, and Mint events.
@@ -327,32 +319,6 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetricsHourly.save();
 }
 
-// These whiteslists are used to track what pools the tokens are a part of. Used in price calculations.
-// Updated at the time of pool created (poolCreated event)
-export function updateTokenWhitelists(
-  token0: Token,
-  token1: Token,
-  poolAddress: string
-): void {
-  const tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
-  const tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
-
-  // update white listed pools
-  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist0.id)) {
-    const newPools = tokenWhitelist1.whitelistPools;
-    newPools.push(poolAddress);
-    tokenWhitelist1.whitelistPools = newPools;
-    tokenWhitelist1.save();
-  }
-
-  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist1.id)) {
-    const newPools = tokenWhitelist0.whitelistPools;
-    newPools.push(poolAddress);
-    tokenWhitelist0.whitelistPools = newPools;
-    tokenWhitelist0.save();
-  }
-}
-
 // Upate token balances based on reserves emitted from the Sync event.
 export function updateInputTokenBalances(
   poolAddress: string,
@@ -363,8 +329,8 @@ export function updateInputTokenBalances(
   const pool = getLiquidityPool(poolAddress, blockNumber);
   const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
-  const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
+  const token0 = Token.load(pool.inputTokens[INT_ZERO]);
+  const token1 = Token.load(pool.inputTokens[INT_ONE]);
 
   const tokenDecimal0 = convertTokenToDecimal(reserve0, token0.decimals);
   const tokenDecimal1 = convertTokenToDecimal(reserve1, token1.decimals);
@@ -394,8 +360,8 @@ export function updateTvlAndTokenPrices(
 
   const protocol = getOrCreateProtocol();
 
-  const token0 = getOrCreateToken(pool.inputTokens[0]);
-  const token1 = getOrCreateToken(pool.inputTokens[1]);
+  const token0 = Token.load(pool.inputTokens[0]);
+  const token1 = Token.load(pool.inputTokens[1]);
 
   const nativeToken = updateNativeTokenPriceInUSD();
 

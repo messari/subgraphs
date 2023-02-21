@@ -1,7 +1,5 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
-  _HelperStore,
-  _LiquidityPoolAmount,
   LiquidityPool,
   LiquidityPoolFee,
 } from "../../../../generated/schema";
@@ -23,15 +21,14 @@ import {
   getLiquidityPool,
   getOrCreateProtocol,
 } from "../../../../src/common/getters";
-import { updateTokenWhitelists } from "../../../../src/common/updateMetrics";
 import { NetworkConfigs } from "../../../../configurations/configure";
 
 // Create a liquidity pool from PairCreated contract call (for WETH pairs on Polygon)
 function createHalvedPoolFees(
-  poolAddress: string,
+  poolAddress: Bytes,
   blockNumber: BigInt
-): string[] {
-  const poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
+): Bytes[] {
+  const poolLpFee = new LiquidityPoolFee(fromBytes(poolAddress.toHexString().concat("-lp-fee")));
   const poolProtocolFee = new LiquidityPoolFee(
     poolAddress.concat("-protocol-fee")
   );
@@ -68,7 +65,7 @@ function createHalvedPoolFees(
 // Create a liquidity pool from PairCreated contract call
 export function createLiquidityPool(
   event: ethereum.Event,
-  poolAddress: string,
+  poolAddress: Bytes,
   token0Address: string,
   token1Address: string
 ): void {
@@ -86,7 +83,7 @@ export function createLiquidityPool(
 
   pool.protocol = protocol.id;
   pool.inputTokens = [token0.id, token1.id];
-  pool.outputToken = LPtoken.id;
+  pool.liquidityToken = LPtoken.id;
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
@@ -94,10 +91,8 @@ export function createLiquidityPool(
     BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
     BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
   ];
-  pool.outputTokenSupply = BIGINT_ZERO;
   pool.activeLiquidity = BIGINT_ZERO;
   pool.totalLiquidity = BIGINT_ZERO;
-  pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.rewardTokens = [];
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
@@ -130,7 +125,7 @@ export function createLiquidityPool(
   protocol.save();
 
   // create the tracked contract based on the template
-  PairTemplate.create(Address.fromString(poolAddress));
+  PairTemplate.create(Address.fromString(poolAddress.toHexString()));
 
   pool.save();
   token0.save();

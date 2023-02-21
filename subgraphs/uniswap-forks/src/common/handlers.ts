@@ -1,7 +1,7 @@
 import { ethereum, BigInt, log } from "@graphprotocol/graph-ts";
 import { getOrCreateAccount, getOrCreatePosition, getOrCreateProtocol, getOrCreateTransfer } from "./getters";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, TransferType } from "./constants";
-import { LiquidityPool, Token, _PositionCounter } from "../../generated/schema";
+import { LiquidityPool, Token } from "../../generated/schema";
 import { ADDRESS_ZERO } from "../../../ellipsis-finance/src/common/constants";
 import { convertTokenToDecimal } from "./utils/utils";
 
@@ -16,9 +16,7 @@ export function handleTransferMint(
   const protocol = getOrCreateProtocol();
 
   // Tracks supply of minted LP tokens
-  pool.outputTokenSupply = pool.outputTokenSupply!.plus(value);
-  
-  const token = pool.outputToken ? Token.load(pool.outputToken!) : null;
+  const token = pool.liquidityToken ? Token.load(pool.liquidityToken!) : null;
   let decimals = token ? token.decimals : DEFAULT_DECIMALS;
 
   const liquidity = convertTokenToDecimal(
@@ -40,9 +38,7 @@ export function handleTransferMint(
   pool.totalLiquidity = pool.activeLiquidity;
   pool.totalLiquidityUSD = pool.activeLiquidityUSD;
 
-  protocol.activeLiquidity = protocol.activeLiquidity!.plus(value);
   protocol.activeLiquidityUSD = protocol.activeLiquidityUSD!.plus(liquidityUSD)
-  protocol.totalLiquidity = protocol.activeLiquidity;
   protocol.totalLiquidityUSD = protocol.activeLiquidityUSD;
 
   // if - create new mint if no mints so far or if last one is done already
@@ -95,9 +91,7 @@ export function handleTransferBurn(
   const protocol = getOrCreateProtocol();
 
   // Tracks supply of minted LP tokens
-  pool.outputTokenSupply = pool.outputTokenSupply!.minus(value);
-  
-  const token = pool.outputToken ? Token.load(pool.outputToken!) : null;
+  const token = pool.liquidityToken ? Token.load(pool.liquidityToken!) : null;
   let decimals = token ? token.decimals : DEFAULT_DECIMALS;
   
   const liquidity = convertTokenToDecimal(
@@ -116,9 +110,7 @@ export function handleTransferBurn(
   pool.totalLiquidity = pool.activeLiquidity;
   pool.totalLiquidityUSD = pool.activeLiquidityUSD;
 
-  protocol.activeLiquidity = protocol.activeLiquidity!.minus(value);
   protocol.activeLiquidityUSD = protocol.activeLiquidityUSD!.minus(liquidityUSD)
-  protocol.totalLiquidity = protocol.activeLiquidity;
   protocol.totalLiquidityUSD = protocol.activeLiquidityUSD;
 
   // Uses address from the transfer to pool part of the burn. Set transfer type from this handler.
@@ -156,11 +148,11 @@ export function handleTransferPosition(
   const to = getOrCreateAccount(event);
   let toPosition = getOrCreatePosition(event);
 
-  fromPosition.outputTokenBalance = fromPosition.outputTokenBalance!.minus(value);
-  if(fromPosition.outputTokenBalance == BIGINT_ZERO && fromPosition.inputTokenBalances[0] == BIGINT_ZERO && fromPosition.inputTokenBalances[1] == BIGINT_ZERO) {
+  fromPosition.liquidity = fromPosition.liquidity!.minus(value);
+  if(fromPosition.liquidity == BIGINT_ZERO && fromPosition.cumulativeDepositTokenAmounts[0] == BIGINT_ZERO && fromPosition.cumulativeDepositTokenAmounts[1] == BIGINT_ZERO) {
     // close the position
     fromPosition.blockNumberClosed = event.block.number
-    fromPosition.hashClosed = event.transaction.hash.toHexString();
+    fromPosition.hashClosed = event.transaction.hash;
     fromPosition.timestampClosed = event.block.timestamp;
     fromPosition.save();
     if(from.openPositionCount > 0) {
@@ -175,7 +167,7 @@ export function handleTransferPosition(
     counter!.save();
   }
 
-  toPosition.outputTokenBalance = toPosition.outputTokenBalance!.plus(value);
+  toPosition.liquidity = toPosition.liquidity!.plus(value);
   toPosition.save();
 
 }
