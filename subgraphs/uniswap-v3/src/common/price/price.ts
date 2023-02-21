@@ -16,11 +16,14 @@ import {
   BIGDECIMAL_ZERO,
   BIGDECIMAL_ONE,
   BIGDECIMAL_TWO,
+  BIGDECIMAL_TEN,
   INT_ONE,
   INT_ZERO,
   Q192,
   PRECISION,
   BIGDECIMAL_TEN_THOUSAND,
+  PRICE_CHANGE_BUFFER_LIMIT,
+  BIGDECIMAL_TEN_BILLION,
 } from "../constants";
 import {
   convertTokenToDecimal,
@@ -139,46 +142,85 @@ export function findUSDPricePerToken(
       const pool = getLiquidityPool(poolAddress)!;
 
       if (pool.totalValueLockedUSD.gt(BIGDECIMAL_ZERO)) {
+        let whitelistTokenIndex = -1;
+        let tokenIndex = -1;
         if (pool.inputTokens[0] == token.id) {
-          // whitelist token is token1
-          const token1 = getOrCreateToken(event, pool.inputTokens[1], false);
-          // get the derived whitelist token in pool
-          const whitelistTokenValueLocked =
-            poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!);
-          if (
-            whitelistTokenValueLocked.gt(largestWhitelistTokenValue) &&
-            whitelistTokenValueLocked.gt(
-              NetworkConfigs.getMinimumLiquidityThreshold()
-            )
-          ) {
-            largestWhitelistTokenValue = whitelistTokenValueLocked;
-            // token1 per our token * whitelist token per token1
-            priceSoFar = poolAmounts.tokenPrices[1].times(
-              token1.lastPriceUSD as BigDecimal
-            );
-          }
+          whitelistTokenIndex = 1;
+          tokenIndex = 0;
+        } else if (pool.inputTokens[1] == token.id) {
+          whitelistTokenIndex = 0;
+          tokenIndex = 1;
         }
-        if (pool.inputTokens[1] == token.id) {
-          const token0 = getOrCreateToken(event, pool.inputTokens[0], false);
-          // get the derived whitelist in pool
-          const whitelistTokenValueLocked =
-            poolAmounts.inputTokenBalances[0].times(token0.lastPriceUSD!);
-          if (
-            whitelistTokenValueLocked.gt(largestWhitelistTokenValue) &&
-            whitelistTokenValueLocked.gt(
-              NetworkConfigs.getMinimumLiquidityThreshold()
-            )
-          ) {
-            largestWhitelistTokenValue = whitelistTokenValueLocked;
-            // token0 per our token * whitelist token per token0
-            priceSoFar = poolAmounts.tokenPrices[0].times(
-              token0.lastPriceUSD as BigDecimal
-            );
+
+        // Return if token is not in pool
+        if (tokenIndex == -1 || whitelistTokenIndex == -1) {
+          continue;
+        }
+
+        // log.warning("HELLO", [])
+
+        // whitelist token is token1
+        const whitelistToken = getOrCreateToken(
+          event,
+          pool.inputTokens[whitelistTokenIndex],
+          false
+        );
+        // get the derived whitelist token in pool
+        const whitelistTokenValueLocked = poolAmounts.inputTokenBalances[
+          whitelistTokenIndex
+        ].times(whitelistToken.lastPriceUSD!);
+
+        // Check if it meets criteria to update prices.
+        if (
+          whitelistTokenValueLocked.gt(largestWhitelistTokenValue) &&
+          whitelistTokenValueLocked.gt(
+            NetworkConfigs.getMinimumLiquidityThreshold()
+          )
+        ) {
+          // Calculate new price of a token and TVL of token in this pool.
+          const newPriceSoFar = poolAmounts.tokenPrices[
+            whitelistTokenIndex
+          ].times(whitelistToken.lastPriceUSD as BigDecimal);
+          const newTokenTotalValueLocked =
+            poolAmounts.inputTokenBalances[tokenIndex].times(newPriceSoFar);
+
+          // If price is too high, skip this pool
+          if (newTokenTotalValueLocked.gt(BIGDECIMAL_TEN_BILLION)) {
+            log.warning("Price too high for token: {} from pool: {}", [
+              token.id.toHexString(),
+              pool.id.toHexString(),
+            ]);
+            continue;
           }
+
+          // Set new price and largest pool for pricing.
+          largestWhitelistTokenValue = whitelistTokenValueLocked;
+          priceSoFar = newPriceSoFar;
         }
       }
     }
   }
+
+  // Uncomment this after the current production version is fully synced and re-deploy to make the oracle more robust
+
+  // if (!token.lastPriceUSD || token.lastPriceUSD!.equals(BIGDECIMAL_ZERO)) {
+  //   return priceSoFar
+  // }
+
+  // // If priceSoFar 10x greater or less than token.lastPriceUSD, use token.lastPriceUSD
+  // // Increment buffer so that it allows large price jumps if seen repeatedly
+  // if (
+  //   (priceSoFar.gt(token.lastPriceUSD!.times(BIGDECIMAL_TEN)) ||
+  //   priceSoFar.lt(token.lastPriceUSD!.div(BIGDECIMAL_TEN)))
+  // ) {
+  //   if (token._largePriceChangeBuffer < PRICE_CHANGE_BUFFER_LIMIT) {
+  //     token._largePriceChangeBuffer = token._largePriceChangeBuffer + 1;
+  //     return token.lastPriceUSD!;
+  //   }
+  // }
+
+  // token._largePriceChangeBuffer = 0;
+
   return priceSoFar; // nothing was found return 0
 }
 

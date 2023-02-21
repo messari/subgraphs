@@ -134,6 +134,7 @@ export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_THREE = 3 as i32;
+export const PRICE_CHANGE_BUFFER_LIMIT = 5 as i32;
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));

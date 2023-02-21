@@ -159,10 +159,12 @@ export class DexEventHandler {
 
     // Raw Deltas
     this.inputTokenBalanceDeltas = deltas.inputTokenBalancesDeltas;
+
     this.uncollectedSupplySideTokenAmountsDeltas =
       deltas.uncollectedSupplySideTokenAmountsDeltas;
     this.uncollectedProtocolSideTokenAmountsDeltas =
       deltas.uncollectedProtocolSideTokenAmountsDeltas;
+
     this.totalLiquidityDelta = deltas.totalLiquidityDelta;
     this.activeLiquidityDelta = deltas.activeLiquidityDelta;
 
@@ -186,10 +188,8 @@ export class DexEventHandler {
 
     // Liquidity Deltas and Balances
     this.totalLiquidity = pool.totalLiquidity.plus(this.totalLiquidityDelta);
-    this.totalLiquidityUSD = sumBigDecimalList(this.inputTokenBalancesUSD);
-    this.totalLiquidityDeltaUSD = this.totalLiquidityUSD.minus(
-      this.pool.totalLiquidityUSD
-    );
+    this.totalLiquidityUSD = BIGDECIMAL_ZERO;
+    this.totalLiquidityDeltaUSD = BIGDECIMAL_ZERO;
 
     // Get the new liquidity price per unit
     this.newLiquidityPricePerUnit = safeDivBigDecimal(
@@ -199,14 +199,10 @@ export class DexEventHandler {
 
     // Get the deltas and values of the liquidity that is wihtin tick range.
     this.activeLiquidity = pool.activeLiquidity.plus(this.activeLiquidityDelta);
-    this.activeLiquidityUSD = this.activeLiquidity
-      .toBigDecimal()
-      .times(this.newLiquidityPricePerUnit);
-    this.activeLiquidityDeltaUSD = this.activeLiquidityUSD.minus(
-      this.pool.activeLiquidityUSD
-    );
+    this.activeLiquidityUSD = BIGDECIMAL_ZERO;
+    this.activeLiquidityDeltaUSD = BIGDECIMAL_ZERO;
 
-    // Uncollected Token Deltas and Balances
+    // TEMPORARILY DISABLED AS WE ARE NOT TRACKING UNCOLLECTED TOKENS ON THIS BRANCH
     this.uncollectedSupplySideTokenAmounts = sumBigIntListByIndex([
       pool.uncollectedSupplySideTokenAmounts,
       this.uncollectedSupplySideTokenAmountsDeltas,
@@ -234,11 +230,7 @@ export class DexEventHandler {
     );
 
     // Total Value Locked
-    this.totalValueLockedUSD = this.totalLiquidityUSD.plus(
-      sumBigDecimalList(this.uncollectedProtocolSideValuesUSD).plus(
-        sumBigDecimalList(this.uncollectedSupplySideValuesUSD)
-      )
-    );
+    this.totalValueLockedUSD = sumBigDecimalList(this.inputTokenBalancesUSD);
     this.totalValueLockedUSDDelta = this.totalValueLockedUSD.minus(
       this.pool.totalValueLockedUSD
     );

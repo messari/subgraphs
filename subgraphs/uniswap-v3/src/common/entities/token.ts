@@ -9,6 +9,7 @@ import {
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
+  BIGINT_HUNDRED,
 } from "../constants";
 import {
   findUSDPricePerToken,
@@ -46,6 +47,7 @@ export function getOrCreateToken(
     }
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
+    // token._largePriceChangeBuffer = 0;
 
     // Fixing token fields that did not return proper values from contract
     // Manually coded in when necessary
@@ -54,8 +56,13 @@ export function getOrCreateToken(
     token.save();
   }
 
-  if (token.lastPriceBlockNumber != event.block.number && getNewPrice) {
-    token.lastPriceUSD = findUSDPricePerToken(event, token);
+  if (
+    event.block.number.minus(token.lastPriceBlockNumber!).gt(BIGINT_HUNDRED) &&
+    getNewPrice
+  ) {
+    const newPrice = findUSDPricePerToken(event, token);
+
+    token.lastPriceUSD = newPrice;
     token.lastPriceBlockNumber = event.block.number;
     token.save();
   }
