@@ -1,5 +1,3 @@
-import { log } from "@graphprotocol/graph-ts";
-
 const availableRoutes: Array<Route> = [
   {
     originChainId: 1,
@@ -923,27 +921,9 @@ export function findOriginToken(
       route.destinationToken.toLowerCase() == destinationToken.toLowerCase() &&
       route.destinationChainId == destinationChainId
     ) {
-      log.error(
-        " +++ MATCHFOUND: originChainId: {}, routeOC: {}, destinationChainId: {}, routeDC: {}, destinationToken: {}, routeDT: {}, routeOT: {}",
-        [
-          originChainId.toString(),
-          route.originChainId.toString(),
-          destinationChainId.toString(),
-          route.destinationChainId.toString(),
-          destinationToken,
-          route.destinationToken,
-          route.originToken,
-        ]
-      );
-
       return route.originToken;
     }
   }
-
-  log.error(
-    " --- MATCHNOTFOUND: originChainId: {}, destinationChainId: {}, destinationToken: {}",
-    [originChainId.toString(), destinationChainId.toString(), destinationToken]
-  );
   // TODO: should we return null?
   return destinationToken;
 }

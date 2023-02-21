@@ -5,8 +5,16 @@ import {
   RewardTokenType,
   SECONDS_PER_DAY_BI,
 } from "../sdk/util/constants";
-import { Versions } from "../versions";
+import {
+  ACROSS_ACCELERATING_DISTRIBUTOR_CONTRACT,
+  ACROSS_PROTOCOL_NAME,
+  ACROSS_REWARD_TOKEN,
+  Pricer,
+  TokenInit,
+} from "../util";
+import { getUsdPrice } from "../prices";
 import { findOriginToken } from "../availableRoutesApi";
+import { Versions } from "../versions";
 
 import { SDK } from "../sdk/protocols/bridge";
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
@@ -19,32 +27,15 @@ import {
 import { _ERC20 } from "../../generated/SpokePool/_ERC20";
 import { FilledRelay } from "../../generated/SpokePool/SpokePool";
 import { AcceleratingDistributor } from "../../generated/SpokePool/AcceleratingDistributor";
-import { Pricer, TokenInit } from "./common";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
 
 export function handleFilledRelay(event: FilledRelay): void {
-  // uint256 amount
-  // uint256 totalFilledAmount
-  // uint256 fillAmount
-  // uint256 repaymentChainId
-  // uint256 originChainId
-  // uint256 destinationChainId
-  // uint64 relayerFeePct
-  // uint64 appliedRelayerFeePct
-  // uint64 realizedLpFeePct
-  // uint32 depositId
-  // address destinationToken
-  // index_topic_1 address relayer
-  // index_topic_2 address depositor
-  // address recipient
-  // bool isSlowRelay
-
   // Config
   const conf = new BridgeConfig(
-    event.address.toHexString(), // TODO: verify
-    "across-v2", //NetworkConfigs.getProtocolName(),
-    "across-v2", // NetworkConfigs.getProtocolSlug(),
-    BridgePermissionType.WHITELIST, // TBD
+    event.address.toHexString(),
+    ACROSS_PROTOCOL_NAME,
+    ACROSS_PROTOCOL_NAME,
+    BridgePermissionType.WHITELIST,
     Versions
   );
 
@@ -104,26 +95,30 @@ export function handleFilledRelay(event: FilledRelay): void {
   );
 
   // Revenue
-  // TODO: lpfee % is not in %, fix
   // Note: We take the amount from crossChain (origin) and multiplying by inputToken price (destination).
   // This isn't ideal but we do this because we don't have access to price for the crossToken.
-  const supplySideRevenue = bigIntToBigDecimal(
-    event.params.amount.times(event.params.realizedLpFeePct),
-    inputToken.decimals
-  ).times(inputToken.lastPriceUSD!);
+  const lpFee = bigIntToBigDecimal(event.params.realizedLpFeePct);
+  const supplySideRevenueAmount = bigIntToBigDecimal(event.params.amount).times(
+    lpFee
+  );
+  const supplySideRevenue = getUsdPrice(
+    inputTokenAddress,
+    supplySideRevenueAmount
+  );
   pool.addSupplySideRevenueUSD(supplySideRevenue);
 
   // Rewards
   // RewardToken can also be fetched from AcceleratingDistributor contract ("rewardToken" method)
   // Only track rewardToken emissions on mainnet where AcceleratingDistributor is deployed
-  if (destinationChainId == networkToChainID(Network.MAINNET)) {
-    const rewardTokenAddress = Address.fromString(
-      "0x44108f0223A3C3028F5Fe7AEC7f9bb2E66beF82F"
-    );
+  if (
+    destinationChainId == networkToChainID(Network.MAINNET) &&
+    event.block.number >= BigInt.fromI32(15977129)
+  ) {
+    const rewardTokenAddress = Address.fromString(ACROSS_REWARD_TOKEN);
     const rewardToken = sdk.Tokens.getOrCreateToken(rewardTokenAddress);
 
     const acceleratingDistributorContract = AcceleratingDistributor.bind(
-      Address.fromString("0x9040e41eF5E8b281535a96D9a48aCb8cfaBD9a48")
+      Address.fromString(ACROSS_ACCELERATING_DISTRIBUTOR_CONTRACT)
     );
     const contractCall =
       acceleratingDistributorContract.try_stakingTokens(rewardTokenAddress);
@@ -135,9 +130,16 @@ export function handleFilledRelay(event: FilledRelay): void {
         []
       );
     } else {
+      log.error("baseEmission: {}", [
+        contractCall.value.getBaseEmissionRate().toString(),
+      ]);
       baseEmissionRate = contractCall.value.getBaseEmissionRate();
     }
 
+    log.error("tx: {} baseEmissionRate: {}", [
+      event.transaction.hash.toHexString(),
+      baseEmissionRate!.toString(),
+    ]);
     const amount = baseEmissionRate!
       .times(SECONDS_PER_DAY_BI)
       .div(BigInt.fromI32(rewardToken.decimals));

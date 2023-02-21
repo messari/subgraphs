@@ -10,17 +10,21 @@ import {
   BridgePoolType,
 } from "../sdk/protocols/bridge/enums";
 import { Versions } from "../versions";
-import { Pricer, TokenInit } from "./common";
+import {
+  ACROSS_HUB_POOL_CONTRACT,
+  ACROSS_PROTOCOL_NAME,
+  Pricer,
+  TokenInit,
+} from "../util";
 
 const conf = new BridgeConfig(
-  "0xc186fA914353c44b2E33eBE05f21846F1048bEda", // hub-pool address
-  "across-v2", //NetworkConfigs.getProtocolName(),
-  "across-v2", // NetworkConfigs.getProtocolSlug(),
-  BridgePermissionType.WHITELIST, // TBD
+  ACROSS_HUB_POOL_CONTRACT,
+  ACROSS_PROTOCOL_NAME,
+  ACROSS_PROTOCOL_NAME,
+  BridgePermissionType.WHITELIST,
   Versions
 );
 
-// TODO: further scope to reduce duplication - only different parameter is lpTokensMinted vs lpTokensBurned
 export function handleLiquidityAdded(event: LiquidityAdded): void {
   const sdk = SDK.initializeFromEvent(
     conf,
@@ -41,8 +45,6 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   const amount = event.params.amount;
   const account = sdk.Accounts.loadAccount(event.params.liquidityProvider);
 
-  // TODO: liquidityDeposit.from is set to poolId, expected?
-  // TODO: should pool name and symbol be "Pool - Token" (Eg HubPool - Wrapped Ether)? Doesn't matter since there is only a single liquidity pool in ethereum anyway.
   account.liquidityDeposit(pool, amount);
 }
 
