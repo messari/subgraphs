@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
+import { Box, Grid, Tooltip, Typography } from "@mui/material";
 import { dateValueKeys, negativeFieldList } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
 import { useEffect, useState } from "react";
@@ -7,8 +7,9 @@ import { BigNumber } from "bignumber.js";
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
 import JSZip from "jszip";
-import DefiLlamaComparsionTab from "../DefiLlamaComparisonTab";
+import DefiLlamaComparsionTab from "../../common/chartComponents/DefiLlamaComparison";
 import { UploadFileCSV } from "../../common/utilComponents/UploadFileCSV";
+import { useSearchParams } from "react-router-dom";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
@@ -47,9 +48,18 @@ function ProtocolTabEntity({
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   const list: { [x: string]: any } = {};
 
+  const [searchParams] = useSearchParams();
+  const defiLlamaNetworkParam = searchParams.get("defillamanetwork") || null;
+  const defiLlamaProtocolParam = searchParams.get("defillamaprotocol") || null;
+
+  let defiLlamaCompareTVLDefault = false;
+  if (defiLlamaProtocolParam || defiLlamaNetworkParam) {
+    defiLlamaCompareTVLDefault = true;
+  }
+
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
   const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
-  const [defiLlamaCompareTVL, setDefiLlamaCompareTVL] = useState<boolean>(false);
+  const [defiLlamaCompareTVL, setDefiLlamaCompareTVL] = useState<boolean>(defiLlamaCompareTVLDefault);
   const [csvJSON, setCsvJSON] = useState<any>(null);
   const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
 
@@ -216,7 +226,7 @@ function ProtocolTabEntity({
                   };
                 }
               }
-              if (fieldName.includes("umulative")) {
+              if (fieldName?.toUpperCase()?.includes("CUMULATIVE")) {
                 if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
                   dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
                 }
@@ -262,7 +272,7 @@ function ProtocolTabEntity({
                   }
                   dataFieldMetrics[fieldName].negative.count += 1;
                 }
-                if (dataFieldKey.includes("umulative")) {
+                if (dataFieldKey?.toUpperCase()?.includes("CUMULATIVE")) {
                   if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes("cumulative")) {
                     dataFieldMetrics[dataFieldKey].cumulative = { prevVal: 0, hasLowered: "" };
                   }
@@ -397,7 +407,9 @@ function ProtocolTabEntity({
               </Typography>
             </CopyLinkToClipboard>
           </Box>
-          <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}><UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} /></Tooltip>
+          <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}>
+            <UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} />
+          </Tooltip>
           <div>
             <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
             <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Chart Images</div>
@@ -408,7 +420,7 @@ function ProtocolTabEntity({
             if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
               return <>
                 <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(false)} >Remove DefiLlama Comparison</div>
-                <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} getData={() => console.log('GET DATA')} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
+                <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
             }
 
             const label = entityName + "-" + field;
@@ -547,7 +559,14 @@ function ProtocolTabEntity({
         return <h3>JAVASCRIPT ERROR - PROTOCOL TAB</h3>;
       }
     }
-  } else if (currentTimeseriesLoading || (!currentTimeseriesLoading && !currentEntityData && !currentTimeseriesError)) {
+  } else if (currentTimeseriesError) {
+    issues.push({
+      type: "VAL",
+      message: currentTimeseriesError?.message,
+      level: "critical",
+      fieldName: entityName + "-" + currentTimeseriesError?.message,
+    });
+
     return (
       <Grid key={entityName}>
         <Box my={3}>
@@ -557,7 +576,7 @@ function ProtocolTabEntity({
             </Typography>
           </CopyLinkToClipboard>
         </Box>
-        <CircularProgress sx={{ margin: 6 }} size={50} />
+        <h3>{currentTimeseriesError?.message}</h3>
       </Grid>
     );
   } else {
@@ -570,8 +589,6 @@ function ProtocolTabEntity({
             </Typography>
           </CopyLinkToClipboard>
         </Box>
-        <h3>Hold on! This subgraph has alot of entities, it may take a minute for the query to return.</h3>
-        <CircularProgress sx={{ margin: 6 }} size={50} />
       </Grid>
     );
   }

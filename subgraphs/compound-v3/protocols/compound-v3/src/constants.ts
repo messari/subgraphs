@@ -32,6 +32,9 @@ export const DEFAULT_DECIMALS = 18;
 export const CONFIGURATOR_ADDRESS =
   "0x316f9708bB98af7dA9c68C1C3b5e79039cD336E3";
 export const REWARDS_ADDRESS = "0x1B0e765F6224C21223AeA2af16c1C46E38885a40";
+export const WETH_COMET_ADDRESS = "0xA17581A9E3356d9A858b789D68B4d866e593aE94";
+export const USDC_COMET_WETH_MARKET_ID =
+  "0xc3d688b66703497daa19211eedff47f25384cdc3c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 
 /////////////////////////////
 ///// Protocol Specific /////

@@ -1,0 +1,258 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum/contract
+    name: PoolAddressesProviderRegistry
+    network: {{ network }}
+    source:
+      address: "{{ PoolAddressesProviderRegistry.address }}"
+      abi: PoolAddressesProviderRegistry
+      startBlock: {{ PoolAddressesProviderRegistry.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LendingProtocol
+      abis:
+        - name: PoolAddressesProviderRegistry
+          file: ./abis/aave-v3/PoolAddressesProviderRegistry.json
+      eventHandlers:
+        - event: AddressesProviderRegistered(indexed address,indexed uint256)
+          handler: handleAddressesProviderRegistered
+      file: ./protocols/aave-v3/src/mapping.ts
+  - kind: ethereum
+    name: RewardsController
+    network: {{ network }}
+    source:
+      address: "{{ RewardsController.address }}"
+      abi: RewardsController
+      startBlock: {{ RewardsController.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - RewardsController
+      abis:
+        - name: RewardsController
+          file: ./abis/aave-v3/RewardsController.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: AaveOracle
+          file: ./abis/aave-v3/AaveOracle.json
+        - name: IPriceOracleGetter
+          file: ./abis/IPriceOracleGetter.json
+      eventHandlers:
+        - event: AssetConfigUpdated(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleAssetConfigUpdated
+      file: ./protocols/aave-v3/src/mapping.ts
+
+  # this is needed to make import path compatible with aave-v2-forks
+  - kind: ethereum
+    name: LendingPool
+    network: {{ network }}
+    source:
+      abi: LendingPool
+      startBlock: {{ PoolAddressesProviderRegistry.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: LendingPool
+          file: ./abis/aave-v3/LendingPool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: AaveOracle
+          file: ./abis/aave-v3/AaveOracle.json
+        - name: IPriceOracleGetter
+          file: ./abis/IPriceOracleGetter.json
+        - name: AToken
+          file: ./abis/aave-v3/AToken.json
+        - name: StableDebtToken
+          file: ./abis/aave-v3/StableDebtToken.json
+        - name: VariableDebtToken
+          file: ./abis/aave-v3/VariableDebtToken.json
+      eventHandlers:
+        - event: Borrow(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
+          handler: handleBorrow
+      file: ./protocols/aave-v3/src/mapping.ts
+
+templates:
+  - kind: ethereum
+    name: LendingPoolAddressesProvider
+    network: {{ network }}
+    source:
+      abi: LendingPoolAddressesProvider
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: LendingPoolAddressesProvider
+          file: ./abis/aave-v3/LendingPoolAddressesProvider.json
+      eventHandlers:
+        - event: PriceOracleUpdated(indexed address,indexed address)
+          handler: handlePriceOracleUpdated
+        - event: ProxyCreated(indexed bytes32,indexed address,indexed address)
+          handler: handleProxyCreated
+      file: ./protocols/aave-v3/src/mapping.ts
+  - kind: ethereum
+    name: LendingPool
+    network: {{ network }}
+    source:
+      abi: LendingPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: LendingPool
+          file: ./abis/aave-v3/LendingPool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: AaveOracle
+          file: ./abis/aave-v3/AaveOracle.json      
+        - name: IPriceOracleGetter
+          file: ./abis/IPriceOracleGetter.json
+        - name: AToken
+          file: ./abis/aave-v3/AToken.json
+        - name: StableDebtToken
+          file: ./abis/aave-v3/StableDebtToken.json
+        - name: VariableDebtToken
+          file: ./abis/aave-v3/VariableDebtToken.json
+      eventHandlers:
+        - event: Borrow(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
+          handler: handleBorrow
+        - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
+          handler: handleLiquidationCall
+        - event: Repay(indexed address,indexed address,indexed address,uint256,bool)
+          handler: handleRepay
+        - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleReserveDataUpdated
+        - event: Supply(indexed address,address,indexed address,uint256,indexed uint16)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256)
+          handler: handleWithdraw
+        - event: ReserveUsedAsCollateralEnabled(indexed address,indexed address)
+          handler: handleReserveUsedAsCollateralEnabled
+        - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
+          handler: handleReserveUsedAsCollateralDisabled
+      file: ./protocols/aave-v3/src/mapping.ts
+  - kind: ethereum
+    name: LendingPoolConfigurator
+    network: {{ network }}
+    source:
+      abi: LendingPoolConfigurator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: LendingPoolConfigurator
+          file: ./abis/aave-v3/LendingPoolConfigurator.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: AToken
+          file: ./abis/aave-v3/AToken.json
+      eventHandlers:
+        - event: CollateralConfigurationChanged(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralConfigurationChanged
+        - event: ReserveActive(indexed address,bool)
+          handler: handleReserveActive
+        - event: ReserveBorrowing(indexed address,bool)
+          handler: handleReserveBorrowing
+        - event: ReserveFrozen(indexed address,bool)
+          handler: handleReserveFrozen
+        - event: ReserveInitialized(indexed address,indexed address,address,address,address)
+          handler: handleReserveInitialized
+        - event: ReservePaused(indexed address,bool)
+          handler: handleReservePaused
+      file: ./protocols/aave-v3/src/mapping.ts
+  - kind: ethereum
+    name: AToken
+    network: {{ network }}
+    source:
+      abi: AToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: AToken
+          file: ./abis/aave-v3/AToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleCollateralTransfer
+      file: ./protocols/aave-v3/src/mapping.ts
+  - kind: ethereum
+    name: StableDebtToken
+    network: {{ network }}
+    source:
+      abi: StableDebtToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableDebtToken
+          file: ./abis/aave-v3/StableDebtToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleStableTransfer
+      file: ./protocols/aave-v3/src/mapping.ts
+  - kind: ethereum
+    name: VariableDebtToken
+    network: {{ network }}
+    source:
+      abi: VariableDebtToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: VariableDebtToken
+          file: ./abis/aave-v3/VariableDebtToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleVariableTransfer
+      file: ./protocols/aave-v3/src/mapping.ts

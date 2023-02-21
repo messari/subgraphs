@@ -1,6 +1,6 @@
 # Subgraph Schema: Yield Aggregator
 # Version: 1.3.0
-# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
   ARBITRUM_ONE
@@ -410,8 +410,17 @@ type Vault @entity {
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
-  " Strategy that belong to this protocol "
+  " Address of Controller associated with this vault "
+  _controller: String!
+
+  " Address of strategy associated with this vault "
   _strategy: String!
+
+  " Address of BribesProcessor associated with this vault "
+  _bribesProcessor: String!
+
+  " last rewards block number (used to turn of depleted rewards) "
+  _lastRewardsBlockNumber: BigInt!
 
   ##### Snapshots #####
 
@@ -686,4 +695,33 @@ type _Strategy @entity {
 
   " Address of the Vault "
   vaultAddress: String!
+}
+
+# Helper entity for fetching vault address using want token
+type _WantToken @entity {
+  " { Contract Address of Strategy } "
+  id: ID!
+
+  " Address of the Vault "
+  vaultAddress: String!
+}
+
+type _CircularBuffer @entity {
+  " 'CIRCULAR_BUFFER' "
+  id: ID!
+
+  " Array of sorted block numbers sorted continuously "
+  blocks: [Int!]!
+
+  " The index in the blocks array which will be used with the newest block to calculate block speed (Usally set to about a day before newest block) "
+  windowStartIndex: Int!
+
+  " The next index in the blocks array that will be replaced with the newest block "
+  nextIndex: Int!
+
+  " This determines the size of the blocks array. Should be set to contain at least a days worth of blocks according to a 1 day window for measuring speed"
+  bufferSize: Int!
+
+  " The current calculated number of blocks per day based on calculated block speed "
+  blocksPerDay: BigDecimal!
 }

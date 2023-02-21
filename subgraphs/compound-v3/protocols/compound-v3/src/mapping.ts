@@ -59,9 +59,11 @@ import {
   DEFAULT_DECIMALS,
   REWARDS_ADDRESS,
   MARKET_PREFIX,
+  USDC_COMET_WETH_MARKET_ID,
+  WETH_COMET_ADDRESS,
 } from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
-import { Token } from "../../../generated/schema";
+import { Market, Token } from "../../../generated/schema";
 import { CometRewards } from "../../../generated/templates/Comet/CometRewards";
 import { TokenManager } from "../../../src/sdk/token";
 import { AccountManager } from "../../../src/sdk/account";
@@ -1163,7 +1165,27 @@ function getPrice(priceFeed: Address, cometContract: Comet): BigDecimal {
     return BIGDECIMAL_ZERO;
   }
 
+  // The WETH market was deployed at block 16400710: https://etherscan.io/tx/0xfd5e08c8c8a524fcfa3f481b452067d41033644175bc5c3be6a8397847df27fa
+  // In this market the price is returned in ETH, so we need to convert to USD
+  // Comet address: 0xA17581A9E3356d9A858b789D68B4d866e593aE94
+  if (cometContract._address == Address.fromHexString(WETH_COMET_ADDRESS)) {
+    const wethPriceUSD = getWETHPriceUSD();
+    return bigIntToBigDecimal(tryPrice.value, COMPOUND_DECIMALS).times(
+      wethPriceUSD
+    );
+  }
+
   return bigIntToBigDecimal(tryPrice.value, COMPOUND_DECIMALS);
+}
+
+// get the price of WETH in USD
+function getWETHPriceUSD(): BigDecimal {
+  const market = Market.load(Bytes.fromHexString(USDC_COMET_WETH_MARKET_ID));
+  if (!market) {
+    return BIGDECIMAL_ZERO;
+  }
+
+  return market.inputTokenPriceUSD;
 }
 
 function isMint(event: ethereum.Event): BigInt | null {
