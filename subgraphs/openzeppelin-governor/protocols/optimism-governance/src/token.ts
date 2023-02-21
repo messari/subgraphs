@@ -4,20 +4,24 @@ import {
   DelegateVotesChanged,
   Transfer,
 } from "../../../generated/GovernanceToken/GovernanceToken";
-import { DelegateVotingPowerChange } from "../../../generated/schema";
+import {
+  DelegateChange,
+  DelegateVotingPowerChange,
+} from "../../../generated/schema";
 import { BIGINT_ONE, BIGINT_ZERO } from "../../../src/constants";
 import {
   getGovernance,
   getOrCreateDelegate,
+  getOrCreateTokenHolder,
   toDecimal,
 } from "../../../src/handlers";
-import {
-  _handleDelegateChanged,
-  _handleTransfer,
-} from "../../../src/tokenHandlers";
+import { _handleTransfer } from "../../../src/tokenHandlers";
 
 // DelegateChanged(indexed address,indexed address,indexed address)
 export function handleDelegateChanged(event: DelegateChanged): void {
+  // NOTE: We are using a copy/paste of the common _handleDelegateChanged function here
+  // because we want to override the delegateChangeId to include the block number.
+  // This is due to Optimism having multiple blocks with the same block timestamp
   _handleDelegateChanged(
     event.params.delegator.toHexString(),
     event.params.fromDelegate.toHexString(),
@@ -41,6 +45,37 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
 }
 
 // ================= Extracted from subgraphs/openzeppelin-governor/src/tokenHandlers.ts =================
+function _handleDelegateChanged(
+  delegator: string,
+  fromDelegate: string,
+  toDelegate: string,
+  event: ethereum.Event
+): void {
+  const tokenHolder = getOrCreateTokenHolder(delegator);
+  const previousDelegate = getOrCreateDelegate(fromDelegate);
+  const newDelegate = getOrCreateDelegate(toDelegate);
+
+  tokenHolder.delegate = newDelegate.id;
+  tokenHolder.save();
+
+  previousDelegate.tokenHoldersRepresentedAmount =
+    previousDelegate.tokenHoldersRepresentedAmount - 1;
+  previousDelegate.save();
+
+  newDelegate.tokenHoldersRepresentedAmount =
+    newDelegate.tokenHoldersRepresentedAmount + 1;
+  newDelegate.save();
+
+  const delegateChanged = createDelegateChange(
+    event,
+    toDelegate,
+    fromDelegate,
+    delegator
+  );
+
+  delegateChanged.save();
+}
+
 function _handleDelegateVotesChanged(
   delegateAddress: string,
   previousBalance: BigInt,
@@ -78,6 +113,33 @@ function _handleDelegateVotesChanged(
 }
 
 // ================= Extracted from subgraphs/openzeppelin-governor/src/handlers.ts =================
+function createDelegateChange(
+  event: ethereum.Event,
+  toDelegate: string,
+  fromDelegate: string,
+  delegator: string
+): DelegateChange {
+  // THIS SINGLE LINE IS THE ONLY DIFFERENCE FROM THE ORIGINAL FUNCTION
+  // We are adding the block number to the id to avoid duplicate ids when there are multiple blocks
+  // with the same timestamp
+  const delegateChangeId = `${event.block.timestamp.toI64()}-${
+    event.block.number
+  }-${event.logIndex}`;
+
+  const delegateChange = new DelegateChange(delegateChangeId);
+
+  delegateChange.delegate = toDelegate;
+  delegateChange.delegator = delegator;
+  delegateChange.previousDelegate = fromDelegate;
+  delegateChange.tokenAddress = event.address.toHexString();
+  delegateChange.txnHash = event.transaction.hash.toHexString();
+  delegateChange.blockNumber = event.block.number;
+  delegateChange.blockTimestamp = event.block.timestamp;
+  delegateChange.logIndex = event.logIndex;
+
+  return delegateChange;
+}
+
 function createDelegateVotingPowerChange(
   event: ethereum.Event,
   previousBalance: BigInt,
@@ -107,7 +169,7 @@ function createDelegateVotingPowerChange(
   return delegateVPChange;
 }
 
-// // Transfer(indexed address,indexed address,uint256)
+// Transfer(indexed address,indexed address,uint256)
 export function handleTransfer(event: Transfer): void {
   _handleTransfer(
     event.params.from.toHexString(),
