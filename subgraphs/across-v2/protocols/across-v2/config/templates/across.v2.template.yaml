@@ -7,7 +7,7 @@ dataSources:
     name: HubPool
     network: mainnet
     source:
-      address: "0xc186fA914353c44b2E33eBE05f21846F1048bEda"
+      address: "0xc186fa914353c44b2e33ebe05f21846f1048beda"
       abi: HubPool
       startBlock: 14819537
     mapping:
@@ -55,7 +55,7 @@ dataSources:
           handler: handleLiquidityAdded
         - event: LiquidityRemoved(indexed address,uint256,uint256,indexed address)
           handler: handleLiquidityRemoved
-      file: ./src/handlers.ts
+      file: ./src/handlers/liquidity.ts
   {{/HubPool}}
   {{#SpokePool}}
   - kind: ethereum
@@ -119,7 +119,5 @@ dataSources:
       eventHandlers:
         - event: FilledRelay(uint256,uint256,uint256,uint256,uint256,uint256,uint64,uint64,uint64,uint32,address,indexed address,indexed address,address,bool)
           handler: handleFilledRelay
-        # - event: FundsDeposited(uint256,uint256,uint256,uint64,indexed uint32,uint32,indexed address,address,indexed address)
-        #   handler: handleFundsDeposited
-      file: ./src/handlers.ts
+      file: ./src/handlers/transfers.ts
   {{/SpokePool}}

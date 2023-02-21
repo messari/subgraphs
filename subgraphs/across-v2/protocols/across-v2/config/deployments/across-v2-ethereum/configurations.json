@@ -1,10 +1,11 @@
 {
   "deployment": "ACROSS_V2_ETHEREUM",
+  "HubPool": [{}],
   "SpokePool": [
     {
       "chain": "Ethereum",
       "network": "mainnet",
-      "address": "0x4D9079Bb4165aeb4084c526a32695dCfd2F77381",
+      "address": "0x4d9079bb4165aeb4084c526a32695dcfd2f77381",
       "startBlock": 14819486
     }
   ]
