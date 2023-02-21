@@ -172,6 +172,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
     governanceFramework.contractAddress = contractAddress;
     governanceFramework.tokenAddress = contract.token().toHexString();
+    governanceFramework.timelockAddress = "";
 
     governanceFramework.votingDelay = contract.votingDelay();
     governanceFramework.votingPeriod = contract.votingPeriod();
