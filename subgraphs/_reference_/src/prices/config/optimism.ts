@@ -13,7 +13,7 @@ export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract(
 );
 export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract();
 export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract(
-  "0xD81eb3728a631871a7eBBaD631b5f424909f0c77",
+  "0xd81eb3728a631871a7ebbad631b5f424909f0c77",
   4365625
 );
 export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
@@ -31,8 +31,8 @@ export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
 );
 
 export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0xC5cfaDA84E902aD92DD40194f0883ad49639b023", 2373837),
-  new OracleContract("0x445FE580eF8d70FF569aB36e80c647af338db351", 3729171),
+  new OracleContract("0xc5cfada84e902ad92dd40194f0883ad49639b023", 2373837),
+  new OracleContract("0x445fe580ef8d70ff569ab36e80c647af338db351", 3729171),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x9c12939390052919aF3155f41Bf4160Fd3666A6f", 19702709), // Velodrame
+  new OracleContract("0x9c12939390052919af3155f41bf4160fd3666a6f", 19702709), // Velodrame
 ];
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// BLACKLISTED TOKENS ////////////////////////////

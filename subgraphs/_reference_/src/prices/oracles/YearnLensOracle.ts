@@ -6,10 +6,10 @@ import { YearnLensContract } from "../../../generated/UniswapV2Factory/YearnLens
 
 export function getYearnLensContract(
   contract: OracleContract,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): YearnLensContract | null {
   if (
-    contract.startBlock.lt(block.number) ||
+    (block && contract.startBlock.gt(block.number)) ||
     utils.isNullAddress(contract.address)
   )
     return null;
@@ -19,7 +19,7 @@ export function getYearnLensContract(
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const config = utils.getConfig();
 
@@ -39,6 +39,6 @@ export function getTokenPriceUSDC(
   return CustomPriceType.initialize(
     tokenPrice,
     constants.DEFAULT_USDC_DECIMALS,
-    "YearnLensOracle"
+    constants.OracleType.YEARN_LENS_ORACLE
   );
 }

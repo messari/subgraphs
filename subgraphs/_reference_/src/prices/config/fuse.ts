@@ -25,8 +25,8 @@ export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [];
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0xE3F85aAd0c8DD7337427B9dF5d0fB741d65EEEB5", 15645719), // Voltage Finance
-  new OracleContract("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506", 12936314), // Sushiswap
+  new OracleContract("0xe3f85aad0c8dd7337427b9df5d0fb741d65eeeb5", 15645719), // Voltage Finance
+  new OracleContract("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506", 12936314), // Sushiswap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -51,13 +51,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0xa722c13135930332Eb3d749B2F0906559D2C5b99"
+  "0xa722c13135930332eb3d749b2f0906559d2c5b99"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0x0BE9e53fd7EDaC9F859882AfdDa116645287C629" // Wrapped Fuse (WFUSE)
+  "0x0be9e53fd7edac9f859882afdda116645287c629" // Wrapped Fuse (WFUSE)
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x620fd5fa44BE6af63715Ef4E65DDFA0387aD13F5"
+  "0x620fd5fa44be6af63715ef4e65ddfa0387ad13f5"
 );
 
 export class config implements Configurations {

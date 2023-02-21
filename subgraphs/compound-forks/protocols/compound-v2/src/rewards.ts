@@ -15,7 +15,7 @@ import {
   INT_TWO,
   INT_ZERO,
 } from "../../../src/constants";
-import { SubgraphNetwork } from "./constants";
+import { Network } from "./constants";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WINDOW_SIZE_SECONDS, TIMESTAMP_STORAGE_INTERVALS, and BUFFER_SIZE can be modified. These are just recommended values - 'somewhat' arbitrary. //
@@ -180,13 +180,19 @@ export function getRewardsPerDay(
   );
 
   // Estimate block speed for the window in seconds.
-  const unnormalizedBlockSpeed =
-    WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
+  let unnormalizedBlockSpeed = BIGDECIMAL_ZERO;
+  if (windowSecondsCount != BIGDECIMAL_ZERO) {
+    unnormalizedBlockSpeed =
+      WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
+  }
 
   // block speed converted to specified rate.
-  const normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
-    WINDOW_SIZE_SECONDS_BD
-  ).times(unnormalizedBlockSpeed);
+  let normalizedBlockSpeed = BIGDECIMAL_ZERO;
+  if (unnormalizedBlockSpeed != BIGDECIMAL_ZERO) {
+    normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD).times(
+      unnormalizedBlockSpeed
+    );
+  }
 
   // Update BlockTracker with new values.
   circularBuffer.blocksPerDay = normalizedBlockSpeed;
@@ -228,34 +234,36 @@ export function getOrCreateCircularBuffer(): _CircularBuffer {
 function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
-  const network = dataSource.network();
-  if (network == SubgraphNetwork.ETHEREUM) {
+  const network = dataSource.network().toUpperCase().replace("-", "_");
+  if (network == Network.MAINNET) {
     return BigDecimal.fromString("13.39");
-  } else if (network == SubgraphNetwork.ARBITRUM) {
+  } else if (network == Network.ARBITRUM_ONE) {
     return BigDecimal.fromString("15");
-  } else if (network == SubgraphNetwork.AURORA) {
+  } else if (network == Network.AURORA) {
     return BigDecimal.fromString("1.03");
-  } else if (network == SubgraphNetwork.BSC) {
+  } else if (network == Network.BSC) {
     return BigDecimal.fromString("5");
-  } else if (network == SubgraphNetwork.CELO) {
+  } else if (network == Network.CELO) {
     return BigDecimal.fromString("5");
-  } else if (network == SubgraphNetwork.FANTOM) {
+  } else if (network == Network.FANTOM) {
     return BigDecimal.fromString("1");
-  } else if (network == SubgraphNetwork.OPTIMISM) {
+  } else if (network == Network.OPTIMISM) {
     return BigDecimal.fromString("12.5");
-  } else if (network == SubgraphNetwork.POLYGON) {
+  } else if (network == Network.MATIC) {
     return BigDecimal.fromString("2");
-  } else if (network == SubgraphNetwork.XDAI) {
+  } else if (network == Network.XDAI) {
     return BigDecimal.fromString("5");
   }
   // Blocks are mined as needed
-  // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")
+  // else if (network == Network.AVALANCHE) return BigDecimal.fromString("2.5")
   // else if (dataSource.network() == "cronos") return BigDecimal.fromString("13.39")
   // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")
-  // else if (dataSource.network() == SubgraphNetwork.MOONBEAM) return BigDecimal.fromString("13.39")
-  // else if (dataSource.network() == SubgraphNetwork.MOONRIVER) return BigDecimal.fromString("13.39")
+  // else if (dataSource.network() == Network.MOONBEAM) return BigDecimal.fromString("13.39")
+  // else if (dataSource.network() == Network.MOONRIVER) return BigDecimal.fromString("13.39")
   else {
-    log.warning("getStartingBlockRate(): Network not found", []);
+    log.critical("getStartingBlockRate(): Network not found: {}", [
+      dataSource.network(),
+    ]);
     return BIGDECIMAL_ZERO;
   }
 }

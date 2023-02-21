@@ -42,7 +42,7 @@ export const TablePoolOverview = ({
     let baseFieldCol = false;
     let inputTokenLabel = "Input Token";
     let inputTokenColWidth = 210;
-    if (protocolType === "EXCHANGE" || protocolType === "GENERIC") {
+    if (protocolType === "EXCHANGE" || protocolType === "GENERIC" || protocolType === "PERPETUAL") {
       inputTokenLabel = "Input Tokens";
       inputTokenColWidth = 220;
     }

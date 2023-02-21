@@ -13,7 +13,7 @@ import {
   SECONDS_PER_DAY_BI,
   SECONDS_PER_HOUR_BI,
 } from "../../util/constants";
-import { CustomEventType } from ".";
+import { CustomEventType } from "../../util/events";
 
 const SnapshotHelperID = Bytes.fromUTF8("_ProtocolSnapshotHelper");
 const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
@@ -113,6 +113,8 @@ export class ProtocolSnapshot {
 
     // tvl
     snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+    snapshot.totalValueExportedUSD = protocol.totalValueExportedUSD;
+    snapshot.totalValueImportedUSD = protocol.totalValueImportedUSD;
     snapshot.protocolControlledValueUSD = protocol.protocolControlledValueUSD;
 
     // revenues
