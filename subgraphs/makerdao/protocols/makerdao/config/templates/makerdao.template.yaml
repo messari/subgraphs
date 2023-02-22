@@ -58,7 +58,7 @@ dataSources:
         # function fold(bytes32 i, address u, int256 rate)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0xb65337df00000000000000000000000000000000000000000000000000000000"
-          handler: handleVatFold
+          handler: handleVatFold  
 
   # Borrow rate
   - name: Jug

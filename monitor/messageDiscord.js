@@ -3,8 +3,7 @@ import moment from "moment";
 import { protocolErrorMessages } from './errorSchemas.js';
 import { resolveQueriesToAttempt } from './resolutions.js';
 import { monitorVersion, ProtocolTypeEntityName, sleep, colorsArray } from './util.js';
-import fs from 'fs';
-import path from 'path';
+import { getGithubIssues, postGithubIssue } from './github.js';
 // Error handling functions
 
 export async function errorNotification(error, channelId = process.env.CHANNEL_ID) {
@@ -360,7 +359,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 }
             }
             let errorsOnDeployment = false;
-            Object.entries(depo.protocolErrors).forEach(([errorType, errorArray]) => {
+            Object.entries(depo.protocolErrors).forEach(([errorType, errorArray], idx) => {
                 if (issuesSet?.includes(errorType)) {
                     return;
                 }
@@ -524,6 +523,7 @@ export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHAN
 }
 
 export async function sendMessageToZapierThread(msgObj) {
+    const postedIssues = await getGithubIssues();
     const currentThreadMessages = await fetchMessages("", process.env.PROD_CHANNEL);
     const currentThreadMessagesContent = currentThreadMessages.map(x => x.content);
     const baseURL = "https://discordapp.com/api/channels/" + process.env.PROD_CHANNEL + "/messages";
@@ -533,6 +533,7 @@ export async function sendMessageToZapierThread(msgObj) {
     };
 
     let messageConstruction = ``;
+    const ghIssuePromiseArray = [];
 
     if (Object.keys(msgObj).includes('indexing')) {
         let invalidIndexingAlertIndexes = [];
@@ -549,6 +550,7 @@ export async function sendMessageToZapierThread(msgObj) {
         if (validAlerts.length > 0) {
             messageConstruction += `Indexing errors on ${msgObj.protocolName}\n\n`;
             messageConstruction += validAlerts.join('\n');
+            ghIssuePromiseArray.push(postGithubIssue(msgObj.protocolName + ": Indexing Errors", validAlerts.join('\n'), postedIssues));
         }
     } else if (Object.keys(msgObj).includes('protocol')) {
         const invalidProtocolAlertIndexes = {};
@@ -573,7 +575,9 @@ export async function sendMessageToZapierThread(msgObj) {
             const validAlerts = []
             msgObj.protocol[deployment]?.Field?.forEach((x, idx) => {
                 if (!invalidProtocolAlertIndexes[deployment].includes(idx)) {
-                    validAlerts.push(`Field: ${x}\nValue: ${msgObj.protocol[deployment]?.Value[idx]}\nDescription: ${msgObj.protocol[deployment]?.Description[idx]}\n`);
+                    const alertBody = `Field: ${x}\nValue: ${msgObj.protocol[deployment]?.Value[idx]}\nDescription: ${msgObj.protocol[deployment]?.Description[idx]}\n`;
+                    validAlerts.push(alertBody);
+                    ghIssuePromiseArray.push(postGithubIssue(msgObj.protocolName + " " + deployment + ": Protocol Error " + x, alertBody, postedIssues));
                 }
             })
             if (validAlerts.length > 0) {
@@ -591,6 +595,10 @@ export async function sendMessageToZapierThread(msgObj) {
     }
 
     const postJSON = JSON.stringify({ "content": messageConstruction });
+
+    if (ghIssuePromiseArray.length > 0) {
+        await Promise.all(ghIssuePromiseArray);
+    }
 
     try {
         const req = await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch(async function (err1) {

@@ -1,0 +1,104 @@
+{
+  "gnosisAuctionAddress": "0x0b7fFc1f4AD541A4Ed16b40D8c37f0929158D101",
+  "gnosisAuctionStartBlock": 13195539,
+  "swapOldAddress": "0xF0E5c92cEdd66C7985C354C35e2bC37E685b99Da",
+  "swapOldStartBlock": 14740669,
+  "swapNewAddress": "0xEb8CAB2F4663247db8eAfb556F498c861bB4e161",
+  "swapNewStartBlock": 15126067,
+  "airswapAddress": "0x4572f2554421Bd64Bef1c22c8a81840E8D496BeA",
+  "airswapStartBlock": 11938402,
+  "gaugeControllerAddress": "0x0cb9cc35cEFa5622E8d25aF36dD56DE142eF6415",
+  "gaugeControllerStartBlock": 14285271,
+  "isGaugeController": true,
+  "network": "mainnet",
+
+  "vaults": [
+    {
+      "name": "ETHCallV2",
+      "address": "0x25751853Eab4D0eB3652B5eB6ecB102A2789644B",
+      "startBlock": 13201665
+    },
+    {
+      "name": "rETHThetaV2",
+      "address": "0xA1Da0580FA96129E753D736a5901C31Df5eC5edf",
+      "startBlock": 14978392
+    },
+    {
+      "name": "ETHPutV2",
+      "address": "0xCc323557c71C0D1D20a1861Dc69c06C5f3cC9624",
+      "startBlock": 13757633
+    },
+    {
+      "name": "stETHV2",
+      "address": "0x53773E034d9784153471813dacAFF53dBBB78E8c",
+      "startBlock": 13670377
+    },
+    {
+      "name": "AAVECallV2",
+      "address": "0xe63151A0Ed4e5fafdc951D877102cf0977Abd365",
+      "startBlock": 13536539
+    },
+    {
+      "name": "WBTCCallV2",
+      "address": "0x65a833afDc250D9d38f8CD9bC2B1E3132dB13B2F",
+      "startBlock": 13195539
+    },
+    {
+      "name": "ApeThetav2",
+      "address": "0xc0cF10Dd710aefb209D9dc67bc746510ffd98A53",
+      "startBlock": 14419385
+    },
+    {
+      "name": "rEarnUSDCVault",
+      "address": "0x84c2b16FA6877a8fF4F3271db7ea837233DFd6f0",
+      "startBlock": 15394088
+    },
+    {
+      "name": "rEarnSTETHVault",
+      "address": "0xCE5513474E077F5336cf1B33c1347FDD8D48aE8c",
+      "startBlock": 16043013
+    },
+    {
+      "name": "EthCallV1",
+      "address": "0x0FABaF48Bbf864a3947bdd0Ba9d764791a60467A",
+      "startBlock": 11938402
+    },
+    {
+      "name": "WBTCcallV1",
+      "address": "0x8b5876f5B0Bf64056A89Aa7e97511644758c3E8c",
+      "startBlock": 11938402
+    },
+    {
+      "name": "USDCEthPutV1",
+      "address": "0x16772a7f4a3ca291C21B8AcE76F9332dDFfbb5Ef",
+      "startBlock": 12369554
+    },
+    {
+      "name": "RibbonYearnETHPutV1",
+      "address": "0x8FE74471F198E426e96bE65f40EeD1F8BA96e54f",
+      "startBlock": 12696707
+    }
+  ],
+  "liquidityGauges": [
+    {
+      "name": " RibbonETHCallLiquidityMining",
+      "address": "0xd46f9546ebAbAAC44DC1B6D0Ac1eeb357D34FBeB",
+      "startBlock": 12632454
+    },
+
+    {
+      "name": "RibbonWBTCCallLiquidityMining",
+      "address": "0x1d27a3A92330693B897db9B1C26290Ba381049b1",
+      "startBlock": 12632497
+    },
+    {
+      "name": "RibbonETHPutLiquidityMining",
+      "address": "0xe79734461499246b6A8C8e768B96bebd0C891f63",
+      "startBlock": 12632353
+    }
+  ],
+
+  "graftEnabled": false,
+  "subgraphId": "QmTohsuueVrzG6MtghRWSDscYBKv88A21FVVnG6rmmF8L6",
+  "graftStartBlock": 14185606
+}

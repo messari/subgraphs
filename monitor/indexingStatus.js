@@ -88,17 +88,20 @@ export async function getIndexingStatusData(indexingStatusQueriesArray) {
     );
     let indexData = [];
     await Promise.all(indexingStatusQueries)
-      .then(
-        (response) =>
-        (indexData = response.map(
+      .then((response) => {
+        return (indexData = response.map(
           (resultData) => (resultData.data.data)
         ))
-      )
+      })
       .catch((err) => {
         errorNotification("ERROR LOCATION 3 " + err.message)
       });
-    indexData = { ...indexData[0], ...indexData[1] };
-    return indexData;
+
+    let dataObjectToReturn = {};
+    indexData.forEach(dataset => {
+      dataObjectToReturn = { ...dataObjectToReturn, ...dataset };
+    });
+    return dataObjectToReturn;
   } catch (err) {
     errorNotification("ERROR LOCATION 4 " + err.message)
   }

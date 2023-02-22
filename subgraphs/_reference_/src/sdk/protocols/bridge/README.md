@@ -60,6 +60,10 @@ interface Protocol {
   getCurrentChainID(): BigInt;
   setTotalValueLocked(tvl: BigDecimal): void;
   addTotalValueLocked(tvl: BigDecimal): void;
+  addTotalValueExportedUSD(tve: BigDecimal): void;
+  setTotalValueExportedUSD(tve: BigDecimal): void;
+  addTotalValueImportedUSD(tvi: BigDecimal): void;
+  setTotalValueImportedUSD(tvi: BigDecimal): void;
   addSupplySideRevenueUSD(rev: BigDecimal): void;
   addProtocolSideRevenueUSD(rev: BigDecimal): void;
   addRevenueUSD(protocolSide: BigDecimal, supplySide: BigDecimal): void;
@@ -221,6 +225,9 @@ interface Pool {
   refreshTotalValueLocked(): void;
   setTotalValueLocked(newTVL: BigDecimal): void;
   addTotalValueLocked(delta: BigDecimal): void;
+  setNetValueExportedUSD(newNetValueExported: BigDecimal): void;
+  addNetValueExportedUSD(delta: BigDecimal): void;
+  refreshNetValueExportedUSD(): void;
   getInputTokenAmountPrice(amount: BigInt): BigDecimal;
   addInputTokenBalance(amount: BigInt, updateMetrics: bool = true): void;
   setInputTokenBalance(newBalance: BigInt, updateMetrics: bool = true): void;
@@ -269,6 +276,8 @@ All the rest you probably won't need unless you don't create transfers|deposits|
 ### _sdk.Tokens_
 
 This is a simple utility class to instantiate tokens and crossChainTokens easily. It also exposes a `registerSupportedToken`, which you probably don't need, since it is called as part of the `Pool.initialize`.
+
+It also exposes an optional method `setTokenPresaver(presaver: TokenPresaver)`, which allows you to inject a class that implements `TokenPresaver`. What this will do is to call `preSaveToken(token: Token): Token` when initializing a new token right before calling `.save()`. This allows you to add extra context to the Token entity if you need to do so.
 
 ### _sdk.Pricer_
 

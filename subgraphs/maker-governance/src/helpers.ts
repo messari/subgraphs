@@ -133,18 +133,16 @@ export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
       const expiration = dsSpell.try_expiration();
       if (!expiration.reverted) {
         spell.expiryTime = expiration.value;
-      } else {
-        spell.expiryTime = BIGINT_ZERO;
+        spell.governanceFramework = event.address.toHexString();
+        spell.totalVotes = BIGINT_ZERO;
+        spell.totalWeightedVotes = BIGINT_ZERO;
+        spell.save();
+
+        // Track this new spell
+        DSSpellTemplate.create(spellAddress);
+
+        newSpellCount = newSpellCount + 1;
       }
-      spell.governanceFramework = event.address.toHexString();
-      spell.totalVotes = BIGINT_ZERO;
-      spell.totalWeightedVotes = BIGINT_ZERO;
-      spell.save();
-
-      // Track this new spell
-      DSSpellTemplate.create(spellAddress);
-
-      newSpellCount = newSpellCount + 1;
     }
     slate.yays = slate.yays.concat([spellID]);
     // loop through slate indices until a revert breaks it
