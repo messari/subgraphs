@@ -36,14 +36,12 @@ import {
   getOrCreateProtocol,
   getOrCreateTransfer,
   getOrCreateLPToken,
-  getLiquidityPoolAmounts,
   getOrCreatePosition,
   getOrCreateAccount,
   getOrCreateToken,
 } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import {
-  updateDepositHelper,
   updateVolumeAndFees,
 } from "./updateMetrics";
 import { NetworkConfigs } from "../../configurations/configure";
@@ -183,7 +181,7 @@ export function createDeposit(
   const transfer = getOrCreateTransfer(event);
 
   const pool = getLiquidityPool(
-    event.address.toHexString(),
+    event.address,
     event.block.number
   );
 
@@ -248,7 +246,6 @@ export function createDeposit(
   account.save();
   // create a position snapshot
   createPositionSnapshot(event, position);
-  updateDepositHelper(event.address);
 
 }
 
@@ -299,7 +296,7 @@ export function createWithdraw(
   const protocol = getOrCreateProtocol(); 
 
   const pool = getLiquidityPool(
-    event.address.toHexString(),
+    event.address,
     event.block.number
   );
 
@@ -409,13 +406,12 @@ export function createSwapHandleVolumeAndFees(
 
   const protocol = getOrCreateProtocol();
   const pool = getLiquidityPool(
-    event.address.toHexString(),
+    event.address,
     event.block.number
   );
-  const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
-  const token0 = Token.load(pool.inputTokens[0]);
-  const token1 = Token.load(pool.inputTokens[1]);
+  const token0 = getOrCreateToken(pool.inputTokens[0]);
+  const token1 = getOrCreateToken(pool.inputTokens[1]);
 
   // totals for volume updates
   const amount0 = amount0In.minus(amount0Out);

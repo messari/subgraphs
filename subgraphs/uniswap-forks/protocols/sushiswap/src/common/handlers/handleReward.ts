@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefSushiswap } from "../../../../../generated/MasterChef/MasterChefSushiswap";
 import { LiquidityPool } from "../../../../../generated/schema";
@@ -59,14 +59,14 @@ export function handleReward(
 
   // If comes back null then it is probably a uniswap v2 pool.
   // MasterChef was used for UniV2 LP tokens before SushiSwap liquidity pools were created.
-  const pool = LiquidityPool.load(masterChefPool.poolAddress!);
+  const pool = LiquidityPool.load(Address.fromString(masterChefPool.poolAddress!));
   if (!pool) {
     return;
   }
 
-  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(Address.fromString(NetworkConfigs.getRewardToken()));
   pool.rewardTokens = [
-    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    getOrCreateRewardToken(Address.fromString(NetworkConfigs.getRewardToken())).id,
   ];
 
   // Update staked amounts
