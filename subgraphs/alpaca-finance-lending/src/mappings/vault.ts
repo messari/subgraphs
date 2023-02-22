@@ -181,14 +181,20 @@ export function handleAddDebt(event: AddDebt): void {
   updateInterest(event, market);
   const contract = Vault.bind(event.address);
   const trytoken = contract.try_token();
-  const tryDebtVal = contract.try_debtShareToVal(event.params.debtShare);
-  if (trytoken.reverted || tryDebtVal.reverted) {
+  const tryTotalDebtVal = contract.try_vaultDebtVal();
+  const tryDeltaDebtVal = contract.try_debtShareToVal(event.params.debtShare);
+  if (
+    trytoken.reverted ||
+    tryDeltaDebtVal.reverted ||
+    tryTotalDebtVal.reverted
+  ) {
     log.error("[handleAddDebt]Failed to handle add debt for market {} tx={}", [
       market.id,
       event.transaction.hash.toHexString(),
     ]);
     return;
   }
+
   const tryPositions = contract.try_positions(event.params.id);
   if (tryPositions.reverted) {
     return;
@@ -198,14 +204,14 @@ export function handleAddDebt(event: AddDebt): void {
     market,
     trytoken.value,
     tryPositions.value.getOwner(),
-    tryDebtVal.value
+    tryDeltaDebtVal.value
   );
-  changeMarketBorrowBalance(event, market, tryDebtVal.value);
+  changeMarketBorrowBalance(event, market, tryTotalDebtVal.value);
   updateUserPosition(
     event,
     tryPositions.value.getOwner(),
     market,
-    tryDebtVal.value,
+    tryDeltaDebtVal.value,
     PositionSide.BORROWER,
     false
   );
@@ -216,14 +222,20 @@ export function handleRemoveDebt(event: RemoveDebt): void {
   updateInterest(event, market);
   const contract = Vault.bind(event.address);
   const trytoken = contract.try_token();
-  const tryDebtVal = contract.try_debtShareToVal(event.params.debtShare);
-  if (trytoken.reverted || tryDebtVal.reverted) {
+  const tryTotalDebtVal = contract.try_vaultDebtVal();
+  const tryDeltaDebtVal = contract.try_debtShareToVal(event.params.debtShare);
+  if (
+    trytoken.reverted ||
+    tryDeltaDebtVal.reverted ||
+    tryTotalDebtVal.reverted
+  ) {
     log.error(
       "[handleRemoveDebt]Failed to handle remove debt from market {} tx={}",
       [market.id, event.transaction.hash.toHexString()]
     );
     return;
   }
+
   const tryPositions = contract.try_positions(event.params.id);
   if (tryPositions.reverted) {
     return;
@@ -233,18 +245,14 @@ export function handleRemoveDebt(event: RemoveDebt): void {
     market,
     trytoken.value,
     tryPositions.value.getOwner(),
-    tryDebtVal.value
+    tryDeltaDebtVal.value
   );
-  changeMarketBorrowBalance(
-    event,
-    market,
-    tryDebtVal.value.times(BIGINT_NEGATIVE_ONE)
-  );
+  changeMarketBorrowBalance(event, market, tryTotalDebtVal.value);
   updateUserPosition(
     event,
     tryPositions.value.getOwner(),
     market,
-    tryDebtVal.value,
+    tryDeltaDebtVal.value,
     PositionSide.BORROWER,
     false
   );
@@ -344,18 +352,7 @@ export function updateInterest(event: ethereum.Event, market: Market): void {
     .times(BIGDECIMAL_ONE.minus(PROTOCOL_LENDING_FEE.div(BIGDECIMAL_HUNDRED)))
     .div(totalTokenAmount.toBigDecimal());
   updateMarketRates(event, market, borrowerAPY, lenderAPY);
-  log.info(
-    "[updateInterestRate]market={},vaultDebtValu={},totalToken={},RatePerSec={},borrowerAPY={},lenderAPY={},tx={}",
-    [
-      market.id,
-      vaultDebtVal.toString(),
-      totalTokenAmount.toString(),
-      ratePerSec.toString(),
-      borrowerAPY.toString(),
-      lenderAPY.toString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
+
   const dailyInterest = ratePerSec
     .times(vaultDebtVal)
     .times(BIGINT_SECONDS_PER_DAY)
