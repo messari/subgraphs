@@ -35,6 +35,7 @@ function ProtocolTab({
   protocolTimeseriesError,
   overlayProtocolTimeseriesData
 }: ProtocolTabProps) {
+  const [protocolDataRenderState, setProtocolDataRenderState] = useState<any>({});
   const [issuesToDisplay, setIssuesToDisplay] = useState<
     { message: string; type: string; level: string; fieldName: string }[]
   >([]);
@@ -50,13 +51,13 @@ function ProtocolTab({
   }
 
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
-  let protocolDataRender: any[] = [];
+  const protocolDataRender: any = {};
 
   const specificCharts: any[] = [];
   const specificChartsOnEntity: any = {};
 
   if (protocolTimeseriesData) {
-    protocolDataRender = Object.keys(protocolTimeseriesData).map((entityName: string, index: number) => {
+    Object.keys(protocolTimeseriesData).forEach((entityName: string, index: number) => {
       const currentEntityData = protocolTimeseriesData[entityName];
       if (!specificChartsOnEntity[entityName]) {
         specificChartsOnEntity[entityName] = {};
@@ -74,55 +75,76 @@ function ProtocolTab({
       const prevEntityName = Object.keys(protocolTimeseriesData)[index - 1];
 
       if (protocolTimeseriesLoading[entityName] || protocolTimeseriesLoading[prevEntityName]) {
-        return (
-          <Grid key={entityName}>
-            <Box my={3}>
-              <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
-                <Typography variant="h4" id={entityName}>
-                  {entityName}
-                </Typography>
-              </CopyLinkToClipboard>
-            </Box>
-            <CircularProgress sx={{ margin: 6 }} size={50} />
-          </Grid>
-        );
+        protocolDataRender[entityName] = ({
+          element:
+            (<Grid key={entityName}>
+              <Box my={3}>
+                <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
+                  <Typography variant="h4" id={entityName}>
+                    {entityName}
+                  </Typography>
+                </CopyLinkToClipboard>
+              </Box>
+              <CircularProgress sx={{ margin: 6 }} size={50} />
+            </Grid>), type: 1
+        });
       }
 
       if (!currentEntityData && !protocolTimeseriesError[entityName] && protocolTimeseriesError[prevEntityName]) {
-        return (
-          <Grid key={entityName}>
-            <Box my={3}>
-              <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
-                <Typography variant="h4" id={entityName}>
-                  {entityName}
-                </Typography>
-              </CopyLinkToClipboard>
-            </Box>
-            <h3>{entityName} timeseries query could not trigger</h3>
-          </Grid>
-        );
+        protocolDataRender[entityName] = ({
+          element: (
+            <Grid key={entityName}>
+              <Box my={3}>
+                <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
+                  <Typography variant="h4" id={entityName}>
+                    {entityName}
+                  </Typography>
+                </CopyLinkToClipboard>
+              </Box>
+              <h3>{entityName} timeseries query could not trigger</h3>
+            </Grid>), type: 2
+        });
       }
 
-      return (
-        <ProtocolTabEntity
-          key={entityName + "-ProtocolTabEntity"}
-          entityName={entityName}
-          entitiesData={entitiesData}
-          subgraphEndpoints={subgraphEndpoints}
-          currentEntityData={currentEntityData}
-          overlaySchemaData={overlaySchemaData}
-          entitySpecificElements={entitySpecificElements}
-          protocolSchemaData={protocolSchemaData}
-          currentOverlayEntityData={currentOverlayEntityData}
-          currentTimeseriesLoading={protocolTimeseriesLoading[entityName]}
-          currentTimeseriesError={protocolTimeseriesError[entityName]}
-          protocolType={protocolType}
-          protocolTableData={protocolTableData[protocolEntityNameSingular]}
-          issuesProps={issues}
-          setIssues={(x) => setIssues(x, entityName)}
-        />
-      );
+      // create state returnedEntity[entityName]
+      // Rather than returning the mapped component, set the component to render to state (if unequal to current state for that entity)
+      // Render the compoennt from state
+
+      protocolDataRender[entityName] = ({
+        element: (
+          <ProtocolTabEntity
+            key={entityName + "-ProtocolTabEntity"}
+            entityName={entityName}
+            entitiesData={entitiesData}
+            subgraphEndpoints={subgraphEndpoints}
+            currentEntityData={currentEntityData}
+            overlaySchemaData={overlaySchemaData}
+            entitySpecificElements={entitySpecificElements}
+            protocolSchemaData={protocolSchemaData}
+            currentOverlayEntityData={currentOverlayEntityData}
+            currentTimeseriesLoading={protocolTimeseriesLoading[entityName]}
+            currentTimeseriesError={protocolTimeseriesError[entityName]}
+            protocolType={protocolType}
+            protocolTableData={protocolTableData[protocolEntityNameSingular]}
+            setIssues={(issArr: any) => {
+
+              const issuesToAdd = issArr.filter((issObj: any) => {
+                return !issues[entityName].filter((iss: any) => {
+                  return issObj.fieldName === iss.fieldName && issObj.type === iss.type
+                })
+              })
+
+              setIssues(issuesToAdd, entityName)
+            }}
+          />), type: 3
+      });
     });
+    Object.keys(protocolDataRender).forEach((entityName: string) => {
+      if (protocolDataRender[entityName].type !== protocolDataRenderState[entityName]?.type) {
+        setProtocolDataRenderState({ ...protocolDataRenderState, [entityName]: protocolDataRender[entityName] });
+      }
+    })
+
   }
 
   let allLoaded = true;
@@ -165,7 +187,9 @@ function ProtocolTab({
         issuesProps={tableIssuesInit}
         setIssues={(x) => setTableIssues(x)}
       />
-      {protocolDataRender}
+      {Object.values(protocolDataRenderState).map((x: any) => {
+        return x.element
+      })}
       {specificCharts}
     </>
   );
