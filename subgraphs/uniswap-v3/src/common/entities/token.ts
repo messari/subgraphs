@@ -47,7 +47,10 @@ export function getOrCreateToken(
     }
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
-    // token._largePriceChangeBuffer = 0;
+    token._totalSupply = BIGINT_ZERO;
+    token._totalValueLockedUSD = BIGDECIMAL_ZERO;
+    token._largeTVLImpactBuffer = 0;
+    token._largePriceChangeBuffer = 0;
 
     // Fixing token fields that did not return proper values from contract
     // Manually coded in when necessary

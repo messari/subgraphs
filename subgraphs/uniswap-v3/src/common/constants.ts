@@ -109,6 +109,7 @@ export const BIGINT_MAX = BigInt.fromString(
 );
 export const BIGDECIMAL_NEG_ONE = new BigDecimal(BIGINT_NEG_ONE);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGDECIMAL_FIVE_PERCENT = BigDecimal.fromString("0.05");
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
 export const BIGDECIMAL_TEN = new BigDecimal(BIGINT_TEN);

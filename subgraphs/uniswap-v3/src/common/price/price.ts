@@ -23,8 +23,10 @@ import {
   BIGDECIMAL_TEN_THOUSAND,
   PRICE_CHANGE_BUFFER_LIMIT,
   BIGDECIMAL_TEN_BILLION,
+  BIGDECIMAL_FIVE_PERCENT,
 } from "../constants";
 import {
+  absBigDecimal,
   convertTokenToDecimal,
   exponentToBigInt,
   safeDiv,
@@ -32,6 +34,7 @@ import {
 import { NetworkConfigs } from "../../../configurations/configure";
 import { getOrCreateToken, getOrCreateTokenWhitelist } from "../entities/token";
 import { getLiquidityPool, getLiquidityPoolAmounts } from "../entities/pool";
+import { getOrCreateProtocol } from "../entities/protocol";
 
 // Divide numbers too large for floating point or BigDecimal
 
@@ -200,26 +203,46 @@ export function findUSDPricePerToken(
     }
   }
 
+  // Buffer token pricings that would cause large spikes on the protocol level
+  const protocol = getOrCreateProtocol();
+  const tokenTVLDelta = absBigDecimal(
+    priceSoFar
+      .times(token._totalSupply.toBigDecimal())
+      .minus(token._totalValueLockedUSD)
+  );
+  const protocolTVLPercentageDelta = absBigDecimal(
+    safeDiv(tokenTVLDelta, protocol.totalValueLockedUSD)
+  );
+  if (protocolTVLPercentageDelta.gt(BIGDECIMAL_FIVE_PERCENT)) {
+    log.warning("Price too high for token: {} from pool: {}", [
+      token.id.toHexString(),
+      priceSoFar.toString(),
+    ]);
+    token._largeTVLImpactBuffer += 1;
+    return token.lastPriceUSD!;
+  }
+
   // Uncomment this after the current production version is fully synced and re-deploy to make the oracle more robust
+  if (!token.lastPriceUSD || token.lastPriceUSD!.equals(BIGDECIMAL_ZERO)) {
+    return priceSoFar;
+  }
 
-  // if (!token.lastPriceUSD || token.lastPriceUSD!.equals(BIGDECIMAL_ZERO)) {
-  //   return priceSoFar
-  // }
+  // If priceSoFar 10x greater or less than token.lastPriceUSD, use token.lastPriceUSD
+  // Increment buffer so that it allows large price jumps if seen repeatedly
+  if (
+    priceSoFar.gt(token.lastPriceUSD!.times(BIGDECIMAL_TWO)) ||
+    priceSoFar.lt(token.lastPriceUSD!.div(BIGDECIMAL_TWO))
+  ) {
+    if (token._largePriceChangeBuffer < PRICE_CHANGE_BUFFER_LIMIT) {
+      token._largePriceChangeBuffer = token._largePriceChangeBuffer + 1;
+      return token.lastPriceUSD!;
+    }
+  }
 
-  // // If priceSoFar 10x greater or less than token.lastPriceUSD, use token.lastPriceUSD
-  // // Increment buffer so that it allows large price jumps if seen repeatedly
-  // if (
-  //   (priceSoFar.gt(token.lastPriceUSD!.times(BIGDECIMAL_TWO)) ||
-  //   priceSoFar.lt(token.lastPriceUSD!.div(BIGDECIMAL_TWO)))
-  // ) {
-  //   if (token._largePriceChangeBuffer < PRICE_CHANGE_BUFFER_LIMIT) {
-  //     token._largePriceChangeBuffer = token._largePriceChangeBuffer + 1;
-  //     return token.lastPriceUSD!;
-  //   }
-  // }
+  token._largePriceChangeBuffer = 0;
+  token._largeTVLImpactBuffer = 0;
 
-  // token._largePriceChangeBuffer = 0;
-
+  token.save();
   return priceSoFar; // nothing was found return 0
 }
 

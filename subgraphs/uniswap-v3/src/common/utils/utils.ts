@@ -13,6 +13,7 @@ import {
   BIGINT_TEN,
   BIGDECIMAL_NEG_ONE,
   BIGINT_HUNDRED,
+  BIGINT_NEG_ONE,
 } from "../constants";
 import { getLiquidityPoolFee } from "../entities/pool";
 
@@ -285,4 +286,18 @@ export function stringToBytesList(list: string[]): Bytes[] {
     result[i] = Bytes.fromHexString(list[i]);
   }
   return result;
+}
+
+export function absBigInt(value: BigInt): BigInt {
+  if (value.lt(BIGINT_ZERO)) {
+    return value.times(BIGINT_NEG_ONE);
+  }
+  return value;
+}
+
+export function absBigDecimal(value: BigDecimal): BigDecimal {
+  if (value.lt(BIGDECIMAL_ZERO)) {
+    return value.times(BIGDECIMAL_NEG_ONE);
+  }
+  return value;
 }
