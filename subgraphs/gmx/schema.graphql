@@ -788,9 +788,6 @@ type LiquidityPool @entity {
   " Current TVL (Total Value Locked) of this pool in USD "
   totalValueLockedUSD: BigDecimal!
 
-  " Number of cumulative unique users "
-  cumulativeUniqueUsers: Int!
-
   " All funding rates for this liquidity pool. (Should be in APR format and the same order as inputTokens) "
   fundingrate: [BigDecimal!]!
 
@@ -820,6 +817,12 @@ type LiquidityPool @entity {
 
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " Number of cumulative unique users in this pool "
+  cumulativeUniqueUsers: Int!
+
+  " Number of cumulative depositors in this pool "
+  cumulativeUniqueDepositors: Int!
 
   " Number of cumulative borrowers "
   cumulativeUniqueBorrowers: Int!
@@ -1016,6 +1019,18 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
 
+  " Number of unique daily users "
+  dailyActiveUsers: Int!
+
+  " Number of cumulative users "
+  _cumulativeUniqueUsers: Int!
+
+  " Number of unique daily depositors "
+  dailyActiveDepositors: Int!
+
+  " Number of cumulative depositors "
+  _cumulativeUniqueDepositors: Int!
+
   " Number of unique daily borrowers "
   dailyActiveBorrowers: Int!
 
@@ -1137,7 +1152,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   _cumulativeOutflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Array to account for multi-asset pools. "
-  inputTokens: [Token!]!
+  _inputTokens: [Token!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -1312,7 +1327,7 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   _cumulativeOutflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Array to account for multi-asset pools. "
-  inputTokens: [Token!]!
+  _inputTokens: [Token!]!
   
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!

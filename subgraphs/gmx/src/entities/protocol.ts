@@ -41,10 +41,10 @@ export function getOrCreateProtocol(): DerivPerpProtocol {
     protocol.cumulativeTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
 
     protocol.cumulativeUniqueUsers = INT_ZERO;
+    protocol.cumulativeUniqueDepositors = INT_ZERO;
     protocol.cumulativeUniqueBorrowers = INT_ZERO;
     protocol.cumulativeUniqueLiquidators = INT_ZERO;
     protocol.cumulativeUniqueLiquidatees = INT_ZERO;
-    protocol.cumulativeUniqueDepositors = INT_ZERO;
 
     protocol.openInterestUSD = BIGDECIMAL_ZERO;
     protocol.longPositionCount = INT_ZERO;
@@ -232,6 +232,13 @@ export function incrementProtocolEventCount(
 export function incrementProtocolUniqueUsers(event: ethereum.Event): void {
   const protocol = getOrCreateProtocol();
   protocol.cumulativeUniqueUsers += INT_ONE;
+  protocol._lastUpdateTimestamp = event.block.timestamp;
+  protocol.save();
+}
+
+export function incrementProtocolUniqueDepositors(event: ethereum.Event): void {
+  const protocol = getOrCreateProtocol();
+  protocol.cumulativeUniqueDepositors += INT_ONE;
   protocol._lastUpdateTimestamp = event.block.timestamp;
   protocol.save();
 }

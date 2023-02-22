@@ -26,6 +26,10 @@ import {
   increaseProtocolSupplySideRevenue,
   updateProtocolOpenInterestUSD,
   incrementProtocolUniqueUsers,
+  incrementProtocolUniqueDepositors,
+  incrementProtocolUniqueBorrowers,
+  incrementProtocolUniqueLiquidators,
+  incrementProtocolUniqueLiquidatees,
 } from "./protocol";
 import { getOrCreateToken, updateTokenPrice } from "./token";
 import {
@@ -82,6 +86,8 @@ export function getOrCreateLiquidityPool(event: ethereum.Event): LiquidityPool {
     pool.cumulativeWithdrawPremiumUSD = BIGDECIMAL_ZERO;
     pool.cumulativeTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
 
+    pool.cumulativeUniqueUsers = INT_ZERO;
+    pool.cumulativeUniqueDepositors = INT_ZERO;
     pool.cumulativeUniqueBorrowers = INT_ZERO;
     pool.cumulativeUniqueLiquidators = INT_ZERO;
     pool.cumulativeUniqueLiquidatees = INT_ZERO;
@@ -587,6 +593,46 @@ export function incrementPoolUniqueUsers(event: ethereum.Event): void {
 
   // Protocol
   incrementProtocolUniqueUsers(event);
+}
+
+export function incrementPoolUniqueDepositors(event: ethereum.Event): void {
+  const pool = getOrCreateLiquidityPool(event);
+  pool.cumulativeUniqueDepositors += INT_ONE;
+  pool._lastUpdateTimestamp = event.block.timestamp;
+  pool.save();
+
+  // Protocol
+  incrementProtocolUniqueDepositors(event);
+}
+
+export function incrementPoolUniqueBorrowers(event: ethereum.Event): void {
+  const pool = getOrCreateLiquidityPool(event);
+  pool.cumulativeUniqueBorrowers += INT_ONE;
+  pool._lastUpdateTimestamp = event.block.timestamp;
+  pool.save();
+
+  // Protocol
+  incrementProtocolUniqueBorrowers(event);
+}
+
+export function incrementPoolUniqueLiquidators(event: ethereum.Event): void {
+  const pool = getOrCreateLiquidityPool(event);
+  pool.cumulativeUniqueLiquidators += INT_ONE;
+  pool._lastUpdateTimestamp = event.block.timestamp;
+  pool.save();
+
+  // Protocol
+  incrementProtocolUniqueLiquidators(event);
+}
+
+export function incrementPoolUniqueLiquidatees(event: ethereum.Event): void {
+  const pool = getOrCreateLiquidityPool(event);
+  pool.cumulativeUniqueLiquidatees += INT_ONE;
+  pool._lastUpdateTimestamp = event.block.timestamp;
+  pool.save();
+
+  // Protocol
+  incrementProtocolUniqueLiquidatees(event);
 }
 
 export function updatePoolSnapshotDayID(

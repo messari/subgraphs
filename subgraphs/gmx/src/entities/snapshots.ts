@@ -124,6 +124,8 @@ export function takeLiquidityPoolDailySnapshot(
     inputTokenLength
   ).fill(BIGDECIMAL_ZERO);
 
+  let prevCumulativeUniqueUsers = INT_ZERO;
+  let prevCumulativeUniqueDepositors = INT_ZERO;
   let prevCumulativeUniqueBorrowers = INT_ZERO;
   let prevCumulativeUniqueLiquidators = INT_ZERO;
   let prevCumulativeUniqueLiquidatees = INT_ZERO;
@@ -153,7 +155,7 @@ export function takeLiquidityPoolDailySnapshot(
     prevCumulativeTotalLiquidityPremiumUSD =
       prevPoolMetrics.cumulativeTotalLiquidityPremiumUSD;
 
-    prevInputTokens = prevPoolMetrics.inputTokens;
+    prevInputTokens = prevPoolMetrics._inputTokens;
     prevCumulativeInflowVolumeUSD = prevPoolMetrics.cumulativeInflowVolumeUSD;
     prevCumulativeClosedInflowVolumeUSD =
       prevPoolMetrics.cumulativeClosedInflowVolumeUSD;
@@ -175,6 +177,9 @@ export function takeLiquidityPoolDailySnapshot(
     prevCumulativeClosedInflowVolumeByTokenUSD =
       prevPoolMetrics._cumulativeClosedInflowVolumeByTokenUSD;
 
+    prevCumulativeUniqueUsers = prevPoolMetrics._cumulativeUniqueUsers;
+    prevCumulativeUniqueDepositors =
+      prevPoolMetrics._cumulativeUniqueDepositors;
     prevCumulativeUniqueBorrowers = prevPoolMetrics.cumulativeUniqueBorrowers;
     prevCumulativeUniqueLiquidators =
       prevPoolMetrics.cumulativeUniqueLiquidators;
@@ -200,7 +205,7 @@ export function takeLiquidityPoolDailySnapshot(
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetrics.dailyOpenInterestUSD = pool.openInterestUSD;
 
-  poolMetrics.inputTokens = pool.inputTokens;
+  poolMetrics._inputTokens = pool.inputTokens;
   poolMetrics.inputTokenBalances = pool.inputTokenBalances;
   poolMetrics.inputTokenWeights = pool.inputTokenWeights;
   poolMetrics.outputTokenSupply = pool.outputTokenSupply;
@@ -345,6 +350,12 @@ export function takeLiquidityPoolDailySnapshot(
   poolMetrics.dailyOutflowVolumeByTokenAmount = dailyOutflowVolumeByTokenAmount;
   poolMetrics.dailyOutflowVolumeByTokenUSD = dailyOutflowVolumeByTokenUSD;
 
+  poolMetrics.dailyActiveUsers =
+    pool.cumulativeUniqueUsers - prevCumulativeUniqueUsers;
+  poolMetrics._cumulativeUniqueUsers = pool.cumulativeUniqueUsers;
+  poolMetrics.dailyActiveDepositors =
+    pool.cumulativeUniqueDepositors - prevCumulativeUniqueDepositors;
+  poolMetrics._cumulativeUniqueDepositors = pool.cumulativeUniqueDepositors;
   poolMetrics.dailyActiveBorrowers =
     pool.cumulativeUniqueBorrowers - prevCumulativeUniqueBorrowers;
   poolMetrics.cumulativeUniqueBorrowers = pool.cumulativeUniqueBorrowers;
@@ -454,7 +465,7 @@ export function takeLiquidityPoolHourlySnapshot(
     prevCumulativeTotalLiquidityPremiumUSD =
       prevPoolMetrics.cumulativeTotalLiquidityPremiumUSD;
 
-    prevInputTokens = prevPoolMetrics.inputTokens;
+    prevInputTokens = prevPoolMetrics._inputTokens;
     prevCumulativeInflowVolumeUSD = prevPoolMetrics.cumulativeInflowVolumeUSD;
     prevCumulativeClosedInflowVolumeUSD =
       prevPoolMetrics.cumulativeClosedInflowVolumeUSD;
@@ -489,7 +500,7 @@ export function takeLiquidityPoolHourlySnapshot(
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetrics.hourlyOpenInterestUSD = pool.openInterestUSD;
 
-  poolMetrics.inputTokens = pool.inputTokens;
+  poolMetrics._inputTokens = pool.inputTokens;
   poolMetrics.inputTokenBalances = pool.inputTokenBalances;
   poolMetrics.inputTokenWeights = pool.inputTokenWeights;
   poolMetrics.outputTokenSupply = pool.outputTokenSupply;
