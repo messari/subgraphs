@@ -67,7 +67,14 @@ export class UniswapV3ArbitrumConfigurations implements Configurations {
     return stringToBytesList([]);
   }
   getUntrackedTokens(): Bytes[] {
-    return stringToBytesList(["0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a"]);
+    return stringToBytesList([
+      "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a",
+      "0xb2f1b969c8d709def61663d3add28b696f0a508e", // Porsche
+      "0x8b794cdd5a89b05f65886d4afddc7152d0a1633a", // Fake WETH
+      "0x2807cdee12db6b043cc7ac4ddaec88c89871d299", // Core DAO
+      "0x0e017687ce1971fc7672246de6675112de137730", // Flare
+      "0x9799b59e133d95a8f145be345f25e8ee97815ce0", // Poison.Finance Poison
+    ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("100000");
