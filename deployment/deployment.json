@@ -5017,7 +5017,7 @@
     "deployments": {
       "aave-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5047,7 +5047,7 @@
     "deployments": {
       "dydx-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5077,7 +5077,7 @@
     "deployments": {
       "angle-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5137,7 +5137,7 @@
     "deployments": {
       "ens-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5171,7 +5171,7 @@
     "deployments": {
       "euler-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5235,7 +5235,7 @@
     "deployments": {
       "hop-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5269,7 +5269,7 @@
     "deployments": {
       "silo-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5303,7 +5303,7 @@
     "deployments": {
       "truefi-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5337,7 +5337,7 @@
     "deployments": {
       "unlock-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5371,7 +5371,7 @@
     "deployments": {
       "rarible-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5401,7 +5401,7 @@
     "deployments": {
       "ousd-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5431,7 +5431,7 @@
     "deployments": {
       "threshold-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5461,7 +5461,7 @@
     "deployments": {
       "ampleforth-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5491,7 +5491,7 @@
     "deployments": {
       "compound-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5551,7 +5551,7 @@
     "deployments": {
       "cryptex-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5581,7 +5581,7 @@
     "deployments": {
       "gitcoin-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5611,7 +5611,7 @@
     "deployments": {
       "idle-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5671,7 +5671,7 @@
     "deployments": {
       "indexed-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5791,7 +5791,7 @@
     "deployments": {
       "pooltogether-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5821,7 +5821,7 @@
     "deployments": {
       "radicle-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5851,7 +5851,7 @@
     "deployments": {
       "reflexer-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5881,7 +5881,7 @@
     "deployments": {
       "uniswap-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5971,7 +5971,7 @@
     "deployments": {
       "unslashed-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
