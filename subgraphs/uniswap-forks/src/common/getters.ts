@@ -16,6 +16,8 @@ import {
   UsageMetricsHourlySnapshot,
   Position,
   PositionSnapshot,
+  _PositionCounter,
+  _Transfer,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
@@ -44,16 +46,16 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
   // Load from the Id
   // If not create a new position
   const pool = getLiquidityPool(
-    event.address.toHexString(),
+    event.address,
     event.block.number
   );
   const protocol = getOrCreateProtocol();
 
   const account = getOrCreateAccount(event);
 
-  const counterId = account.id
+  const counterId = account.id.toHexString()
                         .concat("-")
-                        .concat(pool.id)
+                        .concat(pool.id.toHexString())
   let counter = _PositionCounter.load(counterId);                      
   // Open position always ends with zero
   if(!counter) {
@@ -61,22 +63,21 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
     counter.nextCount = INT_ZERO;
     counter.save();
   }
-  const positionId = account.id
+  const positionAddress = Address.fromString(account.id.toHexString()
                             .concat("-")
-                            .concat(pool.id)
+                            .concat(pool.id.toHexString())
                             .concat("-")
-                            .concat(counter.nextCount.toString());
-  let position = Position.load(positionId);
+                            .concat(counter.nextCount.toString()));
+  let position = Position.load(positionAddress);
   if(!position) {
-    position = new Position(positionId);
+    position = new Position(positionAddress);
     position.account = account.id
     position.pool = pool.id;
-    position.hashOpened = event.transaction.hash.toHexString();
+    position.hashOpened = event.transaction.hash;
     position.blockNumberOpened = event.block.number;
     position.timestampOpened = event.block.timestamp;
     position.depositCount = INT_ZERO;
-    position.inputTokenBalances = new Array<BigInt>(pool.inputTokens.length).map<BigInt>(()=>BIGINT_ZERO);
-    position.outputTokenBalance = BIGINT_ZERO;
+    position.liquidity = BIGINT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.save(); 
     pool.positionCount += INT_ONE;
@@ -97,9 +98,9 @@ export function getOrCreatePosition(event: ethereum.Event):Position {
 export function getOrCreateAccount(event:ethereum.Event): Account {
   let transfer = getOrCreateTransfer(event);
 
-  let account = Account.load(transfer.sender!)
+  let account = Account.load(Address.fromString(transfer.sender!));
   if(!account) {
-    account = new Account(transfer.sender!)
+    account = new Account(Address.fromString(transfer.sender!));
     account.positionCount = INT_ZERO;
     account.openPositionCount = INT_ZERO;
     account.closedPositionCount = INT_ZERO;
@@ -145,39 +146,33 @@ export function getOrCreateProtocol(): DexAmmProtocol {
 }
 
 export function getLiquidityPool(
-  poolAddress: string,
+  poolAddress: Bytes,
   blockNumber: BigInt
 ): LiquidityPool {
   const pool = LiquidityPool.load(poolAddress)!;
-  pool.fees = createPoolFees(poolAddress, blockNumber);
+  // pool.fees = createPoolFees(poolAddress, blockNumber);
   pool.save();
   return pool;
 }
 
-export function getLiquidityPoolAmounts(
-  poolAddress: string
-): _LiquidityPoolAmount {
-  return _LiquidityPoolAmount.load(poolAddress)!;
-}
-
-export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
+export function getLiquidityPoolFee(id: Bytes): LiquidityPoolFee {
   return LiquidityPoolFee.load(id)!;
 }
 
-export function getOrCreateTokenWhitelist(
-  tokenAddress: string
-): _TokenWhitelist {
-  let tokenTracker = _TokenWhitelist.load(tokenAddress);
-  // fetch info if null
-  if (!tokenTracker) {
-    tokenTracker = new _TokenWhitelist(tokenAddress);
+// export function getOrCreateTokenWhitelist(
+//   tokenAddress: string
+// ): _TokenWhitelist {
+//   let tokenTracker = _TokenWhitelist.load(tokenAddress);
+//   // fetch info if null
+//   if (!tokenTracker) {
+//     tokenTracker = new _TokenWhitelist(tokenAddress);
 
-    tokenTracker.whitelistPools = [];
-    tokenTracker.save();
-  }
+//     tokenTracker.whitelistPools = [];
+//     tokenTracker.save();
+//   }
 
-  return tokenTracker;
-}
+//   return tokenTracker;
+// }
 
 export function getOrCreateTransfer(event: ethereum.Event): _Transfer {
   let transfer = _Transfer.load(event.transaction.hash.toHexString());
@@ -194,31 +189,21 @@ export function getOrCreateUsageMetricDailySnapshot(
   event: ethereum.Event
 ): UsageMetricsDailySnapshot {
   const protocol = getOrCreateProtocol();
+  
   // Number of days since Unix epoch
   const id = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   const dayId = id.toString();
   // Create unique id for the day
-  let usageMetrics = UsageMetricsDailySnapshot.load(dayId);
+  let usageMetrics = UsageMetricsDailySnapshot.load(Address.fromString(dayId));
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(dayId);
-    usageMetrics.protocol = NetworkConfigs.getFactoryAddress();
+    usageMetrics.protocol = Address.fromString(NetworkConfigs.getFactoryAddress());
 
     usageMetrics.dailyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.dailyTransactionCount = INT_ZERO;
-    const depositStatId = protocol.id.concat("-deposit-").concat(dayId);
-    let depositStat =  createStat(depositStatId);
-    usageMetrics.depositStats = depositStat.id;
-
-    const withdrawStatId = protocol.id.concat("-withdraw-").concat(dayId);
-    let withdrawStat =  createStat(withdrawStatId);
-    usageMetrics.withdrawStats = withdrawStat.id;
-
-    const swapStatId = protocol.id.concat("-swap-").concat(dayId);
-    let swapStat = createStat(swapStatId);
-    usageMetrics.swapStats = swapStat.id
-
+    
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
 
@@ -242,7 +227,7 @@ export function getOrCreateUsageMetricHourlySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(hourId);
-    usageMetrics.protocol = NetworkConfigs.getFactoryAddress();
+    usageMetrics.protocol = Address.fromString(NetworkConfigs.getFactoryAddress());
 
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
@@ -326,8 +311,8 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
     poolMetrics = new LiquidityPoolHourlySnapshot(
       event.address.toHexString().concat("-").concat(hourId)
     );
-    poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
-    poolMetrics.pool = event.address.toHexString();
+    poolMetrics.protocol = Address.fromString(NetworkConfigs.getFactoryAddress());
+    poolMetrics.pool = event.address;
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlyVolumeByTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
@@ -362,7 +347,7 @@ export function getOrCreateFinancialsDailySnapshot(
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id);
-    financialMetrics.protocol = NetworkConfigs.getFactoryAddress();
+    financialMetrics.protocol = Address.fromString(NetworkConfigs.getFactoryAddress());
 
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
@@ -432,11 +417,11 @@ export function getOrCreateLPToken(
   return token;
 }
 
-export function getOrCreateRewardToken(address: string): RewardToken {
+export function getOrCreateRewardToken(address: Bytes): RewardToken {
   let rewardToken = RewardToken.load(address);
   if (rewardToken == null) {
     const token = getOrCreateToken(address);
-    rewardToken = new RewardToken(RewardTokenType.DEPOSIT + "-" + address);
+    rewardToken = new RewardToken(Address.fromString(RewardTokenType.DEPOSIT + "-" + address.toHexString()));
     rewardToken.token = token.id;
     rewardToken.type = RewardTokenType.DEPOSIT;
     rewardToken.save();

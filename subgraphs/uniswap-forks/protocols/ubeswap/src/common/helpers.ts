@@ -73,10 +73,10 @@ export function getOrCreateMasterChefStakingPool(
     log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
     // Add a reward token to the liquidity pool since it now has an associated staking pool.
-    const pool = LiquidityPool.load(masterChefPool.poolAddress!);
+    const pool = LiquidityPool.load(Address.fromString(masterChefPool.poolAddress!));
     if (pool) {
       pool.rewardTokens = [
-        getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+        getOrCreateRewardToken(Address.fromString(NetworkConfigs.getRewardToken())).id,
       ];
       pool.save();
     }
@@ -116,7 +116,7 @@ export function updateRewardEmissions(event: ethereum.Event): void {
     MasterChef.MASTERCHEF + "-" + masterChefAddressPidMap.pid.toString()
   )!;
   const pool = getLiquidityPool(
-    masterChefPool.poolAddress!,
+    Address.fromString(masterChefPool.poolAddress!),
     event.block.number
   );
 
@@ -168,8 +168,8 @@ export function updateStakedAmount(
   const masterChefPool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEF + "-" + masterChefAddressPidMap.pid.toString()
   )!;
-  const pool = getLiquidityPool(
-    masterChefPool.poolAddress!,
+  const pool = getLiquidityPool( 
+    Address.fromString(masterChefPool.poolAddress!),
     event.block.number
   );
 

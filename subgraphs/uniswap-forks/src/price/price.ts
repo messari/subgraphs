@@ -1,9 +1,7 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts/index";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts/index";
 import {
   getLiquidityPool,
-  getLiquidityPoolAmounts,
   getOrCreateToken,
-  getOrCreateTokenWhitelist,
 } from "../common/getters";
 import {
   Token,
@@ -23,7 +21,7 @@ import { NetworkConfigs } from "../../configurations/configure";
 export function updateNativeTokenPriceInUSD(): Token {
   let nativeAmount = BIGDECIMAL_ZERO;
   let stableAmount = BIGDECIMAL_ZERO;
-  const nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
+  const nativeToken = getOrCreateToken(Address.fromString(NetworkConfigs.getReferenceToken()));
   // fetch average price of NATIVE_TOKEN_ADDRESS from STABLE_ORACLES
   for (let i = 0; i < NetworkConfigs.getStableOraclePools().length; i++) {
     const pool = _LiquidityPoolAmount.load(
@@ -67,17 +65,16 @@ export function findUSDPricePerToken(
 
   // hardcoded fix for incorrect rates
   // if whitelist includes token - get the safe price
-  if (NetworkConfigs.getStableCoins().includes(token.id)) {
+  if (NetworkConfigs.getStableCoins().includes(token.id.toHexString())) {
     priceSoFar = BIGDECIMAL_ONE;
-  } else if (NetworkConfigs.getUntrackedTokens().includes(token.id)) {
+  } else if (NetworkConfigs.getUntrackedTokens().includes(token.id.toHexString())) {
     priceSoFar = BIGDECIMAL_ZERO;
   } else {
     for (let i = 0; i < whiteList.length; ++i) {
       const poolAddress = whiteList[i];
-      const poolAmounts = getLiquidityPoolAmounts(poolAddress);
       const pool = getLiquidityPool(poolAddress, blockNumber);
 
-      if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
+      if (pool.activeLiquidity.gt(BIGINT_ZERO)) {
         if (
           pool.inputTokens[0] == token.id &&
           pool.totalValueLockedUSD.gt(

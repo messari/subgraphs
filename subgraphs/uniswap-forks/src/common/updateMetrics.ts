@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum, log, store } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, Bytes, ethereum, log, store } from "@graphprotocol/graph-ts";
 import {
   Account,
   ActiveAccount,
@@ -11,7 +11,6 @@ import {
 } from "../../generated/schema";
 import {
   getLiquidityPool,
-  getLiquidityPoolAmounts,
   getLiquidityPoolFee,
   getOrCreateProtocol,
   getOrCreateFinancialsDailySnapshot,
@@ -19,6 +18,7 @@ import {
   getOrCreateLiquidityPoolHourlySnapshot,
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
+  getOrCreateToken,
 } from "./getters";
 import {
   BIGDECIMAL_ZERO,
@@ -50,9 +50,7 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetricsDaily.timestamp = event.block.timestamp;
   financialMetricsDaily.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialMetricsDaily.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
-  financialMetricsDaily.activeLiquidity = protocol.activeLiquidity;
   financialMetricsDaily.activeLiquidityUSD = protocol.activeLiquidityUSD;
-  financialMetricsDaily.totalLiquidity = protocol.totalLiquidity;
   financialMetricsDaily.totalLiquidityUSD = protocol.totalLiquidityUSD;
   financialMetricsDaily.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
   financialMetricsDaily.cumulativeSupplySideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
@@ -95,17 +93,17 @@ export function updateUsageMetrics(
   if (usageType == UsageType.DEPOSIT) {
 
     usageMetricsHourly.hourlyDepositCount += INT_ONE;
-    usageMetricsDaily.depositStats = updateDepositMetricsUSD(protocol.id, event);
+    usageMetricsDaily.dailyDepositCount += INT_ONE;
   } else if (usageType == UsageType.WITHDRAW) {
     usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
-    usageMetricsDaily.withdrawStats = updateWithdrawMetricsUSD(protocol.id, event);
+    usageMetricsDaily.dailyDepositCount += INT_ONE;
   } else if (usageType == UsageType.SWAP) {
     usageMetricsHourly.hourlySwapCount += INT_ONE;
-    usageMetricsDaily.swapStats = updateSwapMetricsUSD(protocol.id, event);
+    usageMetricsDaily.dailyDepositCount += INT_ONE;
   }
 
   // Combine the id and the user address to generate a unique user id for the day
-  const dailyActiveAccountId = from.concat("-").concat(dayId);
+  const dailyActiveAccountId = Address.fromString(from.concat("-").concat(dayId));
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -113,7 +111,7 @@ export function updateUsageMetrics(
     dailyActiveAccount.save();
   }
 
-  const hourlyActiveAccountId = from.concat("-").concat(hourId);
+  const hourlyActiveAccountId = Address.fromString(from.concat("-").concat(hourId));
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -121,9 +119,9 @@ export function updateUsageMetrics(
     hourlyActiveAccount.save();
   }
 
-  let account = Account.load(from);
+  let account = Account.load(fromAddress);
   if (!account) {
-    account = new Account(from);
+    account = new Account(fromAddress);
     protocol.cumulativeUniqueUsers += INT_ONE;
     account.positionCount = INT_ZERO;
     account.openPositionCount = INT_ZERO;
@@ -141,127 +139,6 @@ export function updateUsageMetrics(
   protocol.save();
 }
 
-/**
- * Updates daily deposit usage metrics stats for a given day
- * @param event 
- * @returns string the id of the stat entity for the given day
- */
-function updateDepositMetricsUSD(statTypeId:string, event: ethereum.Event): string {
-
-  // Number of days since Unix epoch
-  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  const dayId = day.toString();
-
-  const statId = statTypeId.concat("-deposit-").concat(dayId);
-  let stat = Stat.load(statId);
-  if (!stat) {
-    stat = createStat(statId)
-  }
-  const transactionHash = event.transaction.hash.toHexString();
-  const deposit = Deposit.load(
-    transactionHash.concat("-").concat(event.logIndex.toString())
-  );
-
-  if (deposit && deposit.amountUSD) {
-    const amountUSD = deposit.amountUSD;
-
-    let valuesUSD = stat._valuesUSD;
-    valuesUSD.push(amountUSD);
-    stat._valuesUSD = valuesUSD;
-    stat.meanUSD = BigDecimalArray.mean(valuesUSD);
-    stat.medianUSD = BigDecimalArray.median(valuesUSD);
-    stat.maxUSD = BigDecimalArray.maxValue(valuesUSD);
-    stat.minUSD = BigDecimalArray.minValue(valuesUSD);
-  }
-
-  stat.count = stat.count.plus(BIGINT_ONE);
-  stat.save();
-  return stat.id;
-}
-
-
-/*
- * Updates withdraw usage metrics stats for the day or hour
- * @param timeStampId
- * @param protocolId
- * @param valuesSuffix
- * @param event 
- * @returns string the id of the stat entity 
- */
-function updateWithdrawMetricsUSD(statTypeId: string, event: ethereum.Event): string {
-
-  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  const dayId = day.toString();
-
-  const statId = statTypeId.concat("-withdraw-").concat(dayId);
-  let stat = Stat.load(statId);
-  if (!stat) {
-    stat = createStat(statId);
-  }
-  const transactionHash = event.transaction.hash.toHexString();
-  const withdraw = Withdraw.load(
-    transactionHash.concat("-").concat(event.logIndex.toString())
-  );
-
-  if (withdraw && withdraw.amountUSD) {
-    const amountUSD = withdraw.amountUSD;
-    let valuesUSD = stat._valuesUSD;
-    valuesUSD.push(amountUSD);
-    stat.meanUSD = BigDecimalArray.mean(valuesUSD);
-    stat.medianUSD = BigDecimalArray.median(valuesUSD);
-    stat.maxUSD = BigDecimalArray.maxValue(valuesUSD);
-    stat.minUSD = BigDecimalArray.minValue(valuesUSD);
-  }
-
-  stat.count = stat.count.plus(BIGINT_ONE);
-  stat.save();
-  return stat.id;
-}
-
-/*
- * Updates swap usage metrics stats for the day or hour
- * @param timeStampId
- * @param protocolId
- * @param valuesSuffix
- * @param event 
- * @returns string the id of the stat entity 
- */
-function updateSwapMetricsUSD(statTypeId: string, event: ethereum.Event): string {
-
-  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  const dayId = day.toString();
-
-  const statId = statTypeId.concat("-swap-").concat(dayId);
-  let stat = Stat.load(statId);
-  if (!stat) {
-    stat = createStat(statId);
-  }
-  const transactionHash = event.transaction.hash.toHexString();
-  const swap = Swap.load(
-    transactionHash.concat("-").concat(event.logIndex.toString())
-  );
-
-  if (swap && swap.amountInUSD) {
-    const amountUSD = swap.amountInUSD
-    let valuesUSD = stat._valuesUSD;
-    valuesUSD.push(amountUSD)
-    stat._valuesUSD = valuesUSD;
-    stat.count = stat.count.plus(BIGINT_ONE);
-    const meanUsd = BigDecimalArray.mean(valuesUSD);
-    stat.meanUSD = meanUsd;
-    stat.medianUSD = BigDecimalArray.median(valuesUSD);
-    stat.maxUSD = BigDecimalArray.maxValue(valuesUSD);
-    stat.minUSD = BigDecimalArray.minValue(valuesUSD);
-  }
-
-  stat.count = stat.count.plus(BIGINT_ONE);
-  stat.save();
-  return stat.id;
-}
-
-
-
-
 // Update UsagePoolDailySnapshot entity
 // Updated on Swap, Burn, and Mint events.
 export function updatePoolMetrics(event: ethereum.Event): void {
@@ -270,7 +147,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
 
   const pool = getLiquidityPool(
-    event.address.toHexString(),
+    event.address,
     event.block.number
   );
 
@@ -281,8 +158,10 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetricsDaily.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   poolMetricsDaily.inputTokenBalances = pool.inputTokenBalances;
   poolMetricsDaily.inputTokenWeights = pool.inputTokenWeights;
-  poolMetricsDaily.outputTokenSupply = pool.outputTokenSupply;
-  poolMetricsDaily.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsDaily.activeLiquidity = pool.activeLiquidity;
+  poolMetricsDaily.activeLiquidityUSD = pool.activeLiquidityUSD;
+  poolMetricsDaily.totalLiquidity = pool.totalLiquidity;
+  poolMetricsDaily.totalLiquidityUSD = pool.totalLiquidityUSD;
   poolMetricsDaily.blockNumber = event.block.number;
   poolMetricsDaily.timestamp = event.block.timestamp;
   poolMetricsDaily.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
@@ -298,8 +177,10 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetricsHourly.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   poolMetricsHourly.inputTokenBalances = pool.inputTokenBalances;
   poolMetricsHourly.inputTokenWeights = pool.inputTokenWeights;
-  poolMetricsHourly.outputTokenSupply = pool.outputTokenSupply;
-  poolMetricsHourly.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsHourly.activeLiquidity = pool.activeLiquidity;
+  poolMetricsHourly.activeLiquidityUSD = pool.activeLiquidityUSD;
+  poolMetricsHourly.totalLiquidity = pool.totalLiquidity;
+  poolMetricsHourly.totalLiquidityUSD = pool.totalLiquidityUSD
   poolMetricsHourly.blockNumber = event.block.number;
   poolMetricsHourly.timestamp = event.block.timestamp;
   poolMetricsHourly.rewardTokenEmissionsAmount =
@@ -312,30 +193,25 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetricsHourly.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
 
-  poolMetricsDaily.depositStats = updateDepositMetricsUSD(pool.id, event);
-  poolMetricsDaily.withdrawStats = updateWithdrawMetricsUSD(pool.id, event);
-  poolMetricsDaily.swapStats = updateSwapMetricsUSD(pool.id, event)
   poolMetricsDaily.save();
   poolMetricsHourly.save();
 }
 
 // Upate token balances based on reserves emitted from the Sync event.
 export function updateInputTokenBalances(
-  poolAddress: string,
+  poolAddress: Bytes,
   reserve0: BigInt,
   reserve1: BigInt,
   blockNumber: BigInt
 ): void {
   const pool = getLiquidityPool(poolAddress, blockNumber);
-  const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  const token0 = Token.load(pool.inputTokens[INT_ZERO]);
-  const token1 = Token.load(pool.inputTokens[INT_ONE]);
+  const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
+  const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
 
   const tokenDecimal0 = convertTokenToDecimal(reserve0, token0.decimals);
   const tokenDecimal1 = convertTokenToDecimal(reserve1, token1.decimals);
 
-  poolAmounts.inputTokenBalances = [tokenDecimal0, tokenDecimal1];
   pool.inputTokenBalances = [reserve0, reserve1];
 
   const nativeToken = updateNativeTokenPriceInUSD();
@@ -347,13 +223,12 @@ export function updateInputTokenBalances(
   let token1BalanceUSD = token1PriceUSD.times(convertTokenToDecimal(reserve1, token1.decimals));
 
   pool.inputTokenBalancesUSD = [token0BalanceUSD, token1BalanceUSD];
-  poolAmounts.save();
   pool.save();
 }
 
 // Update tvl an token prices in the Sync event.
 export function updateTvlAndTokenPrices(
-  poolAddress: string,
+  poolAddress: Bytes,
   blockNumber: BigInt
 ): void {
   const pool = getLiquidityPool(poolAddress, blockNumber);
@@ -392,12 +267,12 @@ export function updateTvlAndTokenPrices(
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(newTvl);
 
   const outputTokenSupply = convertTokenToDecimal(
-    pool.outputTokenSupply!,
+    pool.totalLiquidity,
     DEFAULT_DECIMALS
   );
 
   // Update LP token prices
-  if (pool.outputTokenSupply! == BIGINT_ZERO) {
+  if (pool.totalLiquidity == BIGINT_ZERO) {
     pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   } else {
     pool.outputTokenPriceUSD = newTvl.div(outputTokenSupply);
@@ -423,39 +298,39 @@ export function updateVolumeAndFees(
   const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
   const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
-  const supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
-  const protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
+  // const supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
+  // const protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
 
   // Update volume occurred during swaps
-  poolMetricsDaily.dailyVolumeByTokenUSD = [
-    poolMetricsDaily.dailyVolumeByTokenUSD[INT_ZERO].plus(
-      trackedAmountUSD[INT_ZERO]
-    ),
-    poolMetricsDaily.dailyVolumeByTokenUSD[INT_ONE].plus(
-      trackedAmountUSD[INT_ONE]
-    ),
+  // poolMetricsDaily.dailyVolumeByTokenUSD = [
+  //   poolMetricsDaily.dailyVolumeByTokenUSD[INT_ZERO].plus(
+  //     trackedAmountUSD[INT_ZERO]
+  //   ),
+  //   poolMetricsDaily.dailyVolumeByTokenUSD[INT_ONE].plus(
+  //     trackedAmountUSD[INT_ONE]
+  //   ),
+  // ];
+  poolMetricsDaily.dailyVolumeTokenAmounts = [
+    poolMetricsDaily.dailyVolumeTokenAmounts[INT_ZERO].plus(token0Amount),
+    poolMetricsDaily.dailyVolumeTokenAmounts[INT_ONE].plus(token1Amount),
   ];
-  poolMetricsDaily.dailyVolumeByTokenAmount = [
-    poolMetricsDaily.dailyVolumeByTokenAmount[INT_ZERO].plus(token0Amount),
-    poolMetricsDaily.dailyVolumeByTokenAmount[INT_ONE].plus(token1Amount),
-  ];
-  poolMetricsHourly.hourlyVolumeByTokenUSD = [
-    poolMetricsHourly.hourlyVolumeByTokenUSD[INT_ZERO].plus(
-      trackedAmountUSD[INT_ZERO]
-    ),
-    poolMetricsHourly.hourlyVolumeByTokenUSD[INT_ONE].plus(
-      trackedAmountUSD[INT_ONE]
-    ),
-  ];
-  poolMetricsHourly.hourlyVolumeByTokenAmount = [
-    poolMetricsHourly.hourlyVolumeByTokenAmount[INT_ZERO].plus(token0Amount),
-    poolMetricsHourly.hourlyVolumeByTokenAmount[INT_ONE].plus(token1Amount),
+  // poolMetricsHourly.hourlyVolumeByTokenUSD = [
+  //   poolMetricsHourly.hourlyVolumeByTokenUSD[INT_ZERO].plus(
+  //     trackedAmountUSD[INT_ZERO]
+  //   ),
+  //   poolMetricsHourly.hourlyVolumeByTokenUSD[INT_ONE].plus(
+  //     trackedAmountUSD[INT_ONE]
+  //   ),
+  // ];
+  poolMetricsHourly.hourlyVolumeTokenAmounts = [
+    poolMetricsHourly.hourlyVolumeTokenAmounts[INT_ZERO].plus(token0Amount),
+    poolMetricsHourly.hourlyVolumeTokenAmounts[INT_ONE].plus(token1Amount),
   ];
 
-  poolMetricsDaily.dailyVolumeUSD = poolMetricsDaily.dailyVolumeUSD.plus(
+  poolMetricsDaily.dailyTotalVolumeUSD = poolMetricsDaily.dailyTotalVolumeUSD.plus(
     trackedAmountUSD[INT_TWO]
   );
-  poolMetricsHourly.hourlyVolumeUSD = poolMetricsHourly.hourlyVolumeUSD.plus(
+  poolMetricsHourly.hourlyTotalVolumeUSD = poolMetricsHourly.hourlyTotalVolumeUSD.plus(
     trackedAmountUSD[INT_TWO]
   );
 
@@ -542,13 +417,6 @@ export function updateVolumeAndFees(
   poolMetricsHourly.save();
   protocol.save();
   pool.save();
-}
-
-// Update store that tracks the deposit count per pool
-export function updateDepositHelper(poolAddress: Address): void {
-  const poolDeposits = _HelperStore.load(poolAddress.toHexString())!;
-  poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE;
-  poolDeposits.save();
 }
 
 export function updateMetricsDepositsHelper(event: ethereum.Event, valueUSD: BigDecimal): void {

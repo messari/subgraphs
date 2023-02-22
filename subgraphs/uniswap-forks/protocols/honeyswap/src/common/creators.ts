@@ -137,7 +137,7 @@ export function createLiquidityPool(
 
 // Add reward token to liquidity pool from HoneyFarm add contract call (PoolAdded event)
 export function createPoolRewardToken(
-  poolAddress: string,
+  poolAddress: Bytes,
   blockNumber: BigInt
 ): void {
   const pool = getLiquidityPool(poolAddress, blockNumber);
@@ -151,7 +151,7 @@ export function createPoolRewardToken(
 
 // Remove reward token from liquidity pool from HoneyFarm set contract call (PoolRemoved event)
 export function removePoolRewardToken(
-  poolAddress: string,
+  poolAddress: Bytes,
   blockNumber: BigInt
 ): void {
   const pool = getLiquidityPool(poolAddress, blockNumber);

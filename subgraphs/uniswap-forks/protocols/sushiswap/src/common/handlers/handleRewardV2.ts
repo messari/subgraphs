@@ -1,4 +1,4 @@
-import { ethereum, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { ethereum, BigInt, BigDecimal, log, Address } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import {
   LiquidityPool,
@@ -32,14 +32,14 @@ export function updateMasterChef(
   const masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
   // Return if pool does not exist
-  const pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
+  const pool = LiquidityPool.load(Address.fromString(masterChefV2Pool.poolAddress!));
   if (!pool) {
     return;
   }
 
-  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(Address.fromString(NetworkConfigs.getRewardToken()));
   pool.rewardTokens = [
-    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    getOrCreateRewardToken(Address.fromString(NetworkConfigs.getRewardToken())).id,
   ];
 
   // Calculate Reward Emission per second to a specific pool
