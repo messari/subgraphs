@@ -3645,6 +3645,36 @@
       }
     }
   },
+  "spark-lend": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "spark-lend",
+    "project": "makerdao",
+    "deployments": {
+      "spark-lend-georli": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "spark.lend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "spark-lend-georli",
+            "query-id": "spark-lend-georli"
+          }
+        }
+      }
+    }
+  },
   "radiant": {
     "schema": "lending",
     "base": "aave-forks",
