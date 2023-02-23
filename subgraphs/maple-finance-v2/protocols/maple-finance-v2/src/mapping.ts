@@ -636,6 +636,10 @@ function updateBorrowRate(manager: DataManager): void {
   }
 
   // borrow rate = annual interest on all principal / total principal (in APR)
+
+  // catch divide by zero
+  if (totalPrincipal.equals(BIGDECIMAL_ZERO)) return;
+
   const borrowRate = rateAmount
     .div(totalPrincipal)
     .times(exponentToBigDecimal(2));
@@ -664,6 +668,9 @@ function updateSupplyRate(manager: DataManager, event: ethereum.Event): void {
     // decrement days
     days--;
   }
+  // catch divide by zero
+  if (market.totalDepositBalanceUSD.equals(BIGDECIMAL_ZERO)) return;
+
   const supplyRate = totalInterest
     .div(market.totalDepositBalanceUSD)
     .times(exponentToBigDecimal(2));
