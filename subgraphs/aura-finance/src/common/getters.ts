@@ -18,12 +18,7 @@ import {
 } from "./constants";
 import { NetworkConfigs } from "../../configurations/configure";
 import { getUsdPricePerToken } from "../prices";
-import {
-  fetchTokenName,
-  fetchTokenSymbol,
-  fetchTokenDecimals,
-  UNKNOWN_TOKEN_VALUE,
-} from "./tokens";
+import { fetchTokenName, fetchTokenSymbol, fetchTokenDecimals } from "./tokens";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils/datetime";
 import { prefixID } from "./utils/strings";
 import { readValue } from "./utils/ethereum";
