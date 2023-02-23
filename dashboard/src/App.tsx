@@ -110,7 +110,7 @@ function App() {
             ?.join(
               "_"
             );
-          aliasToProtocol[alias] = protocol?.protocol;
+          aliasToProtocol[alias] = protocolName;
         }
         if (!depoCount[schemaType]) {
           depoCount[schemaType] = { totalCount: 0, prodCount: 0, devCount: 0 };

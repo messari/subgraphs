@@ -40,7 +40,11 @@ export const latestSchemaVersions = (schemaType: string, versionStr: string) => 
     if ((["1.3.0"]).includes(versionStr)) {
       return true;
     }
-  } else if (schema === "bridge" || schema === "generic") {
+  } else if (schema === "bridge") {
+    if ((["1.2.0"]).includes(versionStr)) {
+      return true;
+    }
+  } else if (schema === "generic") {
     if ((["1.1.0"]).includes(versionStr)) {
       return true;
     }
