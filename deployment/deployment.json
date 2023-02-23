@@ -7177,7 +7177,7 @@
     "deployments": {
       "portal-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -7199,7 +7199,7 @@
       },
       "portal-fantom": {
         "network": "fantom",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -7221,7 +7221,7 @@
       },
       "portal-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -7243,7 +7243,7 @@
       },
       "portal-polygon": {
         "network": "polygon",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
@@ -7265,7 +7265,7 @@
       },
       "portal-avalanche": {
         "network": "avalanche",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
           "subgraph": "1.0.0",
