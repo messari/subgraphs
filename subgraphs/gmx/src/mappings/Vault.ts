@@ -191,7 +191,7 @@ export function handleUpdatePositionEvent(
   let collateralTokenAmountDelta = BIGINT_ZERO;
   if (
     collateralToken.lastPriceUSD &&
-    collateralToken.lastPriceUSD != BIGDECIMAL_ZERO
+    collateralToken.lastPriceUSD! > BIGDECIMAL_ZERO
   ) {
     collateralTokenAmountDelta = bigDecimalToBigInt(
       collateralUSDDelta
@@ -267,7 +267,7 @@ export function handleUpdatePositionEvent(
         let indexTokenAmountDelta = BIGINT_ZERO;
         if (
           indexToken.lastPriceUSD &&
-          indexToken.lastPriceUSD != BIGDECIMAL_ZERO
+          indexToken.lastPriceUSD! > BIGDECIMAL_ZERO
         ) {
           indexTokenAmountDelta = bigDecimalToBigInt(
             sizeUSDDelta

@@ -180,7 +180,7 @@ export function updateUserPosition(
       .toBigDecimal();
 
     const indexToken = getOrCreateToken(event, indexTokenAddress);
-    if (indexToken.lastPriceUSD && indexToken.lastPriceUSD != BIGDECIMAL_ZERO) {
+    if (indexToken.lastPriceUSD && indexToken.lastPriceUSD! > BIGDECIMAL_ZERO) {
       position.balance = bigDecimalToBigInt(
         position.balanceUSD
           .times(exponentToBigDecimal(indexToken.decimals))
@@ -190,7 +190,7 @@ export function updateUserPosition(
     const collateralToken = getOrCreateToken(event, collateralTokenAddress);
     if (
       collateralToken.lastPriceUSD &&
-      collateralToken.lastPriceUSD != BIGDECIMAL_ZERO
+      collateralToken.lastPriceUSD! > BIGDECIMAL_ZERO
     ) {
       position.collateralBalance = bigDecimalToBigInt(
         position.collateralBalanceUSD
