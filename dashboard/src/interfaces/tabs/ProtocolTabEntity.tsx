@@ -44,6 +44,7 @@ function ProtocolTabEntity({
   setIssues,
 }: ProtocolTabEntityProps) {
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
+  const [issuesSet, setIssuesSet] = useState<boolean>(false);
   const list: { [x: string]: any } = {};
 
   const [searchParams] = useSearchParams();
@@ -85,9 +86,10 @@ function ProtocolTabEntity({
   }, [chartsImageFiles])
 
   useEffect(() => {
-    // const issuesToSet = { ...issuesProps };
-    // issuesToSet[entityName] = issues;
-    setIssues(issues);
+    if (!issuesSet && issues.length > 0) {
+      setIssues(issues);
+      setIssuesSet(true);
+    }
   });
 
   if (!currentTimeseriesLoading && currentEntityData) {

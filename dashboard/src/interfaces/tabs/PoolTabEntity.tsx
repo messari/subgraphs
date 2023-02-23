@@ -60,8 +60,7 @@ interface PoolTabEntityProps {
   overlayPoolTimeseriesLoading: boolean;
   poolId: string;
   protocolData: { [x: string]: any };
-  setIssues: React.Dispatch<{ [x: string]: { message: string; type: string; level: string; fieldName: string }[] }>;
-  issuesProps: { [x: string]: { message: string; type: string; level: string; fieldName: string }[] };
+  setIssues: any;
 }
 
 function PoolTabEntity({
@@ -76,9 +75,10 @@ function PoolTabEntity({
   poolId,
   protocolData,
   setIssues,
-  issuesProps,
 }: PoolTabEntityProps) {
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
+  const [issuesSet, setIssuesSet] = useState<boolean>(false);
+
   // Get the key name of the pool specific to the protocol type (singular and plural)
   const poolKeySingular = PoolName[data.protocols[0].type];
   const poolKeyPlural = PoolNames[data.protocols[0].type];
@@ -120,9 +120,10 @@ function PoolTabEntity({
   }, [downloadAllCharts])
 
   useEffect(() => {
-    const issuesToSet = { ...issuesProps };
-    issuesToSet[entityName] = issues;
-    setIssues(issuesToSet);
+    if (!issuesSet && issues.length > 0) {
+      setIssues(issues);
+      setIssuesSet(true);
+    }
   });
 
   try {
@@ -388,9 +389,7 @@ function PoolTabEntity({
                     apr = (Number(val) / timeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
                     factors.push("snapshot.totalBorrowBalanceUSD");
                   } else if (
-                    currentRewardToken?.type?.includes("BORROW") &&
-                    issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x?.type?.includes("BORROW")).length ===
-                    0
+                    currentRewardToken?.type?.includes("BORROW")
                   ) {
                     issues.push({
                       type: "BORROW",
@@ -461,19 +460,17 @@ function PoolTabEntity({
             });
           }
         } catch (err) {
-          if (issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0) {
-            let message = "JAVASCRIPT ERROR";
-            if (err instanceof Error) {
-              message = err.message;
-            }
-            console.log(err);
-            issues.push({
-              type: "JS",
-              message: message,
-              level: "critical",
-              fieldName: entityName + "-" + fieldName,
-            });
+          let message = "JAVASCRIPT ERROR";
+          if (err instanceof Error) {
+            message = err.message;
           }
+          console.log(err);
+          issues.push({
+            type: "JS",
+            message: message,
+            level: "critical",
+            fieldName: entityName + "-" + fieldName,
+          });
         }
         if (x < overlayDifference && overlayPoolTimeseriesData.length > 0) {
           overlayDataFields[fieldName] = [
@@ -641,9 +638,7 @@ function PoolTabEntity({
                     apr = (Number(val) / overlayTimeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
                     factors.push("snapshot.totalBorrowBalanceUSD");
                   } else if (
-                    currentRewardToken?.type?.includes("BORROW") &&
-                    issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x?.type?.includes("BORROW")).length ===
-                    0
+                    currentRewardToken?.type?.includes("BORROW")
                   ) {
                     issues.push({
                       type: "BORROW",
@@ -708,19 +703,17 @@ function PoolTabEntity({
             });
           }
         } catch (err) {
-          if (issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0) {
-            let message = "JAVASCRIPT ERROR";
-            if (err instanceof Error) {
-              message = err.message;
-            }
-            console.log(err);
-            issues.push({
-              type: "JS",
-              message: message,
-              level: "critical",
-              fieldName: entityName + "-" + fieldName,
-            });
+          let message = "JAVASCRIPT ERROR";
+          if (err instanceof Error) {
+            message = err.message;
           }
+          console.log(err);
+          issues.push({
+            type: "JS",
+            message: message,
+            level: "critical",
+            fieldName: entityName + "-" + fieldName,
+          });
         }
       }
     }
@@ -789,8 +782,7 @@ function PoolTabEntity({
         Object.keys(rewardChart).forEach((reward: any, idx: number) => {
           if (!(fieldsList.filter((x) => x.includes(reward))?.length > 1)) {
             if (
-              dataFieldMetrics[reward].sum === 0 &&
-              issues.filter((x) => x.fieldName === entityName + "-" + reward).length === 0
+              dataFieldMetrics[reward].sum === 0
             ) {
               const fieldName = entityName + "-" + reward;
               issues.push({ type: "SUM", level: "error", fieldName, message: dataFieldMetrics[reward]?.factors });
@@ -831,9 +823,7 @@ function PoolTabEntity({
     if (entitySpecificElements['rates']) {
       ratesElement = <ChartContainer csvMetaDataProp={csvMetaData} csvJSONProp={csvJSON} baseKey="" elementId={"rates"} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={entitySpecificElements['rates']["tableData"]} dataChart={entitySpecificElements['rates']['dataChart']} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} isStringField={true} />
       entitySpecificElements['rates']?.['issues']?.forEach((iss: any) => {
-        if (issues.filter((x) => x.fieldName === iss).length === 0) {
-          issues.push({ type: "SUM", level: "error", fieldName: iss, message: "" });
-        }
+        issues.push({ type: "SUM", level: "error", fieldName: iss, message: "" });
       });
     }
 
@@ -850,8 +840,7 @@ function PoolTabEntity({
           totalWeightAtIdx = totalWeightAtIdx / 100;
         }
         if (
-          Math.abs(1 - totalWeightAtIdx) > .01 &&
-          issues.filter((x) => x.fieldName === entityName + "-inputTokenWeights").length === 0
+          Math.abs(1 - totalWeightAtIdx) > .01
         ) {
           const fieldName = entityName + "-inputTokenWeights";
           const date = toDate(val.date);
@@ -908,62 +897,58 @@ function PoolTabEntity({
     });
 
     Object.keys(rewardFieldCount).forEach((field) => {
-      if (issues.filter((x) => x.type === "TOK" && x.fieldName.includes(data[poolKeySingular]?.name)).length === 0) {
-        if (rewardFieldCount[field] === 1 && data[poolKeySingular][field]) {
-          if (data[poolKeySingular][field].length > rewardTokensLength) {
+      if (rewardFieldCount[field] === 1 && data[poolKeySingular][field]) {
+        if (data[poolKeySingular][field].length > rewardTokensLength) {
+          issues.push({
+            type: "TOK",
+            level: "error",
+            fieldName: `${data[poolKeySingular]?.name}-${field}///${data[poolKeySingular][field].length - 1}`,
+            message: `rewardTokens///${rewardTokensLength - 1}`,
+          });
+        } else if (data[poolKeySingular][field].length < rewardTokensLength) {
+          issues.push({
+            type: "TOK",
+            level: "error",
+            fieldName: `${data[poolKeySingular]?.name}-rewardTokens///${rewardTokensLength - 1}`,
+            message: `${field}///${data[poolKeySingular][field].length - 1}`,
+          });
+        }
+      } else {
+        if (rewardFieldCount[field] > rewardTokensLength) {
+          if (!(rewardFieldCount[field] === 1 && dataFieldMetrics[field].sum === 0)) {
             issues.push({
               type: "TOK",
               level: "error",
-              fieldName: `${data[poolKeySingular]?.name}-${field}///${data[poolKeySingular][field].length - 1}`,
+              fieldName: `${data[poolKeySingular]?.name}-${field}///${rewardFieldCount[field] - 1}`,
               message: `rewardTokens///${rewardTokensLength - 1}`,
             });
-          } else if (data[poolKeySingular][field].length < rewardTokensLength) {
-            issues.push({
-              type: "TOK",
-              level: "error",
-              fieldName: `${data[poolKeySingular]?.name}-rewardTokens///${rewardTokensLength - 1}`,
-              message: `${field}///${data[poolKeySingular][field].length - 1}`,
-            });
           }
-        } else {
-          if (rewardFieldCount[field] > rewardTokensLength) {
-            if (!(rewardFieldCount[field] === 1 && dataFieldMetrics[field].sum === 0)) {
-              issues.push({
-                type: "TOK",
-                level: "error",
-                fieldName: `${data[poolKeySingular]?.name}-${field}///${rewardFieldCount[field] - 1}`,
-                message: `rewardTokens///${rewardTokensLength - 1}`,
-              });
-            }
-          } else if (rewardFieldCount[field] < rewardTokensLength) {
-            issues.push({
-              type: "TOK",
-              level: "error",
-              fieldName: `${data[poolKeySingular]?.name}-rewardTokens///${rewardTokensLength - 1}`,
-              message: `${field}///${rewardFieldCount[field] - 1}`,
-            });
-          }
+        } else if (rewardFieldCount[field] < rewardTokensLength) {
+          issues.push({
+            type: "TOK",
+            level: "error",
+            fieldName: `${data[poolKeySingular]?.name}-rewardTokens///${rewardTokensLength - 1}`,
+            message: `${field}///${rewardFieldCount[field] - 1}`,
+          });
         }
       }
     });
 
     Object.keys(inputTokenFieldCount).forEach((field) => {
-      if (issues.filter((x) => x.type === "TOK" && x.fieldName.includes(data[poolKeySingular]?.name)).length === 0) {
-        if (inputTokenFieldCount[field] > inputTokensLength) {
-          issues.push({
-            type: "TOK",
-            level: "error",
-            fieldName: `${data[poolKeySingular]?.name}-${field}///${inputTokenFieldCount[field] - 1}`,
-            message: `inputTokens///${inputTokensLength - 1}`,
-          });
-        } else if (inputTokenFieldCount[field] < inputTokensLength) {
-          issues.push({
-            type: "TOK",
-            level: "error",
-            fieldName: `${data[poolKeySingular]?.name}-inputTokens///${inputTokensLength - 1}`,
-            message: `${field}///${inputTokenFieldCount[field] - 1}`,
-          });
-        }
+      if (inputTokenFieldCount[field] > inputTokensLength) {
+        issues.push({
+          type: "TOK",
+          level: "error",
+          fieldName: `${data[poolKeySingular]?.name}-${field}///${inputTokenFieldCount[field] - 1}`,
+          message: `inputTokens///${inputTokensLength - 1}`,
+        });
+      } else if (inputTokenFieldCount[field] < inputTokensLength) {
+        issues.push({
+          type: "TOK",
+          level: "error",
+          fieldName: `${data[poolKeySingular]?.name}-inputTokens///${inputTokensLength - 1}`,
+          message: `${field}///${inputTokenFieldCount[field] - 1}`,
+        });
       }
     });
 
@@ -1094,8 +1079,7 @@ function PoolTabEntity({
         });
         if (
           dataFieldMetrics[field]?.negative &&
-          !isNegativeField &&
-          issues.filter((x) => x.fieldName === `${entityName}-${field}` && x.type === "NEG").length === 0
+          !isNegativeField
         ) {
           issues.push({
             message: JSON.stringify(dataFieldMetrics[field]?.negative),
@@ -1125,7 +1109,6 @@ function PoolTabEntity({
 
         if (
           dataFieldMetrics[field]?.sum === 0 &&
-          issues.filter((x) => x.fieldName === label).length === 0 &&
           !(fieldsList.filter((x) => x.includes(field))?.length > 1)
         ) {
           // This array holds field names for fields that trigger a critical level issue rather than just an error level if all values are 0
@@ -1152,7 +1135,6 @@ function PoolTabEntity({
           issues.push({ type: "SUM", message: "", level, fieldName: label });
         }
         if (
-          issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
           dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
         ) {
           issues.push({
@@ -1168,14 +1150,12 @@ function PoolTabEntity({
           message = err.message;
         }
         console.log(err);
-        if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
-          issues.push({
-            type: "JS",
-            message: message,
-            level: "critical",
-            fieldName: entityName + "-" + field,
-          });
-        }
+        issues.push({
+          type: "JS",
+          message: message,
+          level: "critical",
+          fieldName: entityName + "-" + field,
+        });
         return (
           <div key={elementId}>
             <Box mt={3} mb={1}>
