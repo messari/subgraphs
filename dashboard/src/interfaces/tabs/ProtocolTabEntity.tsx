@@ -238,7 +238,6 @@ function ProtocolTabEntity({
             } else if (Array.isArray(currentInstanceField)) {
               // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
               // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
-              // currentInstanceField.forEach((val: string, arrayIndex: number) => {
               for (let arrayIndex = 0; arrayIndex < currentInstanceField.length; arrayIndex++) {
                 const val = currentInstanceField[arrayIndex];
                 const dataFieldKey = fieldName + " [" + arrayIndex + "]";
@@ -332,7 +331,6 @@ function ProtocolTabEntity({
               }
             }
           } catch (err) {
-            // if (issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0) {
             let message = "JAVASCRIPT ERROR";
             if (err instanceof Error) {
               message = err.message;
@@ -344,7 +342,6 @@ function ProtocolTabEntity({
               fieldName: entityName + "-" + fieldName,
             });
           }
-          // }
         });
       }
 
@@ -428,7 +425,6 @@ function ProtocolTabEntity({
 
             try {
               if (
-                // issues.filter((x) => x.fieldName === label && x.type === "SUM")?.length === 0 &&
                 dataFieldMetrics[field]?.sum === 0
               ) {
                 // Create a warning for the 0 sum of all snapshots for this field
@@ -464,7 +460,6 @@ function ProtocolTabEntity({
                 });
               }
               if (
-                // issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE")?.length === 0 &&
                 dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
               ) {
                 issues.push({
@@ -480,7 +475,6 @@ function ProtocolTabEntity({
               if (
                 dataFieldMetrics[field]?.negative &&
                 !isNegativeField
-                // issues.filter((x) => x.fieldName === `${entityName}-${field}` && x.type === "NEG").length === 0
               ) {
                 issues.push({
                   message: JSON.stringify(dataFieldMetrics[field]?.negative),
@@ -495,15 +489,12 @@ function ProtocolTabEntity({
               if (err instanceof Error) {
                 message = err.message;
               }
-              // 
-              // if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
               issues.push({
                 type: "JS",
                 message: 6 + message,
                 level: "critical",
                 fieldName: entityName + "-" + field,
               });
-              // }
               return (
                 <div key={elementId}>
                   <Box mt={3} mb={1} style={{ borderTop: "2px solid #B8301C", borderBottom: "2px solid #B8301C" }}>
