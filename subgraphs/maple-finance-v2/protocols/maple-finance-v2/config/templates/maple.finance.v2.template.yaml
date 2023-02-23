@@ -133,6 +133,10 @@ templates:
           file: ./abis/Pool.json
         - name: MapleGlobals
           file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
+        - name: MapleLoan
+          file: ./abis/MapleLoan.json
         - name: LoanManager
           file: ./abis/LoanManager.json
         - name: ERC20
@@ -160,6 +164,8 @@ templates:
           file: ./abis/MapleLoan.json
         - name: MapleGlobals
           file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
         - name: Pool
           file: ./abis/Pool.json
       eventHandlers:
@@ -185,6 +191,8 @@ templates:
           file: ./abis/MapleLoan.json
         - name: MapleGlobals
           file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
       eventHandlers:
         - event: Initialized(indexed address,indexed address,address[2],uint256[3],uint256[3],uint256[4],uint256[2])
           handler: handleLoanInitialized
@@ -206,28 +214,12 @@ templates:
           file: ./abis/WithdrawalManager.json
         - name: MapleGlobals
           file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
       eventHandlers:
         - event: WithdrawalProcessed(indexed address,uint256,uint256)
           handler: handleWithdrawalProcessed
       file: ./protocols/maple-finance-v2/src/mapping.ts
-  # - kind: ethereum/contract
-  #   name: LoanManager
-  #   network: {{ network }}
-  #   source:
-  #     abi: LoanManager
-  #   mapping:
-  #     kind: ethereum/events
-  #     apiVersion: 0.0.6
-  #     language: wasm/assemblyscript
-  #     entities: []
-  #     abis:
-  #       - name: LoanManager
-  #         file: ./abis/LoanManager.json
-  #       - name: MapleGlobals
-  #         file: ./abis/MapleGlobals.json
-  #     eventHandlers:
-  #       - event: PaymentAdded()
-  #     file: ./protocols/maple-finance-v2/src/mapping.ts
   - kind: ethereum/contract
     name: Liquidator
     network: {{ network }}
@@ -243,6 +235,8 @@ templates:
           file: ./abis/Liquidator.json
         - name: MapleGlobals
           file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
       eventHandlers:
         - event: PortionLiquidated(uint256,uint256)
           handler: handlePortionLiquidated

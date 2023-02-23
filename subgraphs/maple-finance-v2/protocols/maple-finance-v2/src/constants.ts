@@ -32,8 +32,10 @@ export const LOAN_MANAGER_FACTORY =
 export const LIQUIDATOR_FACTORY = "0xa2091116649b070d2a27fc5c85c9820302114c63";
 export const WITHDRAWAL_MANAGER_FACTORY =
   "0xb9e25b584dc4a7c9d47aef577f111fbe5705773b";
-export const MAPLE_LOAN_FACTORY = "0x36a7350309b2eb30f3b908ab0154851b5ed81db0"; //TODO do we need this?
 export const MAPLE_GLOBALS = "0x804a6f5f667170f545bf14e5ddb48c70b788390c"; // price from getLatestPrice()
+export const CHAINLINK_USDC_ORACLE =
+  "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6";
+export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 
 /////////////////////////////
 ///// Protocol Specific /////

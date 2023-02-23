@@ -13,6 +13,7 @@ import {
   PaymentMade,
 } from "../../../generated/templates/MapleLoan/MapleLoan";
 import { MapleGlobals } from "../../../generated/templates/MapleLoan/MapleGlobals";
+import { Chainlink } from "../../../generated/templates/MapleLoan/Chainlink";
 import { LoanManager } from "../../../generated/LoanManagerFactory/LoanManager";
 import {
   PoolManager as PoolManagerTemplate,
@@ -36,6 +37,7 @@ import {
   exponentToBigDecimal,
   InterestRateSide,
   InterestRateType,
+  SECONDS_PER_DAY,
   TokenType,
 } from "../../../src/sdk/constants";
 import { DataManager } from "../../../src/sdk/manager";
@@ -45,15 +47,23 @@ import {
   getProtocolData,
   MAPLE_GLOBALS,
   ZERO_ADDRESS,
+  DEFAULT_DECIMALS,
+  USDC_ADDRESS,
+  CHAINLINK_USDC_ORACLE,
 } from "./constants";
-import { Token, _Loan } from "../../../generated/schema";
+import {
+  MarketDailySnapshot,
+  Token,
+  _Loan,
+  _MarketList,
+} from "../../../generated/schema";
 import { ERC20, Transfer } from "../../../generated/PoolManagerFactory/ERC20";
 
 /////////////////////
 //// Pool Events ////
 /////////////////////
 
-// TODO: missing some PoolManager contexts for loan creation...
+// TODO: figure out why transfers are not working well
 
 //
 // Pool created event
@@ -97,7 +107,7 @@ export function handleManagerInstanceDeployed(event: InstanceDeployed): void {
   const market = manager.getMarket();
   manager.getOrUpdateRate(
     InterestRateSide.BORROWER,
-    InterestRateType.FIXED,
+    InterestRateType.VARIABLE,
     BIGDECIMAL_ZERO
   );
   manager.getOrUpdateRate(
@@ -120,6 +130,17 @@ export function handleManagerInstanceDeployed(event: InstanceDeployed): void {
   market._poolManager = event.params.instance_;
   market.save();
   // TODO: price oracle?
+
+  // add new pools to protocol
+  let marketList = _MarketList.load(getProtocolData().protocolID);
+  if (!marketList) {
+    marketList = new _MarketList(getProtocolData().protocolID);
+    marketList.markets = [];
+  }
+  const markets = marketList.markets;
+  markets.push(Bytes.fromHexString(tryPool.value.toHexString()));
+  marketList.markets = markets;
+  marketList.save();
 }
 
 //
@@ -168,6 +189,14 @@ export function handleLoanFunded(event: LoanFunded): void {
     event,
     getProtocolData()
   );
+  const market = manager.getMarket();
+  let loans = market._loans;
+  if (!loans) {
+    loans = [];
+  }
+  loans.push(loan.id);
+  market._loans = loans;
+  market.save();
 
   const inputTokenPriceUSD = getPriceUSD(tryInputToken.value);
   const inputTokenDecimals = manager.getInputToken().decimals;
@@ -197,13 +226,17 @@ export function handleTransfer(event: Transfer): void {
     ]);
     return;
   }
+  // log.warning("transfer: {} {}", [
+  //   event.params.value.toString(),
+  //   event.transaction.hash.toHexString(),
+  // ]); TODO remove
   const manager = new DataManager(
     Bytes.fromHexString(event.address.toHexString()),
     Bytes.fromHexString(tryInputToken.value.toHexString()),
     event,
     getProtocolData()
   );
-  updateMarketAndProtocol(manager);
+  updateMarketAndProtocol(manager, event);
 
   const market = manager.getMarket();
   const inputTokenDecimals = manager.getInputToken().decimals;
@@ -361,7 +394,7 @@ export function handlePaymentMade(event: PaymentMade): void {
     event,
     getProtocolData()
   );
-  updateMarketAndProtocol(manager);
+  updateMarketAndProtocol(manager, event);
 
   const mapleLoanContract = MapleLoan.bind(event.address);
   const tryPrinciple = mapleLoanContract.try_principal();
@@ -398,13 +431,8 @@ export function handlePaymentMade(event: PaymentMade): void {
     InterestRateType.FIXED
   );
 
-  // update interest paid
-  manager.addSupplyRevenue(
-    event.params.interestPaid_
-      .toBigDecimal()
-      .div(exponentToBigDecimal(inputTokenDecimals))
-      .times(inputTokenPriceUSD)
-  );
+  // update protocol revenue collected
+  // this is either from borrow fees, management fees or loan origination fees
   manager.addProtocolRevenue(
     event.params.interestPaid_
       .toBigDecimal()
@@ -483,7 +511,7 @@ export function handleLiquidatorInstanceDeployed(
 // This is the liquidation function
 // Note: We don't get the market this was liquidated in or the accounts involved
 export function handlePortionLiquidated(event: PortionLiquidated): void {
-  // TODO: not sure how we want to handle this
+  // TODO: not sure how we want to handle this. This has never been emitted before
 }
 
 /////////////////
@@ -493,8 +521,10 @@ export function handlePortionLiquidated(event: PortionLiquidated): void {
 //
 // Updates the market and protocol with latest data
 // Prices, balances, exchange rate, TVL, rates
-// TODO; update rates
-function updateMarketAndProtocol(manager: DataManager): void {
+function updateMarketAndProtocol(
+  manager: DataManager,
+  event: ethereum.Event
+): void {
   const market = manager.getMarket();
   if (!market._loanManager) {
     log.error(
@@ -517,6 +547,15 @@ function updateMarketAndProtocol(manager: DataManager): void {
     );
     return;
   }
+  const inputTokenPriceUSD = getPriceUSD(
+    Address.fromBytes(manager.getInputToken().id)
+  );
+  const exchangeRate = tryBalance.value
+    .toBigDecimal()
+    .div(tryTotalSupply.value.toBigDecimal());
+  market.outputTokenSupply = tryTotalSupply.value;
+  market.outputTokenPriceUSD = inputTokenPriceUSD.times(exchangeRate);
+  market.save();
 
   const tryAUM = loanManagerContract.try_assetsUnderManagement();
   if (tryAUM.reverted) {
@@ -527,13 +566,6 @@ function updateMarketAndProtocol(manager: DataManager): void {
     return;
   }
 
-  const exchangeRate = tryBalance.value
-    .div(tryTotalSupply.value)
-    .toBigDecimal();
-  const inputTokenPriceUSD = getPriceUSD(
-    Address.fromBytes(manager.getInputToken().id)
-  );
-
   manager.updateMarketAndProtocolData(
     inputTokenPriceUSD,
     tryBalance.value,
@@ -541,6 +573,104 @@ function updateMarketAndProtocol(manager: DataManager): void {
     null,
     null,
     exchangeRate
+  );
+
+  // calculate accrued interest on the loans
+  const tryAccruedInterest = loanManagerContract.try_getAccruedInterest();
+  if (tryAccruedInterest.reverted) {
+    log.error(
+      "[updateMarketAndProtocol] LoanManager contract {} does not have a getAccruedInterest",
+      [market._loanManager!.toHexString()]
+    );
+    return;
+  }
+  if (!market._prevRevenue) {
+    market._prevRevenue = BIGINT_ZERO;
+  }
+
+  if (market._prevRevenue!.lt(tryAccruedInterest.value)) {
+    const revenueDelta = tryAccruedInterest.value.minus(market._prevRevenue!);
+    market._prevRevenue = tryAccruedInterest.value;
+    market.save();
+
+    manager.addProtocolRevenue(
+      revenueDelta
+        .toBigDecimal()
+        .div(exponentToBigDecimal(manager.getInputToken().decimals))
+        .times(inputTokenPriceUSD)
+    );
+  }
+
+  updateBorrowRate(manager);
+  updateSupplyRate(manager, event);
+}
+
+function updateBorrowRate(manager: DataManager): void {
+  const market = manager.getMarket();
+
+  // update borrow rate using the rate from the loans
+  let totalPrincipal = BIGDECIMAL_ZERO;
+  let rateAmount = BIGDECIMAL_ZERO;
+  if (!market._loans) return;
+  for (let i = 0; i < market._loans!.length; i++) {
+    const loanContract = MapleLoan.bind(Address.fromBytes(market._loans![i]));
+    const tryPrincipal = loanContract.try_principal();
+    const tryRate = loanContract.try_interestRate();
+
+    if (tryPrincipal.reverted || tryRate.reverted) {
+      log.error(
+        "[updateMarketAndProtocol] Loan contract {} does not have a principal or interestRate",
+        [loanContract._address.toHexString()]
+      );
+      continue;
+    }
+    const principal = tryPrincipal.value
+      .toBigDecimal()
+      .div(exponentToBigDecimal(manager.getInputToken().decimals));
+    totalPrincipal = totalPrincipal.plus(principal);
+    rateAmount = rateAmount.plus(
+      principal.times(
+        tryRate.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS))
+      )
+    );
+  }
+
+  // borrow rate = annual interest on all principal / total principal (in APR)
+  const borrowRate = rateAmount
+    .div(totalPrincipal)
+    .times(exponentToBigDecimal(2));
+  manager.getOrUpdateRate(
+    InterestRateSide.BORROWER,
+    InterestRateType.VARIABLE,
+    borrowRate
+  );
+}
+
+function updateSupplyRate(manager: DataManager, event: ethereum.Event): void {
+  const market = manager.getMarket();
+
+  // update supply rate using interest from the last 30 days
+  let totalInterest = BIGDECIMAL_ZERO;
+  let days = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  for (let i = 0; i < 30; i++) {
+    const snapshotID = market.id.concat(Bytes.fromI32(days));
+    const thisDailyMarketSnapshot = MarketDailySnapshot.load(snapshotID);
+    if (thisDailyMarketSnapshot) {
+      totalInterest = totalInterest.plus(
+        thisDailyMarketSnapshot.dailySupplySideRevenueUSD
+      );
+    }
+
+    // decrement days
+    days--;
+  }
+  const supplyRate = totalInterest
+    .div(market.totalDepositBalanceUSD)
+    .times(exponentToBigDecimal(2));
+  manager.getOrUpdateRate(
+    InterestRateSide.LENDER,
+    InterestRateType.VARIABLE,
+    supplyRate
   );
 }
 
@@ -563,12 +693,19 @@ function getPriceUSD(asset: Address): BigDecimal {
   const mapleGlobalsContract = MapleGlobals.bind(
     Address.fromString(MAPLE_GLOBALS)
   );
-  const tryPrice = mapleGlobalsContract.try_getLatestPrice(asset);
+  let tryPrice = mapleGlobalsContract.try_getLatestPrice(asset);
   if (tryPrice.reverted) {
-    log.warning("[getPriceUSD] Could not get price for asset {}", [
-      asset.toHexString(),
-    ]);
-    return BIGDECIMAL_ZERO;
+    if (asset == Address.fromString(USDC_ADDRESS)) {
+      const chainlinkContract = Chainlink.bind(
+        Address.fromString(CHAINLINK_USDC_ORACLE)
+      );
+      tryPrice = chainlinkContract.try_latestAnswer();
+    } else {
+      log.warning("[getPriceUSD] Could not get price for asset {}", [
+        asset.toHexString(),
+      ]);
+      return BIGDECIMAL_ZERO;
+    }
   }
   const token = Token.load(asset);
   if (!token) {
