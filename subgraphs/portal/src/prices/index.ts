@@ -47,14 +47,19 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     );
   }
 
-  // 1. Yearn Lens Oracle
-  const yearnLensPrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr);
-  if (!yearnLensPrice.reverted) {
-    log.info("[YearnLensOracle] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      yearnLensPrice.usdPrice.toString(),
-    ]);
-    return yearnLensPrice;
+  if (
+    tokenAddr !=
+    Address.fromString("0x50d1c9771902476076ecfc8b2a83ad6b9355a4c9") // FTT
+  ) {
+    // 1. Yearn Lens Oracle
+    const yearnLensPrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr);
+    if (!yearnLensPrice.reverted) {
+      log.info("[YearnLensOracle] tokenAddress: {}, Price: {}", [
+        tokenAddr.toHexString(),
+        yearnLensPrice.usdPrice.toString(),
+      ]);
+      return yearnLensPrice;
+    }
   }
 
   // 2. ChainLink Feed Registry
