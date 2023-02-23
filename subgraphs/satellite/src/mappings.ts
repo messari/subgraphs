@@ -47,6 +47,8 @@ import {
   TokenType,
 } from "./sdk/util/constants";
 import { Pool } from "./sdk/protocols/bridge/pool";
+import { isValidEVMAddress } from "./sdk/util/strings";
+import { BridgeType } from "../../multichain/src/common/constants";
 
 // empty handler for prices library
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
@@ -234,18 +236,20 @@ export function handleTokenSent(event: TokenSent): void {
   const dstNetworkConstants = getNetworkSpecificConstant(dstChainId);
   const dstPoolId = dstNetworkConstants.getPoolAddress();
 
-  const dstAddress1 = Bytes.fromUTF8(event.params.destinationAddress);
-  const dstAddress2 = Address.fromString(event.params.destinationAddress);
-  log.info("[handleTokenSent]original={},dstAddress1={},dstAddress2={}", [
+  const dstStr = event.params.destinationAddress;
+  const dstAddress = isValidEVMAddress(dstStr)
+    ? Address.fromString(dstStr)
+    : Bytes.fromUTF8(dstStr);
+
+  log.info("[handleTokenSent]original={},dstAddress={}", [
     event.params.destinationAddress,
-    dstAddress1.toHexString(),
-    dstAddress2.toHexString(),
+    dstAddress.toHexString(),
   ]);
 
   _handleTransferOut(
     Address.fromString(tokenAddress),
     event.params.sender,
-    Bytes.fromUTF8(event.params.destinationAddress),
+    dstAddress,
     event.params.amount,
     dstChainId,
     poolId,
@@ -268,7 +272,12 @@ export function handleContractCallWithToken(
   );
   const dstNetworkConstants = getNetworkSpecificConstant(dstChainId);
   const dstPoolId = dstNetworkConstants.getPoolAddress();
-  const dstAccount = Address.fromUTF8(event.params.destinationContractAddress);
+
+  const dstStr = event.params.destinationContractAddress;
+  const dstAccount = isValidEVMAddress(dstStr)
+    ? Address.fromString(dstStr)
+    : Bytes.fromUTF8(dstStr);
+
   _handleTransferOut(
     Address.fromString(tokenAddress),
     event.params.sender,
@@ -285,7 +294,7 @@ export function handleContractCallWithToken(
 
   const sdk = _getSDK(event)!;
   const acc = sdk.Accounts.loadAccount(event.params.sender);
-  //TODO: acc.messageOut(dstChainId, dstAccount, event.params.payload);
+  acc.messageOut(dstChainId, dstAccount, event.params.payload);
 }
 
 export function handleContractCall(event: ContractCall): void {
@@ -302,8 +311,6 @@ export function handleContractCall(event: ContractCall): void {
   acc.messageOut(dstChainId, dstAccount, event.params.payload);
 }
 
-//export function handleTokenTransfer(event: Transfer): void {}
-
 export function handleContractCallApproved(event: ContractCallApproved): void {
   // contract call
   const srcChainId = networkToChainID(event.params.sourceChain.toUpperCase());
@@ -319,8 +326,12 @@ export function handleContractCallApprovedWithMint(
 ): void {
   // contract call
   const srcChainId = networkToChainID(event.params.sourceChain.toUpperCase());
-  // this is needed to support transferIn from non-EVM chain
-  const srcAccount = Bytes.fromUTF8(event.params.sourceAddress);
+  // this is needed to support transferIn from non-EVM chains
+  const srcStr = event.params.sourceAddress;
+  const srcAccount = isValidEVMAddress(srcStr)
+    ? Address.fromString(srcStr)
+    : Bytes.fromUTF8(srcStr);
+
   const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
   const tokenAddress = tokenSymbol.tokenAddress!;
   const poolId = event.address.concat(Address.fromString(tokenAddress));
@@ -345,7 +356,7 @@ export function handleContractCallApprovedWithMint(
 
   const sdk = _getSDK(event)!;
   const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
-  //TODO: acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
+  acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
 }
 
 export function handleMintToken(call: MintTokenCall): void {
@@ -410,6 +421,12 @@ export function handleMintToken(call: MintTokenCall): void {
 }
 
 export function handleCommandExecuted(event: Executed): void {
+  log.info("[handleCommandExecuted]commandId={} tx {} logIndex={}", [
+    event.params.commandId.toHexString(),
+    event.transaction.hash.toHexString(),
+    event.transactionLogIndex.toString(),
+  ]);
+
   const receipt = event.receipt;
   if (!receipt) {
     log.error("[handleCommandExecuted]No receipt for tx {}", [
@@ -425,6 +442,15 @@ export function handleCommandExecuted(event: Executed): void {
   let tokenAddress = Address.zero();
   let account = Address.zero();
   let amount = BIGINT_ZERO;
+  const commandId = event.params.commandId;
+  let command = _Command.load(commandId);
+  if (!command) {
+    command = new _Command(commandId);
+    command.isBurnToken = false;
+    command.isProcessed = false;
+    command.save();
+  }
+
   const logs = event.receipt!.logs;
   //Transfer should have an index that's below event.logIndex
   const transferLogIndex = event.logIndex.minus(BIGINT_ONE);
@@ -447,56 +473,38 @@ export function handleCommandExecuted(event: Executed): void {
       const toAddress = ethereum
         .decode("address", thisLog.topics[2])!
         .toAddress();
-
-      log.info("[handleCommandExecuted]thisLog.data={} tx={} logIndex={}", [
-        thisLog.data.toHexString(),
-        thisLog.transactionHash.toHexString(),
-        thisLog.logIndex.toString(),
-      ]);
       const transferAmount = ethereum
         .decode("uint256", thisLog.data)!
         .toBigInt();
 
+      log.info(
+        "[handleCommandExecuted]from={} to={} thisLog.data={} tx={} logIndex={}",
+        [
+          fromAddress.toHexString(),
+          toAddress.toHexString(),
+          thisLog.data.toHexString(),
+          thisLog.transactionHash.toHexString(),
+          thisLog.logIndex.toString(),
+        ]
+      );
+
+      log.info("[handleCommandExecuted]to==0x0 {} tx={} logIndex={}", [
+        toAddress.equals(Address.zero()).toString(),
+        thisLog.transactionHash.toHexString(),
+        thisLog.logIndex.toString(),
+      ]);
+
       // transfer to burn
       if (toAddress.equals(Address.zero())) {
-        tokenAddress = thisLog.address;
-        account = fromAddress;
-        amount = transferAmount;
+        // this may be a burn token tx that has already been handled by
+        // handleContractCallWithToken and handleTokenSent
+        command.tokenAddress = thisLog.address;
+        command.account = fromAddress;
+        command.amount = transferAmount;
+        command.save();
+        return;
       }
     }
-  }
-
-  if (
-    tokenAddress.equals(Address.zero()) ||
-    account.equals(Address.zero()) ||
-    amount.equals(BIGINT_ZERO)
-  ) {
-    log.info("[handleCommandExecuted]tx {} not a burn transaction", [
-      event.transaction.hash.toHexString(),
-    ]);
-    return;
-  }
-
-  log.info("[]tokenAddress={},account={},amoun{}, tx={}", [
-    tokenAddress.toHexString(),
-    account.toHexString(),
-    amount.toString(),
-    event.transaction.hash.toHexString(),
-  ]);
-
-  // this may be a burnToken tx that has already been handled by
-  // handleContractCallWithToken and handleTokenSent
-  const commandId = event.params.commandId;
-  let command = _Command.load(commandId);
-  if (!command) {
-    command = new _Command(commandId);
-    command.isBurnToken = false;
-    command.isProcessed = false;
-    command.tokenAddress = tokenAddress;
-    command.account = account;
-    command.amount = amount;
-    command.save();
-    return;
   }
 
   if (!command.isBurnToken || command.isProcessed) {
@@ -505,9 +513,9 @@ export function handleCommandExecuted(event: Executed): void {
 
   _handleBurnToken(
     commandId,
-    tokenAddress,
-    account,
-    amount,
+    Address.fromBytes(command.tokenAddress!),
+    Address.fromBytes(command.account!),
+    command.amount!,
     command,
     event,
     null
@@ -531,7 +539,7 @@ export function handleBurnTokenCall(call: BurnTokenCall): void {
   command.isBurnToken = true;
   command.save();
 
-  if (command.isProcessed) {
+  if (command.isProcessed || !command.tokenAddress) {
     return;
   }
 
@@ -702,7 +710,7 @@ function _handleBurnToken(
   tokenAddress: Address,
   account: Address,
   amount: BigInt,
-  burnToken: _Command,
+  command: _Command,
   event: ethereum.Event | null,
   call: ethereum.Call | null
 ): void {
@@ -726,8 +734,8 @@ function _handleBurnToken(
     commandId
   );
 
-  burnToken.isProcessed = true;
-  burnToken.save();
+  command.isProcessed = true;
+  command.save();
 }
 
 export function bytesToUnsignedBigInt(

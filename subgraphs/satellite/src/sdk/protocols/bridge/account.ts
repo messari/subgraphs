@@ -149,7 +149,7 @@ export class Account {
    *
    * @param pool The pool the transfer was made on.
    * @param route The route the transfer went through.
-   * @param destination The account receiving the funds.
+   * @param destination The account receiving the funds, type Address for EVM chain, or Bytes for non-EVM chain.
    * @param amount The amount of tokens transferred.
    * @param transactionID Optional transaction ID on the source chain.
    * @param updateMetrics Optional, defaults to true. If true, volumes will be updated at PoolRoute, Pool and Protocol. Make it false if you want to update these manually for some reason. Activity counts and transaction counts will still be updated.
@@ -181,7 +181,7 @@ export class Account {
    *
    * @param pool The pool the transfer was made on.
    * @param route The route the transfer went through.
-   * @param source The account sending the funds.
+   * @param source The account sending the funds, type Address for EVM chain, or Bytes for non-EVM chain.
    * @param amount The amount of tokens transferred.
    * @param transactionID Optional transaction ID on the source chain.
    * @param updateMetrics Optional, defaults to true. If true, volumes will be updated at PoolRoute, Pool and Protocol. Make it false if you want to update these manually for some reason. Activity counts and transaction counts will still be updated.
@@ -279,12 +279,12 @@ export class Account {
    * Creates a BridgeMessage entity for a message arriving to this chain
    *
    * @param srcChainId the source chain id
-   * @param source The account sending the message.
+   * @param source The account sending the message, type Address for EVM chain, or Bytes for non-EVM chain.
    * @param data Contents of the message
    * @param transactionID Optional transaction ID on the source chain.
    * @returns BridgeMessage
    */
-  messageIn(srcChainId: BigInt, source: Address, data: Bytes): BridgeMessage {
+  messageIn(srcChainId: BigInt, source: Bytes, data: Bytes): BridgeMessage {
     this.countMessageIn();
     this.protocol.addTransaction(TransactionType.MESSAGE_RECEIVED);
 
@@ -302,13 +302,13 @@ export class Account {
    * Creates a BridgeMessage entity for a message away from this chain
    *
    * @param dstChainId the destination chain id
-   * @param destination The account receiving the message.
+   * @param destination The account receiving the message, type Address for EVM chain, or Bytes for non-EVM chain.
    * @param data Contents of the message
    * @returns BridgeMessage
    */
   messageOut(
     dstChainId: BigInt,
-    destination: Address,
+    destination: Bytes,
     data: Bytes
   ): BridgeMessage {
     this.countMessageOut();
@@ -327,8 +327,8 @@ export class Account {
   private message(
     srcChainId: BigInt,
     dstChainId: BigInt,
-    sender: Address,
-    receiver: Address,
+    sender: Bytes, // type Address for EVM chain, or Bytes for non-EVM chain.
+    receiver: Bytes, // type Address for EVM chain, or Bytes for non-EVM chain.
     isOutgoing: boolean,
     data: Bytes
   ): BridgeMessage {
