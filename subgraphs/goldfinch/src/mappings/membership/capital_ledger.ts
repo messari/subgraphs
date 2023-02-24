@@ -232,14 +232,12 @@ function allocateAmountToMarket(
       .div(deltaTotalCapitalStaked);
 
     const mkt = getOrCreateMarket(mktID, event);
-    if (!mkt._membershipRewardEligibleAmount) {
+    if (!mkt._membershipRewardEligibleAmount)
       mkt._membershipRewardEligibleAmount = BIGINT_ZERO;
-    }
     mkt._membershipRewardEligibleAmount =
       mkt._membershipRewardEligibleAmount!.plus(mktDeltaEligibleAmount);
-    if (!mkt._membershipRewardNextEpochAmount) {
+    if (!mkt._membershipRewardNextEpochAmount)
       mkt._membershipRewardNextEpochAmount = BIGINT_ZERO;
-    }
     mkt._membershipRewardNextEpochAmount =
       mkt._membershipRewardNextEpochAmount!.plus(mktDeltaNextEpochAmount);
     mkt.save();
