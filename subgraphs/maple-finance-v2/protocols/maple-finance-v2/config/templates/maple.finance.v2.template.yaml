@@ -207,6 +207,8 @@ templates:
           file: ./abis/MapleGlobals.json
         - name: Chainlink
           file: ./abis/Chainlink.json
+        - name: PoolManager
+          file: ./abis/PoolManager.json
       eventHandlers:
         - event: PaymentMade(uint256,uint256,uint256)
           handler: handlePaymentMade
