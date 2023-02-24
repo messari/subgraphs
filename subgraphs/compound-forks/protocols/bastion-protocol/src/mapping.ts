@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  dataSource,
+  log,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -66,13 +72,16 @@ import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import {
+  AURORA_REALM_ADDRESS,
   bstnOracle,
   cBSTNContract,
   comptrollerAddr,
+  MULTICHAIN_REALM_ADDRESS,
   nativeCToken,
   nativeToken,
   rewardDistributorAddress,
   REWARD_TOKENS,
+  STNEAR_REALM_ADDRESS,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 import { RewardDistributor } from "../../../generated/templates/CToken/RewardDistributor";
@@ -103,7 +112,6 @@ export function handleMarketExited(event: MarketExited): void {
 
 export function handleMarketListed(event: MarketListed): void {
   CTokenTemplate.create(event.params.cToken);
-
   const cTokenAddr = event.params.cToken;
   const cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
@@ -117,6 +125,14 @@ export function handleMarketListed(event: MarketListed): void {
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
+  let marketNamePrefix = "";
+  if (event.address.equals(AURORA_REALM_ADDRESS)) {
+    marketNamePrefix = "Aurora Ream: ";
+  } else if (event.address.equals(STNEAR_REALM_ADDRESS)) {
+    marketNamePrefix = "STNear Ream: ";
+  } else if (event.address.equals(MULTICHAIN_REALM_ADDRESS)) {
+    marketNamePrefix = "Multichain Ream: ";
+  }
   if (cTokenAddr == nativeCToken.address) {
     const marketListedData = new MarketListedData(
       protocol,
@@ -124,7 +140,7 @@ export function handleMarketListed(event: MarketListed): void {
       nativeCToken,
       cTokenReserveFactorMantissa
     );
-    _handleMarketListed(marketListedData, event);
+    _handleMarketListed(marketListedData, event, marketNamePrefix);
     return;
   }
 
@@ -155,7 +171,8 @@ export function handleMarketListed(event: MarketListed): void {
       ),
       cTokenReserveFactorMantissa
     ),
-    event
+    event,
+    marketNamePrefix
   );
 }
 

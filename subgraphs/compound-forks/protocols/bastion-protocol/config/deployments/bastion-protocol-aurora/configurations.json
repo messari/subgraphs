@@ -4,17 +4,17 @@
   "startBlock": "60837829",
   "realms": [
     {
-      "name": "ComptrollerAuroraRealm",
+      "name": "Aurora-Realm",
       "address": "0xe1cf09BDa2e089c63330F0Ffe3F6D6b790835973",
       "startBlock": "61197199"
     },
     {
-      "name": "ComptrollerSTNearRealm",
+      "name": "STNear-Realm",
       "address": "0xE550A886716241AFB7ee276e647207D7667e1E79",
       "startBlock": "61877979"
     },
     {
-      "name": "ComptrollerMultichainRealm",
+      "name": "Multichain-Realm",
       "address": "0xA195b3d7AA34E47Fb2D2e5A682DF2d9EFA2daF06",
       "startBlock": "61196478"
     }
