@@ -7819,13 +7819,13 @@
       }
     }
   },
-  "gains-network": {
+  "gains-trade": {
     "schema": "derivatives-perpfutures",
-    "base": "gains-network",
-    "protocol": "gains-network",
+    "base": "gains-trade",
+    "protocol": "gains-trade",
     "project": "gains-network",
     "deployments": {
-      "gains-network-arbitrum": {
+      "gains-trade-arbitrum": {
         "network": "arbitrum",
         "status": "dev",
         "versions": {
@@ -7835,19 +7835,19 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "gains-network-arbitrum",
-            "query-id": "gains-network-arbitrum"
+            "slug": "gains-trade-arbitrum",
+            "query-id": "gains-trade-arbitrum"
           }
         },
         "files": {
-          "template": "gains.network.template.yaml"
+          "template": "gains.trade.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
         }
       },
-      "gains-network-polygon": {
+      "gains-trade-polygon": {
         "network": "polygon",
         "status": "dev",
         "versions": {
@@ -7857,16 +7857,16 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "gains-network-polygon",
-            "query-id": "gains-network-polygon"
+            "slug": "gains-trade-polygon",
+            "query-id": "gains-trade-polygon"
           }
         },
         "files": {
-          "template": "gains.network.template.yaml"
+          "template": "gains.trade.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
         }
       }
     }
