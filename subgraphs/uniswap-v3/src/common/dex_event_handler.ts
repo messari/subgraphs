@@ -580,9 +580,10 @@ export class DexEventHandler {
     for (let i = 0; i < this.poolTokens.length; i++) {
       const poolToken = this.poolTokens[i];
       poolToken._totalSupply = this.inputTokenBalanceDeltas[i];
-      poolToken._totalValueLockedUSD = poolToken._totalSupply
-        .toBigDecimal()
-        .times(poolToken.lastPriceUSD!);
+      poolToken._totalValueLockedUSD = convertTokenToDecimal(
+        poolToken._totalSupply,
+        poolToken.decimals
+      ).times(poolToken.lastPriceUSD!);
       poolToken.save();
     }
   }
