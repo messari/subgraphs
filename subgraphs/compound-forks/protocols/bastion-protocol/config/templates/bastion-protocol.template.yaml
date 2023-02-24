@@ -40,6 +40,47 @@ dataSources:
         - event: ActionPaused(address,string,bool)
           handler: handleActionPaused
       file: ./protocols/bastion-protocol/src/mapping.ts
+  {{#realms}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: Comptroller
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Protocol
+        - Market
+        - Token
+      abis:
+        - name: Comptroller
+          file: ./abis/Comptroller.json
+        - name: CToken
+          file: ./abis/CToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: MarketListed(address)
+          handler: handleMarketListed
+        - event: MarketEntered(address,address)
+          handler: handleMarketEntered
+        - event: MarketExited(address,address)
+          handler: handleMarketExited
+        - event: NewPriceOracle(address,address)
+          handler: handleNewPriceOracle
+        - event: NewCollateralFactor(address,uint256,uint256)
+          handler: handleNewCollateralFactor
+        - event: NewLiquidationIncentive(uint256,uint256)
+          handler: handleNewLiquidationIncentive
+        - event: ActionPaused(address,string,bool)
+          handler: handleActionPaused
+      file: ./protocols/bastion-protocol/src/mapping.ts  
+  {{/realms}}
+
 templates:
   - name: CToken
     kind: ethereum/contract
