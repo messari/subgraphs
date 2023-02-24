@@ -434,7 +434,7 @@ export function handlePaymentMade(event: PaymentMade): void {
   // update protocol revenue collected
   // this is either from borrow fees, management fees or loan origination fees
   manager.addProtocolRevenue(
-    event.params.interestPaid_
+    event.params.fees_
       .toBigDecimal()
       .div(exponentToBigDecimal(inputTokenDecimals))
       .times(inputTokenPriceUSD)
