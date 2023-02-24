@@ -414,8 +414,9 @@ export function handleInterestCollected(event: InterestCollected): void {
   // if it is from a tranched pool, the interest revenue has been accounted there.
   // Only update rates when interest is collected from tranched pools
   const interestAmountUSD = event.params.amount.divDecimal(USDC_DECIMALS);
-  if (!market._lenderInterestAmountUSD)
+  if (!market._lenderInterestAmountUSD) {
     market._lenderInterestAmountUSD = BIGDECIMAL_ZERO;
+  }
   if (event.params.payer == event.address) {
     // interest from compound sweep, new revenue not having been accounted
     updateProtocol = true;
@@ -425,8 +426,9 @@ export function handleInterestCollected(event: InterestCollected): void {
       market._lenderInterestAmountUSD!.plus(interestAmountUSD);
     market.save();
   } else {
-    if (!market._borrowerInterestAmountUSD)
+    if (!market._borrowerInterestAmountUSD) {
       market._borrowerInterestAmountUSD = BIGDECIMAL_ZERO;
+    }
     market._borrowerInterestAmountUSD =
       market._borrowerInterestAmountUSD!.plus(interestAmountUSD);
     market._lenderInterestAmountUSD =
