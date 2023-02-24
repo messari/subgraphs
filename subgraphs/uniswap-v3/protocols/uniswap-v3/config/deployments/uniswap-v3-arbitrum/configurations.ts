@@ -74,6 +74,11 @@ export class UniswapV3ArbitrumConfigurations implements Configurations {
       // "0x2807cdee12db6b043cc7ac4ddaec88c89871d299", // Core DAO
       // "0x0e017687ce1971fc7672246de6675112de137730", // Flare
       // "0x9799b59e133d95a8f145be345f25e8ee97815ce0", // Poison.Finance Poison
+      // "0x1ca6e7eb4ba052ac6cb53e2516061f88821c1ec2", // Canto
+      // "0x59767fda87eaf896caf7b149d12f3c7287697a9e", // VitaDAO
+      // "0x7f91531fc25dd262aebf57e8ebe9a6a6df372e96", // WoofWork1
+      // "0x90959fc17635f6b62bf5a9bdaee849f0f54ec2c4", // WoofWork2
+      // "0x6f2446d795e0807e828d5707871590c4abe84627", // Rocket Pool
     ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
