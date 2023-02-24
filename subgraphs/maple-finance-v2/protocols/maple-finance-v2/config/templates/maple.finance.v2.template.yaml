@@ -234,7 +234,7 @@ templates:
           file: ./abis/MapleGlobals.json
         - name: Chainlink
           file: ./abis/Chainlink.json
-        - namne: MapleLoan
+        - name: MapleLoan
           file: ./abis/MapleLoan.json
         - name: LoanManager
           file: ./abis/LoanManager.json
