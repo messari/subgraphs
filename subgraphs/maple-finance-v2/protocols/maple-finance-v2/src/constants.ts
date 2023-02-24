@@ -36,6 +36,7 @@ export const MAPLE_GLOBALS = "0x804a6f5f667170f545bf14e5ddb48c70b788390c"; // pr
 export const CHAINLINK_USDC_ORACLE =
   "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6";
 export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+export const MIGRATION_HELPER = "0x580b1a894b9fbdbf7d29ba9b492807bf539dd508";
 
 /////////////////////////////
 ///// Protocol Specific /////

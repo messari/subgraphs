@@ -59,25 +59,6 @@ dataSources:
           handler: handleLoanInstanceDeployed
       file: ./protocols/maple-finance-v2/src/mapping.ts
   - kind: ethereum/contract
-    name: WithdrawalManagerFactory
-    network: {{ network }}
-    source:
-      address: "{{ withdrawalManagerFactory.address }}"
-      abi: ContractFactory
-      startBlock: {{ withdrawalManagerFactory.startBlock }}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: ContractFactory
-          file: ./abis/ContractFactory.json
-      eventHandlers:
-        - event: InstanceDeployed(indexed uint256,indexed address,bytes)
-          handler: handleWithdrawalInstanceDeployed
-      file: ./protocols/maple-finance-v2/src/mapping.ts
-  - kind: ethereum/contract
     name: LoanManagerFactory
     network: {{ network }}
     source:
@@ -117,6 +98,35 @@ dataSources:
         - event: InstanceDeployed(indexed uint256,indexed address,bytes)
           handler: handleLiquidatorInstanceDeployed
       file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
+    name: MigrationHelper
+    network: {{ network }}
+    source:
+      address: "{{ migrationHelper.address }}"
+      abi: MigrationHelper
+      startBlock: {{ migrationHelper.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MigrationHelper
+          file: ./abis/MigrationHelper.json
+        - name: MapleLoan
+          file: ./abis/MapleLoan.json
+        - name: MapleGlobals
+          file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+        - name: Pool
+          file: ./abis/Pool.json
+      eventHandlers:
+        - event: LoanAddedToTransitionLoanManager(indexed address,indexed address)
+          handler: handleLoanAddedToTransitionLoanManager
+      file: ./protocols/maple-finance-v2/src/mapping.ts
 templates:
   - kind: ethereum/contract
     name: Pool
@@ -144,6 +154,10 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
       file: ./protocols/maple-finance-v2/src/mapping.ts
   - kind: ethereum/contract
     name: PoolManager
@@ -194,31 +208,8 @@ templates:
         - name: Chainlink
           file: ./abis/Chainlink.json
       eventHandlers:
-        - event: Initialized(indexed address,indexed address,address[2],uint256[3],uint256[3],uint256[4],uint256[2])
-          handler: handleLoanInitialized
         - event: PaymentMade(uint256,uint256,uint256)
           handler: handlePaymentMade
-      file: ./protocols/maple-finance-v2/src/mapping.ts
-  - kind: ethereum/contract
-    name: WithdrawalManager
-    network: {{ network }}
-    source:
-      abi: WithdrawalManager
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: WithdrawalManager
-          file: ./abis/WithdrawalManager.json
-        - name: MapleGlobals
-          file: ./abis/MapleGlobals.json
-        - name: Chainlink
-          file: ./abis/Chainlink.json
-      eventHandlers:
-        - event: WithdrawalProcessed(indexed address,uint256,uint256)
-          handler: handleWithdrawalProcessed
       file: ./protocols/maple-finance-v2/src/mapping.ts
   - kind: ethereum/contract
     name: Liquidator

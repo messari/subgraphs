@@ -8,10 +8,6 @@
     "startBlock": 16126990,
     "address": "0x36a7350309b2eb30f3b908ab0154851b5ed81db0"
   },
-  "withdrawalManagerFactory": {
-    "startBlock": 16127008,
-    "address": "0xb9e25B584dc4a7C9d47aEF577f111fBE5705773B"
-  },
   "loanManagerFactory": {
     "startBlock": 16126995,
     "address": "0x1551717ae4fdcb65ed028f7fb7aba39908f6a7a6"
@@ -19,5 +15,9 @@
   "liquidatorFactory": {
     "startBlock": 16126990,
     "address": "0xa2091116649b070D2a27Fc5C85c9820302114c63"
+  },
+  "migrationHelper": {
+    "startBlock": 16127022,
+    "address": "0x580b1a894b9fbdbf7d29ba9b492807bf539dd508"
   }
 }
