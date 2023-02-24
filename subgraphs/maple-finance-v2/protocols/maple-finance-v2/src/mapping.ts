@@ -593,7 +593,7 @@ function updateMarketAndProtocol(
     market._prevRevenue = tryAccruedInterest.value;
     market.save();
 
-    manager.addProtocolRevenue(
+    manager.addSupplyRevenue(
       revenueDelta
         .toBigDecimal()
         .div(exponentToBigDecimal(manager.getInputToken().decimals))
