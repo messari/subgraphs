@@ -2731,6 +2731,28 @@
           }
         }
       },
+      "evm-base": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "evm.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-base-goerli",
+            "query-id": "network-base-goerli"
+          }
+        }
+      },
       "evm-boba": {
         "network": "boba",
         "status": "dev",
