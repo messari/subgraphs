@@ -23,16 +23,11 @@ import {
   ReserveInitialized,
 } from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
-  Borrow,
-  Deposit,
-  LiquidationCall,
   Paused,
-  Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
   Unpaused,
-  Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
 import { AToken } from "../../../generated/LendingPool/AToken";
 import {
@@ -318,58 +313,6 @@ export function handlePaused(event: Paused): void {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handleUnpaused(event: Unpaused): void {
   _handleUnpaused(getProtocolData());
-}
-
-export function handleDeposit(event: Deposit): void {
-  _handleDeposit(
-    event,
-    event.params.amount,
-    event.params.reserve,
-    getProtocolData(),
-    event.params.onBehalfOf
-  );
-}
-
-export function handleWithdraw(event: Withdraw): void {
-  _handleWithdraw(
-    event,
-    event.params.amount,
-    event.params.reserve,
-    getProtocolData(),
-    event.params.user
-  );
-}
-
-export function handleBorrow(event: Borrow): void {
-  _handleBorrow(
-    event,
-    event.params.amount,
-    event.params.reserve,
-    getProtocolData(),
-    event.params.onBehalfOf
-  );
-}
-
-export function handleRepay(event: Repay): void {
-  _handleRepay(
-    event,
-    event.params.amount,
-    event.params.reserve,
-    getProtocolData(),
-    event.params.user
-  );
-}
-
-export function handleLiquidationCall(event: LiquidationCall): void {
-  _handleLiquidate(
-    event,
-    event.params.liquidatedCollateralAmount,
-    event.params.collateralAsset,
-    getProtocolData(),
-    event.params.liquidator,
-    event.params.user,
-    event.params.debtAsset
-  );
 }
 
 /////////////////////////
