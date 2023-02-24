@@ -209,6 +209,10 @@ templates:
           file: ./abis/Chainlink.json
         - name: PoolManager
           file: ./abis/PoolManager.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
       eventHandlers:
         - event: PaymentMade(uint256,uint256,uint256)
           handler: handlePaymentMade
@@ -230,6 +234,12 @@ templates:
           file: ./abis/MapleGlobals.json
         - name: Chainlink
           file: ./abis/Chainlink.json
+        - namne: MapleLoan
+          file: ./abis/MapleLoan.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+        - name: Pool
+          file: ./abis/Pool.json
       eventHandlers:
         - event: PortionLiquidated(uint256,uint256)
           handler: handlePortionLiquidated
