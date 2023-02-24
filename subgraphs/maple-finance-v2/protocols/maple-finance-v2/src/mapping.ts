@@ -217,16 +217,16 @@ export function handleLoanFunded(event: LoanFunded): void {
 }
 
 //
-// handles money being moved in/out the pool
-// this includes Deposits / Withdrawals / Transfers
+// handles money being migrated or transferred in the pool
 export function handleTransfer(event: Transfer): void {
-  if (
-    event.params.from == ZERO_ADDRESS ||
-    event.params.to == ZERO_ADDRESS ||
-    event.params.from != Address.fromHexString(MIGRATION_HELPER)
-  ) {
+  if (event.params.from == ZERO_ADDRESS || event.params.to == ZERO_ADDRESS) {
     // burns/mints are not considered
     // Also we only want to handle transfers from the migration helper
+    return;
+  }
+
+  if (event.params.from == event.address || event.params.to == event.address) {
+    // this is a transfer to/from the pool itself
     return;
   }
 
@@ -262,17 +262,27 @@ export function handleTransfer(event: Transfer): void {
     .div(exponentToBigDecimal(inputTokenDecimals))
     .times(market.inputTokenPriceUSD);
 
-  manager.createDeposit(
-    market.inputToken,
-    event.params.to,
-    amount,
-    amountUSD,
-    getBalanceOf(event.address, event.params.to),
-    InterestRateType.VARIABLE
-  );
-
-  // TODO get deposits from deposit.receiver and deposit.assets
-  // TODO: if both from and to are zero quit or to == from
+  if (event.params.from == Address.fromHexString(MIGRATION_HELPER)) {
+    manager.createDeposit(
+      market.inputToken,
+      event.params.to,
+      amount,
+      amountUSD,
+      getBalanceOf(event.address, event.params.to),
+      InterestRateType.VARIABLE
+    );
+  } else {
+    manager.createTransfer(
+      market.inputToken,
+      event.params.from,
+      event.params.to,
+      amount,
+      amountUSD,
+      getBalanceOf(event.address, event.params.from),
+      getBalanceOf(event.address, event.params.to),
+      InterestRateType.VARIABLE
+    );
+  }
 }
 
 //
