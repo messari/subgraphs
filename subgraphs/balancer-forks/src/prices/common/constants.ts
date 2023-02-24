@@ -28,4 +28,5 @@ export const BLACKLISTED_TOKENS: Address[] = [
   NULL.TYPE_ADDRESS,
   Address.fromString("0xbc6e06778708177a18210181b073da747c88490a"), // SYNR Token
   Address.fromString("0x93eeb426782bd88fcd4b48d7b0368cf061044928"), // The Rug Game Token
+  Address.fromString("0x1e6fcb0c88add2fef7e2753cfade6db390581cfb"), // Specter Swap
 ];
