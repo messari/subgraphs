@@ -258,7 +258,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		]
 	}
 	getMaticPools(): string[] {
-		return [MainnetBridge.MATIC, PolygonAmm.MATIC, XdaiAmm.MATIC]
+		return [PolygonAmm.MATIC, XdaiAmm.MATIC]
 	}
 	getMaticTokens(): string[] {
 		return [PolygonToken.MATIC, XdaiToken.MATIC, MainnetToken.MATIC]

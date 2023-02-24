@@ -126,6 +126,8 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 		])
 
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+		pool.addInputTokenBalance(event.params.amount)
+
 		log.warning('Receipient3: {}, inputToken: {}', [
 			event.params.recipient.toHexString(),
 			inputToken,

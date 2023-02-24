@@ -1,4 +1,5 @@
-import { ethereum, Bytes } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
+import { CustomEventType } from "../../util/events";
 import {
   Pool as PoolSchema,
   PoolDailySnapshot,
@@ -10,9 +11,9 @@ import { SECONDS_PER_DAY_BI, SECONDS_PER_HOUR_BI } from "../../util/constants";
 
 export class PoolSnapshot {
   pool: PoolSchema;
-  event: ethereum.Event;
+  event: CustomEventType;
 
-  constructor(pool: PoolSchema, event: ethereum.Event) {
+  constructor(pool: PoolSchema, event: CustomEventType) {
     this.pool = pool;
     this.event = event;
     this.takeSnapshots();
@@ -65,6 +66,7 @@ export class PoolSnapshot {
 
     // tvl and balances
     snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
+    snapshot.netValueExportedUSD = pool.netValueExportedUSD;
     snapshot.mintSupply = pool.mintSupply;
     snapshot.inputTokenBalance = pool.inputTokenBalance;
     snapshot.outputTokenSupply = pool.outputTokenSupply;
@@ -176,6 +178,7 @@ export class PoolSnapshot {
 
     // tvl and balances
     snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
+    snapshot.netValueExportedUSD = pool.netValueExportedUSD;
     snapshot.mintSupply = pool.mintSupply;
     snapshot.inputTokenBalance = pool.inputTokenBalance;
     snapshot.outputTokenSupply = pool.outputTokenSupply;
@@ -269,7 +272,7 @@ export class PoolSnapshot {
   }
 
   private takeRouteSnapshot(
-    event: ethereum.Event,
+    event: CustomEventType,
     snapshotID: Bytes,
     routeId: Bytes,
     previousSnapshotID: Bytes
