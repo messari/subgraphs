@@ -26,7 +26,7 @@ import {
 } from "../sdk/protocols/bridge/enums";
 import { TokenPricer } from "../sdk/protocols/config";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
-import { BIGINT_ZERO } from "../sdk/util/constants";
+import { BIGINT_ZERO, ZERO_ADDRESS } from "../sdk/util/constants";
 
 import {
   Bridge,
@@ -128,6 +128,10 @@ export function handleSwapOut(event: LogMessagePublished): void {
     crosschainTokenType = CrosschainTokenType.CANONICAL;
   }
 
+  if (tokenAddress == Address.fromString(ZERO_ADDRESS)) {
+    return;
+  }
+
   const token = sdk.Tokens.getOrCreateToken(truncateAddress(tokenAddress));
   amount = denormalizeAmount(amount, token.decimals);
 
@@ -205,6 +209,10 @@ export function handleSwapIn(call: CompleteTransferCall): void {
     crosschainTokenType = CrosschainTokenType.CANONICAL;
   }
 
+  if (tokenAddress == Address.fromString(ZERO_ADDRESS)) {
+    return;
+  }
+
   const token = sdk.Tokens.getOrCreateToken(truncateAddress(tokenAddress));
   amount = denormalizeAmount(amount, token.decimals);
 
@@ -278,6 +286,10 @@ export function handleSwapInWithPayload(
     tokenAddress = bridgeContract.wrappedAsset(tokenChain, tokenAddress);
     bridgePoolType = BridgePoolType.BURN_MINT;
     crosschainTokenType = CrosschainTokenType.CANONICAL;
+  }
+
+  if (tokenAddress == Address.fromString(ZERO_ADDRESS)) {
+    return;
   }
 
   const token = sdk.Tokens.getOrCreateToken(truncateAddress(tokenAddress));
@@ -354,6 +366,10 @@ export function handleSwapInNative(
     crosschainTokenType = CrosschainTokenType.CANONICAL;
   }
 
+  if (tokenAddress == Address.fromString(ZERO_ADDRESS)) {
+    return;
+  }
+
   const token = sdk.Tokens.getOrCreateToken(truncateAddress(tokenAddress));
   amount = denormalizeAmount(amount, token.decimals);
 
@@ -427,6 +443,10 @@ export function handleSwapInNativeWithPayload(
     tokenAddress = bridgeContract.wrappedAsset(tokenChain, tokenAddress);
     bridgePoolType = BridgePoolType.BURN_MINT;
     crosschainTokenType = CrosschainTokenType.CANONICAL;
+  }
+
+  if (tokenAddress == Address.fromString(ZERO_ADDRESS)) {
+    return;
   }
 
   const token = sdk.Tokens.getOrCreateToken(truncateAddress(tokenAddress));
