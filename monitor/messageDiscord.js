@@ -352,7 +352,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 }
                 if (!issueHasBeenAlerted) {
                     indexingErrorEmbed.color = placeholderColor;
-                    indexErrorEmbedDepos[networkString] = depo?.indexingError;
+                    indexErrorEmbedDepos[networkString] = { failureBlock: depo?.indexingError, message: depo?.indexingErrorMessage };
                     if (!!depo.pending) {
                         indexErrorPendingHash[networkString] = depo?.hash;
                     }
@@ -397,6 +397,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             let failureBlock = "";
 
             Object.keys(indexErrorEmbedDepos)?.forEach(networkString => {
+                const indexErrorObj = indexErrorEmbedDepos[networkString];
                 let link = '';
                 if (networkString.includes(' (PENDING')) {
                     link = `https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]}`;
@@ -406,11 +407,11 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                     link = `https://okgraph.xyz/?q=messari%2F${protocol}-${networkString}`;
                     labelValue += `\n[${networkString}](${link})\n`;
                 }
-                failureBlock += '\n' + indexErrorEmbedDepos[networkString] + '\n';
+                failureBlock += '\n' + indexErrorObj.failureBlock + '\n';
                 if (prodStatusDepoMapping[networkString] === true) {
                     aggThreadIndexErrorEmbeds[0].value += labelValue;
                     aggThreadIndexErrorEmbeds[1].value += failureBlock;
-                    zapierProdThreadIndexing.push(`${networkString}: ${link}`);
+                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}: ${indexErrorObj.failureBlock}`, ghMessage: `${networkString}: Block #${indexErrorObj.failureBlock} - ${indexErrorObj.message}}\n` });
                 }
             })
             indexingErrorEmbed.fields[0].value += labelValue;
@@ -541,7 +542,7 @@ export async function sendMessageToZapierThread(msgObj) {
 
         threadIndexingAlerts.forEach(indexingThread => {
             msgObj.indexing.forEach((indexingAlert, idx) => {
-                if (indexingThread.toUpperCase().includes(indexingAlert.toUpperCase())) {
+                if (indexingThread.toUpperCase().includes(indexingAlert.zappierMessage?.toUpperCase())) {
                     invalidIndexingAlertIndexes.push(idx);
                 }
             })
@@ -549,8 +550,8 @@ export async function sendMessageToZapierThread(msgObj) {
         const validAlerts = msgObj.indexing.filter((x, idx) => !invalidIndexingAlertIndexes.includes(idx));
         if (validAlerts.length > 0) {
             messageConstruction += `Indexing errors on ${msgObj.protocolName}\n\n`;
-            messageConstruction += validAlerts.join('\n');
-            ghIssuePromiseArray.push(postGithubIssue(msgObj.protocolName + ": Indexing Errors", validAlerts.join('\n'), postedIssues));
+            messageConstruction += validAlerts.map(x => x.zappierMessage).join('\n');
+            ghIssuePromiseArray.push(postGithubIssue(msgObj.protocolName + ": Indexing Errors", validAlerts.map(x => x.ghMessage).join('\n'), postedIssues));
         }
     } else if (Object.keys(msgObj).includes('protocol')) {
         const invalidProtocolAlertIndexes = {};
