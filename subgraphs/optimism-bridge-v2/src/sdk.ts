@@ -26,8 +26,8 @@ import { Versions } from "./versions";
 
 const conf = new BridgeConfig(
   BRIDGE_ADDRESS.get(dataSource.network().toUpperCase()),
-  "Optimism Gateway",
-  "optimism-gateway",
+  "Optimism Bridge V2",
+  "optimism-bridge-v2",
   BridgePermissionType.WHITELIST,
   Versions
 );
