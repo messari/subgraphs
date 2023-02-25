@@ -63,6 +63,7 @@ export async function indexStatusFlow(deployments) {
 
       if (!!indexData[indexDataName]?.fatalError) {
         deployments[realNameString].indexingError = indexData[indexDataName]?.fatalError?.block?.number;
+        deployments[realNameString].indexingErrorMessage = indexData[indexDataName]?.fatalError?.message;
       }
 
       if (
@@ -71,9 +72,9 @@ export async function indexStatusFlow(deployments) {
         invalidDeployments.push(realNameString);
       }
 
-      if (parseFloat(deployments[realNameString]?.indexedPercentage) < 10) {
-        invalidDeployments.push(realNameString);
-      }
+      // if (parseFloat(deployments[realNameString]?.indexedPercentage) < 10) {
+      //   invalidDeployments.push(realNameString);
+      // }
     });
     return { invalidDeployments, deployments };
   } catch (err) {
@@ -115,6 +116,7 @@ export async function generateIndexStatusQuery(deployments) {
   subgraph
   synced
   fatalError {
+    message
     block {
       number
     }
