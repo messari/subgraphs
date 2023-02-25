@@ -1,4 +1,4 @@
-import { Box, Grid, Tooltip, Typography } from "@mui/material";
+import { Box, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames, dateValueKeys } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
@@ -90,6 +90,13 @@ function PoolTabEntity({
   const [csvJSON, setCsvJSON] = useState<any>(null);
   const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
 
+  // dataFields object has corresponding key:value pairs. Key is the field name and value is an array with an object holding the coordinates to be plotted on the chart for that entity field.
+  const [dataFieldsState, setDataFieldsState] = useState<{ [data: string]: { [dataField: string]: { date: number; value: number }[] } }>({});
+  // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
+  const [dataFieldMetricsState, setDataFieldMetricsState] = useState<{ [dataField: string]: { [metric: string]: any } }>({});
+  // For the current entity, loop through all instances of that entity
+  const [overlayDataFieldsState, setOverlayDataFieldsState] = useState<{ [dataField: string]: { date: number; value: number }[] }>({});
+
   useEffect(() => {
     if (downloadAllCharts) {
       if (chartsImageFiles) {
@@ -144,579 +151,591 @@ function PoolTabEntity({
         </Box>
       );
     }
-    const dataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+
+    let dataFields: { [dataField: string]: { date: number; value: number }[] } = {};
     // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
-    const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
+    let dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
 
-    const overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+    let overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
 
-    for (let x = currentEntityData.length - 1; x >= 0; x--) {
-      const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-      let dateVal: number = Number(timeseriesInstance['timestamp']);
-      dateValueKeys.forEach((key: string) => {
-        let factor = 86400;
-        if (key.includes('hour')) {
-          factor = factor / 24;
-        }
-        if (!!(Number(timeseriesInstance[key]) * factor)) {
-          dateVal = (Number(timeseriesInstance[key]) * factor);
-        }
-      })
-
-      const overlayDifference = currentEntityData.length - overlayPoolTimeseriesData.length;
-      const overlayTimeseriesInstance: { [x: string]: any } = overlayPoolTimeseriesData[x - overlayDifference];
-      let overlayDateVal: number = Number(overlayTimeseriesInstance?.['timestamp']) || 0;
-      if (!!overlayTimeseriesInstance) {
+    if (!dataFieldsState?.data) {
+      for (let x = currentEntityData.length - 1; x >= 0; x--) {
+        const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+        let dateVal: number = Number(timeseriesInstance['timestamp']);
         dateValueKeys.forEach((key: string) => {
           let factor = 86400;
           if (key.includes('hour')) {
             factor = factor / 24;
           }
-          if (!!(Number(overlayTimeseriesInstance[key]) * factor)) {
-            overlayDateVal = (Number(overlayTimeseriesInstance[key]) * factor);
+          if (!!(Number(timeseriesInstance[key]) * factor)) {
+            dateVal = (Number(timeseriesInstance[key]) * factor);
           }
         })
-      }
-      // Take the given timeseries instance and loop thru the fields of the instance (ie totalValueLockedUSD)
-      let skip = false;
-      for (let z = 0; z < Object.keys(timeseriesInstance).length; z++) {
-        const fieldName = Object.keys(timeseriesInstance)[z];
-        if (fieldName === "timestamp" || fieldName === "__typename" || fieldName === "id" || dateValueKeys.includes(fieldName)) {
-          continue;
+
+        const overlayDifference = currentEntityData.length - overlayPoolTimeseriesData.length;
+        const overlayTimeseriesInstance: { [x: string]: any } = overlayPoolTimeseriesData[x - overlayDifference];
+        let overlayDateVal: number = Number(overlayTimeseriesInstance?.['timestamp']) || 0;
+        if (!!overlayTimeseriesInstance) {
+          dateValueKeys.forEach((key: string) => {
+            let factor = 86400;
+            if (key.includes('hour')) {
+              factor = factor / 24;
+            }
+            if (!!(Number(overlayTimeseriesInstance[key]) * factor)) {
+              overlayDateVal = (Number(overlayTimeseriesInstance[key]) * factor);
+            }
+          })
         }
-        const capsFieldName = fieldName.toUpperCase();
-        const currentInstanceField = timeseriesInstance[fieldName];
-        let currentOverlayInstanceField: any = null;
-        if (overlayTimeseriesInstance) {
-          if (Object.keys(overlayTimeseriesInstance).includes(fieldName)) {
-            currentOverlayInstanceField = overlayTimeseriesInstance[fieldName];
+        // Take the given timeseries instance and loop thru the fields of the instance (ie totalValueLockedUSD)
+        let skip = false;
+        for (let z = 0; z < Object.keys(timeseriesInstance).length; z++) {
+          const fieldName = Object.keys(timeseriesInstance)[z];
+          if (fieldName === "timestamp" || fieldName === "__typename" || fieldName === "id" || dateValueKeys.includes(fieldName)) {
+            continue;
           }
-        }
-        let value: any = currentInstanceField;
-        try {
-          if (!value && value !== 0 && !Array.isArray(currentInstanceField)) {
-            value = 0;
-            if (!dataFields[fieldName]) {
-              dataFields[fieldName] = [];
-              dataFieldMetrics[fieldName] = { sum: null };
-            }
-            if (capsFieldName === "REWARDTOKENEMISSIONSUSD") {
-              if (!dataFields.rewardAPR) {
-                dataFields.rewardAPR = [];
-                dataFieldMetrics.rewardAPR = { sum: 0 };
-              }
-              dataFields.rewardAPR.push(value);
-            }
-            const returnedData = addDataPoint(
-              dataFields,
-              dataFieldMetrics,
-              fieldName,
-              Number(value),
-              dateVal,
-              timeseriesInstance.id,
-            );
-            dataFields[fieldName] = returnedData.currentEntityField;
-            dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
-            if (overlayTimeseriesInstance) {
-              skip = true;
-            } else {
-              continue;
+          const capsFieldName = fieldName.toUpperCase();
+          const currentInstanceField = timeseriesInstance[fieldName];
+          let currentOverlayInstanceField: any = null;
+          if (overlayTimeseriesInstance) {
+            if (Object.keys(overlayTimeseriesInstance).includes(fieldName)) {
+              currentOverlayInstanceField = overlayTimeseriesInstance[fieldName];
             }
           }
-          if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField && !skip) {
-            // Add the data to the array held on the dataField key of the fieldName
-            if (!dataFields[fieldName]) {
-              dataFields[fieldName] = [];
-              dataFieldMetrics[fieldName] = { sum: 0 };
-            }
-
-            value = currentInstanceField;
-            if (value < 0) {
-              if (!dataFieldMetrics[fieldName].negative) {
-                // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
-                dataFieldMetrics[fieldName].negative = {
-                  firstSnapshot: timeseriesInstance.id,
-                  value: value,
-                  count: 0,
-                };
+          let value: any = currentInstanceField;
+          try {
+            if (!value && value !== 0 && !Array.isArray(currentInstanceField)) {
+              value = 0;
+              if (!dataFields[fieldName]) {
+                dataFields[fieldName] = [];
+                dataFieldMetrics[fieldName] = { sum: null };
               }
-              dataFieldMetrics[fieldName].negative.count += 1;
-            }
-            if (
-              (capsFieldName.includes("OUTPUTTOKEN") &&
-                capsFieldName !== "OUTPUTTOKEN" &&
-                !capsFieldName.includes("USD")) ||
-              capsFieldName === "PRICEPERSHARE"
-            ) {
-              value = convertTokenDecimals(currentInstanceField, data[poolKeySingular]?.outputToken?.decimals);
-            }
-            if (fieldName === "inputTokenBalance") {
-              const dec = data[poolKeySingular].inputToken.decimals;
-              value = convertTokenDecimals(currentInstanceField, dec);
-            }
-
-            const returnedData = addDataPoint(
-              dataFields,
-              dataFieldMetrics,
-              fieldName,
-              Number(value),
-              dateVal,
-              timeseriesInstance.id,
-            );
-            dataFields[fieldName] = returnedData.currentEntityField;
-            dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
-          }
-
-          if (fieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField && !skip) {
-            // Catch the fields for reward token data that is optional but would be handled as an array
-            let dataFieldKey = "";
-            let iterateArray = data[poolKeySingular][fieldName];
-            if (!Array.isArray(iterateArray)) {
-              iterateArray = data[poolKeySingular]?.rewardTokens;
-            }
-            iterateArray.forEach((item: any, idx: number) => {
-              const token = data[poolKeySingular]?.rewardTokens[idx];
-              if (token?.token?.name) {
-                dataFieldKey = " [" + token?.token?.name + "]";
-              } else {
-                dataFieldKey = " [" + idx + "]";
-              }
-              if (!dataFields[fieldName + dataFieldKey]) {
-                dataFields[fieldName + dataFieldKey] = [{ value: 0, date: dateVal }];
-                dataFieldMetrics[fieldName + dataFieldKey] = { sum: 0 };
-              } else {
-                dataFields[fieldName + dataFieldKey].push({
-                  value: 0,
-                  date: dateVal,
-                });
-                dataFieldMetrics[fieldName + dataFieldKey].sum += 0;
-              }
-              if (fieldName === "rewardTokenEmissionsUSD") {
-                if (!dataFields["rewardAPR" + dataFieldKey]) {
-                  dataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: dateVal }];
-                  dataFieldMetrics["rewardAPR" + dataFieldKey] = { sum: 0 };
-                } else {
-                  dataFields["rewardAPR" + dataFieldKey].push({
-                    value: 0,
-                    date: dateVal,
-                  });
-                  dataFieldMetrics["rewardAPR" + dataFieldKey].sum += 0;
+              if (capsFieldName === "REWARDTOKENEMISSIONSUSD") {
+                if (!dataFields.rewardAPR) {
+                  dataFields.rewardAPR = [];
+                  dataFieldMetrics.rewardAPR = { sum: 0 };
                 }
-              }
-            });
-            if (overlayTimeseriesInstance) {
-              skip = true;
-            } else {
-              continue;
-            }
-          } else if (Array.isArray(currentInstanceField) && !skip) {
-            // If the instance field data is an array, extrapolate this array into multiple keys (one for each element of the array)
-            currentInstanceField.forEach((val: any, arrayIndex: number) => {
-              // Determine the name/label/id of each element to be separated out of the array
-              let fieldSplitIdentifier = arrayIndex.toString();
-              let value: number = 0;
-              if (!isNaN(Number(val))) {
-                value = Number(val);
-              } else if (typeof val === "object") {
-                const holdingValueKey = Object.keys(val).find((x) => {
-                  return !isNaN(Number(val[x]));
-                });
-                if (holdingValueKey) {
-                  value = Number(val[holdingValueKey]);
-                }
-                if (val["type"]) {
-                  fieldSplitIdentifier = val["type"];
-                } else {
-                  const holdingValueStr = Object.keys(val).find((x) => {
-                    return typeof val[x] === "string" && isNaN(Number(val[x]));
-                  });
-                  if (holdingValueStr) {
-                    fieldSplitIdentifier = holdingValueStr;
-                  }
-                }
-              }
-
-              if (fieldName === "rates") {
-                fieldSplitIdentifier = val.side + '-' + val.type;
-              }
-              const dataFieldKey = fieldName + " [" + fieldSplitIdentifier + "]";
-
-              // Save the data to the dataFields object array
-              if (!dataFields[dataFieldKey]) {
-                dataFields[dataFieldKey] = [];
-                dataFieldMetrics[dataFieldKey] = { sum: 0 };
-              }
-
-              if (val < 0) {
-                if (!dataFieldMetrics[dataFieldKey].negative) {
-                  // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
-                  dataFieldMetrics[dataFieldKey].negative = {
-                    firstSnapshot: timeseriesInstance.id,
-                    value: val,
-                    count: 0,
-                  };
-                }
-                dataFieldMetrics[dataFieldKey].negative.count += 1;
-              }
-
-              if (value || value === 0) {
-                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT") || capsFieldName.includes("SUPPLYSIDETOKENAMOUNTS") || capsFieldName.includes("VOLUMETOKENAMOUNTS")) {
-                  // convert the value with decimals for certain fields
-                  value = convertTokenDecimals(val, data[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
-                }
-
-                if (fieldName === "rewardTokenEmissionsAmount") {
-                  // If the current field is rewardTokenEmissionsAmount, convert the value with decimals
-                  // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
-                  const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
-                  if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
-                    value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
-                  } else {
-                    value = convertTokenDecimals(val, 18);
-                  }
-                }
-
-                if (fieldName === "rewardTokenEmissionsUSD") {
-                  //Convert emissions amount in USD to APR
-                  const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
-                  const factors = ["rewardTokenEmissionsUSD"];
-                  let apr = 0;
-                  if (
-                    currentRewardToken?.type?.includes("BORROW") &&
-                    data.protocols[0]?.type === "LENDING" &&
-                    timeseriesInstance?.totalBorrowBalanceUSD
-                  ) {
-                    apr = (Number(val) / timeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
-                    factors.push("snapshot.totalBorrowBalanceUSD");
-                  } else if (
-                    currentRewardToken?.type?.includes("BORROW")
-                  ) {
-                    issues.push({
-                      type: "BORROW",
-                      message:
-                        "Attempted to calculate APR of BORROW reward token. Field 'totalBorrowBalanceUSD' is not present in the timeseries instance.",
-                      level: "critical",
-                      fieldName: entityName + "-" + fieldName,
-                    });
-                  } else if (timeseriesInstance?.totalDepositBalanceUSD && data.protocols[0].type === "LENDING") {
-                    factors.push("snapshot.totalDepositBalanceUSD");
-                    apr = (Number(val) / timeseriesInstance.totalDepositBalanceUSD) * 100 * 365;
-                  } else {
-                    if (
-                      !Number(timeseriesInstance?.stakedOutputTokenAmount) ||
-                      !Number(timeseriesInstance?.outputTokenSupply)
-                    ) {
-                      factors.push("snapshot.totalValueLockedUSD");
-                      apr = (Number(val) / Number(timeseriesInstance.totalValueLockedUSD)) * 100 * 365;
-                    } else {
-                      factors.push(
-                        "snapshot.totalValueLockedUSD",
-                        "snapshot.stakedOutputTokenAmount",
-                        "snapshot.outputTokenSupply",
-                      );
-                      apr =
-                        (Number(val) /
-                          (Number(timeseriesInstance.totalValueLockedUSD) *
-                            (Number(timeseriesInstance?.stakedOutputTokenAmount) /
-                              Number(timeseriesInstance?.outputTokenSupply)))) *
-                        100 *
-                        365;
-                    }
-                  }
-
-                  if (!apr || !isFinite(apr)) {
-                    apr = 0;
-                  }
-                  // Create the reward APR [idx] field
-                  if (!dataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
-                    dataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
-                      { value: apr, date: dateVal },
-                    ];
-                    dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"] = {
-                      sum: apr,
-                      factors: factors.join(", "),
-                    };
-                  } else {
-                    dataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
-                      value: apr,
-                      date: dateVal,
-                    });
-                    dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"].sum += apr;
-                  }
-                }
-              } else {
-                value = 0;
+                dataFields.rewardAPR.push(value);
               }
               const returnedData = addDataPoint(
                 dataFields,
                 dataFieldMetrics,
-                dataFieldKey,
+                fieldName,
                 Number(value),
                 dateVal,
                 timeseriesInstance.id,
               );
-              dataFields[dataFieldKey] = returnedData.currentEntityField;
-              dataFieldMetrics[dataFieldKey] = returnedData.currentEntityFieldMetrics;
-            });
-          }
-        } catch (err) {
-          let message = "JAVASCRIPT ERROR";
-          if (err instanceof Error) {
-            message = err.message;
-          }
-          console.log(err);
-          issues.push({
-            type: "JS",
-            message: message,
-            level: "critical",
-            fieldName: entityName + "-" + fieldName,
-          });
-        }
-        if (x < overlayDifference && overlayPoolTimeseriesData.length > 0) {
-          overlayDataFields[fieldName] = [
-            { value: 0, date: dateVal },
-            ...overlayDataFields[fieldName],
-          ];
-          continue
-        }
-        if (!overlayTimeseriesInstance) {
-          continue;
-        }
-        value = currentOverlayInstanceField;
-        try {
-          if (!value && value !== 0 && !Array.isArray(currentOverlayInstanceField)) {
-            value = 0;
-            if (!overlayDataFields[fieldName]) {
-              overlayDataFields[fieldName] = [];
-            }
-            if (capsFieldName === "REWARDTOKENEMISSIONSUSD") {
-              if (!overlayDataFields.rewardAPR) {
-                overlayDataFields.rewardAPR = [];
-              }
-              overlayDataFields.rewardAPR.push(value);
-            }
-            const returnedData = addDataPoint(
-              overlayDataFields,
-              dataFieldMetrics,
-              fieldName,
-              Number(value),
-              overlayDateVal,
-              overlayTimeseriesInstance.id,
-            );
-            overlayDataFields[fieldName] = returnedData.currentEntityField;
-            continue;
-          }
-          if (!isNaN(currentOverlayInstanceField) && !Array.isArray(currentOverlayInstanceField) && currentOverlayInstanceField) {
-            // Add the data to the array held on the dataField key of the fieldName
-            if (!overlayDataFields[fieldName]) {
-              overlayDataFields[fieldName] = [];
-            }
-
-            value = currentOverlayInstanceField;
-            if (
-              (capsFieldName.includes("OUTPUTTOKEN") &&
-                capsFieldName !== "OUTPUTTOKEN" &&
-                !capsFieldName.includes("USD")) ||
-              capsFieldName === "PRICEPERSHARE"
-            ) {
-              value = convertTokenDecimals(currentOverlayInstanceField, data[poolKeySingular]?.outputToken?.decimals);
-            }
-            if (fieldName === "inputTokenBalance") {
-              const dec = overlayData[poolKeySingular].inputToken.decimals;
-              value = convertTokenDecimals(currentOverlayInstanceField, dec);
-            }
-
-            const returnedData = addDataPoint(
-              overlayDataFields,
-              dataFieldMetrics,
-              fieldName,
-              Number(value),
-              overlayDateVal,
-              overlayTimeseriesInstance.id,
-            );
-            overlayDataFields[fieldName] = returnedData.currentEntityField;
-          }
-
-          if (fieldName.toUpperCase().includes("REWARDTOKEN") && !currentOverlayInstanceField) {
-            // Catch the fields for reward token overlayData that is optional but would be handled as an array
-            let dataFieldKey = "";
-            let iterateArray = overlayData[poolKeySingular][fieldName];
-            if (!Array.isArray(iterateArray)) {
-              iterateArray = overlayData[poolKeySingular]?.rewardTokens;
-            }
-            iterateArray.forEach((item: any, idx: number) => {
-              const token = overlayData[poolKeySingular]?.rewardTokens[idx];
-              if (token?.token?.name) {
-                dataFieldKey = " [" + token?.token?.name + "]";
+              dataFields[fieldName] = returnedData.currentEntityField;
+              dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
+              if (overlayTimeseriesInstance) {
+                skip = true;
               } else {
-                dataFieldKey = " [" + idx + "]";
+                continue;
               }
-              if (!overlayDataFields[fieldName + dataFieldKey]) {
-                overlayDataFields[fieldName + dataFieldKey] = [{ value: 0, date: overlayDateVal }];
-              } else {
-                overlayDataFields[fieldName + dataFieldKey].push({
-                  value: 0,
-                  date: overlayDateVal,
-                });
+            }
+            if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField && !skip) {
+              // Add the data to the array held on the dataField key of the fieldName
+              if (!dataFields[fieldName]) {
+                dataFields[fieldName] = [];
+                dataFieldMetrics[fieldName] = { sum: 0 };
               }
-              if (fieldName === "rewardTokenEmissionsUSD") {
-                if (!overlayDataFields["rewardAPR" + dataFieldKey]) {
-                  overlayDataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: overlayDateVal }];
+
+              value = currentInstanceField;
+              if (value < 0) {
+                if (!dataFieldMetrics[fieldName].negative) {
+                  // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
+                  dataFieldMetrics[fieldName].negative = {
+                    firstSnapshot: timeseriesInstance.id,
+                    value: value,
+                    count: 0,
+                  };
+                }
+                dataFieldMetrics[fieldName].negative.count += 1;
+              }
+              if (
+                (capsFieldName.includes("OUTPUTTOKEN") &&
+                  capsFieldName !== "OUTPUTTOKEN" &&
+                  !capsFieldName.includes("USD")) ||
+                capsFieldName === "PRICEPERSHARE"
+              ) {
+                value = convertTokenDecimals(currentInstanceField, data[poolKeySingular]?.outputToken?.decimals);
+              }
+              if (fieldName === "inputTokenBalance") {
+                const dec = data[poolKeySingular].inputToken.decimals;
+                value = convertTokenDecimals(currentInstanceField, dec);
+              }
+
+              const returnedData = addDataPoint(
+                dataFields,
+                dataFieldMetrics,
+                fieldName,
+                Number(value),
+                dateVal,
+                timeseriesInstance.id,
+              );
+              dataFields[fieldName] = returnedData.currentEntityField;
+              dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
+            }
+
+            if (fieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField && !skip) {
+              // Catch the fields for reward token data that is optional but would be handled as an array
+              let dataFieldKey = "";
+              let iterateArray = data[poolKeySingular][fieldName];
+              if (!Array.isArray(iterateArray)) {
+                iterateArray = data[poolKeySingular]?.rewardTokens;
+              }
+              iterateArray.forEach((item: any, idx: number) => {
+                const token = data[poolKeySingular]?.rewardTokens[idx];
+                if (token?.token?.name) {
+                  dataFieldKey = " [" + token?.token?.name + "]";
                 } else {
-                  overlayDataFields["rewardAPR" + dataFieldKey].push({
+                  dataFieldKey = " [" + idx + "]";
+                }
+                if (!dataFields[fieldName + dataFieldKey]) {
+                  dataFields[fieldName + dataFieldKey] = [{ value: 0, date: dateVal }];
+                  dataFieldMetrics[fieldName + dataFieldKey] = { sum: 0 };
+                } else {
+                  dataFields[fieldName + dataFieldKey].push({
                     value: 0,
-                    date: overlayDateVal,
+                    date: dateVal,
                   });
+                  dataFieldMetrics[fieldName + dataFieldKey].sum += 0;
                 }
-              }
-            });
-            continue;
-          } else if (Array.isArray(currentOverlayInstanceField) && overlayData) {
-            // If the instance field overlayData is an array, extrapolate this array into multiple keys (one for each element of the array)
-            currentOverlayInstanceField.forEach((val: any, arrayIndex: number) => {
-              // Determine the name/label/id of each element to be separated out of the array
-              let fieldSplitIdentifier = arrayIndex.toString();
-              let value: number = 0;
-              if (!isNaN(Number(val))) {
-                value = Number(val);
-              } else if (typeof val === "object") {
-                const holdingValueKey = Object.keys(val).find((x) => {
-                  return !isNaN(Number(val[x]));
-                });
-                if (holdingValueKey) {
-                  value = Number(val[holdingValueKey]);
-                }
-                if (val["type"]) {
-                  fieldSplitIdentifier = val["type"];
-                } else {
-                  const holdingValueStr = Object.keys(val).find((x) => {
-                    return typeof val[x] === "string" && isNaN(Number(val[x]));
-                  });
-                  if (holdingValueStr) {
-                    fieldSplitIdentifier = holdingValueStr;
-                  }
-                }
-              }
-
-              if (fieldName === "rates") {
-                fieldSplitIdentifier = val.side + '-' + val.type;
-              }
-              const dataFieldKey = fieldName + " [" + fieldSplitIdentifier + "]";
-
-              // Save the overlayData to the overlayDataFields object array
-              if (!overlayDataFields[dataFieldKey]) {
-                overlayDataFields[dataFieldKey] = [];
-              }
-
-              if (value || value === 0) {
-                if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT") || capsFieldName.includes("SUPPLYSIDETOKENAMOUNTS") || capsFieldName.includes("VOLUMETOKENAMOUNTS")) {
-                  // convert the value with decimals for certain fields
-                  value = convertTokenDecimals(val, overlayData[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
-                }
-
-                if (fieldName === "rewardTokenEmissionsAmount") {
-                  // If the current field is rewardTokenEmissionsAmount, convert the value with decimals
-                  // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
-                  const currentRewardToken = overlayData[poolKeySingular].rewardTokens[arrayIndex];
-                  if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
-                    value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
-                  } else {
-                    value = convertTokenDecimals(val, 18);
-                  }
-                }
-
                 if (fieldName === "rewardTokenEmissionsUSD") {
-                  //Convert emissions amount in USD to APR
-                  const currentRewardToken = overlayData[poolKeySingular].rewardTokens[arrayIndex];
-                  const factors = ["rewardTokenEmissionsUSD"];
-                  let apr = 0;
-                  if (
-                    currentRewardToken?.type?.includes("BORROW") &&
-                    overlayData.protocols[0]?.type === "LENDING" &&
-                    overlayTimeseriesInstance?.totalBorrowBalanceUSD
-                  ) {
-                    apr = (Number(val) / overlayTimeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
-                    factors.push("snapshot.totalBorrowBalanceUSD");
-                  } else if (
-                    currentRewardToken?.type?.includes("BORROW")
-                  ) {
-                    issues.push({
-                      type: "BORROW",
-                      message:
-                        "Attempted to calculate APR of BORROW reward token. Field 'totalBorrowBalanceUSD' is not present in the timeseries instance.",
-                      level: "critical",
-                      fieldName: entityName + "-" + fieldName,
-                    });
-                  } else if (overlayTimeseriesInstance?.totalDepositBalanceUSD && overlayData.protocols[0].type === "LENDING") {
-                    factors.push("snapshot.totalDepositBalanceUSD");
-                    apr = (Number(val) / overlayTimeseriesInstance.totalDepositBalanceUSD) * 100 * 365;
+                  if (!dataFields["rewardAPR" + dataFieldKey]) {
+                    dataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: dateVal }];
+                    dataFieldMetrics["rewardAPR" + dataFieldKey] = { sum: 0 };
                   } else {
-                    if (
-                      !Number(overlayTimeseriesInstance?.stakedOutputTokenAmount) ||
-                      !Number(overlayTimeseriesInstance?.outputTokenSupply)
-                    ) {
-                      factors.push("snapshot.totalValueLockedUSD");
-                      apr = (Number(val) / Number(overlayTimeseriesInstance.totalValueLockedUSD)) * 100 * 365;
+                    dataFields["rewardAPR" + dataFieldKey].push({
+                      value: 0,
+                      date: dateVal,
+                    });
+                    dataFieldMetrics["rewardAPR" + dataFieldKey].sum += 0;
+                  }
+                }
+              });
+              if (overlayTimeseriesInstance) {
+                skip = true;
+              } else {
+                continue;
+              }
+            } else if (Array.isArray(currentInstanceField) && !skip) {
+              // If the instance field data is an array, extrapolate this array into multiple keys (one for each element of the array)
+              currentInstanceField.forEach((val: any, arrayIndex: number) => {
+                // Determine the name/label/id of each element to be separated out of the array
+                let fieldSplitIdentifier = arrayIndex.toString();
+                let value: number = 0;
+                if (!isNaN(Number(val))) {
+                  value = Number(val);
+                } else if (typeof val === "object") {
+                  const holdingValueKey = Object.keys(val).find((x) => {
+                    return !isNaN(Number(val[x]));
+                  });
+                  if (holdingValueKey) {
+                    value = Number(val[holdingValueKey]);
+                  }
+                  if (val["type"]) {
+                    fieldSplitIdentifier = val["type"];
+                  } else {
+                    const holdingValueStr = Object.keys(val).find((x) => {
+                      return typeof val[x] === "string" && isNaN(Number(val[x]));
+                    });
+                    if (holdingValueStr) {
+                      fieldSplitIdentifier = holdingValueStr;
+                    }
+                  }
+                }
+
+                if (fieldName === "rates") {
+                  fieldSplitIdentifier = val.side + '-' + val.type;
+                }
+                const dataFieldKey = fieldName + " [" + fieldSplitIdentifier + "]";
+
+                // Save the data to the dataFields object array
+                if (!dataFields[dataFieldKey]) {
+                  dataFields[dataFieldKey] = [];
+                  dataFieldMetrics[dataFieldKey] = { sum: 0 };
+                }
+
+                if (val < 0) {
+                  if (!dataFieldMetrics[dataFieldKey].negative) {
+                    // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
+                    dataFieldMetrics[dataFieldKey].negative = {
+                      firstSnapshot: timeseriesInstance.id,
+                      value: val,
+                      count: 0,
+                    };
+                  }
+                  dataFieldMetrics[dataFieldKey].negative.count += 1;
+                }
+
+                if (value || value === 0) {
+                  if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT") || capsFieldName.includes("SUPPLYSIDETOKENAMOUNTS") || capsFieldName.includes("VOLUMETOKENAMOUNTS")) {
+                    // convert the value with decimals for certain fields
+                    value = convertTokenDecimals(val, data[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
+                  }
+
+                  if (fieldName === "rewardTokenEmissionsAmount") {
+                    // If the current field is rewardTokenEmissionsAmount, convert the value with decimals
+                    // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
+                    const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
+                    if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
+                      value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
                     } else {
-                      factors.push(
-                        "snapshot.totalValueLockedUSD",
-                        "snapshot.stakedOutputTokenAmount",
-                        "snapshot.outputTokenSupply",
-                      );
-                      apr =
-                        (Number(val) /
-                          (Number(overlayTimeseriesInstance.totalValueLockedUSD) *
-                            (Number(overlayTimeseriesInstance?.stakedOutputTokenAmount) /
-                              Number(overlayTimeseriesInstance?.outputTokenSupply)))) *
-                        100 *
-                        365;
+                      value = convertTokenDecimals(val, 18);
                     }
                   }
 
-                  if (!apr || !isFinite(apr)) {
-                    apr = 0;
+                  if (fieldName === "rewardTokenEmissionsUSD") {
+                    //Convert emissions amount in USD to APR
+                    const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
+                    const factors = ["rewardTokenEmissionsUSD"];
+                    let apr = 0;
+                    if (
+                      currentRewardToken?.type?.includes("BORROW") &&
+                      data.protocols[0]?.type === "LENDING" &&
+                      timeseriesInstance?.totalBorrowBalanceUSD
+                    ) {
+                      apr = (Number(val) / timeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
+                      factors.push("snapshot.totalBorrowBalanceUSD");
+                    } else if (
+                      currentRewardToken?.type?.includes("BORROW")
+                    ) {
+                      issues.push({
+                        type: "BORROW",
+                        message:
+                          "Attempted to calculate APR of BORROW reward token. Field 'totalBorrowBalanceUSD' is not present in the timeseries instance.",
+                        level: "critical",
+                        fieldName: entityName + "-" + fieldName,
+                      });
+                    } else if (timeseriesInstance?.totalDepositBalanceUSD && data.protocols[0].type === "LENDING") {
+                      factors.push("snapshot.totalDepositBalanceUSD");
+                      apr = (Number(val) / timeseriesInstance.totalDepositBalanceUSD) * 100 * 365;
+                    } else {
+                      if (
+                        !Number(timeseriesInstance?.stakedOutputTokenAmount) ||
+                        !Number(timeseriesInstance?.outputTokenSupply)
+                      ) {
+                        factors.push("snapshot.totalValueLockedUSD");
+                        apr = (Number(val) / Number(timeseriesInstance.totalValueLockedUSD)) * 100 * 365;
+                      } else {
+                        factors.push(
+                          "snapshot.totalValueLockedUSD",
+                          "snapshot.stakedOutputTokenAmount",
+                          "snapshot.outputTokenSupply",
+                        );
+                        apr =
+                          (Number(val) /
+                            (Number(timeseriesInstance.totalValueLockedUSD) *
+                              (Number(timeseriesInstance?.stakedOutputTokenAmount) /
+                                Number(timeseriesInstance?.outputTokenSupply)))) *
+                          100 *
+                          365;
+                      }
+                    }
+
+                    if (!apr || !isFinite(apr)) {
+                      apr = 0;
+                    }
+                    // Create the reward APR [idx] field
+                    if (!dataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
+                      dataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
+                        { value: apr, date: dateVal },
+                      ];
+                      dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"] = {
+                        sum: apr,
+                        factors: factors.join(", "),
+                      };
+                    } else {
+                      dataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
+                        value: apr,
+                        date: dateVal,
+                      });
+                      dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"].sum += apr;
+                    }
                   }
-                  // Create the reward APR [idx] field
-                  if (!overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
-                    overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
-                      { value: apr, date: overlayDateVal },
-                    ];
-                  } else {
-                    overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
-                      value: apr,
-                      date: overlayDateVal,
-                    });
-                  }
+                } else {
+                  value = 0;
                 }
-              } else {
-                value = 0;
+                const returnedData = addDataPoint(
+                  dataFields,
+                  dataFieldMetrics,
+                  dataFieldKey,
+                  Number(value),
+                  dateVal,
+                  timeseriesInstance.id,
+                );
+                dataFields[dataFieldKey] = returnedData.currentEntityField;
+                dataFieldMetrics[dataFieldKey] = returnedData.currentEntityFieldMetrics;
+              });
+            }
+          } catch (err) {
+            let message = "JAVASCRIPT ERROR";
+            if (err instanceof Error) {
+              message = err.message;
+            }
+            console.log(err);
+            issues.push({
+              type: "JS",
+              message: message,
+              level: "critical",
+              fieldName: entityName + "-" + fieldName,
+            });
+          }
+          if (x < overlayDifference && overlayPoolTimeseriesData.length > 0) {
+            overlayDataFields[fieldName] = [
+              ...overlayDataFields[fieldName],
+              { value: 0, date: dateVal },
+            ];
+            continue
+          }
+          if (!overlayTimeseriesInstance) {
+            continue;
+          }
+          value = currentOverlayInstanceField;
+          try {
+            if (!value && value !== 0 && !Array.isArray(currentOverlayInstanceField)) {
+              value = 0;
+              if (!overlayDataFields[fieldName]) {
+                overlayDataFields[fieldName] = [];
+              }
+              if (capsFieldName === "REWARDTOKENEMISSIONSUSD") {
+                if (!overlayDataFields.rewardAPR) {
+                  overlayDataFields.rewardAPR = [];
+                }
+                overlayDataFields.rewardAPR.push(value);
               }
               const returnedData = addDataPoint(
                 overlayDataFields,
                 dataFieldMetrics,
-                dataFieldKey,
+                fieldName,
                 Number(value),
                 overlayDateVal,
                 overlayTimeseriesInstance.id,
               );
-              overlayDataFields[dataFieldKey] = returnedData.currentEntityField;
+              overlayDataFields[fieldName] = returnedData.currentEntityField;
+              continue;
+            }
+            if (!isNaN(currentOverlayInstanceField) && !Array.isArray(currentOverlayInstanceField) && currentOverlayInstanceField) {
+              // Add the data to the array held on the dataField key of the fieldName
+              if (!overlayDataFields[fieldName]) {
+                overlayDataFields[fieldName] = [];
+              }
+
+              value = currentOverlayInstanceField;
+              if (
+                (capsFieldName.includes("OUTPUTTOKEN") &&
+                  capsFieldName !== "OUTPUTTOKEN" &&
+                  !capsFieldName.includes("USD")) ||
+                capsFieldName === "PRICEPERSHARE"
+              ) {
+                value = convertTokenDecimals(currentOverlayInstanceField, data[poolKeySingular]?.outputToken?.decimals);
+              }
+              if (fieldName === "inputTokenBalance") {
+                const dec = overlayData[poolKeySingular].inputToken.decimals;
+                value = convertTokenDecimals(currentOverlayInstanceField, dec);
+              }
+
+              const returnedData = addDataPoint(
+                overlayDataFields,
+                dataFieldMetrics,
+                fieldName,
+                Number(value),
+                overlayDateVal,
+                overlayTimeseriesInstance.id,
+              );
+              overlayDataFields[fieldName] = returnedData.currentEntityField;
+            }
+
+            if (fieldName.toUpperCase().includes("REWARDTOKEN") && !currentOverlayInstanceField) {
+              // Catch the fields for reward token overlayData that is optional but would be handled as an array
+              let dataFieldKey = "";
+              let iterateArray = overlayData[poolKeySingular][fieldName];
+              if (!Array.isArray(iterateArray)) {
+                iterateArray = overlayData[poolKeySingular]?.rewardTokens;
+              }
+              iterateArray.forEach((item: any, idx: number) => {
+                const token = overlayData[poolKeySingular]?.rewardTokens[idx];
+                if (token?.token?.name) {
+                  dataFieldKey = " [" + token?.token?.name + "]";
+                } else {
+                  dataFieldKey = " [" + idx + "]";
+                }
+                if (!overlayDataFields[fieldName + dataFieldKey]) {
+                  overlayDataFields[fieldName + dataFieldKey] = [{ value: 0, date: overlayDateVal }];
+                } else {
+                  overlayDataFields[fieldName + dataFieldKey].push({
+                    value: 0,
+                    date: overlayDateVal,
+                  });
+                }
+                if (fieldName === "rewardTokenEmissionsUSD") {
+                  if (!overlayDataFields["rewardAPR" + dataFieldKey]) {
+                    overlayDataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: overlayDateVal }];
+                  } else {
+                    overlayDataFields["rewardAPR" + dataFieldKey].push({
+                      value: 0,
+                      date: overlayDateVal,
+                    });
+                  }
+                }
+              });
+              continue;
+            } else if (Array.isArray(currentOverlayInstanceField) && overlayData) {
+              // If the instance field overlayData is an array, extrapolate this array into multiple keys (one for each element of the array)
+              currentOverlayInstanceField.forEach((val: any, arrayIndex: number) => {
+                // Determine the name/label/id of each element to be separated out of the array
+                let fieldSplitIdentifier = arrayIndex.toString();
+                let value: number = 0;
+                if (!isNaN(Number(val))) {
+                  value = Number(val);
+                } else if (typeof val === "object") {
+                  const holdingValueKey = Object.keys(val).find((x) => {
+                    return !isNaN(Number(val[x]));
+                  });
+                  if (holdingValueKey) {
+                    value = Number(val[holdingValueKey]);
+                  }
+                  if (val["type"]) {
+                    fieldSplitIdentifier = val["type"];
+                  } else {
+                    const holdingValueStr = Object.keys(val).find((x) => {
+                      return typeof val[x] === "string" && isNaN(Number(val[x]));
+                    });
+                    if (holdingValueStr) {
+                      fieldSplitIdentifier = holdingValueStr;
+                    }
+                  }
+                }
+
+                if (fieldName === "rates") {
+                  fieldSplitIdentifier = val.side + '-' + val.type;
+                }
+                const dataFieldKey = fieldName + " [" + fieldSplitIdentifier + "]";
+
+                // Save the overlayData to the overlayDataFields object array
+                if (!overlayDataFields[dataFieldKey]) {
+                  overlayDataFields[dataFieldKey] = [];
+                }
+
+                if (value || value === 0) {
+                  if (fieldName === "inputTokenBalances" || capsFieldName.includes("VOLUMEBYTOKENAMOUNT") || capsFieldName.includes("SUPPLYSIDETOKENAMOUNTS") || capsFieldName.includes("VOLUMETOKENAMOUNTS")) {
+                    // convert the value with decimals for certain fields
+                    value = convertTokenDecimals(val, overlayData[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
+                  }
+
+                  if (fieldName === "rewardTokenEmissionsAmount") {
+                    // If the current field is rewardTokenEmissionsAmount, convert the value with decimals
+                    // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
+                    const currentRewardToken = overlayData[poolKeySingular].rewardTokens[arrayIndex];
+                    if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
+                      value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
+                    } else {
+                      value = convertTokenDecimals(val, 18);
+                    }
+                  }
+
+                  if (fieldName === "rewardTokenEmissionsUSD") {
+                    //Convert emissions amount in USD to APR
+                    const currentRewardToken = overlayData[poolKeySingular].rewardTokens[arrayIndex];
+                    const factors = ["rewardTokenEmissionsUSD"];
+                    let apr = 0;
+                    if (
+                      currentRewardToken?.type?.includes("BORROW") &&
+                      overlayData.protocols[0]?.type === "LENDING" &&
+                      overlayTimeseriesInstance?.totalBorrowBalanceUSD
+                    ) {
+                      apr = (Number(val) / overlayTimeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
+                      factors.push("snapshot.totalBorrowBalanceUSD");
+                    } else if (
+                      currentRewardToken?.type?.includes("BORROW")
+                    ) {
+                      issues.push({
+                        type: "BORROW",
+                        message:
+                          "Attempted to calculate APR of BORROW reward token. Field 'totalBorrowBalanceUSD' is not present in the timeseries instance.",
+                        level: "critical",
+                        fieldName: entityName + "-" + fieldName,
+                      });
+                    } else if (overlayTimeseriesInstance?.totalDepositBalanceUSD && overlayData.protocols[0].type === "LENDING") {
+                      factors.push("snapshot.totalDepositBalanceUSD");
+                      apr = (Number(val) / overlayTimeseriesInstance.totalDepositBalanceUSD) * 100 * 365;
+                    } else {
+                      if (
+                        !Number(overlayTimeseriesInstance?.stakedOutputTokenAmount) ||
+                        !Number(overlayTimeseriesInstance?.outputTokenSupply)
+                      ) {
+                        factors.push("snapshot.totalValueLockedUSD");
+                        apr = (Number(val) / Number(overlayTimeseriesInstance.totalValueLockedUSD)) * 100 * 365;
+                      } else {
+                        factors.push(
+                          "snapshot.totalValueLockedUSD",
+                          "snapshot.stakedOutputTokenAmount",
+                          "snapshot.outputTokenSupply",
+                        );
+                        apr =
+                          (Number(val) /
+                            (Number(overlayTimeseriesInstance.totalValueLockedUSD) *
+                              (Number(overlayTimeseriesInstance?.stakedOutputTokenAmount) /
+                                Number(overlayTimeseriesInstance?.outputTokenSupply)))) *
+                          100 *
+                          365;
+                      }
+                    }
+
+                    if (!apr || !isFinite(apr)) {
+                      apr = 0;
+                    }
+                    // Create the reward APR [idx] field
+                    if (!overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
+                      overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
+                        { value: apr, date: overlayDateVal },
+                      ];
+                    } else {
+                      overlayDataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
+                        value: apr,
+                        date: overlayDateVal,
+                      });
+                    }
+                  }
+                } else {
+                  value = 0;
+                }
+                const returnedData = addDataPoint(
+                  overlayDataFields,
+                  dataFieldMetrics,
+                  dataFieldKey,
+                  Number(value),
+                  overlayDateVal,
+                  overlayTimeseriesInstance.id,
+                );
+                overlayDataFields[dataFieldKey] = returnedData.currentEntityField;
+              });
+            }
+          } catch (err) {
+            let message = "JAVASCRIPT ERROR";
+            if (err instanceof Error) {
+              message = err.message;
+            }
+            console.log(err);
+            issues.push({
+              type: "JS",
+              message: message,
+              level: "critical",
+              fieldName: entityName + "-" + fieldName,
             });
           }
-        } catch (err) {
-          let message = "JAVASCRIPT ERROR";
-          if (err instanceof Error) {
-            message = err.message;
-          }
-          console.log(err);
-          issues.push({
-            type: "JS",
-            message: message,
-            level: "critical",
-            fieldName: entityName + "-" + fieldName,
-          });
         }
       }
+      setDataFieldsState({ data: dataFields });
+      setDataFieldMetricsState(dataFieldMetrics);
+      setOverlayDataFieldsState(overlayDataFields);
+
+      return <CircularProgress size={50} />;
     }
+
+    dataFields = dataFieldsState.data;
+    dataFieldMetrics = dataFieldMetricsState;
+    overlayDataFields = overlayDataFieldsState;
 
     list[entityName] = {};
     // Code to determine what fields were expected/what were present

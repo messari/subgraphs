@@ -1,4 +1,4 @@
-import { Box, Grid, Tooltip, Typography } from "@mui/material";
+import { Box, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
 import { dateValueKeys, negativeFieldList } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
 import { useEffect, useState } from "react";
@@ -62,6 +62,13 @@ function ProtocolTabEntity({
   const [csvJSON, setCsvJSON] = useState<any>(null);
   const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
 
+  // dataFields object has corresponding key:value pairs. Key is the field name and value is an array with an object holding the coordinates to be plotted on the chart for that entity field.
+  const [dataFieldsState, setDataFieldsState] = useState<{ [data: string]: { [dataField: string]: { date: number; value: number }[] } }>({});
+  // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
+  const [dataFieldMetricsState, setDataFieldMetricsState] = useState<{ [dataField: string]: { [metric: string]: any } }>({});
+  // For the current entity, loop through all instances of that entity
+  const [overlayDataFieldsState, setOverlayDataFieldsState] = useState<{ [dataField: string]: { date: number; value: number }[] }>({});
+
   useEffect(() => {
     if (downloadAllCharts) {
       if (chartsImageFiles) {
@@ -104,211 +111,143 @@ function ProtocolTabEntity({
         );
       }
       // dataFields object has corresponding key:value pairs. Key is the field name and value is an array with an object holding the coordinates to be plotted on the chart for that entity field.
-      const dataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+      let dataFields: { [dataField: string]: { date: number; value: number }[] } = {};
       // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
-      const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
+      let dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
       // For the current entity, loop through all instances of that entity
-      const overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+      let overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
       const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
-      for (let x = currentEntityData.length - 1; x >= 0; x--) {
-        const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-        let dateVal: number = Number(timeseriesInstance['timestamp']);
-        dateValueKeys.forEach((key: string) => {
-          let factor = 86400;
-          if (key.includes('hour')) {
-            factor = factor / 24;
-          }
-          if (!!(Number(timeseriesInstance[key]) * factor)) {
-            dateVal = (Number(timeseriesInstance[key]) * factor);
-          }
-        })
-
-        let overlayIndex = x;
-        if (overlayDifference > 0) {
-          overlayIndex = x - overlayDifference;
-        }
-        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[overlayIndex];
-
-        let overlayDateVal: number = Number(overlayTimeseriesInstance?.['timestamp']) || 0;
-        if (!!overlayTimeseriesInstance) {
+      if (!dataFieldsState?.data) {
+        for (let x = currentEntityData.length - 1; x >= 0; x--) {
+          const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          let dateVal: number = Number(timeseriesInstance['timestamp']);
           dateValueKeys.forEach((key: string) => {
             let factor = 86400;
             if (key.includes('hour')) {
               factor = factor / 24;
             }
-            if (!!(Number(overlayTimeseriesInstance[key]) * factor)) {
-              overlayDateVal = (Number(overlayTimeseriesInstance[key]) * factor);
+            if (!!(Number(timeseriesInstance[key]) * factor)) {
+              dateVal = (Number(timeseriesInstance[key]) * factor);
             }
           })
-        }
-        // On the entity instance, loop through all of the entity fields within it
-        // create the base yield field for DEXs
-        Object.keys(timeseriesInstance).forEach((fieldName: string) => {
-          // skip the timestamp field on each entity instance
-          if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename" || dateValueKeys.includes(fieldName)) {
-            return;
+
+          let overlayIndex = x;
+          if (overlayDifference > 0) {
+            overlayIndex = x - overlayDifference;
           }
-          // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
-          const currentInstanceField = timeseriesInstance[fieldName];
-          let currentOverlayInstanceField: any = {};
-          if (overlayTimeseriesInstance) {
-            if (Object.keys(overlayTimeseriesInstance).includes(fieldName)) {
-              currentOverlayInstanceField = overlayTimeseriesInstance[fieldName];
+          const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[overlayIndex];
+
+          let overlayDateVal: number = Number(overlayTimeseriesInstance?.['timestamp']) || 0;
+          if (!!overlayTimeseriesInstance) {
+            dateValueKeys.forEach((key: string) => {
+              let factor = 86400;
+              if (key.includes('hour')) {
+                factor = factor / 24;
+              }
+              if (!!(Number(overlayTimeseriesInstance[key]) * factor)) {
+                overlayDateVal = (Number(overlayTimeseriesInstance[key]) * factor);
+              }
+            })
+          }
+          // On the entity instance, loop through all of the entity fields within it
+          // create the base yield field for DEXs
+          Object.keys(timeseriesInstance).forEach((fieldName: string) => {
+            // skip the timestamp field on each entity instance
+            if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename" || dateValueKeys.includes(fieldName)) {
+              return;
             }
-          }
-          try {
-            if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField)) {
-              // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
-              // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
-              if (!dataFields[fieldName]) {
-                dataFields[fieldName] = [
-                  { value: Number(currentInstanceField), date: dateVal },
-                ];
-                dataFieldMetrics[fieldName] = { sum: Number(currentInstanceField) };
-              } else {
-                dataFields[fieldName].push({
-                  value: Number(currentInstanceField),
-                  date: dateVal,
-                });
-                dataFieldMetrics[fieldName].sum += Number(currentInstanceField);
+            // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
+            const currentInstanceField = timeseriesInstance[fieldName];
+            let currentOverlayInstanceField: any = {};
+            if (overlayTimeseriesInstance) {
+              if (Object.keys(overlayTimeseriesInstance).includes(fieldName)) {
+                currentOverlayInstanceField = overlayTimeseriesInstance[fieldName];
               }
-              if (Number(currentInstanceField) < 0) {
-                if (!dataFieldMetrics[fieldName].negative) {
-                  // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
-                  dataFieldMetrics[fieldName].negative = {
-                    firstSnapshot: timeseriesInstance.id,
-                    value: Number(currentInstanceField),
-                    count: 0,
-                  };
-                }
-                dataFieldMetrics[fieldName].negative.count += 1;
-              }
-              if (fieldName.endsWith("TotalRevenueUSD") && !dataFieldMetrics[fieldName].revSumMismatch) {
-                // store ID of first instance where total rev != supply + protocol rev
-                const fieldSplit = fieldName.split("TotalRevenueUSD");
-                const totalRevenue = new BigNumber(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].sum);
-                const sumRevenue = new BigNumber(dataFieldMetrics[`${fieldSplit[0]}ProtocolSideRevenueUSD`].sum).plus(
-                  new BigNumber(dataFieldMetrics[`${fieldSplit[0]}SupplySideRevenueUSD`].sum),
-                );
-                if (!sumRevenue.isEqualTo(totalRevenue)) {
-                  const divergence = totalRevenue.minus(sumRevenue).div(totalRevenue).times(100).toNumber().toFixed(1);
-                  dataFieldMetrics[fieldName].revSumMismatch = {
-                    timeSeriesInstanceId: timeseriesInstance.id,
-                    totalRevenue,
-                    sumRevenue,
-                    divergence,
-                  };
-                }
-              }
-              if (fieldName.endsWith("TransactionCount") && !dataFieldMetrics[fieldName].txSumMismatch) {
-                // store ID of first instance where total tx != sum of all individual tx
-                const individualTxCountKeys = Object.keys(timeseriesInstance).filter(
-                  (field) =>
-                    (field.startsWith("daily") || field.startsWith("hourly")) &&
-                    field.endsWith("Count") &&
-                    !field.endsWith("TransactionCount"),
-                );
-                const individualTxSum = individualTxCountKeys.reduce(
-                  (prev, currentKey) => prev.plus(new BigNumber(timeseriesInstance[currentKey])),
-                  new BigNumber(0),
-                );
-
-                const totalTxKey = Object.keys(timeseriesInstance).find((field) => field.endsWith("TransactionCount"));
-                const totalTx = new BigNumber(totalTxKey || 0);
-
-                if (!individualTxSum.isEqualTo(totalTx)) {
-                  const divergence = totalTx.minus(individualTxSum).div(totalTx).times(100).toNumber().toFixed(1);
-                  dataFieldMetrics[fieldName].txSumMismatch = {
-                    timeSeriesInstanceId: timeseriesInstance.id,
-                    individualTxSum,
-                    totalTx,
-                    divergence,
-                  };
-                }
-              }
-              if (fieldName?.toUpperCase()?.includes("CUMULATIVE")) {
-                if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
-                  dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
-                }
-                if (Number(currentInstanceField) < dataFieldMetrics[fieldName]?.cumulative?.prevVal) {
-                  dataFieldMetrics[fieldName].cumulative.hasLowered = timeseriesInstance.id;
-                }
-                dataFieldMetrics[fieldName].cumulative.prevVal = Number(currentInstanceField);
-              }
-            } else if (Array.isArray(currentInstanceField)) {
-              // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
-              // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
-              for (let arrayIndex = 0; arrayIndex < currentInstanceField.length; arrayIndex++) {
-                const val = currentInstanceField[arrayIndex];
-                const dataFieldKey = fieldName + " [" + arrayIndex + "]";
-                let value = Number(val);
-                try {
-                  if (fieldName === "mintedTokenSupplies" && protocolTableData?.lendingType === "CDP") {
-                    if (protocolTableData?.mintedTokens.length > 0) {
-                      value = convertTokenDecimals(val, protocolTableData.mintedTokens[arrayIndex]?.decimals);
-                    }
-                  } else if (fieldName === "mintedTokenSupplies" && protocolTableData?.lendingType !== "CDP") {
-                    continue;
-                  }
-                } catch (err) {
-                  console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
-                }
-                if (!dataFields[dataFieldKey]) {
-                  dataFields[dataFieldKey] = [{ value: value, date: dateVal }];
-                  dataFieldMetrics[dataFieldKey] = { sum: value };
+            }
+            try {
+              if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField)) {
+                // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
+                // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
+                if (!dataFields[fieldName]) {
+                  dataFields[fieldName] = [
+                    { value: Number(currentInstanceField), date: dateVal },
+                  ];
+                  dataFieldMetrics[fieldName] = { sum: Number(currentInstanceField) };
                 } else {
-                  dataFields[dataFieldKey].push({ value: value, date: dateVal });
-                  dataFieldMetrics[dataFieldKey].sum += value;
+                  dataFields[fieldName].push({
+                    value: Number(currentInstanceField),
+                    date: dateVal,
+                  });
+                  dataFieldMetrics[fieldName].sum += Number(currentInstanceField);
                 }
-                if (Number(value) < 0) {
+                if (Number(currentInstanceField) < 0) {
                   if (!dataFieldMetrics[fieldName].negative) {
                     // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
                     dataFieldMetrics[fieldName].negative = {
                       firstSnapshot: timeseriesInstance.id,
-                      value: Number(value),
+                      value: Number(currentInstanceField),
                       count: 0,
                     };
                   }
                   dataFieldMetrics[fieldName].negative.count += 1;
                 }
-                if (dataFieldKey?.toUpperCase()?.includes("CUMULATIVE")) {
-                  if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes("cumulative")) {
-                    dataFieldMetrics[dataFieldKey].cumulative = { prevVal: 0, hasLowered: "" };
+                if (fieldName.endsWith("TotalRevenueUSD") && !dataFieldMetrics[fieldName].revSumMismatch) {
+                  // store ID of first instance where total rev != supply + protocol rev
+                  const fieldSplit = fieldName.split("TotalRevenueUSD");
+                  const totalRevenue = new BigNumber(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].sum);
+                  const sumRevenue = new BigNumber(dataFieldMetrics[`${fieldSplit[0]}ProtocolSideRevenueUSD`].sum).plus(
+                    new BigNumber(dataFieldMetrics[`${fieldSplit[0]}SupplySideRevenueUSD`].sum),
+                  );
+                  if (!sumRevenue.isEqualTo(totalRevenue)) {
+                    const divergence = totalRevenue.minus(sumRevenue).div(totalRevenue).times(100).toNumber().toFixed(1);
+                    dataFieldMetrics[fieldName].revSumMismatch = {
+                      timeSeriesInstanceId: timeseriesInstance.id,
+                      totalRevenue,
+                      sumRevenue,
+                      divergence,
+                    };
                   }
-                  if (value < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
-                    dataFieldMetrics[dataFieldKey].cumulative.hasLowered = timeseriesInstance.id;
+                }
+                if (fieldName.endsWith("TransactionCount") && !dataFieldMetrics[fieldName].txSumMismatch) {
+                  // store ID of first instance where total tx != sum of all individual tx
+                  const individualTxCountKeys = Object.keys(timeseriesInstance).filter(
+                    (field) =>
+                      (field.startsWith("daily") || field.startsWith("hourly")) &&
+                      field.endsWith("Count") &&
+                      !field.endsWith("TransactionCount"),
+                  );
+                  const individualTxSum = individualTxCountKeys.reduce(
+                    (prev, currentKey) => prev.plus(new BigNumber(timeseriesInstance[currentKey])),
+                    new BigNumber(0),
+                  );
+
+                  const totalTxKey = Object.keys(timeseriesInstance).find((field) => field.endsWith("TransactionCount"));
+                  const totalTx = new BigNumber(totalTxKey || 0);
+
+                  if (!individualTxSum.isEqualTo(totalTx)) {
+                    const divergence = totalTx.minus(individualTxSum).div(totalTx).times(100).toNumber().toFixed(1);
+                    dataFieldMetrics[fieldName].txSumMismatch = {
+                      timeSeriesInstanceId: timeseriesInstance.id,
+                      individualTxSum,
+                      totalTx,
+                      divergence,
+                    };
                   }
-                  dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
                 }
-              }
-            }
-
-            if (x < overlayDifference && currentOverlayEntityData.length > 0) {
-              overlayDataFields[fieldName] = [
-                { value: 0, date: Number(timeseriesInstance.timestamp) },
-                ...overlayDataFields[fieldName],
-              ];
-            } else if (overlayTimeseriesInstance) {
-              if (!isNaN(currentOverlayInstanceField) && !Array.isArray(currentOverlayInstanceField)) {
-                // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
-                // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
-                if (!overlayDataFields[fieldName]) {
-                  overlayDataFields[fieldName] = [
-                    { value: Number(currentOverlayInstanceField), date: overlayDateVal },
-                  ];
-                } else {
-                  overlayDataFields[fieldName].push({
-                    value: Number(currentOverlayInstanceField),
-                    date: overlayDateVal,
-                  });
+                if (fieldName?.toUpperCase()?.includes("CUMULATIVE")) {
+                  if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
+                    dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
+                  }
+                  if (Number(currentInstanceField) < dataFieldMetrics[fieldName]?.cumulative?.prevVal) {
+                    dataFieldMetrics[fieldName].cumulative.hasLowered = timeseriesInstance.id;
+                  }
+                  dataFieldMetrics[fieldName].cumulative.prevVal = Number(currentInstanceField);
                 }
-
-              } else if (Array.isArray(currentOverlayInstanceField)) {
+              } else if (Array.isArray(currentInstanceField)) {
                 // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
                 // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
-                // currentOverlayInstanceField.forEach((val: string, arrayIndex: number) => {
-                for (let arrayIndex = 0; arrayIndex < currentOverlayInstanceField.length; arrayIndex++) {
-                  const val = currentOverlayInstanceField[arrayIndex];
+                for (let arrayIndex = 0; arrayIndex < currentInstanceField.length; arrayIndex++) {
+                  const val = currentInstanceField[arrayIndex];
                   const dataFieldKey = fieldName + " [" + arrayIndex + "]";
                   let value = Number(val);
                   try {
@@ -322,28 +261,107 @@ function ProtocolTabEntity({
                   } catch (err) {
                     console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
                   }
-                  if (!overlayDataFields[dataFieldKey]) {
-                    overlayDataFields[dataFieldKey] = [{ value: value, date: overlayDateVal }];
+                  if (!dataFields[dataFieldKey]) {
+                    dataFields[dataFieldKey] = [{ value: value, date: dateVal }];
+                    dataFieldMetrics[dataFieldKey] = { sum: value };
                   } else {
-                    overlayDataFields[dataFieldKey].push({ value: value, date: overlayDateVal });
+                    dataFields[dataFieldKey].push({ value: value, date: dateVal });
+                    dataFieldMetrics[dataFieldKey].sum += value;
+                  }
+                  if (Number(value) < 0) {
+                    if (!dataFieldMetrics[fieldName].negative) {
+                      // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
+                      dataFieldMetrics[fieldName].negative = {
+                        firstSnapshot: timeseriesInstance.id,
+                        value: Number(value),
+                        count: 0,
+                      };
+                    }
+                    dataFieldMetrics[fieldName].negative.count += 1;
+                  }
+                  if (dataFieldKey?.toUpperCase()?.includes("CUMULATIVE")) {
+                    if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes("cumulative")) {
+                      dataFieldMetrics[dataFieldKey].cumulative = { prevVal: 0, hasLowered: "" };
+                    }
+                    if (value < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
+                      dataFieldMetrics[dataFieldKey].cumulative.hasLowered = timeseriesInstance.id;
+                    }
+                    dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
                   }
                 }
               }
+
+              if (x < overlayDifference && currentOverlayEntityData.length > 0) {
+                overlayDataFields[fieldName] = [
+                  ...overlayDataFields[fieldName],
+                  { value: 0, date: Number(timeseriesInstance.timestamp) },
+                ];
+              } else if (overlayTimeseriesInstance) {
+                if (!isNaN(currentOverlayInstanceField) && !Array.isArray(currentOverlayInstanceField)) {
+                  // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
+                  // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
+                  if (!overlayDataFields[fieldName]) {
+                    overlayDataFields[fieldName] = [
+                      { value: Number(currentOverlayInstanceField), date: overlayDateVal },
+                    ];
+                  } else {
+                    overlayDataFields[fieldName].push({
+                      value: Number(currentOverlayInstanceField),
+                      date: overlayDateVal,
+                    });
+                  }
+
+                } else if (Array.isArray(currentOverlayInstanceField)) {
+                  // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
+                  // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
+                  // currentOverlayInstanceField.forEach((val: string, arrayIndex: number) => {
+                  for (let arrayIndex = 0; arrayIndex < currentOverlayInstanceField.length; arrayIndex++) {
+                    const val = currentOverlayInstanceField[arrayIndex];
+                    const dataFieldKey = fieldName + " [" + arrayIndex + "]";
+                    let value = Number(val);
+                    try {
+                      if (fieldName === "mintedTokenSupplies" && protocolTableData?.lendingType === "CDP") {
+                        if (protocolTableData?.mintedTokens.length > 0) {
+                          value = convertTokenDecimals(val, protocolTableData.mintedTokens[arrayIndex]?.decimals);
+                        }
+                      } else if (fieldName === "mintedTokenSupplies" && protocolTableData?.lendingType !== "CDP") {
+                        continue;
+                      }
+                    } catch (err) {
+                      console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
+                    }
+                    if (!overlayDataFields[dataFieldKey]) {
+                      overlayDataFields[dataFieldKey] = [{ value: value, date: overlayDateVal }];
+                    } else {
+                      overlayDataFields[dataFieldKey].push({ value: value, date: overlayDateVal });
+                    }
+                  }
+                }
+              }
+            } catch (err) {
+              let message = "JAVASCRIPT ERROR";
+              if (err instanceof Error) {
+                message = err.message;
+              }
+              issues.push({
+                type: "JS",
+                message: message,
+                level: "critical",
+                fieldName: entityName + "-" + fieldName,
+              });
             }
-          } catch (err) {
-            let message = "JAVASCRIPT ERROR";
-            if (err instanceof Error) {
-              message = err.message;
-            }
-            issues.push({
-              type: "JS",
-              message: message,
-              level: "critical",
-              fieldName: entityName + "-" + fieldName,
-            });
-          }
-        });
+          });
+        }
+        setDataFieldsState({ data: dataFields });
+        setDataFieldMetricsState(dataFieldMetrics);
+        setOverlayDataFieldsState(overlayDataFields);
+
+        return <CircularProgress size={50} />;
       }
+
+      dataFields = dataFieldsState.data;
+      dataFieldMetrics = dataFieldMetricsState;
+      overlayDataFields = overlayDataFieldsState;
 
       list[entityName] = {};
       for (let x = 0; x < Object.keys(entitiesData[entityName]).length; x++) {
