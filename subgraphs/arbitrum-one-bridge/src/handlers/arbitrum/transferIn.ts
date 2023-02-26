@@ -47,20 +47,17 @@ export function handleTransferIn(event: DepositFinalized): void {
   // -- TOKENS
 
   const gatewayContract = TokenGateway.bind(event.address);
-
-  const inputTokenAddress = event.params.l1Token;
-  const inputToken = sdk.Tokens.getOrCreateToken(inputTokenAddress);
-
-  let crossTokenAddress: Address;
-
-  const crossTokenAddressResult =
-    gatewayContract.try_calculateL2TokenAddress(inputTokenAddress);
-  if (crossTokenAddressResult.reverted) {
+  const crossTokenAddress = event.params.l1Token;
+  let inputTokenAddress: Address;
+  const inputTokenAddressResult =
+    gatewayContract.try_calculateL2TokenAddress(crossTokenAddress);
+  if (inputTokenAddressResult.reverted) {
     log.info("calculate cross token address call reverted", []);
   } else {
-    crossTokenAddress = crossTokenAddressResult.value;
+    inputTokenAddress = inputTokenAddressResult.value;
   }
 
+  const inputToken = sdk.Tokens.getOrCreateToken(inputTokenAddress!);
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     networkToChainID(Network.ARBITRUM_ONE),
     crossTokenAddress!,
