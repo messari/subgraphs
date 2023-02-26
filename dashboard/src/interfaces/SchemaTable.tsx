@@ -1,5 +1,5 @@
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { negativeFieldList, percentageFieldList } from "../constants";
 import { convertTokenDecimals, formatIntToFixed2 } from "../utils";
 import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
@@ -42,14 +42,15 @@ interface SchemaTableProps {
   protocolType: string;
   schemaName: string;
   dataFields: { [x: string]: string };
-  issuesProps: { message: string; type: string; level: string; fieldName: string }[];
   setIssues: React.Dispatch<
     React.SetStateAction<{ message: string; type: string; level: string; fieldName: string }[]>
   >;
 }
 
-function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesProps, setIssues }: SchemaTableProps) {
+function SchemaTable({ entityData, protocolType, schemaName, dataFields, setIssues }: SchemaTableProps) {
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
+  const [issuesSet, setIssuesSet] = useState<boolean>(false)
+
   let schema: (JSX.Element | null)[] = [];
   if (entityData) {
     schema = Object.keys(entityData).map((fieldName: string) => {
@@ -470,8 +471,9 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
   }
 
   useEffect(() => {
-    console.log("SCHEMATABLE ISSUE TO SET", issues, issuesProps);
-    if (JSON.stringify(issues) !== JSON.stringify(issuesProps)) {
+    console.log("SCHEMATABLE ISSUE TO SET", issues);
+    if (JSON.stringify(issues) && !issuesSet) {
+      setIssuesSet(true);
       setIssues(issues);
     }
   });

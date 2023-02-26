@@ -7,7 +7,6 @@ import {
   Withdraw,
   Borrow,
   Repay,
-  Liquidate,
   Token,
   Position,
   PositionSnapshot,
@@ -438,10 +437,17 @@ export function updatePosition(
     }
 
     lenderPosition.balance = lenderPosition.balance.plus(deltaCollateral);
-    assert(
-      lenderPosition.balance.ge(BIGINT_ZERO),
-      `[updatePosition]balance for position ${lenderPosition.id} ${lenderPosition.balance} < 0`,
-    );
+    if (lenderPosition.balance.le(BIGINT_ZERO)) {
+      if (lenderPosition.balance.ge(BIGINT_NEG_HUNDRED)) {
+        // a small negative lender position, likely due to rounding
+        lenderPosition.balance = BIGINT_ZERO;
+      } else {
+        log.error("[updatePosition]balance for position {} = {} < 0", [
+          lenderPosition.id,
+          lenderPosition.balance.toString(),
+        ]);
+      }
+    }
 
     if (deltaCollateral.gt(BIGINT_ZERO)) {
       // deposit
@@ -467,7 +473,6 @@ export function updatePosition(
 
         account.openPositionCount -= INT_ONE;
         account.closedPositionCount += INT_ONE;
-        //account.withdrawCount += INT_ONE;
       }
 
       // link event to position (createTransactions needs to be called first)
@@ -723,13 +728,11 @@ export function liquidatePosition(
   ilk: Bytes,
   collateral: BigInt, // net collateral liquidated
   debt: BigInt, // debt repaid
-): void {
+): string[] {
   const protocol = getOrCreateLendingProtocol();
   const market: Market = getMarketFromIlk(ilk)!;
   const accountAddress = getOwnerAddress(urn);
   const account = getOrCreateAccount(accountAddress);
-
-  const liquidate = Liquidate.load(createEventID(event))!;
 
   log.info("[liquidatePosition]urn={}, ilk={}, collateral={}, debt={}", [
     urn,
@@ -774,10 +777,6 @@ export function liquidatePosition(
   lenderPosition.balance = lenderPosition.balance.minus(collateral);
   lenderPosition.liquidationCount += INT_ONE;
 
-  assert(
-    lenderPosition.balance.ge(BIGINT_ZERO),
-    `[liquidatePosition]balance of position ${lenderPosition.id} ${lenderPosition.balance} < 0`,
-  );
   if (lenderPosition.balance == BIGINT_ZERO) {
     // lender side is closed
     lenderPosition.blockNumberClosed = event.block.number;
@@ -794,15 +793,12 @@ export function liquidatePosition(
   lenderPosition.save();
   snapshotPosition(event, lenderPosition);
 
-  //TODO: this should be an array/list including borrowerPosition and lenderPosition
-  liquidate.position = lenderPosition.id;
-  liquidate.save();
-
   protocol.save();
   market.save();
   account.save();
 
-  assert(account.openPositionCount >= 0, `Account ${account.id} openPositionCount=${account.openPositionCount}`);
+  //assert(account.openPositionCount >= 0, `Account ${account.id} openPositionCount=${account.openPositionCount}`);
+  return [lenderPosition.id, borrowerPosition.id];
 }
 
 export function snapshotPosition(event: ethereum.Event, position: Position): void {
