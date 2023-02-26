@@ -8,13 +8,14 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  INT_ONE,
   INT_ZERO,
-  SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "../common/constants";
 import { getTokenFromCurrency } from "../common/util";
 import { getOrCreateLendingProtocol } from "./protocol";
-import { getOrCreateInterestRate } from "./InterestRate";
+import { getOrCreateInterestRate } from "./interestRate";
+import { updateFinancials } from "../setters/financialMetrics";
 
 export function getOrCreateMarket(
   event: ethereum.Event,
@@ -88,9 +89,9 @@ export function getOrCreateMarket(
 
 export function getOrCreateMarketDailySnapshot(
   event: ethereum.Event,
+  dailyId: i64,
   marketId: string
 ): MarketDailySnapshot {
-  const dailyId = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   const id = "daily-" + marketId + "-" + dailyId.toString();
 
   const protocol = getOrCreateLendingProtocol();
@@ -124,14 +125,22 @@ export function getOrCreateMarketDailySnapshot(
     marketMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     marketMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
 
-    marketMetrics.cumulativeSupplySideRevenueUSD =
-      market.cumulativeSupplySideRevenueUSD;
-    marketMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    marketMetrics.cumulativeProtocolSideRevenueUSD =
-      market.cumulativeProtocolSideRevenueUSD;
-    marketMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
-    marketMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    const prevDailyId = dailyId - INT_ONE;
+    const prevMarketMetrics = MarketDailySnapshot.load(prevDailyId.toString());
+    if (prevMarketMetrics == null) {
+      marketMetrics.cumulativeSupplySideRevenueUSD =
+        market.cumulativeSupplySideRevenueUSD;
+      marketMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+      marketMetrics.cumulativeProtocolSideRevenueUSD =
+        market.cumulativeProtocolSideRevenueUSD;
+      marketMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+      marketMetrics.cumulativeTotalRevenueUSD =
+        market.cumulativeTotalRevenueUSD;
+      marketMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    } else {
+      updateFinancials(event, market.id, prevMarketMetrics);
+    }
+
     marketMetrics.save();
   }
 

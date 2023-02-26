@@ -38,7 +38,7 @@ import {
 } from "../getters/accountAssets";
 import { getTokenFromCurrency } from "../common/util";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
-import { getOrCreateInterestRate } from "../getters/InterestRate";
+import { getOrCreateInterestRate } from "../getters/interestRate";
 import { getOrCreateERC1155Token } from "../getters/token";
 
 export function handleLendBorrowTrade(event: LendBorrowTrade): void {
@@ -138,7 +138,10 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
           const rate = bigIntToBigDecimal(impliedRate, RATE_PRECISION_DECIMALS);
           interestRate.rate = rate.times(BIGDECIMAL_HUNDRED);
           interestRate.save();
-          mkt.rates = [interestRate.id];
+          // TODO: remove
+          // we don't need this because we aren't changing the
+          // interestRate entity, only updating latest impliedRate
+          // mkt.rates = [interestRate.id];
 
           // set exchange rate for market in event
           const timeToMaturity = bigIntToBigDecimal(
