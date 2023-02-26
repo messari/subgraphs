@@ -70,7 +70,7 @@ export class Account {
    * Tracks the number of event entities created by this account during the current ethereum.Event
    * in case multiple ones need to be created at once, to avoid ID collissions.
    */
-  private eventCount: u8;
+  public eventCount: u8;
 
   constructor(protocol: Bridge, account: AccountSchema, tokens: TokenManager) {
     this.account = account;

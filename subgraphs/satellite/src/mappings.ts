@@ -278,7 +278,7 @@ export function handleContractCallWithToken(
     ? Address.fromString(dstStr)
     : Bytes.fromUTF8(dstStr);
 
-  _handleTransferOut(
+  const transferId = _handleTransferOut(
     Address.fromString(tokenAddress),
     event.params.sender,
     dstAccount,
@@ -294,6 +294,22 @@ export function handleContractCallWithToken(
 
   const sdk = _getSDK(event)!;
   const acc = sdk.Accounts.loadAccount(event.params.sender);
+  const cEventType = CustomEventType.initialize(
+    event.block,
+    event.transaction,
+    event.transactionLogIndex,
+    event
+  );
+  log.info(
+    "[handleContractCallWithToken] tranferId={} eventCount={} eventId={} tx={} logIndex={}",
+    [
+      transferId.toHexString(),
+      acc.eventCount.toString(),
+      acc.idFromEvent(cEventType).toHexString(),
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]
+  );
   acc.messageOut(dstChainId, dstAccount, event.params.payload);
 }
 
@@ -338,7 +354,7 @@ export function handleContractCallApprovedWithMint(
   const srcNetworkConstants = getNetworkSpecificConstant(srcChainId);
   const srcPoolId = srcNetworkConstants.getPoolAddress();
 
-  _handleTransferIn(
+  const transferId = _handleTransferIn(
     Address.fromString(tokenAddress),
     srcAccount,
     event.params.contractAddress,
@@ -356,6 +372,22 @@ export function handleContractCallApprovedWithMint(
 
   const sdk = _getSDK(event)!;
   const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
+  const cEventType = CustomEventType.initialize(
+    event.block,
+    event.transaction,
+    event.transactionLogIndex,
+    event
+  );
+  log.info(
+    "[handleContractCallApprovedWithMint] transferId={} eventCount={} eventId={} tx={} logIndex={}",
+    [
+      transferId.toHexString(),
+      acc.eventCount.toString(),
+      acc.idFromEvent(cEventType).toHexString(),
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]
+  );
   acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
 }
 
@@ -452,7 +484,7 @@ export function handleCommandExecuted(event: Executed): void {
   }
 
   const logs = event.receipt!.logs;
-  //Transfer should have an index that's below event.logIndex
+  //Transfer has a logIndex that's one below event.logIndex
   const transferLogIndex = event.logIndex.minus(BIGINT_ONE);
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
@@ -494,15 +526,15 @@ export function handleCommandExecuted(event: Executed): void {
         thisLog.logIndex.toString(),
       ]);
 
-      // transfer to burn
-      if (toAddress.equals(Address.zero())) {
+      // transfer to burn or address(this)
+      if (toAddress.equals(Address.zero()) || toAddress.equals(event.address)) {
         // this may be a burn token tx that has already been handled by
         // handleContractCallWithToken and handleTokenSent
         command.tokenAddress = thisLog.address;
         command.account = fromAddress;
         command.amount = transferAmount;
         command.save();
-        return;
+        break;
       }
     }
   }
@@ -597,7 +629,7 @@ function _handleTransferOut(
   event: ethereum.Event | null,
   call: ethereum.Call | null,
   refId: Bytes | null = null
-): void {
+): Bytes {
   const sdk = _getSDK(event, call)!;
   const inputToken = sdk.Tokens.getOrCreateToken(token);
 
@@ -628,6 +660,8 @@ function _handleTransferOut(
     transfer._refId = refId;
     transfer.save();
   }
+
+  return transfer.id;
 }
 
 function _handleTransferIn(
@@ -644,7 +678,7 @@ function _handleTransferIn(
   transactionID: Bytes | null = null,
   event: ethereum.Event | null = null,
   call: ethereum.Call | null = null
-): void {
+): Bytes {
   const sdk = _getSDK(event, call)!;
 
   const pool = sdk.Pools.loadPool(
@@ -675,6 +709,7 @@ function _handleTransferIn(
     transfer._refId = refId;
     transfer.save();
   }
+  return transfer.id;
 }
 
 function _handleMessageOut(
@@ -699,7 +734,6 @@ function _handleMessageIn(
   event: ethereum.Event | null = null,
   call: ethereum.Call | null = null
 ): void {
-  // see doc in _handleMessageOut
   const sdk = _getSDK(event, call)!;
   const acc = sdk.Accounts.loadAccount(receiver);
   acc.messageIn(srcChainId, sender, data);
