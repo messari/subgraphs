@@ -1,4 +1,4 @@
-import { Bytes, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, ethereum, log, Address } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../generated/Vat/ERC20";
 import { GemJoin } from "../generated/Vat/GemJoin";
 import { Vat, LogNote as VatNoteEvent } from "../generated/Vat/Vat";
@@ -46,6 +46,7 @@ import {
   INT_ZERO,
   INT_ONE,
   MIGRATION_ADDRESS,
+  CAT_V1_ADDRESS,
 } from "./common/constants";
 import {
   updateUsageMetrics,
@@ -412,24 +413,31 @@ export function handleCatFile(event: CatNoteEvent): void {
   // 3rd arg: start = 4 + 2 * 32, end = start + 32
   const chop = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
 
-  if (what == "chop") {
-    const market = getMarketFromIlk(ilk);
-    if (market == null) {
-      log.warning("[handleFileDog]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
-      return;
-    }
-    const liquidationPenalty = bigIntToBDUseDecimals(chop, WAD).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
-    if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
-      market.liquidationPenalty = liquidationPenalty;
-      market.save();
-    }
-
-    log.info("[handleCatFile]ilk={}, chop={}, liquidationPenalty={}", [
-      ilk.toString(),
-      chop.toString(),
-      market.liquidationPenalty.toString(),
-    ]);
+  if (what != "chop") {
+    return;
   }
+
+  const market = getMarketFromIlk(ilk);
+  if (market == null) {
+    log.warning("[handleFileDog]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
+    return;
+  }
+  // CAT V1 chop decimals = RAY
+  //     V2 chop decimals = WAD
+  const chopDecimals = event.address.equals(Address.fromString(CAT_V1_ADDRESS)) ? RAY : WAD;
+  const liquidationPenalty = bigIntToBDUseDecimals(chop, chopDecimals)
+    .minus(BIGDECIMAL_ONE)
+    .times(BIGDECIMAL_ONE_HUNDRED);
+  if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
+    market.liquidationPenalty = liquidationPenalty;
+    market.save();
+  }
+
+  log.info("[handleCatFile]ilk={}, chop={}, liquidationPenalty={}", [
+    ilk.toString(),
+    chop.toString(),
+    market.liquidationPenalty.toString(),
+  ]);
 }
 
 // New liquidation
@@ -503,26 +511,27 @@ export function handleDogFile(event: DogFileChopEvent): void {
     return;
   }
   const what = event.params.what.toString();
-  if (what == "chop") {
-    const market = getMarketFromIlk(ilk);
-    if (market == null) {
-      log.warning("[handleFileDog]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
-      return;
-    }
-    const chop = event.params.data;
-    const liquidationPenalty = bigIntToBDUseDecimals(chop, WAD).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
-    if (liquidationPenalty.ge(BIGDECIMAL_ZERO)) {
-      market.liquidationPenalty = liquidationPenalty;
-      market.save();
-    }
-
-    log.info("[handleDogFile]ilk={}, chop={}, liquidationPenalty={}, market.liquidationPenalty={}", [
-      ilk.toString(),
-      chop.toString(),
-      liquidationPenalty.toString(),
-      market.liquidationPenalty.toString(),
-    ]);
+  if (what != "chop") {
+    return;
   }
+  const market = getMarketFromIlk(ilk);
+  if (market == null) {
+    log.warning("[handleFileDog]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
+    return;
+  }
+  const chop = event.params.data;
+  const liquidationPenalty = bigIntToBDUseDecimals(chop, WAD).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
+  if (liquidationPenalty.ge(BIGDECIMAL_ZERO)) {
+    market.liquidationPenalty = liquidationPenalty;
+    market.save();
+  }
+
+  log.info("[handleDogFile]ilk={}, chop={}, liquidationPenalty={}, market.liquidationPenalty={}", [
+    ilk.toString(),
+    chop.toString(),
+    liquidationPenalty.toString(),
+    market.liquidationPenalty.toString(),
+  ]);
 }
 
 // Auction of collateral used by Cat (liquidation)
