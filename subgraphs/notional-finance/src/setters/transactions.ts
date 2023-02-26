@@ -24,7 +24,6 @@ import {
   PROTOCOL_ID,
   BIGDECIMAL_HUNDRED,
   INT_HUNDRED,
-  BIGDECIMAL_ONE,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
 import { addAccountToProtocol, updateUsageMetrics } from "./usageMetrics";
@@ -39,7 +38,6 @@ import {
 } from "./financialMetrics";
 import { getTokenFromCurrency } from "../common/util";
 import { Notional } from "../../generated/Notional/Notional";
-import { getOrCreateInterestRate } from "../getters/InterestRate";
 
 export function getOrCreatePosition(
   event: ethereum.Event,
@@ -300,16 +298,6 @@ export function createDeposit(
 
   deposit.save();
 
-  // update lending rates for deposit trades
-  // used for supply side revenue calculations
-  const mkt = getOrCreateMarket(event, market.id);
-  const interestRate = getOrCreateInterestRate(mkt.id);
-  mkt._lendRatesSum = mkt._lendRatesSum.plus(interestRate.rate);
-  mkt._lendCount = mkt._lendCount.plus(BIGDECIMAL_ONE);
-  mkt.save();
-  const avgInterestRate = mkt._lendRatesSum.div(mkt._lendCount);
-  updateFinancials(event, mkt.id, avgInterestRate);
-
   updatePosition(
     market.id,
     transactionType,
@@ -324,6 +312,7 @@ export function createDeposit(
     event.transaction.to!,
     transactionType
   );
+  updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
   updateTVLAndBalances(event);
 
@@ -371,6 +360,7 @@ export function createWithdraw(
     event.transaction.to!,
     transactionType
   );
+  updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
   updateTVLAndBalances(event);
 
@@ -417,6 +407,7 @@ export function createBorrow(
     event.transaction.to!,
     transactionType
   );
+  updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
   updateTVLAndBalances(event);
 
@@ -463,6 +454,7 @@ export function createRepay(
     event.transaction.to!,
     transactionType
   );
+  updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
   updateTVLAndBalances(event);
 
@@ -526,8 +518,8 @@ export function createLiquidate(
   addAccountToProtocol(TransactionType.LIQUIDATOR, liquidatorAccount, event);
 
   // BLOCKER: cannot update these metrics without market id
-  // updateLiquidationMetrics
-  // updateMarket
+  // updateFinancials(event, amountUSD, market.id);
+  // updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
 
   return liquidate;
 }
