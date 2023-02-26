@@ -720,6 +720,12 @@ type LiquidityPool @entity {
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
 
+  " Number of cumulative unique users in this pool "
+  cumulativeUniqueUsers: Int!
+
+  " Number of cumulative depositors in this pool "
+  cumulativeUniqueDepositors: Int!
+
   " Number of cumulative borrowers "
   cumulativeUniqueBorrowers: Int!
 
@@ -881,6 +887,12 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
   " All premium paid to enter and exit liquidity pool. "
   cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " Number of unique daily users "
+  dailyActiveUsers: Int!
+
+  " Number of unique daily depositors "
+  dailyActiveDepositors: Int!
 
   " Number of unique daily borrowers "
   dailyActiveBorrowers: Int!
@@ -1307,6 +1319,9 @@ type Borrow implements Event @entity(immutable: true) {
   " Address that sent the tokens "
   from: Bytes!
 
+  " Account that controls this transaction "
+  account: Account!
+
   " Block number of this event "
   blockNumber: BigInt!
 
@@ -1588,6 +1603,12 @@ type Account @entity {
 
   " Number of withdraws in this account "
   withdrawCount: Int!
+
+  " All borrows events occurred in this account "
+  borrows: [Borrow!]! @derivedFrom(field: "account")
+
+  " Number of borrows in this account "
+  borrowCount: Int!
 
   " All collateral put into protocol for trading events occurred in this account "
   collateralIn: [CollateralIn!]! @derivedFrom(field: "account")

@@ -3,8 +3,7 @@ import moment from "moment";
 import { protocolErrorMessages } from './errorSchemas.js';
 import { resolveQueriesToAttempt } from './resolutions.js';
 import { monitorVersion, ProtocolTypeEntityName, sleep, colorsArray } from './util.js';
-import fs from 'fs';
-import path from 'path';
+import { getGithubIssues, postGithubIssue } from './github.js';
 // Error handling functions
 
 export async function errorNotification(error, channelId = process.env.CHANNEL_ID) {
@@ -353,14 +352,14 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 }
                 if (!issueHasBeenAlerted) {
                     indexingErrorEmbed.color = placeholderColor;
-                    indexErrorEmbedDepos[networkString] = depo?.indexingError;
+                    indexErrorEmbedDepos[networkString] = { failureBlock: depo?.indexingError, message: depo?.indexingErrorMessage };
                     if (!!depo.pending) {
                         indexErrorPendingHash[networkString] = depo?.hash;
                     }
                 }
             }
             let errorsOnDeployment = false;
-            Object.entries(depo.protocolErrors).forEach(([errorType, errorArray]) => {
+            Object.entries(depo.protocolErrors).forEach(([errorType, errorArray], idx) => {
                 if (issuesSet?.includes(errorType)) {
                     return;
                 }
@@ -398,6 +397,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             let failureBlock = "";
 
             Object.keys(indexErrorEmbedDepos)?.forEach(networkString => {
+                const indexErrorObj = indexErrorEmbedDepos[networkString];
                 let link = '';
                 if (networkString.includes(' (PENDING')) {
                     link = `https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]}`;
@@ -407,11 +407,11 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                     link = `https://okgraph.xyz/?q=messari%2F${protocol}-${networkString}`;
                     labelValue += `\n[${networkString}](${link})\n`;
                 }
-                failureBlock += '\n' + indexErrorEmbedDepos[networkString] + '\n';
+                failureBlock += '\n' + indexErrorObj.failureBlock + '\n';
                 if (prodStatusDepoMapping[networkString] === true) {
                     aggThreadIndexErrorEmbeds[0].value += labelValue;
                     aggThreadIndexErrorEmbeds[1].value += failureBlock;
-                    zapierProdThreadIndexing.push(`${networkString}: ${link}`);
+                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}: ${indexErrorObj.failureBlock}`, ghMessage: `${networkString}: Block #${indexErrorObj.failureBlock} - ${indexErrorObj.message}}\n` });
                 }
             })
             indexingErrorEmbed.fields[0].value += labelValue;
@@ -524,6 +524,7 @@ export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHAN
 }
 
 export async function sendMessageToZapierThread(msgObj) {
+    const postedIssues = await getGithubIssues();
     const currentThreadMessages = await fetchMessages("", process.env.PROD_CHANNEL);
     const currentThreadMessagesContent = currentThreadMessages.map(x => x.content);
     const baseURL = "https://discordapp.com/api/channels/" + process.env.PROD_CHANNEL + "/messages";
@@ -533,6 +534,7 @@ export async function sendMessageToZapierThread(msgObj) {
     };
 
     let messageConstruction = ``;
+    const ghIssuePromiseArray = [];
 
     if (Object.keys(msgObj).includes('indexing')) {
         let invalidIndexingAlertIndexes = [];
@@ -540,7 +542,7 @@ export async function sendMessageToZapierThread(msgObj) {
 
         threadIndexingAlerts.forEach(indexingThread => {
             msgObj.indexing.forEach((indexingAlert, idx) => {
-                if (indexingThread.toUpperCase().includes(indexingAlert.toUpperCase())) {
+                if (indexingThread.toUpperCase().includes(indexingAlert.zappierMessage?.toUpperCase())) {
                     invalidIndexingAlertIndexes.push(idx);
                 }
             })
@@ -548,7 +550,8 @@ export async function sendMessageToZapierThread(msgObj) {
         const validAlerts = msgObj.indexing.filter((x, idx) => !invalidIndexingAlertIndexes.includes(idx));
         if (validAlerts.length > 0) {
             messageConstruction += `Indexing errors on ${msgObj.protocolName}\n\n`;
-            messageConstruction += validAlerts.join('\n');
+            messageConstruction += validAlerts.map(x => x.zappierMessage).join('\n');
+            ghIssuePromiseArray.push(postGithubIssue(msgObj.protocolName + ": Indexing Errors", validAlerts.map(x => x.ghMessage).join('\n'), postedIssues));
         }
     } else if (Object.keys(msgObj).includes('protocol')) {
         const invalidProtocolAlertIndexes = {};
@@ -573,7 +576,9 @@ export async function sendMessageToZapierThread(msgObj) {
             const validAlerts = []
             msgObj.protocol[deployment]?.Field?.forEach((x, idx) => {
                 if (!invalidProtocolAlertIndexes[deployment].includes(idx)) {
-                    validAlerts.push(`Field: ${x}\nValue: ${msgObj.protocol[deployment]?.Value[idx]}\nDescription: ${msgObj.protocol[deployment]?.Description[idx]}\n`);
+                    const alertBody = `Field: ${x}\nValue: ${msgObj.protocol[deployment]?.Value[idx]}\nDescription: ${msgObj.protocol[deployment]?.Description[idx]}\n`;
+                    validAlerts.push(alertBody);
+                    ghIssuePromiseArray.push(postGithubIssue(msgObj.protocolName + " " + deployment + ": Protocol Error " + x, alertBody, postedIssues));
                 }
             })
             if (validAlerts.length > 0) {
@@ -591,6 +596,10 @@ export async function sendMessageToZapierThread(msgObj) {
     }
 
     const postJSON = JSON.stringify({ "content": messageConstruction });
+
+    if (ghIssuePromiseArray.length > 0) {
+        await Promise.all(ghIssuePromiseArray);
+    }
 
     try {
         const req = await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch(async function (err1) {
