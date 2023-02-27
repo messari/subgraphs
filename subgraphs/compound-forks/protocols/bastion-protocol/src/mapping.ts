@@ -1,10 +1,4 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  dataSource,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -133,6 +127,7 @@ export function handleMarketListed(event: MarketListed): void {
   } else if (event.address.equals(MULTICHAIN_REALM_ADDRESS)) {
     marketNamePrefix = "Multichain Ream: ";
   }
+
   if (cTokenAddr == nativeCToken.address) {
     const marketListedData = new MarketListedData(
       protocol,
