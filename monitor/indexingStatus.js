@@ -72,9 +72,9 @@ export async function indexStatusFlow(deployments) {
         invalidDeployments.push(realNameString);
       }
 
-      // if (parseFloat(deployments[realNameString]?.indexedPercentage) < 10) {
-      //   invalidDeployments.push(realNameString);
-      // }
+      if (parseFloat(deployments[realNameString]?.indexedPercentage) < 10) {
+        invalidDeployments.push(realNameString);
+      }
     });
     return { invalidDeployments, deployments };
   } catch (err) {
