@@ -1,4 +1,11 @@
 import {
+  log,
+  Bytes,
+  BigInt,
+  Address,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
+import {
   Swap,
   Borrow,
   Deposit,
@@ -14,7 +21,6 @@ import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
 import * as constants from "../../util/constants";
 import { EventType, ActivityType, TransactionType } from "./enums";
-import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 export class AccountManager {
@@ -47,6 +53,7 @@ export class AccountManager {
 
       account.depositCount = 0;
       account.withdrawCount = 0;
+      account.borrowCount = 0;
       account.collateralInCount = 0;
       account.collateralOutCount = 0;
       account.liquidateCount = 0;
@@ -70,12 +77,14 @@ export class Account {
   event: CustomEventType;
   protocol: Perpetual;
   tokens: TokenManager;
+  pool: Pool | null;
 
   constructor(
     protocol: Perpetual,
     account: AccountSchema,
     tokens: TokenManager
   ) {
+    this.pool = null;
     this.account = account;
     this.protocol = protocol;
     this.tokens = tokens;
@@ -92,6 +101,7 @@ export class Account {
 
   private getAmountUSD(tokens: Bytes[], amounts: BigInt[]): BigDecimal {
     let amountUSD = constants.BIGDECIMAL_ZERO;
+    if (tokens.length != amounts.length) return amountUSD;
 
     for (let idx = 0; idx < tokens.length; idx++) {
       const token = this.tokens.getOrCreateToken(
@@ -157,7 +167,7 @@ export class Account {
    * @param pool The pool where the liquidity was deposited.
    * @param amounts The amount deposited of inputTokens.
    * @param sharesMinted The amount of shares minted of outputToken.
-   * @param updateMetrics Optional, defaults to true. If true it will update the pool and protocol TVL and inputTokenBalance.
+   * @param updateMetrics Optional, defaults to true. If true it will update the protocol and pool's deposit and transaction count.
    * @returns Deposit
    */
   deposit(
@@ -168,6 +178,13 @@ export class Account {
   ): Deposit {
     const depositId = this.getIdFromEvent(EventType.DEPOSIT);
     const deposit = new Deposit(depositId);
+
+    if (amounts.length != pool.getInputTokens().length) {
+      log.critical(
+        "[Account][Deposit] Pool:{} inputTokens length does not match deposit amount array length",
+        [pool.getBytesID().toHexString()]
+      );
+    }
 
     deposit.hash = this.event.transaction.hash;
     deposit.logIndex = this.event.logIndex.toI32();
@@ -185,7 +202,12 @@ export class Account {
     deposit.pool = pool.getBytesID();
     deposit.save();
 
-    if (updateMetrics) this.protocol.addTransaction(TransactionType.DEPOSIT);
+    if (updateMetrics) {
+      this.pool = pool;
+      this.countDeposit();
+      this.protocol.addTransaction(TransactionType.DEPOSIT);
+    }
+
     return deposit;
   }
 
@@ -194,7 +216,7 @@ export class Account {
    * @param pool The pool where the liquidity was withdrawn.
    * @param amounts The amount withdrawn of inputTokens.
    * @param sharesMinted The amount of shares burnt of outputToken.
-   * @param updateMetrics Optional, defaults to true. If true it will update the pool and protocol TVL and inputTokenBalance.
+   * @param updateMetrics Optional, defaults to true. If true it will update the protocol withdraw and transaction count.
    * @returns Withdraw
    */
   withdraw(
@@ -205,6 +227,13 @@ export class Account {
   ): Withdraw {
     const withdrawId = this.getIdFromEvent(EventType.WITHDRAW);
     const withdraw = new Withdraw(withdrawId);
+
+    if (amounts.length != pool.getInputTokens().length) {
+      log.critical(
+        "[Account][Withdraw] Pool:{} inputTokens length does not match Withdraw amount array length",
+        [pool.getBytesID().toHexString()]
+      );
+    }
 
     withdraw.hash = this.event.transaction.hash;
     withdraw.logIndex = this.event.logIndex.toI32();
@@ -222,7 +251,11 @@ export class Account {
     withdraw.pool = pool.getBytesID();
     withdraw.save();
 
-    if (updateMetrics) this.protocol.addTransaction(TransactionType.WITHDRAW);
+    if (updateMetrics) {
+      this.pool = pool;
+      this.countWithdraw();
+      this.protocol.addTransaction(TransactionType.WITHDRAW);
+    }
     return withdraw;
   }
 
@@ -234,7 +267,7 @@ export class Account {
    * @param tokenIn The token withdrawn from the pool.
    * @param amountIn The token amount withdrawn from the pool.
    * @param tradingPair  The contract address for the trading pair or pool.
-   * @param updateMetrics Optional, defaults to true. If true it will update the pool and protocol TVL and inputTokenBalance.
+   * @param updateMetrics Optional, defaults to true. If true it will update the protocol swap and transaction count.
    * @returns Swap
    */
   swap(
@@ -274,7 +307,11 @@ export class Account {
     swap.pool = pool.getBytesID();
     swap.save();
 
-    if (updateMetrics) this.protocol.addTransaction(TransactionType.SWAP);
+    if (updateMetrics) {
+      this.pool = pool;
+      this.countSwap();
+      this.protocol.addTransaction(TransactionType.SWAP);
+    }
     return swap;
   }
 
@@ -317,7 +354,11 @@ export class Account {
     borrow.pool = pool.getBytesID();
     borrow.save();
 
-    if (updateMetrics) this.protocol.addTransaction(TransactionType.BORROW);
+    if (updateMetrics) {
+      this.pool = pool;
+      this.countBorrow();
+      this.protocol.addTransaction(TransactionType.BORROW);
+    }
     return borrow;
   }
 
@@ -340,6 +381,13 @@ export class Account {
     const collateralId = this.getIdFromEvent(EventType.DEPOSIT);
     const collateralIn = new CollateralIn(collateralId);
 
+    if (amounts.length != pool.getInputTokens().length) {
+      log.critical(
+        "[Account][collateralIn] Pool:{} inputTokens length does not match collateralIn amount array length",
+        [pool.getBytesID().toHexString()]
+      );
+    }
+
     collateralIn.hash = this.event.transaction.hash;
     collateralIn.logIndex = this.event.logIndex.toI32();
     collateralIn.protocol = this.protocol.getBytesID();
@@ -357,8 +405,11 @@ export class Account {
     collateralIn.pool = pool.getBytesID();
     collateralIn.save();
 
-    if (updateMetrics)
+    if (updateMetrics) {
+      this.pool = pool;
+      this.countCollateralIn();
       this.protocol.addTransaction(TransactionType.COLLATERAL_IN);
+    }
     return collateralIn;
   }
 
@@ -381,6 +432,13 @@ export class Account {
     const collateralId = this.getIdFromEvent(EventType.WITHDRAW);
     const collateralOut = new CollateralOut(collateralId);
 
+    if (amounts.length != pool.getInputTokens().length) {
+      log.critical(
+        "[Account][collateralOut] Pool:{} inputTokens length does not match collateralOut amount array length",
+        [pool.getBytesID().toHexString()]
+      );
+    }
+
     collateralOut.hash = this.event.transaction.hash;
     collateralOut.logIndex = this.event.logIndex.toI32();
     collateralOut.protocol = this.protocol.getBytesID();
@@ -398,8 +456,11 @@ export class Account {
     collateralOut.pool = pool.getBytesID();
     collateralOut.save();
 
-    if (updateMetrics)
+    if (updateMetrics) {
+      this.pool = pool;
+      this.countCollateralOut();
       this.protocol.addTransaction(TransactionType.COLLATERAL_OUT);
+    }
     return collateralOut;
   }
 
@@ -452,17 +513,24 @@ export class Account {
     liquidate.pool = pool.getBytesID();
     liquidate.save();
 
-    if (updateMetrics) this.protocol.addTransaction(TransactionType.LIQUIDATE);
+    if (updateMetrics) {
+      this.pool = pool;
+      this.countLiquidatee();
+      this.protocol.addTransaction(TransactionType.LIQUIDATE);
+    }
     return liquidate;
   }
 
   /**
    * Adds 1 to the account total deposit count. If it is the first deposit ever
    * and the account has not withdrawn before it will also increase
-   * the number of unique depositors in the protocol.
+   * the number of unique depositors in the protocol and pool.
    */
   countDeposit(): void {
-    if (this.account.depositCount == 0) this.protocol.addDepositor();
+    if (this.account.depositCount == 0) {
+      this.protocol.addDepositor();
+      if (this.pool) this.pool.addDepositor();
+    }
 
     this.account.depositCount += 1;
     this.account.save();
@@ -475,6 +543,21 @@ export class Account {
    */
   countWithdraw(): void {
     this.account.withdrawCount += 1;
+    this.account.save();
+  }
+
+  /**
+   * Adds 1 to the account total borrow count. If it is the first borrow ever
+   * and the account has not borrowed before it will also increase
+   * the number of unique borrowers in the protocol and pool.
+   */
+  countBorrow(): void {
+    if (this.account.borrowCount == 0) {
+      this.protocol.addBorrower();
+      if (this.pool) this.pool.addBorrower();
+    }
+
+    this.account.borrowCount += 1;
     this.account.save();
   }
 
@@ -504,11 +587,13 @@ export class Account {
 
   /**
    * Adds 1 to the account total liquidation count. If it is the first liquidation ever
-   * and the account has not withdrawn before it will also increase
-   * the number of unique liquidation in the protocol.
+   * it will also increase the number of unique liquidation in the protocol and the associated pool.
    */
   countLiquidator(): void {
-    if (this.account.liquidateCount == 0) this.protocol.addLiquidator();
+    if (this.account.liquidateCount == 0) {
+      this.protocol.addLiquidator();
+      if (this.pool) this.pool.addLiquidator();
+    }
 
     this.account.liquidateCount += 1;
     this.account.save();
@@ -518,11 +603,13 @@ export class Account {
 
   /**
    * Adds 1 to the account total liquidatee count. If it is the first liquidatee ever
-   * and the account has not withdrawn before it will also increase
-   * the number of unique liquidatee in the protocol.
+   * it will also increase the number of unique liquidatee in the protocol and the associated pool.
    */
   countLiquidatee(): void {
-    if (this.account.liquidationCount == 0) this.protocol.addLiquidatee();
+    if (this.account.liquidationCount == 0) {
+      this.protocol.addLiquidatee();
+      if (this.pool) this.pool.addLiquidatee();
+    }
 
     this.account.liquidationCount += 1;
     this.account.save();

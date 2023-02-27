@@ -96,6 +96,8 @@ export class Pool {
 
     this.pool.openInterestUSD = constants.BIGDECIMAL_ZERO;
 
+    this.pool.cumulativeUniqueUsers = 0;
+    this.pool.cumulativeUniqueDepositors = 0;
     this.pool.cumulativeUniqueBorrowers = 0;
     this.pool.cumulativeUniqueLiquidators = 0;
     this.pool.cumulativeUniqueLiquidatees = 0;
@@ -223,8 +225,8 @@ export class Pool {
   }
 
   /**
-   * Updates the total value locked for this pool to the given value.
-   * Will also update the protocol's total value locked based on the change in this pool's.
+   * set the volume for this pool to the given value.
+   * Will also update the protocol's total volume on the change in this pool's.
    */
   setVolume(newVolume: BigDecimal): void {
     const delta = newVolume.minus(this.pool.cumulativeVolumeUSD);
@@ -233,9 +235,8 @@ export class Pool {
   }
 
   /**
-   * Adds the given delta to the total value locked for this pool.
-   * Will also update the protocol's total value locked based on the change in this pool's.
-   *
+   * Adds the given delta to the cumulative volume for this pool.
+   * Will also update the protocol's total volume on the change in this pool's.
    * @param delta The change in total value locked for this pool.
    */
   addVolume(delta: BigDecimal): void {
@@ -251,7 +252,7 @@ export class Pool {
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param rev {BigDecimal} The value to add to the protocol's supplySideRevenue.
    */
-  addSupplySideRevenueUSD(rev: BigDecimal): void {
+  private addSupplySideRevenueUSD(rev: BigDecimal): void {
     this.pool.cumulativeTotalRevenueUSD =
       this.pool.cumulativeTotalRevenueUSD.plus(rev);
     this.pool.cumulativeSupplySideRevenueUSD =
@@ -267,7 +268,7 @@ export class Pool {
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param rev {BigDecimal} The value to add to the protocol's protocolSideRevenue.
    */
-  addProtocolSideRevenueUSD(rev: BigDecimal): void {
+  private addProtocolSideRevenueUSD(rev: BigDecimal): void {
     this.pool.cumulativeTotalRevenueUSD =
       this.pool.cumulativeTotalRevenueUSD.plus(rev);
     this.pool.cumulativeProtocolSideRevenueUSD =
@@ -295,7 +296,7 @@ export class Pool {
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param premium {BigDecimal} The value to add to the pool and protocol's entryPremium.
    */
-  addEntryPremiumUSD(premium: BigDecimal): void {
+  private addEntryPremiumUSD(premium: BigDecimal): void {
     this.pool.cumulativeTotalPremiumUSD =
       this.pool.cumulativeTotalPremiumUSD.plus(premium);
     this.pool.cumulativeEntryPremiumUSD =
@@ -311,7 +312,7 @@ export class Pool {
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param premium {BigDecimal} The value to add to the pool and protocol's entryPremium.
    */
-  addExitPremiumUSD(premium: BigDecimal): void {
+  private addExitPremiumUSD(premium: BigDecimal): void {
     this.pool.cumulativeTotalPremiumUSD =
       this.pool.cumulativeTotalPremiumUSD.plus(premium);
     this.pool.cumulativeExitPremiumUSD =
@@ -342,7 +343,7 @@ export class Pool {
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param premium {BigDecimal} The value to add to the pool and protocol's depositPremium.
    */
-  addDepositPremiumUSD(premium: BigDecimal): void {
+  private addDepositPremiumUSD(premium: BigDecimal): void {
     this.pool.cumulativeTotalLiquidityPremiumUSD =
       this.pool.cumulativeTotalLiquidityPremiumUSD.plus(premium);
     this.pool.cumulativeDepositPremiumUSD =
@@ -358,7 +359,7 @@ export class Pool {
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param premium {BigDecimal} The value to add to the pool and protocol's withdrawPremium.
    */
-  addWithdrawPremiumUSD(premium: BigDecimal): void {
+  private addWithdrawPremiumUSD(premium: BigDecimal): void {
     this.pool.cumulativeTotalLiquidityPremiumUSD =
       this.pool.cumulativeTotalLiquidityPremiumUSD.plus(premium);
     this.pool.cumulativeWithdrawPremiumUSD =
@@ -567,6 +568,26 @@ export class Pool {
   }
 
   /**
+   * Adds some value to the cumulativeUniqueUsers counter. If the value is omitted it will default to 1.
+   * If you are loading accounts with the AccountManager you won't need to use this method.
+   * @param count {u8} The value to add to the counter.
+   */
+  addUser(count: u8 = 1): void {
+    this.pool.cumulativeUniqueUsers += count;
+    this.save();
+  }
+
+  /**
+   * Adds some value to the cumulativeUniqueDepositors counter. If the value is omitted it will default to 1.
+   * If you are loading accounts with the AccountManager you won't need to use this method.
+   * @param count {u8} The value to add to the counter.
+   */
+  addDepositor(count: u8 = 1): void {
+    this.pool.cumulativeUniqueDepositors += count;
+    this.save();
+  }
+
+  /**
    * Adds some value to the cumulativeUniqueBorrowers counter. If the value is omitted it will default to 1.
    * If you are loading accounts with the AccountManager you won't need to use this method.
    * @param count {u8} The value to add to the counter.
@@ -578,7 +599,6 @@ export class Pool {
 
   /**
    * Adds some value to the cumulativeUniqueLiquidators counter. If the value is omitted it will default to 1.
-   * If you are loading accounts with the AccountManager you won't need to use this method.
    * @param count {u8} The value to add to the counter.
    */
   addLiquidator(count: u8 = 1): void {
@@ -588,7 +608,6 @@ export class Pool {
 
   /**
    * Adds some value to the cumulativeUniqueLiquidatees counter. If the value is omitted it will default to 1.
-   * If you are loading accounts with the AccountManager you won't need to use this method.
    * @param count {u8} The value to add to the counter.
    */
   addLiquidatee(count: u8 = 1): void {
@@ -598,7 +617,6 @@ export class Pool {
 
   /**
    * Adds 1 to the cumulativePositionCount counter and adds 1 to the counter corresponding the given position type.
-   * If you are creating transaction entities from the Account class you won't need to use this method.
    * @param positionSide {PositionType} The type of transaction to add.
    * @see PositionType
    * @see Account
@@ -619,7 +637,6 @@ export class Pool {
 
   /**
    * Subtracts 1 to the cumulativePositionCount counter and adds 1 to the counter corresponding the given position type.
-   * If you are creating transaction entities from the Account class you won't need to use this method.
    * @param positionSide {PositionType} The type of transaction to add.
    * @see PositionType
    * @see Account

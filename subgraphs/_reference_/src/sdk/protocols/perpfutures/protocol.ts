@@ -463,13 +463,14 @@ export class Perpetual {
       this.protocol.depositCount += 1;
     } else if (type == TransactionType.WITHDRAW) {
       this.protocol.withdrawCount += 1;
+    } else if (type == TransactionType.SWAP) {
+      this.protocol.swapCount += 1;
     } else if (type == TransactionType.BORROW) {
       this.protocol.borrowCount += 1;
     } else if (type == TransactionType.COLLATERAL_IN) {
       this.protocol.collateralInCount += 1;
     } else if (type == TransactionType.COLLATERAL_OUT) {
       this.protocol.collateralOutCount += 1;
-    } else if (type == TransactionType.LIQUIDATE) {
     }
 
     this.protocol.transactionCount += 1;

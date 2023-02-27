@@ -145,7 +145,7 @@ export class Position {
    * @param collateralToken
    * @param amount
    */
-  setcollateralBalance(collateralToken: Address, amount: BigInt): void {
+  setCollateralBalance(collateralToken: Address, amount: BigInt): void {
     if (!this.position) return;
 
     this.position.collateralBalance = amount;
