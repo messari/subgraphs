@@ -1154,7 +1154,7 @@ enum TransferType {
 }
 
 type BridgeTransfer implements Event @entity(immutable: true) {
-  " event.transaction.hash.concatI32(event.logIndex) "
+  " event.transaction.hash.concatI32(event.logIndex).concatI32(eventCount)"
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
@@ -1229,7 +1229,7 @@ type BridgeTransfer implements Event @entity(immutable: true) {
 
 # Some bridges support sending
 type BridgeMessage implements Event @entity(immutable: true) {
-  " event.transaction.hash.concatI32(event.logIndex) "
+  " event.transaction.hash.concatI32(event.logIndex).concatI32(eventCount) "
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "

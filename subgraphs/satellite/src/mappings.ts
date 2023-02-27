@@ -257,7 +257,9 @@ export function handleTokenSent(event: TokenSent): void {
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event,
-    null
+    null,
+    null,
+    getTxId(event)
   );
 }
 
@@ -278,7 +280,7 @@ export function handleContractCallWithToken(
     ? Address.fromString(dstStr)
     : Bytes.fromUTF8(dstStr);
 
-  const transferId = _handleTransferOut(
+  _handleTransferOut(
     Address.fromString(tokenAddress),
     event.params.sender,
     dstAccount,
@@ -289,28 +291,11 @@ export function handleContractCallWithToken(
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event,
-    null
+    null,
+    null,
+    getTxId(event),
+    event.params.payload
   );
-
-  const sdk = _getSDK(event)!;
-  const acc = sdk.Accounts.loadAccount(event.params.sender);
-  const cEventType = CustomEventType.initialize(
-    event.block,
-    event.transaction,
-    event.transactionLogIndex,
-    event
-  );
-  log.info(
-    "[handleContractCallWithToken] tranferId={} eventCount={} eventId={} tx={} logIndex={}",
-    [
-      transferId.toHexString(),
-      acc.eventCount.toString(),
-      acc.idFromEvent(cEventType).toHexString(),
-      event.transaction.hash.toHexString(),
-      event.transactionLogIndex.toString(),
-    ]
-  );
-  acc.messageOut(dstChainId, dstAccount, event.params.payload);
 }
 
 export function handleContractCall(event: ContractCall): void {
@@ -354,7 +339,7 @@ export function handleContractCallApprovedWithMint(
   const srcNetworkConstants = getNetworkSpecificConstant(srcChainId);
   const srcPoolId = srcNetworkConstants.getPoolAddress();
 
-  const transferId = _handleTransferIn(
+  _handleTransferIn(
     Address.fromString(tokenAddress),
     srcAccount,
     event.params.contractAddress,
@@ -364,31 +349,12 @@ export function handleContractCallApprovedWithMint(
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
-    event.params.commandId,
-    event.transaction.hash.concatI32(event.transactionLogIndex.toI32()),
     event,
-    null
+    null,
+    event.params.commandId,
+    getTxId(event),
+    event.params.payloadHash
   );
-
-  const sdk = _getSDK(event)!;
-  const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
-  const cEventType = CustomEventType.initialize(
-    event.block,
-    event.transaction,
-    event.transactionLogIndex,
-    event
-  );
-  log.info(
-    "[handleContractCallApprovedWithMint] transferId={} eventCount={} eventId={} tx={} logIndex={}",
-    [
-      transferId.toHexString(),
-      acc.eventCount.toString(),
-      acc.idFromEvent(cEventType).toHexString(),
-      event.transaction.hash.toHexString(),
-      event.transactionLogIndex.toString(),
-    ]
-  );
-  acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
 }
 
 export function handleMintToken(call: MintTokenCall): void {
@@ -445,10 +411,10 @@ export function handleMintToken(call: MintTokenCall): void {
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
-    call.inputs.value1, //commandId
-    call.transaction.hash.concatI32(call.transaction.index.toI32()),
     null,
-    call
+    call,
+    call.inputs.value1, //commandId
+    getTxId(null, call)
   );
 }
 
@@ -627,8 +593,10 @@ function _handleTransferOut(
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
   event: ethereum.Event | null,
-  call: ethereum.Call | null,
-  refId: Bytes | null = null
+  call: ethereum.Call | null = null,
+  refId: Bytes | null = null,
+  transactionID: Bytes | null = null,
+  messagePayload: Bytes | null = null
 ): Bytes {
   const sdk = _getSDK(event, call)!;
   const inputToken = sdk.Tokens.getOrCreateToken(token);
@@ -646,19 +614,22 @@ function _handleTransferOut(
     token
   );
   pool.addDestinationToken(crossToken);
-  const txHash = event ? event.transaction.hash : call!.transaction.hash;
   const acc = sdk.Accounts.loadAccount(sender);
   const transfer = acc.transferOut(
     pool,
     pool.getDestinationTokenRoute(crossToken)!,
     receiver,
     amount,
-    txHash
+    transactionID
   );
 
   if (refId) {
     transfer._refId = refId;
     transfer.save();
+  }
+
+  if (messagePayload) {
+    acc.messageOut(dstChainId, receiver, messagePayload);
   }
 
   return transfer.id;
@@ -674,10 +645,11 @@ function _handleTransferIn(
   poolId: Bytes,
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
+  event: ethereum.Event | null,
+  call: ethereum.Call | null = null,
   refId: Bytes | null = null,
   transactionID: Bytes | null = null,
-  event: ethereum.Event | null = null,
-  call: ethereum.Call | null = null
+  messagePayload: Bytes | null = null
 ): Bytes {
   const sdk = _getSDK(event, call)!;
 
@@ -709,34 +681,12 @@ function _handleTransferIn(
     transfer._refId = refId;
     transfer.save();
   }
+
+  if (messagePayload) {
+    acc.messageIn(srcChainId, sender, messagePayload);
+  }
+
   return transfer.id;
-}
-
-function _handleMessageOut(
-  dstChainId: BigInt,
-  sender: Address,
-  receiver: Address,
-  data: Bytes,
-  fee: BigInt,
-  event: ethereum.Event | null = null,
-  call: ethereum.Call | null = null
-): void {
-  const sdk = _getSDK(event, call)!;
-  const acc = sdk.Accounts.loadAccount(sender);
-  acc.messageOut(dstChainId, receiver, data);
-}
-
-function _handleMessageIn(
-  srcChainId: BigInt,
-  sender: Address,
-  receiver: Address,
-  data: Bytes,
-  event: ethereum.Event | null = null,
-  call: ethereum.Call | null = null
-): void {
-  const sdk = _getSDK(event, call)!;
-  const acc = sdk.Accounts.loadAccount(receiver);
-  acc.messageIn(srcChainId, sender, data);
 }
 
 function _handleBurnToken(
@@ -765,7 +715,8 @@ function _handleBurnToken(
     CrosschainTokenType.WRAPPED,
     event,
     call,
-    commandId
+    commandId,
+    getTxId(event, call)
   );
 
   command.isProcessed = true;
@@ -791,4 +742,19 @@ export function bytes32ToAddress(bytes: Bytes): Address {
 export function bytes32ToAddressHexString(bytes: Bytes): string {
   //take the last 40 hexstring: 0x + 32 bytes/64 hex characters
   return `0x${bytes.toHexString().slice(26).toLowerCase()}`;
+}
+
+export function getTxId(
+  event: ethereum.Event | null,
+  call: ethereum.Call | null = null
+): Bytes | null {
+  if (event) {
+    return event.transaction.hash.concatI32(event.transactionLogIndex.toI32());
+  }
+
+  if (call) {
+    return call.transaction.hash.concatI32(call.transaction.index.toI32());
+  }
+
+  return null;
 }
