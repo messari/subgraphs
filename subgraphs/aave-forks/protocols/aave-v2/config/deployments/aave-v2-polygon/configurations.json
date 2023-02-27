@@ -12,7 +12,7 @@
     "startBlock": "12687245",
     "address": "0x8dFf5E27EA6b7AC08EbFdf9eB090F32ee9a30fcf"
   },
-  "graftEnabled": true,
+  "graftEnabled": false,
   "subgraphId": "QmUp2UHf7AuRCBXCy82xkuyAutKog4p2dE6ik8qYKNfG15",
   "graftStartBlock": 31123151
 }
