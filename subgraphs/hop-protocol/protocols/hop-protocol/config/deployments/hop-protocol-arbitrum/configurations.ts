@@ -21,7 +21,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		else if (tokenAddress == ArbitrumToken.DAI) return ArbitrumAmm.DAI
 		else if (tokenAddress == ArbitrumToken.USDT) return ArbitrumAmm.USDT
 		else if (tokenAddress == ArbitrumToken.ETH) return ArbitrumAmm.ETH
-		else if (tokenAddress == ArbitrumToken.WBTC) return ArbitrumAmm.WBTC
 		else {
 			log.critical('Token not found', [])
 			return ''
@@ -30,16 +29,12 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 	getTokenDetails(tokenAddress: string): string[] {
 		if (this.getUsdcTokens().includes(tokenAddress)) {
 			return ['USDC', 'USDC', '6', ArbitrumBridge.USDC]
-		} else if (this.getUsdcTokens().includes(tokenAddress)) {
+		} else if (this.getDaiTokens().includes(tokenAddress)) {
 			return ['DAI', 'DAI', '18', ArbitrumBridge.DAI]
 		} else if (this.getUsdtTokens().includes(tokenAddress)) {
 			return ['USDT', 'USDT', '6', ArbitrumBridge.USDT]
 		} else if (this.getEthTokens().includes(tokenAddress)) {
 			return ['ETH', 'ETH', '18', ArbitrumBridge.ETH]
-		} else if (tokenAddress == ArbitrumToken.WBTC) {
-			return ['WBTC', 'WBTC', '18', ArbitrumBridge.WBTC]
-		} else if (tokenAddress == ArbitrumToken.HOP) {
-			return ['HOP', 'HOP', '18', ArbitrumBridge.HOP]
 		} else {
 			log.critical('Token not found', [])
 			return []
@@ -72,8 +67,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		else if (tokenAddress == ArbitrumToken.DAI) return PolygonToken.DAI
 		else if (tokenAddress == ArbitrumToken.USDT) return PolygonToken.USDT
 		else if (tokenAddress == ArbitrumToken.ETH) return PolygonToken.ETH
-		else if (tokenAddress == ArbitrumToken.WBTC) return PolygonToken.WBTC
-		else if (tokenAddress == ArbitrumToken.HOP) return PolygonToken.HOP
 		else {
 			log.critical('Token not found', [])
 		}
@@ -84,8 +77,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		else if (tokenAddress == ArbitrumToken.DAI) return XdaiToken.DAI
 		else if (tokenAddress == ArbitrumToken.USDT) return XdaiToken.USDT
 		else if (tokenAddress == ArbitrumToken.ETH) return XdaiToken.ETH
-		else if (tokenAddress == ArbitrumToken.WBTC) return XdaiToken.WBTC
-		else if (tokenAddress == ArbitrumToken.HOP) return XdaiToken.HOP
 		else {
 			log.critical('Token not found', [])
 		}
@@ -101,10 +92,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 			return OptimismToken.USDT
 		} else if (tokenAddress == ArbitrumToken.ETH) {
 			return OptimismToken.ETH
-		} else if (tokenAddress == ArbitrumToken.WBTC) {
-			return OptimismToken.WBTC
-		} else if (tokenAddress == ArbitrumToken.HOP) {
-			return OptimismToken.HOP
 		} else {
 			log.critical('Token not found', [])
 		}
@@ -116,8 +103,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		else if (tokenAddress == ArbitrumToken.DAI) return MainnetToken.DAI
 		else if (tokenAddress == ArbitrumToken.USDT) return MainnetToken.USDT
 		else if (tokenAddress == ArbitrumToken.ETH) return MainnetToken.ETH
-		else if (tokenAddress == ArbitrumToken.WBTC) return MainnetToken.WBTC
-		else if (tokenAddress == ArbitrumToken.HOP) return MainnetToken.HOP
 		else {
 			log.critical('Token not found', [])
 		}
@@ -133,10 +118,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 			return ArbitrumToken.USDT
 		} else if (bridgeAddress == ArbitrumBridge.ETH) {
 			return ArbitrumToken.ETH
-		} else if (bridgeAddress == ArbitrumBridge.WBTC) {
-			return ArbitrumToken.WBTC
-		} else if (bridgeAddress == ArbitrumBridge.HOP) {
-			return ArbitrumToken.HOP
 		} else {
 			log.critical('Token not found', [])
 			return ''
@@ -148,7 +129,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		else if (poolAddress == ArbitrumAmm.DAI) return ArbitrumToken.DAI
 		else if (poolAddress == ArbitrumAmm.USDT) return ArbitrumToken.USDT
 		else if (poolAddress == ArbitrumAmm.ETH) return ArbitrumToken.ETH
-		else if (poolAddress == ArbitrumAmm.WBTC) return ArbitrumToken.WBTC
 		else {
 			log.critical('Token not found', [])
 			return ''
@@ -160,8 +140,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		else if (bridgeAddress == ArbitrumBridge.DAI) return ArbitrumAmm.DAI
 		else if (bridgeAddress == ArbitrumBridge.USDT) return ArbitrumAmm.USDT
 		else if (bridgeAddress == ArbitrumBridge.ETH) return ArbitrumAmm.ETH
-		else if (bridgeAddress == ArbitrumBridge.WBTC) return ArbitrumAmm.WBTC
-		else if (bridgeAddress == ArbitrumBridge.HOP) return ArbitrumToken.HOP
 		else {
 			log.critical('Address not found', [])
 			return ''
@@ -177,8 +155,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 			return ['HOP-USDT', 'hUSDT/USDT']
 		} else if (poolAddress == ArbitrumAmm.ETH) {
 			return ['HOP-ETH', 'hETH/ETH']
-		} else if (poolAddress == ArbitrumAmm.WBTC) {
-			return ['HOP-WBTC', 'hWBTC/WBTC']
 		} else {
 			log.critical('Token not found', [])
 			return []
@@ -191,8 +167,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 			ArbitrumToken.DAI,
 			ArbitrumToken.USDT,
 			ArbitrumToken.ETH,
-			ArbitrumToken.WBTC,
-			ArbitrumToken.HOP,
 		]
 	}
 	getPoolsList(): string[] {
@@ -201,7 +175,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 			ArbitrumAmm.DAI,
 			ArbitrumAmm.USDT,
 			ArbitrumAmm.ETH,
-			ArbitrumAmm.WBTC,
 		]
 	}
 	getBridgeList(): string[] {
@@ -210,8 +183,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 			ArbitrumBridge.DAI,
 			ArbitrumBridge.USDT,
 			ArbitrumBridge.ETH,
-			ArbitrumBridge.WBTC,
-			ArbitrumBridge.HOP,
 		]
 	}
 	getArbitrumPoolAddressFromBridgeAddress(bridgeAddress: string): string {
@@ -234,16 +205,16 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		return []
 	}
 	getUsdcTokens(): string[] {
-		return [ArbitrumToken.USDC, ArbitrumRewardToken.USDC]
+		return [ArbitrumToken.USDC]
 	}
 	getDaiTokens(): string[] {
-		return [ArbitrumToken.DAI, ArbitrumRewardToken.DAI]
+		return [ArbitrumToken.DAI]
 	}
 	getUsdtTokens(): string[] {
-		return [ArbitrumToken.USDT, ArbitrumRewardToken.USDT]
+		return [ArbitrumToken.USDT]
 	}
 	getEthTokens(): string[] {
-		return [ArbitrumToken.ETH, ArbitrumRewardToken.ETH]
+		return [ArbitrumToken.ETH]
 	}
 	getDaiPools(): string[] {
 		return []
@@ -258,18 +229,6 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		return []
 	}
 	getSnxTokens(): string[] {
-		return []
-	}
-	getsUSDPools(): string[] {
-		return []
-	}
-	getsUSDTokens(): string[] {
-		return []
-	}
-	getWbtcPools(): string[] {
-		return []
-	}
-	getWbtcTokens(): string[] {
 		return []
 	}
 	getMaticPools(): string[] {

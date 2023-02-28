@@ -43,6 +43,7 @@ enum Network {
   VELAS
   THUNDERCORE
   HECO
+  XDAI
   XDAIARB
   ENERGYWEB
   HPB

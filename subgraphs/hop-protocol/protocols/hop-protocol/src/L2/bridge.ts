@@ -61,7 +61,12 @@ class TokenInit implements TokenInitializer {
 const conf = new BridgeConfig(
 	'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547',
 	'HOP-'
-		.concat(dataSource.network().toUpperCase().replace('-', '_'))
+		.concat(
+			dataSource
+				.network()
+				.toUpperCase()
+				.replace('-', '_')
+		)
 		.concat('-BRIDGE'),
 	'hop-'.concat(dataSource.network().replace('-', '_')).concat('-bridge'),
 	BridgePermissionType.PERMISSIONLESS,
@@ -70,7 +75,12 @@ const conf = new BridgeConfig(
 
 export function handleBonderAdded(event: BonderAdded): void {
 	if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
 		sdk.Accounts.loadAccount(event.params.newBonder)
 	}
 }
@@ -108,7 +118,12 @@ export function handleTransferFromL1Completed(
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
 
 		const acc = sdk.Accounts.loadAccount(event.transaction.from)
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
@@ -120,7 +135,10 @@ export function handleTransferFromL1Completed(
 
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
 			reverseChainIDs.get(
-				dataSource.network().toUpperCase().replace('-', '_')
+				dataSource
+					.network()
+					.toUpperCase()
+					.replace('-', '_')
 			)!,
 			Address.fromString(
 				NetworkConfigs.getMainnetCrossTokenFromTokenAddress(inputToken)
@@ -213,7 +231,12 @@ export function handleTransferSent(event: TransferSent): void {
 		const poolName = poolConfig[0]
 		const poolSymbol = poolConfig[1]
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
 
 		const acc = sdk.Accounts.loadAccount(event.params.recipient)
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))

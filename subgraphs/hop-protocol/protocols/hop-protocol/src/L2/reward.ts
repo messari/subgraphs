@@ -32,6 +32,12 @@ import {
 	BIGINT_TEN_TO_EIGHTEENTH,
 	RewardTokenType,
 } from '../../../../src/sdk/util/constants'
+import {
+	GNO_REWARDS,
+	HOP_REWARDS,
+	OP_REWARDS,
+	RewardTokens,
+} from '../../config/constants/constant'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -48,7 +54,12 @@ class Pricer implements TokenPricer {
 const conf = new BridgeConfig(
 	'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547',
 	'HOP-'
-		.concat(dataSource.network().toUpperCase().replace('-', '_'))
+		.concat(
+			dataSource
+				.network()
+				.toUpperCase()
+				.replace('-', '_')
+		)
 		.concat('-BRIDGE'),
 	'hop-'.concat(dataSource.network().replace('-', '_')).concat('-bridge'),
 	BridgePermissionType.PERMISSIONLESS,
@@ -69,56 +80,183 @@ export function handleRewardsPaid(event: RewardPaid): void {
 	if (
 		NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
 	) {
-		let amount = event.params.reward
+		if (GNO_REWARDS.includes(event.address.toHexString)) {
+			let amount = event.params.reward
 
-		const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
-			event.address.toHexString()
-		)
-		log.warning('RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}', [
-			event.address.toHexString(),
-			poolAddress,
-			amount.toString(),
-		])
-		const inputToken =
-			NetworkConfigs.getTokenAddressFromPoolAddress(poolAddress)
-
-		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
-		log.warning('RewardsPaid 1 --> poolAddress: {},', [poolAddress])
-
-		const poolName = poolConfig[1]
-		const poolSymbol = poolConfig[0]
-
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
-
-		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
-		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
-
-		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
-		}
-
-		const Reward = L2_Reward.bind(event.address)
-		const rewardRateCall = Reward.try_rewardRate()
-		if (!rewardRateCall.reverted) {
-			log.warning('RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}', [
-				event.transaction.hash.toHexString(),
-				rewardRateCall.value.toString(),
-				BIGINT_TEN_TO_EIGHTEENTH.toString(),
-			])
-			const rewardRate = rewardRateCall.value
-
-			const dailyEmission = BigInt.fromI32(86400).times(rewardRate)
-			pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
-			log.warning(
-				'RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}',
-				[
-					event.transaction.hash.toHexString(),
-					rewardRate.toString(),
-					dailyEmission.toString(),
-				]
+			const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
+				event.address.toHexString()
 			)
-		} else {
-			log.warning('Rewards rate call reverted', [])
+			log.warning(
+				'GNO RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}',
+				[event.address.toHexString(), poolAddress, amount.toString()]
+			)
+
+			const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
+			log.warning('GNO RewardsPaid 1 --> poolAddress: {},', [poolAddress])
+
+			const poolName = poolConfig[1]
+			const poolSymbol = poolConfig[0]
+
+			const sdk = SDK.initializeFromEvent(
+				conf,
+				new Pricer(),
+				new TokenInit(),
+				event
+			)
+
+			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+			const token = sdk.Tokens.getOrCreateToken(
+				Address.fromString(RewardTokens.GNO)
+			)
+
+			if (!pool.isInitialized) {
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
+
+			const Reward = L2_Reward.bind(event.address)
+			const rewardRateCall = Reward.try_rewardRate()
+			if (!rewardRateCall.reverted) {
+				log.warning(
+					'GNO RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}',
+					[
+						event.transaction.hash.toHexString(),
+						rewardRateCall.value.toString(),
+						BIGINT_TEN_TO_EIGHTEENTH.toString(),
+					]
+				)
+				const rewardRate = rewardRateCall.value
+
+				const dailyEmission = BigInt.fromI32(86400).times(rewardRate)
+				pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
+				log.warning(
+					'GNO RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}',
+					[
+						event.transaction.hash.toHexString(),
+						rewardRate.toString(),
+						dailyEmission.toString(),
+					]
+				)
+			} else {
+				log.warning('GNO Rewards rate call reverted', [])
+			}
+		} else if (OP_REWARDS.includes(event.address.toHexString)) {
+			let amount = event.params.reward
+
+			const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
+				event.address.toHexString()
+			)
+			log.warning(
+				'OP RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}',
+				[event.address.toHexString(), poolAddress, amount.toString()]
+			)
+
+			const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
+			log.warning('OP RewardsPaid 1 --> poolAddress: {},', [poolAddress])
+
+			const poolName = poolConfig[1]
+			const poolSymbol = poolConfig[0]
+
+			const sdk = SDK.initializeFromEvent(
+				conf,
+				new Pricer(),
+				new TokenInit(),
+				event
+			)
+
+			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+			const token = sdk.Tokens.getOrCreateToken(
+				Address.fromString(RewardTokens.OP)
+			)
+
+			if (!pool.isInitialized) {
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
+
+			const Reward = L2_Reward.bind(event.address)
+			const rewardRateCall = Reward.try_rewardRate()
+			if (!rewardRateCall.reverted) {
+				log.warning(
+					'OP RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}',
+					[
+						event.transaction.hash.toHexString(),
+						rewardRateCall.value.toString(),
+						BIGINT_TEN_TO_EIGHTEENTH.toString(),
+					]
+				)
+				const rewardRate = rewardRateCall.value
+
+				const dailyEmission = BigInt.fromI32(86400).times(rewardRate)
+				pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
+				log.warning(
+					'OP RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}',
+					[
+						event.transaction.hash.toHexString(),
+						rewardRate.toString(),
+						dailyEmission.toString(),
+					]
+				)
+			} else {
+				log.warning('OP Rewards rate call reverted', [])
+			}
+		} else if (HOP_REWARDS.includes(event.address.toHexString)) {
+			let amount = event.params.reward
+
+			const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
+				event.address.toHexString()
+			)
+			log.warning(
+				'HOP RewardsPaid --> emitter: {}, poolAddress: {}, amount: {}',
+				[event.address.toHexString(), poolAddress, amount.toString()]
+			)
+
+			const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
+			log.warning('RewardsPaid 1 --> poolAddress: {},', [poolAddress])
+
+			const poolName = poolConfig[1]
+			const poolSymbol = poolConfig[0]
+
+			const sdk = SDK.initializeFromEvent(
+				conf,
+				new Pricer(),
+				new TokenInit(),
+				event
+			)
+
+			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+			const token = sdk.Tokens.getOrCreateToken(
+				Address.fromString(RewardTokens.HOP)
+			)
+
+			if (!pool.isInitialized) {
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
+
+			const Reward = L2_Reward.bind(event.address)
+			const rewardRateCall = Reward.try_rewardRate()
+			if (!rewardRateCall.reverted) {
+				log.warning(
+					'HOP RewardsPaid 2 --> txHash: {}, rewardRate: {}, bigTen: {}',
+					[
+						event.transaction.hash.toHexString(),
+						rewardRateCall.value.toString(),
+						BIGINT_TEN_TO_EIGHTEENTH.toString(),
+					]
+				)
+				const rewardRate = rewardRateCall.value
+
+				const dailyEmission = BigInt.fromI32(86400).times(rewardRate)
+				pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
+				log.warning(
+					'HOP RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}',
+					[
+						event.transaction.hash.toHexString(),
+						rewardRate.toString(),
+						dailyEmission.toString(),
+					]
+				)
+			} else {
+				log.warning('HOP Rewards rate call reverted', [])
+			}
 		}
 	}
 }
@@ -137,25 +275,51 @@ export function handleStaked(event: Staked): void {
 			amount.toString(),
 		])
 
-		const inputToken =
-			NetworkConfigs.getTokenAddressFromPoolAddress(poolAddress)
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 		log.warning('Staked 1 --> poolAddress: {},', [poolAddress])
 
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
+		if (GNO_REWARDS.includes(event.address.toHexString)) {
+			const token = sdk.Tokens.getOrCreateToken(
+				Address.fromString(RewardTokens.GNO)
+			)
+			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
-		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
-		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
-		sdk.Accounts.loadAccount(event.params.user)
+			if (!pool.isInitialized) {
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+			}
+			pool.addStakedOutputTokenAmount(amount)
+		} else if (OP_REWARDS.includes(event.address.toHexString)) {
+			const token = sdk.Tokens.getOrCreateToken(
+				Address.fromString(RewardTokens.GNO)
+			)
+			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
-		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			if (!pool.isInitialized) {
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+			}
+			pool.addStakedOutputTokenAmount(amount)
+		} else if (HOP_REWARDS.includes(event.address.toHexString)) {
+			const token = sdk.Tokens.getOrCreateToken(
+				Address.fromString(RewardTokens.GNO)
+			)
+			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+
+			if (!pool.isInitialized) {
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+			}
+			pool.addStakedOutputTokenAmount(amount)
 		}
 
-		pool.addStakedOutputTokenAmount(amount)
+		sdk.Accounts.loadAccount(event.params.user)
 	}
 }
 
@@ -173,24 +337,50 @@ export function handleWithdrawn(event: Withdrawn): void {
 			poolAddress,
 			amount.toString(),
 		])
-		const inputToken =
-			NetworkConfigs.getTokenAddressFromPoolAddress(poolAddress)
+
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 		log.warning('UnStaked 1 --> poolAddress: {},', [poolAddress])
 
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
+		if (GNO_REWARDS.includes(event.address.toHexString)) {
+			const token = sdk.Tokens.getOrCreateToken(
+				Address.fromString(RewardTokens.GNO)
+			)
+			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
-		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
-		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
-		sdk.Accounts.loadAccount(event.params.user)
+			if (!pool.isInitialized) {
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+			}
+			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
+		} else if (OP_REWARDS.includes(event.address.toHexString)) {
+			const token = sdk.Tokens.getOrCreateToken(
+				Address.fromString(RewardTokens.GNO)
+			)
+			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
-		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			if (!pool.isInitialized) {
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+			}
+			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
+		} else if (HOP_REWARDS.includes(event.address.toHexString)) {
+			const token = sdk.Tokens.getOrCreateToken(
+				Address.fromString(RewardTokens.GNO)
+			)
+			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+
+			if (!pool.isInitialized) {
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+			}
+			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
 		}
-
-		pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
+		sdk.Accounts.loadAccount(event.params.user)
 	}
 }

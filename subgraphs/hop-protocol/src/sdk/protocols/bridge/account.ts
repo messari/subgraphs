@@ -449,7 +449,7 @@ export class Account {
 		if (this.account.depositCount == 0 && this.account.withdrawCount == 0) {
 			this.protocol.addLiquidityProvider()
 		}
-		this.protocol.addTransaction(TransactionType.LIQUIDITY_DEPOSIT)
+		// this.protocol.addTransaction(TransactionType.LIQUIDITY_DEPOSIT)
 
 		this.trackActivity(ActivityType.LIQUIDITY_PROVISIONING)
 		this.account.depositCount += 1
@@ -465,7 +465,7 @@ export class Account {
 			this.protocol.addLiquidityProvider()
 		}
 
-		this.protocol.addTransaction(TransactionType.LIQUIDITY_WITHDRAW)
+		// this.protocol.addTransaction(TransactionType.LIQUIDITY_WITHDRAW)
 
 		this.trackActivity(ActivityType.LIQUIDITY_PROVISIONING)
 		this.account.withdrawCount += 1

@@ -63,7 +63,12 @@ class TokenInit implements TokenInitializer {
 const conf = new BridgeConfig(
 	'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547',
 	'HOP-'
-		.concat(dataSource.network().toUpperCase().replace('-', '_'))
+		.concat(
+			dataSource
+				.network()
+				.toUpperCase()
+				.replace('-', '_')
+		)
 		.concat('-BRIDGE'),
 	'hop-'.concat(dataSource.network().replace('-', '_')).concat('-bridge'),
 	BridgePermissionType.PERMISSIONLESS,
@@ -74,7 +79,12 @@ export function handleBonderAdded(event: BonderAdded): void {
 	if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
 		log.warning('bridgeAddress: {}', [event.address.toHexString()])
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
 		sdk.Accounts.loadAccount(event.params.newBonder)
 	}
 }
@@ -112,7 +122,12 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 
 		log.warning('poolAddress4: {}, inputToken: {}', [poolAddress, inputToken])
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
 
 		log.warning('Receipient1: {}, inputToken: {}', [
 			event.params.recipient.toHexString(),
@@ -126,7 +141,6 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 		])
 
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
-		pool.addInputTokenBalance(event.params.amount)
 
 		log.warning('Receipient3: {}, inputToken: {}', [
 			event.params.recipient.toHexString(),
@@ -169,6 +183,9 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 			event.params.chainId.toString(),
 			inputToken,
 		])
+
+		pool.addInputTokenBalance(event.params.amount)
+
 		let receipt = event.receipt
 
 		if (receipt) {

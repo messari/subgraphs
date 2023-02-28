@@ -10,7 +10,6 @@ import {
 	XdaiToken,
 	PolygonToken,
 	PolygonAmm,
-	ZERO_ADDRESS,
 	OptimismAmm,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
@@ -27,18 +26,12 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			return ['MATIC', 'Matic', '18', MainnetBridge.MATIC]
 		} else if (this.getDaiTokens().includes(tokenAddress)) {
 			return ['DAI', 'DAI Stablecoin', '18', MainnetBridge.DAI]
-		} else if (this.getWbtcTokens().includes(tokenAddress)) {
-			return ['WBTC', 'Wrapped BTC', '18', MainnetBridge.WBTC]
 		} else if (this.getUsdtTokens().includes(tokenAddress)) {
 			return ['USDT', 'Tether USD', '6', MainnetBridge.USDT]
 		} else if (this.getSnxTokens().includes(tokenAddress)) {
 			return ['SNX', 'SNX', '18', MainnetBridge.SNX]
-		} else if (this.getsUSDTokens().includes(tokenAddress)) {
-			return ['sUSD', 'sUSD', '18', MainnetBridge.sUSD]
 		} else if (this.getEthTokens().includes(tokenAddress)) {
 			return ['ETH', 'Ethereum', '18', MainnetBridge.ETH]
-		} else if (tokenAddress == MainnetToken.HOP) {
-			return ['HOP', 'HOP Token', '18', MainnetBridge.HOP]
 		} else {
 			log.critical('Token details not found', [])
 			return []
@@ -52,18 +45,12 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			return ['HOP-MATIC', 'hMATIC/MATIC']
 		} else if (this.getDaiPools().includes(poolAddress)) {
 			return ['HOP-DAI', 'hDAI/DAI']
-		} else if (this.getWbtcPools().includes(poolAddress)) {
-			return ['HOP-WBTC', 'hWBTC/WBTC']
 		} else if (this.getUsdtPools().includes(poolAddress)) {
 			return ['HOP-USDT', 'hUSDT/USDT']
 		} else if (this.getSnxPools().includes(poolAddress)) {
 			return ['HOP-SNX', 'hSNX/SNX']
-		} else if (this.getsUSDPools().includes(poolAddress)) {
-			return ['HOP-sUSD', 'hsUSD/sUSD']
 		} else if (this.getEthPools().includes(poolAddress)) {
 			return ['HOP-ETH', 'hETH/ETH']
-		} else if (poolAddress == ZERO_ADDRESS) {
-			return ['HOP-POOL', 'HOP-POOL']
 		} else {
 			log.critical('Pool not found', [])
 			return []
@@ -82,11 +69,9 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (bridgeAddress == MainnetBridge.DAI) return MainnetToken.DAI
 		else if (bridgeAddress == MainnetBridge.USDT) return MainnetToken.USDT
 		else if (bridgeAddress == MainnetBridge.ETH) return MainnetToken.ETH
-		else if (bridgeAddress == MainnetBridge.WBTC) return MainnetToken.WBTC
 		else if (bridgeAddress == MainnetBridge.SNX) return MainnetToken.SNX
 		else if (bridgeAddress == MainnetBridge.sUSD) return MainnetToken.sUSD
 		else if (bridgeAddress == MainnetBridge.MATIC) return MainnetToken.MATIC
-		else if (bridgeAddress == MainnetBridge.HOP) return MainnetToken.HOP
 		else {
 			log.critical('Token not found', [])
 			return ''
@@ -98,8 +83,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (bridgeAddress == MainnetBridge.DAI) return ArbitrumAmm.DAI
 		else if (bridgeAddress == MainnetBridge.USDT) return ArbitrumAmm.USDT
 		else if (bridgeAddress == MainnetBridge.ETH) return ArbitrumAmm.ETH
-		else if (bridgeAddress == MainnetBridge.WBTC) return ArbitrumAmm.WBTC
-		else if (bridgeAddress == MainnetBridge.HOP) return ZERO_ADDRESS
 		else {
 			log.critical('Token not found', [])
 
@@ -112,8 +95,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (bridgeAddress == MainnetBridge.USDT) return PolygonAmm.USDT
 		else if (bridgeAddress == MainnetBridge.MATIC) return PolygonAmm.MATIC
 		else if (bridgeAddress == MainnetBridge.ETH) return PolygonAmm.ETH
-		else if (bridgeAddress == MainnetBridge.WBTC) return PolygonAmm.WBTC
-		else if (bridgeAddress == MainnetBridge.HOP) return ZERO_ADDRESS
 		else {
 			log.critical('Polygon Pool not found', [])
 
@@ -126,9 +107,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (bridgeAddress == MainnetBridge.DAI) return XdaiAmm.DAI
 		else if (bridgeAddress == MainnetBridge.USDT) return XdaiAmm.USDT
 		else if (bridgeAddress == MainnetBridge.ETH) return XdaiAmm.ETH
-		else if (bridgeAddress == MainnetBridge.WBTC) return XdaiAmm.WBTC
 		else if (bridgeAddress == MainnetBridge.MATIC) return XdaiAmm.MATIC
-		else if (bridgeAddress == MainnetBridge.HOP) return ZERO_ADDRESS
 		else {
 			log.critical('Xdai Pool not found', [])
 
@@ -141,10 +120,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (bridgeAddress == MainnetBridge.DAI) return OptimismAmm.DAI
 		else if (bridgeAddress == MainnetBridge.USDT) return OptimismAmm.USDT
 		else if (bridgeAddress == MainnetBridge.ETH) return OptimismAmm.ETH
-		else if (bridgeAddress == MainnetBridge.WBTC) return OptimismAmm.WBTC
 		else if (bridgeAddress == MainnetBridge.sUSD) return OptimismAmm.sUSD
 		else if (bridgeAddress == MainnetBridge.SNX) return OptimismAmm.SNX
-		else if (bridgeAddress == MainnetBridge.HOP) return ZERO_ADDRESS
 		else {
 			log.critical('Optimism Pool not found', [])
 
@@ -173,11 +150,9 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			MainnetToken.DAI,
 			MainnetToken.USDT,
 			MainnetToken.ETH,
-			MainnetToken.WBTC,
 			MainnetToken.MATIC,
 			MainnetToken.SNX,
 			MainnetToken.sUSD,
-			MainnetToken.HOP,
 		]
 	}
 
@@ -239,24 +214,7 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 	getSnxTokens(): string[] {
 		return [MainnetToken.SNX, OptimismToken.SNX]
 	}
-	getsUSDPools(): string[] {
-		return [OptimismAmm.sUSD]
-	}
-	getsUSDTokens(): string[] {
-		return [OptimismToken.sUSD, MainnetToken.sUSD]
-	}
-	getWbtcPools(): string[] {
-		return [OptimismAmm.WBTC, XdaiAmm.WBTC, PolygonAmm.WBTC, ArbitrumAmm.WBTC]
-	}
-	getWbtcTokens(): string[] {
-		return [
-			PolygonToken.WBTC,
-			XdaiToken.WBTC,
-			ArbitrumToken.WBTC,
-			OptimismToken.WBTC,
-			MainnetToken.WBTC,
-		]
-	}
+
 	getMaticPools(): string[] {
 		return [PolygonAmm.MATIC, XdaiAmm.MATIC]
 	}
@@ -270,11 +228,9 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			MainnetBridge.DAI,
 			MainnetBridge.USDT,
 			MainnetBridge.ETH,
-			MainnetBridge.WBTC,
 			MainnetBridge.MATIC,
 			MainnetBridge.SNX,
 			MainnetBridge.sUSD,
-			MainnetBridge.HOP,
 		]
 	}
 
@@ -314,8 +270,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (tokenAddress == MainnetToken.DAI) return ArbitrumToken.DAI
 		else if (tokenAddress == MainnetToken.USDT) return ArbitrumToken.USDT
 		else if (tokenAddress == MainnetToken.ETH) return ArbitrumToken.ETH
-		else if (tokenAddress == MainnetToken.WBTC) return ArbitrumToken.WBTC
-		else if (tokenAddress == MainnetToken.HOP) return ArbitrumToken.HOP
 		else {
 			log.critical('Arb Crosstoken not found', [])
 			return ''
@@ -327,8 +281,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (tokenAddress == MainnetToken.USDT) return PolygonToken.USDT
 		else if (tokenAddress == MainnetToken.ETH) return PolygonToken.ETH
 		else if (tokenAddress == MainnetToken.MATIC) return PolygonToken.MATIC
-		else if (tokenAddress == MainnetToken.WBTC) return PolygonToken.WBTC
-		else if (tokenAddress == MainnetToken.HOP) return PolygonToken.HOP
 		else {
 			log.critical('Polygon Crosstoken not found', [])
 			return ''
@@ -339,10 +291,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (tokenAddress == MainnetToken.DAI) return OptimismToken.DAI
 		else if (tokenAddress == MainnetToken.USDT) return OptimismToken.USDT
 		else if (tokenAddress == MainnetToken.ETH) return OptimismToken.ETH
-		else if (tokenAddress == MainnetToken.WBTC) return OptimismToken.WBTC
 		else if (tokenAddress == MainnetToken.sUSD) return OptimismToken.sUSD
 		else if (tokenAddress == MainnetToken.SNX) return OptimismToken.SNX
-		else if (tokenAddress == MainnetToken.HOP) return OptimismToken.HOP
 		else {
 			log.critical('Optimism Crosstoken not found', [])
 			return ''
@@ -353,8 +303,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (tokenAddress == MainnetToken.DAI) return XdaiToken.DAI
 		else if (tokenAddress == MainnetToken.USDT) return XdaiToken.USDT
 		else if (tokenAddress == MainnetToken.ETH) return XdaiToken.ETH
-		else if (tokenAddress == MainnetToken.WBTC) return XdaiToken.WBTC
-		else if (tokenAddress == MainnetToken.HOP) return XdaiToken.HOP
 		else if (tokenAddress == MainnetToken.MATIC) return XdaiToken.MATIC
 		else {
 			log.critical('Xdai Crosstoken not found', [])

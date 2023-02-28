@@ -8,7 +8,6 @@ import {
 	XdaiBridge,
 	XdaiToken,
 	PolygonToken,
-	ZERO_ADDRESS,
 	XdaiRewardToken,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
@@ -23,7 +22,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		else if (tokenAddress == XdaiToken.DAI) return XdaiAmm.DAI
 		else if (tokenAddress == XdaiToken.USDT) return XdaiAmm.USDT
 		else if (tokenAddress == XdaiToken.ETH) return XdaiAmm.ETH
-		else if (tokenAddress == XdaiToken.WBTC) return XdaiAmm.WBTC
 		else if (tokenAddress == XdaiToken.MATIC) return XdaiAmm.MATIC
 		else {
 			log.critical('Token not found', [])
@@ -39,12 +37,8 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			return ['USDT', 'Tether USD', '6', XdaiBridge.USDT]
 		} else if (this.getEthTokens().includes(tokenAddress)) {
 			return ['ETH', 'ETH', '18', XdaiBridge.ETH]
-		} else if (tokenAddress == XdaiToken.WBTC) {
-			return ['WBTC', 'Wrapped BTC', '18', XdaiBridge.WBTC]
 		} else if (tokenAddress == XdaiToken.MATIC) {
 			return ['MATIC', 'MATIC', '18', XdaiBridge.MATIC]
-		} else if (tokenAddress == XdaiToken.HOP) {
-			return ['HOP', 'HOP', '18', ZERO_ADDRESS]
 		} else {
 			log.critical('Token not found', [])
 			return []
@@ -77,10 +71,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			return ArbitrumToken.USDT
 		} else if (tokenAddress == XdaiToken.ETH) {
 			return ArbitrumToken.ETH
-		} else if (tokenAddress == XdaiToken.WBTC) {
-			return ArbitrumToken.WBTC
-		} else if (tokenAddress == XdaiToken.HOP) {
-			return ArbitrumToken.HOP
 		} else {
 			log.critical('Token not found', [])
 		}
@@ -98,10 +88,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			return PolygonToken.MATIC
 		} else if (tokenAddress == XdaiToken.ETH) {
 			return PolygonToken.ETH
-		} else if (tokenAddress == XdaiToken.WBTC) {
-			return PolygonToken.WBTC
-		} else if (tokenAddress == XdaiToken.HOP) {
-			return PolygonToken.HOP
 		} else {
 			log.critical('Token not found', [])
 		}
@@ -117,10 +103,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			return OptimismToken.USDT
 		} else if (tokenAddress == XdaiToken.ETH) {
 			return OptimismToken.ETH
-		} else if (tokenAddress == XdaiToken.WBTC) {
-			return OptimismToken.WBTC
-		} else if (tokenAddress == XdaiToken.HOP) {
-			return OptimismToken.HOP
 		} else {
 			log.critical('Token not found', [])
 		}
@@ -133,8 +115,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		else if (tokenAddress == XdaiToken.USDT) return MainnetToken.USDT
 		else if (tokenAddress == XdaiToken.MATIC) return MainnetToken.MATIC
 		else if (tokenAddress == XdaiToken.ETH) return MainnetToken.ETH
-		else if (tokenAddress == XdaiToken.WBTC) return MainnetToken.WBTC
-		else if (tokenAddress == XdaiToken.HOP) return MainnetToken.HOP
 		else {
 			log.critical('Token not found', [])
 		}
@@ -147,8 +127,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		else if (bridgeAddress == XdaiBridge.USDT) return XdaiToken.USDT
 		else if (bridgeAddress == XdaiBridge.ETH) return XdaiToken.ETH
 		else if (bridgeAddress == XdaiBridge.MATIC) return XdaiToken.MATIC
-		else if (bridgeAddress == XdaiBridge.WBTC) return XdaiToken.WBTC
-		else if (bridgeAddress == XdaiBridge.HOP) return XdaiToken.HOP
 		else {
 			log.critical('Token not found', [])
 			return ''
@@ -161,7 +139,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		else if (poolAddress == XdaiAmm.USDT) return XdaiToken.USDT
 		else if (poolAddress == XdaiAmm.ETH) return XdaiToken.ETH
 		else if (poolAddress == XdaiAmm.MATIC) return XdaiToken.MATIC
-		else if (poolAddress == XdaiAmm.WBTC) return XdaiToken.WBTC
 		else {
 			log.critical('Token not found', [])
 			return ''
@@ -174,8 +151,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		else if (bridgeAddress == XdaiBridge.USDT) return XdaiAmm.USDT
 		else if (bridgeAddress == XdaiBridge.ETH) return XdaiAmm.ETH
 		else if (bridgeAddress == XdaiBridge.MATIC) return XdaiAmm.MATIC
-		else if (bridgeAddress == XdaiBridge.WBTC) return XdaiAmm.WBTC
-		else if (bridgeAddress == XdaiBridge.HOP) return ZERO_ADDRESS
 		else {
 			log.critical('Bridge Address not found', [])
 			return ''
@@ -188,8 +163,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		else if (poolAddress == XdaiAmm.USDT) return ['HOP-USDT', 'hUSDT/USDT']
 		else if (poolAddress == XdaiAmm.ETH) return ['HOP-ETH', 'hETH/ETH']
 		else if (poolAddress == XdaiAmm.MATIC) return ['HOP-MATIC', 'hMATIC/MATIC']
-		else if (poolAddress == XdaiAmm.WBTC) return ['HOP-WBTC', 'hWBTC/WBTC']
-		else if (poolAddress == ZERO_ADDRESS) return ['HOP', 'HOP']
 		else {
 			log.critical('Pool not found', [])
 			return []
@@ -218,20 +191,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			XdaiToken.USDT,
 			XdaiToken.ETH,
 			XdaiToken.MATIC,
-			XdaiToken.WBTC,
-			XdaiToken.HOP,
 		]
 	}
 	getPoolsList(): string[] {
-		return [
-			XdaiAmm.USDC,
-			XdaiAmm.DAI,
-			XdaiAmm.USDT,
-			XdaiAmm.MATIC,
-			XdaiAmm.ETH,
-			XdaiAmm.WBTC,
-			ZERO_ADDRESS,
-		]
+		return [XdaiAmm.USDC, XdaiAmm.DAI, XdaiAmm.USDT, XdaiAmm.MATIC, XdaiAmm.ETH]
 	}
 	getBridgeList(): string[] {
 		return [
@@ -240,8 +203,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			XdaiBridge.MATIC,
 			XdaiBridge.USDT,
 			XdaiBridge.ETH,
-			XdaiBridge.WBTC,
-			XdaiBridge.HOP,
 		]
 	}
 
@@ -282,25 +243,25 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		return []
 	}
 	getUsdcTokens(): string[] {
-		return [XdaiRewardToken.USDC_A, XdaiRewardToken.USDC_B, XdaiToken.USDC]
+		return [XdaiToken.USDC]
 	}
 	getDaiPools(): string[] {
 		return []
 	}
 	getDaiTokens(): string[] {
-		return [XdaiRewardToken.DAI_A, XdaiRewardToken.DAI_B, XdaiToken.DAI]
+		return [XdaiToken.DAI]
 	}
 	getUsdtPools(): string[] {
 		return []
 	}
 	getUsdtTokens(): string[] {
-		return [XdaiRewardToken.USDT_A, XdaiRewardToken.USDT_B, XdaiToken.USDT]
+		return [XdaiToken.USDT]
 	}
 	getEthPools(): string[] {
 		return []
 	}
 	getEthTokens(): string[] {
-		return [XdaiRewardToken.ETH_A, XdaiRewardToken.ETH_B, XdaiToken.ETH]
+		return [XdaiToken.ETH]
 	}
 	getSnxPools(): string[] {
 		return []
@@ -308,18 +269,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 	getSnxTokens(): string[] {
 		return []
 	}
-	getsUSDPools(): string[] {
-		return []
-	}
-	getsUSDTokens(): string[] {
-		return []
-	}
-	getWbtcPools(): string[] {
-		return []
-	}
-	getWbtcTokens(): string[] {
-		return []
-	}
+
 	getMaticPools(): string[] {
 		return []
 	}

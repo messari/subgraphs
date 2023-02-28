@@ -3,7 +3,7 @@
   "isMainnet": false,
   "subgraphName": "hop-optimism",
   "deployment": "HOP_PROTOCOL_OPTIMISM",
-  "graftEnabled": true,
+  "graftEnabled": false,
   "subgraphId": "QmU7M5GwtQg7fEVWf6VUJGPEKX1v6RM4cTy3HBuTNvN5pb",
   "graftStartBlock": 30117251,
   "tokens": [

@@ -3,7 +3,7 @@
   "isMainnet": false,
   "subgraphName": "hop-xdai",
   "deployment": "HOP_PROTOCOL_XDAI",
-  "graftEnabled": true,
+  "graftEnabled": false,
   "subgraphId": "QmPnBixhYpzw2yAaTWjJmwq2ADUNC9heuZVRDxnuB7AiXb",
   "graftStartBlock": 19573939,
   "tokens": [
@@ -94,12 +94,6 @@
       "token": "ETH",
       "address": "0x4014DC015641c08788F15bD6eB20dA4c47D936d8",
       "startBlock": 18359665
-    },
-    {
-      "dataSourceName": "HopL2AmmWBTC",
-      "token": "WBTC",
-      "address": "0xb07c6505e1E41112494123e40330c5Ac09817CFB",
-      "startBlock": 18723027
     }
   ],
   "bridges": [
@@ -132,12 +126,6 @@
       "token": "ETH",
       "address": "0xD8926c12C0B2E5Cd40cFdA49eCaFf40252Af491B",
       "startBlock": 18359713
-    },
-    {
-      "dataSourceName": "HopL2BridgeWBTC",
-      "token": "WBTC",
-      "address": "0x07C592684Ee9f71D58853F9387579332d471b6Ca",
-      "startBlock": 18723032
     },
     {
       "dataSourceName": "HopL2BridgeHOP",
@@ -188,12 +176,6 @@
       "token": "ETH",
       "address": "0xC61bA16e864eFbd06a9fe30Aab39D18B8F63710a",
       "startBlock": 20383666
-    },
-    {
-      "dataSourceName": "HopL2RewardsETH_B",
-      "token": "ETH",
-      "address": "0x712F0cf37Bdb8299D0666727F73a5cAbA7c1c24c",
-      "startBlock": 24646599
     }
   ]
 }

@@ -48,7 +48,12 @@ class TokenInit implements TokenInitializer {
 const conf = new BridgeConfig(
 	'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547',
 	'HOP-'
-		.concat(dataSource.network().toUpperCase().replace('-', '_'))
+		.concat(
+			dataSource
+				.network()
+				.toUpperCase()
+				.replace('-', '_')
+		)
 		.concat('-BRIDGE'),
 	'hop-'.concat(dataSource.network().replace('-', '_')).concat('-bridge'),
 	BridgePermissionType.PERMISSIONLESS,
@@ -75,7 +80,12 @@ export function handleTransfer(event: Transfer): void {
 			]
 		)
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
 
 		sdk.Tokens.getOrCreateToken(event.address)
 

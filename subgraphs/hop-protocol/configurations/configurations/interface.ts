@@ -32,10 +32,6 @@ export interface Configurations {
 	getEthTokens(): string[]
 	getSnxPools(): string[]
 	getSnxTokens(): string[]
-	getsUSDPools(): string[]
-	getsUSDTokens(): string[]
-	getWbtcPools(): string[]
-	getWbtcTokens(): string[]
 	getMaticPools(): string[]
 	getMaticTokens(): string[]
 }

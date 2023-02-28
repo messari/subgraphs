@@ -3,7 +3,7 @@
   "isMainnet": false,
   "subgraphName": "hop-polygon",
   "deployment": "HOP_PROTOCOL_POLYGON",
-  "graftEnabled": true,
+  "graftEnabled": false,
   "subgraphId": "Qmbk8xpfKcwG7itoCr2aJ3xhYYDLjftaiEQPdAvXNoThzN",
   "graftStartBlock": 16761065,
   "tokens": [
@@ -48,14 +48,6 @@
       "startBlock": 19706859
     },
     {
-      "dataSourceName": "TokenWBTC",
-      "token": "WBTC",
-      "tokenName": "Wrapped BTC",
-      "tokenDecimals": 18,
-      "address": "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
-      "startBlock": 20536705
-    },
-    {
       "dataSourceName": "TokenHOP",
       "token": "HOP",
       "tokenName": "Hop",
@@ -94,12 +86,6 @@
       "token": "ETH",
       "address": "0x266e2dc3C4c59E42AA07afeE5B09E964cFFe6778",
       "startBlock": 19706846
-    },
-    {
-      "dataSourceName": "HopL2AmmWBTC",
-      "token": "WBTC",
-      "address": "0x4e9840f3C1ff368a10731D15c11516b9Fe7E1898",
-      "startBlock": 20536692
     }
   ],
   "bridges": [
@@ -132,74 +118,32 @@
       "token": "ETH",
       "address": "0xb98454270065A31D71Bf635F6F7Ee6A518dFb849",
       "startBlock": 19706859
-    },
-    {
-      "dataSourceName": "HopL2BridgeWBTC",
-      "token": "WBTC",
-      "address": "0x91Bd9Ccec64fC22475323a0E55d58F7786587905",
-      "startBlock": 20536705
-    },
-    {
-      "dataSourceName": "HopL2BridgeHOP",
-      "token": "HOP",
-      "address": "0x58c61AeE5eD3D748a1467085ED2650B697A66234",
-      "startBlock": 33447834
     }
   ],
   "rewards": [
     {
-      "dataSourceName": "HopL2Rewards",
-      "token": "USDC",
-      "address": "0x2C2Ab81Cf235e86374468b387e241DF22459A265",
-      "startBlock": 16761065
-    },
-    {
-      "dataSourceName": "HopL2RewardsUSDC_B",
+      "dataSourceName": "HopL2RewardsUSDC",
       "token": "USDC",
       "address": "0x7811737716942967Ae6567B26a5051cC72af550E",
       "startBlock": 34505750
     },
     {
-      "dataSourceName": "HopL2RewardsUSDT_A",
-      "token": "USDT",
-      "address": "0x07932e9A5AB8800922B2688FB1FA0DAAd8341772",
-      "startBlock": 17540994
-    },
-    {
-      "dataSourceName": "HopL2RewardsUSDT_B",
+      "dataSourceName": "HopL2RewardsUSDT",
       "token": "USDT",
       "address": "0x297E5079DF8173Ae1696899d3eACD708f0aF82Ce",
       "startBlock": 34505757
     },
     {
-      "dataSourceName": "HopL2RewardsDAI_A",
-      "token": "DAI",
-      "address": "0x4Aeb0B5B1F3e74314A7Fa934dB090af603E8289b",
-      "startBlock": 27094057
-    },
-    {
-      "dataSourceName": "HopL2RewardsDAI_B",
+      "dataSourceName": "HopL2RewardsDAI",
       "token": "DAI",
       "address": "0xd6dC6F69f81537Fe9DEcc18152b7005B45Dc2eE7",
       "startBlock": 34505754
     },
     {
-      "dataSourceName": "HopL2RewardsETH_A",
-      "token": "ETH",
-      "address": "0x7bCeDA1Db99D64F25eFA279BB11CE48E15Fda427",
-      "startBlock": 20261272
-    },
-    {
-      "dataSourceName": "HopL2RewardsETH_B",
+      "dataSourceName": "HopL2RewardsETH",
       "token": "ETH",
       "address": "0xAA7b3a4A084e6461D486E53a03CF45004F0963b7",
       "startBlock": 34505746
-    },
-    {
-      "dataSourceName": "HopL2RewardsMATIC",
-      "token": "MATIC",
-      "address": "0x7dEEbCaD1416110022F444B03aEb1D20eB4Ea53f",
-      "startBlock": 17840131
     }
   ]
 }

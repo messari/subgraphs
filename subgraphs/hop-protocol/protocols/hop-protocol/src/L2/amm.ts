@@ -46,7 +46,12 @@ class Pricer implements TokenPricer {
 const conf = new BridgeConfig(
 	'0x03D7f750777eC48d39D080b020D83Eb2CB4e3547',
 	'HOP-'
-		.concat(dataSource.network().toUpperCase().replace('-', '_'))
+		.concat(
+			dataSource
+				.network()
+				.toUpperCase()
+				.replace('-', '_')
+		)
 		.concat('-BRIDGE'),
 	'hop-'.concat(dataSource.network().replace('-', '_')).concat('-bridge'),
 	BridgePermissionType.PERMISSIONLESS,
@@ -68,7 +73,9 @@ export function handleTokenSwap(event: TokenSwap): void {
 		const amount = event.params.tokensSold
 
 		const bp = BigInt.fromString('4').div(BigInt.fromString('10000'))
+		log.warning('FEES 1- bp: {}', [bp.toString()])
 		const fees = amount.times(bp)
+		log.warning('FEES 2- fees: {}', [fees.toString()])
 
 		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
 			event.address.toHexString()
@@ -80,7 +87,12 @@ export function handleTokenSwap(event: TokenSwap): void {
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
 
 		const pool = sdk.Pools.loadPool<string>(event.address)
 		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
@@ -112,7 +124,12 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
 
 		const pool = sdk.Pools.loadPool<string>(event.address)
 		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
@@ -123,7 +140,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 		}
 
 		pool.setOutputTokenSupply(event.params.lpTokenSupply)
-		pool.addRevenueNative(BigInt.zero(), event.params.fees[0])
+		// pool.addRevenueNative(BigInt.zero(), event.params.fees[0])
 		acc.liquidityDeposit(pool, liquidity, false)
 
 		pool.setInputTokenBalance(
@@ -185,7 +202,12 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
 
 		const pool = sdk.Pools.loadPool<string>(event.address)
 		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
@@ -262,7 +284,12 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 		const poolName = poolConfig[0]
 		const poolSymbol = poolConfig[1]
 
-		const sdk = new SDK(conf, new Pricer(), new TokenInit(), event)
+		const sdk = SDK.initializeFromEvent(
+			conf,
+			new Pricer(),
+			new TokenInit(),
+			event
+		)
 
 		const pool = sdk.Pools.loadPool<string>(event.address)
 		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
