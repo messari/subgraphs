@@ -44,8 +44,12 @@ export function handleMinted(event: Minted): void {
 
   // Update vault token supply
   let vault = getOrCreateVault(event.address, event.block);
-  vault.inputTokenBalance += event.params.mintAmount;
-  vault.outputTokenSupply += event.params.mintAmount;
+  vault.inputTokenBalance = vault.inputTokenBalance.plus(
+    event.params.mintAmount
+  );
+  vault.outputTokenSupply = vault.outputTokenSupply!.plus(
+    event.params.mintAmount
+  );
   vault.save();
 
   updateUsageMetrics(event.params.receiver, UsageType.DEPOSIT, event); // minted shares are attributed to receiver
@@ -59,8 +63,12 @@ export function handleBurned(event: Burned): void {
 
   // Update vault token supply
   let vault = getOrCreateVault(event.address, event.block);
-  vault.inputTokenBalance -= event.params.burnAmount;
-  vault.outputTokenSupply -= event.params.burnAmount;
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(
+    event.params.burnAmount
+  );
+  vault.outputTokenSupply = vault.outputTokenSupply!.minus(
+    event.params.burnAmount
+  );
   vault.save();
 
   updateUsageMetrics(event.transaction.from, UsageType.WITHDRAW, event); // Burned shares are attributed to msg.sender

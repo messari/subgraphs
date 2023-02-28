@@ -16,8 +16,8 @@ import { getOrCreateVault, updateVaultSnapshots } from "../helpers/vaults";
 import { _GaugeRewardToken } from "../../../generated/schema";
 
 export function handleAddGauge(event: AddGauge): void {
-  const gaugeAddress = event.params.gauge
-  const vaultAddress = event.params.vault
+  const gaugeAddress = event.params.gauge;
+  const vaultAddress = event.params.vault;
   let gauge = getOrCreateLiquidityGauge(gaugeAddress);
   gauge.vault = vaultAddress.toHex();
   gauge.save();
@@ -40,7 +40,9 @@ export function handleDeposit(event: Deposit): void {
   let gauge = getOrCreateLiquidityGauge(event.address);
   const vaultAddress = Address.fromString(gauge.vault);
   let vault = getOrCreateVault(vaultAddress, event.block);
-  vault.stakedOutputTokenAmount += event.params.value;
+  vault.stakedOutputTokenAmount = vault.stakedOutputTokenAmount!.plus(
+    event.params.value
+  );
   vault.save();
 
   updateVaultSnapshots(vaultAddress, event.block);
@@ -51,7 +53,9 @@ export function handleWithdraw(event: Withdraw): void {
   let gauge = getOrCreateLiquidityGauge(event.address);
   const vaultAddress = Address.fromString(gauge.vault);
   let vault = getOrCreateVault(vaultAddress, event.block);
-  vault.stakedOutputTokenAmount -= event.params.value;
+  vault.stakedOutputTokenAmount = vault.stakedOutputTokenAmount!.minus(
+    event.params.value
+  );
   vault.save();
 
   updateVaultSnapshots(vaultAddress, event.block);
@@ -63,7 +67,7 @@ export function handleRewardDataUpdate(event: RewardDataUpdate): void {
   const rewardTokenAddress = event.params._token;
 
   let gauge = getOrCreateLiquidityGauge(gaugeAddress);
-  const vaultAddress = Address.fromString(gauge.vault)
+  const vaultAddress = Address.fromString(gauge.vault);
 
   updateRewardToken(
     gaugeAddress,
