@@ -15,6 +15,8 @@ import {
   Deposit,
   Withdraw,
   Swap as SwapEvent,
+  Position,
+  PositionSnapshot,
   Token,
   Position,
   PositionSnapshot,
