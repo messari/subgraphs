@@ -21,6 +21,15 @@ import {
   DeployTokenCall,
   Executed,
 } from "../generated/AxelarGateway/AxelarGateway";
+import {
+  GasPaidForContractCall,
+  GasPaidForContractCallWithToken,
+  NativeGasPaidForContractCall,
+  NativeGasPaidForContractCallWithToken,
+  GasAdded,
+  NativeGasAdded,
+  RefundCall,
+} from "../generated/AxelarGasService/AxelarGasService";
 import { SDK } from "./sdk/protocols/bridge";
 import { CustomEventType } from "./sdk/util/events";
 import { TokenPricer } from "./sdk/protocols/config";
@@ -45,10 +54,10 @@ import {
   getNetworkSpecificConstant,
   Network,
   TokenType,
+  BIGINT_MINUS_ONE,
 } from "./sdk/util/constants";
 import { Pool } from "./sdk/protocols/bridge/pool";
 import { isValidEVMAddress } from "./sdk/util/strings";
-import { BridgeType } from "../../multichain/src/common/constants";
 
 // empty handler for prices library
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
@@ -397,7 +406,8 @@ export function handleMintToken(call: MintTokenCall): void {
 
   //const tokenType = tokenSymbol.tokenType!;
   const receiver = account;
-  const poolId = call.to;
+  const poolId = call.to.concat(Address.fromString(tokenAddress!));
+  // No info of source chain or src account for mintToken call/event
   const srcChainId = networkToChainID(Network.UNKNOWN_NETWORK);
   const srcPoolId = Address.zero(); // Not available
   const srcAccount = account; //Not available, assumed to be the same as receiver
@@ -551,6 +561,47 @@ export function handleBurnTokenCall(call: BurnTokenCall): void {
     sender,
     amount,
     command,
+    null,
+    call
+  );
+}
+
+export function handleGasPaidForContractCall(
+  event: GasPaidForContractCall
+): void {
+  _handleFees(event.params.gasToken, event.params.gasFeeAmount, event);
+}
+
+export function handleGasPaidForContractCallWithToken(
+  event: GasPaidForContractCallWithToken
+): void {
+  _handleFees(event.params.gasToken, event.params.gasFeeAmount, event);
+}
+
+export function handleNativeGasPaidForContractCall(
+  event: NativeGasPaidForContractCall
+): void {
+  _handleFees(Address.zero(), event.params.gasFeeAmount, event);
+}
+
+export function handleNativeGasPaidForContractCallWithToken(
+  event: NativeGasPaidForContractCallWithToken
+): void {
+  _handleFees(Address.zero(), event.params.gasFeeAmount, event);
+}
+
+export function handleGasAdded(event: GasAdded): void {
+  _handleFees(event.params.gasToken, event.params.gasFeeAmount, event);
+}
+
+export function handleNativeGasAdded(event: NativeGasAdded): void {
+  _handleFees(Address.zero(), event.params.gasFeeAmount, event);
+}
+
+export function handleFeeRefund(call: RefundCall): void {
+  _handleFees(
+    call.inputs.token,
+    call.inputs.amount.times(BIGINT_MINUS_ONE),
     null,
     call
   );
@@ -721,6 +772,19 @@ function _handleBurnToken(
 
   command.isProcessed = true;
   command.save();
+}
+
+function _handleFees(
+  tokenAddress: Address,
+  feeAmount: BigInt,
+  event: ethereum.Event | null,
+  call: ethereum.Call | null = null
+): void {
+  const sdk = _getSDK(event)!;
+  const poolAddress = getNetworkSpecificConstant().getPoolAddress();
+  const poolId = poolAddress.concat(tokenAddress);
+  const pool = sdk.Pools.loadPool(poolId);
+  pool.addRevenueNative(feeAmount, BIGINT_ZERO);
 }
 
 export function bytesToUnsignedBigInt(
