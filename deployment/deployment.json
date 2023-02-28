@@ -7527,7 +7527,7 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7549,7 +7549,7 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7571,7 +7571,7 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7593,7 +7593,7 @@
         "network": "gnosis",
         "status": "prod",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7615,7 +7615,7 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
