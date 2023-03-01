@@ -581,13 +581,21 @@ export function handleGasPaidForContractCallWithToken(
 export function handleNativeGasPaidForContractCall(
   event: NativeGasPaidForContractCall
 ): void {
-  _handleFees(Address.zero(), event.params.gasFeeAmount, event);
+  _handleFees(
+    getNetworkSpecificConstant().gasFeeToken,
+    event.params.gasFeeAmount,
+    event
+  );
 }
 
 export function handleNativeGasPaidForContractCallWithToken(
   event: NativeGasPaidForContractCallWithToken
 ): void {
-  _handleFees(Address.zero(), event.params.gasFeeAmount, event);
+  _handleFees(
+    getNetworkSpecificConstant().gasFeeToken,
+    event.params.gasFeeAmount,
+    event
+  );
 }
 
 export function handleGasAdded(event: GasAdded): void {
@@ -595,12 +603,21 @@ export function handleGasAdded(event: GasAdded): void {
 }
 
 export function handleNativeGasAdded(event: NativeGasAdded): void {
-  _handleFees(Address.zero(), event.params.gasFeeAmount, event);
+  _handleFees(
+    getNetworkSpecificConstant().gasFeeToken,
+    event.params.gasFeeAmount,
+    event
+  );
 }
 
 export function handleFeeRefund(call: RefundCall): void {
+  let tokenAddress = call.inputs.token;
+  if (tokenAddress.equals(Address.zero())) {
+    tokenAddress = getNetworkSpecificConstant().gasFeeToken;
+  }
+
   _handleFees(
-    call.inputs.token,
+    tokenAddress,
     call.inputs.amount.times(BIGINT_MINUS_ONE),
     null,
     call
@@ -780,10 +797,16 @@ function _handleFees(
   event: ethereum.Event | null,
   call: ethereum.Call | null = null
 ): void {
-  const sdk = _getSDK(event)!;
+  const sdk = _getSDK(event, call)!;
   const poolAddress = getNetworkSpecificConstant().getPoolAddress();
   const poolId = poolAddress.concat(tokenAddress);
-  const pool = sdk.Pools.loadPool(poolId);
+  const inputToken = sdk.Tokens.getOrCreateToken(tokenAddress);
+  const pool = sdk.Pools.loadPool(
+    poolId,
+    onCreatePool,
+    BridgePoolType.BURN_MINT,
+    inputToken.id.toHexString()
+  );
   pool.addRevenueNative(feeAmount, BIGINT_ZERO);
 }
 
