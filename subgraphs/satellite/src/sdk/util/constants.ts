@@ -245,18 +245,12 @@ export class NetworkSpecificConstant {
     public readonly poolAddress: Address
   ) {}
 
-  /*
-  getProtocolId(): Bytes {
-    return this.protocolId;
-  }
-  */
-
   getPoolAddress(): Address {
     return this.poolAddress;
   }
 }
 
-// https://cbridge-docs.celer.network/reference/contract-addresses
+// https://docs.axelar.dev/dev/build/contract-addresses/mainnet
 export function getNetworkSpecificConstant(
   chainId: BigInt | null = null
 ): NetworkSpecificConstant {
@@ -270,170 +264,56 @@ export function getNetworkSpecificConstant(
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
       chainId,
-      Address.fromString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"),
-      Address.fromString("0x5427fefa711eff984124bfbb1ab6fbf5e3da1820")
-    );
-  } else if (equalsIgnoreCase(network, Network.ARB_NOVA)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xb3833ecd19d4ff964fa7bc3f8ac070ad5e360e56")
+      Address.fromString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"), //WETH
+      Address.fromString("0x4f4495243837681061c4743b74b3eedf548d56a5")
     );
   } else if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
     return new NetworkSpecificConstant(
       chainId,
-      Address.zero(),
-      Address.fromString("0xbdd2739ae69a054895be33a22b2d2ed71a1de778")
-    );
-  } else if (equalsIgnoreCase(network, Network.ASTAR)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0x3b53d2c7b44d40be05fa5e2309ffeb6eb2492d88")
-    );
-  } else if (equalsIgnoreCase(network, Network.AURORA)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xbdd2739ae69a054895be33a22b2d2ed71a1de778")
+      Address.fromString("0x82af49447d8a07e3bd95bd0d56f35241523fbab1"), //WETH
+      Address.fromString("0xe432150cce91c13a887f7d836923d5597add8e31")
     );
   } else if (equalsIgnoreCase(network, Network.AVALANCHE)) {
     return new NetworkSpecificConstant(
       chainId,
-      Address.zero(),
-      Address.fromString("0xb774c6f82d1d5dbd36894762330809e512fed195")
+      Address.fromString("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"),
+      Address.fromString("0x5029c0eff6c34351a0cec334542cdb22c7928f78")
     );
   } else if (equalsIgnoreCase(network, Network.BSC)) {
     return new NetworkSpecificConstant(
       chainId,
-      Address.zero(),
-      Address.fromString("0x26c76f7fef00e02a5dd4b5cc8a0f717eb61e1e4b")
-    );
-  } else if (equalsIgnoreCase(network, Network.BOBA)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xc5ef662b833de914b9ba7a3532c6bb008a9b23a6")
+      Address.fromString("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"),
+      Address.fromString("0x304acf330bbe08d1e512eefaa92f6a57871fd895")
     );
   } else if (equalsIgnoreCase(network, Network.CELO)) {
     return new NetworkSpecificConstant(
       chainId,
-      Address.zero(),
-      Address.fromString("0xda1dd66924b0470501ac7736372d4171cdd1162e")
-    );
-  } else if (equalsIgnoreCase(network, Network.EVMOS)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xc1d6e421a062fdbb26c31db4a2113df0f678cd04")
+      Address.fromString("0x471ece3750da237f93b8e339c536989b8978a438"),
+      Address.fromString("0xe432150cce91c13a887f7d836923d5597add8e31")
     );
   } else if (equalsIgnoreCase(network, Network.FANTOM)) {
     return new NetworkSpecificConstant(
       chainId,
-      Address.zero(),
-      Address.fromString("0x30f7aa65d04d289ce319e88193a33a8eb1857fb9")
-    );
-  } else if (equalsIgnoreCase(network, Network.XDAI)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xd4c058380d268d85bc7c758072f561e8f2db5975")
-    );
-  } else if (equalsIgnoreCase(network, Network.HARMONY)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xdd90e5e87a2081dcf0391920868ebc2ffb81a1af")
-    );
-  } else if (equalsIgnoreCase(network, Network.HECO)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0x81ecac0d6be0550a00ff064a4f9dd2400585fe9c")
+      Address.fromString("0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83"),
+      Address.fromString("0x304acf330bbe08d1e512eefaa92f6a57871fd895")
     );
   } else if (equalsIgnoreCase(network, Network.KAVA)) {
     return new NetworkSpecificConstant(
       chainId,
-      Address.zero(),
-      Address.fromString("0xf8bf9988206c4de87f52a3c24486e4367b7088cb")
-    );
-  } else if (equalsIgnoreCase(network, Network.KLAYTN)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xb3833ecd19d4ff964fa7bc3f8ac070ad5e360e56")
+      Address.fromString("0xc86c7c0efbd6a49b35e8714c5f59d99de09a225b"),
+      Address.fromString("0x2d5d7d31f671f86c782533cc367f14109a082712")
     );
   } else if (equalsIgnoreCase(network, Network.MATIC)) {
     return new NetworkSpecificConstant(
       chainId,
-      Address.zero(),
-      Address.fromString("0xb3833ecd19d4ff964fa7bc3f8ac070ad5e360e56")
+      Address.fromString("0x0000000000000000000000000000000000001010"),
+      Address.fromString("0x6f015f16de9fc8791b234ef68d486d2bf203fba8")
     );
   } else if (equalsIgnoreCase(network, Network.MOONBEAM)) {
     return new NetworkSpecificConstant(
       chainId,
-      Address.zero(),
-      Address.fromString("0xbb7684cc5408f4dd0921e5c2cadd547b8f1ad573")
-    );
-  } else if (equalsIgnoreCase(network, Network.MOONRIVER)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0x374b8a9f3ec5eb2d97eca84ea27aca45aa1c57ef")
-    );
-  } else if (equalsIgnoreCase(network, Network.GODWOKEN)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xb3833ecd19d4ff964fa7bc3f8ac070ad5e360e56")
-    );
-  } else if (equalsIgnoreCase(network, Network.OKEXCHAIN)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0x48284eb583a1f3058f4bce0a685d44fe29d4539e")
-    );
-  } else if (equalsIgnoreCase(network, Network.OASIS)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xbb7684cc5408f4dd0921e5c2cadd547b8f1ad573")
-    );
-  } else if (equalsIgnoreCase(network, Network.OPTIMISM)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0x61f85ff2a2f4289be4bb9b72fc7010b3142b5f41")
-    );
-  } else if (equalsIgnoreCase(network, Network.METIS)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xb51541df05de07be38dcfc4a80c05389a54502bb")
-    );
-  } else if (equalsIgnoreCase(network, Network.REI)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0x9b36f165bab9ebe611d491180418d8de4b8f3a1f")
-    );
-  } else if (equalsIgnoreCase(network, Network.SX)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0x9bb46d5100d2db4608112026951c9c965b233f4d")
-    );
-  } else if (equalsIgnoreCase(network, Network.SHIDEN)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0xbb7684cc5408f4dd0921e5c2cadd547b8f1ad573")
-    );
-  } else if (equalsIgnoreCase(network, Network.SYSCOIN)) {
-    return new NetworkSpecificConstant(
-      chainId,
-      Address.zero(),
-      Address.fromString("0x841ce48f9446c8e281d3f1444cb859b4a6d0738c")
+      Address.fromString("0xacc15dc74880c9944775448304b263d191c6077f"),
+      Address.fromString("0x4f4495243837681061c4743b74b3eedf548d56a5")
     );
   }
 
