@@ -45,10 +45,10 @@ export function getOrCreateToken(event: ethereum.Event, tokenAddress: Address): 
     token.lastPriceBlockNumber = event.block.number;
   }
 
-  if (token.lastPriceBlockNumber! < event.block.number) {
+  if (token.lastPriceBlockNumber && token.lastPriceBlockNumber! < event.block.number) {
     token.lastPriceUSD = getUsdPrice(tokenAddress, BigDecimal.fromString("1"));
-    if (token.lastPriceUSD == BIGDECIMAL_ZERO) {
-      token.lastPriceUSD = BigDecimal.fromString("1");
+    if (!token.lastPriceUSD) {
+      token.lastPriceUSD = BIGDECIMAL_ZERO;
     }
     token.lastPriceBlockNumber = event.block.number;
   }
