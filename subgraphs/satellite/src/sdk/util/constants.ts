@@ -4,9 +4,7 @@ import {
   log,
   dataSource,
   Address,
-  Bytes,
 } from "@graphprotocol/graph-ts";
-import { Token } from "../../../generated/schema";
 import {
   chainIDToNetwork,
   networkToChainID,

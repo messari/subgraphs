@@ -447,9 +447,6 @@ export function handleCommandExecuted(event: Executed): void {
     ByteArray.fromUTF8("Transfer(address,address,uint256)")
   );
 
-  let tokenAddress = Address.zero();
-  let account = Address.zero();
-  let amount = BIGINT_ZERO;
   const commandId = event.params.commandId;
   let command = _Command.load(commandId);
   if (!command) {
