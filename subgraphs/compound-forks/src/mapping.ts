@@ -1569,6 +1569,18 @@ export function updateMarket(
     updateAllMarketPrices(comptrollerAddress, blockNumber);
   }
 
+  log.info(
+    "[updateMarket]market={}/{} underlyingPrice reverted={} value={} block={}",
+    [
+      market.name!,
+      market.id,
+      updateMarketData.getUnderlyingPriceResult.reverted.toString(),
+      updateMarketData.getUnderlyingPriceResult.reverted
+        ? "null"
+        : updateMarketData.getUnderlyingPriceResult.value.toString(),
+      blockNumber.toString(),
+    ]
+  );
   // update this market's price no matter what
   const underlyingTokenPriceUSD = getTokenPriceUSD(
     updateMarketData.getUnderlyingPriceResult,
@@ -2396,6 +2408,20 @@ export function updateAllMarketPrices(
     }
 
     // update market price
+    const result = priceOracle.try_getUnderlyingPrice(
+      Address.fromString(market.id)
+    );
+    log.info(
+      "[updateAllMarketPrices]market={}/{} oralce={} underlyingPrice reverted={} value={} block={}",
+      [
+        market.name!,
+        market.id,
+        protocol._priceOracle,
+        result.reverted.toString(),
+        result.reverted ? "null" : result.value.toHexString(),
+        blockNumber.toString(),
+      ]
+    );
     const underlyingTokenPriceUSD = getTokenPriceUSD(
       priceOracle.try_getUnderlyingPrice(Address.fromString(market.id)),
       underlyingToken.decimals

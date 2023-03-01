@@ -83,6 +83,10 @@ import { RewardDistributor } from "../../../generated/templates/CToken/RewardDis
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
   const newPriceOracle = event.params.newPriceOracle;
+  log.info("[handleNewPriceOracle]price oracle {} => {}", [
+    protocol._priceOracle,
+    newPriceOracle.toHexString(),
+  ]);
   _handleNewPriceOracle(protocol, newPriceOracle);
 }
 
@@ -295,6 +299,12 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   if (event.block.number.toI64() > 60837741) {
     updateRewards(marketAddress, event.block.number);
   }
+
+  log.info("[handleAccrueInterest]marketAddress={} tx={}-{}", [
+    marketAddress.toHexString(),
+    event.transaction.hash.toHexString(),
+    event.transactionLogIndex.toString(),
+  ]);
 
   const cTokenContract = CToken.bind(marketAddress);
   const protocol = getOrCreateProtocol();
