@@ -117,7 +117,7 @@ function ProtocolTabEntity({
       // For the current entity, loop through all instances of that entity
       let overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
       const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
-      if (!dataFieldsState?.data) {
+      if (!dataFieldsState?.data || (currentOverlayEntityData.length > 0 && Object.keys(overlayDataFieldsState).length === 0)) {
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
           let dateVal: number = Number(timeseriesInstance['timestamp']);
