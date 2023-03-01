@@ -146,13 +146,12 @@ function _getSDK(
   }
 
   const protocolId = getNetworkSpecificConstant()
-    //.getProtocolId() //TODO necessary?
     .getPoolAddress()
     .toHexString();
   const conf = new BridgeConfig(
     protocolId,
-    "Axelar Satellite",
-    "satellite",
+    "Axelar",
+    "axelar",
     BridgePermissionType.PERMISSIONLESS,
     Versions
   );
