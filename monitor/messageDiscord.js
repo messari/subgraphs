@@ -411,7 +411,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 if (prodStatusDepoMapping[networkString] === true) {
                     aggThreadIndexErrorEmbeds[0].value += labelValue;
                     aggThreadIndexErrorEmbeds[1].value += failureBlock;
-                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}: ${indexErrorObj.failureBlock}`, ghMessage: `${networkString}: Block #${indexErrorObj.failureBlock} - ${indexErrorObj.message}}\n` });
+                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}: ${indexErrorObj.failureBlock}`, ghMessage: `${networkString}: Block #${indexErrorObj.failureBlock} - ${indexErrorObj.message}\n` });
                 }
             })
             indexingErrorEmbed.fields[0].value += labelValue;

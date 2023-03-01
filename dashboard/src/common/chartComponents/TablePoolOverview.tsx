@@ -115,11 +115,15 @@ export const TablePoolOverview = ({
               params.value.length,
             )}`;
           }
+          let onClick = undefined;
           const blockExplorerUrlBase = blockExplorers[protocolNetwork?.toUpperCase()];
+          if(blockExplorerUrlBase) {
+            onClick = () => (window.location.href = blockExplorerUrlBase + "address/" + params.value);
+          }
           return (
             <Tooltip title={params.value}>
               <span
-                onClick={() => (window.location.href = blockExplorerUrlBase + "address/" + params.value)}
+                onClick={onClick}
                 style={tableCellTruncate}
               >
                 {poolIdStr}
