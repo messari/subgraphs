@@ -8,14 +8,14 @@ import { getOrCreateDexAmm, getOrCreateToken, getTokenHelperId } from "../common
 import { poolDetail, ZERO_ADDRESS } from "../common/constants";
 
 export function handleCashAdded(event: CashAdded): void {
-  let _asset = _Asset.load(event.address.toHexString())!;
+  const _asset = _Asset.load(event.address.toHexString())!;
   _asset.cash = _asset.cash.plus(event.params.cashBeingAdded);
   _asset.save();
   updateProtocolTVL(event, event.address);
 }
 
 export function handleCashRemoved(event: CashRemoved): void {
-  let _asset = _Asset.load(event.address.toHexString())!;
+  const _asset = _Asset.load(event.address.toHexString())!;
   _asset.cash = _asset.cash.minus(event.params.cashBeingRemoved);
   _asset.save();
   updateProtocolTVL(event, event.address);
@@ -29,17 +29,17 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     event.params.newPool.toHexString(),
   ]);
 
-  let _asset = _Asset.load(event.address.toHexString())!;
-  let detail: poolDetail = poolDetail.fromAddress(event.params.newPool.toHexString());
-  let assetPool = LiquidityPool.load(event.address.toHexString())!;
-  let token = getOrCreateToken(event, Address.fromString(_asset.token));
+  const _asset = _Asset.load(event.address.toHexString())!;
+  const detail: poolDetail = poolDetail.fromAddress(event.params.newPool.toHexString());
+  const assetPool = LiquidityPool.load(event.address.toHexString())!;
+  const token = getOrCreateToken(event, Address.fromString(_asset.token));
 
   if (assetPool._ignore && !detail.ignore) {
-    let protocol = getOrCreateDexAmm();
+    const protocol = getOrCreateDexAmm();
     protocol.totalPoolCount = protocol.totalPoolCount - 1;
     protocol.save();
   } else if (!assetPool._ignore && detail.ignore) {
-    let protocol = getOrCreateDexAmm();
+    const protocol = getOrCreateDexAmm();
     protocol.totalPoolCount = protocol.totalPoolCount + 1;
     protocol.save();
   }
@@ -51,7 +51,7 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   assetPool.save();
 
   if (!event.params.previousPool.equals(ZERO_ADDRESS)) {
-    let helper = _LiquidityPoolAssetTokenHelper.load(
+    const helper = _LiquidityPoolAssetTokenHelper.load(
       getTokenHelperId(event.params.previousPool, Address.fromString(_asset.token)),
     )!;
     log.debug("[{}][ChangePool] from helper id {}", [event.transaction.hash.toHexString(), helper.id]);
