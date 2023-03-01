@@ -40,6 +40,7 @@ import {
   exponentToBigDecimal,
   InterestRateSide,
   InterestRateType,
+  INT_ZERO,
   SECONDS_PER_DAY,
   TokenType,
   TransactionType,
@@ -206,10 +207,11 @@ export function handleLoanFunded(event: LoanFunded): void {
     Bytes.fromHexString(tryInputToken.value.toHexString()),
     tryBorrower.value,
     event.params.amount_,
-    event.params.amount_
-      .toBigDecimal()
-      .div(exponentToBigDecimal(inputTokenDecimals))
-      .times(inputTokenPriceUSD),
+    getTotalPriceUSD(
+      event.params.amount_,
+      inputTokenDecimals,
+      inputTokenPriceUSD
+    ),
     event.params.amount_,
     inputTokenPriceUSD,
     InterestRateType.FIXED
@@ -257,10 +259,11 @@ export function handleTransfer(event: Transfer): void {
       .truncate(0)
       .toString()
   );
-  const amountUSD = amount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(inputTokenDecimals))
-    .times(market.inputTokenPriceUSD);
+  const amountUSD = getTotalPriceUSD(
+    amount,
+    inputTokenDecimals,
+    market.inputTokenPriceUSD
+  );
 
   if (event.params.from == Address.fromHexString(MIGRATION_HELPER)) {
     manager.createDeposit(
@@ -306,10 +309,11 @@ export function handleDeposit(event: Deposit): void {
   updateMarketAndProtocol(manager, event);
   const market = manager.getMarket();
 
-  const amountUSD = event.params.assets_
-    .toBigDecimal()
-    .div(exponentToBigDecimal(manager.getInputToken().decimals))
-    .times(market.inputTokenPriceUSD);
+  const amountUSD = getTotalPriceUSD(
+    event.params.assets_,
+    manager.getInputToken().decimals,
+    market.inputTokenPriceUSD
+  );
 
   manager.createDeposit(
     market.inputToken,
@@ -342,10 +346,11 @@ export function handleWithdraw(event: Withdraw): void {
   updateMarketAndProtocol(manager, event);
   const market = manager.getMarket();
 
-  const amountUSD = event.params.assets_
-    .toBigDecimal()
-    .div(exponentToBigDecimal(manager.getInputToken().decimals))
-    .times(market.inputTokenPriceUSD);
+  const amountUSD = getTotalPriceUSD(
+    event.params.assets_,
+    manager.getInputToken().decimals,
+    market.inputTokenPriceUSD
+  );
 
   manager.createWithdraw(
     market.inputToken,
@@ -490,10 +495,7 @@ export function handlePaymentMade(event: PaymentMade): void {
     Bytes.fromHexString(tryAsset.value.toHexString()),
     Bytes.fromHexString(tryBorrower.value.toHexString()),
     repayAmount,
-    repayAmount
-      .toBigDecimal()
-      .div(exponentToBigDecimal(inputTokenDecimals))
-      .times(inputTokenPriceUSD),
+    getTotalPriceUSD(repayAmount, inputTokenDecimals, inputTokenPriceUSD),
     tryPrinciple.value,
     inputTokenPriceUSD,
     InterestRateType.FIXED
@@ -502,10 +504,7 @@ export function handlePaymentMade(event: PaymentMade): void {
   // update protocol revenue collected
   // this is either from borrow fees, management fees or loan origination fees
   manager.addProtocolRevenue(
-    event.params.fees_
-      .toBigDecimal()
-      .div(exponentToBigDecimal(inputTokenDecimals))
-      .times(inputTokenPriceUSD)
+    getTotalPriceUSD(event.params.fees_, inputTokenDecimals, inputTokenPriceUSD)
   );
 }
 
@@ -600,10 +599,12 @@ export function handlePortionLiquidated(event: PortionLiquidated): void {
   updateMarketAndProtocol(manager, event);
 
   const market = manager.getMarket();
-  const amountUSD = event.params.returnedAmount_
-    .toBigDecimal()
-    .div(exponentToBigDecimal(manager.getInputToken().decimals))
-    .times(market.inputTokenPriceUSD);
+  const amountUSD = getTotalPriceUSD(
+    event.params.returnedAmount_,
+    manager.getInputToken().decimals,
+    market.inputTokenPriceUSD
+  );
+
   manager.updateTransactionData(
     TransactionType.LIQUIDATE,
     event.params.returnedAmount_,
@@ -712,9 +713,11 @@ function updateMarketAndProtocol(
   const inputTokenPriceUSD = getPriceUSD(
     Address.fromBytes(manager.getInputToken().id)
   );
-  const exchangeRate = tryBalance.value
-    .toBigDecimal()
-    .div(tryTotalSupply.value.toBigDecimal());
+
+  const exchangeRate = safeDiv(
+    tryBalance.value.toBigDecimal(),
+    tryTotalSupply.value.toBigDecimal()
+  );
   market.outputTokenSupply = tryTotalSupply.value;
   market.outputTokenPriceUSD = inputTokenPriceUSD.times(exchangeRate);
   market.save();
@@ -756,10 +759,11 @@ function updateMarketAndProtocol(
     market.save();
 
     manager.addSupplyRevenue(
-      revenueDelta
-        .toBigDecimal()
-        .div(exponentToBigDecimal(manager.getInputToken().decimals))
-        .times(inputTokenPriceUSD)
+      getTotalPriceUSD(
+        revenueDelta,
+        manager.getInputToken().decimals,
+        inputTokenPriceUSD
+      )
     );
   }
 
@@ -786,9 +790,10 @@ function updateBorrowRate(manager: DataManager): void {
       );
       continue;
     }
-    const principal = tryPrincipal.value
-      .toBigDecimal()
-      .div(exponentToBigDecimal(manager.getInputToken().decimals));
+    const principal = safeDiv(
+      tryPrincipal.value.toBigDecimal(),
+      exponentToBigDecimal(manager.getInputToken().decimals)
+    );
     totalPrincipal = totalPrincipal.plus(principal);
     rateAmount = rateAmount.plus(
       principal.times(
@@ -802,9 +807,9 @@ function updateBorrowRate(manager: DataManager): void {
   // catch divide by zero
   if (totalPrincipal.equals(BIGDECIMAL_ZERO)) return;
 
-  const borrowRate = rateAmount
-    .div(totalPrincipal)
-    .times(exponentToBigDecimal(2));
+  const borrowRate = safeDiv(rateAmount, totalPrincipal).times(
+    exponentToBigDecimal(2)
+  );
   manager.getOrUpdateRate(
     InterestRateSide.BORROWER,
     InterestRateType.VARIABLE,
@@ -833,9 +838,10 @@ function updateSupplyRate(manager: DataManager, event: ethereum.Event): void {
   // catch divide by zero
   if (market.totalDepositBalanceUSD.equals(BIGDECIMAL_ZERO)) return;
 
-  const supplyRate = totalInterest
-    .div(market.totalDepositBalanceUSD)
-    .times(exponentToBigDecimal(2));
+  const supplyRate = safeDiv(
+    totalInterest,
+    market.totalDepositBalanceUSD
+  ).times(exponentToBigDecimal(2));
   manager.getOrUpdateRate(
     InterestRateSide.LENDER,
     InterestRateType.VARIABLE,
@@ -887,6 +893,30 @@ function getPriceUSD(asset: Address): BigDecimal {
   return tryPrice.value
     .toBigDecimal()
     .div(exponentToBigDecimal(CHAINLINK_DECIMALS));
+}
+
+//
+// get the price of any amount with error handling
+function getTotalPriceUSD(
+  amount: BigInt,
+  decimals: i32,
+  priceUSD: BigDecimal
+): BigDecimal {
+  if (decimals <= INT_ZERO) {
+    return amount.toBigDecimal().times(priceUSD);
+  } else {
+    return amount
+      .toBigDecimal()
+      .div(exponentToBigDecimal(decimals))
+      .times(priceUSD);
+  }
+}
+
+function safeDiv(a: BigDecimal, b: BigDecimal): BigDecimal {
+  if (b == BIGDECIMAL_ZERO) {
+    return BIGDECIMAL_ZERO;
+  }
+  return a.div(b);
 }
 
 function getOrCreateLoan(loanId: Bytes, event: ethereum.Event): _Loan {
