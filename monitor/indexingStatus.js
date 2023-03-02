@@ -63,6 +63,7 @@ export async function indexStatusFlow(deployments) {
 
       if (!!indexData[indexDataName]?.fatalError) {
         deployments[realNameString].indexingError = indexData[indexDataName]?.fatalError?.block?.number;
+        deployments[realNameString].indexingErrorMessage = indexData[indexDataName]?.fatalError?.message;
       }
 
       if (
@@ -115,6 +116,7 @@ export async function generateIndexStatusQuery(deployments) {
   subgraph
   synced
   fatalError {
+    message
     block {
       number
     }

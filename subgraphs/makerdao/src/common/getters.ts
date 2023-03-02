@@ -1,4 +1,11 @@
-import { Address, Bytes, ethereum, BigInt, log, BigDecimal } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  Bytes,
+  ethereum,
+  BigInt,
+  log,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
 import {
   Token,
   UsageMetricsDailySnapshot,
@@ -42,7 +49,7 @@ export function getOrCreateToken(
   tokenId: string,
   name: string = "unknown",
   symbol: string = "unknown",
-  decimals: i32 = 18,
+  decimals: i32 = 18
 ): Token {
   let token = Token.load(tokenId);
   // fetch info if null
@@ -60,7 +67,9 @@ export function getOrCreateToken(
 ///////// Metrics /////////
 ///////////////////////////
 
-export function getOrCreateUsageMetricsHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
+export function getOrCreateUsageMetricsHourlySnapshot(
+  event: ethereum.Event
+): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
   const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
@@ -85,7 +94,9 @@ export function getOrCreateUsageMetricsHourlySnapshot(event: ethereum.Event): Us
   return usageMetrics;
 }
 
-export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricsDailySnapshot(
+  event: ethereum.Event
+): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
@@ -102,10 +113,13 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics.dailyActiveLiquidators = 0;
     usageMetrics.dailyActiveLiquidatees = 0;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-    usageMetrics.cumulativeUniqueDepositors = protocol.cumulativeUniqueDepositors;
+    usageMetrics.cumulativeUniqueDepositors =
+      protocol.cumulativeUniqueDepositors;
     usageMetrics.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
-    usageMetrics.cumulativeUniqueLiquidators = protocol.cumulativeUniqueLiquidators;
-    usageMetrics.cumulativeUniqueLiquidatees = protocol.cumulativeUniqueLiquidatees;
+    usageMetrics.cumulativeUniqueLiquidators =
+      protocol.cumulativeUniqueLiquidators;
+    usageMetrics.cumulativeUniqueLiquidatees =
+      protocol.cumulativeUniqueLiquidatees;
     usageMetrics.totalPoolCount = protocol.totalPoolCount;
     usageMetrics.dailyTransactionCount = 0;
     usageMetrics.dailyDepositCount = 0;
@@ -120,7 +134,10 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
   return usageMetrics;
 }
 
-export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot {
+export function getOrCreateMarketHourlySnapshot(
+  event: ethereum.Event,
+  marketAddress: string
+): MarketHourlySnapshot {
   const hours: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   const snapshotID = marketAddress.concat("-").concat(hours.toString());
   let marketMetrics = MarketHourlySnapshot.load(snapshotID);
@@ -152,8 +169,10 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAdd
     marketMetrics.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
     marketMetrics.hourlyRepayUSD = BIGDECIMAL_ZERO;
 
-    marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
-    marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+    marketMetrics.cumulativeSupplySideRevenueUSD =
+      market.cumulativeSupplySideRevenueUSD;
+    marketMetrics.cumulativeProtocolSideRevenueUSD =
+      market.cumulativeProtocolSideRevenueUSD;
     marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
 
     marketMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -166,7 +185,10 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAdd
   return marketMetrics;
 }
 
-export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot {
+export function getOrCreateMarketDailySnapshot(
+  event: ethereum.Event,
+  marketAddress: string
+): MarketDailySnapshot {
   const days: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   const snapshotID = marketAddress.concat("-").concat(days.toString());
   let marketMetrics = MarketDailySnapshot.load(snapshotID);
@@ -198,8 +220,10 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddr
     marketMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
     marketMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
 
-    marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
-    marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+    marketMetrics.cumulativeSupplySideRevenueUSD =
+      market.cumulativeSupplySideRevenueUSD;
+    marketMetrics.cumulativeProtocolSideRevenueUSD =
+      market.cumulativeProtocolSideRevenueUSD;
     marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
 
     marketMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -212,7 +236,9 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddr
   return marketMetrics;
 }
 
-export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
+export function getOrCreateFinancials(
+  event: ethereum.Event
+): FinancialsDailySnapshot {
   // Number of days since Unix epoch
   const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
@@ -226,12 +252,18 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
     financialMetrics.mintedTokenSupplies = protocol.mintedTokenSupplies;
 
-    financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-    financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-    financialMetrics._cumulativeProtocolSideStabilityFeeRevenue = protocol._cumulativeProtocolSideStabilityFeeRevenue;
-    financialMetrics._cumulativeProtocolSideLiquidationRevenue = protocol._cumulativeProtocolSideLiquidationRevenue;
-    financialMetrics._cumulativeProtocolSidePSMRevenue = protocol._cumulativeProtocolSidePSMRevenue;
-    financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+    financialMetrics.cumulativeSupplySideRevenueUSD =
+      protocol.cumulativeSupplySideRevenueUSD;
+    financialMetrics.cumulativeProtocolSideRevenueUSD =
+      protocol.cumulativeProtocolSideRevenueUSD;
+    financialMetrics._cumulativeProtocolSideStabilityFeeRevenue =
+      protocol._cumulativeProtocolSideStabilityFeeRevenue;
+    financialMetrics._cumulativeProtocolSideLiquidationRevenue =
+      protocol._cumulativeProtocolSideLiquidationRevenue;
+    financialMetrics._cumulativeProtocolSidePSMRevenue =
+      protocol._cumulativeProtocolSidePSMRevenue;
+    financialMetrics.cumulativeTotalRevenueUSD =
+      protocol.cumulativeTotalRevenueUSD;
     financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
     financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
     financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
@@ -308,12 +340,14 @@ export function getOrCreateMarket(
   name: string = "unknown",
   inputToken: string = ZERO_ADDRESS,
   blockNumber: BigInt = BIGINT_ZERO,
-  timeStamp: BigInt = BIGINT_ZERO,
+  timeStamp: BigInt = BIGINT_ZERO
 ): Market {
   let market = Market.load(marketID);
   if (market == null) {
     if (marketID == ZERO_ADDRESS) {
-      log.warning("[getOrCreateMarket]Creating a new Market with marketID={}", [marketID]);
+      log.warning("[getOrCreateMarket]Creating a new Market with marketID={}", [
+        marketID,
+      ]);
     }
     const protocol = getOrCreateLendingProtocol();
     market = new Market(marketID);
@@ -365,7 +399,10 @@ export function getOrCreateMarket(
   return market;
 }
 
-export function getOrCreateIlk(ilk: Bytes, marketID: string = ZERO_ADDRESS): _Ilk | null {
+export function getOrCreateIlk(
+  ilk: Bytes,
+  marketID: string = ZERO_ADDRESS
+): _Ilk | null {
   let _ilk = _Ilk.load(ilk.toHexString());
   if (_ilk == null && marketID != ZERO_ADDRESS) {
     _ilk = new _Ilk(ilk.toHexString());
@@ -375,7 +412,11 @@ export function getOrCreateIlk(ilk: Bytes, marketID: string = ZERO_ADDRESS): _Il
   return _ilk;
 }
 
-export function getOrCreateInterestRate(marketAddress: string, side: string, type: string): InterestRate {
+export function getOrCreateInterestRate(
+  marketAddress: string,
+  side: string,
+  type: string
+): InterestRate {
   const interestRateID = side + "-" + type + "-" + marketAddress;
   let interestRate = InterestRate.load(interestRateID);
   if (interestRate) {
@@ -394,7 +435,9 @@ export function getOrCreateInterestRate(marketAddress: string, side: string, typ
 export function getLiquidateEvent(LiquidateID: string): Liquidate | null {
   const liquidate = Liquidate.load(LiquidateID);
   if (liquidate == null) {
-    log.error("[getLiquidateEvent]Liquidate entity with id {} does not exist", [LiquidateID]);
+    log.error("[getLiquidateEvent]Liquidate entity with id {} does not exist", [
+      LiquidateID,
+    ]);
     return null;
   }
   return liquidate;
@@ -408,7 +451,7 @@ export function getOrCreateLiquidate(
   liquidator: string | null = null,
   amount: BigInt | null = null,
   amountUSD: BigDecimal | null = null,
-  profitUSD: BigDecimal | null = null,
+  profitUSD: BigDecimal | null = null
 ): Liquidate {
   let liquidate = Liquidate.load(LiquidateID);
   if (liquidate == null) {
@@ -467,14 +510,17 @@ export function getOrCreatePosition(
   address: string,
   ilk: Bytes,
   side: string,
-  newPosition: bool = false,
+  newPosition: bool = false
 ): Position {
   const urnOwnerAddr = getOwnerAddressFromUrn(address);
   const _is_urn = urnOwnerAddr == null ? false : true;
   // urn owner may be a proxy
   const proxyOwnerAddr = getOwnerAddressFromProxy(address);
-  const urnProxyOwnerAddr = urnOwnerAddr ? getOwnerAddressFromProxy(urnOwnerAddr) : null;
-  const _is_proxy = proxyOwnerAddr == null && urnProxyOwnerAddr == null ? false : true;
+  const urnProxyOwnerAddr = urnOwnerAddr
+    ? getOwnerAddressFromProxy(urnOwnerAddr)
+    : null;
+  const _is_proxy =
+    proxyOwnerAddr == null && urnProxyOwnerAddr == null ? false : true;
   const accountAddress = getOwnerAddress(address);
   const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
   const positionPrefix = `${address}-${marketID}-${side}`;
@@ -519,53 +565,69 @@ export function getOrCreatePosition(
     position.save();
   }
 
-  log.info("[getOrCreatePosition]Get/create position positionID={}, account={}, balance={}", [
-    positionID,
-    accountAddress,
-    position.balance.toString(),
-  ]);
+  log.info(
+    "[getOrCreatePosition]Get/create position positionID={}, account={}, balance={}",
+    [positionID, accountAddress, position.balance.toString()]
+  );
   return position;
 }
 
 // find the open position for the matching urn/ilk/side combination
 // there should be only one or none
-export function getOpenPosition(urn: string, ilk: Bytes, side: string): Position | null {
+export function getOpenPosition(
+  urn: string,
+  ilk: Bytes,
+  side: string
+): Position | null {
   const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
   const nextCounter = getNextPositionCounter(urn, ilk, side);
-  log.info("[getOpenPosition]Finding open position for urn {}/ilk {}/side {}", [urn, ilk.toString(), side]);
+  log.info("[getOpenPosition]Finding open position for urn {}/ilk {}/side {}", [
+    urn,
+    ilk.toString(),
+    side,
+  ]);
   for (let counter = nextCounter; counter >= 0; counter--) {
     const positionID = `${urn}-${marketID}-${side}-${counter}`;
     const position = Position.load(positionID);
     if (position) {
-      const hashClosed = position.hashClosed != null ? position.hashClosed! : "null";
+      const hashClosed =
+        position.hashClosed != null ? position.hashClosed! : "null";
       const balance = position.balance.toString();
       const account = position.account;
       // position is open
       if (position.hashClosed == null) {
         log.info(
           "[getOpenPosition]found open position counter={}, position.id={}, account={}, balance={}, hashClosed={}",
-          [counter.toString(), positionID, account, balance, hashClosed],
+          [counter.toString(), positionID, account, balance, hashClosed]
         );
         return position;
       } else {
-        log.info("[getOpenPosition]iterating counter={}, position.id={}, account={}, balance={}, hashClosed={}", [
-          counter.toString(),
-          positionID,
-          account,
-          balance,
-          hashClosed,
-        ]);
+        log.info(
+          "[getOpenPosition]iterating counter={}, position.id={}, account={}, balance={}, hashClosed={}",
+          [counter.toString(), positionID, account, balance, hashClosed]
+        );
       }
     } else {
-      log.info("[getOpenPosition]iterating counter={}, position.id={} doesn't exist", [counter.toString(), positionID]);
+      log.info(
+        "[getOpenPosition]iterating counter={}, position.id={} doesn't exist",
+        [counter.toString(), positionID]
+      );
     }
   }
-  log.info("[getOpenPosition]No open position for urn {}/ilk {}/side {}", [urn, ilk.toString(), side]);
+  log.info("[getOpenPosition]No open position for urn {}/ilk {}/side {}", [
+    urn,
+    ilk.toString(),
+    side,
+  ]);
 
   return null;
 }
 
-export function getOrCreatePositionCounter(urn: string, ilk: Bytes, side: string): _PositionCounter {
+export function getOrCreatePositionCounter(
+  urn: string,
+  ilk: Bytes,
+  side: string
+): _PositionCounter {
   const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
   const ID = `${urn}-${marketID}-${side}`;
   let counterEnity = _PositionCounter.load(ID);
@@ -580,7 +642,11 @@ export function getOrCreatePositionCounter(urn: string, ilk: Bytes, side: string
 ///////////////////////////
 ///////// Helpers /////////
 ///////////////////////////
-export function getNextPositionCounter(urn: string, ilk: Bytes, side: string): i32 {
+export function getNextPositionCounter(
+  urn: string,
+  ilk: Bytes,
+  side: string
+): i32 {
   const counterEnity = getOrCreatePositionCounter(urn, ilk, side);
   return counterEnity.nextCount;
 }
@@ -589,7 +655,9 @@ export function getMarketAddressFromIlk(ilk: Bytes): Address | null {
   const _ilk = getOrCreateIlk(ilk);
   if (_ilk) return Address.fromString(_ilk.marketAddress);
 
-  log.warning("[getMarketAddressFromIlk]MarketAddress for ilk {} not found", [ilk.toString()]);
+  log.warning("[getMarketAddressFromIlk]MarketAddress for ilk {} not found", [
+    ilk.toString(),
+  ]);
   return null;
 }
 
@@ -628,12 +696,17 @@ export function getOwnerAddress(address: string): string {
 }
 
 // this is needed to prevent snapshot rates from being pointers to the current rate
-export function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
+export function getSnapshotRates(
+  rates: string[],
+  timeSuffix: string
+): string[] {
   const snapshotRates: string[] = [];
   for (let i = 0; i < rates.length; i++) {
     const rate = InterestRate.load(rates[i]);
     if (!rate) {
-      log.warning("[getSnapshotRates] rate {} not found, should not happen", [rates[i]]);
+      log.warning("[getSnapshotRates] rate {} not found, should not happen", [
+        rates[i],
+      ]);
       continue;
     }
 

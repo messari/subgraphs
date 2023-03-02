@@ -92,10 +92,6 @@ function ProtocolTab({
           </Grid>);
       }
 
-      // create state returnedEntity[entityName]
-      // Rather than returning the mapped component, set the component to render to state (if unequal to current state for that entity)
-      // Render the compoennt from state
-
       return (
         <ProtocolTabEntity
           key={entityName + "-ProtocolTabEntity"}
