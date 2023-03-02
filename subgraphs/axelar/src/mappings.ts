@@ -763,7 +763,8 @@ function _handleBurnToken(
   call: ethereum.Call | null
 ): void {
   const sender = account;
-  const poolId = event ? event.address : call!.to;
+  const poolAddress = event ? event.address : call!.to;
+  const poolId = poolAddress.concat(tokenAddress);
   const dstChainId = networkToChainID(Network.UNKNOWN_NETWORK);
   const dstPoolId = Address.zero(); // Not available
   const receiver = sender; //Not available, assumed to be the same as sender
@@ -773,8 +774,8 @@ function _handleBurnToken(
     receiver,
     amount,
     dstChainId,
-    dstPoolId,
     poolId,
+    dstPoolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
     event,
