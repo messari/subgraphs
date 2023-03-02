@@ -67,7 +67,6 @@ import {
   _handleActionPaused,
   _handleMarketEntered,
   _handleTransfer,
-  getTokenPriceUSD,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
