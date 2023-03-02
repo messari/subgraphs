@@ -128,11 +128,13 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
               valueStr = "N/A";
             }
             const blockExplorerUrlBase = blockExplorers[protocolNetwork.toUpperCase()];
-            if (k.toUpperCase() === "HASH") {
-              onClick = () => (window.location.href = blockExplorerUrlBase + "tx/" + params.value);
-            }
-            if (k.toUpperCase() === "FROM" || k.toUpperCase() === "TO") {
-              onClick = () => (window.location.href = blockExplorerUrlBase + "address/" + params.value);
+            if(blockExplorerUrlBase) {
+              if (k.toUpperCase() === "HASH") {
+                onClick = () => (window.location.href = blockExplorerUrlBase + "tx/" + params.value);
+              }
+              if (k.toUpperCase() === "FROM" || k.toUpperCase() === "TO") {
+                onClick = () => (window.location.href = blockExplorerUrlBase + "address/" + params.value);
+              }
             }
             if (k.toUpperCase().includes("USD")) {
               valueStr = "$" + Number(Number(params.value).toFixed(2)).toLocaleString();
