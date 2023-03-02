@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -37,6 +43,8 @@ import {
   INT_ONE,
   BIGDECIMAL_ZERO,
   mantissaFactor,
+  bigDecimalToBigInt,
+  BDChangeDecimals,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -59,6 +67,7 @@ import {
   _handleActionPaused,
   _handleMarketEntered,
   _handleTransfer,
+  getTokenPriceUSD,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
@@ -79,6 +88,11 @@ import {
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 import { RewardDistributor } from "../../../generated/templates/CToken/RewardDistributor";
+import { getUsdPricePerToken } from "./prices";
+
+// empty handler for prices library
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+export function handlehandleSetFeeTo(call: ethereum.Call): void {}
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
@@ -308,7 +322,8 @@ export function handleAccrueInterest(event: AccrueInterest): void {
 
   const cTokenContract = CToken.bind(marketAddress);
   const protocol = getOrCreateProtocol();
-  const oracleContract = PriceOracle.bind(
+  const underlyingPriceResult = getUnderlyingTokenPriceUSDResult(
+    marketAddress,
     Address.fromString(protocol._priceOracle)
   );
   const updateMarketData = new UpdateMarketData(
@@ -316,7 +331,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
-    oracleContract.try_getUnderlyingPrice(marketAddress),
+    underlyingPriceResult,
     SECONDS_PER_YEAR
   );
   const interestAccumulated = event.params.interestAccumulated;
@@ -567,4 +582,53 @@ function getBastionPrice(): BigDecimal {
     BIGINT_ZERO
   );
   return priceUSD.toBigDecimal().div(exponentToBigDecimal(mantissaFactor));
+}
+
+function getUnderlyingTokenPriceUSDResult(
+  cToken: Address,
+  priceOracle: Address
+): ethereum.CallResult<BigInt> {
+  log.info("[getUnderlyingTokenPriceUSDResult]cToken={}", [
+    cToken.toHexString(),
+    priceOracle.toHexString(),
+  ]);
+  const oracleContract = PriceOracle.bind(priceOracle);
+  const oracleResult = oracleContract.try_getUnderlyingPrice(cToken);
+  if (!oracleResult.reverted) {
+    log.info("[getUnderlyingTokenPriceUSDResult]price={} from oracle {}", [
+      oracleResult.value.toString(),
+      priceOracle.toHexString(),
+    ]);
+    return oracleResult;
+  }
+
+  const revertedResult = new ethereum.CallResult<BigInt>();
+  const market = Market.load(cToken.toHexString());
+  if (!market || !market.inputToken) {
+    return revertedResult;
+  }
+  const underlyingTokenAddress = market.inputToken;
+  const tokenPriceUSD = getTokenPriceUSDFromPricesLib(
+    Address.fromString(underlyingTokenAddress)
+  );
+  if (!tokenPriceUSD) {
+    return revertedResult;
+  }
+  const underlyingToken = Token.load(underlyingTokenAddress);
+  if (!underlyingToken) {
+    return revertedResult;
+  }
+  const mantissaDecimalFactor = 18 - underlyingToken.decimals + 18;
+  const tokenPriceBigInt = bigDecimalToBigInt(
+    BDChangeDecimals(tokenPriceUSD, 0, mantissaDecimalFactor)
+  );
+  log.info("[getUnderlyingTokenPriceUSDResult]price={} from prices lib", [
+    tokenPriceBigInt.toString(),
+  ]);
+  return ethereum.CallResult.fromValue<BigInt>(tokenPriceBigInt);
+}
+
+function getTokenPriceUSDFromPricesLib(token: Address): BigDecimal | null {
+  const tokenPriceUSD = getUsdPricePerToken(token);
+  return tokenPriceUSD.reverted ? null : tokenPriceUSD.usdPrice;
 }

@@ -2,6 +2,47 @@ specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
+  # this section is for price oracle import path
+  - kind: ethereum
+    name: UniswapV2Factory
+    network: {{ network }}
+    source:
+      abi: UniswapV2Factory
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: _ERC20
+          file: ./abis/prices/ERC20.json
+        - name: UniswapV2Factory
+          file: ./abis/prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/prices/Aave/Oracle.json
+        - name: CurvePool
+          file: ./abis/prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/prices/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setFeeTo(address)
+          handler: handleSetFeeTo
+      file: ./protocols/bastion-protocol/src/mapping.ts
+
   - kind: ethereum/contract
     name: Comptroller
     network: {{ network }}
@@ -11,7 +52,7 @@ dataSources:
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Protocol
@@ -50,7 +91,7 @@ dataSources:
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Protocol
@@ -89,7 +130,7 @@ templates:
       abi: CToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Deposit
