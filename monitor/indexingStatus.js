@@ -62,8 +62,8 @@ export async function indexStatusFlow(deployments) {
       deployments[realNameString].indexedPercentage = indexedPercentage.toFixed(2);
 
       if (!!indexData[indexDataName]?.fatalError) {
-        deployments[realNameString].indexingError = indexData[indexDataName]?.fatalError?.block?.number;
-        deployments[realNameString].indexingErrorMessage = indexData[indexDataName]?.fatalError?.message;
+        deployments[realNameString].indexingError = indexData[indexDataName]?.fatalError?.block?.number || 0;
+        deployments[realNameString].indexingErrorMessage = indexData[indexDataName]?.fatalError?.message || "ERROR";
       }
 
       if (
