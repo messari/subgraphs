@@ -139,11 +139,11 @@ export function handleMarketListed(event: MarketListed): void {
   );
   let marketNamePrefix = "";
   if (event.address.equals(AURORA_REALM_ADDRESS)) {
-    marketNamePrefix = "Aurora Ream: ";
+    marketNamePrefix = "Aurora Realm: ";
   } else if (event.address.equals(STNEAR_REALM_ADDRESS)) {
-    marketNamePrefix = "STNear Ream: ";
+    marketNamePrefix = "STNear Realm: ";
   } else if (event.address.equals(MULTICHAIN_REALM_ADDRESS)) {
-    marketNamePrefix = "Multichain Ream: ";
+    marketNamePrefix = "Multichain Realm: ";
   }
 
   if (cTokenAddr == nativeCToken.address) {
@@ -153,7 +153,10 @@ export function handleMarketListed(event: MarketListed): void {
       nativeCToken,
       cTokenReserveFactorMantissa
     );
-    _handleMarketListed(marketListedData, event, marketNamePrefix);
+    _handleMarketListed(marketListedData, event);
+    const market = Market.load(cTokenAddr.toHexString())!;
+    market.name = `${marketNamePrefix}${market.name!}`;
+    market.save();
     return;
   }
 
@@ -184,9 +187,12 @@ export function handleMarketListed(event: MarketListed): void {
       ),
       cTokenReserveFactorMantissa
     ),
-    event,
-    marketNamePrefix
+    event
   );
+
+  const market = Market.load(cTokenAddr.toHexString())!;
+  market.name = `${marketNamePrefix}${market.name!}`;
+  market.save();
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {

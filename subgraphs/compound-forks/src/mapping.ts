@@ -254,8 +254,7 @@ export function _handleMarketEntered(
 
 export function _handleMarketListed(
   marketListedData: MarketListedData,
-  event: ethereum.Event,
-  marketNamePrefix: string = ""
+  event: ethereum.Event
 ): void {
   const cTokenAddr = marketListedData.cToken.address;
   let cToken = Token.load(cTokenAddr.toHexString());
@@ -288,7 +287,7 @@ export function _handleMarketListed(
   // create market
   //
   const market = new Market(cTokenAddr.toHexString());
-  market.name = `${marketNamePrefix}${cToken.name}`;
+  market.name = cToken.name;
   market.protocol = marketListedData.protocol.id;
   market.inputToken = underlyingToken.id;
   market.outputToken = cToken.id;
