@@ -3,7 +3,7 @@ import 'dotenv/config'
 import { postError } from './messageDiscord.js';
 
 export async function postGithubIssue(title, body, postedIssues) {
-    if (process.env.GH_TOKEN) {
+    if (!!process.env.GH_TOKEN) {
         const octokit = new Octokit({
             auth: "Bearer " + process.env.GH_TOKEN
         })
@@ -25,6 +25,8 @@ export async function postGithubIssue(title, body, postedIssues) {
                 postError(err.message)
             }
         }
+    } else {
+        postError('GH TOKEN ENV NOT ADDED')
     }
 }
 
