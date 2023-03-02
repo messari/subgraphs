@@ -270,7 +270,7 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
 
         if (
             dataFields.includes("totalPoolCount") &&
-            !(parseFloat(data.totalPoolCount) >= 0 && parseFloat(data.totalPoolCount) < 10000) &&
+            !(parseFloat(data.totalPoolCount) >= 0 && parseFloat(data.totalPoolCount) < 500000) &&
             !issuesArrays.totalPoolCount.includes(data.totalPoolCount)
         ) {
             issuesArrays.totalPoolCount.push(data.totalPoolCount);

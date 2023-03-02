@@ -23,6 +23,20 @@ export async function errorNotification(error, channelId = process.env.CHANNEL_I
     }
 }
 
+export async function postError(message) {
+    try {
+        const baseURL = "https://discordapp.com/api/channels/1019063880040861806/messages";
+        const headers = {
+            "Authorization": "Bot " + process.env.BOT_TOKEN,
+            "Content-Type": "application/json",
+        }
+        const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor from ${process.env.CHANNEL_ID} on Channel ${process.env.CHANNEL_ID}- Errors detected**\n` + message });
+        await axios.post(baseURL, postJSON, { "headers": { ...headers } })
+    } catch (err) {
+        console.log('ERROR POSTING DISCORD - ' + err.message + ' - ' + message)
+    }
+}
+
 // Functions involved in fetching messages/channels
 
 export async function getDiscordMessages(messages, channelId = process.env.CHANNEL_ID) {
@@ -449,69 +463,72 @@ export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHAN
     }
     const aggThreadQueriesToResolve = [];
     const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
-    const currentThreadMessages = await fetchMessages("", aggThreadId);
-    const baseURL = "https://discordapp.com/api/channels/" + aggThreadId + "/messages";
-    const headers = {
-        "Authorization": "Bot " + process.env.BOT_TOKEN,
-        "Content-Type": "application/json",
-    };
-    aggThreadMsgObjects.forEach(aggThread => {
-        let aggThreadMsgObjectsToSend = [];
-
-        const indexingErrorEmbed = {
-            title: "Indexing Errors " + aggThread.protocol,
-            description: 'These subgraphs encountered a fatal error in indexing',
-            fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Failed At Block', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
-            footer: { text: monitorVersion }
+    try {
+        const currentThreadMessages = await fetchMessages("", aggThreadId);
+        const baseURL = "https://discordapp.com/api/channels/" + aggThreadId + "/messages";
+        const headers = {
+            "Authorization": "Bot " + process.env.BOT_TOKEN,
+            "Content-Type": "application/json",
         };
-        const msg = currentThreadMessages.find(x => {
-            return !!x.embeds.find(embed => embed.title.toUpperCase().includes(aggThread.protocol.toUpperCase())) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS);
-        });
+        aggThreadMsgObjects.forEach(aggThread => {
+            let aggThreadMsgObjectsToSend = [];
 
-        let embedToAdd = false;
-        if (aggThread.embeds.length > 1) {
-            if (!!msg) {
-                const existingEmbed = msg.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
-                if (existingEmbed) {
-                    const aggThreadNetworkStringsArr = aggThread.embeds[0].value.split('\n').join('-----').split('-----');
-                    const aggThreadBlockValueArr = aggThread.embeds[1].value.split('\n').join('-----').split('-----');
-                    const existingMessageNetworkStringsArr = existingEmbed.fields[0].value.split('\n').join('-----').split('-----');
-                    const existingMessageBlockValueArr = existingEmbed.fields[1].value.split('\n').join('-----').split('-----');
-                    aggThreadNetworkStringsArr.forEach((networkLine, networkIdx) => {
-                        const existingMessageIndex = existingMessageNetworkStringsArr.indexOf(networkLine);
-                        if (!(existingMessageIndex >= 0 && aggThreadBlockValueArr[networkIdx] === existingMessageBlockValueArr[existingMessageIndex])) {
-                            indexingErrorEmbed.fields[0].value += networkLine;
-                            indexingErrorEmbed.fields[1].value += aggThreadBlockValueArr[networkIdx];
-                            embedToAdd = true;
-                        }
-                    });
+            const indexingErrorEmbed = {
+                title: "Indexing Errors " + aggThread.protocol,
+                description: 'These subgraphs encountered a fatal error in indexing',
+                fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Failed At Block', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
+                footer: { text: monitorVersion }
+            };
+            const msg = currentThreadMessages.find(x => {
+                return !!x.embeds.find(embed => embed.title.toUpperCase().includes(aggThread.protocol.toUpperCase())) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS);
+            });
+
+            let embedToAdd = false;
+            if (aggThread.embeds.length > 1) {
+                if (!!msg) {
+                    const existingEmbed = msg.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
+                    if (existingEmbed) {
+                        const aggThreadNetworkStringsArr = aggThread.embeds[0].value.split('\n').join('-----').split('-----');
+                        const aggThreadBlockValueArr = aggThread.embeds[1].value.split('\n').join('-----').split('-----');
+                        const existingMessageNetworkStringsArr = existingEmbed.fields[0].value.split('\n').join('-----').split('-----');
+                        const existingMessageBlockValueArr = existingEmbed.fields[1].value.split('\n').join('-----').split('-----');
+                        aggThreadNetworkStringsArr.forEach((networkLine, networkIdx) => {
+                            const existingMessageIndex = existingMessageNetworkStringsArr.indexOf(networkLine);
+                            if (!(existingMessageIndex >= 0 && aggThreadBlockValueArr[networkIdx] === existingMessageBlockValueArr[existingMessageIndex])) {
+                                indexingErrorEmbed.fields[0].value += networkLine;
+                                indexingErrorEmbed.fields[1].value += aggThreadBlockValueArr[networkIdx];
+                                embedToAdd = true;
+                            }
+                        });
+                    }
+                } else if (aggThread?.embeds[0]?.value?.length > 0 && aggThread?.embeds[1]?.value?.length > 0) {
+                    indexingErrorEmbed.fields[0].value += aggThread.embeds[0].value;
+                    indexingErrorEmbed.fields[1].value += aggThread.embeds[1].value;
+                    embedToAdd = true;
                 }
-            } else if (aggThread?.embeds[0]?.value?.length > 0 && aggThread?.embeds[1]?.value?.length > 0) {
-                indexingErrorEmbed.fields[0].value += aggThread.embeds[0].value;
-                indexingErrorEmbed.fields[1].value += aggThread.embeds[1].value;
-                embedToAdd = true;
             }
-        }
 
-        if (embedToAdd) {
-            indexingErrorEmbed.color = colorsArray[Math.floor(Math.random() * 8)];
-            aggThreadMsgObjectsToSend.unshift(indexingErrorEmbed);
-        }
+            if (embedToAdd) {
+                indexingErrorEmbed.color = colorsArray[Math.floor(Math.random() * 8)];
+                aggThreadMsgObjectsToSend.unshift(indexingErrorEmbed);
+            }
 
-        if (aggThread.protocolErrorEmbeds) {
-            aggThreadMsgObjectsToSend = [...aggThreadMsgObjectsToSend, ...aggThread.protocolErrorEmbeds]
-        }
+            if (aggThread.protocolErrorEmbeds) {
+                aggThreadMsgObjectsToSend = [...aggThreadMsgObjectsToSend, ...aggThread.protocolErrorEmbeds]
+            }
 
-        if (aggThreadMsgObjectsToSend.length > 0) {
-            const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on ${aggThread.protocol} subgraphs (prod)**\n`, "embeds": aggThreadMsgObjectsToSend });
-            const query = axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch(err => console.log(aggThread.protocol));
-            aggThreadQueriesToResolve.push(query);
-        }
-    })
+            if (aggThreadMsgObjectsToSend.length > 0) {
+                const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on ${aggThread.protocol} subgraphs (prod)**\n`, "embeds": aggThreadMsgObjectsToSend });
+                const query = axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch(err => console.log(aggThread.protocol));
+                aggThreadQueriesToResolve.push(query);
+            }
+        })
+    } catch (err) {
+        postError(err.message);
+    }
 
     try {
         await resolveQueriesToAttempt(aggThreadQueriesToResolve);
-        aggThreadMsgObjects = [];
     } catch (err) {
         console.log(err?.response?.config?.data);
         if (err?.response?.status === 429) {
@@ -521,6 +538,7 @@ export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHAN
             return null;
         }
     }
+    aggThreadMsgObjects = [];
 }
 
 export async function sendMessageToZapierThread(msgObj) {
