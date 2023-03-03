@@ -1,5 +1,5 @@
 import axios from "axios";
-import { clearThread, constructEmbedMsg, errorNotification, getAllThreadsToClear, getDiscordMessages, sendMessageToAggThread } from "./messageDiscord.js";
+import { clearThread, constructEmbedMsg, errorNotification, getAllThreadsToClear, getDiscordMessages, postError, sendMessageToAggThread } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolDerivedFields, protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
@@ -19,6 +19,7 @@ let protocolNameToBaseMapping = {};
 
 async function executionFlow() {
   console.log('START');
+  postError('TEST ERROR POST')
   let data = null;
   try {
     const result = await axios.get(

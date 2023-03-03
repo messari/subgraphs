@@ -3771,8 +3771,8 @@
         "network": "celo",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "schema": "3.0.3",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
