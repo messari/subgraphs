@@ -47,19 +47,11 @@ function PoolTab({
   poolsListError,
   setPoolId,
 }: PoolTabProps) {
-  const [issuesToDisplay, setIssuesToDisplay] = useState<
-    { message: string; type: string; level: string; fieldName: string }[]
-  >([]);
-  const [tableIssues, setTableIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>(
-    [],
-  );
-  const issues: { [entityName: string]: { message: string; type: string; level: string; fieldName: string }[] } = {};
-  function setIssues(
-    issuesSet: { [x: string]: { message: string; type: string; level: string; fieldName: string }[] },
-    entityName: string,
-  ) {
-    issues[entityName] = issuesSet[entityName];
-  }
+  const [issuesToDisplay, setIssuesToDisplay] = useState<{
+    [key: string]:
+    { message: string; type: string; level: string; fieldName: string }
+  }>({});
+
 
   console.log("DATA", data);
   // Get the key name of the pool specific to the protocol type (singular and plural)
@@ -78,19 +70,7 @@ function PoolTab({
     }
   });
 
-  useEffect(() => {
-    console.log("POOL ISSUES TO SET", issuesToDisplay, issues, tableIssues);
-    let brokenDownIssuesState: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
-    Object.keys(issues).forEach((iss) => {
-      brokenDownIssuesState = brokenDownIssuesState.concat(issues[iss]);
-    });
-    if (allLoaded) {
-      setIssuesToDisplay(brokenDownIssuesState);
-    }
-  }, [poolTimeseriesData, poolTimeseriesLoading, tableIssues]);
-
   let issuesDisplayElement = null;
-
   const entityData = data[poolKeySingular];
 
   let poolDropDown = null;
@@ -99,7 +79,7 @@ function PoolTab({
       <PoolDropDown
         poolId={poolId}
         setPoolId={(x) => {
-          setTableIssues([]);
+          setIssuesToDisplay({});
           setPoolId(x);
         }}
         pools={poolsList[poolNames]}
@@ -256,8 +236,9 @@ function PoolTab({
   let poolDataSection = null;
   let poolTable = null;
   if (poolId) {
+    const issuesArrayProps: { message: string; type: string; level: string; fieldName: string }[] = Object.values(issuesToDisplay);
     issuesDisplayElement = (
-      <IssuesDisplay issuesArrayProps={issuesToDisplay} allLoaded={allLoaded} oneLoaded={oneLoaded} />
+      <IssuesDisplay issuesArrayProps={issuesArrayProps} allLoaded={allLoaded} oneLoaded={oneLoaded} />
     );
     if (poolData) {
       poolTable = (
@@ -267,9 +248,17 @@ function PoolTab({
           schemaName={poolKeySingular}
           protocolType={data.protocols[0].type}
           dataFields={poolData}
-          setIssues={(x) => setTableIssues(x)}
-          issuesProps={tableIssues}
-        />
+          setIssues={(issArr: any) => {
+            const issuesToAdd: any = {};
+            issArr.forEach((issObj: any) => {
+              issuesToAdd[issObj.fieldName + issObj.type] = issObj;
+            })
+            if (Object.keys(issuesToAdd).length > 0) {
+              setIssuesToDisplay((prevState) => {
+                return ({ ...prevState, ...issuesToAdd });
+              });
+            }
+          }} />
       );
     }
     let activeMessage = null
@@ -298,9 +287,17 @@ function PoolTab({
             entitiesData={entitiesData}
             poolId={poolId}
             protocolData={protocolData}
-            issuesProps={issues}
-            setIssues={(x) => setIssues(x, entityName)}
-          />
+            setIssues={(issArr: any) => {
+              const issuesToAdd: any = {};
+              issArr.forEach((issObj: any) => {
+                issuesToAdd[issObj.fieldName + issObj.type] = issObj;
+              })
+              if (Object.keys(issuesToAdd).length > 0) {
+                setIssuesToDisplay((prevState) => {
+                  return ({ ...prevState, ...issuesToAdd });
+                });
+              }
+            }} />
         );
       });
       poolDataSection = (

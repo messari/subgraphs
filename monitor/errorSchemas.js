@@ -5,7 +5,7 @@ export const protocolErrorMessages = {
     cumulativeTotalRevenueUSD: "'Protocol' entity has a cumulativeTotalRevenueUSD that is not within $1000 of the value of cumulativeProtocolSideRevenueUSD + cumulativeSupplySideRevenueUSD",
     cumulativeVolumeUSD: "This field on 'Protocol' entity has a negative value.",
     cumulativeUniqueUsers: "This field on 'Protocol' entity has a value below 0 or greater than 100,000,000.",
-    totalPoolCount: "This field on 'Protocol' entity has less than 0 pools or more than 10,000 pools.",
+    totalPoolCount: "This field on 'Protocol' entity has less than 0 pools or more than 500,000 pools.",
     cumulativeUniqueDepositors: "'Protocol' entity has fewer cumulativeUniqueUsers than cumulativeUniqueDepositors.",
     cumulativeUniqueBorrowers: "This field on 'Protocol' entity has a fewer cumulativeUniqueUsers than cumulativeUniqueBorrowers.",
     cumulativeUniqueLiquidators: "This field on 'Protocol' entity has less cumulativeUniqueUsers than cumulativeUniqueLiquidators.",

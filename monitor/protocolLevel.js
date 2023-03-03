@@ -114,7 +114,6 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                         cumulativePositionCount
                         totalPoolCount
                         totalDepositBalanceUSD
-                        cumulativeDepositUSD
                         totalBorrowBalanceUSD
                         cumulativeBorrowUSD
                         cumulativeLiquidateUSD
@@ -134,7 +133,6 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                         cumulativeTotalRevenueUSD
                         cumulativeUniqueUsers
                         totalDepositBalanceUSD
-                        cumulativeDepositUSD
                         totalBorrowBalanceUSD
                         cumulativeBorrowUSD
                         cumulativeLiquidateUSD
@@ -272,7 +270,7 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
 
         if (
             dataFields.includes("totalPoolCount") &&
-            !(parseFloat(data.totalPoolCount) >= 0 && parseFloat(data.totalPoolCount) < 10000) &&
+            !(parseFloat(data.totalPoolCount) >= 0 && parseFloat(data.totalPoolCount) < 500000) &&
             !issuesArrays.totalPoolCount.includes(data.totalPoolCount)
         ) {
             issuesArrays.totalPoolCount.push(data.totalPoolCount);
@@ -340,17 +338,6 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
             !issuesArrays.totalDepositBalanceUSD.includes('$' + formatIntToFixed2(parseFloat(data.totalDepositBalanceUSD)))
         ) {
             issuesArrays.totalDepositBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalDepositBalanceUSD)));
-        }
-
-        if (
-            dataFields.includes("cumulativeDepositUSD") &&
-            !(
-                parseFloat(data.cumulativeDepositUSD) >=
-                parseFloat(data.totalDepositBalanceUSD)
-            ) &&
-            !issuesArrays.cumulativeDepositUSD.includes('$' + formatIntToFixed2(parseFloat(data.cumulativeDepositUSD)))
-        ) {
-            issuesArrays.cumulativeDepositUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeDepositUSD)));
         }
 
         if (

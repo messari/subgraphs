@@ -2336,7 +2336,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.3.0",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3112,7 +3112,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "2.1.0",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -3530,7 +3530,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3552,7 +3552,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3574,7 +3574,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3596,7 +3596,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3771,8 +3771,8 @@
         "network": "celo",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "schema": "3.0.3",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6068,7 +6068,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.3.1",
+          "subgraph": "1.3.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6494,7 +6494,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.2",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -7813,6 +7813,58 @@
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        }
+      }
+    }
+  },
+  "gains-trade": {
+    "schema": "derivatives-perpfutures",
+    "base": "gains-trade",
+    "protocol": "gains-trade",
+    "project": "gains-network",
+    "deployments": {
+      "gains-trade-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gains-trade-arbitrum",
+            "query-id": "gains-trade-arbitrum"
+          }
+        },
+        "files": {
+          "template": "gains.trade.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "gains-trade-polygon": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gains-trade-polygon",
+            "query-id": "gains-trade-polygon"
+          }
+        },
+        "files": {
+          "template": "gains.trade.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
         }
       }
     }
