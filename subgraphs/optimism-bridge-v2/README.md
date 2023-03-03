@@ -50,6 +50,10 @@ Optimism Gateway does not charge a fee to bridge assets, therefore there is no r
 
 - Some of the earliest transfers on Optimism network are missing price data, because price oracles were not deployed yet
 
+## Smart Contract Interactions
+
+![Optimism Gateway](../../docs/images/protocols/optimism-gateway.png "Optimism Gateway")
+
 ## Links
 
 Links to the relevant sources to learn about this protocol.
