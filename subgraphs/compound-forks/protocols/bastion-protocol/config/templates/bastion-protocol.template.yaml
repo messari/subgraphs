@@ -38,9 +38,9 @@ dataSources:
           file: ./abis/prices/Calculations/Curve.json
         - name: CalculationsSushiSwap
           file: ./abis/prices/Calculations/SushiSwap.json
-      callHandlers:
-        - function: setFeeTo(address)
-          handler: handleSetFeeTo
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
       file: ./protocols/bastion-protocol/src/mapping.ts
 
   - kind: ethereum/contract

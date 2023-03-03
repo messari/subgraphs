@@ -91,12 +91,12 @@ import { getUsdPricePerToken } from "./prices";
 
 // empty handler for prices library
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-export function handlehandleSetFeeTo(call: ethereum.Call): void {}
+export function handlePairCreated(event: ethereum.Event): void {}
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
   const newPriceOracle = event.params.newPriceOracle;
-  log.info("[handleNewPriceOracle]price oracle {} => {}", [
+  log.info("[handleNewPriceOracle] price oracle {} => {}", [
     protocol._priceOracle,
     newPriceOracle.toHexString(),
   ]);
