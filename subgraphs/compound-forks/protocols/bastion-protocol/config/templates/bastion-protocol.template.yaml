@@ -65,6 +65,28 @@ dataSources:
           file: ./abis/CToken.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: _ERC20
+          file: ./abis/prices/ERC20.json
+        - name: UniswapV2Factory
+          file: ./abis/prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/prices/Aave/Oracle.json
+        - name: CurvePool
+          file: ./abis/prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/prices/Calculations/SushiSwap.json          
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
@@ -104,6 +126,28 @@ dataSources:
           file: ./abis/CToken.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: _ERC20
+          file: ./abis/prices/ERC20.json
+        - name: UniswapV2Factory
+          file: ./abis/prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/prices/Aave/Oracle.json
+        - name: CurvePool
+          file: ./abis/prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
@@ -149,6 +193,28 @@ templates:
           file: ./abis/PriceOracle.json
         - name: RewardDistributor
           file: ./abis/bastion-protocol/RewardDistributor.json
+        - name: _ERC20
+          file: ./abis/prices/ERC20.json
+        - name: UniswapV2Factory
+          file: ./abis/prices/Uniswap/Factory.json
+        - name: UniswapRouter
+          file: ./abis/prices/Uniswap/Router.json
+        - name: UniswapPair
+          file: ./abis/prices/Uniswap/Pair.json
+        - name: AaveOracleContract
+          file: ./abis/prices/Aave/Oracle.json
+        - name: CurvePool
+          file: ./abis/prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/prices/Curve/Registry.json
+        - name: YearnLensContract
+          file: ./abis/prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/prices/ChainLink.json
+        - name: CalculationsCurve
+          file: ./abis/prices/Calculations/Curve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
