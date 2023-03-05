@@ -80,7 +80,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
 	if (
 		NetworkConfigs.getRewardTokenList().includes(event.address.toHexString())
 	) {
-		if (GNO_REWARDS.includes(event.address.toHexString)) {
+		if (GNO_REWARDS.includes(event.address.toHexString())) {
 			let amount = event.params.reward
 
 			const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
@@ -139,7 +139,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			} else {
 				log.warning('GNO Rewards rate call reverted', [])
 			}
-		} else if (OP_REWARDS.includes(event.address.toHexString)) {
+		} else if (OP_REWARDS.includes(event.address.toHexString())) {
 			let amount = event.params.reward
 
 			const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
@@ -198,7 +198,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			} else {
 				log.warning('OP Rewards rate call reverted', [])
 			}
-		} else if (HOP_REWARDS.includes(event.address.toHexString)) {
+		} else if (HOP_REWARDS.includes(event.address.toHexString())) {
 			let amount = event.params.reward
 
 			const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
@@ -287,34 +287,34 @@ export function handleStaked(event: Staked): void {
 			new TokenInit(),
 			event
 		)
-		if (GNO_REWARDS.includes(event.address.toHexString)) {
+		if (GNO_REWARDS.includes(event.address.toHexString())) {
 			const token = sdk.Tokens.getOrCreateToken(
 				Address.fromString(RewardTokens.GNO)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
 			if (!pool.isInitialized) {
-				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.addStakedOutputTokenAmount(amount)
-		} else if (OP_REWARDS.includes(event.address.toHexString)) {
+		} else if (OP_REWARDS.includes(event.address.toHexString())) {
 			const token = sdk.Tokens.getOrCreateToken(
-				Address.fromString(RewardTokens.GNO)
+				Address.fromString(RewardTokens.OP)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
 			if (!pool.isInitialized) {
-				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.addStakedOutputTokenAmount(amount)
-		} else if (HOP_REWARDS.includes(event.address.toHexString)) {
+		} else if (HOP_REWARDS.includes(event.address.toHexString())) {
 			const token = sdk.Tokens.getOrCreateToken(
-				Address.fromString(RewardTokens.GNO)
+				Address.fromString(RewardTokens.HOP)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
 			if (!pool.isInitialized) {
-				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.addStakedOutputTokenAmount(amount)
 		}
@@ -350,34 +350,34 @@ export function handleWithdrawn(event: Withdrawn): void {
 			new TokenInit(),
 			event
 		)
-		if (GNO_REWARDS.includes(event.address.toHexString)) {
+		if (GNO_REWARDS.includes(event.address.toHexString())) {
 			const token = sdk.Tokens.getOrCreateToken(
 				Address.fromString(RewardTokens.GNO)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
 			if (!pool.isInitialized) {
-				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
-		} else if (OP_REWARDS.includes(event.address.toHexString)) {
+		} else if (OP_REWARDS.includes(event.address.toHexString())) {
 			const token = sdk.Tokens.getOrCreateToken(
-				Address.fromString(RewardTokens.GNO)
+				Address.fromString(RewardTokens.OP)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
 			if (!pool.isInitialized) {
-				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
-		} else if (HOP_REWARDS.includes(event.address.toHexString)) {
+		} else if (HOP_REWARDS.includes(event.address.toHexString())) {
 			const token = sdk.Tokens.getOrCreateToken(
-				Address.fromString(RewardTokens.GNO)
+				Address.fromString(RewardTokens.HOP)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
 			if (!pool.isInitialized) {
-				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token!)
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
 		}

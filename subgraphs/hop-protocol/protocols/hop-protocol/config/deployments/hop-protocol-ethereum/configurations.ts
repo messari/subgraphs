@@ -70,7 +70,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (bridgeAddress == MainnetBridge.USDT) return MainnetToken.USDT
 		else if (bridgeAddress == MainnetBridge.ETH) return MainnetToken.ETH
 		else if (bridgeAddress == MainnetBridge.SNX) return MainnetToken.SNX
-		else if (bridgeAddress == MainnetBridge.sUSD) return MainnetToken.sUSD
 		else if (bridgeAddress == MainnetBridge.MATIC) return MainnetToken.MATIC
 		else {
 			log.critical('Token not found', [])
@@ -120,7 +119,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (bridgeAddress == MainnetBridge.DAI) return OptimismAmm.DAI
 		else if (bridgeAddress == MainnetBridge.USDT) return OptimismAmm.USDT
 		else if (bridgeAddress == MainnetBridge.ETH) return OptimismAmm.ETH
-		else if (bridgeAddress == MainnetBridge.sUSD) return OptimismAmm.sUSD
 		else if (bridgeAddress == MainnetBridge.SNX) return OptimismAmm.SNX
 		else {
 			log.critical('Optimism Pool not found', [])
@@ -152,7 +150,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			MainnetToken.ETH,
 			MainnetToken.MATIC,
 			MainnetToken.SNX,
-			MainnetToken.sUSD,
 		]
 	}
 
@@ -230,7 +227,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 			MainnetBridge.ETH,
 			MainnetBridge.MATIC,
 			MainnetBridge.SNX,
-			MainnetBridge.sUSD,
 		]
 	}
 
@@ -291,7 +287,6 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		else if (tokenAddress == MainnetToken.DAI) return OptimismToken.DAI
 		else if (tokenAddress == MainnetToken.USDT) return OptimismToken.USDT
 		else if (tokenAddress == MainnetToken.ETH) return OptimismToken.ETH
-		else if (tokenAddress == MainnetToken.sUSD) return OptimismToken.sUSD
 		else if (tokenAddress == MainnetToken.SNX) return OptimismToken.SNX
 		else {
 			log.critical('Optimism Crosstoken not found', [])

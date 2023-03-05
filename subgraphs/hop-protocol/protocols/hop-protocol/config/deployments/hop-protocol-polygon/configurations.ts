@@ -182,6 +182,8 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 			return PolygonToken.USDT
 		} else if (poolAddress == PolygonAmm.ETH) {
 			return PolygonToken.ETH
+		} else if (poolAddress == PolygonAmm.MATIC) {
+			return PolygonToken.MATIC
 		} else {
 			log.critical('Token not found', [])
 			return ''

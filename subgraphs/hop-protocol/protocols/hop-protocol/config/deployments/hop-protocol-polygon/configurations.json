@@ -4,8 +4,8 @@
   "subgraphName": "hop-polygon",
   "deployment": "HOP_PROTOCOL_POLYGON",
   "graftEnabled": false,
-  "subgraphId": "Qmbk8xpfKcwG7itoCr2aJ3xhYYDLjftaiEQPdAvXNoThzN",
-  "graftStartBlock": 16761065,
+  "subgraphId": "QmdAqJPhLsi46wxH4gAKM2eYB4Cn2cXAdnv1jU7c7AcW1R",
+  "graftStartBlock": 17669515,
   "tokens": [
     {
       "dataSourceName": "Token",
@@ -13,7 +13,7 @@
       "tokenName": "USD Coin",
       "tokenDecimals": 6,
       "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
-      "startBlock": 15810014
+      "startBlock": 15810013
     },
     {
       "dataSourceName": "TokenUSDT",
@@ -93,7 +93,7 @@
       "dataSourceName": "HopL2Bridge",
       "token": "USDC",
       "address": "0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8",
-      "startBlock": 15810014
+      "startBlock": 15810015
     },
     {
       "dataSourceName": "HopL2BridgeUSDT",
@@ -122,7 +122,7 @@
   ],
   "rewards": [
     {
-      "dataSourceName": "HopL2RewardsUSDC",
+      "dataSourceName": "HopL2Rewards",
       "token": "USDC",
       "address": "0x7811737716942967Ae6567B26a5051cC72af550E",
       "startBlock": 34505750

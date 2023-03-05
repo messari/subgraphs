@@ -1,4 +1,9 @@
+import { Address } from '@graphprotocol/graph-ts'
+
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+export const POOL_TWO = Address.fromString(
+	'0x0000000000000000000000000000000000000001'
+)
 export namespace XdaiBridge {
 	export const USDC = '0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8'.toLowerCase()
 	export const USDT = '0xFD5a186A7e8453Eb867A360526c5d987A00ACaC2'.toLowerCase()
@@ -37,7 +42,6 @@ export namespace MainnetToken {
 	export const MATIC = '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0'.toLowerCase()
 	export const DAI = '0x6B175474E89094C44Da98b954EedeAC495271d0F'.toLowerCase()
 	export const ETH = ZERO_ADDRESS.toLowerCase()
-	export const sUSD = '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51'.toLowerCase()
 	export const SNX = '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f'.toLowerCase()
 }
 
@@ -47,7 +51,6 @@ export namespace MainnetBridge {
 	export const MATIC = '0x22B1Cbb8D98a01a3B71D034BB899775A76Eb1cc2'.toLowerCase()
 	export const DAI = '0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1'.toLowerCase()
 	export const ETH = '0xb8901acB165ed027E32754E0FFe830802919727f'.toLowerCase()
-	export const sUSD = '0x36443fC70E073fe9D50425f82a3eE19feF697d62'.toLowerCase()
 	export const SNX = '0x893246FACF345c99e4235E5A7bbEE7404c988b96'.toLowerCase()
 }
 
@@ -84,7 +87,6 @@ export namespace OptimismBridge {
 	export const USDT = '0x46ae9BaB8CEA96610807a275EBD36f8e916b5C61'.toLowerCase()
 	export const DAI = '0x7191061D5d4C60f598214cC6913502184BAddf18'.toLowerCase()
 	export const ETH = '0x83f6244Bd87662118d96D9a6D44f09dffF14b30E'.toLowerCase()
-	export const sUSD = '0x33Fe5bB8DA466dA55a8A32D6ADE2BB104E2C5201'.toLowerCase()
 	export const SNX = '0x16284c7323c35F4960540583998C98B1CfC581a7'.toLowerCase()
 }
 export namespace OptimismAmm {
@@ -92,7 +94,6 @@ export namespace OptimismAmm {
 	export const USDT = '0xeC4B41Af04cF917b54AEb6Df58c0f8D78895b5Ef'.toLowerCase()
 	export const DAI = '0xF181eD90D6CfaC84B8073FdEA6D34Aa744B41810'.toLowerCase()
 	export const ETH = '0xaa30D6bba6285d0585722e2440Ff89E23EF68864'.toLowerCase()
-	export const sUSD = '0x8d4063E82A4Db8CdAed46932E1c71e03CA69Bede'.toLowerCase()
 	export const SNX = '0x1990BC6dfe2ef605Bfc08f5A23564dB75642Ad73'.toLowerCase()
 }
 
@@ -101,7 +102,6 @@ export namespace OptimismToken {
 	export const USDT = '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58'.toLowerCase()
 	export const DAI = '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase()
 	export const ETH = '0x4200000000000000000000000000000000000006'.toLowerCase()
-	export const sUSD = '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9'.toLowerCase()
 	export const SNX = '0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4'.toLowerCase()
 }
 
@@ -188,8 +188,8 @@ export const MESSENGER_EVENT_SIGNATURES = [
 ]
 export namespace RewardTokens {
 	export const HOP = '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
-	export const OP = '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
-	export const GNO = '0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC'.toLowerCase()
+	export const OP = '0x4200000000000000000000000000000000000042'.toLowerCase()
+	export const GNO = '0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb'.toLowerCase()
 }
 export const GNO_REWARDS = [
 	XdaiRewardToken.DAI_A,
@@ -202,7 +202,7 @@ export const HOP_REWARDS = [
 	ArbitrumRewardToken.USDC,
 	ArbitrumRewardToken.USDT,
 	OptimismRewardToken.DAI,
-	OptimismRewardToken.SNX_B,
+	OptimismRewardToken.SNX_A,
 	OptimismRewardToken.ETH,
 	OptimismRewardToken.USDC,
 	OptimismRewardToken.USDT,
@@ -214,4 +214,4 @@ export const HOP_REWARDS = [
 	XdaiRewardToken.USDC_B,
 	XdaiRewardToken.USDT_B,
 ]
-export const OP_REWARDS = [OptimismRewardToken.SNX_A]
+export const OP_REWARDS = [OptimismRewardToken.SNX_B]
