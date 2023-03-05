@@ -77,7 +77,7 @@ export function handleBurned(event: Burned): void {
 }
 
 export function handleFeesEarned(event: FeesEarned): void {
-  createFeesEarned(event);
+  //createFeesEarned(event);
   updateRevenue(event);
   updateTvl(event);
   updateVaultSnapshots(event.address, event.block);

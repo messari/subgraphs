@@ -14,17 +14,22 @@ export function getDualTokenUSD(
   blockNumber: BigInt
 ): BigDecimal {
   // Update token prices
-  let token0 = updateTokenPrice(token0Address, blockNumber);
-  let token1 = updateTokenPrice(token1Address, blockNumber);
+  const amount0USD = getTokenValueUSD(token0Address, amount0, blockNumber);
+  const amount1USD = getTokenValueUSD(token1Address, amount1, blockNumber);
 
-  let amount0Usd = token0.lastPriceUSD!.times(
-    bigIntToBigDecimal(amount0, token0.decimals)
-  );
-  let amount1Usd = token1.lastPriceUSD!.times(
-    bigIntToBigDecimal(amount1, token1.decimals)
-  );
+  return amount0USD.plus(amount1USD);
+}
 
-  return amount0Usd.plus(amount1Usd);
+export function getTokenValueUSD(
+  tokenAddress: Address,
+  amount: BigInt,
+  blockNumber: BigInt
+): BigDecimal {
+  let token = updateTokenPrice(tokenAddress, blockNumber);
+  let amountUSD = token.lastPriceUSD!.times(
+    bigIntToBigDecimal(amount, token.decimals)
+  );
+  return amountUSD;
 }
 
 // Update token price and return token entity

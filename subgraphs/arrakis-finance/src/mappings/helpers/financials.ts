@@ -1,4 +1,4 @@
-import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import { Address, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
 import { FeesEarned } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { ArrakisVaultV1 as ArrakisVaultContract } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { getOrCreateUnderlyingToken, getOrCreateVault } from "./vaults";
@@ -130,11 +130,14 @@ export function updateRevenue(event: FeesEarned): void {
   vaultDailySnapshot.dailyTotalRevenueUSD += eventTotalRevenueUSD;
 
   vaultHourlySnapshot.hourlySupplySideRevenueUSD += eventSupplySideRevenueUSD;
-  vaultHourlySnapshot.hourlyProtocolSideRevenueUSD += eventProtocolSideRevenueUSD;
+  vaultHourlySnapshot.hourlyProtocolSideRevenueUSD +=
+    eventProtocolSideRevenueUSD;
   vaultHourlySnapshot.hourlyTotalRevenueUSD += eventTotalRevenueUSD;
 
-  financialsDailySnapshot.dailySupplySideRevenueUSD += eventSupplySideRevenueUSD;
-  financialsDailySnapshot.dailyProtocolSideRevenueUSD += eventProtocolSideRevenueUSD;
+  financialsDailySnapshot.dailySupplySideRevenueUSD +=
+    eventSupplySideRevenueUSD;
+  financialsDailySnapshot.dailyProtocolSideRevenueUSD +=
+    eventProtocolSideRevenueUSD;
   financialsDailySnapshot.dailyTotalRevenueUSD += eventTotalRevenueUSD;
 
   // Update cumulative revenue from protocol
