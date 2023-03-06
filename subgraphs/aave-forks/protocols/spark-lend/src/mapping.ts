@@ -1,14 +1,6 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
-import {
-  getNetworkSpecificConstant,
-  Protocol,
-} from "./constants";
+import { getNetworkSpecificConstant, Protocol } from "./constants";
 import {
   BorrowingDisabledOnReserve,
   BorrowingEnabledOnReserve,
@@ -20,14 +12,14 @@ import {
 } from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
-  Deposit,
+  Supply,
   LiquidationCall,
-  Paused,
+  // Paused,
   Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
-  Unpaused,
+  // Unpaused,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
 import { AToken } from "../../../generated/LendingPool/AToken";
@@ -61,9 +53,7 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  equalsIgnoreCase,
   exponentToBigDecimal,
-  Network,
   PositionSide,
   readValue,
   RewardTokenType,
@@ -71,7 +61,6 @@ import {
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
-import { StakedAave } from "../../../generated/LendingPool/StakedAave";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
 import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
@@ -293,16 +282,16 @@ export function handleReserveUsedAsCollateralDisabled(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function handlePaused(event: Paused): void {
-  _handlePaused(getProtocolData());
-}
+// export function handlePaused(event: Paused): void {
+//   _handlePaused(getProtocolData());
+// }
+// TODO: this is not implemented in spark lend? Did not find these events in the ABI
+// // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// export function handleUnpaused(event: Unpaused): void {
+//   _handleUnpaused(getProtocolData());
+// }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function handleUnpaused(event: Unpaused): void {
-  _handleUnpaused(getProtocolData());
-}
-
-export function handleDeposit(event: Deposit): void {
+export function handleDeposit(event: Supply): void {
   _handleDeposit(
     event,
     event.params.amount,
