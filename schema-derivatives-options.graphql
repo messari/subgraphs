@@ -90,28 +90,28 @@ enum LiquidityPoolFeeType {
   " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
   DYNAMIC_TRADING_FEE
 
-  " Fixed fee that's paid to the LP, as a percentage of the traded amount. e.g. 10% of fees to GMX LP providers (GLP holders). "
+  " Fixed fee that's paid to the LP, as a percentage of the traded amount. "
   FIXED_LP_FEE
 
   " Some protocols use dynamic LP fees . Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
   DYNAMIC_LP_FEE
 
-  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 10% of GMX fees to protocol. "
+  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. "
   FIXED_PROTOCOL_FEE
 
   " Some protocols use dynamic protocol fees. Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
   DYNAMIC_PROTOCOL_FEE
 
-  " Fixed fee that's paid to the stakers, as a percentage of the traded amount. e.g. 15% of all fees on GMX to stakers. "
+  " Fixed fee that's paid to the stakers, as a percentage of the traded amount. "
   FIXED_STAKE_FEE
 
   " Some protocols use dynamic stakers fees. Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
   DYNAMIC_STAKE_FEE
 
-  " One-time fee charged by the protocol during deposit, in percentages of the deposit token (e.g. dynamic fee collected for LP providers in GMX)"
+  " One-time fee charged by the protocol during deposit, in percentages of the deposit token. "
   DEPOSIT_FEE
 
-  " One-time fee charged by the protocol (e.g. GMX charges a fee from certain pools with withdrawing) during withdrawal, in percentages of the withdrawal token "
+  " One-time fee charged by the protocol during withdrawal, in percentages of the withdrawal token "
   WITHDRAWAL_FEE
 }
 
