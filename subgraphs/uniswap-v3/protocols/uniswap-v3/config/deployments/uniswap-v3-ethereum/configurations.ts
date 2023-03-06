@@ -117,6 +117,6 @@ export class UniswapV3MainnetConfigurations implements Configurations {
     ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return BigDecimal.fromString("100000");
+    return BigDecimal.fromString("200000");
   }
 }
