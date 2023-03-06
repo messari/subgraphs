@@ -10,10 +10,10 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return new CustomPriceType();
   }
 
-  let network = dataSource.network();
+  const network = dataSource.network();
 
   // TraderJoe Router
-  let traderJoePrice = getPriceUsdcTraderJoe(tokenAddr, network);
+  const traderJoePrice = getPriceUsdcTraderJoe(tokenAddr, network);
   if (!traderJoePrice.reverted) {
     log.warning("[TraderJoeRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -26,7 +26,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   ]);
 
   // 7. SushiSwap Router
-  let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
+  const sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
   if (!sushiswapPrice.reverted) {
     log.warning("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -39,7 +39,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 }
 
 export function getUsdPrice(tokenAddr: Address, amount: BigDecimal): BigDecimal {
-  let tokenPrice = getUsdPricePerToken(tokenAddr);
+  const tokenPrice = getUsdPricePerToken(tokenAddr);
 
   if (!tokenPrice.reverted) {
     return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);
