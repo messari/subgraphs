@@ -1,4 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BIGDECIMAL_ZERO } from "../constants";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
@@ -55,9 +56,7 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 // https://docs.aave.com/developers/v/2.0/glossary
 
 export function rayToWad(a: BigInt): BigInt {
-  const halfRatio = BigInt.fromI32(10)
-    .pow(9)
-    .div(BigInt.fromI32(2));
+  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
   return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
 }
 
@@ -69,4 +68,11 @@ export function wadToRay(a: BigInt): BigInt {
 // Round BigDecimal to whole number
 export function roundToWholeNumber(n: BigDecimal): BigDecimal {
   return n.truncate(0);
+}
+
+// safe divide BigDecimal
+export function divide(a: BigDecimal, b: BigDecimal): BigDecimal {
+  if (b == BIGDECIMAL_ZERO) return BIGDECIMAL_ZERO;
+
+  return a.div(b);
 }
