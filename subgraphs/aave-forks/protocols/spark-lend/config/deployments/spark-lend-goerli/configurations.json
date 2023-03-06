@@ -1,16 +1,12 @@
 {
   "network": "goerli",
-  "factory": {
+  "PoolAddressesProviderRegistry": {
     "startBlock": "8530760",
-    "address": "0x5EEE318E5668d578b820d3C80152482E01fcE5cA"
+    "address": "0x4B77347F0Ea327017Af59D75445578d892bB0eB5"
   },
-  "lendingPoolConfigurator": {
-    "startBlock": "8530774",
-    "address": "0x1c8f3F938Fb50dc5dd9202a8038Cc94D9e3CEaEa"
-  },
-  "lendingPool": {
-    "startBlock": "8530773",
-    "address": "0xcce82ac5CE8Be2718a8112d2dD9155836b131C27"
+  "RewardsController": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": "8530760"
   },
   "graftEnabled": false,
   "subgraphId": "",

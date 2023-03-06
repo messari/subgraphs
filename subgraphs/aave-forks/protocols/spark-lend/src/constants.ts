@@ -17,6 +17,14 @@ export namespace Protocol {
   export const NAME = "Spark Lend";
   export const SLUG = "spark-lend";
 }
+
+export namespace TokenType {
+  export const ATOKEN = "ATOKEN";
+  export const INPUTTOKEN = "INPUTTOKEN";
+  export const VTOKEN = "VTOKEN";
+  export const STOKEN = "STOKEN";
+}
+
 export const AAVE_DECIMALS = 8;
 
 ////////////////////////////
@@ -25,7 +33,7 @@ export const AAVE_DECIMALS = 8;
 
 export class NetworkSpecificConstant {
   constructor(
-    public readonly protocolAddress: Address, // aka, LendingPoolAddressesProvider
+    public readonly protocolAddress: Address, // aka, PoolAddressesProviderRegistry
     public readonly network: string
   ) {}
 }
@@ -48,3 +56,7 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
 export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }
+
+// Context keys
+export const PROTOCOL_ID_KEY = "protocolId";
+export const POOL_ADDRESSES_PROVIDER_ID_KEY = "poolAddressesProviderId";
