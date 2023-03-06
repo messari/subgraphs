@@ -5304,7 +5304,7 @@
     "protocol": "optimism-governance",
     "deployments": {
       "optimism-governance-optimism": {
-        "network": "ethereum",
+        "network": "optimism",
         "status": "dev",
         "versions": {
           "schema": "1.0.0",
