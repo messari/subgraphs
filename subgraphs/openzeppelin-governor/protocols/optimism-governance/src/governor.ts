@@ -14,7 +14,6 @@ import {
   _handleProposalCreated,
   _handleProposalCanceled,
   _handleProposalExecuted,
-  _handleProposalQueued,
   _handleVoteCast,
   getProposal,
   getGovernance,
