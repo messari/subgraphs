@@ -39,18 +39,23 @@ export class NetworkSpecificConstant {
 }
 
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
-  const network = dataSource.network();
-  if (equalsIgnoreCase(network, "goerli")) {
-    return new NetworkSpecificConstant(
-      Address.fromString("0x5EEE318E5668d578b820d3C80152482E01fcE5cA"),
-      Network.MAINNET // TODO: should be goerli
-    );
-  } else {
-    log.error("[getNetworkSpecificConstant] Unsupported network: {}", [
-      network,
-    ]);
-    return new NetworkSpecificConstant(Address.fromString(ZERO_ADDRESS), "");
-  }
+  return new NetworkSpecificConstant(
+    Address.fromString("0x5EEE318E5668d578b820d3C80152482E01fcE5cA"),
+    Network.MAINNET // TODO: should be goerli
+  );
+
+  // const network = dataSource.network();
+  // if (equalsIgnoreCase(network, "goerli")) {
+  //   return new NetworkSpecificConstant(
+  //     Address.fromString("0x5EEE318E5668d578b820d3C80152482E01fcE5cA"),
+  //     Network.MAINNET // TODO: should be goerli
+  //   );
+  // } else {
+  //   log.error("[getNetworkSpecificConstant] Unsupported network: {}", [
+  //     network,
+  //   ]);
+  //   return new NetworkSpecificConstant(Address.fromString(ZERO_ADDRESS), "");
+  // }
 }
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
