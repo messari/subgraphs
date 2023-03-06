@@ -163,6 +163,9 @@ interface Protocol {
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
+
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 70% of fees on GMX). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   cumulativeSupplySideRevenueUSD: BigDecimal!
 
@@ -287,6 +290,9 @@ type DerivPerpProtocol implements Protocol @entity {
 
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
+
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
 
   " All historical Notional volume in USD "
   cumulativeVolumeUSD: BigDecimal!
@@ -561,6 +567,9 @@ type FinancialsDailySnapshot @entity(immutable: true) {
 
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
+
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
 
   " Daily trade Notional volume, in USD "
   dailyVolumeUSD: BigDecimal!
