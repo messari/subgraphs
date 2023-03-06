@@ -13,11 +13,7 @@ import {
   VaultFeeType,
 } from "../../common/constants";
 import { getOrCreateYieldAggregator } from "../../common/getters";
-import {
-  createDeposit,
-  createFeesEarned,
-  createWithdraw,
-} from "../helpers/events";
+import { createDeposit, createWithdraw } from "../helpers/events";
 import { updateRevenue, updateTvl } from "../helpers/financials";
 import { updateUsageMetrics } from "../helpers/usageMetrics";
 import {
@@ -27,11 +23,11 @@ import {
 } from "../helpers/vaults";
 
 export function handlePoolCreated(event: PoolCreated): void {
-  let protocol = getOrCreateYieldAggregator(event.address);
+  const protocol = getOrCreateYieldAggregator(event.address);
   protocol.totalPoolCount += 1;
   protocol.save();
   // Create Vault
-  let vault = getOrCreateVault(event.params.pool, event.block);
+  const vault = getOrCreateVault(event.params.pool, event.block);
   vault.protocol = event.address.toHex();
   vault.save();
 
@@ -43,7 +39,7 @@ export function handleMinted(event: Minted): void {
   createDeposit(event);
 
   // Update vault token supply
-  let vault = getOrCreateVault(event.address, event.block);
+  const vault = getOrCreateVault(event.address, event.block);
   vault.inputTokenBalance = vault.inputTokenBalance.plus(
     event.params.mintAmount
   );
@@ -62,7 +58,7 @@ export function handleBurned(event: Burned): void {
   createWithdraw(event);
 
   // Update vault token supply
-  let vault = getOrCreateVault(event.address, event.block);
+  const vault = getOrCreateVault(event.address, event.block);
   vault.inputTokenBalance = vault.inputTokenBalance.minus(
     event.params.burnAmount
   );
@@ -77,14 +73,13 @@ export function handleBurned(event: Burned): void {
 }
 
 export function handleFeesEarned(event: FeesEarned): void {
-  //createFeesEarned(event);
   updateRevenue(event);
   updateTvl(event);
   updateVaultSnapshots(event.address, event.block);
 }
 
 export function handleUpdateManagerParams(event: UpdateManagerParams): void {
-  let vaultPerformanceFee = getOrCreateVaultFee(
+  const vaultPerformanceFee = getOrCreateVaultFee(
     VaultFeeType.PERFORMANCE_FEE,
     event.address.toHex()
   );

@@ -25,8 +25,8 @@ export function getTokenValueUSD(
   amount: BigInt,
   blockNumber: BigInt
 ): BigDecimal {
-  let token = updateTokenPrice(tokenAddress, blockNumber);
-  let amountUSD = token.lastPriceUSD!.times(
+  const token = updateTokenPrice(tokenAddress, blockNumber);
+  const amountUSD = token.lastPriceUSD!.times(
     bigIntToBigDecimal(amount, token.decimals)
   );
   return amountUSD;
@@ -37,13 +37,13 @@ export function updateTokenPrice(
   tokenAddress: Address,
   blockNumber: BigInt
 ): Token {
-  let token = getOrCreateToken(tokenAddress);
+  const token = getOrCreateToken(tokenAddress);
   if (blockNumber > token.lastPriceBlockNumber!) {
     let priceSourceSkips = TOKEN_PRICE_SOURCE_SKIPS.get(tokenAddress);
     if (priceSourceSkips === null) {
       priceSourceSkips = [];
     }
-    let fetchPrice = getUsdPricePerToken(tokenAddress, priceSourceSkips);
+    const fetchPrice = getUsdPricePerToken(tokenAddress, priceSourceSkips);
     token.lastPriceUSD = fetchPrice.usdPrice.div(fetchPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = blockNumber;
     token.save();

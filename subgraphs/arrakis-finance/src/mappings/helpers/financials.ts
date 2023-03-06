@@ -1,4 +1,4 @@
-import { Address, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { FeesEarned } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { ArrakisVaultV1 as ArrakisVaultContract } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { getOrCreateUnderlyingToken, getOrCreateVault } from "./vaults";
@@ -20,12 +20,12 @@ import { bigIntToBigDecimal } from "../../common/utils/numbers";
 
 // Update TVL related fields in all entities
 export function updateTvl(event: ethereum.Event): void {
-  let underlyingToken = getOrCreateUnderlyingToken(event.address);
+  const underlyingToken = getOrCreateUnderlyingToken(event.address);
 
   // Update underlying amounts
   if (event.block.number > underlyingToken.lastAmountBlockNumber) {
-    let vaultContract = ArrakisVaultContract.bind(event.address);
-    let totalAmounts = vaultContract.getUnderlyingBalances();
+    const vaultContract = ArrakisVaultContract.bind(event.address);
+    const totalAmounts = vaultContract.getUnderlyingBalances();
     underlyingToken.lastAmount0 = totalAmounts.getAmount0Current();
     underlyingToken.lastAmount1 = totalAmounts.getAmount1Current();
     underlyingToken.lastAmountBlockNumber = event.block.number;
@@ -33,10 +33,10 @@ export function updateTvl(event: ethereum.Event): void {
   }
 
   // Track existing TVL for cumulative calculations
-  let vault = getOrCreateVault(event.address, event.block);
-  let oldTvl = vault.totalValueLockedUSD;
+  const vault = getOrCreateVault(event.address, event.block);
+  const oldTvl = vault.totalValueLockedUSD;
 
-  let newTvl = getDualTokenUSD(
+  const newTvl = getDualTokenUSD(
     Address.fromString(underlyingToken.token0),
     Address.fromString(underlyingToken.token1),
     underlyingToken.lastAmount0,
@@ -45,11 +45,11 @@ export function updateTvl(event: ethereum.Event): void {
   );
 
   // Calculate price per share
-  let outputToken = getOrCreateToken(Address.fromString(vault.outputToken!));
-  let vaultTokenSupply = vault.outputTokenSupply!;
+  const outputToken = getOrCreateToken(Address.fromString(vault.outputToken!));
+  const vaultTokenSupply = vault.outputTokenSupply!;
   let outputTokenPriceUSD = vault.outputTokenPriceUSD;
   if (vaultTokenSupply > BIGINT_ZERO) {
-    let outputTokenSupplyDecimals = bigIntToBigDecimal(
+    const outputTokenSupplyDecimals = bigIntToBigDecimal(
       vaultTokenSupply,
       outputToken.decimals
     );
@@ -57,10 +57,10 @@ export function updateTvl(event: ethereum.Event): void {
   }
 
   // Update entities
-  let protocol = getOrCreateYieldAggregator(
+  const protocol = getOrCreateYieldAggregator(
     REGISTRY_ADDRESS_MAP.get(dataSource.network())!
   );
-  let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
 
   vault.totalValueLockedUSD = newTvl;
   vault.outputTokenPriceUSD = outputTokenPriceUSD;
@@ -78,10 +78,10 @@ export function updateTvl(event: ethereum.Event): void {
 
 // Update revenue related fields, Only changes when rebalance is called.
 export function updateRevenue(event: FeesEarned): void {
-  let underlyingToken = getOrCreateUnderlyingToken(event.address);
+  const underlyingToken = getOrCreateUnderlyingToken(event.address);
 
   // Calculate revenue in USD
-  let eventTotalRevenueUSD = getDualTokenUSD(
+  const eventTotalRevenueUSD = getDualTokenUSD(
     Address.fromString(underlyingToken.token0),
     Address.fromString(underlyingToken.token1),
     event.params.feesEarned0,
@@ -91,28 +91,28 @@ export function updateRevenue(event: FeesEarned): void {
 
   const SupplySideShare = BIGDECIMAL_HUNDRED.minus(PROTOCOL_PERFORMANCE_FEE);
 
-  let eventSupplySideRevenueUSD = eventTotalRevenueUSD
+  const eventSupplySideRevenueUSD = eventTotalRevenueUSD
     .times(SupplySideShare)
     .div(BIGDECIMAL_HUNDRED);
 
-  let eventProtocolSideRevenueUSD = eventTotalRevenueUSD
+  const eventProtocolSideRevenueUSD = eventTotalRevenueUSD
     .times(PROTOCOL_PERFORMANCE_FEE)
     .div(BIGDECIMAL_HUNDRED);
 
   // Update entities
-  let protocol = getOrCreateYieldAggregator(
+  const protocol = getOrCreateYieldAggregator(
     REGISTRY_ADDRESS_MAP.get(dataSource.network())!
   );
-  let vault = getOrCreateVault(event.address, event.block);
-  let vaultDailySnapshot = getOrCreateVaultDailySnapshot(
+  const vault = getOrCreateVault(event.address, event.block);
+  const vaultDailySnapshot = getOrCreateVaultDailySnapshot(
     event.address,
     event.block
   );
-  let vaultHourlySnapshot = getOrCreateVaultHourlySnapshot(
+  const vaultHourlySnapshot = getOrCreateVaultHourlySnapshot(
     event.address,
     event.block
   );
-  let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
 
   // Update protocol cumulative revenue
   protocol.cumulativeSupplySideRevenueUSD += eventSupplySideRevenueUSD;

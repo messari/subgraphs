@@ -13,17 +13,16 @@ import {
   updateRewardEmission,
 } from "../helpers/liquidityGauge";
 import { getOrCreateVault, updateVaultSnapshots } from "../helpers/vaults";
-import { _GaugeRewardToken } from "../../../generated/schema";
 
 export function handleAddGauge(event: AddGauge): void {
   const gaugeAddress = event.params.gauge;
   const vaultAddress = event.params.vault;
-  let gauge = getOrCreateLiquidityGauge(gaugeAddress);
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress);
   gauge.vault = vaultAddress.toHex();
   gauge.save();
 
   // Liquidity gauge sets the first reward token to SPICE in constructor
-  let gaugeContract = GaugeContract.bind(gaugeAddress);
+  const gaugeContract = GaugeContract.bind(gaugeAddress);
   const rewardTokenAddress = gaugeContract.SPICE();
   updateRewardToken(
     gaugeAddress,
@@ -37,9 +36,9 @@ export function handleAddGauge(event: AddGauge): void {
 
 export function handleDeposit(event: Deposit): void {
   // update amount of tokens staked
-  let gauge = getOrCreateLiquidityGauge(event.address);
+  const gauge = getOrCreateLiquidityGauge(event.address);
   const vaultAddress = Address.fromString(gauge.vault);
-  let vault = getOrCreateVault(vaultAddress, event.block);
+  const vault = getOrCreateVault(vaultAddress, event.block);
   vault.stakedOutputTokenAmount = vault.stakedOutputTokenAmount!.plus(
     event.params.value
   );
@@ -50,9 +49,9 @@ export function handleDeposit(event: Deposit): void {
 
 export function handleWithdraw(event: Withdraw): void {
   // update amount of tokens staked
-  let gauge = getOrCreateLiquidityGauge(event.address);
+  const gauge = getOrCreateLiquidityGauge(event.address);
   const vaultAddress = Address.fromString(gauge.vault);
-  let vault = getOrCreateVault(vaultAddress, event.block);
+  const vault = getOrCreateVault(vaultAddress, event.block);
   vault.stakedOutputTokenAmount = vault.stakedOutputTokenAmount!.minus(
     event.params.value
   );
@@ -66,7 +65,7 @@ export function handleRewardDataUpdate(event: RewardDataUpdate): void {
   const gaugeAddress = event.address;
   const rewardTokenAddress = event.params._token;
 
-  let gauge = getOrCreateLiquidityGauge(gaugeAddress);
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress);
   const vaultAddress = Address.fromString(gauge.vault);
 
   updateRewardToken(

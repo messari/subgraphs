@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _GaugeRewardToken, _LiquidityGauge } from "../../../generated/schema";
 import { LiquidityGaugeV4 as GaugeContract } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
 import {
@@ -28,12 +28,12 @@ function createGaugeRewardToken(
   rewardTokenAddress: Address,
   rewardTokenIndex: i32
 ): _GaugeRewardToken {
-  let id = gaugeAddress
+  const id = gaugeAddress
     .toHex()
     .concat("-")
     .concat(rewardTokenAddress.toHex());
 
-  let rewardToken = new _GaugeRewardToken(id);
+  const rewardToken = new _GaugeRewardToken(id);
   rewardToken.gauge = gaugeAddress.toHex();
   rewardToken.rewardToken = rewardTokenAddress.toHex();
   rewardToken.rewardTokenIndex = rewardTokenIndex;
@@ -50,29 +50,26 @@ export function updateRewardToken(
 ): void {
   getOrCreateRewardToken(rewardTokenAddress);
 
-  let vault = getOrCreateVault(vaultAddress, block);
+  const vault = getOrCreateVault(vaultAddress, block);
 
   let gaugeRewardToken = _GaugeRewardToken.load(
-    gaugeAddress
-      .toHex()
-      .concat("-")
-      .concat(rewardTokenAddress.toHex())
+    gaugeAddress.toHex().concat("-").concat(rewardTokenAddress.toHex())
   );
   // Add gauge reward token if not found
   if (!gaugeRewardToken) {
-    let rewardTokens = vault.rewardTokens!;
-    let emissionsAmount = vault.rewardTokenEmissionsAmount!;
-    let emissionsUSD = vault.rewardTokenEmissionsUSD!;
+    const rewardTokens = vault.rewardTokens!;
+    const emissionsAmount = vault.rewardTokenEmissionsAmount!;
+    const emissionsUSD = vault.rewardTokenEmissionsUSD!;
 
     // Check if reward token already exists on the vault
     // This might be the case if a new gauge replaced an old one
-    let rewardTokenIndex = rewardTokens.length
+    let rewardTokenIndex = rewardTokens.length;
     for (let i = 0; i < rewardTokens.length; i++) {
       if (Address.fromString(rewardTokens[i]) == rewardTokenAddress) {
-        rewardTokenIndex = i
+        rewardTokenIndex = i;
       }
     }
-    
+
     // Create new _GaugeRewardToken entity for future index lookup
     gaugeRewardToken = createGaugeRewardToken(
       gaugeAddress,
@@ -102,26 +99,26 @@ export function updateRewardEmission(
     .toHex()
     .concat("-")
     .concat(rewardTokenAddress.toHex());
-  let gaugeRewardToken = _GaugeRewardToken.load(gaugeRewardTokenId)!;
+  const gaugeRewardToken = _GaugeRewardToken.load(gaugeRewardTokenId)!;
   const rewardTokenIndex = gaugeRewardToken.rewardTokenIndex;
 
   // Update emissions
-  let vault = getOrCreateVault(vaultAddress, block);
+  const vault = getOrCreateVault(vaultAddress, block);
 
   // Calculate new rates
-  let gaugeContract = GaugeContract.bind(gaugeAddress);
+  const gaugeContract = GaugeContract.bind(gaugeAddress);
   const rewardData = gaugeContract.reward_data(rewardTokenAddress);
   const periodFinish = rewardData.getPeriod_finish();
 
-  let emissionsAmount = vault.rewardTokenEmissionsAmount!;
-  let emissionsUSD = vault.rewardTokenEmissionsUSD!;
+  const emissionsAmount = vault.rewardTokenEmissionsAmount!;
+  const emissionsUSD = vault.rewardTokenEmissionsUSD!;
   if (block.timestamp < periodFinish) {
     // Calculate rate if reward period has not ended
     const rate = rewardData.getRate(); // rate is tokens per second
     emissionsAmount[rewardTokenIndex] = rate.times(
       BigInt.fromI32(SECONDS_PER_DAY)
     );
-    let rewardToken = updateTokenPrice(rewardTokenAddress, block.number);
+    const rewardToken = updateTokenPrice(rewardTokenAddress, block.number);
     emissionsUSD[rewardTokenIndex] = rewardToken.lastPriceUSD!.times(
       emissionsAmount[rewardTokenIndex].toBigDecimal()
     );

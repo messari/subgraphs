@@ -1,10 +1,4 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Vault, VaultFee, _UnderlyingToken } from "../../../generated/schema";
 import { ArrakisVaultV1 as VaultV1Contract } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { UniswapV3Pool as PoolContract } from "../../../generated/templates/ArrakisVault/UniswapV3Pool";
@@ -25,10 +19,10 @@ export function updateVaultSnapshots(
   vaultAddress: Address,
   block: ethereum.Block
 ): void {
-  let vault = getOrCreateVault(vaultAddress, block);
+  const vault = getOrCreateVault(vaultAddress, block);
 
-  let dailySnapshot = getOrCreateVaultDailySnapshot(vaultAddress, block);
-  let hourlySnapshot = getOrCreateVaultHourlySnapshot(vaultAddress, block);
+  const dailySnapshot = getOrCreateVaultDailySnapshot(vaultAddress, block);
+  const hourlySnapshot = getOrCreateVaultHourlySnapshot(vaultAddress, block);
 
   dailySnapshot.inputTokenBalance = vault.inputTokenBalance;
   dailySnapshot.outputTokenSupply = vault.outputTokenSupply!;
@@ -64,12 +58,12 @@ export function getOrCreateVault(
   vaultAddress: Address,
   block: ethereum.Block
 ): Vault {
-  let vaultId = vaultAddress.toHex();
+  const vaultId = vaultAddress.toHex();
   let vault = Vault.load(vaultId);
   if (!vault) {
-    let vaultContract = VaultV1Contract.bind(vaultAddress);
+    const vaultContract = VaultV1Contract.bind(vaultAddress);
     const poolAddress = vaultContract.pool();
-    let poolContract = PoolContract.bind(poolAddress);
+    const poolContract = PoolContract.bind(poolAddress);
     const poolFeePercentage = poolContract.fee() / 10000.0;
 
     // Create relevant tokens
@@ -105,13 +99,12 @@ export function getOrCreateVault(
     const managerFee = BigInt.fromI32(
       vaultContract.managerFeeBPS() / 100
     ).toBigDecimal();
-    let vaultPerformanceFee = getOrCreateVaultFee(
+    const vaultPerformanceFee = getOrCreateVaultFee(
       VaultFeeType.PERFORMANCE_FEE,
       vaultId
     );
-    vaultPerformanceFee.feePercentage = PROTOCOL_PERFORMANCE_FEE.plus(
-      managerFee
-    );
+    vaultPerformanceFee.feePercentage =
+      PROTOCOL_PERFORMANCE_FEE.plus(managerFee);
     vaultPerformanceFee.save();
 
     vault.fees = [vaultPerformanceFee.id];
@@ -150,7 +143,7 @@ export function getOrCreateVaultFee(
   feeType: string,
   vaultId: string
 ): VaultFee {
-  let vaultFeeId = feeType.concat("-").concat(vaultId);
+  const vaultFeeId = feeType.concat("-").concat(vaultId);
 
   let vaultFee = VaultFee.load(vaultFeeId);
   if (!vaultFee) {
