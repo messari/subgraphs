@@ -1,11 +1,11 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../constants";
 
-export let minute = BigInt.fromI32(60);
-export let hour = BigInt.fromI32(3600);
-export let day = BigInt.fromI32(86400);
+export const minute = BigInt.fromI32(60);
+export const hour = BigInt.fromI32(3600);
+export const day = BigInt.fromI32(86400);
 
-export let one = BigInt.fromI32(1);
+export const one = BigInt.fromI32(1);
 
 export function getDays(timestamp: i64): i64 {
   // Get number of days since epoch time
@@ -18,7 +18,7 @@ export function getHours(timestamp: i64): i64 {
 }
 
 export function getMinuteOpenTime(timestamp: BigInt): BigInt {
-  let interval = minute;
+  const interval = minute;
   return getOpenTime(timestamp, interval);
 }
 
@@ -27,7 +27,7 @@ export function getMinuteCloseTime(timestamp: BigInt): BigInt {
 }
 
 export function getTenMinuteOpenTime(timestamp: BigInt): BigInt {
-  let interval = minute.times(BigInt.fromI32(10));
+  const interval = minute.times(BigInt.fromI32(10));
   return getOpenTime(timestamp, interval);
 }
 
@@ -38,7 +38,7 @@ export function getTenMinuteCloseTime(timestamp: BigInt): BigInt {
 }
 
 export function getHourOpenTime(timestamp: BigInt): BigInt {
-  let interval = hour;
+  const interval = hour;
   return getOpenTime(timestamp, interval);
 }
 
@@ -47,7 +47,7 @@ export function getHourCloseTime(timestamp: BigInt): BigInt {
 }
 
 export function getDayOpenTime(timestamp: BigInt): BigInt {
-  let interval = day;
+  const interval = day;
   return getOpenTime(timestamp, interval);
 }
 
@@ -58,13 +58,13 @@ export function getDayCloseTime(timestamp: BigInt): BigInt {
 // helpers
 
 export function getOpenTime(timestamp: BigInt, interval: BigInt): BigInt {
-  let excess = timestamp.mod(interval);
+  const excess = timestamp.mod(interval);
   return timestamp.minus(excess);
 }
 
 export function isSameDay(t1: BigInt, t2: BigInt): boolean {
-  let startOfDay1 = getDayOpenTime(t1);
-  let startOfDay2 = getDayOpenTime(t2);
+  const startOfDay1 = getDayOpenTime(t1);
+  const startOfDay2 = getDayOpenTime(t2);
 
   return startOfDay1.equals(startOfDay2);
 }

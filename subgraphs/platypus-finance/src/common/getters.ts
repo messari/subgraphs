@@ -1,4 +1,4 @@
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
   Token,
@@ -80,7 +80,7 @@ export function getOrCreateLiquidityPoolParamsHelper(
 }
 
 function getOrCreateLiquidityPoolFeeType(feeType: string, poolAddress: Address): LiquidityPoolFee {
-  let id = feeType.concat("-").concat(poolAddress.toHexString());
+  const id = feeType.concat("-").concat(poolAddress.toHexString());
   let liquidityPoolFee = LiquidityPoolFee.load(id);
   if (!liquidityPoolFee) {
     liquidityPoolFee = new LiquidityPoolFee(id);
@@ -91,15 +91,15 @@ function getOrCreateLiquidityPoolFeeType(feeType: string, poolAddress: Address):
 }
 
 function getOrCreateLiquidityPoolFeeTypes(poolAddress: Address): string[] {
-  let tradingFee = getOrCreateLiquidityPoolFeeType(LiquidityPoolFeeType.FIXED_TRADING_FEE, poolAddress);
-  let withdrawFee = getOrCreateLiquidityPoolFeeType(LiquidityPoolFeeType.WITHDRAWAL_FEE, poolAddress);
-  let depositFee = getOrCreateLiquidityPoolFeeType(LiquidityPoolFeeType.DEPOSIT_FEE, poolAddress);
+  const tradingFee = getOrCreateLiquidityPoolFeeType(LiquidityPoolFeeType.FIXED_TRADING_FEE, poolAddress);
+  const withdrawFee = getOrCreateLiquidityPoolFeeType(LiquidityPoolFeeType.WITHDRAWAL_FEE, poolAddress);
+  const depositFee = getOrCreateLiquidityPoolFeeType(LiquidityPoolFeeType.DEPOSIT_FEE, poolAddress);
   return [tradingFee.id, withdrawFee.id, depositFee.id];
 }
 
 function addPoolToProtocol(poolId: string, ignore: bool): void {
-  let protocol = getOrCreateDexAmm();
-  let _pools: string[] = protocol.pools;
+  const protocol = getOrCreateDexAmm();
+  const _pools: string[] = protocol.pools;
 
   if (!ignore && !_pools.includes(poolId)) {
     _pools.push(poolId);
@@ -114,7 +114,7 @@ export function getTokenHelperId(poolAddress: Address, tokenAddress: Address): s
 }
 
 function indexAssetForPoolToken(poolAddress: Address, assetAddress: Address, tokenAddress: Address): void {
-  let id = getTokenHelperId(poolAddress, tokenAddress);
+  const id = getTokenHelperId(poolAddress, tokenAddress);
   let helper = _LiquidityPoolAssetTokenHelper.load(id);
   if (!helper) {
     helper = new _LiquidityPoolAssetTokenHelper(id);
@@ -129,7 +129,7 @@ export function getOrCreateAssetPool(
   poolAddress: Address,
   tokenAddress: Address,
 ): LiquidityPool {
-  let poolId = assetAddress.toHexString();
+  const poolId = assetAddress.toHexString();
   let pool = LiquidityPool.load(poolId);
 
   if (!pool) {
@@ -138,8 +138,8 @@ export function getOrCreateAssetPool(
     pool.protocol = PROTOCOL_ADMIN;
     pool.fees = getOrCreateLiquidityPoolFeeTypes(poolAddress);
 
-    let token = getOrCreateToken(event, tokenAddress);
-    let detail: poolDetail = poolDetail.fromAddress(poolAddress.toHexString());
+    const token = getOrCreateToken(event, tokenAddress);
+    const detail: poolDetail = poolDetail.fromAddress(poolAddress.toHexString());
 
     pool.name = token.symbol.concat(" on ").concat(detail.name);
     pool.symbol = token.symbol.concat("-").concat(detail.symbol);
@@ -171,8 +171,8 @@ export function getAssetAddressForPoolToken(
   poolAddress: Address,
   tokenAddress: Address,
 ): Address {
-  let id = getTokenHelperId(poolAddress, tokenAddress);
-  let helper = _LiquidityPoolAssetTokenHelper.load(id);
+  const id = getTokenHelperId(poolAddress, tokenAddress);
+  const helper = _LiquidityPoolAssetTokenHelper.load(id);
   if (helper) {
     return Address.fromString(helper.asset);
   }
@@ -181,7 +181,7 @@ export function getAssetAddressForPoolToken(
 
 export function getOrCreateDailyUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
@@ -206,7 +206,7 @@ export function getOrCreateDailyUsageMetricSnapshot(event: ethereum.Event): Usag
 
 export function getOrCreateHourlyUsageMetricSnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
   // " { # of hours since Unix epoch time } "
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsHourlySnapshot.load(id.toString());
@@ -235,13 +235,13 @@ export function getOrCreateLiquidityPoolDailySnapshot(
   poolAddress: Address,
   tokenAddress: Address,
 ): LiquidityPoolDailySnapshot {
-  let timestamp: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let id: string = assetAddress.toHexString().concat("-").concat(timestamp.toString());
+  const timestamp: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id: string = assetAddress.toHexString().concat("-").concat(timestamp.toString());
 
   let poolDailyMetrics = LiquidityPoolDailySnapshot.load(id);
 
   if (!poolDailyMetrics) {
-    let pool = getOrCreateAssetPool(event, assetAddress, poolAddress, tokenAddress);
+    const pool = getOrCreateAssetPool(event, assetAddress, poolAddress, tokenAddress);
     poolDailyMetrics = new LiquidityPoolDailySnapshot(id);
     poolDailyMetrics.protocol = PROTOCOL_ADMIN;
     poolDailyMetrics.pool = pool.id;
@@ -279,13 +279,13 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
   poolAddress: Address,
   tokenAddress: Address,
 ): LiquidityPoolHourlySnapshot {
-  let timestamp: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
-  let id: string = assetAddress.toHexString().concat("-").concat(timestamp.toString());
+  const timestamp: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const id: string = assetAddress.toHexString().concat("-").concat(timestamp.toString());
 
   let poolHourlyMetrics = LiquidityPoolHourlySnapshot.load(id);
 
   if (!poolHourlyMetrics) {
-    let pool = getOrCreateAssetPool(event, assetAddress, poolAddress, tokenAddress);
+    const pool = getOrCreateAssetPool(event, assetAddress, poolAddress, tokenAddress);
     poolHourlyMetrics = new LiquidityPoolHourlySnapshot(id);
     poolHourlyMetrics.protocol = PROTOCOL_ADMIN;
     poolHourlyMetrics.pool = pool.id;
@@ -319,7 +319,7 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
 
 export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): FinancialsDailySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
@@ -377,7 +377,7 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
 }
 
 export function getOrCreateAsset(event: ethereum.Event, tokenAddress: Address, assetAddress: Address): _Asset {
-  let id = assetAddress.toHexString();
+  const id = assetAddress.toHexString();
 
   let _asset = _Asset.load(id);
   // fetch info if null
@@ -401,7 +401,7 @@ export function getOrCreateAsset(event: ethereum.Event, tokenAddress: Address, a
 }
 
 export function getOrCreateRewardToken(event: ethereum.Event, tokenAddress: Address): RewardToken {
-  let id = RewardTokenType.DEPOSIT.concat("-").concat(tokenAddress.toHexString());
+  const id = RewardTokenType.DEPOSIT.concat("-").concat(tokenAddress.toHexString());
   let rewardToken = RewardToken.load(id);
   if (!rewardToken) {
     rewardToken = new RewardToken(id);
