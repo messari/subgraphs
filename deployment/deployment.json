@@ -3480,11 +3480,11 @@
           "hosted-service": {
             "slug": "ribbon-finance-ethereum",
             "query-id": "ribbon-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "ribbon-finance-ethereum",
+            "query-id": "GQdCg4oR8tFB4tH8svyL1PfgDABKnRXz4GjwFYH68pPG"
           }
-        },
-        "decentralized-network": {
-          "slug": "ribbon-finance-ethereum",
-          "query-id": "GQdCg4oR8tFB4tH8svyL1PfgDABKnRXz4GjwFYH68pPG"
         }
       },
       "ribbon-finance-avalanche": {
@@ -3850,6 +3850,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-celo",
             "query-id": "uniswap-v3-celo"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-celo",
+            "query-id": "9nh6Ums63wFcoZpmegyPcAFtY3CAzQc3S6cuERALYMqa"
           }
         }
       },
@@ -4548,6 +4552,10 @@
           "hosted-service": {
             "slug": "sushiswap-celo",
             "query-id": "sushiswap-celo"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-celo",
+            "query-id": "94swSaaFChsQoZzb9Vc7Lo6FWFV6YZUMNSdFVTMAeRgj"
           }
         }
       },
