@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.5
 schema:
   file: ./schema.graphql
 dataSources:
@@ -12,34 +12,25 @@ dataSources:
       abi: Vault
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Token
-        - RewardToken
-        - YieldAggregator
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - VaultFee
-        - Vault
-        - VaultDailySnapshot
         - Deposit
         - Withdraw
       abis:
         - name: Vault
           file: ./abis/Vault.json
+        - name: BribesProcessor
+          file: ./abis/BribesProcessor.json
         - name: Strategy
           file: ./abis/Strategy.json
         - name: Controller
           file: ./abis/Controller.json
-        - name: Geyser
-          file: ./abis/Geyser.json
         - name: BaseRewardPool
           file: ./abis/BaseRewardPool.json
-        - name: Locker
-          file: ./abis/Locker.json
-        - name: SushiswapChef
-          file: ./abis/SushiswapChef.json
+        - name: RewardsLogger
+          file: ./abis/RewardsLogger.json
         - name: ERC20
           file: ./abis/ERC20.json
 
@@ -59,6 +50,12 @@ dataSources:
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
@@ -69,20 +66,17 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
+        - event: PerformanceFeeGovernance(indexed address,indexed address,uint256,indexed uint256,uint256)
+          handler: handlePerformanceFeeGovernance
+        - event: PerformanceFeeStrategist(indexed address,indexed address,uint256,indexed uint256,uint256)
+          handler: handlePerformanceFeeStrategist
+        - event: TreeDistribution(indexed address,uint256,indexed uint256,uint256)
+          handler: handleTreeDistribution
+        - event: WithdrawalFee(indexed address,indexed address,uint256,indexed uint256,uint256)
+          handler: handleWithdrawalFee
         - event: Harvested(indexed address,uint256,indexed uint256,uint256)
           handler: handleHarvested
-        - event: FullPricePerShareUpdated(uint256,indexed uint256,indexed uint256)
-          handler: handleFullPricePerShareUpdated
       callHandlers:
         - function: deposit(uint256)
           handler: handleDeposit
@@ -103,44 +97,36 @@ dataSources:
       file: ./src/mappings/vaultMappings.ts
   {{/vaults}}
 
-  {{#strategies}}
   - kind: ethereum
-    name: {{ name }}
+    name: rewardsLogger
     network: {{ chain }}
     source:
-      abi: Strategy
-      address: "{{ address }}"
-      startBlock: {{ startBlock }}
+      address: "{{ rewardsLoggerAddress }}"
+      startBlock: {{ rewardsLoggerStartBlock }}
+      abi: RewardsLogger
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Token
-        - RewardToken
-        - YieldAggregator
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - VaultFee
-        - Vault
-        - VaultDailySnapshot
         - Deposit
         - Withdraw
       abis:
+        - name: RewardsLogger
+          file: ./abis/RewardsLogger.json
         - name: Vault
           file: ./abis/Vault.json
+        - name: BribesProcessor
+          file: ./abis/BribesProcessor.json
         - name: Strategy
           file: ./abis/Strategy.json
         - name: Controller
           file: ./abis/Controller.json
-        - name: Geyser
-          file: ./abis/Geyser.json
         - name: BaseRewardPool
           file: ./abis/BaseRewardPool.json
-        - name: Locker
-          file: ./abis/Locker.json
-        - name: SushiswapChef
-          file: ./abis/SushiswapChef.json
+        - name: DiggToken
+          file: ./abis/DiggToken.json
         - name: ERC20
           file: ./abis/ERC20.json
 
@@ -160,6 +146,12 @@ dataSources:
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
@@ -170,34 +162,10 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Harvest(uint256,indexed uint256)
-          handler: handleHarvest
-        - event: CurveHarvest(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleCurveHarvest
-        - event: FarmHarvest(uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleFarmHarvest
-        - event: HarvestState(uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleHarvestState
-        - event: HarvestState(uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleDiggHarvestState
-        - event: TreeDistribution(indexed address,uint256,indexed uint256,uint256)
-          handler: handleTreeDistribution
-        - event: PerformanceFeeGovernance(indexed address,indexed address,uint256,indexed uint256,uint256)
-          handler: handlePerformanceFeeGovernance
-        - event: PerformanceFeeStrategist(indexed address,indexed address,uint256,indexed uint256,uint256)
-          handler: handlePerformanceFeeStrategist
-      file: ./src/mappings/strategyMappings.ts
-  {{/strategies}}
+        - event: UnlockScheduleSet(indexed address,address,uint256,uint256,uint256,uint256,indexed uint256,indexed uint256)
+          handler: handleUnlockScheduleSet
+      file: ./src/mappings/rewardsLoggerMappings.ts
 
 templates: 
   - kind: ethereum
@@ -207,34 +175,25 @@ templates:
       abi: Strategy
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Token
-        - RewardToken
-        - YieldAggregator
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - VaultFee
-        - Vault
-        - VaultDailySnapshot
         - Deposit
         - Withdraw
       abis:
         - name: Vault
           file: ./abis/Vault.json
+        - name: BribesProcessor
+          file: ./abis/BribesProcessor.json
         - name: Strategy
           file: ./abis/Strategy.json
         - name: Controller
           file: ./abis/Controller.json
-        - name: Geyser
-          file: ./abis/Geyser.json
         - name: BaseRewardPool
           file: ./abis/BaseRewardPool.json
-        - name: Locker
-          file: ./abis/Locker.json
-        - name: SushiswapChef
-          file: ./abis/SushiswapChef.json
+        - name: RewardsLogger
+          file: ./abis/RewardsLogger.json
         - name: ERC20
           file: ./abis/ERC20.json
 
@@ -254,6 +213,12 @@ templates:
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
@@ -264,30 +229,36 @@ templates:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: CurveHarvest(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleCurveHarvest
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
         - event: Harvest(uint256,indexed uint256)
           handler: handleHarvest
         - event: FarmHarvest(uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleFarmHarvest
+        - event: HarvestState(uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleDiggHarvest
         - event: HarvestState(uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleHarvestState
-        - event: TreeDistribution(indexed address,uint256,indexed uint256,uint256)
-          handler: handleTreeDistribution
+        - event: CurveHarvest(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleCurveHarvest
+
+        - event: SetWithdrawalFee(uint256)
+          handler: handleSetWithdrawalFee
         - event: PerformanceFeeGovernance(indexed address,indexed address,uint256,indexed uint256,uint256)
           handler: handlePerformanceFeeGovernance
+        - event: SetPerformanceFeeGovernance(uint256)
+          handler: handleSetPerformanceFeeGovernance
         - event: PerformanceFeeStrategist(indexed address,indexed address,uint256,indexed uint256,uint256)
           handler: handlePerformanceFeeStrategist
+        - event: SetPerformanceFeeStrategist(uint256)
+          handler: handleSetPerformanceFeeStrategist
+        
+        - event: TreeDistribution(indexed address,uint256,indexed uint256,uint256)
+          handler: handleTreeDistribution
+      callHandlers:
+        - function: setBribesProcessor(address)
+          handler: handleSetBribesProcessor
       file: ./src/mappings/strategyMappings.ts
   - kind: ethereum
     name: Controller
@@ -296,36 +267,27 @@ templates:
       abi: Controller
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Token
-        - RewardToken
-        - YieldAggregator
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - VaultFee
-        - Vault
-        - VaultDailySnapshot
         - Deposit
         - Withdraw
       abis:
         - name: Vault
           file: ./abis/Vault.json
+        - name: BribesProcessor
+          file: ./abis/BribesProcessor.json
         - name: Strategy
           file: ./abis/Strategy.json
         - name: Controller
           file: ./abis/Controller.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: Geyser
-          file: ./abis/Geyser.json
         - name: BaseRewardPool
           file: ./abis/BaseRewardPool.json
-        - name: Locker
-          file: ./abis/Locker.json
-        - name: SushiswapChef
-          file: ./abis/SushiswapChef.json
+        - name: RewardsLogger
+          file: ./abis/RewardsLogger.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -343,6 +305,12 @@ templates:
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
@@ -353,20 +321,80 @@ templates:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       callHandlers:
-        - function: revokeStrategy(address,address)
-          handler: handleRevokeStrategy
-        - function: setStrategy(address,address)
-          handler: handleSetStrategy
         - function: setVault(address,address)
           handler: handleSetVault
+        - function: setStrategy(address,address)
+          handler: handleSetStrategy
       file: ./src/mappings/controllerMappings.ts
+  - kind: ethereum
+    name: BribesProcessor
+    network: {{ chain }}
+    source:
+      abi: BribesProcessor
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Deposit
+        - Withdraw
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: BribesProcessor
+          file: ./abis/BribesProcessor.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: BaseRewardPool
+          file: ./abis/BaseRewardPool.json
+        - name: RewardsLogger
+          file: ./abis/RewardsLogger.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: BribeEmission(indexed address,indexed address,uint256)
+          handler: handleBribeEmission
+        - event: PerformanceFeeGovernance(indexed address,uint256)
+          handler: handlePerformanceFeeGovernance
+        - event: SentBribeToGovernance(indexed address,uint256)
+          handler: handleSentBribeToGovernance
+        - event: SentBribeToTree(indexed address,uint256)
+          handler: handleSentBribeToTree
+      file: ./src/mappings/bribesMappings.ts

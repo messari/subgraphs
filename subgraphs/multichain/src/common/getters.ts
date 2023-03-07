@@ -304,9 +304,24 @@ export function getOrCreatePoolRoute(
     poolRoute.createdBlockNumber = BIGINT_ZERO;
 
     protocol.totalPoolRouteCount += INT_ONE;
+    addCrosschainTokenToPoolIfNotExists(pool, crosschainToken);
   }
 
   return poolRoute;
+}
+
+function addCrosschainTokenToPoolIfNotExists(
+  pool: Pool,
+  crossToken: CrosschainToken
+): void {
+  if (pool.destinationTokens.indexOf(crossToken.id) >= 0) {
+    return;
+  }
+
+  const tokens = pool.destinationTokens;
+  tokens.push(crossToken.id);
+  pool.destinationTokens = tokens;
+  pool.save();
 }
 
 export function getOrCreatePoolDailySnapshot(

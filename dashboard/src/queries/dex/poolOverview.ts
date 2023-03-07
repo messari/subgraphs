@@ -20,7 +20,7 @@ export const schema = (version: string): string => {
 export const schema130 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-      liquidityPools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+      liquidityPools(first: 10, skip: $skipAmt, orderBy: totalValueLockedUSD, orderDirection: desc) {
         id
         name
         fees {
@@ -39,7 +39,7 @@ export const schema130 = (): string => {
 export const schema200 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-      liquidityPools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+      liquidityPools(first: 10, skip: $skipAmt, orderBy: totalValueLockedUSD, orderDirection: desc) {
         id
         name
         fees {
@@ -59,7 +59,7 @@ export const schema200 = (): string => {
 export const schema303 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-      liquidityPools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+      liquidityPools(first: 10, skip: $skipAmt, orderBy: totalValueLockedUSD, orderDirection: desc) {
         id
         name
         fees {

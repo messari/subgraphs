@@ -4,11 +4,12 @@ import MomentAdapter from "@material-ui/pickers/adapter/moment";
 import { Moment } from "moment";
 
 interface DatePickerProps {
-    dates: any;
+    dates: Moment[];
     setDates: any;
 }
 
 export const DatePicker = ({ dates, setDates }: DatePickerProps) => {
+    const datesValue: any = dates;
     return (
         (
             <Box position="absolute" zIndex={2} top={30} right={320} border="1px solid white">
@@ -20,7 +21,7 @@ export const DatePicker = ({ dates, setDates }: DatePickerProps) => {
                                 setDates((prev: Moment[]) => [...prev, newVal].sort((a, b) => (a.isBefore(b) ? -1 : 1)));
                             }
                         }}
-                        value={dates}
+                        value={datesValue}
                         renderDay={(day, _selectedDates, pickersDayProps) => {
                             return (
                                 <div

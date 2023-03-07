@@ -20,7 +20,7 @@ export class CustomPriceType {
   }
 
   static initialize(_usdPrice: BigDecimal, _decimals: i32 = 0): CustomPriceType {
-    let result = new CustomPriceType();
+    const result = new CustomPriceType();
     result._usdPrice = new Wrapped(_usdPrice);
     result._decimals = new Wrapped(_decimals as u8);
 

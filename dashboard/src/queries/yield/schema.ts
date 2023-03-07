@@ -1,5 +1,7 @@
 import { Schema, Versions } from "../../constants";
 
+export const versionsList = ["1.2.0", "1.3.0"];
+
 export const schema = (version: string): Schema => {
   // The version group uses the first two digits  of the schema version and defaults to that schema.
   const versionGroupArr = version.split(".");
@@ -112,6 +114,61 @@ export const schema120 = (): Schema => {
     return baseStr + fields + " }";
   });
 
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalValueLockedUSD: "BigDecimal!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    cumulativeUniqueUsers: "Int!",
+    protocolControlledValueUSD: "BigDecimal",
+  };
+
+  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+
+  const financialsQuery = `
+  query Data {
+      ${finanQuery}
+    }`;
+  const hourlyUsageQuery = `
+  query Data {
+    ${usageHourlyQuery}
+  }`;
+  const dailyUsageQuery = `
+  query Data {
+    ${usageDailyQuery}
+  }`;
+
+  const protocolTableQuery = `
+  query Data($protocolId: String) {
+    yieldAggregator(id: $protocolId) {
+      ${protocolQueryFields}
+    }
+  }`;
+
+  const poolsQuery = `
+    query Data {
+      vaults(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
+        id
+        name
+      }
+    }
+    `;
+
+  const poolTimeseriesQuery = `
+    query Data($poolId: String) {
+      ${vaultDailyQuery}
+      ${vaultHourlyQuery}
+    }
+    `;
+
   const poolData = {
     id: "ID!",
     name: "String",
@@ -130,55 +187,6 @@ export const schema120 = (): Schema => {
     stakedOutputTokenAmount: "BigInt",
     pricePerShare: "BigDecimal",
   };
-
-  const financialsQuery = `
-    query Data {
-      ${finanQuery}
-    }`;
-  const hourlyUsageQuery = `
-    query Data {
-      ${usageHourlyQuery}
-    }`;
-  const dailyUsageQuery = `
-    query Data {
-      ${usageDailyQuery}
-    }`;
-
-  const protocolTableQuery = `
-    query Data($protocolId: String) {
-      yieldAggregator(id: $protocolId) {
-        id
-        name
-        slug
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        network
-        type
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        cumulativeUniqueUsers
-        protocolControlledValueUSD
-      }
-    }`;
-
-  const poolsQuery = `
-      query Data {
-        vaults(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
-          id
-          name
-        }
-      }
-    `;
-
-  const poolTimeseriesQuery = `
-  query Data($poolId: String) {
-    ${vaultDailyQuery}
-    ${vaultHourlyQuery}
-  }
-  `;
 
   const query = `
     query Data($poolId: String, $protocolId: String){
@@ -199,19 +207,7 @@ export const schema120 = (): Schema => {
       }
 
       yieldAggregators {
-        id
-        name
-        slug
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        network
-        type
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        cumulativeUniqueUsers
+        ${protocolQueryFields}
       }
 
       ${vaultHourlyQuery}
@@ -258,23 +254,6 @@ export const schema120 = (): Schema => {
         rewardTokenEmissionsUSD
       }
     }`;
-
-  const protocolFields = {
-    id: "ID!",
-    name: "String!",
-    slug: "String!",
-    schemaVersion: "String!",
-    subgraphVersion: "String!",
-    methodologyVersion: "String!",
-    network: "Network!",
-    type: "ProtocolType!",
-    totalValueLockedUSD: "BigDecimal!",
-    cumulativeSupplySideRevenueUSD: "BigDecimal!",
-    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-    cumulativeTotalRevenueUSD: "BigDecimal!",
-    cumulativeUniqueUsers: "Int!",
-    protocolControlledValueUSD: "BigDecimal",
-  };
 
   return {
     entities,
@@ -402,6 +381,62 @@ export const schema130 = (): Schema => {
     return baseStr + fields + " }";
   });
 
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalValueLockedUSD: "BigDecimal!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    cumulativeUniqueUsers: "Int!",
+    protocolControlledValueUSD: "BigDecimal",
+    totalPoolCount: "Int!",
+  };
+
+  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+
+  const financialsQuery = `
+    query Data {
+      ${finanQuery}
+    }`;
+  const hourlyUsageQuery = `
+    query Data {
+      ${usageHourlyQuery}
+    }`;
+  const dailyUsageQuery = `
+    query Data {
+      ${usageDailyQuery}
+    }`;
+
+  const protocolTableQuery = `
+    query Data($protocolId: String) {
+      yieldAggregator(id: $protocolId) {
+        ${protocolQueryFields}
+      }
+    }`;
+
+  const poolsQuery = `
+      query Data {
+        vaults(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
+          id
+          name
+        }
+      }
+    `;
+
+  const poolTimeseriesQuery = `
+  query Data($poolId: String) {
+    ${vaultDailyQuery}
+    ${vaultHourlyQuery}
+  }
+  `;
+
   const poolData = {
     id: "ID!",
     name: "String",
@@ -424,56 +459,6 @@ export const schema130 = (): Schema => {
     pricePerShare: "BigDecimal",
   };
 
-  const financialsQuery = `
-    query Data {
-      ${finanQuery}
-    }`;
-  const hourlyUsageQuery = `
-    query Data {
-      ${usageHourlyQuery}
-    }`;
-  const dailyUsageQuery = `
-    query Data {
-      ${usageDailyQuery}
-    }`;
-
-  const protocolTableQuery = `
-    query Data($protocolId: String) {
-      yieldAggregator(id: $protocolId) {
-        id
-        name
-        slug
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        network
-        type
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        cumulativeUniqueUsers
-        protocolControlledValueUSD
-        totalPoolCount
-      }
-    }`;
-
-  const poolsQuery = `
-      query Data {
-        vaults(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
-          id
-          name
-        }
-      }
-    `;
-
-  const poolTimeseriesQuery = `
-  query Data($poolId: String) {
-    ${vaultDailyQuery}
-    ${vaultHourlyQuery}
-  }
-  `;
-
   const query = `
     query Data($poolId: String, $protocolId: String){
       _meta {
@@ -493,20 +478,7 @@ export const schema130 = (): Schema => {
       }
 
       yieldAggregators {
-        id
-        name
-        slug
-        schemaVersion
-        subgraphVersion
-        methodologyVersion
-        network
-        type
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        cumulativeUniqueUsers
-        totalPoolCount
+        ${protocolQueryFields}
       }
 
       ${vaultHourlyQuery}
@@ -557,23 +529,6 @@ export const schema130 = (): Schema => {
       }
     }`;
 
-  const protocolFields = {
-    id: "ID!",
-    name: "String!",
-    slug: "String!",
-    schemaVersion: "String!",
-    subgraphVersion: "String!",
-    methodologyVersion: "String!",
-    network: "Network!",
-    type: "ProtocolType!",
-    totalValueLockedUSD: "BigDecimal!",
-    cumulativeSupplySideRevenueUSD: "BigDecimal!",
-    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-    cumulativeTotalRevenueUSD: "BigDecimal!",
-    cumulativeUniqueUsers: "Int!",
-    protocolControlledValueUSD: "BigDecimal",
-    totalPoolCount: "Int!",
-  };
 
   return {
     entities,

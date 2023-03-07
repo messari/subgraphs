@@ -2,8 +2,8 @@
 
 ## Configuration
 
-- In `subgraph.yaml`, add the following code inside the `abis` section of the `datasources` which is going to fetch prices of token using the `Price Oracle`.
-  **NOTE**: Include the following code in each of the datasources, that is dependent on the `Price Oracle` and update imports in each file inside oracle folder.
+In `subgraph.yaml`, add the following code snippet inside the `abis` section of the `datasources` which is going to fetch prices of token using the `Price Oracle`.
+  **NOTE**: Include the following code snippet in each of the datasources, that is dependent on the `Price Oracle` and update imports in each file inside oracle folder.
 
 ```
 ###########################################
@@ -22,6 +22,12 @@
 # YearnLens Contracts
 - name: YearnLensContract
   file: ./abis/Prices/YearnLens.json
+# Aave Oracle Contract
+- name: AaveOracleContract
+  file: ./abis/Prices/AaveOracle.json
+# SushiSwap Contracts
+- name: CalculationsSushiSwap
+  file: ./abis/Prices/Calculations/SushiSwap.json
 # ChainLink Contracts
 - name: ChainLinkContract
   file: ./abis/Prices/ChainLink.json
@@ -32,15 +38,6 @@
   file: ./abis/Prices/Uniswap/Factory.json
 - name: UniswapPair
   file: ./abis/Prices/Uniswap/Pair.json
-# SushiSwap Contracts
-- name: SushiSwapRouter
-  file: ./abis/Prices/SushiSwap/Router.json
-- name: SushiSwapFactory
-  file: ./abis/Prices/SushiSwap/Factory.json
-- name: SushiSwapPair
-  file: ./abis/Prices/SushiSwap/Pair.json
-- name: CalculationsSushiSwap
-  file: ./abis/Prices/Calculations/SushiSwap.json
 ```
 
 ## Usage
@@ -83,7 +80,6 @@ let tokenPrice = getUsdPrice(tokenAddr, amount);
 ## Folder Structure
 
 ```
-
 Prices
 ├── calculations
 │   ├── CalculationsCurve.ts
@@ -92,24 +88,36 @@ Prices
 │   ├── types.ts
 │   ├── constants.ts
 │   └── utils.ts
+├── config
+│   ├── arbitrum.ts
+│   ├── aurora.ts
+│   ├── avalanche.ts
+│   ├── bsc.ts
+│   ├── fantom.ts
+│   ├── gnosis.ts
+│   ├── harmony.ts
+│   ├── mainnet.ts
+│   ├── moonbeam.ts
+│   ├── optimism.ts
+│   └── polygon.ts
 ├── oracles
+│   ├── AaveOracle.ts
 │   ├── ChainLinkFeed.ts
 │   └── YearnLensOracle.ts
 ├── routers
 │   ├── CurveRouter.ts
-│   ├── SushiSwapRouter.ts
-│   └── UniswapRouter.ts
+│   └── UniswapForksRouter.ts
 │── README.md
 └── index.ts
 ```
 
 ## Development Status
 
-### Mainnet
-
 🔨 = In progress.  
 🛠 = Feature complete. Additional testing required.
 `MultiCall` = If the method uses more than two `JSON RPC Call`.
+
+### Mainnet
 
 | Method                                                                               |      Type      | StartBlock | MultiCall | Status |
 | ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |
@@ -124,10 +132,6 @@ Prices
 
 ### Fantom
 
-🔨 = In progress.  
-🛠 = Feature complete. Additional testing required.
-`MultiCall` = If the method uses more than two `JSON RPC Call`.
-
 | Method                                                                               |      Type      | StartBlock | MultiCall | Status |
 | ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |
 | [Curve](https://ftmscan.com/address/0x0b53e9df372e72d8fdcdbedfbb56059957a37128)     | `Calculations` | `27067399` |    ❎     |   🛠    |
@@ -139,13 +143,17 @@ Prices
 
 ### Arbitrum-One
 
-🔨 = In progress.  
-🛠 = Feature complete. Additional testing required.
-`MultiCall` = If the method uses more than two `JSON RPC Call`.
-
 | Method                                                                               |      Type      | StartBlock | MultiCall | Status |
 | ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |
 | [Curve](https://arbiscan.io/address/0x26f698491daf32771217abc1356dae48c7230c75)     | `Calculations` | `5287603` |    ❎     |   🛠    |
 | [SushiSwap](https://arbiscan.io/address/0x5EA7E501c9A23F4A76Dc7D33a11D995B13a1dD25) | `Calculations` | `2396120` |    ❎     |   🛠    |
 | [Curve](https://arbiscan.io/address/0x445FE580eF8d70FF569aB36e80c647af338db351)     |    `Router`    | `1362056` |    ✅     |   🛠    |
 | [SushiSwap](https://arbiscan.io/address/0x1b02da8cb0d097eb8d57a175b88c7d8b47997506) |    `Router`    | `73` |    ✅     |   🛠    |
+
+
+### Polygon
+
+| Method                                                                               |      Type      | StartBlock | MultiCall | Status |
+| ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |
+| [QuickSwap](https://etherscan.io/address/0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff) |    `Router`    | `4931900`  |    ✅     |   🛠   |
+| [SushiSwap](https://etherscan.io/address/0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506) |    `Router`    | `11333235` |    ✅     |   🛠   |

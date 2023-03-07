@@ -273,7 +273,7 @@ export function updateTvlAndTokenPrices(
   );
 
   // Update LP token prices
-  if (pool.outputTokenSupply == BIGINT_ZERO) {
+  if (pool.outputTokenSupply! == BIGINT_ZERO) {
     pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   } else {
     pool.outputTokenPriceUSD = newTvl.div(outputTokenSupply);
