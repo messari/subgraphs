@@ -8,10 +8,10 @@ The timeseries data is important, based off `Network` and adds numerous daily/ho
 
 ### Schema 1.2.0 Explanation
 
-There is a new entity called `STATS` that contains statistical calculations for each field collected.
+There is a new entity called `STAT` that contains statistical calculations for each field collected.
 
 ```ts
-type Stats @entity {
+type Stat @entity {
   " { id of the snapshot this belongs to } - { DataType } "
   id: ID!
 
@@ -48,7 +48,7 @@ type Stats @entity {
 
 The fields that will exhibit this type are:
 
-- `dailyUniqueAuthors` measures the number of different authors that mined a block this day. Some of the `STATS` metrics are redundant for this field.
+- `dailyUniqueAuthors` measures the number of different authors that mined a block this day. Some of the `STAT` metrics are redundant for this field.
 - `dailyDifficulty`
 - `dailyGasUsed`
 - `dailyGasLimit`
