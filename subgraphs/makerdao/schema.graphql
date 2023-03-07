@@ -1299,6 +1299,8 @@ type _FlipBidsStore @entity {
   bid: BigInt!
   " Is the auction ended "
   ended: Boolean
+  " Liquidated Position Ids"
+  positions: [Position!]
 }
 
 # Helper entity for liquidate transaction (Clip contract)
@@ -1322,6 +1324,8 @@ type _ClipTakeStore @entity {
   tab: BigInt!
   " amount of debt to be repaid "
   tab0: BigInt
+  " Liquidated Position Ids"
+  positions: [Position!]
 }
 
 # Helper entity for calculating supply side revenue
@@ -1368,4 +1372,33 @@ type _PositionCounter @entity {
   id: ID!
   " Next count "
   nextCount: Int!
+}
+
+type _TokenInOut @entity {
+  " tx hash-logIndex "
+  id: ID!
+  ilk: String!
+  block: BigInt!
+  handler: String!
+  token: String!
+  urn: String
+  v: String
+  w: String
+  amount: BigInt!
+  inputTokenBalance_: BigInt!
+  onChainWETHBalance: BigInt!
+}
+
+type _gem @entity {
+  " ilk "
+  id: ID!
+  block: BigInt!
+  balance: BigInt!
+}
+
+type _gemSnapshot @entity {
+  " ilk-block# "
+  id: ID!
+  block: BigInt!
+  balance: BigInt!
 }

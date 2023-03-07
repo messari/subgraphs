@@ -35,19 +35,10 @@ function ProtocolTab({
   protocolTimeseriesError,
   overlayProtocolTimeseriesData
 }: ProtocolTabProps) {
-  const [issuesToDisplay, setIssuesToDisplay] = useState<
-    { message: string; type: string; level: string; fieldName: string }[]
-  >([]);
-  const [tableIssues, setTableIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>(
-    [],
-  );
-  const issues: { [entityName: string]: { message: string; type: string; level: string; fieldName: string }[] } = {};
-  function setIssues(
-    issuesSet: { [x: string]: { message: string; type: string; level: string; fieldName: string }[] },
-    entityName: string,
-  ) {
-    issues[entityName] = issuesSet[entityName];
-  }
+  const [issuesToDisplay, setIssuesToDisplay] = useState<{
+    [key: string]:
+    { message: string; type: string; level: string; fieldName: string }
+  }>({});
 
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
   let protocolDataRender: any[] = [];
@@ -84,8 +75,7 @@ function ProtocolTab({
               </CopyLinkToClipboard>
             </Box>
             <CircularProgress sx={{ margin: 6 }} size={50} />
-          </Grid>
-        );
+          </Grid>)
       }
 
       if (!currentEntityData && !protocolTimeseriesError[entityName] && protocolTimeseriesError[prevEntityName]) {
@@ -99,8 +89,7 @@ function ProtocolTab({
               </CopyLinkToClipboard>
             </Box>
             <h3>{entityName} timeseries query could not trigger</h3>
-          </Grid>
-        );
+          </Grid>);
       }
 
       return (
@@ -118,9 +107,17 @@ function ProtocolTab({
           currentTimeseriesError={protocolTimeseriesError[entityName]}
           protocolType={protocolType}
           protocolTableData={protocolTableData[protocolEntityNameSingular]}
-          issuesProps={issues}
-          setIssues={(x) => setIssues(x, entityName)}
-        />
+          setIssues={(issArr: any) => {
+            const issuesToAdd: any = {};
+            issArr.forEach((issObj: any) => {
+              issuesToAdd[issObj.fieldName + issObj.type] = issObj;
+            })
+            if (Object.keys(issuesToAdd).length > 0) {
+              setIssuesToDisplay((prevState) => {
+                return ({ ...prevState, ...issuesToAdd })
+              })
+            }
+          }} />
       );
     });
   }
@@ -139,32 +136,31 @@ function ProtocolTab({
     }
   });
 
-  useEffect(() => {
-    let brokenDownIssuesState: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
-    Object.keys(issues).forEach((iss) => {
-      brokenDownIssuesState = brokenDownIssuesState.concat(issues[iss]);
-    });
-    if (allLoaded && brokenDownIssuesState.length !== issuesToDisplay.length) {
-      setIssuesToDisplay(brokenDownIssuesState);
-    }
-  }, [protocolTimeseriesData, protocolTimeseriesLoading, tableIssues]);
-
   if (!protocolTableData) {
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
 
-  const tableIssuesInit = tableIssues;
+  const issuesArrayProps: { message: string; type: string; level: string; fieldName: string }[] = Object.values(issuesToDisplay);
+
   return (
     <>
-      <IssuesDisplay issuesArrayProps={issuesToDisplay} oneLoaded={oneLoaded} allLoaded={allLoaded} />
+      <IssuesDisplay issuesArrayProps={issuesArrayProps} oneLoaded={oneLoaded} allLoaded={allLoaded} />
       <SchemaTable
         entityData={protocolTableData[protocolEntityNameSingular]}
         protocolType={protocolType}
         dataFields={protocolFields}
         schemaName={protocolEntityNameSingular}
-        issuesProps={tableIssuesInit}
-        setIssues={(x) => setTableIssues(x)}
-      />
+        setIssues={(issArr: any) => {
+          const issuesToAdd: any = {};
+          issArr.forEach((issObj: any) => {
+            issuesToAdd[issObj.fieldName + issObj.type] = issObj;
+          })
+          if (Object.keys(issuesToAdd).length > 0) {
+            setIssuesToDisplay((prevState) => {
+              return ({ ...prevState, ...issuesToAdd })
+            })
+          }
+        }} />
       {protocolDataRender}
       {specificCharts}
     </>

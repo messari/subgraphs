@@ -478,7 +478,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.1",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -500,7 +500,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2336,7 +2336,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.3.0",
           "methodology": "1.0.1"
         },
         "files": {
@@ -3112,7 +3112,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "2.0.2",
+          "subgraph": "2.2.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -3530,7 +3530,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3552,7 +3552,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3574,7 +3574,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3596,7 +3596,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3771,8 +3771,8 @@
         "network": "celo",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "schema": "3.0.3",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4699,6 +4699,7 @@
     "schema": "dex-amm",
     "base": "uniswap-forks",
     "protocol": "trisolaris",
+    "project": "trisolaris",
     "deployments": {
       "trisolaris-aurora": {
         "network": "aurora",
@@ -5016,7 +5017,7 @@
     "deployments": {
       "aave-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5046,7 +5047,7 @@
     "deployments": {
       "dydx-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5076,7 +5077,7 @@
     "deployments": {
       "angle-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5136,7 +5137,7 @@
     "deployments": {
       "ens-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5170,7 +5171,7 @@
     "deployments": {
       "euler-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5234,7 +5235,7 @@
     "deployments": {
       "hop-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5268,7 +5269,7 @@
     "deployments": {
       "silo-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5302,7 +5303,7 @@
     "deployments": {
       "truefi-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5336,7 +5337,7 @@
     "deployments": {
       "unlock-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5370,7 +5371,7 @@
     "deployments": {
       "rarible-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5400,7 +5401,7 @@
     "deployments": {
       "ousd-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5430,7 +5431,7 @@
     "deployments": {
       "threshold-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5460,7 +5461,7 @@
     "deployments": {
       "ampleforth-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5490,7 +5491,7 @@
     "deployments": {
       "compound-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5550,7 +5551,7 @@
     "deployments": {
       "cryptex-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5580,7 +5581,7 @@
     "deployments": {
       "gitcoin-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5610,7 +5611,7 @@
     "deployments": {
       "idle-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5670,7 +5671,7 @@
     "deployments": {
       "indexed-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5790,7 +5791,7 @@
     "deployments": {
       "pooltogether-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5820,7 +5821,7 @@
     "deployments": {
       "radicle-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5850,7 +5851,7 @@
     "deployments": {
       "reflexer-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5880,7 +5881,7 @@
     "deployments": {
       "uniswap-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -5970,7 +5971,7 @@
     "deployments": {
       "unslashed-governance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.0.0",
           "subgraph": "1.0.0",
@@ -6067,7 +6068,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.3.1",
+          "subgraph": "1.3.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6493,7 +6494,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.2",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -7814,6 +7815,58 @@
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        }
+      }
+    }
+  },
+  "gains-trade": {
+    "schema": "derivatives-perpfutures",
+    "base": "gains-trade",
+    "protocol": "gains-trade",
+    "project": "gains-network",
+    "deployments": {
+      "gains-trade-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gains-trade-arbitrum",
+            "query-id": "gains-trade-arbitrum"
+          }
+        },
+        "files": {
+          "template": "gains.trade.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "gains-trade-polygon": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gains-trade-polygon",
+            "query-id": "gains-trade-polygon"
+          }
+        },
+        "files": {
+          "template": "gains.trade.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
         }
       }
     }

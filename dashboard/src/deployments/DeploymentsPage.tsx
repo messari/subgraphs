@@ -3,11 +3,11 @@ import { useNavigate } from "react-router";
 import { SearchInput } from "../common/utilComponents/SearchInput";
 import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
 import { Typography } from "@mui/material";
-import { NewClient } from "../utils";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
 import DevCountTable from "./DevCountTable";
 import IndexingCalls from "./IndexingCalls";
+import DecenIndexingCalls from "./DecenIndexingCalls";
 
 const DeploymentsLayout = styled("div")`
   padding: 0;
@@ -28,15 +28,61 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
 
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
-  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
-  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({
+    lending: false,
+    exchanges: false,
+    vaults: false,
+    generic: false,
+    bridge: false,
+    erc20: false,
+    erc721: false,
+    governance: false,
+    network: false,
+    ["nft-marketplace"]: false
+  });
 
-  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
-  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, bridge: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({
+    lending: false,
+    exchanges: false,
+    vaults: false,
+    generic: false,
+    bridge: false,
+    erc20: false,
+    erc721: false,
+    governance: false,
+    network: false,
+    ["nft-marketplace"]: false
+  });
 
+  const [indexingStatusError, setIndexingStatusError] = useState<any>({
+    lending: false,
+    exchanges: false,
+    vaults: false,
+    generic: false,
+    bridge: false,
+    erc20: false,
+    erc721: false,
+    governance: false,
+    network: false,
+    ["nft-marketplace"]: false
+  });
+
+  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({
+    lending: false,
+    exchanges: false,
+    vaults: false,
+    generic: false,
+    bridge: false,
+    erc20: false,
+    erc721: false,
+    governance: false,
+    network: false,
+    ["nft-marketplace"]: false
+  });
+
+  const [decenDepoIndexingStatus, setDecenDepoIndexingStatus] = useState<boolean>(false);
   const [indexingStatus, setIndexingStatus] = useState<any>(false);
   const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
-  const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
 
   useEffect(() => {
     getData();
@@ -46,6 +92,10 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
   window.scrollTo(0, 0);
 
   const decenDeposToSubgraphIds: any = {};
+  const depoIdToSubgraphName: any = {};
+  const depoIds: any = [];
+  let decentralizedDepoQuery: any = "";
+
   if (Object.keys(decentralizedDeployments)?.length) {
     Object.keys(decentralizedDeployments).forEach((x) => {
       const protocolObj = Object.keys(protocolsToQuery).find((pro) => pro.includes(x));
@@ -59,11 +109,38 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         }
         let subgraphIdToMap = { id: "", signal: 0 };
         if (decentralizedDeployments[x]?.signalledTokens > 0) {
+          depoIdToSubgraphName[decentralizedDeployments[x]?.deploymentId] = (protocolsToQuery[protocolObj]?.protocol || protocolObj) + "-" + networkStr;
+          depoIds.push(decentralizedDeployments[x]?.deploymentId);
           subgraphIdToMap = { id: decentralizedDeployments[x]?.subgraphId, signal: decentralizedDeployments[x]?.signalledTokens };
         }
         decenDeposToSubgraphIds[x + "-" + networkStr] = subgraphIdToMap;
       }
     });
+
+    const subgraphIdString = JSON.stringify(depoIds);
+    decentralizedDepoQuery = `query Status { indexingStatuses(subgraphs: ${subgraphIdString} ) { 
+          subgraph
+          synced
+          fatalError {
+            message
+          }
+          chains {
+            chainHeadBlock {
+              number
+            }
+            earliestBlock {
+              number
+            }
+            latestBlock {
+              number
+            }
+            lastHealthyBlock {
+              number
+            }
+          }
+          entityCount
+      }
+  }`;
   }
 
   // counts section
@@ -88,6 +165,16 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         indexingStatusError={indexingStatusError}
         indexingStatusErrorPending={indexingStatusErrorPending}
       />)
+  }
+  let decenIndexingCalls = null;
+  if (decentralizedDepoQuery?.length > 0) {
+    decenIndexingCalls = (
+      <DecenIndexingCalls
+        setDepoIndexingStatus={setDecenDepoIndexingStatus}
+        decentralizedDepoQuery={decentralizedDepoQuery}
+        depoIdToSubgraphName={depoIdToSubgraphName}
+      />
+    );
   }
 
   if (!!indexingStatus) {
@@ -159,6 +246,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         {devCountTable}
         <DeploymentsTable
           getData={() => getData()}
+          decenDepoIndexingStatus={decenDepoIndexingStatus}
           issuesMapping={issuesMapping}
           protocolsToQuery={protocolsToQuery}
           decenDeposToSubgraphIds={decenDeposToSubgraphIds}
@@ -168,6 +256,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
           indexingStatusErrorPending={indexingStatusErrorPending}
         />
       </DeploymentsLayout>
+      {decenIndexingCalls}
       {indexingCalls}
     </DeploymentsContextProvider >
   );
