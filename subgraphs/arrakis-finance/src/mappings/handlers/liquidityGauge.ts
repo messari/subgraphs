@@ -55,20 +55,6 @@ export function handleAddGauge(event: AddGauge): void {
   }
 
   updateRewardTokens(spiceResult.value, vault);
-
-  //TODO: Remove
-  log.info(
-    "[handleAddGauge]vault={}, rewardTokens=[{}], rewardAmount=[{}], rewardUSD=[{}] tx={}-{}",
-    [
-      vault.id,
-      vault.rewardTokens!.toString(),
-      vault.rewardTokenEmissionsAmount!.toString(),
-      vault.rewardTokenEmissionsUSD!.toString(),
-      event.transaction.hash.toHexString(),
-      event.transactionLogIndex.toString(),
-    ]
-  );
-
   updateVaultSnapshots(vaultAddress, event.block);
 }
 

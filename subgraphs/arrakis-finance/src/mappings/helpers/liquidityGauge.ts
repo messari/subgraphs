@@ -78,7 +78,7 @@ export function updateRewardTokens(
 }
 
 export function updateRewardEmission(
-  gaugeAddress: Address, //TODO: Remove
+  gaugeAddress: Address,
   vaultAddress: Address,
   rewardTokenAddress: Address,
   event: ethereum.Event
@@ -105,22 +105,11 @@ export function updateRewardEmission(
     );
     return;
   }
-  // TODO: Remove periodFinish
-  const periodFinish = rewardDataResult.value.getPeriod_finish();
   const rate = rewardDataResult.value.getRate(); // rate is tokens per second
 
   const rewardTokens = vault.rewardTokens!;
   const emissionsAmount = vault.rewardTokenEmissionsAmount!;
   const emissionsUSD = vault.rewardTokenEmissionsUSD!;
-  // TODO: Remove
-  log.info(
-    "[updateRewardEmission]vault={},vault.emissionsAmount={},vault.emissionsUSD={}",
-    [
-      vaultAddress.toHexString(),
-      emissionsAmount.toString(),
-      emissionsUSD.toString(),
-    ]
-  );
   const rewardTokenIndex = rewardTokens.indexOf(rewardTokenId);
   if (rewardTokenIndex == -1) {
     log.error(
@@ -145,35 +134,10 @@ export function updateRewardEmission(
   emissionsUSD[rewardTokenIndex] = rewardToken.lastPriceUSD!.times(
     bigIntToBigDecimal(emissionsAmount[rewardTokenIndex], rewardToken.decimals)
   );
-  // TODO: Remove
-  log.info(
-    "[updateRewardEmission]vault={},gauge={},rewardToken={},periodFinish={},rate={},emissionsAmount={},emissionsUSD={},tx={}-{}",
-    [
-      vaultAddress.toHexString(),
-      gaugeAddress.toHexString(),
-      rewardTokenAddress.toHexString(),
-      periodFinish.toString(),
-      rate.toString(),
-      emissionsAmount[rewardTokenIndex].toString(),
-      emissionsUSD[rewardTokenIndex].toString(),
-      event.transaction.hash.toHexString(),
-      event.transactionLogIndex.toString(),
-    ]
-  );
 
   vault.rewardTokenEmissionsAmount = emissionsAmount;
   vault.rewardTokenEmissionsUSD = emissionsUSD;
   vault.save();
-
-  // TODO: Remove
-  log.info(
-    "[updateRewardEmission]vault={},vault.emissionsAmount={},vault.emissionsUSD={}",
-    [
-      vaultAddress.toHexString(),
-      vault.rewardTokenEmissionsAmount!.toString(),
-      vault.rewardTokenEmissionsUSD!.toString(),
-    ]
-  );
 }
 
 // A function which given 3 arrays of arbitrary types of the same length,
@@ -193,11 +157,4 @@ export function sortArrayByReference<T, K>(
     sorted.push(toSort[index]);
   }
   return sorted;
-}
-
-// sortBytesArray will sort an array of Bytes in ascending order
-// by comparing their hex string representation.
-export function sortStringArray(array: string[]): String[] {
-  const sorted = array.map((item) => item);
-  sorted.sort();
 }
