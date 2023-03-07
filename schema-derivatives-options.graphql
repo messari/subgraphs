@@ -37,6 +37,14 @@ enum ProtocolType {
   # Will add more
 }
 
+enum OptionType {
+  " Position opened as call "
+  CALL
+
+  " Position opened as put "
+  PUT
+}
+
 type Token @entity {
   " Smart contract address of the token "
   id: Bytes!
@@ -1030,12 +1038,6 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " Hourly Deposit trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
   hourlyDepositVolumeByTokenUSD: [BigDecimal!]!
 
-  " All Inflow trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  _cumulativeDepositVolumeByTokenAmount: [BigInt!]!
-
-  " All Deposit trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  _cumulativeDepositVolumeByTokenUSD: [BigDecimal!]!
-
   " Deposit historical trade notional volume occurred in this pool, in USD "
   cumulativeDepositVolumeUSD: BigDecimal!
 
@@ -1047,12 +1049,6 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
 
   " Hourly Withdraw trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
   hourlyWithdrawVolumeByTokenUSD: [BigDecimal!]!
-
-  " All Withdraw trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  _cumumativeWithdrawVolumeByTokenAmount: [BigInt!]!
-
-  " All Withdraw trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  _cumulativeWithdrawVolumeByTokenUSD: [BigDecimal!]!
 
   " Withdraw historical trade notional volume occurred in this pool, in USD "
   cumulativeWithdrawVolumeUSD: BigDecimal!
@@ -1276,14 +1272,6 @@ type Account @entity {
 type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: Bytes!
-}
-
-enum OptionType {
-  " Position opened as call "
-  CALL
-
-  " Position opened as put "
-  PUT
 }
 
 # A position describes a contract that a user has taken (either a call/put)
