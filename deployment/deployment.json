@@ -3433,6 +3433,10 @@
             "slug": "ribbon-finance-ethereum",
             "query-id": "ribbon-finance-ethereum"
           }
+        },
+        "decentralized-network": {
+          "slug": "ribbon-finance-ethereum",
+          "query-id": "GQdCg4oR8tFB4tH8svyL1PfgDABKnRXz4GjwFYH68pPG"
         }
       },
       "ribbon-finance-avalanche": {
