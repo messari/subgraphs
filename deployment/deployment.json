@@ -3814,7 +3814,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.2.2",
+          "subgraph": "1.2.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3836,7 +3836,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3862,7 +3862,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.2.2",
+          "subgraph": "1.2.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3888,7 +3888,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.1.4",
+          "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3910,7 +3910,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
