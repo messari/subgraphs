@@ -1,6 +1,9 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import { LiquidityGauge as LiquidityGaugeTemplate } from "../../../generated/templates";
-import { AddGauge } from "../../../generated/GaugeRegistry/GaugeRegistry";
+import {
+  AddGauge,
+  RemoveGauge,
+} from "../../../generated/GaugeRegistry/GaugeRegistry";
 import {
   Deposit,
   Withdraw,
@@ -9,29 +12,120 @@ import {
 } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
 import {
   getOrCreateLiquidityGauge,
-  updateRewardToken,
   updateRewardEmission,
+  updateRewardTokens,
 } from "../helpers/liquidityGauge";
 import { getOrCreateVault, updateVaultSnapshots } from "../helpers/vaults";
+import { Vault } from "../../../generated/schema";
+import { RewardTokenType } from "../../common/constants";
+import { getOrCreateRewardToken } from "../../common/getters";
 
 export function handleAddGauge(event: AddGauge): void {
   const gaugeAddress = event.params.gauge;
+  LiquidityGaugeTemplate.create(gaugeAddress);
+
   const vaultAddress = event.params.vault;
   const gauge = getOrCreateLiquidityGauge(gaugeAddress);
-  gauge.vault = vaultAddress.toHex();
+  gauge.vault = vaultAddress.toHexString();
   gauge.save();
+
+  const vault = Vault.load(vaultAddress.toHexString());
+  if (!vault) {
+    log.error("[handleAddGauge]vault {} doesn't exist tx {}-{}", [
+      vaultAddress.toHexString(),
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]);
+    return;
+  }
 
   // Liquidity gauge sets the first reward token to SPICE in constructor
   const gaugeContract = GaugeContract.bind(gaugeAddress);
-  const rewardTokenAddress = gaugeContract.SPICE();
-  updateRewardToken(
-    gaugeAddress,
-    vaultAddress,
-    rewardTokenAddress,
-    event.block
+  const spiceResult = gaugeContract.try_SPICE();
+  if (spiceResult.reverted) {
+    log.error(
+      "[handleAddGauge]gauge.SPICE() call for gauge {} reverted tx {}-{}",
+      [
+        gaugeAddress.toHexString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
+    );
+    return;
+  }
+
+  updateRewardTokens(spiceResult.value, vault);
+
+  //TODO: Remove
+  log.info(
+    "[handleAddGauge]vault={}, rewardTokens=[{}], rewardAmount=[{}], rewardUSD=[{}] tx={}-{}",
+    [
+      vault.id,
+      vault.rewardTokens!.toString(),
+      vault.rewardTokenEmissionsAmount!.toString(),
+      vault.rewardTokenEmissionsUSD!.toString(),
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]
   );
 
-  LiquidityGaugeTemplate.create(gaugeAddress);
+  updateVaultSnapshots(vaultAddress, event.block);
+}
+
+export function handleRemoveGauge(event: RemoveGauge): void {
+  const gaugeAddress = event.params.gauge;
+  const vaultAddress = event.params.vault;
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress);
+  gauge.vault = Address.zero().toHexString();
+  gauge.save();
+
+  const vault = Vault.load(vaultAddress.toHexString());
+  if (!vault) {
+    log.error("[handleRemoveGauge]vault {} doesn't exist tx {}-{}", [
+      vaultAddress.toHexString(),
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]);
+    return;
+  }
+
+  // remove reward token from vault.rewardTokens
+  const gaugeContract = GaugeContract.bind(gaugeAddress);
+  const spiceResult = gaugeContract.try_SPICE();
+  if (spiceResult.reverted) {
+    log.error(
+      "[handleRemoveGauge]gauge.SPICE() call for gauge {} reverted tx {}-{}",
+      [
+        gaugeAddress.toHexString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
+    );
+    return;
+  }
+  const rewardToken = getOrCreateRewardToken(
+    spiceResult.value,
+    RewardTokenType.DEPOSIT
+  );
+
+  const rewardTokens = vault.rewardTokens;
+  if (!rewardTokens || rewardTokens.length == 0) {
+    return;
+  }
+  const rewardEmission = vault.rewardTokenEmissionsAmount;
+  const rewardEmissionUSD = vault.rewardTokenEmissionsUSD;
+  const index = rewardTokens.indexOf(rewardToken.id);
+  if (index != -1) {
+    rewardTokens.splice(index, 1);
+    rewardEmission!.splice(index, 1);
+    rewardEmissionUSD!.splice(index, 1);
+  }
+  vault.rewardTokens = rewardTokens;
+  vault.rewardTokenEmissionsAmount = rewardEmission;
+  vault.rewardTokenEmissionsUSD = rewardEmissionUSD;
+  vault.save();
+
+  updateVaultSnapshots(vaultAddress, event.block);
 }
 
 export function handleDeposit(event: Deposit): void {
@@ -67,18 +161,18 @@ export function handleRewardDataUpdate(event: RewardDataUpdate): void {
 
   const gauge = getOrCreateLiquidityGauge(gaugeAddress);
   const vaultAddress = Address.fromString(gauge.vault);
+  const vault = Vault.load(vaultAddress.toHexString());
+  if (!vault) {
+    log.error("[handleRewardDataUpdate]vault {} doesn't exist tx {}-{}", [
+      vaultAddress.toHexString(),
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]);
+    return;
+  }
 
-  updateRewardToken(
-    gaugeAddress,
-    vaultAddress,
-    rewardTokenAddress,
-    event.block
-  );
+  updateRewardTokens(rewardTokenAddress, vault);
   // Update vaults with new reward emissions
-  updateRewardEmission(
-    gaugeAddress,
-    vaultAddress,
-    rewardTokenAddress,
-    event.block
-  );
+  updateRewardEmission(gaugeAddress, vaultAddress, rewardTokenAddress, event);
+  updateVaultSnapshots(vaultAddress, event.block);
 }

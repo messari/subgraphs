@@ -34,6 +34,9 @@ export function updateVaultSnapshots(
     vault.cumulativeProtocolSideRevenueUSD;
   dailySnapshot.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
   dailySnapshot.stakedOutputTokenAmount = vault.stakedOutputTokenAmount;
+  dailySnapshot.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  dailySnapshot.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+
   dailySnapshot.blockNumber = block.number;
   dailySnapshot.timestamp = block.timestamp;
 
@@ -47,6 +50,8 @@ export function updateVaultSnapshots(
     vault.cumulativeProtocolSideRevenueUSD;
   hourlySnapshot.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
   hourlySnapshot.stakedOutputTokenAmount = vault.stakedOutputTokenAmount;
+  hourlySnapshot.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  hourlySnapshot.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
   hourlySnapshot.blockNumber = block.number;
   hourlySnapshot.timestamp = block.timestamp;
 

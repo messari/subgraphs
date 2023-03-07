@@ -70,6 +70,8 @@ dataSources:
       eventHandlers:
         - event: AddGauge(address,address)
           handler: handleAddGauge
+        - event: RemoveGauge(address,address)
+          handler: handleRemoveGauge          
       file: ./src/mappings/handlers/liquidityGauge.ts
   {{/gaugeRegistry}}
 templates:

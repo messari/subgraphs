@@ -45,13 +45,17 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getOrCreateRewardToken(address: Address): RewardToken {
-  let rewardToken = RewardToken.load(address.toHexString());
+export function getOrCreateRewardToken(
+  address: Address,
+  type: RewardTokenType
+): RewardToken {
+  const rewardTokenId = `${type}-${address.toHexString()}`;
+  let rewardToken = RewardToken.load(rewardTokenId);
   if (!rewardToken) {
     const token = getOrCreateToken(address);
-    rewardToken = new RewardToken(address.toHexString());
+    rewardToken = new RewardToken(rewardTokenId);
     rewardToken.token = token.id;
-    rewardToken.type = RewardTokenType.DEPOSIT;
+    rewardToken.type = type;
     rewardToken.save();
   }
   return rewardToken as RewardToken;

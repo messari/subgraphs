@@ -62,6 +62,7 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
+export declare type RewardTokenType = string;
 export namespace LendingType {
   export const CDP = "CDP";
   export const POOLED = "POOLED";
