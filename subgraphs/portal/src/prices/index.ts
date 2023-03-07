@@ -21,6 +21,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       Address.fromString("0x761d38e5ddf6ccf6cf7c55759d5210750b5d60f3"), // ELON
       Address.fromString("0xd9a8bb44968f35282f1b91c353f77a61baf31a4b"), // GTPS
       Address.fromString("0xbc0071caa8d58a85c9bacbd27bb2b22cbf4ff479"), // GTPS fantom
+      Address.fromString("0xd52d9ba6fcbadb1fe1e3aca52cbb72c4d9bbb4ec"), // GTPS polygon
       Address.fromString("0x337dc89ebcc33a337307d58a51888af92cfdc81b"), // WFTM
       Address.fromString("0xbd31ea8212119f94a611fa969881cba3ea06fa3d"), // LUNA (Wormhole)
       Address.fromString("0xd2877702675e6ceb975b4a1dff9fb7baf4c91ea9"), // wrapped LUNA
