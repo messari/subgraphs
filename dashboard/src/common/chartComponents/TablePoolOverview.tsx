@@ -10,12 +10,12 @@ interface TablePoolOverviewProps {
   dataTable: any;
   protocolType: string;
   protocolNetwork: string;
-  handleTabChange: (event: any, newValue: string) => void;
-  setPoolId: React.Dispatch<React.SetStateAction<string>>;
   skipAmt: number;
   tablePoolOverviewLoading: boolean;
-  setIssues: React.Dispatch<{ message: string; type: string; level: string; fieldName: string }[]>;
   issueProps: { message: string; type: string; level: string; fieldName: string }[];
+  handleTabChange: (event: any, newValue: string) => void;
+  setPoolId: React.Dispatch<React.SetStateAction<string>>;
+  setIssues: React.Dispatch<{ message: string; type: string; level: string; fieldName: string }[]>;
 }
 
 export const TablePoolOverview = ({
@@ -23,12 +23,12 @@ export const TablePoolOverview = ({
   dataTable,
   protocolType,
   protocolNetwork,
-  handleTabChange,
-  setPoolId,
   skipAmt,
   tablePoolOverviewLoading,
-  setIssues,
   issueProps,
+  handleTabChange,
+  setPoolId,
+  setIssues,
 }: TablePoolOverviewProps) => {
   const navigate = useNavigate();
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [...issueProps];
@@ -117,7 +117,7 @@ export const TablePoolOverview = ({
           }
           let onClick = undefined;
           const blockExplorerUrlBase = blockExplorers[protocolNetwork?.toUpperCase()];
-          if(blockExplorerUrlBase) {
+          if (blockExplorerUrlBase) {
             onClick = () => (window.location.href = blockExplorerUrlBase + "address/" + params.value);
           }
           return (
@@ -162,7 +162,7 @@ export const TablePoolOverview = ({
         field: "tvl",
         headerName: "TVL (USD)",
         width: 180,
-        renderCell: (params: any) => {
+        renderCell: (params: { [x: string]: any }) => {
           const val = "$" + Number(params.value.toFixed(2)).toLocaleString();
           return (
             <Tooltip title={params.value}>
@@ -175,7 +175,7 @@ export const TablePoolOverview = ({
         field: "rewardTokens",
         headerName: "Reward Tokens",
         width: inputTokenColWidth,
-        renderCell: (params: any) => {
+        renderCell: (params: { [x: string]: any }) => {
           if (params?.row?.rewardTokens === null || params?.row?.rewardTokens === undefined) {
             return (
               <span>
@@ -203,14 +203,14 @@ export const TablePoolOverview = ({
       },
     ];
     columns = columns.concat(optionalFields);
-    const tableData = dataTable.map((pool: any, i: any) => {
+    const tableData = dataTable.map((pool: { [x: string]: any }, idx: number) => {
       let inputTokenSymbol = pool?.inputToken?.symbol;
       if (pool.inputTokens) {
-        inputTokenSymbol = pool.inputTokens.map((tok: any) => tok.symbol).join(", ");
+        inputTokenSymbol = pool.inputTokens.map((tok: { [x: string]: any }) => tok.symbol).join(", ");
       }
       const returnObj: { [x: string]: any } = {
-        id: i + 1 + skipAmt,
-        idx: i + 1 + skipAmt,
+        id: idx + 1 + skipAmt,
+        idx: idx + 1 + skipAmt,
         name: pool.name || "N/A",
         poolId: pool.id,
         inputToken: inputTokenSymbol,
@@ -219,13 +219,13 @@ export const TablePoolOverview = ({
       };
       if (
         Number(pool.totalValueLockedUSD) > 1000000000000 &&
-        issues.filter((x) => x.fieldName === `#${i + 1 + skipAmt} - ${pool.name || "N/A"}`).length === 0
+        issues.filter((iss: { [x: string]: any }) => iss.fieldName === `#${idx + 1 + skipAmt} - ${pool.name || "N/A"}`).length === 0
       ) {
         issues.push({
           type: "TVL+",
           message: "",
           level: "warning",
-          fieldName: `#${i + 1 + skipAmt} - ${pool.name || "N/A"}`,
+          fieldName: `#${idx + 1 + skipAmt} - ${pool.name || "N/A"}`,
         });
       }
 
@@ -241,7 +241,7 @@ export const TablePoolOverview = ({
         const tokenFieldDiff = pool.rewardTokens?.length - pool.rewardTokenEmissionsUSD?.length;
         if (
           tokenFieldDiff !== 0 &&
-          issues.filter((x) => x.type === "TOK" && x.fieldName.includes(pool.name)).length === 0
+          issues.filter((iss: { [x: string]: any }) => iss.type === "TOK" && iss.fieldName.includes(pool.name)).length === 0
         ) {
           if (pool.rewardTokens?.length > pool.rewardTokenEmissionsUSD?.length) {
             issues.push({
@@ -268,15 +268,15 @@ export const TablePoolOverview = ({
             if (
               !Number(pool.totalBorrowBalanceUSD) &&
               issues.filter(
-                (x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
+                (iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
               ).length === 0
             ) {
               issues.push({
                 type: "VAL",
-                message: `${pool.name || "#" + i + 1 + skipAmt
+                message: `${pool.name || "#" + idx + 1 + skipAmt
                   } does not have a valid 'totalBorrowBalanceUSD' value. Reward APR (BORROWER) could not be properly calculated.`,
                 level: "critical",
-                fieldName: `${pool.name || "#" + i + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
+                fieldName: `${pool.name || "#" + idx + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
               });
             } else if (Number(pool.totalBorrowBalanceUSD)) {
               apr = (Number(val) / Number(pool.totalBorrowBalanceUSD)) * 100 * 365;
@@ -289,17 +289,17 @@ export const TablePoolOverview = ({
               !Number(pool.totalDepositBalanceUSD) &&
               !Number(pool.totalValueLockedUSD) &&
               issues.filter(
-                (x) =>
-                  x.fieldName ===
-                  `${pool.name || "#" + i + 1 + skipAmt} - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
+                (iss: { [x: string]: any }) =>
+                  iss.fieldName ===
+                  `${pool.name || "#" + idx + 1 + skipAmt} - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
               ).length === 0
             ) {
               issues.push({
                 type: "VAL",
-                message: `${pool.name || "#" + i + 1 + skipAmt
+                message: `${pool.name || "#" + idx + 1 + skipAmt
                   } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
                 level: "critical",
-                fieldName: `${pool.name || "#" + i + 1 + skipAmt
+                fieldName: `${pool.name || "#" + idx + 1 + skipAmt
                   } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
               });
             } else if (pool.totalDepositBalanceUSD) {
@@ -328,46 +328,46 @@ export const TablePoolOverview = ({
           if (
             Number(apr) === 0 &&
             issues.filter(
-              (x) =>
-                x.fieldName ===
-                `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              (iss: { [x: string]: any }) =>
+                iss.fieldName ===
+                `${pool.name || "Pool " + idx + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             ).length === 0
           ) {
             issues.push({
               type: "RATEZERO",
               message: "",
               level: "warning",
-              fieldName: `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              fieldName: `${pool.name || "Pool " + idx + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             });
           }
           if (
             isNaN(apr) &&
             issues.filter(
-              (x) =>
-                x.fieldName ===
-                `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              (iss: { [x: string]: any }) =>
+                iss.fieldName ===
+                `${pool.name || "Pool " + idx + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             ).length === 0
           ) {
             issues.push({
               type: "NAN",
               message: "",
               level: "critical",
-              fieldName: `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              fieldName: `${pool.name || "Pool " + idx + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             });
           }
           if (
             Number(apr) < 0 &&
             issues.filter(
-              (x) =>
-                x.fieldName ===
-                `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              (iss: { [x: string]: any }) =>
+                iss.fieldName ===
+                `${pool.name || "Pool " + idx + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             ).length === 0
           ) {
             issues.push({
               type: "RATENEG",
               message: "",
               level: "critical",
-              fieldName: `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              fieldName: `${pool.name || "Pool " + idx + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             });
           }
           rewardFactors.push("Token [" + idx + "] " + rewardFactorsStr);
@@ -411,13 +411,13 @@ export const TablePoolOverview = ({
             if (
               feePercentage < 1 &&
               feePercentage !== 0 &&
-              issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} LP Fee`).length === 0
+              issues.filter((iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} LP Fee`).length === 0
             ) {
               issues.push({
                 type: "RATEDEC",
                 message: "1%",
                 level: "error",
-                fieldName: `${pool.name || "#" + i + 1 + skipAmt} LP Fee`,
+                fieldName: `${pool.name || "#" + idx + 1 + skipAmt} LP Fee`,
               });
             }
             const volumeUSD = Number(pool?.dailyVolumeUSD) || 0;
@@ -428,25 +428,25 @@ export const TablePoolOverview = ({
             if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
               value = 0;
               if (
-                issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0
+                issues.filter((iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`).length === 0
               ) {
                 issues.push({
                   type: "NAN",
                   message: "",
                   level: "critical",
-                  fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
+                  fieldName: `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`,
                 });
               }
             }
             if (
               value < 0 &&
-              issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0
+              issues.filter((iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`).length === 0
             ) {
               issues.push({
                 type: "RATENEG",
                 message: "",
                 level: "critical",
-                fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
+                fieldName: `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`,
               });
             }
             returnObj.baseYield = value;
@@ -461,13 +461,13 @@ export const TablePoolOverview = ({
             if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
               value = 0;
               if (
-                issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0
+                issues.filter((iss: { [x: string]: any }) => iss.fieldName === `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`).length === 0
               ) {
                 issues.push({
                   type: "NAN",
                   message: "",
                   level: "critical",
-                  fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
+                  fieldName: `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`,
                 });
               }
             }
@@ -476,32 +476,32 @@ export const TablePoolOverview = ({
           } else {
             if (
               issues.filter(
-                (x) =>
-                  x.message ===
+                (iss: { [x: string]: any }) =>
+                  iss.message ===
                   `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`,
               ).length === 0 &&
-              issues.filter((x) => x.message === `${pool.name} Base yield could not be calculated.`).length === 0 &&
+              issues.filter((iss: { [x: string]: any }) => iss.message === `${pool.name} Base yield could not be calculated.`).length === 0 &&
               (Object.keys(pool?.fees)?.length === 0 || !pool?.fees)
             ) {
               issues.push({
                 type: "val",
                 message: `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`,
                 level: "critical",
-                fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
+                fieldName: `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`,
               });
             } else if (
               issues.filter(
-                (x) =>
-                  x.message ===
+                (iss: { [x: string]: any }) =>
+                  iss.message ===
                   `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`,
               ).length === 0 &&
-              issues.filter((x) => x.message === `${pool.name} Base yield could not be calculated.`).length === 0
+              issues.filter((iss: { [x: string]: any }) => iss.message === `${pool.name} Base yield could not be calculated.`).length === 0
             ) {
               issues.push({
                 type: "val",
                 message: `${pool.name} Base yield could not be calculated.`,
                 level: "critical",
-                fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
+                fieldName: `${pool.name || "#" + idx + 1 + skipAmt} Base Yield`,
               });
             }
             returnObj.baseYield = "N/A";
@@ -515,7 +515,7 @@ export const TablePoolOverview = ({
       return returnObj;
     });
     if (dataTable.length === 0 && tablePoolOverviewLoading) {
-      if (issues.filter((x) => x.fieldName === "poolOverview").length === 0) {
+      if (issues.filter((iss: { [x: string]: any }) => iss.fieldName === "poolOverview").length === 0) {
         issues.push({
           message: "No pools returned in pool overview.",
           type: "POOL",
@@ -523,21 +523,21 @@ export const TablePoolOverview = ({
           fieldName: "poolOverview",
         });
       }
-    } else if (issues.filter((x) => x.fieldName === "poolOverview").length > 0) {
-      const idx = issues.findIndex((x) => x.fieldName === "poolOverview");
+    } else if (issues.filter((iss: { [x: string]: any }) => iss.fieldName === "poolOverview").length > 0) {
+      const idx = issues.findIndex((iss: { [x: string]: any }) => iss.fieldName === "poolOverview");
       issues.splice(idx, 1);
     }
     return (
       <Box height={52 * (tableData.length + 1.5)} py={6} id={"tableID"}>
         <DataGrid
           sx={{ textOverflow: "clip" }}
-          onRowClick={(row) => {
+          onRowClick={(event) => {
             const href = new URL(window.location.href);
             const p = new URLSearchParams(href.search);
             p.set("tab", "pool");
-            p.set("poolId", row.row.poolId);
+            p.set("poolId", event.row.poolId);
             navigate("?" + p.toString().split("%2F").join("/"));
-            setPoolId(row.row.poolId);
+            setPoolId(event.row.poolId);
             handleTabChange(null, "3");
           }}
           columnBuffer={7}
