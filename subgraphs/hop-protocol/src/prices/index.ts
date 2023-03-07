@@ -17,13 +17,22 @@ import {
 	dataSource,
 	BigInt,
 } from '@graphprotocol/graph-ts'
-import { XdaiToken } from '../../protocols/hop-protocol/config/constants/constant'
+import {
+	XdaiToken,
+	priceTokens,
+} from '../../protocols/hop-protocol/config/constants/constant'
 import { UniswapPair } from '../../generated/Token/UniswapPair'
-import { bigIntToBigDecimal } from '../sdk/util/numbers'
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 	if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
 		return new CustomPriceType()
+	}
+
+	if (priceTokens.includes(tokenAddr.toHexString())) {
+		return CustomPriceType.initialize(
+			constants.BIGDECIMAL_USD_PRICE,
+			constants.DEFAULT_USDC_DECIMALS
+		)
 	}
 
 	const config = utils.getConfig()
@@ -73,8 +82,9 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 	}
 
 	// 4. CalculationsSushiSwap
-	const calculationsSushiSwapPrice =
-		SushiCalculations.getTokenPriceUSDC(tokenAddr)
+	const calculationsSushiSwapPrice = SushiCalculations.getTokenPriceUSDC(
+		tokenAddr
+	)
 	if (!calculationsSushiSwapPrice.reverted) {
 		log.info('[CalculationsSushiSwap] tokenAddress: {}, Price: {}', [
 			tokenAddr.toHexString(),

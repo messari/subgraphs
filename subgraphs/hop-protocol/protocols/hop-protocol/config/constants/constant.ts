@@ -1,9 +1,7 @@
 import { Address } from '@graphprotocol/graph-ts'
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
-export const POOL_TWO = Address.fromString(
-	'0x0000000000000000000000000000000000000001'
-)
+
 export namespace XdaiBridge {
 	export const USDC = '0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8'.toLowerCase()
 	export const USDT = '0xFD5a186A7e8453Eb867A360526c5d987A00ACaC2'.toLowerCase()
@@ -144,16 +142,18 @@ export namespace PolygonRewardToken {
 }
 
 export const priceTokens = [
-	PolygonToken.ETH,
-	PolygonToken.MATIC,
-	ArbitrumToken.ETH,
-	MainnetToken.ETH,
-	MainnetToken.MATIC,
-	MainnetToken.SNX,
-	OptimismToken.ETH,
-	OptimismToken.SNX,
-	XdaiToken.ETH,
-	XdaiToken.MATIC,
+	OptimismToken.USDC,
+	OptimismToken.USDT,
+	XdaiToken.USDT,
+	XdaiToken.USDC,
+	PolygonToken.USDC,
+	PolygonToken.USDT,
+	ArbitrumToken.USDT,
+	ArbitrumToken.USDC,
+	OptimismToken.DAI,
+	XdaiToken.DAI,
+	PolygonToken.DAI,
+	ArbitrumToken.DAI,
 ]
 
 export const MESSENGER_ADDRESSES = [

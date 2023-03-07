@@ -29,11 +29,7 @@ import {
 import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
-import {
-	BIGINT_MINUS_ONE,
-	BIGINT_TEN_TO_EIGHTEENTH,
-} from '../../../../src/sdk/util/constants'
-import { priceTokens } from '../../config/constants/constant'
+import { BIGINT_ONE } from '../../../../src/sdk/util/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -162,33 +158,23 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 		acc.liquidityDeposit(pool, liquidity, false)
 
-		pool.addInputTokenBalance(amount[0])
-		hPool.addInputTokenBalance(amount[1])
-
 		pool.pool.relation = hPool.getBytesID()
+		hPool.pool.relation = hPool.getBytesID()
 
 		const Amm = L2_Amm.bind(event.address)
-		const virtualPriceCall = Amm.try_getVirtualPrice()
-		if (!virtualPriceCall.reverted) {
-			const price = virtualPriceCall.value
-			if (priceTokens.includes(inputToken)) {
-				const tokenPrice = sdk.Pricer.getTokenPrice(token)
-				const lpAmount = event.params.lpTokenSupply
-					.times(price)
-					.div(BIGINT_TEN_TO_EIGHTEENTH)
+		// const virtualPriceCall = Amm.try_getVirtualPrice()
+		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
+		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
 
-				pool.setTotalValueLocked(tokenPrice.times(bigIntToBigDecimal(lpAmount)))
-			} else {
-				pool.setTotalValueLocked(
-					bigIntToBigDecimal(
-						event.params.lpTokenSupply
-							.times(price)
-							.div(BIGINT_TEN_TO_EIGHTEENTH)
-					)
-				)
-			}
+		if (!inputBalanceCallA.reverted) {
+			pool.setInputTokenBalance(inputBalanceCallA.value)
 		} else {
-			log.warning('Contract call reverted', [])
+			log.warning('inputBalanceCallA reverted', [])
+		}
+		if (!inputBalanceCallB.reverted) {
+			hPool.setInputTokenBalance(inputBalanceCallB.value)
+		} else {
+			log.warning('inputBalanceCallB reverted', [])
 		}
 
 		log.warning(
@@ -251,31 +237,21 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 		acc.liquidityWithdraw(pool, liquidity, false)
 
 		pool.pool.relation = hPool.getBytesID()
-
-		hPool.addInputTokenBalance(amount[1].times(BIGINT_MINUS_ONE))
+		hPool.pool.relation = hPool.getBytesID()
 
 		const Amm = L2_Amm.bind(event.address)
-		const virtualPriceCall = Amm.try_getVirtualPrice()
-		if (!virtualPriceCall.reverted) {
-			const price = virtualPriceCall.value
-			if (priceTokens.includes(inputToken)) {
-				const tokenPrice = sdk.Pricer.getTokenPrice(token)
-				const lpAmount = event.params.lpTokenSupply
-					.times(price)
-					.div(BIGINT_TEN_TO_EIGHTEENTH)
+		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
+		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
 
-				pool.setTotalValueLocked(tokenPrice.times(bigIntToBigDecimal(lpAmount)))
-			} else {
-				pool.setTotalValueLocked(
-					bigIntToBigDecimal(
-						event.params.lpTokenSupply
-							.times(price)
-							.div(BIGINT_TEN_TO_EIGHTEENTH)
-					)
-				)
-			}
+		if (!inputBalanceCallA.reverted) {
+			pool.setInputTokenBalance(inputBalanceCallA.value)
 		} else {
-			log.warning('Contract call reverted', [])
+			log.warning('inputBalanceCallA reverted', [])
+		}
+		if (!inputBalanceCallB.reverted) {
+			hPool.setInputTokenBalance(inputBalanceCallB.value)
+		} else {
+			log.warning('inputBalanceCallB reverted', [])
 		}
 
 		log.warning(
@@ -303,8 +279,6 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 		if (!tokenIndex.equals(BigInt.zero())) {
 			return
 		}
-
-		const amount = event.params.lpTokenAmount.div(BigInt.fromString('2'))
 
 		const inputToken = NetworkConfigs.getTokenAddressFromPoolAddress(
 			event.address.toHexString()
@@ -347,31 +321,22 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 
 		pool.pool.relation = hPool.getBytesID()
-
-		hPool.addInputTokenBalance(amount.times(BIGINT_MINUS_ONE))
+		hPool.pool.relation = hPool.getBytesID()
 
 		const Amm = L2_Amm.bind(event.address)
-		const virtualPriceCall = Amm.try_getVirtualPrice()
-		if (!virtualPriceCall.reverted) {
-			const price = virtualPriceCall.value
-			if (priceTokens.includes(inputToken)) {
-				const tokenPrice = sdk.Pricer.getTokenPrice(token)
-				const lpAmount = event.params.lpTokenSupply
-					.times(price)
-					.div(BIGINT_TEN_TO_EIGHTEENTH)
 
-				pool.setTotalValueLocked(tokenPrice.times(bigIntToBigDecimal(lpAmount)))
-			} else {
-				pool.setTotalValueLocked(
-					bigIntToBigDecimal(
-						event.params.lpTokenSupply
-							.times(price)
-							.div(BIGINT_TEN_TO_EIGHTEENTH)
-					)
-				)
-			}
+		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
+		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
+
+		if (!inputBalanceCallA.reverted) {
+			pool.setInputTokenBalance(inputBalanceCallA.value)
 		} else {
-			log.warning('Contract call reverted', [])
+			log.warning('inputBalanceCallA reverted', [])
+		}
+		if (!inputBalanceCallB.reverted) {
+			hPool.setInputTokenBalance(inputBalanceCallB.value)
+		} else {
+			log.warning('inputBalanceCallB reverted', [])
 		}
 
 		log.warning('LWITHONE lpTokenSupply: {}, amount: {}, txHash: {}', [
