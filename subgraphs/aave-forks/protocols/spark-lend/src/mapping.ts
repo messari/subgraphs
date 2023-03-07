@@ -564,7 +564,8 @@ function getAssetPriceInUSDC(
   }
 
   //fall back to v2 price oracle
-  return getAssetPriceFallback(tokenAddress, priceOracle, blockNumber);
+  // return getAssetPriceFallback(tokenAddress, priceOracle, blockNumber);
+  return BIGDECIMAL_ZERO;
 }
 
 function getAssetPriceFallback(

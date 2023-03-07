@@ -29,7 +29,7 @@ dataSources:
       eventHandlers:
         - event: AddressesProviderRegistered(indexed address,indexed uint256)
           handler: handleAddressesProviderRegistered
-      file: ./protocols/aave-v3/src/mapping.ts
+      file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: RewardsController
     network: {{ network }}
@@ -59,7 +59,7 @@ dataSources:
       eventHandlers:
         - event: AssetConfigUpdated(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleAssetConfigUpdated
-      file: ./protocols/aave-v3/src/mapping.ts
+      file: ./protocols/spark-lend/src/mapping.ts
 
   # this is needed to make import path compatible with aave-v2-forks
   - kind: ethereum
@@ -95,7 +95,7 @@ dataSources:
       eventHandlers:
         - event: Borrow(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
           handler: handleBorrow
-      file: ./protocols/aave-v3/src/mapping.ts
+      file: ./protocols/spark-lend/src/mapping.ts
 
 templates:
   - kind: ethereum
@@ -116,7 +116,7 @@ templates:
           handler: handlePriceOracleUpdated
         - event: ProxyCreated(indexed bytes32,indexed address,indexed address)
           handler: handleProxyCreated
-      file: ./protocols/aave-v3/src/mapping.ts
+      file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: LendingPool
     network: {{ network }}
@@ -163,7 +163,7 @@ templates:
           handler: handleReserveUsedAsCollateralEnabled
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
-      file: ./protocols/aave-v3/src/mapping.ts
+      file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: LendingPoolConfigurator
     network: {{ network }}
@@ -198,7 +198,7 @@ templates:
           handler: handleReserveInitialized
         - event: ReservePaused(indexed address,bool)
           handler: handleReservePaused
-      file: ./protocols/aave-v3/src/mapping.ts
+      file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: AToken
     network: {{ network }}
@@ -217,7 +217,7 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleCollateralTransfer
-      file: ./protocols/aave-v3/src/mapping.ts
+      file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: StableDebtToken
     network: {{ network }}
@@ -236,7 +236,7 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleStableTransfer
-      file: ./protocols/aave-v3/src/mapping.ts
+      file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: VariableDebtToken
     network: {{ network }}
@@ -255,4 +255,4 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleVariableTransfer
-      file: ./protocols/aave-v3/src/mapping.ts
+      file: ./protocols/spark-lend/src/mapping.ts
