@@ -1,0 +1,17 @@
+{
+  "network": "avalanche",
+  "Controller": {
+    "address": "",
+    "startBlock": 0
+  },
+  "OTokenFactory": {
+    "address": "",
+    "startBlock": 0
+  },
+  "Whitelist": {
+    "address": ""
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

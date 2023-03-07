@@ -1,0 +1,17 @@
+{
+  "network": "arbitrum-one",
+  "Controller": {
+    "address": "0xeE30f92cc9Bf896679567d1aCD551f0E179756fC",
+    "startBlock": 1286633
+  },
+  "OTokenFactory": {
+    "address": "0x4D3a52A0e98144CAf46Ac226d83e8f144b5c654D",
+    "startBlock": 1263909
+  },
+  "Whitelist": {
+    "address": "0xB8f0AC1Ab70643ebE8103Db3618EA5eD6901B458"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

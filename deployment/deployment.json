@@ -8103,13 +8103,13 @@
       }
     }
   },
-  "opyn": {
+  "opyn-gamma": {
     "schema": "derivatives-options",
-    "base": "opyn",
-    "protocol": "opyn",
+    "base": "opyn-gamma",
+    "protocol": "opyn-gamma",
     "project": "opyn",
     "deployments": {
-      "opyn-ethereum": {
+      "opyn-gamma-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -8124,14 +8124,14 @@
           }
         },
         "files": {
-          "template": "opyn.template.yaml"
+          "template": "opyn.gamma.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
         }
       },
-      "opyn-avalanche": {
+      "opyn-gamma-avalanche": {
         "network": "avalanche",
         "status": "dev",
         "versions": {
@@ -8146,14 +8146,14 @@
           }
         },
         "files": {
-          "template": "opyn.template.yaml"
+          "template": "opyn.gamma.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
         }
       },
-      "opyn-polygon": {
+      "opyn-gamma-polygon": {
         "network": "polygon",
         "status": "dev",
         "versions": {
@@ -8163,12 +8163,12 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "opyn-polygon",
-            "query-id": "opyn-polygon"
+            "slug": "opyn-gamma-polygon",
+            "query-id": "opyn-gamma-polygon"
           }
         },
         "files": {
-          "template": "opyn.template.yaml"
+          "template": "opyn.gamma.template.yaml"
         },
         "options": {
           "prepare:yaml": true,

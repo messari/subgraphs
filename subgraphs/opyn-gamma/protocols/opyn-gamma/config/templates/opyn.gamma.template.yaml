@@ -1,0 +1,163 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Controller
+    network: {{ network }}
+    source:
+      address: "{{ Controller.address }}"
+      abi: Controller
+      startBlock: {{ Controller.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: AccountOperatorUpdated(indexed address,indexed address,bool)
+          handler: handleAccountOperatorUpdated
+        - event: CallExecuted(indexed address,indexed address,bytes)
+          handler: handleCallExecuted
+        - event: CallRestricted(bool)
+          handler: handleCallRestricted
+        - event: CollateralAssetDeposited(indexed address,indexed address,indexed
+            address,uint256,uint256)
+          handler: handleCollateralAssetDeposited
+        - event: CollateralAssetWithdrawed(indexed address,indexed address,indexed
+            address,uint256,uint256)
+          handler: handleCollateralAssetWithdrawed
+        - event: Donated(indexed address,indexed address,uint256)
+          handler: handleDonated
+        - event: FullPauserUpdated(indexed address,indexed address)
+          handler: handleFullPauserUpdated
+        - event: LongOtokenDeposited(indexed address,indexed address,indexed
+            address,uint256,uint256)
+          handler: handleLongOtokenDeposited
+        - event: LongOtokenWithdrawed(indexed address,indexed address,indexed
+            address,uint256,uint256)
+          handler: handleLongOtokenWithdrawed
+        - event: NakedCapUpdated(indexed address,uint256)
+          handler: handleNakedCapUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PartialPauserUpdated(indexed address,indexed address)
+          handler: handlePartialPauserUpdated
+        - event: Redeem(indexed address,indexed address,indexed address,address,uint256,uint256)
+          handler: handleRedeem
+        - event: ShortOtokenBurned(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleShortOtokenBurned
+        - event: ShortOtokenMinted(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleShortOtokenMinted
+        - event: SystemFullyPaused(bool)
+          handler: handleSystemFullyPaused
+        - event: SystemPartiallyPaused(bool)
+          handler: handleSystemPartiallyPaused
+        - event: VaultLiquidated(indexed address,indexed address,indexed
+            address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleVaultLiquidated
+        - event: VaultOpened(indexed address,uint256,indexed uint256)
+          handler: handleVaultOpened
+        - event: VaultSettled(indexed address,indexed address,address,uint256,uint256,indexed uint256)
+          handler: handleVaultSettled
+      file: ./src/mappings/Controller.ts
+  - kind: ethereum
+    name: OTokenFactory
+    network: {{ network }}
+    source:
+      address: "{{ OTokenFactory.address }}"
+      abi: OTokenFactory
+      startBlock: {{ OTokenFactory.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: OTokenFactory
+          file: ./abis/OTokenFactory.json
+      eventHandlers:
+        - event: OtokenCreated(address,address,indexed address,indexed address,indexed address,uint256,uint256,bool)
+          handler: handleOtokenCreated
+      file: ./src/mappings/OTokenFactory.ts
+  - kind: ethereum
+    name: Oracle
+    network: {{ network }}
+    source:
+      address: "{{ Oracle.address }}"
+      abi: Oracle
+      startBlock: {{ Oracle.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Oracle
+          file: ./abis/Oracle.json
+      eventHandlers:
+        - event: DisputerUpdated(indexed address)
+          handler: handleDisputerUpdated
+        - event: ExpiryPriceDisputed(indexed address,indexed uint256,uint256,uint256,uint256)
+          handler: handleExpiryPriceDisputed
+        - event: ExpiryPriceUpdated(indexed address,indexed uint256,uint256,uint256)
+          handler: handleExpiryPriceUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PricerDisputePeriodUpdated(indexed address,uint256)
+          handler: handlePricerDisputePeriodUpdated
+        - event: PricerLockingPeriodUpdated(indexed address,uint256)
+          handler: handlePricerLockingPeriodUpdated
+        - event: PricerUpdated(indexed address,indexed address)
+          handler: handlePricerUpdated
+        - event: StablePriceUpdated(indexed address,uint256)
+          handler: handleStablePriceUpdated
+      file: ./src/mappings/Oracle.ts
+  - kind: ethereum
+    name: MarginPool
+    network: {{ network }}
+    source:
+      address: "{{ MarginPool.address }}"
+      abi: MarginPool
+      startBlock: {{ MarginPool.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MarginPool
+          file: ./abis/MarginPool.json
+      eventHandlers:
+        - event: TransferToPool(indexed address,indexed address,uint256)
+          handler: handleTransferToPool
+        - event: TransferToUser(indexed address,indexed address,uint256)
+          handler: handleTransferToUser
+      file: ./src/mappings/MarginPool.ts
+templates:
+  - kind: ethereum
+    name: OToken
+    network: {{ network }}
+    source:
+      abi: ERC20
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/OToken.ts
