@@ -1,6 +1,6 @@
 import { Box, Button } from "@mui/material";
 import { DataGrid, GridAlignment } from "@mui/x-data-grid";
-import moment from "moment";
+import moment, { Moment } from "moment";
 import { useState } from "react";
 import { downloadCSV, formatIntToFixed2, tableCellTruncate, toDate, toUnitsSinceEpoch, upperCaseFirstOfString } from "../../../src/utils/index";
 import { DatePicker } from "../utilComponents/DatePicker";
@@ -18,20 +18,20 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortOrderAsc, setSortOrderAsc] = useState<Boolean>(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [dates, setDates] = useState<any>([]);
+  const [dates, setDates] = useState<Moment[]>([]);
 
-  function sortFunction(a: any, b: any) {
-    let aVal = a[sortColumn];
-    if (!isNaN(Number(a[sortColumn]))) {
-      aVal = Number(a[sortColumn]);
-    } else if (a[sortColumn].includes("%")) {
-      aVal = Number(a[sortColumn].split("%").join(""));
+  function sortFunction(aArg: any, bArg: any) {
+    let aVal = aArg[sortColumn];
+    if (!isNaN(Number(aArg[sortColumn]))) {
+      aVal = Number(aArg[sortColumn]);
+    } else if (aArg[sortColumn].includes("%")) {
+      aVal = Number(aArg[sortColumn].split("%").join(""));
     }
-    let bVal = b[sortColumn];
-    if (!isNaN(Number(b[sortColumn]))) {
-      bVal = Number(b[sortColumn]);
-    } else if (b[sortColumn].includes("%")) {
-      bVal = Number(b[sortColumn].split("%").join(""));
+    let bVal = bArg[sortColumn];
+    if (!isNaN(Number(bArg[sortColumn]))) {
+      bVal = Number(bArg[sortColumn]);
+    } else if (bArg[sortColumn].includes("%")) {
+      bVal = Number(bArg[sortColumn].split("%").join(""));
     }
 
     if (sortOrderAsc) {
@@ -72,7 +72,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
           type: "number",
           headerAlign: "right" as GridAlignment,
           align: "right" as GridAlignment,
-          renderCell: (params: any) => {
+          renderCell: (params: { [x: string]: any }) => {
             const value = Number(params?.value);
             const cellStyle = { ...tableCellTruncate };
             cellStyle.width = "100%";
@@ -88,18 +88,18 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
       if (isHourly) {
         formatStr = "YYYY-MM-DD hh";
       }
-      const datesSelectedTimestamps = dates.map((x: any) => x.format(formatStr));
+      const datesSelectedTimestamps = dates.map((date: any) => date.format(formatStr));
       const differencePercentageArr: any = [];
       const dataTableCopy = JSON.parse(JSON.stringify({ ...dataTable }));
-      dataTableCopy[baseKey] = dataTableCopy[baseKey].filter((x: any) => {
+      dataTableCopy[baseKey] = dataTableCopy[baseKey].filter((obj: { [x: string]: any }) => {
         if (datesSelectedTimestamps.length > 0) {
-          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format(formatStr));
+          return datesSelectedTimestamps.includes(moment.utc(obj.date * 1000).format(formatStr));
         }
         return true;
       });
-      dataTableCopy[overlayKey] = dataTableCopy[overlayKey].filter((x: any) => {
+      dataTableCopy[overlayKey] = dataTableCopy[overlayKey].filter((obj: any) => {
         if (datesSelectedTimestamps.length > 0) {
-          return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format(formatStr));
+          return datesSelectedTimestamps.includes(moment.utc(obj.date * 1000).format(formatStr));
         }
         return true;
       });
@@ -110,7 +110,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
         dateToValMap[key] = val.value;
       });
       const tableData = dataTableCopy[baseKey]
-        .map((val: any, i: any) => {
+        .map((val: any, idx: any) => {
           let date = toDate(val.date, isHourly);
           const dateKey = toUnitsSinceEpoch(toDate(val.date, isHourly), isHourly);
           let overlayVal = dateToValMap[dateKey];
@@ -120,7 +120,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
           const diff = Math.abs(val.value - overlayVal);
           differencePercentageArr.push({ value: ((diff / overlayVal) * 100).toFixed(2) + "%", date: val.date });
           return {
-            id: i,
+            id: idx,
             date: date,
             [baseKey]: "$" + formatIntToFixed2(val.value),
             [overlayKey]: "$" + formatIntToFixed2(overlayVal),
@@ -141,37 +141,37 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
               if (!Array.isArray(dataTableCopy)) {
                 let length = dataTableCopy[Object.keys(dataTableCopy)[0]].length;
                 const arrayToSend: any = [];
-                for (let i = 0; i < length; i++) {
+                for (let iteration = 0; iteration < length; iteration++) {
                   let objectIteration: any = {};
                   let hasUndefined = false;
-                  objectIteration.date = dataTableCopy[Object.keys(dataTableCopy)[0]][i].date;
-                  Object.keys(dataTableCopy).forEach((x: any) => {
-                    if (dataTableCopy[x][i]?.value) {
-                      objectIteration[x] = dataTableCopy[x][i]?.value;
+                  objectIteration.date = dataTableCopy[Object.keys(dataTableCopy)[0]][iteration].date;
+                  Object.keys(dataTableCopy).forEach((key: string) => {
+                    if (dataTableCopy[key][iteration]?.value) {
+                      objectIteration[key] = dataTableCopy[key][iteration]?.value;
                     } else {
                       hasUndefined = true;
                     }
                   });
-                  if (differencePercentageArr[i]) {
-                    objectIteration.differencePercentage = differencePercentageArr[i].value;
+                  if (differencePercentageArr[iteration]) {
+                    objectIteration.differencePercentage = differencePercentageArr[iteration].value;
                   }
                   if (!hasUndefined) {
                     arrayToSend.push(objectIteration);
                   }
                 }
-                return downloadCSV(arrayToSend.sort(sortFunction).filter((x: any) => {
+                return downloadCSV(arrayToSend.sort(sortFunction).filter((obj: { [x: string]: any }) => {
                   if (datesSelectedTimestamps.length > 0) {
-                    return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+                    return datesSelectedTimestamps.includes(moment.utc(obj.date * 1000).format("YYYY-MM-DD"));
                   }
                   return true;
-                }).map((x: any) => ({ ...x, date: moment.utc(x.date * 1000).format("YYYY-MM-DD") })), datasetLabel + '-csv', datasetLabel);
+                }).map((json: { [x: string]: any }) => ({ ...json, date: moment.utc(json.date * 1000).format("YYYY-MM-DD") })), datasetLabel + '-csv', datasetLabel);
               } else {
-                return downloadCSV(dataTableCopy.sort(sortFunction).filter((x: any) => {
+                return downloadCSV(dataTableCopy.sort(sortFunction).filter((json: { [x: string]: any }) => {
                   if (datesSelectedTimestamps.length > 0) {
-                    return datesSelectedTimestamps.includes(moment.utc(x.date * 1000).format("YYYY-MM-DD"));
+                    return datesSelectedTimestamps.includes(moment.utc(json.date * 1000).format("YYYY-MM-DD"));
                   }
                   return true;
-                }).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [datasetLabel]: x.value })), datasetLabel + '-csv', datasetLabel);
+                }).map((json: { [x: string]: any }) => ({ date: moment.utc(json.date * 1000).format("YYYY-MM-DD"), [datasetLabel]: json.value })), datasetLabel + '-csv', datasetLabel);
               }
             }}>
               Save CSV
@@ -184,10 +184,10 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isHourly, jpegDownloa
                 sortModel: [{ field: "date", sort: "desc" }],
               },
             }}
-            onSortModelChange={(x) => {
-              setSortColumn(x[0].field);
-              setSortOrderAsc(x[0].sort === "asc");
-            }}
+            onSortModelChange={((data: any[]) => {
+              setSortColumn(data[0].field);
+              setSortOrderAsc(data[0].sort === "asc");
+            })}
             rows={tableData}
             columns={columns}
           />
