@@ -24,6 +24,10 @@
           "hosted-service": {
             "slug": "abracadabra-money-arbitrum",
             "query-id": "abracadabra-money-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "abracadabra-money-arbitrum",
+            "query-id": "GnroBYmeLLtKuHNyTNS38hzKki5n4CWaHeaMRqZpU4cr"
           }
         }
       },
@@ -46,6 +50,10 @@
           "hosted-service": {
             "slug": "abracadabra-money-avalanche",
             "query-id": "abracadabra-money-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "abracadabra-money-avalanche",
+            "query-id": "CZBD7e8VGvNa6WkBHZAaC688bsZ35UvAM1AuDdVng2aE"
           }
         }
       },
@@ -248,6 +256,10 @@
           "hosted-service": {
             "slug": "aave-v2-avalanche",
             "query-id": "aave-v2-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "aave-v2-avalanche",
+            "query-id": "AQHJdvUMkPfSxi6Q2LxXYjWXjGvfCST8DFFYE4VUKtU6"
           }
         }
       },
@@ -326,6 +338,10 @@
           "hosted-service": {
             "slug": "aave-v3-arbitrum",
             "query-id": "aave-v3-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-arbitrum",
+            "query-id": "J9dtvE11PWNZH74frWyx9QZonyC1Db2UWDMUegmT3zkG"
           }
         }
       },
@@ -348,6 +364,10 @@
           "hosted-service": {
             "slug": "aave-v3-avalanche",
             "query-id": "aave-v3-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-avalanche",
+            "query-id": "94D1g2jHHqKUS5uhbEPHWyRgfp4bYeZPn5Cr5R3zvoYH"
           }
         }
       },
@@ -1174,6 +1194,10 @@
           "hosted-service": {
             "slug": "banker-joe-avalanche",
             "query-id": "banker-joe-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "banker-joe-avalanche",
+            "query-id": "F94CS4mephx6noem4KsXxeGDSufCGUH5fXrqUX5ZiFk2"
           }
         }
       }
@@ -1264,6 +1288,10 @@
           "hosted-service": {
             "slug": "benqi-avalanche",
             "query-id": "benqi-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "benqi-avalanche",
+            "query-id": "EcNHwEGXq3KW1vCbHHj1iwvtf62ae5kxzEQhKtRqPygt"
           }
         }
       }
@@ -1388,6 +1416,10 @@
           "hosted-service": {
             "slug": "cream-finance-arbitrum",
             "query-id": "cream-finance-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "cream-finance-arbitrum",
+            "query-id": "4TbqVA8p2DoBd5qDbPMwmDZv3CsJjWtxo8nVSqF2tA9a"
           }
         }
       },
@@ -1488,6 +1520,10 @@
           "hosted-service": {
             "slug": "dforce-arbitrum",
             "query-id": "dforce-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "dforce-arbitrum",
+            "query-id": "FFK9Fa8fdBrAugNVFqRZVAtrej7FjsQNq1s9LVBhF4FX"
           }
         }
       },
@@ -1632,6 +1668,10 @@
           "hosted-service": {
             "slug": "iron-bank-avalanche",
             "query-id": "iron-bank-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "iron-bank-avalanche",
+            "query-id": "7ziHxbouaMXhSzxf5nfTXLYYASajU9bTCcxWoTKEAkBe"
           }
         }
       },
@@ -1818,6 +1858,10 @@
           "hosted-service": {
             "slug": "rari-fuse-arbitrum",
             "query-id": "rari-fuse-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "rari-fuse-arbitrum",
+            "query-id": "DbD7U3k8trdQUC2KqC2Fu2WcS42QUZHr2YXJzZXjH719"
           }
         }
       },
@@ -2486,6 +2530,10 @@
           "hosted-service": {
             "slug": "vesta-finance-arbitrum",
             "query-id": "vesta-finance-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "vesta-finance-arbitrum",
+            "query-id": "9RFPnB3zNjtc7x9kowTyBU2YVGUFSJRe27EBJWLMVgy6"
           }
         }
       }
@@ -3458,6 +3506,10 @@
           "hosted-service": {
             "slug": "ribbon-finance-avalanche",
             "query-id": "ribbon-finance-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "ribbon-finance-avalanche",
+            "query-id": "8qztgeMTJrq2kQHK7LzmbmDUpuBvDc6eFASDqN8SJBM5"
           }
         }
       }
@@ -3548,6 +3600,10 @@
           "hosted-service": {
             "slug": "saddle-finance-arbitrum",
             "query-id": "saddle-finance-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "saddle-finance-arbitrum",
+            "query-id": "FsT2DES8UdhfDkXCtE56h5WCDrrSXrtJiSMgNWvSdyYL"
           }
         }
       },
@@ -3674,6 +3730,10 @@
           "hosted-service": {
             "slug": "radiant-arbitrum",
             "query-id": "radiant-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "radiant-arbitrum",
+            "query-id": "43NeT7UTACLUkohKBaG7auvkhsj4Kwux9kNTJr6sFdNe"
           }
         }
       }
@@ -3920,6 +3980,10 @@
           "hosted-service": {
             "slug": "qidao-arbitrum",
             "query-id": "qidao-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "qidao-arbitrum",
+            "query-id": "Dy1yVPfbS27HTrqEq3nLGFGi3TMYxPzSfY7Zxxj5ZJhf"
           }
         }
       },
@@ -3942,6 +4006,10 @@
           "hosted-service": {
             "slug": "qidao-avalanche",
             "query-id": "qidao-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "qidao-avalanche",
+            "query-id": "4cKy6QQMc5tpfdx8yxfYeb9TLZmgLQe44ddW1G7NwkA6"
           }
         }
       },
@@ -4930,6 +4998,10 @@
           "hosted-service": {
             "slug": "yearn-v2-arbitrum",
             "query-id": "yearn-v2-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "yearn-v2-arbitrum",
+            "query-id": "39F8fYCvLYmutjqpzEwx3dcEJTtFFVupvBzJqkEzftA7"
           }
         }
       },
@@ -6086,6 +6158,10 @@
           "hosted-service": {
             "slug": "platypus-finance-avalanche",
             "query-id": "platypus-finance-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "platypus-finance-avalanche",
+            "query-id": "8EBbn3tNayccBZrnW9ae6Q4NLHfVEcozvkB3YAp5Qatr"
           }
         }
       }
