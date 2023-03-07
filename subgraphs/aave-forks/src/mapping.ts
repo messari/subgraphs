@@ -44,6 +44,7 @@ import {
   VariableDebtToken as VTokenTemplate,
   StableDebtToken as STokenTemplate,
 } from "../generated/templates";
+import { LendingPool } from "../generated/LendingPool/LendingPool";
 
 //////////////////////////
 ///// Helper Classes /////
@@ -74,20 +75,40 @@ export function _handlePriceOracleUpdated(
   protocol.save();
 }
 
-export function _handleReserveInitialized(
+export function _getOrCreateMarket(
   event: ethereum.Event,
   underlyingToken: Address,
-  outputToken: Address,
-  variableDebtToken: Address,
+  outputToken: Address | null,
+  variableDebtToken: Address | null,
   protocolData: ProtocolData,
   stableDebtToken: Address = Address.fromString(ZERO_ADDRESS)
-): void {
+): Market | null {
+  let market = Market.load(underlyingToken.toHexString());
+  if (!market) {
+    return market;
+  }
+
+  if (!outputToken || !variableDebtToken) {
+    const lendingPoolContract = LendingPool.bind(event.address);
+    const tryGetReserveData =
+      lendingPoolContract.try_getReserveData(underlyingToken);
+    if (tryGetReserveData.reverted) {
+      log.error("Failed to get reserve data for reserve {}", [
+        underlyingToken.toHexString(),
+      ]);
+      return null;
+    }
+    outputToken = tryGetReserveData.value.aTokenAddress;
+    variableDebtToken = tryGetReserveData.value.variableDebtTokenAddress;
+    stableDebtToken = tryGetReserveData.value.stableDebtTokenAddress;
+  }
+
   // create tokens
   const outputTokenEntity = getOrCreateToken(outputToken);
   const variableDebtTokenEntity = getOrCreateToken(variableDebtToken);
 
   // update and initialize specofic market variables
-  const market = getOrCreateMarket(underlyingToken, protocolData);
+  market = getOrCreateMarket(underlyingToken, protocolData);
 
   market.name = outputTokenEntity.name;
   market.outputToken = outputTokenEntity.id;
@@ -104,6 +125,8 @@ export function _handleReserveInitialized(
 
   // create AToken template to watch Transfer
   ATokenTemplate.create(outputToken);
+
+  return market;
 }
 
 export function _handleCollateralConfigurationChanged(

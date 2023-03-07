@@ -37,6 +37,7 @@ import {
 import { AToken } from "../../../generated/LendingPool/AToken";
 import {
   ProtocolData,
+  _getOrCreateMarket,
   _handleBorrow,
   _handleBorrowingDisabledOnReserve,
   _handleBorrowingEnabledOnReserve,
@@ -50,7 +51,6 @@ import {
   _handleReserveDataUpdated,
   _handleReserveDeactivated,
   _handleReserveFactorChanged,
-  _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
   _handleTransfer,
@@ -107,7 +107,7 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
   // This function handles market entity from reserve creation event
   // Attempt to load or create the market implementation
 
-  _handleReserveInitialized(
+  _getOrCreateMarket(
     event,
     event.params.asset,
     event.params.aToken,
@@ -120,6 +120,8 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
 export function handleCollateralConfigurationChanged(
   event: CollateralConfigurationChanged
 ): void {
+  _getOrCreateMarket(event, event.params.asset, null, null, getProtocolData());
+
   _handleCollateralConfigurationChanged(
     event.params.asset,
     event.params.liquidationBonus,
@@ -132,24 +134,34 @@ export function handleCollateralConfigurationChanged(
 export function handleBorrowingEnabledOnReserve(
   event: BorrowingEnabledOnReserve
 ): void {
+  _getOrCreateMarket(event, event.params.asset, null, null, getProtocolData());
+
   _handleBorrowingEnabledOnReserve(event.params.asset, getProtocolData());
 }
 
 export function handleBorrowingDisabledOnReserve(
   event: BorrowingDisabledOnReserve
 ): void {
+  _getOrCreateMarket(event, event.params.asset, null, null, getProtocolData());
+
   _handleBorrowingDisabledOnReserve(event.params.asset, getProtocolData());
 }
 
 export function handleReserveActivated(event: ReserveActivated): void {
+  _getOrCreateMarket(event, event.params.asset, null, null, getProtocolData());
+
   _handleReserveActivated(event.params.asset, getProtocolData());
 }
 
 export function handleReserveDeactivated(event: ReserveDeactivated): void {
+  _getOrCreateMarket(event, event.params.asset, null, null, getProtocolData());
+
   _handleReserveDeactivated(event.params.asset, getProtocolData());
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
+  _getOrCreateMarket(event, event.params.asset, null, null, getProtocolData());
+
   _handleReserveFactorChanged(
     event.params.asset,
     event.params.factor,
@@ -166,13 +178,14 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   const protocol = getOrCreateLendingProtocol(protocolData);
 
   // update rewards if there is an incentive controller
-  const market = Market.load(event.params.reserve.toHexString());
-  if (!market) {
-    log.warning("[handleReserveDataUpdated] Market not found", [
-      event.params.reserve.toHexString(),
-    ]);
-    return;
-  }
+  const market = _getOrCreateMarket(
+    event,
+    event.params.reserve,
+    null,
+    null,
+    getProtocolData()
+  );
+  if (!market) return;
 
   //
   // Reward rate (rewards/second) in a market comes from try_assets(to)
@@ -291,6 +304,14 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 export function handleReserveUsedAsCollateralEnabled(
   event: ReserveUsedAsCollateralEnabled
 ): void {
+  _getOrCreateMarket(
+    event,
+    event.params.reserve,
+    null,
+    null,
+    getProtocolData()
+  );
+
   // This Event handler enables a reserve/market to be used as collateral
   _handleReserveUsedAsCollateralEnabled(
     event.params.reserve,
@@ -302,6 +323,14 @@ export function handleReserveUsedAsCollateralEnabled(
 export function handleReserveUsedAsCollateralDisabled(
   event: ReserveUsedAsCollateralDisabled
 ): void {
+  _getOrCreateMarket(
+    event,
+    event.params.reserve,
+    null,
+    null,
+    getProtocolData()
+  );
+
   // This Event handler disables a reserve/market being used as collateral
   _handleReserveUsedAsCollateralDisabled(
     event.params.reserve,
@@ -321,6 +350,15 @@ export function handleUnpaused(event: Unpaused): void {
 }
 
 export function handleDeposit(event: Deposit): void {
+  const market = _getOrCreateMarket(
+    event,
+    event.params.reserve,
+    null,
+    null,
+    getProtocolData()
+  );
+  if (!market) return;
+
   _handleDeposit(
     event,
     event.params.amount,
@@ -331,6 +369,15 @@ export function handleDeposit(event: Deposit): void {
 }
 
 export function handleWithdraw(event: Withdraw): void {
+  const market = _getOrCreateMarket(
+    event,
+    event.params.reserve,
+    null,
+    null,
+    getProtocolData()
+  );
+  if (!market) return;
+
   _handleWithdraw(
     event,
     event.params.amount,
@@ -341,6 +388,15 @@ export function handleWithdraw(event: Withdraw): void {
 }
 
 export function handleBorrow(event: Borrow): void {
+  const market = _getOrCreateMarket(
+    event,
+    event.params.reserve,
+    null,
+    null,
+    getProtocolData()
+  );
+  if (!market) return;
+
   _handleBorrow(
     event,
     event.params.amount,
@@ -351,6 +407,15 @@ export function handleBorrow(event: Borrow): void {
 }
 
 export function handleRepay(event: Repay): void {
+  const market = _getOrCreateMarket(
+    event,
+    event.params.reserve,
+    null,
+    null,
+    getProtocolData()
+  );
+  if (!market) return;
+
   _handleRepay(
     event,
     event.params.amount,
@@ -361,6 +426,24 @@ export function handleRepay(event: Repay): void {
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
+  let market = _getOrCreateMarket(
+    event,
+    event.params.collateralAsset,
+    null,
+    null,
+    getProtocolData()
+  );
+  if (!market) return;
+
+  market = _getOrCreateMarket(
+    event,
+    event.params.debtAsset,
+    null,
+    null,
+    getProtocolData()
+  );
+  if (!market) return;
+
   _handleLiquidate(
     event,
     event.params.liquidatedCollateralAmount,
