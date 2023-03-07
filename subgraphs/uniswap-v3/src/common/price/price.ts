@@ -159,9 +159,6 @@ export function findUSDPricePerToken(
           continue;
         }
 
-        // log.warning("HELLO", [])
-
-        // whitelist token is token1
         const whitelistToken = getOrCreateToken(
           event,
           pool.inputTokens[whitelistTokenIndex],
