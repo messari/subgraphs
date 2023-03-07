@@ -7,8 +7,8 @@ export function addPosition(
   market: Market,
   account: Account,
   balance: BigInt,
-  side: string,
-  eventType: i32,
+  side: PositionSide,
+  eventType: EventType,
   event: ethereum.Event,
 ): string {
   const counterID = account.id.concat("-").concat(market.id).concat("-").concat(side);
@@ -24,8 +24,12 @@ export function addPosition(
 
   if (eventType == EventType.DEPOSIT) {
     position.depositCount += 1;
+    countAccountDeposit(account, protocol);
   } else if (eventType == EventType.BORROW) {
     position.borrowCount += 1;
+    countAccountBorrow(account, protocol);
+  } else if (eventType == EventType.LIQUIDATOR) {
+    countAccountLiquidate(account, protocol);
   }
   position.save();
 
@@ -109,8 +113,8 @@ export function subtractPosition(
   market: Market,
   account: Account,
   balance: BigInt,
-  side: string,
-  eventType: i32,
+  side: PositionSide,
+  eventType: EventType,
   event: ethereum.Event,
 ): string | null {
   const counterID = account.id.concat("-").concat(market.id).concat("-").concat(side);
@@ -129,13 +133,13 @@ export function subtractPosition(
   position.balance = balance;
   if (eventType == EventType.WITHDRAW) {
     position.withdrawCount += 1;
-    account.withdrawCount += 1;
+    countAccountWithdraw(account);
   } else if (eventType == EventType.REPAY) {
     position.repayCount += 1;
-    account.repayCount += 1;
+    countAccountRepay(account);
   } else if (eventType == EventType.LIQUIDATEE) {
     position.liquidationCount += 1;
-    account.liquidationCount += 1;
+    countAccountLiquidatee(account, protocol);
   }
   account.save();
   position.save();
@@ -183,4 +187,50 @@ export function subtractPosition(
   snapshotPosition(position, event);
 
   return positionID;
+}
+
+function countAccountBorrow(account: Account, protocol: LendingProtocol): void {
+  account.borrowCount += 1;
+  if (account.borrowCount == 1) {
+    protocol.cumulativeUniqueBorrowers += 1;
+  }
+  account.save();
+  protocol.save();
+}
+
+function countAccountRepay(account: Account): void {
+  account.repayCount += 1;
+  account.save();
+}
+
+function countAccountDeposit(account: Account, protocol: LendingProtocol): void {
+  account.depositCount += 1;
+  if (account.depositCount == 1) {
+    protocol.cumulativeUniqueDepositors += 1;
+  }
+  account.save();
+  protocol.save();
+}
+
+function countAccountWithdraw(account: Account): void {
+  account.withdrawCount += 1;
+  account.save();
+}
+
+function countAccountLiquidate(liquidator: Account, protocol: LendingProtocol): void {
+  liquidator.liquidateCount += 1;
+  if (liquidator.liquidateCount == 1) {
+    protocol.cumulativeUniqueLiquidators += 1;
+  }
+  liquidator.save();
+  protocol.save();
+}
+
+function countAccountLiquidatee(liquidatee: Account, protocol: LendingProtocol): void {
+  liquidatee.liquidationCount += 1;
+  if (liquidatee.liquidationCount == 1) {
+    protocol.cumulativeUniqueLiquidatees += 1;
+  }
+  liquidatee.save();
+  protocol.save();
 }
