@@ -183,8 +183,11 @@ export function findUSDPricePerToken(
           const newPriceSoFar = poolAmounts.tokenPrices[
             whitelistTokenIndex
           ].times(whitelistToken.lastPriceUSD as BigDecimal);
-          const newTokenTotalValueLocked =
-            poolAmounts.inputTokenBalances[tokenIndex].times(newPriceSoFar);
+
+          const newTokenTotalValueLocked = convertTokenToDecimal(
+            token._totalSupply,
+            token.decimals
+          ).times(newPriceSoFar);
 
           // If price is too high, skip this pool
           if (newTokenTotalValueLocked.gt(BIGDECIMAL_TEN_BILLION)) {
@@ -207,7 +210,7 @@ export function findUSDPricePerToken(
   const protocol = getOrCreateProtocol();
   const tokenTVLDelta = absBigDecimal(
     priceSoFar
-      .times(token._totalSupply.toBigDecimal())
+      .times(convertTokenToDecimal(token._totalSupply, token.decimals))
       .minus(token._totalValueLockedUSD)
   );
   const protocolTVLPercentageDelta = absBigDecimal(

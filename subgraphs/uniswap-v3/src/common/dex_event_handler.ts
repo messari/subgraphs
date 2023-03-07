@@ -579,7 +579,9 @@ export class DexEventHandler {
   updateAndSavePoolTokenEntities(): void {
     for (let i = 0; i < this.poolTokens.length; i++) {
       const poolToken = this.poolTokens[i];
-      poolToken._totalSupply = this.inputTokenBalanceDeltas[i];
+      poolToken._totalSupply = poolToken._totalSupply.plus(
+        this.inputTokenBalanceDeltas[i]
+      );
       poolToken._totalValueLockedUSD = convertTokenToDecimal(
         poolToken._totalSupply,
         poolToken.decimals
