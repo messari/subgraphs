@@ -1,4 +1,10 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { _LiquidityGauge, Vault } from "../../../generated/schema";
 import { LiquidityGaugeV4 as GaugeContract } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
 import {
@@ -38,15 +44,32 @@ export function updateRewardTokens(
   let rewardEmission = vault.rewardTokenEmissionsAmount;
   let rewardEmissionUSD = vault.rewardTokenEmissionsUSD;
   if (!rewardTokens) {
-    rewardTokens = [];
-    rewardEmission = [];
-    rewardEmissionUSD = [];
-  }
-  const index = rewardTokens.indexOf(rewardToken.id);
-  if (index == -1) {
+    rewardTokens = [rewardToken.id];
+    rewardEmission = [BIGINT_ZERO];
+    rewardEmissionUSD = [BIGDECIMAL_ZERO];
+  } else {
+    const index = rewardTokens.indexOf(rewardToken.id);
+    if (index != -1) {
+      // Do nothing if rewardToken is already in rewardTokens
+      return;
+    }
+
     rewardTokens.push(rewardToken.id);
     rewardEmission!.push(BIGINT_ZERO);
     rewardEmissionUSD!.push(BIGDECIMAL_ZERO);
+
+    const rewardTokensUnsorted = rewardTokens;
+    rewardTokens.sort();
+    rewardEmission = sortArrayByReference<string, BigInt>(
+      rewardTokens,
+      rewardTokensUnsorted,
+      rewardEmission!
+    );
+    rewardEmissionUSD = sortArrayByReference<string, BigDecimal>(
+      rewardTokens,
+      rewardTokensUnsorted,
+      rewardEmissionUSD!
+    );
   }
   vault.rewardTokens = rewardTokens;
   vault.rewardTokenEmissionsAmount = rewardEmission;
@@ -55,7 +78,7 @@ export function updateRewardTokens(
 }
 
 export function updateRewardEmission(
-  gaugeAddress: Address,
+  gaugeAddress: Address, //TODO: Remove
   vaultAddress: Address,
   rewardTokenAddress: Address,
   event: ethereum.Event
@@ -151,4 +174,30 @@ export function updateRewardEmission(
       vault.rewardTokenEmissionsUSD!.toString(),
     ]
   );
+}
+
+// A function which given 3 arrays of arbitrary types of the same length,
+// where the first one holds the reference order, the second one holds the same elements
+// as the first but in different order, and the third any arbitrary elements. It will return
+// the third array after sorting it according to the order of the first one.
+// For example:
+// sortArrayByReference(['a', 'c', 'b'], ['a', 'b', 'c'], [1, 2, 3]) => [1, 3, 2]
+export function sortArrayByReference<T, K>(
+  reference: T[],
+  array: T[],
+  toSort: K[]
+): K[] {
+  const sorted: K[] = new Array<K>();
+  for (let i = 0; i < reference.length; i++) {
+    const index = array.indexOf(reference[i]);
+    sorted.push(toSort[index]);
+  }
+  return sorted;
+}
+
+// sortBytesArray will sort an array of Bytes in ascending order
+// by comparing their hex string representation.
+export function sortStringArray(array: string[]): String[] {
+  const sorted = array.map((item) => item);
+  sorted.sort();
 }
