@@ -29,7 +29,7 @@ export const TRADERJOE_WETH_ADDRESS = Address.fromString("0xb31f66aa3c1e785363f0
 export const TRADERJOE_CALCULATIONS_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000");
 
 export const TRADERJOE_ROUTER_ADDRESS = new TypedMap<string, Address>();
-TRADERJOE_ROUTER_ADDRESS.set("routerV1", Address.fromString("0x60aE616a2155Ee3d9A68541Ba4544862310933d4"));
+TRADERJOE_ROUTER_ADDRESS.set("routerV1", Address.fromString("0x60ae616a2155ee3d9a68541ba4544862310933d4"));
 TRADERJOE_ROUTER_ADDRESS.set("routerV2", Address.fromString("0x0000000000000000000000000000000000000000"));
 
 ///////////////////////////////////////////////////////////////////////////
@@ -58,8 +58,8 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString("0x000000000000000
 
 export const WHITELIST_TOKENS = new TypedMap<string, Address>();
 WHITELIST_TOKENS.set("WAVAX", Address.fromString("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"));
-WHITELIST_TOKENS.set("AVAX", Address.fromString("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"));
-WHITELIST_TOKENS.set("ETH", Address.fromString("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"));
+WHITELIST_TOKENS.set("AVAX", Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"));
+WHITELIST_TOKENS.set("ETH", Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"));
 WHITELIST_TOKENS.set("USDT", Address.fromString("0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7"));
 WHITELIST_TOKENS.set("DAI", Address.fromString("0xd586e7f844cea2f87f50152665bcbc2c279d8d70"));
 WHITELIST_TOKENS.set("USDC", Address.fromString("0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664"));

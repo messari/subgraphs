@@ -15,12 +15,22 @@ export function bytes32ToAddressHexString(bytes: Bytes): string {
   return `0x${bytes.toHexString().slice(26).toLowerCase()}`;
 }
 
-export function bytesToUnsignedBigInt(bytes: Bytes, bigEndian: boolean = true): BigInt {
+export function bytesToUnsignedBigInt(
+  bytes: Bytes,
+  bigEndian: boolean = true
+): BigInt {
   // Caution: this function changes the input bytes for bigEndian
-  return BigInt.fromUnsignedBytes(bigEndian ? Bytes.fromUint8Array(bytes.reverse()) : bytes);
+  return BigInt.fromUnsignedBytes(
+    bigEndian ? Bytes.fromUint8Array(bytes.reverse()) : bytes
+  );
 }
 
-export function bytesToSignedBigInt(bytes: Bytes, bigEndian: boolean = true): BigInt {
+export function bytesToSignedBigInt(
+  bytes: Bytes,
+  bigEndian: boolean = true
+): BigInt {
   // Caution: this function changes the input bytes for bigEndian
-  return BigInt.fromSignedBytes(bigEndian ? Bytes.fromUint8Array(bytes.reverse()) : bytes);
+  return BigInt.fromSignedBytes(
+    bigEndian ? Bytes.fromUint8Array(bytes.reverse()) : bytes
+  );
 }

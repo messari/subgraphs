@@ -6,8 +6,8 @@ description: ...
 features:
   - grafting
 graft:
-  base: {{subgraphId}} # Subgraph ID of base subgraph
-  block: {{graftStartBlock}} # Block number
+  base: {{subgraphId}}
+  block: {{graftStartBlock}}
 {{/graftEnabled}}
 dataSources:
   # Vault

@@ -11,17 +11,13 @@ declare module 'chart.js' {
 }
 
 interface BridgeOutboundChartProps {
-    dayVolByChain: any[];
+    dayVolByChain: { [x: string]: string };
     title: string;
     dates: number[];
     chartRef: any;
 }
 
 export function BridgeOutboundChart({ dayVolByChain, dates, title, chartRef }: BridgeOutboundChartProps) {
-    let chains: string[] = [];
-    if (dayVolByChain.length > 0) {
-        chains = Object.keys(dayVolByChain);
-    }
 
     const intMode: "nearest" | "x" | "y" | "index" | "dataset" | "point" | undefined = "nearest";
     const intAxis: "x" | "y" | "xy" | "r" | undefined = "x";
@@ -69,9 +65,9 @@ export function BridgeOutboundChart({ dayVolByChain, dates, title, chartRef }: B
         },
     };
     const colorList = ["red", "blue", "yellow", "lime", "blueviolet", "orange", "purple", "maroon", "aqua", "olive", 'deeppink'];
-    const labels = dates.map((ts: number) => moment(ts * 1000).format('MM-DD-YYYY'));
+    const labels = dates.map((date: number) => moment(date * 1000).format('MM-DD-YYYY'));
 
-    const datasets = Object.keys(dayVolByChain).map((chain: any, idx: number) => {
+    const datasets = Object.keys(dayVolByChain).map((chain: string, idx: number) => {
         return { data: dayVolByChain[chain], label: chain, backgroundColor: colorList[idx], hoverBackgroundColor: "white", hoverBorderColor: "white", hoverBorderWidth: 10 };
     });
     const data = {
