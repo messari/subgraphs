@@ -23,11 +23,16 @@ import {
   ReserveInitialized,
 } from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
+  Borrow,
+  Deposit,
+  LiquidationCall,
   Paused,
+  Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
   Unpaused,
+  Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
 import { AToken } from "../../../generated/LendingPool/AToken";
 import {
@@ -174,96 +179,96 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // Supply side the to address is the aToken
   // Borrow side the to address is the variableDebtToken
 
-  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  const tryIncentiveController = aTokenContract.try_getIncentivesController();
-  if (!tryIncentiveController.reverted) {
-    const incentiveControllerContract = AaveIncentivesController.bind(
-      tryIncentiveController.value
-    );
-    const tryBorrowRewards = incentiveControllerContract.try_assets(
-      Address.fromString(market._vToken!)
-    );
-    const trySupplyRewards = incentiveControllerContract.try_assets(
-      Address.fromString(market.outputToken!)
-    );
-    const tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
+  // const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  // const tryIncentiveController = aTokenContract.try_getIncentivesController();
+  // if (!tryIncentiveController.reverted) {
+  //   const incentiveControllerContract = AaveIncentivesController.bind(
+  //     tryIncentiveController.value
+  //   );
+  //   const tryBorrowRewards = incentiveControllerContract.try_assets(
+  //     Address.fromString(market._vToken!)
+  //   );
+  //   const trySupplyRewards = incentiveControllerContract.try_assets(
+  //     Address.fromString(market.outputToken!)
+  //   );
+  //   const tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
 
-    if (!tryRewardAsset.reverted) {
-      // get reward tokens
-      const borrowRewardToken = getOrCreateRewardToken(
-        tryRewardAsset.value,
-        RewardTokenType.BORROW
-      );
-      const depositRewardToken = getOrCreateRewardToken(
-        tryRewardAsset.value,
-        RewardTokenType.DEPOSIT
-      );
+  //   if (!tryRewardAsset.reverted) {
+  //     // get reward tokens
+  //     const borrowRewardToken = getOrCreateRewardToken(
+  //       tryRewardAsset.value,
+  //       RewardTokenType.BORROW
+  //     );
+  //     const depositRewardToken = getOrCreateRewardToken(
+  //       tryRewardAsset.value,
+  //       RewardTokenType.DEPOSIT
+  //     );
 
-      // always ordered [borrow, deposit/supply]
-      const rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
-      const rewardEmissions = [BIGINT_ZERO, BIGINT_ZERO];
-      const rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-      const rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
+  //     // always ordered [borrow, deposit/supply]
+  //     const rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
+  //     const rewardEmissions = [BIGINT_ZERO, BIGINT_ZERO];
+  //     const rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  //     const rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
 
-      // get reward token price
-      // get price of reward token (if stkAAVE it is tied to the price of AAVE)
-      let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
-      if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
-        // get staked token if possible to grab price of staked token
-        const stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
-        const tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
-        if (!tryStakedToken.reverted) {
-          rewardTokenPriceUSD = getAssetPriceInUSDC(
-            tryStakedToken.value,
-            Address.fromString(protocol._priceOracle),
-            event.block.number
-          );
-        }
-      }
+  //     // get reward token price
+  //     // get price of reward token (if stkAAVE it is tied to the price of AAVE)
+  //     let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
+  //     if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
+  //       // get staked token if possible to grab price of staked token
+  //       const stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
+  //       const tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
+  //       if (!tryStakedToken.reverted) {
+  //         rewardTokenPriceUSD = getAssetPriceInUSDC(
+  //           tryStakedToken.value,
+  //           Address.fromString(protocol._priceOracle),
+  //           event.block.number
+  //         );
+  //       }
+  //     }
 
-      // if reward token price was not found then use old method
-      if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
-        rewardTokenPriceUSD = getAssetPriceInUSDC(
-          tryRewardAsset.value,
-          Address.fromString(protocol._priceOracle),
-          event.block.number
-        );
-      }
+  //     // if reward token price was not found then use old method
+  //     if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
+  //       rewardTokenPriceUSD = getAssetPriceInUSDC(
+  //         tryRewardAsset.value,
+  //         Address.fromString(protocol._priceOracle),
+  //         event.block.number
+  //       );
+  //     }
 
-      // we check borrow first since it will show up first in graphql ordering
-      // see explanation in docs/Mapping.md#Array Sorting When Querying
-      if (!tryBorrowRewards.reverted) {
-        // update borrow rewards
-        const borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
-          BigInt.fromI32(SECONDS_PER_DAY)
-        );
-        rewardEmissions[0] = borrowRewardsPerDay;
-        const borrowRewardsPerDayUSD = borrowRewardsPerDay
-          .toBigDecimal()
-          .div(exponentToBigDecimal(rewardDecimals))
-          .times(rewardTokenPriceUSD);
-        rewardEmissionsUSD[0] = borrowRewardsPerDayUSD;
-      }
+  //     // we check borrow first since it will show up first in graphql ordering
+  //     // see explanation in docs/Mapping.md#Array Sorting When Querying
+  //     if (!tryBorrowRewards.reverted) {
+  //       // update borrow rewards
+  //       const borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
+  //         BigInt.fromI32(SECONDS_PER_DAY)
+  //       );
+  //       rewardEmissions[0] = borrowRewardsPerDay;
+  //       const borrowRewardsPerDayUSD = borrowRewardsPerDay
+  //         .toBigDecimal()
+  //         .div(exponentToBigDecimal(rewardDecimals))
+  //         .times(rewardTokenPriceUSD);
+  //       rewardEmissionsUSD[0] = borrowRewardsPerDayUSD;
+  //     }
 
-      if (!trySupplyRewards.reverted) {
-        // update deposit rewards
-        const supplyRewardsPerDay = trySupplyRewards.value.value0.times(
-          BigInt.fromI32(SECONDS_PER_DAY)
-        );
-        rewardEmissions[1] = supplyRewardsPerDay;
-        const supplyRewardsPerDayUSD = supplyRewardsPerDay
-          .toBigDecimal()
-          .div(exponentToBigDecimal(rewardDecimals))
-          .times(rewardTokenPriceUSD);
-        rewardEmissionsUSD[1] = supplyRewardsPerDayUSD;
-      }
+  //     if (!trySupplyRewards.reverted) {
+  //       // update deposit rewards
+  //       const supplyRewardsPerDay = trySupplyRewards.value.value0.times(
+  //         BigInt.fromI32(SECONDS_PER_DAY)
+  //       );
+  //       rewardEmissions[1] = supplyRewardsPerDay;
+  //       const supplyRewardsPerDayUSD = supplyRewardsPerDay
+  //         .toBigDecimal()
+  //         .div(exponentToBigDecimal(rewardDecimals))
+  //         .times(rewardTokenPriceUSD);
+  //       rewardEmissionsUSD[1] = supplyRewardsPerDayUSD;
+  //     }
 
-      market.rewardTokens = rewardTokens;
-      market.rewardTokenEmissionsAmount = rewardEmissions;
-      market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
-      market.save();
-    }
-  }
+  //     market.rewardTokens = rewardTokens;
+  //     market.rewardTokenEmissionsAmount = rewardEmissions;
+  //     market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+  //     market.save();
+  //   }
+  // }
 
   const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromString(market.inputToken),
@@ -313,6 +318,58 @@ export function handlePaused(event: Paused): void {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handleUnpaused(event: Unpaused): void {
   _handleUnpaused(getProtocolData());
+}
+
+export function handleDeposit(event: Deposit): void {
+  _handleDeposit(
+    event,
+    event.params.amount,
+    event.params.reserve,
+    getProtocolData(),
+    event.params.onBehalfOf
+  );
+}
+
+export function handleWithdraw(event: Withdraw): void {
+  _handleWithdraw(
+    event,
+    event.params.amount,
+    event.params.reserve,
+    getProtocolData(),
+    event.params.user
+  );
+}
+
+export function handleBorrow(event: Borrow): void {
+  _handleBorrow(
+    event,
+    event.params.amount,
+    event.params.reserve,
+    getProtocolData(),
+    event.params.onBehalfOf
+  );
+}
+
+export function handleRepay(event: Repay): void {
+  _handleRepay(
+    event,
+    event.params.amount,
+    event.params.reserve,
+    getProtocolData(),
+    event.params.user
+  );
+}
+
+export function handleLiquidationCall(event: LiquidationCall): void {
+  _handleLiquidate(
+    event,
+    event.params.liquidatedCollateralAmount,
+    event.params.collateralAsset,
+    getProtocolData(),
+    event.params.liquidator,
+    event.params.user,
+    event.params.debtAsset
+  );
 }
 
 /////////////////////////

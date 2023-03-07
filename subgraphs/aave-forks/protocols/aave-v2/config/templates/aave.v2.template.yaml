@@ -112,6 +112,16 @@ dataSources:
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
       eventHandlers:
+        - event: Deposit(indexed address,address,indexed address,uint256,indexed uint16)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256)
+          handler: handleWithdraw
+        - event: Borrow(indexed address,address,indexed address,uint256,uint256,uint256,indexed uint16)
+          handler: handleBorrow
+        - event: Repay(indexed address,indexed address,indexed address,uint256)
+          handler: handleRepay
+        - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
+          handler: handleLiquidationCall
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleReserveDataUpdated
         - event: ReserveUsedAsCollateralEnabled(indexed address,indexed address)
