@@ -53,6 +53,8 @@ export function updatePoolMetrics(
   poolDailySnapshot: PoolDailySnapshot,
   poolHourlySnapshot: PoolHourlySnapshot,
   poolRoute: PoolRoute,
+  poolRouteDailySnapshotID: Bytes,
+  poolRouteHourlySnapshotID: Bytes,
   block: ethereum.Block
 ): void {
   pool.inputTokenBalance = token._totalSupply;
@@ -68,7 +70,7 @@ export function updatePoolMetrics(
   poolDailySnapshot.inputTokenBalance = pool.inputTokenBalance;
   poolDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolDailySnapshot.routes = arrayUnique(
-    addToArrayAtIndex(poolDailySnapshot.routes, poolRoute.id)
+    addToArrayAtIndex(poolDailySnapshot.routes, poolRouteDailySnapshotID)
   );
   poolDailySnapshot.blockNumber = block.number;
   poolDailySnapshot.timestamp = block.timestamp;
@@ -76,7 +78,7 @@ export function updatePoolMetrics(
   poolHourlySnapshot.inputTokenBalance = pool.inputTokenBalance;
   poolHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolHourlySnapshot.routes = arrayUnique(
-    addToArrayAtIndex(poolHourlySnapshot.routes, poolRoute.id)
+    addToArrayAtIndex(poolHourlySnapshot.routes, poolRouteHourlySnapshotID)
   );
   poolHourlySnapshot.blockNumber = block.number;
   poolHourlySnapshot.timestamp = block.timestamp;
@@ -170,7 +172,7 @@ export function updateVolume(
   poolRouteDailySnapshot.snapshotVolumeIn =
     poolRouteDailySnapshot.snapshotVolumeIn.plus(volumeIn);
   poolRouteDailySnapshot.snapshotVolumeInUSD =
-    poolRouteDailySnapshot.cumulativeVolumeInUSD.plus(volumeInUSD);
+    poolRouteDailySnapshot.snapshotVolumeInUSD.plus(volumeInUSD);
   poolRouteDailySnapshot.cumulativeVolumeIn = pool.cumulativeVolumeIn;
   poolRouteDailySnapshot.cumulativeVolumeInUSD = pool.cumulativeVolumeInUSD;
   poolRouteDailySnapshot.snapshotVolumeOut =
@@ -205,7 +207,7 @@ export function updateVolume(
   poolRouteHourlySnapshot.snapshotVolumeIn =
     poolRouteHourlySnapshot.snapshotVolumeIn.plus(volumeIn);
   poolRouteHourlySnapshot.snapshotVolumeInUSD =
-    poolRouteHourlySnapshot.cumulativeVolumeInUSD.plus(volumeInUSD);
+    poolRouteHourlySnapshot.snapshotVolumeInUSD.plus(volumeInUSD);
   poolRouteHourlySnapshot.cumulativeVolumeIn = pool.cumulativeVolumeIn;
   poolRouteHourlySnapshot.cumulativeVolumeInUSD = pool.cumulativeVolumeInUSD;
   poolRouteHourlySnapshot.snapshotVolumeOut =
@@ -302,7 +304,7 @@ export function updateUsageMetrics(
   eventType: string,
   crosschainID: BigInt,
   block: ethereum.Block,
-  transaction: ethereum.Transaction
+  accountAddr: Address
 ): void {
   const transactionCount = INT_ONE;
   const depositCount = eventType == EventType.DEPOSIT ? INT_ONE : INT_ZERO;
@@ -375,8 +377,7 @@ export function updateUsageMetrics(
   usageMetricsHourly.blockNumber = block.number;
   usageMetricsHourly.timestamp = block.timestamp;
 
-  const from = transaction.from.toHexString();
-  const account = getOrCreateAccount(protocol, from);
+  const account = getOrCreateAccount(protocol, accountAddr.toHexString());
 
   if (account.transferInCount == INT_ZERO) {
     protocol.cumulativeUniqueTransferReceivers += transferInCount;
@@ -422,7 +423,8 @@ export function updateUsageMetrics(
     protocol.cumulativeUniqueMessageSenders;
 
   const dayId = getDaysSinceEpoch(block.timestamp.toI32());
-  const dailyActiveAccountID = from
+  const dailyActiveAccountID = accountAddr
+    .toHexString()
     .concat("-")
     .concat("daily")
     .concat("-")
@@ -439,7 +441,8 @@ export function updateUsageMetrics(
     );
 
     const inverseEventType = InverseEventType.get(eventType)!;
-    const inverseDailyActiveAccountID = from
+    const inverseDailyActiveAccountID = accountAddr
+      .toHexString()
       .concat("-")
       .concat("daily")
       .concat("-")
@@ -463,7 +466,8 @@ export function updateUsageMetrics(
   }
 
   const hourId = getHoursSinceEpoch(block.timestamp.toI32());
-  const hourlyActiveAccountID = from
+  const hourlyActiveAccountID = accountAddr
+    .toHexString()
     .concat("-")
     .concat("hourly")
     .concat("-")
@@ -480,7 +484,8 @@ export function updateUsageMetrics(
     );
 
     const inverseEventType = InverseEventType.get(eventType)!;
-    const inverseHourlyActiveAccountID = from
+    const inverseHourlyActiveAccountID = accountAddr
+      .toHexString()
       .concat("-")
       .concat("hourly")
       .concat("-")
@@ -560,7 +565,7 @@ export function createBridgeTransferEvent(
   transferEvent.protocol = Bytes.fromHexString(
     NetworkConfigs.getFactoryAddress()
   );
-  transferEvent.to = event.transaction.to!;
+  transferEvent.to = event.transaction.to ? event.transaction.to! : toAddress;
   transferEvent.from = event.transaction.from;
   transferEvent.isOutgoing = isOutgoing;
   transferEvent.pool = pool.id;
@@ -569,7 +574,7 @@ export function createBridgeTransferEvent(
   if (isOutgoing) {
     const account = getOrCreateAccount(
       protocol,
-      event.transaction.from.toHexString()
+      transferEvent.from.toHexString()
     );
     transferEvent.account = account.id;
 
@@ -579,7 +584,7 @@ export function createBridgeTransferEvent(
   } else {
     const account = getOrCreateAccount(
       protocol,
-      event.transaction.to!.toHexString()
+      transferEvent.to.toHexString()
     );
     transferEvent.account = account.id;
 

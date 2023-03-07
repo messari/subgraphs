@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM (Extended)
-# Version: 3.0.3
+# Version: 3.0.4
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -23,7 +23,7 @@ enum Network {
   OPTIMISM
   OSMOSIS
   MATIC # aka Polygon
-  XDAI # aka Gnosis Chain
+  GNOSIS
 }
 
 enum ProtocolType {

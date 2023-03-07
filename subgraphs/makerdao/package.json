@@ -2,7 +2,7 @@
   "name": "makerdao",
   "license": "UNLICENSED",
   "scripts": {
-    "prettier": "prettier --config ./.prettierrc.yaml --write \"**/*.{js,json,md,ts}\"",
+    "format": "npx prettier --write .",
     "codegen": "graph codegen"
   },
   "dependencies": {

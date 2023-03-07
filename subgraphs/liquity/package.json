@@ -2,7 +2,8 @@
   "name": "liquity-extended-subgraph",
   "license": "MIT",
   "scripts": {
-    "codegen": "graph codegen"
+    "codegen": "graph codegen",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.32.0",

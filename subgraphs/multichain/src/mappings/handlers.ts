@@ -122,6 +122,8 @@ export function handlerSwapOutV2(event: LogSwapout): void {
     poolDailySnapshot,
     poolHourlySnapshot,
     poolRoute,
+    poolRouteDailySnapshot.id,
+    poolRouteHourlySnapshot.id,
     event.block
   );
   const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
@@ -143,7 +145,7 @@ export function handlerSwapOutV2(event: LogSwapout): void {
   const feeUSD = NetworkConfigs.getBridgeFeeUSD(
     BridgeType.BRIDGE,
     token,
-    chainID.toString(),
+    crosschainID.toString(),
     event.params.amount
   );
   updateRevenue(
@@ -162,7 +164,7 @@ export function handlerSwapOutV2(event: LogSwapout): void {
     EventType.TRANSFER_OUT,
     crosschainID,
     event.block,
-    event.transaction
+    event.params.account
   );
 
   createBridgeTransferEvent(
@@ -277,6 +279,8 @@ export function handlerSwapInV2(event: LogSwapin): void {
     poolDailySnapshot,
     poolHourlySnapshot,
     poolRoute,
+    poolRouteDailySnapshot.id,
+    poolRouteHourlySnapshot.id,
     event.block
   );
   const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
@@ -311,7 +315,7 @@ export function handlerSwapInV2(event: LogSwapin): void {
     EventType.TRANSFER_IN,
     crosschainID,
     event.block,
-    event.transaction
+    event.params.account
   );
 
   createBridgeTransferEvent(
@@ -431,6 +435,8 @@ export function handleSwapOut(event: LogAnySwapOut): void {
     poolDailySnapshot,
     poolHourlySnapshot,
     poolRoute,
+    poolRouteDailySnapshot.id,
+    poolRouteHourlySnapshot.id,
     event.block
   );
   const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
@@ -452,7 +458,7 @@ export function handleSwapOut(event: LogAnySwapOut): void {
   const feeUSD = NetworkConfigs.getBridgeFeeUSD(
     BridgeType.ROUTER,
     token,
-    chainID.toString(),
+    crosschainID.toString(),
     event.params.amount
   );
   updateRevenue(
@@ -471,7 +477,7 @@ export function handleSwapOut(event: LogAnySwapOut): void {
     EventType.TRANSFER_OUT,
     crosschainID,
     event.block,
-    event.transaction
+    event.params.from
   );
 
   createBridgeTransferEvent(
@@ -591,6 +597,8 @@ export function handleSwapIn(event: LogAnySwapIn): void {
     poolDailySnapshot,
     poolHourlySnapshot,
     poolRoute,
+    poolRouteDailySnapshot.id,
+    poolRouteHourlySnapshot.id,
     event.block
   );
   const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
@@ -625,7 +633,7 @@ export function handleSwapIn(event: LogAnySwapIn): void {
     EventType.TRANSFER_IN,
     crosschainID,
     event.block,
-    event.transaction
+    event.params.to
   );
 
   createBridgeTransferEvent(
@@ -687,7 +695,7 @@ export function handleDeposit(call: DepositCall): void {
     EventType.DEPOSIT,
     crosschainID,
     call.block,
-    call.transaction
+    call.inputs.to
   );
 
   createLiquidityDepositEvent(
@@ -732,7 +740,7 @@ export function handleDepositVault(call: DepositVaultCall): void {
     EventType.DEPOSIT,
     crosschainID,
     call.block,
-    call.transaction
+    call.inputs.to
   );
 
   createLiquidityDepositEvent(
@@ -777,7 +785,7 @@ export function handleWithdraw(call: WithdrawCall): void {
     EventType.WITHDRAW,
     crosschainID,
     call.block,
-    call.transaction
+    call.inputs.to
   );
 
   createLiquidityWithdrawEvent(
@@ -822,7 +830,7 @@ export function handleWithdrawVault(call: WithdrawVaultCall): void {
     EventType.WITHDRAW,
     crosschainID,
     call.block,
-    call.transaction
+    call.inputs.to
   );
 
   createLiquidityWithdrawEvent(

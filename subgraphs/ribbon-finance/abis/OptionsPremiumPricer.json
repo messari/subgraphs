@@ -1,0 +1,131 @@
+[
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_optionId", "type": "bytes32" },
+      {
+        "internalType": "address",
+        "name": "_volatilityOracle",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "_priceOracle", "type": "address" },
+      { "internalType": "address", "name": "_stablesOracle", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "st", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "expiryTimestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "getOptionDelta",
+    "outputs": [
+      { "internalType": "uint256", "name": "delta", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "sp", "type": "uint256" },
+      { "internalType": "uint256", "name": "st", "type": "uint256" },
+      { "internalType": "uint256", "name": "v", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "expiryTimestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "getOptionDelta",
+    "outputs": [
+      { "internalType": "uint256", "name": "delta", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "st", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "expiryTimestamp",
+        "type": "uint256"
+      },
+      { "internalType": "bool", "name": "isPut", "type": "bool" }
+    ],
+    "name": "getPremium",
+    "outputs": [
+      { "internalType": "uint256", "name": "premium", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "st", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "expiryTimestamp",
+        "type": "uint256"
+      },
+      { "internalType": "bool", "name": "isPut", "type": "bool" }
+    ],
+    "name": "getPremiumInStables",
+    "outputs": [
+      { "internalType": "uint256", "name": "premium", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getUnderlyingPrice",
+    "outputs": [
+      { "internalType": "uint256", "name": "price", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "optionId",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "priceOracle",
+    "outputs": [
+      { "internalType": "contract IPriceOracle", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stablesOracle",
+    "outputs": [
+      { "internalType": "contract IPriceOracle", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "volatilityOracle",
+    "outputs": [
+      {
+        "internalType": "contract IManualVolatilityOracle",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

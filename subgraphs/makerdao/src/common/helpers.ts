@@ -1,4 +1,11 @@
-import { ethereum, BigDecimal, BigInt, log, Address, Bytes } from "@graphprotocol/graph-ts";
+import {
+  ethereum,
+  BigDecimal,
+  BigInt,
+  log,
+  Address,
+  Bytes,
+} from "@graphprotocol/graph-ts";
 import {
   Market,
   Account,
@@ -7,7 +14,6 @@ import {
   Withdraw,
   Borrow,
   Repay,
-  Liquidate,
   Token,
   Position,
   PositionSnapshot,
@@ -52,13 +58,14 @@ export function updateProtocol(
   liquidateUSD: BigDecimal = BIGDECIMAL_ZERO,
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
-  protocolSideRevenueType: u32 = 0,
+  protocolSideRevenueType: u32 = 0
 ): void {
   const protocol = getOrCreateLendingProtocol();
 
   // update Deposit
   if (deltaCollateralUSD.gt(BIGDECIMAL_ZERO)) {
-    protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(deltaCollateralUSD);
+    protocol.cumulativeDepositUSD =
+      protocol.cumulativeDepositUSD.plus(deltaCollateralUSD);
   }
 
   // protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(deltaCollateralUSD);
@@ -68,8 +75,12 @@ export function updateProtocol(
   for (let i: i32 = 0; i < protocol.marketIDList.length; i++) {
     const marketID = protocol.marketIDList[i];
     const market = Market.load(marketID);
-    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(market!.totalBorrowBalanceUSD);
-    totalDepositBalanceUSD = totalDepositBalanceUSD.plus(market!.totalDepositBalanceUSD);
+    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
+      market!.totalBorrowBalanceUSD
+    );
+    totalDepositBalanceUSD = totalDepositBalanceUSD.plus(
+      market!.totalDepositBalanceUSD
+    );
   }
   protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
   protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
@@ -89,38 +100,51 @@ export function updateProtocol(
 
   // update Borrow
   if (deltaDebtUSD.gt(BIGDECIMAL_ZERO)) {
-    protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(deltaDebtUSD);
+    protocol.cumulativeBorrowUSD =
+      protocol.cumulativeBorrowUSD.plus(deltaDebtUSD);
   }
 
   if (liquidateUSD.gt(BIGDECIMAL_ZERO)) {
-    protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidateUSD);
+    protocol.cumulativeLiquidateUSD =
+      protocol.cumulativeLiquidateUSD.plus(liquidateUSD);
   }
 
   if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+    protocol.cumulativeTotalRevenueUSD =
+      protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
   }
 
   if (newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
+    protocol.cumulativeSupplySideRevenueUSD =
+      protocol.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   }
 
-  const newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
+  const newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(
+    newSupplySideRevenueUSD
+  );
   if (newProtocolSideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(
-      protocol.cumulativeSupplySideRevenueUSD,
-    );
+    protocol.cumulativeProtocolSideRevenueUSD =
+      protocol.cumulativeTotalRevenueUSD.minus(
+        protocol.cumulativeSupplySideRevenueUSD
+      );
     switch (protocolSideRevenueType) {
       case ProtocolSideRevenueType.STABILITYFEE:
         protocol._cumulativeProtocolSideStabilityFeeRevenue =
-          protocol._cumulativeProtocolSideStabilityFeeRevenue!.plus(newProtocolSideRevenueUSD);
+          protocol._cumulativeProtocolSideStabilityFeeRevenue!.plus(
+            newProtocolSideRevenueUSD
+          );
         break;
       case ProtocolSideRevenueType.LIQUIDATION:
         protocol._cumulativeProtocolSideLiquidationRevenue =
-          protocol._cumulativeProtocolSideLiquidationRevenue!.plus(newProtocolSideRevenueUSD);
+          protocol._cumulativeProtocolSideLiquidationRevenue!.plus(
+            newProtocolSideRevenueUSD
+          );
         break;
       case ProtocolSideRevenueType.PSM:
         protocol._cumulativeProtocolSidePSMRevenue =
-          protocol._cumulativeProtocolSidePSMRevenue!.plus(newProtocolSideRevenueUSD);
+          protocol._cumulativeProtocolSidePSMRevenue!.plus(
+            newProtocolSideRevenueUSD
+          );
         break;
     }
   }
@@ -141,7 +165,7 @@ export function updateMarket(
   deltaDebtUSD: BigDecimal = BIGDECIMAL_ZERO,
   liquidateUSD: BigDecimal = BIGDECIMAL_ZERO,
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
-  newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
+  newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO
 ): void {
   const token = getOrCreateToken(market.inputToken);
 
@@ -150,7 +174,8 @@ export function updateMarket(
     market.inputTokenBalance = market.inputTokenBalance.plus(deltaCollateral);
 
     if (deltaCollateral.gt(BIGINT_ZERO)) {
-      market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(deltaCollateralUSD);
+      market.cumulativeDepositUSD =
+        market.cumulativeDepositUSD.plus(deltaCollateralUSD);
     } else if (deltaCollateral.lt(BIGINT_ZERO)) {
       // ignore as we don't care about cumulativeWithdraw in a market
     }
@@ -159,41 +184,52 @@ export function updateMarket(
   if (token.lastPriceUSD) {
     market.inputTokenPriceUSD = token.lastPriceUSD!;
     // here we "mark-to-market" - re-price total collateral using last price
-    market.totalDepositBalanceUSD = bigIntToBDUseDecimals(market.inputTokenBalance, token.decimals).times(
-      market.inputTokenPriceUSD,
-    );
+    market.totalDepositBalanceUSD = bigIntToBDUseDecimals(
+      market.inputTokenBalance,
+      token.decimals
+    ).times(market.inputTokenPriceUSD);
   } else if (deltaCollateralUSD != BIGDECIMAL_ZERO) {
-    market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(deltaCollateralUSD);
+    market.totalDepositBalanceUSD =
+      market.totalDepositBalanceUSD.plus(deltaCollateralUSD);
   }
 
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
   if (deltaDebtUSD != BIGDECIMAL_ZERO) {
-    market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(deltaDebtUSD);
+    market.totalBorrowBalanceUSD =
+      market.totalBorrowBalanceUSD.plus(deltaDebtUSD);
     if (deltaDebtUSD.gt(BIGDECIMAL_ZERO)) {
-      market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(deltaDebtUSD);
+      market.cumulativeBorrowUSD =
+        market.cumulativeBorrowUSD.plus(deltaDebtUSD);
     } else if (deltaDebtUSD.lt(BIGDECIMAL_ZERO)) {
       // again ignore repay
     }
   }
 
   if (liquidateUSD.gt(BIGDECIMAL_ZERO)) {
-    market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(liquidateUSD);
+    market.cumulativeLiquidateUSD =
+      market.cumulativeLiquidateUSD.plus(liquidateUSD);
   }
 
   // update revenue
   if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+    market.cumulativeTotalRevenueUSD =
+      market.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
   }
 
   if (newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
+    market.cumulativeSupplySideRevenueUSD =
+      market.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   }
 
-  if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO) || newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    market.cumulativeProtocolSideRevenueUSD = market.cumulativeTotalRevenueUSD.minus(
-      market.cumulativeSupplySideRevenueUSD,
-    );
+  if (
+    newTotalRevenueUSD.gt(BIGDECIMAL_ZERO) ||
+    newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)
+  ) {
+    market.cumulativeProtocolSideRevenueUSD =
+      market.cumulativeTotalRevenueUSD.minus(
+        market.cumulativeSupplySideRevenueUSD
+      );
   }
 
   market.save();
@@ -205,7 +241,7 @@ export function updateMarket(
     deltaDebtUSD,
     liquidateUSD,
     newTotalRevenueUSD,
-    newSupplySideRevenueUSD,
+    newSupplySideRevenueUSD
   );
 }
 
@@ -216,13 +252,15 @@ export function snapshotMarket(
   deltaDebtUSD: BigDecimal = BIGDECIMAL_ZERO,
   liquidateUSD: BigDecimal = BIGDECIMAL_ZERO,
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
-  newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
+  newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO
 ): void {
   const marketID = market.id;
   const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, marketID);
   const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, marketID);
   if (marketHourlySnapshot == null || marketDailySnapshot == null) {
-    log.error("[snapshotMarket]Failed to get marketsnapshot for {}", [marketID]);
+    log.error("[snapshotMarket]Failed to get marketsnapshot for {}", [
+      marketID,
+    ]);
     return;
   }
   const hours = (event.block.timestamp.toI32() / SECONDS_PER_HOUR).toString();
@@ -233,9 +271,12 @@ export function snapshotMarket(
 
   marketHourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketHourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
-  marketHourlySnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
-  marketHourlySnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
-  marketHourlySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  marketHourlySnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketHourlySnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  marketHourlySnapshot.cumulativeTotalRevenueUSD =
+    market.cumulativeTotalRevenueUSD;
   marketHourlySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketHourlySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketHourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -252,9 +293,12 @@ export function snapshotMarket(
 
   marketDailySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketDailySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
-  marketDailySnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
-  marketDailySnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
-  marketDailySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  marketDailySnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketDailySnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  marketDailySnapshot.cumulativeTotalRevenueUSD =
+    market.cumulativeTotalRevenueUSD;
   marketDailySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketDailySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketDailySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -270,48 +314,69 @@ export function snapshotMarket(
   marketDailySnapshot.timestamp = event.block.timestamp;
 
   if (deltaCollateralUSD.gt(BIGDECIMAL_ZERO)) {
-    marketHourlySnapshot.hourlyDepositUSD = marketHourlySnapshot.hourlyDepositUSD.plus(deltaCollateralUSD);
-    marketDailySnapshot.dailyDepositUSD = marketDailySnapshot.dailyDepositUSD.plus(deltaCollateralUSD);
+    marketHourlySnapshot.hourlyDepositUSD =
+      marketHourlySnapshot.hourlyDepositUSD.plus(deltaCollateralUSD);
+    marketDailySnapshot.dailyDepositUSD =
+      marketDailySnapshot.dailyDepositUSD.plus(deltaCollateralUSD);
   } else if (deltaCollateralUSD.lt(BIGDECIMAL_ZERO)) {
     // minus a negative number
-    marketHourlySnapshot.hourlyWithdrawUSD = marketHourlySnapshot.hourlyWithdrawUSD.minus(deltaCollateralUSD);
-    marketDailySnapshot.dailyWithdrawUSD = marketDailySnapshot.dailyWithdrawUSD.minus(deltaCollateralUSD);
+    marketHourlySnapshot.hourlyWithdrawUSD =
+      marketHourlySnapshot.hourlyWithdrawUSD.minus(deltaCollateralUSD);
+    marketDailySnapshot.dailyWithdrawUSD =
+      marketDailySnapshot.dailyWithdrawUSD.minus(deltaCollateralUSD);
   }
 
   if (deltaDebtUSD.gt(BIGDECIMAL_ZERO)) {
-    marketHourlySnapshot.hourlyBorrowUSD = marketHourlySnapshot.hourlyBorrowUSD.plus(deltaDebtUSD);
-    marketDailySnapshot.dailyBorrowUSD = marketDailySnapshot.dailyBorrowUSD.plus(deltaDebtUSD);
+    marketHourlySnapshot.hourlyBorrowUSD =
+      marketHourlySnapshot.hourlyBorrowUSD.plus(deltaDebtUSD);
+    marketDailySnapshot.dailyBorrowUSD =
+      marketDailySnapshot.dailyBorrowUSD.plus(deltaDebtUSD);
   } else if (deltaDebtUSD.lt(BIGDECIMAL_ZERO)) {
     // minus a negative number
-    marketHourlySnapshot.hourlyRepayUSD = marketHourlySnapshot.hourlyRepayUSD.minus(deltaDebtUSD);
-    marketDailySnapshot.dailyRepayUSD = marketDailySnapshot.dailyRepayUSD.minus(deltaDebtUSD);
+    marketHourlySnapshot.hourlyRepayUSD =
+      marketHourlySnapshot.hourlyRepayUSD.minus(deltaDebtUSD);
+    marketDailySnapshot.dailyRepayUSD =
+      marketDailySnapshot.dailyRepayUSD.minus(deltaDebtUSD);
   }
 
   if (liquidateUSD.gt(BIGDECIMAL_ZERO)) {
-    marketHourlySnapshot.hourlyLiquidateUSD = marketHourlySnapshot.hourlyLiquidateUSD.plus(liquidateUSD);
-    marketDailySnapshot.dailyLiquidateUSD = marketDailySnapshot.dailyLiquidateUSD.plus(liquidateUSD);
+    marketHourlySnapshot.hourlyLiquidateUSD =
+      marketHourlySnapshot.hourlyLiquidateUSD.plus(liquidateUSD);
+    marketDailySnapshot.dailyLiquidateUSD =
+      marketDailySnapshot.dailyLiquidateUSD.plus(liquidateUSD);
   }
 
   // update revenue
   if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlyTotalRevenueUSD.plus(newTotalRevenueUSD);
-    marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+    marketHourlySnapshot.hourlyTotalRevenueUSD =
+      marketHourlySnapshot.hourlyTotalRevenueUSD.plus(newTotalRevenueUSD);
+    marketDailySnapshot.dailyTotalRevenueUSD =
+      marketDailySnapshot.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
   }
 
   if (newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     marketHourlySnapshot.hourlySupplySideRevenueUSD =
-      marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
+      marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
+        newSupplySideRevenueUSD
+      );
     marketDailySnapshot.dailySupplySideRevenueUSD =
-      marketDailySnapshot.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
+      marketDailySnapshot.dailySupplySideRevenueUSD.plus(
+        newSupplySideRevenueUSD
+      );
   }
 
-  if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO) || newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    marketHourlySnapshot.hourlyProtocolSideRevenueUSD = marketHourlySnapshot.hourlyTotalRevenueUSD.minus(
-      marketHourlySnapshot.hourlySupplySideRevenueUSD,
-    );
-    marketDailySnapshot.dailyProtocolSideRevenueUSD = marketDailySnapshot.dailyTotalRevenueUSD.minus(
-      marketDailySnapshot.dailySupplySideRevenueUSD,
-    );
+  if (
+    newTotalRevenueUSD.gt(BIGDECIMAL_ZERO) ||
+    newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)
+  ) {
+    marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
+      marketHourlySnapshot.hourlyTotalRevenueUSD.minus(
+        marketHourlySnapshot.hourlySupplySideRevenueUSD
+      );
+    marketDailySnapshot.dailyProtocolSideRevenueUSD =
+      marketDailySnapshot.dailyTotalRevenueUSD.minus(
+        marketDailySnapshot.dailySupplySideRevenueUSD
+      );
   }
   marketHourlySnapshot.save();
   marketDailySnapshot.save();
@@ -324,7 +389,7 @@ export function updateFinancialsSnapshot(
   liquidateUSD: BigDecimal = BIGDECIMAL_ZERO,
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
-  protocolSideRevenueType: u32 = 0,
+  protocolSideRevenueType: u32 = 0
 ): void {
   const protocol = getOrCreateLendingProtocol();
   const financials = getOrCreateFinancials(event);
@@ -334,21 +399,28 @@ export function updateFinancialsSnapshot(
   financials.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
   financials.mintedTokenSupplies = protocol.mintedTokenSupplies;
 
-  financials.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  financials.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-  financials._cumulativeProtocolSideStabilityFeeRevenue = protocol._cumulativeProtocolSideStabilityFeeRevenue;
-  financials._cumulativeProtocolSideLiquidationRevenue = protocol._cumulativeProtocolSideLiquidationRevenue;
-  financials._cumulativeProtocolSidePSMRevenue = protocol._cumulativeProtocolSidePSMRevenue;
+  financials.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financials.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financials._cumulativeProtocolSideStabilityFeeRevenue =
+    protocol._cumulativeProtocolSideStabilityFeeRevenue;
+  financials._cumulativeProtocolSideLiquidationRevenue =
+    protocol._cumulativeProtocolSideLiquidationRevenue;
+  financials._cumulativeProtocolSidePSMRevenue =
+    protocol._cumulativeProtocolSidePSMRevenue;
   financials.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   financials.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
   financials.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
   financials.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
 
   if (deltaCollateralUSD.gt(BIGDECIMAL_ZERO)) {
-    financials.dailyDepositUSD = financials.dailyDepositUSD.plus(deltaCollateralUSD);
+    financials.dailyDepositUSD =
+      financials.dailyDepositUSD.plus(deltaCollateralUSD);
   } else if (deltaCollateralUSD.lt(BIGDECIMAL_ZERO)) {
     // minus a negative number
-    financials.dailyWithdrawUSD = financials.dailyWithdrawUSD.minus(deltaCollateralUSD);
+    financials.dailyWithdrawUSD =
+      financials.dailyWithdrawUSD.minus(deltaCollateralUSD);
   }
 
   if (deltaDebtUSD.gt(BIGDECIMAL_ZERO)) {
@@ -359,34 +431,46 @@ export function updateFinancialsSnapshot(
   }
 
   if (liquidateUSD.gt(BIGDECIMAL_ZERO)) {
-    financials.dailyLiquidateUSD = financials.dailyLiquidateUSD.plus(liquidateUSD);
+    financials.dailyLiquidateUSD =
+      financials.dailyLiquidateUSD.plus(liquidateUSD);
   }
 
   if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    financials.dailyTotalRevenueUSD = financials.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+    financials.dailyTotalRevenueUSD =
+      financials.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
   }
 
   if (newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    financials.dailySupplySideRevenueUSD = financials.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
+    financials.dailySupplySideRevenueUSD =
+      financials.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   }
 
-  const newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
+  const newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(
+    newSupplySideRevenueUSD
+  );
   if (newProtocolSideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    financials.dailyProtocolSideRevenueUSD = financials.dailyTotalRevenueUSD.minus(
-      financials.dailySupplySideRevenueUSD,
-    );
+    financials.dailyProtocolSideRevenueUSD =
+      financials.dailyTotalRevenueUSD.minus(
+        financials.dailySupplySideRevenueUSD
+      );
     switch (protocolSideRevenueType) {
       case ProtocolSideRevenueType.STABILITYFEE:
         financials._dailyProtocolSideStabilityFeeRevenue =
-          financials._dailyProtocolSideStabilityFeeRevenue!.plus(newProtocolSideRevenueUSD);
+          financials._dailyProtocolSideStabilityFeeRevenue!.plus(
+            newProtocolSideRevenueUSD
+          );
         break;
       case ProtocolSideRevenueType.LIQUIDATION:
         financials._dailyProtocolSideLiquidationRevenue =
-          financials._dailyProtocolSideLiquidationRevenue!.plus(newProtocolSideRevenueUSD);
+          financials._dailyProtocolSideLiquidationRevenue!.plus(
+            newProtocolSideRevenueUSD
+          );
         break;
       case ProtocolSideRevenueType.PSM:
         financials._dailyProtocolSidePSMRevenue =
-          financials._dailyProtocolSidePSMRevenue!.plus(newProtocolSideRevenueUSD);
+          financials._dailyProtocolSidePSMRevenue!.plus(
+            newProtocolSideRevenueUSD
+          );
         break;
     }
   }
@@ -403,7 +487,7 @@ export function updatePosition(
   urn: string,
   ilk: Bytes,
   deltaCollateral: BigInt = BIGINT_ZERO,
-  deltaDebt: BigInt = BIGINT_ZERO,
+  deltaDebt: BigInt = BIGINT_ZERO
 ): void {
   const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
   const accountAddress = getOwnerAddress(urn);
@@ -419,10 +503,16 @@ export function updatePosition(
     if (lenderPosition == null) {
       // this is a new lender position, deltaCollateral > 0
       // because user cannot create a lender position with deltaCollateral <=0
-      lenderPosition = getOrCreatePosition(event, urn, ilk, PositionSide.LENDER, true);
+      lenderPosition = getOrCreatePosition(
+        event,
+        urn,
+        ilk,
+        PositionSide.LENDER,
+        true
+      );
       assert(
         deltaCollateral.gt(BIGINT_ZERO),
-        `[updatePosition]Creating new lender position ${lenderPosition.id} with deltaCollateral ${deltaCollateral} <= 0`,
+        `[updatePosition]Creating new lender position ${lenderPosition.id} with deltaCollateral ${deltaCollateral} <= 0`
       );
 
       protocol.openPositionCount += INT_ONE;
@@ -438,10 +528,17 @@ export function updatePosition(
     }
 
     lenderPosition.balance = lenderPosition.balance.plus(deltaCollateral);
-    assert(
-      lenderPosition.balance.ge(BIGINT_ZERO),
-      `[updatePosition]balance for position ${lenderPosition.id} ${lenderPosition.balance} < 0`,
-    );
+    if (lenderPosition.balance.le(BIGINT_ZERO)) {
+      if (lenderPosition.balance.ge(BIGINT_NEG_HUNDRED)) {
+        // a small negative lender position, likely due to rounding
+        lenderPosition.balance = BIGINT_ZERO;
+      } else {
+        log.error("[updatePosition]balance for position {} = {} < 0", [
+          lenderPosition.id,
+          lenderPosition.balance.toString(),
+        ]);
+      }
+    }
 
     if (deltaCollateral.gt(BIGINT_ZERO)) {
       // deposit
@@ -467,7 +564,6 @@ export function updatePosition(
 
         account.openPositionCount -= INT_ONE;
         account.closedPositionCount += INT_ONE;
-        //account.withdrawCount += INT_ONE;
       }
 
       // link event to position (createTransactions needs to be called first)
@@ -490,10 +586,16 @@ export function updatePosition(
     let borrowerPosition = getOpenPosition(urn, ilk, PositionSide.BORROWER);
     if (borrowerPosition == null) {
       // new borrower position
-      borrowerPosition = getOrCreatePosition(event, urn, ilk, PositionSide.BORROWER, true);
+      borrowerPosition = getOrCreatePosition(
+        event,
+        urn,
+        ilk,
+        PositionSide.BORROWER,
+        true
+      );
       assert(
         deltaDebt.gt(BIGINT_ZERO),
-        `[updatePosition]Creating new borrower position ${borrowerPosition.id} with deltaDebt ${deltaDebt} <= 0`,
+        `[updatePosition]Creating new borrower position ${borrowerPosition.id} with deltaDebt ${deltaDebt} <= 0`
       );
 
       protocol.openPositionCount += INT_ONE;
@@ -519,12 +621,19 @@ export function updatePosition(
       // was 30077488379451392498995503
       //borrowerPosition.balance.ge(BIGINT_ZERO),
       borrowerPosition.balance.ge(BIGINT_NEG_HUNDRED),
-      `[updatePosition]balance for position ${borrowerPosition.id} ${borrowerPosition.balance} < 0`,
+      `[updatePosition]balance for position ${borrowerPosition.id} ${borrowerPosition.balance} < 0`
     );
-    if (borrowerPosition.balance.lt(BIGINT_ZERO) && borrowerPosition.balance.gt(BIGINT_NEG_HUNDRED)) {
+    if (
+      borrowerPosition.balance.lt(BIGINT_ZERO) &&
+      borrowerPosition.balance.gt(BIGINT_NEG_HUNDRED)
+    ) {
       log.warning(
         "[updatePosition]A small negative borrow balance of {} for position {} with tx {}; deemed position closed (balance set to 0)",
-        [borrowerPosition.balance.toString(), borrowerPosition.id, event.transaction.hash.toHexString()],
+        [
+          borrowerPosition.balance.toString(),
+          borrowerPosition.id,
+          event.transaction.hash.toHexString(),
+        ]
       );
       borrowerPosition.balance = BIGINT_ZERO;
     }
@@ -577,7 +686,7 @@ export function updatePosition(
   const tx = event.transaction.hash.toHexString();
   assert(
     account.openPositionCount >= 0,
-    `urn ${urn} for account ${account.id} openPositionCount=${account.openPositionCount} at tx ${tx}`,
+    `urn ${urn} for account ${account.id} openPositionCount=${account.openPositionCount} at tx ${tx}`
   );
 }
 
@@ -591,15 +700,18 @@ export function transferPosition(
   side: string,
   srcAccountAddress: string | null = null,
   dstAccountAddress: string | null = null,
-  transferAmount: BigInt | null = null, // suport partial transfer of a position
+  transferAmount: BigInt | null = null // suport partial transfer of a position
 ): void {
   if (srcUrn == dstUrn && srcAccountAddress == dstAccountAddress) {
-    log.info("[transferPosition]srcUrn {}==dstUrn {} && srcAccountAddress {}==dstAccountAddress {}, no transfer", [
-      srcUrn,
-      dstUrn,
-      srcAccountAddress ? srcAccountAddress : "null",
-      dstAccountAddress ? dstAccountAddress : "null",
-    ]);
+    log.info(
+      "[transferPosition]srcUrn {}==dstUrn {} && srcAccountAddress {}==dstAccountAddress {}, no transfer",
+      [
+        srcUrn,
+        dstUrn,
+        srcAccountAddress ? srcAccountAddress : "null",
+        dstAccountAddress ? dstAccountAddress : "null",
+      ]
+    );
     return;
   }
 
@@ -615,29 +727,29 @@ export function transferPosition(
 
   const srcPosition = getOpenPosition(srcUrn, ilk, side);
   if (srcPosition == null) {
-    log.warning("[transferPosition]No open position found for source: urn {}/ilk {}/side {}; no transfer", [
-      srcUrn,
-      ilk.toHexString(),
-      side,
-    ]);
+    log.warning(
+      "[transferPosition]No open position found for source: urn {}/ilk {}/side {}; no transfer",
+      [srcUrn, ilk.toHexString(), side]
+    );
     return;
   }
 
   const srcPositionBalance0 = srcPosition.balance;
   if (!transferAmount || transferAmount > srcPosition.balance) {
-    const transferAmountStr = transferAmount ? transferAmount.toString() : "null";
-    log.warning("[transferPosition]transferAmount={} is null or > src position balance {} for {}", [
-      transferAmountStr,
-      srcPosition.balance.toString(),
-      srcPosition.id,
-    ]);
+    const transferAmountStr = transferAmount
+      ? transferAmount.toString()
+      : "null";
+    log.warning(
+      "[transferPosition]transferAmount={} is null or > src position balance {} for {}",
+      [transferAmountStr, srcPosition.balance.toString(), srcPosition.id]
+    );
     transferAmount = srcPosition.balance;
   }
   assert(
     transferAmount <= srcPosition.balance,
     `[transferPosition]src ${srcUrn}/ilk ${ilk.toHexString()}/side ${side} transfer amount ${transferAmount.toString()} > balance ${
       srcPosition.balance
-    }`,
+    }`
   );
 
   srcPosition.balance = srcPosition.balance.minus(transferAmount);
@@ -689,15 +801,18 @@ export function transferPosition(
   dstAccount.openPositionCount += INT_ONE;
   dstAccount.positionCount += INT_ONE;
 
-  log.info("[transferPosition]transfer {} from {} (is_urn={},balance={}) to {} (is_urn={},balance={})", [
-    transferAmount.toString(),
-    srcPosition.id,
-    srcPosition._is_urn.toString(),
-    srcPositionBalance0.toString(),
-    dstPosition.id,
-    dstPosition._is_urn.toString(),
-    dstPosition.balance.toString(),
-  ]);
+  log.info(
+    "[transferPosition]transfer {} from {} (is_urn={},balance={}) to {} (is_urn={},balance={})",
+    [
+      transferAmount.toString(),
+      srcPosition.id,
+      srcPosition._is_urn.toString(),
+      srcPositionBalance0.toString(),
+      dstPosition.id,
+      dstPosition._is_urn.toString(),
+      dstPosition.balance.toString(),
+    ]
+  );
 
   protocol.save();
   market.save();
@@ -708,11 +823,11 @@ export function transferPosition(
 
   assert(
     srcAccount.openPositionCount >= 0,
-    `Account ${srcAccount.id} openPositionCount=${srcAccount.openPositionCount}`,
+    `Account ${srcAccount.id} openPositionCount=${srcAccount.openPositionCount}`
   );
   assert(
     dstAccount.openPositionCount >= 0,
-    `Account ${dstAccount.id} openPositionCount=${dstAccount.openPositionCount}`,
+    `Account ${dstAccount.id} openPositionCount=${dstAccount.openPositionCount}`
   );
 }
 
@@ -722,14 +837,12 @@ export function liquidatePosition(
   urn: string,
   ilk: Bytes,
   collateral: BigInt, // net collateral liquidated
-  debt: BigInt, // debt repaid
-): void {
+  debt: BigInt // debt repaid
+): string[] {
   const protocol = getOrCreateLendingProtocol();
   const market: Market = getMarketFromIlk(ilk)!;
   const accountAddress = getOwnerAddress(urn);
   const account = getOrCreateAccount(accountAddress);
-
-  const liquidate = Liquidate.load(createEventID(event))!;
 
   log.info("[liquidatePosition]urn={}, ilk={}, collateral={}, debt={}", [
     urn,
@@ -752,7 +865,7 @@ export function liquidatePosition(
 
   assert(
     borrowerPosition.balance.ge(BIGINT_ZERO),
-    `[liquidatePosition]balance of position ${borrowerPosition.id} ${borrowerPosition.balance} < 0`,
+    `[liquidatePosition]balance of position ${borrowerPosition.id} ${borrowerPosition.balance} < 0`
   );
   // liquidation closes the borrowing side position
   if (borrowerPosition.balance == BIGINT_ZERO) {
@@ -774,10 +887,6 @@ export function liquidatePosition(
   lenderPosition.balance = lenderPosition.balance.minus(collateral);
   lenderPosition.liquidationCount += INT_ONE;
 
-  assert(
-    lenderPosition.balance.ge(BIGINT_ZERO),
-    `[liquidatePosition]balance of position ${lenderPosition.id} ${lenderPosition.balance} < 0`,
-  );
   if (lenderPosition.balance == BIGINT_ZERO) {
     // lender side is closed
     lenderPosition.blockNumberClosed = event.block.number;
@@ -794,18 +903,18 @@ export function liquidatePosition(
   lenderPosition.save();
   snapshotPosition(event, lenderPosition);
 
-  //TODO: this should be an array/list including borrowerPosition and lenderPosition
-  liquidate.position = lenderPosition.id;
-  liquidate.save();
-
   protocol.save();
   market.save();
   account.save();
 
-  assert(account.openPositionCount >= 0, `Account ${account.id} openPositionCount=${account.openPositionCount}`);
+  //assert(account.openPositionCount >= 0, `Account ${account.id} openPositionCount=${account.openPositionCount}`);
+  return [lenderPosition.id, borrowerPosition.id];
 }
 
-export function snapshotPosition(event: ethereum.Event, position: Position): void {
+export function snapshotPosition(
+  event: ethereum.Event,
+  position: Position
+): void {
   const txHash: string = event.transaction.hash.toHexString();
   const snapshotID = `${position.id}-${txHash}-${event.logIndex.toString()}`;
   let snapshot = PositionSnapshot.load(snapshotID);
@@ -821,11 +930,10 @@ export function snapshotPosition(event: ethereum.Event, position: Position): voi
     snapshot.timestamp = event.block.timestamp;
     snapshot.save();
   } else {
-    log.error("[snapshotPosition]Position snapshot {} already exists for position {} at tx hash {}", [
-      snapshotID,
-      position.id,
-      txHash,
-    ]);
+    log.error(
+      "[snapshotPosition]Position snapshot {} already exists for position {} at tx hash {}",
+      [snapshotID, position.id, txHash]
+    );
   }
 }
 
@@ -837,14 +945,18 @@ export function updateUsageMetrics(
   deltaDebtUSD: BigDecimal = BIGDECIMAL_ZERO,
   liquidateUSD: BigDecimal = BIGDECIMAL_ZERO,
   liquidator: string | null = null,
-  liquidatee: string | null = null,
+  liquidatee: string | null = null
 ): void {
   const protocol = getOrCreateLendingProtocol();
   const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
   const usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
 
-  const hours: string = (event.block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
-  const days: string = (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  const hours: string = (
+    event.block.timestamp.toI64() / SECONDS_PER_HOUR
+  ).toString();
+  const days: string = (
+    event.block.timestamp.toI64() / SECONDS_PER_DAY
+  ).toString();
 
   // userU, userV, userW may be the same, they may not
   for (let i: i32 = 0; i < users.length; i++) {
@@ -858,7 +970,10 @@ export function updateUsageMetrics(
       usageDailySnapshot.cumulativeUniqueUsers += 1;
     }
 
-    const hourlyActiveAcctountID = "hourly-".concat(accountID).concat("-").concat(hours);
+    const hourlyActiveAcctountID = "hourly-"
+      .concat(accountID)
+      .concat("-")
+      .concat(hours);
     let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAcctountID);
     if (hourlyActiveAccount == null) {
       hourlyActiveAccount = new ActiveAccount(hourlyActiveAcctountID);
@@ -867,7 +982,10 @@ export function updateUsageMetrics(
       usageHourlySnapshot.hourlyActiveUsers += 1;
     }
 
-    const dailyActiveAcctountID = "daily-".concat(accountID).concat("-").concat(days);
+    const dailyActiveAcctountID = "daily-"
+      .concat(accountID)
+      .concat("-")
+      .concat(days);
     let dailyActiveAccount = ActiveAccount.load(dailyActiveAcctountID);
     if (dailyActiveAccount == null) {
       dailyActiveAccount = new ActiveAccount(dailyActiveAcctountID);
@@ -889,7 +1007,10 @@ export function updateUsageMetrics(
     depositAccount!.depositCount += INT_ONE;
     depositAccount!.save();
 
-    const dailyDepositorAcctountID = "daily-depositor-".concat(users[1]).concat("-").concat(days);
+    const dailyDepositorAcctountID = "daily-depositor-"
+      .concat(users[1])
+      .concat("-")
+      .concat(days);
     let dailyDepositorAccount = ActiveAccount.load(dailyDepositorAcctountID);
     if (dailyDepositorAccount == null) {
       dailyDepositorAccount = new ActiveAccount(dailyDepositorAcctountID);
@@ -919,7 +1040,10 @@ export function updateUsageMetrics(
     borrowAccount!.borrowCount += INT_ONE;
     borrowAccount!.save();
 
-    const dailyBorrowerAcctountID = "daily-borrow-".concat(users[2]).concat("-").concat(days);
+    const dailyBorrowerAcctountID = "daily-borrow-"
+      .concat(users[2])
+      .concat("-")
+      .concat(days);
     let dailyBorrowerAccount = ActiveAccount.load(dailyBorrowerAcctountID);
     if (dailyBorrowerAccount == null) {
       dailyBorrowerAccount = new ActiveAccount(dailyBorrowerAcctountID);
@@ -959,8 +1083,13 @@ export function updateUsageMetrics(
       liquidatorAccount.liquidateCount += INT_ONE;
       liquidatorAccount.save();
 
-      const dailyLiquidatorAcctountID = "daily-liquidate".concat(liquidator).concat("-").concat(days);
-      let dailyLiquidatorAccount = ActiveAccount.load(dailyLiquidatorAcctountID);
+      const dailyLiquidatorAcctountID = "daily-liquidate"
+        .concat(liquidator)
+        .concat("-")
+        .concat(days);
+      let dailyLiquidatorAccount = ActiveAccount.load(
+        dailyLiquidatorAcctountID
+      );
       if (dailyLiquidatorAccount == null) {
         dailyLiquidatorAccount = new ActiveAccount(dailyLiquidatorAcctountID);
         dailyLiquidatorAccount.save();
@@ -971,7 +1100,10 @@ export function updateUsageMetrics(
     if (liquidatee) {
       let liquidateeAccount = Account.load(liquidatee);
       // a new liquidatee
-      if (liquidateeAccount == null || liquidateeAccount.liquidationCount == 0) {
+      if (
+        liquidateeAccount == null ||
+        liquidateeAccount.liquidationCount == 0
+      ) {
         // liquidatee should already have positions & should not be new users
         liquidateeAccount = getOrCreateAccount(liquidatee);
         protocol.cumulativeUniqueLiquidatees += 1;
@@ -981,8 +1113,13 @@ export function updateUsageMetrics(
       liquidateeAccount.liquidationCount += INT_ONE;
       liquidateeAccount.save();
 
-      const dailyLiquidateeAcctountID = "daily-liquidatee-".concat(liquidatee).concat("-").concat(days);
-      let dailyLiquidateeAccount = ActiveAccount.load(dailyLiquidateeAcctountID);
+      const dailyLiquidateeAcctountID = "daily-liquidatee-"
+        .concat(liquidatee)
+        .concat("-")
+        .concat(days);
+      let dailyLiquidateeAccount = ActiveAccount.load(
+        dailyLiquidateeAcctountID
+      );
       if (dailyLiquidateeAccount == null) {
         dailyLiquidateeAccount = new ActiveAccount(dailyLiquidateeAcctountID);
         dailyLiquidateeAccount.save();
@@ -1012,7 +1149,7 @@ export function createTransactions(
   deltaCollateral: BigInt = BIGINT_ZERO,
   deltaCollateralUSD: BigDecimal = BIGDECIMAL_ZERO,
   deltaDebt: BigInt = BIGINT_ZERO,
-  deltaDebtUSD: BigDecimal = BIGDECIMAL_ZERO,
+  deltaDebtUSD: BigDecimal = BIGDECIMAL_ZERO
 ): void {
   const transactionID = createEventID(event);
 
@@ -1083,14 +1220,18 @@ export function createTransactions(
   // liquidate is handled by getOrCreateLiquidate() in getters
 }
 
-export function updatePriceForMarket(marketID: string, event: ethereum.Event): void {
+export function updatePriceForMarket(
+  marketID: string,
+  event: ethereum.Event
+): void {
   // Price is updated for market marketID
   const market = getOrCreateMarket(marketID);
   const token = Token.load(market.inputToken);
   market.inputTokenPriceUSD = token!.lastPriceUSD!;
-  market.totalDepositBalanceUSD = bigIntToBDUseDecimals(market.inputTokenBalance, token!.decimals).times(
-    market.inputTokenPriceUSD,
-  );
+  market.totalDepositBalanceUSD = bigIntToBDUseDecimals(
+    market.inputTokenBalance,
+    token!.decimals
+  ).times(market.inputTokenPriceUSD);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
   market.save();
 
@@ -1102,10 +1243,14 @@ export function updatePriceForMarket(marketID: string, event: ethereum.Event): v
     const marketAddress = marketIDList[i];
     const market = getOrCreateMarket(marketAddress);
     if (market == null) {
-      log.warning("[updatePriceForMarket]market {} doesn't exist", [marketAddress]);
+      log.warning("[updatePriceForMarket]market {} doesn't exist", [
+        marketAddress,
+      ]);
       continue;
     }
-    protocolTotalDepositBalanceUSD = protocolTotalDepositBalanceUSD.plus(market.totalDepositBalanceUSD);
+    protocolTotalDepositBalanceUSD = protocolTotalDepositBalanceUSD.plus(
+      market.totalDepositBalanceUSD
+    );
   }
 
   protocol.totalDepositBalanceUSD = protocolTotalDepositBalanceUSD;
@@ -1120,7 +1265,7 @@ export function updateRevenue(
   marketID: string,
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
-  protocolSideRevenueType: u32 = 0,
+  protocolSideRevenueType: u32 = 0
 ): void {
   const market = getOrCreateMarket(marketID);
   if (market) {
@@ -1132,7 +1277,7 @@ export function updateRevenue(
       BIGDECIMAL_ZERO,
       BIGDECIMAL_ZERO,
       newTotalRevenueUSD,
-      newSupplySideRevenueUSD,
+      newSupplySideRevenueUSD
     );
   }
 
@@ -1142,7 +1287,7 @@ export function updateRevenue(
     BIGDECIMAL_ZERO,
     newTotalRevenueUSD,
     newSupplySideRevenueUSD,
-    protocolSideRevenueType,
+    protocolSideRevenueType
   );
 
   updateFinancialsSnapshot(
@@ -1152,6 +1297,6 @@ export function updateRevenue(
     BIGDECIMAL_ZERO,
     newTotalRevenueUSD,
     newSupplySideRevenueUSD,
-    protocolSideRevenueType,
+    protocolSideRevenueType
   );
 }

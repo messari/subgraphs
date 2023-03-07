@@ -59,7 +59,10 @@ export function getPriceUSD(token: Token, event: ethereum.Event): BigDecimal {
   if (USD_TOKENS.has(symbol)) {
     return BIGDECIMAL_ONE;
   }
-  if (token.lastPriceBlockNumber == event.block.number) {
+  if (
+    token.lastPriceBlockNumber &&
+    token.lastPriceBlockNumber! == event.block.number
+  ) {
     return token.lastPriceUSD!;
   }
   // No market for SDL yet
@@ -230,7 +233,11 @@ function calculateSwap(
   if (!pool._basePool) {
     call = contract.try_calculateSwap(inputIndex, outputIndex, amount);
   } else {
-    call = contract.try_calculateSwapUnderlying(inputIndex, outputIndex, amount);
+    call = contract.try_calculateSwapUnderlying(
+      inputIndex,
+      outputIndex,
+      amount
+    );
   }
   if (call.reverted) {
     log.error(

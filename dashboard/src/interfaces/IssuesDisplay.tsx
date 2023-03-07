@@ -1,6 +1,6 @@
 import { styled } from "../styled";
 import { CircularProgress, Typography } from "@mui/material";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import { negativeFieldList } from "../constants";
 
@@ -72,7 +72,7 @@ const messagesByLevel = (
         issuesMsg = `${issuesArray[x].fieldName?.split("///")[0]} array has elements up to index [${issuesArray[x].fieldName?.split("///")[1]
           }], but ${issuesArray[x]?.message?.split("///")[0]} array ${endStr}.`;
       }
-      if (issuesArray[x].type === "NEG") {
+      if (issuesArray[x].type === "NEG" && !negativeFieldList?.includes(issuesArray[x].fieldName)) {
         const msgObj = JSON.parse(issuesArray[x].message);
         issuesMsg = `'${issuesArray[x].fieldName}' has ${msgObj.count} negative values. First instance of a negative value is on snapshot ${msgObj.firstSnapshot} with a value of ${msgObj.value}`;
       }
@@ -126,7 +126,6 @@ export const IssuesDisplay = ({ issuesArrayProps, allLoaded, oneLoaded }: Issues
   if (!oneLoaded && !allLoaded && issuesArray.length === 0) {
     return <IssuesContainer $hasCritical={false}>{waitingElement}</IssuesContainer>;
   }
-
   const criticalIssues = issuesArray.filter((iss) => iss.level === "critical");
   const errorIssues = issuesArray.filter((iss) => iss.level === "error");
   const warningIssues = issuesArray.filter((iss) => iss.level === "warning");

@@ -144,7 +144,7 @@ export class PositionManager {
     if (this.interestType) {
       position.type = this.interestType;
     }
-    position.balance = BIGINT_ZERO;
+    position.balance = newBalance;
     position.depositCount = INT_ZERO;
     position.withdrawCount = INT_ZERO;
     position.borrowCount = INT_ZERO;
@@ -152,6 +152,14 @@ export class PositionManager {
     position.liquidationCount = INT_ZERO;
     position.transferredCount = INT_ZERO;
     position.receivedCount = INT_ZERO;
+
+    if (transactionType == TransactionType.DEPOSIT) {
+      position.depositCount += INT_ONE;
+    } else if (transactionType == TransactionType.BORROW) {
+      position.borrowCount += INT_ONE;
+    } else if (transactionType == TransactionType.TRANSFER) {
+      position.receivedCount += INT_ONE;
+    }
     position.save();
 
     //

@@ -1,12 +1,12 @@
 import { Box, CircularProgress, Grid, Typography } from "@mui/material";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
-import { PoolName, PoolNames } from "../../constants";
+import { dateValueKeys, PoolName, PoolNames } from "../../constants";
 import SchemaTable from "../SchemaTable";
 import IssuesDisplay from "../IssuesDisplay";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import PoolTabEntity from "./PoolTabEntity";
-import BridgeOutboundVolumeLogic from "../BridgeOutboundVolumeLogic";
+import BridgeOutboundVolumeLogic from "../../common/utilComponents/BridgeOutboundVolumeLogic";
 
 interface PoolTabProps {
   data: any;
@@ -47,19 +47,11 @@ function PoolTab({
   poolsListError,
   setPoolId,
 }: PoolTabProps) {
-  const [issuesToDisplay, setIssuesToDisplay] = useState<
-    { message: string; type: string; level: string; fieldName: string }[]
-  >([]);
-  const [tableIssues, setTableIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>(
-    [],
-  );
-  const issues: { [entityName: string]: { message: string; type: string; level: string; fieldName: string }[] } = {};
-  function setIssues(
-    issuesSet: { [x: string]: { message: string; type: string; level: string; fieldName: string }[] },
-    entityName: string,
-  ) {
-    issues[entityName] = issuesSet[entityName];
-  }
+  const [issuesToDisplay, setIssuesToDisplay] = useState<{
+    [key: string]:
+    { message: string; type: string; level: string; fieldName: string }
+  }>({});
+
 
   console.log("DATA", data);
   // Get the key name of the pool specific to the protocol type (singular and plural)
@@ -78,19 +70,7 @@ function PoolTab({
     }
   });
 
-  useEffect(() => {
-    console.log("POOL ISSUES TO SET", issuesToDisplay, issues, tableIssues);
-    let brokenDownIssuesState: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
-    Object.keys(issues).forEach((iss) => {
-      brokenDownIssuesState = brokenDownIssuesState.concat(issues[iss]);
-    });
-    if (allLoaded) {
-      setIssuesToDisplay(brokenDownIssuesState);
-    }
-  }, [poolTimeseriesData, poolTimeseriesLoading, tableIssues]);
-
   let issuesDisplayElement = null;
-
   const entityData = data[poolKeySingular];
 
   let poolDropDown = null;
@@ -98,24 +78,16 @@ function PoolTab({
     poolDropDown = (
       <PoolDropDown
         poolId={poolId}
-        setPoolId={(x) => setPoolId(x)}
-        setIssues={(x) => {
-          setTableIssues(x);
+        setPoolId={(x) => {
+          setIssuesToDisplay({});
+          setPoolId(x);
         }}
         pools={poolsList[poolNames]}
       />
     );
-  } else if (poolListLoading) {
+  } else if (poolListLoading || !poolId) {
     poolDropDown = <CircularProgress sx={{ margin: 6 }} size={50} />;
-  } else if (!poolId) {
-    poolDropDown = (
-      <h3>
-        Hold on! This subgraph has alot of entities, it may take a minute for the query to return. After 2 minutes of
-        waiting, refresh the page and the results should appear promptly.
-      </h3>
-    );
   }
-
 
   // Specific chart routing
   // This logic renders components that are specific to a given schema type or version
@@ -134,7 +106,9 @@ function PoolTab({
         </CopyLinkToClipboard>
       </Box>
     </Grid>);
-    specificCharts.push(headerComponent, <BridgeOutboundVolumeLogic poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
+    if (data[poolKeySingular]?.routes?.length > 0) {
+      specificCharts.push(headerComponent, <BridgeOutboundVolumeLogic poolId={poolId} routes={data[poolKeySingular]?.routes} subgraphToQueryURL={subgraphToQueryURL} />);
+    }
   } else if (schemaType?.toUpperCase() === "EXCHANGE") {
     if (poolTimeseriesData) {
       Object.keys(poolTimeseriesData).forEach((entityName: string) => {
@@ -145,12 +119,22 @@ function PoolTab({
         const tokenWeightData: any = []
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          let dateVal: number = Number(timeseriesInstance['timestamp']);
+          dateValueKeys.forEach((key: string) => {
+            let factor = 86400;
+            if (key.includes('hour')) {
+              factor = factor / 24;
+            }
+            if (!!(Number(timeseriesInstance[key]) * factor)) {
+              dateVal = (Number(timeseriesInstance[key]) * factor);
+            }
+          })
           if (timeseriesInstance.inputTokenWeights) {
             timeseriesInstance.inputTokenWeights.forEach((weight: any, idx: number) => {
               if (idx > tokenWeightData.length - 1) {
                 tokenWeightData.push([]);
               }
-              tokenWeightData[idx].push({ value: Number(weight), date: Number(timeseriesInstance.timestamp) })
+              tokenWeightData[idx].push({ value: Number(weight), date: dateVal })
             })
           }
           // For exchange protocols, calculate the baseYield
@@ -167,7 +151,7 @@ function PoolTab({
           if (!specificChartsOnEntity[entityName]['baseYield']) {
             specificChartsOnEntity[entityName]['baseYield'] = [];
           } else {
-            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: Number(timeseriesInstance.timestamp) });
+            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: dateVal });
           }
         }
         specificChartsOnEntity[entityName]['inputTokenWeights'] = tokenWeightData;
@@ -182,6 +166,16 @@ function PoolTab({
         const currentEntityData = poolTimeseriesData[entityName];
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          let dateVal: number = Number(timeseriesInstance['timestamp']);
+          dateValueKeys.forEach((key: string) => {
+            let factor = 86400;
+            if (key.includes('hour')) {
+              factor = factor / 24;
+            }
+            if (!!(Number(timeseriesInstance[key]) * factor)) {
+              dateVal = (Number(timeseriesInstance[key]) * factor);
+            }
+          })
           let value = 0;
           // For Yield Agg protocols, calculate the baseYield
           if (timeseriesInstance.totalValueLockedUSD && timeseriesInstance.dailySupplySideRevenueUSD) {
@@ -192,9 +186,49 @@ function PoolTab({
           if (!specificChartsOnEntity[entityName]['baseYield']) {
             specificChartsOnEntity[entityName]['baseYield'] = [];
           } else {
-            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: Number(timeseriesInstance.timestamp) });
+            specificChartsOnEntity[entityName]['baseYield'].push({ value, date: dateVal });
           }
         }
+      })
+    }
+  } else if (schemaType?.toUpperCase() === "LENDING") {
+    if (poolTimeseriesData) {
+      Object.keys(poolTimeseriesData).forEach((entityName: string) => {
+        if (!specificChartsOnEntity[entityName]) {
+          specificChartsOnEntity[entityName] = {};
+        }
+        const currentEntityData = poolTimeseriesData[entityName];
+        const tableVals: { value: any; date: any }[] = [];
+        const ratesChart: any = {};
+        const ratesSums: any = {};
+        data?.market?.rates?.forEach((rate: { [x: string]: string }) => {
+          const rateKey = `${rate?.type || ""}-${rate?.side || ""}`;
+          ratesChart[rateKey] = [];
+          ratesSums[rateKey] = 0;
+        })
+        for (let x = currentEntityData.length - 1; x >= 0; x--) {
+          const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+          let dateVal: number = Number(timeseriesInstance['timestamp']);
+          dateValueKeys.forEach((key: string) => {
+            let factor = 86400;
+            if (key.includes('hour')) {
+              factor = factor / 24;
+            }
+            if (!!(Number(timeseriesInstance[key]) * factor)) {
+              dateVal = (Number(timeseriesInstance[key]) * factor);
+            }
+          })
+          const initTableValue: any = { value: [], date: dateVal };
+          timeseriesInstance["rates"].forEach((rateElement: any, idx: number) => {
+            const rateKey = `${rateElement.type || ""}-${rateElement.side || ""}`;
+            initTableValue.value.push(`[${idx}]: ${Number(rateElement.rate).toFixed(3)}%`);
+            ratesSums[rateKey] += Number(rateElement.rate);
+            ratesChart[rateKey].push({ value: Number(rateElement.rate), date: dateVal })
+          });
+          tableVals.push({ value: initTableValue.value.join(', '), date: initTableValue.date });
+        }
+        const issues = Object.keys(ratesSums)?.filter(rateLabel => ratesSums[rateLabel] === 0);
+        specificChartsOnEntity[entityName]['rates'] = { dataChart: ratesChart, tableData: tableVals, issues: issues.map(iss => entityName + '-' + iss) };
       })
     }
   }
@@ -202,8 +236,9 @@ function PoolTab({
   let poolDataSection = null;
   let poolTable = null;
   if (poolId) {
+    const issuesArrayProps: { message: string; type: string; level: string; fieldName: string }[] = Object.values(issuesToDisplay);
     issuesDisplayElement = (
-      <IssuesDisplay issuesArrayProps={issuesToDisplay} allLoaded={allLoaded} oneLoaded={oneLoaded} />
+      <IssuesDisplay issuesArrayProps={issuesArrayProps} allLoaded={allLoaded} oneLoaded={oneLoaded} />
     );
     if (poolData) {
       poolTable = (
@@ -213,9 +248,17 @@ function PoolTab({
           schemaName={poolKeySingular}
           protocolType={data.protocols[0].type}
           dataFields={poolData}
-          setIssues={(x) => setTableIssues(x)}
-          issuesProps={tableIssues}
-        />
+          setIssues={(issArr: any) => {
+            const issuesToAdd: any = {};
+            issArr.forEach((issObj: any) => {
+              issuesToAdd[issObj.fieldName + issObj.type] = issObj;
+            })
+            if (Object.keys(issuesToAdd).length > 0) {
+              setIssuesToDisplay((prevState) => {
+                return ({ ...prevState, ...issuesToAdd });
+              });
+            }
+          }} />
       );
     }
     let activeMessage = null
@@ -244,9 +287,17 @@ function PoolTab({
             entitiesData={entitiesData}
             poolId={poolId}
             protocolData={protocolData}
-            issuesProps={issues}
-            setIssues={(x) => setIssues(x, entityName)}
-          />
+            setIssues={(issArr: any) => {
+              const issuesToAdd: any = {};
+              issArr.forEach((issObj: any) => {
+                issuesToAdd[issObj.fieldName + issObj.type] = issObj;
+              })
+              if (Object.keys(issuesToAdd).length > 0) {
+                setIssuesToDisplay((prevState) => {
+                  return ({ ...prevState, ...issuesToAdd });
+                });
+              }
+            }} />
         );
       });
       poolDataSection = (
@@ -265,13 +316,8 @@ function PoolTab({
       );
     } else if (poolTimeseriesError) {
       poolDataSection = (
-        <Grid>
-          <Box my={3}>
-            <CopyLinkToClipboard link={window.location.href}>
-              <Typography variant="h4">{poolTimeseriesError?.message}</Typography>
-            </CopyLinkToClipboard>
-          </Box>
-          <CircularProgress sx={{ margin: 6 }} size={50} />
+        <Grid key={"poolTabEntityError"}>
+          <h3>Query Could not Return Successfully - {poolTimeseriesError?.message}</h3>
         </Grid>
       );
     } else {
@@ -293,7 +339,6 @@ function PoolTab({
       );
     }
   }
-
 
   return (
     <>

@@ -1,9 +1,8 @@
 import { Address, dataSource, log, BigInt } from "@graphprotocol/graph-ts";
 import {
-  AVALANCHE_BLOCKS_PER_YEAR,
   ETHEREUM_BLOCKS_PER_YEAR,
-  FANTOM_BLOCKS_PER_YEAR,
   Network,
+  SECONDS_PER_YEAR,
 } from "../../../src/constants";
 
 export class NetworkSpecificConstant {
@@ -17,33 +16,37 @@ export class NetworkSpecificConstant {
   }
 }
 
-const OPTIMISM_BLOCKS_PER_YEAR = ETHEREUM_BLOCKS_PER_YEAR;
-
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0xAB1c342C7bf5Ec5F02ADEA1c2270670bCa144CbB"),
+      Address.fromString("0xab1c342c7bf5ec5f02adea1c2270670bca144cbb"),
       Network.MAINNET,
       ETHEREUM_BLOCKS_PER_YEAR
     );
   } else if (equalsIgnoreCase(network, Network.FANTOM)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0x4250A6D3BD57455d7C6821eECb6206F507576cD2"),
+      Address.fromString("0x4250a6d3bd57455d7c6821eecb6206f507576cd2"),
       Network.FANTOM,
-      FANTOM_BLOCKS_PER_YEAR
+      // Iron bank on fantom actually calculates interest based on timestamp
+      // See https://github.com/messari/subgraphs/issues/1746 for details
+      SECONDS_PER_YEAR
     );
   } else if (equalsIgnoreCase(network, Network.AVALANCHE)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0x2eE80614Ccbc5e28654324a66A396458Fa5cD7Cc"),
+      Address.fromString("0x2ee80614ccbc5e28654324a66a396458fa5cd7cc"),
       Network.AVALANCHE,
-      AVALANCHE_BLOCKS_PER_YEAR
+      // Iron bank on avalance actually calculates interest based on timestamp
+      // See https://github.com/messari/subgraphs/issues/1746 for details
+      SECONDS_PER_YEAR
     );
   } else if (equalsIgnoreCase(network, Network.OPTIMISM)) {
     return new NetworkSpecificConstant(
-      Address.fromString("0xE0B57FEEd45e7D908f2d0DaCd26F113Cf26715BF"),
+      Address.fromString("0xe0b57feed45e7d908f2d0dacd26f113cf26715bf"),
       Network.OPTIMISM,
-      OPTIMISM_BLOCKS_PER_YEAR
+      // Iron bank on optimism actually calculates interest based on timestamp
+      // See https://github.com/messari/subgraphs/issues/1746 for details
+      SECONDS_PER_YEAR
     );
   } else {
     log.error("[getNetworkSpecificConstant] Unsupported network {}", [network]);
@@ -62,9 +65,9 @@ function equalsIgnoreCase(a: string, b: string): boolean {
 // contract addresses on optimism for reward emission USD calculation
 export const BEETHOVEN_POOL_DEPLOYED_BLOCK = BigInt.fromI32(25922732);
 export const rETH_IB_POOL_ADDRESS =
-  "0x785F08fB77ec934c01736E30546f87B4daccBe50";
+  "0x785f08fb77ec934c01736e30546f87b4daccbe50";
 export const rETH_OP_USD_POOL_ADDRESS =
   "0xb0de49429fbb80c635432bbad0b3965b28560177";
-export const IB_TOKEN_ADDRESS = "0x00a35FD824c717879BF370E70AC6868b95870Dfb";
-export const rETH_ADDRESS = "0x9Bcef72be871e61ED4fBbc7630889beE758eb81D";
-export const BB_aUSD_ADDRESS = "0x6222ae1d2a9f6894dA50aA25Cb7b303497f9BEbd";
+export const IB_TOKEN_ADDRESS = "0x00a35fd824c717879bf370e70ac6868b95870dfb";
+export const rETH_ADDRESS = "0x9bcef72be871e61ed4fbbc7630889bee758eb81d";
+export const BB_aUSD_ADDRESS = "0x6222ae1d2a9f6894da50aa25cb7b303497f9bebd";

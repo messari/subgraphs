@@ -7,20 +7,29 @@ import {
   BIGDECIMAL_THREE,
 } from "../common/constants";
 
-export function bigIntToBDUseDecimals(quantity: BigInt, decimals: i32 = 18): BigDecimal {
+export function bigIntToBDUseDecimals(
+  quantity: BigInt,
+  decimals: i32 = 18
+): BigDecimal {
   return quantity.divDecimal(
     BigInt.fromI32(10)
       .pow(decimals as u8)
-      .toBigDecimal(),
+      .toBigDecimal()
   );
 }
 
-export function bigDecimalExponential(rate: BigDecimal, exponent: BigDecimal): BigDecimal {
+export function bigDecimalExponential(
+  rate: BigDecimal,
+  exponent: BigDecimal
+): BigDecimal {
   // binomial expansion to obtain (1 + x)^n : (1 + rate)^exponent
   // 1 + n *x + (n/2*(n-1))*x**2+(n/6*(n-1)*(n-2))*x**3+(n/12*(n-1)*(n-2)*(n-3))*x**4
   // this is less precise, but more efficient than `powerBigDecimal` when power is big
   const firstTerm = exponent.times(rate);
-  const secondTerm = exponent.div(BIGDECIMAL_TWO).times(exponent.minus(BIGDECIMAL_ONE)).times(rate.times(rate));
+  const secondTerm = exponent
+    .div(BIGDECIMAL_TWO)
+    .times(exponent.minus(BIGDECIMAL_ONE))
+    .times(rate.times(rate));
   const thirdTerm = exponent
     .div(BIGDECIMAL_SIX)
     .times(exponent.minus(BIGDECIMAL_TWO))
@@ -70,6 +79,7 @@ export function bigIntChangeDecimals(x: BigInt, from: i32, to: i32): BigInt {
 
 export function round(numberToRound: BigDecimal): BigDecimal {
   const parsedNumber: number = parseFloat(numberToRound.toString());
-  const roundedNumber: number = Math.ceil((parsedNumber + Number.EPSILON) * 100) / 100;
+  const roundedNumber: number =
+    Math.ceil((parsedNumber + Number.EPSILON) * 100) / 100;
   return BigDecimal.fromString(roundedNumber.toString());
 }

@@ -8,7 +8,12 @@ import {
 import { erc20QiStablecoin } from "../../generated/templates/Vault/erc20QiStablecoin";
 import { QiStablecoinDecimals } from "../../generated/templates/Vault/QiStablecoinDecimals";
 import { Token } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, COLLATERAL_PRICE_DECIMALS } from "../utils/constants";
+import {
+  BIGDECIMAL_ZERO,
+  COLLATERAL_PRICE_DECIMALS,
+  STAKEDAO_STETH_VAULT,
+  YEARN_STETH_VAULT,
+} from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { prefixID } from "../utils/strings";
 
@@ -23,6 +28,25 @@ export function getCollateralPrice(
   ) {
     return token.lastPriceUSD!;
   }
+
+  // Catch price error in ethereum deployment
+  // On block 15542061 in the StakeDao Curve stETh vault the price is $1591.3254437
+  if (
+    marketAddress == STAKEDAO_STETH_VAULT &&
+    event.block.number.toI32() == 15542061
+  ) {
+    return BigDecimal.fromString("1591.3254437");
+  }
+
+  // Catch another price error in the ethereum deployment
+  // On block 15542065 in the Yearn Curve stETH vault the price is $1700.24630687
+  if (
+    marketAddress == YEARN_STETH_VAULT &&
+    event.block.number.toI32() == 15542065
+  ) {
+    return BigDecimal.fromString("1700.24630687");
+  }
+
   const contract = erc20QiStablecoin.bind(marketAddress);
   const priceCall = contract.try_getEthPriceSource();
   if (priceCall.reverted) {

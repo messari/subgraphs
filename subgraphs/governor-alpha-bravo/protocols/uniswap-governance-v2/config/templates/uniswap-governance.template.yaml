@@ -22,7 +22,7 @@ dataSources:
         - Delegate
       abis:
         - name: GovernorAlpha
-          file: ./abis/uniswap-governance-v1/GovernorAlpha.json
+          file: ./abis/uniswap-governance-v2/GovernorAlpha.json
       eventHandlers:
         - event: ProposalCanceled(uint256)
           handler: handleProposalCanceled
@@ -34,7 +34,7 @@ dataSources:
           handler: handleProposalQueued
         - event: VoteCast(address,uint256,bool,uint256)
           handler: handleVoteCast
-      file: ./protocols/uniswap-governance-v1/src/governor-alpha.ts
+      file: ./protocols/uniswap-governance-v2/src/governor-alpha.ts
   - kind: ethereum/contract
     name: Uni
     network:  {{ network }}
@@ -54,7 +54,7 @@ dataSources:
         - Delegate
       abis:
         - name: Uni
-          file: ./abis/uniswap-governance-v1/Uni.json
+          file: ./abis/uniswap-governance-v2/Uni.json
       eventHandlers:
         - event: DelegateChanged(indexed address,indexed address,indexed address)
           handler: handleDelegateChanged
@@ -62,5 +62,5 @@ dataSources:
           handler: handleDelegateVotesChanged
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./protocols/uniswap-governance-v1/src/uni.ts
+      file: ./protocols/uniswap-governance-v2/src/uni.ts
       

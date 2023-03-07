@@ -1,7 +1,15 @@
-import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
+import {
+  log,
+  Address,
+  ethereum,
+  BigDecimal,
+  DataSourceContext,
+} from "@graphprotocol/graph-ts";
 import {
   Token,
   Account,
+  VaultFee,
+  _WantToken,
   RewardToken,
   YieldAggregator,
   VaultDailySnapshot,
@@ -11,12 +19,13 @@ import {
   UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
 import * as utils from "./utils";
+import { Versions } from "../versions";
 import * as constants from "./constants";
+import { getUsdPricePerToken } from "../prices";
 import { Vault as VaultStore } from "../../generated/schema";
+import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { ERC20 as ERC20Contract } from "../../generated/templates/Strategy/ERC20";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
-import { Strategy as StrategyContract } from "../../generated/templates/Strategy/Strategy";
-import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -63,7 +72,10 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
   return protocol;
 }
 
-export function getOrCreateToken(address: Address): Token {
+export function getOrCreateToken(
+  address: Address,
+  block: ethereum.Block
+): Token {
   let token = Token.load(address.toHexString());
 
   if (!token) {
@@ -78,15 +90,51 @@ export function getOrCreateToken(address: Address): Token {
     token.save();
   }
 
+  if (
+    !token.lastPriceUSD ||
+    !token.lastPriceBlockNumber ||
+    block.number
+      .minus(token.lastPriceBlockNumber!)
+      .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
+  ) {
+    const tokenPrice = getUsdPricePerToken(address);
+    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceBlockNumber = block.number;
+
+    token.save();
+  }
+
   return token;
 }
 
-export function getOrCreateRewardToken(address: Address): RewardToken {
+export function getOrCreateWantToken(
+  wantToken: Address,
+  vaultAddress: Address | null
+): _WantToken {
+  let wantTokenStore = _WantToken.load(wantToken.toHexString());
+
+  if (!wantTokenStore) {
+    wantTokenStore = new _WantToken(wantToken.toHexString());
+
+    if (!vaultAddress) vaultAddress = constants.NULL.TYPE_ADDRESS;
+
+    wantTokenStore.vaultAddress = vaultAddress.toHexString();
+
+    wantTokenStore.save();
+  }
+
+  return wantTokenStore;
+}
+
+export function getOrCreateRewardToken(
+  address: Address,
+  block: ethereum.Block
+): RewardToken {
   let rewardToken = RewardToken.load(address.toHexString());
 
   if (!rewardToken) {
     rewardToken = new RewardToken(address.toHexString());
-    const token = getOrCreateToken(address);
+    const token = getOrCreateToken(address, block);
     rewardToken.token = token.id;
     rewardToken.type = constants.RewardTokenType.DEPOSIT;
 
@@ -96,10 +144,35 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
   return rewardToken;
 }
 
+export function getOrCreateVaultFee(
+  feeId: string,
+  feeType: string,
+  feePercentage: BigDecimal | null = null
+): VaultFee {
+  let fees = VaultFee.load(feeId);
+
+  if (!fees) {
+    fees = new VaultFee(feeId);
+
+    fees.feeType = feeType;
+    fees.feePercentage = feePercentage;
+
+    fees.save();
+  }
+
+  if (feePercentage) {
+    fees.feePercentage = feePercentage;
+
+    fees.save();
+  }
+
+  return fees;
+}
+
 export function getOrCreateFinancialDailySnapshots(
   block: ethereum.Block
 ): FinancialsDailySnapshot {
-  let id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
+  const id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
   if (!financialMetrics) {
@@ -128,7 +201,7 @@ export function getOrCreateFinancialDailySnapshots(
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let id: string = (
+  const id: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_DAY
   ).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
@@ -158,7 +231,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let metricsID: string = (
+  const metricsID: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_HOUR
   ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
@@ -186,7 +259,7 @@ export function getOrCreateVaultsDailySnapshots(
   vaultId: string,
   block: ethereum.Block
 ): VaultDailySnapshot {
-  let id: string = vaultId
+  const id: string = vaultId
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString());
   let vaultSnapshots = VaultDailySnapshot.load(id);
@@ -224,7 +297,7 @@ export function getOrCreateVaultsHourlySnapshots(
   vaultId: string,
   block: ethereum.Block
 ): VaultHourlySnapshot {
-  let id: string = vaultId
+  const id: string = vaultId
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString());
   let vaultSnapshots = VaultHourlySnapshot.load(id);
@@ -258,54 +331,6 @@ export function getOrCreateVaultsHourlySnapshots(
   return vaultSnapshots;
 }
 
-export function createWithdrawalFee(
-  vaultAddress: Address,
-  strategyContract: StrategyContract
-): string {
-  const withdrawalFeeId =
-    utils.enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE) +
-    vaultAddress.toHexString();
-
-  let withdrawalFee = utils.readValue<BigInt>(
-    strategyContract.try_withdrawalFee(),
-    constants.BIGINT_ZERO
-  );
-
-  utils.createFeeType(
-    withdrawalFeeId,
-    constants.VaultFeeType.WITHDRAWAL_FEE,
-    withdrawalFee
-  );
-
-  return withdrawalFeeId;
-}
-
-export function createPerformanceFee(
-  vaultAddress: Address,
-  strategyContract: StrategyContract
-): string {
-  const performanceFeeId =
-    utils.enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
-    vaultAddress.toHexString();
-
-  let performanceFeeGovernance = utils.readValue<BigInt>(
-    strategyContract.try_performanceFeeGovernance(),
-    constants.BIGINT_ZERO
-  );
-  let performanceFeeStrategist = utils.readValue<BigInt>(
-    strategyContract.try_performanceFeeStrategist(),
-    constants.BIGINT_ZERO
-  );
-
-  utils.createFeeType(
-    performanceFeeId,
-    constants.VaultFeeType.PERFORMANCE_FEE,
-    performanceFeeGovernance.plus(performanceFeeStrategist)
-  );
-
-  return performanceFeeId;
-}
-
 export function getOrCreateVault(
   vaultAddress: Address,
   block: ethereum.Block
@@ -319,32 +344,28 @@ export function getOrCreateVault(
 
     vault.name = utils.readValue<string>(vaultContract.try_name(), "");
     vault.symbol = utils.readValue<string>(vaultContract.try_symbol(), "");
+
+    // There is no deposit limit on Badger DAO
+    vault.depositLimit = constants.BIGINT_ZERO;
     vault.protocol = constants.PROTOCOL_ID;
-    vault.depositLimit = utils.readValue<BigInt>(
-      vaultContract.try_max(),
-      constants.BIGINT_ZERO
-    );
 
     const inputTokenAddress = utils.readValue<Address>(
       vaultContract.try_token(),
       constants.NULL.TYPE_ADDRESS
     );
-    const inputToken = getOrCreateToken(inputTokenAddress);
+    const inputToken = getOrCreateToken(inputTokenAddress, block);
+    getOrCreateWantToken(inputTokenAddress, vaultAddress);
+
     vault.inputToken = inputToken.id;
     vault.inputTokenBalance = constants.BIGINT_ZERO;
 
-    const outputToken = getOrCreateToken(vaultAddress);
+    const outputToken = getOrCreateToken(vaultAddress, block);
     vault.outputToken = outputToken.id;
+
     vault.outputTokenSupply = constants.BIGINT_ZERO;
     vault.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
 
-    vault.pricePerShare = utils
-      .readValue<BigInt>(
-        vaultContract.try_getPricePerFullShare(),
-        constants.BIGINT_ZERO
-      )
-      .toBigDecimal()
-      .div(constants.BIGINT_TEN.pow(outputToken.decimals as u8).toBigDecimal());
+    vault.pricePerShare = constants.BIGDECIMAL_ZERO;
 
     vault.createdBlockNumber = block.number;
     vault.createdTimestamp = block.timestamp;
@@ -355,27 +376,50 @@ export function getOrCreateVault(
     vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
-    const strategyAddress = utils.getStrategyAddressFromVault(vaultAddress);
-    const strategyContract = StrategyContract.bind(strategyAddress);
-
-    const withdrawalFeeId = createWithdrawalFee(vaultAddress, strategyContract);
-    const performanceFeeId = createPerformanceFee(
+    const controllerAddress = utils.getControllerAddress(vaultAddress);
+    const strategyAddress = utils.getVaultStrategy(
       vaultAddress,
-      strategyContract
+      inputTokenAddress
+    );
+    if (strategyAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
+      const context = new DataSourceContext();
+      context.setString("vaultAddress", vaultAddress.toHexString());
+
+      StrategyTemplate.createWithContext(strategyAddress, context);
+    }
+
+    const bribesAddress = utils.getBribesProcessor(
+      vaultAddress,
+      strategyAddress
     );
 
-    vault.fees = [withdrawalFeeId, performanceFeeId];
+    vault.fees = utils.getVaultFees(vaultAddress, strategyAddress).stringIds();
+    vault._lastRewardsBlockNumber = block.number;
 
+    vault._bribesProcessor = bribesAddress.toHexString();
+    vault._controller = controllerAddress.toHexString();
     vault._strategy = strategyAddress.toHexString();
+
     vault.save();
 
     utils.updateProtocolAfterNewVault(vaultAddress);
 
-    log.warning("[CreateVault] VaultId: {}, inputToken: {}, strategy: {}", [
+    log.warning("[NewVault] VaultId: {}, inputToken: {}, strategy: {}", [
       vaultAddress.toHexString(),
       inputTokenAddress.toHexString(),
       strategyAddress.toHexString(),
     ]);
+  }
+
+  if (
+    block.number
+      .minus(vault._lastRewardsBlockNumber)
+      .gt(constants.REWARDS_LOGGER_CACHING)
+  ) {
+    utils.deactivateFinishedRewards(vault, block);
+
+    vault._lastRewardsBlockNumber = block.number;
+    vault.save();
   }
 
   return vault;

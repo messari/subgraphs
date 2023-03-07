@@ -1,4 +1,4 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/templates/Swap/ERC20";
 import { ERC20NameBytes } from "../../generated/templates/Swap/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../../generated/templates/Swap/ERC20SymbolBytes";
@@ -52,17 +52,17 @@ function fetchTokenName(contract: ERC20): string {
 }
 
 function fetchTokenSymbol(contract: ERC20): string {
-  let contractSymbolBytes = ERC20SymbolBytes.bind(contract._address);
+  const contractSymbolBytes = ERC20SymbolBytes.bind(contract._address);
 
   // try types string and bytes32 for symbol
   let symbolValue = UNKNOWN_TOKEN_VALUE;
-  let symbolResult = contract.try_symbol();
+  const symbolResult = contract.try_symbol();
   if (!symbolResult.reverted) {
     return symbolResult.value;
   }
 
   // non-standard ERC20 implementation
-  let symbolResultBytes = contractSymbolBytes.try_symbol();
+  const symbolResultBytes = contractSymbolBytes.try_symbol();
   if (!symbolResultBytes.reverted) {
     // for broken pairs that have no symbol function exposed
     if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
