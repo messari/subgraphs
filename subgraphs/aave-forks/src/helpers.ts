@@ -87,7 +87,7 @@ export function getOrCreateLendingProtocol(
     lendingProtocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-    lendingProtocol._priceOracle = ZERO_ADDRESS;
+    lendingProtocol._priceOracle = "0x0229F777B0fAb107F9591a41d5F02E4e98dB6f2d";
     lendingProtocol._marketIDs = [];
   }
 
