@@ -32,8 +32,8 @@ function App() {
       })
       .then(function (json) {
         if (Array.isArray(json)) {
-          let newIssuesMapping: any = {};
-          json.forEach((x: any) => {
+          let newIssuesMapping: { [x: string]: string } = {};
+          json.forEach((x: { [x: string]: any }) => {
             const key: string = x.title.toUpperCase().split(' ').join(" ") || "";
             newIssuesMapping[key] = x.html_url;
           });
@@ -63,16 +63,16 @@ function App() {
       });
   };
 
-  const aliasToProtocol: any = {};
+  const aliasToProtocol: { [x: string]: string } = {};
 
-  const depoCount: any = { all: { totalCount: 0, prodCount: 0, devCount: 0 } };
+  const depoCount: { [x: string]: { totalCount: number, prodCount: number, devCount: number } } = { all: { totalCount: 0, prodCount: 0, devCount: 0 } };
   // Construct subgraph endpoints
   const subgraphEndpoints: { [x: string]: any } = {};
   const endpointSlugs: string[] = [];
-  const endpointSlugsByType: any = {};
+  const endpointSlugsByType: { [x: string]: any } = {};
   if (Object.keys(protocolsToQuery)?.length > 0) {
     Object.keys(protocolsToQuery).forEach((protocolName: string) => {
-      const protocol: any = protocolsToQuery[protocolName];
+      const protocol: { [x: string]: any } = protocolsToQuery[protocolName];
       let isDev = false;
       let schemaType = protocol.schema;
       if (schemaMapping[protocol.schema]) {
@@ -154,7 +154,7 @@ function App() {
   }
   entityCount`;
 
-  const indexingStatusQueries: any = {};
+  const indexingStatusQueries: { [x: string]: { [x: string]: string[] } } = {};
   Object.keys(endpointSlugsByType).forEach((protocolType: string) => {
     let fullCurrentQueryArray = ["query {"];
     let fullPendingQueryArray = ["query {"];
@@ -229,8 +229,8 @@ function App() {
   useEffect(() => {
     if (decentralized && !Object.keys(decentralizedDeployments)?.length) {
       const decenDepos: { [x: string]: any } = {};
-      const subs = [...decentralized.graphAccounts[0].subgraphs, ...decentralized.graphAccounts[1].subgraphs];
-      subs.forEach((sub: any, idx: number) => {
+      const subgraphsOnDecenAcct = [...decentralized.graphAccounts[0].subgraphs, ...decentralized.graphAccounts[1].subgraphs];
+      subgraphsOnDecenAcct.forEach((sub: { [x: string]: any }) => {
         try {
           let name = sub.currentVersion?.subgraphDeployment?.originalName?.toLowerCase()?.split(" ");
           if (!name) {

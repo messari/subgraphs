@@ -8,6 +8,7 @@ import { convertTokenDecimals, formatIntToFixed2, toPercent } from "../utils";
 
 interface ProtocolSection {
     protocol: { [x: string]: any };
+    decenDepoData: any;
     issuesMapping: any;
     schemaType: string;
     subgraphName: string;
@@ -21,7 +22,7 @@ interface ProtocolSection {
     validationSupported: boolean;
 }
 
-function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
+function ProtocolSection({ protocol, decenDepoData, issuesMapping, schemaType, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
     const [showDeposDropDown, toggleShowDeposDropDown] = useState<boolean>(false);
     const navigate = useNavigate();
     useEffect(() => {
@@ -56,6 +57,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
     })
     if (showDeposDropDown) {
         const depoRowsOnProtocol = protocol.networks.map((depo: any) => {
+            const decenObject = decenDepoData?.[depo.deploymentName];
             let chainLabel = depo.chain;
             if (protocol.networks.filter((x: any) => x.chain === depo.chain).length > 1) {
                 chainLabel = depo.deploymentName;
@@ -274,7 +276,6 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
             let decenRow = null;
             try {
                 if (!!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.decentralizedNetworkId) || !!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.hostedServiceId)) {
-                    const decenObject = depo?.indexStatus;
                     let syncedDecen = decenObject?.synced ?? {};
                     let statusDecenDataOnChain: { [x: string]: any } = {};
                     if (decenObject?.chains?.length > 0) {
@@ -287,8 +288,8 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                     }
 
                     let indexedDecen = formatIntToFixed2(toPercent(
-                        statusDecenDataOnChain?.latestBlock?.number - statusDecenDataOnChain?.earliestBlock?.number || 0,
-                        statusDecenDataOnChain?.chainHeadBlock?.number - statusDecenDataOnChain?.earliestBlock?.number,
+                        statusDecenDataOnChain?.latestBlock?.number || 0 - statusDecenDataOnChain?.earliestBlock?.number || 0,
+                        statusDecenDataOnChain?.chainHeadBlock?.number || 0 - statusDecenDataOnChain?.earliestBlock?.number || 0,
                     ));
 
                     if (syncedDecen && !decenObject?.fatalError && Number(indexedDecen) > 99) {
@@ -296,7 +297,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                         indexedDecen = formatIntToFixed2(100);
                     }
 
-                    const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(x => x.includes(subgraphName));
+                    const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(x => x.includes(subgraphName) || x.includes(depo?.decentralizedNetworkId));
                     let decenSubgraphId = decenObject?.subgraph;
                     if (decenSubgraphKey) {
                         decenSubgraphId = decenDeposToSubgraphIds[decenSubgraphKey]?.id;

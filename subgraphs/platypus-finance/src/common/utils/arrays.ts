@@ -1,5 +1,5 @@
 export function removeFromArrayAtIndex<T>(x: T[], index: i32): T[] {
-  let retval = new Array<T>(x.length - 1);
+  const retval = new Array<T>(x.length - 1);
   let nI = 0;
   for (let i = 0; i < x.length; i++) {
     if (i != index) {
@@ -14,7 +14,7 @@ export function addToArrayAtIndex<T>(x: T[], item: T, index: i32): T[] {
   if (x.length == 0) {
     return [item];
   }
-  let retval = new Array<T>();
+  const retval = new Array<T>();
   let i = 0;
   while (i < index) {
     retval.push(x[i]);
@@ -51,7 +51,7 @@ export function arrayUnique<T>(array: T[]): T[] {
 }
 
 export function arrayUniqueBy<T>(array: T[], pluck: (item: T) => string): T[] {
-  let references = array.map<string>(item => pluck(item));
+  const references = array.map<string>(item => pluck(item));
   let unique: T[] = new Array<T>();
   for (let i: i32 = 0; i < references.length; i++) {
     if (references.indexOf(references[i]) == i) {

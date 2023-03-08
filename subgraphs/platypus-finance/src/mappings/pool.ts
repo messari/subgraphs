@@ -9,10 +9,10 @@ import {
   updateProtocolTVL,
   updateMetricsAfterSwap,
 } from "../common/metrics";
-import { createDeposit, createAsset, createWithdraw, createSwap } from "./helpers";
+import { createDeposit, createAsset, createWithdraw } from "./helpers";
 
 export function handleDeposit(event: Deposit): void {
-  let assetAddress = getAssetAddressForPoolToken(event, event.address, event.params.token);
+  const assetAddress = getAssetAddressForPoolToken(event, event.address, event.params.token);
   if (assetAddress.equals(ZERO_ADDRESS)) {
     log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}", [
       event.transaction.hash.toHexString(),
@@ -37,7 +37,7 @@ export function handleDeposit(event: Deposit): void {
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  let assetAddress = getAssetAddressForPoolToken(event, event.address, event.params.token);
+  const assetAddress = getAssetAddressForPoolToken(event, event.address, event.params.token);
   if (assetAddress.equals(ZERO_ADDRESS)) {
     log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}", [
       event.transaction.hash.toHexString(),
@@ -62,7 +62,7 @@ export function handleWithdraw(event: Withdraw): void {
 }
 
 export function handleSwap(event: Swap): void {
-  let fromAssetAddress = getAssetAddressForPoolToken(event, event.address, event.params.fromToken);
+  const fromAssetAddress = getAssetAddressForPoolToken(event, event.address, event.params.fromToken);
   if (fromAssetAddress.equals(ZERO_ADDRESS)) {
     log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}", [
       event.transaction.hash.toHexString(),
@@ -72,7 +72,7 @@ export function handleSwap(event: Swap): void {
     ]);
     return;
   }
-  let toAssetAddress = getAssetAddressForPoolToken(event, event.address, event.params.toToken);
+  const toAssetAddress = getAssetAddressForPoolToken(event, event.address, event.params.toToken);
   if (toAssetAddress.equals(ZERO_ADDRESS)) {
     log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}", [
       event.transaction.hash.toHexString(),
@@ -105,10 +105,10 @@ export function handleAssetAdded(event: AssetAdded): void {
 
 export function fetchRetentionRatioAndHaircutRate(event: ethereum.Event, poolAddress: Address): void {
   // Get LiquidtiyPoolParamsHelper
-  let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event, poolAddress);
+  const liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event, poolAddress);
   if (liquidityPoolParams.updateBlockNumber.lt(event.block.number)) {
-    let PoolContract = Pool.bind(poolAddress);
-    let retentionRatio_call = PoolContract.try_getRetentionRatio();
+    const PoolContract = Pool.bind(poolAddress);
+    const retentionRatio_call = PoolContract.try_getRetentionRatio();
 
     if (retentionRatio_call.reverted) {
       log.error("[Fetch Retention Ratio]Error fetching Retention Ration for address: {}", [poolAddress.toHexString()]);
@@ -116,7 +116,7 @@ export function fetchRetentionRatioAndHaircutRate(event: ethereum.Event, poolAdd
     // Update LiquidityPoolParamsHelper
     liquidityPoolParams.RetentionRatio = retentionRatio_call.value.toBigDecimal();
 
-    let haircutRate_call = PoolContract.try_getHaircutRate();
+    const haircutRate_call = PoolContract.try_getHaircutRate();
 
     if (haircutRate_call.reverted) {
       log.error("[Fetch Haircut Rate]Error fetching Haircut Rate for address: {}", [poolAddress.toHexString()]);

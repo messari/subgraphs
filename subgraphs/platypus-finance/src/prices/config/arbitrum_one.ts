@@ -7,14 +7,14 @@ export const NETWORK_STRING = "arbitrum-one";
 ///////////////////////////////////////////////////////////////////////////
 
 export const CURVE_CALCULATIONS_ADDRESS = Address.fromString("0x26f698491daf32771217abc1356dae48c7230c75");
-export const CURVE_REGISTRY_ADDRESS = Address.fromString("0x445FE580eF8d70FF569aB36e80c647af338db351");
-export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString("0x0E9fBb167DF83EdE3240D6a5fa5d40c6C6851e15");
+export const CURVE_REGISTRY_ADDRESS = Address.fromString("0x445fe580ef8d70ff569ab36e80c647af338db351");
+export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString("0x0e9fbb167df83ede3240d6a5fa5d40c6c6851e15");
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// SUSHISWAP CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString("0x5EA7E501c9A23F4A76Dc7D33a11D995B13a1dD25");
+export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString("0x5ea7e501c9a23f4a76dc7d33a11d995b13a1dd25");
 export const SUSHISWAP_WETH_ADDRESS = Address.fromString("0x82af49447d8a07e3bd95bd0d56f35241523fbab1");
 
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
@@ -47,7 +47,7 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString("0x000000000000000
 
 export const WHITELIST_TOKENS = new TypedMap<string, Address>();
 WHITELIST_TOKENS.set("WETH", Address.fromString("0x82af49447d8a07e3bd95bd0d56f35241523fbab1"));
-WHITELIST_TOKENS.set("ETH", Address.fromString("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"));
+WHITELIST_TOKENS.set("ETH", Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"));
 WHITELIST_TOKENS.set("USDT", Address.fromString("0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9"));
 WHITELIST_TOKENS.set("DAI", Address.fromString("0xda10009cbd5d07dd0cecc66161fc93d7c9000da1"));
 WHITELIST_TOKENS.set("USDC", Address.fromString("0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"));
