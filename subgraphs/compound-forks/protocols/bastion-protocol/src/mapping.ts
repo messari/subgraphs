@@ -1,10 +1,4 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -43,8 +37,6 @@ import {
   INT_ONE,
   BIGDECIMAL_ZERO,
   mantissaFactor,
-  bigDecimalToBigInt,
-  BDChangeDecimals,
 } from "../../../src/constants";
 import {
   ProtocolData,

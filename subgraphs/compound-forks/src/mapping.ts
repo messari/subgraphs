@@ -1568,18 +1568,6 @@ export function updateMarket(
     updateAllMarketPrices(comptrollerAddress, blockNumber);
   }
 
-  log.info(
-    "[updateMarket]market={}/{} underlyingPrice reverted={} value={} block={}",
-    [
-      market.name!,
-      market.id,
-      updateMarketData.getUnderlyingPriceResult.reverted.toString(),
-      updateMarketData.getUnderlyingPriceResult.reverted
-        ? "null"
-        : updateMarketData.getUnderlyingPriceResult.value.toString(),
-      blockNumber.toString(),
-    ]
-  );
   // update this market's price no matter what
   const underlyingTokenPriceUSD = getTokenPriceUSD(
     updateMarketData.getUnderlyingPriceResult,
