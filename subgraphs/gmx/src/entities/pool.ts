@@ -92,7 +92,9 @@ export function getOrCreateLiquidityPool(event: ethereum.Event): LiquidityPool {
     pool.cumulativeUniqueLiquidators = INT_ZERO;
     pool.cumulativeUniqueLiquidatees = INT_ZERO;
 
-    pool.openInterestUSD = BIGDECIMAL_ZERO;
+    pool.longOpenInterestUSD = BIGDECIMAL_ZERO;
+    pool.shortOpenInterestUSD = BIGDECIMAL_ZERO;
+    pool.totalOpenInterestUSD = BIGDECIMAL_ZERO;
     pool.longPositionCount = INT_ZERO;
     pool.shortPositionCount = INT_ZERO;
     pool.openPositionCount = INT_ZERO;
@@ -376,18 +378,33 @@ export function updatePoolOpenInterestUSD(
   event: ethereum.Event,
   pool: LiquidityPool,
   amountChangeUSD: BigDecimal,
-  isIncrease: boolean
+  isIncrease: boolean,
+  isLong: boolean
 ): void {
   if (isIncrease) {
-    pool.openInterestUSD = pool.openInterestUSD.plus(amountChangeUSD);
+    pool.totalOpenInterestUSD = pool.totalOpenInterestUSD.plus(amountChangeUSD);
+    if (isLong) {
+      pool.longOpenInterestUSD = pool.longOpenInterestUSD.plus(amountChangeUSD);
+    } else {
+      pool.shortOpenInterestUSD =
+        pool.shortOpenInterestUSD.plus(amountChangeUSD);
+    }
   } else {
-    pool.openInterestUSD = pool.openInterestUSD.minus(amountChangeUSD);
+    pool.totalOpenInterestUSD =
+      pool.totalOpenInterestUSD.minus(amountChangeUSD);
+    if (isLong) {
+      pool.longOpenInterestUSD =
+        pool.longOpenInterestUSD.minus(amountChangeUSD);
+    } else {
+      pool.shortOpenInterestUSD =
+        pool.shortOpenInterestUSD.minus(amountChangeUSD);
+    }
   }
   pool._lastUpdateTimestamp = event.block.timestamp;
   pool.save();
 
   // Protocol
-  updateProtocolOpenInterestUSD(event, amountChangeUSD, isIncrease);
+  updateProtocolOpenInterestUSD(event, amountChangeUSD, isIncrease, isLong);
 }
 
 export function updatePoolInputTokenBalance(
@@ -503,10 +520,8 @@ export function updatePoolRewardToken(
 
   const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
   if (rewardTokenIndex >= 0) {
-    rewardTokenEmissionsAmount[rewardTokenIndex] =
-      rewardTokenEmissionsAmount[rewardTokenIndex].plus(tokensPerDay);
-    rewardTokenEmissionsUSD[rewardTokenIndex] =
-      rewardTokenEmissionsUSD[rewardTokenIndex].plus(tokensPerDayUSD);
+    rewardTokenEmissionsAmount[rewardTokenIndex] = tokensPerDay;
+    rewardTokenEmissionsUSD[rewardTokenIndex] = tokensPerDayUSD;
   } else {
     rewardTokens.push(rewardToken.id);
     rewardTokenEmissionsAmount.push(tokensPerDay);

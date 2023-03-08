@@ -251,7 +251,7 @@ export function handleUpdatePositionEvent(
 
   switch (eventType) {
     case EventType.CollateralIn:
-      updatePoolOpenInterestUSD(event, pool, sizeUSDDelta, true);
+      updatePoolOpenInterestUSD(event, pool, sizeUSDDelta, true, isLong);
 
       createCollateralIn(
         event,
@@ -294,7 +294,7 @@ export function handleUpdatePositionEvent(
       );
       break;
     case EventType.CollateralOut:
-      updatePoolOpenInterestUSD(event, pool, sizeUSDDelta, false);
+      updatePoolOpenInterestUSD(event, pool, sizeUSDDelta, false, isLong);
 
       createCollateralOut(
         event,
@@ -315,7 +315,7 @@ export function handleUpdatePositionEvent(
       );
       break;
     case EventType.Liquidated:
-      updatePoolOpenInterestUSD(event, pool, sizeUSDDelta, false);
+      updatePoolOpenInterestUSD(event, pool, sizeUSDDelta, false, isLong);
 
       createLiquidate(
         event,

@@ -46,7 +46,9 @@ export function getOrCreateProtocol(): DerivPerpProtocol {
     protocol.cumulativeUniqueLiquidators = INT_ZERO;
     protocol.cumulativeUniqueLiquidatees = INT_ZERO;
 
-    protocol.openInterestUSD = BIGDECIMAL_ZERO;
+    protocol.longOpenInterestUSD = BIGDECIMAL_ZERO;
+    protocol.shortOpenInterestUSD = BIGDECIMAL_ZERO;
+    protocol.totalOpenInterestUSD = BIGDECIMAL_ZERO;
     protocol.longPositionCount = INT_ZERO;
     protocol.shortPositionCount = INT_ZERO;
     protocol.openPositionCount = INT_ZERO;
@@ -178,17 +180,36 @@ export function updateProtocolTVL(
 export function updateProtocolOpenInterestUSD(
   event: ethereum.Event,
   openInterestChangeUSD: BigDecimal,
-  isIncrease: boolean
+  isIncrease: boolean,
+  isLong: boolean
 ): void {
   const protocol = getOrCreateProtocol();
   if (isIncrease) {
-    protocol.openInterestUSD = protocol.openInterestUSD.plus(
+    protocol.totalOpenInterestUSD = protocol.totalOpenInterestUSD.plus(
       openInterestChangeUSD
     );
+    if (isLong) {
+      protocol.longOpenInterestUSD = protocol.longOpenInterestUSD.plus(
+        openInterestChangeUSD
+      );
+    } else {
+      protocol.shortOpenInterestUSD = protocol.shortOpenInterestUSD.plus(
+        openInterestChangeUSD
+      );
+    }
   } else {
-    protocol.openInterestUSD = protocol.openInterestUSD.minus(
+    protocol.totalOpenInterestUSD = protocol.totalOpenInterestUSD.minus(
       openInterestChangeUSD
     );
+    if (isLong) {
+      protocol.longOpenInterestUSD = protocol.longOpenInterestUSD.minus(
+        openInterestChangeUSD
+      );
+    } else {
+      protocol.shortOpenInterestUSD = protocol.shortOpenInterestUSD.minus(
+        openInterestChangeUSD
+      );
+    }
   }
 
   protocol._lastUpdateTimestamp = event.block.timestamp;

@@ -203,7 +203,9 @@ export function takeLiquidityPoolDailySnapshot(
   poolMetrics.pool = pool.id;
 
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
-  poolMetrics.dailyOpenInterestUSD = pool.openInterestUSD;
+  poolMetrics.dailyLongOpenInterestUSD = pool.longOpenInterestUSD;
+  poolMetrics.dailyShortOpenInterestUSD = pool.shortOpenInterestUSD;
+  poolMetrics.dailyTotalOpenInterestUSD = pool.totalOpenInterestUSD;
 
   poolMetrics._inputTokens = pool.inputTokens;
   poolMetrics.inputTokenBalances = pool.inputTokenBalances;
@@ -498,7 +500,9 @@ export function takeLiquidityPoolHourlySnapshot(
   poolMetrics.pool = pool.id;
 
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
-  poolMetrics.hourlyOpenInterestUSD = pool.openInterestUSD;
+  poolMetrics.hourlyLongOpenInterestUSD = pool.longOpenInterestUSD;
+  poolMetrics.hourlyShortOpenInterestUSD = pool.shortOpenInterestUSD;
+  poolMetrics.hourlyTotalOpenInterestUSD = pool.totalOpenInterestUSD;
 
   poolMetrics._inputTokens = pool.inputTokens;
   poolMetrics.inputTokenBalances = pool.inputTokenBalances;
@@ -783,7 +787,9 @@ export function takeFinancialDailySnapshot(
     );
   financialMetrics.cumulativeTotalLiquidityPremiumUSD =
     protocol.cumulativeTotalLiquidityPremiumUSD;
-  financialMetrics.dailyOpenInterestUSD = protocol.openInterestUSD;
+  financialMetrics.dailyLongOpenInterestUSD = protocol.longOpenInterestUSD;
+  financialMetrics.dailyShortOpenInterestUSD = protocol.shortOpenInterestUSD;
+  financialMetrics.dailyTotalOpenInterestUSD = protocol.totalOpenInterestUSD;
 
   financialMetrics.save();
 }
