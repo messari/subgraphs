@@ -5477,6 +5477,36 @@
       }
     }
   },
+  "optimism-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "optimism-governance",
+    "project": "optimism",
+    "deployments": {
+      "optimism-governance-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "optimism-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "optimism-governance",
+            "query-id": "optimism-governance"
+          }
+        }
+      }
+    }
+  },
   "ousd-governance": {
     "schema": "governance",
     "base": "openzeppelin-governor",
