@@ -4,6 +4,7 @@ import { schema as yieldSchema } from "./yield/schema";
 import { schema as lendingSchema } from "./lending/schema";
 import { schema as bridgeSchema } from "./bridge/schema";
 import { schema as perpSchema } from "./perpetual/schema";
+import { schema as optionSchema } from "./options/schema";
 import { schema as genericSchema } from "./generic/schema";
 
 import { schema as dexPoolOverview } from "./dex/poolOverview";
@@ -11,6 +12,7 @@ import { schema as yieldPoolOverview } from "./yield/poolOverview";
 import { schema as lendingPoolOverview } from "./lending/poolOverview";
 import { schema as bridgePoolOverview } from "./bridge/poolOverview";
 import { schema as perpPoolOverview } from "./perpetual/poolOverview";
+import { schema as optionPoolOverview } from "./options/poolOverview";
 import { schema as genericOverview } from "./generic/poolOverview";
 import { gql } from "@apollo/client";
 
@@ -43,6 +45,8 @@ export const schema = (type: string, version: string): Schema => {
       return bridgeSchema(version);
     case ProtocolType.PERPETUAL:
       return perpSchema(version);
+    case ProtocolType.OPTION:
+      return optionSchema(version);
     case ProtocolType.GENERIC:
       return genericSchema(version);
     default:
@@ -62,6 +66,8 @@ export const poolOverview = (type: string, version: string): string => {
       return bridgePoolOverview(version);
     case ProtocolType.PERPETUAL:
       return perpPoolOverview(version);
+    case ProtocolType.OPTION:
+      return optionPoolOverview(version);
     case ProtocolType.GENERIC:
       return genericOverview(version);
     default:
