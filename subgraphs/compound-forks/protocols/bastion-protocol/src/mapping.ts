@@ -94,7 +94,7 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
     return;
   }
 
-  if ((event.address = STNEAR_REALM_ADDRESS)) {
+  if (event.address == STNEAR_REALM_ADDRESS) {
     protocol._stNearPriceOracle = event.params.newPriceOracle.toHexString();
     protocol.save();
   }
