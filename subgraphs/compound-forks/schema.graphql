@@ -323,6 +323,9 @@ type LendingProtocol implements Protocol @entity {
   " oracle for the protocol "
   _priceOracle: String!
 
+  " oracle for STNear (Bastion Protocol) "
+  _stNearPriceOracle: String
+
   " All markets that belong to this protocol. protocol.markets won't work, see https://github.com/graphprotocol/graph-ts/issues/219 "
   _marketIDs: [ID!]!
 

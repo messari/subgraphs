@@ -83,24 +83,29 @@ import {
   nativeToken,
   rewardDistributorAddress,
   REWARD_TOKENS,
+  stNEAR_MARKETS,
   STNEAR_REALM_ADDRESS,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 import { RewardDistributor } from "../../../generated/templates/CToken/RewardDistributor";
-import { getUsdPricePerToken } from "./prices";
-
-// empty handler for prices library
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-export function handlePairCreated(event: ethereum.Event): void {}
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
+  // only update oracle from the Hub comptroller
   const protocol = getOrCreateProtocol();
-  const newPriceOracle = event.params.newPriceOracle;
-  log.info("[handleNewPriceOracle] price oracle {} => {}", [
-    protocol._priceOracle,
-    newPriceOracle.toHexString(),
-  ]);
-  _handleNewPriceOracle(protocol, newPriceOracle);
+  if (event.address == comptrollerAddr) {
+    const newPriceOracle = event.params.newPriceOracle;
+    log.info("[handleNewPriceOracle] price oracle {} => {}", [
+      protocol._priceOracle,
+      newPriceOracle.toHexString(),
+    ]);
+    _handleNewPriceOracle(protocol, newPriceOracle);
+    return;
+  }
+
+  if ((event.address = STNEAR_REALM_ADDRESS)) {
+    protocol._stNearPriceOracle = event.params.newPriceOracle.toHexString();
+    protocol.save();
+  }
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
@@ -153,7 +158,18 @@ export function handleMarketListed(event: MarketListed): void {
       cTokenReserveFactorMantissa
     );
     _handleMarketListed(marketListedData, event);
-    const market = Market.load(cTokenAddr.toHexString())!;
+    const market = Market.load(cTokenAddr.toHexString());
+    if (!market) {
+      log.critical(
+        "[handleMarketListed]market entity {} not added for tx {}-{}",
+        [
+          cTokenAddr.toHexString(),
+          event.transaction.hash.toHexString(),
+          event.transactionLogIndex.toString(),
+        ]
+      );
+      return;
+    }
     market.name = `${marketNamePrefix}${market.name!}`;
     market.save();
     return;
@@ -189,7 +205,18 @@ export function handleMarketListed(event: MarketListed): void {
     event
   );
 
-  const market = Market.load(cTokenAddr.toHexString())!;
+  const market = Market.load(cTokenAddr.toHexString());
+  if (!market) {
+    log.critical(
+      "[handleMarketListed]market entity {} not added for tx {}-{}",
+      [
+        cTokenAddr.toHexString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
+    );
+    return;
+  }
   market.name = `${marketNamePrefix}${market.name!}`;
   market.save();
 }
@@ -319,24 +346,20 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     updateRewards(marketAddress, event.block.number);
   }
 
-  log.info("[handleAccrueInterest]marketAddress={} tx={}-{}", [
-    marketAddress.toHexString(),
-    event.transaction.hash.toHexString(),
-    event.transactionLogIndex.toString(),
-  ]);
-
   const cTokenContract = CToken.bind(marketAddress);
   const protocol = getOrCreateProtocol();
-  const underlyingPriceResult = getUnderlyingTokenPriceUSDResult(
-    marketAddress,
-    Address.fromString(protocol._priceOracle)
-  );
+  let priceOracle = protocol._priceOracle;
+  if (stNEAR_MARKETS.includes(marketAddress) && protocol._stNearPriceOracle) {
+    priceOracle = protocol._stNearPriceOracle!;
+  }
+  const oracleContract = PriceOracle.bind(Address.fromString(priceOracle));
+
   const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
-    underlyingPriceResult,
+    oracleContract.try_getUnderlyingPrice(marketAddress),
     SECONDS_PER_YEAR
   );
   const interestAccumulated = event.params.interestAccumulated;
@@ -587,53 +610,4 @@ function getBastionPrice(): BigDecimal {
     BIGINT_ZERO
   );
   return priceUSD.toBigDecimal().div(exponentToBigDecimal(mantissaFactor));
-}
-
-function getUnderlyingTokenPriceUSDResult(
-  cToken: Address,
-  priceOracle: Address
-): ethereum.CallResult<BigInt> {
-  log.info("[getUnderlyingTokenPriceUSDResult]cToken={}", [
-    cToken.toHexString(),
-    priceOracle.toHexString(),
-  ]);
-  const oracleContract = PriceOracle.bind(priceOracle);
-  const oracleResult = oracleContract.try_getUnderlyingPrice(cToken);
-  if (!oracleResult.reverted) {
-    log.info("[getUnderlyingTokenPriceUSDResult]price={} from oracle {}", [
-      oracleResult.value.toString(),
-      priceOracle.toHexString(),
-    ]);
-    return oracleResult;
-  }
-
-  const revertedResult = new ethereum.CallResult<BigInt>();
-  const market = Market.load(cToken.toHexString());
-  if (!market || !market.inputToken) {
-    return revertedResult;
-  }
-  const underlyingTokenAddress = market.inputToken;
-  const tokenPriceUSD = getTokenPriceUSDFromPricesLib(
-    Address.fromString(underlyingTokenAddress)
-  );
-  if (!tokenPriceUSD) {
-    return revertedResult;
-  }
-  const underlyingToken = Token.load(underlyingTokenAddress);
-  if (!underlyingToken) {
-    return revertedResult;
-  }
-  const mantissaDecimalFactor = 18 - underlyingToken.decimals + 18;
-  const tokenPriceBigInt = bigDecimalToBigInt(
-    BDChangeDecimals(tokenPriceUSD, 0, mantissaDecimalFactor)
-  );
-  log.info("[getUnderlyingTokenPriceUSDResult]price={} from prices lib", [
-    tokenPriceBigInt.toString(),
-  ]);
-  return ethereum.CallResult.fromValue<BigInt>(tokenPriceBigInt);
-}
-
-function getTokenPriceUSDFromPricesLib(token: Address): BigDecimal | null {
-  const tokenPriceUSD = getUsdPricePerToken(token);
-  return tokenPriceUSD.reverted ? null : tokenPriceUSD.usdPrice;
 }
