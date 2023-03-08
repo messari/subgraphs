@@ -1,12 +1,12 @@
 {
   "network": "goerli",
   "PoolAddressesProviderRegistry": {
-    "startBlock": "8530760",
-    "address": "0x4B77347F0Ea327017Af59D75445578d892bB0eB5"
+    "startBlock": "8612695",
+    "address": "0x1ad570fDEA255a3c1d8Cf56ec76ebA2b7bFDFfea"
   },
   "RewardsController": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": "8530760"
+    "startBlock": "8612695"
   },
   "graftEnabled": false,
   "subgraphId": "",
