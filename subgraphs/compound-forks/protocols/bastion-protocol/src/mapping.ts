@@ -24,6 +24,7 @@ import {
   Market,
   RewardToken,
   Token,
+  _Realm,
 } from "../../../generated/schema";
 import {
   cTokenDecimals,
@@ -82,22 +83,12 @@ import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 import { RewardDistributor } from "../../../generated/templates/CToken/RewardDistributor";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
-  // only update oracle from the Hub comptroller
-  const protocol = getOrCreateProtocol();
-  if (event.address == comptrollerAddr) {
-    const newPriceOracle = event.params.newPriceOracle;
-    log.info("[handleNewPriceOracle] price oracle {} => {}", [
-      protocol._priceOracle,
-      newPriceOracle.toHexString(),
-    ]);
-    _handleNewPriceOracle(protocol, newPriceOracle);
-    return;
+  let realm = _Realm.load(event.address.toHexString());
+  if (!realm) {
+    realm = new _Realm(event.address.toHexString());
   }
-
-  if (event.address == STNEAR_REALM_ADDRESS) {
-    protocol._stNearPriceOracle = event.params.newPriceOracle.toHexString();
-    protocol.save();
-  }
+  realm.priceOracle = event.params.newPriceOracle.toHexString();
+  realm.save();
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
@@ -133,6 +124,7 @@ export function handleMarketListed(event: MarketListed): void {
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
+
   let marketNamePrefix = "";
   if (event.address.equals(AURORA_REALM_ADDRESS)) {
     marketNamePrefix = "Aurora Realm: ";
@@ -163,6 +155,7 @@ export function handleMarketListed(event: MarketListed): void {
       return;
     }
     market.name = `${marketNamePrefix}${market.name!}`;
+    market._realm = event.address.toHexString();
     market.save();
     return;
   }
@@ -210,6 +203,7 @@ export function handleMarketListed(event: MarketListed): void {
     return;
   }
   market.name = `${marketNamePrefix}${market.name!}`;
+  market._realm = event.address.toHexString();
   market.save();
 }
 
@@ -338,14 +332,35 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     updateRewards(marketAddress, event.block.number);
   }
 
-  const cTokenContract = CToken.bind(marketAddress);
-  const protocol = getOrCreateProtocol();
-  let priceOracle = protocol._priceOracle;
-  if (stNEAR_MARKETS.includes(marketAddress) && protocol._stNearPriceOracle) {
-    priceOracle = protocol._stNearPriceOracle!;
+  const market = Market.load(marketAddress.toHexString());
+  if (!market || !market._realm) {
+    log.error(
+      "[handleAccrueInterest]market {} doesn't exist or realm {} tx {}-{}",
+      [
+        marketAddress.toHexString(),
+        market && !market._realm ? "=null" : "",
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toHexString(),
+      ]
+    );
+    return;
   }
-  const oracleContract = PriceOracle.bind(Address.fromString(priceOracle));
 
+  const realm = _Realm.load(market._realm!);
+  if (!realm) {
+    log.error("[handleAccrueInterest]realm {} doesn't exist tx {}-{}", [
+      market._realm!,
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toHexString(),
+    ]);
+    return;
+  }
+
+  const oracleContract = PriceOracle.bind(
+    Address.fromString(realm.priceOracle)
+  );
+
+  const cTokenContract = CToken.bind(marketAddress);
   const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
