@@ -288,13 +288,6 @@ export function stringToBytesList(list: string[]): Bytes[] {
   return result;
 }
 
-export function absBigInt(value: BigInt): BigInt {
-  if (value.lt(BIGINT_ZERO)) {
-    return value.times(BIGINT_NEG_ONE);
-  }
-  return value;
-}
-
 export function absBigDecimal(value: BigDecimal): BigDecimal {
   if (value.lt(BIGDECIMAL_ZERO)) {
     return value.times(BIGDECIMAL_NEG_ONE);

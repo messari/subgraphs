@@ -144,27 +144,16 @@ export function findUSDPricePerToken(
       const pool = getLiquidityPool(poolAddress)!;
 
       if (pool.totalValueLockedUSD.gt(BIGDECIMAL_ZERO)) {
-        let whitelistTokenIndex = -1;
-        let tokenIndex = -1;
-        if (pool.inputTokens[0] == token.id) {
-          whitelistTokenIndex = 1;
-          tokenIndex = 0;
-        } else if (pool.inputTokens[1] == token.id) {
-          whitelistTokenIndex = 0;
-          tokenIndex = 1;
-        }
-
-        // Return if token is not in pool
-        if (tokenIndex == -1 || whitelistTokenIndex == -1) {
+        const token_index = get_token_index(pool, token);
+        if (token_index == null) {
           continue;
         }
-
+        const whitelistTokenIndex = 0 == token_index ? 1 : 0;
         const whitelistToken = getOrCreateToken(
           event,
           pool.inputTokens[whitelistTokenIndex],
           false
         );
-        // get the derived whitelist token in pool
         const whitelistTokenValueLocked = poolAmounts.inputTokenBalances[
           whitelistTokenIndex
         ].times(whitelistToken.lastPriceUSD!);
@@ -176,22 +165,12 @@ export function findUSDPricePerToken(
             NetworkConfigs.getMinimumLiquidityThreshold()
           )
         ) {
-          // Calculate new price of a token and TVL of token in this pool.
-          const newPriceSoFar = poolAmounts.tokenPrices[
-            whitelistTokenIndex
-          ].times(whitelistToken.lastPriceUSD as BigDecimal);
-
-          const newTokenTotalValueLocked = convertTokenToDecimal(
-            token._totalSupply,
-            token.decimals
-          ).times(newPriceSoFar);
-
-          // If price is too high, skip this pool
-          if (newTokenTotalValueLocked.gt(BIGDECIMAL_TEN_BILLION)) {
-            log.warning("Price too high for token: {} from pool: {}", [
-              token.id.toHexString(),
-              pool.id.toHexString(),
-            ]);
+          const newPriceSoFar = computePriceFromConvertedSqrtX96Ratio(
+            pool,
+            whitelistToken,
+            poolAmounts.tokenPrices[whitelistTokenIndex]
+          );
+          if (newPriceSoFar == null) {
             continue;
           }
 
@@ -222,7 +201,6 @@ export function findUSDPricePerToken(
     return token.lastPriceUSD!;
   }
 
-  // Uncomment this after the current production version is fully synced and re-deploy to make the oracle more robust
   if (!token.lastPriceUSD || token.lastPriceUSD!.equals(BIGDECIMAL_ZERO)) {
     return priceSoFar;
   }
@@ -243,8 +221,47 @@ export function findUSDPricePerToken(
   token._largeTVLImpactBuffer = 0;
 
   token.save();
-  return priceSoFar; // nothing was found return 0
+  return priceSoFar;
 }
+
+function get_token_index(pool: LiquidityPool, token: Token): number | null {
+  if (pool.inputTokens[0] == token.id) {
+    return 0;
+  }
+  if (pool.inputTokens[1] == token.id) {
+    return 1;
+  }
+  return null;
+}
+
+function computePriceFromConvertedSqrtX96Ratio(
+  pool: LiquidityPool,
+  token: Token,
+  convertedSqrtX96Ratio: BigDecimal
+) {
+  // Calculate new price of a token and TVL of token in this pool.
+  const newPriceSoFar = convertedSqrtX96Ratio.times(
+    token.lastPriceUSD as BigDecimal
+  );
+
+  const newTokenTotalValueLocked = convertTokenToDecimal(
+    token._totalSupply,
+    token.decimals
+  ).times(newPriceSoFar);
+
+  // If price is too high, skip this pool
+  if (newTokenTotalValueLocked.gt(BIGDECIMAL_TEN_BILLION)) {
+    log.warning("Price too high for token: {} from pool: {}", [
+      token.id.toHexString(),
+      pool.id.toHexString(),
+    ]);
+    return null;
+  }
+
+  return newPriceSoFar;
+}
+
+function if_token_not_in_pool();
 
 /**
  * Accepts tokens and amounts, return tracked amount based on token whitelist
