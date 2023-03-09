@@ -153,8 +153,7 @@ export function handleTransferFromL1Completed(
 			pool.getDestinationTokenRoute(crossToken)!,
 			event.transaction.from,
 			event.params.amount,
-			event.transaction.hash,
-			false
+			event.transaction.hash
 		)
 		//MESSAGES
 		let receipt = event.receipt
@@ -271,8 +270,7 @@ export function handleTransferSent(event: TransferSent): void {
 			pool.getDestinationTokenRoute(crossToken)!,
 			event.params.recipient,
 			event.params.amount,
-			event.transaction.hash,
-			false
+			event.transaction.hash
 		)
 		pool.addRevenueNative(BigInt.zero(), event.params.bonderFee)
 
