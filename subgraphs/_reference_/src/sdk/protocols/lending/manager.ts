@@ -51,7 +51,8 @@ import { PositionManager } from "./position";
  * You can think of this as an abstraction so the developer doesn't
  * need to think about all of the detailed storage changes that occur.
  *
- * Schema Version: 3.0.0
+ * Schema Version:  3.0.0
+ * SDK Version:     1.0.1
  * Author(s):
  *  - @dmelotik
  */
@@ -317,7 +318,7 @@ export class DataManager {
     }
 
     if (protocolFees.indexOf(feeType) == -1) {
-      protocolFees!.push(feeType);
+      protocolFees.push(feeType);
     }
     this.protocol.fees = protocolFees;
     this.protocol.save();
@@ -329,13 +330,21 @@ export class DataManager {
     return Address.fromBytes(this.market.id);
   }
 
-  getOrCreateRevenueDetail(id: Bytes): RevenueDetail {
+  getOrCreateRevenueDetail(id: Bytes, isMarket: boolean): RevenueDetail {
     let details = RevenueDetail.load(id);
     if (!details) {
       details = new RevenueDetail(id);
       details.sources = [];
       details.amountsUSD = [];
       details.save();
+
+      if (isMarket) {
+        this.market.revenueDetail = details.id;
+        this.market.save();
+      } else {
+        this.protocol.revenueDetail = details.id;
+        this.protocol.save();
+      }
     }
 
     return details;
@@ -926,9 +935,13 @@ export class DataManager {
       fee = this.getOrUpdateFee(FeeType.OTHER);
     }
 
-    const marketRevDetails = this.getOrCreateRevenueDetail(this.market.id);
+    const marketRevDetails = this.getOrCreateRevenueDetail(
+      this.market.id,
+      true
+    );
     const protocolRevenueDetail = this.getOrCreateRevenueDetail(
-      this.protocol.id
+      this.protocol.id,
+      false
     );
 
     this.insertInOrder(marketRevDetails, protocolRevenueDelta, fee.id);
@@ -948,9 +961,13 @@ export class DataManager {
       fee = this.getOrUpdateFee(FeeType.OTHER);
     }
 
-    const marketRevDetails = this.getOrCreateRevenueDetail(this.market.id);
+    const marketRevDetails = this.getOrCreateRevenueDetail(
+      this.market.id,
+      true
+    );
     const protocolRevenueDetail = this.getOrCreateRevenueDetail(
-      this.protocol.id
+      this.protocol.id,
+      false
     );
 
     this.insertInOrder(marketRevDetails, supplyRevenueDelta, fee.id);
@@ -1151,32 +1168,43 @@ export class DataManager {
     amountUSD: BigDecimal,
     associatedSource: string
   ): void {
+    if (details.sources.length == 0) {
+      details.sources = [associatedSource];
+      details.amountsUSD = [amountUSD];
+      details.save();
+      return; // initial add is manually done
+    }
+
     let sources = details.sources;
+    let amountsUSD = details.amountsUSD;
 
     // insert in alphabetical order
     for (let i = 0; i < sources.length; i++) {
       const index = associatedSource.localeCompare(sources[i]);
       if (index < 0) {
-        // insert associatedSource at index i - 1
-        sources = insert(sources, i - 1, associatedSource);
-        details.amountsUSD = insert(
+        // insert associatedSource at index i
+        sources = insert(sources, i, associatedSource);
+        amountsUSD = insert(
           details.amountsUSD,
-          i - 1,
-          details.amountsUSD[i].plus(amountUSD)
+          i,
+          amountsUSD[i].plus(amountUSD)
         );
         break;
-      } else if (index > 0) {
+      } else if (index == 0) {
+        // update associatedSource at index i
+        sources[i] = associatedSource;
+        amountsUSD[i] = amountsUSD[i].plus(amountUSD);
+        break;
+      } else {
         if (i == sources.length - 1) {
-          // insert associatedSource at end of array
           sources.push(associatedSource);
-          details.amountsUSD.push(amountUSD);
+          amountsUSD.push(amountUSD);
           break;
         }
-      } else {
-        details.amountsUSD[i] = details.amountsUSD[i].plus(amountUSD);
       }
     }
     details.sources = sources;
+    details.amountsUSD = amountsUSD;
     details.save();
   }
 

@@ -10,7 +10,8 @@ import { BIGDECIMAL_ZERO } from "./constants";
  * a wrapper for the Token entity making it easier to
  * use in mappings and get info about the token.
  *
- * Schema Version: 3.0.0
+ * Schema Version:  3.0.0
+ * SDK Version:     1.0.1
  * Author(s):
  *  - @dmelotik
  */
