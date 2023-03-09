@@ -9,7 +9,7 @@ export function getOrCreatePool(
   blockNumber: BigInt,
   blockTimestamp: BigInt
 ): Pool {
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
   let pool = Pool.load(protocol.id);
 
   if (!pool) {
