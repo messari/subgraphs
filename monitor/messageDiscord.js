@@ -330,6 +330,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
         const indexErrorEmbedDepos = {};
         const indexErrorPendingHash = {};
+        const indexErrorDecenHash = {};
         const prodStatusDepoMapping = {};
         const aggThreadProtocolErrorEmbeds = [];
         const aggThreadIndexErrorEmbeds = JSON.parse(JSON.stringify([...indexingErrorEmbed.fields]));
@@ -367,6 +368,10 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 if (!issueHasBeenAlerted) {
                     indexingErrorEmbed.color = placeholderColor;
                     indexErrorEmbedDepos[networkString] = { failureBlock: depo?.indexingError, message: depo?.indexingErrorMessage };
+                    if (depo.isDecen) {
+                        indexErrorEmbedDepos[networkString].isDecen = true;
+                        indexErrorDecenHash[networkString] = depo?.hash;
+                    }
                     if (!!depo.pending) {
                         indexErrorPendingHash[networkString] = depo?.hash;
                     }
@@ -416,7 +421,9 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 if (networkString.includes(' (PENDING')) {
                     link = `https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]}`;
                     labelValue += `\n[${networkString.split(' ')[0]}-PENDING](${link})\n`;
-
+                } else if (indexErrorObj.isDecen) {
+                    link = `https://okgraph.xyz/?q=${indexErrorDecenHash[networkString]}`;
+                    labelValue += `\n[${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}](${link})\n`;
                 } else {
                     link = `https://okgraph.xyz/?q=messari%2F${protocol}-${networkString}`;
                     labelValue += `\n[${networkString}](${link})\n`;
@@ -425,7 +432,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 if (prodStatusDepoMapping[networkString] === true) {
                     aggThreadIndexErrorEmbeds[0].value += labelValue;
                     aggThreadIndexErrorEmbeds[1].value += failureBlock;
-                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}: ${indexErrorObj.failureBlock}`, ghMessage: `${networkString}: Block #${indexErrorObj.failureBlock} - ${indexErrorObj.message}\n` });
+                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}: ${indexErrorObj.failureBlock} - ${link}`, ghMessage: `${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}: Block #${indexErrorObj.failureBlock} - ${indexErrorObj.message}\n` });
                 }
             })
             indexingErrorEmbed.fields[0].value += labelValue;

@@ -4,7 +4,7 @@ import 'dotenv/config'
 import { protocolDerivedFields, protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
 import { pullMessagesByThread, resolveQueriesToAttempt, resolveThreadCreation } from "./resolutions.js";
-import { generateEndpoints, indexStatusFlow } from "./indexingStatus.js";
+import { generateEndpoints, indexStatusFlow, queryDecentralizedIndex } from "./indexingStatus.js";
 
 const hourMs = 3600000;
 
@@ -32,8 +32,9 @@ async function executionFlow() {
   const loopDeploymentJSON = await generateEndpoints(data, protocolNameToBaseMapping);
   const subgraphEndpoints = loopDeploymentJSON.subgraphEndpoints;
   protocolNameToBaseMapping = loopDeploymentJSON.protocolNameToBaseMapping;
+  const hostedEndpointToDecenNetwork = loopDeploymentJSON.hostedEndpointToDecenNetwork;
+  const decenKeyToEndpoint = await queryDecentralizedIndex(hostedEndpointToDecenNetwork);
 
-  // Generate deployments object which holds the issues/metadata for each deployment
   let deployments = {};
   const protocolNames = [];
 
@@ -66,6 +67,26 @@ async function executionFlow() {
         if (!protocolNames.includes(protocolName)) {
           protocolNames.push(protocolName);
         }
+        if (decenKeyToEndpoint[hostedEndpointToDecenNetwork[deploymentString]]) {
+          const decenObj = decenKeyToEndpoint[hostedEndpointToDecenNetwork[deploymentString]];
+          deployments[deploymentsKey + '(DECEN)'] = {
+            status: status,
+            protocolName: protocolName,
+            hash: decenObj.hash,
+            indexingErrorMessage: decenObj.indexingErrorMessage,
+            indexingError: decenObj.indexingErrorBlock,
+            indexedPercentage: decenObj.indexingPercentage || 0,
+            url: decenObj.endpoint,
+            protocolType: protocolType,
+            versions: versions,
+            network: network,
+            isDecen: true
+          }
+          deployments[deploymentsKey + '(DECEN)'].protocolErrors = JSON.parse(JSON.stringify(protocolErrors));
+          if (protocolType && deploymentsKey + '(DECEN)' && Object.keys(errorsObj).includes(protocolType)) {
+            deployments[deploymentsKey + '(DECEN)'].poolErrors = JSON.parse(JSON.stringify(errorsObj[protocolType]));
+          }
+        }
       });
     });
   });
@@ -80,7 +101,6 @@ async function executionFlow() {
   deployments = await protocolLevel(deployments, invalidDeployments);
   deployments = await protocolDerivedFields(deployments, invalidDeployments);
   const currentDiscordMessages = await getDiscordMessages([]);
-
   const protocolThreadsToStart = [];
   let protocolNameToChannelMapping = {};
   protocolNames.forEach(protocolName => {
