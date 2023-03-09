@@ -60,7 +60,7 @@ export async function generateEndpoints(data, protocolNameToBaseMapping) {
 
 export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
   const decenQueries = Object.values(hostedEndpointToDecenNetwork).map((decenNetwork) => {
-    const endpoint = "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + decenNetwork
+    const endpoint = "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenNetwork
     const string = `query MyQuery {
       _meta {
           deployment
@@ -124,7 +124,7 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
     }
     if (obj.fatalError) {
       decenSubgraphHashToIndexingObj[decenDeploymentMapping[obj.subgraph]] = {
-        endpoint: "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + decenDeploymentMapping[obj.subgraph],
+        endpoint: "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenDeploymentMapping[obj.subgraph],
         hash: obj.subgraph,
         indexingErrorMessage: obj.fatalError.message,
         indexingErrorBlock: obj?.chains[0]?.latestBlock?.number,
