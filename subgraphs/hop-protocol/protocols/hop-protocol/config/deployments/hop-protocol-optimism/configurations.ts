@@ -10,6 +10,7 @@ import {
 	ZERO_ADDRESS,
 	OptimismAmm,
 	OptimismRewardToken,
+	RewardTokens,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolOptimismConfigurations implements Configurations {
@@ -67,6 +68,12 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 			return ['ETH', 'Ethereum', '18', OptimismBridge.ETH]
 		} else if (this.getSnxTokens().includes(tokenAddress)) {
 			return ['SNX', 'SNX', '18', OptimismBridge.SNX]
+		} else if (tokenAddress == RewardTokens.GNO) {
+			return ['GNO', 'Gnosis Token', '18', ZERO_ADDRESS]
+		} else if (tokenAddress == RewardTokens.HOP) {
+			return ['HOP', 'HOP Token', '18', ZERO_ADDRESS]
+		} else if (tokenAddress == RewardTokens.OP) {
+			return ['OP', 'Optimism Token', '18', ZERO_ADDRESS]
 		} else {
 			log.critical('Token not found', [])
 			return []

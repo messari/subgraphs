@@ -9,6 +9,8 @@ import {
 	PolygonToken,
 	OptimismToken,
 	ArbitrumRewardToken,
+	ZERO_ADDRESS,
+	RewardTokens,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolArbitrumConfigurations implements Configurations {
@@ -35,6 +37,10 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 			return ['USDT', 'USDT', '6', ArbitrumBridge.USDT]
 		} else if (this.getEthTokens().includes(tokenAddress)) {
 			return ['ETH', 'ETH', '18', ArbitrumBridge.ETH]
+		} else if (tokenAddress == RewardTokens.GNO) {
+			return ['GNO', 'Gnosis Token', '18', ZERO_ADDRESS]
+		} else if (tokenAddress == RewardTokens.HOP) {
+			return ['HOP', 'HOP Token', '18', ZERO_ADDRESS]
 		} else {
 			log.critical('Token not found', [])
 			return []

@@ -9,6 +9,8 @@ import {
 	XdaiToken,
 	PolygonToken,
 	XdaiRewardToken,
+	ZERO_ADDRESS,
+	RewardTokens,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 
@@ -39,6 +41,10 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			return ['ETH', 'ETH', '18', XdaiBridge.ETH]
 		} else if (tokenAddress == XdaiToken.MATIC) {
 			return ['MATIC', 'MATIC', '18', XdaiBridge.MATIC]
+		} else if (tokenAddress == RewardTokens.GNO) {
+			return ['GNO', 'Gnosis Token', '18', ZERO_ADDRESS]
+		} else if (tokenAddress == RewardTokens.HOP) {
+			return ['HOP', 'HOP Token', '18', ZERO_ADDRESS]
 		} else {
 			log.critical('Token not found', [])
 			return []

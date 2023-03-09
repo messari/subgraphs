@@ -9,6 +9,8 @@ import {
 	PolygonAmm,
 	PolygonToken,
 	PolygonRewardToken,
+	ZERO_ADDRESS,
+	RewardTokens,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolPolygonConfigurations implements Configurations {
@@ -59,6 +61,10 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 			return ['ETH', 'ETH', '18', PolygonBridge.ETH]
 		} else if (this.getMaticTokens().includes(tokenAddress)) {
 			return ['MATIC', 'MATIC', '18', PolygonBridge.MATIC]
+		} else if (tokenAddress == RewardTokens.GNO) {
+			return ['GNO', 'Gnosis Token', '18', ZERO_ADDRESS]
+		} else if (tokenAddress == RewardTokens.HOP) {
+			return ['HOP', 'HOP Token', '18', ZERO_ADDRESS]
 		} else {
 			log.critical('Token not found', [])
 			return []
