@@ -44,7 +44,6 @@ import {
   _getOrCreateProtocol,
   _handleNewReserveFactor,
   _handleNewCollateralFactor,
-  _handleNewPriceOracle,
   _handleMarketListed,
   MarketListedData,
   TokenData,
@@ -76,7 +75,6 @@ import {
   nativeToken,
   rewardDistributorAddress,
   REWARD_TOKENS,
-  stNEAR_MARKETS,
   STNEAR_REALM_ADDRESS,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";

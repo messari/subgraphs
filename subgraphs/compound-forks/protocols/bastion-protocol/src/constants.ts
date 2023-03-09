@@ -30,8 +30,6 @@ export const nativeToken = new TokenData(
   18
 );
 
-export const WETH_ADDRESS = "0xc9bdeed33cd01541e1eed10f90519d2c06fe3feb";
-
 export const nativeCToken = new TokenData(
   Address.fromString("0x4e8fe8fd314cfc09bdb0942c5adcc37431abdcd0"),
   "Bastion Ether",
@@ -46,11 +44,6 @@ export const cBSTNContract = Address.fromString(
 export const bstnOracle = Address.fromString(
   "0x4fa59cae2b1e0d3bbadb3385ba29b0b35822e8ad"
 );
-
-export const stNEAR_MARKETS = [
-  Address.fromString("0x30fff4663a8dcdd9ed81e60acf505e6159f19bbc"),
-  Address.fromString("0xb76108eb764b4427505c4bb020a37d95b3ef5afe"),
-];
 
 // reward token mappings
 export const REWARD_TOKENS = [
