@@ -54,7 +54,7 @@ import { _ERC20 } from "../generated/PoolBasedBridge/_ERC20";
 import { ERC20NameBytes } from "../generated/PoolBasedBridge/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../generated/PoolBasedBridge/ERC20SymbolBytes";
 import { Versions } from "./versions";
-import { Token, _Refund, _PTBv1, _ERC20Bal } from "../generated/schema";
+import { Token, _Refund, _PTBv1 } from "../generated/schema";
 import { bigDecimalToBigInt, bigIntToBigDecimal } from "./sdk/util/numbers";
 import { getUsdPricePerToken, getUsdPrice } from "./prices";
 import { networkToChainID } from "./sdk/protocols/bridge/chainIds";
