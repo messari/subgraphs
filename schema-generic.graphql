@@ -1,5 +1,5 @@
 # Subgraph Schema: Generic
-# Version: 2.0.0
+# Version: 2.1.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -324,6 +324,9 @@ type Pool @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
+  " The USD value of input tokens in this pool. Should be the same order as the pool's `inputTokens` field. "
+  inputTokenBalancesUSD: [BigDecimal!]!
+
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
   outputTokenSupply: BigInt
 
@@ -396,6 +399,9 @@ type PoolDailySnapshot @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
+  " The USD value of input tokens in this pool. Should be the same order as the pool's `inputTokens` field. "
+  inputTokenBalancesUSD: [BigDecimal!]!
+
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
   outputTokenSupply: BigInt
 
@@ -456,6 +462,9 @@ type PoolHourlySnapshot @entity {
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
+
+  " The USD value of input tokens in this pool. Should be the same order as the pool's `inputTokens` field. "
+  inputTokenBalancesUSD: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
   outputTokenSupply: BigInt

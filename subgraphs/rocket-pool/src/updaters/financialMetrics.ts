@@ -41,13 +41,23 @@ export function updateProtocolAndPoolRewardsTvl(
 
   // inputToken is ETH, price with ETH
 
+  const rplPriceUSD = getOrCreateToken(
+    Address.fromString(RPL_ADDRESS),
+    blockNumber
+  ).lastPriceUSD!;
+  const ethPriceUSD = getOrCreateToken(
+    Address.fromString(ETH_ADDRESS),
+    blockNumber
+  ).lastPriceUSD!;
+
   const ethTVLUSD = bigIntToBigDecimal(inputTokenBalances[1]).times(
-    getOrCreateToken(Address.fromString(ETH_ADDRESS), blockNumber).lastPriceUSD!
+    ethPriceUSD
+  );
+  const rplTVLUSD = bigIntToBigDecimal(inputTokenBalances[0]).times(
+    rplPriceUSD
   );
 
-  const rplTVLUSD = bigIntToBigDecimal(inputTokenBalances[0]).times(
-    getOrCreateToken(Address.fromString(RPL_ADDRESS), blockNumber).lastPriceUSD!
-  );
+  pool.inputTokenBalancesUSD = [rplTVLUSD, ethTVLUSD];
 
   const totalValueLockedUSD = ethTVLUSD.plus(rplTVLUSD);
   pool.totalValueLockedUSD = totalValueLockedUSD;
@@ -100,11 +110,13 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
   // Pool Daily
   poolMetricsDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsDailySnapshot.inputTokenBalances = pool.inputTokenBalances;
+  poolMetricsDailySnapshot.inputTokenBalancesUSD = pool.inputTokenBalancesUSD;
   poolMetricsDailySnapshot.save();
 
   // Pool Hourly
   poolMetricsHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsHourlySnapshot.inputTokenBalances = pool.inputTokenBalances;
+  poolMetricsHourlySnapshot.inputTokenBalancesUSD = pool.inputTokenBalancesUSD;
   poolMetricsHourlySnapshot.save();
 
   // Financials Daily
@@ -385,6 +397,7 @@ export function getOrCreatePoolsDailySnapshot(
     poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.inputTokenBalances = pool.inputTokenBalances;
+    poolMetrics.inputTokenBalancesUSD = pool.inputTokenBalancesUSD;
     poolMetrics.outputTokenSupply = pool.outputTokenSupply;
     poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
     poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
@@ -426,6 +439,7 @@ export function getOrCreatePoolsHourlySnapshot(
     poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     poolMetrics.inputTokenBalances = pool.inputTokenBalances;
+    poolMetrics.inputTokenBalancesUSD = pool.inputTokenBalancesUSD;
     poolMetrics.outputTokenSupply = pool.outputTokenSupply;
     poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
     poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
