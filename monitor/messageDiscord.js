@@ -330,6 +330,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
         const indexErrorEmbedDepos = {};
         const indexErrorPendingHash = {};
+        const indexErrorDecenHash = {};
         const prodStatusDepoMapping = {};
         const aggThreadProtocolErrorEmbeds = [];
         const aggThreadIndexErrorEmbeds = JSON.parse(JSON.stringify([...indexingErrorEmbed.fields]));
@@ -367,6 +368,10 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 if (!issueHasBeenAlerted) {
                     indexingErrorEmbed.color = placeholderColor;
                     indexErrorEmbedDepos[networkString] = { failureBlock: depo?.indexingError, message: depo?.indexingErrorMessage };
+                    if (depo.isDecen) {
+                        indexErrorEmbedDepos[networkString].isDecen = true;
+                        indexErrorDecenHash[networkString] = depo?.hash;
+                    }
                     if (!!depo.pending) {
                         indexErrorPendingHash[networkString] = depo?.hash;
                     }
@@ -407,29 +412,37 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             }
         });
         if (Object.keys(indexErrorEmbedDepos)?.length > 0) {
-            let labelValue = "";
-            let failureBlock = "";
+            let labelValueThread = "";
+            let failureBlockThread = "";
 
             Object.keys(indexErrorEmbedDepos)?.forEach(networkString => {
+                let labelValueLine = "";
+                let failureBlockLine = "";
                 const indexErrorObj = indexErrorEmbedDepos[networkString];
                 let link = '';
                 if (networkString.includes(' (PENDING')) {
                     link = `https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]}`;
-                    labelValue += `\n[${networkString.split(' ')[0]}-PENDING](${link})\n`;
-
+                    labelValueLine += `\n[${networkString.split(' ')[0]}-PENDING](${link})\n`;
+                    labelValueThread += labelValueLine;
+                } else if (indexErrorObj.isDecen) {
+                    link = `https://okgraph.xyz/?q=${indexErrorDecenHash[networkString]}`;
+                    labelValueLine += `\n[${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}](${link})\n`;
+                    labelValueThread += labelValueLine;
                 } else {
                     link = `https://okgraph.xyz/?q=messari%2F${protocol}-${networkString}`;
-                    labelValue += `\n[${networkString}](${link})\n`;
+                    labelValueLine = `\n[${networkString}](${link})\n`;
+                    labelValueThread += labelValueLine;
                 }
-                failureBlock += '\n' + indexErrorObj.failureBlock + '\n';
+                failureBlockLine = '\n' + indexErrorObj.failureBlock + '\n';
+                failureBlockThread += failureBlockLine;
                 if (prodStatusDepoMapping[networkString] === true) {
-                    aggThreadIndexErrorEmbeds[0].value += labelValue;
-                    aggThreadIndexErrorEmbeds[1].value += failureBlock;
-                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}: ${indexErrorObj.failureBlock}`, ghMessage: `${networkString}: Block #${indexErrorObj.failureBlock} - ${indexErrorObj.message}\n` });
+                    aggThreadIndexErrorEmbeds[0].value += labelValueLine;
+                    aggThreadIndexErrorEmbeds[1].value += failureBlockLine;
+                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}: ${indexErrorObj.failureBlock} - ${link}`, ghMessage: `${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}: Block #${indexErrorObj.failureBlock} - ${indexErrorObj.message}\n` });
                 }
             })
-            indexingErrorEmbed.fields[0].value += labelValue;
-            indexingErrorEmbed.fields[1].value += failureBlock;
+            indexingErrorEmbed.fields[0].value += labelValueThread;
+            indexingErrorEmbed.fields[1].value += failureBlockThread;
             embedObjects.unshift(indexingErrorEmbed);
         }
 
