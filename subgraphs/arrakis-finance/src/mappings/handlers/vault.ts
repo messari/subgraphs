@@ -8,6 +8,7 @@ import {
   UpdateManagerParams,
 } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import {
+  BIGINT_ZERO,
   PROTOCOL_PERFORMANCE_FEE,
   UsageType,
   VaultFeeType,
@@ -27,11 +28,11 @@ import {
 } from "../helpers/vaults";
 
 export function handlePoolCreated(event: PoolCreated): void {
-  let protocol = getOrCreateYieldAggregator(event.address);
+  const protocol = getOrCreateYieldAggregator(event.address);
   protocol.totalPoolCount += 1;
   protocol.save();
   // Create Vault
-  let vault = getOrCreateVault(event.params.pool, event.block);
+  const vault = getOrCreateVault(event.params.pool, event.block);
   vault.protocol = event.address.toHex();
   vault.save();
 
@@ -43,9 +44,16 @@ export function handleMinted(event: Minted): void {
   createDeposit(event);
 
   // Update vault token supply
-  let vault = getOrCreateVault(event.address, event.block);
-  vault.inputTokenBalance += event.params.mintAmount;
-  vault.outputTokenSupply += event.params.mintAmount;
+  const vault = getOrCreateVault(event.address, event.block);
+  vault.inputTokenBalance = vault.inputTokenBalance.plus(
+    event.params.mintAmount
+  );
+  if (event.params.mintAmount && !vault.outputTokenSupply) {
+    vault.outputTokenSupply = BIGINT_ZERO;
+  }
+  vault.outputTokenSupply = vault.outputTokenSupply!.plus(
+    event.params.mintAmount
+  );
   vault.save();
 
   updateUsageMetrics(event.params.receiver, UsageType.DEPOSIT, event); // minted shares are attributed to receiver
@@ -58,9 +66,16 @@ export function handleBurned(event: Burned): void {
   createWithdraw(event);
 
   // Update vault token supply
-  let vault = getOrCreateVault(event.address, event.block);
-  vault.inputTokenBalance -= event.params.burnAmount;
-  vault.outputTokenSupply -= event.params.burnAmount;
+  const vault = getOrCreateVault(event.address, event.block);
+  vault.inputTokenBalance = vault.inputTokenBalance.plus(
+    event.params.burnAmount
+  );
+  if (event.params.burnAmount && !vault.outputTokenSupply) {
+    vault.outputTokenSupply = BIGINT_ZERO;
+  }
+  vault.outputTokenSupply = vault.outputTokenSupply!.plus(
+    event.params.burnAmount
+  );
   vault.save();
 
   updateUsageMetrics(event.transaction.from, UsageType.WITHDRAW, event); // Burned shares are attributed to msg.sender
@@ -76,7 +91,7 @@ export function handleFeesEarned(event: FeesEarned): void {
 }
 
 export function handleUpdateManagerParams(event: UpdateManagerParams): void {
-  let vaultPerformanceFee = getOrCreateVaultFee(
+  const vaultPerformanceFee = getOrCreateVaultFee(
     VaultFeeType.PERFORMANCE_FEE,
     event.address.toHex()
   );
