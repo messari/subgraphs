@@ -36,6 +36,7 @@ async function executionFlow() {
   const decenKeyToEndpoint = await queryDecentralizedIndex(hostedEndpointToDecenNetwork);
 
   let deployments = {};
+  let decentralizedDeployments = {};
   const protocolNames = [];
 
   Object.entries(subgraphEndpoints).forEach(([protocolType, protocolsOnType]) => {
@@ -69,7 +70,7 @@ async function executionFlow() {
         }
         if (decenKeyToEndpoint[hostedEndpointToDecenNetwork[deploymentString]]) {
           const decenObj = decenKeyToEndpoint[hostedEndpointToDecenNetwork[deploymentString]];
-          deployments[deploymentsKey + '(DECEN)'] = {
+          decentralizedDeployments[deploymentsKey + '(DECEN)'] = {
             status: status,
             protocolName: protocolName,
             hash: decenObj.hash,
@@ -82,9 +83,9 @@ async function executionFlow() {
             network: network,
             isDecen: true
           }
-          deployments[deploymentsKey + '(DECEN)'].protocolErrors = JSON.parse(JSON.stringify(protocolErrors));
+          decentralizedDeployments[deploymentsKey + '(DECEN)'].protocolErrors = JSON.parse(JSON.stringify(protocolErrors));
           if (protocolType && deploymentsKey + '(DECEN)' && Object.keys(errorsObj).includes(protocolType)) {
-            deployments[deploymentsKey + '(DECEN)'].poolErrors = JSON.parse(JSON.stringify(errorsObj[protocolType]));
+            decentralizedDeployments[deploymentsKey + '(DECEN)'].poolErrors = JSON.parse(JSON.stringify(errorsObj[protocolType]));
           }
         }
       });
@@ -94,7 +95,7 @@ async function executionFlow() {
   await getAllThreadsToClear(Date.now() - (86400000 * 7), process.env.CHANNEL_ID);
 
   const indexStatusFlowObject = await indexStatusFlow(deployments);
-  deployments = indexStatusFlowObject.deployments;
+  deployments = { ...indexStatusFlowObject.deployments, ...decentralizedDeployments };
   const invalidDeployments = indexStatusFlowObject.invalidDeployments;
 
   // pass invalid deployments arr to protocolLevel, before execution check if depo key is included in array
@@ -146,8 +147,12 @@ async function executionFlow() {
       indexDeploymentIssues = [];
     }
     const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet, protocolIssuesOnThread, indexDeploymentIssues);
-    return { message: embeddedMessages, protocolName: protocolName, channel: channelId };
-  });
+    if (embeddedMessages) {
+      return { message: embeddedMessages, protocolName: protocolName, channel: channelId };
+    } else {
+      return null;
+    }
+  }).filter(x => x);
   if (messagesToPost.length > 0) {
     await clearThread(Date.now() - (86400000), process.env.PROD_CHANNEL);
     const aggThread = currentDiscordMessages.find(x => x.content.includes('Production Ready Subgraph Indexing Failure'));

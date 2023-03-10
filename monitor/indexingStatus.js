@@ -59,6 +59,9 @@ export async function generateEndpoints(data, protocolNameToBaseMapping) {
 };
 
 export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
+  if (!process.env.GRAPH_API_KEY) {
+    return {};
+  }
   const decenQueries = Object.values(hostedEndpointToDecenNetwork).map((decenNetwork) => {
     const endpoint = "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenNetwork
     const string = `query MyQuery {
@@ -186,18 +189,20 @@ export async function indexStatusFlow(deployments) {
 
 export async function getIndexingStatusData(indexingStatusQueriesArray) {
   try {
-    const indexingStatusQueries = indexingStatusQueriesArray.map((query) =>
-      axios.post("https://api.thegraph.com/index-node/graphql", { query: query })
-    );
+    const indexingStatusQueries = indexingStatusQueriesArray.map((query) => {
+      return axios.post("https://api.thegraph.com/index-node/graphql", { query: query });
+    });
     let indexData = [];
     await Promise.all(indexingStatusQueries)
       .then((response) => {
         return (indexData = response.map(
-          (resultData) => (resultData.data.data)
+          (resultData) => {
+            return (resultData.data.data);
+          }
         ))
       })
       .catch((err) => {
-        errorNotification("ERROR LOCATION 3 " + err.message)
+        errorNotification("ERROR LOCATION 3 " + err)
       });
 
     let dataObjectToReturn = {};
