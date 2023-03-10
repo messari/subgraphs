@@ -438,7 +438,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 if (prodStatusDepoMapping[networkString] === true) {
                     aggThreadIndexErrorEmbeds[0].value += labelValueLine;
                     aggThreadIndexErrorEmbeds[1].value += failureBlockLine;
-                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}: ${indexErrorObj.failureBlock} - ${link}`, ghMessage: `${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}: Block #${indexErrorObj.failureBlock} - ${indexErrorObj.message}\n` });
+                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}: ${indexErrorObj.failureBlock} - ${link}`, ghMessage: `${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}: Block #${indexErrorObj.failureBlock} - ${link} - ${indexErrorObj.message}\n` });
                 }
             })
             indexingErrorEmbed.fields[0].value += labelValueThread;
