@@ -1994,7 +1994,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.0",
-          "subgraph": "2.0.0",
+          "subgraph": "2.0.1",
           "methodology": "1.0.0"
         },
         "files": {
