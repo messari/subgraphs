@@ -5,6 +5,7 @@ import { versionsList as versionsListYield } from "./queries/yield/schema";
 import { versionsList as versionsListGeneric } from "./queries/generic/schema";
 import { versionsList as versionsListBridge } from "./queries/bridge/schema";
 import { versionsList as versionsListPerp } from "./queries/perpetual/schema";
+import { versionsList as versionsListOption } from "./queries/options/schema";
 
 export namespace ProtocolType {
   export const EXCHANGE = "EXCHANGE";
@@ -12,6 +13,7 @@ export namespace ProtocolType {
   export const YIELD = "YIELD";
   export const BRIDGE = "BRIDGE";
   export const PERPETUAL = "PERPETUAL";
+  export const OPTION = "OPTION";
   export const GENERIC = "GENERIC";
 }
 export namespace Versions {
@@ -44,7 +46,7 @@ export const latestSchemaVersions = (schemaType: string, versionStr: string) => 
     if (["1.2.0"].includes(versionStr)) {
       return true;
     }
-  } else if (schema === "generic") {
+  } else if (schema === "generic" || "option") {
     if (["1.1.0"].includes(versionStr)) {
       return true;
     }
@@ -59,6 +61,7 @@ export const listSchemaVersionsByType: { [x: string]: string[] } = {
   GENERIC: versionsListGeneric,
   BRIDGE: versionsListBridge,
   PERPETUAL: versionsListPerp,
+  OPTION: versionsListOption,
   exchanges: versionsListDex,
   vaults: versionsListYield,
   "dex-amm": versionsListDex,
@@ -67,6 +70,7 @@ export const listSchemaVersionsByType: { [x: string]: string[] } = {
   generic: versionsListGeneric,
   bridge: versionsListBridge,
   perpetual: versionsListPerp,
+  option: versionsListOption
 };
 
 export const SubgraphBaseUrl = "https://api.thegraph.com/subgraphs/name/";
@@ -77,6 +81,7 @@ export const PoolName: Record<string, string> = {
   GENERIC: "pool",
   BRIDGE: "pool",
   PERPETUAL: "liquidityPool",
+  OPTION: "liquidityPool",
   exchanges: "liquidityPool",
   vaults: "vault",
   "dex-amm": "liquidityPool",
@@ -85,6 +90,7 @@ export const PoolName: Record<string, string> = {
   generic: "pool",
   bridge: "pool",
   perpetual: "liquidityPool",
+  option: "liquidityPool",
 };
 export const PoolNames: Record<string, string> = {
   EXCHANGE: "liquidityPools",
@@ -93,6 +99,7 @@ export const PoolNames: Record<string, string> = {
   GENERIC: "pools",
   BRIDGE: "pools",
   PERPETUAL: "liquidityPools",
+  OPTION: "liquidityPools",
   exchanges: "liquidityPools",
   vaults: "vaults",
   "dex-amm": "liquidityPools",
@@ -101,6 +108,7 @@ export const PoolNames: Record<string, string> = {
   generic: "pools",
   bridge: "pools",
   perpetual: "liquidityPools",
+  option: "liquidityPools",
 };
 export const ProtocolTypeEntityName: Record<string, string> = {
   EXCHANGE: "dexAmmProtocol",
@@ -109,6 +117,7 @@ export const ProtocolTypeEntityName: Record<string, string> = {
   GENERIC: "protocol",
   BRIDGE: "bridgeProtocol",
   PERPETUAL: "derivPerpProtocol",
+  OPTION: "derivOptProtocol",
 };
 export const ProtocolTypeEntityNames: Record<string, string> = {
   EXCHANGE: "dexAmmProtocols",
@@ -117,6 +126,7 @@ export const ProtocolTypeEntityNames: Record<string, string> = {
   GENERIC: "protocols",
   BRIDGE: "bridgeProtocols",
   PERPETUAL: "derivPerpProtocols",
+  OPTION: "derivOptProtocols",
 };
 export interface Schema {
   entities: string[];

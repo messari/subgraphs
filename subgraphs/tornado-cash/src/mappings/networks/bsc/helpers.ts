@@ -11,8 +11,8 @@ import {
 } from "../../../../generated/TornadoCash01/TornadoCashETH";
 
 export function createDeposit(poolAddress: string, event: Deposit): void {
-  let pool = getOrCreatePool(poolAddress, event);
-  let inputToken = getOrCreateToken(
+  const pool = getOrCreatePool(poolAddress, event);
+  const inputToken = getOrCreateToken(
     Address.fromString(pool.inputTokens[0]),
     event.block.number
   );
@@ -20,16 +20,19 @@ export function createDeposit(poolAddress: string, event: Deposit): void {
   pool.inputTokenBalances = [
     pool.inputTokenBalances[0].plus(pool._denomination),
   ];
-  pool.totalValueLockedUSD = bigIntToBigDecimal(
+
+  const inputTokenBalanceUSD = bigIntToBigDecimal(
     pool.inputTokenBalances[0],
     inputToken.decimals
   ).times(inputToken.lastPriceUSD!);
+  pool.inputTokenBalancesUSD = [inputTokenBalanceUSD];
+  pool.totalValueLockedUSD = inputTokenBalanceUSD;
   pool.save();
 }
 
 export function createWithdrawal(poolAddress: string, event: Withdrawal): void {
-  let pool = getOrCreatePool(poolAddress, event);
-  let inputToken = getOrCreateToken(
+  const pool = getOrCreatePool(poolAddress, event);
+  const inputToken = getOrCreateToken(
     Address.fromString(pool.inputTokens[0]),
     event.block.number
   );
@@ -37,19 +40,22 @@ export function createWithdrawal(poolAddress: string, event: Withdrawal): void {
   pool.inputTokenBalances = [
     pool.inputTokenBalances[0].minus(pool._denomination),
   ];
-  pool.totalValueLockedUSD = bigIntToBigDecimal(
+
+  const inputTOkenBalanceUSD = bigIntToBigDecimal(
     pool.inputTokenBalances[0],
     inputToken.decimals
   ).times(inputToken.lastPriceUSD!);
+  pool.inputTokenBalancesUSD = [inputTOkenBalanceUSD];
+  pool.totalValueLockedUSD = inputTOkenBalanceUSD;
   pool.save();
 
-  let relayerFeeUsd = bigIntToBigDecimal(
+  const relayerFeeUsd = bigIntToBigDecimal(
     event.params.fee,
     inputToken.decimals
   ).times(inputToken.lastPriceUSD!);
 
   if (relayerFeeUsd != BIGDECIMAL_ZERO) {
-    let protocolFeeUsd = BIGDECIMAL_ZERO;
+    const protocolFeeUsd = BIGDECIMAL_ZERO;
 
     updateRevenue(event, poolAddress, relayerFeeUsd, protocolFeeUsd);
   }

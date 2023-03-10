@@ -4,7 +4,7 @@ import 'dotenv/config'
 import { protocolDerivedFields, protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
 import { pullMessagesByThread, resolveQueriesToAttempt, resolveThreadCreation } from "./resolutions.js";
-import { generateEndpoints, indexStatusFlow } from "./indexingStatus.js";
+import { generateEndpoints, indexStatusFlow, queryDecentralizedIndex } from "./indexingStatus.js";
 
 const hourMs = 3600000;
 
@@ -32,9 +32,11 @@ async function executionFlow() {
   const loopDeploymentJSON = await generateEndpoints(data, protocolNameToBaseMapping);
   const subgraphEndpoints = loopDeploymentJSON.subgraphEndpoints;
   protocolNameToBaseMapping = loopDeploymentJSON.protocolNameToBaseMapping;
+  const hostedEndpointToDecenNetwork = loopDeploymentJSON.hostedEndpointToDecenNetwork;
+  const decenKeyToEndpoint = await queryDecentralizedIndex(hostedEndpointToDecenNetwork);
 
-  // Generate deployments object which holds the issues/metadata for each deployment
   let deployments = {};
+  let decentralizedDeployments = {};
   const protocolNames = [];
 
   Object.entries(subgraphEndpoints).forEach(([protocolType, protocolsOnType]) => {
@@ -66,6 +68,26 @@ async function executionFlow() {
         if (!protocolNames.includes(protocolName)) {
           protocolNames.push(protocolName);
         }
+        if (decenKeyToEndpoint[hostedEndpointToDecenNetwork[deploymentString]]) {
+          const decenObj = decenKeyToEndpoint[hostedEndpointToDecenNetwork[deploymentString]];
+          decentralizedDeployments[deploymentsKey + '(DECEN)'] = {
+            status: status,
+            protocolName: protocolName,
+            hash: decenObj.hash,
+            indexingErrorMessage: decenObj.indexingErrorMessage,
+            indexingError: decenObj.indexingErrorBlock,
+            indexedPercentage: decenObj.indexingPercentage || 0,
+            url: decenObj.endpoint,
+            protocolType: protocolType,
+            versions: versions,
+            network: network,
+            isDecen: true
+          }
+          decentralizedDeployments[deploymentsKey + '(DECEN)'].protocolErrors = JSON.parse(JSON.stringify(protocolErrors));
+          if (protocolType && deploymentsKey + '(DECEN)' && Object.keys(errorsObj).includes(protocolType)) {
+            decentralizedDeployments[deploymentsKey + '(DECEN)'].poolErrors = JSON.parse(JSON.stringify(errorsObj[protocolType]));
+          }
+        }
       });
     });
   });
@@ -73,14 +95,13 @@ async function executionFlow() {
   await getAllThreadsToClear(Date.now() - (86400000 * 7), process.env.CHANNEL_ID);
 
   const indexStatusFlowObject = await indexStatusFlow(deployments);
-  deployments = indexStatusFlowObject.deployments;
+  deployments = { ...indexStatusFlowObject.deployments, ...decentralizedDeployments };
   const invalidDeployments = indexStatusFlowObject.invalidDeployments;
 
   // pass invalid deployments arr to protocolLevel, before execution check if depo key is included in array
   deployments = await protocolLevel(deployments, invalidDeployments);
   deployments = await protocolDerivedFields(deployments, invalidDeployments);
   const currentDiscordMessages = await getDiscordMessages([]);
-
   const protocolThreadsToStart = [];
   let protocolNameToChannelMapping = {};
   protocolNames.forEach(protocolName => {
@@ -126,8 +147,12 @@ async function executionFlow() {
       indexDeploymentIssues = [];
     }
     const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet, protocolIssuesOnThread, indexDeploymentIssues);
-    return { message: embeddedMessages, protocolName: protocolName, channel: channelId };
-  });
+    if (embeddedMessages) {
+      return { message: embeddedMessages, protocolName: protocolName, channel: channelId };
+    } else {
+      return null;
+    }
+  }).filter(x => x);
   if (messagesToPost.length > 0) {
     await clearThread(Date.now() - (86400000), process.env.PROD_CHANNEL);
     const aggThread = currentDiscordMessages.find(x => x.content.includes('Production Ready Subgraph Indexing Failure'));
