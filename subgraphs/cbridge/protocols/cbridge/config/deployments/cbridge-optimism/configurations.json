@@ -36,6 +36,7 @@
     "address": "0x0D71D18126E03646eb09FEc929e2ae87b7CAE69d",
     "startBlock": 7730742
   },
+  "supportCallHandlers": false,
   "graftEnabled": false,
   "subgraphId": "",
   "graftStartBlock": 14848861

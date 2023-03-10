@@ -12,6 +12,7 @@ export class CustomEventType {
   block: ethereum.Block;
   transaction: ethereum.Transaction;
   logIndex: BigInt;
+  address: Address;
   event: ethereum.Event | null;
 
   constructor() {
@@ -44,6 +45,7 @@ export class CustomEventType {
       BIGINT_ZERO
     );
     this.logIndex = BIGINT_ZERO;
+    this.address = Address.zero();
     this.event = null;
   }
 
@@ -51,12 +53,14 @@ export class CustomEventType {
     block: ethereum.Block,
     transaction: ethereum.Transaction,
     logIndex: BigInt,
+    address: Address,
     event: ethereum.Event | null = null
   ): CustomEventType {
     const customEvent = new CustomEventType();
     customEvent.block = block;
     customEvent.transaction = transaction;
     customEvent.logIndex = logIndex;
+    customEvent.address = address;
     customEvent.event = event;
 
     return customEvent;

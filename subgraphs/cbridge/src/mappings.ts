@@ -12,6 +12,7 @@ import {
   Relay,
   Send,
   WithdrawCall,
+  WithdrawDone,
 } from "../generated/PoolBasedBridge/PoolBasedBridge";
 import {
   Deposited as OTVDeposited,
@@ -34,7 +35,9 @@ import {
   Message2,
   MessageWithTransfer,
   ExecuteMessageCall,
-  ExecuteMessage1Call as ExecuteMessageCall2, // for non-EVM chain
+  ExecuteMessage1Call as ExecuteMessageCall2, // for non-EVM chain,
+  Executed,
+  FeeWithdrawn,
 } from "../generated/MessageBus/MessageBus";
 import { FarmingRewardClaimed } from "../generated/FarmingRewards/FarmingRewards";
 import { CustomEventType, SDK } from "./sdk/protocols/bridge";
@@ -63,11 +66,12 @@ import {
   SECONDS_PER_DAY,
   PoolName,
   BIGINT_TWO,
+  Network,
 } from "./sdk/util/constants";
 
 // empty handler for prices library
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-export function handlePairCreated(): void {}
+export function handlePairCreated(event: ethereum.Event): void {}
 
 // Implement TokenPricer to pass it to the SDK constructor
 class Pricer implements TokenPricer {
@@ -128,29 +132,36 @@ class TokenInit implements TokenInitializer {
   }
 }
 
-function _getSDK(
-  event: ethereum.Event | null = null,
+function _createCustomEvent(
+  event: ethereum.Event | null,
   call: ethereum.Call | null = null
-): SDK | null {
+): CustomEventType | null {
   let customEvent: CustomEventType;
   if (event) {
     customEvent = CustomEventType.initialize(
       event.block,
       event.transaction,
       event.transactionLogIndex,
+      event.address,
       event
     );
   } else if (call) {
     customEvent = CustomEventType.initialize(
       call.block,
       call.transaction,
-      call.transaction.index
+      call.transaction.index,
+      call.to
     );
   } else {
-    log.error("[_getSDK]either event or call needs to be specified", []);
+    log.error(
+      "[_createCustomEvent]either event or call needs to be specified",
+      []
+    );
     return null;
   }
-
+  return customEvent;
+}
+function _getSDK(customEvent: CustomEventType): SDK {
   const protocolId = getNetworkSpecificConstant().getProtocolId().toHexString();
   const conf = new BridgeConfig(
     protocolId,
@@ -219,7 +230,12 @@ export function handleSend(event: Send): void {
 }
 
 export function handleLiquidityAdded(event: LiquidityAdded): void {
-  const sdk = _getSDK(event)!;
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.critical("[handleLiquidityAdded]customeEvent cannot be null", []);
+    return;
+  }
+  const sdk = _getSDK(customEvent);
   const pool = sdk.Pools.loadPool(
     event.address.concat(event.params.token),
     onCreatePool,
@@ -231,32 +247,63 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   acc.liquidityDeposit(pool, event.params.amount, true);
 }
 
-export function handleWithdraw(call: WithdrawCall): void {
+export function handleWithdrawEvent(event: WithdrawDone): void {
+  const wdmsg = new WithdrawMsg(
+    networkToChainID(Network.UNKNOWN_NETWORK),
+    event.params.seqnum,
+    event.params.receiver,
+    event.params.token,
+    event.params.amount,
+    event.params.refid
+  );
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[handleWithdrawEvent]customeEvent cannot be null", []);
+    return;
+  }
+  _handleWithdraw(wdmsg, customEvent);
+}
+
+export function handleWithdrawCall(call: WithdrawCall): void {
   const buf = call.inputs._wdmsg;
   const wdmsg = decodeWithdrawMsg(buf);
+  const customEvent = _createCustomEvent(null, call);
+  if (!customEvent) {
+    log.error("[handleWithdrawCall]customeEvent cannot be null", []);
+    return;
+  }
+  _handleWithdraw(wdmsg, customEvent);
+}
 
-  const sdk = _getSDK(null, call)!;
+function _handleWithdraw(
+  wdmsg: WithdrawMsg,
+  customEvent: CustomEventType
+): void {
+  const poolId = customEvent.address.concat(wdmsg.token);
+  const sdk = _getSDK(customEvent);
   const pool = sdk.Pools.loadPool(
-    call.to.concat(wdmsg.token),
+    poolId,
     onCreatePool,
     BridgePoolType.LIQUIDITY,
     wdmsg.token.toHexString()
   );
 
   const bridgePoolType = BridgePoolType.LIQUIDITY;
-  const txId = call.transaction.hash.concatI32(call.transaction.index.toI32());
+  const txId = customEvent.transaction.hash.concatI32(
+    customEvent.logIndex.toI32()
+  );
   const refund = _Refund.load(wdmsg.refId);
 
-  const tx = call.transaction.hash
+  const tx = customEvent.transaction.hash
     .toHexString()
     .concat("-")
-    .concat(call.transaction.index.toString());
+    .concat(customEvent.logIndex.toString());
   log.info("[handleWithdraw]token={} refId={} amount={} tx={} block={}", [
     wdmsg.token.toHexString(),
     wdmsg.refId.toHexString(),
     wdmsg.amount.toString(),
     tx,
-    call.block.number.toString(),
+    customEvent.block.number.toString(),
   ]);
 
   if (wdmsg.refId.equals(Bytes.empty())) {
@@ -293,10 +340,9 @@ export function handleWithdraw(call: WithdrawCall): void {
       pool.getBytesID(),
       bridgePoolType,
       CrosschainTokenType.CANONICAL,
+      customEvent,
       wdmsg.refId,
-      txId,
-      null,
-      call
+      txId
     );
   } else {
     const networkConstants = getNetworkSpecificConstant(wdmsg.chainId);
@@ -306,7 +352,7 @@ export function handleWithdraw(call: WithdrawCall): void {
 
     _handleTransferIn(
       wdmsg.token,
-      wdmsg.receiver, //no sender info is available, assuming to be same as receiver
+      wdmsg.receiver,
       wdmsg.receiver,
       wdmsg.amount,
       wdmsg.chainId,
@@ -314,16 +360,20 @@ export function handleWithdraw(call: WithdrawCall): void {
       pool.getBytesID(),
       bridgePoolType,
       CrosschainTokenType.CANONICAL,
+      customEvent,
       wdmsg.refId,
-      txId,
-      null,
-      call
+      txId
     );
   }
 }
 
 export function handleRelay(event: Relay): void {
-  const sdk = _getSDK(event)!;
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[handleRelay]customeEvent cannot be null", []);
+    return;
+  }
+  const sdk = _getSDK(customEvent);
   const pool = sdk.Pools.loadPool(
     event.address.concat(event.params.token),
     onCreatePool,
@@ -350,10 +400,9 @@ export function handleRelay(event: Relay): void {
     pool.getBytesID(),
     bridgePoolType,
     CrosschainTokenType.CANONICAL,
+    customEvent,
     event.params.srcTransferId,
-    txId,
-    event,
-    null
+    txId
   );
 }
 
@@ -440,6 +489,11 @@ export function handleOTVv2Withdrawn(event: OTVv2Withdrawn): void {
 
 // Pegged Token Bridge V1
 export function handlePTBMint(event: PTBMint): void {
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[handleRelay]customeEvent cannot be null", []);
+    return;
+  }
   const poolId = event.address.concat(event.params.token);
   const networkConstants = getNetworkSpecificConstant(event.params.refChainId);
   const srcPoolAddress = networkConstants.getPoolAddress(
@@ -457,9 +511,9 @@ export function handlePTBMint(event: PTBMint): void {
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
+    customEvent,
     event.params.refId,
-    txId,
-    event
+    txId
   );
 
   const ptb = new _PTBv1(event.params.token);
@@ -501,6 +555,11 @@ export function handlePTBBurn(event: PTBBurn): void {
 }
 
 export function handlePTBv2Mint(event: PTBv2Mint): void {
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[handlePTBv2Mint]customeEvent cannot be null", []);
+    return;
+  }
   const poolId = event.address.concat(event.params.token);
   const networkConstants = getNetworkSpecificConstant(event.params.refChainId);
   const srcPoolAddress = networkConstants.getPoolAddress(
@@ -518,14 +577,19 @@ export function handlePTBv2Mint(event: PTBv2Mint): void {
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
+    customEvent,
     event.params.refId,
-    txId,
-    event
+    txId
   );
 }
 
 export function handleFarmingRewardClaimed(event: FarmingRewardClaimed): void {
-  const sdk = _getSDK(event)!;
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[handleFarmingRewardClaimed]customeEvent cannot be null", []);
+    return;
+  }
+  const sdk = _getSDK(customEvent);
   const protocol = sdk.Protocol.protocol;
   // average reward emission over the duration in days
   const averageRewardOverDays = 7;
@@ -596,55 +660,113 @@ export function handlePTBv2Burn(event: PTBv2Burn): void {
 }
 
 export function handleMessage2(event: Message2): void {
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[handleMessage2]customeEvent cannot be null", []);
+    return;
+  }
   _handleMessageOut(
     event.params.dstChainId,
     event.params.sender,
     Address.fromBytes(event.params.receiver), //this may truncate addresses for non-EVM chain
     event.params.message,
     event.params.fee,
-    event
+    customEvent
   );
 }
 
 export function handleMessage(event: Message): void {
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[handleMessage]customeEvent cannot be null", []);
+    return;
+  }
   _handleMessageOut(
     event.params.dstChainId,
     event.params.sender,
     event.params.receiver,
     event.params.message,
     event.params.fee,
-    event
+    customEvent
   );
 }
 
 export function handleMessageWithTransfer(event: MessageWithTransfer): void {
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[handleMessageWithTransfer]customeEvent cannot be null", []);
+    return;
+  }
   _handleMessageOut(
     event.params.dstChainId,
     event.params.sender,
     event.params.receiver,
     event.params.message,
     event.params.fee,
-    event
+    customEvent
+  );
+}
+
+export function handlerMessageExecuted(event: Executed): void {
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.critical("[handlerMessageExecuted]customeEvent cannot be null", []);
+    return;
+  }
+  _handleMessageIn(
+    event.params.srcChainId,
+    Address.zero(), // sender not available from event.params
+    event.params.receiver,
+    Bytes.empty(), // msg data not available from event.params
+    customEvent
   );
 }
 
 export function handleExecuteMessage(call: ExecuteMessageCall): void {
+  const customEvent = _createCustomEvent(null, call);
+  if (!customEvent) {
+    log.critical("[handleExecuteMessage]customeEvent cannot be null", []);
+    return;
+  }
+
   // See https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/message/libraries/MsgDataTypes.sol#L55
   const sender = call.inputs._route.at(0).toAddress();
   const receiver = call.inputs._route.at(1).toAddress();
   const srcChainId = call.inputs._route.at(2).toBigInt();
   const data = call.inputs._message;
-  _handleMessageIn(srcChainId, sender, receiver, data, null, call);
+  _handleMessageIn(srcChainId, sender, receiver, data, customEvent);
 }
 
 // for non-EVM chain where the address may be more than 20 bytes
 export function handleExecuteMessage2(call: ExecuteMessageCall2): void {
+  const customEvent = _createCustomEvent(null, call);
+  if (!customEvent) {
+    log.critical("[handleExecuteMessage2]customeEvent cannot be null", []);
+    return;
+  }
+
   // See https://github.com/celer-network/sgn-v2-contracts/blob/aa569f848165840bd4eec8134f753e105e36ae38/contracts/message/libraries/MsgDataTypes.sol#L55
   const sender = call.inputs._route.at(0).toAddress();
   const receiver = call.inputs._route.at(1).toAddress();
   const srcChainId = call.inputs._route.at(3).toBigInt();
   const data = call.inputs._message;
-  _handleMessageIn(srcChainId, sender, receiver, data, null, call);
+  _handleMessageIn(srcChainId, sender, receiver, data, customEvent);
+}
+
+export function handleMessageBusFeeWithdraw(event: FeeWithdrawn): void {
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[handleMessageBusFeeWithdraw]customeEvent cannot be null", []);
+    return;
+  }
+  const sdk = _getSDK(customEvent);
+  // message fees are attributed to the liquidity-based pool for native (gas fee) token
+  const networkConstants = getNetworkSpecificConstant();
+  const poolId = networkConstants.poolBasedBridge.concat(
+    Address.fromByteArray(networkConstants.gasFeeToken.id)
+  );
+  const pool = sdk.Pools.loadPool(poolId);
+  pool.addRevenueNative(event.params.amount, BIGINT_ZERO);
 }
 
 function _handleTransferOut(
@@ -660,7 +782,12 @@ function _handleTransferOut(
   event: ethereum.Event,
   refId: Bytes | null = null
 ): void {
-  const sdk = _getSDK(event)!;
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[_handleTransferOut]customeEvent cannot be null", []);
+    return;
+  }
+  const sdk = _getSDK(customEvent);
   const inputToken = sdk.Tokens.getOrCreateToken(token);
 
   const pool = sdk.Pools.loadPool(
@@ -702,12 +829,11 @@ function _handleTransferIn(
   poolId: Bytes,
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
+  customEvent: CustomEventType,
   refId: Bytes | null = null,
-  transactionID: Bytes | null = null,
-  event: ethereum.Event | null = null,
-  call: ethereum.Call | null = null
+  transactionID: Bytes | null = null
 ): void {
-  const sdk = _getSDK(event, call)!;
+  const sdk = _getSDK(customEvent);
 
   const pool = sdk.Pools.loadPool(
     poolId,
@@ -747,7 +873,12 @@ function _handleOTVWithdrawn(
   refId: Bytes,
   event: ethereum.Event
 ): void {
-  const sdk = _getSDK(event)!;
+  const customEvent = _createCustomEvent(event);
+  if (!customEvent) {
+    log.error("[_handleOTVWithdrawn]customeEvent cannot be null", []);
+    return;
+  }
+  const sdk = _getSDK(customEvent);
   const poolId = event.address.concat(token);
   const pool = sdk.Pools.loadPool(poolId);
   const txId = event.transaction.hash.concatI32(event.logIndex.toI32());
@@ -777,9 +908,9 @@ function _handleOTVWithdrawn(
       pool.getBytesID(),
       BridgePoolType.BURN_MINT,
       CrosschainTokenType.CANONICAL,
+      customEvent,
       refId,
-      txId,
-      event
+      txId
     );
     return;
   }
@@ -800,9 +931,9 @@ function _handleOTVWithdrawn(
     poolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
+    customEvent,
     refId,
-    txId,
-    event
+    txId
   );
 }
 
@@ -812,10 +943,9 @@ function _handleMessageOut(
   receiver: Address,
   data: Bytes,
   fee: BigInt,
-  event: ethereum.Event | null = null,
-  call: ethereum.Call | null = null
+  customEvent: CustomEventType
 ): void {
-  const sdk = _getSDK(event, call)!;
+  const sdk = _getSDK(customEvent);
   const acc = sdk.Accounts.loadAccount(sender);
   acc.messageOut(dstChainId, receiver, data);
 
@@ -850,11 +980,10 @@ function _handleMessageIn(
   sender: Address,
   receiver: Address,
   data: Bytes,
-  event: ethereum.Event | null = null,
-  call: ethereum.Call | null = null
+  customeEvent: CustomEventType
 ): void {
   // see doc in _handleMessageOut
-  const sdk = _getSDK(event, call)!;
+  const sdk = _getSDK(customeEvent);
   const acc = sdk.Accounts.loadAccount(receiver);
   acc.messageIn(srcChainId, sender, data);
 }

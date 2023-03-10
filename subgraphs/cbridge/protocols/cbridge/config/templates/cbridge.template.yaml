@@ -98,10 +98,16 @@ dataSources:
           handler: handleLiquidityAdded
         - event: Relay(bytes32,address,address,address,uint256,uint64,bytes32)
           handler: handleRelay
-        # we cannot use WithdrawDone because it doesn't have info of source chain
+        {{^supportCallHandlers}}
+        - event: WithdrawDone(bytes32,uint64,address,address,uint256,bytes32)
+          handler: handleWithdrawEvent
+        {{/supportCallHandlers}}
+      # Use withdraw callhandler if possible to get info of source chain
+      {{#supportCallHandlers}}
       callHandlers:
         - function: withdraw(bytes,bytes[],address[],uint256[])
-          handler: handleWithdraw
+          handler: handleWithdrawCall
+      {{/supportCallHandlers}}
       file: ./src/mappings.ts
 
   - kind: ethereum
@@ -384,17 +390,26 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
+        - event: FeeWithdrawn(address,uint256)
+          handler: handleMessageBusFeeWithdrawn
+        # messageOut
         - event: Message(indexed address,address,uint256,bytes,uint256)
           handler: handleMessage
         - event: Message2(indexed address,bytes,uint256,bytes,uint256)
           handler: handleMessage2
         - event: MessageWithTransfer(indexed address,address,uint256,address,bytes32,bytes,uint256)
           handler: handleMessageWithTransfer
-        #- event: FeeWithdrawn(address,uint256)
-        #  handler: handleFeeWithdrawn
+        {{^supportCallHandlers}}
+        # messageIn
+        - event: Executed(uint8,bytes32,uint8,indexed address,uint64,bytes32)
+          handler: handlerMessageExecuted
+        {{/supportCallHandlers}}
+      {{#supportCallHandlers}}
+      # Use executeMessage callHandlers if possible for sender
       callHandlers:
         - function: executeMessage(bytes,(address,address,uint64,bytes32),bytes[],address[],uint256[])
           handler: handleExecuteMessage
         - function: executeMessage(bytes,(bytes,address,uint64,bytes32),bytes[],address[],uint256[])
           handler: handleExecuteMessage2
+      {{/supportCallHandlers}}      
       file: ./src/mappings.ts
