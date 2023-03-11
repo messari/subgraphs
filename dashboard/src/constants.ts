@@ -38,11 +38,11 @@ export const latestSchemaVersions = (schemaType: string, versionStr: string) => 
     if (["3.0.0"].includes(versionStr)) {
       return true;
     }
-  } else if (schema === "vaults" || schema === "generic" || schema === "perpetual") {
+  } else if (schema === "vaults" || schema === "generic") {
     if (["1.3.0"].includes(versionStr)) {
       return true;
     }
-  } else if (schema === "bridge") {
+  } else if (schema === "bridge" || schema === "perpetual") {
     if (["1.2.0"].includes(versionStr)) {
       return true;
     }
