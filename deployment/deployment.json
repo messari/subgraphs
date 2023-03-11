@@ -7823,7 +7823,7 @@
     "deployments": {
       "gmx-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.2.0",
           "subgraph": "1.0.0",
@@ -7845,7 +7845,7 @@
       },
       "gmx-avalanche": {
         "network": "avalanche",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.2.0",
           "subgraph": "1.0.0",
