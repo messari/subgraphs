@@ -13,13 +13,11 @@ export function handleDisputerUpdated(event: DisputerUpdatedEvent): void {}
 
 export function handleExpiryPriceDisputed(
   event: ExpiryPriceDisputedEvent
-): void {
-  // contracts expired, overwrite price
-}
+): void {}
 
-export function handleExpiryPriceUpdated(event: ExpiryPriceUpdatedEvent): void {
-  // contracts expired
-}
+export function handleExpiryPriceUpdated(
+  event: ExpiryPriceUpdatedEvent
+): void {}
 
 export function handleOwnershipTransferred(
   event: OwnershipTransferredEvent

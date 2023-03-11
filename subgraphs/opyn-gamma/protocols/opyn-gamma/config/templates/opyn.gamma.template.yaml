@@ -1,6 +1,13 @@
 specVersion: 0.0.5
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }}
+  block: {{ graftStartBlock }} 
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum
     name: Controller
@@ -23,6 +30,8 @@ dataSources:
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
+        - name: Oracle
+          file: ./abis/Oracle.json
       eventHandlers:
         - event: AccountOperatorUpdated(indexed address,indexed address,bool)
           handler: handleAccountOperatorUpdated
@@ -85,6 +94,12 @@ dataSources:
       abis:
         - name: OTokenFactory
           file: ./abis/OTokenFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
       eventHandlers:
         - event: OtokenCreated(address,address,indexed address,indexed address,indexed address,uint256,uint256,bool)
           handler: handleOtokenCreated
@@ -137,6 +152,8 @@ dataSources:
       abis:
         - name: MarginPool
           file: ./abis/MarginPool.json
+        - name: Oracle
+          file: ./abis/Oracle.json
       eventHandlers:
         - event: TransferToPool(indexed address,indexed address,uint256)
           handler: handleTransferToPool
@@ -157,6 +174,8 @@ templates:
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: Oracle
+          file: ./abis/Oracle.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer

@@ -3,6 +3,7 @@ import { ERC20SymbolBytes } from "../../generated/Controller/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/Controller/ERC20NameBytes";
 import { Address, Bytes } from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
+import { BIGINT_ZERO } from "./constants";
 
 export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
@@ -73,7 +74,8 @@ export function isNullEthValue(value: string): boolean {
   );
 }
 
-export function getOrCreateToken(tokenAddress: Address): Token {
+export function getOrCreateToken(address: Bytes): Token {
+  const tokenAddress = Address.fromBytes(address);
   let token = Token.load(tokenAddress);
   // fetch info if null
   if (!token) {
@@ -81,6 +83,7 @@ export function getOrCreateToken(tokenAddress: Address): Token {
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.name = fetchTokenName(tokenAddress);
     token.decimals = fetchTokenDecimals(tokenAddress);
+    token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
   return token;

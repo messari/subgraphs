@@ -6,7 +6,11 @@ export class OpynEthereumConfigurations implements Configurations {
   getNetwork(): string {
     return Network.MAINNET;
   }
-  getOracleAddress(): Address {
+  getOracleAddress(blockNumber: i32): Address {
+    if (blockNumber < 12729956) {
+      // V1 oracle
+      return Address.fromString("0xc497f40D1B7db6FA5017373f1a0Ec6d53126Da23");
+    }
     return Address.fromString("0x789cd7ab3742e23ce0952f6bc3eb3a73a0e08833");
   }
   getControllerAddress(): Address {

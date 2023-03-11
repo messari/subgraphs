@@ -1,6 +1,13 @@
-import { Address } from "@graphprotocol/graph-ts";
-import { Account } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, INT_ZERO } from "../common/constants";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Account, Option } from "../../generated/schema";
+import { BIGDECIMAL_ZERO, INT_ZERO, OptionType } from "../common/constants";
+import {
+  decrementPoolPositionCount,
+  incrementPoolExercisedCount,
+  incrementPoolMintedCount,
+  incrementPoolPositionCount,
+  incrementPoolTakenCount,
+} from "./pool";
 import { incrementProtocolUniqueUsers } from "./protocol";
 
 export function getOrCreateAccount(address: Address): Account {
@@ -28,7 +35,69 @@ export function getOrCreateAccount(address: Address): Account {
   return account;
 }
 
-export function incrementAccountPositionCount(account: Account): void {
+export function incrementAccountPositionCount(
+  event: ethereum.Event,
+  account: Account,
+  option: Option
+): void {
   account.openPositionCount += 1;
+  account.contractsTakenCount += 1;
   account.save();
+  incrementPoolPositionCount(event, option);
+}
+
+export function decrementAccountPositionCount(
+  event: ethereum.Event,
+  account: Account,
+  option: Option
+): void {
+  account.openPositionCount -= 1;
+  account.closedPositionCount += 1;
+  account.contractsClosedCount += 1;
+  account.save();
+  decrementPoolPositionCount(event, option);
+}
+
+export function incrementAccountMintedCount(
+  event: ethereum.Event,
+  account: Account,
+  option: Option
+): void {
+  if (option.type == OptionType.CALL) {
+    account.callsMintedCount += 1;
+  } else {
+    account.putsMintedCount += 1;
+  }
+  account.contractsMintedCount += 1;
+  account.save();
+  incrementPoolMintedCount(event, option);
+}
+
+export function incrementAccountTakenCount(
+  event: ethereum.Event,
+  account: Account,
+  option: Option
+): void {
+  account.contractsTakenCount += 1;
+  account.save();
+  incrementPoolTakenCount(event, option);
+}
+
+export function incrementAccountExpiredCount(
+  event: ethereum.Event,
+  account: Account,
+  option: Option
+): void {
+  account.contractsExpiredCount += 1;
+  account.save();
+}
+
+export function incrementAccountExercisedCount(
+  event: ethereum.Event,
+  account: Account,
+  option: Option
+): void {
+  account.contractsExercisedCount += 1;
+  account.save();
+  incrementPoolExercisedCount(event, option);
 }

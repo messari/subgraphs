@@ -5,16 +5,21 @@ import { getOrCreateToken } from "../common/tokens";
 import { getUSDAmount } from "../price";
 import { prefixID } from "../common/utils/strings";
 import { getOrCreateAccount } from "./account";
-import { getOrCreatePool } from "./pool";
+import { handlePoolDeposit, getOrCreatePool, handlePoolWithdraw } from "./pool";
 import { getOrCreateOpynProtocol } from "./protocol";
+import {
+  incrementProtocolDepositCount,
+  incrementProtocolWithdrawCount,
+} from "./usage";
 
 export function createDeposit(
   event: ethereum.Event,
   asset: Address,
   amount: BigInt,
-  from: Address
+  from: Address,
+  owner: Address
 ): void {
-  const account = getOrCreateAccount(from);
+  const account = getOrCreateAccount(owner);
   const token = getOrCreateToken(asset);
   const pool = getOrCreatePool(token);
   const deposit = new Deposit(
@@ -37,18 +42,22 @@ export function createDeposit(
   deposit.outputToken = null;
   deposit.inputTokenAmounts = [amount];
   deposit.outputTokenAmount = null;
-  deposit.amountUSD = getUSDAmount(token, amount);
+  deposit.amountUSD = getUSDAmount(event, token, amount);
   deposit.pool = pool.id;
   deposit.save();
+
+  handlePoolDeposit(event, pool, deposit);
+  incrementProtocolDepositCount(event, account);
 }
 
 export function createWithdraw(
   event: ethereum.Event,
   asset: Address,
   amount: BigInt,
-  to: Address
+  to: Address,
+  owner: Address
 ): void {
-  const account = getOrCreateAccount(to);
+  const account = getOrCreateAccount(owner);
   const token = getOrCreateToken(asset);
   const pool = getOrCreatePool(token);
   const withdraw = new Withdraw(
@@ -71,7 +80,10 @@ export function createWithdraw(
   withdraw.outputToken = null;
   withdraw.inputTokenAmounts = [amount];
   withdraw.outputTokenAmount = null;
-  withdraw.amountUSD = getUSDAmount(token, amount);
+  withdraw.amountUSD = getUSDAmount(event, token, amount);
   withdraw.pool = pool.id;
   withdraw.save();
+
+  handlePoolWithdraw(event, pool, withdraw);
+  incrementProtocolWithdrawCount(event, account);
 }

@@ -4,7 +4,7 @@ import { Address } from "@graphprotocol/graph-ts";
 // If a new configuration is needed for a deployment, add a new value to the configurations interface.
 export interface Configurations {
   getNetwork(): string;
-  getOracleAddress(): Address;
+  getOracleAddress(blockNumber: i32): Address;
   getControllerAddress(): Address;
   getMarginPoolAddress(): Address;
 }
