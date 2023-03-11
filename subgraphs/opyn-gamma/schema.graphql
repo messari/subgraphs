@@ -1,5 +1,5 @@
 # Subgraph Schema: Derivatives Options
-# Version: 1.1.0
+# Version: 1.2.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -37,6 +37,14 @@ enum ProtocolType {
   # Will add more
 }
 
+enum OptionType {
+  " Position opened as call "
+  CALL
+
+  " Position opened as put "
+  PUT
+}
+
 type Token @entity {
   " Smart contract address of the token "
   id: Bytes!
@@ -65,11 +73,6 @@ enum RewardTokenType {
   BORROW
 }
 
-enum OptionType {
-  PUT
-  CALL
-}
-
 type RewardToken @entity(immutable: true) {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: Bytes!
@@ -92,22 +95,28 @@ enum LiquidityPoolFeeType {
   " Some protocols use tiered fees instead of fixed fee (e.g. DYDX). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
   TIERED_TRADING_FEE
 
-  " Some protocols use dynamic fees instead of fixed fee. Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
   DYNAMIC_TRADING_FEE
 
-  " Fixed fee that's paid to the LP, as a percentage of the traded amount."
+  " Fixed fee that's paid to the LP, as a percentage of the traded amount. "
   FIXED_LP_FEE
 
-  " Some protocols use dynamic LP fees. Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  " Some protocols use dynamic LP fees . Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
   DYNAMIC_LP_FEE
 
-  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
+  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. "
   FIXED_PROTOCOL_FEE
 
   " Some protocols use dynamic protocol fees. Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
   DYNAMIC_PROTOCOL_FEE
 
-  " One-time fee charged by the protocol during deposit, in percentages of the deposit token "
+  " Fixed fee that's paid to the stakers, as a percentage of the traded amount. "
+  FIXED_STAKE_FEE
+
+  " Some protocols use dynamic stakers fees. Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_STAKE_FEE
+
+  " One-time fee charged by the protocol during deposit, in percentages of the deposit token. "
   DEPOSIT_FEE
 
   " One-time fee charged by the protocol during withdrawal, in percentages of the withdrawal token "
@@ -196,7 +205,7 @@ interface Protocol {
   cumulativeUniqueTakers: Int!
 
   " Notional value of all open positions "
-  openInterestUSD: Int!
+  openInterestUSD: BigDecimal!
 
   " Total number of open positions "
   openPositionCount: Int!
@@ -322,9 +331,6 @@ type DerivOptProtocol implements Protocol @entity {
 
   " Number of cumulative unique Takers "
   cumulativeUniqueTakers: Int!
-
-  " Notional value of all open positions "
-  openInterestUSD: Int!
 
   " Total number of pools "
   totalPoolCount: Int!
@@ -463,7 +469,7 @@ type FinancialsDailySnapshot @entity(immutable: true) {
   cumulativeClosedVolumeUSD: BigDecimal!
 
   " Daily Notional value of all open positions "
-  dailyOpenInterestUSD: Int!
+  dailyOpenInterestUSD: BigDecimal!
 
   " Daily revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   dailySupplySideRevenueUSD: BigDecimal!
@@ -654,7 +660,7 @@ type LiquidityPool @entity {
   cumulativeClosedVolumeUSD: BigDecimal!
 
   " Notional value of all open positions "
-  openInterestUSD: Int!
+  openInterestUSD: BigDecimal!
 
   " Total number of puts minted "
   putsMintedCount: Int!
@@ -765,7 +771,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   dailyTotalRevenueUSD: BigDecimal!
 
   " Daily Notional value of all open positions "
-  dailyOpenInterestUSD: Int!
+  dailyOpenInterestUSD: BigDecimal!
 
   " Daily premium paid to enter a position. "
   dailyEntryPremiumUSD: BigDecimal!
@@ -852,7 +858,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   openPositionCount: Int!
 
   " Daily number of closed positions "
-  dailyclosedPositionCount: Int!
+  dailyClosedPositionCount: Int!
 
   " Total number of closed positions "
   closedPositionCount: Int!
@@ -964,7 +970,7 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   hourlyTotalRevenueUSD: BigDecimal!
 
   " Hourly Notional value of all open positions "
-  hourlyOpenInterestUSD: Int!
+  hourlyOpenInterestUSD: BigDecimal!
 
   " Hourly premium paid to enter a position. "
   hourlyEntryPremiumUSD: BigDecimal!
@@ -1261,7 +1267,7 @@ type ActiveAccount @entity {
 
 # A position describes a contract that a user has taken (either a call/put)
 # Note: A position snapshot is not necessary because the position is opened and closed with no other interaction
-#       All of the data we would get from a snapshot is already available in the position.
+# All of the data we would get from a snapshot is already available in the position.
 type Position @entity {
   " { Account address }-{ Pool address }-{ Position Side }-{ Counter } "
   id: Bytes!
@@ -1335,48 +1341,4 @@ type Position @entity {
 
   " The fee the user paid to exit the position in USD "
   closePremiumUSD: BigDecimal
-}
-
-type OToken @entity {
-  " Smart contract address of the token "
-  id: Bytes!
-
-  " Name of the token, mirrored from the smart contract "
-  name: String!
-
-  " Symbol of the token, mirrored from the smart contract "
-  symbol: String!
-
-  " The number of decimal places this token uses, default to 18 "
-  decimals: Int!
-
-  " Optional field to track the price of a token, mostly for caching purposes "
-  lastPriceUSD: BigDecimal
-
-  " Optional field to track the block number of the last token price "
-  lastPriceBlockNumber: BigInt
-
-  " Underlying asset "
-  underlyingAsset: Token!
-
-  " Strike asset "
-  strikeAsset: Token!
-
-  " Collateral asset "
-  collateralAsset: Token!
-
-  " Price the predicted the asset is going to be at the maturity of the option "
-  strikePrice: BigDecimal!
-
-  " The type of option this position is. e.g. put/call "
-  type: OptionType!
-
-  " The timestamp this contract expires (maturity) "
-  expirationTimestamp: BigInt!
-
-  " The account that created this OToken "
-  creator: Account!
-
-  " Creation timestamp "
-  createdTimestamp: BigInt!
 }
