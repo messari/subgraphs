@@ -45,7 +45,6 @@ import {
   ProtocolSideRevenueType,
   INT_ONE,
   PositionSide,
-  BIGINT_NEG_HUNDRED,
 } from "./constants";
 import { createEventID } from "../utils/strings";
 import { bigIntToBDUseDecimals } from "../utils/numbers";
@@ -510,10 +509,18 @@ export function updatePosition(
         PositionSide.LENDER,
         true
       );
-      assert(
-        deltaCollateral.gt(BIGINT_ZERO),
-        `[updatePosition]Creating new lender position ${lenderPosition.id} with deltaCollateral ${deltaCollateral} <= 0`
-      );
+
+      if (deltaCollateral.le(BIGINT_ZERO)) {
+        log.critical(
+          "[updatePosition]Creating a new lender position {} with deltaCollateral ={} <= 0 at tx {}-{}",
+          [
+            lenderPosition.id,
+            deltaCollateral.toString(),
+            event.transaction.hash.toHexString(),
+            event.transactionLogIndex.toString(),
+          ]
+        );
+      }
 
       protocol.openPositionCount += INT_ONE;
       protocol.cumulativePositionCount += INT_ONE;
@@ -528,16 +535,16 @@ export function updatePosition(
     }
 
     lenderPosition.balance = lenderPosition.balance.plus(deltaCollateral);
-    if (lenderPosition.balance.le(BIGINT_ZERO)) {
-      if (lenderPosition.balance.ge(BIGINT_NEG_HUNDRED)) {
-        // a small negative lender position, likely due to rounding
-        lenderPosition.balance = BIGINT_ZERO;
-      } else {
-        log.error("[updatePosition]balance for position {} = {} < 0", [
-          lenderPosition.id,
+    if (lenderPosition.balance.lt(BIGINT_ZERO)) {
+      log.critical(
+        "[updatePosition]A negative lender balance of {} for position {} with tx {}-{}",
+        [
           lenderPosition.balance.toString(),
-        ]);
-      }
+          lenderPosition.id,
+          event.transaction.hash.toHexString(),
+          event.transactionLogIndex.toString(),
+        ]
+      );
     }
 
     if (deltaCollateral.gt(BIGINT_ZERO)) {
@@ -593,10 +600,18 @@ export function updatePosition(
         PositionSide.BORROWER,
         true
       );
-      assert(
-        deltaDebt.gt(BIGINT_ZERO),
-        `[updatePosition]Creating new borrower position ${borrowerPosition.id} with deltaDebt ${deltaDebt} <= 0`
-      );
+
+      if (deltaDebt.le(BIGINT_ZERO)) {
+        log.critical(
+          "[updatePosition]Creating a new lender position {} with deltaDebt={} <= 0 at tx {}-{}",
+          [
+            borrowerPosition.id,
+            deltaDebt.toString(),
+            event.transaction.hash.toHexString(),
+            event.transactionLogIndex.toString(),
+          ]
+        );
+      }
 
       protocol.openPositionCount += INT_ONE;
       protocol.cumulativePositionCount += INT_ONE;
@@ -618,28 +633,16 @@ export function updatePosition(
     // 2. at block 14055178, urn 0x1c47bb6773db2a441264c1af2c943d8bdfaf19fe
     // repaid -30077488379451392498995529 dai, when the borrow balance
     // was 30077488379451392498995503
-    //borrowerPosition.balance.ge(BIGINT_ZERO),
-    if (borrowerPosition.balance.ge(BIGINT_NEG_HUNDRED)) {
-      log.critical("[updatePosition] position {} balance = {} < 0 tx={}-{}", [
-        borrowerPosition.id,
-        borrowerPosition.balance.toString(),
-        event.transaction.hash.toHexString(),
-        event.transactionLogIndex.toString(),
-      ]);
-    }
-    if (
-      borrowerPosition.balance.lt(BIGINT_ZERO) &&
-      borrowerPosition.balance.gt(BIGINT_NEG_HUNDRED)
-    ) {
-      log.warning(
-        "[updatePosition]A small negative borrow balance of {} for position {} with tx {}; deemed position closed (balance set to 0)",
+    if (borrowerPosition.balance.lt(BIGINT_ZERO)) {
+      log.critical(
+        "[updatePosition] A negative borrow balance of {} for position {} with tx {}-{}",
         [
           borrowerPosition.balance.toString(),
           borrowerPosition.id,
           event.transaction.hash.toHexString(),
+          event.transactionLogIndex.toString(),
         ]
       );
-      borrowerPosition.balance = BIGINT_ZERO;
     }
 
     if (deltaDebt.gt(BIGINT_ZERO)) {
@@ -687,11 +690,18 @@ export function updatePosition(
   market.save();
   account.save();
 
-  const tx = event.transaction.hash.toHexString();
-  assert(
-    account.openPositionCount >= 0,
-    `urn ${urn} for account ${account.id} openPositionCount=${account.openPositionCount} at tx ${tx}`
-  );
+  if (account.openPositionCount < 0) {
+    log.critical(
+      "[updatePosition]urn {} for account {} openPositionCount={} at tx {}-{}",
+      [
+        urn,
+        account.id,
+        account.openPositionCount.toString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
+    );
+  }
 }
 
 // handle transfer of position from one user account (src) to another (dst),
