@@ -782,7 +782,7 @@ export function getNetworkSpecificConstant(
 
   log.error("[getNetworkSpecificConstant] Unsupported network: {}", [network]);
   return new NetworkSpecificConstant(
-    BIGINT_ZERO,
+    networkToChainID(Network.UNKNOWN_NETWORK),
     gasFeeToken,
     Address.zero(),
     Address.zero(),
