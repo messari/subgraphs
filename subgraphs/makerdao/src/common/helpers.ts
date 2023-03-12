@@ -611,18 +611,22 @@ export function updatePosition(
 
     borrowerPosition.balance = borrowerPosition.balance.plus(deltaDebt);
 
-    assert(
-      // this may be less than 0, but not too negative (>-100)
-      // 1. at block 12507581, urn 0x03453d22095c0edd61cd40c3ccdc394a0e85dc1a
-      // repaid -203334964101176257798573 dai, when the borrow balance
-      // was 203334964101176257798572
-      // 2. at block 14055178, urn 0x1c47bb6773db2a441264c1af2c943d8bdfaf19fe
-      // repaid -30077488379451392498995529 dai, when the borrow balance
-      // was 30077488379451392498995503
-      //borrowerPosition.balance.ge(BIGINT_ZERO),
-      borrowerPosition.balance.ge(BIGINT_NEG_HUNDRED),
-      `[updatePosition]balance for position ${borrowerPosition.id} ${borrowerPosition.balance} < 0`
-    );
+    // this may be less than 0, but not too negative (>-100), e.g.
+    // 1. at block 12507581, urn 0x03453d22095c0edd61cd40c3ccdc394a0e85dc1a
+    // repaid -203334964101176257798573 dai, when the borrow balance
+    // was 203334964101176257798572
+    // 2. at block 14055178, urn 0x1c47bb6773db2a441264c1af2c943d8bdfaf19fe
+    // repaid -30077488379451392498995529 dai, when the borrow balance
+    // was 30077488379451392498995503
+    //borrowerPosition.balance.ge(BIGINT_ZERO),
+    if (borrowerPosition.balance.ge(BIGINT_NEG_HUNDRED)) {
+      log.critical("[updatePosition] position {} balance = {} < 0 tx={}-{}", [
+        borrowerPosition.id,
+        borrowerPosition.balance.toString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]);
+    }
     if (
       borrowerPosition.balance.lt(BIGINT_ZERO) &&
       borrowerPosition.balance.gt(BIGINT_NEG_HUNDRED)

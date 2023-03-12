@@ -50,6 +50,10 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x7608870300000000000000000000000000000000000000000000000000000000"
           handler: handleVatFrob
+        ### CDP Confiscation
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x7bab3f4000000000000000000000000000000000000000000000000000000000"
+          handler: handleVatFrob
         # function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x870c616d00000000000000000000000000000000000000000000000000000000"
