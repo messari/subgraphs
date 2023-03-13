@@ -2008,6 +2008,10 @@
           "hosted-service": {
             "slug": "compound-v3-ethereum",
             "query-id": "compound-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "compound-v3-ethereum",
+            "query-id": "6PaB6tKFqrL6YoAELEhFGU6Gc39cEynLbo6ETZMF3sCy"
           }
         }
       }
@@ -2397,7 +2401,7 @@
           },
           "decentralized-network": {
             "slug": "goldfinch-ethereum",
-            "query-id": "Dtj2HicXKpoUjNB7ffdBkMwt3L9Sz3cbENd67AdHu6Vb"
+            "query-id": "72Cez54APnySAn6h8MswzYkwaL9KjvuuKnKArnPJ8yxbdBkMwt3L9Sz3cbENd67AdHu6Vb"
           }
         }
       }
