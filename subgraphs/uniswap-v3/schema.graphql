@@ -65,6 +65,16 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " amount of tokens in the protocol "
+  _totalSupply: BigInt!
+
+  " Total value locked in the protocol "
+  _totalValueLockedUSD: BigDecimal!
+
+  _largePriceChangeBuffer: Int!
+
+  _largeTVLImpactBuffer: Int!
 }
 
 enum RewardTokenType {
@@ -600,12 +610,6 @@ type LiquidityPool @entity {
 
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
-
-  _totalAmountWithdrawn: [BigInt!]!
-
-  _totalAmountCollected: [BigInt!]!
-
-  _totalAmountEarned: [BigInt!]!
 }
 
 #################################
