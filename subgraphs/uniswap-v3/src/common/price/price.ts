@@ -238,7 +238,7 @@ function computePriceFromConvertedSqrtX96Ratio(
   pool: LiquidityPool,
   token: Token,
   convertedSqrtX96Ratio: BigDecimal
-) {
+): BigDecimal | null {
   // Calculate new price of a token and TVL of token in this pool.
   const newPriceSoFar = convertedSqrtX96Ratio.times(
     token.lastPriceUSD as BigDecimal

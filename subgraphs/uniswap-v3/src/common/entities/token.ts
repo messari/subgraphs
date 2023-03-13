@@ -59,16 +59,16 @@ export function getOrCreateToken(
     token.save();
   }
 
-  if (
-    event.block.number.minus(token.lastPriceBlockNumber!).gt(BIGINT_TEN) &&
-    getNewPrice
-  ) {
-    const newPrice = findUSDPricePerToken(event, token);
+  // if (
+  //   !token.lastPriceBlockNumber || event.block.number.minus(token.lastPriceBlockNumber!).gt(BIGINT_TEN) &&
+  //   getNewPrice
+  // ) {
+  //   const newPrice = findUSDPricePerToken(event, token);
 
-    token.lastPriceUSD = newPrice;
-    token.lastPriceBlockNumber = event.block.number;
-    token.save();
-  }
+  //   token.lastPriceUSD = newPrice;
+  //   token.lastPriceBlockNumber = event.block.number;
+  //   token.save();
+  // }
 
   return token as Token;
 }
