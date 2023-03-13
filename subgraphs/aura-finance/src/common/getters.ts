@@ -204,23 +204,24 @@ export function getOrCreateBalancerPoolToken(
       if (tokens[idx].lastPriceUSD! == BIGDECIMAL_ZERO) {
         const unknownPricePoolToken = tokens[idx];
 
-        const weights = getPoolTokenWeights(poolAddress, popIndex);
-
         const knownPricePoolTokenValueUSD = bigIntToBigDecimal(
           balances[knownPricePoolTokenIndex],
           knownPricePoolToken.decimals
         ).times(knownPricePoolToken.lastPriceUSD!);
 
-        const unknownPricePoolTokenValueUSD = divide(
-          weights[idx].times(knownPricePoolTokenValueUSD),
-          weights[knownPricePoolTokenIndex]
-        );
-        unknownPricePoolToken.lastPriceUSD = divide(
-          unknownPricePoolTokenValueUSD,
-          bigIntToBigDecimal(balances[idx], unknownPricePoolToken.decimals)
-        );
+        const weights = getPoolTokenWeights(poolAddress, popIndex);
+        if (weights.length == tokens.length) {
+          const unknownPricePoolTokenValueUSD = divide(
+            weights[idx].times(knownPricePoolTokenValueUSD),
+            weights[knownPricePoolTokenIndex]
+          );
+          unknownPricePoolToken.lastPriceUSD = divide(
+            unknownPricePoolTokenValueUSD,
+            bigIntToBigDecimal(balances[idx], unknownPricePoolToken.decimals)
+          );
 
-        unknownPricePoolToken.save();
+          unknownPricePoolToken.save();
+        }
       }
 
       const tokenValueUSD = bigIntToBigDecimal(
