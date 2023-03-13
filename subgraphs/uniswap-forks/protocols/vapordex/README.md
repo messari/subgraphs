@@ -4,7 +4,7 @@
 
 ## Networks
 
-- Polygon
+- Avalanche
 
 ## Calculation Methodology v1.0.0
 

@@ -89,6 +89,8 @@ export class VaporDEXAvalancheConfigurations implements Configurations {
       "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e", // USDC
       "0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7", // USDT
       "0xc7198437980c041c805a1edcba50c1ce5db95118", // USDT.e
+      "0x83a283641C6B4DF383BCDDf807193284C84c5342", // VPND
+      "0x7bddaF6DbAB30224AA2116c4291521C7a60D5f55", // VAPE
     ]);
   }
   getStableCoins(): string[] {
