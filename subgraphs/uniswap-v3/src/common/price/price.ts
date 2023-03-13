@@ -145,7 +145,7 @@ export function findUSDPricePerToken(
 
       if (pool.totalValueLockedUSD.gt(BIGDECIMAL_ZERO)) {
         const token_index = get_token_index(pool, token);
-        if (token_index == null) {
+        if (!token_index) {
           continue;
         }
         const whitelistTokenIndex = 0 == token_index ? 1 : 0;
@@ -170,7 +170,7 @@ export function findUSDPricePerToken(
             whitelistToken,
             poolAmounts.tokenPrices[whitelistTokenIndex]
           );
-          if (newPriceSoFar == null) {
+          if (!newPriceSoFar) {
             continue;
           }
 
@@ -224,14 +224,15 @@ export function findUSDPricePerToken(
   return priceSoFar;
 }
 
-function get_token_index(pool: LiquidityPool, token: Token): number | null {
+// Tried to return null from here and it did not
+function get_token_index(pool: LiquidityPool, token: Token): number {
   if (pool.inputTokens[0] == token.id) {
     return 0;
   }
   if (pool.inputTokens[1] == token.id) {
     return 1;
   }
-  return null;
+  return -1;
 }
 
 function computePriceFromConvertedSqrtX96Ratio(
