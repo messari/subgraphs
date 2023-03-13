@@ -12,20 +12,10 @@ import {
   incrementDepositHelper,
 } from "../common/entities/deposit";
 import { DexEventHandler } from "../common/dex_event_handler";
-import {
-  getOrCreateProtocol,
-  updateProtocolFees,
-} from "../common/entities/protocol";
+import { updateProtocolFees } from "../common/entities/protocol";
 import { updateTokenPrices } from "../common/entities/token";
-import { getAmountUSD, getLiquidityPool } from "../common/entities/pool";
-import {
-  subtractBigDecimalLists,
-  subtractBigIntLists,
-  sumBigDecimalList,
-  sumBigIntListByIndex,
-} from "../common/utils/utils";
+import { getLiquidityPool } from "../common/entities/pool";
 import { getOrCreateTick } from "../common/entities/tick";
-import { CollectProtocol } from "../../generated/Factory/Pool";
 import { getSwapDeltas } from "../common/entities/swap";
 import { getWithdrawDeltas } from "../common/entities/withdraw";
 import { BIGINT_ZERO } from "../common/constants";

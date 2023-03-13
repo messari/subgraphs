@@ -1,14 +1,6 @@
 import { BigInt } from "@graphprotocol/graph-ts";
 import { LiquidityPool } from "../../../generated/schema";
-import {
-  INT_ZERO,
-  INT_ONE,
-  BIGINT_ZERO,
-  PRECISION_DECIMAL,
-  PRECISION,
-} from "../constants";
-import { percToDecBI } from "../utils/utils";
-import { getLiquidityPoolFee } from "./pool";
+import { BIGINT_ZERO } from "../constants";
 import { RawDeltas } from "../dex_event_handler";
 
 export function getSwapDeltas(

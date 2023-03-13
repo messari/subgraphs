@@ -7,7 +7,6 @@ import {
   BIGINT_ZERO,
   INT_ZERO,
   TokenType,
-  ZERO_ADDRESS,
 } from "../constants";
 
 export function getOrCreatePosition(

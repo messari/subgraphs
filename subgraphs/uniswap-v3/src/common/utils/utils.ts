@@ -13,7 +13,6 @@ import {
   BIGINT_TEN,
   BIGDECIMAL_NEG_ONE,
   BIGINT_HUNDRED,
-  BIGINT_NEG_ONE,
 } from "../constants";
 import { getLiquidityPoolFee } from "../entities/pool";
 

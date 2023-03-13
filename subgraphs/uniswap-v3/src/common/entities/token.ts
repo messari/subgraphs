@@ -37,7 +37,7 @@ export function getOrCreateToken(
     if (
       token.id ==
         Address.fromHexString(
-          "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1".toLowerCase()
+          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase()
         ) &&
       NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
     ) {
@@ -151,7 +151,7 @@ function fixTokenFields(token: Token): Token {
   if (
     token.id ==
       Address.fromHexString(
-        "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1".toLowerCase()
+        "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase()
       ) &&
     NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
   ) {

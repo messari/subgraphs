@@ -261,8 +261,6 @@ function computePriceFromConvertedSqrtX96Ratio(
   return newPriceSoFar;
 }
 
-function if_token_not_in_pool();
-
 /**
  * Accepts tokens and amounts, return tracked amount based on token whitelist
  * If one token on whitelist, return amount in that token converted to USD.
