@@ -37,13 +37,13 @@ export function updateRewards(
   const stakingStrategyV1Contract = StakingStrategyV1.bind(
     stakingStrategyAddress
   );
-  let tryGetRewardTokens = stakingStrategyV1Contract.try_getRewardTokens();
+  const tryGetRewardTokens = stakingStrategyV1Contract.try_getRewardTokens();
   if (tryGetRewardTokens.reverted) {
     return;
   }
   const rewardTokens = tryGetRewardTokens.value;
 
-  let rewardsPerEpoch: BigInt[] = [];
+  const rewardsPerEpoch: BigInt[] = [];
   let tryRewardsPerEpoch = stakingStrategyV1Contract.try_rewardsPerEpoch(epoch);
   if (!tryRewardsPerEpoch.reverted) {
     rewardsPerEpoch.push(tryRewardsPerEpoch.value);

@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Account } from "../../generated/schema";
 import { EventType } from "./event";
 import { BIGDECIMAL_ZERO, INT_ONE, INT_ZERO } from "../utils/constants";
