@@ -357,7 +357,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 }
             }
             protocolErrorEmbed.title = `Protocol Level Errors on ${protocol}-${networkString}`;
-            if (!!depo.indexingError) {
+            if (!!depo.indexingError && !depo?.protocolType?.includes('governance')) {
                 const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
                 let issueHasBeenAlerted = false;
                 if (!!depo.pending) {
@@ -367,13 +367,15 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 }
                 if (!issueHasBeenAlerted) {
                     indexingErrorEmbed.color = placeholderColor;
-                    indexErrorEmbedDepos[networkString] = { failureBlock: depo?.indexingError, message: depo?.indexingErrorMessage };
                     if (depo.isDecen) {
-                        indexErrorEmbedDepos[networkString].isDecen = true;
-                        indexErrorDecenHash[networkString] = depo?.hash;
-                    }
-                    if (!!depo.pending) {
-                        indexErrorPendingHash[networkString] = depo?.hash;
+                        indexErrorEmbedDepos[networkString + ' (DECEN)'] = { failureBlock: depo?.indexingError, message: depo?.indexingErrorMessage };
+                        indexErrorEmbedDepos[networkString + ' (DECEN)'].isDecen = true;
+                        indexErrorDecenHash[networkString + ' (DECEN)'] = depo?.hash;
+                    } else {
+                        indexErrorEmbedDepos[networkString] = { failureBlock: depo?.indexingError, message: depo?.indexingErrorMessage };
+                        if (!!depo.pending) {
+                            indexErrorPendingHash[networkString] = depo?.hash;
+                        }
                     }
                 }
             }
@@ -411,6 +413,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 }
             }
         });
+        const chains = [];
         if (Object.keys(indexErrorEmbedDepos)?.length > 0) {
             let labelValueThread = "";
             let failureBlockThread = "";
@@ -420,25 +423,30 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 let failureBlockLine = "";
                 const indexErrorObj = indexErrorEmbedDepos[networkString];
                 let link = '';
+                let baseNetworkString = networkString;
+                let threadKey = "ghMessage";
                 if (networkString.includes(' (PENDING')) {
                     link = `https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]}`;
                     labelValueLine += `\n[${networkString.split(' ')[0]}-PENDING](${link})\n`;
                     labelValueThread += labelValueLine;
                 } else if (indexErrorObj.isDecen) {
+                    baseNetworkString = networkString.split(' (DECEN)')[0];
                     link = `https://okgraph.xyz/?q=${indexErrorDecenHash[networkString]}`;
-                    labelValueLine += `\n[${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}](${link})\n`;
+                    labelValueLine += `\n[${networkString}](${link})\n`;
                     labelValueThread += labelValueLine;
+                    threadKey += "Decen";
                 } else {
                     link = `https://okgraph.xyz/?q=messari%2F${protocol}-${networkString}`;
                     labelValueLine = `\n[${networkString}](${link})\n`;
                     labelValueThread += labelValueLine;
                 }
+                chains.push(networkString);
                 failureBlockLine = '\n' + indexErrorObj.failureBlock + '\n';
                 failureBlockThread += failureBlockLine;
-                if (prodStatusDepoMapping[networkString] === true) {
+                if (prodStatusDepoMapping[baseNetworkString] === true) {
                     aggThreadIndexErrorEmbeds[0].value += labelValueLine;
                     aggThreadIndexErrorEmbeds[1].value += failureBlockLine;
-                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}: ${indexErrorObj.failureBlock} - ${link}`, ghMessage: `${networkString}${indexErrorObj.isDecen ? ' (DECEN)' : ""}: Block #${indexErrorObj.failureBlock} - ${link} - ${indexErrorObj.message}\n` });
+                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}: ${indexErrorObj.failureBlock} - ${link}`, [threadKey]: `${networkString}: Block #${indexErrorObj.failureBlock}\nLink: ${link}\nError: ${indexErrorObj.message}\n\n` });
                 }
             })
             indexingErrorEmbed.fields[0].value += labelValueThread;
@@ -448,10 +456,10 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
 
         if (Object.keys(zapierProdThreadProtocols).length > 0 || zapierProdThreadIndexing.length > 0) {
             if (zapierProdThreadIndexing.length > 0) {
-                sendMessageToZapierThread({ indexing: zapierProdThreadIndexing, protocolName: protocol });
+                sendMessageToZapierThread({ indexing: zapierProdThreadIndexing, protocolName: protocol, chains });
             };
             if (Object.keys(zapierProdThreadProtocols).length > 0) {
-                sendMessageToZapierThread({ protocol: zapierProdThreadProtocols, protocolName: protocol });
+                sendMessageToZapierThread({ protocol: zapierProdThreadProtocols, protocolName: protocol, chains });
             }
         }
 
@@ -582,7 +590,12 @@ export async function sendMessageToZapierThread(msgObj) {
         if (validAlerts.length > 0) {
             messageConstruction += `Indexing errors on ${msgObj.protocolName}\n\n`;
             messageConstruction += validAlerts.map(x => x.zappierMessage).join('\n');
-            ghIssuePromiseArray.push(postGithubIssue(msgObj.protocolName + ": Indexing Errors", validAlerts.map(x => x.ghMessage).join('\n'), postedIssues));
+            if (validAlerts.filter(x => x.ghMessage).length > 0) {
+                ghIssuePromiseArray.push(postGithubIssue({ protocol: msgObj.protocolName, type: "Indexing Errors", chains: msgObj.chains.filter(x => !x.toUpperCase().includes('DECEN')) }, validAlerts.filter(x => x.ghMessage).map(x => x.ghMessage).join('\n'), postedIssues, false));
+            }
+            if (validAlerts.filter(x => x.ghMessageDecen).length > 0) {
+                ghIssuePromiseArray.push(postGithubIssue({ protocol: msgObj.protocolName, type: "Indexing Errors", chains: msgObj.chains.filter(x => x.toUpperCase().includes('DECEN')) }, validAlerts.filter(x => x.ghMessageDecen).map(x => x.ghMessageDecen).join('\n'), postedIssues), true);
+            }
         }
     } else if (Object.keys(msgObj).includes('protocol')) {
         const invalidProtocolAlertIndexes = {};
@@ -609,7 +622,7 @@ export async function sendMessageToZapierThread(msgObj) {
                 if (!invalidProtocolAlertIndexes[deployment].includes(idx)) {
                     const alertBody = `Field: ${x}\nValue: ${msgObj.protocol[deployment]?.Value[idx]}\nDescription: ${msgObj.protocol[deployment]?.Description[idx]}\n`;
                     validAlerts.push(alertBody);
-                    ghIssuePromiseArray.push(postGithubIssue(msgObj.protocolName + " " + deployment + ": Protocol Error " + x, alertBody, postedIssues));
+                    ghIssuePromiseArray.push(postGithubIssue({ protocol: msgObj.protocolName, chains: [deployment], type: "Protocol Error " + x }, alertBody, postedIssues, deployment?.toUpperCase()?.includes('DECEN')));
                 }
             })
             if (validAlerts.length > 0) {
@@ -622,15 +635,15 @@ export async function sendMessageToZapierThread(msgObj) {
         }
     }
 
+    if (ghIssuePromiseArray.length > 0) {
+        await Promise.all(ghIssuePromiseArray);
+    }
+
     if (messageConstruction.length === 0) {
         return null;
     }
 
     const postJSON = JSON.stringify({ "content": messageConstruction });
-
-    if (ghIssuePromiseArray.length > 0) {
-        await Promise.all(ghIssuePromiseArray);
-    }
 
     try {
         const req = await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch(async function (err1) {
