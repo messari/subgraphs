@@ -108,6 +108,13 @@ export function handleMarketExited(event: MarketExited): void {
 }
 
 export function handleMarketListed(event: MarketListed): void {
+  if (event.params.cToken.equals(cBSTNContract)) {
+    log.info("[handleMarketListed]cBSTN token {} is skipped", [
+      event.params.cToken.toHexString(),
+    ]);
+    return;
+  }
+
   CTokenTemplate.create(event.params.cToken);
   const cTokenAddr = event.params.cToken;
   const cToken = Token.load(cTokenAddr.toHexString());
@@ -115,7 +122,6 @@ export function handleMarketListed(event: MarketListed): void {
     return;
   }
   // this is a new cToken, a new underlying token, and a new market
-
   const protocol = getOrCreateProtocol();
   const cTokenContract = CToken.bind(event.params.cToken);
   const cTokenReserveFactorMantissa = getOrElse<BigInt>(
@@ -439,6 +445,11 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
 
   if (!tryBorrowZero.reverted) {
     borrowRewardSpeed = tryBorrowZero.value;
+    log.info("[updateRewards]market={}/{},rewardBorrowSpeeds0={}", [
+      market.id,
+      market.name!,
+      borrowRewardSpeed.toString(),
+    ]);
 
     // load BSTN token
     token = Token.load(REWARD_TOKENS[INT_ZERO].toHexString());
@@ -456,6 +467,12 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   }
 
   if (!tryBorrowOne.reverted) {
+    log.info("[updateRewards]market={}/{},rewardBorrowSpeeds1={}", [
+      market.id,
+      market.name!,
+      tryBorrowZero.value.toString(),
+    ]);
+
     if (
       borrowRewardSpeed &&
       borrowRewardSpeed.gt(BIGINT_ZERO) &&
@@ -503,6 +520,17 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
         .div(exponentToBigDecimal(token.decimals))
         .times(priceUSD!)
     );
+
+    log.info(
+      "[updateRewards]market={}/{},rewardTokens={},rewardEmission={},USD={}",
+      [
+        market.id,
+        market.name!,
+        rewardTokens.toString(),
+        rewardEmissions.toString(),
+        rewardEmissionsUSD.toString(),
+      ]
+    );
   }
 
   // look for supply-side rewards
@@ -520,6 +548,11 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
 
   if (!trySupplyZero.reverted) {
     supplyRewardSpeed = trySupplyZero.value;
+    log.info("[updateRewards]market={}/{},rewardSupplySpeeds0={}", [
+      market.id,
+      market.name!,
+      supplyRewardSpeed.toString(),
+    ]);
 
     // load BSTN token
     token = Token.load(REWARD_TOKENS[INT_ZERO].toHexString());
@@ -537,6 +570,11 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   }
 
   if (!trySupplyOne.reverted) {
+    log.info("[updateRewards]market={}/{},rewardSupplySpeeds1={}", [
+      market.id,
+      market.name!,
+      trySupplyOne.value.toString(),
+    ]);
     if (
       supplyRewardSpeed &&
       supplyRewardSpeed.gt(BIGINT_ZERO) &&
@@ -581,6 +619,16 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
         .toBigDecimal()
         .div(exponentToBigDecimal(token.decimals))
         .times(priceUSD!)
+    );
+    log.info(
+      "[updateRewards]market={}/{},rewardTokens={},rewardEmission={},USD={}",
+      [
+        market.id,
+        market.name!,
+        rewardTokens.toString(),
+        rewardEmissions.toString(),
+        rewardEmissionsUSD.toString(),
+      ]
     );
   }
 
