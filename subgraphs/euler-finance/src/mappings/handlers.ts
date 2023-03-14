@@ -122,12 +122,20 @@ function _handleAssetStatusPostHack(event: AssetStatus): void {
 
   const eTokenAddress = Address.fromString(assetStatus.eToken!);
   const eToken = ERC20.bind(eTokenAddress);
-  const eTokenTotalSupply = eToken.totalSupply();
+  const eTokenTotalSupplyResult = eToken.try_totalSupply();
   const dTokenAddress = Address.fromString(market._dToken!);
   const dToken = ERC20.bind(dTokenAddress);
-  const dTokenTotalSupply = dToken.totalSupply();
+  const dTokenTotalSupplyResult = dToken.try_totalSupply();
+
+  if (eTokenTotalSupplyResult.reverted || dTokenTotalSupplyResult.reverted) {
+    log.error("eToken or dToken try_totalSupply() call reverted at tx {}-{}", [
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]);
+    return;
+  }
   // convert to native decimals
-  const borrowBalance = bigIntChangeDecimals(dTokenTotalSupply, DEFAULT_DECIMALS, token.decimals);
+  const borrowBalance = bigIntChangeDecimals(dTokenTotalSupplyResult.value, DEFAULT_DECIMALS, token.decimals);
   const borrowBalanceUSD = bigIntToBDUseDecimals(borrowBalance, token.decimals).times(token.lastPriceUSD!);
   const totalDepositBalance = erc20TokenBal.plus(borrowBalance);
   const totalDepositBalanceUSD = bigIntToBDUseDecimals(totalDepositBalance, token.decimals).times(token.lastPriceUSD!);
@@ -151,7 +159,7 @@ function _handleAssetStatusPostHack(event: AssetStatus): void {
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
   market.inputTokenBalance = totalDepositBalance;
-  market.outputTokenSupply = eTokenTotalSupply;
+  market.outputTokenSupply = eTokenTotalSupplyResult.value;
   market._totalBorrowBalance = borrowBalance;
   market.save();
 
