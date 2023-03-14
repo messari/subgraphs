@@ -63,6 +63,9 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
     return {};
   }
   const decenQueries = Object.values(hostedEndpointToDecenNetwork).map((decenNetwork) => {
+    if (!decenNetwork) {
+      return null;
+    }
     const endpoint = "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenNetwork
     const string = `query MyQuery {
       _meta {
