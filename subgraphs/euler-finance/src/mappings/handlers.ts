@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -57,6 +57,12 @@ import { Stake } from "../../generated/EulStakes/EulStakes";
 import { Markets as MarketsContract } from "../../generated/euler/Markets";
 
 export function handleAssetStatus(event: AssetStatus): void {
+  // https://etherscan.io/tx/0xc310a0affe2169d1f6feec1c63dbc7f7c62a887fa48795d327d4d2da2d6b111d
+  const EULER_HACK_BLOCK_NUMBER = BigInt.fromI32(16817996);
+  if (event.block.number.ge(EULER_HACK_BLOCK_NUMBER)) {
+    _handleAssetStatusPostHack(event);
+    return;
+  }
   const underlying = event.params.underlying.toHexString();
   const totalBorrows = event.params.totalBorrows; //== dToken totalSupply
   const totalBalances = event.params.totalBalances; //== eToken totalSupply
@@ -70,7 +76,8 @@ export function handleAssetStatus(event: AssetStatus): void {
   const market = getOrCreateMarket(marketId);
   const token = Token.load(underlying)!;
 
-  // totalBorrows is divided by INTERNAL_DEBT_PRECISION in logAssetStatus() (L346 BasicLogic.sol)
+  // totalBorrows is divided by INTERNAL_DEBT_PRECISION in logAssetStatus()
+  // https://github.com/euler-xyz/euler-contracts/blob/dfaa7788b17ac7c2a826a3ed242d7181998a778f/contracts/BaseLogic.sol#L346
   const totalBorrowBalance = bigIntChangeDecimals(totalBorrows, DEFAULT_DECIMALS, token.decimals);
   const totalDepositBalance = bigIntChangeDecimals(poolSize.plus(totalBorrows), DEFAULT_DECIMALS, token.decimals);
   if (totalBalances.gt(BIGINT_ZERO)) {
@@ -99,6 +106,66 @@ export function handleAssetStatus(event: AssetStatus): void {
   assetStatus.interestRate = interestRate;
   assetStatus.timestamp = event.params.timestamp;
   assetStatus.save();
+}
+
+function _handleAssetStatusPostHack(event: AssetStatus): void {
+  const underlying = event.params.underlying.toHexString();
+
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
+  const protocol = getOrCreateLendingProtocol();
+  const market = getOrCreateMarket(marketId);
+  const token = Token.load(underlying)!;
+
+  const erc20Contract = ERC20.bind(event.params.underlying);
+  const erc20TokenBal = erc20Contract.balanceOf(Address.fromString(EULER_ADDRESS));
+
+  const eTokenAddress = Address.fromString(assetStatus.eToken!);
+  const eToken = ERC20.bind(eTokenAddress);
+  const eTokenTotalSupply = eToken.totalSupply();
+  const dTokenAddress = Address.fromString(market._dToken!);
+  const dToken = ERC20.bind(dTokenAddress);
+  const dTokenTotalSupply = dToken.totalSupply();
+  // convert to native decimals
+  const borrowBalance = bigIntChangeDecimals(dTokenTotalSupply, DEFAULT_DECIMALS, token.decimals);
+  const borrowBalanceUSD = bigIntToBDUseDecimals(borrowBalance, token.decimals).times(token.lastPriceUSD!);
+  const totalDepositBalance = erc20TokenBal.plus(borrowBalance);
+  const totalDepositBalanceUSD = bigIntToBDUseDecimals(totalDepositBalance, token.decimals).times(token.lastPriceUSD!);
+
+  protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD
+    .plus(totalDepositBalanceUSD)
+    .minus(market.totalDepositBalanceUSD);
+  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD
+    .plus(borrowBalanceUSD)
+    .minus(market.totalBorrowBalanceUSD);
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
+  protocol.save();
+
+  log.info("[_handleAssetStatusPostHack]protocol.totalValueLockedUSD={},protocol.totalBorrowBalanceUSD={}", [
+    protocol.totalValueLockedUSD.toString(),
+    protocol.totalBorrowBalanceUSD.toString(),
+  ]);
+
+  market.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  market.totalBorrowBalanceUSD = borrowBalanceUSD;
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+
+  market.inputTokenBalance = totalDepositBalance;
+  market.outputTokenSupply = eTokenTotalSupply;
+  market._totalBorrowBalance = borrowBalance;
+  market.save();
+
+  log.info("[_handleAssetStatusPostHack]market {}/{} totalValueLockedUSD={}, totalBorrowBalanceUSD={} tx {}-{}", [
+    market.id,
+    market.name ? market.name! : "",
+    market.totalValueLockedUSD.toString(),
+    market.totalBorrowBalanceUSD.toString(),
+    event.transaction.hash.toHexString(),
+    event.transactionLogIndex.toString(),
+  ]);
+
+  snapshotMarket(event.block, marketId, BIGDECIMAL_ZERO, null);
+  snapshotFinancials(event.block, BIGDECIMAL_ZERO, null, protocol);
 }
 
 function updateProtocolTVL(event: AssetStatus, protocol: LendingProtocol): void {
