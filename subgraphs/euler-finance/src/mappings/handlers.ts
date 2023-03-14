@@ -134,9 +134,14 @@ function _handleAssetStatusPostHack(event: AssetStatus): void {
     ]);
     return;
   }
-  // convert to native decimals
-  const borrowBalance = bigIntChangeDecimals(dTokenTotalSupplyResult.value, DEFAULT_DECIMALS, token.decimals);
-  const borrowBalanceUSD = bigIntToBDUseDecimals(borrowBalance, token.decimals).times(token.lastPriceUSD!);
+
+  // These don't work as the dToken.totalSupply() doesn't account for the hack
+  //const borrowBalance = bigIntChangeDecimals(dTokenTotalSupplyResult.value, DEFAULT_DECIMALS, token.decimals);
+  //const borrowBalanceUSD = bigIntToBDUseDecimals(borrowBalance, token.decimals).times(token.lastPriceUSD!);
+
+  // Keep _totalBorrowBalance unchanged (ignore the hack)
+  const borrowBalance = market._totalBorrowBalance!;
+  const borrowBalanceUSD = market.totalBorrowBalanceUSD;
   const totalDepositBalance = erc20TokenBal.plus(borrowBalance);
   const totalDepositBalanceUSD = bigIntToBDUseDecimals(totalDepositBalance, token.decimals).times(token.lastPriceUSD!);
 
@@ -160,7 +165,7 @@ function _handleAssetStatusPostHack(event: AssetStatus): void {
 
   market.inputTokenBalance = totalDepositBalance;
   market.outputTokenSupply = eTokenTotalSupplyResult.value;
-  market._totalBorrowBalance = borrowBalance;
+
   market.save();
 
   log.info("[_handleAssetStatusPostHack]market {}/{} totalValueLockedUSD={}, totalBorrowBalanceUSD={} tx {}-{}", [
