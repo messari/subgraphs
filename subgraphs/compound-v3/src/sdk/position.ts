@@ -28,7 +28,8 @@ import { TokenManager } from "./token";
  * This file contains the PositionManager class, which is used to
  * make changes to a given position.
  *
- * Schema Version: 3.0.0
+ * Schema Version:  3.0.0
+ * SDK Version:     1.0.1
  * Author(s):
  *  - @dmelotik
  */

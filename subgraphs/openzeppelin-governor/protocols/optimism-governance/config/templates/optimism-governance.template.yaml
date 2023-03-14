@@ -1,0 +1,74 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: OptimismGovernorV2
+    network: {{ network }}
+    source:
+      address: "{{ governorContractAddress }}"
+      abi: OptimismGovernorV2
+      startBlock: {{ governorContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: OptimismGovernorV2
+          file: ./abis/optimism-governance/OptimismGovernorV2.json
+      eventHandlers:
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        #- event: ProposalDeadlineUpdated
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: ProposalThresholdSet(uint256,uint256)
+          handler: handleProposalThresholdSet
+        - event: QuorumNumeratorUpdated(uint256,uint256)
+          handler: handleQuorumNumeratorUpdated
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+        - event: VoteCastWithParams(indexed address,uint256,uint8,uint256,string,bytes)
+          handler: handleVoteCastWithParams
+        - event: VotingDelaySet(uint256,uint256)
+          handler: handleVotingDelaySet
+        - event: VotingPeriodSet(uint256,uint256)
+          handler: handleVotingPeriodSet
+      file: ./protocols/optimism-governance/src/governor.ts
+  - kind: ethereum/contract
+    name: GovernanceToken
+    network:  {{ network }}
+    source:
+      address: "{{ tokenContractAddress }}"
+      abi: GovernanceToken
+      startBlock: {{ tokenContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: GovernanceToken
+          file: ./abis/optimism-governance/GovernanceToken.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/optimism-governance/src/token.ts

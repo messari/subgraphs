@@ -103,10 +103,6 @@ export function createLiquidityPool(
   pool.lastUpdateBlockNumber = event.block.number;
   pool.lastUpdateTimestamp = event.block.timestamp;
 
-  pool._totalAmountWithdrawn = [BIGINT_ZERO, BIGINT_ZERO];
-  pool._totalAmountCollected = [BIGINT_ZERO, BIGINT_ZERO];
-  pool._totalAmountEarned = [BIGINT_ZERO, BIGINT_ZERO];
-
   poolAmounts.inputTokens = [token0.id, token1.id];
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
   poolAmounts.tokenPrices = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
