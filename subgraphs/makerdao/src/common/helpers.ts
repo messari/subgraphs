@@ -511,7 +511,7 @@ export function updatePosition(
       );
 
       if (deltaCollateral.le(BIGINT_ZERO)) {
-        log.critical(
+        log.error(
           "[updatePosition]Creating a new lender position {} with deltaCollateral ={} <= 0 at tx {}-{}",
           [
             lenderPosition.id,
@@ -520,6 +520,7 @@ export function updatePosition(
             event.transactionLogIndex.toString(),
           ]
         );
+        log.critical("", []);
       }
 
       protocol.openPositionCount += INT_ONE;
@@ -536,7 +537,7 @@ export function updatePosition(
 
     lenderPosition.balance = lenderPosition.balance.plus(deltaCollateral);
     if (lenderPosition.balance.lt(BIGINT_ZERO)) {
-      log.critical(
+      log.error(
         "[updatePosition]A negative lender balance of {} for position {} with tx {}-{}",
         [
           lenderPosition.balance.toString(),
@@ -545,6 +546,7 @@ export function updatePosition(
           event.transactionLogIndex.toString(),
         ]
       );
+      log.critical("", []);
     }
 
     if (deltaCollateral.gt(BIGINT_ZERO)) {
@@ -602,7 +604,7 @@ export function updatePosition(
       );
 
       if (deltaDebt.le(BIGINT_ZERO)) {
-        log.critical(
+        log.error(
           "[updatePosition]Creating a new lender position {} with deltaDebt={} <= 0 at tx {}-{}",
           [
             borrowerPosition.id,
@@ -611,6 +613,7 @@ export function updatePosition(
             event.transactionLogIndex.toString(),
           ]
         );
+        log.critical("", []);
       }
 
       protocol.openPositionCount += INT_ONE;
@@ -626,15 +629,8 @@ export function updatePosition(
 
     borrowerPosition.balance = borrowerPosition.balance.plus(deltaDebt);
 
-    // this may be less than 0, but not too negative (>-100), e.g.
-    // 1. at block 12507581, urn 0x03453d22095c0edd61cd40c3ccdc394a0e85dc1a
-    // repaid -203334964101176257798573 dai, when the borrow balance
-    // was 203334964101176257798572
-    // 2. at block 14055178, urn 0x1c47bb6773db2a441264c1af2c943d8bdfaf19fe
-    // repaid -30077488379451392498995529 dai, when the borrow balance
-    // was 30077488379451392498995503
     if (borrowerPosition.balance.lt(BIGINT_ZERO)) {
-      log.critical(
+      log.error(
         "[updatePosition] A negative borrow balance of {} for position {} with tx {}-{}",
         [
           borrowerPosition.balance.toString(),
@@ -643,6 +639,7 @@ export function updatePosition(
           event.transactionLogIndex.toString(),
         ]
       );
+      log.critical("", []);
     }
 
     if (deltaDebt.gt(BIGINT_ZERO)) {
@@ -691,7 +688,7 @@ export function updatePosition(
   account.save();
 
   if (account.openPositionCount < 0) {
-    log.critical(
+    log.error(
       "[updatePosition]urn {} for account {} openPositionCount={} at tx {}-{}",
       [
         urn,
@@ -701,6 +698,7 @@ export function updatePosition(
         event.transactionLogIndex.toString(),
       ]
     );
+    log.critical("", []);
   }
 }
 
