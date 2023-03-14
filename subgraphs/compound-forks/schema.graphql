@@ -1331,3 +1331,10 @@ type _Realm @entity {
   id: ID!
   priceOracle: String!
 }
+
+type _RewardType @entity {
+  " {RewardType} "
+  id: ID!
+  " reward token "
+  token: Token!
+}

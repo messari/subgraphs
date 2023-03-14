@@ -45,8 +45,17 @@ export const bstnOracle = Address.fromString(
   "0x4fa59cae2b1e0d3bbadb3385ba29b0b35822e8ad"
 );
 
+export const cNearContract = Address.fromString(
+  "0x8c14ea853321028a7bb5e4fb0d0147f183d3b677"
+);
+
+export const nearOracle = Address.fromString(
+  "0x91a99a522d6fc3a424701b875497279c426c1d70"
+);
+
 // reward token mappings
 export const REWARD_TOKENS = [
   Address.fromString("0x9f1f933c660a1dc856f0e0fe058435879c5ccef0"), // BSTN (index 0)
   Address.fromString("0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d"), // wNEAR (index 1)
+  //some realm market has Meta as a reward token e.g Staked NEAR Realm
 ];

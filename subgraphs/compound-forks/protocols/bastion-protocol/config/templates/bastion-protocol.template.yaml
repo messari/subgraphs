@@ -39,6 +39,8 @@ dataSources:
           handler: handleNewLiquidationIncentive
         - event: ActionPaused(address,string,bool)
           handler: handleActionPaused
+        - event: NewRewardDistributor(address,address)
+          handler: handleNewRewardDistributor
       file: ./protocols/bastion-protocol/src/mapping.ts
   {{#realms}}
   - kind: ethereum/contract
@@ -78,6 +80,8 @@ dataSources:
           handler: handleNewLiquidationIncentive
         - event: ActionPaused(address,string,bool)
           handler: handleActionPaused
+        - event: NewRewardDistributor(address,address)
+          handler: handleNewRewardDistributor
       file: ./protocols/bastion-protocol/src/mapping.ts  
   {{/realms}}
 
@@ -125,4 +129,36 @@ templates:
           handler: handleNewReserveFactor
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+      file: ./protocols/bastion-protocol/src/mapping.ts
+
+  - name: RewardDistributor
+    kind: ethereum/contract
+    network: {{ network }}
+    source:
+      abi: RewardDistributor
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: CToken
+          file: ./abis/CToken.json
+        - name: Comptroller
+          file: ./abis/Comptroller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: PriceOracle
+          file: ./abis/PriceOracle.json
+        - name: RewardDistributor
+          file: ./abis/bastion-protocol/RewardDistributor.json
+      eventHandlers:
+        - event: RewardAdded(uint8,address)
+          handler: handleRewardAdded
+        - event: RewardAddressChanged(uint8,address,address)
+          handler: handleRewardAddressChanged
+        - event: RewardBorrowSpeedUpdated(uint8,indexed address,uint256)
+          handler: handleRewardBorrowSpeedUpdated
+        - event: RewardSupplySpeedUpdated(uint8,indexed address,uint256)
+          handler: handleRewardSupplySpeedUpdated
       file: ./protocols/bastion-protocol/src/mapping.ts
