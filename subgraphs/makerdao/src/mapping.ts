@@ -1,9 +1,11 @@
 import {
   Bytes,
   BigDecimal,
+  ByteArray,
   ethereum,
   log,
   Address,
+  crypto,
 } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../generated/Vat/ERC20";
 import { GemJoin } from "../generated/Vat/GemJoin";
@@ -211,6 +213,40 @@ export function handleVatCage(event: VatNoteEvent): void {
     market.canBorrowFrom = false;
     market.save();
   }
+}
+
+export function handleVatGrab(event: ethereum.Event): void {
+  // only needed for non-liquidations
+  if (!event.receipt) {
+    log.error("[handleVatGrab]no receipt found. Tx Hash: {}", [
+      event.transaction.hash.toHexString(),
+    ]);
+    return;
+  }
+
+  const liquidationSigs = [
+    crypto.keccak256(
+      ByteArray.fromUTF8(
+        "Bite(indexed bytes32,indexed address,uint256,uint256,uint256,address,uint256)"
+      )
+    ),
+
+    crypto.keccak256(
+      ByteArray.fromUTF8(
+        "Bark(indexed bytes32,indexed address,uint256,uint256,uint256,address,indexed uint256)"
+      )
+    ),
+  ];
+
+  for (let i = 0; i < event.receipt!.logs.length; i++) {
+    const txLog = event.receipt!.logs[i];
+    if (liquidationSigs.includes(txLog.topics.at(0))) {
+      // it is a liquidation transaction; skip
+      return;
+    }
+  }
+
+  handleVatFrob(event);
 }
 
 // Borrow/Repay/Deposit/Withdraw

@@ -20,7 +20,7 @@ dataSources:
       startBlock: 8928152
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -41,28 +41,35 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x65fae35e00000000000000000000000000000000000000000000000000000000"
           handler: handleVatRely
+          receipt: true
         # function cage()
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x6924500900000000000000000000000000000000000000000000000000000000"
           handler: handleVatCage
+          receipt: true
         ### CDP Manipulation ###
         # function frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x7608870300000000000000000000000000000000000000000000000000000000"
           handler: handleVatFrob
+          receipt: true
         ### CDP Confiscation
+        # function frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x7bab3f4000000000000000000000000000000000000000000000000000000000"
-          handler: handleVatFrob
+          handler: handleVatGrab
+          receipt: true
         # function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x870c616d00000000000000000000000000000000000000000000000000000000"
           handler: handleVatFork
+          receipt: true
         ### Collect stability fee ###
         # function fold(bytes32 i, address u, int256 rate)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0xb65337df00000000000000000000000000000000000000000000000000000000"
-          handler: handleVatFold  
+          handler: handleVatFold
+          receipt: true
 
   # Borrow rate
   - name: Jug
@@ -74,7 +81,7 @@ dataSources:
       startBlock: 8928160
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -101,7 +108,7 @@ dataSources:
       startBlock: 8928160
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -137,7 +144,7 @@ dataSources:
       startBlock: 8928152
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -172,7 +179,7 @@ dataSources:
       startBlock: 8928165
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -203,7 +210,7 @@ dataSources:
       startBlock: 10742907
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -233,7 +240,7 @@ dataSources:
       startBlock: 12246358
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -263,7 +270,7 @@ dataSources:
       startBlock: 8928198
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -305,7 +312,7 @@ dataSources:
       startBlock: 5834580
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -329,7 +336,7 @@ dataSources:
       startBlock: 11478006
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -355,7 +362,7 @@ dataSources:
       startBlock: 13057085
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -381,7 +388,7 @@ dataSources:
       startBlock: 13684200
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       abis:
@@ -406,7 +413,7 @@ templates:
       abi: Flip
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       entities:
@@ -443,7 +450,7 @@ templates:
       abi: Clip
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       entities:
