@@ -1,7 +1,7 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../generated/schema";
-import { IERC20Detailed } from "../../generated/ibUSDT/IERC20Detailed";
-import { IERC20DetailedBytes } from "../../generated/ibUSDT/IERC20DetailedBytes";
+import { IERC20Detailed } from "../../generated/ibALPACA/IERC20Detailed";
+import { IERC20DetailedBytes } from "../../generated/ibALPACA/IERC20DetailedBytes";
 import { prefixID } from "../utils/strings";
 
 export const UNKNOWN_TOKEN_VALUE = "unknown";

@@ -83,13 +83,14 @@ export class Pool {
     this.pool.protocol = this.protocol.getBytesID();
     this.pool.name = name;
     this.pool.symbol = symbol;
-    this.pool.inputToken = inputToken.id;
+    this.pool.inputTokens = [inputToken.id];
     this.pool.outputToken = outputToken ? outputToken.id : null;
     this.pool.isLiquidity = isLiquidity ? isLiquidity : null;
     this.pool.createdTimestamp = event.block.timestamp;
     this.pool.createdBlockNumber = event.block.number;
 
-    this.pool.inputTokenBalance = BIGINT_ZERO;
+    this.pool.inputTokenBalances = [];
+    this.pool.inputTokenBalancesUSD = [];
     this.pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;

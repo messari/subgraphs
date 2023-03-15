@@ -28,9 +28,6 @@ export default function PositionTab({
         poolId={poolId}
         pools={poolsList[poolNames]}
         setPoolId={(x) => setPoolId(x)}
-        setIssues={() => {
-          // TODO: set issues
-        }}
       />
     );
   } else if (poolListLoading) {
@@ -72,7 +69,6 @@ export default function PositionTab({
               const tempStr = valueStr;
               valueStr = `${valueStr.slice(0, 10)}...${valueStr.slice(valueStr.length - 15, valueStr.length)}`;
 
-              // TODO: use correct network blockchain explorer
               const getBaseUrl = () => {
                 if (key === "id") {
                   return;

@@ -8,6 +8,7 @@ import { convertTokenDecimals, formatIntToFixed2, toPercent } from "../utils";
 
 interface ProtocolSection {
     protocol: { [x: string]: any };
+    decenDepoData: any;
     issuesMapping: any;
     schemaType: string;
     subgraphName: string;
@@ -21,7 +22,7 @@ interface ProtocolSection {
     validationSupported: boolean;
 }
 
-function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
+function ProtocolSection({ protocol, decenDepoData, issuesMapping, schemaType, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
     const [showDeposDropDown, toggleShowDeposDropDown] = useState<boolean>(false);
     const navigate = useNavigate();
     useEffect(() => {
@@ -29,6 +30,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
     }, [tableExpanded])
 
     const issuesTitles = Object.keys(issuesMapping);
+    const subNameUpper = subgraphName.toUpperCase();
 
     let hasDecentralizedDepo = false;
     protocol.networks.forEach((depo: any) => {
@@ -44,8 +46,9 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                 if (issuesMapping[x].includes('/pull/')) {
                     return false;
                 }
-                const depoSpecificIssue = x.toUpperCase().includes(subgraphName.toUpperCase()) && x.toUpperCase().includes(depo.chain.toUpperCase());
-                const protocolWideIssue = x.toUpperCase().includes(subgraphName.toUpperCase() + ' ALL');
+                const title = x.toUpperCase();
+                const depoSpecificIssue = title.includes(subNameUpper) && title.includes(depo.chain.toUpperCase());
+                const protocolWideIssue = title.includes(subNameUpper + ' ALL');
                 return depoSpecificIssue || protocolWideIssue;
             }));
             if (!!openRepoIssue) {
@@ -56,6 +59,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
     })
     if (showDeposDropDown) {
         const depoRowsOnProtocol = protocol.networks.map((depo: any) => {
+            const decenObject = decenDepoData?.[depo.deploymentName];
             let chainLabel = depo.chain;
             if (protocol.networks.filter((x: any) => x.chain === depo.chain).length > 1) {
                 chainLabel = depo.deploymentName;
@@ -70,8 +74,10 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                         if (issuesMapping[x].includes('/pull/')) {
                             return false;
                         }
-                        const depoSpecificIssue = x.toUpperCase().includes(subgraphName.toUpperCase()) && x.toUpperCase().includes(depo.chain.toUpperCase());
-                        const protocolWideIssue = x.toUpperCase().includes(subgraphName.toUpperCase() + ' ALL');
+                        const title = x.toUpperCase();
+                        const titleIsDecen = title.includes('DECEN');
+                        const protocolWideIssue = title.includes(subNameUpper + ' ALL');
+                        const depoSpecificIssue = title.includes(subNameUpper) && title.includes(depo.chain.toUpperCase()) && !titleIsDecen;
                         return depoSpecificIssue || protocolWideIssue;
                     }));
                     if (!!openRepoIssue) {
@@ -274,7 +280,6 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
             let decenRow = null;
             try {
                 if (!!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.decentralizedNetworkId) || !!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.hostedServiceId)) {
-                    const decenObject = depo?.indexStatus;
                     let syncedDecen = decenObject?.synced ?? {};
                     let statusDecenDataOnChain: { [x: string]: any } = {};
                     if (decenObject?.chains?.length > 0) {
@@ -287,8 +292,8 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                     }
 
                     let indexedDecen = formatIntToFixed2(toPercent(
-                        statusDecenDataOnChain?.latestBlock?.number - statusDecenDataOnChain?.earliestBlock?.number || 0,
-                        statusDecenDataOnChain?.chainHeadBlock?.number - statusDecenDataOnChain?.earliestBlock?.number,
+                        statusDecenDataOnChain?.latestBlock?.number || 0 - statusDecenDataOnChain?.earliestBlock?.number || 0,
+                        statusDecenDataOnChain?.chainHeadBlock?.number || 0 - statusDecenDataOnChain?.earliestBlock?.number || 0,
                     ));
 
                     if (syncedDecen && !decenObject?.fatalError && Number(indexedDecen) > 99) {
@@ -296,7 +301,7 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                         indexedDecen = formatIntToFixed2(100);
                     }
 
-                    const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(x => x.includes(subgraphName));
+                    const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(x => x.includes(subgraphName) || x.includes(depo?.decentralizedNetworkId));
                     let decenSubgraphId = decenObject?.subgraph;
                     if (decenSubgraphKey) {
                         decenSubgraphId = decenDeposToSubgraphIds[decenSubgraphKey]?.id;
@@ -328,6 +333,23 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                                 <Tooltip title="Current Curation Signal" placement="top" ><span style={{ padding: "0", cursor: "default", fontWeight: "800" }}>{convertedSignalAmount}K GRT</span></Tooltip>
                             </span>
                         );
+                    }
+                    let decenDepoStatusIcon = "https://images.emojiterra.com/twitter/v13.1/512px/2705.png";
+                    let decenStatusLink = depoLevelStatusLink;
+                    const openDecenIssue = issuesTitles.find((x: any) => {
+                        if (issuesMapping[x].includes('/pull/')) {
+                            return false;
+                        }
+                        const title = x.toUpperCase();
+                        const titleIsDecen = title.includes('DECEN');
+                        let depoSpecificIssue = false;
+                        const protocolWideIssue = title.includes(subNameUpper + ' ALL');
+                        depoSpecificIssue = title.includes(subNameUpper) && title.includes(depo.chain.toUpperCase()) && titleIsDecen;
+                        return protocolWideIssue || depoSpecificIssue;
+                    });
+                    if (!!openDecenIssue) {
+                        decenDepoStatusIcon = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoseJ8t1vi2kPFznJJSyeIHGYxgvCvbCMgs6a9TMI&s";
+                        decenStatusLink = issuesMapping[openDecenIssue] || "";
                     }
                     decenRow = (
                         <TableRow onClick={(event) => {
@@ -374,11 +396,11 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {depo?.status === "prod" ? <Tooltip title={depoLevelStatusHover}><img className="round-image" onClick={(e) => {
-                                    if (depoLevelStatusLink?.length > 0) {
-                                        e.stopPropagation()
-                                        window.location.href = (depoLevelStatusLink)
+                                    if (decenStatusLink?.length > 0) {
+                                        e.stopPropagation();
+                                        window.location.href = (decenStatusLink);
                                     }
-                                }} src={depoLevelStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
+                                }} src={decenDepoStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {indexedDecen ? indexedDecen + "%" : "N/A"}
@@ -714,7 +736,6 @@ function ProtocolSection({ protocol, issuesMapping, schemaType, subgraphName, cl
             <TableCell
                 sx={{ padding: "0 0 0 6px", verticalAlign: "middle", display: "flex", height: "35px" }}
             >
-
                 <Tooltip title="Click To View All Deployments On This Protocol" placement="top" >
                     <SubgraphLogo name={subgraphName} size={30} />
                 </Tooltip>

@@ -478,9 +478,15 @@ export function handlePaymentApplied(event: PaymentApplied): void {
 
   // lenders receive interestAmountUSD - reserveAmountUSD
   if (market._interestTimestamp) {
+    if (!market._borrowerInterestAmountUSD) {
+      market._borrowerInterestAmountUSD = BIGDECIMAL_ZERO;
+    }
     market._borrowerInterestAmountUSD = market
       ._borrowerInterestAmountUSD!.plus(interestAmountUSD)
       .plus(reserveAmountUSD);
+    if (!market._lenderInterestAmountUSD) {
+      market._lenderInterestAmountUSD = BIGDECIMAL_ZERO;
+    }
     market._lenderInterestAmountUSD =
       market._lenderInterestAmountUSD!.plus(interestAmountUSD);
     market.save();

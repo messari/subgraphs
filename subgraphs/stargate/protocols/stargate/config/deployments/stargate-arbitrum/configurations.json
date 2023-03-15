@@ -1,0 +1,18 @@
+{
+  "deployment": "STARGATE_ARBITRUM",
+  "network": "arbitrum-one",
+  "file": "./src/mappings/handlers.ts",
+  "lpStaking": [
+    {
+      "name": "LPStaking",
+      "address": "0xeA8DfEE1898a7e0a59f7527F076106d7e44c2176",
+      "startBlock": 8040516,
+      "abi": "LPStaking",
+      "depositHandler": "handleStakeForBlockRewards",
+      "withdrawHandler": "handleUnstakeForBlockRewards"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

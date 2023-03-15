@@ -1,0 +1,12 @@
+{
+  "name": "@messari-subgraphs/eslint-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "peerDependencies": {
+    "eslint": "8.23.1"
+  },
+  "dependencies": {
+    "ethereum-address": "^0.0.4"
+  }
+}

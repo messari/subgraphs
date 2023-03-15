@@ -21,8 +21,12 @@ import {
   Q192,
   PRECISION,
   BIGDECIMAL_TEN_THOUSAND,
+  PRICE_CHANGE_BUFFER_LIMIT,
+  BIGDECIMAL_TEN_BILLION,
+  BIGDECIMAL_FIVE_PERCENT,
 } from "../constants";
 import {
+  absBigDecimal,
   convertTokenToDecimal,
   exponentToBigInt,
   safeDiv,
@@ -30,6 +34,7 @@ import {
 import { NetworkConfigs } from "../../../configurations/configure";
 import { getOrCreateToken, getOrCreateTokenWhitelist } from "../entities/token";
 import { getLiquidityPool, getLiquidityPoolAmounts } from "../entities/pool";
+import { getOrCreateProtocol } from "../entities/protocol";
 
 // Divide numbers too large for floating point or BigDecimal
 
@@ -139,47 +144,122 @@ export function findUSDPricePerToken(
       const pool = getLiquidityPool(poolAddress)!;
 
       if (pool.totalValueLockedUSD.gt(BIGDECIMAL_ZERO)) {
-        if (pool.inputTokens[0] == token.id) {
-          // whitelist token is token1
-          const token1 = getOrCreateToken(event, pool.inputTokens[1], false);
-          // get the derived whitelist token in pool
-          const whitelistTokenValueLocked =
-            poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!);
-          if (
-            whitelistTokenValueLocked.gt(largestWhitelistTokenValue) &&
-            whitelistTokenValueLocked.gt(
-              NetworkConfigs.getMinimumLiquidityThreshold()
-            )
-          ) {
-            largestWhitelistTokenValue = whitelistTokenValueLocked;
-            // token1 per our token * whitelist token per token1
-            priceSoFar = poolAmounts.tokenPrices[1].times(
-              token1.lastPriceUSD as BigDecimal
-            );
-          }
+        const token_index = get_token_index(pool, token);
+        if (!token_index) {
+          continue;
         }
-        if (pool.inputTokens[1] == token.id) {
-          const token0 = getOrCreateToken(event, pool.inputTokens[0], false);
-          // get the derived whitelist in pool
-          const whitelistTokenValueLocked =
-            poolAmounts.inputTokenBalances[0].times(token0.lastPriceUSD!);
-          if (
-            whitelistTokenValueLocked.gt(largestWhitelistTokenValue) &&
-            whitelistTokenValueLocked.gt(
-              NetworkConfigs.getMinimumLiquidityThreshold()
-            )
-          ) {
-            largestWhitelistTokenValue = whitelistTokenValueLocked;
-            // token0 per our token * whitelist token per token0
-            priceSoFar = poolAmounts.tokenPrices[0].times(
-              token0.lastPriceUSD as BigDecimal
-            );
+        const whitelistTokenIndex = 0 == token_index ? 1 : 0;
+        const whitelistToken = getOrCreateToken(
+          event,
+          pool.inputTokens[whitelistTokenIndex],
+          false
+        );
+        const whitelistTokenValueLocked = poolAmounts.inputTokenBalances[
+          whitelistTokenIndex
+        ].times(whitelistToken.lastPriceUSD!);
+
+        // Check if it meets criteria to update prices.
+        if (
+          whitelistTokenValueLocked.gt(largestWhitelistTokenValue) &&
+          whitelistTokenValueLocked.gt(
+            NetworkConfigs.getMinimumLiquidityThreshold()
+          )
+        ) {
+          const newPriceSoFar = computePriceFromConvertedSqrtX96Ratio(
+            pool,
+            whitelistToken,
+            poolAmounts.tokenPrices[whitelistTokenIndex]
+          );
+          if (!newPriceSoFar) {
+            continue;
           }
+
+          // Set new price and largest pool for pricing.
+          largestWhitelistTokenValue = whitelistTokenValueLocked;
+          priceSoFar = newPriceSoFar;
         }
       }
     }
   }
-  return priceSoFar; // nothing was found return 0
+
+  // Buffer token pricings that would cause large spikes on the protocol level
+  const protocol = getOrCreateProtocol();
+  const tokenTVLDelta = absBigDecimal(
+    priceSoFar
+      .times(convertTokenToDecimal(token._totalSupply, token.decimals))
+      .minus(token._totalValueLockedUSD)
+  );
+  const protocolTVLPercentageDelta = absBigDecimal(
+    safeDiv(tokenTVLDelta, protocol.totalValueLockedUSD)
+  );
+  if (protocolTVLPercentageDelta.gt(BIGDECIMAL_FIVE_PERCENT)) {
+    log.warning("Price too high for token: {} from pool: {}", [
+      token.id.toHexString(),
+      priceSoFar.toString(),
+    ]);
+    token._largeTVLImpactBuffer += 1;
+    return token.lastPriceUSD!;
+  }
+
+  if (!token.lastPriceUSD || token.lastPriceUSD!.equals(BIGDECIMAL_ZERO)) {
+    return priceSoFar;
+  }
+
+  // If priceSoFar 10x greater or less than token.lastPriceUSD, use token.lastPriceUSD
+  // Increment buffer so that it allows large price jumps if seen repeatedly
+  if (
+    priceSoFar.gt(token.lastPriceUSD!.times(BIGDECIMAL_TWO)) ||
+    priceSoFar.lt(token.lastPriceUSD!.div(BIGDECIMAL_TWO))
+  ) {
+    if (token._largePriceChangeBuffer < PRICE_CHANGE_BUFFER_LIMIT) {
+      token._largePriceChangeBuffer = token._largePriceChangeBuffer + 1;
+      return token.lastPriceUSD!;
+    }
+  }
+
+  token._largePriceChangeBuffer = 0;
+  token._largeTVLImpactBuffer = 0;
+
+  token.save();
+  return priceSoFar;
+}
+
+// Tried to return null from here and it did not
+function get_token_index(pool: LiquidityPool, token: Token): number {
+  if (pool.inputTokens[0] == token.id) {
+    return 0;
+  }
+  if (pool.inputTokens[1] == token.id) {
+    return 1;
+  }
+  return -1;
+}
+
+function computePriceFromConvertedSqrtX96Ratio(
+  pool: LiquidityPool,
+  token: Token,
+  convertedSqrtX96Ratio: BigDecimal
+): BigDecimal | null {
+  // Calculate new price of a token and TVL of token in this pool.
+  const newPriceSoFar = convertedSqrtX96Ratio.times(
+    token.lastPriceUSD as BigDecimal
+  );
+
+  const newTokenTotalValueLocked = convertTokenToDecimal(
+    token._totalSupply,
+    token.decimals
+  ).times(newPriceSoFar);
+
+  // If price is too high, skip this pool
+  if (newTokenTotalValueLocked.gt(BIGDECIMAL_TEN_BILLION)) {
+    log.warning("Price too high for token: {} from pool: {}", [
+      token.id.toHexString(),
+      pool.id.toHexString(),
+    ]);
+    return null;
+  }
+
+  return newPriceSoFar;
 }
 
 /**

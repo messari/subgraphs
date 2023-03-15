@@ -89,6 +89,7 @@ export class DexEventHandler {
   account: Account;
   protocol: DexAmmProtocol;
   pool: LiquidityPool;
+  poolTokens: Token[];
   _poolAmounts: _LiquidityPoolAmount;
   newUser: bool;
 
@@ -148,27 +149,29 @@ export class DexEventHandler {
     this.account = getOrCreateAccount(event.transaction.from);
     this.protocol = getOrCreateProtocol();
     this.pool = pool;
+    this.poolTokens = getTokens(event, pool);
     this._poolAmounts = getLiquidityPoolAmounts(pool.id)!;
     this.newUser = this.account._newUser;
     this.dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
     this.hourID = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-    const tokens = getTokens(event, pool);
     const supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
     const protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
 
     // Raw Deltas
     this.inputTokenBalanceDeltas = deltas.inputTokenBalancesDeltas;
+
     this.uncollectedSupplySideTokenAmountsDeltas =
       deltas.uncollectedSupplySideTokenAmountsDeltas;
     this.uncollectedProtocolSideTokenAmountsDeltas =
       deltas.uncollectedProtocolSideTokenAmountsDeltas;
+
     this.totalLiquidityDelta = deltas.totalLiquidityDelta;
     this.activeLiquidityDelta = deltas.activeLiquidityDelta;
 
     // Pool Token Deltas and Balances
     this.inputTokenBalanceDeltasUSD = getAbsUSDValues(
-      tokens,
+      this.poolTokens,
       this.inputTokenBalanceDeltas
     );
     this.inputTokenBalances = sumBigIntListByIndex([
@@ -176,20 +179,18 @@ export class DexEventHandler {
       this.inputTokenBalanceDeltas,
     ]);
     this.inputTokenBalancesUSD = getAbsUSDValues(
-      tokens,
+      this.poolTokens,
       this.inputTokenBalances
     );
     this.inputTokenBalancesPoolAmounts = convertBigIntListToBigDecimalList(
-      tokens,
+      this.poolTokens,
       this.inputTokenBalances
     );
 
     // Liquidity Deltas and Balances
     this.totalLiquidity = pool.totalLiquidity.plus(this.totalLiquidityDelta);
-    this.totalLiquidityUSD = sumBigDecimalList(this.inputTokenBalancesUSD);
-    this.totalLiquidityDeltaUSD = this.totalLiquidityUSD.minus(
-      this.pool.totalLiquidityUSD
-    );
+    this.totalLiquidityUSD = BIGDECIMAL_ZERO;
+    this.totalLiquidityDeltaUSD = BIGDECIMAL_ZERO;
 
     // Get the new liquidity price per unit
     this.newLiquidityPricePerUnit = safeDivBigDecimal(
@@ -199,20 +200,16 @@ export class DexEventHandler {
 
     // Get the deltas and values of the liquidity that is wihtin tick range.
     this.activeLiquidity = pool.activeLiquidity.plus(this.activeLiquidityDelta);
-    this.activeLiquidityUSD = this.activeLiquidity
-      .toBigDecimal()
-      .times(this.newLiquidityPricePerUnit);
-    this.activeLiquidityDeltaUSD = this.activeLiquidityUSD.minus(
-      this.pool.activeLiquidityUSD
-    );
+    this.activeLiquidityUSD = BIGDECIMAL_ZERO;
+    this.activeLiquidityDeltaUSD = BIGDECIMAL_ZERO;
 
-    // Uncollected Token Deltas and Balances
+    // TEMPORARILY DISABLED AS WE ARE NOT TRACKING UNCOLLECTED TOKENS ON THIS BRANCH
     this.uncollectedSupplySideTokenAmounts = sumBigIntListByIndex([
       pool.uncollectedSupplySideTokenAmounts,
       this.uncollectedSupplySideTokenAmountsDeltas,
     ]);
     this.uncollectedSupplySideValuesUSD = getAbsUSDValues(
-      tokens,
+      this.poolTokens,
       this.uncollectedSupplySideTokenAmounts
     );
     this.uncollectedSupplySideValuesDeltasUSD = subtractBigDecimalLists(
@@ -225,7 +222,7 @@ export class DexEventHandler {
       this.uncollectedProtocolSideTokenAmountsDeltas,
     ]);
     this.uncollectedProtocolSideValuesUSD = getAbsUSDValues(
-      tokens,
+      this.poolTokens,
       this.uncollectedProtocolSideTokenAmounts
     );
     this.uncollectedProtocolSideValuesDeltasUSD = subtractBigDecimalLists(
@@ -234,11 +231,7 @@ export class DexEventHandler {
     );
 
     // Total Value Locked
-    this.totalValueLockedUSD = this.totalLiquidityUSD.plus(
-      sumBigDecimalList(this.uncollectedProtocolSideValuesUSD).plus(
-        sumBigDecimalList(this.uncollectedSupplySideValuesUSD)
-      )
-    );
+    this.totalValueLockedUSD = sumBigDecimalList(this.inputTokenBalancesUSD);
     this.totalValueLockedUSDDelta = this.totalValueLockedUSD.minus(
       this.pool.totalValueLockedUSD
     );
@@ -247,7 +240,7 @@ export class DexEventHandler {
       // Get the tracked volume and revenue - they are not tracked for non-whitelist token
       this.trackedInputTokenBalanceDeltasUSD = getTrackedVolumeUSD(
         pool,
-        tokens,
+        this.poolTokens,
         this.inputTokenBalanceDeltasUSD
       );
       this.trackedVolumeUSD = BigDecimalAverage(
@@ -270,7 +263,7 @@ export class DexEventHandler {
     } else {
       // Array with zeros
       this.trackedInputTokenBalanceDeltasUSD = new Array<BigDecimal>(
-        tokens.length
+        this.poolTokens.length
       ).fill(BIGDECIMAL_ZERO);
       this.trackedVolumeUSD = BIGDECIMAL_ZERO;
       this.trackedSupplySideRevenueDeltaUSD = BIGDECIMAL_ZERO;
@@ -281,7 +274,7 @@ export class DexEventHandler {
   }
 
   createWithdraw(
-    owner: Address,
+    from: Address,
     tickLower: Tick | null,
     tickUpper: Tick | null,
     position: Position | null
@@ -302,7 +295,7 @@ export class DexEventHandler {
     withdraw.protocol = this.protocol.id;
     withdraw.pool = this.pool.id;
     withdraw.position = position ? position.id : null;
-    withdraw.account = owner;
+    withdraw.account = from;
     withdraw.blockNumber = this.event.block.number;
     withdraw.timestamp = this.event.block.timestamp;
     withdraw.liquidity = this.totalLiquidityDelta.abs();
@@ -316,7 +309,7 @@ export class DexEventHandler {
   }
 
   createDeposit(
-    owner: Address,
+    from: Address,
     tickLower: Tick | null,
     tickUpper: Tick | null,
     position: Position | null
@@ -337,7 +330,7 @@ export class DexEventHandler {
     deposit.protocol = this.protocol.id;
     deposit.pool = this.pool.id;
     deposit.position = position ? position.id : null;
-    deposit.account = owner;
+    deposit.account = from;
     deposit.blockNumber = this.event.block.number;
     deposit.timestamp = this.event.block.timestamp;
     deposit.liquidity = this.totalLiquidityDelta.abs();
@@ -353,7 +346,7 @@ export class DexEventHandler {
   createSwap(
     tokensInIdx: i32,
     tokensOutIdx: i32,
-    sender: Address,
+    from: Address,
     tick: BigInt | null
   ): void {
     this.eventType = EventType.SWAP;
@@ -370,7 +363,7 @@ export class DexEventHandler {
     swap.gasLimit = this.event.transaction.gasLimit;
     swap.gasPrice = this.event.transaction.gasPrice;
     swap.protocol = this.protocol.id;
-    swap.account = sender;
+    swap.account = from;
     swap.pool = this.pool.id;
     swap.blockNumber = this.event.block.number;
     swap.timestamp = this.event.block.timestamp;
@@ -466,6 +459,7 @@ export class DexEventHandler {
     this.updateAndSaveLiquidityPoolEntity();
     this.updateAndSaveAccountEntity();
     this.updateAndSaveUsageMetrics();
+    this.updateAndSavePoolTokenEntities();
   }
 
   updateAndSaveProtocolEntity(): void {
@@ -580,6 +574,20 @@ export class DexEventHandler {
     this._poolAmounts.save();
 
     this.pool.save();
+  }
+
+  updateAndSavePoolTokenEntities(): void {
+    for (let i = 0; i < this.poolTokens.length; i++) {
+      const poolToken = this.poolTokens[i];
+      poolToken._totalSupply = poolToken._totalSupply.plus(
+        this.inputTokenBalanceDeltas[i]
+      );
+      poolToken._totalValueLockedUSD = convertTokenToDecimal(
+        poolToken._totalSupply,
+        poolToken.decimals
+      ).times(poolToken.lastPriceUSD!);
+      poolToken.save();
+    }
   }
 
   updateAndSaveFinancialMetrics(day: i32): void {

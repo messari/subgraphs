@@ -9,6 +9,7 @@ import {
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
+  BIGINT_TEN,
 } from "../constants";
 import {
   findUSDPricePerToken,
@@ -36,7 +37,7 @@ export function getOrCreateToken(
     if (
       token.id ==
         Address.fromHexString(
-          "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1".toLowerCase()
+          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase()
         ) &&
       NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
     ) {
@@ -46,6 +47,10 @@ export function getOrCreateToken(
     }
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
+    token._totalSupply = BIGINT_ZERO;
+    token._totalValueLockedUSD = BIGDECIMAL_ZERO;
+    token._largeTVLImpactBuffer = 0;
+    token._largePriceChangeBuffer = 0;
 
     // Fixing token fields that did not return proper values from contract
     // Manually coded in when necessary
@@ -54,8 +59,14 @@ export function getOrCreateToken(
     token.save();
   }
 
-  if (token.lastPriceBlockNumber != event.block.number && getNewPrice) {
-    token.lastPriceUSD = findUSDPricePerToken(event, token);
+  if (
+    token.lastPriceBlockNumber &&
+    event.block.number.minus(token.lastPriceBlockNumber!).gt(BIGINT_TEN) &&
+    getNewPrice
+  ) {
+    const newPrice = findUSDPricePerToken(event, token);
+
+    token.lastPriceUSD = newPrice;
     token.lastPriceBlockNumber = event.block.number;
     token.save();
   }
@@ -141,7 +152,7 @@ function fixTokenFields(token: Token): Token {
   if (
     token.id ==
       Address.fromHexString(
-        "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1".toLowerCase()
+        "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase()
       ) &&
     NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
   ) {
