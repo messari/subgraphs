@@ -216,11 +216,6 @@ export function handleVatCage(event: VatNoteEvent): void {
 }
 
 export function handleVatGrab(event: VatNoteEvent): void {
-  log.info("[handleVatGrab]tx={}-{}", [
-    event.transaction.hash.toHexString(),
-    event.transactionLogIndex.toString(),
-  ]);
-
   // only needed for non-liquidations
   if (!event.receipt) {
     log.error("[handleVatGrab]no receipt found. Tx Hash: {}", [
@@ -245,17 +240,6 @@ export function handleVatGrab(event: VatNoteEvent): void {
 
   for (let i = 0; i < event.receipt!.logs.length; i++) {
     const txLog = event.receipt!.logs[i];
-    log.info(
-      "[handleVatGrab]LogIndex={},signature={},liquidationSigs=[{}, {}], signature==Sigs[0]?{}, signature==Sigs[1]?{}",
-      [
-        txLog.logIndex.toString(),
-        txLog.topics.at(0).toHexString(),
-        liquidationSigs[0].toHexString(),
-        liquidationSigs[1].toHexString(),
-        txLog.topics.at(0).equals(liquidationSigs[0]).toString(),
-        txLog.topics.at(0).equals(liquidationSigs[1]).toString(),
-      ]
-    );
 
     if (liquidationSigs.includes(txLog.topics.at(0))) {
       // it is a liquidation transaction; skip
