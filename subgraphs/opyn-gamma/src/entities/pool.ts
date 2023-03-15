@@ -114,7 +114,7 @@ export function handlePoolDeposit(
   ];
   hourlySnapshot.hourlyDepositVolumeUSD =
     hourlySnapshot.hourlyDepositVolumeUSD.plus(deposit.amountUSD);
-  dailySnapshot.save();
+  hourlySnapshot.save();
 }
 
 export function handlePoolWithdraw(
@@ -148,7 +148,7 @@ export function handlePoolWithdraw(
   ];
   hourlySnapshot.hourlyWithdrawVolumeUSD =
     hourlySnapshot.hourlyWithdrawVolumeUSD.plus(withdraw.amountUSD);
-  dailySnapshot.save();
+  hourlySnapshot.save();
 }
 
 export function updatePoolTVL(

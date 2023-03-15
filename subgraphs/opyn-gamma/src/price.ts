@@ -12,6 +12,7 @@ import { Option, Token } from "../generated/schema";
 import { BIGDECIMAL_ZERO, INT_EIGHT } from "./common/constants";
 import { getOrCreateToken } from "./common/tokens";
 import { bigIntToBigDecimal } from "./common/utils/numbers";
+import { getUsdPricePerToken } from "./prices";
 
 export function getTokenPrice(event: ethereum.Event, token: Token): BigDecimal {
   if (event.block.number == token.lastPriceBlockNumber!) {
@@ -28,8 +29,10 @@ export function getTokenPrice(event: ethereum.Event, token: Token): BigDecimal {
     token.save();
     return price;
   }
-  log.error("Failed to get price for asset: {}", [token.id.toHex()]);
-  return BIGDECIMAL_ZERO;
+  log.error("Failed to get price for asset: {}, trying with price oracle", [
+    token.id.toHex(),
+  ]);
+  return getUsdPricePerToken(Address.fromBytes(token.id)).usdPrice;
 }
 
 export function getUSDAmount(

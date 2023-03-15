@@ -32,6 +32,38 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: Oracle
           file: ./abis/Oracle.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
         - event: AccountOperatorUpdated(indexed address,indexed address,bool)
           handler: handleAccountOperatorUpdated
@@ -78,6 +110,8 @@ dataSources:
           handler: handleVaultOpened
         - event: VaultSettled(indexed address,indexed address,address,uint256,uint256,indexed uint256)
           handler: handleVaultSettled
+        - event: VaultSettled_V1(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleVaultSettled_V1
       file: ./src/mappings/Controller.ts
   - kind: ethereum
     name: OTokenFactory

@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import {
   AccountOperatorUpdated,
   CallExecuted,
@@ -23,7 +23,7 @@ import {
   VaultSettled,
 } from "../../generated/Controller/Controller";
 import { Option } from "../../generated/schema";
-import { BIGINT_ZERO } from "../common/constants";
+import { BIGINT_ZERO, ZERO_ADDRESS } from "../common/constants";
 import { getOrCreateAccount } from "../entities/account";
 import { createDeposit, createWithdraw } from "../entities/event";
 import { markOptionExpired } from "../entities/option";
@@ -107,9 +107,16 @@ export function handleVaultLiquidated(event: VaultLiquidated): void {
     event.params.vaultOwner,
     event.params.vaultId
   );
+  const collateralAsset = vault.collateralAssets[0];
+  if (collateralAsset.toHex() == ZERO_ADDRESS) {
+    log.error("Collateral asset from vault was zero, asset: {}, amount: {}", [
+      vault.collateralAssets[0].toHex(),
+      vault.collateralAmounts[0].toHex(),
+    ]);
+  }
   createWithdraw(
     event,
-    vault.collateralAssets[0],
+    collateralAsset,
     event.params.collateralPayout,
     event.params.receiver,
     event.params.liquidator
@@ -119,6 +126,18 @@ export function handleVaultLiquidated(event: VaultLiquidated): void {
 export function handleVaultOpened(event: VaultOpened): void {}
 
 export function handleVaultSettled(event: VaultSettled): void {
+  const option = Option.load(event.params.oTokenAddress)!;
+  markOptionExpired(event, option);
+  createWithdraw(
+    event,
+    Address.fromBytes(option.collateralAsset),
+    event.params.payout,
+    event.params.to,
+    event.params.accountOwner
+  );
+}
+
+export function handleVaultSettled_V1(event: VaultSettled): void {
   const option = Option.load(event.params.oTokenAddress)!;
   markOptionExpired(event, option);
   createWithdraw(
