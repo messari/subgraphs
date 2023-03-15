@@ -2,7 +2,7 @@
   "network": "matic",
   "defaultNetwork": "Network.MATIC",
 
-  "priceCaching": 50000,
+  "priceCaching": 10000,
 
   "poolInfoContract": "0x7544Fe3d184b6B55D6B36c3FCA1157eE0Ba30287",
   "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",

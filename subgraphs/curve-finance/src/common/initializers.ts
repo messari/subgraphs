@@ -147,9 +147,6 @@ export function getOrCreateToken(
       token.decimals = constants.DEFAULT_DECIMALS.toI32();
     }
 
-    const tokenPrice = getUsdPricePerToken(address);
-    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
-    token.lastPriceBlockNumber = block.number;
     token.save();
   }
 
@@ -160,8 +157,9 @@ export function getOrCreateToken(
       .minus(token.lastPriceBlockNumber!)
       .gt(constants.PRICE_CACHING_BLOCKS)
   ) {
-    const tokenPrice = getUsdPricePerToken(address);
-    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    const tokenPrice = getUsdPricePerToken(address, block);
+    token.oracleType = tokenPrice.oracleType;
+    token.lastPriceUSD = tokenPrice.usdPrice;
     token.lastPriceBlockNumber = block.number;
 
     token.save();

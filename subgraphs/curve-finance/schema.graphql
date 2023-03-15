@@ -53,6 +53,9 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " Optional field to track the method used for fetching the token price "
+  oracleType: String
 }
 
 enum RewardTokenType {

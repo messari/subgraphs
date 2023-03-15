@@ -10,7 +10,7 @@ import * as AVALANCHE from "../config/avalanche";
 import * as ARBITRUM_ONE from "../config/arbitrum";
 
 import * as constants from "./constants";
-import { Configurations } from "./types";
+import { Configurations, ContractInfo } from "./types";
 import { _ERC20 } from "../../../generated/templates/PoolTemplate/_ERC20";
 import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 
@@ -25,17 +25,44 @@ export function readValue<T>(
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
+export function getContract(
+  contractInfo: ContractInfo | null,
+  block: ethereum.Block | null = null
+): Address | null {
+  if (!contractInfo || (block && contractInfo.startBlock.gt(block.number)))
+    return null;
+
+  return contractInfo.address;
+}
+
+export function getTokenName(tokenAddr: Address): string {
+  const tokenContract = _ERC20.bind(tokenAddr);
+  const name = readValue<string>(tokenContract.try_name(), "");
+
+  return name;
+}
+
 export function getTokenDecimals(tokenAddr: Address): BigInt {
-  const token = _ERC20.bind(tokenAddr);
+  const tokenContract = _ERC20.bind(tokenAddr);
 
   const decimals = readValue<BigInt>(
-    token.try_decimals(),
+    tokenContract.try_decimals(),
     constants.DEFAULT_DECIMALS
   );
 
   return decimals;
 }
 
+export function getTokenSupply(tokenAddr: Address): BigInt {
+  const tokenContract = _ERC20.bind(tokenAddr);
+
+  const totalSupply = readValue<BigInt>(
+    tokenContract.try_totalSupply(),
+    constants.BIGINT_ONE
+  );
+
+  return totalSupply;
+}
 export function getConfig(): Configurations {
   const network = dataSource.network();
 

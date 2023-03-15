@@ -300,7 +300,7 @@ export function updateRewardTokenEmissions(
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
     .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
-    .times(tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen));
+    .times(tokenPrice.usdPrice);
 
   pool.rewardTokens = rewardTokens;
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;

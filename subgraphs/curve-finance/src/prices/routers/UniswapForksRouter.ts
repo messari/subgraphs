@@ -1,7 +1,7 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { UniswapPair as UniswapPairContract } from "../../../generated/templates/PoolTemplate/UniswapPair";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/templates/PoolTemplate/UniswapRouter";
 
@@ -19,49 +19,52 @@ export function isLpToken(tokenAddress: Address, ethAddress: Address): bool {
   return true;
 }
 
-export function getTokenPriceUSDC(tokenAddress: Address): CustomPriceType {
+export function getTokenPriceUSDC(
+  tokenAddress: Address,
+  block: ethereum.Block | null = null
+): CustomPriceType {
   const config = utils.getConfig();
   if (!config) return new CustomPriceType();
 
-  const ethAddress = config.ethAddress();
-  const usdcAddress = config.usdcAddress();
+  const ethAddress = config.whitelistedTokens().mustGet("WETH").address;
+  const usdcAddress = config.whitelistedTokens().mustGet("USDC").address;
 
   if (isLpToken(tokenAddress, ethAddress)) {
-    return getLpTokenPriceUsdc(tokenAddress);
+    return getLpTokenPriceUsdc(tokenAddress, block);
   }
-  return getPriceFromRouterUSDC(tokenAddress, usdcAddress);
+  return getPriceFromRouterUSDC(tokenAddress, usdcAddress, block);
 }
 
 export function getPriceFromRouterUSDC(
   tokenAddress: Address,
-  usdcAddress: Address
+  usdcAddress: Address,
+  block: ethereum.Block | null = null
 ): CustomPriceType {
-  return getPriceFromRouter(tokenAddress, usdcAddress);
+  return getPriceFromRouter(tokenAddress, usdcAddress, block);
 }
 
 export function getPriceFromRouter(
   token0Address: Address,
-  token1Address: Address
+  token1Address: Address,
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const config = utils.getConfig();
 
-  const ethAddress = config.ethAddress();
-  const wethAddress = config.wethAddress();
+  const wethAddress = config.whitelistedTokens().mustGet("WETH").address;
+  const nativeTokenAddress = config
+    .whitelistedTokens()
+    .mustGet("NATIVE_TOKEN").address;
 
   // Construct swap path
   const path: Address[] = [];
   let numberOfJumps: BigInt;
 
   // Convert ETH address to WETH
-  if (token0Address == ethAddress) {
-    token0Address = wethAddress;
-  }
-  if (token1Address == ethAddress) {
-    token1Address = wethAddress;
-  }
+  if (token0Address == nativeTokenAddress) token0Address = wethAddress;
+  if (token1Address == nativeTokenAddress) token1Address = wethAddress;
 
   const inputTokenIsWeth: bool =
-    token0Address == wethAddress || token1Address == wethAddress;
+    token0Address.equals(wethAddress) || token1Address.equals(wethAddress);
 
   if (inputTokenIsWeth) {
     // Path = [token0, weth] or [weth, token1]
@@ -79,15 +82,16 @@ export function getPriceFromRouter(
   }
 
   const token0Decimals = utils.getTokenDecimals(token0Address);
-  const amountIn = BigInt.fromI32(10).pow(token0Decimals.toI32() as u8);
+  const amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
   const routerAddresses = config.uniswapForks();
 
   let amountOut = constants.BIGINT_ZERO;
   for (let idx = 0; idx < routerAddresses.length; idx++) {
-    const routerAddress = routerAddresses.at(idx);
+    const routerAddress = routerAddresses[idx];
+    if (block && routerAddress.startBlock.gt(block.number)) continue;
 
-    const uniswapForkRouter = UniswapRouterContract.bind(routerAddress);
+    const uniswapForkRouter = UniswapRouterContract.bind(routerAddress.address);
     const amountOutArray = uniswapForkRouter.try_getAmountsOut(amountIn, path);
 
     if (!amountOutArray.reverted) {
@@ -105,15 +109,21 @@ export function getPriceFromRouter(
 
   return CustomPriceType.initialize(
     amountOutBigDecimal,
-    constants.DEFAULT_USDC_DECIMALS
+    config.whitelistedTokens().mustGet("USDC").decimals as u8,
+    constants.OracleType.UNISWAP_FORKS_ROUTER
   );
 }
 
-export function getLpTokenPriceUsdc(tokenAddress: Address): CustomPriceType {
+export function getLpTokenPriceUsdc(
+  tokenAddress: Address,
+  block: ethereum.Block | null = null
+): CustomPriceType {
   const uniSwapPair = UniswapPairContract.bind(tokenAddress);
 
-  const totalLiquidity: CustomPriceType =
-    getLpTokenTotalLiquidityUsdc(tokenAddress);
+  const totalLiquidity: CustomPriceType = getLpTokenTotalLiquidityUsdc(
+    tokenAddress,
+    block
+  );
   const totalSupply = utils.readValue<BigInt>(
     uniSwapPair.try_totalSupply(),
     constants.BIGINT_ZERO
@@ -126,7 +136,12 @@ export function getLpTokenPriceUsdc(tokenAddress: Address): CustomPriceType {
   const pairDecimalsCall = uniSwapPair.try_decimals();
 
   if (pairDecimalsCall.reverted) {
-    pairDecimals = constants.DEFAULT_DECIMALS.toI32() as u8;
+    log.warning(
+      "[UniswapForksRouter] Failed to fetch pair decimals, tokenAddress: {}",
+      [tokenAddress.toHexString()]
+    );
+
+    return new CustomPriceType();
   } else {
     pairDecimals = pairDecimalsCall.value;
   }
@@ -137,12 +152,14 @@ export function getLpTokenPriceUsdc(tokenAddress: Address): CustomPriceType {
 
   return CustomPriceType.initialize(
     pricePerLpTokenUsdc,
-    constants.DEFAULT_USDC_DECIMALS
+    constants.DEFAULT_USDC_DECIMALS,
+    constants.OracleType.UNISWAP_FORKS_ROUTER
   );
 }
 
 export function getLpTokenTotalLiquidityUsdc(
-  tokenAddress: Address
+  tokenAddress: Address,
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const uniSwapPair = UniswapPairContract.bind(tokenAddress);
 
@@ -169,8 +186,8 @@ export function getLpTokenTotalLiquidityUsdc(
 
   if (reservesCall.reverted) return new CustomPriceType();
 
-  const token0Price = getTokenPriceUSDC(token0Address);
-  const token1Price = getTokenPriceUSDC(token1Address);
+  const token0Price = getTokenPriceUSDC(token0Address, block);
+  const token1Price = getTokenPriceUSDC(token1Address, block);
 
   if (token0Price.reverted || token1Price.reverted) {
     return new CustomPriceType();
@@ -198,7 +215,8 @@ export function getLpTokenTotalLiquidityUsdc(
 
     return CustomPriceType.initialize(
       totalLiquidity,
-      constants.DEFAULT_USDC_DECIMALS
+      constants.DEFAULT_USDC_DECIMALS,
+      constants.OracleType.UNISWAP_FORKS_ROUTER
     );
   }
   return new CustomPriceType();

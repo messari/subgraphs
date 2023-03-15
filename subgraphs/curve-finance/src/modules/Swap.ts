@@ -6,8 +6,10 @@ import {
 import {
   log,
   BigInt,
+  crypto,
   Address,
   ethereum,
+  ByteArray,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
@@ -72,6 +74,48 @@ export function createSwapTransaction(
   return swapTransaction;
 }
 
+export function isTokenOutFromInputTokens(
+  poolAddress: Address,
+  amount: BigInt,
+  event: ethereum.Event
+): bool {
+  const receipt = event.receipt;
+  if (!receipt) return false;
+
+  const eventLogs = event.receipt!.logs;
+  if (!eventLogs) return false;
+
+  for (let i = 0; i < eventLogs.length; i++) {
+    const _log = eventLogs.at(i);
+    if (_log.topics.length < 2) continue;
+
+    const topic_signature = _log.topics.at(0);
+
+    if (
+      crypto
+        .keccak256(ByteArray.fromUTF8("Transfer(address,address,uint256)"))
+        .equals(topic_signature)
+    ) {
+      const fromAddress = ethereum.decode("address", _log.topics.at(1));
+      const toAddress = ethereum.decode("address", _log.topics.at(2));
+
+      if (!fromAddress || !toAddress) continue;
+
+      if (
+        fromAddress.toAddress().equals(constants.NULL.TYPE_ADDRESS) &&
+        toAddress.toAddress().equals(poolAddress)
+      ) {
+        const transferAmount = ethereum.decode("uint256", _log.data);
+
+        if (transferAmount && transferAmount.toBigInt().equals(amount))
+          return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 export function UpdateMetricsAfterSwap(block: ethereum.Block): void {
   const protocol = getOrCreateDexAmmProtocol();
 
@@ -90,13 +134,14 @@ export function UpdateMetricsAfterSwap(block: ethereum.Block): void {
 
 export function Swap(
   liquidityPoolAddress: Address,
-  sold_id: BigInt,
+  soldId: BigInt,
   amountIn: BigInt,
-  bought_id: BigInt,
+  boughtId: BigInt,
   amountOut: BigInt,
   buyer: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block,
+  event: ethereum.Event,
   underlying: boolean = false
 ): void {
   const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
@@ -105,22 +150,27 @@ export function Swap(
   let tokenOut: string;
 
   if (!underlying) {
-    tokenIn = pool._inputTokensOrdered[sold_id.toI32()];
-    tokenOut = pool._inputTokensOrdered[bought_id.toI32()];
+    tokenIn = pool._inputTokensOrdered[soldId.toI32()];
+    tokenOut = pool._inputTokensOrdered[boughtId.toI32()];
   } else {
     const underlyingCoins = utils.getPoolUnderlyingCoinsFromRegistry(
       liquidityPoolAddress,
       Address.fromString(pool._registryAddress)
     );
-
     if (underlyingCoins.length == 0) return;
 
-    tokenIn = underlyingCoins[sold_id.toI32()].toHexString();
-    tokenOut = underlyingCoins[bought_id.toI32()].toHexString();
+    if (soldId.toI32() == 0) {
+      tokenIn = pool._inputTokensOrdered[0];
+    } else {
+      tokenIn = underlyingCoins[soldId.toI32()].toHexString();
+    }
 
-    if (bought_id.toI32() == 0) {
-      // Exception: https://etherscan.io/address/0x06cb22615ba53e60d67bf6c341a0fd5e718e1655#code#L750
-      tokenIn = pool._inputTokensOrdered.at(-1);
+    if (boughtId.toI32() == 0) {
+      tokenOut = pool._inputTokensOrdered[0];
+      if (isTokenOutFromInputTokens(liquidityPoolAddress, amountIn, event))
+        tokenIn = pool._inputTokensOrdered.at(-1);
+    } else {
+      tokenOut = underlyingCoins[boughtId.toI32()].toHexString();
     }
   }
 

@@ -246,7 +246,11 @@ export function getPoolUnderlyingCoins(poolAddress: Address): Address[] {
       []
     );
 
-    if (underlyingCoins.length != 0) return underlyingCoins;
+    if (
+      underlyingCoins.length != 0 ||
+      underlyingCoins[0].notEqual(constants.NULL.TYPE_ADDRESS)
+    )
+      return underlyingCoins;
   }
 
   return underlyingCoins;
@@ -450,9 +454,19 @@ export function getPoolFromGauge(gaugeAddress: Address): Address {
 }
 
 export function getPoolTVL(
-  outputToken: Token,
-  outputTokenBalance: BigInt
+  pool: LiquidityPool,
+  outputTokenBalance: BigInt,
+  block: ethereum.Block
 ): BigDecimal {
+  const outputToken = getOrCreateTokenFromString(pool.outputToken!, block);
+
+  if (outputToken.lastPriceUSD!.equals(constants.BIGDECIMAL_ZERO))
+    return getPoolTVLUsingInputTokens(
+      pool.inputTokens,
+      pool.inputTokenBalances,
+      block
+    );
+
   const totalValueLockedUSD = outputTokenBalance
     .divDecimal(
       constants.BIGINT_TEN.pow(outputToken.decimals as u8).toBigDecimal()
