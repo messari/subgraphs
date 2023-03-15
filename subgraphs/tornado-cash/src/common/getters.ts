@@ -73,13 +73,13 @@ export function getOrCreateToken(
     token = new Token(tokenAddress.toHexString());
 
     if (isNativeToken(tokenAddress)) {
-      let conf = NetworkConfigs.getNativeToken();
+      const conf = NetworkConfigs.getNativeToken();
 
       token.name = conf.get("name")!;
       token.symbol = conf.get("symbol")!;
       token.decimals = parseInt(conf.get("decimals")!) as i32;
     } else if (isRewardToken(tokenAddress)) {
-      let conf = NetworkConfigs.getRewardToken();
+      const conf = NetworkConfigs.getRewardToken();
 
       token.name = conf.get("name")!;
       token.symbol = conf.get("symbol")!;
@@ -93,7 +93,7 @@ export function getOrCreateToken(
   }
 
   if (!token.lastPriceUSD || token.lastPriceBlockNumber! < blockNumber) {
-    let price = getUsdPricePerToken(tokenAddress, blockNumber);
+    const price = getUsdPricePerToken(tokenAddress, blockNumber);
     if (price.reverted) {
       token.lastPriceUSD = BIGDECIMAL_ZERO;
     } else {
@@ -115,7 +115,7 @@ export function getOrCreateRewardToken(
   );
 
   if (!rewardToken) {
-    let token = getOrCreateToken(address, blockNumber);
+    const token = getOrCreateToken(address, blockNumber);
 
     rewardToken = new RewardToken(
       RewardTokenType.DEPOSIT.concat("-").concat(address.toHexString())
@@ -140,10 +140,10 @@ export function getOrCreatePool(
     pool = new Pool(poolAddress);
 
     let token: Token;
-    let contractTCERC20 = TornadoCashERC20.bind(
+    const contractTCERC20 = TornadoCashERC20.bind(
       Address.fromString(poolAddress)
     );
-    let token_call = contractTCERC20.try_token();
+    const token_call = contractTCERC20.try_token();
     if (!token_call.reverted) {
       token = getOrCreateToken(token_call.value, event.block.number);
     } else {
@@ -155,7 +155,7 @@ export function getOrCreatePool(
 
     pool.inputTokens = [token.id];
 
-    let denomination = NetworkConfigs.getPoolDenomination(
+    const denomination = NetworkConfigs.getPoolDenomination(
       isNativeToken(Address.fromString(token.id)),
       poolAddress
     );
@@ -186,11 +186,12 @@ export function getOrCreatePool(
     pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     pool.inputTokenBalances = [BIGINT_ZERO];
+    pool.inputTokenBalancesUSD = [BIGDECIMAL_ZERO];
     pool.createdTimestamp = event.block.timestamp;
     pool.createdBlockNumber = event.block.number;
     pool.save();
 
-    let protocol = getOrCreateProtocol();
+    const protocol = getOrCreateProtocol();
 
     protocol.pools = addToArrayAtIndex<string>(protocol.pools, pool.id);
     protocol.totalPoolCount = protocol.totalPoolCount + 1;
@@ -203,7 +204,7 @@ export function getOrCreatePool(
 export function getOrCreatePoolDailySnapshot(
   event: ethereum.Event
 ): PoolDailySnapshot {
-  let dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
 
   let poolMetrics = PoolDailySnapshot.load(
     event.address.toHexString().concat("-").concat(dayId)
@@ -224,6 +225,7 @@ export function getOrCreatePoolDailySnapshot(
     poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.inputTokenBalances = [BIGINT_ZERO];
+    poolMetrics.inputTokenBalancesUSD = [BIGDECIMAL_ZERO];
     poolMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     poolMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
 
@@ -239,7 +241,7 @@ export function getOrCreatePoolDailySnapshot(
 export function getOrCreatePoolHourlySnapshot(
   event: ethereum.Event
 ): PoolHourlySnapshot {
-  let hourId = getHoursSinceEpoch(event.block.timestamp.toI32());
+  const hourId = getHoursSinceEpoch(event.block.timestamp.toI32());
 
   let poolMetrics = PoolHourlySnapshot.load(
     event.address.toHexString().concat("-").concat(hourId)
@@ -260,6 +262,7 @@ export function getOrCreatePoolHourlySnapshot(
     poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.inputTokenBalances = [BIGINT_ZERO];
+    poolMetrics.inputTokenBalancesUSD = [BIGDECIMAL_ZERO];
     poolMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     poolMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
 
@@ -275,7 +278,7 @@ export function getOrCreatePoolHourlySnapshot(
 export function getOrCreateUsageMetricDailySnapshot(
   event: ethereum.Event
 ): UsageMetricsDailySnapshot {
-  let dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
 
   let usageMetrics = UsageMetricsDailySnapshot.load(dayId);
 
@@ -299,7 +302,7 @@ export function getOrCreateUsageMetricDailySnapshot(
 export function getOrCreateUsageMetricHourlySnapshot(
   event: ethereum.Event
 ): UsageMetricsHourlySnapshot {
-  let hourId = getHoursSinceEpoch(event.block.timestamp.toI32());
+  const hourId = getHoursSinceEpoch(event.block.timestamp.toI32());
 
   let usageMetrics = UsageMetricsHourlySnapshot.load(hourId);
 
@@ -322,7 +325,7 @@ export function getOrCreateUsageMetricHourlySnapshot(
 export function getOrCreateFinancialsDailySnapshot(
   event: ethereum.Event
 ): FinancialsDailySnapshot {
-  let dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
 
   let financialMetrics = FinancialsDailySnapshot.load(dayId);
 

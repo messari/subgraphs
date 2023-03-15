@@ -53,6 +53,7 @@ export function getOrCreatePool(
 
     // Quantitative Token Data
     pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+    pool.inputTokenBalancesUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     pool.outputTokenSupply = BIGINT_ZERO;
     pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     pool.stakedOutputTokenAmount = BIGINT_ZERO;

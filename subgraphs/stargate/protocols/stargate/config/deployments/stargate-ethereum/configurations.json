@@ -1,0 +1,17 @@
+{
+  "deployment": "STARGATE_MAINNET",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "router": {
+    "address": "0x8731d54E9D02c286767d56ac03e8037C07e01e98",
+    "startBlock": 14402864
+  },
+  "lpStaking": {
+    "address": "0xB0D502E938ed5f4df2E681fE6E419ff29631d62b",
+    "startBlock": 14402874,
+    "abi": "LPStaking"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

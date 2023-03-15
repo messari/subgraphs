@@ -1,26 +1,23 @@
 import { Box, CircularProgress } from "@mui/material";
-import moment from "moment";
-import { useRef } from "react";
 import { Line } from "react-chartjs-2";
 import { toDate } from "../../utils";
 
 interface ChartProps {
   datasetLabel: string;
   dataChart: any;
-  identifier: string;
   chartRef: any;
 
 }
 
-export const Chart = ({ identifier, datasetLabel, dataChart, chartRef }: ChartProps) => {
+export const Chart = ({ datasetLabel, dataChart, chartRef }: ChartProps) => {
   if (dataChart) {
     let labels: string[] = [];
     let datasets: { data: any; backgroundColor: string; borderColor: string; label: string }[] = [];
     if (Array.isArray(dataChart)) {
-      labels = dataChart.map((e: any) => toDate(e.date));
+      labels = dataChart.map((e: { [x: string]: any }) => toDate(e.date));
       datasets = [
         {
-          data: dataChart.map((e: any) => e.value),
+          data: dataChart.map((e: { [x: string]: any }) => e.value),
           backgroundColor: "rgba(53, 162, 235, 0.5)",
           borderColor: "rgb(53, 162, 235)",
           label: datasetLabel,
@@ -28,15 +25,15 @@ export const Chart = ({ identifier, datasetLabel, dataChart, chartRef }: ChartPr
       ];
     } else if (typeof dataChart === "object") {
       const colorList = ["red", "blue", "yellow", "lime", "pink", "black", "orange", "green"];
-      datasets = Object.keys(dataChart).map((item: string, idx: number) => {
+      datasets = Object.keys(dataChart).map((label: string, idx: number) => {
         if (labels.length === 0) {
-          labels = dataChart[item].map((e: any) => toDate(e.date));
+          labels = dataChart[label].map((e: { [x: string]: any }) => toDate(e.date));
         }
         return {
-          data: dataChart[item].map((e: any) => e.value),
+          data: dataChart[label].map((e: { [x: string]: any }) => e.value),
           backgroundColor: colorList[idx],
           borderColor: colorList[idx],
-          label: item,
+          label: label,
         };
       });
     } else {

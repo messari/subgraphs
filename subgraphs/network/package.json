@@ -1,14 +1,13 @@
 {
   "name": "Network Subgraph",
   "license": "MIT",
-  "description": "A subgraph that gathers L1 data for EVM chains",
   "scripts": {
     "format": "npx prettier --write .",
     "codegen": "graph codegen"
   },
   "dependencies": {
-    "@graphprotocol/graph-ts": "^0.29.2",
-    "@graphprotocol/graph-cli": "^0.37.7"
+    "@graphprotocol/graph-ts": "0.29.3",
+    "@graphprotocol/graph-cli": "0.42.4"
   },
   "devDependencies": {
     "prettier": "^2.6.0"

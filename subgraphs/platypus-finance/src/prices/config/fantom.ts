@@ -7,14 +7,14 @@ export const NETWORK_STRING = "fantom";
 ///////////////////////////////////////////////////////////////////////////
 
 export const CURVE_CALCULATIONS_ADDRESS = Address.fromString("0x0b53e9df372e72d8fdcdbedfbb56059957a37128");
-export const CURVE_REGISTRY_ADDRESS = Address.fromString("0x0f854EA9F38ceA4B1c2FC79047E9D0134419D5d6");
-export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString("0x4fb93D7d320E8A263F22f62C2059dFC2A8bCbC4c");
+export const CURVE_REGISTRY_ADDRESS = Address.fromString("0x0f854ea9f38cea4b1c2fc79047e9d0134419d5d6");
+export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString("0x4fb93d7d320e8a263f22f62c2059dfc2a8bcbc4c");
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// SUSHISWAP CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString("0xec7Ac8AC897f5082B2c3d4e8D2173F992A097F24");
+export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString("0xec7ac8ac897f5082b2c3d4e8d2173f992a097f24");
 export const SUSHISWAP_WETH_ADDRESS = Address.fromString("0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83");
 
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
@@ -50,16 +50,16 @@ WHITELIST_TOKENS.set(
   "WETH",
   Address.fromString("0x658b0c7613e890ee50b8c4bc6a3f41ef411208ad"), // fETH
 );
-WHITELIST_TOKENS.set("ETH", Address.fromString("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"));
+WHITELIST_TOKENS.set("ETH", Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"));
 WHITELIST_TOKENS.set("gfUSDT", Address.fromString("0x940f41f0ec9ba1a34cf001cc03347ac092f5f6b5"));
 WHITELIST_TOKENS.set("DAI", Address.fromString("0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e"));
 WHITELIST_TOKENS.set("USDC", Address.fromString("0x04068da6c83afcfa0e13ba15a6696662335d5b75"));
 WHITELIST_TOKENS.set("WFTM", Address.fromString("0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83"));
-WHITELIST_TOKENS.set("WBTC", Address.fromString("0x321162Cd933E2Be498Cd2267a90534A804051b11"));
+WHITELIST_TOKENS.set("WBTC", Address.fromString("0x321162cd933e2be498cd2267a90534a804051b11"));
 WHITELIST_TOKENS.set("fBTC", Address.fromString("0xe1146b9ac456fcbb60644c36fd3f868a9072fc6e"));
 WHITELIST_TOKENS.set("FRAX", Address.fromString("0xdc301622e621166bd8e82f2ca0a26c13ad0be355"));
 WHITELIST_TOKENS.set("LINK", Address.fromString("0xb3654dc3d10ea7645f8319668e8f54d2574fbdc8"));
-WHITELIST_TOKENS.set("CRV", Address.fromString("0x1E4F97b9f9F913c46F1632781732927B9019C68b"));
+WHITELIST_TOKENS.set("CRV", Address.fromString("0x1e4f97b9f9f913c46f1632781732927b9019c68b"));
 
 export const BASE_TOKEN = "FTM";
 export const WRAPPED_BASE_TOKEN = "WFTM";

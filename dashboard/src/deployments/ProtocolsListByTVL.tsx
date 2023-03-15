@@ -5,7 +5,6 @@ import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 import { useNavigate } from "react-router";
 import { NetworkLogo, NetworkLogos, networkMapping } from "../common/NetworkLogo";
 import { ProtocolTypeDropDown } from "../common/utilComponents/ProtocolTypeDropDown";
-import moment from "moment";
 
 interface ProtocolsListByTVLProps {
     protocolsToQuery: { [x: string]: any };

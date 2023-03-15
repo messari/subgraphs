@@ -9,7 +9,7 @@ export function getOrCreatePool(
   blockNumber: BigInt,
   blockTimestamp: BigInt
 ): Pool {
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
   let pool = Pool.load(protocol.id);
 
   if (!pool) {
@@ -40,6 +40,7 @@ export function getOrCreatePool(
 
     // Quantitative Token Data
     pool.inputTokenBalances = [BIGINT_ZERO];
+    pool.inputTokenBalancesUSD = [BIGDECIMAL_ZERO];
     pool.outputTokenSupply = BIGINT_ZERO;
     pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     pool.stakedOutputTokenAmount = null;

@@ -1,0 +1,14 @@
+{
+  "network": "arbitrum-one",
+  "GlpManagerAddr": "0x321F653eED006AD1C29D174e17d96351BDe22649",
+  "GlpManagerStartBlock": 225000,
+  "GlpManager2Addr": "0x3963FfC9dff443c2A94f21b129D429891E32ec18",
+  "GlpManager2StartBlock": 40559781,
+  "VaultAddr": "0x489ee077994B6658eAfA855C308275EAd8097C4A",
+  "VaultStartBlock": 227091,
+  "FeeGlpRewardDistributorAddr": "0x5C04a12EB54A093c396f61355c6dA0B15890150d",
+  "FeeGlpRewardDistributorStartBlock": 218204,
+  "EsgmxGlpRewardDistributorAddr": "0x60519b48ec4183a61ca2B8e37869E675FD203b34",
+  "EsgmxGlpRewardDistributorStartBlock": 218208,
+  "deployment": "GMX_ARBITRUM"
+}

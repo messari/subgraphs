@@ -43,7 +43,7 @@ export function handleTransfer(event: Transfer): void {
   if (
     event.params.to.toHexString() == ZERO_ADDRESS &&
     event.params.value.equals(BIGINT_THOUSAND) &&
-    pool.outputTokenSupply == BIGINT_ZERO
+    pool.outputTokenSupply! == BIGINT_ZERO
   ) {
     return;
   }
