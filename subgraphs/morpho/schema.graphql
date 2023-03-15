@@ -1098,6 +1098,12 @@ type Market @entity {
   " The aggregation of the 'borrowBalanceInOf.inP2P' user balances"
   _scaledBorrowInP2P: BigInt!
 
+  " The aggregation of the scaled p2p supply balances if the p2p balances was on pool"
+  _virtualScaledSupply: BigInt!
+
+  " The aggregation of the scaled p2p borrow balances if the p2p balances was on pool"
+  _virtualScaledBorrow: BigInt!
+
   " The poolSupplyAmount in scaled units"
   poolSupplyAmount: BigInt!
 
@@ -1145,6 +1151,16 @@ type Market @entity {
 
   " The total borrow interest paid by users on p2p in USD"
   p2pBorrowInterestsUSD: BigDecimal!
+
+  " The amount of borrow interest not paid by p2p matched users compared to a pool position"
+  p2pBorrowInterestsImprovement: BigDecimal!
+  " The amount of borrow interest not paid by p2p matched users compared to a pool position, in USD"
+  p2pBorrowInterestsImprovementUSD: BigDecimal!
+
+  " The amount of supply interest earned by p2p matched users compared to a pool position"
+  p2pSupplyInterestsImprovement: BigDecimal!
+  " The amount of supply interest earned by p2p matched users compared to a pool position, in USD"
+  p2pSupplyInterestsImprovementUSD: BigDecimal!
 
   " The number of decimals of the rates and the indexes, WAD or RAY."
   _indexesOffset: Int!
@@ -1680,6 +1696,8 @@ type Position @entity {
   " balance in P2P (in P2PUnits) "
   balanceInP2P: BigInt!
 
+  " balance in pool units from p2p balance"
+  _virtualP2P: BigInt!
 }
 
 # Unlike other snapshots that are taken at a fixed time interval. Position

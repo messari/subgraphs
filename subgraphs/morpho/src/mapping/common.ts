@@ -128,6 +128,14 @@ export function _handleSupplied(
     event
   );
 
+  const virtualP2P = balanceInP2P
+    .times(market._p2pSupplyIndex)
+    .div(market._lastPoolSupplyIndex);
+
+  market._virtualScaledSupply = market._virtualScaledSupply
+    .minus(position._virtualP2P)
+    .plus(virtualP2P);
+
   market._scaledSupplyOnPool = market._scaledSupplyOnPool
     .minus(position.balanceOnPool)
     .plus(balanceOnPool);
@@ -137,6 +145,7 @@ export function _handleSupplied(
 
   position.balanceOnPool = balanceOnPool;
   position.balanceInP2P = balanceInP2P;
+  position._virtualP2P = virtualP2P;
 
   const totalSupplyOnPool = balanceOnPool
     .times(market._lastPoolSupplyIndex)
@@ -255,15 +264,23 @@ export function _handleWithdrawn(
     return;
   }
 
+  const virtualP2P = balanceInP2P
+    .times(market._p2pSupplyIndex)
+    .div(market._lastPoolSupplyIndex);
+
   market._scaledSupplyOnPool = market._scaledSupplyOnPool
     .minus(position.balanceOnPool)
     .plus(balanceOnPool);
   market._scaledSupplyInP2P = market._scaledSupplyInP2P
     .minus(position.balanceInP2P)
     .plus(balanceInP2P);
+  market._virtualScaledSupply = market._virtualScaledSupply
+    .minus(position._virtualP2P)
+    .plus(virtualP2P);
 
   position.balanceOnPool = balanceOnPool;
   position.balanceInP2P = balanceInP2P;
+  position._virtualP2P = virtualP2P;
 
   position.save();
 
@@ -483,6 +500,10 @@ export function _handleBorrowed(
     event
   );
 
+  const virtualP2P = inP2P
+    .times(market._p2pBorrowIndex)
+    .div(market._lastPoolBorrowIndex);
+
   market._scaledBorrowOnPool = market._scaledBorrowOnPool
     .minus(position.balanceOnPool)
     .plus(onPool);
@@ -491,8 +512,13 @@ export function _handleBorrowed(
     .minus(position.balanceInP2P)
     .plus(inP2P);
 
+  market._virtualScaledBorrow = market._virtualScaledBorrow
+    .minus(position._virtualP2P)
+    .plus(virtualP2P);
+
   position.balanceOnPool = onPool;
   position.balanceInP2P = inP2P;
+  position._virtualP2P = virtualP2P;
 
   const borrowOnPool = onPool
     .times(market._lastPoolBorrowIndex)
@@ -570,11 +596,16 @@ export function _handleP2PIndexesUpdated(
   // The token price is updated in reserveUpdated event
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
-  const poolSupplyInterest = poolSupplyIndex
+  const supplyDeltaIndexes = poolSupplyIndex
     .minus(market._lastPoolSupplyIndex)
     .toBigDecimal()
-    .div(exponentToBigDecimal(market._indexesOffset))
+    .div(exponentToBigDecimal(market._indexesOffset));
+  const poolSupplyInterest = supplyDeltaIndexes
     .times(market._scaledSupplyOnPool.toBigDecimal())
+    .div(exponentToBigDecimal(inputToken.decimals));
+
+  const virtualSupplyInterest = supplyDeltaIndexes
+    .times(market._virtualScaledSupply.toBigDecimal())
     .div(exponentToBigDecimal(inputToken.decimals));
 
   market._lastPoolSupplyIndex = poolSupplyIndex;
@@ -588,11 +619,17 @@ export function _handleP2PIndexesUpdated(
 
   market._p2pSupplyIndex = p2pSupplyIndex;
 
-  const poolBorrowInterest = poolBorrowIndex
+  const borrowDeltaIndexes = poolBorrowIndex
     .minus(market._lastPoolBorrowIndex)
     .toBigDecimal()
-    .div(exponentToBigDecimal(market._indexesOffset))
+    .div(exponentToBigDecimal(market._indexesOffset));
+
+  const poolBorrowInterest = borrowDeltaIndexes
     .times(market._scaledBorrowOnPool.toBigDecimal())
+    .div(exponentToBigDecimal(inputToken.decimals));
+
+  const virtualBorrowInterest = borrowDeltaIndexes
+    .times(market._virtualScaledBorrow.toBigDecimal())
     .div(exponentToBigDecimal(inputToken.decimals));
 
   market._lastPoolBorrowIndex = poolBorrowIndex;
@@ -640,6 +677,30 @@ export function _handleP2PIndexesUpdated(
   market.p2pBorrowInterestsUSD = market.p2pBorrowInterestsUSD.plus(
     p2pBorrowInterest.times(market.inputTokenPriceUSD)
   );
+
+  market.p2pSupplyInterestsImprovement =
+    market.p2pSupplyInterestsImprovement.plus(
+      p2pSupplyInterest.minus(virtualSupplyInterest)
+    );
+
+  market.p2pSupplyInterestsImprovementUSD =
+    market.p2pSupplyInterestsImprovementUSD.plus(
+      p2pSupplyInterest
+        .minus(virtualSupplyInterest)
+        .times(market.inputTokenPriceUSD)
+    );
+
+  market.p2pBorrowInterestsImprovement =
+    market.p2pBorrowInterestsImprovement.plus(
+      virtualBorrowInterest.minus(p2pBorrowInterest)
+    );
+
+  market.p2pBorrowInterestsImprovementUSD =
+    market.p2pBorrowInterestsImprovementUSD.plus(
+      virtualBorrowInterest
+        .minus(p2pBorrowInterest)
+        .times(market.inputTokenPriceUSD)
+    );
 
   market.cumulativeTotalRevenueUSD =
     market.cumulativeTotalRevenueUSD.plus(totalRevenueDeltaUSD);
@@ -732,6 +793,13 @@ export function _handleRepaid(
     );
     return;
   }
+  const virtualP2P = balanceInP2P
+    .times(market._p2pBorrowIndex)
+    .div(market._lastPoolBorrowIndex);
+
+  market._virtualScaledBorrow = market._virtualScaledBorrow
+    .minus(position._virtualP2P)
+    .plus(virtualP2P);
   market._scaledBorrowOnPool = market._scaledBorrowOnPool
     .minus(position.balanceOnPool)
     .plus(balanceOnPool);
@@ -741,6 +809,7 @@ export function _handleRepaid(
 
   position.balanceOnPool = balanceOnPool;
   position.balanceInP2P = balanceInP2P;
+  position._virtualP2P = virtualP2P;
 
   position.save();
 
@@ -879,6 +948,13 @@ export function _handleSupplierPositionUpdated(
     EventType.SUPPLIER_POSITION_UPDATE,
     event
   );
+  const virtualP2P = inP2P
+    .times(market._p2pSupplyIndex)
+    .div(market._lastPoolSupplyIndex);
+
+  market._virtualScaledSupply = market._virtualScaledSupply
+    .minus(position._virtualP2P)
+    .plus(virtualP2P);
 
   market._scaledSupplyOnPool = market._scaledSupplyOnPool
     .minus(position.balanceOnPool)
@@ -889,6 +965,7 @@ export function _handleSupplierPositionUpdated(
 
   position.balanceOnPool = onPool;
   position.balanceInP2P = inP2P;
+  position._virtualP2P = virtualP2P;
 
   position.save();
   market.save();
@@ -918,6 +995,13 @@ export function _handleBorrowerPositionUpdated(
     EventType.BORROWER_POSITION_UPDATE,
     event
   );
+  const virtualP2P = inP2P
+    .times(market._p2pBorrowIndex)
+    .div(market._lastPoolBorrowIndex);
+
+  market._virtualScaledBorrow = market._virtualScaledBorrow
+    .minus(position._virtualP2P)
+    .plus(virtualP2P);
 
   market._scaledBorrowOnPool = market._scaledBorrowOnPool
     .minus(position.balanceOnPool)
@@ -928,6 +1012,7 @@ export function _handleBorrowerPositionUpdated(
 
   position.balanceOnPool = onPool;
   position.balanceInP2P = inP2P;
+  position._virtualP2P = virtualP2P;
 
   position.save();
   market.save();

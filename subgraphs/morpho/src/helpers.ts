@@ -521,6 +521,7 @@ export function addPosition(
     }
     position.balanceOnPool = BigInt.zero();
     position.balanceInP2P = BigInt.zero();
+    position._virtualP2P = BigInt.zero();
 
     position.balance = BigInt.zero();
     position.depositCount = 0;

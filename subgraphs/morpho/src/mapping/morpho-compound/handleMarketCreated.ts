@@ -142,6 +142,8 @@ export function handleMarketCreated(event: MarketCreated): void {
   market._scaledSupplyInP2P = BigInt.zero();
   market._scaledBorrowOnPool = BigInt.zero();
   market._scaledBorrowInP2P = BigInt.zero();
+  market._virtualScaledSupply = BigInt.zero();
+  market._virtualScaledBorrow = BigInt.zero();
 
   market.poolSupplyAmount = BigInt.zero();
   market.poolBorrowAmount = BigInt.zero();
@@ -156,6 +158,10 @@ export function handleMarketCreated(event: MarketCreated): void {
   market.poolBorrowInterests = BigDecimal.zero();
   market.p2pSupplyInterests = BigDecimal.zero();
   market.p2pBorrowInterests = BigDecimal.zero();
+  market.p2pBorrowInterestsImprovement = BigDecimal.zero();
+  market.p2pBorrowInterestsImprovementUSD = BigDecimal.zero();
+  market.p2pSupplyInterestsImprovement = BigDecimal.zero();
+  market.p2pSupplyInterestsImprovementUSD = BigDecimal.zero();
   market.poolSupplyInterestsUSD = BigDecimal.zero();
   market.poolBorrowInterestsUSD = BigDecimal.zero();
   market.p2pSupplyInterestsUSD = BigDecimal.zero();
