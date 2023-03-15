@@ -1,5 +1,5 @@
 import axios from "axios";
-import { errorNotification } from "./messageDiscord.js";
+import { errorNotification, postError } from "./messageDiscord.js";
 
 const queryContents = `
 subgraph
@@ -85,59 +85,76 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
     )
   });
 
+  const decenSubgraphHashToIndexingObj = {};
   const decenDeploymentMapping = {};
+  const decenErrorObj = {};
   await Promise.allSettled(decenQueries)
     .then(
-      (response) =>
-      (response.forEach((metaData) => {
-        if (metaData?.value?.data?.data?._meta?.deployment) {
-          decenDeploymentMapping[metaData?.value?.data?.data?._meta?.deployment] = metaData?.value?.config?.url?.split("/subgraphs/id/")?.[1];
-        }
-      })))
+      (response) => {
+        response.forEach((metaData) => {
+          if (metaData?.value?.data?.data?._meta?.deployment) {
+            decenDeploymentMapping[metaData?.value?.data?.data?._meta?.deployment] = metaData?.value?.config?.url?.split("/subgraphs/id/")?.[1];
+          } else {
+            decenErrorObj[metaData?.value?.config?.url?.split("/subgraphs/id/")?.[1]] = metaData?.value?.data?.errors?.message;
+          }
+        })
+      })
     .catch((err) => errorNotification("ERROR LOCATION 16 " + err.message));
 
-  const indexingQuery = `query Status { indexingStatuses(subgraphs: ${JSON.stringify(Object.keys(decenDeploymentMapping))} ) { 
-    subgraph
-    synced
-    fatalError {
-      message
-    }
-    chains {
-      chainHeadBlock {
-        number
+  if (Object.keys(decenDeploymentMapping)?.length > 0) {
+    const indexingQuery = `query Status { indexingStatuses(subgraphs: ${JSON.stringify(Object.keys(decenDeploymentMapping))} ) { 
+      subgraph
+      synced
+      fatalError {
+        message
       }
-      earliestBlock {
-        number
+      chains {
+        chainHeadBlock {
+          number
+        }
+        earliestBlock {
+          number
+        }
+        latestBlock {
+          number
+        }
+        lastHealthyBlock {
+          number
+        }
       }
-      latestBlock {
-        number
-      }
-      lastHealthyBlock {
-        number
-      }
-    }
-    entityCount
-}
-}`;
+      entityCount
+  }
+  }`;
 
-  const res = await axios.post("https://api.thegraph.com/index-node/graphql", { query: indexingQuery })
-  const decenSubgraphHashToIndexingObj = {};
-  res.data.data.indexingStatuses.forEach(obj => {
-    let indexedPercentage = ((obj?.chains[0]?.latestBlock?.number - obj?.chains[0]?.earliestBlock?.number) / (obj?.chains[0]?.chainHeadBlock?.number - obj?.chains[0]?.earliestBlock?.number)) || 0;
-    indexedPercentage = indexedPercentage * 100;
-    if (indexedPercentage > 99.5) {
-      indexedPercentage = 100;
+    let res = {};
+    try {
+      res = await axios.post("https://api.thegraph.com/index-node/graphql", { query: indexingQuery });
+    } catch (err) {
+      postError('ERROR QUERYING INDEX STATUS - ', err.message);
     }
-    if (obj.fatalError) {
-      decenSubgraphHashToIndexingObj[decenDeploymentMapping[obj.subgraph]] = {
-        endpoint: "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenDeploymentMapping[obj.subgraph],
-        hash: obj.subgraph,
-        indexingErrorMessage: obj.fatalError.message,
-        indexingErrorBlock: obj?.chains[0]?.latestBlock?.number,
-        indexingPercentage: indexedPercentage.toFixed(2)
-      };
+    try {
+      res?.data?.data?.indexingStatuses?.forEach(obj => {
+        let indexedPercentage = ((obj?.chains[0]?.latestBlock?.number - obj?.chains[0]?.earliestBlock?.number) / (obj?.chains[0]?.chainHeadBlock?.number - obj?.chains[0]?.earliestBlock?.number)) || 0;
+        indexedPercentage = indexedPercentage * 100;
+        if (indexedPercentage > 99.5) {
+          indexedPercentage = 100;
+        }
+        if (obj?.fatalError) {
+          decenSubgraphHashToIndexingObj[decenDeploymentMapping[obj?.subgraph]] = {
+            endpoint: "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenDeploymentMapping[obj?.subgraph],
+            hash: obj?.subgraph,
+            indexingErrorMessage: obj?.fatalError?.message,
+            indexingErrorBlock: obj?.chains[0]?.latestBlock?.number,
+            indexingPercentage: indexedPercentage.toFixed(2)
+          };
+        }
+      });
+    } catch (err) {
+      postError('ERROR HANDLING INDEXING STATUS RESPONSE - ' + err.message);
     }
-  });
+  } else {
+    postError('ERRORS CREATING DECENTRALIZED DEPLOYMENT MAPPING - ' + Object.values(decenErrorObj).join(' | ').slice(0, 500) + '...');
+  }
   return decenSubgraphHashToIndexingObj;
 }
 
