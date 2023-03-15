@@ -1,0 +1,14 @@
+{
+  "name": "morpho-v1",
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write ."
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.42.4",
+    "@graphprotocol/graph-ts": "^0.29.3"
+  },
+  "devDependencies": {
+    "matchstick-as": "^0.5.2"
+  }
+}
