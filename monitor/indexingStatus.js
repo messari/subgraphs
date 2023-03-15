@@ -130,7 +130,7 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
     try {
       res = await axios.post("https://api.thegraph.com/index-node/graphql", { query: indexingQuery });
     } catch (err) {
-      postError('ERROR QUERYING INDEX STATUS - ', err.message);
+      postError('ERROR QUERYING INDEX STATUS - ' + err.message);
     }
     try {
       res?.data?.data?.indexingStatuses?.forEach(obj => {
