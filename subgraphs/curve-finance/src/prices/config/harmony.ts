@@ -18,7 +18,7 @@ export const AAVE_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
 
 export const CURVE_REGISTRY_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x0a53FaDa2d943057C47A301D25a4D9b3B8e01e8E"),
+    Address.fromString("0x0a53fada2d943057c47a301d25a4d9b3b8e01e8e"),
     BigInt.fromI32(18003250)
   ),
 ];
@@ -29,7 +29,7 @@ export const CURVE_REGISTRY_ADDRESSES = [
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"), // SushiSwap
+    Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // SushiSwap
     BigInt.fromI32(11256069)
   ),
 ];

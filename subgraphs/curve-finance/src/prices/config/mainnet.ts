@@ -13,12 +13,12 @@ export const YEARN_LENS_CONTRACT_ADDRESS = ContractInfo.set(
 );
 
 export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0x07D91f5fb9Bf7798734C3f606dB065549F6893bb"),
+  Address.fromString("0x07d91f5fb9bf7798734c3f606db065549f6893bb"),
   BigInt.fromI32(12522266)
 );
 
 export const CHAIN_LINK_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"),
+  Address.fromString("0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf"),
   BigInt.fromI32(12864088)
 );
 
@@ -27,17 +27,17 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = ContractInfo.set(
 ///////////////////////////////////////////////////////////////////////////
 
 export const CURVE_CALCULATIONS_ADDRESS = ContractInfo.set(
-  Address.fromString("0x25BF7b72815476Dd515044F9650Bf79bAd0Df655"),
+  Address.fromString("0x25bf7b72815476dd515044f9650bf79bad0df655"),
   BigInt.fromI32(12370088)
 );
 
 export const CURVE_REGISTRY_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x7D86446dDb609eD0F5f8684AcF30380a356b2B4c"),
+    Address.fromString("0x7d86446ddb609ed0f5f8684acf30380a356b2b4c"),
     BigInt.fromI32(11154794)
   ),
   ContractInfo.set(
-    Address.fromString("0x8F942C20D02bEfc377D41445793068908E2250D0"),
+    Address.fromString("0x8f942c20d02befc377d41445793068908e2250d0"),
     BigInt.fromI32(13986752)
   ),
 ];
@@ -57,7 +57,7 @@ export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
     BigInt.fromI32(10207858)
   ),
   ContractInfo.set(
-    Address.fromString("0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F"), // SushiSwap
+    Address.fromString("0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f"), // SushiSwap
     BigInt.fromI32(10794261)
   ),
 ];
@@ -177,7 +177,7 @@ WHITELISTED_TOKENS.set(
   TokenInfo.set(
     "ETH",
     18,
-    Address.fromString("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE")
+    Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
   )
 );
 

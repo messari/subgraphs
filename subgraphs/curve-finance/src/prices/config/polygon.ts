@@ -8,12 +8,12 @@ export const NETWORK_STRING = "matic";
 ///////////////////////////////////////////////////////////////////////////
 
 export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0x7F069df72b7A39bCE9806e3AfaF579E54D8CF2b9"),
+  Address.fromString("0x7f069df72b7a39bce9806e3afaf579e54d8cf2b9"),
   BigInt.fromI32(15030523)
 );
 
 export const AAVE_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0xb023e699F5a33916Ea823A16485e259257cA8Bd1"),
+  Address.fromString("0xb023e699f5a33916ea823a16485e259257ca8bd1"),
   BigInt.fromI32(25825996)
 );
 
@@ -23,11 +23,11 @@ export const AAVE_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
 
 export const CURVE_REGISTRY_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x094d12e5b541784701FD8d65F11fc0598FBC6332"),
+    Address.fromString("0x094d12e5b541784701fd8d65f11fc0598fbc6332"),
     BigInt.fromI32(13991825)
   ),
   ContractInfo.set(
-    Address.fromString("0x47bB542B9dE58b970bA50c9dae444DDB4c16751a"),
+    Address.fromString("0x47bb542b9de58b970ba50c9dae444ddb4c16751a"),
     BigInt.fromI32(23556360)
   ),
 ];

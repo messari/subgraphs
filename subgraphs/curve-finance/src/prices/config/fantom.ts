@@ -13,12 +13,12 @@ export const YEARN_LENS_CONTRACT_ADDRESS = ContractInfo.set(
 );
 
 export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0xE8E598A1041b6fDB13999D275a202847D9b654ca"),
+  Address.fromString("0xe8e598a1041b6fdb13999d275a202847d9b654ca"),
   BigInt.fromI32(34026291)
 );
 
 export const AAVE_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0xfd6f3c1845604C8AE6c6E402ad17fb9885160754"),
+  Address.fromString("0xfd6f3c1845604c8ae6c6e402ad17fb9885160754"),
   BigInt.fromI32(33142059)
 );
 
@@ -33,11 +33,11 @@ export const CURVE_CALCULATIONS_ADDRESS = ContractInfo.set(
 
 export const CURVE_REGISTRY_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x0f854EA9F38ceA4B1c2FC79047E9D0134419D5d6"),
+    Address.fromString("0x0f854ea9f38cea4b1c2fc79047e9d0134419d5d6"),
     BigInt.fromI32(5655918)
   ),
   ContractInfo.set(
-    Address.fromString("0x4fb93D7d320E8A263F22f62C2059dFC2A8bCbC4c"),
+    Address.fromString("0x4fb93d7d320e8a263f22f62c2059dfc2a8bcbc4c"),
     BigInt.fromI32(27552509)
   ),
 ];
@@ -61,7 +61,7 @@ export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
     BigInt.fromI32(2457904)
   ),
   ContractInfo.set(
-    Address.fromString("0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52"), // Spiritswap
+    Address.fromString("0x16327e3fbdaca3bcf7e38f5af2599d2ddc33ae52"), // Spiritswap
     BigInt.fromI32(4250168)
   ),
 ];

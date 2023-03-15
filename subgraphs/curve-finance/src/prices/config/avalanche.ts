@@ -8,12 +8,12 @@ export const NETWORK_STRING = "avalanche";
 ///////////////////////////////////////////////////////////////////////////
 
 export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0xBd0c7AaF0bF082712EbE919a9dD94b2d978f79A9"),
+  Address.fromString("0xbd0c7aaf0bf082712ebe919a9dd94b2d978f79a9"),
   BigInt.fromI32(8608685)
 );
 
 export const AAVE_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0xEBd36016B3eD09D4693Ed4251c67Bd858c3c7C9C"),
+  Address.fromString("0xebd36016b3ed09d4693ed4251c67bd858c3c7c9c"),
   BigInt.fromI32(11970477)
 );
 
@@ -23,11 +23,11 @@ export const AAVE_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
 
 export const CURVE_REGISTRY_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6"),
+    Address.fromString("0x8474ddbe98f5aa3179b3b3f5942d724afcdec9f6"),
     BigInt.fromI32(5254206)
   ),
   ContractInfo.set(
-    Address.fromString("0x90f421832199e93d01b64DaF378b183809EB0988"),
+    Address.fromString("0x90f421832199e93d01b64daf378b183809eb0988"),
     BigInt.fromI32(9384663)
   ),
 ];
@@ -38,15 +38,15 @@ export const CURVE_REGISTRY_ADDRESSES = [
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x60aE616a2155Ee3d9A68541Ba4544862310933d4"), // TraderJOE
+    Address.fromString("0x60ae616a2155ee3d9a68541ba4544862310933d4"), // TraderJOE
     BigInt.fromI32(2486393)
   ),
   ContractInfo.set(
-    Address.fromString("0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106"), // Pangolin
+    Address.fromString("0xe54ca86531e17ef3616d22ca28b0d458b6c89106"), // Pangolin
     BigInt.fromI32(56879)
   ),
   ContractInfo.set(
-    Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"), // SushiSwap
+    Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // SushiSwap
     BigInt.fromI32(506236)
   ),
 ];

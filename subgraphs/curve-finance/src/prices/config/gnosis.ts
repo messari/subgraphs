@@ -8,7 +8,7 @@ export const NETWORK_STRING: string = "xdai";
 ///////////////////////////////////////////////////////////////////////////
 
 export const INCH_ORACLE_CONTRACT_ADDRESS =  ContractInfo.set(
-  Address.fromString("0x142DB045195CEcaBe415161e1dF1CF0337A4d02E"),
+  Address.fromString("0x142db045195cecabe415161e1df1cf0337a4d02e"),
   BigInt.fromI32(19731993),
 );
 ///////////////////////////////////////////////////////////////////////////
@@ -17,11 +17,11 @@ export const INCH_ORACLE_CONTRACT_ADDRESS =  ContractInfo.set(
 
 export const CURVE_REGISTRY_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x55E91365697EB8032F98290601847296eC847210"),
+    Address.fromString("0x55e91365697eb8032f98290601847296ec847210"),
     BigInt.fromI32(20754886),
   ),
   ContractInfo.set(
-    Address.fromString("0x8A4694401bE8F8FCCbC542a3219aF1591f87CE17"),
+    Address.fromString("0x8a4694401be8f8fccbc542a3219af1591f87ce17"),
     BigInt.fromI32(23334728),
   ),
 ];

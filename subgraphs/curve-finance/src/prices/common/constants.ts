@@ -24,7 +24,7 @@ export const CHAIN_LINK_USD_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000348"
 );
 export const ETH_ADDRESS = Address.fromString(
-  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 );
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
@@ -43,8 +43,8 @@ export const STABLE_TOKENS: string[] = ["USDC", "USDT", "DAI"];
 
 export const BLACKLISTED_TOKENS: Address[] = [
   Address.fromString("0x0000000000000000000000000000000000000000"), // Null Address
-  Address.fromString("0xB755B949C126C04e0348DD881a5cF55d424742B2"), // Curve USD-BTC-ETH
+  Address.fromString("0xb755b949c126c04e0348dd881a5cf55d424742b2"), // Curve USD-BTC-ETH
   Address.fromString("0xd79138c49c49200a1afc935171d1bdad084fdc95"), // Curve.fi Factory Plain Pool: 3pool
-  Address.fromString("0x37C9Be6C81990398e9B87494484Afc6a4608C25d"), // Curve.fi Factory Plain Pool: blizz
+  Address.fromString("0x37c9be6c81990398e9b87494484afc6a4608c25d"), // Curve.fi Factory Plain Pool: blizz
   Address.fromString("0xf72beacc6fd334e14a7ddac25c3ce1eb8a827e10"), // Curve.fi Factory USD Metapool: Defrost H2O
 ];

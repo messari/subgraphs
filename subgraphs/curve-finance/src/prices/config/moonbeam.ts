@@ -9,7 +9,7 @@ export const NETWORK_STRING = "moonbeam";
 
 export const CURVE_REGISTRY_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0xC2b1DF84112619D190193E48148000e3990Bf627"),
+    Address.fromString("0xc2b1df84112619d190193e48148000e3990bf627"),
     BigInt.fromI32(1452049)
   ),
 ];

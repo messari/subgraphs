@@ -18,7 +18,7 @@ export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
 );
 
 export const AAVE_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0xb56c2F0B653B2e0b10C9b928C8580Ac5Df02C7C7"),
+  Address.fromString("0xb56c2f0b653b2e0b10c9b928c8580ac5df02c7c7"),
   BigInt.fromI32(7740843)
 );
 
@@ -33,11 +33,11 @@ export const CURVE_CALCULATIONS_ADDRESS = ContractInfo.set(
 
 export const CURVE_REGISTRY_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x445FE580eF8d70FF569aB36e80c647af338db351"),
+    Address.fromString("0x445fe580ef8d70ff569ab36e80c647af338db351"),
     BigInt.fromI32(1362056)
   ),
   ContractInfo.set(
-    Address.fromString("0x0E9fBb167DF83EdE3240D6a5fa5d40c6C6851e15"),
+    Address.fromString("0x0e9fbb167df83ede3240d6a5fa5d40c6c6851e15"),
     BigInt.fromI32(4530115)
   ),
 ];
@@ -137,7 +137,7 @@ WHITELISTED_TOKENS.set(
   TokenInfo.set(
     "ETH",
     18,
-    Address.fromString("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE")
+    Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
   )
 );
 

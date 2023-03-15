@@ -8,7 +8,7 @@ export const NETWORK_STRING = "aurora";
 ///////////////////////////////////////////////////////////////////////////
 
 export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
-  Address.fromString("0xE4E0552452e5cC1306A2bF5B2Fd9b1eA19418795"),
+  Address.fromString("0xe4e0552452e5cc1306a2bf5b2fd9b1ea19418795"),
   BigInt.fromI32(66366270)
 );
 
@@ -29,7 +29,7 @@ export const CURVE_REGISTRY_ADDRESSES = [
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x2CB45Edb4517d5947aFdE3BEAbF95A582506858B"), // TriSolaris
+    Address.fromString("0x2cb45edb4517d5947afde3beabf95a582506858b"), // TriSolaris
     BigInt.fromI32(49607893)
   ),
 ];
@@ -61,7 +61,7 @@ WHITELISTED_TOKENS.set(
   TokenInfo.set(
     "USDC",
     6,
-    Address.fromString("0xB12BFcA5A55806AaF64E99521918A4bf0fC40802")
+    Address.fromString("0xb12bfca5a55806aaf64e99521918a4bf0fc40802")
   )
 );
 WHITELISTED_TOKENS.set(
@@ -69,7 +69,7 @@ WHITELISTED_TOKENS.set(
   TokenInfo.set(
     "USDT",
     6,
-    Address.fromString("0x4988a896b1227218e4A686fdE5EabdcAbd91571f")
+    Address.fromString("0x4988a896b1227218e4a686fde5eabdcabd91571f")
   )
 );
 
@@ -78,7 +78,7 @@ WHITELISTED_TOKENS.set(
   TokenInfo.set(
     "DAI",
     18,
-    Address.fromString("0xe3520349F477A5F6EB06107066048508498A291b")
+    Address.fromString("0xe3520349f477a5f6eb06107066048508498a291b")
   )
 );
 
@@ -87,7 +87,7 @@ WHITELISTED_TOKENS.set(
   TokenInfo.set(
     "WETH",
     18,
-    Address.fromString("0xC9BdeEd33CD01541e1eeD10f90519d2C06Fe3feB")
+    Address.fromString("0xc9bdeed33cd01541e1eed10f90519d2c06fe3feb")
   )
 );
 
@@ -96,7 +96,7 @@ WHITELISTED_TOKENS.set(
   TokenInfo.set(
     "Aurora",
     18,
-    Address.fromString("0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79")
+    Address.fromString("0x8bec47865ade3b172a928df8f990bc7f2a3b9f79")
   )
 );
 
