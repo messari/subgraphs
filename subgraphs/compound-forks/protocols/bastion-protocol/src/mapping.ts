@@ -69,6 +69,7 @@ import {
   _handleTransfer,
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
+  getTokenPriceUSD,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
@@ -364,11 +365,6 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
 export function handleAccrueInterest(event: AccrueInterest): void {
   const marketAddress = event.address;
-  // update rewards for market after the RewardDistributor is created at block 60837741
-  //if (event.block.number.toI64() > 60837741) {
-  //  updateRewards(marketAddress, event.block.number);
-  //}
-
   const market = Market.load(marketAddress.toHexString());
   if (!market || !market._realm) {
     log.error(
@@ -388,7 +384,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     log.error("[handleAccrueInterest]realm {} doesn't exist tx {}-{}", [
       market._realm!,
       event.transaction.hash.toHexString(),
-      event.transactionLogIndex.toHexString(),
+      event.transactionLogIndex.toString(),
     ]);
     return;
   }
@@ -396,6 +392,28 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   const oracleContract = PriceOracle.bind(
     Address.fromString(realm.priceOracle)
   );
+
+  const underlyingPriceResult =
+    oracleContract.try_getUnderlyingPrice(marketAddress);
+  const underlyingToken = Token.load(market.inputToken)!;
+  if (!underlyingPriceResult.reverted) {
+    const priceUSD = getTokenPriceUSD(
+      underlyingPriceResult,
+      underlyingToken.decimals
+    );
+    log.info(
+      "[handleAccrueInterest]underlying token={}/{} PriceResult={},priceUSD={},tx {}-{} block {}",
+      [
+        underlyingToken.id,
+        underlyingToken.name,
+        underlyingPriceResult.value.toString(),
+        priceUSD.toString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+        event.block.number.toString(),
+      ]
+    );
+  }
 
   const cTokenContract = CToken.bind(marketAddress);
   const updateMarketData = new UpdateMarketData(
@@ -513,7 +531,6 @@ function updateRewardSpeed(
   const rewardTokenAddress = Address.fromString(rewardType.token);
   const token = getOrCreateToken(rewardTokenAddress);
   const dailyEmission = newSpeed.times(BigInt.fromI32(SECONDS_PER_DAY));
-  //TODO update reward token price (getBastionPrice, ...)
   const priceUSD = getRewardTokenPrice(token);
   const dailyEmissionUSD = dailyEmission
     .toBigDecimal()
@@ -521,12 +538,12 @@ function updateRewardSpeed(
     .times(priceUSD);
 
   const rewardToken = getOrCreateRewardToken(token, rewardTokenType);
-  const rewardTokens = market.rewardTokens ? market.rewardTokens : [];
+  const rewardTokens = market.rewardTokens ? market.rewardTokens! : [];
   let rewardEmissions = market.rewardTokenEmissionsAmount
-    ? market.rewardTokenEmissionsAmount
+    ? market.rewardTokenEmissionsAmount!
     : [];
   let rewardEmissionsUSD = market.rewardTokenEmissionsUSD
-    ? market.rewardTokenEmissionsUSD
+    ? market.rewardTokenEmissionsUSD!
     : [];
 
   const rewardTokenIndex = rewardTokens!.indexOf(rewardToken.id);
@@ -562,7 +579,7 @@ function updateRewardSpeed(
   market.save();
 
   log.info(
-    "[]market {}/{} reward emission updated: rewardTokens [{}], emissions=[{}], emissionsUSD=[{}] at tx {}-{}",
+    "[updateRewardSpeed]market {}/{} reward emission updated: rewardTokens [{}], emissions=[{}], emissionsUSD=[{}] at tx {}-{}",
     [
       market.id,
       market.name ? market.name! : "",
@@ -616,24 +633,43 @@ function getOrCreateRewardToken(token: Token, type: string): RewardToken {
 function getRewardTokenPrice(token: Token): BigDecimal {
   if (Address.fromString(token.id).equals(cBSTNContract)) {
     const oracleContract = PriceOracle.bind(bstnOracle);
-
-    const priceUSD = getOrElse(
+    const price = getOrElse(
       oracleContract.try_getUnderlyingPrice(cBSTNContract),
       BIGINT_ZERO
     );
-    return priceUSD.toBigDecimal().div(exponentToBigDecimal(mantissaFactor));
+    const priceUSD = price
+      .toBigDecimal()
+      .div(exponentToBigDecimal(mantissaFactor));
+    log.info("[getRewardTokenPrice]token {}/{} price={}", [
+      token.symbol,
+      priceUSD.toString(),
+    ]);
+    return priceUSD;
   }
 
   if (Address.fromString(token.id).equals(cNearContract)) {
     const oracleContract = PriceOracle.bind(nearOracle);
-
-    const priceUSD = getOrElse(
+    const price = getOrElse(
       oracleContract.try_getUnderlyingPrice(cNearContract),
       BIGINT_ZERO
     );
-    return priceUSD.toBigDecimal().div(exponentToBigDecimal(mantissaFactor));
+    const priceUSD = price
+      .toBigDecimal()
+      .div(exponentToBigDecimal(mantissaFactor));
+    log.info("[getRewardTokenPrice]token {}/{} price={}", [
+      token.symbol,
+      priceUSD.toString(),
+    ]);
+    return priceUSD;
   }
-  return token.lastPriceUSD ? token.lastPriceUSD! : BIGDECIMAL_ZERO;
+
+  const priceUSD = token.lastPriceUSD ? token.lastPriceUSD! : BIGDECIMAL_ZERO;
+  log.info("[getRewardTokenPrice]token {}/{} price={}", [
+    token.symbol,
+    priceUSD.toString(),
+  ]);
+
+  return priceUSD;
 }
 
 // A function which given 3 arrays of arbitrary types of the same length,
