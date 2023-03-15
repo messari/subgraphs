@@ -6,10 +6,7 @@ export class RewardsInfoType {
   private _rewardTokens: Address[];
   private _rewardRates: BigInt[];
 
-  constructor(
-    rewardTokens: Address[],
-    rewardRates: BigInt[],
-  ) {
+  constructor(rewardTokens: Address[], rewardRates: BigInt[]) {
     this._rewardTokens = rewardTokens;
     this._rewardRates = rewardRates;
   }
@@ -36,7 +33,7 @@ export class PoolFeesType {
   constructor(
     tradingFee: LiquidityPoolFee,
     protocolFee: LiquidityPoolFee,
-    lpFee: LiquidityPoolFee,
+    lpFee: LiquidityPoolFee
   ) {
     this._tradingFee = tradingFee;
     this._protocolFee = protocolFee;

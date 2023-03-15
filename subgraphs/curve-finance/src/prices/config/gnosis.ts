@@ -7,9 +7,9 @@ export const NETWORK_STRING: string = "xdai";
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const INCH_ORACLE_CONTRACT_ADDRESS =  ContractInfo.set(
+export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
   Address.fromString("0x142db045195cecabe415161e1df1cf0337a4d02e"),
-  BigInt.fromI32(19731993),
+  BigInt.fromI32(19731993)
 );
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
@@ -18,11 +18,11 @@ export const INCH_ORACLE_CONTRACT_ADDRESS =  ContractInfo.set(
 export const CURVE_REGISTRY_ADDRESSES = [
   ContractInfo.set(
     Address.fromString("0x55e91365697eb8032f98290601847296ec847210"),
-    BigInt.fromI32(20754886),
+    BigInt.fromI32(20754886)
   ),
   ContractInfo.set(
     Address.fromString("0x8a4694401be8f8fccbc542a3219af1591f87ce17"),
-    BigInt.fromI32(23334728),
+    BigInt.fromI32(23334728)
   ),
 ];
 
@@ -33,7 +33,7 @@ export const CURVE_REGISTRY_ADDRESSES = [
 export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
   ContractInfo.set(
     Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // SushiSwap
-    BigInt.fromI32(14735910),
+    BigInt.fromI32(14735910)
   ),
 ];
 ///////////////////////////////////////////////////////////////////////////
