@@ -14,7 +14,6 @@ import {
   incrementPoolEventCount,
   increasePoolPremium,
   increasePoolVolume,
-  increasePoolTotalRevenue,
   increasePoolProtocolSideRevenue,
   updatePoolCurrentEpoch,
 } from "../entities/pool";
@@ -181,7 +180,6 @@ export function handleUpdatePositionEvent(
     collateralToken.decimals
   ).times(collateralToken.lastPriceUSD!);
 
-  increasePoolTotalRevenue(event, pool, feeUSD);
   increasePoolProtocolSideRevenue(event, pool, feeUSD);
   updateTempUsageMetrics(event, accountAddress, eventType);
 

@@ -247,17 +247,6 @@ export function incrementProtocolTotalPoolCount(event: ethereum.Event): void {
   protocol.save();
 }
 
-export function increaseProtocolTotalRevenue(
-  event: ethereum.Event,
-  amountChangeUSD: BigDecimal
-): void {
-  const protocol = getOrCreateProtocol();
-  protocol.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD.plus(amountChangeUSD);
-  protocol._lastUpdateTimestamp = event.block.timestamp;
-  protocol.save();
-}
-
 export function increaseProtocolSideRevenue(
   event: ethereum.Event,
   amountChangeUSD: BigDecimal
@@ -265,6 +254,9 @@ export function increaseProtocolSideRevenue(
   const protocol = getOrCreateProtocol();
   protocol.cumulativeProtocolSideRevenueUSD =
     protocol.cumulativeProtocolSideRevenueUSD.plus(amountChangeUSD);
+  // Protocol total revenue
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(amountChangeUSD);
   protocol._lastUpdateTimestamp = event.block.timestamp;
   protocol.save();
 }
@@ -276,6 +268,9 @@ export function increaseProtocolSupplySideRevenue(
   const protocol = getOrCreateProtocol();
   protocol.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD.plus(amountChangeUSD);
+  // Protocol total revenue
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(amountChangeUSD);
   protocol._lastUpdateTimestamp = event.block.timestamp;
   protocol.save();
 }

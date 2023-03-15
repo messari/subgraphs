@@ -17,7 +17,6 @@ import {
   getOrCreateProtocol,
   updateProtocolTVL,
   increaseProtocolPremium,
-  increaseProtocolTotalRevenue,
   increaseProtocolSideRevenue,
   increaseProtocolSupplySideRevenue,
   updateProtocolOpenInterestUSD,
@@ -383,7 +382,7 @@ export function incrementPoolEventCount(
   incrementProtocolEventCount(event, eventType, isPut);
 }
 
-export function updatePoolInputTokenBalance(
+export function increasePoolInputTokenBalance(
   event: ethereum.Event,
   pool: LiquidityPool,
   inputToken: Token,
@@ -444,20 +443,6 @@ export function updatePoolRewardToken(
   pool.save();
 }
 
-export function increasePoolTotalRevenue(
-  event: ethereum.Event,
-  pool: LiquidityPool,
-  amountChangeUSD: BigDecimal
-): void {
-  pool.cumulativeTotalRevenueUSD =
-    pool.cumulativeTotalRevenueUSD.plus(amountChangeUSD);
-  pool._lastUpdateTimestamp = event.block.timestamp;
-  pool.save();
-
-  // Protocol
-  increaseProtocolTotalRevenue(event, amountChangeUSD);
-}
-
 export function increasePoolProtocolSideRevenue(
   event: ethereum.Event,
   pool: LiquidityPool,
@@ -465,6 +450,9 @@ export function increasePoolProtocolSideRevenue(
 ): void {
   pool.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD.plus(amountChangeUSD);
+  // Pool total revenue
+  pool.cumulativeTotalRevenueUSD =
+    pool.cumulativeTotalRevenueUSD.plus(amountChangeUSD);
   pool._lastUpdateTimestamp = event.block.timestamp;
   pool.save();
 
@@ -479,6 +467,9 @@ export function increasePoolSupplySideRevenue(
 ): void {
   pool.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD.plus(amountChangeUSD);
+  // Pool total revenue
+  pool.cumulativeTotalRevenueUSD =
+    pool.cumulativeTotalRevenueUSD.plus(amountChangeUSD);
   pool._lastUpdateTimestamp = event.block.timestamp;
   pool.save();
 
