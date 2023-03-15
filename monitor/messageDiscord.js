@@ -594,7 +594,7 @@ export async function sendMessageToZapierThread(msgObj) {
                 ghIssuePromiseArray.push(postGithubIssue({ protocol: msgObj.protocolName, type: "Indexing Errors", chains: msgObj.chains.filter(x => !x.toUpperCase().includes('DECEN')) }, validAlerts.filter(x => x.ghMessage).map(x => x.ghMessage).join('\n'), postedIssues, false));
             }
             if (validAlerts.filter(x => x.ghMessageDecen).length > 0) {
-                ghIssuePromiseArray.push(postGithubIssue({ protocol: msgObj.protocolName, type: "Indexing Errors", chains: msgObj.chains.filter(x => x.toUpperCase().includes('DECEN')) }, validAlerts.filter(x => x.ghMessageDecen).map(x => x.ghMessageDecen).join('\n'), postedIssues), true);
+                ghIssuePromiseArray.push(postGithubIssue({ protocol: msgObj.protocolName, type: "Indexing Errors", chains: msgObj.chains.filter(x => x.toUpperCase().includes('DECEN')) }, validAlerts.filter(x => x.ghMessageDecen).map(x => x.ghMessageDecen).join('\n'), postedIssues, true));
             }
         }
     } else if (Object.keys(msgObj).includes('protocol')) {

@@ -7,9 +7,14 @@ export async function postGithubIssue(title, body, postedIssues, isDecen) {
         const octokit = new Octokit({
             auth: "Bearer " + process.env.GH_TOKEN
         })
-        if (!postedIssues.map(x => x.title.toUpperCase()).find(x => x.includes(title.type.toUpperCase()) && x.includes(title.protocol.toUpperCase()) && (isDecen ? x.includes('DECEN') : !x.includes('DECEN')))) {
+        if (postedIssues.length === 0) {
+            postError('NO POSTED ISSUES REACHED GH ISSUE FUNC');
+        }
+        const issArr = postedIssues.map(x => x.title.toUpperCase());
+        if (!issArr.filter(x => x.includes(title.type.toUpperCase()) && x.includes(title.protocol.toUpperCase()) && (isDecen ? x.includes('DECEN') : !x.includes('DECEN')))?.length > 0) {
             try {
-                const chains = `[${title.chains.join(", ")}]`;
+                postError(JSON.stringify(title), JSON.stringify(postedIssues.map(x => x.title)), 'ENTERED AND POSTING GH ISSUE')
+                const chains = `${title.chains.join(", ")}`;
                 await octokit.request('POST /repos/messari/subgraphs/issues', {
                     title: `${title.protocol} ${chains}: ${title.type}`,
                     body,
@@ -20,14 +25,13 @@ export async function postGithubIssue(title, body, postedIssues, isDecen) {
                         'bug',
                         'monitor'
                     ]
-                })
-
+                });
             } catch (err) {
                 postError(err.message)
             }
         }
     } else {
-        postError('GH TOKEN ENV NOT ADDED')
+        postError('GH TOKEN ENV NOT ADDED');
     }
 }
 
