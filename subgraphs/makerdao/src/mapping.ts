@@ -215,7 +215,12 @@ export function handleVatCage(event: VatNoteEvent): void {
   }
 }
 
-export function handleVatGrab(event: ethereum.Event): void {
+export function handleVatGrab(event: VatNoteEvent): void {
+  log.info("[handleVatGrab]tx={}-{}", [
+    event.transaction.hash.toHexString(),
+    event.transactionLogIndex.toString(),
+  ]);
+
   // only needed for non-liquidations
   if (!event.receipt) {
     log.error("[handleVatGrab]no receipt found. Tx Hash: {}", [
@@ -227,21 +232,37 @@ export function handleVatGrab(event: ethereum.Event): void {
   const liquidationSigs = [
     crypto.keccak256(
       ByteArray.fromUTF8(
-        "Bite(indexed bytes32,indexed address,uint256,uint256,uint256,address,uint256)"
+        "Bite(bytes32,address,uint256,uint256,uint256,address,uint256)"
       )
     ),
 
     crypto.keccak256(
       ByteArray.fromUTF8(
-        "Bark(indexed bytes32,indexed address,uint256,uint256,uint256,address,indexed uint256)"
+        "Bark(bytes32,address,uint256,uint256,uint256,address,uint256)"
       )
     ),
   ];
 
   for (let i = 0; i < event.receipt!.logs.length; i++) {
     const txLog = event.receipt!.logs[i];
+    log.info(
+      "[handleVatGrab]LogIndex={},signature={},liquidationSigs=[{}, {}], signature==Sigs[0]?{}, signature==Sigs[1]?{}",
+      [
+        txLog.logIndex.toString(),
+        txLog.topics.at(0).toHexString(),
+        liquidationSigs[0].toHexString(),
+        liquidationSigs[1].toHexString(),
+        txLog.topics.at(0).equals(liquidationSigs[0]).toString(),
+        txLog.topics.at(0).equals(liquidationSigs[1]).toString(),
+      ]
+    );
+
     if (liquidationSigs.includes(txLog.topics.at(0))) {
       // it is a liquidation transaction; skip
+      log.info("[handleVatGrab]Skip handle grab() for liquidation tx {}-{}", [
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]);
       return;
     }
   }
