@@ -1,0 +1,392 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: MorphoAaveV2
+    network: mainnet
+    source:
+      address: "{{ morpho-aave-v2.address }}"
+      abi: MorphoAaveV2
+      startBlock: {{ morpho-aave-v2.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Borrowed
+        - P2PAmountsUpdated
+        - P2PBorrowDeltaUpdated
+        - P2PSupplyDeltaUpdated
+        - Supplied
+        - BorrowerPositionUpdated
+        - SupplierPositionUpdated
+        - P2PIndexesUpdated
+        - Liquidated
+        - Withdrawn
+        - Repaid
+        - AaveIncentivesControllerSet
+        - DefaultMaxGasForMatchingSet
+        - IsBorrowPausedSet
+        - IsDeprecatedSet
+        - IsLiquidateBorrowPausedSet
+        - IsLiquidateCollateralPausedSet
+        - IsRepayPausedSet
+        - IsSupplyPausedSet
+        - IsWithdrawPausedSet
+        - MarketCreated
+        - MaxSortedUsersSet
+        - OwnershipTransferred
+        - P2PIndexCursorSet
+        - P2PStatusSet
+        - PartialPauseStatusSet
+        - PauseStatusSet
+        - ReserveFactorSet
+        - ReserveFeeClaimed
+      abis:
+        - name: MorphoAaveV2
+          file: ./abis/MorphoAaveV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: AToken
+          file: ./abis/aave/AToken.json
+        - name: DebtToken
+          file: ./abis/aave/DebtToken.json
+        - name: LendingPool
+          file: ./abis/aave/LendingPool.json
+        - name: LendingPoolAddressesProvider
+          file: ./abis/aave/LendingPoolAddressesProvider.json
+        - name: LendingPoolConfigurator
+          file: ./abis/aave/LendingPoolConfigurator.json
+        - name: PriceOracle
+          file: ./abis/aave/PriceOracle.json
+        - name: ProtocolDataProvider
+          file: ./abis/aave/ProtocolDataProvider.json
+        - name: ChainlinkPriceFeed
+          file: ./abis/chainlink/PriceFeed.json
+      eventHandlers:
+        - event: Borrowed(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleBorrowed
+        - event: P2PAmountsUpdated(indexed address,uint256,uint256)
+          handler: handleP2PAmountsUpdated
+        - event: P2PBorrowDeltaUpdated(indexed address,uint256)
+          handler: handleP2PBorrowDeltaUpdated
+        - event: P2PSupplyDeltaUpdated(indexed address,uint256)
+          handler: handleP2PSupplyDeltaUpdated
+        - event: Supplied(indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleSupplied
+        - event: BorrowerPositionUpdated(indexed address,indexed address,uint256,uint256)
+          handler: handleBorrowerPositionUpdated
+        - event: SupplierPositionUpdated(indexed address,indexed address,uint256,uint256)
+          handler: handleSupplierPositionUpdated
+        - event: P2PIndexesUpdated(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleP2PIndexesUpdated
+        - event: Liquidated(address,indexed address,indexed address,uint256,indexed address,uint256)
+          handler: handleLiquidated
+        - event: Withdrawn(indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdrawn
+        - event: Repaid(indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleRepaid
+        - event: DefaultMaxGasForMatchingSet((uint64,uint64,uint64,uint64))
+          handler: handleDefaultMaxGasForMatchingSet
+        - event: IsBorrowPausedSet(indexed address,bool)
+          handler: handleIsBorrowPausedSet
+        - event: IsDeprecatedSet(indexed address,bool)
+          handler: handleIsDeprecatedSet
+        - event: IsLiquidateBorrowPausedSet(indexed address,bool)
+          handler: handleIsLiquidateBorrowPausedSet
+        - event: IsLiquidateCollateralPausedSet(indexed address,bool)
+          handler: handleIsLiquidateCollateralPausedSet
+        - event: IsRepayPausedSet(indexed address,bool)
+          handler: handleIsRepayPausedSet
+        - event: IsSupplyPausedSet(indexed address,bool)
+          handler: handleIsSupplyPausedSet
+        - event: IsWithdrawPausedSet(indexed address,bool)
+          handler: handleIsWithdrawPausedSet
+        - event: MarketCreated(indexed address,uint16,uint16)
+          handler: handleMarketCreated
+        - event: MaxSortedUsersSet(uint256)
+          handler: handleMaxSortedUsersSet
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: P2PIndexCursorSet(indexed address,uint16)
+          handler: handleP2PIndexCursorSet
+        - event: P2PStatusSet(indexed address,bool)
+          handler: handleP2PStatusSet
+        - event: PartialPauseStatusSet(indexed address,bool)
+          handler: handlePartialPauseStatusSet
+        - event: PauseStatusSet(indexed address,bool)
+          handler: handlePauseStatusSet
+        - event: ReserveFactorSet(indexed address,uint16)
+          handler: handleReserveFactorSet
+        - event: ReserveFeeClaimed(indexed address,uint256)
+          handler: handleReserveFeeClaimed
+      file: ./src/mapping/morpho-aave/morpho-aave-v2.ts
+
+  - kind: ethereum
+    name: MorphoCompound
+    network: mainnet
+    source:
+      address: "{{ morpho-compound.address }}"
+      abi: MorphoCompound
+      startBlock: {{ morpho-compound.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - P2PIndexesUpdated
+        - Borrowed
+        - BorrowerPositionUpdated
+        - Liquidated
+        - P2PAmountsUpdated
+        - P2PBorrowDeltaUpdated
+        - P2PSupplyDeltaUpdated
+        - Repaid
+        - Supplied
+        - SupplierPositionUpdated
+        - Withdrawn
+        - DefaultMaxGasForMatchingSet
+        - IsBorrowPausedSet
+        - IsDeprecatedSet
+        - IsLiquidateBorrowPausedSet
+        - IsLiquidateCollateralPausedSet
+        - IsRepayPausedSet
+        - IsSupplyPausedSet
+        - IsWithdrawPausedSet
+        - MarketCreated
+        - MaxSortedUsersSet
+        - OwnershipTransferred
+        - P2PIndexCursorSet
+        - P2PStatusSet
+        - PartialPauseStatusSet
+        - PauseStatusSet
+        - ReserveFactorSet
+        - ReserveFeeClaimed
+        - RewardsClaimed
+        - RewardsClaimedAndTraded
+      abis:
+        - name: MorphoCompound
+          file: ./abis/compound/MorphoCompound.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CToken
+          file: ./abis/compound/CToken.json
+        - name: Comptroller
+          file: ./abis/compound/Comptroller.json
+        - name: CompoundOracle
+          file: ./abis/compound/CompoundOracle.json
+      eventHandlers:
+        - event: P2PIndexesUpdated(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleP2PIndexesUpdated
+        - event: Borrowed(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleBorrowed
+        - event: BorrowerPositionUpdated(indexed address,indexed address,uint256,uint256)
+          handler: handleBorrowerPositionUpdated
+        - event: Liquidated(address,indexed address,indexed address,uint256,indexed address,uint256)
+          handler: handleLiquidated
+        - event: P2PAmountsUpdated(indexed address,uint256,uint256)
+          handler: handleP2PAmountsUpdated
+        - event: P2PBorrowDeltaUpdated(indexed address,uint256)
+          handler: handleP2PBorrowDeltaUpdated
+        - event: P2PSupplyDeltaUpdated(indexed address,uint256)
+          handler: handleP2PSupplyDeltaUpdated
+        - event: Repaid(indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleRepaid
+        - event: Supplied(indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleSupplied
+        - event: SupplierPositionUpdated(indexed address,indexed address,uint256,uint256)
+          handler: handleSupplierPositionUpdated
+        - event: Withdrawn(indexed address,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdrawn
+        - event: DefaultMaxGasForMatchingSet((uint64,uint64,uint64,uint64))
+          handler: handleDefaultMaxGasForMatchingSet
+        - event: IsBorrowPausedSet(indexed address,bool)
+          handler: handleIsBorrowPausedSet
+        - event: IsDeprecatedSet(indexed address,bool)
+          handler: handleIsDeprecatedSet
+        - event: IsLiquidateBorrowPausedSet(indexed address,bool)
+          handler: handleIsLiquidateBorrowPausedSet
+        - event: IsLiquidateCollateralPausedSet(indexed address,bool)
+          handler: handleIsLiquidateCollateralPausedSet
+        - event: IsRepayPausedSet(indexed address,bool)
+          handler: handleIsRepayPausedSet
+        - event: IsSupplyPausedSet(indexed address,bool)
+          handler: handleIsSupplyPausedSet
+        - event: IsWithdrawPausedSet(indexed address,bool)
+          handler: handleIsWithdrawPausedSet
+        - event: MarketCreated(indexed address,uint16,uint16)
+          handler: handleMarketCreated
+        - event: MaxSortedUsersSet(uint256)
+          handler: handleMaxSortedUsersSet
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: P2PIndexCursorSet(indexed address,uint16)
+          handler: handleP2PIndexCursorSet
+        - event: P2PStatusSet(indexed address,bool)
+          handler: handleP2PStatusSet
+        - event: PartialPauseStatusSet(indexed address,bool)
+          handler: handlePartialPauseStatusSet
+        - event: PauseStatusSet(indexed address,bool)
+          handler: handlePauseStatusSet
+        - event: ReserveFactorSet(indexed address,uint16)
+          handler: handleReserveFactorSet
+        - event: ReserveFeeClaimed(indexed address,uint256)
+          handler: handleReserveFeeClaimed
+        - event: RewardsClaimed(indexed address,uint256)
+          handler: handleRewardsClaimed
+        - event: RewardsClaimedAndTraded(indexed address,uint256)
+          handler: handleRewardsClaimedAndTraded
+      file: ./src/mapping/morpho-compound/morpho-compound.ts
+templates:
+  - kind: ethereum
+    name: LendingPool
+    network: mainnet
+    source:
+      abi: LendingPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ReserveDataUpdated
+      abis:
+        - name: MorphoAaveV2
+          file: ./abis/MorphoAaveV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: AToken
+          file: ./abis/aave/AToken.json
+        - name: DebtToken
+          file: ./abis/aave/DebtToken.json
+        - name: LendingPool
+          file: ./abis/aave/LendingPool.json
+        - name: LendingPoolAddressesProvider
+          file: ./abis/aave/LendingPoolAddressesProvider.json
+        - name: LendingPoolConfigurator
+          file: ./abis/aave/LendingPoolConfigurator.json
+        - name: PriceOracle
+          file: ./abis/aave/PriceOracle.json
+        - name: ProtocolDataProvider
+          file: ./abis/aave/ProtocolDataProvider.json
+        - name: ChainlinkPriceFeed
+          file: ./abis/chainlink/PriceFeed.json
+      eventHandlers:
+        - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleReserveDataUpdated
+      file: ./src/mapping/morpho-aave/lending-pool.ts
+
+  - kind: ethereum
+    name: LendingPoolConfigurator
+    network: mainnet
+    source:
+      abi: LendingPoolConfigurator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - BorrowingDisabledOnReserve
+        - BorrowingEnabledOnReserve
+        - CollateralConfigurationChanged
+        - ReserveActivated
+        - ReserveDeactivated
+        - ReserveDecimalsChanged
+        - ReserveFrozen
+        - ReserveUnfrozen
+      abis:
+        - name: LendingPoolConfigurator
+          file: ./abis/aave/LendingPoolConfigurator.json
+      eventHandlers:
+        - event: CollateralConfigurationChanged(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralConfigurationChanged
+      file: ./src/mapping/morpho-aave/lending-pool-configurator.ts
+  - kind: ethereum
+    name: CToken
+    network: mainnet
+    source:
+      abi: CToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AccrueInterest
+        - NewReserveFactor
+        - ReservesAdded
+        - ReservesReduced
+      abis:
+        - name: MorphoCompound
+          file: ./abis/compound/MorphoCompound.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CToken
+          file: ./abis/compound/CToken.json
+        - name: Comptroller
+          file: ./abis/compound/Comptroller.json
+        - name: CompoundOracle
+          file: ./abis/compound/CompoundOracle.json
+      eventHandlers:
+        - event: AccrueInterest(uint256,uint256,uint256)
+          handler: handleAccrueInterestV1
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleAccrueInterestV2
+      file: ./src/mapping/morpho-compound/c-token.ts
+  - kind: ethereum
+    name: Comptroller
+    network: mainnet
+    source:
+      abi: Comptroller
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CompBorrowSpeedUpdated
+        - CompSupplySpeedUpdated
+        - NewCloseFactor
+        - NewCollateralFactor
+        - NewPriceOracle
+      abis:
+        - name: MorphoCompound
+          file: ./abis/compound/MorphoCompound.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CToken
+          file: ./abis/compound/CToken.json
+        - name: Comptroller
+          file: ./abis/compound/Comptroller.json
+        - name: CompoundOracle
+          file: ./abis/compound/CompoundOracle.json
+      eventHandlers:
+        #        - event: CompBorrowSpeedUpdated(indexed address,uint256)
+        #          handler: handleCompBorrowSpeedUpdated
+        #        - event: CompSupplySpeedUpdated(indexed address,uint256)
+        #          handler: handleCompSupplySpeedUpdated
+        - event: NewBorrowCap(indexed address,uint256)
+          handler: handleNewBorrowCap
+        - event: NewCloseFactor(uint256,uint256)
+          handler: handleNewCloseFactor
+        - event: NewCollateralFactor(address,uint256,uint256)
+          handler: handleNewCollateralFactor
+        - event: NewPriceOracle(address,address)
+          handler: handleNewPriceOracle
+      file: ./src/mapping/morpho-compound/comptroller.ts
+  - kind: ethereum
+    name: CompoundOracle
+    network: mainnet
+    source:
+      abi: CompoundOracle
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - PriceUpdated
+      abis:
+        - name: CompoundOracle
+          file: ./abis/compound/CompoundOracle.json
+      eventHandlers:
+        - event: PriceUpdated(indexed bytes32,uint256)
+          handler: handlePriceUpdated
+      file: ./src/mapping/morpho-compound/oracle.ts
