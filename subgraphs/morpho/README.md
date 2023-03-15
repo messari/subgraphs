@@ -43,8 +43,14 @@ All Morpho Protocols are indexed in the same subgraph with different `LendingPro
 
 Coming soon
 
+## P2P improvement
+
+The Market entity has properties named `p2pSupplyInterestsImprovement` & `p2pBorrowInterestsImprovement` that are the improvement of the interests of the users that are matched on the P2P market compared to their equivalent position on the underlying pool.
+
+For example, if Alice has $100 matched at a 1% yield per yer (0.5% on the underlying pool), after one year, the yield earned is $1, and it was about $0.5 on the pool
 
  ## TODO
 - [ ] Add the Comp rewards for morpho-compound, since the protocol is redistributing comp rewards to users on pool
 - [ ] Add data about the p2p matching, such as number of matches, matched value etc.
 - [ ] Add Protocol Revenues. Not a problem for now since reserve factor is setted to 0.
+
