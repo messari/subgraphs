@@ -182,7 +182,7 @@ export function takeLiquidityPoolDailySnapshot(
       prevPoolMetrics._cumulativeOpenPositionCount;
     prevClosedPositionCount = prevPoolMetrics.closedPositionCount;
   } else if (pool._lastSnapshotDayID > INT_ZERO) {
-    log.error(
+    log.critical(
       "Missing daily pool snapshot at ID that has been snapped: Pool {}, ID {} ",
       [pool.id.toHexString(), pool._lastSnapshotDayID.toString()]
     );
@@ -445,7 +445,7 @@ export function takeLiquidityPoolHourlySnapshot(
     prevCumulativeWithdrawVolumeByTokenUSD =
       prevPoolMetrics._cumulativeWithdrawVolumeByTokenUSD;
   } else if (pool._lastSnapshotHourID > INT_ZERO) {
-    log.error(
+    log.critical(
       "Missing hourly pool snapshot at ID that has been snapped: Pool {}, ID {} ",
       [pool.id.toHexString(), pool._lastSnapshotHourID.toString()]
     );
