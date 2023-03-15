@@ -51,23 +51,23 @@ export class UniswapV3ArbitrumConfigurations implements Configurations {
   }
   getStableCoins(): Bytes[] {
     return stringToBytesList([
-      "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", // USDC
-      "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", // USDT
-      "0xD74f5255D557944cf7Dd0E45FF521520002D5748", // USDs
+      "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8", // USDC
+      "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9", // USDT
+      "0xd74f5255d557944cf7dd0e45ff521520002d5748", // USDs
     ]);
   }
   getStableOraclePools(): Bytes[] {
     return stringToBytesList([
-      "0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443", // wETH/USDC - 0.05
-      "0x17c14D2c404D167802b16C450d3c99F88F2c4F4d", // wETH/USDC - 0.30
-      "0xc858A329Bf053BE78D6239C4A4343B8FbD21472b", // wETH/USDT
+      "0xc31e54c7a869b9fcbecc14363cf510d1c41fa443", // wETH/USDC - 0.05
+      "0x17c14d2c404d167802b16c450d3c99f88f2c4f4d", // wETH/USDC - 0.30
+      "0xc858a329bf053be78d6239c4a4343b8fbd21472b", // wETH/USDT
     ]);
   }
   getUntrackedPairs(): Bytes[] {
     return stringToBytesList([]);
   }
   getUntrackedTokens(): Bytes[] {
-    return stringToBytesList(["0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a"]);
+    return stringToBytesList([]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("100000");

@@ -486,10 +486,10 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
             (response) => (response.map(x => {
                 const returnedData = x?.value?.data?.data;
                 const returnedError = x?.value?.data?.errors;
-                const depoKey = Object.keys(deployments).find(depo => deployments[depo].url === x.value.config.url)
+                const depoKey = Object.keys(deployments).find(depo => deployments[depo].url === x?.value?.config?.url)
                 let alert = ``;
 
-                if (returnedData) {
+                if (returnedData && depoKey) {
                     const key = Object.keys(returnedData)[0];
                     if (returnedData[key]?.length === 0 || !returnedData[key]) {
                         // alert for no protocol entity found
@@ -507,7 +507,9 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                     if (alertArr.length > 0) {
                         alert = alertArr.join(" --- ");
                         errorNotification("ERROR LOCATION 28 " + alert)
-                        deploymentsToReturn[depoKey].protocolErrors.queryError.push(alert);
+                        if (depoKey) {
+                            deploymentsToReturn[depoKey].protocolErrors.queryError.push(alert);
+                        }
                     }
                 }
 

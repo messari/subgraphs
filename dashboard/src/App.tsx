@@ -20,7 +20,7 @@ function App() {
   const [issuesMapping, setIssuesMapping] = useState<any>({});
 
   const getGithubRepoIssues = () => {
-    fetch("https://api.github.com/repos/messari/subgraphs/issues?per_page=100&state=open", {
+    fetch("https://api.github.com/repos/messari/subgraphs/issues?per_page=100&state=open&sort=updated", {
       method: "GET",
       headers: {
         Accept: "*/*",

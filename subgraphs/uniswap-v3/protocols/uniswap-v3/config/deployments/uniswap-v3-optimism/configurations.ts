@@ -68,10 +68,7 @@ export class UniswapV3OptimismConfigurations implements Configurations {
     return stringToBytesList([]);
   }
   getUntrackedTokens(): Bytes[] {
-    return stringToBytesList([
-      "0x296f55f8fb28e498b858d0bcda06d955b2cb3f97", // stargatetoken
-      "0x2e3d870790dc77a83dd1d18184acc7439a53f475", // frax
-    ]);
+    return stringToBytesList([]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("100000");

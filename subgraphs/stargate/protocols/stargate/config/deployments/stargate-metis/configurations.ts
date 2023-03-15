@@ -5,9 +5,9 @@ import {
 } from "../../../../../src/common/constants";
 import { Network } from "../../../../../src/sdk/util/constants";
 
-export class StargateFantomConfigurations implements Configurations {
+export class StargateMetisConfigurations implements Configurations {
   getNetwork(): string {
-    return Network.FANTOM;
+    return Network.METIS;
   }
   getProtocolName(): string {
     return PROTOCOL_NAME;
@@ -16,6 +16,6 @@ export class StargateFantomConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x9d1b1669c73b033dfe47ae5a0164ab96df25b944";
+    return "0xaf54be5b6eec24d6bfacf1cce4eaf680a8239398";
   }
 }

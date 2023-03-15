@@ -24,7 +24,7 @@ export class UniswapV3CeloConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0xd9dc0d8f754c027DF7eCB4BD381301cEC76CD32F")
+      Address.fromString("0xd9dc0d8f754c027df7ecb4bd381301cec76cd32f")
     );
   }
   getFeeOnOff(): string {

@@ -16,9 +16,6 @@ export class StargateMainnetConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x06D538690AF257Da524f25D0CD52fD85b1c2173E";
-  }
-  getRewardToken(): string {
-    return "0xAf5191B0De278C7286d6C7CC6ab6BB8A73bA2Cd6";
+    return "0x06d538690af257da524f25d0cd52fd85b1c2173e";
   }
 }
