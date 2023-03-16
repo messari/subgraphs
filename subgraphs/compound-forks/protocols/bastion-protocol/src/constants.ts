@@ -37,6 +37,10 @@ export const nativeCToken = new TokenData(
   cTokenDecimals
 );
 
+export const BSTN_TOKEN_ADDRESS = Address.fromString(
+  "0x9f1f933c660a1dc856f0e0fe058435879c5ccef0"
+);
+
 export const cBSTNContract = Address.fromString(
   "0x08ac1236ae3982ec9463efe10f0f320d9f5a9a4b"
 );
@@ -45,12 +49,28 @@ export const bstnOracle = Address.fromString(
   "0x4fa59cae2b1e0d3bbadb3385ba29b0b35822e8ad"
 );
 
+export const NEAR_TOKEN_ADDRESS = Address.fromString(
+  "0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d"
+);
+
 export const cNearContract = Address.fromString(
   "0x8c14ea853321028a7bb5e4fb0d0147f183d3b677"
 );
 
 export const nearOracle = Address.fromString(
   "0x91a99a522d6fc3a424701b875497279c426c1d70"
+);
+
+export const STNEAR_TOKEN_ADDRESS = Address.fromString(
+  "0x07f9f7f963c5cd2bbffd30ccfb964be114332e30"
+);
+
+export const cStNearContract = Address.fromString(
+  "0x30fff4663a8dcdd9ed81e60acf505e6159f19bbc"
+);
+
+export const stNearOracle = Address.fromString(
+  "0x71ebea24b18f6ecf97c5a5bcaef3e0639575f08c"
 );
 
 // reward token mappings

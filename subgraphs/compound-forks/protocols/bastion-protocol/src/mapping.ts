@@ -42,8 +42,6 @@ import {
   SECONDS_PER_DAY,
   RewardTokenType,
   exponentToBigDecimal,
-  INT_ZERO,
-  INT_ONE,
   BIGDECIMAL_ZERO,
   mantissaFactor,
 } from "../../../src/constants";
@@ -81,22 +79,24 @@ import {
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import {
   AURORA_REALM_ADDRESS,
+  BSTN_TOKEN_ADDRESS,
   bstnOracle,
   cBSTNContract,
   cNearContract,
   comptrollerAddr,
+  cStNearContract,
   MULTICHAIN_REALM_ADDRESS,
   nativeCToken,
   nativeToken,
+  NEAR_TOKEN_ADDRESS,
   nearOracle,
-  rewardDistributorAddress,
-  REWARD_TOKENS,
+  STNEAR_TOKEN_ADDRESS,
+  stNearOracle,
   STNEAR_REALM_ADDRESS,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 import {
   RewardAdded,
-  RewardDistributor,
   RewardAddressChanged,
   RewardBorrowSpeedUpdated,
   RewardSupplySpeedUpdated,
@@ -368,7 +368,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   const market = Market.load(marketAddress.toHexString());
   if (!market || !market._realm) {
     log.error(
-      "[handleAccrueInterest]market {} doesn't exist or realm {} tx {}-{}",
+      "[handleAccrueInterest]market {} doesn't exist or market.realm{} tx {}-{}",
       [
         marketAddress.toHexString(),
         market && !market._realm ? "=null" : "",
@@ -389,21 +389,36 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     return;
   }
 
-  const oracleContract = PriceOracle.bind(
-    Address.fromString(realm.priceOracle)
+  // replace price oracle for Near and stNear token in the stNear realm
+  // as the stNear realm oracle returns prices relative to the Near price
+  let priceOracle = Address.fromString(realm.priceOracle);
+  let marketAddressForOracle = marketAddress;
+  if (Address.fromString(market.inputToken).equals(NEAR_TOKEN_ADDRESS)) {
+    priceOracle = nearOracle;
+    marketAddressForOracle = cNearContract;
+  } else if (
+    Address.fromString(market.inputToken).equals(STNEAR_TOKEN_ADDRESS)
+  ) {
+    priceOracle = stNearOracle;
+    marketAddressForOracle = cStNearContract;
+  }
+
+  const oracleContract = PriceOracle.bind(priceOracle);
+  const underlyingToken = Token.load(market.inputToken)!;
+  const underlyingPriceResult = oracleContract.try_getUnderlyingPrice(
+    marketAddressForOracle
   );
 
-  const underlyingPriceResult =
-    oracleContract.try_getUnderlyingPrice(marketAddress);
-  const underlyingToken = Token.load(market.inputToken)!;
   if (!underlyingPriceResult.reverted) {
     const priceUSD = getTokenPriceUSD(
       underlyingPriceResult,
       underlyingToken.decimals
     );
     log.info(
-      "[handleAccrueInterest]underlying token={}/{} PriceResult={},priceUSD={},tx {}-{} block {}",
+      "[handleAccrueInterest]market={}/{}; underlying token={}/{}; PriceResult={},priceUSD={}; tx {}-{}, block {}",
       [
+        market.id,
+        market.name ? market.name! : "",
         underlyingToken.id,
         underlyingToken.name,
         underlyingPriceResult.value.toString(),
@@ -546,32 +561,32 @@ function updateRewardSpeed(
     ? market.rewardTokenEmissionsUSD!
     : [];
 
-  const rewardTokenIndex = rewardTokens!.indexOf(rewardToken.id);
+  const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
   if (rewardTokenIndex == -1) {
     // this is a new reward token
-    rewardTokens!.push(rewardToken.id);
-    rewardEmissions!.push(dailyEmission);
-    rewardEmissionsUSD!.push(dailyEmissionUSD);
+    rewardTokens.push(rewardToken.id);
+    rewardEmissions.push(dailyEmission);
+    rewardEmissionsUSD.push(dailyEmissionUSD);
 
-    if (rewardTokens!.length > 1) {
+    if (rewardTokens.length > 1) {
       // rewardTokenEmissionsAmount, rewardTokenEmissionsUSD needs to be sorted
-      const rewardTokensUnsorted = rewardTokens!;
-      rewardTokens!.sort();
+      const rewardTokensUnsorted = rewardTokens;
+      rewardTokens.sort();
       rewardEmissions = sortArrayByReference<string, BigInt>(
-        rewardTokens!,
+        rewardTokens,
         rewardTokensUnsorted,
-        rewardEmissions!
+        rewardEmissions
       );
       rewardEmissionsUSD = sortArrayByReference<string, BigDecimal>(
-        rewardTokens!,
+        rewardTokens,
         rewardTokensUnsorted,
-        rewardEmissionsUSD!
+        rewardEmissionsUSD
       );
     }
   } else {
     // existing reward token, update rewardEmissions and rewardEmissionsUSD at rewardTokenIndex
-    rewardEmissions![rewardTokenIndex] = dailyEmission;
-    rewardEmissionsUSD![rewardTokenIndex] = dailyEmissionUSD;
+    rewardEmissions[rewardTokenIndex] = dailyEmission;
+    rewardEmissionsUSD[rewardTokenIndex] = dailyEmissionUSD;
   }
   market.rewardTokens = rewardTokens;
   market.rewardTokenEmissionsAmount = rewardEmissions;
@@ -631,7 +646,7 @@ function getOrCreateRewardToken(token: Token, type: string): RewardToken {
 }
 
 function getRewardTokenPrice(token: Token): BigDecimal {
-  if (Address.fromString(token.id).equals(cBSTNContract)) {
+  if (Address.fromString(token.id).equals(BSTN_TOKEN_ADDRESS)) {
     const oracleContract = PriceOracle.bind(bstnOracle);
     const price = getOrElse(
       oracleContract.try_getUnderlyingPrice(cBSTNContract),
@@ -640,14 +655,15 @@ function getRewardTokenPrice(token: Token): BigDecimal {
     const priceUSD = price
       .toBigDecimal()
       .div(exponentToBigDecimal(mantissaFactor));
-    log.info("[getRewardTokenPrice]token {}/{} price={}", [
+    log.info("[getRewardTokenPrice]1 token {}/{} price={}", [
+      token.id,
       token.symbol,
       priceUSD.toString(),
     ]);
     return priceUSD;
   }
 
-  if (Address.fromString(token.id).equals(cNearContract)) {
+  if (Address.fromString(token.id).equals(NEAR_TOKEN_ADDRESS)) {
     const oracleContract = PriceOracle.bind(nearOracle);
     const price = getOrElse(
       oracleContract.try_getUnderlyingPrice(cNearContract),
@@ -656,7 +672,8 @@ function getRewardTokenPrice(token: Token): BigDecimal {
     const priceUSD = price
       .toBigDecimal()
       .div(exponentToBigDecimal(mantissaFactor));
-    log.info("[getRewardTokenPrice]token {}/{} price={}", [
+    log.info("[getRewardTokenPrice]2 token {}/{} price={}", [
+      token.id,
       token.symbol,
       priceUSD.toString(),
     ]);
@@ -664,7 +681,8 @@ function getRewardTokenPrice(token: Token): BigDecimal {
   }
 
   const priceUSD = token.lastPriceUSD ? token.lastPriceUSD! : BIGDECIMAL_ZERO;
-  log.info("[getRewardTokenPrice]token {}/{} price={}", [
+  log.info("[getRewardTokenPrice]3 token {}/{} price={}", [
+    token.id,
     token.symbol,
     priceUSD.toString(),
   ]);
