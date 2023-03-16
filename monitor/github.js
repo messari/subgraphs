@@ -46,11 +46,11 @@ export async function getGithubIssues() {
                     Authorization: "Bearer " + process.env.GH_TOKEN
                 },
             })
-
             validIssues = await req.json();
         } catch (err) {
-            console.log(err)
+            postError("getGithubIssues() - " + err.message);
         }
     }
+    postError("NUMBER OF ISSUES PULLED FROM GH REPO: " + validIssues?.length + " --- " + validIssues.map(x => x.title).join(" --- ") || 0);
     return validIssues;
 }

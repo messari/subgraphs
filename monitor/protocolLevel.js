@@ -64,8 +64,28 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
         let queryToUse = ``;
 
         if (deployment.data.protocols[0].type.toUpperCase() === "EXCHANGE") {
-            if (versionGroup === "2.0") {
+            if (versionGroup === "2.0.0") {
                 queryToUse = ``;
+            } else if (versionGroup === "1.3.0") {
+                queryToUse = `query {
+                    dexAmmProtocols {
+                        id
+                        name
+                        slug
+                        schemaVersion
+                        subgraphVersion
+                        methodologyVersion
+                        network
+                        type
+                        cumulativeVolumeUSD
+                        cumulativeUniqueUsers
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                        totalPoolCount
+                    }
+                }`;
             } else {
                 queryToUse = `
                 query {
@@ -93,7 +113,7 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 }`;
             }
         } else if (deployment.data.protocols[0].type.toUpperCase() === "LENDING") {
-            if (versionGroup === "2.0") {
+            if (versionGroup === "2.0.0") {
                 queryToUse = `
                 query {
                     lendingProtocols {
@@ -140,7 +160,7 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 }`;
             }
         } else if (deployment.data.protocols[0].type.toUpperCase() === "YIELD") {
-            if (versionGroup === "2.0") {
+            if (versionGroup === "2.0.0") {
                 queryToUse = ``;
             } else {
                 queryToUse = `
@@ -276,41 +296,41 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
             issuesArrays.totalPoolCount.push(data.totalPoolCount);
         }
 
-        if (
-            dataFields.includes("cumulativeUniqueDepositors") &&
-            parseFloat(data.cumulativeUniqueDepositors) <
-            parseFloat(data.cumulativeUniqueUsers) &&
-            !issuesArrays.cumulativeUniqueDepositors.includes(data.cumulativeUniqueDepositors)
-        ) {
-            issuesArrays.cumulativeUniqueDepositors.push(data.cumulativeUniqueDepositors);
-        }
+        // if (
+        //     dataFields.includes("cumulativeUniqueDepositors") &&
+        //     parseFloat(data.cumulativeUniqueDepositors) >
+        //     parseFloat(data.cumulativeUniqueUsers) &&
+        //     !issuesArrays.cumulativeUniqueDepositors.includes(data.cumulativeUniqueDepositors)
+        // ) {
+        //     issuesArrays.cumulativeUniqueDepositors.push(data.cumulativeUniqueDepositors);
+        // }
 
-        if (
-            dataFields.includes("cumulativeUniqueBorrowers") &&
-            parseFloat(data.cumulativeUniqueBorrowers) <
-            parseFloat(data.cumulativeUniqueUsers) &&
-            !issuesArrays.cumulativeUniqueBorrowers.includes(data.cumulativeUniqueBorrowers)
-        ) {
-            issuesArrays.cumulativeUniqueBorrowers.push(data.cumulativeUniqueBorrowers);
-        }
+        // if (
+        //     dataFields.includes("cumulativeUniqueBorrowers") &&
+        //     parseFloat(data.cumulativeUniqueBorrowers) >
+        //     parseFloat(data.cumulativeUniqueUsers) &&
+        //     !issuesArrays.cumulativeUniqueBorrowers.includes(data.cumulativeUniqueBorrowers)
+        // ) {
+        //     issuesArrays.cumulativeUniqueBorrowers.push(data.cumulativeUniqueBorrowers);
+        // }
 
-        if (
-            dataFields.includes("cumulativeUniqueLiquidators") &&
-            parseFloat(data.cumulativeUniqueLiquidators) <
-            parseFloat(data.cumulativeUniqueUsers) &&
-            !issuesArrays.cumulativeUniqueLiquidators.includes(data.cumulativeUniqueLiquidators)
-        ) {
-            issuesArrays.cumulativeUniqueLiquidators.push(data.cumulativeUniqueLiquidators);
-        }
+        // if (
+        //     dataFields.includes("cumulativeUniqueLiquidators") &&
+        //     parseFloat(data.cumulativeUniqueLiquidators) >
+        //     parseFloat(data.cumulativeUniqueUsers) &&
+        //     !issuesArrays.cumulativeUniqueLiquidators.includes(data.cumulativeUniqueLiquidators)
+        // ) {
+        //     issuesArrays.cumulativeUniqueLiquidators.push(data.cumulativeUniqueLiquidators);
+        // }
 
-        if (
-            dataFields.includes("cumulativeUniqueLiquidatees") &&
-            parseFloat(data.cumulativeUniqueLiquidatees) <
-            parseFloat(data.cumulativeUniqueUsers) &&
-            !issuesArrays.cumulativeUniqueLiquidatees.includes(data.cumulativeUniqueLiquidatees)
-        ) {
-            issuesArrays.cumulativeUniqueLiquidatees.push(data.cumulativeUniqueLiquidatees);
-        }
+        // if (
+        //     dataFields.includes("cumulativeUniqueLiquidatees") &&
+        //     parseFloat(data.cumulativeUniqueLiquidatees) >
+        //     parseFloat(data.cumulativeUniqueUsers) &&
+        //     !issuesArrays.cumulativeUniqueLiquidatees.includes(data.cumulativeUniqueLiquidatees)
+        // ) {
+        //     issuesArrays.cumulativeUniqueLiquidatees.push(data.cumulativeUniqueLiquidatees);
+        // }
 
         if (
             dataFields.includes("openPositionCount") &&
