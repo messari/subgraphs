@@ -67,7 +67,6 @@ import {
   _handleTransfer,
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
-  getTokenPriceUSD,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
@@ -404,39 +403,13 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   }
 
   const oracleContract = PriceOracle.bind(priceOracle);
-  const underlyingToken = Token.load(market.inputToken)!;
-  const underlyingPriceResult = oracleContract.try_getUnderlyingPrice(
-    marketAddressForOracle
-  );
-
-  if (!underlyingPriceResult.reverted) {
-    const priceUSD = getTokenPriceUSD(
-      underlyingPriceResult,
-      underlyingToken.decimals
-    );
-    log.info(
-      "[handleAccrueInterest]market={}/{}; underlying token={}/{}; PriceResult={},priceUSD={}; tx {}-{}, block {}",
-      [
-        market.id,
-        market.name ? market.name! : "",
-        underlyingToken.id,
-        underlyingToken.name,
-        underlyingPriceResult.value.toString(),
-        priceUSD.toString(),
-        event.transaction.hash.toHexString(),
-        event.transactionLogIndex.toString(),
-        event.block.number.toString(),
-      ]
-    );
-  }
-
   const cTokenContract = CToken.bind(marketAddress);
   const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
-    oracleContract.try_getUnderlyingPrice(marketAddress),
+    oracleContract.try_getUnderlyingPrice(marketAddressForOracle),
     SECONDS_PER_YEAR
   );
   const interestAccumulated = event.params.interestAccumulated;
