@@ -159,19 +159,14 @@ export function Swap(
     );
     if (underlyingCoins.length == 0) return;
 
-    if (soldId.toI32() == 0) {
-      tokenIn = pool._inputTokensOrdered[0];
-    } else {
-      tokenIn = underlyingCoins[soldId.toI32()].toHexString();
-    }
+    tokenIn = underlyingCoins[soldId.toI32()].toHexString();
+    tokenOut = underlyingCoins[boughtId.toI32()].toHexString();
 
-    if (boughtId.toI32() == 0) {
-      tokenOut = pool._inputTokensOrdered[0];
-      if (isTokenOutFromInputTokens(liquidityPoolAddress, amountIn, event))
-        tokenIn = pool._inputTokensOrdered.at(-1);
-    } else {
-      tokenOut = underlyingCoins[boughtId.toI32()].toHexString();
-    }
+    if (
+      boughtId.toI32() == 0 &&
+      isTokenOutFromInputTokens(liquidityPoolAddress, amountIn, event)
+    )
+      tokenIn = pool._inputTokensOrdered.at(-1);
   }
 
   const tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);
