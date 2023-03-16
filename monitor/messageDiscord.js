@@ -609,7 +609,7 @@ export async function sendMessageToZapierThread(msgObj) {
                     msgObj.protocol[deployment]?.Field?.forEach((fieldName, idx) => {
                         const alertStrAfterFieldName = alert?.toUpperCase()?.split(fieldName?.toUpperCase())[1];
                         const alertStrBeforeDesc = alertStrAfterFieldName?.split('DESCRIPTION')[0];
-                        const alertToBeSent = msgObj?.protocol[deployment]?.Value[idx]?.toUpperCase();
+                        const alertToBeSent = msgObj?.protocol[deployment]?.value?.[idx]?.toUpperCase();
                         const valueCondition = alertStrBeforeDesc?.includes(alertToBeSent);
                         if (alert.toUpperCase().includes(fieldName.toUpperCase()) && valueCondition) {
                             invalidProtocolAlertIndexes[deployment].push(idx);
@@ -648,7 +648,7 @@ export async function sendMessageToZapierThread(msgObj) {
     try {
         const req = await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch(async function (err1) {
             await sleep(5000);
-            await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch((err) => console.log("ERROR ZAPIER MSG # " + err?.response?.data?.message + err?.response?.data?.retry_after + err?.response?.config?.data))
+            await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch((err) => console.log("ERROR ZAPIER MSG # " + err?.response?.data?.message + err?.message + err?.response?.config?.data))
         });
         return req;
     } catch (err) {
