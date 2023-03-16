@@ -51,6 +51,6 @@ export async function getGithubIssues() {
             postError("getGithubIssues() - " + err.message);
         }
     }
-    postError("NUMBER OF ISSUES PULLED FROM GH REPO: " + validIssues?.length + " --- " + JSON.stringify(validIssues) || 0);
+    postError("NUMBER OF ISSUES PULLED FROM GH REPO: " + validIssues?.length + " --- " + validIssues.map(x => x.title).join(" --- ") || 0);
     return validIssues;
 }
