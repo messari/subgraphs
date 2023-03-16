@@ -45,6 +45,7 @@ import {
   ProtocolSideRevenueType,
   INT_ONE,
   PositionSide,
+  BIGINT_NEG_HUNDRED,
 } from "./constants";
 import { createEventID } from "../utils/strings";
 import { bigIntToBDUseDecimals } from "../utils/numbers";
@@ -536,17 +537,31 @@ export function updatePosition(
     }
 
     lenderPosition.balance = lenderPosition.balance.plus(deltaCollateral);
+    // this may be less than 0 (but > -100) from rounding & for tokens with decimals < 18
+    // because we keep position balance in native unit, but maker always keep them in WAD (18 decimals)
+    //
+    // for example 1. at block 12507581, urn 0x03453d22095c0edd61cd40c3ccdc394a0e85dc1a
+    // repaid -203334964101176257798573 dai, when the borrow balance
+    // was 203334964101176257798572
+    // 2. at block 14055178, urn 0x1c47bb6773db2a441264c1af2c943d8bdfaf19fe
+    // repaid -30077488379451392498995529 dai, when the borrow balance
+    // was 30077488379451392498995503
     if (lenderPosition.balance.lt(BIGINT_ZERO)) {
-      log.error(
-        "[updatePosition]A negative lender balance of {} for position {} with tx {}-{}",
-        [
-          lenderPosition.balance.toString(),
-          lenderPosition.id,
-          event.transaction.hash.toHexString(),
-          event.transactionLogIndex.toString(),
-        ]
-      );
-      log.critical("", []);
+      if (lenderPosition.balance.ge(BIGINT_NEG_HUNDRED)) {
+        // a small negative lender position, likely due to rounding
+        lenderPosition.balance = BIGINT_ZERO;
+      } else {
+        log.error(
+          "[updatePosition]A negative lender balance of {} for position {} with tx {}-{}",
+          [
+            lenderPosition.balance.toString(),
+            lenderPosition.id,
+            event.transaction.hash.toHexString(),
+            event.transactionLogIndex.toString(),
+          ]
+        );
+        log.critical("", []);
+      }
     }
 
     if (deltaCollateral.gt(BIGINT_ZERO)) {
@@ -628,17 +643,23 @@ export function updatePosition(
     }
 
     borrowerPosition.balance = borrowerPosition.balance.plus(deltaDebt);
-
+    // see comment above for lenderPosition.balance
     if (borrowerPosition.balance.lt(BIGINT_ZERO)) {
-      log.error(
-        "[updatePosition] A negative borrow balance of {} for position {} with tx {}-{}",
-        [
-          borrowerPosition.balance.toString(),
-          borrowerPosition.id,
-          event.transaction.hash.toHexString(),
-          event.transactionLogIndex.toString(),
-        ]
-      );
+      if (borrowerPosition.balance.ge(BIGINT_NEG_HUNDRED)) {
+        // a small negative lender position, likely due to rounding
+        borrowerPosition.balance = BIGINT_ZERO;
+      } else {
+        log.error(
+          "[updatePosition]A negative lender balance of {} for position {} with tx {}-{}",
+          [
+            borrowerPosition.balance.toString(),
+            borrowerPosition.id,
+            event.transaction.hash.toHexString(),
+            event.transactionLogIndex.toString(),
+          ]
+        );
+        log.critical("", []);
+      }
       log.critical("", []);
     }
 
