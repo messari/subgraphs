@@ -3832,6 +3832,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-arbitrum",
             "query-id": "uniswap-v3-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-arbitrum",
+            "query-id": "9tSS5FaePZnjmnXnSKCCqKVLAqA6eGg6jA2oRojsXUbP"
           }
         }
       },
@@ -3883,7 +3887,7 @@
           },
           "decentralized-network": {
             "slug": "uniswap-v3-ethereum",
-            "query-id": "ELUcwgpm14LKPLrBRuVvPvNKHQ9HvwmtKgKSH6123cr7"
+            "query-id": "G3JZhmKKHC4mydRzD6kSz5fCWve5WDYYCyTFSJyv3SD5"
           }
         }
       },
