@@ -20,8 +20,8 @@ export function getOrCreateTick(
     let liquidityGross = BIGINT_ZERO;
 
     if (!tick_info.reverted) {
-      liquidityNet = tick_info.value.value0;
-      liquidityGross = tick_info.value.value1;
+      liquidityGross = tick_info.value.value0;
+      liquidityNet = tick_info.value.value1;
     }
 
     // Update pool liquidity
