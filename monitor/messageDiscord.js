@@ -25,7 +25,7 @@ export async function postAlert(message) {
             "Content-Type": "application/json",
         }
         const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor from ${process.env.CHANNEL_ID} on Channel ${process.env.CHANNEL_ID}- Errors detected**\n` + message });
-        // await axios.post(baseURL, postJSON, { "headers": { ...headers } })
+        await axios.post(baseURL, postJSON, { "headers": { ...headers } })
     } catch (err) {
         errorNotification('ERROR POSTING DISCORD - ' + err.message + ' - ' + message);
     }
@@ -234,7 +234,6 @@ export async function sendDiscordMessage(messageObjects, protocolName, channelId
         x.color = color;
         return x;
     });
-
     const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on ${protocolName}**\n`, "embeds": messageObjects });
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
@@ -305,7 +304,7 @@ export async function unarchiveThread(channelId = process.env.CHANNEL_ID) {
     }
 }
 
-export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThread, indexDeploymentIssues, issuesGithub) {
+export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThread, indexDeploymentIssues, channelId, issuesGithub, issuesProdDiscord) {
     try {
         const embedObjects = [];
         const indexingErrorEmbed = {
@@ -441,13 +440,21 @@ export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesO
             indexingErrorEmbed.fields[1].value += failureBlockThread;
             embedObjects.unshift(indexingErrorEmbed);
         }
+        if (embedObjects.length > 0) {
+            let indexingErrorEmbedsToAggThread = [];
+            if (aggThreadIndexErrorEmbeds[1].value.length > 3) {
+                indexingErrorEmbedsToAggThread = aggThreadIndexErrorEmbeds;
+            }
+            aggThreadMsgObjects.push({ embeds: indexingErrorEmbedsToAggThread, protocol: protocol, protocolErrorEmbeds: aggThreadProtocolErrorEmbeds });
+            await sendDiscordMessage(embedObjects, protocol, channelId);
+        }
         let object = {};
         if (Object.keys(zapierProdThreadProtocols).length > 0 || zapierProdThreadIndexing.length > 0) {
             if (zapierProdThreadIndexing.length > 0) {
-                object = await constructZapierAndGithubIssue({ indexing: zapierProdThreadIndexing, protocolName: protocol, chains }, issuesGithub);
+                object = await constructZapierAndGithubIssue({ indexing: zapierProdThreadIndexing, protocolName: protocol, chains }, issuesGithub, issuesProdDiscord);
             };
             if (Object.keys(zapierProdThreadProtocols).length > 0) {
-                object = await constructZapierAndGithubIssue({ protocol: zapierProdThreadProtocols, protocolName: protocol, chains }, issuesGithub);
+                object = await constructZapierAndGithubIssue({ protocol: zapierProdThreadProtocols, protocolName: protocol, chains }, issuesGithub, issuesProdDiscord);
             }
 
             if (object.github?.length > 0) {
@@ -458,14 +465,6 @@ export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesO
             }
         }
 
-        if (embedObjects.length > 0) {
-            let indexingErrorEmbedsToAggThread = [];
-            if (aggThreadIndexErrorEmbeds[1].value.length > 3) {
-                indexingErrorEmbedsToAggThread = aggThreadIndexErrorEmbeds;
-            }
-            aggThreadMsgObjects.push({ embeds: indexingErrorEmbedsToAggThread, protocol: protocol, protocolErrorEmbeds: aggThreadProtocolErrorEmbeds });
-            return embedObjects;
-        }
         return null;
     } catch (err) {
         errorNotification("ERROR LOCATION 15 " + err.message);
@@ -500,9 +499,10 @@ export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHAN
             });
 
             let embedToAdd = false;
+            let existingEmbed = null;
             if (aggThread.embeds.length > 1) {
                 if (!!msg) {
-                    const existingEmbed = msg.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
+                    existingEmbed = msg.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
                     if (existingEmbed) {
                         const aggThreadNetworkStringsArr = aggThread.embeds[0].value.split('\n').join('-----').split('-----');
                         const aggThreadBlockValueArr = aggThread.embeds[1].value.split('\n').join('-----').split('-----');
@@ -532,7 +532,6 @@ export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHAN
             if (aggThread.protocolErrorEmbeds) {
                 aggThreadMsgObjectsToSend = [...aggThreadMsgObjectsToSend, ...aggThread.protocolErrorEmbeds]
             }
-            console.log('CHECK THAT THIS ARR HAS ELEMENTS', aggThreadMsgObjectsToSend.length)
             if (aggThreadMsgObjectsToSend.length > 0) {
                 const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on ${aggThread.protocol} subgraphs (prod)**\n`, "embeds": aggThreadMsgObjectsToSend });
                 const query = axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch(err => console.log(err.message));
@@ -544,7 +543,7 @@ export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHAN
     }
 
     try {
-
+        await sleep(1500);
         await resolveQueriesToAttempt(aggThreadQueriesToResolve);
     } catch (err) {
         console.log(err?.response?.config?.data);
@@ -558,9 +557,8 @@ export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHAN
     aggThreadMsgObjects = [];
 }
 
-export async function constructZapierAndGithubIssue(msgObj, postedIssues) {
-    const currentThreadMessages = await fetchMessages("", process.env.PROD_CHANNEL);
-    const currentThreadMessagesContent = currentThreadMessages.map(x => x.content);
+export async function constructZapierAndGithubIssue(msgObj, postedIssues, issuesProdDiscord) {
+    const currentThreadMessagesContent = issuesProdDiscord.map(x => x.content);
 
     let messageConstruction = ``;
     const ghIssuePromiseArray = [];
