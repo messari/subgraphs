@@ -510,10 +510,19 @@ export function updatePosition(
         PositionSide.LENDER,
         true
       );
-      assert(
-        deltaCollateral.gt(BIGINT_ZERO),
-        `[updatePosition]Creating new lender position ${lenderPosition.id} with deltaCollateral ${deltaCollateral} <= 0`
-      );
+
+      if (deltaCollateral.le(BIGINT_ZERO)) {
+        log.error(
+          "[updatePosition]Creating a new lender position {} with deltaCollateral ={} <= 0 at tx {}-{}",
+          [
+            lenderPosition.id,
+            deltaCollateral.toString(),
+            event.transaction.hash.toHexString(),
+            event.transactionLogIndex.toString(),
+          ]
+        );
+        log.critical("", []);
+      }
 
       protocol.openPositionCount += INT_ONE;
       protocol.cumulativePositionCount += INT_ONE;
@@ -528,15 +537,30 @@ export function updatePosition(
     }
 
     lenderPosition.balance = lenderPosition.balance.plus(deltaCollateral);
-    if (lenderPosition.balance.le(BIGINT_ZERO)) {
+    // this may be less than 0 (but > -100) from rounding & for tokens with decimals < 18
+    // because we keep position balance in native unit, but maker always keep them in WAD (18 decimals)
+    //
+    // for example 1. at block 12507581, urn 0x03453d22095c0edd61cd40c3ccdc394a0e85dc1a
+    // repaid -203334964101176257798573 dai, when the borrow balance
+    // was 203334964101176257798572
+    // 2. at block 14055178, urn 0x1c47bb6773db2a441264c1af2c943d8bdfaf19fe
+    // repaid -30077488379451392498995529 dai, when the borrow balance
+    // was 30077488379451392498995503
+    if (lenderPosition.balance.lt(BIGINT_ZERO)) {
       if (lenderPosition.balance.ge(BIGINT_NEG_HUNDRED)) {
         // a small negative lender position, likely due to rounding
         lenderPosition.balance = BIGINT_ZERO;
       } else {
-        log.error("[updatePosition]balance for position {} = {} < 0", [
-          lenderPosition.id,
-          lenderPosition.balance.toString(),
-        ]);
+        log.error(
+          "[updatePosition]A negative lender balance of {} for position {} with tx {}-{}",
+          [
+            lenderPosition.balance.toString(),
+            lenderPosition.id,
+            event.transaction.hash.toHexString(),
+            event.transactionLogIndex.toString(),
+          ]
+        );
+        log.critical("", []);
       }
     }
 
@@ -593,10 +617,19 @@ export function updatePosition(
         PositionSide.BORROWER,
         true
       );
-      assert(
-        deltaDebt.gt(BIGINT_ZERO),
-        `[updatePosition]Creating new borrower position ${borrowerPosition.id} with deltaDebt ${deltaDebt} <= 0`
-      );
+
+      if (deltaDebt.le(BIGINT_ZERO)) {
+        log.error(
+          "[updatePosition]Creating a new lender position {} with deltaDebt={} <= 0 at tx {}-{}",
+          [
+            borrowerPosition.id,
+            deltaDebt.toString(),
+            event.transaction.hash.toHexString(),
+            event.transactionLogIndex.toString(),
+          ]
+        );
+        log.critical("", []);
+      }
 
       protocol.openPositionCount += INT_ONE;
       protocol.cumulativePositionCount += INT_ONE;
@@ -610,32 +643,24 @@ export function updatePosition(
     }
 
     borrowerPosition.balance = borrowerPosition.balance.plus(deltaDebt);
-
-    assert(
-      // this may be less than 0, but not too negative (>-100)
-      // 1. at block 12507581, urn 0x03453d22095c0edd61cd40c3ccdc394a0e85dc1a
-      // repaid -203334964101176257798573 dai, when the borrow balance
-      // was 203334964101176257798572
-      // 2. at block 14055178, urn 0x1c47bb6773db2a441264c1af2c943d8bdfaf19fe
-      // repaid -30077488379451392498995529 dai, when the borrow balance
-      // was 30077488379451392498995503
-      //borrowerPosition.balance.ge(BIGINT_ZERO),
-      borrowerPosition.balance.ge(BIGINT_NEG_HUNDRED),
-      `[updatePosition]balance for position ${borrowerPosition.id} ${borrowerPosition.balance} < 0`
-    );
-    if (
-      borrowerPosition.balance.lt(BIGINT_ZERO) &&
-      borrowerPosition.balance.gt(BIGINT_NEG_HUNDRED)
-    ) {
-      log.warning(
-        "[updatePosition]A small negative borrow balance of {} for position {} with tx {}; deemed position closed (balance set to 0)",
-        [
-          borrowerPosition.balance.toString(),
-          borrowerPosition.id,
-          event.transaction.hash.toHexString(),
-        ]
-      );
-      borrowerPosition.balance = BIGINT_ZERO;
+    // see comment above for lenderPosition.balance
+    if (borrowerPosition.balance.lt(BIGINT_ZERO)) {
+      if (borrowerPosition.balance.ge(BIGINT_NEG_HUNDRED)) {
+        // a small negative lender position, likely due to rounding
+        borrowerPosition.balance = BIGINT_ZERO;
+      } else {
+        log.error(
+          "[updatePosition]A negative lender balance of {} for position {} with tx {}-{}",
+          [
+            borrowerPosition.balance.toString(),
+            borrowerPosition.id,
+            event.transaction.hash.toHexString(),
+            event.transactionLogIndex.toString(),
+          ]
+        );
+        log.critical("", []);
+      }
+      log.critical("", []);
     }
 
     if (deltaDebt.gt(BIGINT_ZERO)) {
@@ -683,11 +708,19 @@ export function updatePosition(
   market.save();
   account.save();
 
-  const tx = event.transaction.hash.toHexString();
-  assert(
-    account.openPositionCount >= 0,
-    `urn ${urn} for account ${account.id} openPositionCount=${account.openPositionCount} at tx ${tx}`
-  );
+  if (account.openPositionCount < 0) {
+    log.error(
+      "[updatePosition]urn {} for account {} openPositionCount={} at tx {}-{}",
+      [
+        urn,
+        account.id,
+        account.openPositionCount.toString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
+    );
+    log.critical("", []);
+  }
 }
 
 // handle transfer of position from one user account (src) to another (dst),
