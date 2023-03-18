@@ -34,6 +34,7 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   BIGINT_NEG_ONE,
+  BIGINT_TWO,
 } from "./constants";
 import { getOrCreateAccount } from "./entities/account";
 import { getLiquidityPoolFee, getLiquidityPoolAmounts } from "./entities/pool";
@@ -517,9 +518,21 @@ export class DexEventHandler {
 
   updateAndSaveLiquidityPoolEntity(): void {
     this.pool.totalValueLockedUSD = this.totalValueLockedUSD;
-    this.pool.totalLiquidity = this.totalLiquidity;
-    this.pool.totalLiquidityUSD = this.totalLiquidityUSD;
+
+    if (this.tickLower && this.tickUpper) {
+      if (this.tickLower!._new && this.tickUpper!._new) {
+      } else if (!this.tickLower!._new && !this.tickUpper!._new) {
+        this.pool.totalLiquidity = this.pool.totalLiquidity.plus(
+          this.totalLiquidityDelta
+        );
+      } else {
+        this.pool.totalLiquidity = this.pool.totalLiquidity.plus(
+          this.totalLiquidityDelta.div(BIGINT_TWO)
+        );
+      }
+    }
     this.pool.activeLiquidity = this.activeLiquidity;
+    this.pool.totalLiquidityUSD = this.totalLiquidityUSD;
     this.pool.activeLiquidityUSD = this.activeLiquidityUSD;
 
     this.pool.inputTokenBalances = this.inputTokenBalances;
@@ -897,30 +910,34 @@ export class DexEventHandler {
   }
 
   updateAndSaveTickEntity(): void {
-    this.tickLower!.liquidityGross = this.tickLower!.liquidityGross.plus(
-      this.totalLiquidityDelta
-    );
+    if (!this.tickLower!._new) {
+      this.tickLower!.liquidityGross = this.tickLower!.liquidityGross.plus(
+        this.totalLiquidityDelta
+      );
+      this.tickLower!.liquidityNet = this.tickLower!.liquidityNet.plus(
+        this.totalLiquidityDelta
+      );
+    }
     this.tickLower!.liquidityGrossUSD =
       this.tickLower!.liquidityGross.toBigDecimal().times(
         this.newLiquidityPricePerUnit
       );
-    this.tickLower!.liquidityNet = this.tickLower!.liquidityNet.plus(
-      this.totalLiquidityDelta
-    );
     this.tickLower!.liquidityNetUSD =
       this.tickLower!.liquidityNet.toBigDecimal().times(
         this.newLiquidityPricePerUnit
       );
-    this.tickUpper!.liquidityGross = this.tickUpper!.liquidityGross.plus(
-      this.totalLiquidityDelta
-    );
+    if (!this.tickUpper!._new) {
+      this.tickUpper!.liquidityGross = this.tickUpper!.liquidityGross.plus(
+        this.totalLiquidityDelta
+      );
+      this.tickUpper!.liquidityNet = this.tickUpper!.liquidityNet.plus(
+        this.totalLiquidityDelta
+      );
+    }
     this.tickUpper!.liquidityGrossUSD =
       this.tickUpper!.liquidityGross.toBigDecimal().times(
         this.newLiquidityPricePerUnit
       );
-    this.tickUpper!.liquidityNet = this.tickUpper!.liquidityNet.minus(
-      this.totalLiquidityDelta
-    );
     this.tickUpper!.liquidityNetUSD =
       this.tickUpper!.liquidityNet.toBigDecimal().times(
         this.newLiquidityPricePerUnit

@@ -932,6 +932,8 @@ type Tick @entity {
 
   " Block number of the last time this entity was updated "
   lastUpdateBlockNumber: BigInt!
+
+  _new: Boolean!
 }
 
 #######################################

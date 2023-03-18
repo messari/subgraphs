@@ -150,3 +150,5 @@ export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
 export const MOST_RECENT_TRANSACTION = "MOST_RECENT_TRANSACTION";
 
 export const TICK_BASE = BigDecimal.fromString("1.0001");
+
+export const MINIMUM_LIQUIDITY = BigInt.fromI32(1000);
