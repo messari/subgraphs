@@ -2008,6 +2008,10 @@
           "hosted-service": {
             "slug": "compound-v3-ethereum",
             "query-id": "compound-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "compound-v3-ethereum",
+            "query-id": "6PaB6tKFqrL6YoAELEhFGU6Gc39cEynLbo6ETZMF3sCy"
           }
         }
       }
@@ -2397,7 +2401,7 @@
           },
           "decentralized-network": {
             "slug": "goldfinch-ethereum",
-            "query-id": "Dtj2HicXKpoUjNB7ffdBkMwt3L9Sz3cbENd67AdHu6Vb"
+            "query-id": "72Cez54APnySAn6h8MswzYkwaL9KjvuuKnKArnPJ8yxb"
           }
         }
       }
@@ -3828,6 +3832,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-arbitrum",
             "query-id": "uniswap-v3-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-arbitrum",
+            "query-id": "9tSS5FaePZnjmnXnSKCCqKVLAqA6eGg6jA2oRojsXUbP"
           }
         }
       },
@@ -3879,7 +3887,7 @@
           },
           "decentralized-network": {
             "slug": "uniswap-v3-ethereum",
-            "query-id": "ELUcwgpm14LKPLrBRuVvPvNKHQ9HvwmtKgKSH6123cr7"
+            "query-id": "G3JZhmKKHC4mydRzD6kSz5fCWve5WDYYCyTFSJyv3SD5"
           }
         }
       },
