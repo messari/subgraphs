@@ -377,6 +377,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     );
     return;
   }
+  updateRewardTokenPrices(market, event);
 
   const realm = _Realm.load(market._realm!);
   if (!realm) {
@@ -578,6 +579,51 @@ function updateRewardSpeed(
       event.transactionLogIndex.toString(),
     ]
   );
+
+  getOrCreateMarketDailySnapshot(
+    market,
+    event.block.timestamp,
+    event.block.number
+  );
+  getOrCreateMarketHourlySnapshot(
+    market,
+    event.block.timestamp,
+    event.block.number
+  );
+}
+
+function updateRewardTokenPrices(market: Market, event: ethereum.Event): void {
+  if (!market.rewardTokens || market.rewardTokens!.length == 0) {
+    return;
+  }
+
+  const rewardEmissions = market.rewardTokenEmissionsAmount;
+  if (!rewardEmissions || rewardEmissions.length == 0) {
+    return;
+  }
+  const rewardEmissionsUSD: BigDecimal[] = [];
+
+  for (let i = 0; i < market.rewardTokens!.length; i++) {
+    const rewardTokenId = market.rewardTokens![i];
+    const rewardToken = RewardToken.load(rewardTokenId);
+    if (!rewardToken) {
+      log.error("[]reward token {} for market {} doesn't exist", [
+        rewardTokenId,
+        market.id,
+      ]);
+      return;
+    }
+    const token = getOrCreateToken(Address.fromString(rewardToken.token));
+    const priceUSD = getRewardTokenPrice(token);
+    rewardEmissionsUSD.push(
+      rewardEmissions[i]
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals))
+        .times(priceUSD)
+    );
+  }
+  market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+  market.save();
 
   getOrCreateMarketDailySnapshot(
     market,
