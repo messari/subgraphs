@@ -155,6 +155,15 @@ export function increasePoolVolume(
   collateralUSDDelta: BigDecimal,
   eventType: EventType
 ): void {
+  // sizeUSD and collateralUSD are unique concepts for derivative options trading.
+  // For example, a user want to sell a call to be able to buy 1 BTC at the current 25K
+  // price one month later. In this scenario, the sizeUSD is 1BTC * BTCPrice = 25K. But
+  // in order to do so, he just needs to deposit right now 1 ETH as collateral, whose
+  // value is 1 ETH * ETHPrice = 1.5K (Assuming ETH is 1.5K now)
+  // So for derivative, there are normal two kind of values. One is the intended trading
+  // size, which is called sizeUSD in the codes, while the other is the collateral size,
+  // which is called collateralUSD in the codes.
+
   switch (eventType) {
     case EventType.Deposit:
       pool._cumulativeDepositedVolumeUSD =
