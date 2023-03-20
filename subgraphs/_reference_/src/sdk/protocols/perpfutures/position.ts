@@ -11,6 +11,17 @@ import { TokenManager } from "./tokens";
 import * as constants from "../../util/constants";
 import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
+/**
+ * This file contains the Position class, which is used to
+ * make all of the storage changes that occur in the position and
+ * its corresponding snapshots.
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @harsh9200
+ */
+
 export class Position {
   protocol: Perpetual;
   tokens: TokenManager;
@@ -58,7 +69,11 @@ export class Position {
     const positionId = this.getPositionId(pool, account, positionSide);
 
     this.position = PositionSchema.load(positionId);
-    if (this.position) return;
+
+    if (this.position) {
+      this.takePositionSnapshot();
+      return;
+    }
 
     this.position = new PositionSchema(positionId);
     this.position.account = account.getBytesId();
@@ -138,6 +153,7 @@ export class Position {
       .getTokenPricer()
       .getAmountValueUSD(this.tokens.getOrCreateToken(token), amount);
     this.save();
+    this.takePositionSnapshot();
   }
 
   /**
@@ -153,6 +169,7 @@ export class Position {
       .getTokenPricer()
       .getAmountValueUSD(this.tokens.getOrCreateToken(collateralToken), amount);
     this.save();
+    this.takePositionSnapshot();
   }
 
   /**
@@ -196,9 +213,11 @@ export class Position {
 
     if (this.account) this.account.closePosition(this.position.side);
     if (this.pool) this.pool.closePosition(this.position.side);
+
+    this.takePositionSnapshot();
   }
 
-  takePositionSnapshot(): void {
+  private takePositionSnapshot(): void {
     if (!this.position) return;
 
     const event = this.protocol.getCurrentEvent();

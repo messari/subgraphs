@@ -15,6 +15,16 @@ import { Versions } from "../../../../../../deployment/context/interface";
 import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/schema";
 
 /**
+ * This file contains the Perpetual class, which is used to
+ * make all of the storage changes that occur in a protocol.
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @harsh9200
+ */
+
+/**
  * ProtocolManager is a wrapper around the ProtocolSchema entity that takes care of
  * safely and conveniently updating the entity. Updating the Protocol entity using this
  * wrapper also takes care of the Financials and Usage snapshots.
@@ -83,7 +93,9 @@ export class Perpetual {
       protocol.cumulativeWithdrawPremiumUSD = constants.BIGDECIMAL_ZERO;
       protocol.cumulativeTotalLiquidityPremiumUSD = constants.BIGDECIMAL_ZERO;
 
-      protocol.openInterestUSD = constants.BIGDECIMAL_ZERO;
+      protocol.longOpenInterestUSD = constants.BIGDECIMAL_ZERO;
+      protocol.shortOpenInterestUSD = constants.BIGDECIMAL_ZERO;
+      protocol.totalOpenInterestUSD = constants.BIGDECIMAL_ZERO;
 
       protocol.cumulativeUniqueUsers = 0;
       protocol.cumulativeUniqueDepositors = 0;
@@ -106,8 +118,8 @@ export class Perpetual {
 
       protocol.totalPoolCount = 0;
 
-      protocol._lastSnapshotDayID = 0;
-      protocol._lastSnapshotHourID = 0;
+      protocol._lastSnapshotDayID = constants.BIGINT_ZERO;
+      protocol._lastSnapshotHourID = constants.BIGINT_ZERO;
       protocol._lastUpdateTimestamp = constants.BIGINT_ZERO;
     }
 
@@ -221,19 +233,6 @@ export class Perpetual {
   addVolume(volume: BigDecimal): void {
     this.protocol.totalValueLockedUSD =
       this.protocol.totalValueLockedUSD.plus(volume);
-    this.save();
-  }
-
-  /**
-   * Sets the openInterest in USD for the protocol. Most times this will be called internally by
-   * other members of the library when openInterest changes are made to them. But if the library
-   * is not well fitted to a given protocol and you need to set the openInterest manually, you can
-   * use this method.
-   * It will also update the protocol's snapshots.
-   * @param openInterest {BigDecimal} The new total value locked for the protocol.
-   */
-  setOpenInterest(openInterest: BigDecimal): void {
-    this.protocol.openInterestUSD = openInterest;
     this.save();
   }
 
@@ -411,6 +410,34 @@ export class Perpetual {
   ): void {
     this.addDepositPremiumUSD(depositPremium);
     this.addWithdrawPremiumUSD(withdrawPremium);
+  }
+
+  /**
+   * Adds a given USD value to the protocol's long and total openInterestUSD.
+   *
+   * @param amountChangeUSD {BigDecimal} The value to add to the protocol's openInterest in USD.
+   */
+  updateLongOpenInterestUSD(amountChangeUSD: BigDecimal): void {
+    this.protocol.totalOpenInterestUSD =
+      this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
+    this.protocol.longOpenInterestUSD =
+      this.protocol.longOpenInterestUSD.plus(amountChangeUSD);
+
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol's short and total openInterestUSD.
+   *
+   * @param amountChangeUSD {BigDecimal} The value to add to the protocol's openInterest in USD.
+   */
+  updateShortOpenInterestUSD(amountChangeUSD: BigDecimal): void {
+    this.protocol.totalOpenInterestUSD =
+      this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
+    this.protocol.shortOpenInterestUSD =
+      this.protocol.shortOpenInterestUSD.plus(amountChangeUSD);
+
+    this.save();
   }
 
   /**

@@ -23,6 +23,20 @@ import * as constants from "../../util/constants";
 import { EventType, ActivityType, TransactionType } from "./enums";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
+/**
+ * This file contains the AccountClass, which does
+ * the operations on the Account entity. This includes:
+ *  - Creating a new Account
+ *  - Updating an existing Account
+ *  - Making a position
+ *  - Making position snapshots
+ * 
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @harsh9200
+ */
+
 export class AccountManager {
   protocol: Perpetual;
   tokens: TokenManager;

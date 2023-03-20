@@ -7,9 +7,20 @@ import {
 } from "../../../../generated/schema";
 import { TransactionType } from "./enums";
 import { AccountWasActive } from "./account";
-import { Bytes } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import * as constants from "../../util/constants";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+
+/**
+ * This file contains the ProtocolSnapshot, which is used to
+ * make all of the storage changes that occur in the protocol's
+ * daily and hourly snapshots.
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @harsh9200
+ */
 
 export class ProtocolSnapshot {
   protocol: PerpetualSchema;
@@ -79,13 +90,13 @@ export class ProtocolSnapshot {
     if (snapshotDayID != this.dayID) {
       this.takeFinancialsDailySnapshot(snapshotDayID);
       this.takeUsageDailySnapshot(snapshotDayID);
-      this.protocol._lastSnapshotDayID = snapshotDayID;
+      this.protocol._lastSnapshotDayID = BigInt.fromI32(snapshotDayID);
       this.protocol.save();
     }
 
     if (snapshotHourID != this.hourID) {
       this.takeUsageHourlySnapshot(snapshotHourID);
-      this.protocol._lastSnapshotHourID = snapshotHourID;
+      this.protocol._lastSnapshotHourID = BigInt.fromI32(snapshotDayID);
       this.protocol.save();
     }
   }
@@ -94,16 +105,17 @@ export class ProtocolSnapshot {
     const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
 
     const previousSnapshot = FinancialsDailySnapshot.load(
-      Bytes.fromI32(this.protocol._lastSnapshotDayID)
+      Bytes.fromBigInt(this.protocol._lastSnapshotDayID!)
     );
 
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;
 
     snapshot.totalValueLockedUSD = this.protocol.totalValueLockedUSD;
-    snapshot.dailyOpenInterestUSD = this.protocol.openInterestUSD;
-    snapshot.protocolControlledValueUSD =
-      this.protocol.protocolControlledValueUSD;
+
+    snapshot.dailyLongOpenInterestUSD = this.protocol.longOpenInterestUSD;
+    snapshot.dailyShortOpenInterestUSD = this.protocol.shortOpenInterestUSD;
+    snapshot.dailyTotalOpenInterestUSD = this.protocol.totalOpenInterestUSD;
 
     snapshot.dailyVolumeUSD = previousSnapshot
       ? this.protocol.cumulativeVolumeUSD.minus(
@@ -218,7 +230,7 @@ export class ProtocolSnapshot {
 
     const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = UsageMetricsDailySnapshot.load(
-      Bytes.fromI32(this.protocol._lastSnapshotDayID)
+      Bytes.fromBigInt(this.protocol._lastSnapshotDayID!)
     );
 
     snapshot.days = day;
@@ -228,17 +240,27 @@ export class ProtocolSnapshot {
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
 
     snapshot.dailyLongPositionCount = previousSnapshot
-      ? this.protocol.longPositionCount - previousSnapshot.longPositionCount
+      ? max(
+          this.protocol.longPositionCount - previousSnapshot.longPositionCount,
+          0
+        )
       : this.protocol.longPositionCount;
     snapshot.longPositionCount = this.protocol.longPositionCount;
 
     snapshot.dailyShortPositionCount = previousSnapshot
-      ? this.protocol.shortPositionCount - previousSnapshot.shortPositionCount
+      ? max(
+          this.protocol.shortPositionCount -
+            previousSnapshot.shortPositionCount,
+          0
+        )
       : this.protocol.shortPositionCount;
     snapshot.shortPositionCount = this.protocol.shortPositionCount;
 
     snapshot.dailyOpenPositionCount = previousSnapshot
-      ? this.protocol.openPositionCount - previousSnapshot.openPositionCount
+      ? max(
+          this.protocol.openPositionCount - previousSnapshot.openPositionCount,
+          0
+        )
       : this.protocol.openPositionCount;
     snapshot.openPositionCount = this.protocol.openPositionCount;
 
