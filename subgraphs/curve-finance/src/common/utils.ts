@@ -247,7 +247,7 @@ export function getPoolUnderlyingCoins(poolAddress: Address): Address[] {
     );
 
     if (
-      underlyingCoins.length != 0 ||
+      underlyingCoins.length != 0 &&
       underlyingCoins[0].notEqual(constants.NULL.TYPE_ADDRESS)
     )
       return underlyingCoins;
