@@ -85,6 +85,44 @@ export function updateProtocolOpenInterest(
   getOrCreateFinancialsSnapshot(event, protocol);
 }
 
+export function addProtocolMintVolume(
+  event: ethereum.Event,
+  amountUSD: BigDecimal
+): void {
+  const protocol = getOrCreateOpynProtocol();
+  protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(amountUSD);
+  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
+  financialsSnapshot.dailyVolumeUSD =
+    financialsSnapshot.dailyVolumeUSD.plus(amountUSD);
+  financialsSnapshot.save();
+}
+
+export function addProtocolClosedVolume(
+  event: ethereum.Event,
+  amountUSD: BigDecimal
+): void {
+  const protocol = getOrCreateOpynProtocol();
+  protocol.cumulativeClosedVolumeUSD =
+    protocol.cumulativeClosedVolumeUSD.plus(amountUSD);
+  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
+  financialsSnapshot.dailyClosedVolumeUSD =
+    financialsSnapshot.dailyClosedVolumeUSD.plus(amountUSD);
+  financialsSnapshot.save();
+}
+
+export function addProtocolExercisedVolume(
+  event: ethereum.Event,
+  amountUSD: BigDecimal
+): void {
+  const protocol = getOrCreateOpynProtocol();
+  protocol.cumulativeExercisedVolumeUSD =
+    protocol.cumulativeExercisedVolumeUSD.plus(amountUSD);
+  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
+  financialsSnapshot.dailyExercisedVolumeUSD =
+    financialsSnapshot.dailyExercisedVolumeUSD.plus(amountUSD);
+  financialsSnapshot.save();
+}
+
 export function incrementProtocolUniqueUsers(): void {
   const protocol = getOrCreateOpynProtocol();
   protocol.cumulativeUniqueUsers += 1;

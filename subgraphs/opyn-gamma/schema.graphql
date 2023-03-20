@@ -873,16 +873,16 @@ type LiquidityPoolDailySnapshot @entity(immutable: false) {
   cumulativeVolumeUSD: BigDecimal!
 
   " Daily Deposit trade notional volume in USD "
-  dailyDepositVolumeUSD: BigDecimal!
+  dailyDepositedVolumeUSD: BigDecimal!
 
   " Daily Deposit trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
-  dailyDepositVolumeByTokenAmount: [BigInt!]!
+  dailyDepositedVolumeByTokenAmount: [BigInt!]!
 
   " Daily Deposit trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
-  dailyDepositVolumeByTokenUSD: [BigDecimal!]!
+  dailyDepositedVolumeByTokenUSD: [BigDecimal!]!
 
   " Deposit historical trade notional volume occurred in this pool, in USD "
-  cumulativeDepositVolumeUSD: BigDecimal!
+  cumulativeDepositedVolumeUSD: BigDecimal!
 
   " Daily Withdraw trade notional volume occurred in USD "
   dailyWithdrawVolumeUSD: BigDecimal!
@@ -903,10 +903,10 @@ type LiquidityPoolDailySnapshot @entity(immutable: false) {
   cumulativeClosedVolumeUSD: BigDecimal!
 
   " Daily notional volume in USD taken of underlying at time of contract exercise"
-  dailyExercisedVolumeUSD: BigDecimal!
+  dailyExerciseVolumeUSD: BigDecimal!
 
   " All historical notional volume in USD taken of underlying at time of contract exercised"
-  cumulativeExercisedVolumeUSD: BigDecimal!
+  cumulativeExerciseVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!

@@ -20,6 +20,9 @@ import {
 import { getOrCreateToken } from "../common/tokens";
 import { getUSDAmount } from "../price";
 import {
+  addProtocolClosedVolume,
+  addProtocolExercisedVolume,
+  addProtocolMintVolume,
   decrementProtocolPositionCount,
   getOrCreateOpynProtocol,
   incrementProtocolExercisedCount,
@@ -96,14 +99,14 @@ export function handlePoolDeposit(
   pool.save();
   updatePoolTVL(event, pool);
   const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
-  dailySnapshot.dailyDepositVolumeByTokenAmount = [
-    dailySnapshot.dailyDepositVolumeByTokenAmount[0].plus(amount),
+  dailySnapshot.dailyDepositedVolumeByTokenAmount = [
+    dailySnapshot.dailyDepositedVolumeByTokenAmount[0].plus(amount),
   ];
-  dailySnapshot.dailyDepositVolumeByTokenUSD = [
-    dailySnapshot.dailyDepositVolumeByTokenUSD[0].plus(deposit.amountUSD),
+  dailySnapshot.dailyDepositedVolumeByTokenUSD = [
+    dailySnapshot.dailyDepositedVolumeByTokenUSD[0].plus(deposit.amountUSD),
   ];
-  dailySnapshot.dailyDepositVolumeUSD =
-    dailySnapshot.dailyDepositVolumeUSD.plus(deposit.amountUSD);
+  dailySnapshot.dailyDepositedVolumeUSD =
+    dailySnapshot.dailyDepositedVolumeUSD.plus(deposit.amountUSD);
   dailySnapshot.save();
   const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
   hourlySnapshot.hourlyDepositVolumeByTokenAmount = [
@@ -179,6 +182,57 @@ export function updatePoolOpenInterest(
   getOrCreatePoolDailySnapshot(event, pool);
   getOrCreatePoolHourlySnapshot(event, pool);
   updateProtocolOpenInterest(event, netChangeUSD);
+}
+
+export function addPoolMintVolume(
+  event: ethereum.Event,
+  pool: LiquidityPool,
+  amountUSD: BigDecimal
+): void {
+  pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(amountUSD);
+  pool.save();
+  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
+  dailySnapshot.dailyVolumeUSD = dailySnapshot.dailyVolumeUSD.plus(amountUSD);
+  dailySnapshot.save();
+  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
+  hourlySnapshot.hourlyVolumeUSD =
+    hourlySnapshot.hourlyVolumeUSD.plus(amountUSD);
+  hourlySnapshot.save();
+  addProtocolMintVolume(event, amountUSD);
+}
+
+export function addPoolClosedVolume(
+  event: ethereum.Event,
+  pool: LiquidityPool,
+  amountUSD: BigDecimal
+): void {
+  pool.cumulativeClosedVolumeUSD =
+    pool.cumulativeClosedVolumeUSD.plus(amountUSD);
+  pool.save();
+  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
+  dailySnapshot.dailyClosedVolumeUSD =
+    dailySnapshot.dailyClosedVolumeUSD.plus(amountUSD);
+  dailySnapshot.save();
+  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
+  hourlySnapshot.save();
+  addProtocolClosedVolume(event, amountUSD);
+}
+
+export function addPoolExercisedVolume(
+  event: ethereum.Event,
+  pool: LiquidityPool,
+  amountUSD: BigDecimal
+): void {
+  pool.cumulativeExercisedVolumeUSD =
+    pool.cumulativeExercisedVolumeUSD.plus(amountUSD);
+  pool.save();
+  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
+  dailySnapshot.dailyExerciseVolumeUSD =
+    dailySnapshot.dailyExerciseVolumeUSD.plus(amountUSD);
+  dailySnapshot.save();
+  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
+  hourlySnapshot.save();
+  addProtocolExercisedVolume(event, amountUSD);
 }
 
 export function incrementPoolPositionCount(
@@ -289,14 +343,14 @@ function getOrCreatePoolDailySnapshot(
     snapshot.dailyVolumeUSD = BIGDECIMAL_ZERO;
     snapshot.dailyVolumeByTokenAmount = [BIGINT_ZERO];
     snapshot.dailyVolumeByTokenUSD = [BIGDECIMAL_ZERO];
-    snapshot.dailyDepositVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyDepositVolumeByTokenAmount = [BIGINT_ZERO];
-    snapshot.dailyDepositVolumeByTokenUSD = [BIGDECIMAL_ZERO];
+    snapshot.dailyDepositedVolumeUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyDepositedVolumeByTokenAmount = [BIGINT_ZERO];
+    snapshot.dailyDepositedVolumeByTokenUSD = [BIGDECIMAL_ZERO];
     snapshot.dailyWithdrawVolumeUSD = BIGDECIMAL_ZERO;
     snapshot.dailyWithdrawVolumeByTokenAmount = [BIGINT_ZERO];
     snapshot.dailyWithdrawVolumeByTokenUSD = [BIGDECIMAL_ZERO];
     snapshot.dailyClosedVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyExercisedVolumeUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyExerciseVolumeUSD = BIGDECIMAL_ZERO;
 
     snapshot.dailyPutsMintedCount = INT_ZERO;
     snapshot.dailyCallsMintedCount = INT_ZERO;
@@ -329,10 +383,10 @@ function getOrCreatePoolDailySnapshot(
   snapshot.openPositionCount = pool.openPositionCount;
   snapshot.closedPositionCount = pool.closedPositionCount;
   snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
-  snapshot.cumulativeDepositVolumeUSD = pool.cumulativeDepositVolumeUSD;
+  snapshot.cumulativeDepositedVolumeUSD = pool.cumulativeDepositVolumeUSD;
   snapshot.cumulativeWithdrawVolumeUSD = pool.cumulativeWithdrawVolumeUSD;
   snapshot.cumulativeClosedVolumeUSD = pool.cumulativeClosedVolumeUSD;
-  snapshot.cumulativeExercisedVolumeUSD = pool.cumulativeExercisedVolumeUSD;
+  snapshot.cumulativeExerciseVolumeUSD = pool.cumulativeExercisedVolumeUSD;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
   snapshot.inputTokenWeights = pool.inputTokenWeights;
   snapshot.outputTokenSupply = pool.outputTokenSupply;

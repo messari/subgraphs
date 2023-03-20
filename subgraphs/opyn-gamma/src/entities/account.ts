@@ -83,15 +83,6 @@ export function incrementAccountTakenCount(
   incrementPoolTakenCount(event, option);
 }
 
-export function incrementAccountExpiredCount(
-  event: ethereum.Event,
-  account: Account,
-  option: Option
-): void {
-  account.contractsExpiredCount += 1;
-  account.save();
-}
-
 export function incrementAccountExercisedCount(
   event: ethereum.Event,
   account: Account,

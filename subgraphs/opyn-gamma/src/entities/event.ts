@@ -16,10 +16,9 @@ export function createDeposit(
   event: ethereum.Event,
   asset: Address,
   amount: BigInt,
-  from: Address,
-  owner: Address
+  from: Address
 ): void {
-  const account = getOrCreateAccount(owner);
+  const account = getOrCreateAccount(from);
   const token = getOrCreateToken(asset);
   const pool = getOrCreatePool(token);
   const deposit = new Deposit(
@@ -54,10 +53,9 @@ export function createWithdraw(
   event: ethereum.Event,
   asset: Address,
   amount: BigInt,
-  to: Address,
-  owner: Address
+  to: Address
 ): void {
-  const account = getOrCreateAccount(owner);
+  const account = getOrCreateAccount(to);
   const token = getOrCreateToken(asset);
   const pool = getOrCreatePool(token);
   const withdraw = new Withdraw(

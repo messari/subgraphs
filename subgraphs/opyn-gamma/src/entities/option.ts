@@ -1,16 +1,24 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { NetworkConfigs } from "../../configurations/configure";
+import { Controller } from "../../generated/Controller/Controller";
 import { OtokenCreated } from "../../generated/OTokenFactory/OTokenFactory";
 import { Option } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
+  BIGINT_TEN_TO_EIGHTH,
   BIGINT_ZERO,
-  INT_EIGHT,
   OptionType,
 } from "../common/constants";
 import { getOrCreateToken } from "../common/tokens";
 import { bigIntToBigDecimal } from "../common/utils/numbers";
-import { getOptionExpiryPrice, getUnderlyingPrice } from "../price";
-import { getOrCreatePool, updatePoolOpenInterest } from "./pool";
+import { getOptionExpiryPrice, getOptionValue } from "../price";
+import {
+  addPoolClosedVolume,
+  addPoolExercisedVolume,
+  addPoolMintVolume,
+  getOrCreatePool,
+  updatePoolOpenInterest,
+} from "./pool";
 
 export function createOption(event: OtokenCreated): Option {
   const token = getOrCreateToken(event.params.tokenAddress);
@@ -34,12 +42,28 @@ export function createOption(event: OtokenCreated): Option {
   return option;
 }
 
+export function isOptionITM(option: Option): boolean {
+  const controller = Controller.bind(NetworkConfigs.getControllerAddress());
+  const payout = controller.getPayout(
+    Address.fromBytes(option.id),
+    BIGINT_TEN_TO_EIGHTH
+  );
+  return payout.gt(BIGINT_ZERO);
+}
+
 export function markOptionExpired(event: ethereum.Event, option: Option): void {
   if (option.expirationPriceUSD) {
     return;
   }
   option.expirationPriceUSD = getOptionExpiryPrice(event, option);
   option.save();
+  const pool = getOrCreatePool(getOrCreateToken(option.pool));
+  const totalValueUSD = getOptionValue(event, option, option.totalSupply!);
+  if (isOptionITM(option)) {
+    addPoolExercisedVolume(event, pool, totalValueUSD);
+  } else {
+    addPoolClosedVolume(event, pool, totalValueUSD);
+  }
 }
 
 export function updateOptionTotalSupply(
@@ -47,17 +71,44 @@ export function updateOptionTotalSupply(
   option: Option,
   netChange: BigInt
 ): void {
-  const price = getUnderlyingPrice(event, option);
   const previousOpenInterestUSD = option.openInterestUSD!;
   option.totalSupply = option.totalSupply!.plus(netChange);
-  option.openInterestUSD = price.times(
-    bigIntToBigDecimal(option.totalSupply!, INT_EIGHT)
-  );
-  option.save();
+  let totalValueUSD = BIGDECIMAL_ZERO;
+  if (!isOptionExpired(event, option)) {
+    totalValueUSD = getOptionValue(event, option, option.totalSupply!);
+  }
+  option.openInterestUSD = totalValueUSD;
   const pool = getOrCreatePool(getOrCreateToken(option.pool));
   updatePoolOpenInterest(
     event,
     pool,
     option.openInterestUSD!.minus(previousOpenInterestUSD)
   );
+  option.save();
+}
+
+export function mintOption(
+  event: ethereum.Event,
+  option: Option,
+  amount: BigInt
+): void {
+  updateOptionTotalSupply(event, option, amount);
+  const pool = getOrCreatePool(getOrCreateToken(option.pool));
+  const amountUSD = getOptionValue(event, option, amount);
+  addPoolMintVolume(event, pool, amountUSD);
+}
+
+export function burnOption(
+  event: ethereum.Event,
+  option: Option,
+  amount: BigInt
+): void {
+  if (isOptionExpired(event, option)) {
+    markOptionExpired(event, option);
+  }
+  updateOptionTotalSupply(event, option, BIGINT_ZERO.minus(amount));
+}
+
+function isOptionExpired(event: ethereum.Event, option: Option): boolean {
+  return event.block.timestamp.gt(option.expirationTimestamp!);
 }

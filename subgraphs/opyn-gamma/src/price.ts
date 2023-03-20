@@ -48,9 +48,7 @@ export function getUnderlyingPrice(
   event: ethereum.Event,
   option: Option
 ): BigDecimal {
-  if (event.block.number >= option.expirationTimestamp!) {
-    return BIGDECIMAL_ZERO;
-  } else if (event.block.number == option.lastPriceBlockNumber!) {
+  if (event.block.number == option.lastPriceBlockNumber!) {
     return option.lastPriceUSD!;
   }
   const underlyingPrice = getTokenPrice(
@@ -66,6 +64,16 @@ export function getUnderlyingPrice(
   option.lastPriceUSD = price;
   option.save();
   return price;
+}
+
+export function getOptionValue(
+  event: ethereum.Event,
+  option: Option,
+  amount: BigInt
+): BigDecimal {
+  return getUnderlyingPrice(event, option).times(
+    bigIntToBigDecimal(amount, INT_EIGHT)
+  );
 }
 
 export function getOptionExpiryPrice(
