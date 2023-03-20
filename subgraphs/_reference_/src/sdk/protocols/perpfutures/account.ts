@@ -30,7 +30,7 @@ import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
  *  - Updating an existing Account
  *  - Making a position
  *  - Making position snapshots
- * 
+ *
  * Schema Version:  1.2.0
  * SDK Version:     1.0.0
  * Author(s):
