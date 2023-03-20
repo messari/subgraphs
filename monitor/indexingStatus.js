@@ -1,5 +1,5 @@
 import axios from "axios";
-import { errorNotification, postError } from "./messageDiscord.js";
+import { errorNotification, postAlert } from "./messageDiscord.js";
 
 const queryContents = `
 subgraph
@@ -130,7 +130,7 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
     try {
       res = await axios.post("https://api.thegraph.com/index-node/graphql", { query: indexingQuery });
     } catch (err) {
-      postError('ERROR QUERYING INDEX STATUS - ' + err.message);
+      postAlert('ERROR QUERYING INDEX STATUS - ' + err.message);
     }
     try {
       res?.data?.data?.indexingStatuses?.forEach(obj => {
@@ -150,10 +150,10 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
         }
       });
     } catch (err) {
-      postError('ERROR HANDLING INDEXING STATUS RESPONSE - ' + err.message);
+      postAlert('ERROR HANDLING INDEXING STATUS RESPONSE - ' + err.message);
     }
   } else {
-    postError('ERRORS CREATING DECENTRALIZED DEPLOYMENT MAPPING - ' + Object.values(decenErrorObj).join(' | ').slice(0, 500) + '...');
+    postAlert('ERRORS CREATING DECENTRALIZED DEPLOYMENT MAPPING - ' + Object.values(decenErrorObj).join(' | ').slice(0, 500) + '...');
   }
   return decenSubgraphHashToIndexingObj;
 }

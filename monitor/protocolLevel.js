@@ -64,8 +64,28 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
         let queryToUse = ``;
 
         if (deployment.data.protocols[0].type.toUpperCase() === "EXCHANGE") {
-            if (versionGroup === "2.0") {
+            if (versionGroup === "2.0.0") {
                 queryToUse = ``;
+            } else if (versionGroup === "1.3.0") {
+                queryToUse = `query {
+                    dexAmmProtocols {
+                        id
+                        name
+                        slug
+                        schemaVersion
+                        subgraphVersion
+                        methodologyVersion
+                        network
+                        type
+                        cumulativeVolumeUSD
+                        cumulativeUniqueUsers
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                        totalPoolCount
+                    }
+                }`;
             } else {
                 queryToUse = `
                 query {
@@ -93,7 +113,7 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 }`;
             }
         } else if (deployment.data.protocols[0].type.toUpperCase() === "LENDING") {
-            if (versionGroup === "2.0") {
+            if (versionGroup === "2.0.0") {
                 queryToUse = `
                 query {
                     lendingProtocols {
@@ -140,7 +160,7 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 }`;
             }
         } else if (deployment.data.protocols[0].type.toUpperCase() === "YIELD") {
-            if (versionGroup === "2.0") {
+            if (versionGroup === "2.0.0") {
                 queryToUse = ``;
             } else {
                 queryToUse = `
@@ -215,23 +235,17 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
         }
 
         if (
-            !(
+            (!(
                 data.cumulativeSupplySideRevenueUSD >= 0 &&
                 data.cumulativeSupplySideRevenueUSD <= 100000000000
-            ) &&
-            !issuesArrays.cumulativeSupplySideRevenueUSD.includes('$' + formatIntToFixed2(parseFloat(data.cumulativeSupplySideRevenueUSD)))
+            ) ||
+                !(
+                    data.cumulativeProtocolSideRevenueUSD >= 0 &&
+                    data.cumulativeProtocolSideRevenueUSD <= 100000000000
+                )) &&
+            !issuesArrays.cumulativeRevenueFactors
         ) {
-            issuesArrays.cumulativeSupplySideRevenueUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeSupplySideRevenueUSD)));
-        }
-
-        if (
-            !(
-                data.cumulativeProtocolSideRevenueUSD >= 0 &&
-                data.cumulativeProtocolSideRevenueUSD <= 100000000000
-            ) &&
-            !issuesArrays.cumulativeProtocolSideRevenueUSD.includes('$' + formatIntToFixed2(parseFloat(data.cumulativeProtocolSideRevenueUSD)))
-        ) {
-            issuesArrays.cumulativeProtocolSideRevenueUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeProtocolSideRevenueUSD)));
+            issuesArrays.cumulativeRevenueFactors.push('$' + formatIntToFixed2(parseFloat(data.cumulativeSupplySideRevenueUSD)) + ' | ' + '$' + formatIntToFixed2(parseFloat(data.cumulativeProtocolSideRevenueUSD)));
         }
 
         if (
@@ -276,40 +290,23 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
             issuesArrays.totalPoolCount.push(data.totalPoolCount);
         }
 
+        const userTypesStr = `${data.cumulativeUniqueDepositors || 0}+${data.cumulativeUniqueBorrowers || 0}+${data.cumulativeUniqueLiquidators || 0}+${data.cumulativeUniqueLiquidatees || 0}=${data.cumulativeUniqueUsers || 0}`;
         if (
-            dataFields.includes("cumulativeUniqueDepositors") &&
-            parseFloat(data.cumulativeUniqueDepositors) <
-            parseFloat(data.cumulativeUniqueUsers) &&
-            !issuesArrays.cumulativeUniqueDepositors.includes(data.cumulativeUniqueDepositors)
+            (dataFields.includes("cumulativeUniqueDepositors") &&
+                parseFloat(data.cumulativeUniqueDepositors) >
+                parseFloat(data.cumulativeUniqueUsers)) ||
+            (dataFields.includes("cumulativeUniqueBorrowers") &&
+                parseFloat(data.cumulativeUniqueBorrowers) >
+                parseFloat(data.cumulativeUniqueUsers)) ||
+            (dataFields.includes("cumulativeUniqueLiquidators") &&
+                parseFloat(data.cumulativeUniqueLiquidators) >
+                parseFloat(data.cumulativeUniqueUsers)) ||
+            (dataFields.includes("cumulativeUniqueLiquidatees") &&
+                parseFloat(data.cumulativeUniqueLiquidatees) >
+                parseFloat(data.cumulativeUniqueUsers)) &&
+            !issuesArrays.cumulativeUniqueUserFactors.includes(userTypesStr)
         ) {
-            issuesArrays.cumulativeUniqueDepositors.push(data.cumulativeUniqueDepositors);
-        }
-
-        if (
-            dataFields.includes("cumulativeUniqueBorrowers") &&
-            parseFloat(data.cumulativeUniqueBorrowers) <
-            parseFloat(data.cumulativeUniqueUsers) &&
-            !issuesArrays.cumulativeUniqueBorrowers.includes(data.cumulativeUniqueBorrowers)
-        ) {
-            issuesArrays.cumulativeUniqueBorrowers.push(data.cumulativeUniqueBorrowers);
-        }
-
-        if (
-            dataFields.includes("cumulativeUniqueLiquidators") &&
-            parseFloat(data.cumulativeUniqueLiquidators) <
-            parseFloat(data.cumulativeUniqueUsers) &&
-            !issuesArrays.cumulativeUniqueLiquidators.includes(data.cumulativeUniqueLiquidators)
-        ) {
-            issuesArrays.cumulativeUniqueLiquidators.push(data.cumulativeUniqueLiquidators);
-        }
-
-        if (
-            dataFields.includes("cumulativeUniqueLiquidatees") &&
-            parseFloat(data.cumulativeUniqueLiquidatees) <
-            parseFloat(data.cumulativeUniqueUsers) &&
-            !issuesArrays.cumulativeUniqueLiquidatees.includes(data.cumulativeUniqueLiquidatees)
-        ) {
-            issuesArrays.cumulativeUniqueLiquidatees.push(data.cumulativeUniqueLiquidatees);
+            issuesArrays.cumulativeUniqueUserFactors.push(userTypesStr);
         }
 
         if (

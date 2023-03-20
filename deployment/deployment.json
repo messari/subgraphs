@@ -2008,6 +2008,10 @@
           "hosted-service": {
             "slug": "compound-v3-ethereum",
             "query-id": "compound-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "compound-v3-ethereum",
+            "query-id": "6PaB6tKFqrL6YoAELEhFGU6Gc39cEynLbo6ETZMF3sCy"
           }
         }
       }
@@ -2346,8 +2350,8 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.3.1",
-          "methodology": "1.2.1"
+          "subgraph": "1.3.2",
+          "methodology": "1.2.2"
         },
         "files": {
           "template": "euler.template.yaml"
@@ -2397,7 +2401,7 @@
           },
           "decentralized-network": {
             "slug": "goldfinch-ethereum",
-            "query-id": "Dtj2HicXKpoUjNB7ffdBkMwt3L9Sz3cbENd67AdHu6Vb"
+            "query-id": "72Cez54APnySAn6h8MswzYkwaL9KjvuuKnKArnPJ8yxb"
           }
         }
       }
@@ -3160,7 +3164,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "2.2.0",
+          "subgraph": "2.3.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -3828,6 +3832,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-arbitrum",
             "query-id": "uniswap-v3-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-arbitrum",
+            "query-id": "9tSS5FaePZnjmnXnSKCCqKVLAqA6eGg6jA2oRojsXUbP"
           }
         }
       },
@@ -3879,7 +3887,7 @@
           },
           "decentralized-network": {
             "slug": "uniswap-v3-ethereum",
-            "query-id": "ELUcwgpm14LKPLrBRuVvPvNKHQ9HvwmtKgKSH6123cr7"
+            "query-id": "G3JZhmKKHC4mydRzD6kSz5fCWve5WDYYCyTFSJyv3SD5"
           }
         }
       },
