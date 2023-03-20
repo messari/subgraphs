@@ -9,7 +9,7 @@ import {
 import { NetworkConfigs } from "../configurations/configure";
 import { Oracle } from "../generated/Oracle/Oracle";
 import { Option, Token } from "../generated/schema";
-import { BIGDECIMAL_ZERO, INT_EIGHT } from "./common/constants";
+import { INT_EIGHT } from "./common/constants";
 import { getOrCreateToken } from "./common/tokens";
 import { bigIntToBigDecimal } from "./common/utils/numbers";
 import { getUsdPricePerToken } from "./prices";

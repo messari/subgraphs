@@ -3,4 +3,7 @@
 // for the protocol/network deployment in the `protocols` folder.
 export namespace Deploy {
   export const OPYN_ETHEREUM = 0;
+  export const OPYN_ARBITRUM = 1;
+  export const OPYN_AVALANCHE = 2;
+  export const OPYN_POLYGON = 3;
 }

@@ -1,15 +1,21 @@
 {
+  "deployment": "OPYN_ARBITRUM",
   "network": "arbitrum-one",
   "Controller": {
-    "address": "0xeE30f92cc9Bf896679567d1aCD551f0E179756fC",
+    "address": "0xee30f92cc9bf896679567d1acd551f0e179756fc",
     "startBlock": 1286633
   },
   "OTokenFactory": {
-    "address": "0x4D3a52A0e98144CAf46Ac226d83e8f144b5c654D",
+    "address": "0x4d3a52a0e98144caf46ac226d83e8f144b5c654d",
     "startBlock": 1263909
   },
-  "Whitelist": {
-    "address": "0xB8f0AC1Ab70643ebE8103Db3618EA5eD6901B458"
+  "Oracle": {
+    "address": "0x7a1e6f0f07ee2ddde14cd4b8eb582bad065357c5",
+    "startBlock": 1286515
+  },
+  "MarginPool": {
+    "address": "0x63d8d20606c048b9b79a30ea45ca6787f8aeb051",
+    "startBlock": 1286544
   },
   "graftEnabled": false,
   "subgraphId": "",

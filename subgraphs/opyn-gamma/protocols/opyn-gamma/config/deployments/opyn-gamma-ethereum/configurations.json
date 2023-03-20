@@ -13,9 +13,6 @@
     "address": "0x789cD7AB3742e23Ce0952F6Bc3Eb3A73A0E08833",
     "startBlock": 12727844
   },
-  "Whitelist": {
-    "address": "0xa5EA18ac6865f315ff5dD9f1a7fb1d41A30a6779"
-  },
   "MarginPool": {
     "address": "0x5934807cC0654d46755eBd2848840b616256C6Ef",
     "startBlock": 11544469
