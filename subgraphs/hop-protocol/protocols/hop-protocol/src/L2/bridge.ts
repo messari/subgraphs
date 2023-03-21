@@ -35,7 +35,9 @@ import {
 	OPTIMISM_L2_SIGNATURE,
 	MESSENGER_EVENT_SIGNATURES,
 } from '../../config/constants/constant'
-import { Network } from '../../../../src/sdk/util/constants'
+import { BIGINT_MINUS_ONE, Network } from '../../../../src/sdk/util/constants'
+import { L2_Amm } from '../../../../generated/HopL2Amm/L2_Amm'
+import { BIGINT_ONE } from '../../../../src/common/constants'
 
 class Pricer implements TokenPricer {
 	getTokenPrice(token: Token): BigDecimal {
@@ -93,21 +95,24 @@ export function handleTransferFromL1Completed(
 		event.transaction.hash.toHexString(),
 	])
 	if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
-		const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
+		const inputTokenOne = NetworkConfigs.getTokenAddressFromBridgeAddress(
 			event.address.toHexString()
-		)
+		)[0]
+		const inputTokenTwo = NetworkConfigs.getTokenAddressFromBridgeAddress(
+			event.address.toHexString()
+		)[1]
 
 		log.warning('inputToken: {}, bridgeAddress: {}', [
-			inputToken,
+			inputTokenOne,
 			event.address.toHexString(),
 		])
 		const poolAddress = NetworkConfigs.getPoolAddressFromBridgeAddress(
 			event.address.toHexString()
 		)
 		log.warning(
-			'inputToken2: {}, bridgeAddress2: {}, poolAddress2: {}, txHash: {}',
+			'inputTokenOne2: {}, bridgeAddress2: {}, poolAddress2: {}, txHash: {}',
 			[
-				inputToken,
+				inputTokenOne,
 				event.address.toHexString(),
 				poolAddress,
 				event.transaction.hash.toHexString(),
@@ -126,13 +131,23 @@ export function handleTransferFromL1Completed(
 		)
 
 		const acc = sdk.Accounts.loadAccount(event.transaction.from)
+		const tokenOne = sdk.Tokens.getOrCreateToken(
+			Address.fromString(inputTokenOne)
+		)
+		const tokenTwo = sdk.Tokens.getOrCreateToken(
+			Address.fromString(inputTokenTwo)
+		)
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
-		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
 
+		const hPool = sdk.Pools.loadPool<string>(
+			Bytes.fromHexString(poolAddress.concat('-').concat('1'))
+		)
 		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenOne)
 		}
-
+		if (!hPool.isInitialized) {
+			hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenTwo)
+		}
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
 			reverseChainIDs.get(
 				dataSource
@@ -141,11 +156,15 @@ export function handleTransferFromL1Completed(
 					.replace('-', '_')
 			)!,
 			Address.fromString(
-				NetworkConfigs.getMainnetCrossTokenFromTokenAddress(inputToken)
+				NetworkConfigs.getMainnetCrossTokenFromTokenAddress(inputTokenOne)
 			),
 			CrosschainTokenType.CANONICAL,
-			Address.fromString(inputToken)
+			Address.fromString(inputTokenOne)
 		)
+
+		pool.pool.relation = hPool.getBytesID()
+		hPool.pool.relation = hPool.getBytesID()
+
 		pool.addDestinationToken(crossToken)
 
 		acc.transferIn(
@@ -155,6 +174,24 @@ export function handleTransferFromL1Completed(
 			event.params.amount,
 			event.transaction.hash
 		)
+
+		const Amm = L2_Amm.bind(Address.fromString(poolAddress))
+		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
+		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
+
+		if (!inputBalanceCallA.reverted) {
+			pool.setInputTokenBalance(inputBalanceCallA.value)
+		} else {
+			log.warning('inputBalanceCallA reverted', [])
+		}
+		if (!inputBalanceCallB.reverted) {
+			hPool.setInputTokenBalance(inputBalanceCallB.value)
+
+			log.warning('inputBalanceCall : {}', [inputBalanceCallB.value.toString()])
+		} else {
+			log.warning('inputBalanceCallB reverted', [])
+		}
+
 		//MESSAGES
 		let receipt = event.receipt
 
@@ -216,16 +253,20 @@ export function handleTransferSent(event: TransferSent): void {
 		]
 	)
 	if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
-		const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
+		const inputTokenOne = NetworkConfigs.getTokenAddressFromBridgeAddress(
 			event.address.toHexString()
-		)
+		)[0]
+		const inputTokenTwo = NetworkConfigs.getTokenAddressFromBridgeAddress(
+			event.address.toHexString()
+		)[1]
+
 		const poolAddress = NetworkConfigs.getPoolAddressFromBridgeAddress(
 			event.address.toHexString()
 		)
 
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 		log.warning('S1 - inputToken: {},  poolAddress: {}', [
-			inputToken,
+			inputTokenOne,
 			poolAddress,
 		])
 		const poolName = poolConfig[0]
@@ -238,30 +279,47 @@ export function handleTransferSent(event: TransferSent): void {
 			event
 		)
 
+		const tokenOne = sdk.Tokens.getOrCreateToken(
+			Address.fromString(inputTokenOne)
+		)
+		const tokenTwo = sdk.Tokens.getOrCreateToken(
+			Address.fromString(inputTokenTwo)
+		)
 		const acc = sdk.Accounts.loadAccount(event.params.recipient)
 		const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
-		const token = sdk.Tokens.getOrCreateToken(Address.fromString(inputToken))
 
+		const hPool = sdk.Pools.loadPool<string>(
+			Bytes.fromHexString(poolAddress.concat('-').concat('1'))
+		)
 		if (!pool.isInitialized) {
-			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenOne)
 		}
+
+		if (!hPool.isInitialized) {
+			hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenTwo)
+		}
+
 		log.warning('S2 - inputToken: {},  poolAddress: {}', [
-			inputToken,
+			inputTokenOne,
 			poolAddress,
 		])
+
+		pool.pool.relation = hPool.getBytesID()
+		hPool.pool.relation = hPool.getBytesID()
+
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
 			event.params.chainId,
 			Address.fromString(
 				NetworkConfigs.getCrossTokenAddress(
 					event.params.chainId.toString(),
-					inputToken
+					inputTokenOne
 				)
 			),
 			CrosschainTokenType.CANONICAL,
-			Address.fromString(inputToken)
+			Address.fromString(inputTokenOne)
 		)
 		log.warning('S3 - inputToken: {},  poolAddress: {}', [
-			inputToken,
+			inputTokenOne,
 			poolAddress,
 		])
 		pool.addDestinationToken(crossToken)
@@ -272,7 +330,23 @@ export function handleTransferSent(event: TransferSent): void {
 			event.params.amount,
 			event.transaction.hash
 		)
-		pool.addRevenueNative(BigInt.zero(), event.params.bonderFee)
+
+		const Amm = L2_Amm.bind(Address.fromString(poolAddress))
+		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
+		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
+
+		if (!inputBalanceCallA.reverted) {
+			pool.setInputTokenBalance(inputBalanceCallA.value)
+		} else {
+			log.warning('inputBalanceCallA reverted', [])
+		}
+		if (!inputBalanceCallB.reverted) {
+			hPool.setInputTokenBalance(inputBalanceCallB.value)
+
+			log.warning('inputBalanceCall : {}', [inputBalanceCallB.value.toString()])
+		} else {
+			log.warning('inputBalanceCallB reverted', [])
+		}
 
 		//MESSAGES
 		let receipt = event.receipt

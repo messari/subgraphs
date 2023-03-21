@@ -244,6 +244,7 @@ export class Pool {
 	 */
 	setTotalValueLocked(newTVL: BigDecimal): void {
 		const delta = newTVL.minus(this.pool.totalValueLockedUSD)
+
 		this.addTotalValueLocked(delta)
 		this.save()
 	}
@@ -656,7 +657,7 @@ export class Pool {
 			if (!transfer.isOutgoing) {
 				amount = amount.times(BIGINT_MINUS_ONE)
 			}
-			this.addInputTokenBalance(amount, false)
+			// this.addInputTokenBalance(amount)
 			this.refreshNetValueExportedUSD()
 		}
 	}
@@ -670,7 +671,7 @@ export class Pool {
 	 */
 	trackDeposit(deposit: LiquidityDeposit): void {
 		this.protocol.addTransaction(TransactionType.LIQUIDITY_DEPOSIT)
-		this.addInputTokenBalance(deposit.amount, false)
+		this.addInputTokenBalance(deposit.amount)
 		this._addInputTokenLiquidityBalance(deposit.amount)
 	}
 
@@ -684,7 +685,7 @@ export class Pool {
 	trackWithdraw(withdraw: LiquidityWithdraw): void {
 		this.protocol.addTransaction(TransactionType.LIQUIDITY_WITHDRAW)
 		const amount = withdraw.amount.times(BIGINT_MINUS_ONE)
-		this.addInputTokenBalance(amount, false)
+		this.addInputTokenBalance(amount)
 		this._addInputTokenLiquidityBalance(amount)
 	}
 }

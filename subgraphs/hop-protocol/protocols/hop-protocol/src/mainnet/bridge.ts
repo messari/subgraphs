@@ -95,7 +95,7 @@ export function handleTransferSentToL2(event: TransferSentToL2): void {
 	if (NetworkConfigs.getBridgeList().includes(event.address.toHexString())) {
 		const inputToken = NetworkConfigs.getTokenAddressFromBridgeAddress(
 			event.address.toHexString()
-		)
+		)[0]
 
 		log.warning('inputToken1: {}, bridgeAddress: {}, chainId: {}', [
 			inputToken,

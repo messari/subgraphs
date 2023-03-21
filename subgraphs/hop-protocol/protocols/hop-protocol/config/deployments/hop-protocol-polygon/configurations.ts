@@ -11,6 +11,7 @@ import {
 	PolygonRewardToken,
 	ZERO_ADDRESS,
 	RewardTokens,
+	PolygonHtoken,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolPolygonConfigurations implements Configurations {
@@ -82,20 +83,20 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 		}
 	}
 
-	getTokenAddressFromBridgeAddress(bridgeAddress: string): string {
+	getTokenAddressFromBridgeAddress(bridgeAddress: string): string[] {
 		if (bridgeAddress == PolygonBridge.USDC) {
-			return PolygonToken.USDC
+			return [PolygonToken.USDC, PolygonHtoken.USDC]
 		} else if (bridgeAddress == PolygonBridge.DAI) {
-			return PolygonToken.DAI
+			return [PolygonToken.DAI, PolygonHtoken.DAI]
 		} else if (bridgeAddress == PolygonBridge.USDT) {
-			return PolygonToken.USDT
+			return [PolygonToken.USDT, PolygonHtoken.USDT]
 		} else if (bridgeAddress == PolygonBridge.ETH) {
-			return PolygonToken.ETH
+			return [PolygonToken.ETH, PolygonHtoken.ETH]
 		} else if (bridgeAddress == PolygonBridge.MATIC) {
-			return PolygonToken.MATIC
+			return [PolygonToken.MATIC, PolygonHtoken.MATIC]
 		} else {
 			log.critical('Token not found', [])
-			return ''
+			return ['']
 		}
 	}
 
@@ -179,20 +180,20 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 		return ''
 	}
 
-	getTokenAddressFromPoolAddress(poolAddress: string): string {
+	getTokenAddressFromPoolAddress(poolAddress: string): string[] {
 		if (poolAddress == PolygonAmm.USDC) {
-			return PolygonToken.USDC
+			return [PolygonToken.USDC, PolygonHtoken.USDC]
 		} else if (poolAddress == PolygonAmm.DAI) {
-			return PolygonToken.DAI
+			return [PolygonToken.DAI, PolygonHtoken.DAI]
 		} else if (poolAddress == PolygonAmm.USDT) {
-			return PolygonToken.USDT
+			return [PolygonToken.USDT, PolygonHtoken.USDT]
 		} else if (poolAddress == PolygonAmm.ETH) {
-			return PolygonToken.ETH
+			return [PolygonToken.ETH, PolygonHtoken.ETH]
 		} else if (poolAddress == PolygonAmm.MATIC) {
-			return PolygonToken.MATIC
+			return [PolygonToken.MATIC, PolygonHtoken.MATIC]
 		} else {
 			log.critical('Token not found', [])
-			return ''
+			return ['']
 		}
 	}
 
@@ -277,19 +278,19 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 		return []
 	}
 	getUsdcTokens(): string[] {
-		return [PolygonToken.USDC]
+		return [PolygonToken.USDC, PolygonHtoken.USDC]
 	}
 	getDaiTokens(): string[] {
-		return [PolygonToken.DAI]
+		return [PolygonToken.DAI, PolygonHtoken.DAI]
 	}
 	getEthTokens(): string[] {
-		return [PolygonToken.ETH]
+		return [PolygonToken.ETH, PolygonHtoken.ETH]
 	}
 	getMaticTokens(): string[] {
-		return [PolygonToken.MATIC]
+		return [PolygonToken.MATIC, PolygonHtoken.MATIC]
 	}
 	getUsdtTokens(): string[] {
-		return [PolygonToken.USDT]
+		return [PolygonToken.USDT, PolygonHtoken.USDT]
 	}
 	getUsdtPools(): string[] {
 		return []

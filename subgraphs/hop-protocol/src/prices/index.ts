@@ -18,6 +18,12 @@ import {
 	BigInt,
 } from '@graphprotocol/graph-ts'
 import {
+	ArbitrumHtoken,
+	ArbitrumToken,
+	OptimismHtoken,
+	OptimismToken,
+	RewardTokens,
+	XdaiHtoken,
 	XdaiToken,
 	priceTokens,
 } from '../../protocols/hop-protocol/config/constants/constant'
@@ -26,6 +32,21 @@ import { UniswapPair } from '../../generated/Token/UniswapPair'
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 	if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
 		return new CustomPriceType()
+	}
+
+	if (tokenAddr.toHexString() == ArbitrumHtoken.ETH) {
+		tokenAddr = Address.fromString(ArbitrumToken.ETH)
+	}
+	if (tokenAddr.toHexString() == OptimismHtoken.ETH) {
+		tokenAddr = Address.fromString(OptimismToken.ETH)
+	}
+
+	if (tokenAddr.toHexString() == XdaiHtoken.ETH) {
+		tokenAddr = Address.fromString(XdaiToken.ETH)
+	}
+
+	if (tokenAddr.toHexString() == OptimismHtoken.SNX) {
+		tokenAddr = Address.fromString(OptimismToken.SNX)
 	}
 
 	if (priceTokens.includes(tokenAddr.toHexString())) {
@@ -113,7 +134,12 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 		return curvePrice
 	}
 	// 8. uniswapV2
-	if (tokenAddr.toHexString() == XdaiToken.ETH) {
+	if (
+		tokenAddr.toHexString() == XdaiToken.ETH ||
+		tokenAddr.toHexString() == XdaiHtoken.ETH
+	) {
+		tokenAddr = Address.fromString(XdaiToken.ETH)
+
 		const uniswapV2Price = UniswapV2.getTokenPriceUSDC(tokenAddr)
 		if (!uniswapV2Price.reverted) {
 			log.info('[UniswapV2Eth] tokenAddress: {}, Price: {}', [
@@ -125,9 +151,39 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 	}
 
 	// 9. Uniswap Router
-	if (tokenAddr.toHexString() == XdaiToken.MATIC) {
+	if (
+		tokenAddr.toHexString() == XdaiToken.MATIC ||
+		tokenAddr.toHexString() == XdaiHtoken.MATIC
+	) {
 		const uniSwapPair = UniswapPair.bind(
 			Address.fromString('0x70cd033af4dc9763700d348e402dfeddb86e09e1')
+		)
+
+		let price: BigInt
+		tokenAddr = Address.fromString(XdaiToken.MATIC)
+		let reserve = uniSwapPair.try_getReserves()
+		if (!reserve.reverted) {
+			price = reserve.value.value1.div(reserve.value.value0)
+			log.warning(
+				'[UniswapV2Matic] tokenAddress: {}, Reserve1: {}, Reserve0: {}, Price: {}',
+				[
+					tokenAddr.toHexString(),
+					reserve.value.value1.toString(),
+					reserve.value.value0.toString(),
+					price.toBigDecimal().toString(),
+				]
+			)
+			let x: CustomPriceType
+			x = CustomPriceType.initialize(price.toBigDecimal())
+			if (!x.reverted) {
+				return x
+			}
+		}
+	}
+
+	if (tokenAddr.toHexString() == RewardTokens.GNO) {
+		const uniSwapPair = UniswapPair.bind(
+			Address.fromString('0xe9ad744f00f9c3c2458271b7b9f30cce36b74776')
 		)
 
 		let price: BigInt
@@ -151,6 +207,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 			}
 		}
 	}
+
 	// 10. Uniswap Router
 	const uniswapPrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr)
 	if (!uniswapPrice.reverted) {

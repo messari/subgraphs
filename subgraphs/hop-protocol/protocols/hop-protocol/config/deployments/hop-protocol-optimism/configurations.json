@@ -98,12 +98,6 @@
       "startBlock": 0
     },
     {
-      "dataSourceName": "HopL2AmmWBTC",
-      "token": "WBTC",
-      "address": "0x46fc3Af3A47792cA3ED06fdF3D657145A675a8D8",
-      "startBlock": 0
-    },
-    {
       "dataSourceName": "HopL2AmmSNX",
       "token": "SNX",
       "address": "0x1990BC6dfe2ef605Bfc08f5A23564dB75642Ad73",

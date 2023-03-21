@@ -7,6 +7,7 @@ import {
 	XdaiAmm,
 	XdaiBridge,
 	XdaiToken,
+	XdaiHtoken,
 	PolygonToken,
 	XdaiRewardToken,
 	ZERO_ADDRESS,
@@ -39,7 +40,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 			return ['USDT', 'Tether USD', '6', XdaiBridge.USDT]
 		} else if (this.getEthTokens().includes(tokenAddress)) {
 			return ['ETH', 'ETH', '18', XdaiBridge.ETH]
-		} else if (tokenAddress == XdaiToken.MATIC) {
+		} else if (this.getMaticTokens().includes(tokenAddress)) {
 			return ['MATIC', 'MATIC', '18', XdaiBridge.MATIC]
 		} else if (tokenAddress == RewardTokens.GNO) {
 			return ['GNO', 'Gnosis Token', '18', ZERO_ADDRESS]
@@ -127,27 +128,34 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		return ''
 	}
 
-	getTokenAddressFromBridgeAddress(bridgeAddress: string): string {
-		if (bridgeAddress == XdaiBridge.USDC) return XdaiToken.USDC
-		else if (bridgeAddress == XdaiBridge.DAI) return XdaiToken.DAI
-		else if (bridgeAddress == XdaiBridge.USDT) return XdaiToken.USDT
-		else if (bridgeAddress == XdaiBridge.ETH) return XdaiToken.ETH
-		else if (bridgeAddress == XdaiBridge.MATIC) return XdaiToken.MATIC
-		else {
+	getTokenAddressFromBridgeAddress(bridgeAddress: string): string[] {
+		if (bridgeAddress == XdaiBridge.USDC) {
+			return [XdaiToken.USDC, XdaiHtoken.USDC]
+		} else if (bridgeAddress == XdaiBridge.DAI) {
+			return [XdaiToken.DAI, XdaiHtoken.DAI]
+		} else if (bridgeAddress == XdaiBridge.USDT) {
+			return [XdaiToken.USDT, XdaiHtoken.USDT]
+		} else if (bridgeAddress == XdaiBridge.ETH) {
+			return [XdaiToken.ETH, XdaiHtoken.ETH]
+		} else if (bridgeAddress == XdaiBridge.MATIC) {
+			return [XdaiToken.MATIC, XdaiHtoken.MATIC]
+		} else {
 			log.critical('Token not found', [])
-			return ''
+			return ['']
 		}
 	}
 
-	getTokenAddressFromPoolAddress(poolAddress: string): string {
-		if (poolAddress == XdaiAmm.USDC) return XdaiToken.USDC
-		else if (poolAddress == XdaiAmm.DAI) return XdaiToken.DAI
-		else if (poolAddress == XdaiAmm.USDT) return XdaiToken.USDT
-		else if (poolAddress == XdaiAmm.ETH) return XdaiToken.ETH
-		else if (poolAddress == XdaiAmm.MATIC) return XdaiToken.MATIC
+	getTokenAddressFromPoolAddress(poolAddress: string): string[] {
+		if (poolAddress == XdaiAmm.USDC) return [XdaiToken.USDC, XdaiHtoken.USDC]
+		else if (poolAddress == XdaiAmm.DAI) return [XdaiToken.DAI, XdaiHtoken.DAI]
+		else if (poolAddress == XdaiAmm.USDT)
+			return [XdaiToken.USDT, XdaiHtoken.USDT]
+		else if (poolAddress == XdaiAmm.ETH) return [XdaiToken.ETH, XdaiHtoken.ETH]
+		else if (poolAddress == XdaiAmm.MATIC)
+			return [XdaiToken.MATIC, XdaiHtoken.MATIC]
 		else {
 			log.critical('Token not found', [])
-			return ''
+			return ['']
 		}
 	}
 
@@ -249,25 +257,25 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		return []
 	}
 	getUsdcTokens(): string[] {
-		return [XdaiToken.USDC]
+		return [XdaiToken.USDC, XdaiHtoken.USDC]
 	}
 	getDaiPools(): string[] {
 		return []
 	}
 	getDaiTokens(): string[] {
-		return [XdaiToken.DAI]
+		return [XdaiToken.DAI, XdaiHtoken.DAI]
 	}
 	getUsdtPools(): string[] {
 		return []
 	}
 	getUsdtTokens(): string[] {
-		return [XdaiToken.USDT]
+		return [XdaiToken.USDT, XdaiHtoken.USDT]
 	}
 	getEthPools(): string[] {
 		return []
 	}
 	getEthTokens(): string[] {
-		return [XdaiToken.ETH]
+		return [XdaiToken.ETH, XdaiHtoken.ETH]
 	}
 	getSnxPools(): string[] {
 		return []
@@ -280,6 +288,6 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		return []
 	}
 	getMaticTokens(): string[] {
-		return []
+		return [XdaiToken.MATIC, XdaiHtoken.MATIC]
 	}
 }

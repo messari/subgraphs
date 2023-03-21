@@ -64,16 +64,16 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		return ''
 	}
 
-	getTokenAddressFromBridgeAddress(bridgeAddress: string): string {
-		if (bridgeAddress == MainnetBridge.USDC) return MainnetToken.USDC
-		else if (bridgeAddress == MainnetBridge.DAI) return MainnetToken.DAI
-		else if (bridgeAddress == MainnetBridge.USDT) return MainnetToken.USDT
-		else if (bridgeAddress == MainnetBridge.ETH) return MainnetToken.ETH
-		else if (bridgeAddress == MainnetBridge.SNX) return MainnetToken.SNX
-		else if (bridgeAddress == MainnetBridge.MATIC) return MainnetToken.MATIC
+	getTokenAddressFromBridgeAddress(bridgeAddress: string): string[] {
+		if (bridgeAddress == MainnetBridge.USDC) return [MainnetToken.USDC]
+		else if (bridgeAddress == MainnetBridge.DAI) return [MainnetToken.DAI]
+		else if (bridgeAddress == MainnetBridge.USDT) return [MainnetToken.USDT]
+		else if (bridgeAddress == MainnetBridge.ETH) return [MainnetToken.ETH]
+		else if (bridgeAddress == MainnetBridge.SNX) return [MainnetToken.SNX]
+		else if (bridgeAddress == MainnetBridge.MATIC) return [MainnetToken.MATIC]
 		else {
 			log.critical('Token not found', [])
-			return ''
+			return ['']
 		}
 	}
 
@@ -234,8 +234,8 @@ export class HopProtocolEthereumConfigurations implements Configurations {
 		return []
 	}
 
-	getTokenAddressFromPoolAddress(poolAddress: string): string {
-		return ''
+	getTokenAddressFromPoolAddress(poolAddress: string): string[] {
+		return ['']
 	}
 	getPoolAddressFromTokenAddress(tokenAddress: string): string {
 		return ''

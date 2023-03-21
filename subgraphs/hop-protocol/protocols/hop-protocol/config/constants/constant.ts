@@ -24,6 +24,14 @@ export namespace XdaiToken {
 	export const DAI = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'.toLowerCase()
 	export const ETH = '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'.toLowerCase()
 }
+
+export namespace XdaiHtoken {
+	export const USDC = '0x9ec9551d4A1a1593b0ee8124D98590CC71b3B09D'.toLowerCase()
+	export const USDT = '0x91f8490eC27cbB1b2FaEdd29c2eC23011d7355FB'.toLowerCase()
+	export const MATIC = '0xE38faf9040c7F09958c638bBDB977083722c5156'.toLowerCase()
+	export const DAI = '0xB1ea9FeD58a317F81eEEFC18715Dd323FDEf45c4'.toLowerCase()
+	export const ETH = '0xc46F2004006d4C770346f60a7BaA3f1Cc67dFD1c'.toLowerCase()
+}
 export namespace XdaiRewardToken {
 	export const USDC_A = '0x5D13179c5fa40b87D53Ff67ca26245D3D5B2F872'.toLowerCase()
 	export const USDC_B = '0x636A7ee78faCd079DaBC8f81EDA1D09AA9D440A7'.toLowerCase()
@@ -55,7 +63,6 @@ export namespace MainnetBridge {
 export namespace ArbitrumBridge {
 	export const USDC = '0x0e0E3d2C5c292161999474247956EF542caBF8dd'.toLowerCase()
 	export const USDT = '0x72209Fe68386b37A40d6bCA04f78356fd342491f'.toLowerCase()
-	export const MATIC = '0x7ac71c29fEdF94BAc5A5C9aB76E1Dd12Ea885CCC'.toLowerCase()
 	export const DAI = '0x7aC115536FE3A185100B2c4DE4cb328bf3A58Ba6'.toLowerCase()
 	export const ETH = '0x3749C4f034022c39ecafFaBA182555d4508caCCC'.toLowerCase()
 }
@@ -71,6 +78,13 @@ export namespace ArbitrumToken {
 	export const USDT = '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9'.toLowerCase()
 	export const DAI = '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase()
 	export const ETH = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'.toLowerCase()
+}
+
+export namespace ArbitrumHtoken {
+	export const USDC = '0x0ce6c85cF43553DE10FC56cecA0aef6Ff0DD444d'.toLowerCase()
+	export const USDT = '0x12e59C59D282D2C00f3166915BED6DC2F5e2B5C7'.toLowerCase()
+	export const DAI = '0x46ae9BaB8CEA96610807a275EBD36f8e916b5C61'.toLowerCase()
+	export const ETH = '0xDa7c0de432a9346bB6e96aC74e3B61A36d8a77eB'.toLowerCase()
 }
 
 export namespace ArbitrumRewardToken {
@@ -101,6 +115,14 @@ export namespace OptimismToken {
 	export const DAI = '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase()
 	export const ETH = '0x4200000000000000000000000000000000000006'.toLowerCase()
 	export const SNX = '0x8700dAec35aF8Ff88c16BdF0418774CB3D7599B4'.toLowerCase()
+}
+
+export namespace OptimismHtoken {
+	export const USDC = '0x25D8039bB044dC227f741a9e381CA4cEAE2E6aE8'.toLowerCase()
+	export const USDT = '0x2057C8ECB70Afd7Bee667d76B4CD373A325b1a20'.toLowerCase()
+	export const DAI = '0x56900d66D74Cb14E3c86895789901C9135c95b16'.toLowerCase()
+	export const ETH = '0xE38faf9040c7F09958c638bBDB977083722c5156'.toLowerCase()
+	export const SNX = '0x13B7F51BD865410c3AcC4d56083C5B56aB38D203'.toLowerCase()
 }
 
 export namespace OptimismRewardToken {
@@ -134,6 +156,14 @@ export namespace PolygonToken {
 	export const ETH = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'.toLowerCase()
 	export const MATIC = '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270'.toLowerCase()
 }
+
+export namespace PolygonHtoken {
+	export const USDC = '0x9ec9551d4A1a1593b0ee8124D98590CC71b3B09D'.toLowerCase()
+	export const USDT = '0x9F93ACA246F457916E49Ec923B8ed099e313f763'.toLowerCase()
+	export const DAI = '0xb8901acB165ed027E32754E0FFe830802919727f'.toLowerCase()
+	export const ETH = '0x1fDeAF938267ca43388eD1FdB879eaF91e920c7A'.toLowerCase()
+	export const MATIC = '0x712F0cf37Bdb8299D0666727F73a5cAbA7c1c24c'.toLowerCase()
+}
 export namespace PolygonRewardToken {
 	export const USDC = '0x7811737716942967Ae6567B26a5051cC72af550E'.toLowerCase()
 	export const USDT = '0x297E5079DF8173Ae1696899d3eACD708f0aF82Ce'.toLowerCase()
@@ -144,16 +174,31 @@ export namespace PolygonRewardToken {
 export const priceTokens = [
 	OptimismToken.USDC,
 	OptimismToken.USDT,
-	XdaiToken.USDT,
+	OptimismToken.DAI,
+	OptimismHtoken.USDT,
+	OptimismHtoken.USDC,
+	OptimismHtoken.DAI,
+
 	XdaiToken.USDC,
+	XdaiHtoken.USDC,
+	XdaiToken.USDT,
+	XdaiHtoken.USDT,
+	XdaiToken.DAI,
+	XdaiHtoken.DAI,
+
 	PolygonToken.USDC,
 	PolygonToken.USDT,
+	PolygonHtoken.USDC,
+	PolygonHtoken.USDT,
+	PolygonToken.DAI,
+	PolygonHtoken.DAI,
+
 	ArbitrumToken.USDT,
 	ArbitrumToken.USDC,
-	OptimismToken.DAI,
-	XdaiToken.DAI,
-	PolygonToken.DAI,
+	ArbitrumHtoken.USDT,
+	ArbitrumHtoken.USDC,
 	ArbitrumToken.DAI,
+	ArbitrumHtoken.DAI,
 ]
 
 export const MESSENGER_ADDRESSES = [
@@ -162,6 +207,14 @@ export const MESSENGER_ADDRESSES = [
 	'0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e'.toLowerCase(), //XDAI_L1
 	'0x75Df5AF045d91108662D8080fD1FEFAd6aA0bb59'.toLowerCase(), //XDAI_L2
 	'0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f'.toLowerCase(), //ARBITRUM_L1
+]
+export const OPTIMISM_GENESIS_HASHES = [
+	'0x9168732d683634ce7155a8f6cbc6a1798582ccfa830a4351939d7343cbef675f', //ETH
+	'0xb164734917a3ab5987544d99f6a5875a95bbb30d57c30dfec8db8d13789490ee', //USDC
+	'0xa392dd41af7be095e026578a0c756e949fbef19a0ca5da6da4cf7ea409fd52f6', //USDT
+	'0x657e0c1d2500f62f3027c59bd24bf1495e4ecb99ab50739b3d44cdc64a96a289', //DAI
+	'0xb496953b1c04dd8e6ea5bb009b613870afd7848d56d1f56d7ebbb076bd0916cc', //SNX
+	'0xee86691a2a4854a472734e98c72c2a8763a7927ba0019d4b4c58d56bd2b3d9bd', //SUSD
 ]
 
 export const XDAI_L2_SIGNATURE =

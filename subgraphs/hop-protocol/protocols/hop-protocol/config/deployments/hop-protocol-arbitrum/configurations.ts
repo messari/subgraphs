@@ -11,6 +11,7 @@ import {
 	ArbitrumRewardToken,
 	ZERO_ADDRESS,
 	RewardTokens,
+	ArbitrumHtoken,
 } from '../../constants/constant'
 import { Network } from '../../../../../src/sdk/util/constants'
 export class HopProtocolArbitrumConfigurations implements Configurations {
@@ -115,29 +116,33 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		return ''
 	}
 
-	getTokenAddressFromBridgeAddress(bridgeAddress: string): string {
+	getTokenAddressFromBridgeAddress(bridgeAddress: string): string[] {
 		if (bridgeAddress == ArbitrumBridge.USDC) {
-			return ArbitrumToken.USDC
+			return [ArbitrumToken.USDC, ArbitrumHtoken.USDC]
 		} else if (bridgeAddress == ArbitrumBridge.DAI) {
-			return ArbitrumToken.DAI
+			return [ArbitrumToken.DAI, ArbitrumHtoken.DAI]
 		} else if (bridgeAddress == ArbitrumBridge.USDT) {
-			return ArbitrumToken.USDT
+			return [ArbitrumToken.USDT, ArbitrumHtoken.USDT]
 		} else if (bridgeAddress == ArbitrumBridge.ETH) {
-			return ArbitrumToken.ETH
+			return [ArbitrumToken.ETH, ArbitrumHtoken.ETH]
 		} else {
 			log.critical('Token not found', [])
-			return ''
+			return ['']
 		}
 	}
 
-	getTokenAddressFromPoolAddress(poolAddress: string): string {
-		if (poolAddress == ArbitrumAmm.USDC) return ArbitrumToken.USDC
-		else if (poolAddress == ArbitrumAmm.DAI) return ArbitrumToken.DAI
-		else if (poolAddress == ArbitrumAmm.USDT) return ArbitrumToken.USDT
-		else if (poolAddress == ArbitrumAmm.ETH) return ArbitrumToken.ETH
+	getTokenAddressFromPoolAddress(poolAddress: string): string[] {
+		if (poolAddress == ArbitrumAmm.USDC)
+			return [ArbitrumToken.USDC, ArbitrumHtoken.USDC]
+		else if (poolAddress == ArbitrumAmm.DAI)
+			return [ArbitrumToken.DAI, ArbitrumHtoken.DAI]
+		else if (poolAddress == ArbitrumAmm.USDT)
+			return [ArbitrumToken.USDT, ArbitrumHtoken.USDT]
+		else if (poolAddress == ArbitrumAmm.ETH)
+			return [ArbitrumToken.ETH, ArbitrumHtoken.ETH]
 		else {
 			log.critical('Token not found', [])
-			return ''
+			return ['']
 		}
 	}
 
@@ -211,16 +216,16 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 		return []
 	}
 	getUsdcTokens(): string[] {
-		return [ArbitrumToken.USDC]
+		return [ArbitrumToken.USDC, ArbitrumHtoken.USDC]
 	}
 	getDaiTokens(): string[] {
-		return [ArbitrumToken.DAI]
+		return [ArbitrumToken.DAI, ArbitrumHtoken.DAI]
 	}
 	getUsdtTokens(): string[] {
-		return [ArbitrumToken.USDT]
+		return [ArbitrumToken.USDT, ArbitrumHtoken.USDT]
 	}
 	getEthTokens(): string[] {
-		return [ArbitrumToken.ETH]
+		return [ArbitrumToken.ETH, ArbitrumHtoken.ETH]
 	}
 	getDaiPools(): string[] {
 		return []

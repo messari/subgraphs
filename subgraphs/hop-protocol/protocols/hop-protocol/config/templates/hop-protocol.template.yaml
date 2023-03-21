@@ -270,6 +270,8 @@ dataSources:
       language: wasm/assemblyscript
       entities: []
       abis:
+        - name: L2_Amm
+          file: ./abis/L2_Amm.json
         - name: L2_Bridge
           file: ./abis/L2_Bridge.json
         - name: L2_Optimism_Messenger

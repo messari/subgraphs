@@ -4,8 +4,8 @@
   "subgraphName": "hop-xdai",
   "deployment": "HOP_PROTOCOL_XDAI",
   "graftEnabled": false,
-  "subgraphId": "QmbKE6Qr1qNx4438KFwDMaavLGQ615JvUtMchrET1C84Qe",
-  "graftStartBlock": 20418884,
+  "subgraphId": "QmVF2VxWpFugux9o8LyemeGbTBRiJJNE4rq4tjSeBGvU9L",
+  "graftStartBlock": 17020413,
   "tokens": [
     {
       "dataSourceName": "Token",
@@ -46,14 +46,6 @@
       "tokenDecimals": 18,
       "address": "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1",
       "startBlock": 18359713
-    },
-    {
-      "dataSourceName": "TokenWBTC",
-      "token": "WBTC",
-      "tokenName": "Wrapped BTC",
-      "tokenDecimals": 18,
-      "address": "0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252",
-      "startBlock": 18723032
     },
     {
       "dataSourceName": "TokenHOP",
