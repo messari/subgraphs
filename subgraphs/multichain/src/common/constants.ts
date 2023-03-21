@@ -260,6 +260,8 @@ NetworkByID.set("1361940275777", Network.TERRA);
 
 const mainnetInacuratePricefeedTokens = [
   Address.fromString("0x86A298581388bc199e61BFeCDcA8eA22Cf6C0Da3"), // anyGTPS
+  Address.fromString("0x9b2f9f348425b1ef54c232f87ee7d4d570c1b552"), // anyHOGE
+  Address.fromString("0x015cea338ce68bd912b3c704620c6000ee9f4ab9"), // anyGCAKE
 ];
 
 export const INACURATE_PRICEFEED_TOKENS = new TypedMap<string, Address[]>();
