@@ -57,12 +57,7 @@ import {
   CHAINLINK_USDC_ORACLE,
   MIGRATION_HELPER,
 } from "./constants";
-import {
-  MarketDailySnapshot,
-  Token,
-  _Loan,
-  _MarketList,
-} from "../../../generated/schema";
+import { MarketDailySnapshot, Token, _Loan } from "../../../generated/schema";
 import { ERC20, Transfer } from "../../../generated/PoolManagerFactory/ERC20";
 
 /////////////////////
@@ -87,7 +82,7 @@ export function handleManagerInstanceDeployed(event: InstanceDeployed): void {
 
   const poolContract = Pool.bind(tryPool.value);
   const outputToken = new TokenManager(
-    Bytes.fromHexString(tryPool.value.toHexString()),
+    tryPool.value,
     event,
     TokenType.REBASING
   );
@@ -102,8 +97,8 @@ export function handleManagerInstanceDeployed(event: InstanceDeployed): void {
   }
 
   const manager = new DataManager(
-    Bytes.fromHexString(tryPool.value.toHexString()),
-    Bytes.fromHexString(tryInputToken.value.toHexString()),
+    tryPool.value,
+    tryInputToken.value,
     event,
     getProtocolData()
   );
@@ -129,21 +124,10 @@ export function handleManagerInstanceDeployed(event: InstanceDeployed): void {
   market.isActive = false; // controlled with setAsActive
   market.canBorrowFrom = false; // controlled with setAsActive
   market.canUseAsCollateral = false; // collateral is posted during loans separate from any deposits
-  market.borrowedToken = Bytes.fromHexString(tryInputToken.value.toHexString());
+  market.borrowedToken = tryInputToken.value;
   market.stableBorrowedTokenBalance = BIGINT_ZERO;
   market._poolManager = event.params.instance_;
   market.save();
-
-  // add new pools to protocol
-  let marketList = _MarketList.load(getProtocolData().protocolID);
-  if (!marketList) {
-    marketList = new _MarketList(getProtocolData().protocolID);
-    marketList.markets = [];
-  }
-  const markets = marketList.markets;
-  markets.push(Bytes.fromHexString(tryPool.value.toHexString()));
-  marketList.markets = markets;
-  marketList.save();
 }
 
 //
@@ -187,8 +171,8 @@ export function handleLoanFunded(event: LoanFunded): void {
   }
 
   const manager = new DataManager(
-    Bytes.fromHexString(tryPool.value.toHexString()),
-    Bytes.fromHexString(tryInputToken.value.toHexString()),
+    tryPool.value,
+    tryInputToken.value,
     event,
     getProtocolData()
   );
@@ -204,10 +188,10 @@ export function handleLoanFunded(event: LoanFunded): void {
   const inputTokenPriceUSD = getPriceUSD(tryInputToken.value);
   const inputTokenDecimals = manager.getInputToken().decimals;
   manager.createBorrow(
-    Bytes.fromHexString(tryInputToken.value.toHexString()),
+    tryInputToken.value,
     tryBorrower.value,
     event.params.amount_,
-    getTotalPriceUSD(
+    getTotalValueUSD(
       event.params.amount_,
       inputTokenDecimals,
       inputTokenPriceUSD
@@ -241,8 +225,8 @@ export function handleTransfer(event: Transfer): void {
     return;
   }
   const manager = new DataManager(
-    Bytes.fromHexString(event.address.toHexString()),
-    Bytes.fromHexString(tryInputToken.value.toHexString()),
+    event.address,
+    tryInputToken.value,
     event,
     getProtocolData()
   );
@@ -259,7 +243,7 @@ export function handleTransfer(event: Transfer): void {
       .truncate(0)
       .toString()
   );
-  const amountUSD = getTotalPriceUSD(
+  const amountUSD = getTotalValueUSD(
     amount,
     inputTokenDecimals,
     market.inputTokenPriceUSD
@@ -301,15 +285,15 @@ export function handleDeposit(event: Deposit): void {
   }
 
   const manager = new DataManager(
-    Bytes.fromHexString(event.address.toHexString()),
-    Bytes.fromHexString(tryInputToken.value.toHexString()),
+    event.address,
+    tryInputToken.value,
     event,
     getProtocolData()
   );
   updateMarketAndProtocol(manager, event);
   const market = manager.getMarket();
 
-  const amountUSD = getTotalPriceUSD(
+  const amountUSD = getTotalValueUSD(
     event.params.assets_,
     manager.getInputToken().decimals,
     market.inputTokenPriceUSD
@@ -338,15 +322,15 @@ export function handleWithdraw(event: Withdraw): void {
   }
 
   const manager = new DataManager(
-    Bytes.fromHexString(event.address.toHexString()),
-    Bytes.fromHexString(tryInputToken.value.toHexString()),
+    event.address,
+    tryInputToken.value,
     event,
     getProtocolData()
   );
   updateMarketAndProtocol(manager, event);
   const market = manager.getMarket();
 
-  const amountUSD = getTotalPriceUSD(
+  const amountUSD = getTotalValueUSD(
     event.params.assets_,
     manager.getInputToken().decimals,
     market.inputTokenPriceUSD
@@ -386,8 +370,8 @@ export function handleSetAsActive(event: SetAsActive): void {
   }
 
   const manager = new DataManager(
-    Bytes.fromHexString(tryPool.value.toHexString()),
-    Bytes.fromHexString(tryAsset.value.toHexString()),
+    tryPool.value,
+    tryAsset.value,
     event,
     getProtocolData()
   );
@@ -420,8 +404,8 @@ export function handleLiquidityCapSet(event: LiquidityCapSet): void {
   }
 
   const manager = new DataManager(
-    Bytes.fromHexString(tryPool.value.toHexString()),
-    Bytes.fromHexString(tryAsset.value.toHexString()),
+    tryPool.value,
+    tryAsset.value,
     event,
     getProtocolData()
   );
@@ -463,7 +447,7 @@ export function handlePaymentMade(event: PaymentMade): void {
 
   const manager = new DataManager(
     loan.market!,
-    Bytes.fromHexString(tryAsset.value.toHexString()),
+    tryAsset.value,
     event,
     getProtocolData()
   );
@@ -492,10 +476,10 @@ export function handlePaymentMade(event: PaymentMade): void {
   );
   const inputTokenDecimals = manager.getInputToken().decimals;
   manager.createRepay(
-    Bytes.fromHexString(tryAsset.value.toHexString()),
-    Bytes.fromHexString(tryBorrower.value.toHexString()),
+    tryAsset.value,
+    tryBorrower.value,
     repayAmount,
-    getTotalPriceUSD(repayAmount, inputTokenDecimals, inputTokenPriceUSD),
+    getTotalValueUSD(repayAmount, inputTokenDecimals, inputTokenPriceUSD),
     tryPrinciple.value,
     inputTokenPriceUSD,
     InterestRateType.FIXED
@@ -504,7 +488,7 @@ export function handlePaymentMade(event: PaymentMade): void {
   // update protocol revenue collected
   // this is either from borrow fees, management fees or loan origination fees
   manager.addProtocolRevenue(
-    getTotalPriceUSD(event.params.fees_, inputTokenDecimals, inputTokenPriceUSD)
+    getTotalValueUSD(event.params.fees_, inputTokenDecimals, inputTokenPriceUSD)
   );
 }
 
@@ -527,8 +511,8 @@ export function handleLoanManagerInstanceDeployed(
   }
 
   const manager = new DataManager(
-    Bytes.fromHexString(tryPool.value.toHexString()),
-    Bytes.fromHexString(tryAsset.value.toHexString()),
+    tryPool.value,
+    tryAsset.value,
     event,
     getProtocolData()
   );
@@ -537,7 +521,7 @@ export function handleLoanManagerInstanceDeployed(
     protocol._loanManagers = [];
   }
   const loanManagers = protocol._loanManagers!;
-  loanManagers.push(Bytes.fromHexString(event.params.instance_.toHexString()));
+  loanManagers.push(event.params.instance_);
   protocol._loanManagers = loanManagers;
   protocol.save();
 
@@ -591,15 +575,15 @@ export function handlePortionLiquidated(event: PortionLiquidated): void {
   }
 
   const manager = new DataManager(
-    Bytes.fromHexString(tryPool.value.toHexString()),
-    Bytes.fromHexString(tryAsset.value.toHexString()),
+    tryPool.value,
+    tryAsset.value,
     event,
     getProtocolData()
   );
   updateMarketAndProtocol(manager, event);
 
   const market = manager.getMarket();
-  const amountUSD = getTotalPriceUSD(
+  const amountUSD = getTotalValueUSD(
     event.params.returnedAmount_,
     manager.getInputToken().decimals,
     market.inputTokenPriceUSD
@@ -660,8 +644,8 @@ export function handleLoanAddedToTransitionLoanManager(
   }
 
   const manager = new DataManager(
-    Bytes.fromHexString(tryPool.value.toHexString()),
-    Bytes.fromHexString(tryInputToken.value.toHexString()),
+    tryPool.value,
+    tryInputToken.value,
     event,
     getProtocolData()
   );
@@ -759,7 +743,7 @@ function updateMarketAndProtocol(
     market.save();
 
     manager.addSupplyRevenue(
-      getTotalPriceUSD(
+      getTotalValueUSD(
         revenueDelta,
         manager.getInputToken().decimals,
         inputTokenPriceUSD
@@ -897,7 +881,7 @@ function getPriceUSD(asset: Address): BigDecimal {
 
 //
 // get the price of any amount with error handling
-function getTotalPriceUSD(
+function getTotalValueUSD(
   amount: BigInt,
   decimals: i32,
   priceUSD: BigDecimal

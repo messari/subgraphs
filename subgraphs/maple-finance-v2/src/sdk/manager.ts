@@ -51,7 +51,7 @@ import { PositionManager } from "./position";
  * You can think of this as an abstraction so the developer doesn't
  * need to think about all of the detailed storage changes that occur.
  *
- * Schema Version:  3.0.0
+ * Schema Version:  3.0.1
  * SDK Version:     1.0.1
  * Author(s):
  *  - @dmelotik
