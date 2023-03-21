@@ -13,7 +13,7 @@ import {
   LiquidityPoolFeeType,
   FeeSwitch,
   BIGDECIMAL_TWO,
-  BIGDECIMAL_ONE,
+  BIGDECIMAL_FIFTY_PERCENT,
 } from "../../../../src/common/constants";
 import { createPoolFees } from "../../../../src/common/creators";
 import {
@@ -65,7 +65,7 @@ function createHalvedPoolFees(
   return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
 
-// Create a liquidity pool from PairCreated contract call
+// Create a liquidity pool from PairCreated event emission.
 export function createLiquidityPool(
   event: ethereum.Event,
   poolAddress: string,
@@ -85,29 +85,22 @@ export function createLiquidityPool(
   const poolAmounts = new _LiquidityPoolAmount(poolAddress);
 
   pool.protocol = protocol.id;
+  pool.name = protocol.name + " " + LPtoken.symbol;
+  pool.symbol = LPtoken.symbol;
   pool.inputTokens = [token0.id, token1.id];
   pool.outputToken = LPtoken.id;
-  pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-  pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.inputTokenWeights = [
-    BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
-    BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
-  ];
-  pool.outputTokenSupply = BIGINT_ZERO;
-  pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool.rewardTokens = [];
-  pool.stakedOutputTokenAmount = BIGINT_ZERO;
-  pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
   pool.isSingleSided = false;
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
-  pool.name = protocol.name + " " + LPtoken.symbol;
-  pool.symbol = LPtoken.symbol;
-
-  poolAmounts.inputTokens = [token0.id, token1.id];
-  poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+  pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+  pool.inputTokenWeights = [BIGDECIMAL_FIFTY_PERCENT, BIGDECIMAL_FIFTY_PERCENT];
+  pool.outputTokenSupply = BIGINT_ZERO;
+  pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
 
   // Halve pool fees for WETH pairs
   if (
@@ -119,6 +112,9 @@ export function createLiquidityPool(
     pool.fees = createPoolFees(poolAddress, event.block.number);
   }
 
+  poolAmounts.inputTokens = [token0.id, token1.id];
+  poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+
   // Used to track the number of deposits in a liquidity pool
   const poolDeposits = new _HelperStore(poolAddress);
   poolDeposits.valueInt = INT_ZERO;
@@ -127,7 +123,7 @@ export function createLiquidityPool(
   protocol.totalPoolCount += 1;
   protocol.save();
 
-  // create the tracked contract based on the template
+  // Create and track the newly created pool contract based on the template specified in the subgraph.yaml file.
   PairTemplate.create(Address.fromString(poolAddress));
 
   pool.save();
