@@ -380,7 +380,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     );
     return;
   }
-  updateRewardTokenPrices(market, event);
+  updateRewardTokenPrices(market);
 
   const realm = _Realm.load(market._realm!);
   if (!realm) {
@@ -595,7 +595,7 @@ function updateRewardSpeed(
   );
 }
 
-function updateRewardTokenPrices(market: Market, event: ethereum.Event): void {
+function updateRewardTokenPrices(market: Market): void {
   if (!market.rewardTokens || market.rewardTokens!.length == 0) {
     return;
   }
