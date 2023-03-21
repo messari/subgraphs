@@ -2,7 +2,7 @@ import { BigInt } from "@graphprotocol/graph-ts";
 import {
   MinipoolDequeued,
   MinipoolEnqueued,
-} from "../../generated/rocketMinipoolQueue/rocketMinipoolQueue";
+} from "../../generated/rocketMinipoolqueue/rocketMinipoolqueue";
 import { Minipool, Node } from "../../generated/schema";
 import { updateUsageMetrics } from "../updaters/usageMetrics";
 
