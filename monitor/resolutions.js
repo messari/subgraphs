@@ -1,8 +1,8 @@
 import { errorNotification, fetchMessages, sendDiscordMessage, startProtocolThread } from "./messageDiscord.js";
 import { sleep } from "./util.js";
 
-export async function pullMessagesByThread(channelIdList, channelToProtocolIssuesMapping, channelToIndexIssuesMapping) {
-    const channelToProtocolIssuesMappingCopy = JSON.parse(JSON.stringify(channelToProtocolIssuesMapping));
+export async function pullMessagesByThread(channelIdList, channelToProtocolIss, channelToIndexIssuesMapping) {
+    const channelToProtocolIssuesMapping = JSON.parse(JSON.stringify(channelToProtocolIss));
     const channelIdsListCopy = JSON.parse(JSON.stringify([...channelIdList]));
 
     const useQueries = channelIdsListCopy.slice(0, 5);
@@ -15,7 +15,7 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIssue
         promiseSettle.forEach((res) => {
             if (res?.value?.length > 0) {
                 res.value.forEach((protocolMessageObject) => {
-                    const networkList = Object.keys(channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id] || []);
+                    const networkList = Object.keys(channelToProtocolIssuesMapping[protocolMessageObject.channel_id] || []);
                     if (networkList.length === 0) {
                         return;
                     }
@@ -29,9 +29,9 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIssue
                         }
                         let fieldCells = embedObjectOnChain.fields.filter(cell => cell.name === "Field").map(x => x.value);
                         if (fieldCells) {
-                            const existingFields = channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id][chainStr];
+                            const existingFields = channelToProtocolIssuesMapping[protocolMessageObject.channel_id][chainStr];
                             fieldCells = [...existingFields, ...fieldCells.filter(x => !existingFields.includes(x))];
-                            channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id][chainStr] = fieldCells;
+                            channelToProtocolIssuesMapping[protocolMessageObject.channel_id][chainStr] = fieldCells;
                         }
                     });
 
@@ -60,16 +60,15 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIssue
             }
         });
     } catch (err) {
-        console.log(err);
         errorNotification("ERROR LOCATION 18 " + err.message);
     }
 
     await sleep(5000);
     if (newQueriesArray.length > 0) {
-        return pullMessagesByThread(newQueriesArray, channelToProtocolIssuesMappingCopy, channelToIndexIssuesMapping);
+        return pullMessagesByThread(newQueriesArray, channelToProtocolIssuesMapping, channelToIndexIssuesMapping);
     }
 
-    return { channelToProtocolIssuesMapping: channelToProtocolIssuesMappingCopy, channelToIndexIssuesMapping };
+    return { channelToProtocolIssuesMapping, channelToIndexIssuesMapping };
 }
 
 let reqCount = 0;
@@ -92,9 +91,6 @@ export async function resolveThreadCreation(protocols, threadsCreated, protocolN
     } catch (err) {
         errorNotification("ERROR LOCATION 19 " + err.message);
     }
-
-    // Discord rate limits to 50 threads started in an undefined period. Per iteration of this script (once daily) max 50 threads will be started. 
-    // The remaining threads are posted the next time the monitor service executes
 
     if (reqCount >= 45) {
         return threadsCreatedCopy;

@@ -209,16 +209,16 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
         )
         .catch((err) => errorNotification("ERROR LOCATION 17 " + err.message));
 
-    protocolTypeLevelData.forEach((protocol) => {
+    protocolTypeLevelData.forEach((protocolData) => {
         const deploymentName = Object.keys(deployments).find(
-            (depoName) => deployments[depoName]?.url === protocol?.url
+            (depoName) => deployments[depoName]?.url === protocolData?.url
         );
         const deployment = { ...deployments[deploymentName] };
 
         const issuesArrays = { ...deployment.protocolErrors };
-
-        if (!protocol?.protocol) return;
-        const data = protocol.protocol[Object.keys(protocol.protocol)[0]][0];
+        const protocolEntityData = protocolData?.protocol;
+        if (!protocolEntityData) return;
+        const data = protocolEntityData[Object.keys(protocolEntityData)[0]][0];
         if (!data) return;
 
         const dataFields = Object.keys(data);
@@ -337,16 +337,15 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
             issuesArrays.totalDepositBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalDepositBalanceUSD)));
         }
 
+        const totalBorrowBalanceUSDExcluded = ["rari-fuse", "truefi", "maple", "goldfinch"];
+
         if (
             dataFields.includes("totalBorrowBalanceUSD") &&
             !(
                 parseFloat(data.totalBorrowBalanceUSD) <=
                 parseFloat(data.totalDepositBalanceUSD)
             ) &&
-            !deploymentName.includes("rari-fuse") &&
-            !deploymentName.includes("truefi") &&
-            !deploymentName.includes("maple") &&
-            !deploymentName.includes("goldfinch") &&
+            !totalBorrowBalanceUSDExcluded.find(x => deploymentName.includes(x)) &&
             !issuesArrays.totalBorrowBalanceUSD.includes('$' + formatIntToFixed2(parseFloat(data.totalBorrowBalanceUSD)))
         ) {
             issuesArrays.totalBorrowBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalBorrowBalanceUSD)));
@@ -379,10 +378,6 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
 }
 
 export const protocolDerivedFields = async (deployments, invalidDeployments) => {
-
-    // Loop deployments object and get protocol type and scema version for every deployment on every protocol
-    // Create queries for different schema types and versions
-    // Queries are only to take first result of derived fields on the main protocol entity
 
     const derivedFieldQueries = {
         "lendingProtocol": (depo) => `{
@@ -483,7 +478,7 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
             (response) => (response.map(x => {
                 const returnedData = x?.value?.data?.data;
                 const returnedError = x?.value?.data?.errors;
-                const depoKey = Object.keys(deployments).find(depo => deployments[depo].url === x?.value?.config?.url)
+                const depoKey = Object.keys(deployments).find(depo => deployments[depo].url === x?.value?.config?.url);
                 let alert = ``;
 
                 if (returnedData && depoKey) {
@@ -503,7 +498,7 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                     const alertArr = returnedError?.filter(errObj => errObj.message !== "indexing_error")?.map(errObj => errObj.message)?.filter(alert => !alert.includes("Store error: database unavailable"));
                     if (alertArr.length > 0) {
                         alert = alertArr.join(" --- ");
-                        errorNotification("ERROR LOCATION 28 " + alert)
+                        errorNotification("ERROR LOCATION 28 " + alert);
                         if (depoKey) {
                             deploymentsToReturn[depoKey].protocolErrors.queryError.push(alert);
                         }
