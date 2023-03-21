@@ -22,7 +22,7 @@ import {
   ProtocolType,
   BridgePoolType,
   CrosschainTokenType,
-  INACURATE_PRICEFEED_TOKENS,
+  INACCURATE_PRICEFEED_TOKENS,
   INT_ONE,
   Network,
   ZERO_ADDRESS,
@@ -128,7 +128,7 @@ export function getOrCreateToken(
       : Network.UNKNOWN_NETWORK;
 
     if (
-      !INACURATE_PRICEFEED_TOKENS.get(network)!.includes(
+      !INACCURATE_PRICEFEED_TOKENS.get(network)!.includes(
         Address.fromBytes(token.id)
       )
     ) {
