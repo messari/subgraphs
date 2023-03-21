@@ -7337,10 +7337,10 @@
     "deployments": {
       "optimism-bridge-v2-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -7353,16 +7353,15 @@
           "template": "optimism.bridge.template.yaml"
         },
         "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:yaml": true
         }
       },
       "optimism-bridge-v2-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
@@ -7375,8 +7374,7 @@
           "template": "optimism.bridge.template.yaml"
         },
         "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:yaml": true
         }
       }
     }
