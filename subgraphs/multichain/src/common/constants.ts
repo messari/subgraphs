@@ -146,7 +146,7 @@ export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 export const ETH_DECIMALS = 18;
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 ////////////////////////
 ///// Type Helpers /////
@@ -259,7 +259,7 @@ NetworkByID.set("1000005128531", Network.NAS);
 NetworkByID.set("1361940275777", Network.TERRA);
 
 const mainnetInaccuratePricefeedTokens = [
-  Address.fromString("0x86A298581388bc199e61BFeCDcA8eA22Cf6C0Da3"), // anyGTPS
+  Address.fromString("0x86a298581388bc199e61bfecdca8ea22cf6c0da3"), // anyGTPS
   Address.fromString("0x9b2f9f348425b1ef54c232f87ee7d4d570c1b552"), // anyHOGE
   Address.fromString("0x015cea338ce68bd912b3c704620c6000ee9f4ab9"), // anyGCAKE
 ];
