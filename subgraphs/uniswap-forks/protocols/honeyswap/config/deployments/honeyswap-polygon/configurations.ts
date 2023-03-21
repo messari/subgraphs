@@ -36,11 +36,11 @@ export class HoneyswapMaticConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x03DAa61d8007443a6584e3d8f85105096543C19c";
+    return "0x03daa61d8007443a6584e3d8f85105096543c19c";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x03DAa61d8007443a6584e3d8f85105096543C19c")
+      Address.fromString("0x03daa61d8007443a6584e3d8f85105096543c19c")
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

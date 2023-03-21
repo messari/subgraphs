@@ -36,11 +36,11 @@ export class HoneyswapGnosisConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7";
+    return "0xa818b4f111ccac7aa31d0bcc0806d64f2e0737d7";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7")
+      Address.fromString("0xa818b4f111ccac7aa31d0bcc0806d64f2e0737d7")
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
