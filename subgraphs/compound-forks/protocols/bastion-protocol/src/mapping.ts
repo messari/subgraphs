@@ -262,7 +262,10 @@ export function handleActionPaused(event: ActionPaused1): void {
   const marketID = event.params.cToken.toHexString();
   const action = event.params.action;
   const pauseState = event.params.pauseState;
-  _handleActionPaused(marketID, action, pauseState);
+  // it seems bastion protocol flips the pauseState, so we invert it here
+  // https://github.com/messari/subgraphs/issues/1415#issuecomment-1475407997
+  // https://github.com/messari/subgraphs/pull/1805#pullrequestreview-1349739373
+  _handleActionPaused(marketID, action, !pauseState);
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
@@ -624,17 +627,6 @@ function updateRewardTokenPrices(market: Market, event: ethereum.Event): void {
   }
   market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
   market.save();
-
-  getOrCreateMarketDailySnapshot(
-    market,
-    event.block.timestamp,
-    event.block.number
-  );
-  getOrCreateMarketHourlySnapshot(
-    market,
-    event.block.timestamp,
-    event.block.number
-  );
 }
 
 function getOrCreateToken(tokenAddress: Address): Token {
