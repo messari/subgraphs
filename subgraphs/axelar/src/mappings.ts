@@ -61,7 +61,7 @@ import { isValidEVMAddress } from "./sdk/util/strings";
 
 // empty handler for prices library
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-export function handlehandleSetFeeTo(call: ethereum.Call): void {}
+export function handlePairCreated(event: ethereum.Event): void {}
 
 // Implement TokenPricer to pass it to the SDK constructor
 class Pricer implements TokenPricer {
@@ -173,62 +173,11 @@ export function onCreatePool(
   }
 }
 
-export function handleDeployToken(call: DeployTokenCall): void {
-  const decimals = bytesToUnsignedBigInt(
-    Bytes.fromUint8Array(call.inputs.params.subarray(64, 96))
-  );
-  const cap = bytesToUnsignedBigInt(
-    Bytes.fromUint8Array(call.inputs.params.subarray(96, 128))
-  );
-  const tokenAddress = bytes32ToAddress(
-    Bytes.fromUint8Array(call.inputs.params.subarray(128, 160))
-  );
-  const mintLimit = bytesToUnsignedBigInt(
-    Bytes.fromUint8Array(call.inputs.params.subarray(160, 192))
-  );
-  const name = Bytes.fromUint8Array(
-    call.inputs.params.subarray(192, 224)
-  ).toString();
-  const symbol = Bytes.fromUint8Array(
-    call.inputs.params.subarray(256, 288)
-  ).toString();
-
-  log.info(
-    "[handleDeployToken]decode call.inputs.params {}: name={}, symbol={}, decimals={}, cap={}, tokenAddress={}, mintLimit={}",
-    [
-      call.inputs.params.toHexString(),
-      name,
-      symbol,
-      decimals.toString(),
-      cap.toString(),
-      tokenAddress.toHexString(),
-      mintLimit.toString(),
-    ]
-  );
-  // derived tokenType from tokenAddress param
-  let tokenType: string;
-  if (tokenAddress != Address.zero()) {
-    tokenType = TokenType.EXTERNAL;
-  } else {
-    tokenType = TokenType.INTERNAL_BURNABLEFROM;
-
-    //TokenType.InternalBurnable is never assigned
-  }
-  // tokenAddress will be computed by deployToken()
-  getOrCreateTokenSymbol(symbol, null, tokenType);
-}
-
 export function handleTokenDeployed(event: TokenDeployed): void {
-  const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
-  // it may be possible to calculate tokenAddress, but the logic is complicated;
-  // get it from the TokenDeployed event
-  tokenSymbol.tokenAddress = event.params.tokenAddresses.toHexString();
-  tokenSymbol.save();
-
-  log.info("[handleTokenDeployed]symbol={} tokenAddress={}", [
-    tokenSymbol.id,
-    tokenSymbol.tokenAddress!,
-  ]);
+  getOrCreateTokenSymbol(
+    event.params.symbol,
+    event.params.tokenAddresses.toHexString()
+  );
 
   //ERC20Template.create(event.params.tokenAddresses);
 }
@@ -236,7 +185,7 @@ export function handleTokenDeployed(event: TokenDeployed): void {
 export function handleTokenSent(event: TokenSent): void {
   // the token should have already been deployed
   const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
-  const tokenAddress = tokenSymbol.tokenAddress!;
+  const tokenAddress = tokenSymbol.tokenAddress;
   const poolId = event.address.concat(Address.fromString(tokenAddress));
   const dstChainId = networkToChainID(
     event.params.destinationChain.toUpperCase()
@@ -275,7 +224,7 @@ export function handleContractCallWithToken(
   event: ContractCallWithToken
 ): void {
   const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
-  const tokenAddress = tokenSymbol.tokenAddress!;
+  const tokenAddress = tokenSymbol.tokenAddress;
   const poolId = event.address.concat(Address.fromString(tokenAddress));
   const dstChainId = networkToChainID(
     event.params.destinationChain.toUpperCase()
@@ -304,6 +253,10 @@ export function handleContractCallWithToken(
     getTxId(event),
     event.params.payload
   );
+
+  const sdk = _getSDK(event)!;
+  const acc = sdk.Accounts.loadAccount(event.params.sender);
+  acc.messageOut(dstChainId, dstAccount, event.params.payload);
 }
 
 export function handleContractCall(event: ContractCall): void {
@@ -342,7 +295,7 @@ export function handleContractCallApprovedWithMint(
     : Bytes.fromUTF8(srcStr);
 
   const tokenSymbol = getOrCreateTokenSymbol(event.params.symbol);
-  const tokenAddress = tokenSymbol.tokenAddress!;
+  const tokenAddress = tokenSymbol.tokenAddress;
   const poolId = event.address.concat(Address.fromString(tokenAddress));
   const srcNetworkConstants = getNetworkSpecificConstant(srcChainId);
   const srcPoolId = srcNetworkConstants.getPoolAddress();
@@ -363,6 +316,10 @@ export function handleContractCallApprovedWithMint(
     getTxId(event),
     event.params.payloadHash
   );
+
+  const sdk = _getSDK(event)!;
+  const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
+  acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
 }
 
 export function handleMintToken(call: MintTokenCall): void {
@@ -405,13 +362,13 @@ export function handleMintToken(call: MintTokenCall): void {
 
   //const tokenType = tokenSymbol.tokenType!;
   const receiver = account;
-  const poolId = call.to.concat(Address.fromString(tokenAddress!));
+  const poolId = call.to.concat(Address.fromString(tokenAddress));
   // No info of source chain or src account for mintToken call/event
   const srcChainId = networkToChainID(Network.UNKNOWN_NETWORK);
   const srcPoolId = Address.zero(); // Not available
   const srcAccount = account; //Not available, assumed to be the same as receiver
   _handleTransferIn(
-    Address.fromString(tokenAddress!),
+    Address.fromString(tokenAddress),
     srcAccount,
     receiver,
     amount,
@@ -434,6 +391,11 @@ export function handleCommandExecuted(event: Executed): void {
     event.transactionLogIndex.toString(),
   ]);
 
+  // command is one of deployToken, mintToken, approveContractCall, approveContractCallWithMint,
+  // burnToken or transferOperatorship
+  // https://github.com/axelarnetwork/axelar-cgp-solidity/blob/2a24602fdad6d3aa80f4e43cacfe7241adbb905e/contracts/AxelarGateway.sol#L308-L319
+  // We only interest in mintToken and burnToken, we detect those events
+  // by search the log receipt for Transfer event
   const receipt = event.receipt;
   if (!receipt) {
     log.error("[handleCommandExecuted]No receipt for tx {}", [
@@ -471,6 +433,7 @@ export function handleCommandExecuted(event: Executed): void {
       transferLogIndex.equals(thisLog.logIndex) &&
       logSignature == transferSignature
     ) {
+      const tokenAddress = thisLog.address;
       const fromAddress = ethereum
         .decode("address", thisLog.topics[1])!
         .toAddress();
@@ -482,7 +445,7 @@ export function handleCommandExecuted(event: Executed): void {
         .toBigInt();
 
       log.info(
-        "[handleCommandExecuted]from={} to={} thisLog.data={} tx={} logIndex={}",
+        "[handleCommandExecuted]from={} to={} thisLog.data={} tx={}-{}",
         [
           fromAddress.toHexString(),
           toAddress.toHexString(),
@@ -492,18 +455,54 @@ export function handleCommandExecuted(event: Executed): void {
         ]
       );
 
-      log.info("[handleCommandExecuted]to==0x0 {} tx={} logIndex={}", [
+      log.info("[handleCommandExecuted]to==0x0 {} tx={}-{}", [
         toAddress.equals(Address.zero()).toString(),
         thisLog.transactionHash.toHexString(),
         thisLog.logIndex.toString(),
       ]);
 
-      // transfer to burn or address(this)
+      // burnToken: transfer to 0x or address(this)
       if (toAddress.equals(Address.zero()) || toAddress.equals(event.address)) {
+        //TODO: _handleBurnToken()
+
+        _handleBurnToken(
+          commandId,
+          tokenAddress,
+          fromAddress,
+          transferAmount,
+          command,
+          event,
+          null
+        );
+
         // this may be a burn token tx that has already been handled by
         // handleContractCallWithToken and handleTokenSent
         command.tokenAddress = thisLog.address;
         command.account = fromAddress;
+        command.amount = transferAmount;
+        command.save();
+        break;
+      }
+
+      // mintToken: transfer from 0x or address(this)
+      if (
+        fromAddress.equals(Address.zero()) ||
+        fromAddress.equals(event.address)
+      ) {
+        // TODO: _handleMintToken
+        _handleMintToken(
+          commandId,
+          tokenAddress,
+          toAddress,
+          transferAmount,
+          command,
+          event,
+          null
+        );
+        // this may be a burn token tx that has already been handled by
+        // handleContractCallWithToken and handleTokenSent
+        command.tokenAddress = thisLog.address;
+        command.account = toAddress;
         command.amount = transferAmount;
         command.save();
         break;
@@ -633,14 +632,12 @@ export function handleFeeRefund(call: RefundCall): void {
 
 function getOrCreateTokenSymbol(
   symbol: string,
-  tokenAddress: string | null = null,
-  tokenType: string | null = null
+  tokenAddress: string | null = null
 ): _TokenSymbol {
   let tokenSymbol = _TokenSymbol.load(symbol);
   if (!tokenSymbol) {
     tokenSymbol = new _TokenSymbol(symbol);
-    tokenSymbol.tokenAddress = tokenAddress;
-    tokenSymbol.tokenType = tokenType;
+    tokenSymbol.tokenAddress = tokenAddress!;
     tokenSymbol.save();
   }
   return tokenSymbol;
@@ -751,6 +748,41 @@ function _handleTransferIn(
   }
 
   return transfer.id;
+}
+
+function _handleMintToken(
+  commandId: Bytes,
+  tokenAddress: Address,
+  account: Address,
+  amount: BigInt,
+  command: _Command,
+  event: ethereum.Event | null,
+  call: ethereum.Call | null
+): void {
+  const receiver = account;
+  const poolAddress = event ? event.address : call!.to;
+  const poolId = poolAddress.concat(tokenAddress);
+  const srcChainId = networkToChainID(Network.UNKNOWN_NETWORK);
+  const srcPoolId = Address.zero(); // Not available
+  const sender = receiver; //Not available, assumed to be the same as receiver
+  _handleTransferIn(
+    Address.fromBytes(tokenAddress),
+    sender,
+    receiver,
+    amount,
+    srcChainId,
+    srcPoolId,
+    poolId,
+    BridgePoolType.BURN_MINT,
+    CrosschainTokenType.WRAPPED,
+    event,
+    call,
+    commandId,
+    getTxId(event, call)
+  );
+
+  command.isProcessed = true;
+  command.save();
 }
 
 function _handleBurnToken(

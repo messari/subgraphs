@@ -46,9 +46,9 @@ dataSources:
           file: ./abis/Prices/Calculations/Curve.json
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
-      callHandlers:
-        - function: setFeeTo(address)
-          handler: handleSetFeeTo
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
       file: ./src/mappings.ts
 
   - kind: ethereum
@@ -109,16 +109,10 @@ dataSources:
           handler: handleContractCallApprovedWithMint
         - event: ContractCallApproved(indexed bytes32,string,string,indexed address,indexed bytes32,bytes32,uint256)
           handler: handleContractCallApproved
+        # command execution
         - event: Executed(indexed bytes32)
           handler: handleCommandExecuted
           receipt: true
-      callHandlers:
-        - function: deployToken(bytes,bytes32)
-          handler: handleDeployToken
-        - function: mintToken(bytes,bytes32)
-          handler: handleMintToken
-        - function: burnToken(bytes,bytes32)
-          handler: handleBurnTokenCall
       file: ./src/mappings.ts
 
   - kind: ethereum
@@ -179,7 +173,9 @@ dataSources:
           handler: handleGasAdded
         - event: NativeGasAdded(indexed bytes32,indexed uint256,uint256,address)
           handler: handleNativeGasAdded
+      {{#supportCallHandlers}}
       callHandlers:
         - function: refund(address,address,uint256)
           handler: handleFeeRefund
+      {{/supportCallHandlers}}
       file: ./src/mappings.ts
