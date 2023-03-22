@@ -1,4 +1,4 @@
-export const monitorVersion = "v1.3.8";
+export const monitorVersion = "v1.3.9";
 
 export const sleep = m => new Promise(r => setTimeout(r, m));
 
@@ -41,3 +41,17 @@ export const colorsArray = [
     0xCBC3E3,
     0x953553,
 ];
+
+export async function parseIndexingThreadStrings(strObject) {
+    if (strObject.value) {
+        return strObject.value.split('\n').join('-----').split('-----');
+    }
+    return "";
+}
+
+export const indexingErrorEmbedSchema = {
+    title: "Indexing Errors",
+    description: 'These subgraphs encountered a fatal error in indexing',
+    fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Failed At Block', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
+    footer: { text: monitorVersion }
+};
