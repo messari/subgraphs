@@ -1797,6 +1797,18 @@ type PositionSnapshot @entity(immutable: true) {
   " Notional value of collateral position, in USD "
   collateralBalanceUSD: BigDecimal!
 
+  " Notional value of position right before close, in asset units. In other events match balance. "
+  closeBalance: BigInt
+
+  " Notional value of collateral position right before close, in collateral units. In other events match collateralBalance."
+  closeCollateralBalance: BigInt
+
+  " Notional value of position right before close, in USD, at time of open. In other events match balanceUSD. "
+  closeBalanceUSD: BigDecimal
+
+  " Notional value of collateral position right before close, in USD. In other events match collateralBalanceUSD. "
+  closeCollateralBalanceUSD: BigDecimal
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
