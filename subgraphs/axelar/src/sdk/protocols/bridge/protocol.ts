@@ -15,8 +15,7 @@ import {
   BigInt,
 } from "@graphprotocol/graph-ts";
 import { chainIDToNetwork, networkToChainID } from "./chainIds";
-import { SDK } from ".";
-import { CustomEventType } from "../../util/events";
+import { CustomEventType, SDK } from ".";
 
 /**
  * Bridge is a wrapper around the BridgeProtocolSchema entity that takes care of
@@ -72,8 +71,6 @@ export class Bridge {
     protocol.type = constants.ProtocolType.BRIDGE;
     protocol.permissionType = conf.getPermissionType();
     protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    protocol.totalValueExportedUSD = constants.BIGDECIMAL_ZERO;
-    protocol.totalValueImportedUSD = constants.BIGDECIMAL_ZERO;
     protocol.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -193,28 +190,6 @@ export class Bridge {
   addTotalValueLocked(tvl: BigDecimal): void {
     this.protocol.totalValueLockedUSD =
       this.protocol.totalValueLockedUSD.plus(tvl);
-    this.save();
-  }
-
-  addTotalValueExportedUSD(tve: BigDecimal): void {
-    this.protocol.totalValueExportedUSD =
-      this.protocol.totalValueExportedUSD.plus(tve);
-    this.save();
-  }
-
-  setTotalValueExportedUSD(tve: BigDecimal): void {
-    this.protocol.totalValueExportedUSD = tve;
-    this.save();
-  }
-
-  addTotalValueImportedUSD(tvi: BigDecimal): void {
-    this.protocol.totalValueImportedUSD =
-      this.protocol.totalValueImportedUSD.plus(tvi);
-    this.save();
-  }
-
-  setTotalValueImportedUSD(tvi: BigDecimal): void {
-    this.protocol.totalValueImportedUSD = tvi;
     this.save();
   }
 

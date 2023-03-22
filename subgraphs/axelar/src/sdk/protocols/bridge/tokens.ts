@@ -10,11 +10,7 @@ import { Bridge } from "./protocol";
 import { RewardTokenType } from "../../util/constants";
 
 export interface TokenInitializer {
-  getTokenParams(address: Bytes): TokenParams;
-}
-
-export interface TokenPresaver {
-  preSaveToken(token: Token): Token;
+  getTokenParams(address: Address): TokenParams;
 }
 
 export class TokenParams {
@@ -26,15 +22,10 @@ export class TokenParams {
 export class TokenManager {
   protocol: Bridge;
   initializer: TokenInitializer;
-  presaver: TokenPresaver | null;
 
   constructor(protocol: Bridge, init: TokenInitializer) {
     this.protocol = protocol;
     this.initializer = init;
-  }
-
-  setTokenPresaver(presaver: TokenPresaver): void {
-    this.presaver = presaver;
   }
 
   getOrCreateToken(address: Address): Token {
@@ -48,10 +39,6 @@ export class TokenManager {
     token.name = params.name;
     token.symbol = params.symbol;
     token.decimals = params.decimals;
-
-    if (this.presaver) {
-      token = this.presaver!.preSaveToken(token);
-    }
     token.save();
     return token;
   }
@@ -78,29 +65,6 @@ export class TokenManager {
     rToken.token = token.id;
     rToken.save();
     return rToken;
-  }
-
-  getOrCreateNonEVMCrosschainToken(
-    chainID: BigInt,
-    address: Bytes,
-    type: string,
-    token: Address
-  ): CrosschainToken {
-    const id = changetype<Bytes>(Bytes.fromBigInt(chainID)).concat(address);
-    let ct = CrosschainToken.load(id);
-    if (ct) {
-      return ct;
-    }
-
-    const base = this.getOrCreateToken(token);
-    ct = new CrosschainToken(id);
-    ct.chainID = chainID;
-    ct.network = chainIDToNetwork(chainID);
-    ct.address = address;
-    ct.type = type;
-    ct.token = base.id;
-    ct.save();
-    return ct;
   }
 
   getOrCreateCrosschainToken(

@@ -18,12 +18,11 @@ import { Bridge } from "./protocol";
 import { BridgePoolType, CrosschainTokenType, TransactionType } from "./enums";
 import {
   BIGDECIMAL_ZERO,
-  BIGDECIMAL_MINUS_ONE,
   BIGINT_MINUS_ONE,
   BIGINT_ZERO,
   RewardTokenType,
 } from "../../util/constants";
-import { bigIntToBigDecimal } from "../../util/numbers";
+import { exponentToBigDecimal } from "../../util/numbers";
 import {
   sortArrayByReference,
   sortBytesArray,
@@ -31,8 +30,7 @@ import {
 } from "../../util/arrays";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
-import { SDK } from ".";
-import { CustomEventType } from "../../util/events";
+import { CustomEventType, SDK } from ".";
 
 type onCreatePoolCallback = (
   event: CustomEventType,
@@ -99,7 +97,7 @@ export class Pool {
     this.pool.save();
   }
 
-  getInputToken(): Token {
+  private getInputToken(): Token {
     return this.tokens.getOrCreateToken(
       Address.fromBytes(this.pool.inputToken)
     );
@@ -129,9 +127,7 @@ export class Pool {
       this.pool.mintSupply = BIGINT_ZERO;
     }
     this.pool.inputTokenBalance = BIGINT_ZERO;
-    this.pool._inputTokenLiquidityBalance = BIGINT_ZERO;
     this.pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    this.pool.netValueExportedUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
@@ -179,12 +175,6 @@ export class Pool {
         chainIDs[1]
       }`
     );
-  }
-
-  private _addInputTokenLiquidityBalance(delta: BigInt): void {
-    this.pool._inputTokenLiquidityBalance =
-      this.pool._inputTokenLiquidityBalance!.plus(delta);
-    this.save();
   }
 
   /**
@@ -270,80 +260,6 @@ export class Pool {
   }
 
   /**
-   * Updates the net value exported for this pool to the given value.
-   * Will also update the protocol's net value exported based on the change in this pool's.
-   *
-   * @param newNetValueExported The new net value exported for this pool.
-   */
-  setNetValueExportedUSD(newNetValueExported: BigDecimal): void {
-    const delta = newNetValueExported.minus(this.pool.netValueExportedUSD);
-    this.addNetValueExportedUSD(delta);
-  }
-
-  /**
-   * Adds the given delta to the net value exported for this pool.
-   * Will also update the protocol's net value exported based on the change in this pool's.
-   * Since at the protocol level valueExported is broken down into totalValueExported and totalValueImported,
-   * it is a bit tricky to update those. In order to do so, we deduct the current netValueExported from
-   * the protocols, recalculate the pool's netValueExported, and then add it back again to the protocol.
-   *
-   * @param delta The change in net value exported for this pool.
-   */
-  addNetValueExportedUSD(delta: BigDecimal): void {
-    this.resetProtocolValueExportedUSD();
-    this.pool.netValueExportedUSD = this.pool.netValueExportedUSD.plus(delta);
-
-    if (this.pool.netValueExportedUSD.lt(BIGDECIMAL_ZERO)) {
-      this.protocol.addTotalValueImportedUSD(
-        this.pool.netValueExportedUSD.times(BIGDECIMAL_MINUS_ONE)
-      );
-    } else {
-      this.protocol.addTotalValueExportedUSD(this.pool.netValueExportedUSD);
-    }
-    this.save();
-  }
-
-  /**
-   * Removes this pool totalValueExported from the protocol's total value exported. To be added later
-   * in a cleaner way.
-   */
-  private resetProtocolValueExportedUSD(): void {
-    if (this.pool.netValueExportedUSD.gt(BIGDECIMAL_ZERO)) {
-      this.protocol.addTotalValueExportedUSD(
-        this.pool.netValueExportedUSD.times(BIGDECIMAL_MINUS_ONE)
-      );
-    } else {
-      this.protocol.addTotalValueImportedUSD(this.pool.netValueExportedUSD);
-    }
-  }
-
-  /**
-   * Recalculates the net value exported for this pool based on its current input token balance and minted supplies,
-   * adjusting for liquidity. Value exported is the USD value of all assets currently in this chain that have been bridged
-   * from another one, or the other way around: all assets currently in the other chain that have been bridged from this one.
-   * Lock/Release pools will have a positive net value exported, while Burn/Mint pools will have a negative net value exported.
-   * Liquidity based pools' value exported will be the difference between its balance and total liquidity provisioned to it. If
-   * balance is lower than total liquidity provided then it means we bridged funds into this chain.
-   * @returns
-   */
-  refreshNetValueExportedUSD(): void {
-    let amount: BigInt = BIGINT_ZERO;
-    const type = this.pool.type;
-    if (type == BridgePoolType.LOCK_RELEASE) {
-      amount = this.pool.inputTokenBalance;
-    } else if (type == BridgePoolType.BURN_MINT) {
-      amount = this.pool.mintSupply!.times(BIGINT_MINUS_ONE);
-    } else if (type == BridgePoolType.LIQUIDITY) {
-      amount = this.pool.inputTokenBalance.minus(
-        this.pool._inputTokenLiquidityBalance!
-      );
-    }
-
-    const val = this.getInputTokenAmountPrice(amount);
-    this.setNetValueExportedUSD(val);
-  }
-
-  /**
    * Utility function to convert some amount of input token to USD.
    *
    * @param amount the amount of inputToken to convert to USD
@@ -355,7 +271,7 @@ export class Pool {
     token.lastPriceUSD = price;
     token.save();
 
-    return bigIntToBigDecimal(amount, token.decimals).times(price);
+    return amount.divDecimal(exponentToBigDecimal(token.decimals)).times(price);
   }
 
   /**
@@ -419,7 +335,7 @@ export class Pool {
         this.pool.cumulativeVolumeOutUSD.plus(amountUSD);
       this.pool.netVolume = this.pool.netVolume.minus(amount);
       this.pool.netVolumeUSD = this.pool.netVolumeUSD.minus(amountUSD);
-      this.protocol.addVolumeOutUSD(amountUSD);
+      this.protocol.addVolumeInUSD(amountUSD);
     } else {
       route.cumulativeVolumeIn = route.cumulativeVolumeIn.plus(amount);
       route.cumulativeVolumeInUSD = route.cumulativeVolumeInUSD.plus(amountUSD);
@@ -428,7 +344,7 @@ export class Pool {
         this.pool.cumulativeVolumeInUSD.plus(amountUSD);
       this.pool.netVolume = this.pool.netVolume.plus(amount);
       this.pool.netVolumeUSD = this.pool.netVolumeUSD.plus(amountUSD);
-      this.protocol.addVolumeInUSD(amountUSD);
+      this.protocol.addVolumeOutUSD(amountUSD);
     }
     route.save();
     this.save();
@@ -649,7 +565,6 @@ export class Pool {
         amount = amount.times(BIGINT_MINUS_ONE);
       }
       this.addMintSupply(amount);
-      this.refreshNetValueExportedUSD();
     } else if (
       this.pool.type == BridgePoolType.LIQUIDITY ||
       this.pool.type == BridgePoolType.LOCK_RELEASE
@@ -659,7 +574,6 @@ export class Pool {
         amount = amount.times(BIGINT_MINUS_ONE);
       }
       this.addInputTokenBalance(amount);
-      this.refreshNetValueExportedUSD();
     }
   }
 
@@ -673,7 +587,6 @@ export class Pool {
   trackDeposit(deposit: LiquidityDeposit): void {
     this.protocol.addTransaction(TransactionType.LIQUIDITY_DEPOSIT);
     this.addInputTokenBalance(deposit.amount);
-    this._addInputTokenLiquidityBalance(deposit.amount);
   }
 
   /**
@@ -685,9 +598,7 @@ export class Pool {
    */
   trackWithdraw(withdraw: LiquidityWithdraw): void {
     this.protocol.addTransaction(TransactionType.LIQUIDITY_WITHDRAW);
-    const amount = withdraw.amount.times(BIGINT_MINUS_ONE);
-    this.addInputTokenBalance(amount);
-    this._addInputTokenLiquidityBalance(amount);
+    this.addInputTokenBalance(withdraw.amount.times(BIGINT_MINUS_ONE));
   }
 }
 

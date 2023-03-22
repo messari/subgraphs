@@ -1,6 +1,7 @@
 import {
   BigDecimal,
   BigInt,
+  Bytes,
   log,
   dataSource,
   Address,
@@ -238,10 +239,12 @@ export class NetworkSpecificConstant {
   constructor(
     public readonly chainId: BigInt,
     public readonly gasFeeToken: Address,
-    // assume protocolId is the address of pool-based bridge
-    //public readonly protocolId: Bytes,
     public readonly poolAddress: Address
   ) {}
+
+  getProtocolId(): Bytes {
+    return this.poolAddress;
+  }
 
   getPoolAddress(): Address {
     return this.poolAddress;

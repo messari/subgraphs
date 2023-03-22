@@ -30,8 +30,7 @@ import {
   NativeGasAdded,
   RefundCall,
 } from "../generated/AxelarGasService/AxelarGasService";
-import { SDK } from "./sdk/protocols/bridge";
-import { CustomEventType } from "./sdk/util/events";
+import { CustomEventType, SDK } from "./sdk/protocols/bridge";
 import { TokenPricer } from "./sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
 import {
@@ -122,32 +121,38 @@ class TokenInit implements TokenInitializer {
   }
 }
 
-function _getSDK(
-  event: ethereum.Event | null = null,
+function _createCustomEvent(
+  event: ethereum.Event | null,
   call: ethereum.Call | null = null
-): SDK | null {
+): CustomEventType | null {
   let customEvent: CustomEventType;
   if (event) {
     customEvent = CustomEventType.initialize(
       event.block,
       event.transaction,
       event.transactionLogIndex,
+      event.address,
       event
     );
   } else if (call) {
     customEvent = CustomEventType.initialize(
       call.block,
       call.transaction,
-      call.transaction.index
+      call.transaction.index,
+      call.to
     );
   } else {
-    log.error("[_getSDK]either event or call needs to be specified", []);
+    log.error(
+      "[_createCustomEvent]either event or call needs to be specified",
+      []
+    );
     return null;
   }
+  return customEvent;
+}
 
-  const protocolId = getNetworkSpecificConstant()
-    .getPoolAddress()
-    .toHexString();
+function _getSDK(customEvent: CustomEventType): SDK {
+  const protocolId = getNetworkSpecificConstant().getProtocolId().toHexString();
   const conf = new BridgeConfig(
     protocolId,
     "Axelar",
@@ -203,6 +208,7 @@ export function handleTokenSent(event: TokenSent): void {
     dstAddress.toHexString(),
   ]);
 
+  const customEvent = _createCustomEvent(event)!;
   _handleTransferOut(
     Address.fromString(tokenAddress),
     event.params.sender,
@@ -213,10 +219,8 @@ export function handleTokenSent(event: TokenSent): void {
     dstPoolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
-    event,
-    null,
-    null,
-    getTxId(event)
+    customEvent,
+    null
   );
 }
 
@@ -237,6 +241,8 @@ export function handleContractCallWithToken(
     ? Address.fromString(dstStr)
     : Bytes.fromUTF8(dstStr);
 
+  const customEvent = _createCustomEvent(event)!;
+
   _handleTransferOut(
     Address.fromString(tokenAddress),
     event.params.sender,
@@ -247,16 +253,17 @@ export function handleContractCallWithToken(
     dstPoolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
-    event,
-    null,
-    null,
-    getTxId(event),
-    event.params.payload
+    customEvent,
+    null
   );
 
-  const sdk = _getSDK(event)!;
-  const acc = sdk.Accounts.loadAccount(event.params.sender);
-  acc.messageOut(dstChainId, dstAccount, event.params.payload);
+  _handleMessageOut(
+    dstChainId,
+    event.params.sender,
+    dstAccount,
+    event.params.payloadHash,
+    customEvent
+  );
 }
 
 export function handleContractCall(event: ContractCall): void {
@@ -268,19 +275,28 @@ export function handleContractCall(event: ContractCall): void {
     event.params.destinationContractAddress
   );
 
-  const sdk = _getSDK(event)!;
-  const acc = sdk.Accounts.loadAccount(event.params.sender);
-  acc.messageOut(dstChainId, dstAccount, event.params.payload);
+  const customEvent = _createCustomEvent(event)!;
+  _handleMessageOut(
+    dstChainId,
+    event.params.sender,
+    dstAccount,
+    event.params.payloadHash,
+    customEvent
+  );
 }
 
 export function handleContractCallApproved(event: ContractCallApproved): void {
   // contract call
   const srcChainId = networkToChainID(event.params.sourceChain.toUpperCase());
   const srcAccount = Address.fromString(event.params.sourceAddress);
-
-  const sdk = _getSDK(event)!;
-  const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
-  acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
+  const customEvent = _createCustomEvent(event)!;
+  _handleMessageIn(
+    srcChainId,
+    srcAccount,
+    event.address,
+    event.params.payloadHash,
+    customEvent
+  );
 }
 
 export function handleContractCallApprovedWithMint(
@@ -300,6 +316,7 @@ export function handleContractCallApprovedWithMint(
   const srcNetworkConstants = getNetworkSpecificConstant(srcChainId);
   const srcPoolId = srcNetworkConstants.getPoolAddress();
 
+  const customEvent = _createCustomEvent(event)!;
   _handleTransferIn(
     Address.fromString(tokenAddress),
     srcAccount,
@@ -309,78 +326,17 @@ export function handleContractCallApprovedWithMint(
     srcPoolId,
     poolId,
     BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
-    event,
-    null,
-    event.params.commandId,
-    getTxId(event),
-    event.params.payloadHash
+    CrosschainTokenType.CANONICAL,
+    customEvent,
+    event.params.commandId
   );
 
-  const sdk = _getSDK(event)!;
-  const acc = sdk.Accounts.loadAccount(event.params.contractAddress);
-  acc.messageIn(srcChainId, srcAccount, event.params.payloadHash);
-}
-
-export function handleMintToken(call: MintTokenCall): void {
-  // decode symbol, account, amount
-  const account = bytes32ToAddress(
-    Bytes.fromUint8Array(call.inputs.params.subarray(32, 64))
-  );
-  const amount = bytesToUnsignedBigInt(
-    Bytes.fromUint8Array(call.inputs.params.subarray(64, 96))
-  );
-  const symbol = Bytes.fromUint8Array(
-    call.inputs.params.subarray(128, 160)
-  ).toString();
-
-  log.info(
-    "[handleMintToken]decode call.inputs.params {}: symbol={}, account={}, amount={}",
-    [
-      call.inputs.params.toHexString(),
-      symbol,
-      account.toHexString(),
-      amount.toString(),
-    ]
-  );
-
-  const tokenSymbol = getOrCreateTokenSymbol(symbol);
-  let tokenAddress = tokenSymbol.tokenAddress;
-  if (!tokenAddress) {
-    // find tokenAddress on-chain from the AlexarGateway contract
-    const contract = AxelarGatewayContract.bind(call.to);
-    const tokenAddressResult = contract.try_tokenAddresses(symbol);
-    if (tokenAddressResult.reverted) {
-      log.error("[handleMintToken]Failed to get token address for {}", [
-        tokenAddressResult.value.toHexString(),
-      ]);
-      return;
-    } else {
-      tokenAddress = tokenAddressResult.value.toHexString();
-    }
-  }
-
-  //const tokenType = tokenSymbol.tokenType!;
-  const receiver = account;
-  const poolId = call.to.concat(Address.fromString(tokenAddress));
-  // No info of source chain or src account for mintToken call/event
-  const srcChainId = networkToChainID(Network.UNKNOWN_NETWORK);
-  const srcPoolId = Address.zero(); // Not available
-  const srcAccount = account; //Not available, assumed to be the same as receiver
-  _handleTransferIn(
-    Address.fromString(tokenAddress),
-    srcAccount,
-    receiver,
-    amount,
+  _handleMessageIn(
     srcChainId,
-    srcPoolId,
-    poolId,
-    BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
-    null,
-    call,
-    call.inputs.value1, //commandId
-    getTxId(null, call)
+    srcAccount,
+    event.address,
+    event.params.payloadHash,
+    customEvent
   );
 }
 
@@ -463,24 +419,17 @@ export function handleCommandExecuted(event: Executed): void {
 
       // burnToken: transfer to 0x or address(this)
       if (toAddress.equals(Address.zero()) || toAddress.equals(event.address)) {
-        //TODO: _handleBurnToken()
-
+        log.info("[handleCommandExecuted]_handleBurnToken tx={}-{}", [
+          thisLog.transactionHash.toHexString(),
+          thisLog.logIndex.toString(),
+        ]);
         _handleBurnToken(
           commandId,
           tokenAddress,
           fromAddress,
           transferAmount,
-          command,
-          event,
-          null
+          event
         );
-
-        // this may be a burn token tx that has already been handled by
-        // handleContractCallWithToken and handleTokenSent
-        command.tokenAddress = thisLog.address;
-        command.account = fromAddress;
-        command.amount = transferAmount;
-        command.save();
         break;
       }
 
@@ -489,119 +438,70 @@ export function handleCommandExecuted(event: Executed): void {
         fromAddress.equals(Address.zero()) ||
         fromAddress.equals(event.address)
       ) {
-        // TODO: _handleMintToken
+        log.info("[handleCommandExecuted]_handleBurnToken tx={}-{}", [
+          thisLog.transactionHash.toHexString(),
+          thisLog.logIndex.toString(),
+        ]);
         _handleMintToken(
           commandId,
           tokenAddress,
           toAddress,
           transferAmount,
-          command,
-          event,
-          null
+          event
         );
-        // this may be a burn token tx that has already been handled by
-        // handleContractCallWithToken and handleTokenSent
-        command.tokenAddress = thisLog.address;
-        command.account = toAddress;
-        command.amount = transferAmount;
-        command.save();
         break;
       }
     }
   }
-
-  if (!command.isBurnToken || command.isProcessed) {
-    return;
-  }
-
-  _handleBurnToken(
-    commandId,
-    Address.fromBytes(command.tokenAddress!),
-    Address.fromBytes(command.account!),
-    command.amount!,
-    command,
-    event,
-    null
-  );
-}
-
-export function handleBurnTokenCall(call: BurnTokenCall): void {
-  log.info("[handleBurnTokenCall]call.inputs.params {}, commandId={}", [
-    call.inputs.params.toHexString(),
-    call.inputs.value1.toHexString(),
-  ]);
-
-  const commandId = call.inputs.value1;
-  let command = _Command.load(commandId);
-  if (!command) {
-    command = new _Command(commandId);
-    command.isBurnToken = true;
-    command.isProcessed = false;
-    command.save();
-  }
-  command.isBurnToken = true;
-  command.save();
-
-  if (command.isProcessed || !command.tokenAddress) {
-    return;
-  }
-
-  const tokenAddress = Address.fromBytes(command.tokenAddress!);
-  const sender = Address.fromBytes(command.account!);
-  const amount = command.amount!;
-
-  _handleBurnToken(
-    commandId,
-    tokenAddress,
-    sender,
-    amount,
-    command,
-    null,
-    call
-  );
 }
 
 export function handleGasPaidForContractCall(
   event: GasPaidForContractCall
 ): void {
-  _handleFees(event.params.gasToken, event.params.gasFeeAmount, event);
+  const customEvent = _createCustomEvent(event)!;
+  _handleFees(event.params.gasToken, event.params.gasFeeAmount, customEvent);
 }
 
 export function handleGasPaidForContractCallWithToken(
   event: GasPaidForContractCallWithToken
 ): void {
-  _handleFees(event.params.gasToken, event.params.gasFeeAmount, event);
+  const customEvent = _createCustomEvent(event)!;
+  _handleFees(event.params.gasToken, event.params.gasFeeAmount, customEvent);
 }
 
 export function handleNativeGasPaidForContractCall(
   event: NativeGasPaidForContractCall
 ): void {
+  const customEvent = _createCustomEvent(event)!;
   _handleFees(
     getNetworkSpecificConstant().gasFeeToken,
     event.params.gasFeeAmount,
-    event
+    customEvent
   );
 }
 
 export function handleNativeGasPaidForContractCallWithToken(
   event: NativeGasPaidForContractCallWithToken
 ): void {
+  const customEvent = _createCustomEvent(event)!;
   _handleFees(
     getNetworkSpecificConstant().gasFeeToken,
     event.params.gasFeeAmount,
-    event
+    customEvent
   );
 }
 
 export function handleGasAdded(event: GasAdded): void {
-  _handleFees(event.params.gasToken, event.params.gasFeeAmount, event);
+  const customEvent = _createCustomEvent(event)!;
+  _handleFees(event.params.gasToken, event.params.gasFeeAmount, customEvent);
 }
 
 export function handleNativeGasAdded(event: NativeGasAdded): void {
+  const customEvent = _createCustomEvent(event)!;
   _handleFees(
     getNetworkSpecificConstant().gasFeeToken,
     event.params.gasFeeAmount,
-    event
+    customEvent
   );
 }
 
@@ -610,12 +510,11 @@ export function handleFeeRefund(call: RefundCall): void {
   if (tokenAddress.equals(Address.zero())) {
     tokenAddress = getNetworkSpecificConstant().gasFeeToken;
   }
-
+  const customEvent = _createCustomEvent(null, call)!;
   _handleFees(
     tokenAddress,
     call.inputs.amount.times(BIGINT_MINUS_ONE),
-    null,
-    call
+    customEvent
   );
 }
 
@@ -653,13 +552,10 @@ function _handleTransferOut(
   dstPoolId: Address,
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
-  event: ethereum.Event | null,
-  call: ethereum.Call | null = null,
-  refId: Bytes | null = null,
-  transactionID: Bytes | null = null,
-  messagePayload: Bytes | null = null
-): Bytes {
-  const sdk = _getSDK(event, call)!;
+  customEvent: CustomEventType,
+  refId: Bytes | null = null
+): void {
+  const sdk = _getSDK(customEvent);
   const inputToken = sdk.Tokens.getOrCreateToken(token);
 
   const pool = sdk.Pools.loadPool(
@@ -675,25 +571,20 @@ function _handleTransferOut(
     token
   );
   pool.addDestinationToken(crossToken);
+
   const acc = sdk.Accounts.loadAccount(sender);
   const transfer = acc.transferOut(
     pool,
     pool.getDestinationTokenRoute(crossToken)!,
     receiver,
     amount,
-    transactionID
+    customEvent.transaction.hash
   );
 
   if (refId) {
     transfer._refId = refId;
     transfer.save();
   }
-
-  if (messagePayload) {
-    acc.messageOut(dstChainId, receiver, messagePayload);
-  }
-
-  return transfer.id;
 }
 
 function _handleTransferIn(
@@ -706,13 +597,10 @@ function _handleTransferIn(
   poolId: Bytes,
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
-  event: ethereum.Event | null,
-  call: ethereum.Call | null = null,
-  refId: Bytes | null = null,
-  transactionID: Bytes | null = null,
-  messagePayload: Bytes | null = null
-): Bytes {
-  const sdk = _getSDK(event, call)!;
+  customEvent: CustomEventType,
+  refId: Bytes | null = null
+): void {
+  const sdk = _getSDK(customEvent);
 
   const pool = sdk.Pools.loadPool(
     poolId,
@@ -720,7 +608,6 @@ function _handleTransferIn(
     bridgePoolType,
     token.toHexString()
   );
-
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     srcChainId,
     srcPoolId,
@@ -735,19 +622,13 @@ function _handleTransferIn(
     pool.getDestinationTokenRoute(crossToken)!,
     sender,
     amount,
-    transactionID
+    customEvent.transaction.hash
   );
 
   if (refId) {
     transfer._refId = refId;
     transfer.save();
   }
-
-  if (messagePayload) {
-    acc.messageIn(srcChainId, sender, messagePayload);
-  }
-
-  return transfer.id;
 }
 
 function _handleMintToken(
@@ -755,18 +636,17 @@ function _handleMintToken(
   tokenAddress: Address,
   account: Address,
   amount: BigInt,
-  command: _Command,
-  event: ethereum.Event | null,
-  call: ethereum.Call | null
+  event: ethereum.Event
 ): void {
   const receiver = account;
-  const poolAddress = event ? event.address : call!.to;
+  const poolAddress = event.address;
   const poolId = poolAddress.concat(tokenAddress);
   const srcChainId = networkToChainID(Network.UNKNOWN_NETWORK);
   const srcPoolId = Address.zero(); // Not available
   const sender = receiver; //Not available, assumed to be the same as receiver
+  const customEvent = _createCustomEvent(event)!;
   _handleTransferIn(
-    Address.fromBytes(tokenAddress),
+    tokenAddress,
     sender,
     receiver,
     amount,
@@ -774,15 +654,10 @@ function _handleMintToken(
     srcPoolId,
     poolId,
     BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
-    event,
-    call,
-    commandId,
-    getTxId(event, call)
+    CrosschainTokenType.CANONICAL,
+    customEvent,
+    commandId
   );
-
-  command.isProcessed = true;
-  command.save();
 }
 
 function _handleBurnToken(
@@ -790,16 +665,15 @@ function _handleBurnToken(
   tokenAddress: Address,
   account: Address,
   amount: BigInt,
-  command: _Command,
-  event: ethereum.Event | null,
-  call: ethereum.Call | null
+  event: ethereum.Event
 ): void {
   const sender = account;
-  const poolAddress = event ? event.address : call!.to;
+  const poolAddress = event.address;
   const poolId = poolAddress.concat(tokenAddress);
   const dstChainId = networkToChainID(Network.UNKNOWN_NETWORK);
   const dstPoolId = Address.zero(); // Not available
   const receiver = sender; //Not available, assumed to be the same as sender
+  const customEvent = _createCustomEvent(event)!;
   _handleTransferOut(
     Address.fromBytes(tokenAddress),
     sender,
@@ -810,23 +684,17 @@ function _handleBurnToken(
     dstPoolId,
     BridgePoolType.BURN_MINT,
     CrosschainTokenType.WRAPPED,
-    event,
-    call,
-    commandId,
-    getTxId(event, call)
+    customEvent,
+    commandId
   );
-
-  command.isProcessed = true;
-  command.save();
 }
 
 function _handleFees(
   tokenAddress: Address,
   feeAmount: BigInt,
-  event: ethereum.Event | null,
-  call: ethereum.Call | null = null
+  customEvent: CustomEventType
 ): void {
-  const sdk = _getSDK(event, call)!;
+  const sdk = _getSDK(customEvent);
   const poolAddress = getNetworkSpecificConstant().getPoolAddress();
   const poolId = poolAddress.concat(tokenAddress);
   const inputToken = sdk.Tokens.getOrCreateToken(tokenAddress);
@@ -837,6 +705,31 @@ function _handleFees(
     inputToken.id.toHexString()
   );
   pool.addRevenueNative(feeAmount, BIGINT_ZERO);
+}
+
+function _handleMessageIn(
+  srcChainId: BigInt,
+  sender: Bytes,
+  receiver: Address,
+  data: Bytes,
+  customeEvent: CustomEventType
+): void {
+  // see doc in _handleMessageOut
+  const sdk = _getSDK(customeEvent);
+  const acc = sdk.Accounts.loadAccount(receiver);
+  acc.messageIn(srcChainId, sender, data);
+}
+
+function _handleMessageOut(
+  dstChainId: BigInt,
+  sender: Address,
+  receiver: Bytes,
+  data: Bytes,
+  customEvent: CustomEventType
+): void {
+  const sdk = _getSDK(customEvent);
+  const acc = sdk.Accounts.loadAccount(sender);
+  acc.messageOut(dstChainId, receiver, data);
 }
 
 export function bytesToUnsignedBigInt(

@@ -1,5 +1,5 @@
 import { Bytes } from "@graphprotocol/graph-ts";
-import { CustomEventType } from "../../util/events";
+import { CustomEventType } from ".";
 import {
   Pool as PoolSchema,
   PoolDailySnapshot,
@@ -66,7 +66,6 @@ export class PoolSnapshot {
 
     // tvl and balances
     snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
-    snapshot.netValueExportedUSD = pool.netValueExportedUSD;
     snapshot.mintSupply = pool.mintSupply;
     snapshot.inputTokenBalance = pool.inputTokenBalance;
     snapshot.outputTokenSupply = pool.outputTokenSupply;
@@ -178,7 +177,6 @@ export class PoolSnapshot {
 
     // tvl and balances
     snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
-    snapshot.netValueExportedUSD = pool.netValueExportedUSD;
     snapshot.mintSupply = pool.mintSupply;
     snapshot.inputTokenBalance = pool.inputTokenBalance;
     snapshot.outputTokenSupply = pool.outputTokenSupply;
