@@ -7,11 +7,12 @@ import {
 } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { BIGINT_ZERO, REGISTRY_ADDRESS_MAP } from "../../common/constants";
 import { getDualTokenUSD } from "./pricing";
-import { getOrCreateUnderlyingToken } from "./vaults";
+import { getOrCreateVault } from "./vaults";
 
 // Create deposit entity corresponding to vault Minted events
 export function createDeposit(event: Minted): void {
   const vaultId = event.address.toHex();
+  const vault = getOrCreateVault(event.address, event.block);
 
   // { Transaction hash }-{ Log index }
   const deposit = new Deposit(
@@ -29,13 +30,12 @@ export function createDeposit(event: Minted): void {
   deposit.vault = event.address.toHex();
 
   // Get underlying tokens to calculate USD value
-  const underlyingToken = getOrCreateUnderlyingToken(event.address);
   deposit.amountUSD = getDualTokenUSD(
-    Address.fromString(underlyingToken.token0),
-    Address.fromString(underlyingToken.token1),
+    Address.fromString(vault._token0),
+    Address.fromString(vault._token1),
     event.params.amount0In,
     event.params.amount1In,
-    event.block.number
+    event.block
   );
 
   deposit.save();
@@ -44,6 +44,7 @@ export function createDeposit(event: Minted): void {
 // Create withdraw entity corresponding to hypervisor withdraw events
 export function createWithdraw(event: Burned): void {
   const vaultId = event.address.toHex();
+  const vault = getOrCreateVault(event.address, event.block);
 
   // { Transaction hash }-{ Log index }
   const withdrawal = new Withdraw(
@@ -61,13 +62,12 @@ export function createWithdraw(event: Burned): void {
   withdrawal.vault = event.address.toHex();
 
   // Get underlying tokens to calculate USD value
-  const underlyingToken = getOrCreateUnderlyingToken(event.address);
   withdrawal.amountUSD = getDualTokenUSD(
-    Address.fromString(underlyingToken.token0),
-    Address.fromString(underlyingToken.token1),
+    Address.fromString(vault._token0),
+    Address.fromString(vault._token1),
     event.params.amount0Out,
     event.params.amount1Out,
-    event.block.number
+    event.block
   );
 
   withdrawal.save();

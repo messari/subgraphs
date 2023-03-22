@@ -55,7 +55,7 @@ export function handleAddGauge(event: AddGauge): void {
   }
 
   updateRewardTokens(spiceResult.value, vault);
-  updateVaultSnapshots(vaultAddress, event.block);
+  updateVaultSnapshots(vault, event.block);
 }
 
 export function handleRemoveGauge(event: RemoveGauge): void {
@@ -111,7 +111,7 @@ export function handleRemoveGauge(event: RemoveGauge): void {
   vault.rewardTokenEmissionsUSD = rewardEmissionUSD;
   vault.save();
 
-  updateVaultSnapshots(vaultAddress, event.block);
+  updateVaultSnapshots(vault, event.block);
 }
 
 export function handleDeposit(event: Deposit): void {
@@ -124,7 +124,7 @@ export function handleDeposit(event: Deposit): void {
   );
   vault.save();
 
-  updateVaultSnapshots(vaultAddress, event.block);
+  updateVaultSnapshots(vault, event.block);
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -137,7 +137,7 @@ export function handleWithdraw(event: Withdraw): void {
   );
   vault.save();
 
-  updateVaultSnapshots(vaultAddress, event.block);
+  updateVaultSnapshots(vault, event.block);
 }
 
 export function handleRewardDataUpdate(event: RewardDataUpdate): void {
@@ -160,5 +160,5 @@ export function handleRewardDataUpdate(event: RewardDataUpdate): void {
   updateRewardTokens(rewardTokenAddress, vault);
   // Update vaults with new reward emissions
   updateRewardEmission(gaugeAddress, vaultAddress, rewardTokenAddress, event);
-  updateVaultSnapshots(vaultAddress, event.block);
+  updateVaultSnapshots(vault, event.block);
 }

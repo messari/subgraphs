@@ -40,6 +40,7 @@ export function getOrCreateToken(tokenAddress: Address): Token {
     token.decimals = fetchTokenDecimals(tokenAddress);
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
+    token._lastPriceTimestamp = BIGINT_ZERO;
     token.save();
   }
   return token;
@@ -188,6 +189,13 @@ export function getOrCreateVaultDailySnapshot(
     snapshot.stakedOutputTokenAmount = null;
     snapshot.rewardTokenEmissionsAmount = null;
     snapshot.rewardTokenEmissionsUSD = null;
+    // TODO
+    snapshot._token0 = "";
+    snapshot._token1 = "";
+    snapshot._token0Amount = BIGINT_ZERO;
+    snapshot._token1Amount = BIGINT_ZERO;
+    snapshot._token0AmountUSD = BIGDECIMAL_ZERO;
+    snapshot._token1AmountUSD = BIGDECIMAL_ZERO;
     snapshot.blockNumber = block.number;
     snapshot.timestamp = block.timestamp;
     snapshot.save();

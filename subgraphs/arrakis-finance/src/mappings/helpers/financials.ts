@@ -1,9 +1,10 @@
-import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import { Address, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
 import { FeesEarned } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { ArrakisVaultV1 as ArrakisVaultContract } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
-import { getOrCreateUnderlyingToken, getOrCreateVault } from "./vaults";
+import { getOrCreateVault, updateVaultSnapshots } from "./vaults";
 import {
   BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   PROTOCOL_PERFORMANCE_FEE,
   REGISTRY_ADDRESS_MAP,
@@ -15,34 +16,54 @@ import {
   getOrCreateVaultHourlySnapshot,
   getOrCreateYieldAggregator,
 } from "../../common/getters";
-import { getDualTokenUSD } from "./pricing";
+import { getDualTokenUSD, getTokenValueUSD } from "./pricing";
 import { bigIntToBigDecimal } from "../../common/utils/numbers";
+import { Vault } from "../../../generated/schema";
 
 // Update TVL related fields in all entities
 export function updateTvl(event: ethereum.Event): void {
-  const underlyingToken = getOrCreateUnderlyingToken(event.address);
+  const vaultAddress = event.address;
+  // Track existing TVL for cumulative calculations
+  const vault = updateVaultTokenValue(vaultAddress.toHexString(), event.block);
 
-  // Update underlying amounts
-  if (event.block.number > underlyingToken.lastAmountBlockNumber) {
-    const vaultContract = ArrakisVaultContract.bind(event.address);
-    const totalAmounts = vaultContract.getUnderlyingBalances();
-    underlyingToken.lastAmount0 = totalAmounts.getAmount0Current();
-    underlyingToken.lastAmount1 = totalAmounts.getAmount1Current();
-    underlyingToken.lastAmountBlockNumber = event.block.number;
-    underlyingToken.save();
+  // Update entities
+  const protocol = getOrCreateYieldAggregator(
+    REGISTRY_ADDRESS_MAP.get(dataSource.network())!
+  );
+
+  let protocolTvlUSD = BIGDECIMAL_ZERO;
+  const vaultIDs = protocol._vaultIDs ? protocol._vaultIDs! : [];
+  for (let i = 0; i < vaultIDs.length; i++) {
+    const _vault = updateVaultTokenValue(vaultIDs[i], event.block);
+    protocolTvlUSD = protocolTvlUSD.plus(_vault.totalValueLockedUSD);
   }
 
-  // Track existing TVL for cumulative calculations
-  const vault = getOrCreateVault(event.address, event.block);
-  const oldTvl = vault.totalValueLockedUSD;
+  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+  financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  financialsDailySnapshot.blockNumber = event.block.number;
+  financialsDailySnapshot.timestamp = event.block.timestamp;
 
-  const newTvl = getDualTokenUSD(
-    Address.fromString(underlyingToken.token0),
-    Address.fromString(underlyingToken.token1),
-    underlyingToken.lastAmount0,
-    underlyingToken.lastAmount1,
-    event.block.number
+  protocol.save();
+  financialsDailySnapshot.save();
+}
+
+function updateVaultTokenValue(
+  vaultAddress: string,
+  block: ethereum.Block
+): Vault {
+  const vault = getOrCreateVault(Address.fromString(vaultAddress), block);
+
+  const token0AmountUSD = getTokenValueUSD(
+    Address.fromString(vault._token0),
+    vault._token0Amount,
+    block
   );
+  const token1AmountUSD = getTokenValueUSD(
+    Address.fromString(vault._token1),
+    vault._token1Amount,
+    block
+  );
+  const newTvl = token0AmountUSD.plus(token1AmountUSD);
 
   // Calculate price per share
   const outputToken = getOrCreateToken(Address.fromString(vault.outputToken!));
@@ -56,37 +77,28 @@ export function updateTvl(event: ethereum.Event): void {
     outputTokenPriceUSD = newTvl.div(outputTokenSupplyDecimals);
   }
 
-  // Update entities
-  const protocol = getOrCreateYieldAggregator(
-    REGISTRY_ADDRESS_MAP.get(dataSource.network())!
-  );
-  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
-
   vault.totalValueLockedUSD = newTvl;
   vault.outputTokenPriceUSD = outputTokenPriceUSD;
-
-  protocol.totalValueLockedUSD += newTvl.minus(oldTvl);
-
-  financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialsDailySnapshot.blockNumber = event.block.number;
-  financialsDailySnapshot.timestamp = event.block.timestamp;
-
+  vault._token0AmountUSD = token0AmountUSD;
+  vault._token1AmountUSD = token1AmountUSD;
   vault.save();
-  protocol.save();
-  financialsDailySnapshot.save();
+
+  updateVaultSnapshots(vault, block);
+
+  return vault;
 }
 
 // Update revenue related fields, Only changes when rebalance is called.
 export function updateRevenue(event: FeesEarned): void {
-  const underlyingToken = getOrCreateUnderlyingToken(event.address);
+  const vault = getOrCreateVault(event.address, event.block);
 
   // Calculate revenue in USD
   const eventTotalRevenueUSD = getDualTokenUSD(
-    Address.fromString(underlyingToken.token0),
-    Address.fromString(underlyingToken.token1),
+    Address.fromString(vault._token0),
+    Address.fromString(vault._token1),
     event.params.feesEarned0,
     event.params.feesEarned1,
-    event.block.number
+    event.block
   );
 
   const SupplySideShare = BIGDECIMAL_HUNDRED.minus(PROTOCOL_PERFORMANCE_FEE);
@@ -103,7 +115,7 @@ export function updateRevenue(event: FeesEarned): void {
   const protocol = getOrCreateYieldAggregator(
     REGISTRY_ADDRESS_MAP.get(dataSource.network())!
   );
-  const vault = getOrCreateVault(event.address, event.block);
+
   const vaultDailySnapshot = getOrCreateVaultDailySnapshot(
     event.address,
     event.block
@@ -115,30 +127,54 @@ export function updateRevenue(event: FeesEarned): void {
   const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
 
   // Update protocol cumulative revenue
-  protocol.cumulativeSupplySideRevenueUSD += eventSupplySideRevenueUSD;
-  protocol.cumulativeProtocolSideRevenueUSD += eventProtocolSideRevenueUSD;
-  protocol.cumulativeTotalRevenueUSD += eventTotalRevenueUSD;
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD.plus(eventSupplySideRevenueUSD);
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(eventProtocolSideRevenueUSD);
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(eventTotalRevenueUSD);
 
   // Update vault cumulative revenue
-  vault.cumulativeSupplySideRevenueUSD += eventSupplySideRevenueUSD;
-  vault.cumulativeProtocolSideRevenueUSD += eventProtocolSideRevenueUSD;
-  vault.cumulativeTotalRevenueUSD += eventTotalRevenueUSD;
+  vault.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD.plus(eventSupplySideRevenueUSD);
+  vault.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD.plus(eventProtocolSideRevenueUSD);
+  vault.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD.plus(eventTotalRevenueUSD);
 
   // Increment snapshot revenues
-  vaultDailySnapshot.dailySupplySideRevenueUSD += eventSupplySideRevenueUSD;
-  vaultDailySnapshot.dailyProtocolSideRevenueUSD += eventProtocolSideRevenueUSD;
-  vaultDailySnapshot.dailyTotalRevenueUSD += eventTotalRevenueUSD;
+  vaultDailySnapshot.dailySupplySideRevenueUSD =
+    vaultDailySnapshot.dailySupplySideRevenueUSD.plus(
+      eventSupplySideRevenueUSD
+    );
+  vaultDailySnapshot.dailyProtocolSideRevenueUSD =
+    vaultDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+      eventProtocolSideRevenueUSD
+    );
+  vaultDailySnapshot.dailyTotalRevenueUSD =
+    vaultDailySnapshot.dailyTotalRevenueUSD.plus(eventTotalRevenueUSD);
 
-  vaultHourlySnapshot.hourlySupplySideRevenueUSD += eventSupplySideRevenueUSD;
-  vaultHourlySnapshot.hourlyProtocolSideRevenueUSD +=
-    eventProtocolSideRevenueUSD;
-  vaultHourlySnapshot.hourlyTotalRevenueUSD += eventTotalRevenueUSD;
+  vaultHourlySnapshot.hourlySupplySideRevenueUSD =
+    vaultHourlySnapshot.hourlySupplySideRevenueUSD.plus(
+      eventSupplySideRevenueUSD
+    );
+  vaultHourlySnapshot.hourlyProtocolSideRevenueUSD =
+    vaultHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+      eventProtocolSideRevenueUSD
+    );
+  vaultHourlySnapshot.hourlyTotalRevenueUSD =
+    vaultHourlySnapshot.hourlyTotalRevenueUSD.plus(eventTotalRevenueUSD);
 
-  financialsDailySnapshot.dailySupplySideRevenueUSD +=
-    eventSupplySideRevenueUSD;
-  financialsDailySnapshot.dailyProtocolSideRevenueUSD +=
-    eventProtocolSideRevenueUSD;
-  financialsDailySnapshot.dailyTotalRevenueUSD += eventTotalRevenueUSD;
+  financialsDailySnapshot.dailySupplySideRevenueUSD =
+    financialsDailySnapshot.dailySupplySideRevenueUSD.plus(
+      eventSupplySideRevenueUSD
+    );
+  financialsDailySnapshot.dailyProtocolSideRevenueUSD =
+    financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+      eventProtocolSideRevenueUSD
+    );
+  financialsDailySnapshot.dailyTotalRevenueUSD =
+    financialsDailySnapshot.dailyTotalRevenueUSD.plus(eventTotalRevenueUSD);
 
   // Update cumulative revenue from protocol
   financialsDailySnapshot.cumulativeSupplySideRevenueUSD =

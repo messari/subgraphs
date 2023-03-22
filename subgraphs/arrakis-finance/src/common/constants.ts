@@ -208,10 +208,6 @@ TOKEN_PRICE_SOURCE_SKIPS.set(
     PriceSource.YEARN, // Yearn is returning incorrect price
   ]
 );
-TOKEN_PRICE_SOURCE_SKIPS.set(
-  Address.fromString("0x61baadcf22d2565b0f471b291c475db5555e0b76"), // Aelin Token
-  // Skip bad price
-  [
-    PriceSource.ONE_INCH, // 1Inch is returning incorrect price
-  ]
-);
+
+// duration to refresh prices
+export const THIRTY_MINUTES_IN_SECONDS = BigInt.fromI32(30 * 60);

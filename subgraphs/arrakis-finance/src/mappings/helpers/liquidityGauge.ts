@@ -130,7 +130,7 @@ export function updateRewardEmission(
   emissionsAmount[rewardTokenIndex] = rate.times(
     BigInt.fromI32(SECONDS_PER_DAY)
   );
-  const rewardToken = updateTokenPrice(rewardTokenAddress, block.number);
+  const rewardToken = updateTokenPrice(rewardTokenAddress, block);
   emissionsUSD[rewardTokenIndex] = rewardToken.lastPriceUSD!.times(
     bigIntToBigDecimal(emissionsAmount[rewardTokenIndex], rewardToken.decimals)
   );

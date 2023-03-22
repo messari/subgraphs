@@ -53,6 +53,9 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " Optional field to track the timestamp of the last token price "
+  _lastPriceTimestamp: BigInt
 }
 
 enum RewardTokenType {
@@ -230,6 +233,9 @@ type YieldAggregator implements Protocol @entity {
 
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
+
+  " Array of all vault IDs for iteration "
+  _vaultIDs: [String!]
 }
 
 ###############################
@@ -423,6 +429,19 @@ type Vault @entity {
 
   " All withdrawals made from this vault "
   withdraws: [Withdraw!]! @derivedFrom(field: "vault")
+
+  " token0 of vault "
+  _token0: Token!
+  " token1 of vault "
+  _token1: Token!
+  " token0 amount"
+  _token0Amount: BigInt!
+  " token1 amount "
+  _token1Amount: BigInt!
+  " token0 amount USD "
+  _token0AmountUSD: BigDecimal!
+  " token1 amount USD "
+  _token1AmountUSD: BigDecimal!
 }
 
 #################################
@@ -486,6 +505,20 @@ type VaultDailySnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+
+  # TODO: for diagnosing, to be removed
+  " token0 of vault "
+  _token0: Token!
+  " token1 of vault "
+  _token1: Token!
+  " token0 amount"
+  _token0Amount: BigInt!
+  " token1 amount "
+  _token1Amount: BigInt!
+  " token0 amount USD "
+  _token0AmountUSD: BigDecimal!
+  " token1 amount USD "
+  _token1AmountUSD: BigDecimal!
 }
 
 type VaultHourlySnapshot @entity {
