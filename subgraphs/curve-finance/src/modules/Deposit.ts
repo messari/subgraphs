@@ -119,6 +119,9 @@ export function Deposit(
     totalSupplyAfterDeposit,
     block
   );
+  pool._tvlUSDExcludingBasePoolLpTokens =
+    utils.getPoolTVLExcludingBasePoolLpToken(pool, block);
+
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,
@@ -142,7 +145,7 @@ export function Deposit(
     block
   );
 
-  utils.updateProtocolTotalValueLockedUSD();
+  utils.updateProtocolTotalValueLockedUSD(block);
   UpdateMetricsAfterDeposit(block);
 
   log.info(

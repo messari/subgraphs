@@ -19,6 +19,7 @@ import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/E
 import { Pool as LiquidityPoolContract } from "../../generated/templates/PoolTemplate/Pool";
 import { Registry as RegistryContract } from "../../generated/templates/PoolTemplate/Registry";
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/LiquidityGauge/Gauge";
+import { AddressProvider as AddressProviderContract } from "../../generated/templates/PoolTemplate/AddressProvider";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -130,6 +131,29 @@ export function isPoolRegistered(poolAddress: Address): boolean {
   const pool = LiquidityPool.load(poolAddress.toHexString());
 
   if (!pool) return false;
+  return true;
+}
+
+export function isMainRegistryPool(poolAddress: Address): boolean {
+  const addressProvider = AddressProviderContract.bind(
+    constants.CURVE_ADDRESS_PROVIDER
+  );
+
+  const mainRegistryAddress = readValue<Address>(
+    addressProvider.try_get_registry(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  if (mainRegistryAddress.equals(constants.NULL.TYPE_ADDRESS)) return false;
+
+  const mainRegistryContract = RegistryContract.bind(mainRegistryAddress);
+  const lpToken = readValue<Address>(
+    mainRegistryContract.try_get_lp_token(poolAddress),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  if (lpToken.equals(constants.NULL.TYPE_ADDRESS)) return false;
+
   return true;
 }
 
@@ -476,7 +500,31 @@ export function getPoolTVL(
   return totalValueLockedUSD;
 }
 
-export function updateProtocolTotalValueLockedUSD(): void {
+export function getPoolTVLExcludingBasePoolLpToken(
+  pool: LiquidityPool,
+  block: ethereum.Block
+): BigDecimal {
+  let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+
+  for (let idx = 0; idx < pool.inputTokens.length; idx++) {
+    const balance = pool.inputTokenBalances[idx];
+    const inputToken = getOrCreateTokenFromString(pool.inputTokens[idx], block);
+
+    if (inputToken.isBasePoolLpToken) continue;
+
+    const balanceUSD = balance
+      .divDecimal(
+        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+      )
+      .times(inputToken.lastPriceUSD!);
+
+    totalValueLockedUSD = totalValueLockedUSD.plus(balanceUSD);
+  }
+
+  return totalValueLockedUSD;
+}
+
+export function updateProtocolTotalValueLockedUSD(block: ethereum.Block): void {
   const protocol = getOrCreateDexAmmProtocol();
 
   const poolIds = protocol._poolIds;
@@ -484,9 +532,22 @@ export function updateProtocolTotalValueLockedUSD(): void {
 
   for (let poolIdx = 0; poolIdx < poolIds.length; poolIdx++) {
     const pool = LiquidityPool.load(poolIds[poolIdx]);
-
     if (!pool) continue;
-    totalValueLockedUSD = totalValueLockedUSD.plus(pool.totalValueLockedUSD);
+
+    let poolTVL = pool.totalValueLockedUSD;
+    for (let idx = 0; idx < pool.inputTokens.length; idx++) {
+      const inputToken = getOrCreateTokenFromString(
+        pool.inputTokens[idx],
+        block
+      );
+
+      if (inputToken.isBasePoolLpToken) {
+        poolTVL = pool._tvlUSDExcludingBasePoolLpTokens;
+        break;
+      }
+    }
+
+    totalValueLockedUSD = totalValueLockedUSD.plus(poolTVL);
   }
 
   protocol.totalValueLockedUSD = totalValueLockedUSD;

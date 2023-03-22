@@ -39,6 +39,85 @@
     }
   ],
 
+  "basePoolsLpToken": [
+    {
+      "name": "3crv",
+      "address": "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490"
+    },
+    {
+      "name": "renbtc",
+      "address": "0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3"
+    },
+    {
+      "name": "susd",
+      "address": "0xC25a3A3b969415c80451098fa907EC722572917F"
+    },
+    {
+      "name": "busd",
+      "address": "0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B"
+    },
+    {
+      "name": "compound",
+      "address": "0x845838DF265Dcd2c412A1Dc9e959c7d08537f8a2"
+    },
+    {
+      "name": "hbtc",
+      "address": "0xb19059ebb43466C323583928285a49f558E572Fd"
+    },
+    {
+      "name": "pax",
+      "address": "0xD905e2eaeBe188fc92179b6350807D8bd91Db0D8"
+    },
+    {
+      "name": "ren",
+      "address": "0x49849C98ae39Fff122806C06791Fa73784FB3675"
+    },
+    {
+      "name": "seth",
+      "address": "0xA3D87FffcE63B53E0d54fAa1cc983B7eB0b74A9c"
+    },
+    {
+      "name": "usdt",
+      "address": "0x9fC689CCaDa600B6DF723D9E47D84d76664a1F23"
+    },
+    {
+      "name": "y",
+      "address": "0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8"
+    },
+    {
+      "name": "dusd",
+      "address": "0x3a664Ab939FD8482048609f652f9a0B0677337B9"
+    },
+    {
+      "name": "gusd",
+      "address": "0xD2967f45c4f384DEEa880F807Be904762a3DeA07"
+    },
+    {
+      "name": "husd",
+      "address": "0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858"
+    },
+    {
+      "name": "linkusd",
+      "address": "0x6D65b498cb23deAba52db31c93Da9BFFb340FB8F"
+    },
+    {
+      "name": "musd",
+      "address": "0x1AEf73d49Dedc4b1778d0706583995958Dc862e6"
+    },
+    {
+      "name": "rsv",
+      "address": "0xC2Ee6b0334C261ED60C72f6054450b61B8f18E35"
+    },
+    {
+      "name": "usdk",
+      "address": "0x97E2768e8E73511cA874545DC5Ff8067eB19B787"
+    },
+    {
+      "name": "usdn",
+      "address": "0x4f3E8F405CF5aFC05D68142F3783bDfE13811522"
+    }
+  ],
+
   "graftEnabled": false,
   "subgraphId": "",
   "graftStartBlock": ""

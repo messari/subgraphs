@@ -41,6 +41,8 @@ dataSources:
           file: ./abis/GaugeController.json
         - name: Minter
           file: ./abis/Minter.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
         - name: ERC20
           file: ./abis/ERC20.json
         
@@ -128,6 +130,8 @@ dataSources:
           file: ./abis/Rewards.json
         - name: Minter
           file: ./abis/Minter.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
         - name: ERC20
           file: ./abis/ERC20.json
         
@@ -201,6 +205,8 @@ templates:
           file: ./abis/GaugeController.json
         - name: Rewards
           file: ./abis/Rewards.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
         - name: Minter
           file: ./abis/Minter.json
         - name: ERC20
@@ -320,6 +326,8 @@ templates:
           file: ./abis/PoolInfo.json
         - name: Rewards
           file: ./abis/Rewards.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
         - name: Minter
           file: ./abis/Minter.json
         - name: ERC20

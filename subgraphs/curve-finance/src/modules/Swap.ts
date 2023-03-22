@@ -228,8 +228,6 @@ export function Swap(
   updateSnapshotsVolume(liquidityPoolAddress, volumeUSD, block);
   UpdateMetricsAfterSwap(block);
 
-  utils.updateProtocolTotalValueLockedUSD();
-
   log.info(
     "[Exchange] LiquidityPool: {}, tokenIn: {}, tokenOut: {}, amountInUSD: {}, amountOutUSD: {}, isUnderlying: {}, TxnHash: {}",
     [

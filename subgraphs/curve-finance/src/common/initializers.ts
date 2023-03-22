@@ -141,6 +141,8 @@ export function getOrCreateToken(
       .readValue<BigInt>(contract.try_decimals(), constants.DEFAULT_DECIMALS)
       .toI32();
 
+    token.isBasePoolLpToken = false;
+
     if (address.equals(constants.ETH_ADDRESS)) {
       token.name = "ETH";
       token.symbol = "ETH";
@@ -419,6 +421,7 @@ export function getOrCreateLiquidityPool(
     pool = new LiquidityPoolStore(poolAddress.toHexString());
 
     pool.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    pool._tvlUSDExcludingBasePoolLpTokens = constants.BIGDECIMAL_ZERO;
     pool.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     pool.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     pool.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -426,10 +429,18 @@ export function getOrCreateLiquidityPool(
 
     const lpToken = utils.getLpTokenFromPool(poolAddress, block);
     if (lpToken.id != constants.NULL.TYPE_STRING) {
-      const lpTokenStore = getOrCreateLpToken(Address.fromString(lpToken.id));
+      const lpTokenAddress = Address.fromString(lpToken.id);
+      const lpTokenStore = getOrCreateLpToken(lpTokenAddress);
       lpTokenStore.poolAddress = poolAddress.toHexString();
-
       lpTokenStore.save();
+
+      if (
+        constants.HARDCODED_BASEPOOLS_LP_TOKEN.includes(lpTokenAddress) ||
+        utils.isMainRegistryPool(poolAddress)
+      ) {
+        lpToken.isBasePoolLpToken = true;
+        lpToken.save();
+      }
     }
 
     pool.name = lpToken.name;
