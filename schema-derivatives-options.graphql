@@ -1,5 +1,5 @@
 # Subgraph Schema: Derivatives Options
-# Version: 1.2.0
+# Version: 1.3.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -317,8 +317,17 @@ type DerivOptProtocol implements Protocol @entity {
   " Total number of contracts exercised+expired "
   contractsClosedCount: Int!
 
+  " Notional value of all open positions "
+  openInterestUSD: BigDecimal!
+
+  " Cumulative historical value of all open positions "
+  cumulativeOpenInterestUSD: BigDecimal!
+
   " Total number of open positions (total positions open-closed) "
   openPositionCount: Int!
+
+  " Cumulative number of open positions (minted positions) "
+  cumulativeOpenPositionCount: Int!
 
   " Total number of closed positions "
   closedPositionCount: Int!
@@ -471,6 +480,9 @@ type FinancialsDailySnapshot @entity(immutable: true) {
   " Daily Notional value of all open positions "
   dailyOpenInterestUSD: BigDecimal!
 
+  " All historical value of all open positions "
+  cumulativeOpenInterestUSD: BigDecimal!
+
   " Daily revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   dailySupplySideRevenueUSD: BigDecimal!
 
@@ -572,6 +584,9 @@ type FinancialsDailySnapshot @entity(immutable: true) {
 
   " Total number of open positions (minted-closed positions) "
   openPositionCount: Int!
+
+  " Cumulative number of open positions (minted positions) "
+  cumulativeOpenPositionCount: Int!
 
   " Daily number of closed positions "
   dailyClosedPositionCount: Int!
@@ -689,6 +704,36 @@ type LiquidityPool @entity {
   " Total number of closed positions (closed+exercised+expired) "
   closedPositionCount: Int!
 
+  " Cumulative value of all open positions "
+  cumulativeOpenInterestUSD: BigDecimal!
+
+  " Cumulative number of open positions (minted positions) "
+  cumulativeOpenPositionCount: Int!
+
+  " All historical deposit notional volume occurred in this pool, in USD "
+  cumulativeDepositedVolumeUSD: BigDecimal!
+
+  " All historical withdraw notional volume occurred in this pool, in USD "
+  cumulativeWithdrawVolumeUSD: BigDecimal!
+
+  " All trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenAmount: [BigInt!]!
+
+  " All trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenUSD: [BigDecimal!]!
+
+  " All deposit trade notional Deposit volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositedVolumeByTokenAmount: [BigInt!]!
+
+  " All deposit trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositedVolumeByTokenUSD: [BigDecimal!]!
+
+  " All withdraw trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenAmount: [BigInt!]!
+
+  " All withdraw trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenUSD: [BigDecimal!]!
+
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
@@ -773,6 +818,9 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Daily Notional value of all open positions "
   dailyOpenInterestUSD: BigDecimal!
 
+  " All Notional value of all open positions "
+  cumulativeOpenInterestUSD: BigDecimal!
+
   " Daily premium paid to enter a position. "
   dailyEntryPremiumUSD: BigDecimal!
 
@@ -854,6 +902,9 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Daily number of open positions (contracts minted-closed)"
   dailyOpenPositionCount: Int!
 
+  " Cumulative number of open positions (contracts minted) "
+  cumulativeOpenPositionCount: Int!
+
   " Total number of open positions (contracts minted-closed) "
   openPositionCount: Int!
 
@@ -875,6 +926,12 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " All historical trade notional volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 
+  " All trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenAmount: [BigInt!]!
+
+  " All trade notional volumefor a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenUSD: [BigDecimal!]!
+
   " Daily Deposit trade notional volume in USD "
   dailyDepositedVolumeUSD: BigDecimal!
 
@@ -887,6 +944,12 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Deposit historical trade notional volume occurred in this pool, in USD "
   cumulativeDepositedVolumeUSD: BigDecimal!
 
+  " All deposit trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositedVolumeByTokenAmount: [BigInt!]!
+
+  " All deposit trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositedVolumeByTokenUSD: [BigDecimal!]!
+
   " Daily Withdraw trade notional volume occurred in USD "
   dailyWithdrawVolumeUSD: BigDecimal!
 
@@ -898,6 +961,12 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
   " Withdraw historical trade notional volume occurred in this pool, in USD "
   cumulativeWithdrawVolumeUSD: BigDecimal!
+
+  " All Withdraw trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenAmount: [BigInt!]!
+
+  " All Withdraw trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenUSD: [BigDecimal!]!
 
   " Daily notional volume in USD taken of underlying at time of contract closed but not exercised"
   dailyClosedVolumeUSD: BigDecimal!
@@ -972,6 +1041,9 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " Hourly Notional value of all open positions "
   hourlyOpenInterestUSD: BigDecimal!
 
+  " All notional value of all open positions "
+  cumulativeOpenInterestUSD: BigDecimal!
+
   " Hourly premium paid to enter a position. "
   hourlyEntryPremiumUSD: BigDecimal!
 
@@ -1020,6 +1092,12 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " All historical trade notional volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 
+  " All trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenAmount: [BigInt!]!
+
+  " All trade notional volume occurred in in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenUSD: [BigDecimal!]!
+
   " Hourly Deposit trade notional volume occurred in this pool, in USD "
   hourlyDepositVolumeUSD: BigDecimal!
 
@@ -1032,6 +1110,12 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " Deposit historical trade notional volume occurred in this pool, in USD "
   cumulativeDepositVolumeUSD: BigDecimal!
 
+  " All deposit trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositVolumeByTokenAmount: [BigInt!]!
+
+  " All deposit trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositVolumeByTokenUSD: [BigDecimal!]!
+
   " Hourly Withdraw trade notional volume occurred in this pool, in USD "
   hourlyWithdrawVolumeUSD: BigDecimal!
 
@@ -1043,6 +1127,12 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
 
   " Withdraw historical trade notional volume occurred in this pool, in USD "
   cumulativeWithdrawVolumeUSD: BigDecimal!
+
+  " All withdraw trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenAmount: [BigInt!]!
+
+  " All withdraw trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenUSD: [BigDecimal!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
