@@ -10,15 +10,11 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   TokenSent,
-  AxelarGateway as AxelarGatewayContract,
   TokenDeployed,
   ContractCallWithToken,
   ContractCall,
   ContractCallApprovedWithMint,
   ContractCallApproved,
-  MintTokenCall,
-  BurnTokenCall,
-  DeployTokenCall,
   Executed,
 } from "../generated/AxelarGateway/AxelarGateway";
 import {
@@ -53,7 +49,6 @@ import {
   BIGINT_ONE,
   getNetworkSpecificConstant,
   Network,
-  TokenType,
   BIGINT_MINUS_ONE,
 } from "./sdk/util/constants";
 import { Pool } from "./sdk/protocols/bridge/pool";
