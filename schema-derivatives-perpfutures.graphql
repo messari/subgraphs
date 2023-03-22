@@ -1,5 +1,5 @@
 # Subgraph Schema: Derivatives Perpetual Futures
-# Version: 1.2.0
+# Version: 1.2.1
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -780,37 +780,37 @@ type LiquidityPool @entity {
   " All historical trade notional volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 
-  " cumulative volume of pool by token amount "
+  " Cumulative volume of pool by token amount "
   cumulativeVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative volume of pool in USD "
+  " Cumulative volume of pool in USD "
   cumulativeVolumeByTokenUSD: [BigDecimal!]!
 
   " Inflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming into protocol from trade, at the time of position opened. "
   cumulativeInflowVolumeUSD: BigDecimal!
 
-  " cumulative inflow volume of pool by token amount "
+  " Cumulative inflow volume of pool by token amount "
   cumulativeInflowVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative inflow volume of pool in USD "
+  " Cumulative inflow volume of pool in USD "
   cumulativeInflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Inflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming into protocol from trade, at the time of position closed. "
   cumulativeClosedInflowVolumeUSD: BigDecimal!
 
-  " cumulative closed inflow volume of pool by token amount "
+  " Cumulative closed inflow volume of pool by token amount "
   cumulativeClosedInflowVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative closed inflow volume of pool in USD "
+  " Cumulative closed inflow volume of pool in USD "
   cumulativeClosedInflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Outflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming outof protocol from trade. "
   cumulativeOutflowVolumeUSD: BigDecimal!
 
-  " cumulative outflow volume of pool by token amount "
+  " Cumulative outflow volume of pool by token amount "
   cumulativeOutflowVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative outflow volume of pool in USD "
+  " Cumulative outflow volume of pool in USD "
   cumulativeOutflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
@@ -1014,13 +1014,13 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Daily trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
   dailyVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative volume of pool by token amount "
+  " Cumulative volume of pool by token amount "
   cumulativeVolumeByTokenAmount: [BigInt!]!
 
   " Daily trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
   dailyVolumeByTokenUSD: [BigDecimal!]!
 
-  " cumulative volume of pool in USD "
+  " Cumulative volume of pool in USD "
   cumulativeVolumeByTokenUSD: [BigDecimal!]!
 
   " All historical trade notional volume occurred in this pool, in USD "
@@ -1035,13 +1035,13 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Daily Inflow trade notional volume occurred in in this pool for a specific input token, in native amount, at time of position open. The ordering should be the same as the pool's `inputTokens` field. "
   dailyInflowVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative inflow volume of pool by token amount "
+  " Cumulative inflow volume of pool by token amount "
   cumulativeInflowVolumeByTokenAmount: [BigInt!]!
 
   " Daily Inflow trade notional volume occurred in this pool for a specific input token, in USD, based on value of underlying assets coming into protocol from trade, at time of position open. The ordering should be the same as the pool's `inputTokens` field. "
   dailyInflowVolumeByTokenUSD: [BigDecimal!]!
 
-  " cumulative inflow volume of pool in USD "
+  " Cumulative inflow volume of pool in USD "
   cumulativeInflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Inflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming into protocol from trade, at the time of position open. "
@@ -1053,13 +1053,13 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Daily Inflow trade notional volume occurred in in this pool for a specific input token, in native amount, at time of position closed The ordering should be the same as the pool's `inputTokens` field. "
   dailyClosedInflowVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative closed inflow volume of pool by token amount "
+  " Cumulative closed inflow volume of pool by token amount "
   cumulativeClosedInflowVolumeByTokenAmount: [BigInt!]!
 
   " Daily Inflow trade notional volume occurred in this pool for a specific input token, in USD, based on value of underlying assets coming into protocol from trade, at time of position closed. The ordering should be the same as the pool's `inputTokens` field. "
   dailyClosedInflowVolumeByTokenUSD: [BigDecimal!]!
 
-  " cumulative closed inflow volume of pool in USD "
+  " Cumulative closed inflow volume of pool in USD "
   cumulativeClosedInflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Inflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming into protocol from trade, at the time of position closed. "
@@ -1074,13 +1074,13 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Daily Outflow trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
   dailyOutflowVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative outflow volume of pool by token amount "
+  " Cumulative outflow volume of pool by token amount "
   cumulativeOutflowVolumeByTokenAmount: [BigInt!]!
 
   " Daily Outflow trade notional volume occurred in this pool for a specific input token, in USD, based on value of underlying assets coming out of protocol from trade. The ordering should be the same as the pool's `inputTokens` field. "
   dailyOutflowVolumeByTokenUSD: [BigDecimal!]!
 
-  " cumulative outflow volume of pool in USD "
+  " Cumulative outflow volume of pool in USD "
   cumulativeOutflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Outflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming outof protocol from trade. "
@@ -1198,13 +1198,13 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " Hourly trade volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
   hourlyVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative volume of pool by token amount "
+  " Cumulative volume of pool by token amount "
   cumulativeVolumeByTokenAmount: [BigInt!]!
 
   " Hourly trade volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
   hourlyVolumeByTokenUSD: [BigDecimal!]!
 
-  " cumulative volume of pool in USD "
+  " Cumulative volume of pool in USD "
   cumulativeVolumeByTokenUSD: [BigDecimal!]!
 
   " All historical trade volume occurred in this pool, in USD "
@@ -1216,13 +1216,13 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " Hourly Inflow trade notional volume occurred in this pool for a specific input token, in native amount, at time position open. The ordering should be the same as the pool's `inputTokens` field. "
   hourlyInflowVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative inflow volume of pool by token amount "
+  " Cumulative inflow volume of pool by token amount "
   cumulativeInflowVolumeByTokenAmount: [BigInt!]!
 
   " Hourly Inflow trade notional volume occurred in in this pool for a specific input token, in USD, at time position open. The ordering should be the same as the pool's `inputTokens` field. "
   hourlyInflowVolumeByTokenUSD: [BigDecimal!]!
 
-  " cumulative inflow volume of pool in USD "
+  " Cumulative inflow volume of pool in USD "
   cumulativeInflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Inflow historical trade notional volume occurred in this pool, in USD, at time position open. "
@@ -1234,13 +1234,13 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " Hourly Inflow trade notional volume occurred in this pool for a specific input token, in native amount, at time position closed. The ordering should be the same as the pool's `inputTokens` field. "
   hourlyClosedInflowVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative closed inflow volume of pool by token amount "
+  " Cumulative closed inflow volume of pool by token amount "
   cumulativeClosedInflowVolumeByTokenAmount: [BigInt!]!
 
   " Hourly Inflow trade notional volume occurred in in this pool for a specific input token, in USD, at time position closed. The ordering should be the same as the pool's `inputTokens` field. "
   hourlyClosedInflowVolumeByTokenUSD: [BigDecimal!]!
 
-  " cumulative closed inflow volume of pool in USD "
+  " Cumulative closed inflow volume of pool in USD "
   cumulativeClosedInflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Inflow historical trade notional volume occurred in this pool, in USD, at time position closed. "
@@ -1252,13 +1252,13 @@ type LiquidityPoolHourlySnapshot @entity(immutable: true) {
   " Hourly Outflow trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
   hourlyOutflowVolumeByTokenAmount: [BigInt!]!
 
-  " cumulative outflow volume of pool by token amount "
+  " Cumulative outflow volume of pool by token amount "
   cumulativeOutflowVolumeByTokenAmount: [BigInt!]!
 
   " Hourly Outflow trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
   hourlyOutflowVolumeByTokenUSD: [BigDecimal!]!
 
-  " cumulative outflow volume of pool in USD "
+  " Cumulative outflow volume of pool in USD "
   cumulativeOutflowVolumeByTokenUSD: [BigDecimal!]!
 
   " Outflow historical trade notional volume occurred in this pool, in USD "
@@ -1903,31 +1903,26 @@ type PositionSnapshot @entity(immutable: true) {
   timestamp: BigInt!
 }
 
+###########################
+##### Helper Entities #####
+###########################
+
+# Helper entity for calculating daily/hourly fields
 type _ActivityHelper @entity {
   id: Bytes!
 
-  dailyActiveUsers: Int!
-  hourlyActiveUsers: Int!
+  activeUsers: Int!
+  activeDepositors: Int!
+  activeBorrowers: Int!
+  activeLiquidators: Int!
+  activeLiquidatees: Int!
 
-  dailyActiveDepositors: Int!
-  dailyActiveBorrowers: Int!
-  dailyActiveLiquidators: Int!
-  dailyActiveLiquidatees: Int!
+  transactionCount: Int!
 
-  dailyTransactionCount: Int!
-  hourlyTransactionCount: Int!
-
-  dailyDepositCount: Int!
-  hourlyDepositCount: Int!
-
-  dailyWithdrawCount: Int!
-  hourlyWithdrawCount: Int!
-
-  dailyBorrowCount: Int!
-  hourlyBorrowCount: Int!
-
-  dailySwapCount: Int!
-  hourlySwapCount: Int!
+  depositCount: Int!
+  withdrawCount: Int!
+  borrowCount: Int!
+  swapCount: Int!
 }
 
 # Helper entity for getting positions
