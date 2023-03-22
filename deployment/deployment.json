@@ -3187,13 +3187,13 @@
       }
     }
   },
-  "maple-finance": {
+  "maple-finance-v1": {
     "schema": "lending",
-    "base": "maple-finance",
-    "protocol": "maple-finance",
+    "base": "maple-finance-v1",
+    "protocol": "maple-finance-v1",
     "project": "maple",
     "deployments": {
-      "maple-finance-ethereum": {
+      "maple-finance-v1-ethereum": {
         "network": "ethereum",
         "status": "prod",
         "versions": {
@@ -3229,10 +3229,10 @@
     "deployments": {
       "maple-finance-v2-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
         "files": {

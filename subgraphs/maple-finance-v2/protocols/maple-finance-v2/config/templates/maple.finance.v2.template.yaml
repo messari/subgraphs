@@ -1,0 +1,246 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum/contract
+    name: PoolManagerFactory
+    network: {{ network }}
+    source:
+      address: "{{ poolManagerFactory.address }}"
+      abi: ContractFactory
+      startBlock: {{ poolManagerFactory.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: ContractFactory
+          file: ./abis/ContractFactory.json
+        - name: PoolManager
+          file: ./abis/PoolManager.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: InstanceDeployed(indexed uint256,indexed address,bytes)
+          handler: handleManagerInstanceDeployed
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
+    name: MapleLoanFactory
+    network: {{ network }}
+    source:
+      address: "{{ mapleLoanFactory.address }}"
+      abi: ContractFactory
+      startBlock: {{ mapleLoanFactory.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: ContractFactory
+          file: ./abis/ContractFactory.json
+      eventHandlers:
+        - event: InstanceDeployed(indexed uint256,indexed address,bytes)
+          handler: handleLoanInstanceDeployed
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
+    name: LoanManagerFactory
+    network: {{ network }}
+    source:
+      address: "{{ loanManagerFactory.address }}"
+      abi: ContractFactory
+      startBlock: {{ loanManagerFactory.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: ContractFactory
+          file: ./abis/ContractFactory.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+      eventHandlers:
+        - event: InstanceDeployed(indexed uint256,indexed address,bytes)
+          handler: handleLoanManagerInstanceDeployed
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
+    name: LiquidatorFactory
+    network: {{ network }}
+    source:
+      address: "{{ liquidatorFactory.address }}"
+      abi: ContractFactory
+      startBlock: {{ liquidatorFactory.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: ContractFactory
+          file: ./abis/ContractFactory.json
+      eventHandlers:
+        - event: InstanceDeployed(indexed uint256,indexed address,bytes)
+          handler: handleLiquidatorInstanceDeployed
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
+    name: MigrationHelper
+    network: {{ network }}
+    source:
+      address: "{{ migrationHelper.address }}"
+      abi: MigrationHelper
+      startBlock: {{ migrationHelper.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MigrationHelper
+          file: ./abis/MigrationHelper.json
+        - name: MapleLoan
+          file: ./abis/MapleLoan.json
+        - name: MapleGlobals
+          file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+        - name: Pool
+          file: ./abis/Pool.json
+      eventHandlers:
+        - event: LoanAddedToTransitionLoanManager(indexed address,indexed address)
+          handler: handleLoanAddedToTransitionLoanManager
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+templates:
+  - kind: ethereum/contract
+    name: Pool
+    network: {{ network }}
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: MapleGlobals
+          file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
+        - name: MapleLoan
+          file: ./abis/MapleLoan.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
+    name: PoolManager
+    network: {{ network }}
+    source:
+      abi: PoolManager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: PoolManager
+          file: ./abis/PoolManager.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+        - name: MapleLoan
+          file: ./abis/MapleLoan.json
+        - name: MapleGlobals
+          file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
+        - name: Pool
+          file: ./abis/Pool.json
+      eventHandlers:
+        - event: LoanFunded(indexed address,indexed address,uint256)
+          handler: handleLoanFunded
+        - event: SetAsActive(bool)
+          handler: handleSetAsActive
+        - event: LiquidityCapSet(uint256)
+          handler: handleLiquidityCapSet
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
+    name: MapleLoan
+    network: {{ network }}
+    source:
+      abi: MapleLoan
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MapleLoan
+          file: ./abis/MapleLoan.json
+        - name: MapleGlobals
+          file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
+        - name: PoolManager
+          file: ./abis/PoolManager.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+      eventHandlers:
+        - event: PaymentMade(uint256,uint256,uint256)
+          handler: handlePaymentMade
+      file: ./protocols/maple-finance-v2/src/mapping.ts
+  - kind: ethereum/contract
+    name: Liquidator
+    network: {{ network }}
+    source:
+      abi: Liquidator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Liquidator
+          file: ./abis/Liquidator.json
+        - name: MapleGlobals
+          file: ./abis/MapleGlobals.json
+        - name: Chainlink
+          file: ./abis/Chainlink.json
+        - name: MapleLoan
+          file: ./abis/MapleLoan.json
+        - name: LoanManager
+          file: ./abis/LoanManager.json
+        - name: Pool
+          file: ./abis/Pool.json
+      eventHandlers:
+        - event: PortionLiquidated(uint256,uint256)
+          handler: handlePortionLiquidated
+      file: ./protocols/maple-finance-v2/src/mapping.ts

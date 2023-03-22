@@ -1,8 +1,8 @@
-import { ERC20 } from "../../../../generated/Configurator/ERC20";
-import { ERC20SymbolBytes } from "../../../../generated/Configurator/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../../../generated/Configurator/ERC20NameBytes";
+import { ERC20 } from "../../generated/PoolManagerFactory/ERC20";
+import { ERC20SymbolBytes } from "../../generated/PoolManagerFactory/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/PoolManagerFactory/ERC20NameBytes";
 import { Address, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { RewardToken, Token } from "../../../../generated/schema";
+import { RewardToken, Token } from "../../generated/schema";
 import { BIGDECIMAL_ZERO } from "./constants";
 
 /**
