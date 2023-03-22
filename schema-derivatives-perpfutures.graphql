@@ -13,7 +13,7 @@ enum Network {
   COSMOS
   CRONOS
   MAINNET # Ethereum Mainnet
-  FANTOMƒ
+  FANTOM
   FUSE
   HARMONY
   JUNO
