@@ -420,7 +420,10 @@ export function handleCommandExecuted(event: Executed): void {
 
       // burnToken: transfer to 0x or address(this)
       if (toAddress.equals(Address.zero()) || toAddress.equals(event.address)) {
-        log.info("[handleCommandExecuted]_handleBurnToken tx={}-{}", [
+        log.info("[handleCommandExecuted] burn {} {} token from {} tx={}-{}", [
+          transferAmount.toString(),
+          tokenAddress.toHexString(),
+          fromAddress.toHexString(),
           thisLog.transactionHash.toHexString(),
           thisLog.logIndex.toString(),
         ]);
@@ -439,7 +442,10 @@ export function handleCommandExecuted(event: Executed): void {
         fromAddress.equals(Address.zero()) ||
         fromAddress.equals(event.address)
       ) {
-        log.info("[handleCommandExecuted]_handleBurnToken tx={}-{}", [
+        log.info("[handleCommandExecuted] mint {} {} token to {} tx={}-{}", [
+          transferAmount.toString(),
+          tokenAddress.toHexString(),
+          toAddress.toHexString(),
           thisLog.transactionHash.toHexString(),
           thisLog.logIndex.toString(),
         ]);
