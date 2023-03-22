@@ -1,0 +1,239 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: Router
+    network: {{ network }}
+    source:
+      address: "{{ router.address }}"
+      abi: Router
+      startBlock: {{ router.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - BridgeProtocol
+      abis:
+        - name: Bridge
+          file: ./abis/Stargate/Bridge.json
+        - name: LPStaking
+          file: ./abis/Stargate/LPStaking.json
+        - name: LPStakingTime
+          file: ./abis/Stargate/LPStakingTime.json
+        - name: Pool
+          file: ./abis/Stargate/Pool.json
+        - name: Router
+          file: ./abis/Stargate/Router.json
+        - name: Factory
+          file: ./abis/Stargate/Factory.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      callHandlers:
+        - function: createPool(uint256,address,uint8,uint8,string,string)
+          handler: handleCreatePool
+        - function: addLiquidity(uint256,uint256,address)
+          handler: handleAddLiquidity
+      file: {{{ file }}}
+  - kind: ethereum
+    name: LPStaking
+    network: {{ network }}
+    source:
+      address: "{{ lpStaking.address }}"
+      abi: {{ lpStaking.abi }}
+      startBlock: {{ lpStaking.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - BridgeProtocol
+      abis:
+        - name: Bridge
+          file: ./abis/Stargate/Bridge.json
+        - name: LPStaking
+          file: ./abis/Stargate/LPStaking.json
+        - name: LPStakingTime
+          file: ./abis/Stargate/LPStakingTime.json
+        - name: Pool
+          file: ./abis/Stargate/Pool.json
+        - name: Router
+          file: ./abis/Stargate/Router.json
+        - name: Factory
+          file: ./abis/Stargate/Factory.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256)
+          handler: handleStake
+        - event: Withdraw(indexed address,indexed uint256,uint256)
+          handler: handleUnstake
+      file: {{{ file }}}
+templates:
+  - name: PoolTemplate
+    kind: ethereum
+    network: {{ network }}
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - BridgeProtocol
+      abis:
+        - name: Bridge
+          file: ./abis/Stargate/Bridge.json
+        - name: LPStaking
+          file: ./abis/Stargate/LPStaking.json
+        - name: LPStakingTime
+          file: ./abis/Stargate/LPStakingTime.json
+        - name: Pool
+          file: ./abis/Stargate/Pool.json
+        - name: Router
+          file: ./abis/Stargate/Router.json
+        - name: Factory
+          file: ./abis/Stargate/Factory.json
+
+        - name: ERC20
+          file: ./abis/Tokens/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/Tokens/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/Tokens/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: Swap(uint16,uint256,address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleSwapOut
+        - event: RedeemLocal(address,uint256,uint256,uint16,uint256,bytes)
+          handler: handleRedeemLocal
+        - event: InstantRedeemLocal(address,uint256,uint256,address)
+          handler: handleInstantRedeemLocal
+        - event: RedeemRemote(uint16,uint256,address,uint256,uint256)
+          handler: handleRedeemRemote
+        - event: RedeemLocalCallback(address,uint256,uint256)
+          handler: handleRedeemLocalCallback
+      callHandlers:
+        - function: swapRemote(uint16,uint256,address,(uint256,uint256,uint256,uint256,uint256,uint256))
+          handler: handleSwapIn
+      file: {{{ file }}}

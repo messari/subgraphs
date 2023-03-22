@@ -1,0 +1,15 @@
+{
+  "deployment": "POLYGON_MAINNET",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "rootChainManager": {
+    "address": "0xA0c68C638235ee32657e8f720a23ceC1bFc77C77",
+    "startBlock": 10735437
+  },
+  "fxERC20RootTunnel": {
+    "startBlock": 13241945
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

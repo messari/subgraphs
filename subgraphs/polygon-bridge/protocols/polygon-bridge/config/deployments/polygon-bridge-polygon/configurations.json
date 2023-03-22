@@ -1,0 +1,12 @@
+{
+  "deployment": "STARGATE_POLYGON",
+  "network": "matic",
+  "file": "./src/mappings/handlers.ts",
+  "router": {
+    "address": "0x45A01E4e04F14f7A4a6702c74187c5F6222033cd",
+    "startBlock": 26032409
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
