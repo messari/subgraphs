@@ -115,3 +115,7 @@ Diagrams of the protocol, specifically focusing on key things needed for the Sub
 Validation done for this subgraph against other data sources can be found here: [Validation Spreadsheet](https://docs.google.com/spreadsheets/d/1viyui7nAzUXMx68EJSW61xC251uS8zpKePzV2xijjGQ/edit?usp=sharing)
 
 Validation for subgraph self-consistency, and some helper queries for the Validation Spreadsheet are here: [Notebooks](./validation)
+
+## Notes
+
+-   Maple 1.0 was deprecated as of December 11th, 2022. See [this](https://maplefinance.gitbook.io/maple/maple-1.0/maple-token-holders) for more info.

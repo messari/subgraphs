@@ -2,15 +2,15 @@ import axios from 'axios';
 import moment from "moment";
 import { protocolErrorMessages } from './errorSchemas.js';
 import { resolveQueriesToAttempt } from './resolutions.js';
-import { monitorVersion, ProtocolTypeEntityName, sleep, colorsArray } from './util.js';
-import { getGithubIssues, postGithubIssue } from './github.js';
+import { monitorVersion, ProtocolTypeEntityName, sleep, colorsArray, parseIndexingThreadStrings, indexingErrorEmbedSchema } from './util.js';
+import { postGithubIssue } from './github.js';
 
 // Error handling functions
 
 export async function errorNotification(error, channelId = process.env.CHANNEL_ID) {
     try {
-        const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor from ${process.env.CHANNEL_ID} on Channel ${channelId}- Errors detected**\n` + error });
-        console.log(postJSON)
+        // const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor from ${process.env.CHANNEL_ID} on Channel ${channelId}- Errors detected**\n` + error });
+        console.log(error)
         return null;
     } catch (err) {
         errorNotification("ERROR LOCATION 6 " + err.message);
@@ -131,9 +131,13 @@ export async function clearMessages(channelId) {
 }
 
 export async function getAllThreadsToClear(deleteMsgsFromBeforeTS, channelId) {
-    const msgs = await getDiscordMessages([], channelId);
-    msgs.push({ id: process.env.PROD_CHANNEL });
-    await clearAllThreads(msgs, deleteMsgsFromBeforeTS);
+    try {
+        const msgs = await getDiscordMessages([], channelId);
+        msgs.push({ id: process.env.PROD_CHANNEL });
+        await clearAllThreads(msgs, deleteMsgsFromBeforeTS);
+    } catch (err) {
+        errorNotification("ERROR LOCATION 11 " + err?.message);
+    }
 }
 
 export async function clearAllThreads(msgs, deleteMsgsFromBeforeTS) {
@@ -166,7 +170,8 @@ export async function clearThread(deleteMsgsFromBeforeTS, channelId) {
         }
 
         const timeAgo = new Date(deleteMsgsFromBeforeTS)
-        messages = msgs.filter(x => moment(new Date(x.timestamp)).isSameOrBefore(timeAgo)).map(x => x.id).slice(0, 100)
+        messages = msgs.filter(x => moment(new Date(x.timestamp)).isSameOrBefore(timeAgo));
+        messages = messages.map(x => x.id).slice(0, 100);
         messages.pop();
         if (messages.length === 1) {
             deleteSingleMessage(messages[0], channelId);
@@ -255,10 +260,11 @@ export async function startProtocolThread(subject, base, channelId = process.env
         "Content-Type": "application/json",
     }
 
-    let postJSON = JSON.stringify({ "content": subject + ' (Base: ' + base + ')' });
+    let subjectStr = subject;
     if (base === '') {
-        postJSON = JSON.stringify({ "content": subject });
+        subjectStr += ' (Base: ' + base + ')';
     }
+    const postJSON = JSON.stringify({ "content": subjectStr });
     let msgId = "";
     try {
         const res = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
@@ -305,24 +311,19 @@ export async function unarchiveThread(channelId = process.env.CHANNEL_ID) {
 }
 
 export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThread, indexDeploymentIssues, channelId, issuesGithub, issuesProdDiscord) {
-    try {
-        const embedObjects = [];
-        const indexingErrorEmbed = {
-            title: "Indexing Errors",
-            description: 'These subgraphs encountered a fatal error in indexing',
-            fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Failed At Block', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
-            footer: { text: monitorVersion }
-        };
+    const embedObjects = [];
+    const indexingErrorEmbed = JSON.parse(JSON.stringify(indexingErrorEmbedSchema));
 
-        const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
-        const indexErrorEmbedDepos = {};
-        const indexErrorPendingHash = {};
-        const indexErrorDecenHash = {};
-        const prodStatusDepoMapping = {};
-        const aggThreadProtocolErrorEmbeds = [];
-        const aggThreadIndexErrorEmbeds = JSON.parse(JSON.stringify([...indexingErrorEmbed.fields]));
-        let zapierProdThreadIndexing = [];
-        let zapierProdThreadProtocols = {};
+    const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
+    const indexErrorEmbedDepos = {};
+    const indexErrorPendingHash = {};
+    const indexErrorDecenHash = {};
+    const prodStatusDepoMapping = {};
+    const aggThreadProtocolErrorEmbeds = [];
+    const aggThreadIndexErrorEmbeds = JSON.parse(JSON.stringify([...indexingErrorEmbed.fields]));
+    let zapierProdThreadIndexing = [];
+    let zapierProdThreadProtocols = {};
+    try {
         deploymentsOnProtocol.forEach((depo) => {
             let networkString = depo.network;
             if (depo.status === 'prod') {
@@ -345,7 +346,7 @@ export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesO
             }
             protocolErrorEmbed.title = `Protocol Level Errors on ${protocol}-${networkString}`;
             if (!!depo.indexingError && !depo?.protocolType?.includes('governance')) {
-                const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
+                const messagesAfterTS = new Date(Date.now() - ((86400000 * 7)));
                 let issueHasBeenAlerted = false;
                 if (!!depo.pending) {
                     issueHasBeenAlerted = (indexDeploymentIssues.find(x => x.chain.includes(networkString.split(' ')[0] + "-PENDING") && x.indexed.includes(depo?.indexingError?.toString()) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS)) || false);
@@ -400,7 +401,12 @@ export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesO
                 }
             }
         });
-        const chains = [];
+    } catch (err) {
+        errorNotification("ERROR LOCATION constructEmbedMsg() initializing embed object " + err.message);
+    }
+
+    const chains = [];
+    try {
         if (Object.keys(indexErrorEmbedDepos)?.length > 0) {
             let labelValueThread = "";
             let failureBlockThread = "";
@@ -440,6 +446,11 @@ export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesO
             indexingErrorEmbed.fields[1].value += failureBlockThread;
             embedObjects.unshift(indexingErrorEmbed);
         }
+    } catch (err) {
+        errorNotification("ERROR LOCATION constructEmbedMsg() generating specialized embed messages " + err.message);
+    }
+
+    try {
         if (embedObjects.length > 0) {
             let indexingErrorEmbedsToAggThread = [];
             if (aggThreadIndexErrorEmbeds[1].value.length > 3) {
@@ -448,6 +459,11 @@ export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesO
             aggThreadMsgObjects.push({ embeds: indexingErrorEmbedsToAggThread, protocol: protocol, protocolErrorEmbeds: aggThreadProtocolErrorEmbeds });
             await sendDiscordMessage(embedObjects, protocol, channelId);
         }
+    } catch (err) {
+        errorNotification("ERROR LOCATION constructEmbedMsg() sending discord message " + err.message);
+    }
+
+    try {
         let object = {};
         if (Object.keys(zapierProdThreadProtocols).length > 0 || zapierProdThreadIndexing.length > 0) {
             if (zapierProdThreadIndexing.length > 0) {
@@ -464,11 +480,10 @@ export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesO
                 await sendMessageToZapierThread(object.zapier);
             }
         }
-
-        return null;
     } catch (err) {
-        errorNotification("ERROR LOCATION 15 " + err.message);
+        errorNotification("ERROR LOCATION constructEmbedMsg() sending zapier/gh embed " + err.message);
     }
+    return;
 }
 
 let aggThreadMsgObjects = [];
@@ -487,15 +502,11 @@ export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHAN
         };
         aggThreadMsgObjects.forEach(aggThread => {
             let aggThreadMsgObjectsToSend = [];
-
-            const indexingErrorEmbed = {
-                title: "Indexing Errors " + aggThread.protocol,
-                description: 'These subgraphs encountered a fatal error in indexing',
-                fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Failed At Block', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
-                footer: { text: monitorVersion }
-            };
+            const indexingErrorEmbed = JSON.parse(JSON.stringify(indexingErrorEmbedSchema));
+            indexingErrorEmbed.title += " " + aggThread.protocol;
             const msg = currentThreadMessages.find(x => {
-                return !!x.embeds.find(embed => embed.title.toUpperCase().includes(aggThread.protocol.toUpperCase())) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS);
+                const isAfterTs = moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS);
+                return !!x.embeds.find(embed => embed.title.toUpperCase().includes(aggThread.protocol.toUpperCase())) && isAfterTs;
             });
 
             let embedToAdd = false;
@@ -504,10 +515,10 @@ export async function sendMessageToAggThread(aggThreadId = process.env.PROD_CHAN
                 if (!!msg) {
                     existingEmbed = msg.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
                     if (existingEmbed) {
-                        const aggThreadNetworkStringsArr = aggThread.embeds[0].value.split('\n').join('-----').split('-----');
-                        const aggThreadBlockValueArr = aggThread.embeds[1].value.split('\n').join('-----').split('-----');
-                        const existingMessageNetworkStringsArr = existingEmbed.fields[0].value.split('\n').join('-----').split('-----');
-                        const existingMessageBlockValueArr = existingEmbed.fields[1].value.split('\n').join('-----').split('-----');
+                        const aggThreadNetworkStringsArr = parseIndexingThreadStrings(aggThread.embeds[0]);
+                        const aggThreadBlockValueArr = parseIndexingThreadStrings(aggThread.embeds[1]);
+                        const existingMessageNetworkStringsArr = parseIndexingThreadStrings(existingEmbed.fields[0]);
+                        const existingMessageBlockValueArr = parseIndexingThreadStrings(existingEmbed.fields[1]);
                         aggThreadNetworkStringsArr.forEach((networkLine, networkIdx) => {
                             const existingMessageIndex = existingMessageNetworkStringsArr.indexOf(networkLine);
                             if (!(existingMessageIndex >= 0 && aggThreadBlockValueArr[networkIdx] === existingMessageBlockValueArr[existingMessageIndex])) {
@@ -645,7 +656,7 @@ export async function sendMessageToZapierThread(messageConstruction) {
 
         const req = await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch(async function (err) {
             await sleep(5000);
-            await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch((zapierErr) => console.log("ERROR ZAPIER MSG # " + zapierErr?.response?.data?.message + zapierErr?.message + zapierErr?.response?.config?.data));
+            await axios.post(baseURL, postJSON, { "headers": { ...headers } }).catch((zapierErr) => console.log("ERROR ZAPIER MSG # " + zapierErr?.message));
         });
         return req;
     } catch (err) {
