@@ -30,7 +30,8 @@ import {
   NativeGasAdded,
   RefundCall,
 } from "../generated/AxelarGasService/AxelarGasService";
-import { CustomEventType, SDK } from "./sdk/protocols/bridge";
+import { SDK } from "./sdk/protocols/bridge";
+import { CustomEventType } from "./sdk/util/events";
 import { TokenPricer } from "./sdk/protocols/config";
 import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
 import {
