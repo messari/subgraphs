@@ -349,7 +349,7 @@ export function handleLiquidation(event: LogRepay): void {
       .lastPriceUSD!
   );
 
-  const liqudidatedAccount = getOrCreateAccount(
+  const liquidateeAccount = getOrCreateAccount(
     event.params.to.toHexString(),
     protocol
   );
@@ -361,7 +361,7 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.hash = event.transaction.hash.toHexString();
   liquidateEvent.nonce = event.transaction.nonce;
   liquidateEvent.logIndex = event.transactionLogIndex.toI32();
-  liquidateEvent.liquidatee = liqudidatedAccount.id;
+  liquidateEvent.liquidatee = liquidateeAccount.id;
   liquidateEvent.liquidator = liquidatorAccount.id;
   liquidateEvent.blockNumber = event.block.number;
   liquidateEvent.timestamp = event.block.timestamp;
@@ -383,11 +383,11 @@ export function handleLiquidation(event: LogRepay): void {
   usageDailySnapshot.dailyLiquidateCount += 1;
   usageDailySnapshot.save();
 
-  liqudidatedAccount.liquidateCount = liqudidatedAccount.liquidateCount + 1;
-  liqudidatedAccount.save();
+  liquidateeAccount.liquidateCount = liquidateeAccount.liquidateCount + 1;
+  liquidateeAccount.save();
   addAccountToProtocol(
     EventType.LIQUIDATEE,
-    liqudidatedAccount,
+    liquidateeAccount,
     event,
     protocol
   );

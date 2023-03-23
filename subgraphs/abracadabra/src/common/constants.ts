@@ -150,61 +150,50 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 /////////////////////////////
 
 export const BENTOBOX_ADDRESS_MAINNET =
-  "0xf5bce5077908a1b7370b9ae04adc565ebd643966".toLowerCase();
+  "0xf5bce5077908a1b7370b9ae04adc565ebd643966";
 export const BENTOBOX_ADDRESS_AVALANCHE =
-  "0xf4f46382c2be1603dc817551ff9a7b333ed1d18f".toLowerCase();
+  "0xf4f46382c2be1603dc817551ff9a7b333ed1d18f";
 export const BENTOBOX_ADDRESS_ARBITRUM =
-  "0x74c764d41b77dbbb4fe771dab1939b00b146894a".toLowerCase();
+  "0x74c764d41b77dbbb4fe771dab1939b00b146894a";
 export const BENTOBOX_ADDRESS_FANTOM =
-  "0xf5bce5077908a1b7370b9ae04adc565ebd643966".toLowerCase();
+  "0xf5bce5077908a1b7370b9ae04adc565ebd643966";
 export const BENTOBOX_ADDRESS_BSC =
-  "0x090185f2135308bad17527004364ebcc2d37e5f6".toLowerCase();
+  "0x090185f2135308bad17527004364ebcc2d37e5f6";
 
 export const DEGENBOX_ADDRESS_MAINNET =
-  "0xd96f48665a1410c0cd669a88898eca36b9fc2cce".toLowerCase();
+  "0xd96f48665a1410c0cd669a88898eca36b9fc2cce";
 export const DEGENBOX_ADDRESS_AVALANCHE =
-  "0x1fc83f75499b7620d53757f0b01e2ae626aae530".toLowerCase();
+  "0x1fc83f75499b7620d53757f0b01e2ae626aae530";
 export const DEGENBOX_ADDRESS_ARBITRUM = ZERO_ADDRESS;
 export const DEGENBOX_ADDRESS_FANTOM =
-  "0x74a0bca2eeedf8883cb91e37e9ff49430f20a616".toLowerCase();
+  "0x74a0bca2eeedf8883cb91e37e9ff49430f20a616";
 export const DEGENBOX_ADDRESS_BSC = ZERO_ADDRESS;
 
 export const ABRA_ACCOUNTS = [
   // same on all chains
-  "0xfddfe525054efaad204600d00ca86adb1cc2ea8a".toLowerCase(),
-  "0xb4efda6daf5ef75d08869a0f9c0213278fb43b6c".toLowerCase(),
+  "0xfddfe525054efaad204600d00ca86adb1cc2ea8a",
+  "0xb4efda6daf5ef75d08869a0f9c0213278fb43b6c",
 ];
 
-export const MIM_MAINNET =
-  "0x99d8a9c45b2eca8864373a26d1459e3dff1e17f3".toLowerCase();
-export const MIM_AVALANCHE =
-  "0x130966628846bfd36ff31a822705796e8cb8c18d".toLowerCase();
-export const MIM_ARBITRUM =
-  "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a".toLowerCase();
-export const MIM_FANTOM =
-  "0x82f0b8b456c1a451378467398982d4834b6829c1".toLowerCase();
-export const MIM_BSC =
-  "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba".toLowerCase();
+export const MIM_MAINNET = "0x99d8a9c45b2eca8864373a26d1459e3dff1e17f3";
+export const MIM_AVALANCHE = "0x130966628846bfd36ff31a822705796e8cb8c18d";
+export const MIM_ARBITRUM = "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a";
+export const MIM_FANTOM = "0x82f0b8b456c1a451378467398982d4834b6829c1";
+export const MIM_BSC = "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba";
 
 export const STAKED_SPELL_MAINNET =
-  "0x26fa3fffb6efe8c1e69103acb4044c26b9a106a9".toLowerCase();
+  "0x26fa3fffb6efe8c1e69103acb4044c26b9a106a9";
 export const STAKED_SPELL_AVALANCHE =
-  "0x3ee97d514bbef95a2f110e6b9b73824719030f7a".toLowerCase();
+  "0x3ee97d514bbef95a2f110e6b9b73824719030f7a";
 export const STAKED_SPELL_ARBITRUM =
-  "0xf7428ffcb2581a2804998efbb036a43255c8a8d3".toLowerCase();
-export const STAKED_SPELL_FANTOM =
-  "0xbb29d2a58d880af8aa5859e30470134deaf84f2b".toLowerCase();
+  "0xf7428ffcb2581a2804998efbb036a43255c8a8d3";
+export const STAKED_SPELL_FANTOM = "0xbb29d2a58d880af8aa5859e30470134deaf84f2b";
 
-export const YV_USDT_MARKET =
-  "0x551a7cff4de931f32893c928bbc3d25bf1fc5147".toLowerCase();
-export const YV_WETH_MARKET =
-  "0x6ff9061bb8f97d948942cef376d98b51fa38b91f".toLowerCase();
-export const YV_YFI_MARKET =
-  "0xffbf4892822e0d552cff317f65e1ee7b5d3d9ae6".toLowerCase();
-export const YV_USDC_MARKET =
-  "0x6cbafee1fab76ca5b5e144c43b3b50d42b7c8c8f".toLowerCase();
-export const XSUSHI_MARKET =
-  "0xbb02a884621fb8f5bfd263a67f58b65df5b090f3".toLowerCase();
+export const YV_USDT_MARKET = "0x551a7cff4de931f32893c928bbc3d25bf1fc5147";
+export const YV_WETH_MARKET = "0x6ff9061bb8f97d948942cef376d98b51fa38b91f";
+export const YV_YFI_MARKET = "0xffbf4892822e0d552cff317f65e1ee7b5d3d9ae6";
+export const YV_USDC_MARKET = "0x6cbafee1fab76ca5b5e144c43b3b50d42b7c8c8f";
+export const XSUSHI_MARKET = "0xbb02a884621fb8f5bfd263a67f58b65df5b090f3";
 
 export const COLLATERIZATION_RATE_PRECISION = 5;
 
