@@ -86,7 +86,7 @@ export namespace ActivityType {
 /////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; // used for Mainnet pricing
+export const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // used for Mainnet pricing
 
 ///////////////////
 ///// Numbers /////
