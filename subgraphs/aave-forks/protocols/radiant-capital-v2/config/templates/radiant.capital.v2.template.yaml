@@ -30,7 +30,7 @@ dataSources:
       eventHandlers:
         - event: PriceOracleUpdated(indexed address)
           handler: handlePriceOracleUpdated
-      file: ./protocols/radiant-capital/src/mapping.ts
+      file: ./protocols/radiant-capital-v2/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPool
     network: {{ network }}
@@ -91,7 +91,7 @@ dataSources:
           handler: handlePaused
         - event: Unpaused()
           handler: handleUnpaused
-      file: ./protocols/radiant-capital/src/mapping.ts
+      file: ./protocols/radiant-capital-v2/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator
     network: {{ network }}
@@ -133,7 +133,7 @@ dataSources:
           handler: handleReserveDeactivated
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
-      file: ./protocols/radiant-capital/src/mapping.ts
+      file: ./protocols/radiant-capital-v2/src/mapping.ts
   - kind: ethereum/contract
     name: UniswapV3Pool
     network: {{ network }}
@@ -155,7 +155,7 @@ dataSources:
       eventHandlers:
         - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
           handler: handleSwap
-      file: ./protocols/radiant-capital/src/rewards.ts
+      file: ./protocols/radiant-capital-v2/src/rewards.ts
 templates:
   - kind: ethereum/contract
     name: AToken
@@ -175,7 +175,7 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleCollateralTransfer
-      file: ./protocols/radiant-capital/src/mapping.ts
+      file: ./protocols/radiant-capital-v2/src/mapping.ts
   - kind: ethereum/contract
     name: VariableDebtToken
     network: {{ network }}
@@ -194,7 +194,7 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleVariableTransfer
-      file: ./protocols/radiant-capital/src/mapping.ts
+      file: ./protocols/radiant-capital-v2/src/mapping.ts
   - kind: ethereum/contract
     name: StableDebtToken
     network: {{ network }}
@@ -213,4 +213,4 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleStableTransfer
-      file: ./protocols/radiant-capital/src/mapping.ts
+      file: ./protocols/radiant-capital-v2/src/mapping.ts

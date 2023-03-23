@@ -14,8 +14,6 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export const REWARD_TOKEN_ADDRESS =
   "0x3082cc23568ea640225c2467653db90e9250aaa0"; // RDNT token
-export const RDNT_WETH_Uniswap_Pair =
-  "0xa8ba5f3ccfb8d2b7f4225e371cde11871e088933"; // RDNT/WETH TODO
 export const RWETH_ADDRESS = "0x0df5dfd95966753f01cb80e76dc20ea958238c46";
 
 /////////////////////////////
