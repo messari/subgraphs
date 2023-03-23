@@ -1797,6 +1797,12 @@ type PositionSnapshot @entity(immutable: true) {
   " Notional value of collateral position, in USD "
   collateralBalanceUSD: BigDecimal!
 
+  " Notional value of position right before position closed, in USD, only useful at close events. "
+  closeBalanceUSD: BigDecimal
+
+  " Notional value of collateral position ight before position closed, in USD, only useful at close events "
+  closeCollateralBalanceUSD: BigDecimal
+
   " Realised profit and loss in USD at the time of close or event "
   realisedPnlUSD: BigDecimal
 
