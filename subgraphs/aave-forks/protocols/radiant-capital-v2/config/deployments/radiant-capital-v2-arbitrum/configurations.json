@@ -13,7 +13,7 @@
     "address": "0xf4b1486dd74d07706052a33d31d7c0aafd0659e1"
   },
   "UniswapV3Pool": {
-    "startBlock": 71305703,
+    "startBlock": "71305703",
     "address": "0xa8ba5f3ccfb8d2b7f4225e371cde11871e088933"
   },
   "graftEnabled": false,
