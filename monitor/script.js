@@ -94,13 +94,12 @@ async function executionFlow() {
   await getAllThreadsToClear(Date.now() - (86400000 * 7), process.env.CHANNEL_ID);
   await clearThread(Date.now() - (86400000), process.env.PROD_CHANNEL);
 
-  const indexStatusFlowObject = await indexStatusFlow(deployments);
-  deployments = { ...indexStatusFlowObject.deployments, ...decentralizedDeployments };
-  const invalidDeployments = indexStatusFlowObject.invalidDeployments;
+  const indexStatusFlowDepos = await indexStatusFlow(deployments);
+  deployments = { ...indexStatusFlowDepos, ...decentralizedDeployments };
 
   // pass invalid deployments arr to protocolLevel, before execution check if depo key is included in array
-  deployments = await protocolLevel(deployments, invalidDeployments);
-  deployments = await protocolDerivedFields(deployments, invalidDeployments);
+  deployments = await protocolLevel(deployments);
+  deployments = await protocolDerivedFields(deployments);
   const currentDiscordMessages = await getDiscordMessages([]);
   const protocolThreadsToStart = [];
   let protocolNameToChannelMapping = {};
@@ -113,8 +112,8 @@ async function executionFlow() {
     }
   })
 
-  const channelMapping = await resolveThreadCreation(protocolThreadsToStart, protocolNameToChannelMapping, protocolNameToBaseMapping);
-  protocolNameToChannelMapping = { ...protocolNameToChannelMapping, ...channelMapping };
+  const newProtocolThreads = await resolveThreadCreation(protocolThreadsToStart, protocolNameToChannelMapping, protocolNameToBaseMapping);
+  protocolNameToChannelMapping = { ...protocolNameToChannelMapping, ...newProtocolThreads };
   let channelToProtocolIssuesMapping = {};
   let channelToIndexIssuesMapping = {};
 
@@ -122,13 +121,13 @@ async function executionFlow() {
     const channelId = protocolNameToChannelMapping[protocolName];
     channelToProtocolIssuesMapping[channelId] = {};
     channelToIndexIssuesMapping[channelId] = [];
-    Object.keys(deployments).filter(x => {
-      return deployments[x].protocolName === protocolName;
-    }).forEach(x => {
-      if (deployments[x].pending) {
-        channelToProtocolIssuesMapping[channelId][deployments[x].network + '-pending'] = [];
-      } else {
-        channelToProtocolIssuesMapping[channelId][deployments[x].network] = [];
+    Object.keys(deployments).forEach(x => {
+      if (deployments[x].protocolName === protocolName) {
+        if (deployments[x].pending) {
+          channelToProtocolIssuesMapping[channelId][deployments[x].network + '-pending'] = [];
+        } else {
+          channelToProtocolIssuesMapping[channelId][deployments[x].network] = [];
+        }
       }
     });
   });
@@ -151,7 +150,7 @@ async function executionFlow() {
       indexDeploymentIssues = [];
     }
     return constructEmbedMsg(protocolName, deploymentSet, protocolIssuesOnThread, indexDeploymentIssues, channelId, issuesGithub, currentThreadMessages);
-  })
+  });
 
   await resolveQueriesToAttempt(messagesToPost);
 
