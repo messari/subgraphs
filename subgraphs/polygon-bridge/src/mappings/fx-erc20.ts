@@ -22,6 +22,7 @@ import { getUsdPricePerToken, getUsdPrice } from "../prices";
 import { Versions } from "../versions";
 import { ERC20 } from "../../generated/FxERC20Events/ERC20";
 import { RootChainManager } from "../../generated/FxERC20Events/RootChainManager";
+import { BIGDECIMAL_ZERO } from "../prices/common/constants";
 
 export const conf = new BridgeConfig(
   NetworkConfigs.getFactoryAddress(),
@@ -34,14 +35,18 @@ export const conf = new BridgeConfig(
 export class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
     const pricedToken = Address.fromBytes(token.id);
-
+    if (NetworkConfigs.ignoreToken(pricedToken.toHexString())) {
+      return BIGDECIMAL_ZERO;
+    }
     return getUsdPricePerToken(pricedToken).usdPrice;
   }
 
   getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
     const pricedToken = Address.fromBytes(token.id);
     const _amount = bigIntToBigDecimal(amount, token.decimals);
-
+    if (NetworkConfigs.ignoreToken(pricedToken.toHexString())) {
+      return BIGDECIMAL_ZERO;
+    }
     return getUsdPrice(pricedToken, _amount);
   }
 }
@@ -49,14 +54,26 @@ export class Pricer implements TokenPricer {
 export class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
     const wrappedERC20 = ERC20.bind(address);
-    const name = wrappedERC20.name();
-    const symbol = wrappedERC20.symbol();
-    const decimals = wrappedERC20.decimals();
+    const name_call = wrappedERC20.try_name();
+    const symbol_call = wrappedERC20.try_symbol();
+    const decimals_call = wrappedERC20.try_decimals();
+
+    if (name_call.reverted || symbol_call.reverted || decimals_call.reverted) {
+      log.warning("[tokenInit] token params not found for address: {}", [
+        address.toHexString(),
+      ]);
+
+      return {
+        name: "unknown",
+        symbol: "unknown",
+        decimals: 18,
+      };
+    }
 
     return {
-      name,
-      symbol,
-      decimals,
+      name: name_call.value,
+      symbol: symbol_call.value,
+      decimals: decimals_call.value,
     };
   }
 }
@@ -67,7 +84,6 @@ export function handleTokenMappedERC20(event: TokenMappedERC20): void {
 
   const pool = sdk.Pools.loadPool<string>(event.params.rootToken);
   const rootToken = sdk.Tokens.getOrCreateToken(event.params.rootToken);
-  const childToken = sdk.Tokens.getOrCreateToken(event.params.childToken);
 
   if (!pool.isInitialized) {
     pool.initialize(

@@ -13,7 +13,6 @@ export function handlePOSTokenMapped(event: TokenMapped): void {
 
   const pool = sdk.Pools.loadPool<string>(event.params.rootToken);
   const rootToken = sdk.Tokens.getOrCreateToken(event.params.rootToken);
-  const childToken = sdk.Tokens.getOrCreateToken(event.params.childToken);
 
   if (!pool.isInitialized) {
     pool.initialize(

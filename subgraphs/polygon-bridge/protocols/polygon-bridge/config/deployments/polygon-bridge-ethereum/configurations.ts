@@ -22,11 +22,11 @@ export class PolygonMainnetConfigurations implements Configurations {
   getRewardToken(): string {
     return "";
   }
-  ignoreToken(tokenAddr: string): Boolean {
-    const ignoreList = [""];
-    if (ignoreList.indexOf(tokenAddr)) {
-      return true;
-    }
+  ignoreToken(tokenAddr: string): boolean {
+    const ignoreList = ["0x5D0fa08AEb173AdE44B0Cf7F31d506D8E04f0ac8"];
+    // if (ignoreList.indexOf(tokenAddr) > -1) {
+    //   return true;
+    // }
 
     return false;
   }

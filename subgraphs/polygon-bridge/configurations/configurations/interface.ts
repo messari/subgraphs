@@ -4,5 +4,5 @@ export interface Configurations {
   getProtocolSlug(): string;
   getFactoryAddress(): string;
   getRewardToken(): string;
-  ignoreToken(tokenAddr: string): Boolean;
+  ignoreToken(tokenAddr: string): boolean;
 }

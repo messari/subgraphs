@@ -21,7 +21,7 @@ export class PolygonMaticConfigurations implements Configurations {
   getRewardToken(): string {
     return "";
   }
-  ignoreToken(tokenAddr: string): Boolean {
+  ignoreToken(tokenAddr: string): boolean {
     const ignoreList = [""];
     if (ignoreList.indexOf(tokenAddr)) {
       return true;
