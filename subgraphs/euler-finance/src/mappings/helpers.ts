@@ -680,7 +680,7 @@ function updateTransactionCount(
 // return null if not a liquidation event or error
 function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
   if (!event.receipt) {
-    log.warning("[isReserveFeeFromLiquidation][{}] has no event.receipt", [event.transaction.hash.toHexString()]);
+    log.warning("[getRepayForLiquidation][{}] has no event.receipt", [event.transaction.hash.toHexString()]);
     return null;
   }
 

@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
   ActiveAuthor,
   Author,
@@ -6,7 +6,7 @@ import {
   DailySnapshot,
   HourlySnapshot,
   Network,
-  Stats,
+  Stat,
 } from "../generated/schema";
 import {
   BIGDECIMAL_ZERO,
@@ -19,7 +19,6 @@ import {
   NETWORK_NAME,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
-  BIGDECIMAL_TWO,
   BIGINT_MAX,
 } from "./constants";
 import { BlockData, UpdateNetworkData } from "./mapping";
@@ -109,12 +108,13 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
   if (blockData.author) {
     // check for new hourly authors
-    const id =
+    const id = Bytes.fromUTF8(
       IntervalType.DAILY +
-      "-" +
-      blockData.author!.toHexString() +
-      "-" +
-      snapshot.id;
+        "-" +
+        blockData.author!.toHexString() +
+        "-" +
+        snapshot.id.toString()
+    );
     let activeAuthor = ActiveAuthor.load(id);
     if (!activeAuthor) {
       activeAuthor = new ActiveAuthor(id);
@@ -235,12 +235,13 @@ function updateHourlySnapshot(blockData: BlockData, network: Network): void {
   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
   if (blockData.author) {
     // check for new hourly authors
-    const id =
+    const id = Bytes.fromUTF8(
       IntervalType.HOURLY +
-      "-" +
-      blockData.author!.toHexString() +
-      "-" +
-      snapshot.id;
+        "-" +
+        blockData.author!.toHexString() +
+        "-" +
+        snapshot.id.toString()
+    );
     let activeAuthor = ActiveAuthor.load(id);
     if (!activeAuthor) {
       activeAuthor = new ActiveAuthor(id);
@@ -370,9 +371,9 @@ export function updateAuthors(
 }
 
 //
-// Update Stats entity and return the id
+// Update Stat entity and return the id
 // calculate the variance, q1, q3 once the daily/hourly snapshot is done
-function updateStats(id: string, dataType: string, value: BigInt): string {
+function updateStats(id: string, dataType: string, value: BigInt): Bytes {
   const stats = getOrCreateStats(id, dataType);
 
   // basic fields
@@ -383,191 +384,32 @@ function updateStats(id: string, dataType: string, value: BigInt): string {
   stats.max = value.gt(stats.max) ? value : stats.max;
   stats.min = value.lt(stats.min) ? value : stats.min;
 
-  // update mean / median
-  const values = stats.values;
-  values.push(value);
-  stats.values = values;
-  stats.mean = stats.sum
-    .toBigDecimal()
-    .div(BigDecimal.fromString(stats.count.toString()));
+  // update mean
+  const delta = value.toBigDecimal().minus(stats.mean);
+  stats.mean = stats.mean.plus(
+    delta.div(BigDecimal.fromString(stats.count.toString()))
+  );
+
+  // update rolling variance
+  // Using the Welford's online algorithm
+  const delta2 = value.toBigDecimal().minus(stats.mean);
+  stats._meanSquared = stats._meanSquared!.plus(delta.times(delta2));
+  stats.variance = updateVariance(stats._meanSquared!, stats.count);
 
   stats.save();
   return stats.id;
 }
 
-function getMedian(list: BigInt[]): BigDecimal {
-  // base case - error catching
-  if (list.length == 0) {
+//
+//
+// Gets new variance using Welford's online algorithm
+// This algorithm properly calcs variance for a stream of data
+function updateVariance(meanSquared: BigDecimal, count: i32): BigDecimal {
+  if (count < 2) {
     return BIGDECIMAL_ZERO;
   }
-  if (list.length == 1) {
-    return list[0].toBigDecimal();
-  }
-  if (list.length == 2) {
-    return list[0].plus(list[1]).toBigDecimal().div(BIGDECIMAL_TWO);
-  }
 
-  if (list.length % 2 == 1) {
-    // list length is odd
-    const index = (list.length - 1) / 2;
-    return list[index].toBigDecimal();
-  } else {
-    // list length is even
-    const index1 = list.length / 2;
-    const index2 = index1 + 1;
-    const sum = list[index1].toBigDecimal().plus(list[index2].toBigDecimal());
-    return sum.div(BIGDECIMAL_TWO);
-  }
-}
-
-//
-//
-// update the previous daily snapshots statistical data
-function updatePreviousDailySnapshot(snapshot: DailySnapshot): void {
-  const network = getOrCreateNetwork(NETWORK_NAME);
-
-  // update network dailyBlock stats
-  updateStats(
-    network.id,
-    DataType.BLOCKS,
-    BigInt.fromI32(snapshot.dailyBlocks)
-  );
-  updateStatisicalData(getOrCreateStats(network.id, DataType.BLOCKS));
-
-  // calculate var, q1, and q3 for prev snapshots
-  if (snapshot.dailyUniqueAuthors) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.AUTHORS));
-  }
-  if (snapshot.dailyDifficulty) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.DIFFICULTY));
-  }
-  if (snapshot.dailyGasUsed) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_USED));
-  }
-  if (snapshot.dailyGasLimit) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_LIMIT));
-  }
-  if (snapshot.dailyBurntFees) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.BURNT_FEES));
-  }
-  if (snapshot.dailyRewards) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.REWARDS));
-  }
-  if (snapshot.dailySize) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SIZE));
-  }
-  if (snapshot.dailyChunks) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.CHUNKS));
-  }
-  if (snapshot.dailySupply) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SUPPLY));
-  }
-  if (snapshot.dailyTransactions) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
-  }
-  if (snapshot.dailyBlockInterval) {
-    updateStatisicalData(
-      getOrCreateStats(snapshot.id, DataType.BLOCK_INTERVAL)
-    );
-  }
-  if (snapshot.dailyGasPrice) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
-  }
-}
-
-//
-//
-// update the previous hourly snapshots statistical data
-function updatePreviousHourlySnapshot(snapshot: HourlySnapshot): void {
-  // calculate var, q1, and q3 for prev snapshots
-  if (snapshot.hourlyUniqueAuthors) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.AUTHORS));
-  }
-  if (snapshot.hourlyDifficulty) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.DIFFICULTY));
-  }
-  if (snapshot.hourlyGasUsed) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_USED));
-  }
-  if (snapshot.hourlyGasLimit) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_LIMIT));
-  }
-  if (snapshot.hourlyBurntFees) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.BURNT_FEES));
-  }
-  if (snapshot.hourlyRewards) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.REWARDS));
-  }
-  if (snapshot.hourlySize) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SIZE));
-  }
-  if (snapshot.hourlyChunks) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.CHUNKS));
-  }
-  if (snapshot.hourlySupply) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SUPPLY));
-  }
-  if (snapshot.hourlyTransactions) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
-  }
-  if (snapshot.hourlyBlockInterval) {
-    updateStatisicalData(
-      getOrCreateStats(snapshot.id, DataType.BLOCK_INTERVAL)
-    );
-  }
-  if (snapshot.hourlyGasPrice) {
-    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
-  }
-}
-
-//
-//
-// This function updates a snapshots variance, q1, and q3
-function updateStatisicalData(statsEntity: Stats): void {
-  // sort values array
-  statsEntity.values = statsEntity.values.sort();
-
-  // find variance
-  statsEntity.variance = findVariance(statsEntity.mean, statsEntity.values);
-
-  // find first and second half arrays
-  let firstHalf: BigInt[];
-  let secondHalf: BigInt[];
-  const middleIndex = Math.round(statsEntity.values.length / 2) as i32;
-
-  if (statsEntity.values.length % 2 == 1) {
-    // list length is odd
-    firstHalf = statsEntity.values.slice(0, middleIndex - 2);
-    secondHalf = statsEntity.values.slice(middleIndex);
-  } else {
-    // list length is even
-    firstHalf = statsEntity.values.slice(0, middleIndex - 1);
-    secondHalf = statsEntity.values.slice(middleIndex);
-  }
-
-  statsEntity.q1 = getMedian(firstHalf);
-  statsEntity.q3 = getMedian(secondHalf);
-  statsEntity.save();
-}
-
-//
-//
-// Finds the variance of a list of numbers with the mean already supplied
-// Variance = Sum( (x - mean)^2 ) / N
-function findVariance(mean: BigDecimal, values: BigInt[]): BigDecimal {
-  let sumOfDeviationSquared = BIGDECIMAL_ZERO;
-  for (let i = 0; i < values.length; i++) {
-    const value = values[i].toBigDecimal();
-    const deviation = value.minus(mean);
-    const deviationSquared = deviation.times(deviation);
-    sumOfDeviationSquared = sumOfDeviationSquared.plus(deviationSquared);
-  }
-
-  return values.length == 0
-    ? BIGDECIMAL_ZERO
-    : sumOfDeviationSquared.div(
-        BigDecimal.fromString(values.length.toString())
-      );
+  return meanSquared.div(BigDecimal.fromString((count - 1).toString()));
 }
 
 /////////////////
@@ -575,7 +417,7 @@ function findVariance(mean: BigDecimal, values: BigInt[]): BigDecimal {
 /////////////////
 
 function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
-  const id = (timestamp.toI64() / SECONDS_PER_DAY).toString();
+  const id = Bytes.fromI32(timestamp.toI32() / SECONDS_PER_DAY);
   let dailySnapshot = DailySnapshot.load(id);
   if (!dailySnapshot) {
     dailySnapshot = new DailySnapshot(id);
@@ -586,30 +428,12 @@ function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
     dailySnapshot.cumulativeUniqueAuthors = INT_ZERO;
 
     dailySnapshot.save();
-
-    // update variance, q1, q3 of previous snapshot
-    // update dailyBlocks stats in network
-    // we know that the previous snapshot exists because we are handling every block
-    const previousSnapshotId = (
-      timestamp.toI64() / SECONDS_PER_DAY -
-      1
-    ).toString();
-    const previousSnapshot = DailySnapshot.load(previousSnapshotId);
-    if (!previousSnapshot) {
-      log.warning(
-        "[getOrCreateDailySnapshot] previous snapshot not found at timestamp: {}",
-        [timestamp.toString()]
-      );
-    } else {
-      // snapshot exists
-      updatePreviousDailySnapshot(previousSnapshot);
-    }
   }
   return dailySnapshot;
 }
 
 function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
-  const id = (timestamp.toI64() / SECONDS_PER_HOUR).toString();
+  const id = Bytes.fromI32(timestamp.toI32() / SECONDS_PER_HOUR);
   let hourlySnapshot = HourlySnapshot.load(id);
   if (!hourlySnapshot) {
     hourlySnapshot = new HourlySnapshot(id);
@@ -620,30 +444,12 @@ function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
     hourlySnapshot.cumulativeUniqueAuthors = INT_ZERO;
 
     hourlySnapshot.save();
-
-    // update variance, q1, q3 of previous snapshot
-    // we know that the previous snapshot exists because we are handling every block
-    const previousSnapshotId = (
-      timestamp.toI64() / SECONDS_PER_HOUR -
-      1
-    ).toString();
-    const previousSnapshot = HourlySnapshot.load(previousSnapshotId);
-    log.warning("previous hourly: {}", [previousSnapshotId]);
-    if (!previousSnapshot) {
-      log.warning(
-        "[getOrCreateHourlySnapshot] previous snapshot not found at timestamp: {}",
-        [timestamp.toString()]
-      );
-    } else {
-      // snapshot exists
-      updatePreviousHourlySnapshot(previousSnapshot);
-    }
   }
   return hourlySnapshot;
 }
 
 export function createBlock(blockData: BlockData): void {
-  const block = new Block(blockData.height.toString());
+  const block = new Block(Bytes.fromI32(blockData.height.toI32()));
 
   block.hash = blockData.hash;
   block.timestamp = blockData.timestamp;
@@ -689,11 +495,11 @@ function getOrCreateNetwork(id: string): Network {
   return network;
 }
 
-function getOrCreateStats(snapshot: string, dataType: string): Stats {
-  const id = snapshot.concat("-").concat(dataType);
-  let stats = Stats.load(id);
+function getOrCreateStats(snapshot: string, dataType: string): Stat {
+  const id = Bytes.fromUTF8(snapshot.concat("-").concat(dataType));
+  let stats = Stat.load(id);
   if (!stats) {
-    stats = new Stats(id);
+    stats = new Stat(id);
     stats.count = INT_ZERO;
     stats.mean = BIGDECIMAL_ZERO;
     stats.max = BIGINT_ZERO;
@@ -701,8 +507,8 @@ function getOrCreateStats(snapshot: string, dataType: string): Stats {
     stats.variance = BIGDECIMAL_ZERO;
     stats.q3 = BIGDECIMAL_ZERO;
     stats.q1 = BIGDECIMAL_ZERO;
-    stats.values = [];
     stats.sum = BIGINT_ZERO;
+    stats._meanSquared = BIGDECIMAL_ZERO;
     stats.save();
   }
 

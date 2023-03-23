@@ -1,5 +1,5 @@
-import { BigInt, Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { _Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
+import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
+import { Deposit, Swap, Withdraw } from "../../generated/schema";
 import { Asset as AssetTemplate } from "../../generated/templates";
 import { getOrCreateAsset, getOrCreateAssetPool, getOrCreateDexAmm, getOrCreateToken } from "../common/getters";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
@@ -25,11 +25,11 @@ export function createDeposit(
   to: Address,
   sender: Address,
 ): Deposit {
-  let protocol = getOrCreateDexAmm();
-  let deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+  const protocol = getOrCreateDexAmm();
+  const deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
-  let pool = getOrCreateAssetPool(event, assetAddress, event.address, inputTokenAddress);
-  let inputToken = getOrCreateToken(event, inputTokenAddress);
+  const pool = getOrCreateAssetPool(event, assetAddress, event.address, inputTokenAddress);
+  const inputToken = getOrCreateToken(event, inputTokenAddress);
 
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
@@ -58,11 +58,11 @@ export function createWithdraw(
   to: Address,
   sender: Address,
 ): Withdraw {
-  let withdraw = new Withdraw(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+  const withdraw = new Withdraw(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
-  let protocol = getOrCreateDexAmm();
-  let pool = getOrCreateAssetPool(event, assetAddress, event.address, inputTokenAddress);
-  let inputToken = getOrCreateToken(event, inputTokenAddress);
+  const protocol = getOrCreateDexAmm();
+  const pool = getOrCreateAssetPool(event, assetAddress, event.address, inputTokenAddress);
+  const inputToken = getOrCreateToken(event, inputTokenAddress);
 
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.logIndex.toI32();
@@ -93,14 +93,14 @@ export function createSwap(
   actualOutputTokenAmount: BigInt,
   to: Address,
 ): Swap {
-  let swap = new Swap(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+  const swap = new Swap(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
-  let protocol = getOrCreateDexAmm();
-  let inputToken = getOrCreateToken(event, inputTokenAddress);
-  let outputToken = getOrCreateToken(event, outputTokenAddress);
+  const protocol = getOrCreateDexAmm();
+  const inputToken = getOrCreateToken(event, inputTokenAddress);
+  const outputToken = getOrCreateToken(event, outputTokenAddress);
 
-  let amountInUsd = tokenAmountToUSDAmount(inputToken, inputTokenAmount);
-  let amountOutUsd = tokenAmountToUSDAmount(outputToken, actualOutputTokenAmount);
+  const amountInUsd = tokenAmountToUSDAmount(inputToken, inputTokenAmount);
+  const amountOutUsd = tokenAmountToUSDAmount(outputToken, actualOutputTokenAmount);
 
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();

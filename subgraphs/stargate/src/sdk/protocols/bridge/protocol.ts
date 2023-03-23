@@ -67,7 +67,7 @@ export class Bridge {
     protocol = new BridgeProtocolSchema(id);
     protocol.name = conf.getName();
     protocol.slug = conf.getSlug();
-    protocol.network = dataSource.network().toUpperCase();
+    protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = constants.ProtocolType.BRIDGE;
     protocol.permissionType = conf.getPermissionType();
     protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
@@ -166,6 +166,14 @@ export class Bridge {
    */
   getCurrentChainID(): BigInt {
     return networkToChainID(this.protocol.network);
+  }
+
+  /**
+   *
+   * @returns {number} The number of pools.
+   */
+  getPoolCount(): number {
+    return this.protocol.totalPoolCount;
   }
 
   /**

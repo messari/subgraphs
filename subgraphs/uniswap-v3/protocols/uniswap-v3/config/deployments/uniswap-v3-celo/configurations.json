@@ -6,6 +6,6 @@
   "nonFungiblePositionManagerAddressStartBlock": 13916372,
   "deployment": "UNISWAP_V3_CELO",
   "graftEnabled": false,
-  "subgraphId": "QmSc7pZu9tm455ZCLVK9CDdusdMGR3DfbsBQpvuYyUN13a",
-  "graftStartBlock": 15118044
+  "subgraphId": "QmT16sB6PNNqauEDe7DEs2ErafrmXNFaup2ayRQvC9P9Ea",
+  "graftStartBlock": 17855816
 }

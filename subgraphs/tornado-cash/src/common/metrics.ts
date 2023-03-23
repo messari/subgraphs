@@ -23,10 +23,10 @@ export function updatePoolMetrics(
   poolAddress: string,
   event: ethereum.Event
 ): void {
-  let poolMetricsDaily = getOrCreatePoolDailySnapshot(event);
-  let poolMetricsHourly = getOrCreatePoolHourlySnapshot(event);
+  const poolMetricsDaily = getOrCreatePoolDailySnapshot(event);
+  const poolMetricsHourly = getOrCreatePoolHourlySnapshot(event);
 
-  let pool = getOrCreatePool(poolAddress, event);
+  const pool = getOrCreatePool(poolAddress, event);
 
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsDaily.cumulativeSupplySideRevenueUSD =
@@ -35,6 +35,7 @@ export function updatePoolMetrics(
     pool.cumulativeProtocolSideRevenueUSD;
   poolMetricsDaily.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
   poolMetricsDaily.inputTokenBalances = pool.inputTokenBalances;
+  poolMetricsDaily.inputTokenBalancesUSD = pool.inputTokenBalancesUSD;
   poolMetricsDaily.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   poolMetricsDaily.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
 
@@ -48,6 +49,7 @@ export function updatePoolMetrics(
     pool.cumulativeProtocolSideRevenueUSD;
   poolMetricsHourly.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
   poolMetricsHourly.inputTokenBalances = pool.inputTokenBalances;
+  poolMetricsHourly.inputTokenBalancesUSD = pool.inputTokenBalancesUSD;
   poolMetricsHourly.rewardTokenEmissionsAmount =
     pool.rewardTokenEmissionsAmount;
   poolMetricsHourly.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
@@ -61,12 +63,12 @@ export function updatePoolMetrics(
 
 // Update usage metrics entities
 export function updateUsageMetrics(event: ethereum.Event): void {
-  let from = event.transaction.from.toHexString();
+  const from = event.transaction.from.toHexString();
 
-  let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
-  let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
+  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
+  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
 
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetricsDaily.blockNumber = event.block.number;
@@ -78,14 +80,14 @@ export function updateUsageMetrics(event: ethereum.Event): void {
   usageMetricsHourly.hourlyTransactionCount += INT_ONE;
 
   // Number of days since Unix epoch
-  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-  let dayId = day.toString();
-  let hourId = hour.toString();
+  const dayId = day.toString();
+  const hourId = hour.toString();
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = from.concat("-").concat(dayId);
+  const dailyActiveAccountId = from.concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -93,7 +95,7 @@ export function updateUsageMetrics(event: ethereum.Event): void {
     dailyActiveAccount.save();
   }
 
-  let hourlyActiveAccountId = from.concat("-").concat(hourId);
+  const hourlyActiveAccountId = from.concat("-").concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -119,14 +121,14 @@ export function updateUsageMetrics(event: ethereum.Event): void {
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
-  let financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
+  const financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
 
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
 
-  let pools = protocol.pools;
+  const pools = protocol.pools;
   let tvl = BIGDECIMAL_ZERO;
   for (let i = 0; i < pools.length; i++) {
-    let pool = getOrCreatePool(pools[i], event);
+    const pool = getOrCreatePool(pools[i], event);
 
     tvl = tvl.plus(pool.totalValueLockedUSD);
   }
@@ -152,68 +154,62 @@ export function updateRevenue(
   relayerFeeUsd: BigDecimal,
   protocolFeeUsd: BigDecimal
 ): void {
-  let pool = getOrCreatePool(poolAddress, event);
+  const pool = getOrCreatePool(poolAddress, event);
 
-  pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
-    relayerFeeUsd
-  );
-  pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(
-    protocolFeeUsd
-  );
+  pool.cumulativeTotalRevenueUSD =
+    pool.cumulativeTotalRevenueUSD.plus(relayerFeeUsd);
+  pool.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD.plus(protocolFeeUsd);
   pool.cumulativeSupplySideRevenueUSD = pool.cumulativeTotalRevenueUSD.minus(
     pool.cumulativeProtocolSideRevenueUSD
   );
   pool.save();
 
-  let poolMetricsDaily = getOrCreatePoolDailySnapshot(event);
+  const poolMetricsDaily = getOrCreatePoolDailySnapshot(event);
 
-  poolMetricsDaily.dailyTotalRevenueUSD = poolMetricsDaily.dailyTotalRevenueUSD.plus(
-    relayerFeeUsd
-  );
-  poolMetricsDaily.dailyProtocolSideRevenueUSD = poolMetricsDaily.dailyProtocolSideRevenueUSD.plus(
-    protocolFeeUsd
-  );
-  poolMetricsDaily.dailySupplySideRevenueUSD = poolMetricsDaily.dailyTotalRevenueUSD.minus(
-    poolMetricsDaily.dailyProtocolSideRevenueUSD
-  );
+  poolMetricsDaily.dailyTotalRevenueUSD =
+    poolMetricsDaily.dailyTotalRevenueUSD.plus(relayerFeeUsd);
+  poolMetricsDaily.dailyProtocolSideRevenueUSD =
+    poolMetricsDaily.dailyProtocolSideRevenueUSD.plus(protocolFeeUsd);
+  poolMetricsDaily.dailySupplySideRevenueUSD =
+    poolMetricsDaily.dailyTotalRevenueUSD.minus(
+      poolMetricsDaily.dailyProtocolSideRevenueUSD
+    );
   poolMetricsDaily.save();
 
-  let poolMetricsHourly = getOrCreatePoolHourlySnapshot(event);
+  const poolMetricsHourly = getOrCreatePoolHourlySnapshot(event);
 
-  poolMetricsHourly.hourlyTotalRevenueUSD = poolMetricsHourly.hourlyTotalRevenueUSD.plus(
-    relayerFeeUsd
-  );
-  poolMetricsHourly.hourlyProtocolSideRevenueUSD = poolMetricsHourly.hourlyProtocolSideRevenueUSD.plus(
-    protocolFeeUsd
-  );
-  poolMetricsHourly.hourlySupplySideRevenueUSD = poolMetricsHourly.hourlyTotalRevenueUSD.minus(
-    poolMetricsHourly.hourlyProtocolSideRevenueUSD
-  );
+  poolMetricsHourly.hourlyTotalRevenueUSD =
+    poolMetricsHourly.hourlyTotalRevenueUSD.plus(relayerFeeUsd);
+  poolMetricsHourly.hourlyProtocolSideRevenueUSD =
+    poolMetricsHourly.hourlyProtocolSideRevenueUSD.plus(protocolFeeUsd);
+  poolMetricsHourly.hourlySupplySideRevenueUSD =
+    poolMetricsHourly.hourlyTotalRevenueUSD.minus(
+      poolMetricsHourly.hourlyProtocolSideRevenueUSD
+    );
   poolMetricsHourly.save();
 
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
 
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    relayerFeeUsd
-  );
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    protocolFeeUsd
-  );
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(
-    protocol.cumulativeProtocolSideRevenueUSD
-  );
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(relayerFeeUsd);
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeUsd);
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.minus(
+      protocol.cumulativeProtocolSideRevenueUSD
+    );
   protocol.save();
 
-  let financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
+  const financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
 
-  financialMetricsDaily.dailyTotalRevenueUSD = financialMetricsDaily.dailyTotalRevenueUSD.plus(
-    relayerFeeUsd
-  );
-  financialMetricsDaily.dailyProtocolSideRevenueUSD = financialMetricsDaily.dailyProtocolSideRevenueUSD.plus(
-    protocolFeeUsd
-  );
-  financialMetricsDaily.dailySupplySideRevenueUSD = financialMetricsDaily.dailyTotalRevenueUSD.minus(
-    financialMetricsDaily.dailyProtocolSideRevenueUSD
-  );
+  financialMetricsDaily.dailyTotalRevenueUSD =
+    financialMetricsDaily.dailyTotalRevenueUSD.plus(relayerFeeUsd);
+  financialMetricsDaily.dailyProtocolSideRevenueUSD =
+    financialMetricsDaily.dailyProtocolSideRevenueUSD.plus(protocolFeeUsd);
+  financialMetricsDaily.dailySupplySideRevenueUSD =
+    financialMetricsDaily.dailyTotalRevenueUSD.minus(
+      financialMetricsDaily.dailyProtocolSideRevenueUSD
+    );
   financialMetricsDaily.save();
 }

@@ -1,27 +1,12 @@
 {
   "license": "MIT",
-  "files": [
-    "src",
-    "subgraph.yaml",
-    "schema.graphql",
-    "deployment.json"
-  ],
   "scripts": {
-    "prep:addresses:mainnet": "ts-node config/mainnetAddressScript.mustache && mustache ./config/generatedAddresses.json ./config/addresses.mustache > ./config/addresses.ts",
-    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
-    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts",
-    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_target}",
-    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs}"
+    "format": "npx prettier . --write"
   },
   "devDependencies": {
-    "@graphprotocol/contracts": "1.13.0",
-    "@graphprotocol/graph-cli": "0.32.0",
-    "@graphprotocol/graph-ts": "0.27.0",
-    "@types/mustache": "^4.2.1",
-    "@types/node": "^14.0.13",
+    "@graphprotocol/graph-cli": "0.42.4",
+    "@graphprotocol/graph-ts": "0.29.3",
     "mustache": "^4.0.1",
-    "prettier": "^2.0.5",
-    "ts-node": "^10.9.1",
-    "typescript": "^3.9.3"
+    "prettier": "^2.8.3"
   }
 }
