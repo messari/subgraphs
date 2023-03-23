@@ -90,7 +90,16 @@ class Pricer implements TokenPricer {
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
     const erc20 = _ERC20.bind(address);
-    const decimals = erc20.decimals().toI32();
+    const decimalsResult = erc20.try_decimals();
+    let decimals: i32 = 18;
+    if (!decimalsResult.reverted) {
+      decimals = decimalsResult.value.toI32();
+    } else {
+      log.warning(
+        "[getTokenParams]token {} decimals() call reverted; default to 18 decimals",
+        [address.toHexString()]
+      );
+    }
 
     let name = "Unknown Token";
     const nameResult = erc20.try_name();
@@ -102,9 +111,10 @@ class TokenInit implements TokenInitializer {
       if (!nameResult.reverted) {
         name = nameResult.value.toString();
       } else {
-        log.warning("[getTokenParams]Fail to get name for token {}", [
-          address.toHexString(),
-        ]);
+        log.warning(
+          "[getTokenParams]Fail to get name for token {}; default to 'Unknown Token'",
+          [address.toHexString()]
+        );
       }
     }
 
@@ -118,9 +128,10 @@ class TokenInit implements TokenInitializer {
       if (!symbolResult.reverted) {
         symbol = symbolResult.value.toString();
       } else {
-        log.warning("[getTokenParams]Fail to get symbol for token {}", [
-          address.toHexString(),
-        ]);
+        log.warning(
+          "[getTokenParams]Fail to get symbol for token {}; default to 'Unknown'",
+          [address.toHexString()]
+        );
       }
     }
 
