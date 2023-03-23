@@ -44,11 +44,13 @@ export async function generateDecenEndpoints(data) {
         }
         Object.values(protocol.deployments).forEach((depoData) => {
           let hostedServiceId = "";
-          if (!!depoData?.services["hosted-service"]) {
-            hostedServiceId = depoData?.services["hosted-service"]?.slug;
+          const hostedServiceObject = depoData?.services["hosted-service"];
+          if (!!hostedServiceObject) {
+            hostedServiceId = hostedServiceObject?.slug;
           }
-          if (!!depoData?.services["decentralized-network"]) {
-            hostedEndpointToDecenNetwork["https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId] = (depoData?.services["decentralized-network"]?.["query-id"]);
+          const decenObj = depoData?.services["decentralized-network"];
+          if (!!decenObj) {
+            hostedEndpointToDecenNetwork["https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId] = (decenObj?.["query-id"]);
           }
         });
       })
@@ -196,7 +198,6 @@ export async function indexStatusFlow(deployments) {
 
     const indexingStatusQueriesArray = generateIndexStatus.indexingStatusQueries;
     const indexData = await getIndexingStatusData(indexingStatusQueriesArray);
-    const invalidDeployments = [];
     Object.keys(indexData).forEach((indexDataName) => {
       const realNameString = indexDataName.split("_").join("-");
       if (!indexData[indexDataName] && indexDataName.includes("pending")) {
@@ -223,16 +224,12 @@ export async function indexStatusFlow(deployments) {
       }
 
       if (
-        !indexData[indexDataName]
+        !indexData[indexDataName] || parseFloat(deployments[realNameString]?.indexedPercentage) < 10
       ) {
-        invalidDeployments.push(realNameString);
-      }
-
-      if (parseFloat(deployments[realNameString]?.indexedPercentage) < 10) {
-        invalidDeployments.push(realNameString);
+        delete deployments[realNameString];
       }
     });
-    return { invalidDeployments, deployments };
+    return deployments;
   } catch (err) {
     errorNotification("ERROR LOCATION 2 " + err.message);
   }

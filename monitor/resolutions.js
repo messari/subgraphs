@@ -1,5 +1,5 @@
 import { errorNotification, fetchMessages, sendDiscordMessage, startProtocolThread } from "./messageDiscord.js";
-import { sleep } from "./util.js";
+import { parseIndexingThreadStrings, sleep } from "./util.js";
 
 export async function pullMessagesByThread(channelIdList, channelToProtocolIss, channelToIndexIssuesMapping) {
     const channelToProtocolIssuesMapping = JSON.parse(JSON.stringify(channelToProtocolIss));
@@ -14,12 +14,12 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIss, 
         const promiseSettle = await Promise.allSettled(fetchMessagesPromiseArr);
         promiseSettle.forEach((res) => {
             if (res?.value?.length > 0) {
-                res.value.forEach((protocolMessageObject) => {
+                res.value.forEach(async (protocolMessageObject) => {
                     const networkList = Object.keys(channelToProtocolIssuesMapping[protocolMessageObject.channel_id] || []);
                     if (networkList.length === 0) {
                         return;
                     }
-                    networkList.forEach(chain => {
+                    networkList.forEach((chain) => {
                         const chainStr = chain.split('-pending')[0];
                         const isPending = chain.split('-pending').length > 1;
 
@@ -51,8 +51,8 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIss, 
                     if (!indexedLine) {
                         return;
                     }
-                    const linesByChainArr = chainLine.split('\n').join('-----').split('-----');
-                    const linesByIndexedArr = indexedLine.split('\n').join('-----').split('-----');
+                    const linesByChainArr = await parseIndexingThreadStrings({ value: chainLine });
+                    const linesByIndexedArr = await parseIndexingThreadStrings({ value: indexedLine });
                     linesByChainArr.forEach((line, idx) => {
                         channelToIndexIssuesMapping[protocolMessageObject.channel_id].push({ chain: line, indexed: linesByIndexedArr[idx], timestamp: protocolMessageObject.timestamp });
                     })
@@ -78,11 +78,12 @@ export async function resolveThreadCreation(protocols, threadsCreated, protocolN
     useQueries = useQueries.slice(0, 5);
     const newQueriesArray = [...protocols.slice(5)];
     try {
-        const promiseSettle = await Promise.allSettled(useQueries.map(object => {
+        const threadPromises = useQueries.map(object => {
             const base = protocolNameToBaseMapping[object.protocolName];
             reqCount += 1;
             return startProtocolThread(object.protocolName, base);
-        }));
+        })
+        const promiseSettle = await Promise.allSettled(threadPromises);
         promiseSettle.forEach(res => {
             if (res?.value) {
                 threadsCreatedCopy[res?.value?.protocolName] = res?.value?.channel;
@@ -107,7 +108,7 @@ export async function resolveQueriesToAttempt(queriesToAttempt) {
     let useQueries = queriesToAttempt.slice(0, 5);
     const newQueriesArray = [...queriesToAttempt.slice(5)];
     try {
-        await Promise.allSettled(useQueries.map(object => sendDiscordMessage(object.message, object.protocolName, object.channel)));
+        await Promise.allSettled(useQueries.map(object => sendDiscordMessage(object?.message || "", object?.protocolName || "", object?.channel || "")));
     } catch (err) {
         errorNotification("ERROR LOCATION 20 " + err.message);
     }

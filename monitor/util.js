@@ -1,4 +1,6 @@
-export const monitorVersion = "v1.3.9";
+import { errorNotification } from "./messageDiscord.js";
+
+export const monitorVersion = "v1.4.0";
 
 export const sleep = m => new Promise(r => setTimeout(r, m));
 
@@ -43,10 +45,15 @@ export const colorsArray = [
 ];
 
 export async function parseIndexingThreadStrings(strObject) {
-    if (strObject.value) {
-        return strObject.value.split('\n').join('-----').split('-----');
+    try {
+        if (strObject.value) {
+            const resArr = strObject?.value?.split('\n')?.join('-----')?.split('-----');
+            return resArr || [];
+        }
+        return [];
+    } catch (err) {
+        errorNotification(err.message);
     }
-    return "";
 }
 
 export const indexingErrorEmbedSchema = {
