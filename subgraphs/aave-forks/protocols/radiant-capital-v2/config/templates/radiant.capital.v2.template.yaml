@@ -19,7 +19,7 @@ dataSources:
       startBlock: {{ factory.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - LendingProtocol
@@ -40,7 +40,7 @@ dataSources:
       startBlock: {{ lendingPool.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Market
@@ -52,8 +52,6 @@ dataSources:
       abis:
         - name: ChefIncentivesController
           file: ./abis/radiant-capital/ChefIncentivesController.json
-        - name: UniswapV2Pair
-          file: ./abis/radiant-capital/UniswapV2Pair.json
         - name: RToken
           file: ./abis/radiant-capital/RToken.json
         - name: AToken
@@ -103,7 +101,7 @@ dataSources:
       startBlock: {{ lendingPoolConfigurator.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Market
@@ -136,6 +134,28 @@ dataSources:
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
       file: ./protocols/radiant-capital/src/mapping.ts
+  - kind: ethereum/contract
+    name: UniswapV3Pool
+    network: {{ network }}
+    source:
+      address: "{{ UniswapV3Pool.address }}"
+      abi: UniswapV3Pool
+      startBlock: {{ UniswapV3Pool.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Market
+      abis:
+        - name: UniswapV3Pool
+          file: ./abis/radiant-capital-v2/UniswapV3Pool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
+          handler: handleSwap
+      file: ./protocols/radiant-capital/src/rewards.ts
 templates:
   - kind: ethereum/contract
     name: AToken
@@ -144,7 +164,7 @@ templates:
       abi: AToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -163,7 +183,7 @@ templates:
       abi: VariableDebtToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -182,7 +202,7 @@ templates:
       abi: StableDebtToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
