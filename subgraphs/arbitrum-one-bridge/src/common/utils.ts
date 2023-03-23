@@ -8,7 +8,7 @@ import { _ERC20 } from "../../generated/ERC20Gateway/_ERC20";
 import { BridgePermissionType } from "../sdk/protocols/bridge/enums";
 import { BridgeConfig } from "../sdk/protocols/bridge/config";
 import { Versions } from "../versions";
-import { ETH_ADDRESS } from "../sdk/util/constants";
+import { ETH_ADDRESS, ETH_NAME, ETH_SYMBOL } from "../sdk/util/constants";
 
 export class Pricer implements TokenPricer {
   block: ethereum.Block;
@@ -30,9 +30,19 @@ export class Pricer implements TokenPricer {
 
 export class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
-    const name = this.fetchTokenName(address);
-    const symbol = this.fetchTokenSymbol(address);
-    const decimals = this.fetchTokenDecimals(address) as i32;
+    let name: string;
+    let symbol: string;
+    let decimals: i32;
+
+    if (address == Address.fromString(ETH_ADDRESS)) {
+      name = ETH_NAME;
+      symbol = ETH_SYMBOL;
+      decimals = 18;
+    } else {
+      name = this.fetchTokenName(address);
+      symbol = this.fetchTokenSymbol(address);
+      decimals = this.fetchTokenDecimals(address) as i32;
+    }
 
     return {
       name,
