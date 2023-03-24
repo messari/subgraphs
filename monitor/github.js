@@ -10,24 +10,25 @@ export async function postGithubIssue(title, body, postedIssues, isDecen) {
         })
         if (postedIssues.length === 0) {
             postAlert('NO POSTED ISSUES REACHED GH ISSUE FUNC');
-        }
-        const issArr = postedIssues.map(x => x.title.toUpperCase());
-        if (!issArr.filter(x => x.includes(title.type.toUpperCase()) && x.includes(title.protocol.toUpperCase()) && (isDecen ? x.includes('DECEN') : !x.includes('DECEN')))?.length > 0) {
-            try {
-                const chains = `${title.chains.join(", ")}`;
-                await octokit.request('POST /repos/messari/subgraphs/issues', {
-                    title: `${title.protocol} ${chains}: ${title.type}`,
-                    body,
-                    assignees: [
-                        "bye43"
-                    ],
-                    labels: [
-                        'bug',
-                        'monitor'
-                    ]
-                });
-            } catch (err) {
-                postAlert(err.message)
+        } else {
+            const issArr = postedIssues.map(x => x.title?.toUpperCase());
+            if (!issArr.filter(x => x.includes(title.type.toUpperCase()) && x.includes(title.protocol.toUpperCase()) && (isDecen ? x.includes('DECEN') : !x.includes('DECEN')))?.length > 0) {
+                try {
+                    const chains = `${title.chains.join(", ")}`;
+                    await octokit.request('POST /repos/messari/subgraphs/issues', {
+                        title: `${title.protocol} ${chains}: ${title.type}`,
+                        body,
+                        assignees: [
+                            "bye43"
+                        ],
+                        labels: [
+                            'bug',
+                            'monitor'
+                        ]
+                    });
+                } catch (err) {
+                    postAlert(err.message)
+                }
             }
         }
     } else {
