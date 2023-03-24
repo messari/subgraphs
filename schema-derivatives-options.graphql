@@ -1337,6 +1337,9 @@ type Position @entity {
   " Account that owns this position"
   account: Account!
 
+  " The asset the contract was created for (generally the same as the underlying asset in the pool) "
+  asset: Token!
+
   " The hash of the transaction that created this position (contract) "
   takenHash: Bytes!
 
@@ -1353,7 +1356,7 @@ type Position @entity {
   exercisedBlockNumber: BigInt
 
   " Price of the underlying asset at the time the option was closed (can be null if it gets closed without exercising) "
-  closedPrice: BigDecimal
+  closedPriceUSD: BigDecimal
 
   " The timestamp the position is closed ( can be the same as exercised, if the owner exercises their contract) "
   closedTimestamp: BigInt
