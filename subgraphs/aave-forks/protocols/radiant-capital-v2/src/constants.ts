@@ -9,7 +9,7 @@ export const REWARD_TOKEN_ADDRESS =
 export const WETH_ADDRESS = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1";
 export const RDNT_WETH_POOL_ADDRESS =
   "0xa8ba5f3ccfb8d2b7f4225e371cde11871e088933";
-export const RWETH_ADDRESS = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1";
+export const RWETH_ADDRESS = "0x0df5dfd95966753f01cb80e76dc20ea958238c46";
 
 /////////////////////////////
 ///// Protocol Specific /////
