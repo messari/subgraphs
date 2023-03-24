@@ -8,6 +8,7 @@ import {
 } from "./constants";
 import {
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   DEFAULT_DECIMALS,
   exponentToBigDecimal,
   RewardTokenType,
@@ -125,6 +126,11 @@ export function getRewardPrice(): BigDecimal {
 
   const reserveRDNT = tryRdntBalance.value;
   const reserveWETH = tryWethBalance.value;
+
+  // div by 0 error handle
+  if (reserveRDNT.equals(BIGINT_ZERO) || reserveWETH.equals(BIGINT_ZERO)) {
+    return BIGDECIMAL_ZERO;
+  }
 
   const priceInWETH = reserveWETH
     .toBigDecimal()
