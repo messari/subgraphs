@@ -134,28 +134,6 @@ dataSources:
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
       file: ./protocols/radiant-capital-v2/src/mapping.ts
-  - kind: ethereum/contract
-    name: UniswapV3Pool
-    network: {{ network }}
-    source:
-      address: "{{ UniswapV3Pool.address }}"
-      abi: UniswapV3Pool
-      startBlock: {{ UniswapV3Pool.startBlock }}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - Market
-      abis:
-        - name: UniswapV3Pool
-          file: ./abis/radiant-capital-v2/UniswapV3Pool.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-      eventHandlers:
-        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
-          handler: handleSwap
-      file: ./protocols/radiant-capital-v2/src/rewards.ts
 templates:
   - kind: ethereum/contract
     name: AToken
