@@ -1,6 +1,6 @@
 import { errorNotification } from "./messageDiscord.js";
 
-export const monitorVersion = "v1.4.0";
+export const monitorVersion = "v1.4.1";
 
 export const sleep = m => new Promise(r => setTimeout(r, m));
 
@@ -48,11 +48,14 @@ export async function parseIndexingThreadStrings(strObject) {
     try {
         if (strObject.value) {
             const resArr = strObject?.value?.split('\n')?.join('-----')?.split('-----');
-            return resArr || [];
+            if (Array.isArray(resArr)) {
+                return resArr;
+            }
         }
         return [];
     } catch (err) {
         errorNotification(err.message);
+        return [];
     }
 }
 

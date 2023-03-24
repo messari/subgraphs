@@ -29,9 +29,9 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIss, 
                         }
                         let fieldCells = embedObjectOnChain.fields.filter(cell => cell.name === "Field").map(x => x.value);
                         if (fieldCells) {
-                            const existingFields = channelToProtocolIssuesMapping[protocolMessageObject.channel_id][chainStr];
+                            const existingFields = channelToProtocolIssuesMapping[protocolMessageObject.channel_id][chain];
                             fieldCells = [...existingFields, ...fieldCells.filter(x => !existingFields.includes(x))];
-                            channelToProtocolIssuesMapping[protocolMessageObject.channel_id][chainStr] = fieldCells;
+                            channelToProtocolIssuesMapping[protocolMessageObject.channel_id][chain] = fieldCells;
                         }
                     });
 
