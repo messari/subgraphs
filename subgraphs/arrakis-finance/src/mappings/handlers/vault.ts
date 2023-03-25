@@ -1,4 +1,4 @@
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 import { PoolCreated } from "../../../generated/ArrakisFactory/ArrakisFactoryV1";
 import { ArrakisVault as ArrakisVaultTemplate } from "../../../generated/templates";
 import {
@@ -60,7 +60,7 @@ export function handleMinted(event: Minted): void {
 
   // Update vault token supply
   const vault = getOrCreateVault(event.address, event.block);
-  let tokenBalances = getUnderlyingTokenBalances(event.address, event);
+  const tokenBalances = getUnderlyingTokenBalances(event.address, event);
   if (tokenBalances && tokenBalances.length == 2) {
     vault._token0Amount = tokenBalances[0];
     vault._token1Amount = tokenBalances[1];
@@ -86,7 +86,7 @@ export function handleBurned(event: Burned): void {
 
   // Update vault token supply
   const vault = getOrCreateVault(event.address, event.block);
-  let tokenBalances = getUnderlyingTokenBalances(event.address, event);
+  const tokenBalances = getUnderlyingTokenBalances(event.address, event);
   if (tokenBalances && tokenBalances.length == 2) {
     vault._token0Amount = tokenBalances[0];
     vault._token1Amount = tokenBalances[1];
@@ -106,7 +106,7 @@ export function handleBurned(event: Burned): void {
 
 export function handleRebalance(event: Rebalance): void {
   const vault = getOrCreateVault(event.address, event.block);
-  let tokenBalances = getUnderlyingTokenBalances(event.address, event);
+  const tokenBalances = getUnderlyingTokenBalances(event.address, event);
   if (!tokenBalances) {
     return;
   }

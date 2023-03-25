@@ -5,7 +5,7 @@ import {
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
-import { Vault, VaultFee, _UnderlyingToken } from "../../../generated/schema";
+import { Vault, VaultFee } from "../../../generated/schema";
 import { ArrakisVaultV1 as VaultV1Contract } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { UniswapV3Pool as PoolContract } from "../../../generated/templates/ArrakisVault/UniswapV3Pool";
 import {

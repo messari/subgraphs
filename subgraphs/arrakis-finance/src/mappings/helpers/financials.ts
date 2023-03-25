@@ -1,6 +1,5 @@
-import { Address, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { FeesEarned } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
-import { ArrakisVaultV1 as ArrakisVaultContract } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { getOrCreateVault, updateVaultSnapshots } from "./vaults";
 import {
   BIGDECIMAL_HUNDRED,
@@ -24,7 +23,7 @@ import { Vault } from "../../../generated/schema";
 export function updateTvl(event: ethereum.Event): void {
   const vaultAddress = event.address;
   // Track existing TVL for cumulative calculations
-  const vault = updateVaultTokenValue(vaultAddress.toHexString(), event.block);
+  updateVaultTokenValue(vaultAddress.toHexString(), event.block);
 
   // Update entities
   const protocol = getOrCreateYieldAggregator(
