@@ -38,6 +38,7 @@ export function updateTvl(event: ethereum.Event): void {
     protocolTvlUSD = protocolTvlUSD.plus(_vault.totalValueLockedUSD);
   }
 
+  protocol.totalValueLockedUSD = protocolTvlUSD;
   const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
   financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialsDailySnapshot.blockNumber = event.block.number;
