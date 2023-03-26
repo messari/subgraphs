@@ -95,11 +95,11 @@ export function handleTransferOut(event: WithdrawalFinalized): void {
 
   // -- ACCOUNT
 
-  const acc = sdk.Accounts.loadAccount(event.params._from);
-  acc.transferOut(
+  const acc = sdk.Accounts.loadAccount(event.params._to);
+  acc.transferIn(
     pool,
     pool.getDestinationTokenRoute(crossToken)!,
-    event.params._to,
+    event.params._from,
     event.params._amount,
     event.transaction.hash
   );
