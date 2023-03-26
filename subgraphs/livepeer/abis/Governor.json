@@ -1,0 +1,190 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address[]",
+            "name": "target",
+            "type": "address[]"
+          },
+          { "internalType": "uint256[]", "name": "value", "type": "uint256[]" },
+          { "internalType": "bytes[]", "name": "data", "type": "bytes[]" },
+          { "internalType": "uint256", "name": "nonce", "type": "uint256" }
+        ],
+        "indexed": false,
+        "internalType": "struct Governor.Update",
+        "name": "update",
+        "type": "tuple"
+      }
+    ],
+    "name": "UpdateCancelled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address[]",
+            "name": "target",
+            "type": "address[]"
+          },
+          { "internalType": "uint256[]", "name": "value", "type": "uint256[]" },
+          { "internalType": "bytes[]", "name": "data", "type": "bytes[]" },
+          { "internalType": "uint256", "name": "nonce", "type": "uint256" }
+        ],
+        "indexed": false,
+        "internalType": "struct Governor.Update",
+        "name": "update",
+        "type": "tuple"
+      }
+    ],
+    "name": "UpdateExecuted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address[]",
+            "name": "target",
+            "type": "address[]"
+          },
+          { "internalType": "uint256[]", "name": "value", "type": "uint256[]" },
+          { "internalType": "bytes[]", "name": "data", "type": "bytes[]" },
+          { "internalType": "uint256", "name": "nonce", "type": "uint256" }
+        ],
+        "indexed": false,
+        "internalType": "struct Governor.Update",
+        "name": "update",
+        "type": "tuple"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "delay",
+        "type": "uint256"
+      }
+    ],
+    "name": "UpdateStaged",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address[]",
+            "name": "target",
+            "type": "address[]"
+          },
+          { "internalType": "uint256[]", "name": "value", "type": "uint256[]" },
+          { "internalType": "bytes[]", "name": "data", "type": "bytes[]" },
+          { "internalType": "uint256", "name": "nonce", "type": "uint256" }
+        ],
+        "internalType": "struct Governor.Update",
+        "name": "_update",
+        "type": "tuple"
+      }
+    ],
+    "name": "cancel",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address[]",
+            "name": "target",
+            "type": "address[]"
+          },
+          { "internalType": "uint256[]", "name": "value", "type": "uint256[]" },
+          { "internalType": "bytes[]", "name": "data", "type": "bytes[]" },
+          { "internalType": "uint256", "name": "nonce", "type": "uint256" }
+        ],
+        "internalType": "struct Governor.Update",
+        "name": "_update",
+        "type": "tuple"
+      }
+    ],
+    "name": "execute",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address[]",
+            "name": "target",
+            "type": "address[]"
+          },
+          { "internalType": "uint256[]", "name": "value", "type": "uint256[]" },
+          { "internalType": "bytes[]", "name": "data", "type": "bytes[]" },
+          { "internalType": "uint256", "name": "nonce", "type": "uint256" }
+        ],
+        "internalType": "struct Governor.Update",
+        "name": "_update",
+        "type": "tuple"
+      },
+      { "internalType": "uint256", "name": "_delay", "type": "uint256" }
+    ],
+    "name": "stage",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "updates",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
