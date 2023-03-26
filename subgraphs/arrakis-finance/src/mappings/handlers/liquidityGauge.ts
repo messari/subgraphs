@@ -1,4 +1,4 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log, store } from "@graphprotocol/graph-ts";
 import { LiquidityGauge as LiquidityGaugeTemplate } from "../../../generated/templates";
 import {
   AddGauge,
@@ -12,8 +12,9 @@ import {
 } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
 import {
   getOrCreateLiquidityGauge,
-  updateRewardEmission,
-  updateRewardTokens,
+  removeRewardToken,
+  updateRewardEmissions,
+  addRewardToken,
 } from "../helpers/liquidityGauge";
 import { getOrCreateVault, updateVaultSnapshots } from "../helpers/vaults";
 import { Vault } from "../../../generated/schema";
@@ -54,7 +55,7 @@ export function handleAddGauge(event: AddGauge): void {
     return;
   }
 
-  updateRewardTokens(spiceResult.value, vault);
+  addRewardToken(spiceResult.value, RewardTokenType.DEPOSIT, vault);
   updateVaultSnapshots(vault, event.block);
 }
 
@@ -62,7 +63,7 @@ export function handleRemoveGauge(event: RemoveGauge): void {
   const gaugeAddress = event.params.gauge;
   const vaultAddress = event.params.vault;
   const gauge = getOrCreateLiquidityGauge(gaugeAddress);
-  gauge.vault = Address.zero().toHexString();
+  store.remove("_LiquidityGauge", gauge.id);
   gauge.save();
 
   const vault = Vault.load(vaultAddress.toHexString());
@@ -77,10 +78,10 @@ export function handleRemoveGauge(event: RemoveGauge): void {
 
   // remove reward token from vault.rewardTokens
   const gaugeContract = GaugeContract.bind(gaugeAddress);
-  const spiceResult = gaugeContract.try_SPICE();
-  if (spiceResult.reverted) {
+  const rewardCountResult = gaugeContract.try_reward_count();
+  if (rewardCountResult.reverted) {
     log.error(
-      "[handleRemoveGauge]gauge.SPICE() call for gauge {} reverted tx {}-{}",
+      "[handleRemoveGauge]reward_count() call for gauge {} reverted tx {}-{}",
       [
         gaugeAddress.toHexString(),
         event.transaction.hash.toHexString(),
@@ -89,27 +90,29 @@ export function handleRemoveGauge(event: RemoveGauge): void {
     );
     return;
   }
-  const rewardToken = getOrCreateRewardToken(
-    spiceResult.value,
-    RewardTokenType.DEPOSIT
-  );
 
-  const rewardTokens = vault.rewardTokens;
-  if (!rewardTokens || rewardTokens.length == 0) {
-    return;
+  for (let i = 0; i < rewardCountResult.value.toI32(); i++) {
+    const rewardTokenResult = gaugeContract.try_reward_tokens(
+      BigInt.fromI32(i)
+    );
+    if (rewardCountResult.reverted) {
+      log.error(
+        "[handleRemoveGauge]reward_tokens(i) call for gauge {} reverted tx {}-{}",
+        [
+          i.toString(),
+          gaugeAddress.toHexString(),
+          event.transaction.hash.toHexString(),
+          event.transactionLogIndex.toString(),
+        ]
+      );
+      continue;
+    }
+    const rewardToken = getOrCreateRewardToken(
+      rewardTokenResult.value,
+      RewardTokenType.DEPOSIT
+    );
+    removeRewardToken(rewardToken.id, vault);
   }
-  const rewardEmission = vault.rewardTokenEmissionsAmount;
-  const rewardEmissionUSD = vault.rewardTokenEmissionsUSD;
-  const index = rewardTokens.indexOf(rewardToken.id);
-  if (index != -1) {
-    rewardTokens.splice(index, 1);
-    rewardEmission!.splice(index, 1);
-    rewardEmissionUSD!.splice(index, 1);
-  }
-  vault.rewardTokens = rewardTokens;
-  vault.rewardTokenEmissionsAmount = rewardEmission;
-  vault.rewardTokenEmissionsUSD = rewardEmissionUSD;
-  vault.save();
 
   updateVaultSnapshots(vault, event.block);
 }
@@ -124,6 +127,7 @@ export function handleDeposit(event: Deposit): void {
   );
   vault.save();
 
+  updateRewardEmissions(vault, event.address, event);
   updateVaultSnapshots(vault, event.block);
 }
 
@@ -137,6 +141,7 @@ export function handleWithdraw(event: Withdraw): void {
   );
   vault.save();
 
+  updateRewardEmissions(vault, event.address, event);
   updateVaultSnapshots(vault, event.block);
 }
 
@@ -157,8 +162,8 @@ export function handleRewardDataUpdate(event: RewardDataUpdate): void {
     return;
   }
 
-  updateRewardTokens(rewardTokenAddress, vault);
+  addRewardToken(rewardTokenAddress, RewardTokenType.DEPOSIT, vault);
   // Update vaults with new reward emissions
-  updateRewardEmission(gaugeAddress, vaultAddress, rewardTokenAddress, event);
+  updateRewardEmissions(vault, gaugeAddress, event);
   updateVaultSnapshots(vault, event.block);
 }

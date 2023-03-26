@@ -730,3 +730,13 @@ type _LiquidityGauge @entity {
   "Address of vault tokens the gauge accept deposits from"
   vault: Vault!
 }
+
+# Keeps track of when reward ends for token in a gauge
+type _RewardData @entity {
+  " {Liquidity gauge address}-{reward token address} "
+  id: ID!
+  " rate of emission "
+  rate: BigInt!
+  " timestamp of reward period finish "
+  PeriodFinish: BigInt!
+}

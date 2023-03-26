@@ -1,6 +1,10 @@
 import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { FeesEarned } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
-import { getOrCreateVault, updateVaultSnapshots } from "./vaults";
+import {
+  getOrCreateVault,
+  getUnderlyingTokenBalances,
+  updateVaultSnapshots,
+} from "./vaults";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
@@ -21,9 +25,9 @@ import { Vault } from "../../../generated/schema";
 
 // Update TVL related fields in all entities
 export function updateTvl(event: ethereum.Event): void {
-  const vaultAddress = event.address;
+  // const vaultAddress = event.address;
   // Track existing TVL for cumulative calculations
-  updateVaultTokenValue(vaultAddress.toHexString(), event.block);
+  // updateVaultTokenValue(vaultAddress.toHexString(), event.block);
 
   // Update entities
   const protocol = getOrCreateYieldAggregator(
@@ -33,7 +37,10 @@ export function updateTvl(event: ethereum.Event): void {
   let protocolTvlUSD = BIGDECIMAL_ZERO;
   const vaultIDs = protocol._vaultIDs ? protocol._vaultIDs! : [];
   for (let i = 0; i < vaultIDs.length; i++) {
-    const _vault = updateVaultTokenValue(vaultIDs[i], event.block);
+    const _vault = updateVaultTokenValue(
+      Address.fromString(vaultIDs[i]),
+      event
+    );
     protocolTvlUSD = protocolTvlUSD.plus(_vault.totalValueLockedUSD);
   }
 
@@ -48,10 +55,19 @@ export function updateTvl(event: ethereum.Event): void {
 }
 
 function updateVaultTokenValue(
-  vaultAddress: string,
-  block: ethereum.Block
+  vaultAddress: Address,
+  event: ethereum.Event,
+  updateUnderlyingBalances: boolean = true
 ): Vault {
-  const vault = getOrCreateVault(Address.fromString(vaultAddress), block);
+  const block = event.block;
+  const vault = getOrCreateVault(vaultAddress, block);
+  if (updateUnderlyingBalances) {
+    const tokenBalances = getUnderlyingTokenBalances(vaultAddress, event);
+    if (tokenBalances && tokenBalances.length == 2) {
+      vault._token0Amount = tokenBalances[0];
+      vault._token1Amount = tokenBalances[1];
+    }
+  }
 
   const token0AmountUSD = getTokenValueUSD(
     Address.fromString(vault._token0),
@@ -63,8 +79,8 @@ function updateVaultTokenValue(
     vault._token1Amount,
     block
   );
-  const newTvl = token0AmountUSD.plus(token1AmountUSD);
 
+  const newTvl = token0AmountUSD.plus(token1AmountUSD);
   // Calculate price per share
   const outputToken = getOrCreateToken(Address.fromString(vault.outputToken!));
   const vaultTokenSupply = vault.outputTokenSupply!;

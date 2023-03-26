@@ -23,7 +23,6 @@ import { updateUsageMetrics } from "../helpers/usageMetrics";
 import {
   getOrCreateVault,
   getOrCreateVaultFee,
-  getUnderlyingTokenBalances,
   updateVaultSnapshots,
 } from "../helpers/vaults";
 
@@ -60,11 +59,9 @@ export function handleMinted(event: Minted): void {
 
   // Update vault token supply
   const vault = getOrCreateVault(event.address, event.block);
-  const tokenBalances = getUnderlyingTokenBalances(event.address, event);
-  if (tokenBalances && tokenBalances.length == 2) {
-    vault._token0Amount = tokenBalances[0];
-    vault._token1Amount = tokenBalances[1];
-  }
+  // update underlying token balances is done by updateVaultTokenValue inside updateTvl
+  // we update all vaults for each vault event, so the underlying token balances are updated
+  // more frequently at some cost of the indexing speed
 
   vault.inputTokenBalance = vault.inputTokenBalance.plus(
     event.params.mintAmount
@@ -86,11 +83,9 @@ export function handleBurned(event: Burned): void {
 
   // Update vault token supply
   const vault = getOrCreateVault(event.address, event.block);
-  const tokenBalances = getUnderlyingTokenBalances(event.address, event);
-  if (tokenBalances && tokenBalances.length == 2) {
-    vault._token0Amount = tokenBalances[0];
-    vault._token1Amount = tokenBalances[1];
-  }
+  // update underlying token balances is done by updateVaultTokenValue inside updateTvl
+  // we update all vaults for each vault event, so the underlying token balances are updated
+  // more frequently at some cost of the indexing speed
   vault.inputTokenBalance = vault.inputTokenBalance.minus(
     event.params.burnAmount
   );
@@ -106,14 +101,10 @@ export function handleBurned(event: Burned): void {
 
 export function handleRebalance(event: Rebalance): void {
   const vault = getOrCreateVault(event.address, event.block);
-  const tokenBalances = getUnderlyingTokenBalances(event.address, event);
-  if (!tokenBalances) {
-    return;
-  }
-
-  vault._token0Amount = tokenBalances[0];
-  vault._token1Amount = tokenBalances[1];
-  vault.save();
+  // update underlying token balances is done by updateVaultTokenValue inside updateTvl
+  // we update all vaults for each vault event, so the underlying token balances are updated
+  // more frequently at some cost of the indexing speed
+  updateTvl(event);
   updateVaultSnapshots(vault, event.block);
 }
 

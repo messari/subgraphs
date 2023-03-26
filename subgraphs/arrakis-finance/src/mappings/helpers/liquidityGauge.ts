@@ -5,7 +5,12 @@ import {
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
-import { _LiquidityGauge, Vault } from "../../../generated/schema";
+import {
+  _LiquidityGauge,
+  Vault,
+  _RewardData,
+  RewardToken,
+} from "../../../generated/schema";
 import { LiquidityGaugeV4 as GaugeContract } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
 import {
   RewardTokenType,
@@ -16,7 +21,6 @@ import {
 import { getOrCreateRewardToken } from "../../common/getters";
 import { bigIntToBigDecimal } from "../../common/utils/numbers";
 import { updateTokenPrice } from "./pricing";
-import { getOrCreateVault } from "./vaults";
 
 export function getOrCreateLiquidityGauge(
   gaugeAddress: Address
@@ -31,13 +35,14 @@ export function getOrCreateLiquidityGauge(
   return gauge;
 }
 
-export function updateRewardTokens(
+export function addRewardToken(
   rewardTokenAddress: Address,
+  rewardTokenType: RewardTokenType,
   vault: Vault
 ): void {
   const rewardToken = getOrCreateRewardToken(
     rewardTokenAddress,
-    RewardTokenType.DEPOSIT
+    rewardTokenType
   );
 
   let rewardTokens = vault.rewardTokens;
@@ -77,25 +82,36 @@ export function updateRewardTokens(
   vault.save();
 }
 
-export function updateRewardEmission(
+export function removeRewardToken(rewardTokenId: string, vault: Vault): void {
+  const rewardTokens = vault.rewardTokens;
+  if (!rewardTokens || rewardTokens.length == 0) {
+    return;
+  }
+  const rewardEmission = vault.rewardTokenEmissionsAmount;
+  const rewardEmissionUSD = vault.rewardTokenEmissionsUSD;
+  const index = rewardTokens.indexOf(rewardTokenId);
+  if (index != -1) {
+    rewardTokens.splice(index, 1);
+    rewardEmission!.splice(index, 1);
+    rewardEmissionUSD!.splice(index, 1);
+  }
+  vault.rewardTokens = rewardTokens;
+  vault.rewardTokenEmissionsAmount = rewardEmission;
+  vault.rewardTokenEmissionsUSD = rewardEmissionUSD;
+  vault.save();
+}
+
+export function updateRewardData(
   gaugeAddress: Address,
-  vaultAddress: Address,
   rewardTokenAddress: Address,
   event: ethereum.Event
 ): void {
-  const block = event.block;
-  const rewardTokenId = `${
-    RewardTokenType.DEPOSIT
-  }-${rewardTokenAddress.toHexString()}`;
-
-  // Update emissions
-  const vault = getOrCreateVault(vaultAddress, block);
-  // Calculate new rates
+  // get new rates
   const gaugeContract = GaugeContract.bind(gaugeAddress);
   const rewardDataResult = gaugeContract.try_reward_data(rewardTokenAddress);
   if (rewardDataResult.reverted) {
     log.error(
-      "[updateRewardEmission]gauge.reward_data() call for gauge {} and token {} reverted tx {}-{}",
+      "[updateRewardData]reward_data() call for gauge {} and token {} reverted tx {}-{}",
       [
         gaugeAddress.toHexString(),
         rewardTokenAddress.toHexString(),
@@ -106,18 +122,54 @@ export function updateRewardEmission(
     return;
   }
   const rate = rewardDataResult.value.getRate(); // rate is tokens per second
+  const periodFinish = rewardDataResult.value.getPeriod_finish();
 
-  const rewardTokens = vault.rewardTokens!;
-  const emissionsAmount = vault.rewardTokenEmissionsAmount!;
-  const emissionsUSD = vault.rewardTokenEmissionsUSD!;
-  const rewardTokenIndex = rewardTokens.indexOf(rewardTokenId);
-  if (rewardTokenIndex == -1) {
+  const rewardDataId = `${gaugeAddress.toHexString()}-${rewardTokenAddress.toHexString()}`;
+  let rewardData = _RewardData.load(rewardDataId);
+  if (!rewardData) {
+    rewardData = new _RewardData(rewardDataId);
+  }
+  rewardData.rate = rate;
+  rewardData.PeriodFinish = periodFinish;
+  rewardData.save();
+}
+
+export function updateRewardEmissions(
+  vault: Vault,
+  gaugeAddress: Address,
+  event: ethereum.Event
+): void {
+  const rewardTokens = vault.rewardTokens ? vault.rewardTokens! : [];
+
+  for (let i = 0; i < rewardTokens.length; i++) {
+    updateRewardEmission(vault, rewardTokens[i], gaugeAddress, event);
+  }
+}
+
+function updateRewardEmission(
+  vault: Vault,
+  rewardTokenId: string,
+  gaugeAddress: Address,
+  event: ethereum.Event
+): void {
+  const rewardToken = RewardToken.load(rewardTokenId);
+  if (!rewardToken) {
+    log.error("[]no RewardToken found for reward token {} tx {}-{}", [
+      rewardTokenId,
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]);
+    return;
+  }
+
+  const rewardDataId = `${gaugeAddress.toHexString()}-${rewardToken.token}`;
+  const rewardData = _RewardData.load(rewardDataId);
+  if (!rewardData) {
     log.error(
-      "[updateRewardEmission]rewardTokenId {} not found in vault.rewardTokens [{}] for vault {} tx {}-{}",
+      "[updateRewardEmission]no RewardData found for gauge {} and reward token {} tx {}-{}",
       [
+        gaugeAddress.toHexString(),
         rewardTokenId,
-        rewardTokens.toString(),
-        vault.id,
         event.transaction.hash.toHexString(),
         event.transactionLogIndex.toString(),
       ]
@@ -125,15 +177,31 @@ export function updateRewardEmission(
     return;
   }
 
-  // rate is valid no matter Period_finish has ended or not
-  // https://github.com/ArrakisFinance/polygon-staking/blob/85dc3f4abc579d861205353a3a0141cc73df3baa/vyper/contracts/LiquidityGaugeV4.vy#L600-L605
-  emissionsAmount[rewardTokenIndex] = rate.times(
-    BigInt.fromI32(SECONDS_PER_DAY)
-  );
-  const rewardToken = updateTokenPrice(rewardTokenAddress, block);
-  emissionsUSD[rewardTokenIndex] = rewardToken.lastPriceUSD!.times(
-    bigIntToBigDecimal(emissionsAmount[rewardTokenIndex], rewardToken.decimals)
-  );
+  const rewardTokens = vault.rewardTokens ? vault.rewardTokens! : [];
+  const emissionsAmount = vault.rewardTokenEmissionsAmount
+    ? vault.rewardTokenEmissionsAmount!
+    : [];
+  const emissionsUSD = vault.rewardTokenEmissionsUSD
+    ? vault.rewardTokenEmissionsUSD!
+    : [];
+  const rewardTokenIndex = rewardTokens.indexOf(rewardTokenId);
+
+  // once the reward period is past, the rate goes to 0
+  if (event.block.timestamp.ge(rewardData.PeriodFinish)) {
+    emissionsAmount[rewardTokenIndex] = BIGINT_ZERO;
+    emissionsUSD[rewardTokenIndex] = BIGDECIMAL_ZERO;
+  } else {
+    emissionsAmount[rewardTokenIndex] = rewardData.rate.times(
+      BigInt.fromI32(SECONDS_PER_DAY)
+    );
+    const token = updateTokenPrice(
+      Address.fromString(rewardToken.token),
+      event.block
+    );
+    emissionsUSD[rewardTokenIndex] = token.lastPriceUSD!.times(
+      bigIntToBigDecimal(emissionsAmount[rewardTokenIndex], token.decimals)
+    );
+  }
 
   vault.rewardTokenEmissionsAmount = emissionsAmount;
   vault.rewardTokenEmissionsUSD = emissionsUSD;
