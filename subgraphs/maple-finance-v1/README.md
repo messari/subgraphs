@@ -84,19 +84,19 @@ The number of Unique Addresses that interacted with the protocol through these t
 
 Diagrams of the protocol, specifically focusing on key things needed for the Subgraph. Each diagram follows this legend:
 
-![Legend](./docs/Legend.jpg)
+![Legend](../../docs/images/protocols/maple-finance-v1/Legend.jpg)
 
 ### Protocol Map
 
-![Protocol Map](./docs/ProtocolMap.jpg)
+![Protocol Map](../../docs/images/protocols/maple-finance-v1/ProtocolMap.jpg)
 
 ### Providing Liquidity Flow
 
-![Providing Liquidity Flow](./docs/ProvidingLiquidity.jpg)
+![Providing Liquidity Flow](../../docs/images/protocols/maple-finance-v1/ProvidingLiquidity.jpg)
 
 ### Staking Flow
 
-![Staking](./docs/Staking.jpg)
+![Staking](../../docs/images/protocols/maple-finance-v1/Staking.jpg)
 
 ### Taking Loan Flow
 
@@ -104,11 +104,11 @@ Diagrams of the protocol, specifically focusing on key things needed for the Sub
 
 ### Repaying Loan (Principal and Interest)
 
-![Repay Loan](./docs/RepayLoan.jpg)
+![Repay Loan](../../docs/images/protocols/maple-finance-v1/RepayLoan.jpg)
 
 ### Liquidation Flow
 
-![Liquidation](./docs/Liquidation.jpg)
+![Liquidation](../../docs/images/protocols/maple-finance-v1/Liquidation.jpg)
 
 ## Validation
 

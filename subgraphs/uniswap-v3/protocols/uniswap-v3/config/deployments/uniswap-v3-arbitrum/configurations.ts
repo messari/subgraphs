@@ -67,7 +67,11 @@ export class UniswapV3ArbitrumConfigurations implements Configurations {
     return stringToBytesList([]);
   }
   getUntrackedTokens(): Bytes[] {
-    return stringToBytesList([]);
+    return stringToBytesList([
+      "0x916c1daf79236700eb67e593dc2456890ffba548",
+      "0x73e7d8bad2677656c8cfbe6e18a9257c6be2b87f",
+      "0x7a6717ceabe536bb9a6bb39182a4cd575d4e222e",
+    ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("100000");
