@@ -62,17 +62,17 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
 
     // -- ACCOUNT
 
-    acc.transferIn(
+    acc.transferOut(
       pool,
       pool.getDestinationTokenRoute(crossToken)!,
-      event.params.sender,
+      event.params.sender, // sender and receiver are same when bridging eth
       event.transaction.value,
       event.transaction.hash
     );
   } else if (event.params.kind == L2_MSG) {
-    acc.messageIn(
+    acc.messageOut(
       networkToChainID(Network.ARBITRUM_ONE),
-      event.params.sender,
+      event.transaction.to!, // don't have access to receiver
       event.params.messageDataHash
     );
   }
