@@ -14,7 +14,7 @@ import { Bridge } from "./protocol";
 import { TokenManager } from "./tokens";
 import { BridgePoolType, TransactionType, TransferType } from "./enums";
 import { getUnixDays, getUnixHours } from "../../util/events";
-import { CustomEventType } from ".";
+import { CustomEventType } from "../../util/events";
 
 export class AccountManager {
   protocol: Bridge;
@@ -66,11 +66,18 @@ export class Account {
   protocol: Bridge;
   tokens: TokenManager;
 
+  /**
+   * Tracks the number of event entities created by this account during the current ethereum.Event
+   * in case multiple ones need to be created at once, to avoid ID collissions.
+   */
+  private eventCount: u8;
+
   constructor(protocol: Bridge, account: AccountSchema, tokens: TokenManager) {
     this.account = account;
     this.protocol = protocol;
     this.event = protocol.getCurrentEvent();
     this.tokens = tokens;
+    this.eventCount = 0;
   }
 
   private isActiveByActivityID(id: string): boolean {
@@ -138,6 +145,38 @@ export class Account {
 
   /**
    * Creates a BridgeTransfer entity for a transfer away from this chain
+   * to a non-EVM chain and updates the volumes at PoolRoute, Pool and Protocol.
+   *
+   * @param pool The pool the transfer was made on.
+   * @param route The route the transfer went through.
+   * @param destination The non-EVM account receiving the funds.
+   * @param amount The amount of tokens transferred.
+   * @param transactionID Optional transaction ID on the source chain.
+   * @param updateMetrics Optional, defaults to true. If true, volumes will be updated at PoolRoute, Pool and Protocol. Make it false if you want to update these manually for some reason. Activity counts and transaction counts will still be updated.
+   * @returns BridgeTransfer
+   */
+  nonEVMTransferOut(
+    pool: Pool,
+    route: PoolRoute,
+    destination: Bytes,
+    amount: BigInt,
+    transactionID: Bytes | null = null,
+    updateMetrics: boolean = true
+  ): BridgeTransfer {
+    this.countTransferOut();
+    return this.transfer(
+      pool,
+      route,
+      destination,
+      amount,
+      true,
+      transactionID,
+      updateMetrics
+    );
+  }
+
+  /**
+   * Creates a BridgeTransfer entity for a transfer away from this chain
    * and updates the volumes at PoolRoute, Pool and Protocol.
    *
    * @param pool The pool the transfer was made on.
@@ -163,6 +202,38 @@ export class Account {
       destination,
       amount,
       true,
+      transactionID,
+      updateMetrics
+    );
+  }
+
+  /**
+   * Creates a BridgeTransfer entity for a transfer arriving to this chain
+   * from a non-EVM address and updates the volumes at PoolRoute, Pool and Protocol.
+   *
+   * @param pool The pool the transfer was made on.
+   * @param route The route the transfer went through.
+   * @param source The non-EVM account sending the funds.
+   * @param amount The amount of tokens transferred.
+   * @param transactionID Optional transaction ID on the source chain.
+   * @param updateMetrics Optional, defaults to true. If true, volumes will be updated at PoolRoute, Pool and Protocol. Make it false if you want to update these manually for some reason. Activity counts and transaction counts will still be updated.
+   * @returns BridgeTransfer
+   */
+  nonEVMTransferIn(
+    pool: Pool,
+    route: PoolRoute,
+    source: Bytes,
+    amount: BigInt,
+    transactionID: Bytes | null = null,
+    updateMetrics: boolean = true
+  ): BridgeTransfer {
+    this.countTransferIn();
+    return this.transfer(
+      pool,
+      route,
+      source,
+      amount,
+      false,
       transactionID,
       updateMetrics
     );
@@ -203,7 +274,7 @@ export class Account {
   private transfer(
     pool: Pool,
     route: PoolRoute,
-    counterparty: Address,
+    counterparty: Bytes,
     amount: BigInt,
     isOutgoing: boolean,
     transactionID: Bytes | null,
@@ -255,7 +326,7 @@ export class Account {
   }
 
   private transferBoilerplate(): BridgeTransfer {
-    const id = idFromEvent(this.event);
+    const id = this.idFromEvent(this.event);
     const transfer = new BridgeTransfer(id);
     transfer.hash = this.event.transaction.hash;
     transfer.logIndex = this.event.logIndex.toI32();
@@ -325,7 +396,7 @@ export class Account {
     isOutgoing: boolean,
     data: Bytes
   ): BridgeMessage {
-    const id = idFromEvent(this.event);
+    const id = this.idFromEvent(this.event);
     const message = new BridgeMessage(id);
     message.hash = this.event.transaction.hash;
     message.logIndex = this.event.logIndex.toI32();
@@ -362,7 +433,7 @@ export class Account {
       Address.fromBytes(_pool.inputToken)
     );
 
-    const id = idFromEvent(this.event);
+    const id = this.idFromEvent(this.event);
     const deposit = new LiquidityDeposit(id);
     deposit.hash = this.event.transaction.hash;
     deposit.logIndex = this.event.logIndex.toI32();
@@ -406,7 +477,7 @@ export class Account {
       Address.fromBytes(_pool.inputToken)
     );
 
-    const id = idFromEvent(this.event);
+    const id = this.idFromEvent(this.event);
     const withdraw = new LiquidityWithdraw(id);
     withdraw.hash = this.event.transaction.hash;
     withdraw.logIndex = this.event.logIndex.toI32();
@@ -514,10 +585,13 @@ export class Account {
     this.account.messageSentCount += 1;
     this.account.save();
   }
-}
 
-function idFromEvent(event: CustomEventType): Bytes {
-  return event.transaction.hash.concatI32(event.logIndex.toI32());
+  idFromEvent(event: CustomEventType): Bytes {
+    this.eventCount += 1;
+    return event.transaction.hash
+      .concatI32(event.logIndex.toI32())
+      .concatI32(this.eventCount);
+  }
 }
 
 function inferTransferType(
