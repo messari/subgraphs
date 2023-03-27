@@ -52,6 +52,9 @@ export function isOptionITM(option: Option): boolean {
 }
 
 export function markOptionExpired(event: ethereum.Event, option: Option): void {
+  if (!isOptionExpired(event, option)) {
+    return;
+  }
   if (option.expirationPriceUSD) {
     return;
   }
@@ -61,9 +64,9 @@ export function markOptionExpired(event: ethereum.Event, option: Option): void {
   const totalValueUSD = getOptionValue(event, option, option.totalSupply!);
   if (isOptionITM(option)) {
     addPoolExercisedVolume(event, pool, totalValueUSD);
-  } else {
-    addPoolClosedVolume(event, pool, totalValueUSD);
   }
+  addPoolClosedVolume(event, pool, totalValueUSD);
+  updateOptionTotalSupply(event, option, BIGINT_ZERO);
 }
 
 export function updateOptionTotalSupply(
@@ -103,9 +106,6 @@ export function burnOption(
   option: Option,
   amount: BigInt
 ): void {
-  if (isOptionExpired(event, option)) {
-    markOptionExpired(event, option);
-  }
   updateOptionTotalSupply(event, option, BIGINT_ZERO.minus(amount));
 }
 

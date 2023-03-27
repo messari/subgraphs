@@ -6,9 +6,9 @@ import {
   incrementPoolExercisedCount,
   incrementPoolMintedCount,
   incrementPoolPositionCount,
-  incrementPoolTakenCount,
 } from "./pool";
 import { incrementProtocolUniqueUsers } from "./protocol";
+import { incrementProtocolTakerCount } from "./usage";
 
 export function getOrCreateAccount(address: Address): Account {
   let account = Account.load(address);
@@ -44,6 +44,7 @@ export function incrementAccountPositionCount(
   account.contractsTakenCount += 1;
   account.save();
   incrementPoolPositionCount(event, option);
+  incrementProtocolTakerCount(event, account);
 }
 
 export function decrementAccountPositionCount(
@@ -71,16 +72,6 @@ export function incrementAccountMintedCount(
   account.contractsMintedCount += 1;
   account.save();
   incrementPoolMintedCount(event, option);
-}
-
-export function incrementAccountTakenCount(
-  event: ethereum.Event,
-  account: Account,
-  option: Option
-): void {
-  account.contractsTakenCount += 1;
-  account.save();
-  incrementPoolTakenCount(event, option);
 }
 
 export function incrementAccountExercisedCount(

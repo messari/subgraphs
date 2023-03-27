@@ -5,13 +5,13 @@
     "address": "0x4ccc2339F87F6c59c6893E1A678c2266cA58dC72",
     "startBlock": 11544482
   },
+  "Controller_V1": {
+    "address": "0x4ccc2339F87F6c59c6893E1A678c2266cA58dC72",
+    "startBlock": 11544482
+  },
   "OTokenFactory": {
     "address": "0x7C06792Af1632E77cb27a558Dc0885338F4Bdf8E",
     "startBlock": 11544447
-  },
-  "Oracle": {
-    "address": "0x789cD7AB3742e23Ce0952F6Bc3Eb3A73A0E08833",
-    "startBlock": 12727844
   },
   "MarginPool": {
     "address": "0x5934807cC0654d46755eBd2848840b616256C6Ef",

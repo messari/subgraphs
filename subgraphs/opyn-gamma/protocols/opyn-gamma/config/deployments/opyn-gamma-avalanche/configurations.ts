@@ -6,6 +6,7 @@ export class OpynAvalancheConfigurations implements Configurations {
   getNetwork(): string {
     return Network.AVALANCHE;
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getOracleAddress(blockNumber: i32): Address {
     return Address.fromString("0x108abfba5ad61bd61a930bfe73394558d60f0b10");
   }

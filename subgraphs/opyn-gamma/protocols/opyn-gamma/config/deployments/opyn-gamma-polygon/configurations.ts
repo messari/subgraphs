@@ -6,6 +6,7 @@ export class OpynPolygonConfigurations implements Configurations {
   getNetwork(): string {
     return Network.MATIC;
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getOracleAddress(blockNumber: i32): Address {
     return Address.fromString("0x3d561c832706e6e0b485a7a78958982e782e8e91");
   }

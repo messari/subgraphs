@@ -9,10 +9,6 @@
     "address": "0x25bc1cd298512885f0e452833198bcbb149f66a5",
     "startBlock": 7339775
   },
-  "Oracle": {
-    "address": "0x108abfba5ad61bd61a930bfe73394558d60f0b10",
-    "startBlock": 8303598
-  },
   "MarginPool": {
     "address": "0xccf6629aeab734e621cc59ebb0297196774fdb9d",
     "startBlock": 7339816

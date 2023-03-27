@@ -1,9 +1,7 @@
-import { BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   LiquidityPool,
-  LiquidityPoolDailySnapshot,
-  LiquidityPoolHourlySnapshot,
   Option,
   Token,
   Withdraw,
@@ -14,8 +12,6 @@ import {
   BIGINT_ZERO,
   INT_ZERO,
   OptionType,
-  SECONDS_PER_DAY,
-  SECONDS_PER_HOUR,
 } from "../common/constants";
 import { getOrCreateToken } from "../common/tokens";
 import { getUSDAmount } from "../price";
@@ -28,7 +24,6 @@ import {
   incrementProtocolExercisedCount,
   incrementProtocolMintedCount,
   incrementProtocolPositionCount,
-  incrementProtocolTakenCount,
   incrementProtocolTotalPoolCount,
   updateProtocolOpenInterest,
   updateProtocolUSDLocked,
@@ -59,8 +54,15 @@ export function getOrCreatePool(token: Token): LiquidityPool {
     pool.cumulativeWithdrawPremiumUSD = BIGDECIMAL_ZERO;
     pool.cumulativeTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
     pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    pool.cumulativeDepositVolumeUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeVolumeByTokenAmount = [BIGINT_ZERO];
+    pool.cumulativeVolumeByTokenUSD = [BIGDECIMAL_ZERO];
+    pool.cumulativeDepositedVolumeUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeDepositedVolumeByTokenUSD = [BIGDECIMAL_ZERO];
+    pool.cumulativeDepositedVolumeByTokenAmount = [BIGINT_ZERO];
     pool.cumulativeWithdrawVolumeUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeWithdrawVolumeUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeWithdrawVolumeByTokenUSD = [BIGDECIMAL_ZERO];
+    pool.cumulativeWithdrawVolumeByTokenAmount = [BIGINT_ZERO];
     pool.cumulativeExercisedVolumeUSD = BIGDECIMAL_ZERO;
     pool.cumulativeClosedVolumeUSD = BIGDECIMAL_ZERO;
     pool.openInterestUSD = BIGDECIMAL_ZERO;
@@ -80,6 +82,8 @@ export function getOrCreatePool(token: Token): LiquidityPool {
     pool.stakedOutputTokenAmount = null;
     pool.rewardTokenEmissionsAmount = null;
     pool.rewardTokenEmissionsUSD = null;
+    pool._lastDailySnapshotTimestamp = BIGINT_ZERO;
+    pool._lastHourlySnapshotTimestamp = BIGINT_ZERO;
     pool.save();
     incrementProtocolTotalPoolCount();
   }
@@ -93,31 +97,17 @@ export function handlePoolDeposit(
 ): void {
   const amount = deposit.inputTokenAmounts[0];
   pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount)];
-  pool.cumulativeDepositVolumeUSD = pool.cumulativeDepositVolumeUSD.plus(
+  pool.cumulativeDepositedVolumeUSD = pool.cumulativeDepositedVolumeUSD.plus(
     deposit.amountUSD
   );
+  pool.cumulativeDepositedVolumeByTokenUSD = [
+    pool.cumulativeDepositedVolumeByTokenUSD[0].plus(deposit.amountUSD),
+  ];
+  pool.cumulativeDepositedVolumeByTokenAmount = [
+    pool.cumulativeDepositedVolumeByTokenAmount[0].plus(amount),
+  ];
   pool.save();
   updatePoolTVL(event, pool);
-  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
-  dailySnapshot.dailyDepositedVolumeByTokenAmount = [
-    dailySnapshot.dailyDepositedVolumeByTokenAmount[0].plus(amount),
-  ];
-  dailySnapshot.dailyDepositedVolumeByTokenUSD = [
-    dailySnapshot.dailyDepositedVolumeByTokenUSD[0].plus(deposit.amountUSD),
-  ];
-  dailySnapshot.dailyDepositedVolumeUSD =
-    dailySnapshot.dailyDepositedVolumeUSD.plus(deposit.amountUSD);
-  dailySnapshot.save();
-  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
-  hourlySnapshot.hourlyDepositVolumeByTokenAmount = [
-    hourlySnapshot.hourlyDepositVolumeByTokenAmount[0].plus(amount),
-  ];
-  hourlySnapshot.hourlyDepositVolumeByTokenUSD = [
-    hourlySnapshot.hourlyDepositVolumeByTokenUSD[0].plus(deposit.amountUSD),
-  ];
-  hourlySnapshot.hourlyDepositVolumeUSD =
-    hourlySnapshot.hourlyDepositVolumeUSD.plus(deposit.amountUSD);
-  hourlySnapshot.save();
 }
 
 export function handlePoolWithdraw(
@@ -130,28 +120,14 @@ export function handlePoolWithdraw(
   pool.cumulativeWithdrawVolumeUSD = pool.cumulativeWithdrawVolumeUSD.plus(
     withdraw.amountUSD
   );
+  pool.cumulativeWithdrawVolumeByTokenUSD = [
+    pool.cumulativeWithdrawVolumeByTokenUSD[0].plus(withdraw.amountUSD),
+  ];
+  pool.cumulativeWithdrawVolumeByTokenAmount = [
+    pool.cumulativeWithdrawVolumeByTokenAmount[0].plus(amount),
+  ];
   pool.save();
   updatePoolTVL(event, pool);
-  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
-  dailySnapshot.dailyWithdrawVolumeByTokenAmount = [
-    dailySnapshot.dailyWithdrawVolumeByTokenAmount[0].plus(amount),
-  ];
-  dailySnapshot.dailyWithdrawVolumeByTokenUSD = [
-    dailySnapshot.dailyWithdrawVolumeByTokenUSD[0].plus(withdraw.amountUSD),
-  ];
-  dailySnapshot.dailyWithdrawVolumeUSD =
-    dailySnapshot.dailyWithdrawVolumeUSD.plus(withdraw.amountUSD);
-  dailySnapshot.save();
-  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
-  hourlySnapshot.hourlyWithdrawVolumeByTokenAmount = [
-    hourlySnapshot.hourlyWithdrawVolumeByTokenAmount[0].plus(amount),
-  ];
-  hourlySnapshot.hourlyWithdrawVolumeByTokenUSD = [
-    hourlySnapshot.hourlyWithdrawVolumeByTokenUSD[0].plus(withdraw.amountUSD),
-  ];
-  hourlySnapshot.hourlyWithdrawVolumeUSD =
-    hourlySnapshot.hourlyWithdrawVolumeUSD.plus(withdraw.amountUSD);
-  hourlySnapshot.save();
 }
 
 export function updatePoolTVL(
@@ -164,10 +140,7 @@ export function updatePoolTVL(
     token,
     pool.inputTokenBalances[0]
   );
-  updateProtocolUSDLocked(
-    event,
-    totalValueLocked.minus(pool.totalValueLockedUSD)
-  );
+  updateProtocolUSDLocked(totalValueLocked.minus(pool.totalValueLockedUSD));
   pool.totalValueLockedUSD = totalValueLocked;
   pool.save();
 }
@@ -179,9 +152,7 @@ export function updatePoolOpenInterest(
 ): void {
   pool.openInterestUSD = pool.openInterestUSD.plus(netChangeUSD);
   pool.save();
-  getOrCreatePoolDailySnapshot(event, pool);
-  getOrCreatePoolHourlySnapshot(event, pool);
-  updateProtocolOpenInterest(event, netChangeUSD);
+  updateProtocolOpenInterest(netChangeUSD);
 }
 
 export function addPoolMintVolume(
@@ -191,14 +162,7 @@ export function addPoolMintVolume(
 ): void {
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(amountUSD);
   pool.save();
-  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
-  dailySnapshot.dailyVolumeUSD = dailySnapshot.dailyVolumeUSD.plus(amountUSD);
-  dailySnapshot.save();
-  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
-  hourlySnapshot.hourlyVolumeUSD =
-    hourlySnapshot.hourlyVolumeUSD.plus(amountUSD);
-  hourlySnapshot.save();
-  addProtocolMintVolume(event, amountUSD);
+  addProtocolMintVolume(amountUSD);
 }
 
 export function addPoolClosedVolume(
@@ -209,13 +173,7 @@ export function addPoolClosedVolume(
   pool.cumulativeClosedVolumeUSD =
     pool.cumulativeClosedVolumeUSD.plus(amountUSD);
   pool.save();
-  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
-  dailySnapshot.dailyClosedVolumeUSD =
-    dailySnapshot.dailyClosedVolumeUSD.plus(amountUSD);
-  dailySnapshot.save();
-  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
-  hourlySnapshot.save();
-  addProtocolClosedVolume(event, amountUSD);
+  addProtocolClosedVolume(amountUSD);
 }
 
 export function addPoolExercisedVolume(
@@ -226,13 +184,7 @@ export function addPoolExercisedVolume(
   pool.cumulativeExercisedVolumeUSD =
     pool.cumulativeExercisedVolumeUSD.plus(amountUSD);
   pool.save();
-  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
-  dailySnapshot.dailyExerciseVolumeUSD =
-    dailySnapshot.dailyExerciseVolumeUSD.plus(amountUSD);
-  dailySnapshot.save();
-  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
-  hourlySnapshot.save();
-  addProtocolExercisedVolume(event, amountUSD);
+  addProtocolExercisedVolume(amountUSD);
 }
 
 export function incrementPoolPositionCount(
@@ -243,11 +195,7 @@ export function incrementPoolPositionCount(
   pool.openPositionCount += 1;
   pool.contractsTakenCount += 1;
   pool.save();
-  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
-  dailySnapshot.dailyContractsTakenCount += 1;
-  dailySnapshot.save();
-  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
-  incrementProtocolPositionCount(event);
+  incrementProtocolPositionCount();
 }
 
 export function decrementPoolPositionCount(
@@ -259,11 +207,7 @@ export function decrementPoolPositionCount(
   pool.closedPositionCount += 1;
   pool.contractsClosedCount += 1;
   pool.save();
-  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
-  dailySnapshot.dailyContractsClosedCount += 1;
-  dailySnapshot.save();
-  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
-  decrementProtocolPositionCount(event);
+  decrementProtocolPositionCount();
 }
 
 export function incrementPoolMintedCount(
@@ -271,37 +215,14 @@ export function incrementPoolMintedCount(
   option: Option
 ): void {
   const pool = LiquidityPool.load(option.pool)!;
-  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
   if (option.type == OptionType.CALL) {
     pool.callsMintedCount += 1;
-    dailySnapshot.callsMintedCount += 1;
-    dailySnapshot.dailyCallsMintedCount += 1;
   } else {
     pool.putsMintedCount += 1;
-    dailySnapshot.putsMintedCount += 1;
-    dailySnapshot.dailyPutsMintedCount += 1;
   }
   pool.contractsMintedCount += 1;
   pool.save();
-  dailySnapshot.contractsMintedCount += 1;
-  dailySnapshot.dailyContractsMintedCount += 1;
-  dailySnapshot.save();
-  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
-  incrementProtocolMintedCount(event, option);
-}
-
-export function incrementPoolTakenCount(
-  event: ethereum.Event,
-  option: Option
-): void {
-  const pool = LiquidityPool.load(option.pool)!;
-  pool.contractsTakenCount += 1;
-  pool.save();
-  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
-  dailySnapshot.dailyContractsTakenCount += 1;
-  dailySnapshot.save();
-  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
-  incrementProtocolTakenCount(event);
+  incrementProtocolMintedCount(option);
 }
 
 export function incrementPoolExercisedCount(
@@ -311,148 +232,5 @@ export function incrementPoolExercisedCount(
   const pool = LiquidityPool.load(option.pool)!;
   pool.contractsExercisedCount += 1;
   pool.save();
-  const dailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
-  dailySnapshot.dailyContractsExercisedCount += 1;
-  dailySnapshot.save();
-  const hourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
-  incrementProtocolExercisedCount(event);
-}
-
-function getOrCreatePoolDailySnapshot(
-  event: ethereum.Event,
-  pool: LiquidityPool
-): LiquidityPoolDailySnapshot {
-  const days = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  const id = Bytes.fromUTF8(`${pool.id.toHex()}-${days}`);
-  const protocol = getOrCreateOpynProtocol();
-  let snapshot = LiquidityPoolDailySnapshot.load(id);
-  if (!snapshot) {
-    snapshot = new LiquidityPoolDailySnapshot(id);
-    snapshot.days = days;
-    snapshot.protocol = protocol.id;
-    snapshot.pool = pool.id;
-    snapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyEntryPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyExitPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyTotalPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyDepositPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyWithdrawPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyVolumeByTokenAmount = [BIGINT_ZERO];
-    snapshot.dailyVolumeByTokenUSD = [BIGDECIMAL_ZERO];
-    snapshot.dailyDepositedVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyDepositedVolumeByTokenAmount = [BIGINT_ZERO];
-    snapshot.dailyDepositedVolumeByTokenUSD = [BIGDECIMAL_ZERO];
-    snapshot.dailyWithdrawVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyWithdrawVolumeByTokenAmount = [BIGINT_ZERO];
-    snapshot.dailyWithdrawVolumeByTokenUSD = [BIGDECIMAL_ZERO];
-    snapshot.dailyClosedVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.dailyExerciseVolumeUSD = BIGDECIMAL_ZERO;
-
-    snapshot.dailyPutsMintedCount = INT_ZERO;
-    snapshot.dailyCallsMintedCount = INT_ZERO;
-    snapshot.dailyContractsMintedCount = INT_ZERO;
-    snapshot.dailyContractsTakenCount = INT_ZERO;
-    snapshot.dailyContractsExpiredCount = INT_ZERO;
-    snapshot.dailyContractsExercisedCount = INT_ZERO;
-    snapshot.dailyContractsClosedCount = INT_ZERO;
-  }
-  snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
-  snapshot.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
-  snapshot.cumulativeProtocolSideRevenueUSD =
-    pool.cumulativeProtocolSideRevenueUSD;
-  snapshot.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
-  snapshot.cumulativeEntryPremiumUSD = pool.cumulativeEntryPremiumUSD;
-  snapshot.cumulativeExitPremiumUSD = pool.cumulativeExitPremiumUSD;
-  snapshot.cumulativeTotalPremiumUSD = pool.cumulativeTotalPremiumUSD;
-  snapshot.cumulativeDepositPremiumUSD = pool.cumulativeDepositPremiumUSD;
-  snapshot.cumulativeWithdrawPremiumUSD = pool.cumulativeWithdrawPremiumUSD;
-  snapshot.cumulativeTotalLiquidityPremiumUSD =
-    pool.cumulativeTotalLiquidityPremiumUSD;
-  snapshot.openInterestUSD = pool.openInterestUSD;
-  snapshot.putsMintedCount = pool.putsMintedCount;
-  snapshot.callsMintedCount = pool.callsMintedCount;
-  snapshot.contractsMintedCount = pool.contractsMintedCount;
-  snapshot.contractsTakenCount = pool.contractsTakenCount;
-  snapshot.contractsExpiredCount = pool.contractsExpiredCount;
-  snapshot.contractsExercisedCount = pool.contractsExercisedCount;
-  snapshot.contractsClosedCount = pool.contractsClosedCount;
-  snapshot.openPositionCount = pool.openPositionCount;
-  snapshot.closedPositionCount = pool.closedPositionCount;
-  snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
-  snapshot.cumulativeDepositedVolumeUSD = pool.cumulativeDepositVolumeUSD;
-  snapshot.cumulativeWithdrawVolumeUSD = pool.cumulativeWithdrawVolumeUSD;
-  snapshot.cumulativeClosedVolumeUSD = pool.cumulativeClosedVolumeUSD;
-  snapshot.cumulativeExerciseVolumeUSD = pool.cumulativeExercisedVolumeUSD;
-  snapshot.inputTokenBalances = pool.inputTokenBalances;
-  snapshot.inputTokenWeights = pool.inputTokenWeights;
-  snapshot.outputTokenSupply = pool.outputTokenSupply;
-  snapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  snapshot.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
-  snapshot.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
-  snapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
-  snapshot.save();
-  return snapshot;
-}
-
-function getOrCreatePoolHourlySnapshot(
-  event: ethereum.Event,
-  pool: LiquidityPool
-): LiquidityPoolHourlySnapshot {
-  const hours = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
-  const id = Bytes.fromUTF8(`${pool.id.toHex()}-${hours}`);
-  const protocol = getOrCreateOpynProtocol();
-  let snapshot = LiquidityPoolHourlySnapshot.load(id);
-  if (!snapshot) {
-    snapshot = new LiquidityPoolHourlySnapshot(id);
-    snapshot.hours = hours;
-    snapshot.protocol = protocol.id;
-    snapshot.pool = pool.id;
-    snapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyEntryPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyExitPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyTotalPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyDepositPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyWithdrawPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyVolumeByTokenAmount = [BIGINT_ZERO];
-    snapshot.hourlyVolumeByTokenUSD = [BIGDECIMAL_ZERO];
-    snapshot.hourlyDepositVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyDepositVolumeByTokenAmount = [BIGINT_ZERO];
-    snapshot.hourlyDepositVolumeByTokenUSD = [BIGDECIMAL_ZERO];
-    snapshot.hourlyWithdrawVolumeUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyWithdrawVolumeByTokenAmount = [BIGINT_ZERO];
-    snapshot.hourlyWithdrawVolumeByTokenUSD = [BIGDECIMAL_ZERO];
-  }
-  snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
-  snapshot.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
-  snapshot.cumulativeProtocolSideRevenueUSD =
-    pool.cumulativeProtocolSideRevenueUSD;
-  snapshot.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
-  snapshot.cumulativeEntryPremiumUSD = pool.cumulativeEntryPremiumUSD;
-  snapshot.cumulativeExitPremiumUSD = pool.cumulativeExitPremiumUSD;
-  snapshot.cumulativeTotalPremiumUSD = pool.cumulativeTotalPremiumUSD;
-  snapshot.cumulativeDepositPremiumUSD = pool.cumulativeDepositPremiumUSD;
-  snapshot.cumulativeWithdrawPremiumUSD = pool.cumulativeWithdrawPremiumUSD;
-  snapshot.cumulativeTotalLiquidityPremiumUSD =
-    pool.cumulativeTotalLiquidityPremiumUSD;
-  snapshot.openInterestUSD = pool.openInterestUSD;
-  snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
-  snapshot.cumulativeDepositVolumeUSD = pool.cumulativeDepositVolumeUSD;
-  snapshot.cumulativeWithdrawVolumeUSD = pool.cumulativeWithdrawVolumeUSD;
-  snapshot.inputTokenBalances = pool.inputTokenBalances;
-  snapshot.inputTokenWeights = pool.inputTokenWeights;
-  snapshot.outputTokenSupply = pool.outputTokenSupply;
-  snapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  snapshot.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
-  snapshot.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
-  snapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
-  snapshot.save();
-  return snapshot;
+  incrementProtocolExercisedCount();
 }

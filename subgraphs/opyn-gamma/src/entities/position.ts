@@ -43,10 +43,9 @@ export function exercisePosition(
 ): void {
   const position = closePosition(event, account, option);
   if (position) {
-    // ?
     position.exercisedBlockNumber = event.block.number;
     position.exercisedTimestamp = event.block.timestamp;
-    position.closedPrice = option.expirationPriceUSD;
+    position.closedPriceUSD = option.expirationPriceUSD;
     position.save();
   }
   incrementAccountExercisedCount(event, account, option);
@@ -61,7 +60,9 @@ function openNewPosition(
   const id = getPositionId(account, option);
   const position = new Position(id);
   position.option = option.id;
+  position.pool = option.pool;
   position.account = account.id;
+  position.asset = option.underlyingAsset;
   position.takenHash = event.transaction.hash;
   position.takenBlockNumber = event.block.number;
   position.takenTimestamp = event.block.timestamp;
@@ -85,7 +86,7 @@ function closePosition(
   }
   position.closedTimestamp = event.block.timestamp;
   position.closedBlockNumber = event.block.number;
-  position.closedPrice = getUnderlyingPrice(event, option);
+  position.closedPriceUSD = getUnderlyingPrice(event, option);
   position.save();
   decrementAccountPositionCount(event, account, option);
   incrementPositionCounter(account, option);

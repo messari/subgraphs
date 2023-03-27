@@ -6,6 +6,7 @@ export class OpynArbitrumConfigurations implements Configurations {
   getNetwork(): string {
     return Network.ARBITRUM_ONE;
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getOracleAddress(blockNumber: i32): Address {
     return Address.fromString("0x7a1e6f0f07ee2ddde14cd4b8eb582bad065357c5");
   }

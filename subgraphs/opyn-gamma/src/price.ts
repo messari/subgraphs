@@ -7,7 +7,7 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../configurations/configure";
-import { Oracle } from "../generated/Oracle/Oracle";
+import { Oracle } from "../generated/Controller/Oracle";
 import { Option, Token } from "../generated/schema";
 import { INT_EIGHT } from "./common/constants";
 import { getOrCreateToken } from "./common/tokens";

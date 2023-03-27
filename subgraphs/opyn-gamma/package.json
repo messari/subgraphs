@@ -7,7 +7,7 @@
     "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.template.mustache > configurations/configure.ts"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.40.0",
-    "@graphprotocol/graph-ts": "0.29.1"
+    "@graphprotocol/graph-cli": "0.43.0",
+    "@graphprotocol/graph-ts": "0.29.3"
   }
 }

@@ -11,6 +11,7 @@ import {
   incrementProtocolDepositCount,
   incrementProtocolWithdrawCount,
 } from "./usage";
+import { takeSnapshots } from "./snapshot";
 
 export function createDeposit(
   event: ethereum.Event,
@@ -21,6 +22,7 @@ export function createDeposit(
   const account = getOrCreateAccount(from);
   const token = getOrCreateToken(asset);
   const pool = getOrCreatePool(token);
+  takeSnapshots(event, pool);
   const deposit = new Deposit(
     Bytes.fromUTF8(
       prefixID(
@@ -58,6 +60,7 @@ export function createWithdraw(
   const account = getOrCreateAccount(to);
   const token = getOrCreateToken(asset);
   const pool = getOrCreatePool(token);
+  takeSnapshots(event, pool);
   const withdraw = new Withdraw(
     Bytes.fromUTF8(
       prefixID(

@@ -65,52 +65,74 @@ dataSources:
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
-        - event: AccountOperatorUpdated(indexed address,indexed address,bool)
-          handler: handleAccountOperatorUpdated
-        - event: CallExecuted(indexed address,indexed address,bytes)
-          handler: handleCallExecuted
-        - event: CallRestricted(bool)
-          handler: handleCallRestricted
-        - event: CollateralAssetDeposited(indexed address,indexed address,indexed
-            address,uint256,uint256)
-          handler: handleCollateralAssetDeposited
-        - event: CollateralAssetWithdrawed(indexed address,indexed address,indexed
-            address,uint256,uint256)
-          handler: handleCollateralAssetWithdrawed
-        - event: Donated(indexed address,indexed address,uint256)
-          handler: handleDonated
-        - event: FullPauserUpdated(indexed address,indexed address)
-          handler: handleFullPauserUpdated
-        - event: LongOtokenDeposited(indexed address,indexed address,indexed
-            address,uint256,uint256)
-          handler: handleLongOtokenDeposited
-        - event: LongOtokenWithdrawed(indexed address,indexed address,indexed
-            address,uint256,uint256)
-          handler: handleLongOtokenWithdrawed
-        - event: NakedCapUpdated(indexed address,uint256)
-          handler: handleNakedCapUpdated
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: PartialPauserUpdated(indexed address,indexed address)
-          handler: handlePartialPauserUpdated
         - event: Redeem(indexed address,indexed address,indexed address,address,uint256,uint256)
           handler: handleRedeem
-        - event: ShortOtokenBurned(indexed address,indexed address,indexed address,uint256,uint256)
-          handler: handleShortOtokenBurned
-        - event: ShortOtokenMinted(indexed address,indexed address,indexed address,uint256,uint256)
-          handler: handleShortOtokenMinted
-        - event: SystemFullyPaused(bool)
-          handler: handleSystemFullyPaused
-        - event: SystemPartiallyPaused(bool)
-          handler: handleSystemPartiallyPaused
-        - event: VaultLiquidated(indexed address,indexed address,indexed
-            address,uint256,uint256,uint256,uint256,uint256)
-          handler: handleVaultLiquidated
-        - event: VaultOpened(indexed address,uint256,indexed uint256)
-          handler: handleVaultOpened
         - event: VaultSettled(indexed address,indexed address,address,uint256,uint256,indexed uint256)
           handler: handleVaultSettled
       file: ./src/mappings/Controller.ts
+{{#Controller_V1}}
+  - kind: ethereum
+    name: Controller_V1
+    network: {{ network }}
+    source:
+      address: "{{ Controller_V1.address }}"
+      abi: Controller_V1
+      startBlock: {{ Controller_V1.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Controller_V1
+          file: ./abis/Controller_V1.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: Oracle
+          file: ./abis/Oracle.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: VaultSettled(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleVaultSettled
+      file: ./src/mappings/Controller_V1.ts
+{{/Controller_V1}}
   - kind: ethereum
     name: OTokenFactory
     network: {{ network }}
@@ -136,39 +158,6 @@ dataSources:
         - event: OtokenCreated(address,address,indexed address,indexed address,indexed address,uint256,uint256,bool)
           handler: handleOtokenCreated
       file: ./src/mappings/OTokenFactory.ts
-  - kind: ethereum
-    name: Oracle
-    network: {{ network }}
-    source:
-      address: "{{ Oracle.address }}"
-      abi: Oracle
-      startBlock: {{ Oracle.startBlock }}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: Oracle
-          file: ./abis/Oracle.json
-      eventHandlers:
-        - event: DisputerUpdated(indexed address)
-          handler: handleDisputerUpdated
-        - event: ExpiryPriceDisputed(indexed address,indexed uint256,uint256,uint256,uint256)
-          handler: handleExpiryPriceDisputed
-        - event: ExpiryPriceUpdated(indexed address,indexed uint256,uint256,uint256)
-          handler: handleExpiryPriceUpdated
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: PricerDisputePeriodUpdated(indexed address,uint256)
-          handler: handlePricerDisputePeriodUpdated
-        - event: PricerLockingPeriodUpdated(indexed address,uint256)
-          handler: handlePricerLockingPeriodUpdated
-        - event: PricerUpdated(indexed address,indexed address)
-          handler: handlePricerUpdated
-        - event: StablePriceUpdated(indexed address,uint256)
-          handler: handleStablePriceUpdated
-      file: ./src/mappings/Oracle.ts
   - kind: ethereum
     name: MarginPool
     network: {{ network }}
