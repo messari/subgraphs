@@ -92,6 +92,8 @@ export function updateProtocolAndPoolTvl(
     getOrCreateToken(Address.fromString(RPL_ADDRESS), blockNumber).lastPriceUSD!
   );
 
+  pool.inputTokenBalancesUSD = [rplTVLUSD, ethTVLUSD];
+
   const totalValueLockedUSD = ethTVLUSD.plus(rplTVLUSD);
   pool.totalValueLockedUSD = totalValueLockedUSD;
   pool.save();
