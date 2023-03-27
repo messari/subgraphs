@@ -36,6 +36,7 @@ import {
   CrosschainTokenType,
 } from "./sdk/protocols/bridge/enums";
 import { BridgeConfig } from "./sdk/protocols/bridge/config";
+import { Account } from "./sdk/protocols/bridge/account";
 import { _ERC20 } from "../generated/AxelarGateway/_ERC20";
 import { ERC20NameBytes } from "../generated/AxelarGateway/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../generated/AxelarGateway/ERC20SymbolBytes";
@@ -239,7 +240,7 @@ export function handleContractCallWithToken(
 
   const customEvent = _createCustomEvent(event)!;
 
-  _handleTransferOut(
+  const account = _handleTransferOut(
     Address.fromString(tokenAddress),
     event.params.sender,
     dstAccount,
@@ -253,13 +254,7 @@ export function handleContractCallWithToken(
     null
   );
 
-  _handleMessageOut(
-    dstChainId,
-    event.params.sender,
-    dstAccount,
-    event.params.payloadHash,
-    customEvent
-  );
+  account.messageOut(dstChainId, dstAccount, event.params.payload);
 }
 
 export function handleContractCall(event: ContractCall): void {
@@ -313,7 +308,7 @@ export function handleContractCallApprovedWithMint(
   const srcPoolId = srcNetworkConstants.getPoolAddress();
 
   const customEvent = _createCustomEvent(event)!;
-  _handleTransferIn(
+  const account = _handleTransferIn(
     Address.fromString(tokenAddress),
     srcAccount,
     event.params.contractAddress,
@@ -327,13 +322,7 @@ export function handleContractCallApprovedWithMint(
     event.params.commandId
   );
 
-  _handleMessageIn(
-    srcChainId,
-    srcAccount,
-    event.address,
-    event.params.payloadHash,
-    customEvent
-  );
+  account.messageIn(srcChainId, srcAccount, event.params.payloadHash);
 }
 
 export function handleCommandExecuted(event: Executed): void {
@@ -347,7 +336,7 @@ export function handleCommandExecuted(event: Executed): void {
   // burnToken or transferOperatorship
   // https://github.com/axelarnetwork/axelar-cgp-solidity/blob/2a24602fdad6d3aa80f4e43cacfe7241adbb905e/contracts/AxelarGateway.sol#L308-L319
   // We only interest in mintToken and burnToken, we detect those events
-  // by search the log receipt for Transfer event
+  // by searching the log receipt for Transfer event
   const receipt = event.receipt;
   if (!receipt) {
     log.error("[handleCommandExecuted]No receipt for tx {}", [
@@ -556,7 +545,7 @@ function _handleTransferOut(
   crosschainTokenType: CrosschainTokenType,
   customEvent: CustomEventType,
   refId: Bytes | null = null
-): void {
+): Account {
   const sdk = _getSDK(customEvent);
   const inputToken = sdk.Tokens.getOrCreateToken(token);
 
@@ -587,6 +576,7 @@ function _handleTransferOut(
     transfer._refId = refId;
     transfer.save();
   }
+  return acc;
 }
 
 function _handleTransferIn(
@@ -601,7 +591,7 @@ function _handleTransferIn(
   crosschainTokenType: CrosschainTokenType,
   customEvent: CustomEventType,
   refId: Bytes | null = null
-): void {
+): Account {
   const sdk = _getSDK(customEvent);
 
   const pool = sdk.Pools.loadPool(
@@ -631,6 +621,7 @@ function _handleTransferIn(
     transfer._refId = refId;
     transfer.save();
   }
+  return acc;
 }
 
 function _handleMintToken(
