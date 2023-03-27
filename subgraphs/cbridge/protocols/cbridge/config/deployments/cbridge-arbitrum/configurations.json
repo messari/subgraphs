@@ -17,7 +17,7 @@
     "startBlock": 4058525
   },
   "PeggedTokenBridgeV2": {
-    "address": "0xc72e7fC220e650e93495622422F3c14fb03aAf6B",
+    "address": "0x0000000000000000000000000000000000000000",
     "startBlock": 24353930
   },
   "FarmingRewards": {

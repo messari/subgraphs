@@ -1,20 +1,20 @@
 {
-  "network": "harmony",
+  "network": "moonriver",
   "Bridge": {
-    "address": "0x78a21c1d3ed53a82d4247b9ee5bf001f4620ceec",
-    "startBlock": 20279574
+    "address": "0x841ce48F9446C8E281D3F1444cB859b4A6D0738C",
+    "startBlock": 1050601
   },
   "OriginalTokenVault": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 20884938
+    "startBlock": 1152962
   },
   "OriginalTokenVaultV2": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 20884938
+    "startBlock": 1152962
   },
   "PeggedTokenBridge": {
-    "address": "0xdd90e5e87a2081dcf0391920868ebc2ffb81a1af",
-    "startBlock": 20884938
+    "address": "0x374B8a9f3eC5eB2D97ECA84Ea27aCa45aa1C57EF",
+    "startBlock": 1152962
   },
   "PeggedTokenBridgeV2": {
     "address": "0x0000000000000000000000000000000000000000",
