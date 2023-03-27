@@ -4,7 +4,7 @@ import 'dotenv/config'
 import { protocolDerivedFields, protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
 import { pullMessagesByThread, resolveQueriesToAttempt, resolveThreadCreation } from "./resolutions.js";
-import { generateEndpoints, indexStatusFlow, queryDecentralizedIndex } from "./indexingStatus.js";
+import { generateDecenEndpoints, generateEndpoints, generateProtocolToBaseMap, indexStatusFlow, queryDecentralizedIndex } from "./indexingStatus.js";
 import { getGithubIssues } from "./github.js";
 
 const hourMs = 3600000;
@@ -16,7 +16,6 @@ try {
   errorNotification("ERROR LOCATION 21 " + err.message + ' MAIN LOGIC script.js');
 }
 
-let protocolNameToBaseMapping = {};
 
 async function executionFlow() {
   console.log('START');
@@ -30,10 +29,9 @@ async function executionFlow() {
   } catch (err) {
     console.log(err.message);
   }
-  const loopDeploymentJSON = await generateEndpoints(data, protocolNameToBaseMapping);
-  const subgraphEndpoints = loopDeploymentJSON.subgraphEndpoints;
-  protocolNameToBaseMapping = loopDeploymentJSON.protocolNameToBaseMapping;
-  const hostedEndpointToDecenNetwork = loopDeploymentJSON.hostedEndpointToDecenNetwork;
+  const subgraphEndpoints = await generateEndpoints(data);
+  const hostedEndpointToDecenNetwork = await generateDecenEndpoints(data);
+  const protocolNameToBaseMapping = await generateProtocolToBaseMap(data);
   const decenKeyToEndpoint = await queryDecentralizedIndex(hostedEndpointToDecenNetwork);
 
   let deployments = {};
@@ -163,6 +161,6 @@ async function executionFlow() {
     await clearThread(Date.now() - (86400000), aggThreadId);
   }
   await sendMessageToAggThread(aggThreadId);
-  console.log('FINISH')
+  console.log('FINISH');
   return;
 }

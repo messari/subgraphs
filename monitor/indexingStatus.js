@@ -22,15 +22,49 @@ chains {
   }
 }`;
 
-export async function generateEndpoints(data, protocolNameToBaseMapping) {
+export async function generateProtocolToBaseMap(data) {
+  const protocolToBaseMap = {};
+  if (Object.keys(data)?.length > 0) {
+    Object.keys(data).forEach((protocolName) => {
+      const protocol = data[protocolName];
+      protocolToBaseMap[protocolName] = protocol.base;
+    })
+  }
+  return protocolToBaseMap;
+}
+
+export async function generateDecenEndpoints(data) {
+  const hostedEndpointToDecenNetwork = {};
   try {
-    const protocolNameToBaseMappingCopy = JSON.parse(JSON.stringify(protocolNameToBaseMapping));
-    const subgraphEndpoints = {};
-    const hostedEndpointToDecenNetwork = {};
     if (Object.keys(data)?.length > 0) {
       Object.keys(data).forEach((protocolName) => {
         const protocol = data[protocolName];
-        protocolNameToBaseMappingCopy[protocolName] = protocol.base;
+        if (!protocol.schema) {
+          return;
+        }
+        Object.values(protocol.deployments).forEach((depoData) => {
+          let hostedServiceId = "";
+          if (!!depoData?.services["hosted-service"]) {
+            hostedServiceId = depoData?.services["hosted-service"]?.slug;
+          }
+          if (!!depoData?.services["decentralized-network"]) {
+            hostedEndpointToDecenNetwork["https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId] = (depoData?.services["decentralized-network"]?.["query-id"]);
+          }
+        });
+      })
+    }
+  } catch (err) {
+    errorNotification("ERROR LOCATION 1 " + err.message);
+  }
+  return hostedEndpointToDecenNetwork;
+}
+
+export async function generateEndpoints(data) {
+  try {
+    const subgraphEndpoints = {};
+    if (Object.keys(data)?.length > 0) {
+      Object.keys(data).forEach((protocolName) => {
+        const protocol = data[protocolName];
         if (!protocol.schema) {
           return;
         }
@@ -46,13 +80,10 @@ export async function generateEndpoints(data, protocolNameToBaseMapping) {
             hostedServiceId = depoData?.services["hosted-service"]?.slug;
           }
           subgraphEndpoints[protocol.schema][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId;
-          if (!!depoData?.services["decentralized-network"]) {
-            hostedEndpointToDecenNetwork["https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId] = (depoData?.services["decentralized-network"]?.["query-id"]);
-          }
         });
       });
     }
-    return { subgraphEndpoints, protocolNameToBaseMapping: protocolNameToBaseMappingCopy, hostedEndpointToDecenNetwork };
+    return subgraphEndpoints;
   } catch (err) {
     errorNotification("ERROR LOCATION 1 " + err.message);
   }

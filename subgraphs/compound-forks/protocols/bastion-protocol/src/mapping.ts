@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -8,6 +14,7 @@ import {
   ActionPaused1,
   MarketExited,
   MarketEntered,
+  NewRewardDistributor,
 } from "../../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -24,6 +31,8 @@ import {
   Market,
   RewardToken,
   Token,
+  _Realm,
+  _RewardType,
 } from "../../../generated/schema";
 import {
   cTokenDecimals,
@@ -33,8 +42,6 @@ import {
   SECONDS_PER_DAY,
   RewardTokenType,
   exponentToBigDecimal,
-  INT_ZERO,
-  INT_ONE,
   BIGDECIMAL_ZERO,
   mantissaFactor,
 } from "../../../src/constants";
@@ -43,7 +50,6 @@ import {
   _getOrCreateProtocol,
   _handleNewReserveFactor,
   _handleNewCollateralFactor,
-  _handleNewPriceOracle,
   _handleMarketListed,
   MarketListedData,
   TokenData,
@@ -59,28 +65,61 @@ import {
   _handleActionPaused,
   _handleMarketEntered,
   _handleTransfer,
+  getOrCreateMarketDailySnapshot,
+  getOrCreateMarketHourlySnapshot,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
 import { Comptroller } from "../../../generated/Comptroller/Comptroller";
-import { CToken as CTokenTemplate } from "../../../generated/templates";
+import {
+  CToken as CTokenTemplate,
+  RewardDistributor as RewardDistributorTemplate,
+} from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import {
+  AURORA_REALM_ADDRESS,
+  BSTN_TOKEN_ADDRESS,
   bstnOracle,
   cBSTNContract,
+  cNearContract,
   comptrollerAddr,
+  cStNearContract,
+  MULTICHAIN_REALM_ADDRESS,
   nativeCToken,
   nativeToken,
-  rewardDistributorAddress,
-  REWARD_TOKENS,
+  NEAR_TOKEN_ADDRESS,
+  nearOracle,
+  STNEAR_TOKEN_ADDRESS,
+  stNearOracle,
+  STNEAR_REALM_ADDRESS,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
-import { RewardDistributor } from "../../../generated/templates/CToken/RewardDistributor";
+import {
+  RewardAdded,
+  RewardAddressChanged,
+  RewardBorrowSpeedUpdated,
+  RewardSupplySpeedUpdated,
+} from "../../../generated/templates/RewardDistributor/RewardDistributor";
+
+export function handleNewRewardDistributor(event: NewRewardDistributor): void {
+  log.info(
+    "[handleNewRewardDistributor]New RewardDistributor {} for market {} at tx {}",
+    [
+      event.params.newRewardDistributor.toHexString(),
+      event.address.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+  RewardDistributorTemplate.create(event.params.newRewardDistributor);
+}
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
-  const protocol = getOrCreateProtocol();
-  const newPriceOracle = event.params.newPriceOracle;
-  _handleNewPriceOracle(protocol, newPriceOracle);
+  let realm = _Realm.load(event.address.toHexString());
+  if (!realm) {
+    realm = new _Realm(event.address.toHexString());
+  }
+  realm.priceOracle = event.params.newPriceOracle.toHexString();
+  realm.save();
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
@@ -102,21 +141,36 @@ export function handleMarketExited(event: MarketExited): void {
 }
 
 export function handleMarketListed(event: MarketListed): void {
-  CTokenTemplate.create(event.params.cToken);
+  if (event.params.cToken.equals(cBSTNContract)) {
+    log.info("[handleMarketListed]cBSTN token {} is skipped", [
+      event.params.cToken.toHexString(),
+    ]);
+    return;
+  }
 
+  CTokenTemplate.create(event.params.cToken);
   const cTokenAddr = event.params.cToken;
   const cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
   }
   // this is a new cToken, a new underlying token, and a new market
-
   const protocol = getOrCreateProtocol();
   const cTokenContract = CToken.bind(event.params.cToken);
   const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
+
+  let marketNamePrefix = "";
+  if (event.address.equals(AURORA_REALM_ADDRESS)) {
+    marketNamePrefix = "Aurora Realm: ";
+  } else if (event.address.equals(STNEAR_REALM_ADDRESS)) {
+    marketNamePrefix = "STNear Realm: ";
+  } else if (event.address.equals(MULTICHAIN_REALM_ADDRESS)) {
+    marketNamePrefix = "Multichain Realm: ";
+  }
+
   if (cTokenAddr == nativeCToken.address) {
     const marketListedData = new MarketListedData(
       protocol,
@@ -125,6 +179,21 @@ export function handleMarketListed(event: MarketListed): void {
       cTokenReserveFactorMantissa
     );
     _handleMarketListed(marketListedData, event);
+    const market = Market.load(cTokenAddr.toHexString());
+    if (!market) {
+      log.critical(
+        "[handleMarketListed]market entity {} not added for tx {}-{}",
+        [
+          cTokenAddr.toHexString(),
+          event.transaction.hash.toHexString(),
+          event.transactionLogIndex.toString(),
+        ]
+      );
+      return;
+    }
+    market.name = `${marketNamePrefix}${market.name!}`;
+    market._realm = event.address.toHexString();
+    market.save();
     return;
   }
 
@@ -157,6 +226,22 @@ export function handleMarketListed(event: MarketListed): void {
     ),
     event
   );
+
+  const market = Market.load(cTokenAddr.toHexString());
+  if (!market) {
+    log.critical(
+      "[handleMarketListed]market entity {} not added for tx {}-{}",
+      [
+        cTokenAddr.toHexString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
+    );
+    return;
+  }
+  market.name = `${marketNamePrefix}${market.name!}`;
+  market._realm = event.address.toHexString();
+  market.save();
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
@@ -177,7 +262,10 @@ export function handleActionPaused(event: ActionPaused1): void {
   const marketID = event.params.cToken.toHexString();
   const action = event.params.action;
   const pauseState = event.params.pauseState;
-  _handleActionPaused(marketID, action, pauseState);
+  // it seems bastion protocol flips the pauseState, so we invert it here
+  // https://github.com/messari/subgraphs/issues/1415#issuecomment-1475407997
+  // https://github.com/messari/subgraphs/pull/1805#pullrequestreview-1349739373
+  _handleActionPaused(marketID, action, !pauseState);
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
@@ -279,22 +367,53 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
 export function handleAccrueInterest(event: AccrueInterest): void {
   const marketAddress = event.address;
-  // update rewards for market after the RewardDistributor is created at block 60837741
-  if (event.block.number.toI64() > 60837741) {
-    updateRewards(marketAddress, event.block.number);
+  const market = Market.load(marketAddress.toHexString());
+  if (!market || !market._realm) {
+    log.error(
+      "[handleAccrueInterest]market {} doesn't exist or market.realm{} tx {}-{}",
+      [
+        marketAddress.toHexString(),
+        market && !market._realm ? "=null" : "",
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toHexString(),
+      ]
+    );
+    return;
+  }
+  updateRewardTokenPrices(market);
+
+  const realm = _Realm.load(market._realm!);
+  if (!realm) {
+    log.error("[handleAccrueInterest]realm {} doesn't exist tx {}-{}", [
+      market._realm!,
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]);
+    return;
   }
 
+  // replace price oracle for Near and stNear token in the stNear realm
+  // as the stNear realm oracle returns prices relative to the Near price
+  let priceOracle = Address.fromString(realm.priceOracle);
+  let marketAddressForOracle = marketAddress;
+  if (Address.fromString(market.inputToken).equals(NEAR_TOKEN_ADDRESS)) {
+    priceOracle = nearOracle;
+    marketAddressForOracle = cNearContract;
+  } else if (
+    Address.fromString(market.inputToken).equals(STNEAR_TOKEN_ADDRESS)
+  ) {
+    priceOracle = stNearOracle;
+    marketAddressForOracle = cStNearContract;
+  }
+
+  const oracleContract = PriceOracle.bind(priceOracle);
   const cTokenContract = CToken.bind(marketAddress);
-  const protocol = getOrCreateProtocol();
-  const oracleContract = PriceOracle.bind(
-    Address.fromString(protocol._priceOracle)
-  );
   const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
-    oracleContract.try_getUnderlyingPrice(marketAddress),
+    oracleContract.try_getUnderlyingPrice(marketAddressForOracle),
     SECONDS_PER_YEAR
   );
   const interestAccumulated = event.params.interestAccumulated;
@@ -332,192 +451,195 @@ function getOrCreateProtocol(): LendingProtocol {
   return _getOrCreateProtocol(protocolData);
 }
 
-//
-//
-// Update the rewards arrays in a given market
-function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
-  const market = Market.load(marketAddress.toHexString());
+export function handleRewardAdded(event: RewardAdded): void {
+  const rewardTypeId = event.params.rewardType.toString();
+  let rewardToken = _RewardType.load(rewardTypeId);
+  if (!rewardToken) {
+    rewardToken = new _RewardType(rewardTypeId);
+  }
+  rewardToken.token = event.params.newRewardAddress.toHexString();
+  rewardToken.save();
+  getOrCreateToken(event.params.newRewardAddress);
+}
+
+export function handleRewardAddressChanged(event: RewardAddressChanged): void {
+  const rewardTypeId = event.params.rewardType.toString();
+  let rewardToken = _RewardType.load(rewardTypeId);
+  if (!rewardToken) {
+    rewardToken = new _RewardType(rewardTypeId);
+  }
+  rewardToken.token = event.params.newRewardAddress.toHexString();
+  rewardToken.save();
+  getOrCreateToken(event.params.newRewardAddress);
+}
+
+export function handleRewardBorrowSpeedUpdated(
+  event: RewardBorrowSpeedUpdated
+): void {
+  updateRewardSpeed(
+    event.params.rewardType.toString(),
+    event.params.cToken,
+    event.params.newSpeed,
+    RewardTokenType.BORROW,
+    event
+  );
+}
+
+export function handleRewardSupplySpeedUpdated(
+  event: RewardSupplySpeedUpdated
+): void {
+  updateRewardSpeed(
+    event.params.rewardType.toString(),
+    event.params.cToken,
+    event.params.newSpeed,
+    RewardTokenType.DEPOSIT,
+    event
+  );
+}
+
+function updateRewardSpeed(
+  rewardTypeId: string,
+  cToken: Address,
+  newSpeed: BigInt,
+  rewardTokenType: RewardTokenType,
+  event: ethereum.Event
+): void {
+  const rewardType = _RewardType.load(rewardTypeId);
+  if (!rewardType) {
+    log.error(
+      "[updateRewardSpeed]RewardType {} doesn't exist in _RewardType tx {}",
+      [rewardTypeId, event.transaction.hash.toHexString()]
+    );
+    return;
+  }
+  const market = Market.load(cToken.toHexString());
   if (!market) {
-    log.warning("[updateRewards] Market not found: {}", [
-      marketAddress.toHexString(),
+    log.error("[updateRewardSpeed]market {} doesn't exist", [
+      cToken.toHexString(),
     ]);
     return;
   }
 
-  // setup variables and contracts
-  const rewardTokens: string[] = [];
-  const rewardEmissions: BigInt[] = [];
-  const rewardEmissionsUSD: BigDecimal[] = [];
+  const rewardTokenAddress = Address.fromString(rewardType.token);
+  const token = getOrCreateToken(rewardTokenAddress);
+  const dailyEmission = newSpeed.times(BigInt.fromI32(SECONDS_PER_DAY));
+  const priceUSD = getRewardTokenPrice(token);
+  const dailyEmissionUSD = dailyEmission
+    .toBigDecimal()
+    .div(exponentToBigDecimal(token.decimals))
+    .times(priceUSD);
 
-  const rewardDistributorContract = RewardDistributor.bind(
-    rewardDistributorAddress
-  );
+  const rewardToken = getOrCreateRewardToken(token, rewardTokenType);
+  const rewardTokens = market.rewardTokens ? market.rewardTokens! : [];
+  let rewardEmissions = market.rewardTokenEmissionsAmount
+    ? market.rewardTokenEmissionsAmount!
+    : [];
+  let rewardEmissionsUSD = market.rewardTokenEmissionsUSD
+    ? market.rewardTokenEmissionsUSD!
+    : [];
 
-  // look for borrow-side rewards
-  // must check both types of rewards (see constants.ts for details)
-  const tryBorrowZero = rewardDistributorContract.try_rewardBorrowSpeeds(
-    INT_ZERO,
-    marketAddress
-  );
-  const tryBorrowOne = rewardDistributorContract.try_rewardBorrowSpeeds(
-    INT_ONE,
-    marketAddress
-  );
-  let borrowRewardSpeed: BigInt | null = null;
-  let borrowRewardToken: RewardToken | null = null;
-  let token: Token | null = null;
+  const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
+  if (rewardTokenIndex == -1) {
+    // this is a new reward token
+    rewardTokens.push(rewardToken.id);
+    rewardEmissions.push(dailyEmission);
+    rewardEmissionsUSD.push(dailyEmissionUSD);
 
-  if (!tryBorrowZero.reverted) {
-    borrowRewardSpeed = tryBorrowZero.value;
-
-    // load BSTN token
-    token = Token.load(REWARD_TOKENS[INT_ZERO].toHexString());
-    if (!token) {
-      token = new Token(REWARD_TOKENS[INT_ZERO].toHexString());
-      token.name = "Bastion Protocol";
-      token.symbol = "BSTN";
-      token.decimals = 18;
-    }
-    token.lastPriceUSD = getBastionPrice();
-    token.lastPriceBlockNumber = blockNumber;
-    token.save();
-
-    borrowRewardToken = getOrCreateRewardToken(token, RewardTokenType.BORROW);
-  }
-
-  if (!tryBorrowOne.reverted) {
-    if (
-      borrowRewardSpeed &&
-      borrowRewardSpeed.gt(BIGINT_ZERO) &&
-      tryBorrowOne.value.gt(BIGINT_ZERO)
-    ) {
-      log.warning(
-        "[updateRewards] Multiple reward speeds found for borrow side: {} {} {}",
-        [
-          marketAddress.toHexString(),
-          borrowRewardSpeed.toString(),
-          tryBorrowOne.value.toString(),
-        ]
+    if (rewardTokens.length > 1) {
+      // rewardTokenEmissionsAmount, rewardTokenEmissionsUSD needs to be sorted
+      const rewardTokensUnsorted = rewardTokens;
+      rewardTokens.sort();
+      rewardEmissions = sortArrayByReference<string, BigInt>(
+        rewardTokens,
+        rewardTokensUnsorted,
+        rewardEmissions
       );
-      return;
-    }
-    if (tryBorrowOne.value.gt(BIGINT_ZERO)) {
-      borrowRewardSpeed = tryBorrowOne.value;
-
-      // load wNEAR token
-      token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
-      if (!token) {
-        // wNEAR is already made from the NEAR market
-        log.warning("[updateRewards] wNEAR not found: {} {}", [
-          REWARD_TOKENS[INT_ONE].toHexString(),
-          borrowRewardSpeed.toString(),
-        ]);
-        return;
-      }
-
-      borrowRewardToken = getOrCreateRewardToken(token, RewardTokenType.BORROW);
-    }
-  }
-
-  // if a borrow side reward is successfully found, update rewards
-  if (borrowRewardSpeed && token) {
-    const priceUSD = token.lastPriceUSD ? token.lastPriceUSD : BIGDECIMAL_ZERO;
-    rewardTokens.push(borrowRewardToken!.id);
-    const dailyBorrowRewards = borrowRewardSpeed.times(
-      BigInt.fromI32(SECONDS_PER_DAY)
-    );
-    rewardEmissions.push(dailyBorrowRewards);
-    rewardEmissionsUSD.push(
-      dailyBorrowRewards
-        .toBigDecimal()
-        .div(exponentToBigDecimal(token.decimals))
-        .times(priceUSD!)
-    );
-  }
-
-  // look for supply-side rewards
-  // must check both types of rewards (see constants.ts for details)
-  const trySupplyZero = rewardDistributorContract.try_rewardSupplySpeeds(
-    INT_ZERO,
-    marketAddress
-  );
-  const trySupplyOne = rewardDistributorContract.try_rewardSupplySpeeds(
-    INT_ONE,
-    marketAddress
-  );
-  let supplyRewardSpeed: BigInt | null = null;
-  let supplyRewardToken: RewardToken | null = null;
-
-  if (!trySupplyZero.reverted) {
-    supplyRewardSpeed = trySupplyZero.value;
-
-    // load BSTN token
-    token = Token.load(REWARD_TOKENS[INT_ZERO].toHexString());
-    if (!token) {
-      token = new Token(REWARD_TOKENS[INT_ZERO].toHexString());
-      token.name = "Bastion Protocol";
-      token.symbol = "BSTN";
-      token.decimals = 18;
-    }
-    token.lastPriceUSD = getBastionPrice();
-    token.lastPriceBlockNumber = blockNumber;
-    token.save();
-
-    supplyRewardToken = getOrCreateRewardToken(token, RewardTokenType.DEPOSIT);
-  }
-
-  if (!trySupplyOne.reverted) {
-    if (
-      supplyRewardSpeed &&
-      supplyRewardSpeed.gt(BIGINT_ZERO) &&
-      trySupplyOne.value.gt(BIGINT_ZERO)
-    ) {
-      log.warning(
-        "[updateRewards] Multiple reward speeds found for supply side: {} {}",
-        [marketAddress.toHexString()]
+      rewardEmissionsUSD = sortArrayByReference<string, BigDecimal>(
+        rewardTokens,
+        rewardTokensUnsorted,
+        rewardEmissionsUSD
       );
     }
-
-    if (trySupplyOne.value.gt(BIGINT_ZERO)) {
-      supplyRewardSpeed = trySupplyOne.value;
-
-      // load wNEAR token
-      token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
-      if (!token) {
-        // wNEAR is already made from the NEAR market
-        log.warning("[updateRewards] wNEAR not found: {}", [
-          REWARD_TOKENS[INT_ONE].toHexString(),
-        ]);
-        return;
-      }
-
-      supplyRewardToken = getOrCreateRewardToken(
-        token,
-        RewardTokenType.DEPOSIT
-      );
-    }
+  } else {
+    // existing reward token, update rewardEmissions and rewardEmissionsUSD at rewardTokenIndex
+    rewardEmissions[rewardTokenIndex] = dailyEmission;
+    rewardEmissionsUSD[rewardTokenIndex] = dailyEmissionUSD;
   }
-
-  // if a supply side reward is successfully found, update rewards
-  if (supplyRewardSpeed && token) {
-    const priceUSD = token.lastPriceUSD ? token.lastPriceUSD : BIGDECIMAL_ZERO;
-    rewardTokens.push(supplyRewardToken!.id);
-    const dailySupplyRewards = supplyRewardSpeed.times(
-      BigInt.fromI32(SECONDS_PER_DAY)
-    );
-    rewardEmissions.push(dailySupplyRewards);
-    rewardEmissionsUSD.push(
-      supplyRewardSpeed
-        .toBigDecimal()
-        .div(exponentToBigDecimal(token.decimals))
-        .times(priceUSD!)
-    );
-  }
-
   market.rewardTokens = rewardTokens;
   market.rewardTokenEmissionsAmount = rewardEmissions;
   market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
   market.save();
+
+  log.info(
+    "[updateRewardSpeed]market {}/{} reward emission updated: rewardTokens [{}], emissions=[{}], emissionsUSD=[{}] at tx {}-{}",
+    [
+      market.id,
+      market.name ? market.name! : "",
+      market.rewardTokens!.toString(),
+      market.rewardTokenEmissionsAmount!.toString(),
+      market.rewardTokenEmissionsUSD!.toString(),
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]
+  );
+
+  getOrCreateMarketDailySnapshot(
+    market,
+    event.block.timestamp,
+    event.block.number
+  );
+  getOrCreateMarketHourlySnapshot(
+    market,
+    event.block.timestamp,
+    event.block.number
+  );
+}
+
+function updateRewardTokenPrices(market: Market): void {
+  if (!market.rewardTokens || market.rewardTokens!.length == 0) {
+    return;
+  }
+
+  const rewardEmissions = market.rewardTokenEmissionsAmount;
+  if (!rewardEmissions || rewardEmissions.length == 0) {
+    return;
+  }
+  const rewardEmissionsUSD: BigDecimal[] = [];
+
+  for (let i = 0; i < market.rewardTokens!.length; i++) {
+    const rewardTokenId = market.rewardTokens![i];
+    const rewardToken = RewardToken.load(rewardTokenId);
+    if (!rewardToken) {
+      log.error("[]reward token {} for market {} doesn't exist", [
+        rewardTokenId,
+        market.id,
+      ]);
+      return;
+    }
+    const token = getOrCreateToken(Address.fromString(rewardToken.token));
+    const priceUSD = getRewardTokenPrice(token);
+    rewardEmissionsUSD.push(
+      rewardEmissions[i]
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals))
+        .times(priceUSD)
+    );
+  }
+  market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+  market.save();
+}
+
+function getOrCreateToken(tokenAddress: Address): Token {
+  let token = Token.load(tokenAddress.toHexString());
+  if (!token) {
+    token = new Token(tokenAddress.toHexString());
+    const erc20Contract = ERC20.bind(tokenAddress);
+    token.name = getOrElse(erc20Contract.try_name(), "Unknown");
+    token.symbol = getOrElse(erc20Contract.try_symbol(), "UNKWN");
+    token.decimals = getOrElse(erc20Contract.try_decimals(), 0);
+    token.save();
+  }
+  return token;
 }
 
 function getOrCreateRewardToken(token: Token, type: string): RewardToken {
@@ -534,15 +656,66 @@ function getOrCreateRewardToken(token: Token, type: string): RewardToken {
   return rewardToken;
 }
 
-//
-//
-// Get the current price of BSTN for rewards calculations
-function getBastionPrice(): BigDecimal {
-  const oracleContract = PriceOracle.bind(bstnOracle);
+function getRewardTokenPrice(token: Token): BigDecimal {
+  if (Address.fromString(token.id).equals(BSTN_TOKEN_ADDRESS)) {
+    const oracleContract = PriceOracle.bind(bstnOracle);
+    const price = getOrElse(
+      oracleContract.try_getUnderlyingPrice(cBSTNContract),
+      BIGINT_ZERO
+    );
+    const priceUSD = price
+      .toBigDecimal()
+      .div(exponentToBigDecimal(mantissaFactor));
+    log.info("[getRewardTokenPrice]1 token {}/{} price={}", [
+      token.id,
+      token.symbol,
+      priceUSD.toString(),
+    ]);
+    return priceUSD;
+  }
 
-  const priceUSD = getOrElse(
-    oracleContract.try_getUnderlyingPrice(cBSTNContract),
-    BIGINT_ZERO
-  );
-  return priceUSD.toBigDecimal().div(exponentToBigDecimal(mantissaFactor));
+  if (Address.fromString(token.id).equals(NEAR_TOKEN_ADDRESS)) {
+    const oracleContract = PriceOracle.bind(nearOracle);
+    const price = getOrElse(
+      oracleContract.try_getUnderlyingPrice(cNearContract),
+      BIGINT_ZERO
+    );
+    const priceUSD = price
+      .toBigDecimal()
+      .div(exponentToBigDecimal(mantissaFactor));
+    log.info("[getRewardTokenPrice]2 token {}/{} price={}", [
+      token.id,
+      token.symbol,
+      priceUSD.toString(),
+    ]);
+    return priceUSD;
+  }
+
+  const priceUSD = token.lastPriceUSD ? token.lastPriceUSD! : BIGDECIMAL_ZERO;
+  log.info("[getRewardTokenPrice]3 token {}/{} price={}", [
+    token.id,
+    token.symbol,
+    priceUSD.toString(),
+  ]);
+
+  return priceUSD;
+}
+
+// A function which given 3 arrays of arbitrary types of the same length,
+// where the first one holds the reference order, the second one holds the same elements
+// as the first but in different order, and the third any arbitrary elements. It will return
+// the third array after sorting it according to the order of the first one.
+// For example:
+// sortArrayByReference(['a', 'c', 'b'], ['a', 'b', 'c'], [1, 2, 3]) => [1, 3, 2]
+export function sortArrayByReference<T, K>(
+  reference: T[],
+  array: T[],
+  toSort: K[]
+): K[] {
+  const sorted: K[] = new Array<K>();
+  for (let i = 0; i < reference.length; i++) {
+    const index = array.indexOf(reference[i]);
+    sorted.push(toSort[index]);
+  }
+  return sorted;
 }
