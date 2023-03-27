@@ -52,13 +52,17 @@ export function getTokenDecimals(tokenAddr: Address): BigDecimal {
   return constants.BIGINT_TEN.pow(decimals.toI32() as u8).toBigDecimal();
 }
 
-export function getPoolTokensInfo(poolId: Bytes): PoolTokensType {
+export function getPoolTokensInfo(
+  poolAddress: Address,
+  poolId: Bytes
+): PoolTokensType {
   const vaultContract = VaultContract.bind(constants.VAULT_ADDRESS);
 
   const poolTokens = vaultContract.try_getPoolTokens(poolId);
   if (poolTokens.reverted) return new PoolTokensType();
 
   return new PoolTokensType(
+    poolAddress,
     poolTokens.value.getTokens(),
     poolTokens.value.getBalances()
   );
@@ -99,7 +103,7 @@ export function getPoolInputTokenBalances(
   poolId: Bytes
 ): BigInt[] {
   const poolContract = WeightedPoolContract.bind(poolAddress);
-  const poolTokensInfo = getPoolTokensInfo(poolId);
+  const poolTokensInfo = getPoolTokensInfo(poolAddress, poolId);
 
   const poolBalances = poolTokensInfo.getBalances;
 
