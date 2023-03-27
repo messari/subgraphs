@@ -2732,7 +2732,7 @@
         }
       },
       "evm-base": {
-        "network": "ethereum",
+        "network": "base-testnet",
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
