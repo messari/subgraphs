@@ -3022,7 +3022,7 @@
         }
       },
       "evm-zksync": {
-        "network": "ethereum",
+        "network": "zksync-era",
         "status": "dev",
         "versions": {
           "schema": "1.1.2",
