@@ -39,7 +39,7 @@ export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_AAVE_ORACLE_DECIMALS = 8;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
-export const STABLE_TOKENS: string[] = ["USDC", "USDT", "DAI"];
+export const STABLE_TOKENS: string[] = ["WETH", "DAI", "USDT", "USDC"];
 
 export const BLACKLISTED_TOKENS: Address[] = [
   Address.fromString("0x0000000000000000000000000000000000000000"), // Null Address

@@ -52,7 +52,9 @@ export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const YEARN_LENS_BLACKLIST: Address[] = [];
-export const INCH_ORACLE_BLACKLIST: Address[] = [];
+export const INCH_ORACLE_BLACKLIST: Address[] = [
+  Address.fromString("0xf8a57c1d3b9629b77b6726a042ca48990a84fb49") // btcCRV
+];
 export const AAVE_ORACLE_BLACKLIST: Address[] = [];
 export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [];
 export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];

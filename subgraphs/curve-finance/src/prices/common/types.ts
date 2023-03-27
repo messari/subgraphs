@@ -13,6 +13,7 @@ export class TokenInfo {
   private _name: string;
   private _decimals: i32;
   private _address: Address;
+  private _isStable: bool;
 
   constructor() {
     this._name = "";
@@ -20,11 +21,17 @@ export class TokenInfo {
     this._address = constants.NULL.TYPE_ADDRESS;
   }
 
-  static set(name: string, decimals: i32, address: Address): TokenInfo {
+  static set(
+    name: string,
+    decimals: i32,
+    address: Address,
+    isStable: bool = true
+  ): TokenInfo {
     const instance = new TokenInfo();
     instance._name = name;
     instance._decimals = decimals;
     instance._address = address;
+    instance._isStable = isStable;
 
     return instance;
   }
@@ -37,6 +44,9 @@ export class TokenInfo {
   }
   get address(): Address {
     return this._address;
+  }
+  get isStable(): bool {
+    return this._isStable;
   }
 }
 
