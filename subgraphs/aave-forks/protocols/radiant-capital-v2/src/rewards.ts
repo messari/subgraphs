@@ -6,8 +6,8 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
+  ARBITRUM_REWARD_TOKEN_ADDRESS,
   RDNT_WETH_POOL_ADDRESS,
-  REWARD_TOKEN_ADDRESS,
   rTOKEN_DECIMALS,
   RWETH_ADDRESS,
   WETH_ADDRESS,
@@ -70,11 +70,11 @@ export function updateMarketRewards(
 
   // create reward tokens
   const borrowRewardToken = getOrCreateRewardToken(
-    Address.fromString(REWARD_TOKEN_ADDRESS),
+    Address.fromString(ARBITRUM_REWARD_TOKEN_ADDRESS),
     RewardTokenType.BORROW
   );
   const depositRewardToken = getOrCreateRewardToken(
-    Address.fromString(REWARD_TOKEN_ADDRESS),
+    Address.fromString(ARBITRUM_REWARD_TOKEN_ADDRESS),
     RewardTokenType.DEPOSIT
   );
   market.rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
@@ -118,7 +118,9 @@ export function updateMarketRewards(
 // get the price of RDNT by comparing the balance of RDNT to WETH in the uniswap pool and normalizing using the WETH USD price
 export function getRewardPrice(): BigDecimal {
   if (equalsIgnoreCase(dataSource.network(), Network.ARBITRUM_ONE)) {
-    const rdntAddress = ERC20.bind(Address.fromString(REWARD_TOKEN_ADDRESS));
+    const rdntAddress = ERC20.bind(
+      Address.fromString(ARBITRUM_REWARD_TOKEN_ADDRESS)
+    );
     const wethAddress = ERC20.bind(Address.fromString(WETH_ADDRESS));
     const tryRdntBalance = rdntAddress.try_balanceOf(
       Address.fromString(RDNT_WETH_POOL_ADDRESS)

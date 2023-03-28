@@ -4,7 +4,19 @@ import { Network } from "../../../src/constants";
 ///// Addresses /////
 /////////////////////
 
-export const REWARD_TOKEN_ADDRESS =
+export class RewardConfig {
+  public readonly rewardTokenAddress: string;
+  public readonly poolAddress: string; // used for pricing the token
+  public readonly rTokenMarket: string; // used to price the other token in the market
+}
+
+export const ARBITRUM_REWARD_CONFIG = new RewardConfig(
+  "0x3082cc23568ea640225c2467653db90e9250aaa0", // RDNT token
+  "0xa8ba5f3ccfb8d2b7f4225e371cde11871e088933", // RDNT/WETH pool
+  "0x0df5dfd95966753f01cb80e76dc20ea958238c46" // rWETH market
+);
+
+export const ARBITRUM_REWARD_TOKEN_ADDRESS =
   "0x3082cc23568ea640225c2467653db90e9250aaa0"; // RDNT token
 export const WETH_ADDRESS = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1";
 export const RDNT_WETH_POOL_ADDRESS =
