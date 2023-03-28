@@ -1,27 +1,47 @@
+import { dataSource, log } from "@graphprotocol/graph-ts";
 import { Network } from "../../../src/constants";
+import { equalsIgnoreCase } from "../../../src/constants";
 
-/////////////////////
-///// Addresses /////
-/////////////////////
+///////////////////////
+///// Reward Info /////
+///////////////////////
 
 export class RewardConfig {
-  public readonly rewardTokenAddress: string;
-  public readonly poolAddress: string; // used for pricing the token
-  public readonly rTokenMarket: string; // used to price the other token in the market
+  constructor(
+    public readonly rewardTokenAddress: string,
+    public readonly otherPoolTokenAddress: string,
+    public readonly poolAddress: string, // used for pricing the token
+    public readonly rTokenMarket: string // used to price the other token in the market
+  ) {}
 }
 
 export const ARBITRUM_REWARD_CONFIG = new RewardConfig(
   "0x3082cc23568ea640225c2467653db90e9250aaa0", // RDNT token
+  "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // WETH token
   "0xa8ba5f3ccfb8d2b7f4225e371cde11871e088933", // RDNT/WETH pool
   "0x0df5dfd95966753f01cb80e76dc20ea958238c46" // rWETH market
 );
 
-export const ARBITRUM_REWARD_TOKEN_ADDRESS =
-  "0x3082cc23568ea640225c2467653db90e9250aaa0"; // RDNT token
-export const WETH_ADDRESS = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1";
-export const RDNT_WETH_POOL_ADDRESS =
-  "0xa8ba5f3ccfb8d2b7f4225e371cde11871e088933";
-export const RWETH_ADDRESS = "0x0df5dfd95966753f01cb80e76dc20ea958238c46";
+export const BSC_REWARD_CONFIG = new RewardConfig(
+  "0xf7de7e8a6bd59ed41a4b5fe50278b3b7f31384df", // RDNT token
+  "", // NO POOL
+  "", // NO POOL
+  "" // NO POOL
+);
+
+export function getRewardConfig(): RewardConfig {
+  const network = dataSource.network();
+
+  if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
+    return ARBITRUM_REWARD_CONFIG;
+  }
+  if (equalsIgnoreCase(network, Network.BSC)) {
+    return BSC_REWARD_CONFIG;
+  }
+
+  log.error("[getRewardConfig] Unsupported network {}", [network]);
+  return new RewardConfig("", "", "", "");
+}
 
 /////////////////////////////
 ///// Protocol Specific /////

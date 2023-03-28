@@ -1,24 +1,10 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  dataSource,
-  log,
-} from "@graphprotocol/graph-ts";
-import {
-  ARBITRUM_REWARD_TOKEN_ADDRESS,
-  RDNT_WETH_POOL_ADDRESS,
-  rTOKEN_DECIMALS,
-  RWETH_ADDRESS,
-  WETH_ADDRESS,
-} from "./constants";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { getRewardConfig, rTOKEN_DECIMALS } from "./constants";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
-  equalsIgnoreCase,
   exponentToBigDecimal,
-  Network,
   RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
@@ -68,13 +54,15 @@ export function updateMarketRewards(
     return;
   }
 
+  const rewardConfig = getRewardConfig();
+
   // create reward tokens
   const borrowRewardToken = getOrCreateRewardToken(
-    Address.fromString(ARBITRUM_REWARD_TOKEN_ADDRESS),
+    Address.fromString(rewardConfig.rewardTokenAddress),
     RewardTokenType.BORROW
   );
   const depositRewardToken = getOrCreateRewardToken(
-    Address.fromString(ARBITRUM_REWARD_TOKEN_ADDRESS),
+    Address.fromString(rewardConfig.rewardTokenAddress),
     RewardTokenType.DEPOSIT
   );
   market.rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
@@ -117,50 +105,46 @@ export function updateMarketRewards(
 
 // get the price of RDNT by comparing the balance of RDNT to WETH in the uniswap pool and normalizing using the WETH USD price
 export function getRewardPrice(): BigDecimal {
-  if (equalsIgnoreCase(dataSource.network(), Network.ARBITRUM_ONE)) {
-    const rdntAddress = ERC20.bind(
-      Address.fromString(ARBITRUM_REWARD_TOKEN_ADDRESS)
-    );
-    const wethAddress = ERC20.bind(Address.fromString(WETH_ADDRESS));
-    const tryRdntBalance = rdntAddress.try_balanceOf(
-      Address.fromString(RDNT_WETH_POOL_ADDRESS)
-    );
-    const tryWethBalance = wethAddress.try_balanceOf(
-      Address.fromString(RDNT_WETH_POOL_ADDRESS)
-    );
-    if (tryRdntBalance.reverted || tryWethBalance.reverted) {
-      log.error("[getRewardPrice] Unable to get balances from pool {}", [
-        RDNT_WETH_POOL_ADDRESS,
-      ]);
-      return BIGDECIMAL_ZERO;
-    }
+  const rewardConfig = getRewardConfig();
 
-    const reserveRDNT = tryRdntBalance.value;
-    const reserveWETH = tryWethBalance.value;
-
-    // div by 0 error handle
-    if (reserveRDNT.equals(BIGINT_ZERO) || reserveWETH.equals(BIGINT_ZERO)) {
-      return BIGDECIMAL_ZERO;
-    }
-
-    const priceInWETH = reserveWETH
-      .toBigDecimal()
-      .div(reserveRDNT.toBigDecimal());
-
-    // get WETH price in USD from aToken contract.
-    const rToken = RToken.bind(Address.fromString(RWETH_ADDRESS));
-    const call = rToken.try_getAssetPrice();
-    return call.reverted
-      ? BIGDECIMAL_ZERO
-      : call.value
-          .toBigDecimal()
-          .div(exponentToBigDecimal(rTOKEN_DECIMALS))
-          .times(priceInWETH);
+  const rdntAddress = ERC20.bind(
+    Address.fromString(rewardConfig.rewardTokenAddress)
+  );
+  const wethAddress = ERC20.bind(
+    Address.fromString(rewardConfig.otherPoolTokenAddress)
+  );
+  const tryRdntBalance = rdntAddress.try_balanceOf(
+    Address.fromString(rewardConfig.poolAddress)
+  );
+  const tryWethBalance = wethAddress.try_balanceOf(
+    Address.fromString(rewardConfig.poolAddress)
+  );
+  if (tryRdntBalance.reverted || tryWethBalance.reverted) {
+    log.error("[getRewardPrice] Unable to get balances from pool {}", [
+      rewardConfig.poolAddress,
+    ]);
+    return BIGDECIMAL_ZERO;
   }
 
-  if (equalsIgnoreCase(dataSource.network(), Network.BSC)) {
-    // TODO
+  const reserveRDNT = tryRdntBalance.value;
+  const reserveWETH = tryWethBalance.value;
+
+  // div by 0 error handle
+  if (reserveRDNT.equals(BIGINT_ZERO) || reserveWETH.equals(BIGINT_ZERO)) {
+    return BIGDECIMAL_ZERO;
   }
 
-  return BIGDECIMAL_ZERO;
+  const priceInWETH = reserveWETH
+    .toBigDecimal()
+    .div(reserveRDNT.toBigDecimal());
+
+  // get WETH price in USD from aToken contract.
+  const rToken = RToken.bind(Address.fromString(rewardConfig.rTokenMarket));
+  const call = rToken.try_getAssetPrice();
+  return call.reverted
+    ? BIGDECIMAL_ZERO
+    : call.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(rTOKEN_DECIMALS))
+        .times(priceInWETH);
 }
