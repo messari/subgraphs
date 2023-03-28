@@ -216,6 +216,8 @@ When adding entities, make sure you document them with comments in your schema. 
 
 There are some fields that we (and subgraph consumers) are going to expect to be immutable. There are technical limitations as to why we cannot force this on a subgraph level, but we want to be very cautious when we change these fields in `prod` subgraphs especially.
 
+> In this case immutability is case-sensitive. Changing the casing of an ID will result in a different perceived entity in some downstream systems.
+
 Scenario: We expect the `market.id` field to not change on deployments, and a DB ingesting our subgraph will expect this to be the case. But then we change `market.id` and the DB thinks there is a new `market` when in actuality, we just updated the identifier.
 
 In general you should not change the following fields across deployments before consulting with the downstream users:
