@@ -92,7 +92,7 @@ There is a standard logging format that we follow in subgraphs to ensure subgrap
 
 Each log severity has a different purpose and should be used accordingly.
 
-> The goal is to remove ambiguity in the logs as much as possible.
+> The goal is to remove ambiguity of log meaning for devs, help downstream consumers understand what is happening on a subgraph-level, and use downtime judiciously.
 
 ### Logging Format
 
