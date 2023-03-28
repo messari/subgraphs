@@ -1,5 +1,5 @@
 import { dataSource, log } from "@graphprotocol/graph-ts";
-import { Network } from "../../../src/constants";
+import { Network, ZERO_ADDRESS } from "../../../src/constants";
 import { equalsIgnoreCase } from "../../../src/constants";
 
 ///////////////////////
@@ -24,9 +24,9 @@ export const ARBITRUM_REWARD_CONFIG = new RewardConfig(
 
 export const BSC_REWARD_CONFIG = new RewardConfig(
   "0xf7de7e8a6bd59ed41a4b5fe50278b3b7f31384df", // RDNT token
-  "", // NO POOL
-  "", // NO POOL
-  "" // NO POOL
+  ZERO_ADDRESS, // NO POOL
+  ZERO_ADDRESS, // NO POOL
+  ZERO_ADDRESS // NO POOL
 );
 
 export function getRewardConfig(): RewardConfig {
@@ -40,7 +40,12 @@ export function getRewardConfig(): RewardConfig {
   }
 
   log.error("[getRewardConfig] Unsupported network {}", [network]);
-  return new RewardConfig("", "", "", "");
+  return new RewardConfig(
+    ZERO_ADDRESS,
+    ZERO_ADDRESS,
+    ZERO_ADDRESS,
+    ZERO_ADDRESS
+  );
 }
 
 /////////////////////////////
