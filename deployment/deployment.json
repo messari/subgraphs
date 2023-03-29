@@ -3651,7 +3651,7 @@
     "protocol": "spark-lend",
     "project": "makerdao",
     "deployments": {
-      "spark-lend-goerli": {
+      "spark-lend-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -3668,8 +3668,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "spark-lend-goerli",
-            "query-id": "spark-lend-goerli"
+            "slug": "spark-lend-ethereum",
+            "query-id": "spark-lend-ethereum"
           }
         }
       }
