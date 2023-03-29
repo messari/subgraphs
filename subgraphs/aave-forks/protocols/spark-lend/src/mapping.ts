@@ -4,7 +4,6 @@ import {
   BigInt,
   log,
   ethereum,
-  Bytes,
 } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
@@ -24,7 +23,6 @@ import {
 } from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
-  LendingPool as LendingPoolContract,
   LiquidationCall,
   Repay,
   ReserveDataUpdated,
@@ -63,7 +61,6 @@ import {
   BIGINT_ZERO,
   exponentToBigDecimal,
   InterestRateType,
-  INT_TWO,
   PositionSide,
   readValue,
   RewardTokenType,
