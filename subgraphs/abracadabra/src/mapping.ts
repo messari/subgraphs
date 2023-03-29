@@ -103,11 +103,14 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
     collateralToken.decimals
   ).times(tokenPriceUSD!);
 
+  const protocol = getOrCreateLendingProtocol();
+  const account = getOrCreateAccount(event.params.to.toHexString(), protocol);
+
   depositEvent.hash = event.transaction.hash.toHexString();
   depositEvent.nonce = event.transaction.nonce;
   depositEvent.logIndex = event.transactionLogIndex.toI32();
   depositEvent.market = market.id;
-  depositEvent.account = event.params.to.toHexString();
+  depositEvent.account = account.id;
   depositEvent.blockNumber = event.block.number;
   depositEvent.timestamp = event.block.timestamp;
   depositEvent.market = market.id;
@@ -122,10 +125,10 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   depositEvent.amountUSD = amountUSD;
   depositEvent.position = updatePositions(
     PositionSide.LENDER,
-    getOrCreateLendingProtocol(),
+    protocol,
     market,
     EventType.DEPOSIT,
-    depositEvent.account,
+    account,
     event
   );
   depositEvent.save();
@@ -171,11 +174,14 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
     collateralToken.decimals
   ).times(tokenPriceUSD!);
 
+  const protocol = getOrCreateLendingProtocol();
+  const account = getOrCreateAccount(event.params.from.toHexString(), protocol);
+
   withdrawalEvent.hash = event.transaction.hash.toHexString();
   withdrawalEvent.nonce = event.transaction.nonce;
   withdrawalEvent.logIndex = event.transactionLogIndex.toI32();
   withdrawalEvent.market = market.id;
-  withdrawalEvent.account = event.params.from.toHexString();
+  withdrawalEvent.account = account.id;
   withdrawalEvent.blockNumber = event.block.number;
   withdrawalEvent.timestamp = event.block.timestamp;
   withdrawalEvent.market = market.id;
@@ -188,10 +194,10 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   withdrawalEvent.amountUSD = amountUSD;
   withdrawalEvent.position = updatePositions(
     PositionSide.LENDER,
-    getOrCreateLendingProtocol(),
+    protocol,
     market,
     EventType.WITHDRAW,
-    withdrawalEvent.account,
+    account,
     event,
     liquidation
   );
@@ -232,11 +238,14 @@ export function handleLogBorrow(event: LogBorrow): void {
     DEFAULT_DECIMALS
   ).times(mimPriceUSD!);
 
+  const protocol = getOrCreateLendingProtocol();
+  const account = getOrCreateAccount(event.params.from.toHexString(), protocol);
+
   borrowEvent.hash = event.transaction.hash.toHexString();
   borrowEvent.nonce = event.transaction.nonce;
   borrowEvent.logIndex = event.transactionLogIndex.toI32();
   borrowEvent.market = market.id;
-  borrowEvent.account = event.params.from.toHexString();
+  borrowEvent.account = account.id;
   borrowEvent.blockNumber = event.block.number;
   borrowEvent.timestamp = event.block.timestamp;
   borrowEvent.market = market.id;
@@ -245,10 +254,10 @@ export function handleLogBorrow(event: LogBorrow): void {
   borrowEvent.amountUSD = amountUSD;
   borrowEvent.position = updatePositions(
     PositionSide.BORROWER,
-    getOrCreateLendingProtocol(),
+    protocol,
     market,
     EventType.BORROW,
-    borrowEvent.account,
+    account,
     event
   );
   borrowEvent.save();
@@ -327,6 +336,7 @@ export function handleLiquidation(event: LogRepay): void {
     liquidateEvent.amount,
     false
   );
+  const protocol = getOrCreateLendingProtocol();
   const collateralAmountUSD = bigIntToBigDecimal(
     collateralAmount,
     collateralToken.decimals
@@ -339,11 +349,20 @@ export function handleLiquidation(event: LogRepay): void {
       .lastPriceUSD!
   );
 
+  const liquidateeAccount = getOrCreateAccount(
+    event.params.to.toHexString(),
+    protocol
+  );
+  const liquidatorAccount = getOrCreateAccount(
+    event.params.from.toHexString(),
+    protocol
+  );
+
   liquidateEvent.hash = event.transaction.hash.toHexString();
   liquidateEvent.nonce = event.transaction.nonce;
   liquidateEvent.logIndex = event.transactionLogIndex.toI32();
-  liquidateEvent.liquidatee = event.params.to.toHexString();
-  liquidateEvent.liquidator = event.params.from.toHexString();
+  liquidateEvent.liquidatee = liquidateeAccount.id;
+  liquidateEvent.liquidator = liquidatorAccount.id;
   liquidateEvent.blockNumber = event.block.number;
   liquidateEvent.timestamp = event.block.timestamp;
   liquidateEvent.market = market.id;
@@ -364,15 +383,23 @@ export function handleLiquidation(event: LogRepay): void {
   usageDailySnapshot.dailyLiquidateCount += 1;
   usageDailySnapshot.save();
 
-  const liqudidatedAccount = getOrCreateAccount(liquidateEvent.liquidatee);
-  liqudidatedAccount.liquidateCount = liqudidatedAccount.liquidateCount + 1;
-  liqudidatedAccount.save();
-  addAccountToProtocol(EventType.LIQUIDATEE, liqudidatedAccount, event);
+  liquidateeAccount.liquidateCount = liquidateeAccount.liquidateCount + 1;
+  liquidateeAccount.save();
+  addAccountToProtocol(
+    EventType.LIQUIDATEE,
+    liquidateeAccount,
+    event,
+    protocol
+  );
 
-  const liquidatorAccount = getOrCreateAccount(liquidateEvent.liquidator);
   liquidatorAccount.liquidationCount = liquidatorAccount.liquidationCount + 1;
   liquidatorAccount.save();
-  addAccountToProtocol(EventType.LIQUIDATOR, liquidatorAccount, event);
+  addAccountToProtocol(
+    EventType.LIQUIDATOR,
+    liquidatorAccount,
+    event,
+    protocol
+  );
 
   marketHourlySnapshot.hourlyLiquidateUSD =
     marketHourlySnapshot.hourlyLiquidateUSD.plus(collateralAmountUSD);
@@ -390,7 +417,6 @@ export function handleLiquidation(event: LogRepay): void {
   marketDailySnapshot.save();
   market.save();
 
-  const protocol = getOrCreateLendingProtocol();
   const protocolCumulativeLiquidateUSD =
     protocol.cumulativeLiquidateUSD.plus(collateralAmountUSD);
   financialsDailySnapshot.cumulativeLiquidateUSD =
@@ -434,11 +460,14 @@ export function handleLogRepay(event: LogRepay): void {
     DEFAULT_DECIMALS
   ).times(mimPriceUSD!);
 
+  const protocol = getOrCreateLendingProtocol();
+  const account = getOrCreateAccount(event.params.to.toHexString(), protocol);
+
   repayEvent.hash = event.transaction.hash.toHexString();
   repayEvent.nonce = event.transaction.nonce;
   repayEvent.logIndex = event.transactionLogIndex.toI32();
   repayEvent.market = market.id;
-  repayEvent.account = event.params.to.toHexString();
+  repayEvent.account = account.id;
   repayEvent.blockNumber = event.block.number;
   repayEvent.timestamp = event.block.timestamp;
   repayEvent.market = market.id;
@@ -447,10 +476,10 @@ export function handleLogRepay(event: LogRepay): void {
   repayEvent.amountUSD = amountUSD;
   repayEvent.position = updatePositions(
     PositionSide.BORROWER,
-    getOrCreateLendingProtocol(),
+    protocol,
     market,
     EventType.REPAY,
-    repayEvent.account,
+    account,
     event,
     liquidation
   );

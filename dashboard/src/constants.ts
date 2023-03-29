@@ -5,6 +5,7 @@ import { versionsList as versionsListYield } from "./queries/yield/schema";
 import { versionsList as versionsListGeneric } from "./queries/generic/schema";
 import { versionsList as versionsListBridge } from "./queries/bridge/schema";
 import { versionsList as versionsListPerp } from "./queries/perpetual/schema";
+import { versionsList as versionsListOption } from "./queries/options/schema";
 
 export namespace ProtocolType {
   export const EXCHANGE = "EXCHANGE";
@@ -12,6 +13,7 @@ export namespace ProtocolType {
   export const YIELD = "YIELD";
   export const BRIDGE = "BRIDGE";
   export const PERPETUAL = "PERPETUAL";
+  export const OPTION = "OPTION";
   export const GENERIC = "GENERIC";
 }
 export namespace Versions {
@@ -29,24 +31,28 @@ export namespace Versions {
 export const latestSchemaVersions = (schemaType: string, versionStr: string) => {
   const schema = schemaMapping[schemaType];
   if (schema === "exchanges") {
-    if ((["3.0.3"]).includes(versionStr)) {
+    if (["3.0.3"].includes(versionStr)) {
       return true;
     }
   } else if (schema === "lending") {
-    if ((["3.0.0"]).includes(versionStr)) {
+    if (["3.0.0"].includes(versionStr)) {
       return true;
     }
-  } else if (schema === "vaults" || schema === "generic" || schema === "perpetual") {
-    if ((["1.3.0"]).includes(versionStr)) {
+  } else if (schema === "vaults" || schema === "generic") {
+    if (["1.3.0"].includes(versionStr)) {
       return true;
     }
-  } else if (schema === "bridge" || schema === "generic") {
-    if ((["1.1.0"]).includes(versionStr)) {
+  } else if (schema === "bridge" || schema === "perpetual") {
+    if (["1.2.0"].includes(versionStr)) {
+      return true;
+    }
+  } else if (schema === "generic" || "option") {
+    if (["1.1.0"].includes(versionStr)) {
       return true;
     }
   }
   return false;
-}
+};
 
 export const listSchemaVersionsByType: { [x: string]: string[] } = {
   EXCHANGE: versionsListDex,
@@ -55,15 +61,17 @@ export const listSchemaVersionsByType: { [x: string]: string[] } = {
   GENERIC: versionsListGeneric,
   BRIDGE: versionsListBridge,
   PERPETUAL: versionsListPerp,
-  "exchanges": versionsListDex,
-  "vaults": versionsListYield,
+  OPTION: versionsListOption,
+  exchanges: versionsListDex,
+  vaults: versionsListYield,
   "dex-amm": versionsListDex,
   "yield-aggregator": versionsListYield,
-  "lending": versionsListLending,
-  "generic": versionsListGeneric,
-  "bridge": versionsListBridge,
-  "perpetual": versionsListPerp
-}
+  lending: versionsListLending,
+  generic: versionsListGeneric,
+  bridge: versionsListBridge,
+  perpetual: versionsListPerp,
+  option: versionsListOption
+};
 
 export const SubgraphBaseUrl = "https://api.thegraph.com/subgraphs/name/";
 export const PoolName: Record<string, string> = {
@@ -73,14 +81,16 @@ export const PoolName: Record<string, string> = {
   GENERIC: "pool",
   BRIDGE: "pool",
   PERPETUAL: "liquidityPool",
-  "exchanges": "liquidityPool",
-  "vaults": "vault",
+  OPTION: "liquidityPool",
+  exchanges: "liquidityPool",
+  vaults: "vault",
   "dex-amm": "liquidityPool",
   "yield-aggregator": "vault",
-  "lending": "market",
-  "generic": "pool",
-  "bridge": "pool",
-  "perpetual": "liquidityPool"
+  lending: "market",
+  generic: "pool",
+  bridge: "pool",
+  perpetual: "liquidityPool",
+  option: "liquidityPool",
 };
 export const PoolNames: Record<string, string> = {
   EXCHANGE: "liquidityPools",
@@ -89,14 +99,16 @@ export const PoolNames: Record<string, string> = {
   GENERIC: "pools",
   BRIDGE: "pools",
   PERPETUAL: "liquidityPools",
-  "exchanges": "liquidityPools",
-  "vaults": "vaults",
+  OPTION: "liquidityPools",
+  exchanges: "liquidityPools",
+  vaults: "vaults",
   "dex-amm": "liquidityPools",
   "yield-aggregator": "vaults",
-  "lending": "markets",
-  "generic": "pools",
-  "bridge": "pools",
-  "perpetual": "liquidityPools"
+  lending: "markets",
+  generic: "pools",
+  bridge: "pools",
+  perpetual: "liquidityPools",
+  option: "liquidityPools",
 };
 export const ProtocolTypeEntityName: Record<string, string> = {
   EXCHANGE: "dexAmmProtocol",
@@ -104,7 +116,8 @@ export const ProtocolTypeEntityName: Record<string, string> = {
   YIELD: "yieldAggregator",
   GENERIC: "protocol",
   BRIDGE: "bridgeProtocol",
-  PERPETUAL: "derivPerpProtocol"
+  PERPETUAL: "derivPerpProtocol",
+  OPTION: "derivOptProtocol",
 };
 export const ProtocolTypeEntityNames: Record<string, string> = {
   EXCHANGE: "dexAmmProtocols",
@@ -112,7 +125,8 @@ export const ProtocolTypeEntityNames: Record<string, string> = {
   YIELD: "yieldAggregators",
   GENERIC: "protocols",
   BRIDGE: "bridgeProtocols",
-  PERPETUAL: "derivPerpProtocols"
+  PERPETUAL: "derivPerpProtocols",
+  OPTION: "derivOptProtocols",
 };
 export interface Schema {
   entities: string[];
@@ -142,16 +156,16 @@ export const percentageFieldList = [
 ];
 
 export const blockExplorers: Record<string, string> = {
-  ARBITRUM: "https://arbiscan.io/",
+  ARBITRUM_ONE: "https://arbiscan.io/",
   AURORA: "https://aurorascan.dev/",
   AVALANCHE: "https://snowtrace.io/",
   BSC: "https://bscscan.com/",
   FANTOM: "https://ftmscan.com/",
-  ETHEREUM: "https://etherscan.io/",
-  POLYGON: "https://polygonscan.com/",
+  MAINNET: "https://etherscan.io/",
+  MATIC: "https://polygonscan.com/",
   MOONRIVER: "https://moonriver.moonscan.io/",
   OPTIMISM: "https://optimistic.etherscan.io/",
-  GNOSIS: "https://blockscout.com/xdai/mainnet/",
+  XDAI: "https://blockscout.com/xdai/mainnet/",
   CELO: "https://explorer.celo.org/",
   FUSE: "https://explorer.fuse.io/",
   HARMONY: "https://explorer.harmony.one/",
@@ -161,4 +175,4 @@ export const blockExplorers: Record<string, string> = {
 // negativeFieldList contains field names that can be negative
 export const negativeFieldList = ["dailyNetVolumeUSD", "netVolumeUSD", "cumulativeNetVolumeUSD"];
 
-export const dateValueKeys = ['day', 'days', 'hour', 'hours'];
+export const dateValueKeys = ["day", "days", "hour", "hours"];

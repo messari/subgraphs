@@ -126,7 +126,6 @@ export const IssuesDisplay = ({ issuesArrayProps, allLoaded, oneLoaded }: Issues
   if (!oneLoaded && !allLoaded && issuesArray.length === 0) {
     return <IssuesContainer $hasCritical={false}>{waitingElement}</IssuesContainer>;
   }
-
   const criticalIssues = issuesArray.filter((iss) => iss.level === "critical");
   const errorIssues = issuesArray.filter((iss) => iss.level === "error");
   const warningIssues = issuesArray.filter((iss) => iss.level === "warning");

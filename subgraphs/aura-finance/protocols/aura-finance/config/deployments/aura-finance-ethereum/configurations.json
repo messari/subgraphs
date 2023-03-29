@@ -16,7 +16,7 @@
       "startBlock": 16176240
     }
   ],
-  "graftEnabled": false,
-  "subgraphId": "QmdQdzMnkUayk7kNyf7YapKSD4L1z8mFxHfZrGFewgacxc",
-  "graftStartBlock": 15775503
+  "graftEnabled": true,
+  "subgraphId": "QmSmhvZvc9MNPCsgBLCbSeKFDtvCUvbLGyiTmg9wyDJZc6",
+  "graftStartBlock": 16818368
 }

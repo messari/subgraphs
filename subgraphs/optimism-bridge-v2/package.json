@@ -1,0 +1,16 @@
+{
+  "name": "optimism-bridge-v2",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build:subgraph": "graph build"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.37.2",
+    "@graphprotocol/graph-ts": "^0.29.1",
+    "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  }
+}
