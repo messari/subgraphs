@@ -13,7 +13,7 @@ import { Network } from "../../sdk/util/constants";
 import { ethSideConf, Pricer, TokenInit } from "../../common/utils";
 import { _ERC20 } from "../../../generated/ERC20Gateway/_ERC20";
 
-export function handleTransferOut3pGateway(event: WithdrawalFinalized): void {
+export function handleTransferIn3pGateway(event: WithdrawalFinalized): void {
   // build params
   const l1Token = new ethereum.EventParam("l1token", event.parameters[0].value);
   const _from = new ethereum.EventParam("_from", event.parameters[1].value);
@@ -44,10 +44,10 @@ export function handleTransferOut3pGateway(event: WithdrawalFinalized): void {
   );
 
   // primary handler
-  handleTransferOut(withdrawalFinalized);
+  handleTransferIn(withdrawalFinalized);
 }
 
-export function handleTransferOut(event: WithdrawalFinalized): void {
+export function handleTransferIn(event: WithdrawalFinalized): void {
   // -- SDK
 
   const sdk = SDK.initialize(
