@@ -31,6 +31,12 @@ export function takeSnapshots(
       .plus(SECONDS_PER_DAY_BI)
       .lt(event.block.timestamp)
   ) {
+    if (pool._lastDailySnapshotTimestamp.equals(BIGINT_ZERO)) {
+      // Set pool creation time data here
+      pool.createdBlockNumber = event.block.number;
+      pool.createdTimestamp = event.block.timestamp;
+      pool.save();
+    }
     takePoolDailySnapshot(event, pool);
   }
   if (
@@ -554,6 +560,7 @@ export function takeUsageMetricsDailySnapshot(
   usageMetrics.cumulativeUniqueLP = protocol.cumulativeUniqueLP;
   usageMetrics.cumulativeUniqueTakers = protocol.cumulativeUniqueTakers;
   usageMetrics.totalPoolCount = protocol.totalPoolCount;
+  usageMetrics.save();
 
   activityHelper.dailyActiveUsers = INT_ZERO;
   activityHelper.dailyUniqueLP = INT_ZERO;
@@ -588,6 +595,7 @@ export function takeUsageMetricsHourlySnapshot(
   usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetrics.cumulativeUniqueLP = protocol.cumulativeUniqueLP;
   usageMetrics.cumulativeUniqueTakers = protocol.cumulativeUniqueTakers;
+  usageMetrics.save();
 
   activityHelper.hourlyActiveUsers = INT_ZERO;
   activityHelper.hourlyUniqueLP = INT_ZERO;

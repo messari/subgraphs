@@ -53,6 +53,15 @@ In the case that a contract (position) expires worthless, there may be no update
 Different options are grouped into Liquidity Pools by their collateral token.
 For each pool, every option with a unique underlying asset, expiry date and type (put/call), will be recorded under `LiquidityPool.options`.
 
+## Notes
+
+Options are marked as closed once either:
+
+1. A vault which minted the option is settled (and collateral is withdrawn)
+2. Some of the option token is redeemed for the backing collateral (if the option expired in the money)
+
+Because of this, there are a few expired options that are not marked closed.
+
 ## Links
 
 Links to the relevant sources to learn about this protocol.
