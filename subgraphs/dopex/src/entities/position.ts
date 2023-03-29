@@ -18,7 +18,6 @@ import {
   convertTokenToDecimal,
   exponentToBigDecimal,
 } from "../utils/numbers";
-import { Ssov } from "../../generated/DPXMonthlyCalls/Ssov";
 import { PriceOracle } from "../../generated/DPXMonthlyCalls/PriceOracle";
 import { getOption } from "./option";
 

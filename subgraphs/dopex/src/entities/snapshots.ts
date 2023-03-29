@@ -592,7 +592,6 @@ export function takeFinancialDailySnapshot(
   let prevContractsExpiredCount = INT_ZERO;
   let prevContractsExercisedCount = INT_ZERO;
   let prevContractsClosedCount = INT_ZERO;
-  let prevClosedPositionCount = INT_ZERO;
 
   if (prevFinancialMetrics) {
     prevCumulativeVolumeUSD = prevFinancialMetrics.cumulativeVolumeUSD;
@@ -627,7 +626,6 @@ export function takeFinancialDailySnapshot(
     prevContractsExpiredCount = prevFinancialMetrics.contractsExpiredCount;
     prevContractsExercisedCount = prevFinancialMetrics.contractsExercisedCount;
     prevContractsClosedCount = prevFinancialMetrics.contractsClosedCount;
-    prevClosedPositionCount = prevFinancialMetrics.closedPositionCount;
   } else if (protocol._lastSnapshotDayID > INT_ZERO) {
     log.error(
       "Missing protocol snapshot at ID that has been snapped: Protocol {}, ID {} ",
