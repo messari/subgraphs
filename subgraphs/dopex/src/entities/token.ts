@@ -11,7 +11,8 @@ import {
 
 export function getOrCreateToken(
   event: ethereum.Event,
-  tokenAddress: Address
+  tokenAddress: Address,
+  getPrice: boolean = true
 ): Token {
   let token = Token.load(tokenAddress);
 
@@ -24,6 +25,10 @@ export function getOrCreateToken(
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = event.block.number;
     token.save();
+  }
+
+  if (!getPrice) {
+    return token;
   }
 
   if (

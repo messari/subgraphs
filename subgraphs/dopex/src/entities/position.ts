@@ -7,7 +7,7 @@ import {
 } from "@graphprotocol/graph-ts";
 import { Account, LiquidityPool, Position } from "../../generated/schema";
 import { updateAccountOpenPositionCount } from "./account";
-import { UpdatePoolOpenPositionCount } from "./pool";
+import { updatePoolOpenPositionCount } from "./pool";
 import {
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
@@ -20,6 +20,7 @@ import {
 } from "../utils/numbers";
 import { Ssov } from "../../generated/DPXMonthlyCalls/Ssov";
 import { PriceOracle } from "../../generated/DPXMonthlyCalls/PriceOracle";
+import { getOption } from "./option";
 
 export function getUserPosition(
   event: ethereum.Event,
@@ -46,20 +47,12 @@ export function createUserPosition(
   const positionId = getPositionID(account, pool, epoch, strike, optionType);
   const position = new Position(positionId);
   position.pool = pool.id;
-  position.type = optionType;
   position.account = account.id;
-
-  const ssoveContract = Ssov.bind(event.address);
-  const tryGetEpochData = ssoveContract.try_getEpochData(epoch);
-  if (!tryGetEpochData.reverted) {
-    position.expirationTimestamp = tryGetEpochData.value.expiry;
-  }
-
+  position.option = getOption(event, pool, epoch, strike, optionType)!.id;
   position.takenHash = event.transaction.hash;
   position.takenBlockNumber = event.block.number;
   position.takenTimestamp = event.block.timestamp;
 
-  position.strikePrice = strike.divDecimal(PRICE_PRECISION);
   let takenPrice = BIGDECIMAL_ZERO;
   const priceOracle = PriceOracle.bind(Address.fromBytes(pool._oracleAddress!));
   const tryGetUnderlyingPrice = priceOracle.try_getUnderlyingPrice();
@@ -84,7 +77,7 @@ export function createUserPosition(
   position.save();
 
   updateAccountOpenPositionCount(account, true);
-  UpdatePoolOpenPositionCount(event, pool, true);
+  updatePoolOpenPositionCount(event, pool, true);
 
   return position;
 }
@@ -108,19 +101,12 @@ export function closeUserPosition(
 
   position.closedBlockNumber = event.block.number;
   position.closedTimestamp = event.block.timestamp;
-
-  const ssoveContract = Ssov.bind(event.address);
-  const tryGetEpochData = ssoveContract.try_getEpochData(epoch);
-  if (!tryGetEpochData.reverted) {
-    position.exercisedPriceUSD =
-      tryGetEpochData.value.settlementPrice.divDecimal(PRICE_PRECISION);
-  }
   position.closePremiumUSD = BIGDECIMAL_ZERO;
 
   position.save();
 
   updateAccountOpenPositionCount(account, false);
-  UpdatePoolOpenPositionCount(event, pool, false);
+  updatePoolOpenPositionCount(event, pool, false);
 }
 
 function getPositionID(

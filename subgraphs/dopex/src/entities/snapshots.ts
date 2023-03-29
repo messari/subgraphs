@@ -89,7 +89,6 @@ export function takeLiquidityPoolDailySnapshot(
   let prevCumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   let prevCumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   let prevCumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  let prevCumulativeOpenInterestUSD = BIGDECIMAL_ZERO;
 
   let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeDepositedVolumeUSD = BIGDECIMAL_ZERO;
@@ -129,8 +128,6 @@ export function takeLiquidityPoolDailySnapshot(
   let prevContractsExpiredCount = INT_ZERO;
   let prevContractsExercisedCount = INT_ZERO;
   let prevContractsClosedCount = INT_ZERO;
-  let prevCumulativeOpenPositionCount = INT_ZERO;
-  let prevClosedPositionCount = INT_ZERO;
 
   if (prevPoolMetrics) {
     prevCumulativeSupplySideRevenueUSD =
@@ -138,7 +135,6 @@ export function takeLiquidityPoolDailySnapshot(
     prevCumulativeProtocolSideRevenueUSD =
       prevPoolMetrics.cumulativeProtocolSideRevenueUSD;
     prevCumulativeTotalRevenueUSD = prevPoolMetrics.cumulativeTotalRevenueUSD;
-    prevCumulativeOpenInterestUSD = prevPoolMetrics._cumulativeOpenInterestUSD;
 
     prevCumulativeVolumeUSD = prevPoolMetrics.cumulativeVolumeUSD;
     prevCumulativeDepositedVolumeUSD =
@@ -149,17 +145,16 @@ export function takeLiquidityPoolDailySnapshot(
     prevCumulativeExerciseVolumeUSD =
       prevPoolMetrics.cumulativeExerciseVolumeUSD;
     prevCumulativeVolumeByTokenAmount =
-      prevPoolMetrics._cumulativeVolumeByTokenAmount;
-    prevCumulativeVolumeByTokenUSD =
-      prevPoolMetrics._cumulativeVolumeByTokenUSD;
+      prevPoolMetrics.cumulativeVolumeByTokenAmount;
+    prevCumulativeVolumeByTokenUSD = prevPoolMetrics.cumulativeVolumeByTokenUSD;
     prevCumulativeDepositedVolumeByTokenAmount =
-      prevPoolMetrics._cumulativeDepositedVolumeByTokenAmount;
+      prevPoolMetrics.cumulativeDepositedVolumeByTokenAmount;
     prevCumulativeDepositedVolumeByTokenUSD =
-      prevPoolMetrics._cumulativeDepositedVolumeByTokenUSD;
+      prevPoolMetrics.cumulativeDepositedVolumeByTokenUSD;
     prevCumulativeWithdrawVolumeByTokenAmount =
-      prevPoolMetrics._cumulativeWithdrawVolumeByTokenAmount;
+      prevPoolMetrics.cumulativeWithdrawVolumeByTokenAmount;
     prevCumulativeWithdrawVolumeByTokenUSD =
-      prevPoolMetrics._cumulativeWithdrawVolumeByTokenUSD;
+      prevPoolMetrics.cumulativeWithdrawVolumeByTokenUSD;
 
     prevCumulativeEntryPremiumUSD = prevPoolMetrics.cumulativeEntryPremiumUSD;
     prevCumulativeExitPremiumUSD = prevPoolMetrics.cumulativeExitPremiumUSD;
@@ -178,9 +173,6 @@ export function takeLiquidityPoolDailySnapshot(
     prevContractsExpiredCount = prevPoolMetrics.contractsExpiredCount;
     prevContractsExercisedCount = prevPoolMetrics.contractsExercisedCount;
     prevContractsClosedCount = prevPoolMetrics.contractsClosedCount;
-    prevCumulativeOpenPositionCount =
-      prevPoolMetrics._cumulativeOpenPositionCount;
-    prevClosedPositionCount = prevPoolMetrics.closedPositionCount;
   } else if (pool._lastSnapshotDayID > INT_ZERO) {
     log.critical(
       "Missing daily pool snapshot at ID that has been snapped: Pool {}, ID {} ",
@@ -221,10 +213,7 @@ export function takeLiquidityPoolDailySnapshot(
   poolMetrics.dailyTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.minus(
     prevCumulativeTotalRevenueUSD
   );
-  poolMetrics._cumulativeOpenInterestUSD = pool._cumulativeOpenInterestUSD;
-  poolMetrics.dailyOpenInterestUSD = pool._cumulativeOpenInterestUSD.minus(
-    prevCumulativeOpenInterestUSD
-  );
+  poolMetrics.openInterestUSD = pool.openInterestUSD;
 
   poolMetrics.dailyEntryPremiumUSD = pool.cumulativeEntryPremiumUSD.minus(
     prevCumulativeEntryPremiumUSD
@@ -258,13 +247,14 @@ export function takeLiquidityPoolDailySnapshot(
   );
   poolMetrics.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
 
-  poolMetrics.dailyDepositedVolumeUSD =
-    pool._cumulativeDepositedVolumeUSD.minus(prevCumulativeDepositedVolumeUSD);
-  poolMetrics.cumulativeDepositedVolumeUSD = pool._cumulativeDepositedVolumeUSD;
-  poolMetrics.dailyWithdrawVolumeUSD = pool._cumulativeWithdrawVolumeUSD.minus(
+  poolMetrics.dailyDepositedVolumeUSD = pool.cumulativeDepositedVolumeUSD.minus(
+    prevCumulativeDepositedVolumeUSD
+  );
+  poolMetrics.cumulativeDepositedVolumeUSD = pool.cumulativeDepositedVolumeUSD;
+  poolMetrics.dailyWithdrawVolumeUSD = pool.cumulativeWithdrawVolumeUSD.minus(
     prevCumulativeWithdrawVolumeUSD
   );
-  poolMetrics.cumulativeWithdrawVolumeUSD = pool._cumulativeWithdrawVolumeUSD;
+  poolMetrics.cumulativeWithdrawVolumeUSD = pool.cumulativeWithdrawVolumeUSD;
   poolMetrics.dailyClosedVolumeUSD = pool.cumulativeClosedVolumeUSD.minus(
     prevCumulativeClosedVolumeUSD
   );
@@ -274,28 +264,27 @@ export function takeLiquidityPoolDailySnapshot(
   );
   poolMetrics.cumulativeExerciseVolumeUSD = pool.cumulativeExercisedVolumeUSD;
 
-  poolMetrics._cumulativeVolumeByTokenAmount =
-    pool._cumulativeVolumeByTokenAmount;
-  poolMetrics._cumulativeVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
+  poolMetrics.cumulativeVolumeByTokenAmount =
+    pool.cumulativeVolumeByTokenAmount;
+  poolMetrics.cumulativeVolumeByTokenUSD = pool.cumulativeVolumeByTokenUSD;
 
-  poolMetrics._cumulativeDepositedVolumeByTokenAmount =
-    pool._cumulativeDepositedVolumeByTokenAmount;
-  poolMetrics._cumulativeDepositedVolumeByTokenUSD =
-    pool._cumulativeDepositedVolumeByTokenUSD;
-  poolMetrics._cumulativeWithdrawVolumeByTokenAmount =
-    pool._cumulativeWithdrawVolumeByTokenAmount;
-  poolMetrics._cumulativeWithdrawVolumeByTokenUSD =
-    pool._cumulativeWithdrawVolumeByTokenUSD;
-  const dailyVolumeByTokenAmount = pool._cumulativeVolumeByTokenAmount;
-  const dailyVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
+  poolMetrics.cumulativeDepositedVolumeByTokenAmount =
+    pool.cumulativeDepositedVolumeByTokenAmount;
+  poolMetrics.cumulativeDepositedVolumeByTokenUSD =
+    pool.cumulativeDepositedVolumeByTokenUSD;
+  poolMetrics.cumulativeWithdrawVolumeByTokenAmount =
+    pool.cumulativeWithdrawVolumeByTokenAmount;
+  poolMetrics.cumulativeWithdrawVolumeByTokenUSD =
+    pool.cumulativeWithdrawVolumeByTokenUSD;
+  const dailyVolumeByTokenAmount = pool.cumulativeVolumeByTokenAmount;
+  const dailyVolumeByTokenUSD = pool.cumulativeVolumeByTokenUSD;
   const dailyDepositedVolumeByTokenAmount =
-    pool._cumulativeDepositedVolumeByTokenAmount;
+    pool.cumulativeDepositedVolumeByTokenAmount;
   const dailyDepositedVolumeByTokenUSD =
-    pool._cumulativeDepositedVolumeByTokenUSD;
+    pool.cumulativeDepositedVolumeByTokenUSD;
   const dailyWithdrawVolumeByTokenAmount =
-    pool._cumulativeWithdrawVolumeByTokenAmount;
-  const dailyWithdrawVolumeByTokenUSD =
-    pool._cumulativeWithdrawVolumeByTokenUSD;
+    pool.cumulativeWithdrawVolumeByTokenAmount;
+  const dailyWithdrawVolumeByTokenUSD = pool.cumulativeWithdrawVolumeByTokenUSD;
   for (let i = 0; i < inputTokenLength; i++) {
     dailyVolumeByTokenAmount[i] = dailyVolumeByTokenAmount[i].minus(
       prevCumulativeVolumeByTokenAmount[i]
@@ -351,11 +340,6 @@ export function takeLiquidityPoolDailySnapshot(
     pool.contractsExercisedCount - prevContractsExercisedCount;
   poolMetrics.contractsExercisedCount = pool.contractsExercisedCount;
   poolMetrics.openPositionCount = pool.openPositionCount;
-  poolMetrics.dailyOpenPositionCount =
-    pool._cumulativeOpenPositionCount - prevCumulativeOpenPositionCount;
-  poolMetrics._cumulativeOpenPositionCount = pool._cumulativeOpenPositionCount;
-  poolMetrics.dailyClosedPositionCount =
-    pool.closedPositionCount - prevClosedPositionCount;
   poolMetrics.closedPositionCount = pool.closedPositionCount;
 
   poolMetrics.save();
@@ -378,7 +362,6 @@ export function takeLiquidityPoolHourlySnapshot(
   let prevCumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   let prevCumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   let prevCumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  let prevCumulativeOpenInterestUSD = BIGDECIMAL_ZERO;
 
   let prevCumulativeEntryPremiumUSD = BIGDECIMAL_ZERO;
   let prevCumulativeExitPremiumUSD = BIGDECIMAL_ZERO;
@@ -415,7 +398,6 @@ export function takeLiquidityPoolHourlySnapshot(
     prevCumulativeProtocolSideRevenueUSD =
       prevPoolMetrics.cumulativeProtocolSideRevenueUSD;
     prevCumulativeTotalRevenueUSD = prevPoolMetrics.cumulativeTotalRevenueUSD;
-    prevCumulativeOpenInterestUSD = prevPoolMetrics._cumulativeOpenInterestUSD;
 
     prevCumulativeEntryPremiumUSD = prevPoolMetrics.cumulativeEntryPremiumUSD;
     prevCumulativeExitPremiumUSD = prevPoolMetrics.cumulativeExitPremiumUSD;
@@ -433,17 +415,16 @@ export function takeLiquidityPoolHourlySnapshot(
     prevCumulativeWithdrawVolumeUSD =
       prevPoolMetrics.cumulativeWithdrawVolumeUSD;
     prevCumulativeVolumeByTokenAmount =
-      prevPoolMetrics._cumulativeVolumeByTokenAmount;
-    prevCumulativeVolumeByTokenUSD =
-      prevPoolMetrics._cumulativeVolumeByTokenUSD;
+      prevPoolMetrics.cumulativeVolumeByTokenAmount;
+    prevCumulativeVolumeByTokenUSD = prevPoolMetrics.cumulativeVolumeByTokenUSD;
     prevCumulativeDepositedVolumeByTokenAmount =
-      prevPoolMetrics._cumulativeDepositVolumeByTokenAmount;
+      prevPoolMetrics.cumulativeDepositVolumeByTokenAmount;
     prevCumulativeDepositedVolumeByTokenUSD =
-      prevPoolMetrics._cumulativeDepositVolumeByTokenUSD;
+      prevPoolMetrics.cumulativeDepositVolumeByTokenUSD;
     prevCumulativeWithdrawVolumeByTokenAmount =
-      prevPoolMetrics._cumulativeWithdrawVolumeByTokenAmount;
+      prevPoolMetrics.cumulativeWithdrawVolumeByTokenAmount;
     prevCumulativeWithdrawVolumeByTokenUSD =
-      prevPoolMetrics._cumulativeWithdrawVolumeByTokenUSD;
+      prevPoolMetrics.cumulativeWithdrawVolumeByTokenUSD;
   } else if (pool._lastSnapshotHourID > INT_ZERO) {
     log.critical(
       "Missing hourly pool snapshot at ID that has been snapped: Pool {}, ID {} ",
@@ -456,10 +437,7 @@ export function takeLiquidityPoolHourlySnapshot(
   poolMetrics.pool = pool.id;
 
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
-  poolMetrics._cumulativeOpenInterestUSD = pool._cumulativeOpenInterestUSD;
-  poolMetrics.hourlyOpenInterestUSD = pool._cumulativeOpenInterestUSD.minus(
-    prevCumulativeOpenInterestUSD
-  );
+  poolMetrics.openInterestUSD = pool.openInterestUSD;
 
   poolMetrics.inputTokenBalances = pool.inputTokenBalances;
   poolMetrics.inputTokenWeights = pool.inputTokenWeights;
@@ -516,36 +494,36 @@ export function takeLiquidityPoolHourlySnapshot(
     prevCumulativeVolumeUSD
   );
   poolMetrics.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
-  poolMetrics.hourlyDepositVolumeUSD = pool._cumulativeDepositedVolumeUSD.minus(
+  poolMetrics.hourlyDepositVolumeUSD = pool.cumulativeDepositedVolumeUSD.minus(
     prevCumulativeDepositedVolumeUSD
   );
-  poolMetrics.cumulativeDepositVolumeUSD = pool._cumulativeDepositedVolumeUSD;
-  poolMetrics.hourlyWithdrawVolumeUSD = pool._cumulativeWithdrawVolumeUSD.minus(
+  poolMetrics.cumulativeDepositVolumeUSD = pool.cumulativeDepositedVolumeUSD;
+  poolMetrics.hourlyWithdrawVolumeUSD = pool.cumulativeWithdrawVolumeUSD.minus(
     prevCumulativeWithdrawVolumeUSD
   );
-  poolMetrics.cumulativeWithdrawVolumeUSD = pool._cumulativeWithdrawVolumeUSD;
+  poolMetrics.cumulativeWithdrawVolumeUSD = pool.cumulativeWithdrawVolumeUSD;
 
-  poolMetrics._cumulativeVolumeByTokenAmount =
-    pool._cumulativeVolumeByTokenAmount;
-  poolMetrics._cumulativeVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
-  poolMetrics._cumulativeDepositVolumeByTokenAmount =
-    pool._cumulativeDepositedVolumeByTokenAmount;
-  poolMetrics._cumulativeDepositVolumeByTokenUSD =
-    pool._cumulativeDepositedVolumeByTokenUSD;
-  poolMetrics._cumulativeWithdrawVolumeByTokenAmount =
-    pool._cumulativeWithdrawVolumeByTokenAmount;
-  poolMetrics._cumulativeWithdrawVolumeByTokenUSD =
-    pool._cumulativeWithdrawVolumeByTokenUSD;
-  const hourlyVolumeByTokenAmount = pool._cumulativeVolumeByTokenAmount;
-  const hourlyVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
+  poolMetrics.cumulativeVolumeByTokenAmount =
+    pool.cumulativeVolumeByTokenAmount;
+  poolMetrics.cumulativeVolumeByTokenUSD = pool.cumulativeVolumeByTokenUSD;
+  poolMetrics.cumulativeDepositVolumeByTokenAmount =
+    pool.cumulativeDepositedVolumeByTokenAmount;
+  poolMetrics.cumulativeDepositVolumeByTokenUSD =
+    pool.cumulativeDepositedVolumeByTokenUSD;
+  poolMetrics.cumulativeWithdrawVolumeByTokenAmount =
+    pool.cumulativeWithdrawVolumeByTokenAmount;
+  poolMetrics.cumulativeWithdrawVolumeByTokenUSD =
+    pool.cumulativeWithdrawVolumeByTokenUSD;
+  const hourlyVolumeByTokenAmount = pool.cumulativeVolumeByTokenAmount;
+  const hourlyVolumeByTokenUSD = pool.cumulativeVolumeByTokenUSD;
   const hourlyDepositedVolumeByTokenAmount =
-    pool._cumulativeDepositedVolumeByTokenAmount;
+    pool.cumulativeDepositedVolumeByTokenAmount;
   const hourlyDepositedVolumeByTokenUSD =
-    pool._cumulativeDepositedVolumeByTokenUSD;
+    pool.cumulativeDepositedVolumeByTokenUSD;
   const hourlyWithdrawVolumeByTokenAmount =
-    pool._cumulativeWithdrawVolumeByTokenAmount;
+    pool.cumulativeWithdrawVolumeByTokenAmount;
   const hourlyWithdrawVolumeByTokenUSD =
-    pool._cumulativeWithdrawVolumeByTokenUSD;
+    pool.cumulativeWithdrawVolumeByTokenUSD;
   for (let i = 0; i < inputTokenLength; i++) {
     hourlyVolumeByTokenAmount[i] = hourlyVolumeByTokenAmount[i].minus(
       prevCumulativeVolumeByTokenAmount[i]
@@ -596,7 +574,6 @@ export function takeFinancialDailySnapshot(
   let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeExercisedVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeClosedVolumeUSD = BIGDECIMAL_ZERO;
-  let prevCumulativeOpenInterestUSD = BIGDECIMAL_ZERO;
 
   let prevCumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   let prevCumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -615,7 +592,6 @@ export function takeFinancialDailySnapshot(
   let prevContractsExpiredCount = INT_ZERO;
   let prevContractsExercisedCount = INT_ZERO;
   let prevContractsClosedCount = INT_ZERO;
-  let prevCumulativeOpenPositionCount = INT_ZERO;
   let prevClosedPositionCount = INT_ZERO;
 
   if (prevFinancialMetrics) {
@@ -624,8 +600,6 @@ export function takeFinancialDailySnapshot(
       prevFinancialMetrics.cumulativeExercisedVolumeUSD;
     prevCumulativeClosedVolumeUSD =
       prevFinancialMetrics.cumulativeClosedVolumeUSD;
-    prevCumulativeOpenInterestUSD =
-      prevFinancialMetrics._cumulativeOpenInterestUSD;
 
     prevCumulativeSupplySideRevenueUSD =
       prevFinancialMetrics.cumulativeSupplySideRevenueUSD;
@@ -653,8 +627,6 @@ export function takeFinancialDailySnapshot(
     prevContractsExpiredCount = prevFinancialMetrics.contractsExpiredCount;
     prevContractsExercisedCount = prevFinancialMetrics.contractsExercisedCount;
     prevContractsClosedCount = prevFinancialMetrics.contractsClosedCount;
-    prevCumulativeOpenPositionCount =
-      prevFinancialMetrics._cumulativeOpenPositionCount;
     prevClosedPositionCount = prevFinancialMetrics.closedPositionCount;
   } else if (protocol._lastSnapshotDayID > INT_ZERO) {
     log.error(
@@ -682,10 +654,7 @@ export function takeFinancialDailySnapshot(
     protocol.cumulativeClosedVolumeUSD;
   financialMetrics.dailyClosedVolumeUSD =
     protocol.cumulativeClosedVolumeUSD.minus(prevCumulativeClosedVolumeUSD);
-  financialMetrics._cumulativeOpenInterestUSD =
-    protocol._cumulativeOpenInterestUSD;
-  financialMetrics.dailyOpenInterestUSD =
-    protocol._cumulativeOpenInterestUSD.minus(prevCumulativeOpenInterestUSD);
+  financialMetrics.openInterestUSD = protocol.openInterestUSD;
 
   financialMetrics.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD;
@@ -752,13 +721,7 @@ export function takeFinancialDailySnapshot(
   financialMetrics.dailyContractsClosedCount =
     protocol.contractsClosedCount - prevContractsClosedCount;
   financialMetrics.contractsClosedCount = protocol.contractsClosedCount;
-  financialMetrics.dailyOpenPositionCount =
-    protocol._cumulativeOpenPositionCount - prevCumulativeOpenPositionCount;
-  financialMetrics._cumulativeOpenPositionCount =
-    protocol._cumulativeOpenPositionCount;
   financialMetrics.openPositionCount = protocol.openPositionCount;
-  financialMetrics.dailyClosedPositionCount =
-    protocol.closedPositionCount - prevClosedPositionCount;
   financialMetrics.closedPositionCount = protocol.closedPositionCount;
 
   financialMetrics.save();

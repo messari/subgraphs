@@ -41,13 +41,13 @@ export function getOrCreateLiquidityPool(
   event: ethereum.Event,
   poolAddress: Address
 ): LiquidityPool {
-  const protocol = getOrCreateProtocol();
   let pool = LiquidityPool.load(poolAddress);
 
   if (!pool) {
     pool = new LiquidityPool(poolAddress);
 
     // Metadata
+    const protocol = getOrCreateProtocol();
     pool.protocol = protocol.id;
 
     const ssovContract = Ssov.bind(event.address);
@@ -122,16 +122,14 @@ export function getOrCreateLiquidityPool(
     pool.rewardTokenEmissionsAmount = [];
     pool.rewardTokenEmissionsUSD = [];
 
-    pool._cumulativeOpenInterestUSD = BIGDECIMAL_ZERO;
-    pool._cumulativeOpenPositionCount = INT_ZERO;
-    pool._cumulativeDepositedVolumeUSD = BIGDECIMAL_ZERO;
-    pool._cumulativeWithdrawVolumeUSD = BIGDECIMAL_ZERO;
-    pool._cumulativeVolumeByTokenAmount = [BIGINT_ZERO];
-    pool._cumulativeVolumeByTokenUSD = [BIGDECIMAL_ZERO];
-    pool._cumulativeDepositedVolumeByTokenAmount = [BIGINT_ZERO];
-    pool._cumulativeDepositedVolumeByTokenUSD = [BIGDECIMAL_ZERO];
-    pool._cumulativeWithdrawVolumeByTokenAmount = [BIGINT_ZERO];
-    pool._cumulativeWithdrawVolumeByTokenUSD = [BIGDECIMAL_ZERO];
+    pool.cumulativeDepositedVolumeUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeWithdrawVolumeUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeVolumeByTokenAmount = [BIGINT_ZERO];
+    pool.cumulativeVolumeByTokenUSD = [BIGDECIMAL_ZERO];
+    pool.cumulativeDepositedVolumeByTokenAmount = [BIGINT_ZERO];
+    pool.cumulativeDepositedVolumeByTokenUSD = [BIGDECIMAL_ZERO];
+    pool.cumulativeWithdrawVolumeByTokenAmount = [BIGINT_ZERO];
+    pool.cumulativeWithdrawVolumeByTokenUSD = [BIGDECIMAL_ZERO];
     pool._currentEpoch = BIGINT_ZERO;
     pool._lastSnapshotDayID = INT_ZERO;
     pool._lastSnapshotHourID = INT_ZERO;
@@ -163,41 +161,40 @@ export function increasePoolVolume(
   // So for derivative, there are normal two kind of values. One is the intended trading
   // size, which is called sizeUSD in the codes, while the other is the collateral size,
   // which is called collateralUSD in the codes.
-
   switch (eventType) {
     case EventType.Deposit:
-      pool._cumulativeDepositedVolumeUSD =
-        pool._cumulativeDepositedVolumeUSD.plus(collateralUSDDelta);
+      pool.cumulativeDepositedVolumeUSD =
+        pool.cumulativeDepositedVolumeUSD.plus(collateralUSDDelta);
 
       const cumulativeDepositedVolumeByTokenAmount =
-        pool._cumulativeDepositedVolumeByTokenAmount;
+        pool.cumulativeDepositedVolumeByTokenAmount;
       const cumulativeDepositedVolumeByTokenUSD =
-        pool._cumulativeDepositedVolumeByTokenUSD;
+        pool.cumulativeDepositedVolumeByTokenUSD;
       cumulativeDepositedVolumeByTokenAmount[0] =
         cumulativeDepositedVolumeByTokenAmount[0].plus(collateralAmountDelta);
       cumulativeDepositedVolumeByTokenUSD[0] =
         cumulativeDepositedVolumeByTokenUSD[0].plus(collateralUSDDelta);
-      pool._cumulativeDepositedVolumeByTokenAmount =
+      pool.cumulativeDepositedVolumeByTokenAmount =
         cumulativeDepositedVolumeByTokenAmount;
-      pool._cumulativeDepositedVolumeByTokenUSD =
+      pool.cumulativeDepositedVolumeByTokenUSD =
         cumulativeDepositedVolumeByTokenUSD;
 
       break;
     case EventType.Withdraw:
-      pool._cumulativeWithdrawVolumeUSD =
-        pool._cumulativeWithdrawVolumeUSD.plus(collateralUSDDelta);
+      pool.cumulativeWithdrawVolumeUSD =
+        pool.cumulativeWithdrawVolumeUSD.plus(collateralUSDDelta);
 
       const cumulativeWithdrawVolumeByTokenAmount =
-        pool._cumulativeWithdrawVolumeByTokenAmount;
+        pool.cumulativeWithdrawVolumeByTokenAmount;
       const cumulativeWithdrawVolumeByTokenUSD =
-        pool._cumulativeWithdrawVolumeByTokenUSD;
+        pool.cumulativeWithdrawVolumeByTokenUSD;
       cumulativeWithdrawVolumeByTokenAmount[0] =
         cumulativeWithdrawVolumeByTokenAmount[0].plus(collateralAmountDelta);
       cumulativeWithdrawVolumeByTokenUSD[0] =
         cumulativeWithdrawVolumeByTokenUSD[0].plus(collateralUSDDelta);
-      pool._cumulativeWithdrawVolumeByTokenAmount =
+      pool.cumulativeWithdrawVolumeByTokenAmount =
         cumulativeWithdrawVolumeByTokenAmount;
-      pool._cumulativeWithdrawVolumeByTokenUSD =
+      pool.cumulativeWithdrawVolumeByTokenUSD =
         cumulativeWithdrawVolumeByTokenUSD;
 
       break;
@@ -213,15 +210,15 @@ export function increasePoolVolume(
 
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(sizeUSDDelta);
 
-  const cumulativeVolumeByTokenAmount = pool._cumulativeVolumeByTokenAmount;
-  const cumulativeVolumeByTokenUSD = pool._cumulativeVolumeByTokenUSD;
+  const cumulativeVolumeByTokenAmount = pool.cumulativeVolumeByTokenAmount;
+  const cumulativeVolumeByTokenUSD = pool.cumulativeVolumeByTokenUSD;
   cumulativeVolumeByTokenAmount[0] = cumulativeVolumeByTokenAmount[0].plus(
     collateralAmountDelta
   );
   cumulativeVolumeByTokenUSD[0] =
     cumulativeVolumeByTokenUSD[0].plus(collateralUSDDelta);
-  pool._cumulativeVolumeByTokenAmount = cumulativeVolumeByTokenAmount;
-  pool._cumulativeVolumeByTokenUSD = cumulativeVolumeByTokenUSD;
+  pool.cumulativeVolumeByTokenAmount = cumulativeVolumeByTokenAmount;
+  pool.cumulativeVolumeByTokenUSD = cumulativeVolumeByTokenUSD;
 
   pool._lastUpdateTimestamp = event.block.timestamp;
   pool.save();
@@ -326,8 +323,6 @@ export function updatePoolOpenInterestUSD(
 ): void {
   if (isIncrease) {
     pool.openInterestUSD = pool.openInterestUSD.plus(amountChangeUSD);
-    pool._cumulativeOpenInterestUSD =
-      pool._cumulativeOpenInterestUSD.plus(amountChangeUSD);
   } else {
     pool.openInterestUSD = pool.openInterestUSD.minus(amountChangeUSD);
   }
@@ -339,7 +334,7 @@ export function updatePoolOpenInterestUSD(
   updateProtocolOpenInterestUSD(event, amountChangeUSD, isIncrease);
 }
 
-export function UpdatePoolOpenPositionCount(
+export function updatePoolOpenPositionCount(
   event: ethereum.Event,
   pool: LiquidityPool,
   isIncrease: boolean

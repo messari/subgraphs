@@ -1,5 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
+  Bootstrap,
   Deposit,
   Purchase,
   Settle,
@@ -27,6 +28,7 @@ import { closeUserPosition, createUserPosition } from "../entities/position";
 import { takeSnapshots, updateTempUsageMetrics } from "../entities/snapshots";
 import { convertTokenToDecimal } from "../utils/numbers";
 import { BIGINT_ZERO, OptionType, PRICE_PRECISION } from "../utils/constants";
+import { createOption } from "../entities/option";
 
 export function handleDeposit(event: Deposit): void {
   handleUpdateLiquidityEvent(
@@ -236,5 +238,28 @@ export function handleUpdatePositionEvent(
     );
     updatePoolTvl(event, pool, settlePnLAmount, eventType);
     updatePoolOpenInterestUSD(event, pool, sizeUSDDelta, false);
+  }
+}
+
+export function handleBootstrap(event: Bootstrap): void {
+  takeSnapshots(event, event.address);
+
+  const pool = getOrCreateLiquidityPool(event, event.address);
+  for (let i = 0; i < event.params.strikes.length; i++) {
+    const ssoveContract = Ssov.bind(event.address);
+    const tryGetEpochStrikeData = ssoveContract.try_getEpochStrikeData(
+      event.params.epoch,
+      event.params.strikes[i]
+    );
+    if (!tryGetEpochStrikeData.reverted) {
+      const strikeTokenAddress = tryGetEpochStrikeData.value.strikeToken;
+      createOption(
+        event,
+        pool,
+        event.params.epoch,
+        event.params.strikes[i],
+        strikeTokenAddress
+      );
+    }
   }
 }

@@ -52,6 +52,8 @@ dataSources:
 
         - name: Ssov
           file: ./abis/SsovV3.json
+        - name: SsovV3OptionsToken
+          file: ./abis/SsovV3OptionsToken.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: PriceOracle
@@ -69,5 +71,7 @@ dataSources:
           handler: handlePurchase
         - event: Settle(uint256,uint256,uint256,uint256,uint256,indexed address,indexed address)
           handler: handleSettle
+        - event: Bootstrap(uint256,uint256[])
+          handler: handleBootstrap
       file: ./src/mappings/Ssov.ts
   {{/ssov}}

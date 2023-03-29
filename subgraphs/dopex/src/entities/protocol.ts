@@ -57,8 +57,6 @@ export function getOrCreateProtocol(): DerivOptProtocol {
     protocol.cumulativeUniqueTakers = INT_ZERO;
     protocol.totalPoolCount = INT_ZERO;
 
-    protocol._cumulativeOpenInterestUSD = BIGDECIMAL_ZERO;
-    protocol._cumulativeOpenPositionCount = INT_ZERO;
     protocol._lastSnapshotDayID = INT_ZERO;
     protocol._lastUpdateTimestamp = BIGINT_ZERO;
   }
@@ -161,8 +159,6 @@ export function updateProtocolOpenInterestUSD(
   const protocol = getOrCreateProtocol();
   if (isIncrease) {
     protocol.openInterestUSD = protocol.openInterestUSD.plus(changeUSD);
-    protocol._cumulativeOpenInterestUSD =
-      protocol._cumulativeOpenInterestUSD.plus(changeUSD);
   } else {
     protocol.openInterestUSD = protocol.openInterestUSD.minus(changeUSD);
   }
