@@ -634,6 +634,9 @@ function multiArraySort(
 ): void {
   if (ref.length != arr1.length || ref.length != arr2.length) {
     // cannot sort
+    log.error("[multiArraySort] cannot sort arrays. Array reference: {}", [
+      ref.toString(),
+    ]);
     return;
   }
 
