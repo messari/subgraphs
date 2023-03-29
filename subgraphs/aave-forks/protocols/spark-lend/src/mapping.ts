@@ -108,12 +108,10 @@ export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
     return;
   }
 
-  const marketId = Address.fromString(assetToken._market!);
-  const market = Market.load(marketId.toHexString());
+  const marketId = assetToken._market!;
+  const market = Market.load(marketId);
   if (!market) {
-    log.error("[handleAssetConfigUpdated]Market {} not found", [
-      marketId.toHexString(),
-    ]);
+    log.error("[handleAssetConfigUpdated]Market {} not found", [marketId]);
     return;
   }
 
