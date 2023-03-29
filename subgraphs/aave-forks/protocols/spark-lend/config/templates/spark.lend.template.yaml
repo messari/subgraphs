@@ -25,9 +25,9 @@ dataSources:
         - LendingProtocol
       abis:
         - name: LendingPoolAddressesProvider
-          file: ./abis/LendingPoolAddressesProvider.json
+          file: ./abis/aave-v3/LendingPoolAddressesProvider.json
       eventHandlers:
-        - event: PriceOracleUpdated(indexed address)
+        - event: PriceOracleUpdated(indexed address,indexed address)
           handler: handlePriceOracleUpdated
       file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum/contract
