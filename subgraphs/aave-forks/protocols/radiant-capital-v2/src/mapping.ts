@@ -1,6 +1,10 @@
 import { Address, log } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
-import { Protocol, rTOKEN_DECIMALS } from "./constants";
+import {
+  getNetworkSpecificConstant,
+  Protocol,
+  rTOKEN_DECIMALS,
+} from "./constants";
 import {
   BorrowingDisabledOnReserve,
   BorrowingEnabledOnReserve,
@@ -56,11 +60,13 @@ import { Transfer as CollateralTransfer } from "../../../generated/templates/ATo
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 
 function getProtocolData(): ProtocolData {
+  const networkSpecific = getNetworkSpecificConstant();
+
   return new ProtocolData(
-    Protocol.PROTOCOL_ADDRESS,
+    networkSpecific.protocolAddress,
     Protocol.NAME,
     Protocol.SLUG,
-    Protocol.NETWORK
+    networkSpecific.network
   );
 }
 

@@ -55,9 +55,34 @@ export function getRewardConfig(): RewardConfig {
 export namespace Protocol {
   export const NAME = "Radiant Capital V2";
   export const SLUG = "radiant-capital-v2";
-  export const PROTOCOL_ADDRESS = "0x091d52cace1edc5527c99cdcfa6937c1635330e4"; // addresses provider
-  export const NETWORK = Network.ARBITRUM_ONE;
 }
 
 // Number of decimals in which rToken oracle prices are returned.
 export const rTOKEN_DECIMALS = 8;
+
+export class NetworkSpecificConstant {
+  constructor(
+    public readonly protocolAddress: string, // aka, PoolAddressesProviderRegistry
+    public readonly network: string
+  ) {}
+}
+
+export function getNetworkSpecificConstant(): NetworkSpecificConstant {
+  const network = dataSource.network();
+  if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
+    return new NetworkSpecificConstant(
+      "0x091d52cace1edc5527c99cdcfa6937c1635330e4",
+      Network.ARBITRUM_ONE
+    );
+  } else if (equalsIgnoreCase(network, Network.BSC)) {
+    return new NetworkSpecificConstant(
+      "0x63764769da006395515c3f8aff9c91a809ef6607",
+      Network.BSC
+    );
+  } else {
+    log.critical("[getNetworkSpecificConstant] Unsupported network: {}", [
+      network,
+    ]);
+    return new NetworkSpecificConstant(ZERO_ADDRESS, "");
+  }
+}
