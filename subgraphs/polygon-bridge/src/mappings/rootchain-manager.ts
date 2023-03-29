@@ -1,11 +1,28 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { TokenMapped } from "../../generated/RootChainManager/RootChainManager";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  PredicateRegistered,
+  TokenMapped,
+} from "../../generated/RootChainManager/RootChainManager";
 import { SDK } from "../sdk/protocols/bridge";
 import {
   BridgePoolType,
   CrosschainTokenType,
 } from "../sdk/protocols/bridge/enums";
 import { conf, Pricer, TokenInit } from "./fx-erc20";
+import { Predicate as PredicateTemplate } from "../../generated/templates";
+
+export function handlePredicateRegistered(event: PredicateRegistered): void {
+  log.debug(
+    "[handlePredicate] New Predicate {} with TokenType {} at block {} & hash: {}",
+    [
+      event.params.predicateAddress.toHexString(),
+      event.params.tokenType.toString(),
+      event.block.number.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+  PredicateTemplate.create(event.params.predicateAddress);
+}
 
 export function handlePOSTokenMapped(event: TokenMapped): void {
   const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
