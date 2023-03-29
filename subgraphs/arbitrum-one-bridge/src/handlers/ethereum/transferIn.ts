@@ -3,7 +3,7 @@ import {
   BridgePoolType,
   CrosschainTokenType,
 } from "../../sdk/protocols/bridge/enums";
-import { Address, log, ethereum, Bytes } from "@graphprotocol/graph-ts";
+import { Address, log, ethereum, Bytes, BigInt } from "@graphprotocol/graph-ts";
 import {
   TokenGateway,
   WithdrawalFinalized,
@@ -11,6 +11,7 @@ import {
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
 import { Network } from "../../sdk/util/constants";
 import { ethSideConf, Pricer, TokenInit } from "../../common/utils";
+import { _ERC20 } from "../../../generated/ERC20Gateway/_ERC20";
 
 export function handleTransferOut3pGateway(event: WithdrawalFinalized): void {
   // build params
@@ -74,7 +75,7 @@ export function handleTransferOut(event: WithdrawalFinalized): void {
     networkToChainID(Network.ARBITRUM_ONE),
     crossTokenAddress!,
     CrosschainTokenType.CANONICAL,
-    inputTokenAddress!
+    inputTokenAddress
   );
 
   // -- POOL
@@ -103,4 +104,26 @@ export function handleTransferOut(event: WithdrawalFinalized): void {
     event.params._amount,
     event.transaction.hash
   );
+
+  // -- TVL
+
+  let inputTokenBalance: BigInt;
+  const erc20 = _ERC20.bind(inputTokenAddress);
+  const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
+  if (inputTokenBalanceResult.reverted) {
+    log.info("calculate token balance owned by bridge contract reverted", []);
+  } else {
+    inputTokenBalance = inputTokenBalanceResult.value;
+  }
+  log.error(
+    "hash: {} contract: {} pool: {} inputToken: {} inputTokenBalance: {}",
+    [
+      event.transaction.hash.toHexString(),
+      event.address.toHexString(),
+      pool.getBytesID().toString(),
+      pool.getInputToken().id.toString(),
+      inputTokenBalance!.toString(),
+    ]
+  );
+  pool.setInputTokenBalance(inputTokenBalance!);
 }

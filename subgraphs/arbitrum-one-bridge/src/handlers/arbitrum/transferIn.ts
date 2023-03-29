@@ -1,4 +1,4 @@
-import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   DepositFinalized,
   TokenGateway,
@@ -11,6 +11,7 @@ import { SDK } from "../../sdk/protocols/bridge";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
 import { arbSideConf, Pricer, TokenInit } from "../../common/utils";
 import { Network } from "../../sdk/util/constants";
+import { _ERC20 } from "../../../generated/ERC20Gateway/_ERC20";
 
 export function handleTransferIn3pGateway(event: DepositFinalized): void {
   log.error("[3p Gateway] We are in transferIn3pGateway", []);
@@ -91,4 +92,26 @@ export function handleTransferIn(event: DepositFinalized): void {
     event.params._amount,
     event.transaction.hash
   );
+
+  // -- TVL
+
+  let inputTokenBalance: BigInt;
+  const erc20 = _ERC20.bind(inputTokenAddress!);
+  const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
+  if (inputTokenBalanceResult.reverted) {
+    log.info("calculate token balance owned by bridge contract reverted", []);
+  } else {
+    inputTokenBalance = inputTokenBalanceResult.value;
+  }
+  log.error(
+    "hash: {} contract: {} pool: {} inputToken: {} inputTokenBalance: {}",
+    [
+      event.transaction.hash.toHexString(),
+      event.address.toHexString(),
+      pool.getBytesID().toString(),
+      pool.getInputToken().id.toString(),
+      inputTokenBalance!.toString(),
+    ]
+  );
+  pool.setInputTokenBalance(inputTokenBalance!);
 }
