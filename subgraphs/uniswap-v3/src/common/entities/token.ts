@@ -1,7 +1,11 @@
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../configurations/configure";
 import { ERC20 } from "../../../generated/Factory/ERC20";
-import { Token, _TokenWhitelist } from "../../../generated/schema";
+import {
+  Token,
+  _TokenWhitelist,
+  _TokenWhitelistSymbol,
+} from "../../../generated/schema";
 import {
   DEFAULT_DECIMALS,
   Network,
@@ -106,28 +110,69 @@ export function getOrCreateTokenWhitelist(
   return tokenTracker;
 }
 
+function formatTokenSymbol(tokenSymbol: string): string {
+  return tokenSymbol.replace(" ", "").toLowerCase();
+}
+
+export function getOrCreateTokenWhitelistSymbol(
+  tokenSymbol: string,
+  tokenAddress: Bytes
+): _TokenWhitelistSymbol {
+  // Strip and lowercase token symbol
+  const formattedTokenSymbol = formatTokenSymbol(tokenSymbol);
+  let tokenWhitelistSymbol = _TokenWhitelistSymbol.load(formattedTokenSymbol);
+  // fetch info if null
+  if (!tokenWhitelistSymbol) {
+    tokenWhitelistSymbol = new _TokenWhitelistSymbol(formattedTokenSymbol);
+    tokenWhitelistSymbol.address = tokenAddress!;
+    tokenWhitelistSymbol.save();
+  }
+
+  return tokenWhitelistSymbol;
+}
+
+export function isFakeWhitelistToken(token: Token): bool {
+  const formattedTokenSymbol = formatTokenSymbol(token.symbol);
+  const tokenWhitelistSymbol = _TokenWhitelistSymbol.load(formattedTokenSymbol);
+  if (tokenWhitelistSymbol && tokenWhitelistSymbol.address != token.id) {
+    return true;
+  }
+  return false;
+}
+
 // These whiteslists are used to track what pools the tokens are a part of. Used in price calculations.
 export function updateTokenWhitelists(
   token0: Token,
   token1: Token,
   poolAddress: Bytes
 ): void {
-  const tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
-  const tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
-
   // update white listed pools
-  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist0.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(token0.id)) {
+    const tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
+    const tokenWhitelistSymbol0 = getOrCreateTokenWhitelistSymbol(
+      token0.symbol,
+      token0.id
+    );
+
     const newPools = tokenWhitelist1.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist1.whitelistPools = newPools;
     tokenWhitelist1.save();
+    tokenWhitelistSymbol0.save();
   }
 
-  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist1.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(token1.id)) {
+    const tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
+    const tokenWhitelistSymbol1 = getOrCreateTokenWhitelistSymbol(
+      token1.symbol,
+      token1.id
+    );
+
     const newPools = tokenWhitelist0.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist0.whitelistPools = newPools;
     tokenWhitelist0.save();
+    tokenWhitelistSymbol1.save();
   }
 }
 

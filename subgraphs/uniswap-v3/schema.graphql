@@ -1413,3 +1413,11 @@ type _TokenWhitelist @entity {
   " pools token is in that are white listed for USD pricing "
   whitelistPools: [LiquidityPool!]!
 }
+
+type _TokenWhitelistSymbol @entity(immutable: true) {
+  " Whitelist Token Symbol "
+  id: ID!
+
+  " Whitelist Token Address"
+  address: Bytes!
+}
