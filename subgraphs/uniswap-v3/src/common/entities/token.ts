@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../configurations/configure";
 import { ERC20 } from "../../../generated/Factory/ERC20";
 import {
@@ -110,16 +110,21 @@ export function getOrCreateTokenWhitelist(
   return tokenTracker;
 }
 
+function formatTokenSymbol(tokenSymbol: string): string {
+  return tokenSymbol.replace(" ", "").toLowerCase();
+}
+
 export function getOrCreateTokenWhitelistSymbol(
   tokenSymbol: string,
   tokenAddress: Bytes
 ): _TokenWhitelistSymbol {
-  let tokenWhitelistSymbol = _TokenWhitelistSymbol.load(tokenSymbol);
+  // Strip and lowercase token symbol
+  const formattedTokenSymbol = formatTokenSymbol(tokenSymbol);
+  let tokenWhitelistSymbol = _TokenWhitelistSymbol.load(formattedTokenSymbol);
   // fetch info if null
   if (!tokenWhitelistSymbol) {
-    tokenWhitelistSymbol = new _TokenWhitelistSymbol(tokenSymbol);
-
-    tokenWhitelistSymbol.address = tokenAddress;
+    tokenWhitelistSymbol = new _TokenWhitelistSymbol(formattedTokenSymbol);
+    tokenWhitelistSymbol.address = tokenAddress!;
     tokenWhitelistSymbol.save();
   }
 
@@ -127,7 +132,8 @@ export function getOrCreateTokenWhitelistSymbol(
 }
 
 export function isFakeWhitelistToken(token: Token): bool {
-  const tokenWhitelistSymbol = _TokenWhitelistSymbol.load(token.symbol);
+  const formattedTokenSymbol = formatTokenSymbol(token.symbol);
+  const tokenWhitelistSymbol = _TokenWhitelistSymbol.load(formattedTokenSymbol);
   if (tokenWhitelistSymbol && tokenWhitelistSymbol.address != token.id) {
     return true;
   }
