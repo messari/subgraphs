@@ -385,23 +385,6 @@ export function handleCommandExecuted(event: Executed): void {
         .decode("uint256", thisLog.data)!
         .toBigInt();
 
-      log.info(
-        "[handleCommandExecuted]from={} to={} thisLog.data={} tx={}-{}",
-        [
-          fromAddress.toHexString(),
-          toAddress.toHexString(),
-          thisLog.data.toHexString(),
-          thisLog.transactionHash.toHexString(),
-          thisLog.logIndex.toString(),
-        ]
-      );
-
-      log.info("[handleCommandExecuted]to==0x0 {} tx={}-{}", [
-        toAddress.equals(Address.zero()).toString(),
-        thisLog.transactionHash.toHexString(),
-        thisLog.logIndex.toString(),
-      ]);
-
       // burnToken: transfer to 0x or address(this)
       if (toAddress.equals(Address.zero()) || toAddress.equals(event.address)) {
         log.info("[handleCommandExecuted] burn {} {} token from {} tx={}-{}", [
