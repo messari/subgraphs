@@ -716,6 +716,8 @@ export function handleMessageWithTransfer(event: MessageWithTransfer): void {
     event.params.fee,
     customEvent
   );
+  // Here we don't need to handle transferOut because another transfer event will be emitted
+  // https://github.com/celer-network/sgn-v2-contracts/blob/9ce8ffe13389415a53e2c38838da1b99689d40f0/contracts/message/libraries/MessageSenderLib.sol#L66-L98
 }
 
 export function handlerMessageExecuted(event: Executed): void {
