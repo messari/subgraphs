@@ -9,7 +9,7 @@ import {
 import { NetworkConfigs } from "../configurations/configure";
 import { Oracle } from "../generated/Controller/Oracle";
 import { Option, Token } from "../generated/schema";
-import { INT_EIGHT } from "./common/constants";
+import { BIGDECIMAL_ZERO, INT_EIGHT } from "./common/constants";
 import { getOrCreateToken } from "./common/tokens";
 import { bigIntToBigDecimal } from "./common/utils/numbers";
 import { getUsdPricePerToken } from "./prices";
@@ -101,9 +101,16 @@ function getExpiryPrice(
   asset: Bytes,
   expirationTimestamp: BigInt
 ): BigDecimal {
-  const result = oracle.getExpiryPrice(
+  const callResult = oracle.try_getExpiryPrice(
     Address.fromBytes(asset),
     expirationTimestamp
   );
-  return bigIntToBigDecimal(result.value0, INT_EIGHT);
+  if (callResult.reverted) {
+    log.warning(
+      "Failed to get expiry price for asset {} and expiry {}, setting to 0",
+      [asset.toHex(), expirationTimestamp.toString()]
+    );
+    return BIGDECIMAL_ZERO;
+  }
+  return bigIntToBigDecimal(callResult.value.value0, INT_EIGHT);
 }
