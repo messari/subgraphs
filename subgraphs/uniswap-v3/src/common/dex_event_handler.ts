@@ -24,7 +24,6 @@ import {
   Token,
   Withdraw,
   _LiquidityPoolAmount,
-  _TokenWhitelistSymbol,
 } from "../../generated/schema";
 import {
   INT_ZERO,
