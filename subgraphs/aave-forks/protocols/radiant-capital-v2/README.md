@@ -138,9 +138,7 @@ Important terms:
 
 ### Rewards for depositors and borrowers
 
-Depositors and borrowers earn the RDNT emissions per block:
-
-> Reward Rate of a pool = Rewards received in RDNT \* RDNT Price / Deposit or borrow balance of that pool
+No rewards on BSC subgraph, because we don't have a pool to price RDNT from.
 
 ### Interest Rates
 
