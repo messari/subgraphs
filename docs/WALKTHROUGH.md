@@ -102,6 +102,7 @@ Logs should be descriptive and formatted as follows to remain easy to parse thro
 - A description of what the log is
 - Any relevant information that is needed to understand the log
 - A prefix to differentiate messari subgraph logs
+- If possible, the transaction hash should also be included
 
 Examples:
 
@@ -121,16 +122,16 @@ log.warning(
 
 ```typescript
 log.error(
-  "messari log: [handleDeposit] Market: {} not found. Market entity expected to be created.",
-  [event.address.toHexString()]
+  "messari log: [handleDeposit] Market: {} not found. Market entity expected to be created. Transaction hash {}",
+  [event.address.toHexString(), event.transaction.hash.toHexString()]
 );
 ```
 
 ```typescript
 // This is impossible, and something is seriously wrong if this occurs
 log.critical(
-  "messari log: [updateMarketData] InputTokenBalance is negative in market {}.",
-  [market.id.toHexString()]
+  "messari log: [updateMarketData] InputTokenBalance is negative in market {}. Transaction hash {}",
+  [market.id.toHexString(), event.transaction.hash.toHexString()]
 );
 ```
 
