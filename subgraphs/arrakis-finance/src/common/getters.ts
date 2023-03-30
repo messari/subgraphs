@@ -189,7 +189,6 @@ export function getOrCreateVaultDailySnapshot(
     snapshot.stakedOutputTokenAmount = null;
     snapshot.rewardTokenEmissionsAmount = null;
     snapshot.rewardTokenEmissionsUSD = null;
-    // TODO
     snapshot._token0 = "";
     snapshot._token1 = "";
     snapshot._token0Amount = BIGINT_ZERO;

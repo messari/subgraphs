@@ -506,7 +506,6 @@ type VaultDailySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
-  # TODO: for diagnosing, to be removed
   " token0 of vault "
   _token0: Token!
   " token1 of vault "

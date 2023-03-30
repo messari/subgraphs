@@ -49,7 +49,6 @@ export function updateVaultSnapshots(
   dailySnapshot.stakedOutputTokenAmount = vault.stakedOutputTokenAmount;
   dailySnapshot.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
   dailySnapshot.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
-  // TODO: remove after diagnosing
   dailySnapshot._token0 = vault._token0;
   dailySnapshot._token1 = vault._token1;
   dailySnapshot._token0Amount = vault._token0Amount;
