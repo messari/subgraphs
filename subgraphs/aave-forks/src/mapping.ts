@@ -1007,7 +1007,7 @@ export function _handleLiquidate(
   liquidate.hash = event.transaction.hash.toHexString();
   liquidate.nonce = event.transaction.nonce;
   liquidate.logIndex = event.logIndex.toI32();
-  liquidate.asset = debtAsset!.id;
+  liquidate.asset = debtAsset.id;
   liquidate.amount = amount;
   liquidate.amountUSD = amount
     .toBigDecimal()
