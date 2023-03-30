@@ -25,10 +25,6 @@ import { Vault } from "../../../generated/schema";
 
 // Update TVL related fields in all entities
 export function updateTvl(event: ethereum.Event): void {
-  // const vaultAddress = event.address;
-  // Track existing TVL for cumulative calculations
-  // updateVaultTokenValue(vaultAddress.toHexString(), event.block);
-
   // Update entities
   const protocol = getOrCreateYieldAggregator(
     REGISTRY_ADDRESS_MAP.get(dataSource.network())!

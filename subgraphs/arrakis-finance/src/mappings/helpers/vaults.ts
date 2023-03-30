@@ -26,8 +26,6 @@ export function updateVaultSnapshots(
   vault: Vault,
   block: ethereum.Block
 ): void {
-  //const vault = getOrCreateVault(vaultAddress, block);
-
   const dailySnapshot = getOrCreateVaultDailySnapshot(
     Address.fromString(vault.id),
     block
@@ -141,34 +139,6 @@ export function getOrCreateVault(
   }
   return vault;
 }
-
-/*
-export function getOrCreateUnderlyingToken(
-  vaultAddress: Address
-): _UnderlyingToken {
-  const vaultId = vaultAddress.toHex();
-  let underlyingToken = _UnderlyingToken.load(vaultId);
-  if (!underlyingToken) {
-    const vaultContract = VaultV1Contract.bind(vaultAddress);
-
-    const token0Address = vaultContract.token0();
-    const token1Address = vaultContract.token1();
-    const tokenBalances = vaultContract.getUnderlyingBalances();
-
-    getOrCreateToken(token0Address);
-    getOrCreateToken(token1Address);
-
-    underlyingToken = new _UnderlyingToken(vaultId);
-    underlyingToken.token0 = token0Address.toHex();
-    underlyingToken.lastAmount0 = tokenBalances.value0;
-    underlyingToken.token1 = token1Address.toHex();
-    underlyingToken.lastAmount1 = tokenBalances.value1;
-    underlyingToken.lastAmountBlockNumber = BIGINT_ZERO;
-    underlyingToken.save();
-  }
-  return underlyingToken;
-}
-*/
 
 export function getOrCreateVaultFee(
   feeType: string,
