@@ -31,23 +31,31 @@ export namespace Versions {
 export const latestSchemaVersions = (schemaType: string, versionStr: string) => {
   const schema = schemaMapping[schemaType];
   if (schema === "exchanges") {
-    if (["3.0.3"].includes(versionStr)) {
+    if (["3.0.4"].includes(versionStr)) {
       return true;
     }
   } else if (schema === "lending") {
-    if (["3.0.0"].includes(versionStr)) {
+    if (["3.0.1"].includes(versionStr)) {
       return true;
     }
-  } else if (schema === "vaults" || schema === "generic") {
-    if (["1.3.0"].includes(versionStr)) {
+  } else if (schema === "vaults") {
+    if (["1.3.1"].includes(versionStr)) {
       return true;
     }
-  } else if (schema === "bridge" || schema === "perpetual") {
+  } else if (schema === "generic") {
+    if (["2.1.0"].includes(versionStr)) {
+      return true;
+    }
+  } else if (schema === "bridge") {
     if (["1.2.0"].includes(versionStr)) {
       return true;
     }
-  } else if (schema === "generic" || "option") {
-    if (["1.1.0"].includes(versionStr)) {
+  } else if (schema === "option") {
+    if (["1.3.0"].includes(versionStr)) {
+      return true;
+    }
+  } else if (schema === "perpetual") {
+    if (["1.2.1"].includes(versionStr)) {
       return true;
     }
   }
@@ -70,7 +78,7 @@ export const listSchemaVersionsByType: { [x: string]: string[] } = {
   generic: versionsListGeneric,
   bridge: versionsListBridge,
   perpetual: versionsListPerp,
-  option: versionsListOption
+  option: versionsListOption,
 };
 
 export const SubgraphBaseUrl = "https://api.thegraph.com/subgraphs/name/";
