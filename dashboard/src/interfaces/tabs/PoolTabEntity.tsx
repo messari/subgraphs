@@ -263,6 +263,10 @@ function PoolTabEntity({
                 const dec = data[poolKeySingular].inputToken.decimals;
                 value = convertTokenDecimals(currentInstanceField, dec);
               }
+              if (fieldName === "mintSupply") {
+                const dec = data[poolKeySingular].inputToken.decimals;
+                value = convertTokenDecimals(currentInstanceField, dec);
+              }
 
               const returnedData = addDataPoint(
                 dataFields,
@@ -531,6 +535,10 @@ function PoolTabEntity({
                 value = convertTokenDecimals(currentOverlayInstanceField, data[poolKeySingular]?.outputToken?.decimals);
               }
               if (fieldName === "inputTokenBalance") {
+                const dec = overlayData[poolKeySingular].inputToken.decimals;
+                value = convertTokenDecimals(currentOverlayInstanceField, dec);
+              }
+              if (fieldName === "mintSupply") {
                 const dec = overlayData[poolKeySingular].inputToken.decimals;
                 value = convertTokenDecimals(currentOverlayInstanceField, dec);
               }
