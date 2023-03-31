@@ -263,6 +263,9 @@ type DerivOptProtocol implements Protocol @entity {
   " All historical notional volume in USD taken of underlying at time of contract minting"
   cumulativeVolumeUSD: BigDecimal!
 
+  " All historical volume of Collateral assets in USD in this pool"
+  cumulativeCollateralVolumeUSD: BigDecimal
+
   " All historical notional volume in USD taken of underlying at time of contract exercise"
   cumulativeExercisedVolumeUSD: BigDecimal!
 
@@ -458,6 +461,12 @@ type FinancialsDailySnapshot @entity(immutable: true) {
 
   " All historical trade notional volume of underylying assets in USD "
   cumulativeVolumeUSD: BigDecimal!
+
+  " Daily volume of Collateral assets in USD in this pool"
+  dailyCollateralVolumeUSD: BigDecimal
+
+  " All historical volume of Collateral assets in USD in this pool"
+  cumulativeCollateralVolumeUSD: BigDecimal
 
   " Daily notional volume in USD taken of underlying at time of contract exercise"
   dailyExercisedVolumeUSD: BigDecimal!
