@@ -1,0 +1,11 @@
+{
+  "deployment": "QUICKSWAP_ZKEVM",
+  "network": "polygon-zkevm",
+  "factory": {
+    "address": "0x4B9f4d2435Ef65559567e5DbFC1BbB37abC43B57",
+    "startBlock": 300
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

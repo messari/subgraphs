@@ -39,6 +39,7 @@ export namespace Network {
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
   export const MATIC = "MATIC"; // aka Polygon
+  export const POLYGON_ZKEVM = "POLYGON_ZKEVM";
   export const GNOSIS = "GNOSIS"; // aka Gnosis Chain
 }
 

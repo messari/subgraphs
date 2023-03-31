@@ -4406,6 +4406,28 @@
             "query-id": "quickswap-polygon"
           }
         }
+      },
+      "quickswap-polygon-zkevm": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "quickswap.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "quickswap-polygon-zkevm",
+            "query-id": "quickswap-polygon-zkevm"
+          }
+        }
       }
     }
   },

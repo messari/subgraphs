@@ -752,6 +752,9 @@ type LiquidityPool @entity {
 
   " All Option entities from this pool "
   options: [Option!]! @derivedFrom(field: "pool")
+
+  _lastDailySnapshotTimestamp: BigInt!
+  _lastHourlySnapshotTimestamp: BigInt!
 }
 
 #################################
@@ -1319,6 +1322,18 @@ type ActiveAccount @entity {
   id: Bytes!
 }
 
+# Helper entity for getting positions
+type _PositionCounter @entity {
+  " { Account address }-{ Option id } "
+  id: Bytes!
+
+  " Next count "
+  nextCount: Int!
+
+  " The last timestamp this position was updated "
+  lastTimestamp: BigInt
+}
+
 # A position describes a contract that a user has taken (either a call/put)
 # Note: A position snapshot is not necessary because the position is opened and closed with no other interaction
 # All of the data we would get from a snapshot is already available in the position.
@@ -1443,4 +1458,38 @@ type Option @entity {
 
   " All Position entities from this option "
   positions: [Position!]! @derivedFrom(field: "option")
+}
+
+type _ActivityHelper @entity {
+  id: Bytes!
+
+  hourlyActiveUsers: Int!
+  dailyActiveUsers: Int!
+
+  hourlyUniqueLP: Int!
+  dailyUniqueLP: Int!
+
+  hourlyUniqueTakers: Int!
+  dailyUniqueTakers: Int!
+
+  hourlyTransactionCount: Int!
+  dailyTransactionCount: Int!
+
+  hourlyDepositCount: Int!
+  dailyDepositCount: Int!
+
+  hourlyWithdrawCount: Int!
+  dailyWithdrawCount: Int!
+}
+
+type _ProtocolSnapshotHelper @entity {
+  id: Bytes!
+
+  lastDailyFinancialsTimestamp: BigInt!
+  lastDailyUsageTimestamp: BigInt!
+  lastHourlyUsageTimestamp: BigInt!
+
+  lastDailyFinancialsSnapshot: Bytes!
+  lastDailyUsageSnapshot: Bytes!
+  lastHourlyUsageSnapshot: Bytes!
 }
