@@ -56,15 +56,26 @@ module.exports = {
 
     // prefer template literal for string concatenation:
     // https://eslint.org/docs/latest/rules/prefer-template
-    "prefer-template": "error",
+    "prefer-template": "warn",
 
     // enforce camelCase naming
     // https://eslint.org/docs/latest/rules/camelcase
     "@typescript-eslint/naming-convention": [
-      "warn",
+      "error",
       {
         selector: "variable",
         format: ["camelCase"],
+        leadingUnderscore: "allow",
+      },
+      {
+        selector: "variable",
+        modifiers: ["const", "global"],
+        format: ["UPPER_CASE"],
+      },
+      {
+        selector: "function",
+        format: ["camelCase"],
+        leadingUnderscore: "allow",
       },
     ],
 
