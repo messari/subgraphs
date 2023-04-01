@@ -1,0 +1,16 @@
+{
+  "deployment": "GAINS_TRADE_POLYGON",
+  "network": "matic",
+  "file": "./src/mappings/handlers.ts",
+  "vault": {
+    "address": "0x91993f2101cc758D0dEB7279d41e880F7dEFe827",
+    "startBlock": "36865592"
+  },
+  "callbacks": {
+    "address": "0xb454d8A8C98035C65Bb73FE2a11567b9B044E0fa",
+    "startBlock": "36865608"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

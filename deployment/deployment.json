@@ -7844,7 +7844,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "gains-trade-polygon": {
@@ -7866,7 +7866,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     }
