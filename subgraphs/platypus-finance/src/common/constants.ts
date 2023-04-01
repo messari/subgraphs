@@ -84,15 +84,15 @@ export namespace InterestRateSide {
 //////////////////////////////
 
 export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 export const ZERO_ADDRESS = Address.fromString(ZERO_ADDRESS_STRING);
 
-export const MasterPlatypus_ADDRESS = Address.fromString("0x68c5f4374228BEEdFa078e77b5ed93C28a2f713E");
-export const MasterPlatypusOld_ADDRESS = Address.fromString("0xB0523f9F473812FB195Ee49BC7d2ab9873a98044");
-export const MasterPlatypusFactory_ADDRESS = Address.fromString("0x7125B4211357d7C3a90F796c956c12c681146EbB");
+export const MasterPlatypus_ADDRESS = Address.fromString("0x68c5f4374228beedfa078e77b5ed93c28a2f713e");
+export const MasterPlatypusOld_ADDRESS = Address.fromString("0xb0523f9f473812fb195ee49bc7d2ab9873a98044");
+export const MasterPlatypusFactory_ADDRESS = Address.fromString("0x7125b4211357d7c3a90f796c956c12c681146ebb");
 
-export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+export const UNISWAP_V2_FACTORY = "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f";
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
 export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // created block 10042267
@@ -152,12 +152,12 @@ export const ETH_NAME = "Ether";
 
 export const WAVAX_ADDRESS = "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7";
 
-export const PROTOCOL_ADMIN = "0x416a7989a964C9ED60257B064Efc3a30FE6bF2eE";
+export const PROTOCOL_ADMIN = "0x416a7989a964c9ed60257b064efc3a30fe6bf2ee";
 
 export const PTPAddress = "0x22d4002028f537599be9f666d1c4fa138522f9c8";
 
 // Main USD Pool
-export const POOL_PROXY = "0x66357dCaCe80431aee0A7507e2E361B7e2402370";
+export const POOL_PROXY = "0x66357dcace80431aee0a7507e2e361b7e2402370";
 
 export class poolDetail {
   name: string;
@@ -178,49 +178,49 @@ export class poolDetail {
       // We comment out the main pool as we already are "watching" its events
       // As per the subgraph.yaml manifest definition
       // "0x66357dCaCe80431aee0A7507e2E361B7e2402370",
-      "0xe0D166DE15665bC4B7185B2e35E847E51316E126",
-      "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824",
-      "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7",
-      "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83",
-      "0x4658EA7e9960D6158a261104aAA160cC953bb6ba",
-      "0x39dE4e02F76Dbd4352Ec2c926D8d64Db8aBdf5b2",
-      "0x233Ba46B01d2FbF1A31bDBc500702E286d6de218",
-      "0x91BB10D68C72d64a7cE10482b453153eEa03322C",
-      "0x27912AE6Ba9a54219d8287C3540A8969FF35500B",
-      "0x853ea32391AaA14c112C645FD20BA389aB25C5e0",
-      "0x3B55E45fD6bd7d4724F5c47E0d1bCaEdd059263e",
+      "0xe0d166de15665bc4b7185b2e35e847e51316e126",
+      "0xb8e567fc23c39c94a1f6359509d7b43d1fbed824",
+      "0x30c30d826be87cd0a4b90855c2f38f7fcfe4eaa7",
+      "0xc828d995c686aaba78a4ac89dfc8ec0ff4c5be83",
+      "0x4658ea7e9960d6158a261104aaa160cc953bb6ba",
+      "0x39de4e02f76dbd4352ec2c926d8d64db8abdf5b2",
+      "0x233ba46b01d2fbf1a31bdbc500702e286d6de218",
+      "0x91bb10d68c72d64a7ce10482b453153eea03322c",
+      "0x27912ae6ba9a54219d8287c3540a8969ff35500b",
+      "0x853ea32391aaa14c112c645fd20ba389ab25c5e0",
+      "0x3b55e45fd6bd7d4724f5c47e0d1bcaedd059263e",
     ];
   }
 
   // Get all tokens with a static defintion
   static getPoolDetails(): Array<poolDetail> {
-    let poolDetailArray = new Array<poolDetail>();
-    let detailsJson = [
-      ["Main Pool", "Main Pool", "0x66357dCaCe80431aee0A7507e2E361B7e2402370", "false"],
-      ["Alt Pool UST", "UST-USDC Pool", "0xe0D166DE15665bC4B7185B2e35E847E51316E126", "false"],
-      ["Alt Pool Frax", "Frax-USDC Pool", "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824", "false"],
-      ["Alt Pool MIM", "MIM-USDC Pool", "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7", "false"],
-      ["Alt Pool YUSD", "YUSD-USDC Pool", "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83", "false"],
-      ["Alt Pool sAVAX", "sAVAX-AVAX Pool", "0x4658EA7e9960D6158a261104aAA160cC953bb6ba", "false"],
-      ["Alt Pool BTC.b-WBTC.e", "BTC.b-WBTC.e Pool", "0x39dE4e02F76Dbd4352Ec2c926D8d64Db8aBdf5b2", "false"],
-      ["Factory Pool H2O", "H2O-USDC Pool", "0x233Ba46B01d2FbF1A31bDBc500702E286d6de218", "false"],
-      ["Factory Pool TSD", "TSD-USDC Pool", "0x91BB10D68C72d64a7cE10482b453153eEa03322C", "false"],
-      ["Factory Pool MONEY", "MONEY-USDC Pool", "0x27912AE6Ba9a54219d8287C3540A8969FF35500B", "false"],
-      ["Factory Pool dForce USX", "USX-USDC Pool", "0x89E9EFD9614621309aDA948a761D364F0236eDEA", "false"],
-      ["Factory Pool MAI", "MiMatic-USDC Pool", "0x1abB6Bf97506C9B4AC985F558C4Ee6Eeb9C11F1D", "false"],
+    const poolDetailArray = new Array<poolDetail>();
+    const detailsJson = [
+      ["Main Pool", "Main Pool", "0x66357dcace80431aee0a7507e2e361b7e2402370", "false"],
+      ["Alt Pool UST", "UST-USDC Pool", "0xe0d166de15665bc4b7185b2e35e847e51316e126", "false"],
+      ["Alt Pool Frax", "Frax-USDC Pool", "0xb8e567fc23c39c94a1f6359509d7b43d1fbed824", "false"],
+      ["Alt Pool MIM", "MIM-USDC Pool", "0x30c30d826be87cd0a4b90855c2f38f7fcfe4eaa7", "false"],
+      ["Alt Pool YUSD", "YUSD-USDC Pool", "0xc828d995c686aaba78a4ac89dfc8ec0ff4c5be83", "false"],
+      ["Alt Pool sAVAX", "sAVAX-AVAX Pool", "0x4658ea7e9960d6158a261104aaa160cc953bb6ba", "false"],
+      ["Alt Pool BTC.b-WBTC.e", "BTC.b-WBTC.e Pool", "0x39de4e02f76dbd4352ec2c926d8d64db8abdf5b2", "false"],
+      ["Factory Pool H2O", "H2O-USDC Pool", "0x233ba46b01d2fbf1a31bdbc500702e286d6de218", "false"],
+      ["Factory Pool TSD", "TSD-USDC Pool", "0x91bb10d68c72d64a7ce10482b453153eea03322c", "false"],
+      ["Factory Pool MONEY", "MONEY-USDC Pool", "0x27912ae6ba9a54219d8287c3540a8969ff35500b", "false"],
+      ["Factory Pool dForce USX", "USX-USDC Pool", "0x89e9efd9614621309ada948a761d364f0236edea", "false"],
+      ["Factory Pool MAI", "MiMatic-USDC Pool", "0x1abb6bf97506c9b4ac985f558c4ee6eeb9c11f1d", "false"],
 
       // Ignore pools while calculating TVL not in above list
       ["Withdraw Pool MIM", "MIM-Ignore", "0x6c84f0580c8ffab0c716c87e66ab474e4bea97d9", "true"],
       ["Withdraw Pool UST", "UST-USDC-Ignore", "0xefa5d088a58a2d4ee5504102c5ffde69301527b0", "true"],
       ["Multisig (Treasury)", "Multisig-Treasury", "0x068e297e8ff74115c9e1c4b5b83b700fda5afdeb", "true"],
-      ["Multisig (Incentives)", "Multisig-Incentives", "0xD2805cff8877235d9EC88F683F85A8213DC288BC", "true"],
-      ["Admin (Address)", "Admin-Address", "0x416a7989a964C9ED60257B064Efc3a30FE6bF2eE", "true"],
+      ["Multisig (Incentives)", "Multisig-Incentives", "0xd2805cff8877235d9ec88f683f85a8213dc288bc", "true"],
+      ["Admin (Address)", "Admin-Address", "0x416a7989a964c9ed60257b064efc3a30fe6bf2ee", "true"],
 
       // Ignore all unknown pools
       ["unknown pool", "unknown pool", "unknown", "true"],
     ];
     for (let i = 0; i < detailsJson.length; i++) {
-      let details = new poolDetail(detailsJson[i][0], detailsJson[i][1], detailsJson[i][2], detailsJson[i][3]);
+      const details = new poolDetail(detailsJson[i][0], detailsJson[i][1], detailsJson[i][2], detailsJson[i][3]);
       poolDetailArray.push(details);
     }
 
@@ -228,7 +228,7 @@ export class poolDetail {
   }
 
   static fromAddress(poolAddress: string): poolDetail {
-    let details = this.getPoolDetails();
+    const details = this.getPoolDetails();
     for (let i = 0; i < details.length; i++) {
       if (details[i].address.toLowerCase() == poolAddress.toLowerCase()) {
         return details[i];

@@ -30,7 +30,10 @@ export function getOrCreateToken(
     }
   }
 
-  if (token.lastPriceBlockNumber && token.lastPriceBlockNumber == blockNumber) {
+  if (
+    token.lastPriceBlockNumber &&
+    token.lastPriceBlockNumber! == blockNumber
+  ) {
     return token;
   }
 

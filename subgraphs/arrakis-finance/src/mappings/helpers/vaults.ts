@@ -5,10 +5,11 @@ import {
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
-import { Vault, VaultFee, _UnderlyingToken } from "../../../generated/schema";
+import { Vault, VaultFee } from "../../../generated/schema";
 import { ArrakisVaultV1 as VaultV1Contract } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { UniswapV3Pool as PoolContract } from "../../../generated/templates/ArrakisVault/UniswapV3Pool";
 import {
+  BIGDECIMAL_ZERO,
   BIGINT_MAX,
   BIGINT_ZERO,
   PROTOCOL_PERFORMANCE_FEE,
@@ -22,13 +23,17 @@ import {
 
 // Update daily and hourly snapshots from vault entity
 export function updateVaultSnapshots(
-  vaultAddress: Address,
+  vault: Vault,
   block: ethereum.Block
 ): void {
-  let vault = getOrCreateVault(vaultAddress, block);
-
-  let dailySnapshot = getOrCreateVaultDailySnapshot(vaultAddress, block);
-  let hourlySnapshot = getOrCreateVaultHourlySnapshot(vaultAddress, block);
+  const dailySnapshot = getOrCreateVaultDailySnapshot(
+    Address.fromString(vault.id),
+    block
+  );
+  const hourlySnapshot = getOrCreateVaultHourlySnapshot(
+    Address.fromString(vault.id),
+    block
+  );
 
   dailySnapshot.inputTokenBalance = vault.inputTokenBalance;
   dailySnapshot.outputTokenSupply = vault.outputTokenSupply!;
@@ -40,6 +45,15 @@ export function updateVaultSnapshots(
     vault.cumulativeProtocolSideRevenueUSD;
   dailySnapshot.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
   dailySnapshot.stakedOutputTokenAmount = vault.stakedOutputTokenAmount;
+  dailySnapshot.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  dailySnapshot.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+  dailySnapshot._token0 = vault._token0;
+  dailySnapshot._token1 = vault._token1;
+  dailySnapshot._token0Amount = vault._token0Amount;
+  dailySnapshot._token1Amount = vault._token1Amount;
+  dailySnapshot._token0AmountUSD = vault._token0AmountUSD;
+  dailySnapshot._token1AmountUSD = vault._token1AmountUSD;
+
   dailySnapshot.blockNumber = block.number;
   dailySnapshot.timestamp = block.timestamp;
 
@@ -53,6 +67,8 @@ export function updateVaultSnapshots(
     vault.cumulativeProtocolSideRevenueUSD;
   hourlySnapshot.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
   hourlySnapshot.stakedOutputTokenAmount = vault.stakedOutputTokenAmount;
+  hourlySnapshot.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  hourlySnapshot.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
   hourlySnapshot.blockNumber = block.number;
   hourlySnapshot.timestamp = block.timestamp;
 
@@ -64,16 +80,15 @@ export function getOrCreateVault(
   vaultAddress: Address,
   block: ethereum.Block
 ): Vault {
-  let vaultId = vaultAddress.toHex();
+  const vaultId = vaultAddress.toHex();
   let vault = Vault.load(vaultId);
   if (!vault) {
-    let vaultContract = VaultV1Contract.bind(vaultAddress);
+    const vaultContract = VaultV1Contract.bind(vaultAddress);
     const poolAddress = vaultContract.pool();
-    let poolContract = PoolContract.bind(poolAddress);
+    const poolContract = PoolContract.bind(poolAddress);
     const poolFeePercentage = poolContract.fee() / 10000.0;
 
     // Create relevant tokens
-    getOrCreateUnderlyingToken(vaultAddress);
     getOrCreateToken(vaultAddress);
 
     vault = new Vault(vaultId);
@@ -101,17 +116,22 @@ export function getOrCreateVault(
     vault.stakedOutputTokenAmount = BIGINT_ZERO;
     vault.rewardTokenEmissionsAmount = [];
     vault.rewardTokenEmissionsUSD = [];
+    vault._token0 = "";
+    vault._token1 = "";
+    vault._token0Amount = BIGINT_ZERO;
+    vault._token1Amount = BIGINT_ZERO;
+    vault._token0AmountUSD = BIGDECIMAL_ZERO;
+    vault._token1AmountUSD = BIGDECIMAL_ZERO;
 
     const managerFee = BigInt.fromI32(
       vaultContract.managerFeeBPS() / 100
     ).toBigDecimal();
-    let vaultPerformanceFee = getOrCreateVaultFee(
+    const vaultPerformanceFee = getOrCreateVaultFee(
       VaultFeeType.PERFORMANCE_FEE,
       vaultId
     );
-    vaultPerformanceFee.feePercentage = PROTOCOL_PERFORMANCE_FEE.plus(
-      managerFee
-    );
+    vaultPerformanceFee.feePercentage =
+      PROTOCOL_PERFORMANCE_FEE.plus(managerFee);
     vaultPerformanceFee.save();
 
     vault.fees = [vaultPerformanceFee.id];
@@ -120,37 +140,11 @@ export function getOrCreateVault(
   return vault;
 }
 
-export function getOrCreateUnderlyingToken(
-  vaultAddress: Address
-): _UnderlyingToken {
-  const vaultId = vaultAddress.toHex();
-  let underlyingToken = _UnderlyingToken.load(vaultId);
-  if (!underlyingToken) {
-    const vaultContract = VaultV1Contract.bind(vaultAddress);
-
-    const token0Address = vaultContract.token0();
-    const token1Address = vaultContract.token1();
-    const tokenBalances = vaultContract.getUnderlyingBalances();
-
-    getOrCreateToken(token0Address);
-    getOrCreateToken(token1Address);
-
-    underlyingToken = new _UnderlyingToken(vaultId);
-    underlyingToken.token0 = token0Address.toHex();
-    underlyingToken.lastAmount0 = tokenBalances.value0;
-    underlyingToken.token1 = token1Address.toHex();
-    underlyingToken.lastAmount1 = tokenBalances.value1;
-    underlyingToken.lastAmountBlockNumber = BIGINT_ZERO;
-    underlyingToken.save();
-  }
-  return underlyingToken;
-}
-
 export function getOrCreateVaultFee(
   feeType: string,
   vaultId: string
 ): VaultFee {
-  let vaultFeeId = feeType.concat("-").concat(vaultId);
+  const vaultFeeId = feeType.concat("-").concat(vaultId);
 
   let vaultFee = VaultFee.load(vaultFeeId);
   if (!vaultFee) {
@@ -161,4 +155,28 @@ export function getOrCreateVaultFee(
   }
 
   return vaultFee;
+}
+
+export function getUnderlyingTokenBalances(
+  vaultAddress: Address,
+  event: ethereum.Event
+): BigInt[] | null {
+  const vaultContract = VaultV1Contract.bind(vaultAddress);
+  const underlyingBalancesResult = vaultContract.try_getUnderlyingBalances();
+  if (underlyingBalancesResult.reverted) {
+    log.error(
+      "[getUnderlyingTokenBalances]vault {} getUnderlyingBalances() call reverted tx {}-{}",
+      [
+        vaultAddress.toHexString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
+    );
+    return null;
+  }
+  const result = [
+    underlyingBalancesResult.value.getAmount0Current(),
+    underlyingBalancesResult.value.getAmount1Current(),
+  ];
+  return result;
 }

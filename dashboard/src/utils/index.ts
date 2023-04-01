@@ -139,6 +139,9 @@ export function formatIntToFixed2(val: number): string {
   } else if (!returnStr.split(".")[1]?.length) {
     returnStr += ".00";
   }
+  if (returnStr.includes('NaN')) {
+    returnStr = "0.00";
+  }
   return returnStr;
 };
 

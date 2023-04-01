@@ -27,12 +27,17 @@ export function updateProtocolAndPoolTvl(
   // Pool
   pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount)];
   // inputToken is ETH, price with ETH
+  const ethPriceUSD = getOrCreateToken(
+    Address.fromString(ETH_ADDRESS),
+    block.number
+  ).lastPriceUSD!;
+  pool.inputTokenBalancesUSD = [
+    bigIntToBigDecimal(pool.inputTokenBalances[0]).times(ethPriceUSD),
+  ];
+
   pool.totalValueLockedUSD = bigIntToBigDecimal(
     pool.inputTokenBalances[0]
-  ).times(
-    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
-      .lastPriceUSD!
-  );
+  ).times(ethPriceUSD);
   pool.outputTokenPriceUSD = getOrCreateToken(
     Address.fromString(PROTOCOL_ID),
     block.number
@@ -55,6 +60,7 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
   // Pool Daily
   poolMetricsDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsDailySnapshot.inputTokenBalances = pool.inputTokenBalances;
+  poolMetricsDailySnapshot.inputTokenBalancesUSD = pool.inputTokenBalancesUSD;
   poolMetricsDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
   poolMetricsDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsDailySnapshot.cumulativeProtocolSideRevenueUSD =
@@ -68,6 +74,7 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
   // Pool Hourly
   poolMetricsHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsHourlySnapshot.inputTokenBalances = pool.inputTokenBalances;
+  poolMetricsHourlySnapshot.inputTokenBalancesUSD = pool.inputTokenBalancesUSD;
   poolMetricsHourlySnapshot.outputTokenSupply = pool.outputTokenSupply;
   poolMetricsHourlySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsHourlySnapshot.cumulativeProtocolSideRevenueUSD =
@@ -298,6 +305,7 @@ export function getOrCreatePoolsDailySnapshot(
     poolMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     poolMetrics.inputTokenBalances = [BIGINT_ZERO];
+    poolMetrics.inputTokenBalancesUSD = [BIGDECIMAL_ZERO];
     poolMetrics.outputTokenSupply = BIGINT_ZERO;
     poolMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   }
@@ -333,6 +341,7 @@ export function getOrCreatePoolsHourlySnapshot(
     poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     poolMetrics.inputTokenBalances = [BIGINT_ZERO];
+    poolMetrics.inputTokenBalancesUSD = [BIGDECIMAL_ZERO];
     poolMetrics.outputTokenSupply = BIGINT_ZERO;
     poolMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   }

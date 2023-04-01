@@ -1,55 +1,17 @@
 # Network Subgraph
 
-This subgraph and schema will gather a standard set of L1 data metrics that matter.
-
-## Quickstart
-
-### Deployment
-
-Once everything is setup properly deploying is very easy.
-
-```bash
-# This example will deploy all evm networks to the hosted service under "dmelotik" in deploymentConfigurations.json
-npm run deploy --SUBGRAPH=network --PROTOCOL=evm --LOCATION=dmelotik
-
-# This will do the same, but only deploying the mainnet subgraph
-npm run deploy --SUBGRAPH=network --PROTOCOL=evm --NETWORK=ethereum --LOCATION=dmelotik
-```
-
-> Setting `deploy-on-merge` to `true` in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) will run the above commands on subgraphs that have changed to messari's hosted service.
-
-### Development Commands
-
-During development you probably won't want to fully deploy the subgraph every time. Follow this guide to do each step incrementally.
-
-To setup the subgraph manifest from the template:
-
-```bash
-# Use mainnet network as an example
-npm run prepare:yaml --PROTOCOL=evm --NETWORK=ethereum --TEMPLATE=evm.template.yaml
-```
-
-To codegen and build:
-
-```bash
-graph codegen
-graph build
-```
-
-> If you are working on multiple subgraphs you may want to delete `./generated/**` before `codegen` so no old files are left behind.
-
-To deploy follow the steps above. You may put your hosted service endpoint in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) just how messari's is set to take advantage of the commands.
+This subgraph and schema will gather a standard set of network data metrics that matter.
 
 ## About the Schema
 
 The timeseries data is important, based off `Network` and adds numerous daily/hourly metrics.
 
-### Schema 1.1.1 Explanation
+### Schema 1.2.0 Explanation
 
-There is a new entity called `STATS` that contains statistical calculations for each field collected.
+There is a new entity called `STAT` that contains statistical calculations for each field collected.
 
 ```ts
-type Stats @entity {
+type Stat @entity {
   " { id of the snapshot this belongs to } - { DataType } "
   id: ID!
 
@@ -65,13 +27,11 @@ type Stats @entity {
   " The minimum value in this data set "
   min: BigInt!
 
-  " List of values in order from smallest to largest "
-  values: [BigInt!]!
 
   " The sum of all the values "
   sum: BigInt!
 
-  ##### Calculated Statisitcal Fields #####
+  ##### Calculated Statistical Fields #####
 
   " The standard deviation of all values within this entity "
   variance: BigDecimal
@@ -88,7 +48,7 @@ type Stats @entity {
 
 The fields that will exhibit this type are:
 
-- `dailyUniqueAuthors` measures the number of different authors that mined a block this day. Some of the `STATS` metrics are redunant for this field.
+- `dailyUniqueAuthors` measures the number of different authors that mined a block this day. Some of the `STAT` metrics are redundant for this field.
 - `dailyDifficulty`
 - `dailyGasUsed`
 - `dailyGasLimit`
@@ -255,20 +215,6 @@ class Block {
 - explain how eth rewards can be calculated using subgraph data
 - `aurora` will take ~3 months to fully sync
 - `optimism` blocks are actually transactions. There is no way to get blocks.
-
-### Deployment
-
-Once everything is setup properly deploying is very easy.
-
-```bash
-# This example will deploy rari-fuse on all networks to the hosted service under "dmelotik" in deploymentConfigurations.json
-npm run deploy --SUBGRAPH=network --PROTOCOL=evm --LOCATION=dmelotik
-
-# This will do the same, but only deploying the mainnet subgraph
-npm run deploy --SUBGRAPH=network --PROTOCOL=evm --NETWORK=juno --LOCATION=dmelotik
-```
-
-> Setting `deploy-on-merge` to `true` in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) will run the above commands on subgraphs that have changed to messari's hosted service.
 
 ## Resources and Links
 

@@ -21,9 +21,9 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
     return null;
   }
   if (dataTable && dataTable[0]) {
-    const tableData: any[] = [];
+    const tableData: { [x: string]: any }[] = [];
     for (let i = 0; i < dataTable.length; i++) {
-      const currentData = { ...dataTable[i] };
+      const currentData: { [x: string]: any } = { ...dataTable[i] };
       if (currentData?.liquidatee?.id) {
         currentData.liquidatee = currentData.liquidatee.id;
       }
@@ -69,7 +69,7 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
           currentData.inputTokenAmounts = inputTokensDecimal.join(", ");
           currentData.outputTokenAmount = outputTokenDecimal;
           currentData.inputTokens = currentData.inputTokens
-            .map((tok: any) => {
+            .map((tok: { [x: string]: any }) => {
               return tok.id;
             })
             .join(", ");
@@ -96,15 +96,14 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
         tableData.push({ id: `${eventName}-${i}`, date: toDate(currentData.timestamp), ...currentData });
       }
     }
-    const columns = Object.entries(dataTable[0])
-      .filter(function ([k, val]) {
-        if (k.includes("typename")) {
+    const columns = Object.keys(dataTable[0])
+      .filter(function (field: string) {
+        if (field.includes("typename")) {
           return false;
         }
         return true;
       })
-      .map(([k, val]) => {
-        let field = k;
+      .map((field: string) => {
         if (field === "timestamp") {
           field = "date";
         }
@@ -112,7 +111,7 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
           field: field,
           headerName: field,
           width: 250,
-          renderCell: (params: any) => {
+          renderCell: (params: { [x: string]: any }) => {
             let valueStr = params.value;
             if (field === "date") {
               valueStr = params.value;
@@ -128,15 +127,15 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
               valueStr = "N/A";
             }
             const blockExplorerUrlBase = blockExplorers[protocolNetwork.toUpperCase()];
-            if(blockExplorerUrlBase) {
-              if (k.toUpperCase() === "HASH") {
+            if (blockExplorerUrlBase) {
+              if (field.toUpperCase() === "HASH") {
                 onClick = () => (window.location.href = blockExplorerUrlBase + "tx/" + params.value);
               }
-              if (k.toUpperCase() === "FROM" || k.toUpperCase() === "TO") {
+              if (field.toUpperCase() === "FROM" || field.toUpperCase() === "TO") {
                 onClick = () => (window.location.href = blockExplorerUrlBase + "address/" + params.value);
               }
             }
-            if (k.toUpperCase().includes("USD")) {
+            if (field.toUpperCase().includes("USD")) {
               valueStr = "$" + Number(Number(params.value).toFixed(2)).toLocaleString();
             }
             return (

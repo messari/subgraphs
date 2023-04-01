@@ -23,8 +23,8 @@ import { RateChanged } from "../../../../generated/TornadoCashMiner/TornadoCashM
 import { Swap } from "../../../../generated/TornadoCashRewardSwap/TornadoCashRewardSwap";
 
 export function createDeposit(poolAddress: string, event: Deposit): void {
-  let pool = getOrCreatePool(poolAddress, event);
-  let inputToken = getOrCreateToken(
+  const pool = getOrCreatePool(poolAddress, event);
+  const inputToken = getOrCreateToken(
     Address.fromString(pool.inputTokens[0]),
     event.block.number
   );
@@ -32,16 +32,19 @@ export function createDeposit(poolAddress: string, event: Deposit): void {
   pool.inputTokenBalances = [
     pool.inputTokenBalances[0].plus(pool._denomination),
   ];
-  pool.totalValueLockedUSD = bigIntToBigDecimal(
+
+  const inputTokenbalanceUSD = bigIntToBigDecimal(
     pool.inputTokenBalances[0],
     inputToken.decimals
   ).times(inputToken.lastPriceUSD!);
+  pool.inputTokenBalancesUSD = [inputTokenbalanceUSD];
+  pool.totalValueLockedUSD = inputTokenbalanceUSD;
   pool.save();
 }
 
 export function createWithdrawal(poolAddress: string, event: Withdrawal): void {
-  let pool = getOrCreatePool(poolAddress, event);
-  let inputToken = getOrCreateToken(
+  const pool = getOrCreatePool(poolAddress, event);
+  const inputToken = getOrCreateToken(
     Address.fromString(pool.inputTokens[0]),
     event.block.number
   );
@@ -49,24 +52,27 @@ export function createWithdrawal(poolAddress: string, event: Withdrawal): void {
   pool.inputTokenBalances = [
     pool.inputTokenBalances[0].minus(pool._denomination),
   ];
-  pool.totalValueLockedUSD = bigIntToBigDecimal(
+
+  const inputTokenBalanceUSD = bigIntToBigDecimal(
     pool.inputTokenBalances[0],
     inputToken.decimals
   ).times(inputToken.lastPriceUSD!);
+  pool.inputTokenBalancesUSD = [inputTokenBalanceUSD];
+  pool.totalValueLockedUSD = inputTokenBalanceUSD;
   pool.save();
 
-  let relayerFeeUsd = bigIntToBigDecimal(
+  const relayerFeeUsd = bigIntToBigDecimal(
     event.params.fee,
     inputToken.decimals
   ).times(inputToken.lastPriceUSD!);
 
   if (relayerFeeUsd != BIGDECIMAL_ZERO) {
-    let protocolFeeToken = getOrCreateToken(
+    const protocolFeeToken = getOrCreateToken(
       Address.fromString(NetworkConfigs.getRewardToken().get("address")!),
       event.block.number
     );
 
-    let protocolFeeUsd = bigIntToBigDecimal(
+    const protocolFeeUsd = bigIntToBigDecimal(
       pool._fee,
       protocolFeeToken.decimals
     ).times(protocolFeeToken.lastPriceUSD!);
@@ -76,7 +82,7 @@ export function createWithdrawal(poolAddress: string, event: Withdrawal): void {
 }
 
 export function createFeeUpdated(poolAddress: string, event: FeeUpdated): void {
-  let pool = getOrCreatePool(poolAddress, event);
+  const pool = getOrCreatePool(poolAddress, event);
 
   pool._fee = event.params.newFee;
   pool.save();
@@ -86,28 +92,28 @@ export function createRateChanged(
   poolAddress: string,
   event: RateChanged
 ): void {
-  let pool = getOrCreatePool(poolAddress, event);
+  const pool = getOrCreatePool(poolAddress, event);
 
   pool._apEmissionsAmount = [event.params.value];
   pool.save();
 }
 
 export function createRewardSwap(event: Swap): void {
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
 
-  let rewardToken = getOrCreateToken(
+  const rewardToken = getOrCreateToken(
     Address.fromString(NetworkConfigs.getRewardToken().get("address")!),
     event.block.number
   );
 
-  let pools = protocol.pools;
+  const pools = protocol.pools;
   for (let i = 0; i < pools.length; i++) {
-    let pool = getOrCreatePool(pools[i], event);
+    const pool = getOrCreatePool(pools[i], event);
 
-    let rewardsPerBlock = event.params.TORN.div(event.params.pTORN).times(
+    const rewardsPerBlock = event.params.TORN.div(event.params.pTORN).times(
       pool._apEmissionsAmount![0]
     );
-    let rewardsPerDay = getRewardsPerDay(
+    const rewardsPerDay = getRewardsPerDay(
       event.block.timestamp,
       event.block.number,
       new BigDecimal(rewardsPerBlock),

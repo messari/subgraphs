@@ -1,4 +1,4 @@
-import { Deposit, DepositFor, EmergencyWithdraw, Withdraw } from "../../generated/MasterPlatypus/MasterPlatypus";
+import { Deposit, DepositFor, Withdraw, EmergencyWithdraw } from "../../generated/MasterPlatypus/MasterPlatypus";
 
 import { LiquidityPool, RewardToken, _Asset } from "../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
@@ -18,10 +18,10 @@ import {
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 import { emissionsPerDay } from "../common/rewards";
 
-export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset | null {
-  let MasterPlatypusContract = MasterPlatypusOld.bind(MasterPlatypusOld_ADDRESS);
+export function handleOldPlatypus<T>(event: T, pid: BigInt, harvestRewards: boolean): _Asset | null {
+  const MasterPlatypusContract = MasterPlatypusOld.bind(MasterPlatypusOld_ADDRESS);
 
-  let poolInfo = MasterPlatypusContract.try_poolInfo(pid);
+  const poolInfo = MasterPlatypusContract.try_poolInfo(pid);
   if (poolInfo.reverted) {
     log.error("[HandleRewards][{}]error fetching poolInfo for pid {} from MP {}", [
       event.transaction.hash.toHexString(),
@@ -30,10 +30,10 @@ export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset | null {
     ]);
     return null;
   }
-  let poolInfoMap = poolInfo.value;
-  let poolPoints = poolInfoMap.value1;
+  const poolInfoMap = poolInfo.value;
+  const poolPoints = poolInfoMap.value1;
 
-  let _asset = _Asset.load(poolInfoMap.value0.toHexString());
+  const _asset = _Asset.load(poolInfoMap.value0.toHexString());
   if (!_asset) {
     log.error("[HandleRewards][{}]Asset not found {}", [
       event.transaction.hash.toHexString(),
@@ -42,78 +42,81 @@ export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset | null {
     return null;
   }
 
-  // _asset!._index = pid;
-  addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
+  if (harvestRewards) {
+    // _asset!._index = pid;
+    addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
 
-  _asset!.save();
+    _asset!.save();
 
-  let getTotalPoints_call = MasterPlatypusContract.try_totalAllocPoint();
-  if (getTotalPoints_call.reverted) {
-    log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
-      event.transaction.hash.toHexString(),
-      pid.toString(),
-    ]);
-  }
-
-  let totalPoints = getTotalPoints_call.value;
-
-  let ptpPerSecond_call = MasterPlatypusContract.try_ptpPerSec();
-  if (ptpPerSecond_call.reverted) {
-    log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
-      event.transaction.hash.toHexString(),
-      pid.toString(),
-    ]);
-  }
-
-  let ptpPerSecond = ptpPerSecond_call.value;
-  let rewarder = poolInfoMap.value4;
-  if (rewarder.notEqual(ZERO_ADDRESS)) {
-    let bonusRewards = MasterPlatypusContract.try_rewarderBonusTokenInfo(pid);
-    if (bonusRewards.reverted) {
-      log.error("[HandleRewards][{}]error fetching bonusRewards for pid {}", [
+    const getTotalPoints_call = MasterPlatypusContract.try_totalAllocPoint();
+    if (getTotalPoints_call.reverted) {
+      log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
         event.transaction.hash.toHexString(),
         pid.toString(),
       ]);
     }
-    addRewardTokenToAsset(event, bonusRewards.value.value0, _asset!);
-  }
 
-  let rewardTokenEmissionsAmount = new Array<BigInt>();
-  let rewardTokenEmissionsUSD = new Array<BigDecimal>();
+    const totalPoints = getTotalPoints_call.value;
 
-  for (let k = 0; k < _asset!.rewardTokens!.length; k++) {
-    let tps: BigInt;
-    let rewardToken = RewardToken.load(_asset!.rewardTokens![k])!;
-    let token = getOrCreateToken(event, Address.fromString(rewardToken.token));
-
-    log.debug("[HandleRewards][{}] Asset: {}, RT: {}, rewarder: {}", [
-      event.transaction.hash.toHexString(),
-      _asset!.id.toString(),
-      rewardToken.id.toString(),
-      rewarder.toHexString(),
-    ]);
-
-    if (token.id == PTPAddress) {
-      tps = ptpPerSecond.times(poolPoints).div(totalPoints);
-    } else {
-      tps = getBonusRewardTPS(rewarder);
+    const ptpPerSecond_call = MasterPlatypusContract.try_ptpPerSec();
+    if (ptpPerSecond_call.reverted) {
+      log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
+        event.transaction.hash.toHexString(),
+        pid.toString(),
+      ]);
     }
 
-    log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
-    rewardTokenEmissionsAmount.push(emissionsPerDay(tps));
-    rewardTokenEmissionsUSD.push(tokenAmountToUSDAmount(token, emissionsPerDay(tps)));
+    const ptpPerSecond = ptpPerSecond_call.value;
+    const rewarder = poolInfoMap.value4;
+    if (rewarder.notEqual(ZERO_ADDRESS)) {
+      const bonusRewards = MasterPlatypusContract.try_rewarderBonusTokenInfo(pid);
+      if (bonusRewards.reverted) {
+        log.error("[HandleRewards][{}]error fetching bonusRewards for pid {}", [
+          event.transaction.hash.toHexString(),
+          pid.toString(),
+        ]);
+      }
+      addRewardTokenToAsset(event, bonusRewards.value.value0, _asset!);
+    }
+
+    const rewardTokenEmissionsAmount = new Array<BigInt>();
+    const rewardTokenEmissionsUSD = new Array<BigDecimal>();
+
+    for (let k = 0; k < _asset!.rewardTokens!.length; k++) {
+      let tps: BigInt;
+      const rewardToken = RewardToken.load(_asset!.rewardTokens![k])!;
+      const token = getOrCreateToken(event, Address.fromString(rewardToken.token));
+
+      log.debug("[HandleRewards][{}] Asset: {}, RT: {}, rewarder: {}", [
+        event.transaction.hash.toHexString(),
+        _asset!.id.toString(),
+        rewardToken.id.toString(),
+        rewarder.toHexString(),
+      ]);
+
+      if (token.id == PTPAddress) {
+        tps = ptpPerSecond.times(poolPoints).div(totalPoints);
+      } else {
+        tps = getBonusRewardTPS(rewarder);
+      }
+
+      log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
+      rewardTokenEmissionsAmount.push(emissionsPerDay(tps));
+      rewardTokenEmissionsUSD.push(tokenAmountToUSDAmount(token, emissionsPerDay(tps)));
+    }
+
+    _asset!.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+    _asset!.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   }
 
-  _asset!.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
-  _asset!.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   _asset!.save();
   return _asset!;
 }
 
-export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset | null{
-  let MasterPlatypusContract = MasterPlatypusFactory.bind(MasterPlatypusFactory_ADDRESS);
+export function handleFactoryPlatypus<T>(event: T, pid: BigInt, harvestRewards: boolean): _Asset | null {
+  const MasterPlatypusContract = MasterPlatypusFactory.bind(MasterPlatypusFactory_ADDRESS);
 
-  let poolInfo = MasterPlatypusContract.try_poolInfo(pid);
+  const poolInfo = MasterPlatypusContract.try_poolInfo(pid);
   if (poolInfo.reverted) {
     log.error("[HandleRewards][{}]error fetching poolInfo for pid {} from MP {}", [
       event.transaction.hash.toHexString(),
@@ -122,9 +125,9 @@ export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset | null{
     ]);
     return null;
   }
-  let poolInfoMap = poolInfo.value;
-  let poolPoints = poolInfoMap.value1;
-  let _asset = _Asset.load(poolInfoMap.value0.toHexString());
+  const poolInfoMap = poolInfo.value;
+  const poolPoints = poolInfoMap.value1;
+  const _asset = _Asset.load(poolInfoMap.value0.toHexString());
   if (!_asset) {
     log.error("[HandleRewards][{}]Asset not found {}", [
       event.transaction.hash.toHexString(),
@@ -133,78 +136,81 @@ export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset | null{
     return null;
   }
 
-  // _asset!._index = pid;
-  addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
+  if (harvestRewards) {
+    // _asset!._index = pid;
+    addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
 
-  _asset!.save();
+    _asset!.save();
 
-  let getTotalPoints_call = MasterPlatypusContract.try_totalBaseAllocPoint();
-  if (getTotalPoints_call.reverted) {
-    log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
-      event.transaction.hash.toHexString(),
-      pid.toString(),
-    ]);
-  }
-
-  let totalPoints = getTotalPoints_call.value;
-  let ptpPerSecond_call = MasterPlatypusContract.try_ptpPerSec();
-  if (ptpPerSecond_call.reverted) {
-    log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
-      event.transaction.hash.toHexString(),
-      pid.toString(),
-    ]);
-  }
-
-  let ptpPerSecond = ptpPerSecond_call.value;
-  let rewarder = poolInfoMap.value4;
-
-  if (rewarder.notEqual(ZERO_ADDRESS)) {
-    let bonusRewards = MasterPlatypusContract.try_rewarderBonusTokenInfo(pid);
-    if (bonusRewards.reverted) {
-      log.error("[HandleRewards][{}]error fetching bonusRewards for pid {}", [
+    const getTotalPoints_call = MasterPlatypusContract.try_totalBaseAllocPoint();
+    if (getTotalPoints_call.reverted) {
+      log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
         event.transaction.hash.toHexString(),
         pid.toString(),
       ]);
     }
-    addRewardTokenToAsset(event, bonusRewards.value.value0, _asset!);
-  }
 
-  let rewardTokenEmissionsAmount = new Array<BigInt>();
-  let rewardTokenEmissionsUSD = new Array<BigDecimal>();
-
-  for (let k = 0; k < _asset!.rewardTokens!.length; k++) {
-    let tps: BigInt;
-    let rewardToken = RewardToken.load(_asset!.rewardTokens![k])!;
-    let token = getOrCreateToken(event, Address.fromString(rewardToken.token));
-
-    log.debug("[HandleRewards][{}] Asset: {}, RT: {}, rewarder: {}", [
-      event.transaction.hash.toHexString(),
-      _asset!.id.toString(),
-      rewardToken.id.toString(),
-      rewarder.toHexString(),
-    ]);
-
-    if (token.id == PTPAddress) {
-      tps = ptpPerSecond.times(poolPoints).div(totalPoints);
-    } else {
-      tps = getBonusRewardTPS(rewarder);
+    const totalPoints = getTotalPoints_call.value;
+    const ptpPerSecond_call = MasterPlatypusContract.try_ptpPerSec();
+    if (ptpPerSecond_call.reverted) {
+      log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
+        event.transaction.hash.toHexString(),
+        pid.toString(),
+      ]);
     }
 
-    log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
-    rewardTokenEmissionsAmount.push(emissionsPerDay(tps));
-    rewardTokenEmissionsUSD.push(tokenAmountToUSDAmount(token, emissionsPerDay(tps)));
+    const ptpPerSecond = ptpPerSecond_call.value;
+    const rewarder = poolInfoMap.value4;
+
+    if (rewarder.notEqual(ZERO_ADDRESS)) {
+      const bonusRewards = MasterPlatypusContract.try_rewarderBonusTokenInfo(pid);
+      if (bonusRewards.reverted) {
+        log.error("[HandleRewards][{}]error fetching bonusRewards for pid {}", [
+          event.transaction.hash.toHexString(),
+          pid.toString(),
+        ]);
+      }
+      addRewardTokenToAsset(event, bonusRewards.value.value0, _asset!);
+    }
+
+    const rewardTokenEmissionsAmount = new Array<BigInt>();
+    const rewardTokenEmissionsUSD = new Array<BigDecimal>();
+
+    for (let k = 0; k < _asset!.rewardTokens!.length; k++) {
+      let tps: BigInt;
+      const rewardToken = RewardToken.load(_asset!.rewardTokens![k])!;
+      const token = getOrCreateToken(event, Address.fromString(rewardToken.token));
+
+      log.debug("[HandleRewards][{}] Asset: {}, RT: {}, rewarder: {}", [
+        event.transaction.hash.toHexString(),
+        _asset!.id.toString(),
+        rewardToken.id.toString(),
+        rewarder.toHexString(),
+      ]);
+
+      if (token.id == PTPAddress) {
+        tps = ptpPerSecond.times(poolPoints).div(totalPoints);
+      } else {
+        tps = getBonusRewardTPS(rewarder);
+      }
+
+      log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
+      rewardTokenEmissionsAmount.push(emissionsPerDay(tps));
+      rewardTokenEmissionsUSD.push(tokenAmountToUSDAmount(token, emissionsPerDay(tps)));
+    }
+
+    _asset!.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+    _asset!.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   }
 
-  _asset!.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
-  _asset!.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   _asset!.save();
   return _asset!;
 }
 
-export function handlePlatypus<T>(event: T, pid: BigInt): _Asset | null {
-  let MasterPlatypusContract = MasterPlatypus.bind(event.address);
+export function handlePlatypus<T>(event: T, pid: BigInt, harvestRewards: boolean): _Asset | null {
+  const MasterPlatypusContract = MasterPlatypus.bind(event.address);
 
-  let poolInfo = MasterPlatypusContract.try_poolInfo(pid);
+  const poolInfo = MasterPlatypusContract.try_poolInfo(pid);
   if (poolInfo.reverted) {
     log.error("[HandleRewards][{}]error fetching poolInfo for pid {} from MP {}", [
       event.transaction.hash.toHexString(),
@@ -213,10 +219,10 @@ export function handlePlatypus<T>(event: T, pid: BigInt): _Asset | null {
     ]);
     return null;
   }
-  let poolInfoMap = poolInfo.value;
-  let poolPoints = poolInfoMap.value7;
+  const poolInfoMap = poolInfo.value;
+  const poolPoints = poolInfoMap.value7;
 
-  let _asset = _Asset.load(poolInfoMap.value0.toHexString());
+  const _asset = _Asset.load(poolInfoMap.value0.toHexString());
   if (!_asset) {
     log.error("[HandleRewards][{}]Asset not found {}", [
       event.transaction.hash.toHexString(),
@@ -225,69 +231,72 @@ export function handlePlatypus<T>(event: T, pid: BigInt): _Asset | null {
     return null;
   }
 
-  // _asset!._index = pid;
-  addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
+  if (harvestRewards) {
+    // _asset!._index = pid;
+    addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
 
-  _asset!.save();
+    _asset!.save();
 
-  let getTotalPoints_call = MasterPlatypusContract.try_totalAdjustedAllocPoint();
-  if (getTotalPoints_call.reverted) {
-    log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
-      event.transaction.hash.toHexString(),
-      pid.toString(),
-    ]);
-  }
-
-  let totalPoints = getTotalPoints_call.value;
-  let ptpPerSecond_call = MasterPlatypusContract.try_ptpPerSec();
-  if (ptpPerSecond_call.reverted) {
-    log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
-      event.transaction.hash.toHexString(),
-      pid.toString(),
-    ]);
-  }
-
-  let ptpPerSecond = ptpPerSecond_call.value;
-  let rewarder = poolInfoMap.value4;
-  if (rewarder.notEqual(ZERO_ADDRESS)) {
-    let bonusRewards = MasterPlatypusContract.try_rewarderBonusTokenInfo(pid);
-    if (bonusRewards.reverted) {
-      log.error("[HandleRewards][{}]error fetching bonusRewards for pid {}", [
+    const getTotalPoints_call = MasterPlatypusContract.try_totalAdjustedAllocPoint();
+    if (getTotalPoints_call.reverted) {
+      log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
         event.transaction.hash.toHexString(),
         pid.toString(),
       ]);
     }
-    addRewardTokenToAsset(event, bonusRewards.value.value0, _asset!);
-  }
 
-  let rewardTokenEmissionsAmount = new Array<BigInt>();
-  let rewardTokenEmissionsUSD = new Array<BigDecimal>();
-
-  for (let k = 0; k < _asset!.rewardTokens!.length; k++) {
-    let tps: BigInt;
-    let rewardToken = RewardToken.load(_asset!.rewardTokens![k])!;
-    let token = getOrCreateToken(event, Address.fromString(rewardToken.token));
-
-    log.debug("[HandleRewards][{}] Asset: {}, RT: {}, rewarder: {}", [
-      event.transaction.hash.toHexString(),
-      _asset!.id.toString(),
-      rewardToken.id.toString(),
-      rewarder.toHexString(),
-    ]);
-
-    if (token.id == PTPAddress) {
-      tps = ptpPerSecond.times(poolPoints).div(totalPoints);
-    } else {
-      tps = getBonusRewardTPS(rewarder);
+    const totalPoints = getTotalPoints_call.value;
+    const ptpPerSecond_call = MasterPlatypusContract.try_ptpPerSec();
+    if (ptpPerSecond_call.reverted) {
+      log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
+        event.transaction.hash.toHexString(),
+        pid.toString(),
+      ]);
     }
 
-    log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
-    rewardTokenEmissionsAmount.push(emissionsPerDay(tps));
-    rewardTokenEmissionsUSD.push(tokenAmountToUSDAmount(token, emissionsPerDay(tps)));
+    const ptpPerSecond = ptpPerSecond_call.value;
+    const rewarder = poolInfoMap.value4;
+    if (rewarder.notEqual(ZERO_ADDRESS)) {
+      const bonusRewards = MasterPlatypusContract.try_rewarderBonusTokenInfo(pid);
+      if (bonusRewards.reverted) {
+        log.error("[HandleRewards][{}]error fetching bonusRewards for pid {}", [
+          event.transaction.hash.toHexString(),
+          pid.toString(),
+        ]);
+      }
+      addRewardTokenToAsset(event, bonusRewards.value.value0, _asset!);
+    }
+
+    const rewardTokenEmissionsAmount = new Array<BigInt>();
+    const rewardTokenEmissionsUSD = new Array<BigDecimal>();
+
+    for (let k = 0; k < _asset!.rewardTokens!.length; k++) {
+      let tps: BigInt;
+      const rewardToken = RewardToken.load(_asset!.rewardTokens![k])!;
+      const token = getOrCreateToken(event, Address.fromString(rewardToken.token));
+
+      log.debug("[HandleRewards][{}] Asset: {}, RT: {}, rewarder: {}", [
+        event.transaction.hash.toHexString(),
+        _asset!.id.toString(),
+        rewardToken.id.toString(),
+        rewarder.toHexString(),
+      ]);
+
+      if (token.id == PTPAddress) {
+        tps = ptpPerSecond.times(poolPoints).div(totalPoints);
+      } else {
+        tps = getBonusRewardTPS(rewarder);
+      }
+
+      log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
+      rewardTokenEmissionsAmount.push(emissionsPerDay(tps));
+      rewardTokenEmissionsUSD.push(tokenAmountToUSDAmount(token, emissionsPerDay(tps)));
+    }
+
+    _asset!.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+    _asset!.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   }
 
-  _asset!.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
-  _asset!.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   _asset!.save();
   return _asset!;
 }
@@ -295,9 +304,9 @@ export function handlePlatypus<T>(event: T, pid: BigInt): _Asset | null {
 export function updatePoolRewards(event: ethereum.Event, assetAddress: Address): void {
   log.debug("[UpdateRewards][{}] get pool {}", [event.transaction.hash.toHexString(), assetAddress.toHexString()]);
 
-  let pool = LiquidityPool.load(assetAddress.toHexString())!;
+  const pool = LiquidityPool.load(assetAddress.toHexString())!;
   if (!pool._ignore) {
-    let _asset = _Asset.load(assetAddress.toHexString())!;
+    const _asset = _Asset.load(assetAddress.toHexString())!;
     if (_asset.rewardTokens) {
       pool.rewardTokens = _asset.rewardTokens;
       pool.rewardTokenEmissionsAmount = _asset.rewardTokenEmissionsAmount;
@@ -315,7 +324,7 @@ export function updatePoolRewards(event: ethereum.Event, assetAddress: Address):
 }
 
 export function addRewardTokenToAsset(event: ethereum.Event, rtAddress: Address, _asset: _Asset): RewardToken {
-  let rt = getOrCreateRewardToken(event, rtAddress);
+  const rt = getOrCreateRewardToken(event, rtAddress);
   let rts = _asset.rewardTokens;
 
   if (!rts) {
@@ -338,8 +347,8 @@ export function getBonusRewardTPS(rewarder: Address): BigInt {
   if (rewarder.equals(ZERO_ADDRESS)) {
     return BIGINT_ZERO;
   }
-  let rewarderContract = SimpleRewarder.bind(rewarder);
-  let tps = rewarderContract.try_tokenPerSec();
+  const rewarderContract = SimpleRewarder.bind(rewarder);
+  const tps = rewarderContract.try_tokenPerSec();
   if (tps.reverted) {
     log.error("[HandleRewards]error fetching simplerewarder {} getting tps ", [
       rewarderContract._address.toHexString(),
@@ -348,22 +357,23 @@ export function getBonusRewardTPS(rewarder: Address): BigInt {
   return tps.value;
 }
 
-export function getAssetForRewards<T>(event: T): _Asset | null {
-  let pid = event.params.pid;
+export function getAssetForRewards<T>(event: T, harvestRewards: boolean): _Asset | null {
+  const pid = event.params.pid;
   if (event.address.equals(MasterPlatypusOld_ADDRESS)) {
-    return handleOldPlatypus(event, pid);
+    return handleOldPlatypus(event, pid, harvestRewards);
   } else if (event.address == MasterPlatypusFactory_ADDRESS) {
-    return handleFactoryPlatypus(event, pid);
+    return handleFactoryPlatypus(event, pid, harvestRewards);
   } else {
-    return handlePlatypus(event, pid);
+    return handlePlatypus(event, pid, harvestRewards);
   }
 }
 
 export function handleDeposit(event: Deposit): void {
-  let _asset: _Asset | null;
-  _asset = getAssetForRewards<Deposit>(event);
+  const _asset: _Asset | null = getAssetForRewards<Deposit>(event, true);
   if (!_asset) {
-    log.error("[{}] error handling masterchef event, potentially unexpected asset", [event.transaction.hash.toHexString()])
+    log.error("[{}] error handling masterchef event, potentially unexpected asset", [
+      event.transaction.hash.toHexString(),
+    ]);
     return;
   }
   _asset.amountStaked = _asset.amountStaked.plus(event.params.amount);
@@ -372,10 +382,11 @@ export function handleDeposit(event: Deposit): void {
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  let _asset: _Asset | null;
-  _asset = getAssetForRewards<Withdraw>(event);
+  const _asset: _Asset | null = getAssetForRewards<Withdraw>(event, true);
   if (!_asset) {
-    log.error("[{}] error handling masterchef event, potentially unexpected asset", [event.transaction.hash.toHexString()])
+    log.error("[{}] error handling masterchef event, potentially unexpected asset", [
+      event.transaction.hash.toHexString(),
+    ]);
     return;
   }
   _asset.amountStaked = _asset.amountStaked.minus(event.params.amount);
@@ -384,10 +395,11 @@ export function handleWithdraw(event: Withdraw): void {
 }
 
 export function handleDepositFor(event: DepositFor): void {
-  let _asset: _Asset | null;
-  _asset = getAssetForRewards<DepositFor>(event);
+  const _asset: _Asset | null = getAssetForRewards<DepositFor>(event, true);
   if (!_asset) {
-    log.error("[{}] error handling masterchef event, potentially unexpected asset", [event.transaction.hash.toHexString()])
+    log.error("[{}] error handling masterchef event, potentially unexpected asset", [
+      event.transaction.hash.toHexString(),
+    ]);
     return;
   }
   _asset.amountStaked = _asset.amountStaked.plus(event.params.amount);
@@ -395,4 +407,14 @@ export function handleDepositFor(event: DepositFor): void {
   updatePoolRewards(event, Address.fromString(_asset.id));
 }
 
-export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {}
+export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
+  const _asset: _Asset | null = getAssetForRewards<EmergencyWithdraw>(event, false);
+  if (!_asset) {
+    log.error("[{}] error handling masterchef event, potentially unexpected asset", [
+      event.transaction.hash.toHexString(),
+    ]);
+    return;
+  }
+  _asset.amountStaked = _asset.amountStaked.minus(event.params.amount);
+  _asset.save();
+}

@@ -129,7 +129,7 @@ export function handleCosmosBlock(block: cosmos.Block): void {
     BigInt.fromI64(header.height),
     header.hash,
     BigInt.fromI64(header.time.seconds),
-    header.validatorsHash,
+    header.proposerAddress,
     null,
     null,
     null,
@@ -229,7 +229,7 @@ export function handleNearBlock(block: near.Block): void {
   let burntFees = BIGINT_ZERO;
   for (let i = 0; i < chunks.length; i++) {
     const chunk = new Chunk(chunks[i].chunkHash);
-    chunk.block = header.height.toString();
+    chunk.block = Bytes.fromI32(header.height as i32);
     chunk.gasUsed = BigInt.fromI64(chunks[i].gasUsed);
     chunk.gasLimit = BigInt.fromI64(chunks[i].gasLimit);
     chunk.burntFees = chunks[i].balanceBurnt;

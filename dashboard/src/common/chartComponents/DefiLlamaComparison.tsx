@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import IssuesDisplay from "../../interfaces/IssuesDisplay";
 import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
 import { Chart } from "./Chart";
 import { ComparisonTable } from "./ComparisonTable";
 import { lineupChartDatapoints, toDate } from "../../utils";
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { DeploymentsDropDown } from "../utilComponents/DeploymentsDropDown";
 import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 import moment from "moment";
@@ -17,7 +16,6 @@ interface DefiLlamaComparsionTabProps {
 
 // This component is for each individual subgraph
 function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlamaComparsionTabProps) {
-
   function jpegDownloadHandler() {
     try {
       const fileName = defiLlamaSlug?.split(" (").join("-")?.split(")")?.join("-")?.split(" ")?.join("-") + moment.utc(Date.now()).format("MMDDYY") + ".jpeg";
@@ -44,17 +42,8 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlama
   const [includeStakedTVL, setIncludeStakedTVL] = useState(true);
   const [includeBorrowedTVL, setIncludeBorrowedTVL] = useState(true);
 
-  const client = useMemo(() => {
-    return new ApolloClient({
-      link: new HttpLink({
-        uri: deploymentURL,
-      }),
-      cache: new InMemoryCache(),
-    });
-  }, [deploymentURL]);
-
   const chartRef = useRef<any>(null);
-  const deploymentNameToUrlMapping: any = {};
+  const deploymentNameToUrlMapping: { [x: string]: { slug: string, defiLlamaNetworks: string[], subgraphNetworks: any } } = {};
 
   try {
     Object.values(subgraphEndpoints).forEach((protocolsOnType: { [x: string]: any }) => {
@@ -93,7 +82,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlama
       defiLlamaProtocols.forEach((protocol) => {
         const currentName = protocol.name.toLowerCase().split(" ").join("-");
         if (Object.keys(deploymentNameToUrlMapping).includes(currentName) || Object.keys(deploymentNameToUrlMapping).includes(currentName.split('-')[0])) {
-          const key = Object.keys(deploymentNameToUrlMapping).includes(currentName) ? currentName : currentName.split('-')[0];
+          const key: string = Object.keys(deploymentNameToUrlMapping).includes(currentName) ? currentName : currentName.split('-')[0];
           deploymentNameToUrlMapping[key].slug = protocol.slug;
           deploymentNameToUrlMapping[key].defiLlamaNetworks = Object.keys(protocol.chainTvls).map((x) =>
             x.toLowerCase(),
@@ -159,7 +148,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlama
   }, [issuesState]);
 
   let chart = null;
-  let chartRenderCondition = (Object.keys(defiLlamaData).length > 0 &&
+  let chartRenderCondition: Boolean = (Object.keys(defiLlamaData).length > 0 &&
     financialsData?.financialsDailySnapshots &&
     defiLlamaData?.name?.toLowerCase() === defiLlamaSlug?.split(" (")[0]?.toLowerCase());
 
@@ -226,7 +215,7 @@ function DefiLlamaComparsionTab({ subgraphEndpoints, financialsData }: DefiLlama
           </Box>
           <Grid container justifyContent="space-between">
             <Grid key={elementId} item xs={7.5}>
-              <Chart identifier={""} datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} chartRef={chartRef} />
+              <Chart datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} chartRef={chartRef} />
             </Grid>
             <Grid key={elementId + "2"} item xs={4}>
               <ComparisonTable

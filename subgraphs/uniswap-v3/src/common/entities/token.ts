@@ -1,7 +1,11 @@
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../configurations/configure";
 import { ERC20 } from "../../../generated/Factory/ERC20";
-import { Token, _TokenWhitelist } from "../../../generated/schema";
+import {
+  Token,
+  _TokenWhitelist,
+  _TokenWhitelistSymbol,
+} from "../../../generated/schema";
 import {
   DEFAULT_DECIMALS,
   Network,
@@ -9,6 +13,7 @@ import {
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
+  BIGINT_TEN,
 } from "../constants";
 import {
   findUSDPricePerToken,
@@ -36,7 +41,7 @@ export function getOrCreateToken(
     if (
       token.id ==
         Address.fromHexString(
-          "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1".toLowerCase()
+          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase()
         ) &&
       NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
     ) {
@@ -46,6 +51,10 @@ export function getOrCreateToken(
     }
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
+    token._totalSupply = BIGINT_ZERO;
+    token._totalValueLockedUSD = BIGDECIMAL_ZERO;
+    token._largeTVLImpactBuffer = 0;
+    token._largePriceChangeBuffer = 0;
 
     // Fixing token fields that did not return proper values from contract
     // Manually coded in when necessary
@@ -54,8 +63,14 @@ export function getOrCreateToken(
     token.save();
   }
 
-  if (token.lastPriceBlockNumber != event.block.number && getNewPrice) {
-    token.lastPriceUSD = findUSDPricePerToken(event, token);
+  if (
+    token.lastPriceBlockNumber &&
+    event.block.number.minus(token.lastPriceBlockNumber!).gt(BIGINT_TEN) &&
+    getNewPrice
+  ) {
+    const newPrice = findUSDPricePerToken(event, token);
+
+    token.lastPriceUSD = newPrice;
     token.lastPriceBlockNumber = event.block.number;
     token.save();
   }
@@ -95,28 +110,69 @@ export function getOrCreateTokenWhitelist(
   return tokenTracker;
 }
 
+function formatTokenSymbol(tokenSymbol: string): string {
+  return tokenSymbol.replace(" ", "").toLowerCase();
+}
+
+export function getOrCreateTokenWhitelistSymbol(
+  tokenSymbol: string,
+  tokenAddress: Bytes
+): _TokenWhitelistSymbol {
+  // Strip and lowercase token symbol
+  const formattedTokenSymbol = formatTokenSymbol(tokenSymbol);
+  let tokenWhitelistSymbol = _TokenWhitelistSymbol.load(formattedTokenSymbol);
+  // fetch info if null
+  if (!tokenWhitelistSymbol) {
+    tokenWhitelistSymbol = new _TokenWhitelistSymbol(formattedTokenSymbol);
+    tokenWhitelistSymbol.address = tokenAddress!;
+    tokenWhitelistSymbol.save();
+  }
+
+  return tokenWhitelistSymbol;
+}
+
+export function isFakeWhitelistToken(token: Token): bool {
+  const formattedTokenSymbol = formatTokenSymbol(token.symbol);
+  const tokenWhitelistSymbol = _TokenWhitelistSymbol.load(formattedTokenSymbol);
+  if (tokenWhitelistSymbol && tokenWhitelistSymbol.address != token.id) {
+    return true;
+  }
+  return false;
+}
+
 // These whiteslists are used to track what pools the tokens are a part of. Used in price calculations.
 export function updateTokenWhitelists(
   token0: Token,
   token1: Token,
   poolAddress: Bytes
 ): void {
-  const tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
-  const tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
-
   // update white listed pools
-  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist0.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(token0.id)) {
+    const tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
+    const tokenWhitelistSymbol0 = getOrCreateTokenWhitelistSymbol(
+      token0.symbol,
+      token0.id
+    );
+
     const newPools = tokenWhitelist1.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist1.whitelistPools = newPools;
     tokenWhitelist1.save();
+    tokenWhitelistSymbol0.save();
   }
 
-  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist1.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(token1.id)) {
+    const tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
+    const tokenWhitelistSymbol1 = getOrCreateTokenWhitelistSymbol(
+      token1.symbol,
+      token1.id
+    );
+
     const newPools = tokenWhitelist0.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist0.whitelistPools = newPools;
     tokenWhitelist0.save();
+    tokenWhitelistSymbol1.save();
   }
 }
 
@@ -141,7 +197,7 @@ function fixTokenFields(token: Token): Token {
   if (
     token.id ==
       Address.fromHexString(
-        "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1".toLowerCase()
+        "0x82af49447d8a07e3bd95bd0d56f35241523fbab1".toLowerCase()
       ) &&
     NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
   ) {

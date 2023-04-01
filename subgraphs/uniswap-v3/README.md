@@ -17,6 +17,8 @@ DEXs can be very difficult with composing accurate prices from the liquidity poo
 
 Each of these measures are taken on a case by case basis and are selected in order to solve the problem the most reliably while still providing a good representation of the TVL. Ingoring of TVL changes with delta of mroe than 1 Billion is a temporary fix, and will be removed once the underlying issue is better resolved in 2.0.0.
 
+As per the pricing investigation that is currently underway, we have discovered that many of the pricing issues result from fake versions of tokens. The pool that ends up being the outlier in the instances seen, are often composed of a token that is a fake version of a whitelist token and another token, sometimes fake as well, that has an outlier price. The pricing mechanism ignores calculating metrics when one of the tokens is a fake version of the whitelist token.
+
 ## Calculation Methodology v1.0.0
 
 ### Positions

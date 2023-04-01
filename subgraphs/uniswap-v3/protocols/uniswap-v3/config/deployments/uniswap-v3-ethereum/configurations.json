@@ -6,6 +6,6 @@
   "nonFungiblePositionManagerAddressStartBlock": 12369650,
   "deployment": "UNISWAP_V3_ETHEREUM",
   "graftEnabled": false,
-  "subgraphId": "Qmd4qCceZsR296FKmbZzysuKGoncScX1tdN1pn3MZFSvZa",
-  "graftStartBlock": 12931653
+  "subgraphId": "Qmd81tYS2KEva2JVMpadDd1stBno1PvFyrfc1KW2j19iyb",
+  "graftStartBlock": 14548185
 }
