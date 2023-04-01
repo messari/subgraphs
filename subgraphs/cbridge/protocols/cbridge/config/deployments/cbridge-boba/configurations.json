@@ -1,40 +1,40 @@
 {
-  "network": "celo",
+  "network": "boba",
   "Bridge": {
-    "address": "0xBB7684Cc5408F4DD0921E5c2Cadd547b8f1AD573",
-    "startBlock": 10400072
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 994831
   },
   "OriginalTokenVault": {
-    "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 18526711
+    "address": "0x8db213bE5268a2b8B78Af08468ff1EA422073Da0",
+    "startBlock": 239716
   },
   "OriginalTokenVaultV2": {
-    "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 18526711
+    "address": "0x4C882ec256823eE773B25b414d36F92ef58a7c0C",
+    "startBlock": 561937
   },
   "PeggedTokenBridge": {
-    "address": "0xDA1DD66924B0470501aC7736372d4171cDd1162E",
-    "startBlock": 10400391
+    "address": "0xC5Ef662b833De914B9bA7a3532C6BB008a9b23a6",
+    "startBlock": 262305
   },
   "PeggedTokenBridgeV2": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 18526711
+    "startBlock": 994831
   },
   "FarmingRewards": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 18526711
+    "startBlock": 994831
   },
   "Staking": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 18526711
+    "startBlock": 994831
   },
   "StakingRewards": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 18526711
+    "startBlock": 994831
   },
   "MessageBus": {
     "address": "0x0000000000000000000000000000000000000000",
-    "startBlock": 18526711
+    "startBlock": 994831
   },
   "supportCallHandlers": false,
   "graftEnabled": false,

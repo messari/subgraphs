@@ -7535,322 +7535,6 @@
       }
     }
   },
-  "celer-bridge": {
-    "schema": "bridge",
-    "base": "celer-bridge",
-    "protocol": "celer-bridge",
-    "project": "celer",
-    "deployments": {
-      "celer-bridge-ethereum": {
-        "network": "ethereum",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-ethereum",
-            "query-id": "celer-bridge-ethereum"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-bsc": {
-        "network": "bsc",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-bsc",
-            "query-id": "celer-bridge-bsc"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-optimism": {
-        "network": "optimism",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-optimism",
-            "query-id": "celer-bridge-optimism"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-arbitrum": {
-        "network": "arbitrum",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-arbitrum",
-            "query-id": "celer-bridge-arbitrum"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-polygon": {
-        "network": "polygon",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-polygon",
-            "query-id": "celer-bridge-polygon"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-avalanche": {
-        "network": "avalanche",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-avalanche",
-            "query-id": "celer-bridge-avalanche"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-fantom": {
-        "network": "fantom",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-fantom",
-            "query-id": "celer-bridge-fantom"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-aurora": {
-        "network": "aurora",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-aurora",
-            "query-id": "celer-bridge-aurora"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-boba": {
-        "network": "boba",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-boba",
-            "query-id": "celer-bridge-boba"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-xdai": {
-        "network": "gnosis",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-xdai",
-            "query-id": "celer-bridge-xdai"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-harmony": {
-        "network": "harmony",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-harmony",
-            "query-id": "celer-bridge-harmony"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-celo": {
-        "network": "celo",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-celo",
-            "query-id": "celer-bridge-celo"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-moonriver": {
-        "network": "moonriver",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-moonriver",
-            "query-id": "celer-bridge-moonriver"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-moonbeam": {
-        "network": "moonbeam",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-moonbeam",
-            "query-id": "celer-bridge-moonbeam"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      }
-    }
-  },
   "gmx": {
     "schema": "derivatives-perpfutures",
     "base": "gmx",
@@ -8120,6 +7804,28 @@
           "hosted-service": {
             "slug": "cbridge-avalanche",
             "query-id": "cbridge-avalanche"
+          }
+        }
+      },
+      "cbridge-boba": {
+        "network": "boba",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "cbridge.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-boba",
+            "query-id": "cbridge-boba"
           }
         }
       },
