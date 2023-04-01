@@ -19,7 +19,7 @@ dataSources:
       startBlock: {{ rootChainManager.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Token 
@@ -101,7 +101,7 @@ dataSources:
       startBlock: {{ fxERC20RootTunnel.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Token
@@ -185,7 +185,7 @@ templates:
       abi: ERC20Predicate
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Token 
@@ -255,4 +255,7 @@ templates:
       eventHandlers:
         - event: LockedERC20(indexed address,indexed address,indexed address,uint256)
           handler: handleERC20Lock
+      callHandlers:
+        - function: exitTokens(address,address,bytes)
+          handler: handleExitTokens
       file: ./src/mappings/predicate.ts

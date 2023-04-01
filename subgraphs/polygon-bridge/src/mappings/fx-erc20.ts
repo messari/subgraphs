@@ -174,12 +174,7 @@ export function handleFxWithdrawERC20(event: FxWithdrawERC20): void {
   const token = sdk.Tokens.getOrCreateToken(event.params.rootToken);
 
   if (!pool.isInitialized) {
-    pool.initialize(
-      token.name,
-      token.symbol,
-      BridgePoolType.LOCK_RELEASE,
-      token
-    );
+    pool.initialize(token.name, token.symbol, BridgePoolType.BURN_MINT, token);
   }
 
   const crosschainTokenAddr = event.params.childToken;
