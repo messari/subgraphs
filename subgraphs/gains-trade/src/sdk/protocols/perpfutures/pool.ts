@@ -10,7 +10,7 @@ import {
   Token as TokenSchema,
   LiquidityPool as LiquidityPoolSchema,
 } from "../../../../generated/schema";
-import { EventType, PositionType, TransactionType } from "./enums";
+import { PositionType, TransactionType } from "./enums";
 import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
@@ -23,7 +23,6 @@ import {
   Address,
   log,
 } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../../../configurations/configure";
 import { safeDivide } from "../../../mappings/helpers";
 
 export class PoolManager {

@@ -18,21 +18,21 @@ export class GainsTradePolygonConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): Address {
-    return Address.fromString("0xec9581354f7750Bc8194E3e801f8eE1D91e2a8Ac");
+    return Address.fromString("0xec9581354f7750bc8194e3e801f8ee1d91e2a8ac");
   }
   getDaiAddress(): Address {
     return Address.fromString("0x8f3cf7ad23cd3cadbd9735aff958023239c6a063");
   }
   getVaultAddress(): Address {
-    return Address.fromString("0x91993f2101cc758D0dEB7279d41e880F7dEFe827");
+    return Address.fromString("0x91993f2101cc758d0deb7279d41e880f7defe827");
   }
   getStorageAddress(): Address {
-    return Address.fromString("0xaee4d11a16B2bc65EDD6416Fb626EB404a6D65BD");
+    return Address.fromString("0xaee4d11a16b2bc65edd6416fb626eb404a6d65bd");
   }
   getPairInfoAddress(): Address {
     return Address.fromString("0xee7442accc1c27f2c69423576d3b1d25b563e977");
   }
   getPairStorageAddress(): Address {
-    return Address.fromString("0x6e5326e944F528c243B9Ca5d14fe5C9269a8c922");
+    return Address.fromString("0x6e5326e944f528c243b9ca5d14fe5c9269a8c922");
   }
 }

@@ -9,13 +9,7 @@ import { Account } from "./account";
 import { Perpetual } from "./protocol";
 import { TokenManager } from "./tokens";
 import * as constants from "../../util/constants";
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  Bytes,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 class LoadPositionResponse {
   position: Position;

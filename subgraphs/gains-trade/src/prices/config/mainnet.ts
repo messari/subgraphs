@@ -42,7 +42,7 @@ export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
 ];
 
 export const UNISWAP_FACTORY_ADDRESSES = Address.fromString(
-  "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+  "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f"
 );
 
 ///////////////////////////////////////////////////////////////////////////

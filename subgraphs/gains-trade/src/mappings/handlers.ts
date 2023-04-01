@@ -423,7 +423,7 @@ export function handleMarketExecuted(event: MarketExecuted): void {
       TransactionType.COLLATERAL_OUT
     );
 
-    let collateralAmounts = createTokenAmountArray(
+    const collateralAmounts = createTokenAmountArray(
       pool,
       [collateralToken],
       [pnlAmount]
@@ -691,7 +691,7 @@ export function handleLimitExecuted(event: LimitExecuted): void {
         TransactionType.COLLATERAL_OUT
       );
 
-      let collateralAmounts = createTokenAmountArray(
+      const collateralAmounts = createTokenAmountArray(
         pool,
         [collateralToken],
         [pnlAmount]

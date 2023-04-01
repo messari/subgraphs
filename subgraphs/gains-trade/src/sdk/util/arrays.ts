@@ -1,4 +1,4 @@
-import { Bytes, BigInt, log } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
 
 // A function which given 3 arrays of arbitrary types of the same length,
 // where the first one holds the reference order, the second one holds the same elements
@@ -56,7 +56,7 @@ export function addToArrayAtIndex<T>(x: T[], item: T, index: i32 = -1): T[] {
   if (index == -1 || index > x.length) {
     index = x.length;
   }
-  let retval = new Array<T>();
+  const retval = new Array<T>();
   let i = 0;
   while (i < index) {
     retval.push(x[i]);

@@ -3,7 +3,6 @@ import {
   Address,
   dataSource,
   BigDecimal,
-  BigInt,
 } from "@graphprotocol/graph-ts";
 import { SDK } from ".";
 import { AccountWasActive } from "./account";
@@ -12,7 +11,6 @@ import { CustomEventType } from "../../util/events";
 import { ProtocolSnapshot } from "./protocolSnapshot";
 import { PositionType, TransactionType } from "./enums";
 import { ProtocolConfigurer, TokenPricer } from "../config";
-import { Versions } from "../../../../../../deployment/context/interface";
 import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/schema";
 
 /**

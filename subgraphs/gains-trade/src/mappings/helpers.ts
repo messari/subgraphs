@@ -18,7 +18,7 @@ export function createTokenAmountArray(
     return new Array<BigInt>();
   }
 
-  let tokenAmounts = new Array<BigInt>(pool.getInputTokens().length).fill(
+  const tokenAmounts = new Array<BigInt>(pool.getInputTokens().length).fill(
     BIGINT_ZERO
   );
 
