@@ -4416,7 +4416,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "quickswap.template.yaml"
+          "template": "quickswap.zkevm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
