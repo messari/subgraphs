@@ -20,7 +20,7 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 
 export const CURVE_REGISTRY_ADDRESSES: Address[] = [
-  Address.fromString("0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858"),
+  Address.fromString("0x5b5cfe992adac0c9d48e05854b2d91c73a003858"),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ export const CURVE_REGISTRY_ADDRESSES: Address[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
-  Address.fromString("0x2CB45Edb4517d5947aFdE3BEAbF95A582506858B"), // TriSolaris
+  Address.fromString("0x2cb45edb4517d5947afde3beabf95a582506858b"), // TriSolaris
 ];
 
 ///////////////////////////////////////////////////////////////////////////

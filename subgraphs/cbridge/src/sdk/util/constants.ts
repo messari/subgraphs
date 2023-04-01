@@ -166,7 +166,7 @@ export namespace UsageType {
 //////////////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 ////////////////////////
 ///// Type Helpers /////
@@ -372,7 +372,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0x85f138bfEE4ef8e540890CFb48F620571d67Eda3"),
+        Address.fromString("0x85f138bfee4ef8e540890cfb48f620571d67eda3"),
         // Real address is non-EVM compatible
         //Address.fromString("FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z"),
         "Avalanche",
@@ -462,7 +462,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0xBF183E0d2f06872e10F5DBEc745999aDfcB5f000"),
+        Address.fromString("0xbf183e0d2f06872e10f5dbec745999adfcb5f000"),
         "EVMOS",
         "EVMOS",
         18 as i32
@@ -512,7 +512,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0x799a4202c12ca952cB311598a024C80eD371a41e"),
+        Address.fromString("0x799a4202c12ca952cb311598a024c80ed371a41e"),
         "Harmony One",
         "ONE",
         18 as i32
@@ -537,7 +537,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0xB66A437693992d9c94F0C315270F869C016432b9"),
+        Address.fromString("0xb66a437693992d9c94f0c315270f869c016432b9"),
         "Kava Token",
         "KAVA",
         18 as i32
@@ -552,7 +552,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0x393126c0653F49E079500cc0f218A27c793136A0"),
+        Address.fromString("0x393126c0653f49e079500cc0f218a27c793136a0"),
         "Klaytn Token",
         "KLAY",
         18 as i32
@@ -592,7 +592,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0x017bE64db48dfc962221c984b9A6937A5d09E81A"),
+        Address.fromString("0x017be64db48dfc962221c984b9a6937a5d09e81a"),
         "Moonbeam Token",
         "GLMR",
         9 as i32
@@ -607,7 +607,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0xAa4483BD555f6CddfE34C2Ee6A5A798E5C75775A"),
+        Address.fromString("0xaa4483bd555f6cddfe34c2ee6a5a798e5c75775a"),
         "Moonriver Token",
         "MOVR",
         18 as i32
@@ -632,7 +632,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0xe302bF71B1f6F3024E7642F9c824Ac86B58436a0"),
+        Address.fromString("0xe302bf71b1f6f3024e7642f9c824ac86b58436a0"),
         "OKEx Token",
         "OKB",
         18 as i32
@@ -647,7 +647,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0x30589d7c60490c72C2452A04f4d1a95653ba056f"),
+        Address.fromString("0x30589d7c60490c72c2452a04f4d1a95653ba056f"),
         "Oasis Token",
         "OAC",
         18 as i32
@@ -672,7 +672,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0xb2EA9527bF05bC3b73320a1ec18bd4F2Fe88d952"),
+        Address.fromString("0xb2ea9527bf05bc3b73320a1ec18bd4f2fe88d952"),
         "Optimism Token",
         "OP",
         18 as i32
@@ -697,7 +697,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0x9E32b13ce7f2E80A01932B42553652E053D6ed8e"),
+        Address.fromString("0x9e32b13ce7f2e80a01932b42553652e053d6ed8e"),
         "Metis Token",
         "METIS",
         18 as i32
@@ -712,7 +712,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0x3E9D9124596af6D8FaaeFc9B3e07b3cE397d34F7"),
+        Address.fromString("0x3e9d9124596af6d8faaefc9b3e07b3ce397d34f7"),
         "REI Token",
         "REIT",
         18 as i32
@@ -727,7 +727,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0x99fE3B1391503A1bC1788051347A1324bff41452"),
+        Address.fromString("0x99fe3b1391503a1bc1788051347a1324bff41452"),
         "SX Network Token",
         "SX",
         18 as i32
@@ -742,7 +742,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0x00E856ee945A49bb73436e719D96910Cd9D116a4"),
+        Address.fromString("0x00e856ee945a49bb73436e719d96910cd9d116a4"),
         "SHIDEN Token",
         "SDN",
         18 as i32
@@ -767,7 +767,7 @@ export function getNetworkSpecificConstant(
     return new NetworkSpecificConstant(
       chainId,
       getOrCreateGasFeeToken(
-        Address.fromString("0x3A0D746B3EA1d8ccDf19aD915913BD68391133Ca"),
+        Address.fromString("0x3a0d746b3ea1d8ccdf19ad915913bd68391133ca"),
         "Syscoin Token",
         "SYSX",
         18 as i32

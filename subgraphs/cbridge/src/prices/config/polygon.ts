@@ -13,7 +13,7 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
 export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 
 export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
-  "0xb023e699F5a33916Ea823A16485e259257cA8Bd1"
+  "0xb023e699f5a33916ea823a16485e259257ca8bd1"
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -23,8 +23,8 @@ export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
 export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 
 export const CURVE_REGISTRY_ADDRESSES: Address[] = [
-  Address.fromString("0x094d12e5b541784701FD8d65F11fc0598FBC6332"),
-  Address.fromString("0x47bB542B9dE58b970bA50c9dae444DDB4c16751a"),
+  Address.fromString("0x094d12e5b541784701fd8d65f11fc0598fbc6332"),
+  Address.fromString("0x47bb542b9de58b970ba50c9dae444ddb4c16751a"),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ export const CURVE_REGISTRY_ADDRESSES: Address[] = [
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
   Address.fromString("0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff"), // QuickSwap
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"), // SushiSwap
+  Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // SushiSwap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
