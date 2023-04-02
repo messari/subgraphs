@@ -144,8 +144,8 @@ export function findUSDPricePerToken(
       const pool = getLiquidityPool(poolAddress)!;
 
       if (pool.totalValueLockedUSD.gt(BIGDECIMAL_ZERO)) {
-        const token_index = get_token_index(pool, token);
-        if (!token_index) {
+        const token_index: i32 = get_token_index(pool, token);
+        if (token_index == -1) {
           continue;
         }
         const whitelistTokenIndex = 0 == token_index ? 1 : 0;
@@ -197,11 +197,15 @@ export function findUSDPricePerToken(
       token.id.toHexString(),
       priceSoFar.toString(),
     ]);
-    token._largeTVLImpactBuffer += 1;
-    return token.lastPriceUSD!;
+    if (token._largeTVLImpactBuffer < PRICE_CHANGE_BUFFER_LIMIT) {
+      token._largeTVLImpactBuffer += 1;
+      token.save();
+      return token.lastPriceUSD!;
+    }
   }
 
   if (!token.lastPriceUSD || token.lastPriceUSD!.equals(BIGDECIMAL_ZERO)) {
+    token.save();
     return priceSoFar;
   }
 
@@ -212,7 +216,8 @@ export function findUSDPricePerToken(
     priceSoFar.lt(token.lastPriceUSD!.div(BIGDECIMAL_TWO))
   ) {
     if (token._largePriceChangeBuffer < PRICE_CHANGE_BUFFER_LIMIT) {
-      token._largePriceChangeBuffer = token._largePriceChangeBuffer + 1;
+      token._largePriceChangeBuffer += 1;
+      token.save();
       return token.lastPriceUSD!;
     }
   }
@@ -225,7 +230,7 @@ export function findUSDPricePerToken(
 }
 
 // Tried to return null from here and it did not
-function get_token_index(pool: LiquidityPool, token: Token): number {
+function get_token_index(pool: LiquidityPool, token: Token): i32 {
   if (pool.inputTokens[0] == token.id) {
     return 0;
   }

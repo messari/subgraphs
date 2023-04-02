@@ -73,7 +73,7 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
 ///////////////////////////////////////////////////////////////////////////
 
 export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
-  "0xD81eb3728a631871a7eBBaD631b5f424909f0c77"
+  "0xd81eb3728a631871a7ebbad631b5f424909f0c77"
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
 ///////////////////////////////////////////////////////////////////////////
 
 export const ONE_INCH_ORACLE_CONTRACT_ADDRESS = Address.fromString(
-  "0x11DEE30E710B8d4a8630392781Cc3c0046365d4c"
+  "0x11dee30e710b8d4a8630392781cc3c0046365d4c"
 );
 
 ///////////////////////////////////////////////////////////////////////////

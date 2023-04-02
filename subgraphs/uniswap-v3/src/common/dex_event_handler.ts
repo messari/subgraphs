@@ -38,7 +38,7 @@ import {
 import { getOrCreateAccount } from "./entities/account";
 import { getLiquidityPoolFee, getLiquidityPoolAmounts } from "./entities/pool";
 import { getOrCreateProtocol } from "./entities/protocol";
-import { getOrCreateToken } from "./entities/token";
+import { getOrCreateToken, isFakeWhitelistToken } from "./entities/token";
 import {
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
@@ -1059,6 +1059,17 @@ function getAbsUSDValues(
   tokenAmounts: BigInt[]
 ): BigDecimal[] {
   const usdValues: BigDecimal[] = [];
+
+  // Check for fake versions of whitelisted tokens. Do not price these tokens.
+  for (let i = 0; i < tokens.length; i++) {
+    if (isFakeWhitelistToken(tokens[i])) {
+      for (let i = 0; i < tokens.length; i++) {
+        usdValues.push(BIGDECIMAL_ZERO);
+      }
+      return usdValues;
+    }
+  }
+
   for (let i = 0; i < tokens.length; i++) {
     usdValues.push(
       bigDecimalAbs(
