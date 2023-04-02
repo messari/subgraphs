@@ -16,9 +16,6 @@ export class StargateFantomConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x9d1B1669c73b033DFe47ae5a0164Ab96df25B944";
-  }
-  getRewardToken(): string {
-    return "0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590";
+    return "0x9d1b1669c73b033dfe47ae5a0164ab96df25b944";
   }
 }

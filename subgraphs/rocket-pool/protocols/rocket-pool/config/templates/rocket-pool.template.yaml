@@ -65,7 +65,7 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
         - name: RocketStorage
-          file: ./abis/rocketStorage.json
+          file: ./abis/RocketStorage.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -329,7 +329,7 @@ dataSources:
         - Minipool
       abis:
         - name: rocketMinipoolqueue
-          file: ./abis/RocketMinipoolqueue.json
+          file: ./abis/RocketMinipoolQueue.json
         - name: rocketNetworkPrices
           file: ./abis/RocketNetworkPrices.json
         - name: rocketTokenRETH

@@ -145,6 +145,38 @@ export class Account {
 
   /**
    * Creates a BridgeTransfer entity for a transfer away from this chain
+   * to a non-EVM chain and updates the volumes at PoolRoute, Pool and Protocol.
+   *
+   * @param pool The pool the transfer was made on.
+   * @param route The route the transfer went through.
+   * @param destination The non-EVM account receiving the funds.
+   * @param amount The amount of tokens transferred.
+   * @param transactionID Optional transaction ID on the source chain.
+   * @param updateMetrics Optional, defaults to true. If true, volumes will be updated at PoolRoute, Pool and Protocol. Make it false if you want to update these manually for some reason. Activity counts and transaction counts will still be updated.
+   * @returns BridgeTransfer
+   */
+  nonEVMTransferOut(
+    pool: Pool,
+    route: PoolRoute,
+    destination: Bytes,
+    amount: BigInt,
+    transactionID: Bytes | null = null,
+    updateMetrics: boolean = true
+  ): BridgeTransfer {
+    this.countTransferOut();
+    return this.transfer(
+      pool,
+      route,
+      destination,
+      amount,
+      true,
+      transactionID,
+      updateMetrics
+    );
+  }
+
+  /**
+   * Creates a BridgeTransfer entity for a transfer away from this chain
    * and updates the volumes at PoolRoute, Pool and Protocol.
    *
    * @param pool The pool the transfer was made on.
@@ -170,6 +202,38 @@ export class Account {
       destination,
       amount,
       true,
+      transactionID,
+      updateMetrics
+    );
+  }
+
+  /**
+   * Creates a BridgeTransfer entity for a transfer arriving to this chain
+   * from a non-EVM address and updates the volumes at PoolRoute, Pool and Protocol.
+   *
+   * @param pool The pool the transfer was made on.
+   * @param route The route the transfer went through.
+   * @param source The non-EVM account sending the funds.
+   * @param amount The amount of tokens transferred.
+   * @param transactionID Optional transaction ID on the source chain.
+   * @param updateMetrics Optional, defaults to true. If true, volumes will be updated at PoolRoute, Pool and Protocol. Make it false if you want to update these manually for some reason. Activity counts and transaction counts will still be updated.
+   * @returns BridgeTransfer
+   */
+  nonEVMTransferIn(
+    pool: Pool,
+    route: PoolRoute,
+    source: Bytes,
+    amount: BigInt,
+    transactionID: Bytes | null = null,
+    updateMetrics: boolean = true
+  ): BridgeTransfer {
+    this.countTransferIn();
+    return this.transfer(
+      pool,
+      route,
+      source,
+      amount,
+      false,
       transactionID,
       updateMetrics
     );
@@ -210,7 +274,7 @@ export class Account {
   private transfer(
     pool: Pool,
     route: PoolRoute,
-    counterparty: Address,
+    counterparty: Bytes,
     amount: BigInt,
     isOutgoing: boolean,
     transactionID: Bytes | null,

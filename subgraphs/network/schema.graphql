@@ -1,5 +1,5 @@
 # Subgraph Schema: Network
-# Version: 1.1.2
+# Version: 1.2.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum SubgraphNetwork {
@@ -44,9 +44,9 @@ enum DataType {
 }
 
 # Stores statistical analytics for given metrics
-type Stats @entity {
+type Stat @entity {
   " { id of the snapshot this belongs to } - { DataType } "
-  id: ID!
+  id: Bytes!
 
   " Number of times entity has been used in a time data entity "
   count: Int!
@@ -59,9 +59,6 @@ type Stats @entity {
 
   " The minimum value in this data set "
   min: BigInt!
-
-  " List of values in order from smallest to largest "
-  values: [BigInt!]!
 
   " The sum of all the values "
   sum: BigInt!
@@ -76,6 +73,10 @@ type Stats @entity {
 
   " This is the lower quartile where 25% of the values lie "
   q1: BigDecimal
+
+  ##### Helpers #####
+
+  _meanSquared: BigDecimal
 }
 
 ##########################
@@ -128,7 +129,7 @@ type Network @entity {
   totalSupply: BigInt
 
   " Statistical analysis of blocks/day from daily snapshots "
-  dailyBlocks: Stats!
+  dailyBlocks: Stat!
 
   #### Snapshots ####
 
@@ -145,7 +146,7 @@ type Network @entity {
 
 type DailySnapshot @entity {
   " { number of days since UNIX epoch time } "
-  id: ID!
+  id: Bytes!
 
   " ID of the network this snapshot belongs to "
   network: Network!
@@ -165,69 +166,69 @@ type DailySnapshot @entity {
   cumulativeUniqueAuthors: Int!
 
   " Statistical analysis of unique daily active authors "
-  dailyUniqueAuthors: Stats
+  dailyUniqueAuthors: Stat
 
   " Total difficulty up until this day "
   cumulativeDifficulty: BigInt
 
   " Statistical analysis of difficulty during this day "
-  dailyDifficulty: Stats
+  dailyDifficulty: Stat
 
   " Total gas used up until this day "
   cumulativeGasUsed: BigInt
 
   " Statistical analysis of gas used during this day"
-  dailyGasUsed: Stats
+  dailyGasUsed: Stat
 
   " Statistical analysis of gas limit across blocks this day"
-  dailyGasLimit: Stats
+  dailyGasLimit: Stat
 
   " Total amount of fees burned "
   cumulativeBurntFees: BigInt
 
   " Statisical amount of burnt fees for this day "
-  dailyBurntFees: Stats
+  dailyBurntFees: Stat
 
   " Total amount of rewards emitted "
   cumulativeRewards: BigInt
 
   " Statistical analysis of rewards emitted on this day "
-  dailyRewards: Stats
+  dailyRewards: Stat
 
   " Total size of the entire network in this day (in native units) "
   cumulativeSize: BigInt
 
   " Statistical analysis of size in bytes of a block during this day "
-  dailySize: Stats
+  dailySize: Stat
 
   " Statistical analysis of chunks per block during this day "
-  dailyChunks: Stats
+  dailyChunks: Stat
 
   " Total amount of the native asset in circulation during this day "
   totalSupply: BigInt
 
   " Statisitcal analysis of the daily supply "
-  dailySupply: Stats
+  dailySupply: Stat
 
   " Total number of transactions that have occured on this blockchain "
   cumulativeTransactions: BigInt
 
   " Statistical analysis of transactions per day "
-  dailyTransactions: Stats
+  dailyTransactions: Stat
 
   " Statisical analysis of the block interval during this day "
-  dailyBlockInterval: Stats
+  dailyBlockInterval: Stat
 
   " gas price at the end of this hour in network native gas units "
   gasPrice: BigInt
 
   " Statistical analysis of the gas price during this day "
-  dailyGasPrice: Stats
+  dailyGasPrice: Stat
 }
 
 type HourlySnapshot @entity {
   " { number of hours since UNIX epoch time } "
-  id: ID!
+  id: Bytes!
 
   " ID of the network this snapshot belongs to "
   network: Network!
@@ -247,64 +248,64 @@ type HourlySnapshot @entity {
   cumulativeUniqueAuthors: Int!
 
   " Statistical analysis of unique hourly active authors "
-  hourlyUniqueAuthors: Stats
+  hourlyUniqueAuthors: Stat
 
   " Total difficulty up until this hour "
   cumulativeDifficulty: BigInt
 
   " Statistical analysis of difficulty during this hour "
-  hourlyDifficulty: Stats
+  hourlyDifficulty: Stat
 
   " Total gas used up until this hour "
   cumulativeGasUsed: BigInt
 
   " Statistical analysis of gas used during this hour"
-  hourlyGasUsed: Stats
+  hourlyGasUsed: Stat
 
   " Statistical analysis of gas limit across blocks this hour"
-  hourlyGasLimit: Stats
+  hourlyGasLimit: Stat
 
   " Total amount of fees burned "
   cumulativeBurntFees: BigInt
 
   " Statisical amount of burnt fees for this hour "
-  hourlyBurntFees: Stats
+  hourlyBurntFees: Stat
 
   " Total amount of rewards emitted "
   cumulativeRewards: BigInt
 
   " Statistical analysis of rewards emitted on this hour "
-  hourlyRewards: Stats
+  hourlyRewards: Stat
 
   " Total size of the entire network in this hour (in native units) "
   cumulativeSize: BigInt
 
   " Statistical analysis of size in bytes of a block during this hour "
-  hourlySize: Stats
+  hourlySize: Stat
 
   " Statistical analysis of chunks per block during this hour "
-  hourlyChunks: Stats
+  hourlyChunks: Stat
 
   " Total amount of the native asset in circulation during this hour "
   totalSupply: BigInt
 
   " Statisitcal analysis of the hourly supply "
-  hourlySupply: Stats
+  hourlySupply: Stat
 
   " Total number of transactions that have occured on this blockchain "
   cumulativeTransactions: BigInt
 
   " Statistical analysis of transactions per hour "
-  hourlyTransactions: Stats
+  hourlyTransactions: Stat
 
   " Statisical analysis of the block interval during this hour "
-  hourlyBlockInterval: Stats
+  hourlyBlockInterval: Stat
 
   " gas price at the end of this hour in network native gas units "
   gasPrice: BigInt
 
   " Statistical analysis of the gas price during this hour "
-  hourlyGasPrice: Stats
+  hourlyGasPrice: Stat
 }
 
 ##########################
@@ -313,7 +314,7 @@ type HourlySnapshot @entity {
 
 type Block @entity(immutable: true) {
   " { block number } "
-  id: ID!
+  id: Bytes!
 
   " Hash of this block "
   hash: Bytes!
@@ -380,7 +381,7 @@ type Author @entity {
 # Helper entity for calculating daily/hourly active authors
 type ActiveAuthor @entity(immutable: true) {
   " { daily/hourly }-{ Address of the author }-{ Days/hours since Unix epoch } "
-  id: ID!
+  id: Bytes!
 }
 
 # Helper entitiy for NEAR protocol to keep track of chunks for metric aggregation

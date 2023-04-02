@@ -23,6 +23,7 @@ import {
   sumBigIntListByIndex,
 } from "../common/utils/utils";
 import { getOrCreateProtocol } from "../common/entities/protocol";
+import { getOrCreateAccount } from "../common/entities/account";
 
 export function getUSDValueFromNativeTokens(
   tokens: Token[],
@@ -42,8 +43,8 @@ export function getUSDValueFromNativeTokens(
 }
 
 export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
+  const account = getOrCreateAccount(event.transaction.from);
   const position = getOrCreatePosition(event, event.params.tokenId);
-
   // position was not able to be fetched
   if (position == null) {
     return;
@@ -51,6 +52,9 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
 
   const pool = getLiquidityPool(Address.fromBytes(position.pool));
   const protocol = getOrCreateProtocol();
+  if (account._newUser) {
+    protocol.cumulativeUniqueUsers += INT_ONE;
+  }
 
   if (!pool) {
     log.warning("Pool not found for position: {}", [position.id.toHexString()]);
@@ -90,12 +94,15 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   );
   position.depositCount += INT_ONE;
 
+  account.save();
   position.save();
+  protocol.save();
 
   savePositionSnapshot(position, event);
 }
 
 export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
+  const account = getOrCreateAccount(event.transaction.from);
   const position = getOrCreatePosition(event, event.params.tokenId);
 
   // position was not able to be fetched
@@ -105,6 +112,10 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
 
   const pool = getLiquidityPool(Address.fromBytes(position.pool));
   const protocol = getOrCreateProtocol();
+
+  if (account._newUser) {
+    protocol.cumulativeUniqueUsers += INT_ONE;
+  }
 
   if (!pool) {
     log.warning("Pool not found for position: {}", [position.id.toHexString()]);
@@ -138,20 +149,30 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
     position.timestampClosed = event.block.timestamp;
   }
 
+  account.save();
   position.save();
+  protocol.save();
 
   savePositionSnapshot(position, event);
 }
 
 export function handleTransfer(event: Transfer): void {
+  const account = getOrCreateAccount(event.params.to);
   const position = getOrCreatePosition(event, event.params.tokenId);
 
   // position was not able to be fetched
   if (position == null) {
     return;
   }
+  if (account._newUser) {
+    const protocol = getOrCreateProtocol();
+    protocol.cumulativeUniqueUsers += INT_ONE;
+    protocol.save();
+  }
 
   position.account = event.params.to;
+
+  account.save();
   position.save();
 }
 

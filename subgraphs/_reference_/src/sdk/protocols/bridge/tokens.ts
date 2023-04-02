@@ -84,6 +84,29 @@ export class TokenManager {
     return rToken;
   }
 
+  getOrCreateNonEVMCrosschainToken(
+    chainID: BigInt,
+    address: Bytes,
+    type: string,
+    token: Address
+  ): CrosschainToken {
+    const id = changetype<Bytes>(Bytes.fromBigInt(chainID)).concat(address);
+    let ct = CrosschainToken.load(id);
+    if (ct) {
+      return ct;
+    }
+
+    const base = this.getOrCreateToken(token);
+    ct = new CrosschainToken(id);
+    ct.chainID = chainID;
+    ct.network = chainIDToNetwork(chainID);
+    ct.address = address;
+    ct.type = type;
+    ct.token = base.id;
+    ct.save();
+    return ct;
+  }
+
   getOrCreateCrosschainToken(
     chainID: BigInt,
     address: Address,

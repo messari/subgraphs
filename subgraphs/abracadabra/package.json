@@ -1,13 +1,11 @@
 {
-  "name": "abracadabra-ext",
-  "license": "UNLICENSED",
+  "name": "abracadabra",
   "scripts": {
-    "format": "npx prettier --write .",
-    "codegen": "graph codegen"
+    "format": "npx prettier --write ."
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.33.0",
-    "@graphprotocol/graph-ts": "^0.27.0",
+    "@graphprotocol/graph-cli": "0.42.4",
+    "@graphprotocol/graph-ts": "0.29.3",
     "prettier": "^2.7.1"
   }
 }

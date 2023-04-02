@@ -1,4 +1,6 @@
-export const monitorVersion = "v1.2.9";
+import { errorNotification } from "./messageDiscord.js";
+
+export const monitorVersion = "v1.4.1";
 
 export const sleep = m => new Promise(r => setTimeout(r, m));
 
@@ -41,3 +43,25 @@ export const colorsArray = [
     0xCBC3E3,
     0x953553,
 ];
+
+export async function parseIndexingThreadStrings(strObject) {
+    try {
+        if (strObject.value) {
+            const resArr = strObject?.value?.split('\n')?.join('-----')?.split('-----');
+            if (Array.isArray(resArr)) {
+                return resArr;
+            }
+        }
+        return [];
+    } catch (err) {
+        errorNotification(err.message);
+        return [];
+    }
+}
+
+export const indexingErrorEmbedSchema = {
+    title: "Indexing Errors",
+    description: 'These subgraphs encountered a fatal error in indexing',
+    fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Failed At Block', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
+    footer: { text: monitorVersion }
+};
