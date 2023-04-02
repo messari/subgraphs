@@ -8,11 +8,12 @@ Briding is implemented using gateways (for cross-chain asset bridgning) and rout
 
 ## Mechanism
 
-Arbitrum implements a Lock-Release bridging mechanism where some amount (bridged_amount - fees) of tokens are escrowed in L1 bridge/gateway contracts and the same amount of canonical token on L2 (arbitrum) are minted to the sender. 
+Arbitrum implements a Lock-Release bridging mechanism where some amount (bridged_amount - fees) of tokens are escrowed in L1 bridge/gateway contracts and the same amount of canonical token on L2 (arbitrum) are minted to the sender.
 
 Withdrawal involves burning some amount of tokens in L2 contract, which can be claimed on the L1 bridge contract after challenge period is complete.
 
 ## Useful Links
+
 - [Arbitrum Bridge](https://bridge.arbitrum.io)
 - [Smart contract architecture](https://l2beat.com/scaling/projects/arbitrum#contracts)
 - [Token bridge useful addresses](https://developer.arbitrum.io/useful-addresses#token-bridge)
@@ -31,5 +32,5 @@ The bridge supports both token transfers and cross-chain messaging.
 
 ### Fees and Revenue
 
-* This is a canonical bridge implemented by Offchain Labs. Bridging involves fees (L2 gas, L1 calldata fees, L1 gas fees) to cover the transaction costs on L1 and L2.
-* A portion of the transaction costs (from sequencer) goes to Offchain Labs but the bridge protocol doesn't earn any fees/revenue.
+- This is a canonical bridge implemented by Offchain Labs. Bridging involves fees (L2 gas, L1 calldata fees, L1 gas fees) to cover the transaction costs on L1 and L2.
+- A portion of the transaction costs (from sequencer) goes to Offchain Labs but the bridge protocol doesn't earn any fees/revenue.

@@ -2,7 +2,7 @@
   "deployment": "ARBITRUM_ONE_ARBITRUM",
   "network": "arbitrum-one",
   "abi": "TokenGateway",
-  "file": "./src/handlers/arbitrum/transferIn.ts",
+  "file": "./src/handlers/arbitrum/transfers.ts",
   "L2ArbSys": [
     {
       "name": "L2ArbSys",

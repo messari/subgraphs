@@ -1,7 +1,7 @@
 {
   "deployment": "ARBITRUM_ONE_MAINNET",
   "network": "mainnet",
-  "file": "./src/handlers/ethereum/transferIn.ts",
+  "file": "./src/handlers/ethereum/transfers.ts",
   "L1Bridge": [
     {
       "name": "L1Bridge",

@@ -70,6 +70,8 @@ dataSources:
       eventHandlers:
         - event: WithdrawalFinalized(address,indexed address,indexed address,indexed uint256,uint256)
           handler: handleTransferIn{{ handlerSuffix }}
+        - event: DepositInitiated(address,indexed address,indexed address,indexed uint256,uint256)
+          handler: handleTransferOut{{ handlerSuffix }}
   {{/L1Gateways}}
   {{#L1Bridge}}
   - kind: ethereum
@@ -206,6 +208,8 @@ dataSources:
       eventHandlers:
         - event: DepositFinalized(indexed address,indexed address,indexed address,uint256)
           handler: handleTransferIn{{ handlerSuffix }}
+        - event: WithdrawalInitiated(address,indexed address,indexed address,indexed uint256,uint256,uint256)
+          handler: handleTransferOut{{ handlerSuffix }}
   {{/L2Gateways}}
   {{#L2ArbSys}}
   - kind: ethereum
