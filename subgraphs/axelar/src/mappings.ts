@@ -17,6 +17,7 @@ import {
   ContractCallApproved,
   Executed,
 } from "../generated/AxelarGateway/AxelarGateway";
+import { BurnableMintableCappedERC20 } from "../generated/AxelarGateway/BurnableMintableCappedERC20";
 import {
   GasPaidForContractCall,
   GasPaidForContractCallWithToken,
@@ -51,6 +52,7 @@ import {
   getNetworkSpecificConstant,
   Network,
   BIGINT_MINUS_ONE,
+  TokenType,
 } from "./sdk/util/constants";
 import { Pool } from "./sdk/protocols/bridge/pool";
 import { isValidEVMAddress } from "./sdk/util/strings";
@@ -176,12 +178,13 @@ export function onCreatePool(
 }
 
 export function handleTokenDeployed(event: TokenDeployed): void {
+  // determine whether the token deployed is internal or external token type
+  const tokenType = getTokenType(event.params.tokenAddresses);
   getOrCreateTokenSymbol(
     event.params.symbol,
-    event.params.tokenAddresses.toHexString()
+    event.params.tokenAddresses.toHexString(),
+    TokenType.EXTERNAL
   );
-
-  //ERC20Template.create(event.params.tokenAddresses);
 }
 
 export function handleTokenSent(event: TokenSent): void {
@@ -200,6 +203,15 @@ export function handleTokenSent(event: TokenSent): void {
     ? Address.fromString(dstStr)
     : Bytes.fromUTF8(dstStr);
 
+  const bridgePoolType =
+    tokenSymbol.tokenType == TokenType.EXTERNAL
+      ? BridgePoolType.LOCK_RELEASE
+      : BridgePoolType.BURN_MINT;
+  const crosschainTokenType =
+    tokenSymbol.tokenType == TokenType.EXTERNAL
+      ? CrosschainTokenType.WRAPPED
+      : CrosschainTokenType.CANONICAL;
+
   log.info("[handleTokenSent]original={},dstAddress={}", [
     event.params.destinationAddress,
     dstAddress.toHexString(),
@@ -214,8 +226,8 @@ export function handleTokenSent(event: TokenSent): void {
     dstChainId,
     poolId,
     dstPoolId,
-    BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
+    bridgePoolType,
+    crosschainTokenType,
     customEvent,
     null
   );
@@ -238,6 +250,15 @@ export function handleContractCallWithToken(
     ? Address.fromString(dstStr)
     : Bytes.fromUTF8(dstStr);
 
+  const bridgePoolType =
+    tokenSymbol.tokenType == TokenType.EXTERNAL
+      ? BridgePoolType.LOCK_RELEASE
+      : BridgePoolType.BURN_MINT;
+  const crosschainTokenType =
+    tokenSymbol.tokenType == TokenType.EXTERNAL
+      ? CrosschainTokenType.WRAPPED
+      : CrosschainTokenType.CANONICAL;
+
   const customEvent = _createCustomEvent(event)!;
 
   const account = _handleTransferOut(
@@ -248,8 +269,8 @@ export function handleContractCallWithToken(
     dstChainId,
     poolId,
     dstPoolId,
-    BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
+    bridgePoolType,
+    crosschainTokenType,
     customEvent,
     null
   );
@@ -307,6 +328,15 @@ export function handleContractCallApprovedWithMint(
   const srcNetworkConstants = getNetworkSpecificConstant(srcChainId);
   const srcPoolId = srcNetworkConstants.getPoolAddress();
 
+  const bridgePoolType =
+    tokenSymbol.tokenType == TokenType.EXTERNAL
+      ? BridgePoolType.LOCK_RELEASE
+      : BridgePoolType.BURN_MINT;
+  const crosschainTokenType =
+    tokenSymbol.tokenType == TokenType.EXTERNAL
+      ? CrosschainTokenType.WRAPPED
+      : CrosschainTokenType.CANONICAL;
+
   const customEvent = _createCustomEvent(event)!;
   const account = _handleTransferIn(
     Address.fromString(tokenAddress),
@@ -316,8 +346,8 @@ export function handleContractCallApprovedWithMint(
     srcChainId,
     srcPoolId,
     poolId,
-    BridgePoolType.BURN_MINT,
-    CrosschainTokenType.CANONICAL,
+    bridgePoolType,
+    crosschainTokenType,
     customEvent,
     event.params.commandId
   );
@@ -493,29 +523,6 @@ export function handleFeeRefund(call: RefundCall): void {
 }
 
 //////////////////////////////// HELPER FUNCTIONS //////////////////////////////
-/**
- * get or create an TokenSymbol entity; if the entry is new, either `tokenAddress`
- * or `contractAddress` param needs to be provided
- *
- * @param symbol token symbol
- * @param tokenAddress token address
- * @param contractAddress address of AxelarGatewayMultiSig contract
- *
- */
-
-function getOrCreateTokenSymbol(
-  symbol: string,
-  tokenAddress: string | null = null
-): _TokenSymbol {
-  let tokenSymbol = _TokenSymbol.load(symbol);
-  if (!tokenSymbol) {
-    tokenSymbol = new _TokenSymbol(symbol);
-    tokenSymbol.tokenAddress = tokenAddress!;
-    tokenSymbol.save();
-  }
-  return tokenSymbol;
-}
-
 function _handleTransferOut(
   token: Address,
   sender: Address,
@@ -617,6 +624,16 @@ function _handleMintToken(
   const receiver = account;
   const poolAddress = event.address;
   const poolId = poolAddress.concat(tokenAddress);
+  const tokenType = getTokenType(tokenAddress);
+  const bridgePoolType =
+    tokenType == TokenType.EXTERNAL
+      ? BridgePoolType.LOCK_RELEASE
+      : BridgePoolType.BURN_MINT;
+  const crosschainTokenType =
+    tokenType == TokenType.EXTERNAL
+      ? CrosschainTokenType.WRAPPED
+      : CrosschainTokenType.CANONICAL;
+
   const srcChainId = networkToChainID(Network.UNKNOWN_NETWORK);
   const srcPoolId = Address.zero(); // Not available
   const sender = receiver; //Not available, assumed to be the same as receiver
@@ -629,8 +646,8 @@ function _handleMintToken(
     srcChainId,
     srcPoolId,
     poolId,
-    BridgePoolType.BURN_MINT,
-    CrosschainTokenType.CANONICAL,
+    bridgePoolType,
+    crosschainTokenType,
     customEvent,
     commandId
   );
@@ -646,6 +663,16 @@ function _handleBurnToken(
   const sender = account;
   const poolAddress = event.address;
   const poolId = poolAddress.concat(tokenAddress);
+  const tokenType = getTokenType(tokenAddress);
+  const bridgePoolType =
+    tokenType == TokenType.EXTERNAL
+      ? BridgePoolType.LOCK_RELEASE
+      : BridgePoolType.BURN_MINT;
+  const crosschainTokenType =
+    tokenType == TokenType.EXTERNAL
+      ? CrosschainTokenType.WRAPPED
+      : CrosschainTokenType.CANONICAL;
+
   const dstChainId = networkToChainID(Network.UNKNOWN_NETWORK);
   const dstPoolId = Address.zero(); // Not available
   const receiver = sender; //Not available, assumed to be the same as sender
@@ -658,8 +685,8 @@ function _handleBurnToken(
     dstChainId,
     poolId,
     dstPoolId,
-    BridgePoolType.BURN_MINT,
-    CrosschainTokenType.WRAPPED,
+    bridgePoolType,
+    crosschainTokenType,
     customEvent,
     commandId
   );
@@ -706,6 +733,43 @@ function _handleMessageOut(
   const sdk = _getSDK(customEvent);
   const acc = sdk.Accounts.loadAccount(sender);
   acc.messageOut(dstChainId, receiver, data);
+}
+
+/**
+ * get or create an TokenSymbol entity; if the entry is new, either `tokenAddress`
+ * or `contractAddress` param needs to be provided
+ *
+ * @param symbol token symbol
+ * @param tokenAddress token address
+ * @param contractAddress address of AxelarGatewayMultiSig contract
+ *
+ */
+
+function getOrCreateTokenSymbol(
+  symbol: string,
+  tokenAddress: string | null = null,
+  tokenType: TokenType | null = null
+): _TokenSymbol {
+  let tokenSymbol = _TokenSymbol.load(symbol);
+  if (!tokenSymbol) {
+    tokenSymbol = new _TokenSymbol(symbol);
+    tokenSymbol.tokenAddress = tokenAddress!;
+    tokenSymbol.tokenType = tokenType!;
+    tokenSymbol.save();
+  }
+  return tokenSymbol;
+}
+
+function getTokenType(tokenAddress: Address): TokenType {
+  const internalERC20Contract = BurnableMintableCappedERC20.bind(tokenAddress);
+  const depositAddressResult = internalERC20Contract.try_depositAddress(
+    Bytes.empty()
+  );
+  let tokenType = TokenType.INTERNAL;
+  if (depositAddressResult.reverted) {
+    tokenType = TokenType.EXTERNAL;
+  }
+  return tokenType;
 }
 
 export function bytesToUnsignedBigInt(

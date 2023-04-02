@@ -161,10 +161,12 @@ export namespace UsageType {
 }
 
 export namespace TokenType {
-  export const INTERNAL_BURNABLE = "INTERNAL_BURNABLE";
-  export const INTERNAL_BURNABLEFROM = "INTERNAL_BURNABLEFROM";
+  // underlying token created by Axelar, using BURN_MINT
+  export const INTERNAL = "INTERNAL";
+  // underlying token external to Axelar, using LOCK_RELEASE
   export const EXTERNAL = "EXTERNAL";
 }
+export type TokenType = string;
 
 //////////////////////////////
 ///// Ethereum Addresses /////

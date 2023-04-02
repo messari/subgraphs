@@ -1390,6 +1390,8 @@ type _TokenSymbol @entity {
   id: ID!
   " token address "
   tokenAddress: String!
+  " token type, internal or external"
+  tokenType: String!
 }
 
 # helper for handling burnToken Command
