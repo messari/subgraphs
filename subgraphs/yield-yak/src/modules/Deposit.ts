@@ -42,7 +42,11 @@ export function _Deposit(
     vault.outputTokenSupply = strategyContract.totalSupply();
   }
 
-  vault.inputTokenBalance = strategyContract.totalDeposits();
+  if (strategyContract.try_totalDeposits().reverted) {
+    vault.inputTokenBalance = ZERO_BIGINT;
+  } else {
+    vault.inputTokenBalance = strategyContract.totalDeposits();
+  }
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .divDecimal(inputTokenDecimals)
