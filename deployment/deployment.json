@@ -3734,6 +3734,11 @@
           "hosted-service": {
             "slug": "spark-lend-ethereum",
             "query-id": "spark-lend-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "spark-lend-ethereum",
+            "network": "arbitrum",
+            "query-id": "6f3YqP75bLuLZAv7Cm1BohFot17kT3Svekg6giuvaTmg"
           }
         }
       }
