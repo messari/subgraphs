@@ -1,4 +1,4 @@
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 import {
   Pool as PoolSchema,
   PoolDailySnapshot,
@@ -29,24 +29,16 @@ export class PoolSnapshot {
       this.pool.lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
     const snapshotHourID =
       this.pool.lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
-    log.warning(
-      "[takePoolSnapshots] snapshotDayId {} snapshotHourId {} dayId {} hourID {}",
-      [
-        snapshotDayID.toString(),
-        snapshotHourID.toString(),
-        this.dayID.toString(),
-        this.hourID.toString(),
-      ]
-    );
+
     if (snapshotDayID != this.dayID) {
-      this.pool.lastSnapshotDayID = BigInt.fromI32(snapshotDayID);
       this.takeDailySnapshot(snapshotDayID);
+      this.pool.lastSnapshotDayID = BigInt.fromI32(snapshotDayID);
       this.pool.save();
     }
 
     if (snapshotHourID != this.hourID) {
-      this.pool.lastSnapshotHourID = BigInt.fromI32(snapshotHourID);
       this.takeHourlySnapshot(snapshotHourID);
+      this.pool.lastSnapshotHourID = BigInt.fromI32(snapshotHourID);
       this.pool.save();
     }
   }
@@ -104,9 +96,6 @@ export class PoolSnapshot {
     snapshot.hourlyTotalRevenueUSD = totalRevenueDelta;
 
     snapshot.save();
-    log.warning("[takeHourlySnapshots] Stops on isinitialized {}", [
-      this.pool.id.concatI32(this.pool.lastSnapshotHourID!.toI32()).toString(),
-    ]);
   }
 
   private takeDailySnapshot(day: i32): void {
@@ -156,8 +145,5 @@ export class PoolSnapshot {
     snapshot.dailyTotalRevenueUSD = totalRevenueDelta;
 
     snapshot.save();
-    log.warning("[takeDailySnapshots] Stops on isinitialized {}", [
-      this.pool.id.concatI32(this.pool.lastSnapshotDayID!.toI32()).toString(),
-    ]);
   }
 }

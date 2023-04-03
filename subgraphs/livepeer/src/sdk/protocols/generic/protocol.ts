@@ -242,4 +242,9 @@ export class ProtocolManager {
     this.protocol.totalPoolCount += count;
     this.save();
   }
+
+  addTransaction(): void {
+    this.protocol.cumulativeTransactionCount += 1;
+    this.save();
+  }
 }

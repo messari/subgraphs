@@ -99,24 +99,32 @@ export const FEE_DENOMINATOR_BIGINT = BIGINT_TEN.pow(10);
 export const FEE_DENOMINATOR = BigDecimal.fromString("10000000000");
 
 export const LIVEPEER_PLATFORM_ID = "livepeer";
-export const PROTOCOL_ID = "0x35Bcf3c30594191d53231E4FF333E8A770453e40";
+export const PROTOCOL_ID = "0x35bcf3c30594191d53231e4ff333e8a770453e40";
 
 export const ROUND_MANAGER_ADDRESS = Address.fromString(
   "0xdd6f56dcC28D3F5f27084381fE8Df634985cc39f"
 );
 export const BONDING_MANAGER_ADDRESS = Address.fromString(
-  "0x35Bcf3c30594191d53231E4FF333E8A770453e40"
+  "0x35bcf3c30594191d53231e4ff333e8a770453e40"
 );
 export const LPT_ADDRESS = Address.fromString(
-  "0x289ba1701C2F088cf0faf8B3705246331cB8A839"
+  "0x289ba1701c2f088cf0faf8b3705246331cb8a839"
 );
 
 export const MINTER_ADDRESS = Address.fromString(
-  "0xc20DE37170B45774e6CD3d2304017fc962f27252"
+  "0xc20de37170b45774e6cd3d2304017fc962f27252"
 );
 
 export const WETH_ADDRESS = Address.fromString(
-  "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+  "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
 );
 
 export const WETH_DECIMALS = 18;
+
+export const UNISWAP_V3_LPT_ETH_POOL_ADDRESS = Address.fromString(
+  "4fd47e5102dfbf95541f64ed6fe13d4ed26d2546"
+);
+
+export const UNISWAP_V3_DAI_ETH_POOL_ADDRESS = Address.fromString(
+  "a961f0473da4864c5ed28e00fcc53a3aab056c1b"
+);

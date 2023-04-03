@@ -1,16 +1,24 @@
-import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
-import { BondingManager } from "../../generated/BondingManager/BondingManager";
-import * as constants from "../common/constants";
-// Import entity types generated from the GraphQL schema
+import {
+  TokenInitialize,
+  TokenPrice,
+  getTotalRewardTokens,
+} from "../modules/Tokens";
+import { Versions } from "../versions";
 import * as utils from "../common/utils";
+import { SDK } from "../sdk/protocols/generic";
+import * as constants from "../common/constants";
+import { CustomEventType } from "../sdk/util/events";
+import { ProtocolConfig } from "../sdk/protocols/config";
+import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { BondingManager } from "../../generated/BondingManager/BondingManager";
+
 export function createOrUpdatePool(
   poolAddress: Address,
   event: ethereum.Event
 ): void {
-  log.warning("[createPool] start poolAddress {}", [poolAddress.toHexString()]);
   if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
-  const sdk = utils.initializeSDK(event);
+  const sdk = initializeSDK(event);
   const bondingManagerContract = BondingManager.bind(
     constants.BONDING_MANAGER_ADDRESS
   );
@@ -43,16 +51,39 @@ export function createOrUpdatePool(
   );
 
   pool.setInputTokenBalance([poolTvl], true);
-  let rewardTokenEmission = constants.BIGDECIMAL_HUNDRED;
+  let rewardTokenEmission = constants.BIGINT_ZERO;
   if (!protocolTvl.equals(constants.BIGINT_ZERO))
-    rewardTokenEmission = utils
-      .bigIntToBigDecimal(poolTvl, 18)
-      .div(utils.bigIntToBigDecimal(protocolTvl, 18))
-      .times(utils.getTotalRewardTokens());
+    rewardTokenEmission = poolTvl
+      .times(getTotalRewardTokens())
+      .div(protocolTvl);
   pool.setRewardEmissions(
     constants.RewardTokenType.DEPOSIT,
     LPT,
-    rewardTokenEmission.digits
+    rewardTokenEmission
   );
-  log.warning("[createPool] end poolAddress {}", [poolAddress.toHexString()]);
+}
+
+export function initializeSDK(event: ethereum.Event): SDK {
+  const protocolConfig = new ProtocolConfig(
+    constants.PROTOCOL_ID,
+    constants.PROTOCOL_NAME,
+    constants.PROTOCOL_SLUG,
+    Versions
+  );
+  const tokenPricer = new TokenPrice();
+  const tokenInitializer = new TokenInitialize();
+  const customEvent = CustomEventType.initialize(
+    event.block,
+    event.transaction,
+    event.logIndex,
+    event
+  );
+  const sdk = new SDK(
+    protocolConfig,
+    tokenPricer,
+    tokenInitializer,
+    customEvent
+  );
+
+  return sdk;
 }

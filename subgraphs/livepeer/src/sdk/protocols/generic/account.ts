@@ -66,6 +66,7 @@ export class Account {
     };
 
     this.protocol.addActiveUser(generalActivity);
+    this.protocol.addTransaction();
   }
 
   private isActiveByActivityID(id: string): boolean {

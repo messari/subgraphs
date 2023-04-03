@@ -1,4 +1,4 @@
-import { Bytes, BigInt, log } from "@graphprotocol/graph-ts";
+import { Bytes, BigInt } from "@graphprotocol/graph-ts";
 import { AccountWasActive } from "./account";
 import {
   Protocol as ProtocolSchema,
@@ -47,15 +47,6 @@ export class ProtocolSnapshot {
       this.protocol.lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
     const snapshotHourID =
       this.protocol.lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
-    log.warning(
-      "[takeProtocolSnapshots] snapshotDayId {} snapshotHourId {} dayId {} hourID {}",
-      [
-        snapshotDayID.toString(),
-        snapshotHourID.toString(),
-        this.dayID.toString(),
-        this.hourID.toString(),
-      ]
-    );
 
     if (snapshotDayID != this.dayID) {
       this.takeFinancialsDailySnapshot(snapshotDayID);
@@ -117,7 +108,6 @@ export class ProtocolSnapshot {
     snapshot.dailyTotalRevenueUSD = totalRevenueDelta;
 
     snapshot.save();
-    log.warning("[takeFinancialDailySnapshots] dayId {}", [day.toString()]);
   }
 
   private takeUsageDailySnapshot(day: i32): void {
@@ -159,7 +149,6 @@ export class ProtocolSnapshot {
 
     activity.dailyActiveUsers = 0;
     activity.save();
-    log.warning("[takeUsageDailySnapshots] ", []);
   }
 
   private takeUsageHourlySnapshot(hour: i32): void {
@@ -197,7 +186,6 @@ export class ProtocolSnapshot {
 
     activity.hourlyActiveUsers = 0;
     activity.save();
-    log.warning("[takeUsageHourlySnapshots] ", []);
   }
 }
 

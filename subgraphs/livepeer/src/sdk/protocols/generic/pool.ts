@@ -1,10 +1,4 @@
-import {
-  Bytes,
-  BigDecimal,
-  BigInt,
-  Address,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 import { Pool as PoolSchema, Token } from "../../../../generated/schema";
 import { ProtocolManager } from "./protocol";
 import {
@@ -61,12 +55,8 @@ export class Pool {
     this.pool = pool;
     this.protocol = protocol;
     this.tokens = tokens;
-    this.pool.lastSnapshotHourID = BIGINT_ZERO;
-    this.pool.lastSnapshotDayID = BIGINT_ZERO;
     this.snapshoter = new PoolSnapshot(pool, protocol.event);
-    if (this.isInitialized) {
-      this.pool.lastUpdateTimestamp = this.protocol.event.block.timestamp;
-    }
+    this.pool.lastUpdateTimestamp = protocol.event.block.timestamp;
   }
 
   private save(): void {
@@ -358,10 +348,7 @@ export class Pool {
   ): void {
     const rToken = this.tokens.getOrCreateRewardToken(type, token);
     const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
-    log.warning("[setRewardEmissions]  amount {} amountUSD {}", [
-      amount.toString(),
-      amountUSD.toString(),
-    ]);
+
     if (!this.pool.rewardTokens) {
       this.pool.rewardTokens = [rToken.id];
       this.pool.rewardTokenEmissionsAmount = [amount];
