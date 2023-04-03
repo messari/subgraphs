@@ -54,17 +54,13 @@ module.exports = {
     // disallow magic numbers: https://eslint.org/docs/latest/rules/no-magic-numbers
     "@typescript-eslint/no-magic-numbers": "error",
 
-    // prefer template literal for string concatenation:
-    // https://eslint.org/docs/latest/rules/prefer-template
-    "prefer-template": "warn",
-
     // enforce camelCase naming
     // https://eslint.org/docs/latest/rules/camelcase
     "@typescript-eslint/naming-convention": [
       "error",
       {
-        selector: "variable",
-        format: ["camelCase"],
+        selector: "default",
+        format: ["camelCase", "UPPER_CASE"],
         leadingUnderscore: "allow",
       },
       {
@@ -76,6 +72,10 @@ module.exports = {
         selector: "function",
         format: ["camelCase"],
         leadingUnderscore: "allow",
+      },
+      {
+        selector: "typeLike",
+        format: ["PascalCase"],
       },
     ],
 
