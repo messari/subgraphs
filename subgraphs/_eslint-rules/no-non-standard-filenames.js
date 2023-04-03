@@ -4,14 +4,19 @@ module.exports = {
   create: function (context) {
     return {
       Program(node) {
-        const fileName = context.getFilename();
-        const regex = /(\/([_a-z]+[_-]*[a-z]+)*)*(\.ts)?$/;
-        if (!regex.test(fileName)) {
-          context.report({
-            node,
-            message: `Filename '${fileName}' does not match the required pattern '${regex}' (single, snake_case, kebab-case)`,
-          });
-        }
+        const regex = /^([_a-z0-9]+[_-]*[a-z0-9]+)*(\.ts)?$/;
+        const neededPathParts = context.getFilename().split("subgraphs").pop();
+        const parthParts = neededPathParts.split("/").splice(1);
+        parthParts.forEach((part) => {
+          if (!regex.test(part)) {
+            context.report({
+              node,
+              message: `'${part}' in ${neededPathParts} ${regex.test(
+                part
+              )} does not match single word, snake_case, or kebab-case`,
+            });
+          }
+        });
       },
     };
   },
