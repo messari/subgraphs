@@ -270,7 +270,7 @@ export function updateRewardTokenEmissions(
   const rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
   const token = getOrCreateToken(rewardTokenAddress, block);
-  const tokenPrice = getUsdPricePerToken(rewardTokenAddress);
+  const tokenPrice = getUsdPricePerToken(rewardTokenAddress, block);
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay

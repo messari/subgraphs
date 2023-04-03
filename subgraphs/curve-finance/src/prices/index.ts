@@ -124,9 +124,10 @@ export function getUsdPricePerToken(
 
 export function getUsdPrice(
   tokenAddr: Address,
-  amount: BigDecimal
+  amount: BigDecimal,
+  block: ethereum.Block
 ): BigDecimal {
-  const tokenPrice = getUsdPricePerToken(tokenAddr);
+  const tokenPrice = getUsdPricePerToken(tokenAddr, block);
 
   if (!tokenPrice.reverted) return tokenPrice.usdPrice.times(amount);
   return constants.BIGDECIMAL_ZERO;
