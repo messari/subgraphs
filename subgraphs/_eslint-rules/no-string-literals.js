@@ -15,7 +15,7 @@ module.exports = {
   },
 
   create: function (context) {
-    function checkLogCall(node, ancestors, logValue) {
+    function checkLogCallOrStringMethods(node, ancestors, logValue) {
       const callExpressionAncestor = ancestors.find(
         (ancestor) => ancestor.type === "CallExpression"
       );
@@ -25,6 +25,7 @@ module.exports = {
         if (
           callee.type === "MemberExpression" &&
           (callee.object.name === "log" ||
+            // these may need to be expanded to include more methods
             ["fromString"].includes(callee.property.name) ||
             ["concat", "toLowerCase"].includes(callee.property.name))
         ) {
@@ -65,7 +66,7 @@ module.exports = {
         }
         const ancestors = context.getAncestors();
         // if the string literal is a call argument, it must be log.error etc
-        if (!checkLogCall(node, ancestors, node.value)) {
+        if (!checkLogCallOrStringMethods(node, ancestors, node.value)) {
           // if the string literal is used in variable declaration, variable name
           // must be in UPPER_CASE in constants.ts
           checkVariableDeclarator(node, ancestors, node.value);
@@ -78,7 +79,7 @@ module.exports = {
           const rawValue = quasi.value.raw;
           if (rawValue.length > 0 && !regex.test(rawValue)) {
             // if the string literal is a call argument, it must be log.error etc
-            if (!checkLogCall(node, ancestors, rawValue)) {
+            if (!checkLogCallOrStringMethods(node, ancestors, rawValue)) {
               // if the string literal is used in variable declaration, variable name
               // must be in UPPER_CASE in constants.ts
               checkVariableDeclarator(node, ancestors, rawValue);

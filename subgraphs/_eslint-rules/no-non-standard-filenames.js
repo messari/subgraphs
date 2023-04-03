@@ -1,6 +1,20 @@
 module.exports = {
   // see https://github.com/messari/subgraphs/issues/1484
   // folder and file names must be in snake_case or kebab-case; leading "_" allowed.
+  meta: {
+    docs: {
+      description:
+        "filename and folder name must be in snake_case or kebab-case",
+      category: "Stylistic Issues",
+      recommended: true,
+    },
+    fixable: null,
+    schema: [],
+    messages: {
+      forbidden: "filename and folder name must be in snake_case or kebab-case",
+    },
+  },
+
   create: function (context) {
     return {
       Program(node) {
@@ -11,9 +25,7 @@ module.exports = {
           if (!regex.test(part)) {
             context.report({
               node,
-              message: `'${part}' in ${neededPathParts} ${regex.test(
-                part
-              )} does not match single word, snake_case, or kebab-case`,
+              message: `${part} in ${neededPathParts} does not match single word, snake_case, or kebab-case naming convention`,
             });
           }
         });
