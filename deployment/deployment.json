@@ -4041,6 +4041,58 @@
       }
     }
   },
+  "pancake-v3": {
+    "schema": "dex-amm",
+    "base": "uniswap-v3",
+    "protocol": "pancake-v3",
+    "project": "pancake",
+    "deployments": {
+      "pancake-v3-bsc": {
+        "network": "bsc",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.3",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "pancake.v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "pancake-v3-bsc",
+            "query-id": "pancake-v3-bsc"
+          }
+        }
+      },
+      "pancake-v3-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.3",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "pancake.v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "pancake-v3-ethereum",
+            "query-id": "pancake-v3-ethereum"
+          }
+        }
+      }
+    }
+  },
   "osmosis-dex": {
     "schema": "dex-amm",
     "base": "osmosis-dex",

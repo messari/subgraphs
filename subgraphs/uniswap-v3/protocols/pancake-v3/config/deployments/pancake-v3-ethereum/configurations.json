@@ -1,0 +1,11 @@
+{
+  "network": "mainnet",
+  "factoryAddress": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+  "factoryAddressStartBlock": 16950686,
+  "nonFungiblePositionManagerAddress": "0x46A15B0b27311cedF172AB29E4f4766fbE7F4364",
+  "nonFungiblePositionManagerAddressStartBlock": 16944786,
+  "deployment": "PANCAKE_V3_ETHEREUM",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
