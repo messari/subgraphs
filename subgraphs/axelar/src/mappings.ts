@@ -183,7 +183,7 @@ export function handleTokenDeployed(event: TokenDeployed): void {
   getOrCreateTokenSymbol(
     event.params.symbol,
     event.params.tokenAddresses.toHexString(),
-    TokenType.EXTERNAL
+    tokenType
   );
 }
 
