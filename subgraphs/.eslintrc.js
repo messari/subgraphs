@@ -54,6 +54,9 @@ module.exports = {
     // disallow magic numbers: https://eslint.org/docs/latest/rules/no-magic-numbers
     "@typescript-eslint/no-magic-numbers": "error",
 
+    // Enforce for cleanliness
+    "@typescript-eslint/no-unused-vars": "error",
+
     // enforce camelCase naming
     // https://eslint.org/docs/latest/rules/camelcase
     "@typescript-eslint/naming-convention": [
