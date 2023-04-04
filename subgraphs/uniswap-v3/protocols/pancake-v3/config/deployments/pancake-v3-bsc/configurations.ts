@@ -55,10 +55,14 @@ export class PancakeV3BSCConfigurations implements Configurations {
       "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d", // USDC
       "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3", // DAI
       "0x55d398326f99059ff775485246999027b3197955", // USDT
+      "0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
     ]);
   }
   getStableOraclePools(): Bytes[] {
-    return stringToBytesList([]);
+    return stringToBytesList([
+      "0x36696169c63e42cd08ce11f5deebbcebae652050", // wBNB/Tether - 0.05
+      "0x81a9b5f18179ce2bf8f001b8a634db80771f1824", // wBNB/USDC - 0.05
+    ]);
   }
   getUntrackedPairs(): Bytes[] {
     return stringToBytesList([]);

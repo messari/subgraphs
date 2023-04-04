@@ -61,8 +61,8 @@ export class PancakeV3EthereumConfigurations implements Configurations {
   }
   getStableOraclePools(): Bytes[] {
     return stringToBytesList([
-      "0x1ac1a8feaaea1900c4166deeed0c11cc10669d36", // USDC/wETH
-      "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", // WETH/USDT
+      "0x1ac1a8feaaea1900c4166deeed0c11cc10669d36", // USDC/wETH - 0.05
+      "0x6ca298d2983ab03aa1da7679389d955a4efee15c", // WETH/USDT - 0.05
     ]);
   }
   getUntrackedPairs(): Bytes[] {
