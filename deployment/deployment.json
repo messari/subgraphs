@@ -4041,13 +4041,13 @@
       }
     }
   },
-  "pancake-v3": {
+  "pancakeswap-v3": {
     "schema": "dex-amm",
     "base": "uniswap-v3",
-    "protocol": "pancake-v3",
-    "project": "pancake",
+    "protocol": "pancakeswap-v3",
+    "project": "pancakeswap",
     "deployments": {
-      "pancake-v3-bsc": {
+      "pancakeswap-v3-bsc": {
         "network": "bsc",
         "status": "dev",
         "versions": {
@@ -4064,12 +4064,12 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "pancake-v3-bsc",
-            "query-id": "pancake-v3-bsc"
+            "slug": "pancakeswap-v3-bsc",
+            "query-id": "pancakeswap-v3-bsc"
           }
         }
       },
-      "pancake-v3-ethereum": {
+      "pancakeswap-v3-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -4086,8 +4086,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "pancake-v3-ethereum",
-            "query-id": "pancake-v3-ethereum"
+            "slug": "pancakeswap-v3-ethereum",
+            "query-id": "pancakeswap-v3-ethereum"
           }
         }
       }

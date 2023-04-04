@@ -3,8 +3,8 @@ import { UniswapV3MainnetConfigurations } from "../../protocols/uniswap-v3/confi
 import { UniswapV3MaticConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-polygon/configurations";
 import { UniswapV3OptimismConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-optimism/configurations";
 import { UniswapV3CeloConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-celo/configurations";
-import { PancakeV3BSCConfigurations } from "../../protocols/pancake-v3/config/deployments/pancake-v3-bsc/configurations";
-import { PancakeV3EthereumConfigurations } from "../../protocols/pancake-v3/config/deployments/pancake-v3-ethereum/configurations";
+import { PancakeV3BSCConfigurations } from "../../protocols/pancakeswap-v3/config/deployments/pancakeswap-v3-bsc/configurations";
+import { PancakeV3EthereumConfigurations } from "../../protocols/pancakeswap-v3/config/deployments/pancakeswap-v3-ethereum/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
