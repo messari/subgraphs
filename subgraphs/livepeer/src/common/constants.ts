@@ -120,11 +120,12 @@ export const WETH_ADDRESS = Address.fromString(
 );
 
 export const WETH_DECIMALS = 18;
-
 export const UNISWAP_V3_LPT_ETH_POOL_ADDRESS = Address.fromString(
   "4fd47e5102dfbf95541f64ed6fe13d4ed26d2546"
 );
-
 export const UNISWAP_V3_DAI_ETH_POOL_ADDRESS = Address.fromString(
   "a961f0473da4864c5ed28e00fcc53a3aab056c1b"
 );
+
+export const QI92 =
+  "6277101735386680763835789423207666416102355444464034512896"; // 2 ** 192

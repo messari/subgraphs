@@ -34,7 +34,7 @@ export function sqrtPriceX96ToTokenPrices(
   token0Decimals: BigInt,
   token1Decimals: BigInt
 ): BigDecimal[] {
-  const Q192 = "6277101735386680763835789423207666416102355444464034512896"; // 2 ** 192
+  const Q192 = constants.QI92;
   const num = sqrtPriceX96.times(sqrtPriceX96).toBigDecimal();
   const denom = BigDecimal.fromString(Q192);
   const price1 = num
