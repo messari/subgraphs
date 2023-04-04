@@ -1,10 +1,11 @@
-import { ethereum, Bytes, Address } from "@graphprotocol/graph-ts";
+import { ethereum, Bytes, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   Account,
   LiquidityPool,
   Position,
   PositionSnapshot,
   _PositionCounter,
+  _PositionMap,
 } from "../../generated/schema";
 import { Vault } from "../../generated/Vault/Vault";
 import { NetworkConfigs } from "../../configurations/configure";
@@ -126,6 +127,7 @@ export function getOrCreateUserPosition(
 
 export function updateUserPosition(
   event: ethereum.Event,
+  positionKey: Bytes,
   account: Account,
   pool: LiquidityPool,
   collateralTokenAddress: Address,
@@ -160,6 +162,9 @@ export function updateUserPosition(
   if (position.side == PositionSide.SHORT) {
     isLong = false;
   }
+
+  const prevBalanceUSD = position.balanceUSD;
+  const prevCollateralBalanceUSD = position.collateralBalanceUSD;
   const vaultContract = Vault.bind(
     Address.fromBytes(NetworkConfigs.getVaultAddress())
   );
@@ -209,7 +214,14 @@ export function updateUserPosition(
   position.save();
 
   if (position.balanceUSD == BIGDECIMAL_ZERO) {
-    closePosition(event, account, pool, position);
+    closePosition(
+      event,
+      account,
+      pool,
+      position,
+      prevBalanceUSD,
+      prevCollateralBalanceUSD
+    );
   }
 
   createPositionSnapshot(event, position);
@@ -236,17 +248,68 @@ export function createPositionSnapshot(
   snapshot.collateralBalance = position.collateralBalance;
   snapshot.balanceUSD = position.balanceUSD;
   snapshot.collateralBalanceUSD = position.collateralBalanceUSD;
+  snapshot.realisedPnlUSD = position.realisedPnlUSD;
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
 
   snapshot.save();
 }
 
+export function createPositionMap(
+  positionKey: Bytes,
+  account: Account,
+  pool: LiquidityPool,
+  collateralTokenAddress: Address,
+  indexTokenAddress: Address,
+  positionSide: string
+): _PositionMap {
+  const positionMap = new _PositionMap(positionKey);
+  positionMap.positionId = getPositionID(
+    account,
+    pool,
+    collateralTokenAddress,
+    indexTokenAddress,
+    positionSide
+  );
+  positionMap.save();
+
+  return positionMap;
+}
+
+export function getPositionIdWithKey(positionKey: Bytes): Bytes | null {
+  const positionMap = _PositionMap.load(positionKey);
+  if (positionMap) {
+    return positionMap.positionId;
+  }
+
+  return null;
+}
+
+export function updatePositionRealisedPnlUSD(
+  positionKey: Bytes,
+  realisedPnlUSD: BigDecimal
+): void {
+  const positionMap = _PositionMap.load(positionKey);
+  if (!positionMap) {
+    return;
+  }
+
+  const position = Position.load(positionMap.positionId);
+  if (!position) {
+    return;
+  }
+
+  position.realisedPnlUSD = realisedPnlUSD;
+  position.save();
+}
+
 function closePosition(
   event: ethereum.Event,
   account: Account,
   pool: LiquidityPool,
-  position: Position
+  position: Position,
+  prevBalanceUSD: BigDecimal,
+  prevCollateralBalanceUSD: BigDecimal
 ): void {
   const fundingTokenIndex = pool.inputTokens.indexOf(position.collateral);
   if (fundingTokenIndex >= 0) {
@@ -257,6 +320,8 @@ function closePosition(
   position.balanceUSD = BIGDECIMAL_ZERO;
   position.collateralBalance = BIGINT_ZERO;
   position.collateralBalanceUSD = BIGDECIMAL_ZERO;
+  position.closeBalanceUSD = prevBalanceUSD;
+  position.closeCollateralBalanceUSD = prevCollateralBalanceUSD;
   position.hashClosed = event.transaction.hash;
   position.blockNumberClosed = event.block.number;
   position.timestampClosed = event.block.timestamp;
