@@ -16,6 +16,13 @@ module.exports = {
 
   create: function (context) {
     function checkLogCallOrStringMethods(node, ancestors, logValue) {
+      // allowed methods using string literal as arguments
+      // e.g. Bytes.fromHexString("0x123456789abcdef")
+      // BigInt.fromString("1")
+      const ALLOWED_METHODS = ["fromString", "fromHexString"];
+      // allowed string methods: e.g. "daily-".concat(poolId)
+      const ALLOWED_STRING_METHODS = ["concat"];
+
       const callExpressionAncestor = ancestors.find(
         (ancestor) => ancestor.type === "CallExpression"
       );
@@ -26,8 +33,8 @@ module.exports = {
           callee.type === "MemberExpression" &&
           (callee.object.name === "log" ||
             // these may need to be expanded to include more methods
-            ["fromString"].includes(callee.property.name) ||
-            ["concat", "toLowerCase"].includes(callee.property.name))
+            ALLOWED_METHODS.includes(callee.property.name) ||
+            ALLOWED_STRING_METHODS.includes(callee.property.name))
         ) {
           return false;
         }
