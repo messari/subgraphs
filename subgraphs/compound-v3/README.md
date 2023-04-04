@@ -87,6 +87,7 @@ Some of the new features in Compound III not found in V2 are:
 - Position ID is often not found in `subtractPosition()`. Expect base token positions to be off.
   - This is because the baseToken is so fluid, to fix this we would need to open a supply and borrow position each time a user updates their cUSDC balance.
   - We need to account for any double counting with this.
+- In the beginning of Compound V3 Polygon there are cases where the borrow rate is higher than the supply rate. To cover this, we skip the revenue calculation on that block.
 
 ## Reference and Useful Links
 
