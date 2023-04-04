@@ -263,7 +263,7 @@ type DerivOptProtocol implements Protocol @entity {
   " All historical notional volume in USD taken of underlying at time of contract minting"
   cumulativeVolumeUSD: BigDecimal!
 
-  " All historical volume of Collateral assets in USD in this pool"
+  " All historical volume of Collateral assets in USD in this pool that was used for trading"
   cumulativeCollateralVolumeUSD: BigDecimal
 
   " All historical notional volume in USD taken of underlying at time of contract exercise"
@@ -462,10 +462,10 @@ type FinancialsDailySnapshot @entity(immutable: true) {
   " All historical trade notional volume of underylying assets in USD "
   cumulativeVolumeUSD: BigDecimal!
 
-  " Daily volume of Collateral assets in USD in this pool"
+  " Daily volume of Collateral assets in USD in this pool that was used for trading"
   dailyCollateralVolumeUSD: BigDecimal
 
-  " All historical volume of Collateral assets in USD in this pool"
+  " All historical volume of Collateral assets in USD in this pool that was used for trading"
   cumulativeCollateralVolumeUSD: BigDecimal
 
   " Daily notional volume in USD taken of underlying at time of contract exercise"
@@ -659,7 +659,7 @@ type LiquidityPool @entity {
   " All historical trade notional volume of underylying assets in USD in this pool "
   cumulativeVolumeUSD: BigDecimal!
 
-  " All historical volume of Collateral assets in USD in this pool "
+  " All historical volume of Collateral assets in USD in this pool, that was used for trading "
   cumulativeCollateralVolumeUSD: BigDecimal
 
   " All historical deposit notional volume occurred in this pool, in USD "
@@ -896,7 +896,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Daily trade notional volume occurred when contract created, in USD "
   dailyVolumeUSD: BigDecimal!
 
-  " Daily volume of collateral when contract created, in USD "
+  " Daily volume of collateral when contract created, in USD, that was used for trading "
   dailyCollateralVolumeUSD: BigDecimal
 
   " Daily trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
@@ -908,7 +908,7 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " All historical trade notional volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 
-  " All historical volume of Collateral assets in USD in this pool"
+  " All historical volume of Collateral assets in USD in this pool, that was used for trading"
   cumulativeCollateralVolumeUSD: BigDecimal
 
   " All trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
