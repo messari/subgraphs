@@ -91,6 +91,7 @@ export function takeLiquidityPoolDailySnapshot(
   let prevCumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
   let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
+  let prevCumulativeCollateralVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeDepositedVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeWithdrawVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeClosedVolumeUSD = BIGDECIMAL_ZERO;
@@ -137,6 +138,8 @@ export function takeLiquidityPoolDailySnapshot(
     prevCumulativeTotalRevenueUSD = prevPoolMetrics.cumulativeTotalRevenueUSD;
 
     prevCumulativeVolumeUSD = prevPoolMetrics.cumulativeVolumeUSD;
+    prevCumulativeCollateralVolumeUSD =
+      prevPoolMetrics.cumulativeCollateralVolumeUSD!;
     prevCumulativeDepositedVolumeUSD =
       prevPoolMetrics.cumulativeDepositedVolumeUSD;
     prevCumulativeWithdrawVolumeUSD =
@@ -246,6 +249,12 @@ export function takeLiquidityPoolDailySnapshot(
     prevCumulativeVolumeUSD
   );
   poolMetrics.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
+  poolMetrics.dailyCollateralVolumeUSD =
+    pool.cumulativeCollateralVolumeUSD!.minus(
+      prevCumulativeCollateralVolumeUSD
+    );
+  poolMetrics.cumulativeCollateralVolumeUSD =
+    pool.cumulativeCollateralVolumeUSD;
 
   poolMetrics.dailyDepositedVolumeUSD = pool.cumulativeDepositedVolumeUSD.minus(
     prevCumulativeDepositedVolumeUSD
@@ -572,6 +581,7 @@ export function takeFinancialDailySnapshot(
   );
 
   let prevCumulativeVolumeUSD = BIGDECIMAL_ZERO;
+  let prevCumulativeCollateralVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeExercisedVolumeUSD = BIGDECIMAL_ZERO;
   let prevCumulativeClosedVolumeUSD = BIGDECIMAL_ZERO;
 
@@ -595,6 +605,8 @@ export function takeFinancialDailySnapshot(
 
   if (prevFinancialMetrics) {
     prevCumulativeVolumeUSD = prevFinancialMetrics.cumulativeVolumeUSD;
+    prevCumulativeCollateralVolumeUSD =
+      prevFinancialMetrics.cumulativeCollateralVolumeUSD!;
     prevCumulativeExercisedVolumeUSD =
       prevFinancialMetrics.cumulativeExercisedVolumeUSD;
     prevCumulativeClosedVolumeUSD =
@@ -642,6 +654,12 @@ export function takeFinancialDailySnapshot(
   financialMetrics.dailyVolumeUSD = protocol.cumulativeVolumeUSD.minus(
     prevCumulativeVolumeUSD
   );
+  financialMetrics.cumulativeCollateralVolumeUSD =
+    protocol.cumulativeCollateralVolumeUSD;
+  financialMetrics.dailyCollateralVolumeUSD =
+    protocol.cumulativeCollateralVolumeUSD!.minus(
+      prevCumulativeCollateralVolumeUSD
+    );
   financialMetrics.cumulativeExercisedVolumeUSD =
     protocol.cumulativeExercisedVolumeUSD;
   financialMetrics.dailyExercisedVolumeUSD =

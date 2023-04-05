@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -173,3 +173,13 @@ export const PROTOCOL_ADDRESS = "0xd74c61ca8917be73377d74a007e6f002c25efb4e";
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 export const PRICE_PRECISION = BigDecimal.fromString("100000000");
 export const CHAIN_LINK = "chainlink";
+export const addressLookupTable = new TypedMap<string, string>();
+addressLookupTable.set("rDPX", "0x32eb7902d4134bf98a28b963d26de779af92a212");
+addressLookupTable.set("DPX", "0x6c2c06790b3e3e3c38e12ee22f8183b37a13ee55");
+addressLookupTable.set("stETH", "0x5979d7b546e38e414f7e9822514be443a4800529");
+addressLookupTable.set("BTC", "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f");
+addressLookupTable.set("ETH", "0x82af49447d8a07e3bd95bd0d56f35241523fbab1");
+addressLookupTable.set("CRV", "0x11cdb42b0eb46d95f990bedd4695a6e3fa034978");
+addressLookupTable.set("GMX", "0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a");
+addressLookupTable.set("gOHM", "0x8d9ba570d6cb60C7e3e0f31343efe75ab8e65fb1");
+addressLookupTable.set("MATIC", "0x0000000000000000000000000000000000001010");

@@ -29,6 +29,7 @@ export function getOrCreateProtocol(): DerivOptProtocol {
     protocol.protocolControlledValueUSD = BIGDECIMAL_ZERO;
     protocol.openInterestUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeCollateralVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeExercisedVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeClosedVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -85,6 +86,7 @@ export function increaseSupplySideRevenue(
 export function increaseProtocolVolume(
   event: ethereum.Event,
   sizeUSDDelta: BigDecimal,
+  collateralUSDDelta: BigDecimal,
   eventType: EventType
 ): void {
   const protocol = getOrCreateProtocol();
@@ -97,6 +99,8 @@ export function increaseProtocolVolume(
   }
   protocol.cumulativeVolumeUSD =
     protocol.cumulativeVolumeUSD.plus(sizeUSDDelta);
+  protocol.cumulativeCollateralVolumeUSD =
+    protocol.cumulativeCollateralVolumeUSD!.plus(collateralUSDDelta);
 
   protocol._lastUpdateTimestamp = event.block.timestamp;
   protocol.save();

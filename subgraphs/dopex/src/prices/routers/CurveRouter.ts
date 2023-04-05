@@ -3,8 +3,8 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { BigInt, Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
-import { CurvePool as CurvePoolContract } from "../../../generated/DPXMonthlyCalls/CurvePool";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/DPXMonthlyCalls/CurveRegistry";
+import { CurvePool as CurvePoolContract } from "../../../generated/BasicWeeklyCalls/CurvePool";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/BasicWeeklyCalls/CurveRegistry";
 
 export function isCurveLpToken(
   lpAddress: Address,

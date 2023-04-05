@@ -6,7 +6,7 @@ import {
   Settle,
   Ssov,
   Withdraw,
-} from "../../generated/DPXMonthlyCalls/Ssov";
+} from "../../generated/BasicWeeklyCalls/Ssov";
 import { updateRewards } from "./StakingStrategy";
 import {
   getOrCreateLiquidityPool,
@@ -27,7 +27,12 @@ import { getOrCreateToken, updateTokenPrice } from "../entities/token";
 import { closeUserPosition, createUserPosition } from "../entities/position";
 import { takeSnapshots, updateTempUsageMetrics } from "../entities/snapshots";
 import { convertTokenToDecimal } from "../utils/numbers";
-import { BIGINT_ZERO, OptionType, PRICE_PRECISION } from "../utils/constants";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  OptionType,
+  PRICE_PRECISION,
+} from "../utils/constants";
 import { createOption } from "../entities/option";
 
 export function handleDeposit(event: Deposit): void {
@@ -108,6 +113,7 @@ function handleUpdateLiquidityEvent(
   increasePoolVolume(
     event,
     pool,
+    BIGINT_ZERO,
     amountChangeUSD,
     amountChange,
     amountChangeUSD,
@@ -208,6 +214,7 @@ export function handleUpdatePositionEvent(
     increasePoolVolume(
       event,
       pool,
+      optionAmount,
       sizeUSDDelta,
       purchasePremiumAmount,
       purchasePremiumUSD,
@@ -231,6 +238,7 @@ export function handleUpdatePositionEvent(
     increasePoolVolume(
       event,
       pool,
+      optionAmount,
       sizeUSDDelta,
       settlePnLAmount,
       settlePnLUSD,

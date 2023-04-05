@@ -6,7 +6,7 @@ dataSources:
   {{#ssov}}
   - kind: ethereum/contract
     name:  {{ name }}
-    network: arbitrum-one
+    network:  {{ network }}
     source:
       address:  "{{ address }}"
       abi: Ssov
@@ -56,8 +56,6 @@ dataSources:
           file: ./abis/SsovV3OptionsToken.json
         - name: ERC20
           file: ./abis/ERC20.json
-        - name: PriceOracle
-          file: ./abis/PriceOracle.json
         - name: StakingStrategyV1
           file: ./abis/StakingStrategyV1.json
         - name: StakingStrategyV2

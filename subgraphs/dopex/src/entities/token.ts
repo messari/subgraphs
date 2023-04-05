@@ -1,5 +1,5 @@
 import { Address, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { ERC20 } from "../../generated/DPXMonthlyCalls/ERC20";
+import { ERC20 } from "../../generated/BasicWeeklyCalls/ERC20";
 import { Token, RewardToken } from "../../generated/schema";
 import { getUsdPricePerToken } from "../prices";
 import {

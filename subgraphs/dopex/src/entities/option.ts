@@ -1,7 +1,7 @@
 import { ethereum, Bytes, Address, BigInt } from "@graphprotocol/graph-ts";
 import { LiquidityPool, Option } from "../../generated/schema";
 import { OptionType, PRICE_PRECISION } from "../utils/constants";
-import { SsovV3OptionsToken } from "../../generated/DPXMonthlyCalls/SsovV3OptionsToken";
+import { SsovV3OptionsToken } from "../../generated/BasicWeeklyCalls/SsovV3OptionsToken";
 import { getOrCreateToken } from "./token";
 
 export function getOption(
@@ -12,7 +12,7 @@ export function getOption(
   optionType: string
 ): Option | null {
   const optionId = getOptionID(pool, epoch, strike, optionType);
-  return Option.load(optionId)!;
+  return Option.load(optionId);
 }
 
 export function createOption(
@@ -30,6 +30,7 @@ export function createOption(
   const option = new Option(optionId);
   option.type = optionType;
   option.pool = pool.id;
+  option.underlyingAsset = pool._underlyingAsset;
   option.collateralAsset = pool.inputTokens[0];
   option.strikePrice = strike.divDecimal(PRICE_PRECISION);
   option.createdTimestamp = event.block.timestamp;

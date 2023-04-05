@@ -1,4 +1,5 @@
 {
+  "network": "arbitrum-one",
   "ssov": [
     {
       "name": "RDPXMonthlyCalls",
@@ -21,7 +22,7 @@
       "startBlock": 22833452
     },
     {
-      "name": "DPXWeeklyCalls",
+      "name": "BasicWeeklyCalls",
       "address": "0x10FD85ec522C245a63239b9FC64434F58520bd1f",
       "startBlock": 22833438
     },

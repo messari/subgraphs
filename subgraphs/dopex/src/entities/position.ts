@@ -1,10 +1,4 @@
-import {
-  ethereum,
-  Bytes,
-  Address,
-  BigDecimal,
-  BigInt,
-} from "@graphprotocol/graph-ts";
+import { ethereum, Bytes, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Account, LiquidityPool, Position } from "../../generated/schema";
 import { updateAccountOpenPositionCount } from "./account";
 import { updatePoolOpenPositionCount } from "./pool";
@@ -18,8 +12,8 @@ import {
   convertTokenToDecimal,
   exponentToBigDecimal,
 } from "../utils/numbers";
-import { PriceOracle } from "../../generated/DPXMonthlyCalls/PriceOracle";
 import { getOption } from "./option";
+import { Ssov } from "../../generated/BasicWeeklyCalls/Ssov";
 
 export function getUserPosition(
   event: ethereum.Event,
@@ -47,14 +41,15 @@ export function createUserPosition(
   const position = new Position(positionId);
   position.pool = pool.id;
   position.account = account.id;
+  position.asset = pool._underlyingAsset;
   position.option = getOption(event, pool, epoch, strike, optionType)!.id;
   position.takenHash = event.transaction.hash;
   position.takenBlockNumber = event.block.number;
   position.takenTimestamp = event.block.timestamp;
 
   let takenPrice = BIGDECIMAL_ZERO;
-  const priceOracle = PriceOracle.bind(Address.fromBytes(pool._oracleAddress!));
-  const tryGetUnderlyingPrice = priceOracle.try_getUnderlyingPrice();
+  const ssoveContract = Ssov.bind(event.address);
+  const tryGetUnderlyingPrice = ssoveContract.try_getUnderlyingPrice();
   if (!tryGetUnderlyingPrice.reverted) {
     takenPrice = tryGetUnderlyingPrice.value.divDecimal(PRICE_PRECISION);
   }

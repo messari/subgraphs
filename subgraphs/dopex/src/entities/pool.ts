@@ -32,10 +32,11 @@ import {
   LiquidityPoolFeeType,
   BIGDECIMAL_HUNDRED,
   CHAIN_LINK,
+  addressLookupTable,
 } from "../utils/constants";
 import { convertTokenToDecimal, multiArraySort } from "../utils/numbers";
 import { enumToPrefix } from "../utils/strings";
-import { Ssov } from "../../generated/DPXMonthlyCalls/Ssov";
+import { Ssov } from "../../generated/BasicWeeklyCalls/Ssov";
 
 export function getOrCreateLiquidityPool(
   event: ethereum.Event,
@@ -64,12 +65,20 @@ export function getOrCreateLiquidityPool(
       const collateralToken = getOrCreateToken(event, tryCollateralToken.value);
       pool.inputTokens = [collateralToken.id];
     }
+    const tryUnderlyingSymbol = ssovContract.try_underlyingSymbol();
+    if (!tryUnderlyingSymbol.reverted) {
+      const UnderlyingAssetAddressString = addressLookupTable.get(
+        tryUnderlyingSymbol.value
+      );
+      if (UnderlyingAssetAddressString) {
+        pool._underlyingAsset = getOrCreateToken(
+          event,
+          Address.fromString(UnderlyingAssetAddressString)
+        ).id;
+      }
+    }
 
     pool.oracle = CHAIN_LINK;
-    const tryAddresses = ssovContract.try_addresses();
-    if (!tryAddresses.reverted) {
-      pool._oracleAddress = tryAddresses.value.getPriceOracle();
-    }
     const tryIsPut = ssovContract.try_isPut();
     if (!tryIsPut.reverted) {
       pool._isPut = tryIsPut.value;
@@ -102,6 +111,7 @@ export function getOrCreateLiquidityPool(
     pool.cumulativeTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
 
     pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeCollateralVolumeUSD = BIGDECIMAL_ZERO;
     pool.cumulativeExercisedVolumeUSD = BIGDECIMAL_ZERO;
     pool.cumulativeClosedVolumeUSD = BIGDECIMAL_ZERO;
     pool.openInterestUSD = BIGDECIMAL_ZERO;
@@ -148,6 +158,7 @@ export function getOrCreateLiquidityPool(
 export function increasePoolVolume(
   event: ethereum.Event,
   pool: LiquidityPool,
+  sizeAmountDelta: BigInt,
   sizeUSDDelta: BigDecimal,
   collateralAmountDelta: BigInt,
   collateralUSDDelta: BigDecimal,
@@ -209,21 +220,22 @@ export function increasePoolVolume(
   }
 
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(sizeUSDDelta);
+  pool.cumulativeCollateralVolumeUSD =
+    pool.cumulativeCollateralVolumeUSD!.plus(collateralUSDDelta);
 
   const cumulativeVolumeByTokenAmount = pool.cumulativeVolumeByTokenAmount;
   const cumulativeVolumeByTokenUSD = pool.cumulativeVolumeByTokenUSD;
-  cumulativeVolumeByTokenAmount[0] = cumulativeVolumeByTokenAmount[0].plus(
-    collateralAmountDelta
-  );
+  cumulativeVolumeByTokenAmount[0] =
+    cumulativeVolumeByTokenAmount[0].plus(sizeAmountDelta);
   cumulativeVolumeByTokenUSD[0] =
-    cumulativeVolumeByTokenUSD[0].plus(collateralUSDDelta);
+    cumulativeVolumeByTokenUSD[0].plus(sizeUSDDelta);
   pool.cumulativeVolumeByTokenAmount = cumulativeVolumeByTokenAmount;
   pool.cumulativeVolumeByTokenUSD = cumulativeVolumeByTokenUSD;
 
   pool._lastUpdateTimestamp = event.block.timestamp;
   pool.save();
 
-  increaseProtocolVolume(event, sizeUSDDelta, eventType);
+  increaseProtocolVolume(event, sizeUSDDelta, collateralUSDDelta, eventType);
 }
 
 export function increasePoolPremium(

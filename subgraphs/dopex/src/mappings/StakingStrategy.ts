@@ -1,8 +1,8 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { LiquidityPool } from "../../generated/schema";
-import { Ssov } from "../../generated/DPXMonthlyCalls/Ssov";
-import { StakingStrategyV1 } from "../../generated/DPXMonthlyCalls/StakingStrategyV1";
-import { StakingStrategyV2 } from "../../generated/DPXMonthlyCalls/StakingStrategyV2";
+import { Ssov } from "../../generated/BasicWeeklyCalls/Ssov";
+import { StakingStrategyV1 } from "../../generated/BasicWeeklyCalls/StakingStrategyV1";
+import { StakingStrategyV2 } from "../../generated/BasicWeeklyCalls/StakingStrategyV2";
 import { getOrCreateToken, getOrCreateRewardToken } from "../entities/token";
 import { updatePoolRewardToken } from "../entities/pool";
 import { bigDecimalToBigInt, convertTokenToDecimal } from "../utils/numbers";
