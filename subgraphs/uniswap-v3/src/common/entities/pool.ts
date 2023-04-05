@@ -19,7 +19,6 @@ import {
   INT_ONE,
   INT_ZERO,
   LiquidityPoolFeeType,
-  PROTOCOL_FEE_TO_OFF,
   TokenType,
   BIGDECIMAL_ONE,
   FeeSwitch,
