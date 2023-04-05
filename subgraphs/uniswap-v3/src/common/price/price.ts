@@ -63,11 +63,6 @@ export function getNativeTokenPriceInUSD(nativeToken: Token): BigDecimal {
   let stableAmount = BIGDECIMAL_ZERO;
   let tokenIndicator: i32;
 
-  if (NetworkConfigs.getStableOraclePools().length == 0) {
-    log.warning("No STABLE_ORACLE_POOLS given", []);
-    return BIGDECIMAL_ZERO;
-  }
-
   let largestPool = _LiquidityPoolAmount.load(
     NetworkConfigs.getStableOraclePools()[0]
   );
