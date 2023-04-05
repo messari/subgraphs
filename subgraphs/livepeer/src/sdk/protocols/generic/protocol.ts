@@ -74,7 +74,7 @@ export class ProtocolManager {
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
-    protocol.cumulativeTransactionCount = 0;
+    protocol._cumulativeTransactionCount = 0;
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
 
@@ -244,7 +244,7 @@ export class ProtocolManager {
   }
 
   addTransaction(): void {
-    this.protocol.cumulativeTransactionCount += 1;
+    this.protocol._cumulativeTransactionCount += 1;
     this.save();
   }
 }
