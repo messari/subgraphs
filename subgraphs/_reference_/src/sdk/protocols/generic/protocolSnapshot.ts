@@ -1,4 +1,4 @@
-import { Bytes } from "@graphprotocol/graph-ts";
+import { Bytes, BigInt } from "@graphprotocol/graph-ts";
 import { AccountWasActive } from "./account";
 import {
   Protocol as ProtocolSchema,
@@ -44,20 +44,20 @@ export class ProtocolSnapshot {
 
   private takeSnapshots(): void {
     const snapshotDayID =
-      this.protocol.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
+      this.protocol.lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
     const snapshotHourID =
-      this.protocol.lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
+      this.protocol.lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
 
     if (snapshotDayID != this.dayID) {
       this.takeFinancialsDailySnapshot(snapshotDayID);
       this.takeUsageDailySnapshot(snapshotDayID);
-      this.protocol.lastSnapshotDayID = snapshotDayID;
+      this.protocol.lastSnapshotDayID = BigInt.fromI32(snapshotDayID);
       this.protocol.save();
     }
 
     if (snapshotHourID != this.hourID) {
       this.takeUsageHourlySnapshot(snapshotHourID);
-      this.protocol.lastSnapshotHourID = snapshotHourID;
+      this.protocol.lastSnapshotHourID = BigInt.fromI32(snapshotHourID);
       this.protocol.save();
     }
   }
@@ -65,7 +65,7 @@ export class ProtocolSnapshot {
   private takeFinancialsDailySnapshot(day: i32): void {
     const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = FinancialsDailySnapshot.load(
-      this.protocol.lastSnapshotDayID
+      Bytes.fromI32(this.protocol.lastSnapshotDayID!.toI32())
     );
 
     snapshot.day = day;
@@ -115,7 +115,7 @@ export class ProtocolSnapshot {
 
     const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = UsageMetricsDailySnapshot.load(
-      this.protocol.lastSnapshotDayID
+      Bytes.fromI32(this.protocol.lastSnapshotDayID!.toI32())
     );
 
     snapshot.protocol = this.protocol.id;
@@ -125,32 +125,24 @@ export class ProtocolSnapshot {
 
     // unique users
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
-    snapshot.cumulativeUniqueTransferSenders =
-      this.protocol.cumulativeUniqueTransferSenders;
-    snapshot.cumulativeUniqueTransferReceivers =
-      this.protocol.cumulativeUniqueTransferReceivers;
-    snapshot.cumulativeUniqueLiquidityProviders =
-      this.protocol.cumulativeUniqueLiquidityProviders;
-    snapshot.cumulativeUniqueMessageSenders =
-      this.protocol.cumulativeUniqueMessageSenders;
 
     // daily activity
     snapshot.dailyActiveUsers = activity.dailyActiveUsers;
 
     // transaction counts
-    snapshot.cumulativeTransactionCount =
-      this.protocol.cumulativeTransactionCount;
+    snapshot._cumulativeTransactionCount =
+      this.protocol._cumulativeTransactionCount;
 
     // misc
     snapshot.totalPoolCount = this.protocol.totalPoolCount;
 
     // deltas
-    let transactionDelta = snapshot.cumulativeTransactionCount;
+    let transactionDelta = snapshot._cumulativeTransactionCount;
 
     if (previousSnapshot) {
       transactionDelta =
-        snapshot.cumulativeTransactionCount -
-        previousSnapshot.cumulativeTransactionCount;
+        snapshot._cumulativeTransactionCount -
+        previousSnapshot._cumulativeTransactionCount;
     }
     snapshot.dailyTransactionCount = transactionDelta;
     snapshot.save();
@@ -164,7 +156,7 @@ export class ProtocolSnapshot {
 
     const snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
     const previousSnapshot = UsageMetricsHourlySnapshot.load(
-      this.protocol.lastSnapshotHourID
+      Bytes.fromI32(this.protocol.lastSnapshotHourID!.toI32())
     );
 
     snapshot.protocol = this.protocol.id;
@@ -179,15 +171,15 @@ export class ProtocolSnapshot {
     snapshot.hourlyActiveUsers = activity.hourlyActiveUsers;
 
     // transaction counts
-    snapshot.cumulativeTransactionCount =
-      this.protocol.cumulativeTransactionCount;
+    snapshot._cumulativeTransactionCount =
+      this.protocol._cumulativeTransactionCount;
 
     // deltas
-    let transactionDelta = snapshot.cumulativeTransactionCount;
+    let transactionDelta = snapshot._cumulativeTransactionCount;
     if (previousSnapshot) {
       transactionDelta =
-        snapshot.cumulativeTransactionCount -
-        previousSnapshot.cumulativeTransactionCount;
+        snapshot._cumulativeTransactionCount -
+        previousSnapshot._cumulativeTransactionCount;
     }
     snapshot.hourlyTransactionCount = transactionDelta;
     snapshot.save();

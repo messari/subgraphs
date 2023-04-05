@@ -1,3 +1,4 @@
+import { BigInt } from "@graphprotocol/graph-ts";
 import {
   Pool as PoolSchema,
   PoolDailySnapshot,
@@ -21,39 +22,40 @@ export class PoolSnapshot {
   }
 
   private takeSnapshots(): void {
-    if (!this.isInitialized()) {
-      return;
-    }
+    if (!this.isInitialized()) return;
+    if (!this.pool.lastUpdateTimestamp) return;
 
     const snapshotDayID =
-      this.pool.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
+      this.pool.lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
     const snapshotHourID =
-      this.pool.lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
+      this.pool.lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
 
     if (snapshotDayID != this.dayID) {
       this.takeDailySnapshot(snapshotDayID);
-      this.pool.lastSnapshotDayID = snapshotDayID;
+      this.pool.lastSnapshotDayID = BigInt.fromI32(snapshotDayID);
       this.pool.save();
     }
 
     if (snapshotHourID != this.hourID) {
       this.takeHourlySnapshot(snapshotHourID);
-      this.pool.lastSnapshotHourID = snapshotHourID;
+      this.pool.lastSnapshotHourID = BigInt.fromI32(snapshotHourID);
       this.pool.save();
     }
   }
 
   private isInitialized(): boolean {
-    return this.pool.lastSnapshotDayID && this.pool.lastSnapshotHourID;
+    return this.pool.lastSnapshotDayID && this.pool.lastSnapshotHourID
+      ? true
+      : false;
   }
 
   private takeHourlySnapshot(hour: i32): void {
     const snapshot = new PoolHourlySnapshot(this.pool.id.concatI32(hour));
     const previousSnapshot = PoolHourlySnapshot.load(
-      this.pool.id.concatI32(this.pool.lastSnapshotHourID)
+      this.pool.id.concatI32(this.pool.lastSnapshotHourID!.toI32())
     );
 
-    snapshot.hour = hour;
+    snapshot.hours = hour;
     snapshot.protocol = this.pool.protocol;
     snapshot.pool = this.pool.id;
     snapshot.timestamp = this.event.block.timestamp;
@@ -63,10 +65,7 @@ export class PoolSnapshot {
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenBalancesUSD = this.pool.inputTokenBalancesUSD;
-    snapshot.totalLiquidity = this.pool.totalLiquidity;
-    snapshot.totalLiquidityUSD = this.pool.totalLiquidityUSD;
-    snapshot.stakedLiquidity = this.pool.stakedLiquidity;
-    snapshot.rewardTokenEmissions = this.pool.rewardTokenEmissions;
+    snapshot.rewardTokenEmissionsAmount = this.pool.rewardTokenEmissionsAmount;
     snapshot.rewardTokenEmissionsUSD = this.pool.rewardTokenEmissionsUSD;
 
     // revenues
@@ -103,7 +102,7 @@ export class PoolSnapshot {
   private takeDailySnapshot(day: i32): void {
     const snapshot = new PoolDailySnapshot(this.pool.id.concatI32(day));
     const previousSnapshot = PoolDailySnapshot.load(
-      this.pool.id.concatI32(this.pool.lastSnapshotDayID)
+      this.pool.id.concatI32(this.pool.lastSnapshotDayID!.toI32())
     );
 
     snapshot.day = day;
@@ -116,10 +115,7 @@ export class PoolSnapshot {
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenBalancesUSD = this.pool.inputTokenBalancesUSD;
-    snapshot.totalLiquidity = this.pool.totalLiquidity;
-    snapshot.totalLiquidityUSD = this.pool.totalLiquidityUSD;
-    snapshot.stakedLiquidity = this.pool.stakedLiquidity;
-    snapshot.rewardTokenEmissions = this.pool.rewardTokenEmissions;
+    snapshot.rewardTokenEmissionsAmount = this.pool.rewardTokenEmissionsAmount;
     snapshot.rewardTokenEmissionsUSD = this.pool.rewardTokenEmissionsUSD;
 
     // revenues
