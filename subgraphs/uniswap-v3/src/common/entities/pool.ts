@@ -143,9 +143,9 @@ export function createPoolFees(poolAddress: Bytes, fee: i64): Bytes[] {
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
   poolLpFee.feePercentage =
     NetworkConfigs.getProtocolFeeOnOff() == FeeSwitch.ON
-      ? BIGDECIMAL_ONE.minus(NetworkConfigs.getProtocolFeeRatio(fee)).times(
-          tradingFeePercentage
-        )
+      ? BIGDECIMAL_ONE.minus(
+          NetworkConfigs.getInitialProtocolFeeProportion(fee)
+        ).times(tradingFeePercentage)
       : tradingFeePercentage;
 
   // Protocol Fee
@@ -155,7 +155,9 @@ export function createPoolFees(poolAddress: Bytes, fee: i64): Bytes[] {
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
   poolProtocolFee.feePercentage =
     NetworkConfigs.getProtocolFeeOnOff() == FeeSwitch.ON
-      ? NetworkConfigs.getProtocolFeeRatio(fee).times(tradingFeePercentage)
+      ? NetworkConfigs.getInitialProtocolFeeProportion(fee).times(
+          tradingFeePercentage
+        )
       : BIGDECIMAL_ZERO;
 
   poolLpFee.save();
@@ -167,6 +169,37 @@ export function createPoolFees(poolAddress: Bytes, fee: i64): Bytes[] {
 
 export function getLiquidityPool(poolAddress: Bytes): LiquidityPool | null {
   return LiquidityPool.load(poolAddress);
+}
+
+// Updated protocol fees if specified by SetFeeProtocol event
+export function updateProtocolFees(
+  poolAddress: Bytes,
+  feeProtocol: BigInt
+): void {
+  const poolTradingFee = getLiquidityPoolFee(
+    Bytes.fromHexString("trading-fee-").concat(poolAddress)
+  );
+  const poolLpFee = getLiquidityPoolFee(
+    Bytes.fromHexString("xlp-fee-").concat(poolAddress)
+  );
+  const poolProtocolFee = getLiquidityPoolFee(
+    Bytes.fromHexString("xprotocol-fee-").concat(poolAddress)
+  );
+
+  // Value5 is the feeProtocol variabe in the slot0 struct of the pool contract
+  const protocolFeeProportion =
+    NetworkConfigs.getProtocolFeeProportion(feeProtocol);
+
+  // Update protocol and trading fees for this pool
+  poolLpFee.feePercentage = poolTradingFee.feePercentage!.times(
+    BIGDECIMAL_ONE.minus(protocolFeeProportion)
+  );
+  poolProtocolFee.feePercentage = poolTradingFee.feePercentage!.times(
+    protocolFeeProportion
+  );
+
+  poolLpFee.save();
+  poolProtocolFee.save();
 }
 
 export function getLiquidityPoolAmounts(

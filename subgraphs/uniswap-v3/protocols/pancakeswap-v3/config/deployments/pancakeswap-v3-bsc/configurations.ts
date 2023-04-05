@@ -1,6 +1,7 @@
-import { Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { Factory } from "../../../../../generated/Factory/Factory";
 import {
+  BIGDECIMAL_TEN_THOUSAND,
   FeeSwitch,
   Network,
   RewardIntervalType,
@@ -30,13 +31,16 @@ export class PancakeV3BSCConfigurations implements Configurations {
   getProtocolFeeOnOff(): string {
     return FeeSwitch.ON;
   }
-  getProtocolFeeRatio(fee: i64): BigDecimal {
+  getInitialProtocolFeeProportion(fee: i64): BigDecimal {
     if (fee == 100) {
       return BigDecimal.fromString("0.33");
     } else if (fee == 500) {
       return BigDecimal.fromString("0.34");
     }
     return BigDecimal.fromString("0.32");
+  }
+  getProtocolFeeProportion(protocolFee: BigInt): BigDecimal {
+    return protocolFee.toBigDecimal().div(BIGDECIMAL_TEN_THOUSAND);
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.NONE;

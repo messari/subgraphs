@@ -1,4 +1,4 @@
-import { Bytes, BigDecimal } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Factory } from "../../generated/Factory/Factory";
 
 export interface Configurations {
@@ -8,7 +8,8 @@ export interface Configurations {
   getFactoryAddress(): Bytes;
   getFactoryContract(): Factory;
   getProtocolFeeOnOff(): string;
-  getProtocolFeeRatio(fee: i64): BigDecimal;
+  getInitialProtocolFeeProportion(fee: i64): BigDecimal;
+  getProtocolFeeProportion(protocolFee: BigInt): BigDecimal;
   getRewardIntervalType(): string;
   getReferenceToken(): Bytes;
   getRewardToken(): Bytes;

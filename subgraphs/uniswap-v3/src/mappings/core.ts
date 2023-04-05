@@ -5,14 +5,12 @@ import {
   Burn as BurnEvent,
   Swap as SwapEvent,
   Collect as CollectEvent,
-  SetFeeProtocol,
 } from "../../generated/templates/Pool/Pool";
 import {
   getDepositDeltas,
   incrementDepositHelper,
 } from "../common/entities/deposit";
 import { DexEventHandler } from "../common/dex_event_handler";
-import { updateProtocolFees } from "../common/entities/protocol";
 import { updateTokenPrices } from "../common/entities/token";
 import { getLiquidityPool } from "../common/entities/pool";
 import { getOrCreateTick } from "../common/entities/tick";
@@ -25,11 +23,6 @@ export function handleInitialize(event: Initialize): void {
   const pool = getLiquidityPool(event.address)!;
   pool.tick = BigInt.fromI32(event.params.tick);
   pool.save();
-}
-
-// Update the fees colected by the protocol.
-export function handleSetFeeProtocol(event: SetFeeProtocol): void {
-  updateProtocolFees(event);
 }
 
 // Handle mint event emmitted from a pool contract.
