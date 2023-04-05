@@ -9,14 +9,17 @@ import { SDK } from "../sdk/protocols/generic";
 import * as constants from "../common/constants";
 import { CustomEventType } from "../sdk/util/events";
 import { ProtocolConfig } from "../sdk/protocols/config";
-import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { BondingManager } from "../../generated/BondingManager/BondingManager";
 
 export function createOrUpdatePool(
   poolAddress: Address,
   event: ethereum.Event
 ): void {
-  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) {
+    log.error("[createOrUpdatePool] Pool address null", []);
+    return;
+  }
 
   const sdk = initializeSDK(event);
   const bondingManagerContract = BondingManager.bind(
@@ -50,7 +53,7 @@ export function createOrUpdatePool(
     false
   );
 
-  pool.setInputTokenBalance([poolInputTokenBalance], true);
+  pool.setInputTokenBalances([poolInputTokenBalance], true);
   let rewardTokenEmission = constants.BIGINT_ZERO;
   if (!totalInputTokenBalance.equals(constants.BIGINT_ZERO))
     rewardTokenEmission = poolInputTokenBalance

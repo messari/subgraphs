@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
@@ -17,6 +17,8 @@ export function readValue<T>(
   callResult: ethereum.CallResult<T>,
   defaultValue: T
 ): T {
+  if (callResult.reverted)
+    log.warning("[readValue] Contract call reverted", []);
   return callResult.reverted ? defaultValue : callResult.value;
 }
 

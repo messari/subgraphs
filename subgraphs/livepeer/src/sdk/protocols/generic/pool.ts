@@ -97,6 +97,7 @@ export class Pool {
     this.pool.createdBlockNumber = event.block.number;
 
     this.pool.inputTokenBalances = [];
+    this.pool.inputTokenBalancesUSD = [];
     this.pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -118,16 +119,8 @@ export class Pool {
     let totalValueLockedUSD = BIGDECIMAL_ZERO;
 
     for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
-      const inputTokenBalance = this.pool.inputTokenBalances[idx];
-      const inputToken = this.tokens.getOrCreateToken(
-        Address.fromBytes(this.pool.inputTokens[idx])
-      );
-
-      const amountUSD = this.getInputTokenAmountPrice(
-        inputToken,
-        inputTokenBalance
-      );
-      totalValueLockedUSD = totalValueLockedUSD.plus(amountUSD);
+      const inputTokenBalanceUSD = this.pool.inputTokenBalancesUSD[idx];
+      totalValueLockedUSD = totalValueLockedUSD.plus(inputTokenBalanceUSD);
     }
 
     this.setTotalValueLocked(totalValueLockedUSD);
@@ -170,34 +163,41 @@ export class Pool {
   }
 
   /**
-   * Adds the given amount to the pool's input token balance. It will optionally
-   * update the pool's and protocol's total value locked. If not stated, will default to true.
-   *
-   * @param amount amount to be added to the pool's input token balance.
-   * @param updateMetrics optional parameter to indicate whether to update the pool's and protocol's total value locked.
-   */
-  // addInputTokenBalance(inputTokenId:Bytes,amount: BigInt, updateMetrics: boolean = true): void {
-  //   const inputTokenIndex = this.pool.inputTokens.indexOf(inputTokenId);
-  //   const oldBalances = this.pool.inputTokenBalances;
-  //   oldBalances.at(inputTokenIndex).plus(amount);
-  //   this.setInputTokenBalance(newBalance, updateMetrics);
-  // }
-
-  /**
    * Sets the pool's input token balance to the given amount. It will optionally
    * update the pool's and protocol's total value locked. If not stated, will default to true.
    *
    * @param amount amount to be set as the pool's input token balance.
    * @param updateMetrics optional parameter to indicate whether to update the pool's and protocol's total value locked.
    */
-  setInputTokenBalance(
+  setInputTokenBalances(
     newBalances: BigInt[],
     updateMetrics: boolean = true
   ): void {
     this.pool.inputTokenBalances = newBalances;
+    this.setInputTokenBalancesUSD();
     if (updateMetrics) {
       this.refreshTotalValueLocked();
     }
+  }
+
+  /**
+   * Sets the pool's input token balance USD by calculating it for each token.
+   */
+  setInputTokenBalancesUSD(): void {
+    const inputTokenBalancesUSD: BigDecimal[] = [];
+    for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
+      const inputTokenBalance = this.pool.inputTokenBalances[idx];
+      const inputToken = this.tokens.getOrCreateToken(
+        Address.fromBytes(this.pool.inputTokens[idx])
+      );
+
+      const amountUSD = this.getInputTokenAmountPrice(
+        inputToken,
+        inputTokenBalance
+      );
+      inputTokenBalancesUSD.push(amountUSD);
+    }
+    this.pool.inputTokenBalancesUSD = inputTokenBalancesUSD;
   }
 
   getBytesID(): Bytes {
