@@ -430,7 +430,7 @@ export function handleOTVDeposited(event: OTVDeposited): void {
     event.params.mintChainId,
     poolId,
     dstPoolId,
-    BridgePoolType.BURN_MINT,
+    BridgePoolType.LOCK_RELEASE,
     CrosschainTokenType.WRAPPED,
     event,
     event.params.depositId
@@ -472,7 +472,7 @@ export function handleOTVv2Deposited(event: OTVv2Deposited): void {
     event.params.mintChainId,
     poolId,
     dstPoolId,
-    BridgePoolType.BURN_MINT,
+    BridgePoolType.LOCK_RELEASE,
     CrosschainTokenType.WRAPPED,
     event,
     event.params.depositId
@@ -919,7 +919,7 @@ function _handleOTVWithdrawn(
       thisChainId,
       thisPoolAddress,
       pool.getBytesID(),
-      BridgePoolType.BURN_MINT,
+      BridgePoolType.LOCK_RELEASE,
       CrosschainTokenType.CANONICAL,
       customEvent,
       refId,
