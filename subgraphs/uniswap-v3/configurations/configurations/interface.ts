@@ -7,7 +7,8 @@ export interface Configurations {
   getProtocolSlug(): string;
   getFactoryAddress(): Bytes;
   getFactoryContract(): Factory;
-  getFeeOnOff(): string;
+  getProtocolFeeOnOff(): string;
+  getProtocolFeeRatio(fee: i64): BigDecimal;
   getRewardIntervalType(): string;
   getReferenceToken(): Bytes;
   getRewardToken(): Bytes;

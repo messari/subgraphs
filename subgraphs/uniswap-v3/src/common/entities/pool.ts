@@ -21,11 +21,14 @@ import {
   LiquidityPoolFeeType,
   PROTOCOL_FEE_TO_OFF,
   TokenType,
+  BIGDECIMAL_ONE,
+  FeeSwitch,
 } from "../constants";
 import { convertFeeToPercent, convertTokenToDecimal } from "../utils/utils";
 import { getOrCreateProtocol } from "./protocol";
 import { getOrCreateToken, updateTokenWhitelists } from "./token";
 import { Pool as PoolTemplate } from "../../../generated/templates";
+import { NetworkConfigs } from "../../../configurations/configure";
 
 // Create a liquidity pool from pairCreated event.
 export function createLiquidityPool(
@@ -126,26 +129,35 @@ export function createLiquidityPool(
 
 // create pool fee entities based on the fee structure received from pairCreated event.
 export function createPoolFees(poolAddress: Bytes, fee: i64): Bytes[] {
+  const tradingFeePercentage = convertFeeToPercent(fee);
+  // Trading Fee
+  const poolTradingFee = new LiquidityPoolFee(
+    Bytes.fromHexString("trading-fee-").concat(poolAddress)
+  );
+  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
+  poolTradingFee.feePercentage = tradingFeePercentage;
+
   // LP Fee
   const poolLpFee = new LiquidityPoolFee(
     Bytes.fromHexString("xlp-fee-").concat(poolAddress)
   );
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
-  poolLpFee.feePercentage = convertFeeToPercent(fee);
+  poolLpFee.feePercentage =
+    NetworkConfigs.getProtocolFeeOnOff() == FeeSwitch.ON
+      ? BIGDECIMAL_ONE.minus(NetworkConfigs.getProtocolFeeRatio(fee)).times(
+          tradingFeePercentage
+        )
+      : tradingFeePercentage;
 
   // Protocol Fee
   const poolProtocolFee = new LiquidityPoolFee(
     Bytes.fromHexString("xprotocol-fee-").concat(poolAddress)
   );
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
-  poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF;
-
-  // Trading Fee
-  const poolTradingFee = new LiquidityPoolFee(
-    Bytes.fromHexString("trading-fee-").concat(poolAddress)
-  );
-  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
-  poolTradingFee.feePercentage = convertFeeToPercent(fee);
+  poolProtocolFee.feePercentage =
+    NetworkConfigs.getProtocolFeeOnOff() == FeeSwitch.ON
+      ? NetworkConfigs.getProtocolFeeRatio(fee).times(tradingFeePercentage)
+      : BIGDECIMAL_ZERO;
 
   poolLpFee.save();
   poolProtocolFee.save();

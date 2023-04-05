@@ -1,6 +1,7 @@
-import { Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, Bytes, log } from "@graphprotocol/graph-ts";
 import { Factory } from "../../../../../generated/Factory/Factory";
 import {
+  BIGDECIMAL_ZERO,
   FeeSwitch,
   Network,
   RewardIntervalType,
@@ -27,8 +28,14 @@ export class UniswapV3CeloConfigurations implements Configurations {
       Address.fromString("0xd9dc0d8f754c027df7ecb4bd381301cec76cd32f")
     );
   }
-  getFeeOnOff(): string {
+  getProtocolFeeOnOff(): string {
     return FeeSwitch.OFF;
+  }
+  getProtocolFeeRatio(fee: i64): BigDecimal {
+    log.warning("getProtocolFeeRatio is not implemented for Arbitrum: {}", [
+      fee.toString(),
+    ]);
+    return BIGDECIMAL_ZERO;
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.NONE;

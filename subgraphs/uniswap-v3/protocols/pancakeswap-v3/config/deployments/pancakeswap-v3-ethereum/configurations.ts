@@ -27,8 +27,16 @@ export class PancakeV3EthereumConfigurations implements Configurations {
       Address.fromString("0x0bfbcf9fa4f9c56b0f40a671ad40e0805a091865")
     );
   }
-  getFeeOnOff(): string {
-    return FeeSwitch.OFF;
+  getProtocolFeeOnOff(): string {
+    return FeeSwitch.ON;
+  }
+  getProtocolFeeRatio(fee: i64): BigDecimal {
+    if (fee == 100) {
+      return BigDecimal.fromString("0.33");
+    } else if (fee == 500) {
+      return BigDecimal.fromString("0.34");
+    }
+    return BigDecimal.fromString("0.32");
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.NONE;
