@@ -5,71 +5,67 @@ import {
   Reward,
   TranscoderActivated,
   TranscoderDeactivated,
-  TranscoderSlashed,
   TranscoderUpdate,
   TransferBond,
   Unbond,
   WithdrawFees,
   WithdrawStake,
 } from "../../generated/BondingManager/BondingManager";
-import { trackUsageMetrics } from "../modules/Metrics";
+import { trackUsageMetrics } from "../modules/metrics";
 import { createOrUpdatePool } from "../common/initializers";
 
-export function bond(event: Bond): void {
+export function handleBond(event: Bond): void {
   createOrUpdatePool(event.params.newDelegate, event);
   trackUsageMetrics(event.params.delegator, event);
   trackUsageMetrics(event.params.newDelegate, event);
 }
 
-export function transferBond(event: TransferBond): void {
+export function handleTransferBond(event: TransferBond): void {
   trackUsageMetrics(event.params.newDelegator, event);
   trackUsageMetrics(event.params.oldDelegator, event);
 }
 
-export function unbond(event: Unbond): void {
+export function handleUnbond(event: Unbond): void {
   trackUsageMetrics(event.params.delegator, event);
   trackUsageMetrics(event.params.delegate, event);
   createOrUpdatePool(event.params.delegate, event);
 }
 
-export function rebond(event: Rebond): void {
+export function handleRebond(event: Rebond): void {
   trackUsageMetrics(event.params.delegator, event);
   trackUsageMetrics(event.params.delegate, event);
 }
 
-export function withdrawStake(event: WithdrawStake): void {
+export function handleWithdrawStake(event: WithdrawStake): void {
   trackUsageMetrics(event.params.delegator, event);
 }
 
-export function withdrawFees(event: WithdrawFees): void {
+export function handleWithdrawFees(event: WithdrawFees): void {
   trackUsageMetrics(event.params.delegator, event);
 }
 
-export function reward(event: Reward): void {
+export function handleReward(event: Reward): void {
   trackUsageMetrics(event.params.transcoder, event);
 }
 
-export function transcoderSlashed(event: TranscoderSlashed): void {
-  createOrUpdatePool(event.params.transcoder, event);
-  trackUsageMetrics(event.params.transcoder, event);
-}
-
-export function transcoderUpdate(event: TranscoderUpdate): void {
+export function handleTranscoderUpdate(event: TranscoderUpdate): void {
   trackUsageMetrics(event.params.transcoder, event);
   createOrUpdatePool(event.params.transcoder, event);
 }
 
-export function transcoderActivated(event: TranscoderActivated): void {
+export function handleTranscoderActivated(event: TranscoderActivated): void {
   createOrUpdatePool(event.params.transcoder, event);
   trackUsageMetrics(event.params.transcoder, event);
 }
 
-export function transcoderDeactivated(event: TranscoderDeactivated): void {
+export function handleTranscoderDeactivated(
+  event: TranscoderDeactivated
+): void {
   createOrUpdatePool(event.params.transcoder, event);
   trackUsageMetrics(event.params.transcoder, event);
 }
 
-export function earningsClaimed(event: EarningsClaimed): void {
+export function handleEarningsClaimed(event: EarningsClaimed): void {
   createOrUpdatePool(event.params.delegate, event);
   trackUsageMetrics(event.params.delegator, event);
   trackUsageMetrics(event.params.delegate, event);

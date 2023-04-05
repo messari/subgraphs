@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import { Token } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { TokenPricer } from "../sdk/protocols/config";
-import { getEthPriceUsd, getLptPriceEth } from "./Prices";
+import { getEthPriceUsd, getLptPriceEth } from "./prices";
 import { ERC20 } from "../../generated/BondingManager/ERC20";
 import { Minter } from "../../generated/BondingManager/Minter";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
@@ -63,8 +63,7 @@ export class TokenPrice implements TokenPricer {
       return amountDecimal.times(ethPriceUSD);
     }
 
-    const amountValueUSD = constants.BIGDECIMAL_ZERO;
-    return amountValueUSD;
+    return constants.BIGDECIMAL_ZERO;
   }
 }
 

@@ -2,7 +2,7 @@ import {
   TokenInitialize,
   TokenPrice,
   getTotalRewardTokens,
-} from "../modules/Tokens";
+} from "../modules/tokens";
 import { Versions } from "../versions";
 import * as utils from "../common/utils";
 import { SDK } from "../sdk/protocols/generic";
@@ -23,18 +23,18 @@ export function createOrUpdatePool(
     constants.BONDING_MANAGER_ADDRESS
   );
 
-  let protocolTvl = utils.readValue(
+  let totalInputTokenBalance = utils.readValue(
     bondingManagerContract.try_currentRoundTotalActiveStake(),
     constants.BIGINT_ZERO
   );
 
-  if (protocolTvl.equals(constants.BIGINT_ZERO))
-    protocolTvl = utils.readValue(
+  if (totalInputTokenBalance.equals(constants.BIGINT_ZERO))
+    totalInputTokenBalance = utils.readValue(
       bondingManagerContract.try_nextRoundTotalActiveStake(),
       constants.BIGINT_ZERO
     );
 
-  const poolTvl = utils.readValue(
+  const poolInputTokenBalance = utils.readValue(
     bondingManagerContract.try_transcoderTotalStake(poolAddress),
     constants.BIGINT_ZERO
   );
@@ -50,12 +50,12 @@ export function createOrUpdatePool(
     false
   );
 
-  pool.setInputTokenBalance([poolTvl], true);
+  pool.setInputTokenBalance([poolInputTokenBalance], true);
   let rewardTokenEmission = constants.BIGINT_ZERO;
-  if (!protocolTvl.equals(constants.BIGINT_ZERO))
-    rewardTokenEmission = poolTvl
+  if (!totalInputTokenBalance.equals(constants.BIGINT_ZERO))
+    rewardTokenEmission = poolInputTokenBalance
       .times(getTotalRewardTokens())
-      .div(protocolTvl);
+      .div(totalInputTokenBalance);
   pool.setRewardEmissions(
     constants.RewardTokenType.DEPOSIT,
     LPT,

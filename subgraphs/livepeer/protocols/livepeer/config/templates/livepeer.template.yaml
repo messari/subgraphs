@@ -37,27 +37,27 @@ dataSources:
           - Protocol
       eventHandlers:
         - event: TranscoderUpdate(indexed address,uint256,uint256)
-          handler: transcoderUpdate
+          handler: handleTranscoderUpdate
         - event: TranscoderActivated(indexed address,uint256)
-          handler: transcoderActivated
+          handler: handleTranscoderActivated
         - event: TranscoderDeactivated(indexed address,uint256)
-          handler: transcoderDeactivated
+          handler: handleTranscoderDeactivated
         - event: EarningsClaimed(indexed address,indexed address,uint256,uint256,uint256,uint256)
-          handler: earningsClaimed
+          handler: handleEarningsClaimed
         - event: Bond(indexed address,indexed address,indexed address,uint256,uint256)
-          handler: bond
+          handler: handleBond
         - event: Unbond(indexed address,indexed address,uint256,uint256,uint256)
-          handler: unbond
+          handler: handleUnbond
         - event: Rebond(indexed address,indexed address,uint256,uint256)
-          handler: rebond
+          handler: handleRebond
         - event: WithdrawStake(indexed address,uint256,uint256,uint256)
-          handler: withdrawStake
+          handler: handleWithdrawStake
         - event: Reward(indexed address,uint256)
-          handler: reward
+          handler: handleReward
         - event: WithdrawFees(indexed address,address,uint256)
-          handler: withdrawFees
+          handler: handleWithdrawFees
         - event: TransferBond(indexed address,indexed address,uint256,uint256,uint256)
-          handler: transferBond
+          handler: handleTransferBond
   - kind: ethereum/contract
     name: TicketBroker
     network: {{network}}
@@ -87,4 +87,4 @@ dataSources:
         - Protocol
       eventHandlers:
         - event: WinningTicketRedeemed(indexed address,indexed address,uint256,uint256,uint256,uint256,bytes)
-          handler: winningTicketRedeemed
+          handler: handleWinningTicketRedeemed

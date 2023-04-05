@@ -83,11 +83,14 @@ export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TEN = BigInt.fromI32(10);
+
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
+export const BIGDECIMAL_ONE = BigDecimal.fromString("1");
+export const BIGDECIMAL_TEN = BigDecimal.fromString("10");
 
 export const USDC_ADDRESS = Address.fromString(
   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
@@ -127,5 +130,6 @@ export const UNISWAP_V3_DAI_ETH_POOL_ADDRESS = Address.fromString(
   "a961f0473da4864c5ed28e00fcc53a3aab056c1b"
 );
 
-export const QI92 =
-  "6277101735386680763835789423207666416102355444464034512896"; // 2 ** 192
+export const QI92 = BigDecimal.fromString(
+  "6277101735386680763835789423207666416102355444464034512896"
+); // 2 ** 192

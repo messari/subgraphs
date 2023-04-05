@@ -3,7 +3,9 @@ import * as constants from "../common/constants";
 import { createOrUpdatePool, initializeSDK } from "../common/initializers";
 import { WinningTicketRedeemed } from "../../generated/TicketBroker/TicketBroker";
 
-export function winningTicketRedeemed(event: WinningTicketRedeemed): void {
+export function handleWinningTicketRedeemed(
+  event: WinningTicketRedeemed
+): void {
   const transcoderAddress = event.params.recipient;
   const ethAmount = event.params.faceValue;
   const sdk = initializeSDK(event);

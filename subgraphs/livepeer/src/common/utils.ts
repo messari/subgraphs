@@ -34,26 +34,25 @@ export function sqrtPriceX96ToTokenPrices(
   token0Decimals: BigInt,
   token1Decimals: BigInt
 ): BigDecimal[] {
-  const Q192 = constants.QI92;
   const num = sqrtPriceX96.times(sqrtPriceX96).toBigDecimal();
-  const denom = BigDecimal.fromString(Q192);
+  const denom = constants.QI92;
   const price1 = num
     .div(denom)
     .times(exponentToBigDecimal(token0Decimals))
     .div(exponentToBigDecimal(token1Decimals));
 
-  const price0 = safeDiv(BigDecimal.fromString("1"), price1);
+  const price0 = safeDiv(constants.BIGDECIMAL_ONE, price1);
   return [price0, price1];
 }
 
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
-  let bd = BigDecimal.fromString("1");
+  let bd = constants.BIGDECIMAL_ONE;
   for (
     let i = constants.BIGINT_ZERO;
     i.lt(decimals);
     i = i.plus(constants.BIGINT_ONE)
   ) {
-    bd = bd.times(BigDecimal.fromString("10"));
+    bd = bd.times(constants.BIGDECIMAL_TEN);
   }
   return bd;
 }
