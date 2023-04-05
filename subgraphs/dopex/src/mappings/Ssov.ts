@@ -27,12 +27,7 @@ import { getOrCreateToken, updateTokenPrice } from "../entities/token";
 import { closeUserPosition, createUserPosition } from "../entities/position";
 import { takeSnapshots, updateTempUsageMetrics } from "../entities/snapshots";
 import { convertTokenToDecimal } from "../utils/numbers";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  OptionType,
-  PRICE_PRECISION,
-} from "../utils/constants";
+import { BIGINT_ZERO, OptionType, PRICE_PRECISION } from "../utils/constants";
 import { createOption } from "../entities/option";
 
 export function handleDeposit(event: Deposit): void {
