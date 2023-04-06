@@ -16,8 +16,6 @@ import {
   LiquidityPoolFee,
   Token as TokenSchema,
   LiquidityPool as LiquidityPoolSchema,
-  _OpenInterestHelper,
-  _FundingRateHelper,
 } from "../../../../generated/schema";
 
 /**

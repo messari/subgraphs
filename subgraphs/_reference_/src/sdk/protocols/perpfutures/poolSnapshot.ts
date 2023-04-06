@@ -9,7 +9,6 @@ import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
   LiquidityPool as PoolSchema,
-  _DailyRewardsHelper,
 } from "../../../../generated/schema";
 
 /**
