@@ -541,7 +541,7 @@ function getOrCreateDailyRewardsHelper(
     entity.prevDayRewardsAmount = constants.BIGINT_ZERO;
   }
 
-  let prevDayEntity = _DailyRewardsHelper.load(pool.id.concatI32(day - 1));
+  const prevDayEntity = _DailyRewardsHelper.load(pool.id.concatI32(day - 1));
   if (prevDayEntity) {
     entity.prevDayRewardsAmount = prevDayEntity.dailyRewardsAmount;
   }
