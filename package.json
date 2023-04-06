@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "messari-subgraph-cli": "^0.1.52",
     "minimist": "^1.2.6",
     "mustache": "^4.2.0"
   },

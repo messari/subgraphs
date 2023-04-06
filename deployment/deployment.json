@@ -3913,7 +3913,7 @@
   },
   "uniswap-v3": {
     "schema": "dex-amm",
-    "base": "uniswap-v3",
+    "base": "uniswap-v3-forks",
     "protocol": "uniswap-v3",
     "project": "uniswap",
     "deployments": {
@@ -4043,7 +4043,7 @@
   },
   "pancakeswap-v3": {
     "schema": "dex-amm",
-    "base": "uniswap-v3",
+    "base": "uniswap-v3-forks",
     "protocol": "pancakeswap-v3",
     "project": "pancakeswap",
     "deployments": {

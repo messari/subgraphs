@@ -1,5 +1,5 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { PoolCreated } from "../../generated//Factory/Factory";
+import { PoolCreated } from "../../generated/Factory/Factory";
 import { NetworkConfigs } from "../../configurations/configure";
 import { createLiquidityPool } from "../common/entities/pool";
 import { getOrCreateProtocol } from "../common/entities/protocol";
