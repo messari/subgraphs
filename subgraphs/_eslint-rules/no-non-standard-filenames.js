@@ -20,17 +20,34 @@ module.exports = {
   create: function (context) {
     return {
       Program(node) {
-        const regex = /^([a-z0-9]+[_-]*[a-z0-9]+)*(\.ts)?$/;
-        const neededPathParts = context.getFilename().split("subgraphs").pop();
-        const parthParts = neededPathParts.split(path.sep).splice(1); //splice ignores the first ""
-        parthParts.forEach((part) => {
-          if (!regex.test(part)) {
+        const pathRegex = /^([a-z]+[_-]*[a-z0-9]+)*(\.ts)?$/; //snake_case or kebab-case
+        const camelCaseRegex = /^[a-z]+[a-zA-Z0-9]*\.ts$/; // camelCase for ts
+        const PascalCaseRegex = /^[A-Z]+[a-zA-Z0-9]*\.json$/; // PascalCase for abis (json)
+        const fullFileName = context.getFilename();
+        const neededPathParts = fullFileName.split("subgraphs").pop();
+        const parthParts = neededPathParts.split(path.sep);
+        parthParts.slice(1, parthParts.length - 1).forEach((part) => {
+          if (!pathRegex.test(part)) {
             context.report({
               node,
-              message: `${part} in ${neededPathParts} does not match single word, snake_case, or kebab-case naming convention`,
+              message: `folder name '${part}' in ${neededPathParts} does not match snake_case or kebab-case naming convention`,
             });
           }
         });
+        const fileName = path.basename(fullFileName);
+        const fileExt = path.extname(fullFileName).toLowerCase();
+        if (fileExt === ".ts" && !camelCaseRegex.test(fileName)) {
+          context.report({
+            node,
+            message: `file name ${fileName} does not match camelCase naming convention`,
+          });
+        }
+        if (fileExt === ".json" && !PascalCaseRegex.test(fileName)) {
+          context.report({
+            node,
+            message: `file name ${fileName} does not match PascalCase naming convention`,
+          });
+        }
       },
     };
   },
