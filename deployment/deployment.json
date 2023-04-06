@@ -3913,7 +3913,7 @@
   },
   "uniswap-v3": {
     "schema": "dex-amm",
-    "base": "uniswap-v3",
+    "base": "uniswap-v3-forks",
     "protocol": "uniswap-v3",
     "project": "uniswap",
     "deployments": {
@@ -3922,7 +3922,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.2.4",
+          "subgraph": "1.2.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3948,7 +3948,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.1.9",
+          "subgraph": "1.1.10",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3974,7 +3974,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.2.4",
+          "subgraph": "1.2.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4000,7 +4000,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.1.5",
+          "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4022,7 +4022,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4036,6 +4036,58 @@
           "hosted-service": {
             "slug": "uniswap-v3-polygon",
             "query-id": "uniswap-v3-polygon"
+          }
+        }
+      }
+    }
+  },
+  "pancakeswap-v3": {
+    "schema": "dex-amm",
+    "base": "uniswap-v3-forks",
+    "protocol": "pancakeswap-v3",
+    "project": "pancakeswap",
+    "deployments": {
+      "pancakeswap-v3-bsc": {
+        "network": "bsc",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.3",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "pancake.v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "pancakeswap-v3-bsc",
+            "query-id": "pancakeswap-v3-bsc"
+          }
+        }
+      },
+      "pancakeswap-v3-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "3.0.3",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "pancake.v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "pancakeswap-v3-ethereum",
+            "query-id": "pancakeswap-v3-ethereum"
           }
         }
       }
