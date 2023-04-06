@@ -66,6 +66,7 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
       pool.openPositionCount += INT_ONE;
       pool.closedPositionCount -= INT_ONE;
       account.openPositionCount += INT_ONE;
+      account.closedPositionCount -= INT_ONE;
       protocol.openPositionCount += INT_ONE;
       position.hashClosed = null;
       position.blockNumberClosed = null;
