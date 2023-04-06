@@ -33,6 +33,9 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 	if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
 		return new CustomPriceType()
 	}
+	if (tokenAddr == Address.fromString(XdaiHtoken.MATIC)) {
+		tokenAddr = Address.fromString(XdaiToken.MATIC)
+	}
 
 	if (tokenAddr.toHexString() == ArbitrumHtoken.ETH) {
 		tokenAddr = Address.fromString(ArbitrumToken.ETH)
@@ -56,6 +59,29 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 		)
 	}
 
+	if (tokenAddr.toHexString() == XdaiToken.MATIC) {
+		const uniSwapPair = UniswapPair.bind(
+			Address.fromString('0x70cd033af4dc9763700d348e402dfeddb86e09e1')
+		)
+
+		let price: BigInt
+		let reserve = uniSwapPair.try_getReserves()
+		if (!reserve.reverted) {
+			price = reserve.value.value1.div(reserve.value.value0)
+			log.warning(
+				'[UniswapV2Matic] tokenAddress: {}, Reserve1: {}, Reserve0: {}, Price: {}',
+				[
+					tokenAddr.toHexString(),
+					reserve.value.value1.toString(),
+					reserve.value.value0.toString(),
+					price.toBigDecimal().toString(),
+				]
+			)
+			let x: CustomPriceType
+			x = CustomPriceType.initialize(price.toBigDecimal())
+			return x
+		}
+	}
 	const config = utils.getConfig()
 	if (config.network() == 'default') {
 		log.warning('Failed to fetch price: network {} not implemented', [
@@ -147,37 +173,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 				uniswapV2Price.usdPrice.toString(),
 			])
 			return uniswapV2Price
-		}
-	}
-
-	// 9. Uniswap Router
-	if (
-		tokenAddr.toHexString() == XdaiToken.MATIC ||
-		tokenAddr.toHexString() == XdaiHtoken.MATIC
-	) {
-		const uniSwapPair = UniswapPair.bind(
-			Address.fromString('0x70cd033af4dc9763700d348e402dfeddb86e09e1')
-		)
-
-		let price: BigInt
-		tokenAddr = Address.fromString(XdaiToken.MATIC)
-		let reserve = uniSwapPair.try_getReserves()
-		if (!reserve.reverted) {
-			price = reserve.value.value1.div(reserve.value.value0)
-			log.warning(
-				'[UniswapV2Matic] tokenAddress: {}, Reserve1: {}, Reserve0: {}, Price: {}',
-				[
-					tokenAddr.toHexString(),
-					reserve.value.value1.toString(),
-					reserve.value.value0.toString(),
-					price.toBigDecimal().toString(),
-				]
-			)
-			let x: CustomPriceType
-			x = CustomPriceType.initialize(price.toBigDecimal())
-			if (!x.reverted) {
-				return x
-			}
 		}
 	}
 

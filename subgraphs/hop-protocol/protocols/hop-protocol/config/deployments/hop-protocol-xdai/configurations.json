@@ -142,13 +142,13 @@
     {
       "dataSourceName": "HopL2RewardsUSDT_A",
       "token": "USDT",
-      "address": "0x12a3a66720dD925fa93f7C895bC20Ca9560AdFe7",
+      "address": "0x2C2Ab81Cf235e86374468b387e241DF22459A265",
       "startBlock": 20895527
     },
     {
       "dataSourceName": "HopL2RewardsUSDT_B",
       "token": "USDT",
-      "address": "0xBF7a02d963b23D84313F07a04ad663409CEE5A92",
+      "address": "0x3d4Cc8A61c7528Fd86C55cfe061a78dCBA48EDd1",
       "startBlock": 24646600
     },
     {
@@ -164,10 +164,10 @@
       "startBlock": 24646600
     },
     {
-      "dataSourceName": "HopL2RewardsETH_A",
+      "dataSourceName": "HopL2RewardsETH_B",
       "token": "ETH",
-      "address": "0xC61bA16e864eFbd06a9fe30Aab39D18B8F63710a",
-      "startBlock": 20383666
+      "address": "0x712F0cf37Bdb8299D0666727F73a5cAbA7c1c24c",
+      "startBlock": 24646599
     }
   ]
 }

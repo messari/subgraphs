@@ -200,6 +200,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 		}
 
 		pool.setOutputTokenSupply(event.params.lpTokenSupply)
+		hPool.setOutputTokenSupply(event.params.lpTokenSupply)
 
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()
@@ -287,6 +288,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 		}
 
 		pool.setOutputTokenSupply(event.params.lpTokenSupply)
+		hPool.setOutputTokenSupply(event.params.lpTokenSupply)
 
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()
@@ -367,6 +369,7 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 		}
 
 		pool.setOutputTokenSupply(event.params.lpTokenSupply)
+		hPool.setOutputTokenSupply(event.params.lpTokenSupply)
 
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()

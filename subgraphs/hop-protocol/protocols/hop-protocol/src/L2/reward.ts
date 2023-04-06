@@ -17,6 +17,7 @@ import {
 	BigInt,
 	log,
 	dataSource,
+	Bytes,
 } from '@graphprotocol/graph-ts'
 import {
 	L2_Reward,
@@ -30,6 +31,7 @@ import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
 import {
 	BIGINT_MINUS_ONE,
 	BIGINT_TEN_TO_EIGHTEENTH,
+	BIGINT_TWO,
 	RewardTokenType,
 } from '../../../../src/sdk/util/constants'
 import {
@@ -105,6 +107,9 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			)
 
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+			const hPool = sdk.Pools.loadPool<string>(
+				Bytes.fromHexString(poolAddress.concat('-').concat('1'))
+			)
 			const token = sdk.Tokens.getOrCreateToken(
 				Address.fromString(RewardTokens.GNO)
 			)
@@ -112,7 +117,9 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			if (!pool.isInitialized) {
 				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
-
+			if (!hPool.isInitialized) {
+				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
 			const Reward = L2_Reward.bind(event.address)
 			const rewardRateCall = Reward.try_rewardRate()
 			if (!rewardRateCall.reverted) {
@@ -124,10 +131,12 @@ export function handleRewardsPaid(event: RewardPaid): void {
 						BIGINT_TEN_TO_EIGHTEENTH.toString(),
 					]
 				)
-				const rewardRate = rewardRateCall.value
+				const rewardRate = rewardRateCall.value.div(BIGINT_TWO)
 
 				const dailyEmission = BigInt.fromI32(86400).times(rewardRate)
 				pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
+				hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
+
 				log.warning(
 					'GNO RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}',
 					[
@@ -139,7 +148,8 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			} else {
 				log.warning('GNO Rewards rate call reverted', [])
 			}
-		} else if (OP_REWARDS.includes(event.address.toHexString())) {
+		}
+		if (OP_REWARDS.includes(event.address.toHexString())) {
 			let amount = event.params.reward
 
 			const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
@@ -164,6 +174,9 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			)
 
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+			const hPool = sdk.Pools.loadPool<string>(
+				Bytes.fromHexString(poolAddress.concat('-').concat('1'))
+			)
 			const token = sdk.Tokens.getOrCreateToken(
 				Address.fromString(RewardTokens.OP)
 			)
@@ -171,7 +184,9 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			if (!pool.isInitialized) {
 				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
-
+			if (!hPool.isInitialized) {
+				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
 			const Reward = L2_Reward.bind(event.address)
 			const rewardRateCall = Reward.try_rewardRate()
 			if (!rewardRateCall.reverted) {
@@ -183,10 +198,12 @@ export function handleRewardsPaid(event: RewardPaid): void {
 						BIGINT_TEN_TO_EIGHTEENTH.toString(),
 					]
 				)
-				const rewardRate = rewardRateCall.value
+				const rewardRate = rewardRateCall.value.div(BIGINT_TWO)
 
 				const dailyEmission = BigInt.fromI32(86400).times(rewardRate)
 				pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
+				hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
+
 				log.warning(
 					'OP RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}',
 					[
@@ -198,7 +215,8 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			} else {
 				log.warning('OP Rewards rate call reverted', [])
 			}
-		} else if (HOP_REWARDS.includes(event.address.toHexString())) {
+		}
+		if (HOP_REWARDS.includes(event.address.toHexString())) {
 			let amount = event.params.reward
 
 			const poolAddress = NetworkConfigs.getPoolAddressFromRewardTokenAddress(
@@ -223,12 +241,20 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			)
 
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+
+			const hPool = sdk.Pools.loadPool<string>(
+				Bytes.fromHexString(poolAddress.concat('-').concat('1'))
+			)
 			const token = sdk.Tokens.getOrCreateToken(
 				Address.fromString(RewardTokens.HOP)
 			)
 
 			if (!pool.isInitialized) {
 				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
+
+			if (!hPool.isInitialized) {
+				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 
 			const Reward = L2_Reward.bind(event.address)
@@ -242,10 +268,12 @@ export function handleRewardsPaid(event: RewardPaid): void {
 						BIGINT_TEN_TO_EIGHTEENTH.toString(),
 					]
 				)
-				const rewardRate = rewardRateCall.value
+				const rewardRate = rewardRateCall.value.div(BIGINT_TWO)
 
 				const dailyEmission = BigInt.fromI32(86400).times(rewardRate)
 				pool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
+				hPool.setRewardEmissions(RewardTokenType.DEPOSIT, token, dailyEmission)
+
 				log.warning(
 					'HOP RewardsPaid 3 --> txHash: {}, rewardRate: {}, dailyEmission: {}',
 					[
@@ -292,31 +320,67 @@ export function handleStaked(event: Staked): void {
 				Address.fromString(RewardTokens.GNO)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+			const hPool = sdk.Pools.loadPool<string>(
+				Bytes.fromHexString(poolAddress.concat('-').concat('1'))
+			)
 
 			if (!pool.isInitialized) {
 				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
+
+			if (!hPool.isInitialized) {
+				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
+			pool.pool.relation = hPool.getBytesID()
+			hPool.pool.relation = hPool.getBytesID()
+
 			pool.addStakedOutputTokenAmount(amount)
-		} else if (OP_REWARDS.includes(event.address.toHexString())) {
+			hPool.addStakedOutputTokenAmount(amount)
+		}
+		if (OP_REWARDS.includes(event.address.toHexString())) {
 			const token = sdk.Tokens.getOrCreateToken(
 				Address.fromString(RewardTokens.OP)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
-			if (!pool.isInitialized) {
-				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
-			}
-			pool.addStakedOutputTokenAmount(amount)
-		} else if (HOP_REWARDS.includes(event.address.toHexString())) {
-			const token = sdk.Tokens.getOrCreateToken(
-				Address.fromString(RewardTokens.HOP)
+			const hPool = sdk.Pools.loadPool<string>(
+				Bytes.fromHexString(poolAddress.concat('-').concat('1'))
 			)
-			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
 
 			if (!pool.isInitialized) {
 				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
+
+			if (!hPool.isInitialized) {
+				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
+			pool.pool.relation = hPool.getBytesID()
+			hPool.pool.relation = hPool.getBytesID()
+
 			pool.addStakedOutputTokenAmount(amount)
+			hPool.addStakedOutputTokenAmount(amount)
+		}
+		if (HOP_REWARDS.includes(event.address.toHexString())) {
+			const token = sdk.Tokens.getOrCreateToken(
+				Address.fromString(RewardTokens.HOP)
+			)
+			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+			const hPool = sdk.Pools.loadPool<string>(
+				Bytes.fromHexString(poolAddress.concat('-').concat('1'))
+			)
+
+			if (!pool.isInitialized) {
+				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
+
+			pool.pool.relation = hPool.getBytesID()
+			hPool.pool.relation = hPool.getBytesID()
+
+			if (!hPool.isInitialized) {
+				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
+			pool.addStakedOutputTokenAmount(amount)
+			hPool.addStakedOutputTokenAmount(amount)
 		}
 
 		sdk.Accounts.loadAccount(event.params.user)
@@ -355,31 +419,57 @@ export function handleWithdrawn(event: Withdrawn): void {
 				Address.fromString(RewardTokens.GNO)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+			const hPool = sdk.Pools.loadPool<string>(
+				Bytes.fromHexString(poolAddress.concat('-').concat('1'))
+			)
 
 			if (!pool.isInitialized) {
 				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
+
+			if (!hPool.isInitialized) {
+				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
 			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
-		} else if (OP_REWARDS.includes(event.address.toHexString())) {
+			hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
+		}
+		if (OP_REWARDS.includes(event.address.toHexString())) {
 			const token = sdk.Tokens.getOrCreateToken(
 				Address.fromString(RewardTokens.OP)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+			const hPool = sdk.Pools.loadPool<string>(
+				Bytes.fromHexString(poolAddress.concat('-').concat('1'))
+			)
 
 			if (!pool.isInitialized) {
 				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
+
+			if (!hPool.isInitialized) {
+				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
 			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
-		} else if (HOP_REWARDS.includes(event.address.toHexString())) {
+			hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
+		}
+		if (HOP_REWARDS.includes(event.address.toHexString())) {
 			const token = sdk.Tokens.getOrCreateToken(
 				Address.fromString(RewardTokens.HOP)
 			)
 			const pool = sdk.Pools.loadPool<string>(Address.fromString(poolAddress))
+			const hPool = sdk.Pools.loadPool<string>(
+				Bytes.fromHexString(poolAddress.concat('-').concat('1'))
+			)
 
 			if (!pool.isInitialized) {
 				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
+
+			if (!hPool.isInitialized) {
+				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+			}
 			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
+			hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
 		}
 		sdk.Accounts.loadAccount(event.params.user)
 	}

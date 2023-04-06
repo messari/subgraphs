@@ -265,6 +265,7 @@ export const HOP_REWARDS = [
 	PolygonRewardToken.DAI,
 	XdaiRewardToken.DAI_B,
 	XdaiRewardToken.USDC_B,
+	XdaiRewardToken.ETH_B,
 	XdaiRewardToken.USDT_B,
 ]
 export const OP_REWARDS = [OptimismRewardToken.SNX_B]
