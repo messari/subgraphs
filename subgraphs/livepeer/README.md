@@ -45,7 +45,7 @@
 
 ### Protocol-Side Revenue USD
 
-- All redeemed tickets are supply-side revenue.
+- There is no protocol side revenue.
 
 ### Total Unique Users
 
@@ -67,3 +67,10 @@
 ### Protocol Controlled Value
 
 - Not Applicable for this subgraph.
+
+### Useful Links
+
+- Primer(Short notes on explaining livepeer working): https://livepeer.org/primer
+- Docs: https://docs.livepeer.org/
+- Livepeer explorer(Analytics and user dashboard): https://explorer.livepeer.org/
+- Contract Addresses: https://docs.livepeer.org/reference/deployed-contract-addresses

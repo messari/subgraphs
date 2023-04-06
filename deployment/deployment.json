@@ -2505,7 +2505,7 @@
     "deployments": {
       "livepeer-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.1.0",
           "subgraph": "1.0.0",

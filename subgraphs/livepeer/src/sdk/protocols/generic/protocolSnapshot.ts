@@ -130,19 +130,19 @@ export class ProtocolSnapshot {
     snapshot.dailyActiveUsers = activity.dailyActiveUsers;
 
     // transaction counts
-    snapshot._cumulativeTransactionCount =
-      this.protocol._cumulativeTransactionCount;
+    snapshot.cumulativeTransactionCount =
+      this.protocol.cumulativeTransactionCount;
 
     // misc
     snapshot.totalPoolCount = this.protocol.totalPoolCount;
 
     // deltas
-    let transactionDelta = snapshot._cumulativeTransactionCount;
+    let transactionDelta = snapshot.cumulativeTransactionCount;
 
     if (previousSnapshot) {
       transactionDelta =
-        snapshot._cumulativeTransactionCount -
-        previousSnapshot._cumulativeTransactionCount;
+        snapshot.cumulativeTransactionCount -
+        previousSnapshot.cumulativeTransactionCount;
     }
     snapshot.dailyTransactionCount = transactionDelta;
     snapshot.save();
@@ -171,15 +171,15 @@ export class ProtocolSnapshot {
     snapshot.hourlyActiveUsers = activity.hourlyActiveUsers;
 
     // transaction counts
-    snapshot._cumulativeTransactionCount =
-      this.protocol._cumulativeTransactionCount;
+    snapshot.cumulativeTransactionCount =
+      this.protocol.cumulativeTransactionCount;
 
     // deltas
-    let transactionDelta = snapshot._cumulativeTransactionCount;
+    let transactionDelta = snapshot.cumulativeTransactionCount;
     if (previousSnapshot) {
       transactionDelta =
-        snapshot._cumulativeTransactionCount -
-        previousSnapshot._cumulativeTransactionCount;
+        snapshot.cumulativeTransactionCount -
+        previousSnapshot.cumulativeTransactionCount;
     }
     snapshot.hourlyTransactionCount = transactionDelta;
     snapshot.save();
