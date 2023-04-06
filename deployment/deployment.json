@@ -7987,7 +7987,7 @@
         "network": "arbitrum",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.1",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8009,7 +8009,7 @@
         "network": "polygon",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.1",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },

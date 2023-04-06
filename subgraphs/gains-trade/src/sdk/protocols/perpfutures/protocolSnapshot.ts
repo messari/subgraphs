@@ -1,3 +1,10 @@
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
+
+import { TransactionType } from "./enums";
+import { AccountWasActive } from "./account";
+import * as constants from "../../util/constants";
+import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+
 import {
   _ActivityHelper,
   FinancialsDailySnapshot,
@@ -5,134 +12,129 @@ import {
   UsageMetricsHourlySnapshot,
   DerivPerpProtocol as PerpetualSchema,
 } from "../../../../generated/schema";
-import { TransactionType } from "./enums";
-import { AccountWasActive } from "./account";
-import { BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-import * as constants from "../../util/constants";
-import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+
+/**
+ * This file contains the ProtocolSnapshot, which is used to
+ * make all of the storage changes that occur in the protocol's
+ * daily and hourly snapshots.
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @harsh9200
+ */
 
 export class ProtocolSnapshot {
   protocol: PerpetualSchema;
   event: CustomEventType;
   dayID: i32;
   hourID: i32;
-  activityHelper: _ActivityHelper;
+  dailyActivityHelper: _ActivityHelper;
+  hourlyActivityHelper: _ActivityHelper;
 
   constructor(protocol: PerpetualSchema, event: CustomEventType) {
     this.protocol = protocol;
     this.event = event;
     this.dayID = getUnixDays(event.block);
     this.hourID = getUnixHours(event.block);
-    this.activityHelper = initActivityHelper();
+
+    this.dailyActivityHelper = initActivityHelper(
+      Bytes.fromUTF8("daily-".concat(this.dayID.toString()))
+    );
+    this.hourlyActivityHelper = initActivityHelper(
+      Bytes.fromUTF8("hourly-".concat(this.hourID.toString()))
+    );
+
     this.takeSnapshots();
   }
 
   addActiveUser(activity: AccountWasActive): void {
-    this.activityHelper.dailyActiveUsers += activity.daily ? 1 : 0;
-    this.activityHelper.hourlyActiveUsers += activity.hourly ? 1 : 0;
-    this.activityHelper.save();
+    this.dailyActivityHelper.activeUsers += activity.daily ? 1 : 0;
+    this.hourlyActivityHelper.activeUsers += activity.hourly ? 1 : 0;
+
+    this.dailyActivityHelper.save();
+    this.hourlyActivityHelper.save();
   }
 
   addActiveDepositor(activity: AccountWasActive): void {
-    this.activityHelper.dailyActiveDepositors += activity.daily ? 1 : 0;
-    this.activityHelper.save();
+    this.dailyActivityHelper.activeDepositors += activity.daily ? 1 : 0;
+    this.dailyActivityHelper.save();
   }
 
   addActiveBorrower(activity: AccountWasActive): void {
-    this.activityHelper.dailyActiveBorrowers += activity.daily ? 1 : 0;
-    this.activityHelper.save();
+    this.dailyActivityHelper.activeBorrowers += activity.daily ? 1 : 0;
+    this.dailyActivityHelper.save();
   }
 
   addActiveLiquidator(activity: AccountWasActive): void {
-    this.activityHelper.dailyActiveLiquidators += activity.daily ? 1 : 0;
-    this.activityHelper.save();
+    this.dailyActivityHelper.activeLiquidators += activity.daily ? 1 : 0;
+    this.dailyActivityHelper.save();
   }
 
   addActiveLiquidatee(activity: AccountWasActive): void {
-    this.activityHelper.dailyActiveLiquidatees += activity.daily ? 1 : 0;
-    this.activityHelper.save();
+    this.dailyActivityHelper.activeLiquidatees += activity.daily ? 1 : 0;
+    this.dailyActivityHelper.save();
   }
 
   addTransaction(type: TransactionType): void {
     if (type == TransactionType.DEPOSIT) {
-      this.activityHelper.dailyDepositCount += 1;
-      this.activityHelper.hourlyDepositCount += 1;
+      this.hourlyActivityHelper.depositCount += 1;
+      this.dailyActivityHelper.depositCount += 1;
     } else if (type == TransactionType.WITHDRAW) {
-      this.activityHelper.dailyWithdrawCount += 1;
-      this.activityHelper.hourlyWithdrawCount += 1;
+      this.hourlyActivityHelper.withdrawCount += 1;
+      this.dailyActivityHelper.withdrawCount += 1;
     } else if (type == TransactionType.BORROW) {
-      this.activityHelper.dailyBorrowCount += 1;
-      this.activityHelper.hourlyBorrowCount += 1;
+      this.hourlyActivityHelper.borrowCount += 1;
+      this.dailyActivityHelper.borrowCount += 1;
     } else if (type == TransactionType.SWAP) {
-      this.activityHelper.dailySwapCount += 1;
-      this.activityHelper.hourlySwapCount += 1;
+      this.hourlyActivityHelper.swapCount += 1;
+      this.dailyActivityHelper.swapCount += 1;
     }
 
-    this.activityHelper.dailyTransactionCount += 1;
-    this.activityHelper.hourlyTransactionCount += 1;
-    this.activityHelper.save();
+    this.hourlyActivityHelper.transactionCount += 1;
+    this.dailyActivityHelper.transactionCount += 1;
+
+    this.hourlyActivityHelper.save();
+    this.dailyActivityHelper.save();
   }
 
   private takeSnapshots(): void {
-    if (!this.isInitialized()) return;
+    if (!this.protocol._lastUpdateTimestamp) return;
 
     const snapshotDayID =
       this.protocol._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_DAY;
     const snapshotHourID =
       this.protocol._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_HOUR;
 
-    log.warning(
-      "[takeSnapshots] lastUpdated: {} snapshotDayID: {} this.dayID: {} snapshotHourID: {} this.hourID: {}",
-      [
-        this.protocol._lastUpdateTimestamp!.toString(),
-        snapshotDayID.toString(),
-        this.dayID.toString(),
-        snapshotHourID.toString(),
-        this.hourID.toString(),
-      ]
-    );
     if (snapshotDayID != this.dayID) {
       this.takeFinancialsDailySnapshot(snapshotDayID);
       this.takeUsageDailySnapshot(snapshotDayID);
       this.protocol._lastSnapshotDayID = BigInt.fromI32(snapshotDayID);
-      // this.protocol._lastUpdateTimestamp = this.event.block.timestamp;
       this.protocol.save();
     }
 
     if (snapshotHourID != this.hourID) {
       this.takeUsageHourlySnapshot(snapshotHourID);
-      this.protocol._lastSnapshotHourID = BigInt.fromI32(snapshotHourID);
-      // this.protocol._lastUpdateTimestamp = this.event.block.timestamp;
+      this.protocol._lastSnapshotHourID = BigInt.fromI32(snapshotDayID);
       this.protocol.save();
     }
   }
 
-  private isInitialized(): boolean {
-    return !!(
-      this.protocol._lastSnapshotDayID &&
-      this.protocol._lastSnapshotHourID &&
-      this.protocol._lastUpdateTimestamp
-    );
-  }
-
   private takeFinancialsDailySnapshot(day: i32): void {
     const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
+
     const previousSnapshot = FinancialsDailySnapshot.load(
       Bytes.fromI32(this.protocol._lastSnapshotDayID!.toI32())
-    );
-
-    log.warning(
-      "[takeFinancialsDailySnapshot] snapshotID: {} previousSnapshotID: {}",
-      [day.toString(), this.protocol._lastSnapshotDayID!.toString()]
     );
 
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;
 
     snapshot.totalValueLockedUSD = this.protocol.totalValueLockedUSD;
-    snapshot.dailyOpenInterestUSD = this.protocol.openInterestUSD;
-    snapshot.protocolControlledValueUSD =
-      this.protocol.protocolControlledValueUSD;
+
+    snapshot.dailyLongOpenInterestUSD = this.protocol.longOpenInterestUSD;
+    snapshot.dailyShortOpenInterestUSD = this.protocol.shortOpenInterestUSD;
+    snapshot.dailyTotalOpenInterestUSD = this.protocol.totalOpenInterestUSD;
 
     snapshot.dailyVolumeUSD = previousSnapshot
       ? this.protocol.cumulativeVolumeUSD.minus(
@@ -243,36 +245,43 @@ export class ProtocolSnapshot {
   }
 
   private takeUsageDailySnapshot(day: i32): void {
-    const activity = this.activityHelper;
+    const activity = initActivityHelper(
+      Bytes.fromUTF8("daily-".concat(day.toString()))
+    );
 
     const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = UsageMetricsDailySnapshot.load(
       Bytes.fromI32(this.protocol._lastSnapshotDayID!.toI32())
     );
 
-    log.warning(
-      "[takeUsageDailySnapshot] snapshotID: {} previousSnapshotID: {}",
-      [day.toString(), this.protocol._lastSnapshotDayID!.toString()]
-    );
-
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;
 
-    snapshot.dailyActiveUsers = activity.dailyActiveUsers;
+    snapshot.dailyActiveUsers = activity.activeUsers;
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
 
     snapshot.dailyLongPositionCount = previousSnapshot
-      ? this.protocol.longPositionCount - previousSnapshot.longPositionCount
+      ? max(
+          this.protocol.longPositionCount - previousSnapshot.longPositionCount,
+          0
+        )
       : this.protocol.longPositionCount;
     snapshot.longPositionCount = this.protocol.longPositionCount;
 
     snapshot.dailyShortPositionCount = previousSnapshot
-      ? this.protocol.shortPositionCount - previousSnapshot.shortPositionCount
+      ? max(
+          this.protocol.shortPositionCount -
+            previousSnapshot.shortPositionCount,
+          0
+        )
       : this.protocol.shortPositionCount;
     snapshot.shortPositionCount = this.protocol.shortPositionCount;
 
     snapshot.dailyOpenPositionCount = previousSnapshot
-      ? this.protocol.openPositionCount - previousSnapshot.openPositionCount
+      ? max(
+          this.protocol.openPositionCount - previousSnapshot.openPositionCount,
+          0
+        )
       : this.protocol.openPositionCount;
     snapshot.openPositionCount = this.protocol.openPositionCount;
 
@@ -287,25 +296,25 @@ export class ProtocolSnapshot {
       : this.protocol.cumulativePositionCount;
     snapshot.cumulativePositionCount = this.protocol.cumulativePositionCount;
 
-    snapshot.dailyTransactionCount = activity.dailyTransactionCount;
-    snapshot.dailyDepositCount = activity.dailyDepositCount;
-    snapshot.dailyWithdrawCount = activity.dailyWithdrawCount;
-    snapshot.dailyBorrowCount = activity.dailyBorrowCount;
-    snapshot.dailySwapCount = activity.dailySwapCount;
+    snapshot.dailyTransactionCount = activity.transactionCount;
+    snapshot.dailyDepositCount = activity.depositCount;
+    snapshot.dailyWithdrawCount = activity.withdrawCount;
+    snapshot.dailyBorrowCount = activity.borrowCount;
+    snapshot.dailySwapCount = activity.swapCount;
 
-    snapshot.dailyActiveDepositors = activity.dailyActiveDepositors;
+    snapshot.dailyActiveDepositors = activity.activeDepositors;
     snapshot.cumulativeUniqueDepositors =
       this.protocol.cumulativeUniqueDepositors;
 
-    snapshot.dailyActiveBorrowers = activity.dailyActiveBorrowers;
+    snapshot.dailyActiveBorrowers = activity.activeBorrowers;
     snapshot.cumulativeUniqueBorrowers =
       this.protocol.cumulativeUniqueBorrowers;
 
-    snapshot.dailyActiveLiquidators = activity.dailyActiveLiquidators;
+    snapshot.dailyActiveLiquidators = activity.activeLiquidators;
     snapshot.cumulativeUniqueLiquidators =
       this.protocol.cumulativeUniqueLiquidators;
 
-    snapshot.dailyActiveLiquidatees = activity.dailyActiveLiquidatees;
+    snapshot.dailyActiveLiquidatees = activity.activeLiquidatees;
     snapshot.cumulativeUniqueLiquidatees =
       this.protocol.cumulativeUniqueLiquidatees;
 
@@ -323,76 +332,50 @@ export class ProtocolSnapshot {
 
     snapshot.totalPoolCount = this.protocol.totalPoolCount;
     snapshot.save();
-
-    activity.dailyActiveUsers = 0;
-    activity.dailyActiveDepositors = 0;
-    activity.dailyActiveBorrowers = 0;
-    activity.dailyActiveLiquidators = 0;
-    activity.dailyActiveLiquidatees = 0;
-
-    activity.dailyTransactionCount = 0;
-    activity.dailyDepositCount = 0;
-    activity.dailyWithdrawCount = 0;
-    activity.dailyBorrowCount = 0;
-    activity.dailySwapCount = 0;
-    activity.save();
   }
 
   private takeUsageHourlySnapshot(hour: i32): void {
-    const activity = this.activityHelper;
+    const activity = initActivityHelper(
+      Bytes.fromUTF8("hourly-".concat(hour.toString()))
+    );
     const snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
-
-    log.warning("[takeUsageHourlySnapshot] snapshotID: {}", [hour.toString()]);
 
     snapshot.hours = hour;
     snapshot.protocol = this.protocol.id;
 
-    snapshot.hourlyActiveUsers = activity.hourlyActiveUsers;
+    snapshot.hourlyActiveUsers = activity.activeUsers;
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
 
-    snapshot.hourlyTransactionCount = activity.hourlyTransactionCount;
-    snapshot.hourlyDepositCount = activity.hourlyDepositCount;
-    snapshot.hourlyWithdrawCount = activity.hourlyWithdrawCount;
-    snapshot.hourlyBorrowCount = activity.hourlyBorrowCount;
-    snapshot.hourlySwapCount = activity.hourlySwapCount;
+    snapshot.hourlyTransactionCount = activity.transactionCount;
+    snapshot.hourlyDepositCount = activity.depositCount;
+    snapshot.hourlyWithdrawCount = activity.withdrawCount;
+    snapshot.hourlyBorrowCount = activity.borrowCount;
+    snapshot.hourlySwapCount = activity.swapCount;
     snapshot.save();
-
-    activity.hourlyActiveUsers = 0;
-    activity.hourlyTransactionCount = 0;
-    activity.hourlyDepositCount = 0;
-    activity.hourlyWithdrawCount = 0;
-    activity.hourlyBorrowCount = 0;
-    activity.hourlySwapCount = 0;
-    activity.save();
   }
 }
 
-function initActivityHelper(): _ActivityHelper {
-  const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
-  let helper = _ActivityHelper.load(ActivityHelperID);
-  if (helper) return helper;
+export function initActivityHelper(id: Bytes): _ActivityHelper {
+  let activityHelper = _ActivityHelper.load(id);
 
-  helper = new _ActivityHelper(ActivityHelperID);
-  helper.dailyActiveUsers = 0;
-  helper.hourlyActiveUsers = 0;
+  if (!activityHelper) {
+    activityHelper = new _ActivityHelper(id);
 
-  helper.dailyActiveDepositors = 0;
-  helper.dailyActiveBorrowers = 0;
-  helper.dailyActiveLiquidators = 0;
-  helper.dailyActiveLiquidatees = 0;
+    activityHelper.activeUsers = 0;
+    activityHelper.activeDepositors = 0;
+    activityHelper.activeBorrowers = 0;
+    activityHelper.activeLiquidators = 0;
+    activityHelper.activeLiquidatees = 0;
 
-  helper.dailyTransactionCount = 0;
-  helper.hourlyTransactionCount = 0;
-  helper.dailyDepositCount = 0;
-  helper.hourlyDepositCount = 0;
-  helper.dailyWithdrawCount = 0;
-  helper.hourlyWithdrawCount = 0;
-  helper.dailyBorrowCount = 0;
-  helper.hourlyBorrowCount = 0;
-  helper.dailySwapCount = 0;
-  helper.hourlySwapCount = 0;
+    activityHelper.transactionCount = 0;
 
-  helper.save();
+    activityHelper.depositCount = 0;
+    activityHelper.withdrawCount = 0;
+    activityHelper.borrowCount = 0;
+    activityHelper.swapCount = 0;
 
-  return helper;
+    activityHelper.save();
+  }
+
+  return activityHelper;
 }

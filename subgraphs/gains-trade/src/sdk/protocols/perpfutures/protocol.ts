@@ -4,6 +4,7 @@ import {
   dataSource,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
+
 import { SDK } from ".";
 import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
@@ -11,7 +12,18 @@ import { CustomEventType } from "../../util/events";
 import { ProtocolSnapshot } from "./protocolSnapshot";
 import { PositionType, TransactionType } from "./enums";
 import { ProtocolConfigurer, TokenPricer } from "../config";
+
 import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/schema";
+
+/**
+ * This file contains the Perpetual class, which is used to
+ * make all of the storage changes that occur in a protocol.
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @harsh9200
+ */
 
 /**
  * ProtocolManager is a wrapper around the ProtocolSchema entity that takes care of
@@ -82,7 +94,9 @@ export class Perpetual {
       protocol.cumulativeWithdrawPremiumUSD = constants.BIGDECIMAL_ZERO;
       protocol.cumulativeTotalLiquidityPremiumUSD = constants.BIGDECIMAL_ZERO;
 
-      protocol.openInterestUSD = constants.BIGDECIMAL_ZERO;
+      protocol.longOpenInterestUSD = constants.BIGDECIMAL_ZERO;
+      protocol.shortOpenInterestUSD = constants.BIGDECIMAL_ZERO;
+      protocol.totalOpenInterestUSD = constants.BIGDECIMAL_ZERO;
 
       protocol.cumulativeUniqueUsers = 0;
       protocol.cumulativeUniqueDepositors = 0;
@@ -106,8 +120,8 @@ export class Perpetual {
 
       protocol.totalPoolCount = 0;
 
-      protocol._lastSnapshotDayID = constants.BIGINT_MINUS_ONE;
-      protocol._lastSnapshotHourID = constants.BIGINT_MINUS_ONE;
+      protocol._lastSnapshotDayID = constants.BIGINT_ZERO;
+      protocol._lastSnapshotHourID = constants.BIGINT_ZERO;
     }
 
     const versions = conf.getVersions();
@@ -168,7 +182,268 @@ export class Perpetual {
     return this.pricer;
   }
 
-  // Usage
+  /**
+   * Sets the TVL in USD for the protocol. Most times this will be called internally by
+   * other members of the library when TVL changes are made to them. But if the library
+   * is not well fitted to a given protocol and you need to set the TVL manually, you can
+   * use this method.
+   * It will also update the protocol's snapshots.
+   * @param tvl {BigDecimal} The new total value locked for the protocol.
+   */
+  setTotalValueLocked(tvl: BigDecimal): void {
+    this.protocol.totalValueLockedUSD = tvl;
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol's TVL. It can be a positive or negative amount.
+   * Same as for setTotalValueLocked, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param amount {BigDecimal} The value to add to the protocol's TVL.
+   */
+  addTotalValueLocked(amount: BigDecimal): void {
+    this.setTotalValueLocked(this.protocol.totalValueLockedUSD.plus(amount));
+  }
+
+  /**
+   * Sets the Volume in USD for the protocol. Most times this will be called internally by
+   * other members of the library when Volume changes are made to them. But if the library
+   * is not well fitted to a given protocol and you need to set the Volume manually, you can
+   * use this method.
+   * It will also update the protocol's snapshots.
+   * @param volume {BigDecimal} The new total value locked for the protocol.
+   */
+  setVolume(volume: BigDecimal): void {
+    this.protocol.cumulativeVolumeUSD = volume;
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol's volume. It can be a positive or negative amount.
+   * Same as for setTotalValueLocked, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param volume {BigDecimal} The value to add to the protocol's volume.
+   */
+  addVolume(volume: BigDecimal): void {
+    this.setVolume(this.protocol.cumulativeVolumeUSD.plus(volume));
+  }
+
+  /**
+   * Adds a given USD value to the protocol InflowVolumeUSD. It can be a positive or negative amount.
+   * @param volume {BigDecimal} The value to add to the protocol's InflowVolumeUSD.
+   */
+  addInflowVolumeUSD(volume: BigDecimal): void {
+    this.protocol.cumulativeInflowVolumeUSD =
+      this.protocol.cumulativeInflowVolumeUSD.plus(volume);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol ClosedInflowVolumeUSD. It can be a positive or negative amount.
+   * @param volume {BigDecimal} The value to add to the protocol's ClosedInflowVolumeUSD.
+   */
+  addClosedInflowVolumeUSD(volume: BigDecimal): void {
+    this.protocol.cumulativeClosedInflowVolumeUSD =
+      this.protocol.cumulativeClosedInflowVolumeUSD.plus(volume);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol OutflowVolumeUSD. It can be a positive or negative amount.
+   * @param volume {BigDecimal} The value to add to the protocol's OutflowVolumeUSD.
+   */
+  addOutflowVolumeUSD(volume: BigDecimal): void {
+    this.protocol.cumulativeOutflowVolumeUSD =
+      this.protocol.cumulativeOutflowVolumeUSD.plus(volume);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol supplySideRevenue. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param rev {BigDecimal} The value to add to the protocol's supplySideRevenue.
+   */
+  addSupplySideRevenueUSD(rev: BigDecimal): void {
+    this.protocol.cumulativeTotalRevenueUSD =
+      this.protocol.cumulativeTotalRevenueUSD.plus(rev);
+    this.protocol.cumulativeSupplySideRevenueUSD =
+      this.protocol.cumulativeSupplySideRevenueUSD.plus(rev);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol protocolSideRevenue. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param rev {BigDecimal} The value to add to the protocol's protocolSideRevenue.
+   */
+  addProtocolSideRevenueUSD(rev: BigDecimal): void {
+    this.protocol.cumulativeTotalRevenueUSD =
+      this.protocol.cumulativeTotalRevenueUSD.plus(rev);
+    this.protocol.cumulativeProtocolSideRevenueUSD =
+      this.protocol.cumulativeProtocolSideRevenueUSD.plus(rev);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol StakeSideRevenue. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param rev {BigDecimal} The value to add to the protocol's StakeSideRevenue.
+   */
+  addStakeSideRevenueUSD(rev: BigDecimal): void {
+    this.protocol.cumulativeTotalRevenueUSD =
+      this.protocol.cumulativeTotalRevenueUSD.plus(rev);
+    this.protocol.cumulativeStakeSideRevenueUSD =
+      this.protocol.cumulativeStakeSideRevenueUSD.plus(rev);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol's supplySideRevenue and protocolSideRevenue. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param protocolSide {BigDecimal} The value to add to the protocol's protocolSideRevenue.
+   * @param supplySide {BigDecimal} The value to add to the protocol's supplySideRevenue.
+   * @param stakeSide {BigDecimal} The value to add to the protocol's stakeSideRevenue.
+   */
+  addRevenueUSD(
+    protocolSide: BigDecimal,
+    supplySide: BigDecimal,
+    stakeSide: BigDecimal
+  ): void {
+    this.addSupplySideRevenueUSD(supplySide);
+    this.addProtocolSideRevenueUSD(protocolSide);
+    this.addStakeSideRevenueUSD(stakeSide);
+  }
+
+  /**
+   * Adds a given USD value to the protocol EntryPremium. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param premium {BigDecimal} The value to add to the protocol's EntryPremium.
+   */
+  addEntryPremiumUSD(premium: BigDecimal): void {
+    this.protocol.cumulativeTotalPremiumUSD =
+      this.protocol.cumulativeTotalPremiumUSD.plus(premium);
+    this.protocol.cumulativeEntryPremiumUSD =
+      this.protocol.cumulativeEntryPremiumUSD.plus(premium);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol ExitPremium. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param premium {BigDecimal} The value to add to the protocol's ExitPremium.
+   */
+  addExitPremiumUSD(premium: BigDecimal): void {
+    this.protocol.cumulativeTotalPremiumUSD =
+      this.protocol.cumulativeTotalPremiumUSD.plus(premium);
+    this.protocol.cumulativeExitPremiumUSD =
+      this.protocol.cumulativeExitPremiumUSD.plus(premium);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol depositPremium. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param premium {BigDecimal} The value to add to the protocol's depositPremium.
+   */
+  addDepositPremiumUSD(premium: BigDecimal): void {
+    this.protocol.cumulativeTotalLiquidityPremiumUSD =
+      this.protocol.cumulativeTotalLiquidityPremiumUSD.plus(premium);
+    this.protocol.cumulativeDepositPremiumUSD =
+      this.protocol.cumulativeDepositPremiumUSD.plus(premium);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol withdrawPremium. It can be a positive or negative amount.
+   * Same as for the rest of setters, this is mostly to be called internally by the library.
+   * But you can use it if you need to. It will also update the protocol's snapshots.
+   * @param premium {BigDecimal} The value to add to the protocol's withdrawPremium.
+   */
+  addWithdrawPremiumUSD(premium: BigDecimal): void {
+    this.protocol.cumulativeTotalLiquidityPremiumUSD =
+      this.protocol.cumulativeTotalLiquidityPremiumUSD.plus(premium);
+    this.protocol.cumulativeWithdrawPremiumUSD =
+      this.protocol.cumulativeWithdrawPremiumUSD.plus(premium);
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol's long and total openInterestUSD.
+   *
+   * @param amountChangeUSD {BigDecimal} The value to add to the protocol's openInterest in USD.
+   */
+  updateLongOpenInterestUSD(amountChangeUSD: BigDecimal): void {
+    this.protocol.totalOpenInterestUSD =
+      this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
+    this.protocol.longOpenInterestUSD =
+      this.protocol.longOpenInterestUSD.plus(amountChangeUSD);
+
+    this.save();
+  }
+
+  /**
+   * Adds a given USD value to the protocol's short and total openInterestUSD.
+   *
+   * @param amountChangeUSD {BigDecimal} The value to add to the protocol's openInterest in USD.
+   */
+  updateShortOpenInterestUSD(amountChangeUSD: BigDecimal): void {
+    this.protocol.totalOpenInterestUSD =
+      this.protocol.totalOpenInterestUSD.plus(amountChangeUSD);
+    this.protocol.shortOpenInterestUSD =
+      this.protocol.shortOpenInterestUSD.plus(amountChangeUSD);
+
+    this.save();
+  }
+
+  /**
+   * Adds 1 to the cumulativePositionCount counter and adds 1 to the counter corresponding the given position type.
+   * If you are creating transaction entities from the Account class you won't need to use this method.
+   * @param positionSide {PositionType} The type of transaction to add.
+   * @see PositionType
+   * @see Account
+   */
+  openPosition(positionSide: PositionType): void {
+    if (positionSide == PositionType.LONG) {
+      this.protocol.longPositionCount += 1;
+    } else if (positionSide == PositionType.SHORT) {
+      this.protocol.shortPositionCount += 1;
+    }
+
+    this.protocol.openPositionCount += 1;
+    this.protocol.cumulativePositionCount += 1;
+    this.save();
+  }
+
+  /**
+   * Subtracts 1 from the cumulativePositionCount counter and adds 1 to the counter corresponding the given position type.
+   * If you are creating transaction entities from the Account class you won't need to use this method.
+   * @param positionSide {PositionType} The type of transaction to add.
+   * @see PositionType
+   * @see Account
+   */
+  closePosition(
+    positionSide: PositionType,
+    isExistingOpenPosition: boolean = true
+  ): void {
+    if (isExistingOpenPosition) {
+      if (positionSide == PositionType.LONG) {
+        this.protocol.longPositionCount -= 1;
+      } else if (positionSide == PositionType.SHORT) {
+        this.protocol.shortPositionCount -= 1;
+      }
+      this.protocol.openPositionCount -= 1;
+    }
+    this.protocol.closedPositionCount += 1;
+
+    this.save();
+  }
 
   /**
    * Adds 1 to the transactionCount counter and adds 1 to the counter corresponding the given transaction type.
@@ -177,22 +452,11 @@ export class Perpetual {
    * @see TransactionType
    * @see Account
    */
-  addTransaction(
-    type: TransactionType,
-    amountUSD: BigDecimal | null = null
-  ): void {
+  addTransaction(type: TransactionType): void {
     if (type == TransactionType.DEPOSIT) {
-      if (!amountUSD) {
-        return;
-      }
       this.protocol.depositCount += 1;
-      this.addTotalValueLocked(amountUSD);
     } else if (type == TransactionType.WITHDRAW) {
-      if (!amountUSD) {
-        return;
-      }
       this.protocol.withdrawCount += 1;
-      this.addTotalValueLocked(amountUSD.times(constants.BIGDECIMAL_MINUS_ONE));
     } else if (type == TransactionType.SWAP) {
       this.protocol.swapCount += 1;
     } else if (type == TransactionType.BORROW) {
@@ -308,271 +572,5 @@ export class Perpetual {
   addPool(count: u8 = 1): void {
     this.protocol.totalPoolCount += count;
     this.save();
-  }
-
-  // Position
-
-  /**
-   * Adds 1 to the cumulativePositionCount counter and adds 1 to the counter corresponding the given position type.
-   * If you are creating transaction entities from the Account class you won't need to use this method.
-   * @param positionSide {PositionType} The type of transaction to add.
-   * @see PositionType
-   * @see Account
-   */
-  openPosition(positionSide: PositionType): void {
-    if (positionSide == PositionType.LONG) {
-      this.protocol.longPositionCount += 1;
-    } else if (positionSide == PositionType.SHORT) {
-      this.protocol.shortPositionCount += 1;
-    }
-
-    this.protocol.openPositionCount += 1;
-    this.protocol.cumulativePositionCount += 1;
-    this.save();
-  }
-
-  /**
-   * Subtracts 1 from the cumulativePositionCount counter and adds 1 to the counter corresponding the given position type.
-   * If you are creating transaction entities from the Account class you won't need to use this method.
-   * @param positionSide {PositionType} The type of transaction to add.
-   * @see PositionType
-   * @see Account
-   */
-  closePosition(
-    positionSide: PositionType,
-    isExistingOpenPosition: boolean = true
-  ): void {
-    if (isExistingOpenPosition) {
-      if (positionSide == PositionType.LONG) {
-        this.protocol.longPositionCount -= 1;
-      } else if (positionSide == PositionType.SHORT) {
-        this.protocol.shortPositionCount -= 1;
-      }
-      this.protocol.openPositionCount -= 1;
-    }
-    this.protocol.closedPositionCount += 1;
-
-    this.save();
-  }
-
-  // TVL
-
-  /**
-   * Sets the TVL in USD for the protocol. Most times this will be called internally by
-   * other members of the library when TVL changes are made to them. But if the library
-   * is not well fitted to a given protocol and you need to set the TVL manually, you can
-   * use this method.
-   * It will also update the protocol's snapshots.
-   * @param tvl {BigDecimal} The new total value locked for the protocol.
-   */
-  private setTotalValueLocked(tvl: BigDecimal): void {
-    this.protocol.totalValueLockedUSD = tvl;
-    this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol's TVL. It can be a positive or negative amount.
-   * Same as for setTotalValueLocked, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param amount {BigDecimal} The value to add to the protocol's TVL.
-   */
-  addTotalValueLocked(amount: BigDecimal): void {
-    this.setTotalValueLocked(this.protocol.totalValueLockedUSD.plus(amount));
-  }
-
-  // Volume
-
-  /**
-   * Sets the Volume in USD for the protocol. Most times this will be called internally by
-   * other members of the library when Volume changes are made to them. But if the library
-   * is not well fitted to a given protocol and you need to set the Volume manually, you can
-   * use this method.
-   * It will also update the protocol's snapshots.
-   * @param newVolumeUSD {BigDecimal} The new total value locked for the protocol.
-   */
-  private setVolumeUSD(newVolumeUSD: BigDecimal): void {
-    this.protocol.cumulativeVolumeUSD = newVolumeUSD;
-    this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol's volume. It can be a positive or negative amount.
-   * Same as for setTotalValueLocked, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param amountUSD {BigDecimal} The value to add to the protocol's volume.
-   */
-  addVolumeUSD(amountUSD: BigDecimal): void {
-    this.setVolumeUSD(this.protocol.cumulativeVolumeUSD.plus(amountUSD));
-  }
-
-  /**
-   * Adds a given USD value to the protocol InflowVolumeUSD. It can be a positive or negative amount.
-   * @param volume {BigDecimal} The value to add to the protocol's InflowVolumeUSD.
-   */
-  addInflowVolumeUSD(volume: BigDecimal): void {
-    this.protocol.cumulativeInflowVolumeUSD =
-      this.protocol.cumulativeInflowVolumeUSD.plus(volume);
-    this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol OutflowVolumeUSD. It can be a positive or negative amount.
-   * @param volume {BigDecimal} The value to add to the protocol's OutflowVolumeUSD.
-   */
-  addOutflowVolumeUSD(volume: BigDecimal): void {
-    this.protocol.cumulativeOutflowVolumeUSD =
-      this.protocol.cumulativeOutflowVolumeUSD.plus(volume);
-    this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol ClosedInflowVolumeUSD. It can be a positive or negative amount.
-   * @param volume {BigDecimal} The value to add to the protocol's ClosedInflowVolumeUSD.
-   */
-  addClosedInflowVolumeUSD(volume: BigDecimal): void {
-    this.protocol.cumulativeClosedInflowVolumeUSD =
-      this.protocol.cumulativeClosedInflowVolumeUSD.plus(volume);
-    this.save();
-  }
-
-  // Revenue
-
-  /**
-   * Adds a given USD value to the protocol supplySideRevenue. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param rev {BigDecimal} The value to add to the protocol's supplySideRevenue.
-   */
-  addSupplySideRevenueUSD(rev: BigDecimal): void {
-    this.protocol.cumulativeTotalRevenueUSD =
-      this.protocol.cumulativeTotalRevenueUSD.plus(rev);
-    this.protocol.cumulativeSupplySideRevenueUSD =
-      this.protocol.cumulativeSupplySideRevenueUSD.plus(rev);
-    this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol protocolSideRevenue. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param rev {BigDecimal} The value to add to the protocol's protocolSideRevenue.
-   */
-  addProtocolSideRevenueUSD(rev: BigDecimal): void {
-    this.protocol.cumulativeTotalRevenueUSD =
-      this.protocol.cumulativeTotalRevenueUSD.plus(rev);
-    this.protocol.cumulativeProtocolSideRevenueUSD =
-      this.protocol.cumulativeProtocolSideRevenueUSD.plus(rev);
-    this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol StakeSideRevenue. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param rev {BigDecimal} The value to add to the protocol's StakeSideRevenue.
-   */
-  addStakeSideRevenueUSD(rev: BigDecimal): void {
-    this.protocol.cumulativeTotalRevenueUSD =
-      this.protocol.cumulativeTotalRevenueUSD.plus(rev);
-    this.protocol.cumulativeStakeSideRevenueUSD =
-      this.protocol.cumulativeStakeSideRevenueUSD.plus(rev);
-    this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol's supplySideRevenue and protocolSideRevenue. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param protocolSide {BigDecimal} The value to add to the protocol's protocolSideRevenue.
-   * @param supplySide {BigDecimal} The value to add to the protocol's supplySideRevenue.
-   * @param stakeSide {BigDecimal} The value to add to the protocol's stakeSideRevenue.
-   */
-  addRevenueUSD(
-    protocolSide: BigDecimal,
-    supplySide: BigDecimal,
-    stakeSide: BigDecimal
-  ): void {
-    this.addSupplySideRevenueUSD(supplySide);
-    this.addProtocolSideRevenueUSD(protocolSide);
-    this.addStakeSideRevenueUSD(stakeSide);
-  }
-
-  // Premium
-
-  /**
-   * Adds a given USD value to the protocol depositPremium. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param premium {BigDecimal} The value to add to the protocol's depositPremium.
-   */
-  addDepositPremiumUSD(premium: BigDecimal): void {
-    this.protocol.cumulativeTotalLiquidityPremiumUSD =
-      this.protocol.cumulativeTotalLiquidityPremiumUSD.plus(premium);
-    this.protocol.cumulativeDepositPremiumUSD =
-      this.protocol.cumulativeDepositPremiumUSD.plus(premium);
-    this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol withdrawPremium. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param premium {BigDecimal} The value to add to the protocol's withdrawPremium.
-   */
-  addWithdrawPremiumUSD(premium: BigDecimal): void {
-    this.protocol.cumulativeTotalLiquidityPremiumUSD =
-      this.protocol.cumulativeTotalLiquidityPremiumUSD.plus(premium);
-    this.protocol.cumulativeWithdrawPremiumUSD =
-      this.protocol.cumulativeWithdrawPremiumUSD.plus(premium);
-    this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol EntryPremium. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param premium {BigDecimal} The value to add to the protocol's EntryPremium.
-   */
-  addEntryPremiumUSD(premium: BigDecimal): void {
-    this.protocol.cumulativeTotalPremiumUSD =
-      this.protocol.cumulativeTotalPremiumUSD.plus(premium);
-    this.protocol.cumulativeEntryPremiumUSD =
-      this.protocol.cumulativeEntryPremiumUSD.plus(premium);
-    this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol ExitPremium. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param premium {BigDecimal} The value to add to the protocol's ExitPremium.
-   */
-  addExitPremiumUSD(premium: BigDecimal): void {
-    this.protocol.cumulativeTotalPremiumUSD =
-      this.protocol.cumulativeTotalPremiumUSD.plus(premium);
-    this.protocol.cumulativeExitPremiumUSD =
-      this.protocol.cumulativeExitPremiumUSD.plus(premium);
-    this.save();
-  }
-
-  // Open Interest
-
-  /**
-   * Sets the openInterest in USD for the protocol. Most times this will be called internally by
-   * other members of the library when openInterest changes are made to them. But if the library
-   * is not well fitted to a given protocol and you need to set the openInterest manually, you can
-   * use this method.
-   * It will also update the protocol's snapshots.
-   * @param openInterest {BigDecimal} The new total value locked for the protocol.
-   */
-  setOpenInterest(openInterest: BigDecimal): void {
-    this.protocol.openInterestUSD = openInterest;
-    this.save();
-  }
-
-  updateOpenInterest(amountOld: BigDecimal, amountNew: BigDecimal): void {
-    this.setOpenInterest(
-      this.protocol.openInterestUSD.minus(amountOld).plus(amountNew)
-    );
   }
 }

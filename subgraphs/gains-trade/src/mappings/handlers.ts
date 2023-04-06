@@ -2,7 +2,6 @@ import {
   Address,
   BigDecimal,
   BigInt,
-  Bytes,
   dataSource,
   log,
 } from "@graphprotocol/graph-ts";
@@ -10,8 +9,9 @@ import {
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
-import { createTokenAmountArray, safeDivide } from "./helpers";
+import { createTokenAmountArray } from "./helpers";
 
+import { Vault } from "../../generated/Vault/Vault";
 import { PairStorage } from "../../generated/Vault/PairStorage";
 import { Storage } from "../../generated/Vault/Storage";
 import { PairInfo } from "../../generated/Vault/PairInfo";
@@ -40,9 +40,12 @@ import {
   TokenInitializer,
   TokenParams,
 } from "../sdk/protocols/perpfutures/tokens";
-import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
 import {
-  BIGDECIMAL_ONE,
+  bigDecimalToBigInt,
+  bigIntToBigDecimal,
+  safeDivide,
+} from "../sdk/util/numbers";
+import {
   BIGINT_HUNDRED,
   BIGINT_MINUS_ONE,
   BIGINT_ONE,
@@ -50,11 +53,9 @@ import {
   LiquidityPoolFeeType,
   PositionSide,
   RewardTokenType,
-  ZERO_ADDRESS,
 } from "../sdk/util/constants";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { getRewardsPerDay, RewardIntervalType } from "../sdk/util/rewards";
-import { pairIndexToName } from "./pairList";
 
 // Implement TokenPricer to pass it to the SDK constructor
 class Pricer implements TokenPricer {
@@ -110,9 +111,14 @@ export function handleDeposit(event: Deposit): void {
 
   const pool = sdk.Pools.loadPool(dataSource.address());
   if (!pool.isInitialized) {
-    pool.initialize("gDAI Vault", "gDAI Vault", [depositToken], outputToken);
+    pool.initialize(
+      "gDAI Vault",
+      "gDAI Vault",
+      [depositToken],
+      outputToken,
+      "chainlink"
+    );
 
-    pool.setInputTokenWeights([BIGDECIMAL_ONE]);
     pool.setPoolFee(
       LiquidityPoolFeeType.DYNAMIC_PROTOCOL_FEE,
       safeDivide(
@@ -135,36 +141,16 @@ export function handleDeposit(event: Deposit): void {
     [depositToken],
     [depositAmount]
   );
-  const account = sdk.Accounts.loadAccount(caller);
-  account.deposit(pool, depositAmounts);
-}
+  const loadAccountResponse = sdk.Accounts.loadAccount(caller);
+  const account = loadAccountResponse.account;
+  if (loadAccountResponse.isNewUser) {
+    const protocol = sdk.Protocol;
+    protocol.addUser();
+    pool.addUser();
+  }
 
-export function handleDepositLocked(event: DepositLocked): void {
-  const stakeAmount = event.params.d.assetsDeposited;
-
-  const sdk = SDK.initializeFromEvent(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event
-  );
-
-  const pool = sdk.Pools.loadPool(dataSource.address());
-  pool.addStakedOutputTokenAmount(stakeAmount);
-}
-
-export function handleDepositUnlocked(event: DepositUnlocked): void {
-  const unstakeAmount = event.params.d.assetsDeposited;
-
-  const sdk = SDK.initializeFromEvent(
-    conf,
-    new Pricer(),
-    new TokenInit(),
-    event
-  );
-
-  const pool = sdk.Pools.loadPool(dataSource.address());
-  pool.addStakedOutputTokenAmount(unstakeAmount.times(BIGINT_MINUS_ONE));
+  account.deposit(pool, depositAmounts, mintAmount);
+  pool.addInputTokenBalances(depositAmounts);
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -191,8 +177,62 @@ export function handleWithdraw(event: Withdraw): void {
     [withdrawToken],
     [withdrawAmount]
   );
-  const account = sdk.Accounts.loadAccount(caller);
-  account.withdraw(pool, withdrawAmounts);
+  const loadAccountResponse = sdk.Accounts.loadAccount(caller);
+  const account = loadAccountResponse.account;
+  if (loadAccountResponse.isNewUser) {
+    const protocol = sdk.Protocol;
+    protocol.addUser();
+    pool.addUser();
+  }
+
+  account.withdraw(pool, withdrawAmounts, burnAmount);
+  pool.addInputTokenBalances(
+    withdrawAmounts.map<BigInt>((amount) => amount.times(BIGINT_MINUS_ONE))
+  );
+}
+
+export function handleDepositLocked(event: DepositLocked): void {
+  const sender = event.params.sender;
+  const stakeAmount = event.params.d.assetsDeposited;
+
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+
+  const pool = sdk.Pools.loadPool(dataSource.address());
+  pool.addStakedOutputTokenAmount(stakeAmount);
+
+  const loadAccountResponse = sdk.Accounts.loadAccount(sender);
+  if (loadAccountResponse.isNewUser) {
+    const protocol = sdk.Protocol;
+    protocol.addUser();
+    pool.addUser();
+  }
+}
+
+export function handleDepositUnlocked(event: DepositUnlocked): void {
+  const receiver = event.params.receiver;
+  const unstakeAmount = event.params.d.assetsDeposited;
+
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(),
+    new TokenInit(),
+    event
+  );
+
+  const pool = sdk.Pools.loadPool(dataSource.address());
+  pool.addStakedOutputTokenAmount(unstakeAmount.times(BIGINT_MINUS_ONE));
+
+  const loadAccountResponse = sdk.Accounts.loadAccount(receiver);
+  if (loadAccountResponse.isNewUser) {
+    const protocol = sdk.Protocol;
+    protocol.addUser();
+    pool.addUser();
+  }
 }
 
 export function handleMarketExecuted(event: MarketExecuted): void {
@@ -226,7 +266,6 @@ export function handleMarketExecuted(event: MarketExecuted): void {
   const precision = precisionCall.value;
 
   const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
-  pool.addVolumeByToken(Address.fromBytes(collateralToken.id), leveragedAmount);
 
   const pairIndex = event.params.t.pairIndex;
   const openInterestLongCall = storageContract.try_openInterestDai(
@@ -254,29 +293,12 @@ export function handleMarketExecuted(event: MarketExecuted): void {
     return;
   }
   const openInterestShort = openInterestShortCall.value;
-
-  const openInterest = openInterestLong.plus(openInterestShort);
-  pool.setOpenInterest(collateralToken, openInterest);
-
-  const pairName = pairIndexToName.get(pairIndex);
-  if (!pairName) {
-    log.warning("[pairIndexToName] pairIndex: {} not listed", [
-      pairIndex.toString(),
-    ]);
-    return;
-  }
-  const pairHex = Bytes.fromUTF8(pairName!).toHexString().replace("0x", "");
-  const pairAddr = Address.fromString(
-    ZERO_ADDRESS.slice(0, ZERO_ADDRESS.length - pairHex.length) + pairHex
+  pool.updateOpenInterestByToken(
+    pairIndex,
+    collateralToken,
+    openInterestLong,
+    openInterestShort
   );
-
-  const tradingPair = sdk.Tokens.getOrCreateSyntheticToken(
-    pairAddr,
-    pairName!,
-    pairName!,
-    10 as i32
-  );
-  pool.addInputToken(tradingPair.id);
 
   const pairInfoContract = PairInfo.bind(NetworkConfigs.getPairInfoAddress());
   const fundingRatePerBlockCall =
@@ -299,12 +321,16 @@ export function handleMarketExecuted(event: MarketExecuted): void {
     fundingRatePerBlock.toBigDecimal(),
     RewardIntervalType.BLOCK
   );
-  pool.setFundingRateByToken(
-    Address.fromBytes(tradingPair.id),
-    fundingRatePerDay
-  );
+  pool.updateFundingRateByToken(pairIndex, collateralToken, fundingRatePerDay);
 
-  const account = sdk.Accounts.loadAccount(trader);
+  const loadAccountResponse = sdk.Accounts.loadAccount(trader);
+  const account = loadAccountResponse.account;
+  if (loadAccountResponse.isNewUser) {
+    const protocol = sdk.Protocol;
+    protocol.addUser();
+    pool.addUser();
+  }
+
   const loadPositionResponse = sdk.Positions.loadPosition(
     pool,
     account,
@@ -320,12 +346,21 @@ export function handleMarketExecuted(event: MarketExecuted): void {
   const pairStorageContract = PairStorage.bind(
     NetworkConfigs.getPairStorageAddress()
   );
+  const vaultContract = Vault.bind(NetworkConfigs.getVaultAddress());
+  const sharesTransferredCall =
+    vaultContract.try_convertToShares(collateralAmount);
+  if (sharesTransferredCall.reverted) {
+    log.warning(
+      "[sharesTransferredCall reverted] hash: {} collateralAmount: {}",
+      [event.transaction.hash.toHexString(), collateralAmount.toString()]
+    );
+    return;
+  }
+  const sharesTransferred = sharesTransferredCall.value;
 
   if (event.params.open) {
-    pool.addInflowVolumeByToken(
-      Address.fromBytes(collateralToken.id),
-      leveragedAmount
-    );
+    pool.addInflowVolumeByToken(collateralToken, leveragedAmount);
+    pool.addVolumeByToken(collateralToken, leveragedAmount);
 
     const openFeePCall = pairStorageContract.try_pairOpenFeeP(pairIndex);
     if (openFeePCall.reverted) {
@@ -342,9 +377,8 @@ export function handleMarketExecuted(event: MarketExecuted): void {
         precision.times(BIGINT_HUNDRED).toBigDecimal()
       )
     );
-
     pool.addPremiumByToken(
-      Address.fromBytes(collateralToken.id),
+      collateralToken,
       openingFee,
       TransactionType.COLLATERAL_IN
     );
@@ -354,7 +388,12 @@ export function handleMarketExecuted(event: MarketExecuted): void {
       [collateralToken],
       [collateralAmount]
     );
-    account.collateralIn(pool, positionID, collateralAmounts);
+    account.collateralIn(
+      pool,
+      positionID,
+      collateralAmounts,
+      sharesTransferred
+    );
 
     if (leverage > BIGINT_ONE) {
       account.borrow(
@@ -366,14 +405,8 @@ export function handleMarketExecuted(event: MarketExecuted): void {
     }
 
     position.setLeverage(leverage.toBigDecimal());
-    position.setBalance(
-      Address.fromBytes(collateralToken.id),
-      collateralAmount
-    );
-    position.setCollateralBalance(
-      Address.fromBytes(collateralToken.id),
-      collateralAmount
-    );
+    position.setBalance(collateralToken, collateralAmount);
+    position.setCollateralBalance(collateralToken, collateralAmount);
     position.addCollateralInCount();
     position.setFundingrateOpen(fundingRatePerDay);
   } else {
@@ -383,21 +416,29 @@ export function handleMarketExecuted(event: MarketExecuted): void {
       precision.times(BIGINT_HUNDRED).toBigDecimal()
     );
     const pnlAmount = collateralAmount.plus(bigDecimalToBigInt(pnl));
-    const leveragedPnlAmount = pnlAmount.times(leverage);
 
     if (percentProfit <= BIGINT_ZERO) {
       pool.addClosedInflowVolumeByToken(
-        Address.fromBytes(collateralToken.id),
+        collateralToken,
         collateralAmount.minus(pnlAmount)
       );
-      pool.addOutflowVolumeByToken(
-        Address.fromBytes(collateralToken.id),
-        pnlAmount
-      );
+      pool.addOutflowVolumeByToken(collateralToken, pnlAmount);
+      pool.addVolumeByToken(collateralToken, pnlAmount);
+
+      position.setBalanceClosed(collateralToken, pnlAmount);
+      position.setCollateralBalanceClosed(collateralToken, pnlAmount);
+      position.setRealisedPnlClosed(collateralToken, bigDecimalToBigInt(pnl));
     } else {
-      pool.addOutflowVolumeByToken(
-        Address.fromBytes(collateralToken.id),
-        leveragedPnlAmount
+      const leveragedPnlAmount = pnlAmount.times(leverage);
+
+      pool.addOutflowVolumeByToken(collateralToken, leveragedPnlAmount);
+      pool.addVolumeByToken(collateralToken, leveragedPnlAmount);
+
+      position.setBalanceClosed(collateralToken, leveragedPnlAmount);
+      position.setCollateralBalanceClosed(collateralToken, leveragedPnlAmount);
+      position.setRealisedPnlClosed(
+        collateralToken,
+        bigDecimalToBigInt(pnl).times(leverage)
       );
     }
 
@@ -416,9 +457,8 @@ export function handleMarketExecuted(event: MarketExecuted): void {
         precision.times(BIGINT_HUNDRED).toBigDecimal()
       )
     );
-
     pool.addPremiumByToken(
-      Address.fromBytes(collateralToken.id),
+      collateralToken,
       closingFee,
       TransactionType.COLLATERAL_OUT
     );
@@ -428,7 +468,12 @@ export function handleMarketExecuted(event: MarketExecuted): void {
       [collateralToken],
       [pnlAmount]
     );
-    account.collateralOut(pool, positionID, collateralAmounts);
+    account.collateralOut(
+      pool,
+      positionID,
+      collateralAmounts,
+      sharesTransferred
+    );
 
     position.addCollateralOutCount();
     position.setFundingrateClosed(fundingRatePerDay);
@@ -468,8 +513,6 @@ export function handleLimitExecuted(event: LimitExecuted): void {
 
   const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
 
-  pool.addVolumeByToken(Address.fromBytes(collateralToken.id), leveragedAmount);
-
   const pairIndex = event.params.t.pairIndex;
   const openInterestLongCall = storageContract.try_openInterestDai(
     pairIndex,
@@ -496,29 +539,12 @@ export function handleLimitExecuted(event: LimitExecuted): void {
     return;
   }
   const openInterestShort = openInterestShortCall.value;
-
-  const openInterest = openInterestLong.plus(openInterestShort);
-  pool.setOpenInterest(collateralToken, openInterest);
-
-  const pairName = pairIndexToName.get(pairIndex);
-  if (!pairName) {
-    log.warning("[pairIndexToName] pairIndex: {} not listed", [
-      pairIndex.toString(),
-    ]);
-    return;
-  }
-  const pairHex = Bytes.fromUTF8(pairName!).toHexString().replace("0x", "");
-  const pairAddr = Address.fromString(
-    ZERO_ADDRESS.slice(0, ZERO_ADDRESS.length - pairHex.length) + pairHex
+  pool.updateOpenInterestByToken(
+    pairIndex,
+    collateralToken,
+    openInterestLong,
+    openInterestShort
   );
-
-  const tradingPair = sdk.Tokens.getOrCreateSyntheticToken(
-    pairAddr,
-    pairName!,
-    pairName!,
-    10 as i32
-  );
-  pool.addInputToken(tradingPair.id);
 
   const pairInfoContract = PairInfo.bind(NetworkConfigs.getPairInfoAddress());
   const fundingRatePerBlockCall =
@@ -537,12 +563,16 @@ export function handleLimitExecuted(event: LimitExecuted): void {
     fundingRatePerBlock.toBigDecimal(),
     RewardIntervalType.BLOCK
   );
-  pool.setFundingRateByToken(
-    Address.fromBytes(tradingPair.id),
-    fundingRatePerDay
-  );
+  pool.updateFundingRateByToken(pairIndex, collateralToken, fundingRatePerDay);
 
-  const account = sdk.Accounts.loadAccount(trader);
+  const loadAccountResponse = sdk.Accounts.loadAccount(trader);
+  const account = loadAccountResponse.account;
+  if (loadAccountResponse.isNewUser) {
+    const protocol = sdk.Protocol;
+    protocol.addUser();
+    pool.addUser();
+  }
+
   const loadPositionResponse = sdk.Positions.loadPosition(
     pool,
     account,
@@ -558,13 +588,22 @@ export function handleLimitExecuted(event: LimitExecuted): void {
   const pairStorageContract = PairStorage.bind(
     NetworkConfigs.getPairStorageAddress()
   );
+  const vaultContract = Vault.bind(NetworkConfigs.getVaultAddress());
+  const sharesTransferredCall =
+    vaultContract.try_convertToShares(collateralAmount);
+  if (sharesTransferredCall.reverted) {
+    log.warning(
+      "[sharesTransferredCall reverted] hash: {} collateralAmount: {}",
+      [event.transaction.hash.toHexString(), collateralAmount.toString()]
+    );
+    return;
+  }
+  const sharesTransferred = sharesTransferredCall.value;
 
   // orderType [TP, SL, LIQ, OPEN]
   if (event.params.orderType == 3) {
-    pool.addInflowVolumeByToken(
-      Address.fromBytes(collateralToken.id),
-      leveragedAmount
-    );
+    pool.addInflowVolumeByToken(collateralToken, leveragedAmount);
+    pool.addVolumeByToken(collateralToken, leveragedAmount);
 
     const openFeePCall = pairStorageContract.try_pairOpenFeeP(pairIndex);
     if (openFeePCall.reverted) {
@@ -582,7 +621,7 @@ export function handleLimitExecuted(event: LimitExecuted): void {
       )
     );
     pool.addPremiumByToken(
-      Address.fromBytes(collateralToken.id),
+      collateralToken,
       openingFee,
       TransactionType.COLLATERAL_IN
     );
@@ -592,7 +631,12 @@ export function handleLimitExecuted(event: LimitExecuted): void {
       [collateralToken],
       [collateralAmount]
     );
-    account.collateralIn(pool, positionID, collateralAmounts);
+    account.collateralIn(
+      pool,
+      positionID,
+      collateralAmounts,
+      sharesTransferred
+    );
 
     if (leverage > BIGINT_ONE) {
       account.borrow(
@@ -604,14 +648,8 @@ export function handleLimitExecuted(event: LimitExecuted): void {
     }
 
     position.setLeverage(leverage.toBigDecimal());
-    position.setBalance(
-      Address.fromBytes(collateralToken.id),
-      collateralAmount
-    );
-    position.setCollateralBalance(
-      Address.fromBytes(collateralToken.id),
-      collateralAmount
-    );
+    position.setBalance(collateralToken, collateralAmount);
+    position.setCollateralBalance(collateralToken, collateralAmount);
     position.addCollateralInCount();
     position.setFundingrateOpen(fundingRatePerDay);
   } else {
@@ -621,7 +659,6 @@ export function handleLimitExecuted(event: LimitExecuted): void {
       precision.times(BIGINT_HUNDRED).toBigDecimal()
     );
     const pnlAmount = collateralAmount.plus(bigDecimalToBigInt(pnl));
-    const leveragedPnlAmount = pnlAmount.times(leverage);
 
     const closeFeePCall = pairStorageContract.try_pairCloseFeeP(pairIndex);
     if (closeFeePCall.reverted) {
@@ -645,13 +682,10 @@ export function handleLimitExecuted(event: LimitExecuted): void {
     if (event.params.orderType == 2) {
       // liquidate
       if (percentProfit <= BIGINT_ZERO) {
-        pool.addClosedInflowVolumeByToken(
-          Address.fromBytes(collateralToken.id),
-          collateralAmount
-        );
+        pool.addClosedInflowVolumeByToken(collateralToken, collateralAmount);
       }
       pool.addPremiumByToken(
-        Address.fromBytes(collateralToken.id),
+        collateralToken,
         closingFee,
         TransactionType.LIQUIDATE
       );
@@ -668,25 +702,40 @@ export function handleLimitExecuted(event: LimitExecuted): void {
       );
 
       position.addLiquidationCount();
+      position.setBalanceClosed(collateralToken, BIGINT_ZERO);
+      position.setCollateralBalanceClosed(collateralToken, BIGINT_ZERO);
+      position.setRealisedPnlClosed(collateralToken, bigDecimalToBigInt(pnl));
     } else {
       if (percentProfit <= BIGINT_ZERO) {
         pool.addClosedInflowVolumeByToken(
-          Address.fromBytes(collateralToken.id),
+          collateralToken,
           collateralAmount.minus(pnlAmount)
         );
-        pool.addOutflowVolumeByToken(
-          Address.fromBytes(collateralToken.id),
-          pnlAmount
-        );
+        pool.addOutflowVolumeByToken(collateralToken, pnlAmount);
+        pool.addVolumeByToken(collateralToken, pnlAmount);
+
+        position.setBalanceClosed(collateralToken, pnlAmount);
+        position.setCollateralBalanceClosed(collateralToken, pnlAmount);
+        position.setRealisedPnlClosed(collateralToken, bigDecimalToBigInt(pnl));
       } else {
-        pool.addOutflowVolumeByToken(
-          Address.fromBytes(collateralToken.id),
+        const leveragedPnlAmount = pnlAmount.times(leverage);
+
+        pool.addOutflowVolumeByToken(collateralToken, leveragedPnlAmount);
+        pool.addVolumeByToken(collateralToken, leveragedPnlAmount);
+
+        position.setBalanceClosed(collateralToken, leveragedPnlAmount);
+        position.setCollateralBalanceClosed(
+          collateralToken,
           leveragedPnlAmount
+        );
+        position.setRealisedPnlClosed(
+          collateralToken,
+          bigDecimalToBigInt(pnl).times(leverage)
         );
       }
 
       pool.addPremiumByToken(
-        Address.fromBytes(collateralToken.id),
+        collateralToken,
         closingFee,
         TransactionType.COLLATERAL_OUT
       );
@@ -696,7 +745,12 @@ export function handleLimitExecuted(event: LimitExecuted): void {
         [collateralToken],
         [pnlAmount]
       );
-      account.collateralOut(pool, positionID, collateralAmounts);
+      account.collateralOut(
+        pool,
+        positionID,
+        collateralAmounts,
+        sharesTransferred
+      );
 
       position.addCollateralOutCount();
     }
@@ -718,11 +772,7 @@ export function handleDevGovFeeCharged(event: DevGovFeeCharged): void {
   );
   const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
 
-  pool.addRevenueByToken(
-    Address.fromBytes(collateralToken.id),
-    devGovFee,
-    BIGINT_ZERO
-  );
+  pool.addRevenueByToken(collateralToken, devGovFee, BIGINT_ZERO);
 }
 
 export function handleLpFeeCharged(event: LpFeeCharged): void {
@@ -740,11 +790,7 @@ export function handleLpFeeCharged(event: LpFeeCharged): void {
   );
   const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
 
-  pool.addRevenueByToken(
-    Address.fromBytes(collateralToken.id),
-    BIGINT_ZERO,
-    lpFee
-  );
+  pool.addRevenueByToken(collateralToken, BIGINT_ZERO, lpFee);
 }
 
 export function handleDaiVaultFeeCharged(event: DaiVaultFeeCharged): void {
@@ -762,11 +808,7 @@ export function handleDaiVaultFeeCharged(event: DaiVaultFeeCharged): void {
   );
   const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
 
-  pool.addRevenueByToken(
-    Address.fromBytes(collateralToken.id),
-    BIGINT_ZERO,
-    vaultFee
-  );
+  pool.addRevenueByToken(collateralToken, BIGINT_ZERO, vaultFee);
 }
 
 export function handleSssFeeCharged(event: SssFeeCharged): void {

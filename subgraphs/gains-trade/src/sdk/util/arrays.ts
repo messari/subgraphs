@@ -70,19 +70,26 @@ export function addToArrayAtIndex<T>(x: T[], item: T, index: i32 = -1): T[] {
   return retval;
 }
 
-export function updateArray<BigInt>(
-  x: BigInt[],
-  y: BigInt[],
-  multiple: BigInt
-): BigInt[] {
-  if (x.length == 0 || y.length == 0 || x.length != y.length) {
-    return x;
+export function addArrays<T>(a: T[], b: T[]): T[] {
+  const retval = new Array<T>();
+  if (a.length == b.length) {
+    let i = 0;
+    while (i < a.length) {
+      retval.push(a[i].plus(b[i]));
+      i += 1;
+    }
   }
-  const retval = new Array<BigInt>();
-  let i = 0;
-  while (i < x.length) {
-    retval.push(x[i].plus(y[i].times(multiple)));
-    i += 1;
+  return retval;
+}
+
+export function subtractArrays<T>(a: T[], b: T[]): T[] {
+  const retval = new Array<T>();
+  if (a.length == b.length) {
+    let i = 0;
+    while (i < a.length) {
+      retval.push(a[i].minus(b[i]));
+      i += 1;
+    }
   }
   return retval;
 }

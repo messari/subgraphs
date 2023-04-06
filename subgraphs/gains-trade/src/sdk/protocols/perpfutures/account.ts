@@ -5,6 +5,14 @@ import {
   Address,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
+
+import { Pool } from "./pool";
+import { Perpetual } from "./protocol";
+import { TokenManager } from "./tokens";
+import * as constants from "../../util/constants";
+import { EventType, ActivityType, TransactionType } from "./enums";
+import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+
 import {
   Swap,
   Borrow,
@@ -16,12 +24,30 @@ import {
   ActiveAccount,
   Account as AccountSchema,
 } from "../../../../generated/schema";
-import { Pool } from "./pool";
-import { Perpetual } from "./protocol";
-import { TokenManager } from "./tokens";
-import * as constants from "../../util/constants";
-import { EventType, ActivityType, TransactionType } from "./enums";
-import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+
+/**
+ * This file contains the AccountClass, which does
+ * the operations on the Account entity. This includes:
+ *  - Creating a new Account
+ *  - Updating an existing Account
+ *  - Making a position
+ *  - Making position snapshots
+ *
+ * Schema Version:  1.2.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @harsh9200
+ */
+
+class LoadAccountResponse {
+  account: Account;
+  isNewUser: boolean;
+
+  constructor(account: Account, isNewUser: boolean) {
+    this.account = account;
+    this.isNewUser = isNewUser;
+  }
+}
 
 export class AccountManager {
   protocol: Perpetual;
@@ -32,39 +58,41 @@ export class AccountManager {
     this.tokens = tokens;
   }
 
-  loadAccount(address: Address): Account {
-    let account = AccountSchema.load(address);
-    if (!account) {
-      account = new AccountSchema(address);
+  loadAccount(address: Address): LoadAccountResponse {
+    let isNewUser = false;
+    let entity = AccountSchema.load(address);
+    if (!entity) {
+      isNewUser = true;
+      entity = new AccountSchema(address);
 
-      account.cumulativeEntryPremiumUSD = constants.BIGDECIMAL_ZERO;
-      account.cumulativeExitPremiumUSD = constants.BIGDECIMAL_ZERO;
-      account.cumulativeTotalPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeEntryPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeExitPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeTotalPremiumUSD = constants.BIGDECIMAL_ZERO;
 
-      account.cumulativeDepositPremiumUSD = constants.BIGDECIMAL_ZERO;
-      account.cumulativeWithdrawPremiumUSD = constants.BIGDECIMAL_ZERO;
-      account.cumulativeTotalLiquidityPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeDepositPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeWithdrawPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeTotalLiquidityPremiumUSD = constants.BIGDECIMAL_ZERO;
 
-      account.longPositionCount = 0;
-      account.shortPositionCount = 0;
-      account.openPositionCount = 0;
-      account.closedPositionCount = 0;
-      account.cumulativeUniqueLiquidatees = 0;
+      entity.longPositionCount = 0;
+      entity.shortPositionCount = 0;
+      entity.openPositionCount = 0;
+      entity.closedPositionCount = 0;
+      entity.cumulativeUniqueLiquidatees = 0;
 
-      account.depositCount = 0;
-      account.withdrawCount = 0;
-      account.borrowCount = 0;
-      account.swapCount = 0;
-      account.collateralInCount = 0;
-      account.collateralOutCount = 0;
-      account.liquidateCount = 0;
-      account.liquidationCount = 0;
+      entity.depositCount = 0;
+      entity.withdrawCount = 0;
+      entity.borrowCount = 0;
+      entity.swapCount = 0;
+      entity.collateralInCount = 0;
+      entity.collateralOutCount = 0;
+      entity.liquidateCount = 0;
+      entity.liquidationCount = 0;
 
-      account.save();
-
-      this.protocol.addUser();
+      entity.save();
     }
-    return new Account(this.protocol, account, this.tokens);
+
+    const account = new Account(this.protocol, entity, this.tokens);
+    return new LoadAccountResponse(account, isNewUser);
   }
 }
 
@@ -174,7 +202,7 @@ export class Account {
   deposit(
     pool: Pool,
     amounts: BigInt[],
-    sharesMinted: BigInt | null = null,
+    sharesMinted: BigInt,
     updateMetrics: bool = true
   ): Deposit {
     const depositId = this.getIdFromEvent(EventType.DEPOSIT);
@@ -198,19 +226,15 @@ export class Account {
     deposit.inputTokens = pool.getInputTokens();
     deposit.outputToken = pool.getOutputToken();
     deposit.inputTokenAmounts = amounts;
-    if (sharesMinted) {
-      deposit.outputTokenAmount = sharesMinted;
-    }
+    deposit.outputTokenAmount = sharesMinted;
     deposit.amountUSD = this.getAmountUSD(pool.getInputTokens(), amounts);
     deposit.pool = pool.getBytesID();
     deposit.save();
 
     if (updateMetrics) {
       this.pool = pool;
-      this.pool!.updateInputTokenBalances(amounts, constants.BIGINT_ONE);
-
       this.countDeposit();
-      this.protocol.addTransaction(TransactionType.DEPOSIT, deposit.amountUSD);
+      this.protocol.addTransaction(TransactionType.DEPOSIT);
     }
 
     return deposit;
@@ -220,14 +244,14 @@ export class Account {
    *
    * @param pool The pool where the liquidity was withdrawn.
    * @param amounts The amount withdrawn of inputTokens.
-   * @param sharesMinted The amount of shares burnt of outputToken.
+   * @param sharesBurnt The amount of shares burnt of outputToken.
    * @param updateMetrics Optional, defaults to true. If true it will update the protocol withdraw and transaction count.
    * @returns Withdraw
    */
   withdraw(
     pool: Pool,
     amounts: BigInt[],
-    sharesBurnt: BigInt | null = null,
+    sharesBurnt: BigInt,
     updateMetrics: bool = true
   ): Withdraw {
     const withdrawId = this.getIdFromEvent(EventType.WITHDRAW);
@@ -251,27 +275,15 @@ export class Account {
     withdraw.inputTokens = pool.getInputTokens();
     withdraw.outputToken = pool.getOutputToken();
     withdraw.inputTokenAmounts = amounts;
-    if (sharesBurnt) {
-      withdraw.outputTokenAmount = sharesBurnt;
-    }
+    withdraw.outputTokenAmount = sharesBurnt;
     withdraw.amountUSD = this.getAmountUSD(pool.getInputTokens(), amounts);
     withdraw.pool = pool.getBytesID();
     withdraw.save();
 
     if (updateMetrics) {
       this.pool = pool;
-      // this.pool!.addInputTokenBalances(
-      //   amounts.map<BigInt>((amount) =>
-      //     amount.times(constants.BIGINT_MINUS_ONE)
-      //   )
-      // );
-      this.pool!.updateInputTokenBalances(amounts, constants.BIGINT_MINUS_ONE);
-
       this.countWithdraw();
-      this.protocol.addTransaction(
-        TransactionType.WITHDRAW,
-        withdraw.amountUSD
-      );
+      this.protocol.addTransaction(TransactionType.WITHDRAW);
     }
     return withdraw;
   }
@@ -392,7 +404,7 @@ export class Account {
     pool: Pool,
     position: Bytes,
     amounts: BigInt[],
-    sharesMinted: BigInt | null = null,
+    sharesMinted: BigInt,
     updateMetrics: bool = true
   ): CollateralIn {
     const collateralId = this.getIdFromEvent(EventType.DEPOSIT);
@@ -417,18 +429,13 @@ export class Account {
     collateralIn.inputTokens = pool.getInputTokens();
     collateralIn.outputToken = pool.getOutputToken();
     collateralIn.inputTokenAmounts = amounts;
-    if (sharesMinted) {
-      collateralIn.outputTokenAmount = sharesMinted;
-    }
+    collateralIn.outputTokenAmount = sharesMinted;
     collateralIn.amountUSD = this.getAmountUSD(pool.getInputTokens(), amounts);
     collateralIn.pool = pool.getBytesID();
     collateralIn.save();
 
     if (updateMetrics) {
       this.pool = pool;
-      // this.pool!.addInputTokenBalances(amounts);
-      // this.pool!.updateInputTokenBalances(amounts, constants.BIGINT_ONE);
-
       this.countCollateralIn();
       this.protocol.addTransaction(TransactionType.COLLATERAL_IN);
     }
@@ -448,7 +455,7 @@ export class Account {
     pool: Pool,
     position: Bytes,
     amounts: BigInt[],
-    sharesBurnt: BigInt | null = null,
+    sharesBurnt: BigInt,
     updateMetrics: bool = true
   ): CollateralOut {
     const collateralId = this.getIdFromEvent(EventType.WITHDRAW);
@@ -473,22 +480,13 @@ export class Account {
     collateralOut.inputTokens = pool.getInputTokens();
     collateralOut.outputToken = pool.getOutputToken();
     collateralOut.inputTokenAmounts = amounts;
-    if (sharesBurnt) {
-      collateralOut.outputTokenAmount = sharesBurnt;
-    }
+    collateralOut.outputTokenAmount = sharesBurnt;
     collateralOut.amountUSD = this.getAmountUSD(pool.getInputTokens(), amounts);
     collateralOut.pool = pool.getBytesID();
     collateralOut.save();
 
     if (updateMetrics) {
       this.pool = pool;
-      // this.pool!.addInputTokenBalances(
-      //   amounts.map<BigInt>((amount) =>
-      //     amount.times(constants.BIGINT_MINUS_ONE)
-      //   )
-      // );
-      // this.pool!.updateInputTokenBalances(amounts, constants.BIGINT_MINUS_ONE);
-
       this.countCollateralOut();
       this.protocol.addTransaction(TransactionType.COLLATERAL_OUT);
     }
@@ -531,6 +529,7 @@ export class Account {
     liquidate.blockNumber = this.event.block.number;
     liquidate.timestamp = this.event.block.timestamp;
     liquidate.liquidator = liquidator;
+    liquidate.account = liquidatee;
     liquidate.liquidatee = liquidatee;
     liquidate.asset = asset;
     liquidate.amount = amountLiquidated;

@@ -1,15 +1,17 @@
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+
+import { Pool } from "./pool";
+import { Account } from "./account";
+import { Perpetual } from "./protocol";
+import { TokenManager } from "./tokens";
+import * as constants from "../../util/constants";
+
 import {
   Token,
   PositionSnapshot,
   _PositionCounter,
   Position as PositionSchema,
 } from "../../../../generated/schema";
-import { Pool } from "./pool";
-import { Account } from "./account";
-import { Perpetual } from "./protocol";
-import { TokenManager } from "./tokens";
-import * as constants from "../../util/constants";
-import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 class LoadPositionResponse {
   position: Position;
@@ -86,7 +88,6 @@ export class PositionManager {
 
       entity.side = positionSide;
       entity.fundingrateOpen = constants.BIGDECIMAL_ZERO;
-      entity.fundingrateClosed = constants.BIGDECIMAL_ZERO;
       entity.leverage = constants.BIGDECIMAL_ZERO;
 
       entity.balance = constants.BIGINT_ZERO;
@@ -196,24 +197,60 @@ export class Position {
    * @param token
    * @param amount
    */
-  setBalance(token: Address, amount: BigInt): void {
+  setBalance(token: Token, amount: BigInt): void {
     this.position.balance = amount;
     this.position.balanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(this.tokens.getOrCreateToken(token), amount);
+      .getAmountValueUSD(token, amount);
     this.save();
   }
 
   /**
    * Sets the position's collateralBalance value.
-   * @param collateralToken
+   * @param token
    * @param amount
    */
-  setCollateralBalance(collateralToken: Address, amount: BigInt): void {
+  setCollateralBalance(token: Token, amount: BigInt): void {
     this.position.collateralBalance = amount;
     this.position.collateralBalanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(this.tokens.getOrCreateToken(collateralToken), amount);
+      .getAmountValueUSD(token, amount);
+    this.save();
+  }
+
+  /**
+   * Sets the position's closeBalanceUSD value.
+   * @param token
+   * @param amount
+   */
+  setBalanceClosed(token: Token, amount: BigInt): void {
+    this.position.closeBalanceUSD = this.protocol
+      .getTokenPricer()
+      .getAmountValueUSD(token, amount);
+    this.save();
+  }
+
+  /**
+   * Sets the position's closeCollateralBalanceUSD value.
+   * @param token
+   * @param amount
+   */
+  setCollateralBalanceClosed(token: Token, amount: BigInt): void {
+    this.position.closeCollateralBalanceUSD = this.protocol
+      .getTokenPricer()
+      .getAmountValueUSD(token, amount);
+    this.save();
+  }
+
+  /**
+   * Sets the position's realisedPnlUSD value.
+   * @param token
+   * @param amount
+   */
+  setRealisedPnlClosed(token: Token, amount: BigInt): void {
+    this.position.realisedPnlUSD = this.protocol
+      .getTokenPricer()
+      .getAmountValueUSD(token, amount);
     this.save();
   }
 
@@ -259,6 +296,7 @@ export class Position {
     snapshot.collateralBalance = this.position.collateralBalance;
     snapshot.balanceUSD = this.position.balanceUSD;
     snapshot.collateralBalanceUSD = this.position.collateralBalanceUSD;
+    snapshot.realisedPnlUSD = this.position.realisedPnlUSD;
     snapshot.blockNumber = this.protocol.event.block.number;
     snapshot.timestamp = this.protocol.event.block.timestamp;
 
