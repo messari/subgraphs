@@ -1,6 +1,6 @@
+import { ProtocolManager } from "./protocol";
 import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../../../generated/schema";
-import { ProtocolManager } from "./protocol";
 import { BIGDECIMAL_ZERO, RewardTokenType } from "../../util/constants";
 
 export interface TokenInitializer {

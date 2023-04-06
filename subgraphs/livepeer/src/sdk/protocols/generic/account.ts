@@ -1,10 +1,10 @@
-import { Address } from "@graphprotocol/graph-ts";
 import {
   Account as AccountSchema,
   ActiveAccount,
 } from "../../../../generated/schema";
-import { ProtocolManager } from "./protocol";
 import { TokenManager } from "./tokens";
+import { ProtocolManager } from "./protocol";
+import { Address } from "@graphprotocol/graph-ts";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 export class AccountManager {

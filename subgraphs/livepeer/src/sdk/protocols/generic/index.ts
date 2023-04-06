@@ -1,12 +1,11 @@
-import { ethereum } from "@graphprotocol/graph-ts";
-
+import { PoolManager } from "./pool";
 import { AccountManager } from "./account";
 import { ProtocolManager } from "./protocol";
-import { PoolManager } from "./pool";
-import { ProtocolConfigurer, TokenPricer } from "../config";
-import { TokenManager, TokenInitializer } from "./tokens";
 import { BIGINT_ZERO } from "../../util/constants";
+import { ethereum } from "@graphprotocol/graph-ts";
 import { CustomEventType } from "../../util/events";
+import { TokenManager, TokenInitializer } from "./tokens";
+import { ProtocolConfigurer, TokenPricer } from "../config";
 
 export class SDK {
   Protocol: ProtocolManager;

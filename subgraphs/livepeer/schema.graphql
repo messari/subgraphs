@@ -142,13 +142,13 @@ type Protocol @entity {
   totalPoolCount: Int!
 
   " Day ID of the most recent daily snapshot "
-  lastSnapshotDayID: BigInt
+  lastSnapshotDayID: Int!
 
   " Hour ID of the most recent hourly snapshot "
-  lastSnapshotHourID: BigInt
+  lastSnapshotHourID: Int!
 
   " Timestamp of the last time this entity was updated "
-  lastUpdateTimestamp: BigInt
+  lastUpdateTimestamp: BigInt!
 
   ##### Snapshots #####
 
@@ -352,13 +352,13 @@ type Pool @entity {
   rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Day ID of the most recent daily snapshot "
-  lastSnapshotDayID: BigInt
+  lastSnapshotDayID: Int!
 
   " Hour ID of the most recent hourly snapshot "
-  lastSnapshotHourID: BigInt
+  lastSnapshotHourID: Int!
 
   " Timestamp of the last time this entity was updated "
-  lastUpdateTimestamp: BigInt
+  lastUpdateTimestamp: BigInt!
 
   ##### Snapshots #####
 

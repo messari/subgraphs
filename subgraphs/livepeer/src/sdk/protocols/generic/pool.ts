@@ -1,19 +1,19 @@
-import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
-import { Pool as PoolSchema, Token } from "../../../../generated/schema";
-import { ProtocolManager } from "./protocol";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  RewardTokenType,
-} from "../../util/constants";
-import { exponentToBigDecimal } from "../../util/numbers";
 import {
   sortArrayByReference,
   sortBytesArray,
   updateArrayAtIndex,
 } from "../../util/arrays";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  RewardTokenType,
+} from "../../util/constants";
 import { TokenManager } from "./tokens";
+import { ProtocolManager } from "./protocol";
 import { PoolSnapshot } from "./poolSnapshot";
+import { exponentToBigDecimal } from "../../util/numbers";
+import { Pool as PoolSchema, Token } from "../../../../generated/schema";
+import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
 export class PoolManager {
   protocol: ProtocolManager;
@@ -27,13 +27,13 @@ export class PoolManager {
   loadPool(id: Bytes): Pool {
     let entity = PoolSchema.load(id);
     if (entity) {
-      return new Pool(this.protocol, entity, this.tokens);
+      return new Pool(this.protocol, entity, this.tokens, true);
     }
 
     entity = new PoolSchema(id);
     entity.protocol = this.protocol.getBytesID();
 
-    const pool = new Pool(this.protocol, entity, this.tokens);
+    const pool = new Pool(this.protocol, entity, this.tokens, false);
     pool.isInitialized = false;
     return pool;
   }
@@ -50,29 +50,22 @@ export class Pool {
   constructor(
     protocol: ProtocolManager,
     pool: PoolSchema,
-    tokens: TokenManager
+    tokens: TokenManager,
+    isInitialized: bool
   ) {
     this.pool = pool;
     this.protocol = protocol;
     this.tokens = tokens;
-    this.snapshoter = new PoolSnapshot(pool, protocol.event);
-    this.pool.lastUpdateTimestamp = protocol.event.block.timestamp;
+
+    if (isInitialized) {
+      this.snapshoter = new PoolSnapshot(pool, protocol.event);
+      this.pool.lastUpdateTimestamp = protocol.event.block.timestamp;
+      this.save();
+    }
   }
 
   private save(): void {
     this.pool.save();
-  }
-
-  private getInputTokens(): Token[] {
-    const inputTokens = [];
-    for (let i: number = 0; i < this.pool.inputTokens.length; i++) {
-      inputTokens.push(
-        this.tokens.getOrCreateToken(
-          Address.fromBytes(this.pool.inputTokens.at(i))
-        )
-      );
-    }
-    return inputTokens;
   }
 
   initialize(
@@ -103,8 +96,8 @@ export class Pool {
     this.pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
-    this.pool.lastSnapshotDayID = BIGINT_ZERO;
-    this.pool.lastSnapshotHourID = BIGINT_ZERO;
+    this.pool.lastSnapshotDayID = 0;
+    this.pool.lastSnapshotHourID = 0;
     this.pool.lastUpdateTimestamp = BIGINT_ZERO;
     this.save();
 
