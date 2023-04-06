@@ -1993,8 +1993,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.0",
-          "subgraph": "2.0.1",
+          "schema": "3.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2012,6 +2012,28 @@
           "decentralized-network": {
             "slug": "compound-v3-ethereum",
             "query-id": "6PaB6tKFqrL6YoAELEhFGU6Gc39cEynLbo6ETZMF3sCy"
+          }
+        }
+      },
+      "compound-v3-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "compound.v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "compound-v3-polygon",
+            "query-id": "compound-v3-polygon"
           }
         }
       }
@@ -3773,6 +3795,58 @@
       }
     }
   },
+  "radiant-v2": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "radiant-capital-v2",
+    "project": "radiant",
+    "deployments": {
+      "radiant-capital-v2-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "radiant.capital.v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "radiant-capital-v2-arbitrum",
+            "query-id": "radiant-capital-v2-arbitrum"
+          }
+        }
+      },
+      "radiant-capital-v2-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "radiant.capital.v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "radiant-capital-v2-bsc",
+            "query-id": "radiant-capital-v2-bsc"
+          }
+        }
+      }
+    }
+  },
   "uwu-lend": {
     "schema": "lending",
     "base": "aave-forks",
@@ -3865,7 +3939,7 @@
           },
           "decentralized-network": {
             "slug": "uniswap-v3-arbitrum",
-            "query-id": "9tSS5FaePZnjmnXnSKCCqKVLAqA6eGg6jA2oRojsXUbP"
+            "query-id": "8sE6rTNkPhzZXZC6c8UQy2ghFTu5PPdGauwUBm4t7HZ1"
           }
         }
       },
@@ -7369,8 +7443,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.1",
+          "schema": "1.2.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -7390,8 +7464,8 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.1",
+          "schema": "1.2.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
