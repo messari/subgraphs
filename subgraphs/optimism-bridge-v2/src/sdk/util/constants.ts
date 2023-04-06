@@ -96,6 +96,8 @@ export namespace ProtocolType {
   export const LENDING = "LENDING";
   export const YIELD = "YIELD";
   export const BRIDGE = "BRIDGE";
+  export const OPTION = "OPTION";
+  export const PERPETUAL = "PERPETUAL";
   export const GENERIC = "GENERIC";
 }
 
@@ -115,10 +117,12 @@ export namespace LiquidityPoolFeeType {
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
+export type LiquidityPoolFeeType = string;
 
 export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";
   export const BORROW = "BORROW";
+  export const STAKE = "STAKE";
 }
 export type RewardTokenType = string;
 
@@ -148,6 +152,12 @@ export namespace UsageType {
   export const WITHDRAW = "WITHDRAW";
   export const SWAP = "SWAP";
 }
+
+export namespace PositionSide {
+  export const LONG = "LONG";
+  export const SHORT = "SHORT";
+}
+export type PositionSide = string;
 
 //////////////////////////////
 ///// Ethereum Addresses /////
