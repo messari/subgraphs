@@ -1,15 +1,16 @@
-import {
-  subtractTwoBigIntArrays,
-  subtractTwoBigDecimalArrays,
-} from "../../util/arrays";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+
+import { subtractArrays } from "../../util/arrays";
+import * as constants from "../../util/constants";
+import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+import { initActivityHelper } from "./protocolSnapshot";
+
 import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
   LiquidityPool as PoolSchema,
+  _DailyRewardsHelper,
 } from "../../../../generated/schema";
-import { BigInt } from "@graphprotocol/graph-ts";
-import * as constants from "../../util/constants";
-import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 /**
  * This file contains the PoolSnapshot, which is used to
@@ -41,9 +42,9 @@ export class PoolSnapshot {
     if (!this.pool._lastUpdateTimestamp) return;
 
     const snapshotDayID =
-      this.pool._lastUpdateTimestamp.toI32() / constants.SECONDS_PER_DAY;
+      this.pool._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_DAY;
     const snapshotHourID =
-      this.pool._lastUpdateTimestamp.toI32() / constants.SECONDS_PER_HOUR;
+      this.pool._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_HOUR;
 
     if (snapshotDayID != this.dayID) {
       this.pool._lastSnapshotDayID = BigInt.fromI32(snapshotDayID);
@@ -155,7 +156,7 @@ export class PoolSnapshot {
 
     snapshot.cumulativeVolumeByTokenUSD = this.pool.cumulativeVolumeByTokenUSD;
     snapshot.hourlyVolumeByTokenUSD = previousSnapshot
-      ? subtractTwoBigDecimalArrays(
+      ? subtractArrays<BigDecimal>(
           snapshot.cumulativeVolumeByTokenUSD,
           previousSnapshot.cumulativeVolumeByTokenUSD
         )
@@ -164,7 +165,7 @@ export class PoolSnapshot {
     snapshot.cumulativeVolumeByTokenAmount =
       this.pool.cumulativeVolumeByTokenAmount;
     snapshot.hourlyVolumeByTokenAmount = previousSnapshot
-      ? subtractTwoBigIntArrays(
+      ? subtractArrays<BigInt>(
           snapshot.cumulativeVolumeByTokenAmount,
           previousSnapshot.cumulativeVolumeByTokenAmount
         )
@@ -178,7 +179,7 @@ export class PoolSnapshot {
     snapshot.cumulativeInflowVolumeByTokenUSD =
       this.pool.cumulativeInflowVolumeByTokenUSD;
     snapshot.hourlyInflowVolumeByTokenUSD = previousSnapshot
-      ? subtractTwoBigDecimalArrays(
+      ? subtractArrays<BigDecimal>(
           snapshot.cumulativeInflowVolumeByTokenUSD,
           previousSnapshot.cumulativeInflowVolumeByTokenUSD
         )
@@ -187,7 +188,7 @@ export class PoolSnapshot {
     snapshot.cumulativeInflowVolumeByTokenAmount =
       this.pool.cumulativeInflowVolumeByTokenAmount;
     snapshot.hourlyInflowVolumeByTokenAmount = previousSnapshot
-      ? subtractTwoBigIntArrays(
+      ? subtractArrays<BigInt>(
           snapshot.cumulativeInflowVolumeByTokenAmount,
           previousSnapshot.cumulativeInflowVolumeByTokenAmount
         )
@@ -203,7 +204,7 @@ export class PoolSnapshot {
     snapshot.cumulativeClosedInflowVolumeByTokenUSD =
       this.pool.cumulativeClosedInflowVolumeByTokenUSD;
     snapshot.hourlyClosedInflowVolumeByTokenUSD = previousSnapshot
-      ? subtractTwoBigDecimalArrays(
+      ? subtractArrays<BigDecimal>(
           snapshot.cumulativeClosedInflowVolumeByTokenUSD,
           previousSnapshot.cumulativeClosedInflowVolumeByTokenUSD
         )
@@ -212,7 +213,7 @@ export class PoolSnapshot {
     snapshot.cumulativeClosedInflowVolumeByTokenAmount =
       this.pool.cumulativeInflowVolumeByTokenAmount;
     snapshot.hourlyClosedInflowVolumeByTokenAmount = previousSnapshot
-      ? subtractTwoBigIntArrays(
+      ? subtractArrays<BigInt>(
           snapshot.cumulativeClosedInflowVolumeByTokenAmount,
           previousSnapshot.cumulativeClosedInflowVolumeByTokenAmount
         )
@@ -229,7 +230,7 @@ export class PoolSnapshot {
     snapshot.cumulativeOutflowVolumeByTokenUSD =
       this.pool.cumulativeOutflowVolumeByTokenUSD;
     snapshot.hourlyOutflowVolumeByTokenUSD = previousSnapshot
-      ? subtractTwoBigDecimalArrays(
+      ? subtractArrays<BigDecimal>(
           snapshot.cumulativeOutflowVolumeByTokenUSD,
           previousSnapshot.cumulativeOutflowVolumeByTokenUSD
         )
@@ -238,7 +239,7 @@ export class PoolSnapshot {
     snapshot.cumulativeOutflowVolumeByTokenAmount =
       this.pool.cumulativeOutflowVolumeByTokenAmount;
     snapshot.hourlyOutflowVolumeByTokenAmount = previousSnapshot
-      ? subtractTwoBigIntArrays(
+      ? subtractArrays<BigInt>(
           snapshot.cumulativeOutflowVolumeByTokenAmount,
           previousSnapshot.cumulativeOutflowVolumeByTokenAmount
         )
@@ -352,7 +353,7 @@ export class PoolSnapshot {
 
     snapshot.cumulativeVolumeByTokenUSD = this.pool.cumulativeVolumeByTokenUSD;
     snapshot.dailyVolumeByTokenUSD = previousSnapshot
-      ? subtractTwoBigDecimalArrays(
+      ? subtractArrays<BigDecimal>(
           snapshot.cumulativeVolumeByTokenUSD,
           previousSnapshot.cumulativeVolumeByTokenUSD
         )
@@ -361,7 +362,7 @@ export class PoolSnapshot {
     snapshot.cumulativeVolumeByTokenAmount =
       this.pool.cumulativeVolumeByTokenAmount;
     snapshot.dailyVolumeByTokenAmount = previousSnapshot
-      ? subtractTwoBigIntArrays(
+      ? subtractArrays<BigInt>(
           snapshot.cumulativeVolumeByTokenAmount,
           previousSnapshot.cumulativeVolumeByTokenAmount
         )
@@ -375,7 +376,7 @@ export class PoolSnapshot {
     snapshot.cumulativeInflowVolumeByTokenUSD =
       this.pool.cumulativeInflowVolumeByTokenUSD;
     snapshot.dailyInflowVolumeByTokenUSD = previousSnapshot
-      ? subtractTwoBigDecimalArrays(
+      ? subtractArrays<BigDecimal>(
           snapshot.cumulativeInflowVolumeByTokenUSD,
           previousSnapshot.cumulativeInflowVolumeByTokenUSD
         )
@@ -384,7 +385,7 @@ export class PoolSnapshot {
     snapshot.cumulativeInflowVolumeByTokenAmount =
       this.pool.cumulativeInflowVolumeByTokenAmount;
     snapshot.dailyInflowVolumeByTokenAmount = previousSnapshot
-      ? subtractTwoBigIntArrays(
+      ? subtractArrays<BigInt>(
           snapshot.cumulativeInflowVolumeByTokenAmount,
           previousSnapshot.cumulativeInflowVolumeByTokenAmount
         )
@@ -400,7 +401,7 @@ export class PoolSnapshot {
     snapshot.cumulativeClosedInflowVolumeByTokenUSD =
       this.pool.cumulativeClosedInflowVolumeByTokenUSD;
     snapshot.dailyClosedInflowVolumeByTokenUSD = previousSnapshot
-      ? subtractTwoBigDecimalArrays(
+      ? subtractArrays<BigDecimal>(
           snapshot.cumulativeClosedInflowVolumeByTokenUSD,
           previousSnapshot.cumulativeClosedInflowVolumeByTokenUSD
         )
@@ -409,7 +410,7 @@ export class PoolSnapshot {
     snapshot.cumulativeClosedInflowVolumeByTokenAmount =
       this.pool.cumulativeInflowVolumeByTokenAmount;
     snapshot.dailyClosedInflowVolumeByTokenAmount = previousSnapshot
-      ? subtractTwoBigIntArrays(
+      ? subtractArrays<BigInt>(
           snapshot.cumulativeClosedInflowVolumeByTokenAmount,
           previousSnapshot.cumulativeClosedInflowVolumeByTokenAmount
         )
@@ -426,7 +427,7 @@ export class PoolSnapshot {
     snapshot.cumulativeOutflowVolumeByTokenUSD =
       this.pool.cumulativeOutflowVolumeByTokenUSD;
     snapshot.dailyOutflowVolumeByTokenUSD = previousSnapshot
-      ? subtractTwoBigDecimalArrays(
+      ? subtractArrays<BigDecimal>(
           snapshot.cumulativeOutflowVolumeByTokenUSD,
           previousSnapshot.cumulativeOutflowVolumeByTokenUSD
         )
@@ -435,7 +436,7 @@ export class PoolSnapshot {
     snapshot.cumulativeOutflowVolumeByTokenAmount =
       this.pool.cumulativeOutflowVolumeByTokenAmount;
     snapshot.dailyOutflowVolumeByTokenAmount = previousSnapshot
-      ? subtractTwoBigIntArrays(
+      ? subtractArrays<BigInt>(
           snapshot.cumulativeOutflowVolumeByTokenAmount,
           previousSnapshot.cumulativeOutflowVolumeByTokenAmount
         )
@@ -447,6 +448,13 @@ export class PoolSnapshot {
           previousSnapshot.cumulativeOutflowVolumeUSD
         )
       : snapshot.cumulativeOutflowVolumeUSD;
+
+    snapshot.cumulativeUniqueUsers = this.pool.cumulativeUniqueUsers;
+
+    const dailyActivityHelper = initActivityHelper(
+      Bytes.fromUTF8("daily-".concat(this.dayID.toString()))
+    );
+    snapshot.dailyActiveUsers = dailyActivityHelper.activeUsers;
 
     snapshot.cumulativeUniqueDepositors = this.pool.cumulativeUniqueDepositors;
     snapshot.dailyActiveDepositors = previousSnapshot
