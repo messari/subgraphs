@@ -2930,7 +2930,7 @@
         }
       },
       "evm-polygon-zkevm": {
-        "network": "network-polygon-zkevm",
+        "network": "polygon-zkevm",
         "status": "dev",
         "versions": {
           "schema": "1.2.0",
