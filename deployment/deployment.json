@@ -3926,7 +3926,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v3.template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3952,7 +3952,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v3.template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3978,7 +3978,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v3.template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -4004,7 +4004,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v3.template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -4026,7 +4026,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v3.template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -4056,7 +4056,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "pancake.v3.template.yaml"
+          "template": "pancakeswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -4078,7 +4078,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "pancake.v3.template.yaml"
+          "template": "pancakeswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,

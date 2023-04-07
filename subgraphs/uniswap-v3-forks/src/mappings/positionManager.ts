@@ -167,14 +167,19 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
 
 export function handleTransfer(event: Transfer): void {
   const position = getOrCreatePosition(event, event.params.tokenId);
-
   const account = getOrCreateAccount(event.params.to);
-  const oldAccount = getOrCreateAccount(position!.account);
+
+  // position was not able to be fetched
+  if (position == null) {
+    return;
+  }
+
+  const oldAccount = getOrCreateAccount(Address.fromBytes(position.account));
 
   account.positionCount += INT_ONE;
   oldAccount.positionCount -= INT_ONE;
 
-  if (isClosed(position!)) {
+  if (isClosed(position)) {
     account.closedPositionCount += INT_ONE;
     oldAccount.closedPositionCount -= INT_ONE;
   } else {
@@ -182,10 +187,6 @@ export function handleTransfer(event: Transfer): void {
     oldAccount.openPositionCount -= INT_ONE;
   }
 
-  // position was not able to be fetched
-  if (position == null) {
-    return;
-  }
   if (account._newUser) {
     const protocol = getOrCreateProtocol();
     protocol.cumulativeUniqueUsers += INT_ONE;
