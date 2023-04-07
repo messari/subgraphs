@@ -86,7 +86,7 @@ export namespace ActivityType {
 /////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; // used for Mainnet pricing
+export const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // used for Mainnet pricing
 
 ///////////////////
 ///// Numbers /////
@@ -101,6 +101,7 @@ export const INT_FOUR = 4 as i32;
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_THREE = BigInt.fromI32(3);
+export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);

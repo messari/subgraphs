@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   Swap,
   IncreasePoolAmount,
@@ -24,7 +24,12 @@ import {
   getOrCreateAccount,
   incrementAccountEventCount,
 } from "../entities/account";
-import { getUserPosition, updateUserPosition } from "../entities/position";
+import {
+  createPositionMap,
+  getUserPosition,
+  updatePositionRealisedPnlUSD,
+  updateUserPosition,
+} from "../entities/position";
 import {
   increaseProtocolStakeSideRevenue,
   incrementProtocolEventCount,
@@ -42,6 +47,7 @@ import {
 } from "../entities/pool";
 import { takeSnapshots, updateTempUsageMetrics } from "../entities/snapshots";
 import {
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_NEGONE,
   BIGINT_ZERO,
@@ -52,6 +58,7 @@ import {
   PositionSide,
   PRICE_PRECISION,
   PROTOCOL_SIDE_REVENUE_PERCENT,
+  STAKE_SIDE_REVENUE_PERCENT,
 } from "../utils/constants";
 import {
   bigDecimalToBigInt,
@@ -113,6 +120,7 @@ export function handleSwap(event: Swap): void {
 export function handleIncreasePosition(event: IncreasePosition): void {
   handleUpdatePositionEvent(
     event,
+    event.params.key,
     event.params.account,
     event.params.collateralToken,
     event.params.collateralDelta,
@@ -129,6 +137,7 @@ export function handleIncreasePosition(event: IncreasePosition): void {
 export function handleDecreasePosition(event: DecreasePosition): void {
   handleUpdatePositionEvent(
     event,
+    event.params.key,
     event.params.account,
     event.params.collateralToken,
     event.params.collateralDelta,
@@ -145,6 +154,7 @@ export function handleDecreasePosition(event: DecreasePosition): void {
 export function handleLiquidatePosition(event: LiquidatePosition): void {
   handleUpdatePositionEvent(
     event,
+    event.params.key,
     event.params.account,
     event.params.collateralToken,
     event.params.collateral,
@@ -160,6 +170,7 @@ export function handleLiquidatePosition(event: LiquidatePosition): void {
 
 export function handleUpdatePositionEvent(
   event: ethereum.Event,
+  positionKey: Bytes,
   accountAddress: Address,
   collateralTokenAddress: Address,
   collateralDelta: BigInt,
@@ -217,10 +228,19 @@ export function handleUpdatePositionEvent(
     );
     if (!existingPosition) {
       OpenPositionCount = INT_ONE;
+      createPositionMap(
+        positionKey,
+        account,
+        pool,
+        collateralTokenAddress,
+        indexTokenAddress,
+        positionSide
+      );
     }
   }
   const position = updateUserPosition(
     event,
+    positionKey,
     account,
     pool,
     collateralTokenAddress,
@@ -361,23 +381,23 @@ export function handleUpdatePositionEvent(
 }
 
 export function handleClosePosition(event: ClosePosition): void {
-  if (event.params.realisedPnl >= BIGINT_ZERO) {
-    return;
-  }
   takeSnapshots(event);
 
-  const pool = getOrCreateLiquidityPool(event);
-  increasePoolVolume(
-    event,
-    pool,
-    BIGDECIMAL_ZERO,
-    null,
-    BIGINT_ZERO,
-    BIGINT_NEGONE.times(event.params.realisedPnl)
-      .div(PRICE_PRECISION)
-      .toBigDecimal(),
-    EventType.ClosePosition
-  );
+  const realisedPnlUSD = event.params.realisedPnl.div(PRICE_PRECISION);
+  updatePositionRealisedPnlUSD(event.params.key, realisedPnlUSD.toBigDecimal());
+
+  if (event.params.realisedPnl < BIGINT_ZERO) {
+    const pool = getOrCreateLiquidityPool(event);
+    increasePoolVolume(
+      event,
+      pool,
+      BIGDECIMAL_ZERO,
+      null,
+      BIGINT_ZERO,
+      BIGINT_NEGONE.times(realisedPnlUSD).toBigDecimal(),
+      EventType.ClosePosition
+    );
+  }
 }
 
 export function handleCollectSwapFees(event: CollectSwapFees): void {
@@ -418,12 +438,17 @@ function handleCollectFees(event: ethereum.Event, feeUsd: BigInt): void {
     event,
     totalFee.times(PROTOCOL_SIDE_REVENUE_PERCENT)
   );
-  increasePoolSupplySideRevenue(
-    event,
-    totalFee.minus(totalFee.times(PROTOCOL_SIDE_REVENUE_PERCENT))
-  );
+  // For GMX, 30% of trade fees goes to stakers of native token (e.g. GMX stakers)
   increaseProtocolStakeSideRevenue(
     event,
-    totalFee.minus(totalFee.times(PROTOCOL_SIDE_REVENUE_PERCENT))
+    totalFee.times(STAKE_SIDE_REVENUE_PERCENT)
+  );
+  increasePoolSupplySideRevenue(
+    event,
+    totalFee.times(
+      BIGDECIMAL_ONE.minus(PROTOCOL_SIDE_REVENUE_PERCENT).minus(
+        STAKE_SIDE_REVENUE_PERCENT
+      )
+    )
   );
 }
