@@ -1154,7 +1154,7 @@ enum TransferType {
 }
 
 type BridgeTransfer implements Event @entity(immutable: true) {
-  " event.transaction.hash.concatI32(event.logIndex) "
+  " event.transaction.hash.concatI32(event.logIndex).concatI32(eventCount)"
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
@@ -1222,11 +1222,14 @@ type BridgeTransfer implements Event @entity(immutable: true) {
 
   " Timestamp of this event "
   timestamp: BigInt!
+
+  " reference id, may be used to join source and destination end of a transfer across different chains "
+  _refId: Bytes
 }
 
 # Some bridges support sending
 type BridgeMessage implements Event @entity(immutable: true) {
-  " event.transaction.hash.concatI32(event.logIndex) "
+  " event.transaction.hash.concatI32(event.logIndex).concatI32(eventCount) "
   id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
@@ -1379,4 +1382,28 @@ type _CircularBuffer @entity {
 
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
+}
+
+# helper for mapping token symbol to address
+type _TokenSymbol @entity {
+  " token symbol "
+  id: ID!
+  " token address "
+  tokenAddress: String!
+}
+
+# helper for handling burnToken Command
+type _Command @entity {
+  " commandId "
+  id: Bytes!
+  " Is this a burnToken command? "
+  isBurnToken: Boolean!
+  " Has it been processed? "
+  isProcessed: Boolean!
+  " account address "
+  account: Bytes
+  " token address "
+  tokenAddress: Bytes
+  " burn amount "
+  amount: BigInt
 }

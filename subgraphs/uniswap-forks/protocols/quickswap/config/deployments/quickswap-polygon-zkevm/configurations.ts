@@ -16,10 +16,14 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
 
-export class PangolinAvalancheConfigurations implements Configurations {
+export class QuickswapZkevmConfigurations implements Configurations {
   getNetwork(): string {
-    return Network.AVALANCHE;
+    return Network.POLYGON_ZKEVM;
   }
   getSchemaVersion(): string {
     return PROTOCOL_SCHEMA_VERSION;
@@ -37,11 +41,13 @@ export class PangolinAvalancheConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xefa94DE7a4656D787667C749f7E1223D71E9FD88";
+    return toLowerCase("0x4B9f4d2435Ef65559567e5DbFC1BbB37abC43B57");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0xefa94DE7a4656D787667C749f7E1223D71E9FD88")
+      Address.fromString(
+        toLowerCase("0x4B9f4d2435Ef65559567e5DbFC1BbB37abC43B57")
+      )
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -63,56 +69,42 @@ export class PangolinAvalancheConfigurations implements Configurations {
     return BigDecimal.fromString("0.3");
   }
   getFeeOnOff(): string {
-    // const contract = this.getFactoryContract();
-    // const feeToResult = contract.try_feeTo();
-    // if (!feeToResult.reverted && feeToResult.value != Address.zero()) {
-    //   return FeeSwitch.ON;
-    // }
     return FeeSwitch.OFF;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.TIMESTAMP;
+    return RewardIntervalType.NONE;
   }
   getRewardTokenRate(): BigInt {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"; // wAVAX
+    return toLowerCase("0x4F9A0e7FD2Bf6067db6994CF12E4495Df938E6e9"); // wETH
   }
   getRewardToken(): string {
-    return "0x60781c2586d68229fde47564546784ab3faca982";
+    return toLowerCase("");
   }
   getWhitelistTokens(): string[] {
-    return [
-      "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7", // wAVAX
-      "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e", // USDC
-      "0xc7198437980c041c805a1edcba50c1ce5db95118", // USDT.e
-      "0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7", // USDT
-      "0xde3a24028580884448a5397872046a019649b084", // USDT old
-    ];
+    return toLowerCaseList([
+      "0x4F9A0e7FD2Bf6067db6994CF12E4495Df938E6e9", // wETH
+      "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035", // USDC
+      "0x1E4a5963aBFD975d8c9021ce480b42188849D41d", // USDT
+      "0xa2036f0538221a77A3937F1379699f44945018d0", // MATIC
+    ]);
   }
   getStableCoins(): string[] {
-    return [
-      "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e", // USDC
-      "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664", // USDC.e
-      "0xc7198437980c041c805a1edcba50c1ce5db95118", // USDT.e
-      "0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7", // USDT
-      "0xde3a24028580884448a5397872046a019649b084", // USDT old
-      "0xba7deebbfc5fa1100fb055a87773e1e99cd3507a", // DAI
-    ];
+    return toLowerCaseList([
+      "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035", // USDC
+      "0x1E4a5963aBFD975d8c9021ce480b42188849D41d", // USDT
+    ]);
   }
   getStableOraclePools(): string[] {
-    return [
-      "0xe3ba3d5e3f98eeff5e9eddd5bd20e476202770da", // USDt/wAVAX
-      "0x0e0100ab771e9288e0aa97e11557e6654c3a9665", // USDC/wAVAX
-      "0xbd918ed441767fe7924e99f6a0e0b568ac1970d9", // USDC.e/wAVAX
-      "0x17a2e8275792b4616befb02eb9ae699aa0dcb94b", // DAI/wAVAX
-      "0x9ee0a4e21bd333a6bb2ab298194320b8daa26516", // USDT old/WAVAX
-    ];
+    return toLowerCaseList([
+      "0xc44AD482f24fd750cAeBa387d2726d8653F8c4bB", // wETH/USDC
+      "0x4412c7152c658967a3360F0A1472E701bDBeca9E", // wETH/USDT
+    ]);
   }
-
   getUntrackedPairs(): string[] {
-    return [];
+    return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
     return [];

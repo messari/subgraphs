@@ -17,6 +17,7 @@ import { SpookyswapFantomConfigurations } from "../../protocols/spookyswap/confi
 import { UbeswapCeloConfigurations } from "../../protocols/ubeswap/config/deployments/ubeswap-celo/configurations";
 import { SpiritSwapFantomConfigurations } from "../../protocols/spiritswap/config/deployments/spiritswap-fantom/configurations";
 import { QuickswapMaticConfigurations } from "../../protocols/quickswap/config/deployments/quickswap-polygon/configurations";
+import { QuickswapZkevmConfigurations } from "../../protocols/quickswap/config/deployments/quickswap-polygon-zkevm/configurations";
 import { SolarbeamMoonriverConfigurations } from "../../protocols/solarbeam/config/deployments/solarbeam-moonriver/configurations";
 import { TraderJoeAvalancheConfigurations } from "../../protocols/trader-joe/config/deployments/trader-joe-avalanche/configurations";
 import { TrisolarisAuroraConfigurations } from "../../protocols/trisolaris/config/deployments/trisolaris-aurora/configurations";
@@ -90,6 +91,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.QUICKSWAP_POLYGON: {
       return new QuickswapMaticConfigurations();
+    }
+    case Deploy.QUICKSWAP_ZKEVM: {
+      return new QuickswapZkevmConfigurations();
     }
     case Deploy.SOLARBEAM_MOONRIVER: {
       return new SolarbeamMoonriverConfigurations();
