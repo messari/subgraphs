@@ -3042,6 +3042,28 @@
             "query-id": "ANz3TpZdY2syZGQvGA85ANNG7KiSWdPmv55kP4H4sRPJ"
           }
         }
+      },
+      "evm-zksync": {
+        "network": "zksync-era",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.2",
+          "subgraph": "1.1.4",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "evm.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-zksync",
+            "query-id": "network-zksync"
+          }
+        }
       }
     }
   },
