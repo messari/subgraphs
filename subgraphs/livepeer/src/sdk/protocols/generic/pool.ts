@@ -23,6 +23,7 @@ import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
  * SDK Version:     1.0.0
  * Author(s):
  *  - @steegecs
+ *  - @shashwatS22
  */
 
 export class PoolManager {

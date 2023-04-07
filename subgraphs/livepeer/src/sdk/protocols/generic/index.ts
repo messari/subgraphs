@@ -14,6 +14,8 @@ import { ProtocolConfigurer, TokenPricer } from "../config";
  * SDK Version:     1.0.0
  * Author(s):
  *  - @steegecs
+ *  - @shashwatS22
+
  */
 
 export class SDK {

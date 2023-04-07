@@ -10,6 +10,7 @@ import { BIGDECIMAL_ZERO, RewardTokenType } from "../../util/constants";
  * SDK Version:     1.0.0
  * Author(s):
  *  - @steegecs
+ *  - @shashwatS22
  */
 
 export interface TokenInitializer {

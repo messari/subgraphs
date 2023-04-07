@@ -21,6 +21,7 @@ const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
  * SDK Version:     1.0.0
  * Author(s):
  *  - @steegecs
+ *  - @shashwatS22
  */
 
 /**
