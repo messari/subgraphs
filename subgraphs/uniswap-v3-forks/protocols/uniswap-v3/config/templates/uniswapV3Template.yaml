@@ -138,7 +138,7 @@ templates:
         - LiqudityPool
       abis:
         - name: Pool
-          file: ./abis/uniswap-v3/ool.json
+          file: ./abis/uniswap-v3/Pool.json
       eventHandlers:
         - event: SetFeeProtocol(uint8,uint8,uint8,uint8)
           handler: handleSetFeeProtocol

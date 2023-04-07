@@ -10,6 +10,7 @@ import {
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
+  ZERO_ADDRESS,
 } from "../common/constants";
 import { getLiquidityPool } from "../common/entities/pool";
 import {
@@ -52,9 +53,6 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
 
   const pool = getLiquidityPool(Address.fromBytes(position.pool));
   const protocol = getOrCreateProtocol();
-  if (account._newUser) {
-    protocol.cumulativeUniqueUsers += INT_ONE;
-  }
 
   if (!pool) {
     log.warning("Pool not found for position: {}", [position.id.toHexString()]);
@@ -73,9 +71,9 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
       position.timestampClosed = null;
     } else {
       pool.openPositionCount += INT_ONE;
-      pool.positionCount = INT_ONE;
+      pool.positionCount += INT_ONE;
       account.openPositionCount += INT_ONE;
-      account.positionCount = INT_ONE;
+      account.positionCount += INT_ONE;
       protocol.openPositionCount += INT_ONE;
       protocol.cumulativePositionCount += INT_ONE;
     }
@@ -118,10 +116,6 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
 
   const pool = getLiquidityPool(Address.fromBytes(position.pool));
   const protocol = getOrCreateProtocol();
-
-  if (account._newUser) {
-    protocol.cumulativeUniqueUsers += INT_ONE;
-  }
 
   if (!pool) {
     log.warning("Pool not found for position: {}", [position.id.toHexString()]);
@@ -166,6 +160,10 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
 }
 
 export function handleTransfer(event: Transfer): void {
+  if (event.params.from == ZERO_ADDRESS) {
+    return;
+  }
+
   const position = getOrCreatePosition(event, event.params.tokenId);
   const account = getOrCreateAccount(event.params.to);
 
@@ -174,7 +172,7 @@ export function handleTransfer(event: Transfer): void {
     return;
   }
 
-  const oldAccount = getOrCreateAccount(Address.fromBytes(position.account));
+  const oldAccount = getOrCreateAccount(event.params.from);
 
   account.positionCount += INT_ONE;
   oldAccount.positionCount -= INT_ONE;
@@ -182,15 +180,13 @@ export function handleTransfer(event: Transfer): void {
   if (isClosed(position)) {
     account.closedPositionCount += INT_ONE;
     oldAccount.closedPositionCount -= INT_ONE;
+    log.warning("Transfering closed position: {}, liquidity: {}", [
+      position.id.toHexString(),
+      position.liquidity.toString(),
+    ]);
   } else {
     account.openPositionCount += INT_ONE;
     oldAccount.openPositionCount -= INT_ONE;
-  }
-
-  if (account._newUser) {
-    const protocol = getOrCreateProtocol();
-    protocol.cumulativeUniqueUsers += INT_ONE;
-    protocol.save();
   }
 
   position.account = event.params.to;

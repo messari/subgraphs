@@ -1039,8 +1039,6 @@ type Account @entity {
 
   " All swap events of this account "
   swaps: [Swap!]! @derivedFrom(field: "account")
-
-  _newUser: Boolean
 }
 
 type Position @entity {

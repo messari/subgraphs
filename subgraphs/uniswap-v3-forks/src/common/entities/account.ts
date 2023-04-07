@@ -12,11 +12,9 @@ export function getOrCreateAccount(address: Address): Account {
     account.depositCount = INT_ZERO;
     account.withdrawCount = INT_ZERO;
     account.swapCount = INT_ZERO;
-    account._newUser = true;
 
     return account;
   }
-  account._newUser = false;
 
   return account;
 }
