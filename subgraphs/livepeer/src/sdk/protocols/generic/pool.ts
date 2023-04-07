@@ -15,6 +15,16 @@ import { exponentToBigDecimal } from "../../util/numbers";
 import { Pool as PoolSchema, Token } from "../../../../generated/schema";
 import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 
+/**
+ * This file contains the PoolManager, which is used to
+ * initialize new pools in the protocol.
+ *
+ * Schema Version:  2.1.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ */
+
 export class PoolManager {
   protocol: ProtocolManager;
   tokens: TokenManager;
@@ -109,6 +119,7 @@ export class Pool {
    * This function will also update the protocol's total value locked based on the change in this pool's.
    */
   refreshTotalValueLocked(): void {
+    this.setInputTokenBalancesUSD();
     let totalValueLockedUSD = BIGDECIMAL_ZERO;
 
     for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {

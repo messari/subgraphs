@@ -7,6 +7,18 @@ import { ProtocolManager } from "./protocol";
 import { Address } from "@graphprotocol/graph-ts";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
+/**
+ * This file contains the AccountClass, which does
+ * the operations on the Account entity. This includes:
+ *  - Creating a new Account
+ *  - Updating an existing Account
+ *
+ * Schema Version:  2.1.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ */
+
 export class AccountManager {
   protocol: ProtocolManager;
   tokens: TokenManager;

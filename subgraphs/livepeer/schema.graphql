@@ -192,6 +192,9 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
   dailyTransactionCount: Int!
 
+  " Total number of transactions. Transactions include events triggered by outside users (ie, deposit, withdraw, etc.)"
+  cumulativeTransactionCount: Int!
+
   " Total number of pools "
   totalPoolCount: Int!
 
@@ -200,9 +203,6 @@ type UsageMetricsDailySnapshot @entity {
 
   " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
   blockNumber: BigInt!
-
-  " Total number of transactions. Transactions include events triggered by outside users (ie, deposit, withdraw, etc.)"
-  cumulativeTransactionCount: Int!
 }
 
 type UsageMetricsHourlySnapshot @entity {
@@ -224,14 +224,14 @@ type UsageMetricsHourlySnapshot @entity {
   " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
   hourlyTransactionCount: Int!
 
+  " Total number of transactions. Transactions include events triggered by outside users (ie, deposit, withdraw, etc.)"
+  cumulativeTransactionCount: Int!
+
   " Timestamp of when this snapshot was taken/last modified (May be taken after interval has passed) "
   timestamp: BigInt!
 
   " Block number of when this snapshot was taken/last modified (May be taken after interval has passed) "
   blockNumber: BigInt!
-
-  " Total number of transactions. Transactions include events triggered by outside users (ie, deposit, withdraw, etc.)"
-  cumulativeTransactionCount: Int!
 }
 
 type FinancialsDailySnapshot @entity {

@@ -1,6 +1,6 @@
+import { Versions } from "../../../../../deployment/context/interface";
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../../generated/schema";
-import { Versions } from "../../../../../deployment/context/interface";
 
 export interface ProtocolConfigurer {
   getID(): string;

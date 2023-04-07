@@ -15,6 +15,16 @@ import { Protocol as ProtocolSchema } from "../../../../generated/schema";
 import { Versions } from "../../../../../../deployment/context/interface";
 
 /**
+ * This file contains the ProtocolManager class, which is used to
+ * make all of the storage changes that occur in a protocol.
+ *
+ * Schema Version:  2.1.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ */
+
+/**
  * ProtocolManager is a wrapper around the ProtocolSchema entity that takes care of
  * safely and conveniently updating the entity. Updating the Protocol entity using this
  * wrapper also takes care of the Financials and Usage snapshots.

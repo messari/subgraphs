@@ -6,6 +6,16 @@ import {
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../../util/constants";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
+/**
+ * This file contains the PoolSnapshot, which is used to
+ * make all of the storage changes that occur in the pool daily and hourly snapshots.
+ *
+ * Schema Version:  2.1.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ */
+
 export class PoolSnapshot {
   pool: PoolSchema;
   event: CustomEventType;
@@ -24,9 +34,9 @@ export class PoolSnapshot {
     if (!this.pool.lastUpdateTimestamp) return;
 
     const snapshotDayID =
-      this.pool.lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
+      this.pool.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
     const snapshotHourID =
-      this.pool.lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
+      this.pool.lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
 
     if (snapshotDayID != this.dayID) {
       this.takeDailySnapshot(snapshotDayID);
@@ -44,7 +54,7 @@ export class PoolSnapshot {
   private takeHourlySnapshot(hour: i32): void {
     const snapshot = new PoolHourlySnapshot(this.pool.id.concatI32(hour));
     const previousSnapshot = PoolHourlySnapshot.load(
-      this.pool.id.concatI32(this.pool.lastSnapshotHourID!)
+      this.pool.id.concatI32(this.pool.lastSnapshotHourID)
     );
 
     snapshot.hours = hour;
@@ -94,7 +104,7 @@ export class PoolSnapshot {
   private takeDailySnapshot(day: i32): void {
     const snapshot = new PoolDailySnapshot(this.pool.id.concatI32(day));
     const previousSnapshot = PoolDailySnapshot.load(
-      this.pool.id.concatI32(this.pool.lastSnapshotDayID!)
+      this.pool.id.concatI32(this.pool.lastSnapshotDayID)
     );
 
     snapshot.day = day;

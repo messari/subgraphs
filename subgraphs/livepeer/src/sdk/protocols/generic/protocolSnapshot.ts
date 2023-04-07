@@ -13,6 +13,17 @@ import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
 
 /**
+ * This file contains the ProtocolSnapshot, which is used to
+ * make all of the storage changes that occur in the protocol's
+ * daily and hourly snapshots.
+ *
+ * Schema Version:  2.1.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ */
+
+/**
  * Helper class to manage Financials and Usage snapshots.
  * It is not meant to be used directly, but rather by the Protocol and Account lib classes.
  * Whenever it is instantiated it will check if it is time to take any of the
@@ -44,9 +55,9 @@ export class ProtocolSnapshot {
 
   private takeSnapshots(): void {
     const snapshotDayID =
-      this.protocol.lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
+      this.protocol.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
     const snapshotHourID =
-      this.protocol.lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
+      this.protocol.lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
 
     if (snapshotDayID != this.dayID) {
       this.takeFinancialsDailySnapshot(snapshotDayID);
@@ -65,7 +76,7 @@ export class ProtocolSnapshot {
   private takeFinancialsDailySnapshot(day: i32): void {
     const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = FinancialsDailySnapshot.load(
-      Bytes.fromI32(this.protocol.lastSnapshotDayID!)
+      Bytes.fromI32(this.protocol.lastSnapshotDayID)
     );
 
     snapshot.day = day;
@@ -115,7 +126,7 @@ export class ProtocolSnapshot {
 
     const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = UsageMetricsDailySnapshot.load(
-      Bytes.fromI32(this.protocol.lastSnapshotDayID!)
+      Bytes.fromI32(this.protocol.lastSnapshotDayID)
     );
 
     snapshot.protocol = this.protocol.id;
@@ -156,7 +167,7 @@ export class ProtocolSnapshot {
 
     const snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
     const previousSnapshot = UsageMetricsHourlySnapshot.load(
-      Bytes.fromI32(this.protocol.lastSnapshotHourID!)
+      Bytes.fromI32(this.protocol.lastSnapshotHourID)
     );
 
     snapshot.protocol = this.protocol.id;

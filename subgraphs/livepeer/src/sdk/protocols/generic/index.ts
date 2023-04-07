@@ -7,6 +7,15 @@ import { CustomEventType } from "../../util/events";
 import { TokenManager, TokenInitializer } from "./tokens";
 import { ProtocolConfigurer, TokenPricer } from "../config";
 
+/**
+ * This file contains the SDK class, which initializes
+ * all managers from event or call.
+ * Schema Version:  2.1.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ */
+
 export class SDK {
   Protocol: ProtocolManager;
   Accounts: AccountManager;
