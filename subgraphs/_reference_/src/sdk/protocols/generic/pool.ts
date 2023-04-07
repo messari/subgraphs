@@ -1,19 +1,30 @@
-import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
-import { Pool as PoolSchema, Token } from "../../../../generated/schema";
-import { ProtocolManager } from "./protocol";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  RewardTokenType,
-} from "../../util/constants";
-import { exponentToBigDecimal } from "../../util/numbers";
 import {
   sortArrayByReference,
   sortBytesArray,
   updateArrayAtIndex,
 } from "../../util/arrays";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  RewardTokenType,
+} from "../../util/constants";
 import { TokenManager } from "./tokens";
+import { ProtocolManager } from "./protocol";
 import { PoolSnapshot } from "./poolSnapshot";
+import { exponentToBigDecimal } from "../../util/numbers";
+import { Pool as PoolSchema, Token } from "../../../../generated/schema";
+import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
+
+/**
+ * This file contains the PoolManager, which is used to
+ * initialize new pools in the protocol.
+ *
+ * Schema Version:  2.1.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+ */
 
 export class PoolManager {
   protocol: ProtocolManager;
@@ -27,13 +38,13 @@ export class PoolManager {
   loadPool(id: Bytes): Pool {
     let entity = PoolSchema.load(id);
     if (entity) {
-      return new Pool(this.protocol, entity, this.tokens);
+      return new Pool(this.protocol, entity, this.tokens, true);
     }
 
     entity = new PoolSchema(id);
     entity.protocol = this.protocol.getBytesID();
 
-    const pool = new Pool(this.protocol, entity, this.tokens);
+    const pool = new Pool(this.protocol, entity, this.tokens, false);
     pool.isInitialized = false;
     return pool;
   }
@@ -50,29 +61,22 @@ export class Pool {
   constructor(
     protocol: ProtocolManager,
     pool: PoolSchema,
-    tokens: TokenManager
+    tokens: TokenManager,
+    isInitialized: bool
   ) {
     this.pool = pool;
     this.protocol = protocol;
     this.tokens = tokens;
-    this.snapshoter = new PoolSnapshot(pool, protocol.event);
-    this.pool.lastUpdateTimestamp = protocol.event.block.timestamp;
+
+    if (isInitialized) {
+      this.snapshoter = new PoolSnapshot(pool, protocol.event);
+      this.pool.lastUpdateTimestamp = protocol.event.block.timestamp;
+      this.save();
+    }
   }
 
   private save(): void {
     this.pool.save();
-  }
-
-  private getInputTokens(): Token[] {
-    const inputTokens = [];
-    for (let i: number = 0; i < this.pool.inputTokens.length; i++) {
-      inputTokens.push(
-        this.tokens.getOrCreateToken(
-          Address.fromBytes(this.pool.inputTokens.at(i))
-        )
-      );
-    }
-    return inputTokens;
   }
 
   initialize(
@@ -103,8 +107,8 @@ export class Pool {
     this.pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
-    this.pool.lastSnapshotDayID = BIGINT_ZERO;
-    this.pool.lastSnapshotHourID = BIGINT_ZERO;
+    this.pool.lastSnapshotDayID = 0;
+    this.pool.lastSnapshotHourID = 0;
     this.pool.lastUpdateTimestamp = BIGINT_ZERO;
     this.save();
 
@@ -116,6 +120,7 @@ export class Pool {
    * This function will also update the protocol's total value locked based on the change in this pool's.
    */
   refreshTotalValueLocked(): void {
+    this.setInputTokenBalancesUSD();
     let totalValueLockedUSD = BIGDECIMAL_ZERO;
 
     for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {

@@ -1,7 +1,17 @@
+import { ProtocolManager } from "./protocol";
 import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../../../generated/schema";
-import { ProtocolManager } from "./protocol";
 import { BIGDECIMAL_ZERO, RewardTokenType } from "../../util/constants";
+
+/**
+ * This file contains the TokenManagerClass, which initializes
+ * token entities.
+ * Schema Version:  2.1.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+ */
 
 export interface TokenInitializer {
   getTokenParams(address: Address): TokenParams;

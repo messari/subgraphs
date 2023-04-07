@@ -1,19 +1,29 @@
-import { Versions } from "../../../../../../deployment/context/interface";
-
-import { Protocol as ProtocolSchema } from "../../../../generated/schema";
-import { ProtocolConfigurer, TokenPricer } from "../config";
-import { ProtocolSnapshot } from "./protocolSnapshot";
-import { AccountWasActive } from "./account";
-import * as constants from "../../util/constants";
+import { SDK } from ".";
 import {
   dataSource,
   Address,
   Bytes,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
-import { SDK } from ".";
+import { AccountWasActive } from "./account";
+import * as constants from "../../util/constants";
 import { BIGINT_ZERO } from "../../util/constants";
 import { CustomEventType } from "../../util/events";
+import { ProtocolSnapshot } from "./protocolSnapshot";
+import { ProtocolConfigurer, TokenPricer } from "../config";
+import { Protocol as ProtocolSchema } from "../../../../generated/schema";
+import { Versions } from "../../../../../../deployment/context/interface";
+
+/**
+ * This file contains the ProtocolManager class, which is used to
+ * make all of the storage changes that occur in a protocol.
+ *
+ * Schema Version:  2.1.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+ */
 
 /**
  * ProtocolManager is a wrapper around the ProtocolSchema entity that takes care of
@@ -74,12 +84,12 @@ export class ProtocolManager {
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
-    protocol._cumulativeTransactionCount = 0;
+    protocol.cumulativeTransactionCount = 0;
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
 
-    protocol.lastSnapshotDayID = BIGINT_ZERO;
-    protocol.lastSnapshotHourID = BIGINT_ZERO;
+    protocol.lastSnapshotDayID = 0;
+    protocol.lastSnapshotHourID = 0;
     protocol.lastUpdateTimestamp = BIGINT_ZERO;
 
     protocol.schemaVersion = conf.getVersions().getSchemaVersion();
@@ -88,7 +98,6 @@ export class ProtocolManager {
 
     const proto = new ProtocolManager(protocol, pricer, event);
     proto.save();
-    // proto.setVersions(conf.getVersions());
     return proto;
   }
 
@@ -244,7 +253,7 @@ export class ProtocolManager {
   }
 
   addTransaction(): void {
-    this.protocol._cumulativeTransactionCount += 1;
+    this.protocol.cumulativeTransactionCount += 1;
     this.save();
   }
 }

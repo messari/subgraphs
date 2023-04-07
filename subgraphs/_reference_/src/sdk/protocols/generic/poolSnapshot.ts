@@ -1,4 +1,3 @@
-import { BigInt } from "@graphprotocol/graph-ts";
 import {
   Pool as PoolSchema,
   PoolDailySnapshot,
@@ -6,6 +5,17 @@ import {
 } from "../../../../generated/schema";
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../../util/constants";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+
+/**
+ * This file contains the PoolSnapshot, which is used to
+ * make all of the storage changes that occur in the pool daily and hourly snapshots.
+ *
+ * Schema Version:  2.1.0
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+ */
 
 export class PoolSnapshot {
   pool: PoolSchema;
@@ -22,37 +32,30 @@ export class PoolSnapshot {
   }
 
   private takeSnapshots(): void {
-    if (!this.isInitialized()) return;
     if (!this.pool.lastUpdateTimestamp) return;
 
     const snapshotDayID =
-      this.pool.lastUpdateTimestamp!.toI32() / SECONDS_PER_DAY;
+      this.pool.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
     const snapshotHourID =
-      this.pool.lastUpdateTimestamp!.toI32() / SECONDS_PER_HOUR;
+      this.pool.lastUpdateTimestamp.toI32() / SECONDS_PER_HOUR;
 
     if (snapshotDayID != this.dayID) {
       this.takeDailySnapshot(snapshotDayID);
-      this.pool.lastSnapshotDayID = BigInt.fromI32(snapshotDayID);
+      this.pool.lastSnapshotDayID = snapshotDayID;
       this.pool.save();
     }
 
     if (snapshotHourID != this.hourID) {
       this.takeHourlySnapshot(snapshotHourID);
-      this.pool.lastSnapshotHourID = BigInt.fromI32(snapshotHourID);
+      this.pool.lastSnapshotHourID = snapshotHourID;
       this.pool.save();
     }
-  }
-
-  private isInitialized(): boolean {
-    return this.pool.lastSnapshotDayID && this.pool.lastSnapshotHourID
-      ? true
-      : false;
   }
 
   private takeHourlySnapshot(hour: i32): void {
     const snapshot = new PoolHourlySnapshot(this.pool.id.concatI32(hour));
     const previousSnapshot = PoolHourlySnapshot.load(
-      this.pool.id.concatI32(this.pool.lastSnapshotHourID!.toI32())
+      this.pool.id.concatI32(this.pool.lastSnapshotHourID)
     );
 
     snapshot.hours = hour;
@@ -102,7 +105,7 @@ export class PoolSnapshot {
   private takeDailySnapshot(day: i32): void {
     const snapshot = new PoolDailySnapshot(this.pool.id.concatI32(day));
     const previousSnapshot = PoolDailySnapshot.load(
-      this.pool.id.concatI32(this.pool.lastSnapshotDayID!.toI32())
+      this.pool.id.concatI32(this.pool.lastSnapshotDayID)
     );
 
     snapshot.day = day;
