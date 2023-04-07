@@ -10,7 +10,7 @@ import {
   getDepositDeltas,
   incrementDepositHelper,
 } from "../common/entities/deposit";
-import { DexEventHandler } from "../common/dex_event_handler";
+import { DexEventHandler } from "../common/dexEventHandler";
 import { updateTokenPrices } from "../common/entities/token";
 import { getLiquidityPool } from "../common/entities/pool";
 import { getOrCreateTick } from "../common/entities/tick";

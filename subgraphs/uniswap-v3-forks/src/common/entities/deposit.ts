@@ -2,7 +2,7 @@
 import { Bytes, BigInt } from "@graphprotocol/graph-ts";
 import { LiquidityPool, _HelperStore } from "../../../generated/schema";
 import { BIGINT_ZERO, INT_ONE } from "../constants";
-import { RawDeltas } from "../dex_event_handler";
+import { RawDeltas } from "../dexEventHandler";
 
 // Update store that tracks the deposit count per pool
 export function incrementDepositHelper(pool: Bytes): void {

@@ -10,6 +10,7 @@ import {
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
+  ZERO_ADDRESS,
 } from "../common/constants";
 import { getLiquidityPool } from "../common/entities/pool";
 import {
@@ -45,16 +46,18 @@ export function getUSDValueFromNativeTokens(
 export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   const account = getOrCreateAccount(event.transaction.from);
   const position = getOrCreatePosition(event, event.params.tokenId);
+
   // position was not able to be fetched
   if (position == null) {
+    log.error("Position not found for transfer tx: {}, position: {}", [
+      event.transaction.hash.toHexString(),
+      event.params.tokenId.toString(),
+    ]);
     return;
   }
 
   const pool = getLiquidityPool(Address.fromBytes(position.pool));
   const protocol = getOrCreateProtocol();
-  if (account._newUser) {
-    protocol.cumulativeUniqueUsers += INT_ONE;
-  }
 
   if (!pool) {
     log.warning("Pool not found for position: {}", [position.id.toHexString()]);
@@ -65,14 +68,19 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
     if (isReOpened(position)) {
       pool.openPositionCount += INT_ONE;
       pool.closedPositionCount -= INT_ONE;
+      account.openPositionCount += INT_ONE;
+      account.closedPositionCount -= INT_ONE;
       protocol.openPositionCount += INT_ONE;
-      protocol.cumulativePositionCount += INT_ONE;
       position.hashClosed = null;
       position.blockNumberClosed = null;
       position.timestampClosed = null;
     } else {
       pool.openPositionCount += INT_ONE;
-      pool.positionCount = INT_ONE;
+      pool.positionCount += INT_ONE;
+      account.openPositionCount += INT_ONE;
+      account.positionCount += INT_ONE;
+      protocol.openPositionCount += INT_ONE;
+      protocol.cumulativePositionCount += INT_ONE;
     }
   }
 
@@ -94,6 +102,7 @@ export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   );
   position.depositCount += INT_ONE;
 
+  pool.save();
   account.save();
   position.save();
   protocol.save();
@@ -107,15 +116,15 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
 
   // position was not able to be fetched
   if (position == null) {
+    log.error("Position not found for transfer tx: {}, position: {}", [
+      event.transaction.hash.toHexString(),
+      event.params.tokenId.toString(),
+    ]);
     return;
   }
 
   const pool = getLiquidityPool(Address.fromBytes(position.pool));
   const protocol = getOrCreateProtocol();
-
-  if (account._newUser) {
-    protocol.cumulativeUniqueUsers += INT_ONE;
-  }
 
   if (!pool) {
     log.warning("Pool not found for position: {}", [position.id.toHexString()]);
@@ -143,12 +152,15 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
   if (isClosed(position)) {
     pool.openPositionCount -= INT_ONE;
     pool.closedPositionCount += INT_ONE;
+    account.openPositionCount -= INT_ONE;
+    account.closedPositionCount += INT_ONE;
     protocol.openPositionCount -= INT_ONE;
     position.hashClosed = event.transaction.hash;
     position.blockNumberClosed = event.block.number;
     position.timestampClosed = event.block.timestamp;
   }
 
+  pool.save();
   account.save();
   position.save();
   protocol.save();
@@ -157,22 +169,39 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
 }
 
 export function handleTransfer(event: Transfer): void {
-  const account = getOrCreateAccount(event.params.to);
+  if (event.params.from == ZERO_ADDRESS) {
+    return;
+  }
+
   const position = getOrCreatePosition(event, event.params.tokenId);
+  const account = getOrCreateAccount(event.params.to);
 
   // position was not able to be fetched
   if (position == null) {
+    log.error("Position not found for transfer tx: {}, position: {}", [
+      event.transaction.hash.toHexString(),
+      event.params.tokenId.toString(),
+    ]);
     return;
   }
-  if (account._newUser) {
-    const protocol = getOrCreateProtocol();
-    protocol.cumulativeUniqueUsers += INT_ONE;
-    protocol.save();
+
+  const oldAccount = getOrCreateAccount(event.params.from);
+
+  account.positionCount += INT_ONE;
+  oldAccount.positionCount -= INT_ONE;
+
+  if (isClosed(position)) {
+    account.closedPositionCount += INT_ONE;
+    oldAccount.closedPositionCount -= INT_ONE;
+  } else {
+    account.openPositionCount += INT_ONE;
+    oldAccount.openPositionCount -= INT_ONE;
   }
 
   position.account = event.params.to;
 
   account.save();
+  oldAccount.save();
   position.save();
 }
 

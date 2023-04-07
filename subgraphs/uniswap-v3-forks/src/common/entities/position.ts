@@ -1,6 +1,6 @@
 import { ethereum, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../configurations/configure";
-import { NonfungiblePositionManager } from "../../../generated/NonFungiblePositionManager/NonFungiblePositionManager";
+import { NonFungiblePositionManager } from "../../../generated/NonFungiblePositionManager/NonFungiblePositionManager";
 import { Position, PositionSnapshot } from "../../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
@@ -17,7 +17,7 @@ export function getOrCreatePosition(
   let position = Position.load(id);
 
   if (position === null) {
-    const contract = NonfungiblePositionManager.bind(event.address);
+    const contract = NonFungiblePositionManager.bind(event.address);
     const positionCall = contract.try_positions(tokenId);
 
     if (!positionCall.reverted) {

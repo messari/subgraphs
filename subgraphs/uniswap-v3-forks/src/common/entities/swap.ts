@@ -1,7 +1,7 @@
 import { BigInt } from "@graphprotocol/graph-ts";
 import { LiquidityPool } from "../../../generated/schema";
 import { BIGINT_ZERO } from "../constants";
-import { RawDeltas } from "../dex_event_handler";
+import { RawDeltas } from "../dexEventHandler";
 
 export function getSwapDeltas(
   pool: LiquidityPool,

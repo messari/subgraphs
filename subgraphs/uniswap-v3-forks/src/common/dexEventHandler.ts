@@ -91,7 +91,6 @@ export class DexEventHandler {
   pool: LiquidityPool;
   poolTokens: Token[];
   _poolAmounts: _LiquidityPoolAmount;
-  newUser: bool;
 
   totalValueLockedUSD: BigDecimal;
   totalValueLockedUSDDelta: BigDecimal;
@@ -151,7 +150,6 @@ export class DexEventHandler {
     this.pool = pool;
     this.poolTokens = getTokens(event, pool);
     this._poolAmounts = getLiquidityPoolAmounts(pool.id)!;
-    this.newUser = this.account._newUser;
     this.dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
     this.hourID = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
@@ -472,8 +470,24 @@ export class DexEventHandler {
     this.protocol.activeLiquidityUSD = this.protocol.activeLiquidityUSD.plus(
       this.activeLiquidityDeltaUSD
     );
-    if (this.newUser) {
-      this.protocol.cumulativeUniqueUsers += INT_ONE;
+
+    if (
+      this.account.depositCount +
+        this.account.withdrawCount +
+        this.account.swapCount ==
+      0
+    ) {
+      this.protocol.cumulativeUniqueUsers += 1;
+    }
+    if (
+      this.account.depositCount + this.account.withdrawCount == 0 &&
+      (this.eventType == EventType.DEPOSIT ||
+        this.eventType == EventType.WITHDRAW)
+    ) {
+      this.protocol.cumulativeUniqueLPs += 1;
+    }
+    if (this.account.swapCount == 0 && this.eventType == EventType.SWAP) {
+      this.protocol.cumulativeUniqueTraders += 1;
     }
 
     this.protocol.cumulativeVolumeUSD = this.protocol.cumulativeVolumeUSD.plus(
@@ -504,13 +518,6 @@ export class DexEventHandler {
 
     this.protocol.lastUpdateBlockNumber = this.event.block.number;
     this.protocol.lastUpdateTimestamp = this.event.block.timestamp;
-
-    if (
-      this.account.depositCount == INT_ZERO &&
-      this.account.withdrawCount == INT_ZERO
-    ) {
-      this.protocol.cumulativeUniqueLPs += INT_ONE;
-    }
 
     this.protocol.save();
   }

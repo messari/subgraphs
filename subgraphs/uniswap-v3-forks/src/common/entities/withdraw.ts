@@ -1,5 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-import { RawDeltas } from "../dex_event_handler";
+import { RawDeltas } from "../dexEventHandler";
 import { LiquidityPool } from "../../../generated/schema";
 import { BIGINT_NEG_ONE, BIGINT_ZERO } from "../constants";
 

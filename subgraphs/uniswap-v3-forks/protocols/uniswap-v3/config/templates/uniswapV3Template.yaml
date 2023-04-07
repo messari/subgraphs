@@ -22,7 +22,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/Factory.ts
+      file: ./src/mappings/factory.ts
       entities:
         - Token
         - DexAmmProtocol
@@ -32,6 +32,8 @@ dataSources:
         - _TokenTracker
         - _LiquidityPoolAmount
       abis:
+        - name: Pool
+          file: ./abis/uniswap-v3/Pool.json
         - name: Factory
           file: ./abis/uniswap-v3/Factory.json
         - name: ERC20
@@ -40,33 +42,31 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
-        - name: Pool
-          file: ./abis/uniswap-v3/pool.json
       eventHandlers:
         - event: PoolCreated(indexed address,indexed address,indexed uint24,int24,address)
           handler: handlePoolCreated
 
   - kind: ethereum/contract
-    name: NonfungiblePositionManager
+    name: NonFungiblePositionManager
     network: {{network}}
     source:
       address: "{{nonFungiblePositionManagerAddress}}"
-      abi: NonfungiblePositionManager
+      abi: NonFungiblePositionManager
       startBlock: {{nonFungiblePositionManagerAddressStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/position-manager.ts
+      file: ./src/mappings/positionManager.ts
       entities:
         - Position
       abis:
-        - name: NonfungiblePositionManager
-          file: ./abis/uniswap-v3/NonfungiblePositionManager.json
-        - name: Pool
-          file: ./abis/uniswap-v3/pool.json
+        - name: pool
+          file: ./abis/uniswap-v3/Pool.json
         - name: Factory
           file: ./abis/uniswap-v3/Factory.json
+        - name: NonFungiblePositionManager
+          file: ./abis/uniswap-v3/NonFungiblePositionManager.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
@@ -107,7 +107,7 @@ templates:
         - _LiquidityPoolAmount
       abis:
         - name: Pool
-          file: ./abis/uniswap-v3/pool.json
+          file: ./abis/uniswap-v3/Pool.json
         - name: Factory
           file: ./abis/uniswap-v3/Factory.json
         - name: ERC20
@@ -138,7 +138,7 @@ templates:
         - LiqudityPool
       abis:
         - name: Pool
-          file: ./abis/uniswap-v3/pool.json
+          file: ./abis/uniswap-v3/Pool.json
       eventHandlers:
         - event: SetFeeProtocol(uint8,uint8,uint8,uint8)
           handler: handleSetFeeProtocol
