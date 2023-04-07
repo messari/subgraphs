@@ -119,7 +119,7 @@ export class Pool {
    * Recalculates the total value locked for this pool based on its current input token balance.
    * This function will also update the protocol's total value locked based on the change in this pool's.
    */
-  refreshTotalValueLocked(): void {
+  private refreshTotalValueLocked(): void {
     this.setInputTokenBalancesUSD();
     let totalValueLockedUSD = BIGDECIMAL_ZERO;
 
@@ -179,7 +179,6 @@ export class Pool {
     updateMetrics: boolean = true
   ): void {
     this.pool.inputTokenBalances = newBalances;
-    this.setInputTokenBalancesUSD();
     if (updateMetrics) {
       this.refreshTotalValueLocked();
     }
@@ -188,7 +187,7 @@ export class Pool {
   /**
    * Sets the pool's input token balance USD by calculating it for each token.
    */
-  setInputTokenBalancesUSD(): void {
+  private setInputTokenBalancesUSD(): void {
     const inputTokenBalancesUSD: BigDecimal[] = [];
     for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
       const inputTokenBalance = this.pool.inputTokenBalances[idx];
