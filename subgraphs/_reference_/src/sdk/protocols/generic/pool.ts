@@ -120,7 +120,6 @@ export class Pool {
    * This function will also update the protocol's total value locked based on the change in this pool's.
    */
   private refreshTotalValueLocked(): void {
-    this.setInputTokenBalancesUSD();
     let totalValueLockedUSD = BIGDECIMAL_ZERO;
 
     for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
@@ -179,6 +178,7 @@ export class Pool {
     updateMetrics: boolean = true
   ): void {
     this.pool.inputTokenBalances = newBalances;
+    this.setInputTokenBalancesUSD();
     if (updateMetrics) {
       this.refreshTotalValueLocked();
     }
