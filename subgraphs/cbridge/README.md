@@ -44,6 +44,8 @@ Stakers and validators on cBridge receive 100% of the protocol fees from the xAs
 
 Protocol Side Revenue = (`xLiquidity Transfer Fees * .5`) + (`xAsset Transfer Fees`) + `Message Fees`
 
+Because information of the fees (except for the Message Fees) are only available via the SGN API and not available on-chain, we cannot track the protocol side revenue as it accrue, but only when it is withdrawn [decoding the refid value of the withdraw](https://github.com/celer-network/sgn-v2-contracts/blob/61159ed26e45e23731e4ed883b1d83be987d6c1a/contracts/pegged-bridge/OriginalTokenVault.sol#L49-L52)
+
 ## Pool-Level Metrics
 
 ### Pool Total Value Locked USD
