@@ -46,8 +46,13 @@ export function getUSDValueFromNativeTokens(
 export function handleIncreaseLiquidity(event: IncreaseLiquidity): void {
   const account = getOrCreateAccount(event.transaction.from);
   const position = getOrCreatePosition(event, event.params.tokenId);
+
   // position was not able to be fetched
   if (position == null) {
+    log.error("Position not found for transfer tx: {}, position: {}", [
+      event.transaction.hash.toHexString(),
+      event.params.tokenId.toString(),
+    ]);
     return;
   }
 
@@ -111,6 +116,10 @@ export function handleDecreaseLiquidity(event: DecreaseLiquidity): void {
 
   // position was not able to be fetched
   if (position == null) {
+    log.error("Position not found for transfer tx: {}, position: {}", [
+      event.transaction.hash.toHexString(),
+      event.params.tokenId.toString(),
+    ]);
     return;
   }
 
@@ -169,6 +178,10 @@ export function handleTransfer(event: Transfer): void {
 
   // position was not able to be fetched
   if (position == null) {
+    log.error("Position not found for transfer tx: {}, position: {}", [
+      event.transaction.hash.toHexString(),
+      event.params.tokenId.toString(),
+    ]);
     return;
   }
 
@@ -180,10 +193,6 @@ export function handleTransfer(event: Transfer): void {
   if (isClosed(position)) {
     account.closedPositionCount += INT_ONE;
     oldAccount.closedPositionCount -= INT_ONE;
-    log.warning("Transfering closed position: {}, liquidity: {}", [
-      position.id.toHexString(),
-      position.liquidity.toString(),
-    ]);
   } else {
     account.openPositionCount += INT_ONE;
     oldAccount.openPositionCount -= INT_ONE;
