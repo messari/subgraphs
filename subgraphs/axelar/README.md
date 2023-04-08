@@ -30,7 +30,7 @@ Total revenue is a measure of the fees paid by the traders over a specific perio
 
 Total Revenue = `ProtocolSideRevenue`
 
-Note: Gas fees (revenue) varying by chain and token, and the information is only available via Axelar CLI or Satellite frontend and not available on-chain. The current subgraph implementation tracks fee payment by users to the Gas Service contract.
+Note: Gas fees varying by chain and token, and the information is only available via Axelar CLI or Satellite frontend and not available on-chain. The current subgraph implementation tracks fee payment by users to the Gas Service contract, which include prepaid actual gas fee and fees to the protocol (maybe set to 0). Overpaid gas fees are refunded to the user, which may lead to negative revenue for certain days in the snapshot when the refund happened in a day/hour different than the payment.
 
 #### Supply Side Revenue USD
 
