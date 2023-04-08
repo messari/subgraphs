@@ -2507,7 +2507,7 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "2.1.0",
+          "schema": "2.1.1",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
