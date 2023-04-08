@@ -7675,36 +7675,6 @@
       }
     }
   },
-  "axelar": {
-    "schema": "bridge",
-    "base": "axelar",
-    "protocol": "axelar",
-    "project": "axelar",
-    "deployments": {
-      "axelar-ethereum": {
-        "network": "ethereum",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "axelar-ethereum",
-            "query-id": "axelar-ethereum"
-          }
-        },
-        "files": {
-          "template": "axelar.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      }
-    }
-  },
   "celer-bridge": {
     "schema": "bridge",
     "base": "celer-bridge",
@@ -8195,6 +8165,190 @@
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        }
+      }
+    }
+  },
+  "axelar": {
+    "schema": "bridge",
+    "base": "axelar",
+    "protocol": "axelar",
+    "project": "axelar-network",
+    "deployments": {
+      "axelar-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-ethereum",
+            "query-id": "axelar-ethereum"
+          }
+        }
+      },
+      "axelar-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-arbitrum",
+            "query-id": "axelar-arbitrum"
+          }
+        }
+      },
+      "axelar-avalanche": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-avalanche",
+            "query-id": "axelar-avalanche"
+          }
+        }
+      },
+      "axelar-bsc": {
+        "network": "bsc",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-bsc",
+            "query-id": "axelar-bsc"
+          }
+        }
+      },
+      "axelar-celo": {
+        "network": "celo",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-celo",
+            "query-id": "axelar-celo"
+          }
+        }
+      },
+      "axelar-fantom": {
+        "network": "fantom",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-fantom",
+            "query-id": "axelar-fantom"
+          }
+        }
+      },
+      "axelar-moonbeam": {
+        "network": "moonbeam",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-moonbeam",
+            "query-id": "axelar-moonbeam"
+          }
+        }
+      },
+      "axelar-polygon": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-polygon",
+            "query-id": "axelar-polygon"
+          }
         }
       }
     }
