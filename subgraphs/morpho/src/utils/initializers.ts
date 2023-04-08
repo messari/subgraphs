@@ -1,10 +1,9 @@
 import { Address, BigDecimal, Bytes, log } from "@graphprotocol/graph-ts";
-
 import { ERC20 } from "../../generated/MorphoAaveV2/ERC20";
 import { LendingPool } from "../../generated/MorphoAaveV2/LendingPool";
 import { LendingPoolAddressesProvider } from "../../generated/MorphoAaveV2/LendingPoolAddressesProvider";
 import { MorphoAaveV2 } from "../../generated/MorphoAaveV2/MorphoAaveV2";
-import { MorphoCompound } from "../../generated/MorphoCompound/MorphoCompound";
+// import { MorphoCompound } from "../../generated/MorphoCompound/MorphoCompound";
 import {
   Token,
   LendingProtocol,
@@ -12,11 +11,12 @@ import {
   _MarketList,
 } from "../../generated/schema";
 import {
-  Comptroller,
+  // Comptroller,
   LendingPool as LendingPoolTemplate,
 } from "../../generated/templates";
 import { LendingPoolConfigurator as LendingPoolConfiguratorTemplate } from "../../generated/templates";
 import { MORPHO_AAVE_V2_ADDRESS, MORPHO_COMPOUND_ADDRESS } from "../constants";
+import { Versions } from "../versions";
 
 export const getOrInitToken = (tokenAddress: Bytes): Token => {
   let token = Token.load(tokenAddress);
@@ -51,37 +51,39 @@ export const getOrInitLendingProtocol = (
       );
       protocol.name = "Morpho Aave V2";
       protocol.slug = "morpho-aave-v2";
-      protocol.schemaVersion = "0.0.5";
-      protocol.subgraphVersion = "0.0.5";
-      protocol.methodologyVersion = "0.0.5";
+      protocol.schemaVersion = Versions.getSchemaVersion();
+      protocol.subgraphVersion = Versions.getSubgraphVersion();
+      protocol.methodologyVersion = Versions.getMethodologyVersion();
       const defaultMaxGas = morpho.defaultMaxGasForMatching();
-      protocol.defaultMaxGasForMatchingSupply = defaultMaxGas.getSupply();
-      protocol.defaultMaxGasForMatchingBorrow = defaultMaxGas.getBorrow();
-      protocol.defaultMaxGasForMatchingWithdraw = defaultMaxGas.getWithdraw();
-      protocol.defaultMaxGasForMatchingRepay = defaultMaxGas.getRepay();
+      protocol._defaultMaxGasForMatchingSupply = defaultMaxGas.getSupply();
+      protocol._defaultMaxGasForMatchingBorrow = defaultMaxGas.getBorrow();
+      protocol._defaultMaxGasForMatchingWithdraw = defaultMaxGas.getWithdraw();
+      protocol._defaultMaxGasForMatchingRepay = defaultMaxGas.getRepay();
 
-      protocol.maxSortedUsers = morpho.maxSortedUsers();
+      protocol._maxSortedUsers = morpho.maxSortedUsers();
 
-      protocol.owner = morpho.owner();
-    } else if (protocolAddress.equals(MORPHO_COMPOUND_ADDRESS)) {
-      const morpho = MorphoCompound.bind(protocolAddress);
-      Comptroller.create(morpho.comptroller());
+      protocol._owner = morpho.owner();
+    }
+    // else if (protocolAddress.equals(MORPHO_COMPOUND_ADDRESS)) {
+    //   const morpho = MorphoCompound.bind(protocolAddress);
+    //   Comptroller.create(morpho.comptroller());
 
-      protocol.name = "Morpho Compound";
-      protocol.slug = "morpho-compound";
-      protocol.schemaVersion = "0.0.5";
-      protocol.subgraphVersion = "0.0.5";
-      protocol.methodologyVersion = "0.0.5";
-      const defaultMaxGas = morpho.defaultMaxGasForMatching();
-      protocol.defaultMaxGasForMatchingSupply = defaultMaxGas.getSupply();
-      protocol.defaultMaxGasForMatchingBorrow = defaultMaxGas.getBorrow();
-      protocol.defaultMaxGasForMatchingWithdraw = defaultMaxGas.getWithdraw();
-      protocol.defaultMaxGasForMatchingRepay = defaultMaxGas.getRepay();
+    //   protocol.name = "Morpho Compound";
+    //   protocol.slug = "morpho-compound";
+    //   protocol.schemaVersion = "0.0.5";
+    //   protocol.subgraphVersion = "0.0.5";
+    //   protocol.methodologyVersion = "0.0.5";
+    //   const defaultMaxGas = morpho.defaultMaxGasForMatching();
+    //   protocol._defaultMaxGasForMatchingSupply = defaultMaxGas.getSupply();
+    //   protocol._defaultMaxGasForMatchingBorrow = defaultMaxGas.getBorrow();
+    //   protocol._defaultMaxGasForMatchingWithdraw = defaultMaxGas.getWithdraw();
+    //   protocol._defaultMaxGasForMatchingRepay = defaultMaxGas.getRepay();
 
-      protocol.maxSortedUsers = morpho.maxSortedUsers();
+    //   protocol._maxSortedUsers = morpho.maxSortedUsers();
 
-      protocol.owner = morpho.owner();
-    } else {
+    //   protocol._owner = morpho.owner();
+    // }
+    else {
       log.critical("Unknown protocol address: {}", [
         protocolAddress.toHexString(),
       ]);
@@ -145,7 +147,7 @@ export const getOrInitMarketList = (protocolAddress: Address): _MarketList => {
 // ###############################
 
 export const getMarket = (marketAddress: Bytes): Market => {
-  let market = Market.load(marketAddress);
+  const market = Market.load(marketAddress);
   if (!market) {
     // The event "MarketCreated" creates directly the market entity
     log.critical("Market not found: {}", [marketAddress.toHexString()]);

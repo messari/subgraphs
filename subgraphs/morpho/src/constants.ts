@@ -4,7 +4,16 @@ import {
   BigInt,
   Bytes,
   ethereum,
+  log,
 } from "@graphprotocol/graph-ts";
+import { ProtocolData } from "./sdk/protocols/lending/manager";
+import {
+  CollateralizationType,
+  LendingType,
+  Network,
+  PermissionType,
+  RiskType,
+} from "./sdk/protocols/lending/constants";
 
 export const BASE_UNITS = BigDecimal.fromString("10000");
 export const WAD = BigDecimal.fromString("1000000000000000000");
@@ -12,32 +21,6 @@ export const WAD = BigDecimal.fromString("1000000000000000000");
 export const RAY = BigDecimal.fromString("1000000000000000000000000000");
 
 export const RAY_BI = BigInt.fromString("1000000000000000000000000000");
-
-export namespace ProtocolType {
-  export const LENDING = "LENDING";
-}
-
-export namespace LendingType {
-  export const CDP = "CDP";
-}
-
-export namespace InterestRateType {
-  export const STABLE = "STABLE";
-  export const VARIABLE = "VARIABLE";
-  export const FIXED = "FIXED";
-  export const POOL = "POOL";
-  export const P2P = "P2P";
-}
-
-export namespace InterestRateSide {
-  export const LENDER = "LENDER";
-  export const BORROWER = "BORROWER";
-}
-
-export namespace PositionSide {
-  export const LENDER = "LENDER";
-  export const BORROWER = "BORROWER";
-}
 
 export namespace EventType {
   export const DEPOSIT = 1;
@@ -52,34 +35,25 @@ export namespace EventType {
   export const BORROWER_POSITION_UPDATE = 8;
 }
 
-export namespace ActivityType {
-  export const DAILY = "DAILY";
-  export const HOURLY = "HOURLY";
-}
-
 /////////////////////
 ///// Addresses /////
 /////////////////////
 
-export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; // used for Mainnet pricing
-
+export const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // used for Mainnet pricing
 export const MORPHO_AAVE_V2_ADDRESS = Address.fromBytes(
   Bytes.fromHexString("0x777777c9898d384f785ee44acfe945efdff5f3e0")
 );
-
 export const MORPHO_COMPOUND_ADDRESS = Address.fromBytes(
   Bytes.fromHexString("0x8888882f8f843896699869179fb6e4f7e3b58888")
 );
-
 export const C_ETH = Address.fromBytes(
-  Bytes.fromHexString("0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5")
+  Bytes.fromHexString("0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5")
 );
 export const WRAPPED_ETH = Address.fromBytes(
   Bytes.fromHexString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
 );
-
 export const ETH_USD_PRICE_FEED_ADDRESS = Address.fromBytes(
-  Bytes.fromHexString("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419")
+  Bytes.fromHexString("0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419")
 );
 
 ///////////////////
@@ -149,4 +123,51 @@ export function exponentToBigInt(decimals: i32): BigInt {
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
+
+export function getProtocolData(protocolID: Address): ProtocolData {
+  if (protocolID == MORPHO_AAVE_V2_ADDRESS) {
+    return new ProtocolData(
+      Bytes.fromHexString(protocolID.toHexString()),
+      "Morpho",
+      "Morpho Aave V2",
+      "morpho-aave-v2",
+      Network.MAINNET,
+      LendingType.CDP,
+      PermissionType.PERMISSIONLESS,
+      PermissionType.PERMISSIONLESS,
+      PermissionType.ADMIN,
+      CollateralizationType.OVER_COLLATERALIZED,
+      RiskType.ISOLATED
+    );
+  } else if (protocolID == MORPHO_COMPOUND_ADDRESS) {
+    return new ProtocolData(
+      Bytes.fromHexString(protocolID.toHexString()),
+      "Morpho",
+      "Morpho Compound",
+      "morpho-compound",
+      Network.MAINNET,
+      LendingType.CDP,
+      PermissionType.PERMISSIONLESS,
+      PermissionType.PERMISSIONLESS,
+      PermissionType.ADMIN,
+      CollateralizationType.OVER_COLLATERALIZED,
+      RiskType.ISOLATED
+    );
+  } else {
+    log.critical("Unknown protocol ID: {}", [protocolID.toHexString()]);
+    return new ProtocolData(
+      Bytes.fromHexString(protocolID.toHexString()),
+      "",
+      "",
+      "",
+      "",
+      "",
+      null,
+      null,
+      null,
+      null,
+      null
+    );
+  }
 }

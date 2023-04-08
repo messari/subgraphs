@@ -143,6 +143,9 @@ enum InterestRateType {
 
   " Fixed interest rate (e.g. Notional) "
   FIXED
+
+  " Interest rate is determined by peer to peer matching (e.g. morpho) "
+  P2P
 }
 
 enum InterestRateSide {
@@ -163,7 +166,7 @@ enum Tranche {
 
 enum PositionSide {
   " Position opened as a lender (used as collateral) "
-  COLLATERAL
+  LENDER
 
   " Position opened as a borrower "
   BORROWER
@@ -537,6 +540,17 @@ type LendingProtocol implements Protocol @entity {
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
+
+  ##### Morpho Specific #####
+
+  _defaultMaxGasForMatchingSupply: BigInt
+  _defaultMaxGasForMatchingBorrow: BigInt
+  _defaultMaxGasForMatchingWithdraw: BigInt
+  _defaultMaxGasForMatchingRepay: BigInt
+
+  _maxSortedUsers: BigInt
+  _owner: Bytes
+  _oracle: Bytes
 }
 
 # helper entity to iterate through all markets
@@ -1009,6 +1023,149 @@ type Market @entity {
 
   " All flashloans made in this market"
   flashloans: [Flashloan!]! @derivedFrom(field: "market")
+
+  ###### Morpho Specific ######
+
+  " The supply index of the reserve, updated at the last pool update"
+  _reserveSupplyIndex: BigInt
+
+  " The borrow index of the reserve, updated at the last pool update"
+  _reserveBorrowIndex: BigInt
+
+  " The timestamp of the last pool update"
+  _lastReserveUpdate: BigInt
+
+  " The supply rate of the reserve, updated at the last pool update"
+  _poolSupplyRate: BigInt
+
+  " The borrow rate of the reserve, updated at the last pool update"
+  _poolBorrowRate: BigInt
+
+  " The supply index of the pool, updated at the last update on Morpho"
+  _lastPoolSupplyIndex: BigInt
+
+  " The borrow index of the pool, updated at the last update on Morpho"
+  _lastPoolBorrowIndex: BigInt
+
+  " The timestamp of the last update on Morpho"
+  _lastPoolUpdate: BigInt
+
+  " The supply Delta, expressed in scaled units. Used for calculating the p2p supply rate"
+  _p2pSupplyDelta: BigInt
+
+  " The borrow Delta, expressed in scaled units. Used for calculating the p2p borrow rate"
+  _p2pBorrowDelta: BigInt
+
+  " The p2p supply index, updated at the last update on Morpho"
+  _p2pSupplyIndex: BigInt
+
+  " The p2p borrow index, updated at the last update on Morpho"
+  _p2pBorrowIndex: BigInt
+
+  " Whether the p2p matching is disabled or not on this market"
+  _isP2PDisabled: Boolean
+
+  " The cursor where the p2p rate is calculated from"
+  _p2pIndexCursor: BigDecimal
+
+  " The total deposited on the underlying pool"
+  _totalSupplyOnPool: BigDecimal
+
+  " The total amount matched peer-to-peer"
+  _totalSupplyInP2P: BigDecimal
+
+  " The total borrowed from the underlying pool"
+  _totalBorrowOnPool: BigDecimal
+
+  " The total amount borrowed peer-to-peer"
+  _totalBorrowInP2P: BigDecimal
+
+  " The p2pSupplyAmount in scaled units"
+  _p2pSupplyAmount: BigInt
+
+  " The p2pBorrowAmount in scaled units"
+  _p2pBorrowAmount: BigInt
+
+  " The aggregation of the 'supplyBalanceInOf.onPool' user balances"
+  _scaledSupplyOnPool: BigInt
+
+  " The aggregation of the 'supplyBalanceInOf.inP2P' user balances"
+  _scaledSupplyInP2P: BigInt
+
+  " The aggregation of the 'borrowBalanceInOf.onPool' user balances"
+  _scaledBorrowOnPool: BigInt
+
+  " The aggregation of the 'borrowBalanceInOf.inP2P' user balances"
+  _scaledBorrowInP2P: BigInt
+
+  " The aggregation of the scaled p2p supply balances if the p2p balances was on pool"
+  _virtualScaledSupply: BigInt
+
+  " The aggregation of the scaled p2p borrow balances if the p2p balances was on pool"
+  _virtualScaledBorrow: BigInt
+
+  " The poolSupplyAmount in scaled units"
+  _poolSupplyAmount: BigInt
+
+  " The poolBorrowAmount in scaled units"
+  _poolBorrowAmount: BigInt
+
+  " Whether the supply is paused or not"
+  _isSupplyPaused: Boolean
+
+  " Whether the borrow is paused or not"
+  _isBorrowPaused: Boolean
+
+  " Whether the withdraw is paused or not"
+  _isWithdrawPaused: Boolean
+
+  " Whether the repay is paused or not"
+  _isRepayPaused: Boolean
+
+  " Whether the liquidate borrow is paused or not"
+  _isLiquidateBorrowPaused: Boolean
+
+  " Whether the liquidate collateral is paused or not"
+  _isLiquidateCollateralPaused: Boolean
+
+  " The total supply interest earned on the pool"
+  _poolSupplyInterests: BigDecimal
+
+  " The total borrow interest paid by users on the pool"
+  _poolBorrowInterests: BigDecimal
+
+  " The total supply interest earned on p2p"
+  _p2pSupplyInterests: BigDecimal
+
+  " The total borrow interest paid by users on p2p"
+  _p2pBorrowInterests: BigDecimal
+
+  " The total supply interest earned on the pool in USD"
+  _poolSupplyInterestsUSD: BigDecimal
+
+  " The total borrow interest paid by users on the pool in USD"
+  _poolBorrowInterestsUSD: BigDecimal
+
+  " The total supply interest earned on p2p in USD"
+  _p2pSupplyInterestsUSD: BigDecimal
+
+  " The total borrow interest paid by users on p2p in USD"
+  _p2pBorrowInterestsUSD: BigDecimal
+
+  " The amount of borrow interest not paid by p2p matched users compared to a pool position"
+  _p2pBorrowInterestsImprovement: BigDecimal
+
+  " The amount of borrow interest not paid by p2p matched users compared to a pool position, in USD"
+  _p2pBorrowInterestsImprovementUSD: BigDecimal
+
+  " The amount of supply interest earned by p2p matched users compared to a pool position"
+  _p2pSupplyInterestsImprovement: BigDecimal
+
+  " The amount of supply interest earned by p2p matched users compared to a pool position, in USD"
+  _p2pSupplyInterestsImprovementUSD: BigDecimal
+
+  " The number of decimals of the rates and the indexes, WAD or RAY."
+  _indexesOffset: Int
 }
 
 #################################
@@ -1533,6 +1690,17 @@ type Position @entity {
 
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
+
+  ##### Morpho Specific #####
+
+  " balance on pool (in poolUnits) "
+  _balanceOnPool: BigInt
+
+  " balance in P2P (in P2PUnits) "
+  _balanceInP2P: BigInt
+
+  " balance in pool units from p2p balance"
+  _virtualP2P: BigInt
 }
 
 # Unlike other snapshots that are taken at a fixed time interval. Position
@@ -1571,6 +1739,20 @@ type PositionSnapshot @entity(immutable: true) {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+
+  ##### Morpho Specific #####
+
+  " Balance on pool (in pool units)"
+  _balanceOnPool: BigInt
+
+  " Balance in P2P (in p2p units)"
+  _balanceInP2P: BigInt
+
+  " Balance on pool in USD"
+  _balanceOnPoolUSD: BigDecimal
+
+  " Balance in P2P in USD "
+  _balanceInP2PUSD: BigDecimal
 }
 
 # Helper entity for calculating daily/hourly active users
@@ -2008,4 +2190,12 @@ type Flashloan implements Event @entity(immutable: true) {
 
   " Amount of asset taken by protocol as a fee in USD "
   feeAmountUSD: BigDecimal
+}
+
+# Used to retrieve the aToken from the underlying address used in Aave events
+type UnderlyingTokenMapping @entity {
+  " The address of the underlying token "
+  id: Bytes!
+  aToken: Bytes!
+  debtToken: Bytes!
 }

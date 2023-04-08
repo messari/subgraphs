@@ -3335,7 +3335,7 @@
     "protocol": "morpho",
     "project": "morpho",
     "deployments": {
-      "morpho-aave-ethereum": {
+      "morpho-aave-v2-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -3344,7 +3344,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "morpho.template.yaml"
+          "template": "morpho.aave-v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3352,8 +3352,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "morpho-aave-ethereum",
-            "query-id": "morpho-aave-ethereum"
+            "slug": "morpho-aave-v2-ethereum",
+            "query-id": "morpho-aave-v2-ethereum"
           }
         }
       },
@@ -3366,7 +3366,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "morpho.template.yaml"
+          "template": "morpho.compound.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
