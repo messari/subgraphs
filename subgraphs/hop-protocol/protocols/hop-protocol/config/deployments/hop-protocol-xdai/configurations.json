@@ -3,9 +3,9 @@
   "isMainnet": false,
   "subgraphName": "hop-xdai",
   "deployment": "HOP_PROTOCOL_XDAI",
-  "graftEnabled": true,
+  "graftEnabled": false,
   "subgraphId": "QmS8LjfYq2gAKx8y7Hkg8C8BcxYjxB9pLkj7zNkyvJVrUq",
-  "graftStartBlock": 20383666,
+  "graftStartBlock": 24646598,
   "tokens": [
     {
       "dataSourceName": "Token",

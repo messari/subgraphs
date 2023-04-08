@@ -64,21 +64,23 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 			Address.fromString('0x70cd033af4dc9763700d348e402dfeddb86e09e1')
 		)
 
-		let price: BigInt
+		let price: BigDecimal
 		let reserve = uniSwapPair.try_getReserves()
 		if (!reserve.reverted) {
-			price = reserve.value.value1.div(reserve.value.value0)
+			price = reserve.value.value1
+				.toBigDecimal()
+				.div(reserve.value.value0.toBigDecimal())
 			log.warning(
 				'[UniswapV2Matic] tokenAddress: {}, Reserve1: {}, Reserve0: {}, Price: {}',
 				[
 					tokenAddr.toHexString(),
 					reserve.value.value1.toString(),
 					reserve.value.value0.toString(),
-					price.toBigDecimal().toString(),
+					price.toString(),
 				]
 			)
 			let x: CustomPriceType
-			x = CustomPriceType.initialize(price.toBigDecimal())
+			x = CustomPriceType.initialize(price)
 			return x
 		}
 	}
@@ -192,7 +194,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 					tokenAddr.toHexString(),
 					reserve.value.value1.toString(),
 					reserve.value.value0.toString(),
-					price.toBigDecimal().toString(),
+					price.toString(),
 				]
 			)
 			let x: CustomPriceType

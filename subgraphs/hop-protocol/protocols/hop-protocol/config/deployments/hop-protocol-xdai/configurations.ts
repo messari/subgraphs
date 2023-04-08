@@ -187,7 +187,7 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 		if (rewardToken == XdaiRewardToken.USDC_A) return XdaiAmm.USDC
 		else if (rewardToken == XdaiRewardToken.USDC_B) return XdaiAmm.USDC
 		else if (rewardToken == XdaiRewardToken.USDT_A) return XdaiAmm.USDT
-		else if (rewardToken == XdaiRewardToken.USDT_A) return XdaiAmm.USDT
+		else if (rewardToken == XdaiRewardToken.USDT_B) return XdaiAmm.USDT
 		else if (rewardToken == XdaiRewardToken.ETH_A) return XdaiAmm.ETH
 		else if (rewardToken == XdaiRewardToken.ETH_B) return XdaiAmm.ETH
 		else if (rewardToken == XdaiRewardToken.DAI_A) return XdaiAmm.DAI
