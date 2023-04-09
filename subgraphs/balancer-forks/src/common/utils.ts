@@ -1,9 +1,9 @@
 import {
+  Bytes,
   BigInt,
   Address,
   ethereum,
   BigDecimal,
-  Bytes,
 } from "@graphprotocol/graph-ts";
 import {
   getOrCreateToken,
@@ -56,7 +56,6 @@ export function getPoolTokensInfo(poolId: Bytes): PoolTokensType {
   const vaultContract = VaultContract.bind(constants.VAULT_ADDRESS);
 
   const poolTokens = vaultContract.try_getPoolTokens(poolId);
-
   if (poolTokens.reverted) return new PoolTokensType();
 
   return new PoolTokensType(
@@ -95,6 +94,30 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   );
 }
 
+export function getPoolInputTokenBalances(
+  poolAddress: Address,
+  poolId: Bytes
+): BigInt[] {
+  const poolContract = WeightedPoolContract.bind(poolAddress);
+  const poolTokensInfo = getPoolTokensInfo(poolId);
+
+  const poolBalances = poolTokensInfo.getBalances;
+
+  const bptTokenIndex = readValue<BigInt>(
+    poolContract.try_getBptIndex(),
+    constants.BIGINT_NEG_ONE
+  );
+
+  if (bptTokenIndex != constants.BIGINT_NEG_ONE) {
+    poolBalances.splice(
+      bptTokenIndex.toI32() as u8,
+      constants.BIGINT_ONE.toI32() as u8
+    );
+  }
+
+  return poolBalances;
+}
+
 export function getPoolScalingFactors(
   poolAddress: Address,
   inputTokens: string[]
@@ -115,6 +138,18 @@ export function getPoolScalingFactors(
 
   if (scales.every((item) => item.isZero())) {
     scales = readValue<BigInt[]>(poolContract.try_getScalingFactors(), scales);
+
+    const bptTokenIndex = readValue<BigInt>(
+      poolContract.try_getBptIndex(),
+      constants.BIGINT_NEG_ONE
+    );
+
+    if (bptTokenIndex != constants.BIGINT_NEG_ONE) {
+      scales.splice(
+        bptTokenIndex.toI32() as u8,
+        constants.BIGINT_ONE.toI32() as u8
+      );
+    }
   }
 
   return scales;
@@ -219,21 +254,23 @@ export function getOutputTokenSupply(
 ): BigInt {
   const poolContract = WeightedPoolContract.bind(poolAddress);
 
+  // Exception: Boosted Pools
+  // since this pool pre-mints all BPT, `totalSupply` * remains constant,
+  // whereas`getVirtualSupply` increases as users join the pool and decreases as they exit it
+
   let totalSupply = readValue<BigInt>(
-    poolContract.try_totalSupply(),
-    oldSupply
+    poolContract.try_getVirtualSupply(),
+    constants.BIGINT_ZERO
   );
+  if (totalSupply.notEqual(constants.BIGINT_ZERO)) return totalSupply;
 
-  if (poolAddress.equals(constants.AAVE_BOOSTED_POOL_ADDRESS)) {
-    // Exception: Aave Boosted Pool
-    // since this pool pre-mints all BPT, `totalSupply` * remains constant,
-    // whereas`getVirtualSupply` increases as users join the pool and decreases as they exit it
+  totalSupply = readValue<BigInt>(
+    poolContract.try_getActualSupply(),
+    constants.BIGINT_ZERO
+  );
+  if (totalSupply.notEqual(constants.BIGINT_ZERO)) return totalSupply;
 
-    totalSupply = readValue<BigInt>(
-      poolContract.try_getVirtualSupply(),
-      oldSupply
-    );
-  }
+  totalSupply = readValue<BigInt>(poolContract.try_totalSupply(), oldSupply);
 
   return totalSupply;
 }

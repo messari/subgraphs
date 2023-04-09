@@ -2,7 +2,7 @@ import { styled } from "../styled";
 import { CircularProgress, Typography } from "@mui/material";
 import { useEffect } from "react";
 import { useState } from "react";
-import { negativeFieldList } from "../constants";
+import { negativeFieldList, nonStrictlyIncrementalFieldList } from "../constants";
 
 const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
   max-height: 230px;
@@ -35,7 +35,7 @@ const messagesByLevel = (
         }
         issuesMsg = `All values in ${issuesArray[x].fieldName} are 0 (or null). ${factors}Verify that this data is being mapped correctly.`;
       }
-      if (issuesArray[x].type === "CUMULATIVE") {
+      if (issuesArray[x].type === "CUMULATIVE" && !nonStrictlyIncrementalFieldList?.includes(issuesArray[x].fieldName)) {
         issuesMsg = `
           ${issuesArray[x].fieldName} cumulative value dropped on snapshot id ${issuesArray[x].message}. Cumulative values should always increase.`;
       }

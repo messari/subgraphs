@@ -22,7 +22,7 @@ import {
   ProtocolType,
   BridgePoolType,
   CrosschainTokenType,
-  INACURATE_PRICEFEED_TOKENS,
+  INACCURATE_PRICEFEED_TOKENS,
   INT_ONE,
   Network,
   ZERO_ADDRESS,
@@ -128,7 +128,7 @@ export function getOrCreateToken(
       : Network.UNKNOWN_NETWORK;
 
     if (
-      !INACURATE_PRICEFEED_TOKENS.get(network)!.includes(
+      !INACCURATE_PRICEFEED_TOKENS.get(network)!.includes(
         Address.fromBytes(token.id)
       )
     ) {
@@ -141,7 +141,7 @@ export function getOrCreateToken(
       } else if (
         network == Network.MAINNET &&
         Address.fromBytes(token.id) ==
-          Address.fromHexString("0xbbc4A8d076F4B1888fec42581B6fc58d242CF2D5") &&
+          Address.fromHexString("0xbbc4a8d076f4b1888fec42581b6fc58d242cf2d5") &&
         block.number == BigInt.fromString("14983245")
       ) {
         token.lastPriceUSD = BIGDECIMAL_ONE;

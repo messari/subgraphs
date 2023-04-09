@@ -9,7 +9,7 @@ export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T
 export function getTokenDecimals(tokenAddr: Address): BigInt {
   const token = _ERC20.bind(tokenAddr);
 
-  let decimals = readValue<BigInt>(token.try_decimals(), constants.DEFAULT_DECIMALS);
+  const decimals = readValue<BigInt>(token.try_decimals(), constants.DEFAULT_DECIMALS);
 
   return decimals;
 }

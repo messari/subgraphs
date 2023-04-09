@@ -8,7 +8,6 @@ import {
 import { chainIDToNetwork } from "./chainIds";
 import { Bridge } from "./protocol";
 import { RewardTokenType } from "../../util/constants";
-import { NetworkConfigs } from "../../../../configurations/configure";
 
 export interface TokenInitializer {
   getTokenParams(address: Address): TokenParams;
@@ -18,7 +17,7 @@ export class TokenParams {
   name: string;
   symbol: string;
   decimals: i32;
-  underlying: Address;
+  underlying: Address | null;
 }
 
 export class TokenManager {
@@ -36,16 +35,12 @@ export class TokenManager {
       return token;
     }
 
+    const params = this.initializer.getTokenParams(address);
     token = new Token(address);
-    if (address == Address.fromString(NetworkConfigs.getRewardToken())) {
-      token.name = "StargateToken";
-      token.symbol = "STG";
-      token.decimals = 18;
-    } else {
-      const params = this.initializer.getTokenParams(address);
-      token.name = params.name;
-      token.symbol = params.symbol;
-      token.decimals = params.decimals;
+    token.name = params.name;
+    token.symbol = params.symbol;
+    token.decimals = params.decimals;
+    if (params.underlying) {
       token._underlying = params.underlying;
     }
     token.save();

@@ -20,18 +20,21 @@ export function updateUsageMetrics(
   const timestamp = event.block.timestamp.toI32();
 
   // Add account
-  let isNewAccount = createAccount(accountAddress, timestamp);
+  const isNewAccount = createAccount(accountAddress);
 
   // Add active accounts
-  let isNewDailyAccount = createDailyActiveAccount(accountAddress, timestamp);
-  let isNewHourlyAccount = createHourlyActiveAccount(accountAddress, timestamp);
+  const isNewDailyAccount = createDailyActiveAccount(accountAddress, timestamp);
+  const isNewHourlyAccount = createHourlyActiveAccount(
+    accountAddress,
+    timestamp
+  );
 
   // Update entities
-  let protocol = getOrCreateYieldAggregator(
+  const protocol = getOrCreateYieldAggregator(
     REGISTRY_ADDRESS_MAP.get(dataSource.network())!
   );
-  let dailyUsageSnapshot = getOrCreateUsageMetricDailySnapshot(event);
-  let hourlyUsageSnapshot = getOrCreateUsageMetricHourlySnapshot(event);
+  const dailyUsageSnapshot = getOrCreateUsageMetricDailySnapshot(event);
+  const hourlyUsageSnapshot = getOrCreateUsageMetricHourlySnapshot(event);
 
   let cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   if (isNewAccount) {
@@ -74,12 +77,9 @@ export function updateUsageMetrics(
   hourlyUsageSnapshot.save();
 }
 
-export function createAccount(
-  accountAddress: Address,
-  timestamp: i32
-): boolean {
+export function createAccount(accountAddress: Address): boolean {
   let isNewAccount = false;
-  let accountId = accountAddress.toHex();
+  const accountId = accountAddress.toHex();
 
   let account = Account.load(accountId);
   if (!account) {

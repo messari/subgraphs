@@ -1,0 +1,15 @@
+{
+  "network": "arbitrum-one",
+  "AxelarGateway": {
+    "address": "0xe432150cce91c13a887f7D836923d5597adD8E31",
+    "startBlock": 42018673
+  },
+  "AxelarGasService": {
+    "address": "0x2d5d7d31F671F86C782533cc367F14109a082712",
+    "startBlock": 43982851
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 15484661
+}

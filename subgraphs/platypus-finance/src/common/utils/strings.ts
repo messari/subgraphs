@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 
 export function hexToNumberString(hex: string): string {
   let hexNumber = BigInt.fromI32(0);
@@ -8,8 +8,8 @@ export function hexToNumberString(hex: string): string {
   }
 
   for (let i = 0; i < hex.length; i += 1) {
-    let character = hex.substr(hex.length - 1 - i, 1);
-    let digit = parseInt(character, 16) as u8;
+    const character = hex.substr(hex.length - 1 - i, 1);
+    const digit = parseInt(character, 16) as u8;
     if (digit) {
       hexNumber = hexNumber.plus(BigInt.fromI32(digit).times(BigInt.fromI32(16).pow(i as u8)));
     }
@@ -21,7 +21,7 @@ export function hexToNumberString(hex: string): string {
 export function hexToAscii(hex: string): string {
   let output = "";
   for (let i = 0; i < hex.length; i += 2) {
-    let charCode = parseInt(hex.substr(i, 2), 16) as u8;
+    const charCode = parseInt(hex.substr(i, 2), 16) as u8;
 
     if (charCode) {
       output += String.fromCharCode(charCode);

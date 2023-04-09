@@ -10,8 +10,10 @@ export function getPriceUsdc(tokenAddress: Address, network: string): CustomPric
 }
 
 export function getPriceFromRouter(token0Address: Address, token1Address: Address, network: string): CustomPriceType {
-  let wethAddress = constants.SUSHISWAP_WETH_ADDRESS.get(network)!;
-  let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(constants.NETWORK_BASE_TOKEN_MAP.get(network)![0])!;
+  const wethAddress = constants.SUSHISWAP_WETH_ADDRESS.get(network)!;
+  const ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(
+    constants.NETWORK_BASE_TOKEN_MAP.get(network)![0],
+  )!;
 
   // Convert ETH address to WETH
   if (token0Address == ethAddress) {
@@ -21,9 +23,9 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
     token1Address = wethAddress;
   }
 
-  let path: Address[] = [];
+  const path: Address[] = [];
   let numberOfJumps: BigInt;
-  let inputTokenIsWeth: bool = token0Address == wethAddress || token1Address == wethAddress;
+  const inputTokenIsWeth: bool = token0Address == wethAddress || token1Address == wethAddress;
 
   if (inputTokenIsWeth) {
     // Path = [token0, weth] or [weth, token1]
@@ -40,13 +42,13 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
     path.push(token1Address);
   }
 
-  let token0Decimals = utils.getTokenDecimals(token0Address);
-  let amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
+  const token0Decimals = utils.getTokenDecimals(token0Address);
+  const amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
   const routerAddresses = constants.TRADERJOE_ROUTER_ADDRESS_MAP.get(network)!;
 
-  let routerAddressV1 = routerAddresses.get("routerV1");
-  let routerAddressV2 = routerAddresses.get("routerV2");
+  const routerAddressV1 = routerAddresses.get("routerV1");
+  const routerAddressV2 = routerAddresses.get("routerV2");
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
 
@@ -68,10 +70,10 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
       }
     }
 
-    let amountOut = amountOutArray.value[amountOutArray.value.length - 1];
-    let feeBips = BigInt.fromI32(30); // .3% per swap fees
+    const amountOut = amountOutArray.value[amountOutArray.value.length - 1];
+    const feeBips = BigInt.fromI32(30); // .3% per swap fees
 
-    let amountOutBigDecimal = amountOut
+    const amountOutBigDecimal = amountOut
       .times(constants.BIGINT_TEN_THOUSAND)
       .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
       .toBigDecimal();

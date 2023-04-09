@@ -1,5 +1,5 @@
 import { Box, CircularProgress, Grid, Tooltip, Typography } from "@mui/material";
-import { negativeFieldList, PoolName, PoolNames, dateValueKeys } from "../../constants";
+import { negativeFieldList, PoolName, PoolNames, dateValueKeys, nonStrictlyIncrementalFieldList } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
 import { useEffect, useState } from "react";
@@ -260,6 +260,10 @@ function PoolTabEntity({
                 value = convertTokenDecimals(currentInstanceField, data[poolKeySingular]?.outputToken?.decimals);
               }
               if (fieldName === "inputTokenBalance") {
+                const dec = data[poolKeySingular].inputToken.decimals;
+                value = convertTokenDecimals(currentInstanceField, dec);
+              }
+              if (fieldName === "mintSupply") {
                 const dec = data[poolKeySingular].inputToken.decimals;
                 value = convertTokenDecimals(currentInstanceField, dec);
               }
@@ -531,6 +535,10 @@ function PoolTabEntity({
                 value = convertTokenDecimals(currentOverlayInstanceField, data[poolKeySingular]?.outputToken?.decimals);
               }
               if (fieldName === "inputTokenBalance") {
+                const dec = overlayData[poolKeySingular].inputToken.decimals;
+                value = convertTokenDecimals(currentOverlayInstanceField, dec);
+              }
+              if (fieldName === "mintSupply") {
                 const dec = overlayData[poolKeySingular].inputToken.decimals;
                 value = convertTokenDecimals(currentOverlayInstanceField, dec);
               }
@@ -1153,8 +1161,11 @@ function PoolTabEntity({
           }
           issues.push({ type: "SUM", message: "", level, fieldName: label });
         }
+        const isnonStrictlyIncrementalFieldList = nonStrictlyIncrementalFieldList.find((x: string) => {
+          return field.toUpperCase().includes(x.toUpperCase());
+        });
         if (
-          dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
+          !isnonStrictlyIncrementalFieldList && dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
         ) {
           issues.push({
             type: "CUMULATIVE",
