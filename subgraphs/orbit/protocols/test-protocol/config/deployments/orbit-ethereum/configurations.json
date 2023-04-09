@@ -1,0 +1,17 @@
+{
+  "deployment": "ORBIT_MAINNET",
+  "network": "mainnet",
+  "file": "./src/mappings/handlers.ts",
+  "vault": [
+    {
+      "name": "Vault",
+      "address": "0x1Bf68A9d1EaEe7826b3593C20a0ca93293cb489a",
+      "startBlock": 	12519710,
+      "abi": "Vault",
+      "depositHandler": "handleLockIn"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
