@@ -68,7 +68,7 @@ dataSources:
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
       eventHandlers:
-        - event: Deposit(string,string,address, bytes, address, uint8, uint, uint, uint)
+        - event: Deposit(string,address,bytes,address,uint8,uint256,uint256,bytes)
           handler: {{ depositHandler }}
       file: {{{ file }}}
   {{/vault}}
