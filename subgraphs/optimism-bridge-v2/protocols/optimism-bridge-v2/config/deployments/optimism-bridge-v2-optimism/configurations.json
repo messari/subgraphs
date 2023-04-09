@@ -1,0 +1,43 @@
+{
+  "network": "optimism",
+  "optimism": {
+    "standardBridge": [
+      {
+        "name": "L2StandardBridge",
+        "address": "0x4200000000000000000000000000000000000010",
+        "startBlock": 0
+      },
+      {
+        "name": "BitBTCBridge",
+        "address": "0x158F513096923fF2d3aab2BcF4478536de6725e2",
+        "startBlock": 320367
+      },
+      {
+        "name": "DAIBridge",
+        "address": "0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65",
+        "startBlock": 0
+      },
+      {
+        "name": "dForceUSDBridge",
+        "address": "0xc76cbFbAfD41761279E3EDb23Fd831Ccb74D5D67",
+        "startBlock": 878824
+      },
+      {
+        "name": "wstETHBridge",
+        "address": "0x8E01013243a96601a86eb3153F0d9Fa4fbFb6957",
+        "startBlock": 17831155
+      }
+    ],
+    "messenger": {
+      "address": "0x4200000000000000000000000000000000000007",
+      "startBlock": 0
+    },
+    "snxBridge": {
+      "address": "0x136b1EC699c62b0606854056f02dC7Bb80482d63",
+      "startBlock": 7686305
+    }
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

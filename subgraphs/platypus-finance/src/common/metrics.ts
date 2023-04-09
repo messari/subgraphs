@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _Asset, Account, ActiveAccount, Swap, LiquidityPool } from "../../generated/schema";
 import {
   getOrCreateAssetPool,
@@ -21,14 +21,14 @@ function updatePoolTVL(
   protocolLockedValue: BigDecimal,
   updateValue: bool,
 ): BigDecimal {
-  let pool = LiquidityPool.load(assetAddress.toHexString())!;
+  const pool = LiquidityPool.load(assetAddress.toHexString())!;
   if (!pool._ignore) {
     if (updateValue) {
       protocolLockedValue = protocolLockedValue.minus(pool.totalValueLockedUSD);
     }
 
-    let _asset = _Asset.load(assetAddress.toHexString())!;
-    let token = getOrCreateToken(event, Address.fromString(_asset.token));
+    const _asset = _Asset.load(assetAddress.toHexString())!;
+    const token = getOrCreateToken(event, Address.fromString(_asset.token));
 
     pool.inputTokenBalances = [_asset.cash];
     pool.totalValueLockedUSD = tokenAmountToUSDAmount(token, _asset.cash);
@@ -40,7 +40,7 @@ function updatePoolTVL(
 }
 
 export function updateProtocolTVL(event: ethereum.Event, assetAddress: Address): void {
-  let protocol = getOrCreateDexAmm();
+  const protocol = getOrCreateDexAmm();
   let protocolLockedValue = protocol.totalValueLockedUSD;
 
   if (!assetAddress.equals(ZERO_ADDRESS)) {
@@ -58,8 +58,8 @@ export function updateProtocolTVL(event: ethereum.Event, assetAddress: Address):
 
 // updates the Financials of the day except revenues, which will be handled in swaps
 export function updateFinancials(event: ethereum.Event): void {
-  let protocol = getOrCreateDexAmm();
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+  const protocol = getOrCreateDexAmm();
+  const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
 
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
@@ -69,9 +69,9 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 export function updateUsageMetrics(event: ethereum.Event, user: Address, transactionType: TransactionType): void {
-  let protocol = getOrCreateDexAmm();
-  let hourlyUsageSnapshot = getOrCreateHourlyUsageMetricSnapshot(event);
-  let dailyUsageSnapshot = getOrCreateDailyUsageMetricSnapshot(event);
+  const protocol = getOrCreateDexAmm();
+  const hourlyUsageSnapshot = getOrCreateHourlyUsageMetricSnapshot(event);
+  const dailyUsageSnapshot = getOrCreateDailyUsageMetricSnapshot(event);
 
   let account = Account.load(user.toHexString());
   if (!account) {
@@ -81,8 +81,8 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address, transac
     protocol.save();
   }
 
-  let hours = getHours(event.block.timestamp.toI64()).toString();
-  let hourlyAccountId = "hourly-".concat(user.toHexString().concat("-").concat(hours));
+  const hours = getHours(event.block.timestamp.toI64()).toString();
+  const hourlyAccountId = "hourly-".concat(user.toHexString().concat("-").concat(hours));
   let hourlyAccount = ActiveAccount.load(hourlyAccountId.toString());
 
   if (!hourlyAccount) {
@@ -91,8 +91,8 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address, transac
     hourlyUsageSnapshot.hourlyActiveUsers += 1;
   }
 
-  let days = getDays(event.block.timestamp.toI64()).toString();
-  let dailyAccountId = "daily-".concat(user.toHexString().concat("-").concat(days));
+  const days = getDays(event.block.timestamp.toI64()).toString();
+  const dailyAccountId = "daily-".concat(user.toHexString().concat("-").concat(days));
   let dailyAccount = ActiveAccount.load(dailyAccountId);
 
   if (!dailyAccount) {
@@ -132,9 +132,9 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address, transac
 }
 
 export function updatePoolMetrics(event: ethereum.Event, assetAddress: Address, tokenAddress: Address): void {
-  let pool = getOrCreateAssetPool(event, assetAddress, event.address, tokenAddress);
-  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(event, assetAddress, event.address, tokenAddress);
-  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(event, assetAddress, event.address, tokenAddress);
+  const pool = getOrCreateAssetPool(event, assetAddress, event.address, tokenAddress);
+  const hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(event, assetAddress, event.address, tokenAddress);
+  const dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(event, assetAddress, event.address, tokenAddress);
 
   hourlySnapshot.blockNumber = event.block.number;
   hourlySnapshot.timestamp = event.block.timestamp;
@@ -173,17 +173,17 @@ function calculateSwapFeeInTokenAmount(event: ethereum.Event, swap: Swap, haircu
   // Fee calculation
   // feeInTokenAmount = (haircut_rate * actual_amount) / (1 - haircut_rate)
   haircutRate = haircutRate.div(exponentToBigDecimal(18));
-  let n: BigDecimal = haircutRate.times(swap.amountOut.toBigDecimal());
-  let d: BigDecimal = BigDecimal.fromString("1").minus(haircutRate);
+  const n: BigDecimal = haircutRate.times(swap.amountOut.toBigDecimal());
+  const d: BigDecimal = BigDecimal.fromString("1").minus(haircutRate);
   return n.div(d);
 }
 
 function calculateSwapFeeInUsd(event: ethereum.Event, swap: Swap, haircutRate: BigDecimal): BigDecimal {
   // Fee calculation
   // feeInTokenUsd = feeInTokenAmount * outputLPTokenPrice / feeInTokenAmount * outputTokenPrice? Assuming latter in current implementation
-  let feeInTokenAmount = calculateSwapFeeInTokenAmount(event, swap, haircutRate);
-  let feeToken = getOrCreateToken(event, Address.fromString(swap.tokenOut));
-  let amountUsd = tokenAmountToUSDAmount(feeToken, BigInt.fromString(feeInTokenAmount.toString().split(".")[0]));
+  const feeInTokenAmount = calculateSwapFeeInTokenAmount(event, swap, haircutRate);
+  const feeToken = getOrCreateToken(event, Address.fromString(swap.tokenOut));
+  const amountUsd = tokenAmountToUSDAmount(feeToken, BigInt.fromString(feeInTokenAmount.toString().split(".")[0]));
   return amountUsd;
 }
 
@@ -199,16 +199,16 @@ export function updateMetricsAfterSwap(
   sender: Address,
   to: Address,
 ): void {
-  let protocol = getOrCreateDexAmm();
-  let fromPool = getOrCreateAssetPool(event, fromAssetAddress, event.address, fromTokenAddress);
-  let toPool = getOrCreateAssetPool(event, toAssetAddress, event.address, toTokenAddress);
+  const protocol = getOrCreateDexAmm();
+  const fromPool = getOrCreateAssetPool(event, fromAssetAddress, event.address, fromTokenAddress);
+  const toPool = getOrCreateAssetPool(event, toAssetAddress, event.address, toTokenAddress);
 
   // create swap entity for the transaction
-  let swap = new Swap(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
-  let inputToken = getOrCreateToken(event, fromTokenAddress);
-  let outputToken = getOrCreateToken(event, toTokenAddress);
-  let amountInUsd = tokenAmountToUSDAmount(inputToken, fromTokenAmount);
-  let amountOutUsd = tokenAmountToUSDAmount(outputToken, actualToTokenAmount);
+  const swap = new Swap(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+  const inputToken = getOrCreateToken(event, fromTokenAddress);
+  const outputToken = getOrCreateToken(event, toTokenAddress);
+  const amountInUsd = tokenAmountToUSDAmount(inputToken, fromTokenAmount);
+  const amountOutUsd = tokenAmountToUSDAmount(outputToken, actualToTokenAmount);
 
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();
@@ -229,12 +229,12 @@ export function updateMetricsAfterSwap(
   swap.save();
 
   // swap fee metrics
-  let poolMetrics = getOrCreateLiquidityPoolParamsHelper(event, poolAddress);
-  let swapFeeUsd = calculateSwapFeeInUsd(event, swap, poolMetrics.HaircutRate);
-  let supplySideFee = exponentToBigDecimal(18).minus(poolMetrics.RetentionRatio).times(swapFeeUsd);
-  let protocolSideFee = swapFeeUsd.minus(supplySideFee);
+  const poolMetrics = getOrCreateLiquidityPoolParamsHelper(event, poolAddress);
+  const swapFeeUsd = calculateSwapFeeInUsd(event, swap, poolMetrics.HaircutRate);
+  const supplySideFee = exponentToBigDecimal(18).minus(poolMetrics.RetentionRatio).times(swapFeeUsd);
+  const protocolSideFee = swapFeeUsd.minus(supplySideFee);
   // swap volume metrics
-  let swapVolumeUsd = calculateSwapVolume(swap);
+  const swapVolumeUsd = calculateSwapVolume(swap);
 
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplySideFee);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideFee);
@@ -245,7 +245,7 @@ export function updateMetricsAfterSwap(
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(swapVolumeUsd);
   protocol.save();
 
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+  const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   // block number and timestamp
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
@@ -280,7 +280,7 @@ export function updateMetricsAfterSwap(
   toPool.cumulativeVolumeUSD = toPool.cumulativeVolumeUSD.plus(swap.amountOutUSD);
   toPool.save();
 
-  let toPoolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+  const toPoolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
     event,
     toAssetAddress,
     event.address,
@@ -317,7 +317,7 @@ export function updateMetricsAfterSwap(
   toPoolHourlySnapshot.rewardTokenEmissionsUSD = toPool.rewardTokenEmissionsUSD;
   toPoolHourlySnapshot.save();
 
-  let toPoolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+  const toPoolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
     event,
     toAssetAddress,
     event.address,
@@ -350,7 +350,7 @@ export function updateMetricsAfterSwap(
   toPoolDailySnapshot.rewardTokenEmissionsUSD = toPool.rewardTokenEmissionsUSD;
   toPoolDailySnapshot.save();
 
-  let fromPoolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+  const fromPoolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
     event,
     Address.fromString(swap.fromPool),
     event.address,
@@ -377,7 +377,7 @@ export function updateMetricsAfterSwap(
   fromPoolHourlySnapshot.rewardTokenEmissionsUSD = fromPool.rewardTokenEmissionsUSD;
   fromPoolHourlySnapshot.save();
 
-  let fromPoolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+  const fromPoolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
     event,
     Address.fromString(swap.fromPool),
     event.address,

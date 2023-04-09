@@ -328,56 +328,48 @@ export function getOrCreateFinancials(
 ///////////////////////////
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
-  let LendingProtocolEntity = LendingProtocol.load(
-    getBentoBoxAddress(dataSource.network())
-  );
-  if (LendingProtocolEntity) {
-    return LendingProtocolEntity;
+  let protocol = LendingProtocol.load(getBentoBoxAddress(dataSource.network()));
+  if (protocol) {
+    return protocol;
   }
-  LendingProtocolEntity = new LendingProtocol(
-    getBentoBoxAddress(dataSource.network())
-  );
-  LendingProtocolEntity.name = "Abracadabra Money";
-  LendingProtocolEntity.slug = "abracadabra";
-  LendingProtocolEntity.schemaVersion = Versions.getSchemaVersion();
-  LendingProtocolEntity.subgraphVersion = Versions.getSubgraphVersion();
-  LendingProtocolEntity.methodologyVersion = Versions.getMethodologyVersion();
+  protocol = new LendingProtocol(getBentoBoxAddress(dataSource.network()));
+  protocol.name = "Abracadabra Money";
+  protocol.slug = "abracadabra";
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
   if (dataSource.network() == ARB_NETWORK) {
-    LendingProtocolEntity.network = Network.ARBITRUM_ONE;
+    protocol.network = Network.ARBITRUM_ONE;
   } else {
-    LendingProtocolEntity.network = getNetwork(dataSource.network());
+    protocol.network = getNetwork(dataSource.network());
   }
-  LendingProtocolEntity.type = ProtocolType.LENDING;
-  LendingProtocolEntity.riskType = RiskType.ISOLATED;
-  LendingProtocolEntity.cumulativeUniqueUsers = 0;
-  LendingProtocolEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  LendingProtocolEntity.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-  LendingProtocolEntity.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-  LendingProtocolEntity.lendingType = LendingType.CDP;
-  LendingProtocolEntity.mintedTokens = [getMIMAddress(dataSource.network())];
-  LendingProtocolEntity.totalPoolCount = 0;
+  protocol.type = ProtocolType.LENDING;
+  protocol.riskType = RiskType.ISOLATED;
+  protocol.cumulativeUniqueUsers = 0;
+  protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  protocol.lendingType = LendingType.CDP;
+  protocol.mintedTokens = [getMIMAddress(dataSource.network())];
+  protocol.totalPoolCount = 0;
 
-  LendingProtocolEntity.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  LendingProtocolEntity.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  LendingProtocolEntity.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  LendingProtocolEntity.cumulativeDepositUSD = BIGDECIMAL_ZERO;
-  LendingProtocolEntity.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
-  LendingProtocolEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-  LendingProtocolEntity.protocolControlledValueUSD = BIGDECIMAL_ZERO;
-  LendingProtocolEntity.marketIDList = [];
-  LendingProtocolEntity.depositors = [];
-  LendingProtocolEntity.borrowers = [];
-  LendingProtocolEntity.liquidators = [];
-  LendingProtocolEntity.liquidatees = [];
-  LendingProtocolEntity.cumulativeUniqueDepositors = 0;
-  LendingProtocolEntity.cumulativeUniqueBorrowers = 0;
-  LendingProtocolEntity.cumulativeUniqueLiquidators = 0;
-  LendingProtocolEntity.cumulativeUniqueLiquidatees = 0;
-  LendingProtocolEntity.openPositionCount = 0;
-  LendingProtocolEntity.cumulativePositionCount = 0;
+  protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  protocol.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+  protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+  protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+  protocol.protocolControlledValueUSD = BIGDECIMAL_ZERO;
+  protocol.marketIDList = [];
+  protocol.cumulativeUniqueDepositors = 0;
+  protocol.cumulativeUniqueBorrowers = 0;
+  protocol.cumulativeUniqueLiquidators = 0;
+  protocol.cumulativeUniqueLiquidatees = 0;
+  protocol.openPositionCount = 0;
+  protocol.cumulativePositionCount = 0;
 
-  LendingProtocolEntity.save();
-  return LendingProtocolEntity;
+  protocol.save();
+  return protocol;
 }
 
 export function getMarket(marketId: string): Market | null {

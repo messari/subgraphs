@@ -1,0 +1,18 @@
+{
+  "network": "bsc",
+  "factory": {
+    "startBlock": "26831937",
+    "address": "0x63764769dA006395515c3f8afF9c91A809eF6607"
+  },
+  "lendingPoolConfigurator": {
+    "startBlock": "26831969",
+    "address": "0x71aE996454ef2229C8C9512D70b122226DEbe765"
+  },
+  "lendingPool": {
+    "startBlock": "26831959",
+    "address": "0xd50Cf00b6e600Dd036Ba8eF475677d816d6c4281"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

@@ -59,12 +59,12 @@ export function createOrUpdateAllFees(
 
 export function getSupplySideFee(address: string): BigDecimal {
   const id = prefixID(LiquidityPoolFeeType.FIXED_LP_FEE, address);
-  let fee = LiquidityPoolFee.load(id);
+  const fee = LiquidityPoolFee.load(id);
   return fee!.feePercentage!.div(BIGDECIMAL_HUNDRED);
 }
 
 export function getProtocolFee(address: string): BigDecimal {
   const id = prefixID(LiquidityPoolFeeType.FIXED_PROTOCOL_FEE, address);
-  let fee = LiquidityPoolFee.load(id);
+  const fee = LiquidityPoolFee.load(id);
   return fee!.feePercentage!.div(BIGDECIMAL_HUNDRED);
 }

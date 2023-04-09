@@ -11,6 +11,7 @@ interface DeploymentsTable {
     protocolsToQuery: { [x: string]: any };
     issuesMapping: any;
     getData: any;
+    decenDepoIndexingStatus: any;
     decenDeposToSubgraphIds: { [x: string]: any };
     indexingStatusLoaded: any;
     indexingStatusLoadedPending: any;
@@ -18,7 +19,7 @@ interface DeploymentsTable {
     indexingStatusErrorPending: any;
 }
 
-function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDeposToSubgraphIds, indexingStatusLoaded, indexingStatusLoadedPending, indexingStatusError, indexingStatusErrorPending }: DeploymentsTable) {
+function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepoIndexingStatus, decenDeposToSubgraphIds, indexingStatusLoaded, indexingStatusLoadedPending, indexingStatusError, indexingStatusErrorPending }: DeploymentsTable) {
     const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
     const [tableExpanded, setTableExpanded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
     const [generateEntityCSV, triggerGenerateEntityCSV] = useState<string>("");
@@ -39,10 +40,6 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
     useEffect(() => {
         setShowDatePicker({ ...schemaBooleansObject });
     }, [generateEntityCSV])
-
-    useEffect(() => {
-        console.log(deposSelected)
-    }, [deposSelected])
 
     useEffect(() => {
         if (generateEntityCSV.length > 0) {
@@ -222,6 +219,13 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
                             }
                         })
                     }
+                    const decenDepoData: any = {};
+                    Object.keys(decenDepoIndexingStatus).forEach(x => {
+                        if (x.includes(subgraphName) || !!(protocol.networks.find((x: any) => x.deploymentName.includes(subgraphName)))) {
+                            decenDepoData[x] = decenDepoIndexingStatus[x];
+                        }
+                    });
+
                     return (<>
                         {csvGenerationComponents}
                         <ProtocolSection
@@ -229,6 +233,7 @@ function DeploymentsTable({ protocolsToQuery, issuesMapping, getData, decenDepos
                             issuesMapping={issuesMapping}
                             subgraphName={subgraphName}
                             protocol={protocol}
+                            decenDepoData={decenDepoData}
                             schemaType={schemaType}
                             clientIndexing={clientIndexing}
                             decenDeposToSubgraphIds={decenDeposToSubgraphIds}

@@ -61,7 +61,8 @@ export class PoolSnapshot {
 
     // tvl and balances
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
-    snapshot.inputTokenBalance = this.pool.inputTokenBalance;
+    snapshot.inputTokenBalances = this.pool.inputTokenBalances;
+    snapshot.inputTokenBalancesUSD = this.pool.inputTokenBalancesUSD;
     snapshot.totalLiquidity = this.pool.totalLiquidity;
     snapshot.totalLiquidityUSD = this.pool.totalLiquidityUSD;
     snapshot.stakedLiquidity = this.pool.stakedLiquidity;
@@ -113,7 +114,8 @@ export class PoolSnapshot {
 
     // tvl and balances
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
-    snapshot.inputTokenBalance = this.pool.inputTokenBalance;
+    snapshot.inputTokenBalances = this.pool.inputTokenBalances;
+    snapshot.inputTokenBalancesUSD = this.pool.inputTokenBalancesUSD;
     snapshot.totalLiquidity = this.pool.totalLiquidity;
     snapshot.totalLiquidityUSD = this.pool.totalLiquidityUSD;
     snapshot.stakedLiquidity = this.pool.stakedLiquidity;

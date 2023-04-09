@@ -1,0 +1,15 @@
+{
+  "network": "bsc",
+  "AxelarGateway": {
+    "address": "0x4F4495243837681061C4743b74B3eEdf548D56A5",
+    "startBlock": 19151651
+  },
+  "AxelarGasService": {
+    "address": "0x2d5d7d31F671F86C782533cc367F14109a082712",
+    "startBlock": 20931507
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 15484661
+}
