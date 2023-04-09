@@ -181,6 +181,23 @@ export const blockExplorers: Record<string, string> = {
 };
 
 // negativeFieldList contains field names that can be negative
-export const negativeFieldList = ["dailyNetVolumeUSD", "netVolumeUSD", "cumulativeNetVolumeUSD"];
+export const negativeFieldList = [
+  "dailyNetVolumeUSD",
+  "cumulativeNetVolumeUSD",
+  "netVolume",
+  "netVolumeUSD",
+  "netDailyVolume",
+  "netDailyVolumeUSD",
+  "netHourlyVolume",
+  "netHourlyVolumeUSD",
+  "netCumulativeVolume",
+  "netCumulativeVolumeUSD",
+];
+
+export const nonStrictlyIncrementalFieldList = [
+  "cumulativeNetVolumeUSD",
+  "netCumulativeVolume",
+  "netCumulativeVolumeUSD",
+];
 
 export const dateValueKeys = ["day", "days", "hour", "hours"];
