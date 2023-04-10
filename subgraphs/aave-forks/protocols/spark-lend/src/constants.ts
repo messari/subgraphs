@@ -10,7 +10,7 @@ export namespace Protocol {
   export const SLUG = "spark-lend";
 }
 
-export namespace TokenType {
+export namespace IavsTokenType {
   export const ATOKEN = "ATOKEN";
   export const INPUTTOKEN = "INPUTTOKEN";
   export const VTOKEN = "VTOKEN";

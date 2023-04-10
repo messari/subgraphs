@@ -6,18 +6,7 @@ import {
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
-import {
-  Account,
-  Borrow,
-  Deposit,
-  Liquidate,
-  Market,
-  Position,
-  Repay,
-  Token,
-  Withdraw,
-  _MarketList,
-} from "../generated/schema";
+import { Account, Market, _MarketList } from "../generated/schema";
 import { AToken } from "../generated/LendingPool/AToken";
 import { StableDebtToken } from "../generated/LendingPool/StableDebtToken";
 import { VariableDebtToken } from "../generated/LendingPool/VariableDebtToken";
@@ -26,17 +15,18 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
-  EventType,
   exponentToBigDecimal,
-  InterestRateSide,
-  InterestRateType,
-  INT_FOUR,
   INT_TWO,
-  PositionSide,
+  INT_FOUR,
   rayToWad,
   RAY_OFFSET,
   ZERO_ADDRESS,
 } from "./constants";
+import {
+  InterestRateSide,
+  InterestRateType,
+  PositionSide,
+} from "./sdk/constants";
 import {
   getBorrowBalance,
   getCollateralBalance,
@@ -66,7 +56,7 @@ export function _handlePriceOracleUpdated(
     newPriceOracle.toHexString(),
   ]);
 
-  let marketList = _MarketList.load(protocolData.protocolID);
+  const marketList = _MarketList.load(protocolData.protocolID);
   if (!marketList) {
     log.warning("[_handlePriceOracleUpdated]marketList for {} does not exist", [
       protocolData.protocolID.toHexString(),
@@ -103,17 +93,13 @@ export function _handleReserveInitialized(
   ATokenTemplate.create(outputToken);
 
   const manager = new DataManager(
-    underlyingToken,
+    outputToken,
     underlyingToken,
     event,
     protocolData
   );
   const market = manager.getMarket();
-  const outputTokenManager = new TokenManager(
-    outputToken,
-    event,
-    TokenType.NON_REBASING
-  );
+  const outputTokenManager = new TokenManager(outputToken, event);
   const vDebtTokenManager = new TokenManager(
     variableDebtToken,
     event,
@@ -123,11 +109,7 @@ export function _handleReserveInitialized(
   market._vToken = vDebtTokenManager.getToken().id;
 
   if (stableDebtToken != Address.zero()) {
-    const sDebtTokenManager = new TokenManager(
-      stableDebtToken,
-      event,
-      TokenType.NON_REBASING
-    );
+    const sDebtTokenManager = new TokenManager(stableDebtToken, event);
     market._sToken = sDebtTokenManager.getToken().id;
     STokenTemplate.create(stableDebtToken);
   }
@@ -139,8 +121,7 @@ export function _handleCollateralConfigurationChanged(
   marketId: Address,
   liquidationPenalty: BigInt,
   liquidationThreshold: BigInt,
-  maximumLTV: BigInt,
-  protocolData: ProtocolData
+  maximumLTV: BigInt
 ): void {
   const market = Market.load(marketId);
   if (!market) {
@@ -168,10 +149,7 @@ export function _handleCollateralConfigurationChanged(
   market.save();
 }
 
-export function _handleBorrowingEnabledOnReserve(
-  marketId: Address,
-  protocolData: ProtocolData
-): void {
+export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
   const market = Market.load(marketId);
   if (!market) {
     log.warning("[_handleBorrowingEnabledOnReserve] Market not found {}", [
@@ -189,10 +167,7 @@ export function _handleBorrowingEnabledOnReserve(
   market.save();
 }
 
-export function _handleBorrowingDisabledOnReserve(
-  marketId: Address,
-  protocolData: ProtocolData
-): void {
+export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
   const market = Market.load(marketId);
   if (!market) {
     log.warning("[_handleBorrowingDisabledOnReserve] Market not found {}", [
@@ -210,10 +185,7 @@ export function _handleBorrowingDisabledOnReserve(
   market.save();
 }
 
-export function _handleReserveActivated(
-  marketId: Address,
-  protocolData: ProtocolData
-): void {
+export function _handleReserveActivated(marketId: Address): void {
   const market = Market.load(marketId);
   if (!market) {
     log.warning("[_handleReserveActivated] Market not found {}", [
@@ -231,10 +203,7 @@ export function _handleReserveActivated(
   market.save();
 }
 
-export function _handleReserveDeactivated(
-  marketId: Address,
-  protocolData: ProtocolData
-): void {
+export function _handleReserveDeactivated(marketId: Address): void {
   const market = Market.load(marketId);
   if (!market) {
     log.warning("[_handleReserveDeactivated] Market not found {}", [
@@ -254,8 +223,7 @@ export function _handleReserveDeactivated(
 
 export function _handleReserveFactorChanged(
   marketId: Address,
-  reserveFactor: BigInt,
-  protocolData: ProtocolData
+  reserveFactor: BigInt
 ): void {
   const market = Market.load(marketId);
   if (!market) {
@@ -273,8 +241,7 @@ export function _handleReserveFactorChanged(
 
 export function _handleReserveUsedAsCollateralEnabled(
   marketId: Address,
-  accountID: Address,
-  protocolData: ProtocolData
+  accountID: Address
 ): void {
   const accountManager = new AccountManager(accountID);
   const account = accountManager.getAccount();
@@ -289,8 +256,7 @@ export function _handleReserveUsedAsCollateralEnabled(
 
 export function _handleReserveUsedAsCollateralDisabled(
   marketId: Address,
-  accountID: Address,
-  protocolData: ProtocolData
+  accountID: Address
 ): void {
   const accountManager = new AccountManager(accountID);
   const account = accountManager.getAccount();
@@ -309,7 +275,7 @@ export function _handleReserveUsedAsCollateralDisabled(
 }
 
 export function _handlePaused(protocolData: ProtocolData): void {
-  let marketList = _MarketList.load(protocolData.protocolID);
+  const marketList = _MarketList.load(protocolData.protocolID);
   if (!marketList) {
     log.warning("[_handlePaused]marketList for {} does not exist", [
       protocolData.protocolID.toHexString(),
@@ -339,7 +305,7 @@ export function _handlePaused(protocolData: ProtocolData): void {
 }
 
 export function _handleUnpaused(protocolData: ProtocolData): void {
-  let marketList = _MarketList.load(protocolData.protocolID);
+  const marketList = _MarketList.load(protocolData.protocolID);
   if (!marketList) {
     log.warning("[_handleUnpaused]marketList for {} does not exist", [
       protocolData.protocolID.toHexString(),
@@ -562,7 +528,7 @@ export function _handleDeposit(
   const positionManager = new PositionManager(
     account,
     market,
-    PositionSide.LENDER
+    PositionSide.COLLATERAL
   );
   positionManager.setCollateral(true);
 }

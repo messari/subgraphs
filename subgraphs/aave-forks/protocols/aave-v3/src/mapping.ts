@@ -18,7 +18,7 @@ import {
   POOL_ADDRESSES_PROVIDER_ID_KEY,
   Protocol,
   PROTOCOL_ID_KEY,
-  TokenType,
+  IavsTokenType,
   USDC_POS_TOKEN_ADDRESS,
   USDC_TOKEN_ADDRESS,
 } from "./constants";
@@ -95,23 +95,28 @@ import {
   ProtocolData,
   RewardData,
 } from "../../../src/sdk/manager";
-import { LendingType } from "../../../src/sdk/constants";
+import {
+  CollateralizationType,
+  LendingType,
+  PermissionType,
+  RiskType,
+} from "../../../src/sdk/constants";
 import { TokenManager } from "../../../src/sdk/token";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
   return new ProtocolData(
     constants.protocolAddress,
-    "lending",
+    Protocol.PROTOCOL,
     Protocol.NAME,
     Protocol.SLUG,
     constants.network,
-    LendingType.CDP,
-    null,
-    null,
-    null,
-    null,
-    null
+    LendingType.POOLED,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.ADMIN,
+    CollateralizationType.OVER_COLLATERALIZED,
+    RiskType.GLOBAL
   );
 }
 
@@ -168,9 +173,9 @@ export function handleProxyCreated(event: ProxyCreated): void {
 export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
   const assetAddress = event.params.asset;
   const assetToken = Token.load(assetAddress);
-  if (!assetToken || !assetToken._market || !assetToken._type) {
+  if (!assetToken || !assetToken._market || !assetToken._iavsTokenType) {
     log.error(
-      "[handleAssetConfigUpdated]Failed to find token {} or assetToken._market/assetToken._type is null",
+      "[handleAssetConfigUpdated]Failed to find token {} or assetToken._market/assetToken._iavsTokenType is null",
       [assetAddress.toHexString()]
     );
     return;
@@ -197,13 +202,22 @@ export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
   // and another for stable borrowing
   let rewardTokenType: string;
   let interestRateType: string;
-  if (assetToken._type && assetToken._type! == TokenType.ATOKEN) {
+  if (
+    assetToken._iavsTokenType &&
+    assetToken._iavsTokenType! == IavsTokenType.ATOKEN
+  ) {
     rewardTokenType = RewardTokenType.DEPOSIT;
     interestRateType = InterestRateType.VARIABLE;
-  } else if (assetToken._type && assetToken._type! == TokenType.STOKEN) {
+  } else if (
+    assetToken._iavsTokenType &&
+    assetToken._iavsTokenType! == IavsTokenType.STOKEN
+  ) {
     rewardTokenType = RewardTokenType.BORROW;
     interestRateType = InterestRateType.STABLE;
-  } else if (assetToken._type && assetToken._type! == TokenType.VTOKEN) {
+  } else if (
+    assetToken._iavsTokenType &&
+    assetToken._iavsTokenType! == IavsTokenType.VTOKEN
+  ) {
     rewardTokenType = RewardTokenType.BORROW;
     interestRateType = InterestRateType.VARIABLE;
   } else {
@@ -249,8 +263,8 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
 
   _handleReserveInitialized(
     event,
-    event.params.asset, // marketID & input Token (underlying asset)
-    event.params.aToken,
+    event.params.asset, //input Token/underlying asset
+    event.params.aToken, //output Token
     event.params.variableDebtToken,
     protocolData,
     event.params.stableDebtToken
@@ -262,25 +276,25 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
 
   // map tokens to market
   assetToken._market = marketId; //this is the market id
-  assetToken._type = TokenType.INPUTTOKEN;
+  assetToken._iavsTokenType = IavsTokenType.INPUTTOKEN;
   assetToken.save();
 
   const aTokenManager = new TokenManager(event.params.aToken, event);
   const aToken = aTokenManager.getToken();
   aToken._market = marketId;
-  aToken._type = TokenType.ATOKEN;
+  aToken._iavsTokenType = IavsTokenType.ATOKEN;
   aToken.save();
 
   const vTokenManager = new TokenManager(event.params.variableDebtToken, event);
   const vToken = vTokenManager.getToken();
   vToken._market = marketId;
-  vToken._type = TokenType.VTOKEN;
+  vToken._iavsTokenType = IavsTokenType.VTOKEN;
   vToken.save();
 
   const sTokenManager = new TokenManager(event.params.stableDebtToken, event);
   const sToken = sTokenManager.getToken();
   sToken._market = marketId;
-  sToken._type = TokenType.STOKEN;
+  sToken._iavsTokenType = IavsTokenType.STOKEN;
   sToken.save();
 }
 
@@ -299,8 +313,7 @@ export function handleCollateralConfigurationChanged(
     marketId,
     event.params.liquidationBonus,
     event.params.liquidationThreshold,
-    event.params.ltv,
-    protocolData
+    event.params.ltv
   );
 }
 
@@ -313,7 +326,7 @@ export function handleReserveActive(event: ReserveActive): void {
     );
     return;
   }
-  _handleReserveActivated(marketId, protocolData);
+  _handleReserveActivated(marketId);
 }
 
 export function handleReserveBorrowing(event: ReserveBorrowing): void {
@@ -325,9 +338,9 @@ export function handleReserveBorrowing(event: ReserveBorrowing): void {
     return;
   }
   if (event.params.enabled) {
-    _handleBorrowingEnabledOnReserve(marketId, protocolData);
+    _handleBorrowingEnabledOnReserve(marketId);
   } else {
-    _handleBorrowingDisabledOnReserve(marketId, protocolData);
+    _handleBorrowingDisabledOnReserve(marketId);
   }
 }
 
@@ -339,7 +352,7 @@ export function handleReserveFrozen(event: ReserveFrozen): void {
     ]);
     return;
   }
-  _handleReserveDeactivated(marketId, protocolData);
+  _handleReserveDeactivated(marketId);
 }
 
 export function handleReservePaused(event: ReservePaused): void {
@@ -350,7 +363,7 @@ export function handleReservePaused(event: ReservePaused): void {
     ]);
     return;
   }
-  _handleReserveDeactivated(marketId, protocolData);
+  _handleReserveDeactivated(marketId);
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
@@ -362,11 +375,7 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
     );
     return;
   }
-  _handleReserveFactorChanged(
-    marketId,
-    event.params.newReserveFactor,
-    protocolData
-  );
+  _handleReserveFactorChanged(marketId, event.params.newReserveFactor);
 }
 
 /////////////////////////////////
@@ -418,11 +427,7 @@ export function handleReserveUsedAsCollateralEnabled(
     return;
   }
   // This Event handler enables a reserve/market to be used as collateral
-  _handleReserveUsedAsCollateralEnabled(
-    marketId,
-    event.params.user,
-    protocolData
-  );
+  _handleReserveUsedAsCollateralEnabled(marketId, event.params.user);
 }
 
 export function handleReserveUsedAsCollateralDisabled(
@@ -437,11 +442,7 @@ export function handleReserveUsedAsCollateralDisabled(
     return;
   }
   // This Event handler disables a reserve/market being used as collateral
-  _handleReserveUsedAsCollateralDisabled(
-    marketId,
-    event.params.user,
-    protocolData
-  );
+  _handleReserveUsedAsCollateralDisabled(marketId, event.params.user);
 }
 
 export function handleDeposit(event: Supply): void {
@@ -681,144 +682,6 @@ function getMarketIdFromToken(tokenAddress: Address): Address | null {
   }
   const marketId = Address.fromBytes(token._market!);
   return marketId;
-}
-/*
-function getOrCreateRewardToken(
-  tokenAddress: Address,
-  rewardTokenType: string,
-  interestRateType: string,
-  distributionEnd: BigInt
-): RewardToken {
-  const token = getOrCreateToken(tokenAddress);
-  // deposit-variable-0x123, borrow-stable-0x123, borrow-variable-0x123
-  const id = `${rewardTokenType}-${interestRateType}-${token.id}`;
-
-  let rewardToken = RewardToken.load(id);
-  if (!rewardToken) {
-    rewardToken = new RewardToken(id);
-    rewardToken.token = token.id;
-    rewardToken.type = rewardTokenType;
-  }
-  rewardToken._distributionEnd = distributionEnd;
-  rewardToken.save();
-
-  return rewardToken;
-}
-
-export function updateMarketRewards(
-  event: ethereum.Event,
-  market: Market,
-  rewardToken: RewardToken,
-  emissionRate: BigInt
-): void {
-  let rewardTokens = market.rewardTokens;
-  let rewardTokenEmissions = market.rewardTokenEmissionsAmount;
-  let rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-
-  if (rewardTokens == null) {
-    rewardTokens = [];
-    rewardTokenEmissions = [];
-    rewardTokenEmissionsUSD = [];
-  }
-
-  let rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
-  if (rewardTokenIndex == -1) {
-    rewardTokenIndex = rewardTokens.push(rewardToken.id) - 1;
-    rewardTokenEmissions!.push(BIGINT_ZERO);
-    rewardTokenEmissionsUSD!.push(BIGDECIMAL_ZERO);
-  }
-  rewardTokenEmissions![rewardTokenIndex] = emissionRate.times(
-    BigInt.fromI32(SECONDS_PER_DAY)
-  );
-  market.rewardTokens = rewardTokens;
-  market.rewardTokenEmissionsAmount = rewardTokenEmissions;
-  market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
-  market.save();
-
-  sortRewardTokens(market);
-  updateMarketRewardEmissions(market, event);
-}
-
-function updateMarketRewardEmissions(
-  market: Market,
-  event: ethereum.Event
-): void {
-  if (market.rewardTokens == null) {
-    return;
-  }
-
-  const protocol = getOrCreateLendingProtocol(protocolData);
-  const rewardTokens = market.rewardTokens!;
-  const rewardEmissions = market.rewardTokenEmissionsAmount!;
-  const rewardEmissionsUSD = market.rewardTokenEmissionsUSD!;
-  for (let i = 0; i < rewardTokens.length; i++) {
-    const rewardToken = RewardToken.load(rewardTokens[i])!;
-    if (event.block.timestamp.gt(rewardToken._distributionEnd!)) {
-      rewardEmissions[i] = BIGINT_ZERO;
-      rewardEmissionsUSD[i] = BIGDECIMAL_ZERO;
-    } else {
-      const token = Token.load(rewardToken.token)!;
-      let rewardTokenPriceUSD = token.lastPriceUSD;
-      rewardTokenPriceUSD = getAssetPriceInUSDC(
-        Address.fromString(token.id),
-        Address.fromString(protocol._priceOracle),
-        event.block.number
-      );
-
-      rewardEmissionsUSD[i] = rewardEmissions[i]
-        .toBigDecimal()
-        .div(exponentToBigDecimal(token.decimals))
-        .times(rewardTokenPriceUSD);
-    }
-  }
-  market.rewardTokenEmissionsAmount = rewardEmissions;
-  market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
-  market.save();
-}
-
-function sortRewardTokens(market: Market): void {
-  if (market.rewardTokens!.length <= 1) {
-    return;
-  }
-
-  const tokens = market.rewardTokens;
-  const emissions = market.rewardTokenEmissionsAmount;
-  const emissionsUSD = market.rewardTokenEmissionsUSD;
-  multiArraySort(tokens!, emissions!, emissionsUSD!);
-
-  market.rewardTokens = tokens;
-  market.rewardTokenEmissionsAmount = emissions;
-  market.rewardTokenEmissionsUSD = emissionsUSD;
-  market.save();
-}
-*/
-function multiArraySort(
-  ref: Array<string>,
-  arr1: Array<BigInt>,
-  arr2: Array<BigDecimal>
-): void {
-  if (ref.length != arr1.length || ref.length != arr2.length) {
-    // cannot sort
-    return;
-  }
-
-  const sorter: Array<Array<string>> = [];
-  for (let i = 0; i < ref.length; i++) {
-    sorter[i] = [ref[i], arr1[i].toString(), arr2[i].toString()];
-  }
-
-  sorter.sort(function (a: Array<string>, b: Array<string>): i32 {
-    if (a[0] < b[0]) {
-      return -1;
-    }
-    return 1;
-  });
-
-  for (let i = 0; i < sorter.length; i++) {
-    ref[i] = sorter[i][0];
-    arr1[i] = BigInt.fromString(sorter[i][1]);
-    arr2[i] = BigDecimal.fromString(sorter[i][2]);
-  }
 }
 
 function setReserveFactor(

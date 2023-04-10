@@ -60,8 +60,8 @@ type Token @entity {
   " the market ID for underlying/asset token, aToken, vToken and sToken"
   _market: Market
 
-  " type of token: aToken, inputToken, sToken, or vToken "
-  _type: String
+  " type of token: inputToken, aToken, vToken, or sToken "
+  _iavsTokenType: String
 }
 
 enum RewardTokenType {

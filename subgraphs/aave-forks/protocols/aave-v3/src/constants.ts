@@ -14,11 +14,12 @@ export const USDC_POS_TOKEN_ADDRESS =
 /////////////////////////////
 
 export namespace Protocol {
+  export const PROTOCOL = "Aave";
   export const NAME = "Aave v3";
   export const SLUG = "aave-v3";
 }
 
-export namespace TokenType {
+export namespace IavsTokenType {
   export const ATOKEN = "ATOKEN";
   export const INPUTTOKEN = "INPUTTOKEN";
   export const VTOKEN = "VTOKEN";
