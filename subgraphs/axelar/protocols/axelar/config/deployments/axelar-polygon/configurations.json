@@ -1,0 +1,15 @@
+{
+  "network": "matic",
+  "AxelarGateway": {
+    "address": "0x6f015F16De9fC8791b234eF68D486d2bF203FBA8",
+    "startBlock": 22850070
+  },
+  "AxelarGasService": {
+    "address": "0x2d5d7d31F671F86C782533cc367F14109a082712",
+    "startBlock": 32528856
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 15484661
+}

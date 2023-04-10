@@ -5,6 +5,7 @@ import {
   Burned,
   FeesEarned,
   Minted,
+  Rebalance,
   UpdateManagerParams,
 } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import {
@@ -12,12 +13,11 @@ import {
   UsageType,
   VaultFeeType,
 } from "../../common/constants";
-import { getOrCreateYieldAggregator } from "../../common/getters";
 import {
-  createDeposit,
-  createFeesEarned,
-  createWithdraw,
-} from "../helpers/events";
+  getOrCreateToken,
+  getOrCreateYieldAggregator,
+} from "../../common/getters";
+import { createDeposit, createWithdraw } from "../helpers/events";
 import { updateRevenue, updateTvl } from "../helpers/financials";
 import { updateUsageMetrics } from "../helpers/usageMetrics";
 import {
@@ -26,13 +26,28 @@ import {
   updateVaultSnapshots,
 } from "../helpers/vaults";
 
+import { ArrakisVaultV1 } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
+
 export function handlePoolCreated(event: PoolCreated): void {
-  let protocol = getOrCreateYieldAggregator(event.address);
+  const protocol = getOrCreateYieldAggregator(event.address);
   protocol.totalPoolCount += 1;
+  const vaultIDs = protocol._vaultIDs ? protocol._vaultIDs! : [];
+  vaultIDs.push(event.params.pool.toHexString());
+  protocol._vaultIDs = vaultIDs;
   protocol.save();
+
   // Create Vault
-  let vault = getOrCreateVault(event.params.pool, event.block);
+  const vault = getOrCreateVault(event.params.pool, event.block);
   vault.protocol = event.address.toHex();
+
+  const vaultContract = ArrakisVaultV1.bind(event.params.pool);
+  const token0Address = vaultContract.token0();
+  const token1Address = vaultContract.token1();
+  const token0 = getOrCreateToken(token0Address);
+  const token1 = getOrCreateToken(token1Address);
+  vault._token0 = token0.id;
+  vault._token1 = token1.id;
+
   vault.save();
 
   ArrakisVaultTemplate.create(event.params.pool);
@@ -43,14 +58,23 @@ export function handleMinted(event: Minted): void {
   createDeposit(event);
 
   // Update vault token supply
-  let vault = getOrCreateVault(event.address, event.block);
-  vault.inputTokenBalance += event.params.mintAmount;
-  vault.outputTokenSupply += event.params.mintAmount;
+  const vault = getOrCreateVault(event.address, event.block);
+  // update underlying token balances is done by updateVaultTokenValue inside updateTvl
+  // we update all vaults for each vault event, so the underlying token balances are updated
+  // more frequently at some cost of the indexing speed
+
+  vault.inputTokenBalance = vault.inputTokenBalance.plus(
+    event.params.mintAmount
+  );
+  vault.outputTokenSupply = vault.outputTokenSupply!.plus(
+    event.params.mintAmount
+  );
+
   vault.save();
 
   updateUsageMetrics(event.params.receiver, UsageType.DEPOSIT, event); // minted shares are attributed to receiver
   updateTvl(event);
-  updateVaultSnapshots(event.address, event.block);
+  updateVaultSnapshots(vault, event.block);
 }
 
 export function handleBurned(event: Burned): void {
@@ -58,25 +82,41 @@ export function handleBurned(event: Burned): void {
   createWithdraw(event);
 
   // Update vault token supply
-  let vault = getOrCreateVault(event.address, event.block);
-  vault.inputTokenBalance -= event.params.burnAmount;
-  vault.outputTokenSupply -= event.params.burnAmount;
+  const vault = getOrCreateVault(event.address, event.block);
+  // update underlying token balances is done by updateVaultTokenValue inside updateTvl
+  // we update all vaults for each vault event, so the underlying token balances are updated
+  // more frequently at some cost of the indexing speed
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(
+    event.params.burnAmount
+  );
+  vault.outputTokenSupply = vault.outputTokenSupply!.minus(
+    event.params.burnAmount
+  );
   vault.save();
 
   updateUsageMetrics(event.transaction.from, UsageType.WITHDRAW, event); // Burned shares are attributed to msg.sender
   updateTvl(event);
-  updateVaultSnapshots(event.address, event.block);
+  updateVaultSnapshots(vault, event.block);
+}
+
+export function handleRebalance(event: Rebalance): void {
+  const vault = getOrCreateVault(event.address, event.block);
+  // update underlying token balances is done by updateVaultTokenValue inside updateTvl
+  // we update all vaults for each vault event, so the underlying token balances are updated
+  // more frequently at some cost of the indexing speed
+  updateTvl(event);
+  updateVaultSnapshots(vault, event.block);
 }
 
 export function handleFeesEarned(event: FeesEarned): void {
-  createFeesEarned(event);
+  const vault = getOrCreateVault(event.address, event.block);
   updateRevenue(event);
   updateTvl(event);
-  updateVaultSnapshots(event.address, event.block);
+  updateVaultSnapshots(vault, event.block);
 }
 
 export function handleUpdateManagerParams(event: UpdateManagerParams): void {
-  let vaultPerformanceFee = getOrCreateVaultFee(
+  const vaultPerformanceFee = getOrCreateVaultFee(
     VaultFeeType.PERFORMANCE_FEE,
     event.address.toHex()
   );
