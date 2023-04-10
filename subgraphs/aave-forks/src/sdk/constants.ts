@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { _ActiveAccount } from "../../../../generated/schema";
+import { _ActiveAccount } from "../../generated/schema";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -197,6 +197,11 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 // BigInt to BigDecimal
 export function bigIntToBigDecimal(x: BigInt, decimals: i32): BigDecimal {
   return x.toBigDecimal().div(exponentToBigDecimal(decimals));
+}
+
+// bigDecimal to BigInt
+export function bigDecimalToBigInt(x: BigDecimal): BigInt {
+  return BigInt.fromString(x.truncate(0).toString());
 }
 
 //change number of decimals for BigDecimal

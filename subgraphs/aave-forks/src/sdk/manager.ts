@@ -590,16 +590,34 @@ export class DataManager {
     return repay;
   }
 
+  /**
+   * Creates a Liquidate entity for a liquidation, update liquidatee and liquidator positions
+   *
+   * @param asset The collateral asset that is seized by the protocol and transfered to the liquidator.
+   * @param liquidator The liquidator.
+   * @param liquidatee The borrower that is liquidated.
+   * @param amount The amount of asset being liquidated.
+   * @param amountUSD The amount in USD.
+   * @param profitUSD Liquidator's profit from the liquidation.
+   * @param newCollateralBalance The liquidatee's new borrowing balance after the liquidation (usually ZERO).
+   * @param interestType Optional - The InterestType of liquidatee's position (FIXED, VARIABLE, etc.).
+   * @param createLiquidatorPosition - whether to create a position for the liquidator in the collateral market
+   * @returns A Liquidate entity or null
+   */
   createLiquidate(
     asset: Bytes,
+    debtTokenId: Bytes,
     liquidator: Address,
     liquidatee: Address,
     amount: BigInt,
     amountUSD: BigDecimal,
     profitUSD: BigDecimal,
-    newBalance: BigInt, // repaid token balance for liquidatee
-    interestType: string | null = null
+    newCollateralBalance: BigInt,
+    newBorrowerBalance: BigInt,
+    interestType: string | null = null,
+    createLiquidatorPosition: bool = false
   ): Liquidate | null {
+    const positions: string[] = []; // positions touched by this liquidation
     const liquidatorAccount = new AccountManager(liquidator);
     if (liquidatorAccount.isNewUser()) {
       this.protocol.cumulativeUniqueUsers += INT_ONE;
@@ -609,33 +627,91 @@ export class DataManager {
     // Note: Be careful, some protocols might give the liquidated collateral to the liquidator
     //       in collateral in the market. But that is not always the case so we don't do it here.
 
+    if (createLiquidatorPosition) {
+      const liquidatorPosition = new PositionManager(
+        liquidatorAccount.getAccount(),
+        this.market,
+        PositionSide.COLLATERAL,
+        interestType
+      );
+
+      const liquidatorPositionID = liquidatorPosition.addPosition(
+        this.event,
+        asset,
+        this.protocol,
+        amount,
+        TransactionType.LIQUIDATOR,
+        this.market.inputTokenPriceUSD
+      );
+
+      if (!liquidatorPositionID) {
+        log.error(
+          "[createLiquidate] positionID is null for market: {} account: {}",
+          [this.market.id.toHexString(), liquidator.toHexString()]
+        );
+        return null;
+      }
+      positions.push(liquidatorPositionID!);
+    }
+
     const liquidateeAccount = new AccountManager(liquidatee);
-    const liquidateePosition = new PositionManager(
+    const collateralPosition = new PositionManager(
       liquidateeAccount.getAccount(),
       this.market,
       PositionSide.COLLATERAL,
       interestType
     );
-    liquidateePosition.subtractPosition(
+
+    const collateralPositionID = collateralPosition.subtractPosition(
       this.event,
       this.protocol,
-      newBalance,
+      newCollateralBalance,
       TransactionType.LIQUIDATE,
       this.market.inputTokenPriceUSD
     );
-    // Note:
-    //  - liquidatees are not considered users since they are not spending gas for the transaction
-    //  - It is possible in some protocols for the liquidator to incur a position if they are transferred collateral tokens
-
-    const positionID = liquidateePosition.getPositionID();
-    if (!positionID) {
+    if (!collateralPositionID) {
       log.error(
         "[createLiquidate] positionID is null for market: {} account: {}",
         [this.market.id.toHexString(), liquidatee.toHexString()]
       );
+
       return null;
     }
+    positions.push(collateralPositionID!);
 
+    const debtMarket = Market.load(debtTokenId);
+    if (!debtMarket) {
+      log.error("[createLiquidate] market {} not found", [
+        debtTokenId.toHexString(),
+      ]);
+      return null;
+    }
+    const borrowerPosition = new PositionManager(
+      liquidateeAccount.getAccount(),
+      debtMarket,
+      PositionSide.BORROWER,
+      interestType
+    );
+
+    const borrowerPositionID = borrowerPosition.subtractPosition(
+      this.event,
+      this.protocol,
+      newBorrowerBalance,
+      TransactionType.LIQUIDATE,
+      debtMarket.inputTokenPriceUSD
+    );
+    if (!borrowerPositionID) {
+      log.error(
+        "[createLiquidate] positionID is null for market: {} account: {}",
+        [debtMarket.id.toHexString(), liquidatee.toHexString()]
+      );
+      return null;
+    }
+    positions.push(borrowerPositionID!);
+
+    // Note:
+    //  - liquidatees are not considered users since they are not spending gas for the transaction
+    //  - It is possible in some protocols for the liquidator to incur a position if they are transferred collateral tokens
     const liquidate = new Liquidate(
       this.event.transaction.hash
         .concatI32(this.event.logIndex.toI32())
@@ -652,7 +728,7 @@ export class DataManager {
     liquidate.liquidator = liquidator;
     liquidate.liquidatee = liquidatee;
     liquidate.market = this.market.id;
-    liquidate.positions = [positionID!];
+    liquidate.positions = positions;
     liquidate.asset = asset;
     liquidate.amount = amount;
     liquidate.amountUSD = amountUSD;

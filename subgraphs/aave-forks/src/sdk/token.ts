@@ -1,9 +1,15 @@
-import { ERC20 } from "../../../../generated/Configurator/ERC20";
-import { ERC20SymbolBytes } from "../../../../generated/Configurator/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../../../generated/Configurator/ERC20NameBytes";
-import { Address, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { RewardToken, Token } from "../../../../generated/schema";
-import { BIGDECIMAL_ZERO } from "./constants";
+import { ERC20 } from "../../generated/LendingPool/ERC20";
+import { ERC20SymbolBytes } from "../../generated/LendingPool/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/LendingPool/ERC20NameBytes";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  Bytes,
+  ethereum,
+} from "@graphprotocol/graph-ts";
+import { RewardToken, Token } from "../../generated/schema";
+import { BIGDECIMAL_ZERO, exponentToBigDecimal } from "./constants";
 
 /**
  * This file contains the TokenClass, which acts as
@@ -67,12 +73,26 @@ export class TokenManager {
     return BIGDECIMAL_ZERO;
   }
 
+  // convert token amount to USD value
+  getAmountUSD(amount: BigInt): BigDecimal {
+    return amount
+      .toBigDecimal()
+      .div(exponentToBigDecimal(this.getDecimals()))
+      .times(this.getPriceUSD());
+  }
   ////////////////////
   ///// Creators /////
   ////////////////////
 
-  getOrCreateRewardToken(rewardTokenType: string): RewardToken {
-    const rewardTokenID = rewardTokenType
+  getOrCreateRewardToken(
+    rewardTokenType: string,
+    interestRateType: string | null = null
+  ): RewardToken {
+    let rewardTokenID = rewardTokenType;
+    if (interestRateType) {
+      rewardTokenID = rewardTokenID.concat("-").concat(interestRateType);
+    }
+    rewardTokenID = rewardTokenID
       .concat("-")
       .concat(this.token.id.toHexString());
     let rewardToken = RewardToken.load(rewardTokenID);

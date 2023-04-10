@@ -12,7 +12,7 @@ import {
   Position,
   _PositionCounter,
   PositionSnapshot,
-} from "../../../../generated/schema";
+} from "../../generated/schema";
 import {
   BIGINT_ZERO,
   exponentToBigDecimal,
@@ -80,8 +80,8 @@ export class PositionManager {
 
   setCollateral(isCollateral: boolean): void {
     if (this.position) {
-      this.position.isCollateral = isCollateral;
-      this.position.save();
+      this.position!.isCollateral = isCollateral;
+      this.position!.save();
     }
   }
 
@@ -99,7 +99,7 @@ export class PositionManager {
     newBalance: BigInt,
     transactionType: string,
     priceUSD: BigDecimal
-  ): void {
+  ): string | null {
     let positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
       positionCounter = new _PositionCounter(this.counterID);
@@ -132,7 +132,7 @@ export class PositionManager {
       // take position snapshot
       //
       this.snapshotPosition(event, priceUSD);
-      return;
+      return null;
     }
     position = new Position(positionID);
     position.account = this.account.id;
@@ -200,6 +200,7 @@ export class PositionManager {
     //
     this.snapshotPosition(event, priceUSD);
     this.dailyActivePosition(positionCounter, event, protocol);
+    return this.getPositionID();
   }
 
   subtractPosition(
@@ -208,13 +209,13 @@ export class PositionManager {
     newBalance: BigInt,
     transactionType: string,
     priceUSD: BigDecimal
-  ): void {
+  ): string | null {
     const positionCounter = _PositionCounter.load(this.counterID);
     if (!positionCounter) {
       log.warning("[subtractPosition] position counter {} not found", [
         this.counterID,
       ]);
-      return;
+      return null;
     }
     const positionID = positionCounter.id
       .concat("-")
@@ -222,7 +223,7 @@ export class PositionManager {
     const position = Position.load(positionID);
     if (!position) {
       log.warning("[subtractPosition] position {} not found", [positionID]);
-      return;
+      return null;
     }
 
     position.balance = newBalance;
@@ -281,6 +282,7 @@ export class PositionManager {
     //
     this.snapshotPosition(event, priceUSD);
     this.dailyActivePosition(positionCounter, event, protocol);
+    return this.getPositionID();
   }
 
   private snapshotPosition(event: ethereum.Event, priceUSD: BigDecimal): void {

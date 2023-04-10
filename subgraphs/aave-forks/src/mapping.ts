@@ -8,14 +8,15 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   Account,
-  ActorAccount,
   Borrow,
   Deposit,
   Liquidate,
   Market,
+  Position,
   Repay,
   Token,
   Withdraw,
+  _MarketList,
 } from "../generated/schema";
 import { AToken } from "../generated/LendingPool/AToken";
 import { StableDebtToken } from "../generated/LendingPool/StableDebtToken";
@@ -37,19 +38,9 @@ import {
   ZERO_ADDRESS,
 } from "./constants";
 import {
-  addPosition,
-  createAccount,
-  createInterestRate,
   getBorrowBalance,
+  getCollateralBalance,
   getMarketByAuxillaryToken,
-  getOrCreateLendingProtocol,
-  getOrCreateMarket,
-  getOrCreateToken,
-  snapshotUsage,
-  subtractPosition,
-  updateFinancials,
-  updateMarketSnapshots,
-  updateSnapshots,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -57,19 +48,11 @@ import {
   StableDebtToken as STokenTemplate,
 } from "../generated/templates";
 import { ERC20 } from "../generated/LendingPool/ERC20";
-
-//////////////////////////
-///// Helper Classes /////
-//////////////////////////
-
-export class ProtocolData {
-  constructor(
-    public readonly protocolAddress: string,
-    public readonly name: string,
-    public readonly slug: string,
-    public readonly network: string
-  ) {}
-}
+import { DataManager, ProtocolData } from "./sdk/manager";
+import { FeeType, TokenType } from "./sdk/constants";
+import { TokenManager } from "./sdk/token";
+import { AccountManager } from "./sdk/account";
+import { PositionManager } from "./sdk/position";
 
 //////////////////////////////////
 ///// Configuration Handlers /////
@@ -79,12 +62,31 @@ export function _handlePriceOracleUpdated(
   newPriceOracle: Address,
   protocolData: ProtocolData
 ): void {
-  log.info("[PriceOracleUpdated] OracleAddress: {}", [
+  log.info("[_handlePriceOracleUpdated] New oracleAddress: {}", [
     newPriceOracle.toHexString(),
   ]);
-  const protocol = getOrCreateLendingProtocol(protocolData);
-  protocol._priceOracle = newPriceOracle.toHexString();
-  protocol.save();
+
+  let marketList = _MarketList.load(protocolData.protocolID);
+  if (!marketList) {
+    log.warning("[_handlePriceOracleUpdated]marketList for {} does not exist", [
+      protocolData.protocolID.toHexString(),
+    ]);
+    return;
+  }
+
+  const markets = marketList.markets;
+  for (let i = 0; i < markets.length; i++) {
+    const market = Market.load(markets[i]);
+    if (!market) {
+      log.warning("[_handlePriceOracleUpdated] Market not found: {}", [
+        markets[i].toHexString(),
+      ]);
+      continue;
+    }
+
+    market.oracle = newPriceOracle;
+    market.save();
+  }
 }
 
 export function _handleReserveInitialized(
@@ -95,28 +97,42 @@ export function _handleReserveInitialized(
   protocolData: ProtocolData,
   stableDebtToken: Address = Address.fromString(ZERO_ADDRESS)
 ): void {
-  // create tokens
-  const outputTokenEntity = getOrCreateToken(outputToken);
-  const variableDebtTokenEntity = getOrCreateToken(variableDebtToken);
-
-  // update and initialize specofic market variables
-  const market = getOrCreateMarket(underlyingToken, protocolData);
-
-  market.name = outputTokenEntity.name;
-  market.outputToken = outputTokenEntity.id;
-  market.createdBlockNumber = event.block.number;
-  market.createdTimestamp = event.block.timestamp;
-  market._vToken = variableDebtTokenEntity.id;
+  // create VToken template
   VTokenTemplate.create(variableDebtToken);
-  if (stableDebtToken != Address.fromString(ZERO_ADDRESS)) {
-    market._sToken = getOrCreateToken(stableDebtToken).id;
+  // create AToken template to watch Transfer
+  ATokenTemplate.create(outputToken);
+
+  const manager = new DataManager(
+    underlyingToken,
+    underlyingToken,
+    event,
+    protocolData
+  );
+  const market = manager.getMarket();
+  const outputTokenManager = new TokenManager(
+    outputToken,
+    event,
+    TokenType.NON_REBASING
+  );
+  const vDebtTokenManager = new TokenManager(
+    variableDebtToken,
+    event,
+    TokenType.NON_REBASING
+  );
+  market.outputToken = outputTokenManager.getToken().id;
+  market._vToken = vDebtTokenManager.getToken().id;
+
+  if (stableDebtToken != Address.zero()) {
+    const sDebtTokenManager = new TokenManager(
+      stableDebtToken,
+      event,
+      TokenType.NON_REBASING
+    );
+    market._sToken = sDebtTokenManager.getToken().id;
     STokenTemplate.create(stableDebtToken);
   }
 
   market.save();
-
-  // create AToken template to watch Transfer
-  ATokenTemplate.create(outputToken);
 }
 
 export function _handleCollateralConfigurationChanged(
@@ -126,8 +142,13 @@ export function _handleCollateralConfigurationChanged(
   maximumLTV: BigInt,
   protocolData: ProtocolData
 ): void {
-  // Adjust market LTV, liquidation, and collateral data when a reserve's collateral configuration has changed
-  const market = getOrCreateMarket(marketId, protocolData);
+  const market = Market.load(marketId);
+  if (!market) {
+    log.warning("[_handleCollateralConfigurationChanged] Market not found {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
 
   market.maximumLTV = maximumLTV.toBigDecimal().div(BIGDECIMAL_HUNDRED);
   market.liquidationThreshold = liquidationThreshold
@@ -151,7 +172,13 @@ export function _handleBorrowingEnabledOnReserve(
   marketId: Address,
   protocolData: ProtocolData
 ): void {
-  const market = getOrCreateMarket(marketId, protocolData);
+  const market = Market.load(marketId);
+  if (!market) {
+    log.warning("[_handleBorrowingEnabledOnReserve] Market not found {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
 
   market.canBorrowFrom = true;
   market._prePauseState = [
@@ -166,7 +193,13 @@ export function _handleBorrowingDisabledOnReserve(
   marketId: Address,
   protocolData: ProtocolData
 ): void {
-  const market = getOrCreateMarket(marketId, protocolData);
+  const market = Market.load(marketId);
+  if (!market) {
+    log.warning("[_handleBorrowingDisabledOnReserve] Market not found {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
 
   market.canBorrowFrom = false;
   market._prePauseState = [
@@ -181,7 +214,13 @@ export function _handleReserveActivated(
   marketId: Address,
   protocolData: ProtocolData
 ): void {
-  const market = getOrCreateMarket(marketId, protocolData);
+  const market = Market.load(marketId);
+  if (!market) {
+    log.warning("[_handleReserveActivated] Market not found {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
 
   market.isActive = true;
   market._prePauseState = [
@@ -196,7 +235,13 @@ export function _handleReserveDeactivated(
   marketId: Address,
   protocolData: ProtocolData
 ): void {
-  const market = getOrCreateMarket(marketId, protocolData);
+  const market = Market.load(marketId);
+  if (!market) {
+    log.warning("[_handleReserveDeactivated] Market not found {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
 
   market.isActive = false;
   market._prePauseState = [
@@ -212,9 +257,15 @@ export function _handleReserveFactorChanged(
   reserveFactor: BigInt,
   protocolData: ProtocolData
 ): void {
-  const market = getOrCreateMarket(marketId, protocolData);
+  const market = Market.load(marketId);
+  if (!market) {
+    log.warning("[_handleReserveDeactivated] Market not found {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
 
-  market._reserveFactor = reserveFactor
+  market.reserveFactor = reserveFactor
     .toBigDecimal()
     .div(exponentToBigDecimal(INT_TWO));
   market.save();
@@ -225,21 +276,13 @@ export function _handleReserveUsedAsCollateralEnabled(
   accountID: Address,
   protocolData: ProtocolData
 ): void {
-  const protocol = getOrCreateLendingProtocol(protocolData);
+  const accountManager = new AccountManager(accountID);
+  const account = accountManager.getAccount();
 
-  const market = getOrCreateMarket(marketId, protocolData);
-
-  // grab account
-  let account = Account.load(accountID.toHexString());
-  if (!account) {
-    account = createAccount(accountID.toHexString());
-    account.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-  const markets = account._enabledCollaterals;
-  markets.push(market.id);
+  const markets = account._enabledCollaterals
+    ? account._enabledCollaterals!
+    : [];
+  markets.push(marketId);
   account._enabledCollaterals = markets;
   account.save();
 }
@@ -249,18 +292,14 @@ export function _handleReserveUsedAsCollateralDisabled(
   accountID: Address,
   protocolData: ProtocolData
 ): void {
-  const market = getOrCreateMarket(marketId, protocolData);
+  const accountManager = new AccountManager(accountID);
+  const account = accountManager.getAccount();
 
-  // grab account
-  const account = Account.load(accountID.toHexString());
-  if (!account) {
-    log.warning("[ReserveUsedAsCollateralEnabled] Account not found: {}", [
-      accountID.toHexString(),
-    ]);
-    return;
-  }
-  const markets = account._enabledCollaterals;
-  const index = markets.indexOf(market.id);
+  const markets = account._enabledCollaterals
+    ? account._enabledCollaterals!
+    : [];
+
+  const index = markets.indexOf(marketId);
   if (index >= 0) {
     // drop 1 element at given index
     markets.splice(index, 1);
@@ -270,12 +309,19 @@ export function _handleReserveUsedAsCollateralDisabled(
 }
 
 export function _handlePaused(protocolData: ProtocolData): void {
-  const protocol = getOrCreateLendingProtocol(protocolData);
+  let marketList = _MarketList.load(protocolData.protocolID);
+  if (!marketList) {
+    log.warning("[_handlePaused]marketList for {} does not exist", [
+      protocolData.protocolID.toHexString(),
+    ]);
+    return;
+  }
 
-  for (let i = 0; i < protocol._marketIDs.length; i++) {
-    const market = Market.load(protocol._marketIDs[i]);
+  const markets = marketList!.markets;
+  for (let i = 0; i < markets.length; i++) {
+    const market = Market.load(markets[i]);
     if (!market) {
-      log.warning("[Paused] Market not found: {}", [protocol._marketIDs[i]]);
+      log.warning("[Paused] Market not found: {}", [markets[i].toHexString()]);
       continue;
     }
 
@@ -293,12 +339,21 @@ export function _handlePaused(protocolData: ProtocolData): void {
 }
 
 export function _handleUnpaused(protocolData: ProtocolData): void {
-  const protocol = getOrCreateLendingProtocol(protocolData);
+  let marketList = _MarketList.load(protocolData.protocolID);
+  if (!marketList) {
+    log.warning("[_handleUnpaused]marketList for {} does not exist", [
+      protocolData.protocolID.toHexString(),
+    ]);
+    return;
+  }
 
-  for (let i = 0; i < protocol._marketIDs.length; i++) {
-    const market = Market.load(protocol._marketIDs[i]);
+  const markets = marketList!.markets;
+  for (let i = 0; i < markets.length; i++) {
+    const market = Market.load(markets[i]);
     if (!market) {
-      log.warning("[Paused] Market not found: {}", [protocol._marketIDs[i]]);
+      log.warning("[_handleUnpaused] Market not found: {}", [
+        markets[i].toHexString(),
+      ]);
       continue;
     }
 
@@ -324,32 +379,32 @@ export function _handleReserveDataUpdated(
   marketId: Address,
   assetPriceUSD: BigDecimal
 ): void {
-  const market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId);
   if (!market) {
     log.warning("[_handlReserveDataUpdated] Market not found {}", [
       marketId.toHexString(),
     ]);
     return;
   }
-  const protocol = getOrCreateLendingProtocol(protocolData);
 
-  // get input token and decimals
-  const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
-
-  // update market prices
-  market.inputTokenPriceUSD = assetPriceUSD;
-  market.outputTokenPriceUSD = assetPriceUSD;
-
+  const manager = new DataManager(
+    marketId,
+    market.inputToken,
+    event,
+    protocolData
+  );
+  const inputToken = manager.getInputToken();
   // get current borrow balance
   let trySBorrowBalance: ethereum.CallResult<BigInt> | null = null;
   if (market._sToken) {
     const stableDebtContract = StableDebtToken.bind(
-      Address.fromString(market._sToken!)
+      Address.fromBytes(market._sToken!)
     );
     trySBorrowBalance = stableDebtContract.try_totalSupply();
   }
+
   const variableDebtContract = VariableDebtToken.bind(
-    Address.fromString(market._vToken!)
+    Address.fromBytes(market._vToken!)
   );
   const tryVBorrowBalance = variableDebtContract.try_totalSupply();
   let sBorrowBalance = BIGINT_ZERO;
@@ -372,14 +427,8 @@ export function _handleReserveDataUpdated(
     return;
   }
 
-  const totalBorrowBalance = sBorrowBalance
-    .plus(vBorrowBalance)
-    .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken.decimals));
-  market.totalBorrowBalanceUSD = totalBorrowBalance.times(assetPriceUSD);
-
   // update total supply balance
-  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  const aTokenContract = AToken.bind(Address.fromBytes(market.outputToken!));
   const tryTotalSupply = aTokenContract.try_totalSupply();
   if (tryTotalSupply.reverted) {
     log.warning(
@@ -388,6 +437,14 @@ export function _handleReserveDataUpdated(
     );
     return;
   }
+
+  manager.updateMarketAndProtocolData(
+    assetPriceUSD,
+    tryTotalSupply.value,
+    vBorrowBalance,
+    sBorrowBalance
+  );
+
   const tryScaledSupply = aTokenContract.try_scaledTotalSupply();
   if (tryScaledSupply.reverted) {
     log.warning(
@@ -396,14 +453,6 @@ export function _handleReserveDataUpdated(
     );
     return;
   }
-
-  market.inputTokenBalance = tryTotalSupply.value;
-  market.outputTokenSupply = tryTotalSupply.value;
-  market.totalDepositBalanceUSD = market.inputTokenBalance
-    .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken.decimals))
-    .times(assetPriceUSD);
-  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
@@ -417,34 +466,30 @@ export function _handleReserveDataUpdated(
     .div(exponentToBigDecimal(inputToken.decimals))
     .times(liquidityIndexDiff);
   const totalRevenueDeltaUSD = newRevenueBD.times(assetPriceUSD);
+  let reserveFactor = market.reserveFactor;
+  if (!reserveFactor) {
+    log.warning(
+      "[_handleReserveDataUpdated]reserveFactor = null for market {}, default to 0.0",
+      [marketId.toHexString()]
+    );
+    reserveFactor = BIGDECIMAL_ZERO;
+  }
   const protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(
-    market._reserveFactor.div(exponentToBigDecimal(INT_TWO))
+    reserveFactor.div(exponentToBigDecimal(INT_TWO))
   );
   const supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
     protocolSideRevenueDeltaUSD
   );
 
-  market.cumulativeTotalRevenueUSD =
-    market.cumulativeTotalRevenueUSD.plus(totalRevenueDeltaUSD);
-  market.cumulativeProtocolSideRevenueUSD =
-    market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueDeltaUSD);
-  market.cumulativeSupplySideRevenueUSD =
-    market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
+  const fee = manager.getOrUpdateFee(
+    FeeType.PROTOCOL_FEE,
+    null,
+    market.reserveFactor
+  );
+  manager.addProtocolRevenue(protocolSideRevenueDeltaUSD, fee);
+  manager.addSupplyRevenue(supplySideRevenueDeltaUSD);
 
-  protocol.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD.plus(totalRevenueDeltaUSD);
-  protocol.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueDeltaUSD);
-  protocol.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
-
-  log.info("[ReserveDataUpdated] New total revenue: {}", [
-    totalRevenueDeltaUSD.toString(),
-  ]);
-
-  // update rates
-  const vBorrowRate = createInterestRate(
-    market.id,
+  manager.getOrUpdateRate(
     InterestRateSide.BORROWER,
     InterestRateType.VARIABLE,
     rayToWad(variableBorrowRate)
@@ -452,64 +497,23 @@ export function _handleReserveDataUpdated(
       .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
 
-  const depositRate = createInterestRate(
-    market.id,
-    InterestRateSide.LENDER,
-    InterestRateType.VARIABLE,
-    rayToWad(liquidityRate)
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
-  );
-
   if (market._sToken) {
     // geist does not have stable borrow rates
-    const sBorrowRate = createInterestRate(
-      market.id,
+    manager.getOrUpdateRate(
       InterestRateSide.BORROWER,
       InterestRateType.STABLE,
       rayToWad(stableBorrowRate)
         .toBigDecimal()
         .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
     );
-    market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
-  } else {
-    market.rates = [depositRate.id, vBorrowRate.id];
   }
 
-  market.save();
-
-  // update protocol TVL / BorrowUSD / SupplyUSD
-  let tvl = BIGDECIMAL_ZERO;
-  let depositUSD = BIGDECIMAL_ZERO;
-  let borrowUSD = BIGDECIMAL_ZERO;
-  for (let i = 0; i < protocol._marketIDs.length; i++) {
-    const thisMarket = Market.load(protocol._marketIDs[i])!;
-    tvl = tvl.plus(thisMarket.totalValueLockedUSD);
-    depositUSD = depositUSD.plus(thisMarket.totalDepositBalanceUSD);
-    borrowUSD = borrowUSD.plus(thisMarket.totalBorrowBalanceUSD);
-  }
-  protocol.totalValueLockedUSD = tvl;
-  protocol.totalDepositBalanceUSD = depositUSD;
-  protocol.totalBorrowBalanceUSD = borrowUSD;
-  protocol.save();
-
-  // update financial snapshot
-  updateFinancials(
-    event,
-    protocol,
-    totalRevenueDeltaUSD,
-    protocolSideRevenueDeltaUSD,
-    supplySideRevenueDeltaUSD
-  );
-
-  // update revenue in market snapshots
-  updateMarketSnapshots(
-    event.block.number,
-    event.block.timestamp,
-    market,
-    totalRevenueDeltaUSD,
-    supplySideRevenueDeltaUSD,
-    protocolSideRevenueDeltaUSD
+  manager.getOrUpdateRate(
+    InterestRateSide.LENDER,
+    InterestRateType.VARIABLE,
+    rayToWad(liquidityRate)
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
 }
 
@@ -520,89 +524,47 @@ export function _handleDeposit(
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  const market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId);
   if (!market) {
-    log.warning("[Deposit] Market not found on protocol: {}", [
+    log.warning("[_handleDeposit] Market {} not found", [
       marketId.toHexString(),
     ]);
     return;
   }
-  const inputToken = Token.load(market.inputToken);
-  const protocol = getOrCreateLendingProtocol(protocolData);
-
-  // create deposit entity
-  const id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
-  const deposit = new Deposit(id);
-
-  // create account
-  let account = Account.load(accountID.toHexString());
+  const manager = new DataManager(
+    marketId,
+    market.inputToken,
+    event,
+    protocolData
+  );
+  const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
+  const newCollateralBalance = getCollateralBalance(market, accountID);
+  manager.createDeposit(
+    marketId,
+    accountID,
+    amount,
+    amountUSD,
+    newCollateralBalance
+  );
+  const account = Account.load(accountID);
   if (!account) {
-    account = createAccount(accountID.toHexString());
-    account.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
+    log.warning("[_handleDeposit]account {} not found", [
+      accountID.toHexString(),
+    ]);
+    return;
   }
-  account.depositCount += 1;
-  account.save();
-
-  // update position
-  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  const positionId = addPosition(
-    protocol,
-    market,
+  if (
+    !account._enabledCollaterals ||
+    account._enabledCollaterals!.indexOf(marketId) == -1
+  ) {
+    return;
+  }
+  const positionManager = new PositionManager(
     account,
-    aTokenContract.try_balanceOf(accountID), // try getting balance of account
-    PositionSide.LENDER,
-    EventType.DEPOSIT,
-    event
-  );
-
-  deposit.position = positionId;
-  deposit.nonce = event.transaction.nonce;
-  deposit.account = accountID.toHexString();
-  deposit.blockNumber = event.block.number;
-  deposit.timestamp = event.block.timestamp;
-  deposit.market = marketId.toHexString();
-  deposit.hash = event.transaction.hash.toHexString();
-  deposit.logIndex = event.logIndex.toI32();
-  deposit.asset = inputToken!.id;
-  deposit.amount = amount;
-  deposit.amountUSD = amount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken!.decimals))
-    .times(market.inputTokenPriceUSD);
-  deposit.save();
-
-  // update metrics
-  protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
-    deposit.amountUSD
-  );
-  protocol.save();
-  market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(
-    deposit.amountUSD
-  );
-  market.save();
-
-  // update usage metrics
-  snapshotUsage(
-    protocol,
-    event.block.number,
-    event.block.timestamp,
-    deposit.account,
-    EventType.DEPOSIT,
-    true
-  );
-
-  // udpate market daily / hourly snapshots / financialSnapshots
-  updateSnapshots(
-    protocol,
     market,
-    deposit.amountUSD,
-    EventType.DEPOSIT,
-    event.block.timestamp,
-    event.block.number
+    PositionSide.LENDER
   );
+  positionManager.setCollateral(true);
 }
 
 export function _handleWithdraw(
@@ -612,84 +574,27 @@ export function _handleWithdraw(
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  const market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId);
   if (!market) {
-    log.warning("[Withdraw] Market not found on protocol: {}", [
+    log.warning("[_handleWithdraw] Market {} not found", [
       marketId.toHexString(),
     ]);
     return;
   }
-  const inputToken = Token.load(market.inputToken);
-  const protocol = getOrCreateLendingProtocol(protocolData);
-
-  // create withdraw entity
-  const id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
-  const withdraw = new Withdraw(id);
-
-  // get account
-  let account = Account.load(accountID.toHexString());
-  if (!account) {
-    account = createAccount(accountID.toHexString());
-    account.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-  account.withdrawCount += 1;
-  account.save();
-
-  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  const positionId = subtractPosition(
-    protocol,
-    market,
-    account,
-    aTokenContract.try_balanceOf(accountID), // try getting balance of account
-    PositionSide.LENDER,
-    EventType.WITHDRAW,
-    event
+  const manager = new DataManager(
+    marketId,
+    market.inputToken,
+    event,
+    protocolData
   );
-  if (positionId === null) {
-    log.warning(
-      "[handleWithdraw] Position not found for account: {} in transaction: {}",
-      [accountID.toHexString(), event.transaction.hash.toHexString()]
-    );
-    return;
-  }
-
-  withdraw.position = positionId;
-  withdraw.blockNumber = event.block.number;
-  withdraw.timestamp = event.block.timestamp;
-  withdraw.account = account.id;
-  withdraw.market = market.id;
-  withdraw.hash = event.transaction.hash.toHexString();
-  withdraw.nonce = event.transaction.nonce;
-  withdraw.logIndex = event.logIndex.toI32();
-  withdraw.asset = inputToken!.id;
-  withdraw.amount = amount;
-  withdraw.amountUSD = amount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken!.decimals))
-    .times(market.inputTokenPriceUSD);
-  withdraw.save();
-
-  // update usage metrics
-  snapshotUsage(
-    protocol,
-    event.block.number,
-    event.block.timestamp,
-    withdraw.account,
-    EventType.WITHDRAW,
-    true
-  );
-
-  // udpate market daily / hourly snapshots / financialSnapshots
-  updateSnapshots(
-    protocol,
-    market,
-    withdraw.amountUSD,
-    EventType.WITHDRAW,
-    event.block.timestamp,
-    event.block.number
+  const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
+  const newCollateralBalance = getCollateralBalance(market, accountID);
+  manager.createWithdraw(
+    marketId,
+    accountID,
+    amount,
+    amountUSD,
+    newCollateralBalance
   );
 }
 
@@ -700,87 +605,28 @@ export function _handleBorrow(
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  const market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId);
   if (!market) {
-    log.warning("[Borrow] Market not found on protocol: {}", [
+    log.warning("[_handleBorrow] Market {} not found", [
       marketId.toHexString(),
     ]);
     return;
   }
-  const inputToken = Token.load(market.inputToken);
-  const protocol = getOrCreateLendingProtocol(protocolData);
-
-  // create borrow entity
-  const id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
-  const borrow = new Borrow(id);
-
-  // create account
-  let account = Account.load(accountID.toHexString());
-  if (!account) {
-    account = createAccount(accountID.toHexString());
-    account.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-  account.borrowCount += 1;
-  account.save();
-
-  // update position
-  const positionId = addPosition(
-    protocol,
-    market,
-    account,
-    getBorrowBalance(market, accountID), // try getting balance of account in debt market
-    PositionSide.BORROWER,
-    EventType.BORROW,
-    event
+  const manager = new DataManager(
+    marketId,
+    market.inputToken,
+    event,
+    protocolData
   );
-
-  borrow.position = positionId;
-  borrow.blockNumber = event.block.number;
-  borrow.timestamp = event.block.timestamp;
-  borrow.account = account.id;
-  borrow.nonce = event.transaction.nonce;
-  borrow.market = market.id;
-  borrow.hash = event.transaction.hash.toHexString();
-  borrow.logIndex = event.logIndex.toI32();
-  borrow.asset = inputToken!.id;
-  borrow.amount = amount;
-  borrow.amountUSD = amount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken!.decimals))
-    .times(market.inputTokenPriceUSD);
-  borrow.save();
-
-  // update metrics
-  protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(
-    borrow.amountUSD
-  );
-  protocol.save();
-  market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(
-    borrow.amountUSD
-  );
-  market.save();
-
-  // update usage metrics
-  snapshotUsage(
-    protocol,
-    event.block.number,
-    event.block.timestamp,
-    borrow.account,
-    EventType.BORROW,
-    true
-  );
-
-  // udpate market daily / hourly snapshots / financialSnapshots
-  updateSnapshots(
-    protocol,
-    market,
-    borrow.amountUSD,
-    EventType.BORROW,
-    event.block.timestamp,
-    event.block.number
+  const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
+  const newBorrowBalance = getBorrowBalance(market, accountID);
+  manager.createBorrow(
+    marketId,
+    accountID,
+    amount,
+    amountUSD,
+    newBorrowBalance,
+    market.inputTokenPriceUSD
   );
 }
 
@@ -791,271 +637,99 @@ export function _handleRepay(
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  const market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId);
   if (!market) {
-    log.warning("[Repay] Market not found on protocol: {}", [
-      marketId.toHexString(),
-    ]);
+    log.warning("[_handleRepay] Market {} not found", [marketId.toHexString()]);
     return;
   }
-  const inputToken = Token.load(market.inputToken);
-  const protocol = getOrCreateLendingProtocol(protocolData);
-
-  // create repay entity
-  const id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
-  const repay = new Repay(id);
-
-  // get account
-  let account = Account.load(accountID.toHexString());
-  if (!account) {
-    account = createAccount(accountID.toHexString());
-    account.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-  account.repayCount += 1;
-  account.save();
-
-  const positionId = subtractPosition(
-    protocol,
-    market,
-    account,
-    getBorrowBalance(market, accountID), // try getting balance of account in debt market
-    PositionSide.BORROWER,
-    EventType.REPAY,
-    event
+  const manager = new DataManager(
+    marketId,
+    market.inputToken,
+    event,
+    protocolData
   );
-  if (positionId === null) {
-    log.warning(
-      "[handleRepay] Position not found for account: {} in transaction; {}",
-      [accountID.toHexString(), event.transaction.hash.toHexString()]
-    );
-    return;
-  }
-
-  repay.position = positionId;
-  repay.blockNumber = event.block.number;
-  repay.timestamp = event.block.timestamp;
-  repay.account = account.id;
-  repay.market = market.id;
-  repay.hash = event.transaction.hash.toHexString();
-  repay.nonce = event.transaction.nonce;
-  repay.logIndex = event.logIndex.toI32();
-  repay.asset = inputToken!.id;
-  repay.amount = amount;
-  repay.amountUSD = amount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken!.decimals))
-    .times(market.inputTokenPriceUSD);
-  repay.save();
-
-  // update usage metrics
-  snapshotUsage(
-    protocol,
-    event.block.number,
-    event.block.timestamp,
-    repay.account,
-    EventType.REPAY,
-    true
-  );
-
-  // udpate market daily / hourly snapshots / financialSnapshots
-  updateSnapshots(
-    protocol,
-    market,
-    repay.amountUSD,
-    EventType.REPAY,
-    event.block.timestamp,
-    event.block.number
+  const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
+  const newBorrowBalance = getBorrowBalance(market, accountID);
+  manager.createRepay(
+    marketId,
+    accountID,
+    amount,
+    amountUSD,
+    newBorrowBalance,
+    market.inputTokenPriceUSD
   );
 }
 
 export function _handleLiquidate(
   event: ethereum.Event,
-  amount: BigInt,
+  amount: BigInt, // amount of collateral liquidated
   marketId: Address, // collateral market
   protocolData: ProtocolData,
   liquidator: Address,
-  borrower: Address, // account liquidated
-  debtToken: Address, // token repaid to cover debt,
+  liquidatee: Address, // account liquidated
+  debtTokenId: Address, // token repaid to cover debt,
   debtToCover: BigInt // the amount of debt repaid by liquidator
 ): void {
-  const market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId);
   if (!market) {
-    log.warning("[Liquidate] Market not found on protocol: {}", [
+    log.warning("[_handleLiquidate] Market {} not found", [
       marketId.toHexString(),
     ]);
     return;
   }
-  const inputToken = Token.load(market.inputToken);
-  const protocol = getOrCreateLendingProtocol(protocolData);
-
-  // create liquidate entity
-  const id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
-  const liquidate = new Liquidate(id);
-
-  // update liquidators account
-  let liquidatorAccount = Account.load(liquidator.toHexString());
-  if (!liquidatorAccount) {
-    liquidatorAccount = createAccount(liquidator.toHexString());
-    liquidatorAccount.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-  liquidatorAccount.liquidateCount += 1;
-  liquidatorAccount.save();
-  const liquidatorActorID = "liquidator"
-    .concat("-")
-    .concat(liquidator.toHexString());
-  let liquidatorActor = ActorAccount.load(liquidatorActorID);
-  if (!liquidatorActor) {
-    liquidatorActor = new ActorAccount(liquidatorActorID);
-    liquidatorActor.save();
-
-    protocol.cumulativeUniqueLiquidators += 1;
-    protocol.save();
-  }
-
-  // get borrower account
-  let account = Account.load(borrower.toHexString());
-  if (!account) {
-    account = createAccount(borrower.toHexString());
-    account.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-  account.liquidationCount += 1;
-  account.save();
-  const liquidateeActorID = "liquidatee"
-    .concat("-")
-    .concat(borrower.toHexString());
-  let liquidateeActor = ActorAccount.load(liquidateeActorID);
-  if (!liquidateeActor) {
-    liquidateeActor = new ActorAccount(liquidateeActorID);
-    liquidateeActor.save();
-
-    protocol.cumulativeUniqueLiquidatees += 1;
-    protocol.save();
-  }
-
-  const repayTokenMarket = Market.load(debtToken.toHexString());
-  if (!repayTokenMarket) {
-    log.warning("[Liquidate] Repay token market not found on protocol: {}", [
-      debtToken.toHexString(),
-    ]);
-    return;
-  }
-
-  // account for borrow being repaid by liquidator
-  const positionId = subtractPosition(
-    protocol,
-    repayTokenMarket,
-    account, // the borrower
-    getBorrowBalance(repayTokenMarket, borrower), // try getting balance of account in debt market
-    PositionSide.BORROWER,
-    EventType.LIQUIDATEE,
-    event
+  const manager = new DataManager(
+    marketId,
+    market.inputToken,
+    event,
+    protocolData
   );
-  if (positionId === null) {
+  const inputToken = manager.getInputToken();
+  let inputTokenPriceUSD = market.inputTokenPriceUSD;
+  if (!inputTokenPriceUSD) {
     log.warning(
-      "[handleLiquidate] Position not found for account: {} in transaction: {}",
-      [borrower.toHexString(), event.transaction.hash.toHexString()]
+      "[_handleLiquidate] Price of input token {} is not set, default to 0.0",
+      [inputToken.id.toHexString()]
     );
-    return;
+    inputTokenPriceUSD = BIGDECIMAL_ZERO;
   }
+  const amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals))
+    .times(inputTokenPriceUSD);
 
-  // account for borrower losing aToken (collateral)
-  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  subtractPosition(
-    protocol,
-    market, // collateral market
-    account,
-    aTokenContract.try_balanceOf(borrower),
-    PositionSide.LENDER,
-    -1, // not incrementing to not double count
-    event
-  );
-
-  // account for liquidator gaining aToken (seized collateral)
-  addPosition(
-    protocol,
-    market, // collateral market
-    liquidatorAccount,
-    aTokenContract.try_balanceOf(liquidator),
-    PositionSide.LENDER,
-    -1, // TODO: how do we classify a liquidator gaining collateral
-    event
-  );
-
-  const debtAsset = Token.load(debtToken.toHexString());
-  if (!debtAsset) {
-    log.warning("[Liquidate] Debt asset not found on protocol: {}", [
-      debtToken.toHexString(),
+  const debtTokenMarket = Market.load(debtTokenId);
+  if (!debtTokenMarket) {
+    log.warning("[_handleLiquidate] market for Debt token  {} not found", [
+      debtTokenId.toHexString(),
     ]);
     return;
   }
+  let debtTokenPriceUSD = debtTokenMarket.inputTokenPriceUSD;
+  if (!debtTokenPriceUSD) {
+    log.warning(
+      "[_handleLiquidate] Price of token {} is not set, default to 0.0",
+      [debtTokenId.toHexString()]
+    );
+    debtTokenPriceUSD = BIGDECIMAL_ZERO;
+  }
 
-  liquidate.position = positionId;
-  liquidate.blockNumber = event.block.number;
-  liquidate.timestamp = event.block.timestamp;
-  liquidate.liquidator = liquidator.toHexString();
-  liquidate.liquidatee = borrower.toHexString();
-  liquidate.market = market.id;
-  liquidate.hash = event.transaction.hash.toHexString();
-  liquidate.nonce = event.transaction.nonce;
-  liquidate.logIndex = event.logIndex.toI32();
-  liquidate.asset = debtAsset.id;
-  liquidate.amount = amount;
-  liquidate.amountUSD = amount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken!.decimals))
-    .times(market.inputTokenPriceUSD);
-  liquidate.profitUSD = liquidate.amountUSD.minus(
-    debtToCover
-      .toBigDecimal()
-      .div(exponentToBigDecimal(debtAsset.decimals))
-      .times(repayTokenMarket.inputTokenPriceUSD)
+  const profitUSD = amountUSD.minus(
+    debtToCover.toBigDecimal().times(debtTokenPriceUSD)
   );
-  liquidate.save();
-
-  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
-    liquidate.amountUSD
-  );
-  protocol.save();
-  market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(
-    liquidate.amountUSD
-  );
-  market.save();
-
-  // update usage metrics
-  snapshotUsage(
-    protocol,
-    event.block.number,
-    event.block.timestamp,
-    liquidate.liquidatee,
-    EventType.LIQUIDATEE,
-    true // only count this liquidate as new tx
-  );
-  snapshotUsage(
-    protocol,
-    event.block.number,
-    event.block.timestamp,
-    liquidate.liquidator,
-    EventType.LIQUIDATOR, // updates dailyActiveLiquidators
-    false
-  );
-
-  // udpate market daily / hourly snapshots / financialSnapshots
-  updateSnapshots(
-    protocol,
-    market,
-    liquidate.amountUSD,
-    EventType.LIQUIDATOR,
-    event.block.timestamp,
-    event.block.number
+  const collateralBalance = getCollateralBalance(market, liquidatee);
+  const debtBalance = getBorrowBalance(debtTokenMarket, liquidatee);
+  manager.createLiquidate(
+    marketId,
+    debtTokenId,
+    liquidator,
+    liquidatee,
+    amount,
+    amountUSD,
+    profitUSD,
+    collateralBalance,
+    debtBalance,
+    null,
+    true
   );
 }
 
@@ -1063,16 +737,17 @@ export function _handleLiquidate(
 //// Transfer Events ////
 /////////////////////////
 
+// TODO: new arg amount
 export function _handleTransfer(
   event: ethereum.Event,
   protocolData: ProtocolData,
   positionSide: string,
   to: Address,
-  from: Address
+  from: Address,
+  amount: BigInt
 ): void {
   const asset = event.address;
-  const protocol = getOrCreateLendingProtocol(protocolData);
-  const market = getMarketByAuxillaryToken(asset.toHexString(), protocolData);
+  const market = getMarketByAuxillaryToken(asset, protocolData);
   if (!market) {
     log.warning("[_handleTransfer] market not found: {}", [
       asset.toHexString(),
@@ -1094,50 +769,38 @@ export function _handleTransfer(
     return;
   }
 
-  // grab accounts
-  let toAccount = Account.load(to.toHexString());
-  if (!toAccount) {
-    toAccount = createAccount(to.toHexString());
-    toAccount.save();
-
-    protocol.cumulativeUniqueUsers++;
-    protocol.save();
-  }
-
-  let fromAccount = Account.load(from.toHexString());
-  if (!fromAccount) {
-    fromAccount = createAccount(from.toHexString());
-    fromAccount.save();
-
-    protocol.cumulativeUniqueUsers++;
-    protocol.save();
-  }
-
   const tokenContract = ERC20.bind(asset);
-
-  // update balance from sender
-  if (fromAccount) {
-    subtractPosition(
-      protocol,
-      market,
-      fromAccount,
-      tokenContract.try_balanceOf(from),
-      positionSide,
-      -1, // TODO: not sure how to classify this event yet
-      event
+  const senderBalanceResult = tokenContract.try_balanceOf(from);
+  const receiverBalanceResult = tokenContract.try_balanceOf(to);
+  if (senderBalanceResult.reverted) {
+    log.warning(
+      "[_handleTransfer]token {} balanceOf() call for account {} reverted",
+      [asset.toHexString(), from.toHexString()]
     );
+    return;
   }
-
-  // update balance from receiver
-  if (toAccount) {
-    addPosition(
-      protocol,
-      market,
-      toAccount,
-      tokenContract.try_balanceOf(to),
-      positionSide,
-      -1, // TODO: not sure how to classify this event yet
-      event
+  if (receiverBalanceResult.reverted) {
+    log.warning(
+      "[_handleTransfer]token {} balanceOf() call for account {} reverted",
+      [asset.toHexString(), to.toHexString()]
     );
+    return;
   }
+  const tokenManager = new TokenManager(asset, event);
+  const amountUSD = tokenManager.getAmountUSD(amount);
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    protocolData
+  );
+  manager.createTransfer(
+    asset,
+    from,
+    to,
+    amount,
+    amountUSD,
+    senderBalanceResult.value,
+    receiverBalanceResult.value
+  );
 }
