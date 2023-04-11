@@ -1,12 +1,22 @@
-import { ethereum } from "@graphprotocol/graph-ts";
-
+import { PoolManager } from "./pool";
 import { AccountManager } from "./account";
 import { ProtocolManager } from "./protocol";
-import { PoolManager } from "./pool";
-import { ProtocolConfigurer, TokenPricer } from "../config";
-import { TokenManager, TokenInitializer } from "./tokens";
 import { BIGINT_ZERO } from "../../util/constants";
+import { ethereum } from "@graphprotocol/graph-ts";
 import { CustomEventType } from "../../util/events";
+import { TokenManager, TokenInitializer } from "./tokens";
+import { ProtocolConfigurer, TokenPricer } from "../config";
+
+/**
+ * This file contains the SDK class, which initializes
+ * all managers from event or call.
+ * Schema Version:  2.1.1
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+
+ */
 
 export class SDK {
   Protocol: ProtocolManager;

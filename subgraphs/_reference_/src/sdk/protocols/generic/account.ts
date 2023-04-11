@@ -1,11 +1,24 @@
-import { Address, Bytes } from "@graphprotocol/graph-ts";
 import {
   Account as AccountSchema,
   ActiveAccount,
 } from "../../../../generated/schema";
-import { ProtocolManager } from "./protocol";
 import { TokenManager } from "./tokens";
+import { ProtocolManager } from "./protocol";
+import { Address } from "@graphprotocol/graph-ts";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+
+/**
+ * This file contains the AccountClass, which does
+ * the operations on the Account entity. This includes:
+ *  - Creating a new Account
+ *  - Updating an existing Account
+ *
+ * Schema Version:  2.1.1
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+ */
 
 export class AccountManager {
   protocol: ProtocolManager;
@@ -17,12 +30,12 @@ export class AccountManager {
   }
 
   loadAccount(address: Address): Account {
-    let acc = AccountSchema.load(address);
+    let acc = AccountSchema.load(address.toHexString());
     if (acc) {
       return new Account(this.protocol, acc, this.tokens);
     }
 
-    acc = new AccountSchema(address);
+    acc = new AccountSchema(address.toHexString());
     acc.save();
 
     this.protocol.addUser();
@@ -57,8 +70,8 @@ export class Account {
     const days = getUnixDays(this.event.block);
     const hours = getUnixHours(this.event.block);
 
-    const generalHourlyID = `${this.account.id.toHexString()}-hourly-${hours}`;
-    const generalDailyID = `${this.account.id.toHexString()}-daily-${days}`;
+    const generalHourlyID = `${this.account.id}-hourly-${hours}`;
+    const generalDailyID = `${this.account.id}-daily-${days}`;
 
     const generalActivity: AccountWasActive = {
       daily: this.isActiveByActivityID(generalDailyID),
@@ -66,13 +79,13 @@ export class Account {
     };
 
     this.protocol.addActiveUser(generalActivity);
+    this.protocol.addTransaction();
   }
 
   private isActiveByActivityID(id: string): boolean {
-    const _id = Bytes.fromUTF8(id);
-    const dAct = ActiveAccount.load(_id);
+    const dAct = ActiveAccount.load(id);
     if (!dAct) {
-      new ActiveAccount(_id).save();
+      new ActiveAccount(id).save();
       return true;
     }
     return false;

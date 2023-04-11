@@ -1,19 +1,29 @@
-import { Versions } from "../../../../../../deployment/context/interface";
-
-import { Protocol as ProtocolSchema } from "../../../../generated/schema";
-import { ProtocolConfigurer, TokenPricer } from "../config";
-import { ProtocolSnapshot } from "./protocolSnapshot";
-import { AccountWasActive } from "./account";
-import * as constants from "../../util/constants";
+import { SDK } from ".";
 import {
   dataSource,
   Address,
   Bytes,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
-import { SDK } from ".";
-import { BIGINT_ZERO } from "../lending/constants";
+import { AccountWasActive } from "./account";
+import * as constants from "../../util/constants";
+import { BIGINT_ZERO } from "../../util/constants";
 import { CustomEventType } from "../../util/events";
+import { ProtocolSnapshot } from "./protocolSnapshot";
+import { ProtocolConfigurer, TokenPricer } from "../config";
+import { Protocol as ProtocolSchema } from "../../../../generated/schema";
+import { Versions } from "../../../../../../deployment/context/interface";
+
+/**
+ * This file contains the ProtocolManager class, which is used to
+ * make all of the storage changes that occur in a protocol.
+ *
+ * Schema Version:  2.1.1
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+ */
 
 /**
  * ProtocolManager is a wrapper around the ProtocolSchema entity that takes care of
@@ -39,6 +49,7 @@ export class ProtocolManager {
     this.event = event;
     this.pricer = pricer;
     this.snapshoter = new ProtocolSnapshot(protocol, event);
+    this.protocol.lastUpdateTimestamp = event.block.timestamp;
   }
 
   /**
@@ -73,6 +84,7 @@ export class ProtocolManager {
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
+    protocol.cumulativeTransactionCount = 0;
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
 
@@ -80,8 +92,12 @@ export class ProtocolManager {
     protocol.lastSnapshotHourID = 0;
     protocol.lastUpdateTimestamp = BIGINT_ZERO;
 
+    protocol.schemaVersion = conf.getVersions().getSchemaVersion();
+    protocol.subgraphVersion = conf.getVersions().getSubgraphVersion();
+    protocol.methodologyVersion = conf.getVersions().getMethodologyVersion();
+
     const proto = new ProtocolManager(protocol, pricer, event);
-    proto.setVersions(conf.getVersions());
+    proto.save();
     return proto;
   }
 
@@ -226,17 +242,6 @@ export class ProtocolManager {
   }
 
   /**
-   * Adds 1 to the cumulativeTransactionCount counter and adds 1 to the counter corresponding the given transaction type.
-   * If you are creating transaction entities from the Account class you won't need to use this method.
-   * @param type {TransactionType} The type of transaction to add.
-   * @see Account
-   */
-  addTransaction(): void {
-    this.protocol.cumulativeTransactionCount += 1;
-    this.save();
-  }
-
-  /**
    * Increases the totalPoolCount counter by the given value.
    * If you are using the PoolManager class you won't need to use this method.
    * @param count {u8} The value to add to the counter.
@@ -244,6 +249,11 @@ export class ProtocolManager {
    */
   addPool(count: u8 = 1): void {
     this.protocol.totalPoolCount += count;
+    this.save();
+  }
+
+  addTransaction(): void {
+    this.protocol.cumulativeTransactionCount += 1;
     this.save();
   }
 }

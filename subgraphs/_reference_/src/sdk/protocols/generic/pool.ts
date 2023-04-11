@@ -1,19 +1,30 @@
-import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
-import { Pool as PoolSchema, Token } from "../../../../generated/schema";
-import { ProtocolManager } from "./protocol";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  RewardTokenType,
-} from "../../util/constants";
-import { exponentToBigDecimal } from "../../util/numbers";
 import {
   sortArrayByReference,
   sortBytesArray,
   updateArrayAtIndex,
 } from "../../util/arrays";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  RewardTokenType,
+} from "../../util/constants";
 import { TokenManager } from "./tokens";
+import { ProtocolManager } from "./protocol";
 import { PoolSnapshot } from "./poolSnapshot";
+import { exponentToBigDecimal } from "../../util/numbers";
+import { Pool as PoolSchema, Token } from "../../../../generated/schema";
+import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
+
+/**
+ * This file contains the PoolManager, which is used to
+ * initialize new pools in the protocol.
+ *
+ * Schema Version:  2.1.1
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+ */
 
 export class PoolManager {
   protocol: ProtocolManager;
@@ -27,13 +38,13 @@ export class PoolManager {
   loadPool(id: Bytes): Pool {
     let entity = PoolSchema.load(id);
     if (entity) {
-      return new Pool(this.protocol, entity, this.tokens);
+      return new Pool(this.protocol, entity, this.tokens, true);
     }
 
     entity = new PoolSchema(id);
     entity.protocol = this.protocol.getBytesID();
 
-    const pool = new Pool(this.protocol, entity, this.tokens);
+    const pool = new Pool(this.protocol, entity, this.tokens, false);
     pool.isInitialized = false;
     return pool;
   }
@@ -50,30 +61,30 @@ export class Pool {
   constructor(
     protocol: ProtocolManager,
     pool: PoolSchema,
-    tokens: TokenManager
+    tokens: TokenManager,
+    isInitialized: bool
   ) {
     this.pool = pool;
     this.protocol = protocol;
     this.tokens = tokens;
-    this.snapshoter = new PoolSnapshot(pool, protocol.event);
+
+    if (isInitialized) {
+      this.snapshoter = new PoolSnapshot(pool, protocol.event);
+      this.pool.lastUpdateTimestamp = protocol.event.block.timestamp;
+      this.save();
+    }
   }
 
   private save(): void {
     this.pool.save();
   }
 
-  private getInputToken(): Token {
-    return this.tokens.getOrCreateToken(
-      Address.fromBytes(this.pool.inputToken)
-    );
-  }
-
   initialize(
     name: string,
     symbol: string,
-    inputToken: Token,
+    inputTokens: Bytes[],
     outputToken: Token | null,
-    isLiquidity: bool | null
+    isLiquidity: bool
   ): void {
     if (this.isInitialized) {
       return;
@@ -83,9 +94,9 @@ export class Pool {
     this.pool.protocol = this.protocol.getBytesID();
     this.pool.name = name;
     this.pool.symbol = symbol;
-    this.pool.inputTokens = [inputToken.id];
+    this.pool.inputTokens = inputTokens;
     this.pool.outputToken = outputToken ? outputToken.id : null;
-    this.pool.isLiquidity = isLiquidity ? isLiquidity : null;
+    this.pool.isLiquidityToken = isLiquidity ? true : false;
     this.pool.createdTimestamp = event.block.timestamp;
     this.pool.createdBlockNumber = event.block.number;
 
@@ -96,8 +107,8 @@ export class Pool {
     this.pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     this.pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
-    this.pool.lastSnapshotDayID = BIGINT_ZERO;
-    this.pool.lastSnapshotHourID = BIGINT_ZERO;
+    this.pool.lastSnapshotDayID = 0;
+    this.pool.lastSnapshotHourID = 0;
     this.pool.lastUpdateTimestamp = BIGINT_ZERO;
     this.save();
 
@@ -108,9 +119,15 @@ export class Pool {
    * Recalculates the total value locked for this pool based on its current input token balance.
    * This function will also update the protocol's total value locked based on the change in this pool's.
    */
-  refreshTotalValueLocked(): void {
-    const tvl = this.getInputTokenAmountPrice(this.pool.inputTokenBalance);
-    this.setTotalValueLocked(tvl);
+  private refreshTotalValueLocked(): void {
+    let totalValueLockedUSD = BIGDECIMAL_ZERO;
+
+    for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
+      const inputTokenBalanceUSD = this.pool.inputTokenBalancesUSD[idx];
+      totalValueLockedUSD = totalValueLockedUSD.plus(inputTokenBalanceUSD);
+    }
+
+    this.setTotalValueLocked(totalValueLockedUSD);
   }
 
   /**
@@ -141,25 +158,12 @@ export class Pool {
    * @param amount the amount of inputToken to convert to USD
    * @returns The converted amount.
    */
-  getInputTokenAmountPrice(amount: BigInt): BigDecimal {
-    const token = this.getInputToken();
+  getInputTokenAmountPrice(token: Token, amount: BigInt): BigDecimal {
     const price = this.protocol.getTokenPricer().getTokenPrice(token);
     token.lastPriceUSD = price;
     token.save();
 
     return amount.divDecimal(exponentToBigDecimal(token.decimals)).times(price);
-  }
-
-  /**
-   * Adds the given amount to the pool's input token balance. It will optionally
-   * update the pool's and protocol's total value locked. If not stated, will default to true.
-   *
-   * @param amount amount to be added to the pool's input token balance.
-   * @param updateMetrics optional parameter to indicate whether to update the pool's and protocol's total value locked.
-   */
-  addInputTokenBalance(amount: BigInt, updateMetrics: boolean = true): void {
-    const newBalance = this.pool.inputTokenBalance.plus(amount);
-    this.setInputTokenBalance(newBalance, updateMetrics);
   }
 
   /**
@@ -169,14 +173,35 @@ export class Pool {
    * @param amount amount to be set as the pool's input token balance.
    * @param updateMetrics optional parameter to indicate whether to update the pool's and protocol's total value locked.
    */
-  setInputTokenBalance(
-    newBalance: BigInt,
+  setInputTokenBalances(
+    newBalances: BigInt[],
     updateMetrics: boolean = true
   ): void {
-    this.pool.inputTokenBalance = newBalance;
+    this.pool.inputTokenBalances = newBalances;
+    this.setInputTokenBalancesUSD();
     if (updateMetrics) {
       this.refreshTotalValueLocked();
     }
+  }
+
+  /**
+   * Sets the pool's input token balance USD by calculating it for each token.
+   */
+  private setInputTokenBalancesUSD(): void {
+    const inputTokenBalancesUSD: BigDecimal[] = [];
+    for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
+      const inputTokenBalance = this.pool.inputTokenBalances[idx];
+      const inputToken = this.tokens.getOrCreateToken(
+        Address.fromBytes(this.pool.inputTokens[idx])
+      );
+
+      const amountUSD = this.getInputTokenAmountPrice(
+        inputToken,
+        inputTokenBalance
+      );
+      inputTokenBalancesUSD.push(amountUSD);
+    }
+    this.pool.inputTokenBalancesUSD = inputTokenBalancesUSD;
   }
 
   getBytesID(): Bytes {
@@ -231,9 +256,13 @@ export class Pool {
    * Convenience method to add revenue denominated in the pool's input token. It converts it to USD
    * under the hood and calls addRevenueUSD.
    */
-  addRevenueNative(protocolSide: BigInt, supplySide: BigInt): void {
+  addRevenueNative(
+    inputToken: Token,
+    protocolSide: BigInt,
+    supplySide: BigInt
+  ): void {
     const pricer = this.protocol.pricer;
-    const inputToken = this.getInputToken();
+
     const pAmountUSD = pricer.getAmountValueUSD(inputToken, protocolSide);
     const sAmountUSD = pricer.getAmountValueUSD(inputToken, supplySide);
     this.addRevenueUSD(pAmountUSD, sAmountUSD);
@@ -323,6 +352,7 @@ export class Pool {
   ): void {
     const rToken = this.tokens.getOrCreateRewardToken(type, token);
     const amountUSD = this.protocol.pricer.getAmountValueUSD(token, amount);
+
     if (!this.pool.rewardTokens) {
       this.pool.rewardTokens = [rToken.id];
       this.pool.rewardTokenEmissionsAmount = [amount];

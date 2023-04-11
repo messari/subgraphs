@@ -1,5 +1,3 @@
-import { Bytes } from "@graphprotocol/graph-ts";
-import { AccountWasActive } from "./account";
 import {
   Protocol as ProtocolSchema,
   FinancialsDailySnapshot,
@@ -7,10 +5,24 @@ import {
   UsageMetricsHourlySnapshot,
   _ActivityHelper,
 } from "../../../../generated/schema";
+import { AccountWasActive } from "./account";
+import { Bytes } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../../util/constants";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
+
+/**
+ * This file contains the ProtocolSnapshot, which is used to
+ * make all of the storage changes that occur in the protocol's
+ * daily and hourly snapshots.
+ *
+ * Schema Version:  2.1.1
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+ */
 
 /**
  * Helper class to manage Financials and Usage snapshots.
@@ -65,7 +77,7 @@ export class ProtocolSnapshot {
   private takeFinancialsDailySnapshot(day: i32): void {
     const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = FinancialsDailySnapshot.load(
-      this.protocol.lastSnapshotDayID
+      Bytes.fromI32(this.protocol.lastSnapshotDayID)
     );
 
     snapshot.day = day;
@@ -115,7 +127,7 @@ export class ProtocolSnapshot {
 
     const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = UsageMetricsDailySnapshot.load(
-      this.protocol.lastSnapshotDayID
+      Bytes.fromI32(this.protocol.lastSnapshotDayID)
     );
 
     snapshot.protocol = this.protocol.id;
@@ -125,14 +137,6 @@ export class ProtocolSnapshot {
 
     // unique users
     snapshot.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
-    snapshot.cumulativeUniqueTransferSenders =
-      this.protocol.cumulativeUniqueTransferSenders;
-    snapshot.cumulativeUniqueTransferReceivers =
-      this.protocol.cumulativeUniqueTransferReceivers;
-    snapshot.cumulativeUniqueLiquidityProviders =
-      this.protocol.cumulativeUniqueLiquidityProviders;
-    snapshot.cumulativeUniqueMessageSenders =
-      this.protocol.cumulativeUniqueMessageSenders;
 
     // daily activity
     snapshot.dailyActiveUsers = activity.dailyActiveUsers;
@@ -164,7 +168,7 @@ export class ProtocolSnapshot {
 
     const snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
     const previousSnapshot = UsageMetricsHourlySnapshot.load(
-      this.protocol.lastSnapshotHourID
+      Bytes.fromI32(this.protocol.lastSnapshotHourID)
     );
 
     snapshot.protocol = this.protocol.id;

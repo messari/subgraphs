@@ -6,6 +6,17 @@ import {
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../../util/constants";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
+/**
+ * This file contains the PoolSnapshot, which is used to
+ * make all of the storage changes that occur in the pool daily and hourly snapshots.
+ *
+ * Schema Version:  2.1.1
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+ */
+
 export class PoolSnapshot {
   pool: PoolSchema;
   event: CustomEventType;
@@ -21,9 +32,7 @@ export class PoolSnapshot {
   }
 
   private takeSnapshots(): void {
-    if (!this.isInitialized()) {
-      return;
-    }
+    if (!this.pool.lastUpdateTimestamp) return;
 
     const snapshotDayID =
       this.pool.lastUpdateTimestamp.toI32() / SECONDS_PER_DAY;
@@ -43,17 +52,13 @@ export class PoolSnapshot {
     }
   }
 
-  private isInitialized(): boolean {
-    return this.pool.lastSnapshotDayID && this.pool.lastSnapshotHourID;
-  }
-
   private takeHourlySnapshot(hour: i32): void {
     const snapshot = new PoolHourlySnapshot(this.pool.id.concatI32(hour));
     const previousSnapshot = PoolHourlySnapshot.load(
       this.pool.id.concatI32(this.pool.lastSnapshotHourID)
     );
 
-    snapshot.hour = hour;
+    snapshot.hours = hour;
     snapshot.protocol = this.pool.protocol;
     snapshot.pool = this.pool.id;
     snapshot.timestamp = this.event.block.timestamp;
@@ -63,10 +68,7 @@ export class PoolSnapshot {
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenBalancesUSD = this.pool.inputTokenBalancesUSD;
-    snapshot.totalLiquidity = this.pool.totalLiquidity;
-    snapshot.totalLiquidityUSD = this.pool.totalLiquidityUSD;
-    snapshot.stakedLiquidity = this.pool.stakedLiquidity;
-    snapshot.rewardTokenEmissions = this.pool.rewardTokenEmissions;
+    snapshot.rewardTokenEmissionsAmount = this.pool.rewardTokenEmissionsAmount;
     snapshot.rewardTokenEmissionsUSD = this.pool.rewardTokenEmissionsUSD;
 
     // revenues
@@ -116,10 +118,7 @@ export class PoolSnapshot {
     snapshot.totalValueLockedUSD = this.pool.totalValueLockedUSD;
     snapshot.inputTokenBalances = this.pool.inputTokenBalances;
     snapshot.inputTokenBalancesUSD = this.pool.inputTokenBalancesUSD;
-    snapshot.totalLiquidity = this.pool.totalLiquidity;
-    snapshot.totalLiquidityUSD = this.pool.totalLiquidityUSD;
-    snapshot.stakedLiquidity = this.pool.stakedLiquidity;
-    snapshot.rewardTokenEmissions = this.pool.rewardTokenEmissions;
+    snapshot.rewardTokenEmissionsAmount = this.pool.rewardTokenEmissionsAmount;
     snapshot.rewardTokenEmissionsUSD = this.pool.rewardTokenEmissionsUSD;
 
     // revenues

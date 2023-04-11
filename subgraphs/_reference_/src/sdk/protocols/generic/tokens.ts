@@ -1,7 +1,17 @@
+import { ProtocolManager } from "./protocol";
 import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../../../generated/schema";
-import { ProtocolManager } from "./protocol";
-import { RewardTokenType } from "../../util/constants";
+import { BIGDECIMAL_ZERO, RewardTokenType } from "../../util/constants";
+
+/**
+ * This file contains the TokenManagerClass, which initializes
+ * token entities.
+ * Schema Version:  2.1.1
+ * SDK Version:     1.0.0
+ * Author(s):
+ *  - @steegecs
+ *  - @shashwatS22
+ */
 
 export interface TokenInitializer {
   getTokenParams(address: Address): TokenParams;
@@ -11,6 +21,12 @@ export class TokenParams {
   name: string;
   symbol: string;
   decimals: i32;
+
+  constructor(name: string, symbol: string, decimals: i32) {
+    this.name = name;
+    this.symbol = symbol;
+    this.decimals = decimals;
+  }
 }
 
 export class TokenManager {
@@ -33,7 +49,9 @@ export class TokenManager {
     token.name = params.name;
     token.symbol = params.symbol;
     token.decimals = params.decimals;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.save();
+
     return token;
   }
 
