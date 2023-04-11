@@ -15,7 +15,10 @@ function getPriorityColor(version: string, versionJSON: string): string {
     const versionChangesEntity = version.split('.');
     const versionChangesJSON = versionJSON.split('.');
 
-    let priorityColor = 'yellow';
+    let priorityColor = 'none';
+    if (versionChangesEntity[2] !== versionChangesJSON[2]) {
+        priorityColor = "yellow";
+    }
     if (versionChangesEntity[1] !== versionChangesJSON[1]) {
         priorityColor = "orange";
     }
