@@ -11,6 +11,19 @@ interface VersionComparisonProps {
     getData: any;
 }
 
+function isVersionMismatch(versionPending: string, versionDecen: string, versionHostedService: string, versionJSON: string): boolean {
+    if (versionPending && versionJSON !== versionPending) {
+        return true;
+    }
+    if (versionDecen && versionJSON !== versionDecen) {
+        return true;
+    }
+    if (versionHostedService && versionJSON !== versionHostedService) {
+        return true;
+    }
+    return false
+}
+
 function getPriorityColor(version: string, versionJSON: string): string {
     const versionChangesEntity = version.split('.');
     const versionChangesJSON = versionJSON.split('.');
@@ -142,7 +155,12 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
         })
 
         const rowsOnTypeTable = slugsListByType[type].map((depo: string) => {
-            if (depo.includes(' (Decentralized)') || subgraphVersionMapping[depo] === slugToVersionJSON[depo]) {
+            const versionPending = subgraphVersionMapping[depo + ' (Pending)'] || ""
+            const versionDecen = decenDepos[depo] || ""
+            const versionHostedService = subgraphVersionMapping[depo] || ""
+            const versionJSON = slugToVersionJSON[depo] || ""
+
+            if (depo.includes(' (Decentralized)') || !isVersionMismatch(versionPending, versionDecen, versionHostedService, versionJSON)) {
                 return null;
             }
             if (subgraphVersionMapping[depo]?.includes('.') && slugToVersionJSON[depo]?.includes('.')) {
@@ -154,17 +172,17 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "left", pointerEvents: "none" }}>
                             {type}
                         </TableCell>
-                        <TableCell onClick={() => window.location.href = subgraphVersionMapping[depo + ' (Pending)'] ? "/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol&version=pending": "#" } sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: getPriorityColor(subgraphVersionMapping[depo + ' (Pending)'] || "", slugToVersionJSON[depo]) }}>
-                            {subgraphVersionMapping[depo + ' (Pending)'] || ""}
+                        <TableCell onClick={() => window.location.href = versionPending ? "/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol&version=pending": "#" } sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: getPriorityColor(versionPending, versionJSON) }}>
+                            {versionPending}
                         </TableCell>
-                        <TableCell onClick={() => window.location.href = decenDepos[depo] ? "/subgraph?endpoint=" + slugToQueryString[depo + " (Decentralized)"] + "&tab=protocol": "#"} sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: getPriorityColor(decenDepos[depo] || "", slugToVersionJSON[depo]) }}>
-                            {decenDepos[depo] || ""}
+                        <TableCell onClick={() => window.location.href = versionDecen ? "/subgraph?endpoint=" + slugToQueryString[depo + " (Decentralized)"] + "&tab=protocol": "#"} sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: getPriorityColor(versionDecen, versionJSON) }}>
+                            {versionDecen}
                         </TableCell>
-                        <TableCell onClick={() => window.location.href = subgraphVersionMapping[depo] ? "/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol": "#"} sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: getPriorityColor(subgraphVersionMapping[depo] || "", slugToVersionJSON[depo]) }}>
-                            {subgraphVersionMapping[depo] || ""}
+                        <TableCell onClick={() => window.location.href = versionHostedService ? "/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol": "#"} sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: getPriorityColor(versionHostedService, versionJSON) }}>
+                            {versionHostedService}
                         </TableCell>
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", pointerEvents: "none" }}>
-                            {slugToVersionJSON[depo] || ""}
+                            {versionJSON}
                         </TableCell>
                     </TableRow>
                 )
@@ -178,16 +196,16 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
                             {type}
                         </TableCell>
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
-                            {subgraphVersionMapping[depo + ' (Pending)'] || ""}
+                            {versionPending}
                         </TableCell>
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
-                            {decenDepos[depo] || ""}
+                            {versionDecen}
                         </TableCell>
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
                             {subgraphVersionMapping[depo]}
                         </TableCell>
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", pointerEvents: "none" }}>
-                            {slugToVersionJSON[depo] || ""}
+                            {versionJSON}
                         </TableCell>
                     </TableRow>
                 )
