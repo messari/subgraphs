@@ -1,0 +1,43 @@
+{
+  "network": "matic",
+  "Bridge": {
+    "address": "0x88DCDC47D2f83a99CF0000FDF667A468bB958a78",
+    "startBlock": 22006535
+  },
+  "OriginalTokenVault": {
+    "address": "0xc1a2D967DfAa6A10f3461bc21864C23C1DD51EeA",
+    "startBlock": 23032419
+  },
+  "OriginalTokenVaultV2": {
+    "address": "0x4C882ec256823eE773B25b414d36F92ef58a7c0C",
+    "startBlock": 28660889
+  },
+  "PeggedTokenBridge": {
+    "address": "0x4d58FDC7d0Ee9b674F49a0ADE11F26C3c9426F7A",
+    "startBlock": 22898562
+  },
+  "PeggedTokenBridgeV2": {
+    "address": "0xb51541df05DE07be38dcfc4a80c05389A54502BB",
+    "startBlock": 28462552
+  },
+  "FarmingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 26901206
+  },
+  "Staking": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 26901206
+  },
+  "StakingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 26901206
+  },
+  "MessageBus": {
+    "address": "0xaFDb9C40C7144022811F034EE07Ce2E110093fe6",
+    "startBlock": 26901206
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 14848861
+}
