@@ -5,14 +5,18 @@ import {
 } from "../../sdk/protocols/bridge/enums";
 import { Address, log, ethereum, Bytes, BigInt } from "@graphprotocol/graph-ts";
 import {
+  DepositInitiated,
   TokenGateway,
   WithdrawalFinalized,
-  DepositInitiated,
 } from "../../../generated/ERC20Gateway/TokenGateway";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
 import { Network } from "../../sdk/util/constants";
 import { ethSideConf, Pricer, TokenInit } from "../../common/utils";
 import { _ERC20 } from "../../../generated/ERC20Gateway/_ERC20";
+
+// ###################################################################################################
+// ################################# Transfer Ins ####################################################
+// ###################################################################################################
 
 export function handleTransferIn3pGateway(event: WithdrawalFinalized): void {
   // build params
@@ -120,7 +124,7 @@ export function handleTransferIn(event: WithdrawalFinalized): void {
 }
 
 // ###################################################################################################
-// ###################################################################################################
+// ############################### Transfer Outs #####################################################
 // ###################################################################################################
 
 export function handleTransferOut3pGateway(event: DepositInitiated): void {
@@ -225,6 +229,21 @@ export function handleTransferOut(event: DepositInitiated): void {
     log.info("calculate token balance owned by bridge contract reverted", []);
   } else {
     inputTokenBalance = inputTokenBalanceResult.value;
+    if (
+      event.params.l1Token.toHexString() ==
+      "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"
+    ) {
+      log.error(
+        "tx: {}, timestamp: {}, block: {}, event.address: {}, input token balance:{}",
+        [
+          event.transaction.hash.toHexString(),
+          event.block.timestamp.toString(),
+          event.block.number.toString(),
+          event.address.toHexString(),
+          inputTokenBalance.toString(),
+        ]
+      );
+    }
   }
   pool.setInputTokenBalance(inputTokenBalance!);
 }

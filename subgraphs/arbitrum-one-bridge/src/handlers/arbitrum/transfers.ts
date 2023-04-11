@@ -14,6 +14,10 @@ import { arbSideConf, Pricer, TokenInit } from "../../common/utils";
 import { Network } from "../../sdk/util/constants";
 import { _ERC20 } from "../../../generated/ERC20Gateway/_ERC20";
 
+// ###################################################################################################
+// ################################# Transfer Ins ####################################################
+// ###################################################################################################
+
 export function handleTransferIn3pGateway(event: DepositFinalized): void {
   const l1Token = new ethereum.EventParam("l1token", event.parameters[0].value);
   const _from = new ethereum.EventParam("_from", event.parameters[1].value);
@@ -105,14 +109,18 @@ export function handleTransferIn(event: DepositFinalized): void {
   pool.setInputTokenBalance(inputTokenBalance!);
 }
 
-export function handleTransferOut3pGateway(event: DepositFinalized): void {
+// ###################################################################################################
+// ############################### Transfer Outs #####################################################
+// ###################################################################################################
+
+export function handleTransferOut3pGateway(event: WithdrawalInitiated): void {
   const l1Token = new ethereum.EventParam("l1token", event.parameters[0].value);
   const _from = new ethereum.EventParam("_from", event.parameters[1].value);
   const _to = new ethereum.EventParam("_to", event.parameters[2].value);
   const _amount = new ethereum.EventParam("_amount", event.parameters[3].value);
 
   const params: ethereum.EventParam[] = [l1Token, _from, _to, _amount];
-  const depositFinalized = new DepositFinalized(
+  const withdrawalInitiated = new WithdrawalInitiated(
     event.address,
     event.logIndex,
     event.transactionLogIndex,
@@ -122,10 +130,10 @@ export function handleTransferOut3pGateway(event: DepositFinalized): void {
     params,
     event.receipt
   );
-  handleTransferOut(depositFinalized);
+  handleTransferOut(withdrawalInitiated);
 }
 
-export function handleTransferOut(event: DepositFinalized): void {
+export function handleTransferOut(event: WithdrawalInitiated): void {
   // -- SDK
 
   const sdk = SDK.initialize(
