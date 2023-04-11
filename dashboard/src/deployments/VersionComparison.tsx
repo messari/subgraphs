@@ -11,6 +11,20 @@ interface VersionComparisonProps {
     getData: any;
 }
 
+function getPriorityColor(version: string, versionJSON: string): string {
+    const versionChangesEntity = version.split('.');
+    const versionChangesJSON = versionJSON.split('.');
+
+    let priorityColor = 'yellow';
+    if (versionChangesEntity[1] !== versionChangesJSON[1]) {
+        priorityColor = "orange";
+    }
+    if (versionChangesEntity[0] !== versionChangesJSON[0]) {
+        priorityColor = '#B8301C';
+    }
+    return priorityColor
+}
+
 function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps) {
     ChartJS.register(...registerables);
     ChartJS.register(PointElement);
@@ -129,33 +143,24 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
                 return null;
             }
             if (subgraphVersionMapping[depo]?.includes('.') && slugToVersionJSON[depo]?.includes('.')) {
-                const versionChangesEntity = subgraphVersionMapping[depo].split('.');
-                const versionChangesJSON = slugToVersionJSON[depo].split('.');
-                let priorityColor = 'yellow';
-                if (versionChangesEntity[1] !== versionChangesJSON[1]) {
-                    priorityColor = "orange";
-                }
-                if (versionChangesEntity[0] !== versionChangesJSON[0]) {
-                    priorityColor = '#B8301C';
-                }
                 return (
-                    <TableRow onClick={() => window.location.href = "https://subgraphs.xyz/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol"} key={depo + "RowComp"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
-                        <TableCell sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px" }}>
+                    <TableRow key={depo + "RowComp"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                        <TableCell sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px", pointerEvents: "none" }}>
                             {depo}
                         </TableCell>
-                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "left" }}>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "left", pointerEvents: "none" }}>
                             {type}
                         </TableCell>
-                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: priorityColor }}>
+                        <TableCell onClick={() => window.location.href = subgraphVersionMapping[depo + ' (Pending)'] ? "/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol&version=pending": "#" } sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: getPriorityColor(subgraphVersionMapping[depo + ' (Pending)'] || "", slugToVersionJSON[depo]) }}>
                             {subgraphVersionMapping[depo + ' (Pending)'] || ""}
                         </TableCell>
-                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: priorityColor }}>
+                        <TableCell onClick={() => window.location.href = decenDepos[depo] ? "/subgraph?endpoint=" + slugToQueryString[depo + " (Decentralized)"] + "&tab=protocol": "#"} sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: getPriorityColor(decenDepos[depo] || "", slugToVersionJSON[depo]) }}>
                             {decenDepos[depo] || ""}
                         </TableCell>
-                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: priorityColor }}>
+                        <TableCell onClick={() => window.location.href = subgraphVersionMapping[depo] ? "/subgraph?endpoint=" + slugToQueryString[depo] + "&tab=protocol": "#"} sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: getPriorityColor(subgraphVersionMapping[depo] || "", slugToVersionJSON[depo]) }}>
                             {subgraphVersionMapping[depo] || ""}
                         </TableCell>
-                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: priorityColor }}>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", pointerEvents: "none" }}>
                             {slugToVersionJSON[depo] || ""}
                         </TableCell>
                     </TableRow>
@@ -166,7 +171,7 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
                         <TableCell sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px" }}>
                             {depo}
                         </TableCell>
-                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "left" }}>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "left", pointerEvents: "none" }}>
                             {type}
                         </TableCell>
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
@@ -178,7 +183,7 @@ function VersionComparison({ protocolsToQuery, getData }: VersionComparisonProps
                         <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
                             {subgraphVersionMapping[depo]}
                         </TableCell>
-                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", color: "#B8301C" }}>
+                        <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", pointerEvents: "none" }}>
                             {slugToVersionJSON[depo] || ""}
                         </TableCell>
                     </TableRow>
