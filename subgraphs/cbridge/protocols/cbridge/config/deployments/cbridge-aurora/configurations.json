@@ -1,0 +1,43 @@
+{
+  "network": "aurora",
+  "Bridge": {
+    "address": "0x841ce48F9446C8E281D3F1444cB859b4A6D0738C",
+    "startBlock": 56081937
+  },
+  "OriginalTokenVault": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 88533813
+  },
+  "OriginalTokenVaultV2": {
+    "address": "0xbCfeF6Bb4597e724D720735d32A9249E0640aA11",
+    "startBlock": 64459966
+  },
+  "PeggedTokenBridge": {
+    "address": "0x4384d5a9D7354C65cE3aee411337bd40493Ad1bC",
+    "startBlock": 56665943
+  },
+  "PeggedTokenBridgeV2": {
+    "address": "0xbdd2739AE69A054895Be33A22b2D2ed71a1DE778",
+    "startBlock": 66794909
+  },
+  "FarmingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 88533813
+  },
+  "Staking": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 88533813
+  },
+  "StakingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 88533813
+  },
+  "MessageBus": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 88533813
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 14848861
+}

@@ -1,0 +1,43 @@
+{
+  "network": "avalanche",
+  "Bridge": {
+    "address": "0xef3c714c9425a8F3697A9C969Dc1af30ba82e5d4",
+    "startBlock": 7660096
+  },
+  "OriginalTokenVault": {
+    "address": "0x5427FEFA711Eff984124bFBB1AB6fbf5E3DA1820",
+    "startBlock": 8670991
+  },
+  "OriginalTokenVaultV2": {
+    "address": "0xb51541df05DE07be38dcfc4a80c05389A54502BB",
+    "startBlock": 14545380
+  },
+  "PeggedTokenBridge": {
+    "address": "0x88DCDC47D2f83a99CF0000FDF667A468bB958a78",
+    "startBlock": 8647239
+  },
+  "PeggedTokenBridgeV2": {
+    "address": "0xb774C6f82d1d5dBD36894762330809e512feD195",
+    "startBlock": 13702682
+  },
+  "FarmingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 13162688
+  },
+  "Staking": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 13162688
+  },
+  "StakingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 13162688
+  },
+  "MessageBus": {
+    "address": "0x5a926eeeafc4d217add17e9641e8ce23cd01ad57",
+    "startBlock": 13162688
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 14848861
+}
