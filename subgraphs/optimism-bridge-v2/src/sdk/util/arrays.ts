@@ -1,4 +1,4 @@
-import { Bytes } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 // A function which given 3 arrays of arbitrary types of the same length,
 // where the first one holds the reference order, the second one holds the same elements
@@ -47,4 +47,19 @@ export function updateArrayAtIndex<T>(x: T[], item: T, index: i32): T[] {
     i += 1;
   }
   return retval;
+}
+
+export function subtractTwoBigIntArrays(a: BigInt[], b: BigInt[]): BigInt[] {
+  if (a.length != b.length) return [];
+
+  return a.map<BigInt>((valueA, indexA) => valueA.minus(b[indexA]));
+}
+
+export function subtractTwoBigDecimalArrays(
+  a: BigDecimal[],
+  b: BigDecimal[]
+): BigDecimal[] {
+  if (a.length != b.length) return [];
+
+  return a.map<BigDecimal>((valueA, indexA) => valueA.minus(b[indexA]));
 }

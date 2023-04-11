@@ -1,0 +1,163 @@
+# Example Queries
+# Subgraph Schema: DEX AMM (Extended)
+# Version: 3.0.3
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+
+{
+  # View the top 10 liquidity pools by total value locked
+  liquidityPools(
+    orderBy: totalValueLockedUSD
+    orderDirection: desc
+    first: 10
+  ) {
+    id
+    totalValueLockedUSD
+    inputTokens {
+      id
+      name
+    }
+  }
+  # View recent activity in a liquidity pool (Works for any liquidity pool). Also, works with hourly snapshots if you change `day` field to `hour`.
+  liquidityPoolDailySnapshots(
+    where: { pool: "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed" }
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    id
+    day
+    dailyVolumesUSD
+    inputTokenBalancesUSD
+    dailyDepositCount
+    dailyWithdrawCount
+    dailySwapCount
+    blockNumber
+    timestamp
+  }
+  # View tick data for calculating liquidity distributions. May need to paginate for more ticks.
+  ticks(
+    first: 1000
+    where: { pool: "0x4585fe77225b41b697c938b018e2ac67ac5a20c0" }
+  ) {
+    id
+    pool {
+      id
+    }
+    index
+    liquidityNet
+    liquidityGross
+  }
+  # View positions with the most liquidity in a pool (Works for any liquidity pool)
+  positions(
+    where: { pool: "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed" }
+    orderBy: liquidityUSD
+    orderDirection: desc
+  ) {
+    id
+    account {
+      id
+    }
+    tickLower {
+      index
+    }
+    tickUpper {
+      index
+    }
+    liquidity
+    depositCount
+    cumulativeDepositUSD
+    withdrawCount
+    cumulativeWithdrawUSD
+  }
+  # (Time Travel) View the price of a token at a specific block
+  tokens(
+    where: { id: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2" }
+    block: { number: 16683403 }
+  ) {
+    id
+    name
+    lastPriceUSD
+  }
+  # Accounts with the most recorded swaps
+  accounts(orderBy: swapCount, orderDirection: desc) {
+    id
+    swapCount
+  }
+  # View the top 10 deposits to a liquidity pool (Works for withdraws as well)
+  deposits(
+    orderBy: amountUSD
+    orderDirection: desc
+    where: { pool: "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed" }
+    first: 10
+  ) {
+    id
+    pool {
+      id
+    }
+    inputTokens {
+      id
+      name
+    }
+    amountUSD
+    inputTokenAmounts
+    blockNumber
+    timestamp
+  }
+  # View the top 10 swaps in a liquidity pool
+  swaps(
+    orderBy: amountInUSD
+    orderDirection: desc
+    where: { pool: "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed" }
+    first: 10
+  ) {
+    id
+    pool {
+      id
+    }
+    tokenIn {
+      id
+      name
+    }
+    amountIn
+    amountInUSD
+    tokenOut {
+      id
+      name
+    }
+    amountOut
+    amountOutUSD
+    blockNumber
+    timestamp
+  }
+  # View usage activity of the last 10 days. Can modify for hourly snapshots.
+  usageMetricsDailySnapshots(
+    orderBy: timestamp
+    orderDirection: desc
+    first: 10
+  ) {
+    id
+    day
+    dailyActiveUsers
+    cumulativeUniqueUsers
+    dailyTransactionCount
+    totalPoolCount
+    dailyDepositCount
+    dailyWithdrawCount
+    dailySwapCount
+  }
+  # View financial activity of the last 10 days.
+  financialsDailySnapshots(
+    orderBy: timestamp
+    orderDirection: desc
+    first: 10
+  ) {
+    id
+    day
+    totalValueLockedUSD
+    dailyVolumeUSD
+    cumulativeVolumeUSD
+    dailySupplySideRevenueUSD
+    cumulativeSupplySideRevenueUSD
+    dailyProtocolSideRevenueUSD
+    cumulativeProtocolSideRevenueUSD
+  }
+}

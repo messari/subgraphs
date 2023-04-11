@@ -19,7 +19,7 @@ export async function errorNotification(error, channelId = process.env.CHANNEL_I
 
 export async function postAlert(message) {
     try {
-        const baseURL = "https://discordapp.com/api/channels/1019063880040861806/messages";
+        const baseURL = "https://discordapp.com/api/channels/" + process.env.DEBUG_CHANNEL + "/messages";
         const headers = {
             "Authorization": "Bot " + process.env.BOT_TOKEN,
             "Content-Type": "application/json",
@@ -145,7 +145,7 @@ export async function clearAllThreads(msgs, deleteMsgsFromBeforeTS) {
     let useMsgs = msgs.slice(0, 5);
     const newMsgsArray = [...msgs.slice(5)];
     try {
-        await Promise.allSettled(useMsgs.map(msg => clearThread(deleteMsgsFromBeforeTS, msg.id)));
+        await Promise.allSettled(useMsgs.map(msg => clearThread(deleteMsgsFromBeforeTS, msg.channel_id)));
     } catch (err) {
         errorNotification("ERROR LOCATION 23 " + err.message);
     }
@@ -261,10 +261,10 @@ export async function startProtocolThread(subject, base, channelId = process.env
     }
 
     let subjectStr = subject;
-    if (base === '') {
+    if (base !== '') {
         subjectStr += ' (Base: ' + base + ')';
     }
-    const postJSON = JSON.stringify({ "content": subjectStr });
+    let postJSON = JSON.stringify({ "content": subjectStr });
     let msgId = "";
     try {
         const res = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
