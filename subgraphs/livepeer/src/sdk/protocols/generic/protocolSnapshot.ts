@@ -17,7 +17,7 @@ const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
  * make all of the storage changes that occur in the protocol's
  * daily and hourly snapshots.
  *
- * Schema Version:  2.1.0
+ * Schema Version:  2.1.1
  * SDK Version:     1.0.0
  * Author(s):
  *  - @steegecs

@@ -6,7 +6,7 @@ import { BIGDECIMAL_ZERO, RewardTokenType } from "../../util/constants";
 /**
  * This file contains the TokenManagerClass, which initializes
  * token entities.
- * Schema Version:  2.1.0
+ * Schema Version:  2.1.1
  * SDK Version:     1.0.0
  * Author(s):
  *  - @steegecs

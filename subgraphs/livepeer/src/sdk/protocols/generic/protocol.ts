@@ -18,7 +18,7 @@ import { Versions } from "../../../../../../deployment/context/interface";
  * This file contains the ProtocolManager class, which is used to
  * make all of the storage changes that occur in a protocol.
  *
- * Schema Version:  2.1.0
+ * Schema Version:  2.1.1
  * SDK Version:     1.0.0
  * Author(s):
  *  - @steegecs

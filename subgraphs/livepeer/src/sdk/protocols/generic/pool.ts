@@ -19,7 +19,7 @@ import { Bytes, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
  * This file contains the PoolManager, which is used to
  * initialize new pools in the protocol.
  *
- * Schema Version:  2.1.0
+ * Schema Version:  2.1.1
  * SDK Version:     1.0.0
  * Author(s):
  *  - @steegecs

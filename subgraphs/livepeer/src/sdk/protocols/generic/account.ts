@@ -13,7 +13,7 @@ import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
  *  - Creating a new Account
  *  - Updating an existing Account
  *
- * Schema Version:  2.1.0
+ * Schema Version:  2.1.1
  * SDK Version:     1.0.0
  * Author(s):
  *  - @steegecs
