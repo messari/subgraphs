@@ -22,10 +22,11 @@ import {
  * This file contains the PoolManager, which is used to
  * initialize new pools in the protocol.
  *
- * Schema Version:  1.2.0
- * SDK Version:     1.0.0
+ * Schema Version:  1.2.2
+ * SDK Version:     1.0.1
  * Author(s):
  *  - @harsh9200
+ *  - @dhruv-chauhan
  */
 
 export class PoolManager {
