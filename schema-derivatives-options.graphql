@@ -462,6 +462,9 @@ type FinancialsDailySnapshot @entity(immutable: true) {
   " All historical trade notional volume of underylying assets in USD "
   cumulativeVolumeUSD: BigDecimal!
 
+  " Current Collateral assets in USD in this pool that was used for trading, amount taken at snapshot"
+  collateralUsedUSD: BigDecimal
+
   " Daily volume of Collateral assets in USD in this pool that was used for trading"
   dailyCollateralVolumeUSD: BigDecimal
 
@@ -895,6 +898,9 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
   " Daily trade notional volume occurred when contract created, in USD "
   dailyVolumeUSD: BigDecimal!
+
+  " Current Collateral assets in USD in this pool that was used for trading, amount taken at snapshot"
+  collateralUsedUSD: BigDecimal
 
   " Daily volume of collateral when contract created, in USD, that was used for trading "
   dailyCollateralVolumeUSD: BigDecimal
