@@ -1,0 +1,90 @@
+specVersion: 0.0.5
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{subgraphId}}
+  block: {{graftStartBlock}}
+{{/graftEnabled}}
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: BondingManager
+    network: {{network}}
+    source:
+      startBlock: {{bondingManagerStartBlock}}
+      address: "{{bondingManagerAddress}}"
+      abi: BondingManager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/bondingManager.ts
+      abis:
+        - name: BondingManager
+          file: ./abis/BondingManager.json
+        - name: RoundsManager
+          file: ./abis/RoundsManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: Minter
+          file: ./abis/Minter.json
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
+      entities:
+          - Pool
+          - Protocol
+      eventHandlers:
+        - event: TranscoderUpdate(indexed address,uint256,uint256)
+          handler: handleTranscoderUpdate
+        - event: TranscoderActivated(indexed address,uint256)
+          handler: handleTranscoderActivated
+        - event: TranscoderDeactivated(indexed address,uint256)
+          handler: handleTranscoderDeactivated
+        - event: EarningsClaimed(indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleEarningsClaimed
+        - event: Bond(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleBond
+        - event: Unbond(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleUnbond
+        - event: Rebond(indexed address,indexed address,uint256,uint256)
+          handler: handleRebond
+        - event: WithdrawStake(indexed address,uint256,uint256,uint256)
+          handler: handleWithdrawStake
+        - event: Reward(indexed address,uint256)
+          handler: handleReward
+        - event: WithdrawFees(indexed address,address,uint256)
+          handler: handleWithdrawFees
+        - event: TransferBond(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleTransferBond
+  - kind: ethereum/contract
+    name: TicketBroker
+    network: {{network}}
+    source:
+      startBlock: {{ticketBrokerStartBlock}}
+      address: "{{ticketBrokerAddress}}"
+      abi: TicketBroker
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/ticketBroker.ts
+      abis:
+        - name: BondingManager
+          file: ./abis/BondingManager.json
+        - name: TicketBroker
+          file: ./abis/TicketBroker.json
+        - name: RoundsManager
+          file: ./abis/RoundsManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: Minter
+          file: ./abis/Minter.json    
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json 
+      entities:
+        - Protocol
+      eventHandlers:
+        - event: WinningTicketRedeemed(indexed address,indexed address,uint256,uint256,uint256,uint256,bytes)
+          handler: handleWinningTicketRedeemed
