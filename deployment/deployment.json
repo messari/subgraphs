@@ -7236,7 +7236,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
         }
       },
       "across-v2-optimism": {
@@ -7258,7 +7258,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
         }
       },
       "across-v2-boba": {
@@ -7280,7 +7280,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
         }
       },
       "across-v2-arbitrum": {
@@ -7302,7 +7302,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
         }
       },
       "across-v2-polygon": {
@@ -7324,7 +7324,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
         }
       }
     }
