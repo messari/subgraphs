@@ -150,21 +150,29 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   }, [protocolSchemaData, overlayDeploymentURL])
 
   // By default, set the schema version to the user selected. If user has not selected, go to the version on the protocol entity
-  let schemaVersion = subgraphToQuery.version;
-  if (protocolSchemaData?.protocols[0]?.schemaVersion) {
-    schemaVersion = protocolSchemaData.protocols[0].schemaVersion;
-  }
   let protocolIdString = searchParams.get("protocolId");
   let protocolIdToUse: string = "";
   if (typeof protocolIdString === "string") {
     protocolIdToUse = protocolIdString;
   }
+
   let protocolType = "N/A";
+  let schemaVersion = subgraphToQuery.version;
+  let slug = ""
+  let networkStr = ""
   let entityError = null;
   if (protocolSchemaData?.protocols?.length > 0) {
-    protocolType = protocolSchemaData?.protocols[0]?.type;
-    if (protocolSchemaData.protocols[0]?.id && !protocolIdToUse) {
+    if (protocolSchemaData.protocols[0].id && !protocolIdToUse) {
       protocolIdToUse = protocolSchemaData.protocols[0]?.id;
+    }
+
+    protocolType = protocolSchemaData.protocols[0].type;
+    schemaVersion = protocolSchemaData.protocols[0].schemaVersion;
+    slug = protocolSchemaData.protocols[0].slug;
+    networkStr = protocolSchemaData.protocols[0].network.toLowerCase().replace("_", "-").replace("mainnet", "ethereum").replace("matic", "polygon");
+
+    if (!subgraphName) {
+      subgraphName = slug.concat("-").concat(networkStr)
     }
   } else if (!protocolSchemaQueryLoading) {
     entityError = new ApolloError({
