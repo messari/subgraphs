@@ -1,4 +1,4 @@
-import { BigDecimal, Bytes, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { LiquidityPool, Tick } from "../../../generated/schema";
 import {
   BIGDECIMAL_ONE,

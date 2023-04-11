@@ -1,4 +1,4 @@
-import { Address, ethereum, log, BigInt } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { BIGINT_TWO, BIGINT_ZERO, INT_ONE, INT_ZERO } from "../constants";
 import { Pool } from "../../../generated/Factory/Pool";
 import { TickLens } from "../../../generated/Factory/TickLens";
