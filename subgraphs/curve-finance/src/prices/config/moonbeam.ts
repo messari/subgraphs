@@ -19,6 +19,10 @@ export const CURVE_REGISTRY_ADDRESSES = [
 ///////////////////////////////////////////////////////////////////////////
 export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
   ContractInfo.set(
+    Address.fromString("0x96b244391D98B62D19aE89b1A4dCcf0fc56970C7"), // BeamSwap
+    BigInt.fromI32(199158)
+  ),
+  ContractInfo.set(
     Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // SushiSwap
     BigInt.fromI32(503734)
   ),
@@ -38,7 +42,15 @@ export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 //////////////////////////// HARDCODED STABLES ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const HARDCODED_STABLES: Address[] = [];
+export const HARDCODED_STABLES: Address[] = [
+  Address.fromString("0x14df360966a1c4582d2b18edbdae432ea0a27575"), // Axelar Wrapped DAI
+  Address.fromString("0xca01a1d0993565291051daff390892518acfad3a"), // Axelar Wrapped USDC
+  Address.fromString("0xdfd74af792bc6d45d1803f425ce62dd16f8ae038"), // Axelar Wrapped USDT
+  Address.fromString("0x765277eebeca2e31912c9946eae1021199b39c61"), // DAI
+  Address.fromString("0x81ecac0d6be0550a00ff064a4f9dd2400585fe9c"), // USDT  (Celer)
+  Address.fromString("0x8e70cd5b4ff3f62659049e74b6649c6603a0e594"), // USDT
+  Address.fromString("0xc234a67a4f840e61ade794be47de455361b52413"), // DAI
+];
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
