@@ -75,6 +75,7 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0x943df430f7f9f734ec7625b561dc5e17a173adf8"), // BLizz MIM
   Address.fromString("0x025ab35ff6abcca56d57475249baaeae08419039"), // Arable USD
   Address.fromString("0x28690ec942671ac8d9bc442b667ec338ede6dfd3"), // deBridge USD Coin
+  Address.fromString("0x1337bedc9d22ecbe766df105c9623922a27963ec"), // av3CRV
 ];
 
 ///////////////////////////////////////////////////////////////////////////
