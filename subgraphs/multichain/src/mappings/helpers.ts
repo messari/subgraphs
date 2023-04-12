@@ -15,9 +15,13 @@ import {
   TransferType,
   BridgePoolType,
   ZERO_ADDRESS,
-  NetworkByID,
+  NETWORK_BY_ID,
   Network,
-  InverseEventType,
+  INVERSE_EVENT_TYPE,
+  BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_FOURTY_FIVE,
+  BIGDECIMAL_FIFTY_FIVE,
+  SnapshotFrequency,
 } from "../common/constants";
 import { getOrCreateAccount } from "../common/getters";
 import { bigIntToBigDecimal } from "../common/utils/numbers";
@@ -238,10 +242,10 @@ export function updateRevenue(
   feeUSD: BigDecimal
 ): void {
   const protocolSideRevenueUSD = feeUSD.times(
-    BigDecimal.fromString("55").div(BigDecimal.fromString("100"))
+    BIGDECIMAL_FIFTY_FIVE.div(BIGDECIMAL_HUNDRED)
   );
   const supplySideRevenueUSD = feeUSD.times(
-    BigDecimal.fromString("45").div(BigDecimal.fromString("100"))
+    BIGDECIMAL_FOURTY_FIVE.div(BIGDECIMAL_HUNDRED)
   );
 
   protocol.cumulativeSupplySideRevenueUSD =
@@ -426,7 +430,7 @@ export function updateUsageMetrics(
   const dailyActiveAccountID = accountAddr
     .toHexString()
     .concat("-")
-    .concat("daily")
+    .concat(SnapshotFrequency.DAILY)
     .concat("-")
     .concat(dayId)
     .concat("-")
@@ -440,11 +444,11 @@ export function updateUsageMetrics(
       Bytes.fromUTF8(dailyActiveAccountID)
     );
 
-    const inverseEventType = InverseEventType.get(eventType)!;
+    const inverseEventType = INVERSE_EVENT_TYPE.get(eventType)!;
     const inverseDailyActiveAccountID = accountAddr
       .toHexString()
       .concat("-")
-      .concat("daily")
+      .concat(SnapshotFrequency.DAILY)
       .concat("-")
       .concat(dayId)
       .concat("-")
@@ -469,7 +473,7 @@ export function updateUsageMetrics(
   const hourlyActiveAccountID = accountAddr
     .toHexString()
     .concat("-")
-    .concat("hourly")
+    .concat(SnapshotFrequency.HOURLY)
     .concat("-")
     .concat(hourId)
     .concat("-")
@@ -483,11 +487,11 @@ export function updateUsageMetrics(
       Bytes.fromUTF8(hourlyActiveAccountID)
     );
 
-    const inverseEventType = InverseEventType.get(eventType)!;
+    const inverseEventType = INVERSE_EVENT_TYPE.get(eventType)!;
     const inverseHourlyActiveAccountID = accountAddr
       .toHexString()
       .concat("-")
-      .concat("hourly")
+      .concat(SnapshotFrequency.HOURLY)
       .concat("-")
       .concat(hourId)
       .concat("-")
@@ -516,8 +520,8 @@ export function updateUsageMetrics(
   usageMetricsDaily.totalSupportedTokenCount =
     protocol.totalSupportedTokenCount;
 
-  const network = NetworkByID.get(crosschainID.toString())
-    ? NetworkByID.get(crosschainID.toString())!
+  const network = NETWORK_BY_ID.get(crosschainID.toString())
+    ? NETWORK_BY_ID.get(crosschainID.toString())!
     : Network.UNKNOWN_NETWORK;
   protocol.supportedNetworks = arrayUnique(
     addToArrayAtIndex(protocol.supportedNetworks, network)

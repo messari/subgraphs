@@ -3,7 +3,7 @@
 //   "crosschainTokenAddress",
 //   "swapFeeRate,minFee,maxFee"
 // ], }
-export const BridgeAPIResponse = `{
+export const BRIDGE_API_RESPONSE = `{
 "0x173fd7434b8b50df08e3298f173487ebdb35fd14": [
 	"1",
 	"0xdbdb4d16eda451d0503b854cf79d55697f90c8df",
@@ -61,7 +61,7 @@ export const BridgeAPIResponse = `{
 //   "swapFeeRate,minFee,maxFee"
 // ], }
 
-export const RouterAPIResponse = `{
+export const ROUTER_API_RESPONSE = `{
 "0xe6cdd3a275c976bca5d3de4f96c7514b899f0434:1284": [
 	"0x7ea2be2df7ba6e54b1a9c70676f668455e329d29",
 	"0.1,883,176590"

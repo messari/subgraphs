@@ -27,6 +27,9 @@ import {
   BIGDECIMAL_ZERO,
   BridgePoolType,
   BridgeType,
+  CONTEXT_KEY_CHAINID,
+  CONTEXT_KEY_CROSSCHAINID,
+  CONTEXT_KEY_POOLID,
   CrosschainTokenType,
   EventType,
   ZERO_ADDRESS,
@@ -672,9 +675,11 @@ export function handleTransfer(event: Transfer): void {
     event.params.to == Address.fromString(ZERO_ADDRESS)
   ) {
     const context = dataSource.context();
-    const poolID = context.getString("poolID");
-    const chainID = BigInt.fromString(context.getString("chainID"));
-    const crosschainID = BigInt.fromString(context.getString("crosschainID"));
+    const poolID = context.getString(CONTEXT_KEY_POOLID);
+    const chainID = BigInt.fromString(context.getString(CONTEXT_KEY_CHAINID));
+    const crosschainID = BigInt.fromString(
+      context.getString(CONTEXT_KEY_CROSSCHAINID)
+    );
 
     const protocol = getOrCreateProtocol();
     const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(
