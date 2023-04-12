@@ -1043,6 +1043,9 @@ type Market @entity {
 
   " Aux: Timestamp of the last time rewards were calculated for this market. "
   _lastRewardsUpdated: BigInt
+
+  " proportion of liquidation bonus (liquidation penalty) going to the protocol "
+  _liquidationProtocolFee: BigDecimal
 }
 
 #################################

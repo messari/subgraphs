@@ -27,6 +27,7 @@ import {
   RAY_OFFSET,
   ZERO_ADDRESS,
   BIGINT_ONE,
+  BIGDECIMAL_ONE,
 } from "./constants";
 import {
   InterestRateSide,
@@ -176,9 +177,9 @@ export function _handleCollateralConfigurationChanged(
   // The liquidation bonus value is equal to the liquidation penalty, the naming is a matter of which side of the liquidation a user is on
   // The liquidationBonus parameter comes out as above 100%, represented by a 5 digit integer over 10000 (100%).
   // To extract the expected value in the liquidationPenalty field: convert to BigDecimal, subtract by 10000 and divide by 100
-  market.liquidationPenalty = liquidationPenalty.toBigDecimal();
-  if (market.liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
-    market.liquidationPenalty = market.liquidationPenalty
+  const bdLiquidationPenalty = liquidationPenalty.toBigDecimal();
+  if (bdLiquidationPenalty.gt(exponentToBigDecimal(INT_FOUR))) {
+    market.liquidationPenalty = bdLiquidationPenalty
       .minus(exponentToBigDecimal(INT_FOUR))
       .div(BIGDECIMAL_HUNDRED);
   }
@@ -248,7 +249,7 @@ export function _handleReserveFactorChanged(
 ): void {
   const market = Market.load(marketId);
   if (!market) {
-    log.warning("[_handleReserveDeactivated] Market not found {}", [
+    log.warning("[_handleReserveFactorChanged] Market {} not found", [
       marketId.toHexString(),
     ]);
     return;
@@ -257,6 +258,28 @@ export function _handleReserveFactorChanged(
   market.reserveFactor = reserveFactor
     .toBigDecimal()
     .div(exponentToBigDecimal(INT_TWO));
+  market.save();
+}
+
+export function _handleLiquidationProtocolFeeChanged(
+  marketId: Address,
+  liquidationProtocolFee: BigInt
+): void {
+  const market = Market.load(marketId);
+  if (!market) {
+    log.warning("[_handleLiquidationProtocolFeeChanged] Market {} not found", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  market._liquidationProtocolFee = liquidationProtocolFee
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
+  log.info(
+    "[LiquidationProtocolFeeChanged]market {} _liquidationProtocolFee={}",
+    [marketId.toHexString(), liquidationProtocolFee.toString()]
+  );
   market.save();
 }
 
@@ -650,7 +673,8 @@ export function _handleLiquidate(
   liquidator: Address,
   liquidatee: Address, // account liquidated
   debtTokenId: Address, // token repaid to cover debt,
-  debtToCover: BigInt // the amount of debt repaid by liquidator
+  debtToCover: BigInt, // the amount of debt repaid by liquidator
+  createLiquidatorPosition: bool = false
 ): void {
   const market = Market.load(marketId);
   if (!market) {
@@ -700,6 +724,7 @@ export function _handleLiquidate(
   );
   const collateralBalance = getCollateralBalance(market, liquidatee);
   const debtBalance = getBorrowBalance(debtTokenMarket, liquidatee);
+
   manager.createLiquidate(
     marketId,
     debtTokenId,
@@ -711,8 +736,35 @@ export function _handleLiquidate(
     collateralBalance,
     debtBalance,
     null,
-    true
+    createLiquidatorPosition
   );
+
+  // according to logic in _calculateAvailableCollateralToLiquidate()
+  // liquidatedCollateralAmount = collateralAmount - liquidationProtocolFee
+  // liquidationProtocolFee = bonusCollateral * liquidationProtocolFeePercentage
+  // bonusCollateral = collateralAmount - collateralAmount / liquidationBonus
+  // liquidationBonus = 1 + liquidationPenalty
+  // => liquidationProtocolFee = liquidationPenalty * liquidationProtocolFeePercentage * liquidatedCollateralAmount / (1 + liquidationPenalty - liquidationPenalty*liquidationProtocolFeePercentage)
+  if (!market._liquidationProtocolFee) {
+    log.warning("[_handleLiquidate]market {} _liquidationProtocolFee = null ", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+  const liquidationProtocolFeeUSD = amountUSD
+    .times(market.liquidationPenalty)
+    .times(market._liquidationProtocolFee!)
+    .div(
+      BIGDECIMAL_ONE.plus(market.liquidationPenalty).minus(
+        market.liquidationPenalty.times(market._liquidationProtocolFee!)
+      )
+    );
+  const fee = manager.getOrUpdateFee(
+    FeeType.LIQUIDATION_FEE,
+    null,
+    market._liquidationProtocolFee
+  );
+  manager.addProtocolRevenue(liquidationProtocolFeeUSD, fee);
 }
 
 /////////////////////////

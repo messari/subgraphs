@@ -198,6 +198,10 @@ templates:
           handler: handleReserveInitialized
         - event: ReservePaused(indexed address,bool)
           handler: handleReservePaused
+        - event: ReserveFactorChanged(indexed address,uint256,uint256)
+          handler: handleReserveFactorChanged
+        - event: LiquidationProtocolFeeChanged(indexed address,uint256,uint256)
+          handler: handleLiquidationProtocolFeeChanged
       file: ./protocols/aave-v3/src/mapping.ts
   - kind: ethereum
     name: AToken

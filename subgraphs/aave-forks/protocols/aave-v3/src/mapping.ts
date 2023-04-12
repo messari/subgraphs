@@ -29,6 +29,7 @@ import {
   ReserveFrozen,
   ReserveInitialized,
   ReservePaused,
+  LiquidationProtocolFeeChanged,
 } from "../../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
@@ -48,6 +49,7 @@ import {
   _handleCollateralConfigurationChanged,
   _handleDeposit,
   _handleLiquidate,
+  _handleLiquidationProtocolFeeChanged,
   _handlePriceOracleUpdated,
   _handleRepay,
   _handleReserveActivated,
@@ -72,8 +74,9 @@ import {
   readValue,
   RewardTokenType,
   SECONDS_PER_DAY,
+  INT_FOUR,
 } from "../../../src/constants";
-import { Market, Token, _DefaultOracle } from "../../../generated/schema";
+import { Market, Token } from "../../../generated/schema";
 import {
   AddressesProviderRegistered,
   PoolAddressesProviderRegistry,
@@ -155,6 +158,7 @@ export function handleProxyCreated(event: ProxyCreated): void {
     POOL_ADDRESSES_PROVIDER_ID_KEY,
     event.address.toHexString()
   );
+
   const id = event.params.id.toString();
   if ("POOL" == id) {
     LendingPoolTemplate.createWithContext(event.params.proxyAddress, context);
@@ -241,7 +245,7 @@ export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
   if (market.oracle) {
     const rewardTokenPriceUSD = getAssetPriceInUSDC(
       Address.fromBytes(rewardToken.token),
-      Address.fromBytes(market.oracle!),
+      manager.getOracleAddress(),
       event.block.number
     );
     if (rewardTokenPriceUSD.gt(BIGDECIMAL_ZERO)) {
@@ -377,6 +381,20 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
   _handleReserveFactorChanged(marketId, event.params.newReserveFactor);
 }
 
+export function handleLiquidationProtocolFeeChanged(
+  event: LiquidationProtocolFeeChanged
+): void {
+  const marketId = getMarketIdFromToken(event.params.asset);
+  if (!marketId) {
+    log.error(
+      "[handleLiquidationProtocolFeeChanged]Failed to find market for asset {}",
+      [event.params.asset.toHexString()]
+    );
+    return;
+  }
+  _handleLiquidationProtocolFeeChanged(marketId, event.params.newFee);
+}
+
 /////////////////////////////////
 ///// Lending Pool Handlers /////
 /////////////////////////////////
@@ -396,21 +414,16 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     ]);
     return;
   }
-  let priceOracle = market.oracle;
-  if (!priceOracle) {
-    const defaultOracle = _DefaultOracle.load(protocolData.protocolID);
-    if (!defaultOracle) {
-      log.warning(
-        "[handleReserveDataUpdated] Either oracle for market {} or default oracle needs to be set",
-        [marketId.toHexString()]
-      );
-      return;
-    }
-    priceOracle = defaultOracle.oracle;
-  }
+  const manager = new DataManager(
+    marketId,
+    market.inputToken,
+    event,
+    protocolData
+  );
+
   const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromBytes(market.inputToken),
-    Address.fromBytes(priceOracle),
+    manager.getOracleAddress(),
     event.block.number
   );
 
@@ -499,7 +512,7 @@ export function handleBorrow(event: Borrow): void {
     return;
   }
 
-  setReserveFactor(marketId, event.address, event.params.reserve);
+  storeReserveFactor(marketId, event.address, event.params.reserve);
 
   _handleBorrow(
     event,
@@ -535,6 +548,13 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     ]);
     return;
   }
+  const collateralMarket = Market.load(collateralMarketId);
+  if (!collateralMarket) {
+    log.error("[handleLiquidationCall]Failed to find market {}", [
+      collateralMarketId.toHexString(),
+    ]);
+    return;
+  }
 
   const debtMarketId = getMarketIdFromToken(event.params.debtAsset);
   if (!debtMarketId) {
@@ -542,6 +562,20 @@ export function handleLiquidationCall(event: LiquidationCall): void {
       event.params.debtAsset.toHexString(),
     ]);
     return;
+  }
+
+  if (!collateralMarket._liquidationProtocolFee) {
+    storeLiquidationProtocolFee(
+      collateralMarketId,
+      event.address,
+      event.params.collateralAsset
+    );
+  }
+
+  // if liquidator chooses to receive AToken, create a position for liquidator
+  let createLiquidatorPosition = false;
+  if (event.params.receiveAToken) {
+    createLiquidatorPosition = true;
   }
 
   _handleLiquidate(
@@ -552,7 +586,8 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidator,
     event.params.user,
     debtMarketId,
-    event.params.debtToCover
+    event.params.debtToCover,
+    createLiquidatorPosition
   );
 }
 
@@ -684,61 +719,130 @@ function getAssetPriceFallback(
 
 function getMarketIdFromToken(tokenAddress: Address): Address | null {
   const token = Token.load(tokenAddress);
-  if (!token || !token._market) {
-    log.error(
-      "[getMarketIdFromToken]token {} not exist or token._market = null",
-      [tokenAddress.toHexString()]
-    );
+  if (!token) {
+    log.error("[getMarketIdFromToken] token {} not exist", [
+      tokenAddress.toHexString(),
+    ]);
     return null;
   }
+  if (!token._market) {
+    log.error("[getMarketIdFromToken] token {} _market = null", [
+      tokenAddress.toHexString(),
+    ]);
+    return null;
+  }
+
   const marketId = Address.fromBytes(token._market!);
   return marketId;
 }
 
-function setReserveFactor(
+function storeReserveFactor(
   marketId: Address,
   poolAddress: Address,
   reserve: Address
 ): void {
-  // Set reserveFactor if not set, as setReserveFactor may be never called
+  // Set reserveFactor if not set, as setReserveFactor() may be never called
+  // and no ReserveFactorChanged event is emitted
   const market = Market.load(marketId);
   if (!market) {
-    log.warning("[setReserveFactor]market {} does not exist", [
+    log.warning("[storeReserveFactor]market {} does not exist", [
       marketId.toHexString(),
     ]);
     return;
   }
 
-  if (!market.reserveFactor || market.reserveFactor!.equals(BIGDECIMAL_ZERO)) {
-    // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L377
-    // for how to decode configuration data to get reserve factor
-    const reserveFactorMask =
-      "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFF";
-    const reserveFactorStartBitPosition = 64 as u8;
-
-    const maskArray = new Uint8Array(32);
-    maskArray.set(Bytes.fromHexString(reserveFactorMask));
-    // BITWISE NOT
-    for (let i = 0; i < maskArray.length; i++) {
-      maskArray[i] = ~maskArray[i];
-    }
-    // reverse for little endian
-    const reserveFactorMaskBigInt = BigInt.fromUnsignedBytes(
-      Bytes.fromUint8Array(maskArray.reverse())
-    );
-
-    const pool = LendingPoolContract.bind(poolAddress);
-    const poolConfigData = pool.getConfiguration(reserve).data;
-    const reserveFactor = poolConfigData
-      .bitAnd(reserveFactorMaskBigInt)
-      .rightShift(reserveFactorStartBitPosition);
-
-    log.info("[setReserveFactor]reserveFactor set to {}", [
-      reserveFactor.toString(),
-    ]);
-    market.reserveFactor = reserveFactor
-      .toBigDecimal()
-      .div(exponentToBigDecimal(INT_TWO));
-    market.save();
+  if (market.reserveFactor || market.reserveFactor!.gt(BIGDECIMAL_ZERO)) {
+    // we should only need to do this when market.reserveFactor is not set or equal to 0.0
+    // changing reserveFactor config should emit ReserveFactorChanged event and handled
+    // by handleReserveFactorChanged
+    return;
   }
+  // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L377
+  // for how to decode configuration data to get reserve factor
+  const reserveFactorMask =
+    "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFF";
+  const reserveFactorStartBitPosition = 64 as u8;
+
+  const pool = LendingPoolContract.bind(poolAddress);
+  const poolConfigData = pool.getConfiguration(reserve).data;
+  const reserveFactor = decodeConfig(
+    poolConfigData,
+    reserveFactorMask,
+    reserveFactorStartBitPosition
+  )
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_TWO));
+
+  log.info("[setReserveFactor]reserveFactor set to {}", [
+    reserveFactor.toString(),
+  ]);
+  market.reserveFactor = reserveFactor;
+  market.save();
+}
+
+function storeLiquidationProtocolFee(
+  marketId: Address,
+  poolAddress: Address,
+  reserve: Address
+): void {
+  // Store LiquidationProtocolFee if not set, as setLiquidationProtocolFee() may be never called
+  // and no LiquidationProtocolFeeChanged event is emitted
+  const market = Market.load(marketId);
+  if (!market) {
+    log.warning("[storeLiquidationProtocolFee]market {} does not exist", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L491
+  // for how to decode configuration data to get _liquidationProtocolFee
+  const liquidationProtocolFeeMask =
+    "0xFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+  const reserveFactorStartBitPosition = 152 as u8;
+
+  const pool = LendingPoolContract.bind(poolAddress);
+  const poolConfigData = pool.getConfiguration(reserve).data;
+  const liquidationProtocolFee = decodeConfig(
+    poolConfigData,
+    liquidationProtocolFeeMask,
+    reserveFactorStartBitPosition
+  )
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
+
+  log.info("[storeLiquidationProtocolFee]market {} liquidationProtocolFee={}", [
+    marketId.toHexString(),
+    liquidationProtocolFee.toString(),
+  ]);
+  market._liquidationProtocolFee = liquidationProtocolFee;
+  market.save();
+}
+
+function decodeConfig(
+  storedData: BigInt,
+  maskStr: string,
+  startBitPosition: u8
+): BigInt {
+  // aave-v3 stores configuration in packed bits (ReserveConfiguration.sol)
+  // decoding them by applying a bit_not mask and right shift by startBitPosition
+  // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L491
+  // for how to decode configuration data to get _liquidationProtocolFee
+
+  const maskArray = new Uint8Array(32);
+  maskArray.set(Bytes.fromHexString(maskStr));
+  // BITWISE NOT
+  for (let i = 0; i < maskArray.length; i++) {
+    maskArray[i] = ~maskArray[i];
+  }
+  // reverse for little endian
+  const configMaskBigInt = BigInt.fromUnsignedBytes(
+    Bytes.fromUint8Array(maskArray.reverse())
+  );
+
+  const config = storedData
+    .bitAnd(configMaskBigInt)
+    .rightShift(startBitPosition);
+
+  return config;
 }

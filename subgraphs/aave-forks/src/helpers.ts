@@ -82,7 +82,7 @@ export function getCollateralBalance(market: Market, account: Address): BigInt {
 
   let exchangeRate = BIGDECIMAL_ONE;
   if (!market.exchangeRate) {
-    log.warning(
+    log.info(
       "[getCollateralBalance]market {} exchange rate not set, default to 1.0",
       [market.id.toHexString()]
     );
