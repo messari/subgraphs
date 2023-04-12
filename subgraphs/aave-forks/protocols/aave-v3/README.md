@@ -1,8 +1,10 @@
 # Aave V3 Subgraph
 
-## Calculation Methodology v1.0.1
+## Calculation Methodology v1.0.2
 
 Methodology version 1.0.1 updates the calculation methodology for aave-v3 to use aave-forks implementation, especially for protocol-side revenue. This change happens as the aave-v3 is refactored as one of aave-forks to consolidate code and address issues in the previous aave-v3 subgraph (subgraph version 1.0.5): [#966](https://github.com/messari/subgraphs/issues/966) and [#1285](https://github.com/messari/subgraphs/issues/1285).
+
+Methodology version 1.0.2 added protocol side revenue from liquidations (see [#1831](https://github.com/messari/subgraphs/issues/1831))
 
 ### Total Value Locked (TVL) USD
 
@@ -24,7 +26,7 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
+`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor) + liquidiated collateral amount * liquidiation penalty * liquidation procotol fee percentage`
 
 ### Supply-Side Revenue USD
 

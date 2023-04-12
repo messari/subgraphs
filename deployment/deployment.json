@@ -323,9 +323,9 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "2.0.1",
-          "subgraph": "1.2.0",
-          "methodology": "1.0.1"
+          "schema": "3.0.1",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.2"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -349,9 +349,9 @@
         "network": "avalanche",
         "status": "prod",
         "versions": {
-          "schema": "2.0.1",
-          "subgraph": "1.2.0",
-          "methodology": "1.0.1"
+          "schema": "3.0.1",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.2"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -375,9 +375,9 @@
         "network": "fantom",
         "status": "prod",
         "versions": {
-          "schema": "2.0.1",
-          "subgraph": "1.2.0",
-          "methodology": "1.0.1"
+          "schema": "3.0.1",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.2"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -397,9 +397,9 @@
         "network": "harmony",
         "status": "prod",
         "versions": {
-          "schema": "2.0.1",
-          "subgraph": "1.2.0",
-          "methodology": "1.0.1"
+          "schema": "3.0.1",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.2"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -419,9 +419,9 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "2.0.1",
-          "subgraph": "1.2.0",
-          "methodology": "1.0.1"
+          "schema": "3.0.1",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.2"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -441,9 +441,9 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "2.0.1",
-          "subgraph": "1.2.0",
-          "methodology": "1.0.1"
+          "schema": "3.0.1",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.2"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -463,9 +463,9 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "2.0.1",
-          "subgraph": "1.1.0",
-          "methodology": "1.0.1"
+          "schema": "3.0.1",
+          "subgraph": "2.0.0",
+          "methodology": "1.0.2"
         },
         "files": {
           "template": "aave.v3.template.yaml"
