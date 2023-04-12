@@ -933,7 +933,7 @@ export function _handleSupplierPositionUpdated(
 ): void {
   const protocol = getOrInitLendingProtocol(event.address);
   const market = getMarket(marketAddress);
-  let account = Account.load(accountID);
+  const account = Account.load(accountID);
   if (!account) {
     log.critical("Account not found for accountID: {}", [
       accountID.toHexString(),
@@ -980,7 +980,7 @@ export function _handleBorrowerPositionUpdated(
 ): void {
   const protocol = getOrInitLendingProtocol(event.address);
   const market = getMarket(marketAddress);
-  let account = Account.load(accountID);
+  const account = Account.load(accountID);
   if (!account) {
     log.critical("Account not found for accountID: {}", [
       accountID.toHexString(),

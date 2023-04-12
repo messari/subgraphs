@@ -27,7 +27,6 @@ import {
   PartialPauseStatusSet,
   PauseStatusSet,
   ReserveFactorSet,
-  ReserveFeeClaimed,
 } from "../../../generated/MorphoAaveV2/MorphoAaveV2";
 import { BASE_UNITS } from "../../constants";
 import { updateP2PRates } from "../../helpers";
@@ -274,5 +273,3 @@ export function handleReserveFactorSet(event: ReserveFactorSet): void {
     .div(BASE_UNITS);
   market.save();
 }
-
-export function handleReserveFeeClaimed(event: ReserveFeeClaimed): void {}

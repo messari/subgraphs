@@ -61,7 +61,7 @@ export namespace ActivityType {
 ///// Addresses /////
 /////////////////////
 
-export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; // used for Mainnet pricing
+export const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // used for Mainnet pricing
 
 export const MORPHO_AAVE_V2_ADDRESS = Address.fromBytes(
   Bytes.fromHexString("0x777777c9898d384f785ee44acfe945efdff5f3e0")
@@ -72,14 +72,14 @@ export const MORPHO_COMPOUND_ADDRESS = Address.fromBytes(
 );
 
 export const C_ETH = Address.fromBytes(
-  Bytes.fromHexString("0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5")
+  Bytes.fromHexString("0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5")
 );
 export const WRAPPED_ETH = Address.fromBytes(
   Bytes.fromHexString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
 );
 
 export const ETH_USD_PRICE_FEED_ADDRESS = Address.fromBytes(
-  Bytes.fromHexString("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419")
+  Bytes.fromHexString("0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419")
 );
 
 ///////////////////

@@ -21,9 +21,6 @@ import {
   PartialPauseStatusSet,
   PauseStatusSet,
   ReserveFactorSet,
-  ReserveFeeClaimed,
-  RewardsClaimed,
-  RewardsClaimedAndTraded,
   Liquidated,
   P2PAmountsUpdated,
   P2PBorrowDeltaUpdated,
@@ -272,11 +269,3 @@ export function handleReserveFactorSet(event: ReserveFactorSet): void {
     .div(BASE_UNITS);
   market.save();
 }
-
-export function handleReserveFeeClaimed(event: ReserveFeeClaimed): void {}
-
-export function handleRewardsClaimed(event: RewardsClaimed): void {}
-
-export function handleRewardsClaimedAndTraded(
-  event: RewardsClaimedAndTraded
-): void {}

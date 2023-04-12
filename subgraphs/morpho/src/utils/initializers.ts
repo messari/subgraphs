@@ -145,7 +145,7 @@ export const getOrInitMarketList = (protocolAddress: Address): _MarketList => {
 // ###############################
 
 export const getMarket = (marketAddress: Bytes): Market => {
-  let market = Market.load(marketAddress);
+  const market = Market.load(marketAddress);
   if (!market) {
     // The event "MarketCreated" creates directly the market entity
     log.critical("Market not found: {}", [marketAddress.toHexString()]);
