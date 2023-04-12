@@ -53,6 +53,43 @@ module.exports = {
       },
     ],
 
+    // disallow magic numbers: https://eslint.org/docs/latest/rules/no-magic-numbers
+    "@typescript-eslint/no-magic-numbers": [
+      "error",
+      {
+        ignoreArrayIndexes: true,
+        ignore: [-1, 0, 1, 2],
+      },
+    ],
+
+    // Enforce for cleanliness
+    "@typescript-eslint/no-unused-vars": "error",
+
+    // enforce camelCase naming
+    // https://eslint.org/docs/latest/rules/camelcase
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        selector: "default",
+        format: ["camelCase", "UPPER_CASE"],
+        leadingUnderscore: "allow",
+      },
+      {
+        selector: "variable",
+        modifiers: ["const", "global"],
+        format: ["UPPER_CASE"],
+      },
+      {
+        selector: "function",
+        format: ["camelCase"],
+        leadingUnderscore: "allow",
+      },
+      {
+        selector: "typeLike",
+        format: ["PascalCase"],
+      },
+    ],
+
     // CUSTOM RULES, find them in subgraphs/_eslint-rules
     // -----------------------------------------------
     

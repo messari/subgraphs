@@ -1,16 +1,19 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_TEN,
+  BIGDECIMAL_ZERO,
+  BIGINT_TEN,
+  DEFAULT_DECIMALS,
+} from "./constants";
 
 import { BIGDECIMAL_ZERO } from "./constants";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
-  decimals: i32 = 18
+  decimals: i32 = DEFAULT_DECIMALS
 ): BigDecimal {
-  return quantity.divDecimal(
-    BigInt.fromI32(10)
-      .pow(decimals as u8)
-      .toBigDecimal()
-  );
+  return quantity.divDecimal(BIGINT_TEN.pow(decimals as u8).toBigDecimal());
 }
 
 export function bigDecimalToBigInt(input: BigDecimal): BigInt {
@@ -19,17 +22,16 @@ export function bigDecimalToBigInt(input: BigDecimal): BigInt {
 }
 
 // returns 10^exp
-export function exponentToBigDecimal(exp: i32 = 18): BigDecimal {
-  let bd = BigDecimal.fromString("1");
-  const ten = BigDecimal.fromString("10");
+export function exponentToBigDecimal(exp: i32 = DEFAULT_DECIMALS): BigDecimal {
+  let bd = BIGDECIMAL_ONE;
   for (let i = 0; i < exp; i++) {
-    bd = bd.times(ten);
+    bd = bd.times(BIGDECIMAL_TEN);
   }
   return bd;
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
-  let sum = BigDecimal.fromString("0");
+  let sum = BIGDECIMAL_ZERO;
   for (let i = 0; i < prices.length; i++) {
     sum = sum.plus(prices[i]);
   }
