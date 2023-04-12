@@ -237,21 +237,6 @@ export function handleTransferOut(event: DepositInitiated): void {
     log.info("calculate token balance owned by bridge contract reverted", []);
   } else {
     inputTokenBalance = inputTokenBalanceResult.value;
-    if (
-      event.params.l1Token.toHexString() ==
-      "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"
-    ) {
-      log.error(
-        "tx: {}, timestamp: {}, block: {}, event.address: {}, input token balance:{}",
-        [
-          event.transaction.hash.toHexString(),
-          event.block.timestamp.toString(),
-          event.block.number.toString(),
-          event.address.toHexString(),
-          inputTokenBalance.toString(),
-        ]
-      );
-    }
   }
   pool.setInputTokenBalance(inputTokenBalance!);
 }
