@@ -196,10 +196,12 @@ interface Protocol {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -301,10 +303,12 @@ type LendingProtocol implements Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -317,20 +321,6 @@ type LendingProtocol implements Protocol @entity {
   ##### Add ons #####
 
   marketIDList: [String!]!
-
-  ##### Account / Position Data #####
-
-  " Any account that has made a deposit before "
-  depositors: [Account!]!
-
-  " Any account that has made a borrow before "
-  borrowers: [Account!]!
-
-  " Any account that has made a liquidation before "
-  liquidators: [Account!]!
-
-  " Any account that has been liquidated before "
-  liquidatees: [Account!]!
 }
 
 ###############################

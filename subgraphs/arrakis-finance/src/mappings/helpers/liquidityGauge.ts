@@ -1,14 +1,26 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { _GaugeRewardToken, _LiquidityGauge } from "../../../generated/schema";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
+import {
+  _LiquidityGauge,
+  Vault,
+  _RewardData,
+  RewardToken,
+} from "../../../generated/schema";
 import { LiquidityGaugeV4 as GaugeContract } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
 import {
+  RewardTokenType,
+  SECONDS_PER_DAY,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  SECONDS_PER_DAY,
 } from "../../common/constants";
 import { getOrCreateRewardToken } from "../../common/getters";
+import { bigIntToBigDecimal } from "../../common/utils/numbers";
 import { updateTokenPrice } from "./pricing";
-import { getOrCreateVault } from "./vaults";
 
 export function getOrCreateLiquidityGauge(
   gaugeAddress: Address
@@ -23,114 +35,194 @@ export function getOrCreateLiquidityGauge(
   return gauge;
 }
 
-function createGaugeRewardToken(
-  gaugeAddress: Address,
+export function addRewardToken(
   rewardTokenAddress: Address,
-  rewardTokenIndex: i32
-): _GaugeRewardToken {
-  let id = gaugeAddress
-    .toHex()
-    .concat("-")
-    .concat(rewardTokenAddress.toHex());
+  rewardTokenType: RewardTokenType,
+  vault: Vault
+): void {
+  const rewardToken = getOrCreateRewardToken(
+    rewardTokenAddress,
+    rewardTokenType
+  );
 
-  let rewardToken = new _GaugeRewardToken(id);
-  rewardToken.gauge = gaugeAddress.toHex();
-  rewardToken.rewardToken = rewardTokenAddress.toHex();
-  rewardToken.rewardTokenIndex = rewardTokenIndex;
-  rewardToken.save();
+  let rewardTokens = vault.rewardTokens;
+  let rewardEmission = vault.rewardTokenEmissionsAmount;
+  let rewardEmissionUSD = vault.rewardTokenEmissionsUSD;
+  if (!rewardTokens) {
+    rewardTokens = [rewardToken.id];
+    rewardEmission = [BIGINT_ZERO];
+    rewardEmissionUSD = [BIGDECIMAL_ZERO];
+  } else {
+    const index = rewardTokens.indexOf(rewardToken.id);
+    if (index != -1) {
+      // Do nothing if rewardToken is already in rewardTokens
+      return;
+    }
 
-  return rewardToken;
+    rewardTokens.push(rewardToken.id);
+    rewardEmission!.push(BIGINT_ZERO);
+    rewardEmissionUSD!.push(BIGDECIMAL_ZERO);
+
+    const rewardTokensUnsorted = rewardTokens;
+    rewardTokens.sort();
+    rewardEmission = sortArrayByReference<string, BigInt>(
+      rewardTokens,
+      rewardTokensUnsorted,
+      rewardEmission!
+    );
+    rewardEmissionUSD = sortArrayByReference<string, BigDecimal>(
+      rewardTokens,
+      rewardTokensUnsorted,
+      rewardEmissionUSD!
+    );
+  }
+  vault.rewardTokens = rewardTokens;
+  vault.rewardTokenEmissionsAmount = rewardEmission;
+  vault.rewardTokenEmissionsUSD = rewardEmissionUSD;
+  vault.save();
 }
 
-export function updateRewardToken(
+export function removeRewardToken(rewardTokenId: string, vault: Vault): void {
+  const rewardTokens = vault.rewardTokens;
+  if (!rewardTokens || rewardTokens.length == 0) {
+    return;
+  }
+  const rewardEmission = vault.rewardTokenEmissionsAmount;
+  const rewardEmissionUSD = vault.rewardTokenEmissionsUSD;
+  const index = rewardTokens.indexOf(rewardTokenId);
+  if (index != -1) {
+    rewardTokens.splice(index, 1);
+    rewardEmission!.splice(index, 1);
+    rewardEmissionUSD!.splice(index, 1);
+  }
+  vault.rewardTokens = rewardTokens;
+  vault.rewardTokenEmissionsAmount = rewardEmission;
+  vault.rewardTokenEmissionsUSD = rewardEmissionUSD;
+  vault.save();
+}
+
+export function updateRewardData(
   gaugeAddress: Address,
-  vaultAddress: Address,
   rewardTokenAddress: Address,
-  block: ethereum.Block
+  event: ethereum.Event
 ): void {
-  getOrCreateRewardToken(rewardTokenAddress);
-
-  let vault = getOrCreateVault(vaultAddress, block);
-
-  let gaugeRewardToken = _GaugeRewardToken.load(
-    gaugeAddress
-      .toHex()
-      .concat("-")
-      .concat(rewardTokenAddress.toHex())
-  );
-  // Add gauge reward token if not found
-  if (!gaugeRewardToken) {
-    let rewardTokens = vault.rewardTokens!;
-    let emissionsAmount = vault.rewardTokenEmissionsAmount!;
-    let emissionsUSD = vault.rewardTokenEmissionsUSD!;
-
-    // Check if reward token already exists on the vault
-    // This might be the case if a new gauge replaced an old one
-    let rewardTokenIndex = rewardTokens.length
-    for (let i = 0; i < rewardTokens.length; i++) {
-      if (Address.fromString(rewardTokens[i]) == rewardTokenAddress) {
-        rewardTokenIndex = i
-      }
-    }
-    
-    // Create new _GaugeRewardToken entity for future index lookup
-    gaugeRewardToken = createGaugeRewardToken(
-      gaugeAddress,
-      rewardTokenAddress,
-      rewardTokenIndex
+  // get new rates
+  const gaugeContract = GaugeContract.bind(gaugeAddress);
+  const rewardDataResult = gaugeContract.try_reward_data(rewardTokenAddress);
+  if (rewardDataResult.reverted) {
+    log.error(
+      "[updateRewardData]reward_data() call for gauge {} and token {} reverted tx {}-{}",
+      [
+        gaugeAddress.toHexString(),
+        rewardTokenAddress.toHexString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
     );
+    return;
+  }
+  const rate = rewardDataResult.value.getRate(); // rate is tokens per second
+  const periodFinish = rewardDataResult.value.getPeriod_finish();
 
-    // update rewardTokens in vault
-    rewardTokens[rewardTokenIndex] = rewardTokenAddress.toHex();
-    emissionsAmount[rewardTokenIndex] = BIGINT_ZERO;
-    emissionsUSD[rewardTokenIndex] = BIGDECIMAL_ZERO;
-    vault.rewardTokens = rewardTokens;
-    vault.rewardTokenEmissionsAmount = emissionsAmount;
-    vault.rewardTokenEmissionsUSD = emissionsUSD;
-    vault.save();
+  const rewardDataId = `${gaugeAddress.toHexString()}-${rewardTokenAddress.toHexString()}`;
+  let rewardData = _RewardData.load(rewardDataId);
+  if (!rewardData) {
+    rewardData = new _RewardData(rewardDataId);
+  }
+  rewardData.rate = rate;
+  rewardData.PeriodFinish = periodFinish;
+  rewardData.save();
+}
+
+export function updateRewardEmissions(
+  vault: Vault,
+  gaugeAddress: Address,
+  event: ethereum.Event
+): void {
+  const rewardTokens = vault.rewardTokens ? vault.rewardTokens! : [];
+
+  for (let i = 0; i < rewardTokens.length; i++) {
+    updateRewardEmission(vault, rewardTokens[i], gaugeAddress, event);
   }
 }
 
-export function updateRewardEmission(
+function updateRewardEmission(
+  vault: Vault,
+  rewardTokenId: string,
   gaugeAddress: Address,
-  vaultAddress: Address,
-  rewardTokenAddress: Address,
-  block: ethereum.Block
+  event: ethereum.Event
 ): void {
-  // Get reward token index
-  const gaugeRewardTokenId = gaugeAddress
-    .toHex()
-    .concat("-")
-    .concat(rewardTokenAddress.toHex());
-  let gaugeRewardToken = _GaugeRewardToken.load(gaugeRewardTokenId)!;
-  const rewardTokenIndex = gaugeRewardToken.rewardTokenIndex;
+  const rewardToken = RewardToken.load(rewardTokenId);
+  if (!rewardToken) {
+    log.error("[]no RewardToken found for reward token {} tx {}-{}", [
+      rewardTokenId,
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString(),
+    ]);
+    return;
+  }
 
-  // Update emissions
-  let vault = getOrCreateVault(vaultAddress, block);
+  const rewardDataId = `${gaugeAddress.toHexString()}-${rewardToken.token}`;
+  const rewardData = _RewardData.load(rewardDataId);
+  if (!rewardData) {
+    log.error(
+      "[updateRewardEmission]no RewardData found for gauge {} and reward token {} tx {}-{}",
+      [
+        gaugeAddress.toHexString(),
+        rewardTokenId,
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
+    );
+    return;
+  }
 
-  // Calculate new rates
-  let gaugeContract = GaugeContract.bind(gaugeAddress);
-  const rewardData = gaugeContract.reward_data(rewardTokenAddress);
-  const periodFinish = rewardData.getPeriod_finish();
+  const rewardTokens = vault.rewardTokens ? vault.rewardTokens! : [];
+  const emissionsAmount = vault.rewardTokenEmissionsAmount
+    ? vault.rewardTokenEmissionsAmount!
+    : [];
+  const emissionsUSD = vault.rewardTokenEmissionsUSD
+    ? vault.rewardTokenEmissionsUSD!
+    : [];
+  const rewardTokenIndex = rewardTokens.indexOf(rewardTokenId);
 
-  let emissionsAmount = vault.rewardTokenEmissionsAmount!;
-  let emissionsUSD = vault.rewardTokenEmissionsUSD!;
-  if (block.timestamp < periodFinish) {
-    // Calculate rate if reward period has not ended
-    const rate = rewardData.getRate(); // rate is tokens per second
-    emissionsAmount[rewardTokenIndex] = rate.times(
+  // once the reward period is past, the rate goes to 0
+  if (event.block.timestamp.ge(rewardData.PeriodFinish)) {
+    emissionsAmount[rewardTokenIndex] = BIGINT_ZERO;
+    emissionsUSD[rewardTokenIndex] = BIGDECIMAL_ZERO;
+  } else {
+    emissionsAmount[rewardTokenIndex] = rewardData.rate.times(
       BigInt.fromI32(SECONDS_PER_DAY)
     );
-    let rewardToken = updateTokenPrice(rewardTokenAddress, block.number);
-    emissionsUSD[rewardTokenIndex] = rewardToken.lastPriceUSD!.times(
-      emissionsAmount[rewardTokenIndex].toBigDecimal()
+    const token = updateTokenPrice(
+      Address.fromString(rewardToken.token),
+      event.block
     );
-  } else {
-    // Set emissions to 0 if reward period has ended
-    emissionsAmount[rewardTokenIndex] = BIGINT_ZERO;
-    emissionsUSD[rewardTokenIndex] = BIGDECIMAL_ZERO;
+    emissionsUSD[rewardTokenIndex] = token.lastPriceUSD!.times(
+      bigIntToBigDecimal(emissionsAmount[rewardTokenIndex], token.decimals)
+    );
   }
+
   vault.rewardTokenEmissionsAmount = emissionsAmount;
   vault.rewardTokenEmissionsUSD = emissionsUSD;
   vault.save();
+}
+
+// A function which given 3 arrays of arbitrary types of the same length,
+// where the first one holds the reference order, the second one holds the same elements
+// as the first but in different order, and the third any arbitrary elements. It will return
+// the third array after sorting it according to the order of the first one.
+// For example:
+// sortArrayByReference(['a', 'c', 'b'], ['a', 'b', 'c'], [1, 2, 3]) => [1, 3, 2]
+export function sortArrayByReference<T, K>(
+  reference: T[],
+  array: T[],
+  toSort: K[]
+): K[] {
+  const sorted: K[] = new Array<K>();
+  for (let i = 0; i < reference.length; i++) {
+    const index = array.indexOf(reference[i]);
+    sorted.push(toSort[index]);
+  }
+  return sorted;
 }

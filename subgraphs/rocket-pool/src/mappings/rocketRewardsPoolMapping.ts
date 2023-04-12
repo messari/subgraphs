@@ -3,7 +3,7 @@ import {
   rocketRewardsPool,
   RPLTokensClaimed,
 } from "../../generated/rocketRewardsPool/rocketRewardsPool";
-import { rocketNetworkPrices } from "../../generated/rocketRewardsPool/rocketNetworkprices";
+import { rocketNetworkPrices } from "../../generated/rocketRewardsPool/rocketNetworkPrices";
 import { RPLRewardInterval, Node } from "../../generated/schema";
 import { generalUtilities } from "../checkpoints/generalUtilities";
 import { rocketPoolEntityFactory } from "../entityFactory";

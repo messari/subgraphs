@@ -2,13 +2,9 @@ import axios from "axios";
 import { errorNotification } from "./messageDiscord.js";
 import { formatIntToFixed2, ProtocolTypeEntityName } from "./util.js";
 
-export const protocolLevel = async (deployments, invalidDeployments) => {
+export const protocolLevel = async (deployments) => {
     const endpointsList = [];
-
     Object.keys(deployments).forEach((key) => {
-        if (invalidDeployments.includes(key)) {
-            return;
-        }
         const depo = deployments[key];
         if (!depo.indexingError) {
             endpointsList.push(depo.url);
@@ -23,7 +19,6 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
           }
       }`;
     const promiseArr = [];
-
     endpointsList.forEach((endpoint) => {
         promiseArr.push(
             axios.post(
@@ -66,8 +61,28 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
         let queryToUse = ``;
 
         if (deployment.data.protocols[0].type.toUpperCase() === "EXCHANGE") {
-            if (versionGroup === "2.0") {
+            if (versionGroup === "2.0.0") {
                 queryToUse = ``;
+            } else if (versionGroup === "1.3.0") {
+                queryToUse = `query {
+                    dexAmmProtocols {
+                        id
+                        name
+                        slug
+                        schemaVersion
+                        subgraphVersion
+                        methodologyVersion
+                        network
+                        type
+                        cumulativeVolumeUSD
+                        cumulativeUniqueUsers
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                        totalPoolCount
+                    }
+                }`;
             } else {
                 queryToUse = `
                 query {
@@ -95,7 +110,7 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 }`;
             }
         } else if (deployment.data.protocols[0].type.toUpperCase() === "LENDING") {
-            if (versionGroup === "2.0") {
+            if (versionGroup === "2.0.0") {
                 queryToUse = `
                 query {
                     lendingProtocols {
@@ -116,7 +131,6 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                         cumulativePositionCount
                         totalPoolCount
                         totalDepositBalanceUSD
-                        cumulativeDepositUSD
                         totalBorrowBalanceUSD
                         cumulativeBorrowUSD
                         cumulativeLiquidateUSD
@@ -136,7 +150,6 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                         cumulativeTotalRevenueUSD
                         cumulativeUniqueUsers
                         totalDepositBalanceUSD
-                        cumulativeDepositUSD
                         totalBorrowBalanceUSD
                         cumulativeBorrowUSD
                         cumulativeLiquidateUSD
@@ -144,7 +157,7 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 }`;
             }
         } else if (deployment.data.protocols[0].type.toUpperCase() === "YIELD") {
-            if (versionGroup === "2.0") {
+            if (versionGroup === "2.0.0") {
                 queryToUse = ``;
             } else {
                 queryToUse = `
@@ -193,16 +206,16 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
         )
         .catch((err) => errorNotification("ERROR LOCATION 17 " + err.message));
 
-    protocolTypeLevelData.forEach((protocol) => {
+    protocolTypeLevelData.forEach((protocolData) => {
         const deploymentName = Object.keys(deployments).find(
-            (depoName) => deployments[depoName]?.url === protocol?.url
+            (depoName) => deployments[depoName]?.url === protocolData?.url
         );
         const deployment = { ...deployments[deploymentName] };
 
         const issuesArrays = { ...deployment.protocolErrors };
-
-        if (!protocol?.protocol) return;
-        const data = protocol.protocol[Object.keys(protocol.protocol)[0]][0];
+        const protocolEntityData = protocolData?.protocol;
+        if (!protocolEntityData) return;
+        const data = protocolEntityData[Object.keys(protocolEntityData)[0]][0];
         if (!data) return;
 
         const dataFields = Object.keys(data);
@@ -212,27 +225,24 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 data.totalValueLockedUSD >= 0 &&
                 data.totalValueLockedUSD < 10000000000
             ) &&
-            deployment.protocolType === 'dex-amm'
+            deployment.protocolType === 'dex-amm' &&
+            !issuesArrays.totalValueLockedUSD.includes('$' + formatIntToFixed2(parseFloat(data.totalValueLockedUSD)))
         ) {
             issuesArrays.totalValueLockedUSD.push('$' + formatIntToFixed2(parseFloat(data.totalValueLockedUSD)));
         }
 
         if (
-            !(
+            (!(
                 data.cumulativeSupplySideRevenueUSD >= 0 &&
                 data.cumulativeSupplySideRevenueUSD <= 100000000000
-            )
+            ) ||
+                !(
+                    data.cumulativeProtocolSideRevenueUSD >= 0 &&
+                    data.cumulativeProtocolSideRevenueUSD <= 100000000000
+                )) &&
+            !issuesArrays.cumulativeRevenueFactors
         ) {
-            issuesArrays.cumulativeSupplySideRevenueUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeSupplySideRevenueUSD)));
-        }
-
-        if (
-            !(
-                data.cumulativeProtocolSideRevenueUSD >= 0 &&
-                data.cumulativeProtocolSideRevenueUSD <= 100000000000
-            )
-        ) {
-            issuesArrays.cumulativeProtocolSideRevenueUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeProtocolSideRevenueUSD)));
+            issuesArrays.cumulativeRevenueFactors.push('$' + formatIntToFixed2(parseFloat(data.cumulativeSupplySideRevenueUSD)) + ' | ' + '$' + formatIntToFixed2(parseFloat(data.cumulativeProtocolSideRevenueUSD)));
         }
 
         if (
@@ -248,65 +258,59 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 " + " +
                 '$' + formatIntToFixed2(parseFloat(data.cumulativeSupplySideRevenueUSD)));
 
-            issuesArrays.cumulativeTotalRevenueUSD.push(value);
+            if (!issuesArrays.cumulativeTotalRevenueUSD.includes(value)) {
+                issuesArrays.cumulativeTotalRevenueUSD.push(value);
+            }
         }
 
         if (
             dataFields.includes("cumulativeVolumeUSD") &&
-            !(parseFloat(data.cumulativeVolumeUSD) >= 0)
+            !(parseFloat(data.cumulativeVolumeUSD) >= 0) &&
+            !issuesArrays.cumulativeVolumeUSD.includes('$' + formatIntToFixed2(parseFloat(data.cumulativeVolumeUSD)))
         ) {
             issuesArrays.cumulativeVolumeUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeVolumeUSD)));
         }
 
         if (
             dataFields.includes("cumulativeUniqueUsers") &&
-            !(parseFloat(data.cumulativeUniqueUsers) >= 0 && parseFloat(data.cumulativeUniqueUsers) < 100000000)
+            !(parseFloat(data.cumulativeUniqueUsers) >= 0 && parseFloat(data.cumulativeUniqueUsers) < 100000000) &&
+            !issuesArrays.cumulativeUniqueUsers.includes(data.cumulativeUniqueUsers)
         ) {
             issuesArrays.cumulativeUniqueUsers.push(data.cumulativeUniqueUsers);
         }
 
         if (
             dataFields.includes("totalPoolCount") &&
-            !(parseFloat(data.totalPoolCount) >= 0 && parseFloat(data.totalPoolCount) < 10000)
+            !(parseFloat(data.totalPoolCount) >= 0 && parseFloat(data.totalPoolCount) < 500000) &&
+            !issuesArrays.totalPoolCount.includes(data.totalPoolCount)
         ) {
             issuesArrays.totalPoolCount.push(data.totalPoolCount);
         }
 
+        const userTypesStr = `${data.cumulativeUniqueDepositors || 0}+${data.cumulativeUniqueBorrowers || 0}+${data.cumulativeUniqueLiquidators || 0}+${data.cumulativeUniqueLiquidatees || 0}=${data.cumulativeUniqueUsers || 0}`;
         if (
-            dataFields.includes("cumulativeUniqueDepositors") &&
-            parseFloat(data.cumulativeUniqueDepositors) <
-            parseFloat(data.cumulativeUniqueUsers)
+            (dataFields.includes("cumulativeUniqueDepositors") &&
+                parseFloat(data.cumulativeUniqueDepositors) >
+                parseFloat(data.cumulativeUniqueUsers)) ||
+            (dataFields.includes("cumulativeUniqueBorrowers") &&
+                parseFloat(data.cumulativeUniqueBorrowers) >
+                parseFloat(data.cumulativeUniqueUsers)) ||
+            (dataFields.includes("cumulativeUniqueLiquidators") &&
+                parseFloat(data.cumulativeUniqueLiquidators) >
+                parseFloat(data.cumulativeUniqueUsers)) ||
+            (dataFields.includes("cumulativeUniqueLiquidatees") &&
+                parseFloat(data.cumulativeUniqueLiquidatees) >
+                parseFloat(data.cumulativeUniqueUsers)) &&
+            !issuesArrays.cumulativeUniqueUserFactors.includes(userTypesStr)
         ) {
-            issuesArrays.cumulativeUniqueDepositors.push(data.cumulativeUniqueDepositors);
-        }
-
-        if (
-            dataFields.includes("cumulativeUniqueBorrowers") &&
-            parseFloat(data.cumulativeUniqueBorrowers) <
-            parseFloat(data.cumulativeUniqueUsers)
-        ) {
-            issuesArrays.cumulativeUniqueBorrowers.push(data.cumulativeUniqueBorrowers);
-        }
-
-        if (
-            dataFields.includes("cumulativeUniqueLiquidators") &&
-            parseFloat(data.cumulativeUniqueLiquidators) <
-            parseFloat(data.cumulativeUniqueUsers)
-        ) {
-            issuesArrays.cumulativeUniqueLiquidators.push(data.cumulativeUniqueLiquidators);
-        }
-
-        if (
-            dataFields.includes("cumulativeUniqueLiquidatees") &&
-            parseFloat(data.cumulativeUniqueLiquidatees) <
-            parseFloat(data.cumulativeUniqueUsers)
-        ) {
-            issuesArrays.cumulativeUniqueLiquidatees.push(data.cumulativeUniqueLiquidatees);
+            issuesArrays.cumulativeUniqueUserFactors.push(userTypesStr);
         }
 
         if (
             dataFields.includes("openPositionCount") &&
-            !(parseFloat(data.openPositionCount) >= 0 && parseFloat(data.openPositionCount) < 1000000000)
+            !(parseFloat(data.openPositionCount) >= 0 &&
+                parseFloat(data.openPositionCount) < 1000000000) &&
+            !issuesArrays.openPositionCount.includes(data.openPositionCount)
         ) {
             issuesArrays.openPositionCount.push(data.openPositionCount);
         }
@@ -316,27 +320,21 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
             !(
                 parseFloat(data.cumulativePositionCount) >=
                 parseFloat(data.openPositionCount)
-            )
+            ) &&
+            !issuesArrays.cumulativePositionCount.includes(data.cumulativePositionCount)
         ) {
             issuesArrays.cumulativePositionCount.push(data.cumulativePositionCount);
         }
 
         if (
             dataFields.includes("totalDepositBalanceUSD") &&
-            !(parseFloat(data.totalDepositBalanceUSD) >= 0 && parseFloat(data.totalDepositBalanceUSD) < 100000000000)
+            !(parseFloat(data.totalDepositBalanceUSD) >= 0 && parseFloat(data.totalDepositBalanceUSD) < 100000000000) &&
+            !issuesArrays.totalDepositBalanceUSD.includes('$' + formatIntToFixed2(parseFloat(data.totalDepositBalanceUSD)))
         ) {
             issuesArrays.totalDepositBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalDepositBalanceUSD)));
         }
 
-        if (
-            dataFields.includes("cumulativeDepositUSD") &&
-            !(
-                parseFloat(data.cumulativeDepositUSD) >=
-                parseFloat(data.totalDepositBalanceUSD)
-            )
-        ) {
-            issuesArrays.cumulativeDepositUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeDepositUSD)));
-        }
+        const totalBorrowBalanceUSDExcluded = ["rari-fuse", "truefi", "maple", "goldfinch"];
 
         if (
             dataFields.includes("totalBorrowBalanceUSD") &&
@@ -344,11 +342,8 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 parseFloat(data.totalBorrowBalanceUSD) <=
                 parseFloat(data.totalDepositBalanceUSD)
             ) &&
-            !deploymentName.includes("rari-fuse") &&
-            !deploymentName.includes("truefi") &&
-            !deploymentName.includes("maple") &&
-            !deploymentName.includes("goldfinch")
-
+            !totalBorrowBalanceUSDExcluded.find(x => deploymentName.includes(x)) &&
+            !issuesArrays.totalBorrowBalanceUSD.includes('$' + formatIntToFixed2(parseFloat(data.totalBorrowBalanceUSD)))
         ) {
             issuesArrays.totalBorrowBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalBorrowBalanceUSD)));
         }
@@ -358,7 +353,8 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
             !(
                 parseFloat(data.cumulativeLiquidateUSD) <=
                 parseFloat(data.cumulativeBorrowUSD)
-            )
+            ) &&
+            !issuesArrays.cumulativeLiquidateUSD.includes('$' + formatIntToFixed2(parseFloat(data.cumulativeLiquidateUSD)))
         ) {
             issuesArrays.cumulativeLiquidateUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeLiquidateUSD)));
         }
@@ -378,15 +374,18 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
     return deploymentsObjToReturn;
 }
 
-export const protocolDerivedFields = async (deployments, invalidDeployments) => {
+export const protocolDerivedFields = async (deployments) => {
 
-    // Loop deployments object and get protocol type and scema version for every deployment on every protocol
-    // Create queries for different schema types and versions
-    // Queries are only to take first result of derived fields on the main protocol entity
-
-    const derivedFieldQueries = {
-        "lendingProtocol": (depo) => `{
-            ${depo}: lendingProtocols {
+    const derivedFieldQuery = (depo, type) => {
+        const protocolEntityType = {
+            "lendingProtocol": "markets",
+            "dexAmmProtocol": "pools",
+            "yieldAggregator": "vaults",
+            "protocol": "pools"
+        }
+        const entityToUse = protocolEntityType[type];
+        return `{
+            ${depo}: ${type}s {
                 dailyUsageMetrics (first: 1){
                   id
                 }
@@ -396,72 +395,21 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                 financialMetrics (first: 1){
                   id
                 }
-                markets (first: 1){
+                ${entityToUse} (first: 1){
                   id
                 }
             }
-        }`,
-        "dexAmmProtocol": (depo) => `{
-            ${depo}: dexAmmProtocols {
-                dailyUsageMetrics (first: 1){
-                  id
-                }
-                hourlyUsageMetrics (first: 1){
-                  id
-                }
-                financialMetrics (first: 1){
-                  id
-                }
-                pools (first: 1){
-                  id
-                }
-            }
-        }`,
-        "yieldAggregator": (depo) => `{
-            ${depo}: yieldAggregators {
-                dailyUsageMetrics (first: 1){
-                  id
-                }
-                hourlyUsageMetrics (first: 1){
-                  id
-                }
-                financialMetrics (first: 1){
-                  id
-                }
-                vaults (first: 1){
-                  id
-                }
-            }
-        }`,
-        "protocol": (depo) => `{
-            ${depo}: protocols {
-                dailyUsageMetrics (first: 1){
-                  id
-                }
-                hourlyUsageMetrics (first: 1){
-                  id
-                }
-                financialMetrics (first: 1){
-                  id
-                }
-                pools (first: 1){
-                  id
-                }
-            }
-        }`
+        }`;
     };
 
     const derivedFieldQueriesToMake = [];
     Object.keys(deployments).forEach((key) => {
-        if (invalidDeployments.includes(key)) {
-            return;
-        }
         const depo = deployments[key];
         const queryKey = ProtocolTypeEntityName[depo.protocolType];
         if (!queryKey) {
             return;
         }
-        const depoQuery = derivedFieldQueries[queryKey](key.split("-").join("_"));
+        const depoQuery = derivedFieldQuery(key.split("-").join("_"), queryKey);
         derivedFieldQueriesToMake.push(
             axios.post(
                 depo.url,
@@ -483,30 +431,31 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
             (response) => (response.map(x => {
                 const returnedData = x?.value?.data?.data;
                 const returnedError = x?.value?.data?.errors;
-                const depoKey = Object.keys(deployments).find(depo => deployments[depo].url === x.value.config.url)
+                const depoKey = Object.keys(deployments).find(depo => deployments[depo].url === x?.value?.config?.url);
                 let alert = ``;
 
-                if (returnedData) {
+                if (returnedData && depoKey) {
                     const key = Object.keys(returnedData)[0];
                     if (returnedData[key]?.length === 0 || !returnedData[key]) {
                         // alert for no protocol entity found
                         deploymentsToReturn[depoKey].protocolErrors.protocolEntity.push(ProtocolTypeEntityName[deploymentsToReturn[depoKey].protocolType]);
                     } else {
-                        const emptyFields = Object.keys(returnedData[key][0]).filter(field => !returnedData[key][0][field] || returnedData[key][0][field]?.length === 0);
+                        const firstVal = returnedData[key][0];
+                        const emptyFields = Object.keys(firstVal).filter(field => !firstVal[field] || firstVal[field]?.length === 0);
                         if (emptyFields.length > 0 && !depoKey.toUpperCase().includes('THE-GRAPH')) {
                             deploymentsToReturn[depoKey].protocolErrors.relatedField.push(emptyFields.join(', '));
                         }
                     }
                 }
 
-                if (returnedError) {
-                    const alertArr = returnedError.filter(errObj => errObj.message !== "indexing_error").map(errObj => errObj.message).filter(alert => !alert.includes("Store error: database unavailable"));
+                if (returnedError?.length > 0) {
+                    const alertArr = returnedError?.filter(errObj => errObj.message !== "indexing_error" && !errObj.message.includes("Store error: database unavailable"))?.map(errObj => errObj.message);
                     if (alertArr.length > 0) {
                         alert = alertArr.join(" --- ");
-                        errorNotification("ERROR LOCATION 28 " + alert)
-                        deploymentsToReturn[depoKey].protocolErrors.queryError.push(alert);
-                        // Map through errors and save the messages to protocolDerivedFieldErrors on depo object
-                        // Maybe save the query to this object to help reproduceability
+                        errorNotification("ERROR LOCATION 28 " + alert);
+                        if (depoKey) {
+                            deploymentsToReturn[depoKey].protocolErrors.queryError.push(alert);
+                        }
                     }
                 }
 

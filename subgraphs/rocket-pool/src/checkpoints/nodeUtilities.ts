@@ -153,6 +153,8 @@ class NodeUtilities {
       networkCheckpoint.totalFinalizedMinipools.plus(
         node.totalFinalizedMinipools
       );
+
+    networkCheckpoint.save();
   }
 
   /**
@@ -241,6 +243,8 @@ class NodeUtilities {
     // Calculate total RPL needed to min/max collateralize the staking minipools at this checkpoint.
     checkpoint.minimumEffectiveRPL = minipoolMetadata.totalMinimumEffectiveRPL;
     checkpoint.maximumEffectiveRPL = minipoolMetadata.totalMaximumEffectiveRPL;
+
+    checkpoint.save();
   }
 
   /**
@@ -293,6 +297,8 @@ class NodeUtilities {
           rplMetadata.totalNodeRewardClaimCount
         );
     }
+
+    checkpoint.save();
   }
 
   /**
@@ -369,6 +375,8 @@ class NodeUtilities {
       checkpoint.totalFinalizedMinipools =
         previousCheckpoint.totalFinalizedMinipools;
     }
+
+    checkpoint.save();
   }
 }
 

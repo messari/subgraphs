@@ -1,6 +1,8 @@
 # Bastion Protocol Subgraph
 
-## Calculation Methodology v1.0.0
+## Calculation Methodology v1.0.1
+
+Methodolgy Version 1.0.1 includes the three isolated lending Realms of the Bastion Protocol: Aurora Realm, STNear Realm and Multichain Realm. They are combined in one subgraph. The markets in each realm have their name prefixed with the realm, e.g. "Aurora Realm: Bastion USD Coin".
 
 ### Total Value Locked (TVL) USD
 
@@ -58,7 +60,7 @@ Amount of reward tokens (BSTN / wNEAR) distributed each day in a given market.
 
 ### Protocol Controlled Value
 
-Not applicable to Compound v2
+Not applicable to Bastion Protocol
 
 ### Outlier Events
 

@@ -22,7 +22,7 @@ import { fetchTokenName, fetchTokenSymbol, fetchTokenDecimals } from "./tokens";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils/datetime";
 import { prefixID } from "./utils/strings";
 import { readValue } from "./utils/ethereum";
-import { bigIntToBigDecimal } from "./utils/numbers";
+import { bigIntToBigDecimal, divide } from "./utils/numbers";
 import { CustomFeesType, PoolInfoType } from "./types";
 import { getPoolTokensInfo, isBPT, getPoolTokenWeights } from "./pools";
 import { Versions } from "../versions";
@@ -202,24 +202,26 @@ export function getOrCreateBalancerPoolToken(
     let poolTVL = BIGDECIMAL_ZERO;
     for (let idx = 0; idx < tokens.length; idx++) {
       if (tokens[idx].lastPriceUSD! == BIGDECIMAL_ZERO) {
-        const unknownPricePoolToken = tokens[idx];
-
         const weights = getPoolTokenWeights(poolAddress, popIndex);
+        if (weights.length == tokens.length) {
+          const unknownPricePoolToken = tokens[idx];
 
-        const knownPricePoolTokenValueUSD = bigIntToBigDecimal(
-          balances[knownPricePoolTokenIndex],
-          knownPricePoolToken.decimals
-        ).times(knownPricePoolToken.lastPriceUSD!);
+          const knownPricePoolTokenValueUSD = bigIntToBigDecimal(
+            balances[knownPricePoolTokenIndex],
+            knownPricePoolToken.decimals
+          ).times(knownPricePoolToken.lastPriceUSD!);
 
-        const unknownPricePoolTokenValueUSD = weights[idx]
-          .times(knownPricePoolTokenValueUSD)
-          .div(weights[knownPricePoolTokenIndex]);
+          const unknownPricePoolTokenValueUSD = divide(
+            weights[idx].times(knownPricePoolTokenValueUSD),
+            weights[knownPricePoolTokenIndex]
+          );
+          unknownPricePoolToken.lastPriceUSD = divide(
+            unknownPricePoolTokenValueUSD,
+            bigIntToBigDecimal(balances[idx], unknownPricePoolToken.decimals)
+          );
 
-        unknownPricePoolToken.lastPriceUSD = unknownPricePoolTokenValueUSD.div(
-          bigIntToBigDecimal(balances[idx], unknownPricePoolToken.decimals)
-        );
-
-        unknownPricePoolToken.save();
+          unknownPricePoolToken.save();
+        }
       }
 
       const tokenValueUSD = bigIntToBigDecimal(
@@ -230,7 +232,10 @@ export function getOrCreateBalancerPoolToken(
       poolTVL = poolTVL.plus(tokenValueUSD);
     }
 
-    bpt.lastPriceUSD = poolTVL.div(bigIntToBigDecimal(supply, bpt.decimals));
+    bpt.lastPriceUSD = divide(
+      poolTVL,
+      bigIntToBigDecimal(supply, bpt.decimals)
+    );
     bpt.lastPriceBlockNumber = blockNumber;
 
     bpt.save();

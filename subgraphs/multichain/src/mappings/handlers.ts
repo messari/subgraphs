@@ -119,6 +119,8 @@ export function handlerSwapOutV2(event: LogSwapout): void {
     poolDailySnapshot,
     poolHourlySnapshot,
     poolRoute,
+    poolRouteDailySnapshot.id,
+    poolRouteHourlySnapshot.id,
     event.block
   );
   const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
@@ -274,6 +276,8 @@ export function handlerSwapInV2(event: LogSwapin): void {
     poolDailySnapshot,
     poolHourlySnapshot,
     poolRoute,
+    poolRouteDailySnapshot.id,
+    poolRouteHourlySnapshot.id,
     event.block
   );
   const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
@@ -428,6 +432,8 @@ export function handleSwapOut(event: LogAnySwapOut): void {
     poolDailySnapshot,
     poolHourlySnapshot,
     poolRoute,
+    poolRouteDailySnapshot.id,
+    poolRouteHourlySnapshot.id,
     event.block
   );
   const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);
@@ -588,6 +594,8 @@ export function handleSwapIn(event: LogAnySwapIn): void {
     poolDailySnapshot,
     poolHourlySnapshot,
     poolRoute,
+    poolRouteDailySnapshot.id,
+    poolRouteHourlySnapshot.id,
     event.block
   );
   const deltaPoolTVL = pool.totalValueLockedUSD.minus(oldPoolTVL);

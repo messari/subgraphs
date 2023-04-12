@@ -1,0 +1,43 @@
+{
+  "network": "arbitrum-one",
+  "Bridge": {
+    "address": "0x1619DE6B6B20eD217a58d00f37B9d47C7663feca",
+    "startBlock": 3483123
+  },
+  "OriginalTokenVault": {
+    "address": "0xFe31bFc4f7C9b69246a6dc0087D91a91Cb040f76",
+    "startBlock": 4524220
+  },
+  "OriginalTokenVaultV2": {
+    "address": "0xEA4B1b0aa3C110c55f650d28159Ce4AD43a4a58b",
+    "startBlock": 10530005
+  },
+  "PeggedTokenBridge": {
+    "address": "0xbdd2739AE69A054895Be33A22b2D2ed71a1DE778",
+    "startBlock": 4058525
+  },
+  "PeggedTokenBridgeV2": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 24353930
+  },
+  "FarmingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 10530005
+  },
+  "Staking": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 10530005
+  },
+  "StakingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 10530005
+  },
+  "MessageBus": {
+    "address": "0x3ad9d0648cdaa2426331e894e980d0a5ed16257f",
+    "startBlock": 9515992
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 14848861
+}

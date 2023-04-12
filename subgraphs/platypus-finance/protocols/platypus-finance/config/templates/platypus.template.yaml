@@ -1,10 +1,12 @@
 specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
+{{#graftEnabled}}
 features:
   - grafting
-# graft:
-#   base: {{ graftBase }}
-#   block: {{ graftBlock }}
+graft:
+  base: {{ graftBase }}
+  block: {{ graftBlock }}
+{{/graftEnabled}}
 schema:
   file: ./schema.graphql
 dataSources:

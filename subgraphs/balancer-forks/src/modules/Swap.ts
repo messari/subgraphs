@@ -9,6 +9,7 @@ import {
   Address,
   ethereum,
   BigDecimal,
+  Bytes,
 } from "@graphprotocol/graph-ts";
 import {
   updateProtocolRevenue,
@@ -99,8 +100,6 @@ export function Swap(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  const inputTokenBalances: BigInt[] = pool.inputTokenBalances;
-
   const tokenInStore = getOrCreateToken(tokenIn, block.number);
   const tokenInIndex = pool.inputTokens.indexOf(tokenIn.toHexString());
 
@@ -109,6 +108,8 @@ export function Swap(
       constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
     )
     .times(tokenInStore.lastPriceUSD!);
+
+  if (tokenInIndex == -1) amountInUSD = constants.BIGDECIMAL_ZERO;
 
   const tokenOutStore = getOrCreateToken(tokenOut, block.number);
   const tokenOutIndex = pool.inputTokens.indexOf(tokenOut.toHexString());
@@ -119,23 +120,14 @@ export function Swap(
     )
     .times(tokenOutStore.lastPriceUSD!);
 
-  if (tokenInIndex != -1) {
-    inputTokenBalances[tokenInIndex] =
-      inputTokenBalances[tokenInIndex].plus(amountIn);
-  } else {
-    amountInUSD = constants.BIGDECIMAL_ZERO;
-  }
-
-  if (tokenOutIndex != -1) {
-    inputTokenBalances[tokenOutIndex] =
-      inputTokenBalances[tokenOutIndex].minus(amountOut);
-  } else {
-    amountOutUSD = constants.BIGDECIMAL_ZERO;
-  }
+  if (tokenOutIndex == -1) amountOutUSD = constants.BIGDECIMAL_ZERO;
 
   const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
 
-  pool.inputTokenBalances = inputTokenBalances;
+  pool.inputTokenBalances = utils.getPoolInputTokenBalances(
+    poolAddress,
+    Bytes.fromHexString(pool._poolId)
+  );
   pool.totalValueLockedUSD = utils.getPoolTVL(
     pool.inputTokens,
     pool.inputTokenBalances,

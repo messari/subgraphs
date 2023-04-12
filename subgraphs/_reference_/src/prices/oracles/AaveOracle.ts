@@ -6,10 +6,10 @@ import { AaveOracleContract } from "../../../generated/UniswapV2Factory/AaveOrac
 
 export function getAaveOracleContract(
   contract: OracleContract,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): AaveOracleContract | null {
   if (
-    contract.startBlock.lt(block.number) ||
+    (block && contract.startBlock.gt(block.number)) ||
     utils.isNullAddress(contract.address)
   )
     return null;
@@ -19,7 +19,7 @@ export function getAaveOracleContract(
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   const config = utils.getConfig();
 
@@ -39,6 +39,6 @@ export function getTokenPriceUSDC(
   return CustomPriceType.initialize(
     tokenPrice,
     constants.AAVE_ORACLE_DECIMALS,
-    "AaveOracle"
+    constants.OracleType.AAVE_ORACLE
   );
 }

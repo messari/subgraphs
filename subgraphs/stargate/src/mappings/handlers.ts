@@ -2,11 +2,14 @@ import {
   Address,
   BigDecimal,
   BigInt,
+  ByteArray,
   dataSource,
   log,
+  crypto,
+  ethereum,
 } from "@graphprotocol/graph-ts";
 
-import { amountLDtoSD } from "./helpers";
+import { checkPoolCount } from "./helpers";
 import { Versions } from "../versions";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { crossPoolTokens } from "../common/constants";
@@ -22,32 +25,34 @@ import {
   BridgePoolType,
   CrosschainTokenType,
 } from "../sdk/protocols/bridge/enums";
-import { Network, RewardTokenType } from "../sdk/util/constants";
+import {
+  Network,
+  RewardTokenType,
+  BIGINT_MINUS_ONE,
+} from "../sdk/util/constants";
 import { chainIDToNetwork } from "../sdk/protocols/bridge/chainIds";
 import { getRewardsPerDay, RewardIntervalType } from "../sdk/util/rewards";
 
 import {
-  AddLiquidityCall,
-  CreatePoolCall,
-} from "../../generated/Router/Router";
-import {
-  InstantRedeemLocal,
-  RedeemLocal,
-  RedeemLocalCallback,
-  RedeemRemote,
+  Mint,
+  Burn,
   Swap,
-  SwapRemoteCall,
-} from "../../generated/Router/Pool";
-import { Pool } from "../../generated/Router/Pool";
-import { Factory as StargateFactory } from "../../generated/Router/Factory";
+  SwapRemote,
+  Pool,
+} from "../../generated/LPStaking/Pool";
 import { PoolTemplate } from "../../generated/templates";
 import { Token } from "../../generated/schema";
 import {
-  Deposit,
+  Deposit as DepositForBlockRewards,
   LPStaking,
-  Withdraw,
+  Withdraw as WithdrawForBlockRewards,
 } from "../../generated/LPStaking/LPStaking";
-import { LPStakingTime } from "../../generated/LPStaking/LPStakingTime";
+import {
+  Deposit as DepositForTimeRewards,
+  LPStakingTime,
+  Withdraw as WithdrawForTimeRewards,
+} from "../../generated/LPStaking/LPStakingTime";
+import { _ERC20 } from "../../generated/LPStaking/_ERC20";
 
 const conf = new BridgeConfig(
   NetworkConfigs.getFactoryAddress(),
@@ -78,11 +83,28 @@ class Pricer implements TokenPricer {
 
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
+    let underlying: Address | null = null;
+
     const wrappedERC20 = Pool.bind(address);
+    const poolIDCall = wrappedERC20.try_poolId();
+    if (poolIDCall.reverted) {
+      const erc20 = _ERC20.bind(address);
+      const name = erc20.name();
+      const symbol = erc20.symbol();
+      const decimals = erc20.decimals().toI32();
+
+      return {
+        name,
+        symbol,
+        decimals,
+        underlying,
+      };
+    }
+
     const name = wrappedERC20.name();
     const symbol = wrappedERC20.symbol();
     const decimals = wrappedERC20.decimals().toI32();
-    const underlying = wrappedERC20.token();
+    underlying = wrappedERC20.token();
 
     return {
       name,
@@ -93,91 +115,202 @@ class TokenInit implements TokenInitializer {
   }
 }
 
-export function handleCreatePool(call: CreatePoolCall): void {
-  const poolAddr = call.outputs.value0;
-  const poolName = call.inputs._name;
-  const poolSymbol = call.inputs._symbol;
+export function handleStakeForBlockRewards(
+  event: DepositForBlockRewards
+): void {
+  const lpStakingContractAddr = dataSource.address();
+  const poolID = event.params.pid;
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), call);
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const token = sdk.Tokens.getOrCreateToken(poolAddr);
+  const lpStakingContract = LPStaking.bind(lpStakingContractAddr);
+
+  const poolInfo = lpStakingContract.poolInfo(poolID);
+  const poolAddr = poolInfo.value0;
+  const allocPoint = poolInfo.value1;
+
+  const rewardToken = sdk.Tokens.getOrCreateToken(lpStakingContract.stargate());
+  const stargatePerBlock = lpStakingContract.stargatePerBlock();
+  const totalAllocPoint = lpStakingContract.totalAllocPoint();
+
+  const stargatePerBlockForPool = stargatePerBlock
+    .times(allocPoint)
+    .div(totalAllocPoint);
+
+  const rewardsPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    stargatePerBlockForPool.toBigDecimal(),
+    RewardIntervalType.BLOCK
+  );
+
   const pool = sdk.Pools.loadPool<string>(poolAddr);
   if (!pool.isInitialized) {
+    const poolContract = Pool.bind(poolAddr);
+    const poolName = poolContract.name();
+    const poolSymbol = poolContract.symbol();
+    const token = sdk.Tokens.getOrCreateToken(poolAddr);
+
     pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+
+    PoolTemplate.create(poolAddr);
   }
 
-  PoolTemplate.create(poolAddr);
-}
-
-export function handleAddLiquidity(call: AddLiquidityCall): void {
-  const poolID = call.inputs._poolId;
-
-  const stargateFactoryContract = StargateFactory.bind(
-    Address.fromString(conf.getID())
+  pool.setRewardEmissions(
+    RewardTokenType.DEPOSIT,
+    rewardToken,
+    bigDecimalToBigInt(rewardsPerDay)
   );
-  const getPoolCall = stargateFactoryContract.try_getPool(poolID);
-  if (getPoolCall.reverted) {
-    return;
+
+  checkPoolCount(sdk);
+}
+
+export function handleStakeForTimeRewards(event: DepositForTimeRewards): void {
+  const lpStakingContractAddr = dataSource.address();
+  const poolID = event.params.pid;
+
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+
+  const lpStakingContract = LPStakingTime.bind(lpStakingContractAddr);
+
+  const poolInfo = lpStakingContract.poolInfo(poolID);
+  const poolAddr = poolInfo.value0;
+  const allocPoint = poolInfo.value1;
+
+  const rewardToken = sdk.Tokens.getOrCreateToken(lpStakingContract.eToken());
+  const stargatePerSecond = lpStakingContract.eTokenPerSecond();
+  const totalAllocPoint = lpStakingContract.totalAllocPoint();
+
+  const stargatePerSecondForPool = stargatePerSecond
+    .times(allocPoint)
+    .div(totalAllocPoint);
+
+  const rewardsPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    stargatePerSecondForPool.toBigDecimal(),
+    RewardIntervalType.TIMESTAMP
+  );
+
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
+  if (!pool.isInitialized) {
+    const poolContract = Pool.bind(poolAddr);
+    const poolName = poolContract.name();
+    const poolSymbol = poolContract.symbol();
+    const token = sdk.Tokens.getOrCreateToken(poolAddr);
+
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+
+    PoolTemplate.create(poolAddr);
   }
 
-  const poolAddr = getPoolCall.value;
-  const amount = amountLDtoSD(poolAddr, call.inputs._amountLD);
+  pool.setRewardEmissions(
+    RewardTokenType.DEPOSIT,
+    rewardToken,
+    bigDecimalToBigInt(rewardsPerDay)
+  );
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), call);
-
-  const pool = sdk.Pools.loadPool<string>(poolAddr);
-
-  const account = sdk.Accounts.loadAccount(call.transaction.from);
-  account.liquidityDeposit(pool, amount);
+  checkPoolCount(sdk);
 }
 
-export function handleRedeemLocal(event: RedeemLocal): void {
-  const poolAddr = dataSource.address();
-  const amount = event.params.amountSD;
+export function handleUnstakeForBlockRewards(
+  event: WithdrawForBlockRewards
+): void {
+  const lpStakingContractAddr = dataSource.address();
+  const poolID = event.params.pid;
 
   const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool<string>(poolAddr);
+  const lpStakingContract = LPStaking.bind(lpStakingContractAddr);
 
-  const account = sdk.Accounts.loadAccount(event.params.from);
-  account.liquidityWithdraw(pool, amount);
+  const poolInfo = lpStakingContract.poolInfo(poolID);
+  const poolAddr = poolInfo.value0;
+  const allocPoint = poolInfo.value1;
+
+  const rewardToken = sdk.Tokens.getOrCreateToken(lpStakingContract.stargate());
+  const stargatePerBlock = lpStakingContract.stargatePerBlock();
+  const totalAllocPoint = lpStakingContract.totalAllocPoint();
+
+  const stargatePerBlockForPool = stargatePerBlock
+    .times(allocPoint)
+    .div(totalAllocPoint);
+
+  const rewardsPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    stargatePerBlockForPool.toBigDecimal(),
+    RewardIntervalType.BLOCK
+  );
+
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
+  if (!pool.isInitialized) {
+    const poolContract = Pool.bind(poolAddr);
+    const poolName = poolContract.name();
+    const poolSymbol = poolContract.symbol();
+    const token = sdk.Tokens.getOrCreateToken(poolAddr);
+
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+
+    PoolTemplate.create(poolAddr);
+  }
+
+  pool.setRewardEmissions(
+    RewardTokenType.DEPOSIT,
+    rewardToken,
+    bigDecimalToBigInt(rewardsPerDay)
+  );
+
+  checkPoolCount(sdk);
 }
 
-export function handleInstantRedeemLocal(event: InstantRedeemLocal): void {
-  const poolAddr = dataSource.address();
-  const amount = event.params.amountSD;
+export function handleUnstakeForTimeRewards(
+  event: WithdrawForTimeRewards
+): void {
+  const lpStakingContractAddr = dataSource.address();
+  const poolID = event.params.pid;
 
   const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
-  const pool = sdk.Pools.loadPool<string>(poolAddr);
+  const lpStakingContract = LPStakingTime.bind(lpStakingContractAddr);
 
-  const account = sdk.Accounts.loadAccount(event.params.from);
-  account.liquidityWithdraw(pool, amount);
-}
+  const poolInfo = lpStakingContract.poolInfo(poolID);
+  const poolAddr = poolInfo.value0;
+  const allocPoint = poolInfo.value1;
 
-export function handleRedeemRemote(event: RedeemRemote): void {
-  const poolAddr = dataSource.address();
-  // event.params.amountSD is infact amountLD
-  const amount = amountLDtoSD(poolAddr, event.params.amountSD);
+  const rewardToken = sdk.Tokens.getOrCreateToken(lpStakingContract.eToken());
+  const stargatePerSecond = lpStakingContract.eTokenPerSecond();
+  const totalAllocPoint = lpStakingContract.totalAllocPoint();
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const stargatePerSecondForPool = stargatePerSecond
+    .times(allocPoint)
+    .div(totalAllocPoint);
 
-  const pool = sdk.Pools.loadPool<string>(poolAddr);
-
-  const account = sdk.Accounts.loadAccount(event.params.from);
-  account.liquidityWithdraw(pool, amount);
-}
-
-export function handleRedeemLocalCallback(event: RedeemLocalCallback): void {
-  const poolAddr = dataSource.address();
-  const amount = event.params._amountToMintSD;
-
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const rewardsPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    stargatePerSecondForPool.toBigDecimal(),
+    RewardIntervalType.TIMESTAMP
+  );
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
+  if (!pool.isInitialized) {
+    const poolContract = Pool.bind(poolAddr);
+    const poolName = poolContract.name();
+    const poolSymbol = poolContract.symbol();
+    const token = sdk.Tokens.getOrCreateToken(poolAddr);
 
-  const account = sdk.Accounts.loadAccount(event.params._to);
-  account.liquidityDeposit(pool, amount);
+    pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token);
+
+    PoolTemplate.create(poolAddr);
+  }
+
+  pool.setRewardEmissions(
+    RewardTokenType.DEPOSIT,
+    rewardToken,
+    bigDecimalToBigInt(rewardsPerDay)
+  );
+
+  checkPoolCount(sdk);
 }
 
 export function handleSwapOut(event: Swap): void {
@@ -238,27 +371,56 @@ export function handleSwapOut(event: Swap): void {
 
   const account = sdk.Accounts.loadAccount(event.params.from);
   account.transferOut(pool, route!, event.params.from, amount);
+
+  checkPoolCount(sdk);
 }
 
-export function handleSwapIn(call: SwapRemoteCall): void {
+export function handleSwapIn(event: SwapRemote): void {
   const poolAddr = dataSource.address();
-  const amount = amountLDtoSD(poolAddr, call.outputs.amountLD);
-  const amountLPFee = call.inputs._s.lpFee;
+  const amount = event.params.amountSD;
 
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), call);
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
   const token = sdk.Tokens.getOrCreateToken(
     Address.fromBytes(pool.getInputToken().id)
   );
-  const crosschainID = BigInt.fromI32(call.inputs._srcChainId as i32);
-  const crossPoolID = call.inputs._srcPoolId;
+
+  let crosschainID = BIGINT_MINUS_ONE;
+  let crossPoolID = BIGINT_MINUS_ONE;
+
+  const creditCPEventSig = crypto.keccak256(
+    ByteArray.fromUTF8("CreditChainPath(uint16,uint256,uint256,uint256)")
+  );
+
+  const logs = event.receipt!.logs;
+  for (let i = 0; i < logs.length; i++) {
+    const currLog = logs.at(i);
+    const topic0Sig = currLog.topics.at(0);
+    if (topic0Sig.equals(creditCPEventSig)) {
+      const decodedLogData = ethereum
+        .decode("(uint16,uint256,uint256,uint256)", currLog.data)!
+        .toTuple();
+
+      crosschainID = decodedLogData.at(0).toBigInt();
+      crossPoolID = decodedLogData.at(1).toBigInt();
+    }
+  }
+
+  if (crossPoolID == BIGINT_MINUS_ONE || crosschainID == BIGINT_MINUS_ONE) {
+    log.warning(
+      "[handleSwapIn] Could not find crosschainID/crossPoolID tx_hash: {}",
+      [event.transaction.hash.toHexString()]
+    );
+
+    return;
+  }
 
   const crosschainNetwork = chainIDToNetwork(crosschainID);
   if (crosschainNetwork == Network.UNKNOWN_NETWORK) {
     log.warning("[handleSwapIn] Network unknown for chainID: {} tx_hash: {}", [
       crosschainID.toString(),
-      call.transaction.hash.toHexString(),
+      event.transaction.hash.toHexString(),
     ]);
 
     return;
@@ -291,110 +453,36 @@ export function handleSwapIn(call: SwapRemoteCall): void {
   pool.addDestinationToken(crosschainToken);
   const route = pool.getDestinationTokenRoute(crosschainToken);
 
-  const account = sdk.Accounts.loadAccount(call.inputs._to);
-  account.transferIn(pool, route!, call.inputs._to, amount);
-  account.liquidityDeposit(pool, amountLPFee);
+  const account = sdk.Accounts.loadAccount(event.params.to);
+  account.transferIn(pool, route!, event.params.to, amount);
+
+  checkPoolCount(sdk);
 }
 
-export function handleStake(event: Deposit): void {
-  const lpStakingContractAddr = dataSource.address();
-  const poolID = event.params.pid;
-
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
-
-  const rewardToken = sdk.Tokens.getOrCreateToken(
-    Address.fromString(NetworkConfigs.getRewardToken())
-  );
-
-  let poolAddr: Address;
-  let rewardsPerDay: BigDecimal;
-
-  const network = dataSource.network().toUpperCase();
-
-  if (network != Network.OPTIMISM) {
-    const lpStakingContract = LPStaking.bind(lpStakingContractAddr);
-
-    const poolInfo = lpStakingContract.poolInfo(poolID);
-    poolAddr = poolInfo.value0;
-    const allocPoint = poolInfo.value1;
-
-    const stargatePerBlock = lpStakingContract.stargatePerBlock();
-    const totalAllocPoint = lpStakingContract.totalAllocPoint();
-
-    const stargatePerBlockForPool = stargatePerBlock
-      .times(allocPoint)
-      .div(totalAllocPoint);
-
-    rewardsPerDay = getRewardsPerDay(
-      event.block.timestamp,
-      event.block.number,
-      stargatePerBlockForPool.toBigDecimal(),
-      RewardIntervalType.BLOCK
-    );
-  } else {
-    const lpStakingContract = LPStakingTime.bind(lpStakingContractAddr);
-
-    const poolInfo = lpStakingContract.poolInfo(poolID);
-    poolAddr = poolInfo.value0;
-    const allocPoint = poolInfo.value1;
-
-    const stargatePerSecond = lpStakingContract.eTokenPerSecond();
-    const totalAllocPoint = lpStakingContract.totalAllocPoint();
-
-    const stargatePerSecondForPool = stargatePerSecond
-      .times(allocPoint)
-      .div(totalAllocPoint);
-
-    rewardsPerDay = getRewardsPerDay(
-      event.block.timestamp,
-      event.block.number,
-      stargatePerSecondForPool.toBigDecimal(),
-      RewardIntervalType.TIMESTAMP
-    );
-  }
-
-  const pool = sdk.Pools.loadPool<string>(poolAddr);
-
-  pool.setRewardEmissions(
-    RewardTokenType.DEPOSIT,
-    rewardToken,
-    bigDecimalToBigInt(rewardsPerDay)
-  );
-}
-
-export function handleUnstake(event: Withdraw): void {
-  const lpStakingContractAddr = dataSource.address();
-  const poolID = event.params.pid;
-
-  const lpStakingContract = LPStaking.bind(lpStakingContractAddr);
-
-  const poolInfo = lpStakingContract.poolInfo(poolID);
-  const poolAddr = poolInfo.value0;
-  const allocPoint = poolInfo.value1;
-
-  const stargatePerBlock = lpStakingContract.stargatePerBlock();
-  const totalAllocPoint = lpStakingContract.totalAllocPoint();
-
-  const stargatePerBlockForPool = stargatePerBlock
-    .times(allocPoint)
-    .div(totalAllocPoint);
+export function handleMint(event: Mint): void {
+  const poolAddr = dataSource.address();
+  const amount = event.params.amountSD;
 
   const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
 
   const pool = sdk.Pools.loadPool<string>(poolAddr);
-  const rewardToken = sdk.Tokens.getOrCreateToken(
-    Address.fromString(NetworkConfigs.getRewardToken())
-  );
-  const rewardsPerDay = getRewardsPerDay(
-    event.block.timestamp,
-    event.block.number,
-    stargatePerBlockForPool.toBigDecimal(),
-    RewardIntervalType.BLOCK
-  );
 
-  pool.setRewardEmissions(
-    RewardTokenType.DEPOSIT,
-    rewardToken,
-    bigDecimalToBigInt(rewardsPerDay)
-  );
+  const account = sdk.Accounts.loadAccount(event.params.to);
+  account.liquidityDeposit(pool, amount);
+
+  checkPoolCount(sdk);
+}
+
+export function handleBurn(event: Burn): void {
+  const poolAddr = dataSource.address();
+  const amount = event.params.amountSD;
+
+  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
+
+  const account = sdk.Accounts.loadAccount(event.params.from);
+  account.liquidityWithdraw(pool, amount);
+
+  checkPoolCount(sdk);
 }
