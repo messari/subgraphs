@@ -6,7 +6,12 @@ import {
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
-import { Account, Market, _MarketList } from "../generated/schema";
+import {
+  Account,
+  Market,
+  _DefaultOracle,
+  _MarketList,
+} from "../generated/schema";
 import { AToken } from "../generated/LendingPool/AToken";
 import { StableDebtToken } from "../generated/LendingPool/StableDebtToken";
 import { VariableDebtToken } from "../generated/LendingPool/VariableDebtToken";
@@ -21,16 +26,20 @@ import {
   rayToWad,
   RAY_OFFSET,
   ZERO_ADDRESS,
+  BIGINT_ONE,
 } from "./constants";
 import {
   InterestRateSide,
   InterestRateType,
+  OracleSource,
   PositionSide,
 } from "./sdk/constants";
 import {
   getBorrowBalance,
   getCollateralBalance,
   getMarketByAuxillaryToken,
+  restorePrePauseState,
+  storePrePauseState,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -50,11 +59,21 @@ import { PositionManager } from "./sdk/position";
 
 export function _handlePriceOracleUpdated(
   newPriceOracle: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  event: ethereum.Event
 ): void {
   log.info("[_handlePriceOracleUpdated] New oracleAddress: {}", [
     newPriceOracle.toHexString(),
   ]);
+
+  // since all aave markets share the same oracle
+  // we will use _DefaultOracle entity for markets whose oracle is not set
+  let defaultOracle = _DefaultOracle.load(protocolData.protocolID);
+  if (!defaultOracle) {
+    defaultOracle = new _DefaultOracle(protocolData.protocolID);
+  }
+  defaultOracle.oracle = newPriceOracle;
+  defaultOracle.save();
 
   const marketList = _MarketList.load(protocolData.protocolID);
   if (!marketList) {
@@ -66,16 +85,25 @@ export function _handlePriceOracleUpdated(
 
   const markets = marketList.markets;
   for (let i = 0; i < markets.length; i++) {
-    const market = Market.load(markets[i]);
-    if (!market) {
+    const _market = Market.load(markets[i]);
+    if (!_market) {
       log.warning("[_handlePriceOracleUpdated] Market not found: {}", [
         markets[i].toHexString(),
       ]);
       continue;
     }
-
-    market.oracle = newPriceOracle;
-    market.save();
+    const manager = new DataManager(
+      markets[i],
+      _market.inputToken,
+      event,
+      protocolData
+    );
+    _market.oracle = manager.getOrCreateOracle(
+      newPriceOracle,
+      true,
+      OracleSource.CHAINLINK
+    ).id;
+    _market.save();
   }
 }
 
@@ -112,6 +140,15 @@ export function _handleReserveInitialized(
     const sDebtTokenManager = new TokenManager(stableDebtToken, event);
     market._sToken = sDebtTokenManager.getToken().id;
     STokenTemplate.create(stableDebtToken);
+  }
+
+  const defaultOracle = _DefaultOracle.load(protocolData.protocolID);
+  if (!market.oracle && defaultOracle) {
+    market.oracle = manager.getOrCreateOracle(
+      Address.fromBytes(defaultOracle.oracle),
+      true,
+      OracleSource.CHAINLINK
+    ).id;
   }
 
   market.save();
@@ -159,12 +196,8 @@ export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
   }
 
   market.canBorrowFrom = true;
-  market._prePauseState = [
-    market._prePauseState[0],
-    market._prePauseState[1],
-    true,
-  ];
   market.save();
+  storePrePauseState(market);
 }
 
 export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
@@ -177,12 +210,8 @@ export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
   }
 
   market.canBorrowFrom = false;
-  market._prePauseState = [
-    market._prePauseState[0],
-    market._prePauseState[1],
-    false,
-  ];
   market.save();
+  storePrePauseState(market);
 }
 
 export function _handleReserveActivated(marketId: Address): void {
@@ -195,12 +224,8 @@ export function _handleReserveActivated(marketId: Address): void {
   }
 
   market.isActive = true;
-  market._prePauseState = [
-    true,
-    market._prePauseState[1],
-    market._prePauseState[2],
-  ];
   market.save();
+  storePrePauseState(market);
 }
 
 export function _handleReserveDeactivated(marketId: Address): void {
@@ -213,12 +238,8 @@ export function _handleReserveDeactivated(marketId: Address): void {
   }
 
   market.isActive = false;
-  market._prePauseState = [
-    false,
-    market._prePauseState[1],
-    market._prePauseState[2],
-  ];
   market.save();
+  storePrePauseState(market);
 }
 
 export function _handleReserveFactorChanged(
@@ -291,12 +312,7 @@ export function _handlePaused(protocolData: ProtocolData): void {
       continue;
     }
 
-    market._prePauseState = [
-      market.isActive,
-      market.canUseAsCollateral,
-      market.canBorrowFrom,
-    ];
-
+    storePrePauseState(market);
     market.isActive = false;
     market.canUseAsCollateral = false;
     market.canBorrowFrom = false;
@@ -323,11 +339,7 @@ export function _handleUnpaused(protocolData: ProtocolData): void {
       continue;
     }
 
-    market.isActive = market._prePauseState[0];
-    market.canUseAsCollateral = market._prePauseState[1];
-    market.canBorrowFrom = market._prePauseState[2];
-
-    market.save();
+    restorePrePauseState(market);
   }
 }
 
@@ -422,8 +434,12 @@ export function _handleReserveDataUpdated(
 
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
+  if (!market._liquidityIndex) {
+    market._liquidityIndex = BIGINT_ONE;
+  }
+
   const liquidityIndexDiff = liquidityIndex
-    .minus(market._liquidityIndex)
+    .minus(market._liquidityIndex!)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
   market._liquidityIndex = liquidityIndex; // must update to current liquidity index

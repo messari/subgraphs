@@ -5,7 +5,6 @@ import {
   dataSource,
   DataSourceContext,
   log,
-  ethereum,
   Bytes,
 } from "@graphprotocol/graph-ts";
 import {
@@ -74,7 +73,7 @@ import {
   RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
-import { Market, RewardToken, Token } from "../../../generated/schema";
+import { Market, Token, _DefaultOracle } from "../../../generated/schema";
 import {
   AddressesProviderRegistered,
   PoolAddressesProviderRegistry,
@@ -147,7 +146,7 @@ export function handleAddressesProviderRegistered(
 ///// PoolAddressProvider Handlers /////
 ///////////////////////////////////////////////r
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
-  _handlePriceOracleUpdated(event.params.newAddress, protocolData);
+  _handlePriceOracleUpdated(event.params.newAddress, protocolData, event);
 }
 
 export function handleProxyCreated(event: ProxyCreated): void {
@@ -397,9 +396,21 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     ]);
     return;
   }
+  let priceOracle = market.oracle;
+  if (!priceOracle) {
+    const defaultOracle = _DefaultOracle.load(protocolData.protocolID);
+    if (!defaultOracle) {
+      log.warning(
+        "[handleReserveDataUpdated] Either oracle for market {} or default oracle needs to be set",
+        [marketId.toHexString()]
+      );
+      return;
+    }
+    priceOracle = defaultOracle.oracle;
+  }
   const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromBytes(market.inputToken),
-    Address.fromBytes(market.oracle!),
+    Address.fromBytes(priceOracle),
     event.block.number
   );
 

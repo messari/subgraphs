@@ -95,3 +95,26 @@ export function getCollateralBalance(market: Market, account: Address): BigInt {
   );
   return collateralBalance;
 }
+
+export function storePrePauseState(market: Market): void {
+  market._prePauseState = [
+    market.isActive,
+    market.canUseAsCollateral,
+    market.canBorrowFrom,
+  ];
+  market.save();
+}
+
+export function restorePrePauseState(market: Market): void {
+  if (!market._prePauseState || market._prePauseState.length !== 3) {
+    log.warning(
+      "[restorePrePauseState] _prePauseState for market {} is not set correctly",
+      [market.id.toHexString()]
+    );
+    return;
+  }
+  market.isActive = market._prePauseState[0];
+  market.canUseAsCollateral = market._prePauseState[1];
+  market.canBorrowFrom = market._prePauseState[2];
+  market.save();
+}

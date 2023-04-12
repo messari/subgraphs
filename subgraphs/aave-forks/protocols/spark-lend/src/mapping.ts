@@ -10,7 +10,7 @@ import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
   Protocol,
-  TokenType,
+  IavsTokenType,
 } from "./constants";
 import {
   CollateralConfigurationChanged,
@@ -100,9 +100,9 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
 export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
   const assetAddress = event.params.asset.toHexString();
   const assetToken = Token.load(assetAddress);
-  if (!assetToken || !assetToken._market || !assetToken._type) {
+  if (!assetToken || !assetToken._market || !assetToken._iavsTokenType) {
     log.error(
-      "[handleAssetConfigUpdated]Failed to find token {} or assetToken._market/assetToken._type is null",
+      "[handleAssetConfigUpdated]Failed to find token {} or assetToken._market/assetToken._iavsTokenType is null",
       [assetAddress]
     );
     return;
@@ -120,13 +120,13 @@ export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
   // and another for stable borrowing
   let rewardTokenType: string;
   let interestRateType: string;
-  if (assetToken._type! == TokenType.ATOKEN) {
+  if (assetToken._iavsTokenType! == IavsTokenType.ATOKEN) {
     rewardTokenType = RewardTokenType.DEPOSIT;
     interestRateType = InterestRateType.VARIABLE;
-  } else if (assetToken._type! == TokenType.STOKEN) {
+  } else if (assetToken._iavsTokenType! == IavsTokenType.STOKEN) {
     rewardTokenType = RewardTokenType.BORROW;
     interestRateType = InterestRateType.STABLE;
-  } else if (assetToken._type! == TokenType.VTOKEN) {
+  } else if (assetToken._iavsTokenType! == IavsTokenType.VTOKEN) {
     rewardTokenType = RewardTokenType.BORROW;
     interestRateType = InterestRateType.VARIABLE;
   } else {
@@ -170,22 +170,22 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
 
   // map tokens to market
   assetToken._market = market.id;
-  assetToken._type = TokenType.INPUTTOKEN;
+  assetToken._iavsTokenType = IavsTokenType.INPUTTOKEN;
   assetToken.save();
 
   const aToken = getOrCreateToken(event.params.aToken);
   aToken._market = market.id;
-  aToken._type = TokenType.ATOKEN;
+  aToken._iavsTokenType = IavsTokenType.ATOKEN;
   aToken.save();
 
   const vToken = getOrCreateToken(event.params.variableDebtToken);
   vToken._market = market.id;
-  vToken._type = TokenType.VTOKEN;
+  vToken._iavsTokenType = IavsTokenType.VTOKEN;
   vToken.save();
 
   const sToken = getOrCreateToken(event.params.stableDebtToken);
   sToken._market = market.id;
-  sToken._type = TokenType.STOKEN;
+  sToken._iavsTokenType = IavsTokenType.STOKEN;
   sToken.save();
 }
 
