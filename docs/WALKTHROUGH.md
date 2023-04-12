@@ -90,6 +90,8 @@ There is a standard logging format that we follow in subgraphs to ensure subgrap
 - `log.error`: This is used for errors that need to be addressed, but are not fatal to the subgraph's function. This should be cause for a fix, but the subgraph can continue to execute. This may cause a minor data issue that should be addressed soon. This would be synonymous to a [#minor](https://github.com/messari/subgraphs/blob/master/docs/CONTRIBUTING.md#minor) fix in our versioning system.
 - `log.critical`: This will be used for fatal errors. When this log is reached a subgraph will stop executing. This error will be cause for a major data issue that would create a major issue downstream if the data is consumed. This needs to be fixed ASAP and is synonymous to a [#major](https://github.com/messari/subgraphs/blob/master/docs/CONTRIBUTING.md#major) fix in our versioning system.
 
+> As a general rule, if a function cannot continue to execute it should either be an `error` or `critical`. The severity will be determined by the impact of the error.
+
 Each log severity has a different purpose and should be used accordingly.
 
 > The goal is to remove ambiguity of log meaning for devs, help downstream consumers understand what is happening on a subgraph-level, and use downtime judiciously.
