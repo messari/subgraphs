@@ -7,6 +7,7 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_TEN_TO_EIGHTH,
   BIGINT_ZERO,
+  INT_EIGHT,
   OptionType,
 } from "../common/constants";
 import { getOrCreateToken } from "../common/tokens";
@@ -30,7 +31,7 @@ export function createOption(event: OtokenCreated): Option {
   option.collateralAsset = collateralToken.id;
   option.pool = getOrCreatePool(collateralToken).id;
   option.strikeAsset = getOrCreateToken(event.params.strike).id;
-  option.strikePrice = bigIntToBigDecimal(event.params.strikePrice);
+  option.strikePrice = bigIntToBigDecimal(event.params.strikePrice, INT_EIGHT);
 
   option.type = event.params.isPut ? OptionType.PUT : OptionType.CALL;
   option.expirationTimestamp = event.params.expiry;

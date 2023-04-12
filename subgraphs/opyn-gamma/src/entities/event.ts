@@ -24,12 +24,7 @@ export function createDeposit(
   const pool = getOrCreatePool(token);
   takeSnapshots(event, pool);
   const deposit = new Deposit(
-    Bytes.fromUTF8(
-      prefixID(
-        "deposit",
-        `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
-      )
-    )
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   deposit.hash = event.transaction.hash;
   deposit.logIndex = event.logIndex.toI32();
@@ -62,12 +57,7 @@ export function createWithdraw(
   const pool = getOrCreatePool(token);
   takeSnapshots(event, pool);
   const withdraw = new Withdraw(
-    Bytes.fromUTF8(
-      prefixID(
-        "withdraw",
-        `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
-      )
-    )
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   );
   withdraw.hash = event.transaction.hash;
   withdraw.logIndex = event.logIndex.toI32();

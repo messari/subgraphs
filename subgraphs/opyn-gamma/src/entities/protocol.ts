@@ -33,6 +33,7 @@ export function getOrCreateOpynProtocol(): DerivOptProtocol {
     protocol.cumulativeDepositPremiumUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeWithdrawPremiumUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeCollateralVolumeUSD = BIGDECIMAL_ZERO;
 
     protocol.putsMintedCount = INT_ZERO;
     protocol.callsMintedCount = INT_ZERO;
@@ -75,6 +76,13 @@ export function updateProtocolOpenInterest(netChangeUSD: BigDecimal): void {
 export function addProtocolMintVolume(amountUSD: BigDecimal): void {
   const protocol = getOrCreateOpynProtocol();
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(amountUSD);
+  protocol.save();
+}
+
+export function addProtocolCollateralVolume(amountUSD: BigDecimal): void {
+  const protocol = getOrCreateOpynProtocol();
+  protocol.cumulativeCollateralVolumeUSD =
+    protocol.cumulativeCollateralVolumeUSD!.plus(amountUSD);
   protocol.save();
 }
 

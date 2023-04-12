@@ -5,6 +5,7 @@ import {
   _ActivityHelper,
 } from "../../generated/schema";
 import {
+  ActivityHelperID,
   INT_ZERO,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
@@ -13,8 +14,6 @@ import {
   incrementProtocolUniqueLPs,
   incrementProtocolUniqueTakers,
 } from "./protocol";
-
-const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
 
 export function updateActiveAccounts(
   event: ethereum.Event,

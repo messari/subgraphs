@@ -9,6 +9,7 @@ import {
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
+  BIGINT_HUNDRED,
   BIGINT_ZERO,
   INT_ZERO,
   OptionType,
@@ -17,6 +18,7 @@ import { getOrCreateToken } from "../common/tokens";
 import { getUSDAmount } from "../price";
 import {
   addProtocolClosedVolume,
+  addProtocolCollateralVolume,
   addProtocolExercisedVolume,
   addProtocolMintVolume,
   decrementProtocolPositionCount,
@@ -65,6 +67,7 @@ export function getOrCreatePool(token: Token): LiquidityPool {
     pool.cumulativeWithdrawVolumeByTokenAmount = [BIGINT_ZERO];
     pool.cumulativeExercisedVolumeUSD = BIGDECIMAL_ZERO;
     pool.cumulativeClosedVolumeUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeCollateralVolumeUSD = BIGDECIMAL_ZERO;
     pool.openInterestUSD = BIGDECIMAL_ZERO;
     pool.putsMintedCount = INT_ZERO;
     pool.callsMintedCount = INT_ZERO;
@@ -76,7 +79,7 @@ export function getOrCreatePool(token: Token): LiquidityPool {
     pool.openPositionCount = INT_ZERO;
     pool.closedPositionCount = INT_ZERO;
     pool.inputTokenBalances = [BIGINT_ZERO];
-    pool.inputTokenWeights = [BIGDECIMAL_ONE];
+    pool.inputTokenWeights = [BIGINT_HUNDRED.toBigDecimal()];
     pool.outputTokenSupply = null;
     pool.outputTokenPriceUSD = null;
     pool.stakedOutputTokenAmount = null;
@@ -163,6 +166,17 @@ export function addPoolMintVolume(
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(amountUSD);
   pool.save();
   addProtocolMintVolume(amountUSD);
+}
+
+export function addPoolCollateralVolume(
+  event: ethereum.Event,
+  pool: LiquidityPool,
+  amountUSD: BigDecimal
+): void {
+  pool.cumulativeCollateralVolumeUSD =
+    pool.cumulativeCollateralVolumeUSD!.plus(amountUSD);
+  pool.save();
+  addProtocolCollateralVolume(amountUSD);
 }
 
 export function addPoolClosedVolume(

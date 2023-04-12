@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -167,6 +167,9 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 
 export const ETH_SYMBOL = "ETH";
 export const ETH_NAME = "Ether";
+
+export const SnapshotHelperID = Bytes.fromUTF8("_ProtocolSnapshotHelper");
+export const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
 
 /////////////////////////////
 ///// Protocol Specific /////

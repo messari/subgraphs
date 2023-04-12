@@ -8,6 +8,7 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  INT_EIGHT,
   INT_ONE,
   INT_ZERO,
 } from "../common/constants";
@@ -70,7 +71,9 @@ function openNewPosition(
   position.premium = BIGINT_ZERO;
   position.premiumUSD = BIGDECIMAL_ZERO;
   position.amount = amount;
-  position.amountUSD = bigIntToBigDecimal(amount, 8).times(position.takenPrice);
+  position.amountUSD = bigIntToBigDecimal(amount, INT_EIGHT).times(
+    position.takenPrice
+  );
   position.save();
   incrementAccountPositionCount(event, account, option);
 }

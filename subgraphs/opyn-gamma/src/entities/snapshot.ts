@@ -15,11 +15,10 @@ import {
   SECONDS_PER_DAY_BI,
   SECONDS_PER_HOUR,
   SECONDS_PER_HOUR_BI,
+  SnapshotHelperID,
 } from "../common/constants";
 import { getOrCreateOpynProtocol } from "./protocol";
 import { getOrCreateActivityHelper } from "./usage";
-
-const SnapshotHelperID = Bytes.fromUTF8("_ProtocolSnapshotHelper");
 
 export function takeSnapshots(
   event: ethereum.Event,
@@ -115,6 +114,8 @@ function takePoolDailySnapshot(
   snapshot.cumulativeTotalLiquidityPremiumUSD =
     snapshot.dailyTotalLiquidityPremiumUSD =
       pool.cumulativeTotalLiquidityPremiumUSD;
+  snapshot.cumulativeCollateralVolumeUSD = pool.cumulativeCollateralVolumeUSD!;
+  snapshot.dailyCollateralVolumeUSD = pool.cumulativeCollateralVolumeUSD!;
 
   snapshot.putsMintedCount = snapshot.dailyPutsMintedCount =
     pool.putsMintedCount;
@@ -196,6 +197,10 @@ function takePoolDailySnapshot(
     snapshot.dailyTotalLiquidityPremiumUSD =
       pool.cumulativeTotalLiquidityPremiumUSD.minus(
         prevSnapshot.cumulativeTotalLiquidityPremiumUSD
+      );
+    snapshot.dailyCollateralVolumeUSD =
+      snapshot.cumulativeCollateralVolumeUSD!.minus(
+        prevSnapshot.cumulativeCollateralVolumeUSD!
       );
 
     snapshot.dailyPutsMintedCount =
@@ -455,6 +460,10 @@ function takeFinancialsDailySnapshot(
   snapshot.cumulativeTotalLiquidityPremiumUSD =
     snapshot.dailyTotalLiquidityPremiumUSD =
       protocol.cumulativeTotalLiquidityPremiumUSD;
+  snapshot.cumulativeCollateralVolumeUSD =
+    protocol.cumulativeCollateralVolumeUSD!;
+  snapshot.cumulativeCollateralVolumeUSD =
+    protocol.cumulativeCollateralVolumeUSD!;
   snapshot.putsMintedCount = snapshot.dailyPutsMintedCount =
     protocol.putsMintedCount;
   snapshot.callsMintedCount = snapshot.dailyCallsMintedCount =
@@ -515,6 +524,11 @@ function takeFinancialsDailySnapshot(
       protocol.cumulativeTotalLiquidityPremiumUSD.minus(
         prevSnapshot.cumulativeTotalLiquidityPremiumUSD
       );
+    snapshot.dailyCollateralVolumeUSD =
+      snapshot.cumulativeCollateralVolumeUSD!.minus(
+        prevSnapshot.cumulativeCollateralVolumeUSD!
+      );
+
     snapshot.dailyPutsMintedCount =
       protocol.putsMintedCount - prevSnapshot.putsMintedCount;
     snapshot.dailyCallsMintedCount =
