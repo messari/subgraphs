@@ -3,14 +3,10 @@ import {
   BridgePoolType,
   CrosschainTokenType,
 } from "../../sdk/protocols/bridge/enums";
-import { Address } from "@graphprotocol/graph-ts";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
-import { ETH_ADDRESS, ETH_SYMBOL, Network } from "../../sdk/util/constants";
+import { ETH_SYMBOL, Network } from "../../sdk/util/constants";
 import { MessageDelivered } from "../../../generated/L1Bridge/Bridge";
-import { ethSideConf, Pricer, TokenInit } from "../../common/utils";
-
-// eth
-const ethAddress = Address.fromString(ETH_ADDRESS);
+import { ethSideConf, ethAddress, Pricer, TokenInit } from "../../common/utils";
 
 export function handleL1MessageDelivered(event: MessageDelivered): void {
   // -- SDK
