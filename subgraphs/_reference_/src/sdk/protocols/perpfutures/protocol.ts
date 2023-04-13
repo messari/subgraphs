@@ -210,7 +210,7 @@ export class Perpetual {
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param volume {BigDecimal} The value to add to the protocol's volume.
    */
-   addVolume(volume: BigDecimal): void {
+  addVolume(volume: BigDecimal): void {
     this.protocol.cumulativeVolumeUSD =
       this.protocol.cumulativeVolumeUSD.plus(volume);
     this.save();

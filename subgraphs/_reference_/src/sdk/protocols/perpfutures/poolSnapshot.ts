@@ -59,9 +59,10 @@ export class PoolSnapshot {
   }
 
   private isInitialized(): boolean {
-    log.error("[isInitialized] cannot create snapshots, pool: {} not initialized", [
-      this.pool.id.toHexString(),
-    ]);
+    log.error(
+      "[isInitialized] cannot create snapshots, pool: {} not initialized",
+      [this.pool.id.toHexString()]
+    );
 
     return this.pool._lastSnapshotDayID &&
       this.pool._lastSnapshotHourID &&

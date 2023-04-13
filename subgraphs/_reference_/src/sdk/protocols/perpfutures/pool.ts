@@ -278,7 +278,7 @@ export class Pool {
    * Will also update the protocol's total volume on the change in this pool's.
    * @param delta The change in total value locked for this pool.
    */
-   addVolume(delta: BigDecimal): void {
+  addVolume(delta: BigDecimal): void {
     this.pool.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD.plus(delta);
     this.save();
 
