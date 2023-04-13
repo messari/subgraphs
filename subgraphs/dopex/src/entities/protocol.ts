@@ -1,4 +1,9 @@
-import { BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import {
+  BigDecimal,
+  Bytes,
+  dataSource,
+  ethereum,
+} from "@graphprotocol/graph-ts";
 import { DerivOptProtocol } from "../../generated/schema";
 import { Versions } from "../versions";
 import { EventType } from "./event";
@@ -7,22 +12,27 @@ import {
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
-  Network,
   ProtocolType,
-  PROTOCOL_ADDRESS,
+  PROTOCOL_ADDRESS_ARBITRUM,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
+  Network,
+  PROTOCOL_ADDRESS_POLYGON,
 } from "../utils/constants";
 
 export function getOrCreateProtocol(): DerivOptProtocol {
-  const address = Bytes.fromHexString(PROTOCOL_ADDRESS);
+  const network = dataSource.network().toUpperCase().replace("-", "_");
+  let address = Bytes.fromHexString(PROTOCOL_ADDRESS_ARBITRUM);
+  if (network == Network.MATIC) {
+    address = Bytes.fromHexString(PROTOCOL_ADDRESS_POLYGON);
+  }
   let protocol = DerivOptProtocol.load(address);
 
   if (!protocol) {
     protocol = new DerivOptProtocol(address);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.network = Network.ARBITRUM_ONE;
+    protocol.network = network;
     protocol.type = ProtocolType.OPTION;
 
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;

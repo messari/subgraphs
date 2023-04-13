@@ -169,7 +169,10 @@ export const ETH_NAME = "Ether";
 export const PROTOCOL_NAME = "Dopex";
 export const PROTOCOL_SLUG = "dopex";
 export const PROTOCOL_ID = "DPX";
-export const PROTOCOL_ADDRESS = "0xd74c61ca8917be73377d74a007e6f002c25efb4e";
+export const PROTOCOL_ADDRESS_ARBITRUM =
+  "0x10fd85ec522C245a63239b9FC64434F58520bd1f";
+export const PROTOCOL_ADDRESS_POLYGON =
+  "0x4ee9fe9500e7c4fe849add9b14beec5ec5b7d955";
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 export const PRICE_PRECISION = BigDecimal.fromString("100000000");
 export const CHAIN_LINK = "chainlink";
