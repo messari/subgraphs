@@ -1,17 +1,16 @@
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { Deposit, Withdraw } from "../../generated/schema";
 import { getOrCreateToken } from "../common/tokens";
 import { getUSDAmount } from "../price";
-import { prefixID } from "../common/utils/strings";
 import { getOrCreateAccount } from "./account";
-import { handlePoolDeposit, getOrCreatePool, handlePoolWithdraw } from "./pool";
+import { getOrCreatePool, handlePoolDeposit, handlePoolWithdraw } from "./pool";
 import { getOrCreateOpynProtocol } from "./protocol";
+import { takeSnapshots } from "./snapshot";
 import {
   incrementProtocolDepositCount,
   incrementProtocolWithdrawCount,
 } from "./usage";
-import { takeSnapshots } from "./snapshot";
 
 export function createDeposit(
   event: ethereum.Event,
