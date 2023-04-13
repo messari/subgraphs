@@ -33,7 +33,6 @@ export function getOrCreateOpynProtocol(): DerivOptProtocol {
     protocol.cumulativeDepositPremiumUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeWithdrawPremiumUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalLiquidityPremiumUSD = BIGDECIMAL_ZERO;
-    protocol.cumulativeCollateralVolumeUSD = BIGDECIMAL_ZERO;
 
     protocol.putsMintedCount = INT_ZERO;
     protocol.callsMintedCount = INT_ZERO;

@@ -114,8 +114,6 @@ function takePoolDailySnapshot(
   snapshot.cumulativeTotalLiquidityPremiumUSD =
     snapshot.dailyTotalLiquidityPremiumUSD =
       pool.cumulativeTotalLiquidityPremiumUSD;
-  snapshot.cumulativeCollateralVolumeUSD = pool.cumulativeCollateralVolumeUSD!;
-  snapshot.dailyCollateralVolumeUSD = pool.cumulativeCollateralVolumeUSD!;
 
   snapshot.putsMintedCount = snapshot.dailyPutsMintedCount =
     pool.putsMintedCount;
@@ -197,10 +195,6 @@ function takePoolDailySnapshot(
     snapshot.dailyTotalLiquidityPremiumUSD =
       pool.cumulativeTotalLiquidityPremiumUSD.minus(
         prevSnapshot.cumulativeTotalLiquidityPremiumUSD
-      );
-    snapshot.dailyCollateralVolumeUSD =
-      snapshot.cumulativeCollateralVolumeUSD!.minus(
-        prevSnapshot.cumulativeCollateralVolumeUSD!
       );
 
     snapshot.dailyPutsMintedCount =
@@ -460,10 +454,6 @@ function takeFinancialsDailySnapshot(
   snapshot.cumulativeTotalLiquidityPremiumUSD =
     snapshot.dailyTotalLiquidityPremiumUSD =
       protocol.cumulativeTotalLiquidityPremiumUSD;
-  snapshot.cumulativeCollateralVolumeUSD =
-    protocol.cumulativeCollateralVolumeUSD!;
-  snapshot.cumulativeCollateralVolumeUSD =
-    protocol.cumulativeCollateralVolumeUSD!;
   snapshot.putsMintedCount = snapshot.dailyPutsMintedCount =
     protocol.putsMintedCount;
   snapshot.callsMintedCount = snapshot.dailyCallsMintedCount =
@@ -523,10 +513,6 @@ function takeFinancialsDailySnapshot(
     snapshot.dailyTotalLiquidityPremiumUSD =
       protocol.cumulativeTotalLiquidityPremiumUSD.minus(
         prevSnapshot.cumulativeTotalLiquidityPremiumUSD
-      );
-    snapshot.dailyCollateralVolumeUSD =
-      snapshot.cumulativeCollateralVolumeUSD!.minus(
-        prevSnapshot.cumulativeCollateralVolumeUSD!
       );
 
     snapshot.dailyPutsMintedCount =
