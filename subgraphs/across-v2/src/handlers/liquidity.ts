@@ -17,7 +17,7 @@ import {
   Pricer,
   TokenInit,
 } from "../util";
-// import { BIGINT_MINUS_ONE } from "../sdk/util/constants";
+import { BIGINT_MINUS_ONE } from "../sdk/util/constants";
 
 const conf = new BridgeConfig(
   ACROSS_HUB_POOL_CONTRACT,
@@ -38,15 +38,6 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   // input token
   const token = sdk.Tokens.getOrCreateToken(event.params.l1Token);
 
-  // pool
-  const poolId = event.address
-    .toHexString()
-    .concat(event.params.l1Token.toHexString());
-  const pool = sdk.Pools.loadPool<string>(Bytes.fromUTF8(poolId));
-  if (!pool.isInitialized) {
-    pool.initialize(token.name, token.symbol, BridgePoolType.LIQUIDITY, token);
-  }
-
   // output token
   const hubPoolContract = HubPool.bind(
     Address.fromString(ACROSS_HUB_POOL_CONTRACT)
@@ -61,8 +52,21 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   } else {
     outputTokenAddress = hubPoolContractCall.value.getLpToken();
   }
-  // const outputToken = sdk.Tokens.getOrCreateToken(outputTokenAddress);
-  // pool.addOutputTokenSupply(event.params.lpTokensMinted);
+  const outputToken = sdk.Tokens.getOrCreateToken(outputTokenAddress);
+
+  // pool
+  const poolId = event.address
+    .toHexString()
+    .concat(event.params.l1Token.toHexString());
+  const pool = sdk.Pools.loadPool<string>(Bytes.fromUTF8(poolId));
+
+  if (!pool.isInitialized) {
+    pool.initialize(token.name, token.symbol, BridgePoolType.LIQUIDITY, token);
+    pool.pool.outputToken = outputToken.id;
+    pool.pool.save();
+  }
+
+  pool.addOutputTokenSupply(event.params.lpTokensMinted);
 
   // account
   const amount = event.params.amount;
@@ -81,15 +85,6 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
   // input token
   const token = sdk.Tokens.getOrCreateToken(event.params.l1Token);
 
-  // pool
-  const poolId = event.address
-    .toHexString()
-    .concat(event.params.l1Token.toHexString());
-  const pool = sdk.Pools.loadPool<string>(Bytes.fromUTF8(poolId));
-  if (!pool.isInitialized) {
-    pool.initialize(token.name, token.symbol, BridgePoolType.LIQUIDITY, token);
-  }
-
   // output token
   const hubPoolContract = HubPool.bind(
     Address.fromString(ACROSS_HUB_POOL_CONTRACT)
@@ -104,8 +99,21 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
   } else {
     outputTokenAddress = hubPoolContractCall.value.getLpToken();
   }
-  // const outputToken = sdk.Tokens.getOrCreateToken(outputTokenAddress);
-  // pool.addOutputTokenSupply(event.params.lpTokensBurnt.times(BIGINT_MINUS_ONE)); // TODO: verify does plus(minus_amount) work?
+  const outputToken = sdk.Tokens.getOrCreateToken(outputTokenAddress);
+
+  // pool
+  const poolId = event.address
+    .toHexString()
+    .concat(event.params.l1Token.toHexString());
+  const pool = sdk.Pools.loadPool<string>(Bytes.fromUTF8(poolId));
+
+  if (!pool.isInitialized) {
+    pool.initialize(token.name, token.symbol, BridgePoolType.LIQUIDITY, token);
+    pool.pool.outputToken = outputToken.id;
+    pool.pool.save();
+  }
+
+  pool.addOutputTokenSupply(event.params.lpTokensBurnt.times(BIGINT_MINUS_ONE));
 
   // account
   const amount = event.params.amount;
