@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 
 import { subtractArrays } from "../../util/arrays";
 import * as constants from "../../util/constants";
@@ -15,8 +15,8 @@ import {
  * This file contains the PoolSnapshot, which is used to
  * make all of the storage changes that occur in the pool daily and hourly snapshots.
  *
- * Schema Version:  1.2.2
- * SDK Version:     1.0.1
+ * Schema Version:  1.3.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -39,7 +39,6 @@ export class PoolSnapshot {
 
   private takeSnapshots(): void {
     if (!this.isInitialized()) return;
-    if (!this.pool._lastUpdateTimestamp) return;
 
     const snapshotDayID =
       this.pool._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_DAY;
@@ -60,7 +59,13 @@ export class PoolSnapshot {
   }
 
   private isInitialized(): boolean {
-    return this.pool._lastSnapshotDayID && this.pool._lastSnapshotHourID
+    log.error("[isInitialized] cannot create snapshots, pool: {} not initialized", [
+      this.pool.id.toHexString(),
+    ]);
+
+    return this.pool._lastSnapshotDayID &&
+      this.pool._lastSnapshotHourID &&
+      this.pool._lastUpdateTimestamp
       ? true
       : false;
   }

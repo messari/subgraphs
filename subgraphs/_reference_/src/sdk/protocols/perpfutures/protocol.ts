@@ -19,8 +19,8 @@ import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/sche
  * This file contains the Perpetual class, which is used to
  * make all of the storage changes that occur in a protocol.
  *
- * Schema Version:  1.2.2
- * SDK Version:     1.0.1
+ * Schema Version:  1.3.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -205,26 +205,15 @@ export class Perpetual {
   }
 
   /**
-   * Sets the Volume in USD for the protocol. Most times this will be called internally by
-   * other members of the library when Volume changes are made to them. But if the library
-   * is not well fitted to a given protocol and you need to set the Volume manually, you can
-   * use this method.
-   * It will also update the protocol's snapshots.
-   * @param volume {BigDecimal} The new total value locked for the protocol.
-   */
-  setVolume(volume: BigDecimal): void {
-    this.protocol.cumulativeVolumeUSD = volume;
-    this.save();
-  }
-
-  /**
    * Adds a given USD value to the protocol's volume. It can be a positive or negative amount.
    * Same as for setTotalValueLocked, this is mostly to be called internally by the library.
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param volume {BigDecimal} The value to add to the protocol's volume.
    */
-  addVolume(volume: BigDecimal): void {
-    this.setVolume(this.protocol.cumulativeVolumeUSD.plus(volume));
+   addVolume(volume: BigDecimal): void {
+    this.protocol.cumulativeVolumeUSD =
+      this.protocol.cumulativeVolumeUSD.plus(volume);
+    this.save();
   }
 
   /**

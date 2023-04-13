@@ -22,8 +22,8 @@ import {
  * This file contains the PoolManager, which is used to
  * initialize new pools in the protocol.
  *
- * Schema Version:  1.2.2
- * SDK Version:     1.0.1
+ * Schema Version:  1.3.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -274,21 +274,13 @@ export class Pool {
   }
 
   /**
-   * set the volume for this pool to the given value.
-   * Will also update the protocol's total volume on the change in this pool's.
-   */
-  setVolume(newVolume: BigDecimal): void {
-    this.pool.cumulativeVolumeUSD = newVolume;
-    this.save();
-  }
-
-  /**
    * Adds the given delta to the cumulative volume for this pool.
    * Will also update the protocol's total volume on the change in this pool's.
    * @param delta The change in total value locked for this pool.
    */
-  addVolume(delta: BigDecimal): void {
-    this.setVolume(this.pool.cumulativeVolumeUSD.plus(delta));
+   addVolume(delta: BigDecimal): void {
+    this.pool.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD.plus(delta);
+    this.save();
 
     this.protocol.addVolume(delta);
   }

@@ -18,8 +18,8 @@ import {
  * make all of the storage changes that occur in the position and
  * its corresponding snapshots.
  *
- * Schema Version:  1.2.2
- * SDK Version:     1.0.1
+ * Schema Version:  1.3.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan

@@ -1,4 +1,4 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 
 import { TransactionType } from "./enums";
 import { AccountWasActive } from "./account";
@@ -18,8 +18,8 @@ import {
  * make all of the storage changes that occur in the protocol's
  * daily and hourly snapshots.
  *
- * Schema Version:  1.2.2
- * SDK Version:     1.0.1
+ * Schema Version:  1.3.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -100,7 +100,13 @@ export class ProtocolSnapshot {
   }
 
   private takeSnapshots(): void {
-    if (!this.protocol._lastUpdateTimestamp) return;
+    if (!this.protocol._lastUpdateTimestamp) {
+      log.error(
+        "[isInitialized] cannot create snapshots, protocol: {} not initialized",
+        [this.protocol.id.toHexString()]
+      );
+      return;
+    }
 
     const snapshotDayID =
       this.protocol._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_DAY;
