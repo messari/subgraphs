@@ -73,6 +73,7 @@ export function populateEmptyPools(event: ethereum.Event): void {
 
     // https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/TickMath.sol
     // https://docs.uniswap.org/contracts/v3/reference/periphery/lens/TickLens
+    // Min and Max tick are the range of ticks that a position can be in
     const maxTick: number = customCeil(887272 / tickSpacing) * tickSpacing;
     const minTick: number = -maxTick;
     const ticksPerWord: number = 256 * tickSpacing;
