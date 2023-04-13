@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 export function removeFromArrayAtIndex<T>(x: T[], index: i32): T[] {
   const retval = new Array<T>(x.length - 1);
   let nI = 0;

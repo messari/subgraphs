@@ -2,8 +2,11 @@
 import { BigInt } from "@graphprotocol/graph-ts";
 import { BIGINT_TEN, SECONDS_PER_DAY } from "../constants";
 
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 export const MINUTE = BigInt.fromI32(60);
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 export const HOUR = BigInt.fromI32(3600);
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 export const DAY = BigInt.fromI32(86400);
 
 export const ONE = BigInt.fromI32(1);
@@ -24,7 +27,7 @@ export function getTenMinuteOpenTime(timestamp: BigInt): BigInt {
 
 export function getTenMinuteCloseTime(timestamp: BigInt): BigInt {
   return getTenMinuteOpenTime(timestamp)
-    .plus(MINUTE.times(BigInt.fromI32(10)))
+    .plus(MINUTE.times(BIGINT_TEN))
     .minus(ONE);
 }
 
