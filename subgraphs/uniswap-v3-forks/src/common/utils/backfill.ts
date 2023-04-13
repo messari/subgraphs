@@ -71,6 +71,8 @@ export function populateEmptyPools(event: ethereum.Event): void {
 
     const tickSpacing = poolContract.tickSpacing();
 
+    // https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/TickMath.sol
+    // https://docs.uniswap.org/contracts/v3/reference/periphery/lens/TickLens
     const maxTick: number = customCeil(887272 / tickSpacing) * tickSpacing;
     const minTick: number = -maxTick;
     const ticksPerWord: number = 256 * tickSpacing;
