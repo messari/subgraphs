@@ -4017,6 +4017,28 @@
           }
         }
       },
+      "uniswap-v3-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.3",
+          "subgraph": "1.3.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v3-bsc",
+            "query-id": "uniswap-v3-bsc"
+          }
+        }
+      },
       "uniswap-v3-celo": {
         "network": "celo",
         "status": "prod",
