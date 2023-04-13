@@ -5,6 +5,7 @@ import { getUsdPrice, getUsdPricePerToken } from "./prices";
 import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
 import { TokenPricer } from "./sdk/protocols/config";
 import { bigIntToBigDecimal } from "./sdk/util/numbers";
+import { ETH_ADDRESS, ETH_NAME, ETH_SYMBOL } from "./sdk/util/constants";
 
 export class Pricer implements TokenPricer {
   block: ethereum.Block;
@@ -26,9 +27,19 @@ export class Pricer implements TokenPricer {
 
 export class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
-    const name = this.fetchTokenName(address);
-    const symbol = this.fetchTokenSymbol(address);
-    const decimals = this.fetchTokenDecimals(address) as i32;
+    let name: string;
+    let symbol: string;
+    let decimals: i32;
+
+    if (address == Address.fromString(ETH_ADDRESS)) {
+      name = ETH_NAME;
+      symbol = ETH_SYMBOL;
+      decimals = 18;
+    } else {
+      name = this.fetchTokenName(address);
+      symbol = this.fetchTokenSymbol(address);
+      decimals = this.fetchTokenDecimals(address) as i32;
+    }
 
     return {
       name,
