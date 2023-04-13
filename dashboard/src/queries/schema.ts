@@ -17,20 +17,21 @@ import { schema as genericOverview } from "./generic/poolOverview";
 import { gql } from "@apollo/client";
 
 export const metaDataQuery = gql`
-{
-  protocols {
-    type
-    schemaVersion
-    subgraphVersion
-    methodologyVersion
-    name
-    id
-    network
+  {
+    protocols {
+      type
+      schemaVersion
+      subgraphVersion
+      methodologyVersion
+      name
+      slug
+      id
+      network
+    }
+    _meta {
+      deployment
+    }
   }
-  _meta {
-    deployment
-  }
-}
 `;
 
 export const schema = (type: string, version: string): Schema => {
