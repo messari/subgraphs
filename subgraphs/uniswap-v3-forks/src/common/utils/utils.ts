@@ -13,6 +13,7 @@ import {
   BIGINT_TEN,
   BIGDECIMAL_NEG_ONE,
   BIGINT_HUNDRED,
+  BIGINT_TWO,
 } from "../constants";
 import { getLiquidityPoolFee } from "../entities/pool";
 
@@ -142,25 +143,26 @@ export function toLowerCase(list: string[]): string[] {
   return list;
 }
 
-export function bigDecimalExponated(
-  value: BigDecimal,
-  power: BigInt
+export function bigDecimalExponentiated(
+  base: BigDecimal,
+  exponent: BigInt
 ): BigDecimal {
-  if (power.equals(BIGINT_ZERO)) {
-    return BIGDECIMAL_ONE;
-  }
-  const negativePower = power.lt(BIGINT_ZERO);
-  let result = BIGDECIMAL_ZERO.plus(value);
-  const powerAbs = power.abs();
-  for (let i = BIGINT_ONE; i.lt(powerAbs); i = i.plus(BIGINT_ONE)) {
-    result = result.times(value);
+  let x = base;
+  let y = BIGDECIMAL_ONE;
+  let n = exponent;
+
+  while (n > BIGINT_ONE) {
+    if (n.mod(BIGINT_TWO) == BIGINT_ZERO) {
+      x = x.times(x);
+      n = n.div(BIGINT_TWO);
+    } else {
+      y = y.times(x);
+      x = x.times(x);
+      n = n.minus(BIGINT_ONE).div(BIGINT_TWO);
+    }
   }
 
-  if (negativePower) {
-    result = safeDiv(BIGDECIMAL_ONE, result);
-  }
-
-  return result;
+  return x.times(y);
 }
 
 // Turn a list of BigInts into a list of absolute value BigInts

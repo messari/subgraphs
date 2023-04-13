@@ -6,7 +6,7 @@ import {
   BIGINT_ZERO,
   INT_ZERO,
 } from "../constants";
-import { bigDecimalExponated, safeDivBigDecimal } from "../utils/utils";
+import { bigDecimalExponentiated, safeDivBigDecimal } from "../utils/utils";
 
 export function getOrCreateTick(
   event: ethereum.Event,
@@ -22,7 +22,7 @@ export function getOrCreateTick(
     tick.pool = pool.id;
     tick.createdTimestamp = event.block.timestamp;
     tick.createdBlockNumber = event.block.number;
-    const price0 = bigDecimalExponated(
+    const price0 = bigDecimalExponentiated(
       BigDecimal.fromString("1.0001"),
       tick.index
     );
