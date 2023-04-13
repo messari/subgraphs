@@ -29,6 +29,13 @@
     }
   ],
 
+  "basePoolsLpToken": [
+    {
+      "name": "x3CRV",
+      "address": "0x1337BedC9D22ecbe766dF105c9623922A27963EC"
+    }
+  ],
+
   "missingOldPools": [
     {
       "name": "3Pool",
