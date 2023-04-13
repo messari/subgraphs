@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { ethereum } from "@graphprotocol/graph-ts";
 
 import { AccountManager } from "./account";
@@ -10,11 +11,11 @@ import { BIGINT_ZERO } from "../../util/constants";
 import { CustomEventType } from "../../util/events";
 
 export class SDK {
-  Protocol: Bridge;
-  Accounts: AccountManager;
-  Pools: PoolManager;
-  Tokens: TokenManager;
-  Pricer: TokenPricer;
+  protocol: Bridge;
+  accounts: AccountManager;
+  pools: PoolManager;
+  tokens: TokenManager;
+  pricer: TokenPricer;
 
   constructor(
     config: BridgeConfigurer,
@@ -22,13 +23,13 @@ export class SDK {
     tokenInitializer: TokenInitializer,
     event: CustomEventType
   ) {
-    this.Protocol = Bridge.load(config, pricer, event);
-    this.Tokens = new TokenManager(this.Protocol, tokenInitializer);
-    this.Accounts = new AccountManager(this.Protocol, this.Tokens);
-    this.Pools = new PoolManager(this.Protocol, this.Tokens);
-    this.Pricer = pricer;
+    this.protocol = Bridge.load(config, pricer, event);
+    this.tokens = new TokenManager(this.protocol, tokenInitializer);
+    this.accounts = new AccountManager(this.protocol, this.tokens);
+    this.pools = new PoolManager(this.protocol, this.tokens);
+    this.pricer = pricer;
 
-    this.Protocol.sdk = this;
+    this.protocol.sdk = this;
   }
 
   static initializeFromEvent(

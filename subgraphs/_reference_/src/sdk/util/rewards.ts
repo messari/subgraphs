@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 /////////////////////
 // VERSION 1.0.3 ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,6 +160,7 @@ export function getRewardsPerDay(
   const startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
 
   // Make sure to still have 2 blocks to calculate rate (This shouldn't happen past the beginning).
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     if (circularBuffer.nextIndex > circularBuffer.windowStartIndex) {
       if (

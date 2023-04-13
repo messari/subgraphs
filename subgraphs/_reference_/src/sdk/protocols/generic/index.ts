@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { PoolManager } from "./pool";
 import { AccountManager } from "./account";
 import { ProtocolManager } from "./protocol";
@@ -19,11 +20,11 @@ import { ProtocolConfigurer, TokenPricer } from "../config";
  */
 
 export class SDK {
-  Protocol: ProtocolManager;
-  Accounts: AccountManager;
-  Pools: PoolManager;
-  Tokens: TokenManager;
-  Pricer: TokenPricer;
+  protocol: ProtocolManager;
+  accounts: AccountManager;
+  pools: PoolManager;
+  tokens: TokenManager;
+  pricer: TokenPricer;
 
   constructor(
     config: ProtocolConfigurer,
@@ -31,13 +32,13 @@ export class SDK {
     tokenInitializer: TokenInitializer,
     event: CustomEventType
   ) {
-    this.Protocol = ProtocolManager.load(config, pricer, event);
-    this.Tokens = new TokenManager(this.Protocol, tokenInitializer);
-    this.Accounts = new AccountManager(this.Protocol, this.Tokens);
-    this.Pools = new PoolManager(this.Protocol, this.Tokens);
-    this.Pricer = pricer;
+    this.protocol = ProtocolManager.load(config, pricer, event);
+    this.tokens = new TokenManager(this.protocol, tokenInitializer);
+    this.accounts = new AccountManager(this.protocol, this.tokens);
+    this.pools = new PoolManager(this.protocol, this.tokens);
+    this.pricer = pricer;
 
-    this.Protocol.sdk = this;
+    this.protocol.sdk = this;
   }
 
   static initializeFromEvent(

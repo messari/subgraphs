@@ -1,10 +1,8 @@
-import { BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-
-import { subtractArrays } from "../../util/arrays";
-import * as constants from "../../util/constants";
-import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
-import { initActivityHelper } from "./protocolSnapshot";
-
+/* eslint-disable rulesdir/no-non-standard-filenames */
+import {
+  subtractTwoBigIntArrays,
+  subtractTwoBigDecimalArrays,
+} from "../../util/arrays";
 import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,

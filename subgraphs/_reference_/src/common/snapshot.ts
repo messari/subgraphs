@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./constants";
 import {
@@ -11,7 +12,7 @@ import {
   _ActivityHelper,
 } from "../../generated/schema";
 
-const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
+const ACTIVITY_HELPER_ID = Bytes.fromUTF8("_ActivityHelper");
 
 export function createProtocolSnapshots(
   event: ethereum.Event,
@@ -308,11 +309,11 @@ function takeLiquidityPoolDailySnapshot(
 }
 
 function initActivityHelper(): _ActivityHelper {
-  let helper = _ActivityHelper.load(ActivityHelperID);
+  let helper = _ActivityHelper.load(ACTIVITY_HELPER_ID);
   if (helper) {
     return helper;
   }
-  helper = new _ActivityHelper(ActivityHelperID);
+  helper = new _ActivityHelper(ACTIVITY_HELPER_ID);
   helper.hourlyActiveUsers = 0;
   helper.dailyActiveUsers = 0;
 

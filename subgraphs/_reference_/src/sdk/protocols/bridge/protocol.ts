@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Versions } from "../../../../../../deployment/context/interface";
 
 import { BridgeProtocol as BridgeProtocolSchema } from "../../../../generated/schema";

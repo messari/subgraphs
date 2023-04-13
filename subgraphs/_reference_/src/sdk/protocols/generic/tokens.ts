@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { ProtocolManager } from "./protocol";
 import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../../../generated/schema";

@@ -1,11 +1,4 @@
-import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-
-import { Pool } from "./pool";
-import { Account } from "./account";
-import { Perpetual } from "./protocol";
-import { TokenManager } from "./tokens";
-import * as constants from "../../util/constants";
-
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import {
   Token,
   PositionSnapshot,

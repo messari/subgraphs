@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts";
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Mint, Burn, Swap } from "../../generated/templates/Pair/Pair";
 import { PairCreated } from "../../generated/templates/Pair/Factory";
 import {

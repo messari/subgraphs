@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount } from "../../generated/schema";
 import {

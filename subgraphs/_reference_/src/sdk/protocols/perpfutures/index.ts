@@ -1,5 +1,4 @@
-import { ethereum } from "@graphprotocol/graph-ts";
-
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { PoolManager } from "./pool";
 import { PositionManager } from "./position";
 import { Perpetual } from "./protocol";
@@ -10,12 +9,12 @@ import { TokenInitializer, TokenManager } from "./tokens";
 import { ProtocolConfigurer, TokenPricer } from "../config";
 
 export class SDK {
-  Protocol: Perpetual;
-  Accounts: AccountManager;
-  Pools: PoolManager;
-  Positions: PositionManager;
-  Tokens: TokenManager;
-  Pricer: TokenPricer;
+  protocol: Perpetual;
+  accounts: AccountManager;
+  pools: PoolManager;
+  position: Position;
+  tokens: TokenManager;
+  pricer: TokenPricer;
 
   constructor(
     config: ProtocolConfigurer,
@@ -23,14 +22,14 @@ export class SDK {
     tokenInitializer: TokenInitializer,
     event: CustomEventType
   ) {
-    this.Protocol = Perpetual.load(config, pricer, event);
-    this.Tokens = new TokenManager(this.Protocol, tokenInitializer);
-    this.Accounts = new AccountManager(this.Protocol, this.Tokens);
-    this.Pools = new PoolManager(this.Protocol, this.Tokens);
-    this.Positions = new PositionManager(this.Protocol, this.Tokens);
-    this.Pricer = pricer;
+    this.protocol = Perpetual.load(config, pricer, event);
+    this.tokens = new TokenManager(this.protocol, tokenInitializer);
+    this.accounts = new AccountManager(this.protocol, this.tokens);
+    this.pools = new PoolManager(this.protocol, this.tokens);
+    this.position = new Position(this.protocol, this.tokens);
+    this.pricer = pricer;
 
-    this.Protocol.sdk = this;
+    this.protocol.sdk = this;
   }
 
   static initializeFromEvent(

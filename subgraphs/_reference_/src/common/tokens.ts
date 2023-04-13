@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 /* eslint-disable prefer-const */
 import { ERC20 } from "../../generated/UniswapV2Factory/ERC20";
 import { ERC20SymbolBytes } from "../../generated/UniswapV2Factory/ERC20SymbolBytes";

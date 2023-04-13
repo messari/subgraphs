@@ -1,5 +1,4 @@
-import { Address, Bytes, log } from "@graphprotocol/graph-ts";
-
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Perpetual } from "./protocol";
 import * as constants from "../../util/constants";
 

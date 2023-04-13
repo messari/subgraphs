@@ -13,14 +13,14 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      forbidden: "filename and folder name must be in snake_case or kebab-case",
+      forbidden: "filename and folder name must be in kebab-case",
     },
   },
 
   create: function (context) {
     return {
       Program(node) {
-        const pathRegex = /^([a-z]+[-]*[a-z0-9]+)*(\.ts)?$/; // kebab-case
+        const pathRegex = /^([a-z]+-*[a-z0-9]+)*(\.ts)?$/; // kebab-case
         const camelCaseRegex = /^[a-z]+[a-zA-Z0-9]*\.ts$/; // camelCase for ts
         const PascalCaseRegex = /^[A-Z]+[a-zA-Z0-9]*\.json$/; // PascalCase for abis (json)
         const fullFileName = context.getFilename();

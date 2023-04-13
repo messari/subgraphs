@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 /////////////////////
 // VERSION 1.0.3 ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -5,11 +6,10 @@
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../configurations/configure";
-import { _CircularBuffer } from "../../generated/schema";
-import { Network } from "./constants";
+import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import { _CircularBuffer } from "../../../generated/schema";
 import {
+  Network,
   BIGDECIMAL_ZERO,
   INT_FOUR,
   INT_NEGATIVE_ONE,
@@ -160,6 +160,7 @@ export function getRewardsPerDay(
   const startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
 
   // Make sure to still have 2 blocks to calculate rate (This shouldn't happen past the beginning).
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     if (circularBuffer.nextIndex > circularBuffer.windowStartIndex) {
       if (
@@ -253,33 +254,34 @@ function getOrCreateCircularBuffer(): _CircularBuffer {
 function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
-  if (NetworkConfigs.getNetwork() == Network.MAINNET) {
+  const network = dataSource.network().toUpperCase().replace("-", "_");
+  if (network == Network.MAINNET) {
     return BigDecimal.fromString("13.39");
-  } else if (NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE) {
+  } else if (network == Network.ARBITRUM_ONE) {
     return BigDecimal.fromString("15");
-  } else if (NetworkConfigs.getNetwork() == Network.AURORA) {
+  } else if (network == Network.AURORA) {
     return BigDecimal.fromString("1.03");
-  } else if (NetworkConfigs.getNetwork() == Network.BSC) {
+  } else if (network == Network.BSC) {
     return BigDecimal.fromString("5");
-  } else if (NetworkConfigs.getNetwork() == Network.CELO) {
+  } else if (network == Network.CELO) {
     return BigDecimal.fromString("5");
-  } else if (NetworkConfigs.getNetwork() == Network.FANTOM) {
+  } else if (network == Network.FANTOM) {
     return BigDecimal.fromString("1");
-  } else if (NetworkConfigs.getNetwork() == Network.FUSE) {
+  } else if (network == Network.FUSE) {
     return BigDecimal.fromString("1");
-  } else if (NetworkConfigs.getNetwork() == Network.OPTIMISM) {
+  } else if (network == Network.OPTIMISM) {
     return BigDecimal.fromString("12.5");
-  } else if (NetworkConfigs.getNetwork() == Network.MATIC) {
+  } else if (network == Network.MATIC) {
     return BigDecimal.fromString("2");
-  } else if (NetworkConfigs.getNetwork() == Network.XDAI) {
+  } else if (network == Network.XDAI) {
     return BigDecimal.fromString("5");
-  } else if (NetworkConfigs.getNetwork() == Network.MOONBEAM) {
+  } else if (network == Network.MOONBEAM) {
     return BigDecimal.fromString("13.39");
-  } else if (NetworkConfigs.getNetwork() == Network.MOONRIVER) {
+  } else if (network == Network.MOONRIVER) {
     return BigDecimal.fromString("13.39");
-  } else if (NetworkConfigs.getNetwork() == Network.AVALANCHE) {
+  } else if (network == Network.AVALANCHE) {
     return BigDecimal.fromString("13.39");
-  } else if (NetworkConfigs.getNetwork() == Network.CRONOS) {
+  } else if (network == Network.CRONOS) {
     return BigDecimal.fromString("5.5");
   }
 

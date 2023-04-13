@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import {
   Bytes,
   BigDecimal,
@@ -34,7 +35,7 @@ import { PoolSnapshot } from "./poolSnapshot";
 import { SDK } from ".";
 import { CustomEventType } from "../../util/events";
 
-type onCreatePoolCallback<T> = (
+type OnCreatePoolCallback<T> = (
   event: CustomEventType,
   pool: Pool,
   sdk: SDK,
@@ -52,7 +53,7 @@ export class PoolManager {
 
   loadPool<T>(
     id: Bytes,
-    onCreate: onCreatePoolCallback<T> | null = null,
+    onCreate: OnCreatePoolCallback<T> | null = null,
     aux: T | null = null
   ): Pool {
     let entity = PoolSchema.load(id);

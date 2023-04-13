@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../../generated/schema";
 import { Versions } from "../../../../../deployment/context/interface";

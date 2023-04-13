@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import * as constants from "./constants";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 

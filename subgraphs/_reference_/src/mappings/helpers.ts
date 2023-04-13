@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable rulesdir/no-non-standard-filenames */
 // import { log } from "@graphprotocol/graph-ts"
 import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
@@ -16,7 +19,7 @@ import {
 } from "../common/constants";
 import { getOrCreateDex, getOrCreateToken } from "../common/getters";
 
-export const factoryContract = FactoryContract.bind(
+export const FACTORY = FactoryContract.bind(
   Address.fromString(FACTORY_ADDRESS)
 );
 
@@ -32,13 +35,13 @@ export function createLiquidityPool(
   // create the tokens and tokentracker
   const token0 = getOrCreateToken(token0Address);
   const token1 = getOrCreateToken(token1Address);
-  const LPtoken = getOrCreateToken(poolAddress);
+  const lpToken = getOrCreateToken(poolAddress);
 
   const pool = new LiquidityPool(poolAddress.toHexString());
 
   pool.protocol = protocol.id;
   pool.inputTokens = [token0.id, token1.id];
-  pool.outputToken = LPtoken.id;
+  pool.outputToken = lpToken.id;
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
@@ -54,8 +57,8 @@ export function createLiquidityPool(
   pool.fees = createPoolFees(poolAddress.toHexString());
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
-  pool.name = protocol.name + " " + LPtoken.symbol;
-  pool.symbol = LPtoken.symbol;
+  pool.name = protocol.name + " " + lpToken.symbol;
+  pool.symbol = lpToken.symbol;
 
   // create the tracked contract based on the template
   PairTemplate.create(poolAddress);
@@ -63,7 +66,7 @@ export function createLiquidityPool(
   pool.save();
   token0.save();
   token1.save();
-  LPtoken.save();
+  lpToken.save();
 }
 
 function createPoolFees(poolAddress: string): string[] {

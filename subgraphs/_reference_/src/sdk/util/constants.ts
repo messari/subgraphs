@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
@@ -158,7 +159,11 @@ export namespace PositionSide {
   export const LONG = "LONG";
   export const SHORT = "SHORT";
 }
-export type PositionSide = string;
+
+export namespace ActivityInterval {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
 
 //////////////////////////////
 ///// Ethereum Addresses /////
@@ -182,7 +187,7 @@ export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromI32(10).pow(18);
 export const BIGINT_MINUS_ONE = BigInt.fromI32(-1);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935"

@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Bytes } from "@graphprotocol/graph-ts";
 import { AccountWasActive } from "./account";
 import {
@@ -15,8 +16,8 @@ import {
 } from "../../util/constants";
 import { CustomEventType } from "../../util/events";
 
-const SnapshotHelperID = Bytes.fromUTF8("_ProtocolSnapshotHelper");
-const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
+const SNAPSHOT_HELPER_ID = Bytes.fromUTF8("_ProtocolSnapshotHelper");
+const ACTIVITY_HELPER_ID = Bytes.fromUTF8("_ActivityHelper");
 
 /**
  * Helper class to manage Financials and Usage snapshots.
@@ -378,11 +379,11 @@ export class ProtocolSnapshot {
 }
 
 function initProtocolHelper(): _ProtocolSnapshotHelper {
-  let helper = _ProtocolSnapshotHelper.load(SnapshotHelperID);
+  let helper = _ProtocolSnapshotHelper.load(SNAPSHOT_HELPER_ID);
   if (helper) {
     return helper;
   }
-  helper = new _ProtocolSnapshotHelper(SnapshotHelperID);
+  helper = new _ProtocolSnapshotHelper(SNAPSHOT_HELPER_ID);
   helper.lastActivityTimestamp = BIGINT_ZERO;
   helper.lastDailyFinancialsTimestamp = BIGINT_ZERO;
   helper.lastDailyFinancialsSnapshot = Bytes.fromI32(0);
@@ -395,11 +396,11 @@ function initProtocolHelper(): _ProtocolSnapshotHelper {
 }
 
 function initActivityHelper(): _ActivityHelper {
-  let helper = _ActivityHelper.load(ActivityHelperID);
+  let helper = _ActivityHelper.load(ACTIVITY_HELPER_ID);
   if (helper) {
     return helper;
   }
-  helper = new _ActivityHelper(ActivityHelperID);
+  helper = new _ActivityHelper(ACTIVITY_HELPER_ID);
   helper.hourlyActiveUsers = 0;
   helper.dailyActiveUsers = 0;
   helper.hourlyActiveTransferSenders = 0;

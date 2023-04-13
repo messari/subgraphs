@@ -1,9 +1,10 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { BigInt, TypedMap } from "@graphprotocol/graph-ts";
 import { Network } from "../../util/constants";
 
 export function chainIDToNetwork(chainID: BigInt): Network {
-  const network = chainIDs.get(chainID.toU64());
+  const network = CHAIN_IDS.get(chainID.toU64());
   if (network) {
     return network;
   }
@@ -12,7 +13,7 @@ export function chainIDToNetwork(chainID: BigInt): Network {
 }
 
 export function networkToChainID(network: Network): BigInt {
-  const chainID = reverseChainIDs.get(network);
+  const chainID = REVERSE_CHAIN_IDS.get(network);
   if (chainID) {
     return chainID;
   }
@@ -20,12 +21,12 @@ export function networkToChainID(network: Network): BigInt {
 }
 
 function setChainID(chainID: u64, network: Network): void {
-  chainIDs.set(chainID, network);
-  reverseChainIDs.set(network, BigInt.fromU64(chainID));
+  CHAIN_IDS.set(chainID, network);
+  REVERSE_CHAIN_IDS.set(network, BigInt.fromU64(chainID));
 }
 
-export const chainIDs = new TypedMap<u64, Network>();
-export const reverseChainIDs = new TypedMap<Network, BigInt>();
+export const CHAIN_IDS = new TypedMap<u64, Network>();
+export const REVERSE_CHAIN_IDS = new TypedMap<Network, BigInt>();
 setChainID(1, Network.MAINNET);
 setChainID(8, Network.UBIQ);
 setChainID(10, Network.OPTIMISM);

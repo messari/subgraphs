@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import {
   Account as AccountSchema,
   ActiveAccount,

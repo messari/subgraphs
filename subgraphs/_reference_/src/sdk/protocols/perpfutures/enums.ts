@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 export namespace TransactionType {
   export const DEPOSIT = "DEPOSIT";
   export const WITHDRAW = "WITHDRAW";

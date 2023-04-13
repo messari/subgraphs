@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
@@ -98,11 +99,11 @@ export function getPriceFromRouter(
     }
   }
 
-  const feeBips = BigInt.fromI32(30);
+  const FEE_BIPS = constants.BIGINT_THIRTY;
 
   const amountOutBigDecimal = amountOut
     .times(constants.BIGINT_TEN_THOUSAND)
-    .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
+    .div(constants.BIGINT_TEN_THOUSAND.minus(FEE_BIPS.times(numberOfJumps)))
     .toBigDecimal();
 
   return CustomPriceType.initialize(

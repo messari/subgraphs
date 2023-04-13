@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { _ActiveAccount } from "../../../../generated/schema";
 
@@ -147,13 +148,15 @@ export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_FOUR = 4 as i32;
+export const INT_NINE = 9 as i32;
+export const INT_SIXTEEN = 16 as i32;
 
 export const BIGINT_NEGATIVE_ONE = BigInt.fromI32(-1);
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THREE_HUNDRED = BigInt.fromI32(300);
-export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromI32(10).pow(18);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
@@ -179,10 +182,10 @@ export const ARBITRUM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 1; // 1 = seconds per
 /////        Math       /////
 /////////////////////////////
 
-export const mantissaFactor = 18;
-export const cTokenDecimals = 8;
-export const mantissaFactorBD = exponentToBigDecimal(mantissaFactor);
-export const cTokenDecimalsBD = exponentToBigDecimal(cTokenDecimals);
+export const DEFAULT_DECIMALS = 18;
+export const CTOKEN_DECIMALS = 8;
+export const DEFAULT_DECIMALS_BD = exponentToBigDecimal(DEFAULT_DECIMALS);
+export const CTOKEN_DECIMALS_BD = exponentToBigDecimal(CTOKEN_DECIMALS);
 
 // n => 10^n
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
@@ -200,7 +203,7 @@ export function bigIntToBigDecimal(x: BigInt, decimals: i32): BigDecimal {
 }
 
 //change number of decimals for BigDecimal
-export function BDChangeDecimals(
+export function changeDecimalsBD(
   x: BigDecimal,
   from: i32,
   to: i32

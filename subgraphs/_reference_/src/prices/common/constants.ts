@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ///////////////////////////////////////////////////////////////////////////
@@ -25,14 +26,17 @@ export const CHAIN_LINK_USD_ADDRESS = Address.fromString(
 
 export const PRICE_LIB_VERSION = "1.2.0";
 
+export const INT_EIGHT = 8;
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TEN = BigInt.fromI32(10);
+export const BIGINT_THIRTY = BigInt.fromI32(30);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000");
 
-export const AAVE_ORACLE_DECIMALS = 8;
+export const AAVE_ORACLE_DECIMALS = INT_EIGHT;
 export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);

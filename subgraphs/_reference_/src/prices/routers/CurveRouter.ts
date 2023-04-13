@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { getUsdPricePerToken } from "..";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
@@ -5,6 +6,8 @@ import { CustomPriceType } from "../common/types";
 import { BigInt, Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { CurvePool as CurvePoolContract } from "../../../generated/templates/Pair/CurvePool";
 import { CurveRegistry as CurveRegistryContract } from "../../../generated/templates/Pair/CurveRegistry";
+
+const MAX_COINS = constants.INT_EIGHT;
 
 export function isCurveLpToken(
   lpAddress: Address,
@@ -140,7 +143,7 @@ export function getUnderlyingCoinFromPool(
 
 export function getPreferredCoinFromCoins(coins: Address[]): Address {
   let preferredCoinAddress = constants.NULL.TYPE_ADDRESS;
-  for (let coinIdx = 0; coinIdx < 8; coinIdx++) {
+  for (let coinIdx = 0; coinIdx < MAX_COINS; coinIdx++) {
     const coinAddress = coins[coinIdx];
 
     if (coinAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
@@ -150,7 +153,7 @@ export function getPreferredCoinFromCoins(coins: Address[]): Address {
     if (
       (preferredCoinAddress.notEqual(constants.NULL.TYPE_ADDRESS) &&
         coinAddress.equals(constants.NULL.TYPE_ADDRESS)) ||
-      coinIdx == 7
+      coinIdx == MAX_COINS - 1
     ) {
       break;
     }
@@ -306,7 +309,7 @@ export function getPriceUsdc(
     .toBigDecimal();
 
   const coins: Address[] = [];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < MAX_COINS; i++) {
     const coin = utils.readValue<Address>(
       poolContract.try_coins(BigInt.fromI32(i)),
       constants.NULL.TYPE_ADDRESS

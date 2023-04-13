@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Bytes } from "@graphprotocol/graph-ts";
 import { CustomEventType } from "../../util/events";
 import {

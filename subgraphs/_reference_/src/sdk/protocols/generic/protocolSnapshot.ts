@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import {
   Protocol as ProtocolSchema,
   FinancialsDailySnapshot,
@@ -10,7 +11,7 @@ import { Bytes } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../../util/constants";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
-const ActivityHelperID = Bytes.fromUTF8("_ActivityHelper");
+const ACTIVITY_HELPER_ID = Bytes.fromUTF8("_ActivityHelper");
 
 /**
  * This file contains the ProtocolSnapshot, which is used to
@@ -202,11 +203,11 @@ export class ProtocolSnapshot {
 }
 
 function initActivityHelper(): _ActivityHelper {
-  let helper = _ActivityHelper.load(ActivityHelperID);
+  let helper = _ActivityHelper.load(ACTIVITY_HELPER_ID);
   if (helper) {
     return helper;
   }
-  helper = new _ActivityHelper(ActivityHelperID);
+  helper = new _ActivityHelper(ACTIVITY_HELPER_ID);
   helper.hourlyActiveUsers = 0;
   helper.dailyActiveUsers = 0;
 

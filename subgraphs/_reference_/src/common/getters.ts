@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 // import { log } from "@graphprotocol/graph-ts"
 import { Address } from "@graphprotocol/graph-ts";
 import {

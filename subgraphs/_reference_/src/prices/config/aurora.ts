@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Configurations, OracleContract } from "../common/types";
+import { DEFAULT_USDC_DECIMALS } from "../common/constants";
 
 export const NETWORK_STRING = "aurora";
 
@@ -49,8 +52,6 @@ export const HARDCODED_STABLES: Address[] = [];
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
-
 export const ETH_ADDRESS = Address.fromString(
   "0x8bec47865ade3b172a928df8f990bc7f2a3b9f79" // Aurora
 );
@@ -61,7 +62,7 @@ export const USDC_ADDRESS = Address.fromString(
   "0xb12bfca5a55806aaf64e99521918a4bf0fc40802"
 );
 
-export class config implements Configurations {
+export class Config implements Configurations {
   network(): string {
     return NETWORK_STRING;
   }
@@ -119,6 +120,6 @@ export class config implements Configurations {
   }
 
   usdcTokenDecimals(): BigInt {
-    return USDC_TOKEN_DECIMALS;
+    return BigInt.fromI32(DEFAULT_USDC_DECIMALS);
   }
 }

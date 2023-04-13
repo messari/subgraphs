@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 export namespace BridgePermissionType {
   export const WHITELIST = "WHITELIST";
   export const PERMISSIONLESS = "PERMISSIONLESS";

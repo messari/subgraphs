@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Bytes } from "@graphprotocol/graph-ts";
 import { Account } from "../../../../generated/schema";
 import { INT_ONE, INT_ZERO } from "./constants";

@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import * as constants from "../common/constants";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Configurations, OracleContract } from "../common/types";
+import { DEFAULT_USDC_DECIMALS } from "../common/constants";
 
 export const NETWORK_STRING = "bsc";
 
@@ -49,8 +52,6 @@ export const HARDCODED_STABLES: Address[] = [];
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_TOKEN_DECIMALS = BigInt.fromI32(18);
-
 export const ETH_ADDRESS = constants.NULL.TYPE_ADDRESS;
 export const WETH_ADDRESS = Address.fromString(
   "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
@@ -59,7 +60,7 @@ export const USDC_ADDRESS = Address.fromString(
   "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
 );
 
-export class config implements Configurations {
+export class Config implements Configurations {
   network(): string {
     return NETWORK_STRING;
   }
@@ -117,6 +118,6 @@ export class config implements Configurations {
   }
 
   usdcTokenDecimals(): BigInt {
-    return USDC_TOKEN_DECIMALS;
+    return BigInt.fromI32(DEFAULT_USDC_DECIMALS);
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import {
   log,
   Address,
@@ -9,13 +10,13 @@ import { CustomPriceType } from "./common/types";
 
 import * as utils from "./common/utils";
 import * as constants from "./common/constants";
-import * as AaveOracle from "./oracles/AaveOracle";
-import * as CurveRouter from "./routers/CurveRouter";
-import * as ChainLinkFeed from "./oracles/ChainLinkFeed";
-import * as YearnLensOracle from "./oracles/YearnLensOracle";
-import * as UniswapForksRouter from "./routers/UniswapForksRouter";
-import * as CurveCalculations from "./calculations/CalculationsCurve";
-import * as SushiCalculations from "./calculations/CalculationsSushiswap";
+import * as AaveOracle from "./oracles/aaveOracle";
+import * as CurveRouter from "./routers/curveRouter";
+import * as ChainLinkFeed from "./oracles/chainLinkFeed";
+import * as YearnLensOracle from "./oracles/yearnLensOracle";
+import * as UniswapForksRouter from "./routers/uniswapForksRouter";
+import * as CurveCalculations from "./calculations/calculationsCurve";
+import * as SushiCalculations from "./calculations/calculationsSushiswap";
 
 export function getUsdPricePerToken(
   tokenAddr: Address,

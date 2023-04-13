@@ -19,7 +19,10 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   overrides: [
     {
-      files: ["*.ts", "*.tsx"],
+      files: ["**/constants.ts", "**/constant.ts"],
+      rules: {
+        "@typescript-eslint/no-magic-numbers": ["off"],
+      },
     },
   ],
   parserOptions: {

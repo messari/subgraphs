@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import {
   Pool as PoolSchema,
   PoolDailySnapshot,

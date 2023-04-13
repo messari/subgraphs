@@ -1,5 +1,4 @@
-import { Bytes, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import {
   sortBytesArray,
   updateArrayAtIndex,

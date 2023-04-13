@@ -1,48 +1,49 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { BigInt } from "@graphprotocol/graph-ts";
-import { SECONDS_PER_DAY } from "../constants";
+import { BIGINT_TEN, SECONDS_PER_DAY } from "../constants";
 
-export const minute = BigInt.fromI32(60);
-export const hour = BigInt.fromI32(3600);
-export const day = BigInt.fromI32(86400);
+export const MINUTE = BigInt.fromI32(60);
+export const HOUR = BigInt.fromI32(3600);
+export const DAY = BigInt.fromI32(86400);
 
-export const one = BigInt.fromI32(1);
+export const ONE = BigInt.fromI32(1);
 
 export function getMinuteOpenTime(timestamp: BigInt): BigInt {
-  const interval = minute;
+  const interval = MINUTE;
   return getOpenTime(timestamp, interval);
 }
 
 export function getMinuteCloseTime(timestamp: BigInt): BigInt {
-  return getMinuteOpenTime(timestamp).plus(minute).minus(one);
+  return getMinuteOpenTime(timestamp).plus(MINUTE).minus(ONE);
 }
 
 export function getTenMinuteOpenTime(timestamp: BigInt): BigInt {
-  const interval = minute.times(BigInt.fromI32(10));
+  const interval = MINUTE.times(BIGINT_TEN);
   return getOpenTime(timestamp, interval);
 }
 
 export function getTenMinuteCloseTime(timestamp: BigInt): BigInt {
   return getTenMinuteOpenTime(timestamp)
-    .plus(minute.times(BigInt.fromI32(10)))
-    .minus(one);
+    .plus(MINUTE.times(BigInt.fromI32(10)))
+    .minus(ONE);
 }
 
 export function getHourOpenTime(timestamp: BigInt): BigInt {
-  const interval = hour;
+  const interval = HOUR;
   return getOpenTime(timestamp, interval);
 }
 
 export function getHourCloseTime(timestamp: BigInt): BigInt {
-  return getHourOpenTime(timestamp).plus(hour).minus(one);
+  return getHourOpenTime(timestamp).plus(HOUR).minus(ONE);
 }
 
 export function getDayOpenTime(timestamp: BigInt): BigInt {
-  const interval = day;
+  const interval = DAY;
   return getOpenTime(timestamp, interval);
 }
 
 export function getDayCloseTime(timestamp: BigInt): BigInt {
-  return getDayOpenTime(timestamp).plus(day).minus(one);
+  return getDayOpenTime(timestamp).plus(DAY).minus(ONE);
 }
 
 export function getDaysSinceEpoch(secondsSinceEpoch: number): string {

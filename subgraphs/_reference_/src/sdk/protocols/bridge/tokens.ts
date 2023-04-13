@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import {
   RewardToken,

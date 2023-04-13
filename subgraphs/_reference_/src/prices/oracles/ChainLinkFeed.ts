@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { Address, ethereum } from "@graphprotocol/graph-ts";

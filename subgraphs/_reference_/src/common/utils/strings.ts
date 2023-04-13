@@ -1,18 +1,24 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { BigInt } from "@graphprotocol/graph-ts";
+
+const HEX_MAX = 16;
+const CHAR_MIN = 32;
+const CHAR_MAX = 126;
+const HEX_PREFIX = "0x";
 
 export function hexToNumberString(hex: string): string {
   let hexNumber = BigInt.fromI32(0);
 
-  if (hex.startsWith("0x")) {
+  if (hex.startsWith(HEX_PREFIX)) {
     hex = hex.slice(2);
   }
 
   for (let i = 0; i < hex.length; i += 1) {
     const character = hex.substr(hex.length - 1 - i, 1);
-    const digit = parseInt(character, 16) as u8;
+    const digit = parseInt(character, HEX_MAX) as u8;
     if (digit) {
       hexNumber = hexNumber.plus(
-        BigInt.fromI32(digit).times(BigInt.fromI32(16).pow(i as u8))
+        BigInt.fromI32(digit).times(BigInt.fromI32(HEX_MAX).pow(i as u8))
       );
     }
   }
@@ -23,7 +29,7 @@ export function hexToNumberString(hex: string): string {
 export function hexToAscii(hex: string): string {
   let output = "";
   for (let i = 0; i < hex.length; i += 2) {
-    const charCode = parseInt(hex.substr(i, 2), 16) as u8;
+    const charCode = parseInt(hex.substr(i, 2), HEX_MAX) as u8;
 
     if (charCode) {
       output += String.fromCharCode(charCode);
@@ -31,7 +37,7 @@ export function hexToAscii(hex: string): string {
 
     // catch cases with charCode outside 32...126,
     // in which case it's probably a number...
-    if (charCode && (charCode < 32 || charCode > 126)) {
+    if (charCode && (charCode < CHAR_MIN || charCode > CHAR_MAX)) {
       return hexToNumberString(hex);
     }
   }

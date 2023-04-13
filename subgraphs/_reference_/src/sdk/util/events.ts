@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { BigInt, Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   BIGINT_ZERO,

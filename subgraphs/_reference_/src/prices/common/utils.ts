@@ -1,3 +1,4 @@
+// eslint-disable-next-line rulesdir/no-non-standard-filenames
 import * as BSC from "../config/bsc";
 import * as CELO from "../config/celo";
 import * as FUSE from "../config/fuse";
@@ -19,6 +20,8 @@ import * as TEMPLATE from "../config/template";
 import { _ERC20 } from "../../../generated/UniswapV2Factory/_ERC20";
 import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 
+const UNKNOWN_TOKEN_NAME = "";
+
 export function isNullAddress(tokenAddr: Address): boolean {
   return tokenAddr.equals(constants.NULL.TYPE_ADDRESS);
 }
@@ -32,7 +35,7 @@ export function readValue<T>(
 
 export function getTokenName(tokenAddr: Address): string {
   const tokenContract = _ERC20.bind(tokenAddr);
-  const name = readValue<string>(tokenContract.try_name(), "");
+  const name = readValue<string>(tokenContract.try_name(), UNKNOWN_TOKEN_NAME);
 
   return name;
 }
@@ -63,34 +66,34 @@ export function getConfig(): Configurations {
   const network = dataSource.network();
 
   if (network == XDAI.NETWORK_STRING) {
-    return new XDAI.config();
+    return new XDAI.Config();
   } else if (network == AURORA.NETWORK_STRING) {
-    return new AURORA.config();
+    return new AURORA.Config();
   } else if (network == BSC.NETWORK_STRING) {
-    return new BSC.config();
+    return new BSC.Config();
   } else if (network == FANTOM.NETWORK_STRING) {
-    return new FANTOM.config();
+    return new FANTOM.Config();
   } else if (network == POLYGON.NETWORK_STRING) {
-    return new POLYGON.config();
+    return new POLYGON.Config();
   } else if (network == MAINNET.NETWORK_STRING) {
-    return new MAINNET.config();
+    return new MAINNET.Config();
   } else if (network == HARMONY.NETWORK_STRING) {
-    return new HARMONY.config();
+    return new HARMONY.Config();
   } else if (network == MOONBEAM.NETWORK_STRING) {
-    return new MOONBEAM.config();
+    return new MOONBEAM.Config();
   } else if (network == OPTIMISM.NETWORK_STRING) {
-    return new OPTIMISM.config();
+    return new OPTIMISM.Config();
   } else if (network == AVALANCHE.NETWORK_STRING) {
-    return new AVALANCHE.config();
+    return new AVALANCHE.Config();
   } else if (network == ARBITRUM_ONE.NETWORK_STRING) {
-    return new ARBITRUM_ONE.config();
+    return new ARBITRUM_ONE.Config();
   } else if (network == CRONOS.NETWORK_STRING) {
-    return new CRONOS.config();
+    return new CRONOS.Config();
   } else if (network == CELO.NETWORK_STRING) {
-    return new CELO.config();
+    return new CELO.Config();
   } else if (network == FUSE.NETWORK_STRING) {
-    return new FUSE.config();
+    return new FUSE.Config();
   }
 
-  return new TEMPLATE.config();
+  return new TEMPLATE.Config();
 }

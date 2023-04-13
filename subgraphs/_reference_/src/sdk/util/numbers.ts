@@ -1,7 +1,9 @@
+/* eslint-disable rulesdir/no-non-standard-filenames */
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_TEN,
+  BIGDECIMAL_TWO,
   BIGDECIMAL_ZERO,
   BIGINT_TEN,
   DEFAULT_DECIMALS,
@@ -48,7 +50,7 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 
   const mid = Math.ceil(sorted.length / 2) as i32;
   if (sorted.length % 2 == 0) {
-    return sorted[mid].plus(sorted[mid - 1]).div(BigDecimal.fromString("2"));
+    return sorted[mid].plus(sorted[mid - 1]).div(BIGDECIMAL_TWO);
   }
 
   return sorted[mid - 1];
