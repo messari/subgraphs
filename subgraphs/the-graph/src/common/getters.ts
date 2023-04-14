@@ -21,12 +21,12 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ZERO,
-  Network,
   ProtocolType,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "./constants";
 import { Versions } from "../versions";
+import { NetworkConfigs } from "../../configurations/configure";
 
 export function getOrCreateProtocol(): Protocol {
   let protocol = Protocol.load(addresses.controller);
@@ -35,7 +35,7 @@ export function getOrCreateProtocol(): Protocol {
     protocol = new Protocol(addresses.controller);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.network = Network.MAINNET;
+    protocol.network = NetworkConfigs.getNetwork();
     protocol.type = ProtocolType.GENERIC;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     // Needed?
