@@ -129,16 +129,9 @@ export function handleFilledRelay(event: FilledRelay): void {
         []
       );
     } else {
-      log.error("baseEmission: {}", [
-        contractCall.value.getBaseEmissionRate().toString(),
-      ]);
       baseEmissionRate = contractCall.value.getBaseEmissionRate();
     }
 
-    log.error("tx: {} baseEmissionRate: {}", [
-      event.transaction.hash.toHexString(),
-      baseEmissionRate!.toString(),
-    ]);
     const amount = baseEmissionRate!
       .times(SECONDS_PER_DAY_BI)
       .div(BigInt.fromI32(rewardToken.decimals));
