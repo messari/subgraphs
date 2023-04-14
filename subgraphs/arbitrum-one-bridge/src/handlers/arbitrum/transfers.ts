@@ -117,9 +117,24 @@ export function handleTransferOut3pGateway(event: WithdrawalInitiated): void {
   const l1Token = new ethereum.EventParam("l1token", event.parameters[0].value);
   const _from = new ethereum.EventParam("_from", event.parameters[1].value);
   const _to = new ethereum.EventParam("_to", event.parameters[2].value);
-  const _amount = new ethereum.EventParam("_amount", event.parameters[3].value);
+  const _l2ToL1Id = new ethereum.EventParam(
+    "_l2ToL1Id",
+    event.parameters[3].value
+  );
+  const _exitNum = new ethereum.EventParam(
+    "_exitNum",
+    event.parameters[4].value
+  );
+  const _amount = new ethereum.EventParam("_amount", event.parameters[5].value);
 
-  const params: ethereum.EventParam[] = [l1Token, _from, _to, _amount];
+  const params: ethereum.EventParam[] = [
+    l1Token,
+    _from,
+    _to,
+    _l2ToL1Id,
+    _exitNum,
+    _amount,
+  ];
   const withdrawalInitiated = new WithdrawalInitiated(
     event.address,
     event.logIndex,
