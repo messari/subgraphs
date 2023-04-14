@@ -269,13 +269,12 @@ export function updateRewardTokenEmissions(
   }
   const rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
-  const token = getOrCreateToken(rewardTokenAddress, block);
-  const tokenPrice = getUsdPricePerToken(rewardTokenAddress, block);
+  const token = getOrCreateToken(rewardTokenAddress, block, true);
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
     .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
-    .times(tokenPrice.usdPrice);
+    .times(token.lastPriceUSD!);
 
   pool.rewardTokens = rewardTokens;
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;

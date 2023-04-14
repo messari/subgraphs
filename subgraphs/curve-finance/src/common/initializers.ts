@@ -126,7 +126,8 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
 
 export function getOrCreateToken(
   address: Address,
-  block: ethereum.Block
+  block: ethereum.Block,
+  fetchLatestPrice: bool = false
 ): Token {
   let token = Token.load(address.toHexString());
 
@@ -140,7 +141,6 @@ export function getOrCreateToken(
     token.decimals = utils
       .readValue<BigInt>(contract.try_decimals(), constants.DEFAULT_DECIMALS)
       .toI32();
-
     token.isBasePoolLpToken = false;
 
     if (address.equals(constants.ETH_ADDRESS)) {
@@ -153,6 +153,7 @@ export function getOrCreateToken(
   }
 
   if (
+    fetchLatestPrice ||
     !token.lastPriceUSD ||
     !token.lastPriceBlockNumber ||
     block.number
