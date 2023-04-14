@@ -144,6 +144,7 @@ export class SushiswapMainnetConfigurations implements Configurations {
       "0xe9f84de264e91529af07fa2c746e934397810334", // Sake Token
       "0x1337def16f9b486faed0293eb623dc8395dfe46a", // Armor Token
       "0x4b4d2e899658fb59b1d518b68fe836b100ee8958", // MIS
+      "0xa487bf43cf3b10dffc97a9a744cbb7036965d3b9", // Deri
     ];
   }
   getBrokenERC20Tokens(): string[] {
