@@ -492,7 +492,7 @@ export function _handleReserveDataUpdated(
     market.reserveFactor
   );
   manager.addProtocolRevenue(protocolSideRevenueDeltaUSD, fee);
-  manager.addSupplyRevenue(supplySideRevenueDeltaUSD);
+  manager.addSupplyRevenue(supplySideRevenueDeltaUSD, fee);
 
   manager.getOrUpdateRate(
     InterestRateSide.BORROWER,

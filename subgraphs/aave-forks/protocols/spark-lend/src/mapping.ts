@@ -32,7 +32,6 @@ import {
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
 import {
-  ProtocolData,
   _handleBorrow,
   _handleBorrowingDisabledOnReserve,
   _handleBorrowingEnabledOnReserve,
@@ -52,11 +51,6 @@ import {
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
-  getOrCreateLendingProtocol,
-  getOrCreateMarket,
-  getOrCreateToken,
-} from "../../../src/helpers";
-import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   exponentToBigDecimal,
@@ -72,6 +66,7 @@ import { Transfer as CollateralTransfer } from "../../../generated/templates/ATo
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 import { AaveOracle } from "../../../generated/RewardsController/AaveOracle";
+import { ProtocolData } from "../../../src/sdk/manager";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();

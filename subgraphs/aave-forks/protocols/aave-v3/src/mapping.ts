@@ -10,7 +10,7 @@ import {
 import {
   PriceOracleUpdated,
   ProxyCreated,
-} from "../../../generated/templates/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
+} from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
@@ -30,7 +30,7 @@ import {
   ReserveInitialized,
   ReservePaused,
   LiquidationProtocolFeeChanged,
-} from "../../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
+} from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
   LendingPool as LendingPoolContract,
@@ -41,7 +41,7 @@ import {
   ReserveUsedAsCollateralEnabled,
   Supply,
   Withdraw,
-} from "../../../generated/templates/LendingPool/LendingPool";
+} from "../../../generated/LendingPool/LendingPool";
 import {
   _handleBorrow,
   _handleBorrowingDisabledOnReserve,
@@ -77,19 +77,10 @@ import {
   INT_FOUR,
 } from "../../../src/constants";
 import { Market, Token } from "../../../generated/schema";
-import {
-  AddressesProviderRegistered,
-  PoolAddressesProviderRegistry,
-} from "../../../generated/PoolAddressesProviderRegistry/PoolAddressesProviderRegistry";
 import { AssetConfigUpdated } from "../../../generated/RewardsController/RewardsController";
 import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
-import {
-  LendingPool as LendingPoolTemplate,
-  LendingPoolAddressesProvider,
-  LendingPoolConfigurator,
-} from "../../../generated/templates";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
 import { AaveOracle } from "../../../generated/LendingPool/AaveOracle";
 import {
@@ -124,50 +115,11 @@ function getProtocolData(): ProtocolData {
 
 const protocolData = getProtocolData();
 
-// PoolAddressesProviderRegistry
-export function handleAddressesProviderRegistered(
-  event: AddressesProviderRegistered
-): void {
-  const poolAddressesProviderRegistry = PoolAddressesProviderRegistry.bind(
-    event.address
-  );
-  if (poolAddressesProviderRegistry.getAddressesProvidersList().length > 1) {
-    // TODO: add support for additional pools, when it becomes necessary
-    log.error("Additional pool address providers not supported", []);
-    return;
-  }
-
-  const context = new DataSourceContext();
-  context.setString(PROTOCOL_ID_KEY, dataSource.address().toHexString());
-  LendingPoolAddressesProvider.createWithContext(
-    event.params.addressesProvider,
-    context
-  );
-}
-
 ///////////////////////////////////////////////
 ///// PoolAddressProvider Handlers /////
 ///////////////////////////////////////////////r
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
   _handlePriceOracleUpdated(event.params.newAddress, protocolData, event);
-}
-
-export function handleProxyCreated(event: ProxyCreated): void {
-  const context = dataSource.context();
-  context.setString(
-    POOL_ADDRESSES_PROVIDER_ID_KEY,
-    event.address.toHexString()
-  );
-
-  const id = event.params.id.toString();
-  if ("POOL" == id) {
-    LendingPoolTemplate.createWithContext(event.params.proxyAddress, context);
-  } else if ("POOL_CONFIGURATOR" == id) {
-    LendingPoolConfigurator.createWithContext(
-      event.params.proxyAddress,
-      context
-    );
-  }
 }
 
 ///////////////////////////////////////////////
