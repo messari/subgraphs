@@ -64,7 +64,7 @@ export function getOrCreateToken(
   }
 
   if (
-    token.lastPriceBlockNumber &&
+    token.lastPriceBlockNumber! &&
     event.block.number.minus(token.lastPriceBlockNumber!).gt(BIGINT_TEN) &&
     getNewPrice
   ) {
