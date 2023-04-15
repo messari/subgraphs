@@ -6,6 +6,7 @@ import { Network, ZERO_ADDRESS } from "../../../src/constants";
 /////////////////////////////
 
 export namespace Protocol {
+  export const PROTOCOL = "Spark Lend";
   export const NAME = "Spark Lend";
   export const SLUG = "spark-lend";
 }

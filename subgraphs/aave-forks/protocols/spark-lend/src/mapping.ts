@@ -1,17 +1,10 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  log,
-  ethereum,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
-import {
-  AAVE_DECIMALS,
-  getNetworkSpecificConstant,
-  Protocol,
-  IavsTokenType,
-} from "./constants";
+import { AssetConfigUpdated } from "../../../generated/RewardsController/RewardsController";
+import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
+import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
+import { AaveOracle } from "../../../generated/RewardsController/AaveOracle";
 import {
   CollateralConfigurationChanged,
   ReserveFactorChanged,
@@ -31,7 +24,14 @@ import {
   Supply,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
+import { Market, Token, _DefaultOracle } from "../../../generated/schema";
 import {
+  AAVE_DECIMALS,
+  getNetworkSpecificConstant,
+  Protocol,
+} from "./constants";
+import {
+  _handleAssetConfigUpdated,
   _handleBorrow,
   _handleBorrowingDisabledOnReserve,
   _handleBorrowingEnabledOnReserve,
@@ -53,28 +53,35 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  exponentToBigDecimal,
   InterestRateType,
   PositionSide,
-  readValue,
   RewardTokenType,
-  SECONDS_PER_DAY,
+  LendingType,
+  IavsTokenType,
 } from "../../../src/constants";
-import { Market, RewardToken, Token } from "../../../generated/schema";
-import { AssetConfigUpdated } from "../../../generated/RewardsController/RewardsController";
-import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
-import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
-import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
-import { AaveOracle } from "../../../generated/RewardsController/AaveOracle";
-import { ProtocolData } from "../../../src/sdk/manager";
+
+import { DataManager, ProtocolData } from "../../../src/sdk/manager";
+import { readValue, getMarketFromToken } from "../../../src/helpers";
+import {
+  CollateralizationType,
+  PermissionType,
+  RiskType,
+} from "../../../src/sdk/constants";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
   return new ProtocolData(
-    constants.protocolAddress.toHexString(),
+    constants.protocolAddress,
+    Protocol.PROTOCOL,
     Protocol.NAME,
     Protocol.SLUG,
-    constants.network
+    constants.network,
+    LendingType.POOLED,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.ADMIN,
+    CollateralizationType.OVER_COLLATERALIZED,
+    RiskType.GLOBAL
   );
 }
 
@@ -85,7 +92,7 @@ const protocolData = getProtocolData();
 ////////////////////////////////////////
 
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
-  _handlePriceOracleUpdated(event.params.newAddress, protocolData);
+  _handlePriceOracleUpdated(event.params.newAddress, protocolData, event);
 }
 
 /////////////////////////////////////
@@ -93,52 +100,31 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
 /////////////////////////////////////
 
 export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
-  const assetAddress = event.params.asset.toHexString();
-  const assetToken = Token.load(assetAddress);
-  if (!assetToken || !assetToken._market || !assetToken._iavsTokenType) {
-    log.error(
-      "[handleAssetConfigUpdated]Failed to find token {} or assetToken._market/assetToken._iavsTokenType is null",
-      [assetAddress]
+  // it is not clear which market.oracle shouild we use
+  // use the protocol-wide defaultOracle
+  const defaultOracle = _DefaultOracle.load(protocolData.protocolID);
+  let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
+  if (!defaultOracle || !defaultOracle.oracle) {
+    log.warning(
+      "[handleAssetConfigUpdated]_DefaultOracle for {} not set; rewardTokenPriceUSD set to default 0.0",
+      [protocolData.protocolID.toHexString()]
     );
-    return;
-  }
-
-  const marketId = assetToken._market!;
-  const market = Market.load(marketId);
-  if (!market) {
-    log.error("[handleAssetConfigUpdated]Market {} not found", [marketId]);
-    return;
-  }
-
-  // There can be more than one reward tokens for a side,
-  // e.g. one reward token for variable borrowing
-  // and another for stable borrowing
-  let rewardTokenType: string;
-  let interestRateType: string;
-  if (assetToken._iavsTokenType! == IavsTokenType.ATOKEN) {
-    rewardTokenType = RewardTokenType.DEPOSIT;
-    interestRateType = InterestRateType.VARIABLE;
-  } else if (assetToken._iavsTokenType! == IavsTokenType.STOKEN) {
-    rewardTokenType = RewardTokenType.BORROW;
-    interestRateType = InterestRateType.STABLE;
-  } else if (assetToken._iavsTokenType! == IavsTokenType.VTOKEN) {
-    rewardTokenType = RewardTokenType.BORROW;
-    interestRateType = InterestRateType.VARIABLE;
   } else {
-    log.error("Failed to update rewards, could not find asset: {}", [
-      assetAddress,
-    ]);
-    return;
+    rewardTokenPriceUSD = getAssetPriceInUSDC(
+      event.params.reward,
+      Address.fromBytes(defaultOracle.oracle)
+    );
   }
 
-  const rewardToken = getOrCreateRewardToken(
+  _handleAssetConfigUpdated(
+    event,
+    event.params.asset,
     event.params.reward,
-    rewardTokenType,
-    interestRateType,
-    event.params.newDistributionEnd
+    rewardTokenPriceUSD,
+    event.params.newEmission,
+    event.params.newDistributionEnd,
+    protocolData
   );
-
-  updateMarketRewards(event, market, rewardToken, event.params.newEmission);
 }
 
 /////////////////////////////////////
@@ -151,52 +137,19 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
 
   _handleReserveInitialized(
     event,
-    event.params.aToken, // marketID & input Token (underlying asset)
+    event.params.asset,
     event.params.aToken,
     event.params.variableDebtToken,
     protocolData,
     event.params.stableDebtToken
   );
-
-  const assetToken = getOrCreateToken(event.params.asset);
-  const market = getOrCreateMarket(event.params.aToken, protocolData);
-  market.inputToken = assetToken.id;
-  market.save();
-
-  // map tokens to market
-  assetToken._market = market.id;
-  assetToken._iavsTokenType = IavsTokenType.INPUTTOKEN;
-  assetToken.save();
-
-  const aToken = getOrCreateToken(event.params.aToken);
-  aToken._market = market.id;
-  aToken._iavsTokenType = IavsTokenType.ATOKEN;
-  aToken.save();
-
-  const vToken = getOrCreateToken(event.params.variableDebtToken);
-  vToken._market = market.id;
-  vToken._iavsTokenType = IavsTokenType.VTOKEN;
-  vToken.save();
-
-  const sToken = getOrCreateToken(event.params.stableDebtToken);
-  sToken._market = market.id;
-  sToken._iavsTokenType = IavsTokenType.STOKEN;
-  sToken.save();
 }
 
 export function handleCollateralConfigurationChanged(
   event: CollateralConfigurationChanged
 ): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error(
-      "[handleCollateralConfigurationChanged]Failed to find market for asset {}",
-      [event.params.asset.toHexString()]
-    );
-    return;
-  }
   _handleCollateralConfigurationChanged(
-    marketId,
+    event.params.asset,
     event.params.liquidationBonus,
     event.params.liquidationThreshold,
     event.params.ltv,
@@ -205,65 +158,28 @@ export function handleCollateralConfigurationChanged(
 }
 
 export function handleReserveActive(event: ReserveActive): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error(
-      "[handleCollateralConfigurationChanged]Failed to find market for asset {}",
-      [event.params.asset.toHexString()]
-    );
-    return;
-  }
-  _handleReserveActivated(marketId, protocolData);
+  _handleReserveActivated(event.params.asset, protocolData);
 }
 
 export function handleReserveBorrowing(event: ReserveBorrowing): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error("[handleReserveBorrowing]Failed to find market for asset {}", [
-      event.params.asset.toHexString(),
-    ]);
-    return;
-  }
   if (event.params.enabled) {
-    _handleBorrowingEnabledOnReserve(marketId, protocolData);
+    _handleBorrowingEnabledOnReserve(event.params.asset, protocolData);
   } else {
-    _handleBorrowingDisabledOnReserve(marketId, protocolData);
+    _handleBorrowingDisabledOnReserve(event.params.asset, protocolData);
   }
 }
 
 export function handleReserveFrozen(event: ReserveFrozen): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error("[handleReserveFrozen]Failed to find market for asset {}", [
-      event.params.asset.toHexString(),
-    ]);
-    return;
-  }
-  _handleReserveDeactivated(marketId, protocolData);
+  _handleReserveDeactivated(event.params.asset, protocolData);
 }
 
 export function handleReservePaused(event: ReservePaused): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error("[handleReservePaused]Failed to find market for asset {}", [
-      event.params.asset.toHexString(),
-    ]);
-    return;
-  }
-  _handleReserveDeactivated(marketId, protocolData);
+  _handleReserveDeactivated(event.params.asset, protocolData);
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
-  const marketId = getMarketIdFromToken(event.params.asset);
-  if (!marketId) {
-    log.error(
-      "[handleReserveFactorChanged]Failed to find market for asset {}",
-      [event.params.asset.toHexString()]
-    );
-    return;
-  }
   _handleReserveFactorChanged(
-    marketId,
+    event.params.asset,
     event.params.newReserveFactor,
     protocolData
   );
@@ -274,22 +190,25 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
-  const protocol = getOrCreateLendingProtocol(protocolData);
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId || !Market.load(marketId.toHexString())) {
-    log.warning("[handleReserveDataUpdated]Market not found for reserve {}", [
+  const market = getMarketFromToken(event.params.reserve, protocolData);
+  if (!market) {
+    log.warning("[handleReserveDataUpdated] Market not found for reserve {}", [
       event.params.reserve.toHexString(),
     ]);
     return;
   }
-
-  const market = Market.load(marketId.toHexString())!;
-  const assetPriceUSD = getAssetPriceInUSDC(
-    Address.fromString(market.inputToken),
-    Address.fromString(protocol._priceOracle)
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    protocolData
   );
 
-  // TODO: better to pass market and protocol
+  const assetPriceUSD = getAssetPriceInUSDC(
+    Address.fromBytes(market.inputToken),
+    manager.getOracleAddress()
+  );
+
   _handleReserveDataUpdated(
     event,
     event.params.liquidityRate,
@@ -297,7 +216,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.variableBorrowRate,
     event.params.stableBorrowRate,
     protocolData,
-    marketId,
+    event.params.reserve,
     assetPriceUSD
   );
 }
@@ -305,17 +224,9 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 export function handleReserveUsedAsCollateralEnabled(
   event: ReserveUsedAsCollateralEnabled
 ): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error(
-      "[handleReserveUsedAsCollateralEnabled]Failed to find market for asset {}",
-      [event.params.reserve.toHexString()]
-    );
-    return;
-  }
   // This Event handler enables a reserve/market to be used as collateral
   _handleReserveUsedAsCollateralEnabled(
-    marketId,
+    event.params.reserve,
     event.params.user,
     protocolData
   );
@@ -324,116 +235,63 @@ export function handleReserveUsedAsCollateralEnabled(
 export function handleReserveUsedAsCollateralDisabled(
   event: ReserveUsedAsCollateralDisabled
 ): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error(
-      "[handleReserveUsedAsCollateralDisabled]Failed to find market for asset {}",
-      [event.params.reserve.toHexString()]
-    );
-    return;
-  }
   // This Event handler disables a reserve/market being used as collateral
   _handleReserveUsedAsCollateralDisabled(
-    marketId,
+    event.params.reserve,
     event.params.user,
     protocolData
   );
 }
 
 export function handleDeposit(event: Supply): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error("[handleDeposit]Failed to find market for asset {}", [
-      event.params.reserve.toHexString(),
-    ]);
-    return;
-  }
   _handleDeposit(
     event,
     event.params.amount,
-    marketId,
+    event.params.reserve,
     protocolData,
     event.params.onBehalfOf
   );
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error("[handleWithdraw]Failed to find market for asset {}", [
-      event.params.reserve.toHexString(),
-    ]);
-    return;
-  }
   _handleWithdraw(
     event,
     event.params.amount,
-    marketId,
+    event.params.reserve,
     protocolData,
     event.params.user
   );
 }
 
 export function handleBorrow(event: Borrow): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error("[handleBorrow]Failed to find market for asset {}", [
-      event.params.reserve.toHexString(),
-    ]);
-    return;
-  }
-
   _handleBorrow(
     event,
     event.params.amount,
-    marketId,
+    event.params.reserve,
     protocolData,
     event.params.onBehalfOf
   );
 }
 
 export function handleRepay(event: Repay): void {
-  const marketId = getMarketIdFromToken(event.params.reserve);
-  if (!marketId) {
-    log.error("[handleRepay]Failed to find market for asset {}", [
-      event.params.reserve.toHexString(),
-    ]);
-    return;
-  }
   _handleRepay(
     event,
     event.params.amount,
-    marketId,
+    event.params.reserve,
     protocolData,
     event.params.user
   );
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
-  const collateralMarketId = getMarketIdFromToken(event.params.collateralAsset);
-  if (!collateralMarketId) {
-    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
-      event.params.collateralAsset.toHexString(),
-    ]);
-    return;
-  }
-
-  const debtMarketId = getMarketIdFromToken(event.params.debtAsset);
-  if (!debtMarketId) {
-    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
-      event.params.debtAsset.toHexString(),
-    ]);
-    return;
-  }
-
   _handleLiquidate(
     event,
     event.params.liquidatedCollateralAmount,
-    collateralMarketId,
+    event.params.collateralAsset,
     protocolData,
     event.params.liquidator,
     event.params.user,
-    debtMarketId,
+    event.params.debtAsset,
     event.params.debtToCover
   );
 }
@@ -448,7 +306,8 @@ export function handleCollateralTransfer(event: CollateralTransfer): void {
     protocolData,
     PositionSide.LENDER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
@@ -458,7 +317,8 @@ export function handleVariableTransfer(event: VariableTransfer): void {
     protocolData,
     PositionSide.BORROWER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
@@ -468,7 +328,8 @@ export function handleStableTransfer(event: StableTransfer): void {
     protocolData,
     PositionSide.BORROWER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
@@ -500,20 +361,7 @@ function getAssetPriceInUSDC(
   return BIGDECIMAL_ZERO;
 }
 
-function getMarketIdFromToken(token: Address): Address | null {
-  const tokenAddress = token.toHexString();
-  const tokenEntity = Token.load(tokenAddress);
-  if (!tokenEntity || !tokenEntity._market) {
-    log.error(
-      "[getMarketIdFromToken]token {} not exist or token._market = null",
-      [tokenAddress]
-    );
-    return null;
-  }
-  const marketId = Address.fromString(tokenEntity._market!);
-  return marketId;
-}
-
+/*
 function getOrCreateRewardToken(
   tokenAddress: Address,
   rewardTokenType: string,
@@ -630,7 +478,7 @@ function multiArraySort(
   if (ref.length != arr1.length || ref.length != arr2.length) {
     // cannot sort
     log.error("[multiArraySort] cannot sort arrays. Array reference: {}", [
-      ref.toString(),
+      ref.toString()
     ]);
     return;
   }
@@ -640,7 +488,7 @@ function multiArraySort(
     sorter[i] = [ref[i], arr1[i].toString(), arr2[i].toString()];
   }
 
-  sorter.sort(function (a: Array<string>, b: Array<string>): i32 {
+  sorter.sort(function(a: Array<string>, b: Array<string>): i32 {
     if (a[0] < b[0]) {
       return -1;
     }
@@ -653,3 +501,4 @@ function multiArraySort(
     arr2[i] = BigDecimal.fromString(sorter[i][2]);
   }
 }
+*/

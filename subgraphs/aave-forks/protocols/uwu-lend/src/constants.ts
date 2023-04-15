@@ -6,6 +6,7 @@ import { Network } from "../../../src/constants";
 /////////////////////////////
 
 export namespace Protocol {
+  export const PROTOCOL = "UwU Lend";
   export const NAME = "UwU Lend";
   export const SLUG = "uwu-lend";
 }
