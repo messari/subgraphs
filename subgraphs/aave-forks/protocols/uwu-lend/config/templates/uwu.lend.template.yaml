@@ -132,6 +132,8 @@ dataSources:
           handler: handlePaused
         - event: Unpaused()
           handler: handleUnpaused
+        - event: FlashLoan(indexed address,indexed address,indexed address,uint256,uint256,uint16)
+          handler: handleFlashloan
       file: ./protocols/uwu-lend/src/mapping.ts
 templates:
   - kind: ethereum/contract

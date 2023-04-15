@@ -36,6 +36,7 @@ import {
   PositionSide,
   RewardTokenType,
   SECONDS_PER_DAY,
+  bigDecimalToBigInt,
 } from "./sdk/constants";
 import {
   getBorrowBalance,
@@ -864,6 +865,54 @@ export function _handleLiquidate(
     market._liquidationProtocolFee
   );
   manager.addProtocolRevenue(liquidationProtocolFeeUSD, fee);
+}
+
+export function _handleFlashLoan(
+  asset: Address,
+  amount: BigInt,
+  account: Address,
+  procotolData: ProtocolData,
+  event: ethereum.Event,
+  premium: BigInt,
+  premiumRate: BigDecimal,
+  premiumRateToProtocol: BigDecimal | null = null //premium collected by the protocol
+): void {
+  const market = getMarketFromToken(asset, procotolData);
+  if (!market) {
+    log.warning("[_handleFlashLoan] market for token {} not found", [
+      asset.toHexString(),
+    ]);
+    return;
+  }
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    procotolData
+  );
+  const tokenManager = new TokenManager(asset, event);
+  const amountUSD = tokenManager.getAmountUSD(amount);
+  manager.createFlashloan(asset, account, amount, amountUSD);
+
+  const premiumUSD = tokenManager.getAmountUSD(premium);
+  if (premiumRateToProtocol && premiumRateToProtocol.gt(BIGDECIMAL_ZERO)) {
+    const premiumAmountToProtocol = bigDecimalToBigInt(
+      premium.toBigDecimal().div(premiumRate).times(premiumRateToProtocol)
+    );
+    const premiumAmountUSDToProtocol = tokenManager.getAmountUSD(
+      premiumAmountToProtocol
+    );
+    const fee = manager.getOrUpdateFee(
+      FeeType.OTHER,
+      null,
+      premiumRateToProtocol
+    );
+    manager.addSupplyRevenue(premiumAmountUSDToProtocol, fee);
+    // premium rate to LP
+    premiumRate = premiumRate.minus(premiumRateToProtocol);
+  }
+  const fee = manager.getOrUpdateFee(FeeType.OTHER, null, premiumRate);
+  manager.addSupplyRevenue(premiumUSD, fee);
 }
 
 /////////////////////////

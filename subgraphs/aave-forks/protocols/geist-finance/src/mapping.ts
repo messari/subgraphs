@@ -9,6 +9,7 @@ import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvi
 import {
   CRV_ADDRESS,
   CRV_FTM_LP_ADDRESS,
+  FLASHLOAN_PREMIUM_TOTAL,
   GEIST_FTM_LP_ADDRESS,
   GFTM_ADDRESS,
   Protocol,
@@ -26,6 +27,7 @@ import {
 import {
   Borrow,
   Deposit,
+  FlashLoan,
   LiquidationCall,
   Paused,
   Repay,
@@ -42,6 +44,7 @@ import {
   _handleBorrowingEnabledOnReserve,
   _handleCollateralConfigurationChanged,
   _handleDeposit,
+  _handleFlashLoan,
   _handleLiquidate,
   _handlePaused,
   _handlePriceOracleUpdated,
@@ -315,6 +318,18 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.debtAsset,
     event.params.debtToCover,
     createLiquidatorPosition
+  );
+}
+
+export function handlehandleFlashloan(event: FlashLoan): void {
+  _handleFlashLoan(
+    event.params.asset,
+    event.params.amount,
+    event.params.initiator,
+    protocolData,
+    event,
+    event.params.premium,
+    FLASHLOAN_PREMIUM_TOTAL
   );
 }
 

@@ -1,6 +1,6 @@
 # Geist Finance Subgraph
 
-## Calculation Methodology v1.0.0
+## Calculation Methodology v1.1.0
 
 ### Total Value Locked (TVL) USD
 
@@ -12,9 +12,7 @@ Sum across all Pools:
 
 Sum across all Pools:
 
-`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate)`
-
-Note: This currently excludes Flash Loans
+`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate) + FlashLoan Amount * Flashloan premium rate (0.9%)`
 
 ### Protocol-Side Revenue USD
 
@@ -30,7 +28,7 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Pool Outstanding Borrow Amount * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
+`(Pool Outstanding Borrow Amount * Pool Borrow Rate) * (1 - Pool Reserve Factor) + FlashLoan Amount * Flashloan premium rate (0.9%)`
 
 ### Total Unique Users
 

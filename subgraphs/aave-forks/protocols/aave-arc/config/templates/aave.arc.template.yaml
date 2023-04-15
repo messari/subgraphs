@@ -132,6 +132,8 @@ dataSources:
           handler: handlePaused
         - event: Unpaused()
           handler: handleUnpaused
+        - event: FlashLoan(indexed address,indexed address,indexed address,uint256,uint256,uint16)
+          handler: handleFlashloan          
       file: ./protocols/aave-arc/src/mapping.ts
 templates:
   - kind: ethereum/contract

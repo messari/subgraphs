@@ -1,4 +1,4 @@
-import { Address, dataSource, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
 import { Network, ZERO_ADDRESS } from "../../../src/constants";
 
 //////////////////////////////
@@ -19,6 +19,10 @@ export namespace Protocol {
   export const SLUG = "aave-v2";
 }
 export const AAVE_DECIMALS = 8;
+
+// This is hardcoded and can not be changed, so it is set as a constant here
+// https://etherscan.io/address/0x05bfa9157e92690b179033ca2f6dd1e86b25ea4d#code#F96#L89
+export const FLASHLOAN_PREMIUM_TOTAL = BigDecimal.fromString("0.0009"); // = 9/10000
 
 ////////////////////////////
 ///// Network Specific /////

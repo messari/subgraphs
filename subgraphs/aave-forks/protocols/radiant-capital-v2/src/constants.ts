@@ -1,4 +1,4 @@
-import { dataSource, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
 import { Network, ZERO_ADDRESS } from "../../../src/constants";
 import { equalsIgnoreCase } from "../../../src/helpers";
 
@@ -61,6 +61,9 @@ export namespace Protocol {
 // Number of decimals in which rToken oracle prices are returned.
 export const rTOKEN_DECIMALS = 8;
 
+// This is hardcoded and can not be changed, so it is set as a constant here
+// https://arbiscan.io/address/0xd1b589c00c940c4c3f7b25e53c8d921c44ef9140#code#F19#L97
+export const FLASHLOAN_PREMIUM_TOTAL = BigDecimal.fromString("0.0009"); // = 9/10000
 export class NetworkSpecificConstant {
   constructor(
     public readonly protocolAddress: string, // aka, PoolAddressesProviderRegistry
