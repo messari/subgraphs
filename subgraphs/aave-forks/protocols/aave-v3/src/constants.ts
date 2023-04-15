@@ -19,13 +19,6 @@ export namespace Protocol {
   export const SLUG = "aave-v3";
 }
 
-export namespace IavsTokenType {
-  export const ATOKEN = "ATOKEN";
-  export const INPUTTOKEN = "INPUTTOKEN";
-  export const VTOKEN = "VTOKEN";
-  export const STOKEN = "STOKEN";
-}
-
 export const AAVE_DECIMALS = 8;
 
 ////////////////////////////

@@ -1,8 +1,14 @@
 // Helpers for the general mapping.ts file
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { ProtocolData } from "./sdk/manager";
-import { Market, _MarketList } from "../generated/schema";
-import { BIGINT_ZERO, BIGDECIMAL_ONE } from "./constants";
+import { Market, Token, _MarketList } from "../generated/schema";
+import { BIGINT_ZERO, BIGINT_ONE, BIGDECIMAL_ONE } from "./constants";
 import { AToken } from "../generated/LendingPool/AToken";
 import { bigDecimalToBigInt } from "./sdk/constants";
 
@@ -41,6 +47,30 @@ export function getMarketByAuxillaryToken(
   return null; // no market found
 }
 
+// this is more efficient than getMarketByAuxillaryToken()
+// but requires a token._market field
+export function getMarketFromToken(
+  tokenAddress: Address,
+  protocolData: ProtocolData
+): Market | null {
+  const token = Token.load(tokenAddress);
+  if (!token) {
+    log.error("[getMarketFromToken] token {} not exist", [
+      tokenAddress.toHexString(),
+    ]);
+    return null;
+  }
+  if (!token._market) {
+    log.warning("[getMarketFromToken] token {} _market = null", [
+      tokenAddress.toHexString(),
+    ]);
+    return getMarketByAuxillaryToken(tokenAddress, protocolData);
+  }
+
+  const marketId = Address.fromBytes(token._market!);
+  const market = Market.load(marketId);
+  return market;
+}
 export function getBorrowBalance(market: Market, account: Address): BigInt {
   let sDebtTokenBalance = BIGINT_ZERO;
   let vDebtTokenBalance = BIGINT_ZERO;
@@ -106,15 +136,46 @@ export function storePrePauseState(market: Market): void {
 }
 
 export function restorePrePauseState(market: Market): void {
-  if (!market._prePauseState || market._prePauseState.length !== 3) {
+  if (!market._prePauseState || market._prePauseState!.length !== 3) {
     log.warning(
       "[restorePrePauseState] _prePauseState for market {} is not set correctly",
       [market.id.toHexString()]
     );
     return;
   }
-  market.isActive = market._prePauseState[0];
-  market.canUseAsCollateral = market._prePauseState[1];
-  market.canBorrowFrom = market._prePauseState[2];
+  market.isActive = market._prePauseState![0];
+  market.canUseAsCollateral = market._prePauseState![1];
+  market.canBorrowFrom = market._prePauseState![2];
   market.save();
+}
+
+export function readValue<T>(
+  callResult: ethereum.CallResult<T>,
+  defaultValue: T
+): T {
+  return callResult.reverted ? defaultValue : callResult.value;
+}
+
+export function rayToWad(a: BigInt): BigInt {
+  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
+  return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
+}
+
+export function wadToRay(a: BigInt): BigInt {
+  const result = a.times(BigInt.fromI32(10).pow(9));
+  return result;
+}
+
+// n => 10^n
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let result = BIGINT_ONE;
+  const ten = BigInt.fromI32(10);
+  for (let i = 0; i < decimals; i++) {
+    result = result.times(ten);
+  }
+  return result.toBigDecimal();
+}
+
+export function equalsIgnoreCase(a: string, b: string): boolean {
+  return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }

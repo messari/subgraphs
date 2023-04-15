@@ -9,6 +9,7 @@ import {
 import {
   Account,
   Market,
+  RewardToken,
   _DefaultOracle,
   _MarketList,
 } from "../generated/schema";
@@ -20,10 +21,9 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
-  exponentToBigDecimal,
+  IavsTokenType,
   INT_TWO,
   INT_FOUR,
-  rayToWad,
   RAY_OFFSET,
   ZERO_ADDRESS,
   BIGINT_ONE,
@@ -34,6 +34,8 @@ import {
   InterestRateType,
   OracleSource,
   PositionSide,
+  RewardTokenType,
+  SECONDS_PER_DAY,
 } from "./sdk/constants";
 import {
   getBorrowBalance,
@@ -41,6 +43,9 @@ import {
   getMarketByAuxillaryToken,
   restorePrePauseState,
   storePrePauseState,
+  exponentToBigDecimal,
+  rayToWad,
+  getMarketFromToken,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -48,7 +53,7 @@ import {
   StableDebtToken as STokenTemplate,
 } from "../generated/templates";
 import { ERC20 } from "../generated/LendingPool/ERC20";
-import { DataManager, ProtocolData } from "./sdk/manager";
+import { DataManager, ProtocolData, RewardData } from "./sdk/manager";
 import { FeeType, TokenType } from "./sdk/constants";
 import { TokenManager } from "./sdk/token";
 import { AccountManager } from "./sdk/account";
@@ -137,9 +142,31 @@ export function _handleReserveInitialized(
   market.outputToken = outputTokenManager.getToken().id;
   market._vToken = vDebtTokenManager.getToken().id;
 
+  // map tokens to market
+  const inputToken = manager.getInputToken();
+  inputToken._market = market.id;
+  inputToken._iavsTokenType = IavsTokenType.INPUTTOKEN;
+  inputToken.save();
+
+  const aToken = outputTokenManager.getToken();
+  aToken._market = market.id;
+  aToken._iavsTokenType = IavsTokenType.ATOKEN;
+  aToken.save();
+
+  const vToken = vDebtTokenManager.getToken();
+  vToken._market = market.id;
+  vToken._iavsTokenType = IavsTokenType.VTOKEN;
+  vToken.save();
+
   if (stableDebtToken != Address.zero()) {
     const sDebtTokenManager = new TokenManager(stableDebtToken, event);
-    market._sToken = sDebtTokenManager.getToken().id;
+    const sToken = sDebtTokenManager.getToken();
+    sToken._market = market.id;
+    sToken._iavsTokenType = IavsTokenType.STOKEN;
+    sToken.save();
+
+    market._sToken = sToken.id;
+
     STokenTemplate.create(stableDebtToken);
   }
 
@@ -156,16 +183,18 @@ export function _handleReserveInitialized(
 }
 
 export function _handleCollateralConfigurationChanged(
-  marketId: Address,
+  asset: Address,
   liquidationPenalty: BigInt,
   liquidationThreshold: BigInt,
-  maximumLTV: BigInt
+  maximumLTV: BigInt,
+  protocolData: ProtocolData
 ): void {
-  const market = Market.load(marketId);
+  const market = getMarketFromToken(asset, protocolData);
   if (!market) {
-    log.warning("[_handleCollateralConfigurationChanged] Market not found {}", [
-      marketId.toHexString(),
-    ]);
+    log.warning(
+      "[_handleCollateralConfigurationChanged] Market for asset {} not found",
+      [asset.toHexString()]
+    );
     return;
   }
 
@@ -187,11 +216,14 @@ export function _handleCollateralConfigurationChanged(
   market.save();
 }
 
-export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
-  const market = Market.load(marketId);
+export function _handleBorrowingEnabledOnReserve(
+  asset: Address,
+  procotolData: ProtocolData
+): void {
+  const market = getMarketFromToken(asset, procotolData);
   if (!market) {
     log.warning("[_handleBorrowingEnabledOnReserve] Market not found {}", [
-      marketId.toHexString(),
+      asset.toHexString(),
     ]);
     return;
   }
@@ -201,12 +233,16 @@ export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
   storePrePauseState(market);
 }
 
-export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
-  const market = Market.load(marketId);
+export function _handleBorrowingDisabledOnReserve(
+  asset: Address,
+  procotolData: ProtocolData
+): void {
+  const market = getMarketFromToken(asset, procotolData);
   if (!market) {
-    log.warning("[_handleBorrowingDisabledOnReserve] Market not found {}", [
-      marketId.toHexString(),
-    ]);
+    log.warning(
+      "[_handleBorrowingDisabledOnReserve] Market for token {} not found",
+      [asset.toHexString()]
+    );
     return;
   }
 
@@ -215,11 +251,14 @@ export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
   storePrePauseState(market);
 }
 
-export function _handleReserveActivated(marketId: Address): void {
-  const market = Market.load(marketId);
+export function _handleReserveActivated(
+  asset: Address,
+  protocolData: ProtocolData
+): void {
+  const market = getMarketFromToken(asset, protocolData);
   if (!market) {
-    log.warning("[_handleReserveActivated] Market not found {}", [
-      marketId.toHexString(),
+    log.warning("[_handleReserveActivated] Market for token {} not found", [
+      asset.toHexString(),
     ]);
     return;
   }
@@ -229,11 +268,14 @@ export function _handleReserveActivated(marketId: Address): void {
   storePrePauseState(market);
 }
 
-export function _handleReserveDeactivated(marketId: Address): void {
-  const market = Market.load(marketId);
+export function _handleReserveDeactivated(
+  asset: Address,
+  procotolData: ProtocolData
+): void {
+  const market = getMarketFromToken(asset, procotolData);
   if (!market) {
-    log.warning("[_handleReserveDeactivated] Market not found {}", [
-      marketId.toHexString(),
+    log.warning("[_handleReserveDeactivated] Market for token {} not found", [
+      asset.toHexString(),
     ]);
     return;
   }
@@ -244,13 +286,14 @@ export function _handleReserveDeactivated(marketId: Address): void {
 }
 
 export function _handleReserveFactorChanged(
-  marketId: Address,
-  reserveFactor: BigInt
+  asset: Address,
+  reserveFactor: BigInt,
+  procotolData: ProtocolData
 ): void {
-  const market = Market.load(marketId);
+  const market = getMarketFromToken(asset, procotolData);
   if (!market) {
-    log.warning("[_handleReserveFactorChanged] Market {} not found", [
-      marketId.toHexString(),
+    log.warning("[_handleReserveFactorChanged] Market for token {} not found", [
+      asset.toHexString(),
     ]);
     return;
   }
@@ -262,14 +305,16 @@ export function _handleReserveFactorChanged(
 }
 
 export function _handleLiquidationProtocolFeeChanged(
-  marketId: Address,
-  liquidationProtocolFee: BigInt
+  asset: Address,
+  liquidationProtocolFee: BigInt,
+  procotolData: ProtocolData
 ): void {
-  const market = Market.load(marketId);
+  const market = getMarketFromToken(asset, procotolData);
   if (!market) {
-    log.warning("[_handleLiquidationProtocolFeeChanged] Market {} not found", [
-      marketId.toHexString(),
-    ]);
+    log.warning(
+      "[_handleLiquidationProtocolFeeChanged] Market for token {} not found",
+      [asset.toHexString()]
+    );
     return;
   }
 
@@ -278,30 +323,48 @@ export function _handleLiquidationProtocolFeeChanged(
     .div(exponentToBigDecimal(INT_FOUR));
   log.info(
     "[LiquidationProtocolFeeChanged]market {} _liquidationProtocolFee={}",
-    [marketId.toHexString(), liquidationProtocolFee.toString()]
+    [asset.toHexString(), liquidationProtocolFee.toString()]
   );
   market.save();
 }
 
 export function _handleReserveUsedAsCollateralEnabled(
-  marketId: Address,
-  accountID: Address
+  asset: Address,
+  accountID: Address,
+  procotolData: ProtocolData
 ): void {
+  const market = getMarketFromToken(asset, procotolData);
+  if (!market) {
+    log.warning(
+      "[_handleReserveUsedAsCollateralEnabled] Market for token {} not found",
+      [asset.toHexString()]
+    );
+    return;
+  }
   const accountManager = new AccountManager(accountID);
   const account = accountManager.getAccount();
 
   const markets = account._enabledCollaterals
     ? account._enabledCollaterals!
     : [];
-  markets.push(marketId);
+  markets.push(market.id);
   account._enabledCollaterals = markets;
   account.save();
 }
 
 export function _handleReserveUsedAsCollateralDisabled(
-  marketId: Address,
-  accountID: Address
+  asset: Address,
+  accountID: Address,
+  procotolData: ProtocolData
 ): void {
+  const market = getMarketFromToken(asset, procotolData);
+  if (!market) {
+    log.warning(
+      "[_handleReserveUsedAsCollateralEnabled] Market for token {} not found",
+      [asset.toHexString()]
+    );
+    return;
+  }
   const accountManager = new AccountManager(accountID);
   const account = accountManager.getAccount();
 
@@ -309,7 +372,7 @@ export function _handleReserveUsedAsCollateralDisabled(
     ? account._enabledCollaterals!
     : [];
 
-  const index = markets.indexOf(marketId);
+  const index = markets.indexOf(market.id);
   if (index >= 0) {
     // drop 1 element at given index
     markets.splice(index, 1);
@@ -327,7 +390,7 @@ export function _handlePaused(protocolData: ProtocolData): void {
     return;
   }
 
-  const markets = marketList!.markets;
+  const markets = marketList.markets;
   for (let i = 0; i < markets.length; i++) {
     const market = Market.load(markets[i]);
     if (!market) {
@@ -352,7 +415,7 @@ export function _handleUnpaused(protocolData: ProtocolData): void {
     return;
   }
 
-  const markets = marketList!.markets;
+  const markets = marketList.markets;
   for (let i = 0; i < markets.length; i++) {
     const market = Market.load(markets[i]);
     if (!market) {
@@ -377,19 +440,20 @@ export function _handleReserveDataUpdated(
   variableBorrowRate: BigInt,
   stableBorrowRate: BigInt,
   protocolData: ProtocolData,
-  marketId: Address,
-  assetPriceUSD: BigDecimal
+  asset: Address,
+  assetPriceUSD: BigDecimal = BIGDECIMAL_ZERO,
+  updateRewards: bool = false
 ): void {
-  const market = Market.load(marketId);
+  const market = getMarketFromToken(asset, protocolData);
   if (!market) {
-    log.warning("[_handlReserveDataUpdated] Market not found {}", [
-      marketId.toHexString(),
+    log.warning("[_handlReserveDataUpdated] Market for asset {} not found", [
+      asset.toHexString(),
     ]);
     return;
   }
 
   const manager = new DataManager(
-    marketId,
+    market.id,
     market.inputToken,
     event,
     protocolData
@@ -434,11 +498,14 @@ export function _handleReserveDataUpdated(
   if (tryTotalSupply.reverted) {
     log.warning(
       "[ReserveDataUpdated] Error getting total supply on market: {}",
-      [marketId.toHexString()]
+      [market.id.toHexString()]
     );
     return;
   }
 
+  if (assetPriceUSD.equals(BIGDECIMAL_ZERO)) {
+    assetPriceUSD = market.inputTokenPriceUSD;
+  }
   manager.updateMarketAndProtocolData(
     assetPriceUSD,
     tryTotalSupply.value,
@@ -450,7 +517,7 @@ export function _handleReserveDataUpdated(
   if (tryScaledSupply.reverted) {
     log.warning(
       "[ReserveDataUpdated] Error getting scaled total supply on market: {}",
-      [marketId.toHexString()]
+      [asset.toHexString()]
     );
     return;
   }
@@ -475,7 +542,7 @@ export function _handleReserveDataUpdated(
   if (!reserveFactor) {
     log.warning(
       "[_handleReserveDataUpdated]reserveFactor = null for market {}, default to 0.0",
-      [marketId.toHexString()]
+      [asset.toHexString()]
     );
     reserveFactor = BIGDECIMAL_ZERO;
   }
@@ -520,24 +587,54 @@ export function _handleReserveDataUpdated(
       .toBigDecimal()
       .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
+
+  // if updateRewards is true:
+  // - check if reward distribution ends,
+  // - refresh rewardEmissionAmountUSD with current token price
+  // this is here because _handleReserveDataUpdated is called most frequently
+  // if data freshness is a priority (at the cost of indexing speed)
+  // we can iterate through all markets in _MarketList and get latest
+  // token price from oracle (to be implemented)
+  if (updateRewards && market.rewardTokens) {
+    for (let i = 0; i < market.rewardTokens!.length; i++) {
+      const rewardToken = RewardToken.load(market.rewardTokens![i]);
+      if (!rewardToken) {
+        continue;
+      }
+      const rewardTokenManager = new TokenManager(
+        Address.fromBytes(rewardToken.token),
+        event
+      );
+      let emission = market.rewardTokenEmissionsAmount![i];
+      if (
+        rewardToken._distributionEnd &&
+        rewardToken._distributionEnd!.lt(event.block.timestamp)
+      ) {
+        emission = BIGINT_ZERO;
+      }
+      const emissionUSD = rewardTokenManager.getAmountUSD(emission);
+      const rewardData = new RewardData(rewardToken, emission, emissionUSD);
+      manager.updateRewards(rewardData);
+    }
+  }
 }
 
 export function _handleDeposit(
   event: ethereum.Event,
   amount: BigInt,
-  marketId: Address,
+  asset: Address,
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  const market = Market.load(marketId);
+  const market = getMarketFromToken(asset, protocolData);
   if (!market) {
-    log.warning("[_handleDeposit] Market {} not found", [
-      marketId.toHexString(),
+    log.warning("[_handleDeposit] Market for token {} not found", [
+      asset.toHexString(),
     ]);
     return;
   }
   const manager = new DataManager(
-    marketId,
+    market.id,
     market.inputToken,
     event,
     protocolData
@@ -545,7 +642,7 @@ export function _handleDeposit(
   const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
   const newCollateralBalance = getCollateralBalance(market, accountID);
   manager.createDeposit(
-    marketId,
+    asset,
     accountID,
     amount,
     amountUSD,
@@ -560,7 +657,7 @@ export function _handleDeposit(
   }
   if (
     !account._enabledCollaterals ||
-    account._enabledCollaterals!.indexOf(marketId) == -1
+    account._enabledCollaterals!.indexOf(asset) == -1
   ) {
     return;
   }
@@ -575,19 +672,19 @@ export function _handleDeposit(
 export function _handleWithdraw(
   event: ethereum.Event,
   amount: BigInt,
-  marketId: Address,
+  asset: Address,
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  const market = Market.load(marketId);
+  const market = getMarketFromToken(asset, protocolData);
   if (!market) {
-    log.warning("[_handleWithdraw] Market {} not found", [
-      marketId.toHexString(),
+    log.warning("[_handleWithdraw] Market for token {} not found", [
+      asset.toHexString(),
     ]);
     return;
   }
   const manager = new DataManager(
-    marketId,
+    market.id,
     market.inputToken,
     event,
     protocolData
@@ -595,7 +692,7 @@ export function _handleWithdraw(
   const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
   const newCollateralBalance = getCollateralBalance(market, accountID);
   manager.createWithdraw(
-    marketId,
+    asset,
     accountID,
     amount,
     amountUSD,
@@ -606,19 +703,19 @@ export function _handleWithdraw(
 export function _handleBorrow(
   event: ethereum.Event,
   amount: BigInt,
-  marketId: Address,
+  asset: Address,
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  const market = Market.load(marketId);
+  const market = getMarketFromToken(asset, protocolData);
   if (!market) {
-    log.warning("[_handleBorrow] Market {} not found", [
-      marketId.toHexString(),
+    log.warning("[_handleBorrow] Market for token {} not found", [
+      asset.toHexString(),
     ]);
     return;
   }
   const manager = new DataManager(
-    marketId,
+    market.id,
     market.inputToken,
     event,
     protocolData
@@ -626,7 +723,7 @@ export function _handleBorrow(
   const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
   const newBorrowBalance = getBorrowBalance(market, accountID);
   manager.createBorrow(
-    marketId,
+    asset,
     accountID,
     amount,
     amountUSD,
@@ -638,17 +735,19 @@ export function _handleBorrow(
 export function _handleRepay(
   event: ethereum.Event,
   amount: BigInt,
-  marketId: Address,
+  asset: Address,
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  const market = Market.load(marketId);
+  const market = getMarketFromToken(asset, protocolData);
   if (!market) {
-    log.warning("[_handleRepay] Market {} not found", [marketId.toHexString()]);
+    log.warning("[_handleRepay] Market for token {} not found", [
+      asset.toHexString(),
+    ]);
     return;
   }
   const manager = new DataManager(
-    marketId,
+    market.id,
     market.inputToken,
     event,
     protocolData
@@ -656,7 +755,7 @@ export function _handleRepay(
   const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
   const newBorrowBalance = getBorrowBalance(market, accountID);
   manager.createRepay(
-    marketId,
+    asset,
     accountID,
     amount,
     amountUSD,
@@ -668,23 +767,23 @@ export function _handleRepay(
 export function _handleLiquidate(
   event: ethereum.Event,
   amount: BigInt, // amount of collateral liquidated
-  marketId: Address, // collateral market
+  collateralAsset: Address, // collateral market
   protocolData: ProtocolData,
   liquidator: Address,
   liquidatee: Address, // account liquidated
-  debtTokenId: Address, // token repaid to cover debt,
+  debtAsset: Address, // token repaid to cover debt,
   debtToCover: BigInt, // the amount of debt repaid by liquidator
   createLiquidatorPosition: bool = false
 ): void {
-  const market = Market.load(marketId);
+  const market = getMarketFromToken(collateralAsset, protocolData);
   if (!market) {
-    log.warning("[_handleLiquidate] Market {} not found", [
-      marketId.toHexString(),
+    log.warning("[_handleLiquidate] Market for token {} not found", [
+      collateralAsset.toHexString(),
     ]);
     return;
   }
   const manager = new DataManager(
-    marketId,
+    market.id,
     market.inputToken,
     event,
     protocolData
@@ -703,10 +802,10 @@ export function _handleLiquidate(
     .div(exponentToBigDecimal(inputToken.decimals))
     .times(inputTokenPriceUSD);
 
-  const debtTokenMarket = Market.load(debtTokenId);
+  const debtTokenMarket = getMarketFromToken(debtAsset, protocolData);
   if (!debtTokenMarket) {
     log.warning("[_handleLiquidate] market for Debt token  {} not found", [
-      debtTokenId.toHexString(),
+      debtAsset.toHexString(),
     ]);
     return;
   }
@@ -714,7 +813,7 @@ export function _handleLiquidate(
   if (!debtTokenPriceUSD) {
     log.warning(
       "[_handleLiquidate] Price of token {} is not set, default to 0.0",
-      [debtTokenId.toHexString()]
+      [debtAsset.toHexString()]
     );
     debtTokenPriceUSD = BIGDECIMAL_ZERO;
   }
@@ -726,8 +825,8 @@ export function _handleLiquidate(
   const debtBalance = getBorrowBalance(debtTokenMarket, liquidatee);
 
   manager.createLiquidate(
-    marketId,
-    debtTokenId,
+    collateralAsset,
+    debtAsset,
     liquidator,
     liquidatee,
     amount,
@@ -735,7 +834,7 @@ export function _handleLiquidate(
     profitUSD,
     collateralBalance,
     debtBalance,
-    null,
+    null, //TODO - interestType is tricky
     createLiquidatorPosition
   );
 
@@ -747,7 +846,7 @@ export function _handleLiquidate(
   // => liquidationProtocolFee = liquidationPenalty * liquidationProtocolFeePercentage * liquidatedCollateralAmount / (1 + liquidationPenalty - liquidationPenalty*liquidationProtocolFeePercentage)
   if (!market._liquidationProtocolFee) {
     log.warning("[_handleLiquidate]market {} _liquidationProtocolFee = null ", [
-      marketId.toHexString(),
+      collateralAsset.toHexString(),
     ]);
     return;
   }
@@ -837,4 +936,87 @@ export function _handleTransfer(
     senderBalanceResult.value,
     receiverBalanceResult.value
   );
+}
+
+export function _handleAssetConfigUpdated(
+  event: ethereum.Event,
+  assetAddress: Address,
+  rewardTokenAddress: Address,
+  rewardTokenPriceUSD: BigDecimal,
+  emissionPerSecond: BigInt, // amount/second
+  distributionEnd: BigInt, // timestamp when emission ends
+  protocolData: ProtocolData
+): void {
+  const market = getMarketFromToken(assetAddress, protocolData);
+  if (!market) {
+    log.error("[_handleAssetConfigUpdated]Market for token {} not found", [
+      assetAddress.toHexString(),
+    ]);
+    return;
+  }
+
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    protocolData
+  );
+  const assetToken = new TokenManager(assetAddress, event).getToken();
+
+  if (!assetToken._iavsTokenType) {
+    log.error(
+      "[_handleAssetConfigUpdated]_iavsTokenType field for token {} is not set",
+      [assetAddress.toHexString()]
+    );
+    return;
+  }
+  // There can be more than one reward tokens for a side,
+  // e.g. one reward token for variable borrowing
+  // and another for stable borrowing
+  let rewardTokenType: string;
+  let interestRateType: string;
+  if (assetToken._iavsTokenType! == IavsTokenType.ATOKEN) {
+    rewardTokenType = RewardTokenType.DEPOSIT;
+    interestRateType = InterestRateType.VARIABLE;
+  } else if (assetToken._iavsTokenType! == IavsTokenType.STOKEN) {
+    rewardTokenType = RewardTokenType.STABLE_BORROW;
+    interestRateType = InterestRateType.STABLE;
+  } else if (assetToken._iavsTokenType! == IavsTokenType.VTOKEN) {
+    rewardTokenType = RewardTokenType.VARIABLE_BORROW;
+    interestRateType = InterestRateType.VARIABLE;
+  } else {
+    log.error(
+      "[_handleAssetConfigUpdated] _iavsTokenType field for token {} is not one of ATOKEN, STOKEN, or VTOKEN",
+      [assetAddress.toHexString()]
+    );
+    return;
+  }
+
+  const rewardTokenManager = new TokenManager(rewardTokenAddress, event);
+  const rewardToken = rewardTokenManager.getOrCreateRewardToken(
+    rewardTokenType,
+    interestRateType
+  );
+  rewardToken._distributionEnd = distributionEnd;
+  rewardToken.save();
+
+  let emission = emissionPerSecond.times(BigInt.fromI32(SECONDS_PER_DAY));
+  if (
+    rewardToken._distributionEnd &&
+    rewardToken._distributionEnd!.lt(event.block.timestamp)
+  ) {
+    log.info(
+      "[_handleAssetConfigUpdated]distributionEnd {} < block timestamp {}; emission set to 0",
+      [event.block.timestamp.toString(), distributionEnd.toString()]
+    );
+    emission = BIGINT_ZERO;
+  }
+
+  if (rewardTokenPriceUSD.gt(BIGDECIMAL_ZERO)) {
+    rewardTokenManager.updatePrice(rewardTokenPriceUSD);
+  }
+
+  const emissionUSD = rewardTokenManager.getAmountUSD(emission);
+  const rewardData = new RewardData(rewardToken, emission, emissionUSD);
+  manager.updateRewards(rewardData);
 }

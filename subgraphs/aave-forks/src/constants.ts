@@ -1,4 +1,4 @@
-import { ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 
 // The network names corresponding to the Network enum in the schema.
 // They also correspond to the ones in `dataSource.network()` after converting to lower case.
@@ -114,37 +114,9 @@ export const RAY_OFFSET = 27;
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 
-/////////////////////////////
-///// Utility Functions /////
-/////////////////////////////
-
-export function readValue<T>(
-  callResult: ethereum.CallResult<T>,
-  defaultValue: T
-): T {
-  return callResult.reverted ? defaultValue : callResult.value;
-}
-
-export function rayToWad(a: BigInt): BigInt {
-  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
-  return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
-}
-
-export function wadToRay(a: BigInt): BigInt {
-  const result = a.times(BigInt.fromI32(10).pow(9));
-  return result;
-}
-
-// n => 10^n
-export function exponentToBigDecimal(decimals: i32): BigDecimal {
-  let result = BIGINT_ONE;
-  const ten = BigInt.fromI32(10);
-  for (let i = 0; i < decimals; i++) {
-    result = result.times(ten);
-  }
-  return result.toBigDecimal();
-}
-
-export function equalsIgnoreCase(a: string, b: string): boolean {
-  return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+export namespace IavsTokenType {
+  export const ATOKEN = "ATOKEN";
+  export const INPUTTOKEN = "INPUTTOKEN";
+  export const VTOKEN = "VTOKEN";
+  export const STOKEN = "STOKEN";
 }
