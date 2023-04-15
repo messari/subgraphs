@@ -45,7 +45,6 @@ import {
   _handleWithdraw,
 } from "../../../src/mapping";
 import { BIGDECIMAL_ZERO, PositionSide } from "../../../src/constants";
-import { Market } from "../../../generated/schema";
 import { updateMarketRewards } from "./rewards";
 import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";

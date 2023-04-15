@@ -9,7 +9,6 @@ import {
 } from "../../../src/constants";
 import { ReserveDataUpdated } from "../../../generated/LendingPool/LendingPool";
 import { RToken } from "../../../generated/LendingPool/RToken";
-import { Market } from "../../../generated/schema";
 import { ChefIncentivesController } from "../../../generated/LendingPool/ChefIncentivesController";
 import { ERC20 } from "../../../generated/LendingPool/ERC20";
 import { exponentToBigDecimal } from "../../../src/helpers";

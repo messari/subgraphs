@@ -64,7 +64,7 @@ import {
   RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
-import { Market, _DefaultOracle } from "../../../generated/schema";
+import { _DefaultOracle } from "../../../generated/schema";
 import { ChefIncentivesController } from "../../../generated/LendingPool/ChefIncentivesController";
 import { SushiSwapLP } from "../../../generated/LendingPool/SushiSwapLP";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";

@@ -24,7 +24,7 @@ import {
   Supply,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
-import { Market, Token, _DefaultOracle } from "../../../generated/schema";
+import { _DefaultOracle } from "../../../generated/schema";
 import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
@@ -53,16 +53,13 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  InterestRateType,
   PositionSide,
-  RewardTokenType,
-  LendingType,
-  IavsTokenType,
 } from "../../../src/constants";
 
 import { DataManager, ProtocolData } from "../../../src/sdk/manager";
 import { readValue, getMarketFromToken } from "../../../src/helpers";
 import {
+  LendingType,
   CollateralizationType,
   PermissionType,
   RiskType,

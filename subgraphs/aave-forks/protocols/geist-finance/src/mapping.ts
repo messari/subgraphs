@@ -67,7 +67,6 @@ import {
   RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
-import { Market } from "../../../generated/schema";
 import { ChefIncentivesController } from "../../../generated/LendingPool/ChefIncentivesController";
 import { SpookySwapOracle } from "../../../generated/LendingPool/SpookySwapOracle";
 import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";

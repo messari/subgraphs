@@ -69,7 +69,7 @@ import {
   RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
-import { Market, Token, _DefaultOracle } from "../../../generated/schema";
+import { Token, _DefaultOracle } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
 import { StakedAave } from "../../../generated/LendingPool/StakedAave";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
