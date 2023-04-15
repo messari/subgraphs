@@ -1,6 +1,6 @@
 # Spark Lend Subgraph
 
-## Calculation Methodology v1.0.0
+## Calculation Methodology v1.1.0
 
 ### Total Value Locked (TVL) USD
 
@@ -12,7 +12,7 @@ Sum across all Pools:
 
 Sum across all Pools:
 
-`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate)`
+`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate) + liquidated collateral amount * liquidation penalty * liquidation procotol fee percentage`
 
 Note: This currently excludes Flash Loans
 
@@ -22,7 +22,7 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
+`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor) + liquidated collateral amount * liquidation penalty * liquidation procotol fee percentage`
 
 ### Supply-Side Revenue USD
 

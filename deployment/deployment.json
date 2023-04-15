@@ -325,7 +325,7 @@
         "versions": {
           "schema": "3.0.1",
           "subgraph": "2.0.0",
-          "methodology": "1.0.2"
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -351,7 +351,7 @@
         "versions": {
           "schema": "3.0.1",
           "subgraph": "2.0.0",
-          "methodology": "1.0.2"
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -377,7 +377,7 @@
         "versions": {
           "schema": "3.0.1",
           "subgraph": "2.0.0",
-          "methodology": "1.0.2"
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -399,7 +399,7 @@
         "versions": {
           "schema": "3.0.1",
           "subgraph": "2.0.0",
-          "methodology": "1.0.2"
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -421,7 +421,7 @@
         "versions": {
           "schema": "3.0.1",
           "subgraph": "2.0.0",
-          "methodology": "1.0.2"
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -443,7 +443,7 @@
         "versions": {
           "schema": "3.0.1",
           "subgraph": "2.0.0",
-          "methodology": "1.0.2"
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -465,7 +465,7 @@
         "versions": {
           "schema": "3.0.1",
           "subgraph": "2.0.0",
-          "methodology": "1.0.2"
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "aave.v3.template.yaml"
@@ -3867,9 +3867,9 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "2.0.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "schema": "3.0.1",
+          "subgraph": "2.0.0",
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "spark.lend.template.yaml"

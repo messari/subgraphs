@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  Bytes,
+  log,
+} from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import { AssetConfigUpdated } from "../../../generated/RewardsController/RewardsController";
 import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
@@ -13,9 +19,11 @@ import {
   ReserveFrozen,
   ReserveInitialized,
   ReservePaused,
+  LiquidationProtocolFeeChanged,
 } from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
+  LendingPool as LendingPoolContract,
   LiquidationCall,
   Repay,
   ReserveDataUpdated,
@@ -24,7 +32,7 @@ import {
   Supply,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
-import { _DefaultOracle } from "../../../generated/schema";
+import { Market, _DefaultOracle } from "../../../generated/schema";
 import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
@@ -38,6 +46,7 @@ import {
   _handleCollateralConfigurationChanged,
   _handleDeposit,
   _handleLiquidate,
+  _handleLiquidationProtocolFeeChanged,
   _handlePriceOracleUpdated,
   _handleRepay,
   _handleReserveActivated,
@@ -53,11 +62,16 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  INT_FOUR,
   PositionSide,
 } from "../../../src/constants";
 
 import { DataManager, ProtocolData } from "../../../src/sdk/manager";
-import { readValue, getMarketFromToken } from "../../../src/helpers";
+import {
+  readValue,
+  getMarketFromToken,
+  exponentToBigDecimal,
+} from "../../../src/helpers";
 import {
   LendingType,
   CollateralizationType,
@@ -182,6 +196,15 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
   );
 }
 
+export function handleLiquidationProtocolFeeChanged(
+  event: LiquidationProtocolFeeChanged
+): void {
+  _handleLiquidationProtocolFeeChanged(
+    event.params.asset,
+    event.params.newFee,
+    protocolData
+  );
+}
 /////////////////////////////////
 ///// Lending Pool Handlers /////
 /////////////////////////////////
@@ -281,6 +304,30 @@ export function handleRepay(event: Repay): void {
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
+  const collateralMarket = getMarketFromToken(
+    event.params.collateralAsset,
+    protocolData
+  );
+  if (!collateralMarket) {
+    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
+      event.params.collateralAsset.toHexString(),
+    ]);
+    return;
+  }
+
+  if (!collateralMarket._liquidationProtocolFee) {
+    storeLiquidationProtocolFee(
+      collateralMarket,
+      event.address,
+      event.params.collateralAsset
+    );
+  }
+
+  // if liquidator chooses to receive AToken, create a position for liquidator
+  let createLiquidatorPosition = false;
+  if (event.params.receiveAToken) {
+    createLiquidatorPosition = true;
+  }
   _handleLiquidate(
     event,
     event.params.liquidatedCollateralAmount,
@@ -289,7 +336,8 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidator,
     event.params.user,
     event.params.debtAsset,
-    event.params.debtToCover
+    event.params.debtToCover,
+    createLiquidatorPosition
   );
 }
 
@@ -358,144 +406,60 @@ function getAssetPriceInUSDC(
   return BIGDECIMAL_ZERO;
 }
 
-/*
-function getOrCreateRewardToken(
-  tokenAddress: Address,
-  rewardTokenType: string,
-  interestRateType: string,
-  distributionEnd: BigInt
-): RewardToken {
-  const token = getOrCreateToken(tokenAddress);
-  // deposit-variable-0x123, borrow-stable-0x123, borrow-variable-0x123
-  const id = `${rewardTokenType}-${interestRateType}-${token.id}`;
+function storeLiquidationProtocolFee(
+  market: Market,
+  poolAddress: Address,
+  reserve: Address
+): void {
+  // Store LiquidationProtocolFee if not set, as setLiquidationProtocolFee() may be never called
+  // and no LiquidationProtocolFeeChanged event is emitted
+  // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L491
+  // for how to decode configuration data to get _liquidationProtocolFee
+  const liquidationProtocolFeeMask =
+    "0xFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
+  const reserveFactorStartBitPosition = 152 as u8;
+  const pool = LendingPoolContract.bind(poolAddress);
+  const poolConfigData = pool.getConfiguration(reserve).data;
+  const liquidationProtocolFee = decodeConfig(
+    poolConfigData,
+    liquidationProtocolFeeMask,
+    reserveFactorStartBitPosition
+  )
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
 
-  let rewardToken = RewardToken.load(id);
-  if (!rewardToken) {
-    rewardToken = new RewardToken(id);
-    rewardToken.token = token.id;
-    rewardToken.type = rewardTokenType;
-  }
-  rewardToken._distributionEnd = distributionEnd;
-  rewardToken.save();
-
-  return rewardToken;
+  log.info("[storeLiquidationProtocolFee]market {} liquidationProtocolFee={}", [
+    market.id.toHexString(),
+    liquidationProtocolFee.toString(),
+  ]);
+  market._liquidationProtocolFee = liquidationProtocolFee;
+  market.save();
 }
 
-export function updateMarketRewards(
-  event: ethereum.Event,
-  market: Market,
-  rewardToken: RewardToken,
-  emissionRate: BigInt
-): void {
-  let rewardTokens = market.rewardTokens;
-  let rewardTokenEmissions = market.rewardTokenEmissionsAmount;
-  let rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+function decodeConfig(
+  storedData: BigInt,
+  maskStr: string,
+  startBitPosition: u8
+): BigInt {
+  // aave-v3 stores configuration in packed bits (ReserveConfiguration.sol)
+  // decoding them by applying a bit_not mask and right shift by startBitPosition
+  // see https://github.com/aave/aave-v3-core/blob/1e46f1cbb7ace08995cb4c8fa4e4ece96a243be3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol#L491
+  // for how to decode configuration data to get _liquidationProtocolFee
 
-  if (rewardTokens == null) {
-    rewardTokens = [];
-    rewardTokenEmissions = [];
-    rewardTokenEmissionsUSD = [];
+  const maskArray = new Uint8Array(32);
+  maskArray.set(Bytes.fromHexString(maskStr));
+  // BITWISE NOT
+  for (let i = 0; i < maskArray.length; i++) {
+    maskArray[i] = ~maskArray[i];
   }
-
-  let rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
-  if (rewardTokenIndex == -1) {
-    rewardTokenIndex = rewardTokens.push(rewardToken.id) - 1;
-    rewardTokenEmissions!.push(BIGINT_ZERO);
-    rewardTokenEmissionsUSD!.push(BIGDECIMAL_ZERO);
-  }
-  rewardTokenEmissions![rewardTokenIndex] = emissionRate.times(
-    BigInt.fromI32(SECONDS_PER_DAY)
+  // reverse for little endian
+  const configMaskBigInt = BigInt.fromUnsignedBytes(
+    Bytes.fromUint8Array(maskArray.reverse())
   );
-  market.rewardTokens = rewardTokens;
-  market.rewardTokenEmissionsAmount = rewardTokenEmissions;
-  market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
-  market.save();
 
-  sortRewardTokens(market);
-  updateMarketRewardEmissions(market, event);
+  const config = storedData
+    .bitAnd(configMaskBigInt)
+    .rightShift(startBitPosition);
+
+  return config;
 }
-
-function updateMarketRewardEmissions(
-  market: Market,
-  event: ethereum.Event
-): void {
-  if (market.rewardTokens == null) {
-    return;
-  }
-
-  const protocol = getOrCreateLendingProtocol(protocolData);
-  const rewardTokens = market.rewardTokens!;
-  const rewardEmissions = market.rewardTokenEmissionsAmount!;
-  const rewardEmissionsUSD = market.rewardTokenEmissionsUSD!;
-  for (let i = 0; i < rewardTokens.length; i++) {
-    const rewardToken = RewardToken.load(rewardTokens[i])!;
-    if (event.block.timestamp.gt(rewardToken._distributionEnd!)) {
-      rewardEmissions[i] = BIGINT_ZERO;
-      rewardEmissionsUSD[i] = BIGDECIMAL_ZERO;
-    } else {
-      const token = Token.load(rewardToken.token)!;
-      let rewardTokenPriceUSD = token.lastPriceUSD;
-      rewardTokenPriceUSD = getAssetPriceInUSDC(
-        Address.fromString(token.id),
-        Address.fromString(protocol._priceOracle)
-      );
-
-      rewardEmissionsUSD[i] = rewardEmissions[i]
-        .toBigDecimal()
-        .div(exponentToBigDecimal(token.decimals))
-        .times(rewardTokenPriceUSD);
-    }
-  }
-  market.rewardTokenEmissionsAmount = rewardEmissions;
-  market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
-  market.save();
-}
-
-function sortRewardTokens(market: Market): void {
-  if (market.rewardTokens!.length <= 1) {
-    return;
-  }
-
-  const tokens = market.rewardTokens;
-  const emissions = market.rewardTokenEmissionsAmount;
-  const emissionsUSD = market.rewardTokenEmissionsUSD;
-  multiArraySort(tokens!, emissions!, emissionsUSD!);
-
-  market.rewardTokens = tokens;
-  market.rewardTokenEmissionsAmount = emissions;
-  market.rewardTokenEmissionsUSD = emissionsUSD;
-  market.save();
-}
-
-function multiArraySort(
-  ref: Array<string>,
-  arr1: Array<BigInt>,
-  arr2: Array<BigDecimal>
-): void {
-  if (ref.length != arr1.length || ref.length != arr2.length) {
-    // cannot sort
-    log.error("[multiArraySort] cannot sort arrays. Array reference: {}", [
-      ref.toString()
-    ]);
-    return;
-  }
-
-  const sorter: Array<Array<string>> = [];
-  for (let i = 0; i < ref.length; i++) {
-    sorter[i] = [ref[i], arr1[i].toString(), arr2[i].toString()];
-  }
-
-  sorter.sort(function(a: Array<string>, b: Array<string>): i32 {
-    if (a[0] < b[0]) {
-      return -1;
-    }
-    return 1;
-  });
-
-  for (let i = 0; i < sorter.length; i++) {
-    ref[i] = sorter[i][0];
-    arr1[i] = BigInt.fromString(sorter[i][1]);
-    arr2[i] = BigDecimal.fromString(sorter[i][2]);
-  }
-}
-*/

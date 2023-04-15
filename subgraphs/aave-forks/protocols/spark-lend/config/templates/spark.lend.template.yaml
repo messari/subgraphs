@@ -69,6 +69,8 @@ dataSources:
           handler: handleReservePaused
         - event: ReserveFactorChanged(indexed address,uint256,uint256)
           handler: handleReserveFactorChanged
+        - event: LiquidationProtocolFeeChanged(indexed address,uint256,uint256)
+          handler: handleLiquidationProtocolFeeChanged
       file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPool
