@@ -288,6 +288,11 @@ export function handleRepay(event: Repay): void {
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
+  // if liquidator chooses to receive AToken, create a position for liquidator
+  let createLiquidatorPosition = false;
+  if (event.params.receiveAToken) {
+    createLiquidatorPosition = true;
+  }
   _handleLiquidate(
     event,
     event.params.liquidatedCollateralAmount,
@@ -296,7 +301,8 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidator,
     event.params.user,
     event.params.debtAsset,
-    event.params.debtToCover
+    event.params.debtToCover,
+    createLiquidatorPosition
   );
 }
 
