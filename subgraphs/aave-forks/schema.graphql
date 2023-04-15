@@ -2050,7 +2050,7 @@ type Flashloan implements Event @entity(immutable: true) {
   feeAmountUSD: BigDecimal
 }
 
-type _DefaultOracle @entity {
+type _DefaultOracle @entity(immutable: true) {
   " protocol id "
   id: Bytes!
   " address of default oracle "
@@ -2058,7 +2058,7 @@ type _DefaultOracle @entity {
 }
 
 # helper entity for flashloan premium rates
-type _FlashLoanPremium @entity {
+type _FlashLoanPremium @entity(immutable: true) {
   " protocol id "
   id: Bytes!
   " total premium rate "
