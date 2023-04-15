@@ -2056,3 +2056,13 @@ type _DefaultOracle @entity {
   " address of default oracle "
   oracle: Bytes!
 }
+
+# helper entity for flashloan premium rates
+type _FlashLoanPremium @entity {
+  " protocol id "
+  id: Bytes!
+  " total premium rate "
+  premiumRateTotal: BigDecimal!
+  " premium rate to protocol "
+  premiumRateToProtocol: BigDecimal!
+}

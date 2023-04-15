@@ -23,9 +23,12 @@ import {
   ReserveInitialized,
   ReservePaused,
   LiquidationProtocolFeeChanged,
+  FlashloanPremiumTotalUpdated,
+  FlashloanPremiumToProtocolUpdated,
 } from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
+  FlashLoan,
   LendingPool as LendingPoolContract,
   LiquidationCall,
   Repay,
@@ -42,6 +45,9 @@ import {
   _handleBorrowingEnabledOnReserve,
   _handleCollateralConfigurationChanged,
   _handleDeposit,
+  _handleFlashLoan,
+  _handleFlashloanPremiumToProtocolUpdated,
+  _handleFlashloanPremiumTotalUpdated,
   _handleLiquidate,
   _handleLiquidationProtocolFeeChanged,
   _handlePriceOracleUpdated,
@@ -70,7 +76,11 @@ import {
   equalsIgnoreCase,
   exponentToBigDecimal,
 } from "../../../src/helpers";
-import { Market, _DefaultOracle } from "../../../generated/schema";
+import {
+  Market,
+  _DefaultOracle,
+  _FlashLoanPremium,
+} from "../../../generated/schema";
 import { AssetConfigUpdated } from "../../../generated/RewardsController/RewardsController";
 import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
@@ -208,6 +218,26 @@ export function handleLiquidationProtocolFeeChanged(
     event.params.newFee,
     protocolData
   );
+}
+
+export function handleFlashloanPremiumTotalUpdated(
+  event: FlashloanPremiumTotalUpdated
+): void {
+  // rate is in 1/10000
+  const rate = event.params.newFlashloanPremiumTotal
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
+  _handleFlashloanPremiumTotalUpdated(rate, protocolData);
+}
+
+export function handleFlashloanPremiumToProtocolUpdated(
+  event: FlashloanPremiumToProtocolUpdated
+): void {
+  // rate is in 1/10000
+  const rate = event.params.newFlashloanPremiumToProtocol
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
+  _handleFlashloanPremiumToProtocolUpdated(rate, protocolData);
 }
 
 /////////////////////////////////
@@ -356,6 +386,27 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.debtAsset,
     event.params.debtToCover,
     createLiquidatorPosition
+  );
+}
+
+export function handlehandleFlashloan(event: FlashLoan): void {
+  const premiumRate = _FlashLoanPremium.load(protocolData.protocolID);
+  if (!premiumRate) {
+    log.error("[handlehandleFlashloan]_FlashLoanPremium with id {} not found", [
+      protocolData.protocolID.toHexString(),
+    ]);
+    return;
+  }
+
+  _handleFlashLoan(
+    event.params.asset,
+    event.params.amount,
+    event.params.initiator,
+    protocolData,
+    event,
+    event.params.premium,
+    premiumRate.premiumRateTotal,
+    premiumRate.premiumRateToProtocol
   );
 }
 

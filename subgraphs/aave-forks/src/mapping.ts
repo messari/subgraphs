@@ -11,6 +11,7 @@ import {
   Market,
   RewardToken,
   _DefaultOracle,
+  _FlashLoanPremium,
   _MarketList,
 } from "../generated/schema";
 import { AToken } from "../generated/LendingPool/AToken";
@@ -380,6 +381,32 @@ export function _handleReserveUsedAsCollateralDisabled(
   }
   account._enabledCollaterals = markets;
   account.save();
+}
+
+export function _handleFlashloanPremiumTotalUpdated(
+  rate: BigDecimal,
+  procotolData: ProtocolData
+): void {
+  let premiumRate = _FlashLoanPremium.load(procotolData.protocolID);
+  if (!premiumRate) {
+    premiumRate = new _FlashLoanPremium(procotolData.protocolID);
+    premiumRate.premiumRateToProtocol = BIGDECIMAL_ZERO;
+  }
+  premiumRate.premiumRateTotal = rate;
+  premiumRate.save();
+}
+
+export function _handleFlashloanPremiumToProtocolUpdated(
+  rate: BigDecimal,
+  procotolData: ProtocolData
+): void {
+  let premiumRate = _FlashLoanPremium.load(procotolData.protocolID);
+  if (!premiumRate) {
+    premiumRate = new _FlashLoanPremium(procotolData.protocolID);
+    premiumRate.premiumRateTotal = rate; // premiumRateTotal >= premiumRateToProtocol
+  }
+  premiumRate.premiumRateToProtocol = rate;
+  premiumRate.save();
 }
 
 export function _handlePaused(protocolData: ProtocolData): void {
@@ -918,8 +945,6 @@ export function _handleFlashLoan(
 /////////////////////////
 //// Transfer Events ////
 /////////////////////////
-
-// TODO: new arg amount
 export function _handleTransfer(
   event: ethereum.Event,
   protocolData: ProtocolData,

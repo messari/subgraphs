@@ -69,6 +69,10 @@ dataSources:
           handler: handleReserveFactorChanged
         - event: LiquidationProtocolFeeChanged(indexed address,uint256,uint256)
           handler: handleLiquidationProtocolFeeChanged
+        - event: FlashloanPremiumTotalUpdated(uint128,uint128)
+          handler: handleFlashloanPremiumTotalUpdated
+        - event: FlashloanPremiumToProtocolUpdated(uint128,uint128)
+          handler: handleFlashloanPremiumToProtocolUpdated
       file: ./protocols/aave-v3/src/mapping.ts
   - kind: ethereum
     name: LendingPool
@@ -118,6 +122,8 @@ dataSources:
           handler: handleReserveUsedAsCollateralEnabled
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
+        - event: FlashLoan(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
+          handler: handleFlashloan
       file: ./protocols/aave-v3/src/mapping.ts
 
   - kind: ethereum

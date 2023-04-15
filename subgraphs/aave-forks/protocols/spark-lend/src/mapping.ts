@@ -20,9 +20,12 @@ import {
   ReserveInitialized,
   ReservePaused,
   LiquidationProtocolFeeChanged,
+  FlashloanPremiumTotalUpdated,
+  FlashloanPremiumToProtocolUpdated,
 } from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
+  FlashLoan,
   LendingPool as LendingPoolContract,
   LiquidationCall,
   Repay,
@@ -32,7 +35,11 @@ import {
   Supply,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
-import { Market, _DefaultOracle } from "../../../generated/schema";
+import {
+  Market,
+  _DefaultOracle,
+  _FlashLoanPremium,
+} from "../../../generated/schema";
 import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
@@ -45,6 +52,9 @@ import {
   _handleBorrowingEnabledOnReserve,
   _handleCollateralConfigurationChanged,
   _handleDeposit,
+  _handleFlashLoan,
+  _handleFlashloanPremiumToProtocolUpdated,
+  _handleFlashloanPremiumTotalUpdated,
   _handleLiquidate,
   _handleLiquidationProtocolFeeChanged,
   _handlePriceOracleUpdated,
@@ -205,6 +215,25 @@ export function handleLiquidationProtocolFeeChanged(
     protocolData
   );
 }
+
+export function handleFlashloanPremiumTotalUpdated(
+  event: FlashloanPremiumTotalUpdated
+): void {
+  const rate = event.params.newFlashloanPremiumTotal
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
+  _handleFlashloanPremiumTotalUpdated(rate, protocolData);
+}
+
+export function handleFlashloanPremiumToProtocolUpdated(
+  event: FlashloanPremiumToProtocolUpdated
+): void {
+  const rate = event.params.newFlashloanPremiumToProtocol
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
+  _handleFlashloanPremiumToProtocolUpdated(rate, protocolData);
+}
+
 /////////////////////////////////
 ///// Lending Pool Handlers /////
 /////////////////////////////////
@@ -338,6 +367,27 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.debtAsset,
     event.params.debtToCover,
     createLiquidatorPosition
+  );
+}
+
+export function handlehandleFlashloan(event: FlashLoan): void {
+  const premiumRate = _FlashLoanPremium.load(protocolData.protocolID);
+  if (!premiumRate) {
+    log.error("[handlehandleFlashloan]_FlashLoanPremium with id {} not found", [
+      protocolData.protocolID.toHexString(),
+    ]);
+    return;
+  }
+
+  _handleFlashLoan(
+    event.params.asset,
+    event.params.amount,
+    event.params.initiator,
+    protocolData,
+    event,
+    event.params.premium,
+    premiumRate.premiumRateTotal,
+    premiumRate.premiumRateToProtocol
   );
 }
 
