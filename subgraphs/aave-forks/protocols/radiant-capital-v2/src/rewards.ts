@@ -4,22 +4,24 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
-  exponentToBigDecimal,
   RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
 import { ReserveDataUpdated } from "../../../generated/LendingPool/LendingPool";
 import { RToken } from "../../../generated/LendingPool/RToken";
-import { getOrCreateRewardToken } from "../../../src/helpers";
 import { Market } from "../../../generated/schema";
 import { ChefIncentivesController } from "../../../generated/LendingPool/ChefIncentivesController";
 import { ERC20 } from "../../../generated/LendingPool/ERC20";
+import { exponentToBigDecimal } from "../../../src/helpers";
+import { DataManager, RewardData } from "../../../src/sdk/manager";
+import { TokenManager } from "../../../src/sdk/token";
 
 export function updateMarketRewards(
+  manager: DataManager,
   event: ReserveDataUpdated,
-  market: Market,
   rTokenContract: RToken
 ): void {
+  const market = manager.getMarket();
   const TWELVE_HOURS = BigInt.fromI32(SECONDS_PER_DAY / 2);
   if (
     market._lastRewardsUpdated &&
@@ -37,10 +39,10 @@ export function updateMarketRewards(
     tryIncentiveController.value
   );
   const tryDepPoolInfo = incentiveController.try_poolInfo(
-    Address.fromString(market.outputToken!)
+    Address.fromBytes(market.outputToken!)
   );
   const tryBorPoolInfo = incentiveController.try_poolInfo(
-    Address.fromString(market._vToken!)
+    Address.fromBytes(market._vToken!)
   );
   const tryTotalAllocPoint = incentiveController.try_totalAllocPoint();
   const tryTotalRewardsPerSecond = incentiveController.try_rewardsPerSecond();
@@ -54,18 +56,18 @@ export function updateMarketRewards(
     return;
   }
 
-  const rewardConfig = getRewardConfig();
-
   // create reward tokens
-  const borrowRewardToken = getOrCreateRewardToken(
+  const rewardConfig = getRewardConfig();
+  const rewardTokenManager = new TokenManager(
     Address.fromString(rewardConfig.rewardTokenAddress),
+    event
+  );
+  const rewardTokenBorrow = rewardTokenManager.getOrCreateRewardToken(
     RewardTokenType.BORROW
   );
-  const depositRewardToken = getOrCreateRewardToken(
-    Address.fromString(rewardConfig.rewardTokenAddress),
+  const rewardTokenDeposit = rewardTokenManager.getOrCreateRewardToken(
     RewardTokenType.DEPOSIT
   );
-  market.rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
 
   // deposit rewards
   const depositRewardsPerSecond = tryTotalRewardsPerSecond.value
@@ -93,12 +95,19 @@ export function updateMarketRewards(
     .div(exponentToBigDecimal(DEFAULT_DECIMALS))
     .times(rewardTokenPriceUSD);
 
-  // set rewards to arrays
-  market.rewardTokenEmissionsAmount = [
+  const rewardDataBorrow = new RewardData(
+    rewardTokenBorrow,
     borrowRewardsPerDay,
+    borRewardsPerDayUSD
+  );
+  const rewardDataDeposit = new RewardData(
+    rewardTokenDeposit,
     depositRewardsPerDay,
-  ];
-  market.rewardTokenEmissionsUSD = [borRewardsPerDayUSD, depRewardsPerDayUSD];
+    depRewardsPerDayUSD
+  );
+  manager.updateRewards(rewardDataBorrow);
+  manager.updateRewards(rewardDataDeposit);
+
   market._lastRewardsUpdated = event.block.timestamp;
   market.save();
 }

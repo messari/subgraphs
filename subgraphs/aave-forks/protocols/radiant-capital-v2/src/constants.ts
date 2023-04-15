@@ -1,6 +1,6 @@
 import { dataSource, log } from "@graphprotocol/graph-ts";
 import { Network, ZERO_ADDRESS } from "../../../src/constants";
-import { equalsIgnoreCase } from "../../../src/constants";
+import { equalsIgnoreCase } from "../../../src/helpers";
 
 ///////////////////////
 ///// Reward Info /////
@@ -53,6 +53,7 @@ export function getRewardConfig(): RewardConfig {
 /////////////////////////////
 
 export namespace Protocol {
+  export const PROTOCOL = "Radiant Capital";
   export const NAME = "Radiant Capital V2";
   export const SLUG = "radiant-capital-v2";
 }

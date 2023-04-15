@@ -15,6 +15,7 @@ export const RWETH_ADDRESS = "0x15b53d277af860f51c3e6843f8075007026bbb3a";
 /////////////////////////////
 
 export namespace Protocol {
+  export const PROTOCOL = "Radiant Capital";
   export const NAME = "Radiant Capital";
   export const SLUG = "radiant-capital";
   export const PROTOCOL_ADDRESS = "0xe21b295ed46528efd5f3ef66e18bc6ad1c87f003"; // addresses provider

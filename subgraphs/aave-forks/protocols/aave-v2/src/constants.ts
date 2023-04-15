@@ -14,6 +14,7 @@ export const USDC_POS_TOKEN_ADDRESS =
 /////////////////////////////
 
 export namespace Protocol {
+  export const PROTOCOL = "Aave";
   export const NAME = "Aave v2";
   export const SLUG = "aave-v2";
 }

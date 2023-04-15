@@ -28,7 +28,6 @@ import {
 } from "../../../generated/LendingPool/LendingPool";
 import { RToken } from "../../../generated/LendingPool/RToken";
 import {
-  ProtocolData,
   _handleBorrow,
   _handleBorrowingDisabledOnReserve,
   _handleBorrowingEnabledOnReserve,
@@ -49,33 +48,45 @@ import {
   _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
-import {
-  BIGDECIMAL_ZERO,
-  exponentToBigDecimal,
-  PositionSide,
-} from "../../../src/constants";
+import { BIGDECIMAL_ZERO, PositionSide } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { updateMarketRewards } from "./rewards";
 import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
+import { DataManager, ProtocolData } from "../../../src/sdk/manager";
+import { exponentToBigDecimal, getMarketFromToken } from "../../../src/helpers";
+import {
+  CollateralizationType,
+  LendingType,
+  PermissionType,
+  RiskType,
+} from "../../../src/sdk/constants";
 
 function getProtocolData(): ProtocolData {
   const networkSpecific = getNetworkSpecificConstant();
 
   return new ProtocolData(
-    networkSpecific.protocolAddress,
+    Address.fromString(networkSpecific.protocolAddress),
+    Protocol.PROTOCOL,
     Protocol.NAME,
     Protocol.SLUG,
-    networkSpecific.network
+    networkSpecific.network,
+    LendingType.POOLED,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.PERMISSIONLESS,
+    PermissionType.ADMIN,
+    CollateralizationType.OVER_COLLATERALIZED,
+    RiskType.GLOBAL
   );
 }
 
+const protocolData = getProtocolData();
 ///////////////////////////////////////////////
 ///// LendingPoolAddressProvider Handlers /////
 ///////////////////////////////////////////////
 
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
-  _handlePriceOracleUpdated(event.params.newAddress, getProtocolData());
+  _handlePriceOracleUpdated(event.params.newAddress, protocolData, event);
 }
 
 //////////////////////////////////////
@@ -91,7 +102,7 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     event.params.asset,
     event.params.aToken,
     event.params.variableDebtToken,
-    getProtocolData()
+    protocolData
     // No stable debt token in radiant
   );
 }
@@ -104,35 +115,35 @@ export function handleCollateralConfigurationChanged(
     event.params.liquidationBonus,
     event.params.liquidationThreshold,
     event.params.ltv,
-    getProtocolData()
+    protocolData
   );
 }
 
 export function handleBorrowingEnabledOnReserve(
   event: BorrowingEnabledOnReserve
 ): void {
-  _handleBorrowingEnabledOnReserve(event.params.asset, getProtocolData());
+  _handleBorrowingEnabledOnReserve(event.params.asset, protocolData);
 }
 
 export function handleBorrowingDisabledOnReserve(
   event: BorrowingDisabledOnReserve
 ): void {
-  _handleBorrowingDisabledOnReserve(event.params.asset, getProtocolData());
+  _handleBorrowingDisabledOnReserve(event.params.asset, protocolData);
 }
 
 export function handleReserveActivated(event: ReserveActivated): void {
-  _handleReserveActivated(event.params.asset, getProtocolData());
+  _handleReserveActivated(event.params.asset, protocolData);
 }
 
 export function handleReserveDeactivated(event: ReserveDeactivated): void {
-  _handleReserveDeactivated(event.params.asset, getProtocolData());
+  _handleReserveDeactivated(event.params.asset, protocolData);
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
   _handleReserveFactorChanged(
     event.params.asset,
     event.params.factor,
-    getProtocolData()
+    protocolData
   );
 }
 
@@ -141,33 +152,36 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
-  const protocolData = getProtocolData();
-
   // update rewards if there is an incentive controller
-  const market = Market.load(event.params.reserve.toHexString());
+  const market = getMarketFromToken(event.params.reserve, protocolData);
   if (!market) {
-    log.error("[handleReserveDataUpdated] Market not found", [
+    log.warning("[handleReserveDataUpdated] Market not found", [
       event.params.reserve.toHexString(),
     ]);
     return;
   }
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    protocolData
+  );
 
-  const rTokenContract = RToken.bind(Address.fromString(market.outputToken!));
-
-  updateMarketRewards(event, market, rTokenContract);
+  const rTokenContract = RToken.bind(Address.fromBytes(market.outputToken!));
+  updateMarketRewards(manager, event, rTokenContract);
 
   let assetPriceUSD = BIGDECIMAL_ZERO;
   const tryPrice = rTokenContract.try_getAssetPrice();
   if (tryPrice.reverted) {
     log.error(
-      "[handleReserveDataUpdated] Token price not found in Market: {}",
-      [market.id]
+      "[handleReserveDataUpdated] Token price not found for Market {}; default to 0.0",
+      [market.id.toHexString()]
     );
+  } else {
+    assetPriceUSD = tryPrice.value
+      .toBigDecimal()
+      .div(exponentToBigDecimal(rTOKEN_DECIMALS));
   }
-
-  assetPriceUSD = tryPrice.value
-    .toBigDecimal()
-    .div(exponentToBigDecimal(rTOKEN_DECIMALS));
 
   _handleReserveDataUpdated(
     event,
@@ -188,7 +202,7 @@ export function handleReserveUsedAsCollateralEnabled(
   _handleReserveUsedAsCollateralEnabled(
     event.params.reserve,
     event.params.user,
-    getProtocolData()
+    protocolData
   );
 }
 
@@ -199,18 +213,18 @@ export function handleReserveUsedAsCollateralDisabled(
   _handleReserveUsedAsCollateralDisabled(
     event.params.reserve,
     event.params.user,
-    getProtocolData()
+    protocolData
   );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handlePaused(event: Paused): void {
-  _handlePaused(getProtocolData());
+  _handlePaused(protocolData);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handleUnpaused(event: Unpaused): void {
-  _handleUnpaused(getProtocolData());
+  _handleUnpaused(protocolData);
 }
 
 export function handleDeposit(event: Deposit): void {
@@ -218,7 +232,7 @@ export function handleDeposit(event: Deposit): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.onBehalfOf
   );
 }
@@ -228,7 +242,7 @@ export function handleWithdraw(event: Withdraw): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.to
   );
 }
@@ -238,7 +252,7 @@ export function handleBorrow(event: Borrow): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.onBehalfOf
   );
 }
@@ -248,7 +262,7 @@ export function handleRepay(event: Repay): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData(),
+    protocolData,
     event.params.user // address that is getting debt reduced
   );
 }
@@ -258,7 +272,7 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event,
     event.params.liquidatedCollateralAmount,
     event.params.collateralAsset,
-    getProtocolData(),
+    protocolData,
     event.params.liquidator,
     event.params.user,
     event.params.debtAsset,
@@ -273,19 +287,21 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 export function handleCollateralTransfer(event: CollateralTransfer): void {
   _handleTransfer(
     event,
-    getProtocolData(),
+    protocolData,
     PositionSide.LENDER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }
 
 export function handleVariableTransfer(event: VariableTransfer): void {
   _handleTransfer(
     event,
-    getProtocolData(),
+    protocolData,
     PositionSide.BORROWER,
     event.params.to,
-    event.params.from
+    event.params.from,
+    event.params.value
   );
 }

@@ -17,6 +17,7 @@ export const CRV_FTM_LP_ADDRESS = "0xB471Ac6eF617e952b84C6a9fF5de65A9da96C93B";
 /////////////////////////////
 
 export namespace Protocol {
+  export const PROTOCOL = "Geist Finance";
   export const NAME = "Geist Finance";
   export const SLUG = "geist-finance";
   export const PROTOCOL_ADDRESS = "0x6c793c628Fe2b480c5e6FB7957dDa4b9291F9c9b";
