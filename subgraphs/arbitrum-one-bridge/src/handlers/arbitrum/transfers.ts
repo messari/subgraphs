@@ -71,14 +71,14 @@ export function handleTransferIn(event: DepositFinalized): void {
 
   // -- POOL
 
-  const poolId = event.address.concat(Bytes.fromUTF8(inputToken.symbol));
+  const poolId = event.address.concat(inputToken.id);
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
     pool.initialize(
       poolId.toString(),
       inputToken.symbol,
-      BridgePoolType.LOCK_RELEASE,
+      BridgePoolType.BURN_MINT,
       inputToken
     );
   }
@@ -181,14 +181,14 @@ export function handleTransferOut(event: WithdrawalInitiated): void {
 
   // -- POOL
 
-  const poolId = event.address.concat(Bytes.fromUTF8(inputToken.symbol));
+  const poolId = event.address.concat(inputToken.id);
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
     pool.initialize(
       poolId.toString(),
       inputToken.symbol,
-      BridgePoolType.LOCK_RELEASE,
+      BridgePoolType.BURN_MINT,
       inputToken
     );
   }

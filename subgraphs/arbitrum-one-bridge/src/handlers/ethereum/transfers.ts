@@ -89,7 +89,7 @@ export function handleTransferIn(event: WithdrawalFinalized): void {
 
   // -- POOL
 
-  const poolId = event.address.concat(Bytes.fromUTF8(inputToken.symbol));
+  const poolId = event.address.concat(inputToken.id);
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
@@ -203,7 +203,7 @@ export function handleTransferOut(event: DepositInitiated): void {
 
   // -- POOL
 
-  const poolId = event.address.concat(Bytes.fromUTF8(inputToken.symbol));
+  const poolId = event.address.concat(inputToken.id);
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {

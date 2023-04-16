@@ -117,7 +117,7 @@ export function handleL2ToL1Transaction(event: L2ToL1Transaction): void {
       pool.initialize(
         poolId.toString(),
         ETH_SYMBOL,
-        BridgePoolType.LOCK_RELEASE,
+        BridgePoolType.BURN_MINT,
         sdk.Tokens.getOrCreateToken(ethAddress)
       );
     }
