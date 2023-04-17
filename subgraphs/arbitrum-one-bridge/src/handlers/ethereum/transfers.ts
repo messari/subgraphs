@@ -3,7 +3,7 @@ import {
   BridgePoolType,
   CrosschainTokenType,
 } from "../../sdk/protocols/bridge/enums";
-import { Address, log, ethereum, Bytes, BigInt } from "@graphprotocol/graph-ts";
+import { Address, log, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import {
   DepositInitiated,
   TokenGateway,
