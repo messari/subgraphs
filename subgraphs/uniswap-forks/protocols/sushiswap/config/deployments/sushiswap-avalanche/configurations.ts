@@ -41,12 +41,12 @@ export class SushiswapAvalancheConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
+    return toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
       Address.fromString(
-        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
+        toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4")
       )
     );
   }
@@ -81,7 +81,7 @@ export class SushiswapAvalancheConfigurations implements Configurations {
     return toLowerCase("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7");
   }
   getRewardToken(): string {
-    return toLowerCase("0x37B608519F91f70F2EeB0e5Ed9AF4061722e4F76");
+    return toLowerCase("0x37b608519f91f70f2eeb0e5ed9af4061722e4f76");
   }
   getBrokenERC20Tokens(): string[] {
     return [];
