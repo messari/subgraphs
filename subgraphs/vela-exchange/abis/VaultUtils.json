@@ -1,0 +1,1086 @@
+[
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_positionVault",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_priceManager",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_settingsManager",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "key",
+                "type": "bytes32"
+            },
+            {
+                "indexed": false,
+                "internalType": "int256",
+                "name": "realisedPnl",
+                "type": "int256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "markPrice",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "feeUsd",
+                "type": "uint256"
+            }
+        ],
+        "name": "ClosePosition",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "key",
+                "type": "bytes32"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "indexToken",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "isLong",
+                "type": "bool"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "posId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "int256",
+                "name": "realisedPnl",
+                "type": "int256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256[7]",
+                "name": "posData",
+                "type": "uint256[7]"
+            }
+        ],
+        "name": "DecreasePosition",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "key",
+                "type": "bytes32"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "indexToken",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "isLong",
+                "type": "bool"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "posId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256[7]",
+                "name": "posData",
+                "type": "uint256[7]"
+            }
+        ],
+        "name": "IncreasePosition",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "key",
+                "type": "bytes32"
+            },
+            {
+                "indexed": false,
+                "internalType": "int256",
+                "name": "realisedPnl",
+                "type": "int256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "markPrice",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "feeUsd",
+                "type": "uint256"
+            }
+        ],
+        "name": "LiquidatePosition",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "fee",
+                "type": "uint256"
+            }
+        ],
+        "name": "SetDepositFee",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "BASIS_POINTS_DIVISOR",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "DEFAULT_FUNDING_RATE_FACTOR",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "DEFAULT_MAX_OPEN_INTEREST",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "DEFAULT_VLP_PRICE",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "FUNDING_RATE_PRECISION",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "LIQUIDATE_FEE_EXCEED",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "LIQUIDATE_NONE_EXCEED",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "LIQUIDATE_THRESHOLD_EXCEED",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_COOLDOWN_DURATION",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_DELTA_TIME",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_DEPOSIT_FEE",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_FEE_BASIS_POINTS",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_FEE_REWARD_BASIS_POINTS",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_FUNDING_RATE_FACTOR",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_FUNDING_RATE_INTERVAL",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_LIQUIDATION_FEE_USD",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_STAKING_FEE",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_TOKENFARM_COOLDOWN_DURATION",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_TRIGGER_GAS_FEE",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_VESTING_DURATION",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MIN_FEE_REWARD_BASIS_POINTS",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MIN_FUNDING_RATE_INTERVAL",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MIN_LEVERAGE",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "ORDER_FILLED",
+        "outputs": [
+            {
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "ORDER_NOT_FILLED",
+        "outputs": [
+            {
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "POSITION_LIMIT",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "POSITION_MARKET",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "POSITION_STOP_LIMIT",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "POSITION_STOP_MARKET",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "POSITION_TRAILING_STOP",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "PRICE_PRECISION",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "STAKING_PID_FOR_CHARGE_FEE",
+        "outputs": [
+            {
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "TRAILING_STOP_TYPE_AMOUNT",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "TRAILING_STOP_TYPE_PERCENT",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "VLP_DECIMALS",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "ZERO_ADDRESS",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_posId",
+                "type": "uint256"
+            }
+        ],
+        "name": "emitClosePositionEvent",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_posId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_sizeDelta",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_fee",
+                "type": "uint256"
+            }
+        ],
+        "name": "emitDecreasePositionEvent",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_posId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_collateralDelta",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_sizeDelta",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_fee",
+                "type": "uint256"
+            }
+        ],
+        "name": "emitIncreasePositionEvent",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_posId",
+                "type": "uint256"
+            }
+        ],
+        "name": "emitLiquidatePositionEvent",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_posId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "_raise",
+                "type": "bool"
+            }
+        ],
+        "name": "validateConfirmDelay",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_posId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "_raise",
+                "type": "bool"
+            }
+        ],
+        "name": "validateDecreasePosition",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_posId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "_raise",
+                "type": "bool"
+            }
+        ],
+        "name": "validateLiquidation",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "enum OrderType",
+                "name": "_orderType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "_params",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "bool",
+                "name": "_raise",
+                "type": "bool"
+            }
+        ],
+        "name": "validatePosData",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_size",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_collateral",
+                "type": "uint256"
+            }
+        ],
+        "name": "validateSizeCollateralAmount",
+        "outputs": [],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_posId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "_params",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "validateTrailingStopInputData",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_posId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "_raise",
+                "type": "bool"
+            }
+        ],
+        "name": "validateTrailingStopPrice",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_indexToken",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isLong",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_posId",
+                "type": "uint256"
+            }
+        ],
+        "name": "validateTrigger",
+        "outputs": [
+            {
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
