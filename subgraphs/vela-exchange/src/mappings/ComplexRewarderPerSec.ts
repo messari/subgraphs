@@ -7,9 +7,7 @@ import { getOrCreateToken, getOrCreateRewardToken } from "../entities/token";
 import { updatePoolRewardToken } from "../entities/pool";
 import { takeSnapshots } from "../entities/snapshots";
 import { convertTokenToDecimal } from "../utils/numbers";
-import {
-  SECONDS_PER_DAY,
-} from "../utils/constants";
+import { SECONDS_PER_DAY } from "../utils/constants";
 
 export function handleAddRewardInfo(event: AddRewardInfo): void {
   takeSnapshots(event);
