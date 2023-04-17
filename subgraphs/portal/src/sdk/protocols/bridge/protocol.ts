@@ -453,4 +453,9 @@ export class Bridge {
     ]);
     this.save();
   }
+
+  setBridgingFee(fee: BigInt): void {
+    this.protocol._bridgeFee = fee;
+    this.save();
+  }
 }

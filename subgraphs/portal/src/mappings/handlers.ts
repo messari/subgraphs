@@ -26,7 +26,7 @@ import {
 } from "../sdk/protocols/bridge/enums";
 import { TokenPricer } from "../sdk/protocols/config";
 import { bigIntToBigDecimal } from "../sdk/util/numbers";
-import { BIGINT_ZERO, ZERO_ADDRESS } from "../sdk/util/constants";
+import { BIGINT_ZERO, INT_ZERO, ZERO_ADDRESS } from "../sdk/util/constants";
 
 import {
   Bridge,
@@ -65,9 +65,34 @@ class Pricer implements TokenPricer {
 class TokenInit implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
     const erc20 = _ERC20.bind(address);
-    const name = erc20.name();
-    const symbol = erc20.symbol();
-    const decimals = erc20.decimals().toI32();
+    let name = "unknown";
+    let symbol = "UNKNOWN";
+    let decimals = INT_ZERO as i32;
+
+    const nameCall = erc20.try_name();
+    if (!nameCall.reverted) {
+      name = nameCall.value;
+    } else {
+      log.warning("[getTokenParams] nameCall reverted for {}", [
+        address.toHexString(),
+      ]);
+    }
+    const symbolCall = erc20.try_symbol();
+    if (!symbolCall.reverted) {
+      symbol = symbolCall.value;
+    } else {
+      log.warning("[getTokenParams] symbolCall reverted for {}", [
+        address.toHexString(),
+      ]);
+    }
+    const decimalsCall = erc20.try_decimals();
+    if (!decimalsCall.reverted) {
+      decimals = decimalsCall.value.toI32();
+    } else {
+      log.warning("[getTokenParams] decimalsCall reverted for {}", [
+        address.toHexString(),
+      ]);
+    }
 
     return {
       name,
@@ -148,7 +173,7 @@ export function handleSwapOut(event: LogMessagePublished): void {
   );
   const crosschainToken = sdk.Tokens.getOrCreateCrosschainToken(
     BigInt.fromI32(toChain),
-    Bytes.fromUTF8(crosschainTokenAddr),
+    crosschainTokenAddr,
     crosschainTokenType,
     Address.fromBytes(token.id)
   );
@@ -160,6 +185,9 @@ export function handleSwapOut(event: LogMessagePublished): void {
   const coreContract = Core.bind(dataSource.address());
   const protocolFee = coreContract.messageFee();
   pool.addRevenueNative(protocolFee, BIGINT_ZERO);
+
+  const protocol = sdk.Protocol;
+  protocol.setBridgingFee(protocolFee);
 
   const account = sdk.Accounts.loadAccount(event.transaction.from);
   account.transferOut(pool, route!, to, amount);
@@ -229,7 +257,7 @@ export function handleSwapIn(call: CompleteTransferCall): void {
   );
   const crosschainToken = sdk.Tokens.getOrCreateCrosschainToken(
     BigInt.fromI32(fromChain),
-    Bytes.fromUTF8(crosschainTokenAddr),
+    crosschainTokenAddr,
     crosschainTokenType,
     Address.fromBytes(token.id)
   );
@@ -308,7 +336,7 @@ export function handleSwapInWithPayload(
   );
   const crosschainToken = sdk.Tokens.getOrCreateCrosschainToken(
     BigInt.fromI32(fromChain),
-    Bytes.fromUTF8(crosschainTokenAddr),
+    crosschainTokenAddr,
     crosschainTokenType,
     Address.fromBytes(token.id)
   );
@@ -386,7 +414,7 @@ export function handleSwapInNative(
   );
   const crosschainToken = sdk.Tokens.getOrCreateCrosschainToken(
     BigInt.fromI32(fromChain),
-    Bytes.fromUTF8(crosschainTokenAddr),
+    crosschainTokenAddr,
     crosschainTokenType,
     Address.fromBytes(token.id)
   );
@@ -465,7 +493,7 @@ export function handleSwapInNativeWithPayload(
   );
   const crosschainToken = sdk.Tokens.getOrCreateCrosschainToken(
     BigInt.fromI32(fromChain),
-    Bytes.fromUTF8(crosschainTokenAddr),
+    crosschainTokenAddr,
     crosschainTokenType,
     Address.fromBytes(token.id)
   );

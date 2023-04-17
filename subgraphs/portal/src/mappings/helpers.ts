@@ -16,7 +16,7 @@ export function getCrossTokenAddress(
   tokenChainID: BigInt,
   chainID: BigInt,
   crossChainID: BigInt
-): string {
+): Bytes {
   const key = tokenID
     .toLowerCase()
     .concat(":")
@@ -36,10 +36,10 @@ export function getCrossTokenAddress(
       key,
     ]);
 
-    return ZERO_ADDRESS;
+    return Bytes.fromUTF8(ZERO_ADDRESS);
   }
 
-  return obj.toString();
+  return Bytes.fromUTF8(obj.toString());
 }
 
 export function truncateAddress(bAddr: Bytes): Address {

@@ -382,6 +382,9 @@ type BridgeProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [Pool!]! @derivedFrom(field: "protocol")
+
+  " Bridging fee charged by the protocol in native token amount "
+  _bridgeFee: BigInt
 }
 
 ###############################
