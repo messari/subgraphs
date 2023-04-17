@@ -437,9 +437,11 @@ export async function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesO
                 failureBlockLine = '\n' + indexErrorObj.failureBlock + '\n';
                 failureBlockThread += failureBlockLine;
                 if (prodStatusDepoMapping[baseNetworkString] === true) {
-                    aggThreadIndexErrorEmbeds[0].value += labelValueLine;
-                    aggThreadIndexErrorEmbeds[1].value += failureBlockLine;
-                    zapierProdThreadIndexing.push({ zappierMessage: `${networkString}: ${indexErrorObj.failureBlock} - ${link}`, [threadKey]: `${networkString}: Block #${indexErrorObj.failureBlock}\nLink: ${link}\nError: ${indexErrorObj.message}\n\n` });
+                    if (!(protocol == "rocket-pool" && indexErrorObj.message.indexOf("rocketNetworkPricesMapping/generateNodeBalanceCheckpoints") >= 0 && indexErrorObj.message.indexOf("Failed to call 'asc_type_id' with 'ArrayBuffer'") >= 0)) {
+                        aggThreadIndexErrorEmbeds[0].value += labelValueLine;
+                        aggThreadIndexErrorEmbeds[1].value += failureBlockLine;
+                        zapierProdThreadIndexing.push({ zappierMessage: `${networkString}: ${indexErrorObj.failureBlock} - ${link}`, [threadKey]: `${networkString}: Block #${indexErrorObj.failureBlock}\nLink: ${link}\nError: ${indexErrorObj.message}\n\n` });
+                    }
                 }
             })
             indexingErrorEmbed.fields[0].value += labelValueThread;
