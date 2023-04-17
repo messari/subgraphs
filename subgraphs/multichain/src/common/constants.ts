@@ -288,7 +288,7 @@ const BSC_INACCURATE_PRICEFEED_TOKENS = [
   Address.fromString("0x1441e091e1247e6e6990ccb2c27169204fb04aa9"), // anyXMETA
 ];
 const MATIC_INACCURATE_PRICEFEED_TOKENS = [
-  Address.fromString("0xd4d4139b2f64B0367F522732b27be7701D36E187"), // anyHND
+  Address.fromString("0xd4d4139b2f64b0367f522732b27be7701d36e187"), // anyHND
 ];
 
 export const INACCURATE_PRICEFEED_TOKENS = new TypedMap<string, Address[]>();
