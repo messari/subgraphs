@@ -8333,6 +8333,36 @@
       }
     }
   },
+  "synfutures-v2": {
+    "schema": "derivatives-perpfutures",
+    "base": "synfutures-v2",
+    "protocol": "synfutures-v2",
+    "project": "synfutures-v2",
+    "deployments": {
+      "synfutures-v2-polygon": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "synfutures-v2-polygon",
+            "query-id": "synfutures-v2-polygon"
+          }
+        },
+        "files": {
+          "template": "synfutures.v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
   "axelar": {
     "schema": "bridge",
     "base": "axelar",
