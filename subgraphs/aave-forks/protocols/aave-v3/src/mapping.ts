@@ -73,7 +73,6 @@ import {
   Network,
   PositionSide,
   INT_FOUR,
-  BIGINT_ONE,
 } from "../../../src/constants";
 import {
   getMarketFromToken,

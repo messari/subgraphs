@@ -755,14 +755,14 @@ export function _handleBorrow(
   );
   const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
   const newBorrowBalance = getBorrowBalance(market, accountID);
-  const borrow = manager.createBorrow(
+  manager.createBorrow(
     asset,
     accountID,
     amount,
     amountUSD,
     newBorrowBalance,
     market.inputTokenPriceUSD,
-    interestRateType, //TODO
+    interestRateType, //TODO: but we don't know the interestRateType for Repay
     isIsolated
   );
 }
