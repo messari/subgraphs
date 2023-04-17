@@ -1,6 +1,14 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum/contract
     name: Comptroller
@@ -11,7 +19,7 @@ dataSources:
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Protocol
@@ -39,7 +47,52 @@ dataSources:
           handler: handleNewLiquidationIncentive
         - event: ActionPaused(address,string,bool)
           handler: handleActionPaused
+        - event: NewRewardDistributor(address,address)
+          handler: handleNewRewardDistributor
       file: ./protocols/bastion-protocol/src/mapping.ts
+  {{#realms}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: Comptroller
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Protocol
+        - Market
+        - Token
+      abis:
+        - name: Comptroller
+          file: ./abis/Comptroller.json
+        - name: CToken
+          file: ./abis/CToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: MarketListed(address)
+          handler: handleMarketListed
+        - event: MarketEntered(address,address)
+          handler: handleMarketEntered
+        - event: MarketExited(address,address)
+          handler: handleMarketExited
+        - event: NewPriceOracle(address,address)
+          handler: handleNewPriceOracle
+        - event: NewCollateralFactor(address,uint256,uint256)
+          handler: handleNewCollateralFactor
+        - event: NewLiquidationIncentive(uint256,uint256)
+          handler: handleNewLiquidationIncentive
+        - event: ActionPaused(address,string,bool)
+          handler: handleActionPaused
+        - event: NewRewardDistributor(address,address)
+          handler: handleNewRewardDistributor
+      file: ./protocols/bastion-protocol/src/mapping.ts  
+  {{/realms}}
+
 templates:
   - name: CToken
     kind: ethereum/contract
@@ -48,7 +101,7 @@ templates:
       abi: CToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Deposit
@@ -84,4 +137,36 @@ templates:
           handler: handleNewReserveFactor
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+      file: ./protocols/bastion-protocol/src/mapping.ts
+
+  - name: RewardDistributor
+    kind: ethereum/contract
+    network: {{ network }}
+    source:
+      abi: RewardDistributor
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: CToken
+          file: ./abis/CToken.json
+        - name: Comptroller
+          file: ./abis/Comptroller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: PriceOracle
+          file: ./abis/PriceOracle.json
+        - name: RewardDistributor
+          file: ./abis/bastion-protocol/RewardDistributor.json
+      eventHandlers:
+        - event: RewardAdded(uint8,address)
+          handler: handleRewardAdded
+        - event: RewardAddressChanged(uint8,address,address)
+          handler: handleRewardAddressChanged
+        - event: RewardBorrowSpeedUpdated(uint8,indexed address,uint256)
+          handler: handleRewardBorrowSpeedUpdated
+        - event: RewardSupplySpeedUpdated(uint8,indexed address,uint256)
+          handler: handleRewardSupplySpeedUpdated
       file: ./protocols/bastion-protocol/src/mapping.ts

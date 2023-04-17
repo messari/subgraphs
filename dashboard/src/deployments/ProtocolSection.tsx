@@ -30,6 +30,7 @@ function ProtocolSection({ protocol, decenDepoData, issuesMapping, schemaType, s
     }, [tableExpanded])
 
     const issuesTitles = Object.keys(issuesMapping);
+    const subNameUpper = subgraphName.toUpperCase();
 
     let hasDecentralizedDepo = false;
     protocol.networks.forEach((depo: any) => {
@@ -45,8 +46,9 @@ function ProtocolSection({ protocol, decenDepoData, issuesMapping, schemaType, s
                 if (issuesMapping[x].includes('/pull/')) {
                     return false;
                 }
-                const depoSpecificIssue = x.toUpperCase().includes(subgraphName.toUpperCase()) && x.toUpperCase().includes(depo.chain.toUpperCase());
-                const protocolWideIssue = x.toUpperCase().includes(subgraphName.toUpperCase() + ' ALL');
+                const title = x.toUpperCase();
+                const depoSpecificIssue = title.includes(subNameUpper) && title.includes(depo.chain.toUpperCase());
+                const protocolWideIssue = title.includes(subNameUpper + ' ALL');
                 return depoSpecificIssue || protocolWideIssue;
             }));
             if (!!openRepoIssue) {
@@ -72,8 +74,10 @@ function ProtocolSection({ protocol, decenDepoData, issuesMapping, schemaType, s
                         if (issuesMapping[x].includes('/pull/')) {
                             return false;
                         }
-                        const depoSpecificIssue = x.toUpperCase().includes(subgraphName.toUpperCase()) && x.toUpperCase().includes(depo.chain.toUpperCase());
-                        const protocolWideIssue = x.toUpperCase().includes(subgraphName.toUpperCase() + ' ALL');
+                        const title = x.toUpperCase();
+                        const titleIsDecen = title.includes('DECEN');
+                        const protocolWideIssue = title.includes(subNameUpper + ' ALL');
+                        const depoSpecificIssue = title.includes(subNameUpper) && title.includes(depo.chain.toUpperCase()) && !titleIsDecen;
                         return depoSpecificIssue || protocolWideIssue;
                     }));
                     if (!!openRepoIssue) {
@@ -330,6 +334,23 @@ function ProtocolSection({ protocol, decenDepoData, issuesMapping, schemaType, s
                             </span>
                         );
                     }
+                    let decenDepoStatusIcon = "https://images.emojiterra.com/twitter/v13.1/512px/2705.png";
+                    let decenStatusLink = depoLevelStatusLink;
+                    const openDecenIssue = issuesTitles.find((x: any) => {
+                        if (issuesMapping[x].includes('/pull/')) {
+                            return false;
+                        }
+                        const title = x.toUpperCase();
+                        const titleIsDecen = title.includes('DECEN');
+                        let depoSpecificIssue = false;
+                        const protocolWideIssue = title.includes(subNameUpper + ' ALL');
+                        depoSpecificIssue = title.includes(subNameUpper) && title.includes(depo.chain.toUpperCase()) && titleIsDecen;
+                        return protocolWideIssue || depoSpecificIssue;
+                    });
+                    if (!!openDecenIssue) {
+                        decenDepoStatusIcon = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoseJ8t1vi2kPFznJJSyeIHGYxgvCvbCMgs6a9TMI&s";
+                        decenStatusLink = issuesMapping[openDecenIssue] || "";
+                    }
                     decenRow = (
                         <TableRow onClick={(event) => {
                             if (event.ctrlKey) {
@@ -375,11 +396,11 @@ function ProtocolSection({ protocol, decenDepoData, issuesMapping, schemaType, s
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {depo?.status === "prod" ? <Tooltip title={depoLevelStatusHover}><img className="round-image" onClick={(e) => {
-                                    if (depoLevelStatusLink?.length > 0) {
-                                        e.stopPropagation()
-                                        window.location.href = (depoLevelStatusLink)
+                                    if (decenStatusLink?.length > 0) {
+                                        e.stopPropagation();
+                                        window.location.href = (decenStatusLink);
                                     }
-                                }} src={depoLevelStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
+                                }} src={decenDepoStatusIcon} height="24px" width="24px" /></Tooltip> : <Tooltip title="In Development"><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" /></Tooltip>}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {indexedDecen ? indexedDecen + "%" : "N/A"}

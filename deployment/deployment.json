@@ -10,7 +10,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.12",
+          "subgraph": "1.2.13",
           "methodology": "1.0.0"
         },
         "files": {
@@ -24,6 +24,10 @@
           "hosted-service": {
             "slug": "abracadabra-money-arbitrum",
             "query-id": "abracadabra-money-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "abracadabra-money-arbitrum",
+            "query-id": "GnroBYmeLLtKuHNyTNS38hzKki5n4CWaHeaMRqZpU4cr"
           }
         }
       },
@@ -32,7 +36,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.12",
+          "subgraph": "1.2.13",
           "methodology": "1.0.0"
         },
         "files": {
@@ -46,6 +50,10 @@
           "hosted-service": {
             "slug": "abracadabra-money-avalanche",
             "query-id": "abracadabra-money-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "abracadabra-money-avalanche",
+            "query-id": "CZBD7e8VGvNa6WkBHZAaC688bsZ35UvAM1AuDdVng2aE"
           }
         }
       },
@@ -54,7 +62,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.12",
+          "subgraph": "1.2.13",
           "methodology": "1.0.0"
         },
         "files": {
@@ -76,7 +84,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.12",
+          "subgraph": "1.2.13",
           "methodology": "1.0.0"
         },
         "files": {
@@ -98,7 +106,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.12",
+          "subgraph": "1.2.13",
           "methodology": "1.0.0"
         },
         "files": {
@@ -248,6 +256,10 @@
           "hosted-service": {
             "slug": "aave-v2-avalanche",
             "query-id": "aave-v2-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "aave-v2-avalanche",
+            "query-id": "AQHJdvUMkPfSxi6Q2LxXYjWXjGvfCST8DFFYE4VUKtU6"
           }
         }
       },
@@ -279,10 +291,10 @@
       },
       "aave-v2-polygon": {
         "network": "polygon",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.3.0",
+          "subgraph": "1.2.18",
           "methodology": "1.0.0"
         },
         "files": {
@@ -326,6 +338,10 @@
           "hosted-service": {
             "slug": "aave-v3-arbitrum",
             "query-id": "aave-v3-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-arbitrum",
+            "query-id": "J9dtvE11PWNZH74frWyx9QZonyC1Db2UWDMUegmT3zkG"
           }
         }
       },
@@ -348,6 +364,10 @@
           "hosted-service": {
             "slug": "aave-v3-avalanche",
             "query-id": "aave-v3-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "aave-v3-avalanche",
+            "query-id": "94D1g2jHHqKUS5uhbEPHWyRgfp4bYeZPn5Cr5R3zvoYH"
           }
         }
       },
@@ -530,7 +550,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.1",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -556,7 +576,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -578,7 +598,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -686,7 +706,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1174,6 +1194,10 @@
           "hosted-service": {
             "slug": "banker-joe-avalanche",
             "query-id": "banker-joe-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "banker-joe-avalanche",
+            "query-id": "F94CS4mephx6noem4KsXxeGDSufCGUH5fXrqUX5ZiFk2"
           }
         }
       }
@@ -1220,8 +1244,8 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.9",
-          "methodology": "1.0.0"
+          "subgraph": "1.2.0",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "bastion-protocol.template.yaml"
@@ -1264,6 +1288,10 @@
           "hosted-service": {
             "slug": "benqi-avalanche",
             "query-id": "benqi-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "benqi-avalanche",
+            "query-id": "EcNHwEGXq3KW1vCbHHj1iwvtf62ae5kxzEQhKtRqPygt"
           }
         }
       }
@@ -1388,6 +1416,10 @@
           "hosted-service": {
             "slug": "cream-finance-arbitrum",
             "query-id": "cream-finance-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "cream-finance-arbitrum",
+            "query-id": "4TbqVA8p2DoBd5qDbPMwmDZv3CsJjWtxo8nVSqF2tA9a"
           }
         }
       },
@@ -1488,6 +1520,10 @@
           "hosted-service": {
             "slug": "dforce-arbitrum",
             "query-id": "dforce-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "dforce-arbitrum",
+            "query-id": "FFK9Fa8fdBrAugNVFqRZVAtrej7FjsQNq1s9LVBhF4FX"
           }
         }
       },
@@ -1632,6 +1668,10 @@
           "hosted-service": {
             "slug": "iron-bank-avalanche",
             "query-id": "iron-bank-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "iron-bank-avalanche",
+            "query-id": "7ziHxbouaMXhSzxf5nfTXLYYASajU9bTCcxWoTKEAkBe"
           }
         }
       },
@@ -1818,6 +1858,10 @@
           "hosted-service": {
             "slug": "rari-fuse-arbitrum",
             "query-id": "rari-fuse-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "rari-fuse-arbitrum",
+            "query-id": "DbD7U3k8trdQUC2KqC2Fu2WcS42QUZHr2YXJzZXjH719"
           }
         }
       },
@@ -1949,8 +1993,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "3.0.0",
-          "subgraph": "2.0.0",
+          "schema": "3.0.1",
+          "subgraph": "2.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1964,6 +2008,32 @@
           "hosted-service": {
             "slug": "compound-v3-ethereum",
             "query-id": "compound-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "compound-v3-ethereum",
+            "query-id": "6PaB6tKFqrL6YoAELEhFGU6Gc39cEynLbo6ETZMF3sCy"
+          }
+        }
+      },
+      "compound-v3-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "compound.v3.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "compound-v3-polygon",
+            "query-id": "compound-v3-polygon"
           }
         }
       }
@@ -1999,7 +2069,7 @@
       },
       "curve-finance-aurora": {
         "network": "aurora",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.0.2",
@@ -2091,7 +2161,7 @@
       },
       "curve-finance-gnosis": {
         "network": "gnosis",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.0.2",
@@ -2302,8 +2372,8 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.3.1",
-          "methodology": "1.2.1"
+          "subgraph": "1.3.2",
+          "methodology": "1.2.2"
         },
         "files": {
           "template": "euler.template.yaml"
@@ -2353,7 +2423,7 @@
           },
           "decentralized-network": {
             "slug": "goldfinch-ethereum",
-            "query-id": "Dtj2HicXKpoUjNB7ffdBkMwt3L9Sz3cbENd67AdHu6Vb"
+            "query-id": "72Cez54APnySAn6h8MswzYkwaL9KjvuuKnKArnPJ8yxb"
           }
         }
       }
@@ -2403,8 +2473,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.0.2",
+          "schema": "1.4.0",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2422,6 +2492,36 @@
           "decentralized-network": {
             "slug": "lido-ethereum",
             "query-id": "XYcD9VeUvSvuqrsV5pFauXk7jQy9hrnhe5Kb7REyuxm"
+          }
+        }
+      }
+    }
+  },
+  "livepeer": {
+    "schema": "generic",
+    "base": "livepeer",
+    "protocol": "livepeer",
+    "project": "livepeer",
+    "deployments": {
+      "livepeer-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "livepeer.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "livepeer-arbitrum",
+            "query-id": "livepeer-arbitrum"
           }
         }
       }
@@ -2486,6 +2586,10 @@
           "hosted-service": {
             "slug": "vesta-finance-arbitrum",
             "query-id": "vesta-finance-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "vesta-finance-arbitrum",
+            "query-id": "9RFPnB3zNjtc7x9kowTyBU2YVGUFSJRe27EBJWLMVgy6"
           }
         }
       }
@@ -2877,6 +2981,28 @@
           }
         }
       },
+      "evm-polygon-zkevm": {
+        "network": "polygon-zkevm",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "evm.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-polygon-zkevm",
+            "query-id": "network-polygon-zkevm"
+          }
+        }
+      },
       "evm-moonbeam": {
         "network": "moonbeam",
         "status": "dev",
@@ -2925,8 +3051,8 @@
         "network": "optimism",
         "status": "dev",
         "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.1.3",
+          "schema": "1.2.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2966,6 +3092,28 @@
           "decentralized-network": {
             "slug": "network-gnosis",
             "query-id": "ANz3TpZdY2syZGQvGA85ANNG7KiSWdPmv55kP4H4sRPJ"
+          }
+        }
+      },
+      "evm-zksync": {
+        "network": "zksync-era",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.2",
+          "subgraph": "1.1.4",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "evm.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-zksync",
+            "query-id": "network-zksync"
           }
         }
       }
@@ -3112,7 +3260,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "2.2.0",
+          "subgraph": "2.3.0",
           "methodology": "1.1.0"
         },
         "files": {
@@ -3135,13 +3283,13 @@
       }
     }
   },
-  "maple-finance": {
+  "maple-finance-v1": {
     "schema": "lending",
-    "base": "maple-finance",
-    "protocol": "maple-finance",
+    "base": "maple-finance-v1",
+    "protocol": "maple-finance-v1",
     "project": "maple",
     "deployments": {
-      "maple-finance-ethereum": {
+      "maple-finance-v1-ethereum": {
         "network": "ethereum",
         "status": "prod",
         "versions": {
@@ -3177,10 +3325,10 @@
     "deployments": {
       "maple-finance-v2-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "3.0.1",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3432,6 +3580,10 @@
           "hosted-service": {
             "slug": "ribbon-finance-ethereum",
             "query-id": "ribbon-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "ribbon-finance-ethereum",
+            "query-id": "GQdCg4oR8tFB4tH8svyL1PfgDABKnRXz4GjwFYH68pPG"
           }
         }
       },
@@ -3454,6 +3606,10 @@
           "hosted-service": {
             "slug": "ribbon-finance-avalanche",
             "query-id": "ribbon-finance-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "ribbon-finance-avalanche",
+            "query-id": "8qztgeMTJrq2kQHK7LzmbmDUpuBvDc6eFASDqN8SJBM5"
           }
         }
       }
@@ -3544,6 +3700,10 @@
           "hosted-service": {
             "slug": "saddle-finance-arbitrum",
             "query-id": "saddle-finance-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "saddle-finance-arbitrum",
+            "query-id": "FsT2DES8UdhfDkXCtE56h5WCDrrSXrtJiSMgNWvSdyYL"
           }
         }
       },
@@ -3645,6 +3805,36 @@
       }
     }
   },
+  "spark-lend": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "spark-lend",
+    "project": "makerdao",
+    "deployments": {
+      "spark-lend-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "spark.lend.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "spark-lend-ethereum",
+            "query-id": "spark-lend-ethereum"
+          }
+        }
+      }
+    }
+  },
   "radiant": {
     "schema": "lending",
     "base": "aave-forks",
@@ -3670,6 +3860,62 @@
           "hosted-service": {
             "slug": "radiant-arbitrum",
             "query-id": "radiant-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "radiant-arbitrum",
+            "query-id": "43NeT7UTACLUkohKBaG7auvkhsj4Kwux9kNTJr6sFdNe"
+          }
+        }
+      }
+    }
+  },
+  "radiant-v2": {
+    "schema": "lending",
+    "base": "aave-forks",
+    "protocol": "radiant-capital-v2",
+    "project": "radiant",
+    "deployments": {
+      "radiant-capital-v2-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "radiant.capital.v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "radiant-capital-v2-arbitrum",
+            "query-id": "radiant-capital-v2-arbitrum"
+          }
+        }
+      },
+      "radiant-capital-v2-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "radiant.capital.v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "radiant-capital-v2-bsc",
+            "query-id": "radiant-capital-v2-bsc"
           }
         }
       }
@@ -3741,7 +3987,7 @@
   },
   "uniswap-v3": {
     "schema": "dex-amm",
-    "base": "uniswap-v3",
+    "base": "uniswap-v3-forks",
     "protocol": "uniswap-v3",
     "project": "uniswap",
     "deployments": {
@@ -3749,12 +3995,12 @@
         "network": "arbitrum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "schema": "3.0.3",
+          "subgraph": "1.3.6",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v3.template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3764,6 +4010,32 @@
           "hosted-service": {
             "slug": "uniswap-v3-arbitrum",
             "query-id": "uniswap-v3-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-arbitrum",
+            "query-id": "8sE6rTNkPhzZXZC6c8UQy2ghFTu5PPdGauwUBm4t7HZ1"
+          }
+        }
+      },
+      "uniswap-v3-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.3",
+          "subgraph": "1.3.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v3-bsc",
+            "query-id": "uniswap-v3-bsc"
           }
         }
       },
@@ -3772,11 +4044,11 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.1.7",
+          "subgraph": "1.2.11",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v3.template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3786,6 +4058,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-celo",
             "query-id": "uniswap-v3-celo"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-celo",
+            "query-id": "9nh6Ums63wFcoZpmegyPcAFtY3CAzQc3S6cuERALYMqa"
           }
         }
       },
@@ -3793,12 +4069,12 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "schema": "3.0.3",
+          "subgraph": "1.3.6",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v3.template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3811,7 +4087,7 @@
           },
           "decentralized-network": {
             "slug": "uniswap-v3-ethereum",
-            "query-id": "ELUcwgpm14LKPLrBRuVvPvNKHQ9HvwmtKgKSH6123cr7"
+            "query-id": "G3JZhmKKHC4mydRzD6kSz5fCWve5WDYYCyTFSJyv3SD5"
           }
         }
       },
@@ -3819,12 +4095,12 @@
         "network": "optimism",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "schema": "3.0.3",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v3.template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3841,12 +4117,12 @@
         "network": "polygon",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.1.4",
+          "schema": "3.0.3",
+          "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap.v3.template.yaml"
+          "template": "uniswapV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -3856,6 +4132,58 @@
           "hosted-service": {
             "slug": "uniswap-v3-polygon",
             "query-id": "uniswap-v3-polygon"
+          }
+        }
+      }
+    }
+  },
+  "pancakeswap-v3": {
+    "schema": "dex-amm",
+    "base": "uniswap-v3-forks",
+    "protocol": "pancakeswap-v3",
+    "project": "pancakeswap",
+    "deployments": {
+      "pancakeswap-v3-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.3",
+          "subgraph": "1.1.1",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "pancakeswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "pancakeswap-v3-bsc",
+            "query-id": "pancakeswap-v3-bsc"
+          }
+        }
+      },
+      "pancakeswap-v3-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.3",
+          "subgraph": "1.1.1",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "pancakeswapV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "pancakeswap-v3-ethereum",
+            "query-id": "pancakeswap-v3-ethereum"
           }
         }
       }
@@ -3916,6 +4244,10 @@
           "hosted-service": {
             "slug": "qidao-arbitrum",
             "query-id": "qidao-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "qidao-arbitrum",
+            "query-id": "Dy1yVPfbS27HTrqEq3nLGFGi3TMYxPzSfY7Zxxj5ZJhf"
           }
         }
       },
@@ -3938,6 +4270,10 @@
           "hosted-service": {
             "slug": "qidao-avalanche",
             "query-id": "qidao-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "qidao-avalanche",
+            "query-id": "4cKy6QQMc5tpfdx8yxfYeb9TLZmgLQe44ddW1G7NwkA6"
           }
         }
       },
@@ -4476,6 +4812,10 @@
           "hosted-service": {
             "slug": "sushiswap-celo",
             "query-id": "sushiswap-celo"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-celo",
+            "query-id": "94swSaaFChsQoZzb9Vc7Lo6FWFV6YZUMNSdFVTMAeRgj"
           }
         }
       },
@@ -4750,6 +5090,10 @@
           "hosted-service": {
             "slug": "ubeswap-celo",
             "query-id": "ubeswap-celo"
+          },
+          "decentralized-network": {
+            "slug": "ubeswap-celo",
+            "query-id": "6f3YqP75bLuLZAv7Cm1BohFot17kT3Svekg6giuvaTmg"
           }
         }
       }
@@ -4826,7 +5170,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.1",
-          "subgraph": "1.0.7",
+          "subgraph": "1.0.8",
           "methodology": "1.0.1"
         },
         "files": {
@@ -4852,7 +5196,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.5",
+          "subgraph": "1.0.6",
           "methodology": "1.0.1"
         },
         "files": {
@@ -4926,6 +5270,10 @@
           "hosted-service": {
             "slug": "yearn-v2-arbitrum",
             "query-id": "yearn-v2-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "yearn-v2-arbitrum",
+            "query-id": "39F8fYCvLYmutjqpzEwx3dcEJTtFFVupvBzJqkEzftA7"
           }
         }
       },
@@ -5388,6 +5736,36 @@
           "hosted-service": {
             "slug": "rarible-governance",
             "query-id": "rarible-governance"
+          }
+        }
+      }
+    }
+  },
+  "optimism-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "optimism-governance",
+    "project": "optimism",
+    "deployments": {
+      "optimism-governance-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "optimism-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "optimism-governance",
+            "query-id": "optimism-governance"
           }
         }
       }
@@ -6068,7 +6446,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.3.2",
+          "subgraph": "1.3.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6082,6 +6460,10 @@
           "hosted-service": {
             "slug": "platypus-finance-avalanche",
             "query-id": "platypus-finance-avalanche"
+          },
+          "decentralized-network": {
+            "slug": "platypus-finance-avalanche",
+            "query-id": "8EBbn3tNayccBZrnW9ae6Q4NLHfVEcozvkB3YAp5Qatr"
           }
         }
       }
@@ -6403,8 +6785,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.0.2",
+          "schema": "1.4.0",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6429,8 +6811,8 @@
         "network": "bsc",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.0.2",
+          "schema": "1.4.0",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6459,7 +6841,7 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
+          "schema": "1.4.0",
           "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
@@ -6494,7 +6876,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6557,8 +6939,8 @@
         "network": "ethereum",
         "status": "prod",
         "versions": {
-          "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "schema": "1.4.0",
+          "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6626,7 +7008,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.0.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6678,7 +7060,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6697,10 +7079,10 @@
       },
       "stargate-avalanche": {
         "network": "avalanche",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6719,10 +7101,10 @@
       },
       "stargate-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6741,10 +7123,10 @@
       },
       "stargate-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6763,10 +7145,10 @@
       },
       "stargate-polygon": {
         "network": "polygon",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6785,10 +7167,10 @@
       },
       "stargate-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -6810,7 +7192,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -7295,10 +7677,10 @@
     "deployments": {
       "optimism-bridge-v2-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
+          "schema": "1.2.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -7311,16 +7693,15 @@
           "template": "optimism.bridge.template.yaml"
         },
         "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:yaml": true
         }
       },
       "optimism-bridge-v2-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
+          "schema": "1.2.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -7333,8 +7714,7 @@
           "template": "optimism.bridge.template.yaml"
         },
         "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:yaml": true
         }
       }
     }
@@ -7465,13 +7845,13 @@
       }
     }
   },
-  "celer-bridge": {
+  "cbridge": {
     "schema": "bridge",
-    "base": "celer-bridge",
-    "protocol": "celer-bridge",
-    "project": "celer",
+    "base": "cbridge",
+    "protocol": "cbridge",
+    "project": "celer-network",
     "deployments": {
-      "celer-bridge-ethereum": {
+      "cbridge-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -7479,65 +7859,21 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-ethereum",
-            "query-id": "celer-bridge-ethereum"
-          }
-        },
         "files": {
-          "template": "celer.bridge.template.yaml"
+          "template": "cbridge.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-bsc": {
-        "network": "bsc",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "prepare:constants": false
         },
         "services": {
           "hosted-service": {
-            "slug": "celer-bridge-bsc",
-            "query-id": "celer-bridge-bsc"
+            "slug": "cbridge-ethereum",
+            "query-id": "cbridge-ethereum"
           }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
         }
       },
-      "celer-bridge-optimism": {
-        "network": "optimism",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-optimism",
-            "query-id": "celer-bridge-optimism"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-arbitrum": {
+      "cbridge-arbitrum": {
         "network": "arbitrum",
         "status": "dev",
         "versions": {
@@ -7545,87 +7881,21 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-arbitrum",
-            "query-id": "celer-bridge-arbitrum"
-          }
-        },
         "files": {
-          "template": "celer.bridge.template.yaml"
+          "template": "cbridge.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-polygon": {
-        "network": "polygon",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "prepare:constants": false
         },
         "services": {
           "hosted-service": {
-            "slug": "celer-bridge-polygon",
-            "query-id": "celer-bridge-polygon"
+            "slug": "cbridge-arbitrum",
+            "query-id": "cbridge-arbitrum"
           }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
         }
       },
-      "celer-bridge-avalanche": {
-        "network": "avalanche",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-avalanche",
-            "query-id": "celer-bridge-avalanche"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-fantom": {
-        "network": "fantom",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-fantom",
-            "query-id": "celer-bridge-fantom"
-          }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-aurora": {
+      "cbridge-aurora": {
         "network": "aurora",
         "status": "dev",
         "versions": {
@@ -7633,21 +7903,43 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-aurora",
-            "query-id": "celer-bridge-aurora"
-          }
-        },
         "files": {
-          "template": "celer.bridge.template.yaml"
+          "template": "cbridge.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-aurora",
+            "query-id": "cbridge-aurora"
+          }
         }
       },
-      "celer-bridge-boba": {
+      "cbridge-avalanche": {
+        "network": "avalanche",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "cbridge.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-avalanche",
+            "query-id": "cbridge-avalanche"
+          }
+        }
+      },
+      "cbridge-boba": {
         "network": "boba",
         "status": "dev",
         "versions": {
@@ -7655,65 +7947,43 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-boba",
-            "query-id": "celer-bridge-boba"
-          }
-        },
         "files": {
-          "template": "celer.bridge.template.yaml"
+          "template": "cbridge.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-boba",
+            "query-id": "cbridge-boba"
+          }
         }
       },
-      "celer-bridge-xdai": {
-        "network": "gnosis",
+      "cbridge-bsc": {
+        "network": "bsc",
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-xdai",
-            "query-id": "celer-bridge-xdai"
-          }
-        },
         "files": {
-          "template": "celer.bridge.template.yaml"
+          "template": "cbridge.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "celer-bridge-harmony": {
-        "network": "harmony",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "prepare:constants": false
         },
         "services": {
           "hosted-service": {
-            "slug": "celer-bridge-harmony",
-            "query-id": "celer-bridge-harmony"
+            "slug": "cbridge-bsc",
+            "query-id": "cbridge-bsc"
           }
-        },
-        "files": {
-          "template": "celer.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
         }
       },
-      "celer-bridge-celo": {
+      "cbridge-celo": {
         "network": "celo",
         "status": "dev",
         "versions": {
@@ -7721,43 +7991,87 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-celo",
-            "query-id": "celer-bridge-celo"
-          }
-        },
         "files": {
-          "template": "celer.bridge.template.yaml"
+          "template": "cbridge.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-celo",
+            "query-id": "cbridge-celo"
+          }
         }
       },
-      "celer-bridge-moonriver": {
-        "network": "moonriver",
+      "cbridge-fantom": {
+        "network": "fantom",
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-moonriver",
-            "query-id": "celer-bridge-moonriver"
-          }
-        },
         "files": {
-          "template": "celer.bridge.template.yaml"
+          "template": "cbridge.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-fantom",
+            "query-id": "cbridge-fantom"
+          }
         }
       },
-      "celer-bridge-moonbeam": {
+      "cbridge-gnosis": {
+        "network": "gnosis",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "cbridge.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-gnosis",
+            "query-id": "cbridge-gnosis"
+          }
+        }
+      },
+      "cbridge-harmony": {
+        "network": "harmony",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "cbridge.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-harmony",
+            "query-id": "cbridge-harmony"
+          }
+        }
+      },
+      "cbridge-moonbeam": {
         "network": "moonbeam",
         "status": "dev",
         "versions": {
@@ -7765,18 +8079,84 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "services": {
-          "hosted-service": {
-            "slug": "celer-bridge-moonbeam",
-            "query-id": "celer-bridge-moonbeam"
-          }
-        },
         "files": {
-          "template": "celer.bridge.template.yaml"
+          "template": "cbridge.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": true
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-moonbeam",
+            "query-id": "cbridge-moonbeam"
+          }
+        }
+      },
+      "cbridge-moonriver": {
+        "network": "moonriver",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "cbridge.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-moonriver",
+            "query-id": "cbridge-moonriver"
+          }
+        }
+      },
+      "cbridge-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "cbridge.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-optimism",
+            "query-id": "cbridge-optimism"
+          }
+        }
+      },
+      "cbridge-polygon": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "cbridge.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cbridge-polygon",
+            "query-id": "cbridge-polygon"
+          }
         }
       }
     }
@@ -7789,9 +8169,9 @@
     "deployments": {
       "gmx-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "1.0.2",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7811,9 +8191,9 @@
       },
       "gmx-avalanche": {
         "network": "avalanche",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "1.0.2",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -7955,6 +8335,272 @@
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        }
+      }
+    }
+  },
+  "mummy-finance": {
+    "schema": "derivatives-perpfutures",
+    "base": "mummy-finance",
+    "protocol": "mummy-finance",
+    "project": "mummy-finance",
+    "deployments": {
+      "mummy-finance-fantom": {
+        "network": "fantom",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mummy-finance-fantom",
+            "query-id": "mummy-finance-fantom"
+          }
+        },
+        "files": {
+          "template": "mummy.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "mummy-finance-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mummy-finance-optimism",
+            "query-id": "mummy-finance-optimism"
+          }
+        },
+        "files": {
+          "template": "mummy.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
+  "vela-exchange": {
+    "schema": "derivatives-perpfutures",
+    "base": "vela-exchange",
+    "protocol": "vela-exchange",
+    "project": "vela-exchange",
+    "deployments": {
+      "vela-exchange-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "vela-exchange-arbitrum",
+            "query-id": "vela-exchange-arbitrum"
+          }
+        },
+        "files": {
+          "template": "vela.exchange.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
+  "axelar": {
+    "schema": "bridge",
+    "base": "axelar",
+    "protocol": "axelar",
+    "project": "axelar-network",
+    "deployments": {
+      "axelar-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-ethereum",
+            "query-id": "axelar-ethereum"
+          }
+        }
+      },
+      "axelar-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-arbitrum",
+            "query-id": "axelar-arbitrum"
+          }
+        }
+      },
+      "axelar-avalanche": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-avalanche",
+            "query-id": "axelar-avalanche"
+          }
+        }
+      },
+      "axelar-bsc": {
+        "network": "bsc",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-bsc",
+            "query-id": "axelar-bsc"
+          }
+        }
+      },
+      "axelar-celo": {
+        "network": "celo",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-celo",
+            "query-id": "axelar-celo"
+          }
+        }
+      },
+      "axelar-fantom": {
+        "network": "fantom",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-fantom",
+            "query-id": "axelar-fantom"
+          }
+        }
+      },
+      "axelar-moonbeam": {
+        "network": "moonbeam",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-moonbeam",
+            "query-id": "axelar-moonbeam"
+          }
+        }
+      },
+      "axelar-polygon": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "1.1.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "axelar.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "axelar-polygon",
+            "query-id": "axelar-polygon"
+          }
         }
       }
     }

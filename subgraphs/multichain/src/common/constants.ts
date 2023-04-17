@@ -146,7 +146,7 @@ export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 export const ETH_DECIMALS = 18;
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 ////////////////////////
 ///// Type Helpers /////
@@ -258,28 +258,30 @@ NetworkByID.set("1000004280404", Network.APT);
 NetworkByID.set("1000005128531", Network.NAS);
 NetworkByID.set("1361940275777", Network.TERRA);
 
-const mainnetInacuratePricefeedTokens = [
-  Address.fromString("0x86A298581388bc199e61BFeCDcA8eA22Cf6C0Da3"), // anyGTPS
+const mainnetInaccuratePricefeedTokens = [
+  Address.fromString("0x86a298581388bc199e61bfecdca8ea22cf6c0da3"), // anyGTPS
+  Address.fromString("0x9b2f9f348425b1ef54c232f87ee7d4d570c1b552"), // anyHOGE
+  Address.fromString("0x015cea338ce68bd912b3c704620c6000ee9f4ab9"), // anyGCAKE
 ];
 
-export const INACURATE_PRICEFEED_TOKENS = new TypedMap<string, Address[]>();
-INACURATE_PRICEFEED_TOKENS.set(Network.ARBITRUM_ONE, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.AURORA, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.AVALANCHE, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.BOBA, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.BSC, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.CELO, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.CRONOS, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.FANTOM, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.FUSE, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.XDAI, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.HARMONY, []);
-INACURATE_PRICEFEED_TOKENS.set(
+export const INACCURATE_PRICEFEED_TOKENS = new TypedMap<string, Address[]>();
+INACCURATE_PRICEFEED_TOKENS.set(Network.ARBITRUM_ONE, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.AURORA, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.AVALANCHE, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.BOBA, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.BSC, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.CELO, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.CRONOS, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.FANTOM, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.FUSE, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.XDAI, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.HARMONY, []);
+INACCURATE_PRICEFEED_TOKENS.set(
   Network.MAINNET,
-  mainnetInacuratePricefeedTokens
+  mainnetInaccuratePricefeedTokens
 );
-INACURATE_PRICEFEED_TOKENS.set(Network.MOONBEAM, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.MOONRIVER, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.OPTIMISM, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.MATIC, []);
-INACURATE_PRICEFEED_TOKENS.set(Network.UNKNOWN_NETWORK, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.MOONBEAM, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.MOONRIVER, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.OPTIMISM, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.MATIC, []);
+INACCURATE_PRICEFEED_TOKENS.set(Network.UNKNOWN_NETWORK, []);

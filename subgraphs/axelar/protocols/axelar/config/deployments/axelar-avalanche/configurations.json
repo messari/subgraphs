@@ -1,0 +1,15 @@
+{
+  "network": "avalanche",
+  "AxelarGateway": {
+    "address": "0x5029C0EFf6C34351a0CEc334542cDb22c7928f78",
+    "startBlock": 8590881
+  },
+  "AxelarGasService": {
+    "address": "0x2d5d7d31F671F86C782533cc367F14109a082712",
+    "startBlock": 19369414
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 15484661
+}

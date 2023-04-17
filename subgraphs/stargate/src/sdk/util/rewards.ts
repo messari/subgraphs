@@ -191,29 +191,33 @@ export function getRewardsPerDay(
     }
   }
 
-  // Wideness of the window in seconds.
-  const windowSecondsCount = BigDecimal.fromString(
-    (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString()
-  );
+  const network = dataSource.network().toUpperCase().replace("-", "_");
+  if (network != Network.ARBITRUM_ONE) {
+    // Wideness of the window in seconds.
+    const windowSecondsCount = BigDecimal.fromString(
+      (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString()
+    );
 
-  // Wideness of the window in blocks.
-  const windowBlocksCount = BigDecimal.fromString(
-    (
-      currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + INT_ONE]
-    ).toString()
-  );
+    // Wideness of the window in blocks.
+    const windowBlocksCount = BigDecimal.fromString(
+      (
+        currentBlockNumberI32 -
+        blocks[circularBuffer.windowStartIndex + INT_ONE]
+      ).toString()
+    );
 
-  // Estimate block speed for the window in seconds.
-  const unnormalizedBlockSpeed =
-    WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
+    // Estimate block speed for the window in seconds.
+    const unnormalizedBlockSpeed =
+      WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
 
-  // block speed converted to specified rate.
-  const normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
-    WINDOW_SIZE_SECONDS_BD
-  ).times(unnormalizedBlockSpeed);
+    // block speed converted to specified rate.
+    const normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
+      WINDOW_SIZE_SECONDS_BD
+    ).times(unnormalizedBlockSpeed);
 
-  // Update BlockTracker with new values.
-  circularBuffer.blocksPerDay = normalizedBlockSpeed;
+    // Update BlockTracker with new values.
+    circularBuffer.blocksPerDay = normalizedBlockSpeed;
+  }
   circularBuffer.blocks = blocks;
 
   circularBuffer.save();
@@ -256,7 +260,7 @@ function getStartingBlockRate(): BigDecimal {
   if (network == Network.MAINNET) {
     return BigDecimal.fromString("13.39");
   } else if (network == Network.ARBITRUM_ONE) {
-    return BigDecimal.fromString("15");
+    return BigDecimal.fromString("12");
   } else if (network == Network.AURORA) {
     return BigDecimal.fromString("1.03");
   } else if (network == Network.BSC) {

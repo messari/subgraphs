@@ -1,0 +1,18 @@
+{
+  "deployment": "STARGATE_METIS",
+  "network": "metis",
+  "file": "./src/mappings/handlers.ts",
+  "lpStaking": [
+    {
+      "name": "LPStakingTime",
+      "address": "0x45A01E4e04F14f7A4a6702c74187c5F6222033cd",
+      "startBlock": 4320637,
+      "abi": "LPStakingTime",
+      "depositHandler": "handleStakeForTimeRewards",
+      "withdrawHandler": "handleUnstakeForTimeRewards"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

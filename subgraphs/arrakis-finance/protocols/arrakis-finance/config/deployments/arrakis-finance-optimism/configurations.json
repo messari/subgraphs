@@ -6,5 +6,11 @@
       "startBlock": 2146721
     }
   ],
-  "hasLiquidityGauge": false
+  "gaugeRegistry": [
+    {
+      "address": "0x2ff5d1da4985113f467bbbff015e76ce8ab05f29",
+      "startBlock": 4423425
+    }
+  ],
+  "hasLiquidityGauge": true
 }
