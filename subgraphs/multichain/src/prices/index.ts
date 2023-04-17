@@ -19,7 +19,7 @@ import * as SushiCalculations from "./calculations/CalculationsSushiswap";
 
 export function getUsdPricePerToken(
   tokenAddr: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): CustomPriceType {
   if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
     return new CustomPriceType();
@@ -128,7 +128,7 @@ export function getUsdPricePerToken(
 export function getUsdPrice(
   tokenAddr: Address,
   amount: BigDecimal,
-  block: ethereum.Block
+  block: ethereum.Block | null = null
 ): BigDecimal {
   const tokenPrice = getUsdPricePerToken(tokenAddr, block);
 

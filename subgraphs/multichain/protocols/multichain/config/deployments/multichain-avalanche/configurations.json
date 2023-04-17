@@ -128,6 +128,66 @@
       "address": "0x237917e8a998b37759c8ee2faa529d60c66c2927",
       "abi": "anyToken",
       "startBlock": 12259746
+    },
+    {
+      "name": "BridgeV2-21",
+      "address": "0xcaf5191fc480f43e4df80106c7695eca56e48b18",
+      "abi": "anyToken",
+      "startBlock": 6457688
+    },
+    {
+      "name": "BridgeV2-22",
+      "address": "0xe6b9d092223f39013656702a40dbe6b7decc5746",
+      "abi": "anyToken",
+      "startBlock": 8556956
+    },
+    {
+      "name": "BridgeV2-23",
+      "address": "0xd4d026322c88c2d49942a75dff920fcfbc5614c1",
+      "abi": "anyToken",
+      "startBlock": 7052990
+    },
+    {
+      "name": "BridgeV2-24",
+      "address": "0xdc42728b0ea910349ed3c6e1c9dc06b5fb591f98",
+      "abi": "anyToken",
+      "startBlock": 1101319
+    },
+    {
+      "name": "BridgeV2-25",
+      "address": "0x921f99719eb6c01b4b8f0ba7973a7c24891e740a",
+      "abi": "anyToken",
+      "startBlock": 8557009
+    },
+    {
+      "name": "BridgeV2-26",
+      "address": "0x993163cad35162fb579d7b64e6695cb076ef5064",
+      "abi": "anyToken",
+      "startBlock": 5572783
+    },
+    {
+      "name": "BridgeV2-27",
+      "address": "0x3d8f74620857dd8ed6d0da02ceb13fd0ed8ba678",
+      "abi": "anyToken",
+      "startBlock": 7358042
+    },
+    {
+      "name": "BridgeV2-28",
+      "address": "0x340fe1d898eccaad394e2ba0fc1f93d27c7b717a",
+      "abi": "anyToken",
+      "startBlock": 4981525
+    },
+    {
+      "name": "BridgeV2-29",
+      "address": "0x2cf51e73c3516f3d86e9c0b4de0971dbf0766fd4",
+      "abi": "anyToken",
+      "startBlock": 6457845
+    },
+    {
+      "name": "BridgeV2-30",
+      "address": "0x3ff1af9e583d3790ec51e1407c9e94d8d1133dc3",
+      "abi": "anyToken",
+      "startBlock": 15838932
     }
   ],
   "routerConfig": [

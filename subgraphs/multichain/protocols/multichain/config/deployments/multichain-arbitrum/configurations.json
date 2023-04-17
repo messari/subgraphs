@@ -85,15 +85,27 @@
     },
     {
       "name": "Router-3",
-      "address": "0xa71353bb71dda105d383b02fc2dd172c4d39ef8b",
-      "abi": "Router",
-      "startBlock": 36897402
-    },
-    {
-      "name": "Router-4",
       "address": "0x650Af55D5877F289837c30b94af91538a7504b76",
       "abi": "Router",
       "startBlock": 15315466
+    },
+    {
+      "name": "Router-4",
+      "address": "0xa71353bb71dda105d383b02fc2dd172c4d39ef8b",
+      "abi": "Router",
+      "startBlock": 12484297
+    },
+    {
+      "name": "Router-5",
+      "address": "0xcB9f441FFAE898e7A2f32143Fd79ac899517a9Dc",
+      "abi": "Router",
+      "startBlock": 40777821
+    },
+    {
+      "name": "Router-6",
+      "address": "0xbB29D2A58d880Af8AA5859e30470134dEAf84F2B",
+      "abi": "Router",
+      "startBlock": 72400091
     }
   ],
   "graftEnabled": false,

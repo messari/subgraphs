@@ -46,7 +46,7 @@ export const ROUTER_API_RESPONSE = `{
 ],
 "0xc9baa8cfdde8e328787e29b4b078abf2dadc2055:1": [
 	"0x4b641f607570b9053035780615f5b56a91f38f90",
-	"0.02,4.9,1000"
+	"0.02,9.9,1000"
 ],
 "0xc9baa8cfdde8e328787e29b4b078abf2dadc2055:10": [
 	"0x65e66a61d0a8f1e686c2d6083ad611a10d84d97a",
