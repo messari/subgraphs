@@ -1,7 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
 import * as utils from "./utils";
-import { addresses } from "../../config/addresses";
 import {
   FinancialsDailySnapshot,
   Protocol,
@@ -29,10 +28,10 @@ import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
 
 export function getOrCreateProtocol(): Protocol {
-  let protocol = Protocol.load(addresses.controller);
+  let protocol = Protocol.load(NetworkConfigs.getControllerAddress());
 
   if (!protocol) {
-    protocol = new Protocol(addresses.controller);
+    protocol = new Protocol(NetworkConfigs.getControllerAddress());
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
     protocol.network = NetworkConfigs.getNetwork();
