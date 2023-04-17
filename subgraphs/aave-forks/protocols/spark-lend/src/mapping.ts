@@ -5,6 +5,7 @@ import {
   ByteArray,
   Bytes,
   crypto,
+  ethereum,
   log,
 } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
@@ -328,39 +329,8 @@ export function handleBorrow(event: Borrow): void {
       "[handleBorrow]No receipt for tx {}; cannot set isIsolated flag",
       [event.transaction.hash.toHexString()]
     );
-  }
-
-  const eventSignature = crypto.keccak256(
-    ByteArray.fromUTF8("IsolationModeTotalDebtUpdated(address,uint256)")
-  );
-  const logs = event.receipt!.logs;
-  //IsolationModeTotalDebtUpdated emitted before Borrow's event.logIndex
-  // e.g. https://etherscan.io/tx/0x4b038b26555d4b6c057cd612057b39e6482a7c60eb44058ee61d299332efdf29#eventlog
-  const eventLogIndex = event.logIndex;
-  for (let i = 0; i < logs.length; i++) {
-    const thisLog = logs[i];
-    if (thisLog.logIndex.gt(eventLogIndex)) {
-      // no IsolationModeTotalDebtUpdated log before Borrow
-      break;
-    }
-    // topics[0] - signature
-    const logSignature = thisLog.topics[0];
-    if (
-      eventLogIndex.lt(thisLog.logIndex) &&
-      thisLog.address == event.address &&
-      logSignature == eventSignature
-    ) {
-      log.info(
-        "[handleBorrow]borrow position of asset {} by account {} is isolated tx {}",
-        [
-          event.params.reserve.toHexString(),
-          event.params.onBehalfOf.toHexString(),
-          event.transaction.hash.toHexString(),
-        ]
-      );
-      isIsolated = true;
-      break;
-    }
+  } else {
+    isIsolated = getIsIsolatedFlag(event);
   }
 
   let interestRateType: InterestRateType | null = null;
@@ -455,13 +425,29 @@ export function handleFlashloan(event: FlashLoan): void {
 /////////////////////////
 
 export function handleCollateralTransfer(event: CollateralTransfer): void {
+  // determine the transfer amount because different versions of the AToken contract
+  // pass discounted and undiscounted amount to Transfer() and BalanceTransfer() event
+  // here we get the higher of the two amount and use it as the transfer amount
+  // e.g. https://arbiscan.io/tx/0x7ee837a19f37f0f74acb75be2eb07de85adcf1fcca1b66e8d2118958ce4fe8a1#eventlog
+  // logIndex 18 and 21
+  let amount = event.params.value;
+  const receipt = event.receipt;
+  if (!receipt) {
+    log.warning("[handleBorrow]No receipt for tx {}", [
+      event.transaction.hash.toHexString(),
+    ]);
+  } else {
+    const btAmount = getBalanceTransferAmount(event);
+    amount = btAmount.gt(amount) ? btAmount : amount;
+  }
+
   _handleTransfer(
     event,
     protocolData,
     PositionSide.LENDER,
     event.params.to,
     event.params.from,
-    event.params.value
+    amount
   );
 }
 
@@ -571,4 +557,65 @@ function decodeConfig(
     .rightShift(startBitPosition);
 
   return config;
+}
+
+function getIsIsolatedFlag(event: ethereum.Event): boolean {
+  let isIsolated = false;
+  const eventSignature = crypto.keccak256(
+    ByteArray.fromUTF8("IsolationModeTotalDebtUpdated(address,uint256)")
+  );
+  const logs = event.receipt!.logs;
+  //IsolationModeTotalDebtUpdated emitted before Borrow's event.logIndex
+  // e.g. https://etherscan.io/tx/0x4b038b26555d4b6c057cd612057b39e6482a7c60eb44058ee61d299332efdf29#eventlog
+  const eventLogIndex = event.logIndex;
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs[i];
+    if (thisLog.logIndex.gt(eventLogIndex)) {
+      // no IsolationModeTotalDebtUpdated log before Borrow
+      break;
+    }
+    // topics[0] - signature
+    const logSignature = thisLog.topics[0];
+    if (thisLog.address == event.address && logSignature == eventSignature) {
+      log.info(
+        "[getIsIsolatedFlag]found IsolationModeTotalDebtUpdated event isolated=true tx {}",
+        [event.transaction.hash.toHexString()]
+      );
+      isIsolated = true;
+      break;
+    }
+  }
+  return isIsolated;
+}
+
+function getBalanceTransferAmount(event: ethereum.Event): BigInt {
+  let btAmount = BIGINT_ZERO;
+  const eventSignature = crypto.keccak256(
+    ByteArray.fromUTF8("BalanceTransfer(address, address, uint256, uint256)")
+  );
+  const logs = event.receipt!.logs;
+  // BalanceTransfer emitted after Transfer's event.logIndex
+  // e.g. https://arbiscan.io/tx/0x7ee837a19f37f0f74acb75be2eb07de85adcf1fcca1b66e8d2118958ce4fe8a1#eventlog
+  const eventLogIndex = event.logIndex;
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs[i];
+    if (thisLog.logIndex.le(eventLogIndex)) {
+      // skip event with logIndex < event.logIndex
+      continue;
+    }
+    // topics[0] - signature
+    const logSignature = thisLog.topics[0];
+    if (thisLog.address == event.address && logSignature == eventSignature) {
+      const decoded = ethereum
+        .decode("(uint256,uint256)", thisLog.data)!
+        .toTuple();
+      btAmount = decoded[0].toBigInt();
+      log.info("[handleCollateralTransfer] BalanceTransfer amount= {} tx {}", [
+        btAmount.toString(),
+        event.transaction.hash.toHexString(),
+      ]);
+      break;
+    }
+  }
+  return btAmount;
 }

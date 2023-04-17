@@ -177,6 +177,7 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleCollateralTransfer
+          receipt: true
       file: ./protocols/aave-v3/src/mapping.ts
   - kind: ethereum
     name: StableDebtToken

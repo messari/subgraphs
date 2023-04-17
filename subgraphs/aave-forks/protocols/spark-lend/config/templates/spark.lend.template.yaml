@@ -183,6 +183,7 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleCollateralTransfer
+          receipt: true
       file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: StableDebtToken
