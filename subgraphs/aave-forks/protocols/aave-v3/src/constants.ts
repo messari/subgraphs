@@ -21,6 +21,12 @@ export namespace Protocol {
 
 export const AAVE_DECIMALS = 8;
 
+export namespace InterestRateMode {
+  export const NONE = 0 as i32;
+  export const STABLE = 1 as i32;
+  export const VARIABLE = 2 as i32;
+}
+
 ////////////////////////////
 ///// Network Specific /////
 ////////////////////////////

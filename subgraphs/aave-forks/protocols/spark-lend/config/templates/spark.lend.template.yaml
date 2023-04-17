@@ -19,7 +19,7 @@ dataSources:
       startBlock: {{ factory.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - LendingProtocol
@@ -39,7 +39,7 @@ dataSources:
       startBlock: {{ lendingPoolConfigurator.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Market
@@ -85,7 +85,7 @@ dataSources:
       startBlock: {{ lendingPool.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Market
@@ -116,6 +116,7 @@ dataSources:
       eventHandlers:
         - event: Borrow(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
           handler: handleBorrow
+          receipt: true
         - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
           handler: handleLiquidationCall
         - event: Repay(indexed address,indexed address,indexed address,uint256,bool)
@@ -142,7 +143,7 @@ dataSources:
       startBlock: {{ RewardsController.startBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - RewardsController
@@ -171,7 +172,7 @@ templates:
       abi: AToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -190,7 +191,7 @@ templates:
       abi: StableDebtToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -209,7 +210,7 @@ templates:
       abi: VariableDebtToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:

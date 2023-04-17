@@ -87,8 +87,8 @@ export class PositionManager {
 
   setIsolation(isIsolated: boolean): void {
     if (this.position) {
-      this.position.isIsolated = isIsolated;
-      this.position.save();
+      this.position!.isIsolated = isIsolated;
+      this.position!.save();
     }
   }
 

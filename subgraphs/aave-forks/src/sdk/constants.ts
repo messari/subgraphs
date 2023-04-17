@@ -74,6 +74,7 @@ export namespace InterestRateType {
   export const VARIABLE = "VARIABLE";
   export const FIXED = "FIXED";
 }
+export type InterestRateType = string;
 
 export namespace InterestRateSide {
   export const LENDER = "LENDER";

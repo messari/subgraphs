@@ -2,7 +2,9 @@ import {
   Address,
   BigDecimal,
   BigInt,
+  ByteArray,
   Bytes,
+  crypto,
   log,
 } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
@@ -43,6 +45,7 @@ import {
 import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
+  InterestRateMode,
   Protocol,
 } from "./constants";
 import {
@@ -87,6 +90,7 @@ import {
   CollateralizationType,
   PermissionType,
   RiskType,
+  InterestRateType,
 } from "../../../src/sdk/constants";
 
 function getProtocolData(): ProtocolData {
@@ -313,12 +317,67 @@ export function handleWithdraw(event: Withdraw): void {
 }
 
 export function handleBorrow(event: Borrow): void {
+  // determine whether the borrow position is in isolated mode
+  // borrow in isolated mode will have an IsolationModeTotalDebtUpdated event emitted
+  // before the Borrow event
+  // https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/protocol/libraries/logic/BorrowLogic.sol#L139
+  let isIsolated = false;
+  const receipt = event.receipt;
+  if (!receipt) {
+    log.warning(
+      "[handleBorrow]No receipt for tx {}; cannot set isIsolated flag",
+      [event.transaction.hash.toHexString()]
+    );
+  }
+
+  const eventSignature = crypto.keccak256(
+    ByteArray.fromUTF8("IsolationModeTotalDebtUpdated(address,uint256)")
+  );
+  const logs = event.receipt!.logs;
+  //IsolationModeTotalDebtUpdated emitted before Borrow's event.logIndex
+  // e.g. https://etherscan.io/tx/0x4b038b26555d4b6c057cd612057b39e6482a7c60eb44058ee61d299332efdf29#eventlog
+  const eventLogIndex = event.logIndex;
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs[i];
+    if (thisLog.logIndex.gt(eventLogIndex)) {
+      // no IsolationModeTotalDebtUpdated log before Borrow
+      break;
+    }
+    // topics[0] - signature
+    const logSignature = thisLog.topics[0];
+    if (
+      eventLogIndex.lt(thisLog.logIndex) &&
+      thisLog.address == event.address &&
+      logSignature == eventSignature
+    ) {
+      log.info(
+        "[handleBorrow]borrow position of asset {} by account {} is isolated tx {}",
+        [
+          event.params.reserve.toHexString(),
+          event.params.onBehalfOf.toHexString(),
+          event.transaction.hash.toHexString(),
+        ]
+      );
+      isIsolated = true;
+      break;
+    }
+  }
+
+  let interestRateType: InterestRateType | null = null;
+  if (event.params.interestRateMode === InterestRateMode.STABLE) {
+    interestRateType = InterestRateType.STABLE;
+  } else if (event.params.interestRateMode === InterestRateMode.VARIABLE) {
+    interestRateType = InterestRateType.VARIABLE;
+  }
+
   _handleBorrow(
     event,
     event.params.amount,
     event.params.reserve,
     protocolData,
-    event.params.onBehalfOf
+    event.params.onBehalfOf,
+    interestRateType,
+    isIsolated
   );
 }
 
@@ -370,10 +429,10 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   );
 }
 
-export function handlehandleFlashloan(event: FlashLoan): void {
+export function handleFlashloan(event: FlashLoan): void {
   const premiumRate = _FlashLoanPremium.load(protocolData.protocolID);
   if (!premiumRate) {
-    log.error("[handlehandleFlashloan]_FlashLoanPremium with id {} not found", [
+    log.error("[handleFlashloan]_FlashLoanPremium with id {} not found", [
       protocolData.protocolID.toHexString(),
     ]);
     return;

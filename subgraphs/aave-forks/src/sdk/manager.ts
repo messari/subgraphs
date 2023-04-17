@@ -360,7 +360,8 @@ export class DataManager {
     amount: BigInt,
     amountUSD: BigDecimal,
     newBalance: BigInt,
-    interestType: string | null = null
+    interestType: string | null = null,
+    isIsolated: boolean = false
   ): Deposit {
     const depositor = new AccountManager(account);
     if (depositor.isNewUser()) {
@@ -381,6 +382,9 @@ export class DataManager {
       TransactionType.DEPOSIT,
       this.market.inputTokenPriceUSD
     );
+    if (isIsolated) {
+      position.setIsolation(isIsolated);
+    }
 
     const deposit = new Deposit(
       this.event.transaction.hash
@@ -478,7 +482,8 @@ export class DataManager {
     amountUSD: BigDecimal,
     newBalance: BigInt,
     tokenPriceUSD: BigDecimal, // used for different borrow token in CDP
-    interestType: string | null = null
+    interestType: string | null = null,
+    isIsolated: boolean = false
   ): Borrow {
     const borrower = new AccountManager(account);
     if (borrower.isNewUser()) {
@@ -499,6 +504,10 @@ export class DataManager {
       TransactionType.BORROW,
       tokenPriceUSD
     );
+
+    if (isIsolated) {
+      position.setIsolation(isIsolated);
+    }
 
     const borrow = new Borrow(
       this.event.transaction.hash

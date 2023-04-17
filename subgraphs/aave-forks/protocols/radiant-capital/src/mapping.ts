@@ -286,7 +286,7 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   );
 }
 
-export function handlehandleFlashloan(event: FlashLoan): void {
+export function handleFlashloan(event: FlashLoan): void {
   _handleFlashLoan(
     event.params.asset,
     event.params.amount,

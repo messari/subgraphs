@@ -683,17 +683,20 @@ export function _handleDeposit(
     ]);
     return;
   }
-  if (
-    !account._enabledCollaterals ||
-    account._enabledCollaterals!.indexOf(asset) == -1
-  ) {
-    return;
-  }
   const positionManager = new PositionManager(
     account,
     market,
     PositionSide.COLLATERAL
   );
+  if (
+    !account._enabledCollaterals ||
+    account._enabledCollaterals!.indexOf(asset) == -1
+  ) {
+    // Supply in isolated mode won't have ReserveUsedAsCollateralEnabled set
+    // https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/protocol/libraries/logic/SupplyLogic.sol#L76-L88
+    positionManager.setIsolation(true);
+    return;
+  }
   positionManager.setCollateral(true);
 }
 
@@ -733,7 +736,9 @@ export function _handleBorrow(
   amount: BigInt,
   asset: Address,
   protocolData: ProtocolData,
-  accountID: Address
+  accountID: Address,
+  interestRateType: InterestRateType | null = null,
+  isIsolated: boolean = false
 ): void {
   const market = getMarketFromToken(asset, protocolData);
   if (!market) {
@@ -750,13 +755,15 @@ export function _handleBorrow(
   );
   const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
   const newBorrowBalance = getBorrowBalance(market, accountID);
-  manager.createBorrow(
+  const borrow = manager.createBorrow(
     asset,
     accountID,
     amount,
     amountUSD,
     newBorrowBalance,
-    market.inputTokenPriceUSD
+    market.inputTokenPriceUSD,
+    interestRateType, //TODO
+    isIsolated
   );
 }
 
