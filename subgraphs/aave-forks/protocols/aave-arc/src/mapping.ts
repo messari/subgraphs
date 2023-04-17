@@ -76,7 +76,7 @@ import { Token, _DefaultOracle } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
 import { StakedAave } from "../../../generated/LendingPool/StakedAave";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
-import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { BalanceTransfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 import {

@@ -52,7 +52,7 @@ import {
 } from "../../../src/mapping";
 import { BIGDECIMAL_ZERO, PositionSide } from "../../../src/constants";
 import { updateMarketRewards } from "./rewards";
-import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { BalanceTransfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 import { DataManager, ProtocolData } from "../../../src/sdk/manager";
 import {

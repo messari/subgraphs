@@ -72,7 +72,7 @@ import {
 } from "../../../src/constants";
 import { ChefIncentivesController } from "../../../generated/LendingPool/ChefIncentivesController";
 import { SpookySwapOracle } from "../../../generated/LendingPool/SpookySwapOracle";
-import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { BalanceTransfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 import {
   DataManager,

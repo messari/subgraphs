@@ -153,7 +153,7 @@ templates:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
+        - event: BalanceTransfer(address indexed,address indexed,uint256,uint256)
           handler: handleCollateralTransfer
       file: ./protocols/radiant-capital-v2/src/mapping.ts
   - kind: ethereum/contract
