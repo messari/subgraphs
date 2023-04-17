@@ -4,7 +4,6 @@ import {
   BigInt,
   Bytes,
   ethereum,
-  log,
 } from "@graphprotocol/graph-ts";
 import {
   IncreasePosition,

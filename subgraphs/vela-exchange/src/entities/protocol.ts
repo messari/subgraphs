@@ -1,4 +1,4 @@
-import { BigDecimal, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, Bytes, ethereum} from "@graphprotocol/graph-ts";
 import { DerivPerpProtocol } from "../../generated/schema";
 import { Versions } from "../versions";
 import { EventType } from "./event";
