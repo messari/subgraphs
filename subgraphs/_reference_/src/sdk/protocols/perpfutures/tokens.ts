@@ -1,7 +1,21 @@
+import { Address, Bytes, log } from "@graphprotocol/graph-ts";
+
 import { Perpetual } from "./protocol";
 import * as constants from "../../util/constants";
-import { Address, Bytes, log } from "@graphprotocol/graph-ts";
+
 import { Token, RewardToken } from "../../../../generated/schema";
+
+/**
+ * This file contains the TokenClass, which acts as
+ * a wrapper for the Token entity making it easier to
+ * use in mappings and get info about the token.
+ *
+ * Schema Version:  1.3.0
+ * SDK Version:     1.1.0
+ * Author(s):
+ *  - @harsh9200
+ *  - @dhruv-chauhan
+ */
 
 export interface TokenInitializer {
   getTokenParams(address: Address): TokenParams;

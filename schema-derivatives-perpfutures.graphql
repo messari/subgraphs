@@ -1,5 +1,5 @@
 # Subgraph Schema: Derivatives Perpetual Futures
-# Version: 1.2.1
+# Version: 1.3.0
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -954,6 +954,9 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Number of unique daily users "
   dailyActiveUsers: Int!
 
+  " Number of cumulative users "
+  cumulativeUniqueUsers: Int!
+
   " Number of unique daily depositors "
   dailyActiveDepositors: Int!
 
@@ -1029,9 +1032,6 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
   " Daily Inflow trade notional volume in this pool, in USD, based on value of underlying assets coming into protocol from trade, at time of position open"
   dailyInflowVolumeUSD: BigDecimal!
 
-  " Inflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming into protocol from trade, at the time of position opened. "
-  cumulativeInflowVolumeUSD: BigDecimal!
-
   " Daily Inflow trade notional volume occurred in in this pool for a specific input token, in native amount, at time of position open. The ordering should be the same as the pool's `inputTokens` field. "
   dailyInflowVolumeByTokenAmount: [BigInt!]!
 
@@ -1061,9 +1061,6 @@ type LiquidityPoolDailySnapshot @entity(immutable: true) {
 
   " Cumulative closed inflow volume of pool in USD "
   cumulativeClosedInflowVolumeByTokenUSD: [BigDecimal!]!
-
-  " Inflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming into protocol from trade, at the time of position closed. "
-  cumulativeClosedInflowVolumeUSD: BigDecimal!
 
   " Inflow historical trade notional volume occurred in this pool, in USD, based on value of underlying assets coming into protocol from trade, at the time of position closed. "
   cumulativeClosedInflowVolumeUSD: BigDecimal!
@@ -1445,9 +1442,6 @@ type Borrow implements Event @entity(immutable: true) {
   " Address that sent the tokens "
   from: Bytes!
 
-  " Account that controls this transaction "
-  account: Account!
-
   " Block number of this event "
   blockNumber: BigInt!
 
@@ -1655,7 +1649,7 @@ type Liquidate implements Event @entity(immutable: true) {
   timestamp: BigInt!
 
   " Account that carried out the liquidation "
-  liquidator: Account!
+  account: Account!
 
   " Account that got liquidated "
   liquidatee: Account!
@@ -1755,7 +1749,7 @@ type Account @entity {
   swapCount: Int!
 
   " All liquidation events where this account was the liquidator "
-  liquidates: [Liquidate!]! @derivedFrom(field: "liquidator")
+  liquidates: [Liquidate!]! @derivedFrom(field: "account")
 
   " Number of times this account liquidated a position "
   liquidateCount: Int!
