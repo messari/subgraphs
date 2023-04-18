@@ -1074,10 +1074,8 @@ export function _handleAssetConfigUpdated(
   }
 
   const rewardTokenManager = new TokenManager(rewardTokenAddress, event);
-  const rewardToken = rewardTokenManager.getOrCreateRewardToken(
-    rewardTokenType,
-    interestRateType
-  );
+  const rewardToken =
+    rewardTokenManager.getOrCreateRewardToken(rewardTokenType);
   rewardToken._distributionEnd = distributionEnd;
   rewardToken.save();
 

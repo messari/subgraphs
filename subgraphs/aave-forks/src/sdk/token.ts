@@ -84,15 +84,8 @@ export class TokenManager {
   ///// Creators /////
   ////////////////////
 
-  getOrCreateRewardToken(
-    rewardTokenType: string,
-    interestRateType: string | null = null
-  ): RewardToken {
-    let rewardTokenID = rewardTokenType;
-    if (interestRateType) {
-      rewardTokenID = rewardTokenID.concat("-").concat(interestRateType);
-    }
-    rewardTokenID = rewardTokenID
+  getOrCreateRewardToken(rewardTokenType: string): RewardToken {
+    const rewardTokenID = rewardTokenType
       .concat("-")
       .concat(this.token.id.toHexString());
     let rewardToken = RewardToken.load(rewardTokenID);
