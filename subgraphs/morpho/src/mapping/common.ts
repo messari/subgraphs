@@ -898,7 +898,7 @@ export function _handleSupplierPositionUpdated(
   inP2P: BigInt
 ): void {
   const market = getMarket(marketAddress);
-  let account = Account.load(accountID);
+  const account = Account.load(accountID);
   if (!account) {
     log.critical("Account not found for accountID: {}", [
       accountID.toHexString(),

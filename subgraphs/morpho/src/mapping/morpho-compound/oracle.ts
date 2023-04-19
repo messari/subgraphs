@@ -27,7 +27,7 @@ export function handlePriceUpdated(event: PriceUpdated): void {
     return;
   }
   // Map between the hash of a symbol and its address
-  let hashToSymbol = new Map<string, string>();
+  const hashToSymbol = new Map<string, string>();
   hashToSymbol.set(
     "0xa5e92f3efb6826155f1f728e162af9d7cda33a574a1153b58f03ea01cc37e568",
     "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
