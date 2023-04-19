@@ -31,6 +31,7 @@ import {
 } from "../../generated/SpokePool/SpokePool";
 import { AcceleratingDistributor } from "../../generated/SpokePool/AcceleratingDistributor";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
+import { _ERC20 } from "../../generated/SpokePool/_ERC20";
 
 export function handleFilledRelay(event: FilledRelay): void {
   // Chain
@@ -104,6 +105,21 @@ export function handleFilledRelay(event: FilledRelay): void {
     event.params.amount,
     event.transaction.hash
   );
+
+  // TVL
+  let inputTokenBalance: BigInt;
+  const erc20 = _ERC20.bind(inputTokenAddress);
+  const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
+  if (inputTokenBalanceResult.reverted) {
+    log.info(
+      "[ERC20:balanceOf()] calculate token balance owned by bridge contract reverted",
+      []
+    );
+  } else {
+    inputTokenBalance = inputTokenBalanceResult.value;
+  }
+
+  pool.setInputTokenBalance(inputTokenBalance!);
 
   // Revenue
   // Note: We take the amount from crossChain (origin) and multiplying by inputToken price (destination).
@@ -223,4 +239,19 @@ export function handleFundsDeposited(event: FundsDeposited): void {
     event.params.amount,
     event.transaction.hash
   );
+
+  // TVL
+  let inputTokenBalance: BigInt;
+  const erc20 = _ERC20.bind(inputTokenAddress);
+  const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
+  if (inputTokenBalanceResult.reverted) {
+    log.info(
+      "[ERC20:balanceOf()] calculate token balance owned by bridge contract reverted",
+      []
+    );
+  } else {
+    inputTokenBalance = inputTokenBalanceResult.value;
+  }
+
+  pool.setInputTokenBalance(inputTokenBalance!);
 }
