@@ -6837,12 +6837,38 @@
     "protocol": "the-graph",
     "project": "the-graph",
     "deployments": {
+      "the-graph-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "1.4.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "the-graph-arbitrum",
+            "query-id": "the-graph-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "the-graph-arbitrum",
+            "query-id": "UNKNOWN"
+          }
+        },
+        "files": {
+          "template": "theGraphTemplate.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
       "the-graph-ethereum": {
         "network": "ethereum",
         "status": "prod",
         "versions": {
           "schema": "1.4.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6856,11 +6882,11 @@
           }
         },
         "files": {
-          "template": "the.graph.template.yaml"
+          "template": "theGraphTemplate.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     }
