@@ -61,7 +61,12 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
-    pool.initialize(token.name, token.symbol, BridgePoolType.LIQUIDITY, token);
+    pool.initialize(
+      token.name,
+      token.symbol,
+      BridgePoolType.LOCK_RELEASE,
+      token
+    );
     pool.pool.outputToken = outputToken.id;
     pool.pool.save();
   }
@@ -108,7 +113,12 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
-    pool.initialize(token.name, token.symbol, BridgePoolType.LIQUIDITY, token);
+    pool.initialize(
+      token.name,
+      token.symbol,
+      BridgePoolType.LOCK_RELEASE,
+      token
+    );
     pool.pool.outputToken = outputToken.id;
     pool.pool.save();
   }
