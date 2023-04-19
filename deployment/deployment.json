@@ -6839,7 +6839,7 @@
     "deployments": {
       "the-graph-arbitrum": {
         "network": "arbitrum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.4.0",
           "subgraph": "1.0.0",
