@@ -72,3 +72,7 @@ N/A
 ## Smart Contracts Interactions
 
 ![Aave V3](../../docs/images/protocols/aave-v3.png "Aave V3")
+
+## Notes
+
+- Risk Type: beside common collateral and loan in global risk type, aave-v3 provides an isolation mode whether suppliers of isolated assets can only borrow assets that are borrowable in isolation mode. Since most of collateral and borrow are in global model, we set the riskType field of the procotol to "GLOBAL". We may change it to "MIXED" in the future when we add an "MIXED" risk type.
