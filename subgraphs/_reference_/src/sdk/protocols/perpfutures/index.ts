@@ -1,9 +1,10 @@
+import { ethereum } from "@graphprotocol/graph-ts";
+
 import { PoolManager } from "./pool";
-import { Position } from "./position";
+import { PositionManager } from "./position";
 import { Perpetual } from "./protocol";
 import { AccountManager } from "./account";
 import * as constants from "../../util/constants";
-import { ethereum } from "@graphprotocol/graph-ts";
 import { CustomEventType } from "../../util/events";
 import { TokenInitializer, TokenManager } from "./tokens";
 import { ProtocolConfigurer, TokenPricer } from "../config";
@@ -12,7 +13,7 @@ export class SDK {
   Protocol: Perpetual;
   Accounts: AccountManager;
   Pools: PoolManager;
-  Position: Position;
+  Positions: PositionManager;
   Tokens: TokenManager;
   Pricer: TokenPricer;
 
@@ -26,7 +27,7 @@ export class SDK {
     this.Tokens = new TokenManager(this.Protocol, tokenInitializer);
     this.Accounts = new AccountManager(this.Protocol, this.Tokens);
     this.Pools = new PoolManager(this.Protocol, this.Tokens);
-    this.Position = new Position(this.Protocol, this.Tokens);
+    this.Positions = new PositionManager(this.Protocol, this.Tokens);
     this.Pricer = pricer;
 
     this.Protocol.sdk = this;

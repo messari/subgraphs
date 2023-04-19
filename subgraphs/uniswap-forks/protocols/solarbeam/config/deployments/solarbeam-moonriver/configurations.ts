@@ -41,12 +41,12 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0x049581aEB6Fe262727f290165C29BDAB065a1B68");
+    return toLowerCase("0x049581aeb6fe262727f290165c29bdab065a1b68");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
       Address.fromString(
-        toLowerCase("0x049581aEB6Fe262727f290165C29BDAB065a1B68")
+        toLowerCase("0x049581aeb6fe262727f290165c29bdab065a1b68")
       )
     );
   }

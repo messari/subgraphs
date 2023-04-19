@@ -1,3 +1,10 @@
+import { BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+
+import { TransactionType } from "./enums";
+import { AccountWasActive } from "./account";
+import * as constants from "../../util/constants";
+import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+
 import {
   _ActivityHelper,
   FinancialsDailySnapshot,
@@ -5,21 +12,17 @@ import {
   UsageMetricsHourlySnapshot,
   DerivPerpProtocol as PerpetualSchema,
 } from "../../../../generated/schema";
-import { TransactionType } from "./enums";
-import { AccountWasActive } from "./account";
-import { BigInt, Bytes } from "@graphprotocol/graph-ts";
-import * as constants from "../../util/constants";
-import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 /**
  * This file contains the ProtocolSnapshot, which is used to
  * make all of the storage changes that occur in the protocol's
  * daily and hourly snapshots.
  *
- * Schema Version:  1.2.0
- * SDK Version:     1.0.0
+ * Schema Version:  1.3.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @harsh9200
+ *  - @dhruv-chauhan
  */
 
 export class ProtocolSnapshot {
@@ -39,7 +42,7 @@ export class ProtocolSnapshot {
     this.dailyActivityHelper = initActivityHelper(
       Bytes.fromUTF8("daily-".concat(this.dayID.toString()))
     );
-    this.dailyActivityHelper = initActivityHelper(
+    this.hourlyActivityHelper = initActivityHelper(
       Bytes.fromUTF8("hourly-".concat(this.hourID.toString()))
     );
 
@@ -97,12 +100,18 @@ export class ProtocolSnapshot {
   }
 
   private takeSnapshots(): void {
-    if (!this.protocol._lastUpdateTimestamp) return;
+    if (!this.protocol._lastUpdateTimestamp) {
+      log.error(
+        "[isInitialized] cannot create snapshots, protocol: {} not initialized",
+        [this.protocol.id.toHexString()]
+      );
+      return;
+    }
 
     const snapshotDayID =
-      this.protocol._lastUpdateTimestamp.toI32() / constants.SECONDS_PER_DAY;
+      this.protocol._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_DAY;
     const snapshotHourID =
-      this.protocol._lastUpdateTimestamp.toI32() / constants.SECONDS_PER_HOUR;
+      this.protocol._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_HOUR;
 
     if (snapshotDayID != this.dayID) {
       this.takeFinancialsDailySnapshot(snapshotDayID);
@@ -122,7 +131,7 @@ export class ProtocolSnapshot {
     const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
 
     const previousSnapshot = FinancialsDailySnapshot.load(
-      Bytes.fromBigInt(this.protocol._lastSnapshotDayID!)
+      Bytes.fromI32(this.protocol._lastSnapshotDayID!.toI32())
     );
 
     snapshot.days = day;
@@ -249,7 +258,7 @@ export class ProtocolSnapshot {
 
     const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
     const previousSnapshot = UsageMetricsDailySnapshot.load(
-      Bytes.fromBigInt(this.protocol._lastSnapshotDayID!)
+      Bytes.fromI32(this.protocol._lastSnapshotDayID!.toI32())
     );
 
     snapshot.days = day;
@@ -353,7 +362,7 @@ export class ProtocolSnapshot {
   }
 }
 
-function initActivityHelper(id: Bytes): _ActivityHelper {
+export function initActivityHelper(id: Bytes): _ActivityHelper {
   let activityHelper = _ActivityHelper.load(id);
 
   if (!activityHelper) {
