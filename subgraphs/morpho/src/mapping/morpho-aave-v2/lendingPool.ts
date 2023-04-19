@@ -1,31 +1,14 @@
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
-
-import {
-  LendingProtocol,
-  UnderlyingTokenMapping,
-} from "../../../generated/schema";
+import { Address } from "@graphprotocol/graph-ts";
+import { UnderlyingTokenMapping } from "../../../generated/schema";
 import { ReserveDataUpdated } from "../../../generated/templates/LendingPool/LendingPool";
-import { MORPHO_AAVE_V2_ADDRESS } from "../../constants";
-import { fetchAssetPrice } from "../../utils/aaveV2/fetchers";
+import { MORPHO_AAVE_V2_ADDRESS, ReserveUpdateParams } from "../../constants";
 import {
-  getMarket,
-  getOrInitLendingProtocol,
-  getOrInitToken,
-} from "../../utils/initializers";
+  fetchAssetPrice,
+  fetchMorphoPositionsAaveV2,
+  getAaveProtocol,
+} from "./fetchers";
+import { getMarket, getOrInitToken } from "../../utils/initializers";
 import { _handleReserveUpdate } from "../common";
-
-export class ReserveUpdateParams {
-  constructor(
-    public readonly event: ethereum.Event,
-    public readonly marketAddress: Bytes,
-    public readonly protocol: LendingProtocol,
-    public readonly reserveSupplyIndex: BigInt,
-    public readonly reserveBorrowIndex: BigInt,
-
-    public readonly poolSupplyRate: BigInt,
-    public readonly poolBorrowRate: BigInt
-  ) {}
-}
 
 /**
  * Updates the reserve data for the given reserve
@@ -39,7 +22,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
   const market = getMarket(aTokenAddress);
   const inputToken = getOrInitToken(event.params.reserve);
-  const protocol = getOrInitLendingProtocol(MORPHO_AAVE_V2_ADDRESS);
+  const protocol = getAaveProtocol(MORPHO_AAVE_V2_ADDRESS);
 
   // update the token price frequently
   const tokenPrice = fetchAssetPrice(market);
@@ -57,5 +40,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.liquidityRate,
     event.params.variableBorrowRate
   );
-  _handleReserveUpdate(params);
+
+  const morphoPositions = fetchMorphoPositionsAaveV2(market);
+  _handleReserveUpdate(params, morphoPositions, market);
 }

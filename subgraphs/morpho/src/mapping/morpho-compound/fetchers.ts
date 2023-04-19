@@ -1,15 +1,41 @@
 import { Address } from "@graphprotocol/graph-ts";
-
-import { CToken } from "../../../generated/MorphoCompound/CToken";
-import { MorphoCompound } from "../../../generated/MorphoCompound/MorphoCompound";
-import { Market } from "../../../generated/schema";
+import { CToken } from "../../../generated/Morpho/CToken";
+import { MorphoCompound } from "../../../generated/Morpho/MorphoCompound";
+import { LendingProtocol, Market } from "../../../generated/schema";
 import {
   exponentToBigDecimal,
   exponentToBigInt,
   MORPHO_COMPOUND_ADDRESS,
 } from "../../constants";
-import { MorphoPositions } from "../../mapping/common";
-import { getOrInitToken } from "../initializers";
+import { MorphoPositions } from "../common";
+import {
+  getOrInitLendingProtocol,
+  getOrInitToken,
+} from "../../utils/initializers";
+import { Comptroller } from "../../../generated/templates";
+
+export function getCompoundProtocol(protocolAddress: Address): LendingProtocol {
+  const morpho = getOrInitLendingProtocol(protocolAddress);
+
+  if (morpho.isNew) {
+    const morphoContract = MorphoCompound.bind(protocolAddress);
+    Comptroller.create(morphoContract.comptroller());
+
+    const defaultMaxGas = morphoContract.defaultMaxGasForMatching();
+    morpho.protocol._defaultMaxGasForMatchingSupply = defaultMaxGas.getSupply();
+    morpho.protocol._defaultMaxGasForMatchingBorrow = defaultMaxGas.getBorrow();
+    morpho.protocol._defaultMaxGasForMatchingWithdraw =
+      defaultMaxGas.getWithdraw();
+    morpho.protocol._defaultMaxGasForMatchingRepay = defaultMaxGas.getRepay();
+
+    morpho.protocol._maxSortedUsers = morphoContract.maxSortedUsers();
+
+    morpho.protocol._owner = morphoContract.owner();
+    morpho.protocol.save();
+  }
+
+  return morpho.protocol;
+}
 
 export const fetchMorphoPositionsCompound = (
   market: Market

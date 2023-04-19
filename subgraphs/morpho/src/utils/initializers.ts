@@ -1,22 +1,13 @@
 import { Address, BigDecimal, Bytes, log } from "@graphprotocol/graph-ts";
-
-import { ERC20 } from "../../generated/MorphoAaveV2/ERC20";
-import { LendingPool } from "../../generated/MorphoAaveV2/LendingPool";
-import { LendingPoolAddressesProvider } from "../../generated/MorphoAaveV2/LendingPoolAddressesProvider";
-import { MorphoAaveV2 } from "../../generated/MorphoAaveV2/MorphoAaveV2";
-import { MorphoCompound } from "../../generated/MorphoCompound/MorphoCompound";
+import { ERC20 } from "../../generated/Morpho/ERC20";
 import {
   Token,
   LendingProtocol,
   Market,
   _MarketList,
 } from "../../generated/schema";
-import {
-  Comptroller,
-  LendingPool as LendingPoolTemplate,
-} from "../../generated/templates";
-import { LendingPoolConfigurator as LendingPoolConfiguratorTemplate } from "../../generated/templates";
-import { MORPHO_AAVE_V2_ADDRESS, MORPHO_COMPOUND_ADDRESS } from "../constants";
+import { ProtocolType, getProtocolData } from "../constants";
+import { Versions } from "../versions";
 
 export const getOrInitToken = (tokenAddress: Bytes): Token => {
   let token = Token.load(tokenAddress);
@@ -32,65 +23,35 @@ export const getOrInitToken = (tokenAddress: Bytes): Token => {
   return token;
 };
 
+export class MorphoProtocol {
+  constructor(
+    public readonly protocol: LendingProtocol,
+    public readonly isNew: boolean
+  ) {}
+}
+
 export const getOrInitLendingProtocol = (
   protocolAddress: Address
-): LendingProtocol => {
+): MorphoProtocol => {
   let protocol = LendingProtocol.load(protocolAddress);
+  let isNew = false;
   if (!protocol) {
+    isNew = true;
     protocol = new LendingProtocol(protocolAddress);
+    const data = getProtocolData(protocolAddress);
 
-    if (protocolAddress.equals(MORPHO_AAVE_V2_ADDRESS)) {
-      const morpho = MorphoAaveV2.bind(protocolAddress);
-      const lendingPool = LendingPool.bind(morpho.pool());
-      LendingPoolTemplate.create(lendingPool._address);
-      const addressesProvider = LendingPoolAddressesProvider.bind(
-        morpho.addressesProvider()
-      );
-      LendingPoolConfiguratorTemplate.create(
-        addressesProvider.getLendingPoolConfigurator()
-      );
-      protocol.name = "Morpho Aave V2";
-      protocol.slug = "morpho-aave-v2";
-      protocol.schemaVersion = "0.0.5";
-      protocol.subgraphVersion = "0.0.5";
-      protocol.methodologyVersion = "0.0.5";
-      const defaultMaxGas = morpho.defaultMaxGasForMatching();
-      protocol.defaultMaxGasForMatchingSupply = defaultMaxGas.getSupply();
-      protocol.defaultMaxGasForMatchingBorrow = defaultMaxGas.getBorrow();
-      protocol.defaultMaxGasForMatchingWithdraw = defaultMaxGas.getWithdraw();
-      protocol.defaultMaxGasForMatchingRepay = defaultMaxGas.getRepay();
+    protocol.name = data.name;
+    protocol.slug = data.slug;
+    protocol.protocol = data.protocol;
+    protocol.network = data.network;
+    protocol.type = ProtocolType.LENDING;
+    protocol.lendingType = data.lendingType;
+    protocol.lenderPermissionType = data.lenderPermissionType;
+    protocol.borrowerPermissionType = data.borrowerPermissionType;
+    protocol.poolCreatorPermissionType = data.poolCreatorPermissionType;
+    protocol.collateralizationType = data.collateralizationType;
+    protocol.riskType = data.riskType;
 
-      protocol.maxSortedUsers = morpho.maxSortedUsers();
-
-      protocol.owner = morpho.owner();
-    } else if (protocolAddress.equals(MORPHO_COMPOUND_ADDRESS)) {
-      const morpho = MorphoCompound.bind(protocolAddress);
-      Comptroller.create(morpho.comptroller());
-
-      protocol.name = "Morpho Compound";
-      protocol.slug = "morpho-compound";
-      protocol.schemaVersion = "0.0.5";
-      protocol.subgraphVersion = "0.0.5";
-      protocol.methodologyVersion = "0.0.5";
-      const defaultMaxGas = morpho.defaultMaxGasForMatching();
-      protocol.defaultMaxGasForMatchingSupply = defaultMaxGas.getSupply();
-      protocol.defaultMaxGasForMatchingBorrow = defaultMaxGas.getBorrow();
-      protocol.defaultMaxGasForMatchingWithdraw = defaultMaxGas.getWithdraw();
-      protocol.defaultMaxGasForMatchingRepay = defaultMaxGas.getRepay();
-
-      protocol.maxSortedUsers = morpho.maxSortedUsers();
-
-      protocol.owner = morpho.owner();
-    } else {
-      log.critical("Unknown protocol address: {}", [
-        protocolAddress.toHexString(),
-      ]);
-      return new LendingProtocol(Bytes.fromHexString("0x0"));
-    }
-    protocol.protocol = "Morpho";
-    protocol.network = "MAINNET";
-    protocol.type = "LENDING";
-    protocol.lendingType = "CDP";
     protocol.cumulativeUniqueUsers = 0 as i32;
     protocol.cumulativeUniqueDepositors = 0 as i32;
     protocol.cumulativeUniqueBorrowers = 0 as i32;
@@ -122,12 +83,14 @@ export const getOrInitLendingProtocol = (
     // There is no transfer or flashloan event in Morpho.
     protocol.transferCount = 0 as i32;
     protocol.flashloanCount = 0 as i32;
-
-    // Morpho specific
-
-    protocol.save();
   }
-  return protocol;
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+  protocol.save();
+
+  return new MorphoProtocol(protocol, isNew);
 };
 
 export const getOrInitMarketList = (protocolAddress: Address): _MarketList => {
@@ -141,7 +104,7 @@ export const getOrInitMarketList = (protocolAddress: Address): _MarketList => {
 };
 
 // ###############################
-// ##### Market-Level Metadata #####
+// ##### Market-Level Metadata ###
 // ###############################
 
 export const getMarket = (marketAddress: Bytes): Market => {

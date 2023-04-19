@@ -1,5 +1,4 @@
 import { Address } from "@graphprotocol/graph-ts";
-
 import { Market } from "../../../generated/schema";
 import { CompoundOracle } from "../../../generated/templates";
 import {
@@ -16,7 +15,8 @@ import {
   exponentToBigDecimal,
   MORPHO_COMPOUND_ADDRESS,
 } from "../../constants";
-import { getMarket, getOrInitLendingProtocol } from "../../utils/initializers";
+import { getMarket } from "../../utils/initializers";
+import { getCompoundProtocol } from "./fetchers";
 
 export function handleCompBorrowSpeedUpdated(
   event: CompBorrowSpeedUpdated
@@ -34,7 +34,7 @@ export function handleNewBorrowCap(event: NewBorrowCap): void {
 }
 
 export function handleNewCloseFactor(event: NewCloseFactor): void {
-  const protocol = getOrInitLendingProtocol(MORPHO_COMPOUND_ADDRESS);
+  const protocol = getCompoundProtocol(MORPHO_COMPOUND_ADDRESS);
   const closeFactor = event.params.newCloseFactorMantissa
     .toBigDecimal()
     .div(exponentToBigDecimal(DEFAULT_DECIMALS))
@@ -62,8 +62,8 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
     ) // Blacklist broken oracle
   )
     return;
-  const protocol = getOrInitLendingProtocol(MORPHO_COMPOUND_ADDRESS);
-  protocol.oracle = event.params.newPriceOracle;
+  const protocol = getCompoundProtocol(MORPHO_COMPOUND_ADDRESS);
+  protocol._oracle = event.params.newPriceOracle;
   protocol.save();
   CompoundOracle.create(event.params.newPriceOracle);
 }

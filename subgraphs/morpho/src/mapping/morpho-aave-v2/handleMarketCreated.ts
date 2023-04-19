@@ -1,26 +1,22 @@
 import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-
-import { AToken } from "../../../generated/MorphoAaveV2/AToken";
-import { ERC20 } from "../../../generated/MorphoAaveV2/ERC20";
-import { LendingPool } from "../../../generated/MorphoAaveV2/LendingPool";
-import { LendingPoolAddressesProvider } from "../../../generated/MorphoAaveV2/LendingPoolAddressesProvider";
+import { AToken } from "../../../generated/Morpho/AToken";
+import { ERC20 } from "../../../generated/Morpho/ERC20";
+import { LendingPool } from "../../../generated/Morpho/LendingPool";
+import { LendingPoolAddressesProvider } from "../../../generated/Morpho/LendingPoolAddressesProvider";
 import {
   MarketCreated,
   MorphoAaveV2,
-} from "../../../generated/MorphoAaveV2/MorphoAaveV2";
-import { PriceOracle } from "../../../generated/MorphoAaveV2/PriceOracle";
-import { ProtocolDataProvider } from "../../../generated/MorphoAaveV2/ProtocolDataProvider";
+} from "../../../generated/Morpho/MorphoAaveV2";
+import { PriceOracle } from "../../../generated/Morpho/PriceOracle";
+import { ProtocolDataProvider } from "../../../generated/Morpho/ProtocolDataProvider";
 import { Market, UnderlyingTokenMapping } from "../../../generated/schema";
 import { BASE_UNITS, WAD } from "../../constants";
-import {
-  getOrInitLendingProtocol,
-  getOrInitMarketList,
-  getOrInitToken,
-} from "../../utils/initializers";
+import { getOrInitMarketList, getOrInitToken } from "../../utils/initializers";
+import { getAaveProtocol } from "./fetchers";
 
 export function handleMarketCreated(event: MarketCreated): void {
   // Sync protocol creation since MarketCreated is the first event emitted
-  const protocol = getOrInitLendingProtocol(event.address);
+  const protocol = getAaveProtocol(event.address);
   protocol.totalPoolCount = protocol.totalPoolCount + 1;
   protocol.save();
 
@@ -133,19 +129,19 @@ export function handleMarketCreated(event: MarketCreated): void {
   market._virtualScaledSupply = BigInt.zero();
   market._virtualScaledBorrow = BigInt.zero();
 
-  market.isP2PDisabled = morphoMarket.getIsP2PDisabled();
+  market._isP2PDisabled = morphoMarket.getIsP2PDisabled();
 
   market.reserveFactor = BigInt.fromI32(morphoMarket.getReserveFactor())
     .toBigDecimal()
     .div(BASE_UNITS);
-  market.p2pIndexCursor = BigInt.fromI32(morphoMarket.getP2pIndexCursor())
+  market._p2pIndexCursor = BigInt.fromI32(morphoMarket.getP2pIndexCursor())
     .toBigDecimal()
     .div(BASE_UNITS);
 
-  market.totalSupplyOnPool = BigDecimal.zero();
-  market.totalBorrowOnPool = BigDecimal.zero();
-  market.totalSupplyInP2P = BigDecimal.zero();
-  market.totalBorrowInP2P = BigDecimal.zero();
+  market._totalSupplyOnPool = BigDecimal.zero();
+  market._totalBorrowOnPool = BigDecimal.zero();
+  market._totalSupplyInP2P = BigDecimal.zero();
+  market._totalBorrowInP2P = BigDecimal.zero();
 
   const deltas = morpho.deltas(event.params._poolToken);
   market._p2pSupplyAmount = deltas.getP2pSupplyAmount();
@@ -154,8 +150,8 @@ export function handleMarketCreated(event: MarketCreated): void {
   market._p2pSupplyDelta = deltas.getP2pSupplyDelta();
   market._p2pBorrowDelta = deltas.getP2pBorrowDelta();
 
-  market.poolSupplyAmount = BigInt.zero();
-  market.poolBorrowAmount = BigInt.zero();
+  market._poolSupplyAmount = BigInt.zero();
+  market._poolBorrowAmount = BigInt.zero();
 
   const tokenMapping = new UnderlyingTokenMapping(underlying._address);
   tokenMapping.aToken = event.params._poolToken;
@@ -165,25 +161,25 @@ export function handleMarketCreated(event: MarketCreated): void {
   tokenMapping.debtToken = tokenAddresses.getVariableDebtTokenAddress();
   tokenMapping.save();
 
-  market.isSupplyPaused = false;
-  market.isBorrowPaused = false;
-  market.isWithdrawPaused = false;
-  market.isRepayPaused = false;
-  market.isLiquidateBorrowPaused = false;
-  market.isLiquidateCollateralPaused = false;
+  market._isSupplyPaused = false;
+  market._isBorrowPaused = false;
+  market._isWithdrawPaused = false;
+  market._isRepayPaused = false;
+  market._isLiquidateBorrowPaused = false;
+  market._isLiquidateCollateralPaused = false;
 
-  market.poolSupplyInterests = BigDecimal.zero();
-  market.poolBorrowInterests = BigDecimal.zero();
-  market.p2pSupplyInterests = BigDecimal.zero();
-  market.p2pBorrowInterests = BigDecimal.zero();
-  market.p2pBorrowInterestsImprovement = BigDecimal.zero();
-  market.p2pBorrowInterestsImprovementUSD = BigDecimal.zero();
-  market.p2pSupplyInterestsImprovement = BigDecimal.zero();
-  market.p2pSupplyInterestsImprovementUSD = BigDecimal.zero();
-  market.poolSupplyInterestsUSD = BigDecimal.zero();
-  market.poolBorrowInterestsUSD = BigDecimal.zero();
-  market.p2pSupplyInterestsUSD = BigDecimal.zero();
-  market.p2pBorrowInterestsUSD = BigDecimal.zero();
+  market._poolSupplyInterests = BigDecimal.zero();
+  market._poolBorrowInterests = BigDecimal.zero();
+  market._p2pSupplyInterests = BigDecimal.zero();
+  market._p2pBorrowInterests = BigDecimal.zero();
+  market._p2pBorrowInterestsImprovement = BigDecimal.zero();
+  market._p2pBorrowInterestsImprovementUSD = BigDecimal.zero();
+  market._p2pSupplyInterestsImprovement = BigDecimal.zero();
+  market._p2pSupplyInterestsImprovementUSD = BigDecimal.zero();
+  market._poolSupplyInterestsUSD = BigDecimal.zero();
+  market._poolBorrowInterestsUSD = BigDecimal.zero();
+  market._p2pSupplyInterestsUSD = BigDecimal.zero();
+  market._p2pBorrowInterestsUSD = BigDecimal.zero();
   market._indexesOffset = 27;
   market.rates = [];
   market.save();

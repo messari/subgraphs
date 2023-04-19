@@ -1,11 +1,10 @@
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-
-import { AToken } from "../../../generated/MorphoAaveV2/AToken";
-import { ChainlinkPriceFeed } from "../../../generated/MorphoAaveV2/ChainlinkPriceFeed";
-import { DebtToken } from "../../../generated/MorphoAaveV2/DebtToken";
-import { LendingPoolAddressesProvider } from "../../../generated/MorphoAaveV2/LendingPoolAddressesProvider";
-import { MorphoAaveV2 } from "../../../generated/MorphoAaveV2/MorphoAaveV2";
-import { PriceOracle } from "../../../generated/MorphoAaveV2/PriceOracle";
+import { AToken } from "../../../generated/Morpho/AToken";
+import { ChainlinkPriceFeed } from "../../../generated/Morpho/ChainlinkPriceFeed";
+import { DebtToken } from "../../../generated/Morpho/DebtToken";
+import { LendingPoolAddressesProvider } from "../../../generated/Morpho/LendingPoolAddressesProvider";
+import { MorphoAaveV2 } from "../../../generated/Morpho/MorphoAaveV2";
+import { PriceOracle } from "../../../generated/Morpho/PriceOracle";
 import {
   LendingProtocol,
   Market,
@@ -18,8 +17,43 @@ import {
   MORPHO_AAVE_V2_ADDRESS,
   readValue,
 } from "../../constants";
-import { MorphoPositions } from "../../mapping/common";
-import { getOrInitToken } from "../initializers";
+import { MorphoPositions } from "../common";
+import {
+  getOrInitLendingProtocol,
+  getOrInitToken,
+} from "../../utils/initializers";
+import { LendingPool as LendingPoolTemplate } from "../../../generated/templates";
+import { LendingPool } from "../../../generated/Morpho/LendingPool";
+import { LendingPoolConfigurator as LendingPoolConfiguratorTemplate } from "../../../generated/templates";
+
+export function getAaveProtocol(protocolAddress: Address): LendingProtocol {
+  const morpho = getOrInitLendingProtocol(protocolAddress);
+
+  if (morpho.isNew) {
+    const morphoContract = MorphoAaveV2.bind(protocolAddress);
+    const lendingPool = LendingPool.bind(morphoContract.pool());
+    LendingPoolTemplate.create(lendingPool._address);
+    const addressesProvider = LendingPoolAddressesProvider.bind(
+      morphoContract.addressesProvider()
+    );
+    LendingPoolConfiguratorTemplate.create(
+      addressesProvider.getLendingPoolConfigurator()
+    );
+    const defaultMaxGas = morphoContract.defaultMaxGasForMatching();
+    morpho.protocol._defaultMaxGasForMatchingSupply = defaultMaxGas.getSupply();
+    morpho.protocol._defaultMaxGasForMatchingBorrow = defaultMaxGas.getBorrow();
+    morpho.protocol._defaultMaxGasForMatchingWithdraw =
+      defaultMaxGas.getWithdraw();
+    morpho.protocol._defaultMaxGasForMatchingRepay = defaultMaxGas.getRepay();
+
+    morpho.protocol._maxSortedUsers = morphoContract.maxSortedUsers();
+
+    morpho.protocol._owner = morphoContract.owner();
+    morpho.protocol.save();
+  }
+
+  return morpho.protocol;
+}
 
 export const fetchMorphoPositionsAaveV2 = (market: Market): MorphoPositions => {
   const aTokenAddress = Address.fromString(market.id.toHexString());

@@ -10,14 +10,15 @@ import {
   getOrInitLendingProtocol,
   getOrInitToken,
 } from "../../utils/initializers";
+import { getCompoundProtocol } from "./fetchers";
 
 export function handlePriceUpdated(event: PriceUpdated): void {
-  const protocol = getOrInitLendingProtocol(MORPHO_COMPOUND_ADDRESS);
-  if (!protocol.oracle) {
+  const protocol = getCompoundProtocol(MORPHO_COMPOUND_ADDRESS);
+  if (!protocol._oracle) {
     log.info("Unknown oracle: {}", [event.address.toHexString()]);
     return;
   }
-  const oracleStored = protocol.oracle as Bytes;
+  const oracleStored = protocol._oracle as Bytes;
   if (!oracleStored.equals(event.address)) {
     log.info("Oracle {} deprecated. Current oracle: {}", [
       event.address.toHexString(),

@@ -4,7 +4,9 @@ import {
   BigInt,
   Bytes,
   ethereum,
+  log,
 } from "@graphprotocol/graph-ts";
+import { LendingProtocol } from "../generated/schema";
 
 export const BASE_UNITS = BigDecimal.fromString("10000");
 export const WAD = BigDecimal.fromString("1000000000000000000");
@@ -25,7 +27,6 @@ export namespace InterestRateType {
   export const STABLE = "STABLE";
   export const VARIABLE = "VARIABLE";
   export const FIXED = "FIXED";
-  export const POOL = "POOL";
   export const P2P = "P2P";
 }
 
@@ -35,7 +36,7 @@ export namespace InterestRateSide {
 }
 
 export namespace PositionSide {
-  export const LENDER = "LENDER";
+  export const COLLATERAL = "COLLATERAL";
   export const BORROWER = "BORROWER";
 }
 
@@ -55,6 +56,48 @@ export namespace EventType {
 export namespace ActivityType {
   export const DAILY = "DAILY";
   export const HOURLY = "HOURLY";
+}
+
+export namespace Network {
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
+  export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
+  export const AURORA = "AURORA";
+  export const AVALANCHE = "AVALANCHE";
+  export const BOBA = "BOBA";
+  export const BSC = "BSC"; // aka BNB Chain
+  export const CELO = "CELO";
+  export const COSMOS = "COSMOS";
+  export const CRONOS = "CRONOS";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
+  export const FANTOM = "FANTOM";
+  export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY";
+  export const JUNO = "JUNO";
+  export const MOONBEAM = "MOONBEAM";
+  export const MOONRIVER = "MOONRIVER";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const OSMOSIS = "OSMOSIS";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
+}
+
+export namespace PermissionType {
+  export const WHITELIST_ONLY = "WHITELIST_ONLY";
+  export const PERMISSIONED = "PERMISSIONED";
+  export const PERMISSIONLESS = "PERMISSIONLESS";
+  export const ADMIN = "ADMIN";
+}
+
+export namespace CollateralizationType {
+  export const OVER_COLLATERALIZED = "OVER_COLLATERALIZED";
+  export const UNDER_COLLATERALIZED = "UNDER_COLLATERALIZED";
+  export const UNCOLLATERALIZED = "UNCOLLATERALIZED";
+}
+
+export namespace RiskType {
+  export const GLOBAL = "GLOBAL";
+  export const ISOLATED = "ISOLATED";
 }
 
 /////////////////////
@@ -92,6 +135,7 @@ export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
 export const INT_FOUR = 4 as i32;
 
+export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_THREE = BigInt.fromI32(3);
 
@@ -149,4 +193,87 @@ export function exponentToBigInt(decimals: i32): BigInt {
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
+
+///////////////////////////
+//// Protocol Specific ////
+///////////////////////////
+
+// Morpho Aave specific
+export class ReserveUpdateParams {
+  constructor(
+    public readonly event: ethereum.Event,
+    public readonly marketAddress: Bytes,
+    public readonly protocol: LendingProtocol,
+    public readonly reserveSupplyIndex: BigInt,
+    public readonly reserveBorrowIndex: BigInt,
+    public readonly poolSupplyRate: BigInt,
+    public readonly poolBorrowRate: BigInt
+  ) {}
+}
+
+export class ProtocolData {
+  constructor(
+    public readonly protocolID: Bytes,
+    public readonly protocol: string,
+    public readonly name: string,
+    public readonly slug: string,
+    public readonly network: string,
+    public readonly lendingType: string,
+    public readonly lenderPermissionType: string | null,
+    public readonly borrowerPermissionType: string | null,
+    public readonly poolCreatorPermissionType: string | null,
+    public readonly collateralizationType: string | null,
+    public readonly riskType: string | null
+  ) {}
+}
+
+export function getProtocolData(protocolAddress: Address): ProtocolData {
+  if (protocolAddress == MORPHO_AAVE_V2_ADDRESS) {
+    return new ProtocolData(
+      Bytes.fromHexString(MORPHO_AAVE_V2_ADDRESS.toHexString()),
+      "Morpho",
+      "Morpho Aave V2",
+      "morpho-aave-v2",
+      Network.MAINNET,
+      LendingType.CDP,
+      PermissionType.PERMISSIONLESS,
+      PermissionType.PERMISSIONLESS,
+      PermissionType.PERMISSIONED,
+      CollateralizationType.UNDER_COLLATERALIZED,
+      RiskType.ISOLATED
+    );
+  }
+  if (protocolAddress == MORPHO_COMPOUND_ADDRESS) {
+    return new ProtocolData(
+      Bytes.fromHexString(MORPHO_COMPOUND_ADDRESS.toHexString()),
+      "Morpho",
+      "Morpho Compound",
+      "morpho-compound",
+      Network.MAINNET,
+      LendingType.CDP,
+      PermissionType.PERMISSIONLESS,
+      PermissionType.PERMISSIONLESS,
+      PermissionType.PERMISSIONED,
+      CollateralizationType.UNDER_COLLATERALIZED,
+      RiskType.ISOLATED
+    );
+  }
+
+  log.critical("[getProtocolData] Protocol not found: {}", [
+    protocolAddress.toHexString(),
+  ]);
+  return new ProtocolData(
+    Bytes.fromHexString("0x0000000"),
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    null,
+    null,
+    null,
+    null
+  );
 }

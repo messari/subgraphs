@@ -5,7 +5,6 @@ import {
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
-
 import {
   Account,
   FinancialsDailySnapshot,
@@ -21,7 +20,6 @@ import {
   _ActiveAccount,
   _PositionCounter,
 } from "../generated/schema";
-
 import {
   INT_ZERO,
   ActivityType,
@@ -37,8 +35,9 @@ import {
   InterestRateType,
   BIGDECIMAL_HUNDRED,
   exponentToBigInt,
+  BIGINT_ZERO,
 } from "./constants";
-import { morphoPositionsFromProtocol } from "./mapping/common";
+import { MorphoPositions } from "./mapping/common";
 import { getMarket, getOrInitToken } from "./utils/initializers";
 
 function getDay(timestamp: BigInt): BigInt {
@@ -223,7 +222,7 @@ export function snapshotUsage(
   // update daily active positions
   let positionSide: string | null = null;
   if (eventType === EventType.DEPOSIT || eventType === EventType.WITHDRAW)
-    positionSide = PositionSide.LENDER;
+    positionSide = PositionSide.COLLATERAL;
   else if (
     eventType === EventType.BORROW ||
     eventType === EventType.REPAY ||
@@ -516,11 +515,11 @@ export function addPosition(
     position.blockNumberOpened = event.block.number;
     position.timestampOpened = event.block.timestamp;
     position.side = side;
-    if (side == PositionSide.LENDER) {
+    if (side == PositionSide.COLLATERAL) {
       position.isCollateral = true;
     }
-    position.balanceOnPool = BigInt.zero();
-    position.balanceInP2P = BigInt.zero();
+    position._balanceOnPool = BigInt.zero();
+    position._balanceInP2P = BigInt.zero();
     position._virtualP2P = BigInt.zero();
 
     position.balance = BigInt.zero();
@@ -660,8 +659,8 @@ export function subtractPosition(
     position.hashClosed = event.transaction.hash;
     position.blockNumberClosed = event.block.number;
     position.timestampClosed = event.block.timestamp;
-    position.balanceOnPool = BigInt.zero();
-    position.balanceInP2P = BigInt.zero();
+    position._balanceOnPool = BigInt.zero();
+    position._balanceInP2P = BigInt.zero();
     position.save();
 
     //
@@ -901,16 +900,21 @@ function snapshotPosition(position: Position, event: ethereum.Event): void {
   const market = getMarket(position.market);
   const inputToken = getOrInitToken(market.inputToken);
   const poolIndex =
-    position.side === PositionSide.LENDER
+    position.side === PositionSide.COLLATERAL
       ? market._lastPoolSupplyIndex
       : market._lastPoolBorrowIndex;
   const p2pIndex =
-    position.side === PositionSide.LENDER
+    position.side === PositionSide.COLLATERAL
       ? market._p2pSupplyIndex
       : market._p2pBorrowIndex;
 
-  const balanceOnPool = position.balanceOnPool.times(poolIndex).div(RAY_BI);
-  const balanceInP2P = position.balanceInP2P.times(p2pIndex).div(RAY_BI);
+  // TODO: ugly solution
+  const balanceOnPool = position
+    ._balanceOnPool!.times(poolIndex ? poolIndex : BIGINT_ZERO)
+    .div(RAY_BI);
+  const balanceInP2P = position
+    ._balanceInP2P!.times(p2pIndex ? p2pIndex : BIGINT_ZERO)
+    .div(RAY_BI);
   const totalBalance = balanceOnPool.plus(balanceInP2P);
   snapshot.hash = event.transaction.hash;
   snapshot.logIndex = event.logIndex.toI32();
@@ -924,13 +928,13 @@ function snapshotPosition(position: Position, event: ethereum.Event): void {
     .times(market.inputTokenPriceUSD);
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
-  snapshot.balanceOnPool = balanceOnPool;
-  snapshot.balanceInP2P = balanceInP2P;
-  snapshot.balanceOnPoolUSD = balanceOnPool
+  snapshot._balanceOnPool = balanceOnPool;
+  snapshot._balanceInP2P = balanceInP2P;
+  snapshot._balanceOnPoolUSD = balanceOnPool
     .toBigDecimal()
     .times(exponentToBigDecimal(inputToken.decimals))
     .times(market.inputTokenPriceUSD);
-  snapshot.balanceInP2PUSD = balanceInP2P
+  snapshot._balanceInP2PUSD = balanceInP2P
     .toBigDecimal()
     .times(exponentToBigDecimal(inputToken.decimals))
     .times(market.inputTokenPriceUSD);
@@ -945,10 +949,9 @@ function snapshotPosition(position: Position, event: ethereum.Event): void {
  */
 export function updateProtocolPosition(
   protocol: LendingProtocol,
-  market: Market
+  market: Market,
+  morphoPositions: MorphoPositions
 ): void {
-  const morphoPositions = morphoPositionsFromProtocol(protocol, market);
-
   const newMarketSupplyUSD = morphoPositions.morphoSupplyOnPool
     .plus(morphoPositions.morphoSupplyP2P)
     .times(market.inputTokenPriceUSD);
@@ -977,44 +980,44 @@ export function updateProtocolPosition(
   market.totalDepositBalanceUSD = newMarketSupplyUSD;
   market.totalBorrowBalanceUSD = newMarketBorrowUSD;
   market.totalValueLockedUSD = newMarketSupplyUSD;
-  market.totalSupplyOnPool = morphoPositions.morphoSupplyOnPool;
-  market.totalSupplyInP2P = morphoPositions.morphoSupplyP2P;
-  market.totalBorrowOnPool = morphoPositions.morphoBorrowOnPool;
-  market.totalBorrowInP2P = morphoPositions.morphoBorrowP2P;
+  market._totalSupplyOnPool = morphoPositions.morphoSupplyOnPool;
+  market._totalSupplyInP2P = morphoPositions.morphoSupplyP2P;
+  market._totalBorrowOnPool = morphoPositions.morphoBorrowOnPool;
+  market._totalBorrowInP2P = morphoPositions.morphoBorrowP2P;
   market.save();
 }
 
 export function updateP2PRates(market: Market): void {
-  const supplyRate = market._poolSupplyRate
-    .toBigDecimal()
+  const supplyRate = market
+    ._poolSupplyRate!.toBigDecimal()
     .div(exponentToBigDecimal(market._indexesOffset));
-  const borrowRate = market._poolBorrowRate
-    .toBigDecimal()
+  const borrowRate = market
+    ._poolBorrowRate!.toBigDecimal()
     .div(exponentToBigDecimal(market._indexesOffset));
   let midRate: BigDecimal;
 
   if (borrowRate.lt(supplyRate)) midRate = borrowRate;
   else {
-    midRate = BIGDECIMAL_ONE.minus(market.p2pIndexCursor)
+    midRate = BIGDECIMAL_ONE.minus(market._p2pIndexCursor!)
       .times(supplyRate)
-      .plus(borrowRate.times(market.p2pIndexCursor));
+      .plus(borrowRate.times(market._p2pIndexCursor!));
   }
   const p2pSupplyRateWithFees = market.reserveFactor
-    ? midRate.minus(midRate.minus(supplyRate).times(market.reserveFactor))
+    ? midRate.minus(midRate.minus(supplyRate).times(market.reserveFactor!))
     : midRate;
   const p2pBorrowRateWithFees = market.reserveFactor
-    ? midRate.plus(borrowRate.minus(midRate).times(market.reserveFactor))
+    ? midRate.plus(borrowRate.minus(midRate).times(market.reserveFactor!))
     : midRate;
   let p2pSupplyRateWithDelta = p2pSupplyRateWithFees;
   if (
-    market._p2pSupplyDelta.gt(BigInt.zero()) &&
-    market._p2pSupplyAmount.gt(BigInt.zero())
+    market._p2pSupplyDelta!.gt(BigInt.zero()) &&
+    market._p2pSupplyAmount!.gt(BigInt.zero())
   ) {
-    let shareOfTheDelta = wadToRay(market._p2pSupplyDelta)
-      .times(market._reserveSupplyIndex)
+    let shareOfTheDelta = wadToRay(market._p2pSupplyDelta!)
+      .times(market._reserveSupplyIndex!)
       .div(
-        wadToRay(market._p2pSupplyAmount)
-          .times(market._p2pSupplyIndex)
+        wadToRay(market._p2pSupplyAmount!)
+          .times(market._p2pSupplyIndex!)
           .div(exponentToBigInt(market._indexesOffset))
       );
     if (shareOfTheDelta.gt(exponentToBigInt(market._indexesOffset)))
@@ -1028,14 +1031,14 @@ export function updateP2PRates(market: Market): void {
   }
   let p2pBorrowRateWithDelta = p2pBorrowRateWithFees;
   if (
-    market._p2pBorrowDelta.gt(BigInt.zero()) &&
-    market._p2pBorrowAmount.gt(BigInt.zero())
+    market._p2pBorrowDelta!.gt(BigInt.zero()) &&
+    market._p2pBorrowAmount!.gt(BigInt.zero())
   ) {
-    let shareOfTheDelta = wadToRay(market._p2pBorrowDelta)
-      .times(market._reserveBorrowIndex)
+    let shareOfTheDelta = wadToRay(market._p2pBorrowDelta!)
+      .times(market._reserveBorrowIndex!)
       .div(
-        wadToRay(market._p2pBorrowAmount)
-          .times(market._p2pBorrowIndex)
+        wadToRay(market._p2pBorrowAmount!)
+          .times(market._p2pBorrowIndex!)
           .div(exponentToBigInt(market._indexesOffset))
       );
     if (shareOfTheDelta.gt(exponentToBigInt(market._indexesOffset)))

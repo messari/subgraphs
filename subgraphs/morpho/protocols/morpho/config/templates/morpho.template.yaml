@@ -2,47 +2,19 @@ specVersion: 0.0.5
 schema:
   file: ./schema.graphql
 dataSources:
+{{#isAaveV2}}
   - kind: ethereum
-    name: MorphoAaveV2
+    name: Morpho
     network: mainnet
     source:
-      address: "{{ morpho-aave-v2.address }}"
+      address: "{{ factory.address }}"
       abi: MorphoAaveV2
-      startBlock: {{ morpho-aave-v2.startBlock }}
+      startBlock: {{ factory.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      entities:
-        - Borrowed
-        - P2PAmountsUpdated
-        - P2PBorrowDeltaUpdated
-        - P2PSupplyDeltaUpdated
-        - Supplied
-        - BorrowerPositionUpdated
-        - SupplierPositionUpdated
-        - P2PIndexesUpdated
-        - Liquidated
-        - Withdrawn
-        - Repaid
-        - AaveIncentivesControllerSet
-        - DefaultMaxGasForMatchingSet
-        - IsBorrowPausedSet
-        - IsDeprecatedSet
-        - IsLiquidateBorrowPausedSet
-        - IsLiquidateCollateralPausedSet
-        - IsRepayPausedSet
-        - IsSupplyPausedSet
-        - IsWithdrawPausedSet
-        - MarketCreated
-        - MaxSortedUsersSet
-        - OwnershipTransferred
-        - P2PIndexCursorSet
-        - P2PStatusSet
-        - PartialPauseStatusSet
-        - PauseStatusSet
-        - ReserveFactorSet
-        - ReserveFeeClaimed
+      entities: []
       abis:
         - name: MorphoAaveV2
           file: ./abis/MorphoAaveV2.json
@@ -121,50 +93,21 @@ dataSources:
           handler: handleReserveFactorSet
         - event: ReserveFeeClaimed(indexed address,uint256)
           handler: handleReserveFeeClaimed
-      file: ./src/mapping/morpho-aave/morpho-aave-v2.ts
-
+      file: ./src/mapping/morpho-aave-v2/morphoAaveV2.ts
+{{/isAaveV2}}
+{{#isCompound}}
   - kind: ethereum
-    name: MorphoCompound
+    name: Morpho
     network: mainnet
     source:
-      address: "{{ morpho-compound.address }}"
+      address: "{{ factory.address }}"
       abi: MorphoCompound
-      startBlock: {{ morpho-compound.startBlock }}
+      startBlock: {{ factory.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      entities:
-        - P2PIndexesUpdated
-        - Borrowed
-        - BorrowerPositionUpdated
-        - Liquidated
-        - P2PAmountsUpdated
-        - P2PBorrowDeltaUpdated
-        - P2PSupplyDeltaUpdated
-        - Repaid
-        - Supplied
-        - SupplierPositionUpdated
-        - Withdrawn
-        - DefaultMaxGasForMatchingSet
-        - IsBorrowPausedSet
-        - IsDeprecatedSet
-        - IsLiquidateBorrowPausedSet
-        - IsLiquidateCollateralPausedSet
-        - IsRepayPausedSet
-        - IsSupplyPausedSet
-        - IsWithdrawPausedSet
-        - MarketCreated
-        - MaxSortedUsersSet
-        - OwnershipTransferred
-        - P2PIndexCursorSet
-        - P2PStatusSet
-        - PartialPauseStatusSet
-        - PauseStatusSet
-        - ReserveFactorSet
-        - ReserveFeeClaimed
-        - RewardsClaimed
-        - RewardsClaimedAndTraded
+      entities: []
       abis:
         - name: MorphoCompound
           file: ./abis/compound/MorphoCompound.json
@@ -237,8 +180,10 @@ dataSources:
           handler: handleRewardsClaimed
         - event: RewardsClaimedAndTraded(indexed address,uint256)
           handler: handleRewardsClaimedAndTraded
-      file: ./src/mapping/morpho-compound/morpho-compound.ts
+      file: ./src/mapping/morpho-compound/morphoCompound.ts
+{{/isCompound}}
 templates:
+{{#isAaveV2}}
   - kind: ethereum
     name: LendingPool
     network: mainnet
@@ -248,8 +193,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      entities:
-        - ReserveDataUpdated
+      entities: []
       abis:
         - name: MorphoAaveV2
           file: ./abis/MorphoAaveV2.json
@@ -274,8 +218,7 @@ templates:
       eventHandlers:
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleReserveDataUpdated
-      file: ./src/mapping/morpho-aave/lending-pool.ts
-
+      file: ./src/mapping/morpho-aave-v2/lendingPool.ts
   - kind: ethereum
     name: LendingPoolConfigurator
     network: mainnet
@@ -285,22 +228,16 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      entities:
-        - BorrowingDisabledOnReserve
-        - BorrowingEnabledOnReserve
-        - CollateralConfigurationChanged
-        - ReserveActivated
-        - ReserveDeactivated
-        - ReserveDecimalsChanged
-        - ReserveFrozen
-        - ReserveUnfrozen
+      entities: []
       abis:
         - name: LendingPoolConfigurator
           file: ./abis/aave/LendingPoolConfigurator.json
       eventHandlers:
         - event: CollateralConfigurationChanged(indexed address,uint256,uint256,uint256)
           handler: handleCollateralConfigurationChanged
-      file: ./src/mapping/morpho-aave/lending-pool-configurator.ts
+      file: ./src/mapping/morpho-aave-v2/lendingPoolConfigurator.ts
+{{/isAaveV2}}
+{{#isCompound}}
   - kind: ethereum
     name: CToken
     network: mainnet
@@ -310,11 +247,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      entities:
-        - AccrueInterest
-        - NewReserveFactor
-        - ReservesAdded
-        - ReservesReduced
+      entities: []
       abis:
         - name: MorphoCompound
           file: ./abis/compound/MorphoCompound.json
@@ -331,7 +264,7 @@ templates:
           handler: handleAccrueInterestV1
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
           handler: handleAccrueInterestV2
-      file: ./src/mapping/morpho-compound/c-token.ts
+      file: ./src/mapping/morpho-compound/cToken.ts
   - kind: ethereum
     name: Comptroller
     network: mainnet
@@ -341,12 +274,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      entities:
-        - CompBorrowSpeedUpdated
-        - CompSupplySpeedUpdated
-        - NewCloseFactor
-        - NewCollateralFactor
-        - NewPriceOracle
+      entities: []
       abis:
         - name: MorphoCompound
           file: ./abis/compound/MorphoCompound.json
@@ -359,10 +287,6 @@ templates:
         - name: CompoundOracle
           file: ./abis/compound/CompoundOracle.json
       eventHandlers:
-        #        - event: CompBorrowSpeedUpdated(indexed address,uint256)
-        #          handler: handleCompBorrowSpeedUpdated
-        #        - event: CompSupplySpeedUpdated(indexed address,uint256)
-        #          handler: handleCompSupplySpeedUpdated
         - event: NewBorrowCap(indexed address,uint256)
           handler: handleNewBorrowCap
         - event: NewCloseFactor(uint256,uint256)
@@ -381,8 +305,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      entities:
-        - PriceUpdated
+      entities: []
       abis:
         - name: CompoundOracle
           file: ./abis/compound/CompoundOracle.json
@@ -390,3 +313,4 @@ templates:
         - event: PriceUpdated(indexed bytes32,uint256)
           handler: handlePriceUpdated
       file: ./src/mapping/morpho-compound/oracle.ts
+{{/isCompound}}

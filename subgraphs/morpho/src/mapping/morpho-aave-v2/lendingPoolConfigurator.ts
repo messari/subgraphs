@@ -1,5 +1,4 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
-
 import { UnderlyingTokenMapping } from "../../../generated/schema";
 import { CollateralConfigurationChanged } from "../../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
 import {

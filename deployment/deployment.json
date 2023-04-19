@@ -2989,7 +2989,7 @@
     "protocol": "morpho",
     "project": "morpho",
     "deployments": {
-      "morpho-aave-ethereum": {
+      "morpho-aave-v2-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -3006,8 +3006,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "morpho-aave-ethereum",
-            "query-id": "morpho-aave-ethereum"
+            "slug": "morpho-aave-v2-ethereum",
+            "query-id": "morpho-aave-v2-ethereum"
           }
         }
       },

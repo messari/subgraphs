@@ -1,0 +1,8 @@
+{
+  "network": "mainnet",
+  "isCompound": true,
+  "factory": {
+    "startBlock": 14860866,
+    "address": "0x8888882f8f843896699869179fb6e4f7e3b58888"
+  }
+}
