@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
 import * as utils from "./utils";
 import {
