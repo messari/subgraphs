@@ -39,13 +39,10 @@ export function handleFilledRelay(event: FilledRelay): void {
 
   // mainnet vs L2s
   let bridgeId: string;
-  let bridgePoolType: BridgePoolType;
   if (destinationChainId == networkToChainID(Network.MAINNET)) {
-    bridgePoolType = BridgePoolType.LIQUIDITY;
     bridgeId = ACROSS_HUB_POOL_CONTRACT;
   } else {
     bridgeId = event.address.toHexString();
-    bridgePoolType = BridgePoolType.BURN_MINT;
   }
 
   // Config
@@ -91,7 +88,7 @@ export function handleFilledRelay(event: FilledRelay): void {
     pool.initialize(
       poolId.toString(),
       inputToken.symbol,
-      bridgePoolType,
+      BridgePoolType.LIQUIDITY,
       inputToken
     );
   }
@@ -161,13 +158,10 @@ export function handleFundsDeposited(event: FundsDeposited): void {
 
   // mainnet vs L2s
   let bridgeId: string;
-  let bridgePoolType: BridgePoolType;
   if (originChainId == networkToChainID(Network.MAINNET)) {
-    bridgePoolType = BridgePoolType.LIQUIDITY;
     bridgeId = ACROSS_HUB_POOL_CONTRACT;
   } else {
     bridgeId = event.address.toHexString();
-    bridgePoolType = BridgePoolType.BURN_MINT;
   }
 
   // Config
@@ -213,7 +207,7 @@ export function handleFundsDeposited(event: FundsDeposited): void {
     pool.initialize(
       poolId.toString(),
       inputToken.symbol,
-      bridgePoolType,
+      BridgePoolType.LIQUIDITY,
       inputToken
     );
   }
