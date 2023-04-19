@@ -930,8 +930,10 @@ export function _handleFlashLoan(
 
   const premiumUSD = tokenManager.getAmountUSD(premium);
   if (premiumRateToProtocol && premiumRateToProtocol.gt(BIGDECIMAL_ZERO)) {
+    // according to https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/interfaces/IPool.sol#L634
+    // premiumRateToProtocol is the percentage of premium to protocol
     const premiumAmountToProtocol = bigDecimalToBigInt(
-      premium.toBigDecimal().div(premiumRate).times(premiumRateToProtocol)
+      premium.toBigDecimal().times(premiumRateToProtocol)
     );
     const premiumAmountUSDToProtocol = tokenManager.getAmountUSD(
       premiumAmountToProtocol
@@ -943,10 +945,16 @@ export function _handleFlashLoan(
     );
     manager.addSupplyRevenue(premiumAmountUSDToProtocol, fee);
     // premium rate to LP
-    premiumRate = premiumRate.minus(premiumRateToProtocol);
+    premiumRate = premiumRate.times(
+      BIGDECIMAL_ONE.minus(premiumRateToProtocol)
+    );
   }
-  const fee = manager.getOrUpdateFee(FeeType.OTHER, null, premiumRate);
-  manager.addSupplyRevenue(premiumUSD, fee);
+
+  // flashloan premium to LP is accrued in liquidityIndex and handled in
+  // _handleReserveDataUpdated; we don't add SupplyRevenue to avoid double counting
+  // https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/logic/FlashLoanLogic.sol#L233-L237
+  //const fee = manager.getOrUpdateFee(FeeType.OTHER, null, premiumRate);
+  //manager.addSupplyRevenue(premiumUSD, fee);
 }
 
 /////////////////////////
