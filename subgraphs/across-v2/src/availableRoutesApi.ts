@@ -927,3 +927,23 @@ export function findOriginToken(
 
   return destinationToken;
 }
+
+export function findDestinationToken(
+  originChainId: i32,
+  destinationChainId: i32,
+  originToken: string
+): string {
+  for (let i = 0; i < availableRoutes.length; i++) {
+    const route = availableRoutes[i];
+
+    if (
+      route.originChainId == originChainId &&
+      route.originToken.toLowerCase() == originToken.toLowerCase() &&
+      route.destinationChainId == destinationChainId
+    ) {
+      return route.destinationToken;
+    }
+  }
+
+  return originToken;
+}

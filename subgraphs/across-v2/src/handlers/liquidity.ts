@@ -56,9 +56,9 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
 
   // pool
   const poolId = event.address
-    .toHexString()
-    .concat(event.params.l1Token.toHexString());
-  const pool = sdk.Pools.loadPool<string>(Bytes.fromUTF8(poolId));
+    .concat(event.params.l1Token)
+    .concat(Bytes.fromUTF8("liquidity"));
+  const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, BridgePoolType.LIQUIDITY, token);
@@ -103,9 +103,9 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
 
   // pool
   const poolId = event.address
-    .toHexString()
-    .concat(event.params.l1Token.toHexString());
-  const pool = sdk.Pools.loadPool<string>(Bytes.fromUTF8(poolId));
+    .concat(event.params.l1Token)
+    .concat(Bytes.fromUTF8("liquidity"));
+  const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
     pool.initialize(token.name, token.symbol, BridgePoolType.LIQUIDITY, token);

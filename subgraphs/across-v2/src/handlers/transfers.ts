@@ -7,13 +7,14 @@ import {
 } from "../sdk/util/constants";
 import {
   ACROSS_ACCELERATING_DISTRIBUTOR_CONTRACT,
+  ACROSS_HUB_POOL_CONTRACT,
   ACROSS_PROTOCOL_NAME,
   ACROSS_REWARD_TOKEN,
   Pricer,
   TokenInit,
 } from "../util";
 import { getUsdPrice } from "../prices";
-import { findOriginToken } from "../availableRoutesApi";
+import { findDestinationToken, findOriginToken } from "../availableRoutesApi";
 import { Versions } from "../versions";
 
 import { SDK } from "../sdk/protocols/bridge";
@@ -24,14 +25,32 @@ import {
   CrosschainTokenType,
 } from "../sdk/protocols/bridge/enums";
 
-import { FilledRelay } from "../../generated/SpokePool/SpokePool";
+import {
+  FilledRelay,
+  FundsDeposited,
+} from "../../generated/SpokePool/SpokePool";
 import { AcceleratingDistributor } from "../../generated/SpokePool/AcceleratingDistributor";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
 
 export function handleFilledRelay(event: FilledRelay): void {
+  // Chain
+  const originChainId = event.params.originChainId;
+  const destinationChainId = event.params.destinationChainId;
+
+  // mainnet vs L2s
+  let bridgeId: string;
+  let bridgePoolType: BridgePoolType;
+  if (destinationChainId == networkToChainID(Network.MAINNET)) {
+    bridgePoolType = BridgePoolType.LIQUIDITY;
+    bridgeId = ACROSS_HUB_POOL_CONTRACT;
+  } else {
+    bridgeId = event.address.toHexString();
+    bridgePoolType = BridgePoolType.BURN_MINT;
+  }
+
   // Config
   const conf = new BridgeConfig(
-    event.address.toHexString(),
+    bridgeId,
     ACROSS_PROTOCOL_NAME,
     ACROSS_PROTOCOL_NAME,
     BridgePermissionType.WHITELIST,
@@ -44,10 +63,6 @@ export function handleFilledRelay(event: FilledRelay): void {
     new TokenInit(),
     event
   );
-
-  // Chain
-  const originChainId = event.params.originChainId;
-  const destinationChainId = event.params.destinationChainId;
 
   // InputToken
   const inputTokenAddress = event.params.destinationToken;
@@ -69,14 +84,14 @@ export function handleFilledRelay(event: FilledRelay): void {
   );
 
   // Pool
-  const poolId = event.address.concat(Bytes.fromUTF8(inputToken.symbol));
+  const poolId = event.address.concat(inputToken.id);
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
     pool.initialize(
       poolId.toString(),
       inputToken.symbol,
-      BridgePoolType.LIQUIDITY,
+      bridgePoolType,
       inputToken
     );
   }
@@ -84,7 +99,7 @@ export function handleFilledRelay(event: FilledRelay): void {
   pool.addDestinationToken(crossToken);
 
   // Account
-  const acc = sdk.Accounts.loadAccount(event.params.depositor);
+  const acc = sdk.Accounts.loadAccount(event.params.recipient);
   acc.transferIn(
     pool,
     pool.getDestinationTokenRoute(crossToken)!,
@@ -137,4 +152,81 @@ export function handleFilledRelay(event: FilledRelay): void {
       .div(BigInt.fromI32(rewardToken.decimals));
     pool.setRewardEmissions(RewardTokenType.DEPOSIT, rewardToken, amount);
   }
+}
+
+export function handleFundsDeposited(event: FundsDeposited): void {
+  // Chain
+  const originChainId = event.params.originChainId;
+  const destinationChainId = event.params.destinationChainId;
+
+  // mainnet vs L2s
+  let bridgeId: string;
+  let bridgePoolType: BridgePoolType;
+  if (originChainId == networkToChainID(Network.MAINNET)) {
+    bridgePoolType = BridgePoolType.LIQUIDITY;
+    bridgeId = ACROSS_HUB_POOL_CONTRACT;
+  } else {
+    bridgeId = event.address.toHexString();
+    bridgePoolType = BridgePoolType.BURN_MINT;
+  }
+
+  // Config
+  const conf = new BridgeConfig(
+    bridgeId,
+    ACROSS_PROTOCOL_NAME,
+    ACROSS_PROTOCOL_NAME,
+    BridgePermissionType.WHITELIST,
+    Versions
+  );
+
+  const sdk = SDK.initializeFromEvent(
+    conf,
+    new Pricer(event.block),
+    new TokenInit(),
+    event
+  );
+
+  // InputToken
+  const inputTokenAddress = event.params.originToken;
+  const inputToken = sdk.Tokens.getOrCreateToken(inputTokenAddress!);
+
+  // CrossToken
+  const crossTokenAddress: Address = Address.fromString(
+    findDestinationToken(
+      originChainId.toI32(),
+      destinationChainId.toI32(),
+      inputTokenAddress.toHexString()
+    )
+  );
+  const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
+    originChainId,
+    crossTokenAddress!,
+    CrosschainTokenType.CANONICAL,
+    inputTokenAddress!
+  );
+
+  // Pool
+  const poolId = event.address.concat(inputToken.id);
+  const pool = sdk.Pools.loadPool<string>(poolId);
+
+  if (!pool.isInitialized) {
+    pool.initialize(
+      poolId.toString(),
+      inputToken.symbol,
+      bridgePoolType,
+      inputToken
+    );
+  }
+
+  pool.addDestinationToken(crossToken);
+
+  // Account
+  const acc = sdk.Accounts.loadAccount(event.params.depositor);
+  acc.transferOut(
+    pool,
+    pool.getDestinationTokenRoute(crossToken)!,
+    event.params.recipient,
+    event.params.amount,
+    event.transaction.hash
+  );
 }
