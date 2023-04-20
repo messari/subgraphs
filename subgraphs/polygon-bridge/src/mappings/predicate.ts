@@ -163,5 +163,5 @@ export function handleExitTokens(call: ExitTokensCall): void {
   const route = pool.getDestinationTokenRoute(crosschainToken);
 
   const account = sdk.Accounts.loadAccount(call.inputs.value0);
-  account.transferOut(pool, route!, call.inputs.value0, amount);
+  account.transferIn(pool, route!, call.inputs.value0, amount);
 }

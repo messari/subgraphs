@@ -190,5 +190,5 @@ export function handleFxWithdrawERC20(event: FxWithdrawERC20): void {
   const route = pool.getDestinationTokenRoute(crosschainToken);
 
   const account = sdk.Accounts.loadAccount(event.params.userAddress);
-  account.transferOut(pool, route!, event.params.userAddress, amount);
+  account.transferIn(pool, route!, event.params.userAddress, amount);
 }
