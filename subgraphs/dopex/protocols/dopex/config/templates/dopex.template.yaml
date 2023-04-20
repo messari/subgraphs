@@ -71,5 +71,5 @@ dataSources:
           handler: handleSettle
         - event: Bootstrap(uint256,uint256[])
           handler: handleBootstrap
-      file: ./src/mappings/Ssov.ts
+      file: ./src/mappings/ssov.ts
   {{/ssov}}

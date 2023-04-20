@@ -7,7 +7,7 @@ import {
   Ssov,
   Withdraw,
 } from "../../generated/BasicWeeklyCalls/Ssov";
-import { updateRewards } from "./StakingStrategy";
+import { updateRewards } from "./stakingStrategy";
 import {
   getOrCreateLiquidityPool,
   updatePoolTvl,
