@@ -7761,7 +7761,7 @@
     "deployments": {
       "cbridge-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7783,7 +7783,7 @@
       },
       "cbridge-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7805,7 +7805,7 @@
       },
       "cbridge-aurora": {
         "network": "aurora",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7827,7 +7827,7 @@
       },
       "cbridge-avalanche": {
         "network": "avalanche",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7849,7 +7849,7 @@
       },
       "cbridge-boba": {
         "network": "boba",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7871,7 +7871,7 @@
       },
       "cbridge-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7893,7 +7893,7 @@
       },
       "cbridge-celo": {
         "network": "celo",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7915,7 +7915,7 @@
       },
       "cbridge-fantom": {
         "network": "fantom",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7937,7 +7937,7 @@
       },
       "cbridge-gnosis": {
         "network": "gnosis",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7959,7 +7959,7 @@
       },
       "cbridge-harmony": {
         "network": "harmony",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7981,7 +7981,7 @@
       },
       "cbridge-moonbeam": {
         "network": "moonbeam",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -8003,7 +8003,7 @@
       },
       "cbridge-moonriver": {
         "network": "moonriver",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -8025,7 +8025,7 @@
       },
       "cbridge-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -8047,7 +8047,7 @@
       },
       "cbridge-polygon": {
         "network": "polygon",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -8469,6 +8469,36 @@
         },
         "files": {
           "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
+  "kwenta": {
+    "schema": "derivatives-perpfutures",
+    "base": "kwenta",
+    "protocol": "kwenta",
+    "project": "kwenta",
+    "deployments": {
+      "kwenta-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "kwenta-optimism",
+            "query-id": "kwenta-optimism"
+          }
+        },
+        "files": {
+          "template": "kwenta.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
