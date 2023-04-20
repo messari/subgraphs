@@ -2227,7 +2227,7 @@
       },
       "curve-finance-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.0.2",
@@ -7753,36 +7753,6 @@
       }
     }
   },
-  "axelar": {
-    "schema": "bridge",
-    "base": "axelar",
-    "protocol": "axelar",
-    "project": "axelar",
-    "deployments": {
-      "axelar-ethereum": {
-        "network": "ethereum",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "axelar-ethereum",
-            "query-id": "axelar-ethereum"
-          }
-        },
-        "files": {
-          "template": "axelar.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      }
-    }
-  },
   "cbridge": {
     "schema": "bridge",
     "base": "cbridge",
@@ -8389,17 +8359,135 @@
       }
     }
   },
+  "mux-protocol": {
+    "schema": "derivatives-perpfutures",
+    "base": "mux-protocol",
+    "protocol": "mux-protocol",
+    "project": "mux-network",
+    "deployments": {
+      "mux-protocol-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mux-protocol-arbitrum",
+            "query-id": "mux-protocol-arbitrum"
+          }
+        },
+        "files": {
+          "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "mux-protocol-bsc": {
+        "network": "bsc",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mux-protocol-bsc",
+            "query-id": "mux-protocol-bsc"
+          }
+        },
+        "files": {
+          "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "mux-protocol-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mux-protocol-optimism",
+            "query-id": "mux-protocol-optimism"
+          }
+        },
+        "files": {
+          "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "mux-protocol-avalanche": {
+        "network": "avalanche",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mux-protocol-avalanche",
+            "query-id": "mux-protocol-avalanche"
+          }
+        },
+        "files": {
+          "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "mux-protocol-fantom": {
+        "network": "fantom",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mux-protocol-fantom",
+            "query-id": "mux-protocol-fantom"
+          }
+        },
+        "files": {
+          "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
   "axelar": {
     "schema": "bridge",
     "base": "axelar",
     "protocol": "axelar",
-    "project": "axelar-network",
+    "project": "axelar",
     "deployments": {
       "axelar-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8421,7 +8509,7 @@
         "network": "arbitrum",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8443,7 +8531,7 @@
         "network": "arbitrum",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8465,7 +8553,7 @@
         "network": "bsc",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8487,7 +8575,7 @@
         "network": "celo",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8509,7 +8597,7 @@
         "network": "fantom",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8531,7 +8619,7 @@
         "network": "moonbeam",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8553,7 +8641,7 @@
         "network": "polygon",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
