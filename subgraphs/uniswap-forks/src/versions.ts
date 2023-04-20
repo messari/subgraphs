@@ -6,7 +6,7 @@ export class VersionsClass implements VersionsInterface {
   }
 
   getSubgraphVersion(): string {
-    return "1.2.1";
+    return "1.1.11";
   }
 
   getMethodologyVersion(): string {
