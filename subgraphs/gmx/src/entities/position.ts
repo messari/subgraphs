@@ -177,12 +177,12 @@ export function updateUserPosition(
   if (!tryGetPosition.reverted) {
     position.balanceUSD = tryGetPosition.value
       .getValue0()
-      .div(PRICE_PRECISION)
-      .toBigDecimal();
+      .toBigDecimal()
+      .div(PRICE_PRECISION);
     position.collateralBalanceUSD = tryGetPosition.value
       .getValue1()
-      .div(PRICE_PRECISION)
-      .toBigDecimal();
+      .toBigDecimal()
+      .div(PRICE_PRECISION);
 
     const indexToken = getOrCreateToken(event, indexTokenAddress);
     if (indexToken.lastPriceUSD && indexToken.lastPriceUSD! > BIGDECIMAL_ZERO) {
