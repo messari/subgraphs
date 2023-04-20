@@ -8080,7 +8080,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8102,7 +8102,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
