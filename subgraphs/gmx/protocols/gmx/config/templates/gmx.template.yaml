@@ -57,7 +57,7 @@ dataSources:
           handler: handleAddLiquidity
         - event: RemoveLiquidity(address,address,uint256,uint256,uint256,uint256,uint256)
           handler: handleRemoveLiquidity
-      file: ./src/mappings/GlpManager.ts
+      file: ./src/mappings/glpManager.ts
 
   - kind: ethereum/contract
     name: GlpManager2
@@ -114,7 +114,7 @@ dataSources:
           handler: handleAddLiquidity
         - event: RemoveLiquidity(address,address,uint256,uint256,uint256,uint256,uint256)
           handler: handleRemoveLiquidity
-      file: ./src/mappings/GlpManager.ts
+      file: ./src/mappings/glpManager.ts
 
   - kind: ethereum/contract
     name: Vault
@@ -187,7 +187,7 @@ dataSources:
           handler: handleIncreasePoolAmount
         - event: DecreasePoolAmount(address,uint256)
           handler: handleDecreasePoolAmount
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
 
   - kind: ethereum/contract
     name: FeeGlpRewardDistributor
@@ -241,7 +241,7 @@ dataSources:
       eventHandlers:
         - event: TokensPerIntervalChange(uint256)
           handler: handleEthToGlpChange
-      file: ./src/mappings/RewardDistributor.ts
+      file: ./src/mappings/rewardDistributor.ts
 
   - kind: ethereum/contract
     name: EsgmxGlpRewardDistributor
@@ -295,4 +295,4 @@ dataSources:
       eventHandlers:
         - event: TokensPerIntervalChange(uint256)
           handler: handleEsgmxToGlpChange
-      file: ./src/mappings/RewardDistributor.ts
+      file: ./src/mappings/rewardDistributor.ts
