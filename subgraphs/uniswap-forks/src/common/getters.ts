@@ -338,6 +338,10 @@ export function getOrCreateLPToken(
     token.decimals = DEFAULT_DECIMALS;
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
+    token._totalSupply = BIGINT_ZERO;
+    token._totalValueLockedUSD = BIGDECIMAL_ZERO;
+    token._largeTVLImpactBuffer = 0;
+    token._largePriceChangeBuffer = 0;
     token.save();
   }
   return token;
