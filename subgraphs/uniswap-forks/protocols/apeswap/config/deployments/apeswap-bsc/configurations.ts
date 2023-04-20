@@ -41,7 +41,7 @@ export class ApeswapBscConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6")
+      Address.fromString("0x0841bd0b734e4f5853f0dd8d7ea041c241fb0da6")
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -89,7 +89,7 @@ export class ApeswapBscConfigurations implements Configurations {
       "0x2170ed0880ac9a755fd29b2688956bd959f933f8", // WETH
       "0x250632378e573c6be1ac2f97fcdf00515d0aa91b", // BETH
       "0x603c7f932ed1fc6575303d8fb018fdcbb0f39a95", // BANANA
-      "0xdDb3Bd8645775F59496c821E4F55A7eA6A6dc299", // GNANA
+      "0xddb3bd8645775f59496c821e4f55a7ea6a6dc299", // GNANA
     ];
   }
   getStableCoins(): string[] {

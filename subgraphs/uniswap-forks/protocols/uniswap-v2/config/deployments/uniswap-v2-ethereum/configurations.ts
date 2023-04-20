@@ -37,11 +37,11 @@ export class UniswapV2MainnetConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+    return "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f")
+      Address.fromString("0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f")
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

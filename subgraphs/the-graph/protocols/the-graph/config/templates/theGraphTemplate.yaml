@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Staking
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0xF55041E37E12cD407ad00CE2910B8269B01263b9"
+      address: "{{stakingAddress}}"
       abi: Staking
-      startBlock: 11446785
+      startBlock: {{stakingStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -17,22 +17,29 @@ dataSources:
       abis:
         - name: Staking
           file: ./abis/the-graph/Staking.json
-        - name: ERC20
-          file: ./abis/Prices/ERC20.json
           
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
         # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
@@ -43,15 +50,6 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         ## Indexer staking events
         - event: StakeDeposited(indexed address,uint256)
@@ -78,11 +76,11 @@ dataSources:
   
   - kind: ethereum
     name: Curation
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0x8FE00a685Bcb3B2cc296ff6FfEaB10acA4CE1538"
+      address: "{{curationAddress}}"
       abi: Curation
-      startBlock: 11446775
+      startBlock: {{curationStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -91,22 +89,29 @@ dataSources:
       abis:
         - name: Curation
           file: ./abis/the-graph/Curation.json
-        - name: ERC20
-          file: ./abis/Prices/ERC20.json
           
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
         # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
@@ -117,15 +122,6 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         ## Curator signalling events
         - event: Signalled(indexed address,indexed bytes32,uint256,uint256,uint256)
@@ -138,11 +134,11 @@ dataSources:
   
   - kind: ethereum
     name: RewardsManager
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0x9ac758ab77733b4150a901ebd659cbf8cb93ed66"
+      address: "{{rewardsManagerAddress}}"
       abi: RewardsManager
-      startBlock: 11446789
+      startBlock: {{rewardsManagerStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -151,22 +147,29 @@ dataSources:
       abis:
         - name: RewardsManager
           file: ./abis/the-graph/RewardsManager.json
-        - name: ERC20
-          file: ./abis/Prices/ERC20.json
-          
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
         # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
@@ -177,15 +180,6 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         ## Curator signalling events
         - event: RewardsAssigned(indexed address,indexed address,uint256,uint256)

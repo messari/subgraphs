@@ -78,24 +78,24 @@ export class QuickswapMaticConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"); // wETH
+    return toLowerCase("0x7ceb23fd6bc0add59e62ac25578270cff1b9f619"); // wETH
   }
   getRewardToken(): string {
     return toLowerCase("");
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
-      "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", // wETH
-      "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
-      "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", // USDT
-      "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", // DAI
+      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619", // wETH
+      "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", // USDC
+      "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", // USDT
+      "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063", // DAI
     ]);
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
-      "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
-      "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", // USDT
-      "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", // DAI
+      "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", // USDC
+      "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", // USDT
+      "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063", // DAI
     ]);
   }
   getStableOraclePools(): string[] {

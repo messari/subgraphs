@@ -1,7 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
 import * as utils from "./utils";
-import { addresses } from "../../config/addresses";
 import {
   FinancialsDailySnapshot,
   Protocol,
@@ -11,7 +10,7 @@ import {
   UsageMetricsHourlySnapshot,
   _Indexer,
 } from "../../generated/schema";
-import { ERC20 } from "../../generated/Staking/ERC20";
+import { _ERC20 } from "../../generated/Staking/_ERC20";
 import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
@@ -21,21 +20,21 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ZERO,
-  Network,
   ProtocolType,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "./constants";
 import { Versions } from "../versions";
+import { NetworkConfigs } from "../../configurations/configure";
 
 export function getOrCreateProtocol(): Protocol {
-  let protocol = Protocol.load(addresses.controller);
+  let protocol = Protocol.load(NetworkConfigs.getControllerAddress());
 
   if (!protocol) {
-    protocol = new Protocol(addresses.controller);
+    protocol = new Protocol(NetworkConfigs.getControllerAddress());
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.network = Network.MAINNET;
+    protocol.network = NetworkConfigs.getNetwork();
     protocol.type = ProtocolType.GENERIC;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     // Needed?
@@ -155,7 +154,7 @@ export function getOrCreateToken(
   let token = Token.load(address);
   if (!token) {
     token = new Token(address);
-    const erc20Contract = ERC20.bind(Address.fromString(address));
+    const erc20Contract = _ERC20.bind(Address.fromString(address));
 
     token.name = utils.readValue<string>(erc20Contract.try_name(), "");
     token.symbol = utils.readValue<string>(erc20Contract.try_symbol(), "");
@@ -167,7 +166,7 @@ export function getOrCreateToken(
       .toI32();
 
     const tokenPrice = getUsdPricePerToken(Address.fromString(address));
-    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceUSD = tokenPrice.usdPrice;
     token.lastPriceBlockNumber = event.block.number;
 
     token.save();
@@ -181,7 +180,7 @@ export function getOrCreateToken(
       .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
   ) {
     const tokenPrice = getUsdPricePerToken(Address.fromString(address));
-    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceUSD = tokenPrice.usdPrice;
     token.lastPriceBlockNumber = event.block.number;
 
     token.save();
