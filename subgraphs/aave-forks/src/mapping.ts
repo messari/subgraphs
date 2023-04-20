@@ -928,7 +928,6 @@ export function _handleFlashLoan(
   const amountUSD = tokenManager.getAmountUSD(amount);
   manager.createFlashloan(asset, account, amount, amountUSD);
 
-  const premiumUSD = tokenManager.getAmountUSD(premium);
   if (premiumRateToProtocol && premiumRateToProtocol.gt(BIGDECIMAL_ZERO)) {
     // according to https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/interfaces/IPool.sol#L634
     // premiumRateToProtocol is the percentage of premium to protocol
@@ -1063,16 +1062,12 @@ export function _handleAssetConfigUpdated(
   // e.g. one reward token for variable borrowing
   // and another for stable borrowing
   let rewardTokenType: string;
-  let interestRateType: string;
   if (assetToken._iavsTokenType! == IavsTokenType.ATOKEN) {
     rewardTokenType = RewardTokenType.DEPOSIT;
-    interestRateType = InterestRateType.VARIABLE;
   } else if (assetToken._iavsTokenType! == IavsTokenType.STOKEN) {
     rewardTokenType = RewardTokenType.STABLE_BORROW;
-    interestRateType = InterestRateType.STABLE;
   } else if (assetToken._iavsTokenType! == IavsTokenType.VTOKEN) {
     rewardTokenType = RewardTokenType.VARIABLE_BORROW;
-    interestRateType = InterestRateType.VARIABLE;
   } else {
     log.error(
       "[_handleAssetConfigUpdated] _iavsTokenType field for token {} is not one of ATOKEN, STOKEN, or VTOKEN",
