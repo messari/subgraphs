@@ -223,7 +223,6 @@ export function handleUpdatePositionEvent(
   let OpenPositionCount = INT_ZERO;
   if (eventType == EventType.CollateralIn) {
     const existingPosition = getUserPosition(
-      event,
       account,
       pool,
       collateralTokenAddress,
@@ -452,6 +451,6 @@ function handleCollectFees(event: ethereum.Event, feeUsd: BigInt): void {
 }
 
 // Converts BigInt prices to BigDecimal for GMX using PRICE_PRECISION
-function convertPriceToBigDecimal(value: BigInt): BigDecimal {
+export function convertPriceToBigDecimal(value: BigInt): BigDecimal {
   return value.toBigDecimal().div(PRICE_PRECISION);
 }
