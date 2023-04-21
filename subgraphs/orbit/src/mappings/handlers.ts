@@ -116,6 +116,14 @@ class TokenInit implements TokenInitializer {
 export function handleLockIn(event: Deposit): void {
   // log.warning("{}", [NetworkConfigs.getProtocolName()]);
   const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const poolAddr = dataSource.address();
+  const pool = sdk.Pools.loadPool<string>(poolAddr);
+  const token = sdk.Tokens.getOrCreateToken(
+    Address.fromBytes(pool.getInputToken().id)
+  );
+
+  let crosschainID = BIGINT_MINUS_ONE;
+  let crossPoolID = BIGINT_MINUS_ONE;
 }
 
 
