@@ -5,11 +5,11 @@
     "startBlock": 13857570
   },
   "AxelarGasService": {
-    "address": "0x2d5d7d31F671F86C782533cc367F14109a082712",
+    "address": "0x0000000000000000000000000000000000000000",
     "startBlock": 15448318
   },
   "supportCallHandlers": true,
   "graftEnabled": false,
-  "subgraphId": "QmcUEtkUvCJtsYhdq4t7mrxe9fnybXxJPnNAbCsjwXZ9uQ",
-  "graftStartBlock": 15484661
+  "subgraphId": "QmUxhg6r5uJ4o8jvWRwwhSwmw9iDBnZ4NTBvSBaYfmnzbg",
+  "graftStartBlock": 17074656
 }

@@ -5,7 +5,7 @@
     "startBlock": 19151651
   },
   "AxelarGasService": {
-    "address": "0x2d5d7d31F671F86C782533cc367F14109a082712",
+    "address": "0x0000000000000000000000000000000000000000",
     "startBlock": 20931507
   },
   "supportCallHandlers": false,
