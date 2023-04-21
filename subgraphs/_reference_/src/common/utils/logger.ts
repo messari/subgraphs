@@ -10,9 +10,9 @@ import { ethereum, log } from "@graphprotocol/graph-ts";
  */
 export class Logger {
   event: ethereum.Event;
-  fnName: string | null;
+  fnName: string; // this will act as a rudimentary stack trace
 
-  constructor(event: ethereum.Event, fnName: string | null = null) {
+  constructor(event: ethereum.Event, fnName: string) {
     this.event = event;
     this.fnName = fnName;
   }
@@ -27,24 +27,20 @@ export class Logger {
     return `messari_log: tx: ${this.event.transaction.hash.toHexString()} :: ${msg}`;
   }
 
-  info(msg: string, args: string[] | null = null): void {
-    if (!args) args = [];
+  info(msg: string, args: string[]): void {
     log.info(this.formatLog(msg), args);
   }
-  warning(msg: string, args: string[] | null = null): void {
-    if (!args) args = [];
+  warning(msg: string, args: string[]): void {
     log.warning(this.formatLog(msg), args);
   }
-  error(msg: string, args: string[] | null = null): void {
-    if (!args) args = [];
+  error(msg: string, args: string[]): void {
     log.error(this.formatLog(msg), args);
   }
-  critical(msg: string, args: string[] | null = null): void {
-    if (!args) args = [];
+  critical(msg: string, args: string[]): void {
     log.critical(this.formatLog(msg), args);
   }
 
-  updateFunctionName(fnName: string): void {
-    this.fnName = fnName;
+  addFunctionName(fnName: string): void {
+    this.fnName = this.fnName.concat("/").concat(fnName);
   }
 }
