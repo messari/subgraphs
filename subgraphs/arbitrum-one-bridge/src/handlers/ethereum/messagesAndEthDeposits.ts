@@ -47,7 +47,7 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
 
     if (!pool.isInitialized) {
       pool.initialize(
-        poolId.toString(),
+        poolId.toHexString(),
         ETH_SYMBOL,
         BridgePoolType.LOCK_RELEASE,
         sdk.Tokens.getOrCreateToken(ethAddress)

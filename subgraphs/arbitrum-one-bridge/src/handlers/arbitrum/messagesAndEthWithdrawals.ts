@@ -115,7 +115,7 @@ export function handleL2ToL1Transaction(event: L2ToL1Transaction): void {
 
     if (!pool.isInitialized) {
       pool.initialize(
-        poolId.toString(),
+        poolId.toHexString(),
         ETH_SYMBOL,
         BridgePoolType.BURN_MINT,
         sdk.Tokens.getOrCreateToken(ethAddress)
