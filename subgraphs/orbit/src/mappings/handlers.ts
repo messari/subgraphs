@@ -22,6 +22,8 @@ import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { TokenPricer } from "../sdk/protocols/config";
 import { Token } from "../../generated/schema";
 import { SDK } from "../sdk/protocols/bridge";
+import { CustomEventType } from "../sdk/util/events";
+import { Pool } from "../sdk/protocols/bridge/pool";
 import { Versions } from "../versions";
 import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
@@ -32,14 +34,6 @@ import { ERC20SymbolBytes } from "../../generated/Vault/ERC20SymbolBytes";
 import {
   Deposit
 } from "../../generated/Vault/Vault"
-
-const conf = new BridgeConfig(
-  NetworkConfigs.getFactoryAddress(),
-  NetworkConfigs.getProtocolName(),
-  NetworkConfigs.getProtocolSlug(),
-  BridgePermissionType.PRIVATE,
-  Versions
-);
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -98,32 +92,75 @@ class TokenInit implements TokenInitializer {
   }
 }
 
-//     const name = wrappedERC20.name();
-//     const symbol = wrappedERC20.symbol();
-//     const decimals = wrappedERC20.decimals().toI32();
-//     underlying = wrappedERC20.token();
+function _getSDK(
+  event: ethereum.Event | null = null,
+  call: ethereum.Call | null = null
+): SDK | null {
+  let customEvent: CustomEventType;
+  if (event) {
+    customEvent = CustomEventType.initialize(
+      event.block,
+      event.transaction,
+      event.transactionLogIndex,
+      event
+    );
+  } else if (call) {
+    customEvent = CustomEventType.initialize(
+      call.block,
+      call.transaction,
+      call.transaction.index
+    );
+  } else {
+    log.error("[_getSDK]either event or call needs to be specified", []);
+    return null;
+  }
 
-//     return {
-//       name,
-//       symbol,
-//       decimals,
-//       underlying,
-//     };
-//   }
-// }
+  const conf = new BridgeConfig(
+    NetworkConfigs.getFactoryAddress(),
+    NetworkConfigs.getProtocolName(),
+    NetworkConfigs.getProtocolSlug(),
+    BridgePermissionType.PRIVATE,
+    Versions
+  );
+
+  return new SDK(conf, new Pricer(), new TokenInit(), customEvent);
+}
+
+
+export function onCreatePool(
+  // eslint-disable-next-line no-unused-vars
+  event: CustomEventType,
+  pool: Pool,
+  // eslint-disable-next-line no-unused-vars
+  sdk: SDK,
+  aux1: BridgePoolType | null = null,
+  aux2: string | null = null
+): void {
+  if (aux1 && aux2) {
+    const token = sdk.Tokens.getOrCreateToken(Address.fromString(aux2));
+    pool.initialize(
+      `Pool-based Bridge: ${token.name}`,
+      token.name,
+      aux1,
+      token
+    );
+  }
+}
 
 // Bridge via the Original Token Vault
 export function handleLockIn(event: Deposit): void {
   // log.warning("{}", [NetworkConfigs.getProtocolName()]);
-  const sdk = SDK.initialize(conf, new Pricer(), new TokenInit(), event);
+  const sdk = _getSDK(event)!;
   const poolAddr = dataSource.address();
-  const pool = sdk.Pools.loadPool<string>(poolAddr);
-  const token = sdk.Tokens.getOrCreateToken(
-    Address.fromBytes(pool.getInputToken().id)
+  // const pool = sdk.Pools.loadPool<string>(poolAddr);
+  const tokenAddr = event.params.token
+  const pool = sdk.Pools.loadPool(
+    event.address.concat(tokenAddr),
+    onCreatePool,
+    BridgePoolType.LOCK_RELEASE,
+    tokenAddr.toHexString()
   );
-
-  let crosschainID = BIGINT_MINUS_ONE;
-  let crossPoolID = BIGINT_MINUS_ONE;
+  
 }
 
 

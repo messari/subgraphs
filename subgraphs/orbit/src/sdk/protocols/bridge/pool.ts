@@ -38,7 +38,8 @@ type onCreatePoolCallback<T> = (
   event: CustomEventType,
   pool: Pool,
   sdk: SDK,
-  aux: T | null
+  aux: T | null,
+  aux2: string | null
 ) => void;
 
 export class PoolManager {
@@ -53,7 +54,8 @@ export class PoolManager {
   loadPool<T>(
     id: Bytes,
     onCreate: onCreatePoolCallback<T> | null = null,
-    aux: T | null = null
+    aux: T | null = null,
+    aux2: string | null = null
   ): Pool {
     let entity = PoolSchema.load(id);
     if (entity) {
@@ -66,7 +68,7 @@ export class PoolManager {
     const pool = new Pool(this.protocol, entity, this.tokens);
     pool.isInitialized = false;
     if (onCreate) {
-      onCreate(this.protocol.getCurrentEvent(), pool, this.protocol.sdk!, aux);
+      onCreate(this.protocol.getCurrentEvent(), pool, this.protocol.sdk!, aux, aux2);
     }
     return pool;
   }
