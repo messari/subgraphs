@@ -57,7 +57,7 @@ dataSources:
           handler: handleStake
         - event: Unstake(indexed address,address,uint256,uint256)
           handler: handleUnstake
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
 
   - kind: ethereum
     name: VaultUtils
@@ -121,7 +121,7 @@ dataSources:
           handler: handleClosePosition
         - event: LiquidatePosition(bytes32,int256,uint256,uint256)
           handler: handleLiquidatePosition
-      file: ./src/mappings/VaultUtils.ts
+      file: ./src/mappings/vaultUtils.ts
 
   - kind: ethereum/contract
     name: ComplexRewarderPerSec
@@ -176,4 +176,4 @@ dataSources:
       eventHandlers:
         - event: AddRewardInfo(indexed uint256,indexed uint256,uint256,uint256)
           handler: handleAddRewardInfo
-      file: ./src/mappings/ComplexRewarderPerSec.ts
+      file: ./src/mappings/complexRewarderPerSec.ts
