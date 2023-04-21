@@ -8518,8 +8518,8 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "subgraph": "1.0.1",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "axelar.template.yaml"
@@ -8540,8 +8540,8 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "subgraph": "1.0.1",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "axelar.template.yaml"
@@ -8562,8 +8562,8 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "subgraph": "1.0.1",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "axelar.template.yaml"
@@ -8584,8 +8584,8 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "subgraph": "1.0.1",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "axelar.template.yaml"
@@ -8606,8 +8606,8 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "subgraph": "1.0.1",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "axelar.template.yaml"
@@ -8628,8 +8628,8 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "subgraph": "1.0.1",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "axelar.template.yaml"
@@ -8650,8 +8650,8 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "subgraph": "1.0.1",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "axelar.template.yaml"
@@ -8672,8 +8672,8 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
+          "subgraph": "1.0.1",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "axelar.template.yaml"
