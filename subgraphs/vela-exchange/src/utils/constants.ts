@@ -182,7 +182,7 @@ export const VLP_ADDRESS = "0x4e0d4a5a5b4faf5c2ecc1c63c8d19bb0804a96f1";
 export const USDC_ADDRESS_ARBITRUM =
   "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8";
 export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
-export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
+export const PRICE_PRECISION = BigInt.fromI32(10).pow(30).toBigDecimal();
 export const FUNDING_PRECISION = BigDecimal.fromString("1000000");
 export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.25");
 export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.15");

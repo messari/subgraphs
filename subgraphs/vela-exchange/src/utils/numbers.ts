@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { INT_ZERO } from "./constants";
+import { INT_ZERO, PRICE_PRECISION } from "./constants";
 
 export function bigDecimalToBigInt(input: BigDecimal): BigInt {
   const str = input.truncate(0).toString();
@@ -26,6 +26,11 @@ export function exponentToBigDecimal(exp: i32): BigDecimal {
     bd = bd.times(ten);
   }
   return bd;
+}
+
+// Converts BigInt prices to BigDecimal for contracts using PRICE_PRECISION
+export function convertPriceToBigDecimal(value: BigInt): BigDecimal {
+  return value.toBigDecimal().div(PRICE_PRECISION);
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {

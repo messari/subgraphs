@@ -30,9 +30,12 @@ import {
   INT_ZERO,
   PositionSide,
   POSITION_VAULT_ADDRESS,
-  PRICE_PRECISION,
 } from "../utils/constants";
-import { bigDecimalToBigInt, exponentToBigDecimal } from "../utils/numbers";
+import {
+  bigDecimalToBigInt,
+  convertPriceToBigDecimal,
+  exponentToBigDecimal,
+} from "../utils/numbers";
 
 export function getUserPosition(
   event: ethereum.Event,
@@ -159,7 +162,7 @@ export function updateUserPosition(
     entryFundingRate
   );
 
-  const realisedPnlUSD = realisedPnl.div(PRICE_PRECISION).toBigDecimal();
+  const realisedPnlUSD = convertPriceToBigDecimal(realisedPnl);
   switch (eventType) {
     case EventType.CollateralIn:
       position.collateralInCount += INT_ONE;
@@ -194,14 +197,12 @@ export function updateUserPosition(
     posId
   );
   if (!tryGetPosition.reverted) {
-    position.balanceUSD = tryGetPosition.value
-      .getValue0()
-      .size.div(PRICE_PRECISION)
-      .toBigDecimal();
-    position.collateralBalanceUSD = tryGetPosition.value
-      .getValue0()
-      .collateral.div(PRICE_PRECISION)
-      .toBigDecimal();
+    position.balanceUSD = convertPriceToBigDecimal(
+      tryGetPosition.value.getValue0().size
+    );
+    position.collateralBalanceUSD = convertPriceToBigDecimal(
+      tryGetPosition.value.getValue0().collateral
+    );
 
     const indexToken = getOrCreateToken(event, indexTokenAddress);
     if (indexToken.lastPriceUSD && indexToken.lastPriceUSD! > BIGDECIMAL_ZERO) {

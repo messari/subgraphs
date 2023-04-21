@@ -51,12 +51,15 @@ import {
   INT_ONE,
   INT_ZERO,
   PositionSide,
-  PRICE_PRECISION,
   PROTOCOL_SIDE_REVENUE_PERCENT,
   STAKE_SIDE_REVENUE_PERCENT,
   USDC_ADDRESS_ARBITRUM,
 } from "../utils/constants";
-import { bigDecimalToBigInt, exponentToBigDecimal } from "../utils/numbers";
+import {
+  bigDecimalToBigInt,
+  convertPriceToBigDecimal,
+  exponentToBigDecimal,
+} from "../utils/numbers";
 import { LiquidityPool } from "../../generated/schema";
 
 export function handleIncreasePosition(event: IncreasePosition): void {
@@ -66,9 +69,9 @@ export function handleIncreasePosition(event: IncreasePosition): void {
     event.params.key,
     event.params.account,
     Address.fromString(USDC_ADDRESS_ARBITRUM),
-    event.params.posData[0].div(PRICE_PRECISION).toBigDecimal(),
+    convertPriceToBigDecimal(event.params.posData[0]),
     event.params.indexToken,
-    event.params.posData[1].div(PRICE_PRECISION).toBigDecimal(),
+    convertPriceToBigDecimal(event.params.posData[1]),
     event.params.posData[5],
     event.params.posData[6],
     event.params.isLong,
@@ -85,9 +88,9 @@ export function handleDecreasePosition(event: DecreasePosition): void {
     event.params.key,
     event.params.account,
     Address.fromString(USDC_ADDRESS_ARBITRUM),
-    event.params.posData[0].div(PRICE_PRECISION).toBigDecimal(),
+    convertPriceToBigDecimal(event.params.posData[0]),
     event.params.indexToken,
-    event.params.posData[1].div(PRICE_PRECISION).toBigDecimal(),
+    convertPriceToBigDecimal(event.params.posData[1]),
     event.params.posData[5],
     event.params.posData[6],
     event.params.isLong,
@@ -180,7 +183,7 @@ export function handleUpdatePositionEvent(
   updateTokenPrice(
     event,
     indexToken,
-    indexTokenPrice.div(PRICE_PRECISION).toBigDecimal()
+    convertPriceToBigDecimal(indexTokenPrice)
   );
   const collateralToken = getOrCreateToken(event, collateralTokenAddress);
   let collateralTokenAmountDelta = BIGINT_ZERO;
@@ -242,12 +245,7 @@ export function handleUpdatePositionEvent(
     eventType
   );
 
-  increasePoolPremium(
-    event,
-    pool,
-    fee.div(PRICE_PRECISION).toBigDecimal(),
-    eventType
-  );
+  increasePoolPremium(event, pool, convertPriceToBigDecimal(fee), eventType);
 
   increasePoolVolume(
     event,
@@ -335,7 +333,7 @@ export function handleUpdatePositionEvent(
         indexTokenAddress,
         collateralTokenAmountDelta,
         collateralUSDDelta,
-        realisedPnl.div(PRICE_PRECISION).toBigDecimal(),
+        convertPriceToBigDecimal(realisedPnl),
         event.transaction.from,
         accountAddress,
         position
@@ -378,12 +376,7 @@ function increaseCollectedFees(
   pool: LiquidityPool,
   feeUsd: BigInt
 ): void {
-  const totalFee = feeUsd.div(PRICE_PRECISION).toBigDecimal();
-
-  // log.error("IincreasePoolProtocolSideRevenue {}", [
-  //   totalFee.times(PROTOCOL_SIDE_REVENUE_PERCENT).toString(),
-  // ]);
-
+  const totalFee = convertPriceToBigDecimal(feeUsd);
   increasePoolProtocolSideRevenue(
     event,
     pool,

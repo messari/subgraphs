@@ -44,9 +44,12 @@ import {
   VAULT_ADDRESS,
   USDC_ADDRESS_ARBITRUM,
   BIGDECIMAL_HUNDRED,
-  PRICE_PRECISION,
 } from "../utils/constants";
-import { convertTokenToDecimal, multiArraySort } from "../utils/numbers";
+import {
+  convertPriceToBigDecimal,
+  convertTokenToDecimal,
+  multiArraySort,
+} from "../utils/numbers";
 import { enumToPrefix } from "../utils/strings";
 
 export function getOrCreateLiquidityPool(event: ethereum.Event): LiquidityPool {
@@ -418,10 +421,9 @@ export function updatePoolTvl(
       event,
       Address.fromString(USDC_ADDRESS_ARBITRUM)
     );
-    pool.totalValueLockedUSD = tryTotalUSDC.value
-      .div(PRICE_PRECISION)
-      .toBigDecimal()
-      .times(inputToken.lastPriceUSD!);
+    pool.totalValueLockedUSD = convertPriceToBigDecimal(
+      tryTotalUSDC.value
+    ).times(inputToken.lastPriceUSD!);
   }
   const tvlChangeUSD = pool.totalValueLockedUSD.minus(prevPoolTVL);
 
