@@ -1,4 +1,17 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import {
+  BigDecimal,
+  BigInt,
+  TypedMap,
+  log,
+  dataSource,
+  Address,
+  Bytes,
+} from "@graphprotocol/graph-ts";
+import { Token } from "../../../generated/schema";
+import {
+  chainIDToNetwork,
+  networkToChainID,
+} from "../protocols/bridge/chainIds";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -210,3 +223,150 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 
 export const ETH_SYMBOL = "ETH";
 export const ETH_NAME = "Ether";
+
+export function equalsIgnoreCase(a: string, b: string): boolean {
+  return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
+
+///////////////////////////////////////
+///// Protocol specific Constants /////
+///////////////////////////////////////
+
+export namespace PoolName {
+  export const OriginalTokenVault = "OriginalTokenVault";
+  export const PeggedTokenBridge = "PeggedTokenBridge";
+}
+
+export type PoolName = string;
+export class NetworkSpecificConstant {
+  constructor (
+    public readonly chainName: string,
+    public readonly originalTokenVault: Address,
+    public readonly peggedTokenBridge: TypedMap<string, Address>,
+  ){}
+
+  getOriginalTokenVaultAddress(poolName: PoolName): Address {
+    return this.originalTokenVault;
+  }
+
+  getpeggedTokenBridgeForToChain(ToChain: string): Address | null {
+    return this.peggedTokenBridge.get(ToChain);
+  }
+}
+
+// https://bridge-docs.orbitchain.io/faq/integration-guide/2.-contract-addresses
+export function getNetworkSpecificConstant(
+  network: Network
+): NetworkSpecificConstant {
+  if (equalsIgnoreCase(network, Network.MAINNET)) {
+    const ethToChainMapping = new TypedMap<string, Address>()
+    ethToChainMapping.set(
+      "KLAYTN",
+      Address.fromString("0x60070F5D2e1C1001400A04F152E7ABD43410F7B9")
+    );
+    ethToChainMapping.set(
+      "AVAX",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "BSC",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "CELO",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "FANTOM",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "HARMONY",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "HECO",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "MATIC",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "MOONRIVER",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "XDAI",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "ORBIT",
+      Address.fromString("0x1b57Ce997Ca6a009ce54bB2d37DEbEBadFDbBb06")
+    );
+    return new NetworkSpecificConstant(
+      network,
+      Address.fromString("0x1bf68a9d1eaee7826b3593c20a0ca93293cb489a"),
+      ethToChainMapping
+    );
+  }
+  // TO DO: WRITE THE OTHER CONTRACTS
+  else if (equalsIgnoreCase(network, Network.BSC)) {
+    const ethToChainMapping = new TypedMap<string, Address>()
+    ethToChainMapping.set(
+      "KLAYTN",
+      Address.fromString("0x60070F5D2e1C1001400A04F152E7ABD43410F7B9")
+    );
+    ethToChainMapping.set(
+      "AVAX",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "BSC",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "CELO",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "FANTOM",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "HARMONY",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "HECO",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "MATIC",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "MOONRIVER",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "XDAI",
+      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+    );
+    ethToChainMapping.set(
+      "ORBIT",
+      Address.fromString("0x1b57Ce997Ca6a009ce54bB2d37DEbEBadFDbBb06")
+    );
+    return new NetworkSpecificConstant(
+      network,
+      Address.fromString("0x1bf68a9d1eaee7826b3593c20a0ca93293cb489a"),
+      ethToChainMapping
+    )
+  }
+  log.error("[getNetworkSpecificConstant] Unsupported network: {}", [network]);
+  return new NetworkSpecificConstant(
+    "UNKNOWN",
+    Address.zero(),
+    new TypedMap<string, Address>()
+  );
+}

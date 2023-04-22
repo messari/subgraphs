@@ -3,6 +3,7 @@ import {
   BigDecimal,
   BigInt,
   ByteArray,
+  Bytes,
   dataSource,
   log,
   crypto,
@@ -28,9 +29,10 @@ import { Versions } from "../versions";
 import { bigDecimalToBigInt, bigIntToBigDecimal } from "../sdk/util/numbers";
 import { TokenInitializer, TokenParams } from "../sdk/protocols/bridge/tokens";
 import { _ERC20 } from "../../generated/Vault/_ERC20";
+import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
 import { ERC20NameBytes } from "../../generated/Vault/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../../generated/Vault/ERC20SymbolBytes";
-
+import { getNetworkSpecificConstant } from "../sdk/util/constants";
 import {
   Deposit
 } from "../../generated/Vault/Vault"
@@ -150,17 +152,63 @@ export function onCreatePool(
 // Bridge via the Original Token Vault
 export function handleLockIn(event: Deposit): void {
   // log.warning("{}", [NetworkConfigs.getProtocolName()]);
+  
+  const poolId = event.address.concat(event.params.token)
+  const networkConstants = getNetworkSpecificConstant(dataSource.network());
+  const dstPoolId = networkConstants.getpeggedTokenBridgeForToChain(event.params.toChain);
+  _handleTransferOut(
+    event.params.token,
+    event.params.fromAddr,
+    event.params.toAddr,
+    event.params.amount,
+    event.params.toChain,
+    poolId,
+    dstPoolId,
+    BridgePoolType.LOCK_RELEASE,
+    CrosschainTokenType.WRAPPED,
+    event,
+    event.params.depositId
+  );
+  
   const sdk = _getSDK(event)!;
   const poolAddr = dataSource.address();
   // const pool = sdk.Pools.loadPool<string>(poolAddr);
-  const tokenAddr = event.params.token
+  
+}
+
+function _handleTransferOut(
+  token: Address,
+  sender: Address,
+  receiver: Address,
+  amount: BigInt,
+  toChain: string,
+  poolId: Bytes,
+  dstPoolId: Address | null = null,
+  bridgePoolType: BridgePoolType,
+  crosschainTokenType: CrosschainTokenType,
+  event: ethereum.Event,
+  refId: BigInt
+): void {
+  if (!dstPoolId) {
+    log.error("dstPoolId is null for transaction: {}", [refId.toString()]);
+    return;
+  }
+  const sdk = _getSDK(event)!;
   const pool = sdk.Pools.loadPool(
-    event.address.concat(tokenAddr),
+    poolId,
     onCreatePool,
     BridgePoolType.LOCK_RELEASE,
-    tokenAddr.toHexString()
+    token.toHexString()
   );
-  
+  const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
+    networkToChainID(toChain),
+    dstPoolId,
+    crosschainTokenType,
+    token
+  );
+  pool.addDestinationToken(crossToken);
+  const account = sdk.Accounts.loadAccount(sender)
+  account.transferOut(pool, pool.getDestinationTokenRoute(crossToken)!, sender, amount);
 }
 
 
