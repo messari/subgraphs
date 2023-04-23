@@ -87,6 +87,8 @@ export namespace FeeType {
   export const PROTOCOL_FEE = "PROTOCOL_FEE";
   export const MINT_FEE = "MINT_FEE";
   export const WITHDRAW_FEE = "WITHDRAW_FEE";
+  export const FLASHLOAN_PROTOCOL_FEE = "FLASHLOAN_PROTOCOL_FEE";
+  export const FLASHLOAN_LP_FEE = "FLASHLOAN_LP_FEE";
   export const OTHER = "OTHER";
 }
 

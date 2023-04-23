@@ -38,11 +38,7 @@ import {
   Supply,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
-import {
-  Market,
-  _DefaultOracle,
-  _FlashLoanPremium,
-} from "../../../generated/schema";
+import { Market, _DefaultOracle } from "../../../generated/schema";
 import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
@@ -85,6 +81,7 @@ import {
   readValue,
   getMarketFromToken,
   exponentToBigDecimal,
+  getOrCreateFlashloanPremium,
 } from "../../../src/helpers";
 import {
   LendingType,
@@ -227,6 +224,7 @@ export function handleFlashloanPremiumTotalUpdated(
   const rate = event.params.newFlashloanPremiumTotal
     .toBigDecimal()
     .div(exponentToBigDecimal(INT_FOUR));
+
   _handleFlashloanPremiumTotalUpdated(rate, protocolData);
 }
 
@@ -400,13 +398,7 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 }
 
 export function handleFlashloan(event: FlashLoan): void {
-  const premiumRate = _FlashLoanPremium.load(protocolData.protocolID);
-  if (!premiumRate) {
-    log.error("[handleFlashloan]_FlashLoanPremium with id {} not found", [
-      protocolData.protocolID.toHexString(),
-    ]);
-    return;
-  }
+  const flashloanPremium = getOrCreateFlashloanPremium(protocolData);
 
   _handleFlashLoan(
     event.params.asset,
@@ -415,8 +407,7 @@ export function handleFlashloan(event: FlashLoan): void {
     protocolData,
     event,
     event.params.premium,
-    premiumRate.premiumRateTotal,
-    premiumRate.premiumRateToProtocol
+    flashloanPremium
   );
 }
 

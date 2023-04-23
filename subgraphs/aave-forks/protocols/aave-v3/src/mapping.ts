@@ -69,22 +69,19 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  INT_TWO,
   Network,
   PositionSide,
   INT_FOUR,
+  BIGDECIMAL_HUNDRED,
 } from "../../../src/constants";
 import {
   getMarketFromToken,
   readValue,
   equalsIgnoreCase,
   exponentToBigDecimal,
+  getOrCreateFlashloanPremium,
 } from "../../../src/helpers";
-import {
-  Market,
-  _DefaultOracle,
-  _FlashLoanPremium,
-} from "../../../generated/schema";
+import { Market, _DefaultOracle } from "../../../generated/schema";
 import { AssetConfigUpdated } from "../../../generated/RewardsController/RewardsController";
 import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
@@ -228,7 +225,7 @@ export function handleLiquidationProtocolFeeChanged(
 export function handleFlashloanPremiumTotalUpdated(
   event: FlashloanPremiumTotalUpdated
 ): void {
-  // rate is in 1/10000
+  // rate is in 1/10000 (bps)
   const rate = event.params.newFlashloanPremiumTotal
     .toBigDecimal()
     .div(exponentToBigDecimal(INT_FOUR));
@@ -238,7 +235,7 @@ export function handleFlashloanPremiumTotalUpdated(
 export function handleFlashloanPremiumToProtocolUpdated(
   event: FlashloanPremiumToProtocolUpdated
 ): void {
-  // rate is in 1/10000
+  // rate is in 1/10000 (bps)
   const rate = event.params.newFlashloanPremiumToProtocol
     .toBigDecimal()
     .div(exponentToBigDecimal(INT_FOUR));
@@ -418,13 +415,7 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 }
 
 export function handleFlashloan(event: FlashLoan): void {
-  const premiumRate = _FlashLoanPremium.load(protocolData.protocolID);
-  if (!premiumRate) {
-    log.error("[handleFlashloan]_FlashLoanPremium with id {} not found", [
-      protocolData.protocolID.toHexString(),
-    ]);
-    return;
-  }
+  const flashloanPremium = getOrCreateFlashloanPremium(protocolData);
 
   _handleFlashLoan(
     event.params.asset,
@@ -433,8 +424,7 @@ export function handleFlashloan(event: FlashLoan): void {
     protocolData,
     event,
     event.params.premium,
-    premiumRate.premiumRateTotal,
-    premiumRate.premiumRateToProtocol
+    flashloanPremium
   );
 }
 
@@ -607,7 +597,7 @@ function storeReserveFactor(
     reserveFactorStartBitPosition
   )
     .toBigDecimal()
-    .div(exponentToBigDecimal(INT_TWO));
+    .div(BIGDECIMAL_HUNDRED);
 
   log.info("[setReserveFactor]reserveFactor set to {}", [
     reserveFactor.toString(),

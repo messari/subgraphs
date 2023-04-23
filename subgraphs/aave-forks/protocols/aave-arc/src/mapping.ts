@@ -62,6 +62,7 @@ import {
   equalsIgnoreCase,
   exponentToBigDecimal,
   getMarketFromToken,
+  getOrCreateFlashloanPremium,
   readValue,
 } from "../../../src/helpers";
 import {
@@ -307,6 +308,10 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 }
 
 export function handleFlashloan(event: FlashLoan): void {
+  const flashloanPremium = getOrCreateFlashloanPremium(protocolData);
+  flashloanPremium.premiumRateTotal = FLASHLOAN_PREMIUM_TOTAL;
+  flashloanPremium.save();
+
   _handleFlashLoan(
     event.params.asset,
     event.params.amount,
@@ -314,7 +319,7 @@ export function handleFlashloan(event: FlashLoan): void {
     protocolData,
     event,
     event.params.premium,
-    FLASHLOAN_PREMIUM_TOTAL
+    flashloanPremium
   );
 }
 

@@ -7,8 +7,18 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import { ProtocolData } from "./sdk/manager";
-import { Market, Token, _MarketList } from "../generated/schema";
-import { BIGINT_ZERO, BIGINT_ONE, BIGDECIMAL_ONE } from "./constants";
+import {
+  Market,
+  Token,
+  _FlashLoanPremium,
+  _MarketList,
+} from "../generated/schema";
+import {
+  BIGINT_ZERO,
+  BIGINT_ONE,
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_ZERO,
+} from "./constants";
 import { AToken } from "../generated/LendingPool/AToken";
 import { bigDecimalToBigInt } from "./sdk/constants";
 
@@ -124,6 +134,20 @@ export function getCollateralBalance(market: Market, account: Address): BigInt {
     balanceResult.value.toBigDecimal().times(exchangeRate)
   );
   return collateralBalance;
+}
+
+export function getOrCreateFlashloanPremium(
+  procotolData: ProtocolData
+): _FlashLoanPremium {
+  let flashloanPremium = _FlashLoanPremium.load(procotolData.protocolID);
+  if (!flashloanPremium) {
+    flashloanPremium = new _FlashLoanPremium(procotolData.protocolID);
+    flashloanPremium.premiumRateTotal = BIGDECIMAL_ZERO;
+    flashloanPremium.premiumRateToProtocol = BIGDECIMAL_ZERO;
+    flashloanPremium.premiumUSDToDeduct = BIGDECIMAL_ZERO;
+    flashloanPremium.save();
+  }
+  return flashloanPremium;
 }
 
 export function storePrePauseState(market: Market): void {

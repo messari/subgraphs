@@ -23,7 +23,6 @@ import {
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
   IavsTokenType,
-  INT_TWO,
   INT_FOUR,
   RAY_OFFSET,
   ZERO_ADDRESS,
@@ -37,7 +36,6 @@ import {
   PositionSide,
   RewardTokenType,
   SECONDS_PER_DAY,
-  bigDecimalToBigInt,
 } from "./sdk/constants";
 import {
   getBorrowBalance,
@@ -48,6 +46,7 @@ import {
   exponentToBigDecimal,
   rayToWad,
   getMarketFromToken,
+  getOrCreateFlashloanPremium,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -300,9 +299,7 @@ export function _handleReserveFactorChanged(
     return;
   }
 
-  market.reserveFactor = reserveFactor
-    .toBigDecimal()
-    .div(exponentToBigDecimal(INT_TWO));
+  market.reserveFactor = reserveFactor.toBigDecimal().div(BIGDECIMAL_HUNDRED);
   market.save();
 }
 
@@ -387,26 +384,18 @@ export function _handleFlashloanPremiumTotalUpdated(
   rate: BigDecimal,
   procotolData: ProtocolData
 ): void {
-  let premiumRate = _FlashLoanPremium.load(procotolData.protocolID);
-  if (!premiumRate) {
-    premiumRate = new _FlashLoanPremium(procotolData.protocolID);
-    premiumRate.premiumRateToProtocol = BIGDECIMAL_ZERO;
-  }
-  premiumRate.premiumRateTotal = rate;
-  premiumRate.save();
+  const flashloanPremium = getOrCreateFlashloanPremium(procotolData);
+  flashloanPremium.premiumRateTotal = rate;
+  flashloanPremium.save();
 }
 
 export function _handleFlashloanPremiumToProtocolUpdated(
   rate: BigDecimal,
   procotolData: ProtocolData
 ): void {
-  let premiumRate = _FlashLoanPremium.load(procotolData.protocolID);
-  if (!premiumRate) {
-    premiumRate = new _FlashLoanPremium(procotolData.protocolID);
-    premiumRate.premiumRateTotal = rate; // premiumRateTotal >= premiumRateToProtocol
-  }
-  premiumRate.premiumRateToProtocol = rate;
-  premiumRate.save();
+  const flashloanPremium = getOrCreateFlashloanPremium(procotolData);
+  flashloanPremium.premiumRateToProtocol = rate;
+  flashloanPremium.save();
 }
 
 export function _handlePaused(protocolData: ProtocolData): void {
@@ -565,7 +554,17 @@ export function _handleReserveDataUpdated(
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals))
     .times(liquidityIndexDiff);
-  const totalRevenueDeltaUSD = newRevenueBD.times(assetPriceUSD);
+  let totalRevenueDeltaUSD = newRevenueBD.times(assetPriceUSD);
+
+  // deduct flashloan premium that may have already been accounted for in
+  // _handleFlashloan()
+  const flashloanPremium = getOrCreateFlashloanPremium(protocolData);
+  totalRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
+    flashloanPremium.premiumUSDToDeduct
+  );
+  flashloanPremium.premiumUSDToDeduct = BIGDECIMAL_ZERO;
+  flashloanPremium.save();
+
   let reserveFactor = market.reserveFactor;
   if (!reserveFactor) {
     log.warning(
@@ -574,8 +573,9 @@ export function _handleReserveDataUpdated(
     );
     reserveFactor = BIGDECIMAL_ZERO;
   }
+
   const protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(
-    reserveFactor.div(exponentToBigDecimal(INT_TWO))
+    reserveFactor.div(BIGDECIMAL_HUNDRED)
   );
   const supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
     protocolSideRevenueDeltaUSD
@@ -907,9 +907,8 @@ export function _handleFlashLoan(
   account: Address,
   procotolData: ProtocolData,
   event: ethereum.Event,
-  premium: BigInt,
-  premiumRate: BigDecimal,
-  premiumRateToProtocol: BigDecimal | null = null //premium collected by the protocol
+  premiumAmount: BigInt,
+  flashloanPremium: _FlashLoanPremium
 ): void {
   const market = getMarketFromToken(asset, procotolData);
   if (!market) {
@@ -928,32 +927,60 @@ export function _handleFlashLoan(
   const amountUSD = tokenManager.getAmountUSD(amount);
   manager.createFlashloan(asset, account, amount, amountUSD);
 
-  if (premiumRateToProtocol && premiumRateToProtocol.gt(BIGDECIMAL_ZERO)) {
+  let reserveFactor = market.reserveFactor;
+  if (!reserveFactor) {
+    reserveFactor = BIGDECIMAL_ZERO;
+  }
+  const protocolRevenueShare = reserveFactor.div(BIGDECIMAL_HUNDRED);
+
+  const premiumUSDTotal = tokenManager.getAmountUSD(premiumAmount);
+  let premiumUSDToProtocol = premiumUSDTotal.times(protocolRevenueShare);
+  let premiumUSDToLP = premiumUSDTotal.minus(premiumUSDToProtocol);
+  let premiumUSDToDeduct = premiumUSDTotal;
+  const premiumRateTotal = flashloanPremium.premiumRateTotal;
+  let premiumRateToProtocol = premiumRateTotal.times(protocolRevenueShare);
+  let premiumRateToLP = premiumRateTotal.minus(premiumRateToProtocol);
+
+  if (flashloanPremium.premiumRateToProtocol.gt(BIGDECIMAL_ZERO)) {
     // according to https://github.com/aave/aave-v3-core/blob/29ff9b9f89af7cd8255231bc5faf26c3ce0fb7ce/contracts/interfaces/IPool.sol#L634
     // premiumRateToProtocol is the percentage of premium to protocol
-    const premiumAmountToProtocol = bigDecimalToBigInt(
-      premium.toBigDecimal().times(premiumRateToProtocol)
-    );
-    const premiumAmountUSDToProtocol = tokenManager.getAmountUSD(
-      premiumAmountToProtocol
-    );
-    const fee = manager.getOrUpdateFee(
-      FeeType.OTHER,
-      null,
-      premiumRateToProtocol
-    );
-    manager.addSupplyRevenue(premiumAmountUSDToProtocol, fee);
-    // premium rate to LP
-    premiumRate = premiumRate.times(
-      BIGDECIMAL_ONE.minus(premiumRateToProtocol)
+    premiumUSDToProtocol = premiumUSDTotal
+      .times(flashloanPremium.premiumRateToProtocol)
+      .plus(premiumUSDToProtocol);
+    premiumRateToProtocol = premiumRateTotal
+      .times(flashloanPremium.premiumRateToProtocol)
+      .plus(premiumRateToProtocol);
+
+    // premium to LP
+    premiumUSDToLP = premiumUSDTotal.minus(premiumUSDToProtocol);
+    premiumRateToLP = premiumRateTotal.minus(premiumRateToProtocol);
+    // this part of the premium is transferred to the treasury and not
+    // accrued to liquidityIndex and thus no need to deduct
+    premiumUSDToDeduct = premiumUSDToDeduct.minus(
+      premiumUSDTotal.times(flashloanPremium.premiumRateToProtocol)
     );
   }
 
+  const feeToProtocol = manager.getOrUpdateFee(
+    FeeType.FLASHLOAN_PROTOCOL_FEE,
+    null,
+    premiumRateToProtocol
+  );
+  manager.addProtocolRevenue(premiumUSDToProtocol, feeToProtocol);
+
   // flashloan premium to LP is accrued in liquidityIndex and handled in
-  // _handleReserveDataUpdated; we don't add SupplyRevenue to avoid double counting
+  // _handleReserveDataUpdated;
   // https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/logic/FlashLoanLogic.sol#L233-L237
-  //const fee = manager.getOrUpdateFee(FeeType.OTHER, null, premiumRate);
-  //manager.addSupplyRevenue(premiumUSD, fee);
+  const feeToLP = manager.getOrUpdateFee(
+    FeeType.FLASHLOAN_LP_FEE,
+    null,
+    premiumRateToLP
+  );
+
+  manager.addSupplyRevenue(premiumUSDToLP, feeToLP);
+  // save premiumUSDToDeduct to be deducted from total revenue to avoid double counting
+  flashloanPremium.premiumUSDToDeduct = premiumUSDToDeduct;
+  flashloanPremium.save();
 }
 
 /////////////////////////

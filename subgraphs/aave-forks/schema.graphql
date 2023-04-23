@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol
-# Version: 3.0.1
+# Version: 3.0.2
 # See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
 
 enum Network {
@@ -219,6 +219,12 @@ enum FeeType {
 
   " Fee taken on withdrawal. e.g. found in Euler "
   WITHDRAW_FEE
+
+  " Flashloan Fees taken by the protocol "
+  FLASHLOAN_PROTOCOL_FEE
+
+  " Flashloan Fees taken by LP "
+  FLASHLOAN_LP_FEE
 
   " Any fee not represented here. Please make a github issue for this to be added: https://github.com/messari/subgraphs/issues/new "
   OTHER
@@ -2057,7 +2063,7 @@ type _DefaultOracle @entity {
   oracle: Bytes!
 }
 
-# helper entity for flashloan premium rates
+# helper entity for flashloan premium
 type _FlashLoanPremium @entity {
   " protocol id "
   id: Bytes!
@@ -2065,4 +2071,6 @@ type _FlashLoanPremium @entity {
   premiumRateTotal: BigDecimal!
   " premium rate to protocol "
   premiumRateToProtocol: BigDecimal!
+  " premium to be deducted from revenue, used to avoid double counting "
+  premiumUSDToDeduct: BigDecimal!
 }
