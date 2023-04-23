@@ -35,8 +35,6 @@ dataSources:
         - name: Callbacks
           file: ./abis/Gains/Callbacks.json
 
-        - name: ERC20
-          file: ./abis/Tokens/ERC20.json
         - name: ERC20SymbolBytes
           file: ./abis/Tokens/ERC20SymbolBytes.json
         - name: ERC20NameBytes
@@ -86,13 +84,14 @@ dataSources:
         - event: RewardDistributed(indexed address,uint256)
           handler: handleRewardDistributed
       file: {{{ file }}}
+  {{#callbacks}}
   - kind: ethereum
-    name: Callbacks
+    name: {{ name }}
     network: {{ network }}
     source:
-      address: "{{ callbacks.address }}"
+      address: "{{ address }}"
       abi: Callbacks
-      startBlock: {{ callbacks.startBlock }}
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -111,8 +110,6 @@ dataSources:
         - name: Callbacks
           file: ./abis/Gains/Callbacks.json
 
-        - name: ERC20
-          file: ./abis/Tokens/ERC20.json
         - name: ERC20SymbolBytes
           file: ./abis/Tokens/ERC20SymbolBytes.json
         - name: ERC20NameBytes
@@ -164,3 +161,4 @@ dataSources:
         - event: SssFeeCharged(indexed address,uint256)
           handler: handleSssFeeCharged
       file: {{{ file }}}
+  {{/callbacks}}

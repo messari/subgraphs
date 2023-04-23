@@ -3,18 +3,21 @@ import {
   BigDecimal,
   BigInt,
   dataSource,
-  log,
 } from "@graphprotocol/graph-ts";
 
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { Versions } from "../versions";
 import { NetworkConfigs } from "../../configurations/configure";
-import { createTokenAmountArray } from "./helpers";
+import {
+  closeTrade,
+  createTokenAmountArray,
+  getFundingRate,
+  getPairOpenInterest,
+  getSharesTransferred,
+  openTrade,
+} from "./helpers";
+import { ORACLE, STANDARD_FEE, VAULT_NAME } from "../common/constants";
 
-import { Vault } from "../../generated/Vault/Vault";
-import { PairStorage } from "../../generated/Vault/PairStorage";
-import { Storage } from "../../generated/Vault/Storage";
-import { PairInfo } from "../../generated/Vault/PairInfo";
 import {
   DaiVaultFeeCharged,
   DevGovFeeCharged,
@@ -40,22 +43,14 @@ import {
   TokenInitializer,
   TokenParams,
 } from "../sdk/protocols/perpfutures/tokens";
+import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import {
-  bigDecimalToBigInt,
-  bigIntToBigDecimal,
-  safeDivide,
-} from "../sdk/util/numbers";
-import {
-  BIGINT_HUNDRED,
   BIGINT_MINUS_ONE,
-  BIGINT_ONE,
   BIGINT_ZERO,
   LiquidityPoolFeeType,
   PositionSide,
   RewardTokenType,
 } from "../sdk/util/constants";
-import { TransactionType } from "../sdk/protocols/perpfutures/enums";
-import { getRewardsPerDay, RewardIntervalType } from "../sdk/util/rewards";
 
 // Implement TokenPricer to pass it to the SDK constructor
 class Pricer implements TokenPricer {
@@ -112,27 +107,15 @@ export function handleDeposit(event: Deposit): void {
   const pool = sdk.Pools.loadPool(dataSource.address());
   if (!pool.isInitialized) {
     pool.initialize(
-      "gDAI Vault",
-      "gDAI Vault",
+      VAULT_NAME,
+      VAULT_NAME,
       [depositToken],
       outputToken,
-      "chainlink"
+      ORACLE
     );
 
-    pool.setPoolFee(
-      LiquidityPoolFeeType.DYNAMIC_PROTOCOL_FEE,
-      safeDivide(
-        BigInt.fromI32(6).toBigDecimal(),
-        BigInt.fromI32(100).toBigDecimal()
-      )
-    );
-    pool.setPoolFee(
-      LiquidityPoolFeeType.DYNAMIC_LP_FEE,
-      safeDivide(
-        BigInt.fromI32(6).toBigDecimal(),
-        BigInt.fromI32(100).toBigDecimal()
-      )
-    );
+    pool.setPoolFee(LiquidityPoolFeeType.DYNAMIC_PROTOCOL_FEE, STANDARD_FEE);
+    pool.setPoolFee(LiquidityPoolFeeType.DYNAMIC_LP_FEE, STANDARD_FEE);
   }
   pool.addOutputTokenSupply(mintAmount);
 
@@ -235,12 +218,15 @@ export function handleDepositUnlocked(event: DepositUnlocked): void {
   }
 }
 
+// Event emitted when a trade executes immediately, at the market price
 export function handleMarketExecuted(event: MarketExecuted): void {
   const trader = event.params.t.trader;
   const positionSide = event.params.t.buy
     ? PositionSide.LONG
     : PositionSide.SHORT;
   const leverage = event.params.t.leverage;
+  const pairIndex = event.params.t.pairIndex;
+  const percentProfit = event.params.percentProfit;
 
   const sdk = SDK.initializeFromEvent(
     conf,
@@ -253,75 +239,21 @@ export function handleMarketExecuted(event: MarketExecuted): void {
     NetworkConfigs.getDaiAddress()
   );
   const collateralAmount = event.params.positionSizeDai;
-  const leveragedAmount = collateralAmount.times(leverage);
-
-  const storageContract = Storage.bind(NetworkConfigs.getStorageAddress());
-  const precisionCall = storageContract.try_PRECISION();
-  if (precisionCall.reverted) {
-    log.warning("[precisionCall reverted] hash: {}", [
-      event.transaction.hash.toHexString(),
-    ]);
-    return;
-  }
-  const precision = precisionCall.value;
 
   const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
 
-  const pairIndex = event.params.t.pairIndex;
-  const openInterestLongCall = storageContract.try_openInterestDai(
-    pairIndex,
-    BIGINT_ZERO
-  );
-  if (openInterestLongCall.reverted) {
-    log.warning("[openInterestLongCall reverted] hash: {} pairIndex: {}", [
-      event.transaction.hash.toHexString(),
-      pairIndex.toString(),
-    ]);
-    return;
-  }
-  const openInterestLong = openInterestLongCall.value;
-
-  const openInterestShortCall = storageContract.try_openInterestDai(
-    pairIndex,
-    BIGINT_ONE
-  );
-  if (openInterestShortCall.reverted) {
-    log.warning("[openInterestShortCall reverted] hash: {} pairIndex: {}", [
-      event.transaction.hash.toHexString(),
-      pairIndex.toString(),
-    ]);
-    return;
-  }
-  const openInterestShort = openInterestShortCall.value;
+  const openInterest = getPairOpenInterest(pairIndex, event);
   pool.updateOpenInterestByToken(
     pairIndex,
     collateralToken,
-    openInterestLong,
-    openInterestShort
+    openInterest.long,
+    openInterest.short
   );
 
-  const pairInfoContract = PairInfo.bind(NetworkConfigs.getPairInfoAddress());
-  const fundingRatePerBlockCall =
-    pairInfoContract.try_getFundingFeePerBlockP(pairIndex);
-  if (fundingRatePerBlockCall.reverted) {
-    log.warning(
-      "[fundingRatePerBlockCall reverted]  hash: {} pairInfoContract: {} pairIndex: {}",
-      [
-        event.transaction.hash.toHexString(),
-        NetworkConfigs.getPairInfoAddress().toHexString(),
-        pairIndex.toString(),
-      ]
-    );
-    return;
-  }
-  const fundingRatePerBlock = fundingRatePerBlockCall.value;
-  const fundingRatePerDay = getRewardsPerDay(
-    event.block.timestamp,
-    event.block.number,
-    fundingRatePerBlock.toBigDecimal(),
-    RewardIntervalType.BLOCK
-  );
+  const fundingRatePerDay = getFundingRate(pairIndex, event);
   pool.updateFundingRateByToken(pairIndex, collateralToken, fundingRatePerDay);
+
+  const sharesTransferred = getSharesTransferred(collateralAmount, event);
 
   const loadAccountResponse = sdk.Accounts.loadAccount(trader);
   const account = loadAccountResponse.account;
@@ -340,153 +272,49 @@ export function handleMarketExecuted(event: MarketExecuted): void {
     event.params.open
   );
   const position = loadPositionResponse.position;
-  const positionID = position.getBytesID();
   const isExistingOpenPosition = loadPositionResponse.isExistingOpenPosition;
 
-  const pairStorageContract = PairStorage.bind(
-    NetworkConfigs.getPairStorageAddress()
-  );
-  const vaultContract = Vault.bind(NetworkConfigs.getVaultAddress());
-  const sharesTransferredCall =
-    vaultContract.try_convertToShares(collateralAmount);
-  if (sharesTransferredCall.reverted) {
-    log.warning(
-      "[sharesTransferredCall reverted] hash: {} collateralAmount: {}",
-      [event.transaction.hash.toHexString(), collateralAmount.toString()]
-    );
-    return;
-  }
-  const sharesTransferred = sharesTransferredCall.value;
-
   if (event.params.open) {
-    pool.addInflowVolumeByToken(collateralToken, leveragedAmount);
-    pool.addVolumeByToken(collateralToken, leveragedAmount);
-
-    const openFeePCall = pairStorageContract.try_pairOpenFeeP(pairIndex);
-    if (openFeePCall.reverted) {
-      log.warning("[openFeePCall reverted] hash: {} pairIndex: {}", [
-        event.transaction.hash.toHexString(),
-        pairIndex.toString(),
-      ]);
-      return;
-    }
-    const openFeeP = openFeePCall.value;
-    const openingFee = bigDecimalToBigInt(
-      safeDivide(
-        leveragedAmount.times(openFeeP).toBigDecimal(),
-        precision.times(BIGINT_HUNDRED).toBigDecimal()
-      )
-    );
-    pool.addPremiumByToken(
+    openTrade(
+      pool,
+      account,
+      position,
+      pairIndex,
       collateralToken,
-      openingFee,
-      TransactionType.COLLATERAL_IN
+      collateralAmount,
+      leverage,
+      sharesTransferred,
+      fundingRatePerDay,
+      event
     );
-
-    const collateralAmounts = createTokenAmountArray(
-      pool,
-      [collateralToken],
-      [collateralAmount]
-    );
-    account.collateralIn(
-      pool,
-      positionID,
-      collateralAmounts,
-      sharesTransferred
-    );
-
-    if (leverage > BIGINT_ONE) {
-      account.borrow(
-        pool,
-        positionID,
-        Address.fromBytes(collateralToken.id),
-        leveragedAmount.minus(collateralAmount)
-      );
-    }
-
-    position.setLeverage(leverage.toBigDecimal());
-    position.setBalance(collateralToken, collateralAmount);
-    position.setCollateralBalance(collateralToken, collateralAmount);
-    position.addCollateralInCount();
-    position.setFundingrateOpen(fundingRatePerDay);
   } else {
-    const percentProfit = event.params.percentProfit;
-    const pnl = safeDivide(
-      collateralAmount.times(percentProfit).toBigDecimal(),
-      precision.times(BIGINT_HUNDRED).toBigDecimal()
-    );
-    const pnlAmount = collateralAmount.plus(bigDecimalToBigInt(pnl));
-
-    if (percentProfit <= BIGINT_ZERO) {
-      pool.addClosedInflowVolumeByToken(
-        collateralToken,
-        collateralAmount.minus(pnlAmount)
-      );
-      pool.addOutflowVolumeByToken(collateralToken, pnlAmount);
-      pool.addVolumeByToken(collateralToken, pnlAmount);
-
-      position.setBalanceClosed(collateralToken, pnlAmount);
-      position.setCollateralBalanceClosed(collateralToken, pnlAmount);
-      position.setRealisedPnlClosed(collateralToken, bigDecimalToBigInt(pnl));
-    } else {
-      const leveragedPnlAmount = pnlAmount.times(leverage);
-
-      pool.addOutflowVolumeByToken(collateralToken, leveragedPnlAmount);
-      pool.addVolumeByToken(collateralToken, leveragedPnlAmount);
-
-      position.setBalanceClosed(collateralToken, leveragedPnlAmount);
-      position.setCollateralBalanceClosed(collateralToken, leveragedPnlAmount);
-      position.setRealisedPnlClosed(
-        collateralToken,
-        bigDecimalToBigInt(pnl).times(leverage)
-      );
-    }
-
-    const closeFeePCall = pairStorageContract.try_pairCloseFeeP(pairIndex);
-    if (closeFeePCall.reverted) {
-      log.warning("[closeFeePCall reverted] hash: {} pairIndex: {}", [
-        event.transaction.hash.toHexString(),
-        pairIndex.toString(),
-      ]);
-      return;
-    }
-    const closeFeeP = closeFeePCall.value;
-    const closingFee = bigDecimalToBigInt(
-      safeDivide(
-        leveragedAmount.times(closeFeeP).toBigDecimal(),
-        precision.times(BIGINT_HUNDRED).toBigDecimal()
-      )
-    );
-    pool.addPremiumByToken(
+    closeTrade(
+      pool,
+      account,
+      position,
+      pairIndex,
       collateralToken,
-      closingFee,
-      TransactionType.COLLATERAL_OUT
+      collateralAmount,
+      leverage,
+      sharesTransferred,
+      fundingRatePerDay,
+      percentProfit,
+      isExistingOpenPosition,
+      event,
+      false
     );
-
-    const collateralAmounts = createTokenAmountArray(
-      pool,
-      [collateralToken],
-      [pnlAmount]
-    );
-    account.collateralOut(
-      pool,
-      positionID,
-      collateralAmounts,
-      sharesTransferred
-    );
-
-    position.addCollateralOutCount();
-    position.setFundingrateClosed(fundingRatePerDay);
-    position.closePosition(isExistingOpenPosition);
   }
 }
 
+// Event emitted when a trade executes at exact price set if price reaches threshold
 export function handleLimitExecuted(event: LimitExecuted): void {
   const trader = event.params.t.trader;
   const positionSide = event.params.t.buy
     ? PositionSide.LONG
     : PositionSide.SHORT;
   const leverage = event.params.t.leverage;
+  const pairIndex = event.params.t.pairIndex;
+  const percentProfit = event.params.percentProfit;
 
   const sdk = SDK.initializeFromEvent(
     conf,
@@ -499,71 +327,21 @@ export function handleLimitExecuted(event: LimitExecuted): void {
     NetworkConfigs.getDaiAddress()
   );
   const collateralAmount = event.params.positionSizeDai;
-  const leveragedAmount = collateralAmount.times(leverage);
-
-  const storageContract = Storage.bind(NetworkConfigs.getStorageAddress());
-  const precisionCall = storageContract.try_PRECISION();
-  if (precisionCall.reverted) {
-    log.warning("[precisionCall reverted] hash: {}", [
-      event.transaction.hash.toHexString(),
-    ]);
-    return;
-  }
-  const precision = precisionCall.value;
 
   const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
 
-  const pairIndex = event.params.t.pairIndex;
-  const openInterestLongCall = storageContract.try_openInterestDai(
-    pairIndex,
-    BIGINT_ZERO
-  );
-  if (openInterestLongCall.reverted) {
-    log.warning("[openInterestLongCall reverted] hash: {} pairIndex: {}", [
-      event.transaction.hash.toHexString(),
-      pairIndex.toString(),
-    ]);
-    return;
-  }
-  const openInterestLong = openInterestLongCall.value;
-
-  const openInterestShortCall = storageContract.try_openInterestDai(
-    pairIndex,
-    BIGINT_ONE
-  );
-  if (openInterestShortCall.reverted) {
-    log.warning("[openInterestShortCall reverted] hash: {} pairIndex: {}", [
-      event.transaction.hash.toHexString(),
-      pairIndex.toString(),
-    ]);
-    return;
-  }
-  const openInterestShort = openInterestShortCall.value;
+  const openInterest = getPairOpenInterest(pairIndex, event);
   pool.updateOpenInterestByToken(
     pairIndex,
     collateralToken,
-    openInterestLong,
-    openInterestShort
+    openInterest.long,
+    openInterest.short
   );
 
-  const pairInfoContract = PairInfo.bind(NetworkConfigs.getPairInfoAddress());
-  const fundingRatePerBlockCall =
-    pairInfoContract.try_getFundingFeePerBlockP(pairIndex);
-  if (fundingRatePerBlockCall.reverted) {
-    log.warning(
-      "[fundingRatePerBlockCall reverted] pairInfoAddress: {} pairIndex: {}",
-      [NetworkConfigs.getPairInfoAddress().toHexString(), pairIndex.toString()]
-    );
-    return;
-  }
-  const fundingRatePerBlock = fundingRatePerBlockCall.value;
-  const fundingRatePerDay = getRewardsPerDay(
-    event.block.timestamp,
-    event.block.number,
-    fundingRatePerBlock.toBigDecimal(),
-    RewardIntervalType.BLOCK
-  );
+  const fundingRatePerDay = getFundingRate(pairIndex, event);
   pool.updateFundingRateByToken(pairIndex, collateralToken, fundingRatePerDay);
+
+  const sharesTransferred = getSharesTransferred(collateralAmount, event);
 
   const loadAccountResponse = sdk.Accounts.loadAccount(trader);
   const account = loadAccountResponse.account;
@@ -582,178 +360,56 @@ export function handleLimitExecuted(event: LimitExecuted): void {
     event.params.orderType == 3 ? true : false
   );
   const position = loadPositionResponse.position;
-  const positionID = position.getBytesID();
   const isExistingOpenPosition = loadPositionResponse.isExistingOpenPosition;
 
-  const pairStorageContract = PairStorage.bind(
-    NetworkConfigs.getPairStorageAddress()
-  );
-  const vaultContract = Vault.bind(NetworkConfigs.getVaultAddress());
-  const sharesTransferredCall =
-    vaultContract.try_convertToShares(collateralAmount);
-  if (sharesTransferredCall.reverted) {
-    log.warning(
-      "[sharesTransferredCall reverted] hash: {} collateralAmount: {}",
-      [event.transaction.hash.toHexString(), collateralAmount.toString()]
-    );
-    return;
-  }
-  const sharesTransferred = sharesTransferredCall.value;
-
-  // orderType [TP, SL, LIQ, OPEN]
+  // orderType [TP, SL, LIQ, OPEN] (0-index)
   if (event.params.orderType == 3) {
-    pool.addInflowVolumeByToken(collateralToken, leveragedAmount);
-    pool.addVolumeByToken(collateralToken, leveragedAmount);
-
-    const openFeePCall = pairStorageContract.try_pairOpenFeeP(pairIndex);
-    if (openFeePCall.reverted) {
-      log.warning("[openFeePCall reverted] hash: {} pairIndex: {}", [
-        event.transaction.hash.toHexString(),
-        pairIndex.toString(),
-      ]);
-      return;
-    }
-    const openFeeP = openFeePCall.value;
-    const openingFee = bigDecimalToBigInt(
-      safeDivide(
-        leveragedAmount.times(openFeeP).toBigDecimal(),
-        precision.times(BIGINT_HUNDRED).toBigDecimal()
-      )
-    );
-    pool.addPremiumByToken(
+    openTrade(
+      pool,
+      account,
+      position,
+      pairIndex,
       collateralToken,
-      openingFee,
-      TransactionType.COLLATERAL_IN
+      collateralAmount,
+      leverage,
+      sharesTransferred,
+      fundingRatePerDay,
+      event
     );
-
-    const collateralAmounts = createTokenAmountArray(
+  } else if (event.params.orderType == 2) {
+    closeTrade(
       pool,
-      [collateralToken],
-      [collateralAmount]
+      account,
+      position,
+      pairIndex,
+      collateralToken,
+      collateralAmount,
+      leverage,
+      sharesTransferred,
+      fundingRatePerDay,
+      percentProfit,
+      isExistingOpenPosition,
+      event,
+      true,
+      event.params.nftHolder,
+      trader
     );
-    account.collateralIn(
-      pool,
-      positionID,
-      collateralAmounts,
-      sharesTransferred
-    );
-
-    if (leverage > BIGINT_ONE) {
-      account.borrow(
-        pool,
-        positionID,
-        Address.fromBytes(collateralToken.id),
-        leveragedAmount.minus(collateralAmount)
-      );
-    }
-
-    position.setLeverage(leverage.toBigDecimal());
-    position.setBalance(collateralToken, collateralAmount);
-    position.setCollateralBalance(collateralToken, collateralAmount);
-    position.addCollateralInCount();
-    position.setFundingrateOpen(fundingRatePerDay);
   } else {
-    const percentProfit = event.params.percentProfit;
-    const pnl = safeDivide(
-      collateralAmount.times(percentProfit).toBigDecimal(),
-      precision.times(BIGINT_HUNDRED).toBigDecimal()
+    closeTrade(
+      pool,
+      account,
+      position,
+      pairIndex,
+      collateralToken,
+      collateralAmount,
+      leverage,
+      sharesTransferred,
+      fundingRatePerDay,
+      percentProfit,
+      isExistingOpenPosition,
+      event,
+      false
     );
-    const pnlAmount = collateralAmount.plus(bigDecimalToBigInt(pnl));
-
-    const closeFeePCall = pairStorageContract.try_pairCloseFeeP(pairIndex);
-    if (closeFeePCall.reverted) {
-      log.warning("[closeFeePCall reverted] hash: {} pairIndex: {}", [
-        event.transaction.hash.toHexString(),
-        pairIndex.toString(),
-      ]);
-      return;
-    }
-    const closeFeeP = closeFeePCall.value;
-    const closingFee = bigDecimalToBigInt(
-      safeDivide(
-        leveragedAmount.times(closeFeeP).toBigDecimal(),
-        precision.times(BIGINT_HUNDRED).toBigDecimal()
-      )
-    );
-
-    position.setFundingrateClosed(fundingRatePerDay);
-    position.closePosition(isExistingOpenPosition);
-
-    if (event.params.orderType == 2) {
-      // liquidate
-      if (percentProfit <= BIGINT_ZERO) {
-        pool.addClosedInflowVolumeByToken(collateralToken, collateralAmount);
-      }
-      pool.addPremiumByToken(
-        collateralToken,
-        closingFee,
-        TransactionType.LIQUIDATE
-      );
-
-      account.liquidate(
-        pool,
-        Address.fromBytes(collateralToken.id),
-        Address.fromBytes(collateralToken.id),
-        collateralAmount,
-        event.params.nftHolder,
-        trader,
-        positionID,
-        pnl
-      );
-
-      position.addLiquidationCount();
-      position.setBalanceClosed(collateralToken, BIGINT_ZERO);
-      position.setCollateralBalanceClosed(collateralToken, BIGINT_ZERO);
-      position.setRealisedPnlClosed(collateralToken, bigDecimalToBigInt(pnl));
-    } else {
-      if (percentProfit <= BIGINT_ZERO) {
-        pool.addClosedInflowVolumeByToken(
-          collateralToken,
-          collateralAmount.minus(pnlAmount)
-        );
-        pool.addOutflowVolumeByToken(collateralToken, pnlAmount);
-        pool.addVolumeByToken(collateralToken, pnlAmount);
-
-        position.setBalanceClosed(collateralToken, pnlAmount);
-        position.setCollateralBalanceClosed(collateralToken, pnlAmount);
-        position.setRealisedPnlClosed(collateralToken, bigDecimalToBigInt(pnl));
-      } else {
-        const leveragedPnlAmount = pnlAmount.times(leverage);
-
-        pool.addOutflowVolumeByToken(collateralToken, leveragedPnlAmount);
-        pool.addVolumeByToken(collateralToken, leveragedPnlAmount);
-
-        position.setBalanceClosed(collateralToken, leveragedPnlAmount);
-        position.setCollateralBalanceClosed(
-          collateralToken,
-          leveragedPnlAmount
-        );
-        position.setRealisedPnlClosed(
-          collateralToken,
-          bigDecimalToBigInt(pnl).times(leverage)
-        );
-      }
-
-      pool.addPremiumByToken(
-        collateralToken,
-        closingFee,
-        TransactionType.COLLATERAL_OUT
-      );
-
-      const collateralAmounts = createTokenAmountArray(
-        pool,
-        [collateralToken],
-        [pnlAmount]
-      );
-      account.collateralOut(
-        pool,
-        positionID,
-        collateralAmounts,
-        sharesTransferred
-      );
-
-      position.addCollateralOutCount();
-    }
   }
 }
 
