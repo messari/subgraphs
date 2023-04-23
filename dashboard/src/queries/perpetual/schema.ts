@@ -1528,6 +1528,7 @@ export const schema130 = (): Schema => {
       dailyTotalLiquidityPremiumUSD: "BigDecimal!",
       cumulativeTotalLiquidityPremiumUSD: "BigDecimal!",
       dailyActiveUsers: "Int!",
+      cumulativeUniqueUsers: "Int!",
       dailyActiveDepositors: "Int!",
       dailyActiveBorrowers: "Int!",
       cumulativeUniqueBorrowers: "Int!",
