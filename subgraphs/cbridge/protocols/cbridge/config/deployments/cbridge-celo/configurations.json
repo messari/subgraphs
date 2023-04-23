@@ -1,0 +1,43 @@
+{
+  "network": "celo",
+  "Bridge": {
+    "address": "0xBB7684Cc5408F4DD0921E5c2Cadd547b8f1AD573",
+    "startBlock": 10400072
+  },
+  "OriginalTokenVault": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 18526711
+  },
+  "OriginalTokenVaultV2": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 18526711
+  },
+  "PeggedTokenBridge": {
+    "address": "0xDA1DD66924B0470501aC7736372d4171cDd1162E",
+    "startBlock": 10400391
+  },
+  "PeggedTokenBridgeV2": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 18526711
+  },
+  "FarmingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 18526711
+  },
+  "Staking": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 18526711
+  },
+  "StakingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 18526711
+  },
+  "MessageBus": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 18526711
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 14848861
+}

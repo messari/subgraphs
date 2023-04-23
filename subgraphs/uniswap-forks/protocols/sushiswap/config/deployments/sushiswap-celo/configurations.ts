@@ -41,12 +41,12 @@ export class SushiswapCeloConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
+    return toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
       Address.fromString(
-        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
+        toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4")
       )
     );
   }
@@ -81,7 +81,7 @@ export class SushiswapCeloConfigurations implements Configurations {
     return toLowerCase("0x2def4285787d58a2f811af24755a8150622f4361");
   }
   getRewardToken(): string {
-    return toLowerCase("0x29dFce9c22003A4999930382Fd00f9Fd6133Acd1");
+    return toLowerCase("0x29dfce9c22003a4999930382fd00f9fd6133acd1");
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
@@ -96,7 +96,7 @@ export class SushiswapCeloConfigurations implements Configurations {
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
-      "0xef4229c8c3250C675F21BCefa42f58EfbfF6002a", // USDC
+      "0xef4229c8c3250c675f21bcefa42f58efbff6002a", // USDC
       "0xe4fe50cdd716522a56204352f00aa110f731932d", // DAI
       "0xb020d981420744f6b0fedd22bb67cd37ce18a1d5", // USDT
       "0x765de816845861e75a25fca122bb6898b8b1282a", // Celo Dollar

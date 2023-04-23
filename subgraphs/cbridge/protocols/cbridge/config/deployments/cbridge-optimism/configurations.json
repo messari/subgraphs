@@ -1,0 +1,43 @@
+{
+  "network": "optimism",
+  "Bridge": {
+    "address": "0x9D39Fc627A6d9d9F8C831c16995b209548cc3401",
+    "startBlock": 646444
+  },
+  "OriginalTokenVault": {
+    "address": "0xbCfeF6Bb4597e724D720735d32A9249E0640aA11",
+    "startBlock": 3333433
+  },
+  "OriginalTokenVaultV2": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 7730742
+  },
+  "PeggedTokenBridge": {
+    "address": "0x61f85fF2a2f4289Be4bb9B72Fc7010B3142B5f41",
+    "startBlock": 2400845
+  },
+  "PeggedTokenBridgeV2": {
+    "address": "0xC3c5B9474273113efB74e7Da43B5AAba0Cd9699A",
+    "startBlock": 22924970
+  },
+  "FarmingRewards": {
+    "address": "0x06292DE88aDb3b1557B034ebB1c367E65Ab93E4C",
+    "startBlock": 18267433
+  },
+  "Staking": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 7730742
+  },
+  "StakingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 7730742
+  },
+  "MessageBus": {
+    "address": "0x0D71D18126E03646eb09FEc929e2ae87b7CAE69d",
+    "startBlock": 7730742
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 14848861
+}

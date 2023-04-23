@@ -1,47 +1,40 @@
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+
+import { Pool } from "./pool";
+import { Account } from "./account";
+import { Perpetual } from "./protocol";
+import { TokenManager } from "./tokens";
+import * as constants from "../../util/constants";
+
 import {
   Token,
   PositionSnapshot,
   _PositionCounter,
   Position as PositionSchema,
 } from "../../../../generated/schema";
-import { Pool } from "./pool";
-import { Account } from "./account";
-import { Perpetual } from "./protocol";
-import { TokenManager } from "./tokens";
-import * as constants from "../../util/constants";
-import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 /**
  * This file contains the Position class, which is used to
  * make all of the storage changes that occur in the position and
  * its corresponding snapshots.
  *
- * Schema Version:  1.2.0
- * SDK Version:     1.0.0
+ * Schema Version:  1.3.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @harsh9200
+ *  - @dhruv-chauhan
  */
 
-export class Position {
+export class PositionManager {
   protocol: Perpetual;
   tokens: TokenManager;
-  position: PositionSchema | null;
-  account: Account | null;
-  pool: Pool | null;
 
   constructor(protocol: Perpetual, tokens: TokenManager) {
     this.protocol = protocol;
     this.tokens = tokens;
-    this.pool = null;
-    this.account = null;
-    this.position = null;
   }
 
-  private save(): void {
-    this.position!.save();
-  }
-
-  private getPositionId(
+  getPositionId(
     pool: Pool,
     account: Account,
     positionSide: constants.PositionSide
@@ -53,58 +46,111 @@ export class Position {
       .concat(Bytes.fromUTF8("-"))
       .concat(Bytes.fromUTF8(positionSide));
 
-    return getPositionIdWithCounter(positionId);
+    let positionCounter = _PositionCounter.load(positionId);
+    if (!positionCounter) {
+      positionCounter = new _PositionCounter(positionId);
+      positionCounter.nextCount = 0;
+    } else {
+      positionCounter.nextCount += 1;
+    }
+    positionCounter.save();
+
+    return positionCounter.id
+      .concat(Bytes.fromUTF8("-"))
+      .concatI32(positionCounter.nextCount);
   }
 
-  load(
+  loadPosition(
     pool: Pool,
     account: Account,
     asset: Token,
     collateral: Token,
     positionSide: constants.PositionSide
-  ): void {
-    this.pool = pool;
-    this.account = account;
-
+  ): Position {
     const positionId = this.getPositionId(pool, account, positionSide);
 
-    this.position = PositionSchema.load(positionId);
+    let entity = PositionSchema.load(positionId);
+    if (!entity) {
+      entity = new PositionSchema(positionId);
+      entity.account = account.getBytesId();
+      entity.liquidityPool = pool.getBytesID();
+      entity.collateral = collateral.id;
+      entity.asset = asset.id;
 
-    if (this.position) {
-      this.takePositionSnapshot();
-      return;
+      const event = this.protocol.getCurrentEvent();
+      entity.hashOpened = event.transaction.hash;
+      entity.blockNumberOpened = event.block.number;
+      entity.timestampOpened = event.block.timestamp;
+
+      entity.side = positionSide;
+      entity.fundingrateOpen = constants.BIGDECIMAL_ZERO;
+      entity.leverage = constants.BIGDECIMAL_ZERO;
+
+      entity.balance = constants.BIGINT_ZERO;
+      entity.balanceUSD = constants.BIGDECIMAL_ZERO;
+
+      entity.collateralBalance = constants.BIGINT_ZERO;
+      entity.collateralBalanceUSD = constants.BIGDECIMAL_ZERO;
+
+      entity.collateralInCount = 0;
+      entity.collateralOutCount = 0;
+      entity.liquidationCount = 0;
+
+      entity.save();
     }
 
-    this.position = new PositionSchema(positionId);
-    this.position.account = account.getBytesId();
-    this.position.liquidityPool = pool.getBytesID();
-    this.position.collateral = collateral.id;
-    this.position.asset = asset.id;
+    return new Position(this.protocol, this.tokens, pool, account, entity);
+  }
+}
 
-    const event = this.protocol.getCurrentEvent();
-    this.position.hashOpened = event.transaction.hash;
-    this.position.blockNumberOpened = event.block.number;
-    this.position.timestampOpened = event.block.timestamp;
+export class Position {
+  protocol: Perpetual;
+  tokens: TokenManager;
+  pool: Pool;
+  account: Account;
+  position: PositionSchema;
 
-    this.position.side = positionSide;
-    this.position.fundingrateOpen = constants.BIGDECIMAL_ZERO;
-    this.position.fundingrateClosed = constants.BIGDECIMAL_ZERO;
-    this.position.leverage = constants.BIGDECIMAL_ZERO;
+  constructor(
+    protocol: Perpetual,
+    tokens: TokenManager,
+    pool: Pool,
+    account: Account,
+    position: PositionSchema
+  ) {
+    this.protocol = protocol;
+    this.tokens = tokens;
+    this.pool = pool;
+    this.account = account;
+    this.position = position;
 
-    this.position.balance = constants.BIGINT_ZERO;
-    this.position.balanceUSD = constants.BIGDECIMAL_ZERO;
+    this.openPosition();
+  }
 
-    this.position.collateralBalance = constants.BIGINT_ZERO;
-    this.position.collateralBalanceUSD = constants.BIGDECIMAL_ZERO;
+  getBytesID(): Bytes {
+    return this.position.id;
+  }
 
-    this.position.collateralInCount = 0;
-    this.position.collateralOutCount = 0;
-    this.position.liquidationCount = 0;
+  private save(): void {
+    this.position.save();
+    this.takePositionSnapshot();
+  }
 
-    this.save();
-
+  openPosition(): void {
     this.account.openPosition(this.position.side);
     this.pool.openPosition(this.position.side);
+    this.protocol.openPosition(this.position.side);
+  }
+
+  closePosition(): void {
+    const event = this.protocol.getCurrentEvent();
+    this.position.hashClosed = event.transaction.hash;
+    this.position.blockNumberClosed = event.block.number;
+    this.position.timestampClosed = event.block.timestamp;
+    this.save();
+
+    this.account.closePosition(this.position.side);
+    this.pool.closePosition(this.position.side);
+    this.protocol.closePosition(this.position.side);
   }
 
   /**
@@ -112,8 +158,6 @@ export class Position {
    * @param amount
    */
   setFundingrateOpen(amount: BigDecimal): void {
-    if (!this.position) return;
-
     this.position.fundingrateOpen = amount;
     this.save();
   }
@@ -123,8 +167,6 @@ export class Position {
    * @param amount
    */
   setFundingrateClosed(amount: BigDecimal): void {
-    if (!this.position) return;
-
     this.position.fundingrateClosed = amount;
     this.save();
   }
@@ -134,8 +176,6 @@ export class Position {
    * @param amount
    */
   setLeverage(amount: BigDecimal): void {
-    if (!this.position) return;
-
     this.position.leverage = amount;
     this.save();
   }
@@ -145,39 +185,67 @@ export class Position {
    * @param token
    * @param amount
    */
-  setBalance(token: Address, amount: BigInt): void {
-    if (!this.position) return;
-
+  setBalance(token: Token, amount: BigInt): void {
     this.position.balance = amount;
     this.position.balanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(this.tokens.getOrCreateToken(token), amount);
+      .getAmountValueUSD(token, amount);
     this.save();
-    this.takePositionSnapshot();
   }
 
   /**
    * Sets the position's collateralBalance value.
-   * @param collateralToken
+   * @param token
    * @param amount
    */
-  setCollateralBalance(collateralToken: Address, amount: BigInt): void {
-    if (!this.position) return;
-
+  setCollateralBalance(token: Token, amount: BigInt): void {
     this.position.collateralBalance = amount;
     this.position.collateralBalanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(this.tokens.getOrCreateToken(collateralToken), amount);
+      .getAmountValueUSD(token, amount);
     this.save();
-    this.takePositionSnapshot();
+  }
+
+  /**
+   * Sets the position's closeBalanceUSD value.
+   * @param token
+   * @param amount
+   */
+  setBalanceClosed(token: Token, amount: BigInt): void {
+    this.position.closeBalanceUSD = this.protocol
+      .getTokenPricer()
+      .getAmountValueUSD(token, amount);
+    this.save();
+  }
+
+  /**
+   * Sets the position's closeCollateralBalanceUSD value.
+   * @param token
+   * @param amount
+   */
+  setCollateralBalanceClosed(token: Token, amount: BigInt): void {
+    this.position.closeCollateralBalanceUSD = this.protocol
+      .getTokenPricer()
+      .getAmountValueUSD(token, amount);
+    this.save();
+  }
+
+  /**
+   * Sets the position's realisedPnlUSD value.
+   * @param token
+   * @param amount
+   */
+  setRealisedPnlClosed(token: Token, amount: BigInt): void {
+    this.position.realisedPnlUSD = this.protocol
+      .getTokenPricer()
+      .getAmountValueUSD(token, amount);
+    this.save();
   }
 
   /**
    * Adds 1 to the account position collateralIn count.
    */
-  addCollateralIn(): void {
-    if (!this.position) return;
-
+  addCollateralInCount(): void {
     this.position.collateralInCount += 1;
     this.save();
   }
@@ -185,9 +253,7 @@ export class Position {
   /**
    * Adds 1 to the account position collateralOut count.
    */
-  addCollateralOut(): void {
-    if (!this.position) return;
-
+  addCollateralOutCount(): void {
     this.position.collateralOutCount += 1;
     this.save();
   }
@@ -195,64 +261,33 @@ export class Position {
   /**
    * Adds 1 to the account position liquidation count.
    */
-  addLiquidation(): void {
-    if (!this.position) return;
-
+  addLiquidationCount(): void {
     this.position.liquidationCount += 1;
     this.save();
   }
 
-  closePosition(): void {
-    if (!this.position) return;
-
-    const event = this.protocol.getCurrentEvent();
-    this.position.hashClosed = event.transaction.hash;
-    this.position.blockNumberClosed = event.block.number;
-    this.position.timestampClosed = event.block.timestamp;
-    this.save();
-
-    if (this.account) this.account.closePosition(this.position.side);
-    if (this.pool) this.pool.closePosition(this.position.side);
-
-    this.takePositionSnapshot();
-  }
-
   private takePositionSnapshot(): void {
-    if (!this.position) return;
-
     const event = this.protocol.getCurrentEvent();
-    const snapshotId = this.position!.id.concat(event.transaction.hash).concat(
-      Bytes.fromBigInt(event.transaction.index)
-    );
+    const snapshotId = this.position.id
+      .concat(event.transaction.hash)
+      .concat(Bytes.fromUTF8(event.transaction.index.toString()));
     const snapshot = new PositionSnapshot(snapshotId);
 
     snapshot.hash = event.transaction.hash;
     snapshot.logIndex = event.transaction.index.toI32();
     snapshot.nonce = event.transaction.nonce;
 
-    snapshot.position = this.position!.id;
-    snapshot.account = this.position!.account;
-    snapshot.fundingrate = this.position!.fundingrateOpen;
-    snapshot.balance = this.position!.balance;
-    snapshot.collateralBalance = this.position!.collateralBalance;
-    snapshot.balanceUSD = this.position!.balanceUSD;
-    snapshot.collateralBalanceUSD = this.position!.collateralBalanceUSD;
+    snapshot.position = this.position.id;
+    snapshot.account = this.position.account;
+    snapshot.fundingrate = this.position.fundingrateOpen;
+    snapshot.balance = this.position.balance;
+    snapshot.collateralBalance = this.position.collateralBalance;
+    snapshot.balanceUSD = this.position.balanceUSD;
+    snapshot.collateralBalanceUSD = this.position.collateralBalanceUSD;
+    snapshot.realisedPnlUSD = this.position.realisedPnlUSD;
     snapshot.blockNumber = this.protocol.event.block.number;
     snapshot.timestamp = this.protocol.event.block.timestamp;
 
     snapshot.save();
   }
-}
-
-function getPositionIdWithCounter(counterId: Bytes): Bytes {
-  let positionCounter = _PositionCounter.load(counterId);
-  if (!positionCounter) {
-    positionCounter = new _PositionCounter(counterId);
-    positionCounter.nextCount = 0;
-    positionCounter.save();
-  }
-
-  return positionCounter.id
-    .concat(Bytes.fromUTF8("-"))
-    .concatI32(positionCounter.nextCount);
 }

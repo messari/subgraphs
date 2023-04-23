@@ -1,0 +1,10 @@
+{
+  "deployment": "THE_GRAPH_ARBITRUM",
+  "network": "arbitrum-one",
+  "stakingAddress": "0x00669A4CF01450B64E8A2A20E9b1FCB71E61eF03",
+  "stakingStartBlock": 42449585,
+  "curationAddress": "0x22d78fb4bc72e191c765807f8891b5e1785c8014",
+  "curationStartBlock": 42449403,
+  "rewardsManagerAddress": "0x971B9d3d0Ae3ECa029CAB5eA1fB0F72c85e6a525",
+  "rewardsManagerStartBlock": 42449638
+}
