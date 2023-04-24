@@ -1,0 +1,11 @@
+{
+  "deployment": "VAPORDEX_AVALANCHE",
+  "network": "avalanche",
+  "factory": {
+    "address": "0xC009a670E2B02e21E7e75AE98e254F467f7ae257",
+    "startBlock": 19911183
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
