@@ -2,8 +2,6 @@ import { Address } from "@graphprotocol/graph-ts";
 import { Market } from "../../../generated/schema";
 import { CompoundOracle } from "../../../generated/templates";
 import {
-  CompBorrowSpeedUpdated,
-  CompSupplySpeedUpdated,
   NewBorrowCap,
   NewCloseFactor,
   NewCollateralFactor,
@@ -17,14 +15,6 @@ import {
 } from "../../constants";
 import { getMarket } from "../../utils/initializers";
 import { getCompoundProtocol } from "./fetchers";
-
-export function handleCompBorrowSpeedUpdated(
-  event: CompBorrowSpeedUpdated
-): void {}
-
-export function handleCompSupplySpeedUpdated(
-  event: CompSupplySpeedUpdated
-): void {}
 
 export function handleNewBorrowCap(event: NewBorrowCap): void {
   const market = Market.load(event.params.cToken);

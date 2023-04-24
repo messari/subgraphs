@@ -10,9 +10,7 @@ import { LendingProtocol } from "../generated/schema";
 
 export const BASE_UNITS = BigDecimal.fromString("10000");
 export const WAD = BigDecimal.fromString("1000000000000000000");
-
 export const RAY = BigDecimal.fromString("1000000000000000000000000000");
-
 export const RAY_BI = BigInt.fromString("1000000000000000000000000000");
 
 export namespace ProtocolType {
@@ -49,7 +47,6 @@ export namespace EventType {
   export const LIQUIDATEE = 6;
 
   export const SUPPLIER_POSITION_UPDATE = 7;
-
   export const BORROWER_POSITION_UPDATE = 8;
 }
 

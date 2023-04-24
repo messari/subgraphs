@@ -21,8 +21,6 @@ import {
   PauseStatusSet,
   ReserveFactorSet,
   ReserveFeeClaimed,
-  RewardsClaimed,
-  RewardsClaimedAndTraded,
   Liquidated,
   P2PAmountsUpdated,
   P2PBorrowDeltaUpdated,
@@ -296,10 +294,6 @@ export function handleReserveFactorSet(event: ReserveFactorSet): void {
   market.save();
 }
 
+// Emitted when the treasury claims allocated tokens
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
 export function handleReserveFeeClaimed(event: ReserveFeeClaimed): void {}
-
-export function handleRewardsClaimed(event: RewardsClaimed): void {}
-
-export function handleRewardsClaimedAndTraded(
-  event: RewardsClaimedAndTraded
-): void {}

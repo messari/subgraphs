@@ -176,10 +176,6 @@ dataSources:
           handler: handleReserveFactorSet
         - event: ReserveFeeClaimed(indexed address,uint256)
           handler: handleReserveFeeClaimed
-        - event: RewardsClaimed(indexed address,uint256)
-          handler: handleRewardsClaimed
-        - event: RewardsClaimedAndTraded(indexed address,uint256)
-          handler: handleRewardsClaimedAndTraded
       file: ./src/mapping/morpho-compound/morphoCompound.ts
 {{/isCompound}}
 templates:

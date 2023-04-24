@@ -1,15 +1,10 @@
 import { Address, Bytes, log } from "@graphprotocol/graph-ts";
-
 import {
   CompoundOracle,
   PriceUpdated,
 } from "../../../generated/templates/CompoundOracle/CompoundOracle";
 import { exponentToBigDecimal, MORPHO_COMPOUND_ADDRESS } from "../../constants";
-import {
-  getMarket,
-  getOrInitLendingProtocol,
-  getOrInitToken,
-} from "../../utils/initializers";
+import { getMarket, getOrInitToken } from "../../utils/initializers";
 import { getCompoundProtocol } from "./fetchers";
 
 export function handlePriceUpdated(event: PriceUpdated): void {

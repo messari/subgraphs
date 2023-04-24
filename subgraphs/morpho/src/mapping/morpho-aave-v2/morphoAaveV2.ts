@@ -298,4 +298,6 @@ export function handleReserveFactorSet(event: ReserveFactorSet): void {
   market.save();
 }
 
+// Reserve Fee Claimed is emitted when the treasury claims tokens allocated
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
 export function handleReserveFeeClaimed(event: ReserveFeeClaimed): void {}
