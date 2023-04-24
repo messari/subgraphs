@@ -12,7 +12,7 @@ export class SDK {
   protocol: Perpetual;
   accounts: AccountManager;
   pools: PoolManager;
-  position: Position;
+  position: PositionManager;
   tokens: TokenManager;
   pricer: TokenPricer;
 

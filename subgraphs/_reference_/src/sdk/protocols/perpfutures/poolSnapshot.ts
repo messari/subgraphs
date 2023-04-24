@@ -1,9 +1,5 @@
 /* eslint-disable rulesdir/no-non-standard-filenames */
 import {
-  subtractTwoBigIntArrays,
-  subtractTwoBigDecimalArrays,
-} from "../../util/arrays";
-import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
   LiquidityPool as PoolSchema,

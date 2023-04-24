@@ -1,5 +1,5 @@
 /* eslint-disable rulesdir/no-non-standard-filenames */
-import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
 
 // A function which given 3 arrays of arbitrary types of the same length,
 // where the first one holds the reference order, the second one holds the same elements
