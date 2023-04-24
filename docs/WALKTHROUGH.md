@@ -108,31 +108,42 @@ Logs should be descriptive and formatted as follows to remain easy to parse thro
 
 Examples:
 
+Setup see [logger.ts](../subgraphs/_reference_/src/common/utils/logger.ts):
+
 ```typescript
-log.info(
-  "messari log: [handlePriceOracleUpdated] New price oracle: {} updated from: {}",
-  [event.params.newOracle.toHexString(), event.params.oldOracle.toHexString()]
-);
+import { logger } from "./logger.ts";
+
+const logger = new Logger(event, "handlePriceOracleUpdated");
 ```
 
 ```typescript
-log.warning(
-  "messari log: [getAavePriceUSD] Divide by 0 in liquidity pool used for pricing. Asset {} balance is 0 in this pool.",
+logger.info("New price oracle: {} updated from: {}", [
+  event.params.newOracle.toHexString(),
+  event.params.oldOracle.toHexString(),
+]);
+```
+
+```typescript
+logger.appendFuncName("getAavePriceUSD");
+logger.warning(
+  "Divide by 0 in liquidity pool used for pricing. Asset {} balance is 0 in this pool.",
   [tokenOne.toHexString()]
 );
 ```
 
 ```typescript
-log.error(
-  "messari log: [handleDeposit] Market: {} not found. Market entity expected to be created. Transaction hash {}",
+logger.appendFuncName("handleDeposit");
+logger.error(
+  "Market: {} not found. Market entity expected to be created. Transaction hash {}",
   [event.address.toHexString(), event.transaction.hash.toHexString()]
 );
 ```
 
 ```typescript
+logger.appendFuncName("updateMarketData");
 // This is impossible, and something is seriously wrong if this occurs
-log.critical(
-  "messari log: [updateMarketData] InputTokenBalance is negative in market {}. Transaction hash {}",
+logger.critical(
+  "InputTokenBalance is negative in market {}. Transaction hash {}",
   [market.id.toHexString(), event.transaction.hash.toHexString()]
 );
 ```

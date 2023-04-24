@@ -10,21 +10,17 @@ import { ethereum, log } from "@graphprotocol/graph-ts";
  */
 export class Logger {
   event: ethereum.Event;
-  fnName: string; // this will act as a rudimentary stack trace
+  funcName: string; // this will act as a rudimentary stack trace
 
-  constructor(event: ethereum.Event, fnName: string) {
+  constructor(event: ethereum.Event, funcName: string) {
     this.event = event;
-    this.fnName = fnName;
+    this.funcName = funcName;
   }
 
   private formatLog(msg: string): string {
-    if (this.fnName) {
-      return `messari_log: [${
-        this.fnName
-      }}] tx: ${this.event.transaction.hash.toHexString()} :: ${msg}`;
-    }
-
-    return `messari_log: tx: ${this.event.transaction.hash.toHexString()} :: ${msg}`;
+    return `messari_log: [${
+      this.funcName
+    }}] tx: ${this.event.transaction.hash.toHexString()} :: ${msg}`;
   }
 
   info(msg: string, args: string[]): void {
@@ -40,7 +36,7 @@ export class Logger {
     log.critical(this.formatLog(msg), args);
   }
 
-  addFunctionName(fnName: string): void {
-    this.fnName = this.fnName.concat("/").concat(fnName);
+  appendFuncName(funcName: string): void {
+    this.funcName = this.funcName.concat("/").concat(funcName);
   }
 }
