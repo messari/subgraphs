@@ -16,6 +16,7 @@ import {
   Token as TokenSchema,
   LiquidityPool as LiquidityPoolSchema,
 } from "../../../../generated/schema";
+import { BigDecimal, Bytes, BigInt } from "@graphprotocol/graph-ts";
 
 /**
  * This file contains the PoolManager, which is used to

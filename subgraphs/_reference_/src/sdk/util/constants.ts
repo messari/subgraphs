@@ -155,6 +155,7 @@ export namespace UsageType {
   export const SWAP = "SWAP";
 }
 
+export type PositionSide = string;
 export namespace PositionSide {
   export const LONG = "LONG";
   export const SHORT = "SHORT";

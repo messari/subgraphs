@@ -1,7 +1,7 @@
 /* eslint-disable rulesdir/no-non-standard-filenames */
+import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { Perpetual } from "./protocol";
 import * as constants from "../../util/constants";
-
 import { Token, RewardToken } from "../../../../generated/schema";
 
 /**

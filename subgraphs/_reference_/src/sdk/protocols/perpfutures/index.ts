@@ -7,12 +7,13 @@ import * as constants from "../../util/constants";
 import { CustomEventType } from "../../util/events";
 import { TokenInitializer, TokenManager } from "./tokens";
 import { ProtocolConfigurer, TokenPricer } from "../config";
+import { ethereum } from "@graphprotocol/graph-ts";
 
 export class SDK {
   protocol: Perpetual;
   accounts: AccountManager;
   pools: PoolManager;
-  position: PositionManager;
+  positions: PositionManager;
   tokens: TokenManager;
   pricer: TokenPricer;
 
@@ -26,7 +27,7 @@ export class SDK {
     this.tokens = new TokenManager(this.protocol, tokenInitializer);
     this.accounts = new AccountManager(this.protocol, this.tokens);
     this.pools = new PoolManager(this.protocol, this.tokens);
-    this.position = new Position(this.protocol, this.tokens);
+    this.positions = new PositionManager(this.protocol, this.tokens);
     this.pricer = pricer;
 
     this.protocol.sdk = this;
