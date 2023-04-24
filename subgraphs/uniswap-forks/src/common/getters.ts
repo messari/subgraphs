@@ -28,7 +28,6 @@ import {
   RewardTokenType,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
-  UsageType,
 } from "./constants";
 import { createPoolFees } from "./creators";
 
