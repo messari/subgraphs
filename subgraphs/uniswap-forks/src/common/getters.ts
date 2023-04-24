@@ -16,6 +16,7 @@ import {
   RewardToken,
   LiquidityPoolHourlySnapshot,
   UsageMetricsHourlySnapshot,
+  LiquidityPoolEventSnapshot,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
@@ -27,6 +28,7 @@ import {
   RewardTokenType,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
+  UsageType,
 } from "./constants";
 import { createPoolFees } from "./creators";
 
@@ -224,6 +226,40 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
     poolMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+    poolMetrics.inputTokenWeights = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+
+    poolMetrics.blockNumber = event.block.number;
+    poolMetrics.timestamp = event.block.timestamp;
+
+    poolMetrics.save();
+  }
+
+  return poolMetrics;
+}
+
+export function getOrCreateLiquidityPoolEventSnapshot(
+  eventEntityId: string,
+  eventEntityType: string,
+  event: ethereum.Event
+): LiquidityPoolEventSnapshot {
+  let poolMetrics = LiquidityPoolEventSnapshot.load(
+    event.address.toHexString().concat("-").concat(eventEntityId)
+  );
+
+  if (!poolMetrics) {
+    poolMetrics = new LiquidityPoolEventSnapshot(
+      event.address.toHexString().concat("-").concat(eventEntityId)
+    );
+    poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
+    poolMetrics.pool = event.address.toHexString();
+    poolMetrics.eventId = eventEntityId;
+    poolMetrics.eventType = eventEntityType;
+    poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;

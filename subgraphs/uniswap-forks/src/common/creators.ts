@@ -28,6 +28,7 @@ import {
   FeeSwitch,
   BIGDECIMAL_FIFTY_PERCENT,
   BIGINT_NEG_ONE,
+  UsageType,
 } from "./constants";
 import {
   getLiquidityPool,
@@ -40,6 +41,7 @@ import {
 import { convertTokenToDecimal } from "./utils/utils";
 import {
   updateDepositHelper,
+  updatePoolEventSnapshot,
   updateTokenWhitelists,
   updateVolumeAndFees,
 } from "./updateMetrics";
@@ -213,6 +215,8 @@ export function createDeposit(
   updateDepositHelper(event.address);
 
   deposit.save();
+
+  updatePoolEventSnapshot(deposit.id, UsageType.DEPOSIT, event);
 }
 
 // Create a Withdraw entity on a Burn event for the specific pool..
@@ -263,6 +267,8 @@ export function createWithdraw(
   store.remove("_Transfer", transfer.id);
 
   withdrawal.save();
+
+  updatePoolEventSnapshot(withdrawal.id, UsageType.WITHDRAW, event);
 }
 
 // Handle swaps data and update entities volumes and fees
@@ -348,6 +354,8 @@ export function createSwapHandleVolumeAndFees(
     amount0.abs(),
     amount1.abs()
   );
+
+  updatePoolEventSnapshot(swap.id, UsageType.SWAP, event);
 }
 
 class SwapTokens {

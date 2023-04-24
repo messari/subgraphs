@@ -19,6 +19,7 @@ import {
   getOrCreateTokenWhitelist,
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
+  getOrCreateLiquidityPoolEventSnapshot,
 } from "./getters";
 import {
   BIGDECIMAL_ZERO,
@@ -124,6 +125,41 @@ export function updateUsageMetrics(
   usageMetricsDaily.save();
   usageMetricsHourly.save();
   protocol.save();
+}
+
+export function updatePoolEventSnapshot(
+  eventEntityId: string,
+  eventEntityType: string,
+  event: ethereum.Event
+): void {
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
+
+  const poolMetrics = getOrCreateLiquidityPoolEventSnapshot(
+    eventEntityId,
+    eventEntityType,
+    event
+  );
+  poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+  poolMetrics.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
+  poolMetrics.inputTokenBalances = pool.inputTokenBalances;
+  poolMetrics.inputTokenWeights = pool.inputTokenWeights;
+  poolMetrics.outputTokenSupply = pool.outputTokenSupply;
+  poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetrics.blockNumber = event.block.number;
+  poolMetrics.timestamp = event.block.timestamp;
+  poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+  poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+  poolMetrics.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
+  poolMetrics.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  poolMetrics.cumulativeSupplySideRevenueUSD =
+    pool.cumulativeSupplySideRevenueUSD;
+  poolMetrics.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD;
+
+  poolMetrics.save();
 }
 
 // Update UsagePoolDailySnapshot entity
