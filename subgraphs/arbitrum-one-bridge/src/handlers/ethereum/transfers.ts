@@ -53,10 +53,6 @@ export function handleTransferIn3pGateway(event: WithdrawalFinalized): void {
 }
 
 export function handleTransferIn(event: WithdrawalFinalized): void {
-  if (ignoredToken(event.params.l1Token.toHexString())) {
-    // token is in ignored tokens list, skip execution
-    return;
-  }
   // -- SDK
 
   const sdk = SDK.initialize(
@@ -166,11 +162,6 @@ export function handleTransferOut3pGateway(event: DepositInitiated): void {
 }
 
 export function handleTransferOut(event: DepositInitiated): void {
-  if (ignoredToken(event.params.l1Token.toHexString())) {
-    // token is in ignored tokens list, skip execution
-    return;
-  }
-
   // -- SDK
 
   const sdk = SDK.initialize(
@@ -239,21 +230,4 @@ export function handleTransferOut(event: DepositInitiated): void {
     inputTokenBalance = inputTokenBalanceResult.value;
   }
   pool.setInputTokenBalance(inputTokenBalance!);
-}
-
-function ignoredToken(tokenAddress: string): bool {
-  const IGNORED_TOKENS: Array<string> = [
-    "0x761d38e5ddf6ccf6cf7c55759d5210750b5d60f3",
-    "0xd9a8bb44968f35282f1b91c353f77a61baf31a4b",
-    "0x050cbff7bff0432b6096dd15cd9499913ddf8e23",
-    "0xcfaf8edcea94ebaa080dc4983c3f9be5701d6613",
-  ];
-
-  for (let i = 0; i < IGNORED_TOKENS.length; i++) {
-    if (IGNORED_TOKENS[i] == tokenAddress) {
-      return true;
-    }
-  }
-
-  return false;
 }
