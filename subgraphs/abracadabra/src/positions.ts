@@ -7,6 +7,7 @@ import {
   PositionSnapshot,
   PositionCounter,
   LendingProtocol,
+  ActiveAccount,
 } from "../generated/schema";
 import { Cauldron } from "../generated/templates/Cauldron/Cauldron";
 import {
@@ -16,13 +17,12 @@ import {
   PositionSide,
   SECONDS_PER_DAY,
 } from "./common/constants";
-import {
-  getOrCreateLendingProtocol,
-  getOrCreateUsageMetricsDailySnapshot,
-} from "./common/getters";
-import { addToArrayAtIndex } from "./common/utils/arrays";
+import { getOrCreateUsageMetricsDailySnapshot } from "./common/getters";
 
-export function getOrCreateAccount(accountId: string): Account {
+export function getOrCreateAccount(
+  accountId: string,
+  protocol: LendingProtocol
+): Account {
   let account = Account.load(accountId);
   if (!account) {
     account = new Account(accountId);
@@ -37,8 +37,7 @@ export function getOrCreateAccount(accountId: string): Account {
     account.liquidationCount = 0;
     account.save();
 
-    const protocol = getOrCreateLendingProtocol();
-    protocol.cumulativeUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers++;
     protocol.save();
   }
   return account;
@@ -47,81 +46,84 @@ export function getOrCreateAccount(accountId: string): Account {
 export function addAccountToProtocol(
   eventType: string,
   account: Account,
-  event: ethereum.Event
+  event: ethereum.Event,
+  protocol: LendingProtocol
 ): void {
-  const protocol = getOrCreateLendingProtocol();
   const dailyId: string = (
     event.block.timestamp.toI64() / SECONDS_PER_DAY
   ).toString();
 
-  const activeEventId = `daily-${account.id}-${dailyId}-${eventType}`;
+  // get daily active account
+  const activeEventId = "daily"
+    .concat("-")
+    .concat(account.id)
+    .concat("-")
+    .concat(dailyId)
+    .concat("-")
+    .concat(eventType);
   let activeEvent = ActiveEventAccount.load(activeEventId);
+
+  // get cumulative account by event type
+  const activeAccountId = account.id.concat("-").concat(eventType);
+  let activeAccount = ActiveAccount.load(activeAccountId);
 
   const dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
 
   if (eventType == EventType.DEPOSIT) {
-    if (protocol.depositors.indexOf(account.id) < 0) {
-      protocol.depositors = addToArrayAtIndex(
-        protocol.depositors,
-        account.id,
-        0
-      );
-      protocol.cumulativeUniqueDepositors += 1;
-      dailySnapshot.cumulativeUniqueDepositors =
-        protocol.cumulativeUniqueDepositors;
+    if (!activeAccount) {
+      protocol.cumulativeUniqueDepositors++;
+      activeAccount = new ActiveAccount(activeAccountId);
+      activeAccount.save();
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
+      activeEvent.save();
       dailySnapshot.dailyActiveDepositors += 1;
     }
-    dailySnapshot.save();
   } else if (eventType == EventType.BORROW) {
-    if (protocol.borrowers.indexOf(account.id) < 0) {
-      protocol.borrowers = addToArrayAtIndex(protocol.borrowers, account.id, 0);
-      protocol.cumulativeUniqueBorrowers += 1;
-      dailySnapshot.cumulativeUniqueBorrowers =
-        protocol.cumulativeUniqueBorrowers;
+    if (!activeAccount) {
+      protocol.cumulativeUniqueBorrowers++;
+      activeAccount = new ActiveAccount(activeAccountId);
+      activeAccount.save();
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
+      activeEvent.save();
       dailySnapshot.dailyActiveBorrowers += 1;
     }
-    dailySnapshot.save();
   } else if (eventType == EventType.LIQUIDATOR) {
-    if (protocol.liquidators.indexOf(account.id) < 0) {
-      protocol.liquidators = addToArrayAtIndex(
-        protocol.liquidators,
-        account.id,
-        0
-      );
-      protocol.cumulativeUniqueLiquidators += 1;
-      dailySnapshot.cumulativeUniqueLiquidators =
-        protocol.cumulativeUniqueLiquidators;
+    if (!activeAccount) {
+      protocol.cumulativeUniqueLiquidators++;
+      activeAccount = new ActiveAccount(activeAccountId);
+      activeAccount.save();
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
+      activeEvent.save();
       dailySnapshot.dailyActiveLiquidators += 1;
     }
-    dailySnapshot.save();
   } else if (eventType == EventType.LIQUIDATEE) {
-    if (protocol.liquidatees.indexOf(account.id) < 0) {
-      protocol.liquidatees = addToArrayAtIndex(
-        protocol.liquidatees,
-        account.id,
-        0
-      );
-      protocol.cumulativeUniqueLiquidatees += 1;
-      dailySnapshot.cumulativeUniqueLiquidatees =
-        protocol.cumulativeUniqueLiquidatees;
+    if (!activeAccount) {
+      protocol.cumulativeUniqueLiquidatees++;
+      activeAccount = new ActiveAccount(activeAccountId);
+      activeAccount.save();
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
+      activeEvent.save();
       dailySnapshot.dailyActiveLiquidatees += 1;
     }
-    dailySnapshot.save();
+    protocol.save();
   }
-  activeEvent!.save();
-  protocol.save();
+  dailySnapshot.cumulativeUniqueDepositors =
+    protocol.cumulativeUniqueDepositors;
+  dailySnapshot.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
+  dailySnapshot.cumulativeUniqueLiquidators =
+    protocol.cumulativeUniqueLiquidators;
+  dailySnapshot.cumulativeUniqueLiquidatees =
+    protocol.cumulativeUniqueLiquidatees;
+
+  dailySnapshot.save();
 }
 
 export function updatePositions(
@@ -129,24 +131,23 @@ export function updatePositions(
   protocol: LendingProtocol,
   market: Market,
   eventType: string,
-  accountId: string,
+  account: Account,
   event: ethereum.Event,
   liquidation: boolean = false
 ): string {
-  const account = getOrCreateAccount(accountId);
-
   if (
     eventType == EventType.DEPOSIT ||
     eventType == EventType.BORROW ||
     eventType == EventType.LIQUIDATOR ||
     eventType == EventType.LIQUIDATEE
   ) {
-    addAccountToProtocol(eventType, account, event);
+    log.warning("updatePositions: {}", [eventType]);
+    addAccountToProtocol(eventType, account, event, protocol);
   }
 
   const balance = getAccountBalance(
     Address.fromString(market.id),
-    Address.fromString(accountId),
+    Address.fromString(account.id),
     side
   );
 
@@ -269,9 +270,12 @@ function addPosition(
     position.balance = newBalance;
     if (eventType == EventType.DEPOSIT) {
       position.depositCount += 1;
+      account.depositCount += 1;
     } else if (eventType == EventType.BORROW) {
       position.borrowCount += 1;
+      account.borrowCount += 1;
     }
+    account.save();
     position.save();
 
     snapshotPosition(position, event);
@@ -297,8 +301,10 @@ function addPosition(
   position.liquidationCount = 0;
   if (eventType == EventType.DEPOSIT) {
     position.depositCount += 1;
+    account.depositCount += 1;
   } else if (eventType == EventType.BORROW) {
     position.borrowCount += 1;
+    account.borrowCount += 1;
   }
   position.save();
 
@@ -374,9 +380,12 @@ function subtractPosition(
   position.balance = newBalance;
   if (eventType == EventType.WITHDRAW) {
     position.withdrawCount += 1;
+    account.withdrawCount += 1;
   } else if (eventType == EventType.REPAY) {
     position.repayCount += 1;
+    account.repayCount += 1;
   }
+  account.save();
   position.save();
 
   const closePosition = position.balance == BIGINT_ZERO;

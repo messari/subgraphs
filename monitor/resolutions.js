@@ -1,8 +1,8 @@
 import { errorNotification, fetchMessages, sendDiscordMessage, startProtocolThread } from "./messageDiscord.js";
-import { sleep } from "./util.js";
+import { parseIndexingThreadStrings, sleep } from "./util.js";
 
-export async function pullMessagesByThread(channelIdList, channelToProtocolIssuesMapping, channelToIndexIssuesMapping) {
-    const channelToProtocolIssuesMappingCopy = JSON.parse(JSON.stringify(channelToProtocolIssuesMapping));
+export async function pullMessagesByThread(channelIdList, channelToProtocolIss, channelToIndexIssuesMapping) {
+    const channelToProtocolIssuesMapping = JSON.parse(JSON.stringify(channelToProtocolIss));
     const channelIdsListCopy = JSON.parse(JSON.stringify([...channelIdList]));
 
     const useQueries = channelIdsListCopy.slice(0, 5);
@@ -14,12 +14,12 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIssue
         const promiseSettle = await Promise.allSettled(fetchMessagesPromiseArr);
         promiseSettle.forEach((res) => {
             if (res?.value?.length > 0) {
-                res.value.forEach((protocolMessageObject) => {
-                    const networkList = Object.keys(channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id] || []);
+                res.value.forEach(async (protocolMessageObject) => {
+                    const networkList = Object.keys(channelToProtocolIssuesMapping[protocolMessageObject.channel_id] || []);
                     if (networkList.length === 0) {
                         return;
                     }
-                    networkList.forEach(chain => {
+                    networkList.forEach((chain) => {
                         const chainStr = chain.split('-pending')[0];
                         const isPending = chain.split('-pending').length > 1;
 
@@ -29,9 +29,9 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIssue
                         }
                         let fieldCells = embedObjectOnChain.fields.filter(cell => cell.name === "Field").map(x => x.value);
                         if (fieldCells) {
-                            const existingFields = channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id][chainStr];
+                            const existingFields = channelToProtocolIssuesMapping[protocolMessageObject.channel_id][chain];
                             fieldCells = [...existingFields, ...fieldCells.filter(x => !existingFields.includes(x))];
-                            channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id][chainStr] = fieldCells;
+                            channelToProtocolIssuesMapping[protocolMessageObject.channel_id][chain] = fieldCells;
                         }
                     });
 
@@ -51,8 +51,8 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIssue
                     if (!indexedLine) {
                         return;
                     }
-                    const linesByChainArr = chainLine.split('\n').join('-----').split('-----');
-                    const linesByIndexedArr = indexedLine.split('\n').join('-----').split('-----');
+                    const linesByChainArr = await parseIndexingThreadStrings({ value: chainLine });
+                    const linesByIndexedArr = await parseIndexingThreadStrings({ value: indexedLine });
                     linesByChainArr.forEach((line, idx) => {
                         channelToIndexIssuesMapping[protocolMessageObject.channel_id].push({ chain: line, indexed: linesByIndexedArr[idx], timestamp: protocolMessageObject.timestamp });
                     })
@@ -60,16 +60,15 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIssue
             }
         });
     } catch (err) {
-        console.log(err);
         errorNotification("ERROR LOCATION 18 " + err.message);
     }
 
     await sleep(5000);
     if (newQueriesArray.length > 0) {
-        return pullMessagesByThread(newQueriesArray, channelToProtocolIssuesMappingCopy, channelToIndexIssuesMapping);
+        return pullMessagesByThread(newQueriesArray, channelToProtocolIssuesMapping, channelToIndexIssuesMapping);
     }
 
-    return { channelToProtocolIssuesMapping: channelToProtocolIssuesMappingCopy, channelToIndexIssuesMapping };
+    return { channelToProtocolIssuesMapping, channelToIndexIssuesMapping };
 }
 
 let reqCount = 0;
@@ -79,11 +78,12 @@ export async function resolveThreadCreation(protocols, threadsCreated, protocolN
     useQueries = useQueries.slice(0, 5);
     const newQueriesArray = [...protocols.slice(5)];
     try {
-        const promiseSettle = await Promise.allSettled(useQueries.map(object => {
+        const threadPromises = useQueries.map(object => {
             const base = protocolNameToBaseMapping[object.protocolName];
             reqCount += 1;
             return startProtocolThread(object.protocolName, base);
-        }));
+        })
+        const promiseSettle = await Promise.allSettled(threadPromises);
         promiseSettle.forEach(res => {
             if (res?.value) {
                 threadsCreatedCopy[res?.value?.protocolName] = res?.value?.channel;
@@ -92,9 +92,6 @@ export async function resolveThreadCreation(protocols, threadsCreated, protocolN
     } catch (err) {
         errorNotification("ERROR LOCATION 19 " + err.message);
     }
-
-    // Discord rate limits to 50 threads started in an undefined period. Per iteration of this script (once daily) max 50 threads will be started. 
-    // The remaining threads are posted the next time the monitor service executes
 
     if (reqCount >= 45) {
         return threadsCreatedCopy;
@@ -111,7 +108,7 @@ export async function resolveQueriesToAttempt(queriesToAttempt) {
     let useQueries = queriesToAttempt.slice(0, 5);
     const newQueriesArray = [...queriesToAttempt.slice(5)];
     try {
-        await Promise.allSettled(useQueries.map(object => sendDiscordMessage(object.message, object.protocolName, object.channel)));
+        await Promise.allSettled(useQueries.map(object => sendDiscordMessage(object?.message || "", object?.protocolName || "", object?.channel || "")));
     } catch (err) {
         errorNotification("ERROR LOCATION 20 " + err.message);
     }

@@ -2,15 +2,16 @@
   "deployment": "STARGATE_FANTOM",
   "network": "fantom",
   "file": "./src/mappings/handlers.ts",
-  "router": {
-    "address": "0xAf5191B0De278C7286d6C7CC6ab6BB8A73bA2Cd6",
-    "startBlock": 33646723
-  },
-  "lpStaking": {
-    "address": "0x224D8Fd7aB6AD4c6eb4611Ce56EF35Dec2277F03",
-    "startBlock": 33646780,
-    "abi": "LPStaking"
-  },
+  "lpStaking": [
+    {
+      "name": "LPStaking",
+      "address": "0x224D8Fd7aB6AD4c6eb4611Ce56EF35Dec2277F03",
+      "startBlock": 33646780,
+      "abi": "LPStaking",
+      "depositHandler": "handleStakeForBlockRewards",
+      "withdrawHandler": "handleUnstakeForBlockRewards"
+    }
+  ],
   "graftEnabled": false,
   "subgraphId": "",
   "graftStartBlock": 0

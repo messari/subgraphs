@@ -1,0 +1,18 @@
+{
+  "network": "arbitrum-one",
+  "factory": {
+    "startBlock": "71246184",
+    "address": "0x091d52CacE1edc5527C99cDCFA6937C1635330E4"
+  },
+  "lendingPoolConfigurator": {
+    "startBlock": "71246249",
+    "address": "0xe51dFE7188D0B9A84141ff47d04aB07aeB82B89D"
+  },
+  "lendingPool": {
+    "startBlock": "71246774",
+    "address": "0xf4b1486dd74d07706052a33d31d7c0aafd0659e1"
+  },
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

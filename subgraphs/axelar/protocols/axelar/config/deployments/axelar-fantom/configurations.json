@@ -1,0 +1,15 @@
+{
+  "network": "fantom",
+  "AxelarGateway": {
+    "address": "0x304acf330bbE08d1e512eefaa92F6a57871fD895",
+    "startBlock": 25758453
+  },
+  "AxelarGasService": {
+    "address": "0x2d5d7d31F671F86C782533cc367F14109a082712",
+    "startBlock": 46087791
+  },
+  "supportCallHandlers": true,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 15484661
+}

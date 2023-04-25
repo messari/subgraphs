@@ -1,0 +1,378 @@
+specVersion: 0.0.6
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{ subgraphId }}
+  block: {{ graftStartBlock }}
+{{/graftEnabled}}
+dataSources:
+{{#ethereum}}
+  {{#standardBridge}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: L1StandardBridge
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: L1StandardBridge
+          file: ./abis/L1StandardBridge.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: ERC20DepositInitiated(indexed address,indexed address,indexed address,address,uint256,bytes)
+          handler: handleERC20DepositInitiated
+        - event: ERC20WithdrawalFinalized(indexed address,indexed address,indexed address,address,uint256,bytes)
+          handler: handleERC20WithdrawalFinalized
+        - event: ETHDepositInitiated(indexed address,indexed address,uint256,bytes)
+          handler: handleETHDepositInitiated
+        - event: ETHWithdrawalFinalized(indexed address,indexed address,uint256,bytes)
+          handler: handleETHWithdrawalFinalized
+      file: ./src/mappings/L1StandardBridge.ts
+  {{/standardBridge}}
+  {{#messenger}}
+  - kind: ethereum
+    name: L1CrossDomainMessenger
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: L1CrossDomainMessenger
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: L1CrossDomainMessenger
+          file: ./abis/L1CrossDomainMessenger.json
+      eventHandlers:
+        - event: SentMessage(indexed address,address,bytes,uint256,uint256)
+          handler: handleSentMessage
+      file: ./src/mappings/L1CrossDomainMessenger.ts
+  {{/messenger}}
+  {{#snxBridge}}
+  - kind: ethereum
+    name: SynthetixBridgeToOptimism
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: SynthetixBridgeToOptimism
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: SynthetixBridgeToOptimism
+          file: ./abis/SynthetixBridgeToOptimism.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: DepositInitiated(indexed address,address,uint256)
+          handler: handleDepositInitiated
+        - event: FinalizeSynthTransfer(indexed bytes32,indexed address,uint256)
+          handler: handleFinalizeSynthTransfer
+        - event: InitiateSynthTransfer(indexed bytes32,indexed address,uint256)
+          handler: handleInitiateSynthTransfer
+        - event: WithdrawalFinalized(indexed address,uint256)
+          handler: handleWithdrawalFinalized
+      file: ./src/mappings/SynthetixBridgeToOptimism.ts
+  {{/snxBridge}}
+{{/ethereum}}
+{{#optimism}}
+  {{#standardBridge}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: L2StandardBridge
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: L2StandardBridge
+          file: ./abis/L2StandardBridge.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: DepositFinalized(indexed address,indexed address,indexed address,address,uint256,bytes)
+          handler: handleDepositFinalized
+        - event: WithdrawalInitiated(indexed address,indexed address,indexed address,address,uint256,bytes)
+          handler: handleWithdrawalInitiated
+      file: ./src/mappings/L2StandardBridge.ts
+  {{/standardBridge}}
+  {{#messenger}}
+  - kind: ethereum
+    name: L2CrossDomainMessenger
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: L2CrossDomainMessenger
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: L2CrossDomainMessenger
+          file: ./abis/L2CrossDomainMessenger.json
+      eventHandlers:
+        - event: SentMessage(indexed address,address,bytes,uint256,uint256)
+          handler: handleSentMessage
+      file: ./src/mappings/L2CrossDomainMessenger.ts
+  {{/messenger}}
+  {{#snxBridge}}
+  - kind: ethereum
+    name: SynthetixBridgeToBase
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: SynthetixBridgeToBase
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: SynthetixBridgeToBase
+          file: ./abis/SynthetixBridgeToBase.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: DepositFinalized(indexed address,uint256)
+          handler: handleDepositFinalized
+        - event: FinalizeSynthTransfer(indexed bytes32,indexed address,uint256)
+          handler: handleFinalizeSynthTransfer
+        - event: InitiateSynthTransfer(indexed bytes32,indexed address,uint256)
+          handler: handleInitiateSynthTransfer
+        - event: WithdrawalInitiated(indexed address,address,uint256)
+          handler: handleWithdrawalInitiated
+      file: ./src/mappings/SynthetixBridgeToBase.ts
+  {{/snxBridge}}
+{{/optimism}}
+templates:
+  # Template with all abis to use for imports
+  - kind: ethereum/contract
+    name: Bridge
+    network: {{ network }}
+    source:
+      abi: L1StandardBridge
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: L1StandardBridge
+          file: ./abis/L1StandardBridge.json
+        - name: L1CrossDomainMessenger
+          file: ./abis/L1CrossDomainMessenger.json
+        - name: L2StandardBridge
+          file: ./abis/L2StandardBridge.json
+        - name: L2CrossDomainMessenger
+          file: ./abis/L2CrossDomainMessenger.json
+        - name: SynthetixBridgeToOptimism
+          file: ./abis/SynthetixBridgeToOptimism.json
+        - name: SynthetixBridgeToBase
+          file: ./abis/SynthetixBridgeToBase.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      file: ./src/mappings/L1StandardBridge.ts

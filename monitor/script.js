@@ -1,10 +1,11 @@
 import axios from "axios";
-import { clearThread, constructEmbedMsg, errorNotification, getAllThreadsToClear, getDiscordMessages, postError, sendMessageToAggThread } from "./messageDiscord.js";
+import { clearThread, constructEmbedMsg, errorNotification, fetchMessages, getAllThreadsToClear, getDiscordMessages, postAlert, sendMessageToAggThread } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolDerivedFields, protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
 import { pullMessagesByThread, resolveQueriesToAttempt, resolveThreadCreation } from "./resolutions.js";
-import { generateEndpoints, indexStatusFlow, queryDecentralizedIndex } from "./indexingStatus.js";
+import { generateDecenEndpoints, generateEndpoints, generateProtocolToBaseMap, indexStatusFlow, queryDecentralizedIndex } from "./indexingStatus.js";
+import { getGithubIssues } from "./github.js";
 
 const hourMs = 3600000;
 
@@ -15,11 +16,10 @@ try {
   errorNotification("ERROR LOCATION 21 " + err.message + ' MAIN LOGIC script.js');
 }
 
-let protocolNameToBaseMapping = {};
 
 async function executionFlow() {
   console.log('START');
-  postError('TEST ERROR POST')
+  postAlert('START');
   let data = null;
   try {
     const result = await axios.get(
@@ -27,12 +27,11 @@ async function executionFlow() {
     );
     data = result.data;
   } catch (err) {
-    console.log(err.message)
+    console.log(err.message);
   }
-  const loopDeploymentJSON = await generateEndpoints(data, protocolNameToBaseMapping);
-  const subgraphEndpoints = loopDeploymentJSON.subgraphEndpoints;
-  protocolNameToBaseMapping = loopDeploymentJSON.protocolNameToBaseMapping;
-  const hostedEndpointToDecenNetwork = loopDeploymentJSON.hostedEndpointToDecenNetwork;
+  const subgraphEndpoints = await generateEndpoints(data);
+  const hostedEndpointToDecenNetwork = await generateDecenEndpoints(data);
+  const protocolNameToBaseMapping = await generateProtocolToBaseMap(data);
   const decenKeyToEndpoint = await queryDecentralizedIndex(hostedEndpointToDecenNetwork);
 
   let deployments = {};
@@ -93,14 +92,14 @@ async function executionFlow() {
   });
 
   await getAllThreadsToClear(Date.now() - (86400000 * 7), process.env.CHANNEL_ID);
+  await clearThread(Date.now() - (86400000), process.env.PROD_CHANNEL);
 
-  const indexStatusFlowObject = await indexStatusFlow(deployments);
-  deployments = { ...indexStatusFlowObject.deployments, ...decentralizedDeployments };
-  const invalidDeployments = indexStatusFlowObject.invalidDeployments;
+  const indexStatusFlowDepos = await indexStatusFlow(deployments);
+  deployments = { ...indexStatusFlowDepos, ...decentralizedDeployments };
 
   // pass invalid deployments arr to protocolLevel, before execution check if depo key is included in array
-  deployments = await protocolLevel(deployments, invalidDeployments);
-  deployments = await protocolDerivedFields(deployments, invalidDeployments);
+  deployments = await protocolLevel(deployments);
+  deployments = await protocolDerivedFields(deployments);
   const currentDiscordMessages = await getDiscordMessages([]);
   const protocolThreadsToStart = [];
   let protocolNameToChannelMapping = {};
@@ -113,8 +112,8 @@ async function executionFlow() {
     }
   })
 
-  const channelMapping = await resolveThreadCreation(protocolThreadsToStart, protocolNameToChannelMapping, protocolNameToBaseMapping);
-  protocolNameToChannelMapping = { ...protocolNameToChannelMapping, ...channelMapping };
+  const newProtocolThreads = await resolveThreadCreation(protocolThreadsToStart, protocolNameToChannelMapping, protocolNameToBaseMapping);
+  protocolNameToChannelMapping = { ...protocolNameToChannelMapping, ...newProtocolThreads };
   let channelToProtocolIssuesMapping = {};
   let channelToIndexIssuesMapping = {};
 
@@ -122,20 +121,24 @@ async function executionFlow() {
     const channelId = protocolNameToChannelMapping[protocolName];
     channelToProtocolIssuesMapping[channelId] = {};
     channelToIndexIssuesMapping[channelId] = [];
-    Object.keys(deployments).filter(x => {
-      return deployments[x].protocolName === protocolName;
-    }).forEach(x => {
-      if (deployments[x].pending) {
-        channelToProtocolIssuesMapping[channelId][deployments[x].network + '-pending'] = [];
-      } else {
-        channelToProtocolIssuesMapping[channelId][deployments[x].network] = [];
+    Object.keys(deployments).forEach(x => {
+      if (deployments[x].protocolName === protocolName) {
+        if (deployments[x].pending) {
+          channelToProtocolIssuesMapping[channelId][deployments[x].network + '-pending'] = [];
+        } else {
+          channelToProtocolIssuesMapping[channelId][deployments[x].network] = [];
+        }
       }
     });
   });
   const issuesMapping = await pullMessagesByThread(Object.keys(channelToProtocolIssuesMapping), channelToProtocolIssuesMapping, channelToIndexIssuesMapping);
+  const issuesGithub = await getGithubIssues();
+  const currentThreadMessages = await fetchMessages("", process.env.PROD_CHANNEL);
+
   channelToProtocolIssuesMapping = issuesMapping.channelToProtocolIssuesMapping;
   channelToIndexIssuesMapping = issuesMapping.channelToIndexIssuesMapping;
-  let messagesToPost = protocolNames.map(protocolName => {
+
+  const messagesToPost = protocolNames.map(protocolName => {
     let channelId = protocolNameToChannelMapping[protocolName] || null;
     if (!channelId) {
       return null;
@@ -146,29 +149,17 @@ async function executionFlow() {
     if (!indexDeploymentIssues) {
       indexDeploymentIssues = [];
     }
-    const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet, protocolIssuesOnThread, indexDeploymentIssues);
-    if (embeddedMessages) {
-      return { message: embeddedMessages, protocolName: protocolName, channel: channelId };
-    } else {
-      return null;
-    }
-  }).filter(x => x);
-  if (messagesToPost.length > 0) {
-    await clearThread(Date.now() - (86400000), process.env.PROD_CHANNEL);
-    const aggThread = currentDiscordMessages.find(x => x.content.includes('Production Ready Subgraph Indexing Failure'));
-    const aggThreadId = aggThread?.id || "";
-    if (aggThreadId) {
-      await clearThread(Date.now() - (86400000), aggThreadId);
-    }
-    await sendMessageToAggThread(aggThreadId);
-    messagesToPost = messagesToPost.filter((msg, idx) => {
-      if (!msg?.channel && !!msg) {
-        messagesToPost[idx].channel = protocolNameToChannelMapping[msg?.protocolName];
-      }
-      return !!msg;
-    });
-    await resolveQueriesToAttempt(messagesToPost);
+    return constructEmbedMsg(protocolName, deploymentSet, protocolIssuesOnThread, indexDeploymentIssues, channelId, issuesGithub, currentThreadMessages);
+  });
+
+  await resolveQueriesToAttempt(messagesToPost);
+
+  const aggThread = currentDiscordMessages.find(x => x.content.includes('Production Ready Subgraph Indexing Failure'));
+  const aggThreadId = aggThread?.id || "";
+  if (aggThreadId) {
+    await clearThread(Date.now() - (86400000), aggThreadId);
   }
-  console.log('FINISH')
+  await sendMessageToAggThread(aggThreadId);
+  console.log('FINISH');
   return;
 }

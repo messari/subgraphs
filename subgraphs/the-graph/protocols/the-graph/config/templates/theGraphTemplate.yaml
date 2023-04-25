@@ -1,0 +1,187 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema-generic.graphql
+dataSources:
+  - kind: ethereum
+    name: Staking
+    network: {{network}}
+    source:
+      address: "{{stakingAddress}}"
+      abi: Staking
+      startBlock: {{stakingStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Staking
+          file: ./abis/the-graph/Staking.json
+          
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        ## Indexer staking events
+        - event: StakeDeposited(indexed address,uint256)
+          handler: handleStakeDeposited
+        - event: StakeLocked(indexed address,uint256,uint256)
+          handler: handleStakeLocked
+        - event: StakeSlashed(indexed address,uint256,uint256,address)
+          handler: handleStakeSlashed
+        - event: StakeWithdrawn(indexed address,uint256)
+          handler: handleStakeWithdrawn
+        - event: RebateClaimed(indexed address,indexed bytes32,indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleRebateClaimed
+
+        ## Delegator staking events
+        - event: StakeDelegated(indexed address,indexed address,uint256,uint256)
+          handler: handleStakeDelegated
+        - event: StakeDelegatedLocked(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleStakeDelegatedLocked
+        - event: StakeDelegatedWithdrawn(indexed address,indexed address,uint256)
+          handler: handleStakeDelegatedWithdrawn
+        - event: DelegationParametersUpdated(indexed address,uint32,uint32,uint32)
+          handler: handleDelegationParametersUpdated
+      file: ./src/handlers/handleStaking.ts
+  
+  - kind: ethereum
+    name: Curation
+    network: {{network}}
+    source:
+      address: "{{curationAddress}}"
+      abi: Curation
+      startBlock: {{curationStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Curation
+          file: ./abis/the-graph/Curation.json
+          
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        ## Curator signalling events
+        - event: Signalled(indexed address,indexed bytes32,uint256,uint256,uint256)
+          handler: handleSignalled
+        - event: Burned(indexed address,indexed bytes32,uint256,uint256)
+          handler: handleBurned
+        - event: Collected(indexed bytes32,uint256)
+          handler: handleCollected
+      file: ./src/handlers/handleCurator.ts
+  
+  - kind: ethereum
+    name: RewardsManager
+    network: {{network}}
+    source:
+      address: "{{rewardsManagerAddress}}"
+      abi: RewardsManager
+      startBlock: {{rewardsManagerStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: RewardsManager
+          file: ./abis/the-graph/RewardsManager.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        ## Curator signalling events
+        - event: RewardsAssigned(indexed address,indexed address,uint256,uint256)
+          handler: handleRewardsAssigned
+      file: ./src/handlers/handleRewardsManager.ts

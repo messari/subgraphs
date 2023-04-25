@@ -673,6 +673,9 @@ type Market @entity {
 
   " Amount of output token staked (used to calc reward for iron-bank) "
   _stakedOutputTokenAmount: BigInt
+
+  " Realm of bastion market "
+  _realm: _Realm
 }
 
 #################################
@@ -1321,4 +1324,17 @@ type _PositionCounter @entity {
 type _ActorAccount @entity {
   " { Actor type (Depositor / Borrower / Liquidator / Liquidatee) }-{ Account address } "
   id: ID!
+}
+
+type _Realm @entity {
+  " {Comptroller address of bastion Hub/Realm} "
+  id: ID!
+  priceOracle: String!
+}
+
+type _RewardType @entity {
+  " {RewardType} "
+  id: ID!
+  " reward token "
+  token: Token!
 }

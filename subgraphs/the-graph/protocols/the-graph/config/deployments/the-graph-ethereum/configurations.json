@@ -1,1 +1,10 @@
-{}
+{
+  "deployment": "THE_GRAPH_ETHEREUM",
+  "network": "mainnet",
+  "stakingAddress": "0xF55041E37E12cD407ad00CE2910B8269B01263b9",
+  "stakingStartBlock": 11446785,
+  "curationAddress": "0x8FE00a685Bcb3B2cc296ff6FfEaB10acA4CE1538",
+  "curationStartBlock": 11446775,
+  "rewardsManagerAddress": "0x9ac758ab77733b4150a901ebd659cbf8cb93ed66",
+  "rewardsManagerStartBlock": 11446789
+}

@@ -81,7 +81,7 @@ export class TrisolarisAuroraConfigurations implements Configurations {
     return toLowerCase("0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d"); // wNEAR
   }
   getRewardToken(): string {
-    return toLowerCase("0xFa94348467f64D5A457F75F8bc40495D33c65aBB"); // Trisolaris
+    return toLowerCase("0xfa94348467f64d5a457f75f8bc40495d33c65abb"); // Trisolaris
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([

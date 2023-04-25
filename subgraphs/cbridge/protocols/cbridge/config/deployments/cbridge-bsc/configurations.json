@@ -1,0 +1,43 @@
+{
+  "network": "bsc",
+  "Bridge": {
+    "address": "0xdd90E5E87A2081Dcf0391920868eBc2FFB81a1aF",
+    "startBlock": 12785165
+  },
+  "OriginalTokenVault": {
+    "address": "0x78bc5Ee9F11d133A08b331C2e18fE81BE0Ed02DC",
+    "startBlock": 13888019
+  },
+  "OriginalTokenVaultV2": {
+    "address": "0x11a0c9270D88C99e221360BCA50c2f6Fda44A980",
+    "startBlock": 17508826
+  },
+  "PeggedTokenBridge": {
+    "address": "0xd443FE6bf23A4C9B78312391A30ff881a097580E",
+    "startBlock": 13490479
+  },
+  "PeggedTokenBridgeV2": {
+    "address": "0x26c76F7FeF00e02a5DD4B5Cc8a0f717eB61e1E4b",
+    "startBlock": 14627208
+  },
+  "FarmingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 13670097
+  },
+  "Staking": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 13670030
+  },
+  "StakingRewards": {
+    "address": "0x0000000000000000000000000000000000000000",
+    "startBlock": 13670076
+  },
+  "MessageBus": {
+    "address": "0x95714818fdd7a5454f73da9c777b3ee6ebaeea6b",
+    "startBlock": 16772365
+  },
+  "supportCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 14848861
+}

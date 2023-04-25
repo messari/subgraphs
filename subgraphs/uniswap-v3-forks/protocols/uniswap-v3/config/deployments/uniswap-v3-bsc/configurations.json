@@ -1,0 +1,11 @@
+{
+  "network": "bsc",
+  "factoryAddress": "0xdb1d10011ad0ff90774d0c6bb92e5c5c8b4461f7",
+  "factoryAddressStartBlock": 26324014,
+  "nonFungiblePositionManagerAddress": "0x7b8a01b39d58278b5de7e48c8449c9f4f5170613",
+  "nonFungiblePositionManagerAddressStartBlock": 26324045,
+  "deployment": "UNISWAP_V3_BSC",
+  "graftEnabled": false,
+  "subgraphId": "QmTftg7pdUQ21m2RSmYxXYmhUqYtsvD1QNMJFUJWWANxFm",
+  "graftStartBlock": 50045501
+}

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { errorNotification } from "./messageDiscord.js";
+import { errorNotification, postAlert } from "./messageDiscord.js";
 
 const queryContents = `
 subgraph
@@ -22,15 +22,51 @@ chains {
   }
 }`;
 
-export async function generateEndpoints(data, protocolNameToBaseMapping) {
+export async function generateProtocolToBaseMap(data) {
+  const protocolToBaseMap = {};
+  if (Object.keys(data)?.length > 0) {
+    Object.keys(data).forEach((protocolName) => {
+      const protocol = data[protocolName];
+      protocolToBaseMap[protocolName] = protocol.base;
+    })
+  }
+  return protocolToBaseMap;
+}
+
+export async function generateDecenEndpoints(data) {
+  const hostedEndpointToDecenNetwork = {};
   try {
-    const protocolNameToBaseMappingCopy = JSON.parse(JSON.stringify(protocolNameToBaseMapping));
-    const subgraphEndpoints = {};
-    const hostedEndpointToDecenNetwork = {};
     if (Object.keys(data)?.length > 0) {
       Object.keys(data).forEach((protocolName) => {
         const protocol = data[protocolName];
-        protocolNameToBaseMappingCopy[protocolName] = protocol.base;
+        if (!protocol.schema) {
+          return;
+        }
+        Object.values(protocol.deployments).forEach((depoData) => {
+          let hostedServiceId = "";
+          const hostedServiceObject = depoData?.services["hosted-service"];
+          if (!!hostedServiceObject) {
+            hostedServiceId = hostedServiceObject?.slug;
+          }
+          const decenObj = depoData?.services["decentralized-network"];
+          if (!!decenObj) {
+            hostedEndpointToDecenNetwork["https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId] = (decenObj?.["query-id"]);
+          }
+        });
+      })
+    }
+  } catch (err) {
+    errorNotification("ERROR LOCATION 1 " + err.message);
+  }
+  return hostedEndpointToDecenNetwork;
+}
+
+export async function generateEndpoints(data) {
+  try {
+    const subgraphEndpoints = {};
+    if (Object.keys(data)?.length > 0) {
+      Object.keys(data).forEach((protocolName) => {
+        const protocol = data[protocolName];
         if (!protocol.schema) {
           return;
         }
@@ -46,13 +82,10 @@ export async function generateEndpoints(data, protocolNameToBaseMapping) {
             hostedServiceId = depoData?.services["hosted-service"]?.slug;
           }
           subgraphEndpoints[protocol.schema][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId;
-          if (!!depoData?.services["decentralized-network"]) {
-            hostedEndpointToDecenNetwork["https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId] = (depoData?.services["decentralized-network"]?.["query-id"]);
-          }
         });
       });
     }
-    return { subgraphEndpoints, protocolNameToBaseMapping: protocolNameToBaseMappingCopy, hostedEndpointToDecenNetwork };
+    return subgraphEndpoints;
   } catch (err) {
     errorNotification("ERROR LOCATION 1 " + err.message);
   }
@@ -63,6 +96,9 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
     return {};
   }
   const decenQueries = Object.values(hostedEndpointToDecenNetwork).map((decenNetwork) => {
+    if (!decenNetwork) {
+      return null;
+    }
     const endpoint = "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenNetwork
     const string = `query MyQuery {
       _meta {
@@ -82,59 +118,76 @@ export async function queryDecentralizedIndex(hostedEndpointToDecenNetwork) {
     )
   });
 
+  const decenSubgraphHashToIndexingObj = {};
   const decenDeploymentMapping = {};
+  const decenErrorObj = {};
   await Promise.allSettled(decenQueries)
     .then(
-      (response) =>
-      (response.forEach((metaData) => {
-        if (metaData?.value?.data?.data?._meta?.deployment) {
-          decenDeploymentMapping[metaData?.value?.data?.data?._meta?.deployment] = metaData?.value?.config?.url?.split("/subgraphs/id/")?.[1];
-        }
-      })))
+      (response) => {
+        response.forEach((metaData) => {
+          if (metaData?.value?.data?.data?._meta?.deployment) {
+            decenDeploymentMapping[metaData?.value?.data?.data?._meta?.deployment] = metaData?.value?.config?.url?.split("/subgraphs/id/")?.[1];
+          } else {
+            decenErrorObj[metaData?.value?.config?.url?.split("/subgraphs/id/")?.[1]] = metaData?.value?.data?.errors?.message;
+          }
+        })
+      })
     .catch((err) => errorNotification("ERROR LOCATION 16 " + err.message));
 
-  const indexingQuery = `query Status { indexingStatuses(subgraphs: ${JSON.stringify(Object.keys(decenDeploymentMapping))} ) { 
-    subgraph
-    synced
-    fatalError {
-      message
-    }
-    chains {
-      chainHeadBlock {
-        number
+  if (Object.keys(decenDeploymentMapping)?.length > 0) {
+    const indexingQuery = `query Status { indexingStatuses(subgraphs: ${JSON.stringify(Object.keys(decenDeploymentMapping))} ) { 
+      subgraph
+      synced
+      fatalError {
+        message
       }
-      earliestBlock {
-        number
+      chains {
+        chainHeadBlock {
+          number
+        }
+        earliestBlock {
+          number
+        }
+        latestBlock {
+          number
+        }
+        lastHealthyBlock {
+          number
+        }
       }
-      latestBlock {
-        number
-      }
-      lastHealthyBlock {
-        number
-      }
-    }
-    entityCount
-}
-}`;
+      entityCount
+  }
+  }`;
 
-  const res = await axios.post("https://api.thegraph.com/index-node/graphql", { query: indexingQuery })
-  const decenSubgraphHashToIndexingObj = {};
-  res.data.data.indexingStatuses.forEach(obj => {
-    let indexedPercentage = ((obj?.chains[0]?.latestBlock?.number - obj?.chains[0]?.earliestBlock?.number) / (obj?.chains[0]?.chainHeadBlock?.number - obj?.chains[0]?.earliestBlock?.number)) || 0;
-    indexedPercentage = indexedPercentage * 100;
-    if (indexedPercentage > 99.5) {
-      indexedPercentage = 100;
+    let res = {};
+    try {
+      res = await axios.post("https://api.thegraph.com/index-node/graphql", { query: indexingQuery });
+    } catch (err) {
+      postAlert('ERROR QUERYING INDEX STATUS - ' + err.message);
     }
-    if (obj.fatalError) {
-      decenSubgraphHashToIndexingObj[decenDeploymentMapping[obj.subgraph]] = {
-        endpoint: "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenDeploymentMapping[obj.subgraph],
-        hash: obj.subgraph,
-        indexingErrorMessage: obj.fatalError.message,
-        indexingErrorBlock: obj?.chains[0]?.latestBlock?.number,
-        indexingPercentage: indexedPercentage.toFixed(2)
-      };
+    try {
+      res?.data?.data?.indexingStatuses?.forEach(obj => {
+        let indexedPercentage = ((obj?.chains[0]?.latestBlock?.number - obj?.chains[0]?.earliestBlock?.number) / (obj?.chains[0]?.chainHeadBlock?.number - obj?.chains[0]?.earliestBlock?.number)) || 0;
+        indexedPercentage = indexedPercentage * 100;
+        if (indexedPercentage > 99.5) {
+          indexedPercentage = 100;
+        }
+        if (obj?.fatalError) {
+          decenSubgraphHashToIndexingObj[decenDeploymentMapping[obj?.subgraph]] = {
+            endpoint: "https://gateway.thegraph.com/api/" + process.env.GRAPH_API_KEY + "/subgraphs/id/" + decenDeploymentMapping[obj?.subgraph],
+            hash: obj?.subgraph,
+            indexingErrorMessage: obj?.fatalError?.message,
+            indexingErrorBlock: obj?.chains[0]?.latestBlock?.number,
+            indexingPercentage: indexedPercentage.toFixed(2)
+          };
+        }
+      });
+    } catch (err) {
+      postAlert('ERROR HANDLING INDEXING STATUS RESPONSE - ' + err.message);
     }
-  });
+  } else {
+    postAlert('ERRORS CREATING DECENTRALIZED DEPLOYMENT MAPPING - ' + Object.values(decenErrorObj).join(' | ').slice(0, 500) + '...');
+  }
   return decenSubgraphHashToIndexingObj;
 }
 
@@ -145,7 +198,6 @@ export async function indexStatusFlow(deployments) {
 
     const indexingStatusQueriesArray = generateIndexStatus.indexingStatusQueries;
     const indexData = await getIndexingStatusData(indexingStatusQueriesArray);
-    const invalidDeployments = [];
     Object.keys(indexData).forEach((indexDataName) => {
       const realNameString = indexDataName.split("_").join("-");
       if (!indexData[indexDataName] && indexDataName.includes("pending")) {
@@ -172,16 +224,12 @@ export async function indexStatusFlow(deployments) {
       }
 
       if (
-        !indexData[indexDataName]
+        !indexData[indexDataName] || parseFloat(deployments[realNameString]?.indexedPercentage) < 10
       ) {
-        invalidDeployments.push(realNameString);
-      }
-
-      if (parseFloat(deployments[realNameString]?.indexedPercentage) < 10) {
-        invalidDeployments.push(realNameString);
+        delete deployments[realNameString];
       }
     });
-    return { invalidDeployments, deployments };
+    return deployments;
   } catch (err) {
     errorNotification("ERROR LOCATION 2 " + err.message);
   }

@@ -168,8 +168,8 @@ export function updateUsageMetrics(
   usageDailySnapshot.timestamp = event.block.timestamp;
   usageDailySnapshot.dailyTransactionCount += 1;
 
-  getOrCreateAccount(from.toHexString());
-  getOrCreateAccount(to.toHexString());
+  getOrCreateAccount(from.toHexString(), protocol);
+  getOrCreateAccount(to.toHexString(), protocol);
 
   usageHourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageDailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
