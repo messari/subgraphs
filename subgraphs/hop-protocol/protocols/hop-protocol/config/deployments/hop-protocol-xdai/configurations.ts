@@ -172,11 +172,20 @@ export class HopProtocolxDaiConfigurations implements Configurations {
 	}
 
 	getPoolDetails(poolAddress: string): string[] {
-		if (poolAddress == XdaiAmm.USDC) return ['HOP-USDC', 'hUSDC/USDC']
-		else if (poolAddress == XdaiAmm.DAI) return ['HOP-DAI', 'hDAI/DAI']
-		else if (poolAddress == XdaiAmm.USDT) return ['HOP-USDT', 'hUSDT/USDT']
-		else if (poolAddress == XdaiAmm.ETH) return ['HOP-ETH', 'hETH/ETH']
-		else if (poolAddress == XdaiAmm.MATIC) return ['HOP-MATIC', 'hMATIC/MATIC']
+		if (poolAddress == XdaiAmm.USDC)
+			return ['HOP-USDC', 'hUSDC/USDC Pool - USDC', 'hUSDC/USDC Pool - hUSDC']
+		else if (poolAddress == XdaiAmm.DAI)
+			return ['HOP-DAI', 'hDAI/DAI Pool - DAI', 'hDAI/DAI Pool - hDAI']
+		else if (poolAddress == XdaiAmm.USDT)
+			return ['HOP-USDT', 'hUSDT/USDT Pool - USDT', 'hUSDT/USDT Pool - hUSDT']
+		else if (poolAddress == XdaiAmm.ETH)
+			return ['HOP-ETH', 'hETH/ETH Pool - ETH', 'hETH/ETH Pool - hETH']
+		else if (poolAddress == XdaiAmm.MATIC)
+			return [
+				'HOP-MATIC',
+				'hMATIC/MATIC Pool - MATIC',
+				'hMATIC/MATIC Pool - hMATIC',
+			]
 		else {
 			log.critical('Pool not found', [])
 			return []

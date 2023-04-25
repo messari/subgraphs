@@ -244,7 +244,6 @@ export class Pool {
 	 */
 	setTotalValueLocked(newTVL: BigDecimal): void {
 		const delta = newTVL.minus(this.pool.totalValueLockedUSD)
-
 		this.addTotalValueLocked(delta)
 		this.save()
 	}
@@ -357,7 +356,7 @@ export class Pool {
 	 * @param amount amount to be added to the pool's input token balance.
 	 * @param updateMetrics optional parameter to indicate whether to update the pool's and protocol's total value locked.
 	 */
-	addInputTokenBalance(amount: BigInt, updateMetrics: boolean = true): void {
+	addInputTokenBalance(amount: BigInt, updateMetrics: boolean = false): void {
 		const newBalance = this.pool.inputTokenBalance.plus(amount)
 		this.setInputTokenBalance(newBalance, updateMetrics)
 	}
@@ -376,6 +375,7 @@ export class Pool {
 		this.pool.inputTokenBalance = newBalance
 		if (updateMetrics) {
 			this.refreshTotalValueLocked()
+			this.refreshNetValueExportedUSD()
 		}
 	}
 
@@ -494,7 +494,7 @@ export class Pool {
 	 */
 	addMintSupply(amount: BigInt): void {
 		this.pool.mintSupply = this.pool.mintSupply!.plus(amount)
-		this.save()
+		this.refreshNetValueExportedUSD()
 	}
 
 	/**
@@ -648,7 +648,6 @@ export class Pool {
 				amount = amount.times(BIGINT_MINUS_ONE)
 			}
 			this.addMintSupply(amount)
-			this.refreshNetValueExportedUSD()
 		} else if (
 			this.pool.type == BridgePoolType.LIQUIDITY ||
 			this.pool.type == BridgePoolType.LOCK_RELEASE
@@ -657,8 +656,7 @@ export class Pool {
 			if (!transfer.isOutgoing) {
 				amount = amount.times(BIGINT_MINUS_ONE)
 			}
-			// this.addInputTokenBalance(amount)
-			this.refreshNetValueExportedUSD()
+			this.addInputTokenBalance(amount)
 		}
 	}
 

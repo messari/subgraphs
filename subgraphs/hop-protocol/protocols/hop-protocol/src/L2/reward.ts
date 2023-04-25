@@ -97,7 +97,9 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			log.warning('GNO RewardsPaid 1 --> poolAddress: {},', [poolAddress])
 
 			const poolName = poolConfig[1]
+
 			const poolSymbol = poolConfig[0]
+			const hPoolName = poolConfig[2]
 
 			const sdk = SDK.initializeFromEvent(
 				conf,
@@ -118,7 +120,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
 				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			if (!hPool.isInitialized) {
-				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+				hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			const Reward = L2_Reward.bind(event.address)
 			const rewardRateCall = Reward.try_rewardRate()
@@ -164,7 +166,9 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			log.warning('OP RewardsPaid 1 --> poolAddress: {},', [poolAddress])
 
 			const poolName = poolConfig[1]
+
 			const poolSymbol = poolConfig[0]
+			const hPoolName = poolConfig[2]
 
 			const sdk = SDK.initializeFromEvent(
 				conf,
@@ -185,7 +189,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
 				pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			if (!hPool.isInitialized) {
-				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+				hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			const Reward = L2_Reward.bind(event.address)
 			const rewardRateCall = Reward.try_rewardRate()
@@ -231,7 +235,9 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			log.warning('RewardsPaid 1 --> poolAddress: {},', [poolAddress])
 
 			const poolName = poolConfig[1]
+
 			const poolSymbol = poolConfig[0]
+			const hPoolName = poolConfig[2]
 
 			const sdk = SDK.initializeFromEvent(
 				conf,
@@ -254,7 +260,7 @@ export function handleRewardsPaid(event: RewardPaid): void {
 			}
 
 			if (!hPool.isInitialized) {
-				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+				hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 
 			const Reward = L2_Reward.bind(event.address)
@@ -307,6 +313,8 @@ export function handleStaked(event: Staked): void {
 		log.warning('Staked 1 --> poolAddress: {},', [poolAddress])
 
 		const poolName = poolConfig[1]
+		const hPoolName = poolConfig[2]
+
 		const poolSymbol = poolConfig[0]
 
 		const sdk = SDK.initializeFromEvent(
@@ -329,7 +337,7 @@ export function handleStaked(event: Staked): void {
 			}
 
 			if (!hPool.isInitialized) {
-				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+				hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.pool.relation = hPool.getBytesID()
 			hPool.pool.relation = hPool.getBytesID()
@@ -352,7 +360,7 @@ export function handleStaked(event: Staked): void {
 			}
 
 			if (!hPool.isInitialized) {
-				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+				hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.pool.relation = hPool.getBytesID()
 			hPool.pool.relation = hPool.getBytesID()
@@ -377,7 +385,7 @@ export function handleStaked(event: Staked): void {
 			hPool.pool.relation = hPool.getBytesID()
 
 			if (!hPool.isInitialized) {
-				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+				hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.addStakedOutputTokenAmount(amount)
 			hPool.addStakedOutputTokenAmount(amount)
@@ -406,6 +414,8 @@ export function handleWithdrawn(event: Withdrawn): void {
 		log.warning('UnStaked 1 --> poolAddress: {},', [poolAddress])
 
 		const poolName = poolConfig[1]
+		const hPoolName = poolConfig[2]
+
 		const poolSymbol = poolConfig[0]
 
 		const sdk = SDK.initializeFromEvent(
@@ -428,7 +438,7 @@ export function handleWithdrawn(event: Withdrawn): void {
 			}
 
 			if (!hPool.isInitialized) {
-				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+				hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
 			hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
@@ -447,7 +457,7 @@ export function handleWithdrawn(event: Withdrawn): void {
 			}
 
 			if (!hPool.isInitialized) {
-				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+				hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
 			hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
@@ -466,7 +476,7 @@ export function handleWithdrawn(event: Withdrawn): void {
 			}
 
 			if (!hPool.isInitialized) {
-				hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
+				hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 			}
 			pool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))
 			hPool.addStakedOutputTokenAmount(amount.times(BIGINT_MINUS_ONE))

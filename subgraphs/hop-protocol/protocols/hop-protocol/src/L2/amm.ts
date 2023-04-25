@@ -30,7 +30,7 @@ import { Token } from '../../../../generated/schema'
 import { getUsdPricePerToken, getUsdPrice } from '../../../../src/prices/index'
 import { bigIntToBigDecimal } from '../../../../src/sdk/util/numbers'
 import {
-	BIGINT_MINUS_ONE,
+	BIGDECIMAL_ZERO,
 	BIGINT_ONE,
 	BIGINT_TEN_TO_EIGHTEENTH,
 } from '../../../../src/sdk/util/constants'
@@ -98,6 +98,7 @@ export function handleTokenSwap(event: TokenSwap): void {
 
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
+		const hPoolName = poolConfig[2]
 
 		const sdk = SDK.initializeFromEvent(
 			conf,
@@ -129,7 +130,12 @@ export function handleTokenSwap(event: TokenSwap): void {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenOne)
 		}
 		if (!hPool.isInitialized) {
-			hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenTwo)
+			hPool.initialize(
+				hPoolName,
+				poolSymbol,
+				BridgePoolType.LIQUIDITY,
+				tokenTwo
+			)
 		}
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()
@@ -159,6 +165,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 		)
 
 		const poolName = poolConfig[1]
+		const hPoolName = poolConfig[2]
 		const poolSymbol = poolConfig[0]
 
 		const sdk = SDK.initializeFromEvent(
@@ -187,7 +194,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, token)
 		}
 		if (!hPool.isInitialized) {
-			hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken)
+			hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken)
 		}
 
 		if (
@@ -216,6 +223,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 		}
 		if (!inputBalanceCallB.reverted) {
 			hPool.setInputTokenBalance(inputBalanceCallB.value)
+			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
 
 			log.warning('inputBalanceCall : {}', [inputBalanceCallB.value.toString()])
 		} else {
@@ -256,6 +264,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 
 		const poolName = poolConfig[1]
 		const poolSymbol = poolConfig[0]
+		const hPoolName = poolConfig[2]
 
 		const sdk = SDK.initializeFromEvent(
 			conf,
@@ -284,11 +293,29 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 		}
 
 		if (!hPool.isInitialized) {
-			hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken)
+			hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken)
 		}
 
 		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 		hPool.setOutputTokenSupply(event.params.lpTokenSupply)
+
+		const Amm = L2_Amm.bind(event.address)
+		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
+		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
+
+		if (!inputBalanceCallA.reverted) {
+			pool.setInputTokenBalance(inputBalanceCallA.value)
+		} else {
+			log.warning('inputBalanceCallA reverted', [])
+		}
+		if (!inputBalanceCallB.reverted) {
+			hPool.setInputTokenBalance(inputBalanceCallB.value)
+			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
+
+			log.warning('inputBalanceCall : {}', [inputBalanceCallB.value.toString()])
+		} else {
+			log.warning('inputBalanceCallB reverted', [])
+		}
 
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()
@@ -335,8 +362,9 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 			event.address.toHexString()
 		)
 
-		const poolName = poolConfig[0]
-		const poolSymbol = poolConfig[1]
+		const poolName = poolConfig[1]
+		const hPoolName = poolConfig[2]
+		const poolSymbol = poolConfig[0]
 
 		const sdk = SDK.initializeFromEvent(
 			conf,
@@ -365,11 +393,29 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 		}
 
 		if (!hPool.isInitialized) {
-			hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken)
+			hPool.initialize(hPoolName, poolSymbol, BridgePoolType.LIQUIDITY, hToken)
 		}
 
 		pool.setOutputTokenSupply(event.params.lpTokenSupply)
 		hPool.setOutputTokenSupply(event.params.lpTokenSupply)
+
+		const Amm = L2_Amm.bind(event.address)
+		const inputBalanceCallA = Amm.try_getTokenBalance(BigInt.zero().toI32())
+		const inputBalanceCallB = Amm.try_getTokenBalance(BIGINT_ONE.toI32())
+
+		if (!inputBalanceCallA.reverted) {
+			pool.setInputTokenBalance(inputBalanceCallA.value)
+		} else {
+			log.warning('inputBalanceCallA reverted', [])
+		}
+		if (!inputBalanceCallB.reverted) {
+			hPool.setInputTokenBalance(inputBalanceCallB.value)
+			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
+
+			log.warning('inputBalanceCall : {}', [inputBalanceCallB.value.toString()])
+		} else {
+			log.warning('inputBalanceCallB reverted', [])
+		}
 
 		pool.pool.relation = hPool.getBytesID()
 		hPool.pool.relation = hPool.getBytesID()

@@ -9,7 +9,10 @@ import {
 	BridgePoolType,
 	CrosschainTokenType,
 } from '../../../../src/sdk/protocols/bridge/enums'
-import { reverseChainIDs } from '../../../../src/sdk/protocols/bridge/chainIds'
+import {
+	chainIDToNetwork,
+	reverseChainIDs,
+} from '../../../../src/sdk/protocols/bridge/chainIds'
 import { BridgeConfig } from '../../../../src/sdk/protocols/bridge/config'
 import { Versions } from '../../../../src/versions'
 import { NetworkConfigs } from '../../../../configurations/configure'
@@ -19,7 +22,6 @@ import {
 	BigInt,
 	Bytes,
 	dataSource,
-	ethereum,
 	log,
 } from '@graphprotocol/graph-ts'
 import {
@@ -35,7 +37,7 @@ import {
 	OPTIMISM_L2_SIGNATURE,
 	MESSENGER_EVENT_SIGNATURES,
 } from '../../config/constants/constant'
-import { BIGINT_MINUS_ONE, Network } from '../../../../src/sdk/util/constants'
+import { BIGDECIMAL_ZERO, Network } from '../../../../src/sdk/util/constants'
 import { L2_Amm } from '../../../../generated/HopL2Amm/L2_Amm'
 import { BIGINT_ONE } from '../../../../src/common/constants'
 
@@ -121,6 +123,7 @@ export function handleTransferFromL1Completed(
 		const poolConfig = NetworkConfigs.getPoolDetails(poolAddress)
 
 		const poolName = poolConfig[1]
+		const hPoolName = poolConfig[2]
 		const poolSymbol = poolConfig[0]
 
 		const sdk = SDK.initializeFromEvent(
@@ -146,15 +149,15 @@ export function handleTransferFromL1Completed(
 			pool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenOne)
 		}
 		if (!hPool.isInitialized) {
-			hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenTwo)
+			hPool.initialize(
+				hPoolName,
+				poolSymbol,
+				BridgePoolType.LIQUIDITY,
+				tokenTwo
+			)
 		}
 		const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
-			reverseChainIDs.get(
-				dataSource
-					.network()
-					.toUpperCase()
-					.replace('-', '_')
-			)!,
+			reverseChainIDs.get(Network.MAINNET)!,
 			Address.fromString(
 				NetworkConfigs.getMainnetCrossTokenFromTokenAddress(inputTokenOne)
 			),
@@ -186,6 +189,7 @@ export function handleTransferFromL1Completed(
 		}
 		if (!inputBalanceCallB.reverted) {
 			hPool.setInputTokenBalance(inputBalanceCallB.value)
+			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
 
 			log.warning('inputBalanceCall : {}', [inputBalanceCallB.value.toString()])
 		} else {
@@ -271,6 +275,7 @@ export function handleTransferSent(event: TransferSent): void {
 		])
 		const poolName = poolConfig[0]
 		const poolSymbol = poolConfig[1]
+		const hPoolName = poolConfig[2]
 
 		const sdk = SDK.initializeFromEvent(
 			conf,
@@ -296,7 +301,12 @@ export function handleTransferSent(event: TransferSent): void {
 		}
 
 		if (!hPool.isInitialized) {
-			hPool.initialize(poolName, poolSymbol, BridgePoolType.LIQUIDITY, tokenTwo)
+			hPool.initialize(
+				hPoolName,
+				poolSymbol,
+				BridgePoolType.LIQUIDITY,
+				tokenTwo
+			)
 		}
 
 		log.warning('S2 - inputToken: {},  poolAddress: {}', [
@@ -342,6 +352,7 @@ export function handleTransferSent(event: TransferSent): void {
 		}
 		if (!inputBalanceCallB.reverted) {
 			hPool.setInputTokenBalance(inputBalanceCallB.value)
+			hPool.setNetValueExportedUSD(BIGDECIMAL_ZERO)
 
 			log.warning('inputBalanceCall : {}', [inputBalanceCallB.value.toString()])
 		} else {

@@ -159,13 +159,13 @@ export class HopProtocolArbitrumConfigurations implements Configurations {
 
 	getPoolDetails(poolAddress: string): string[] {
 		if (poolAddress == ArbitrumAmm.USDC) {
-			return ['HOP-USDC', 'hUSDC/USDC']
+			return ['HOP-USDC', 'hUSDC/USDC Pool - USDC', 'hUSDC/USDC Pool - hUSDC']
 		} else if (poolAddress == ArbitrumAmm.DAI) {
-			return ['HOP-DAI', 'hDAI/DAI']
+			return ['HOP-DAI', 'hDAI/DAI Pool - DAI', 'hDAI/DAI Pool - hDAI']
 		} else if (poolAddress == ArbitrumAmm.USDT) {
-			return ['HOP-USDT', 'hUSDT/USDT']
+			return ['HOP-USDT', 'hUSDT/USDT Pool - USDT', 'hUSDT/USDT Pool - hUSDT']
 		} else if (poolAddress == ArbitrumAmm.ETH) {
-			return ['HOP-ETH', 'hETH/ETH']
+			return ['HOP-ETH', 'hETH/ETH Pool - ETH', 'hETH/ETH Pool - hETH']
 		} else {
 			log.critical('Token not found', [])
 			return []

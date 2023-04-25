@@ -3,7 +3,7 @@
   "isMainnet": false,
   "subgraphName": "hop-polygon",
   "deployment": "HOP_PROTOCOL_POLYGON",
-  "graftEnabled": true,
+  "graftEnabled": false,
   "subgraphId": "QmNqpEkiRtDZpA44qUkGWEJWSkdibxndWfX9fBvSXTH1aq",
   "graftStartBlock": 23023811,
   "tokens": [

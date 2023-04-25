@@ -192,17 +192,17 @@ export class HopProtocolOptimismConfigurations implements Configurations {
 
 	getPoolDetails(poolAddress: string): string[] {
 		if (poolAddress == OptimismAmm.USDC) {
-			return ['HOP-USDC', 'hUSDC/USDC']
+			return ['HOP-USDC', 'hUSDC/USDC Pool - USDC', 'hUSDC/USDC Pool - hUSDC']
 		} else if (poolAddress == OptimismAmm.DAI) {
-			return ['HOP-DAI', 'hDAI/DAI']
+			return ['HOP-DAI', 'hDAI/DAI Pool - DAI', 'hDAI/DAI Pool - hDAI']
 		} else if (poolAddress == OptimismAmm.USDT) {
-			return ['HOP-USDT', 'hUSDT/USDT']
+			return ['HOP-USDT', 'hUSDT/USDT Pool - USDT', 'hUSDT/USDT Pool - hUSDT']
 		} else if (poolAddress == OptimismAmm.ETH) {
-			return ['HOP-ETH', 'hETH/ETH']
+			return ['HOP-ETH', 'hETH/ETH Pool - ETH', 'hETH/ETH Pool - hETH']
 		} else if (poolAddress == OptimismAmm.SNX) {
-			return ['HOP-SNX', 'hSNX/SNX']
+			return ['HOP-SNX', 'hSNX/SNX Pool - SNX', 'hSNX/SNX Pool - hSNX']
 		} else if (poolAddress == ZERO_ADDRESS) {
-			return ['HOP-POOL', 'HOP/HOP']
+			return ['HOP-POOL', 'HOP/HOP Pool - HOP', 'hHOP/HOP Pool - hHOP']
 		} else {
 			log.critical('Token not found', [])
 			return []

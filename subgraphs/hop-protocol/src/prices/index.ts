@@ -22,6 +22,8 @@ import {
 	ArbitrumToken,
 	OptimismHtoken,
 	OptimismToken,
+	PolygonHtoken,
+	PolygonToken,
 	RewardTokens,
 	XdaiHtoken,
 	XdaiToken,
@@ -33,23 +35,30 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 	if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
 		return new CustomPriceType()
 	}
-	if (tokenAddr == Address.fromString(XdaiHtoken.MATIC)) {
-		tokenAddr = Address.fromString(XdaiToken.MATIC)
-	}
 
-	if (tokenAddr.toHexString() == ArbitrumHtoken.ETH) {
-		tokenAddr = Address.fromString(ArbitrumToken.ETH)
+	if (tokenAddr == Address.fromString(PolygonHtoken.MATIC)) {
+		tokenAddr = Address.fromString(PolygonToken.MATIC)
+	}
+	if (tokenAddr == Address.fromString(PolygonHtoken.ETH)) {
+		tokenAddr = Address.fromString(PolygonToken.ETH)
 	}
 	if (tokenAddr.toHexString() == OptimismHtoken.ETH) {
 		tokenAddr = Address.fromString(OptimismToken.ETH)
+	}
+	if (tokenAddr.toHexString() == OptimismHtoken.SNX) {
+		tokenAddr = Address.fromString(OptimismToken.SNX)
 	}
 
 	if (tokenAddr.toHexString() == XdaiHtoken.ETH) {
 		tokenAddr = Address.fromString(XdaiToken.ETH)
 	}
 
-	if (tokenAddr.toHexString() == OptimismHtoken.SNX) {
-		tokenAddr = Address.fromString(OptimismToken.SNX)
+	if (tokenAddr == Address.fromString(XdaiHtoken.MATIC)) {
+		tokenAddr = Address.fromString(XdaiToken.MATIC)
+	}
+
+	if (tokenAddr.toHexString() == ArbitrumHtoken.ETH) {
+		tokenAddr = Address.fromString(ArbitrumToken.ETH)
 	}
 
 	if (priceTokens.includes(tokenAddr.toHexString())) {

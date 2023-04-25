@@ -216,15 +216,19 @@ export class HopProtocolPolygonConfigurations implements Configurations {
 
 	getPoolDetails(poolAddress: string): string[] {
 		if (poolAddress == PolygonAmm.USDC) {
-			return ['HOP-USDC', 'hUSDC/USDC']
+			return ['HOP-USDC', 'hUSDC/USDC Pool - USDC', 'hUSDC/USDC Pool - hUSDC']
 		} else if (poolAddress == PolygonAmm.DAI) {
-			return ['HOP-DAI', 'hDAI/DAI']
+			return ['HOP-DAI', 'hDAI/DAI Pool - DAI', 'hDAI/DAI Pool - hDAI']
 		} else if (poolAddress == PolygonAmm.USDT) {
-			return ['HOP-USDT', 'hUSDT/USDT']
+			return ['HOP-USDT', 'hUSDT/USDT Pool - USDT', 'hUSDT/USDT Pool - hUSDT']
 		} else if (poolAddress == PolygonAmm.ETH) {
-			return ['HOP-ETH', 'hETH/ETH']
+			return ['HOP-ETH', 'hETH/ETH Pool - ETH', 'hETH/ETH Pool - hETH']
 		} else if (poolAddress == PolygonAmm.MATIC) {
-			return ['HOP-MATIC', 'hMATIC/MATIC']
+			return [
+				'HOP-MATIC',
+				'hMATIC/MATIC Pool - MATIC',
+				'hMATIC/MATIC Pool - hMATIC',
+			]
 		} else {
 			log.critical('Token not found', [])
 			return []
