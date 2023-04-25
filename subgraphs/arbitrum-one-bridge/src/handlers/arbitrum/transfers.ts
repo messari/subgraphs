@@ -76,7 +76,7 @@ export function handleTransferIn(event: DepositFinalized): void {
 
   if (!pool.isInitialized) {
     pool.initialize(
-      poolId.toHexString(),
+      inputToken.name,
       inputToken.symbol,
       BridgePoolType.BURN_MINT,
       inputToken
@@ -186,7 +186,7 @@ export function handleTransferOut(event: WithdrawalInitiated): void {
 
   if (!pool.isInitialized) {
     pool.initialize(
-      poolId.toHexString(),
+      inputToken.name,
       inputToken.symbol,
       BridgePoolType.BURN_MINT,
       inputToken

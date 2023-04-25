@@ -6,7 +6,12 @@ import {
 
 import { ethereum } from "@graphprotocol/graph-ts";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
-import { BIGINT_ZERO, ETH_SYMBOL, Network } from "../../sdk/util/constants";
+import {
+  BIGINT_ZERO,
+  ETH_NAME,
+  ETH_SYMBOL,
+  Network,
+} from "../../sdk/util/constants";
 import {
   L2ToL1Tx,
   L2ToL1Transaction,
@@ -115,7 +120,7 @@ export function handleL2ToL1Transaction(event: L2ToL1Transaction): void {
 
     if (!pool.isInitialized) {
       pool.initialize(
-        poolId.toHexString(),
+        ETH_NAME,
         ETH_SYMBOL,
         BridgePoolType.BURN_MINT,
         sdk.Tokens.getOrCreateToken(ethAddress)

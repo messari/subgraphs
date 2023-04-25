@@ -4,7 +4,7 @@ import {
   CrosschainTokenType,
 } from "../../sdk/protocols/bridge/enums";
 import { networkToChainID } from "../../sdk/protocols/bridge/chainIds";
-import { ETH_SYMBOL, Network } from "../../sdk/util/constants";
+import { ETH_NAME, ETH_SYMBOL, Network } from "../../sdk/util/constants";
 import { MessageDelivered } from "../../../generated/L1Bridge/Bridge";
 import { ethSideConf, ethAddress, Pricer, TokenInit } from "../../common/utils";
 
@@ -47,7 +47,7 @@ export function handleL1MessageDelivered(event: MessageDelivered): void {
 
     if (!pool.isInitialized) {
       pool.initialize(
-        poolId.toHexString(),
+        ETH_NAME,
         ETH_SYMBOL,
         BridgePoolType.LOCK_RELEASE,
         sdk.Tokens.getOrCreateToken(ethAddress)
