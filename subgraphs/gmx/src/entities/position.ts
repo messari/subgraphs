@@ -25,12 +25,11 @@ import {
   INT_ONE,
   INT_ZERO,
   PositionSide,
-  PRICE_PRECISION,
 } from "../utils/constants";
 import { bigDecimalToBigInt, exponentToBigDecimal } from "../utils/numbers";
+import { convertPriceToBigDecimal } from "../mappings/vault";
 
 export function getUserPosition(
-  event: ethereum.Event,
   account: Account,
   pool: LiquidityPool,
   collateralTokenAddress: Address,
@@ -104,7 +103,6 @@ export function getOrCreateUserPosition(
   positionSide: string
 ): Position {
   const position = getUserPosition(
-    event,
     account,
     pool,
     collateralTokenAddress,
@@ -175,14 +173,12 @@ export function updateUserPosition(
     isLong
   );
   if (!tryGetPosition.reverted) {
-    position.balanceUSD = tryGetPosition.value
-      .getValue0()
-      .div(PRICE_PRECISION)
-      .toBigDecimal();
-    position.collateralBalanceUSD = tryGetPosition.value
-      .getValue1()
-      .div(PRICE_PRECISION)
-      .toBigDecimal();
+    position.balanceUSD = convertPriceToBigDecimal(
+      tryGetPosition.value.getValue0()
+    );
+    position.collateralBalanceUSD = convertPriceToBigDecimal(
+      tryGetPosition.value.getValue1()
+    );
 
     const indexToken = getOrCreateToken(event, indexTokenAddress);
     if (indexToken.lastPriceUSD && indexToken.lastPriceUSD! > BIGDECIMAL_ZERO) {

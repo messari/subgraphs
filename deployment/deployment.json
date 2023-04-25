@@ -573,7 +573,7 @@
       },
       "arrakis-finance-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.0",
@@ -1360,7 +1360,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2279,7 +2279,7 @@
       },
       "curve-finance-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.0.2",
@@ -4170,7 +4170,7 @@
         "status": "prod",
         "versions": {
           "schema": "3.0.3",
-          "subgraph": "1.2.9",
+          "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4560,7 +4560,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4582,7 +4582,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4612,7 +4612,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.5",
+          "subgraph": "1.0.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4634,7 +4634,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4664,7 +4664,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.6",
+          "subgraph": "1.0.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4694,7 +4694,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.8",
+          "subgraph": "1.1.9",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4724,7 +4724,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4754,7 +4754,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.8",
+          "subgraph": "1.1.9",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4784,7 +4784,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4806,7 +4806,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4828,7 +4828,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4850,7 +4850,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4876,7 +4876,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4898,7 +4898,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4920,7 +4920,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "subgraph": "1.2.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4946,7 +4946,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.11",
+          "subgraph": "1.1.12",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4968,7 +4968,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.11",
+          "subgraph": "1.1.12",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4990,7 +4990,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5012,7 +5012,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5034,7 +5034,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.1",
-          "subgraph": "1.1.11",
+          "subgraph": "1.1.12",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5068,7 +5068,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5098,7 +5098,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.5",
+          "subgraph": "1.0.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5128,7 +5128,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5162,7 +5162,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5192,7 +5192,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.10",
+          "subgraph": "1.1.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5222,7 +5222,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.1",
-          "subgraph": "1.0.8",
+          "subgraph": "1.0.9",
           "methodology": "1.0.1"
         },
         "files": {
@@ -5248,7 +5248,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.6",
+          "subgraph": "1.0.7",
           "methodology": "1.0.1"
         },
         "files": {
@@ -6889,12 +6889,38 @@
     "protocol": "the-graph",
     "project": "the-graph",
     "deployments": {
+      "the-graph-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.4.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "the-graph-arbitrum",
+            "query-id": "the-graph-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "the-graph-arbitrum",
+            "query-id": "UNKNOWN"
+          }
+        },
+        "files": {
+          "template": "theGraphTemplate.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
       "the-graph-ethereum": {
         "network": "ethereum",
         "status": "prod",
         "versions": {
           "schema": "1.4.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "services": {
@@ -6908,11 +6934,11 @@
           }
         },
         "files": {
-          "template": "the.graph.template.yaml"
+          "template": "theGraphTemplate.yaml"
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     }
@@ -6962,7 +6988,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.4",
+          "subgraph": "1.0.5",
           "methodology": "1.0.0"
         },
         "services": {
@@ -7112,7 +7138,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -7134,7 +7160,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -7156,7 +7182,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -7178,7 +7204,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -7200,7 +7226,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -7222,7 +7248,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -7244,7 +7270,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.1.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -7779,36 +7805,6 @@
       }
     }
   },
-  "axelar": {
-    "schema": "bridge",
-    "base": "axelar",
-    "protocol": "axelar",
-    "project": "axelar",
-    "deployments": {
-      "axelar-ethereum": {
-        "network": "ethereum",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "axelar-ethereum",
-            "query-id": "axelar-ethereum"
-          }
-        },
-        "files": {
-          "template": "axelar.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      }
-    }
-  },
   "cbridge": {
     "schema": "bridge",
     "base": "cbridge",
@@ -7817,7 +7813,7 @@
     "deployments": {
       "cbridge-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7839,7 +7835,7 @@
       },
       "cbridge-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7861,7 +7857,7 @@
       },
       "cbridge-aurora": {
         "network": "aurora",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7883,7 +7879,7 @@
       },
       "cbridge-avalanche": {
         "network": "avalanche",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7905,7 +7901,7 @@
       },
       "cbridge-boba": {
         "network": "boba",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7927,7 +7923,7 @@
       },
       "cbridge-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7949,7 +7945,7 @@
       },
       "cbridge-celo": {
         "network": "celo",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7971,7 +7967,7 @@
       },
       "cbridge-fantom": {
         "network": "fantom",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -7993,7 +7989,7 @@
       },
       "cbridge-gnosis": {
         "network": "gnosis",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -8015,7 +8011,7 @@
       },
       "cbridge-harmony": {
         "network": "harmony",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -8037,7 +8033,7 @@
       },
       "cbridge-moonbeam": {
         "network": "moonbeam",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -8059,7 +8055,7 @@
       },
       "cbridge-moonriver": {
         "network": "moonriver",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -8081,7 +8077,7 @@
       },
       "cbridge-optimism": {
         "network": "optimism",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -8103,7 +8099,7 @@
       },
       "cbridge-polygon": {
         "network": "polygon",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.1.1",
           "subgraph": "1.0.0",
@@ -8136,7 +8132,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8158,7 +8154,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.2.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "services": {
@@ -8177,72 +8173,94 @@
       }
     }
   },
-  "opyn": {
+  "opyn-gamma": {
     "schema": "derivatives-options",
-    "base": "opyn",
-    "protocol": "opyn",
+    "base": "opyn-gamma",
+    "protocol": "opyn-gamma",
     "project": "opyn",
     "deployments": {
-      "opyn-ethereum": {
+      "opyn-gamma-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
-          "schema": "1.0.1",
-          "subgraph": "1.0.0",
+          "schema": "1.3.1",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
           "hosted-service": {
-            "slug": "opyn-ethereum",
-            "query-id": "opyn-ethereum"
+            "slug": "opyn-gamma-ethereum",
+            "query-id": "opyn-gamma-ethereum"
           }
         },
         "files": {
-          "template": "opyn.template.yaml"
+          "template": "opyn.gamma.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
         }
       },
-      "opyn-avalanche": {
+      "opyn-gamma-avalanche": {
         "network": "avalanche",
         "status": "dev",
         "versions": {
-          "schema": "1.0.1",
-          "subgraph": "1.0.0",
+          "schema": "1.3.1",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
           "hosted-service": {
-            "slug": "opyn-avalanche",
-            "query-id": "opyn-avalanche"
+            "slug": "opyn-gamma-avalanche",
+            "query-id": "opyn-gamma-avalanche"
           }
         },
         "files": {
-          "template": "opyn.template.yaml"
+          "template": "opyn.gamma.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
         }
       },
-      "opyn-polygon": {
-        "network": "polygon",
+      "opyn-gamma-arbitrum": {
+        "network": "arbitrum",
         "status": "dev",
         "versions": {
-          "schema": "1.0.1",
-          "subgraph": "1.0.0",
+          "schema": "1.3.1",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "services": {
           "hosted-service": {
-            "slug": "opyn-polygon",
-            "query-id": "opyn-polygon"
+            "slug": "opyn-gamma-arbitrum",
+            "query-id": "opyn-gamma-arbitrum"
           }
         },
         "files": {
-          "template": "opyn.template.yaml"
+          "template": "opyn.gamma.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "opyn-gamma-polygon": {
+        "network": "polygon",
+        "status": "dev",
+        "versions": {
+          "schema": "1.3.1",
+          "subgraph": "1.0.1",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "opyn-gamma-polygon",
+            "query-id": "opyn-gamma-polygon"
+          }
+        },
+        "files": {
+          "template": "opyn.gamma.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -8415,17 +8433,165 @@
       }
     }
   },
+  "mux-protocol": {
+    "schema": "derivatives-perpfutures",
+    "base": "mux-protocol",
+    "protocol": "mux-protocol",
+    "project": "mux-network",
+    "deployments": {
+      "mux-protocol-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mux-protocol-arbitrum",
+            "query-id": "mux-protocol-arbitrum"
+          }
+        },
+        "files": {
+          "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "mux-protocol-bsc": {
+        "network": "bsc",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mux-protocol-bsc",
+            "query-id": "mux-protocol-bsc"
+          }
+        },
+        "files": {
+          "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "mux-protocol-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mux-protocol-optimism",
+            "query-id": "mux-protocol-optimism"
+          }
+        },
+        "files": {
+          "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "mux-protocol-avalanche": {
+        "network": "avalanche",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mux-protocol-avalanche",
+            "query-id": "mux-protocol-avalanche"
+          }
+        },
+        "files": {
+          "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      },
+      "mux-protocol-fantom": {
+        "network": "fantom",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mux-protocol-fantom",
+            "query-id": "mux-protocol-fantom"
+          }
+        },
+        "files": {
+          "template": "mux.protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
+  "kwenta": {
+    "schema": "derivatives-perpfutures",
+    "base": "kwenta",
+    "protocol": "kwenta",
+    "project": "kwenta",
+    "deployments": {
+      "kwenta-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "kwenta-optimism",
+            "query-id": "kwenta-optimism"
+          }
+        },
+        "files": {
+          "template": "kwenta.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
   "axelar": {
     "schema": "bridge",
     "base": "axelar",
     "protocol": "axelar",
-    "project": "axelar-network",
+    "project": "axelar",
     "deployments": {
       "axelar-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8447,7 +8613,7 @@
         "network": "arbitrum",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8469,7 +8635,7 @@
         "network": "arbitrum",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8491,7 +8657,7 @@
         "network": "bsc",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8513,7 +8679,7 @@
         "network": "celo",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8535,7 +8701,7 @@
         "network": "fantom",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8557,7 +8723,7 @@
         "network": "moonbeam",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -8579,7 +8745,7 @@
         "network": "polygon",
         "status": "dev",
         "versions": {
-          "schema": "1.1.0",
+          "schema": "1.2.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
