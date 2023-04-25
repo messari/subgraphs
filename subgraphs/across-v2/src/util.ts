@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { Token } from "../generated/schema";
 import { _ERC20 } from "../generated/SpokePool/_ERC20";
 import { getUsdPrice, getUsdPricePerToken } from "./prices";
@@ -6,6 +12,7 @@ import { TokenInitializer, TokenParams } from "./sdk/protocols/bridge/tokens";
 import { TokenPricer } from "./sdk/protocols/config";
 import { bigIntToBigDecimal } from "./sdk/util/numbers";
 import { ETH_ADDRESS, ETH_NAME, ETH_SYMBOL } from "./sdk/util/constants";
+import { BIGINT_ZERO } from "./prices/common/constants";
 
 export class Pricer implements TokenPricer {
   block: ethereum.Block;
@@ -77,6 +84,25 @@ export class TokenInit implements TokenInitializer {
       return call.value.toI32();
     }
   }
+}
+
+// TVL
+export function getTokenBalance(
+  tokenAddress: Address,
+  gatewayAddress: Address
+): BigInt {
+  let inputTokenBalance: BigInt = BIGINT_ZERO;
+  const erc20 = _ERC20.bind(tokenAddress);
+  const inputTokenBalanceResult = erc20.try_balanceOf(gatewayAddress);
+  if (inputTokenBalanceResult.reverted) {
+    log.critical(
+      "[ERC20:balanceOf()] calculate token balance owned by bridge contract reverted",
+      []
+    );
+  } else {
+    inputTokenBalance = inputTokenBalanceResult.value;
+  }
+  return inputTokenBalance;
 }
 
 // Constants

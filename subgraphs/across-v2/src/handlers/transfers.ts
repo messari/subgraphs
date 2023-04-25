@@ -12,6 +12,7 @@ import {
   ACROSS_REWARD_TOKEN,
   Pricer,
   TokenInit,
+  getTokenBalance,
 } from "../util";
 import { getUsdPrice } from "../prices";
 import { findDestinationToken, findOriginToken } from "../availableRoutesApi";
@@ -31,7 +32,6 @@ import {
 } from "../../generated/SpokePool/SpokePool";
 import { AcceleratingDistributor } from "../../generated/SpokePool/AcceleratingDistributor";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
-import { _ERC20 } from "../../generated/SpokePool/_ERC20";
 
 export function handleFilledRelay(event: FilledRelay): void {
   // Chain
@@ -87,9 +87,9 @@ export function handleFilledRelay(event: FilledRelay): void {
 
   if (!pool.isInitialized) {
     pool.initialize(
-      poolId.toString(),
+      inputToken.name,
       inputToken.symbol,
-      BridgePoolType.LIQUIDITY,
+      BridgePoolType.LOCK_RELEASE,
       inputToken
     );
   }
@@ -107,19 +107,7 @@ export function handleFilledRelay(event: FilledRelay): void {
   );
 
   // TVL
-  let inputTokenBalance: BigInt;
-  const erc20 = _ERC20.bind(inputTokenAddress);
-  const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
-  if (inputTokenBalanceResult.reverted) {
-    log.info(
-      "[ERC20:balanceOf()] calculate token balance owned by bridge contract reverted",
-      []
-    );
-  } else {
-    inputTokenBalance = inputTokenBalanceResult.value;
-  }
-
-  pool.setInputTokenBalance(inputTokenBalance!);
+  pool.setInputTokenBalance(getTokenBalance(inputTokenAddress, event.address));
 
   // Revenue
   // Note: We take the amount from crossChain (origin) and multiplying by inputToken price (destination).
@@ -221,9 +209,9 @@ export function handleFundsDeposited(event: FundsDeposited): void {
 
   if (!pool.isInitialized) {
     pool.initialize(
-      poolId.toString(),
+      inputToken.name,
       inputToken.symbol,
-      BridgePoolType.LIQUIDITY,
+      BridgePoolType.LOCK_RELEASE,
       inputToken
     );
   }
@@ -241,17 +229,5 @@ export function handleFundsDeposited(event: FundsDeposited): void {
   );
 
   // TVL
-  let inputTokenBalance: BigInt;
-  const erc20 = _ERC20.bind(inputTokenAddress);
-  const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
-  if (inputTokenBalanceResult.reverted) {
-    log.info(
-      "[ERC20:balanceOf()] calculate token balance owned by bridge contract reverted",
-      []
-    );
-  } else {
-    inputTokenBalance = inputTokenBalanceResult.value;
-  }
-
-  pool.setInputTokenBalance(inputTokenBalance!);
+  pool.setInputTokenBalance(getTokenBalance(inputTokenAddress, event.address));
 }

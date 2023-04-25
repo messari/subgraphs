@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import {
   HubPool,
   LiquidityAdded,
@@ -16,9 +16,9 @@ import {
   ACROSS_PROTOCOL_NAME,
   Pricer,
   TokenInit,
+  getTokenBalance,
 } from "../util";
 import { BIGINT_MINUS_ONE } from "../sdk/util/constants";
-import { _ERC20 } from "../../generated/HubPool/_ERC20";
 
 const conf = new BridgeConfig(
   ACROSS_HUB_POOL_CONTRACT,
@@ -62,14 +62,9 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
-    pool.initialize(
-      token.name,
-      token.symbol,
-      BridgePoolType.LOCK_RELEASE,
-      token
-    );
+    pool.initialize(token.name, token.symbol, BridgePoolType.LIQUIDITY, token);
     pool.pool.outputToken = outputToken.id;
-    pool.pool.save();
+    pool.save();
   }
 
   pool.addOutputTokenSupply(event.params.lpTokensMinted);
@@ -80,18 +75,9 @@ export function handleLiquidityAdded(event: LiquidityAdded): void {
   account.liquidityDeposit(pool, amount);
 
   // tvl
-  let inputTokenBalance: BigInt;
-  const erc20 = _ERC20.bind(event.params.l1Token);
-  const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
-  if (inputTokenBalanceResult.reverted) {
-    log.info(
-      "[ERC20:balanceOf()]calculate token balance owned by bridge contract reverted",
-      []
-    );
-  } else {
-    inputTokenBalance = inputTokenBalanceResult.value;
-  }
-  pool.setInputTokenBalance(inputTokenBalance!);
+  pool.setInputTokenBalance(
+    getTokenBalance(event.params.l1Token, event.address)
+  );
 }
 
 export function handleLiquidityRemoved(event: LiquidityRemoved): void {
@@ -128,14 +114,9 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
   const pool = sdk.Pools.loadPool<string>(poolId);
 
   if (!pool.isInitialized) {
-    pool.initialize(
-      token.name,
-      token.symbol,
-      BridgePoolType.LOCK_RELEASE,
-      token
-    );
+    pool.initialize(token.name, token.symbol, BridgePoolType.LIQUIDITY, token);
     pool.pool.outputToken = outputToken.id;
-    pool.pool.save();
+    pool.save();
   }
 
   pool.addOutputTokenSupply(event.params.lpTokensBurnt.times(BIGINT_MINUS_ONE));
@@ -146,16 +127,7 @@ export function handleLiquidityRemoved(event: LiquidityRemoved): void {
   account.liquidityWithdraw(pool, amount);
 
   // tvl
-  let inputTokenBalance: BigInt;
-  const erc20 = _ERC20.bind(event.params.l1Token);
-  const inputTokenBalanceResult = erc20.try_balanceOf(event.address);
-  if (inputTokenBalanceResult.reverted) {
-    log.info(
-      "[ERC20:balanceOf()]calculate token balance owned by bridge contract reverted",
-      []
-    );
-  } else {
-    inputTokenBalance = inputTokenBalanceResult.value;
-  }
-  pool.setInputTokenBalance(inputTokenBalance!);
+  pool.setInputTokenBalance(
+    getTokenBalance(event.params.l1Token, event.address)
+  );
 }
