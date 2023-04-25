@@ -444,7 +444,11 @@ export function handleCollateralTransfer(event: CollateralTransfer): void {
     log.warning("[handleBorrow]No receipt for tx {}", [
       event.transaction.hash.toHexString(),
     ]);
-  } else {
+  } else if (
+    ![event.params.from, event.params.to].includes(Address.zero()) &&
+    ![event.params.from, event.params.to].includes(event.address)
+  ) {
+    // only try to find BalanceTransfer amount for non-burn/mint event
     const btAmount = getBalanceTransferAmount(event);
     amount = btAmount.gt(amount) ? btAmount : amount;
   }
@@ -697,29 +701,65 @@ function getIsIsolatedFlag(event: ethereum.Event): boolean {
 function getBalanceTransferAmount(event: ethereum.Event): BigInt {
   let btAmount = BIGINT_ZERO;
   const eventSignature = crypto.keccak256(
-    ByteArray.fromUTF8("BalanceTransfer(address, address, uint256, uint256)")
+    ByteArray.fromUTF8("BalanceTransfer(address,address,uint256,uint256)")
   );
   const logs = event.receipt!.logs;
   // BalanceTransfer emitted after Transfer's event.logIndex
   // e.g. https://arbiscan.io/tx/0x7ee837a19f37f0f74acb75be2eb07de85adcf1fcca1b66e8d2118958ce4fe8a1#eventlog
   const eventLogIndex = event.logIndex;
+  log.info(
+    "[getBalanceTransferAmount]tx {}-{},logs.length={},event.logIndex={}",
+    [
+      event.transaction.hash.toHexString(),
+      event.logIndex.toString(),
+      logs.length.toString(),
+      eventLogIndex.toString(),
+    ]
+  );
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
+    log.info("[getBalanceTransferAmount]o1 i={},thisLog.logIndex={}", [
+      i.toString(),
+      thisLog.logIndex.toString(),
+    ]);
     if (thisLog.logIndex.le(eventLogIndex)) {
       // skip event with logIndex < event.logIndex
+      log.info("[getBalanceTransferAmount]o2 skipped", []);
       continue;
     }
     // topics[0] - signature
     const logSignature = thisLog.topics[0];
+    log.info(
+      "[getBalanceTransferAmount]o3 logSignature={} BalanceTransferSignature={} thisLog.address={} event.address={}",
+      [
+        logSignature.toHexString(),
+        eventSignature.toHexString(),
+        thisLog.address.toHexString(),
+        event.address.toHexString(),
+      ]
+    );
     if (thisLog.address == event.address && logSignature == eventSignature) {
       const decoded = ethereum
         .decode("(uint256,uint256)", thisLog.data)!
         .toTuple();
-      btAmount = decoded[0].toBigInt();
-      log.info("[handleCollateralTransfer] BalanceTransfer amount= {} tx {}", [
-        btAmount.toString(),
-        event.transaction.hash.toHexString(),
+      // TODO: delete
+      log.info("[getBalanceTransferAmount]o4 decoded=({},{})", [
+        decoded[0].toBigInt().toString(),
+        decoded[1].toBigInt().toString(),
       ]);
+      btAmount = decoded[0].toBigInt();
+      log.info("[getBalanceTransferAmount]o4 btAmount={}", [
+        btAmount.toString(),
+      ]);
+      // TODO: delete
+      log.info(
+        "[getBalanceTransferAmount] BalanceTransfer amount={} tx {}-{}",
+        [
+          btAmount.toString(),
+          event.transaction.hash.toHexString(),
+          thisLog.logIndex.toString(),
+        ]
+      );
       break;
     }
   }

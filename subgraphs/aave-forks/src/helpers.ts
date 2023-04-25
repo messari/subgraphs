@@ -10,6 +10,7 @@ import { ProtocolData } from "./sdk/manager";
 import {
   Market,
   Token,
+  _AccountDebtBalance,
   _FlashLoanPremium,
   _MarketList,
 } from "../generated/schema";
@@ -81,7 +82,7 @@ export function getMarketFromToken(
   const market = Market.load(marketId);
   return market;
 }
-export function getBorrowBalance(market: Market, account: Address): BigInt {
+export function getBorrowBalances(market: Market, account: Address): BigInt[] {
   let sDebtTokenBalance = BIGINT_ZERO;
   let vDebtTokenBalance = BIGINT_ZERO;
 
@@ -103,9 +104,9 @@ export function getBorrowBalance(market: Market, account: Address): BigInt {
       : trySDebtTokenBalance.value;
   }
 
-  const totalDebt = sDebtTokenBalance.plus(vDebtTokenBalance);
+  // const totalDebt = sDebtTokenBalance.plus(vDebtTokenBalance);
 
-  return totalDebt;
+  return [sDebtTokenBalance, vDebtTokenBalance];
 }
 
 export function getCollateralBalance(market: Market, account: Address): BigInt {
@@ -148,6 +149,21 @@ export function getOrCreateFlashloanPremium(
     flashloanPremium.save();
   }
   return flashloanPremium;
+}
+
+export function getOrCreateAccountDebtBalance(
+  market: Market,
+  account: Address
+): _AccountDebtBalance {
+  const id = account.concat(market.id);
+  let accountDebtBalance = _AccountDebtBalance.load(id);
+  if (!accountDebtBalance) {
+    accountDebtBalance = new _AccountDebtBalance(id);
+    accountDebtBalance.sTokenBalance = BIGINT_ZERO;
+    accountDebtBalance.vTokenBalance = BIGINT_ZERO;
+    accountDebtBalance.save();
+  }
+  return accountDebtBalance;
 }
 
 export function storePrePauseState(market: Market): void {

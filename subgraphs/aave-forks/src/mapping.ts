@@ -36,9 +36,10 @@ import {
   PositionSide,
   RewardTokenType,
   SECONDS_PER_DAY,
+  TransactionType,
 } from "./sdk/constants";
 import {
-  getBorrowBalance,
+  getBorrowBalances,
   getCollateralBalance,
   getMarketByAuxillaryToken,
   restorePrePauseState,
@@ -47,6 +48,7 @@ import {
   rayToWad,
   getMarketFromToken,
   getOrCreateFlashloanPremium,
+  getOrCreateAccountDebtBalance,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -754,15 +756,21 @@ export function _handleBorrow(
     protocolData
   );
   const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
-  const newBorrowBalance = getBorrowBalance(market, accountID);
+  const newBorrowBalances = getBorrowBalances(market, accountID);
+
+  const accountDebtBalance = getOrCreateAccountDebtBalance(market, accountID);
+  accountDebtBalance.sTokenBalance = newBorrowBalances[0];
+  accountDebtBalance.vTokenBalance = newBorrowBalances[1];
+  accountDebtBalance.save();
+
   manager.createBorrow(
     asset,
     accountID,
     amount,
     amountUSD,
-    newBorrowBalance,
+    newBorrowBalances[0].plus(newBorrowBalances[1]),
     market.inputTokenPriceUSD,
-    interestRateType, //TODO: but we don't know the interestRateType for Repay
+    interestRateType,
     isIsolated
   );
 }
@@ -788,14 +796,49 @@ export function _handleRepay(
     protocolData
   );
   const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
-  const newBorrowBalance = getBorrowBalance(market, accountID);
+  const newBorrowBalances = getBorrowBalances(market, accountID);
+
+  const accountDebtBalance = getOrCreateAccountDebtBalance(market, accountID);
+  let interestRateType: InterestRateType | null = null;
+
+  // since there may be interest accrued, the balance difference may not exactly
+  // equal repay amount. Here we check whether the balance goes down
+  if (
+    newBorrowBalances[0].minus(accountDebtBalance.sTokenBalance).lt(BIGINT_ZERO)
+  ) {
+    interestRateType = InterestRateType.STABLE;
+  } else if (
+    newBorrowBalances[1].minus(accountDebtBalance.vTokenBalance).lt(BIGINT_ZERO)
+  ) {
+    interestRateType = InterestRateType.VARIABLE;
+  }
+
+  // TODO: delete
+  log.info(
+    "[_handleRepay] {} debt balance prior ({}, {}), current ({}, {}); repay amount={}, interestRateType={}",
+    [
+      accountID.toHexString(),
+      accountDebtBalance.sTokenBalance.toString(),
+      accountDebtBalance.vTokenBalance.toString(),
+      newBorrowBalances[0].toString(),
+      newBorrowBalances[1].toString(),
+      amount.toString(),
+      interestRateType ? interestRateType : "null",
+    ]
+  );
+
+  accountDebtBalance.sTokenBalance = newBorrowBalances[0];
+  accountDebtBalance.vTokenBalance = newBorrowBalances[1];
+  accountDebtBalance.save();
+
   manager.createRepay(
     asset,
     accountID,
     amount,
     amountUSD,
-    newBorrowBalance,
-    market.inputTokenPriceUSD
+    newBorrowBalances[0].plus(newBorrowBalances[1]),
+    market.inputTokenPriceUSD,
+    interestRateType
   );
 }
 
@@ -837,42 +880,6 @@ export function _handleLiquidate(
     .div(exponentToBigDecimal(inputToken.decimals))
     .times(inputTokenPriceUSD);
 
-  const debtTokenMarket = getMarketFromToken(debtAsset, protocolData);
-  if (!debtTokenMarket) {
-    log.warning("[_handleLiquidate] market for Debt token  {} not found", [
-      debtAsset.toHexString(),
-    ]);
-    return;
-  }
-  let debtTokenPriceUSD = debtTokenMarket.inputTokenPriceUSD;
-  if (!debtTokenPriceUSD) {
-    log.warning(
-      "[_handleLiquidate] Price of token {} is not set, default to 0.0",
-      [debtAsset.toHexString()]
-    );
-    debtTokenPriceUSD = BIGDECIMAL_ZERO;
-  }
-
-  const profitUSD = amountUSD.minus(
-    debtToCover.toBigDecimal().times(debtTokenPriceUSD)
-  );
-  const collateralBalance = getCollateralBalance(market, liquidatee);
-  const debtBalance = getBorrowBalance(debtTokenMarket, liquidatee);
-
-  manager.createLiquidate(
-    collateralAsset,
-    debtAsset,
-    liquidator,
-    liquidatee,
-    amount,
-    amountUSD,
-    profitUSD,
-    collateralBalance,
-    debtBalance,
-    null, //TODO - interestType is tricky
-    createLiquidatorPosition
-  );
-
   // according to logic in _calculateAvailableCollateralToLiquidate()
   // liquidatedCollateralAmount = collateralAmount - liquidationProtocolFee
   // liquidationProtocolFee = bonusCollateral * liquidationProtocolFeePercentage
@@ -899,6 +906,125 @@ export function _handleLiquidate(
     market._liquidationProtocolFee
   );
   manager.addProtocolRevenue(liquidationProtocolFeeUSD, fee);
+
+  const debtTokenMarket = getMarketFromToken(debtAsset, protocolData);
+  if (!debtTokenMarket) {
+    log.warning("[_handleLiquidate] market for Debt token  {} not found", [
+      debtAsset.toHexString(),
+    ]);
+    return;
+  }
+  let debtTokenPriceUSD = debtTokenMarket.inputTokenPriceUSD;
+  if (!debtTokenPriceUSD) {
+    log.warning(
+      "[_handleLiquidate] Price of token {} is not set, default to 0.0",
+      [debtAsset.toHexString()]
+    );
+    debtTokenPriceUSD = BIGDECIMAL_ZERO;
+  }
+  const profitUSD = amountUSD.minus(
+    debtToCover.toBigDecimal().times(debtTokenPriceUSD)
+  );
+  const collateralBalance = getCollateralBalance(market, liquidatee);
+  const debtBalances = getBorrowBalances(debtTokenMarket, liquidatee);
+  const totalDebtBalance = debtBalances[0].plus(debtBalances[1]);
+  const subtractBorrowerPosition = false;
+  const liquidate = manager.createLiquidate(
+    collateralAsset,
+    debtAsset,
+    liquidator,
+    liquidatee,
+    amount,
+    amountUSD,
+    profitUSD,
+    collateralBalance,
+    totalDebtBalance,
+    null,
+    createLiquidatorPosition,
+    subtractBorrowerPosition
+  );
+  if (!liquidate) {
+    return;
+  }
+
+  const liquidatedPositions = liquidate.positions;
+  const liquidateeAccount = new AccountManager(liquidatee).getAccount();
+  const protocol = manager.getOrCreateLendingProtocol(protocolData);
+  const accountDebtBalance = getOrCreateAccountDebtBalance(market, liquidatee);
+
+  // since there may be interest accrued, the balance difference may not exactly
+  // equal repay amount. Here we check whether the balance goes down
+  if (debtBalances[0].minus(accountDebtBalance.sTokenBalance).lt(BIGINT_ZERO)) {
+    const interestRateType = InterestRateType.STABLE;
+    const borrowerPosition = new PositionManager(
+      liquidateeAccount,
+      debtTokenMarket,
+      PositionSide.BORROWER,
+      interestRateType
+    );
+
+    const sBorrowerPositionID = borrowerPosition.subtractPosition(
+      event,
+      protocol,
+      debtBalances[0],
+      TransactionType.LIQUIDATE,
+      debtTokenMarket.inputTokenPriceUSD
+    );
+    if (!sBorrowerPositionID) {
+      log.error(
+        "[_handleLiquidate] positionID is null for market {} account {}",
+        [debtTokenMarket.id.toHexString(), liquidatee.toHexString()]
+      );
+    } else {
+      liquidatedPositions.push(sBorrowerPositionID!);
+    }
+  }
+
+  if (debtBalances[1].minus(accountDebtBalance.vTokenBalance).lt(BIGINT_ZERO)) {
+    const interestRateType = InterestRateType.VARIABLE;
+    const borrowerPosition = new PositionManager(
+      liquidateeAccount,
+      debtTokenMarket,
+      PositionSide.BORROWER,
+      interestRateType
+    );
+
+    const vBorrowerPositionID = borrowerPosition.subtractPosition(
+      event,
+      protocol,
+      debtBalances[1],
+      TransactionType.LIQUIDATE,
+      debtTokenMarket.inputTokenPriceUSD
+    );
+    if (!vBorrowerPositionID) {
+      log.error(
+        "[_handleLiquidate] positionID is null for market {} account {}",
+        [debtTokenMarket.id.toHexString(), liquidatee.toHexString()]
+      );
+    } else {
+      liquidatedPositions.push(vBorrowerPositionID!);
+    }
+  }
+
+  liquidate.positions = liquidatedPositions;
+  liquidate.save();
+
+  // TODO: delete
+  log.info(
+    "[_handleLiquidate] {} debt balance prior ({}, {}), current ({}, {}); debtToCover={}",
+    [
+      liquidatee.toHexString(),
+      accountDebtBalance.sTokenBalance.toString(),
+      accountDebtBalance.vTokenBalance.toString(),
+      debtBalances[0].toString(),
+      debtBalances[1].toString(),
+      debtToCover.toString(),
+    ]
+  );
+
+  accountDebtBalance.sTokenBalance = debtBalances[0];
+  accountDebtBalance.vTokenBalance = debtBalances[1];
+  accountDebtBalance.save();
 }
 
 export function _handleFlashLoan(
@@ -1007,7 +1133,7 @@ export function _handleTransfer(
   // then this transfer is emitted as part of another event
   // ie, a deposit, withdraw, borrow, repay, etc
   // we want to let that handler take care of position updates
-  // and zero addresses mean it is apart of a burn / mint
+  // and zero addresses mean it is a part of a burn / mint
   if (
     to == Address.fromString(ZERO_ADDRESS) ||
     from == Address.fromString(ZERO_ADDRESS) ||

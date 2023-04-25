@@ -624,7 +624,8 @@ export class DataManager {
     newCollateralBalance: BigInt,
     newBorrowerBalance: BigInt,
     interestType: string | null = null,
-    createLiquidatorPosition: bool = false
+    createLiquidatorPosition: bool = false,
+    subtractBorrowerPosition: bool = true
   ): Liquidate | null {
     const positions: string[] = []; // positions touched by this liquidation
     const liquidatorAccount = new AccountManager(liquidator);
@@ -687,36 +688,40 @@ export class DataManager {
       return null;
     }
     positions.push(collateralPositionID!);
-
-    const debtMarket = Market.load(debtTokenId);
-    if (!debtMarket) {
-      log.error("[createLiquidate] market {} not found", [
-        debtTokenId.toHexString(),
-      ]);
-      return null;
-    }
-    const borrowerPosition = new PositionManager(
-      liquidateeAccount.getAccount(),
-      debtMarket,
-      PositionSide.BORROWER,
-      interestType
-    );
-
-    const borrowerPositionID = borrowerPosition.subtractPosition(
-      this.event,
-      this.protocol,
-      newBorrowerBalance,
-      TransactionType.LIQUIDATE,
-      debtMarket.inputTokenPriceUSD
-    );
-    if (!borrowerPositionID) {
-      log.error(
-        "[createLiquidate] positionID is null for market: {} account: {}",
-        [debtMarket.id.toHexString(), liquidatee.toHexString()]
+    // we may want to do call subtractPosition outside this function
+    // to close both stable and variable borrowing poositions, e.g.
+    // in aave-forks
+    if (subtractBorrowerPosition) {
+      const debtMarket = Market.load(debtTokenId);
+      if (!debtMarket) {
+        log.error("[createLiquidate] market {} not found", [
+          debtTokenId.toHexString(),
+        ]);
+        return null;
+      }
+      const borrowerPosition = new PositionManager(
+        liquidateeAccount.getAccount(),
+        debtMarket,
+        PositionSide.BORROWER,
+        interestType
       );
-      return null;
+
+      const borrowerPositionID = borrowerPosition.subtractPosition(
+        this.event,
+        this.protocol,
+        newBorrowerBalance,
+        TransactionType.LIQUIDATE,
+        debtMarket.inputTokenPriceUSD
+      );
+      if (!borrowerPositionID) {
+        log.error(
+          "[createLiquidate] positionID is null for market: {} account: {}",
+          [debtMarket.id.toHexString(), liquidatee.toHexString()]
+        );
+        return null;
+      }
+      positions.push(borrowerPositionID!);
     }
-    positions.push(borrowerPositionID!);
 
     // Note:
     //  - liquidatees are not considered users since they are not spending gas for the transaction
