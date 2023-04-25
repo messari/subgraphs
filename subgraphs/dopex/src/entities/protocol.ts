@@ -36,7 +36,6 @@ export function getOrCreateProtocol(): DerivOptProtocol {
     protocol.type = ProtocolType.OPTION;
 
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    protocol.protocolControlledValueUSD = BIGDECIMAL_ZERO;
     protocol.openInterestUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeCollateralVolumeUSD = BIGDECIMAL_ZERO;

@@ -648,8 +648,6 @@ export function takeFinancialDailySnapshot(
   financialMetrics.days = day;
   financialMetrics.protocol = protocol.id;
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.protocolControlledValueUSD =
-    protocol.protocolControlledValueUSD;
   financialMetrics.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
   financialMetrics.dailyVolumeUSD = protocol.cumulativeVolumeUSD.minus(
     prevCumulativeVolumeUSD
