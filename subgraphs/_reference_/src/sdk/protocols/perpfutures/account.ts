@@ -5,6 +5,14 @@ import {
   Address,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
+
+import { Pool } from "./pool";
+import { Perpetual } from "./protocol";
+import { TokenManager } from "./tokens";
+import * as constants from "../../util/constants";
+import { EventType, ActivityType, TransactionType } from "./enums";
+import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
+
 import {
   Swap,
   Borrow,
@@ -16,12 +24,6 @@ import {
   ActiveAccount,
   Account as AccountSchema,
 } from "../../../../generated/schema";
-import { Pool } from "./pool";
-import { Perpetual } from "./protocol";
-import { TokenManager } from "./tokens";
-import * as constants from "../../util/constants";
-import { EventType, ActivityType, TransactionType } from "./enums";
-import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 /**
  * This file contains the AccountClass, which does
@@ -31,11 +33,22 @@ import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
  *  - Making a position
  *  - Making position snapshots
  *
- * Schema Version:  1.2.0
- * SDK Version:     1.0.0
+ * Schema Version:  1.3.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @harsh9200
+ *  - @dhruv-chauhan
  */
+
+class LoadAccountResponse {
+  account: Account;
+  isNewUser: boolean;
+
+  constructor(account: Account, isNewUser: boolean) {
+    this.account = account;
+    this.isNewUser = isNewUser;
+  }
+}
 
 export class AccountManager {
   protocol: Perpetual;
@@ -46,38 +59,41 @@ export class AccountManager {
     this.tokens = tokens;
   }
 
-  loadAccount(address: Address): Account {
-    let account = AccountSchema.load(address);
-    if (!account) {
-      account = new AccountSchema(address);
+  loadAccount(address: Address): LoadAccountResponse {
+    let isNewUser = false;
+    let entity = AccountSchema.load(address);
+    if (!entity) {
+      isNewUser = true;
+      entity = new AccountSchema(address);
 
-      account.cumulativeEntryPremiumUSD = constants.BIGDECIMAL_ZERO;
-      account.cumulativeExitPremiumUSD = constants.BIGDECIMAL_ZERO;
-      account.cumulativeTotalPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeEntryPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeExitPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeTotalPremiumUSD = constants.BIGDECIMAL_ZERO;
 
-      account.cumulativeDepositPremiumUSD = constants.BIGDECIMAL_ZERO;
-      account.cumulativeWithdrawPremiumUSD = constants.BIGDECIMAL_ZERO;
-      account.cumulativeTotalLiquidityPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeDepositPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeWithdrawPremiumUSD = constants.BIGDECIMAL_ZERO;
+      entity.cumulativeTotalLiquidityPremiumUSD = constants.BIGDECIMAL_ZERO;
 
-      account.longPositionCount = 0;
-      account.shortPositionCount = 0;
-      account.openPositionCount = 0;
-      account.closedPositionCount = 0;
-      account.cumulativeUniqueLiquidatees = 0;
+      entity.longPositionCount = 0;
+      entity.shortPositionCount = 0;
+      entity.openPositionCount = 0;
+      entity.closedPositionCount = 0;
+      entity.cumulativeUniqueLiquidatees = 0;
 
-      account.depositCount = 0;
-      account.withdrawCount = 0;
-      account.borrowCount = 0;
-      account.collateralInCount = 0;
-      account.collateralOutCount = 0;
-      account.liquidateCount = 0;
-      account.liquidationCount = 0;
+      entity.depositCount = 0;
+      entity.withdrawCount = 0;
+      entity.borrowCount = 0;
+      entity.swapCount = 0;
+      entity.collateralInCount = 0;
+      entity.collateralOutCount = 0;
+      entity.liquidateCount = 0;
+      entity.liquidationCount = 0;
 
-      account.save();
-
-      this.protocol.addUser();
+      entity.save();
     }
-    return new Account(this.protocol, account, this.tokens);
+
+    const account = new Account(this.protocol, entity, this.tokens);
+    return new LoadAccountResponse(account, isNewUser);
   }
 }
 
@@ -229,7 +245,7 @@ export class Account {
    *
    * @param pool The pool where the liquidity was withdrawn.
    * @param amounts The amount withdrawn of inputTokens.
-   * @param sharesMinted The amount of shares burnt of outputToken.
+   * @param sharesBurnt The amount of shares burnt of outputToken.
    * @param updateMetrics Optional, defaults to true. If true it will update the protocol withdraw and transaction count.
    * @returns Withdraw
    */
@@ -513,7 +529,7 @@ export class Account {
     liquidate.from = liquidatee;
     liquidate.blockNumber = this.event.block.number;
     liquidate.timestamp = this.event.block.timestamp;
-    liquidate.liquidator = liquidator;
+    liquidate.account = liquidator;
     liquidate.liquidatee = liquidatee;
     liquidate.asset = asset;
     liquidate.amount = amountLiquidated;
@@ -530,6 +546,7 @@ export class Account {
     if (updateMetrics) {
       this.pool = pool;
       this.countLiquidatee();
+      this.countLiquidator(liquidator);
       this.protocol.addTransaction(TransactionType.LIQUIDATE);
     }
     return liquidate;
@@ -543,7 +560,7 @@ export class Account {
   countDeposit(): void {
     if (this.account.depositCount == 0) {
       this.protocol.addDepositor();
-      if (this.pool) this.pool.addDepositor();
+      if (this.pool) this.pool!.addDepositor();
     }
 
     this.account.depositCount += 1;
@@ -568,11 +585,13 @@ export class Account {
   countBorrow(): void {
     if (this.account.borrowCount == 0) {
       this.protocol.addBorrower();
-      if (this.pool) this.pool.addBorrower();
+      if (this.pool) this.pool!.addBorrower();
     }
 
     this.account.borrowCount += 1;
     this.account.save();
+
+    this.trackActivity(ActivityType.BORROW);
   }
 
   /**
@@ -603,14 +622,22 @@ export class Account {
    * Adds 1 to the account total liquidation count. If it is the first liquidation ever
    * it will also increase the number of unique liquidation in the protocol and the associated pool.
    */
-  countLiquidator(): void {
-    if (this.account.liquidateCount == 0) {
-      this.protocol.addLiquidator();
-      if (this.pool) this.pool.addLiquidator();
+  countLiquidator(liquidator: Address): void {
+    let entity = AccountSchema.load(liquidator);
+    if (!entity) {
+      const accountManager = new AccountManager(this.protocol, this.tokens);
+      accountManager.loadAccount(liquidator);
+
+      entity = AccountSchema.load(liquidator);
     }
 
-    this.account.liquidateCount += 1;
-    this.account.save();
+    if (entity!.liquidateCount == 0) {
+      this.protocol.addLiquidator();
+      if (this.pool) this.pool!.addLiquidator();
+    }
+
+    entity!.liquidateCount += 1;
+    entity!.save();
 
     this.trackActivity(ActivityType.LIQUIDATOR);
   }
@@ -622,7 +649,7 @@ export class Account {
   countLiquidatee(): void {
     if (this.account.liquidationCount == 0) {
       this.protocol.addLiquidatee();
-      if (this.pool) this.pool.addLiquidatee();
+      if (this.pool) this.pool!.addLiquidatee();
     }
 
     this.account.liquidationCount += 1;

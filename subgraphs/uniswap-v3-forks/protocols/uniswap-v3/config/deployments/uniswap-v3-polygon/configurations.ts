@@ -84,7 +84,10 @@ export class UniswapV3MaticConfigurations implements Configurations {
     return stringToBytesList([]);
   }
   getUntrackedTokens(): Bytes[] {
-    return stringToBytesList([]);
+    return stringToBytesList([
+      "0xff20f43918c70b9fa47b6e3992b042225b17f73e", // Runbit Token
+      "0xdc8d88d9e57cc7be548f76e5e413c4838f953018", // SW DAO Token
+    ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
     return BigDecimal.fromString("100000");

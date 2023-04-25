@@ -4,6 +4,7 @@ import {
   dataSource,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
+
 import { SDK } from ".";
 import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
@@ -11,17 +12,18 @@ import { CustomEventType } from "../../util/events";
 import { ProtocolSnapshot } from "./protocolSnapshot";
 import { PositionType, TransactionType } from "./enums";
 import { ProtocolConfigurer, TokenPricer } from "../config";
-import { Versions } from "../../../../../../deployment/context/interface";
+
 import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/schema";
 
 /**
  * This file contains the Perpetual class, which is used to
  * make all of the storage changes that occur in a protocol.
  *
- * Schema Version:  1.2.0
- * SDK Version:     1.0.0
+ * Schema Version:  1.3.0
+ * SDK Version:     1.1.0
  * Author(s):
  *  - @harsh9200
+ *  - @dhruv-chauhan
  */
 
 /**
@@ -113,6 +115,7 @@ export class Perpetual {
       protocol.depositCount = 0;
       protocol.withdrawCount = 0;
       protocol.borrowCount = 0;
+      protocol.swapCount = 0;
       protocol.collateralInCount = 0;
       protocol.collateralOutCount = 0;
 
@@ -120,26 +123,17 @@ export class Perpetual {
 
       protocol._lastSnapshotDayID = constants.BIGINT_ZERO;
       protocol._lastSnapshotHourID = constants.BIGINT_ZERO;
-      protocol._lastUpdateTimestamp = constants.BIGINT_ZERO;
     }
 
-    const proto = new Perpetual(protocol, pricer, event);
-    proto.setVersions(conf.getVersions());
+    const versions = conf.getVersions();
+    protocol.schemaVersion = versions.getSchemaVersion();
+    protocol.subgraphVersion = versions.getSubgraphVersion();
+    protocol.methodologyVersion = versions.getMethodologyVersion();
 
-    return proto;
-  }
+    protocol._lastUpdateTimestamp = event.block.timestamp;
+    protocol.save();
 
-  /**
-   * Updates the protocol entity versions. This is called on load to make sure we update the version
-   * if we've grafted the subgraph.
-   *
-   * @param versions {Versions} An object that implements the Versions interface, to get the protocol's versions
-   */
-  private setVersions(versions: Versions): void {
-    this.protocol.schemaVersion = versions.getSchemaVersion();
-    this.protocol.subgraphVersion = versions.getSubgraphVersion();
-    this.protocol.methodologyVersion = versions.getMethodologyVersion();
-    this.save();
+    return new Perpetual(protocol, pricer, event);
   }
 
   /**
@@ -150,6 +144,7 @@ export class Perpetual {
    * @private
    */
   private save(): void {
+    this.protocol._lastUpdateTimestamp = this.event.block.timestamp;
     this.protocol.save();
   }
 
@@ -203,25 +198,10 @@ export class Perpetual {
    * Adds a given USD value to the protocol's TVL. It can be a positive or negative amount.
    * Same as for setTotalValueLocked, this is mostly to be called internally by the library.
    * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param tvl {BigDecimal} The value to add to the protocol's TVL.
+   * @param amount {BigDecimal} The value to add to the protocol's TVL.
    */
-  addTotalValueLocked(tvl: BigDecimal): void {
-    this.protocol.totalValueLockedUSD =
-      this.protocol.totalValueLockedUSD.plus(tvl);
-    this.save();
-  }
-
-  /**
-   * Sets the Volume in USD for the protocol. Most times this will be called internally by
-   * other members of the library when Volume changes are made to them. But if the library
-   * is not well fitted to a given protocol and you need to set the Volume manually, you can
-   * use this method.
-   * It will also update the protocol's snapshots.
-   * @param volume {BigDecimal} The new total value locked for the protocol.
-   */
-  setVolume(volume: BigDecimal): void {
-    this.protocol.cumulativeVolumeUSD = volume;
-    this.save();
+  addTotalValueLocked(amount: BigDecimal): void {
+    this.setTotalValueLocked(this.protocol.totalValueLockedUSD.plus(amount));
   }
 
   /**
@@ -231,8 +211,8 @@ export class Perpetual {
    * @param volume {BigDecimal} The value to add to the protocol's volume.
    */
   addVolume(volume: BigDecimal): void {
-    this.protocol.totalValueLockedUSD =
-      this.protocol.totalValueLockedUSD.plus(volume);
+    this.protocol.cumulativeVolumeUSD =
+      this.protocol.cumulativeVolumeUSD.plus(volume);
     this.save();
   }
 
@@ -355,21 +335,6 @@ export class Perpetual {
   }
 
   /**
-   * Adds a given USD value to the protocol's entryPremium and exitPremium. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param entryPremiumPaid {BigDecimal} The value to add to the protocol's entryPremium.
-   * @param exitPremiumPaid {BigDecimal} The value to add to the protocol's exitPremium.
-   */
-  addPremiumUSD(
-    entryPremiumPaid: BigDecimal,
-    exitPremiumPaid: BigDecimal
-  ): void {
-    this.addEntryPremiumUSD(entryPremiumPaid);
-    this.addExitPremiumUSD(exitPremiumPaid);
-  }
-
-  /**
    * Adds a given USD value to the protocol depositPremium. It can be a positive or negative amount.
    * Same as for the rest of setters, this is mostly to be called internally by the library.
    * But you can use it if you need to. It will also update the protocol's snapshots.
@@ -395,21 +360,6 @@ export class Perpetual {
     this.protocol.cumulativeWithdrawPremiumUSD =
       this.protocol.cumulativeWithdrawPremiumUSD.plus(premium);
     this.save();
-  }
-
-  /**
-   * Adds a given USD value to the protocol's depositPremium and withdrawPremium. It can be a positive or negative amount.
-   * Same as for the rest of setters, this is mostly to be called internally by the library.
-   * But you can use it if you need to. It will also update the protocol's snapshots.
-   * @param depositPremium {BigDecimal} The value to add to the protocol's depositPremium.
-   * @param withdrawPremium {BigDecimal} The value to add to the protocol's withdrawPremium.
-   */
-  addTotalLiquidityPremiumUSD(
-    depositPremium: BigDecimal,
-    withdrawPremium: BigDecimal
-  ): void {
-    this.addDepositPremiumUSD(depositPremium);
-    this.addWithdrawPremiumUSD(withdrawPremium);
   }
 
   /**
@@ -447,7 +397,7 @@ export class Perpetual {
    * @see PositionType
    * @see Account
    */
-  addPosition(positionSide: PositionType): void {
+  openPosition(positionSide: PositionType): void {
     if (positionSide == PositionType.LONG) {
       this.protocol.longPositionCount += 1;
     } else if (positionSide == PositionType.SHORT) {

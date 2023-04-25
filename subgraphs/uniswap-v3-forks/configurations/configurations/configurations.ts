@@ -3,6 +3,7 @@ import { UniswapV3MainnetConfigurations } from "../../protocols/uniswap-v3/confi
 import { UniswapV3MaticConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-polygon/configurations";
 import { UniswapV3OptimismConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-optimism/configurations";
 import { UniswapV3CeloConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-celo/configurations";
+import { UniswapV3BSCConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-bsc/configurations";
 import { PancakeV3BSCConfigurations } from "../../protocols/pancakeswap-v3/config/deployments/pancakeswap-v3-bsc/configurations";
 import { PancakeV3EthereumConfigurations } from "../../protocols/pancakeswap-v3/config/deployments/pancakeswap-v3-ethereum/configurations";
 import { Configurations } from "./interface";
@@ -25,6 +26,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.UNISWAP_V3_CELO: {
       return new UniswapV3CeloConfigurations();
+    }
+    case Deploy.UNISWAP_V3_BSC: {
+      return new UniswapV3BSCConfigurations();
     }
     case Deploy.PANCAKE_V3_BSC: {
       return new PancakeV3BSCConfigurations();

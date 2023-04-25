@@ -4,14 +4,6 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
-/////////////////////
-///// Protocols /////
-/////////////////////
-export namespace Protocol {
-  export const APESWAP = "Apeswap";
-  export const UNISWAP_V2 = "Uniswap V2";
-  export const SUSHISWAP = "Sushiswap";
-}
 ////////////////////////
 ///// Schema Enums /////
 ////////////////////////

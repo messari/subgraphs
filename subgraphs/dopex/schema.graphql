@@ -1,0 +1,1551 @@
+# Subgraph Schema: Derivatives Options
+# Version: 1.3.1
+# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
+
+enum Network {
+  ARBITRUM_ONE
+  ARWEAVE_MAINNET
+  AURORA
+  AVALANCHE
+  BOBA
+  BSC # aka BNB Chain
+  CELO
+  COSMOS
+  CRONOS
+  MAINNET # Ethereum Mainnet
+  FANTOM
+  FUSE
+  HARMONY
+  JUNO
+  MOONBEAM
+  MOONRIVER
+  NEAR_MAINNET
+  OPTIMISM
+  OSMOSIS
+  MATIC # aka Polygon
+  XDAI # aka Gnosis Chain
+}
+
+enum ProtocolType {
+  EXCHANGE
+  LENDING
+  YIELD
+  BRIDGE
+  OPTION
+  PERPETUAL
+  GENERIC
+  # Will add more
+}
+
+type Token @entity {
+  " Smart contract address of the token "
+  id: Bytes!
+
+  " Name of the token, mirrored from the smart contract "
+  name: String!
+
+  " Symbol of the token, mirrored from the smart contract "
+  symbol: String!
+
+  " The number of decimal places this token uses, default to 18 "
+  decimals: Int!
+
+  " Optional field to track the price of a token, mostly for caching purposes "
+  lastPriceUSD: BigDecimal
+
+  " Optional field to track the block number of the last token price "
+  lastPriceBlockNumber: BigInt
+}
+
+enum RewardTokenType {
+  " For reward tokens awarded to LPs/lenders "
+  DEPOSIT
+
+  " For reward tokens awarded to borrowers "
+  BORROW
+}
+
+type RewardToken @entity(immutable: true) {
+  " { Reward token type }-{ Smart contract address of the reward token } "
+  id: Bytes!
+
+  " Reference to the actual token "
+  token: Token!
+
+  " The type of the reward token "
+  type: RewardTokenType!
+}
+
+# Note that trading fee is the premium paid *by* the users, whereas LP fee and
+# protocol fee are fees paid *to* the corresponding parties.
+# Most of the time, trading fee = liquidity provider fee + protocol fee,
+# but not always. Thus we explicitly specify all different fee types.
+enum LiquidityPoolFeeType {
+  " Total fixed fee paid by the user per trade, as a percentage of the traded amount. e.g. 0.3% for Uniswap v2, 0.3% for Sushiswap, 0.04% for Curve v1. "
+  FIXED_TRADING_FEE
+
+  " Some protocols use tiered fees instead of fixed fee (e.g. DYDX). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
+  TIERED_TRADING_FEE
+
+  " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_TRADING_FEE
+
+  " Fixed fee that's paid to the LP, as a percentage of the traded amount. e.g. 10% of fees to GMX LP providers (GLP holders). "
+  FIXED_LP_FEE
+
+  " Some protocols use dynamic LP fees . Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_LP_FEE
+
+  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 10% of GMX fees to protocol. "
+  FIXED_PROTOCOL_FEE
+
+  " Some protocols use dynamic protocol fees. Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_PROTOCOL_FEE
+
+  " Fixed fee that's paid to the stakers, as a percentage of the traded amount. e.g. 15% of all fees on GMX to stakers. "
+  FIXED_STAKE_FEE
+
+  " Some protocols use dynamic stakers fees. Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_STAKE_FEE
+
+  " One-time fee charged by the protocol during deposit, in percentages of the deposit token (e.g. dynamic fee collected for LP providers in GMX)"
+  DEPOSIT_FEE
+
+  " One-time fee charged by the protocol (e.g. GMX charges a fee from certain pools with withdrawing) during withdrawal, in percentages of the withdrawal token "
+  WITHDRAWAL_FEE
+}
+
+type LiquidityPoolFee @entity {
+  " { Fee type }-{ Pool address } "
+  id: Bytes!
+
+  " Fee as a percentage of the trade (swap) amount. Does not always apply "
+  feePercentage: BigDecimal
+
+  " Type of fee this pool uses "
+  feeType: LiquidityPoolFeeType!
+}
+
+#############################
+##### Protocol Metadata #####
+#############################
+
+interface Protocol {
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
+  id: Bytes!
+
+  " Name of the protocol, including version. e.g. Uniswap v3 "
+  name: String!
+
+  " Slug of protocol, including version. e.g. uniswap-v3 "
+  slug: String!
+
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
+  " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
+  methodologyVersion: String!
+
+  " The blockchain network this subgraph is indexing on "
+  network: Network!
+
+  " The type of protocol (e.g. DEX, Lending, Yield, etc) "
+  type: ProtocolType!
+
+  ##### Quantitative Data #####
+
+  " Current TVL (Total Value Locked) of the entire protocol "
+  totalValueLockedUSD: BigDecimal!
+
+  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  cumulativeSupplySideRevenueUSD: BigDecimal!
+
+  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
+  cumulativeProtocolSideRevenueUSD: BigDecimal!
+
+  " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
+  cumulativeTotalRevenueUSD: BigDecimal!
+
+  " All premium paid to enter a position. "
+  cumulativeEntryPremiumUSD: BigDecimal!
+
+  " All premium paid to exit a position. "
+  cumulativeExitPremiumUSD: BigDecimal!
+
+  " All premium paid. "
+  cumulativeTotalPremiumUSD: BigDecimal!
+
+  " All premium paid to deposit in liquidity pools. "
+  cumulativeDepositPremiumUSD: BigDecimal!
+
+  " All premium paid to withdraw from liquidity pools. "
+  cumulativeWithdrawPremiumUSD: BigDecimal!
+
+  " All premium paid to enter and exit liquidity pool. "
+  cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " Number of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Number of cumulative unique LPs "
+  cumulativeUniqueLP: Int!
+
+  " Number of cumulative unique Takers "
+  cumulativeUniqueTakers: Int!
+
+  " Notional value of all open positions "
+  openInterestUSD: BigDecimal!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of contracts minted "
+  contractsMintedCount: Int!
+
+  " Total number of pools "
+  totalPoolCount: Int!
+
+  ##### Snapshots #####
+
+  " Daily usage metrics for this protocol "
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
+
+  " Hourly usage metrics for this protocol "
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
+
+  " Daily financial metrics for this protocol "
+  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+}
+
+type DerivOptProtocol implements Protocol @entity {
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
+  id: Bytes!
+
+  " Name of the protocol, including version. e.g. Uniswap v3 "
+  name: String!
+
+  " Slug of protocol, including version. e.g. uniswap-v3 "
+  slug: String!
+
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
+  " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
+  methodologyVersion: String!
+
+  " The blockchain network this subgraph is indexing on "
+  network: Network!
+
+  " The type of protocol (e.g. DEX, Lending, Yield, etc) "
+  type: ProtocolType!
+
+  ##### Quantitative Data #####
+
+  " Current TVL (Total Value Locked) of the entire protocol "
+  totalValueLockedUSD: BigDecimal!
+
+  " All historical notional volume in USD taken of underlying at time of contract minting"
+  cumulativeVolumeUSD: BigDecimal!
+
+  " All historical volume of Collateral assets in USD in this pool that was used for trading"
+  cumulativeCollateralVolumeUSD: BigDecimal
+
+  " All historical notional volume in USD taken of underlying at time of contract exercise"
+  cumulativeExercisedVolumeUSD: BigDecimal!
+
+  " All historical notional volume in USD taken of underlying at time of contract closed but not exercised"
+  cumulativeClosedVolumeUSD: BigDecimal!
+
+  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  cumulativeSupplySideRevenueUSD: BigDecimal!
+
+  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
+  cumulativeProtocolSideRevenueUSD: BigDecimal!
+
+  " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
+  cumulativeTotalRevenueUSD: BigDecimal!
+
+  " All premium paid to enter a position. "
+  cumulativeEntryPremiumUSD: BigDecimal!
+
+  " All premium paid to exit a position. "
+  cumulativeExitPremiumUSD: BigDecimal!
+
+  " All premium paid. "
+  cumulativeTotalPremiumUSD: BigDecimal!
+
+  " All premium paid to deposit in liquidity pools. "
+  cumulativeDepositPremiumUSD: BigDecimal!
+
+  " All premium paid to withdraw from liquidity pools. "
+  cumulativeWithdrawPremiumUSD: BigDecimal!
+
+  " All premium paid to enter and exit liquidity pool. "
+  cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " Total number of puts minted "
+  putsMintedCount: Int!
+
+  " Total number of calls minted "
+  callsMintedCount: Int!
+
+  " Total number of contracts minted "
+  contractsMintedCount: Int!
+
+  " Total number of contracts taken "
+  contractsTakenCount: Int!
+
+  " Total number of contracts expired "
+  contractsExpiredCount: Int!
+
+  " Total number of contracts exercised "
+  contractsExercisedCount: Int!
+
+  " Total number of contracts exercised+expired "
+  contractsClosedCount: Int!
+
+  " Notional value of all open positions "
+  openInterestUSD: BigDecimal!
+
+  " Total number of open positions (total positions open-closed) "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Number of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Number of cumulative unique LPs "
+  cumulativeUniqueLP: Int!
+
+  " Number of cumulative unique Takers "
+  cumulativeUniqueTakers: Int!
+
+  " Total number of pools "
+  totalPoolCount: Int!
+
+  ##### Snapshots #####
+
+  " Daily usage metrics for this protocol "
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
+
+  " Hourly usage metrics for this protocol "
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
+
+  " Daily financial metrics for this protocol "
+  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  ##### Pools #####
+
+  " All pools that belong to this protocol "
+  pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
+
+  " Day ID of the most recent daily snapshot "
+  _lastSnapshotDayID: Int
+
+  " Timestamp of the last time this entity was updated "
+  _lastUpdateTimestamp: BigInt
+}
+
+###############################
+##### Protocol Timeseries #####
+###############################
+
+type UsageMetricsDailySnapshot @entity(immutable: true) {
+  " ID is # of days since Unix epoch time "
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  days: Int!
+
+  " Protocol this snapshot is associated with "
+  protocol: DerivOptProtocol!
+
+  " Number of unique daily active users "
+  dailyActiveUsers: Int!
+
+  " Number of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Daily Number of cumulative unique LPs "
+  dailyUniqueLP: Int!
+
+  " Number of cumulative unique LPs "
+  cumulativeUniqueLP: Int!
+
+  " Daily number of cumulative unique Takers "
+  dailyUniqueTakers: Int!
+
+  " Number of cumulative unique Takers "
+  cumulativeUniqueTakers: Int!
+
+  " Daily total number of transactions. Transactions include all entities that implement the Event interface. "
+  dailyTransactionCount: Int!
+
+  " Daily total number of deposits (add liquidity) "
+  dailyDepositCount: Int!
+
+  " Daily total number of withdrawals (remove liquidity) "
+  dailyWithdrawCount: Int!
+
+  "Daily total number of trades (swaps) "
+  dailySwapCount: Int!
+
+  " Total number of pools "
+  totalPoolCount: Int!
+}
+
+type UsageMetricsHourlySnapshot @entity(immutable: true) {
+  " { # of hours since Unix epoch time } "
+  id: Bytes!
+
+  " Number of hours since Unix epoch time "
+  hours: Int!
+
+  " Protocol this snapshot is associated with "
+  protocol: DerivOptProtocol!
+
+  " Number of unique hourly active users "
+  hourlyActiveUsers: Int!
+
+  " Number of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Number of cumulative unique LPs "
+  cumulativeUniqueLP: Int!
+
+  " Number of cumulative unique Takers "
+  cumulativeUniqueTakers: Int!
+
+  " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
+  hourlyTransactionCount: Int!
+
+  " Total number of deposits (add liquidity) in an hour "
+  hourlyDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) in an hour "
+  hourlyWithdrawCount: Int!
+
+  " Total number of trades (swaps) in an hour "
+  hourlySwapCount: Int!
+}
+
+type _TempUsageMetricsDailySnapshot @entity {
+  " ID is # of days since Unix epoch time "
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  days: Int!
+
+  " Protocol this snapshot is associated with "
+  protocol: DerivOptProtocol!
+
+  " Number of unique daily active users "
+  dailyActiveUsers: Int!
+
+  " Daily Number of cumulative unique LPs "
+  dailyUniqueLP: Int!
+
+  " Daily number of cumulative unique Takers "
+  dailyUniqueTakers: Int!
+
+  " Daily total number of transactions. Transactions include all entities that implement the Event interface. "
+  dailyTransactionCount: Int!
+
+  " Daily total number of deposits (add liquidity) "
+  dailyDepositCount: Int!
+
+  " Daily total number of withdrawals (remove liquidity) "
+  dailyWithdrawCount: Int!
+
+  "Daily total number of trades (swaps) "
+  dailySwapCount: Int!
+}
+
+type _TempUsageMetricsHourlySnapshot @entity {
+  " { # of hours since Unix epoch time } "
+  id: Bytes!
+
+  " Number of hours since Unix epoch time "
+  hours: Int!
+
+  " Protocol this snapshot is associated with "
+  protocol: DerivOptProtocol!
+
+  " Number of unique hourly active users "
+  hourlyActiveUsers: Int!
+
+  " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
+  hourlyTransactionCount: Int!
+
+  " Total number of deposits (add liquidity) in an hour "
+  hourlyDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) in an hour "
+  hourlyWithdrawCount: Int!
+
+  " Total number of trades (swaps) in an hour "
+  hourlySwapCount: Int!
+}
+
+type FinancialsDailySnapshot @entity(immutable: true) {
+  " ID is # of days since Unix epoch time "
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  days: Int!
+
+  " Protocol this snapshot is associated with "
+  protocol: DerivOptProtocol!
+
+  " Current TVL (Total Value Locked) of the entire protocol "
+  totalValueLockedUSD: BigDecimal!
+
+  " Daily trade notional volume of underlying assets at contract mint, in USD "
+  dailyVolumeUSD: BigDecimal!
+
+  " All historical trade notional volume of underylying assets in USD "
+  cumulativeVolumeUSD: BigDecimal!
+
+  " Current Collateral assets in USD in this pool that was used for trading, amount taken at snapshot"
+  collateralUsedUSD: BigDecimal
+
+  " Daily volume of Collateral assets in USD in this pool that was used for trading"
+  dailyCollateralVolumeUSD: BigDecimal
+
+  " All historical volume of Collateral assets in USD in this pool that was used for trading"
+  cumulativeCollateralVolumeUSD: BigDecimal
+
+  " Daily notional volume in USD taken of underlying at time of contract exercise"
+  dailyExercisedVolumeUSD: BigDecimal!
+
+  " All historical notional volume in USD taken of underlying at time of contract exercise"
+  cumulativeExercisedVolumeUSD: BigDecimal!
+
+  " Daily notional volume in USD taken of underlying at time of contract closed but not exercised"
+  dailyClosedVolumeUSD: BigDecimal!
+
+  " All historical notional volume in USD taken of underlying at time of contract closed but not exercised"
+  cumulativeClosedVolumeUSD: BigDecimal!
+
+  " Notional value of all open positions "
+  openInterestUSD: BigDecimal!
+
+  " Daily revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  dailySupplySideRevenueUSD: BigDecimal!
+
+  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  cumulativeSupplySideRevenueUSD: BigDecimal!
+
+  " Daily revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
+  dailyProtocolSideRevenueUSD: BigDecimal!
+
+  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
+  cumulativeProtocolSideRevenueUSD: BigDecimal!
+
+  " Daily revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
+  dailyTotalRevenueUSD: BigDecimal!
+
+  " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
+  cumulativeTotalRevenueUSD: BigDecimal!
+
+  " Daily premium paid to enter a position. "
+  dailyEntryPremiumUSD: BigDecimal!
+
+  " All premium paid to enter a position. "
+  cumulativeEntryPremiumUSD: BigDecimal!
+
+  " Daily premium paid to exit a position. "
+  dailyExitPremiumUSD: BigDecimal!
+
+  " All premium paid to exit a position. "
+  cumulativeExitPremiumUSD: BigDecimal!
+
+  " Daily all premium paid. "
+  dailyTotalPremiumUSD: BigDecimal!
+
+  " All historical premium paid. "
+  cumulativeTotalPremiumUSD: BigDecimal!
+
+  " Daily premium paid to deposit in liquidity pools. "
+  dailyDepositPremiumUSD: BigDecimal!
+
+  " All premium paid to deposit in liquidity pools. "
+  cumulativeDepositPremiumUSD: BigDecimal!
+
+  " Daily premium paid to withdraw from liquidity pools. "
+  dailyWithdrawPremiumUSD: BigDecimal!
+
+  " All premium paid to withdraw from liquidity pools. "
+  cumulativeWithdrawPremiumUSD: BigDecimal!
+
+  " Daily premium paid to enter and exit liquidity pool. "
+  dailyTotalLiquidityPremiumUSD: BigDecimal!
+
+  " All premium paid to enter and exit liquidity pool. "
+  cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " Daily number of puts minted "
+  dailyPutsMintedCount: Int!
+
+  " Total number of puts minted "
+  putsMintedCount: Int!
+
+  " Daily number of calls minted "
+  dailyCallsMintedCount: Int!
+
+  " Total number of calls minted "
+  callsMintedCount: Int!
+
+  " Daily number of contracts minted "
+  dailyContractsMintedCount: Int!
+
+  " Total number of contracts minted "
+  contractsMintedCount: Int!
+
+  " Daily number of contracts taken "
+  dailyContractsTakenCount: Int!
+
+  " Total number of contracts taken "
+  contractsTakenCount: Int!
+
+  " Daily number of contracts expired "
+  dailyContractsExpiredCount: Int!
+
+  " Total number of contracts expired "
+  contractsExpiredCount: Int!
+
+  " Daily number of contracts exercised "
+  dailyContractsExercisedCount: Int!
+
+  " Total number of contracts exercised "
+  contractsExercisedCount: Int!
+
+  " Daily number of contracts exercised+expired "
+  dailyContractsClosedCount: Int!
+
+  " Total number of contracts exercised+expired "
+  contractsClosedCount: Int!
+
+  " Total number of open positions (minted-closed positions) "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+}
+
+###############################
+##### Pool-Level Metadata #####
+###############################
+
+type LiquidityPool @entity {
+  " Smart contract address of the pool "
+  id: Bytes!
+
+  " The protocol this pool belongs to "
+  protocol: DerivOptProtocol!
+
+  " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
+  name: String
+
+  " Symbol of liquidity pool (e.g. 3CRV) "
+  symbol: String
+
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
+  inputTokens: [Token!]!
+
+  " Token that is minted to track ownership of position in protocol "
+  outputToken: Token
+
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
+  " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
+  fees: [LiquidityPoolFee!]!
+
+  " Name of oracle source (e.g. chainlink, uniswap, pyth) "
+  oracle: String
+
+  " Creation timestamp "
+  createdTimestamp: BigInt!
+
+  " Creation block number "
+  createdBlockNumber: BigInt!
+
+  ##### Quantitative Data #####
+
+  " Current TVL (Total Value Locked) of this pool in USD "
+  totalValueLockedUSD: BigDecimal!
+
+  " All revenue generated by the liquidity pool, accrued to the supply side. "
+  cumulativeSupplySideRevenueUSD: BigDecimal!
+
+  " All revenue generated by the liquidity pool, accrued to the protocol. "
+  cumulativeProtocolSideRevenueUSD: BigDecimal!
+
+  " All revenue generated by the liquidity pool. "
+  cumulativeTotalRevenueUSD: BigDecimal!
+
+  " All premium paid to enter a position. "
+  cumulativeEntryPremiumUSD: BigDecimal!
+
+  " All premium paid to exit a position. "
+  cumulativeExitPremiumUSD: BigDecimal!
+
+  " All premium paid. "
+  cumulativeTotalPremiumUSD: BigDecimal!
+
+  " All premium paid to deposit in liquidity pools. "
+  cumulativeDepositPremiumUSD: BigDecimal!
+
+  " All premium paid to withdraw from liquidity pools. "
+  cumulativeWithdrawPremiumUSD: BigDecimal!
+
+  " All premium paid to enter and exit liquidity pool. "
+  cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " All historical trade notional volume of underylying assets in USD in this pool "
+  cumulativeVolumeUSD: BigDecimal!
+
+  " All historical volume of Collateral assets in USD in this pool, that was used for trading "
+  cumulativeCollateralVolumeUSD: BigDecimal
+
+  " All historical notional volume in USD taken of underlying at time of contract exercise in this pool"
+  cumulativeExercisedVolumeUSD: BigDecimal!
+
+  " All historical notional volume in USD taken of underlying at time of contract closed but not exercised"
+  cumulativeClosedVolumeUSD: BigDecimal!
+
+  " Notional value of all open positions "
+  openInterestUSD: BigDecimal!
+
+  " Total number of puts minted "
+  putsMintedCount: Int!
+
+  " Total number of calls minted "
+  callsMintedCount: Int!
+
+  " Total number of contracts minted "
+  contractsMintedCount: Int!
+
+  " Total number of contracts taken "
+  contractsTakenCount: Int!
+
+  " Total number of contracts expired "
+  contractsExpiredCount: Int!
+
+  " Total number of contracts exercised "
+  contractsExercisedCount: Int!
+
+  " Total number of contracts exercised+expired "
+  contractsClosedCount: Int!
+
+  " Total number of open positions (minted-closed)"
+  openPositionCount: Int!
+
+  " Total number of closed positions (closed+exercised+expired) "
+  closedPositionCount: Int!
+
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: [BigInt!]!
+
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
+  inputTokenWeights: [BigDecimal!]!
+
+  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
+  outputTokenSupply: BigInt
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
+
+  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
+  ##### Snapshots #####
+
+  " Liquidity pool daily snapshots "
+  dailySnapshots: [LiquidityPoolDailySnapshot!]! @derivedFrom(field: "pool")
+
+  " Liquidity pool hourly snapshots "
+  hourlySnapshots: [LiquidityPoolHourlySnapshot!]! @derivedFrom(field: "pool")
+
+  ##### Events #####
+
+  " All deposit (add liquidity) events occurred in this pool "
+  deposits: [Deposit!]! @derivedFrom(field: "pool")
+
+  " All withdraw (remove liquidity) events occurred in this pool "
+  withdraws: [Withdraw!]! @derivedFrom(field: "pool")
+
+  " All Position events occurred in this pool "
+  positions: [Position!]! @derivedFrom(field: "pool")
+
+  " All Option entities from this pool "
+  options: [Option!]! @derivedFrom(field: "pool")
+
+  " Deposit historical trade notional volume occurred in this pool, in USD "
+  cumulativeDepositedVolumeUSD: BigDecimal!
+
+  " Withdraw historical trade notional volume occurred in this pool, in USD "
+  cumulativeWithdrawVolumeUSD: BigDecimal!
+
+  " All trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenAmount: [BigInt!]!
+
+  " All trade notional volumefor a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenUSD: [BigDecimal!]!
+
+  " All Deposit trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositedVolumeByTokenAmount: [BigInt!]!
+
+  " All Deposit trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositedVolumeByTokenUSD: [BigDecimal!]!
+
+  " All Withdraw trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenAmount: [BigInt!]!
+
+  " All Withdraw trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenUSD: [BigDecimal!]!
+
+  " The underlying asset in the pool "
+  _underlyingAsset: Token!
+
+  " True if the pool is dedicated for Put option "
+  _isPut: Boolean
+
+  " the current epoch number for the pool "
+  _currentEpoch: BigInt
+
+  " Day ID of the most recent daily snapshot "
+  _lastSnapshotDayID: Int
+
+  " Hour ID of the most recent hourly snapshot "
+  _lastSnapshotHourID: Int
+
+  " Timestamp of the last time this entity was updated "
+  _lastUpdateTimestamp: BigInt
+}
+#################################
+##### Pool-Level Timeseries #####
+#################################
+
+type LiquidityPoolDailySnapshot @entity(immutable: true) {
+  " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  days: Int!
+
+  " The protocol this snapshot belongs to "
+  protocol: DerivOptProtocol!
+
+  " The pool this snapshot belongs to "
+  pool: LiquidityPool!
+
+  ##### Quantitative Data #####
+
+  " Current TVL (Total Value Locked) of this pool "
+  totalValueLockedUSD: BigDecimal!
+
+  " All revenue generated by the liquidity pool, accrued to the supply side. "
+  cumulativeSupplySideRevenueUSD: BigDecimal!
+
+  " Daily revenue generated by the liquidity pool, accrued to the supply side. "
+  dailySupplySideRevenueUSD: BigDecimal!
+
+  " All revenue generated by the liquidity pool, accrued to the protocol. "
+  cumulativeProtocolSideRevenueUSD: BigDecimal!
+
+  " Daily revenue generated by the liquidity pool, accrued to the protocol. "
+  dailyProtocolSideRevenueUSD: BigDecimal!
+
+  " All revenue generated by the liquidity pool. "
+  cumulativeTotalRevenueUSD: BigDecimal!
+
+  " Daily revenue generated by the liquidity pool. "
+  dailyTotalRevenueUSD: BigDecimal!
+
+  " Notional value of all open positions "
+  openInterestUSD: BigDecimal!
+
+  " Daily premium paid to enter a position. "
+  dailyEntryPremiumUSD: BigDecimal!
+
+  " All premium paid to enter a position. "
+  cumulativeEntryPremiumUSD: BigDecimal!
+
+  " Daily premium paid to exit a position. "
+  dailyExitPremiumUSD: BigDecimal!
+
+  " All premium paid to exit a position. "
+  cumulativeExitPremiumUSD: BigDecimal!
+
+  " Daily premium paid. "
+  dailyTotalPremiumUSD: BigDecimal!
+
+  " All premium paid. "
+  cumulativeTotalPremiumUSD: BigDecimal!
+
+  " Daily premium paid to deposit in liquidity pools. "
+  dailyDepositPremiumUSD: BigDecimal!
+
+  " All premium paid to deposit in liquidity pools. "
+  cumulativeDepositPremiumUSD: BigDecimal!
+
+  " Daily premium paid to withdraw from liquidity pools. "
+  dailyWithdrawPremiumUSD: BigDecimal!
+
+  " All premium paid to withdraw from liquidity pools. "
+  cumulativeWithdrawPremiumUSD: BigDecimal!
+
+  " Daily premium paid to enter and exit liquidity pool. "
+  dailyTotalLiquidityPremiumUSD: BigDecimal!
+
+  " All premium paid to enter and exit liquidity pool. "
+  cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " Daily number of puts minted "
+  dailyPutsMintedCount: Int!
+
+  " Total number of puts minted "
+  putsMintedCount: Int!
+
+  " Daily number of calls minted "
+  dailyCallsMintedCount: Int!
+
+  " Total number of calls minted "
+  callsMintedCount: Int!
+
+  " Daily number of contracts minted "
+  dailyContractsMintedCount: Int!
+
+  " Total number of contracts minted "
+  contractsMintedCount: Int!
+
+  " Daily number of contracts taken"
+  dailyContractsTakenCount: Int!
+
+  " Total number of contracts taken "
+  contractsTakenCount: Int!
+
+  " Daily number of contracts expired "
+  dailyContractsExpiredCount: Int!
+
+  " Total number of contracts expired "
+  contractsExpiredCount: Int!
+
+  " Daily number of contracts exercised "
+  dailyContractsExercisedCount: Int!
+
+  " Total number of contracts exercised "
+  contractsExercisedCount: Int!
+
+  " Daily number of contracts exercised+expired "
+  dailyContractsClosedCount: Int!
+
+  " Total number of contracts exercised+expired "
+  contractsClosedCount: Int!
+
+  " Total number of open positions (contracts minted-closed) "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Daily trade notional volume occurred when contract created, in USD "
+  dailyVolumeUSD: BigDecimal!
+
+  " Daily trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyVolumeByTokenAmount: [BigInt!]!
+
+  " Daily trade notional volumefor a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyVolumeByTokenUSD: [BigDecimal!]!
+
+  " All historical trade notional volume occurred in this pool, in USD "
+  cumulativeVolumeUSD: BigDecimal!
+
+  " All trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenAmount: [BigInt!]!
+
+  " All trade notional volumefor a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenUSD: [BigDecimal!]!
+
+  " Current Collateral assets in USD in this pool that was used for trading, amount taken at snapshot"
+  collateralUsedUSD: BigDecimal
+
+  " Daily volume of collateral when contract created, in USD, that was used for trading "
+  dailyCollateralVolumeUSD: BigDecimal
+
+  " All historical volume of Collateral assets in USD in this pool, that was used for trading"
+  cumulativeCollateralVolumeUSD: BigDecimal
+
+  " Daily Deposit trade notional volume in USD "
+  dailyDepositedVolumeUSD: BigDecimal!
+
+  " Daily Deposit trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyDepositedVolumeByTokenAmount: [BigInt!]!
+
+  " Daily Deposit trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyDepositedVolumeByTokenUSD: [BigDecimal!]!
+
+  " Deposit historical trade notional volume occurred in this pool, in USD "
+  cumulativeDepositedVolumeUSD: BigDecimal!
+
+  " All Deposit trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositedVolumeByTokenAmount: [BigInt!]!
+
+  " All Deposit trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositedVolumeByTokenUSD: [BigDecimal!]!
+
+  " Daily Withdraw trade notional volume occurred in USD "
+  dailyWithdrawVolumeUSD: BigDecimal!
+
+  " Daily Withdraw trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyWithdrawVolumeByTokenAmount: [BigInt!]!
+
+  " Daily Withdraw trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyWithdrawVolumeByTokenUSD: [BigDecimal!]!
+
+  " Withdraw historical trade notional volume occurred in this pool, in USD "
+  cumulativeWithdrawVolumeUSD: BigDecimal!
+
+  " All Withdraw trade notional volume for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenAmount: [BigInt!]!
+
+  " All Withdraw trade notional volume for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenUSD: [BigDecimal!]!
+
+  " Daily notional volume in USD taken of underlying at time of contract closed but not exercised"
+  dailyClosedVolumeUSD: BigDecimal!
+
+  " All historical notional volume in USD taken of underlying at time of contract closed but not exercised"
+  cumulativeClosedVolumeUSD: BigDecimal!
+
+  " Daily notional volume in USD taken of underlying at time of contract exercise"
+  dailyExerciseVolumeUSD: BigDecimal!
+
+  " All historical notional volume in USD taken of underlying at time of contract exercised"
+  cumulativeExerciseVolumeUSD: BigDecimal!
+
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: [BigInt!]!
+
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
+  inputTokenWeights: [BigDecimal!]!
+
+  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
+  outputTokenSupply: BigInt
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
+
+  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+}
+
+type LiquidityPoolHourlySnapshot @entity(immutable: true) {
+  " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
+  id: Bytes!
+
+  " Number of hours since Unix epoch time "
+  hours: Int!
+
+  " The protocol this snapshot belongs to "
+  protocol: DerivOptProtocol!
+
+  " The pool this snapshot belongs to "
+  pool: LiquidityPool!
+
+  ##### Quantitative Data #####
+
+  " Current TVL (Total Value Locked) of this pool "
+  totalValueLockedUSD: BigDecimal!
+
+  " All revenue generated by the liquidity pool, accrued to the supply side. "
+  cumulativeSupplySideRevenueUSD: BigDecimal!
+
+  " Hourly revenue generated by the liquidity pool, accrued to the supply side. "
+  hourlySupplySideRevenueUSD: BigDecimal!
+
+  " All revenue generated by the liquidity pool, accrued to the protocol. "
+  cumulativeProtocolSideRevenueUSD: BigDecimal!
+
+  " Hourly revenue generated by the liquidity pool, accrued to the protocol. "
+  hourlyProtocolSideRevenueUSD: BigDecimal!
+
+  " All revenue generated by the liquidity pool. "
+  cumulativeTotalRevenueUSD: BigDecimal!
+
+  " Hourly revenue generated by the liquidity pool. "
+  hourlyTotalRevenueUSD: BigDecimal!
+
+  " Notional value of all open positions "
+  openInterestUSD: BigDecimal!
+
+  " Hourly premium paid to enter a position. "
+  hourlyEntryPremiumUSD: BigDecimal!
+
+  " All premium paid to enter a position. "
+  cumulativeEntryPremiumUSD: BigDecimal!
+
+  " Hourly premium paid to exit a position. "
+  hourlyExitPremiumUSD: BigDecimal!
+
+  " All premium paid to exit a position. "
+  cumulativeExitPremiumUSD: BigDecimal!
+
+  " Hourly premium paid. "
+  hourlyTotalPremiumUSD: BigDecimal!
+
+  " All premium paid. "
+  cumulativeTotalPremiumUSD: BigDecimal!
+
+  " Hourly premium paid to deposit in liquidity pools. "
+  hourlyDepositPremiumUSD: BigDecimal!
+
+  " All premium paid to deposit in liquidity pools. "
+  cumulativeDepositPremiumUSD: BigDecimal!
+
+  " Hourly premium paid to withdraw from liquidity pools. "
+  hourlyWithdrawPremiumUSD: BigDecimal!
+
+  " All premium paid to withdraw from liquidity pools. "
+  cumulativeWithdrawPremiumUSD: BigDecimal!
+
+  " Hourly premium paid to enter and exit liquidity pool. "
+  hourlyTotalLiquidityPremiumUSD: BigDecimal!
+
+  " All premium paid to enter and exit liquidity pool. "
+  cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " Hourly trade notional volume occurred in in this pool for contracts created, in USD "
+  hourlyVolumeUSD: BigDecimal!
+
+  " Hourly trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyVolumeByTokenAmount: [BigInt!]!
+
+  " Hourly trade notional volume occurred in in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyVolumeByTokenUSD: [BigDecimal!]!
+
+  " All historical trade notional volume occurred in this pool, in USD "
+  cumulativeVolumeUSD: BigDecimal!
+
+  " All trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenAmount: [BigInt!]!
+
+  " All trade notional volume occurred in in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeVolumeByTokenUSD: [BigDecimal!]!
+
+  " Hourly Deposit trade notional volume occurred in this pool, in USD "
+  hourlyDepositVolumeUSD: BigDecimal!
+
+  " Hourly Inflow trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyDepositVolumeByTokenAmount: [BigInt!]!
+
+  " Hourly Deposit trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyDepositVolumeByTokenUSD: [BigDecimal!]!
+
+  " Deposit historical trade notional volume occurred in this pool, in USD "
+  cumulativeDepositVolumeUSD: BigDecimal!
+
+  " All deposit trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositVolumeByTokenAmount: [BigInt!]!
+
+  " All deposit trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeDepositVolumeByTokenUSD: [BigDecimal!]!
+
+  " Hourly Withdraw trade notional volume occurred in this pool, in USD "
+  hourlyWithdrawVolumeUSD: BigDecimal!
+
+  " Hourly Withdraw trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyWithdrawVolumeByTokenAmount: [BigInt!]!
+
+  " Hourly Withdraw trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyWithdrawVolumeByTokenUSD: [BigDecimal!]!
+
+  " Withdraw historical trade notional volume occurred in this pool, in USD "
+  cumulativeWithdrawVolumeUSD: BigDecimal!
+
+  " All Withdraw trade notional volume occurred in this pool for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenAmount: [BigInt!]!
+
+  " All Withdraw trade notional volume occurred in this pool for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  cumulativeWithdrawVolumeByTokenUSD: [BigDecimal!]!
+
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: [BigInt!]!
+
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
+  inputTokenWeights: [BigDecimal!]!
+
+  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
+  outputTokenSupply: BigInt
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
+
+  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+}
+
+##################################
+##### Transaction-Level Data #####
+##################################
+
+"""
+An event is any user action that occurs in a protocol. Generally, they are Ethereum events
+emitted by a function in the smart contracts, stored in transaction receipts as event logs.
+However, some user actions of interest are function calls that don't emit events. For example,
+the deposit and withdraw functions in Yearn do not emit any events. In our subgraphs, we still
+store them as events, although they are not technically Ethereum events emitted by smart
+contracts.
+"""
+interface Event {
+  " { Event type }-{ Transaction hash }-{ Log index } "
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: DerivOptProtocol!
+
+  " Address that received the tokens "
+  to: Bytes!
+
+  " Address that sent the tokens "
+  from: Bytes!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+}
+
+type Deposit implements Event @entity(immutable: true) {
+  " deposit-{ Transaction hash }-{ Log index } "
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: DerivOptProtocol!
+
+  " Address that received the tokens "
+  to: Bytes!
+
+  " Address that sent the tokens "
+  from: Bytes!
+
+  " Account that controls this transaction "
+  account: Account!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
+  inputTokens: [Token!]!
+
+  " Output token of the pool. E.g. the UNI-LP token "
+  outputToken: Token
+
+  " Amount of input tokens in the token's native unit "
+  inputTokenAmounts: [BigInt!]!
+
+  " Amount of output tokens in the token's native unit "
+  outputTokenAmount: BigInt
+
+  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
+  amountUSD: BigDecimal!
+
+  " The pool involving this transaction "
+  pool: LiquidityPool!
+}
+
+type Withdraw implements Event @entity(immutable: true) {
+  " withdraw-{ Transaction hash }-{ Log index }"
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: DerivOptProtocol!
+
+  " Address that received the tokens "
+  to: Bytes!
+
+  " Address that sent the tokens "
+  from: Bytes!
+
+  " Account that controls this transaction "
+  account: Account!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
+  inputTokens: [Token!]!
+
+  " Output token of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
+  outputToken: Token
+
+  " Amount of input tokens in the token's native unit "
+  inputTokenAmounts: [BigInt!]!
+
+  " Amount of output tokens in the token's native unit "
+  outputTokenAmount: BigInt
+
+  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
+  amountUSD: BigDecimal!
+
+  " The pool involving this transaction "
+  pool: LiquidityPool!
+}
+
+# An account is a unique Ethereum address
+# Helps to accumulate total unique users
+type Account @entity {
+  " Address of the account "
+  id: Bytes!
+
+  " All premium paid to enter a position. "
+  cumulativeEntryPremiumUSD: BigDecimal!
+
+  " All premium paid to exit a position. "
+  cumulativeExitPremiumUSD: BigDecimal!
+
+  " All premium paid. "
+  cumulativeTotalPremiumUSD: BigDecimal!
+
+  " All premium paid to deposit in liquidity pools. "
+  cumulativeDepositPremiumUSD: BigDecimal!
+
+  " All premium paid to withdraw from liquidity pools. "
+  cumulativeWithdrawPremiumUSD: BigDecimal!
+
+  " All premium paid to enter and exit liquidity pool. "
+  cumulativeTotalLiquidityPremiumUSD: BigDecimal!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of closed positions "
+  closedPositionCount: Int!
+
+  " Total number of puts minted "
+  putsMintedCount: Int!
+
+  " Total number of calls minted "
+  callsMintedCount: Int!
+
+  " Total number of contracts minted "
+  contractsMintedCount: Int!
+
+  " Total number of contracts taken "
+  contractsTakenCount: Int!
+
+  " Total number of contracts expired "
+  contractsExpiredCount: Int!
+
+  " Total number of contracts exercised "
+  contractsExercisedCount: Int!
+
+  " Total number of contracts exercised+expired "
+  contractsClosedCount: Int!
+
+  " All deposit (add liquidity) events occurred in this account "
+  deposits: [Deposit!]! @derivedFrom(field: "account")
+
+  " All withdraw (remove liquidity) events occurred in this account "
+  withdraws: [Withdraw!]! @derivedFrom(field: "account")
+
+  " All Position events occurred in this account "
+  positions: [Position!]! @derivedFrom(field: "account")
+}
+
+# Helper entity for calculating daily/hourly active users
+type ActiveAccount @entity {
+  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
+  id: Bytes!
+}
+
+enum OptionType {
+  " Position opened as call "
+  CALL
+
+  " Position opened as put "
+  PUT
+}
+
+# A position describes a contract that a user has taken (either a call/put)
+# Note: A position snapshot is not necessary because the position is opened and closed with no other interaction
+# All of the data we would get from a snapshot is already available in the position.
+type Position @entity {
+  " { Account address }-{ Option id }-{ Counter } "
+  id: Bytes!
+
+  ##### Metadata #####
+
+  " The liquidity pool this options contract belongs to "
+  pool: LiquidityPool!
+
+  " Reference to the option taken "
+  option: Option!
+
+  " Account that owns this position"
+  account: Account!
+
+  " The asset the contract was created for (generally the same as the underlying asset in the pool) "
+  asset: Token!
+
+  " The hash of the transaction that created this position (contract) "
+  takenHash: Bytes!
+
+  " The block number the contract was taken"
+  takenBlockNumber: BigInt!
+
+  " The timestamp the contract was taken "
+  takenTimestamp: BigInt!
+
+  " Timestamp the contract is exercised (can be always null if the user let's it close without exercising) "
+  exercisedTimestamp: BigInt
+
+  " Blocknumber the contract is exercised "
+  exercisedBlockNumber: BigInt
+
+  " The timestamp the position is closed ( can be the same as exercised, if the owner exercises their contract) "
+  closedTimestamp: BigInt
+
+  " The blocknumber the position is closed ( can be the same as exercised, if the owner exercises their contract) "
+  closedBlockNumber: BigInt
+
+  ##### Prices / Fees #####
+
+  " Price of the underlying asset at the time the option is taken "
+  takenPrice: BigDecimal!
+
+  " Price of the underlying asset at the time the option was closed (can be null if it gets closed without exercising) "
+  closedPriceUSD: BigDecimal
+
+  " The premium is the fee paid to enter the position (in the underlying asset) "
+  premium: BigInt!
+
+  " The fee to enter the position in USD "
+  premiumUSD: BigDecimal!
+
+  " Account of the underlying asset (at the time the option was taken)"
+  amount: BigInt!
+
+  " Underlying amount (in USD) at the time the option was taken "
+  amountUSD: BigDecimal!
+
+  " A fee to exit the position in the asset "
+  closePremium: BigInt
+
+  " The fee the user paid to exit the position in USD "
+  closePremiumUSD: BigDecimal
+}
+
+# Entity containing metadata of a given option (unique underlying + collateral + expiration)
+type Option @entity {
+  " Address or other unique identifier of option "
+  id: Bytes!
+
+  " The type of option this is. e.g. put/call "
+  type: OptionType!
+
+  " The liquidity pool this option belongs to "
+  pool: LiquidityPool!
+
+  " Name of this option "
+  name: String!
+
+  " Symbol of this option "
+  symbol: String!
+
+  " Underlying asset "
+  underlyingAsset: Token!
+
+  " Strike token, the asset the strike price is demoninated in (if not USD) "
+  strikeAsset: Token
+
+  " Collateral asset "
+  collateralAsset: Token!
+
+  " The strike price for this option "
+  strikePrice: BigDecimal!
+
+  " The timestamp this option expires (maturity) "
+  expirationTimestamp: BigInt
+
+  " The block number this option expires (maturity) "
+  expirationBlockNumber: BigInt
+
+  " Price the underlying was at maturity "
+  expirationPriceUSD: BigDecimal
+
+  " Creation timestamp "
+  createdTimestamp: BigInt!
+
+  " Optional field to track the last price "
+  lastPriceUSD: BigDecimal
+
+  " Optional field to track the block number of the last price "
+  lastPriceBlockNumber: BigInt
+
+  " Total supply of option "
+  totalSupply: BigInt
+
+  " Notional value sum of all options minted "
+  openInterestUSD: BigDecimal
+
+  " All Position entities from this option "
+  positions: [Position!]! @derivedFrom(field: "option")
+}

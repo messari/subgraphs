@@ -1,7 +1,6 @@
 // Update usage metrics entities
 
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { addresses } from "../../config/addresses";
 import { Account, ActiveAccount } from "../../generated/schema";
 import { INT_ONE, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./constants";
 import {
@@ -12,6 +11,7 @@ import {
   getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
 import { convertTokenToDecimal } from "./utils";
+import { NetworkConfigs } from "../../configurations/configure";
 
 // Updated on Swap, Burn, and Mint events.
 export function updateUsageMetrics(
@@ -75,7 +75,7 @@ export function updateUsageMetrics(
 export function updateTVL(event: ethereum.Event, tokens: BigInt): void {
   const protocol = getOrCreateProtocol();
   const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-  const grt = getOrCreateToken(event, addresses.graphToken);
+  const grt = getOrCreateToken(event, NetworkConfigs.getGraphTokenAddress());
 
   protocol._totalGRTLocked = protocol._totalGRTLocked.plus(tokens);
   protocol.totalValueLockedUSD = convertTokenToDecimal(
@@ -94,7 +94,7 @@ export function updateSupplySideRewards(
 ): void {
   const protocol = getOrCreateProtocol();
   const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-  const grt = getOrCreateToken(event, addresses.graphToken);
+  const grt = getOrCreateToken(event, NetworkConfigs.getGraphTokenAddress());
 
   const rewardsAmountUSD = convertTokenToDecimal(amount, grt.decimals).times(
     grt.lastPriceUSD!
@@ -125,7 +125,7 @@ export function updateProtocolSideRewards(
 ): void {
   const protocol = getOrCreateProtocol();
   const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-  const grt = getOrCreateToken(event, addresses.graphToken);
+  const grt = getOrCreateToken(event, NetworkConfigs.getGraphTokenAddress());
 
   const rewardsAmountUSD = convertTokenToDecimal(amount, grt.decimals).times(
     grt.lastPriceUSD!
