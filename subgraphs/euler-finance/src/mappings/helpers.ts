@@ -204,9 +204,7 @@ export function createLiquidation(event: Liquidation): BigDecimal {
     seizedToken.lastPriceUSD!,
   );
 
-  const repayUSD = bigIntToBDUseDecimals(event.params.repay, underlyingToken.decimals).times(
-    underlyingToken.lastPriceUSD!,
-  );
+  const repayUSD = bigIntToBDUseDecimals(event.params.repay, DEFAULT_DECIMALS).times(underlyingToken.lastPriceUSD!);
   liquidation.profitUSD = liquidation.amountUSD.minus(repayUSD);
   liquidation.save();
 
