@@ -16,7 +16,7 @@ import {
  * make all of the storage changes that occur in the pool daily and hourly snapshots.
  *
  * Schema Version:  1.3.0
- * SDK Version:     1.1.0
+ * SDK Version:     1.1.1
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -46,15 +46,15 @@ export class PoolSnapshot {
       this.pool._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_HOUR;
 
     if (snapshotDayID != this.dayID) {
+      this.takeDailySnapshot(snapshotDayID);
       this.pool._lastSnapshotDayID = BigInt.fromI32(snapshotDayID);
       this.pool.save();
-      this.takeDailySnapshot(snapshotDayID);
     }
 
     if (snapshotHourID != this.hourID) {
+      this.takeHourlySnapshot(snapshotHourID);
       this.pool._lastSnapshotHourID = BigInt.fromI32(snapshotHourID);
       this.pool.save();
-      this.takeHourlySnapshot(snapshotHourID);
     }
   }
 
@@ -458,35 +458,20 @@ export class PoolSnapshot {
     snapshot.cumulativeUniqueUsers = this.pool.cumulativeUniqueUsers;
 
     const dailyActivityHelper = initActivityHelper(
-      Bytes.fromUTF8("daily-".concat(this.dayID.toString()))
+      Bytes.fromUTF8("daily-".concat(day.toString()))
     );
     snapshot.dailyActiveUsers = dailyActivityHelper.activeUsers;
+    snapshot.dailyActiveDepositors = dailyActivityHelper.activeDepositors;
+    snapshot.dailyActiveBorrowers = dailyActivityHelper.activeBorrowers;
+    snapshot.dailyActiveLiquidators = dailyActivityHelper.activeLiquidators;
+    snapshot.dailyActiveLiquidatees = dailyActivityHelper.activeLiquidatees;
 
     snapshot.cumulativeUniqueDepositors = this.pool.cumulativeUniqueDepositors;
-    snapshot.dailyActiveDepositors = previousSnapshot
-      ? snapshot.cumulativeUniqueDepositors -
-        previousSnapshot.cumulativeUniqueDepositors
-      : snapshot.cumulativeUniqueDepositors;
-
     snapshot.cumulativeUniqueBorrowers = this.pool.cumulativeUniqueBorrowers;
-    snapshot.dailyActiveBorrowers = previousSnapshot
-      ? snapshot.cumulativeUniqueBorrowers -
-        previousSnapshot.cumulativeUniqueBorrowers
-      : snapshot.cumulativeUniqueBorrowers;
-
     snapshot.cumulativeUniqueLiquidators =
       this.pool.cumulativeUniqueLiquidators;
-    snapshot.dailyActiveLiquidators = previousSnapshot
-      ? snapshot.cumulativeUniqueLiquidators -
-        previousSnapshot.cumulativeUniqueLiquidators
-      : snapshot.cumulativeUniqueLiquidators;
-
     snapshot.cumulativeUniqueLiquidatees =
       this.pool.cumulativeUniqueLiquidatees;
-    snapshot.dailyActiveLiquidatees = previousSnapshot
-      ? snapshot.cumulativeUniqueLiquidatees -
-        previousSnapshot.cumulativeUniqueLiquidatees
-      : snapshot.cumulativeUniqueLiquidatees;
 
     snapshot.longPositionCount = this.pool.longPositionCount;
     snapshot.dailyLongPositionCount = previousSnapshot
