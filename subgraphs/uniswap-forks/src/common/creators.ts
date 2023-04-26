@@ -188,6 +188,9 @@ export function createDeposit(
   const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
   const token1Amount = convertTokenToDecimal(amount1, token1.decimals);
 
+  const reserve0Amount = pool.inputTokenBalances[0];
+  const reserve1Amount = pool.inputTokenBalances[1];
+
   const logIndexI32 = event.logIndex.toI32();
   const transactionHash = event.transaction.hash.toHexString();
   const deposit = new Deposit(
@@ -205,6 +208,7 @@ export function createDeposit(
   deposit.outputToken = pool.outputToken;
   deposit.inputTokenAmounts = [amount0, amount1];
   deposit.outputTokenAmount = transfer.liquidity;
+  deposit.reserveAmounts = [reserve0Amount, reserve1Amount];
   deposit.amountUSD = token0
     .lastPriceUSD!.times(token0Amount)
     .plus(token1.lastPriceUSD!.times(token1Amount));
@@ -235,6 +239,9 @@ export function createWithdraw(
   const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
   const token1Amount = convertTokenToDecimal(amount1, token1.decimals);
 
+  const reserve0Amount = pool.inputTokenBalances[0];
+  const reserve1Amount = pool.inputTokenBalances[1];
+
   const logIndexI32 = event.logIndex.toI32();
   const transactionHash = event.transaction.hash.toHexString();
   const withdrawal = new Withdraw(
@@ -255,6 +262,7 @@ export function createWithdraw(
   withdrawal.outputToken = pool.outputToken;
   withdrawal.inputTokenAmounts = [amount0, amount1];
   withdrawal.outputTokenAmount = transfer.liquidity;
+  withdrawal.reserveAmounts = [reserve0Amount, reserve1Amount];
   withdrawal.amountUSD = token0
     .lastPriceUSD!.times(token0Amount)
     .plus(token1.lastPriceUSD!.times(token1Amount));
@@ -298,6 +306,9 @@ export function createSwapHandleVolumeAndFees(
   const amount0 = amount0In.minus(amount0Out);
   const amount1 = amount1In.minus(amount1Out);
 
+  const reserve0Amount = pool.inputTokenBalances[0];
+  const reserve1Amount = pool.inputTokenBalances[1];
+
   // Gets the tokenIn and tokenOut payload based on the amounts
   const swapTokens = getSwapTokens(
     token0,
@@ -328,6 +339,7 @@ export function createSwapHandleVolumeAndFees(
   swap.tokenOut = swapTokens.tokenOut.id;
   swap.amountOut = swapTokens.amountOut;
   swap.amountOutUSD = swapTokens.tokenOutUSD;
+  swap.reserveAmounts = [reserve0Amount, reserve1Amount];
   swap.pool = pool.id;
 
   swap.save();

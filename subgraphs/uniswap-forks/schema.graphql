@@ -690,6 +690,9 @@ type Deposit @entity(immutable: true) {
   " Amount of output tokens in the token's native unit "
   outputTokenAmount: BigInt
 
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]!
+
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
 
@@ -733,6 +736,9 @@ type Withdraw @entity(immutable: true) {
 
   " Amount of output tokens in the token's native unit "
   outputTokenAmount: BigInt
+
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]!
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
@@ -783,6 +789,9 @@ type Swap @entity(immutable: true) {
 
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
+
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]!
 
   " The pool involving this transaction "
   pool: LiquidityPool!
