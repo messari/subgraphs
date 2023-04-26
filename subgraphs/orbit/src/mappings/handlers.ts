@@ -32,7 +32,7 @@ import { _ERC20 } from "../../generated/Vault/_ERC20";
 import { networkToChainID } from "../sdk/protocols/bridge/chainIds";
 import { ERC20NameBytes } from "../../generated/Vault/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../../generated/Vault/ERC20SymbolBytes";
-import { getNetworkSpecificConstant } from "../sdk/util/constants";
+import { BIGINT_ZERO, getNetworkSpecificConstant } from "../sdk/util/constants";
 import {
   Deposit
 } from "../../generated/Vault/Vault"
@@ -151,7 +151,6 @@ export function onCreatePool(
 
 // Bridge via the Original Token Vault
 export function handleLockIn(event: Deposit): void {
-  // log.warning("{}", [NetworkConfigs.getProtocolName()]);
   
   const poolId = event.address.concat(event.params.token)
   const networkConstants = getNetworkSpecificConstant(dataSource.network());
@@ -200,6 +199,14 @@ function _handleTransferOut(
     BridgePoolType.LOCK_RELEASE,
     token.toHexString()
   );
+  const context = dataSource.context();
+  const taxReceiver = Address.fromString(context.getString("taxReceiver"));
+  
+  // If Receiver is taxReceiver, this is the protocol fee
+  if (receiver == taxReceiver) {
+    pool.addRevenueNative(amount, BIGINT_ZERO);
+    return;
+  }
   const crossToken = sdk.Tokens.getOrCreateCrosschainToken(
     networkToChainID(toChain),
     dstPoolId,
@@ -209,6 +216,7 @@ function _handleTransferOut(
   pool.addDestinationToken(crossToken);
   const account = sdk.Accounts.loadAccount(sender)
   account.transferOut(pool, pool.getDestinationTokenRoute(crossToken)!, sender, amount);
+
 }
 
 
