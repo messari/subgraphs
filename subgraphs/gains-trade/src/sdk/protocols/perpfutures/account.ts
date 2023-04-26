@@ -528,8 +528,7 @@ export class Account {
     liquidate.from = liquidatee;
     liquidate.blockNumber = this.event.block.number;
     liquidate.timestamp = this.event.block.timestamp;
-    liquidate.liquidator = liquidator;
-    liquidate.account = liquidatee;
+    liquidate.account = liquidator;
     liquidate.liquidatee = liquidatee;
     liquidate.asset = asset;
     liquidate.amount = amountLiquidated;
