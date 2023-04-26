@@ -7,15 +7,15 @@ import {
 } from "@graphprotocol/graph-ts";
 
 import { NetworkConfigs } from "../../configurations/configure";
-import { PRECISION } from "../common/constants";
+import { PRECISION_BD } from "../common/constants";
 
 import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { Account } from "../sdk/protocols/perpfutures/account";
 import { Position } from "../sdk/protocols/perpfutures/position";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import {
+  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
-  BIGINT_HUNDRED,
   BIGINT_ONE,
   BIGINT_ZERO,
 } from "../sdk/util/constants";
@@ -117,7 +117,7 @@ export function getFundingRate(
     event.block.number,
     fundingRatePerBlock.toBigDecimal(),
     RewardIntervalType.BLOCK
-  );
+  ).div(PRECISION_BD);
 
   return fundingRatePerDay;
 }
@@ -173,7 +173,7 @@ export function openTrade(
     leveragedAmount
       .times(openFeeP)
       .toBigDecimal()
-      .div(PRECISION.times(BIGINT_HUNDRED).toBigDecimal())
+      .div(PRECISION_BD.times(BIGDECIMAL_HUNDRED))
   );
   pool.addPremiumByToken(
     collateralToken,
@@ -226,7 +226,7 @@ export function closeTrade(
   const pnl = collateralAmount
     .times(percentProfit)
     .toBigDecimal()
-    .div(PRECISION.times(BIGINT_HUNDRED).toBigDecimal());
+    .div(PRECISION_BD.times(BIGDECIMAL_HUNDRED));
   const pnlAmount = collateralAmount.plus(bigDecimalToBigInt(pnl));
 
   const pairStorageContract = PairStorage.bind(
@@ -245,7 +245,7 @@ export function closeTrade(
     leveragedAmount
       .times(closeFeeP)
       .toBigDecimal()
-      .div(PRECISION.times(BIGINT_HUNDRED).toBigDecimal())
+      .div(PRECISION_BD.times(BIGDECIMAL_HUNDRED))
   );
 
   const positionID = position.getBytesID();
