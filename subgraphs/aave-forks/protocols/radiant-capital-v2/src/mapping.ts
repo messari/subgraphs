@@ -25,6 +25,7 @@ import {
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
+  Swap,
   Unpaused,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
@@ -47,17 +48,24 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleSwapBorrowRateMode,
   _handleTransfer,
   _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
-import { BIGDECIMAL_ZERO, PositionSide } from "../../../src/constants";
+import {
+  BIGDECIMAL_ZERO,
+  InterestRateMode,
+  InterestRateType,
+  PositionSide,
+} from "../../../src/constants";
 import { updateMarketRewards } from "./rewards";
 import { BalanceTransfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 import { DataManager, ProtocolData } from "../../../src/sdk/manager";
 import {
   exponentToBigDecimal,
+  getBorrowBalances,
   getMarketFromToken,
   getOrCreateFlashloanPremium,
 } from "../../../src/helpers";
@@ -305,6 +313,39 @@ export function handleFlashloan(event: FlashLoan): void {
     event,
     event.params.premium,
     flashloanPremium
+  );
+}
+
+export function handleSwapBorrowRateMode(event: Swap): void {
+  const interestRateMode = event.params.rateMode.toI32();
+  if (
+    ![InterestRateMode.STABLE, InterestRateMode.VARIABLE].includes(
+      interestRateMode
+    )
+  ) {
+    return;
+  }
+
+  const interestRateType =
+    interestRateMode === InterestRateMode.STABLE
+      ? InterestRateType.STABLE
+      : InterestRateType.VARIABLE;
+  const market = getMarketFromToken(event.params.reserve, protocolData);
+  if (!market) {
+    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
+      event.params.reserve.toHexString(),
+    ]);
+    return;
+  }
+
+  const newBorrowBalances = getBorrowBalances(market, event.params.user);
+  _handleSwapBorrowRateMode(
+    event,
+    market,
+    event.params.user,
+    newBorrowBalances,
+    interestRateType,
+    protocolData
   );
 }
 

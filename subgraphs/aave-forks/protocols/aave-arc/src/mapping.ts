@@ -32,6 +32,7 @@ import {
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
+  Swap,
   Unpaused,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
@@ -54,6 +55,7 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleSwapBorrowRateMode,
   _handleTransfer,
   _handleUnpaused,
   _handleWithdraw,
@@ -61,6 +63,7 @@ import {
 import {
   equalsIgnoreCase,
   exponentToBigDecimal,
+  getBorrowBalances,
   getMarketFromToken,
   getOrCreateFlashloanPremium,
   readValue,
@@ -68,6 +71,7 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  InterestRateMode,
   Network,
   PositionSide,
   RewardTokenType,
@@ -90,6 +94,7 @@ import {
   PermissionType,
   RiskType,
   LendingType,
+  InterestRateType,
 } from "../../../src/sdk/constants";
 import { TokenManager } from "../../../src/sdk/token";
 
@@ -320,6 +325,39 @@ export function handleFlashloan(event: FlashLoan): void {
     event,
     event.params.premium,
     flashloanPremium
+  );
+}
+
+export function handleSwapBorrowRateMode(event: Swap): void {
+  const interestRateMode = event.params.rateMode.toI32();
+  if (
+    ![InterestRateMode.STABLE, InterestRateMode.VARIABLE].includes(
+      interestRateMode
+    )
+  ) {
+    return;
+  }
+
+  const interestRateType =
+    interestRateMode === InterestRateMode.STABLE
+      ? InterestRateType.STABLE
+      : InterestRateType.VARIABLE;
+  const market = getMarketFromToken(event.params.reserve, protocolData);
+  if (!market) {
+    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
+      event.params.reserve.toHexString(),
+    ]);
+    return;
+  }
+
+  const newBorrowBalances = getBorrowBalances(market, event.params.user);
+  _handleSwapBorrowRateMode(
+    event,
+    market,
+    event.params.user,
+    newBorrowBalances,
+    interestRateType,
+    protocolData
   );
 }
 

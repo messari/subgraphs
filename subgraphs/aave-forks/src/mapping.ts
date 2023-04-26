@@ -1255,3 +1255,74 @@ export function _handleAssetConfigUpdated(
   const rewardData = new RewardData(rewardToken, emission, emissionUSD);
   manager.updateRewards(rewardData);
 }
+
+export function _handleSwapBorrowRateMode(
+  event: ethereum.Event,
+  market: Market,
+  user: Address,
+  newBorrowBalances: BigInt[],
+  endInterestRateType: InterestRateType,
+  protocolData: ProtocolData
+): void {
+  const account = new AccountManager(user).getAccount();
+  const manager = new DataManager(
+    market.id,
+    market.inputToken,
+    event,
+    protocolData
+  );
+  const protocol = manager.getOrCreateLendingProtocol(protocolData);
+  const sPositionManager = new PositionManager(
+    account,
+    market,
+    PositionSide.BORROWER,
+    InterestRateType.STABLE
+  );
+  const vPositionManager = new PositionManager(
+    account,
+    market,
+    PositionSide.BORROWER,
+    InterestRateType.VARIABLE
+  );
+  const stableTokenBalance = newBorrowBalances[0];
+  const variableTokenBalance = newBorrowBalances[1];
+  //all open position converted to STABLE
+  if (endInterestRateType === InterestRateType.STABLE) {
+    vPositionManager.subtractPosition(
+      event,
+      protocol,
+      variableTokenBalance,
+      TransactionType.SWAP,
+      market.inputTokenPriceUSD
+    );
+    sPositionManager.addPosition(
+      event,
+      market.inputToken,
+      protocol,
+      stableTokenBalance,
+      TransactionType.SWAP,
+      market.inputTokenPriceUSD
+    );
+  } else {
+    vPositionManager.addPosition(
+      event,
+      market.inputToken,
+      protocol,
+      variableTokenBalance,
+      TransactionType.SWAP,
+      market.inputTokenPriceUSD
+    );
+    sPositionManager.subtractPosition(
+      event,
+      protocol,
+      stableTokenBalance,
+      TransactionType.SWAP,
+      market.inputTokenPriceUSD
+    );
+  }
+
+  const accountDebtBalance = getOrCreateAccountDebtBalance(market, user);
+  accountDebtBalance.sTokenBalance = stableTokenBalance;
+  accountDebtBalance.vTokenBalance = variableTokenBalance;
+  accountDebtBalance.save();
+}

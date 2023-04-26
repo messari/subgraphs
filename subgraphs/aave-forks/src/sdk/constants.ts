@@ -117,6 +117,8 @@ export namespace TransactionType {
 
   export const LIQUIDATOR = "LIQUIDATOR";
   export const LIQUIDATEE = "LIQUIDATEE";
+
+  export const SWAP = "SWAP"; // Swap between interest rate types
 }
 
 export namespace AccountActivity {

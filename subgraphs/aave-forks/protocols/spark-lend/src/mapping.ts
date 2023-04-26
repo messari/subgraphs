@@ -36,6 +36,7 @@ import {
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
   Supply,
+  SwapBorrowRateMode,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
 import { Market, _DefaultOracle } from "../../../generated/schema";
@@ -66,6 +67,7 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleSwapBorrowRateMode,
   _handleTransfer,
   _handleWithdraw,
 } from "../../../src/mapping";
@@ -82,6 +84,7 @@ import {
   getMarketFromToken,
   exponentToBigDecimal,
   getOrCreateFlashloanPremium,
+  getBorrowBalances,
 } from "../../../src/helpers";
 import {
   LendingType,
@@ -461,6 +464,36 @@ export function handleStableTransfer(event: StableTransfer): void {
     event.params.to,
     event.params.from,
     event.params.value
+  );
+}
+
+export function handleSwapBorrowRateMode(event: SwapBorrowRateMode): void {
+  if (
+    ![InterestRateMode.STABLE, InterestRateMode.VARIABLE].includes(
+      event.params.interestRateMode
+    )
+  ) {
+    return;
+  }
+  const interestRateType =
+    event.params.interestRateMode === InterestRateMode.STABLE
+      ? InterestRateType.STABLE
+      : InterestRateType.VARIABLE;
+  const market = getMarketFromToken(event.params.reserve, protocolData);
+  if (!market) {
+    log.error("[handleLiquidationCall]Failed to find market for asset {}", [
+      event.params.reserve.toHexString(),
+    ]);
+    return;
+  }
+  const newBorrowBalances = getBorrowBalances(market, event.params.user);
+  _handleSwapBorrowRateMode(
+    event,
+    market,
+    event.params.user,
+    newBorrowBalances,
+    interestRateType,
+    protocolData
   );
 }
 

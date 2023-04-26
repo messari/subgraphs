@@ -81,6 +81,8 @@ dataSources:
           handler: handleBorrow
         - event: Repay(indexed address,indexed address,indexed address,uint256)
           handler: handleRepay
+        - event: Swap(indexed address,indexed address,uint256)
+          handler: handleSwapBorrowRateMode          
         - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool,address)
           handler: handleLiquidationCall
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
