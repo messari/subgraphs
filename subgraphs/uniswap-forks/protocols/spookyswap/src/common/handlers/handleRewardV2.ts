@@ -52,7 +52,7 @@ export function updateMasterChef(
     return;
   }
 
-  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(event, NetworkConfigs.getRewardToken());
   pool.rewardTokens = [rewardToken.id];
 
   // Get the amount of reward tokens emitted per block at this point in time.

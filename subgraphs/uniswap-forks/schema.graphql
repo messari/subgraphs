@@ -53,6 +53,16 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " amount of tokens in the protocol "
+  _totalSupply: BigInt!
+
+  " Total value locked in the protocol "
+  _totalValueLockedUSD: BigDecimal!
+
+  _largePriceChangeBuffer: Int!
+
+  _largeTVLImpactBuffer: Int!
 }
 
 enum RewardTokenType {
