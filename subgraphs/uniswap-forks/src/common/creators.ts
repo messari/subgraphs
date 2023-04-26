@@ -335,7 +335,7 @@ export function createSwapHandleVolumeAndFees(
   // totals for volume updates
   const amount0 = amount0In.minus(amount0Out);
   const amount1 = amount1In.minus(amount1Out);
-  
+
   token0._totalSupply = token0._totalSupply.plus(amount0);
   token1._totalSupply = token1._totalSupply.plus(amount1);
 
@@ -347,7 +347,7 @@ export function createSwapHandleVolumeAndFees(
     token1._totalSupply,
     token1.decimals
   ).times(token1.lastPriceUSD!);
-  
+
   token0.save();
   token1.save();
 

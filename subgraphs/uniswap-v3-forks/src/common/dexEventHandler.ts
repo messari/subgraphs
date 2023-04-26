@@ -80,8 +80,10 @@ export class RawDeltas {
     this.inputTokenBalancesDeltas = inputTokenBalancesDeltas;
     this.totalLiquidityDelta = totalLiquidityDelta;
     this.activeLiquidityDelta = activeLiquidityDelta;
-    this.uncollectedSupplySideTokenAmountsDeltas = uncollectedSupplySideTokenAmountsDeltas;
-    this.uncollectedProtocolSideTokenAmountsDeltas = uncollectedProtocolSideTokenAmountsDeltas;
+    this.uncollectedSupplySideTokenAmountsDeltas =
+      uncollectedSupplySideTokenAmountsDeltas;
+    this.uncollectedProtocolSideTokenAmountsDeltas =
+      uncollectedProtocolSideTokenAmountsDeltas;
   }
 }
 
@@ -252,12 +254,14 @@ export class DexEventHandler {
       this.trackedProtocolSideRevenueDeltaUSD = this.trackedVolumeUSD.times(
         percToDec(protocolFee.feePercentage!)
       );
-      this.trackedSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(
-        this.trackedSupplySideRevenueDeltaUSD
-      );
-      this.trackedProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(
-        this.trackedProtocolSideRevenueDeltaUSD
-      );
+      this.trackedSupplySideRevenueUSD =
+        pool.cumulativeSupplySideRevenueUSD.plus(
+          this.trackedSupplySideRevenueDeltaUSD
+        );
+      this.trackedProtocolSideRevenueUSD =
+        pool.cumulativeProtocolSideRevenueUSD.plus(
+          this.trackedProtocolSideRevenueDeltaUSD
+        );
     } else {
       // Array with zeros
       this.trackedInputTokenBalanceDeltasUSD = new Array<BigDecimal>(
@@ -386,9 +390,8 @@ export class DexEventHandler {
     swap.amountIn = this.inputTokenBalanceDeltas[tokensInIdx];
     swap.amountInUSD = this.inputTokenBalanceDeltasUSD[tokensInIdx];
     swap.tokenOut = this.pool.inputTokens[tokensOutIdx];
-    swap.amountOut = this.inputTokenBalanceDeltas[tokensOutIdx].times(
-      BIGINT_NEG_ONE
-    );
+    swap.amountOut =
+      this.inputTokenBalanceDeltas[tokensOutIdx].times(BIGINT_NEG_ONE);
     swap.amountOutUSD = this.inputTokenBalanceDeltasUSD[tokensOutIdx];
 
     const pool = getLiquidityPool(this.event.address);
@@ -519,22 +522,27 @@ export class DexEventHandler {
       this.trackedVolumeUSD
     );
 
-    this.protocol.cumulativeSupplySideRevenueUSD = this.protocol.cumulativeSupplySideRevenueUSD.plus(
-      this.trackedSupplySideRevenueDeltaUSD
-    );
-    this.protocol.cumulativeProtocolSideRevenueUSD = this.protocol.cumulativeProtocolSideRevenueUSD.plus(
-      this.trackedProtocolSideRevenueDeltaUSD
-    );
-    this.protocol.cumulativeTotalRevenueUSD = this.protocol.cumulativeSupplySideRevenueUSD.plus(
-      this.protocol.cumulativeProtocolSideRevenueUSD
-    );
+    this.protocol.cumulativeSupplySideRevenueUSD =
+      this.protocol.cumulativeSupplySideRevenueUSD.plus(
+        this.trackedSupplySideRevenueDeltaUSD
+      );
+    this.protocol.cumulativeProtocolSideRevenueUSD =
+      this.protocol.cumulativeProtocolSideRevenueUSD.plus(
+        this.trackedProtocolSideRevenueDeltaUSD
+      );
+    this.protocol.cumulativeTotalRevenueUSD =
+      this.protocol.cumulativeSupplySideRevenueUSD.plus(
+        this.protocol.cumulativeProtocolSideRevenueUSD
+      );
 
-    this.protocol.uncollectedSupplySideValueUSD = this.protocol.uncollectedSupplySideValueUSD.plus(
-      sumBigDecimalList(this.uncollectedSupplySideValuesDeltasUSD)
-    );
-    this.protocol.uncollectedProtocolSideValueUSD = this.protocol.uncollectedProtocolSideValueUSD.plus(
-      sumBigDecimalList(this.uncollectedProtocolSideValuesDeltasUSD)
-    );
+    this.protocol.uncollectedSupplySideValueUSD =
+      this.protocol.uncollectedSupplySideValueUSD.plus(
+        sumBigDecimalList(this.uncollectedSupplySideValuesDeltasUSD)
+      );
+    this.protocol.uncollectedProtocolSideValueUSD =
+      this.protocol.uncollectedProtocolSideValueUSD.plus(
+        sumBigDecimalList(this.uncollectedProtocolSideValuesDeltasUSD)
+      );
 
     this.protocol.lastUpdateBlockNumber = this.event.block.number;
     this.protocol.lastUpdateTimestamp = this.event.block.timestamp;
@@ -564,20 +572,27 @@ export class DexEventHandler {
       absBigIntList(this.inputTokenBalanceDeltas),
     ]);
 
-    this.pool.cumulativeSupplySideRevenueUSD = this.pool.cumulativeSupplySideRevenueUSD.plus(
-      this.trackedSupplySideRevenueDeltaUSD
-    );
-    this.pool.cumulativeProtocolSideRevenueUSD = this.pool.cumulativeProtocolSideRevenueUSD.plus(
-      this.trackedProtocolSideRevenueDeltaUSD
-    );
-    this.pool.cumulativeTotalRevenueUSD = this.pool.cumulativeProtocolSideRevenueUSD.plus(
-      this.pool.cumulativeSupplySideRevenueUSD
-    );
+    this.pool.cumulativeSupplySideRevenueUSD =
+      this.pool.cumulativeSupplySideRevenueUSD.plus(
+        this.trackedSupplySideRevenueDeltaUSD
+      );
+    this.pool.cumulativeProtocolSideRevenueUSD =
+      this.pool.cumulativeProtocolSideRevenueUSD.plus(
+        this.trackedProtocolSideRevenueDeltaUSD
+      );
+    this.pool.cumulativeTotalRevenueUSD =
+      this.pool.cumulativeProtocolSideRevenueUSD.plus(
+        this.pool.cumulativeSupplySideRevenueUSD
+      );
 
-    this.pool.uncollectedProtocolSideTokenAmounts = this.uncollectedProtocolSideTokenAmounts;
-    this.pool.uncollectedSupplySideTokenAmounts = this.uncollectedSupplySideTokenAmounts;
-    this.pool.uncollectedProtocolSideValuesUSD = this.uncollectedProtocolSideValuesUSD;
-    this.pool.uncollectedSupplySideValuesUSD = this.uncollectedSupplySideValuesUSD;
+    this.pool.uncollectedProtocolSideTokenAmounts =
+      this.uncollectedProtocolSideTokenAmounts;
+    this.pool.uncollectedSupplySideTokenAmounts =
+      this.uncollectedSupplySideTokenAmounts;
+    this.pool.uncollectedProtocolSideValuesUSD =
+      this.uncollectedProtocolSideValuesUSD;
+    this.pool.uncollectedSupplySideValuesUSD =
+      this.uncollectedSupplySideValuesUSD;
 
     if (this.eventType == EventType.DEPOSIT) {
       this.pool.cumulativeDepositCount += INT_ONE;
@@ -647,25 +662,33 @@ export class DexEventHandler {
     financialMetrics.totalLiquidityUSD = this.protocol.totalLiquidityUSD;
     financialMetrics.activeLiquidityUSD = this.protocol.activeLiquidityUSD;
 
-    financialMetrics.uncollectedProtocolSideValueUSD = this.protocol.uncollectedProtocolSideValueUSD;
-    financialMetrics.uncollectedSupplySideValueUSD = this.protocol.uncollectedSupplySideValueUSD;
+    financialMetrics.uncollectedProtocolSideValueUSD =
+      this.protocol.uncollectedProtocolSideValueUSD;
+    financialMetrics.uncollectedSupplySideValueUSD =
+      this.protocol.uncollectedSupplySideValueUSD;
 
     financialMetrics.cumulativeVolumeUSD = this.protocol.cumulativeVolumeUSD;
     financialMetrics.dailyVolumeUSD = this.protocol.cumulativeVolumeUSD.minus(
       prevCumulativeVolumeUSD
     );
-    financialMetrics.cumulativeSupplySideRevenueUSD = this.protocol.cumulativeSupplySideRevenueUSD;
-    financialMetrics.dailySupplySideRevenueUSD = this.protocol.cumulativeSupplySideRevenueUSD.minus(
-      prevCumulativeSupplySideRevenueUSD
-    );
-    financialMetrics.cumulativeProtocolSideRevenueUSD = this.protocol.cumulativeProtocolSideRevenueUSD;
-    financialMetrics.dailyProtocolSideRevenueUSD = this.protocol.cumulativeProtocolSideRevenueUSD.minus(
-      prevCumulativeProtocolSideRevenueUSD
-    );
-    financialMetrics.cumulativeTotalRevenueUSD = this.protocol.cumulativeTotalRevenueUSD;
-    financialMetrics.dailyTotalRevenueUSD = this.protocol.cumulativeTotalRevenueUSD.minus(
-      prevCumulativeTotalRevenueUSD
-    );
+    financialMetrics.cumulativeSupplySideRevenueUSD =
+      this.protocol.cumulativeSupplySideRevenueUSD;
+    financialMetrics.dailySupplySideRevenueUSD =
+      this.protocol.cumulativeSupplySideRevenueUSD.minus(
+        prevCumulativeSupplySideRevenueUSD
+      );
+    financialMetrics.cumulativeProtocolSideRevenueUSD =
+      this.protocol.cumulativeProtocolSideRevenueUSD;
+    financialMetrics.dailyProtocolSideRevenueUSD =
+      this.protocol.cumulativeProtocolSideRevenueUSD.minus(
+        prevCumulativeProtocolSideRevenueUSD
+      );
+    financialMetrics.cumulativeTotalRevenueUSD =
+      this.protocol.cumulativeTotalRevenueUSD;
+    financialMetrics.dailyTotalRevenueUSD =
+      this.protocol.cumulativeTotalRevenueUSD.minus(
+        prevCumulativeTotalRevenueUSD
+      );
 
     financialMetrics.save();
   }
@@ -723,10 +746,14 @@ export class DexEventHandler {
     poolMetrics.activeLiquidity = this.pool.activeLiquidity;
     poolMetrics.activeLiquidityUSD = this.pool.activeLiquidityUSD;
 
-    poolMetrics.uncollectedProtocolSideTokenAmounts = this.pool.uncollectedProtocolSideTokenAmounts;
-    poolMetrics.uncollectedProtocolSideValuesUSD = this.pool.uncollectedProtocolSideValuesUSD;
-    poolMetrics.uncollectedSupplySideTokenAmounts = this.pool.uncollectedSupplySideTokenAmounts;
-    poolMetrics.uncollectedSupplySideValuesUSD = this.pool.uncollectedSupplySideValuesUSD;
+    poolMetrics.uncollectedProtocolSideTokenAmounts =
+      this.pool.uncollectedProtocolSideTokenAmounts;
+    poolMetrics.uncollectedProtocolSideValuesUSD =
+      this.pool.uncollectedProtocolSideValuesUSD;
+    poolMetrics.uncollectedSupplySideTokenAmounts =
+      this.pool.uncollectedSupplySideTokenAmounts;
+    poolMetrics.uncollectedSupplySideValuesUSD =
+      this.pool.uncollectedSupplySideValuesUSD;
 
     poolMetrics.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD;
     poolMetrics.dailyTotalVolumeUSD = this.pool.cumulativeVolumeUSD.minus(
@@ -737,7 +764,8 @@ export class DexEventHandler {
       this.pool.cumulativeVolumesUSD,
       prevCumulativeVolumesUSD
     );
-    poolMetrics.cumulativeVolumeTokenAmounts = this.pool.cumulativeVolumeTokenAmounts;
+    poolMetrics.cumulativeVolumeTokenAmounts =
+      this.pool.cumulativeVolumeTokenAmounts;
     poolMetrics.dailyVolumeTokenAmounts = subtractBigIntLists(
       this.pool.cumulativeVolumeTokenAmounts,
       prevCumulativeVolumeTokenAmounts
@@ -748,18 +776,21 @@ export class DexEventHandler {
 
     poolMetrics.inputTokenWeights = this.pool.inputTokenWeights;
 
-    poolMetrics.cumulativeSupplySideRevenueUSD = this.pool.cumulativeSupplySideRevenueUSD;
-    poolMetrics.dailySupplySideRevenueUSD = this.pool.cumulativeSupplySideRevenueUSD.minus(
-      prevCumulativeSupplySideRevenueUSD
-    );
-    poolMetrics.cumulativeProtocolSideRevenueUSD = this.pool.cumulativeProtocolSideRevenueUSD;
-    poolMetrics.dailyProtocolSideRevenueUSD = this.pool.cumulativeProtocolSideRevenueUSD.minus(
-      prevCumulativeProtocolSideRevenueUSD
-    );
+    poolMetrics.cumulativeSupplySideRevenueUSD =
+      this.pool.cumulativeSupplySideRevenueUSD;
+    poolMetrics.dailySupplySideRevenueUSD =
+      this.pool.cumulativeSupplySideRevenueUSD.minus(
+        prevCumulativeSupplySideRevenueUSD
+      );
+    poolMetrics.cumulativeProtocolSideRevenueUSD =
+      this.pool.cumulativeProtocolSideRevenueUSD;
+    poolMetrics.dailyProtocolSideRevenueUSD =
+      this.pool.cumulativeProtocolSideRevenueUSD.minus(
+        prevCumulativeProtocolSideRevenueUSD
+      );
     poolMetrics.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
-    poolMetrics.dailyTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD.minus(
-      prevCumulativeTotalRevenueUSD
-    );
+    poolMetrics.dailyTotalRevenueUSD =
+      this.pool.cumulativeTotalRevenueUSD.minus(prevCumulativeTotalRevenueUSD);
 
     poolMetrics.cumulativeDepositCount = this.pool.cumulativeDepositCount;
     poolMetrics.dailyDepositCount =
@@ -834,10 +865,14 @@ export class DexEventHandler {
     poolMetrics.activeLiquidity = this.pool.activeLiquidity;
     poolMetrics.activeLiquidityUSD = this.pool.activeLiquidityUSD;
 
-    poolMetrics.uncollectedProtocolSideTokenAmounts = this.pool.uncollectedProtocolSideTokenAmounts;
-    poolMetrics.uncollectedProtocolSideValuesUSD = this.pool.uncollectedProtocolSideValuesUSD;
-    poolMetrics.uncollectedSupplySideTokenAmounts = this.pool.uncollectedSupplySideTokenAmounts;
-    poolMetrics.uncollectedSupplySideValuesUSD = this.pool.uncollectedSupplySideValuesUSD;
+    poolMetrics.uncollectedProtocolSideTokenAmounts =
+      this.pool.uncollectedProtocolSideTokenAmounts;
+    poolMetrics.uncollectedProtocolSideValuesUSD =
+      this.pool.uncollectedProtocolSideValuesUSD;
+    poolMetrics.uncollectedSupplySideTokenAmounts =
+      this.pool.uncollectedSupplySideTokenAmounts;
+    poolMetrics.uncollectedSupplySideValuesUSD =
+      this.pool.uncollectedSupplySideValuesUSD;
 
     poolMetrics.cumulativeVolumeUSD = this.pool.cumulativeVolumeUSD;
     poolMetrics.hourlyTotalVolumeUSD = this.pool.cumulativeVolumeUSD.minus(
@@ -848,7 +883,8 @@ export class DexEventHandler {
       this.pool.cumulativeVolumesUSD,
       prevCumulativeVolumesUSD
     );
-    poolMetrics.cumulativeVolumeTokenAmounts = this.pool.cumulativeVolumeTokenAmounts;
+    poolMetrics.cumulativeVolumeTokenAmounts =
+      this.pool.cumulativeVolumeTokenAmounts;
     poolMetrics.hourlyVolumeTokenAmounts = subtractBigIntLists(
       this.pool.cumulativeVolumeTokenAmounts,
       prevCumulativeVolumeTokenAmounts
@@ -859,18 +895,21 @@ export class DexEventHandler {
 
     poolMetrics.inputTokenWeights = this.pool.inputTokenWeights;
 
-    poolMetrics.cumulativeSupplySideRevenueUSD = this.pool.cumulativeSupplySideRevenueUSD;
-    poolMetrics.hourlySupplySideRevenueUSD = this.pool.cumulativeSupplySideRevenueUSD.minus(
-      prevCumulativeSupplySideRevenueUSD
-    );
-    poolMetrics.cumulativeProtocolSideRevenueUSD = this.pool.cumulativeProtocolSideRevenueUSD;
-    poolMetrics.hourlyProtocolSideRevenueUSD = this.pool.cumulativeProtocolSideRevenueUSD.minus(
-      prevCumulativeProtocolSideRevenueUSD
-    );
+    poolMetrics.cumulativeSupplySideRevenueUSD =
+      this.pool.cumulativeSupplySideRevenueUSD;
+    poolMetrics.hourlySupplySideRevenueUSD =
+      this.pool.cumulativeSupplySideRevenueUSD.minus(
+        prevCumulativeSupplySideRevenueUSD
+      );
+    poolMetrics.cumulativeProtocolSideRevenueUSD =
+      this.pool.cumulativeProtocolSideRevenueUSD;
+    poolMetrics.hourlyProtocolSideRevenueUSD =
+      this.pool.cumulativeProtocolSideRevenueUSD.minus(
+        prevCumulativeProtocolSideRevenueUSD
+      );
     poolMetrics.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
-    poolMetrics.hourlyTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD.minus(
-      prevCumulativeTotalRevenueUSD
-    );
+    poolMetrics.hourlyTotalRevenueUSD =
+      this.pool.cumulativeTotalRevenueUSD.minus(prevCumulativeTotalRevenueUSD);
 
     poolMetrics.cumulativeDepositCount = this.pool.cumulativeDepositCount;
     poolMetrics.hourlyDepositCount =
@@ -896,27 +935,31 @@ export class DexEventHandler {
     this.tickLower!.liquidityGross = this.tickLower!.liquidityGross.plus(
       this.totalLiquidityDelta
     );
-    this.tickLower!.liquidityGrossUSD = this.tickLower!.liquidityGross.toBigDecimal().times(
-      this.newLiquidityPricePerUnit
-    );
+    this.tickLower!.liquidityGrossUSD =
+      this.tickLower!.liquidityGross.toBigDecimal().times(
+        this.newLiquidityPricePerUnit
+      );
     this.tickLower!.liquidityNet = this.tickLower!.liquidityNet.plus(
       this.totalLiquidityDelta
     );
-    this.tickLower!.liquidityNetUSD = this.tickLower!.liquidityNet.toBigDecimal().times(
-      this.newLiquidityPricePerUnit
-    );
+    this.tickLower!.liquidityNetUSD =
+      this.tickLower!.liquidityNet.toBigDecimal().times(
+        this.newLiquidityPricePerUnit
+      );
     this.tickUpper!.liquidityGross = this.tickUpper!.liquidityGross.plus(
       this.totalLiquidityDelta
     );
-    this.tickUpper!.liquidityGrossUSD = this.tickUpper!.liquidityGross.toBigDecimal().times(
-      this.newLiquidityPricePerUnit
-    );
+    this.tickUpper!.liquidityGrossUSD =
+      this.tickUpper!.liquidityGross.toBigDecimal().times(
+        this.newLiquidityPricePerUnit
+      );
     this.tickUpper!.liquidityNet = this.tickUpper!.liquidityNet.minus(
       this.totalLiquidityDelta
     );
-    this.tickUpper!.liquidityNetUSD = this.tickUpper!.liquidityNet.toBigDecimal().times(
-      this.newLiquidityPricePerUnit
-    );
+    this.tickUpper!.liquidityNetUSD =
+      this.tickUpper!.liquidityNet.toBigDecimal().times(
+        this.newLiquidityPricePerUnit
+      );
 
     this.tickUpper!.lastUpdateBlockNumber = this.event.block.number;
     this.tickUpper!.lastUpdateTimestamp = this.event.block.timestamp;
@@ -1026,8 +1069,10 @@ export class DexEventHandler {
       hourlyActiveAccount.save();
     }
 
-    usageMetricsDaily.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
-    usageMetricsHourly.cumulativeUniqueUsers = this.protocol.cumulativeUniqueUsers;
+    usageMetricsDaily.cumulativeUniqueUsers =
+      this.protocol.cumulativeUniqueUsers;
+    usageMetricsHourly.cumulativeUniqueUsers =
+      this.protocol.cumulativeUniqueUsers;
 
     usageMetricsDaily.save();
     usageMetricsHourly.save();
