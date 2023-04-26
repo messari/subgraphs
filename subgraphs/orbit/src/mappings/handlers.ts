@@ -162,11 +162,11 @@ export function handleLockIn(event: Deposit): void {
     event.params.amount,
     event.params.toChain,
     poolId,
-    dstPoolId,
     BridgePoolType.LOCK_RELEASE,
     CrosschainTokenType.WRAPPED,
     event,
-    event.params.depositId
+    event.params.depositId,
+    dstPoolId,
   );
   
   const sdk = _getSDK(event)!;
@@ -178,15 +178,15 @@ export function handleLockIn(event: Deposit): void {
 function _handleTransferOut(
   token: Address,
   sender: Address,
-  receiver: Address,
+  receiver: Bytes,
   amount: BigInt,
   toChain: string,
   poolId: Bytes,
-  dstPoolId: Address | null = null,
   bridgePoolType: BridgePoolType,
   crosschainTokenType: CrosschainTokenType,
   event: ethereum.Event,
-  refId: BigInt
+  refId: BigInt,
+  dstPoolId: Address | null = null,
 ): void {
   if (!dstPoolId) {
     log.error("dstPoolId is null for transaction: {}", [refId.toString()]);
@@ -196,14 +196,14 @@ function _handleTransferOut(
   const pool = sdk.Pools.loadPool(
     poolId,
     onCreatePool,
-    BridgePoolType.LOCK_RELEASE,
+    bridgePoolType,
     token.toHexString()
   );
   const context = dataSource.context();
   const taxReceiver = Address.fromString(context.getString("taxReceiver"));
   
-  // If Receiver is taxReceiver, this is the protocol fee
-  if (receiver == taxReceiver) {
+  // If Receiver is taxReceiver, this is the tax fee
+  if (Address.fromBytes(receiver) == taxReceiver) {
     pool.addRevenueNative(amount, BIGINT_ZERO);
     return;
   }
