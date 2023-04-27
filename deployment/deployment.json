@@ -1297,6 +1297,58 @@
       }
     }
   },
+  "arbitrum-one-bridge": {
+    "schema": "bridge",
+    "base": "arbitrum-one-bridge",
+    "protocol": "arbitrum-one-bridge",
+    "project": "arbitrum-one-bridge",
+    "deployments": {
+      "arbitrum-one-bridge-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "arbitrum-one-bridge.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "arbitrum-one-bridge-ethereum",
+            "query-id": "arbitrum-one-bridge-ethereum"
+          }
+        }
+      },
+      "arbitrum-one-bridge-arbitrum": {
+        "network": "arbitrum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "arbitrum-one-bridge.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "arbitrum-one-bridge-arbitrum",
+            "query-id": "arbitrum-one-bridge-arbitrum"
+          }
+        }
+      }
+    }
+  },
   "biswap": {
     "schema": "dex-amm",
     "base": "uniswap-forks",
