@@ -1,0 +1,17 @@
+{
+  "deployment": "PORTAL_AVALANCHE",
+  "network": "avalanche",
+  "file": "./src/mappings/handlers.ts",
+  "core": {
+    "address": "0x54a8e5f9c4CbA08F9943965859F6c34eAF03E26c",
+    "startBlock": 8237163
+  },
+  "tokenBridge": {
+    "address": "0x0e082F06FF657D94310cB8cE8B0D9a04541d8052",
+    "startBlock": 8237181
+  },
+  "supportsCallHandlers": false,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
