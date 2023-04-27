@@ -1,7 +1,13 @@
 {
-  "factoryContract": "0x27182842E098f60e3D576794A5bFFb0777E025d3",
-  "startBlock": 13711759,
+  "factory": {
+    "address": "0x27182842E098f60e3D576794A5bFFb0777E025d3",
+    "startBlock": 13711759
+  },
+  "EulStakes": {
+    "address": "0xc697BB6625D9f7AdcF0fbf0cbd4DcF50D8716cd3",
+    "startBlock": 14975091
+  },
   "graftEnabled": false,
-  "subgraphId": "QmSZz3RPd2kekhBrpFkg6anaMP6WYPAEeqAQwRFdL1dCmm",
-  "graftStartBlock": 16817995
+  "subgraphId": "QmcvgkX4XYsCjfTZAgjJFociduZyR1D9WkmS7xjx3jDwGs",
+  "graftStartBlock": 15144100
 }
