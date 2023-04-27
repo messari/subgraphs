@@ -1305,7 +1305,7 @@
     "deployments": {
       "arbitrum-one-bridge-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.2.0",
           "subgraph": "1.0.0",
