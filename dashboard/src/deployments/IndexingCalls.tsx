@@ -33,6 +33,8 @@ function IndexingCalls({ setIndexingStatus, setPendingIndexingStatus, indexingSt
     let currentGovernanceQuery = indexingStatusQueries?.governance?.fullCurrentQueryArray?.join("");
     let currentNetworkQuery = indexingStatusQueries?.network?.fullCurrentQueryArray?.join("");
     let currentNFTQuery = indexingStatusQueries?.["nft-marketplace"]?.fullCurrentQueryArray?.join("");
+    let currentOptionsQuery = indexingStatusQueries?.["derivatives-options"]?.fullCurrentQueryArray?.join("");
+    let currentPerpFuturesQuery = indexingStatusQueries?.["derivatives-perpfutures"]?.fullCurrentQueryArray?.join("");
 
 
     // Generate query from subgraphEndpoints
@@ -115,6 +117,22 @@ function IndexingCalls({ setIndexingStatus, setPendingIndexingStatus, indexingSt
     }] = useLazyQuery(gql`${currentNFTQuery}`, {
         client: clientIndexing,
     });
+    
+    const [fetchStatusOptions, {
+        data: statusOptions,
+        loading: statusOptionsLoading,
+        error: statusOptionsError
+    }] = useLazyQuery(gql`${currentOptionsQuery}`, {
+        client: clientIndexing,
+    });
+
+    const [fetchStatusPerpFutures, {
+        data: statusPerpFutures,
+        loading: statusPerpFuturesLoading,
+        error: statusPerpFuturesError
+    }] = useLazyQuery(gql`${currentPerpFuturesQuery}`, {
+        client: clientIndexing,
+    });
 
     let pendingLendingQuery = indexingStatusQueries?.lending?.fullPendingQueryArray?.join("");
     let pendingDexAmmQuery = indexingStatusQueries?.exchanges?.fullPendingQueryArray?.join("");
@@ -126,6 +144,8 @@ function IndexingCalls({ setIndexingStatus, setPendingIndexingStatus, indexingSt
     let pendingGovernanceQuery = indexingStatusQueries?.governance?.fullPendingQueryArray?.join("");
     let pendingNetworkQuery = indexingStatusQueries?.network?.fullPendingQueryArray?.join("");
     let pendingNFTQuery = indexingStatusQueries?.["nft-marketplace"]?.fullPendingQueryArray?.join("");
+    let pendingOptionsQuery = indexingStatusQueries?.["derivatives-options"]?.fullPendingQueryArray?.join("");
+    let pendingPerpFuturesQuery = indexingStatusQueries?.["derivatives-perpfutures"]?.fullPendingQueryArray?.join("");
 
     const [fetchStatusLendingPending, {
         data: statusLendingPending,
@@ -207,6 +227,22 @@ function IndexingCalls({ setIndexingStatus, setPendingIndexingStatus, indexingSt
         client: clientIndexing,
     });
 
+    const [fetchStatusOptionsPending, {
+        data: statusOptionsPending,
+        loading: statusOptionsPendingLoading,
+        error: statusOptionsPendingError
+    }] = useLazyQuery(gql`${pendingOptionsQuery}`, {
+        client: clientIndexing,
+    });
+
+    const [fetchStatusPerpFuturesPending, {
+        data: statusPerpFuturesPending,
+        loading: statusPerpFuturesPendingLoading,
+        error: statusPerpFuturesPendingError
+    }] = useLazyQuery(gql`${pendingPerpFuturesQuery}`, {
+        client: clientIndexing,
+    });
+
     useEffect(() => {
         fetchStatusLending();
         fetchStatusDexAmm();
@@ -218,6 +254,8 @@ function IndexingCalls({ setIndexingStatus, setPendingIndexingStatus, indexingSt
         fetchStatusGovernance();
         fetchStatusNetwork();
         fetchStatusNFT();
+        fetchStatusOptions();
+        fetchStatusPerpFutures();
         fetchStatusLendingPending();
         fetchStatusDexAmmPending();
         fetchStatusYieldPending();
@@ -228,23 +266,38 @@ function IndexingCalls({ setIndexingStatus, setPendingIndexingStatus, indexingSt
         fetchStatusGovernancePending();
         fetchStatusNetworkPending();
         fetchStatusNFTPending();
+        fetchStatusOptionsPending();
+        fetchStatusPerpFuturesPending();
     }, [])
 
     useEffect(() => {
-        if (statusLending && statusDexAmm && statusYield && statusGeneric && statusBridge && statusErc20 && statusErc721 && statusGovernance && statusNetwork && statusNFT) {
-            setIndexingStatus({ ...statusLending, ...statusDexAmm, ...statusYield, ...statusGeneric, ...statusBridge, ...statusErc20, ...statusErc721, ...statusGovernance, ...statusNetwork, ...statusNFT });
+        if (statusLending && statusDexAmm && statusYield && statusGeneric && statusBridge && statusErc20 && statusErc721 && statusGovernance && statusNetwork && statusNFT && statusOptions && statusPerpFutures) {
+            setIndexingStatus({ ...statusLending, ...statusDexAmm, ...statusYield, ...statusGeneric, ...statusBridge, ...statusErc20, ...statusErc721, ...statusGovernance, ...statusNetwork, ...statusNFT, ...statusOptions, ...statusPerpFutures });
         }
-    }, [statusLending, statusDexAmm, statusYield, statusGeneric, statusBridge, statusErc20, statusErc721, statusGovernance, statusNetwork, statusNFT])
+    }, [statusLending, statusDexAmm, statusYield, statusGeneric, statusBridge, statusErc20, statusErc721, statusGovernance, statusNetwork, statusNFT, statusOptions, statusPerpFutures])
 
     useEffect(() => {
-        if (statusLendingPending && statusDexAmmPending && statusYieldPending && statusGenericPending && statusBridgePending && statusErc20Pending && statusErc721Pending && statusGovernancePending && statusNetworkPending && statusNFTPending) {
-            setPendingIndexingStatus({ ...statusLendingPending, ...statusDexAmmPending, ...statusYieldPending, ...statusGenericPending, ...statusBridgePending, ...statusErc20Pending, ...statusErc721Pending, ...statusGovernancePending, ...statusNetworkPending, ...statusNFTPending });
+        if (statusLendingPending && statusDexAmmPending && statusYieldPending && statusGenericPending && statusBridgePending && statusErc20Pending && statusErc721Pending && statusGovernancePending && statusNetworkPending && statusNFTPending && statusOptionsPending && statusPerpFuturesPending) {
+            setPendingIndexingStatus({ ...statusLendingPending, ...statusDexAmmPending, ...statusYieldPending, ...statusGenericPending, ...statusBridgePending, ...statusErc20Pending, ...statusErc721Pending, ...statusGovernancePending, ...statusNetworkPending, ...statusNFTPending, ...statusOptionsPending, ...statusPerpFuturesPending });
         }
-    }, [statusLendingPending, statusDexAmmPending, statusYieldPending, statusGenericPending, statusBridgePending, statusErc20Pending, statusErc721Pending, statusGovernancePending, statusNetworkPending, statusNFTPending])
+    }, [statusLendingPending, statusDexAmmPending, statusYieldPending, statusGenericPending, statusBridgePending, statusErc20Pending, statusErc721Pending, statusGovernancePending, statusNetworkPending, statusNFTPending, statusOptionsPending, statusPerpFuturesPending])
 
     useEffect(() => {
-        if ((statusLending || statusLendingError) && (statusDexAmm || statusDexAmmError) && (statusYield || statusYieldError) && (statusGeneric || statusGenericError) && (statusBridge || statusBridgeError) && (statusErc20 || statusErc20Error) && (statusErc721 || statusErc721Error) && (statusGovernance || statusGovernanceError) && (statusNetwork || statusNetworkError) && (statusNFT || statusNFTError)) {
-            setIndexingStatusLoaded({ lending: true, exchanges: true, vaults: true, generic: true, bridge: true, erc20: true, erc721: true, governance: true, network: true, ["nft-marketplace"]: true });
+        if ((statusLending || statusLendingError) && (statusDexAmm || statusDexAmmError) && (statusYield || statusYieldError) && (statusGeneric || statusGenericError) && (statusBridge || statusBridgeError) && (statusErc20 || statusErc20Error) && (statusErc721 || statusErc721Error) && (statusGovernance || statusGovernanceError) && (statusNetwork || statusNetworkError) && (statusNFT || statusNFTError) && (statusOptions || statusOptionsError) && (statusPerpFutures || statusPerpFuturesError)) {
+            setIndexingStatusLoaded({    
+                lending: true,
+                exchanges: true,
+                vaults: true,
+                generic: true,
+                bridge: true,
+                erc20: true,
+                erc721: true,
+                governance: true,
+                network: true,
+                ["nft-marketplace"]: true,
+                ["derivatives-options"]: true,
+                ["derivatives-perpfutures"]: true,
+            });
             const newErrorObject = { ...indexingStatusError };
             if (statusLendingError && !indexingStatusError.lending) {
                 newErrorObject.lending = true;
@@ -276,13 +329,32 @@ function IndexingCalls({ setIndexingStatus, setPendingIndexingStatus, indexingSt
             if (statusNFTError && !indexingStatusError?.["nft-marketplace"]) {
                 newErrorObject["nft-marketplace"] = true;
             }
+            if (statusOptionsError && !indexingStatusError?.["derivatives-options"]) {
+                newErrorObject["derivatives-options"] = true;
+            }
+            if (statusPerpFuturesError && !indexingStatusError?.["derivatives-perpfutures"]) {
+                newErrorObject["derivatives-perpfutures"] = true;
+            }
             setIndexingStatusError(newErrorObject);
         }
-    }, [statusLendingLoading, statusDexAmmLoading, statusYieldLoading, statusGenericLoading, statusBridgeLoading, statusErc20Loading, statusErc721Loading, statusGovernanceLoading, statusNetworkLoading, statusNFTLoading]);
+    }, [statusLendingLoading, statusDexAmmLoading, statusYieldLoading, statusGenericLoading, statusBridgeLoading, statusErc20Loading, statusErc721Loading, statusGovernanceLoading, statusNetworkLoading, statusNFTLoading, statusOptionsLoading, statusPerpFuturesLoading]);
 
     useEffect(() => {
-        if ((statusLendingPending || statusLendingPendingError) && (statusDexAmmPending || statusDexAmmPendingError) && (statusYieldPending || statusYieldPendingError) && (statusGenericPending || statusGenericPendingError) && (statusBridgePending || statusBridgePendingError) && (statusErc20Pending || statusErc20PendingError) && (statusErc721Pending || statusErc721PendingError) && (statusGovernancePending || statusGovernancePendingError) && (statusNetworkPending || statusNetworkPendingError) && (statusNFTPending || statusNFTPendingError)) {
-            setIndexingStatusLoadedPending({ lending: true, exchanges: true, vaults: true, generic: true, bridge: true, erc20: true, erc721: true, governance: true, network: true, ["nft-marketplace"]: true });
+        if ((statusLendingPending || statusLendingPendingError) && (statusDexAmmPending || statusDexAmmPendingError) && (statusYieldPending || statusYieldPendingError) && (statusGenericPending || statusGenericPendingError) && (statusBridgePending || statusBridgePendingError) && (statusErc20Pending || statusErc20PendingError) && (statusErc721Pending || statusErc721PendingError) && (statusGovernancePending || statusGovernancePendingError) && (statusNetworkPending || statusNetworkPendingError) && (statusNFTPending || statusNFTPendingError) && (statusOptionsPending || statusOptionsPendingError) && (statusPerpFuturesPending || statusPerpFuturesPendingError)) {
+            setIndexingStatusLoadedPending({
+                lending: true,
+                exchanges: true,
+                vaults: true,
+                generic: true,
+                bridge: true,
+                erc20: true,
+                erc721: true,
+                governance: true,
+                network: true,
+                ["nft-marketplace"]: true,
+                ["derivatives-options"]: true,
+                ["derivatives-perpfutures"]: true,
+            });
             const newErrorObject = { ...indexingStatusErrorPending };
             if (statusLendingError && !indexingStatusErrorPending.lending) {
                 newErrorObject.lending = true;
@@ -314,9 +386,15 @@ function IndexingCalls({ setIndexingStatus, setPendingIndexingStatus, indexingSt
             if (statusNFTError && !indexingStatusErrorPending?.["nft-marketplace"]) {
                 newErrorObject["nft-marketplace"] = true;
             }
+            if (statusOptionsError && !indexingStatusErrorPending?.["derivatives-options"]) {
+                newErrorObject["derivatives-options"] = true;
+            }
+            if (statusPerpFuturesError && !indexingStatusErrorPending?.["derivatives-perpfutures"]) {
+                newErrorObject["derivatives-perpfutures"] = true;
+            }
             setIndexingStatusErrorPending(newErrorObject);
         }
-    }, [statusLendingPendingLoading, statusDexAmmPendingLoading, statusYieldPendingLoading, statusGenericPendingLoading, statusBridgePendingLoading, statusErc20PendingLoading, statusErc721PendingLoading, statusGovernancePendingLoading, statusNetworkPendingLoading, statusNFTPendingLoading]);
+    }, [statusLendingPendingLoading, statusDexAmmPendingLoading, statusYieldPendingLoading, statusGenericPendingLoading, statusBridgePendingLoading, statusErc20PendingLoading, statusErc721PendingLoading, statusGovernancePendingLoading, statusNetworkPendingLoading, statusNFTPendingLoading, statusOptionsPendingLoading, statusPerpFuturesPendingLoading]);
 
     // No need to return a JSX element to render, function needed for state management
     return (null);
