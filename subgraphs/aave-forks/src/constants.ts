@@ -36,11 +36,6 @@ export namespace ProtocolType {
   export const GENERIC = "GENERIC";
 }
 
-export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT";
-  export const BORROW = "BORROW";
-}
-
 export namespace LendingType {
   export const CDP = "CDP";
   export const POOLED = "POOLED";
@@ -51,18 +46,7 @@ export namespace RiskType {
   export const ISOLATED = "ISOLATED";
 }
 
-export namespace InterestRateType {
-  export const STABLE = "STABLE";
-  export const VARIABLE = "VARIABLE";
-  export const FIXED = "FIXED";
-}
-
 export namespace InterestRateSide {
-  export const LENDER = "LENDER";
-  export const BORROWER = "BORROWER";
-}
-
-export namespace PositionSide {
   export const LENDER = "LENDER";
   export const BORROWER = "BORROWER";
 }

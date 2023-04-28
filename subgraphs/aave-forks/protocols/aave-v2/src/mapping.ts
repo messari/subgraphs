@@ -67,8 +67,6 @@ import {
   BIGINT_ZERO,
   InterestRateMode,
   Network,
-  PositionSide,
-  RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
 import { Token, _DefaultOracle } from "../../../generated/schema";
@@ -96,6 +94,8 @@ import {
   InterestRateType,
   LendingType,
   PermissionType,
+  PositionSide,
+  RewardTokenType,
   RiskType,
 } from "../../../src/sdk/constants";
 import { TokenManager } from "../../../src/sdk/token";
@@ -372,7 +372,7 @@ export function handleCollateralTransfer(event: CollateralTransfer): void {
   _handleTransfer(
     event,
     protocolData,
-    PositionSide.LENDER,
+    PositionSide.COLLATERAL,
     event.params.to,
     event.params.from,
     event.params.value
@@ -484,7 +484,7 @@ function updateRewards(manager: DataManager, event: ethereum.Event): void {
   const market = manager.getMarket();
   const aTokenContract = AToken.bind(Address.fromBytes(market.outputToken!));
   const tryIncentiveController = aTokenContract.try_getIncentivesController();
-  if (!tryIncentiveController.reverted) {
+  if (tryIncentiveController.reverted) {
     log.warning(
       "[updateRewards]getIncentivesController() call for aToken {} is reverted",
       [market.outputToken!.toHexString()]
@@ -512,8 +512,11 @@ function updateRewards(manager: DataManager, event: ethereum.Event): void {
   // create reward tokens
   const tokenManager = new TokenManager(tryRewardAsset.value, event);
   const rewardToken = tokenManager.getToken();
-  const borrowRewardToken = tokenManager.getOrCreateRewardToken(
-    RewardTokenType.BORROW
+  const vBorrowRewardToken = tokenManager.getOrCreateRewardToken(
+    RewardTokenType.VARIABLE_BORROW
+  );
+  const sBorrowRewardToken = tokenManager.getOrCreateRewardToken(
+    RewardTokenType.STABLE_BORROW
   );
   const depositRewardToken = tokenManager.getOrCreateRewardToken(
     RewardTokenType.DEPOSIT
@@ -566,12 +569,18 @@ function updateRewards(manager: DataManager, event: ethereum.Event): void {
       .div(exponentToBigDecimal(rewardDecimals))
       .times(rewardTokenPriceUSD);
 
-    const borrowRewardData = new RewardData(
-      borrowRewardToken,
+    const vBorrowRewardData = new RewardData(
+      vBorrowRewardToken,
       borrowRewardsPerDay,
       borrowRewardsPerDayUSD
     );
-    manager.updateRewards(borrowRewardData);
+    const sBorrowRewardData = new RewardData(
+      sBorrowRewardToken,
+      borrowRewardsPerDay,
+      borrowRewardsPerDayUSD
+    );
+    manager.updateRewards(vBorrowRewardData);
+    manager.updateRewards(sBorrowRewardData);
   }
 
   if (!trySupplyRewards.reverted) {

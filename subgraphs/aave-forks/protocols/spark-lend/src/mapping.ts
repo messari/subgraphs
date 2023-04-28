@@ -71,12 +71,7 @@ import {
   _handleTransfer,
   _handleWithdraw,
 } from "../../../src/mapping";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  INT_FOUR,
-  PositionSide,
-} from "../../../src/constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, INT_FOUR } from "../../../src/constants";
 
 import { DataManager, ProtocolData } from "../../../src/sdk/manager";
 import {
@@ -92,6 +87,7 @@ import {
   PermissionType,
   RiskType,
   InterestRateType,
+  PositionSide,
 } from "../../../src/sdk/constants";
 
 function getProtocolData(): ProtocolData {
@@ -438,7 +434,7 @@ export function handleCollateralTransfer(event: CollateralTransfer): void {
   _handleTransfer(
     event,
     protocolData,
-    PositionSide.LENDER,
+    PositionSide.COLLATERAL,
     event.params.to,
     event.params.from,
     amount

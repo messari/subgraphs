@@ -4,7 +4,6 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
-  RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
 import { ReserveDataUpdated } from "../../../generated/LendingPool/LendingPool";
@@ -14,6 +13,7 @@ import { ERC20 } from "../../../generated/LendingPool/ERC20";
 import { exponentToBigDecimal } from "../../../src/helpers";
 import { DataManager, RewardData } from "../../../src/sdk/manager";
 import { TokenManager } from "../../../src/sdk/token";
+import { RewardTokenType } from "../../../src/sdk/constants";
 
 export function updateMarketRewards(
   manager: DataManager,
@@ -61,8 +61,12 @@ export function updateMarketRewards(
     Address.fromString(rewardConfig.rewardTokenAddress),
     event
   );
-  const rewardTokenBorrow = rewardTokenManager.getOrCreateRewardToken(
-    RewardTokenType.BORROW
+
+  const rewardTokenVariableBorrow = rewardTokenManager.getOrCreateRewardToken(
+    RewardTokenType.VARIABLE_BORROW
+  );
+  const rewardTokenStableBorrow = rewardTokenManager.getOrCreateRewardToken(
+    RewardTokenType.STABLE_BORROW
   );
   const rewardTokenDeposit = rewardTokenManager.getOrCreateRewardToken(
     RewardTokenType.DEPOSIT
@@ -94,8 +98,13 @@ export function updateMarketRewards(
     .div(exponentToBigDecimal(DEFAULT_DECIMALS))
     .times(rewardTokenPriceUSD);
 
-  const rewardDataBorrow = new RewardData(
-    rewardTokenBorrow,
+  const rewardDataVariableBorrow = new RewardData(
+    rewardTokenVariableBorrow,
+    borrowRewardsPerDay,
+    borRewardsPerDayUSD
+  );
+  const rewardDataStableBorrow = new RewardData(
+    rewardTokenStableBorrow,
     borrowRewardsPerDay,
     borRewardsPerDayUSD
   );
@@ -104,7 +113,8 @@ export function updateMarketRewards(
     depositRewardsPerDay,
     depRewardsPerDayUSD
   );
-  manager.updateRewards(rewardDataBorrow);
+  manager.updateRewards(rewardDataVariableBorrow);
+  manager.updateRewards(rewardDataStableBorrow);
   manager.updateRewards(rewardDataDeposit);
 
   market._lastRewardsUpdated = event.block.timestamp;

@@ -53,12 +53,7 @@ import {
   _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
-import {
-  BIGDECIMAL_ZERO,
-  InterestRateMode,
-  InterestRateType,
-  PositionSide,
-} from "../../../src/constants";
+import { BIGDECIMAL_ZERO, InterestRateMode } from "../../../src/constants";
 import { updateMarketRewards } from "./rewards";
 import { BalanceTransfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
 import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
@@ -71,8 +66,10 @@ import {
 } from "../../../src/helpers";
 import {
   CollateralizationType,
+  InterestRateType,
   LendingType,
   PermissionType,
+  PositionSide,
   RiskType,
 } from "../../../src/sdk/constants";
 
@@ -357,7 +354,7 @@ export function handleCollateralTransfer(event: CollateralTransfer): void {
   _handleTransfer(
     event,
     protocolData,
-    PositionSide.LENDER,
+    PositionSide.COLLATERAL,
     event.params.to,
     event.params.from,
     event.params.value

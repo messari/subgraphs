@@ -73,8 +73,6 @@ import {
   BIGINT_ZERO,
   InterestRateMode,
   Network,
-  PositionSide,
-  RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
 import { Token, _DefaultOracle } from "../../../generated/schema";
@@ -95,6 +93,8 @@ import {
   RiskType,
   LendingType,
   InterestRateType,
+  PositionSide,
+  RewardTokenType,
 } from "../../../src/sdk/constants";
 import { TokenManager } from "../../../src/sdk/token";
 
@@ -369,7 +369,7 @@ export function handleCollateralTransfer(event: CollateralTransfer): void {
   _handleTransfer(
     event,
     protocolData,
-    PositionSide.LENDER,
+    PositionSide.COLLATERAL,
     event.params.to,
     event.params.from,
     event.params.value
@@ -482,7 +482,7 @@ function updateRewards(manager: DataManager, event: ethereum.Event): void {
   const tokenManager = new TokenManager(tryRewardAsset.value, event);
   const rewardToken = tokenManager.getToken();
   const borrowRewardToken = tokenManager.getOrCreateRewardToken(
-    RewardTokenType.BORROW
+    RewardTokenType.VARIABLE_BORROW
   );
   const depositRewardToken = tokenManager.getOrCreateRewardToken(
     RewardTokenType.DEPOSIT

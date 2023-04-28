@@ -72,7 +72,6 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   Network,
-  PositionSide,
   INT_FOUR,
   BIGDECIMAL_HUNDRED,
 } from "../../../src/constants";
@@ -97,6 +96,7 @@ import {
   InterestRateType,
   LendingType,
   PermissionType,
+  PositionSide,
   RiskType,
 } from "../../../src/sdk/constants";
 
@@ -489,7 +489,7 @@ export function handleCollateralTransfer(event: CollateralTransfer): void {
   _handleTransfer(
     event,
     protocolData,
-    PositionSide.LENDER,
+    PositionSide.COLLATERAL,
     event.params.to,
     event.params.from,
     amount
@@ -775,24 +775,10 @@ function getBalanceTransferAmount(event: ethereum.Event): BigInt {
       const decoded = ethereum
         .decode("(uint256,uint256)", thisLog.data)!
         .toTuple();
-      // TODO: delete
-      log.info("[getBalanceTransferAmount]o4 decoded=({},{})", [
-        decoded[0].toBigInt().toString(),
-        decoded[1].toBigInt().toString(),
-      ]);
       btAmount = decoded[0].toBigInt();
       log.info("[getBalanceTransferAmount]o4 btAmount={}", [
         btAmount.toString(),
       ]);
-      // TODO: delete
-      log.info(
-        "[getBalanceTransferAmount] BalanceTransfer amount={} tx {}-{}",
-        [
-          btAmount.toString(),
-          event.transaction.hash.toHexString(),
-          thisLog.logIndex.toString(),
-        ]
-      );
       break;
     }
   }

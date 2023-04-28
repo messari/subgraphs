@@ -74,8 +74,6 @@ import {
   BIGINT_THREE,
   DEFAULT_DECIMALS,
   InterestRateMode,
-  PositionSide,
-  RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
 import { ChefIncentivesController } from "../../../generated/LendingPool/ChefIncentivesController";
@@ -92,6 +90,8 @@ import {
   InterestRateType,
   LendingType,
   PermissionType,
+  PositionSide,
+  RewardTokenType,
   RiskType,
 } from "../../../src/sdk/constants";
 import { TokenManager } from "../../../src/sdk/token";
@@ -386,7 +386,7 @@ export function handleCollateralTransfer(event: CollateralTransfer): void {
   _handleTransfer(
     event,
     protocolData,
-    PositionSide.LENDER,
+    PositionSide.COLLATERAL,
     event.params.to,
     event.params.from,
     event.params.value
@@ -517,7 +517,7 @@ function updateRewards(manager: DataManager, event: ethereum.Event): void {
     event
   );
   const rewardTokenBorrow = tokenManager.getOrCreateRewardToken(
-    RewardTokenType.BORROW
+    RewardTokenType.VARIABLE_BORROW
   );
   const rewardTokenDeposit = tokenManager.getOrCreateRewardToken(
     RewardTokenType.DEPOSIT

@@ -813,20 +813,6 @@ export function _handleRepay(
     interestRateType = InterestRateType.VARIABLE;
   }
 
-  // TODO: delete
-  log.info(
-    "[_handleRepay] {} debt balance prior ({}, {}), current ({}, {}); repay amount={}, interestRateType={}",
-    [
-      accountID.toHexString(),
-      accountDebtBalance.sTokenBalance.toString(),
-      accountDebtBalance.vTokenBalance.toString(),
-      newBorrowBalances[0].toString(),
-      newBorrowBalances[1].toString(),
-      amount.toString(),
-      interestRateType ? interestRateType : "null",
-    ]
-  );
-
   accountDebtBalance.sTokenBalance = newBorrowBalances[0];
   accountDebtBalance.vTokenBalance = newBorrowBalances[1];
   accountDebtBalance.save();
@@ -1008,19 +994,6 @@ export function _handleLiquidate(
 
   liquidate.positions = liquidatedPositions;
   liquidate.save();
-
-  // TODO: delete
-  log.info(
-    "[_handleLiquidate] {} debt balance prior ({}, {}), current ({}, {}); debtToCover={}",
-    [
-      liquidatee.toHexString(),
-      accountDebtBalance.sTokenBalance.toString(),
-      accountDebtBalance.vTokenBalance.toString(),
-      debtBalances[0].toString(),
-      debtBalances[1].toString(),
-      debtToCover.toString(),
-    ]
-  );
 
   accountDebtBalance.sTokenBalance = debtBalances[0];
   accountDebtBalance.vTokenBalance = debtBalances[1];
