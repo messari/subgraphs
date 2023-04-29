@@ -1,0 +1,253 @@
+[
+  {
+    "type": "event",
+    "name": "L2ToL1Transaction",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "caller",
+        "internalType": "address",
+        "indexed": false
+      },
+      {
+        "type": "address",
+        "name": "destination",
+        "internalType": "address",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "uniqueId",
+        "internalType": "uint256",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "batchNumber",
+        "internalType": "uint256",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "indexInBatch",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "arbBlockNum",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "ethBlockNum",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "timestamp",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "callvalue",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "bytes",
+        "name": "data",
+        "internalType": "bytes",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "L2ToL1Tx",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "caller",
+        "internalType": "address",
+        "indexed": false
+      },
+      {
+        "type": "address",
+        "name": "destination",
+        "internalType": "address",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "hash",
+        "internalType": "uint256",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "position",
+        "internalType": "uint256",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "arbBlockNum",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "ethBlockNum",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "timestamp",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "callvalue",
+        "internalType": "uint256",
+        "indexed": false
+      },
+      {
+        "type": "bytes",
+        "name": "data",
+        "internalType": "bytes",
+        "indexed": false
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SendMerkleUpdate",
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "reserved",
+        "internalType": "uint256",
+        "indexed": true
+      },
+      {
+        "type": "bytes32",
+        "name": "hash",
+        "internalType": "bytes32",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "position",
+        "internalType": "uint256",
+        "indexed": true
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bytes32", "name": "", "internalType": "bytes32" }],
+    "name": "arbBlockHash",
+    "inputs": [
+      { "type": "uint256", "name": "arbBlockNum", "internalType": "uint256" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "arbBlockNumber",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "arbChainID",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "arbOSVersion",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "getStorageGasAvailable",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "isTopLevelCall",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "pure",
+    "outputs": [{ "type": "address", "name": "", "internalType": "address" }],
+    "name": "mapL1SenderContractAddressToL2Alias",
+    "inputs": [
+      { "type": "address", "name": "sender", "internalType": "address" },
+      { "type": "address", "name": "unused", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "address", "name": "", "internalType": "address" }],
+    "name": "myCallersAddressWithoutAliasing",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [
+      { "type": "uint256", "name": "size", "internalType": "uint256" },
+      { "type": "bytes32", "name": "root", "internalType": "bytes32" },
+      { "type": "bytes32[]", "name": "partials", "internalType": "bytes32[]" }
+    ],
+    "name": "sendMerkleTreeState",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "payable",
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "sendTxToL1",
+    "inputs": [
+      { "type": "address", "name": "destination", "internalType": "address" },
+      { "type": "bytes", "name": "data", "internalType": "bytes" }
+    ]
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "wasMyCallersAddressAliased",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "stateMutability": "payable",
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "withdrawEth",
+    "inputs": [
+      { "type": "address", "name": "destination", "internalType": "address" }
+    ]
+  }
+]

@@ -20,7 +20,7 @@ import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/sche
  * make all of the storage changes that occur in a protocol.
  *
  * Schema Version:  1.3.0
- * SDK Version:     1.1.0
+ * SDK Version:     1.1.1
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan

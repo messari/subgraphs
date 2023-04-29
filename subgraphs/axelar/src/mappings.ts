@@ -300,7 +300,10 @@ export function handleContractCall(event: ContractCall): void {
 export function handleContractCallApproved(event: ContractCallApproved): void {
   // contract call
   const srcChainId = networkToChainID(event.params.sourceChain.toUpperCase());
-  const srcAccount = Address.fromString(event.params.sourceAddress);
+  const srcStr = event.params.sourceAddress;
+  const srcAccount = isValidEVMAddress(srcStr)
+    ? Address.fromString(srcStr)
+    : Bytes.fromUTF8(srcStr);
   const customEvent = _createCustomEvent(event)!;
   _handleMessageIn(
     srcChainId,

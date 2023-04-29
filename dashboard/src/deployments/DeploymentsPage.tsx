@@ -38,7 +38,9 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
     erc721: false,
     governance: false,
     network: false,
-    ["nft-marketplace"]: false
+    ["nft-marketplace"]: false,
+    ["derivatives-options"]: false,
+    ["derivatives-perpfutures"]: false,
   });
 
   const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({
@@ -51,7 +53,9 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
     erc721: false,
     governance: false,
     network: false,
-    ["nft-marketplace"]: false
+    ["nft-marketplace"]: false,
+    ["derivatives-options"]: false,
+    ["derivatives-perpfutures"]: false,
   });
 
   const [indexingStatusError, setIndexingStatusError] = useState<any>({
@@ -64,7 +68,9 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
     erc721: false,
     governance: false,
     network: false,
-    ["nft-marketplace"]: false
+    ["nft-marketplace"]: false,
+    ["derivatives-options"]: false,
+    ["derivatives-perpfutures"]: false,
   });
 
   const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({
@@ -77,7 +83,9 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
     erc721: false,
     governance: false,
     network: false,
-    ["nft-marketplace"]: false
+    ["nft-marketplace"]: false,
+    ["derivatives-options"]: false,
+    ["derivatives-perpfutures"]: false,
   });
 
   const [decenDepoIndexingStatus, setDecenDepoIndexingStatus] = useState<boolean>(false);
