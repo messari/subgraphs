@@ -279,11 +279,11 @@ export function handleRepay(event: Repay): void {
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
-  // if liquidator chooses to receive AToken, create a position for liquidator
-  let createLiquidatorPosition = false;
-  if (event.params.receiveAToken) {
-    createLiquidatorPosition = true;
-  }
+  // when liquidator chooses to receive AToken (event.params.receiveAToken==true),
+  // the transfer of AToken will trigger a BalanceTransfer event and the
+  // handleCollateralTransfer event will transfer the position from the liquidatee
+  // to the liquidator
+  const createLiquidatorPosition = false;
   _handleLiquidate(
     event,
     event.params.liquidatedCollateralAmount,

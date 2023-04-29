@@ -611,6 +611,7 @@ export class DataManager {
    * @param newCollateralBalance The liquidatee's new borrowing balance after the liquidation (usually ZERO).
    * @param interestType Optional - The InterestType of liquidatee's position (FIXED, VARIABLE, etc.).
    * @param createLiquidatorPosition - whether to create a position for the liquidator in the collateral market
+   * @param subtractBorrowerPosition - whether to subtract borrower/debt position involved in the liquidation
    * @returns A Liquidate entity or null
    */
   createLiquidate(
