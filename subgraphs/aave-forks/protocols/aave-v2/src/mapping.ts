@@ -472,9 +472,16 @@ function getAssetPriceInUSDC(
 
   // last resort, should not be touched
   const inputToken = Token.load(tokenAddress);
+  if (!inputToken) {
+    log.warning(
+      "[getAssetPriceInUSDC]token {} not found in Token entity; return BIGDECIMAL_ZERO",
+      [tokenAddress.toHexString()]
+    );
+    return BIGDECIMAL_ZERO;
+  }
   return oracleResult
     .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken!.decimals));
+    .div(exponentToBigDecimal(inputToken.decimals));
 }
 
 function updateRewards(manager: DataManager, event: ethereum.Event): void {
