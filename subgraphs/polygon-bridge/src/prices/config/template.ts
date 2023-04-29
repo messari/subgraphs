@@ -98,6 +98,9 @@ export class config implements Configurations {
   hardcodedStables(): Address[] {
     return HARDCODED_STABLES;
   }
+  ignoreList(): Address[] {
+    return [];
+  }
 
   ethAddress(): Address {
     return ETH_ADDRESS;

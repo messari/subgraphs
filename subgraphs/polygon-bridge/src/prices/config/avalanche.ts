@@ -84,6 +84,9 @@ export class config implements Configurations {
   yearnLensBlacklist(): Address[] {
     return YEARN_LENS_BLACKLIST;
   }
+  ignoreList(): Address[] {
+    return [];
+  }
 
   aaveOracle(): Address {
     return AAVE_ORACLE_CONTRACT_ADDRESS;

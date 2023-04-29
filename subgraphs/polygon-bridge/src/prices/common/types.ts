@@ -65,7 +65,7 @@ export interface Configurations {
   curveRegistry(): Address[];
 
   hardcodedStables(): Address[];
-
+  ignoreList(): Address[];
   ethAddress(): Address;
   wethAddress(): Address;
   usdcAddress(): Address;

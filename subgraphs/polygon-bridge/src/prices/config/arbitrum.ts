@@ -120,6 +120,10 @@ export class config implements Configurations {
     return HARDCODED_STABLES;
   }
 
+  ignoreList(): Address[] {
+    return [];
+  }
+
   ethAddress(): Address {
     return ETH_ADDRESS;
   }

@@ -104,6 +104,9 @@ export class config implements Configurations {
   sushiCalculationsBlacklist(): Address[] {
     return SUSHI_CALCULATIONS_BLACKSLIST;
   }
+  ignoreList(): Address[] {
+    return [];
+  }
 
   uniswapForks(): Address[] {
     return UNISWAP_FORKS_ROUTER_ADDRESSES;

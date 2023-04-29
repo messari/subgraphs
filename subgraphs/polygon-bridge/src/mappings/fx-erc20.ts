@@ -35,18 +35,12 @@ export const conf = new BridgeConfig(
 export class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
     const pricedToken = Address.fromBytes(token.id);
-    if (NetworkConfigs.ignoreToken(pricedToken.toHexString())) {
-      return BIGDECIMAL_ZERO;
-    }
     return getUsdPricePerToken(pricedToken).usdPrice;
   }
 
   getAmountValueUSD(token: Token, amount: BigInt): BigDecimal {
     const pricedToken = Address.fromBytes(token.id);
     const _amount = bigIntToBigDecimal(amount, token.decimals);
-    if (NetworkConfigs.ignoreToken(pricedToken.toHexString())) {
-      return BIGDECIMAL_ZERO;
-    }
     return getUsdPrice(pricedToken, _amount);
   }
 }

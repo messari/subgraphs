@@ -100,6 +100,9 @@ export class config implements Configurations {
     return CURVE_CALCULATIONS_BLACKSLIST;
   }
 
+  ignoreList(): Address[] {
+    return [];
+  }
   sushiCalculations(): Address {
     return SUSHISWAP_CALCULATIONS_ADDRESS;
   }

@@ -115,6 +115,9 @@ export class config implements Configurations {
     return CURVE_REGISTRY_ADDRESSES;
   }
 
+  ignoreList(): Address[] {
+    return [];
+  }
   hardcodedStables(): Address[] {
     return HARDCODED_STABLES;
   }

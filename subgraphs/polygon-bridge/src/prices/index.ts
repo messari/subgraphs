@@ -27,6 +27,10 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return new CustomPriceType();
   }
 
+  if (config.ignoreList().includes(tokenAddr)) {
+    return new CustomPriceType();
+  }
+
   if (config.hardcodedStables().includes(tokenAddr)) {
     return CustomPriceType.initialize(
       constants.BIGDECIMAL_USD_PRICE,
