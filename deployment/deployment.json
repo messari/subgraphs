@@ -7459,58 +7459,6 @@
       }
     }
   },
-  "arbitrum-bridge": {
-    "schema": "bridge",
-    "base": "arbitrum-bridge",
-    "protocol": "arbitrum-bridge",
-    "project": "arbitrum",
-    "deployments": {
-      "arbitrum-bridge-ethereum": {
-        "network": "ethereum",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "arbitrum-bridge-ethereum",
-            "query-id": "arbitrum-bridge-ethereum"
-          }
-        },
-        "files": {
-          "template": "arbitrum.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      },
-      "arbitrum-bridge-arbitrum": {
-        "network": "arbitrum",
-        "status": "dev",
-        "versions": {
-          "schema": "1.1.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "arbitrum-bridge-arbitrum",
-            "query-id": "arbitrum-bridge-arbitrum"
-          }
-        },
-        "files": {
-          "template": "arbitrum.bridge.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        }
-      }
-    }
-  },
   "hop-protocol": {
     "schema": "bridge",
     "base": "hop-protocol",
