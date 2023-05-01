@@ -1,0 +1,24 @@
+{
+  "deployment": "GAINS_TRADE_ARBITRUM",
+  "network": "arbitrum-one",
+  "file": "./src/mappings/handlers.ts",
+  "vault": {
+    "address": "0xd85E038593d7A098614721EaE955EC2022B9B91B",
+    "startBlock": "49275523"
+  },
+  "callbacks": [
+    {
+      "name": "Callbacks V6.3.1",
+      "address": "0x298a695906e16aeA0a184A2815A76eAd1a0b7522",
+      "startBlock": "74190311"
+    },
+    {
+      "name": "Callbacks V6.3",
+      "address": "0x6C612C804c84e3D20E3109c8efD06cD2d8b28F46",
+      "startBlock": "49275558"
+    }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
