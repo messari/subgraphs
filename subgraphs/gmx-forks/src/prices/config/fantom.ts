@@ -40,6 +40,7 @@ export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
   new OracleContract("0xbe4fc72f8293f9d3512d58b969c98c3f676cb957", 3796241), // Uniswap v2
   new OracleContract("0x16327e3fbdaca3bcf7e38f5af2599d2ddc33ae52", 4250168), // Spiritswap
   new OracleContract("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506", 2457904), // Sushiswap
+  new OracleContract("0xf491e7b69e4244ad4002bc14e878a34207e38c29", 4242185), // SpookySwap
 ];
 
 ///////////////////////////////////////////////////////////////////////////

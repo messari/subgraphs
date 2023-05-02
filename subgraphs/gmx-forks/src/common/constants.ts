@@ -200,13 +200,14 @@ export const MLP_MANAGER_ADDRESS = Address.fromString(
   "0x304951d7172bcada54ccac1e4674862b3d5b3d5b"
 );
 
-export enum EventType {
-  Deposit,
-  Withdraw,
-  CollateralIn,
-  CollateralOut,
-  ClosePosition,
-  Swap,
-  Liquidate,
-  Liquidated,
-}
+export const SPOOKYSWAP_MMY_USDC_PAIR = Address.fromString(
+  "0x2a6538a456650cd454dcd8f0b4665183dba0bb27"
+);
+
+export const MMY_ADDRESS = Address.fromString(
+  "0x01e77288b38b416f972428d562454fb329350bac"
+);
+
+export const ESCROWED_MMY_ADDRESS = Address.fromString(
+  "0xe41c6c006de9147fc4c84b20cdfbfc679667343f"
+);

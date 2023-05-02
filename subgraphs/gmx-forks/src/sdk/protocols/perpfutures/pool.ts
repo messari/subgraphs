@@ -245,7 +245,14 @@ export class Pool {
   addTotalValueLocked(delta: BigDecimal): void {
     this.pool.totalValueLockedUSD = this.pool.totalValueLockedUSD.plus(delta);
     this.save();
-
+    log.warning(
+      "[addTotalValueLockedPool] delta {} poolTvl {} protocolTvl {}",
+      [
+        delta.toString(),
+        this.pool.totalValueLockedUSD.toString(),
+        this.protocol.protocol.totalValueLockedUSD.toString(),
+      ]
+    );
     this.protocol.addTotalValueLocked(delta);
   }
 
@@ -577,12 +584,9 @@ export class Pool {
       );
     }
 
-    log.warning("[refreshOutputTokenPriceUSD] price token {} price {}", [
-      token.name,
-      price.toString(),
-    ]);
-
     this.pool.outputTokenPriceUSD = price;
+    token.lastPriceUSD = price;
+    token.save();
     this.save();
   }
 
