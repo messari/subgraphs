@@ -1015,6 +1015,9 @@ type Market @entity {
   " Base token interest multiplier for interest. Used to get revenue "
   _baseBorrowIndex: BigInt
 
+  " Base token interest multiplier for the supply side. Can be used to get interest accrued per position. "
+  _baseSupplyIndex: BigInt
+
   " Rewards borrow speed for this market"
   _baseTrackingBorrowSpeed: BigInt
 
@@ -1544,6 +1547,11 @@ type Position @entity {
 
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
+
+  ##### Interest Tracking Fields #####
+
+  " The principal value without interest accrued. Used to calculate interest per position. "
+  _principalValue: BigInt
 }
 
 # Unlike other snapshots that are taken at a fixed time interval. Position
@@ -1582,6 +1590,14 @@ type PositionSnapshot @entity(immutable: true) {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
+
+  ##### Interest Tracking Fields #####
+
+  " The principal value without interest accrued. Used to calculate interest per position. "
+  _principalValue: BigInt
+
+  " Base borrow OR supply index (based on the position side). Used to calculate interest across snapshots. "
+  _baseIndex: BigInt
 }
 
 # Helper entity for calculating daily/hourly active users
