@@ -18,7 +18,7 @@ export namespace ProtocolType {
 }
 
 export namespace LendingType {
-  export const CDP = "CDP";
+  export const POOLED = "POOLED";
 }
 
 export namespace InterestRateType {
@@ -233,7 +233,7 @@ export function getProtocolData(protocolAddress: Address): ProtocolData {
       "Morpho Aave V2",
       "morpho-aave-v2",
       Network.MAINNET,
-      LendingType.CDP,
+      LendingType.POOLED,
       PermissionType.PERMISSIONLESS,
       PermissionType.PERMISSIONLESS,
       PermissionType.PERMISSIONED,
@@ -248,7 +248,7 @@ export function getProtocolData(protocolAddress: Address): ProtocolData {
       "Morpho Compound",
       "morpho-compound",
       Network.MAINNET,
-      LendingType.CDP,
+      LendingType.POOLED,
       PermissionType.PERMISSIONLESS,
       PermissionType.PERMISSIONLESS,
       PermissionType.PERMISSIONED,

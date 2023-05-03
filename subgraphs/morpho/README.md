@@ -6,6 +6,73 @@ Some of the entities are filled with Morpho specific data, permitting to track t
 
 Among them, some properties are defined as "internal", meaning that they are not "human readable" and are used for internal computations. These properties are prepended with an underscore.
 
+## Calculation Methodology v1.0.0
+
+### Total Value Locked (TVL) USD
+
+Sum across all Pools:
+
+`Pool Deposit TVL` = `Pooled Deposits` + `P2P Deposits`
+
+### Total Revenue USD
+
+Sum across all Pools:
+
+`(Pool Borrow Amount * (Pool Borrow Rate + P2P Borrow Rate))`
+
+### Protocol-Side Revenue USD
+
+Portion of the Total Revenue allocated to the Protocol
+
+Sum across all Pools:
+
+`(Pool Oustanding Borrow Amount (POOLED & P2P) * Pool Borrow Rate) * (Pool Reserve Factor)`
+
+> Note: This currently excludes Liquidations. Also, reserve factor is dynamic.
+
+### Supply-Side Revenue USD
+
+Portion of the Total Revenue allocated to the Supply-Side
+
+Sum across all Pools
+
+`(Pool Outstanding Borrows * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
+
+> Note: This currently excludes Liquidations
+
+### Total Unique Users
+
+Count of Unique Addresses which have interacted with the protocol via any transaction
+
+`Deposits`
+
+`Withdrawals`
+
+`Borrows`
+
+`Liquidations`
+
+`Repays`
+
+### Reward Token Emissions Amount
+
+`$COMP Per Block (Normalized to Morpho share)` \* `Blocks Per Day`
+
+> Rewards are only calculated on Morpho Compound for the $COMP rewards that are passed through. $MORPHO rewards are calculated off chains so we cannot include them in the subgraph.
+
+## Notes
+
+- This subgraph contains all of the standard fields, but has many custom fields that are specific to Morpho.
+
+## References and Useful Links
+
+- Website: https://www.morpho.xyz/
+- Application: https://app.morpho.xyz/
+- Morpho Analytics: https://analytics.morpho.xyz/
+- Docs: https://docs.morpho.xyz/start-here/homepage
+
+# Morpho Explained
+
 ## How Morpho works
 
 Each interaction on Morpho-x leads to an interaction on the underlying protocol. Because the Morpho protocol is an aggregation of multiple positions, that means that Morpho is a protocol user itself (regarding the underlying protocol, pool based).
@@ -43,8 +110,7 @@ The Market entity has properties named `p2pSupplyInterestsImprovement` & `p2pBor
 
 For example, if Alice has $100 matched at a 1% yield per yer (0.5% on the underlying pool), after one year, the yield earned is $1, and it was about $0.5 on the pool
 
-## TODO
+## Unimplemented Features
 
 - [ ] Add the Comp rewards for morpho-compound, since the protocol is redistributing comp rewards to users on pool
 - [ ] Add data about the p2p matching, such as number of matches, matched value etc.
-- [ ] Add Protocol Revenues. Not a problem for now since reserve factor is set to 0.

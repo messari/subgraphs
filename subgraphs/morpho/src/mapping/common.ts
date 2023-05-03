@@ -611,7 +611,10 @@ export function _handleP2PIndexesUpdated(
     market.inputTokenPriceUSD
   );
 
-  const protocolSideRevenueDeltaUSD = BigDecimal.zero(); // no fees for now, TODO: use the reserve factor
+  if (!market.reserveFactor) market.reserveFactor = BigDecimal.zero();
+  const protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(
+    market.reserveFactor
+  );
 
   const supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
     protocolSideRevenueDeltaUSD

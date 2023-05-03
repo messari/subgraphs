@@ -1,5 +1,4 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-
 import { CToken } from "../../../generated/Morpho/CToken";
 import { CompoundOracle } from "../../../generated/Morpho/CompoundOracle";
 import { Comptroller } from "../../../generated/Morpho/Comptroller";
