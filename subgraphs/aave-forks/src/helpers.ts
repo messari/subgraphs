@@ -14,14 +14,8 @@ import {
   _FlashLoanPremium,
   _MarketList,
 } from "../generated/schema";
-import {
-  BIGINT_ZERO,
-  BIGINT_ONE,
-  BIGDECIMAL_ONE,
-  BIGDECIMAL_ZERO,
-} from "./constants";
+import { BIGINT_ZERO, BIGINT_ONE, BIGDECIMAL_ZERO } from "./constants";
 import { AToken } from "../generated/LendingPool/AToken";
-import { bigDecimalToBigInt } from "./sdk/constants";
 
 // returns the market based on any auxillary token
 // ie, outputToken, vToken, or sToken
@@ -108,7 +102,7 @@ export function getBorrowBalances(market: Market, account: Address): BigInt[] {
 }
 
 export function getCollateralBalance(market: Market, account: Address): BigInt {
-  let collateralBalance = BIGINT_ZERO;
+  const collateralBalance = BIGINT_ZERO;
   const aTokenContract = AToken.bind(Address.fromBytes(market.outputToken!));
   const balanceResult = aTokenContract.try_balanceOf(account);
   if (balanceResult.reverted) {

@@ -26,7 +26,6 @@ import {
   INT_FOUR,
   RAY_OFFSET,
   ZERO_ADDRESS,
-  BIGINT_ONE,
   BIGDECIMAL_ONE,
   BIGINT_ONE_RAY,
 } from "./constants";
