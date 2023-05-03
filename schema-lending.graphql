@@ -212,6 +212,12 @@ enum FeeType {
   " Fee taken on withdrawal. e.g. found in Euler "
   WITHDRAW_FEE
 
+  " Flashloan Fees taken by the protocol "
+  FLASHLOAN_PROTOCOL_FEE
+
+  " Flashloan Fees taken by LP "
+  FLASHLOAN_LP_FEE
+
   " Any fee not represented here. Please make a github issue for this to be added: https://github.com/messari/subgraphs/issues/new "
   OTHER
 }

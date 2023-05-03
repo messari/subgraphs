@@ -334,6 +334,14 @@ export function handleSwapBorrowRateMode(event: Swap): void {
       interestRateMode
     )
   ) {
+    log.error(
+      "[handleSwapBorrowRateMode]interestRateMode {} is not one of [{}, {}]",
+      [
+        interestRateMode.toString(),
+        InterestRateMode.STABLE.toString(),
+        InterestRateMode.VARIABLE.toString(),
+      ]
+    );
     return;
   }
 

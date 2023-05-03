@@ -28,6 +28,7 @@ import {
   ZERO_ADDRESS,
   BIGINT_ONE,
   BIGDECIMAL_ONE,
+  BIGINT_ONE_RAY,
 } from "./constants";
 import {
   InterestRateSide,
@@ -140,7 +141,7 @@ export function _handleReserveInitialized(
   const vDebtTokenManager = new TokenManager(
     variableDebtToken,
     event,
-    TokenType.NON_REBASING
+    TokenType.REBASING
   );
   market.outputToken = outputTokenManager.getToken().id;
   market._vToken = vDebtTokenManager.getToken().id;
@@ -301,7 +302,9 @@ export function _handleReserveFactorChanged(
     return;
   }
 
-  market.reserveFactor = reserveFactor.toBigDecimal().div(BIGDECIMAL_HUNDRED);
+  market.reserveFactor = reserveFactor
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_FOUR));
   market.save();
 }
 
@@ -322,10 +325,6 @@ export function _handleLiquidationProtocolFeeChanged(
   market._liquidationProtocolFee = liquidationProtocolFee
     .toBigDecimal()
     .div(exponentToBigDecimal(INT_FOUR));
-  log.info(
-    "[LiquidationProtocolFeeChanged]market {} _liquidationProtocolFee={}",
-    [asset.toHexString(), liquidationProtocolFee.toString()]
-  );
   market.save();
 }
 
@@ -544,7 +543,7 @@ export function _handleReserveDataUpdated(
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
   if (!market._liquidityIndex) {
-    market._liquidityIndex = BIGINT_ONE;
+    market._liquidityIndex = BIGINT_ONE_RAY;
   }
 
   const liquidityIndexDiff = liquidityIndex
@@ -576,9 +575,7 @@ export function _handleReserveDataUpdated(
     reserveFactor = BIGDECIMAL_ZERO;
   }
 
-  const protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(
-    reserveFactor.div(BIGDECIMAL_HUNDRED)
-  );
+  const protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(reserveFactor);
   const supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
     protocolSideRevenueDeltaUSD
   );
@@ -869,7 +866,7 @@ export function _handleLiquidate(
   // according to logic in _calculateAvailableCollateralToLiquidate()
   // liquidatedCollateralAmount = collateralAmount - liquidationProtocolFee
   // liquidationProtocolFee = bonusCollateral * liquidationProtocolFeePercentage
-  // bonusCollateral = collateralAmount - collateralAmount / liquidationBonus
+  // bonusCollateral = collateralAmount - (collateralAmount / liquidationBonus)
   // liquidationBonus = 1 + liquidationPenalty
   // => liquidationProtocolFee = liquidationPenalty * liquidationProtocolFeePercentage * liquidatedCollateralAmount / (1 + liquidationPenalty - liquidationPenalty*liquidationProtocolFeePercentage)
   if (!market._liquidationProtocolFee) {
@@ -1030,7 +1027,7 @@ export function _handleFlashLoan(
   if (!reserveFactor) {
     reserveFactor = BIGDECIMAL_ZERO;
   }
-  const protocolRevenueShare = reserveFactor.div(BIGDECIMAL_HUNDRED);
+  const protocolRevenueShare = reserveFactor;
 
   const premiumUSDTotal = tokenManager.getAmountUSD(premiumAmount);
   let premiumUSDToProtocol = premiumUSDTotal.times(protocolRevenueShare);

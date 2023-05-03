@@ -464,11 +464,21 @@ export function handleStableTransfer(event: StableTransfer): void {
 }
 
 export function handleSwapBorrowRateMode(event: SwapBorrowRateMode): void {
+  const interestRateMode = event.params.interestRateMode;
   if (
     ![InterestRateMode.STABLE, InterestRateMode.VARIABLE].includes(
       event.params.interestRateMode
     )
   ) {
+    log.error(
+      "[handleSwapBorrowRateMode]interestRateMode {} is not one of [{}, {}]",
+      [
+        interestRateMode.toString(),
+        InterestRateMode.STABLE.toString(),
+        InterestRateMode.VARIABLE.toString(),
+      ]
+    );
+    return;
     return;
   }
   const interestRateType =
@@ -532,13 +542,13 @@ function storeLiquidationProtocolFee(
   // for how to decode configuration data to get _liquidationProtocolFee
   const liquidationProtocolFeeMask =
     "0xFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-  const reserveFactorStartBitPosition = 152 as u8;
+  const liquidationProtocolFeeStartBitPosition = 152 as u8;
   const pool = LendingPoolContract.bind(poolAddress);
   const poolConfigData = pool.getConfiguration(reserve).data;
   const liquidationProtocolFee = decodeConfig(
     poolConfigData,
     liquidationProtocolFeeMask,
-    reserveFactorStartBitPosition
+    liquidationProtocolFeeStartBitPosition
   )
     .toBigDecimal()
     .div(exponentToBigDecimal(INT_FOUR));

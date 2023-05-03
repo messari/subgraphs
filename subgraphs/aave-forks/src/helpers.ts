@@ -104,8 +104,6 @@ export function getBorrowBalances(market: Market, account: Address): BigInt[] {
       : trySDebtTokenBalance.value;
   }
 
-  // const totalDebt = sDebtTokenBalance.plus(vDebtTokenBalance);
-
   return [sDebtTokenBalance, vDebtTokenBalance];
 }
 
@@ -121,20 +119,7 @@ export function getCollateralBalance(market: Market, account: Address): BigInt {
     return collateralBalance;
   }
 
-  let exchangeRate = BIGDECIMAL_ONE;
-  if (!market.exchangeRate) {
-    log.info(
-      "[getCollateralBalance]market {} exchange rate not set, default to 1.0",
-      [market.id.toHexString()]
-    );
-    return collateralBalance;
-  }
-  exchangeRate = market.exchangeRate!;
-
-  collateralBalance = bigDecimalToBigInt(
-    balanceResult.value.toBigDecimal().times(exchangeRate)
-  );
-  return collateralBalance;
+  return balanceResult.value;
 }
 
 export function getOrCreateFlashloanPremium(
@@ -177,7 +162,7 @@ export function storePrePauseState(market: Market): void {
 
 export function restorePrePauseState(market: Market): void {
   if (!market._prePauseState || market._prePauseState!.length !== 3) {
-    log.warning(
+    log.error(
       "[restorePrePauseState] _prePauseState for market {} is not set correctly",
       [market.id.toHexString()]
     );

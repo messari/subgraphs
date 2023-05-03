@@ -432,11 +432,20 @@ export function handleFlashloan(event: FlashLoan): void {
 }
 
 export function handleSwapBorrowRateMode(event: SwapBorrowRateMode): void {
+  const interestRateMode = event.params.interestRateMode;
   if (
     ![InterestRateMode.STABLE, InterestRateMode.VARIABLE].includes(
-      event.params.interestRateMode
+      interestRateMode
     )
   ) {
+    log.error(
+      "[handleSwapBorrowRateMode]interestRateMode {} is not one of [{}, {}]",
+      [
+        interestRateMode.toString(),
+        InterestRateMode.STABLE.toString(),
+        InterestRateMode.VARIABLE.toString(),
+      ]
+    );
     return;
   }
   const interestRateType =
@@ -634,7 +643,7 @@ function storeReserveFactor(
     reserveFactorStartBitPosition
   )
     .toBigDecimal()
-    .div(BIGDECIMAL_HUNDRED);
+    .div(exponentToBigDecimal(INT_FOUR)); // reserveFactor in bps, 1/10000
 
   log.info("[setReserveFactor]reserveFactor set to {}", [
     reserveFactor.toString(),
