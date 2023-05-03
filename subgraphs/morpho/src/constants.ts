@@ -130,10 +130,10 @@ export const ETH_USD_PRICE_FEED_ADDRESS = Address.fromBytes(
 );
 
 export const CCOMP_ADDRESS = Address.fromString(
-  "0x70e36f6BF80a52b3B46b3aF8e106CC0ed743E8e4"
+  "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4"
 );
 export const COMP_ADDRESS = Address.fromString(
-  "0xc00e94Cb662C3520282E6f5717214004A7f26888"
+  "0xc00e94cb662c3520282e6f5717214004a7f26888"
 );
 export const COMPTROLLER_ADDRESS = Address.fromString(
   "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b"
