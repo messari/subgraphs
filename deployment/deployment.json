@@ -2424,8 +2424,8 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.3.2",
-          "methodology": "1.2.2"
+          "subgraph": "1.4.0",
+          "methodology": "1.2.3"
         },
         "files": {
           "template": "euler.template.yaml"
