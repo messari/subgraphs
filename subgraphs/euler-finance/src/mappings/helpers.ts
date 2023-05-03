@@ -209,6 +209,7 @@ export function createLiquidation(event: Liquidation): BigDecimal {
   liquidation.save();
 
   collateralMarket.cumulativeLiquidateUSD = collateralMarket.cumulativeLiquidateUSD.plus(liquidation.amountUSD);
+  collateralMarket.liquidationPenalty = liquidation.profitUSD.div(liquidation.amountUSD).times(BIGDECIMAL_HUNDRED);
   collateralMarket.save();
 
   const protocol = getOrCreateLendingProtocol();
