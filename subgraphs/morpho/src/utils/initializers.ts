@@ -5,6 +5,7 @@ import {
   LendingProtocol,
   Market,
   _MarketList,
+  RewardToken,
 } from "../../generated/schema";
 import { ProtocolType, getProtocolData } from "../constants";
 import { Versions } from "../versions";
@@ -22,6 +23,23 @@ export const getOrInitToken = (tokenAddress: Bytes): Token => {
   }
   return token;
 };
+
+export function getOrCreateRewardToken(
+  tokenAddress: Address,
+  side: string
+): RewardToken {
+  const token = getOrInitToken(tokenAddress);
+  const rewardTokenID = token.id.toHexString().concat("-").concat(side);
+  let rewardToken = RewardToken.load(rewardTokenID);
+  if (!rewardToken) {
+    rewardToken = new RewardToken(rewardTokenID);
+    rewardToken.token = token.id;
+    rewardToken.type = side;
+    rewardToken.save();
+  }
+
+  return rewardToken;
+}
 
 export class MorphoProtocol {
   constructor(

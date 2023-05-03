@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   P2PSupplyDeltaUpdated,
   Repaid,
@@ -28,8 +28,18 @@ import {
   BorrowerPositionUpdated,
   P2PIndexesUpdated,
 } from "../../../generated/Morpho/MorphoCompound";
-import { BASE_UNITS } from "../../constants";
-import { getMarket } from "../../utils/initializers";
+import {
+  BASE_UNITS,
+  BLOCKS_PER_DAY,
+  CCOMP_ADDRESS,
+  COMPTROLLER_ADDRESS,
+  COMP_ADDRESS,
+  DEFAULT_DECIMALS,
+  MORPHO_COMPOUND_ADDRESS,
+  RewardTokenType,
+  exponentToBigDecimal,
+} from "../../constants";
+import { getMarket, getOrCreateRewardToken } from "../../utils/initializers";
 import {
   _handleBorrowed,
   _handleBorrowerPositionUpdated,
@@ -41,6 +51,10 @@ import {
   _handleWithdrawn,
 } from "../common";
 import { fetchMorphoPositionsCompound, getCompoundProtocol } from "./fetchers";
+import { LendingProtocol, Market } from "../../../generated/schema";
+import { CToken } from "../../../generated/Morpho/CToken";
+import { Comptroller } from "../../../generated/Morpho/Comptroller";
+import { CompoundOracle } from "../../../generated/Morpho/CompoundOracle";
 export { handleMarketCreated } from "./handleMarketCreated";
 
 export function handleP2PIndexesUpdated(event: P2PIndexesUpdated): void {
@@ -150,6 +164,8 @@ export function handleSupplied(event: Supplied): void {
     event.params._balanceOnPool,
     event.params._balanceInP2P
   );
+
+  updateCompoundRewards(market);
 }
 
 export function handleSupplierPositionUpdated(
@@ -178,6 +194,8 @@ export function handleWithdrawn(event: Withdrawn): void {
     event.params._balanceOnPool,
     event.params._balanceInP2P
   );
+
+  updateCompoundRewards(market);
 }
 
 export function handleDefaultMaxGasForMatchingSet(
@@ -297,3 +315,98 @@ export function handleReserveFactorSet(event: ReserveFactorSet): void {
 // Emitted when the treasury claims allocated tokens
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
 export function handleReserveFeeClaimed(event: ReserveFeeClaimed): void {}
+
+// Update $COMP distributed rewards
+export function updateCompoundRewards(market: Market): void {
+  // DEPOSIT first because it alphabetizes
+  const rewardTokens = [
+    getOrCreateRewardToken(COMP_ADDRESS, RewardTokenType.DEPOSIT).id,
+    getOrCreateRewardToken(COMP_ADDRESS, RewardTokenType.VARIABLE_BORROW).id,
+  ];
+  const amounts = [BigInt.zero(), BigInt.zero()];
+  const amountsUSD = [BigDecimal.zero(), BigDecimal.zero()];
+
+  // get token amount in Compound market
+  const cTokenContract = CToken.bind(Address.fromBytes(market.id));
+  const tryCTokenAmount = cTokenContract.try_totalSupply();
+  const tryBalanceOf = cTokenContract.try_balanceOf(MORPHO_COMPOUND_ADDRESS);
+  if (tryCTokenAmount.reverted || tryBalanceOf.reverted) {
+    log.error(
+      "[updateCompoundRewards] cTokenContract.try_totalSupply() or cTokenContract.try_balanceOf(MORPHO_COMPOUND_ADDRESS) reverted for market: {}",
+      [market.id.toHexString()]
+    );
+    return;
+  }
+  const morphoShare = tryBalanceOf.value
+    .toBigDecimal()
+    .div(tryCTokenAmount.value.toBigDecimal());
+
+  // get COMP reward rate per side
+  const comptrollerContract = Comptroller.bind(COMPTROLLER_ADDRESS);
+  const trySupplySpeed = comptrollerContract.try_compSupplySpeeds(
+    Address.fromBytes(market.id)
+  );
+  const tryBorrowSpeed = comptrollerContract.try_compBorrowSpeeds(
+    Address.fromBytes(market.id)
+  );
+
+  if (trySupplySpeed.reverted || tryBorrowSpeed.reverted) {
+    log.error(
+      "[updateCompoundRewards] comptrollerContract.try_compSupplySpeeds(market.id) or comptrollerContract.try_compBorrowSpeeds(market.id) reverted for market: {}",
+      [market.id.toHexString()]
+    );
+    return;
+  }
+
+  // get COMP price in USD
+  const protocol = LendingProtocol.load(market.protocol);
+  if (!protocol) {
+    log.error("[updateCompoundRewards] protocol not found for protocol: {}", [
+      market.protocol.toHexString(),
+    ]);
+    return;
+  }
+  let priceUSD = BigDecimal.zero();
+  if (protocol._oracle) {
+    const oracleContract = CompoundOracle.bind(
+      Address.fromBytes(protocol._oracle!)
+    );
+    const tryPriceUSD = oracleContract.try_getUnderlyingPrice(CCOMP_ADDRESS);
+    const bdFactor = exponentToBigDecimal(DEFAULT_DECIMALS);
+    if (!tryPriceUSD.reverted) {
+      priceUSD = tryPriceUSD.value.toBigDecimal().div(bdFactor);
+    }
+  }
+
+  // set COMP rewards
+  amounts[0] = BigInt.fromString(
+    trySupplySpeed.value
+      .toBigDecimal()
+      .times(morphoShare)
+      .times(BLOCKS_PER_DAY.toBigDecimal())
+      .truncate(0)
+      .toString()
+  );
+  amounts[1] = BigInt.fromString(
+    tryBorrowSpeed.value
+      .toBigDecimal()
+      .times(morphoShare)
+      .times(BLOCKS_PER_DAY.toBigDecimal())
+      .truncate(0)
+      .toString()
+  );
+
+  amountsUSD[0] = amounts[0]
+    .toBigDecimal()
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+    .times(priceUSD);
+  amountsUSD[1] = amounts[1]
+    .toBigDecimal()
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+    .times(priceUSD);
+
+  market.rewardTokens = rewardTokens;
+  market.rewardTokenEmissionsAmount = amounts;
+  market.rewardTokenEmissionsUSD = amountsUSD;
+  market.save();
+}

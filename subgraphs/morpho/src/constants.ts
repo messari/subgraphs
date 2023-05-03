@@ -97,6 +97,13 @@ export namespace RiskType {
   export const ISOLATED = "ISOLATED";
 }
 
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT";
+  export const VARIABLE_BORROW = "VARIABLE_BORROW";
+  export const STABLE_BORROW = "STABLE_BORROW";
+  export const STAKE = "STAKE";
+}
+
 /////////////////////
 ///// Addresses /////
 /////////////////////
@@ -120,6 +127,16 @@ export const WRAPPED_ETH = Address.fromBytes(
 
 export const ETH_USD_PRICE_FEED_ADDRESS = Address.fromBytes(
   Bytes.fromHexString("0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419")
+);
+
+export const CCOMP_ADDRESS = Address.fromString(
+  "0x70e36f6BF80a52b3B46b3aF8e106CC0ed743E8e4"
+);
+export const COMP_ADDRESS = Address.fromString(
+  "0xc00e94Cb662C3520282E6f5717214004A7f26888"
+);
+export const COMPTROLLER_ADDRESS = Address.fromString(
+  "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b"
 );
 
 ///////////////////
@@ -148,6 +165,7 @@ export const RAY_OFFSET = 27;
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 
+export const BLOCKS_PER_DAY = BigInt.fromI32(7200 as i32);
 export const BLOCKS_PER_YEAR = BigInt.fromI32(2632320 as i32); // 7200 blocks per day
 
 /////////////////////////////

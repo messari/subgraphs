@@ -112,5 +112,4 @@ For example, if Alice has $100 matched at a 1% yield per yer (0.5% on the underl
 
 ## Unimplemented Features
 
-- [ ] Add the Comp rewards for morpho-compound, since the protocol is redistributing comp rewards to users on pool
 - [ ] Add data about the p2p matching, such as number of matches, matched value etc.

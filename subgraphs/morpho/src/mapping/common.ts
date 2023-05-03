@@ -613,7 +613,7 @@ export function _handleP2PIndexesUpdated(
 
   if (!market.reserveFactor) market.reserveFactor = BigDecimal.zero();
   const protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(
-    market.reserveFactor
+    market.reserveFactor!
   );
 
   const supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
