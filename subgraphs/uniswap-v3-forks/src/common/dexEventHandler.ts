@@ -36,7 +36,11 @@ import {
   BIGINT_NEG_ONE,
 } from "./constants";
 import { getOrCreateAccount } from "./entities/account";
-import { getLiquidityPoolFee, getLiquidityPoolAmounts } from "./entities/pool";
+import {
+  getLiquidityPoolFee,
+  getLiquidityPoolAmounts,
+  getLiquidityPool,
+} from "./entities/pool";
 import { getOrCreateProtocol } from "./entities/protocol";
 import { getOrCreateToken, isFakeWhitelistToken } from "./entities/token";
 import {
@@ -303,6 +307,14 @@ export class DexEventHandler {
     withdraw.tickLower = this.tickLower ? this.tickLower!.index : null;
     withdraw.tickUpper = this.tickUpper ? this.tickUpper!.index : null;
 
+    const pool = getLiquidityPool(this.event.address);
+    if (pool) {
+      const reserve0Amount = pool.inputTokenBalances[0];
+      const reserve1Amount = pool.inputTokenBalances[1];
+
+      withdraw.reserveAmounts = [reserve0Amount, reserve1Amount];
+    }
+
     withdraw.save();
   }
 
@@ -337,6 +349,14 @@ export class DexEventHandler {
     deposit.amountUSD = sumBigDecimalList(this.inputTokenBalanceDeltasUSD);
     deposit.tickLower = this.tickLower ? this.tickLower!.index : null;
     deposit.tickUpper = this.tickUpper ? this.tickUpper!.index : null;
+
+    const pool = getLiquidityPool(this.event.address);
+    if (pool) {
+      const reserve0Amount = pool.inputTokenBalances[0];
+      const reserve1Amount = pool.inputTokenBalances[1];
+
+      deposit.reserveAmounts = [reserve0Amount, reserve1Amount];
+    }
 
     deposit.save();
   }
@@ -373,6 +393,14 @@ export class DexEventHandler {
     swap.amountOut =
       this.inputTokenBalanceDeltas[tokensOutIdx].times(BIGINT_NEG_ONE);
     swap.amountOutUSD = this.inputTokenBalanceDeltasUSD[tokensOutIdx];
+
+    const pool = getLiquidityPool(this.event.address);
+    if (pool) {
+      const reserve0Amount = pool.inputTokenBalances[0];
+      const reserve1Amount = pool.inputTokenBalances[1];
+
+      swap.reserveAmounts = [reserve0Amount, reserve1Amount];
+    }
 
     swap.save();
     this.pool.save();
