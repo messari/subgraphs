@@ -23,7 +23,7 @@ enum Network {
   OPTIMISM
   OSMOSIS
   MATIC # aka Polygon
-  GNOSIS
+  XDAI # aka Gnosis Chain
 }
 
 enum ProtocolType {
@@ -65,6 +65,16 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " amount of tokens in the protocol "
+  _totalSupply: BigInt!
+
+  " Total value locked in the protocol "
+  _totalValueLockedUSD: BigDecimal!
+
+  _largePriceChangeBuffer: Int!
+
+  _largeTVLImpactBuffer: Int!
 }
 
 enum RewardTokenType {
@@ -297,6 +307,9 @@ type DexAmmProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
+
+  " This is a boolean to indicate whether or not the pools have been instantiated the were initialized before Optimism regenesis "
+  _regenesis: Boolean!
 }
 
 ###############################
@@ -1160,10 +1173,10 @@ type PositionSnapshot @entity(immutable: true) {
   " Number of withdrawals related to this position "
   withdrawCount: Int!
 
-  " Timestamp of when this snapshot was taken "
+  " Block number of this snapshot "
   blockNumber: BigInt!
 
-  " Timestamp of when this snapshot was taken "
+  " Timestamp of this snapshot "
   timestamp: BigInt!
 }
 
@@ -1234,6 +1247,9 @@ type Deposit @entity(immutable: true) {
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
 
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
+
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
 }
@@ -1292,6 +1308,9 @@ type Withdraw @entity(immutable: true) {
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
+
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
@@ -1354,6 +1373,9 @@ type Swap @entity(immutable: true) {
 
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
+
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
 }
 
 # Helper entity for calculating daily/hourly active users
