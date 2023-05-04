@@ -16,7 +16,7 @@ import {
  * make all of the storage changes that occur in the pool daily and hourly snapshots.
  *
  * Schema Version:  1.3.0
- * SDK Version:     1.1.1
+ * SDK Version:     1.1.2
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -458,7 +458,9 @@ export class PoolSnapshot {
     snapshot.cumulativeUniqueUsers = this.pool.cumulativeUniqueUsers;
 
     const dailyActivityHelper = initActivityHelper(
-      Bytes.fromUTF8("daily-".concat(day.toString()))
+      Bytes.fromUTF8(
+        constants.ActivityInterval.DAILY.concat("-").concat(day.toString())
+      )
     );
     snapshot.dailyActiveUsers = dailyActivityHelper.activeUsers;
     snapshot.dailyActiveDepositors = dailyActivityHelper.activeDepositors;
