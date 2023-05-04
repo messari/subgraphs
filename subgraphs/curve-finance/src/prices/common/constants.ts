@@ -29,14 +29,23 @@ export const ETH_ADDRESS = Address.fromString(
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_TEN = BigInt.fromI32(10);
+export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
+export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_TEN = new BigDecimal(BIGINT_TEN);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGDECIMAL_NEG_ONE = new BigDecimal(BIGINT_NEG_ONE);
 export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000");
-
+export const BIGDECIMAL_FIVE_PERCENT = BigDecimal.fromString("0.05");
+export const BIGDECIMAL_TEN_BILLION = new BigDecimal(
+  BigInt.fromString("10000000000")
+);
 export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_AAVE_ORACLE_DECIMALS = 8;
+export const PRICE_CHANGE_BUFFER_LIMIT = 5 as i32;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
 export const STABLE_TOKENS: string[] = ["WETH", "DAI", "USDT", "USDC"];

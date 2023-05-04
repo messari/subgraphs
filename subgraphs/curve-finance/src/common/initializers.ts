@@ -142,6 +142,10 @@ export function getOrCreateToken(
       .readValue<BigInt>(contract.try_decimals(), constants.DEFAULT_DECIMALS)
       .toI32();
     token.isBasePoolLpToken = false;
+    token._totalSupply = constants.BIGINT_ZERO;
+    token._totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    token._largePriceChangeBuffer = 0;
+    token._largeTVLImpactBuffer = 0;
 
     if (address.equals(constants.ETH_ADDRESS)) {
       token.name = "ETH";
