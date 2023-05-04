@@ -759,34 +759,18 @@ function getBalanceTransferAmount(event: ethereum.Event): BigInt {
   );
   for (let i = 0; i < logs.length; i++) {
     const thisLog = logs[i];
-    log.info("[getBalanceTransferAmount]o1 i={},thisLog.logIndex={}", [
-      i.toString(),
-      thisLog.logIndex.toString(),
-    ]);
     if (thisLog.logIndex.le(eventLogIndex)) {
       // skip event with logIndex < event.logIndex
-      log.info("[getBalanceTransferAmount]o2 skipped", []);
       continue;
     }
     // topics[0] - signature
     const logSignature = thisLog.topics[0];
-    log.info(
-      "[getBalanceTransferAmount]o3 logSignature={} BalanceTransferSignature={} thisLog.address={} event.address={}",
-      [
-        logSignature.toHexString(),
-        eventSignature.toHexString(),
-        thisLog.address.toHexString(),
-        event.address.toHexString(),
-      ]
-    );
     if (thisLog.address == event.address && logSignature == eventSignature) {
       const decoded = ethereum
         .decode("(uint256,uint256)", thisLog.data)!
         .toTuple();
       btAmount = decoded[0].toBigInt();
-      log.info("[getBalanceTransferAmount]o4 btAmount={}", [
-        btAmount.toString(),
-      ]);
+
       break;
     }
   }
