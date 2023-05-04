@@ -101,10 +101,6 @@ export class ProtocolSnapshot {
 
   private takeSnapshots(): void {
     if (!this.protocol._lastUpdateTimestamp) {
-      log.error(
-        "[isInitialized] cannot create snapshots, protocol: {} not initialized",
-        [this.protocol.id.toHexString()]
-      );
       return;
     }
 
@@ -132,13 +128,15 @@ export class ProtocolSnapshot {
   }
 
   private takeFinancialsDailySnapshot(day: i32): void {
-    log.warning("[takeFinancialsDailySnapshot]", []);
-
     const snapshot = new FinancialsDailySnapshot(Bytes.fromI32(day));
 
     const previousSnapshot = FinancialsDailySnapshot.load(
       Bytes.fromI32(this.protocol._lastSnapshotDayID!.toI32())
     );
+    log.warning("[takeFinancialsDailySnapshot] currentId {} previousId {}", [
+      day.toString(),
+      this.protocol._lastSnapshotDayID!.toI32().toString(),
+    ]);
 
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;

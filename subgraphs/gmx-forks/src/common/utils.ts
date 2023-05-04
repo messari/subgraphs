@@ -133,7 +133,7 @@ export function bigIntToBigDecimal(
 export function getInputTokenBalancesFromContract(
   inputTokens: TokenSchema[]
 ): BigInt[] {
-  const vaultContract = Vault.bind(constants.POOL_ADDRESS);
+  const vaultContract = Vault.bind(constants.VAULT_ADDRESS);
   const inputTokenBalances = [];
   for (let i = 0; i < inputTokens.length; i++) {
     const inputTokenBalance = readValue(

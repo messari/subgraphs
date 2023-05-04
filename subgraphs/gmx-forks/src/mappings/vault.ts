@@ -40,11 +40,12 @@ export function handleClosePosition(event: ClosePositionEvent): void {
 
 export function handleCollectMarginFees(event: CollectMarginFeesEvent): void {
   const feeUsd = event.params.feeUsd;
+  const sdk = initializeSDK(event);
   const totalFee = utils.bigIntToBigDecimal(
     feeUsd,
     constants.PRICE_PRECISION_DECIMALS
   );
-  const pool = getOrCreatePool(event);
+  const pool = getOrCreatePool(event, sdk);
   pool.addRevenueUSD(
     totalFee.times(constants.PROTOCOL_SIDE_REVENUE_PERCENT),
     totalFee.times(
@@ -53,7 +54,6 @@ export function handleCollectMarginFees(event: CollectMarginFeesEvent): void {
       ).minus(constants.STAKE_SIDE_REVENUE_PERCENT)
     )
   );
-  const sdk = initializeSDK(event);
   sdk.Protocol.addStakeSideRevenueUSD(
     totalFee.times(constants.STAKE_SIDE_REVENUE_PERCENT)
   );
@@ -61,11 +61,12 @@ export function handleCollectMarginFees(event: CollectMarginFeesEvent): void {
 
 export function handleCollectSwapFees(event: CollectSwapFeesEvent): void {
   const feeUsd = event.params.feeUsd;
+  const sdk = initializeSDK(event);
   const totalFee = utils.bigIntToBigDecimal(
     feeUsd,
     constants.PRICE_PRECISION_DECIMALS
   );
-  const pool = getOrCreatePool(event);
+  const pool = getOrCreatePool(event, sdk);
   pool.addRevenueUSD(
     totalFee.times(constants.PROTOCOL_SIDE_REVENUE_PERCENT),
     totalFee.times(
@@ -74,7 +75,6 @@ export function handleCollectSwapFees(event: CollectSwapFeesEvent): void {
       ).minus(constants.STAKE_SIDE_REVENUE_PERCENT)
     )
   );
-  const sdk = initializeSDK(event);
   sdk.Protocol.addStakeSideRevenueUSD(
     totalFee.times(constants.STAKE_SIDE_REVENUE_PERCENT)
   );
@@ -83,8 +83,10 @@ export function handleCollectSwapFees(event: CollectSwapFeesEvent): void {
 export function handleIncreasePoolAmount(event: IncreasePoolAmountEvent): void {
   const amount = event.params.amount;
   const tokenAddress = event.params.token;
-  const pool = getOrCreatePool(event);
-  const token = initializeSDK(event).Tokens.getOrCreateToken(tokenAddress);
+  const sdk = initializeSDK(event);
+
+  const pool = getOrCreatePool(event, sdk);
+  const token = sdk.Tokens.getOrCreateToken(tokenAddress);
   utils.checkAndUpdateInputTokens(pool, token, amount);
   const inputTokens = pool.getInputTokens();
   const inputTokenIndex = inputTokens.indexOf(token.id);
@@ -97,8 +99,10 @@ export function handleIncreasePoolAmount(event: IncreasePoolAmountEvent): void {
 export function handleDecreasePoolAmount(event: DecreasePoolAmountEvent): void {
   const amount = event.params.amount;
   const tokenAddress = event.params.token;
-  const pool = getOrCreatePool(event);
-  const token = initializeSDK(event).Tokens.getOrCreateToken(tokenAddress);
+  const sdk = initializeSDK(event);
+
+  const pool = getOrCreatePool(event, sdk);
+  const token = sdk.Tokens.getOrCreateToken(tokenAddress);
   utils.checkAndUpdateInputTokens(pool, token, amount);
   const inputTokens = pool.getInputTokens();
   const inputTokenIndex = inputTokens.indexOf(token.id);
@@ -165,10 +169,11 @@ export function handleSwap(event: SwapEvent): void {
   const amountIn = event.params.amountIn;
   const amountOut = event.params.amountOutAfterFees;
   const accountAddres = event.params.account;
+  const sdk = initializeSDK(event);
 
-  const account = getOrCreateAccount(event, accountAddres);
+  const pool = getOrCreatePool(event, sdk);
+  const account = getOrCreateAccount(accountAddres, pool, sdk);
 
-  const pool = getOrCreatePool(event);
   account.swap(
     pool,
     tokenInAddress,
@@ -181,21 +186,20 @@ export function handleSwap(event: SwapEvent): void {
 }
 
 export function handleUpdateFundingRate(event: UpdateFundingRateEvent): void {
-  const tokenAddress = event.params.token;
-  const fundingrate = event.params.fundingRate;
-  const pool = getOrCreatePool(event);
-  const token = initializeSDK(event).Tokens.getOrCreateToken(tokenAddress);
-
-  utils.checkAndUpdateInputTokens(pool, token);
-
-  const inputTokens = pool.getInputTokens();
-  const fundingTokenIndex = inputTokens.indexOf(token.id);
-  const fundingrates = pool.pool.fundingrate;
-  if (fundingTokenIndex >= 0) {
-    fundingrates[fundingTokenIndex] = utils.bigIntToBigDecimal(
-      fundingrate,
-      constants.FUNDING_PRECISION_DECIMALS
-    );
-  }
-  pool.setFundingRate(fundingrates);
+  // const tokenAddress = event.params.token;
+  // const fundingrate = event.params.fundingRate;
+  // const sdk = initializeSDK(event);
+  // const pool = getOrCreatePool(event, sdk);
+  // const token = sdk.Tokens.getOrCreateToken(tokenAddress);
+  // utils.checkAndUpdateInputTokens(pool, token);
+  // const inputTokens = pool.getInputTokens();
+  // const fundingTokenIndex = inputTokens.indexOf(token.id);
+  // const fundingrates = pool.pool.fundingrate;
+  // if (fundingTokenIndex >= 0) {
+  //   fundingrates[fundingTokenIndex] = utils.bigIntToBigDecimal(
+  //     fundingrate,
+  //     constants.FUNDING_PRECISION_DECIMALS
+  //   );
+  // }
+  // pool.setFundingRate(fundingrates);
 }

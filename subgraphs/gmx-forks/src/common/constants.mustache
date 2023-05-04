@@ -4,8 +4,8 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_NAME = "MummyFinance";
-export const PROTOCOL_SLUG = "MMY";
+export const PROTOCOL_NAME = "{{protocolName}}";
+export const PROTOCOL_SLUG = "{{protocolSlug}}";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -168,33 +168,35 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const PROTOCOL_ID = "0x304951d7172bCAdA54ccAC1E4674862b3d5b3d5b";
-export const POOL_NAME = "MMYVault";
-export const POOL_SYMBOL = "Vault";
+export const PROTOCOL_ID = "{{protocolId}}";
+export const POOL_NAME = "{{poolName}}";
+export const POOL_SYMBOL = "{{poolSymbol}}";
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
 export const PRICE_PRECISION_DECIMALS = 30;
 
-export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.1");
-export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.3");
+export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("{{protocolSideRevenuePercent}}");
+export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("{{stakeSideRevenuePercent}}");
 export const FUNDING_PRECISION = BigDecimal.fromString("1000000");
 export const FUNDING_PRECISION_DECIMALS = 6;
 
 export const VAULT_ADDRESS = Address.fromString(
-  "0xA6D7D0e650aa40FFa42d845A354c12c2bc0aB15f"
+  "{{VaultAddr}}"
 );
 
 export const MLP_ADDRESS = Address.fromString(
-  "0x0ce61aaf89500e4f007884fbbf62642618def5dd"
+  "{{mlpAddress}}"
 );
 
 export const MLP_MANAGER_ADDRESSES = [
-  Address.fromString("0x304951d7172bCAdA54ccAC1E4674862b3d5b3d5b"), // GlpManager_V1
-];
+    {{#glpManagers}}
+  Address.fromString("{{address}}"), // {{name}}
+{{/glpManagers}}
+]
 
 export const MMY_ADDRESS = Address.fromString(
-  "0x01e77288b38b416f972428d562454fb329350bac"
+  "{{mmyAddress}}"
 );
 
 export const ESCROWED_MMY_ADDRESS = Address.fromString(
-  "0xe41c6c006de9147fc4c84b20cdfbfc679667343f"
+  "{{esMMYAddress}}"
 );

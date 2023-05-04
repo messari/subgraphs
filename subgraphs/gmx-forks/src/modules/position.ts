@@ -30,10 +30,10 @@ export function handleUpdatePositionEvent(
   transactionType: TransactionType,
   liqudateProfit: BigInt
 ): void {
-  const account = getOrCreateAccount(event, accountAddress);
   const sdk = initializeSDK(event);
 
-  const pool = getOrCreatePool(event);
+  const pool = getOrCreatePool(event, sdk);
+  const account = getOrCreateAccount(accountAddress, pool, sdk);
   const indexToken = sdk.Tokens.getOrCreateToken(indexTokenAddress);
   const sizeUSDDelta = utils.bigIntToBigDecimal(
     sizeDelta,
@@ -93,7 +93,8 @@ export function handleUpdatePositionEvent(
     collateralTokenAddress,
     collateralTokenAmountDelta,
     collateralUSDDelta,
-    transactionType
+    transactionType,
+    sdk
   );
 
   if (transactionType == TransactionType.COLLATERAL_IN) {
@@ -154,7 +155,7 @@ export function handleUpdatePositionEvent(
       true
     );
 
-    getOrCreateAccount(event, event.transaction.from);
+    getOrCreateAccount(event.transaction.from, pool, sdk);
   }
 }
 
@@ -195,7 +196,7 @@ export function updateUserPosition(
 
   const prevBalance = position.position.balance;
   const prevCollateralBalance = position.position.collateralBalance;
-  const vaultContract = Vault.bind(Address.fromBytes(constants.POOL_ADDRESS));
+  const vaultContract = Vault.bind(Address.fromBytes(constants.VAULT_ADDRESS));
   const tryGetPosition = vaultContract.try_getPosition(
     Address.fromBytes(account.account.id),
     collateralTokenAddress,

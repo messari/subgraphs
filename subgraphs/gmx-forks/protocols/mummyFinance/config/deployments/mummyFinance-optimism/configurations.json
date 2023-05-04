@@ -1,0 +1,27 @@
+{
+  "network": "optimism",
+  "protocolName": "MummyFinance",
+  "protocolSlug": "MMY",
+  "protocolId": "0x304951d7172bCAdA54ccAC1E4674862b3d5b3d5b",
+  "poolName": "MMYVault",
+  "poolSymbol": "Vault",
+  "protocolSideRevenuePercent": "0.1",
+  "stakeSideRevenuePercent": "0.3",
+  "mlpAddress": "0x0ce61aaf89500e4f007884fbbf62642618def5dd",
+  "mmyAddress": "0x01e77288b38b416f972428d562454fb329350bac",
+  "esMMYAddress": "0xe41c6c006de9147fc4c84b20cdfbfc679667343f",
+  "VaultAddr": "0xA6D7D0e650aa40FFa42d845A354c12c2bc0aB15f",
+  "VaultStartBlock": 51709945,
+  "FeeGlpRewardDistributorAddr": "0xA30b1C3c8EDE3841dE05F9CdD4D0e097aC4C6D92",
+  "FeeGlpRewardDistributorStartBlock": 51710183,
+  "EsgmxGlpRewardDistributorAddr": "0xa0207802b0953b17421bf9cb10b3acf5823496ab",
+  "EsgmxGlpRewardDistributorStartBlock": 51710191,
+  "deployment": "MUMMY_FANTOM",
+  "glpManagers": [
+    {
+      "name": "GlpManager_V1",
+      "address": "0x304951d7172bCAdA54ccAC1E4674862b3d5b3d5b",
+      "startBlock": 51709998
+    }
+  ]
+}

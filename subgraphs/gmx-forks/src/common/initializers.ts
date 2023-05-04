@@ -6,8 +6,6 @@ import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { TokenInitialize, TokenPrice } from "../modules/token";
 import { Versions } from "../versions";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
-import { MlpManager } from "../../generated/MlpManager/MlpManager";
-import { readValue } from "./utils";
 import { Account } from "../sdk/protocols/perpfutures/account";
 
 export function initializeSDK(event: ethereum.Event): SDK {
@@ -25,45 +23,47 @@ export function initializeSDK(event: ethereum.Event): SDK {
     event.logIndex,
     event
   );
-  const sdk = new SDK(
+  // const sdk = new SDK(
+  //   protocolConfig,
+  //   tokenPricer,
+  //   tokenInitializer,
+  //   customEvent
+  // );
+  const sdk = SDK.initializeFromEvent(
     protocolConfig,
     tokenPricer,
     tokenInitializer,
-    customEvent
+    event
   );
 
   return sdk;
 }
 
-export function getOrCreatePool(event: ethereum.Event): Pool {
-  const sdk = initializeSDK(event);
-
+export function getOrCreatePool(event: ethereum.Event, sdk: SDK): Pool {
   const pool = sdk.Pools.loadPool(
-    Bytes.fromHexString(constants.POOL_ADDRESS.toHexString())
+    Bytes.fromHexString(constants.VAULT_ADDRESS.toHexString())
   );
   if (!pool.isInitialized) {
-    const mlpManagerContract = MlpManager.bind(constants.MLP_MANAGER_ADDRESS);
-    const mmyLpAddress = readValue(
-      mlpManagerContract.try_glp(),
-      constants.NULL.TYPE_ADDRESS
+    const outputToken = sdk.Tokens.getOrCreateToken(constants.MLP_ADDRESS);
+    pool.initialize(
+      constants.POOL_NAME,
+      constants.POOL_SYMBOL,
+      [],
+      outputToken
     );
-    const outputToken = sdk.Tokens.getOrCreateToken(mmyLpAddress);
-    pool.initialize("MMYVault", "VAULT", [], outputToken);
   }
   return pool;
 }
 
 export function getOrCreateAccount(
-  event: ethereum.Event,
-  accountAddress: Address
+  accountAddress: Address,
+  pool: Pool,
+  sdk: SDK
 ): Account {
-  const sdk = initializeSDK(event);
-
   const loadAccountResponse = sdk.Accounts.loadAccount(accountAddress);
-  const account = sdk.Accounts.loadAccount(accountAddress).account;
+  const account = loadAccountResponse.account;
   if (loadAccountResponse.isNewUser) {
     const protocol = sdk.Protocol;
-    const pool = getOrCreatePool(event);
     protocol.addUser();
     pool.addUser();
   }

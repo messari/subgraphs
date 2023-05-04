@@ -16,8 +16,8 @@ export function handleEsgmxToGlpChange(event: TokensPerIntervalChange): void {
 }
 
 function handleTokensPerIntervalChange(event: TokensPerIntervalChange): void {
-  const pool = getOrCreatePool(event);
   const sdk = initializeSDK(event);
+  const pool = getOrCreatePool(event, sdk);
 
   const rewardDistributorContract = RewardDistributor.bind(event.address);
   const tryRewardToken = rewardDistributorContract.try_rewardToken();

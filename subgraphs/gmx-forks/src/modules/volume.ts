@@ -1,7 +1,7 @@
 import { Address, BigDecimal, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
-import { initializeSDK } from "../common/initializers";
+import { SDK } from "../sdk/protocols/perpfutures";
 
 export function increasePoolVolume(
   event: ethereum.Event,
@@ -10,11 +10,10 @@ export function increasePoolVolume(
   collateralTokenAddress: Address,
   collateralTokenAmountDelta: BigInt,
   collateralUSDDelta: BigDecimal,
-  transactionType: TransactionType
+  transactionType: TransactionType,
+  sdk: SDK
 ): void {
-  const collateralToken = initializeSDK(event).Tokens.getOrCreateToken(
-    collateralTokenAddress
-  );
+  const collateralToken = sdk.Tokens.getOrCreateToken(collateralTokenAddress);
   if (transactionType == TransactionType.COLLATERAL_IN) {
     pool.addInflowVolumeByToken(collateralToken, collateralTokenAmountDelta);
   }
@@ -27,27 +26,6 @@ export function increasePoolVolume(
       collateralTokenAmountDelta
     );
   }
-  //     switch (transactionType) {
-  //       case TransactionType.COLLATERAL_IN:
-  //           pool.addInflowVolumeByToken(collateralToken, collateralTokenAmountDelta);
-  //       break;
-  //     case TransactionType.COLLATERAL_OUT:
-  //                pool.addOutflowVolumeByToken(
-  //                  collateralToken,
-  //                  collateralTokenAmountDelta
-  //                );
-
-  //       break;
-  //     case TransactionType.LIQUIDATE:
-  //       pool.addClosedInflowVolumeByToken(
-  //                  collateralToken,
-  //                  collateralTokenAmountDelta
-  //                );
-  //       break;
-
-  //     default:
-  //       break;
-  //   }
 
   pool.addVolumeByToken(collateralToken, collateralTokenAmountDelta);
 }

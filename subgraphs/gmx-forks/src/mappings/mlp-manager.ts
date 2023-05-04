@@ -19,9 +19,11 @@ export function handleAddLiquidity(event: AddLiquidityEvent): void {
   const mintAmount = event.params.mintAmount;
   const tokenAddress = event.params.token;
 
-  const pool = getOrCreatePool(event);
-  const account = getOrCreateAccount(event, accountAddress);
-  const token = initializeSDK(event).Tokens.getOrCreateToken(tokenAddress);
+  const sdk = initializeSDK(event);
+
+  const pool = getOrCreatePool(event, sdk);
+  const account = getOrCreateAccount(accountAddress, pool, sdk);
+  const token = sdk.Tokens.getOrCreateToken(tokenAddress);
 
   utils.checkAndUpdateInputTokens(pool, token, amount);
 
@@ -46,10 +48,11 @@ export function handleRemoveLiquidity(event: RemoveLiquidityEvent): void {
   const mlpSupply = event.params.glpSupply;
   const mintAmount = event.params.glpAmount;
   const tokenAddress = event.params.token;
+  const sdk = initializeSDK(event);
 
-  const pool = getOrCreatePool(event);
-  const account = getOrCreateAccount(event, accountAddress);
-  const token = initializeSDK(event).Tokens.getOrCreateToken(tokenAddress);
+  const pool = getOrCreatePool(event, sdk);
+  const account = getOrCreateAccount(accountAddress, pool, sdk);
+  const token = sdk.Tokens.getOrCreateToken(tokenAddress);
 
   utils.checkAndUpdateInputTokens(pool, token);
   const poolInputTokens = pool.getInputTokens();
