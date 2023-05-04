@@ -65,9 +65,6 @@ module.exports = {
       },
     ],
 
-    // Enforce for cleanliness
-    "@typescript-eslint/no-unused-vars": "error",
-
     // CUSTOM RULES, find them in subgraphs/_eslint-rules
     // -----------------------------------------------
 
