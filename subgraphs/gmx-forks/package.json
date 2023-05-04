@@ -5,12 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ shashwats22/mummy-finance",
-    "create-local": "graph create --node http://localhost:8020/ shashwats22/mummy-finance",
-    "remove-local": "graph remove --node http://localhost:8020/ shashwats22/mummy-finance",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 shashwats22/mummy-finance",
-    "test": "graph test",
-    "prepare:constants": "mustache protocols/mummyFinance/config/deployments/mummyFinance-fantom/configurations.json src/common/constants.mustache > src/common/constants.ts",
-    "prepare:yaml": "mustache protocols/mummyFinance/config/deployments/mummyFinance-fantom/configurations.json protocols/mummyFinance/config/templates/mummy.finance.template.yaml > subgraph.yaml"
+    "test": "graph test"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.40.0",
