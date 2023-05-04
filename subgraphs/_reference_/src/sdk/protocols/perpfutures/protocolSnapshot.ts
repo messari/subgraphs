@@ -19,7 +19,7 @@ import {
  * daily and hourly snapshots.
  *
  * Schema Version:  1.3.0
- * SDK Version:     1.1.1
+ * SDK Version:     1.1.2
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
@@ -40,10 +40,18 @@ export class ProtocolSnapshot {
     this.hourID = getUnixHours(event.block);
 
     this.dailyActivityHelper = initActivityHelper(
-      Bytes.fromUTF8("daily-".concat(this.dayID.toString()))
+      Bytes.fromUTF8(
+        constants.ActivityInterval.DAILY.concat("-").concat(
+          this.dayID.toString()
+        )
+      )
     );
     this.hourlyActivityHelper = initActivityHelper(
-      Bytes.fromUTF8("hourly-".concat(this.hourID.toString()))
+      Bytes.fromUTF8(
+        constants.ActivityInterval.HOURLY.concat("-").concat(
+          this.hourID.toString()
+        )
+      )
     );
 
     this.takeSnapshots();
@@ -253,7 +261,9 @@ export class ProtocolSnapshot {
 
   private takeUsageDailySnapshot(day: i32): void {
     const activity = initActivityHelper(
-      Bytes.fromUTF8("daily-".concat(day.toString()))
+      Bytes.fromUTF8(
+        constants.ActivityInterval.DAILY.concat("-").concat(day.toString())
+      )
     );
 
     const snapshot = new UsageMetricsDailySnapshot(Bytes.fromI32(day));
@@ -343,7 +353,9 @@ export class ProtocolSnapshot {
 
   private takeUsageHourlySnapshot(hour: i32): void {
     const activity = initActivityHelper(
-      Bytes.fromUTF8("hourly-".concat(hour.toString()))
+      Bytes.fromUTF8(
+        constants.ActivityInterval.HOURLY.concat("-").concat(hour.toString())
+      )
     );
     const snapshot = new UsageMetricsHourlySnapshot(Bytes.fromI32(hour));
 

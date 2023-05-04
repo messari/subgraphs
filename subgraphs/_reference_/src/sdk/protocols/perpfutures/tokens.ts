@@ -11,7 +11,7 @@ import { Token, RewardToken } from "../../../../generated/schema";
  * use in mappings and get info about the token.
  *
  * Schema Version:  1.3.0
- * SDK Version:     1.1.1
+ * SDK Version:     1.1.2
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan

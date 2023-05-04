@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { BigInt } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY } from "../constants";
 
