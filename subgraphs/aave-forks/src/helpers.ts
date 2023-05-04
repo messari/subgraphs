@@ -10,12 +10,18 @@ import { ProtocolData } from "./sdk/manager";
 import {
   Market,
   Token,
-  _AccountDebtBalance,
+  _BurnMintInterestRateType,
   _FlashLoanPremium,
   _MarketList,
 } from "../generated/schema";
-import { BIGINT_ZERO, BIGINT_ONE, BIGDECIMAL_ZERO } from "./constants";
+import {
+  BIGINT_ZERO,
+  BIGINT_ONE,
+  BIGDECIMAL_ZERO,
+  IavsTokenType,
+} from "./constants";
 import { AToken } from "../generated/LendingPool/AToken";
+import { InterestRateType } from "./sdk/constants";
 
 // returns the market based on any auxillary token
 // ie, outputToken, vToken, or sToken
@@ -130,21 +136,6 @@ export function getOrCreateFlashloanPremium(
   return flashloanPremium;
 }
 
-export function getOrCreateAccountDebtBalance(
-  market: Market,
-  account: Address
-): _AccountDebtBalance {
-  const id = account.concat(market.id);
-  let accountDebtBalance = _AccountDebtBalance.load(id);
-  if (!accountDebtBalance) {
-    accountDebtBalance = new _AccountDebtBalance(id);
-    accountDebtBalance.sTokenBalance = BIGINT_ZERO;
-    accountDebtBalance.vTokenBalance = BIGINT_ZERO;
-    accountDebtBalance.save();
-  }
-  return accountDebtBalance;
-}
-
 export function storePrePauseState(market: Market): void {
   market._prePauseState = [
     market.isActive,
@@ -197,4 +188,55 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
+
+export function getOrCreateBurnMintInterestRateType(
+  event: ethereum.Event,
+  tokenAddress: Address | null = null
+): _BurnMintInterestRateType {
+  const id = event.transaction.hash;
+  let entity = _BurnMintInterestRateType.load(id);
+  if (!entity) {
+    entity = new _BurnMintInterestRateType(id);
+    entity.interestRateTypes = [];
+    entity.save();
+  }
+
+  if (!tokenAddress) {
+    return entity;
+  }
+
+  // add the interestRateType of token to entity.interestRateTypes
+  const debtToken = Token.load(tokenAddress);
+  if (!debtToken) {
+    log.error(
+      "[getOrCreateBurnMintInterestRateType]debtToken with id {} not found tx {}-{}",
+      [
+        event.address.toHexString(),
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
+    );
+    return entity;
+  }
+
+  const interestRateTypes = entity.interestRateTypes
+    ? entity.interestRateTypes!
+    : [];
+  if (
+    debtToken._iavsTokenType == IavsTokenType.STOKEN &&
+    !interestRateTypes.includes(InterestRateType.STABLE)
+  ) {
+    interestRateTypes.push(InterestRateType.STABLE);
+  } else if (
+    debtToken._iavsTokenType == IavsTokenType.VTOKEN &&
+    !interestRateTypes.includes(InterestRateType.VARIABLE)
+  ) {
+    interestRateTypes.push(InterestRateType.VARIABLE);
+  }
+  interestRateTypes.sort();
+  entity.interestRateTypes = interestRateTypes;
+  entity.save();
+
+  return entity;
 }

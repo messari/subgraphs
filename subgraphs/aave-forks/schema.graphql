@@ -2075,12 +2075,10 @@ type _FlashLoanPremium @entity {
   premiumUSDToDeduct: BigDecimal!
 }
 
-# help entity to help identify interest rate type fo repay and liquidation
-type _AccountDebtBalance @entity {
-  " {account}{market} "
+# helper entity determining InterestRateType for burned/minted debtToken in a tx
+type _BurnMintInterestRateType @entity {
+  " {event.transaction.hash} "
   id: Bytes!
-  " vToken Address "
-  vTokenBalance: BigInt!
-  " sToken Address "
-  sTokenBalance: BigInt!
+  " InterestRateType: VARIABLE/STABLE in a list, a liquidation can burn both variable and stable debt tokens "
+  interestRateTypes: [String!]
 }

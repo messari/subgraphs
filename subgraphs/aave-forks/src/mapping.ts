@@ -48,7 +48,7 @@ import {
   rayToWad,
   getMarketFromToken,
   getOrCreateFlashloanPremium,
-  getOrCreateAccountDebtBalance,
+  getOrCreateBurnMintInterestRateType,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -754,11 +754,6 @@ export function _handleBorrow(
   const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
   const newBorrowBalances = getBorrowBalances(market, accountID);
 
-  const accountDebtBalance = getOrCreateAccountDebtBalance(market, accountID);
-  accountDebtBalance.sTokenBalance = newBorrowBalances[0];
-  accountDebtBalance.vTokenBalance = newBorrowBalances[1];
-  accountDebtBalance.save();
-
   manager.createBorrow(
     asset,
     accountID,
@@ -794,24 +789,20 @@ export function _handleRepay(
   const amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
   const newBorrowBalances = getBorrowBalances(market, accountID);
 
-  const accountDebtBalance = getOrCreateAccountDebtBalance(market, accountID);
-  let interestRateType: InterestRateType | null = null;
-
-  // since there may be interest accrued, the balance difference may not exactly
-  // equal repay amount. Here we check whether the balance goes down
-  if (
-    newBorrowBalances[0].minus(accountDebtBalance.sTokenBalance).lt(BIGINT_ZERO)
-  ) {
-    interestRateType = InterestRateType.STABLE;
-  } else if (
-    newBorrowBalances[1].minus(accountDebtBalance.vTokenBalance).lt(BIGINT_ZERO)
-  ) {
-    interestRateType = InterestRateType.VARIABLE;
+  // use debtToken Transfer event for Burn/Mint to determine interestRateType of the Repay event
+  // e.g. https://polygonscan.com/tx/0x29d7eb7599c35cd6435f29cad40189a4385044c3e56e4bc4fb6b7d34cab451db#eventlog (v2)
+  // Transfer(): 158; Repay(): 163
+  // https://optimistic.etherscan.io/tx/0x80d53af69fcaf1852a2bd43b81285e9b6113e5a52fdc74d68cac8828797c9bec#eventlog (v3)
+  // Transfer(): 0; Repay: 5
+  const burnMintInterestRateType = getOrCreateBurnMintInterestRateType(event);
+  const interestRateTypes = burnMintInterestRateType.interestRateTypes;
+  if (!interestRateTypes || interestRateTypes.length != 1) {
+    log.error(
+      "[_handleRepay]BurnMintInterestRateType entity not found for {}; cannot determine interestRateType for Repay event",
+      [event.transaction.hash.toHexString()]
+    );
+    return;
   }
-
-  accountDebtBalance.sTokenBalance = newBorrowBalances[0];
-  accountDebtBalance.vTokenBalance = newBorrowBalances[1];
-  accountDebtBalance.save();
 
   manager.createRepay(
     asset,
@@ -820,7 +811,7 @@ export function _handleRepay(
     amountUSD,
     newBorrowBalances[0].plus(newBorrowBalances[1]),
     market.inputTokenPriceUSD,
-    interestRateType
+    interestRateTypes[0]
   );
 }
 
@@ -932,38 +923,26 @@ export function _handleLiquidate(
   const liquidatedPositions = liquidate.positions;
   const liquidateeAccount = new AccountManager(liquidatee).getAccount();
   const protocol = manager.getOrCreateLendingProtocol(protocolData);
-  const accountDebtBalance = getOrCreateAccountDebtBalance(market, liquidatee);
+  // Use the Transfer event for debtToken to burn to determine the interestRateType for debtToken liquidated
+  // e.g. https://polygonscan.com/tx/0x2578371e35a1fa146aa34ea3936678c20091a08d55fd8cb46e0292fd95fe7f60#eventlog (v2)
+  // https://optimistic.etherscan.io/tx/0xea6110df93b6581cf47b7261b33d9a1ae5cc5cac3b55931a11b7843641780958#eventlog (v3)
 
-  // since there may be interest accrued, the balance difference may not exactly
-  // equal repay amount. Here we check whether the balance goes down
-  if (debtBalances[0].minus(accountDebtBalance.sTokenBalance).lt(BIGINT_ZERO)) {
-    const interestRateType = InterestRateType.STABLE;
-    const borrowerPosition = new PositionManager(
-      liquidateeAccount,
-      debtTokenMarket,
-      PositionSide.BORROWER,
-      interestRateType
+  const burnMintInterestRateType = getOrCreateBurnMintInterestRateType(event);
+  const interestRateTypes = burnMintInterestRateType.interestRateTypes;
+  if (
+    !interestRateTypes ||
+    interestRateTypes.length === 1 ||
+    interestRateTypes.length === 2
+  ) {
+    log.error(
+      "[_handleLiquidate]BurnMintInterestRateType entity not found for {}; cannot determine interestRateType for LiquidationCall event",
+      [event.transaction.hash.toHexString()]
     );
-
-    const sBorrowerPositionID = borrowerPosition.subtractPosition(
-      event,
-      protocol,
-      debtBalances[0],
-      TransactionType.LIQUIDATE,
-      debtTokenMarket.inputTokenPriceUSD
-    );
-    if (!sBorrowerPositionID) {
-      log.error(
-        "[_handleLiquidate] positionID is null for market {} account {}",
-        [debtTokenMarket.id.toHexString(), liquidatee.toHexString()]
-      );
-    } else {
-      liquidatedPositions.push(sBorrowerPositionID!);
-    }
+    return;
   }
 
-  if (debtBalances[1].minus(accountDebtBalance.vTokenBalance).lt(BIGINT_ZERO)) {
-    const interestRateType = InterestRateType.VARIABLE;
+  for (let i = 0; i < interestRateTypes.length; i++) {
+    const interestRateType = interestRateTypes[i];
     const borrowerPosition = new PositionManager(
       liquidateeAccount,
       debtTokenMarket,
@@ -971,29 +950,29 @@ export function _handleLiquidate(
       interestRateType
     );
 
-    const vBorrowerPositionID = borrowerPosition.subtractPosition(
+    const debtBalance =
+      interestRateType === InterestRateType.STABLE
+        ? debtBalances[0]
+        : debtBalances[1];
+    const borrowerPositionID = borrowerPosition.subtractPosition(
       event,
       protocol,
-      debtBalances[1],
+      debtBalance,
       TransactionType.LIQUIDATE,
       debtTokenMarket.inputTokenPriceUSD
     );
-    if (!vBorrowerPositionID) {
+    if (!borrowerPositionID) {
       log.error(
         "[_handleLiquidate] positionID is null for market {} account {}",
         [debtTokenMarket.id.toHexString(), liquidatee.toHexString()]
       );
     } else {
-      liquidatedPositions.push(vBorrowerPositionID!);
+      liquidatedPositions.push(borrowerPositionID!);
     }
   }
 
   liquidate.positions = liquidatedPositions;
   liquidate.save();
-
-  accountDebtBalance.sTokenBalance = debtBalances[0];
-  accountDebtBalance.vTokenBalance = debtBalances[1];
-  accountDebtBalance.save();
 }
 
 export function _handleFlashLoan(
@@ -1105,10 +1084,18 @@ export function _handleTransfer(
   // and zero addresses mean it is a part of a burn / mint
   if (
     to == Address.fromString(ZERO_ADDRESS) ||
-    from == Address.fromString(ZERO_ADDRESS) ||
-    to == asset ||
-    from == asset
+    from == Address.fromString(ZERO_ADDRESS)
   ) {
+    // save interest rate type for debtToken burned/minted
+    // used to determine the interestRateType for Repay/Liquidation event
+    if (positionSide == PositionSide.BORROWER) {
+      getOrCreateBurnMintInterestRateType(event, event.address);
+    }
+    return;
+  }
+
+  // deposit, withdraw, borrow, repay of AToken
+  if (to == asset || from == asset) {
     return;
   }
 
@@ -1273,6 +1260,7 @@ export function _handleSwapBorrowRateMode(
       market.inputTokenPriceUSD
     );
   } else {
+    //all open position converted to VARIABLE
     vPositionManager.addPosition(
       event,
       market.inputToken,
@@ -1289,9 +1277,4 @@ export function _handleSwapBorrowRateMode(
       market.inputTokenPriceUSD
     );
   }
-
-  const accountDebtBalance = getOrCreateAccountDebtBalance(market, user);
-  accountDebtBalance.sTokenBalance = stableTokenBalance;
-  accountDebtBalance.vTokenBalance = variableTokenBalance;
-  accountDebtBalance.save();
 }
