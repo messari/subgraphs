@@ -4069,54 +4069,6 @@
           }
         }
       },
-      "uniswap-v3-bsc": {
-        "network": "bsc",
-        "status": "prod",
-        "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.3.1",
-          "methodology": "1.0.0"
-        },
-        "files": {
-          "template": "uniswapV3Template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "uniswap-v3-bsc",
-            "query-id": "uniswap-v3-bsc"
-          }
-        }
-      },
-      "uniswap-v3-celo": {
-        "network": "celo",
-        "status": "prod",
-        "versions": {
-          "schema": "3.0.4",
-          "subgraph": "1.2.12",
-          "methodology": "1.0.0"
-        },
-        "files": {
-          "template": "uniswapV3Template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": true
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "uniswap-v3-celo",
-            "query-id": "uniswap-v3-celo"
-          },
-          "decentralized-network": {
-            "slug": "uniswap-v3-celo",
-            "query-id": "9nh6Ums63wFcoZpmegyPcAFtY3CAzQc3S6cuERALYMqa"
-          }
-        }
-      },
       "uniswap-v3-ethereum": {
         "network": "ethereum",
         "status": "prod",
@@ -4142,17 +4094,25 @@
             "query-id": "G3JZhmKKHC4mydRzD6kSz5fCWve5WDYYCyTFSJyv3SD5"
           }
         }
-      },
-      "uniswap-v3-optimism": {
-        "network": "optimism",
+      }
+    }
+  },
+  "nftx-v3": {
+    "schema": "dex-amm",
+    "base": "uniswap-v3-forks",
+    "protocol": "nftx-v3",
+    "project": "nftx",
+    "deployments": {
+      "nftx-v3-arbitrum": {
+        "network": "arbitrum",
         "status": "prod",
         "versions": {
           "schema": "3.0.4",
-          "subgraph": "1.3.1",
+          "subgraph": "1.3.7",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswapV3Template.yaml"
+          "template": "nftxV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -4160,21 +4120,21 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "uniswap-v3-optimism",
-            "query-id": "uniswap-v3-optimism"
+            "slug": "nftx-v3-arbitrum",
+            "query-id": "nftx-v3-arbitrum"
           }
         }
       },
-      "uniswap-v3-polygon": {
-        "network": "polygon",
+      "nftx-v3-ethereum": {
+        "network": "ethereum",
         "status": "prod",
         "versions": {
           "schema": "3.0.4",
-          "subgraph": "1.3.1",
+          "subgraph": "1.3.7",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswapV3Template.yaml"
+          "template": "nftxV3Template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -4182,8 +4142,30 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "uniswap-v3-polygon",
-            "query-id": "uniswap-v3-polygon"
+            "slug": "nftx-v3-ethereum",
+            "query-id": "nftx-v3-ethereum"
+          }
+        }
+      },
+      "nftx-v3-goerli": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "3.0.4",
+          "subgraph": "1.3.7",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "nftxV3Template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "nftx-v3-uniswap-goerli",
+            "query-id": "nftx-v3-uniswap-goerli"
           }
         }
       }

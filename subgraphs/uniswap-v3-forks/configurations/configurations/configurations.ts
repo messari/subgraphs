@@ -6,6 +6,9 @@ import { UniswapV3CeloConfigurations } from "../../protocols/uniswap-v3/config/d
 import { UniswapV3BSCConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-bsc/configurations";
 import { PancakeV3BSCConfigurations } from "../../protocols/pancakeswap-v3/config/deployments/pancakeswap-v3-bsc/configurations";
 import { PancakeV3EthereumConfigurations } from "../../protocols/pancakeswap-v3/config/deployments/pancakeswap-v3-ethereum/configurations";
+import { NftxV3MainnetConfigurations } from "../../protocols/nftx-v3/config/deployments/nftx-v3-ethereum/configurations";
+import { NftxV3GoerliConfigurations } from "../../protocols/nftx-v3/config/deployments/nftx-v3-goerli/configurations";
+import { NftxV3ArbitrumConfigurations } from "../../protocols/nftx-v3/config/deployments/nftx-v3-arbitrum/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -35,6 +38,15 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.PANCAKE_V3_ETHEREUM: {
       return new PancakeV3EthereumConfigurations();
+    }
+    case Deploy.NFTX_V3_GOERLI: {
+      return new NftxV3GoerliConfigurations();
+    }
+    case Deploy.NFTX_V3_MAINNET: {
+      return new NftxV3MainnetConfigurations();
+    }
+    case Deploy.NFTX_V3_ARBITRUM: {
+      return new NftxV3ArbitrumConfigurations();
     }
     default: {
       log.critical(
