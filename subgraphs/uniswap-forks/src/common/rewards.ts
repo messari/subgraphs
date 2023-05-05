@@ -264,6 +264,8 @@ function getStartingBlockRate(): BigDecimal {
 
   if (NetworkConfigs.getNetwork() == Network.MAINNET) {
     return BigDecimal.fromString("13.39");
+  } else if (NetworkConfigs.getNetwork() == Network.GOERLI) {
+    return BigDecimal.fromString("13.39");
   } else if (NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE) {
     return BigDecimal.fromString("15");
   } else if (NetworkConfigs.getNetwork() == Network.AURORA) {
