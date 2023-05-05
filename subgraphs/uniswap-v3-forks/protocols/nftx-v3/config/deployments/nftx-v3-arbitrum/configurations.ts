@@ -17,7 +17,7 @@ import { Configurations } from "../../../../../configurations/configurations/int
 import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/common/constants";
 import { stringToBytesList } from "../../../../../src/common/utils/utils";
 
-export class UniswapV3ArbitrumConfigurations implements Configurations {
+export class NftxV3ArbitrumConfigurations implements Configurations {
   getNetwork(): string {
     return Network.ARBITRUM_ONE;
   }
