@@ -5,7 +5,6 @@ import {
   BigDecimal,
   log,
 } from "@graphprotocol/graph-ts";
-
 import { SDK } from ".";
 import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
@@ -13,7 +12,6 @@ import { CustomEventType } from "../../util/events";
 import { ProtocolSnapshot } from "./protocolSnapshot";
 import { PositionType, TransactionType } from "./enums";
 import { ProtocolConfigurer, TokenPricer } from "../config";
-
 import { DerivPerpProtocol as PerpetualSchema } from "../../../../generated/schema";
 
 /**

@@ -1,6 +1,5 @@
-import { Versions } from "../../../../../../deployment/context/interface";
-
 import { ProtocolConfigurer } from "../config";
+import { Versions } from "../../../../../../deployment/context/interface";
 
 export class PerpetualConfig implements ProtocolConfigurer {
   id: string;

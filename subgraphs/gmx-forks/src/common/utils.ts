@@ -8,8 +8,8 @@ import {
 } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
 import { Vault } from "../../generated/Vault/Vault";
-import { Token as TokenSchema } from "../../generated/schema";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
+import { Token as TokenSchema } from "../../generated/schema";
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();

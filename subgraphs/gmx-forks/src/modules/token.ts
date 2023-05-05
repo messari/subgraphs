@@ -1,15 +1,15 @@
+import {
+  TokenInitializer,
+  TokenParams,
+} from "../sdk/protocols/perpfutures/tokens";
 import * as utils from "../common/utils";
 import { Token } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { TokenPricer } from "../sdk/protocols/config";
 import { _ERC20 } from "../../generated/MlpManager/_ERC20";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import {
-  TokenInitializer,
-  TokenParams,
-} from "../sdk/protocols/perpfutures/tokens";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { MlpManager } from "../../generated/MlpManager/MlpManager";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export class TokenInitialize implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {

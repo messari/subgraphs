@@ -1,22 +1,29 @@
-import { Address, Bytes, ethereum, BigInt } from "@graphprotocol/graph-ts";
-
 import {
   getOrCreateAccount,
   getOrCreatePool,
   initializeSDK,
 } from "../common/initializers";
-import * as constants from "../common/constants";
 import * as utils from "../common/utils";
-import { bigDecimalToBigInt, exponentToBigDecimal } from "../sdk/util/numbers";
+import { increasePoolVolume } from "./volume";
+import * as constants from "../common/constants";
+import { Vault } from "../../generated/Vault/Vault";
+import { updatePoolOpenInterestUSD } from "./interest";
+import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { Account } from "../sdk/protocols/perpfutures/account";
 import { Position } from "../sdk/protocols/perpfutures/position";
-import { Pool } from "../sdk/protocols/perpfutures/pool";
-import { Vault } from "../../generated/Vault/Vault";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
-import { increasePoolVolume } from "./volume";
-import { updatePoolOpenInterestUSD } from "./interest";
+import {
+  Address,
+  Bytes,
+  ethereum,
+  BigInt,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
+import { bigDecimalToBigInt, exponentToBigDecimal } from "../sdk/util/numbers";
+import { SDK } from "../sdk/protocols/perpfutures";
+import { Token, _PositionMap } from "../../generated/schema";
 
-export function handleUpdatePositionEvent(
+export function updatePosition(
   event: ethereum.Event,
   positionKey: Bytes,
   accountAddress: Address,
@@ -71,14 +78,14 @@ export function handleUpdatePositionEvent(
   }
 
   const position = updateUserPosition(
-    event,
     positionKey,
     account,
     pool,
     collateralTokenAddress,
     indexTokenAddress,
     positionSide,
-    transactionType
+    transactionType,
+    sdk
   );
 
   pool.addUsdPremium(
@@ -87,12 +94,9 @@ export function handleUpdatePositionEvent(
   );
 
   increasePoolVolume(
-    event,
     pool,
-    sizeUSDDelta,
     collateralTokenAddress,
     collateralTokenAmountDelta,
-    collateralUSDDelta,
     transactionType,
     sdk
   );
@@ -160,16 +164,15 @@ export function handleUpdatePositionEvent(
 }
 
 export function updateUserPosition(
-  event: ethereum.Event,
   positionKey: Bytes,
   account: Account,
   pool: Pool,
   collateralTokenAddress: Address,
   indexTokenAddress: Address,
   positionSide: string,
-  transactionType: TransactionType
+  transactionType: TransactionType,
+  sdk: SDK
 ): Position {
-  const sdk = initializeSDK(event);
   const indexToken = sdk.Tokens.getOrCreateToken(indexTokenAddress);
   const collateralToken = sdk.Tokens.getOrCreateToken(collateralTokenAddress);
   const position = sdk.Positions.loadPosition(
@@ -179,6 +182,15 @@ export function updateUserPosition(
     collateralToken,
     positionSide
   );
+  createPositionMap(
+    positionKey,
+    Address.fromBytes(account.getBytesId()),
+    pool,
+    collateralToken,
+    indexToken,
+    positionSide
+  );
+
   if (transactionType == TransactionType.COLLATERAL_IN) {
     position.addCollateralInCount();
   }
@@ -255,4 +267,53 @@ export function updateUserPosition(
   }
 
   return position;
+}
+
+export function updatePositionRealisedPnlUSD(
+  positionKey: Bytes,
+  realisedPnlUSD: BigDecimal,
+  pool: Pool,
+  sdk: SDK
+): void {
+  const positionMap = _PositionMap.load(positionKey);
+  if (!positionMap) {
+    return;
+  }
+  const account = getOrCreateAccount(
+    Address.fromString(positionMap!.account),
+    pool,
+    sdk
+  );
+  const asset = sdk.Tokens.getOrCreateTokenFromBytes(positionMap!.asset);
+  const collateral = sdk.Tokens.getOrCreateTokenFromBytes(
+    positionMap!.collateral
+  );
+
+  const position = sdk.Positions.loadPosition(
+    pool,
+    account,
+    asset,
+    collateral,
+    positionMap!.positionSide
+  );
+  position.setRealisedPnlUsd(realisedPnlUSD);
+}
+
+export function createPositionMap(
+  positionKey: Bytes,
+  account: Address,
+  pool: Pool,
+  collateralToken: Token,
+  indexToken: Token,
+  positionSide: string
+): _PositionMap {
+  const positionMap = new _PositionMap(positionKey);
+  positionMap.account = account.toHexString();
+  positionMap.pool = pool.getBytesID();
+  positionMap.asset = indexToken.id;
+  positionMap.collateral = collateralToken.id;
+  positionMap.positionSide = positionSide;
+  positionMap.save();
+
+  return positionMap;
 }

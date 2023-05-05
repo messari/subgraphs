@@ -1941,3 +1941,19 @@ type _PositionCounter @entity {
   " Next count "
   nextCount: Int!
 }
+
+# Helper entity to map position key to position id
+type _PositionMap @entity {
+  " Position Key "
+  id: Bytes!
+
+  pool: Bytes!
+
+  account: String!
+
+  asset: Bytes!
+
+  collateral: Bytes!
+
+  positionSide: String!
+}

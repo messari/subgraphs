@@ -1,17 +1,15 @@
-import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-
-import { Pool } from "./pool";
-import { Account } from "./account";
-import { Perpetual } from "./protocol";
-import { TokenManager } from "./tokens";
-import * as constants from "../../util/constants";
-
 import {
   Token,
   PositionSnapshot,
   _PositionCounter,
   Position as PositionSchema,
 } from "../../../../generated/schema";
+import { Pool } from "./pool";
+import { Account } from "./account";
+import { Perpetual } from "./protocol";
+import { TokenManager } from "./tokens";
+import * as constants from "../../util/constants";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 /**
  * This file contains the Position class, which is used to
@@ -239,6 +237,15 @@ export class Position {
     this.position.realisedPnlUSD = this.protocol
       .getTokenPricer()
       .getAmountValueUSD(token, amount);
+    this.save();
+  }
+  /**
+   * Sets the position's realisedPnlUSD value.
+   * @param token
+   * @param amount
+   */
+  setRealisedPnlUsd(amount: BigDecimal): void {
+    this.position.realisedPnlUSD = amount;
     this.save();
   }
 

@@ -1,3 +1,4 @@
+import { getOrCreatePool, initializeSDK } from "../common/initializers";
 import {
   ClosePosition as ClosePositionEvent,
   CollectMarginFees as CollectMarginFeesEvent,
@@ -10,83 +11,58 @@ import {
   Swap as SwapEvent,
   UpdateFundingRate as UpdateFundingRateEvent,
 } from "../../generated/Vault/Vault";
+import { swap } from "../modules/swap";
 import * as utils from "../common/utils";
+import { log } from "@graphprotocol/graph-ts";
+import { collectFees } from "../modules/fees";
 import * as constants from "../common/constants";
 import {
-  getOrCreateAccount,
-  getOrCreatePool,
-  initializeSDK,
-} from "../common/initializers";
-import { Address } from "@graphprotocol/graph-ts";
-import { handleUpdatePositionEvent } from "../modules/position";
+  updatePosition,
+  updatePositionRealisedPnlUSD,
+} from "../modules/position";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
+import { increasePoolVolume } from "../modules/volume";
 
 export function handleClosePosition(event: ClosePositionEvent): void {
-  //  const realisedPnlUSD = utils.bigIntToBigDecimal(event.params.realisedPnl,constants.PRICE_PRECISION_DECIMALS);
-  //   updatePositionRealisedPnlUSD(event.params.key, realisedPnlUSD);
-  //  if (event.params.realisedPnl < constants.BIGINT_ZERO) {
-  //    const pool = getOrCreatePool(event);
-  //    increasePoolVolume(
-  //      event,
-  //      pool,
-  //      constants.BIGDECIMAL_ZERO,
-  //      null,
-  //      BIGINT_ZERO,
-  //      BIGINT_NEGONE.toBigDecimal().times(realisedPnlUSD),
-  //      EventType.ClosePosition
-  //    );
-  //  }
+  const sdk = initializeSDK(event);
+  const realisedPnlUSD = utils.bigIntToBigDecimal(
+    event.params.realisedPnl,
+    constants.PRICE_PRECISION_DECIMALS
+  );
+  const pool = getOrCreatePool(event, sdk);
+  updatePositionRealisedPnlUSD(event.params.key, realisedPnlUSD, pool, sdk);
+  if (event.params.realisedPnl < constants.BIGINT_ZERO) {
+    increasePoolVolume(
+      pool,
+
+      constants.NULL.TYPE_ADDRESS,
+      constants.BIGINT_ZERO,
+      TransactionType.LIQUIDATE,
+      sdk
+    );
+  }
 }
 
 export function handleCollectMarginFees(event: CollectMarginFeesEvent): void {
-  const feeUsd = event.params.feeUsd;
-  const sdk = initializeSDK(event);
-  const totalFee = utils.bigIntToBigDecimal(
-    feeUsd,
-    constants.PRICE_PRECISION_DECIMALS
-  );
-  const pool = getOrCreatePool(event, sdk);
-  pool.addRevenueUSD(
-    totalFee.times(constants.PROTOCOL_SIDE_REVENUE_PERCENT),
-    totalFee.times(
-      constants.BIGDECIMAL_ONE.minus(
-        constants.PROTOCOL_SIDE_REVENUE_PERCENT
-      ).minus(constants.STAKE_SIDE_REVENUE_PERCENT)
-    )
-  );
-  sdk.Protocol.addStakeSideRevenueUSD(
-    totalFee.times(constants.STAKE_SIDE_REVENUE_PERCENT)
-  );
+  collectFees(event, event.params.feeUsd);
 }
 
 export function handleCollectSwapFees(event: CollectSwapFeesEvent): void {
-  const feeUsd = event.params.feeUsd;
-  const sdk = initializeSDK(event);
-  const totalFee = utils.bigIntToBigDecimal(
-    feeUsd,
-    constants.PRICE_PRECISION_DECIMALS
-  );
-  const pool = getOrCreatePool(event, sdk);
-  pool.addRevenueUSD(
-    totalFee.times(constants.PROTOCOL_SIDE_REVENUE_PERCENT),
-    totalFee.times(
-      constants.BIGDECIMAL_ONE.minus(
-        constants.PROTOCOL_SIDE_REVENUE_PERCENT
-      ).minus(constants.STAKE_SIDE_REVENUE_PERCENT)
-    )
-  );
-  sdk.Protocol.addStakeSideRevenueUSD(
-    totalFee.times(constants.STAKE_SIDE_REVENUE_PERCENT)
-  );
+  collectFees(event, event.params.feeUsd);
 }
 
 export function handleIncreasePoolAmount(event: IncreasePoolAmountEvent): void {
   const amount = event.params.amount;
   const tokenAddress = event.params.token;
+  log.warning("[handleIncreasePoolAmount] amount {} token {} ", [
+    amount.toString(),
+    tokenAddress.toHexString(),
+  ]);
   const sdk = initializeSDK(event);
 
   const pool = getOrCreatePool(event, sdk);
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
+
   utils.checkAndUpdateInputTokens(pool, token, amount);
   const inputTokens = pool.getInputTokens();
   const inputTokenIndex = inputTokens.indexOf(token.id);
@@ -113,7 +89,7 @@ export function handleDecreasePoolAmount(event: DecreasePoolAmountEvent): void {
 }
 
 export function handleDecreasePosition(event: DecreasePositionEvent): void {
-  handleUpdatePositionEvent(
+  updatePosition(
     event,
     event.params.key,
     event.params.account,
@@ -130,7 +106,7 @@ export function handleDecreasePosition(event: DecreasePositionEvent): void {
 }
 
 export function handleIncreasePosition(event: IncreasePositionEvent): void {
-  handleUpdatePositionEvent(
+  updatePosition(
     event,
     event.params.key,
     event.params.account,
@@ -147,7 +123,7 @@ export function handleIncreasePosition(event: IncreasePositionEvent): void {
 }
 
 export function handleLiquidatePosition(event: LiquidatePositionEvent): void {
-  handleUpdatePositionEvent(
+  updatePosition(
     event,
     event.params.key,
     event.params.account,
@@ -164,31 +140,23 @@ export function handleLiquidatePosition(event: LiquidatePositionEvent): void {
 }
 
 export function handleSwap(event: SwapEvent): void {
-  const tokenInAddress = event.params.tokenIn;
-  const tokenOutAddress = event.params.tokenOut;
-  const amountIn = event.params.amountIn;
-  const amountOut = event.params.amountOutAfterFees;
-  const accountAddres = event.params.account;
-  const sdk = initializeSDK(event);
-
-  const pool = getOrCreatePool(event, sdk);
-  const account = getOrCreateAccount(accountAddres, pool, sdk);
-
-  account.swap(
-    pool,
-    tokenInAddress,
-    amountIn,
-    tokenOutAddress,
-    amountOut,
-    Address.fromBytes(pool.getBytesID()),
-    true
+  swap(
+    event,
+    event.params.account,
+    event.params.tokenIn,
+    event.params.amountIn,
+    event.params.tokenOut,
+    event.params.amountOutAfterFees
   );
 }
 
 export function handleUpdateFundingRate(event: UpdateFundingRateEvent): void {
-  // const tokenAddress = event.params.token;
-  // const fundingrate = event.params.fundingRate;
-  // const sdk = initializeSDK(event);
+  const tokenAddress = event.params.token;
+  const fundingrate = event.params.fundingRate;
+  const sdk = initializeSDK(event);
+  // const pool = sdk.Pools.loadPool(
+  //   Bytes.fromHexString(constants.VAULT_ADDRESS.toHexString())
+  // );
   // const pool = getOrCreatePool(event, sdk);
   // const token = sdk.Tokens.getOrCreateToken(tokenAddress);
   // utils.checkAndUpdateInputTokens(pool, token);

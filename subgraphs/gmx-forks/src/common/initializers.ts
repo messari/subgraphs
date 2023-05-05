@@ -1,12 +1,11 @@
-import { ProtocolConfig } from "../sdk/protocols/config";
-import { SDK } from "../sdk/protocols/perpfutures";
-import { CustomEventType } from "../sdk/util/events";
-import * as constants from "../common/constants";
-import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { TokenInitialize, TokenPrice } from "../modules/token";
 import { Versions } from "../versions";
+import * as constants from "../common/constants";
+import { SDK } from "../sdk/protocols/perpfutures";
+import { ProtocolConfig } from "../sdk/protocols/config";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
+import { TokenInitialize, TokenPrice } from "../modules/token";
 import { Account } from "../sdk/protocols/perpfutures/account";
+import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
 export function initializeSDK(event: ethereum.Event): SDK {
   const protocolConfig = new ProtocolConfig(
@@ -17,18 +16,7 @@ export function initializeSDK(event: ethereum.Event): SDK {
   );
   const tokenPricer = new TokenPrice();
   const tokenInitializer = new TokenInitialize();
-  const customEvent = CustomEventType.initialize(
-    event.block,
-    event.transaction,
-    event.logIndex,
-    event
-  );
-  // const sdk = new SDK(
-  //   protocolConfig,
-  //   tokenPricer,
-  //   tokenInitializer,
-  //   customEvent
-  // );
+
   const sdk = SDK.initializeFromEvent(
     protocolConfig,
     tokenPricer,

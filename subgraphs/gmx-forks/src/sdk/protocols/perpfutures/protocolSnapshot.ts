@@ -1,10 +1,3 @@
-import { BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-
-import { TransactionType } from "./enums";
-import { AccountWasActive } from "./account";
-import * as constants from "../../util/constants";
-import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
-
 import {
   _ActivityHelper,
   FinancialsDailySnapshot,
@@ -12,6 +5,11 @@ import {
   UsageMetricsHourlySnapshot,
   DerivPerpProtocol as PerpetualSchema,
 } from "../../../../generated/schema";
+import { TransactionType } from "./enums";
+import { AccountWasActive } from "./account";
+import * as constants from "../../util/constants";
+import { BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 /**
  * This file contains the ProtocolSnapshot, which is used to

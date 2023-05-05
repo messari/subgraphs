@@ -1,15 +1,13 @@
-import { Address, BigDecimal, ethereum, BigInt } from "@graphprotocol/graph-ts";
-import { TransactionType } from "../sdk/protocols/perpfutures/enums";
-import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { SDK } from "../sdk/protocols/perpfutures";
+import { Pool } from "../sdk/protocols/perpfutures/pool";
+import { TransactionType } from "../sdk/protocols/perpfutures/enums";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 export function increasePoolVolume(
-  event: ethereum.Event,
   pool: Pool,
-  sizeUSDDelta: BigDecimal,
+
   collateralTokenAddress: Address,
   collateralTokenAmountDelta: BigInt,
-  collateralUSDDelta: BigDecimal,
   transactionType: TransactionType,
   sdk: SDK
 ): void {

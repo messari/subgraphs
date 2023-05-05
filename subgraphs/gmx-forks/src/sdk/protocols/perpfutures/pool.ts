@@ -1,22 +1,24 @@
-import { Bytes, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-
 import {
   sortBytesArray,
   updateArrayAtIndex,
   sortArrayByReference,
 } from "../../util/arrays";
-import { PositionType, TransactionType } from "./enums";
-import { Perpetual } from "./protocol";
-import { TokenManager } from "./tokens";
-import { PoolSnapshot } from "./poolSnapshot";
-import * as constants from "../../util/constants";
-import { exponentToBigDecimal, poolArraySort } from "../../util/numbers";
-
 import {
   LiquidityPoolFee,
   Token as TokenSchema,
   LiquidityPool as LiquidityPoolSchema,
 } from "../../../../generated/schema";
+import { Perpetual } from "./protocol";
+import { TokenManager } from "./tokens";
+import { PoolSnapshot } from "./poolSnapshot";
+import * as constants from "../../util/constants";
+import { PositionType, TransactionType } from "./enums";
+import { Bytes, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  exponentToBigDecimal,
+  poolArraySort,
+  safeDivide,
+} from "../../util/numbers";
 
 /**
  * This file contains the PoolManager, which is used to
@@ -262,9 +264,9 @@ export class Pool {
    */
   refreshTotalValueLocked(): void {
     let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-
     for (let idx = 0; idx < this.pool.inputTokens.length; idx++) {
       const inputTokenBalance = this.pool.inputTokenBalances[idx];
+
       const inputToken = this.tokens.getOrCreateTokenFromBytes(
         this.pool.inputTokens[idx]
       );
@@ -277,6 +279,7 @@ export class Pool {
     }
 
     this.setTotalValueLocked(totalValueLockedUSD);
+
     this.refreshInputTokenWeights();
   }
 
@@ -641,11 +644,15 @@ export class Pool {
         inputToken,
         inputTokenBalance
       );
+      log.warning("[refreshInputTokenWeights] inputTokenTVL {} poolTVL {}", [
+        inputTokenTVL.toString(),
+        this.pool.totalValueLockedUSD.toString(),
+      ]);
 
       inputTokenWeights.push(
-        inputTokenTVL
-          .div(this.pool.totalValueLockedUSD)
-          .times(constants.BIGDECIMAL_HUNDRED)
+        safeDivide(inputTokenTVL, this.pool.totalValueLockedUSD).times(
+          constants.BIGDECIMAL_HUNDRED
+        )
       );
     }
 

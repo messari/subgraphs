@@ -1,11 +1,11 @@
-import { BigInt } from "@graphprotocol/graph-ts";
 import {
   TokensPerIntervalChange,
   RewardDistributor,
 } from "../../generated/FeeGlpRewardDistributor/RewardDistributor";
-import { getOrCreatePool, initializeSDK } from "../common/initializers";
-import { RewardTokenType } from "../sdk/util/constants";
+import { BigInt } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
+import { RewardTokenType } from "../sdk/util/constants";
+import { getOrCreatePool, initializeSDK } from "../common/initializers";
 
 export function handleEthToGlpChange(event: TokensPerIntervalChange): void {
   handleTokensPerIntervalChange(event);

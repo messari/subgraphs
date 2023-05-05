@@ -1,15 +1,13 @@
-import { BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-
-import { subtractArrays } from "../../util/arrays";
-import * as constants from "../../util/constants";
-import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
-import { initActivityHelper } from "./protocolSnapshot";
-
 import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
   LiquidityPool as PoolSchema,
 } from "../../../../generated/schema";
+import { subtractArrays } from "../../util/arrays";
+import * as constants from "../../util/constants";
+import { initActivityHelper } from "./protocolSnapshot";
+import { BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 /**
  * This file contains the PoolSnapshot, which is used to

@@ -1,8 +1,6 @@
-import { Address, Bytes, log } from "@graphprotocol/graph-ts";
-
 import { Perpetual } from "./protocol";
 import * as constants from "../../util/constants";
-
+import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { Token, RewardToken } from "../../../../generated/schema";
 
 /**
