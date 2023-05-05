@@ -11,7 +11,7 @@ export const schema = (version: string): string => {
     case Versions.Schema200:
       return schema200();
     case Versions.Schema300:
-      return schema303();
+      return schema300();
     default:
       return schema130();
   }
@@ -55,7 +55,7 @@ export const schema200 = (): string => {
     }`;
 };
 
-export const schema303 = (): string => {
+export const schema300 = (): string => {
   return `
     query Data($skipAmt: Int!) {
       liquidityPools(first: 10, skip: $skipAmt, orderBy: totalValueLockedUSD, orderDirection: desc) {
