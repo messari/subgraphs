@@ -170,6 +170,7 @@ export const blockExplorers: Record<string, string> = {
   BSC: "https://bscscan.com/",
   FANTOM: "https://ftmscan.com/",
   MAINNET: "https://etherscan.io/",
+  GOERLI: "https://goerli.etherscan.io",
   MATIC: "https://polygonscan.com/",
   MOONRIVER: "https://moonriver.moonscan.io/",
   OPTIMISM: "https://optimistic.etherscan.io/",
