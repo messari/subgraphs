@@ -98,7 +98,7 @@ function AllDataTabs({
   setProtocolId,
   paginate,
   setOverlayDeploymentClient,
-  setOverlayDeploymentURL
+  setOverlayDeploymentURL,
 }: AllDataTabsProps) {
   const [pendingSubgraphData, setPendingSubgraphData] = useState<any>({});
   const [pendingQuery, setPendingQuery] = useState<any>(null);
@@ -107,7 +107,11 @@ function AllDataTabs({
     try {
       if (subgraphEndpoints) {
         if (subgraphEndpoints[schemaMapping[data.protocols[0]?.type]]) {
-          setPendingQuery(getPendingSubgraphsOnProtocolQuery(subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0]?.slug]));
+          setPendingQuery(
+            getPendingSubgraphsOnProtocolQuery(
+              subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0]?.slug],
+            ),
+          );
         }
       }
     } catch (err: any) {
@@ -162,27 +166,37 @@ function AllDataTabs({
   let showDropDown = false;
   let failedToLoad = false;
   try {
-    if (tabValue + "" === "1" &&
+    if (
+      tabValue + "" === "1" &&
       (protocolTimeseriesData.financialsDailySnapshots || protocolTimeseriesError.financialsDailySnapshots) &&
       (protocolTimeseriesData.usageMetricsDailySnapshots || protocolTimeseriesError.usageMetricDailySnapshots) &&
-      (protocolTimeseriesData.usageMetricsHourlySnapshots || protocolTimeseriesError.usageMetricsHourlySnapshots)) {
-      if ((overlayDeploymentURL &&
-        overlayProtocolTimeseriesData.financialsDailySnapshots?.length > 0 &&
-        overlayProtocolTimeseriesData.usageMetricsDailySnapshots?.length > 0 &&
-        overlayProtocolTimeseriesData.usageMetricsHourlySnapshots?.length > 0) || !overlayDeploymentURL) {
+      (protocolTimeseriesData.usageMetricsHourlySnapshots || protocolTimeseriesError.usageMetricsHourlySnapshots)
+    ) {
+      if (
+        (overlayDeploymentURL &&
+          overlayProtocolTimeseriesData.financialsDailySnapshots?.length > 0 &&
+          overlayProtocolTimeseriesData.usageMetricsDailySnapshots?.length > 0 &&
+          overlayProtocolTimeseriesData.usageMetricsHourlySnapshots?.length > 0) ||
+        !overlayDeploymentURL
+      ) {
         showDropDown = true;
       }
-      if ((!protocolTimeseriesData.financialsDailySnapshots &&
-        !protocolTimeseriesData.usageMetricsDailySnapshots &&
-        !protocolTimeseriesData.usageMetricsHourlySnapshots) ||
+      if (
+        (!protocolTimeseriesData.financialsDailySnapshots &&
+          !protocolTimeseriesData.usageMetricsDailySnapshots &&
+          !protocolTimeseriesData.usageMetricsHourlySnapshots) ||
         (overlayDeploymentURL &&
           !overlayProtocolTimeseriesData?.financialsDailySnapshots &&
           !overlayProtocolTimeseriesData?.usageMetricsDailySnapshots &&
-          !overlayProtocolTimeseriesData?.usageMetricsHourlySnapshots)) {
+          !overlayProtocolTimeseriesData?.usageMetricsHourlySnapshots)
+      ) {
         failedToLoad = true;
       }
     } else if (tabValue + "" === "3" && poolTimeseriesRequest.poolTimeseriesData) {
-      if (Object.values(poolTimeseriesRequest.poolTimeseriesData).filter((x: any) => x?.length > 0)?.length === Object.values(poolTimeseriesRequest.poolTimeseriesData).length) {
+      if (
+        Object.values(poolTimeseriesRequest.poolTimeseriesData).filter((x: any) => x?.length > 0)?.length ===
+        Object.values(poolTimeseriesRequest.poolTimeseriesData).length
+      ) {
         showDropDown = true;
       } else if (poolTimeseriesRequest.poolTimeseriesError) {
         failedToLoad = true;
@@ -202,13 +216,15 @@ function AllDataTabs({
 
   let pendingCalls = null;
   if (pendingQuery) {
-    pendingCalls = <PendingCalls query={pendingQuery} setPendingSubgraphData={setPendingSubgraphData} />
+    pendingCalls = <PendingCalls query={pendingQuery} setPendingSubgraphData={setPendingSubgraphData} />;
   }
 
   return (
     <>
       <TabContext value={tabValue}>
-        <div style={{ display: "flex", backgroundColor: "#292f38", justifyContent: "space-between", alignItems: "center" }}>
+        <div
+          style={{ display: "flex", backgroundColor: "#292f38", justifyContent: "space-between", alignItems: "center" }}
+        >
           <StyledTabs value={tabValue} onChange={handleTabChange}>
             <Tab label="Protocol" value="1" />
             <Tab label="Pool Overview" value="2" />
@@ -227,7 +243,8 @@ function AllDataTabs({
             decentralizedDeployments={decentralizedDeployments}
             currentDeploymentURL={overlayDeploymentURL}
             showDropDown={showDropDown}
-            failedToLoad={failedToLoad} />
+            failedToLoad={failedToLoad}
+          />
         </div>
         {protocolDropDown}
         <TabPanel value="1">

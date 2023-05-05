@@ -55,7 +55,6 @@ export const schema200 = (): string => {
     }`;
 };
 
-
 export const schema303 = (): string => {
   return `
     query Data($skipAmt: Int!) {

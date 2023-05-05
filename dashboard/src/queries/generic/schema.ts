@@ -130,7 +130,7 @@ export const schema120 = (): Schema => {
     cumulativeUniqueUsers: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const protocolTableQuery = `
     query Data($protocolId: String) {
@@ -348,7 +348,7 @@ export const schema130 = (): Schema => {
     protocolControlledValueUSD: "BigDecimal",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   // Query pool(pool) entity and events entities
   let events: string[] = [];

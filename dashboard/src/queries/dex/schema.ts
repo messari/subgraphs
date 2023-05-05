@@ -169,7 +169,7 @@ export const schema130 = (): Schema => {
     protocolControlledValueUSD: "BigDecimal",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
     query Data {
@@ -297,7 +297,6 @@ export const schema130 = (): Schema => {
       rewardTokenEmissionsUSD
     }
   }`;
-
 
   return {
     entities,
@@ -461,7 +460,7 @@ export const schema200 = (): Schema => {
     protocolControlledValueUSD: "BigDecimal",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
     query Data {
@@ -482,7 +481,6 @@ export const schema200 = (): Schema => {
         ${protocolQueryFields}
       }
     }`;
-
 
   const positionsQuery = `
     positions(first: 1000) {
@@ -623,7 +621,6 @@ export const schema200 = (): Schema => {
     }
   }`;
 
-
   return {
     entities,
     entitiesData,
@@ -637,11 +634,9 @@ export const schema200 = (): Schema => {
     hourlyUsageQuery,
     dailyUsageQuery,
     poolTimeseriesQuery,
-    positionsQuery
+    positionsQuery,
   };
 };
-
-
 
 export const schema303 = (): Schema => {
   const entities = [
@@ -815,8 +810,7 @@ export const schema303 = (): Schema => {
     if (event === "swaps") {
       fields += ", hash, amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}";
     } else {
-      fields +=
-        ", hash, position{id} amountUSD, inputTokens{id, decimals}, inputTokenAmounts";
+      fields += ", hash, position{id} amountUSD, inputTokens{id, decimals}, inputTokenAmounts";
     }
 
     return baseStr + fields + " }";
@@ -862,7 +856,7 @@ export const schema303 = (): Schema => {
     cumulativePositionCount: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const protocolTableQuery = `
     query Data($protocolId: String) {
@@ -947,7 +941,7 @@ export const schema303 = (): Schema => {
     lastSnapshotDayID: "Int!",
     lastSnapshotHourID: "Int!",
     lastUpdateTimestamp: "BigInt!",
-    lastUpdateBlockNumber: "BigInt!"
+    lastUpdateBlockNumber: "BigInt!",
   };
 
   const poolTimeseriesQuery = `
@@ -1048,7 +1042,6 @@ export const schema303 = (): Schema => {
     }
   }`;
 
-
   return {
     entities,
     entitiesData,
@@ -1062,6 +1055,6 @@ export const schema303 = (): Schema => {
     hourlyUsageQuery,
     dailyUsageQuery,
     poolTimeseriesQuery,
-    positionsQuery
+    positionsQuery,
   };
 };
