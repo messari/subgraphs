@@ -38,6 +38,7 @@ export namespace Network {
   export const DFK = "DFK";
   export const DOGECHAIN = "DOGECHAIN";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
+  export const GOERLI = "GOERLI"; // Ethereum mainnet
   export const ETH_POW = "ETH_POW";
   export const ETHEREUM_CLASSIC = "ETHEREUM_CLASSIC";
   export const EVMOS = "EVMOS";
@@ -193,6 +194,7 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 
 export const NetworkByID = new TypedMap<string, string>();
 NetworkByID.set("1", Network.MAINNET);
+NetworkByID.set("5", Network.GOERLI);
 NetworkByID.set("10", Network.OPTIMISM);
 NetworkByID.set("24", Network.KARDIA);
 NetworkByID.set("25", Network.CRONOS);

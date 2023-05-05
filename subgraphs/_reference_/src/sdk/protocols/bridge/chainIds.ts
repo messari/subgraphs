@@ -26,6 +26,7 @@ function setChainID(chainID: u64, network: Network): void {
 export const chainIDs = new TypedMap<u64, Network>();
 export const reverseChainIDs = new TypedMap<Network, BigInt>();
 setChainID(1, Network.MAINNET);
+setChainID(5, Network.GOERLI);
 setChainID(8, Network.UBIQ);
 setChainID(10, Network.OPTIMISM);
 setChainID(19, Network.SONGBIRD);

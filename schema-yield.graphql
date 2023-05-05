@@ -13,6 +13,7 @@ enum Network {
   COSMOS
   CRONOS
   MAINNET # Ethereum Mainnet
+  GOERLI
   FANTOM
   FUSE
   HARMONY
