@@ -15,6 +15,7 @@ export namespace Network {
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
+  export const GOERLI = "GOERLI";
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
