@@ -63,34 +63,40 @@ function ProtocolTabEntity({
   const [csvMetaData, setCsvMetaData] = useState<any>({ fileName: "", columnName: "", csvError: null });
 
   // dataFields object has corresponding key:value pairs. Key is the field name and value is an array with an object holding the coordinates to be plotted on the chart for that entity field.
-  const [dataFieldsState, setDataFieldsState] = useState<{ [data: string]: { [dataField: string]: { date: number; value: number }[] } }>({});
+  const [dataFieldsState, setDataFieldsState] = useState<{
+    [data: string]: { [dataField: string]: { date: number; value: number }[] };
+  }>({});
   // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
-  const [dataFieldMetricsState, setDataFieldMetricsState] = useState<{ [dataField: string]: { [metric: string]: any } }>({});
+  const [dataFieldMetricsState, setDataFieldMetricsState] = useState<{
+    [dataField: string]: { [metric: string]: any };
+  }>({});
   // For the current entity, loop through all instances of that entity
-  const [overlayDataFieldsState, setOverlayDataFieldsState] = useState<{ [dataField: string]: { date: number; value: number }[] }>({});
+  const [overlayDataFieldsState, setOverlayDataFieldsState] = useState<{
+    [dataField: string]: { date: number; value: number }[];
+  }>({});
 
   useEffect(() => {
     if (downloadAllCharts) {
       if (chartsImageFiles) {
         if (Object.keys(chartsImageFiles).length > 0) {
           let zip = new JSZip();
-          Object.keys(chartsImageFiles).forEach(fileName => {
+          Object.keys(chartsImageFiles).forEach((fileName) => {
             const blob = base64toBlobJPEG(chartsImageFiles[fileName]);
             if (blob) {
-              zip.file(fileName + '.jpeg', blob);
+              zip.file(fileName + ".jpeg", blob);
             }
           });
           zip.generateAsync({ type: "base64" }).then(function (content) {
-            const link = document.createElement('a');
+            const link = document.createElement("a");
             link.download = "charts.zip";
             link.href = "data:application/zip;base64," + content;
-            link.click()
+            link.click();
             triggerDownloadAllCharts(false);
           });
         }
       }
     }
-  }, [chartsImageFiles])
+  }, [chartsImageFiles]);
 
   useEffect(() => {
     if (!issuesSet && issues.length > 0) {
@@ -117,19 +123,22 @@ function ProtocolTabEntity({
       // For the current entity, loop through all instances of that entity
       let overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
       const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
-      if (!dataFieldsState?.data || (currentOverlayEntityData.length > 0 && Object.keys(overlayDataFieldsState).length === 0)) {
+      if (
+        !dataFieldsState?.data ||
+        (currentOverlayEntityData.length > 0 && Object.keys(overlayDataFieldsState).length === 0)
+      ) {
         for (let x = currentEntityData.length - 1; x >= 0; x--) {
           const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-          let dateVal: number = Number(timeseriesInstance['timestamp']);
+          let dateVal: number = Number(timeseriesInstance["timestamp"]);
           dateValueKeys.forEach((key: string) => {
             let factor = 86400;
-            if (key.includes('hour')) {
+            if (key.includes("hour")) {
               factor = factor / 24;
             }
             if (!!(Number(timeseriesInstance[key]) * factor)) {
-              dateVal = (Number(timeseriesInstance[key]) * factor);
+              dateVal = Number(timeseriesInstance[key]) * factor;
             }
-          })
+          });
 
           let overlayIndex = x;
           if (overlayDifference > 0) {
@@ -137,23 +146,28 @@ function ProtocolTabEntity({
           }
           const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[overlayIndex];
 
-          let overlayDateVal: number = Number(overlayTimeseriesInstance?.['timestamp']) || 0;
+          let overlayDateVal: number = Number(overlayTimeseriesInstance?.["timestamp"]) || 0;
           if (!!overlayTimeseriesInstance) {
             dateValueKeys.forEach((key: string) => {
               let factor = 86400;
-              if (key.includes('hour')) {
+              if (key.includes("hour")) {
                 factor = factor / 24;
               }
               if (!!(Number(overlayTimeseriesInstance[key]) * factor)) {
-                overlayDateVal = (Number(overlayTimeseriesInstance[key]) * factor);
+                overlayDateVal = Number(overlayTimeseriesInstance[key]) * factor;
               }
-            })
+            });
           }
           // On the entity instance, loop through all of the entity fields within it
           // create the base yield field for DEXs
           Object.keys(timeseriesInstance).forEach((fieldName: string) => {
             // skip the timestamp field on each entity instance
-            if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename" || dateValueKeys.includes(fieldName)) {
+            if (
+              fieldName === "timestamp" ||
+              fieldName === "id" ||
+              fieldName === "__typename" ||
+              dateValueKeys.includes(fieldName)
+            ) {
               return;
             }
             // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
@@ -169,9 +183,7 @@ function ProtocolTabEntity({
                 // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
                 // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
                 if (!dataFields[fieldName]) {
-                  dataFields[fieldName] = [
-                    { value: Number(currentInstanceField), date: dateVal },
-                  ];
+                  dataFields[fieldName] = [{ value: Number(currentInstanceField), date: dateVal }];
                   dataFieldMetrics[fieldName] = { sum: Number(currentInstanceField) };
                 } else {
                   dataFields[fieldName].push({
@@ -199,7 +211,12 @@ function ProtocolTabEntity({
                     new BigNumber(dataFieldMetrics[`${fieldSplit[0]}SupplySideRevenueUSD`].sum),
                   );
                   if (!sumRevenue.isEqualTo(totalRevenue)) {
-                    const divergence = totalRevenue.minus(sumRevenue).div(totalRevenue).times(100).toNumber().toFixed(1);
+                    const divergence = totalRevenue
+                      .minus(sumRevenue)
+                      .div(totalRevenue)
+                      .times(100)
+                      .toNumber()
+                      .toFixed(1);
                     dataFieldMetrics[fieldName].revSumMismatch = {
                       timeSeriesInstanceId: timeseriesInstance.id,
                       totalRevenue,
@@ -221,7 +238,9 @@ function ProtocolTabEntity({
                     new BigNumber(0),
                   );
 
-                  const totalTxKey = Object.keys(timeseriesInstance).find((field) => field.endsWith("TransactionCount"));
+                  const totalTxKey = Object.keys(timeseriesInstance).find((field) =>
+                    field.endsWith("TransactionCount"),
+                  );
                   const totalTx = new BigNumber(totalTxKey || 0);
 
                   if (!individualTxSum.isEqualTo(totalTx)) {
@@ -310,7 +329,6 @@ function ProtocolTabEntity({
                       date: overlayDateVal,
                     });
                   }
-
                 } else if (Array.isArray(currentOverlayInstanceField)) {
                   // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
                   // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
@@ -382,7 +400,7 @@ function ProtocolTabEntity({
             const req =
               "!" ===
               entitiesData[entityName][entityField].split("")[
-              entitiesData[entityName][entityField].split("").length - 1
+                entitiesData[entityName][entityField].split("").length - 1
               ];
             if (req) {
               list[entityName][entityField] = "MISSING AND REQUIRED";
@@ -393,23 +411,25 @@ function ProtocolTabEntity({
         }
       }
 
-      const mappedCurrentEntityData = currentEntityData.map((instance: any, idx: number) => {
-        let instanceToSave: any = {};
-        let dateVal: number = Number(instance['timestamp']);
-        dateValueKeys.forEach((key: string) => {
-          let factor = 86400;
-          if (key.includes('hour')) {
-            factor = factor / 24;
-          }
-          if (!!(Number(instance[key]) * factor)) {
-            dateVal = (Number(instance[key]) * factor);
-          }
+      const mappedCurrentEntityData = currentEntityData
+        .map((instance: any, idx: number) => {
+          let instanceToSave: any = {};
+          let dateVal: number = Number(instance["timestamp"]);
+          dateValueKeys.forEach((key: string) => {
+            let factor = 86400;
+            if (key.includes("hour")) {
+              factor = factor / 24;
+            }
+            if (!!(Number(instance[key]) * factor)) {
+              dateVal = Number(instance[key]) * factor;
+            }
+          });
+          instanceToSave.date = moment.utc(dateVal).format("YYYY-MM-DD");
+          instanceToSave = { ...instanceToSave, ...instance };
+          delete instanceToSave.__typename;
+          return instanceToSave;
         })
-        instanceToSave.date = moment.utc(dateVal).format("YYYY-MM-DD");
-        instanceToSave = { ...instanceToSave, ...instance };
-        delete instanceToSave.__typename;
-        return instanceToSave;
-      }).sort((a: any, b: any) => (Number(a.timestamp) - Number(b.timestamp)));
+        .sort((a: any, b: any) => Number(a.timestamp) - Number(b.timestamp));
 
       // For each entity field/key in the dataFields object, create a chart and tableChart component
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
@@ -423,28 +443,62 @@ function ProtocolTabEntity({
             </CopyLinkToClipboard>
           </Box>
           <Tooltip placement="top" title={"Overlay chart with data points populated from a .csv file"}>
-            <UploadFileCSV style={{ paddingLeft: "5px", color: "lime" }} isEntityLevel={true} csvMetaData={csvMetaData} field={entityName} csvJSON={csvJSON} setCsvJSON={setCsvJSON} setCsvMetaData={setCsvMetaData} />
+            <UploadFileCSV
+              style={{ paddingLeft: "5px", color: "lime" }}
+              isEntityLevel={true}
+              csvMetaData={csvMetaData}
+              field={entityName}
+              csvJSON={csvJSON}
+              setCsvJSON={setCsvJSON}
+              setCsvMetaData={setCsvMetaData}
+            />
           </Tooltip>
           <div>
-            <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
-            <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Chart Images</div>
+            <div
+              style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }}
+              className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root"
+              onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)}
+            >
+              Download Snapshots as csv
+            </div>
+            <div
+              style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }}
+              className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root"
+              onClick={() => triggerDownloadAllCharts(true)}
+            >
+              Download All Chart Images
+            </div>
           </div>
           {Object.keys(dataFields).map((field: string) => {
             // The following checks if the field is required or can be null
             const fieldName = field.split(" [")[0];
-            if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
-              return <>
-                <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(false)} >Remove DefiLlama Comparison</div>
-                <DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
+            if (
+              fieldName === "totalValueLockedUSD" &&
+              defiLlamaCompareTVL &&
+              entityName === "financialsDailySnapshots"
+            ) {
+              return (
+                <>
+                  <div
+                    style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }}
+                    className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root"
+                    onClick={() => setDefiLlamaCompareTVL(false)}
+                  >
+                    Remove DefiLlama Comparison
+                  </div>
+                  <DefiLlamaComparsionTab
+                    subgraphEndpoints={subgraphEndpoints}
+                    financialsData={{ financialsDailySnapshots: currentEntityData }}
+                  />
+                </>
+              );
             }
 
             const label = entityName + "-" + field;
             const elementId = label.split(" ").join("%20");
 
             try {
-              if (
-                dataFieldMetrics[field]?.sum === 0
-              ) {
+              if (dataFieldMetrics[field]?.sum === 0) {
                 // Create a warning for the 0 sum of all snapshots for this field
                 const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
                   return fieldName.toUpperCase().includes(fieldSchema.toUpperCase());
@@ -480,9 +534,7 @@ function ProtocolTabEntity({
               const isnonStrictlyIncrementalFieldList = nonStrictlyIncrementalFieldList.find((x: string) => {
                 return field.toUpperCase().includes(x.toUpperCase());
               });
-              if (
-                !isnonStrictlyIncrementalFieldList && dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
-              ) {
+              if (!isnonStrictlyIncrementalFieldList && dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0) {
                 issues.push({
                   type: "CUMULATIVE",
                   message: dataFieldMetrics[field]?.cumulative?.hasLowered,
@@ -493,10 +545,7 @@ function ProtocolTabEntity({
               const isNegativeField = negativeFieldList.find((x: string) => {
                 return field.toUpperCase().includes(x.toUpperCase());
               });
-              if (
-                dataFieldMetrics[field]?.negative &&
-                !isNegativeField
-              ) {
+              if (dataFieldMetrics[field]?.negative && !isNegativeField) {
                 issues.push({
                   message: JSON.stringify(dataFieldMetrics[field]?.negative),
                   type: "NEG",
@@ -534,13 +583,21 @@ function ProtocolTabEntity({
               const overlayKey = `${overlaySchemaData?.protocols[0]?.name}-${overlaySchemaData?.protocols[0]?.network}-${overlaySchemaData?.protocols[0]?.subgraphVersion}`;
               let keyDiff = "";
               if (baseKey === overlayKey) {
-                keyDiff = ' (Overlay)';
+                keyDiff = " (Overlay)";
               }
               dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
             }
             let tvlButton = null;
             if (fieldName === "totalValueLockedUSD" && entityName === "financialsDailySnapshots") {
-              tvlButton = <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => setDefiLlamaCompareTVL(true)} >Compare TVL To DefiLlama</div>;
+              tvlButton = (
+                <div
+                  style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }}
+                  className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root"
+                  onClick={() => setDefiLlamaCompareTVL(true)}
+                >
+                  Compare TVL To DefiLlama
+                </div>
+              );
             }
             return (
               <>

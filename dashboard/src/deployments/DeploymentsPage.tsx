@@ -24,8 +24,16 @@ interface DeploymentsPageProps {
   issuesMapping: any;
 }
 
-function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol, decentralizedDeployments, issuesMapping }: DeploymentsPageProps) {
-
+function DeploymentsPage({
+  protocolsToQuery,
+  getData,
+  subgraphCounts,
+  indexingStatusQueries,
+  endpointSlugs,
+  aliasToProtocol,
+  decentralizedDeployments,
+  issuesMapping,
+}: DeploymentsPageProps) {
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
   const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({
@@ -117,9 +125,13 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         }
         let subgraphIdToMap = { id: "", signal: 0 };
         if (decentralizedDeployments[x]?.signalledTokens > 0) {
-          depoIdToSubgraphName[decentralizedDeployments[x]?.deploymentId] = (protocolsToQuery[protocolObj]?.protocol || protocolObj) + "-" + networkStr;
+          depoIdToSubgraphName[decentralizedDeployments[x]?.deploymentId] =
+            (protocolsToQuery[protocolObj]?.protocol || protocolObj) + "-" + networkStr;
           depoIds.push(decentralizedDeployments[x]?.deploymentId);
-          subgraphIdToMap = { id: decentralizedDeployments[x]?.subgraphId, signal: decentralizedDeployments[x]?.signalledTokens };
+          subgraphIdToMap = {
+            id: decentralizedDeployments[x]?.subgraphId,
+            signal: decentralizedDeployments[x]?.signalledTokens,
+          };
         }
         decenDeposToSubgraphIds[x + "-" + networkStr] = subgraphIdToMap;
       }
@@ -172,7 +184,8 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         indexingStatusLoadedPending={indexingStatusLoadedPending}
         indexingStatusError={indexingStatusError}
         indexingStatusErrorPending={indexingStatusErrorPending}
-      />)
+      />
+    );
   }
   let decenIndexingCalls = null;
   if (decentralizedDepoQuery?.length > 0) {
@@ -192,20 +205,21 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         if (!!protocolsToQuery[aliasToProtocol[depo]].deployments[deploymentStr]) {
           protocolsToQuery[aliasToProtocol[depo]].deployments[deploymentStr].indexStatus = indexingStatus[depo];
         } else {
-          if (depo.includes('erc') || depo.includes('governance')) {
-            deploymentStr += '-ethereum';
+          if (depo.includes("erc") || depo.includes("governance")) {
+            deploymentStr += "-ethereum";
           }
           const network = deploymentStr.split("-").pop() || "";
-          const depoKey = (Object.keys(protocolsToQuery[aliasToProtocol[depo]].deployments).find((x: any) => {
-            return protocolsToQuery[aliasToProtocol[depo]].deployments[x].network === network
-          }) || "");
+          const depoKey =
+            Object.keys(protocolsToQuery[aliasToProtocol[depo]].deployments).find((x: any) => {
+              return protocolsToQuery[aliasToProtocol[depo]].deployments[x].network === network;
+            }) || "";
           if (!protocolsToQuery[aliasToProtocol[depo]].deployments[depoKey]) {
             return;
           }
           protocolsToQuery[aliasToProtocol[depo]].deployments[depoKey].indexStatus = indexingStatus[depo];
         }
       }
-    })
+    });
   }
 
   if (!!pendingIndexingStatus) {
@@ -214,14 +228,15 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         return;
       }
       const depoNoPendingArr = depo.split("_");
-      depoNoPendingArr.pop()
+      depoNoPendingArr.pop();
       const deploymentStr = depoNoPendingArr.join("-");
       if (protocolsToQuery[aliasToProtocol[depoNoPendingArr.join("_")]]) {
         if (!!protocolsToQuery[aliasToProtocol[depoNoPendingArr.join("_")]].deployments[deploymentStr]) {
-          protocolsToQuery[aliasToProtocol[depoNoPendingArr.join("_")]].deployments[deploymentStr].pendingIndexStatus = pendingIndexingStatus[depo];
+          protocolsToQuery[aliasToProtocol[depoNoPendingArr.join("_")]].deployments[deploymentStr].pendingIndexStatus =
+            pendingIndexingStatus[depo];
         }
       }
-    })
+    });
   }
 
   return (
@@ -241,10 +256,32 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
           Deployed Subgraphs
         </Typography>
         <div style={{ width: "100%", textAlign: "center" }}>
-          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
+          <span
+            style={{
+              width: "0",
+              flex: "1 1 0",
+              textAlign: "center",
+              marginTop: "0",
+              borderRight: "#6656F8 2px solid",
+              padding: "0 30px",
+            }}
+            className="Menu-Options"
+            onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}
+          >
             {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
           </span>
-          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("protocols-list")}>
+          <span
+            style={{
+              width: "0",
+              flex: "1 1 0",
+              textAlign: "center",
+              marginTop: "0",
+              borderRight: "#6656F8 2px solid",
+              padding: "0 30px",
+            }}
+            className="Menu-Options"
+            onClick={() => navigate("protocols-list")}
+          >
             Protocols To Develop
           </span>
           <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("version-comparison")}>
@@ -266,7 +303,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
       </DeploymentsLayout>
       {decenIndexingCalls}
       {indexingCalls}
-    </DeploymentsContextProvider >
+    </DeploymentsContextProvider>
   );
 }
 
