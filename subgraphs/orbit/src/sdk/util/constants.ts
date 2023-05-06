@@ -249,8 +249,8 @@ export class NetworkSpecificConstant {
     return this.originalTokenVault;
   }
 
-  getpeggedTokenBridgeForToChain(ToChain: string): Address | null {
-    return this.peggedTokenBridge.get(ToChain);
+  getpeggedTokenBridgeForChain(Chain: string): Address | null {
+    return this.peggedTokenBridge.get(Chain);
   }
 }
 
