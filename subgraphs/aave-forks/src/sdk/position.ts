@@ -78,6 +78,13 @@ export class PositionManager {
     return null;
   }
 
+  getPositionBalance(): BigInt | null {
+    if (this.position) {
+      return this.position!.balance;
+    }
+    return null;
+  }
+
   setCollateral(isCollateral: boolean): void {
     if (this.position) {
       this.position!.isCollateral = isCollateral;

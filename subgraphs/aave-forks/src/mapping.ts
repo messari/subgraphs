@@ -927,48 +927,48 @@ export function _handleLiquidate(
   // e.g. https://polygonscan.com/tx/0x2578371e35a1fa146aa34ea3936678c20091a08d55fd8cb46e0292fd95fe7f60#eventlog (v2)
   // https://optimistic.etherscan.io/tx/0xea6110df93b6581cf47b7261b33d9a1ae5cc5cac3b55931a11b7843641780958#eventlog (v3)
 
-  const burnMintInterestRateType = getOrCreateBurnMintInterestRateType(event);
-  const interestRateTypes = burnMintInterestRateType.interestRateTypes;
-  if (
-    !interestRateTypes ||
-    interestRateTypes.length === 1 ||
-    interestRateTypes.length === 2
-  ) {
-    log.error(
-      "[_handleLiquidate]BurnMintInterestRateType entity not found for {}; cannot determine interestRateType for LiquidationCall event",
-      [event.transaction.hash.toHexString()]
-    );
-    return;
-  }
+  // Variable debt is liquidated first
+  const vBorrowerPosition = new PositionManager(
+    liquidateeAccount,
+    debtTokenMarket,
+    PositionSide.BORROWER,
+    InterestRateType.VARIABLE
+  );
 
-  for (let i = 0; i < interestRateTypes.length; i++) {
-    const interestRateType = interestRateTypes[i];
-    const borrowerPosition = new PositionManager(
-      liquidateeAccount,
-      debtTokenMarket,
-      PositionSide.BORROWER,
-      interestRateType
-    );
-
-    const debtBalance =
-      interestRateType === InterestRateType.STABLE
-        ? debtBalances[0]
-        : debtBalances[1];
-    const borrowerPositionID = borrowerPosition.subtractPosition(
+  const vBorrowerPositionBalance = vBorrowerPosition.getPositionBalance();
+  if (vBorrowerPositionBalance && vBorrowerPositionBalance.gt(BIGINT_ZERO)) {
+    vBorrowerPosition.subtractPosition(
       event,
       protocol,
-      debtBalance,
+      debtBalances[1],
       TransactionType.LIQUIDATE,
       debtTokenMarket.inputTokenPriceUSD
     );
-    if (!borrowerPositionID) {
-      log.error(
-        "[_handleLiquidate] positionID is null for market {} account {}",
-        [debtTokenMarket.id.toHexString(), liquidatee.toHexString()]
-      );
-    } else {
-      liquidatedPositions.push(borrowerPositionID!);
-    }
+    liquidatedPositions.push(vBorrowerPosition.getPositionID()!);
+  }
+
+  const sBorrowerPosition = new PositionManager(
+    liquidateeAccount,
+    debtTokenMarket,
+    PositionSide.BORROWER,
+    InterestRateType.STABLE
+  );
+
+  const sBorrowerPositionBalance = sBorrowerPosition.getPositionBalance();
+  // Stable debt is liquidated after exhuasting variable debt
+  if (
+    debtBalances[1].equals(BIGINT_ZERO) &&
+    sBorrowerPositionBalance &&
+    sBorrowerPositionBalance.gt(BIGINT_ZERO)
+  ) {
+    sBorrowerPosition.subtractPosition(
+      event,
+      protocol,
+      debtBalances[0],
+      TransactionType.LIQUIDATE,
+      debtTokenMarket.inputTokenPriceUSD
+    );
+    liquidatedPositions.push(sBorrowerPosition.getPositionID()!);
   }
 
   liquidate.positions = liquidatedPositions;
