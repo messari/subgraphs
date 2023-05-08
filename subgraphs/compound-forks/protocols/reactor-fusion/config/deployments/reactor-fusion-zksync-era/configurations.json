@@ -1,6 +1,6 @@
 {
   "network": "zksync-era",
-  "factoryAddress": "0xF3CaF0bE62a0E6Ff6569004af55F57A0B9440434",
+  "factoryAddress": "0x23848c28Af1C3AA7B999fA57e6b6E8599C17F3f2",
   "startBlock": "1955225",
   "graftEnabled": false,
   "subgraphId": "",
