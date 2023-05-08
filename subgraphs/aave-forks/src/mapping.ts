@@ -48,7 +48,7 @@ import {
   rayToWad,
   getMarketFromToken,
   getOrCreateFlashloanPremium,
-  getOrCreateBurnMintInterestRateType,
+  getInterestRateType,
 } from "./helpers";
 import {
   AToken as ATokenTemplate,
@@ -790,18 +790,15 @@ export function _handleRepay(
   const newBorrowBalances = getBorrowBalances(market, accountID);
 
   // use debtToken Transfer event for Burn/Mint to determine interestRateType of the Repay event
-  // e.g. https://polygonscan.com/tx/0x29d7eb7599c35cd6435f29cad40189a4385044c3e56e4bc4fb6b7d34cab451db#eventlog (v2)
-  // Transfer(): 158; Repay(): 163
-  // https://optimistic.etherscan.io/tx/0x80d53af69fcaf1852a2bd43b81285e9b6113e5a52fdc74d68cac8828797c9bec#eventlog (v3)
-  // Transfer(): 0; Repay: 5
-  const burnMintInterestRateType = getOrCreateBurnMintInterestRateType(event);
-  const interestRateTypes = burnMintInterestRateType.interestRateTypes;
-  if (!interestRateTypes || interestRateTypes.length != 1) {
+  const interestRateType = getInterestRateType(event);
+  if (!interestRateType) {
     log.error(
-      "[_handleRepay]BurnMintInterestRateType entity not found for {}; cannot determine interestRateType for Repay event",
-      [event.transaction.hash.toHexString()]
+      "[_handleRepay]Cannot determine interest rate type for Repay event {}-{}",
+      [
+        event.transaction.hash.toHexString(),
+        event.transactionLogIndex.toString(),
+      ]
     );
-    return;
   }
 
   manager.createRepay(
@@ -811,7 +808,7 @@ export function _handleRepay(
     amountUSD,
     newBorrowBalances[0].plus(newBorrowBalances[1]),
     market.inputTokenPriceUSD,
-    interestRateTypes[0]
+    interestRateType
   );
 }
 
@@ -1084,18 +1081,10 @@ export function _handleTransfer(
   // and zero addresses mean it is a part of a burn / mint
   if (
     to == Address.fromString(ZERO_ADDRESS) ||
-    from == Address.fromString(ZERO_ADDRESS)
+    from == Address.fromString(ZERO_ADDRESS) ||
+    to == asset ||
+    from == asset
   ) {
-    // save interest rate type for debtToken burned/minted
-    // used to determine the interestRateType for Repay/Liquidation event
-    if (positionSide == PositionSide.BORROWER) {
-      getOrCreateBurnMintInterestRateType(event, event.address);
-    }
-    return;
-  }
-
-  // deposit, withdraw, borrow, repay of AToken
-  if (to == asset || from == asset) {
     return;
   }
 

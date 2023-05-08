@@ -3,6 +3,8 @@ import {
   Address,
   BigDecimal,
   BigInt,
+  ByteArray,
+  crypto,
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
@@ -10,7 +12,6 @@ import { ProtocolData } from "./sdk/manager";
 import {
   Market,
   Token,
-  _BurnMintInterestRateType,
   _FlashLoanPremium,
   _MarketList,
 } from "../generated/schema";
@@ -190,53 +191,74 @@ export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }
 
-export function getOrCreateBurnMintInterestRateType(
-  event: ethereum.Event,
-  tokenAddress: Address | null = null
-): _BurnMintInterestRateType {
-  const id = event.transaction.hash;
-  let entity = _BurnMintInterestRateType.load(id);
-  if (!entity) {
-    entity = new _BurnMintInterestRateType(id);
-    entity.interestRateTypes = [];
-    entity.save();
-  }
+// Use the Transfer event before Repay event to detect interestRateType
+// We cannot use Burn event because a Repay event may actually mint
+// new debt token if the repay amount is less than interest accrued
+// e.g. https://polygonscan.com/tx/0x29d7eb7599c35cd6435f29cad40189a4385044c3e56e4bc4fb6b7d34cab451db#eventlog (v2)
+// Transfer(): 158; Repay(): 163
+// https://optimistic.etherscan.io/tx/0x80d53af69fcaf1852a2bd43b81285e9b6113e5a52fdc74d68cac8828797c9bec#eventlog (v3)
+// Transfer(): 0; Repay: 5
 
-  if (!tokenAddress) {
-    return entity;
-  }
+export function getInterestRateType(
+  event: ethereum.Event
+): InterestRateType | null {
+  const eventSignature = crypto.keccak256(
+    ByteArray.fromUTF8("Transfer(address,address,uint256)")
+  );
+  const logs = event.receipt!.logs;
+  // Transfer emitted 5 index ahead of Repay's event.logIndex
+  const targetLogIndex = event.logIndex.minus(BigInt.fromI32(5));
+  log.info("[getInterestRateType]tx {}-{},logs.length={},event.logIndex={}", [
+    event.transaction.hash.toHexString(),
+    event.logIndex.toString(),
+    logs.length.toString(),
+    event.logIndex.toString(),
+  ]);
 
-  // add the interestRateType of token to entity.interestRateTypes
-  const debtToken = Token.load(tokenAddress);
-  if (!debtToken) {
+  for (let i = 0; i < logs.length; i++) {
+    const thisLog = logs[i];
+    if (thisLog.logIndex.lt(targetLogIndex)) {
+      // skip event with logIndex < targetLogIndex
+      continue;
+    }
+    // topics[0] - signature
+    const logSignature = thisLog.topics[0];
+    if (logSignature.equals(eventSignature)) {
+      const from = ethereum
+        .decode("address", thisLog.topics.at(1))!
+        .toAddress();
+      const to = ethereum.decode("address", thisLog.topics.at(2))!.toAddress();
+      if (from.equals(Address.zero()) || to.equals(Address.zero())) {
+        // this is a burn or mint event
+        const tokenAddress = thisLog.address;
+        const token = Token.load(tokenAddress);
+        if (!token) {
+          log.error("[getInterestRateType]token {} not found tx {}-{}", [
+            tokenAddress.toHexString(),
+            event.transaction.hash.toHexString(),
+            event.transactionLogIndex.toString(),
+          ]);
+          return null;
+        }
+        if (token._iavsTokenType === IavsTokenType.STOKEN) {
+          return InterestRateType.STABLE;
+        }
+        if (token._iavsTokenType === IavsTokenType.VTOKEN) {
+          return InterestRateType.VARIABLE;
+        }
+      }
+    }
     log.error(
-      "[getOrCreateBurnMintInterestRateType]debtToken with id {} not found tx {}-{}",
+      "[getInterestRateType]event at logIndex {} signature {} not the exepected Transfer signature {}. tx {}-{} ",
       [
-        event.address.toHexString(),
+        thisLog.logIndex.toString(),
+        logSignature.toHexString(),
+        eventSignature.toHexString(),
         event.transaction.hash.toHexString(),
         event.transactionLogIndex.toString(),
       ]
     );
-    return entity;
+    return null;
   }
-
-  const interestRateTypes = entity.interestRateTypes
-    ? entity.interestRateTypes!
-    : [];
-  if (
-    debtToken._iavsTokenType == IavsTokenType.STOKEN &&
-    !interestRateTypes.includes(InterestRateType.STABLE)
-  ) {
-    interestRateTypes.push(InterestRateType.STABLE);
-  } else if (
-    debtToken._iavsTokenType == IavsTokenType.VTOKEN &&
-    !interestRateTypes.includes(InterestRateType.VARIABLE)
-  ) {
-    interestRateTypes.push(InterestRateType.VARIABLE);
-  }
-  interestRateTypes.sort();
-  entity.interestRateTypes = interestRateTypes;
-  entity.save();
-
-  return entity;
+  return null;
 }

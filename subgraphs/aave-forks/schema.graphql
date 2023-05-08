@@ -2074,11 +2074,3 @@ type _FlashLoanPremium @entity {
   " premium to be deducted from revenue, used to avoid double counting "
   premiumUSDToDeduct: BigDecimal!
 }
-
-# helper entity determining InterestRateType for burned/minted debtToken in a tx
-type _BurnMintInterestRateType @entity {
-  " {event.transaction.hash} "
-  id: Bytes!
-  " InterestRateType: VARIABLE/STABLE in a list, a liquidation can burn both variable and stable debt tokens "
-  interestRateTypes: [String!]
-}
