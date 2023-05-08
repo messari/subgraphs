@@ -820,8 +820,7 @@ export function _handleLiquidate(
   liquidator: Address,
   liquidatee: Address, // account liquidated
   debtAsset: Address, // token repaid to cover debt,
-  debtToCover: BigInt, // the amount of debt repaid by liquidator
-  createLiquidatorPosition: bool = false
+  debtToCover: BigInt // the amount of debt repaid by liquidator
 ): void {
   const market = getMarketFromToken(collateralAsset, protocolData);
   if (!market) {
@@ -910,7 +909,6 @@ export function _handleLiquidate(
     collateralBalance,
     totalDebtBalance,
     null,
-    createLiquidatorPosition,
     subtractBorrowerPosition
   );
   if (!liquidate) {

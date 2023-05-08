@@ -610,7 +610,6 @@ export class DataManager {
    * @param profitUSD Liquidator's profit from the liquidation.
    * @param newCollateralBalance The liquidatee's new borrowing balance after the liquidation (usually ZERO).
    * @param interestType Optional - The InterestType of liquidatee's position (FIXED, VARIABLE, etc.).
-   * @param createLiquidatorPosition - whether to create a position for the liquidator in the collateral market
    * @param subtractBorrowerPosition - whether to subtract borrower/debt position involved in the liquidation
    * @returns A Liquidate entity or null
    */
@@ -625,7 +624,6 @@ export class DataManager {
     newCollateralBalance: BigInt,
     newBorrowerBalance: BigInt,
     interestType: string | null = null,
-    createLiquidatorPosition: bool = false,
     subtractBorrowerPosition: bool = true
   ): Liquidate | null {
     const positions: string[] = []; // positions touched by this liquidation
@@ -637,33 +635,6 @@ export class DataManager {
     liquidatorAccount.countLiquidate();
     // Note: Be careful, some protocols might give the liquidated collateral to the liquidator
     //       in collateral in the market. But that is not always the case so we don't do it here.
-
-    if (createLiquidatorPosition) {
-      const liquidatorPosition = new PositionManager(
-        liquidatorAccount.getAccount(),
-        this.market,
-        PositionSide.COLLATERAL,
-        interestType
-      );
-
-      const liquidatorPositionID = liquidatorPosition.addPosition(
-        this.event,
-        asset,
-        this.protocol,
-        amount,
-        TransactionType.LIQUIDATOR,
-        this.market.inputTokenPriceUSD
-      );
-
-      if (!liquidatorPositionID) {
-        log.error(
-          "[createLiquidate] positionID is null for market: {} account: {}",
-          [this.market.id.toHexString(), liquidator.toHexString()]
-        );
-        return null;
-      }
-      positions.push(liquidatorPositionID!);
-    }
 
     const liquidateeAccount = new AccountManager(liquidatee);
     const collateralPosition = new PositionManager(
