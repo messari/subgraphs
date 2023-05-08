@@ -12,7 +12,7 @@ import * as constants from "./common/constants";
 import * as AaveOracle from "./oracles/AaveOracle";
 import * as CurveRouter from "./routers/CurveRouter";
 import * as ChainLinkFeed from "./oracles/ChainLinkFeed";
-import * as YearnLensOracle from "./oracles/YearnLensOracle";
+// import * as YearnLensOracle from "./oracles/YearnLensOracle";
 import * as UniswapForksRouter from "./routers/UniswapForksRouter";
 import * as CurveCalculations from "./calculations/CalculationsCurve";
 import * as SushiCalculations from "./calculations/CalculationsSushiswap";
@@ -42,14 +42,14 @@ export function getUsdPricePerToken(
   }
 
   // 1. Yearn Lens Oracle
-  const yearnLensPrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr, block);
-  if (!yearnLensPrice.reverted) {
-    log.info("[YearnLensOracle] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      yearnLensPrice.usdPrice.toString(),
-    ]);
-    return yearnLensPrice;
-  }
+  // const yearnLensPrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr, block);
+  // if (!yearnLensPrice.reverted) {
+  //   log.info("[YearnLensOracle] tokenAddress: {}, Price: {}", [
+  //     tokenAddr.toHexString(),
+  //     yearnLensPrice.usdPrice.toString(),
+  //   ]);
+  //   return yearnLensPrice;
+  // }
 
   // 2. ChainLink Feed Registry
   const chainLinkPrice = ChainLinkFeed.getTokenPriceUSDC(tokenAddr, block);
