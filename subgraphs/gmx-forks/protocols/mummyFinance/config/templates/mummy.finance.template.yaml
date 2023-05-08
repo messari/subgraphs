@@ -59,6 +59,9 @@ dataSources:
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
         # Aave Oracle Contract
+        - name: InchOracleContract
+          file: ./abis/Prices/InchOracle.json
+        # Aave Oracle Contract
         - name: AaveOracleContract
           file: ./abis/Prices/AaveOracle.json
         # SushiSwap Contracts
@@ -73,7 +76,7 @@ dataSources:
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json      
+          file: ./abis/Prices/Uniswap/Pair.json   
 
       eventHandlers:
         - event: UpdateFundingRate(address,uint256)
@@ -137,6 +140,9 @@ dataSources:
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
         # Aave Oracle Contract
+        - name: InchOracleContract
+          file: ./abis/Prices/InchOracle.json
+        # Aave Oracle Contract
         - name: AaveOracleContract
           file: ./abis/Prices/AaveOracle.json
         # SushiSwap Contracts
@@ -196,6 +202,9 @@ dataSources:
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
         # Aave Oracle Contract
+        - name: InchOracleContract
+          file: ./abis/Prices/InchOracle.json
+        # Aave Oracle Contract
         - name: AaveOracleContract
           file: ./abis/Prices/AaveOracle.json
         # SushiSwap Contracts
@@ -251,6 +260,9 @@ dataSources:
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: InchOracleContract
+          file: ./abis/Prices/InchOracle.json
         # Aave Oracle Contract
         - name: AaveOracleContract
           file: ./abis/Prices/AaveOracle.json
@@ -308,6 +320,9 @@ templates:
         # YearnLens Contracts
         - name: YearnLensContract
           file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: InchOracleContract
+          file: ./abis/Prices/InchOracle.json
         # Aave Oracle Contract
         - name: AaveOracleContract
           file: ./abis/Prices/AaveOracle.json

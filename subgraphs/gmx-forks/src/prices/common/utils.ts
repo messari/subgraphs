@@ -1,8 +1,11 @@
-import * as BSC from "../config/bsc";
-import * as CELO from "../config/celo";
-import * as FUSE from "../config/fuse";
+import {
+  BigInt,
+  Address,
+  ethereum,
+  dataSource,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
 import * as XDAI from "../config/gnosis";
-import * as CRONOS from "../config/cronos";
 import * as AURORA from "../config/aurora";
 import * as FANTOM from "../config/fantom";
 import * as POLYGON from "../config/polygon";
@@ -13,14 +16,12 @@ import * as OPTIMISM from "../config/optimism";
 import * as AVALANCHE from "../config/avalanche";
 import * as ARBITRUM_ONE from "../config/arbitrum";
 
-import { Configurations } from "./types";
 import * as constants from "./constants";
-import * as TEMPLATE from "../config/template";
-import { _ERC20 } from "../../../generated/Vault/_ERC20";
-import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import { Configurations, ContractInfo } from "./types";
+import { _ERC20 } from "../../../generated/MlpManager/_ERC20";
 
 export function isNullAddress(tokenAddr: Address): boolean {
-  return tokenAddr.equals(constants.NULL.TYPE_ADDRESS);
+  return tokenAddr.equals(constants.NULL.TYPE_ADDRESS) ? true : false;
 }
 
 export function readValue<T>(
@@ -28,6 +29,34 @@ export function readValue<T>(
   defaultValue: T
 ): T {
   return callResult.reverted ? defaultValue : callResult.value;
+}
+
+export function absBigDecimal(value: BigDecimal): BigDecimal {
+  if (value.lt(constants.BIGDECIMAL_ZERO))
+    return value.times(constants.BIGDECIMAL_NEG_ONE);
+  return value;
+}
+
+export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
+  if (amount1.equals(constants.BIGDECIMAL_ZERO)) {
+    return constants.BIGDECIMAL_ZERO;
+  } else {
+    return amount0.div(amount1);
+  }
+}
+
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  return constants.BIGINT_TEN.pow(decimals as u8).toBigDecimal();
+}
+
+export function getContract(
+  contractInfo: ContractInfo | null,
+  block: ethereum.Block | null = null
+): Address | null {
+  if (!contractInfo || (block && contractInfo.startBlock.gt(block.number)))
+    return null;
+
+  return contractInfo.address;
 }
 
 export function getTokenName(tokenAddr: Address): string {
@@ -58,7 +87,6 @@ export function getTokenSupply(tokenAddr: Address): BigInt {
 
   return totalSupply;
 }
-
 export function getConfig(): Configurations {
   const network = dataSource.network();
 
@@ -66,8 +94,6 @@ export function getConfig(): Configurations {
     return new XDAI.config();
   } else if (network == AURORA.NETWORK_STRING) {
     return new AURORA.config();
-  } else if (network == BSC.NETWORK_STRING) {
-    return new BSC.config();
   } else if (network == FANTOM.NETWORK_STRING) {
     return new FANTOM.config();
   } else if (network == POLYGON.NETWORK_STRING) {
@@ -84,13 +110,7 @@ export function getConfig(): Configurations {
     return new AVALANCHE.config();
   } else if (network == ARBITRUM_ONE.NETWORK_STRING) {
     return new ARBITRUM_ONE.config();
-  } else if (network == CRONOS.NETWORK_STRING) {
-    return new CRONOS.config();
-  } else if (network == CELO.NETWORK_STRING) {
-    return new CELO.config();
-  } else if (network == FUSE.NETWORK_STRING) {
-    return new FUSE.config();
   }
 
-  return new TEMPLATE.config();
+  return new MAINNET.config();
 }

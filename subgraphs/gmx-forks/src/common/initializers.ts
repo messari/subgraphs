@@ -3,6 +3,7 @@ import * as constants from "../common/constants";
 import { SDK } from "../sdk/protocols/perpfutures";
 import { ProtocolConfig } from "../sdk/protocols/config";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
+import { LiquidityPoolFeeType } from "../common/constants";
 import { TokenInitialize, TokenPrice } from "../modules/token";
 import { Account } from "../sdk/protocols/perpfutures/account";
 import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
@@ -38,6 +39,16 @@ export function getOrCreatePool(event: ethereum.Event, sdk: SDK): Pool {
       constants.POOL_SYMBOL,
       [],
       outputToken
+    );
+    pool.setPoolFee(
+      LiquidityPoolFeeType.FIXED_PROTOCOL_FEE,
+      constants.PROTOCOL_SIDE_REVENUE_PERCENT.times(
+        constants.BIGDECIMAL_HUNDRED
+      )
+    );
+    pool.setPoolFee(
+      LiquidityPoolFeeType.FIXED_STAKE_FEE,
+      constants.STAKE_SIDE_REVENUE_PERCENT.times(constants.BIGDECIMAL_HUNDRED)
     );
   }
   return pool;

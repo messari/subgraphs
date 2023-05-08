@@ -2,8 +2,8 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { UniswapPair as UniswapPairContract } from "../../../generated/Vault/UniswapPair";
-import { UniswapRouter as UniswapRouterContract } from "../../../generated/Vault/UniswapRouter";
+import { UniswapPair as UniswapPairContract } from "../../../generated/MlpManager/UniswapPair";
+import { UniswapRouter as UniswapRouterContract } from "../../../generated/MlpManager/UniswapRouter";
 
 export function isLpToken(tokenAddress: Address, ethAddress: Address): bool {
   if (tokenAddress.equals(ethAddress)) return false;
@@ -26,8 +26,8 @@ export function getTokenPriceUSDC(
   const config = utils.getConfig();
   if (!config) return new CustomPriceType();
 
-  const ethAddress = config.ethAddress();
-  const usdcAddress = config.usdcAddress();
+  const ethAddress = config.whitelistedTokens().mustGet("WETH").address;
+  const usdcAddress = config.whitelistedTokens().mustGet("USDC").address;
 
   if (isLpToken(tokenAddress, ethAddress)) {
     return getLpTokenPriceUsdc(tokenAddress, block);
@@ -50,16 +50,18 @@ export function getPriceFromRouter(
 ): CustomPriceType {
   const config = utils.getConfig();
 
-  const ethAddress = config.ethAddress();
-  const wethAddress = config.wethAddress();
+  const wethAddress = config.whitelistedTokens().mustGet("WETH").address;
+  const nativeTokenAddress = config
+    .whitelistedTokens()
+    .mustGet("NATIVE_TOKEN").address;
 
   // Construct swap path
   const path: Address[] = [];
   let numberOfJumps: BigInt;
 
   // Convert ETH address to WETH
-  if (token0Address == ethAddress) token0Address = wethAddress;
-  if (token1Address == ethAddress) token1Address = wethAddress;
+  if (token0Address == nativeTokenAddress) token0Address = wethAddress;
+  if (token1Address == nativeTokenAddress) token1Address = wethAddress;
 
   const inputTokenIsWeth: bool =
     token0Address.equals(wethAddress) || token1Address.equals(wethAddress);
@@ -107,7 +109,7 @@ export function getPriceFromRouter(
 
   return CustomPriceType.initialize(
     amountOutBigDecimal,
-    config.usdcTokenDecimals().toI32() as u8,
+    config.whitelistedTokens().mustGet("USDC").decimals as u8,
     constants.OracleType.UNISWAP_FORKS_ROUTER
   );
 }

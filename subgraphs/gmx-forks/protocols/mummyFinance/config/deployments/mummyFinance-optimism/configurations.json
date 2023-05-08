@@ -2,26 +2,26 @@
   "network": "optimism",
   "protocolName": "MummyFinance",
   "protocolSlug": "MMY",
-  "protocolId": "0x304951d7172bCAdA54ccAC1E4674862b3d5b3d5b",
+  "protocolId": "0x9032aeD8C1F2139E04C1AD6D9F75bdF1D6e5CF5c",
   "poolName": "MMYVault",
   "poolSymbol": "Vault",
   "protocolSideRevenuePercent": "0.1",
   "stakeSideRevenuePercent": "0.3",
-  "mlpAddress": "0x0ce61aaf89500e4f007884fbbf62642618def5dd",
-  "mmyAddress": "0x01e77288b38b416f972428d562454fb329350bac",
-  "esMMYAddress": "0xe41c6c006de9147fc4c84b20cdfbfc679667343f",
+  "mlpAddress": "0xCaB2C0A41556149330F4223C9b76d93C610DAfE6",
+  "mmyAddress": "0x47536F17F4fF30e64A96a7555826b8f9e66ec468",
+  "esMMYAddress": "0x0d8393CEa30df4fAFA7f00f333A62DeE451935C1",
   "VaultAddr": "0xA6D7D0e650aa40FFa42d845A354c12c2bc0aB15f",
-  "VaultStartBlock": 51709945,
-  "FeeGlpRewardDistributorAddr": "0xA30b1C3c8EDE3841dE05F9CdD4D0e097aC4C6D92",
-  "FeeGlpRewardDistributorStartBlock": 51710183,
-  "EsgmxGlpRewardDistributorAddr": "0xa0207802b0953b17421bf9cb10b3acf5823496ab",
-  "EsgmxGlpRewardDistributorStartBlock": 51710191,
-  "deployment": "MUMMY_FANTOM",
+  "VaultStartBlock": 78177117,
+  "FeeGlpRewardDistributorAddr": "0xa0207802b0953b17421bf9cb10b3acf5823496ab",
+  "FeeGlpRewardDistributorStartBlock": 78179465,
+  "EsgmxGlpRewardDistributorAddr": "0xad96d9736484e35985773bdf7dba5750dc830042",
+  "EsgmxGlpRewardDistributorStartBlock": 78179548,
+  "deployment": "MUMMY_OPTIMISM",
   "glpManagers": [
     {
       "name": "GlpManager_V1",
-      "address": "0x304951d7172bCAdA54ccAC1E4674862b3d5b3d5b",
-      "startBlock": 51709998
+      "address": "0x9032aeD8C1F2139E04C1AD6D9F75bdF1D6e5CF5c",
+      "startBlock": 78177861
     }
   ]
 }

@@ -1,47 +1,35 @@
-import {
-  log,
-  Address,
-  ethereum,
-  BigDecimal,
-  dataSource,
-} from "@graphprotocol/graph-ts";
-import { CustomPriceType } from "./common/types";
-
 import * as utils from "./common/utils";
 import * as constants from "./common/constants";
+import { CustomPriceType } from "./common/types";
 import * as AaveOracle from "./oracles/AaveOracle";
+import * as InchOracle from "./oracles/InchOracle";
 import * as CurveRouter from "./routers/CurveRouter";
 import * as ChainLinkFeed from "./oracles/ChainLinkFeed";
 import * as YearnLensOracle from "./oracles/YearnLensOracle";
 import * as UniswapForksRouter from "./routers/UniswapForksRouter";
 import * as CurveCalculations from "./calculations/CalculationsCurve";
 import * as SushiCalculations from "./calculations/CalculationsSushiswap";
+import { log, Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 
 export function getUsdPricePerToken(
   tokenAddr: Address,
   block: ethereum.Block | null = null
 ): CustomPriceType {
-  if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
-    return new CustomPriceType();
-  }
-
   const config = utils.getConfig();
-  if (config.network() == "default") {
-    log.warning("Failed to fetch price: network {} not implemented", [
-      dataSource.network(),
-    ]);
 
+  if (!config || constants.BLACKLISTED_TOKENS.includes(tokenAddr))
     return new CustomPriceType();
-  }
 
-  if (config.hardcodedStables().includes(tokenAddr)) {
-    return CustomPriceType.initialize(
-      constants.BIGDECIMAL_USD_PRICE,
-      constants.DEFAULT_USDC_DECIMALS
+  if (config.hardcodedStables().includes(tokenAddr))
+    return CustomPriceType.initializePegged();
+
+  if (tokenAddr.equals(constants.ETH_ADDRESS))
+    return getUsdPricePerToken(
+      config.whitelistedTokens().mustGet("WETH").address,
+      block
     );
-  }
 
-  // 1. Yearn Lens Oracle
+  // 1. YearnLens Oracle
   const yearnLensPrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr, block);
   if (!yearnLensPrice.reverted) {
     log.info("[YearnLensOracle] tokenAddress: {}, Price: {}", [
@@ -51,7 +39,17 @@ export function getUsdPricePerToken(
     return yearnLensPrice;
   }
 
-  // 2. ChainLink Feed Registry
+  // 2. InchOracle
+  const inchOraclePrice = InchOracle.getTokenPriceUSDC(tokenAddr, block);
+  if (!inchOraclePrice.reverted) {
+    log.info("[InchOracle] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      inchOraclePrice.usdPrice.toString(),
+    ]);
+    return inchOraclePrice;
+  }
+
+  // 3. ChainLink Feed Registry
   const chainLinkPrice = ChainLinkFeed.getTokenPriceUSDC(tokenAddr, block);
   if (!chainLinkPrice.reverted) {
     log.info("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
@@ -61,7 +59,7 @@ export function getUsdPricePerToken(
     return chainLinkPrice;
   }
 
-  // 3. CalculationsCurve
+  // 4. CalculationsCurve
   const calculationsCurvePrice = CurveCalculations.getTokenPriceUSDC(
     tokenAddr,
     block
@@ -74,7 +72,7 @@ export function getUsdPricePerToken(
     return calculationsCurvePrice;
   }
 
-  // 4. CalculationsSushiSwap
+  // 5. CalculationsSushiSwap
   const calculationsSushiSwapPrice = SushiCalculations.getTokenPriceUSDC(
     tokenAddr,
     block
@@ -98,7 +96,7 @@ export function getUsdPricePerToken(
   }
 
   // 7. Curve Router
-  const curvePrice = CurveRouter.getCurvePriceUsdc(tokenAddr, block);
+  const curvePrice = CurveRouter.getPriceUsdc(tokenAddr, block);
   if (!curvePrice.reverted) {
     log.info("[CurveRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -108,7 +106,7 @@ export function getUsdPricePerToken(
   }
 
   // 8. Uniswap Router
-  const uniswapPrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr, block);
+  const uniswapPrice = UniswapForksRouter.getTokenPriceUSDC(tokenAddr);
   if (!uniswapPrice.reverted) {
     log.info("[UniswapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -117,8 +115,7 @@ export function getUsdPricePerToken(
     return uniswapPrice;
   }
 
-  log.warning("[Oracle] Failed to Fetch Price, Name: {} Address: {}", [
-    utils.getTokenName(tokenAddr),
+  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
     tokenAddr.toHexString(),
   ]);
 
@@ -128,13 +125,10 @@ export function getUsdPricePerToken(
 export function getUsdPrice(
   tokenAddr: Address,
   amount: BigDecimal,
-  block: ethereum.Block | null = null
+  block: ethereum.Block | null
 ): BigDecimal {
   const tokenPrice = getUsdPricePerToken(tokenAddr, block);
 
-  if (!tokenPrice.reverted) {
-    return tokenPrice.usdPrice.times(amount);
-  }
-
+  if (!tokenPrice.reverted) return tokenPrice.usdPrice.times(amount);
   return constants.BIGDECIMAL_ZERO;
 }

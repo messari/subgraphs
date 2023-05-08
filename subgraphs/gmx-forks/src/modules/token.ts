@@ -57,7 +57,8 @@ export class TokenPrice implements TokenPricer {
 
     let amountVauleUSD = getUsdPrice(
       tokenAddress,
-      utils.bigIntToBigDecimal(amount, token.decimals)
+      utils.bigIntToBigDecimal(amount, token.decimals),
+      null
     );
 
     if (amountVauleUSD.equals(constants.BIGDECIMAL_ZERO)) {
@@ -81,7 +82,8 @@ export class TokenPrice implements TokenPricer {
       if (tokenAddress.equals(constants.ESCROWED_MMY_ADDRESS)) {
         amountVauleUSD = getUsdPrice(
           constants.MMY_ADDRESS,
-          utils.bigIntToBigDecimal(amount, token.decimals)
+          utils.bigIntToBigDecimal(amount, token.decimals),
+          null
         );
       }
     }

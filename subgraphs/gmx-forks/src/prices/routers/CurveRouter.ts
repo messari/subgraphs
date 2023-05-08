@@ -3,12 +3,12 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { BigInt, Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
-import { CurvePool as CurvePoolContract } from "../../../generated/Vault/CurvePool";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/Vault/CurveRegistry";
+import { CurvePool as CurvePoolContract } from "../../../generated/MlpManager/CurvePool";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/MlpManager/CurveRegistry";
 
 export function isCurveLpToken(
   lpAddress: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null
 ): bool {
   const poolAddress = getPoolFromLpToken(lpAddress, block);
   if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return true;
@@ -80,10 +80,11 @@ export function getCurvePriceUsdc(
   const virtualPrice = getVirtualPrice(lpAddress, block).toBigDecimal();
 
   const config = utils.getConfig();
-  const usdcTokenDecimals = config.usdcTokenDecimals();
+  const usdcTokenDecimals = config.whitelistedTokens().mustGet("USDC").decimals;
 
-  const decimalsAdjustment =
-    constants.DEFAULT_DECIMALS.minus(usdcTokenDecimals);
+  const decimalsAdjustment = constants.DEFAULT_DECIMALS.minus(
+    BigInt.fromI32(usdcTokenDecimals)
+  );
   const priceUsdc = virtualPrice
     .times(basePrice.usdPrice)
     .times(
@@ -292,7 +293,7 @@ export function cryptoPoolUnderlyingTokensAddressesByPoolAddress(
 
 export function getPriceUsdc(
   tokenAddress: Address,
-  block: ethereum.Block
+  block: ethereum.Block | null
 ): CustomPriceType {
   if (isCurveLpToken(tokenAddress, block))
     return getCurvePriceUsdc(tokenAddress, block);

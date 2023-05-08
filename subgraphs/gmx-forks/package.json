@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ shashwats22/mummy-finance",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ shashwats22/mummy-finance-optimism",
     "test": "graph test",
-    "prepare:constants": "mustache protocols/mummyFinance/config/deployments/mummyFinance-fantom/configurations.json src/common/constants.mustache > src/common/constants.ts",
-    "prepare:yaml": "mustache protocols/mummyFinance/config/deployments/mummyFinance-fantom/configurations.json protocols/mummyFinance/config/templates/mummy.finance.template.yaml > subgraph.yaml"
+    "prepare:constants": "mustache protocols/mummyFinance/config/deployments/mummyFinance-optimism/configurations.json src/common/constants.mustache > src/common/constants.ts",
+    "prepare:yaml": "mustache protocols/mummyFinance/config/deployments/mummyFinance-optimism/configurations.json protocols/mummyFinance/config/templates/mummy.finance.template.yaml > subgraph.yaml"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.40.0",

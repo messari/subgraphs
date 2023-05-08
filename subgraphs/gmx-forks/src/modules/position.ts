@@ -280,13 +280,13 @@ export function updatePositionRealisedPnlUSD(
     return;
   }
   const account = getOrCreateAccount(
-    Address.fromString(positionMap!.account),
+    Address.fromString(positionMap.account),
     pool,
     sdk
   );
-  const asset = sdk.Tokens.getOrCreateTokenFromBytes(positionMap!.asset);
+  const asset = sdk.Tokens.getOrCreateTokenFromBytes(positionMap.asset);
   const collateral = sdk.Tokens.getOrCreateTokenFromBytes(
-    positionMap!.collateral
+    positionMap.collateral
   );
 
   const position = sdk.Positions.loadPosition(
@@ -294,7 +294,7 @@ export function updatePositionRealisedPnlUSD(
     account,
     asset,
     collateral,
-    positionMap!.positionSide
+    positionMap.positionSide
   );
   position.setRealisedPnlUsd(realisedPnlUSD);
 }

@@ -1,5 +1,5 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Configurations, OracleContract } from "../common/types";
+import { Address, BigInt, TypedMap } from "@graphprotocol/graph-ts";
+import { Configurations, ContractInfo, TokenInfo } from "../common/types";
 
 export const NETWORK_STRING = "mainnet";
 
@@ -7,41 +7,59 @@ export const NETWORK_STRING = "mainnet";
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS = new OracleContract(
-  "0x83d95e0d5f402511db06817aff3f9ea88224b030",
-  12242339
+export const YEARN_LENS_CONTRACT_ADDRESS = ContractInfo.set(
+  Address.fromString("0x83d95e0d5f402511db06817aff3f9ea88224b030"),
+  BigInt.fromI32(12242339)
 );
-export const CHAIN_LINK_CONTRACT_ADDRESS = new OracleContract(
-  "0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf",
-  12864088
+
+export const INCH_ORACLE_CONTRACT_ADDRESS = ContractInfo.set(
+  Address.fromString("0x07d91f5fb9bf7798734c3f606db065549f6893bb"),
+  BigInt.fromI32(12522266)
 );
-export const AAVE_ORACLE_CONTRACT_ADDRESS = new OracleContract();
-export const SUSHISWAP_CALCULATIONS_ADDRESS = new OracleContract(
-  "0x8263e161a855b644f582d9c164c66aabee53f927",
-  12692284
+
+export const CHAIN_LINK_CONTRACT_ADDRESS = ContractInfo.set(
+  Address.fromString("0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf"),
+  BigInt.fromI32(12864088)
 );
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = new OracleContract(
-  "0x25bf7b72815476dd515044f9650bf79bad0df655",
-  12370088
+export const CURVE_CALCULATIONS_ADDRESS = ContractInfo.set(
+  Address.fromString("0x25bf7b72815476dd515044f9650bf79bad0df655"),
+  BigInt.fromI32(12370088)
 );
 
-export const CURVE_REGISTRY_ADDRESSES: OracleContract[] = [
-  new OracleContract("0x7d86446ddb609ed0f5f8684acf30380a356b2b4c", 11154794),
-  new OracleContract("0x8f942c20d02befc377d41445793068908e2250d0", 13986752),
+export const CURVE_REGISTRY_ADDRESSES = [
+  ContractInfo.set(
+    Address.fromString("0x7d86446ddb609ed0f5f8684acf30380a356b2b4c"),
+    BigInt.fromI32(11154794)
+  ),
+  ContractInfo.set(
+    Address.fromString("0x8f942c20d02befc377d41445793068908e2250d0"),
+    BigInt.fromI32(13986752)
+  ),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// UNISWAP FORKS CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const UNISWAP_FORKS_ROUTER_ADDRESSES: OracleContract[] = [
-  new OracleContract("0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f", 10794261), // SushiSwap
-  new OracleContract("0x7a250d5630b4cf539739df2c5dacb4c659f2488d", 10207858), // Uniswap
+export const SUSHISWAP_CALCULATIONS_ADDRESS = ContractInfo.set(
+  Address.fromString("0x5ea7e501c9a23f4a76dc7d33a11d995b13a1dd25"),
+  BigInt.fromI32(2396120)
+);
+
+export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
+  ContractInfo.set(
+    Address.fromString("0x7a250d5630b4cf539739df2c5dacb4c659f2488d"), // Uniswap
+    BigInt.fromI32(10207858)
+  ),
+  ContractInfo.set(
+    Address.fromString("0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f"), // SushiSwap
+    BigInt.fromI32(10794261)
+  ),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -53,12 +71,14 @@ export const YEARN_LENS_BLACKLIST: Address[] = [
   Address.fromString("0x8daebade922df735c38c80c7ebd708af50815faa"), // tBTC
   Address.fromString("0x0316eb71485b0ab14103307bf65a021042c6d380"), // Huobi BTC
   Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
+  Address.fromString("0xae7ab96520de3a18e5e111b5eaab095312d7fe84"), // stETH
 ];
-export const AAVE_ORACLE_BLACKLIST: Address[] = [];
 export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [
   Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
   Address.fromString("0xc4ad29ba4b3c580e6d59105fff484999997675ff"), // crv3Crypto
 ];
+export const INCH_ORACLE_BLACKLIST: Address[] = [];
+export const AAVE_ORACLE_BLACKLIST: Address[] = [];
 export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -66,6 +86,11 @@ export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 ///////////////////////////////////////////////////////////////////////////
 
 export const HARDCODED_STABLES: Address[] = [
+  Address.fromString("0x6b175474e89094c44da98b954eedeac495271d0f"), // DAI
+  Address.fromString("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"), // USDC
+  Address.fromString("0xdac17f958d2ee523a2206206994597c13d831ec7"), // Tether USD
+  Address.fromString("0x6c3f90f043a72fa612cbac8115ee7e52bde6e490"), // Curve.fi DAI/USDC/USDT
+  Address.fromString("0x853d955acef822db058eb8505911ed77f175b99e"), // FRAX
   Address.fromString("0xd632f22692fac7611d2aa1c0d552930d43caed3b"), // Curve.fi Factory USD Metapool: Frax
   Address.fromString("0x99d8a9c45b2eca8864373a26d1459e3dff1e17f3"), // Magic Internet Money
   Address.fromString("0x5a6a4d54456819380173272a5e8e9b9904bdf41b"), // Curve.fi Factory USD Metapool: Magic Internet Money 3Pool
@@ -92,6 +117,16 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0x3ed3b47dd13ec9a98b44e6204a523e766b225811"), // Aave interest bearing USDT
   Address.fromString("0xbcca60bb61934080951369a648fb03df4f96263c"), // Aave interest bearing USDC
   Address.fromString("0x6c5024cd4f8a59110119c56f8933403a539555eb"), // Aave interest bearing SUSD
+  Address.fromString("0x466a756e9a7401b5e2444a3fcb3c2c12fbea0a54"), // Stablecoin
+  Address.fromString("0x31d4eb09a216e181ec8a43ce79226a487d6f0ba9"), // USDM
+  Address.fromString("0xff709449528b6fb6b88f557f7d93dece33bca78d"), // ApeUSD
+  Address.fromString("0xf0a93d4994b3d98fb5e3a2f90dbc2d69073cb86b"), // PWRD Stablecoin
+  Address.fromString("0x42ef9077d8e79689799673ae588e046f8832cb95"), // fryUSD
+  Address.fromString("0x0e2ec54fc0b509f445631bf4b91ab8168230c752"), // LINKUSD
+  Address.fromString("0xea3fb6f331735252e7bfb0b24b3b761301293dbe"), // Vader USD
+  Address.fromString("0x4fabb145d64652a948d72533023f6e7a623c7c53"), // Binance USD
+  Address.fromString("0x956f47f50a910163d8bf957cf5846d573e7f87ca"), // Fei USD
+  Address.fromString("0xc7d9c108d4e1dd1484d3e2568d7f74bfd763d356"), // SORA Synthetic USD
   Address.fromString("0xd71ecff9342a5ced620049e616c5035f1db98620"), // Synth sEUR
 ];
 
@@ -99,58 +134,97 @@ export const HARDCODED_STABLES: Address[] = [
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
+export const WHITELISTED_TOKENS = new TypedMap<string, TokenInfo>();
 
-export const ETH_ADDRESS = Address.fromString(
-  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+WHITELISTED_TOKENS.set(
+  "USDC",
+  TokenInfo.set(
+    "USDC",
+    6,
+    Address.fromString("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
+  )
 );
-export const WETH_ADDRESS = Address.fromString(
-  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+
+WHITELISTED_TOKENS.set(
+  "USDT",
+  TokenInfo.set(
+    "USDT",
+    6,
+    Address.fromString("0xdac17f958d2ee523a2206206994597c13d831ec7")
+  )
 );
-export const USDC_ADDRESS = Address.fromString(
-  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
+WHITELISTED_TOKENS.set(
+  "DAI",
+  TokenInfo.set(
+    "DAI",
+    18,
+    Address.fromString("0x6b175474e89094c44da98b954eedeac495271d0f")
+  )
+);
+
+WHITELISTED_TOKENS.set(
+  "WETH",
+  TokenInfo.set(
+    "WETH",
+    18,
+    Address.fromString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")
+  )
+);
+
+WHITELISTED_TOKENS.set(
+  "NATIVE_TOKEN",
+  TokenInfo.set(
+    "ETH",
+    18,
+    Address.fromString("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+  )
 );
 
 export class config implements Configurations {
-  network(): string {
-    return NETWORK_STRING;
-  }
-
-  yearnLens(): OracleContract {
+  yearnLens(): ContractInfo | null {
     return YEARN_LENS_CONTRACT_ADDRESS;
-  }
-  chainLink(): OracleContract {
-    return CHAIN_LINK_CONTRACT_ADDRESS;
   }
   yearnLensBlacklist(): Address[] {
     return YEARN_LENS_BLACKLIST;
   }
 
-  aaveOracle(): OracleContract {
-    return AAVE_ORACLE_CONTRACT_ADDRESS;
+  inchOracle(): ContractInfo | null {
+    return INCH_ORACLE_CONTRACT_ADDRESS;
+  }
+  inchOracleBlacklist(): Address[] {
+    return INCH_ORACLE_BLACKLIST;
+  }
+
+  chainLink(): ContractInfo | null {
+    return CHAIN_LINK_CONTRACT_ADDRESS;
+  }
+
+  aaveOracle(): ContractInfo | null {
+    return null;
   }
   aaveOracleBlacklist(): Address[] {
     return AAVE_ORACLE_BLACKLIST;
   }
 
-  curveCalculations(): OracleContract {
+  curveCalculations(): ContractInfo | null {
     return CURVE_CALCULATIONS_ADDRESS;
   }
   curveCalculationsBlacklist(): Address[] {
     return CURVE_CALCULATIONS_BLACKSLIST;
   }
 
-  sushiCalculations(): OracleContract {
+  sushiCalculations(): ContractInfo | null {
     return SUSHISWAP_CALCULATIONS_ADDRESS;
   }
   sushiCalculationsBlacklist(): Address[] {
     return SUSHI_CALCULATIONS_BLACKSLIST;
   }
 
-  uniswapForks(): OracleContract[] {
+  uniswapForks(): ContractInfo[] {
     return UNISWAP_FORKS_ROUTER_ADDRESSES;
   }
-  curveRegistry(): OracleContract[] {
+  curveRegistry(): ContractInfo[] {
     return CURVE_REGISTRY_ADDRESSES;
   }
 
@@ -158,17 +232,7 @@ export class config implements Configurations {
     return HARDCODED_STABLES;
   }
 
-  ethAddress(): Address {
-    return ETH_ADDRESS;
-  }
-  wethAddress(): Address {
-    return WETH_ADDRESS;
-  }
-  usdcAddress(): Address {
-    return USDC_ADDRESS;
-  }
-
-  usdcTokenDecimals(): BigInt {
-    return USDC_TOKEN_DECIMALS;
+  whitelistedTokens(): TypedMap<string, TokenInfo> {
+    return WHITELISTED_TOKENS;
   }
 }

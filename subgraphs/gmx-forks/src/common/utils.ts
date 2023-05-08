@@ -1,10 +1,10 @@
 import {
-  Address,
-  BigDecimal,
+  log,
   BigInt,
   Bytes,
+  Address,
   ethereum,
-  log,
+  BigDecimal,
 } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
 import { Vault } from "../../generated/Vault/Vault";
@@ -13,6 +13,10 @@ import { Token as TokenSchema } from "../../generated/schema";
 
 export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
+}
+
+export function enumToPrefix(snake: string): string {
+  return snake.toLowerCase().replace("_", "-") + "-";
 }
 
 export function readValue<T>(
