@@ -20,6 +20,7 @@ module.exports = {
       // e.g. Bytes.fromHexString("0x123456789abcdef")
       // BigInt.fromString("1")
       const ALLOWED_METHODS = [
+        "decode", // in ethereum.decode()
         "fromString",
         "fromHexString",
         "replace",
