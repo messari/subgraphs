@@ -107,7 +107,7 @@ Total volumes in this subgraph refer to perp trading volume. Meanwhile, there ar
 
 ### Total Revenue
 
-> Total Revenue of a Pool = ∑ poistion opening & closing fees, borrowing fees, and swap fees
+> Total Revenue of a Pool = ∑ position opening & closing fees, borrowing fees, and swap fees
 
 #### Supply Side Revenue
 

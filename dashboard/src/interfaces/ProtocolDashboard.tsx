@@ -1,5 +1,14 @@
 import { CircularProgress } from "@mui/material";
-import { ApolloClient, ApolloError, gql, HttpLink, InMemoryCache, NormalizedCacheObject, useLazyQuery, useQuery } from "@apollo/client";
+import {
+  ApolloClient,
+  ApolloError,
+  gql,
+  HttpLink,
+  InMemoryCache,
+  NormalizedCacheObject,
+  useLazyQuery,
+  useQuery,
+} from "@apollo/client";
 
 import { Chart as ChartJS, registerables } from "chart.js";
 import React, { useEffect, useMemo, useState } from "react";
@@ -59,9 +68,10 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
       } else {
         subgraphName = "";
       }
-    } else if (!subgraphParam.includes('/')) {
+    } else if (!subgraphParam.includes("/")) {
       if (subgraphParam?.toUpperCase()?.split("QM")?.length === 1) {
-        queryURL = "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + subgraphParam;
+        queryURL =
+          "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + subgraphParam;
       } else {
         queryURL = "https://api.thegraph.com/subgraphs/id/" + subgraphParam;
       }
@@ -79,7 +89,9 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   const [poolId, setPoolId] = useState<string>(poolIdString);
   const [skipAmt, paginate] = useState<number>(skipAmtParam);
 
-  const [overlayDeploymentClient, setOverlayDeploymentClient] = useState<ApolloClient<NormalizedCacheObject>>(NewClient("https://api.thegraph.com/index-node/graphql"));
+  const [overlayDeploymentClient, setOverlayDeploymentClient] = useState<ApolloClient<NormalizedCacheObject>>(
+    NewClient("https://api.thegraph.com/index-node/graphql"),
+  );
   const [overlayDeploymentURL, setOverlayDeploymentURL] = useState<string>("");
   const [overlayError, setOverlayError] = useState<ApolloError | null>(null);
 
@@ -98,7 +110,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
       setOverlayDeploymentURL(overlayParam);
       setOverlayDeploymentClient(NewClient(overlayParam));
     }
-  }, [])
+  }, []);
 
   const [positionSnapshots, setPositionSnapshots] = useState();
   const [positionsLoading, setPositionsLoading] = useState(false);
@@ -119,12 +131,10 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     error: protocolSchemaQueryError,
   } = useQuery(metaDataQuery, { client });
 
-
-  const [getOverlaySchemaData, {
-    data: overlaySchemaData,
-    loading: overlaySchemaQueryLoading,
-    error: overlaySchemaQueryError,
-  }] = useLazyQuery(metaDataQuery, { client: overlayDeploymentClient });
+  const [
+    getOverlaySchemaData,
+    { data: overlaySchemaData, loading: overlaySchemaQueryLoading, error: overlaySchemaQueryError },
+  ] = useLazyQuery(metaDataQuery, { client: overlayDeploymentClient });
 
   useEffect(() => {
     if (overlayError) {
@@ -138,7 +148,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
       p.set("overlay", overlayDeploymentURL);
     }
     navigate("?" + p.toString().split("%2F").join("/").split("%3A").join(":"));
-  }, [overlayDeploymentURL])
+  }, [overlayDeploymentURL]);
 
   useEffect(() => {
     if (overlayDeploymentURL && protocolSchemaData) {
@@ -147,7 +157,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     if (overlayDeploymentURL === "" && overlayError) {
       setOverlayError(null);
     }
-  }, [protocolSchemaData, overlayDeploymentURL])
+  }, [protocolSchemaData, overlayDeploymentURL]);
 
   // By default, set the schema version to the user selected. If user has not selected, go to the version on the protocol entity
   let protocolIdString = searchParams.get("protocolId");
@@ -158,8 +168,8 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
 
   let protocolType = "N/A";
   let schemaVersion = subgraphToQuery.version;
-  let slug = ""
-  let networkStr = ""
+  let slug = "";
+  let networkStr = "";
   let entityError = null;
   if (protocolSchemaData?.protocols?.length > 0) {
     if (protocolSchemaData.protocols[0].id && !protocolIdToUse) {
@@ -169,10 +179,14 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     protocolType = protocolSchemaData.protocols[0].type;
     schemaVersion = protocolSchemaData.protocols[0].schemaVersion;
     slug = protocolSchemaData.protocols[0].slug;
-    networkStr = protocolSchemaData.protocols[0].network.toLowerCase().replace("_", "-").replace("mainnet", "ethereum").replace("matic", "polygon");
+    networkStr = protocolSchemaData.protocols[0].network
+      .toLowerCase()
+      .replace("_", "-")
+      .replace("mainnet", "ethereum")
+      .replace("matic", "polygon");
 
     if (!subgraphName) {
-      subgraphName = slug.concat("-").concat(networkStr)
+      subgraphName = slug.concat("-").concat(networkStr);
     }
   } else if (!protocolSchemaQueryLoading) {
     entityError = new ApolloError({
@@ -188,11 +202,13 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
       getOverlayMainQueryData();
     }
     if (overlayProtocolType !== protocolType && !overlaySchemaQueryLoading && overlayDeploymentURL) {
-      setOverlayError(new ApolloError({
-        errorMessage: `OVERLAY ERROR - Current subgraph ${subgraphToQuery.url} has a schema type of ${protocolType} while the overlay subgraph ${overlayDeploymentURL} has a schema type of ${overlayProtocolType}. In order to do an overlay comparison, these types have to match.`,
-      }));
+      setOverlayError(
+        new ApolloError({
+          errorMessage: `OVERLAY ERROR - Current subgraph ${subgraphToQuery.url} has a schema type of ${protocolType} while the overlay subgraph ${overlayDeploymentURL} has a schema type of ${overlayProtocolType}. In order to do an overlay comparison, these types have to match.`,
+        }),
+      );
     }
-  }, [overlaySchemaData, overlaySchemaQueryError])
+  }, [overlaySchemaData, overlaySchemaQueryError]);
 
   const [protocolId, setprotocolId] = useState<string>(protocolIdToUse);
 
@@ -242,7 +258,10 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     ${overlayQuery}
   `;
 
-  const [getMainQueryData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId, protocolId }, client });
+  const [getMainQueryData, { data, loading, error }] = useLazyQuery(queryMain, {
+    variables: { poolId, protocolId },
+    client,
+  });
 
   const [
     getFinancialsData,
@@ -272,45 +291,34 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     { client },
   );
 
-  const [getProtocolTableData, { data: protocolTableData, error: protocolTableError }] =
-    useLazyQuery(
-      gql`
-        ${protocolTableQuery}
-      `,
-      { client, variables: { protocolId: protocolIdToUse } },
-    );
-
-  const [getOverlayMainQueryData, { data: overlayData }] =
-    useLazyQuery(
-      overlayQueryMain,
-      { variables: { poolId, protocolId }, client: overlayDeploymentClient }
-    );
-
-  const [
-    getOverlayFinancialsData,
-    { data: overlayFinancialsData },
-  ] = useLazyQuery(
+  const [getProtocolTableData, { data: protocolTableData, error: protocolTableError }] = useLazyQuery(
     gql`
-        ${overlayFinancialsQuery}
-      `,
+      ${protocolTableQuery}
+    `,
+    { client, variables: { protocolId: protocolIdToUse } },
+  );
+
+  const [getOverlayMainQueryData, { data: overlayData }] = useLazyQuery(overlayQueryMain, {
+    variables: { poolId, protocolId },
+    client: overlayDeploymentClient,
+  });
+
+  const [getOverlayFinancialsData, { data: overlayFinancialsData }] = useLazyQuery(
+    gql`
+      ${overlayFinancialsQuery}
+    `,
     { client: overlayDeploymentClient },
   );
-  const [
-    getOverlayDailyUsageData,
-    { data: overlayDailyUsageData, loading: overlayDailyUsageLoading },
-  ] = useLazyQuery(
+  const [getOverlayDailyUsageData, { data: overlayDailyUsageData, loading: overlayDailyUsageLoading }] = useLazyQuery(
     gql`
-        ${overlayDailyUsageQuery}
-      `,
+      ${overlayDailyUsageQuery}
+    `,
     { client: overlayDeploymentClient },
   );
-  const [
-    getOverlayHourlyUsageData,
-    { data: overlayHourlyUsageData },
-  ] = useLazyQuery(
+  const [getOverlayHourlyUsageData, { data: overlayHourlyUsageData }] = useLazyQuery(
     gql`
-        ${overlayHourlyUsageQuery}
-      `,
+      ${overlayHourlyUsageQuery}
+    `,
     { client: overlayDeploymentClient },
   );
 
@@ -339,16 +347,12 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   );
 
   const queryPoolOverview = gql`
-  ${poolOverview(protocolType, schemaVersion)}
+    ${poolOverview(protocolType, schemaVersion)}
   `;
 
   const [
     getOverlayPoolTimeseriesData,
-    {
-      data: overlayPoolTimeseriesData,
-      loading: overlayPoolTimeseriesLoading,
-      error: overlayPoolTimeseriesError,
-    },
+    { data: overlayPoolTimeseriesData, loading: overlayPoolTimeseriesLoading, error: overlayPoolTimeseriesError },
   ] = useLazyQuery(
     gql`
       ${overlayPoolTimeseriesQuery}
@@ -469,18 +473,25 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
 
   useEffect(() => {
     const poolType = PoolName[schemaMapping[protocolType]];
-    if (overlayPoolTimeseriesData && !overlayDailyUsageLoading && !overlayPoolTimeseriesData?.[poolType + 'DailySnapshots']?.length && !overlayPoolTimeseriesData?.[poolType + 'HourlySnapshots']?.length) {
-      setOverlayError(new ApolloError({
-        errorMessage: `OVERLAY ERROR - Current subgraph ${subgraphToQuery.url} has a pool with id ${poolId} while the overlay subgraph ${overlayDeploymentURL} does not. In order to do an overlay comparison, both of these subgraphs need the same pools.`,
-      }));
+    if (
+      overlayPoolTimeseriesData &&
+      !overlayDailyUsageLoading &&
+      !overlayPoolTimeseriesData?.[poolType + "DailySnapshots"]?.length &&
+      !overlayPoolTimeseriesData?.[poolType + "HourlySnapshots"]?.length
+    ) {
+      setOverlayError(
+        new ApolloError({
+          errorMessage: `OVERLAY ERROR - Current subgraph ${subgraphToQuery.url} has a pool with id ${poolId} while the overlay subgraph ${overlayDeploymentURL} does not. In order to do an overlay comparison, both of these subgraphs need the same pools.`,
+        }),
+      );
     }
-  }, [overlayPoolTimeseriesData])
+  }, [overlayPoolTimeseriesData]);
 
   useEffect(() => {
     if (Object.keys(protocolJSON).length === 0) {
       getData();
     }
-  })
+  });
 
   useEffect(() => {
     if (
@@ -610,7 +621,11 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         variables["pool" + (idx + 1) + "Id"] = dataPools[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC" || data?.protocols[0]?.type === "YIELD") {
+      if (
+        data?.protocols[0]?.type === "EXCHANGE" ||
+        data?.protocols[0]?.type === "GENERIC" ||
+        data?.protocols[0]?.type === "YIELD"
+      ) {
         getPoolsSnapshotVolume({ variables });
       }
       if (dataPools[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools2) {
@@ -626,7 +641,11 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         variables["pool" + (idx + 1) + "Id"] = dataPools2[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens2({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC" || data?.protocols[0]?.type === "YIELD") {
+      if (
+        data?.protocols[0]?.type === "EXCHANGE" ||
+        data?.protocols[0]?.type === "GENERIC" ||
+        data?.protocols[0]?.type === "YIELD"
+      ) {
         getPoolsSnapshotVolume2({ variables });
       }
       if (dataPools2[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools3) {
@@ -642,7 +661,11 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         variables["pool" + (idx + 1) + "Id"] = dataPools3[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens3({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC" || data?.protocols[0]?.type === "YIELD") {
+      if (
+        data?.protocols[0]?.type === "EXCHANGE" ||
+        data?.protocols[0]?.type === "GENERIC" ||
+        data?.protocols[0]?.type === "YIELD"
+      ) {
         getPoolsSnapshotVolume3({ variables });
       }
       if (dataPools3[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools4) {
@@ -658,7 +681,11 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         variables["pool" + (idx + 1) + "Id"] = dataPools4[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens4({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC" || data?.protocols[0]?.type === "YIELD") {
+      if (
+        data?.protocols[0]?.type === "EXCHANGE" ||
+        data?.protocols[0]?.type === "GENERIC" ||
+        data?.protocols[0]?.type === "YIELD"
+      ) {
         getPoolsSnapshotVolume4({ variables });
       }
       if (dataPools4[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools5) {
@@ -674,7 +701,11 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
         variables["pool" + (idx + 1) + "Id"] = dataPools5[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens5({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC" || data?.protocols[0]?.type === "YIELD") {
+      if (
+        data?.protocols[0]?.type === "EXCHANGE" ||
+        data?.protocols[0]?.type === "GENERIC" ||
+        data?.protocols[0]?.type === "YIELD"
+      ) {
         getPoolsSnapshotVolume5({ variables });
       }
     }
@@ -699,10 +730,10 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
     }
   }, [error, protocolSchemaQueryError]);
 
-  let protocolKey = Object.keys(protocolJSON).find(x => subgraphName.includes(x));
+  let protocolKey = Object.keys(protocolJSON).find((x) => subgraphName.includes(x));
   let depoKey: any = "";
   if (!!protocolKey) {
-    depoKey = Object.keys(protocolJSON[protocolKey].deployments).find(x => subgraphName.includes(x));
+    depoKey = Object.keys(protocolJSON[protocolKey].deployments).find((x) => subgraphName.includes(x));
   } else {
     protocolKey = "";
   }
@@ -1002,7 +1033,7 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
   let overlayProtocolData = {
     financialsDailySnapshots: [],
     usageMetricsDailySnapshots: [],
-    usageMetricsHourlySnapshots: []
+    usageMetricsHourlySnapshots: [],
   };
 
   if (overlayFinancialsData && overlayDeploymentURL) {
@@ -1017,13 +1048,13 @@ function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints, decentral
 
   let overlayPoolDataToPass: { [x: string]: any } = {};
   if (overlayDeploymentURL && poolId) {
-    if (typeof overlayPoolTimeseriesData === 'object') {
-      Object.keys(overlayPoolTimeseriesData).forEach(x => overlayPoolDataToPass[x] = overlayPoolTimeseriesData[x]);
+    if (typeof overlayPoolTimeseriesData === "object") {
+      Object.keys(overlayPoolTimeseriesData).forEach((x) => (overlayPoolDataToPass[x] = overlayPoolTimeseriesData[x]));
     }
   }
 
   if (poolTimeseriesData) {
-    Object.keys(poolTimeseriesData).forEach(x => {
+    Object.keys(poolTimeseriesData).forEach((x) => {
       if (!overlayPoolDataToPass[x]) {
         overlayPoolDataToPass[x] = [];
       }

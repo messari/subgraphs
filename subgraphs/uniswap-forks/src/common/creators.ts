@@ -106,8 +106,8 @@ export function createLiquidityPool(
   const protocol = getOrCreateProtocol();
 
   // create the tokens and tokentracker
-  const token0 = getOrCreateToken(token0Address);
-  const token1 = getOrCreateToken(token1Address);
+  const token0 = getOrCreateToken(event, token0Address);
+  const token1 = getOrCreateToken(event, token1Address);
   const LPtoken = getOrCreateLPToken(poolAddress, token0, token1);
 
   updateTokenWhitelists(token0, token1, poolAddress);
@@ -181,12 +181,30 @@ export function createDeposit(
     event.block.number
   );
 
-  const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
-  const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
+  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
+  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
+
+  token0._totalSupply = token0._totalSupply.plus(amount0);
+  token1._totalSupply = token1._totalSupply.plus(amount1);
+
+  token0._totalValueLockedUSD = convertTokenToDecimal(
+    token0._totalSupply,
+    token0.decimals
+  ).times(token0.lastPriceUSD!);
+  token1._totalValueLockedUSD = convertTokenToDecimal(
+    token1._totalSupply,
+    token1.decimals
+  ).times(token1.lastPriceUSD!);
+
+  token0.save();
+  token1.save();
 
   // update exchange info (except balances, sync will cover that)
   const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
   const token1Amount = convertTokenToDecimal(amount1, token1.decimals);
+
+  const reserve0Amount = pool.inputTokenBalances[0];
+  const reserve1Amount = pool.inputTokenBalances[1];
 
   const logIndexI32 = event.logIndex.toI32();
   const transactionHash = event.transaction.hash.toHexString();
@@ -205,6 +223,7 @@ export function createDeposit(
   deposit.outputToken = pool.outputToken;
   deposit.inputTokenAmounts = [amount0, amount1];
   deposit.outputTokenAmount = transfer.liquidity;
+  deposit.reserveAmounts = [reserve0Amount, reserve1Amount];
   deposit.amountUSD = token0
     .lastPriceUSD!.times(token0Amount)
     .plus(token1.lastPriceUSD!.times(token1Amount));
@@ -228,12 +247,30 @@ export function createWithdraw(
     event.block.number
   );
 
-  const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
-  const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
+  const token0 = getOrCreateToken(event, pool.inputTokens[INT_ZERO]);
+  const token1 = getOrCreateToken(event, pool.inputTokens[INT_ONE]);
+
+  token0._totalSupply = token0._totalSupply.minus(amount0);
+  token1._totalSupply = token1._totalSupply.minus(amount1);
+
+  token0._totalValueLockedUSD = convertTokenToDecimal(
+    token0._totalSupply,
+    token0.decimals
+  ).times(token0.lastPriceUSD!);
+  token1._totalValueLockedUSD = convertTokenToDecimal(
+    token1._totalSupply,
+    token1.decimals
+  ).times(token1.lastPriceUSD!);
+
+  token0.save();
+  token1.save();
 
   // update exchange info (except balances, sync will cover that)
   const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
   const token1Amount = convertTokenToDecimal(amount1, token1.decimals);
+
+  const reserve0Amount = pool.inputTokenBalances[0];
+  const reserve1Amount = pool.inputTokenBalances[1];
 
   const logIndexI32 = event.logIndex.toI32();
   const transactionHash = event.transaction.hash.toHexString();
@@ -255,6 +292,7 @@ export function createWithdraw(
   withdrawal.outputToken = pool.outputToken;
   withdrawal.inputTokenAmounts = [amount0, amount1];
   withdrawal.outputTokenAmount = transfer.liquidity;
+  withdrawal.reserveAmounts = [reserve0Amount, reserve1Amount];
   withdrawal.amountUSD = token0
     .lastPriceUSD!.times(token0Amount)
     .plus(token1.lastPriceUSD!.times(token1Amount));
@@ -291,12 +329,27 @@ export function createSwapHandleVolumeAndFees(
   );
   const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
-  const token0 = getOrCreateToken(pool.inputTokens[0]);
-  const token1 = getOrCreateToken(pool.inputTokens[1]);
+  const token0 = getOrCreateToken(event, pool.inputTokens[0]);
+  const token1 = getOrCreateToken(event, pool.inputTokens[1]);
 
   // totals for volume updates
   const amount0 = amount0In.minus(amount0Out);
   const amount1 = amount1In.minus(amount1Out);
+
+  token0._totalSupply = token0._totalSupply.plus(amount0);
+  token1._totalSupply = token1._totalSupply.plus(amount1);
+
+  token0._totalValueLockedUSD = convertTokenToDecimal(
+    token0._totalSupply,
+    token0.decimals
+  ).times(token0.lastPriceUSD!);
+  token1._totalValueLockedUSD = convertTokenToDecimal(
+    token1._totalSupply,
+    token1.decimals
+  ).times(token1.lastPriceUSD!);
+
+  token0.save();
+  token1.save();
 
   // Gets the tokenIn and tokenOut payload based on the amounts
   const swapTokens = getSwapTokens(
@@ -307,6 +360,9 @@ export function createSwapHandleVolumeAndFees(
     amount1In,
     amount1Out
   );
+
+  const reserve0Amount = pool.inputTokenBalances[0];
+  const reserve1Amount = pool.inputTokenBalances[1];
 
   const logIndexI32 = event.logIndex.toI32();
   const transactionHash = event.transaction.hash.toHexString();
@@ -328,6 +384,7 @@ export function createSwapHandleVolumeAndFees(
   swap.tokenOut = swapTokens.tokenOut.id;
   swap.amountOut = swapTokens.amountOut;
   swap.amountOutUSD = swapTokens.tokenOutUSD;
+  swap.reserveAmounts = [reserve0Amount, reserve1Amount];
   swap.pool = pool.id;
 
   swap.save();

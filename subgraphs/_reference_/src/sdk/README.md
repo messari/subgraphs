@@ -20,5 +20,6 @@ Refer to each protocol type readme, since requirements might vary:
 
 - [Bridges](./protocols/bridge/README.md)
 - [Lending](./protocols/lending/README.md)
+- [Perpetual Futures](./protocols/perpfutures/README.md)
 - DEX
 - Yield

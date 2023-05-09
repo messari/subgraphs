@@ -1,10 +1,5 @@
 import moment from "moment";
-import {
-  ApolloClient,
-  HttpLink,
-  InMemoryCache,
-  NormalizedCacheObject,
-} from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
 import { useEffect, useRef } from "react";
 
 export const tableCellTruncate: any = {
@@ -14,26 +9,32 @@ export const tableCellTruncate: any = {
 };
 
 export const schemaMapping: { [x: string]: any } = {
-  "exchanges": "exchanges",
-  "vaults": "vaults",
+  exchanges: "exchanges",
+  vaults: "vaults",
   "dex-amm": "exchanges",
   "yield-aggregator": "vaults",
-  "lending": "lending",
-  "generic": "generic",
-  "bridge": "bridge",
-  "bridges": "bridge",
-  "EXCHANGES": "exchanges",
-  "VAULTS": "vaults",
+  lending: "lending",
+  generic: "generic",
+  bridge: "bridge",
+  bridges: "bridge",
+  EXCHANGES: "exchanges",
+  VAULTS: "vaults",
   "DEX-AMM": "exchanges",
   "YIELD-AGGREGATOR": "vaults",
-  "LENDING": "lending",
-  "GENERIC": "generic",
-  "EXCHANGE": "exchanges",
-  "YIELD": "vaults",
-  "BRIDGE": "bridge",
-  "BRIDGES": "bridge"
-
-}
+  LENDING: "lending",
+  GENERIC: "generic",
+  EXCHANGE: "exchanges",
+  YIELD: "vaults",
+  BRIDGE: "bridge",
+  BRIDGES: "bridge",
+  erc20: "erc20",
+  erc721: "erc721",
+  governance: "governance",
+  network: "network",
+  "nft-marketplace": "nft-marketplace",
+  "derivatives-options": "derivatives-options",
+  "derivatives-perpfutures": "derivatives-perpfutures",
+};
 
 export function toDate(timestamp: number, hour: boolean = false) {
   let formatString = "YYYY-MM-DD";
@@ -41,7 +42,7 @@ export function toDate(timestamp: number, hour: boolean = false) {
     formatString += " HH:mm";
   }
   return moment.utc(timestamp * 1000).format(formatString);
-};
+}
 
 export function toUnitsSinceEpoch(dateStr: string, hour: boolean) {
   const timestamp = moment.utc(dateStr).unix();
@@ -49,7 +50,7 @@ export function toUnitsSinceEpoch(dateStr: string, hour: boolean) {
     return Math.round(timestamp / 3600).toString();
   }
   return Math.round(timestamp / 86400).toString();
-};
+}
 
 export function isValidHttpUrl(s: string) {
   let url;
@@ -108,7 +109,7 @@ export function convertTokenDecimals(value: string, decimals: number): number {
 export function parseSubgraphName(url: string) {
   const result = new RegExp(/\/name\/(.*)/g).exec(url);
   return result ? result[1] : "";
-};
+}
 
 export function toPercent(cur: number, total: number): number {
   return parseFloat(((cur / total) * 100).toFixed(2));
@@ -139,16 +140,19 @@ export function formatIntToFixed2(val: number): string {
   } else if (!returnStr.split(".")[1]?.length) {
     returnStr += ".00";
   }
-  if (returnStr.includes('NaN')) {
+  if (returnStr.includes("NaN")) {
     returnStr = "0.00";
   }
   return returnStr;
-};
+}
 
 export function csvToJSONConvertorMultiCol(lines: string[], headers: string[], mmddyyyy: boolean = true): any {
   const invalidColumns = [".", "..", "...", ",", "-", "_", " ", '"', "'"];
   try {
-    if (!(headers.length >= 2) || (!headers.map(x => x?.toLowerCase()).includes('date') && !headers.map(x => x?.toLowerCase()).includes('time'))) {
+    if (
+      !(headers.length >= 2) ||
+      (!headers.map((x) => x?.toLowerCase()).includes("date") && !headers.map((x) => x?.toLowerCase()).includes("time"))
+    ) {
       throw new Error('Wrong CSV data format. The CSV must have multiple columns, one must be a "date" column.');
     }
     const obj: any = {};
@@ -173,14 +177,14 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[], m
             if (entry.includes('"')) {
               entry = entry.split('"').join("");
             }
-            if (header === 'date' && isNaN(entry)) {
+            if (header === "date" && isNaN(entry)) {
               if (isNaN(moment(entry).unix()) && mmddyyyy) {
                 returnRecursion = true;
               } else {
                 if (mmddyyyy) {
                   entry = moment(entry).unix();
                 } else {
-                  entry = moment(entry, 'DD/MM/YYYY').unix();
+                  entry = moment(entry, "DD/MM/YYYY").unix();
                 }
               }
             }
@@ -195,7 +199,7 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[], m
     if (returnRecursion) {
       return csvToJSONConvertorMultiCol(lines, headers, false);
     }
-    return (obj);
+    return obj;
   } catch (err: any) {
     console.error(err.message);
     return err;
@@ -205,7 +209,7 @@ export function csvToJSONConvertorMultiCol(lines: string[], headers: string[], m
 export function csvToJSONConvertorTwoCol(lines: string[], headers: string[], mmddyyyy: boolean = true): any {
   const result = [];
   try {
-    if (headers.length !== 2 || !headers.map(x => x?.toLowerCase()).includes('date')) {
+    if (headers.length !== 2 || !headers.map((x) => x?.toLowerCase()).includes("date")) {
       throw new Error('Wrong CSV data format. The CSV must have two columns, one must be a "date" column.');
     }
     let returnRecursion = false;
@@ -215,8 +219,8 @@ export function csvToJSONConvertorTwoCol(lines: string[], headers: string[], mmd
       for (let j = 0; j < headers.length; j++) {
         let entry: any = currentline[j];
         let header = headers[j].toLowerCase();
-        if (header !== 'date') {
-          header = 'value';
+        if (header !== "date") {
+          header = "value";
         }
         if (entry) {
           if (entry.includes("'")) {
@@ -225,14 +229,14 @@ export function csvToJSONConvertorTwoCol(lines: string[], headers: string[], mmd
           if (entry.includes('"')) {
             entry = entry.split('"').join("");
           }
-          if (header === 'date' && isNaN(entry)) {
+          if (header === "date" && isNaN(entry)) {
             if (isNaN(moment(entry).unix()) && mmddyyyy) {
               returnRecursion = true;
             } else {
               if (mmddyyyy) {
                 entry = moment(entry).unix();
               } else {
-                entry = moment(entry, 'DD/MM/YYYY').unix();
+                entry = moment(entry, "DD/MM/YYYY").unix();
               }
             }
           }
@@ -249,7 +253,7 @@ export function csvToJSONConvertorTwoCol(lines: string[], headers: string[], mmd
     if (returnRecursion) {
       return csvToJSONConvertorTwoCol(lines, headers, false);
     }
-    return (result);
+    return result;
   } catch (err: any) {
     console.error(err.message);
     return err;
@@ -259,8 +263,8 @@ export function csvToJSONConvertorTwoCol(lines: string[], headers: string[], mmd
 export function csvToJSONConvertor(csv: string, isEntityLevel: boolean) {
   try {
     const lines = csv.split("\n");
-    const headers = lines[0].split(",").map(x => x?.includes('\r') ? x.split('\r').join("") : x);
-    let result: any = null
+    const headers = lines[0].split(",").map((x) => (x?.includes("\r") ? x.split("\r").join("") : x));
+    let result: any = null;
     if (headers.length === 2 && !isEntityLevel) {
       result = csvToJSONConvertorTwoCol(lines, headers);
     }
@@ -270,7 +274,7 @@ export function csvToJSONConvertor(csv: string, isEntityLevel: boolean) {
     if (result instanceof Error) {
       throw result;
     }
-    return (result);
+    return result;
   } catch (err: any) {
     console.error(err.message);
     return new Error("csvToJSONConvertor encountered an JS error while processing: " + err?.message + ".");
@@ -279,15 +283,15 @@ export function csvToJSONConvertor(csv: string, isEntityLevel: boolean) {
 
 export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
   try {
-    const arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
-    let CSV = '';
+    const arrData = typeof JSONData != "object" ? JSON.parse(JSONData) : JSONData;
+    let CSV = "";
     if (ShowLabel) {
       let row = "";
       for (let index in arrData[0]) {
-        row += index + ',';
+        row += index + ",";
       }
       row = row.slice(0, -1);
-      CSV += row + '\r\n';
+      CSV += row + "\r\n";
     }
 
     for (let i = 0; i < arrData.length; i++) {
@@ -296,16 +300,16 @@ export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel
         row += '"' + arrData[i][index] + '",';
       }
       row.slice(0, row.length - 1);
-      CSV += row + '\r\n';
+      CSV += row + "\r\n";
     }
 
-    if (CSV === '') {
+    if (CSV === "") {
       return;
     }
 
     const csv = CSV;
-    const filename = (ReportTitle || 'UserExport') + '.csv';
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const filename = (ReportTitle || "UserExport") + ".csv";
+    const blob = new Blob([csv], { type: "text/csv" });
     const csvUrl = window.webkitURL.createObjectURL(blob);
     return { csvUrl, filename };
   } catch (err: any) {
@@ -316,7 +320,7 @@ export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel
 
 export function downloadCSV(data: any, label: string, identifier: string) {
   try {
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     const field = label.split("-")[1] || label;
     let freq = label.split("-")[0]?.toUpperCase()?.includes("HOURLY") ? "hourly-" : "";
     if (label.split("-")[0]?.toUpperCase()?.includes("DAILY")) {
@@ -325,8 +329,8 @@ export function downloadCSV(data: any, label: string, identifier: string) {
     if (field?.toUpperCase()?.includes("DAILY") || field?.toUpperCase()?.includes("HOURLY")) {
       freq = "";
     }
-    link.download = identifier + '-' + freq + field + "-" + moment.utc(Date.now()).format("MMDDYY") + ".csv";
-    const csvEle = JSONToCSVConvertor(data, label + '-csv', label);
+    link.download = identifier + "-" + freq + field + "-" + moment.utc(Date.now()).format("MMDDYY") + ".csv";
+    const csvEle = JSONToCSVConvertor(data, label + "-csv", label);
     if (!csvEle?.csvUrl) {
       throw new Error("csv File not constructed");
     } else {
@@ -341,14 +345,14 @@ export function downloadCSV(data: any, label: string, identifier: string) {
 
 export function base64toBlobJPEG(dataURI: string) {
   try {
-    const byteString = atob(dataURI.split(',')[1]);
+    const byteString = atob(dataURI.split(",")[1]);
     const arrayBuffer = new ArrayBuffer(byteString.length);
     const integerArray = new Uint8Array(arrayBuffer);
 
     for (let i = 0; i < byteString.length; i++) {
       integerArray[i] = byteString.charCodeAt(i);
     }
-    return new Blob([arrayBuffer], { type: 'image/jpeg' });
+    return new Blob([arrayBuffer], { type: "image/jpeg" });
   } catch (err: any) {
     console.error(err.message);
     return;
@@ -367,10 +371,14 @@ export function lineupChartDatapoints(compChart: any) {
     const arr2StartDate = arr2[0]?.date;
 
     if (!arr1StartDate) {
-      throw new Error(`lineupChartDatapoints() error: compChart input key ${key1} was not an array holding objects with valid date properties holding timestamp values.`);
+      throw new Error(
+        `lineupChartDatapoints() error: compChart input key ${key1} was not an array holding objects with valid date properties holding timestamp values.`,
+      );
     }
     if (!arr2StartDate) {
-      throw new Error(`lineupChartDatapoints() error: compChart input key ${key2} was not an array holding objects with valid date properties holding timestamp values.`);
+      throw new Error(
+        `lineupChartDatapoints() error: compChart input key ${key2} was not an array holding objects with valid date properties holding timestamp values.`,
+      );
     }
 
     if (arr1StartDate > arr2StartDate) {

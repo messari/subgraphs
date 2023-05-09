@@ -119,7 +119,7 @@ export const VIEW_V2_START_BLOCK_NUMBER = BigInt.fromI32(14482429);
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const USDT_ADDRESS = "0xdac17f958d2ee523a2206206994597c13d831ec7";
-export const WSETH_ADDRESS = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0";
+export const WStETH_ADDRESS = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0";
 
 ////////////////////////
 ///// Type Helpers /////
