@@ -9,7 +9,7 @@ import { TokenPricer } from "../sdk/protocols/config";
 import { _ERC20 } from "../../generated/MlpManager/_ERC20";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { MlpManager } from "../../generated/MlpManager/MlpManager";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 
 export class TokenInitialize implements TokenInitializer {
   getTokenParams(address: Address): TokenParams {
@@ -29,7 +29,14 @@ export class TokenPrice implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
     const tokenAddress = Address.fromBytes(token.id);
     let tokenPrice = getUsdPricePerToken(tokenAddress).usdPrice;
+    if (tokenAddress.equals(constants.ESCROWED_MMY_ADDRESS)) {
+      log.warning("[tokenPrice] esGMX price {}", [tokenPrice.toString()]);
+    }
     if (tokenPrice.equals(constants.BIGDECIMAL_ZERO)) {
+      if (tokenAddress.equals(constants.ESCROWED_MMY_ADDRESS)) {
+        tokenPrice = getUsdPricePerToken(constants.MMY_ADDRESS).usdPrice;
+        log.warning("[tokenPrice] esGMX price {}", [tokenPrice.toString()]);
+      }
       if (tokenAddress.equals(constants.MLP_ADDRESS)) {
         for (let i = 0; i < constants.MLP_MANAGER_ADDRESSES.length; i++) {
           const mlpManagerContract = MlpManager.bind(
@@ -42,11 +49,9 @@ export class TokenPrice implements TokenPricer {
             ),
             constants.PRICE_PRECISION_DECIMALS
           );
+
           if (!tokenPrice.equals(constants.BIGDECIMAL_ZERO)) break;
         }
-      }
-      if (tokenAddress.equals(constants.ESCROWED_MMY_ADDRESS)) {
-        tokenPrice = getUsdPricePerToken(constants.MMY_ADDRESS).usdPrice;
       }
     }
     return tokenPrice;
@@ -60,8 +65,25 @@ export class TokenPrice implements TokenPricer {
       utils.bigIntToBigDecimal(amount, token.decimals),
       null
     );
+    if (tokenAddress.equals(constants.ESCROWED_MMY_ADDRESS)) {
+      log.warning("[tokenPrice] esGMX valueUSD {} amount {}", [
+        amountVauleUSD.toString(),
+        amount.toString(),
+      ]);
+    }
 
     if (amountVauleUSD.equals(constants.BIGDECIMAL_ZERO)) {
+      if (tokenAddress.equals(constants.ESCROWED_MMY_ADDRESS)) {
+        amountVauleUSD = getUsdPrice(
+          constants.MMY_ADDRESS,
+          utils.bigIntToBigDecimal(amount, token.decimals),
+          null
+        );
+        log.warning("[tokenPrice] esGMX valueUSD {} amount {}", [
+          amountVauleUSD.toString(),
+          amount.toString(),
+        ]);
+      }
       if (tokenAddress.equals(constants.MLP_ADDRESS)) {
         for (let i = 0; i < constants.MLP_MANAGER_ADDRESSES.length; i++) {
           const mlpManagerContract = MlpManager.bind(
@@ -76,15 +98,9 @@ export class TokenPrice implements TokenPricer {
               constants.PRICE_PRECISION_DECIMALS
             )
             .times(utils.bigIntToBigDecimal(amount, token.decimals));
+
           if (!amountVauleUSD.equals(constants.BIGDECIMAL_ZERO)) break;
         }
-      }
-      if (tokenAddress.equals(constants.ESCROWED_MMY_ADDRESS)) {
-        amountVauleUSD = getUsdPrice(
-          constants.MMY_ADDRESS,
-          utils.bigIntToBigDecimal(amount, token.decimals),
-          null
-        );
       }
     }
     return amountVauleUSD;

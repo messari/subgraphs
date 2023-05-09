@@ -13,7 +13,7 @@ import { TokenManager } from "./tokens";
 import { PoolSnapshot } from "./poolSnapshot";
 import * as constants from "../../util/constants";
 import { PositionType, TransactionType } from "./enums";
-import { Bytes, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import {
   exponentToBigDecimal,
   poolArraySort,
@@ -247,14 +247,7 @@ export class Pool {
   addTotalValueLocked(delta: BigDecimal): void {
     this.pool.totalValueLockedUSD = this.pool.totalValueLockedUSD.plus(delta);
     this.save();
-    log.warning(
-      "[addTotalValueLockedPool] delta {} poolTvl {} protocolTvl {}",
-      [
-        delta.toString(),
-        this.pool.totalValueLockedUSD.toString(),
-        this.protocol.protocol.totalValueLockedUSD.toString(),
-      ]
-    );
+
     this.protocol.addTotalValueLocked(delta);
   }
 
@@ -644,10 +637,6 @@ export class Pool {
         inputToken,
         inputTokenBalance
       );
-      log.warning("[refreshInputTokenWeights] inputTokenTVL {} poolTVL {}", [
-        inputTokenTVL.toString(),
-        this.pool.totalValueLockedUSD.toString(),
-      ]);
 
       inputTokenWeights.push(
         safeDivide(inputTokenTVL, this.pool.totalValueLockedUSD).times(

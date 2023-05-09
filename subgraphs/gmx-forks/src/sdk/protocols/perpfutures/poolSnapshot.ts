@@ -6,7 +6,7 @@ import {
 import { subtractArrays } from "../../util/arrays";
 import * as constants from "../../util/constants";
 import { initActivityHelper } from "./protocolSnapshot";
-import { BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 /**
@@ -42,10 +42,6 @@ export class PoolSnapshot {
       this.pool._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_DAY;
     const snapshotHourID =
       this.pool._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_HOUR;
-    log.warning("[takePoolSnapshots] snapshotDayId {} dayId {} ", [
-      snapshotDayID.toString(),
-      this.dayID.toString(),
-    ]);
 
     if (snapshotDayID != this.dayID) {
       this.takeDailySnapshot(snapshotDayID);
@@ -76,10 +72,7 @@ export class PoolSnapshot {
     const previousSnapshot = LiquidityPoolHourlySnapshot.load(
       this.pool.id.concatI32(this.pool._lastSnapshotHourID!.toI32())
     );
-    log.warning(
-      "[takeHourlySnapshots] currentSnapshotsId {} previousSnapshotId {} ",
-      [hour.toString(), this.pool._lastSnapshotHourID!.toString()]
-    );
+
     snapshot.hours = hour;
     snapshot.pool = this.pool.id;
     snapshot.protocol = this.pool.protocol;
@@ -277,11 +270,6 @@ export class PoolSnapshot {
       this.pool.id.concatI32(this.pool._lastSnapshotDayID!.toI32())
     );
 
-    log.warning(
-      "[takeDailySnapshot] currentSnapshotsId {} previousSnapshotId {} ",
-      [day.toString(), this.pool._lastSnapshotDayID!.toString()]
-    );
-
     snapshot.days = day;
     snapshot.pool = this.pool.id;
     snapshot.protocol = this.pool.protocol;
@@ -295,9 +283,7 @@ export class PoolSnapshot {
           previousSnapshot.cumulativeSupplySideRevenueUSD
         )
       : snapshot.cumulativeSupplySideRevenueUSD;
-    log.warning("[dailySupplySideRevenueUSD] DailyRevenue {}", [
-      snapshot.dailySupplySideRevenueUSD.toString(),
-    ]);
+
     snapshot.cumulativeProtocolSideRevenueUSD =
       this.pool.cumulativeProtocolSideRevenueUSD;
     snapshot.dailyProtocolSideRevenueUSD = previousSnapshot

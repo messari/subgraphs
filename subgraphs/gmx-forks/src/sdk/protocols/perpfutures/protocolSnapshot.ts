@@ -8,7 +8,7 @@ import {
 import { TransactionType } from "./enums";
 import { AccountWasActive } from "./account";
 import * as constants from "../../util/constants";
-import { BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { CustomEventType, getUnixDays, getUnixHours } from "../../util/events";
 
 /**
@@ -107,10 +107,6 @@ export class ProtocolSnapshot {
     const snapshotHourID =
       this.protocol._lastUpdateTimestamp!.toI32() / constants.SECONDS_PER_HOUR;
 
-    log.warning("[takeProtocolSnapshots] snapshotDayId {} dayId {}", [
-      snapshotDayID.toString(),
-      this.dayID.toString(),
-    ]);
     if (snapshotDayID != this.dayID) {
       this.takeFinancialsDailySnapshot(snapshotDayID);
       this.takeUsageDailySnapshot(snapshotDayID);
@@ -131,10 +127,6 @@ export class ProtocolSnapshot {
     const previousSnapshot = FinancialsDailySnapshot.load(
       Bytes.fromI32(this.protocol._lastSnapshotDayID!.toI32())
     );
-    log.warning("[takeFinancialsDailySnapshot] currentId {} previousId {}", [
-      day.toString(),
-      this.protocol._lastSnapshotDayID!.toI32().toString(),
-    ]);
 
     snapshot.days = day;
     snapshot.protocol = this.protocol.id;
@@ -254,8 +246,6 @@ export class ProtocolSnapshot {
   }
 
   private takeUsageDailySnapshot(day: i32): void {
-    log.warning("[takeUsageDailySnapshot]", []);
-
     const activity = initActivityHelper(
       Bytes.fromUTF8("daily-".concat(day.toString()))
     );

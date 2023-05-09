@@ -4,8 +4,8 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_NAME = "MummyFinance";
-export const PROTOCOL_SLUG = "MMY";
+export const PROTOCOL_NAME = "GMX";
+export const PROTOCOL_SLUG = "GMX";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -168,33 +168,34 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const PROTOCOL_ID = "0x9032aeD8C1F2139E04C1AD6D9F75bdF1D6e5CF5c";
-export const POOL_NAME = "MMYVault";
+export const PROTOCOL_ID = "0x321f653eed006ad1c29d174e17d96351bde22649";
+export const POOL_NAME = "GMXVault";
 export const POOL_SYMBOL = "Vault";
 export const PRICE_PRECISION = BigInt.fromI32(10).pow(30);
 export const PRICE_PRECISION_DECIMALS = 30;
 
-export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.1");
+export const PROTOCOL_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.15");
 export const STAKE_SIDE_REVENUE_PERCENT = BigDecimal.fromString("0.3");
 export const FUNDING_PRECISION = BigDecimal.fromString("1000000");
 export const FUNDING_PRECISION_DECIMALS = 6;
 
 export const VAULT_ADDRESS = Address.fromString(
-  "0xA6D7D0e650aa40FFa42d845A354c12c2bc0aB15f"
+  "0x489ee077994b6658eafa855c308275ead8097c4a"
 );
 
 export const MLP_ADDRESS = Address.fromString(
-  "0xCaB2C0A41556149330F4223C9b76d93C610DAfE6"
+  "0x4277f8f2c384827b5273592ff7cebd9f2c1ac258"
 );
 
 export const MLP_MANAGER_ADDRESSES = [
-  Address.fromString("0x9032aeD8C1F2139E04C1AD6D9F75bdF1D6e5CF5c"), // GlpManager_V1
+  Address.fromString("0x321f653eed006ad1c29d174e17d96351bde22649"), // GlpManager_V1
+  Address.fromString("0x3963ffc9dff443c2a94f21b129d429891e32ec18"), // GlpManager_V2
 ];
 
 export const MMY_ADDRESS = Address.fromString(
-  "0x47536F17F4fF30e64A96a7555826b8f9e66ec468"
+  "0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a"
 );
 
 export const ESCROWED_MMY_ADDRESS = Address.fromString(
-  "0x0d8393CEa30df4fAFA7f00f333A62DeE451935C1"
+  "0xf42ae1d54fd613c9bb14810b0588faaa09a426ca"
 );

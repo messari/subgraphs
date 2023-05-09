@@ -3,7 +3,6 @@ import {
   Address,
   dataSource,
   BigDecimal,
-  log,
 } from "@graphprotocol/graph-ts";
 import { SDK } from ".";
 import { AccountWasActive } from "./account";
@@ -190,8 +189,6 @@ export class Perpetual {
    * @param tvl {BigDecimal} The new total value locked for the protocol.
    */
   setTotalValueLocked(tvl: BigDecimal): void {
-    log.warning("[setTotalValueLocked] tvl {}", [tvl.toString()]);
-
     this.protocol.totalValueLockedUSD = tvl;
     this.save();
   }
@@ -204,10 +201,7 @@ export class Perpetual {
    */
   addTotalValueLocked(amount: BigDecimal): void {
     const tvl = this.protocol.totalValueLockedUSD.plus(amount);
-    log.warning("[addTotalValueLocked] b amount {} tvl {}", [
-      amount.toString(),
-      tvl.toString(),
-    ]);
+
     this.setTotalValueLocked(tvl);
   }
 

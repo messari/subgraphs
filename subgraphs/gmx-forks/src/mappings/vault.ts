@@ -13,7 +13,6 @@ import {
 } from "../../generated/Vault/Vault";
 import { swap } from "../modules/swap";
 import * as utils from "../common/utils";
-import { log } from "@graphprotocol/graph-ts";
 import { collectFees } from "../modules/fees";
 import * as constants from "../common/constants";
 import {
@@ -54,10 +53,7 @@ export function handleCollectSwapFees(event: CollectSwapFeesEvent): void {
 export function handleIncreasePoolAmount(event: IncreasePoolAmountEvent): void {
   const amount = event.params.amount;
   const tokenAddress = event.params.token;
-  log.warning("[handleIncreasePoolAmount] amount {} token {} ", [
-    amount.toString(),
-    tokenAddress.toHexString(),
-  ]);
+
   const sdk = initializeSDK(event);
 
   const pool = getOrCreatePool(event, sdk);
