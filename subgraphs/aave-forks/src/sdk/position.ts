@@ -78,7 +78,7 @@ export class PositionManager {
     return null;
   }
 
-  getPositionBalance(): BigInt | null {
+  _getPositionBalance(): BigInt | null {
     if (this.position) {
       return this.position!.balance;
     }

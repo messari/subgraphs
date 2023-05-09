@@ -930,7 +930,7 @@ export function _handleLiquidate(
     InterestRateType.VARIABLE
   );
 
-  const vBorrowerPositionBalance = vBorrowerPosition.getPositionBalance();
+  const vBorrowerPositionBalance = vBorrowerPosition._getPositionBalance();
   if (vBorrowerPositionBalance && vBorrowerPositionBalance.gt(BIGINT_ZERO)) {
     vBorrowerPosition.subtractPosition(
       event,
@@ -949,7 +949,7 @@ export function _handleLiquidate(
     InterestRateType.STABLE
   );
 
-  const sBorrowerPositionBalance = sBorrowerPosition.getPositionBalance();
+  const sBorrowerPositionBalance = sBorrowerPosition._getPositionBalance();
   // Stable debt is liquidated after exhuasting variable debt
   if (
     debtBalances[1].equals(BIGINT_ZERO) &&
