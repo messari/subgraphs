@@ -245,10 +245,10 @@ export function handleContractCallWithToken(
   const dstNetworkConstants = getNetworkSpecificConstant(dstChainId);
   const dstPoolId = dstNetworkConstants.getPoolAddress();
 
-  const dstStr = event.params.destinationContractAddress;
-  const dstAccount = isValidEVMAddress(dstStr)
-    ? Address.fromString(dstStr)
-    : Bytes.fromUTF8(dstStr);
+  const dstAccountStr = event.params.destinationContractAddress;
+  const dstAccount = isValidEVMAddress(dstAccountStr)
+    ? Address.fromString(dstAccountStr)
+    : Bytes.fromUTF8(dstAccountStr);
 
   const bridgePoolType =
     tokenSymbol.tokenType == TokenType.EXTERNAL
@@ -283,9 +283,10 @@ export function handleContractCall(event: ContractCall): void {
   const dstChainId = networkToChainID(
     event.params.destinationChain.toUpperCase()
   );
-  const dstAccount = Address.fromString(
-    event.params.destinationContractAddress
-  );
+  const dstAccountStr = event.params.destinationContractAddress;
+  const dstAccount = isValidEVMAddress(dstAccountStr)
+    ? Address.fromString(dstAccountStr)
+    : Bytes.fromUTF8(dstAccountStr);
 
   const customEvent = _createCustomEvent(event)!;
   _handleMessageOut(
