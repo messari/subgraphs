@@ -59,7 +59,7 @@ export const HARDCODED_STABLES: Address[] = [];
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
+export const USDC_TOKEN_DECIMALS = constants.BIGINT_SIX;
 
 export const ETH_ADDRESS = Address.fromString(
   "0x658b0c7613e890ee50b8c4bc6a3f41ef411208ad"
