@@ -57,6 +57,7 @@ import {
   INT_TWENTY_SIX,
   UINT256,
   ADDRESS,
+  TRANSFER,
 } from "./sdk/util/constants";
 import { Pool } from "./sdk/protocols/bridge/pool";
 import { isValidEVMAddress } from "./sdk/util/strings";
@@ -382,7 +383,6 @@ export function handleCommandExecuted(event: Executed): void {
     ]);
     return;
   }
-
   const transferSignature = crypto.keccak256(ByteArray.fromUTF8(TRANSFER));
 
   const commandId = event.params.commandId;
