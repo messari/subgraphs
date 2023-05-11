@@ -96,6 +96,14 @@ export class PoolSnapshot {
         )
       : snapshot.cumulativeProtocolSideRevenueUSD;
 
+    snapshot.cumulativeStakeSideRevenueUSD =
+      this.pool.cumulativeStakeSideRevenueUSD;
+    snapshot.hourlyStakeSideRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeStakeSideRevenueUSD.minus(
+          previousSnapshot.cumulativeStakeSideRevenueUSD
+        )
+      : snapshot.cumulativeStakeSideRevenueUSD;
+
     snapshot.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
     snapshot.hourlyTotalRevenueUSD = previousSnapshot
       ? snapshot.cumulativeTotalRevenueUSD.minus(
@@ -292,6 +300,14 @@ export class PoolSnapshot {
           previousSnapshot.cumulativeProtocolSideRevenueUSD
         )
       : snapshot.cumulativeProtocolSideRevenueUSD;
+
+    snapshot.cumulativeStakeSideRevenueUSD =
+      this.pool.cumulativeStakeSideRevenueUSD;
+    snapshot.dailyStakeSideRevenueUSD = previousSnapshot
+      ? snapshot.cumulativeStakeSideRevenueUSD.minus(
+          previousSnapshot.cumulativeStakeSideRevenueUSD
+        )
+      : snapshot.cumulativeStakeSideRevenueUSD;
 
     snapshot.cumulativeTotalRevenueUSD = this.pool.cumulativeTotalRevenueUSD;
     snapshot.dailyTotalRevenueUSD = previousSnapshot

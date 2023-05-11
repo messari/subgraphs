@@ -428,7 +428,7 @@ export function handleDevGovFeeCharged(event: DevGovFeeCharged): void {
   );
   const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
 
-  pool.addRevenueByToken(collateralToken, devGovFee, BIGINT_ZERO);
+  pool.addRevenueByToken(collateralToken, devGovFee, BIGINT_ZERO, BIGINT_ZERO);
 }
 
 export function handleLpFeeCharged(event: LpFeeCharged): void {
@@ -446,7 +446,7 @@ export function handleLpFeeCharged(event: LpFeeCharged): void {
   );
   const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
 
-  pool.addRevenueByToken(collateralToken, BIGINT_ZERO, lpFee);
+  pool.addRevenueByToken(collateralToken, BIGINT_ZERO, lpFee, BIGINT_ZERO);
 }
 
 export function handleDaiVaultFeeCharged(event: DaiVaultFeeCharged): void {
@@ -464,7 +464,7 @@ export function handleDaiVaultFeeCharged(event: DaiVaultFeeCharged): void {
   );
   const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
 
-  pool.addRevenueByToken(collateralToken, BIGINT_ZERO, vaultFee);
+  pool.addRevenueByToken(collateralToken, BIGINT_ZERO, vaultFee, BIGINT_ZERO);
 }
 
 export function handleSssFeeCharged(event: SssFeeCharged): void {
@@ -480,10 +480,9 @@ export function handleSssFeeCharged(event: SssFeeCharged): void {
   const collateralToken = sdk.Tokens.getOrCreateToken(
     NetworkConfigs.getDaiAddress()
   );
+  const pool = sdk.Pools.loadPool(NetworkConfigs.getVaultAddress());
 
-  const protocol = sdk.Protocol;
-  const sssFeeUSD = protocol.pricer.getAmountValueUSD(collateralToken, sssFee);
-  protocol.addStakeSideRevenueUSD(sssFeeUSD);
+  pool.addRevenueByToken(collateralToken, BIGINT_ZERO, BIGINT_ZERO, sssFee);
 }
 
 export function handleRewardDistributed(event: RewardDistributed): void {
