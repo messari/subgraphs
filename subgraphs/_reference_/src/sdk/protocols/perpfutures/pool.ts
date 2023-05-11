@@ -324,7 +324,7 @@ export class Pool {
    * But you can use it if you need to. It will also update the protocol's snapshots.
    * @param rev {BigDecimal} The value to add to the protocol's protocolSideRevenue.
    */
-   private addStakeSideRevenueUSD(rev: BigDecimal): void {
+  private addStakeSideRevenueUSD(rev: BigDecimal): void {
     this.pool.cumulativeTotalRevenueUSD =
       this.pool.cumulativeTotalRevenueUSD.plus(rev);
     this.pool.cumulativeStakeSideRevenueUSD =
