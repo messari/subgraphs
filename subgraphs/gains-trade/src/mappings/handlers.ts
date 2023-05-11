@@ -47,6 +47,7 @@ import { bigIntToBigDecimal } from "../sdk/util/numbers";
 import {
   BIGINT_MINUS_ONE,
   BIGINT_ZERO,
+  INT_THREE,
   LiquidityPoolFeeType,
   PositionSide,
   RewardTokenType,
@@ -357,13 +358,13 @@ export function handleLimitExecuted(event: LimitExecuted): void {
     collateralToken,
     collateralToken,
     positionSide,
-    event.params.orderType == 3 ? true : false
+    event.params.orderType == INT_THREE ? true : false
   );
   const position = loadPositionResponse.position;
   const isExistingOpenPosition = loadPositionResponse.isExistingOpenPosition;
 
   // orderType [TP, SL, LIQ, OPEN] (0-index)
-  if (event.params.orderType == 3) {
+  if (event.params.orderType == INT_THREE) {
     openTrade(
       pool,
       account,
