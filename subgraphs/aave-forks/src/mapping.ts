@@ -9,6 +9,7 @@ import {
 import {
   Account,
   Market,
+  Position,
   RewardToken,
   _DefaultOracle,
   _FlashLoanPremium,
@@ -698,6 +699,21 @@ export function _handleDeposit(
     return;
   }
   positionManager.setCollateral(true);
+
+  if (account._eMode) {
+    const positionID = positionManager.getPositionID();
+    if (!positionID) {
+      log.error("[_handleDeposit]position not found", []);
+      return;
+    }
+    const position = Position.load(positionID!);
+    if (!position) {
+      log.error("[_handleDeposit]position with ID {} not found", [positionID!]);
+      return;
+    }
+    position._eMode = true;
+    position.save();
+  }
 }
 
 export function _handleWithdraw(

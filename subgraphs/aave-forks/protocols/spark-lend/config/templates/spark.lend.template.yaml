@@ -74,7 +74,9 @@ dataSources:
         - event: FlashloanPremiumTotalUpdated(uint128,uint128)
           handler: handleFlashloanPremiumTotalUpdated
         - event: FlashloanPremiumToProtocolUpdated(uint128,uint128)
-          handler: handleFlashloanPremiumToProtocolUpdated          
+          handler: handleFlashloanPremiumToProtocolUpdated
+        - event: SiloedBorrowingChanged(indexed address,bool,bool)
+          handler: handleSiloedBorrowingChanged
       file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPool
@@ -134,7 +136,10 @@ dataSources:
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
         - event: FlashLoan(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
-          handler: handleFlashloan          
+          handler: handleFlashloan
+        - event: UserEModeSet(indexed address,uint8)
+          handler: handleUserEModeSet
+
       file: ./protocols/spark-lend/src/mapping.ts
   - kind: ethereum
     name: RewardsController

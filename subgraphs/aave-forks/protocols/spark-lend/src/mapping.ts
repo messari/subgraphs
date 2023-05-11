@@ -497,6 +497,26 @@ export function handleSwapBorrowRateMode(event: SwapBorrowRateMode): void {
   );
 }
 
+export function handleSiloedBorrowingChanged(
+  event: SiloedBorrowingChanged
+): void {
+  const market = getMarketFromToken(event.params.asset, protocolData);
+  if (!market) {
+    log.error("[handleSiloedBorrowingChanged]market not found for token {}", [
+      event.params.asset.toHexString(),
+    ]);
+    return;
+  }
+  market._siloedBorrowing = event.params.newState;
+  market.save();
+}
+
+export function handleUserEModeSet(event: UserEModeSet): void {
+  const account = new AccountManager(event.params.user).getAccount();
+  account._eMode = true;
+  account.save();
+}
+
 ///////////////////
 ///// Helpers /////
 ///////////////////

@@ -29,6 +29,7 @@ import {
   LiquidationProtocolFeeChanged,
   FlashloanPremiumTotalUpdated,
   FlashloanPremiumToProtocolUpdated,
+  SiloedBorrowingChanged,
 } from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
@@ -42,6 +43,7 @@ import {
   Supply,
   SwapBorrowRateMode,
   Withdraw,
+  UserEModeSet,
 } from "../../../generated/LendingPool/LendingPool";
 import {
   _handleAssetConfigUpdated,
@@ -98,6 +100,7 @@ import {
   PositionSide,
   RiskType,
 } from "../../../src/sdk/constants";
+import { AccountManager } from "../../../src/sdk/account";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
@@ -517,6 +520,26 @@ export function handleStableTransfer(event: StableTransfer): void {
     event.params.from,
     event.params.value
   );
+}
+
+export function handleSiloedBorrowingChanged(
+  event: SiloedBorrowingChanged
+): void {
+  const market = getMarketFromToken(event.params.asset, protocolData);
+  if (!market) {
+    log.error("[handleSiloedBorrowingChanged]market not found for token {}", [
+      event.params.asset.toHexString(),
+    ]);
+    return;
+  }
+  market._siloedBorrowing = event.params.newState;
+  market.save();
+}
+
+export function handleUserEModeSet(event: UserEModeSet): void {
+  const account = new AccountManager(event.params.user).getAccount();
+  account._eMode = true;
+  account.save();
 }
 
 ///////////////////

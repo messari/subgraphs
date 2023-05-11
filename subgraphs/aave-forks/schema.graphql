@@ -1052,6 +1052,8 @@ type Market @entity {
 
   " proportion of liquidation bonus (liquidation penalty) going to the protocol "
   _liquidationProtocolFee: BigDecimal
+
+  _siloedBorrowing: Boolean
 }
 
 #################################
@@ -1489,6 +1491,9 @@ type Account @entity {
 
   " Markets that the account is using as collateral "
   _enabledCollaterals: [Market!]
+
+  " efficient mode flag "
+  _eMode: Boolean
 }
 
 # A position is defined as who has control over the collateral or debt
@@ -1579,6 +1584,9 @@ type Position @entity {
 
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
+
+  " efficient mode flag "
+  _eMode: Boolean
 }
 
 # Unlike other snapshots that are taken at a fixed time interval. Position

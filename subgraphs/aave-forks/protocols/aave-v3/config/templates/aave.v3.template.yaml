@@ -73,6 +73,8 @@ dataSources:
           handler: handleFlashloanPremiumTotalUpdated
         - event: FlashloanPremiumToProtocolUpdated(uint128,uint128)
           handler: handleFlashloanPremiumToProtocolUpdated
+        - event: SiloedBorrowingChanged(indexed address,bool,bool)
+          handler: handleSiloedBorrowingChanged
       file: ./protocols/aave-v3/src/mapping.ts
   - kind: ethereum
     name: LendingPool
@@ -127,6 +129,9 @@ dataSources:
           handler: handleReserveUsedAsCollateralDisabled
         - event: FlashLoan(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
           handler: handleFlashloan
+        - event: UserEModeSet(indexed address,uint8)
+          handler: handleUserEModeSet
+
       file: ./protocols/aave-v3/src/mapping.ts
 
   - kind: ethereum
