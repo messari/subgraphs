@@ -22,8 +22,8 @@ import {
  * This file contains the PoolManager, which is used to
  * initialize new pools in the protocol.
  *
- * Schema Version:  1.3.0
- * SDK Version:     1.1.2
+ * Schema Version:  1.3.1
+ * SDK Version:     1.1.3
  * Author(s):
  *  - @harsh9200
  *  - @dhruv-chauhan
