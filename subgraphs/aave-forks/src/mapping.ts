@@ -544,12 +544,13 @@ export function _handleReserveDataUpdated(
   if (!market._liquidityIndex) {
     market._liquidityIndex = BIGINT_ONE_RAY;
   }
-
   const liquidityIndexDiff = liquidityIndex
     .minus(market._liquidityIndex!)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
   market._liquidityIndex = liquidityIndex; // must update to current liquidity index
+  market.save();
+
   const newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals))
@@ -643,6 +644,7 @@ export function _handleReserveDataUpdated(
       manager.updateRewards(rewardData);
     }
   }
+  //market.save();
 }
 
 export function _handleDeposit(
@@ -994,15 +996,17 @@ export function _handleFlashLoan(
   );
   const tokenManager = new TokenManager(asset, event);
   const amountUSD = tokenManager.getAmountUSD(amount);
-  manager.createFlashloan(asset, account, amount, amountUSD);
+  const premiumUSDTotal = tokenManager.getAmountUSD(premiumAmount);
+  const flashloan = manager.createFlashloan(asset, account, amount, amountUSD);
+  flashloan.feeAmount = premiumAmount;
+  flashloan.feeAmountUSD = premiumUSDTotal;
+  flashloan.save();
 
   let reserveFactor = market.reserveFactor;
   if (!reserveFactor) {
     reserveFactor = BIGDECIMAL_ZERO;
   }
   const protocolRevenueShare = reserveFactor;
-
-  const premiumUSDTotal = tokenManager.getAmountUSD(premiumAmount);
   let premiumUSDToProtocol = premiumUSDTotal.times(protocolRevenueShare);
   let premiumUSDToLP = premiumUSDTotal.minus(premiumUSDToProtocol);
   let premiumUSDToDeduct = premiumUSDTotal;
