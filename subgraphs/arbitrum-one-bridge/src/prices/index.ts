@@ -41,6 +41,7 @@ export function getUsdPricePerToken(
     );
   }
 
+  // Commented to resolve Issue #2090
   // 1. Yearn Lens Oracle
   // const yearnLensPrice = YearnLensOracle.getTokenPriceUSDC(tokenAddr, block);
   // if (!yearnLensPrice.reverted) {
