@@ -7,6 +7,7 @@
   "poolSymbol": "Vault",
   "protocolSideRevenuePercent": "0.15",
   "stakeSideRevenuePercent": "0.3",
+  "priceCachingBlocks": 7000,
   "mlpAddress": "0x01234181085565ed162a948b6a5e88758cd7c7b8",
   "mmyAddress": "0x62edc0692BD897D2295872a9FFCac5425011c661",
   "esMMYAddress": "0xff1489227bbaac61a9209a08929e4c2a526ddd17",

@@ -28,7 +28,7 @@ export function initializeSDK(event: ethereum.Event): SDK {
   return sdk;
 }
 
-export function getOrCreatePool(event: ethereum.Event, sdk: SDK): Pool {
+export function getOrCreatePool(sdk: SDK): Pool {
   const pool = sdk.Pools.loadPool(
     Bytes.fromHexString(constants.VAULT_ADDRESS.toHexString())
   );

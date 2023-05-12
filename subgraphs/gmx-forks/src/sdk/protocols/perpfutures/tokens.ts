@@ -1,6 +1,12 @@
 import { Perpetual } from "./protocol";
 import * as constants from "../../util/constants";
-import { Address, Bytes, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  Bytes,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { Token, RewardToken } from "../../../../generated/schema";
 
 /**
@@ -43,9 +49,21 @@ export class TokenManager {
       token.name = params.name;
       token.symbol = params.symbol;
       token.decimals = params.decimals;
+      token._setByEvent = false;
       token.save();
     }
     return token;
+  }
+
+  updateTokenPrice(
+    token: Token,
+    usdPrice: BigDecimal,
+    block: ethereum.Block
+  ): void {
+    token.lastPriceUSD = usdPrice;
+    token.lastPriceBlockNumber = block.number;
+    token._setByEvent = true;
+    token.save();
   }
 
   getOrCreateTokenFromBytes(address: Bytes): Token {

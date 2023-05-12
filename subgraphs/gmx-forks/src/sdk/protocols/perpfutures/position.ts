@@ -187,7 +187,7 @@ export class Position {
     this.position.balance = amount;
     this.position.balanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(token, amount);
+      .getAmountValueUSD(token, amount, this.protocol.event.block);
     this.save();
   }
 
@@ -200,7 +200,7 @@ export class Position {
     this.position.collateralBalance = amount;
     this.position.collateralBalanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(token, amount);
+      .getAmountValueUSD(token, amount, this.protocol.event.block);
     this.save();
   }
 
@@ -212,7 +212,7 @@ export class Position {
   setBalanceClosed(token: Token, amount: BigInt): void {
     this.position.closeBalanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(token, amount);
+      .getAmountValueUSD(token, amount, this.protocol.event.block);
     this.save();
   }
 
@@ -224,7 +224,7 @@ export class Position {
   setCollateralBalanceClosed(token: Token, amount: BigInt): void {
     this.position.closeCollateralBalanceUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(token, amount);
+      .getAmountValueUSD(token, amount, this.protocol.event.block);
     this.save();
   }
 
@@ -236,7 +236,7 @@ export class Position {
   setRealisedPnlClosed(token: Token, amount: BigInt): void {
     this.position.realisedPnlUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(token, amount);
+      .getAmountValueUSD(token, amount, this.protocol.event.block);
     this.save();
   }
   /**

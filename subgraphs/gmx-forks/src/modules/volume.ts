@@ -1,7 +1,7 @@
 import { SDK } from "../sdk/protocols/perpfutures";
 import { Pool } from "../sdk/protocols/perpfutures/pool";
-import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 
 export function increasePoolVolume(
   pool: Pool,

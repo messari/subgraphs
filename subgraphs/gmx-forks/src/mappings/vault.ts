@@ -1,4 +1,7 @@
-import { getOrCreatePool, initializeSDK } from "../common/initializers";
+import {
+  updatePosition,
+  updatePositionRealisedPnlUSD,
+} from "../modules/position";
 import {
   ClosePosition as ClosePositionEvent,
   CollectMarginFees as CollectMarginFeesEvent,
@@ -15,12 +18,9 @@ import { swap } from "../modules/swap";
 import * as utils from "../common/utils";
 import { collectFees } from "../modules/fees";
 import * as constants from "../common/constants";
-import {
-  updatePosition,
-  updatePositionRealisedPnlUSD,
-} from "../modules/position";
-import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { increasePoolVolume } from "../modules/volume";
+import { TransactionType } from "../sdk/protocols/perpfutures/enums";
+import { getOrCreatePool, initializeSDK } from "../common/initializers";
 
 export function handleClosePosition(event: ClosePositionEvent): void {
   const sdk = initializeSDK(event);
@@ -28,7 +28,7 @@ export function handleClosePosition(event: ClosePositionEvent): void {
     event.params.realisedPnl,
     constants.PRICE_PRECISION_DECIMALS
   );
-  const pool = getOrCreatePool(event, sdk);
+  const pool = getOrCreatePool(sdk);
   updatePositionRealisedPnlUSD(event.params.key, realisedPnlUSD, pool, sdk);
   if (event.params.realisedPnl < constants.BIGINT_ZERO) {
     increasePoolVolume(
@@ -56,7 +56,7 @@ export function handleIncreasePoolAmount(event: IncreasePoolAmountEvent): void {
 
   const sdk = initializeSDK(event);
 
-  const pool = getOrCreatePool(event, sdk);
+  const pool = getOrCreatePool(sdk);
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
 
   utils.checkAndUpdateInputTokens(pool, token, amount);
@@ -73,7 +73,7 @@ export function handleDecreasePoolAmount(event: DecreasePoolAmountEvent): void {
   const tokenAddress = event.params.token;
   const sdk = initializeSDK(event);
 
-  const pool = getOrCreatePool(event, sdk);
+  const pool = getOrCreatePool(sdk);
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
   utils.checkAndUpdateInputTokens(pool, token, amount);
   const inputTokens = pool.getInputTokens();
@@ -150,12 +150,10 @@ export function handleUpdateFundingRate(event: UpdateFundingRateEvent): void {
   const tokenAddress = event.params.token;
   const fundingrate = event.params.fundingRate;
   const sdk = initializeSDK(event);
-  // const pool = sdk.Pools.loadPool(
-  //   Bytes.fromHexString(constants.VAULT_ADDRESS.toHexString())
-  // );
-  // const pool = getOrCreatePool(event, sdk);
+  // const pool = getOrCreatePool(sdk);
+
   // const token = sdk.Tokens.getOrCreateToken(tokenAddress);
-  // utils.checkAndUpdateInputTokens(pool, token);
+
   // const inputTokens = pool.getInputTokens();
   // const fundingTokenIndex = inputTokens.indexOf(token.id);
   // const fundingrates = pool.pool.fundingrate;

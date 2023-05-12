@@ -1,9 +1,9 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   getOrCreateAccount,
   getOrCreatePool,
   initializeSDK,
 } from "../common/initializers";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function swap(
   event: ethereum.Event,
@@ -15,7 +15,7 @@ export function swap(
 ): void {
   const sdk = initializeSDK(event);
 
-  const pool = getOrCreatePool(event, sdk);
+  const pool = getOrCreatePool(sdk);
   const account = getOrCreateAccount(accountAddress, pool, sdk);
 
   account.swap(

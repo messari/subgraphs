@@ -2,6 +2,7 @@ import {
   TokensPerIntervalChange,
   RewardDistributor,
 } from "../../generated/FeeGlpRewardDistributor/RewardDistributor";
+import * as utils from "../common/utils";
 import { BigInt } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
 import { RewardTokenType } from "../sdk/util/constants";
@@ -17,14 +18,15 @@ export function handleEsgmxToGlpChange(event: TokensPerIntervalChange): void {
 
 function handleTokensPerIntervalChange(event: TokensPerIntervalChange): void {
   const sdk = initializeSDK(event);
-  const pool = getOrCreatePool(event, sdk);
+  const pool = getOrCreatePool(sdk);
 
   const rewardDistributorContract = RewardDistributor.bind(event.address);
-  const tryRewardToken = rewardDistributorContract.try_rewardToken();
-  if (tryRewardToken.reverted) {
-    return;
-  }
-  const rewardTokenAddress = tryRewardToken.value;
+  const rewardTokenAddress = utils.readValue(
+    rewardDistributorContract.try_rewardToken(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  if (rewardTokenAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
   const tokensPerDay = event.params.amount.times(

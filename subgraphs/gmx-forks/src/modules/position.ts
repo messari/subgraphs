@@ -3,15 +3,6 @@ import {
   getOrCreatePool,
   initializeSDK,
 } from "../common/initializers";
-import * as utils from "../common/utils";
-import { increasePoolVolume } from "./volume";
-import * as constants from "../common/constants";
-import { Vault } from "../../generated/Vault/Vault";
-import { updatePoolOpenInterestUSD } from "./interest";
-import { Pool } from "../sdk/protocols/perpfutures/pool";
-import { Account } from "../sdk/protocols/perpfutures/account";
-import { Position } from "../sdk/protocols/perpfutures/position";
-import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import {
   Address,
   Bytes,
@@ -19,9 +10,18 @@ import {
   BigInt,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
-import { bigDecimalToBigInt, exponentToBigDecimal } from "../sdk/util/numbers";
+import * as utils from "../common/utils";
+import { increasePoolVolume } from "./volume";
+import * as constants from "../common/constants";
 import { SDK } from "../sdk/protocols/perpfutures";
+import { Vault } from "../../generated/Vault/Vault";
+import { updatePoolOpenInterestUSD } from "./interest";
+import { Pool } from "../sdk/protocols/perpfutures/pool";
 import { Token, _PositionMap } from "../../generated/schema";
+import { Account } from "../sdk/protocols/perpfutures/account";
+import { Position } from "../sdk/protocols/perpfutures/position";
+import { TransactionType } from "../sdk/protocols/perpfutures/enums";
+import { bigDecimalToBigInt, exponentToBigDecimal } from "../sdk/util/numbers";
 
 export function updatePosition(
   event: ethereum.Event,
@@ -39,9 +39,17 @@ export function updatePosition(
 ): void {
   const sdk = initializeSDK(event);
 
-  const pool = getOrCreatePool(event, sdk);
+  const pool = getOrCreatePool(sdk);
   const account = getOrCreateAccount(accountAddress, pool, sdk);
   const indexToken = sdk.Tokens.getOrCreateToken(indexTokenAddress);
+  sdk.Tokens.updateTokenPrice(
+    indexToken,
+    utils.bigIntToBigDecimal(
+      indexTokenPrice,
+      constants.PRICE_PRECISION_DECIMALS
+    ),
+    event.block
+  );
   const sizeUSDDelta = utils.bigIntToBigDecimal(
     sizeDelta,
     constants.PRICE_PRECISION_DECIMALS

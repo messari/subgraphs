@@ -2,7 +2,13 @@ import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "..";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { InchOracleContract } from "../../../generated/templates/MlpManagerTemplate/InchOracleContract";
 
 export function getTokenPriceUSDC(
@@ -29,7 +35,20 @@ export function getTokenPriceUSDC(
         constants.BIGINT_ZERO
       )
       .toBigDecimal();
-
+    if (
+      tokenAddr.equals(
+        Address.fromString("0x62edc0692bd897d2295872a9ffcac5425011c661")
+      )
+    ) {
+      log.warning(
+        "[InchOracleGetPrice] tokenPrice {} tokenAddress {} stableTokenAddress {} ",
+        [
+          tokenPrice.toString(),
+          tokenAddr.toHexString(),
+          dstToken.address.toHexString(),
+        ]
+      );
+    }
     if (tokenPrice.equals(constants.BIGDECIMAL_ZERO)) continue;
 
     if (constants.STABLE_TOKENS[i] == "WETH") {

@@ -139,7 +139,9 @@ export class Account {
       );
 
       amountUSD = amountUSD.plus(
-        this.protocol.getTokenPricer().getAmountValueUSD(token, amounts[idx])
+        this.protocol
+          .getTokenPricer()
+          .getAmountValueUSD(token, amounts[idx], this.protocol.event.block)
       );
     }
     return amountUSD;
@@ -325,13 +327,21 @@ export class Account {
     swap.amountIn = amountIn;
     swap.amountInUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(this.tokens.getOrCreateToken(tokenIn), amountIn);
+      .getAmountValueUSD(
+        this.tokens.getOrCreateToken(tokenIn),
+        amountIn,
+        this.protocol.event.block
+      );
 
     swap.tokenOut = tokenOut;
     swap.amountOut = amountOut;
     swap.amountOutUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(this.tokens.getOrCreateToken(tokenOut), amountOut);
+      .getAmountValueUSD(
+        this.tokens.getOrCreateToken(tokenOut),
+        amountOut,
+        this.protocol.event.block
+      );
 
     swap.tradingPair = tradingPair;
     swap.pool = pool.getBytesID();
@@ -380,7 +390,11 @@ export class Account {
     borrow.amount = amount;
     borrow.amountUSD = this.protocol
       .getTokenPricer()
-      .getAmountValueUSD(this.tokens.getOrCreateToken(asset), amount);
+      .getAmountValueUSD(
+        this.tokens.getOrCreateToken(asset),
+        amount,
+        this.protocol.event.block
+      );
     borrow.pool = pool.getBytesID();
     borrow.save();
 
@@ -538,7 +552,8 @@ export class Account {
       .getTokenPricer()
       .getAmountValueUSD(
         this.tokens.getOrCreateToken(collateralToken),
-        amountLiquidated
+        amountLiquidated,
+        this.protocol.event.block
       );
     liquidate.profitUSD = profitUSD;
     liquidate.pool = pool.getBytesID();

@@ -1,11 +1,11 @@
-import * as utils from "../common/utils";
-import * as constants from "../common/constants";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   getOrCreateAccount,
   getOrCreatePool,
   initializeSDK,
 } from "../common/initializers";
+import * as utils from "../common/utils";
+import * as constants from "../common/constants";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 
 export function transaction(
@@ -20,7 +20,7 @@ export function transaction(
 ): void {
   const sdk = initializeSDK(event);
 
-  const pool = getOrCreatePool(event, sdk);
+  const pool = getOrCreatePool(sdk);
   const account = getOrCreateAccount(accountAddress, pool, sdk);
   const token = sdk.Tokens.getOrCreateToken(tokenAddress);
 
