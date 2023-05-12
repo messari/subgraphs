@@ -8,7 +8,17 @@
       "address": "0x1Bf68A9d1EaEe7826b3593C20a0ca93293cb489a",
       "startBlock": 	12519710,
       "abi": "Vault",
-      "depositHandler": "handleLockIn"
+      "depositHandler": "handleLockIn",
+      "withdrawHandler": "handleOTVWithdraw"
+    }
+  ],
+  "minter": [
+    {
+      "name": "Minter",
+      "address": "0x012c6d79b189e1aBD1EFaC759b275c5D49Abd164",
+      "startBlock": 	12519710,
+      "abi": "Minter",
+      "mintHandler": "handleMint"
     }
   ],
   "graftEnabled": false,
