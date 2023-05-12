@@ -1,9 +1,9 @@
 {
   "network": "goerli",
-  "factoryAddress": "0x81d7bf1c11a3cb21efb4bffb58866193fad15db9",
-  "factoryAddressStartBlock": 8687910,
-  "nonFungiblePositionManagerAddress": "0x8c993b148fe48273e0ca8f5189a017024d7e593b",
-  "nonFungiblePositionManagerAddressStartBlock": 8689393,
+  "factoryAddress": "0x8206bf754a12205c52a98d39634393f51f38718f",
+  "factoryAddressStartBlock": 8975976,
+  "nonFungiblePositionManagerAddress": "0x7398417c94d02556c371fe1e7a11d1bddafe73f3",
+  "nonFungiblePositionManagerAddressStartBlock": 8975979,
   "deployment": "NFTX_V3_GOERLI",
   "graftEnabled": false,
   "subgraphId": "null",
