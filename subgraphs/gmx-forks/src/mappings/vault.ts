@@ -21,6 +21,7 @@ import * as constants from "../common/constants";
 import { increasePoolVolume } from "../modules/volume";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 import { getOrCreatePool, initializeSDK } from "../common/initializers";
+import { updatePoolAmount } from "../modules/amount";
 
 export function handleClosePosition(event: ClosePositionEvent): void {
   const sdk = initializeSDK(event);
@@ -51,37 +52,11 @@ export function handleCollectSwapFees(event: CollectSwapFeesEvent): void {
 }
 
 export function handleIncreasePoolAmount(event: IncreasePoolAmountEvent): void {
-  const amount = event.params.amount;
-  const tokenAddress = event.params.token;
-
-  const sdk = initializeSDK(event);
-
-  const pool = getOrCreatePool(sdk);
-  const token = sdk.Tokens.getOrCreateToken(tokenAddress);
-
-  utils.checkAndUpdateInputTokens(pool, token, amount);
-  const inputTokens = pool.getInputTokens();
-  const inputTokenIndex = inputTokens.indexOf(token.id);
-  const inputTokenBalances = pool.pool.inputTokenBalances;
-  inputTokenBalances[inputTokenIndex] =
-    inputTokenBalances[inputTokenIndex].plus(amount);
-  pool.setInputTokenBalances(inputTokenBalances, true);
+  updatePoolAmount(event.params.amount, true, event.params.token, event);
 }
 
 export function handleDecreasePoolAmount(event: DecreasePoolAmountEvent): void {
-  const amount = event.params.amount;
-  const tokenAddress = event.params.token;
-  const sdk = initializeSDK(event);
-
-  const pool = getOrCreatePool(sdk);
-  const token = sdk.Tokens.getOrCreateToken(tokenAddress);
-  utils.checkAndUpdateInputTokens(pool, token, amount);
-  const inputTokens = pool.getInputTokens();
-  const inputTokenIndex = inputTokens.indexOf(token.id);
-  const inputTokenBalances = pool.pool.inputTokenBalances;
-  inputTokenBalances[inputTokenIndex] =
-    inputTokenBalances[inputTokenIndex].minus(amount);
-  pool.setInputTokenBalances(inputTokenBalances, true);
+  updatePoolAmount(event.params.amount, false, event.params.token, event);
 }
 
 export function handleDecreasePosition(event: DecreasePositionEvent): void {
