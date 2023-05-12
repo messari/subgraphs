@@ -49,14 +49,14 @@ export class NftxV3GoerliConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): Bytes {
-    return Bytes.fromHexString("0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6"); // WETH
+    return Bytes.fromHexString("0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6"); // WETH  0x18def0e9754385ec1c91e176585f1eb1fd7265f5<- old Weth
   }
   getRewardToken(): Bytes {
     return Bytes.fromHexString("");
   }
   getWhitelistTokens(): Bytes[] {
     return stringToBytesList([
-      "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6", // WETH
+      "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6", // WETH 0x18def0e9754385ec1c91e176585f1eb1fd7265f5 <- old weth
       "0x11fe4b6ae13d2a6055c8d9cf65c55bac32b5d844", // DAI
       "0x07865c6e87b9f70255377e024ace6630c1eaa37f", // USDC
     ]);
