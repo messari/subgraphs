@@ -88,6 +88,7 @@ Some of the new features in Compound III not found in V2 are:
   - This is because the baseToken is so fluid, to fix this we would need to open a supply and borrow position each time a user updates their cUSDC balance.
   - We need to account for any double counting with this.
 - In the beginning of Compound V3 Polygon there are cases where the borrow rate is higher than the supply rate. To cover this, we skip the revenue calculation on that block.
+- The pieces needed to calculate interest per position are available on positions and positionSnapshots. See the calculations needed in order to derive value with interest [here](https://github.com/compound-finance/comet/blob/015cc2a82154ece6d32e6309000583ece0f1811e/contracts/CometCore.sol#L80-L92). This only applies to base assets. Any collateral asset doesn't accrue any interest
 
 ## Reference and Useful Links
 

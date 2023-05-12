@@ -131,7 +131,7 @@ export const schema120 = (): Schema => {
     protocolControlledValueUSD: "BigDecimal",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
   query Data {
@@ -399,7 +399,7 @@ export const schema130 = (): Schema => {
     totalPoolCount: "Int!",
   };
 
-  const protocolQueryFields = Object.keys(protocolFields).map(x => x + '\n');
+  const protocolQueryFields = Object.keys(protocolFields).map((x) => x + "\n");
 
   const financialsQuery = `
     query Data {
@@ -528,7 +528,6 @@ export const schema130 = (): Schema => {
         rewardTokenEmissionsUSD
       }
     }`;
-
 
   return {
     entities,

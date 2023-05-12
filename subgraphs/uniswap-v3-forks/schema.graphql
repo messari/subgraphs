@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM (Extended)
-# Version: 3.0.3
+# Version: 3.0.4
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -1247,6 +1247,9 @@ type Deposit @entity(immutable: true) {
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
 
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
+
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
 }
@@ -1305,6 +1308,9 @@ type Withdraw @entity(immutable: true) {
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
+
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
@@ -1367,6 +1373,9 @@ type Swap @entity(immutable: true) {
 
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
+
+  " Amount of input tokens in the liquidity pool "
+  reserveAmounts: [BigInt!]
 }
 
 # Helper entity for calculating daily/hourly active users

@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { BigInt } from "@graphprotocol/graph-ts";
 
 export function hexToNumberString(hex: string): string {
   let hexNumber = BigInt.fromI32(0);
 
+  /* eslint-disable-next-line rulesdir/no-string-literals */
   if (hex.startsWith("0x")) {
     hex = hex.slice(2);
   }

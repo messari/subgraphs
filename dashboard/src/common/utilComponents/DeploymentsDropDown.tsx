@@ -90,7 +90,7 @@ export const DeploymentsDropDown = ({
           if (targEle.innerText && subgraphObj) {
             p.set("defillamaprotocol", targEle.innerText?.split(" (")[0].split(" ").join("-"));
             p.set("defillamanetwork", targEle.innerText?.split(" (")[1].split(")")[0]);
-            navigate("?" + p.toString().split('%2F').join('/'));
+            navigate("?" + p.toString().split("%2F").join("/"));
             setTextInput(targEle.innerText);
             setDefiLlamaSlug(targEle.innerText);
             setDeploymentURL(subgraphObj.url);

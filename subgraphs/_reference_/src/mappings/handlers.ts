@@ -1,4 +1,3 @@
-import { log } from "@graphprotocol/graph-ts";
 import { Mint, Burn, Swap } from "../../generated/templates/Pair/Pair";
 import { PairCreated } from "../../generated/templates/Pair/Factory";
 import {

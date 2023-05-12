@@ -63,8 +63,8 @@ function ErrorDisplay({
       if (errorObject.graphQLErrors.length <= 5) {
         errorMsgs.push(
           <h3>
-            Required schema fields are missing from this subgraph. Verify that your schema has all of the fields that are
-            in the common {schemaType} {protocolSchemaData?.version} schema.
+            Required schema fields are missing from this subgraph. Verify that your schema has all of the fields that
+            are in the common {schemaType} {protocolSchemaData?.version} schema.
           </h3>,
         );
       } else {
@@ -73,14 +73,16 @@ function ErrorDisplay({
         errorMsgs.push(
           <>
             <h2>
-              Queried {schemaType} schema version {protocolSchemaData?.schemaVersion} - Select a different
-              schema to query below:
+              Queried {schemaType} schema version {protocolSchemaData?.schemaVersion} - Select a different schema to
+              query below:
             </h2>
             {versionsOnType.map((version: string) => {
               if (version === protocolSchemaData?.schemaVersion) {
                 return null;
               }
-              return <Button onClick={() => setSubgraphToQuery({ url: url, version: version })}>Schema {version}</Button>;
+              return (
+                <Button onClick={() => setSubgraphToQuery({ url: url, version: version })}>Schema {version}</Button>
+              );
             })}
           </>,
         );
@@ -117,7 +119,6 @@ function ErrorDisplay({
     } else {
       return null;
     }
-
   } catch (err) {
     return null;
   }

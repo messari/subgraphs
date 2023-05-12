@@ -29,7 +29,7 @@ import { TokenManager } from "./token";
  * make changes to a given position.
  *
  * Schema Version:  3.0.1
- * SDK Version:     1.0.1
+ * SDK Version:     1.0.2
  * Author(s):
  *  - @dmelotik
  */

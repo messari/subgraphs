@@ -124,7 +124,7 @@ export function getOrCreateTokenWhitelistSymbol(
   // fetch info if null
   if (!tokenWhitelistSymbol) {
     tokenWhitelistSymbol = new _TokenWhitelistSymbol(formattedTokenSymbol);
-    tokenWhitelistSymbol.address = tokenAddress!;
+    tokenWhitelistSymbol.address = tokenAddress;
     tokenWhitelistSymbol.save();
   }
 
