@@ -12,13 +12,14 @@
       "withdrawHandler": "handleOTVWithdraw"
     }
   ],
-  "minter": [
+  "minterKLAYTN": [
     {
       "name": "Minter",
       "address": "0x012c6d79b189e1aBD1EFaC759b275c5D49Abd164",
       "startBlock": 	12519710,
       "abi": "Minter",
-      "mintHandler": "handleMint"
+      "mintHandler": "handleMint",
+      "burnHandler": "handleBurn"
     }
   ],
   "graftEnabled": false,
