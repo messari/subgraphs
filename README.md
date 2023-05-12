@@ -1,5 +1,10 @@
 # Messari Standard Subgraphs &bull; [![GitHub license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/messari/subgraphs/blob/master/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](docs/CONTRIBUTING.md) [![Issues Report](https://img.shields.io/badge/issues-report-yellow.svg)](https://github.com/messari/subgraphs/issues/new)
 
+# NFTX Instructions
+
+- Update the contract and blocks at `subgraphs/uniswap-v3-forks/protocols/nftx-v3/config/deployments/nftx-v3-goerli/configurations.ts` and run the following command `messari b nftx-v3-goerli -l -s hosted-service -d`
+  Select `nftx-project` as the target to deploy to. Once it has been pushed you can check for liquidity pools by using the following https://thegraph.com/hosted-service/subgraph/nftx-project/nftx-v3-uniswap-goerli?playgroundQuery=135154
+
 <p align="center">
   <a href="https://messari.io/protocol-explorer/all-protocols">
     <img src="./docs/images/messari-logo.png" alt="Messari Logo" width="460" />
