@@ -35,7 +35,8 @@ import { ERC20SymbolBytes } from "../../generated/Vault/ERC20SymbolBytes";
 import { BIGINT_ZERO, getNetworkSpecificConstant } from "../sdk/util/constants";
 import {
   Deposit, Withdraw
-} from "../../generated/Vault/Vault"
+} from "../../generated/Vault/Vault";
+import { Swap, SwapRequest} from "../../generated/Minter/Minter";
 
 class Pricer implements TokenPricer {
   getTokenPrice(token: Token): BigDecimal {
@@ -172,12 +173,13 @@ export function handleLockIn(event: Deposit): void {
 
 // Withdraw from the Original Token Vault
 export function handleOTVWithdraw(event: Withdraw): void {
-  
-  const poolId = event.address.concat(event.params.token)
+
+  const tokenAddress = Address.fromBytes(event.params.token)
+  const poolId = event.address.concat(tokenAddress);
   const networkConstants = getNetworkSpecificConstant(dataSource.network());
   const srcPoolId = networkConstants.getpeggedTokenBridgeForChain(event.params.fromChain);
   _handleTransferIn(
-    event.params.token,
+    tokenAddress,
     event.params.fromAddr,
     event.params.toAddr,
     event.params.uints[0],
@@ -190,8 +192,48 @@ export function handleOTVWithdraw(event: Withdraw): void {
   );
 }
 
+// Mint on Pegged Token Minter
+export function handleMint(event: Swap): void {
+  const poolId = event.address.concat(event.params.tokenAddress);
+  const networkConstants = getNetworkSpecificConstant(event.params.fromChain);
+  const srcPoolId = networkConstants.getOriginalTokenVaultAddress();
+  _handleTransferIn(
+    event.params.tokenAddress,
+    event.params.fromAddr,
+    event.params.toAddr,
+    event.params.uints[0],
+    event.params.fromChain,
+    poolId,
+    BridgePoolType.BURN_MINT,
+    CrosschainTokenType.WRAPPED,
+    event,
+    srcPoolId,
+  );
+}
+
+// Burn on Pegged Token Minter
+export function handleBurn(event: SwapRequest): void {
+  const poolId = event.address.concat(event.params.tokenAddress);
+  const networkConstants = getNetworkSpecificConstant(event.params.toChain);
+  const dstPoolId = networkConstants.getOriginalTokenVaultAddress();
+  _handleTransferOut(
+    event.params.tokenAddress,
+    event.params.fromAddr,
+    event.params.toAddr,
+    event.params.amount,
+    event.params.toChain,
+    poolId,
+    BridgePoolType.BURN_MINT,
+    CrosschainTokenType.WRAPPED,
+    event,
+    event.params.depositId,
+    dstPoolId,
+  );
+}
+
+
 function _handleTransferIn(
-  token: Bytes,
+  token: Address,
   sender: Bytes,
   receiver: Bytes,
   amount: BigInt,

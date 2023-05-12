@@ -6830,6 +6830,72 @@
             "query-id": "orbit-ethereum"
           }
         }
+      },
+      "orbit-bsc": {
+        "network": "bsc",
+        "status": "prod",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "orbit.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "orbit-bsc",
+            "query-id": "orbit-bsc"
+          }
+        }
+      },
+      "orbit-celo": {
+        "network": "celo",
+        "status": "prod",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "orbit.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "orbit-celo",
+            "query-id": "orbit-celo"
+          }
+        }
+      },
+      "orbit-polygon": {
+        "network": "polygon",
+        "status": "prod",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "orbit.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "orbit-polygon",
+            "query-id": "orbit-polygon"
+          }
+        }
       }
     }
   },

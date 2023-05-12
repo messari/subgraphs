@@ -245,7 +245,7 @@ export class NetworkSpecificConstant {
     public readonly peggedTokenBridge: TypedMap<string, Address>,
   ){}
 
-  getOriginalTokenVaultAddress(poolName: PoolName): Address {
+  getOriginalTokenVaultAddress(): Address {
     return this.originalTokenVault;
   }
 
@@ -259,109 +259,260 @@ export function getNetworkSpecificConstant(
   network: Network
 ): NetworkSpecificConstant {
   if (equalsIgnoreCase(network, Network.MAINNET)) {
-    const ethToChainMapping = new TypedMap<string, Address>()
-    ethToChainMapping.set(
+    const toChainMapping = new TypedMap<string, Address>()
+    toChainMapping.set(
       "KLAYTN",
       Address.fromString("0x60070F5D2e1C1001400A04F152E7ABD43410F7B9")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "AVAX",
       Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "BSC",
       Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "CELO",
       Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "FANTOM",
       Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "HARMONY",
       Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "HECO",
       Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "MATIC",
       Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "MOONRIVER",
       Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "XDAI",
       Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "ORBIT",
       Address.fromString("0x1b57Ce997Ca6a009ce54bB2d37DEbEBadFDbBb06")
     );
     return new NetworkSpecificConstant(
       network,
       Address.fromString("0x1bf68a9d1eaee7826b3593c20a0ca93293cb489a"),
-      ethToChainMapping
+      toChainMapping
     );
   }
-  // TO DO: WRITE THE OTHER CONTRACTS
   else if (equalsIgnoreCase(network, Network.BSC)) {
-    const ethToChainMapping = new TypedMap<string, Address>()
-    ethToChainMapping.set(
+    const toChainMapping = new TypedMap<string, Address>()
+    toChainMapping.set(
       "KLAYTN",
-      Address.fromString("0x60070F5D2e1C1001400A04F152E7ABD43410F7B9")
+      Address.fromString("0xB0a83941058b109Bd0543fa26d22eFb8a2D0f431")
     );
-    ethToChainMapping.set(
-      "AVAX",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
-    );
-    ethToChainMapping.set(
-      "BSC",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
-    );
-    ethToChainMapping.set(
-      "CELO",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
-    );
-    ethToChainMapping.set(
-      "FANTOM",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
-    );
-    ethToChainMapping.set(
-      "HARMONY",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
-    );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "HECO",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0xf2C5a817cc8FFaAB4122f2cE27AB8486DFeAb09F")
     );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "MATIC",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
+      Address.fromString("0x89c527764f03BCb7dC469707B23b79C1D7Beb780")
     );
-    ethToChainMapping.set(
-      "MOONRIVER",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
-    );
-    ethToChainMapping.set(
-      "XDAI",
-      Address.fromString("0x6BD8E3beEC87176BA9c705c9507Aa5e6F0E6706f")
-    );
-    ethToChainMapping.set(
+    toChainMapping.set(
       "ORBIT",
-      Address.fromString("0x1b57Ce997Ca6a009ce54bB2d37DEbEBadFDbBb06")
+      Address.fromString("0xd4EC00c84f01361F36D907E061EA652eE50572AF")
     );
     return new NetworkSpecificConstant(
       network,
-      Address.fromString("0x1bf68a9d1eaee7826b3593c20a0ca93293cb489a"),
-      ethToChainMapping
+      Address.fromString("0x89c527764f03BCb7dC469707B23b79C1D7Beb780"),
+      toChainMapping
     )
+  }
+  else if (equalsIgnoreCase(network, Network.CELO)) {
+    const toChainMapping = new TypedMap<string, Address>()
+    toChainMapping.set(
+      "KLAYTN",
+      Address.fromString("0x979cD0826C2bf62703Ef62221a4feA1f23da3777")
+    );
+    toChainMapping.set(
+      "ORBIT",
+      Address.fromString("0x979cD0826C2bf62703Ef62221a4feA1f23da3777")
+    );
+    return new NetworkSpecificConstant(
+      network,
+      Address.fromString("0x979cD0826C2bf62703Ef62221a4feA1f23da3777"),
+      toChainMapping
+    )
+  }
+  else if (equalsIgnoreCase(network, Network.HECO)) {
+    const toChainMapping = new TypedMap<string, Address>()
+    toChainMapping.set(
+      "KLAYTN",
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+    );
+    toChainMapping.set(
+      "AVAX",
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+    );
+    toChainMapping.set(
+      "BSC",
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+    );
+    toChainMapping.set(
+      "CELO",
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+    );
+    toChainMapping.set(
+      "FANTOM",
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+    );
+    toChainMapping.set(
+      "HARMONY",
+      Address.fromString("0x7112999b437404B430acf80667E94D8E62b9e44E")
+    );
+    toChainMapping.set(
+      "MATIC",
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+    );
+    toChainMapping.set(
+      "MOONRIVER",
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+    );
+    toChainMapping.set(
+      "OEC",
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+    );
+    toChainMapping.set(
+      "XDAI",
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+    );
+    toChainMapping.set(
+      "ORBIT",
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F")
+    );
+    return new NetworkSpecificConstant(
+      network,
+      Address.fromString("0x38C92A7C2B358e2F2b91723e5c4Fc7aa8b4d279F"),
+      toChainMapping
+    );
+  }
+  else if (equalsIgnoreCase(network, Network.KLAYTN)) {
+    const toChainMapping = new TypedMap<string, Address>()
+    toChainMapping.set(
+      "AVAX",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    toChainMapping.set(
+      "BSC",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    toChainMapping.set(
+      "CELO",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    toChainMapping.set(
+      "ETH",
+      Address.fromString("0x012c6d79b189e1aBD1EFaC759b275c5D49Abd164")
+    );
+    toChainMapping.set(
+      "FANTOM",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    toChainMapping.set(
+      "HARMONY",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    toChainMapping.set(
+      "HECO",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    toChainMapping.set(
+      "MATIC",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    toChainMapping.set(
+      "MOONRIVER",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    toChainMapping.set(
+      "OEC",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    toChainMapping.set(
+      "XDAI",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    toChainMapping.set(
+      "ORBIT",
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d")
+    );
+    return new NetworkSpecificConstant(
+      network,
+      Address.fromString("0x9abc3f6c11dbd83234d6e6b2c373dfc1893f648d"),
+      toChainMapping
+    );
+  }
+  else if (equalsIgnoreCase(network, Network.MATIC)) {
+    const toChainMapping = new TypedMap<string, Address>()
+    toChainMapping.set(
+      "AVAX",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "BSC",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "CELO",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "ETH",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "FANTOM",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "HARMONY",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "HECO",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "KLAYTN",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "MOONRIVER",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "OEC",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "XDAI",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    toChainMapping.set(
+      "ORBIT",
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5")
+    );
+    return new NetworkSpecificConstant(
+      network,
+      Address.fromString("0x506DC4c6408813948470a06ef6e4a1DaF228dbd5"),
+      toChainMapping
+    );
   }
   log.error("[getNetworkSpecificConstant] Unsupported network: {}", [network]);
   return new NetworkSpecificConstant(

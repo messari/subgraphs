@@ -4,8 +4,8 @@ import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_NAME = "Uniswap v2";
-export const PROTOCOL_SLUG = "uniswap-v2";
+export const PROTOCOL_NAME = "Orbit Bridge";
+export const PROTOCOL_SLUG = "Orbit Bridge";
 
 ////////////////////////
 ///// Schema Enums /////

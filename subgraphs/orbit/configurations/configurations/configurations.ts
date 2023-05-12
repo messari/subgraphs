@@ -1,11 +1,9 @@
 import { OrbitMainnetConfigurations } from "../../protocols/orbit/config/deployments/orbit-ethereum/configurations";
-// import { OrbitAvalancheConfigurations } from "../../protocols/orbit/config/deployments/orbit-avalanche/configurations";
-// import { OrbitBscConfigurations } from "../../protocols/orbit/config/deployments/orbit-bsc/configurations";
-// import { OrbitPolygonConfigurations } from "../../protocols/orbit/config/deployments/orbit-polygon/configurations";
-// import { OrbitArbitrumConfigurations } from "../../protocols/orbit/config/deployments/orbit-arbitrum/configurations";
-// import { OrbitOptimismConfigurations } from "../../protocols/orbit/config/deployments/orbit-optimism/configurations";
-// import { OrbitFantomConfigurations } from "../../protocols/orbit/config/deployments/orbit-fantom/configurations";
-// import { OrbitMetisConfigurations } from "../../protocols/orbit/config/deployments/orbit-metis/configurations";
+import { OrbitKlaytnConfigurations } from "../../protocols/orbit/config/deployments/orbit-klaytn/configurations";
+import { OrbitBscConfigurations } from "../../protocols/orbit/config/deployments/orbit-bsc/configurations";
+import { OrbitMaticConfigurations } from "../../protocols/orbit/config/deployments/orbit-polygon/configurations";
+import { OrbitCeloConfigurations } from "../../protocols/orbit/config/deployments/orbit-celo/configurations";
+import { OrbitHecoConfigurations } from "../../protocols/orbit/config/deployments/orbit-heco/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -15,27 +13,21 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     case Deploy.ORBIT_MAINNET: {
       return new OrbitMainnetConfigurations();
     }
-    // case Deploy.ORBIT_AVALANCHE: {
-    //   return new OrbitAvalancheConfigurations();
-    // }
-    // case Deploy.ORBIT_BSC: {
-    //   return new OrbitBscConfigurations();
-    // }
-    // case Deploy.ORBIT_POLYGON: {
-    //   return new OrbitPolygonConfigurations();
-    // }
-    // case Deploy.ORBIT_ARBITRUM: {
-    //   return new OrbitArbitrumConfigurations();
-    // }
-    // case Deploy.ORBIT_OPTIMISM: {
-    //   return new OrbitOptimismConfigurations();
-    // }
-    // case Deploy.ORBIT_FANTOM: {
-    //   return new OrbitFantomConfigurations();
-    // }
-    // case Deploy.ORBIT_METIS: {
-    //   return new OrbitMetisConfigurations();
-    // }
+    case Deploy.ORBIT_BSC: {
+      return new OrbitBscConfigurations();
+    }
+    case Deploy.ORBIT_POLYGON: {
+      return new OrbitMaticConfigurations();
+    }
+    case Deploy.ORBIT_KLAYTN: {
+      return new OrbitKlaytnConfigurations();
+    }
+    case Deploy.ORBIT_HECO: {
+      return new OrbitHecoConfigurations();
+    }
+    case Deploy.ORBIT_CELO: {
+      return new OrbitCeloConfigurations();
+    }
     default: {
       log.critical(
         "No configurations found for deployment protocol/network",
