@@ -1,6 +1,6 @@
 {
   "deployment": "ORBIT_POLYGON",
-  "network": "polygon",
+  "network": "matic",
   "file": "./src/mappings/handlers.ts",
   "vault": [
     {
