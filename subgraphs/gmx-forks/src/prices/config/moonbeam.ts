@@ -19,7 +19,7 @@ export const CURVE_REGISTRY_ADDRESSES = [
 ///////////////////////////////////////////////////////////////////////////
 export const UNISWAP_FORKS_ROUTER_ADDRESSES = [
   ContractInfo.set(
-    Address.fromString("0x96b244391D98B62D19aE89b1A4dCcf0fc56970C7"), // BeamSwap
+    Address.fromString("0x96b244391d98b62d19ae89b1a4dccf0fc56970c7"), // BeamSwap
     BigInt.fromI32(199158)
   ),
   ContractInfo.set(

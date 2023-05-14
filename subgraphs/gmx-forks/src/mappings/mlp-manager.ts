@@ -1,7 +1,7 @@
 import {
   AddLiquidity as AddLiquidityEvent,
   RemoveLiquidity as RemoveLiquidityEvent,
-} from "../../generated/MlpManager/MlpManager";
+} from "../../generated/templates/MlpManagerTemplate/MlpManager";
 import { transaction } from "../modules/transaction";
 import { TransactionType } from "../sdk/protocols/perpfutures/enums";
 

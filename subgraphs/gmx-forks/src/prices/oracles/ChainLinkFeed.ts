@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { ChainLinkContract } from "../../../generated/MlpManager/ChainLinkContract";
+import { ChainLinkContract } from "../../../generated/templates/MlpManagerTemplate/ChainLinkContract";
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,

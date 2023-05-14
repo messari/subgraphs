@@ -6,7 +6,7 @@ import * as utils from "../common/utils";
 import { Token } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { TokenPricer } from "../sdk/protocols/config";
-import { _ERC20 } from "../../generated/MlpManager/_ERC20";
+import { _ERC20 } from "../../generated/templates/MlpManagerTemplate/_ERC20";
 import { getUsdPricePerToken } from "../prices";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 

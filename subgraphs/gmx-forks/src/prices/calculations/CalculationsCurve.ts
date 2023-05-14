@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/MlpManager/CalculationsCurve";
+import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/templates/MlpManagerTemplate/CalculationsCurve";
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,

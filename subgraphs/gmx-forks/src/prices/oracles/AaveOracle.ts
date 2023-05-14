@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { AaveOracleContract } from "../../../generated/MlpManager/AaveOracleContract";
+import { AaveOracleContract } from "../../../generated/templates/MlpManagerTemplate/AaveOracleContract";
 
 export function getTokenPriceUSDC(
   tokenAddr: Address,

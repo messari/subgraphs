@@ -123,11 +123,12 @@ export function handleSwap(event: SwapEvent): void {
 
 export function handleUpdateFundingRate(event: UpdateFundingRateEvent): void {
   const tokenAddress = event.params.token;
-  const fundingrate = event.params.fundingRate;
+  // const fundingrate = event.params.fundingRate;
   const sdk = initializeSDK(event);
   // const pool = getOrCreatePool(sdk);
 
-  // const token = sdk.Tokens.getOrCreateToken(tokenAddress);
+  // const token =
+  sdk.Tokens.getOrCreateToken(tokenAddress);
 
   // const inputTokens = pool.getInputTokens();
   // const fundingTokenIndex = inputTokens.indexOf(token.id);

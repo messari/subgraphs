@@ -18,7 +18,7 @@ import * as ARBITRUM_ONE from "../config/arbitrum";
 
 import * as constants from "./constants";
 import { Configurations, ContractInfo } from "./types";
-import { _ERC20 } from "../../../generated/MlpManager/_ERC20";
+import { _ERC20 } from "../../../generated/templates/MlpManagerTemplate/_ERC20";
 
 export function isNullAddress(tokenAddr: Address): boolean {
   return tokenAddr.equals(constants.NULL.TYPE_ADDRESS) ? true : false;
