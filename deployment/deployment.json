@@ -8345,58 +8345,7 @@
       }
     }
   },
-  "mummy-finance": {
-    "schema": "derivatives-perpfutures",
-    "base": "mummy-finance",
-    "protocol": "mummy-finance",
-    "project": "mummy-finance",
-    "deployments": {
-      "mummy-finance-fantom": {
-        "network": "fantom",
-        "status": "dev",
-        "versions": {
-          "schema": "1.2.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "mummy-finance-fantom",
-            "query-id": "mummy-finance-fantom"
-          }
-        },
-        "files": {
-          "template": "mummy.finance.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": false
-        }
-      },
-      "mummy-finance-optimism": {
-        "network": "optimism",
-        "status": "dev",
-        "versions": {
-          "schema": "1.2.1",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "mummy-finance-optimism",
-            "query-id": "mummy-finance-optimism"
-          }
-        },
-        "files": {
-          "template": "mummy.finance.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": false
-        }
-      }
-    }
-  },
+
   "vela-exchange": {
     "schema": "derivatives-perpfutures",
     "base": "vela-exchange",
