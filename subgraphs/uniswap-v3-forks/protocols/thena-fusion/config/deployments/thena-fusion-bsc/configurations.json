@@ -1,0 +1,15 @@
+{
+    "network": "bsc",
+
+    "voterAddress": "0x3a1d0952809f4948d15ebce8d345962a282c4fcb",
+    "voterAddressStartBlock": 27114632,
+
+    "nonFungiblePositionManagerAddress": "0xa51ADb08Cbe6Ae398046A23bec013979816B77Ab",
+    "nonFungiblePositionManagerAddressStartBlock": 26030325,
+    
+    "deployment": "THENA_FUSION_BSC",
+
+    "graftEnabled": false,
+    "subgraphId": "",
+    "graftStartBlock": ""
+}

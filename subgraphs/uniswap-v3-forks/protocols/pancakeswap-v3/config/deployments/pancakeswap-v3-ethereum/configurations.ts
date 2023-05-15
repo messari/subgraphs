@@ -1,10 +1,10 @@
 import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { Factory } from "../../../../../generated/Factory/Factory";
+import { Factory } from "../../../../../generated/templates/Pool/Factory";
 import {
-  BIGDECIMAL_TEN_THOUSAND,
-  FeeSwitch,
   Network,
+  FeeSwitch,
   RewardIntervalType,
+  BIGDECIMAL_TEN_THOUSAND,
 } from "../../../../../src/common/constants";
 import { Configurations } from "../../../../../configurations/configurations/interface";
 import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/common/constants";

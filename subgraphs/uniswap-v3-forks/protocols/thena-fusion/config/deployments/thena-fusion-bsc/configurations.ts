@@ -1,23 +1,16 @@
 import {
-  Address,
-  BigDecimal,
-  BigInt,
-  Bytes,
-  log,
-} from "@graphprotocol/graph-ts";
-import { Factory } from "../../../../../generated/templates/Pool/Factory";
-import {
-  BIGDECIMAL_ONE,
-  BIGDECIMAL_ZERO,
-  FeeSwitch,
   Network,
+  FeeSwitch,
   RewardIntervalType,
+  BIGDECIMAL_TEN_THOUSAND,
 } from "../../../../../src/common/constants";
-import { Configurations } from "../../../../../configurations/configurations/interface";
-import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/common/constants";
+import { Factory } from "../../../../../generated/templates/Pool/Factory";
 import { stringToBytesList } from "../../../../../src/common/utils/utils";
+import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { PROTOCOL_NAME, PROTOCOL_SLUG } from "../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
 
-export class UniswapV3BSCConfigurations implements Configurations {
+export class ThenaFusionBSCConfigurations implements Configurations {
   getNetwork(): string {
     return Network.BSC;
   }
@@ -28,28 +21,32 @@ export class UniswapV3BSCConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): Bytes {
-    return Bytes.fromHexString("0xdb1d10011ad0ff90774d0c6bb92e5c5c8b4461f7");
+    return Bytes.fromHexString("0x306f06c147f064a010530292a1eb6737c3e378e4");
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0xdb1d10011ad0ff90774d0c6bb92e5c5c8b4461f7")
+      Address.fromString("0x306f06c147f064a010530292a1eb6737c3e378e4")
     );
   }
   getProtocolFeeOnOff(): string {
-    return FeeSwitch.OFF;
+    return FeeSwitch.ON;
   }
   getInitialProtocolFeeProportion(fee: i64): BigDecimal {
-    log.warning("getProtocolFeeRatio is not implemented: {}", [fee.toString()]);
-    return BIGDECIMAL_ZERO;
+    if (fee == 100) {
+      return BigDecimal.fromString("0.33");
+    } else if (fee == 500) {
+      return BigDecimal.fromString("0.34");
+    }
+    return BigDecimal.fromString("0.32");
   }
   getProtocolFeeProportion(protocolFee: BigInt): BigDecimal {
-    return BIGDECIMAL_ONE.div(protocolFee.toBigDecimal());
+    return protocolFee.toBigDecimal().div(BIGDECIMAL_TEN_THOUSAND);
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): Bytes {
-    return Bytes.fromHexString("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"); // wbnb
+    return Bytes.fromHexString("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"); // wBNB
   }
   getRewardToken(): Bytes {
     return Bytes.fromHexString("");
@@ -75,9 +72,8 @@ export class UniswapV3BSCConfigurations implements Configurations {
   }
   getStableOraclePools(): Bytes[] {
     return stringToBytesList([
-      "0x32776ed4d96ed069a2d812773f0ad8ad9ef83cf8", // wBNB/BUSD - 0.30
-      "0x6fe9e9de56356f7edbfcbb29fab7cd69471a4869", // wBNB/USDT - 0.05
-      "0x7862d9b4be2156b15d54f41ee4ede2d5b0b455e4", // wBNB/USDT - 0.30
+      "0x36696169c63e42cd08ce11f5deebbcebae652050", // wBNB/Tether - 0.05
+      "0x81a9b5f18179ce2bf8f001b8a634db80771f1824", // wBNB/USDC - 0.05
     ]);
   }
   getUntrackedPairs(): Bytes[] {

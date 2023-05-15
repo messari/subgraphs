@@ -1,0 +1,133 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+features:
+  - grafting
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum/contract
+    name: Voter
+    network: {{network}}
+    source:
+      address: "{{voterAddress}}"
+      abi: Voter
+      startBlock: {{voterAddressStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./protocols/thena-fusion/src/core.ts
+      entities:
+        - Token
+        - DexAmmProtocol
+        - LiquidityPool
+        - Protocol
+        - _PricesUSD
+        - _TokenTracker
+        - _LiquidityPoolAmount
+      abis:
+        - name: Pool
+          file: ./abis/thena-fusion/Pool.json
+        - name: Voter
+          file: ./abis/thena-fusion/Voter.json
+        - name: AlgebraPool
+          file: ./abis/thena-fusion/AlgebraPool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: GaugeCreated(indexed address,address,address,indexed address,indexed address)
+          handler: handleGaugeCreated
+
+  - kind: ethereum/contract
+    name: NonFungiblePositionManager
+    network: {{network}}
+    source:
+      address: "{{nonFungiblePositionManagerAddress}}"
+      abi: NonFungiblePositionManager
+      startBlock: {{nonFungiblePositionManagerAddressStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/positionManager.ts
+      entities:
+        - Position
+      abis:
+        - name: Pool
+          file: ./abis/thena-fusion/Pool.json
+        - name: Factory
+          file: ./abis/thena-fusion/Factory.json
+        - name: AlgebraPool
+          file: ./abis/thena-fusion/AlgebraPool.json
+        - name: NonFungiblePositionManager
+          file: ./abis/thena-fusion/NonFungiblePositionManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: IncreaseLiquidity(indexed uint256,uint128,uint128,uint256,uint256,address)
+          handler: handleIncreaseLiquidity
+        - event: DecreaseLiquidity(indexed uint256,uint128,uint256,uint256)
+          handler: handleDecreaseLiquidity
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+
+templates:
+  - kind: ethereum/contract
+    name: Pool
+    network: {{network}}
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/core.ts
+      entities:
+        - LiqudityPool
+        - Token
+        - Deposit
+        - Withdraw
+        - Swap
+        - LiquidityPool
+        - DexAmmProtocol
+        - Token
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - PoolDailySnapshot
+        - _PricesUSD
+        - _Account
+        - _DailyActiveAccount
+        - _TokenTracker
+        - _LiquidityPoolAmount
+      abis:
+        - name: Pool
+          file: ./abis/thena-fusion/Pool.json
+        - name: Factory
+          file: ./abis/thena-fusion/Factory.json
+        - name: AlgebraPool
+          file: ./abis/thena-fusion/AlgebraPool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        # - event: SetFeeProtocol(uint32,uint32,uint32,uint32)
+        #   handler: handleSetFeeProtocol
+        - event: Initialize(uint160,int24)
+          handler: handleInitialize
+        - event: Collect(indexed address,address,indexed int24,indexed int24,uint128,uint128)
+          handler: handleCollectPool
+        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
+          handler: handleSwap
+        - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleBurn 

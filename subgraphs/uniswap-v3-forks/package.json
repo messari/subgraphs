@@ -2,7 +2,7 @@
   "name": "uniswap-v3-alt",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "graph codegen",
+    "codegen": "rm -rf generated && graph codegen",
     "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts"
   },
   "dependencies": {
