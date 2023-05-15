@@ -58,4 +58,5 @@ export const BLACKLISTED_TOKENS: Address[] = [
   Address.fromString("0x37c9be6c81990398e9b87494484afc6a4608c25d"), // Curve.fi Factory Plain Pool: blizz
   Address.fromString("0xf72beacc6fd334e14a7ddac25c3ce1eb8a827e10"), // Curve.fi Factory USD Metapool: Defrost H2O
   Address.fromString("0xae6aab43c4f3e0cea4ab83752c278f8debaba689"), // dForce
+  Address.fromString("0x10010078a54396f62c96df8532dc2b4847d47ed3"), // Hundred Finance
 ];
