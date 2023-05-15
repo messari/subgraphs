@@ -17,6 +17,7 @@ export function handleTokenBurned(event: TokenBurned): void {
   if (!token) {
     return;
   }
+  // eslint-disable-next-line rulesdir/no-string-literals
   store.remove("TranchedPoolToken", event.params.tokenId.toString());
 }
 
@@ -82,7 +83,14 @@ function isUserFullyWithdrawnFromPool(
   tranchedPool: TranchedPool
 ): boolean {
   for (let i = 0; i < user.tranchedPoolTokens.length; i++) {
-    const token = assert(TranchedPoolToken.load(user.tranchedPoolTokens[i]));
+    const token = TranchedPoolToken.load(user.tranchedPoolTokens[i]);
+    if (!token) {
+      log.error(
+        "[isUserFullyWithdrawnFromPool] Tranched pool token not found for id: {}",
+        [user.tranchedPoolTokens[i]]
+      );
+      continue;
+    }
     if (
       token.tranchedPool == tranchedPool.id &&
       !token.principalAmount.isZero()
@@ -108,10 +116,15 @@ export function handleTokenPrincipalWithdrawn(
   );
   token.save();
   if (token.principalAmount.isZero()) {
-    const tranchedPool = assert(
-      TranchedPool.load(event.params.pool.toHexString())
-    );
-    const user = assert(User.load(event.params.owner.toHexString()));
+    const tranchedPool = TranchedPool.load(event.params.pool.toHexString());
+    if (!tranchedPool) {
+      log.error(
+        "[handleTokenPrincipalWithdrawn] tranchedPool not found for id: {}",
+        [event.params.pool.toHexString()]
+      );
+      return;
+    }
+    const user = getOrInitUser(event.params.owner);
     if (isUserFullyWithdrawnFromPool(user, tranchedPool)) {
       tranchedPool.backers = removeFromList(tranchedPool.backers, user.id);
       tranchedPool.numBackers = tranchedPool.backers.length;

@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-string-literals */
 import { store, ethereum, log, BigInt, Address } from "@graphprotocol/graph-ts";
 
 import {
@@ -54,9 +55,16 @@ export function handleCapitalErc721Deposit(event: CapitalERC721Deposit): void {
     vaultedPoolToken.usdcEquivalent = event.params.usdcEquivalent;
     vaultedPoolToken.vaultedAt = event.block.timestamp.toI32();
     vaultedPoolToken.poolToken = event.params.assetTokenId.toString();
-    const poolToken = assert(
-      TranchedPoolToken.load(event.params.assetTokenId.toString())
+    const poolToken = TranchedPoolToken.load(
+      event.params.assetTokenId.toString()
     );
+    if (!poolToken) {
+      log.error(
+        "[handleCapitalErc721Deposit] TranchedPoolToken not found for id {}",
+        [event.params.assetTokenId.toString()]
+      );
+      return;
+    }
     vaultedPoolToken.tranchedPool = poolToken.tranchedPool;
     vaultedPoolToken.save();
 

@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-string-literals */
 import { BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import { SeniorPoolStakedPosition } from "../../generated/schema";
 import {
@@ -118,9 +119,15 @@ export function handleStaked1(event: Staked1): void {
 export function handleUnstaked(event: Unstaked): void {
   updateCurrentEarnRate(event.address);
 
-  const stakedPosition = assert(
-    SeniorPoolStakedPosition.load(event.params.tokenId.toString())
+  const stakedPosition = SeniorPoolStakedPosition.load(
+    event.params.tokenId.toString()
   );
+  if (!stakedPosition) {
+    log.error("[handleUnstaked] No staked position found for tokenId: {}", [
+      event.params.tokenId.toString(),
+    ]);
+    return;
+  }
   stakedPosition.amount = stakedPosition.amount.minus(event.params.amount);
 
   stakedPosition.save();
@@ -146,9 +153,15 @@ export function handleUnstaked(event: Unstaked): void {
 export function handleUnstaked1(event: Unstaked1): void {
   updateCurrentEarnRate(event.address);
 
-  const stakedPosition = assert(
-    SeniorPoolStakedPosition.load(event.params.tokenId.toString())
+  const stakedPosition = SeniorPoolStakedPosition.load(
+    event.params.tokenId.toString()
   );
+  if (!stakedPosition) {
+    log.error("[handleUnstaked1] No staked position found for tokenId: {}", [
+      event.params.tokenId.toString(),
+    ]);
+    return;
+  }
   stakedPosition.amount = stakedPosition.amount.minus(event.params.amount);
 
   stakedPosition.save();
@@ -176,9 +189,15 @@ export function handleTransfer(event: Transfer): void {
       Bytes.fromHexString("0x0000000000000000000000000000000000000000")
     )
   ) {
-    const stakedPosition = assert(
-      SeniorPoolStakedPosition.load(event.params.tokenId.toString())
+    const stakedPosition = SeniorPoolStakedPosition.load(
+      event.params.tokenId.toString()
     );
+    if (!stakedPosition) {
+      log.error("[handleTransfer] No staked position found for tokenId: {}", [
+        event.params.tokenId.toString(),
+      ]);
+      return;
+    }
     stakedPosition.user = getOrInitUser(event.params.to).id;
     stakedPosition.save();
   }
@@ -264,9 +283,15 @@ export function handleUnstakedAndWithdrewMultiple(
 }
 
 export function handleRewardPaid(event: RewardPaid): void {
-  const position = assert(
-    SeniorPoolStakedPosition.load(event.params.tokenId.toString())
+  const position = SeniorPoolStakedPosition.load(
+    event.params.tokenId.toString()
   );
+  if (!position) {
+    log.error("[handleRewardPaid] No staked position found for tokenId: {}", [
+      event.params.tokenId.toString(),
+    ]);
+    return;
+  }
   position.totalRewardsClaimed = position.totalRewardsClaimed.plus(
     event.params.reward
   );

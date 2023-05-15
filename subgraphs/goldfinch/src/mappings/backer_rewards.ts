@@ -1,4 +1,5 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+/* eslint-disable rulesdir/no-string-literals */
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import { TranchedPoolToken } from "../../generated/schema";
 import {
   BackerRewardsSetTotalRewards,
@@ -37,9 +38,14 @@ export function handleSetMaxInterestDollarsEligible(
 }
 
 export function handleBackerRewardsClaimed(event: BackerRewardsClaimed): void {
-  const poolToken = assert(
-    TranchedPoolToken.load(event.params.tokenId.toString())
-  );
+  const poolToken = TranchedPoolToken.load(event.params.tokenId.toString());
+  if (!poolToken) {
+    log.error(
+      "[handleBackerRewardsClaimed] No tranched pool token found for tokenId: {}",
+      [event.params.tokenId.toString()]
+    );
+    return;
+  }
   poolToken.rewardsClaimed = event.params.amount;
   poolToken.rewardsClaimable = BigInt.zero();
   poolToken.save();
@@ -58,9 +64,14 @@ export function handleBackerRewardsClaimed(event: BackerRewardsClaimed): void {
 export function handleBackerRewardsClaimed1(
   event: BackerRewardsClaimed1
 ): void {
-  const poolToken = assert(
-    TranchedPoolToken.load(event.params.tokenId.toString())
-  );
+  const poolToken = TranchedPoolToken.load(event.params.tokenId.toString());
+  if (!poolToken) {
+    log.error(
+      "[handleBackerRewardsClaimed1] No tranched pool token found for tokenId: {}",
+      [event.params.tokenId.toString()]
+    );
+    return;
+  }
   poolToken.rewardsClaimed = event.params.amountOfTranchedPoolRewards;
   poolToken.stakingRewardsClaimed = event.params.amountOfSeniorPoolRewards;
   poolToken.rewardsClaimable = BigInt.zero();

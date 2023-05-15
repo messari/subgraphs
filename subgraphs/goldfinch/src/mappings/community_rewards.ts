@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-string-literals */
 import { CommunityRewardsToken } from "../../generated/schema";
 import {
   CommunityRewards as CommunityRewardsContract,
@@ -5,7 +6,7 @@ import {
   RewardPaid,
   GrantRevoked,
 } from "../../generated/CommunityRewards/CommunityRewards";
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import { createTransactionFromEvent } from "../entities/helpers";
 
 // Seems redundant, but this handler gets used to add the startTime/endTime info on tokens
@@ -35,9 +36,16 @@ export function handleGranted(event: Granted): void {
 }
 
 export function handleRewardPaid(event: RewardPaid): void {
-  const communityRewardsToken = assert(
-    CommunityRewardsToken.load(event.params.tokenId.toString())
+  const communityRewardsToken = CommunityRewardsToken.load(
+    event.params.tokenId.toString()
   );
+  if (!communityRewardsToken) {
+    log.error(
+      "[handleRewardPaid] No community rewards token found for tokenId: {}",
+      [event.params.tokenId.toString()]
+    );
+    return;
+  }
   communityRewardsToken.totalClaimed = communityRewardsToken.totalClaimed.plus(
     event.params.reward
   );
@@ -54,9 +62,16 @@ export function handleRewardPaid(event: RewardPaid): void {
 }
 
 export function handleGrantRevoked(event: GrantRevoked): void {
-  const communityRewardsToken = assert(
-    CommunityRewardsToken.load(event.params.tokenId.toString())
+  const communityRewardsToken = CommunityRewardsToken.load(
+    event.params.tokenId.toString()
   );
+  if (!communityRewardsToken) {
+    log.error(
+      "[handleGrantRevoked] No community rewards token found for tokenId: {}",
+      [event.params.tokenId.toString()]
+    );
+    return;
+  }
   communityRewardsToken.revokedAt = event.block.timestamp;
   communityRewardsToken.save();
 }

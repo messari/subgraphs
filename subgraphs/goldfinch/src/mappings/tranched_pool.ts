@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-string-literals */
 import { TranchedPool } from "../../generated/schema";
 import { GoldfinchConfig as GoldfinchConfigContract } from "../../generated/templates/TranchedPool/GoldfinchConfig";
 import { CreditLine as CreditLineContract } from "../../generated/templates/TranchedPool/CreditLine";
@@ -345,7 +346,13 @@ export function handleTrancheLocked(event: TrancheLocked): void {
   const goldfinchConfigContract = GoldfinchConfigContract.bind(
     tranchedPoolContract.config()
   );
-  const tranchedPool = assert(TranchedPool.load(event.address.toHexString()));
+  const tranchedPool = TranchedPool.load(event.address.toHexString());
+  if (!tranchedPool) {
+    log.error("[handleTrancheLocked] tranchedPool not found {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
   tranchedPool.estimatedLeverageRatio = getLeverageRatioFromConfig(
     goldfinchConfigContract
   );
@@ -378,7 +385,7 @@ export function handleDrawdownMade(event: DrawdownMade): void {
 
   if (!market._interestTimestamp) {
     market._interestTimestamp = event.block.timestamp;
-    log.debug(
+    log.info(
       "[handleDrawdownMade]market._interestTimestamp for market {} set to {}",
       [marketID, event.block.timestamp.toString()]
     );
@@ -433,7 +440,11 @@ export function handleDrawdownMade(event: DrawdownMade): void {
   );
 
   //
-  const tranchedPool = assert(TranchedPool.load(marketID));
+  const tranchedPool = TranchedPool.load(marketID);
+  if (!tranchedPool) {
+    log.error("[handleDrawdownMade] tranchedPool not found {}", [marketID]);
+    return;
+  }
   getOrInitUser(event.params.borrower); // ensures that a wallet making a drawdown is correctly considered a user
   initOrUpdateTranchedPool(event.address, event.block.timestamp);
   updatePoolCreditLine(event.address, event.block.timestamp);
@@ -567,7 +578,13 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   initOrUpdateTranchedPool(event.address, event.block.timestamp);
   updatePoolCreditLine(event.address, event.block.timestamp);
 
-  const tranchedPool = assert(TranchedPool.load(event.address.toHexString()));
+  const tranchedPool = TranchedPool.load(event.address.toHexString());
+  if (!tranchedPool) {
+    log.error("[handlePaymentApplied] tranchedPool not found {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
   tranchedPool.principalAmountRepaid = tranchedPool.principalAmountRepaid.plus(
     event.params.principalAmount
   );

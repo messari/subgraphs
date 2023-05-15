@@ -1,4 +1,5 @@
-import { store } from "@graphprotocol/graph-ts";
+/* eslint-disable rulesdir/no-string-literals */
+import { log, store } from "@graphprotocol/graph-ts";
 import {
   GFIDeposit,
   GFIWithdrawal,
@@ -27,9 +28,13 @@ export function handleGfiWithdrawal(event: GFIWithdrawal): void {
   if (event.params.remainingAmount.isZero()) {
     store.remove("VaultedGfi", event.params.positionId.toString());
   } else {
-    const vaultedGfi = assert(
-      VaultedGfi.load(event.params.positionId.toString())
-    );
+    const vaultedGfi = VaultedGfi.load(event.params.positionId.toString());
+    if (!vaultedGfi) {
+      log.error("[handleGfiWithdrawal] VaultedGfi not found for id {}", [
+        event.params.positionId.toString(),
+      ]);
+      return;
+    }
     vaultedGfi.amount = event.params.remainingAmount;
     vaultedGfi.save();
   }

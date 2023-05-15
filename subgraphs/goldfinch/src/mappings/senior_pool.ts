@@ -1,3 +1,4 @@
+/* eslint-disable rulesdir/no-string-literals */
 import { Address, log } from "@graphprotocol/graph-ts";
 import {
   SeniorPool as SeniorPoolContract,
@@ -129,12 +130,12 @@ export function handleDepositMade(event: DepositMade): void {
     ]
   );
 
-  assert(
-    protocol.totalValueLockedUSD.ge(BIGDECIMAL_ZERO),
-    `TVL ${
-      protocol.totalValueLockedUSD
-    } <= 0 after tx ${event.transaction.hash.toHexString()}`
-  );
+  if (protocol.totalValueLockedUSD.lt(BIGDECIMAL_ZERO)) {
+    log.error(
+      "[handleDepositMade] TVL in Protocol is negative at transaction {}",
+      [event.transaction.hash.toHexString()]
+    );
+  }
 
   snapshotMarket(market, amountUSD, event, TransactionType.DEPOSIT);
   snapshotFinancials(protocol, amountUSD, event, TransactionType.DEPOSIT);
@@ -202,12 +203,12 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
     market.inputTokenBalance.divDecimal(USDC_DECIMALS);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
-  assert(
-    market.totalValueLockedUSD.ge(BIGDECIMAL_ZERO),
-    `market ${market.id} TVL ${
-      market.totalValueLockedUSD
-    } < 0 after tx ${event.transaction.hash.toHexString()}`
-  );
+  if (market.totalValueLockedUSD.lt(BIGDECIMAL_ZERO)) {
+    log.error(
+      "[handleWithdrawalMade] TVL in Market {} is negative at transaction {}",
+      [market.id, event.transaction.hash.toHexString()]
+    );
+  }
 
   const fiduContract = FiduContract.bind(Address.fromString(FIDU_ADDRESS));
   const accountBalance = fiduContract.balanceOf(event.params.capitalProvider);
@@ -500,12 +501,13 @@ export function handlePrincipalWrittenDown(event: PrincipalWrittenDown): void {
   );
   market.save();
   outputToken.save();
-  assert(
-    market.totalValueLockedUSD.ge(BIGDECIMAL_ZERO),
-    `market ${market.id} TVL ${
-      market.totalValueLockedUSD
-    } < 0 after tx ${event.transaction.hash.toHexString()}`
-  );
+
+  if (market.totalValueLockedUSD.lt(BIGDECIMAL_ZERO)) {
+    log.error(
+      "[handlePrincipalWrittenDown] Market {} has a tvl that is negative at transaction {}",
+      [market.id, event.transaction.hash.toHexString()]
+    );
+  }
 
   const protocol = getOrCreateProtocol();
   protocol.totalDepositBalanceUSD =
